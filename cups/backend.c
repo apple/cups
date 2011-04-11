@@ -63,7 +63,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
   }
 
   return (_httpResolveURI(device_uri, cg->resolved_uri,
-                          sizeof(cg->resolved_uri), 1));
+                          sizeof(cg->resolved_uri), 1, NULL, NULL));
 }
 
 

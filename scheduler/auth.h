@@ -3,7 +3,7 @@
  *
  *   Authorization definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -138,9 +138,6 @@ extern int		cupsdCheckAuth(unsigned ip[4], char *name, int namelen,
 extern int		cupsdCheckGroup(const char *username,
 			                struct passwd *user,
 			                const char *groupname);
-#ifdef HAVE_GSSAPI
-extern krb5_ccache	cupsdCopyKrb5Creds(cupsd_client_t *con);
-#endif /* HAVE_GSSAPI */
 extern cupsd_location_t	*cupsdCopyLocation(cupsd_location_t *loc);
 extern void		cupsdDeleteAllLocations(void);
 extern cupsd_location_t	*cupsdFindBest(const char *path, http_state_t state);

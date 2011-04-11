@@ -94,6 +94,7 @@ cupsGetConflicts(
   cups_array_t		*active;	/* Active conflicts */
   _ppd_cups_uiconsts_t	*c;		/* Current constraints */
   _ppd_cups_uiconst_t	*cptr;		/* Current constraint */
+  ppd_choice_t		*marked;	/* Marked choice */
 
 
  /*
@@ -125,8 +126,16 @@ cupsGetConflicts(
          i > 0;
 	 i --, cptr ++)
       if (strcasecmp(cptr->option->keyword, option))
-        num_options = cupsAddOption(cptr->option->keyword, cptr->choice->choice,
-				    num_options, options);
+      {
+        if (cptr->choice)
+	  num_options = cupsAddOption(cptr->option->keyword,
+	                              cptr->choice->choice, num_options,
+				      options);
+        else if ((marked = ppdFindMarkedChoice(ppd,
+	                                       cptr->option->keyword)) != NULL)
+	  num_options = cupsAddOption(cptr->option->keyword, marked->choice,
+				      num_options, options);
+      }
   }
 
   cupsArrayDelete(active);

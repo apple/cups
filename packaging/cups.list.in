@@ -3,7 +3,7 @@
 #
 #   ESP Package Manager (EPM) file list for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2010 by Apple Inc.
+%copyright 2007-2011 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -309,6 +309,7 @@ l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
 f 0555 root sys $SERVERBIN/filter/rastertopclx driver/rastertopclx
+f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
 f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
 d 0755 root sys $SERVERBIN/notifier -
 f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto

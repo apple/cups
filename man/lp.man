@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: lp.man 7889 2008-08-29 22:03:35Z mike $"
 .\"
-.\"   lp man page for the Common UNIX Printing System (CUPS).
+.\"   lp man page for CUPS.
 .\"
-.\"   Copyright 2007-2010 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lp 1 "CUPS" "31 August 2010" "Apple Inc."
+.TH lp 1 "CUPS" "31 March 2011" "Apple Inc."
 .SH NAME
 lp - print files
 .SH SYNOPSIS
@@ -142,11 +142,10 @@ Submits jobs as \fIusername\fR.
 .TP 5
 -H resume
 .br
-Specifies when the job should be printed. A value of
-\fIimmediate\fR will print the file immediately, a value of
-\fIhold\fR will hold the job indefinitely, and a time value
-(HH:MM) will hold the job until the specified time. Use a value
-of \fIresume\fR with the \fI-i\fR option to resume a held job.
+Specifies when the job should be printed. A value of \fIimmediate\fR will print
+the file immediately, a value of \fIhold\fR will hold the job indefinitely, and
+a UTC time value (HH:MM) will hold the job until the specified UTC (not local)
+time. Use a value of \fIresume\fR with the \fI-i\fR option to resume a held job.
 Use a value of \fIrestart\fR with the \fI-i\fR option to restart
 a completed job.
 .TP 5
@@ -257,7 +256,7 @@ is highest priority).
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2010 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: lp.man 7889 2008-08-29 22:03:35Z mike $".
 .\"

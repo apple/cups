@@ -3,7 +3,7 @@
  *
  *   Private HTTP definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -80,15 +80,72 @@ typedef int socklen_t;
 #  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL
+#    include <openssl/err.h>
+#    include <openssl/rand.h>
+#    include <openssl/ssl.h>
+#  elif defined HAVE_GNUTLS
+#    include <gnutls/gnutls.h>
+#    include <gnutls/x509.h>
+#    include <gcrypt.h>
+#  elif defined(HAVE_CDSASSL)
+#    include <CoreFoundation/CoreFoundation.h>
+#    include <Security/Security.h>
+#    include <Security/SecureTransport.h>
+#    ifdef HAVE_SECITEM_H
+#      include <Security/SecItem.h>
+#    endif /* HAVE_SECITEM_H */
+#    ifdef HAVE_SECBASEPRIV_H
+#      include <Security/SecBasePriv.h>
+#    endif /* HAVE_SECBASEPRIV_H */
+#    ifdef HAVE_SECCERTIFICATE_H
+#      include <Security/SecCertificate.h>
+#      include <Security/SecIdentity.h>
+#    endif /* HAVE_SECCERTIFICATE_H */
+#    ifdef HAVE_SECITEMPRIV_H
+#      include <Security/SecItemPriv.h>
+#    endif /* HAVE_SECITEMPRIV_H */
+#    ifdef HAVE_SECIDENTITYSEARCHPRIV_H
+#      include <Security/SecIdentitySearchPriv.h>
+#    endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
+#    ifdef HAVE_SECPOLICYPRIV_H
+#      include <Security/SecPolicyPriv.h>
+#    endif /* HAVE_SECPOLICYPRIV_H */
+#  elif defined(HAVE_SSPISSL)
+#    include "sspi-private.h"
+#  endif /* HAVE_LIBSSL */
+
+#  ifndef WIN32
+#    include <net/if.h>
+#    ifdef HAVE_GETIFADDRS
+#      include <ifaddrs.h>
+#    else
+#      include <sys/ioctl.h>
+#      ifdef HAVE_SYS_SOCKIO_H
+#        include <sys/sockio.h>
+#      endif /* HAVE_SYS_SOCKIO_H */
+#    endif /* HAVE_GETIFADDRS */
+#  endif /* !WIN32 */
+
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
+ * Types and functions for SSL support...
+ */
+
+#  if defined HAVE_LIBSSL
 /*
  * The OpenSSL library provides its own SSL/TLS context structure for its
  * IO and protocol management.  However, we need to provide our own BIO
  * (basic IO) implementation to do timeouts...
  */
-
-#    include <openssl/err.h>
-#    include <openssl/rand.h>
-#    include <openssl/ssl.h>
 
 typedef SSL  *http_tls_t;
 typedef void *http_tls_credentials_t;
@@ -99,9 +156,6 @@ extern BIO_METHOD *_httpBIOMethods(void);
 /*
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
-#    include <gnutls/gnutls.h>
-#    include <gnutls/x509.h>
-#    include <gcrypt.h>
 
 typedef gnutls_session http_tls_t;
 typedef void *http_tls_credentials_t;
@@ -117,42 +171,24 @@ extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
  * for its IO and protocol management...
  */
 
-#    include <CoreFoundation/CoreFoundation.h>
-#    include <Security/Security.h>
-#    include <Security/SecureTransport.h>
-#    ifdef HAVE_SECITEM_H
-#      include <Security/SecItem.h>
-#    endif /* HAVE_SECITEM_H */
-#    ifdef HAVE_SECBASEPRIV_H
-#      include <Security/SecBasePriv.h>
-#    elif defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */
+#    if !defined(HAVE_SECBASEPRIV_H) && defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */
 extern const char *cssmErrorString(int error);
-#    endif /* HAVE_SECBASEPRIV_H */
-#    ifdef HAVE_SECCERTIFICATE_H
-#      include <Security/SecCertificate.h>
-#      include <Security/SecIdentity.h>
-#    endif /* HAVE_SECCERTIFICATE_H */
-#    ifdef HAVE_SECITEMPRIV_H
-#      include <Security/SecItemPriv.h>
-#    else /* Declare constants from that header... */
+#    endif /* !HAVE_SECBASEPRIV_H && HAVE_CSSMERRORSTRING */
+#    ifndef HAVE_SECITEMPRIV_H /* Declare constants from that header... */
 extern const CFTypeRef kSecClassCertificate;
 extern const CFTypeRef kSecClassIdentity;
-#    endif /* HAVE_SECITEMPRIV_H */
-#    ifdef HAVE_SECIDENTITYSEARCHPRIV_H
-#      include <Security/SecIdentitySearchPriv.h>
-#    elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
+#    endif /* !HAVE_SECITEMPRIV_H */
+#    if !defined(HAVE_SECIDENTITYSEARCHPRIV_H) && defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
 extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
 				CFStringRef idString, CSSM_KEYUSE keyUsage,
 				CFTypeRef keychainOrArray,
 				Boolean returnOnlyValidIdentities,
 				SecIdentitySearchRef* searchRef);
-#    endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
-#    ifdef HAVE_SECPOLICYPRIV_H
-#      include <Security/SecPolicyPriv.h>
-#    elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
+#    endif /* !HAVE_SECIDENTITYSEARCHPRIV_H && HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
+#    if !defined(HAVE_SECPOLICYPRIV_H) && defined(HAVE_SECPOLICYSETVALUE) /* Declare prototype for function in that header... */
 extern OSStatus SecPolicySetValue(SecPolicyRef policyRef,
                                   const CSSM_DATA *value);
-#    endif /* HAVE_SECPOLICYPRIV_H */
+#    endif /* !HAVE_SECPOLICYPRIV_H && HAVE_SECPOLICYSETVALUE */
 
 typedef SSLContextRef	http_tls_t;
 typedef CFArrayRef	http_tls_credentials_t;
@@ -163,11 +199,20 @@ extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
 		               size_t *dataLength);
 
 #  elif defined(HAVE_SSPISSL)
-#    include "sspi-private.h"
+/*
+ * Windows' SSPI library gets a CUPS wrapper...
+ */
+
 typedef _sspi_struct_t * http_tls_t;
 typedef void *http_tls_credentials_t;
+
 #  else
+/*
+ * Otherwise define stub types since we have no SSL support...
+ */
+
 typedef void *http_tls_t;
+typedef void *http_tls_credentials_t;
 #  endif /* HAVE_LIBSSL */
 
 
@@ -258,22 +303,13 @@ extern const char *hstrerror(int error);
  * Some OS's don't have getifaddrs() and freeifaddrs()...
  */
 
-#  ifndef WIN32
-#    include <net/if.h>
-#    ifdef HAVE_GETIFADDRS
-#      include <ifaddrs.h>
-#    else
-#      include <sys/ioctl.h>
-#      ifdef HAVE_SYS_SOCKIO_H
-#        include <sys/sockio.h>
-#      endif /* HAVE_SYS_SOCKIO_H */
-
-#      ifdef ifa_dstaddr
-#        undef ifa_dstaddr
-#      endif /* ifa_dstaddr */
-#      ifndef ifr_netmask
-#        define ifr_netmask ifr_addr
-#      endif /* !ifr_netmask */
+#  if !defined(WIN32) && !defined(HAVE_GETIFADDRS)
+#    ifdef ifa_dstaddr
+#      undef ifa_dstaddr
+#    endif /* ifa_dstaddr */
+#    ifndef ifr_netmask
+#      define ifr_netmask ifr_addr
+#    endif /* !ifr_netmask */
 
 struct ifaddrs				/**** Interface Structure ****/
 {
@@ -291,25 +327,28 @@ struct ifaddrs				/**** Interface Structure ****/
   void			*ifa_data;	/* Interface statistics */
 };
 
-#      ifndef ifa_broadaddr
-#        define ifa_broadaddr ifa_ifu.ifu_broadaddr
-#      endif /* !ifa_broadaddr */
-#      ifndef ifa_dstaddr
-#        define ifa_dstaddr ifa_ifu.ifu_dstaddr
-#      endif /* !ifa_dstaddr */
+#    ifndef ifa_broadaddr
+#      define ifa_broadaddr ifa_ifu.ifu_broadaddr
+#    endif /* !ifa_broadaddr */
+#    ifndef ifa_dstaddr
+#      define ifa_dstaddr ifa_ifu.ifu_dstaddr
+#    endif /* !ifa_dstaddr */
 
 extern int	_cups_getifaddrs(struct ifaddrs **addrs);
-#      define getifaddrs _cups_getifaddrs
+#    define getifaddrs _cups_getifaddrs
 extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
-#      define freeifaddrs _cups_freeifaddrs
-#    endif /* HAVE_GETIFADDRS */
-#  endif /* !WIN32 */
+#    define freeifaddrs _cups_freeifaddrs
+#  endif /* !WIN32 && !HAVE_GETIFADDRS */
+
 
 /*
  * Prototypes...
  */
 
 extern int		_httpAddrPort(http_addr_t *addr);
+extern char		*_httpAssembleUUID(const char *server, int port,
+					   const char *name, int number,
+					   char *buffer, size_t bufsize);
 extern http_tls_credentials_t
 			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,
@@ -324,12 +363,22 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
 extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size, int log);
+			                 size_t resolved_size, int log,
+					 int (*cb)(void *context),
+					 void *context);
 extern void		_httpSetTimeout(http_t *http, double timeout,
 			                _http_timeout_cb_t cb, void *user_data);
 extern int		_httpUpdate(http_t *http, http_status_t *status);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 
+
+/*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 

@@ -95,6 +95,16 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-state-message",
   "printer-state-reasons",
 };
+static const char * const remote_job_states[] =
+{					/* Remote job state keywords */
+  "cups-remote-pending",
+  "cups-remote-pending-held",
+  "cups-remote-processing",
+  "cups-remote-stopped",
+  "cups-remote-canceled",
+  "cups-remote-aborted",
+  "cups-remote-completed"
+};
 static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
@@ -511,6 +521,16 @@ main(int  argc,				/* I - Number of command-line args */
 
     password = getenv("AUTH_PASSWORD");
   }
+
+#ifdef HAVE_GSSAPI
+ /*
+  * For Kerberos, become the printing user (if we can) to get the credentials
+  * that way.
+  */
+
+  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
+    seteuid(atoi(value));
+#endif /* HAVE_GSSAPI */
 
  /*
   * Try finding the remote server...
@@ -1421,6 +1441,23 @@ main(int  argc,				/* I - Number of command-line args */
 	if ((job_state = ippFindAttribute(response, "job-state",
 	                                  IPP_TAG_ENUM)) != NULL)
 	{
+         /*
+	  * Reflect the remote job state in the local queue...
+	  */
+
+          fputs("STATE: -cups-remote-pending,"
+		"cups-remote-pending-held,"
+		"cups-remote-processing,"
+		"cups-remote-stopped,"
+		"cups-remote-canceled,"
+		"cups-remote-aborted,"
+		"cups-remote-completed\n", stderr);
+          if (job_state->values[0].integer >= IPP_JOB_PENDING &&
+	      job_state->values[0].integer <= IPP_JOB_COMPLETED)
+	    fprintf(stderr, "STATE: +%s\n",
+	            remote_job_states[job_state->values[0].integer -
+		                      IPP_JOB_PENDING]);
+
 	 /*
           * Stop polling if the job is finished or pending-held...
 	  */

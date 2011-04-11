@@ -3,7 +3,7 @@
  *
  *   Raster file definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -65,6 +65,19 @@ extern "C" {
  */
 
 #  define CUPS_RASTER_HAVE_COLORIMETRIC 1
+
+/*
+ * The following definition can be used to determine if the
+ * device colorspaces (DEVICEn) are defined...
+ */
+
+#  define CUPS_RASTER_HAVE_DEVICE 1
+
+/*
+ * The following definition can be used to determine if PWG Raster is supported.
+ */
+
+#  define CUPS_RASTER_HAVE_PWGRASTER 1
 
 
 /*

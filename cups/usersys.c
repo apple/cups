@@ -3,7 +3,7 @@
  *
  *   User, system, and password routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -57,6 +57,9 @@ static void	cups_read_client_conf(cups_file_t *fp,
 		                      _cups_globals_t *cg,
 		                      const char *cups_encryption,
 				      const char *cups_server,
+#ifdef HAVE_GSSAPI
+                                      const char *cups_gssservicename,
+#endif /* HAVE_GSSAPI */
 				      const char *cups_anyroot,
 				      const char *cups_expiredroot,
 				      const char *cups_expiredcerts);
@@ -519,6 +522,9 @@ _cupsSetDefaults(void)
   const char	*home,			/* Home directory of user */
 		*cups_encryption,	/* CUPS_ENCRYPTION env var */
 		*cups_server,		/* CUPS_SERVER env var */
+#ifdef HAVE_GSSAPI
+		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
+#endif /* HAVE_GSSAPI */
 		*cups_anyroot,		/* CUPS_ANYROOT env var */
 		*cups_expiredroot,	/* CUPS_EXPIREDROOT env var */
 		*cups_expiredcerts;	/* CUPS_EXPIREDCERTS env var */
@@ -532,11 +538,14 @@ _cupsSetDefaults(void)
   * First collect environment variables...
   */
 
-  cups_encryption   = getenv("CUPS_ENCRYPTION");
-  cups_server	    = getenv("CUPS_SERVER");
-  cups_anyroot	    = getenv("CUPS_ANYROOT");
-  cups_expiredroot  = getenv("CUPS_EXPIREDROOT");
-  cups_expiredcerts = getenv("CUPS_EXPIREDCERTS");
+  cups_encryption     = getenv("CUPS_ENCRYPTION");
+  cups_server	      = getenv("CUPS_SERVER");
+#ifdef HAVE_GSSAPI
+  cups_gssservicename = getenv("CUPS_GSSSERVICENAME");
+#endif /* HAVE_GSSAPI */
+  cups_anyroot	      = getenv("CUPS_ANYROOT");
+  cups_expiredroot    = getenv("CUPS_EXPIREDROOT");
+  cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
 
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
@@ -575,6 +584,9 @@ _cupsSetDefaults(void)
     */
 
     cups_read_client_conf(fp, cg, cups_encryption, cups_server,
+#ifdef HAVE_GSSAPI
+			  cups_gssservicename,
+#endif /* HAVE_GSSAPI */
 			  cups_anyroot, cups_expiredroot,
 			  cups_expiredcerts);
     cupsFileClose(fp);
@@ -592,6 +604,10 @@ cups_read_client_conf(
     _cups_globals_t *cg,		/* I - Global data */
     const char      *cups_encryption,	/* I - CUPS_ENCRYPTION env var */
     const char      *cups_server,	/* I - CUPS_SERVER env var */
+#ifdef HAVE_GSSAPI
+    const char      *cups_gssservicename,
+					/* I - CUPS_GSSSERVICENAME env var */
+#endif /* HAVE_GSSAPI */
     const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
     const char	    *cups_expiredroot,	/* I - CUPS_EXPIREDROOT env var */
     const char	    *cups_expiredcerts)	/* I - CUPS_EXPIREDCERTS env var */
@@ -604,6 +620,9 @@ cups_read_client_conf(
 	any_root[1024],			/* AllowAnyRoot value */
 	expired_root[1024],		/* AllowExpiredRoot value */
 	expired_certs[1024];		/* AllowExpiredCerts value */
+#ifdef HAVE_GSSAPI
+  char	gss_service_name[32];		/* GSSServiceName value */
+#endif /* HAVE_GSSAPI */
 
 
  /*
@@ -642,6 +661,14 @@ cups_read_client_conf(
       strlcpy(expired_certs, value, sizeof(expired_certs));
       cups_expiredcerts = expired_certs;
     }
+#ifdef HAVE_GSSAPI
+    else if (!cups_gssservicename && !strcasecmp(line, "GSSServiceName") &&
+             value)
+    {
+      strlcpy(gss_service_name, value, sizeof(gss_service_name));
+      cups_gssservicename = gss_service_name;
+    }
+#endif /* HAVE_GSSAPI */
   }
 
  /*
@@ -729,6 +756,14 @@ cups_read_client_conf(
     else
       cg->ipp_port = ntohs(service->s_port);
   }
+
+#ifdef HAVE_GSSAPI
+  if (!cups_gssservicename)
+    cups_gssservicename = CUPS_DEFAULT_GSSSERVICENAME;
+
+  strlcpy(cg->gss_service_name, cups_gssservicename,
+	  sizeof(cg->gss_service_name));
+#endif /* HAVE_GSSAPI */
 
   if (cups_anyroot)
     cg->any_root = !strcasecmp(cups_anyroot, "yes") ||

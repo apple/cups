@@ -88,7 +88,6 @@
  *   renew_subscription()        - Renew an existing subscription...
  *   restart_job()               - Restart an old print job.
  *   save_auth_info()            - Save authentication information for a job.
- *   save_krb5_creds()           - Save Kerberos credentials for the job.
  *   send_document()             - Send a file to a printer or class.
  *   send_http_error()           - Send a HTTP error back to the IPP client.
  *   send_ipp_status()           - Send a status back to the IPP client.
@@ -224,9 +223,6 @@ static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	save_auth_info(cupsd_client_t *con, cupsd_job_t *job,
 		               ipp_attribute_t *auth_info);
-#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
-static void	save_krb5_creds(cupsd_client_t *con, cupsd_job_t *job);
-#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 static void	send_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	send_http_error(cupsd_client_t *con, http_status_t status,
 		                cupsd_printer_t *printer);
@@ -2341,7 +2337,8 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
 
   if (!ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL,
-		 cupsdMakeUUID(job->dest, job->id, uuid, sizeof(uuid)));
+		 _httpAssembleUUID(ServerName, RemotePort, job->dest, job->id,
+		                   uuid, sizeof(uuid)));
 }
 
 
@@ -2670,6 +2667,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-is-shared",
                                IPP_TAG_BOOLEAN)) != NULL)
   {
+    if (attr->values[0].boolean &&
+        printer->num_auth_info_required == 1 &&
+	!strcmp(printer->auth_info_required[0], "negotiate"))
+    {
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Cannot share a remote Kerberized printer."));
+      return;
+    }
+
     if (printer->shared && !attr->values[0].boolean)
       cupsdDeregisterPrinter(printer, 1);
 
@@ -3812,7 +3818,6 @@ apple_register_profiles(
 	kCFPreferencesCurrentHost
       };
       CFDictionaryRef	deviceDict;	/* Device dictionary */
-      CFStringRef	printerUUID;	/* Printer UUID */
       CFUUIDRef		deviceUUID;	/* Device UUID */
 
       deviceDict = CFDictionaryCreate(kCFAllocatorDefault,
@@ -3822,21 +3827,12 @@ apple_register_profiles(
 				          sizeof(deviceDictKeys[0]),
 				      &kCFTypeDictionaryKeyCallBacks,
 				      &kCFTypeDictionaryValueCallBacks);
-      printerUUID = CFStringCreateWithCString(kCFAllocatorDefault,
-                                              p->uuid + 9, /* Skip urn:uuid: */
-					      kCFStringEncodingUTF8);
-      if (printerUUID)
-      {
-        deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
-	CFRelease(printerUUID);
+      deviceUUID = ColorSyncCreateUUIDFromUInt32(device_id);
 
-	if (!deviceDict || !deviceUUID ||
-	    !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
-				     deviceDict))
-	  error = 1001;
-      }
-      else
-        error = 1001;
+      if (!deviceDict || !deviceUUID ||
+	  !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
+				   deviceDict))
+	error = 1001;
 
       if (deviceUUID)
         CFRelease(deviceUUID);
@@ -3921,7 +3917,6 @@ apple_unregister_profiles(
     * printer.
     */
 
-    CFStringRef printerUUID;		/* Printer UUID */
     CFUUIDRef deviceUUID;		/* Device UUID */
 
     deviceUUID = ColorSyncCreateUUIDFromUInt32(_ppdHashName(p->name));
@@ -3929,20 +3924,6 @@ apple_unregister_profiles(
     {
       ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
       CFRelease(deviceUUID);
-    }
-
-    printerUUID = CFStringCreateWithCString(kCFAllocatorDefault, p->uuid + 9,
-                                            kCFStringEncodingUTF8);
-    if (printerUUID)
-    {
-      deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
-      if (deviceUUID)
-      {
-	ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
-	CFRelease(deviceUUID);
-      }
-
-      CFRelease(printerUUID);
     }
   }
 
@@ -10377,6 +10358,14 @@ save_auth_info(
     cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
   }
 
+#ifdef HAVE_GSSAPI
+  if (con->have_gss && con->gss_uid > 0)
+  {
+    cupsFilePrintf(fp, "%d\n", (int)con->gss_uid);
+    cupsdSetStringf(&job->auth_uid, "AUTH_UID=%d", (int)con->gss_uid);
+  }
+#endif /* HAVE_GSSAPI */
+
  /*
   * Write a random number of newlines to the end of the file...
   */
@@ -10389,52 +10378,7 @@ save_auth_info(
   */
 
   cupsFileClose(fp);
-
-#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
-#  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  if (con->have_gss &&
-      (con->http.hostaddr->addr.sa_family == AF_LOCAL || con->gss_creds))
-#  else
-  if (con->have_gss && con->gss_creds)
-#  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
-    save_krb5_creds(con, job);
-  else if (job->ccname)
-    cupsdClearString(&(job->ccname));
-#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 }
-
-
-#if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
-/*
- * 'save_krb5_creds()' - Save Kerberos credentials for the job.
- */
-
-static void
-save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
-                cupsd_job_t    *job)	/* I - Job */
-{
- /*
-  * Get the credentials...
-  */
-
-  job->ccache = cupsdCopyKrb5Creds(con);
-
- /*
-  * Add the KRB5CCNAME environment variable to the job so that the
-  * backend can use the credentials when printing.
-  */
-
-  if (job->ccache)
-  {
-    cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
-		    krb5_cc_get_name(KerberosContext, job->ccache));
-
-    cupsdLogJob(job, CUPSD_LOG_DEBUG2, "save_krb5_creds: %s", job->ccname);
-  }
-  else
-    cupsdClearString(&(job->ccname));
-}
-#endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 
 
 /*

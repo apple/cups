@@ -20,6 +20,7 @@
  *                          components.
  *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
  *                          components with a formatted resource.
+ *   _httpAssembleUUID()  - Make a UUID URI conforming to RFC 4122.
  *   httpDecode64()       - Base64-decode a string.
  *   httpDecode64_2()     - Base64-decode a string.
  *   httpEncode64()       - Base64-encode a string.
@@ -433,6 +434,56 @@ httpAssembleURIf(
   else
     return (httpAssembleURI(encoding,  uri, urilen, scheme, username, host,
                             port, resource));
+}
+
+
+/*
+ * '_httpAssembleUUID()' - Make a UUID URI conforming to RFC 4122.
+ *
+ * The buffer needs to be at least 46 bytes in size.
+ */
+
+char *					/* I - UUID string */
+_httpAssembleUUID(const char *server,	/* I - Server name */
+                  int        port,	/* I - Port number */
+		  const char *name,	/* I - Object name or NULL */
+                  int        number,	/* I - Object number or 0 */
+	          char       *buffer,	/* I - String buffer */
+	          size_t     bufsize)	/* I - Size of buffer */
+{
+  char			data[1024];	/* Source string for MD5 */
+  _cups_md5_state_t	md5state;	/* MD5 state */
+  unsigned char		md5sum[16];	/* MD5 digest/sum */
+
+
+ /*
+  * Build a version 3 UUID conforming to RFC 4122.
+  *
+  * Start with the MD5 sum of the server, port, object name and
+  * number, and some random data on the end.
+  */
+
+  snprintf(data, sizeof(data), "%s:%d:%s:%d:%04x:%04x", server,
+           port, name ? name : server, number,
+	   CUPS_RAND() & 0xffff, CUPS_RAND() & 0xffff);
+
+  _cupsMD5Init(&md5state);
+  _cupsMD5Append(&md5state, (unsigned char *)data, strlen(data));
+  _cupsMD5Finish(&md5state, md5sum);
+
+ /*
+  * Generate the UUID from the MD5...
+  */
+
+  snprintf(buffer, bufsize,
+           "urn:uuid:%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+	   "%02x%02x%02x%02x%02x%02x",
+	   md5sum[0], md5sum[1], md5sum[2], md5sum[3], md5sum[4], md5sum[5],
+	   (md5sum[6] & 15) | 0x30, md5sum[7], (md5sum[8] & 0x3f) | 0x40,
+	   md5sum[9], md5sum[10], md5sum[11], md5sum[12], md5sum[13],
+	   md5sum[14], md5sum[15]);
+
+  return (buffer);
 }
 
 
@@ -1331,7 +1382,9 @@ _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
     size_t     resolved_size,		/* I - Size of URI buffer */
-    int        logit)			/* I - Log progress to stderr? */
+    int        logit,			/* I - Log progress to stderr? */
+    int        (*cb)(void *context),	/* I - Continue callback function */
+    void       *context)		/* I - Context pointer for callback */
 {
   char			scheme[32],	/* URI components... */
 			userpass[256],
@@ -1463,12 +1516,18 @@ _httpResolveURI(
 	  if (logit)
 	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
 
+	  if (cb && !(*cb)(context))
+	  {
+	    DEBUG_puts("5_httpResolveURI: callback returned 0 (stop)");
+	    break;
+	  }
+
 	 /*
-	  * For the first minute, wakeup every 2 seconds to emit a
-	  * "looking for printer" message...
+	  * For the first minute (or forever if we have a callback), wakeup
+	  * every 2 seconds to emit a "looking for printer" message...
 	  */
 
-	  timeout = (time(NULL) < (start_time + 60)) ? 2000 : -1;
+	  timeout = (time(NULL) < (start_time + 60) || cb) ? 2000 : -1;
 
 #ifdef HAVE_POLL
 	  polldata.fd     = DNSServiceRefSockFD(ref);

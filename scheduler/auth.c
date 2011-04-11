@@ -27,7 +27,6 @@
  *                               access a location.
  *   cupsdCheckAuth()          - Check authorization masks.
  *   cupsdCheckGroup()         - Check for a user's group membership.
- *   cupsdCopyKrb5Creds()      - Get a copy of the Kerberos credentials.
  *   cupsdCopyLocation()       - Make a copy of a location...
  *   cupsdDeleteAllLocations() - Free all memory used for location
  *                               authorization.
@@ -381,6 +380,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
   username[0] = '\0';
   password[0] = '\0';
+
+#ifdef HAVE_GSSAPI
+  con->gss_uid = 0;
+#endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H
   if (con->authref)
@@ -991,102 +994,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     con->type = CUPSD_AUTH_DIGEST;
   }
 #ifdef HAVE_GSSAPI
-#  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  else if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
-           !strncmp(authorization, "Negotiate", 9))
-  {
-   /*
-    * Pull the credentials directly from the user...
-    */
-
-    krb5_error_code	error;		/* Kerberos error code */
-    cupsd_ucred_t	peercred;	/* Peer credentials */
-    socklen_t		peersize;	/* Size of peer credentials */
-    krb5_ccache		peerccache;	/* Peer Kerberos credentials */
-    krb5_principal	peerprncpl;	/* Peer's default principal */
-    char		*peername;	/* Peer username */
-
-    peersize = sizeof(peercred);
-
-#    ifdef __APPLE__
-    if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
-#    else
-    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
-#    endif /* __APPLE__ */
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
-		      strerror(errno));
-      return;
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "cupsdAuthorize: Copying credentials for UID %d...",
-		    CUPSD_UCRED_UID(peercred));
-
-    if (!KerberosInitialized)
-    {
-     /*
-      * Setup a Kerberos context for the scheduler to use...
-      */
-
-      KerberosInitialized = 1;
-
-      if (krb5_init_context(&KerberosContext))
-      {
-	KerberosContext = NULL;
-
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to initialize Kerberos context");
-	return;
-      }
-    }
-
-    krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
-
-    if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unable to get credentials cache for UID %d (%d/%s)",
-		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
-      krb5_ipc_client_clear_target();
-      return;
-    }
-
-    if (krb5_cc_get_principal(KerberosContext, peerccache, &peerprncpl))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unable to get Kerberos principal for UID %d",
-		      (int)CUPSD_UCRED_UID(peercred));
-      krb5_cc_close(KerberosContext, peerccache);
-      krb5_ipc_client_clear_target();
-      return;
-    }
-
-    if (krb5_unparse_name(KerberosContext, peerprncpl, &peername))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unable to get Kerberos name for UID %d",
-		      (int)CUPSD_UCRED_UID(peercred));
-      krb5_cc_close(KerberosContext, peerccache);
-      krb5_ipc_client_clear_target();
-      return;
-    }
-
-    strlcpy(username, peername, sizeof(username));
-
-    con->have_gss = 1;
-    con->type     = CUPSD_AUTH_NEGOTIATE;
-
-    free(peername);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "cupsdAuthorize: Authorized as %s using Negotiate",
-		    username);
-
-    krb5_cc_close(KerberosContext, peerccache);
-    krb5_ipc_client_clear_target();
-  }
-#  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
   else if (!strncmp(authorization, "Negotiate", 9))
   {
     int			len;		/* Length of authorization string */
@@ -1114,8 +1021,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 #  endif /* __APPLE__ */
-
-    con->gss_output_token.length = 0;
 
    /*
     * Find the start of the Kerberos input token...
@@ -1155,10 +1060,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					  GSS_C_NO_CHANNEL_BINDINGS,
 					  &client_name,
 					  NULL,
-					  &con->gss_output_token,
-					  &con->gss_flags,
+					  &output_token,
 					  NULL,
-					  &con->gss_creds);
+					  NULL,
+					  NULL);
+
+    if (output_token.length > 0)
+      gss_release_buffer(&minor_status, &output_token);
 
     if (GSS_ERROR(major_status))
     {
@@ -1177,10 +1085,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the username associated with the client's credentials...
     */
 
-    if (!con->gss_creds)
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "cupsdAuthorize: No delegated credentials!");
-
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
 			 "cupsdAuthorize: Credentials not complete");
@@ -1193,7 +1097,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
 			   "cupsdAuthorize: Error getting username");
-	gss_release_cred(&minor_status, &con->gss_creds);
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 	return;
@@ -1210,10 +1113,41 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       con->type = CUPSD_AUTH_NEGOTIATE;
     }
-    else
-      gss_release_cred(&minor_status, &con->gss_creds);
 
     gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
+
+#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
+   /*
+    * Get the client's UID if we are printing locally - that allows a backend
+    * to run as the correct user to get Kerberos credentials of its own.
+    */
+
+    if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
+    {
+      cupsd_ucred_t	peercred;	/* Peer credentials */
+      socklen_t		peersize;	/* Size of peer credentials */
+
+      peersize = sizeof(peercred);
+
+#    ifdef __APPLE__
+      if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
+#    else
+      if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred,
+                     &peersize))
+#    endif /* __APPLE__ */
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+			strerror(errno));
+      }
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+			"cupsdAuthorize: Using credentials for UID %d...",
+			CUPSD_UCRED_UID(peercred));
+        con->gss_uid = CUPSD_UCRED_UID(peercred);
+      }
+    }
+#  endif /* SO_PEERCRED && AF_LOCAL */
   }
 #endif /* HAVE_GSSAPI */
   else
@@ -1595,178 +1529,6 @@ cupsdCheckGroup(
 
   return (0);
 }
-
-
-#ifdef HAVE_GSSAPI
-/*
- * 'cupsdCopyKrb5Creds()' - Get a copy of the Kerberos credentials.
- */
-
-krb5_ccache				/* O - Credentials or NULL */
-cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
-{
-#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Sorry, your version of Kerberos does not support delegated "
-		  "credentials!");
-  return (NULL);
-
-#  else
-  krb5_ccache		ccache = NULL;	/* Credentials */
-  krb5_error_code	error;		/* Kerberos error code */
-  OM_uint32		major_status,	/* Major status code */
-			minor_status;	/* Minor status code */
-  krb5_principal	principal;	/* Kerberos principal */
-
-
-#    ifdef __APPLE__
- /*
-  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-  * to use it...
-  */
-
-  if (krb5_init_context == NULL)
-    return (NULL);
-#    endif /* __APPLE__ */
-
-  if (!KerberosInitialized)
-  {
-   /*
-    * Setup a Kerberos context for the scheduler to use...
-    */
-
-    KerberosInitialized = 1;
-
-    if (krb5_init_context(&KerberosContext))
-    {
-      KerberosContext = NULL;
-
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
-      return (NULL);
-    }
-  }
-
- /*
-  * We MUST create a file-based cache because memory-based caches are
-  * only valid for the current process/address space.
-  *
-  * Due to various bugs/features in different versions of Kerberos, we
-  * need either the krb5_cc_new_unique() function or Heimdal's version
-  * of krb5_cc_gen_new() to create a new FILE: credential cache that
-  * can be passed to the backend.  These functions create a temporary
-  * file (typically in /tmp) containing the cached credentials, which
-  * are removed when we have successfully printed a job.
-  */
-
-#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
-  if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL, &ccache)) != 0)
-#    else /* HAVE_HEIMDAL */
-  if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops, &ccache)) != 0)
-#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create new credentials cache (%d/%s)",
-                    error, strerror(errno));
-    return (NULL);
-  }
-
-  if ((error = krb5_parse_name(KerberosContext, con->username, &principal)) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to parse kerberos username (%d/%s)", error,
-                    strerror(errno));
-    krb5_cc_destroy(KerberosContext, ccache);
-    return (NULL);
-  }
-
-  if ((error = krb5_cc_initialize(KerberosContext, ccache, principal)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to initialize credentials cache (%d/%s)", error,
-		    strerror(errno));
-    krb5_cc_destroy(KerberosContext, ccache);
-    krb5_free_principal(KerberosContext, principal);
-    return (NULL);
-  }
-
-  krb5_free_principal(KerberosContext, principal);
-
- /*
-  * Copy the user's credentials to the new cache file...
-  */
-
-#    ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
-      !(con->gss_flags & GSS_C_DELEG_FLAG))
-  {
-   /*
-    * Pull the credentials directly from the user...
-    */
-
-    cupsd_ucred_t	peercred;	/* Peer credentials */
-    socklen_t		peersize;	/* Size of peer credentials */
-    krb5_ccache		peerccache;	/* Peer Kerberos credentials */
-
-    peersize = sizeof(peercred);
-
-#      ifdef __APPLE__
-    if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
-#      else
-    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
-#      endif /* __APPLE__ */
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
-                      strerror(errno));
-      krb5_cc_destroy(KerberosContext, ccache);
-      return (NULL);
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdCopyKrb5Creds: Copying credentials for UID %d...",
-		    CUPSD_UCRED_UID(peercred));
-
-    krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
-
-    if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unable to get credentials cache for UID %d (%d/%s)",
-		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
-      krb5_cc_destroy(KerberosContext, ccache);
-      return (NULL);
-    }
-
-    error = krb5_cc_copy_creds(KerberosContext, peerccache, ccache);
-    krb5_cc_close(KerberosContext, peerccache);
-    krb5_ipc_client_clear_target();
-
-    if (error)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unable to copy credentials cache for UID %d (%d/%s)",
-		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
-      krb5_cc_destroy(KerberosContext, ccache);
-      return (NULL);
-    }
-  }
-  else
-#    endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
-  {
-    major_status = gss_krb5_copy_ccache(&minor_status, con->gss_creds, ccache);
-
-    if (GSS_ERROR(major_status))
-    {
-      cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-			 "Unable to copy client credentials cache");
-      krb5_cc_destroy(KerberosContext, ccache);
-      return (NULL);
-    }
-  }
-
-  return (ccache);
-#  endif /* !HAVE_KRB5_CC_NEW_UNIQUE && !HAVE_HEIMDAL */
-}
-#endif /* HAVE_GSSAPI */
 
 
 /*

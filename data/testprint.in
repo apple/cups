@@ -2,7 +2,6 @@
 Show printer-name printer-info printer-location printer-make-and-model printer-driver-name printer-driver-version paper-size imageable-area
 Header Printer Test Page
 Footer Printer Test Page
-Notice This test page was produced by CUPS @CUPS_VERSION@.
+Notice CUPS @CUPS_VERSION@.
 Image images/cups.png
 Image images/color-wheel.png
-

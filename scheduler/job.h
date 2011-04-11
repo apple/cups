@@ -74,15 +74,13 @@ struct cupsd_job_s			/**** Job request ****/
                                          * if any */
 			*auth_domain,	/* AUTH_DOMAIN environment variable,
 					 * if any */
-			*auth_password;	/* AUTH_PASSWORD environment variable,
+			*auth_password,	/* AUTH_PASSWORD environment variable,
+					 * if any */
+			*auth_uid;	/* AUTH_UID environment variable,
 					 * if any */
   void			*profile;	/* Security profile */
   cups_array_t		*history;	/* Debug log history */
   int			progress;	/* Printing progress */
-#ifdef HAVE_GSSAPI
-  krb5_ccache		ccache;		/* Kerberos credential cache */
-  char			*ccname;	/* KRB5CCNAME environment variable */
-#endif /* HAVE_GSSAPI */
 };
 
 typedef struct cupsd_joblog_s		/**** Job log message ****/

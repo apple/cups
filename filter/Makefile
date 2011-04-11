@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
-#   Filter makefile for the Common UNIX Printing System (CUPS).
+#   Filter makefile for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -26,9 +26,10 @@ FILTERS	=	\
 		pstops \
 		$(IMGFILTERS) \
 		$(PDFTOPS) \
-		rastertolabel \
 		rastertoepson \
-		rastertohp
+		rastertohp \
+		rastertolabel \
+		rastertopwg
 LIBTARGETS =	\
 		$(LIBCUPSIMAGE) \
 		libcupsimage.a \
@@ -52,7 +53,7 @@ OBJS	=	$(IMAGEOBJS) \
 		bannertops.o commandtops.o gziptoany.o imagetops.o \
 		imagetoraster.o common.o pdftops.o pstext.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
-		testimage.o testraster.o textcommon.o texttops.o
+		rastertopwg.o testimage.o testraster.o textcommon.o texttops.o
 
 
 #
@@ -447,15 +448,6 @@ pdftops:	pdftops.o common.o ../cups/$(LIBCUPS)
 
 
 #
-# rastertolabel
-#
-
-rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
-
-
-#
 # rastertoepson
 #
 
@@ -471,6 +463,24 @@ rastertoepson:	rastertoepson.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rastertohp.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+
+
+#
+# rastertolabel
+#
+
+rastertolabel:	rastertolabel.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rastertolabel.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
+
+
+#
+# rastertopwg
+#
+
+rastertopwg:	rastertopwg.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ rastertopwg.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
 
 #
@@ -508,7 +518,7 @@ texttops:	texttops.o textcommon.o common.o \
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
 

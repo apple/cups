@@ -859,12 +859,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 #ifdef HAVE_GSSAPI
         con->have_gss = 0;
-
-	if (con->gss_creds)
-	{
-	  OM_uint32 minor_status;
-	  gss_release_cred(&minor_status, &con->gss_creds);
-	}
+	con->gss_uid  = 0;
 #endif /* HAVE_GSSAPI */
 
        /*
@@ -2548,7 +2543,7 @@ cupsdSendHeader(
     int            auth_type)		/* I - Type of authentication */
 {
   char		auth_str[1024];		/* Authorization string */
-#ifdef HAVE_GSSAPI
+#if 0 /* def HAVE_GSSAPI */
   static char	*gss_buf = NULL;	/* Kerberos auth data buffer */
   static int	gss_bufsize = 0;	/* Size of Kerberos auth data buffer */
 #endif /* HAVE_GSSAPI */
@@ -2619,7 +2614,7 @@ cupsdSendHeader(
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == CUPSD_AUTH_NEGOTIATE && con->gss_output_token.length == 0)
+    else if (auth_type == CUPSD_AUTH_NEGOTIATE /* && con->gss_output_token.length == 0 */)
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
@@ -2660,7 +2655,7 @@ cupsdSendHeader(
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
 	    snprintf(auth_key, auth_size,
-	             ", authkey=\"%s\", trc=\"y\"",
+	             ", authkey=\"%s\"",
 		     SystemGroupAuthKey);
           else
 #else
@@ -2682,7 +2677,7 @@ cupsdSendHeader(
     }
   }
 
-#ifdef HAVE_GSSAPI
+#if 0 /* def HAVE_GSSAPI */
  /*
   * WWW-Authenticate: Negotiate can be included even for
   * non-401 replies...
@@ -4966,15 +4961,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
 
     envp[envc ++] = remote_user;
-
-   /*
-    * Save Kerberos credentials, if any...
-    */
-
-#ifdef HAVE_GSSAPI
-    if (con->gss_creds)
-      ccache = cupsdCopyKrb5Creds(con);
-#endif /* HAVE_GSSAPI */
   }
 
   if (con->http.version == HTTP_1_1)

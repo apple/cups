@@ -135,7 +135,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 		   ServerName, RemotePort, "/printers/%s", name);
   cupsdSetString(&p->uri, uri);
-  cupsdSetString(&p->uuid, cupsdMakeUUID(name, 0, uuid, sizeof(uuid)));
+  cupsdSetString(&p->uuid, _httpAssembleUUID(ServerName, RemotePort, name, 0,
+                                             uuid, sizeof(uuid)));
   cupsdSetDeviceURI(p, "file:///dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;
@@ -1804,6 +1805,16 @@ cupsdSetAuthInfoRequired(
 
         p->auth_info_required[p->num_auth_info_required] = "negotiate";
 	p->num_auth_info_required ++;
+
+       /*
+        * Don't allow sharing of queues that require Kerberos authentication.
+	*/
+
+	if (p->shared)
+	{
+	  cupsdDeregisterPrinter(p, 1);
+	  p->shared = 0;
+	}
       }
       else if ((end - values) == 6 && !strncmp(values, "domain", 6))
       {
@@ -1881,6 +1892,16 @@ cupsdSetAuthInfoRequired(
 
       p->auth_info_required[p->num_auth_info_required] = "negotiate";
       p->num_auth_info_required ++;
+
+     /*
+      * Don't allow sharing of queues that require Kerberos authentication.
+      */
+
+      if (p->shared)
+      {
+	cupsdDeregisterPrinter(p, 1);
+	p->shared = 0;
+      }
 
       return (1);
     }
@@ -3539,6 +3560,7 @@ add_printer_filter(
 					/* Destination super/type */
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
+  size_t	maxsize = 0;		/* Maximum supported file size */
   mime_type_t	*temptype,		/* MIME type looping var */
 		*desttype;		/* Destination MIME type */
   char		filename[1024],		/* Full filter filename */
@@ -3555,7 +3577,9 @@ add_printer_filter(
   * Parse the filter string; it should be in one of the following formats:
   *
   *     source/type cost program
+  *     source/type cost maxsize(nnnn) program
   *     source/type dest/type cost program
+  *     source/type dest/type cost maxsize(nnnn) program
   */
 
   if (sscanf(filter, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
@@ -3586,6 +3610,26 @@ add_printer_filter(
                       p->name, filter);
       return;
     }
+  }
+
+  if (!strncmp(program, "maxsize(", 8))
+  {
+    char	*ptr;			/* Pointer into maxsize(nnnn) program */
+
+    maxsize = strtoll(program + 8, &ptr, 10);
+
+    if (*ptr != ')')
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
+                      p->name, filter);
+      return;
+    }
+
+    ptr ++;
+    while (_cups_isspace(*ptr))
+      ptr ++;
+
+    _cups_strcpy(program, ptr);
   }
 
  /*
@@ -3632,6 +3676,12 @@ add_printer_filter(
 		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
 		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
+#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
+        if (fileinfo.st_uid ||
+	    (fileinfo.st_gid && fileinfo.st_gid != 80 &&
+	     (fileinfo.st_mode & S_IWGRP)) ||
+	    (fileinfo.st_mode & (S_ISUID | S_IWOTH)))
+#endif /* __APPLE__ */
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
 	cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);

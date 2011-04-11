@@ -435,7 +435,11 @@ cupsdStartProcess(
 		    command, commandinfo.st_mode,
 		    (int)commandinfo.st_uid, (int)commandinfo.st_gid);
 
+#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
+    if (commandinfo.st_gid != 80 && job && job->printer)
+#else
     if (job && job->printer)
+#endif /* __APPLE__ */
     {
       if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
