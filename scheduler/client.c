@@ -3406,6 +3406,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
 		    (int)CFArrayGetCount(peerCerts));
+    CFRelease(peerCerts);
   }
   else
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
@@ -3505,7 +3506,7 @@ get_cdsa_certificate(
 
     servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
 					   kCFStringEncodingUTF8);
-  
+
     CFRelease(policy);
 
     policy = SecPolicyCreateSSL(1, servername);
@@ -4591,7 +4592,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   }
   else
     servername = con->servername;
-	
+
  /*
   * Run the "certtool" command to generate a self-signed certificate...
   */
