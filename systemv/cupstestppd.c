@@ -127,7 +127,7 @@ static int	check_profiles(ppd_file_t *ppd, const char *root, int errors,
 static int	check_sizes(ppd_file_t *ppd, int errors, int verbose, int warn);
 static int	check_translations(ppd_file_t *ppd, int errors, int verbose,
 		                   int warn);
-static void	show_conflicts(ppd_file_t *ppd);
+static void	show_conflicts(ppd_file_t *ppd, const char *prefix);
 static int	test_raster(ppd_file_t *ppd, int verbose);
 static void	usage(void);
 static int	valid_path(const char *keyword, const char *path, int errors,
@@ -1340,15 +1340,6 @@ main(int  argc,				/* I - Number of command-line args */
 	                    attr->name);
 	}
 
-        ppdMarkDefaults(ppd);
-	if (ppdConflicts(ppd))
-	{
-	  _cupsLangPuts(stdout,
-	                _("        WARN    Default choices conflicting."));
-
-          show_conflicts(ppd);
-        }
-
         if (ppdversion < 43)
 	{
           _cupsLangPrintf(stdout,
@@ -2166,6 +2157,22 @@ check_defaults(ppd_file_t *ppd,		/* I - PPD file */
 
 
   prefix = warn ? "  WARN  " : "**FAIL**";
+
+  ppdMarkDefaults(ppd);
+  if (ppdConflicts(ppd))
+  {
+    if (!warn && !errors && !verbose)
+      _cupsLangPuts(stdout, _(" FAIL"));
+
+    if (verbose >= 0)
+      _cupsLangPrintf(stdout,
+		      _("      %s  Default choices conflicting."), prefix);
+
+    show_conflicts(ppd, prefix);
+
+    if (!warn)
+      errors ++;
+  }
 
   for (j = 0; j < ppd->num_attrs; j ++)
   {
@@ -3330,7 +3337,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
  */
 
 static void
-show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
+show_conflicts(ppd_file_t *ppd,		/* I - PPD to check */
+               const char *prefix)	/* I - Prefix string */
 {
   int		i, j;			/* Looping variables */
   ppd_const_t	*c;			/* Current constraint */
@@ -3417,9 +3425,9 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
 
     if (c1 != NULL && c1->marked && c2 != NULL && c2->marked)
       _cupsLangPrintf(stdout,
-                      _("        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+                      _("      %s  \"%s %s\" conflicts with \"%s %s\"\n"
                         "                (constraint=\"%s %s %s %s\")."),
-        	      o1->keyword, c1->choice, o2->keyword, c2->choice,
+        	      prefix, o1->keyword, c1->choice, o2->keyword, c2->choice,
 		      c->option1, c->choice1, c->option2, c->choice2);
   }
 }
