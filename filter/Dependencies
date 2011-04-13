@@ -138,6 +138,11 @@ rastertolabel.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 rastertolabel.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
 rastertolabel.o: ../config.h ../cups/language-private.h ../cups/transcode.h
 rastertolabel.o: ../cups/raster.h ../cups/ppd.h
+rastertopwg.o: ../cups/cups.h ../cups/language-private.h ../cups/transcode.h
+rastertopwg.o: ../cups/language.h ../cups/array.h ../cups/versioning.h
+rastertopwg.o: ../cups/raster.h ../cups/cups.h ../cups/file.h ../cups/ipp.h
+rastertopwg.o: ../cups/http.h ../cups/ppd.h ../cups/string-private.h
+rastertopwg.o: ../config.h
 testimage.o: image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
 testimage.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 testimage.o: ../cups/array.h ../cups/language.h ../cups/ppd.h
@@ -295,6 +300,11 @@ rastertolabel.32.o: rastertolabel.c  ../cups/versioning.h ../cups/ipp.h ../cups/
 rastertolabel.32.o: rastertolabel.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
 rastertolabel.32.o: rastertolabel.c  ../config.h ../cups/language-private.h ../cups/transcode.h
 rastertolabel.32.o: rastertolabel.c  ../cups/raster.h ../cups/ppd.h
+rastertopwg.32.o: rastertopwg.c  ../cups/cups.h ../cups/language-private.h ../cups/transcode.h
+rastertopwg.32.o: rastertopwg.c  ../cups/language.h ../cups/array.h ../cups/versioning.h
+rastertopwg.32.o: rastertopwg.c  ../cups/raster.h ../cups/cups.h ../cups/file.h ../cups/ipp.h
+rastertopwg.32.o: rastertopwg.c  ../cups/http.h ../cups/ppd.h ../cups/string-private.h
+rastertopwg.32.o: rastertopwg.c  ../config.h
 testimage.32.o: testimage.c  image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
 testimage.32.o: testimage.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 testimage.32.o: testimage.c  ../cups/array.h ../cups/language.h ../cups/ppd.h
@@ -452,6 +462,11 @@ rastertolabel.64.o: rastertolabel.c  ../cups/versioning.h ../cups/ipp.h ../cups/
 rastertolabel.64.o: rastertolabel.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
 rastertolabel.64.o: rastertolabel.c  ../config.h ../cups/language-private.h ../cups/transcode.h
 rastertolabel.64.o: rastertolabel.c  ../cups/raster.h ../cups/ppd.h
+rastertopwg.64.o: rastertopwg.c  ../cups/cups.h ../cups/language-private.h ../cups/transcode.h
+rastertopwg.64.o: rastertopwg.c  ../cups/language.h ../cups/array.h ../cups/versioning.h
+rastertopwg.64.o: rastertopwg.c  ../cups/raster.h ../cups/cups.h ../cups/file.h ../cups/ipp.h
+rastertopwg.64.o: rastertopwg.c  ../cups/http.h ../cups/ppd.h ../cups/string-private.h
+rastertopwg.64.o: rastertopwg.c  ../config.h
 testimage.64.o: testimage.c  image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
 testimage.64.o: testimage.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 testimage.64.o: testimage.c  ../cups/array.h ../cups/language.h ../cups/ppd.h

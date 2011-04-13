@@ -478,6 +478,10 @@ connections.">cupsSetCredentials</a></li>
 	<li><a href="#cups_job_s" title="Job">cups_job_s</a></li>
 	<li><a href="#cups_option_s" title="Printer Options">cups_option_s</a></li>
 </ul></li>
+<li><a href="#VARIABLES">Variables</a><ul class="code">
+	<li><a href="#CF_RETURNS_RETAINED" title="Get the Apple language identifier associated with a
+locale ID.">CF_RETURNS_RETAINED</a></li>
+</ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#cups_ptype_e" title="Printer type/capability bit constants">cups_ptype_e</a></li>
 </ul></li>
@@ -2445,6 +2449,11 @@ typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *cert
 <dt>value </dt>
 <dd class="description">Value of option</dd>
 </dl>
+<h2 class="title"><a name="VARIABLES">Variables</a></h2>
+<h3 class="variable"><a name="CF_RETURNS_RETAINED">CF_RETURNS_RETAINED</a></h3>
+<p class="description">Get the Apple language identifier associated with a
+locale ID.</p>
+<p class="code">const char *locale) CF_RETURNS_RETAINED;</p>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
 <h3 class="enumeration"><a name="cups_ptype_e">cups_ptype_e</a></h3>
 <p class="description">Printer type/capability bit constants</p>

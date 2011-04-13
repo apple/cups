@@ -345,7 +345,7 @@ div.contents ul.subcontents li {
 
   PPD extension documentation for CUPS.
 
-  Copyright 2007-2010 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -1562,6 +1562,12 @@ the special filter program "-" may be specified.</p>
 <p class='summary'>*cupsFilter2: "source/type destination/type cost program"</p>
 
 <p>This string keyword provides a conversion rule from the given source type to the printer's native format using the filter "program". If a printer supports the source type directly, the special filter program "-" may be specified. The destination type is automatically created as needed and is passed to the filters and backend as the FINAL_CONTENT_TYPE value.</p>
+
+<blockquote><b>Note:</b>
+
+<p>The presence of a single <code>cupsFilter2</code> keyword in the PPD file will hide any <code>cupsFilter</code> keywords from the CUPS scheduler. When using <code>cupsFilter2</code> to provide filters specific for CUPS 1.5 and later, provide a <code>cupsFilter2</code> line for every filter and a <code>cupsFilter</code> line for each filter that is compatible with older versions of CUPS.</p>
+
+</blockquote>
 
 <p>Examples:</p>
 
