@@ -528,8 +528,6 @@ _ppdCacheCreateWithFile(
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
 		    linenum));
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
-      goto create_error;
     }
   }
 
@@ -571,7 +569,10 @@ _ppdCacheCreateWithFile(
   _ppdCacheDestroy(pc);
 
   if (attrs)
+  {
     ippDelete(*attrs);
+    *attrs = NULL;
+  }
 
   return (NULL);
 }
