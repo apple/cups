@@ -4060,7 +4060,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ppd_info.st_mtime = 1;
 
   ippDelete(p->ppd_attrs);
-  p->ppd_attrs = ippNew();
+  p->ppd_attrs = NULL;
 
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
@@ -4093,6 +4093,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
   finishings[0]  = IPP_FINISHINGS_NONE;
   num_finishings = 1;
+
+  p->ppd_attrs = ippNew();
 
   if ((ppd = ppdOpenFile(ppd_name)) != NULL)
   {
