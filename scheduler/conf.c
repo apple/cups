@@ -844,7 +844,7 @@ cupsdReadConfiguration(void)
 #endif /* HAVE_VSYSLOG */
 
  /*
-  * Make sure each of the log files exists and gets rotated as neccessary...
+  * Make sure each of the log files exists and gets rotated as necessary...
   */
 
   if (!strcmp(AccessLog, "syslog"))
