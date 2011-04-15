@@ -263,6 +263,7 @@ VAR char		*SystemGroupAuthKey	VALUE(NULL);
  */
 
 extern void	cupsdAddAlias(cups_array_t *aliases, const char *name);
+extern int	cupsdCheckLogFile(cups_file_t **lf, const char *logname);
 extern int	cupsdCheckPermissions(const char *filename,
 		                      const char *suffix, int mode,
 	 			      int user, int group, int is_dir,

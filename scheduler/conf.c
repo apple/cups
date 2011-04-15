@@ -844,6 +844,19 @@ cupsdReadConfiguration(void)
 #endif /* HAVE_VSYSLOG */
 
  /*
+  * Make sure each of the log files exists and gets rotated as neccessary...
+  */
+
+  if (!strcmp(AccessLog, "syslog"))
+    cupsdCheckLogFile(&AccessFile, AccessLog);
+
+  if (!strcmp(ErrorLog, "syslog"))
+    cupsdCheckLogFile(&ErrorFile, ErrorLog);
+
+  if (!strcmp(PageLog, "syslog"))
+    cupsdCheckLogFile(&PageFile, PageLog);
+
+ /*
   * Log the configuration file that was used...
   */
 
