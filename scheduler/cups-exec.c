@@ -3,7 +3,7 @@
  *
  *   Sandbox helper for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -40,6 +40,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
+  int	i;				/* Looping var */
 #ifdef HAVE_SANDBOX_H
   char	*sandbox_error = NULL;		/* Sandbox error, if any */
 #endif /* HAVE_SANDBOX_H */
@@ -61,7 +62,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Run in a separate security profile...
   */
 
-  if (sandbox_init(argv[1], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
+  if (strcmp(argv[1], "none") &&
+      sandbox_init(argv[1], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
   {
     fprintf(stderr, "DEBUG: sandbox_init failed: %s (%s)\n", sandbox_error,
 	    strerror(errno));
@@ -69,6 +71,20 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 #endif /* HAVE_SANDBOX_H */
+
+ /*
+  * Close file descriptors we don't need (insurance):
+  *
+  * 0   = stdin
+  * 1   = stdout
+  * 2   = stderr
+  * 3   = back-channel
+  * 4   = side-channel
+  * 5-N = unused
+  */
+
+  for (i = 5; i < 1024; i ++)
+    close(i);
 
  /*
   * Execute the program...
