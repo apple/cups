@@ -396,7 +396,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   {
     status = httpUpdate(http);
   }
-  while (http->state == HTTP_POST_RECV);
+  while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
 
   DEBUG_printf(("2cupsGetResponse: status=%d", status));
 
@@ -737,6 +737,14 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	if (status >= HTTP_MULTIPLE_CHOICES)
 	  break;
       }
+
+    if (state == IPP_ERROR)
+    {
+      http->status = HTTP_ERROR;
+      http->state  = HTTP_WAITING;
+
+      return (HTTP_ERROR);
+    }
 
    /*
     * Wait up to 1 second to get the 100-continue response as needed...

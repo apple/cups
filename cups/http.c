@@ -868,7 +868,7 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
 
   http->wused = 0;
 
-  DEBUG_printf(("1httpFlushWrite: Returning %d.", bytes));
+  DEBUG_printf(("1httpFlushWrite: Returning %d, errno=%d.", bytes, errno));
 
   return (bytes);
 }
@@ -1327,7 +1327,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !_httpWait(http, 10000, 1))
+      if (!_httpWait(http, http->blocking ? 30000 : 10000, 1))
       {
         DEBUG_puts("3httpGets: Timed out!");
 #ifdef WIN32
@@ -2951,11 +2951,16 @@ httpWait(http_t *http,			/* I - Connection to server */
   * First see if there is data in the buffer...
   */
 
+  DEBUG_printf(("2httpWait(http=%p, msec=%d)", http, msec));
+
   if (http == NULL)
     return (0);
 
   if (http->used)
+  {
+    DEBUG_puts("3httpWait: Returning 1 since there is buffered data ready.");
     return (1);
+  }
 
  /*
   * Flush pending data, if any...
@@ -2963,6 +2968,8 @@ httpWait(http_t *http,			/* I - Connection to server */
 
   if (http->wused)
   {
+    DEBUG_puts("3httpWait: Flushing write buffer.");
+
     if (httpFlushWrite(http) < 0)
       return (0);
   }
