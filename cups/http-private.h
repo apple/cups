@@ -345,7 +345,9 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
+#define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
 extern int		_httpAddrPort(http_addr_t *addr);
+extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
 					   char *buffer, size_t bufsize);

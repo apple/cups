@@ -761,12 +761,7 @@ _cupsSNMPWrite(
 
   temp = *address;
 
-#ifdef AF_INET6
-  if (temp.addr.sa_family == AF_INET6)
-    temp.ipv6.sin6_port = htons(CUPS_SNMP_PORT);
-  else
-#endif /* AF_INET6 */
-  temp.ipv4.sin_port = htons(CUPS_SNMP_PORT);
+  _httpAddrSetPort(&temp, CUPS_SNMP_PORT);
 
   return (sendto(fd, buffer, bytes, 0, (void *)&temp,
                  httpAddrLength(&temp)) == bytes);

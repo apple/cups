@@ -19,6 +19,7 @@
  *   httpAddrLocalhost() - Check for the local loopback address.
  *   httpAddrLookup()    - Lookup the hostname associated with the address.
  *   _httpAddrPort()     - Get the port number associated with an address.
+ *   _httpAddrSetPort()  - Set the port number associated with an address.
  *   httpAddrString()    - Convert an IP address to a dotted string.
  *   httpGetHostByName() - Lookup a hostname or IP address, and return
  *                         address records for the specified name.
@@ -314,6 +315,27 @@ _httpAddrPort(http_addr_t *addr)	/* I - Address */
     return (ntohs(addr->ipv4.sin_port));
   else
     return (ippPort());
+}
+
+
+/*
+ * '_httpAddrSetPort()' - Set the port number associated with an address.
+ */
+
+void
+_httpAddrSetPort(http_addr_t *addr,	/* I - Address */
+                 int         port)	/* I - Port */
+{
+  if (!addr || port <= 0)
+    return;
+
+#ifdef AF_INET6
+  if (addr->addr.sa_family == AF_INET6)
+    addr->ipv6.sin6_port = htons(port);
+  else
+#endif /* AF_INET6 */
+  if (addr->addr.sa_family == AF_INET)
+    addr->ipv4.sin_port = htons(port);
 }
 
 

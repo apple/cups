@@ -48,6 +48,7 @@
 				276683DD1337B24A000D33D0 /* PBXTargetDependency */,
 				276683DF1337B24A000D33D0 /* PBXTargetDependency */,
 				7258EAEF13459ADA009286F1 /* PBXTargetDependency */,
+				720DD6D11358FDBE0064AA82 /* PBXTargetDependency */,
 				7243793F1333FD23009631B9 /* PBXTargetDependency */,
 				724379C31333FF7D009631B9 /* PBXTargetDependency */,
 			);
@@ -204,6 +205,9 @@
 		276683FD1337F7B8000D33D0 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		2766840F1337FA38000D33D0 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		276684111337FA7C000D33D0 /* cupsaddsmb.c in Sources */ = {isa = PBXBuildFile; fileRef = 276684101337FA7C000D33D0 /* cupsaddsmb.c */; };
+		720DD6CD1358FD720064AA82 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		720DD6D31358FDDE0064AA82 /* snmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 720DD6D21358FDDE0064AA82 /* snmp.c */; };
+		720DD6D413590AB90064AA82 /* ieee1284.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379CA1334000E009631B9 /* ieee1284.c */; };
 		72220EB61333052D00FCA411 /* adminutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EB51333052D00FCA411 /* adminutil.c */; };
 		72220EC41333056300FCA411 /* adminutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EB71333056300FCA411 /* adminutil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220EC51333056300FCA411 /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EB81333056300FCA411 /* array.c */; };
@@ -660,6 +664,20 @@
 			remoteGlobalIDString = 276684031337FA1D000D33D0;
 			remoteInfo = cupsaddsmb;
 		};
+		720DD6CE1358FD790064AA82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		720DD6D01358FDBE0064AA82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 720DD6C11358FD5F0064AA82;
+			remoteInfo = snmp;
+		};
 		72220F6413330A6500FCA411 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
@@ -931,6 +949,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		720DD6C01358FD5F0064AA82 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		72220F5913330A5A00FCA411 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1070,6 +1097,8 @@
 		276684101337FA7C000D33D0 /* cupsaddsmb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupsaddsmb.c; path = ../systemv/cupsaddsmb.c; sourceTree = "<group>"; };
 		27D3037C134148CB00F022B1 /* libcups_s.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; name = libcups_s.exp; path = ../cups/libcups_s.exp; sourceTree = "<group>"; };
 		27D3037D134148CB00F022B1 /* libcups2.def */ = {isa = PBXFileReference; lastKnownFileType = text; name = libcups2.def; path = ../cups/libcups2.def; sourceTree = "<group>"; };
+		720DD6C21358FD5F0064AA82 /* snmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snmp; sourceTree = BUILT_PRODUCTS_DIR; };
+		720DD6D21358FDDE0064AA82 /* snmp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = snmp.c; path = ../backend/snmp.c; sourceTree = "<group>"; };
 		72220EAE1333047D00FCA411 /* libcups.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		72220EB51333052D00FCA411 /* adminutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = adminutil.c; path = ../cups/adminutil.c; sourceTree = "<group>"; };
 		72220EB71333056300FCA411 /* adminutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adminutil.h; path = ../cups/adminutil.h; sourceTree = "<group>"; };
@@ -1391,6 +1420,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		720DD6BF1358FD5F0064AA82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				720DD6CD1358FD720064AA82 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72220EAB1333047D00FCA411 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1604,6 +1641,7 @@
 				276683F01337F78E000D33D0 /* ipptool */,
 				276684041337FA1D000D33D0 /* cupsaddsmb */,
 				7258EAE2134594C4009286F1 /* rastertopwg */,
+				720DD6C21358FD5F0064AA82 /* snmp */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1800,6 +1838,7 @@
 				724379281333E952009631B9 /* lpd.c */,
 				7243790B1333E4E3009631B9 /* network.c */,
 				724379121333E516009631B9 /* runloop.c */,
+				720DD6D21358FDDE0064AA82 /* snmp.c */,
 				7243790C1333E4E3009631B9 /* snmp-supplies.c */,
 				7243793C1333FD19009631B9 /* socket.c */,
 				724379C51333FFC7009631B9 /* usb.c */,
@@ -2267,6 +2306,24 @@
 			productReference = 276684041337FA1D000D33D0 /* cupsaddsmb */;
 			productType = "com.apple.product-type.tool";
 		};
+		720DD6C11358FD5F0064AA82 /* snmp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 720DD6CB1358FD600064AA82 /* Build configuration list for PBXNativeTarget "snmp" */;
+			buildPhases = (
+				720DD6BE1358FD5F0064AA82 /* Sources */,
+				720DD6BF1358FD5F0064AA82 /* Frameworks */,
+				720DD6C01358FD5F0064AA82 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				720DD6CF1358FD790064AA82 /* PBXTargetDependency */,
+			);
+			name = snmp;
+			productName = snmp;
+			productReference = 720DD6C21358FD5F0064AA82 /* snmp */;
+			productType = "com.apple.product-type.tool";
+		};
 		72220EAD1333047D00FCA411 /* libcups */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 72220EB21333047D00FCA411 /* Build configuration list for PBXNativeTarget "libcups" */;
@@ -2514,6 +2571,7 @@
 				276683961337ACA2000D33D0 /* ppdmerge */,
 				276683A31337ACAB000D33D0 /* ppdpo */,
 				7258EAE1134594C4009286F1 /* rastertopwg */,
+				720DD6C11358FD5F0064AA82 /* snmp */,
 				7243792F1333FB85009631B9 /* socket */,
 				273BF6BC1333B5000022CAAB /* testcups */,
 				7243795A1333FF1D009631B9 /* usb */,
@@ -2720,6 +2778,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				276684111337FA7C000D33D0 /* cupsaddsmb.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		720DD6BE1358FD5F0064AA82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				720DD6D413590AB90064AA82 /* ieee1284.c in Sources */,
+				720DD6D31358FDDE0064AA82 /* snmp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3110,6 +3177,16 @@
 			isa = PBXTargetDependency;
 			target = 276684031337FA1D000D33D0 /* cupsaddsmb */;
 			targetProxy = 276684121337FA8D000D33D0 /* PBXContainerItemProxy */;
+		};
+		720DD6CF1358FD790064AA82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 720DD6CE1358FD790064AA82 /* PBXContainerItemProxy */;
+		};
+		720DD6D11358FDBE0064AA82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 720DD6C11358FD5F0064AA82 /* snmp */;
+			targetProxy = 720DD6D01358FDBE0064AA82 /* PBXContainerItemProxy */;
 		};
 		72220F6513330A6500FCA411 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3916,6 +3993,45 @@
 			};
 			name = Release;
 		};
+		720DD6C91358FD5F0064AA82 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		720DD6CA1358FD5F0064AA82 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		72220EB01333047D00FCA411 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4575,6 +4691,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		720DD6CB1358FD600064AA82 /* Build configuration list for PBXNativeTarget "snmp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				720DD6C91358FD5F0064AA82 /* Debug */,
+				720DD6CA1358FD5F0064AA82 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		72220EB21333047D00FCA411 /* Build configuration list for PBXNativeTarget "libcups" */ = {
 			isa = XCConfigurationList;

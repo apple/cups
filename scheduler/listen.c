@@ -151,18 +151,7 @@ cupsdStartListening(void)
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
     httpAddrString(&(lis->address), s, sizeof(s));
-
-#ifdef AF_INET6
-    if (lis->address.addr.sa_family == AF_INET6)
-      p = ntohs(lis->address.ipv6.sin6_port);
-    else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-    if (lis->address.addr.sa_family == AF_LOCAL)
-      p = 0;
-    else
-#endif /* AF_LOCAL */
-    p = ntohs(lis->address.ipv4.sin_port);
+    p = _httpAddrPort(&(lis->address));
 
    /*
     * If needed, create a socket for listening...

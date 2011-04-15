@@ -71,7 +71,7 @@ httpAddrConnect(
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		  _httpAddrPort(&(addrlist->addr))));
 
-    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM,
+    if ((*sock = (int)socket(_httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
                              0)) < 0)
     {
      /*

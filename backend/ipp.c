@@ -685,17 +685,9 @@ main(int  argc,				/* I - Number of command-line args */
   fputs("STATE: -connecting-to-device\n", stderr);
   _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
-#ifdef AF_INET6
-  if (http->hostaddr->addr.sa_family == AF_INET6)
-    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n",
-	    httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
-	    ntohs(http->hostaddr->ipv6.sin6_port));
-  else
-#endif /* AF_INET6 */
-    if (http->hostaddr->addr.sa_family == AF_INET)
-      fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
-	      httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
-	      ntohs(http->hostaddr->ipv4.sin_port));
+  fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
+	  httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
+	  _httpAddrPort(http->hostaddr));
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
