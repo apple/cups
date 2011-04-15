@@ -3286,7 +3286,12 @@ apple_register_profiles(
 	strlcpy(iccfile, attr->value, sizeof(iccfile));
 
       if (access(iccfile, 0))
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "%s: ICC Profile \"%s\" does not exist.", p->name,
+                        iccfile);
 	continue;
+      }
 
       num_profiles ++;
     }
