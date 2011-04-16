@@ -752,6 +752,9 @@ main(int  argc,				/* I - Number of command-line args */
     supported  = cupsDoRequest(http, request, resource);
     ipp_status = cupsLastError();
 
+    fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
+            ippErrorString(ipp_status), cupsLastErrorString());
+
     if (ipp_status > IPP_OK_CONFLICT)
     {
       fprintf(stderr, "DEBUG: Get-Printer-Attributes returned %s.\n",
@@ -767,7 +770,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintFilter(stderr, "WARNING", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 
         report_printer_state(supported, 0);
 
@@ -805,8 +808,7 @@ main(int  argc,				/* I - Number of command-line args */
 			     _("The printer URI is incorrect or no longer "
 		               "exists."));
 
-	if (supported)
-          ippDelete(supported);
+	ippDelete(supported);
 
 	return (CUPS_BACKEND_STOP);
       }
@@ -822,12 +824,12 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Unable to get printer status: %s"),
-			     cupsLastErrorString());
+	                     _("Unable to get printer status."));
         sleep(10);
       }
 
       ippDelete(supported);
+      supported = NULL;
       continue;
     }
 
@@ -846,7 +848,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (i < printer_state->num_values)
       {
-	_cupsLangPrintFilter(stderr, "WARNING", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 
         report_printer_state(supported, 0);
 
@@ -855,6 +857,7 @@ main(int  argc,				/* I - Number of command-line args */
         delay = _cupsNextDelay(delay, &prev_delay);
 
 	ippDelete(supported);
+	supported = NULL;
 	continue;
       }
     }
@@ -1104,7 +1107,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Validate access to the printer...
   */
 
-  while (!job_canceled)
+  while (!job_canceled && validate_job)
   {
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2], argv[3],
                           num_options, options, compression,
@@ -1115,48 +1118,47 @@ main(int  argc,				/* I - Number of command-line args */
 
     ipp_status = cupsLastError();
 
-    if (ipp_status > IPP_OK_CONFLICT &&
-        ipp_status != IPP_OPERATION_NOT_SUPPORTED)
+    fprintf(stderr, "DEBUG: Validate-Job: %s (%s)\n",
+            ippErrorString(ipp_status), cupsLastErrorString());
+
+    if (job_canceled)
+      break;
+
+    if (ipp_status == IPP_SERVICE_UNAVAILABLE || ipp_status == IPP_PRINTER_BUSY)
     {
-      if (job_canceled)
-        break;
-
-      if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
-	  ipp_status == IPP_PRINTER_BUSY)
-      {
-        _cupsLangPrintFilter(stderr, "INFO",
-			     _("Printer busy; will retry in 10 seconds."));
-	sleep(10);
-      }
-      else
-      {
-       /*
-	* Update auth-info-required as needed...
-	*/
-
-        _cupsLangPrintFilter(stderr, "ERROR", "%s", cupsLastErrorString());
-
-	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
-	{
-	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
-		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
-
-         /*
-	  * Normal authentication goes through the password callback, which sets
-	  * auth_info_required to "username,password".  Kerberos goes directly
-	  * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
-	  * here and set auth_info_required as needed...
-	  */
-
-	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		       "Negotiate", 9))
-	    auth_info_required = "negotiate";
-	}
-
-	goto cleanup;
-      }
+      _cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+      sleep(10);
     }
-    else
+    else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+    {
+     /*
+      * Update auth-info-required as needed...
+      */
+
+      fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
+	      httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
+
+     /*
+      * Normal authentication goes through the password callback, which sets
+      * auth_info_required to "username,password".  Kerberos goes directly
+      * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
+      * here and set auth_info_required as needed...
+      */
+
+      if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
+		   "Negotiate", 9))
+	auth_info_required = "negotiate";
+
+      goto cleanup;
+    }
+    else if (ipp_status == IPP_OPERATION_NOT_SUPPORTED)
+    {
+      _cupsLangPrintFilter(stderr, "WARNING",
+			   _("This printer does not conform to the IPP "
+			     "standard and may not work."));
+      break;
+    }
+    else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
       break;
   }
 
@@ -1238,6 +1240,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     ipp_status = cupsLastError();
 
+    fprintf(stderr, "DEBUG: %s: %s (%s)\n",
+            num_files > 1 ? "Create-Job" : "Print-Job",
+            ippErrorString(ipp_status), cupsLastErrorString());
+
     if (ipp_status > IPP_OK_CONFLICT)
     {
       job_id = 0;
@@ -1248,8 +1254,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
-        _cupsLangPrintFilter(stderr, "INFO",
-			     _("Printer busy; will retry in 10 seconds."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 	sleep(10);
 
 	if (num_files == 0)
@@ -1269,8 +1274,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
         _cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Print file was not accepted: %s"),
-			     cupsLastErrorString());
+	                     _("Print file was not accepted."));
 
 	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
 	{
@@ -1287,6 +1291,18 @@ main(int  argc,				/* I - Number of command-line args */
 	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
 		       "Negotiate", 9))
 	    auth_info_required = "negotiate";
+	}
+	else
+	  sleep(10);
+
+	if (num_files == 0)
+	{
+	 /*
+	  * We can't re-submit when we have no files to print, so exit
+	  * immediately with the right status code...
+	  */
+
+	  goto cleanup;
 	}
       }
     }
@@ -1368,13 +1384,15 @@ main(int  argc,				/* I - Number of command-line args */
 	ippDelete(cupsGetResponse(http, resource));
 	ippDelete(request);
 
+	fprintf(stderr, "DEBUG: Send-Document: %s (%s)\n",
+		ippErrorString(cupsLastError()), cupsLastErrorString());
+
 	if (cupsLastError() > IPP_OK_CONFLICT)
 	{
 	  ipp_status = cupsLastError();
 
 	  _cupsLangPrintFilter(stderr, "ERROR",
-			       _("Unable to add file to job: %s"),
-			       cupsLastErrorString());
+			       _("Unable to add document to print job."));
 	  break;
 	}
       }
@@ -1450,6 +1468,9 @@ main(int  argc,				/* I - Number of command-line args */
         break;
       }
 
+      fprintf(stderr, "DEBUG: Get-Job-Attributes: %s (%s)\n",
+	      ippErrorString(ipp_status), cupsLastErrorString());
+
       if (ipp_status > IPP_OK_CONFLICT)
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
@@ -1458,8 +1479,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippDelete(response);
 
           _cupsLangPrintFilter(stderr, "ERROR",
-			       _("Unable to get job attributes: %s"),
-			       cupsLastErrorString());
+			       _("Unable to get print job status."));
           break;
 	}
       }
@@ -1602,11 +1622,8 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
-  else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
-	   ipp_status == IPP_PRINTER_BUSY)
-    return (CUPS_BACKEND_RETRY_CURRENT);
   else if (ipp_status > IPP_OK_CONFLICT)
-    return (CUPS_BACKEND_FAILED);
+    return (CUPS_BACKEND_RETRY_CURRENT);
   else
   {
     _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
@@ -1651,8 +1668,7 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   ippDelete(cupsDoRequest(http, request, resource));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
-    _cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel job: %s"),
-		         cupsLastErrorString());
+    _cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
 }
 
 
@@ -1705,6 +1721,9 @@ check_printer_state(
 
     ippDelete(response);
   }
+
+  fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
+	  ippErrorString(cupsLastError()), cupsLastErrorString());
 
  /*
   * Return the printer-state value...
@@ -1861,6 +1880,9 @@ monitor_printer(
 	*/
 
 	response = cupsDoRequest(http, request, monitor->resource);
+
+	fprintf(stderr, "DEBUG: Get-Job-Attributes: %s (%s)\n",
+		ippErrorString(cupsLastError()), cupsLastErrorString());
 
 	if ((attr = ippFindAttribute(response, "job-state",
 				     IPP_TAG_ENUM)) != NULL)

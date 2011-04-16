@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.5\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2011-04-15 19:49-0700\n"
+"POT-Creation-Date: 2011-04-15 20:27-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3037,7 +3037,7 @@ msgstr ""
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:1633
+#: backend/ipp.c:1650
 msgid "Canceling print job."
 msgstr ""
 
@@ -3110,7 +3110,7 @@ msgstr ""
 msgid "Control file sent successfully."
 msgstr ""
 
-#: backend/ipp.c:1067 backend/lpd.c:455
+#: backend/ipp.c:1070 backend/lpd.c:455
 msgid "Copying print data."
 msgstr ""
 
@@ -4484,12 +4484,12 @@ msgstr ""
 msgid "Print and Tear"
 msgstr ""
 
-#: backend/ipp.c:1304
+#: backend/ipp.c:1320
 #, c-format
 msgid "Print file accepted - job ID %d."
 msgstr ""
 
-#: backend/ipp.c:1297
+#: backend/ipp.c:1313
 msgid "Print file accepted - job ID unknown."
 msgstr ""
 
@@ -4497,9 +4497,8 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:1272
-#, c-format
-msgid "Print file was not accepted: %s"
+#: backend/ipp.c:1277
+msgid "Print file was not accepted."
 msgstr ""
 
 #: filter/bannertops.c:648
@@ -4546,10 +4545,6 @@ msgstr ""
 msgid "Printer busy, will retry in 10 seconds."
 msgstr ""
 
-#: backend/ipp.c:1128 backend/ipp.c:1252
-msgid "Printer busy; will retry in 10 seconds."
-msgstr ""
-
 #: backend/parallel.c:234 backend/serial.c:256
 msgid "Printer busy; will retry in 30 seconds."
 msgstr ""
@@ -4559,7 +4554,7 @@ msgstr ""
 msgid "Printer did not respond after %d seconds."
 msgstr ""
 
-#: backend/ipp.c:788 backend/ipp.c:795
+#: backend/ipp.c:791 backend/ipp.c:798
 #, c-format
 msgid "Printer does not support IPP/%d.%d, trying IPP/%s."
 msgstr ""
@@ -4632,7 +4627,7 @@ msgstr ""
 msgid "Rank   Owner      Pri  Job        Files                       Total Size"
 msgstr ""
 
-#: backend/ipp.c:1612 backend/socket.c:466 driver/rastertoescpx.c:1923
+#: backend/ipp.c:1629 backend/socket.c:466 driver/rastertoescpx.c:1923
 #: driver/rastertopclx.c:1948 filter/rastertoepson.c:1152
 #: filter/rastertohp.c:881 filter/rastertolabel.c:1307
 msgid "Ready to print."
@@ -4941,7 +4936,7 @@ msgstr ""
 msgid "The print file could not be opened."
 msgstr ""
 
-#: backend/ipp.c:805
+#: backend/ipp.c:808
 msgid "The printer URI is incorrect or no longer exists."
 msgstr ""
 
@@ -4949,8 +4944,8 @@ msgstr ""
 msgid "The printer is almost out of ink."
 msgstr ""
 
-#: backend/ipp.c:656 backend/ipp.c:770 backend/ipp.c:849 backend/lpd.c:832
-#: backend/socket.c:368
+#: backend/ipp.c:656 backend/ipp.c:773 backend/ipp.c:851 backend/ipp.c:1129
+#: backend/ipp.c:1257 backend/lpd.c:832 backend/socket.c:368
 msgid "The printer is busy."
 msgstr ""
 
@@ -4962,7 +4957,7 @@ msgstr ""
 msgid "The printer is not connected."
 msgstr ""
 
-#: backend/ipp.c:634 backend/ipp.c:667 backend/ipp.c:766 backend/lpd.c:811
+#: backend/ipp.c:634 backend/ipp.c:667 backend/ipp.c:769 backend/lpd.c:811
 #: backend/lpd.c:852 backend/socket.c:347 backend/socket.c:380
 msgid "The printer is not responding."
 msgstr ""
@@ -5069,11 +5064,11 @@ msgstr ""
 msgid "Thermal Transfer Media"
 msgstr ""
 
-#: backend/ipp.c:922 backend/ipp.c:931
+#: backend/ipp.c:925 backend/ipp.c:934 backend/ipp.c:1157
 msgid "This printer does not conform to the IPP standard and may not work."
 msgstr ""
 
-#: backend/ipp.c:747 backend/ipp.c:863
+#: backend/ipp.c:747 backend/ipp.c:866
 msgid "This printer does not conform to the IPP standard. Please contact the manufacturer of your printer for assistance."
 msgstr ""
 
@@ -5172,9 +5167,8 @@ msgstr ""
 msgid "Unable to add class:"
 msgstr ""
 
-#: backend/ipp.c:1376
-#, c-format
-msgid "Unable to add file to job: %s"
+#: backend/ipp.c:1395
+msgid "Unable to add document to print job."
 msgstr ""
 
 #: scheduler/ipp.c:1628
@@ -5202,9 +5196,8 @@ msgstr ""
 msgid "Unable to cancel RSS subscription:"
 msgstr ""
 
-#: backend/ipp.c:1654
-#, c-format
-msgid "Unable to cancel job: %s"
+#: backend/ipp.c:1671
+msgid "Unable to cancel print job."
 msgstr ""
 
 #: cgi-bin/admin.c:4021
@@ -5227,7 +5220,7 @@ msgstr ""
 msgid "Unable to connect to server"
 msgstr ""
 
-#: backend/ipp.c:612 backend/ipp.c:971 backend/lpd.c:791
+#: backend/ipp.c:612 backend/ipp.c:974 backend/lpd.c:791
 #: backend/parallel.c:219 backend/serial.c:241 backend/socket.c:327
 #: backend/usb-unix.c:117
 msgid "Unable to contact printer, queuing on next printer in class."
@@ -5276,7 +5269,7 @@ msgstr ""
 msgid "Unable to copy print file"
 msgstr ""
 
-#: backend/ipp.c:1742
+#: backend/ipp.c:1761
 msgid "Unable to create compressed print file"
 msgstr ""
 
@@ -5356,7 +5349,7 @@ msgstr ""
 msgid "Unable to fork filter"
 msgstr ""
 
-#: backend/ipp.c:1764
+#: backend/ipp.c:1783
 msgid "Unable to generate compressed print file"
 msgstr ""
 
@@ -5368,13 +5361,12 @@ msgstr ""
 msgid "Unable to get class status:"
 msgstr ""
 
-#: backend/ipp.c:1461
-#, c-format
-msgid "Unable to get job attributes: %s"
-msgstr ""
-
 #: cgi-bin/admin.c:1321
 msgid "Unable to get list of printer drivers:"
+msgstr ""
+
+#: backend/ipp.c:1482
+msgid "Unable to get print job status."
 msgstr ""
 
 #: cgi-bin/admin.c:2959
@@ -5385,13 +5377,12 @@ msgstr ""
 msgid "Unable to get printer list:"
 msgstr ""
 
-#: cgi-bin/printers.c:569
-msgid "Unable to get printer status:"
+#: backend/ipp.c:827
+msgid "Unable to get printer status."
 msgstr ""
 
-#: backend/ipp.c:825
-#, c-format
-msgid "Unable to get printer status: %s"
+#: cgi-bin/printers.c:569
+msgid "Unable to get printer status:"
 msgstr ""
 
 #: cups/adminutil.c:565 cups/adminutil.c:769
@@ -5442,7 +5433,7 @@ msgstr ""
 msgid "Unable to open charset file"
 msgstr ""
 
-#: backend/ipp.c:1748
+#: backend/ipp.c:1767
 msgid "Unable to open compressed print file"
 msgstr ""
 
@@ -5459,7 +5450,7 @@ msgstr ""
 msgid "Unable to open document #%d in job #%d."
 msgstr ""
 
-#: backend/ipp.c:1754 backend/lpd.c:476 backend/parallel.c:150
+#: backend/ipp.c:1773 backend/lpd.c:476 backend/parallel.c:150
 #: backend/serial.c:190 backend/socket.c:156 backend/usb.c:237
 #: filter/bannertops.c:183 filter/gziptoany.c:71 filter/pstext.c:89
 #: filter/pstext.c:249 filter/pstext.c:266 filter/pstops.c:299
@@ -5813,7 +5804,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1401
+#: backend/ipp.c:1419
 msgid "Waiting for job to complete."
 msgstr ""
 
