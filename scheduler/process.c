@@ -14,6 +14,8 @@
  *
  * Contents:
  *
+ *   cupsdCheckProgram()   - Check the permissions of the given program and its
+ *                           containing directory.
  *   cupsdCreateProfile()  - Create an execution profile for a subprocess.
  *   cupsdDestroyProfile() - Delete an execution profile.
  *   cupsdEndProcess()     - End a process.
@@ -61,6 +63,201 @@ static int	compare_procs(cupsd_proc_t *a, cupsd_proc_t *b);
 #ifdef HAVE_SANDBOX_H
 static char	*cupsd_requote(char *dst, const char *src, size_t dstsize);
 #endif /* HAVE_SANDBOX_H */
+
+
+/*
+ * 'cupsdCheckProgram()' - Check the permissions of the given program and its
+ *                         containing directory.
+ */
+
+int					/* O - 1 if OK, 0 if not OK */
+cupsdCheckProgram(
+    const char      *filename,		/* I - Filename to check */
+    cupsd_printer_t *p)			/* I - Printer, if any */
+{
+  struct stat		fileinfo;	/* File information */
+  char			temp[1024],	/* Parent directory filename */
+			*ptr;		/* Pointer into parent directory */
+
+
+ /*
+  * Does the program even exist and is it accessible?
+  */
+
+  if (stat(filename, &fileinfo))
+  {
+   /*
+    * Nope...
+    */
+
+    if (p)
+    {
+      snprintf(p->state_message, sizeof(p->state_message),
+               "Printer driver \"%s\" not available: %s", filename,
+	       strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
+
+      if (cupsdSetPrinterReasons(p, "+cups-missing-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL,
+		      "Printer driver \"%s\" not available.", filename);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Program \"%s\" not available: %s",
+		      filename, strerror(errno));
+
+    return (0);
+  }
+
+ /*
+  * Are we running as root?
+  */
+
+  if (RunUser)
+  {
+   /*
+    * Nope, so anything goes...
+    */
+
+    return (1);
+  }
+
+ /*
+  * Verify permission of the program itself:
+  *
+  * 1. Must be owned by root
+  * 2. Must not be writable by group unless group is root/wheel/admin
+  * 3. Must not be setuid
+  * 4. Must not be writable by others
+  */
+
+  if (fileinfo.st_uid ||		/* 1. Must be owned by root */
+#ifdef __APPLE__
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
+       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
+#else
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
+					/* 2. Must not be writable by group */
+#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
+      (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
+  {
+    if (p)
+    {
+      snprintf(p->state_message, sizeof(p->state_message),
+               "Printer driver \"%s\" has insecure permissions "
+	       "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+	       (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
+                    
+      if (cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s",
+	              p->state_message);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Program \"%s\" has insecure permissions "
+		      "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+		      (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+    errno = EPERM;
+
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "%s%s \"%s\" permissions OK "
+		  "(0%o/uid=%d/gid=%d).", p ? p->name : "",
+		  p ? ": Printer driver" : "Program", filename,
+		  fileinfo.st_mode, (int)fileinfo.st_uid,
+		  (int)fileinfo.st_gid);
+
+ /*
+  * Now check the containing directory...
+  */
+
+  strlcpy(temp, filename, sizeof(temp));
+  if ((ptr = strrchr(temp, '/')) != NULL)
+  {
+    if (ptr == temp)
+      ptr[1] = '\0';
+    else
+      *ptr = '\0';
+  }
+
+  if (stat(temp, &fileinfo))
+  {
+   /*
+    * Doesn't exist...
+    */
+
+    if (p)
+    {
+      snprintf(p->state_message, sizeof(p->state_message),
+               "Printer driver directory \"%s\" not available: %s", temp,
+	       strerror(errno));
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
+
+      if (cupsdSetPrinterReasons(p, "+cups-missing-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL,
+		      "Printer driver directory \"%s\" not available.", temp);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Program directory \"%s\" not available: %s", temp,
+		      strerror(errno));
+
+    return (0);
+  }
+
+  if (fileinfo.st_uid ||		/* 1. Must be owned by root */
+#ifdef __APPLE__
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
+       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
+#else
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
+					/* 2. Must not be writable by group */
+#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
+      (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
+  {
+    if (p)
+    {
+      snprintf(p->state_message, sizeof(p->state_message),
+	       "Printer driver directory \"%s\" has insecure permissions "
+	       "(0%o/uid=%d/gid=%d).", temp, fileinfo.st_mode,
+	       (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
+
+      if (cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s",
+		      p->state_message);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Program directory \"%s\" has insecure permissions "
+		      "(0%o/uid=%d/gid=%d).", temp, fileinfo.st_mode,
+		      (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+    errno = EPERM;
+
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "%s%s directory \"%s\" permissions OK "
+		  "(0%o/uid=%d/gid=%d).", p ? p->name : "",
+		  p ? ": Printer driver" : "Program", temp,
+		  fileinfo.st_mode, (int)fileinfo.st_uid,
+		  (int)fileinfo.st_gid);
+
+ /*
+  * If we get here then we can "safely" run this program...
+  */
+
+  return (1);
+}
 
 
 /*
@@ -317,7 +514,6 @@ cupsdStartProcess(
   char		*real_argv[103],	/* Real command-line arguments */
 		cups_exec[1024];	/* Path to "cups-exec" program */
   int		user;			/* Command UID */
-  struct stat	commandinfo;		/* Command file information */
   cupsd_proc_t	*proc;			/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
@@ -328,6 +524,8 @@ cupsdStartProcess(
   int		linkbytes;		/* Bytes for link path */
 #endif /* __APPLE__ */
 
+
+  *pid = 0;
 
  /*
   * Figure out the UID for the child process...
@@ -344,110 +542,8 @@ cupsdStartProcess(
   * Check the permissions of the command we are running...
   */
 
-  if (stat(command, &commandinfo))
-  {
-    *pid = 0;
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
-		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job=%p(%d), pid=%p) = %d",
-		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job, job ? job->id : 0, pid, *pid);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "%s%s \"%s\" not available: %s",
-		    job && job->printer ? job->printer->name : "",
-		    job && job->printer ? ": Printer driver" : "Program",
-		    command, strerror(errno));
-
-    if (job && job->printer)
-    {
-      if (cupsdSetPrinterReasons(job->printer, "+cups-missing-filter-warning"))
-	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		      "Printer driver \"%s\" not available.", command);
-    }
-
+  if (!cupsdCheckProgram(command, job ? job->printer : NULL))
     return (0);
-  }
-  else if (!RunUser &&
-           ((commandinfo.st_mode & (S_ISUID | S_IWOTH)) ||
-            commandinfo.st_uid))
-  {
-    *pid = 0;
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
-		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job=%p(%d), pid=%p) = %d",
-		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job, job ? job->id : 0, pid, *pid);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "%s%s \"%s\" has insecure permissions "
-		    "(0%o/uid=%d/gid=%d).",
-		    job && job->printer ? job->printer->name : "",
-		    job && job->printer ? ": Printer driver" : "Program",
-		    command, commandinfo.st_mode,
-		    (int)commandinfo.st_uid, (int)commandinfo.st_gid);
-
-    if (job && job->printer)
-    {
-      if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
-	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		      "Printer driver \"%s\" has insecure permissions "
-		      "(0%o/uid=%d/gid=%d).", command, commandinfo.st_mode,
-		      (int)commandinfo.st_uid, (int)commandinfo.st_gid);
-    }
-
-    errno = EPERM;
-
-    return (0);
-  }
-  else if ((commandinfo.st_uid != user || !(commandinfo.st_mode & S_IXUSR)) &&
-           (commandinfo.st_gid != Group || !(commandinfo.st_mode & S_IXGRP)) &&
-           !(commandinfo.st_mode & S_IXOTH))
-  {
-    *pid = 0;
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
-		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job=%p(%d), pid=%p) = %d",
-		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job, job ? job->id : 0, pid, *pid);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "%s%s \"%s\" does not have execute permissions "
-		    "(0%o/uid=%d/gid=%d).",
-		    job && job->printer ? job->printer->name : "",
-		    job && job->printer ? ": Printer driver" : "Program",
-		    command, commandinfo.st_mode, (int)commandinfo.st_uid,
-		    (int)commandinfo.st_gid);
-
-    errno = EPERM;
-    return (0);
-  }
-  else if (!RunUser && commandinfo.st_gid && (commandinfo.st_mode & S_IWGRP))
-  {
-    cupsdLogMessage(CUPSD_LOG_WARN,
-                    "%s%s \"%s\" has insecure permissions "
-		    "(0%o/uid=%d/gid=%d).",
-		    job && job->printer ? job->printer->name : "",
-		    job && job->printer ? ": Printer driver" : "Program",
-		    command, commandinfo.st_mode,
-		    (int)commandinfo.st_uid, (int)commandinfo.st_gid);
-
-#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
-    if (commandinfo.st_gid != 80 && job && job->printer)
-#else
-    if (job && job->printer)
-#endif /* __APPLE__ */
-    {
-      if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
-	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		      "Printer driver \"%s\" has insecure permissions "
-		      "(0%o/uid=%d/gid=%d).", command, commandinfo.st_mode,
-		      (int)commandinfo.st_uid, (int)commandinfo.st_gid);
-    }
-  }
 
 #if defined(__APPLE__)
   if (envp)

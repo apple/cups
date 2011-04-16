@@ -268,6 +268,7 @@ extern int	cupsdCheckPermissions(const char *filename,
 		                      const char *suffix, int mode,
 	 			      int user, int group, int is_dir,
 				      int create_dir);
+extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
 extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
 #ifdef HAVE_GSSAPI

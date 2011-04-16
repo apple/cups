@@ -3563,9 +3563,8 @@ add_printer_filter(
   size_t	maxsize = 0;		/* Maximum supported file size */
   mime_type_t	*temptype,		/* MIME type looping var */
 		*desttype;		/* Destination MIME type */
-  char		filename[1024],		/* Full filter filename */
-		*dirsep;		/* Pointer to directory separator */
-  struct stat	fileinfo;		/* File information */
+  mime_filter_t	*filterptr;		/* MIME filter */
+  char		filename[1024];		/* Full filter filename */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -3633,8 +3632,7 @@ add_printer_filter(
   }
 
  /*
-  * See if the filter program exists; if not, stop the printer and flag
-  * the error!
+  * Check permissions on the filter and its containing directory...
   */
 
   if (strcmp(program, "-"))
@@ -3644,74 +3642,7 @@ add_printer_filter(
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    if (stat(filename, &fileinfo))
-    {
-      memset(&fileinfo, 0, sizeof(fileinfo));
-
-      snprintf(p->state_message, sizeof(p->state_message),
-               "Printer driver \"%s\" not available: %s", filename,
-	       strerror(errno));
-      cupsdSetPrinterReasons(p, "+cups-missing-filter-warning");
-
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
-    }
-
-   /*
-    * When running as root, do additional security checks...
-    */
-
-    else if (!RunUser)
-    {
-     /*
-      * Only use filters that are owned by root and do not have world write
-      * permissions.
-      */
-
-      if (fileinfo.st_uid ||
-          (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
-          (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
-      {
-	snprintf(p->state_message, sizeof(p->state_message),
-		 "Printer driver \"%s\" has insecure permissions "
-		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
-		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
-
-#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
-        if (fileinfo.st_uid ||
-	    (fileinfo.st_gid && fileinfo.st_gid != 80 &&
-	     (fileinfo.st_mode & S_IWGRP)) ||
-	    (fileinfo.st_mode & (S_ISUID | S_IWOTH)))
-#endif /* __APPLE__ */
-	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
-
-	cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
-      }
-      else if (fileinfo.st_mode)
-      {
-       /*
-	* Similarly, check that the parent directory is also owned by root and
-	* does not have world write permissions.
-	*/
-
-	if ((dirsep = strrchr(filename, '/')) != NULL)
-	  *dirsep = '\0';
-
-	if (!stat(filename, &fileinfo) &&
-	    (fileinfo.st_uid ||
-	     (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
-	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
-	{
-	  snprintf(p->state_message, sizeof(p->state_message),
-		   "Printer driver directory \"%s\" has insecure permissions "
-		   "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
-		   (int)fileinfo.st_uid, (int)fileinfo.st_gid);
-
-	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
-
-	  cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
-	}
-      }
-    }
+    cupsdCheckProgram(filename, p);
   }
 
  /*
@@ -3732,7 +3663,8 @@ add_printer_filter(
 		        "%s", p->name, temptype->super, temptype->type,
 		        desttype->super, desttype->type,
 		        cost, program);
-        mimeAddFilter(MimeDatabase, temptype, desttype, cost, program);
+        filterptr = mimeAddFilter(MimeDatabase, temptype, desttype, cost,
+	                          program);
 
         if (!mimeFilterLookup(MimeDatabase, desttype, filtertype))
         {
@@ -3750,8 +3682,12 @@ add_printer_filter(
 		        "%s", p->name, temptype->super, temptype->type,
 		        filtertype->super, filtertype->type,
 		        cost, program);
-        mimeAddFilter(MimeDatabase, temptype, filtertype, cost, program);
+        filterptr = mimeAddFilter(MimeDatabase, temptype, filtertype, cost,
+	                          program);
       }
+
+      if (filterptr)
+	filterptr->maxsize = maxsize;
     }
 }
 

@@ -1428,28 +1428,21 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
       return (kr);
   }
   else if (bundleinfo.st_uid ||
-           (bundleinfo.st_gid && (bundleinfo.st_mode & S_IWGRP)) ||
+           (bundleinfo.st_gid && bundleinfo.st_gid != 80 &&
+	    (bundleinfo.st_mode & S_IWGRP)) ||
+	   (bundleinfo.st_mode & S_ISUID) ||
 	   (bundleinfo.st_mode & S_IWOTH))
   {
     fprintf(stderr, "DEBUG: Class driver \"%s\" has insecure file "
 		    "permissions (0%o/uid=%d/gid=%d).\n", bundlestr,
 		    bundleinfo.st_mode, (int)bundleinfo.st_uid,
 		    (int)bundleinfo.st_gid);
-    if (bundleinfo.st_uid ||
-	(bundleinfo.st_gid && bundleinfo.st_gid != 80 &&
-	 (bundleinfo.st_mode & S_IWGRP)) ||
-	(bundleinfo.st_mode & (S_ISUID | S_IWOTH)))
-      fputs("STATE: +cups-insecure-filter-warning\n", stderr);
+    fputs("STATE: +cups-insecure-filter-warning\n", stderr);
 
-    if (bundleinfo.st_uid ||
-        (bundleinfo.st_gid && bundleinfo.st_gid != 80 &&
-	 (bundleinfo.st_mode & S_IWOTH)))
-    {
-      if (driverPath)
-        return (load_classdriver(NULL, intf, printerDriver));
-      else
-        return (kr);
-    }
+    if (driverPath)
+      return (load_classdriver(NULL, intf, printerDriver));
+    else
+      return (kr);
   }
 
  /*

@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -44,6 +44,7 @@ typedef int (*cupsd_compare_func_t)(const void *, const void *);
  * Prototypes...
  */
 
+extern int		cupsdCheckProgram(const char *filename);
 extern int		cupsdCompareNames(const char *s, const char *t);
 extern cups_array_t	*cupsdCreateStringsArray(const char *s);
 extern int		cupsdExec(const char *command, char **argv);

@@ -1606,8 +1606,12 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
     * Run the driver with no arguments and collect the output...
     */
 
-    argv[0] = dent->filename;
     snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
+
+    if (!cupsdCheckProgram(filename))
+      continue;
+
+    argv[0] = dent->filename;
 
     if ((fp = cupsdPipeCommand(&pid, filename, argv, 0)) != NULL)
     {

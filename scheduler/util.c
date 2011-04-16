@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,6 +14,8 @@
  *
  * Contents:
  *
+ *   cupsdCheckProgram()       - Check the permissions of the given program and
+ *                               its containing directory.
  *   cupsdCompareNames()       - Compare two names.
  *   cupsdCreateStringsArray() - Create a CUPS array of strings.
  *   cupsdExec()               - Run a program with the correct environment.
@@ -37,6 +39,145 @@
 #  include <libgen.h>
 extern char **environ;
 #endif /* __APPLE__ */ 
+
+
+/*
+ * 'cupsdCheckProgram()' - Check the permissions of the given program and its
+ *                         containing directory.
+ *
+ * Note: This function is a parallel implementation of the scheduler function
+ *       of the same name.
+ */
+
+int					/* O - 1 if OK, 0 if not OK */
+cupsdCheckProgram(
+    const char      *filename)		/* I - Filename to check */
+{
+  struct stat		fileinfo;	/* File information */
+  char			temp[1024],	/* Parent directory filename */
+			*ptr;		/* Pointer into parent directory */
+
+
+ /*
+  * Does the program even exist and is it accessible?
+  */
+
+  if (stat(filename, &fileinfo))
+  {
+   /*
+    * Nope...
+    */
+
+    fprintf(stderr, "ERROR: Program \"%s\" not available: %s", filename,
+            strerror(errno));
+
+    return (0);
+  }
+
+ /*
+  * Are we running as root?
+  */
+
+  if (geteuid())
+  {
+   /*
+    * Nope, so anything goes...
+    */
+
+    return (1);
+  }
+
+ /*
+  * Verify permission of the program itself:
+  *
+  * 1. Must be owned by root
+  * 2. Must not be writable by group unless group is root/wheel/admin
+  * 3. Must not be setuid
+  * 4. Must not be writable by others
+  */
+
+  if (fileinfo.st_uid ||		/* 1. Must be owned by root */
+#ifdef __APPLE__
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
+       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
+#else
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
+					/* 2. Must not be writable by group */
+#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
+      (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
+  {
+    fprintf(stderr,
+            "ERROR: Program \"%s\" has insecure permissions "
+	    "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+	    (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+    errno = EPERM;
+
+    return (0);
+  }
+
+  fprintf(stderr, "DEBUG2: Program \"%s\" permissions OK (0%o/uid=%d/gid=%d).",
+          filename, fileinfo.st_mode, (int)fileinfo.st_uid,
+	  (int)fileinfo.st_gid);
+
+ /*
+  * Now check the containing directory...
+  */
+
+  strlcpy(temp, filename, sizeof(temp));
+  if ((ptr = strrchr(temp, '/')) != NULL)
+  {
+    if (ptr == temp)
+      ptr[1] = '\0';
+    else
+      *ptr = '\0';
+  }
+
+  if (stat(temp, &fileinfo))
+  {
+   /*
+    * Doesn't exist...
+    */
+
+    fprintf(stderr, "ERROR: Program directory \"%s\" not available: %s", temp,
+	    strerror(errno));
+
+    return (0);
+  }
+
+  if (fileinfo.st_uid ||		/* 1. Must be owned by root */
+#ifdef __APPLE__
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
+       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
+#else
+      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
+					/* 2. Must not be writable by group */
+#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
+      (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
+  {
+    fprintf(stderr,
+            "ERROR: Program directory \"%s\" has insecure permissions "
+	    "(0%o/uid=%d/gid=%d).", temp, fileinfo.st_mode,
+	    (int)fileinfo.st_uid, (int)fileinfo.st_gid);
+
+    errno = EPERM;
+
+    return (0);
+  }
+
+  fprintf(stderr,
+          "DEBUG2: Program directory \"%s\" permissions OK "
+	  "(0%o/uid=%d/gid=%d).", temp, fileinfo.st_mode, (int)fileinfo.st_uid,
+	  (int)fileinfo.st_gid);
+
+ /*
+  * If we get here then we can "safely" run this program...
+  */
+
+  return (1);
+}
 
 
 /*
