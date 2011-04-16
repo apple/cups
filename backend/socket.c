@@ -352,22 +352,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	{
 	  case EHOSTDOWN :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" may not exist or "
-				     "is unavailable at this time."),
-				   hostname);
+				   _("The printer may not exist or "
+				     "is unavailable at this time."));
 	      break;
 
 	  case EHOSTUNREACH :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" is unreachable at "
-				     "this time."), hostname);
+				   _("The printer is unreachable at this "
+				     "time."));
 	      break;
 
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" is busy."),
-				   hostname);
+	                           _("The printer is busy."));
 	      break;
         }
 
@@ -379,8 +377,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Network printer \"%s\" is not responding."),
-			     hostname);
+	                     _("The printer is not responding."));
 	sleep(30);
       }
     }

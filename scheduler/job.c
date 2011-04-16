@@ -2946,6 +2946,57 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    message   = "Job held for authentication.";
           }
           break;
+
+      case CUPS_BACKEND_RETRY :
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	   /*
+	    * Hold the job if the number of retries is less than the
+	    * JobRetryLimit, otherwise abort the job.
+	    */
+
+	    job->tries ++;
+
+	    if (job->tries > JobRetryLimit && JobRetryLimit > 0)
+	    {
+	     /*
+	      * Too many tries...
+	      */
+
+	      snprintf(buffer, sizeof(buffer),
+		       "Job aborted after %d unsuccessful attempts.",
+		       JobRetryLimit);
+	      job_state = IPP_JOB_ABORTED;
+	      message   = buffer;
+	    }
+	    else
+	    {
+	     /*
+	      * Try again in N seconds...
+	      */
+
+	      snprintf(buffer, sizeof(buffer),
+		       "Job held for %d seconds since it could not be sent.",
+		       JobRetryInterval);
+
+	      job->hold_until = time(NULL) + JobRetryInterval;
+	      job_state       = IPP_JOB_HELD;
+	      message         = buffer;
+	    }
+	  }
+          break;
+
+      case CUPS_BACKEND_RETRY_CURRENT :
+	 /*
+	  * Mark the job as pending and retry on the same printer...
+	  */
+
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	    job_state = IPP_JOB_PENDING;
+	    message   = "Retrying job on same printer.";
+	  }
+          break;
     }
   }
   else if (job->status > 0)

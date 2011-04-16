@@ -640,22 +640,20 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  case EHOSTDOWN :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-			           _("Network printer \"%s\" may not exist or "
-				     "is unavailable at this time."),
-				   hostname);
+			           _("The printer may not exist or "
+				     "is unavailable at this time."));
 	      break;
 
 	  case EHOSTUNREACH :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" is unreachable at "
-				     "this time."), hostname);
+				   _("The printer is unreachable at this "
+				     "time."));
 	      break;
 
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" is busy."),
-			           hostname);
+	                           _("The printer is busy."));
 	      break;
         }
 
@@ -666,8 +664,7 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Network printer \"%s\" is not responding."),
-			     hostname);
+	                     _("The printer is not responding."));
 	sleep(30);
       }
 
@@ -770,9 +767,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintFilter(stderr, "WARNING",
-			     _("Network host \"%s\" is busy; will retry in %d "
-			       "seconds."), hostname, delay);
+	_cupsLangPrintFilter(stderr, "WARNING", _("The printer is busy."));
 
         report_printer_state(supported, 0);
 
@@ -832,11 +827,42 @@ main(int  argc,				/* I - Number of command-line args */
         sleep(10);
       }
 
-      if (supported)
-        ippDelete(supported);
-
+      ippDelete(supported);
       continue;
     }
+
+   /*
+    * Check printer-state-reasons for the "spool-area-full" keyword...
+    */
+
+    if ((printer_state = ippFindAttribute(supported, "printer-state-reasons",
+                                          IPP_TAG_KEYWORD)) != NULL)
+    {
+      for (i = 0; i < printer_state->num_values; i ++)
+        if (!strcmp(printer_state->values[0].string.text, "spool-area-full") ||
+	    !strncmp(printer_state->values[0].string.text, "spool-area-full-",
+	             16))
+          break;
+
+      if (i < printer_state->num_values)
+      {
+	_cupsLangPrintFilter(stderr, "WARNING", _("The printer is busy."));
+
+        report_printer_state(supported, 0);
+
+	sleep(delay);
+
+        delay = _cupsNextDelay(delay, &prev_delay);
+
+	ippDelete(supported);
+	continue;
+      }
+    }
+    else
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("This printer does not conform to the IPP "
+			     "standard. Please contact the manufacturer of "
+			     "your printer for assistance."));
 
    /*
     * Check for supported attributes...
@@ -1225,6 +1251,16 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPrintFilter(stderr, "INFO",
 			     _("Printer busy; will retry in 10 seconds."));
 	sleep(10);
+
+	if (num_files == 0)
+	{
+	 /*
+	  * We can't re-submit when we have no files to print, so exit
+	  * immediately with the right status code...
+	  */
+
+	  goto cleanup;
+	}
       }
       else
       {
@@ -1566,6 +1602,9 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
+  else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+	   ipp_status == IPP_PRINTER_BUSY)
+    return (CUPS_BACKEND_RETRY_CURRENT);
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else
