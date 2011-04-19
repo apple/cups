@@ -1409,8 +1409,11 @@ cupsdRenamePrinter(
   mimeDeleteType(MimeDatabase, p->filetype);
   p->filetype = mimeAddType(MimeDatabase, "printer", name);
 
-  mimeDeleteType(MimeDatabase, p->prefiltertype);
-  p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", name);
+  if (p->prefiltertype)
+  {
+    mimeDeleteType(MimeDatabase, p->prefiltertype);
+    p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", name);
+  }
 
  /*
   * Rename the printer...
@@ -2447,7 +2450,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
       if (p->pc && p->pc->prefilters)
       {
-        p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
+        if (!p->prefiltertype)
+          p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
 
         for (filter = (char *)cupsArrayFirst(p->pc->prefilters);
 	     filter;
