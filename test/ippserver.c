@@ -1297,7 +1297,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->ipv4          = -1;
   printer->ipv6          = -1;
   printer->name          = _cupsStrAlloc(name);
-#ifdef HAVE_DNSSD */
+#ifdef HAVE_DNSSD
   printer->dnssd_name    = _cupsStrRetain(printer->name);
 #endif /* HAVE_DNSSD */
   printer->directory     = _cupsStrAlloc(directory);

@@ -309,9 +309,11 @@ _cupsSetNegotiateAuthString(
     return (-1);
   }
 
+#ifdef DEBUG
   if (major_status == GSS_S_CONTINUE_NEEDED)
     cups_gss_printf(major_status, minor_status,
 		    "_cupsSetNegotiateAuthString: Continuation needed!");
+#endif /* DEBUG */
 
   if (output_token.length > 0 && output_token.length <= 65536)
   {
