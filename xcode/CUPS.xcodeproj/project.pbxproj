@@ -1350,6 +1350,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726AD72B135EAE1E002C930D /* libcups_static.dylib in Frameworks */,
 				273BF6CE1333B5950022CAAB /* CoreFoundation.framework in Frameworks */,
 				273BF6D31333B5C30022CAAB /* Kerberos.framework in Frameworks */,
 				273BF6D41333B5C30022CAAB /* Security.framework in Frameworks */,
@@ -4995,6 +4996,7 @@
 				726AD700135E88F1002C930D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */ = {
 			isa = XCConfigurationList;
