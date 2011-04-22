@@ -111,6 +111,8 @@
 "      %s  REQUIRED %s does not define choice None.\n                REF: Page 122, section 5.17" = "      %s  REQUIRED %s does not define choice None.\n                REF: Page 122, section 5.17";
 "      %s  Size \"%s\" defined for %s but not for %s." = "      %s  Size \"%s\" defined for %s but not for %s.";
 "      %s  Size \"%s\" has unexpected dimensions (%gx%g)." = "      %s  Size \"%s\" has unexpected dimensions (%gx%g).";
+"      %s  Size \"%s\" should be \"%s\"." = "      %s  Size \"%s\" should be \"%s\".";
+"      %s  Size \"%s\" should be the Adobe standard name \"%s\"." = "      %s  Size \"%s\" should be the Adobe standard name \"%s\".";
 "      %s  cupsICCProfile %s hash value collides with %s." = "      %s  cupsICCProfile %s hash value collides with %s.";
 "      %s  cupsUIResolver %s causes a loop." = "      %s  cupsUIResolver %s causes a loop.";
 "      %s  cupsUIResolver %s does not list at least two different options." = "      %s  cupsUIResolver %s does not list at least two different options.";
@@ -683,6 +685,10 @@
 "Destination \"%s\" is not accepting jobs." = "Destination \"%s\" is not accepting jobs.";
 "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s" = "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s";
 "Direct Thermal Media" = "Direct Thermal Media";
+"Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d).";
+"Directory \"%s\" is a file." = "Directory \"%s\" is a file.";
+"Directory \"%s\" not available: %s" = "Directory \"%s\" not available: %s";
+"Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)." = "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d).";
 "Disabled" = "Disabled";
 "Document #%d does not exist in job #%d." = "Document #%d does not exist in job #%d.";
 "Driver Name: " = "Driver Name: ";
@@ -773,6 +779,10 @@
 "FanFold German" = "FanFold German";
 "FanFold Legal German" = "FanFold Legal German";
 "Fanfold US" = "Fanfold US";
+"File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d).";
+"File \"%s\" is a directory." = "File \"%s\" is a directory.";
+"File \"%s\" not available: %s" = "File \"%s\" not available: %s";
+"File \"%s\" permissions OK (0%o/uid=%d/gid=%d)." = "File \"%s\" permissions OK (0%o/uid=%d/gid=%d).";
 "File Folder" = "File Folder";
 "File Folder - 9/16 x 3 7/16\"" = "File Folder - 9/16 x 3 7/16\"";
 "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cupsd.conf\"." = "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cupsd.conf\".";
