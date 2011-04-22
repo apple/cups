@@ -3106,6 +3106,12 @@ apple_init_profile(
   dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 				   &kCFTypeDictionaryKeyCallBacks,
 				   &kCFTypeDictionaryValueCallBacks);
+  if (!dict)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize profile \"%s\".",
+                    iccfile);
+    return;
+  }
 
   cftext = CFStringCreateWithCString(kCFAllocatorDefault, text,
 				     kCFStringEncodingUTF8);
