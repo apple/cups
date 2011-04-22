@@ -1262,6 +1262,9 @@ void
 cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
                cupsd_jobaction_t action)/* I - Action */
 {
+  char	filename[1024];			/* Job filename */
+
+
   if (job->printer)
     finalize_job(job, 1);
 
@@ -1270,8 +1273,6 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
    /*
     * Remove the job info file...
     */
-
-    char	filename[1024];		/* Job filename */
 
     snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	     job->id);
@@ -1290,7 +1291,14 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
     free(job->compressions);
     free(job->filetypes);
 
-    job->num_files = 0;
+    while (job->num_files > 0)
+    {
+      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+	       job->id, job->num_files);
+      unlink(filename);
+
+      job->num_files --;
+    }
   }
 
   if (job->history)
