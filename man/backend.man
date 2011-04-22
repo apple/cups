@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: backend.man 7810 2008-07-29 01:11:15Z mike $"
 .\"
-.\"   Backend man page for the Common UNIX Printing System (CUPS).
+.\"   Backend man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH backend 7 "CUPS" "12 May 2009" "Apple Inc."
+.TH backend 7 "CUPS" "15 April 2011" "Apple Inc."
 
 .SH NAME
 backend \- cups backend transmission interfaces
@@ -168,6 +168,19 @@ The print file was not successfully transmitted because one or
 more attributes are not supported. The scheduler will respond to
 this by canceling the job.
 
+.TP 5
+6 (CUPS_BACKEND_RETRY)
+.br
+The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job at a future time - other jobs may print before
+this one.
+
+.TP 5
+7 (CUPS_BACKEND_RETRY_CURRENT)
+.br
+The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job immediately without allowing intervening jobs.
+
 .PP
 All other exit code values are reserved.
 
@@ -177,7 +190,7 @@ All other exit code values are reserved.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: backend.man 7810 2008-07-29 01:11:15Z mike $".
 .\"

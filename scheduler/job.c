@@ -479,7 +479,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* Job title string */
 			copies[255],	/* # copies string */
 			*options,	/* Options string */
-			*envp[MAX_ENV + 19],
+			*envp[MAX_ENV + 20],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -496,6 +496,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 			apple_language[255],
 					/* APPLE_LANGUAGE env variable */
 #endif /* __APPLE__ */
+			auth_info_required[255],
+					/* AUTH_INFO_REQUIRED env variable */
 			ppd[1024],	/* PPD env variable */
 			printer_info[255],
 					/* PRINTER_INFO env variable */
@@ -878,6 +880,32 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", job->printer->name);
   snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
 
+  if (job->printer->num_auth_info_required == 1)
+    snprintf(auth_info_required, sizeof(auth_info_required),
+             "AUTH_INFO_REQUIRED=%s",
+	     job->printer->auth_info_required[0]);
+  else if (job->printer->num_auth_info_required == 2)
+    snprintf(auth_info_required, sizeof(auth_info_required),
+             "AUTH_INFO_REQUIRED=%s,%s",
+	     job->printer->auth_info_required[0],
+	     job->printer->auth_info_required[1]);
+  else if (job->printer->num_auth_info_required == 3)
+    snprintf(auth_info_required, sizeof(auth_info_required),
+             "AUTH_INFO_REQUIRED=%s,%s,%s",
+	     job->printer->auth_info_required[0],
+	     job->printer->auth_info_required[1],
+	     job->printer->auth_info_required[2]);
+  else if (job->printer->num_auth_info_required == 4)
+    snprintf(auth_info_required, sizeof(auth_info_required),
+             "AUTH_INFO_REQUIRED=%s,%s,%s,%s",
+	     job->printer->auth_info_required[0],
+	     job->printer->auth_info_required[1],
+	     job->printer->auth_info_required[2],
+	     job->printer->auth_info_required[3]);
+  else
+    strlcpy(auth_info_required, "AUTH_INFO_REQUIRED=none",
+	    sizeof(auth_info_required));
+
   envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
   envp[envc ++] = charset;
@@ -938,6 +966,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     envp[envc ++] = class_name;
   }
 
+  envp[envc ++] = auth_info_required;
   if (job->auth_username)
     envp[envc ++] = job->auth_username;
   if (job->auth_domain)
@@ -1233,6 +1262,9 @@ void
 cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
                cupsd_jobaction_t action)/* I - Action */
 {
+  char	filename[1024];			/* Job filename */
+
+
   if (job->printer)
     finalize_job(job, 1);
 
@@ -1241,8 +1273,6 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
    /*
     * Remove the job info file...
     */
-
-    char	filename[1024];		/* Job filename */
 
     snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	     job->id);
@@ -1261,7 +1291,14 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
     free(job->compressions);
     free(job->filetypes);
 
-    job->num_files = 0;
+    while (job->num_files > 0)
+    {
+      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+	       job->id, job->num_files);
+      unlink(filename);
+
+      job->num_files --;
+    }
   }
 
   if (job->history)
@@ -2945,6 +2982,57 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    job_state = IPP_JOB_HELD;
 	    message   = "Job held for authentication.";
           }
+          break;
+
+      case CUPS_BACKEND_RETRY :
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	   /*
+	    * Hold the job if the number of retries is less than the
+	    * JobRetryLimit, otherwise abort the job.
+	    */
+
+	    job->tries ++;
+
+	    if (job->tries > JobRetryLimit && JobRetryLimit > 0)
+	    {
+	     /*
+	      * Too many tries...
+	      */
+
+	      snprintf(buffer, sizeof(buffer),
+		       "Job aborted after %d unsuccessful attempts.",
+		       JobRetryLimit);
+	      job_state = IPP_JOB_ABORTED;
+	      message   = buffer;
+	    }
+	    else
+	    {
+	     /*
+	      * Try again in N seconds...
+	      */
+
+	      snprintf(buffer, sizeof(buffer),
+		       "Job held for %d seconds since it could not be sent.",
+		       JobRetryInterval);
+
+	      job->hold_until = time(NULL) + JobRetryInterval;
+	      job_state       = IPP_JOB_HELD;
+	      message         = buffer;
+	    }
+	  }
+          break;
+
+      case CUPS_BACKEND_RETRY_CURRENT :
+	 /*
+	  * Mark the job as pending and retry on the same printer...
+	  */
+
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	    job_state = IPP_JOB_PENDING;
+	    message   = "Retrying job on same printer.";
+	  }
           break;
     }
   }

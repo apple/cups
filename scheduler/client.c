@@ -179,29 +179,24 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     return;
   }
 
+ /*
+  * Save the connected port number...
+  */
+
+  _httpAddrSetPort(con->http.hostaddr, _httpAddrPort(&(lis->address)));
+
 #ifdef AF_INET6
-  if (lis->address.addr.sa_family == AF_INET6)
-  {
-   /*
-    * Save the connected port number...
-    */
+ /*
+  * Convert IPv4 over IPv6 addresses (::ffff:n.n.n.n) to IPv4 forms we
+  * can more easily use...
+  */
 
-    con->http.hostaddr->ipv6.sin6_port = lis->address.ipv6.sin6_port;
-
-   /*
-    * Convert IPv4 over IPv6 addresses (::ffff:n.n.n.n) to IPv4 forms we
-    * can more easily use...
-    */
-
-    if (con->http.hostaddr->ipv6.sin6_addr.s6_addr32[0] == 0 &&
-        con->http.hostaddr->ipv6.sin6_addr.s6_addr32[1] == 0 &&
-        ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2]) == 0xffff)
-      con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2] = 0;
-  }
-  else
+  if (lis->address.addr.sa_family == AF_INET6 &&
+      con->http.hostaddr->ipv6.sin6_addr.s6_addr32[0] == 0 &&
+      con->http.hostaddr->ipv6.sin6_addr.s6_addr32[1] == 0 &&
+      ntohl(con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2]) == 0xffff)
+    con->http.hostaddr->ipv6.sin6_addr.s6_addr32[2] = 0;
 #endif /* AF_INET6 */
-  if (lis->address.addr.sa_family == AF_INET)
-    con->http.hostaddr->ipv4.sin_port = lis->address.ipv4.sin_port;
 
  /*
   * Check the number of clients on the same address...
@@ -357,22 +352,16 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   }
 #endif /* HAVE_TCPD_H */
 
-#ifdef AF_INET6
-  if (con->http.hostaddr->addr.sa_family == AF_INET6)
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv6)",
-                    con->http.fd, con->http.hostname,
-		    ntohs(con->http.hostaddr->ipv6.sin6_port));
-  else
-#endif /* AF_INET6 */
 #ifdef AF_LOCAL
   if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s (Domain)",
                     con->http.fd, con->http.hostname);
   else
 #endif /* AF_LOCAL */
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv4)",
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv%d)",
                   con->http.fd, con->http.hostname,
-		  ntohs(con->http.hostaddr->ipv4.sin_port));
+		  _httpAddrPort(con->http.hostaddr),
+		  _httpAddrFamily(con->http.hostaddr) == AF_INET ? 4 : 6);
 
  /*
   * Get the local address the client connected to...
@@ -387,38 +376,23 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     strcpy(con->servername, "localhost");
     con->serverport = LocalPort;
   }
+#ifdef AF_LOCAL
+  else if (_httpAddrFamily(&temp) == AF_LOCAL)
+  {
+    strcpy(con->servername, "localhost");
+    con->serverport = LocalPort;
+  }
+#endif /* AF_LOCAL */
   else
   {
-#ifdef AF_INET6
-    if (temp.addr.sa_family == AF_INET6)
-    {
-      if (httpAddrLocalhost(&temp))
-        strlcpy(con->servername, "localhost", sizeof(con->servername));
-      else if (HostNameLookups || RemotePort)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else
-        httpAddrString(&temp, con->servername, sizeof(con->servername));
-
-      con->serverport = ntohs(lis->address.ipv6.sin6_port);
-    }
+    if (httpAddrLocalhost(&temp))
+      strlcpy(con->servername, "localhost", sizeof(con->servername));
+    else if (HostNameLookups || RemotePort)
+      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
     else
-#endif /* AF_INET6 */
-    if (temp.addr.sa_family == AF_INET)
-    {
-      if (httpAddrLocalhost(&temp))
-        strlcpy(con->servername, "localhost", sizeof(con->servername));
-      else if (HostNameLookups || RemotePort)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else
-        httpAddrString(&temp, con->servername, sizeof(con->servername));
+      httpAddrString(&temp, con->servername, sizeof(con->servername));
 
-      con->serverport = ntohs(lis->address.ipv4.sin_port);
-    }
-    else
-    {
-      strcpy(con->servername, "localhost");
-      con->serverport = LocalPort;
-    }
+    con->serverport = _httpAddrPort(&(lis->address));
   }
 
   cupsArrayAdd(Clients, con);
@@ -3406,6 +3380,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
 		    (int)CFArrayGetCount(peerCerts));
+    CFRelease(peerCerts);
   }
   else
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
@@ -3505,7 +3480,7 @@ get_cdsa_certificate(
 
     servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
 					   kCFStringEncodingUTF8);
-  
+
     CFRelease(policy);
 
     policy = SecPolicyCreateSSL(1, servername);
@@ -4591,7 +4566,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   }
   else
     servername = con->servername;
-	
+
  /*
   * Run the "certtool" command to generate a self-signed certificate...
   */

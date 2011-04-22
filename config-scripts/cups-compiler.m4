@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-compiler.m4 7871 2008-08-27 21:12:43Z mike $"
 dnl
-dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
+dnl   Compiler stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -131,15 +131,15 @@ if test -n "$GCC"; then
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
 
-	# The -pie option is available with some versions of GCC and adds
+	# The -fPIE option is available with some versions of GCC and adds
 	# randomization of addresses, which avoids another class of exploits
 	# that depend on a fixed address for common functions.
-	AC_MSG_CHECKING(if GCC supports -pie)
+	AC_MSG_CHECKING(if GCC supports -fPIE)
 	OLDCFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -pie -fPIE"
+	CFLAGS="$CFLAGS -fPIE"
 	AC_TRY_COMPILE(,,
-		PIEFLAGS="-pie -fPIE"
-		AC_MSG_RESULT(yes),
+		[PIEFLAGS="-fPIE -Wl,-pie"
+		AC_MSG_RESULT(yes)],
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
 
@@ -160,7 +160,7 @@ if test -n "$GCC"; then
 			# checking, basically wrapping all string functions
 			# with buffer-limited ones.  Not strictly needed for
 			# CUPS since we already use buffer-limited calls, but
-			# this will catch any additions that are broken.		
+			# this will catch any additions that are broken.
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
 
 			if test x$enable_pie = xyes; then

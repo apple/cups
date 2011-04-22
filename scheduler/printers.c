@@ -1409,8 +1409,11 @@ cupsdRenamePrinter(
   mimeDeleteType(MimeDatabase, p->filetype);
   p->filetype = mimeAddType(MimeDatabase, "printer", name);
 
-  mimeDeleteType(MimeDatabase, p->prefiltertype);
-  p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", name);
+  if (p->prefiltertype)
+  {
+    mimeDeleteType(MimeDatabase, p->prefiltertype);
+    p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", name);
+  }
 
  /*
   * Rename the printer...
@@ -2447,7 +2450,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
       if (p->pc && p->pc->prefilters)
       {
-        p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
+        if (!p->prefiltertype)
+          p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
 
         for (filter = (char *)cupsArrayFirst(p->pc->prefilters);
 	     filter;
@@ -3563,9 +3567,8 @@ add_printer_filter(
   size_t	maxsize = 0;		/* Maximum supported file size */
   mime_type_t	*temptype,		/* MIME type looping var */
 		*desttype;		/* Destination MIME type */
-  char		filename[1024],		/* Full filter filename */
-		*dirsep;		/* Pointer to directory separator */
-  struct stat	fileinfo;		/* File information */
+  mime_filter_t	*filterptr;		/* MIME filter */
+  char		filename[1024];		/* Full filter filename */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -3633,85 +3636,24 @@ add_printer_filter(
   }
 
  /*
-  * See if the filter program exists; if not, stop the printer and flag
-  * the error!
+  * Check permissions on the filter and its containing directory...
   */
 
   if (strcmp(program, "-"))
   {
+    _cups_fc_result_t	result;		/* Result of file check */
+
     if (program[0] == '/')
       strlcpy(filename, program, sizeof(filename));
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    if (stat(filename, &fileinfo))
-    {
-      memset(&fileinfo, 0, sizeof(fileinfo));
+    result = _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
+                            cupsdLogFCMessage, p);
 
-      snprintf(p->state_message, sizeof(p->state_message),
-               "Printer driver \"%s\" not available: %s", filename,
-	       strerror(errno));
-      cupsdSetPrinterReasons(p, "+cups-missing-filter-warning");
-
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
-    }
-
-   /*
-    * When running as root, do additional security checks...
-    */
-
-    else if (!RunUser)
-    {
-     /*
-      * Only use filters that are owned by root and do not have world write
-      * permissions.
-      */
-
-      if (fileinfo.st_uid ||
-          (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
-          (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
-      {
-	snprintf(p->state_message, sizeof(p->state_message),
-		 "Printer driver \"%s\" has insecure permissions "
-		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
-		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
-
-#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
-        if (fileinfo.st_uid ||
-	    (fileinfo.st_gid && fileinfo.st_gid != 80 &&
-	     (fileinfo.st_mode & S_IWGRP)) ||
-	    (fileinfo.st_mode & (S_ISUID | S_IWOTH)))
-#endif /* __APPLE__ */
-	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
-
-	cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
-      }
-      else if (fileinfo.st_mode)
-      {
-       /*
-	* Similarly, check that the parent directory is also owned by root and
-	* does not have world write permissions.
-	*/
-
-	if ((dirsep = strrchr(filename, '/')) != NULL)
-	  *dirsep = '\0';
-
-	if (!stat(filename, &fileinfo) &&
-	    (fileinfo.st_uid ||
-	     (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
-	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
-	{
-	  snprintf(p->state_message, sizeof(p->state_message),
-		   "Printer driver directory \"%s\" has insecure permissions "
-		   "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
-		   (int)fileinfo.st_uid, (int)fileinfo.st_gid);
-
-	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
-
-	  cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
-	}
-      }
-    }
+    if (result == _CUPS_FILE_CHECK_MISSING ||
+        result == _CUPS_FILE_CHECK_WRONG_TYPE)
+      return;
   }
 
  /*
@@ -3732,7 +3674,8 @@ add_printer_filter(
 		        "%s", p->name, temptype->super, temptype->type,
 		        desttype->super, desttype->type,
 		        cost, program);
-        mimeAddFilter(MimeDatabase, temptype, desttype, cost, program);
+        filterptr = mimeAddFilter(MimeDatabase, temptype, desttype, cost,
+	                          program);
 
         if (!mimeFilterLookup(MimeDatabase, desttype, filtertype))
         {
@@ -3750,8 +3693,12 @@ add_printer_filter(
 		        "%s", p->name, temptype->super, temptype->type,
 		        filtertype->super, filtertype->type,
 		        cost, program);
-        mimeAddFilter(MimeDatabase, temptype, filtertype, cost, program);
+        filterptr = mimeAddFilter(MimeDatabase, temptype, filtertype, cost,
+	                          program);
       }
+
+      if (filterptr)
+	filterptr->maxsize = maxsize;
     }
 }
 
@@ -4060,7 +4007,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ppd_info.st_mtime = 1;
 
   ippDelete(p->ppd_attrs);
-  p->ppd_attrs = ippNew();
+  p->ppd_attrs = NULL;
 
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
@@ -4093,6 +4040,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
   finishings[0]  = IPP_FINISHINGS_NONE;
   num_finishings = 1;
+
+  p->ppd_attrs = ippNew();
 
   if ((ppd = ppdOpenFile(ppd_name)) != NULL)
   {
@@ -4899,7 +4848,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     */
 
     if ((ppd_attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL &&
-        ppd_attr->value)
+        ppd_attr->value &&
+	!_cupsFileCheck(ppd_attr->value, _CUPS_FILE_CHECK_FILE, !RunUser,
+	                cupsdLogFCMessage, p))
     {
       CGImageRef	imageRef = NULL;/* Current icon image */
       CGImageRef	biggestIconRef = NULL;

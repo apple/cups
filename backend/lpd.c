@@ -816,22 +816,20 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	{
 	  case EHOSTDOWN :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-			           _("Network printer \"%s\" may not exist or "
-			             "is unavailable at this time."),
-				   hostname);
+			           _("The printer may not exist or "
+			             "is unavailable at this time."));
 	      break;
 
 	  case EHOSTUNREACH :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-			           _("Network printer \"%s\" is unreachable at "
-				     "this time."), hostname);
+			           _("The printer is unreachable at "
+				     "this time."));
 	      break;
 
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-			           _("Network printer \"%s\" is busy."),
-			           hostname);
+	                           _("The printer is busy."));
 	      break;
         }
 
@@ -851,8 +849,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Network printer \"%s\" is not responding."),
-			     hostname);
+	                     _("The printer is not responding."));
 	sleep(30);
       }
     }
@@ -860,17 +857,9 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
     fputs("STATE: -connecting-to-device\n", stderr);
     _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
-#ifdef AF_INET6
-    if (addr->addr.addr.sa_family == AF_INET6)
-      fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6) (local port %d)...\n", 
-	      httpAddrString(&addr->addr, addrname, sizeof(addrname)),
-	      ntohs(addr->addr.ipv6.sin6_port), lport);
-    else
-#endif /* AF_INET6 */
-      if (addr->addr.addr.sa_family == AF_INET)
-	fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4) (local port %d)...\n",
-		httpAddrString(&addr->addr, addrname, sizeof(addrname)),
-		ntohs(addr->addr.ipv4.sin_port), lport);
+    fprintf(stderr, "DEBUG: Connected to %s:%d (local port %d)...\n",
+	    httpAddrString(&(addr->addr), addrname, sizeof(addrname)),
+	    _httpAddrPort(&(addr->addr)), lport);
 
    /*
     * See if the printer supports SNMP...
@@ -1278,12 +1267,7 @@ rresvport_af(int *port,			/* IO - Port number to bind to */
     * Set the port number...
     */
 
-#  ifdef AF_INET6
-    if (family == AF_INET6)
-      addr.ipv6.sin6_port = htons(*port);
-    else
-#  endif /* AF_INET6 */
-    addr.ipv4.sin_port = htons(*port);
+    _httpAddrSetPort(&addr, *port);
 
    /*
     * Try binding the port to the socket; return if all is OK...

@@ -230,7 +230,7 @@ cupsUTF8ToCharset(
   * Handle identity conversions...
   */
 
-  if (encoding == CUPS_UTF8 || encoding <= CUPS_US_ASCII ||
+  if (encoding == CUPS_UTF8 ||
       encoding >= CUPS_ENCODING_VBCS_END)
   {
     strlcpy(dest, (char *)src, maxout);
@@ -243,12 +243,13 @@ cupsUTF8ToCharset(
 
   destptr = dest;
 
-  if (encoding == CUPS_ISO8859_1)
+  if (encoding == CUPS_ISO8859_1 || encoding <= CUPS_US_ASCII)
   {
-    int		ch;			/* Character from string */
+    int		ch,			/* Character from string */
+		maxch;			/* Maximum character for charset */
     char	*destend;		/* End of ISO-8859-1 buffer */
 
-
+    maxch   = encoding == CUPS_ISO8859_1 ? 256 : 128;
     destend = dest + maxout - 1;
 
     while (*src && destptr < destend)
@@ -259,7 +260,7 @@ cupsUTF8ToCharset(
       {
 	ch = ((ch & 0x1f) << 6) | (*src++ & 0x3f);
 
-	if (ch < 256)
+	if (ch < maxch)
           *destptr++ = ch;
 	else
           *destptr++ = '?';

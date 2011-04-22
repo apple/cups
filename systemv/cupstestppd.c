@@ -32,7 +32,7 @@
  *   check_translations() - Check translations in the PPD file.
  *   show_conflicts()     - Show option conflicts in a PPD file.
  *   test_raster()        - Test PostScript commands for raster printers.
- *   usage()              - Show program usage...
+ *   usage()              - Show program usage.
  *   valid_path()         - Check whether a path has the correct capitalization.
  *   valid_utf8()         - Check whether a string contains valid UTF-8 text.
  */
@@ -127,7 +127,7 @@ static int	check_profiles(ppd_file_t *ppd, const char *root, int errors,
 static int	check_sizes(ppd_file_t *ppd, int errors, int verbose, int warn);
 static int	check_translations(ppd_file_t *ppd, int errors, int verbose,
 		                   int warn);
-static void	show_conflicts(ppd_file_t *ppd);
+static void	show_conflicts(ppd_file_t *ppd, const char *prefix);
 static int	test_raster(ppd_file_t *ppd, int verbose);
 static void	usage(void);
 static int	valid_path(const char *keyword, const char *path, int errors,
@@ -1340,15 +1340,6 @@ main(int  argc,				/* I - Number of command-line args */
 	                    attr->name);
 	}
 
-        ppdMarkDefaults(ppd);
-	if (ppdConflicts(ppd))
-	{
-	  _cupsLangPuts(stdout,
-	                _("        WARN    Default choices conflicting."));
-
-          show_conflicts(ppd);
-        }
-
         if (ppdversion < 43)
 	{
           _cupsLangPrintf(stdout,
@@ -2167,6 +2158,22 @@ check_defaults(ppd_file_t *ppd,		/* I - PPD file */
 
   prefix = warn ? "  WARN  " : "**FAIL**";
 
+  ppdMarkDefaults(ppd);
+  if (ppdConflicts(ppd))
+  {
+    if (!warn && !errors && !verbose)
+      _cupsLangPuts(stdout, _(" FAIL"));
+
+    if (verbose >= 0)
+      _cupsLangPrintf(stdout,
+		      _("      %s  Default choices conflicting."), prefix);
+
+    show_conflicts(ppd, prefix);
+
+    if (!warn)
+      errors ++;
+  }
+
   for (j = 0; j < ppd->num_attrs; j ++)
   {
     attr = ppd->attrs[j];
@@ -2916,13 +2923,25 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	    int        verbose,		/* I - Verbosity level */
 	    int        warn)		/* I - Warnings only? */
 {
-  int		i;			/* Looping vars */
+  int		i;			/* Looping var */
   ppd_size_t	*size;			/* Current size */
   int		width,			/* Custom width */
 		length;			/* Custom length */
   const char	*prefix;		/* WARN/FAIL prefix */
   ppd_option_t	*page_size,		/* PageSize option */
 		*page_region;		/* PageRegion option */
+  _pwg_media_t  *pwg_media;             /* PWG media */
+  char          buf[1024];              /* PapeSize name that is supposed to be */
+  const char	*ptr;			/* Pointer into string */
+  int		width_2540ths,		/* PageSize width in 2540ths */
+		length_2540ths;		/* PageSize length in 2540ths */
+  int		is_ok;			/* Flag for PageSize name verification */
+  double	width_tmp,		/* Width after rounded up */
+		length_tmp,		/* Length after rounded up */
+		width_inch,		/* Width in inches */
+		length_inch,		/* Length in inches */
+		width_mm,		/* Width in millimeters */
+		length_mm;		/* Length in millimeters */
 
 
   prefix = warn ? "  WARN  " : "**FAIL**";
@@ -3027,6 +3046,112 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
       if (!warn)
 	errors ++;
+    }
+
+   /*
+    * Verify that the size name is Adobe standard name if it's a standard size
+    * and the dementional name if it's not a standard size.  Suffix should be
+    * .Fullbleed, etc., or numeric, e.g., Letter, Letter.Fullbleed,
+    * Letter.Transverse, Letter1, Letter2, 4x8, 55x91mm, 55x91mm.Fullbleed, etc.
+    */
+
+    if (warn != 0)
+    {
+      is_ok          = 1;
+      width_2540ths  = (size->length > size->width) ?
+                           _PWG_FROMPTS(size->width) :
+			   _PWG_FROMPTS(size->length);
+      length_2540ths = (size->length > size->width) ?
+                           _PWG_FROMPTS(size->length) :
+			   _PWG_FROMPTS(size->width);
+      pwg_media      = _pwgMediaForSize(width_2540ths, length_2540ths);
+
+      if (pwg_media && pwg_media->ppd)
+      {
+        strlcpy(buf, pwg_media->ppd, sizeof(buf));
+
+        if (size->left == 0 && size->bottom == 0 &&
+	    size->right == size->width && size->top == size->length)
+        {
+          snprintf(buf, sizeof(buf), "%s.Fullbleed", pwg_media->ppd);
+	  if (strcmp(size->name, buf))
+	    is_ok = 0;					
+        }
+        else if (size->width > size->length)
+        {
+	  if ((ptr = pwg_media->ppd + strlen(pwg_media->ppd) - 7)
+	          >= pwg_media->ppd && !strcmp(ptr, "Rotated"))
+	  {
+	    if (strcmp(size->name, buf))
+	      is_ok = 0;
+	  }
+	  else
+	  {
+	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+	    if (strcmp(size->name, buf))
+	    {
+	      snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
+	      if (strcmp(size->name, buf))
+		is_ok = 0;					
+	    }
+	  }
+        }
+	else
+        {
+	  if ((!strncmp(size->name, pwg_media->ppd, strlen(pwg_media->ppd))))
+          {
+            for (ptr = size->name + strlen(pwg_media->ppd); *ptr; ptr ++)
+            {
+              if (!isdigit(*ptr & 255))
+	      {
+                is_ok = 0;
+		break;
+	      }
+            }
+          }
+          else
+            is_ok = 0;
+        }
+        
+        if (!is_ok)
+          _cupsLangPrintf(stdout,
+                          _("      %s  Size \"%s\" should be the Adobe "
+			    "standard name \"%s\"."),
+                          prefix, size->name, buf);
+      }
+      else
+      {
+        width_tmp  = (fabs(size->width - ceil(size->width)) < 0.1) ?
+	                 ceil(size->width) : size->width;
+        length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
+	                 ceil(size->length) : size->length;
+
+        if (fmod(width_tmp, 18.0) == 0.0 && fmod(length_tmp, 18.0) == 0.0)
+        {
+          width_inch  = width_tmp / 72.0;
+          length_inch = length_tmp / 72.0;
+
+          snprintf(buf, sizeof(buf), "%gx%g", width_inch, length_inch);
+        }
+        else
+        {
+          width_mm  = size->width / 72.0 * 25.4;
+          length_mm = size->length / 72.0 * 25.4;
+
+          snprintf(buf, sizeof(buf), "%.0fx%.0fmm", width_mm, length_mm);
+        }
+
+        if (size->left == 0 && size->bottom == 0 &&
+	    size->right == size->width && size->top == size->length)
+          strlcat(buf, ".Fullbleed", sizeof(buf));
+        else if (size->width > size->length)
+          strlcat(buf, ".Transverse", sizeof(buf));
+
+        if (strcmp(size->name, buf))
+          _cupsLangPrintf(stdout,
+                          _("      %s  Size \"%s\" should be \"%s\"."),
+                          prefix, size->name, buf);
+      }
     }
   }
 
@@ -3330,7 +3455,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
  */
 
 static void
-show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
+show_conflicts(ppd_file_t *ppd,		/* I - PPD to check */
+               const char *prefix)	/* I - Prefix string */
 {
   int		i, j;			/* Looping variables */
   ppd_const_t	*c;			/* Current constraint */
@@ -3417,9 +3543,9 @@ show_conflicts(ppd_file_t *ppd)		/* I - PPD to check */
 
     if (c1 != NULL && c1->marked && c2 != NULL && c2->marked)
       _cupsLangPrintf(stdout,
-                      _("        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+                      _("      %s  \"%s %s\" conflicts with \"%s %s\"\n"
                         "                (constraint=\"%s %s %s %s\")."),
-        	      o1->keyword, c1->choice, o2->keyword, c2->choice,
+        	      prefix, o1->keyword, c1->choice, o2->keyword, c2->choice,
 		      c->option1, c->choice1, c->option2, c->choice2);
   }
 }
@@ -3477,7 +3603,7 @@ test_raster(ppd_file_t *ppd,		/* I - PPD file */
 
 
 /*
- * 'usage()' - Show program usage...
+ * 'usage()' - Show program usage.
  */
 
 static void

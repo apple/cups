@@ -139,11 +139,19 @@ _ppdCacheCreateWithFile(
     return (NULL);
   }
 
-  if (strncmp(line, "#CUPS-PPD-CACHE-", 16) ||
-      atoi(line + 16) != _PPD_CACHE_VERSION)
+  if (strncmp(line, "#CUPS-PPD-CACHE-", 16))
   {
     _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
     DEBUG_printf(("_ppdCacheCreateWithFile: Wrong first line \"%s\".", line));
+    cupsFileClose(fp);
+    return (NULL);
+  }
+
+  if (atoi(line + 16) != _PPD_CACHE_VERSION)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Out of date PPD cache file."), 1);
+    DEBUG_printf(("_ppdCacheCreateWithFile: Cache file has version %s, "
+                  "expected %d.", line + 16, _PPD_CACHE_VERSION));
     cupsFileClose(fp);
     return (NULL);
   }
@@ -528,8 +536,6 @@ _ppdCacheCreateWithFile(
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
 		    linenum));
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
-      goto create_error;
     }
   }
 
@@ -571,7 +577,10 @@ _ppdCacheCreateWithFile(
   _ppdCacheDestroy(pc);
 
   if (attrs)
+  {
     ippDelete(*attrs);
+    *attrs = NULL;
+  }
 
   return (NULL);
 }

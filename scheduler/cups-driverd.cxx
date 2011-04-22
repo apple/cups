@@ -543,7 +543,10 @@ cat_static(const char *name,		/* I - PPD name */
   const char	*datadir;		/* CUPS_DATADIR env var */
   char		line[1024],		/* Line/filename */
 		message[2048];		/* status-message */
-
+#ifdef __APPLE__
+  const char	*printerDriver,		/* Pointer to .printerDriver extension */
+		*slash;			/* Pointer to next slash */
+#endif /* __APPLE__ */
 
   if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
   {
@@ -575,7 +578,19 @@ cat_static(const char *name,		/* I - PPD name */
 
 #ifdef __APPLE__
   if (!strncmp(name, "System/Library/Printers/PPDs/Contents/Resources/", 48) ||
-      !strncmp(name, "Library/Printers/PPDs/Contents/Resources/", 41))
+      !strncmp(name, "Library/Printers/PPDs/Contents/Resources/", 41) ||
+      (!strncmp(name, "System/Library/Printers/", 24) &&
+       (printerDriver =
+	    strstr(name + 24,
+		   ".printerDriver/Contents/Resources/PPDs")) != NULL &&
+       (slash = strchr(name + 24, '/')) != NULL &&
+       slash > printerDriver) ||
+      (!strncmp(name, "Library/Printers/", 17) &&
+       (printerDriver =
+	    strstr(name + 17,
+		   ".printerDriver/Contents/Resources/PPDs")) != NULL &&
+       (slash = strchr(name + 17, '/')) != NULL &&
+       slash > printerDriver))
   {
    /*
     * Map ppd-name to Mac OS X standard locations...
@@ -583,7 +598,6 @@ cat_static(const char *name,		/* I - PPD name */
 
     snprintf(line, sizeof(line), "/%s", name);
   }
-  else
 
 #elif defined(__linux)
   if (!strncmp(name, "lsb/usr/", 8))
@@ -872,10 +886,14 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Load PPDs from standard Mac OS X locations...
   */
 
+  load_ppds("/Library/Printers",
+            "Library/Printers", 0);
   load_ppds("/Library/Printers/PPDs/Contents/Resources",
             "Library/Printers/PPDs/Contents/Resources", 0);
   load_ppds("/Library/Printers/PPDs/Contents/Resources/en.lproj",
             "Library/Printers/PPDs/Contents/Resources/en.lproj", 0);
+  load_ppds("/System/Library/Printers",
+            "System/Library/Printers", 0);
   load_ppds("/System/Library/Printers/PPDs/Contents/Resources",
             "System/Library/Printers/PPDs/Contents/Resources", 0);
   load_ppds("/System/Library/Printers/PPDs/Contents/Resources/en.lproj",
@@ -1606,8 +1624,13 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
     * Run the driver with no arguments and collect the output...
     */
 
-    argv[0] = dent->filename;
     snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
+
+    if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !geteuid(),
+                       _cupsFileCheckFilter, NULL))
+      continue;
+
+    argv[0] = dent->filename;
 
     if ((fp = cupsdPipeCommand(&pid, filename, argv, 0)) != NULL)
     {
@@ -1807,6 +1830,14 @@ load_ppds(const char *d,		/* I - Actual directory */
   memcpy(dinfoptr, &dinfo, sizeof(struct stat));
   cupsArrayAdd(Inodes, dinfoptr);
 
+ /*
+  * Check permissions...
+  */
+
+  if (_cupsFileCheck(d, _CUPS_FILE_CHECK_DIRECTORY, !geteuid(),
+		     _cupsFileCheckFilter, NULL))
+    return (0);
+
   if ((dir = cupsDirOpen(d)) == NULL)
   {
     if (errno != ENOENT)
@@ -1846,11 +1877,29 @@ load_ppds(const char *d,		/* I - Actual directory */
       */
 
       if (descend)
+      {
 	if (!load_ppds(filename, name, 1))
 	{
 	  cupsDirClose(dir);
 	  return (1);
 	}
+      }
+      else if ((ptr = filename + strlen(filename) - 14) > filename &&
+	       !strcmp(ptr, ".printerDriver"))
+      {
+       /*
+        * Load PPDs in a printer driver bundle.
+	*/
+
+	if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_DIRECTORY, !geteuid(),
+			   _cupsFileCheckFilter, NULL))
+	  continue;
+
+	strlcat(filename, "/Contents/Resources/PPDs", sizeof(filename));
+	strlcat(name, "/Contents/Resources/PPDs", sizeof(name));
+
+	load_ppds(filename, name, 0);
+      }
 
       continue;
     }
@@ -1863,6 +1912,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       continue;
     }
+    else if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_FILE_ONLY, !geteuid(),
+		            _cupsFileCheckFilter, NULL))
+      continue;
 
    /*
     * See if this file has been scanned before...

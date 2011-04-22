@@ -386,7 +386,9 @@ div.contents ul.subcontents li {
 	<li><a href="#mimeDeleteType" title="Delete a type from the MIME database.">mimeDeleteType</a></li>
 	<li><a href="#mimeFileType" title="Determine the type of a file.">mimeFileType</a></li>
 	<li><a href="#mimeFilter" title="Find the fastest way to convert from one type to another.">mimeFilter</a></li>
-	<li><a href="#mimeFilterLookup" title="Lookup a filter...">mimeFilterLookup</a></li>
+	<li><a href="#mimeFilter2" title="Find the fastest way to convert from one type to another,
+including file size.">mimeFilter2</a></li>
+	<li><a href="#mimeFilterLookup" title="Lookup a filter.">mimeFilterLookup</a></li>
 	<li><a href="#mimeFirstFilter" title="Get the first filter in the MIME database.">mimeFirstFilter</a></li>
 	<li><a href="#mimeFirstType" title="Get the first type in the MIME database.">mimeFirstType</a></li>
 	<li><a href="#mimeLoad" title="Create a new MIME database from disk.">mimeLoad</a></li>
@@ -394,7 +396,7 @@ div.contents ul.subcontents li {
 	<li><a href="#mimeLoadTypes" title="Load type definitions from disk.">mimeLoadTypes</a></li>
 	<li><a href="#mimeNextFilter" title="Get the next filter in the MIME database.">mimeNextFilter</a></li>
 	<li><a href="#mimeNextType" title="Get the next type in the MIME database.">mimeNextType</a></li>
-	<li><a href="#mimeNumFilters" title="MIME database">mimeNumFilters</a></li>
+	<li><a href="#mimeNumFilters" title="Next type">mimeNumFilters</a></li>
 	<li><a href="#mimeNumTypes" title="MIME database">mimeNumTypes</a></li>
 	<li><a href="#mimeType" title="Lookup a file type.">mimeType</a></li>
 </ul></li>
@@ -567,8 +569,34 @@ cups_array_t *mimeFilter (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Array of filters to run</p>
+<h3 class="function"><a name="mimeFilter2">mimeFilter2</a></h3>
+<p class="description">Find the fastest way to convert from one type to another,
+including file size.</p>
+<p class="code">
+cups_array_t *mimeFilter2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t srcsize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cost<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>src</dt>
+<dd class="description">Source file type</dd>
+<dt>srcsize</dt>
+<dd class="description">Size of source file</dd>
+<dt>dst</dt>
+<dd class="description">Destination file type</dd>
+<dt>cost</dt>
+<dd class="description">Cost of filters</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Array of filters to run</p>
 <h3 class="function"><a name="mimeFilterLookup">mimeFilterLookup</a></h3>
-<p class="description">Lookup a filter...</p>
+<p class="description">Lookup a filter.</p>
 <p class="code">
 <a href="#mime_filter_t">mime_filter_t</a> *mimeFilterLookup (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
@@ -699,7 +727,7 @@ Use <a href="#mimeLoadFilters"><code>mimeLoadFilters</code></a> to load all filt
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Type or NULL</p>
 <h3 class="function"><a name="mimeNumFilters">mimeNumFilters</a></h3>
-<p class="description">MIME database</p>
+<p class="description">Next type</p>
 <p class="code">
 int mimeNumFilters (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime<br>

@@ -3106,6 +3106,12 @@ apple_init_profile(
   dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 				   &kCFTypeDictionaryKeyCallBacks,
 				   &kCFTypeDictionaryValueCallBacks);
+  if (!dict)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize profile \"%s\".",
+                    iccfile);
+    return;
+  }
 
   cftext = CFStringCreateWithCString(kCFAllocatorDefault, text,
 				     kCFStringEncodingUTF8);
@@ -3286,7 +3292,12 @@ apple_register_profiles(
 	strlcpy(iccfile, attr->value, sizeof(iccfile));
 
       if (access(iccfile, 0))
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "%s: ICC Profile \"%s\" does not exist.", p->name,
+                        iccfile);
 	continue;
+      }
 
       num_profiles ++;
     }
@@ -3416,7 +3427,8 @@ apple_register_profiles(
         else
 	  strlcpy(iccfile, attr->value, sizeof(iccfile));
 
-        if (access(iccfile, 0))
+        if (_cupsFileCheck(iccfile, _CUPS_FILE_CHECK_FILE, !RunUser,
+	                   cupsdLogFCMessage, p))
 	  continue;
 
         if (profile_key[0] == 'c')

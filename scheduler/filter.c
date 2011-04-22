@@ -3,7 +3,7 @@
  *
  *   File type conversion routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,14 +14,16 @@
  *
  * Contents:
  *
- *   mimeAddFilter()    - Add a filter to the current MIME database.
- *   mimeFilter()       - Find the fastest way to convert from one type to
- *                        another.
- *   mimeFilter2()      - Find the fastest way to convert from one type to
- *                        another, including the file size.
- *   mimeFilterLookup() - Lookup a filter.
- *   compare_filters()  - Compare two filters.
- *   find_filters()     - Find the filters to convert from one type to another.
+ *   mimeAddFilter()        - Add a filter to the current MIME database.
+ *   mimeFilter()           - Find the fastest way to convert from one type to
+ *                            another.
+ *   mimeFilter2()          - Find the fastest way to convert from one type to
+ *                            another, including the file size.
+ *   mimeFilterLookup()     - Lookup a filter.
+ *   mime_compare_filters() - Compare two filters.
+ *   mime_compare_srcs()    - Compare two filter source types.
+ *   mime_find_filters()    - Find the filters to convert from one type to
+ *                            another.
  */
 
 /*
@@ -48,9 +50,9 @@ typedef struct _mime_typelist_s		/**** List of source types ****/
  * Local functions...
  */
 
-static int		compare_filters(mime_filter_t *, mime_filter_t *);
-static int		compare_srcs(mime_filter_t *, mime_filter_t *);
-static cups_array_t	*find_filters(mime_t *mime, mime_type_t *src,
+static int		mime_compare_filters(mime_filter_t *, mime_filter_t *);
+static int		mime_compare_srcs(mime_filter_t *, mime_filter_t *);
+static cups_array_t	*mime_find_filters(mime_t *mime, mime_type_t *src,
 				      size_t srcsize, mime_type_t *dst,
 				      int *cost, _mime_typelist_t *visited);
 
@@ -69,12 +71,21 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
   mime_filter_t	*temp;			/* New filter */
 
 
+  DEBUG_printf(("mimeAddFilter(mime=%p, src=%p(%s/%s), dst=%p(%s/%s), cost=%d, "
+                "filter=\"%s\")", mime,
+		src, src ? src->super : "???", src ? src->type : "???",
+		dst, dst ? dst->super : "???", dst ? dst->type : "???",
+		cost, filter));
+		
  /*
   * Range-check the input...
   */
 
   if (!mime || !src || !dst || !filter)
+  {
+    DEBUG_puts("1mimeAddFilter: Returning NULL.");
     return (NULL);
+  }
 
  /*
   * See if we already have an existing filter for the given source and
@@ -90,6 +101,8 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
 
     if (temp->cost > cost)
     {
+      DEBUG_printf(("1mimeAddFilter: Replacing filter \"%s\", cost %d.",
+                    temp->filter, temp->cost));
       temp->cost = cost;
       strlcpy(temp->filter, filter, sizeof(temp->filter));
     }
@@ -101,7 +114,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     */
 
     if (!mime->filters)
-      mime->filters = cupsArrayNew((cups_array_func_t)compare_filters, NULL);
+      mime->filters = cupsArrayNew((cups_array_func_t)mime_compare_filters, NULL);
 
     if (!mime->filters)
       return (NULL);
@@ -118,12 +131,16 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
     temp->cost = cost;
     strlcpy(temp->filter, filter, sizeof(temp->filter));
 
+    DEBUG_puts("1mimeAddFilter: Adding new filter.");
     cupsArrayAdd(mime->filters, temp);
+    cupsArrayAdd(mime->srcs, temp);
   }
 
  /*
   * Return the new/updated filter...
   */
+
+  DEBUG_printf(("1mimeAddFilter: Returning %p.", temp));
 
   return (temp);
 }
@@ -140,9 +157,9 @@ mimeFilter(mime_t      *mime,		/* I - MIME database */
 	   int         *cost)		/* O - Cost of filters */
 {
   DEBUG_printf(("mimeFilter(mime=%p, src=%p(%s/%s), dst=%p(%s/%s), "
-                "cost=%p(%d))",
-        	mime, src, src ? src->super : "?", src ? src->type : "?",
-		dst, dst ? dst->super : "?", dst ? dst->type : "?",
+                "cost=%p(%d))", mime,
+        	src, src ? src->super : "???", src ? src->type : "???",
+		dst, dst ? dst->super : "???", dst ? dst->type : "???",
 		cost, cost ? *cost : 0));
 
   return (mimeFilter2(mime, src, 0, dst, cost));
@@ -161,15 +178,19 @@ mimeFilter2(mime_t      *mime,		/* I - MIME database */
 	    mime_type_t *dst,		/* I - Destination file type */
 	    int         *cost)		/* O - Cost of filters */
 {
+  cups_array_t	*filters;		/* Array of filters to run */
+
+
  /*
   * Range-check the input...
   */
 
   DEBUG_printf(("mimeFilter2(mime=%p, src=%p(%s/%s), srcsize=" CUPS_LLFMT
-                ", dst=%p(%s/%s), cost=%p(%d))",
-        	mime, src, src ? src->super : "?", src ? src->type : "?",
-		CUPS_LLCAST srcsize, dst, dst ? dst->super : "?",
-		dst ? dst->type : "?", cost, cost ? *cost : 0));
+                ", dst=%p(%s/%s), cost=%p(%d))", mime,
+        	src, src ? src->super : "???", src ? src->type : "???",
+		CUPS_LLCAST srcsize,
+		dst, dst ? dst->super : "???", dst ? dst->type : "???",
+		cost, cost ? *cost : 0));
 
   if (cost)
     *cost = 0;
@@ -185,7 +206,7 @@ mimeFilter2(mime_t      *mime,		/* I - MIME database */
   {
     mime_filter_t	*current;	/* Current filter */
 
-    mime->srcs = cupsArrayNew((cups_array_func_t)compare_srcs, NULL);
+    mime->srcs = cupsArrayNew((cups_array_func_t)mime_compare_srcs, NULL);
 
     for (current = mimeFirstFilter(mime);
          current;
@@ -197,7 +218,24 @@ mimeFilter2(mime_t      *mime,		/* I - MIME database */
   * Find the filters...
   */
 
-  return (find_filters(mime, src, srcsize, dst, cost, NULL));
+  filters = mime_find_filters(mime, src, srcsize, dst, cost, NULL);
+
+  DEBUG_printf(("1mimeFilter2: Returning %d filter(s), cost %d:",
+                cupsArrayCount(filters), cost ? *cost : -1));
+#ifdef DEBUG
+  {
+    mime_filter_t	*filter;	/* Current filter */
+
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+	 filter = (mime_filter_t *)cupsArrayNext(filters))
+      DEBUG_printf(("1mimeFilter2: %s/%s %s/%s %d %s", filter->src->super,
+                    filter->src->type, filter->dst->super, filter->dst->type,
+		    filter->cost, filter->filter));
+  }
+#endif /* DEBUG */
+
+  return (filters);
 }
 
 
@@ -210,23 +248,31 @@ mimeFilterLookup(mime_t      *mime,	/* I - MIME database */
                  mime_type_t *src,	/* I - Source type */
                  mime_type_t *dst)	/* I - Destination type */
 {
-  mime_filter_t	key;			/* Key record for filter search */
+  mime_filter_t	key,			/* Key record for filter search */
+		*filter;		/* Matching filter */
 
+
+  DEBUG_printf(("2mimeFilterLookup(mime=%p, src=%p(%s/%s), dst=%p(%s/%s))", mime,
+                src, src ? src->super : "???", src ? src->type : "???",
+		dst, dst ? dst->super : "???", dst ? dst->type : "???"));
 
   key.src = src;
   key.dst = dst;
 
-  return ((mime_filter_t *)cupsArrayFind(mime->filters, &key));
+  filter = (mime_filter_t *)cupsArrayFind(mime->filters, &key);
+  DEBUG_printf(("3mimeFilterLookup: Returning %p(%s).", filter,
+                filter ? filter->filter : "???"));
+  return (filter);
 }
 
 
 /*
- * 'compare_filters()' - Compare two filters.
+ * 'mime_compare_filters()' - Compare two filters.
  */
 
 static int				/* O - Comparison result */
-compare_filters(mime_filter_t *f0,	/* I - First filter */
-                mime_filter_t *f1)	/* I - Second filter */
+mime_compare_filters(mime_filter_t *f0,	/* I - First filter */
+                     mime_filter_t *f1)	/* I - Second filter */
 {
   int	i;				/* Result of comparison */
 
@@ -241,12 +287,12 @@ compare_filters(mime_filter_t *f0,	/* I - First filter */
 
 
 /*
- * 'compare_srcs()' - Compare two srcs...
+ * 'mime_compare_srcs()' - Compare two filter source types.
  */
 
 static int				/* O - Comparison result */
-compare_srcs(mime_filter_t *f0,		/* I - First filter */
-             mime_filter_t *f1)		/* I - Second filter */
+mime_compare_srcs(mime_filter_t *f0,	/* I - First filter */
+                  mime_filter_t *f1)	/* I - Second filter */
 {
   int	i;				/* Result of comparison */
 
@@ -259,16 +305,17 @@ compare_srcs(mime_filter_t *f0,		/* I - First filter */
 
 
 /*
- * 'find_filters()' - Find the filters to convert from one type to another.
+ * 'mime_find_filters()' - Find the filters to convert from one type to another.
  */
 
 static cups_array_t *			/* O - Array of filters to run */
-find_filters(mime_t           *mime,	/* I - MIME database */
-             mime_type_t      *src,	/* I - Source file type */
-	     size_t           srcsize,	/* I - Size of source file */
-	     mime_type_t      *dst,	/* I - Destination file type */
-	     int              *cost,	/* O - Cost of filters */
-	     _mime_typelist_t *list)	/* I - Source types we've used */
+mime_find_filters(
+    mime_t           *mime,		/* I - MIME database */
+    mime_type_t      *src,		/* I - Source file type */
+    size_t           srcsize,		/* I - Size of source file */
+    mime_type_t      *dst,		/* I - Destination file type */
+    int              *cost,		/* O - Cost of filters */
+    _mime_typelist_t *list)		/* I - Source types we've used */
 {
   int			tempcost,	/* Temporary cost */
 			mincost;	/* Current minimum */
@@ -280,7 +327,7 @@ find_filters(mime_t           *mime,	/* I - MIME database */
 			*listptr;	/* Pointer in list */
 
 
-  DEBUG_printf(("2find_filters(mime=%p, src=%p(%s/%s), srcsize=" CUPS_LLFMT
+  DEBUG_printf(("2mime_find_filters(mime=%p, src=%p(%s/%s), srcsize=" CUPS_LLFMT
                 ", dst=%p(%s/%s), cost=%p, list=%p)", mime, src, src->super,
 		src->type, CUPS_LLCAST srcsize, dst, dst->super, dst->type,
 		cost, list));
@@ -296,20 +343,28 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     * Got a direct filter!
     */
 
-    DEBUG_puts("2find_filters: Direct filter found!");
+    DEBUG_puts("3mime_find_filters: Direct filter found.");
 
     if ((mintemp = cupsArrayNew(NULL, NULL)) == NULL)
+    {
+      DEBUG_puts("3mime_find_filters: Returning NULL (out of memory).");
       return (NULL);
+    }
 
     cupsArrayAdd(mintemp, current);
 
     mincost = current->cost;
 
     if (!cost)
+    {
+      DEBUG_printf(("3mime_find_filters: Returning 1 filter, cost %d:",
+                    mincost));
+      DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+                    current->src->super, current->src->type,
+                    current->dst->super, current->dst->type,
+		    current->cost, current->filter));
       return (mintemp);
-
-    DEBUG_puts("2find_filters: Found direct filter:");
-    DEBUG_printf(("2find_filters: %s (cost=%d)", current->filter, mincost));
+    }
   }
   else
   {
@@ -364,14 +419,30 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     listnode.src = current->src;
 
     cupsArraySave(mime->srcs);
-    temp = find_filters(mime, current->dst, srcsize, dst, &tempcost, &listnode);
+    temp = mime_find_filters(mime, current->dst, srcsize, dst, &tempcost,
+                             &listnode);
     cupsArrayRestore(mime->srcs);
 
     if (!temp)
       continue;
 
     if (!cost)
+    {
+      DEBUG_printf(("3mime_find_filters: Returning %d filter(s), cost %d:",
+		    cupsArrayCount(temp), tempcost));
+
+#ifdef DEBUG
+      for (current = (mime_filter_t *)cupsArrayFirst(temp);
+	   current;
+	   current = (mime_filter_t *)cupsArrayNext(temp))
+	DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+		      current->src->super, current->src->type,
+		      current->dst->super, current->dst->type,
+		      current->cost, current->filter));
+#endif /* DEBUG */
+
       return (temp);
+    }
 
    /*
     * Found a match; see if this one is less costly than the last (if
@@ -403,14 +474,17 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     * Hey, we got a match!
     */
 
-#ifdef DEBUG
-    DEBUG_printf(("find_filters: Returning %d filters:\n",
-                  cupsArrayCount(mintemp)));
+    DEBUG_printf(("3mime_find_filters: Returning %d filter(s), cost %d:",
+                  cupsArrayCount(mintemp), mincost));
 
+#ifdef DEBUG
     for (current = (mime_filter_t *)cupsArrayFirst(mintemp);
          current;
 	 current = (mime_filter_t *)cupsArrayNext(mintemp))
-      DEBUG_printf(("find_filters: %s\n", current->filter));
+      DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+                    current->src->super, current->src->type,
+                    current->dst->super, current->dst->type,
+		    current->cost, current->filter));
 #endif /* DEBUG */
 
     if (cost)
@@ -419,7 +493,7 @@ find_filters(mime_t           *mime,	/* I - MIME database */
     return (mintemp);
   }
 
-  DEBUG_puts("find_filters: Returning zippo...");
+  DEBUG_puts("3mime_find_filters: Returning NULL (no matches).");
 
   return (NULL);
 }

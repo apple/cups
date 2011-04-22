@@ -14,6 +14,7 @@
  *
  * Contents:
  *
+ *   cupsdCheckLogFile()     - Open/rotate a log file if it needs it.
  *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
  *   cupsdLogGSSMessage() - Log a GSSAPI error...
  *   cupsdLogJob()        - Log a job message.
@@ -21,7 +22,6 @@
  *   cupsdLogPage()       - Log a page to the page log file.
  *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
  *   cupsdWriteErrorLog() - Write a line to the ErrorLog.
- *   check_log_file()     - Open/rotate a log file if it needs it.
  *   format_log_line()    - Format a line for a log file.
  */
 
@@ -46,8 +46,185 @@ static char	*log_line = NULL;	/* Line for output file */
  * Local functions...
  */
 
-static int	check_log_file(cups_file_t **lf, const char *logname);
 static int	format_log_line(const char *message, va_list ap);
+
+
+/*
+ * 'cupsdCheckLogFile()' - Open/rotate a log file if it needs it.
+ */
+
+int					/* O  - 1 if log file open */
+cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
+	          const char  *logname)	/* I  - Log filename */
+{
+  char		backname[1024],		/* Backup log filename */
+		filename[1024],		/* Formatted log filename */
+		*ptr;			/* Pointer into filename */
+  const char	*logptr;		/* Pointer into log filename */
+
+
+ /*
+  * See if we have a log file to check...
+  */
+
+  if (!lf || !logname || !logname[0])
+    return (1);
+
+ /*
+  * Format the filename as needed...
+  */
+
+  if (!*lf ||
+      (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
+       MaxLogSize > 0))
+  {
+   /*
+    * Handle format strings...
+    */
+
+    filename[sizeof(filename) - 1] = '\0';
+
+    if (logname[0] != '/')
+    {
+      strlcpy(filename, ServerRoot, sizeof(filename));
+      strlcat(filename, "/", sizeof(filename));
+    }
+    else
+      filename[0] = '\0';
+
+    for (logptr = logname, ptr = filename + strlen(filename);
+         *logptr && ptr < (filename + sizeof(filename) - 1);
+	 logptr ++)
+      if (*logptr == '%')
+      {
+       /*
+        * Format spec...
+	*/
+
+        logptr ++;
+	if (*logptr == 's')
+	{
+	 /*
+	  * Insert the server name...
+	  */
+
+	  strlcpy(ptr, ServerName, sizeof(filename) - (ptr - filename));
+	  ptr += strlen(ptr);
+	}
+        else
+	{
+	 /*
+	  * Otherwise just insert the character...
+	  */
+
+	  *ptr++ = *logptr;
+	}
+      }
+      else
+	*ptr++ = *logptr;
+
+    *ptr = '\0';
+  }
+
+ /*
+  * See if the log file is open...
+  */
+
+  if (!*lf)
+  {
+   /*
+    * Nope, open the log file...
+    */
+
+    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
+    {
+     /*
+      * If the file is in CUPS_LOGDIR then try to create a missing directory...
+      */
+
+      if (!strncmp(filename, CUPS_LOGDIR, strlen(CUPS_LOGDIR)))
+      {
+       /*
+        * Try updating the permissions of the containing log directory, using
+	* the log file permissions as a basis...
+	*/
+
+        int log_dir_perm = 0300 | LogFilePerm;
+					/* LogFilePerm + owner write/search */
+	if (log_dir_perm & 0040)
+	  log_dir_perm |= 0010;		/* Add group search */
+	if (log_dir_perm & 0004)
+	  log_dir_perm |= 0001;		/* Add other search */
+
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group,
+	                      1, -1);
+
+        *lf = cupsFileOpen(filename, "a");
+      }
+
+      if (*lf == NULL)
+      {
+	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
+	       strerror(errno));
+
+        if (FatalErrors & CUPSD_FATAL_LOG)
+	  cupsdEndProcess(getpid(), 0);
+
+	return (0);
+      }
+    }
+
+    if (strncmp(filename, "/dev/", 5))
+    {
+     /*
+      * Change ownership and permissions of non-device logs...
+      */
+
+      fchown(cupsFileNumber(*lf), RunUser, Group);
+      fchmod(cupsFileNumber(*lf), LogFilePerm);
+    }
+  }
+
+ /*
+  * Do we need to rotate the log?
+  */
+
+  if (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
+      MaxLogSize > 0)
+  {
+   /*
+    * Rotate log file...
+    */
+
+    cupsFileClose(*lf);
+
+    strcpy(backname, filename);
+    strlcat(backname, ".O", sizeof(backname));
+
+    unlink(backname);
+    rename(filename, backname);
+
+    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
+    {
+      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
+             strerror(errno));
+
+      if (FatalErrors & CUPSD_FATAL_LOG)
+	cupsdEndProcess(getpid(), 0);
+
+      return (0);
+    }
+
+   /*
+    * Change ownership and permissions of non-device logs...
+    */
+
+    fchown(cupsFileNumber(*lf), RunUser, Group);
+    fchmod(cupsFileNumber(*lf), LogFilePerm);
+  }
+
+  return (1);
+}
 
 
 /*
@@ -132,6 +309,51 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
   }
 
   return (s);
+}
+
+
+/*
+ * 'cupsdLogFCMessage()' - Log a file checking message.
+ */
+
+void
+cupsdLogFCMessage(
+    void              *context,		/* I - Printer (if any) */
+    _cups_fc_result_t result,		/* I - Check result */
+    const char        *message)		/* I - Message to log */
+{
+  cupsd_printer_t	*p = (cupsd_printer_t *)context;
+					/* Printer */
+  cupsd_loglevel_t	level;		/* Log level */
+
+
+  if (result == _CUPS_FILE_CHECK_OK)
+    level = CUPSD_LOG_DEBUG2;
+  else
+    level = CUPSD_LOG_ERROR;
+
+  if (p)
+  {
+    cupsdLogMessage(level, "%s: %s", p->name, message);
+
+    if (result == _CUPS_FILE_CHECK_MISSING ||
+        result == _CUPS_FILE_CHECK_WRONG_TYPE)
+    {
+      strlcpy(p->state_message, message, sizeof(p->state_message));
+
+      if (cupsdSetPrinterReasons(p, "+cups-missing-filter-warning"))
+        cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s", message);
+    }
+    else if (result == _CUPS_FILE_CHECK_PERMISSIONS)
+    {
+      strlcpy(p->state_message, message, sizeof(p->state_message));
+
+      if (cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning"))
+        cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s", message);
+    }
+  }
+  else
+    cupsdLogMessage(level, "%s", message);
 }
 
 
@@ -508,7 +730,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
   * Not using syslog; check the log file...
   */
 
-  if (!check_log_file(&PageFile, PageLog))
+  if (!cupsdCheckLogFile(&PageFile, PageLog))
     return (0);
 
  /*
@@ -687,7 +909,7 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   * Not using syslog; check the log file...
   */
 
-  if (!check_log_file(&AccessFile, AccessLog))
+  if (!cupsdCheckLogFile(&AccessFile, AccessLog))
     return (0);
 
  /*
@@ -769,7 +991,7 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   * Not using syslog; check the log file...
   */
 
-  if (!check_log_file(&ErrorFile, ErrorLog))
+  if (!cupsdCheckLogFile(&ErrorFile, ErrorLog))
     return (0);
 
  /*
@@ -779,184 +1001,6 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
                  cupsdGetDateTime(NULL, LogTimeFormat), message);
   cupsFileFlush(ErrorFile);
-
-  return (1);
-}
-
-
-/*
- * 'check_log_file()' - Open/rotate a log file if it needs it.
- */
-
-static int				/* O  - 1 if log file open */
-check_log_file(cups_file_t **lf,	/* IO - Log file */
-	       const char  *logname)	/* I  - Log filename */
-{
-  char		backname[1024],		/* Backup log filename */
-		filename[1024],		/* Formatted log filename */
-		*ptr;			/* Pointer into filename */
-  const char	*logptr;		/* Pointer into log filename */
-
-
- /*
-  * See if we have a log file to check...
-  */
-
-  if (!lf || !logname || !logname[0])
-    return (1);
-
- /*
-  * Format the filename as needed...
-  */
-
-  if (!*lf ||
-      (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
-       MaxLogSize > 0))
-  {
-   /*
-    * Handle format strings...
-    */
-
-    filename[sizeof(filename) - 1] = '\0';
-
-    if (logname[0] != '/')
-    {
-      strlcpy(filename, ServerRoot, sizeof(filename));
-      strlcat(filename, "/", sizeof(filename));
-    }
-    else
-      filename[0] = '\0';
-
-    for (logptr = logname, ptr = filename + strlen(filename);
-         *logptr && ptr < (filename + sizeof(filename) - 1);
-	 logptr ++)
-      if (*logptr == '%')
-      {
-       /*
-        * Format spec...
-	*/
-
-        logptr ++;
-	if (*logptr == 's')
-	{
-	 /*
-	  * Insert the server name...
-	  */
-
-	  strlcpy(ptr, ServerName, sizeof(filename) - (ptr - filename));
-	  ptr += strlen(ptr);
-	}
-        else
-	{
-	 /*
-	  * Otherwise just insert the character...
-	  */
-
-	  *ptr++ = *logptr;
-	}
-      }
-      else
-	*ptr++ = *logptr;
-
-    *ptr = '\0';
-  }
-
- /*
-  * See if the log file is open...
-  */
-
-  if (!*lf)
-  {
-   /*
-    * Nope, open the log file...
-    */
-
-    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
-    {
-     /*
-      * If the file is in CUPS_LOGDIR then try to create a missing directory...
-      */
-
-      if (!strncmp(filename, CUPS_LOGDIR, strlen(CUPS_LOGDIR)))
-      {
-       /*
-        * Try updating the permissions of the containing log directory, using
-	* the log file permissions as a basis...
-	*/
-
-        int log_dir_perm = 0300 | LogFilePerm;
-					/* LogFilePerm + owner write/search */
-	if (log_dir_perm & 0040)
-	  log_dir_perm |= 0010;		/* Add group search */
-	if (log_dir_perm & 0004)
-	  log_dir_perm |= 0001;		/* Add other search */
-
-        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group,
-	                      1, -1);
-
-        *lf = cupsFileOpen(filename, "a");
-      }
-
-      if (*lf == NULL)
-      {
-	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
-	       strerror(errno));
-
-        if (FatalErrors & CUPSD_FATAL_LOG)
-	  cupsdEndProcess(getpid(), 0);
-
-	return (0);
-      }
-    }
-
-    if (strncmp(filename, "/dev/", 5))
-    {
-     /*
-      * Change ownership and permissions of non-device logs...
-      */
-
-      fchown(cupsFileNumber(*lf), RunUser, Group);
-      fchmod(cupsFileNumber(*lf), LogFilePerm);
-    }
-  }
-
- /*
-  * Do we need to rotate the log?
-  */
-
-  if (strncmp(logname, "/dev/", 5) && cupsFileTell(*lf) > MaxLogSize &&
-      MaxLogSize > 0)
-  {
-   /*
-    * Rotate log file...
-    */
-
-    cupsFileClose(*lf);
-
-    strcpy(backname, filename);
-    strlcat(backname, ".O", sizeof(backname));
-
-    unlink(backname);
-    rename(filename, backname);
-
-    if ((*lf = cupsFileOpen(filename, "a")) == NULL)
-    {
-      syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
-             strerror(errno));
-
-      if (FatalErrors & CUPSD_FATAL_LOG)
-	cupsdEndProcess(getpid(), 0);
-
-      return (0);
-    }
-
-   /*
-    * Change ownership and permissions of non-device logs...
-    */
-
-    fchown(cupsFileNumber(*lf), RunUser, Group);
-    fchmod(cupsFileNumber(*lf), LogFilePerm);
-  }
 
   return (1);
 }

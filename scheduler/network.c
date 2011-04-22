@@ -264,12 +264,7 @@ cupsdNetIFUpdate(void)
 
       if (match)
       {
-        if (lis->address.addr.sa_family == AF_INET)
-          temp->port = ntohs(lis->address.ipv4.sin_port);
-#ifdef AF_INET6
-        else if (lis->address.addr.sa_family == AF_INET6)
-          temp->port = ntohs(lis->address.ipv6.sin6_port);
-#endif /* AF_INET6 */
+        temp->port = _httpAddrPort(&(lis->address));
 	break;
       }
     }

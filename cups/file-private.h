@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -59,9 +59,33 @@
 #  endif /* !O_BINARY */
 
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
 /*
  * Types and structures...
  */
+
+typedef enum				/**** _cupsFileCheck return values ****/
+{
+  _CUPS_FILE_CHECK_OK = 0,		/* Everything OK */
+  _CUPS_FILE_CHECK_MISSING = 1,		/* File is missing */
+  _CUPS_FILE_CHECK_PERMISSIONS = 2,	/* File (or parent dir) has bad perms */
+  _CUPS_FILE_CHECK_WRONG_TYPE = 3	/* File has wrong type */
+} _cups_fc_result_t;
+
+typedef enum				/**** _cupsFileCheck file type values ****/
+{
+  _CUPS_FILE_CHECK_FILE = 0,		/* Check the file and parent directory */
+  _CUPS_FILE_CHECK_PROGRAM = 1,		/* Check the program and parent directory */
+  _CUPS_FILE_CHECK_FILE_ONLY = 2,	/* Check the file only */
+  _CUPS_FILE_CHECK_DIRECTORY = 3	/* Check the directory */
+} _cups_fc_filetype_t;
+
+typedef void (*_cups_fc_func_t)(void *context, _cups_fc_result_t result,
+				const char *message);
 
 struct _cups_file_s			/**** CUPS file structure... ****/
 
@@ -87,6 +111,23 @@ struct _cups_file_s			/**** CUPS file structure... ****/
   size_t	printf_size;		/* Size of cupsFilePrintf buffer */
 };
 
+
+/*
+ * Prototypes...
+ */
+
+extern _cups_fc_result_t	_cupsFileCheck(const char *filename,
+					       _cups_fc_filetype_t filetype,
+				               int dorootchecks,
+					       _cups_fc_func_t cb,
+					       void *context);
+extern void			_cupsFileCheckFilter(void *context,
+						     _cups_fc_result_t result,
+						     const char *message);
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_FILE_PRIVATE_H_ */
 

@@ -45,7 +45,9 @@ enum cups_backend_e			/**** Backend exit codes ****/
   CUPS_BACKEND_AUTH_REQUIRED = 2,	/* Job failed, authentication required */
   CUPS_BACKEND_HOLD = 3,		/* Job failed, hold job */
   CUPS_BACKEND_STOP = 4,		/* Job failed, stop queue */
-  CUPS_BACKEND_CANCEL = 5		/* Job failed, cancel job */
+  CUPS_BACKEND_CANCEL = 5,		/* Job failed, cancel job */
+  CUPS_BACKEND_RETRY = 6,		/* Job failed, retry this job later */
+  CUPS_BACKEND_RETRY_CURRENT = 7	/* Job failed, retry this job immediately */
 };
 typedef enum cups_backend_e cups_backend_t;
 					/**** Backend exit codes ****/

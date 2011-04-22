@@ -1492,9 +1492,6 @@ launchd_checkin(void)
 {
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
-#  ifdef HAVE_SSL
-  int			portnum;	/* Port number */
-#  endif /* HAVE_SSL */
   launch_data_t		ld_msg,		/* Launch data message */
 			ld_resp,	/* Launch data response */
 			ld_array,	/* Launch data array */
@@ -1626,17 +1623,7 @@ launchd_checkin(void)
 	lis->fd = fd;
 
 #  ifdef HAVE_SSL
-	portnum = 0;
-
-#    ifdef AF_INET6
-	if (lis->address.addr.sa_family == AF_INET6)
-	  portnum = ntohs(lis->address.ipv6.sin6_port);
-	else
-#    endif /* AF_INET6 */
-	if (lis->address.addr.sa_family == AF_INET)
-	  portnum = ntohs(lis->address.ipv4.sin_port);
-
-	if (portnum == 443)
+	if (_httpAddrPort(&(lis->address)) == 443)
 	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #  endif /* HAVE_SSL */
       }

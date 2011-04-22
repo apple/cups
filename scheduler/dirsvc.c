@@ -1594,16 +1594,8 @@ cupsdStartBrowsing(void)
 	if (httpAddrLocalhost(&(lis->address)))
 	  continue;
 
-	if (lis->address.addr.sa_family == AF_INET)
-	{
-	  DNSSDPort = ntohs(lis->address.ipv4.sin_port);
-	  break;
-	}
-	else if (lis->address.addr.sa_family == AF_INET6)
-	{
-	  DNSSDPort = ntohs(lis->address.ipv6.sin6_port);
-	  break;
-	}
+        DNSSDPort = _httpAddrPort(&(lis->address));
+	break;
       }
 
      /*

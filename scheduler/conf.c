@@ -844,6 +844,19 @@ cupsdReadConfiguration(void)
 #endif /* HAVE_VSYSLOG */
 
  /*
+  * Make sure each of the log files exists and gets rotated as necessary...
+  */
+
+  if (!strcmp(AccessLog, "syslog"))
+    cupsdCheckLogFile(&AccessFile, AccessLog);
+
+  if (!strcmp(ErrorLog, "syslog"))
+    cupsdCheckLogFile(&ErrorFile, ErrorLog);
+
+  if (!strcmp(PageLog, "syslog"))
+    cupsdCheckLogFile(&PageFile, PageLog);
+
+ /*
   * Log the configuration file that was used...
   */
 
@@ -2618,29 +2631,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	httpAddrString(&lis->address, temp, sizeof(temp));
 
-#ifdef AF_INET6
-        if (lis->address.addr.sa_family == AF_INET6)
-          cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv6)", temp,
-                          ntohs(lis->address.ipv6.sin6_port));
-	else
-#endif /* AF_INET6 */
 #ifdef AF_LOCAL
         if (lis->address.addr.sa_family == AF_LOCAL)
           cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s (Domain)", temp);
 	else
 #endif /* AF_LOCAL */
-	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
-                        ntohs(lis->address.ipv4.sin_port));
+	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv%d)", temp,
+                        _httpAddrPort(&(lis->address)),
+			_httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
 
         if (!httpAddrLocalhost(&(lis->address)))
-	{
-#ifdef AF_INET6
-	  if (lis->address.addr.sa_family == AF_INET6)
-	    RemotePort = ntohs(lis->address.ipv6.sin6_port);
-	  else
-#endif /* AF_INET6 */
-	  RemotePort = ntohs(lis->address.ipv4.sin_port);
-	}
+	  RemotePort = _httpAddrPort(&(lis->address));
       }
 
      /*
@@ -2706,7 +2707,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         */
 
 	for (addr = addrlist; addr; addr = addr->next)
-	  if (addr->addr.addr.sa_family == AF_INET)
+	  if (_httpAddrFamily(&(addr->addr)) == AF_INET)
 	    break;
 
 	if (addr)
@@ -2716,7 +2717,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	  cupsdLogMessage(CUPSD_LOG_INFO,
 	                  "Sending browsing info to %s:%d (IPv4)",
-			  temp, ntohs(dira->to.ipv4.sin_port));
+			  temp, _httpAddrPort(&(dira->to)));
 
 	  NumBrowsers ++;
 	}
@@ -3048,7 +3049,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  httpAddrString(&(relay->to), temp, sizeof(temp));
 
 	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-			  value, temp, ntohs(relay->to.ipv4.sin_port));
+			  value, temp, _httpAddrPort(&(relay->to)));
 
 	  NumRelays ++;
 	}

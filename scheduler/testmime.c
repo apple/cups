@@ -14,9 +14,11 @@
  *
  * Contents:
  *
- *   main()        - Main entry for the test program.
- *   print_rules() - Print the rules for a file type...
- *   type_dir()    - Show the MIME types for a given directory.
+ *   main()            - Main entry for the test program.
+ *   add_ppd_filter()  - Add a printer filter from a PPD.
+ *   add_ppd_filters() - Add all filters from a PPD.
+ *   print_rules()     - Print the rules for a file type...
+ *   type_dir()        - Show the MIME types for a given directory.
  */
 
 /*
@@ -25,6 +27,8 @@
 
 #include <cups/string-private.h>
 #include <cups/dir.h>
+#include <cups/debug-private.h>
+#include <cups/ppd-private.h>
 #include "mime.h"
 
 
@@ -32,6 +36,9 @@
  * Local functions...
  */
 
+static void	add_ppd_filter(mime_t *mime, mime_type_t *filtertype,
+		               const char *filter);
+static void	add_ppd_filters(mime_t *mime, ppd_file_t *ppd);
 static void	print_rules(mime_magic_t *rules);
 static void	type_dir(mime_t *mime, const char *dirname);
 
@@ -53,6 +60,8 @@ main(int  argc,				/* I - Number of command-line args */
   mime_t	*mime;			/* MIME database */
   mime_type_t	*src,			/* Source type */
 		*dst;			/* Destination type */
+  struct stat	srcinfo;		/* Source information */
+  ppd_file_t	*ppd;			/* PPD file */
   cups_array_t	*filters;		/* Filters for the file */
   mime_filter_t	*filter;		/* Current filter */
 
@@ -60,7 +69,10 @@ main(int  argc,				/* I - Number of command-line args */
   mime        = NULL;
   src         = NULL;
   dst         = NULL;
-  filter_path = "../filter:../pdftops:" CUPS_SERVERBIN "/filter";
+  ppd         = NULL;
+  filter_path = "../filter:" CUPS_SERVERBIN "/filter";
+
+  srcinfo.st_size = 0;
 
   for (i = 1; i < argc; i ++)
     if (!strcmp(argv[i], "-d"))
@@ -68,7 +80,12 @@ main(int  argc,				/* I - Number of command-line args */
       i ++;
 
       if (i < argc)
+      {
         mime = mimeLoad(argv[i], filter_path);
+
+	if (ppd)
+	  add_ppd_filters(mime, ppd);
+      }
     }
     else if (!strcmp(argv[i], "-f"))
     {
@@ -77,12 +94,28 @@ main(int  argc,				/* I - Number of command-line args */
       if (i < argc)
         filter_path = argv[i];
     }
+    else if (!strcmp(argv[i], "-p"))
+    {
+      i ++;
+
+      if (i < argc)
+      {
+        ppd = ppdOpenFile(argv[i]);
+
+	if (mime)
+	  add_ppd_filters(mime, ppd);
+      }
+    }
     else if (!src)
     {
       if (!mime)
 	mime = mimeLoad("../conf", filter_path);
 
+      if (ppd)
+        add_ppd_filters(mime, ppd);
+
       src = mimeFileType(mime, argv[i], NULL, &compression);
+      stat(argv[i], &srcinfo);
 
       if (src)
 	printf("%s: %s/%s%s\n", argv[i], src->super, src->type,
@@ -102,7 +135,7 @@ main(int  argc,				/* I - Number of command-line args */
       sscanf(argv[i], "%15[^/]/%31s", super, type);
       dst = mimeType(mime, super, type);
 
-      filters = mimeFilter(mime, src, dst, &cost);
+      filters = mimeFilter2(mime, src, srcinfo.st_size, dst, &cost);
 
       if (!filters)
       {
@@ -111,15 +144,25 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else
       {
+        int first = 1;			/* First filter shown? */
+
         printf("Filter cost = %d\n", cost);
 
-        filter = (mime_filter_t *)cupsArrayFirst(filters);
-	fputs(filter->filter, stdout);
-
-	for (filter = (mime_filter_t *)cupsArrayNext(filters);
+        for (filter = (mime_filter_t *)cupsArrayFirst(filters);
 	     filter;
 	     filter = (mime_filter_t *)cupsArrayNext(filters))
-	  printf(" | %s", filter->filter);
+	{
+	  if (!strcmp(filter->filter, "-"))
+	    continue;
+
+          if (first)
+	  {
+	    first = 0;
+	    fputs(filter->filter, stdout);
+	  }
+	  else
+	    printf(" | %s", filter->filter);
+	}
 
         putchar('\n');
 
@@ -128,7 +171,11 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
   if (!mime)
+  {
     mime = mimeLoad("../conf", filter_path);
+    if (ppd)
+      add_ppd_filters(mime, ppd);
+  }
 
   if (!src)
   {
@@ -150,10 +197,170 @@ main(int  argc,				/* I - Number of command-line args */
 	     filter->filter, filter->cost);
 
     type_dir(mime, "../doc");
-    type_dir(mime, "../man");
   }
 
   return (0);
+}
+
+
+/*
+ * 'add_printer_filter()' - Add a printer filter from a PPD.
+ */
+
+static void
+add_ppd_filter(mime_t      *mime,	/* I - MIME database */
+               mime_type_t *filtertype,	/* I - Filter or prefilter MIME type */
+	       const char  *filter)	/* I - Filter to add */
+{
+  char		super[MIME_MAX_SUPER],	/* Super-type for filter */
+		type[MIME_MAX_TYPE],	/* Type for filter */
+		dsuper[MIME_MAX_SUPER],	/* Destination super-type for filter */
+		dtype[MIME_MAX_TYPE],	/* Destination type for filter */
+		dest[MIME_MAX_SUPER + MIME_MAX_TYPE + 2],
+					/* Destination super/type */
+		program[1024];		/* Program/filter name */
+  int		cost;			/* Cost of filter */
+  size_t	maxsize = 0;		/* Maximum supported file size */
+  mime_type_t	*temptype,		/* MIME type looping var */
+		*desttype;		/* Destination MIME type */
+  mime_filter_t	*filterptr;		/* MIME filter */
+
+
+  DEBUG_printf(("add_ppd_filter(mime=%p, filtertype=%p(%s/%s), filter=\"%s\")",
+                mime, filtertype, filtertype->super, filtertype->type, filter));
+
+ /*
+  * Parse the filter string; it should be in one of the following formats:
+  *
+  *     source/type cost program
+  *     source/type cost maxsize(nnnn) program
+  *     source/type dest/type cost program
+  *     source/type dest/type cost maxsize(nnnn) program
+  */
+
+  if (sscanf(filter, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
+             super, type, dsuper, dtype, &cost, program) == 6)
+  {
+    snprintf(dest, sizeof(dest), "test/%s/%s", dsuper, dtype);
+
+    if ((desttype = mimeType(mime, "printer", dest)) == NULL)
+      desttype = mimeAddType(mime, "printer", dest);
+  }
+  else
+  {
+    if (sscanf(filter, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type, &cost,
+               program) == 4)
+    {
+      desttype = filtertype;
+    }
+    else
+    {
+      printf("testmime: Invalid filter string \"%s\".\n", filter);
+      return;
+    }
+  }
+
+  if (!strncmp(program, "maxsize(", 8))
+  {
+    char	*ptr;			/* Pointer into maxsize(nnnn) program */
+
+    maxsize = strtoll(program + 8, &ptr, 10);
+
+    if (*ptr != ')')
+    {
+      printf("testmime: Invalid filter string \"%s\".\n", filter);
+      return;
+    }
+
+    ptr ++;
+    while (_cups_isspace(*ptr))
+      ptr ++;
+
+    _cups_strcpy(program, ptr);
+  }
+
+ /*
+  * Add the filter to the MIME database, supporting wildcards as needed...
+  */
+
+  for (temptype = mimeFirstType(mime);
+       temptype;
+       temptype = mimeNextType(mime))
+    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
+         !strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !strcasecmp(temptype->type, type)))
+    {
+      if (desttype != filtertype)
+      {
+        DEBUG_printf(("add_ppd_filter: Adding filter %s/%s %s/%s %d %s",
+		      temptype->super, temptype->type, desttype->super,
+		      desttype->type, cost, program));
+        filterptr = mimeAddFilter(mime, temptype, desttype, cost, program);
+
+        if (!mimeFilterLookup(mime, desttype, filtertype))
+        {
+          DEBUG_printf(("add_printer_filter: Adding filter %s/%s %s/%s 0 -",
+	                desttype->super, desttype->type, filtertype->super,
+	                filtertype->type));
+          mimeAddFilter(mime, desttype, filtertype, cost, "-");
+        }
+      }
+      else
+      {
+        DEBUG_printf(("add_printer_filter: Adding filter %s/%s %s/%s %d %s",
+		      temptype->super, temptype->type, filtertype->super,
+		      filtertype->type, cost, program));
+        filterptr = mimeAddFilter(mime, temptype, filtertype, cost, program);
+      }
+
+      if (filterptr)
+	filterptr->maxsize = maxsize;
+    }
+}
+
+
+/*
+ * 'add_ppd_filters()' - Add all filters from a PPD.
+ */
+
+static void
+add_ppd_filters(mime_t     *mime,	/* I - MIME database */
+                ppd_file_t *ppd)	/* I - PPD file */
+{
+  _ppd_cache_t	*pc;			/* Cache data for PPD */
+  const char	*value;			/* Filter definition value */
+  mime_type_t	*filter,		/* Filter type */
+		*prefilter;		/* Pre-filter type */
+
+
+  pc = _ppdCacheCreateWithPPD(ppd);
+  if (!pc)
+    return;
+
+  filter = mimeAddType(mime, "printer", "test");
+
+  if (pc->filters)
+  {
+    for (value = (const char *)cupsArrayFirst(pc->filters);
+         value;
+         value = (const char *)cupsArrayNext(pc->filters))
+      add_ppd_filter(mime, filter, value);
+  }
+  else
+  {
+    add_ppd_filter(mime, filter, "application/vnd.cups-raw 0 -");
+    add_ppd_filter(mime, filter, "application/vnd.cups-postscript 0 -");
+  }
+
+  if (pc->prefilters)
+  {
+    prefilter = mimeAddType(mime, "prefilter", "test");
+
+    for (value = (const char *)cupsArrayFirst(pc->prefilters);
+         value;
+         value = (const char *)cupsArrayNext(pc->prefilters))
+      add_ppd_filter(mime, prefilter, value);
+  }
 }
 
 

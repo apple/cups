@@ -202,7 +202,7 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
   size_t		urilen;		/* Length of printer URI */
   ipp_t			*attrs;		/* Static attributes */
   ipp_pstate_t		state;		/* printer-state value */
-  _ipp_preasons_t	state_reasons;	/* printer-state-reasons values */  
+  _ipp_preasons_t	state_reasons;	/* printer-state-reasons values */
   cups_array_t		*jobs;		/* Jobs */
   _ipp_job_t		*active_job;	/* Current active/pending job */
   int			next_job_id;	/* Next job-id value */
@@ -1084,16 +1084,8 @@ create_listener(int family,		/* I  - Address family */
   }
 
   memset(&address, 0, sizeof(address));
-  if (family == AF_INET)
-  {
-    address.ipv4.sin_family = family;
-    address.ipv4.sin_port   = htons(*port);
-  }
-  else
-  {
-    address.ipv6.sin6_family = family;
-    address.ipv6.sin6_port   = htons(*port);
-  }
+  address.addr.sa_family = family;
+  _httpAddrSetPort(&address, *port);
 
   if (bind(sock, (struct sockaddr *)&address, httpAddrLength(&address)))
   {
@@ -1305,7 +1297,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->ipv4          = -1;
   printer->ipv6          = -1;
   printer->name          = _cupsStrAlloc(name);
-#ifdef HAVE_DNSSD */
+#ifdef HAVE_DNSSD
   printer->dnssd_name    = _cupsStrRetain(printer->name);
 #endif /* HAVE_DNSSD */
   printer->directory     = _cupsStrAlloc(directory);
@@ -2898,13 +2890,13 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
     snprintf(filename, sizeof(filename), "%s/%d.png",
              client->printer->directory, job->id);
   else if (!strcasecmp(job->format, "application/pdf"))
-    snprintf(filename, sizeof(filename), "%s/%d.pdf", 
+    snprintf(filename, sizeof(filename), "%s/%d.pdf",
              client->printer->directory, job->id);
   else if (!strcasecmp(job->format, "application/postscript"))
-    snprintf(filename, sizeof(filename), "%s/%d.ps", 
+    snprintf(filename, sizeof(filename), "%s/%d.ps",
              client->printer->directory, job->id);
   else
-    snprintf(filename, sizeof(filename), "%s/%d.prn", 
+    snprintf(filename, sizeof(filename), "%s/%d.prn",
              client->printer->directory, job->id);
 
   if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)

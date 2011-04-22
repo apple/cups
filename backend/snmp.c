@@ -1,9 +1,9 @@
 /*
  * "$Id: snmp.c 7810 2008-07-29 01:11:15Z mike $"
  *
- *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
+ *   SNMP discovery backend for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -164,7 +164,7 @@ static void		probe_device(snmp_cache_t *device);
 static void		read_snmp_conf(const char *address);
 static void		read_snmp_response(int fd);
 static double		run_time(void);
-static void		scan_devices(int fd);
+static void		scan_devices(int ipv4, int ipv6);
 static int		try_connect(http_addr_t *addr, const char *addrname,
 			            int port);
 static void		update_cache(snmp_cache_t *device, const char *uri,
@@ -202,7 +202,8 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		fd;			/* SNMP socket */
+  int		ipv4,			/* SNMP IPv4 socket */
+		ipv6;			/* SNMP IPv6 socket */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -245,8 +246,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Open the SNMP socket...
   */
 
-  if ((fd = _cupsSNMPOpen(AF_INET)) < 0)
+  if ((ipv4 = _cupsSNMPOpen(AF_INET)) < 0)
     return (1);
+
+#ifdef AF_INET6
+  if ((ipv6 = _cupsSNMPOpen(AF_INET6)) < 0)
+    return (1);
+#else
+  ipv6 = -1;
+#endif /* AF_INET6 */
 
  /*
   * Read the configuration file and any cache data...
@@ -262,13 +270,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Scan for devices...
   */
 
-  scan_devices(fd);
+  scan_devices(ipv4, ipv6);
 
  /*
   * Close, free, and return with no errors...
   */
 
-  _cupsSNMPClose(fd);
+  _cupsSNMPClose(ipv4);
+  if (ipv6 >= 0)
+    _cupsSNMPClose(ipv6);
 
   free_array(Addresses);
   free_array(Communities);
@@ -708,7 +718,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 
 #ifdef __APPLE__
  /*
-  * TODO: Try an mDNS query first, and then fallback on direct probes...
+  * If the printer supports Bonjour/mDNS, don't report it from the SNMP backend.
   */
 
   if (!try_connect(&(device->address), device->addrname, 5353))
@@ -1146,8 +1156,11 @@ run_time(void)
  */
 
 static void
-scan_devices(int fd)			/* I - SNMP socket */
+scan_devices(int ipv4,			/* I - SNMP IPv4 socket */
+             int ipv6)			/* I - SNMP IPv6 socket */
 {
+  int			fd,		/* File descriptor for this address */
+			busy;		/* Are we busy processing something? */
   char			*address,	/* Current address */
 			*community;	/* Current community */
   fd_set		input;		/* Input set for select() */
@@ -1156,6 +1169,7 @@ scan_devices(int fd)			/* I - SNMP socket */
   http_addrlist_t	*addrs,		/* List of addresses */
 			*addr;		/* Current address */
   snmp_cache_t		*device;	/* Current device */
+  char			temp[1024];	/* Temporary address string */
 
 
   gettimeofday(&StartTime, NULL);
@@ -1174,7 +1188,6 @@ scan_devices(int fd)			/* I - SNMP socket */
     {
       char	ifname[255];		/* Interface name */
 
-
       strlcpy(ifname, address + 4, sizeof(ifname));
       if (ifname[0])
         ifname[strlen(ifname) - 1] = '\0';
@@ -1182,7 +1195,7 @@ scan_devices(int fd)			/* I - SNMP socket */
       addrs = get_interface_addresses(ifname);
     }
     else
-      addrs = httpAddrGetList(address, AF_INET, NULL);
+      addrs = httpAddrGetList(address, AF_UNSPEC, NULL);
 
     if (!addrs)
     {
@@ -1198,8 +1211,20 @@ scan_devices(int fd)			/* I - SNMP socket */
         	   community, address);
 
       for (addr = addrs; addr; addr = addr->next)
+      {
+#ifdef AF_INET6
+        if (_httpAddrFamily(&(addr->addr)) == AF_INET6)
+	  fd = ipv6;
+	else
+#endif /* AF_INET6 */
+        fd = ipv4;
+
+        debug_printf("DEBUG: Sending get request to %s...\n",
+	             httpAddrString(&(addr->addr), temp, sizeof(temp)));
+
         _cupsSNMPWrite(fd, &(addr->addr), CUPS_SNMP_VERSION_1, community,
 	               CUPS_ASN1_GET_REQUEST, DEVICE_TYPE, DeviceTypeOID);
+      }
     }
 
     httpAddrFreeList(addrs);
@@ -1218,17 +1243,33 @@ scan_devices(int fd)			/* I - SNMP socket */
     timeout.tv_sec  = 2;
     timeout.tv_usec = 0;
 
-    FD_SET(fd, &input);
+    FD_SET(ipv4, &input);
+    if (ipv6 >= 0)
+      FD_SET(ipv6, &input);
+
+    fd = ipv4 > ipv6 ? ipv4 : ipv6;
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
     {
-      fprintf(stderr, "ERROR: %.3f select() for %d failed: %s\n", run_time(),
-              fd, strerror(errno));
+      fprintf(stderr, "ERROR: %.3f select() for %d/%d failed: %s\n", run_time(),
+              ipv4, ipv6, strerror(errno));
       break;
     }
 
-    if (FD_ISSET(fd, &input))
-      read_snmp_response(fd);
-    else
+    busy = 0;
+
+    if (FD_ISSET(ipv4, &input))
+    {
+      read_snmp_response(ipv4);
+      busy = 1;
+    }
+
+    if (ipv6 >= 0 && FD_ISSET(ipv6, &input))
+    {
+      read_snmp_response(ipv6);
+      busy = 1;
+    }
+
+    if (!busy)
     {
      /*
       * List devices with complete information...
@@ -1274,14 +1315,14 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
   debug_printf("DEBUG: %.3f Trying %s://%s:%d...\n", run_time(),
                port == 515 ? "lpd" : "socket", addrname, port);
 
-  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((fd = socket(_httpAddrFamily(addr), SOCK_STREAM, 0)) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create socket: %s\n",
             strerror(errno));
     return (-1);
   }
 
-  addr->ipv4.sin_port = htons(port);
+  _httpAddrSetPort(addr, port);
 
   alarm(1);
 

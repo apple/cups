@@ -89,10 +89,10 @@
 #include <mach/mach_error.h>
 #include <mach/mach_time.h>
 #include <cups/debug-private.h>
+#include <cups/file-private.h>
 #include <cups/sidechannel.h>
 #include <cups/language-private.h>
 #include "backend-private.h"
-
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
@@ -1405,7 +1405,6 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
   classdriver_t	**driver = NULL;
   CFStringRef	bundle = driverPath ? driverPath : kUSBGenericTOPrinterClassDriver;
   char 		bundlestr[1024];	/* Bundle path */
-  struct stat	bundleinfo;		/* File information for bundle */
   CFURLRef	url;			/* URL for driver */
   CFPlugInRef	plugin = NULL;		/* Plug-in address */
 
@@ -1416,41 +1415,14 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
   * Validate permissions for the class driver...
   */
 
-  if (stat(bundlestr, &bundleinfo))
-  {
-    fprintf(stderr, "DEBUG: Class driver \"%s\" not available: %s\n",
-	    bundlestr, strerror(errno));
-    fputs("STATE: +cups-missing-filter-warning\n", stderr);
+  _cups_fc_result_t result = _cupsFileCheck(bundlestr,
+                                            _CUPS_FILE_CHECK_DIRECTORY, 1,
+                                            _cupsFileCheckFilter, NULL);
 
-    if (errno == ENOENT && driverPath)
-      return (load_classdriver(NULL, intf, printerDriver));
-    else
-      return (kr);
-  }
-  else if (bundleinfo.st_uid ||
-           (bundleinfo.st_gid && (bundleinfo.st_mode & S_IWGRP)) ||
-	   (bundleinfo.st_mode & S_IWOTH))
-  {
-    fprintf(stderr, "DEBUG: Class driver \"%s\" has insecure file "
-		    "permissions (0%o/uid=%d/gid=%d).\n", bundlestr,
-		    bundleinfo.st_mode, (int)bundleinfo.st_uid,
-		    (int)bundleinfo.st_gid);
-    if (bundleinfo.st_uid ||
-	(bundleinfo.st_gid && bundleinfo.st_gid != 80 &&
-	 (bundleinfo.st_mode & S_IWGRP)) ||
-	(bundleinfo.st_mode & (S_ISUID | S_IWOTH)))
-      fputs("STATE: +cups-insecure-filter-warning\n", stderr);
-
-    if (bundleinfo.st_uid ||
-        (bundleinfo.st_gid && bundleinfo.st_gid != 80 &&
-	 (bundleinfo.st_mode & S_IWOTH)))
-    {
-      if (driverPath)
-        return (load_classdriver(NULL, intf, printerDriver));
-      else
-        return (kr);
-    }
-  }
+  if (result && driverPath)
+    return (load_classdriver(NULL, intf, printerDriver));
+  else if (result)
+    return (kr);
 
  /*
   * Try loading the class driver...
