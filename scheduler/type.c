@@ -741,7 +741,7 @@ mime_check_rules(
   unsigned char	*bufptr;		/* Pointer into buffer */
 
 
-  DEBUG_printf(("2mime_check_rules(filename=\"%s\", fb=%p, rules=%p)", filename,
+  DEBUG_printf(("4mime_check_rules(filename=\"%s\", fb=%p, rules=%p)", filename,
                 fb, rules));
 
   if (rules == NULL)
@@ -853,7 +853,7 @@ mime_check_rules(
 	  break;
 
       case MIME_MAGIC_STRING :
-          DEBUG_printf(("3mime_check_rules: string(%d, \"%s\")", rules->offset,
+          DEBUG_printf(("5mime_check_rules: string(%d, \"%s\")", rules->offset,
 	                rules->value.stringv));
 
          /*
@@ -872,7 +872,7 @@ mime_check_rules(
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 
-            DEBUG_printf(("3mime_check_rules: loaded %d byte fb->buffer at %d, starts "
+            DEBUG_printf(("5mime_check_rules: loaded %d byte fb->buffer at %d, starts "
 	                  "with \"%c%c%c%c\".",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
 			  fb->buffer[2], fb->buffer[3]));
@@ -888,7 +888,7 @@ mime_check_rules(
 	  else
             result = (memcmp(fb->buffer + rules->offset - fb->offset,
 	                     rules->value.stringv, rules->length) == 0);
-          DEBUG_printf(("3mime_check_rules: result=%d", result));
+          DEBUG_printf(("5mime_check_rules: result=%d", result));
 	  break;
 
       case MIME_MAGIC_ISTRING :
@@ -1089,7 +1089,7 @@ mime_check_rules(
     * the the rule set is false...
     */
 
-    DEBUG_printf(("3mime_check_rules: result of test %p (MIME_MAGIC_%s) is %d",
+    DEBUG_printf(("5mime_check_rules: result of test %p (MIME_MAGIC_%s) is %d",
                   rules, debug_ops[rules->op], result));
 
     if ((result && logic == MIME_MAGIC_OR) ||

@@ -133,6 +133,7 @@ mimeAddFilter(mime_t      *mime,	/* I - MIME database */
 
     DEBUG_puts("1mimeAddFilter: Adding new filter.");
     cupsArrayAdd(mime->filters, temp);
+    cupsArrayAdd(mime->srcs, temp);
   }
 
  /*
@@ -177,6 +178,9 @@ mimeFilter2(mime_t      *mime,		/* I - MIME database */
 	    mime_type_t *dst,		/* I - Destination file type */
 	    int         *cost)		/* O - Cost of filters */
 {
+  cups_array_t	*filters;		/* Array of filters to run */
+
+
  /*
   * Range-check the input...
   */
@@ -214,7 +218,24 @@ mimeFilter2(mime_t      *mime,		/* I - MIME database */
   * Find the filters...
   */
 
-  return (mime_find_filters(mime, src, srcsize, dst, cost, NULL));
+  filters = mime_find_filters(mime, src, srcsize, dst, cost, NULL);
+
+  DEBUG_printf(("1mimeFilter2: Returning %d filter(s), cost %d:",
+                cupsArrayCount(filters), cost ? *cost : -1));
+#ifdef DEBUG
+  {
+    mime_filter_t	*filter;	/* Current filter */
+
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+	 filter = (mime_filter_t *)cupsArrayNext(filters))
+      DEBUG_printf(("1mimeFilter2: %s/%s %s/%s %d %s", filter->src->super,
+                    filter->src->type, filter->dst->super, filter->dst->type,
+		    filter->cost, filter->filter));
+  }
+#endif /* DEBUG */
+
+  return (filters);
 }
 
 
@@ -231,7 +252,7 @@ mimeFilterLookup(mime_t      *mime,	/* I - MIME database */
 		*filter;		/* Matching filter */
 
 
-  DEBUG_printf(("6mimeFilterLookup(mime=%p, src=%p(%s/%s), dst=%p(%s/%s))", mime,
+  DEBUG_printf(("2mimeFilterLookup(mime=%p, src=%p(%s/%s), dst=%p(%s/%s))", mime,
                 src, src ? src->super : "???", src ? src->type : "???",
 		dst, dst ? dst->super : "???", dst ? dst->type : "???"));
 
@@ -239,7 +260,7 @@ mimeFilterLookup(mime_t      *mime,	/* I - MIME database */
   key.dst = dst;
 
   filter = (mime_filter_t *)cupsArrayFind(mime->filters, &key);
-  DEBUG_printf(("7mimeFilterLookup: Returning %p(%s).", filter,
+  DEBUG_printf(("3mimeFilterLookup: Returning %p(%s).", filter,
                 filter ? filter->filter : "???"));
   return (filter);
 }
@@ -338,8 +359,10 @@ mime_find_filters(
     {
       DEBUG_printf(("3mime_find_filters: Returning 1 filter, cost %d:",
                     mincost));
-      DEBUG_printf(("3mime_find_filters: %s (cost=%d)", current->filter,
-		    current->cost));
+      DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+                    current->src->super, current->src->type,
+                    current->dst->super, current->dst->type,
+		    current->cost, current->filter));
       return (mintemp);
     }
   }
@@ -412,8 +435,10 @@ mime_find_filters(
       for (current = (mime_filter_t *)cupsArrayFirst(temp);
 	   current;
 	   current = (mime_filter_t *)cupsArrayNext(temp))
-	DEBUG_printf(("3mime_find_filters: %s (cost=%d)", current->filter,
-	              current->cost));
+	DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+		      current->src->super, current->src->type,
+		      current->dst->super, current->dst->type,
+		      current->cost, current->filter));
 #endif /* DEBUG */
 
       return (temp);
@@ -456,8 +481,10 @@ mime_find_filters(
     for (current = (mime_filter_t *)cupsArrayFirst(mintemp);
          current;
 	 current = (mime_filter_t *)cupsArrayNext(mintemp))
-      DEBUG_printf(("3mime_find_filters: %s (cost=%d)", current->filter,
-                    current->cost));
+      DEBUG_printf(("3mime_find_filters: %s/%s %s/%s %d %s",
+                    current->src->super, current->src->type,
+                    current->dst->super, current->dst->type,
+		    current->cost, current->filter));
 #endif /* DEBUG */
 
     if (cost)
