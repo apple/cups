@@ -312,6 +312,51 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
 }
 
 
+/*
+ * 'cupsdLogFCMessage()' - Log a file checking message.
+ */
+
+void
+cupsdLogFCMessage(
+    void              *context,		/* I - Printer (if any) */
+    _cups_fc_result_t result,		/* I - Check result */
+    const char        *message)		/* I - Message to log */
+{
+  cupsd_printer_t	*p = (cupsd_printer_t *)context;
+					/* Printer */
+  cupsd_loglevel_t	level;		/* Log level */
+
+
+  if (result == _CUPS_FILE_CHECK_OK)
+    level = CUPSD_LOG_DEBUG2;
+  else
+    level = CUPSD_LOG_ERROR;
+
+  if (p)
+  {
+    cupsdLogMessage(level, "%s: %s", p->name, message);
+
+    if (result == _CUPS_FILE_CHECK_MISSING ||
+        result == _CUPS_FILE_CHECK_WRONG_TYPE)
+    {
+      strlcpy(p->state_message, message, sizeof(p->state_message));
+
+      if (cupsdSetPrinterReasons(p, "+cups-missing-filter-warning"))
+        cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s", message);
+    }
+    else if (result == _CUPS_FILE_CHECK_PERMISSIONS)
+    {
+      strlcpy(p->state_message, message, sizeof(p->state_message));
+
+      if (cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning"))
+        cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s", message);
+    }
+  }
+  else
+    cupsdLogMessage(level, "%s", message);
+}
+
+
 #ifdef HAVE_GSSAPI
 /*
  * 'cupsdLogGSSMessage()' - Log a GSSAPI error...

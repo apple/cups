@@ -3,7 +3,7 @@
  *
  *   Configuration file definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -271,6 +271,8 @@ extern int	cupsdCheckPermissions(const char *filename,
 extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
 extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
+extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result,
+		                  const char *message);
 #ifdef HAVE_GSSAPI
 extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,

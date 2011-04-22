@@ -3641,12 +3641,19 @@ add_printer_filter(
 
   if (strcmp(program, "-"))
   {
+    _cups_fc_result_t	result;		/* Result of file check */
+
     if (program[0] == '/')
       strlcpy(filename, program, sizeof(filename));
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    cupsdCheckProgram(filename, p);
+    result = _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
+                            cupsdLogFCMessage, p);
+
+    if (result == _CUPS_FILE_CHECK_MISSING ||
+        result == _CUPS_FILE_CHECK_WRONG_TYPE)
+      return;
   }
 
  /*
@@ -4841,7 +4848,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     */
 
     if ((ppd_attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL &&
-        ppd_attr->value)
+        ppd_attr->value &&
+	!_cupsFileCheck(ppd_attr->value, _CUPS_FILE_CHECK_FILE, !RunUser,
+	                cupsdLogFCMessage, p))
     {
       CGImageRef	imageRef = NULL;/* Current icon image */
       CGImageRef	biggestIconRef = NULL;

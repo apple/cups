@@ -767,7 +767,8 @@ start_backend(const char *name,		/* I - Backend to run */
 
   snprintf(program, sizeof(program), "%s/backend/%s", server_bin, name);
 
-  if (!cupsdCheckProgram(program))
+  if (_cupsFileCheck(program, _CUPS_FILE_CHECK_PROGRAM, !geteuid(),
+                     _cupsFileCheckFilter, NULL))
     return (-1);
 
   backend = backends + num_backends;

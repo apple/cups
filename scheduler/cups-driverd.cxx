@@ -1626,7 +1626,8 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 
     snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
 
-    if (!cupsdCheckProgram(filename))
+    if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !geteuid(),
+                       _cupsFileCheckFilter, NULL))
       continue;
 
     argv[0] = dent->filename;
@@ -1829,6 +1830,14 @@ load_ppds(const char *d,		/* I - Actual directory */
   memcpy(dinfoptr, &dinfo, sizeof(struct stat));
   cupsArrayAdd(Inodes, dinfoptr);
 
+ /*
+  * Check permissions...
+  */
+
+  if (_cupsFileCheck(d, _CUPS_FILE_CHECK_DIRECTORY, !geteuid(),
+		     _cupsFileCheckFilter, NULL))
+    return (0);
+
   if ((dir = cupsDirOpen(d)) == NULL)
   {
     if (errno != ENOENT)
@@ -1882,14 +1891,14 @@ load_ppds(const char *d,		/* I - Actual directory */
         * Load PPDs in a printer driver bundle.
 	*/
 
+	if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_DIRECTORY, !geteuid(),
+			   _cupsFileCheckFilter, NULL))
+	  continue;
+
 	strlcat(filename, "/Contents/Resources/PPDs", sizeof(filename));
 	strlcat(name, "/Contents/Resources/PPDs", sizeof(name));
 
-	if (!load_ppds(filename, name, 0))
-	{
-	  cupsDirClose(dir);
-	  return (1);
-	}
+	load_ppds(filename, name, 0);
       }
 
       continue;
@@ -1903,6 +1912,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       continue;
     }
+    else if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_FILE_ONLY, !geteuid(),
+		            _cupsFileCheckFilter, NULL))
+      continue;
 
    /*
     * See if this file has been scanned before...

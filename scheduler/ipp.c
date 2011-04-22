@@ -3427,7 +3427,8 @@ apple_register_profiles(
         else
 	  strlcpy(iccfile, attr->value, sizeof(iccfile));
 
-        if (access(iccfile, 0))
+        if (_cupsFileCheck(iccfile, _CUPS_FILE_CHECK_FILE, !RunUser,
+	                   cupsdLogFCMessage, p))
 	  continue;
 
         if (profile_key[0] == 'c')

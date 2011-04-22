@@ -44,7 +44,6 @@ typedef int (*cupsd_compare_func_t)(const void *, const void *);
  * Prototypes...
  */
 
-extern int		cupsdCheckProgram(const char *filename);
 extern int		cupsdCompareNames(const char *s, const char *t);
 extern cups_array_t	*cupsdCreateStringsArray(const char *s);
 extern int		cupsdExec(const char *command, char **argv);
