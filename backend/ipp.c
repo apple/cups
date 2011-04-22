@@ -1622,6 +1622,9 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
+  else if (ipp_status == IPP_DOCUMENT_FORMAT ||
+           ipp_status == IPP_CONFLICT)
+    return (CUPS_BACKEND_FAILED);
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
