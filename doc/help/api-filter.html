@@ -386,7 +386,7 @@ div.contents ul.subcontents li {
 <ul class="contents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 	<li><a href="#SECURITY">Security Considerations</a></li>
-	<li><a href="#PERMISSIONS">File Permissions</a></li>
+	<li><a href="#SIGNALS">Signal Handling</a></li>
 	<li><a href="#TEMPFILES">Temporary Files</a></li>
 	<li><a href="#COPIES">Copy Generation</a></li>
 	<li><a href="#EXITCODES">Exit Codes</a></li>
@@ -428,10 +428,9 @@ div.contents ul.subcontents li {
 <!--
   "$Id$"
 
-  Filter and backend programming introduction for the Common UNIX Printing
-  System (CUPS).
+  Filter and backend programming introduction for CUPS.
 
-  Copyright 2007-2009 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -511,6 +510,14 @@ directory to write to.</p>
 that further limit file system access, even for backends running as root. On
 Mac OS X, for example, no backend may write to a user's home directory.</p>
 </blockquote>
+
+<h3><a name="SIGNALS">Signal Handling</a><h3>
+
+<p>The scheduler sends <code>SIGTERM</code> when a printing job is canceled or
+held. Filters, backends, and port monitors <em>must</em> catch
+<code>SIGTERM</code> and perform any cleanup necessary to produce a valid output
+file or return the printer to a known good state. The recommended behavior is to
+end the output on the current page.</p>
 
 <h3><a name="PERMISSIONS">File Permissions</a></h3>
 
@@ -851,7 +858,7 @@ the "DEBUG:" prefix string.</p>
 <p>Filters can communicate with the backend via the
 <a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> and
 <a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
-functions. The 
+functions. The
 <a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> function
 reads data that has been sent back from the device and is typically used to
 obtain status and configuration information. For example, the following code
@@ -1352,6 +1359,10 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datal
 <dd class="description">Job failed, hold job</dd>
 <dt>CUPS_BACKEND_OK </dt>
 <dd class="description">Job completed successfully</dd>
+<dt>CUPS_BACKEND_RETRY </dt>
+<dd class="description">Job failed, retry this job later</dd>
+<dt>CUPS_BACKEND_RETRY_CURRENT </dt>
+<dd class="description">Job failed, retry this job immediately</dd>
 <dt>CUPS_BACKEND_STOP </dt>
 <dd class="description">Job failed, stop queue</dd>
 </dl>
