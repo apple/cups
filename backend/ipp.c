@@ -1129,7 +1129,8 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
       sleep(10);
     }
-    else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+    else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+	     ipp_status == IPP_AUTHENTICATION_CANCELED)
     {
      /*
       * Update auth-info-required as needed...
