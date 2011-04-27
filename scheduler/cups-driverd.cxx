@@ -598,6 +598,7 @@ cat_static(const char *name,		/* I - PPD name */
 
     snprintf(line, sizeof(line), "/%s", name);
   }
+  else
 
 #elif defined(__linux)
   if (!strncmp(name, "lsb/usr/", 8))
