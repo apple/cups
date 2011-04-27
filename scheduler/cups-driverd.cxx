@@ -548,6 +548,7 @@ cat_static(const char *name,		/* I - PPD name */
 		*slash;			/* Pointer to next slash */
 #endif /* __APPLE__ */
 
+
   if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
   {
    /*
