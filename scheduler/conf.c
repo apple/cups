@@ -847,13 +847,13 @@ cupsdReadConfiguration(void)
   * Make sure each of the log files exists and gets rotated as necessary...
   */
 
-  if (!strcmp(AccessLog, "syslog"))
+  if (strcmp(AccessLog, "syslog"))
     cupsdCheckLogFile(&AccessFile, AccessLog);
 
-  if (!strcmp(ErrorLog, "syslog"))
+  if (strcmp(ErrorLog, "syslog"))
     cupsdCheckLogFile(&ErrorFile, ErrorLog);
 
-  if (!strcmp(PageLog, "syslog"))
+  if (strcmp(PageLog, "syslog"))
     cupsdCheckLogFile(&PageFile, PageLog);
 
  /*
