@@ -299,7 +299,7 @@ cat_drv(const char *name,		/* I - PPD name */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
 
-  // Pull out the 
+  // Pull out the path to the .drv file...
   if (httpSeparateURI(HTTP_URI_CODING_ALL, name, scheme, sizeof(scheme),
                       userpass, sizeof(userpass), host, sizeof(host), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK ||
