@@ -57,7 +57,7 @@ more detail.</p>
 <h3><a name="SECURITY">Security Considerations</a></h3>
 
 <p>It is always important to use security programming practices. Filters and
-most backends are run as a non-priviledged user, so the major security
+most backends are run as a non-privileged user, so the major security
 consideration is resource utilization - filters should not depend on unlimited
 amounts of CPU, memory, or disk space, and should protect against conditions
 that could lead to excess usage of any resource like infinite loops and

@@ -31,7 +31,7 @@ mechanisms.</p>
 
 	<dd>Evaluates to the specified integer; the number can be preceded by
 	a leading sign (+/-) followed by a decimal number (1234), octal number
-	(01234), or hexidecimal number (0x1234) using the same rules as C and
+	(01234), or hexadecimal number (0x1234) using the same rules as C and
 	C++.</dd>
 
 	<dt>(NAME NAME ... number number ...)</dt>
@@ -71,7 +71,7 @@ mechanisms.</p>
 </dl>
 
 <p>Printer driver information can be grouped and shared using
-curley braces ({ ... }); PPD files are written when a close
+curly braces ({ ... }); PPD files are written when a close
 brace or end-of-file is seen and a <a href="#PCFileName">PCFileName</a>
 directive has been defined.</p>
 
@@ -1798,8 +1798,7 @@ SimpleColorProfile 720dpi/Glossy 100 90 120 1.5 -5 5 10
 <h3>Description</h3>
 
 <p>The <code>SimpleColorProfile</code> directive creates a
-matrix-based <a href="#ColorProfile"><code>ColorProfile</code></a>
-using values chosen with the <code>cupsprofile(1)</code> utility. 
+matrix-based <a href="#ColorProfile"><code>ColorProfile</code></a>. 
 The resolution and mediatype arguments specify the
 <code>Resolution</code> and <code>MediaType</code> choices which use the
 profile; the hyphen (<code>-</code>) is used to specify that any
@@ -1860,7 +1859,7 @@ Throughput 10
 
 <h3>Description</h3>
 
-<p>The <code>Througput</code> directive sets the <code>Troughput</code>
+<p>The <code>Throughput</code> directive sets the <code>Throughput</code>
 attribute for the current printer driver. The pages-per-minute
 argument is a positive integer representing the peak number of
 pages per minute that the printer is capable of producing. Use a

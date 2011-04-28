@@ -1262,7 +1262,7 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Specify Canadian, UK, and US English, and Candian and French French</em>
+<em>*% Specify Canadian, UK, and US English, and Canadian and French French</em>
 *cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
 </pre>
 
