@@ -3,7 +3,7 @@
  *
  *   Printing utilities for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1762,7 +1762,8 @@ cups_get_printer_uri(
     {
       httpSeparateURI(HTTP_URI_CODING_ALL,
                       _httpResolveURI(attr->values[0].string.text, uri,
-		                      sizeof(uri), 0, NULL, NULL),
+		                      sizeof(uri), _HTTP_RESOLVE_DEFAULT,
+				      NULL, NULL),
                       scheme, sizeof(scheme), username, sizeof(username),
 		      host, hostsize, port, resource, resourcesize);
       ippDelete(response);

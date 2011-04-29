@@ -14,8 +14,9 @@
 			);
 			dependencies = (
 				726AD704135E8AA1002C930D /* PBXTargetDependency */,
-				270CCDB2135E3CDE00007BE2 /* PBXTargetDependency */,
 				273BF6DE1333B6370022CAAB /* PBXTargetDependency */,
+				278C58D6136B641D00836530 /* PBXTargetDependency */,
+				270CCDB2135E3CDE00007BE2 /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = Tests;
@@ -210,6 +211,23 @@
 		276683FD1337F7B8000D33D0 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		2766840F1337FA38000D33D0 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		276684111337FA7C000D33D0 /* cupsaddsmb.c in Sources */ = {isa = PBXBuildFile; fileRef = 276684101337FA7C000D33D0 /* cupsaddsmb.c */; };
+		278C58D9136B645C00836530 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A4C1336F31B004BB496 /* libcups_static.a */; };
+		278C58DE136B645C00836530 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DA136B645C00836530 /* CoreFoundation.framework */; };
+		278C58DF136B645C00836530 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DB136B645C00836530 /* Kerberos.framework */; };
+		278C58E0136B645C00836530 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DC136B645C00836530 /* libresolv.dylib */; };
+		278C58E1136B645C00836530 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DD136B645C00836530 /* SystemConfiguration.framework */; };
+		278C58E3136B647200836530 /* testhttp.c in Sources */ = {isa = PBXBuildFile; fileRef = 278C58E2136B647200836530 /* testhttp.c */; };
+		278C58E4136B649200836530 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A4C1336F31B004BB496 /* libcups_static.a */; };
+		278C58E9136B64B000836530 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E5136B64AF00836530 /* CoreFoundation.framework */; };
+		278C58EA136B64B000836530 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
+		278C58EB136B64B000836530 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
+		278C58EC136B64B000836530 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E8136B64B000836530 /* SystemConfiguration.framework */; };
+		278C58EF136B64C400836530 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58ED136B64C300836530 /* libresolv.dylib */; };
+		278C58F0136B64C400836530 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58EE136B64C400836530 /* libz.dylib */; };
+		278C58F2136B64FE00836530 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F1136B64FD00836530 /* libiconv.dylib */; };
+		278C58F5136B652300836530 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F3136B652300836530 /* libiconv.dylib */; };
+		278C58F6136B652300836530 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F4136B652300836530 /* Security.framework */; };
+		278C58F8136B653800836530 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F7136B653800836530 /* libz.dylib */; };
 		720DD6CD1358FD720064AA82 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		720DD6D31358FDDE0064AA82 /* snmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 720DD6D21358FDDE0064AA82 /* snmp.c */; };
 		720DD6D413590AB90064AA82 /* ieee1284.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379CA1334000E009631B9 /* ieee1284.c */; };
@@ -699,6 +717,20 @@
 			remoteGlobalIDString = 276684031337FA1D000D33D0;
 			remoteInfo = cupsaddsmb;
 		};
+		278C58D5136B641D00836530 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 278C58CA136B640300836530;
+			remoteInfo = testhttp;
+		};
+		278C58D7136B642F00836530 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274FF6891333B1C400317ECB;
+			remoteInfo = libcups_static;
+		};
 		720DD6CE1358FD790064AA82 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
@@ -1007,6 +1039,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		278C58C9136B640300836530 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		720DD6C01358FD5F0064AA82 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1164,6 +1205,22 @@
 		276683F91337F7A9000D33D0 /* ipptool.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ipptool.c; path = ../test/ipptool.c; sourceTree = "<group>"; };
 		276684041337FA1D000D33D0 /* cupsaddsmb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupsaddsmb; sourceTree = BUILT_PRODUCTS_DIR; };
 		276684101337FA7C000D33D0 /* cupsaddsmb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupsaddsmb.c; path = ../systemv/cupsaddsmb.c; sourceTree = "<group>"; };
+		278C58CB136B640300836530 /* testhttp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testhttp; sourceTree = BUILT_PRODUCTS_DIR; };
+		278C58DA136B645C00836530 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		278C58DB136B645C00836530 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Kerberos.framework; sourceTree = DEVELOPER_DIR; };
+		278C58DC136B645C00836530 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libresolv.dylib; sourceTree = DEVELOPER_DIR; };
+		278C58DD136B645C00836530 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		278C58E2136B647200836530 /* testhttp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testhttp.c; path = ../cups/testhttp.c; sourceTree = "<group>"; };
+		278C58E5136B64AF00836530 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = ../../../../../System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<group>"; };
+		278C58E6136B64B000836530 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = ../../../../../System/Library/Frameworks/Kerberos.framework; sourceTree = "<group>"; };
+		278C58E7136B64B000836530 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
+		278C58E8136B64B000836530 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = ../../../../../System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<group>"; };
+		278C58ED136B64C300836530 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = ../../../../../usr/lib/libresolv.dylib; sourceTree = "<group>"; };
+		278C58EE136B64C400836530 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = ../../../../../usr/lib/libz.dylib; sourceTree = "<group>"; };
+		278C58F1136B64FD00836530 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = ../../../../../usr/lib/libiconv.dylib; sourceTree = "<group>"; };
+		278C58F3136B652300836530 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
+		278C58F4136B652300836530 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
+		278C58F7136B653800836530 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		27D3037C134148CB00F022B1 /* libcups_s.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; name = libcups_s.exp; path = ../cups/libcups_s.exp; sourceTree = "<group>"; };
 		27D3037D134148CB00F022B1 /* libcups2.def */ = {isa = PBXFileReference; lastKnownFileType = text; name = libcups2.def; path = ../cups/libcups2.def; sourceTree = "<group>"; };
 		720DD6C21358FD5F0064AA82 /* snmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snmp; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1341,8 +1398,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				278C58E9136B64B000836530 /* CoreFoundation.framework in Frameworks */,
+				278C58EA136B64B000836530 /* Kerberos.framework in Frameworks */,
+				278C58EB136B64B000836530 /* Security.framework in Frameworks */,
+				278C58EC136B64B000836530 /* SystemConfiguration.framework in Frameworks */,
 				270CCDB9135E3D0900007BE2 /* libcups_static.a in Frameworks */,
 				270CCDBA135E3D0900007BE2 /* libcupsmime.dylib in Frameworks */,
+				278C58F2136B64FE00836530 /* libiconv.dylib in Frameworks */,
+				278C58EF136B64C400836530 /* libresolv.dylib in Frameworks */,
+				278C58F0136B64C400836530 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1350,6 +1414,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				278C58E4136B649200836530 /* libcups_static.a in Frameworks */,
 				273BF6CE1333B5950022CAAB /* CoreFoundation.framework in Frameworks */,
 				273BF6D31333B5C30022CAAB /* Kerberos.framework in Frameworks */,
 				273BF6D41333B5C30022CAAB /* Security.framework in Frameworks */,
@@ -1500,6 +1565,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		278C58C8136B640300836530 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				278C58DE136B645C00836530 /* CoreFoundation.framework in Frameworks */,
+				278C58DF136B645C00836530 /* Kerberos.framework in Frameworks */,
+				278C58F6136B652300836530 /* Security.framework in Frameworks */,
+				278C58E1136B645C00836530 /* SystemConfiguration.framework in Frameworks */,
+				278C58D9136B645C00836530 /* libcups_static.a in Frameworks */,
+				278C58F5136B652300836530 /* libiconv.dylib in Frameworks */,
+				278C58E0136B645C00836530 /* libresolv.dylib in Frameworks */,
+				278C58F8136B653800836530 /* libz.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		720DD6BF1358FD5F0064AA82 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1639,8 +1719,9 @@
 		273BF6B81333B4A90022CAAB /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				270CCDBB135E3D3E00007BE2 /* testmime.c */,
 				273BF6C61333B5370022CAAB /* testcups.c */,
+				278C58E2136B647200836530 /* testhttp.c */,
+				270CCDBB135E3D3E00007BE2 /* testmime.c */,
 			);
 			name = tests;
 			sourceTree = "<group>";
@@ -1740,6 +1821,7 @@
 				720DD6C21358FD5F0064AA82 /* snmp */,
 				270CCDA7135E3C9E00007BE2 /* testmime */,
 				726AD6F7135E88F0002C930D /* ippserver */,
+				278C58CB136B640300836530 /* testhttp */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1903,7 +1985,6 @@
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				72F75A4C1336F31B004BB496 /* libcups_static.a */,
 				72220FAC13330B2200FCA411 /* libcupsmime.dylib */,
 				72220EAE1333047D00FCA411 /* libcups.dylib */,
 				72F75A611336F9A3004BB496 /* libcupsimage.dylib */,
@@ -1969,6 +2050,21 @@
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
+				278C58F7136B653800836530 /* libz.dylib */,
+				278C58F3136B652300836530 /* libiconv.dylib */,
+				278C58F4136B652300836530 /* Security.framework */,
+				278C58F1136B64FD00836530 /* libiconv.dylib */,
+				278C58ED136B64C300836530 /* libresolv.dylib */,
+				278C58EE136B64C400836530 /* libz.dylib */,
+				278C58E5136B64AF00836530 /* CoreFoundation.framework */,
+				278C58E6136B64B000836530 /* Kerberos.framework */,
+				278C58E7136B64B000836530 /* Security.framework */,
+				278C58E8136B64B000836530 /* SystemConfiguration.framework */,
+				72F75A4C1336F31B004BB496 /* libcups_static.a */,
+				278C58DA136B645C00836530 /* CoreFoundation.framework */,
+				278C58DB136B645C00836530 /* Kerberos.framework */,
+				278C58DC136B645C00836530 /* libresolv.dylib */,
+				278C58DD136B645C00836530 /* SystemConfiguration.framework */,
 				72220FB113330B4A00FCA411 /* Frameworks */,
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
@@ -2424,6 +2520,24 @@
 			productReference = 276684041337FA1D000D33D0 /* cupsaddsmb */;
 			productType = "com.apple.product-type.tool";
 		};
+		278C58CA136B640300836530 /* testhttp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 278C58D3136B640300836530 /* Build configuration list for PBXNativeTarget "testhttp" */;
+			buildPhases = (
+				278C58C7136B640300836530 /* Sources */,
+				278C58C8136B640300836530 /* Frameworks */,
+				278C58C9136B640300836530 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				278C58D8136B642F00836530 /* PBXTargetDependency */,
+			);
+			name = testhttp;
+			productName = testhttp;
+			productReference = 278C58CB136B640300836530 /* testhttp */;
+			productType = "com.apple.product-type.tool";
+		};
 		720DD6C11358FD5F0064AA82 /* snmp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 720DD6CB1358FD600064AA82 /* Build configuration list for PBXNativeTarget "snmp" */;
@@ -2670,6 +2784,7 @@
 			};
 			buildConfigurationList = 72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */;
 			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -2710,6 +2825,7 @@
 				720DD6C11358FD5F0064AA82 /* snmp */,
 				7243792F1333FB85009631B9 /* socket */,
 				273BF6BC1333B5000022CAAB /* testcups */,
+				278C58CA136B640300836530 /* testhttp */,
 				270CCDA6135E3C9E00007BE2 /* testmime */,
 				7243795A1333FF1D009631B9 /* usb */,
 			);
@@ -2923,6 +3039,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				276684111337FA7C000D33D0 /* cupsaddsmb.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		278C58C7136B640300836530 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				278C58E3136B647200836530 /* testhttp.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3345,6 +3469,16 @@
 			isa = PBXTargetDependency;
 			target = 276684031337FA1D000D33D0 /* cupsaddsmb */;
 			targetProxy = 276684121337FA8D000D33D0 /* PBXContainerItemProxy */;
+		};
+		278C58D6136B641D00836530 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 278C58CA136B640300836530 /* testhttp */;
+			targetProxy = 278C58D5136B641D00836530 /* PBXContainerItemProxy */;
+		};
+		278C58D8136B642F00836530 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274FF6891333B1C400317ECB /* libcups_static */;
+			targetProxy = 278C58D7136B642F00836530 /* PBXContainerItemProxy */;
 		};
 		720DD6CF1358FD790064AA82 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4178,6 +4312,46 @@
 			};
 			name = Release;
 		};
+		278C58D1136B640300836530 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		278C58D2136B640300836530 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		720DD6C91358FD5F0064AA82 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4896,6 +5070,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		278C58D3136B640300836530 /* Build configuration list for PBXNativeTarget "testhttp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				278C58D1136B640300836530 /* Debug */,
+				278C58D2136B640300836530 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		720DD6CB1358FD600064AA82 /* Build configuration list for PBXNativeTarget "snmp" */ = {
 			isa = XCConfigurationList;
