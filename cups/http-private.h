@@ -42,18 +42,25 @@
 #  endif /* WIN32 */
 
 #  ifdef HAVE_GSSAPI
-#    ifdef HAVE_GSSAPI_GSSAPI_H
+#    ifdef HAVE_GSS_GSSAPI_H
+#      include <GSS/gssapi.h>
+#      ifdef HAVE_GSSAPI_GENERIC_H
+#        include <GSS/gssapi_generic.h>
+#      endif /* HAVE_GSSAPI_GENERIC_H */
+#      ifdef HAVE_GSSAPI_KRB5_H
+#        include <GSS/gssapi_krb5.h>
+#      endif /* HAVE_GSSAPI_KRB5_H */
+#    elif defined(HAVE_GSSAPI_GSSAPI_H)
 #      include <gssapi/gssapi.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_H */
-#    ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
-#      include <gssapi/gssapi_generic.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_GENERIC_H */
-#    ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
-#      include <gssapi/gssapi_krb5.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_KRB5_H */
-#    ifdef HAVE_GSSAPI_H
+#      ifdef HAVE_GSSAPI_GENERIC_H
+#        include <gssapi/gssapi_generic.h>
+#      endif /* HAVE_GSSAPI_GENERIC_H */
+#      ifdef HAVE_GSSAPI_KRB5_H
+#        include <gssapi/gssapi_krb5.h>
+#      endif /* HAVE_GSSAPI_KRB5_H */
+#    elif defined(HAVE_GSSAPI_H)
 #      include <gssapi.h>
-#    endif /* HAVE_GSSAPI_H */
+#    endif /* HAVE_GSS_GSSAPI_H */
 #    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
 #      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
 #    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
@@ -290,6 +297,9 @@ struct _http_s				/**** HTTP connection structure. ****/
   _http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5@ */
   void			*timeout_data;	/* User data pointer @since CUPS 1.5@ */
   struct timeval	timeout_value;	/* Timeout in seconds */
+#  ifdef HAVE_GSSAPI
+  char			gsshost[256];	/* Hostname for Kerberos */
+#  endif /* HAVE_GSSAPI */
 };
 
 

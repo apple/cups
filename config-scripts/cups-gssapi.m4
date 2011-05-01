@@ -28,19 +28,26 @@ if test x$enable_gssapi != xno; then
 			Darwin)
 				# Mac OS X weak-links to the Kerberos framework...
 				LIBGSSAPI="-weak_framework Kerberos"
+				AC_MSG_CHECKING(for GSS framework)
+				if test -d /System/Library/Frameworks/GSS.framework; then
+					AC_MSG_RESULT(yes)
+					LIBGSSAPI="$LIBGSSAPI -weak_framework GSS"
+				else
+					AC_MSG_RESULT(no)
+				fi
 				;;
 			SunOS*)
 				# Solaris has a non-standard krb5-config, don't use it!
 				AC_CHECK_LIB(gss, gss_display_status,
 					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
-					CFLAGS="`$KRB5CONFIG --cflags` $CFLAGS"		
-					CPPFLAGS="`$KRB5CONFIG --cflags` $CPPFLAGS"		
+					CFLAGS="`$KRB5CONFIG --cflags` $CFLAGS"
+					CPPFLAGS="`$KRB5CONFIG --cflags` $CPPFLAGS"
 					LIBGSSAPI="-lgss `$KRB5CONFIG --libs`")
 				;;
 			*)
 				# Other platforms just ask for GSSAPI
-				CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"		
-				CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"		
+				CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"
+				CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"
 				LIBGSSAPI="`$KRB5CONFIG --libs gssapi`"
 				;;
 		esac
@@ -63,22 +70,33 @@ if test x$enable_gssapi != xno; then
 
 	if test "x$LIBGSSAPI" != x; then
 		AC_CHECK_HEADER(krb5.h, AC_DEFINE(HAVE_KRB5_H))
-		AC_CHECK_HEADER(gssapi.h, AC_DEFINE(HAVE_GSSAPI_H))
-		AC_CHECK_HEADER(gssapi/gssapi.h, AC_DEFINE(HAVE_GSSAPI_GSSAPI_H))
-		AC_CHECK_HEADER(gssapi/gssapi_generic.h, AC_DEFINE(HAVE_GSSAPI_GSSAPI_GENERIC_H))
-		AC_CHECK_HEADER(gssapi/gssapi_krb5.h, AC_DEFINE(HAVE_GSSAPI_GSSAPI_KRB5_H))
+		if test -d /System/Library/Frameworks/GSS.framework; then
+			AC_CHECK_HEADER(GSS/gssapi.h, AC_DEFINE(HAVE_GSS_GSSAPI_H))
+			AC_CHECK_HEADER(GSS/gssapi_generic.h, AC_DEFINE(HAVE_GSSAPI_GENERIC_H))
+			AC_CHECK_HEADER(GSS/gssapi_krb5.h, AC_DEFINE(HAVE_GSSAPI_KRB5_H))
+			AC_CHECK_HEADER(GSS/gssapi_spi.h, AC_DEFINE(HAVE_GSS_GSSAPI_SPI_H))
+		else
+			AC_CHECK_HEADER(gssapi.h, AC_DEFINE(HAVE_GSSAPI_H))
+			AC_CHECK_HEADER(gssapi/gssapi.h, AC_DEFINE(HAVE_GSSAPI_GSSAPI_H))
+			AC_CHECK_HEADER(gssapi/gssapi_generic.h, AC_DEFINE(HAVE_GSSAPI_GENERIC_H))
+			AC_CHECK_HEADER(gssapi/gssapi_krb5.h, AC_DEFINE(HAVE_GSSAPI_KRB5_H))
+		fi
 
 		SAVELIBS="$LIBS"
 		LIBS="$LIBS $LIBGSSAPI"
 
-		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
-			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
-		AC_CHECK_FUNC(krb5_cc_new_unique, AC_DEFINE(HAVE_KRB5_CC_NEW_UNIQUE))
-		AC_CHECK_FUNC(krb5_ipc_client_set_target_uid, AC_DEFINE(HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID))
+		AC_CHECK_FUNC(__ApplePrivate_gss_acquire_cred_ex_f,
+			      AC_DEFINE(HAVE_GSS_ACQUIRE_CRED_EX_F))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
-		if test $ac_cv_header_gssapi_gssapi_h = yes; then
+		if test x$ac_cv_header_gssapi_gssapi_h = xyes; then
 			AC_TRY_COMPILE([ #include <gssapi/gssapi.h> ],
+				       [ gss_OID foo = GSS_C_NT_HOSTBASED_SERVICE; ],
+				       AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE)
+				       AC_MSG_RESULT(yes),
+				       AC_MSG_RESULT(no))
+		elif test x$ac_cv_header_gss_gssapi_h = xyes; then
+			AC_TRY_COMPILE([ #include <GSS/gssapi.h> ],
 				       [ gss_OID foo = GSS_C_NT_HOSTBASED_SERVICE; ],
 				       AC_DEFINE(HAVE_GSS_C_NT_HOSTBASED_SERVICE)
 				       AC_MSG_RESULT(yes),
@@ -92,13 +110,6 @@ if test x$enable_gssapi != xno; then
 		fi
 
 		LIBS="$SAVELIBS"
-
-		AC_MSG_CHECKING(for Heimdal Kerberos)
-		AC_TRY_COMPILE([ #include <krb5.h> ],
-			       [ char *tmp = heimdal_version; ],
-			       AC_DEFINE(HAVE_HEIMDAL)
-			       AC_MSG_RESULT(yes),
-			       AC_MSG_RESULT(no))
 	fi
 fi
 

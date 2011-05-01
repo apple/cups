@@ -189,7 +189,9 @@ extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
 #  ifdef HAVE_GSSAPI
-extern int		_cupsSetNegotiateAuthString(http_t *http);
+extern int		_cupsSetNegotiateAuthString(http_t *http,
+			                            const char *method,
+						    const char *resource);
 #  endif /* HAVE_GSSAPI */
 extern char		*_cupsUserDefault(char *name, size_t namesize);
 

@@ -169,7 +169,7 @@ httpAddrConnect(
   }
 
   if (!addrlist)
-    _cupsSetError(HTTP_SERVICE_UNAVAILABLE, _("Unable to connect to server"), 1);
+    _cupsSetError(IPP_SERVICE_UNAVAILABLE, _("Unable to connect to server"), 1);
 
   return (addrlist);
 }

@@ -43,7 +43,8 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_HEADER(Security/SecItem.h,
 		    AC_DEFINE(HAVE_SECITEM_H))
 		AC_CHECK_HEADER(Security/SecItemPriv.h,
-		    AC_DEFINE(HAVE_SECITEMPRIV_H))
+		    AC_DEFINE(HAVE_SECITEMPRIV_H),,
+		    [#include <Security/SecItem.h>])
 		AC_CHECK_HEADER(Security/SecPolicy.h,
 		    AC_DEFINE(HAVE_SECPOLICY_H))
 		AC_CHECK_HEADER(Security/SecPolicyPriv.h,

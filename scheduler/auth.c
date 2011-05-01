@@ -559,6 +559,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     strlcpy(username, authorization + 9, sizeof(username));
 
+#  ifdef HAVE_GSSAPI
+    con->gss_uid = CUPSD_UCRED_UID(peercred);
+#  endif /* HAVE_GSSAPI */
+
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdAuthorize: Authorized as %s using PeerCred",
 		    username);
@@ -1122,7 +1126,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * to run as the correct user to get Kerberos credentials of its own.
     */
 
-    if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
+    if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
     {
       cupsd_ucred_t	peercred;	/* Peer credentials */
       socklen_t		peersize;	/* Size of peer credentials */
@@ -1959,7 +1963,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	return (HTTP_OK);		/* unless overridden with Satisfy */
     }
 
+
     if (con->type != type && type != CUPSD_AUTH_NONE &&
+#ifdef HAVE_GSSAPI
+        (type != CUPSD_AUTH_NEGOTIATE || con->gss_uid <= 0) &&
+#endif /* HAVE_GSSAPI */
         (con->type != CUPSD_AUTH_BASIC || type != CUPSD_AUTH_BASICDIGEST))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Authorized using %s, expected %s!",
