@@ -1757,6 +1757,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s", data);
 	else if (!strcmp(destptr->auth_info_required[i], "password"))
 	  cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", data);
+        else if (!strcmp(destptr->auth_info_required[i], "negotiate") &&
+	         isdigit(line[0] & 255))
+	  cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
       }
 
       if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
