@@ -301,7 +301,6 @@ _cupsSetNegotiateAuthString(
 		major_status;		/* Major status code */
   gss_buffer_desc output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token */
-  _cups_globals_t *cg = _cupsGlobals();	/* Thread globals */
 
 
 #  ifdef __APPLE__
@@ -320,10 +319,7 @@ _cupsSetNegotiateAuthString(
 
   if (http->gssname == GSS_C_NO_NAME)
   {
-    if (!cg->gss_service_name[0])
-      _cupsSetDefaults();
-
-    http->gssname = cups_gss_getname(http, cg->gss_service_name);
+    http->gssname = cups_gss_getname(http, _cupsGSSServiceName());
   }
 
   if (http->gssctx != GSS_C_NO_CONTEXT)
