@@ -512,6 +512,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 }
 
 
+#ifdef HAVE_GSSAPI
 /*
  * '_cupsGSSServiceName()' - Get the GSS (Kerberos) service name.
  */
@@ -527,6 +528,7 @@ _cupsGSSServiceName(void)
 
   return (cg->gss_service_name);
 }
+#endif /* HAVE_GSSAPI */
 
 
 /*
