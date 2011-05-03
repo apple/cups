@@ -639,6 +639,7 @@ cupsRasterWriteHeader2(
     fh.cupsBytesPerLine = htonl(r->header.cupsBytesPerLine);
     fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
     fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
+    fh.cupsNumColors    = htonl(r->header.cupsNumColors);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
   }
