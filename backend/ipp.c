@@ -1582,17 +1582,22 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  if (cups_version && last_job_state != job_state->values[0].integer)
 	  {
-	    if (last_job_state >= IPP_JOB_PENDING &&
-	        last_job_state <= IPP_JOB_COMPLETED)
-	      fprintf(stderr, "STATE: -%s\n",
-	              remote_job_states[last_job_state - IPP_JOB_PENDING]);
+	    int new_job_state = job_state->values[0].integer;
+					/* New job-state value */
 
-            last_job_state = job_state->values[0].integer;
+	    if (last_job_state < IPP_JOB_PENDING ||
+	        last_job_state > IPP_JOB_COMPLETED)
+	      last_job_state = IPP_JOB_PENDING;
 
-	    if (last_job_state >= IPP_JOB_PENDING &&
-	        last_job_state <= IPP_JOB_COMPLETED)
-	      fprintf(stderr, "STATE: +%s\n",
-	              remote_job_states[last_job_state - IPP_JOB_PENDING]);
+	    if (new_job_state < IPP_JOB_PENDING ||
+	        new_job_state > IPP_JOB_COMPLETED)
+	      new_job_state = IPP_JOB_PENDING;
+
+	    fprintf(stderr, "STATE: -%s\nSTATE: +%s\n",
+		    remote_job_states[last_job_state - IPP_JOB_PENDING],
+		    remote_job_states[new_job_state - IPP_JOB_PENDING]);
+
+            last_job_state = new_job_state;
 	  }
 
 	  if ((job_sheets = ippFindAttribute(response,
