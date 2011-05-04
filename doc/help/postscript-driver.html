@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>Developing PostScript Printer Drivers</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.7">
+	<title>Developing PostScript Printer Drivers	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -373,14 +374,14 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#BASICS">Printer Driver Basics</a></li>
 <li><a href="#CREATING">Creating New PPD Files</a><ul class="subcontents">
-<li><a href="#IMPORT">Importing Existing PPD Files</a></li>
+	<li><a href="#IMPORT">Importing Existing PPD Files</a></li>
 </ul></li>
 <li><a href="#FILTERS">Using Custom Filters</a></li>
 <li><a href="#COLOR">Implementing Color Management</a></li>
 <li><a href="#MACOSX">Adding Mac OS X Features</a></li>
+</ul>
 <h2 class='title'><a name='BASICS'>Printer Driver Basics</a></h2>
 
 <p>A CUPS PostScript printer driver consists of a PostScript Printer Description (PPD) file that describes the features and capabilities of the device, zero or more <em>filter</em> programs that prepare print data for the device, and zero or more support files for color management, online help, and so forth. The PPD file includes references to all of the filters and support files used by the driver.</p>
