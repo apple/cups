@@ -78,6 +78,7 @@ static int	child_pid = 0;		/* Child process ID */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static const char * const jattrs[] =	/* Job attributes we want */
 {
+  "job-impressions-completed",
   "job-media-sheets-completed",
   "job-state",
   "job-state-reasons"
@@ -208,6 +209,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		job_id;			/* job-id value */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
   ipp_attribute_t *job_state;		/* job-state */
+  int		last_job_state = -1;	/* Last job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
@@ -888,39 +890,54 @@ main(int  argc,				/* I - Number of command-line args */
       continue;
     }
 
-   /*
-    * Check printer-state-reasons for the "spool-area-full" keyword...
-    */
-
-    if ((printer_state = ippFindAttribute(supported, "printer-state-reasons",
-                                          IPP_TAG_KEYWORD)) != NULL)
+    if (!getenv("CLASS"))
     {
-      for (i = 0; i < printer_state->num_values; i ++)
-        if (!strcmp(printer_state->values[0].string.text, "spool-area-full") ||
-	    !strncmp(printer_state->values[0].string.text, "spool-area-full-",
-	             16))
-          break;
+     /*
+      * Check printer-is-accepting-jobs = false and printer-state-reasons for the
+      * "spool-area-full" keyword...
+      */
 
-      if (i < printer_state->num_values)
+      int busy = 0;
+
+      if ((printer_accepting = ippFindAttribute(supported,
+						"printer-is-accepting-jobs",
+						IPP_TAG_BOOLEAN)) != NULL &&
+	  !printer_accepting->values[0].boolean)
+        busy = 1;
+      else if ((printer_state = ippFindAttribute(supported,
+                                                 "printer-state-reasons",
+					         IPP_TAG_KEYWORD)) != NULL)
+      {
+	for (i = 0; i < printer_state->num_values; i ++)
+	  if (!strcmp(printer_state->values[0].string.text, "spool-area-full") ||
+	      !strncmp(printer_state->values[0].string.text, "spool-area-full-",
+		       16))
+	  {
+	    busy = 1;
+	    break;
+	  }
+      }
+      else
+	_cupsLangPrintFilter(stderr, "ERROR",
+			     _("This printer does not conform to the IPP "
+			       "standard. Please contact the manufacturer of "
+			       "your printer for assistance."));
+
+      if (busy)
       {
 	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 
-        report_printer_state(supported, 0);
+	report_printer_state(supported, 0);
 
 	sleep(delay);
 
-        delay = _cupsNextDelay(delay, &prev_delay);
+	delay = _cupsNextDelay(delay, &prev_delay);
 
 	ippDelete(supported);
 	supported = NULL;
 	continue;
       }
     }
-    else
-      _cupsLangPrintFilter(stderr, "ERROR",
-                           _("This printer does not conform to the IPP "
-			     "standard. Please contact the manufacturer of "
-			     "your printer for assistance."));
 
    /*
     * Check for supported attributes...
@@ -1549,18 +1566,31 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Reflect the remote job state in the local queue...
 	  */
 
-          fputs("STATE: -cups-remote-pending,"
-		"cups-remote-pending-held,"
-		"cups-remote-processing,"
-		"cups-remote-stopped,"
-		"cups-remote-canceled,"
-		"cups-remote-aborted,"
-		"cups-remote-completed\n", stderr);
-          if (job_state->values[0].integer >= IPP_JOB_PENDING &&
-	      job_state->values[0].integer <= IPP_JOB_COMPLETED)
-	    fprintf(stderr, "STATE: +%s\n",
-	            remote_job_states[job_state->values[0].integer -
-		                      IPP_JOB_PENDING]);
+	  if (cups_version && last_job_state != job_state->values[0].integer)
+	  {
+	    if (last_job_state >= IPP_JOB_PENDING &&
+	        last_job_state <= IPP_JOB_COMPLETED)
+	      fprintf(stderr, "STATE: -%s\n",
+	              remote_job_states[last_job_state - IPP_JOB_PENDING]);
+
+            last_job_state = job_state->values[0].integer;
+
+	    if (last_job_state >= IPP_JOB_PENDING &&
+	        last_job_state <= IPP_JOB_COMPLETED)
+	      fprintf(stderr, "STATE: +%s\n",
+	              remote_job_states[last_job_state - IPP_JOB_PENDING]);
+	  }
+
+	  if ((job_sheets = ippFindAttribute(response,
+					     "job-media-sheets-completed",
+					     IPP_TAG_INTEGER)) == NULL)
+	    job_sheets = ippFindAttribute(response,
+					  "job-impressions-completed",
+					  IPP_TAG_INTEGER);
+
+	  if (job_sheets)
+	    fprintf(stderr, "PAGE: total %d\n",
+		    job_sheets->values[0].integer);
 
 	 /*
           * Stop polling if the job is finished or pending-held...
@@ -1568,12 +1598,6 @@ main(int  argc,				/* I - Number of command-line args */
 
           if (job_state->values[0].integer > IPP_JOB_STOPPED)
 	  {
-	    if ((job_sheets = ippFindAttribute(response,
-	                                       "job-media-sheets-completed",
-	                                       IPP_TAG_INTEGER)) != NULL)
-	      fprintf(stderr, "PAGE: total %d\n",
-	              job_sheets->values[0].integer);
-
 	    ippDelete(response);
 	    break;
 	  }
