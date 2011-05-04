@@ -804,7 +804,7 @@ main(int  argc,				/* I - Number of command-line args */
     {
       fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
               http->version / 100, http->version % 100);
-      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
     }
 
     supported  = cupsDoRequest(http, request, resource);
@@ -922,7 +922,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
 	fputs("DEBUG: printer-state-reasons not returned in "
 	      "Get-Printer-Attributes response.\n", stderr);
-        fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+        fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
       }
 
       if (busy)
@@ -997,14 +997,14 @@ main(int  argc,				/* I - Number of command-line args */
       {
         fputs("DEBUG: operations-supported does not list Validate-Job.\n",
 	      stderr);
-	fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+	fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
       }
     }
     else
     {
       fputs("DEBUG: operations-supported not returned in "
             "Get-Printer-Attributes response.\n", stderr);
-      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
     }
 
     doc_handling_sup = ippFindAttribute(supported,
@@ -1230,7 +1230,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       fputs("DEBUG: This printer does not implement the REQUIRED Validate-Job "
             "operation.\n", stderr);
-      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
       break;
     }
     else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
@@ -1626,7 +1626,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           fputs("DEBUG: job-state not returned in Get-Job-Attributes reponse - "
 	        "stopping queue.\n", stderr);
-	  fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+	  fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
 	  ipp_status = IPP_INTERNAL_ERROR;
 	  break;
 	}
