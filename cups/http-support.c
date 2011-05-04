@@ -1630,6 +1630,15 @@ _httpResolveURI(
     if ((options & _HTTP_RESOLVE_STDERR) && !uri)
       _cupsLangPrintFilter(stderr, "ERROR", _("Unable to find printer."));
   }
+  else
+  {
+   /*
+    * Nothing more to do...
+    */
+
+    strlcpy(resolved_uri, uri, resolved_size);
+    uri = resolved_uri;
+  }
 
   DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));
 
