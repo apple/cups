@@ -225,7 +225,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*final_content_type,	/* FINAL_CONTENT_TYPE environment var */
 		*document_format;	/* document-format value */
   int		fd;			/* File descriptor */
-  off_t		bytes;			/* Bytes copied */
+  off_t		bytes = 0;		/* Bytes copied */
   char		buffer[16384];		/* Copy buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -233,6 +233,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		version;		/* IPP version */
   ppd_file_t	*ppd;			/* PPD file */
   _ppd_cache_t	*pc;			/* PPD cache and mapping data */
+  fd_set	input;			/* Input set for select() */
 
 
  /*
@@ -632,8 +633,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (num_files == 0)
+  {
     if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 0, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
+    else if ((bytes = read(0, buffer, sizeof(buffer))) <= 0)
+      return (CUPS_BACKEND_OK);
+  }
 
  /*
   * Try connecting to the remote server...
@@ -799,11 +804,7 @@ main(int  argc,				/* I - Number of command-line args */
     {
       fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
               http->version / 100, http->version % 100);
-
-      _cupsLangPrintFilter(stderr, "ERROR",
-                           _("This printer does not conform to the IPP "
-			     "standard. Please contact the manufacturer of "
-			     "your printer for assistance."));
+      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
     }
 
     supported  = cupsDoRequest(http, request, resource);
@@ -918,10 +919,11 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
       }
       else
-	_cupsLangPrintFilter(stderr, "ERROR",
-			     _("This printer does not conform to the IPP "
-			       "standard. Please contact the manufacturer of "
-			       "your printer for assistance."));
+      {
+	fputs("DEBUG: printer-state-reasons not returned in "
+	      "Get-Printer-Attributes response.\n", stderr);
+        fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
+      }
 
       if (busy)
       {
@@ -993,20 +995,16 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (!validate_job)
       {
-        _cupsLangPrintFilter(stderr, "WARNING",
-	                     _("This printer does not conform to the IPP "
-			       "standard and may not work."));
         fputs("DEBUG: operations-supported does not list Validate-Job.\n",
 	      stderr);
+	fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
       }
     }
     else
     {
-      _cupsLangPrintFilter(stderr, "WARNING",
-			   _("This printer does not conform to the IPP "
-			     "standard and may not work."));
       fputs("DEBUG: operations-supported not returned in "
-            "Get-Printer-Attributes request.\n", stderr);
+            "Get-Printer-Attributes response.\n", stderr);
+      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
     }
 
     doc_handling_sup = ippFindAttribute(supported,
@@ -1226,9 +1224,13 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else if (ipp_status == IPP_OPERATION_NOT_SUPPORTED)
     {
-      _cupsLangPrintFilter(stderr, "WARNING",
-			   _("This printer does not conform to the IPP "
-			     "standard and may not work."));
+     /*
+      * This is all too common...
+      */
+
+      fputs("DEBUG: This printer does not implement the REQUIRED Validate-Job "
+            "operation.\n", stderr);
+      fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
       break;
     }
     else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
@@ -1283,24 +1285,36 @@ main(int  argc,				/* I - Number of command-line args */
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
         if (num_files == 1)
-	  fd = open(files[0], O_RDONLY);
+	{
+	  fd    = open(files[0], O_RDONLY);
+          bytes = read(fd, buffer, sizeof(buffer));
+	}
 	else
 	  fd = 0;
 
-        while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+        while (bytes > 0)
 	{
 	  fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
 
 	  if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
             break;
-          else
-	  {
-	   /*
-	    * Check for side-channel requests...
-	    */
 
+	 /*
+	  * Check for side-channel requests and more print data...
+	  */
+
+          FD_ZERO(&input);
+	  FD_SET(fd, &input);
+	  FD_SET(snmp_fd, &input);
+
+          while (select(fd > snmp_fd ? fd + 1 : snmp_fd + 1, &input, NULL, NULL,
+	                NULL) <= 0 && !job_canceled);
+
+	  if (FD_ISSET(snmp_fd, &input))
 	    backendCheckSideChannel(snmp_fd, http->hostaddr);
-	  }
+
+          if (FD_ISSET(fd, &input))
+            bytes = read(fd, buffer, sizeof(buffer));
 	}
 
         if (num_files == 1)
@@ -1610,8 +1624,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  * the job...
 	  */
 
-          fputs("DEBUG: No job-state available from printer - stopping queue.\n",
-	        stderr);
+          fputs("DEBUG: job-state not returned in Get-Job-Attributes reponse - "
+	        "stopping queue.\n", stderr);
+	  fputs("STATE: +cups-printer-is-a-piece-of-junk-report\n", stderr);
 	  ipp_status = IPP_INTERNAL_ERROR;
 	  break;
 	}
