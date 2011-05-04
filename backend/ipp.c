@@ -19,13 +19,14 @@
  *   main()                 - Send a file to the printer or server.
  *   cancel_job()           - Cancel a print job.
  *   check_printer_state()  - Check the printer state.
- *   compress_files()       - Compress print files...
- *   monitor_printer()      - Monitor the printer state...
+ *   compress_files()       - Compress print files.
+ *   monitor_printer()      - Monitor the printer state.
  *   new_request()          - Create a new print creation or validation request.
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
  *   report_attr()          - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
+ *   run_as_user()          - Run the IPP backend as the printing user.
  *   sigterm_handler()      - Handle 'terminate' signals that stop the backend.
  */
 
@@ -37,6 +38,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
+#  include <xpc/xpc.h>
+#  define kPMPrintUIToolAgent	"com.apple.printuitool.agent"
+#  define kPMStartJob		100
+#  define kPMWaitForJob		101
+extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
+		                              uid_t uid);
+#endif /* HAVE_GSSAPI && HAVE_XPC */
 
 
 /*
@@ -64,6 +73,9 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
 
 static const char *auth_info_required = "none";
 					/* New auth-info-required value */
+#if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
+static int	child_pid = 0;		/* Child process ID */
+#endif /* HAVE_GSSAPI && HAVE_XPC */
 static const char * const jattrs[] =	/* Job attributes we want */
 {
   "job-media-sheets-completed",
@@ -133,6 +145,10 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
 static int		report_printer_state(ipp_t *ipp, int job_id);
+#if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
+static int		run_as_user(int argc, char *argv[], uid_t uid,
+			            const char *device_uri, int fd);
+#endif /* HAVE_GSSAPI && HAVE_XPC */
 static void		sigterm_handler(int sig);
 
 
@@ -271,6 +287,64 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * Get the device URI...
+  */
+
+  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_FAILED);
+  }
+
+#ifdef HAVE_GSSAPI
+ /*
+  * For Kerberos, become the printing user (if we can) to get the credentials
+  * that way.
+  */
+
+  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
+  {
+    uid_t	uid = (uid_t)atoi(value);
+					/* User ID */
+
+#  ifdef HAVE_XPC
+    if (uid > 0)
+    {
+      if (argc == 6)
+        return (run_as_user(argc, argv, uid, device_uri, 0));
+      else
+      {
+        int status = 0;			/* Exit status */
+
+        for (i = 6; i < argc && !status && !job_canceled; i ++)
+	{
+	  if ((fd = open(argv[i], O_RDONLY)) >= 0)
+	  {
+	    status = run_as_user(argc, argv, uid, device_uri, fd);
+	    close(fd);
+	  }
+	  else
+	  {
+	    _cupsLangPrintError("ERROR", _("Unable to open print file"));
+	    status = CUPS_BACKEND_FAILED;
+	  }
+	}
+
+	return (status);
+      }
+    }
+
+#  else /* No XPC, just try to run as the user ID */
+    if (uid > 0)
+      seteuid(uid);
+#  endif /* HAVE_XPC */
+  }
+#endif /* HAVE_GSSAPI */
+
+ /*
   * Get the (final) content type...
   */
 
@@ -288,15 +362,6 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Extract the hostname and printer name from the URI...
   */
-
-  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-      return (CUPS_BACKEND_FAILED);
-  }
 
   httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
                   username, sizeof(username), hostname, sizeof(hostname), &port,
@@ -521,16 +586,6 @@ main(int  argc,				/* I - Number of command-line args */
 
     password = getenv("AUTH_PASSWORD");
   }
-
-#ifdef HAVE_GSSAPI
- /*
-  * For Kerberos, become the printing user (if we can) to get the credentials
-  * that way.
-  */
-
-  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
-    seteuid(atoi(value));
-#endif /* HAVE_GSSAPI */
 
  /*
   * Try finding the remote server...
@@ -1739,7 +1794,7 @@ check_printer_state(
 
 #ifdef HAVE_LIBZ
 /*
- * 'compress_files()' - Compress print files...
+ * 'compress_files()' - Compress print files.
  */
 
 static void
@@ -1809,7 +1864,7 @@ compress_files(int  num_files,		/* I - Number of files */
 
 
 /*
- * 'monitor_printer()' - Monitor the printer state...
+ * 'monitor_printer()' - Monitor the printer state.
  */
 
 static void *				/* O - Thread exit code */
@@ -2413,6 +2468,196 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 }
 
 
+#if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
+/*
+ * 'run_as_user()' - Run the IPP backend as the printing user.
+ *
+ * This function uses an XPC-based user agent to run the backend as the printing
+ * user. We need to do this in order to have access to the user's Kerberos
+ * credentials.
+ */
+
+static int				/* O - Exit status */
+run_as_user(int        argc,		/* I - Number of command-line args */
+	    char       *argv[],		/* I - Command-line arguments */
+	    uid_t      uid,		/* I - User ID */
+	    const char *device_uri,	/* I - Device URI */
+	    int        fd)		/* I - File to print */
+{
+  xpc_connection_t	conn;		/* Connection to XPC service */
+  xpc_object_t		request;	/* Request message dictionary */
+  __block xpc_object_t	response;	/* Response message dictionary */
+  dispatch_semaphore_t	sem;		/* Semaphore for waiting for response */
+  int			status = CUPS_BACKEND_FAILED;
+					/* Status of request */
+
+
+  fprintf(stderr, "DEBUG: Running IPP backend as UID %d.\n", (int)uid);
+
+ /*
+  * Connect to the user agent for the specified UID...
+  */
+
+  conn = xpc_connection_create_mach_service(kPMPrintUIToolAgent,
+                                            dispatch_get_global_queue(0, 0), 0);
+  if (!conn)
+  {
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("Unable to start backend process."));
+    fputs("DEBUG: Unable to create connection to agent.\n", stderr);
+    goto cleanup;
+  }
+
+  xpc_connection_set_event_handler(conn,
+                                   ^(xpc_object_t event)
+				   {
+				     xpc_type_t messageType = xpc_get_type(event);
+
+				     if (messageType == XPC_TYPE_ERROR)
+				     {
+				       if (event == XPC_ERROR_CONNECTION_INTERRUPTED)
+					 fprintf(stderr, "DEBUG: Interrupted connection to service %s.\n",
+					         xpc_connection_get_name(conn));
+				       else if (event == XPC_ERROR_CONNECTION_INVALID)
+				         fprintf(stderr, "DEBUG: Connection invalid for service %s.\n",
+					         xpc_connection_get_name(conn));
+				       else
+				         fprintf(stderr, "DEBUG: Unxpected error for service %s: %s\n",
+					         xpc_connection_get_name(conn),
+						 xpc_dictionary_get_string(event, XPC_ERROR_KEY_DESCRIPTION));
+				     }
+				   });
+  xpc_connection_set_target_uid(conn, uid);
+  xpc_connection_resume(conn);
+
+ /*
+  * Try starting the backend...
+  */
+
+  request = xpc_dictionary_create(NULL, NULL, 0);
+  xpc_dictionary_set_int64(request, "command", kPMStartJob);
+  xpc_dictionary_set_string(request, "device-uri", device_uri);
+  xpc_dictionary_set_string(request, "job-id", argv[1]);
+  xpc_dictionary_set_string(request, "user", argv[2]);
+  xpc_dictionary_set_string(request, "title", argv[3]);
+  xpc_dictionary_set_string(request, "copies", argv[4]);
+  xpc_dictionary_set_string(request, "options", argv[5]);
+  xpc_dictionary_set_string(request, "auth-info-required",
+                            getenv("AUTH_INFO_REQUIRED"));
+  xpc_dictionary_set_fd(request, "stdin", fd);
+  xpc_dictionary_set_fd(request, "stderr", 2);
+  xpc_dictionary_set_fd(request, "side-channel", CUPS_SC_FD);
+
+  sem      = dispatch_semaphore_create(0);
+  response = NULL;
+
+  xpc_connection_send_message_with_reply(conn, request,
+                                         dispatch_get_global_queue(0,0),
+					 ^(xpc_object_t reply)
+					 {
+					   /* Save the response and wake up */
+					   if (xpc_get_type(reply)
+					           == XPC_TYPE_DICTIONARY)
+					     response = xpc_retain(reply);
+
+					   dispatch_semaphore_signal(sem);
+					 });
+
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+  xpc_release(request);
+  dispatch_release(sem);
+
+  if (response)
+  {
+    child_pid = xpc_dictionary_get_int64(response, "child-pid");
+
+    xpc_release(response);
+
+    if (child_pid)
+      fprintf(stderr, "DEBUG: Child PID=%d.\n", child_pid);
+    else
+    {
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unable to start backend process."));
+      fputs("DEBUG: No child PID.\n", stderr);
+      goto cleanup;
+    }
+  }
+  else
+  {
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("Unable to start backend process."));
+    fputs("DEBUG: No reply from agent.\n", stderr);
+    goto cleanup;
+  }
+
+ /*
+  * Then wait for the backend to finish...
+  */
+
+  request = xpc_dictionary_create(NULL, NULL, 0);
+  xpc_dictionary_set_int64(request, "command", kPMWaitForJob);
+  xpc_dictionary_set_fd(request, "stderr", 2);
+
+  sem      = dispatch_semaphore_create(0);
+  response = NULL;
+
+  xpc_connection_send_message_with_reply(conn, request,
+                                         dispatch_get_global_queue(0,0),
+					 ^(xpc_object_t reply)
+					 {
+					   /* Save the response and wake up */
+					   if (xpc_get_type(reply)
+					           == XPC_TYPE_DICTIONARY)
+					     response = xpc_retain(reply);
+
+					   dispatch_semaphore_signal(sem);
+					 });
+
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+  xpc_release(request);
+  dispatch_release(sem);
+
+  if (response)
+  {
+    status = xpc_dictionary_get_int64(response, "status");
+
+    if (status == SIGTERM || status == SIGKILL || status == SIGPIPE)
+    {
+      fprintf(stderr, "DEBUG: Child terminated on signal %d.\n", status);
+      status = CUPS_BACKEND_FAILED;
+    }
+    else if (WIFSIGNALED(status))
+    {
+      fprintf(stderr, "DEBUG: Child crashed on signal %d.\n", status);
+      status = CUPS_BACKEND_STOP;
+    }
+    else if (WIFEXITED(status))
+    {
+      status = WEXITSTATUS(status);
+      fprintf(stderr, "DEBUG: Child exited with status %d.\n", status);
+    }
+
+    xpc_release(response);
+  }
+  else
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("Unable to get backend exit status."));
+
+  cleanup:
+
+  if (conn)
+  {
+    xpc_connection_suspend(conn);
+    xpc_connection_cancel(conn);
+    xpc_release(conn);
+  }
+
+  return (status);
+}
+#endif /* HAVE_GSSAPI && HAVE_XPC */
+
+
 /*
  * 'sigterm_handler()' - Handle 'terminate' signals that stop the backend.
  */
@@ -2422,10 +2667,18 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
+#if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
+  if (child_pid)
+  {
+    kill(child_pid, sig);
+    child_pid = 0;
+  }
+#endif /* HAVE_GSSAPI && HAVE_XPC */
+
   if (!job_canceled)
   {
    /*
-    * Flag that the job should be cancelled...
+    * Flag that the job should be canceled...
     */
 
     job_canceled = 1;

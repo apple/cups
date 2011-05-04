@@ -3,7 +3,7 @@
 #
 #   Backend makefile for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -85,7 +85,8 @@ install-data:
 # Install programs...
 #
 
-install-exec:
+install-exec:	$(INSTALLXPC)
+	echo Installing backends in $(SERVERBIN)/backend
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/backend
 	for file in $(RBACKENDS); do \
 		$(LIBTOOL) $(INSTALL_BIN) -m 700 $$file $(SERVERBIN)/backend; \
@@ -93,8 +94,10 @@ install-exec:
 	for file in $(UBACKENDS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/backend; \
 	done
-	$(RM) $(SERVERBIN)/backend/http
-	$(LN) ipp $(SERVERBIN)/backend/http
+	for file in $(IPPALIASES); do \
+		$(RM) $(SERVERBIN)/backend/$$file; \
+		$(LN) ipp $(SERVERBIN)/backend/$$file; \
+	done
 	if test "x$(DNSSD_BACKEND)" != x; then \
 		$(RM) $(SERVERBIN)/backend/mdns; \
 		$(LN) $(DNSSD_BACKEND) $(SERVERBIN)/backend/mdns; \
@@ -105,6 +108,15 @@ install-exec:
 			cp $$file $(SYMROOT); \
 		done \
 	fi
+
+install-xpc:	ipp
+	echo Installing XPC backends in $(SERVERBIN)/apple
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/apple
+	$(LIBTOOL) $(INSTALL_BIN) ipp $(SERVERBIN)/apple
+	for file in $(IPPALIASES); do \
+		$(RM) $(SERVERBIN)/apple/$$file; \
+		$(LN) ipp $(SERVERBIN)/apple/$$file; \
+	done
 
 
 #
@@ -126,10 +138,17 @@ install-libs:
 #
 
 uninstall:
+	$(RM) $(SERVERBIN)/apple/ipp
+	for file in $(IPPALIASES); do \
+		$(RM) $(SERVERBIN)/apple/$$file; \
+	done
+	-$(RMDIR) $(SERVERBIN)/apple
 	for file in $(RBACKENDS) $(UBACKENDS); do \
 		$(RM) $(SERVERBIN)/backend/$$file; \
 	done
-	$(RM) $(SERVERBIN)/backend/http
+	for file in $(IPPALIASES); do \
+		$(RM) $(SERVERBIN)/backend/$$file; \
+	done
 	-$(RMDIR) $(SERVERBIN)/backend
 	-$(RMDIR) $(SERVERBIN)
 

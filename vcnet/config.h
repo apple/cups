@@ -769,6 +769,13 @@
 /* #undef HAVE_COLORSYNCREGISTERDEVICE */
 
 
+/*
+ * Do we have XPC?
+ */
+
+/* #undef HAVE_XPC */
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

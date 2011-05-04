@@ -157,13 +157,16 @@ if test x$enable_ssl != xno; then
     fi
 fi
 
+IPPALIASES="http"
 if test $have_ssl = 1; then
     AC_MSG_RESULT([    Using SSLLIBS="$SSLLIBS"])
     AC_MSG_RESULT([    Using SSLFLAGS="$SSLFLAGS"])
+    IPPALIASES="http https ipps"
 elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes -o x$enable_openssl = xyes; then
     AC_MSG_ERROR([Unable to enable SSL support.])
 fi
 
+AC_SUBST(IPPALIASES)
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
 

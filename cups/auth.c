@@ -350,6 +350,8 @@ _cupsSetNegotiateAuthString(
 			*password;	/* Password string */
     _cups_gss_acquire_t	data;		/* Callback data */
     gss_auth_identity_desc identity;	/* Kerberos user identity */
+    _cups_globals_t	*cg = _cupsGlobals();
+					/* Per-thread global data */
 
     if (!cg->lang_default)
       cg->lang_default = cupsLangDefault();
