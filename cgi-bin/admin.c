@@ -3666,14 +3666,18 @@ do_set_options(http_t *http,		/* I - HTTP connection */
       attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
 
       cgiSetVariable("KEYWORD", "job_sheets_start");
-      cgiSetVariable("KEYTEXT", cgiText(_("Starting Banner")));
+      cgiSetVariable("KEYTEXT",
+                     /* TRANSLATORS: Banner/cover sheet before the print job. */
+                     cgiText(_("Starting Banner")));
       cgiSetVariable("DEFCHOICE", attr != NULL ?
 				  attr->values[0].string.text : "");
 
       cgiCopyTemplateLang("option-pickone.tmpl");
 
       cgiSetVariable("KEYWORD", "job_sheets_end");
-      cgiSetVariable("KEYTEXT", cgiText(_("Ending Banner")));
+      cgiSetVariable("KEYTEXT",
+                     /* TRANSLATORS: Banner/cover sheet after the print job. */
+                     cgiText(_("Ending Banner")));
       cgiSetVariable("DEFCHOICE", attr != NULL && attr->num_values > 1 ?
 				  attr->values[1].string.text : "");
 

@@ -116,7 +116,7 @@ main(int  argc,				/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'P' : /* Printer */
 	    if (argv[i][2])
 	      dest = argv[i] + 2;
@@ -128,7 +128,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		httpClose(http);
 		cupsFreeDests(num_dests, dests);
-	        
+
 	        usage();
 	      }
 
@@ -507,6 +507,7 @@ show_jobs(const char *command,		/* I - Command name */
       if (!longstatus && jobcount == 0)
 #ifdef __osf__
 	_cupsLangPuts(stdout,
+	              /* TRANSLATORS: Pri is job priority. */
 	              _("Rank   Owner      Pri  Job        Files"
 		        "                       Total Size"));
 #else
