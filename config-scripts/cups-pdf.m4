@@ -79,6 +79,12 @@ case "x$with_pdftops" in
 	;;
 esac
 
+if test "x$CUPS_PDFTOPS" != x; then
+	if `$CUPS_PDFTOPS -h 2>&1 | grep -q -- -origpagesizes 2>/dev/null`; then
+		AC_DEFINE(HAVE_PDFTOPS_WITH_ORIGPAGESIZES)
+	fi
+fi
+
 AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
 AC_DEFINE_UNQUOTED(CUPS_GHOSTSCRIPT, "$CUPS_GHOSTSCRIPT")
 AC_SUBST(PDFTOPS)

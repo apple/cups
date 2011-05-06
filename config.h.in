@@ -501,6 +501,7 @@
  */
 
 #undef HAVE_PDFTOPS
+#undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES
 #define CUPS_PDFTOPS	"/usr/bin/pdftops"
 
 

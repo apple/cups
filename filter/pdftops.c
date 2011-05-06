@@ -341,7 +341,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    strcasecmp(val, "false") != 0)
 	  orientation = 1;
       }
-      else if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+      else if ((val = cupsGetOption("orientation-requested", num_options,
+                                    options)) != NULL)
       {
        /*
 	* Map IPP orientation values to 0 to 3:
@@ -395,6 +396,17 @@ main(int  argc,				/* I - Number of command-line args */
       pdf_argv[pdf_argc++] = pdf_height;
 #endif /* HAVE_PDFTOPS */
     }
+#if defined(HAVE_PDFTOPS) && defined(HAVE_PDFTOPS_WITH_ORIGPAGESIZES)
+    else
+    {
+     /*
+      *  Use the page sizes of the original PDF document, this way documents
+      *  which contain pages of different sizes can be printed correctly
+      */
+
+      pdf_argv[pdf_argc++] = (char *)"-origpagesizes";
+    }
+#endif /* HAVE_PDFTOPS && HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
   }
 
 #ifdef HAVE_PDFTOPS
