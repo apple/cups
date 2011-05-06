@@ -3,6 +3,8 @@ CHANGES.txt - 2011-05-06
 
 CHANGES IN CUPS V1.5b1
 
+	- Restored support for GNU TLS and OpenSSL with threading enabled
+	  (STR #3605)
 	- Fixed a confusing error message from cups-polld (STR #3806)
 	- Increased the default RIPCache value to 128MB (STR #3535)
 	- MIME errors are now routed to the error_log file (STR #2410)

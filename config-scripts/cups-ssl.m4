@@ -90,25 +90,17 @@ if test x$enable_ssl != xno; then
     	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
     	AC_PATH_PROG(LIBGCRYPTCONFIG,libgcrypt-config)
 	if $PKGCONFIG --exists gnutls; then
-	    if test "x$have_pthread" = xyes; then
-		AC_MSG_WARN([The current version of GNU TLS cannot be made thread-safe.])
-	    else
-	        have_ssl=1
-	        SSLLIBS=`$PKGCONFIG --libs gnutls`
-	        SSLFLAGS=`$PKGCONFIG --cflags gnutls`
-	        AC_DEFINE(HAVE_SSL)
-	        AC_DEFINE(HAVE_GNUTLS)
-	    fi
+	    have_ssl=1
+	    SSLLIBS=`$PKGCONFIG --libs gnutls`
+	    SSLFLAGS=`$PKGCONFIG --cflags gnutls`
+	    AC_DEFINE(HAVE_SSL)
+	    AC_DEFINE(HAVE_GNUTLS)
 	elif test "x$LIBGNUTLSCONFIG" != x; then
-	    if test "x$have_pthread" = xyes; then
-		AC_MSG_WARN([The current version of GNU TLS cannot be made thread-safe.])
-	    else
-	        have_ssl=1
-	        SSLLIBS=`$LIBGNUTLSCONFIG --libs`
-	        SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
-	        AC_DEFINE(HAVE_SSL)
-	        AC_DEFINE(HAVE_GNUTLS)
-	    fi
+	    have_ssl=1
+	    SSLLIBS=`$LIBGNUTLSCONFIG --libs`
+	    SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
+	    AC_DEFINE(HAVE_SSL)
+	    AC_DEFINE(HAVE_GNUTLS)
 	fi
 
 	if test $have_ssl = 1; then
