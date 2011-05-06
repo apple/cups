@@ -87,9 +87,9 @@ if test "x$CUPS_PDFTOPS" != x; then
 	else
 		AC_MSG_RESULT(no)
 	fi
-fi
 
-if test "x$CUPS_GHOSTSCRIPT" != x; then
+	DEFAULT_PDFTOPS=""
+elif test "x$CUPS_GHOSTSCRIPT" != x; then
 	AC_MSG_CHECKING(whether gs supports the ps2write device)
 	if ($CUPS_GHOSTSCRIPT -h 2>&1 | grep -q ps2write); then
 		AC_MSG_RESULT(yes)
@@ -97,10 +97,15 @@ if test "x$CUPS_GHOSTSCRIPT" != x; then
 	else
 		AC_MSG_RESULT(no)
 	fi
+
+	DEFAULT_PDFTOPS=""
+else
+	DEFAULT_PDFTOPS="#"
 fi
 
 AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
 AC_DEFINE_UNQUOTED(CUPS_GHOSTSCRIPT, "$CUPS_GHOSTSCRIPT")
+AC_SUBST(DEFAULT_PDFTOPS)
 AC_SUBST(PDFTOPS)
 
 dnl

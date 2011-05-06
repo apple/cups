@@ -386,6 +386,7 @@
 		726AD70C135E8B11002C930D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220F4B133306BB00FCA411 /* Security.framework */; };
 		726AD70D135E8B11002C930D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220F4C133306BB00FCA411 /* SystemConfiguration.framework */; };
 		726AD70E135E8B5E002C930D /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220F51133308C100FCA411 /* libiconv.dylib */; };
+		7271883D1374AB14001A2036 /* mime-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 7271883C1374AB14001A2036 /* mime-private.h */; };
 		72F75A5C1336F988004BB496 /* cupstestppd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A5B1336F988004BB496 /* cupstestppd.c */; };
 		72F75A671336FA38004BB496 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		72F75A6C1336FA8A004BB496 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A691336FA8A004BB496 /* error.c */; };
@@ -1418,6 +1419,7 @@
 		72718839137498E4001A2036 /* image-zoom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-zoom.c"; path = "../filter/image-zoom.c"; sourceTree = "<group>"; };
 		7271883A137498E4001A2036 /* image.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = image.c; path = ../filter/image.c; sourceTree = "<group>"; };
 		7271883B137498E4001A2036 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = image.h; path = ../filter/image.h; sourceTree = "<group>"; };
+		7271883C1374AB14001A2036 /* mime-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mime-private.h"; path = "../scheduler/mime-private.h"; sourceTree = "<group>"; };
 		72F75A4C1336F31B004BB496 /* libcups_static.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
@@ -1950,6 +1952,7 @@
 				72220EE4133305BB00FCA411 /* ipp-private.h */,
 				72220EE9133305BB00FCA411 /* language-private.h */,
 				72220EEE133305BB00FCA411 /* md5-private.h */,
+				7271883C1374AB14001A2036 /* mime-private.h */,
 				72220EF5133305BB00FCA411 /* ppd-private.h */,
 				72220EF9133305BB00FCA411 /* pwg-private.h */,
 				72220EFE133305BB00FCA411 /* snmp-private.h */,
@@ -2252,6 +2255,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72220FB813330BCE00FCA411 /* mime.h in Headers */,
+				7271883D1374AB14001A2036 /* mime-private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

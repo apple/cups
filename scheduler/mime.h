@@ -100,11 +100,15 @@ typedef struct _mime_filter_s		/**** MIME Conversion Filter Data ****/
   size_t	maxsize;		/* Maximum file size for this filter */
 } mime_filter_t;
 
+typedef void (*mime_error_cb_t)(void *ctx, const char *message);
+
 typedef struct _mime_s			/**** MIME Database ****/
 {
-  cups_array_t	*types;			/* File types */
-  cups_array_t	*filters;		/* Type conversion filters */
-  cups_array_t	*srcs;			/* Filters sorted by source type */
+  cups_array_t		*types;		/* File types */
+  cups_array_t		*filters;	/* Type conversion filters */
+  cups_array_t		*srcs;		/* Filters sorted by source type */
+  mime_error_cb_t	error_cb;	/* Error message callback */
+  void			*error_ctx;	/* Pointer for callback */
 } mime_t;
 
 
@@ -113,6 +117,7 @@ typedef struct _mime_s			/**** MIME Database ****/
  */
 
 extern void		mimeDelete(mime_t *mime);
+extern mime_t		*mimeNew(void) _CUPS_API_1_5;
 extern mime_t		*mimeLoad(const char *pathname, const char *filterpath);
 extern mime_t		*mimeLoadFilters(mime_t *mime, const char *pathname,
 			                 const char *filterpath);
@@ -144,6 +149,8 @@ extern mime_filter_t	*mimeFilterLookup(mime_t *mime, mime_type_t *src,
 extern mime_filter_t	*mimeFirstFilter(mime_t *mime);
 extern mime_filter_t	*mimeNextFilter(mime_t *mime);
 extern int		mimeNumFilters(mime_t *mime);
+extern void		mimeSetErrorCallback(mime_t *mime, mime_error_cb_t cb,
+			                     void *context) _CUPS_API_1_5;
 
 #  ifdef __cplusplus
 }

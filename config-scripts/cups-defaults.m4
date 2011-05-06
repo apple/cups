@@ -440,25 +440,35 @@ AC_ARG_ENABLE(texttops, [  --enable-texttops       always build the text filter 
 
 if test "x$enable_bannertops" = xno; then
 	BANNERTOPS=""
+	DEFAULT_BANNERTOPS="#"
 elif test "x$enable_bannertops" = xyes; then
 	BANNERTOPS="bannertops"
+	DEFAULT_BANNERTOPS=""
 elif test $uname = Darwin; then
 	BANNERTOPS=""
+	DEFAULT_BANNERTOPS="#"
 else
 	BANNERTOPS="bannertops"
+	DEFAULT_BANNERTOPS=""
 fi
 
 if test "x$enable_texttops" = xno; then
 	TEXTTOPS=""
+	DEFAULT_TEXTTOPS="#"
 elif test "x$enable_texttops" = xyes; then
 	TEXTTOPS="texttops"
+	DEFAULT_TEXTTOPS=""
 elif test $uname = Darwin; then
 	TEXTTOPS=""
+	DEFAULT_TEXTTOPS="#"
 else
 	TEXTTOPS="texttops"
+	DEFAULT_TEXTTOPS=""
 fi
 
 AC_SUBST(BANNERTOPS)
+AC_SUBST(DEFAULT_BANNERTOPS)
+AC_SUBST(DEFAULT_TEXTTOPS)
 AC_SUBST(TEXTTOPS)
 
 dnl Fonts
