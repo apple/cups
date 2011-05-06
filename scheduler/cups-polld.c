@@ -153,9 +153,8 @@ main(int  argc,				/* I - Number of command-line args */
       if ((http = httpConnectEncrypt(argv[1], atoi(argv[2]),
                                      cupsEncryption())) == NULL)
       {
-	fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s: %s\n",
-        	prefix, argv[1], argv[2],
-		h_errno ? hstrerror(h_errno) : strerror(errno));
+	fprintf(stderr, "ERROR: %s Unable to connect to %s on port %s.\n",
+        	prefix, argv[1], argv[2]);
       }
     }
 
