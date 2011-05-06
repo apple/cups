@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.4.0 - 2009-06-26
+INSTALL - CUPS v1.5.0 - 2011-05-06
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
@@ -166,7 +166,6 @@ CREATING BINARY DISTRIBUTIONS WITH EPM
 	deb       - Builds a Debian package
 	depot     - Builds a HP-UX package (also swinstall)
 	inst      - Builds an IRIX package (also tardist)
-	osx       - Builds a MacOS X package
 	pkg       - Builds a Solaris package
 	rpm       - Builds a RPM package
 	setld     - Build a Tru64 UNIX package
