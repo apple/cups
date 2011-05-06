@@ -510,6 +510,7 @@
  */
 
 #undef HAVE_GHOSTSCRIPT
+#undef HAVE_GHOSTSCRIPT_PS2WRITE
 #define CUPS_GHOSTSCRIPT "/usr/bin/gs"
 
 

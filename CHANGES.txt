@@ -3,9 +3,11 @@ CHANGES.txt - 2011-05-06
 
 CHANGES IN CUPS V1.5b1
 
-	- Update PDF filter to support new Poppler option to preserve page sizes
-	  in PDF files when the user has not selected a particular media size
-	  (STR #3689)
+	- Updated PDF filter to support new Ghostscript ps2write device
+	  (STR #3766)
+	- Updated PDF filter to support new Poppler option to preserve page
+	  sizes in PDF files when the user has not selected a particular media
+	  size (STR #3689)
 	- Added new PWG Raster filter for IPP Everywhere printer support.
 	- Added printer-uuid attribute.
 	- Added support for the cupsSingleFile PPD keyword.
