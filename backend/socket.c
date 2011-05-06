@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   AppSocket backend for the Common UNIX Printing System (CUPS).
+ *   AppSocket backend for CUPS.
  *
  *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -93,7 +93,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		have_supplies;		/* Printer supports supply levels? */
   ssize_t	bytes = 0,		/* Initial bytes read */
 		tbytes;			/* Total number of bytes written */
-  char		buffer[1];		/* Initial print buffer */
+  char		buffer[1024];		/* Initial print buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */

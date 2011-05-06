@@ -142,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		contimeout,		/* Connection timeout */
 		copies;			/* Number of copies */
   ssize_t	bytes = 0;		/* Initial bytes read */
-  char		buffer[1];		/* Initial print buffer */
+  char		buffer[16384];		/* Initial print buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -464,7 +464,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if (bytes > 0)
       write(fd, buffer, bytes);
 
-    backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0, 
+    backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
 		   backendNetworkSideCB);
   }
   else if (argc == 6)

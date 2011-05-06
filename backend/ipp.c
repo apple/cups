@@ -1285,20 +1285,15 @@ main(int  argc,				/* I - Number of command-line args */
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
         if (num_files == 1)
-	{
-	  fd    = open(files[0], O_RDONLY);
-          bytes = read(fd, buffer, sizeof(buffer));
-	}
+	  fd = open(files[0], O_RDONLY);
 	else
-	  fd = 0;
-
-        while (bytes > 0)
 	{
-	  fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
+	  fd          = 0;
+	  http_status = cupsWriteRequestData(http, buffer, bytes);
+        }
 
-	  if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
-            break;
-
+        while (http_status == HTTP_CONTINUE)
+	{
 	 /*
 	  * Check for side-channel requests and more print data...
 	  */
@@ -1314,7 +1309,17 @@ main(int  argc,				/* I - Number of command-line args */
 	    backendCheckSideChannel(snmp_fd, http->hostaddr);
 
           if (FD_ISSET(fd, &input))
-            bytes = read(fd, buffer, sizeof(buffer));
+          {
+            if ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+            {
+	      fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
+
+	      if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
+		break;
+	    }
+	    else if (bytes == 0 || (errno != EINTR && errno != EAGAIN))
+	      break;
+	  }
 	}
 
         if (num_files == 1)
@@ -2239,7 +2244,7 @@ new_request(
 	  collate_str = "separate-documents-collated-copies";
 	else
 	  collate_str = "separate-documents-uncollated-copies";
-	
+
         for (i = 0; i < doc_handling_sup->num_values; i ++)
 	  if (!strcmp(doc_handling_sup->values[i].string.text, collate_str))
 	  {
