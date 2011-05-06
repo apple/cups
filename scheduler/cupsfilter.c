@@ -1339,7 +1339,7 @@ read_cupsd_conf(const char *filename)	/* I - File to read */
   else
     set_string(&FontPath, CUPS_FONTPATH);
 
-  set_string(&RIPCache, "8m");
+  set_string(&RIPCache, "128m");
 
   if ((temp = getenv("CUPS_SERVERBIN")) != NULL)
     set_string(&ServerBin, temp);

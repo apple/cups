@@ -133,7 +133,7 @@ to the access log file. The following levels are defined:</P>
 <H3>Description</H3>
 
 <P>The <CODE>Allow</CODE> directive specifies a hostname, IP
-address, or network that is allowed access to the server. 
+address, or network that is allowed access to the server.
 <CODE>Allow</CODE> directives are cumulative, so multiple
 <CODE>Allow</CODE> directives can be used to allow access for
 multiple hosts or networks.</P>
@@ -2692,7 +2692,7 @@ appear inside a <A HREF="#Location"><CODE>Location</CODE></A> or
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-RIPCache 8m
+RIPCache 128m
 RIPCache 1g
 RIPCache 2048k
 </PRE>
@@ -2703,7 +2703,7 @@ RIPCache 2048k
 memory cache used by Raster Image Processor ("RIP") filters such
 as <CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The
 size can be suffixed with a "k" for kilobytes, "m" for megabytes,
-or "g" for gigabytes. The default cache size is "8m", or 8
+or "g" for gigabytes. The default cache size is "128m", or 128
 megabytes.</P>
 
 

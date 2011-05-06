@@ -3,6 +3,7 @@ CHANGES.txt - 2011-05-06
 
 CHANGES IN CUPS V1.5b1
 
+	- Increased the default RIPCache value to 128MB (STR #3535)
 	- MIME errors are now routed to the error_log file (STR #2410)
 	- Updated PDF filter to support new Ghostscript ps2write device
 	  (STR #3766)

@@ -543,7 +543,7 @@ cupsdReadConfiguration(void)
 
   cupsdClearString(&DefaultPaperSize);
 
-  cupsdSetString(&RIPCache, "8m");
+  cupsdSetString(&RIPCache, "128m");
 
   cupsdSetString(&TempDir, NULL);
 
