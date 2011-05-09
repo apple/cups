@@ -804,7 +804,8 @@ main(int  argc,				/* I - Number of command-line args */
     {
       fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
               http->version / 100, http->version % 100);
-      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
+      fputs("STATE: +cups-ipp-conformance-failure-report,"
+            "cups-ipp-wrong-http-version\n", stderr);
     }
 
     supported  = cupsDoRequest(http, request, resource);
@@ -905,12 +906,17 @@ main(int  argc,				/* I - Number of command-line args */
 						IPP_TAG_BOOLEAN)) != NULL &&
 	  !printer_accepting->values[0].boolean)
         busy = 1;
-      else if ((printer_state = ippFindAttribute(supported,
-                                                 "printer-state-reasons",
-					         IPP_TAG_KEYWORD)) != NULL)
+      else if (!printer_accepting)
+        fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-printer-is-accepting-jobs\n", stderr);
+        
+      if ((printer_state = ippFindAttribute(supported,
+					    "printer-state-reasons",
+					    IPP_TAG_KEYWORD)) != NULL && !busy)
       {
 	for (i = 0; i < printer_state->num_values; i ++)
-	  if (!strcmp(printer_state->values[0].string.text, "spool-area-full") ||
+	  if (!strcmp(printer_state->values[0].string.text,
+	              "spool-area-full") ||
 	      !strncmp(printer_state->values[0].string.text, "spool-area-full-",
 		       16))
 	  {
@@ -919,11 +925,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
       }
       else
-      {
-	fputs("DEBUG: printer-state-reasons not returned in "
-	      "Get-Printer-Attributes response.\n", stderr);
-        fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
-      }
+        fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-printer-state-reasons\n", stderr);
 
       if (busy)
       {
@@ -987,6 +990,38 @@ main(int  argc,				/* I - Number of command-line args */
 					   IPP_TAG_ENUM)) != NULL)
     {
       for (i = 0; i < operations_sup->num_values; i ++)
+        if (operations_sup->values[i].integer == IPP_PRINT_JOB)
+	  break;
+
+      if (i >= operations_sup->num_values)
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-print-job\n", stderr);
+
+      for (i = 0; i < operations_sup->num_values; i ++)
+        if (operations_sup->values[i].integer == IPP_CANCEL_JOB)
+	  break;
+
+      if (i >= operations_sup->num_values)
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-cancel-job\n", stderr);
+
+      for (i = 0; i < operations_sup->num_values; i ++)
+        if (operations_sup->values[i].integer == IPP_GET_JOB_ATTRIBUTES)
+	  break;
+
+      if (i >= operations_sup->num_values)
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-get-job-attributes\n", stderr);
+
+      for (i = 0; i < operations_sup->num_values; i ++)
+        if (operations_sup->values[i].integer == IPP_GET_PRINTER_ATTRIBUTES)
+	  break;
+
+      if (i >= operations_sup->num_values)
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-get-printer-attributes\n", stderr);
+
+      for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_VALIDATE_JOB)
 	{
 	  validate_job = 1;
@@ -994,18 +1029,12 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
       if (!validate_job)
-      {
-        fputs("DEBUG: operations-supported does not list Validate-Job.\n",
-	      stderr);
-	fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
-      }
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+              "cups-ipp-missing-validate-job\n", stderr);
     }
     else
-    {
-      fputs("DEBUG: operations-supported not returned in "
-            "Get-Printer-Attributes response.\n", stderr);
-      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
-    }
+      fputs("STATE: +cups-ipp-conformance-failure-report,"
+	    "cups-ipp-missing-operations-supported\n", stderr);
 
     doc_handling_sup = ippFindAttribute(supported,
 					"multiple-document-handling-supported",
@@ -1228,9 +1257,8 @@ main(int  argc,				/* I - Number of command-line args */
       * This is all too common...
       */
 
-      fputs("DEBUG: This printer does not implement the REQUIRED Validate-Job "
-            "operation.\n", stderr);
-      fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
+      fputs("STATE: +cups-ipp-conformance-failure-report,"
+	    "cups-ipp-missing-validate-job\n", stderr);
       break;
     }
     else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
@@ -1403,6 +1431,8 @@ main(int  argc,				/* I - Number of command-line args */
     {
       _cupsLangPrintFilter(stderr, "INFO",
 			   _("Print file accepted - job ID unknown."));
+      fputs("STATE: +cups-ipp-conformance-failure-report,"
+            "cups-ipp-missing-job-id\n", stderr);
       job_id = 0;
     }
     else
@@ -1554,6 +1584,8 @@ main(int  argc,				/* I - Number of command-line args */
         * Job has gone away and/or the server has no job history...
 	*/
 
+	fputs("STATE: +cups-ipp-conformance-failure-report,"
+	      "cups-ipp-missing-job-history\n", stderr);
         ippDelete(response);
 
 	ipp_status = IPP_OK;
@@ -1634,9 +1666,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  * the job...
 	  */
 
-          fputs("DEBUG: job-state not returned in Get-Job-Attributes reponse - "
-	        "stopping queue.\n", stderr);
-	  fputs("STATE: +cups-ipp-conformance-failure-report\n", stderr);
+	  fputs("STATE: +cups-ipp-conformance-failure-report,"
+		"cups-ipp-missing-job-state\n", stderr);
 	  ipp_status = IPP_INTERNAL_ERROR;
 	  break;
 	}
@@ -2452,7 +2483,9 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   {
     reason = reasons->values[i].string.text;
 
-    if (strcmp(reason, "paused") &&
+    if (strcmp(reason, "none") &&
+	strcmp(reason, "none-report") &&
+	strcmp(reason, "paused") &&
 	strcmp(reason, "com.apple.print.recoverable-warning"))
     {
       strlcpy(valptr, prefix, sizeof(value) - (valptr - value) - 1);

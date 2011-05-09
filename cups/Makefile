@@ -110,6 +110,7 @@ HEADERS	=	\
 		versioning.h
 
 HEADERSPRIV =	\
+		array-private.h \
 		cups-private.h \
 		debug-private.h \
 		file-private.h \

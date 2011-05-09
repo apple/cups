@@ -342,6 +342,7 @@
 		72220FB913330BCE00FCA411 /* type.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220FB513330BCE00FCA411 /* type.c */; };
 		72220FBA13330BEE00FCA411 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		72220FBF13330C1000FCA411 /* libcupsmime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220FAC13330B2200FCA411 /* libcupsmime.dylib */; };
+		7234F4201378A16F00D3E9C9 /* array-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 7234F41F1378A16F00D3E9C9 /* array-private.h */; };
 		724379081333E4A5009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		7243790D1333E4E3009631B9 /* ipp.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790A1333E4E3009631B9 /* ipp.c */; };
 		7243790E1333E4E3009631B9 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790B1333E4E3009631B9 /* network.c */; };
@@ -1353,6 +1354,7 @@
 		72220FB313330BCE00FCA411 /* mime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mime.c; path = ../scheduler/mime.c; sourceTree = "<group>"; };
 		72220FB413330BCE00FCA411 /* mime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mime.h; path = ../scheduler/mime.h; sourceTree = "<group>"; };
 		72220FB513330BCE00FCA411 /* type.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type.c; path = ../scheduler/type.c; sourceTree = "<group>"; };
+		7234F41F1378A16F00D3E9C9 /* array-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "array-private.h"; path = "../cups/array-private.h"; sourceTree = "<group>"; };
 		724378FD1333E43E009631B9 /* ipp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ipp; sourceTree = BUILT_PRODUCTS_DIR; };
 		724379091333E4E3009631B9 /* backend-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "backend-private.h"; path = "../backend/backend-private.h"; sourceTree = "<group>"; };
 		7243790A1333E4E3009631B9 /* ipp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ipp.c; path = ../backend/ipp.c; sourceTree = "<group>"; };
@@ -1945,6 +1947,7 @@
 			isa = PBXGroup;
 			children = (
 				72220F471333063D00FCA411 /* config.h */,
+				7234F41F1378A16F00D3E9C9 /* array-private.h */,
 				72220EC01333056300FCA411 /* cups-private.h */,
 				72220EC31333056300FCA411 /* debug-private.h */,
 				72220ED7133305BB00FCA411 /* file-private.h */,
@@ -2247,6 +2250,7 @@
 				72220F3B133305BB00FCA411 /* string-private.h in Headers */,
 				72220F3E133305BB00FCA411 /* thread-private.h in Headers */,
 				72220F481333063D00FCA411 /* config.h in Headers */,
+				7234F4201378A16F00D3E9C9 /* array-private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
