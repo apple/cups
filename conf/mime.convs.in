@@ -38,55 +38,50 @@
 # PostScript filters
 #
 
-application/pdf			application/vnd.cups-postscript	66	pdftops
+@DEFAULT_PDFTOPS@application/pdf			application/vnd.cups-postscript	66	pdftops
 application/postscript		application/vnd.cups-postscript	66	pstops
-application/x-cshell		application/postscript		33	texttops
-application/x-csource		application/postscript		33	texttops
-application/x-perl		application/postscript		33	texttops
-application/x-shell		application/postscript		33	texttops
-text/plain			application/postscript		33	texttops
-text/css			application/postscript		33	texttops
-text/html			application/postscript		33	texttops
-image/gif			application/vnd.cups-postscript	66	imagetops
-image/png			application/vnd.cups-postscript	66	imagetops
-image/jpeg			application/vnd.cups-postscript	66	imagetops
-image/tiff			application/vnd.cups-postscript	66	imagetops
-image/x-bitmap			application/vnd.cups-postscript	66	imagetops
-image/x-photocd			application/vnd.cups-postscript	66	imagetops
-image/x-portable-anymap		application/vnd.cups-postscript	66	imagetops
-image/x-portable-bitmap		application/vnd.cups-postscript	66	imagetops
-image/x-portable-graymap	application/vnd.cups-postscript	66	imagetops
-image/x-portable-pixmap		application/vnd.cups-postscript	66	imagetops
-image/x-sgi-rgb			application/vnd.cups-postscript	66	imagetops
-image/x-xbitmap			application/vnd.cups-postscript	66	imagetops
-image/x-xpixmap			application/vnd.cups-postscript	66	imagetops
-#image/x-xwindowdump		application/vnd.cups-postscript	66	imagetops
-image/x-sun-raster		application/vnd.cups-postscript	66	imagetops
-application/vnd.cups-banner	application/postscript		33	bannertops
+@DEFAULT_TEXTTOPS@application/x-cshell		application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@application/x-csource		application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@application/x-perl		application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@application/x-shell		application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@text/plain			application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@text/css			application/postscript		33	texttops
+@DEFAULT_TEXTTOPS@text/html			application/postscript		33	texttops
+@DEFAULT_IMAGEFILTERS@image/gif			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/png			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/jpeg			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/tiff			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-bitmap			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-photocd			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-portable-anymap		application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-portable-bitmap		application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-portable-graymap	application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-portable-pixmap		application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-sgi-rgb			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-xbitmap			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-xpixmap			application/vnd.cups-postscript	66	imagetops
+@DEFAULT_IMAGEFILTERS@image/x-sun-raster		application/vnd.cups-postscript	66	imagetops
+@DEFAULT_BANNERTOPS@application/vnd.cups-banner	application/postscript		33	bannertops
 
 ########################################################################
 #
 # Raster filters...
 #
 
-image/gif			application/vnd.cups-raster	100	imagetoraster
-image/png			application/vnd.cups-raster	100	imagetoraster
-image/jpeg			application/vnd.cups-raster	100	imagetoraster
-image/tiff			application/vnd.cups-raster	100	imagetoraster
-image/x-bitmap			application/vnd.cups-raster	100	imagetoraster
-image/x-photocd			application/vnd.cups-raster	100	imagetoraster
-image/x-portable-anymap		application/vnd.cups-raster	100	imagetoraster
-image/x-portable-bitmap		application/vnd.cups-raster	100	imagetoraster
-image/x-portable-graymap	application/vnd.cups-raster	100	imagetoraster
-image/x-portable-pixmap		application/vnd.cups-raster	100	imagetoraster
-image/x-sgi-rgb			application/vnd.cups-raster	100	imagetoraster
-image/x-xbitmap			application/vnd.cups-raster	100	imagetoraster
-image/x-xpixmap			application/vnd.cups-raster	100	imagetoraster
-#image/x-xwindowdump		application/vnd.cups-raster	100	imagetoraster
-image/x-sun-raster		application/vnd.cups-raster	100	imagetoraster
-
-# pstoraster is part of GPL Ghostscript...
-application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
+@DEFAULT_IMAGEFILTERS@image/gif			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/png			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/jpeg			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/tiff			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-bitmap			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-photocd			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-portable-anymap		application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-portable-bitmap		application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-portable-graymap	application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-portable-pixmap		application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-sgi-rgb			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-xbitmap			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-xpixmap			application/vnd.cups-raster	100	imagetoraster
+@DEFAULT_IMAGEFILTERS@image/x-sun-raster		application/vnd.cups-raster	100	imagetoraster
 
 # PWG Raster filter for IPP Everywhere...
 application/vnd.cups-raster	image/pwg-raster		100	rastertopwg

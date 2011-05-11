@@ -3,7 +3,7 @@
  *
  *   Sorted array routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,32 +16,35 @@
  *
  * Contents:
  *
- *   cupsArrayAdd()       - Add an element to the array.
- *   cupsArrayClear()     - Clear the array.
- *   cupsArrayCount()     - Get the number of elements in the array.
- *   cupsArrayCurrent()   - Return the current element in the array.
- *   cupsArrayDelete()    - Free all memory used by the array.
- *   cupsArrayDup()       - Duplicate the array.
- *   cupsArrayFind()      - Find an element in the array.
- *   cupsArrayFirst()     - Get the first element in the array.
- *   cupsArrayGetIndex()  - Get the index of the current element.
- *   cupsArrayGetInsert() - Get the index of the last inserted element.
- *   cupsArrayIndex()     - Get the N-th element in the array.
- *   cupsArrayInsert()    - Insert an element in the array.
- *   cupsArrayLast()      - Get the last element in the array.
- *   cupsArrayNew()       - Create a new array.
- *   cupsArrayNew2()      - Create a new array with hash.
- *   cupsArrayNew3()      - Create a new array with hash and/or free function.
- *   cupsArrayNext()      - Get the next element in the array.
- *   cupsArrayPrev()      - Get the previous element in the array.
- *   cupsArrayRemove()    - Remove an element from the array.
- *   cupsArrayRestore()   - Reset the current element to the last @link
- *                          cupsArraySave@.
- *   cupsArraySave()      - Mark the current element for a later @link
- *                          cupsArrayRestore@.
- *   cupsArrayUserData()  - Return the user data for an array.
- *   cups_array_add()     - Insert or append an element to the array...
- *   cups_array_find()    - Find an element in the array...
+ *   cupsArrayAdd()         - Add an element to the array.
+ *   _cupsArrayAddStrings() - Add zero or more comma-delimited strings to an
+ *                            array.
+ *   cupsArrayClear()       - Clear the array.
+ *   cupsArrayCount()       - Get the number of elements in the array.
+ *   cupsArrayCurrent()     - Return the current element in the array.
+ *   cupsArrayDelete()      - Free all memory used by the array.
+ *   cupsArrayDup()         - Duplicate the array.
+ *   cupsArrayFind()        - Find an element in the array.
+ *   cupsArrayFirst()       - Get the first element in the array.
+ *   cupsArrayGetIndex()    - Get the index of the current element.
+ *   cupsArrayGetInsert()   - Get the index of the last inserted element.
+ *   cupsArrayIndex()       - Get the N-th element in the array.
+ *   cupsArrayInsert()      - Insert an element in the array.
+ *   cupsArrayLast()        - Get the last element in the array.
+ *   cupsArrayNew()         - Create a new array.
+ *   cupsArrayNew2()        - Create a new array with hash.
+ *   cupsArrayNew3()        - Create a new array with hash and/or free function.
+ *   _cupsArrayNewStrings() - Create a new array of comma-delimited strings.
+ *   cupsArrayNext()        - Get the next element in the array.
+ *   cupsArrayPrev()        - Get the previous element in the array.
+ *   cupsArrayRemove()      - Remove an element from the array.
+ *   cupsArrayRestore()     - Reset the current element to the last @link
+ *                            cupsArraySave@.
+ *   cupsArraySave()        - Mark the current element for a later @link
+ *                            cupsArrayRestore@.
+ *   cupsArrayUserData()    - Return the user data for an array.
+ *   cups_array_add()       - Insert or append an element to the array.
+ *   cups_array_find()      - Find an element in the array.
  */
 
 /*
@@ -50,7 +53,7 @@
 
 #include "string-private.h"
 #include "debug-private.h"
-#include "array.h"
+#include "array-private.h"
 
 
 /*
@@ -131,6 +134,64 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
   */
 
   return (cups_array_add(a, e, 0));
+}
+
+
+/*
+ * '_cupsArrayAddStrings()' - Add zero or more comma-delimited strings to an
+ *                            array.
+ *
+ * Note: The array MUST be created using the @link _cupsArrayNewStrings@
+ * function. Duplicate strings are NOT added. If the string pointer "s" is NULL
+ * or the empty string, no strings are added to the array.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+_cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
+                     const char   *s)	/* I - Comma-delimited strings or NULL */
+{
+  char		*buffer,		/* Copy of string */
+		*start,			/* Start of string */
+		*end;			/* End of string */
+  int		status = 1;		/* Status of add */
+
+
+  if (!a || !s || !*s)
+    return (0);
+
+  if (!strchr(s, ','))
+  {
+   /*
+    * String doesn't contain a comma, so add it as a single value...
+    */
+
+    if (!cupsArrayFind(a, (void *)s))
+      status = cupsArrayAdd(a, (void *)s);
+  }
+  else if ((buffer = strdup(s)) == NULL)
+    status = 0;
+  else
+  {
+    for (start = end = buffer; *end; start = end)
+    {
+     /*
+      * Find the end of the current delimited string and see if we need to add
+      * it...
+      */
+
+      if ((end = strchr(start, ',')) != NULL)
+        *end++ = '\0';
+      else
+        end = start + strlen(start);
+
+      if (!cupsArrayFind(a, start))
+        status &= cupsArrayAdd(a, start);
+    }
+
+    free(buffer);
+  }
+
+  return (status);
 }
 
 
@@ -713,6 +774,29 @@ cupsArrayNew3(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
 
 
 /*
+ * '_cupsArrayNewStrings()' - Create a new array of comma-delimited strings.
+ *
+ * Note: The array automatically manages copies of the strings passed. If the
+ * string pointer "s" is NULL or the empty string, no strings are added to the
+ * newly created array.
+ */
+
+cups_array_t *				/* O - Array */
+_cupsArrayNewStrings(const char *s)	/* I - Comma-delimited strings or NULL */
+{
+  cups_array_t	*a;			/* Array */
+
+
+  if ((a = cupsArrayNew3((cups_array_func_t)strcmp, NULL, NULL, 0,
+                         (cups_acopy_func_t)_cupsStrAlloc,
+			 (cups_afree_func_t)_cupsStrFree)) != NULL)
+    _cupsArrayAddStrings(a, s);
+
+  return (a);
+}
+
+
+/*
  * 'cupsArrayNext()' - Get the next element in the array.
  *
  * This function is equivalent to "cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)".
@@ -919,7 +1003,7 @@ cupsArrayUserData(cups_array_t *a)	/* I - Array */
 
 
 /*
- * 'cups_array_add()' - Insert or append an element to the array...
+ * 'cups_array_add()' - Insert or append an element to the array.
  *
  * @since CUPS 1.2/Mac OS X 10.5@
  */
@@ -1100,7 +1184,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 
 
 /*
- * 'cups_array_find()' - Find an element in the array...
+ * 'cups_array_find()' - Find an element in the array.
  */
 
 static int				/* O - Index of match */

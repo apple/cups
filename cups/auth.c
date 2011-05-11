@@ -19,11 +19,14 @@
  *
  * Contents:
  *
- *   cupsDoAuthentication() - Authenticate a request.
- *   cups_get_gssname()     - Get GSSAPI name for authentication.
- *   cups_gss_printf()      - Show error messages from GSSAPI...
- *   cups_local_auth()      - Get the local authorization certificate if
- *                            available/applicable...
+ *   cupsDoAuthentication()        - Authenticate a request.
+ *   _cupsSetNegotiateAuthString() - Set the Kerberos authentication string.
+ *   cups_gss_acquire()            - Kerberos credentials callback.
+ *   cups_gss_getname()            - Get CUPS service credentials for
+ *                                   authentication.
+ *   cups_gss_printf()             - Show debug error messages from GSSAPI.
+ *   cups_local_auth()             - Get the local authorization certificate if
+ *                                   available/applicable.
  */
 
 /*
@@ -58,7 +61,42 @@ extern const char *cssmErrorString(int error);
  */
 
 #ifdef HAVE_GSSAPI
-static gss_name_t cups_get_gssname(http_t *http, const char *service_name);
+#  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
+#    ifdef HAVE_GSS_GSSAPI_SPI_H
+#      include <GSS/gssapi_spi.h>
+#    else
+typedef struct gss_auth_identity
+{
+  uint32_t type;
+  uint32_t flags;
+  char *username;
+  char *realm;
+  char *password;
+  gss_buffer_t *credentialsRef;
+} gss_auth_identity_desc;
+extern OM_uint32 gss_acquire_cred_ex_f(gss_status_id_t, const gss_name_t,
+				       OM_uint32, OM_uint32, const gss_OID,
+				       gss_cred_usage_t, gss_auth_identity_t,
+				       void *, void (*)(void *, OM_uint32,
+				                        gss_status_id_t,
+							gss_cred_id_t,
+							gss_OID_set,
+							OM_uint32));
+#    endif /* HAVE_GSS_GSSAPI_SPI_H */
+#    include <dispatch/dispatch.h>
+typedef struct _cups_gss_acquire_s	/* Acquire callback data */
+{
+  dispatch_semaphore_t	sem;		/* Synchronization semaphore */
+  OM_uint32		major;		/* Returned status code */
+  gss_cred_id_t		creds;		/* Returned credentials */
+} _cups_gss_acquire_t;
+
+static void	cups_gss_acquire(void *ctx, OM_uint32 major,
+		                 gss_status_id_t status,
+				 gss_cred_id_t creds, gss_OID_set oids,
+				 OM_uint32 time_rec);
+#  endif /* HAVE_GSS_ACQUIRE_CRED_EX_F */
+static gss_name_t cups_gss_getname(http_t *http, const char *service_name);
 #  ifdef DEBUG
 static void	cups_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
 				const char *message);
@@ -193,7 +231,7 @@ cupsDoAuthentication(
     * Kerberos authentication...
     */
 
-    if (_cupsSetNegotiateAuthString(http))
+    if (_cupsSetNegotiateAuthString(http, method, resource))
     {
       http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);
@@ -255,13 +293,14 @@ cupsDoAuthentication(
 
 int					/* O - 0 on success, -1 on error */
 _cupsSetNegotiateAuthString(
-    http_t *http)			/* I - Connection to server */
+    http_t     *http,			/* I - Connection to server */
+    const char *method,			/* I - Request method ("GET", "POST", "PUT") */
+    const char *resource)		/* I - Resource path */
 {
   OM_uint32	minor_status,		/* Minor status code */
 		major_status;		/* Major status code */
   gss_buffer_desc output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token */
-  _cups_globals_t *cg = _cupsGlobals();	/* Thread globals */
 
 
 #  ifdef __APPLE__
@@ -280,10 +319,7 @@ _cupsSetNegotiateAuthString(
 
   if (http->gssname == GSS_C_NO_NAME)
   {
-    if (!cg->gss_service_name[0])
-      _cupsSetDefaults();
-
-    http->gssname = cups_get_gssname(http, cg->gss_service_name);
+    http->gssname = cups_gss_getname(http, _cupsGSSServiceName());
   }
 
   if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -292,14 +328,96 @@ _cupsSetNegotiateAuthString(
     http->gssctx = GSS_C_NO_CONTEXT;
   }
 
-  major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
-				       &http->gssctx,
-				       http->gssname, http->gssmech,
-				       GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
-				       GSS_C_INDEFINITE,
-				       GSS_C_NO_CHANNEL_BINDINGS,
-				       GSS_C_NO_BUFFER, &http->gssmech,
-				       &output_token, NULL, NULL);
+  major_status = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
+				      &http->gssctx,
+				      http->gssname, http->gssmech,
+				      GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
+				      GSS_C_INDEFINITE,
+				      GSS_C_NO_CHANNEL_BINDINGS,
+				      GSS_C_NO_BUFFER, &http->gssmech,
+				      &output_token, NULL, NULL);
+
+#ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
+  if (major_status == GSS_S_NO_CRED)
+  {
+   /*
+    * Ask the user for credentials...
+    */
+
+    char		prompt[1024],	/* Prompt for user */
+			userbuf[256];	/* Kerberos username */
+    const char		*username,	/* Username string */
+			*password;	/* Password string */
+    _cups_gss_acquire_t	data;		/* Callback data */
+    gss_auth_identity_desc identity;	/* Kerberos user identity */
+    _cups_globals_t	*cg = _cupsGlobals();
+					/* Per-thread global data */
+
+    if (!cg->lang_default)
+      cg->lang_default = cupsLangDefault();
+
+    snprintf(prompt, sizeof(prompt),
+             _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
+	     cupsUser(), http->gssname);
+
+    if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
+      return (-1);
+
+   /*
+    * Try to acquire credentials...
+    */
+
+    username = cupsUser();
+    if (!strchr(username, '@'))
+    {
+      snprintf(userbuf, sizeof(userbuf), "%s@%s", username, http->gssname);
+      username = userbuf;
+    }
+
+    identity.type           = GSS_AUTH_IDENTITY_TYPE_1;
+    identity.flags          = 0;
+    identity.username       = (char *)username;
+    identity.realm          = (char *)"";
+    identity.password       = (char *)password;
+    identity.credentialsRef = NULL;
+
+    data.sem   = dispatch_semaphore_create(0);
+    data.major = 0;
+    data.creds = NULL;
+
+    if (data.sem)
+    {
+      major_status = gss_acquire_cred_ex_f(NULL, GSS_C_NO_NAME, 0,
+				           GSS_C_INDEFINITE, GSS_KRB5_MECHANISM,
+					   GSS_C_INITIATE, &identity, &data,
+					   cups_gss_acquire);
+
+      if (major_status == GSS_S_COMPLETE)
+      {
+	dispatch_semaphore_wait(data.sem, DISPATCH_TIME_FOREVER);
+	major_status = data.major;
+      }
+
+      dispatch_release(data.sem);
+
+      if (major_status == GSS_S_COMPLETE)
+      {
+        OM_uint32	release_minor;	/* Minor status from releasing creds */
+
+	major_status = gss_init_sec_context(&minor_status, data.creds,
+					    &http->gssctx,
+					    http->gssname, http->gssmech,
+					    GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
+					    GSS_C_INDEFINITE,
+					    GSS_C_NO_CHANNEL_BINDINGS,
+					    GSS_C_NO_BUFFER, &http->gssmech,
+					    &output_token, NULL, NULL);
+        gss_release_cred(&release_minor, &data.creds);
+      }
+    }
+  }
+  else
+#endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
   if (GSS_ERROR(major_status))
   {
@@ -310,7 +428,7 @@ _cupsSetNegotiateAuthString(
   }
 
 #ifdef DEBUG
-  if (major_status == GSS_S_CONTINUE_NEEDED)
+  else if (major_status == GSS_S_CONTINUE_NEEDED)
     cups_gss_printf(major_status, minor_status,
 		    "_cupsSetNegotiateAuthString: Continuation needed!");
 #endif /* DEBUG */
@@ -353,12 +471,42 @@ _cupsSetNegotiateAuthString(
 }
 
 
+#  ifdef HAVE_GSS_ACQUIRE_CRED_EX_F
 /*
- * 'cups_get_gssname()' - Get CUPS service credentials for authentication.
+ * 'cups_gss_acquire()' - Kerberos credentials callback.
+ */
+static void
+cups_gss_acquire(
+    void            *ctx,		/* I - Caller context */
+    OM_uint32       major,		/* I - Major error code */
+    gss_status_id_t status,		/* I - Status (unused) */
+    gss_cred_id_t   creds,		/* I - Credentials (if any) */
+    gss_OID_set     oids,		/* I - Mechanism OIDs (unused) */
+    OM_uint32       time_rec)		/* I - Timestamp (unused) */
+{
+  uint32_t		min;		/* Minor error code */
+  _cups_gss_acquire_t	*data;		/* Callback data */
+
+
+  (void)status;
+  (void)time_rec;
+
+  data        = (_cups_gss_acquire_t *)ctx;
+  data->major = major;
+  data->creds = creds;
+
+  gss_release_oid_set(&min, &oids);
+  dispatch_semaphore_signal(data->sem);
+}
+#  endif /* HAVE_GSS_ACQUIRE_CRED_EX_F */
+
+
+/*
+ * 'cups_gss_getname()' - Get CUPS service credentials for authentication.
  */
 
 static gss_name_t			/* O - Server name */
-cups_get_gssname(
+cups_gss_getname(
     http_t     *http,			/* I - Connection to server */
     const char *service_name)		/* I - Service name */
 {
@@ -367,11 +515,10 @@ cups_get_gssname(
   OM_uint32	  major_status,		/* Major status code */
 		  minor_status;		/* Minor status code */
   gss_name_t	  server_name;		/* Server name */
-  char		  buf[1024],		/* Name buffer */
-		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
+  char		  buf[1024];		/* Name buffer */
 
 
-  DEBUG_printf(("7cups_get_gssname(http=%p, service_name=\"%s\")", http,
+  DEBUG_printf(("7cups_gss_getname(http=%p, service_name=\"%s\")", http,
                 service_name));
 
 
@@ -379,18 +526,54 @@ cups_get_gssname(
   * Get the hostname...
   */
 
-  httpGetHostname(http, fqdn, sizeof(fqdn));
+  if (!http->gsshost[0])
+  {
+    httpGetHostname(http, http->gsshost, sizeof(http->gsshost));
 
-  if (!strcmp(fqdn, "localhost"))
-    httpGetHostname(NULL, fqdn, sizeof(fqdn));
+    if (!strcmp(http->gsshost, "localhost"))
+    {
+      if (gethostname(http->gsshost, sizeof(http->gsshost)) < 0)
+      {
+	DEBUG_printf(("1cups_gss_getname: gethostname() failed: %s",
+		      strerror(errno)));
+	http->gsshost[0] = '\0';
+	return (NULL);
+      }
+
+      if (!strchr(http->gsshost, '.'))
+      {
+       /*
+	* The hostname is not a FQDN, so look it up...
+	*/
+
+	struct hostent	*host;		/* Host entry to get FQDN */
+
+	if ((host = gethostbyname(http->gsshost)) != NULL && host->h_name)
+	{
+	 /*
+	  * Use the resolved hostname...
+	  */
+
+	  strlcpy(http->gsshost, host->h_name, sizeof(http->gsshost));
+	}
+	else
+	{
+	  DEBUG_printf(("1cups_gss_getname: gethostbyname(\"%s\") failed.",
+			http->gsshost));
+	  http->gsshost[0] = '\0';
+	  return (NULL);
+	}
+      }
+    }
+  }
 
  /*
-  * Get a server name we can use for authentication purposes...
+  * Get a service name we can use for authentication purposes...
   */
 
-  snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
+  snprintf(buf, sizeof(buf), "%s@%s", service_name, http->gsshost);
 
-  DEBUG_printf(("9cups_get_gssname: Looking up %s...", buf));
+  DEBUG_printf(("8cups_gss_getname: Looking up \"%s\".", buf));
 
   token.value  = buf;
   token.length = strlen(buf);
@@ -402,7 +585,7 @@ cups_get_gssname(
   if (GSS_ERROR(major_status))
   {
     cups_gss_printf(major_status, minor_status,
-                    "cups_get_gssname: gss_import_name() failed");
+                    "cups_gss_getname: gss_import_name() failed");
     return (NULL);
   }
 
@@ -412,7 +595,7 @@ cups_get_gssname(
 
 #  ifdef DEBUG
 /*
- * 'cups_gss_printf()' - Show debug error messages from GSSAPI...
+ * 'cups_gss_printf()' - Show debug error messages from GSSAPI.
  */
 
 static void
@@ -453,7 +636,7 @@ cups_gss_printf(OM_uint32  major_status,/* I - Major status code */
 
 /*
  * 'cups_local_auth()' - Get the local authorization certificate if
- *                       available/applicable...
+ *                       available/applicable.
  */
 
 static int				/* O - 0 if available */

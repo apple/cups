@@ -2588,8 +2588,15 @@ cupsdSendHeader(
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == CUPSD_AUTH_NEGOTIATE /* && con->gss_output_token.length == 0 */)
+    else if (auth_type == CUPSD_AUTH_NEGOTIATE)
+    {
+#  ifdef AF_LOCAL
+      if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
+        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
+      else
+#  endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
+    }
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
@@ -2650,65 +2657,6 @@ cupsdSendHeader(
         return (0);
     }
   }
-
-#if 0 /* def HAVE_GSSAPI */
- /*
-  * WWW-Authenticate: Negotiate can be included even for
-  * non-401 replies...
-  */
-
-  if (con->gss_output_token.length > 0 && con->gss_output_token.length <= 65536)
-  {
-    OM_uint32	minor_status;		/* Minor status code */
-    int		bufsize;		/* Size of output token buffer */
-
-
-    bufsize = con->gss_output_token.length * 4 / 3 + 2;
-
-    if (bufsize > gss_bufsize)
-    {
-      char	*buf;			/* New buffer */
-
-
-      bufsize = (bufsize + 1023) & 1023;/* Round up */
-
-      if (gss_buf)
-        buf = realloc(gss_buf, bufsize);
-      else
-        buf = malloc(bufsize);
-
-      if (!buf)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to allocate %d bytes for Kerberos credentials!",
-			bufsize);
-	return (0);
-      }
-
-      gss_buf     = buf;
-      gss_bufsize = bufsize;
-    }
-
-    httpEncode64_2(gss_buf, gss_bufsize,
-		   con->gss_output_token.value,
-		   con->gss_output_token.length);
-    gss_release_buffer(&minor_status, &con->gss_output_token);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "cupsdSendHeader: WWW-Authenticate: Negotiate %s", gss_buf);
-
-    if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n",
-                   gss_buf) < 0)
-      return (0);
-  }
-  else if (con->gss_output_token.length > 65536)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Kerberos credentials larger than 64k (%d)!",
-		    (int)con->gss_output_token.length);
-    return (0);
-  }
-#endif /* HAVE_GSSAPI */
 
   if (con->language && strcmp(con->language->language, "C"))
   {

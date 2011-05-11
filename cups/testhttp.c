@@ -465,12 +465,30 @@ main(int  argc,				/* I - Number of command-line arguments */
     char	resolved[1024];		/* Resolved URI */
 
 
-    printf("_httpResolveURI(%s): ", argv[1]);
+    printf("_httpResolveURI(%s, _HTTP_RESOLVE_DEFAULT): ", argv[1]);
     fflush(stdout);
 
-    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved), 1, NULL, NULL))
+    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved),
+                         _HTTP_RESOLVE_DEFAULT, NULL, NULL))
     {
       puts("FAIL");
+      return (1);
+    }
+    else
+      printf("PASS (%s)\n", resolved);
+
+    printf("_httpResolveURI(%s, _HTTP_RESOLVE_FQDN): ", argv[1]);
+    fflush(stdout);
+
+    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved),
+                         _HTTP_RESOLVE_FQDN, NULL, NULL))
+    {
+      puts("FAIL");
+      return (1);
+    }
+    else if (strstr(resolved, ".local:"))
+    {
+      printf("FAIL (%s)\n", resolved);
       return (1);
     }
     else

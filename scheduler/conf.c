@@ -21,6 +21,7 @@
  *   cupsdReadConfiguration() - Read the cupsd.conf file.
  *   get_address()            - Get an address + port number from a line.
  *   get_addr_and_mask()      - Get an IP address and netmask.
+ *   mime_error_cb()          - Log a MIME error.
  *   parse_aaa()              - Parse authentication, authorization, and access
  *                              control lines.
  *   parse_fatal_errors()     - Parse FatalErrors values in a string.
@@ -205,6 +206,7 @@ static const unsigned	zeros[4] =
 static http_addrlist_t	*get_address(const char *value, int defport);
 static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
+static void		mime_error_cb(void *ctx, const char *message);
 static int		parse_aaa(cupsd_location_t *loc, char *line,
 			          char *value, int linenum);
 static int		parse_fatal_errors(const char *s);
@@ -541,7 +543,7 @@ cupsdReadConfiguration(void)
 
   cupsdClearString(&DefaultPaperSize);
 
-  cupsdSetString(&RIPCache, "8m");
+  cupsdSetString(&RIPCache, "128m");
 
   cupsdSetString(&TempDir, NULL);
 
@@ -847,13 +849,13 @@ cupsdReadConfiguration(void)
   * Make sure each of the log files exists and gets rotated as necessary...
   */
 
-  if (!strcmp(AccessLog, "syslog"))
+  if (strcmp(AccessLog, "syslog"))
     cupsdCheckLogFile(&AccessFile, AccessLog);
 
-  if (!strcmp(ErrorLog, "syslog"))
+  if (strcmp(ErrorLog, "syslog"))
     cupsdCheckLogFile(&ErrorFile, ErrorLog);
 
-  if (!strcmp(PageLog, "syslog"))
+  if (strcmp(PageLog, "syslog"))
     cupsdCheckLogFile(&PageFile, PageLog);
 
  /*
@@ -1379,7 +1381,10 @@ cupsdReadConfiguration(void)
     snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
     snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
 
-    MimeDatabase = mimeLoadTypes(NULL, mimedir);
+    MimeDatabase = mimeNew();
+    mimeSetErrorCallback(MimeDatabase, mime_error_cb, NULL);
+
+    MimeDatabase = mimeLoadTypes(MimeDatabase, mimedir);
     MimeDatabase = mimeLoadTypes(MimeDatabase, ServerRoot);
     MimeDatabase = mimeLoadFilters(MimeDatabase, mimedir, temp);
     MimeDatabase = mimeLoadFilters(MimeDatabase, ServerRoot, temp);
@@ -1818,6 +1823,18 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     return (0);
 
   return (1);
+}
+
+
+/*
+ * 'mime_error_cb()' - Log a MIME error.
+ */
+
+static void
+mime_error_cb(void       *ctx,		/* I - Context pointer (unused) */
+              const char *message)	/* I - Message */
+{
+  cupsdLogMessage(CUPSD_LOG_ERROR, "%s", message);
 }
 
 

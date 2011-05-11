@@ -103,6 +103,18 @@ LIBZ		=	@LIBZ@
 INSTALLSTATIC	=	@INSTALLSTATIC@
 
 #
+# IPP backend aliases...
+#
+
+IPPALIASES	=	@IPPALIASES@
+
+#
+# Install XPC backends?
+#
+
+INSTALLXPC	=	@INSTALLXPC@
+
+#
 # Program options...
 #
 # ARCHFLAGS     Defines the default architecture build options.

@@ -479,7 +479,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* Job title string */
 			copies[255],	/* # copies string */
 			*options,	/* Options string */
-			*envp[MAX_ENV + 20],
+			*envp[MAX_ENV + 21],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -505,6 +505,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* PRINTER_LOCATION env variable */
 			printer_name[255],
 					/* PRINTER env variable */
+			*printer_state_reasons = NULL,
+					/* PRINTER_STATE_REASONS env var */
 			rip_max_cache[255];
 					/* RIP_MAX_CACHE env variable */
 
@@ -878,6 +880,32 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   snprintf(printer_location, sizeof(printer_name), "PRINTER_LOCATION=%s",
            job->printer->location ? job->printer->location : "");
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", job->printer->name);
+  if (job->printer->num_reasons > 0)
+  {
+    char	*psrptr;		/* Pointer into PRINTER_STATE_REASONS */
+    size_t	psrlen;			/* Size of PRINTER_STATE_REASONS */
+
+    for (psrlen = 22, i = 0; i < job->printer->num_reasons; i ++)
+      psrlen += strlen(job->printer->reasons[i]) + 1;
+
+    if ((printer_state_reasons = malloc(psrlen)) != NULL)
+    {
+     /*
+      * All of these strcpy's are safe because we allocated the psr string...
+      */
+
+      strcpy(printer_state_reasons, "PRINTER_STATE_REASONS=");
+      for (psrptr = printer_state_reasons + 22, i = 0;
+           i < job->printer->num_reasons;
+	   i ++)
+      {
+        if (i)
+	  *psrptr++ = ',';
+	strcpy(psrptr, job->printer->reasons[i]);
+	psrptr += strlen(psrptr);
+      }
+    }
+  }
   snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
 
   if (job->printer->num_auth_info_required == 1)
@@ -920,6 +948,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   envp[envc ++] = printer_info;
   envp[envc ++] = printer_location;
   envp[envc ++] = printer_name;
+  envp[envc ++] = printer_state_reasons ? printer_state_reasons :
+                                          "PRINTER_STATE_REASONS=none";
   envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
                                 "CUPS_FILETYPE=document";
 
@@ -1187,6 +1217,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   }
 
   free(argv);
+  if (printer_state_reasons)
+    free(printer_state_reasons);
 
   cupsdAddSelect(job->status_buffer->fd, (cupsd_selfunc_t)update_job, NULL,
                  job);
@@ -1222,6 +1254,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
     free(argv);
   }
+
+  if (printer_state_reasons)
+    free(printer_state_reasons);
 
   cupsdClosePipe(job->print_pipes);
   cupsdClosePipe(job->back_pipes);
@@ -1757,6 +1792,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s", data);
 	else if (!strcmp(destptr->auth_info_required[i], "password"))
 	  cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", data);
+        else if (!strcmp(destptr->auth_info_required[i], "negotiate") &&
+	         isdigit(line[0] & 255))
+	  cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
       }
 
       if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
@@ -1833,8 +1871,9 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
   * Change the destination information...
   */
 
-  cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                   "Stopping job prior to move.");
+  if (job->state_value > IPP_JOB_HELD)
+    cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
+		     "Stopping job prior to move.");
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, oldp, job,
                 "Job #%d moved from %s to %s.", job->id, olddest,

@@ -526,6 +526,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#gss_auth_identity_desc" title="Local functions...">gss_auth_identity_desc</a></li>
 	<li><a href="#http_addr_t" title="Socket address union, which
 makes using IPv6 and other
 address types easier and
@@ -564,6 +565,7 @@ are server-oriented...">http_state_t</a></li>
 	<li><a href="#ipp_value_t" title="Attribute Value">ipp_value_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
+	<li><a href="#gss_auth_identity" title="Local functions...">gss_auth_identity</a></li>
 	<li><a href="#http_addrlist_s" title="Socket address list, which is
 used to enumerate all of the
 addresses that are associated
@@ -603,9 +605,9 @@ are server-oriented...">http_state_e</a></li>
 <!--
   "$Id$"
 
-  HTTP and IPP API introduction for the Common UNIX Printing System (CUPS).
+  HTTP and IPP API introduction for CUPS.
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -3339,6 +3341,11 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="gss_auth_identity_desc">gss_auth_identity_desc</a></h3>
+<p class="description">Local functions...</p>
+<p class="code">
+typedef struct <a href="#gss_auth_identity">gss_auth_identity</a> gss_auth_identity_desc;
+</p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addr_t">http_addr_t</a></h3>
 <p class="description">Socket address union, which
 makes using IPv6 and other
@@ -3492,6 +3499,25 @@ typedef enum <a href="#ipp_tag_e">ipp_tag_e</a> ipp_tag_t;
 typedef union <a href="#ipp_value_u">ipp_value_u</a> ipp_value_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
+<h3 class="struct"><a name="gss_auth_identity">gss_auth_identity</a></h3>
+<p class="description">Local functions...</p>
+<p class="code">struct gss_auth_identity {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;gss_buffer_t *credentialsRef;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uint32_t flags;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *password;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *realm;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uint32_t type;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *username;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>credentialsRef </dt>
+<dt>flags </dt>
+<dt>password </dt>
+<dt>realm </dt>
+<dt>type </dt>
+<dt>username </dt>
+</dl>
 <h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addrlist_s">http_addrlist_s</a></h3>
 <p class="description">Socket address list, which is
 used to enumerate all of the

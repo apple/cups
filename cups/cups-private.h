@@ -183,13 +183,18 @@ extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsGlobalUnlock(void);
+#  ifdef HAVE_GSSAPI
+extern const char	*_cupsGSSServiceName(void);
+#  endif /* HAVE_GSSAPI */
 extern int		_cupsNextDelay(int current, int *previous);
 extern void		_cupsSetDefaults(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
 #  ifdef HAVE_GSSAPI
-extern int		_cupsSetNegotiateAuthString(http_t *http);
+extern int		_cupsSetNegotiateAuthString(http_t *http,
+			                            const char *method,
+						    const char *resource);
 #  endif /* HAVE_GSSAPI */
 extern char		*_cupsUserDefault(char *name, size_t namesize);
 

@@ -160,51 +160,10 @@ cupsdCompareNames(const char *s,	/* I - First string */
 cups_array_t *				/* O - CUPS array */
 cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
 {
-  cups_array_t	*a;			/* CUPS array */
-  const char	*start,			/* Start of string */
-		*end;			/* End of string */
-  char		buffer[8192];		/* New string */
-
-
-  if (!s)
+  if (!s || !*s)
     return (NULL);
-
-  if ((a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
-                         (cups_ahash_func_t)NULL, 0,
-			 (cups_acopy_func_t)_cupsStrAlloc,
-			 (cups_afree_func_t)_cupsStrFree)) != NULL)
-  {
-    for (start = end = s; *end; start = end + 1)
-    {
-     /*
-      * Find the end of the current delimited string...
-      */
-
-      if ((end = strchr(start, ',')) == NULL)
-      {
-       /*
-        * Last delimited string...
-	*/
-
-        cupsArrayAdd(a, (char *)start);
-	break;
-      }
-
-     /*
-      * Copy the string and add it to the array...
-      */
-
-      if ((end - start + 1) > sizeof(buffer))
-        break;
-
-      memcpy(buffer, start, end - start);
-      buffer[end - start] = '\0';
-
-      cupsArrayAdd(a, buffer);
-    }
-  }
-
-  return (a);
+  else
+    return (_cupsArrayNewStrings(s));
 }
 
 

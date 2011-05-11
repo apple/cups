@@ -186,6 +186,7 @@
 #undef HAVE_STRINGS_H
 #undef HAVE_BSTRING_H
 
+
 /*
  * Do we have the long long type?
  */
@@ -200,6 +201,7 @@
 #  define CUPS_LLCAST	(long)
 #endif /* HAVE_LONG_LONG */
 
+
 /*
  * Do we have the strtoll() function?
  */
@@ -209,6 +211,7 @@
 #ifndef HAVE_STRTOLL
 #  define strtoll(nptr,endptr,base) strtol((nptr), (endptr), (base))
 #endif /* !HAVE_STRTOLL */
+
 
 /*
  * Do we have the strXXX() functions?
@@ -296,13 +299,14 @@
  */
 
 #undef HAVE_AUTHORIZATION_H
+#undef HAVE_SECBASEPRIV_H
 #undef HAVE_SECCERTIFICATE_H
+#undef HAVE_SECIDENTITYSEARCHPRIV_H
 #undef HAVE_SECITEM_H
 #undef HAVE_SECITEMPRIV_H
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
-#undef HAVE_SECBASEPRIV_H
-#undef HAVE_SECIDENTITYSEARCHPRIV_H
+#undef HAVE_SECURETRANSPORTPRIV_H
 
 
 /*
@@ -498,6 +502,7 @@
  */
 
 #undef HAVE_PDFTOPS
+#undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES
 #define CUPS_PDFTOPS	"/usr/bin/pdftops"
 
 
@@ -506,6 +511,7 @@
  */
 
 #undef HAVE_GHOSTSCRIPT
+#undef HAVE_GHOSTSCRIPT_PS2WRITE
 #define CUPS_GHOSTSCRIPT "/usr/bin/gs"
 
 
@@ -541,7 +547,7 @@
 
 
 /*
- * Do we have MacOSX 10.4's mbr_XXX functions?
+ * Do we have Mac OS X 10.4's mbr_XXX functions?
  */
 
 #undef HAVE_MEMBERSHIP_H
@@ -573,27 +579,19 @@
 
 
 /*
- * Do we have the AppleTalk/at_proto.h header?
- */
-
-#undef HAVE_APPLETALK_AT_PROTO_H
-
-
-/*
  * Do we have the GSSAPI support library (for Kerberos support)?
  */
 
-#undef HAVE_GSSAPI
-#undef HAVE_GSSAPI_H
-#undef HAVE_GSSAPI_GSSAPI_H
-#undef HAVE_GSSAPI_GSSAPI_GENERIC_H
-#undef HAVE_GSSAPI_GSSAPI_KRB5_H
-#undef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
+#undef HAVE_GSS_ACQUIRE_CRED_EX_F
 #undef HAVE_GSS_C_NT_HOSTBASED_SERVICE
-#undef HAVE_KRB5_CC_NEW_UNIQUE
-#undef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
+#undef HAVE_GSS_GSSAPI_H
+#undef HAVE_GSS_GSSAPI_SPI_H
+#undef HAVE_GSSAPI
+#undef HAVE_GSSAPI_GENERIC_H
+#undef HAVE_GSSAPI_GSSAPI_H
+#undef HAVE_GSSAPI_H
+#undef HAVE_GSSAPI_KRB5_H
 #undef HAVE_KRB5_H
-#undef HAVE_HEIMDAL
 
 
 /*
@@ -722,6 +720,13 @@
  */
 
 #undef HAVE_COLORSYNCREGISTERDEVICE
+
+
+/*
+ * Do we have XPC?
+ */
+
+#undef HAVE_XPC
 
 
 #endif /* !_CUPS_CONFIG_H_ */

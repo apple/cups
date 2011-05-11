@@ -10371,7 +10371,7 @@ save_auth_info(
   }
 
 #ifdef HAVE_GSSAPI
-  if (con->have_gss && con->gss_uid > 0)
+  if (con->gss_uid > 0)
   {
     cupsFilePrintf(fp, "%d\n", (int)con->gss_uid);
     cupsdSetStringf(&job->auth_uid, "AUTH_UID=%d", (int)con->gss_uid);

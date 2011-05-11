@@ -306,6 +306,7 @@ AC_SUBST(DBUS_NOTIFIERLIBS)
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
+INSTALLXPC=""
 LEGACY_BACKENDS="parallel"
 
 case $uname in
@@ -353,7 +354,7 @@ case $uname in
  		AC_ARG_WITH(operkey, [  --with-operkey          set the default operator @AUTHKEY value],
 			default_operkey="$withval",
 			default_operkey="default")
- 
+
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
 
@@ -378,12 +379,18 @@ case $uname in
 		if test $uversion -ge 100; then
 		    AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
 		fi
+
+		dnl Check for XPC support
+		AC_CHECK_HEADER(xpc/xpc.h,
+			AC_DEFINE(HAVE_XPC)
+			INSTALLXPC="install-xpc")
                 ;;
 esac
 
 AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
+AC_SUBST(INSTALLXPC)
 AC_SUBST(LEGACY_BACKENDS)
 
 dnl Check for build components

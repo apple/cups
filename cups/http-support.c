@@ -36,13 +36,13 @@
  *                          components.
  *   httpStatus()         - Return a short string describing a HTTP status code.
  *   _cups_hstrerror()    - hstrerror() emulation function for Solaris and
- *                          others...
+ *                          others.
  *   _httpDecodeURI()     - Percent-decode a HTTP request URI.
  *   _httpEncodeURI()     - Percent-encode a HTTP request URI.
  *   _httpResolveURI()    - Resolve a DNS-SD URI.
  *   http_copy_decode()   - Copy and decode a URI.
  *   http_copy_encode()   - Copy and encode a URI.
- *   resolve_callback()   - Build a device URI for the given service name.
+ *   http_resolve_cb()    - Build a device URI for the given service name.
  */
 
 /*
@@ -70,6 +70,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
 {
   char		*buffer;		/* Pointer to buffer */
   size_t	bufsize;		/* Size of buffer */
+  int		options;		/* Options passed to _httpResolveURI */
 } _http_uribuf_t;
 
 
@@ -115,15 +116,15 @@ static char		*http_copy_encode(char *dst, const char *src,
 			                  char *dstend, const char *reserved,
 					  const char *term, int encode);
 #ifdef HAVE_DNSSD
-static void DNSSD_API	resolve_callback(DNSServiceRef sdRef,
-					 DNSServiceFlags flags,
-					 uint32_t interfaceIndex,
-					 DNSServiceErrorType errorCode,
-					 const char *fullName,
-					 const char *hostTarget,
-					 uint16_t port, uint16_t txtLen,
-					 const unsigned char *txtRecord,
-					 void *context);
+static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
+					DNSServiceFlags flags,
+					uint32_t interfaceIndex,
+					DNSServiceErrorType errorCode,
+					const char *fullName,
+					const char *hostTarget,
+					uint16_t port, uint16_t txtLen,
+					const unsigned char *txtRecord,
+					void *context);
 #endif /* HAVE_DNSSD */
 
 
@@ -1319,7 +1320,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 
 #ifndef HAVE_HSTRERROR
 /*
- * '_cups_hstrerror()' - hstrerror() emulation function for Solaris and others...
+ * '_cups_hstrerror()' - hstrerror() emulation function for Solaris and others.
  */
 
 const char *				/* O - Error string */
@@ -1382,7 +1383,7 @@ _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
     size_t     resolved_size,		/* I - Size of URI buffer */
-    int        logit,			/* I - Log progress to stderr? */
+    int        options,			/* I - Resolve options */
     int        (*cb)(void *context),	/* I - Continue callback function */
     void       *context)		/* I - Context pointer for callback */
 {
@@ -1416,7 +1417,7 @@ _httpResolveURI(
 		      sizeof(resource)) < HTTP_URI_OK)
 #endif /* DEBUG */
   {
-    if (logit)
+    if (options & _HTTP_RESOLVE_STDERR)
       _cupsLangPrintFilter(stderr, "ERROR", _("Bad device-uri \"%s\"."), uri);
 
     DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
@@ -1449,7 +1450,7 @@ _httpResolveURI(
     struct timeval	stimeout;	/* Timeout value for select() */
 #endif /* HAVE_POLL */
 
-    if (logit)
+    if (options & _HTTP_RESOLVE_STDERR)
       fprintf(stderr, "DEBUG: Resolving \"%s\"...\n", hostname);
 
    /*
@@ -1484,14 +1485,14 @@ _httpResolveURI(
     if (domain)
       *domain++ = '\0';
 
-    uribuf.buffer  = resolved_uri;
-    uribuf.bufsize = resolved_size;
-
+    uribuf.buffer   = resolved_uri;
+    uribuf.bufsize  = resolved_size;
+    uribuf.options  = options;
     resolved_uri[0] = '\0';
 
     DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
-    if (logit)
+    if (options & _HTTP_RESOLVE_STDERR)
     {
       fputs("STATE: +connecting-to-device\n", stderr);
       fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"%s\", "
@@ -1504,7 +1505,7 @@ _httpResolveURI(
     {
       localref = ref;
       if (DNSServiceResolve(&localref, kDNSServiceFlagsShareConnection, 0,
-			    hostname, regtype, "local.", resolve_callback,
+			    hostname, regtype, "local.", http_resolve_cb,
 			    &uribuf) == kDNSServiceErr_NoError)
       {
 	int	fds;			/* Number of ready descriptors */
@@ -1513,7 +1514,7 @@ _httpResolveURI(
 
 	for (;;)
 	{
-	  if (logit)
+	  if (options & _HTTP_RESOLVE_STDERR)
 	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
 
 	  if (cb && !(*cb)(context))
@@ -1561,17 +1562,19 @@ _httpResolveURI(
 	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (domainsent == 0 && strcasecmp(domain, "local."))
+	    if (domainsent == 0 && (domain && strcasecmp(domain, "local.")))
 	    {
-	      if (logit)
+	      if (options & _HTTP_RESOLVE_STDERR)
 		fprintf(stderr,
 		        "DEBUG: Resolving \"%s\", regtype=\"%s\", "
-			"domain=\"%s\"...\n", hostname, regtype, domain);
+			"domain=\"%s\"...\n", hostname, regtype,
+			domain ? domain : "");
   
 	      domainref = ref;
-	      if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection, 0,
-				    hostname, regtype, domain, resolve_callback,
-				    &uribuf) == kDNSServiceErr_NoError)
+	      if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection,
+	                            0, hostname, regtype, domain,
+				    http_resolve_cb, &uribuf)
+		      == kDNSServiceErr_NoError)
 		domainsent = 1;
 	    }
 
@@ -1580,7 +1583,8 @@ _httpResolveURI(
 	    * printer-state-reason...
 	    */
 
-	    if (logit && offline == 0 && time(NULL) > (start_time + 5))
+	    if ((options & _HTTP_RESOLVE_STDERR) && offline == 0 &&
+	        time(NULL) > (start_time + 5))
 	    {
 	      fputs("STATE: +offline-report\n", stderr);
 	      offline = 1;
@@ -1605,7 +1609,7 @@ _httpResolveURI(
       DNSServiceRefDeallocate(ref);
     }
 
-    if (logit)
+    if (options & _HTTP_RESOLVE_STDERR)
     {
       if (uri)
         fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
@@ -1623,8 +1627,17 @@ _httpResolveURI(
     uri = NULL;
 #endif /* HAVE_DNSSD */
 
-    if (logit && !uri)
+    if ((options & _HTTP_RESOLVE_STDERR) && !uri)
       _cupsLangPrintFilter(stderr, "ERROR", _("Unable to find printer."));
+  }
+  else
+  {
+   /*
+    * Nothing more to do...
+    */
+
+    strlcpy(resolved_uri, uri, resolved_size);
+    uri = resolved_uri;
   }
 
   DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));
@@ -1752,11 +1765,11 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 
 #ifdef HAVE_DNSSD
 /*
- * 'resolve_callback()' - Build a device URI for the given service name.
+ * 'http_resolve_cb()' - Build a device URI for the given service name.
  */
 
 static void DNSSD_API
-resolve_callback(
+http_resolve_cb(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Results flags */
     uint32_t            interfaceIndex,	/* I - Interface number */
@@ -1768,25 +1781,35 @@ resolve_callback(
     const unsigned char *txtRecord,	/* I - TXT record data */
     void                *context)	/* I - Pointer to URI buffer */
 {
-  const char		*scheme;	/* URI scheme */
-  char			rp[257];	/* Remote printer */
+  const char		*scheme,	/* URI scheme */
+			*hostptr;	/* Pointer into hostTarget */
+  char			rp[257],	/* Remote printer */
+			fqdn[256];	/* FQDN of the .local name */
   const void		*value;		/* Value from TXT record */
   uint8_t		valueLen;	/* Length of value */
   _http_uribuf_t	*uribuf;	/* URI buffer */
 
 
-  DEBUG_printf(("7resolve_callback(sdRef=%p, flags=%x, interfaceIndex=%u, "
+  DEBUG_printf(("7http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, "
 	        "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
 	        "txtLen=%u, txtRecord=%p, context=%p)", sdRef, flags,
 	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
 	        txtRecord, context));
 
+  uribuf = (_http_uribuf_t *)context;
+
  /*
   * Figure out the scheme from the full name...
   */
 
-  if (strstr(fullName, "._ipp") || strstr(fullName, "._fax-ipp"))
+  if (strstr(fullName, "._ipps") || strstr(fullName, "._ipp-tls"))
+    scheme = "ipps";
+  else if (strstr(fullName, "._ipp") || strstr(fullName, "._fax-ipp"))
     scheme = "ipp";
+  else if (strstr(fullName, "._http."))
+    scheme = "http";
+  else if (strstr(fullName, "._https."))
+    scheme = "https";
   else if (strstr(fullName, "._printer."))
     scheme = "lpd";
   else if (strstr(fullName, "._pdl-datastream."))
@@ -1813,16 +1836,61 @@ resolve_callback(
     rp[0] = '\0';
 
  /*
-  * Assemble the final device URI...
+  * Lookup the FQDN if needed...
   */
 
-  uribuf = (_http_uribuf_t *)context;
+  if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
+      (hostptr = hostTarget + strlen(hostTarget) - 7) > hostTarget &&
+      !strcasecmp(hostptr, ".local."))
+  {
+   /*
+    * OK, we got a .local name but the caller needs a real domain.  Start by
+    * getting the IP address of the .local name and then do reverse-lookups...
+    */
+
+    http_addrlist_t	*addrlist,	/* List of addresses */
+			*addr;		/* Current address */
+
+    DEBUG_printf(("8http_resolve_cb: Looking up \"%s\".", hostTarget));
+
+    snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
+    if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
+    {
+      for (addr = addrlist; addr; addr = addr->next)
+      {
+        int error = getnameinfo(&(addr->addr.addr),
+	                        httpAddrLength(&(addr->addr)),
+			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+
+        if (!error)
+	{
+	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
+
+	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
+	      strcasecmp(hostptr, ".local"))
+	  {
+	    hostTarget = fqdn;
+	    break;
+	  }
+	}
+#ifdef DEBUG
+	else
+	  DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
+			error));
+#endif /* DEBUG */
+      }
+    }
+  }
+
+ /*
+  * Assemble the final device URI...
+  */
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
                   NULL, hostTarget, ntohs(port), rp);
 
-  DEBUG_printf(("8resolve_callback: Resolved URI is \"%s\"...",
-                uribuf->buffer));
+  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }
 #endif /* HAVE_DNSSD */
 

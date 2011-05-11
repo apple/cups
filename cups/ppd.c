@@ -483,7 +483,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   ppd_section_t		section;	/* Order dependency section */
   ppd_profile_t		*profile;	/* Pointer to color profile */
   char			**filter;	/* Pointer to filter */
-  cups_lang_t		*language;	/* Default language */
   struct lconv		*loc;		/* Locale data */
   int			ui_keyword;	/* Is this line a UI keyword? */
   cups_encoding_t	encoding;	/* Encoding of PPD file */
@@ -628,13 +627,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
                                      NULL);
 
  /*
-  * Get the default language for the user...
-  */
-
-  language = cupsLangDefault();
-  loc      = localeconv();
-
- /*
   * Read lines from the PPD file and add them to the file record...
   */
 
@@ -644,6 +636,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   choice     = NULL;
   ui_keyword = 0;
   encoding   = CUPS_ISO8859_1;
+  loc        = localeconv();
 
   while ((mask = ppd_read(fp, &line, keyword, name, text, &string, 1, cg)) != 0)
   {
@@ -1951,8 +1944,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   * Reset language preferences...
   */
 
-  cupsLangFree(language);
-
 #ifdef DEBUG
   if (!cupsFileEOF(fp))
     DEBUG_printf(("1ppdOpen2: Premature EOF at %lu...\n",
@@ -2022,8 +2013,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   ppd_free(line.buffer);
 
   ppdClose(ppd);
-
-  cupsLangFree(language);
 
   return (NULL);
 }

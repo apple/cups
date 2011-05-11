@@ -577,17 +577,16 @@
  * Do we have the GSSAPI support library (for Kerberos support)?
  */
 
+/* #undef HAVE_GSS_ACQUIRE_CRED_EX_F */
+#define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
+/* #undef HAVE_GSS_GSSAPI_H */
+/* #undef HAVE_GSS_GSSAPI_SPI_H */
 #define HAVE_GSSAPI 1
 #define HAVE_GSSAPI_H 1
 #define HAVE_GSSAPI_GSSAPI_H 1
 #define HAVE_GSSAPI_GSSAPI_GENERIC_H 1
 #define HAVE_GSSAPI_GSSAPI_KRB5_H 1
-/* #undef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY */
-#define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
-#define HAVE_KRB5_CC_NEW_UNIQUE 1
-#define HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID 1
 #define HAVE_KRB5_H 1
-/* #undef HAVE_HEIMDAL */
 
 
 /*
@@ -716,6 +715,13 @@
  */
 
 #define HAVE_COLORSYNCREGISTERDEVICE 1
+
+
+/*
+ * Do we have XPC?
+ */
+
+/* #undef HAVE_XPC */
 
 
 #endif /* !_CUPS_CONFIG_H_ */

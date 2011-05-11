@@ -1,9 +1,9 @@
 /*
  * "$Id: image-colorspace.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Colorspace conversions for the Common UNIX Printing System (CUPS).
+ *   Colorspace conversions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   The color saturation/hue matrix stuff is provided thanks to Mr. Paul
@@ -1308,7 +1308,7 @@ rgb_to_lab(cups_ib_t *val)		/* IO - Color value */
   else
     ciel = 903.3 * ciey_yn;
 
-  ciel = ciel;
+/*ciel = ciel;*/
   ciea = 500 * (cielab(ciex, D65_X) - cielab(ciey, D65_Y));
   cieb = 200 * (cielab(ciey, D65_Y) - cielab(ciez, D65_Z));
 

@@ -1,5 +1,5 @@
 /*
- * "$Id: mime.c 7694 2008-06-26 00:23:20Z mike $"
+ * "$Id: mime.c 9750 2011-05-06 22:53:53Z mike $"
  *
  *   MIME database file routines for CUPS.
  *
@@ -14,24 +14,27 @@
  *
  * Contents:
  *
- *   mimeDelete()          - Delete (free) a MIME database.
- *   mimeDeleteFilter()    - Delete a filter from the MIME database.
- *   mimeDeleteType()      - Delete a type from the MIME database.
- *   mimeFirstFilter()     - Get the first filter in the MIME database.
- *   mimeFirstType()       - Get the first type in the MIME database.
- *   mimeLoad()            - Create a new MIME database from disk.
- *   mimeMerge()           - Merge a MIME database from disk with the current one.
- *   mimeNew()             - Create a new, empty MIME database.
- *   mimeNextFilter()      - Get the next filter in the MIME database.
- *   mimeNextType()        - Get the next type in the MIME database.
- *   mimeNumFilters()      - Get the number of filters in a MIME database.
- *   mimeNumTypes()        - Get the number of types in a MIME database.
- *   mime_add_fcache()     - Add a filter to the filter cache.
- *   mime_compare_fcache() - Compare two filter cache entries.
- *   mime_delete_fcache()  - Free all memory used by the filter cache.
- *   mime_delete_rules()   - Free all memory for the given rule tree.
- *   mime_load_convs()     - Load a xyz.convs file...
- *   mime_load_types()     - Load a xyz.types file...
+ *   mimeDelete()           - Delete (free) a MIME database.
+ *   mimeDeleteFilter()     - Delete a filter from the MIME database.
+ *   mimeDeleteType()       - Delete a type from the MIME database.
+ *   _mimeError()           - Show an error message.
+ *   mimeFirstFilter()      - Get the first filter in the MIME database.
+ *   mimeFirstType()        - Get the first type in the MIME database.
+ *   mimeLoad()             - Create a new MIME database from disk.
+ *   mimeLoadFilters()      - Load filter definitions from disk.
+ *   mimeLoadTypes()        - Load type definitions from disk.
+ *   mimeNew()              - Create a new, empty MIME database.
+ *   mimeNextFilter()       - Get the next filter in the MIME database.
+ *   mimeNextType()         - Get the next type in the MIME database.
+ *   mimeNumFilters()       - Get the number of filters in a MIME database.
+ *   mimeNumTypes()         - Get the number of types in a MIME database.
+ *   mimeSetErrorCallback() - Set the callback for error messages.
+ *   mime_add_fcache()      - Add a filter to the filter cache.
+ *   mime_compare_fcache()  - Compare two filter cache entries.
+ *   mime_delete_fcache()   - Free all memory used by the filter cache.
+ *   mime_delete_rules()    - Free all memory for the given rule tree.
+ *   mime_load_convs()      - Load a xyz.convs file.
+ *   mime_load_types()      - Load a xyz.types file.
  */
 
 /*
@@ -41,7 +44,7 @@
 #include <cups/string-private.h>
 #include <cups/debug-private.h>
 #include <cups/dir.h>
-#include "mime.h"
+#include "mime-private.h"
 
 
 /*
@@ -68,7 +71,6 @@ static void	mime_load_convs(mime_t *mime, const char *filename,
 		                const char *filterpath,
 			        cups_array_t *filtercache);
 static void	mime_load_types(mime_t *mime, const char *filename);
-static mime_t	*mime_new(void);
 
 
 /*
@@ -185,6 +187,30 @@ mimeDeleteType(mime_t      *mime,	/* I - MIME database */
 
 
 /*
+ * '_mimeError()' - Show an error message.
+ */
+
+void
+_mimeError(mime_t     *mime,		/* I - MIME database */
+           const char *message,		/* I - Printf-style message string */
+	   ...)				/* I - Additional arguments as needed */
+{
+  va_list	ap;			/* Argument pointer */
+  char		buffer[8192];		/* Message buffer */
+
+
+  if (mime->error_cb)
+  {
+    va_start(ap, message);
+    vsnprintf(buffer, sizeof(buffer), message, ap);
+    va_end(ap);
+
+    (*mime->error_cb)(mime->error_ctx, buffer);
+  }
+}
+
+
+/*
  * 'mimeFirstFilter()' - Get the first filter in the MIME database.
  */
 
@@ -296,6 +322,7 @@ mimeLoadFilters(mime_t     *mime,	/* I - MIME database */
   {
     DEBUG_printf(("1mimeLoadFilters: Unable to open \"%s\": %s", pathname,
                   strerror(errno)));
+    _mimeError(mime, "Unable to open \"%s\": %s", pathname, strerror(errno));
     return (mime);
   }
 
@@ -355,6 +382,7 @@ mimeLoadTypes(mime_t     *mime,		/* I - MIME database or @code NULL@ to create a
     DEBUG_printf(("1mimeLoadTypes: Unable to open \"%s\": %s", pathname,
                   strerror(errno)));
     DEBUG_printf(("1mimeLoadTypes: Returning %p.", mime));
+    _mimeError(mime, "Unable to open \"%s\": %s", pathname, strerror(errno));
     return (mime);
   }
 
@@ -363,7 +391,7 @@ mimeLoadTypes(mime_t     *mime,		/* I - MIME database or @code NULL@ to create a
   */
 
   if (!mime)
-    mime = mime_new();
+    mime = mimeNew();
 
   if (!mime)
   {
@@ -396,6 +424,17 @@ mimeLoadTypes(mime_t     *mime,		/* I - MIME database or @code NULL@ to create a
   DEBUG_printf(("1mimeLoadTypes: Returning %p.", mime));
 
   return (mime);
+}
+
+
+/*
+ * 'mimeNew()' - Create a new, empty MIME database.
+ */
+
+mime_t *				/* O - MIME database */
+mimeNew(void)
+{
+  return ((mime_t *)calloc(1, sizeof(mime_t)));
 }
 
 
@@ -491,6 +530,24 @@ mimeNumTypes(mime_t *mime)		/* I - MIME database */
     DEBUG_printf(("1mimeNumTypes: Returning %d.",
                   cupsArrayCount(mime->types)));
     return (cupsArrayCount(mime->types));
+  }
+}
+
+
+/*
+ * 'mimeSetErrorCallback()' - Set the callback for error messages.
+ */
+
+void
+mimeSetErrorCallback(
+    mime_t          *mime,		/* I - MIME database */
+    mime_error_cb_t cb,			/* I - Callback function */
+    void            *ctx)		/* I - Context pointer for callback */
+{
+  if (mime)
+  {
+    mime->error_cb  = cb;
+    mime->error_ctx = ctx;
   }
 }
 
@@ -609,7 +666,7 @@ mime_delete_rules(mime_magic_t *rules)	/* I - Rules to free */
 
 
 /*
- * 'mime_load_convs()' - Load a xyz.convs file...
+ * 'mime_load_convs()' - Load a xyz.convs file.
  */
 
 static void
@@ -642,6 +699,7 @@ mime_load_convs(
   {
     DEBUG_printf(("3mime_load_convs: Unable to open \"%s\": %s", filename,
                   strerror(errno)));
+    _mimeError(mime, "Unable to open \"%s\": %s", filename, strerror(errno));
     return;
   }
 
@@ -741,6 +799,7 @@ mime_load_convs(
       {
         DEBUG_printf(("mime_load_convs: Filter %s not found in %s.", filter,
 	              filterpath)); 
+        _mimeError(mime, "Filter \"%s\" not found.", filter);
         continue;
       }
     }
@@ -798,7 +857,7 @@ mime_load_convs(
 
 
 /*
- * 'mime_load_types()' - Load a xyz.types file...
+ * 'mime_load_types()' - Load a xyz.types file.
  */
 
 static void
@@ -825,6 +884,7 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
   {
     DEBUG_printf(("3mime_load_types: Unable to open \"%s\": %s", filename,
                   strerror(errno)));
+    _mimeError(mime, "Unable to open \"%s\": %s", filename, strerror(errno));
     return;
   }
 
@@ -896,16 +956,5 @@ mime_load_types(mime_t     *mime,	/* I - MIME database */
 
 
 /*
- * 'mime_new()' - Create a new, empty MIME database.
- */
-
-static mime_t *				/* O - MIME database */
-mime_new(void)
-{
-  return ((mime_t *)calloc(1, sizeof(mime_t)));
-}
-
-
-/*
- * End of "$Id: mime.c 7694 2008-06-26 00:23:20Z mike $".
+ * End of "$Id: mime.c 9750 2011-05-06 22:53:53Z mike $".
  */

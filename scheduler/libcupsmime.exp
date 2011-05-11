@@ -12,8 +12,10 @@ _mimeFirstType
 _mimeLoad
 _mimeLoadFilters
 _mimeLoadTypes
+_mimeNew
 _mimeNextFilter
 _mimeNextType
 _mimeNumFilters
 _mimeNumTypes
+_mimeSetErrorCallback
 _mimeType

@@ -267,6 +267,8 @@ ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
 ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/cups-$user/bin/filter
+ln -s $root/filter/rastertolabel /tmp/cups-$user/bin/filter
+ln -s $root/filter/rastertopwg /tmp/cups-$user/bin/filter
 ln -s $root/filter/texttops /tmp/cups-$user/bin/filter
 
 ln -s $root/data/classified /tmp/cups-$user/share/banners
@@ -286,6 +288,14 @@ ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
 ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
+if test -f $root/filter/imagetops; then
+	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
+fi
+
+if test -f $root/filter/imagetoraster; then
+	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
+fi
+
 #
 # Mac OS X filters and configuration files...
 #
@@ -301,6 +311,8 @@ if test `uname` = Darwin; then
 	ln -s /usr/libexec/cups/filter/pstoappleps /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/rastertourf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/xhtmltopdf /tmp/cups-$user/bin/filter
 
 	if test -f /private/etc/cups/apple.types; then
 		ln -s /private/etc/cups/apple.* /tmp/cups-$user/share/mime
@@ -308,8 +320,6 @@ if test `uname` = Darwin; then
 		ln -s /usr/share/cups/mime/apple.* /tmp/cups-$user/share/mime
 	fi
 else
-	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
-	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
 	ln -s $root/filter/pdftops /tmp/cups-$user/bin/filter
 fi
 

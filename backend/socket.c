@@ -1,7 +1,7 @@
 /*
  * "$Id: socket.c 7881 2008-08-28 20:21:56Z mike $"
  *
- *   AppSocket backend for the Common UNIX Printing System (CUPS).
+ *   AppSocket backend for CUPS.
  *
  *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -91,7 +91,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		start_count,		/* Page count via SNMP at start */
 		page_count,		/* Page count via SNMP */
 		have_supplies;		/* Printer supports supply levels? */
-  ssize_t	tbytes;			/* Total number of bytes written */
+  ssize_t	bytes = 0,		/* Initial bytes read */
+		tbytes;			/* Total number of bytes written */
+  char		buffer[1024];		/* Initial print buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -297,8 +299,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (print_fd == 0)
+  {
     if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 1, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
+    else if ((bytes = read(0, buffer, sizeof(buffer))) <= 0)
+      return (CUPS_BACKEND_OK);
+  }
 
  /*
   * Connect to the printer...
@@ -397,6 +403,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   tbytes = 0;
+
+  if (bytes > 0)
+    tbytes += write(device_fd, buffer, bytes);
 
   while (copies > 0 && tbytes >= 0)
   {

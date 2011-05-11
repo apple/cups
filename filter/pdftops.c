@@ -3,7 +3,7 @@
  *
  *   PDF to PostScript filter front-end for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -92,6 +92,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore broken pipe signals...
+  */
+
+  signal(SIGPIPE, SIG_IGN);
 
  /*
   * Make sure we have the right number of arguments for CUPS!
@@ -270,7 +276,11 @@ main(int  argc,				/* I - Number of command-line args */
   pdf_argv[2] = (char *)"-dNOPAUSE";
   pdf_argv[3] = (char *)"-dBATCH";
   pdf_argv[4] = (char *)"-dSAFER";
+#  ifdef HAVE_GHOSTSCRIPT_PS2WRITE
+  pdf_argv[5] = (char *)"-sDEVICE=ps2write";
+#  else
   pdf_argv[5] = (char *)"-sDEVICE=pswrite";
+#  endif /* HAVE_GHOSTSCRIPT_PS2WRITE */
   pdf_argv[6] = (char *)"-sOUTPUTFILE=%stdout";
   pdf_argc    = 7;
 #endif /* HAVE_PDFTOPS */
@@ -335,7 +345,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    strcasecmp(val, "false") != 0)
 	  orientation = 1;
       }
-      else if ((val = cupsGetOption("orientation-requested", num_options, options)) != NULL)
+      else if ((val = cupsGetOption("orientation-requested", num_options,
+                                    options)) != NULL)
       {
        /*
 	* Map IPP orientation values to 0 to 3:
@@ -389,6 +400,17 @@ main(int  argc,				/* I - Number of command-line args */
       pdf_argv[pdf_argc++] = pdf_height;
 #endif /* HAVE_PDFTOPS */
     }
+#if defined(HAVE_PDFTOPS) && defined(HAVE_PDFTOPS_WITH_ORIGPAGESIZES)
+    else
+    {
+     /*
+      *  Use the page sizes of the original PDF document, this way documents
+      *  which contain pages of different sizes can be printed correctly
+      */
+
+      pdf_argv[pdf_argc++] = (char *)"-origpagesizes";
+    }
+#endif /* HAVE_PDFTOPS && HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
   }
 
 #ifdef HAVE_PDFTOPS

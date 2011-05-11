@@ -1,8 +1,23 @@
-CHANGES.txt - 2011-03-31
+CHANGES.txt - 2011-05-10
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The lpadmin command now allows default option values to be deleted
+	  (STR #2959)
+	- The lpadmin command now allows the cupsIPPSupplies and
+	  cupsSNMPSupplies keywords to be set in a PPD file (STR #3825)
+	- Moving a held job no longer releases it (STR #3839)
+	- Restored support for GNU TLS and OpenSSL with threading enabled
+	  (STR #3605)
+	- Fixed a confusing error message from cups-polld (STR #3806)
+	- Increased the default RIPCache value to 128MB (STR #3535)
+	- MIME errors are now routed to the error_log file (STR #2410)
+	- Updated PDF filter to support new Ghostscript ps2write device
+	  (STR #3766)
+	- Updated PDF filter to support new Poppler option to preserve page
+	  sizes in PDF files when the user has not selected a particular media
+	  size (STR #3689)
 	- Added new PWG Raster filter for IPP Everywhere printer support.
 	- Added printer-uuid attribute.
 	- Added support for the cupsSingleFile PPD keyword.

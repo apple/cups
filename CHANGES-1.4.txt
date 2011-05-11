@@ -4,7 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
-	  STR #3757, STR #3758, STR #3782, STR #3826, STR #3829)
+	  STR #3757, STR #3758, STR #3782, STR #3826, STR #3829, STR #3837)
 	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
 	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)

@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-image.m4 6649 2007-07-11 21:46:42Z mike $"
 dnl
-dnl   Image library/filter stuff for the Common UNIX Printing System (CUPS).
+dnl   Image library/filter stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -16,17 +16,20 @@ dnl
 dnl See if we want the image filters included at all...
 AC_ARG_ENABLE(image, [  --enable-image          always build the image filters])
 
+DEFAULT_IMAGEFILTERS="#"
 IMGFILTERS=""
 if test "x$enable_image" != xno; then
         AC_MSG_CHECKING(whether to build image filters)
         if test "x$enable_image" = xyes -o $uname != Darwin; then
 		IMGFILTERS="imagetops imagetoraster"
+		DEFAULT_IMAGEFILTERS=""
                 AC_MSG_RESULT(yes)
         else
                 AC_MSG_RESULT(no)
         fi
 fi
 
+AC_SUBST(DEFAULT_IMAGEFILTERS)
 AC_SUBST(IMGFILTERS)
 
 dnl Check for image libraries...

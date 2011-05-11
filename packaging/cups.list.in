@@ -263,9 +263,18 @@ $DSOLIBS=@DSOLIBS@
 f 0555 root sys $SBINDIR/cupsd scheduler/cupsd
 
 d 0755 root sys $SERVERBIN -
+%system darwin
+d 0755 root sys $SERVERBIN/apple -
+f 0555 root sys $SERVERBIN/apple/ipp backend/ipp
+l 0755 root sys $SERVERBIN/apple/http ipp
+l 0755 root sys $SERVERBIN/apple/https ipp
+l 0755 root sys $SERVERBIN/apple/ipps ipp
+%system all
 d 0755 root sys $SERVERBIN/backend -
 f 0500 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0700 root sys $SERVERBIN/backend/http ipp
+l 0700 root sys $SERVERBIN/backend/https ipp
+l 0700 root sys $SERVERBIN/backend/ipps ipp
 f 0500 root sys $SERVERBIN/backend/lpd backend/lpd
 %if DNSSD_BACKEND
 f 0500 root sys $SERVERBIN/backend/dnssd backend/dnssd

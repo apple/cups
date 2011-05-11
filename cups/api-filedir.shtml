@@ -1,9 +1,9 @@
 <!--
   "$Id: api-filedir.shtml 7279 2008-01-31 01:50:44Z mike $"
 
-  File and directory API introduction for the Common UNIX Printing System (CUPS).
+  File and directory API introduction for CUPS.
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the

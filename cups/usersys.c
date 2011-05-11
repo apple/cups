@@ -31,6 +31,7 @@
  *   cupsSetUser()           - Set the default user name.
  *   cupsUser()              - Return the current user's name.
  *   _cupsGetPassword()      - Get a password from the user.
+ *   _cupsGSSServiceName()   - Get the GSS (Kerberos) service name.
  *   _cupsSetDefaults()      - Set the default server, port, and encryption.
  *   cups_read_client_conf() - Read a client.conf file.
  */
@@ -509,6 +510,25 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
     return (password);
 #endif /* WIN32 */
 }
+
+
+#ifdef HAVE_GSSAPI
+/*
+ * '_cupsGSSServiceName()' - Get the GSS (Kerberos) service name.
+ */
+
+const char *
+_cupsGSSServiceName(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread globals */
+
+
+  if (!cg->gss_service_name[0])
+    _cupsSetDefaults();
+
+  return (cg->gss_service_name);
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*

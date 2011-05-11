@@ -691,7 +691,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * "replay" attack...
       */
 
-      _cupsSetNegotiateAuthString(http);
+      _cupsSetNegotiateAuthString(http, "POST", resource);
     }
 #endif /* HAVE_GSSAPI */
 

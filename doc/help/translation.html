@@ -141,7 +141,7 @@ subdirectories for each locale, e.g. "fr" for French, "de" for
 German, "fr_ca" for French in Canada, and so forth.</P>
 
 <P>Template files are HTML files with special formatting
-characters in them that allow substition of variables and arrays.
+characters in them that allow substitution of variables and arrays.
 The CUPS CGI programs (<CODE>admin.cgi</CODE>,
 <CODE>classes.cgi</CODE>, <CODE>help.cgi</CODE>,
 <CODE>jobs.cgi</CODE>, and <CODE>printers.cgi</CODE>) use these
@@ -441,7 +441,7 @@ translated all of the templates, add the locale to the
 </TR>
 <TR>
 	<TD>subscription-added.tmpl</TD>
-	<TD>This template shows "subscription xyz added".</TD>
+	<TD>This template shows "subscription ... added".</TD>
 </TR>
 <TR>
 	<TD>subscription-canceled.tmpl</TD>
@@ -466,7 +466,7 @@ translated all of the templates, add the locale to the
 <H3><A NAME="VARIABLE">Inserting Attributes and Values</A></H3>
 
 <P>Template files consist of HTML with variable substitutions for
-named inside curley braces "{name}". Variable names are generally
+named inside curly braces "{name}". Variable names are generally
 the IPP attribute names with the hyphen ("-") replaced by the
 underscore ("_") character. For example, the
 <TT>job-printer-uri</TT> attribute is renamed to
@@ -518,7 +518,7 @@ in the <CODE>job_id</CODE> array:</P>
 &lt;/TABLE&gt;
 </PRE>
 
-<P>Arrays can be nested, however all elements within the curley
+<P>Arrays can be nested, however all elements within the curly
 braces ("{" and "}") are indexed using the innermost array.</P>
 
 <H3>Conditional Tests</H3>

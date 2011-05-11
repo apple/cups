@@ -57,7 +57,7 @@ more detail.</p>
 <h3><a name="SECURITY">Security Considerations</a></h3>
 
 <p>It is always important to use security programming practices. Filters and
-most backends are run as a non-priviledged user, so the major security
+most backends are run as a non-privileged user, so the major security
 consideration is resource utilization - filters should not depend on unlimited
 amounts of CPU, memory, or disk space, and should protect against conditions
 that could lead to excess usage of any resource like infinite loops and
@@ -91,6 +91,22 @@ held. Filters, backends, and port monitors <em>must</em> catch
 <code>SIGTERM</code> and perform any cleanup necessary to produce a valid output
 file or return the printer to a known good state. The recommended behavior is to
 end the output on the current page.</p>
+
+<p>Filters and backends may also receive <code>SIGPIPE</code> when an upstream or downstream filter/backend exits with a non-zero status. Developers should generally <code>ignore SIGPIPE</code> at the beginning of <code>main()</code> with the following function call:</p>
+
+<pre class="example">
+#include &lt;signal.h&gt;>
+
+...
+
+int
+main(int argc, char *argv[])
+{
+  signal(SIGPIPE, SIG_IGN);
+
+  ...
+}
+</pre>
 
 <h3><a name="PERMISSIONS">File Permissions</a></h3>
 

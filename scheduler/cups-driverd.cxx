@@ -299,7 +299,7 @@ cat_drv(const char *name,		/* I - PPD name */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
 
-  // Pull out the 
+  // Pull out the path to the .drv file...
   if (httpSeparateURI(HTTP_URI_CODING_ALL, name, scheme, sizeof(scheme),
                       userpass, sizeof(userpass), host, sizeof(host), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK ||
@@ -548,6 +548,7 @@ cat_static(const char *name,		/* I - PPD name */
 		*slash;			/* Pointer to next slash */
 #endif /* __APPLE__ */
 
+
   if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
   {
    /*
@@ -598,6 +599,7 @@ cat_static(const char *name,		/* I - PPD name */
 
     snprintf(line, sizeof(line), "/%s", name);
   }
+  else
 
 #elif defined(__linux)
   if (!strncmp(name, "lsb/usr/", 8))

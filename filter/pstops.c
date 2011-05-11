@@ -3,7 +3,7 @@
  *
  *   PostScript filter for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -252,6 +252,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore broken pipe signals...
+  */
+
+  signal(SIGPIPE, SIG_IGN);
 
  /*
   * Check command-line...
@@ -608,7 +614,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
   saw_bounding_box = 0;
   saw_for          = 0;
   saw_pages        = 0;
-  saw_title        = 0;	
+  saw_title        = 0;
 
   while (line[0] == '%')
   {
@@ -640,7 +646,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       int	pages;			/* Number of pages */
 
-      if (saw_pages) 
+      if (saw_pages)
 	fputs("DEBUG: A duplicate %%Pages: comment was seen.\n", stderr);
 
       saw_pages = 1;
@@ -687,7 +693,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     }
     else if (!strncmp(line, "%%BoundingBox:", 14))
     {
-      if (saw_bounding_box) 
+      if (saw_bounding_box)
 	fputs("DEBUG: A duplicate %%BoundingBox: comment was seen.\n", stderr);
       else if (strstr(line + 14, "(atend)"))
       {
@@ -750,11 +756,11 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
       break;
   }
 
-  if (!saw_bounding_box) 
+  if (!saw_bounding_box)
     fputs("DEBUG: There wasn't a %%BoundingBox: comment in the header.\n",
           stderr);
 
-  if (!saw_pages) 
+  if (!saw_pages)
     fputs("DEBUG: There wasn't a %%Pages: comment in the header.\n", stderr);
 
   if (!saw_for)
@@ -1784,7 +1790,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
 
     if (!strncmp(line, "%%EndProlog", 11))
       linelen = cupsFileGetLine(fp, line, linesize);
-    else 
+    else
       fputs("DEBUG: The %%EndProlog comment is missing.\n", stderr);
   }
 
@@ -1825,7 +1831,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
   }
 
   doc_puts(doc, "%%BeginSetup\n");
-  
+
   do_setup(doc, ppd);
 
   num_options = 0;
@@ -1855,7 +1861,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 
     if (!strncmp(line, "%%EndSetup", 10))
       linelen = cupsFileGetLine(fp, line, linesize);
-    else 
+    else
       fputs("DEBUG: The %%EndSetup comment is missing.\n", stderr);
   }
 

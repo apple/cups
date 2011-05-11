@@ -141,6 +141,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		timeout,		/* Timeout */
 		contimeout,		/* Connection timeout */
 		copies;			/* Number of copies */
+  ssize_t	bytes = 0;		/* Initial bytes read */
+  char		buffer[16384];		/* Initial print buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -431,8 +433,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (argc == 6)
+  {
     if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 0, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
+    else if (mode == MODE_STANDARD &&
+             (bytes = read(0, buffer, sizeof(buffer))) <= 0)
+      return (CUPS_BACKEND_OK);
+  }
 
  /*
   * If we have 7 arguments, print the file named on the command-line.
@@ -454,7 +461,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
 
-    backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0, 
+    if (bytes > 0)
+      write(fd, buffer, bytes);
+
+    backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
 		   backendNetworkSideCB);
   }
   else if (argc == 6)

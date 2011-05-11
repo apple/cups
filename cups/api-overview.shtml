@@ -1,10 +1,9 @@
 <!--
   "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
 
-  Introduction to CUPS programming content for the Common UNIX Printing System
-  (CUPS).
+  Introduction to CUPS programming content for CUPS.
 
-  Copyright 2008 by Apple Inc.
+  Copyright 2008-2011 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright

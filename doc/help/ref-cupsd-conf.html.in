@@ -114,9 +114,9 @@ to the access log file. The following levels are defined:</P>
   ...
   Allow from All
   Allow from None
-  Allow from *.domain.com
-  Allow from .domain.com
-  Allow from host.domain.com
+  Allow from *.example.com
+  Allow from .example.com
+  Allow from host.example.com
   Allow from nnn.*
   Allow from nnn.nnn.*
   Allow from nnn.nnn.nnn.*
@@ -133,8 +133,8 @@ to the access log file. The following levels are defined:</P>
 <H3>Description</H3>
 
 <P>The <CODE>Allow</CODE> directive specifies a hostname, IP
-address, or network that is allowed access to the server. 
-<CODE>Allow</CODE> directives are cummulative, so multiple
+address, or network that is allowed access to the server.
+<CODE>Allow</CODE> directives are cumulative, so multiple
 <CODE>Allow</CODE> directives can be used to allow access for
 multiple hosts or networks.</P>
 
@@ -342,7 +342,7 @@ default setting is <CODE>No</CODE>.</P>
 <PRE CLASS="command">
 BrowseAddress 255.255.255.255:631
 BrowseAddress 192.0.2.255:631
-BrowseAddress host.domain.com:631
+BrowseAddress host.example.com:631
 BrowseAddress @LOCAL
 BrowseAddress @IF(name)
 </PRE>
@@ -380,7 +380,7 @@ BrowseAllow from none
 BrowseAllow from 192.0.2
 BrowseAllow from 192.0.2.0/24
 BrowseAllow from 192.0.2.0/255.255.255.0
-BrowseAllow from *.domain.com
+BrowseAllow from *.example.com
 BrowseAllow from @LOCAL
 BrowseAllow from @IF(name)
 </PRE>
@@ -418,7 +418,7 @@ BrowseDeny from none
 BrowseDeny from 192.0.2
 BrowseDeny from 192.0.2.0/24
 BrowseDeny from 192.0.2.0/255.255.255.0
-BrowseDeny from *.domain.com
+BrowseDeny from *.example.com
 BrowseDeny from @LOCAL
 BrowseDeny from @IF(name)
 </PRE>
@@ -616,7 +616,7 @@ allow/deny processing. The default order is
 
 <PRE CLASS="command">
 BrowsePoll 192.0.2.2:631
-BrowsePoll host.domain.com:631
+BrowsePoll host.example.com:631
 </PRE>
 
 <H3>Description</H3>
@@ -698,8 +698,8 @@ requests for several seconds while polling the network.</P>
 BrowseRelay 193.0.2.1 192.0.2.255
 BrowseRelay 193.0.2.0/255.255.255.0 192.0.2.255
 BrowseRelay 193.0.2.0/24 192.0.2.255
-BrowseRelay *.domain.com 192.0.2.255
-BrowseRelay host.domain.com 192.0.2.255
+BrowseRelay *.example.com 192.0.2.255
+BrowseRelay host.example.com 192.0.2.255
 </PRE>
 
 <H3>Description</H3>
@@ -1048,9 +1048,9 @@ printers are shared (published) by default. The default is
   ..
   Deny from All
   Deny from None
-  Deny from *.domain.com
-  Deny from .domain.com
-  Deny from host.domain.com
+  Deny from *.example.com
+  Deny from .example.com
+  Deny from host.example.com
   Deny from nnn.*
   Deny from nnn.nnn.*
   Deny from nnn.nnn.nnn.*
@@ -1068,7 +1068,7 @@ printers are shared (published) by default. The default is
 
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP
 address, or network that is denied access to the server.
-<CODE>Deny</CODE> directives are cummulative, so multiple
+<CODE>Deny</CODE> directives are cumulative, so multiple
 <CODE>Deny</CODE> directives can be used to deny access for
 multiple hosts or networks.</P>
 
@@ -1779,11 +1779,11 @@ operations.</P>
 </TR>
 <TR>
 	<TD>Get-Printer-Attributes</TD>
-	<TD>Gets informaion about a printer or class</TD>
+	<TD>Gets information about a printer or class</TD>
 </TR>
 <TR>
 	<TD>Get-Subscription-Attributes</TD>
-	<TD>Gets informaion about a notification subscription</TD>
+	<TD>Gets information about a notification subscription</TD>
 </TR>
 <TR>
 	<TD>Get-Subscriptions</TD>
@@ -1819,7 +1819,7 @@ operations.</P>
 </TR>
 <TR>
 	<TD>Resume-Printer</TD>
-	<TD>Sets the printer-stae value for a printer to idle/processing</TD>
+	<TD>Sets the printer-state value for a printer to idle/processing</TD>
 </TR>
 <TR>
 	<TD>Send-Document</TD>
@@ -2692,7 +2692,7 @@ appear inside a <A HREF="#Location"><CODE>Location</CODE></A> or
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-RIPCache 8m
+RIPCache 128m
 RIPCache 1g
 RIPCache 2048k
 </PRE>
@@ -2703,7 +2703,7 @@ RIPCache 2048k
 memory cache used by Raster Image Processor ("RIP") filters such
 as <CODE>imagetoraster</CODE> and <CODE>pstoraster</CODE>. The
 size can be suffixed with a "k" for kilobytes, "m" for megabytes,
-or "g" for gigabytes. The default cache size is "8m", or 8
+or "g" for gigabytes. The default cache size is "128m", or 128
 megabytes.</P>
 
 
@@ -2743,7 +2743,7 @@ is generated only once on startup or on a restart. The default is
 <P>The <CODE>Satisfy</CODE> directive specifies whether all
 conditions must be satisfied to allow access to the resource. If
 set to <CODE>all</CODE>, then all authentication and access
-control conditions must be satified to allow access.</P>
+control conditions must be satisfied to allow access.</P>
 
 <P>Setting <CODE>Satisfy</CODE> to <CODE>any</CODE> allows a user
 to gain access if the authentication or access control
@@ -2780,18 +2780,14 @@ HREF="#ServerName"><CODE>ServerName</CODE></A>.</P>
 
 <PRE CLASS="command">
 ServerAlias althost
-ServerAlias althost.foo.com
-ServerAlias althost.bar.com
+ServerAlias foo.example.com
+ServerAlias bar.example.com
 ServerAlias *
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>ServerAlias</CODE> directive specifies alternate names that the
-server is known by. By default it contains a list of all aliases associated
-with the <A HREF="#ServerName"><CODE>ServerName</CODE></A>. The special name
-"*" can be used to allow any hostname when accessing CUPS via an external
-network interfaces.</P>
+<P>The <CODE>ServerAlias</CODE> directive specifies alternate names that the server is known by. By default it contains a list of all aliases associated with the <A HREF="#ServerName"><CODE>ServerName</CODE></A>. The special name "*" can be used to allow any hostname when accessing CUPS via an external network interfaces.</P>
 
 <BLOCKQUOTE><B>Note</B>
 
@@ -2868,8 +2864,8 @@ encrypted connections.</P>
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-ServerName foo.domain.com
-ServerName myserver.domain.com
+ServerName foo.example.com
+ServerName myserver.example.com
 </PRE>
 
 <H3>Description</H3>

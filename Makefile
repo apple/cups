@@ -302,9 +302,6 @@ aix bsd deb depot inst pkg setld slackware swinstall tardist:
 epm:
 	epm $(EPMFLAGS) -s packaging/installer.gif cups packaging/cups.list
 
-osx:
-	epm $(EPMFLAGS) -f osx -s packaging/installer.tif cups packaging/cups.list
-
 rpm:
 	epm $(EPMFLAGS) -f rpm -s packaging/installer.gif cups packaging/cups.list
 

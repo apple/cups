@@ -29,6 +29,7 @@
 #include "image.h"
 #include <math.h>
 #include <cups/language-private.h>
+#include <signal.h>
 
 
 /*
@@ -105,6 +106,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   setbuf(stderr, NULL);
+
+ /*
+  * Ignore broken pipe signals...
+  */
+
+  signal(SIGPIPE, SIG_IGN);
 
  /*
   * Check command-line...

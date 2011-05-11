@@ -42,18 +42,25 @@
 #  endif /* WIN32 */
 
 #  ifdef HAVE_GSSAPI
-#    ifdef HAVE_GSSAPI_GSSAPI_H
+#    ifdef HAVE_GSS_GSSAPI_H
+#      include <GSS/gssapi.h>
+#      ifdef HAVE_GSSAPI_GENERIC_H
+#        include <GSS/gssapi_generic.h>
+#      endif /* HAVE_GSSAPI_GENERIC_H */
+#      ifdef HAVE_GSSAPI_KRB5_H
+#        include <GSS/gssapi_krb5.h>
+#      endif /* HAVE_GSSAPI_KRB5_H */
+#    elif defined(HAVE_GSSAPI_GSSAPI_H)
 #      include <gssapi/gssapi.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_H */
-#    ifdef HAVE_GSSAPI_GSSAPI_GENERIC_H
-#      include <gssapi/gssapi_generic.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_GENERIC_H */
-#    ifdef HAVE_GSSAPI_GSSAPI_KRB5_H
-#      include <gssapi/gssapi_krb5.h>
-#    endif /* HAVE_GSSAPI_GSSAPI_KRB5_H */
-#    ifdef HAVE_GSSAPI_H
+#      ifdef HAVE_GSSAPI_GENERIC_H
+#        include <gssapi/gssapi_generic.h>
+#      endif /* HAVE_GSSAPI_GENERIC_H */
+#      ifdef HAVE_GSSAPI_KRB5_H
+#        include <gssapi/gssapi_krb5.h>
+#      endif /* HAVE_GSSAPI_KRB5_H */
+#    elif defined(HAVE_GSSAPI_H)
 #      include <gssapi.h>
-#    endif /* HAVE_GSSAPI_H */
+#    endif /* HAVE_GSS_GSSAPI_H */
 #    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
 #      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
 #    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
@@ -91,6 +98,9 @@ typedef int socklen_t;
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
 #    include <Security/SecureTransport.h>
+#    ifdef HAVE_SECURETRANSPORTPRIV_H
+#      include <Security/SecureTransportPriv.h>
+#    endif /* HAVE_SECURETRANSPORTPRIV_H */
 #    ifdef HAVE_SECITEM_H
 #      include <Security/SecItem.h>
 #    endif /* HAVE_SECITEM_H */
@@ -134,6 +144,16 @@ typedef int socklen_t;
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
+
+
+/*
+ * Constants...
+ */
+
+
+#define _HTTP_RESOLVE_DEFAULT	0	/* Just resolve with default options */
+#define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
+#define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
 
 
 /*
@@ -215,7 +235,6 @@ typedef void *http_tls_t;
 typedef void *http_tls_credentials_t;
 #  endif /* HAVE_LIBSSL */
 
-
 typedef int (*_http_timeout_cb_t)(http_t *http, void *user_data);
 
 struct _http_s				/**** HTTP connection structure. ****/
@@ -281,6 +300,9 @@ struct _http_s				/**** HTTP connection structure. ****/
   _http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5@ */
   void			*timeout_data;	/* User data pointer @since CUPS 1.5@ */
   struct timeval	timeout_value;	/* Timeout in seconds */
+#  ifdef HAVE_GSSAPI
+  char			gsshost[256];	/* Hostname for Kerberos */
+#  endif /* HAVE_GSSAPI */
 };
 
 
@@ -365,7 +387,7 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
 extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size, int log,
+			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
 extern void		_httpSetTimeout(http_t *http, double timeout,

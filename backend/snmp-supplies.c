@@ -40,12 +40,10 @@
 #define CUPS_DEVELOPER_EMPTY		2
 #define CUPS_MARKER_SUPPLY_LOW		4
 #define CUPS_MARKER_SUPPLY_EMPTY	8
-#define CUPS_MARKER_WASTE_ALMOST_FULL	16
-#define CUPS_MARKER_WASTE_FULL		32
-#define CUPS_OPC_NEAR_EOL		64
-#define CUPS_OPC_LIFE_OVER		128
-#define CUPS_TONER_LOW			256
-#define CUPS_TONER_EMPTY		512
+#define CUPS_OPC_NEAR_EOL		16
+#define CUPS_OPC_LIFE_OVER		32
+#define CUPS_TONER_LOW			64
+#define CUPS_TONER_EMPTY		128
 
 
 /*
@@ -172,8 +170,6 @@ static const backend_state_t const supply_states[] =
 			  { CUPS_DEVELOPER_EMPTY, "developer-empty-warning" },
 			  { CUPS_MARKER_SUPPLY_LOW, "marker-supply-low-report" },
 			  { CUPS_MARKER_SUPPLY_EMPTY, "marker-supply-empty-warning" },
-			  { CUPS_MARKER_WASTE_ALMOST_FULL, "marker-waste-almost-full-report" },
-			  { CUPS_MARKER_WASTE_FULL, "marker-waste-full-warning" },
 			  { CUPS_OPC_NEAR_EOL, "opc-near-eol-report" },
 			  { CUPS_OPC_LIFE_OVER, "opc-life-over-warning" },
 			  { CUPS_TONER_LOW, "toner-low-report" },
@@ -251,10 +247,6 @@ backendSNMPSupplies(
               break;
           case CUPS_TC_wasteToner :
           case CUPS_TC_wasteInk :
-              if (percent <= 1)
-                new_supply_state |= CUPS_MARKER_WASTE_FULL;
-              else
-                new_supply_state |= CUPS_MARKER_WASTE_ALMOST_FULL;
               break;
           case CUPS_TC_ink :
           case CUPS_TC_inkCartridge :

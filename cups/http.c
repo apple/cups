@@ -168,19 +168,6 @@ static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
 static int		http_write_ssl(http_t *http, const char *buf, int len);
-
-#  ifdef HAVE_GNUTLS
-#    ifdef HAVE_PTHREAD_H
-GCRY_THREAD_OPTION_PTHREAD_IMPL;
-#    endif /* HAVE_PTHREAD_H */
-
-#  elif defined(HAVE_LIBSSL)
-static _cups_mutex_t	*http_locks;	/* OpenSSL lock mutexes */
-
-static void		http_locking_cb(int mode, int type, const char *file,
-					int line);
-static unsigned long	http_threadid_cb(void);
-#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
 
@@ -1519,14 +1506,6 @@ httpInitialize(void)
 
 #ifdef HAVE_GNUTLS
  /*
-  * Make sure we handle threading properly...
-  */
-
-#  ifdef HAVE_PTHREAD_H
-  gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
-#  endif /* HAVE_PTHREAD_H */
-
- /*
   * Initialize GNU TLS...
   */
 
@@ -1539,19 +1518,6 @@ httpInitialize(void)
 
   SSL_load_error_strings();
   SSL_library_init();
-
- /*
-  * Set the threading callbacks...
-  */
-
-  http_locks = calloc(CRYPTO_num_locks(), sizeof(_cups_mutex_t));
-#  ifdef HAVE_PTHREAD_H
-  for (i = 0; i < CRYPTO_num_locks(); i ++)
-    pthread_mutex_init(http_locks + i, NULL);
-#  endif /* HAVE_PTHREAD_H */
-
-  CRYPTO_set_id_callback(http_threadid_cb);
-  CRYPTO_set_locking_callback(http_locking_cb);
 
  /*
   * Using the current time is a dubious random seed, but on some systems
@@ -3494,25 +3460,6 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 #endif /* HAVE_SSL */
 
 
-#ifdef HAVE_LIBSSL
-/*
- * 'http_locking_cb()' - Lock/unlock a thread's mutex.
- */
-
-static void
-http_locking_cb(int        mode,	/* I - Lock mode */
-		int        type,	/* I - Lock type */
-		const char *file,	/* I - Source file */
-		int        line)	/* I - Line number */
-{
-  if (mode & CRYPTO_LOCK)
-    _cupsMutexLock(http_locks + type);
-  else
-    _cupsMutexUnlock(http_locks + type);
-}
-#endif /* HAVE_LIBSSL */
-
-
 /*
  * 'http_send()' - Send a request with all fields and the trailing blank line.
  */
@@ -4204,23 +4151,6 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
   http->tls_credentials = NULL;
 }
 #endif /* HAVE_SSL */
-
-
-#ifdef HAVE_LIBSSL
-/*
- * 'http_threadid_cb()' - Return the current thread ID.
- */
-
-static unsigned long			/* O - Thread ID */
-http_threadid_cb(void)
-{
-#  ifdef HAVE_PTHREAD_H
-  return ((unsigned long)pthread_self());
-#  else
-  return (0);
-#  endif /* HAVE_PTHREAD_H */
-}
-#endif /* HAVE_LIBSSL */
 
 
 #ifdef HAVE_SSL

@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-pdf.m4 7449 2008-04-14 18:27:53Z mike $"
 dnl
-dnl   PDF filter configuration stuff for the Common UNIX Printing System (CUPS).
+dnl   PDF filter configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -79,8 +79,33 @@ case "x$with_pdftops" in
 	;;
 esac
 
+if test "x$CUPS_PDFTOPS" != x; then
+	AC_MSG_CHECKING(whether pdftops supports -origpagesizes)
+	if ($CUPS_PDFTOPS -h 2>&1 | grep -q -- -origpagesizes); then
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_PDFTOPS_WITH_ORIGPAGESIZES)
+	else
+		AC_MSG_RESULT(no)
+	fi
+
+	DEFAULT_PDFTOPS=""
+elif test "x$CUPS_GHOSTSCRIPT" != x; then
+	AC_MSG_CHECKING(whether gs supports the ps2write device)
+	if ($CUPS_GHOSTSCRIPT -h 2>&1 | grep -q ps2write); then
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_GHOSTSCRIPT_PS2WRITE)
+	else
+		AC_MSG_RESULT(no)
+	fi
+
+	DEFAULT_PDFTOPS=""
+else
+	DEFAULT_PDFTOPS="#"
+fi
+
 AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
 AC_DEFINE_UNQUOTED(CUPS_GHOSTSCRIPT, "$CUPS_GHOSTSCRIPT")
+AC_SUBST(DEFAULT_PDFTOPS)
 AC_SUBST(PDFTOPS)
 
 dnl
