@@ -30,7 +30,11 @@ lpadmin \- configure cups printers and classes
 ] [ -h
 .I server[:port]
 ] -p
-.I destination option(s)
+.I destination
+[ -R
+.I name-default
+]
+.I option(s)
 .br
 .B lpadmin
 [ -E ] [-U
@@ -154,6 +158,10 @@ announced. The default value is "true".
 Sets the IPP operation policy associated with the destination. The
 name must be defined in the \fBcupsd.conf\fR in a Policy section.
 The default operation policy is "default".
+.TP 5
+-R name-default
+.br
+Deletes the named option from \fIprinter\fR.
 .TP 5
 -r class
 .br
