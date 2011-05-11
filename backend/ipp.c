@@ -72,10 +72,6 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
  * Globals...
  */
 
-static int		num_attr_cache = 0;
-					/* Number of cached attributes */
-static cups_option_t	*attr_cache = NULL;
-					/* Cached attributes */
 static const char 	*auth_info_required;
 					/* New auth-info-required value */
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
@@ -126,9 +122,13 @@ static const char * const remote_job_states[] =
   "cups-remote-aborted",
   "cups-remote-completed"
 };
-static cups_array_t	*state_reasons;	/* Array of printe-state-reasons keywords */
-static _cups_mutex_t	state_mutex = _CUPS_MUTEX_INITIALIZER;
+static _cups_mutex_t	report_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control access */
+static int		num_attr_cache = 0;
+					/* Number of cached attributes */
+static cups_option_t	*attr_cache = NULL;
+					/* Cached attributes */
+static cups_array_t	*state_reasons;	/* Array of printe-state-reasons keywords */
 static char		tmpfilename[1024] = "";
 					/* Temporary spool file name */
 
@@ -2399,6 +2399,8 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
 
   *valptr = '\0';
 
+  _cupsMutexLock(&report_mutex);
+
   if ((cached = cupsGetOption(attr->name, num_attr_cache,
                               attr_cache)) == NULL || strcmp(cached, value))
   {
@@ -2410,6 +2412,8 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
                                    &attr_cache);
     fprintf(stderr, "ATTR: %s=%s\n", attr->name, value);
   }
+
+  _cupsMutexUnlock(&report_mutex);
 }
 
 
@@ -2834,7 +2838,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
           op ? op : ' ', cupsArrayCount(new_reasons),
 	  cupsArrayCount(state_reasons));
 
-  _cupsMutexLock(&state_mutex);
+  _cupsMutexLock(&report_mutex);
 
   if (op == '+')
   {
@@ -2943,7 +2947,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
     }
   }
 
-  _cupsMutexUnlock(&state_mutex);
+  _cupsMutexUnlock(&report_mutex);
 
  /*
   * Report changes and return...
