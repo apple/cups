@@ -4114,8 +4114,8 @@ valid_job_attributes(
       respond_unsupported(client, attr);
     }
     else
-      fprintf(stderr, "%s Print-Job compression=\"%s\"\n", client->http.hostname,
-	      attr->values[0].string.text);
+      fprintf(stderr, "%s Print-Job compression=\"%s\"\n",
+              client->http.hostname, attr->values[0].string.text);
   }
 
  /*
@@ -4187,7 +4187,9 @@ valid_job_attributes(
 	break;
 
     if (i >= supported->num_values)
+    {
       respond_unsupported(client, attr);
+    }
   }
 
  /*
