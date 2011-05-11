@@ -1,8 +1,9 @@
-CHANGES.txt - 2011-05-06
+CHANGES.txt - 2011-05-10
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Moving a held job no longer releases it (STR #3839)
 	- Restored support for GNU TLS and OpenSSL with threading enabled
 	  (STR #3605)
 	- Fixed a confusing error message from cups-polld (STR #3806)

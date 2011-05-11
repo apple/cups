@@ -1871,8 +1871,9 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
   * Change the destination information...
   */
 
-  cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
-                   "Stopping job prior to move.");
+  if (job->state_value > IPP_JOB_HELD)
+    cupsdSetJobState(job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
+		     "Stopping job prior to move.");
 
   cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, oldp, job,
                 "Job #%d moved from %s to %s.", job->id, olddest,
