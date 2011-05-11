@@ -1139,6 +1139,16 @@
 /* Begin PBXFileReference section */
 		270CCDA7135E3C9E00007BE2 /* testmime */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testmime; sourceTree = BUILT_PRODUCTS_DIR; };
 		270CCDBB135E3D3E00007BE2 /* testmime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testmime.c; path = ../scheduler/testmime.c; sourceTree = "<group>"; };
+		2732E089137A3F5200FAFEF6 /* cancel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cancel.c; path = ../systemv/cancel.c; sourceTree = "<group>"; };
+		2732E08A137A3F5200FAFEF6 /* cupsaccept.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cupsaccept.c; path = ../systemv/cupsaccept.c; sourceTree = "<group>"; };
+		2732E08B137A3F5200FAFEF6 /* cupstestdsc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cupstestdsc.c; path = ../systemv/cupstestdsc.c; sourceTree = "<group>"; };
+		2732E08C137A3F5200FAFEF6 /* lp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lp.c; path = ../systemv/lp.c; sourceTree = "<group>"; };
+		2732E08D137A3F5200FAFEF6 /* lpadmin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpadmin.c; path = ../systemv/lpadmin.c; sourceTree = "<group>"; };
+		2732E08E137A3F5200FAFEF6 /* lpinfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpinfo.c; path = ../systemv/lpinfo.c; sourceTree = "<group>"; };
+		2732E08F137A3F5200FAFEF6 /* lpmove.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpmove.c; path = ../systemv/lpmove.c; sourceTree = "<group>"; };
+		2732E090137A3F5200FAFEF6 /* lpoptions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpoptions.c; path = ../systemv/lpoptions.c; sourceTree = "<group>"; };
+		2732E091137A3F5200FAFEF6 /* lppasswd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lppasswd.c; path = ../systemv/lppasswd.c; sourceTree = "<group>"; };
+		2732E092137A3F5200FAFEF6 /* lpstat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpstat.c; path = ../systemv/lpstat.c; sourceTree = "<group>"; };
 		273BF6BD1333B5000022CAAB /* testcups */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testcups; sourceTree = BUILT_PRODUCTS_DIR; };
 		273BF6C61333B5370022CAAB /* testcups.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testcups.c; path = ../cups/testcups.c; sourceTree = "<group>"; };
 		273BF6CB1333B5950022CAAB /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -1790,12 +1800,22 @@
 		274FF67313333B0A00317ECB /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				2732E089137A3F5200FAFEF6 /* cancel.c */,
+				2732E08A137A3F5200FAFEF6 /* cupsaccept.c */,
 				276684101337FA7C000D33D0 /* cupsaddsmb.c */,
 				276683681337AA00000D33D0 /* cupsctl.c */,
 				274FF68713333B6E00317ECB /* cupsfilter.c */,
+				2732E08B137A3F5200FAFEF6 /* cupstestdsc.c */,
 				72F75A5B1336F988004BB496 /* cupstestppd.c */,
 				726AD701135E8A90002C930D /* ippserver.c */,
 				276683F91337F7A9000D33D0 /* ipptool.c */,
+				2732E08C137A3F5200FAFEF6 /* lp.c */,
+				2732E08D137A3F5200FAFEF6 /* lpadmin.c */,
+				2732E08E137A3F5200FAFEF6 /* lpinfo.c */,
+				2732E08F137A3F5200FAFEF6 /* lpmove.c */,
+				2732E090137A3F5200FAFEF6 /* lpoptions.c */,
+				2732E091137A3F5200FAFEF6 /* lppasswd.c */,
+				2732E092137A3F5200FAFEF6 /* lpstat.c */,
 			);
 			name = commands;
 			sourceTree = "<group>";

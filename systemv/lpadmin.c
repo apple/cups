@@ -1127,7 +1127,10 @@ set_printer_options(
   cups_file_t	*in,			/* PPD file */
 		*out;			/* Temporary file */
   const char	*protocol,		/* Old protocol option */
-		*customval;		/* Custom option value */
+		*customval,		/* Custom option value */
+		*boolval;		/* Boolean value */
+  int		wrote_ipp_supplies = 0,	/* Wrote cupsIPPSupplies keyword? */
+		wrote_snmp_supplies = 0;/* Wrote cupsSNMPSupplies keyword? */
 
 
   DEBUG_printf(("set_printer_options(http=%p, printer=\"%s\", num_options=%d, "
@@ -1256,7 +1259,27 @@ set_printer_options(
 
     while (cupsFileGets(in, line, sizeof(line)))
     {
-      if (strncmp(line, "*Default", 8))
+      if (!strncmp(line, "*cupsIPPSupplies:", 17) &&
+	  (boolval = cupsGetOption("cupsIPPSupplies", num_options,
+	                           options)) != NULL)
+      {
+        wrote_ipp_supplies = 1;
+        cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
+	               (!strcasecmp(boolval, "true") ||
+		        !strcasecmp(boolval, "yes") ||
+		        !strcasecmp(boolval, "on")) ? "True" : "False");
+      }
+      else if (!strncmp(line, "*cupsSNMPSupplies:", 18) &&
+	       (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
+	                                options)) != NULL)
+      {
+        wrote_snmp_supplies = 1;
+        cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
+	               (!strcasecmp(boolval, "true") ||
+		        !strcasecmp(boolval, "yes") ||
+		        !strcasecmp(boolval, "on")) ? "True" : "False");
+      }
+      else if (strncmp(line, "*Default", 8))
         cupsFilePrintf(out, "%s\n", line);
       else
       {
@@ -1304,6 +1327,26 @@ set_printer_options(
 	else
 	  cupsFilePrintf(out, "%s\n", line);
       }
+    }
+
+    if (!wrote_ipp_supplies &&
+	(boolval = cupsGetOption("cupsIPPSupplies", num_options,
+				 options)) != NULL)
+    {
+      cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
+		     (!strcasecmp(boolval, "true") ||
+		      !strcasecmp(boolval, "yes") ||
+		      !strcasecmp(boolval, "on")) ? "True" : "False");
+    }
+
+    if (!wrote_snmp_supplies &&
+        (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
+			         options)) != NULL)
+    {
+      cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
+		     (!strcasecmp(boolval, "true") ||
+		      !strcasecmp(boolval, "yes") ||
+		      !strcasecmp(boolval, "on")) ? "True" : "False");
     }
 
     cupsFileClose(in);
