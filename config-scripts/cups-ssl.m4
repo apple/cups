@@ -38,6 +38,8 @@ if test x$enable_ssl != xno; then
 		AC_DEFINE(HAVE_CDSASSL)
 
 		dnl Check for the various security headers...
+		AC_CHECK_HEADER(Security/SecureTransportPriv.h,
+		    AC_DEFINE(HAVE_SECURETRANSPORTPRIV_H))
 		AC_CHECK_HEADER(Security/SecCertificate.h,
 		    AC_DEFINE(HAVE_SECCERTIFICATE_H))
 		AC_CHECK_HEADER(Security/SecItem.h,

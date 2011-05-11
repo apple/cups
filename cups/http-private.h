@@ -98,6 +98,9 @@ typedef int socklen_t;
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
 #    include <Security/SecureTransport.h>
+#    ifdef HAVE_SECURETRANSPORTPRIV_H
+#      include <Security/SecureTransportPriv.h>
+#    endif /* HAVE_SECURETRANSPORTPRIV_H */
 #    ifdef HAVE_SECITEM_H
 #      include <Security/SecItem.h>
 #    endif /* HAVE_SECITEM_H */
