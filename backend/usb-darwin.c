@@ -271,9 +271,9 @@ static CFStringRef cfstr_create_trim(const char *cstr);
 static CFStringRef copy_value_for_key(CFStringRef deviceID, CFStringRef *keys);
 static kern_return_t load_classdriver(CFStringRef driverPath, printer_interface_t intf, classdriver_t ***printerDriver);
 static kern_return_t load_printerdriver(CFStringRef *driverBundlePath);
-static kern_return_t registry_close();
+static kern_return_t registry_close(void);
 static kern_return_t registry_open(CFStringRef *driverBundlePath);
-static kern_return_t unload_classdriver();
+static kern_return_t unload_classdriver(classdriver_t ***classdriver);
 static OSStatus copy_deviceid(classdriver_t **printer, CFStringRef *deviceID);
 static void *read_thread(void *reference);
 static void *sidechannel_thread(void *reference);
@@ -285,7 +285,7 @@ static void iterate_printers(iterator_callback_t callBack, void *userdata);
 static void parse_options(char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
 static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
 static void setup_cfLanguage(void);
-static void soft_reset();
+static void soft_reset(void);
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -1567,7 +1567,7 @@ static kern_return_t registry_open(CFStringRef *driverBundlePath)
  * 'registry_close()' - Close the connection to the printer.
  */
 
-static kern_return_t registry_close()
+static kern_return_t registry_close(void)
 {
   if (g.classdriver != NULL)
     (*g.classdriver)->Close(g.classdriver);
@@ -2191,7 +2191,7 @@ static void parse_pserror(char *sockBuffer,
  * 'soft_reset()' - Send a soft reset to the device.
  */
 
-static void soft_reset()
+static void soft_reset(void)
 {
   fd_set	  input_set;		/* Input set for select() */
   struct timeval  tv;			/* Time value */
