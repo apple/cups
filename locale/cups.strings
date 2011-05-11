@@ -318,7 +318,6 @@
 "%s: Error - unknown option \"%c\"." = "%s: Error - unknown option \"%c\".";
 "%s: Error - unknown option \"%s\"." = "%s: Error - unknown option \"%s\".";
 "%s: Expected job ID after \"-i\" option." = "%s: Expected job ID after \"-i\" option.";
-"%s: Filter \"%s\" not available: %s" = "%s: Filter \"%s\" not available: %s";
 "%s: Invalid destination name in list \"%s\"." = "%s: Invalid destination name in list \"%s\".";
 "%s: Invalid filter string \"%s\"." = "%s: Invalid filter string \"%s\".";
 "%s: Need job ID (\"-i jobid\") before \"-H restart\"." = "%s: Need job ID (\"-i jobid\") before \"-H restart\".";
@@ -699,6 +698,7 @@
 "EPL2 Label Printer" = "EPL2 Label Printer";
 "Edit Configuration File" = "Edit Configuration File";
 "Empty PPD file." = "Empty PPD file.";
+// TRANSLATORS: Banner/cover sheet after the print job.
 "Ending Banner" = "Ending Banner";
 "English" = "English";
 "Enter old password:" = "Enter old password:";
@@ -1035,6 +1035,7 @@
 "Quarto" = "Quarto";
 "Quota limit reached." = "Quota limit reached.";
 "Rank    Owner   Job     File(s)                         Total Size" = "Rank    Owner   Job     File(s)                         Total Size";
+// TRANSLATORS: Pri is job priority.
 "Rank   Owner      Pri  Job        Files                       Total Size" = "Rank   Owner      Pri  Job        Files                       Total Size";
 "Ready to print." = "Ready to print.";
 "Reject Jobs" = "Reject Jobs";
@@ -1070,6 +1071,7 @@
 "Special Paper" = "Special Paper";
 "Spooling job, %.0f%% complete." = "Spooling job, %.0f%% complete.";
 "Standard" = "Standard";
+// TRANSLATORS: Banner/cover sheet before the print job.
 "Starting Banner" = "Starting Banner";
 "Starting page %d." = "Starting page %d.";
 "Statement" = "Statement";
@@ -1137,8 +1139,6 @@
 "There is a paper jam." = "There is a paper jam.";
 "There was an unrecoverable USB error." = "There was an unrecoverable USB error.";
 "Thermal Transfer Media" = "Thermal Transfer Media";
-"This printer does not conform to the IPP standard and may not work." = "This printer does not conform to the IPP standard and may not work.";
-"This printer does not conform to the IPP standard. Please contact the manufacturer of your printer for assistance." = "This printer does not conform to the IPP standard. Please contact the manufacturer of your printer for assistance.";
 "Title: " = "Title: ";
 "Too many active jobs." = "Too many active jobs.";
 "Too many job-sheets values (%d > 2)." = "Too many job-sheets values (%d > 2).";
@@ -1206,6 +1206,7 @@
 "Unable to find printer." = "Unable to find printer.";
 "Unable to fork filter" = "Unable to fork filter";
 "Unable to generate compressed print file" = "Unable to generate compressed print file";
+"Unable to get backend exit status." = "Unable to get backend exit status.";
 "Unable to get class list:" = "Unable to get class list:";
 "Unable to get class status:" = "Unable to get class status:";
 "Unable to get list of printer drivers:" = "Unable to get list of printer drivers:";
@@ -1245,6 +1246,7 @@
 "Unable to set Windows printer driver (%d)." = "Unable to set Windows printer driver (%d).";
 "Unable to set options:" = "Unable to set options:";
 "Unable to set server default:" = "Unable to set server default:";
+"Unable to start backend process." = "Unable to start backend process.";
 "Unable to upload cupsd.conf file:" = "Unable to upload cupsd.conf file:";
 "Unable to use legacy USB class driver." = "Unable to use legacy USB class driver.";
 "Unable to write print data" = "Unable to write print data";
@@ -1371,6 +1373,7 @@
 "lpadmin: Expected interface after \"-i\" option." = "lpadmin: Expected interface after \"-i\" option.";
 "lpadmin: Expected location after \"-L\" option." = "lpadmin: Expected location after \"-L\" option.";
 "lpadmin: Expected model after \"-m\" option." = "lpadmin: Expected model after \"-m\" option.";
+"lpadmin: Expected name after \"-R\" option." = "lpadmin: Expected name after \"-R\" option.";
 "lpadmin: Expected name=value after \"-o\" option." = "lpadmin: Expected name=value after \"-o\" option.";
 "lpadmin: Expected printer after \"-p\" option." = "lpadmin: Expected printer after \"-p\" option.";
 "lpadmin: Expected printer name after \"-d\" option." = "lpadmin: Expected printer name after \"-d\" option.";
@@ -1382,6 +1385,7 @@
 "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first." = "lpadmin: Unable to add a printer to the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to connect to server: %s" = "lpadmin: Unable to connect to server: %s";
 "lpadmin: Unable to create temporary file" = "lpadmin: Unable to create temporary file";
+"lpadmin: Unable to delete option:\n         You must specify a printer name first." = "lpadmin: Unable to delete option:\n         You must specify a printer name first.";
 "lpadmin: Unable to open PPD file \"%s\" - %s" = "lpadmin: Unable to open PPD file \"%s\" - %s";
 "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first." = "lpadmin: Unable to remove a printer from the class:\n         You must specify a printer name first.";
 "lpadmin: Unable to set the printer options:\n         You must specify a printer name first." = "lpadmin: Unable to set the printer options:\n         You must specify a printer name first.";
