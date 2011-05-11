@@ -35,6 +35,7 @@
  */
 
 #include "backend-private.h"
+#include <cups/array-private.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -71,10 +72,14 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
  * Globals...
  */
 
-static const char *auth_info_required = "none";
+static int		num_attr_cache = 0;
+					/* Number of cached attributes */
+static cups_option_t	*attr_cache = NULL;
+					/* Cached attributes */
+static const char 	*auth_info_required;
 					/* New auth-info-required value */
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
-static int	child_pid = 0;		/* Child process ID */
+static int		child_pid = 0;	/* Child process ID */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static const char * const jattrs[] =	/* Job attributes we want */
 {
@@ -83,9 +88,12 @@ static const char * const jattrs[] =	/* Job attributes we want */
   "job-state",
   "job-state-reasons"
 };
-static int	job_canceled = 0;	/* Job cancelled? */
-static char	*password = NULL;	/* Password for device URI */
-static int	password_tries = 0;	/* Password tries */
+static int		job_canceled = 0;
+					/* Job cancelled? */
+static char		*password = NULL;
+					/* Password for device URI */
+static int		password_tries = 0;
+					/* Password tries */
 static const char * const pattrs[] =	/* Printer attributes we want */
 {
   "copies-supported",
@@ -118,7 +126,11 @@ static const char * const remote_job_states[] =
   "cups-remote-aborted",
   "cups-remote-completed"
 };
-static char	tmpfilename[1024] = "";	/* Temporary spool file name */
+static cups_array_t	*state_reasons;	/* Array of printe-state-reasons keywords */
+static _cups_mutex_t	state_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex to control access */
+static char		tmpfilename[1024] = "";
+					/* Temporary spool file name */
 
 
 /*
@@ -151,6 +163,7 @@ static int		run_as_user(int argc, char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static void		sigterm_handler(int sig);
+static void		update_reasons(ipp_attribute_t *attr, const char *s);
 
 
 /*
@@ -209,7 +222,6 @@ main(int  argc,				/* I - Number of command-line args */
   int		job_id;			/* job-id value */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
   ipp_attribute_t *job_state;		/* job-state */
-  int		last_job_state = -1;	/* Last job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
@@ -301,6 +313,11 @@ main(int  argc,				/* I - Number of command-line args */
     if (getenv("CLASS") != NULL)
       return (CUPS_BACKEND_FAILED);
   }
+
+  if ((auth_info_required = getenv("AUTH_INFO_REQUIRED")) == NULL)
+    auth_info_required = "none";
+
+  state_reasons = _cupsArrayNewStrings(getenv("PRINTER_STATE_REASONS"));
 
 #ifdef HAVE_GSSAPI
  /*
@@ -598,7 +615,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   sprintf(portname, "%d", port);
 
-  fputs("STATE: +connecting-to-device\n", stderr);
+  update_reasons(NULL, "+connecting-to-device");
   fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
   while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
@@ -609,7 +626,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (getenv("CLASS") != NULL)
     {
-      fputs("STATE: -connecting-to-device\n", stderr);
+      update_reasons(NULL, "-connecting-to-device");
       return (CUPS_BACKEND_STOP);
     }
   }
@@ -656,7 +673,7 @@ main(int  argc,				/* I - Number of command-line args */
       int error = errno;		/* Connection error */
 
       if (http->status == HTTP_PKI_ERROR)
-	fputs("STATE: +cups-certificate-error\n", stderr);
+	update_reasons(NULL, "+cups-certificate-error");
 
       if (job_canceled)
 	break;
@@ -680,7 +697,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	sleep(5);
 
-	fputs("STATE: -connecting-to-device\n", stderr);
+	update_reasons(NULL, "-connecting-to-device");
 
         return (CUPS_BACKEND_FAILED);
       }
@@ -694,7 +711,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("The printer is not responding."));
-	  fputs("STATE: -connecting-to-device\n", stderr);
+	  update_reasons(NULL, "-connecting-to-device");
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -734,14 +751,14 @@ main(int  argc,				/* I - Number of command-line args */
 	break;
     }
     else
-      fputs("STATE: -cups-certificate-error\n", stderr);
+      update_reasons(NULL, "-cups-certificate-error");
   }
   while (http->fd < 0);
 
   if (job_canceled || !http)
     return (CUPS_BACKEND_FAILED);
 
-  fputs("STATE: -connecting-to-device\n", stderr);
+  update_reasons(NULL, "-connecting-to-device");
   _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
   fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
@@ -804,8 +821,8 @@ main(int  argc,				/* I - Number of command-line args */
     {
       fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
               http->version / 100, http->version % 100);
-      fputs("STATE: +cups-ipp-conformance-failure-report,"
-            "cups-ipp-wrong-http-version\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-wrong-http-version");
     }
 
     supported  = cupsDoRequest(http, request, resource);
@@ -907,8 +924,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  !printer_accepting->values[0].boolean)
         busy = 1;
       else if (!printer_accepting)
-        fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-printer-is-accepting-jobs\n", stderr);
+        update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-printer-is-accepting-jobs");
         
       if ((printer_state = ippFindAttribute(supported,
 					    "printer-state-reasons",
@@ -925,8 +942,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
       }
       else
-        fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-printer-state-reasons\n", stderr);
+        update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-printer-state-reasons");
 
       if (busy)
       {
@@ -994,32 +1011,32 @@ main(int  argc,				/* I - Number of command-line args */
 	  break;
 
       if (i >= operations_sup->num_values)
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-print-job\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-print-job");
 
       for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_CANCEL_JOB)
 	  break;
 
       if (i >= operations_sup->num_values)
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-cancel-job\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-cancel-job");
 
       for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_GET_JOB_ATTRIBUTES)
 	  break;
 
       if (i >= operations_sup->num_values)
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-get-job-attributes\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+                             "cups-ipp-missing-get-job-attributes");
 
       for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_GET_PRINTER_ATTRIBUTES)
 	  break;
 
       if (i >= operations_sup->num_values)
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-get-printer-attributes\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-get-printer-attributes");
 
       for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_VALIDATE_JOB)
@@ -1029,12 +1046,12 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
       if (!validate_job)
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-              "cups-ipp-missing-validate-job\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+                             "cups-ipp-missing-validate-job");
     }
     else
-      fputs("STATE: +cups-ipp-conformance-failure-report,"
-	    "cups-ipp-missing-operations-supported\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-operations-supported");
 
     doc_handling_sup = ippFindAttribute(supported,
 					"multiple-document-handling-supported",
@@ -1257,8 +1274,8 @@ main(int  argc,				/* I - Number of command-line args */
       * This is all too common...
       */
 
-      fputs("STATE: +cups-ipp-conformance-failure-report,"
-	    "cups-ipp-missing-validate-job\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-validate-job");
       break;
     }
     else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
@@ -1431,8 +1448,8 @@ main(int  argc,				/* I - Number of command-line args */
     {
       _cupsLangPrintFilter(stderr, "INFO",
 			   _("Print file accepted - job ID unknown."));
-      fputs("STATE: +cups-ipp-conformance-failure-report,"
-            "cups-ipp-missing-job-id\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-job-id");
       job_id = 0;
     }
     else
@@ -1584,8 +1601,8 @@ main(int  argc,				/* I - Number of command-line args */
         * Job has gone away and/or the server has no job history...
 	*/
 
-	fputs("STATE: +cups-ipp-conformance-failure-report,"
-	      "cups-ipp-missing-job-history\n", stderr);
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-job-history");
         ippDelete(response);
 
 	ipp_status = IPP_OK;
@@ -1617,25 +1634,12 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Reflect the remote job state in the local queue...
 	  */
 
-	  if (cups_version && last_job_state != job_state->values[0].integer)
-	  {
-	    int new_job_state = job_state->values[0].integer;
-					/* New job-state value */
-
-	    if (last_job_state < IPP_JOB_PENDING ||
-	        last_job_state > IPP_JOB_COMPLETED)
-	      last_job_state = IPP_JOB_PENDING;
-
-	    if (new_job_state < IPP_JOB_PENDING ||
-	        new_job_state > IPP_JOB_COMPLETED)
-	      new_job_state = IPP_JOB_PENDING;
-
-	    fprintf(stderr, "STATE: -%s\nSTATE: +%s\n",
-		    remote_job_states[last_job_state - IPP_JOB_PENDING],
-		    remote_job_states[new_job_state - IPP_JOB_PENDING]);
-
-            last_job_state = new_job_state;
-	  }
+	  if (cups_version &&
+	      job_state->values[0].integer >= IPP_JOB_PENDING &&
+	      job_state->values[0].integer <= IPP_JOB_COMPLETED)
+	    update_reasons(NULL,
+	                   remote_job_states[job_state->values[0].integer -
+			                     IPP_JOB_PENDING]);
 
 	  if ((job_sheets = ippFindAttribute(response,
 					     "job-media-sheets-completed",
@@ -1666,8 +1670,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  * the job...
 	  */
 
-	  fputs("STATE: +cups-ipp-conformance-failure-report,"
-		"cups-ipp-missing-job-state\n", stderr);
+	  update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			       "cups-ipp-missing-job-state");
 	  ipp_status = IPP_INTERNAL_ERROR;
 	  break;
 	}
@@ -2341,10 +2345,11 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 static void
 report_attr(ipp_attribute_t *attr)	/* I - Attribute */
 {
-  int	i;				/* Looping var */
-  char	value[1024],			/* Value string */
-	*valptr,			/* Pointer into value string */
-	*attrptr;			/* Pointer into attribute value */
+  int		i;			/* Looping var */
+  char		value[1024],		/* Value string */
+		*valptr,		/* Pointer into value string */
+		*attrptr;		/* Pointer into attribute value */
+  const char	*cached;		/* Cached attribute */
 
 
  /*
@@ -2394,11 +2399,17 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
 
   *valptr = '\0';
 
- /*
-  * Tell the scheduler about the new values...
-  */
+  if ((cached = cupsGetOption(attr->name, num_attr_cache,
+                              attr_cache)) == NULL || strcmp(cached, value))
+  {
+   /*
+    * Tell the scheduler about the new values...
+    */
 
-  fprintf(stderr, "ATTR: %s=%s\n", attr->name, value);
+    num_attr_cache = cupsAddOption(attr->name, value, num_attr_cache,
+                                   &attr_cache);
+    fprintf(stderr, "ATTR: %s=%s\n", attr->name, value);
+  }
 }
 
 
@@ -2410,15 +2421,12 @@ static int				/* O - Number of reasons shown */
 report_printer_state(ipp_t *ipp,	/* I - IPP response */
                      int   job_id)	/* I - Current job ID */
 {
-  int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
   ipp_attribute_t	*pa,		/* printer-alert */
 			*pam,		/* printer-alert-message */
 			*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
-  const char		*reason;	/* Current reason */
-  const char		*prefix;	/* Prefix for STATE: line */
   char			value[1024],	/* State/message string */
 			*valptr;	/* Pointer into string */
   static int		ipp_supplies = -1;
@@ -2476,33 +2484,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  value[0] = '\0';
-  prefix   = "STATE: ";
-
-  for (i = 0, count = 0, valptr = value; i < reasons->num_values; i ++)
-  {
-    reason = reasons->values[i].string.text;
-
-    if (strcmp(reason, "none") &&
-	strcmp(reason, "none-report") &&
-	strcmp(reason, "paused") &&
-	strcmp(reason, "com.apple.print.recoverable-warning"))
-    {
-      strlcpy(valptr, prefix, sizeof(value) - (valptr - value) - 1);
-      valptr += strlen(valptr);
-      strlcpy(valptr, reason, sizeof(value) - (valptr - value) - 1);
-      valptr += strlen(valptr);
-
-      prefix  = ",";
-    }
-  }
-
-  if (value[0])
-  {
-    *valptr++ = '\n';
-    *valptr   = '\0';
-    fputs(value, stderr);
-  }
+  update_reasons(reasons, NULL);
 
  /*
   * Relay the current marker-* attribute values...
@@ -2769,7 +2751,7 @@ sigterm_handler(int sig)		/* I - Signal */
 
  /*
   * The scheduler already tried to cancel us once, now just terminate
-  * after removing our temp files!
+  * after removing our temp file!
   */
 
   if (tmpfilename[0])
@@ -2778,6 +2760,202 @@ sigterm_handler(int sig)		/* I - Signal */
   exit(1);
 }
 
+
+/*
+ * 'update_reasons()' - Update the printer-state-reasons values.
+ */
+
+static void
+update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
+               const char      *s)	/* I - STATE: string or NULL */
+{
+  char		op;			/* Add (+), remove (-), replace (\0) */
+  cups_array_t	*new_reasons;		/* New reasons array */
+  char		*reason,		/* Current reason */
+		add[2048],		/* Reasons added string */
+		*addptr,		/* Pointer into add string */
+		rem[2048],		/* Reasons removed string */
+		*remptr;		/* Pointer into remove string */
+  const char	*addprefix,		/* Current add string prefix */
+		*remprefix;		/* Current remove string prefix */
+
+
+  fprintf(stderr, "DEBUG: update_reasons(attr=%d(%s%s), s=\"%s\")\n",
+	  attr ? attr->num_values : 0, attr ? attr->values[0].string.text : "",
+	  attr && attr->num_values > 1 ? ",..." : "", s ? s : "(null)");
+
+ /*
+  * Create an array of new reason keyword strings...
+  */
+
+  if (attr)
+  {
+    int	i;				/* Looping var */
+
+    new_reasons = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+    op          = '\0';
+
+    for (i = 0; i < attr->num_values; i ++)
+    {
+      reason = attr->values[i].string.text;
+
+      if (strcmp(reason, "none") &&
+	  strcmp(reason, "none-report") &&
+	  strcmp(reason, "paused") &&
+	  strcmp(reason, "com.apple.print.recoverable-warning") &&
+	  strncmp(reason, "cups-", 5))
+	cupsArrayAdd(new_reasons, reason);
+    }
+  }
+  else if (s)
+  {
+    if (*s == '+' || *s == '-')
+      op = *s++;
+    else
+      op = '\0';
+
+    new_reasons = _cupsArrayNewStrings(s);
+  }
+  else
+    return;
+
+ /*
+  * Compute the changes...
+  */
+
+  add[0]    = '\0';
+  addprefix = "STATE: +";
+  addptr    = add;
+  rem[0]    = '\0';
+  remprefix = "STATE: -";
+  remptr    = rem;
+
+  fprintf(stderr, "DEBUG2: op='%c', new_reasons=%d, state_reasons=%d\n",
+          op ? op : ' ', cupsArrayCount(new_reasons),
+	  cupsArrayCount(state_reasons));
+
+  _cupsMutexLock(&state_mutex);
+
+  if (op == '+')
+  {
+   /*
+    * Add reasons...
+    */
+
+    for (reason = (char *)cupsArrayFirst(new_reasons);
+	 reason;
+	 reason = (char *)cupsArrayNext(new_reasons))
+    {
+      if (!cupsArrayFind(state_reasons, reason))
+      {
+        if (!strncmp(reason, "cups-remote-", 12))
+	{
+	 /*
+	  * If we are setting cups-remote-xxx, remove all other cups-remote-xxx
+	  * keywords...
+	  */
+
+	  char	*temp;		/* Current reason in state_reasons */
+
+	  cupsArraySave(state_reasons);
+
+	  for (temp = (char *)cupsArrayFirst(state_reasons);
+	       temp;
+	       temp = (char *)cupsArrayNext(state_reasons))
+	    if (!strncmp(temp, "cups-remote-", 12))
+	    {
+	      snprintf(remptr, sizeof(rem) - (remptr - rem), "%s%s", remprefix,
+	               temp);
+	      remptr    += strlen(remptr);
+	      remprefix = ",";
+
+	      cupsArrayRemove(state_reasons, temp);
+	      break;
+	    }
+
+	  cupsArrayRestore(state_reasons);
+	}
+
+        cupsArrayAdd(state_reasons, reason);
+
+        snprintf(addptr, sizeof(add) - (addptr - add), "%s%s", addprefix,
+	         reason);
+	addptr    += strlen(addptr);
+	addprefix = ",";
+      }
+    }
+  }
+  else if (op == '-')
+  {
+   /*
+    * Remove reasons...
+    */
+
+    for (reason = (char *)cupsArrayFirst(new_reasons);
+	 reason;
+	 reason = (char *)cupsArrayNext(new_reasons))
+    {
+      if (cupsArrayFind(state_reasons, reason))
+      {
+	snprintf(remptr, sizeof(rem) - (remptr - rem), "%s%s", remprefix,
+		 reason);
+	remptr    += strlen(remptr);
+	remprefix = ",";
+
+        cupsArrayRemove(state_reasons, reason);
+      }
+    }
+  }
+  else
+  {
+   /*
+    * Replace reasons...
+    */
+
+    for (reason = (char *)cupsArrayFirst(state_reasons);
+	 reason;
+	 reason = (char *)cupsArrayNext(state_reasons))
+    {
+      if (strncmp(reason, "cups-", 5) && !cupsArrayFind(new_reasons, reason))
+      {
+	snprintf(remptr, sizeof(rem) - (remptr - rem), "%s%s", remprefix,
+		 reason);
+	remptr    += strlen(remptr);
+	remprefix = ",";
+
+        cupsArrayRemove(state_reasons, reason);
+      }
+    }
+
+    for (reason = (char *)cupsArrayFirst(new_reasons);
+	 reason;
+	 reason = (char *)cupsArrayNext(new_reasons))
+    {
+      if (!cupsArrayFind(state_reasons, reason))
+      {
+        cupsArrayAdd(state_reasons, reason);
+
+        snprintf(addptr, sizeof(add) - (addptr - add), "%s%s", addprefix,
+	         reason);
+	addptr    += strlen(addptr);
+	addprefix = ",";
+      }
+    }
+  }
+
+  _cupsMutexUnlock(&state_mutex);
+
+ /*
+  * Report changes and return...
+  */
+
+  if (add[0] && rem[0])
+    fprintf(stderr, "%s\n%s\n", add, rem);
+  else if (add[0])
+    fprintf(stderr, "%s\n", add);
+  else if (rem[0])
+    fprintf(stderr, "%s\n", rem);
+}
 
 /*
  * End of "$Id$".

@@ -214,7 +214,6 @@
 		278C58D9136B645C00836530 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A4C1336F31B004BB496 /* libcups_static.a */; };
 		278C58DE136B645C00836530 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DA136B645C00836530 /* CoreFoundation.framework */; };
 		278C58DF136B645C00836530 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DB136B645C00836530 /* Kerberos.framework */; };
-		278C58E0136B645C00836530 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DC136B645C00836530 /* libresolv.dylib */; };
 		278C58E1136B645C00836530 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58DD136B645C00836530 /* SystemConfiguration.framework */; };
 		278C58E3136B647200836530 /* testhttp.c in Sources */ = {isa = PBXBuildFile; fileRef = 278C58E2136B647200836530 /* testhttp.c */; };
 		278C58E4136B649200836530 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A4C1336F31B004BB496 /* libcups_static.a */; };
@@ -222,12 +221,7 @@
 		278C58EA136B64B000836530 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
 		278C58EB136B64B000836530 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
 		278C58EC136B64B000836530 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E8136B64B000836530 /* SystemConfiguration.framework */; };
-		278C58EF136B64C400836530 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58ED136B64C300836530 /* libresolv.dylib */; };
-		278C58F0136B64C400836530 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58EE136B64C400836530 /* libz.dylib */; };
-		278C58F2136B64FE00836530 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F1136B64FD00836530 /* libiconv.dylib */; };
-		278C58F5136B652300836530 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F3136B652300836530 /* libiconv.dylib */; };
 		278C58F6136B652300836530 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F4136B652300836530 /* Security.framework */; };
-		278C58F8136B653800836530 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58F7136B653800836530 /* libz.dylib */; };
 		720DD6CD1358FD720064AA82 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		720DD6D31358FDDE0064AA82 /* snmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 720DD6D21358FDDE0064AA82 /* snmp.c */; };
 		720DD6D413590AB90064AA82 /* ieee1284.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379CA1334000E009631B9 /* ieee1284.c */; };
@@ -1210,19 +1204,13 @@
 		278C58CB136B640300836530 /* testhttp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testhttp; sourceTree = BUILT_PRODUCTS_DIR; };
 		278C58DA136B645C00836530 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		278C58DB136B645C00836530 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Kerberos.framework; sourceTree = DEVELOPER_DIR; };
-		278C58DC136B645C00836530 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libresolv.dylib; sourceTree = DEVELOPER_DIR; };
 		278C58DD136B645C00836530 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		278C58E2136B647200836530 /* testhttp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testhttp.c; path = ../cups/testhttp.c; sourceTree = "<group>"; };
-		278C58E5136B64AF00836530 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = ../../../../../System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<group>"; };
-		278C58E6136B64B000836530 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = ../../../../../System/Library/Frameworks/Kerberos.framework; sourceTree = "<group>"; };
-		278C58E7136B64B000836530 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
-		278C58E8136B64B000836530 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = ../../../../../System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<group>"; };
-		278C58ED136B64C300836530 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = ../../../../../usr/lib/libresolv.dylib; sourceTree = "<group>"; };
-		278C58EE136B64C400836530 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = ../../../../../usr/lib/libz.dylib; sourceTree = "<group>"; };
-		278C58F1136B64FD00836530 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = ../../../../../usr/lib/libiconv.dylib; sourceTree = "<group>"; };
-		278C58F3136B652300836530 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libiconv.dylib; sourceTree = DEVELOPER_DIR; };
+		278C58E5136B64AF00836530 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
+		278C58E6136B64B000836530 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = /System/Library/Frameworks/Kerberos.framework; sourceTree = "<absolute>"; };
+		278C58E7136B64B000836530 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		278C58E8136B64B000836530 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		278C58F4136B652300836530 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
-		278C58F7136B653800836530 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		27D3037C134148CB00F022B1 /* libcups_s.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; name = libcups_s.exp; path = ../cups/libcups_s.exp; sourceTree = "<group>"; };
 		27D3037D134148CB00F022B1 /* libcups2.def */ = {isa = PBXFileReference; lastKnownFileType = text; name = libcups2.def; path = ../cups/libcups2.def; sourceTree = "<group>"; };
 		720DD6C21358FD5F0064AA82 /* snmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snmp; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1442,9 +1430,6 @@
 				278C58EC136B64B000836530 /* SystemConfiguration.framework in Frameworks */,
 				270CCDB9135E3D0900007BE2 /* libcups_static.a in Frameworks */,
 				270CCDBA135E3D0900007BE2 /* libcupsmime.dylib in Frameworks */,
-				278C58F2136B64FE00836530 /* libiconv.dylib in Frameworks */,
-				278C58EF136B64C400836530 /* libresolv.dylib in Frameworks */,
-				278C58F0136B64C400836530 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1612,9 +1597,6 @@
 				278C58F6136B652300836530 /* Security.framework in Frameworks */,
 				278C58E1136B645C00836530 /* SystemConfiguration.framework in Frameworks */,
 				278C58D9136B645C00836530 /* libcups_static.a in Frameworks */,
-				278C58F5136B652300836530 /* libiconv.dylib in Frameworks */,
-				278C58E0136B645C00836530 /* libresolv.dylib in Frameworks */,
-				278C58F8136B653800836530 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2025,6 +2007,14 @@
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				278C58F4136B652300836530 /* Security.framework */,
+				278C58E5136B64AF00836530 /* CoreFoundation.framework */,
+				278C58E6136B64B000836530 /* Kerberos.framework */,
+				278C58E7136B64B000836530 /* Security.framework */,
+				278C58E8136B64B000836530 /* SystemConfiguration.framework */,
+				278C58DA136B645C00836530 /* CoreFoundation.framework */,
+				278C58DB136B645C00836530 /* Kerberos.framework */,
+				278C58DD136B645C00836530 /* SystemConfiguration.framework */,
 				72220FAC13330B2200FCA411 /* libcupsmime.dylib */,
 				72220EAE1333047D00FCA411 /* libcups.dylib */,
 				72F75A611336F9A3004BB496 /* libcupsimage.dylib */,
@@ -2131,21 +2121,7 @@
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
-				278C58F7136B653800836530 /* libz.dylib */,
-				278C58F3136B652300836530 /* libiconv.dylib */,
-				278C58F4136B652300836530 /* Security.framework */,
-				278C58F1136B64FD00836530 /* libiconv.dylib */,
-				278C58ED136B64C300836530 /* libresolv.dylib */,
-				278C58EE136B64C400836530 /* libz.dylib */,
-				278C58E5136B64AF00836530 /* CoreFoundation.framework */,
-				278C58E6136B64B000836530 /* Kerberos.framework */,
-				278C58E7136B64B000836530 /* Security.framework */,
-				278C58E8136B64B000836530 /* SystemConfiguration.framework */,
 				72F75A4C1336F31B004BB496 /* libcups_static.a */,
-				278C58DA136B645C00836530 /* CoreFoundation.framework */,
-				278C58DB136B645C00836530 /* Kerberos.framework */,
-				278C58DC136B645C00836530 /* libresolv.dylib */,
-				278C58DD136B645C00836530 /* SystemConfiguration.framework */,
 				72220FB113330B4A00FCA411 /* Frameworks */,
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
