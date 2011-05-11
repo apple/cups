@@ -157,7 +157,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     ipp_attribute_t *doc_handling_sup);
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
-static int		report_printer_state(ipp_t *ipp, int job_id);
+static void		report_printer_state(ipp_t *ipp, int job_id);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
 static int		run_as_user(int argc, char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
@@ -2421,11 +2421,10 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
  * 'report_printer_state()' - Report the printer state.
  */
 
-static int				/* O - Number of reasons shown */
+static void
 report_printer_state(ipp_t *ipp,	/* I - IPP response */
                      int   job_id)	/* I - Current job ID */
 {
-  int			count;		/* Count of reasons shown... */
   ipp_attribute_t	*pa,		/* printer-alert */
 			*pam,		/* printer-alert-message */
 			*psm,		/* printer-state-message */
@@ -2486,7 +2485,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 
   if ((reasons = ippFindAttribute(ipp, "printer-state-reasons",
                                   IPP_TAG_KEYWORD)) == NULL)
-    return (0);
+    return;
 
   update_reasons(reasons, NULL);
 
@@ -2531,8 +2530,6 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
                                    IPP_TAG_KEYWORD)) != NULL)
       report_attr(marker);
   }
-
-  return (count);
 }
 
 
