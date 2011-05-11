@@ -1558,16 +1558,25 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   snprintf(jobfile, sizeof(jobfile), "%s/c%05d", RequestRoot, job->id);
   if ((fp = cupsFileOpen(jobfile, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to open job control file \"%s\" - %s!",
-		    job->id, jobfile, strerror(errno));
-    goto error;
+    char newfile[1024];			/* New job filename */
+
+    snprintf(newfile, sizeof(newfile), "%s/c%05d.N", RequestRoot, job->id);
+    if ((fp = cupsFileOpen(newfile, "r")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "[Job %d] Unable to open job control file \"%s\": %s",
+		      job->id, jobfile, strerror(errno));
+      goto error;
+    }
+
+    unlink(jobfile);
+    rename(newfile, jobfile);
   }
 
   if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL, job->attrs) != IPP_DATA)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to read job control file \"%s\"!", job->id,
+		    "[Job %d] Unable to read job control file \"%s\".", job->id,
 		    jobfile);
     cupsFileClose(fp);
     goto error;
@@ -2013,7 +2022,8 @@ cupsdSaveAllJobs(void)
 void
 cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 {
-  char		filename[1024];		/* Job control filename */
+  char		filename[1024],		/* Job control filename */
+		newfile[1024];		/* New job control filename */
   cups_file_t	*fp;			/* Job file */
 
 
@@ -2021,12 +2031,13 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
                   job, job->id, job->attrs);
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, job->id);
+  snprintf(newfile, sizeof(newfile), "%s/c%05d.N", RequestRoot, job->id);
 
-  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+  if ((fp = cupsFileOpen(newfile, "w")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to create job control file \"%s\" - %s.",
-		    job->id, filename, strerror(errno));
+		    "[Job %d] Unable to create job control file \"%s\": %s",
+		    job->id, newfile, strerror(errno));
     return;
   }
 
@@ -2037,12 +2048,28 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 
   if (ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL,
                  job->attrs) != IPP_DATA)
+  {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "[Job %d] Unable to write job control file!", job->id);
+                    "[Job %d] Unable to write job control file.", job->id);
+    cupsFileClose(fp);
+    unlink(newfile);
+    return;
+  }
 
-  cupsFileClose(fp);
-
-  job->dirty = 0;
+  if (cupsFileClose(fp))
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Unable to close job control file: %s",
+		    job->id, strerror(errno));
+  else
+  {
+    unlink(filename);
+    if (rename(newfile, filename))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "[Job %d] Unable to finalize job control file: %s",
+		      job->id, strerror(errno));
+    else
+      job->dirty = 0;
+  }
 }
 
 
@@ -3692,9 +3719,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       snprintf(jobfile, sizeof(jobfile), "%s/c%05d", RequestRoot, jobid);
       if (access(jobfile, 0))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away!",
-	                jobid);
-        continue;
+	snprintf(jobfile, sizeof(jobfile), "%s/c%05d.N", RequestRoot, jobid);
+	if (access(jobfile, 0))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away!",
+			  jobid);
+	  continue;
+	}
       }
 
       job = calloc(1, sizeof(cupsd_job_t));
