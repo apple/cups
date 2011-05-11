@@ -18,14 +18,11 @@
  *   cupsdAddString()      - Copy and add a string to an array.
  *   cupsdCheckProcess()   - Tell the main loop to check for dead children.
  *   cupsdClearString()    - Clear a string.
- *   cupsdClosePipe()      - Close a pipe as necessary.
  *   cupsdFreeStrings()    - Free an array of strings.
  *   cupsdHoldSignals()    - Hold child and termination signals.
- *   cupsdOpenPipe()       - Create a pipe which is closed on exec.
  *   cupsdReleaseSignals() - Release signals for delivery.
  *   cupsdSetString()      - Set a string value.
  *   cupsdSetStringf()     - Set a formatted string value.
- *   cupsd_clean_files()   - Clean out old files.
  *   launchd_checkin()     - Check-in with launchd and collect the listening
  *                           fds.
  *   launchd_checkout()    - Update the launchd KeepAlive file as needed.
@@ -48,8 +45,6 @@
 #include <sys/resource.h>
 #include <syslog.h>
 #include <grp.h>
-#include <cups/dir.h>
-#include <fnmatch.h>
 
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
@@ -79,8 +74,6 @@
  * Local functions...
  */
 
-static void		cupsd_clean_files(const char *path,
-			                  const char *pattern);
 #ifdef HAVE_LAUNCHD
 static void		launchd_checkin(void);
 static void		launchd_checkout(void);
@@ -510,9 +503,9 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
-    cupsd_clean_files(TempDir, NULL);
+    cupsdCleanFiles(TempDir, NULL);
 
-  cupsd_clean_files(CacheDir, "*.ipp");
+  cupsdCleanFiles(CacheDir, "*.ipp");
 
 #if HAVE_LAUNCHD
   if (Launchd)
@@ -1232,31 +1225,6 @@ cupsdClearString(char **s)		/* O - String value */
 
 
 /*
- * 'cupsdClosePipe()' - Close a pipe as necessary.
- */
-
-void
-cupsdClosePipe(int *fds)		/* I - Pipe file descriptors (2) */
-{
- /*
-  * Close file descriptors as needed...
-  */
-
-  if (fds[0] >= 0)
-  {
-    close(fds[0]);
-    fds[0] = -1;
-  }
-
-  if (fds[1] >= 0)
-  {
-    close(fds[1]);
-    fds[1] = -1;
-  }
-}
-
-
-/*
  * 'cupsdFreeStrings()' - Free an array of strings.
  */
 
@@ -1296,59 +1264,6 @@ cupsdHoldSignals(void)
   sigaddset(&newmask, SIGCHLD);
   sigprocmask(SIG_BLOCK, &newmask, &holdmask);
 #endif /* HAVE_SIGSET */
-}
-
-
-/*
- * 'cupsdOpenPipe()' - Create a pipe which is closed on exec.
- */
-
-int					/* O - 0 on success, -1 on error */
-cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
-{
- /*
-  * Create the pipe...
-  */
-
-  if (pipe(fds))
-  {
-    fds[0] = -1;
-    fds[1] = -1;
-
-    return (-1);
-  }
-
- /*
-  * Set the "close on exec" flag on each end of the pipe...
-  */
-
-  if (fcntl(fds[0], F_SETFD, fcntl(fds[0], F_GETFD) | FD_CLOEXEC))
-  {
-    close(fds[0]);
-    close(fds[1]);
-
-    fds[0] = -1;
-    fds[1] = -1;
-
-    return (-1);
-  }
-
-  if (fcntl(fds[1], F_SETFD, fcntl(fds[1], F_GETFD) | FD_CLOEXEC))
-  {
-    close(fds[0]);
-    close(fds[1]);
-
-    fds[0] = -1;
-    fds[1] = -1;
-
-    return (-1);
-  }
-
- /*
-  * Return 0 indicating success...
-  */
-
-  return (0);
 }
 
 
@@ -1425,60 +1340,6 @@ cupsdSetStringf(char       **s,		/* O - New string */
 
   if (olds)
     _cupsStrFree(olds);
-}
-
-
-/*
- * 'cupsd_clean_files()' - Clean out old files.
- */
- 
-static void
-cupsd_clean_files(const char *path,	/* I - Directory to clean */
-                  const char *pattern)	/* I - Filename pattern or NULL */
-{
-  cups_dir_t	*dir;			/* Directory */
-  cups_dentry_t	*dent;			/* Directory entry */
-  char		filename[1024];		/* Filename */
-  int		status;			/* Status from unlink/rmdir */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "cupsd_clean_files(path=\"%s\", pattern=\"%s\")", path,
-		  pattern ? pattern : "(null)");
-
-  if ((dir = cupsDirOpen(path)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open directory \"%s\" - %s",
-		    path, strerror(errno));
-    return;
-  }
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "Cleaning out old files in \"%s\"...", path);
-
-  while ((dent = cupsDirRead(dir)) != NULL)
-  {
-    if (pattern && fnmatch(pattern, dent->filename, 0))
-      continue;
-
-    snprintf(filename, sizeof(filename), "%s/%s", path, dent->filename);
-
-    if (S_ISDIR(dent->fileinfo.st_mode))
-    {
-      cupsd_clean_files(filename, pattern);
-
-      status = rmdir(filename);
-    }
-    else
-      status = unlink(filename);
-
-    if (status)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to remove \"%s\" - %s", filename,
-		      strerror(errno));
-    else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Removed \"%s\"...", filename);
-  }
-
-  cupsDirClose(dir);
 }
 
 

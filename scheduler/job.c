@@ -1311,7 +1311,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
 
     snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	     job->id);
-    unlink(filename);
+    if (Classification)
+      cupsdRemoveFile(filename);
+    else
+      unlink(filename);
   }
 
   cupsdClearString(&job->username);
@@ -1330,7 +1333,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
     {
       snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 	       job->id, job->num_files);
-      unlink(filename);
+      if (Classification)
+	cupsdRemoveFile(filename);
+      else
+	unlink(filename);
 
       job->num_files --;
     }
@@ -1830,7 +1836,10 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   job->num_files = 0;
 
-  unlink(jobfile);
+  if (Classification)
+    cupsdRemoveFile(jobfile);
+  else
+    unlink(jobfile);
 
   return (0);
 }
@@ -1945,30 +1954,19 @@ void
 cupsdSaveAllJobs(void)
 {
   int		i;			/* Looping var */
-  cups_file_t	*fp;			/* Job cache file */
-  char		temp[1024];		/* Temporary string */
+  cups_file_t	*fp;			/* job.cache file */
+  char		filename[1024],		/* job.cache filename */
+		temp[1024];		/* Temporary string */
   cupsd_job_t	*job;			/* Current job */
   time_t	curtime;		/* Current time */
   struct tm	*curdate;		/* Current date */
 
 
-  snprintf(temp, sizeof(temp), "%s/job.cache", CacheDir);
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create job cache file \"%s\" - %s",
-                    temp, strerror(errno));
+  snprintf(filename, sizeof(filename), "%s/job.cache", CacheDir);
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
-  }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job cache file \"%s\"...", temp);
-
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...", filename);
 
  /*
   * Write a small header to the file...
@@ -2004,7 +2002,7 @@ cupsdSaveAllJobs(void)
     cupsFilePuts(fp, "</Job>\n");
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 
@@ -2468,7 +2466,10 @@ cupsdSetJobState(
 	  {
 	    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 		     job->id, i);
-	    unlink(filename);
+	    if (Classification)
+	      cupsdRemoveFile(filename);
+	    else
+	      unlink(filename);
 	  }
 
 	  if (job->num_files > 0)
@@ -3641,15 +3642,9 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
   * Open the job.cache file...
   */
 
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  if ((fp = cupsdOpenConfFile(filename)) == NULL)
   {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to open job cache file \"%s\": %s",
-                      filename, strerror(errno));
-
     load_request_root();
-
     return;
   }
 

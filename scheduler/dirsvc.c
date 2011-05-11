@@ -330,7 +330,7 @@ cupsdLoadRemoteCache(void)
   */
 
   snprintf(line, sizeof(line), "%s/remote.cache", CacheDir);
-  if ((fp = cupsFileOpen(line, "r")) == NULL)
+  if ((fp = cupsdOpenConfFile(line)) == NULL)
     return;
 
  /*
@@ -734,8 +734,9 @@ void
 cupsdSaveRemoteCache(void)
 {
   int			i;		/* Looping var */
-  cups_file_t		*fp;		/* printers.conf file */
-  char			temp[1024],	/* Temporary string */
+  cups_file_t		*fp;		/* remote.cache file */
+  char			filename[1024],	/* remote.cache filename */
+			temp[1024],	/* Temporary string */
 			value[2048],	/* Value string */
 			*name;		/* Current user name */
   cupsd_printer_t	*printer;	/* Current printer class */
@@ -748,23 +749,12 @@ cupsdSaveRemoteCache(void)
   * Create the remote.cache file...
   */
 
-  snprintf(temp, sizeof(temp), "%s/remote.cache", CacheDir);
+  snprintf(filename, sizeof(filename), "%s/remote.cache", CacheDir);
 
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to save remote.cache - %s", strerror(errno));
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Saving remote.cache...");
 
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Saving remote.cache...");
 
  /*
   * Write a small header to the file...
@@ -859,7 +849,7 @@ cupsdSaveRemoteCache(void)
       cupsFilePuts(fp, "</Printer>\n");
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 
