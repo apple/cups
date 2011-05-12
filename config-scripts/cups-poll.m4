@@ -1,9 +1,9 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Select/poll stuff for the Common UNIX Printing System (CUPS).
+dnl   Select/poll stuff for CUPS.
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

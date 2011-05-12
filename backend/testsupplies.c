@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   SNMP supplies test program for the Common UNIX Printing System (CUPS).
+ *   SNMP supplies test program for CUPS.
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright

@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   Locale file makefile for the Common UNIX Printing System (CUPS).
+#   Locale file makefile for CUPS.
 #
 #   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
@@ -210,7 +210,7 @@ translate:	translate.o ../cups/$(LIBCUPSSTATIC)
 #
 # Dependencies...
 #
-  
+
 include Dependencies
 
 
