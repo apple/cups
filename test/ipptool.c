@@ -714,6 +714,29 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
       continue;
     }
+    else if (!strcmp(token, "DEFINE-DEFAULT"))
+    {
+     /*
+      * DEFINE-DEFAULT name value
+      */
+
+      if (get_token(fp, attr, sizeof(attr), &linenum) &&
+          get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        expand_variables(vars, token, temp, sizeof(token));
+	if (!get_variable(vars, attr))
+	  set_variable(vars, attr, token);
+      }
+      else
+      {
+        print_fatal_error("Missing DEFINE-DEFAULT name and/or value on line "
+	                  "%d.", linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      continue;
+    }
     else if (!strcmp(token, "IGNORE-ERRORS"))
     {
      /*
@@ -767,6 +790,76 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       show_header = 1;
       continue;
     }
+    else if (!strcmp(token, "INCLUDE-IF-DEFINED"))
+    {
+     /*
+      * INCLUDE-IF-DEFINED name "filename"
+      * INCLUDE-IF-DEFINED name <filename>
+      */
+
+      if (get_token(fp, attr, sizeof(attr), &linenum) &&
+          get_token(fp, temp, sizeof(temp), &linenum))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        if (get_variable(vars, attr) &&
+	    !do_tests(vars, get_filename(testfile, filename, temp,
+	                                 sizeof(filename))))
+	{
+	  pass = 0;
+
+	  if (!IgnoreErrors)
+	    goto test_exit;
+	}
+      }
+      else
+      {
+        print_fatal_error("Missing INCLUDE-IF-DEFINED name or filename on line "
+	                  "%d.", linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      show_header = 1;
+      continue;
+    }
+    else if (!strcmp(token, "INCLUDE-IF-NOT-DEFINED"))
+    {
+     /*
+      * INCLUDE-IF-NOT-DEFINED name "filename"
+      * INCLUDE-IF-NOT-DEFINED name <filename>
+      */
+
+      if (get_token(fp, attr, sizeof(attr), &linenum) &&
+          get_token(fp, temp, sizeof(temp), &linenum))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        if (!get_variable(vars, attr) &&
+	    !do_tests(vars, get_filename(testfile, filename, temp,
+	                                 sizeof(filename))))
+	{
+	  pass = 0;
+
+	  if (!IgnoreErrors)
+	    goto test_exit;
+	}
+      }
+      else
+      {
+        print_fatal_error("Missing INCLUDE-IF-NOT-DEFINED name or filename on "
+	                  "line %d.", linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      show_header = 1;
+      continue;
+    }
     else if (!strcmp(token, "SKIP-IF-DEFINED"))
     {
      /*
@@ -780,7 +873,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
       else
       {
-        print_fatal_error("Missing SKIP-IF-DEFINED value on line %d.", linenum);
+        print_fatal_error("Missing SKIP-IF-DEFINED variable on line %d.",
+	                  linenum);
 	pass = 0;
 	goto test_exit;
       }
@@ -798,7 +892,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
       else
       {
-        print_fatal_error("Missing SKIP-IF-NOT-DEFINED value on line %d.",
+        print_fatal_error("Missing SKIP-IF-NOT-DEFINED variable on line %d.",
 	                  linenum);
 	pass = 0;
 	goto test_exit;

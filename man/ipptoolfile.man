@@ -3,7 +3,7 @@
 .\"
 .\"   ipptoolfile man page for CUPS.
 .\"
-.\"   Copyright 2010 by Apple Inc.
+.\"   Copyright 2010-2011 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "6 August 2010" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "11 May 2011" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -74,6 +74,10 @@ DEFINE variable-name value
 Defines the named variable to the given value. This is equivalent to specifying
 "-d variable-name=value" on the \fIipptool\fR command-line.
 .TP 5
+DEFINE-DEFAULT variable-name value
+Defines the named variable to the given value if it does not already have a
+value.
+.TP 5
 IGNORE-ERRORS yes
 .TP 5
 IGNORE-ERRORS no
@@ -86,6 +90,20 @@ INCLUDE <filename>
 Includes another test file. The first form includes a file relative to the
 current test file, while the second form includes a file from the \fIipptool\fR
 include directory.
+.TP 5
+INCLUDE-IF-DEFINED name "filename"
+.TP 5
+INCLUDE-IF-DEFINED name <filename>
+Includes another test file if the named variable is defined. The first form
+includes a file relative to the current test file, while the second form
+includes a file from the \fIipptool\fR include directory.
+.TP 5
+INCLUDE-IF-NOT-DEFINED name "filename"
+.TP 5
+INCLUDE-IF-NOT-DEFINED name <filename>
+Includes another test file if the named variable is not defined. The first form
+includes a file relative to the current test file, while the second form
+includes a file from the \fIipptool\fR include directory.
 .TP 5
 SKIP-IF-DEFINED variable-name
 .TP 5
@@ -487,7 +505,7 @@ Inserts the username from the URI provided to \fIipptool\fR, if any.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007-2010 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
