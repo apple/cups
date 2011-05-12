@@ -114,13 +114,13 @@ static const char * const pattrs[] =	/* Printer attributes we want */
 };
 static const char * const remote_job_states[] =
 {					/* Remote job state keywords */
-  "cups-remote-pending",
-  "cups-remote-pending-held",
-  "cups-remote-processing",
-  "cups-remote-stopped",
-  "cups-remote-canceled",
-  "cups-remote-aborted",
-  "cups-remote-completed"
+  "+cups-remote-pending",
+  "+cups-remote-pending-held",
+  "+cups-remote-processing",
+  "+cups-remote-stopped",
+  "+cups-remote-canceled",
+  "+cups-remote-aborted",
+  "+cups-remote-completed"
 };
 static _cups_mutex_t	report_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control access */
