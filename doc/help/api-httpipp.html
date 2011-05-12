@@ -343,9 +343,9 @@ div.contents ul.subcontents li {
 <!--
   "$Id$"
 
-  HTTP and IPP API header for the Common UNIX Printing System (CUPS).
+  HTTP and IPP API header for CUPS.
 
-  Copyright 2007-2009 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -1327,7 +1327,7 @@ request is not freed.
 after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpAddCredential">httpAddCredential</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpAddCredential">httpAddCredential</a></h3>
 <p class="description">Allocates and adds a single credential to an array.</p>
 <p class="code">
 int httpAddCredential (<br>
@@ -1630,7 +1630,7 @@ void httpClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New HTTP connection</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
 <p class="description">Copy the credentials associated with an encrypted
 connection.</p>
 <p class="code">
@@ -2447,7 +2447,7 @@ void httpSetCookie (<br>
 <dt>cookie</dt>
 <dd class="description">Cookie string</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpSetCredentials">httpSetCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpSetCredentials">httpSetCredentials</a></h3>
 <p class="description">Set the credentials associated with an encrypted
 connection.</p>
 <p class="code">
@@ -3367,7 +3367,7 @@ typedef struct <a href="#http_addrlist_s">http_addrlist_s</a> / http_addrlist_t;
 <p class="code">
 typedef enum <a href="#http_auth_e">http_auth_e</a> http_auth_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
 <p class="description">Credential data </p>
 <p class="code">
 typedef struct <a href="#http_credential_s">http_credential_s</a> http_credential_t;
@@ -3534,7 +3534,7 @@ with a hostname. </p>
 <dt>next </dt>
 <dd class="description">Pointer to next address in list</dd>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
 <p class="description">Credential data </p>
 <p class="code">struct http_credential_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *data;<br>
@@ -3835,7 +3835,7 @@ are server-oriented...</p>
 <dd class="description">Only a partial file was recieved/sent</dd>
 <dt>HTTP_PAYMENT_REQUIRED </dt>
 <dd class="description">Payment required</dd>
-<dt>HTTP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dt>HTTP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
 <dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_PRECONDITION </dt>
 <dd class="description">Precondition failed</dd>
@@ -4171,7 +4171,7 @@ are server-oriented...</p>
 <dd class="description">client-error-attributes-or-values-not-supported</dd>
 <dt>IPP_ATTRIBUTES_NOT_SETTABLE </dt>
 <dd class="description">client-error-attributes-not-settable</dd>
-<dt>IPP_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dt>IPP_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
 <dd class="description">Authentication canceled by user </dd>
 <dt>IPP_BAD_REQUEST </dt>
 <dd class="description">client-error-bad-request</dd>
@@ -4233,7 +4233,7 @@ are server-oriented...</p>
 <dd class="description">successful-ok-too-many-events</dd>
 <dt>IPP_OPERATION_NOT_SUPPORTED </dt>
 <dd class="description">server-error-operation-not-supported</dd>
-<dt>IPP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dt>IPP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
 <dd class="description">Error negotiating a secure connection </dd>
 <dt>IPP_PRINTER_BUSY </dt>
 <dd class="description">server-error-busy</dd>

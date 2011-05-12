@@ -6,7 +6,8 @@ adminutil.o: ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
 adminutil.o: ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.h
 adminutil.o: language-private.h ../cups/transcode.h thread-private.h
 adminutil.o: adminutil.h
-array.o: string-private.h ../config.h debug-private.h array.h versioning.h
+array.o: string-private.h ../config.h debug-private.h array-private.h array.h
+array.o: versioning.h
 attr.o: cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 attr.o: array.h language.h string-private.h ../config.h debug-private.h
 attr.o: ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
@@ -250,7 +251,8 @@ adminutil.32.o: adminutil.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h ht
 adminutil.32.o: adminutil.c  ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.h
 adminutil.32.o: adminutil.c  language-private.h ../cups/transcode.h thread-private.h
 adminutil.32.o: adminutil.c  adminutil.h
-array.32.o: array.c  string-private.h ../config.h debug-private.h array.h versioning.h
+array.32.o: array.c  string-private.h ../config.h debug-private.h array-private.h array.h
+array.32.o: array.c  versioning.h
 attr.32.o: attr.c  cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 attr.32.o: attr.c  array.h language.h string-private.h ../config.h debug-private.h
 attr.32.o: attr.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
@@ -494,7 +496,8 @@ adminutil.64.o: adminutil.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h ht
 adminutil.64.o: adminutil.c  ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.h
 adminutil.64.o: adminutil.c  language-private.h ../cups/transcode.h thread-private.h
 adminutil.64.o: adminutil.c  adminutil.h
-array.64.o: array.c  string-private.h ../config.h debug-private.h array.h versioning.h
+array.64.o: array.c  string-private.h ../config.h debug-private.h array-private.h array.h
+array.64.o: array.c  versioning.h
 attr.64.o: attr.c  cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 attr.64.o: attr.c  array.h language.h string-private.h ../config.h debug-private.h
 attr.64.o: attr.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h

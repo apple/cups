@@ -259,7 +259,7 @@ static BIO_METHOD	http_bio_methods =
  *
  * Use @code cupsArrayNew(NULL, NULL)@ to create a credentials array.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -492,7 +492,7 @@ httpConnectEncrypt(
  * 'httpCopyCredentials()' - Copy the credentials associated with an encrypted
  *			     connection.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -2364,7 +2364,7 @@ httpSetAuthString(http_t     *http,	/* I - Connection to server */
  * 'httpSetCredentials()' - Set the credentials associated with an encrypted
  *			    connection.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 int						/* O - Status of call (0 = success) */

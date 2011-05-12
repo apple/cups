@@ -187,7 +187,7 @@ enum cups_mode_e			/**** cupsRasterOpen modes ****/
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
   CUPS_RASTER_WRITE_COMPRESSED = 2,	/* Open stream for compressed writing @since CUPS 1.3/Mac OS X 10.5@ */
-  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5@ */
+  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5/Mac OS X 10.7@ */
 };
 
 typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/

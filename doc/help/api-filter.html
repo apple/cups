@@ -343,10 +343,9 @@ div.contents ul.subcontents li {
 <!--
   "$Id$"
 
-  Filter and backend programming header for the Common UNIX Printing System
-  (CUPS).
+  Filter and backend programming header for CUPS.
 
-  Copyright 2008-2009 by Apple Inc.
+  Copyright 2008-2011 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -1399,7 +1398,7 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datal
 <dd class="description">Drain all pending output</dd>
 <dt>CUPS_SC_CMD_GET_BIDI </dt>
 <dd class="description">Return bidirectional capabilities</dd>
-<dt>CUPS_SC_CMD_GET_CONNECTED <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dt>CUPS_SC_CMD_GET_CONNECTED <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
 <dd class="description">Return whether the backend is &quot;connected&quot; to the printer </dd>
 <dt>CUPS_SC_CMD_GET_DEVICE_ID </dt>
 <dd class="description">Return the IEEE-1284 device ID</dd>

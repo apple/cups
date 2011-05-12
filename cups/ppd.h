@@ -274,7 +274,7 @@ typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2/Mac OS X 10.5@
 } ppd_coption_t;
 
 typedef struct _ppd_cache_s _ppd_cache_t;
-					/**** PPD cache and mapping data @since CUPS 1.5@ @private@ ****/
+					/**** PPD cache and mapping data @since CUPS 1.5/Mac OS X 10.7@ @private@ ****/
 
 typedef struct ppd_file_s		/**** PPD File ****/
 {
@@ -340,7 +340,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
 
   /**** New in CUPS 1.5 ****/
-  _ppd_cache_t	*cache;			/* PPD cache and mapping data @since CUPS 1.5@ @private@ */
+  _ppd_cache_t	*cache;			/* PPD cache and mapping data @since CUPS 1.5/Mac OS X 10.7@ @private@ */
 } ppd_file_t;
 
 
