@@ -5689,10 +5689,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   snprintf(buffer, sizeof(buffer), "%s/daemon/cups-driverd", ServerBin);
   snprintf(tempfile, sizeof(tempfile), "%s/%d.ppd", TempDir, con->http.fd);
   tempfd = open(tempfile, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-  if (tempfd < 0)
+  if (tempfd < 0 || cupsdOpenPipe(temppipe))
     return (-1);
-
-  cupsdOpenPipe(temppipe);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
@@ -10812,7 +10810,9 @@ send_http_error(
   cupsdLogMessage(status == HTTP_FORBIDDEN ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                   "Returning HTTP %s for %s (%s) from %s",
                   httpStatus(status),
-		  ippOpString(con->request->request.op.operation_id),
+		  con->request ?
+		      ippOpString(con->request->request.op.operation_id) :
+		      "no operation-id",
 		  uri ? uri->values[0].string.text : "no URI",
 		  con->http.hostname);
 

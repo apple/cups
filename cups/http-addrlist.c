@@ -414,7 +414,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
         portnum = 80;
       else if (!strcmp(service, "https"))
         portnum = 443;
-      else if (!strcmp(service, "ipp"))
+      else if (!strcmp(service, "ipp") || !strcmp(service, "ipps"))
         portnum = 631;
       else if (!strcmp(service, "lpd"))
         portnum = 515;
@@ -535,14 +535,17 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       portnum = 80;
     else if (!strcmp(service, "https"))
       portnum = 443;
-    else if (!strcmp(service, "ipp"))
+    else if (!strcmp(service, "ipp") || !strcmp(service, "ipps"))
       portnum = 631;
     else if (!strcmp(service, "lpd"))
       portnum = 515;
     else if (!strcmp(service, "socket"))
       portnum = 9100;
     else
+    {
+      httpAddrFreeList(first);
       return (NULL);
+    }
 
     if (hostname && !strcasecmp(hostname, "localhost"))
     {

@@ -413,10 +413,7 @@ backendGetMakeModel(
 
       char	temp[1024];		/* Temporary make and model */
 
-      if (mfg)
-	snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
-      else
-	snprintf(temp, sizeof(temp), "%s", mdl);
+      snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
 
       _ppdNormalizeMakeAndModel(temp, make_model, make_model_size);
     }

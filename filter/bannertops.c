@@ -992,6 +992,8 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
 
 	if (i == num_pages)
 	  cupsImageClose(image);
+
+	free(line);
       }
     }
 

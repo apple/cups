@@ -462,10 +462,10 @@ gif_read_image(FILE         *fp,	/* I - Input file */
   pass      = 0;
   code_size = getc(fp);
 
-  if (code_size > GIF_MAX_BITS || !pixels)
+  if (!pixels)
     return (-1);
 
-  if (gif_read_lzw(fp, 1, code_size) < 0)
+  if (code_size > GIF_MAX_BITS || gif_read_lzw(fp, 1, code_size) < 0)
   {
     free(pixels);
     return (-1);

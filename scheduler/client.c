@@ -2815,7 +2815,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
             if (!strncasecmp(con->header, "Location:", 9))
 	    {
-  	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE);
+  	      if (!cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE))
+	      {
+	        cupsdCloseClient(con);
+		return;
+	      }
+
 	      con->sent_header = 2;
 
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
@@ -2829,7 +2834,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    }
 	    else
 	    {
-  	      cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE);
+  	      if (!cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE))
+	      {
+	        cupsdCloseClient(con);
+		return;
+	      }
+
 	      con->sent_header = 1;
 
 	      if (con->http.version == HTTP_1_1)
@@ -3952,8 +3962,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #ifdef HAVE_JAVA
@@ -3973,8 +3982,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_JAVA */
@@ -3995,8 +4003,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PERL */
@@ -4017,8 +4024,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PHP */
@@ -4039,8 +4045,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PYTHON */
@@ -4048,8 +4053,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		  "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		  "type=%s/%s) = 0", con, con->http.fd, filename, filestats,
-		  type ? type->super : "unknown",
-		  type ? type->type : "unknown");
+		  type->super, type->type);
   return (0);
 }
 
