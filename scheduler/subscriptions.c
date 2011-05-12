@@ -735,14 +735,8 @@ cupsdLoadAllSubscriptions(void)
   */
 
   snprintf(line, sizeof(line), "%s/subscriptions.conf", ServerRoot);
-  if ((fp = cupsFileOpen(line, "r")) == NULL)
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "LoadAllSubscriptions: Unable to open %s - %s", line,
-		      strerror(errno));
+  if ((fp = cupsdOpenConfFile(line)) == NULL)
     return;
-  }
 
  /*
   * Read all of the lines from the file...
@@ -1080,8 +1074,8 @@ cupsdSaveAllSubscriptions(void)
 {
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* subscriptions.conf file */
-  char			temp[1024];	/* Temporary string */
-  char			backup[1024];	/* subscriptions.conf.O file */
+  char			filename[1024],	/* subscriptions.conf filename */
+			temp[1024];	/* Temporary string */
   cupsd_subscription_t	*sub;		/* Current subscription */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
@@ -1094,36 +1088,12 @@ cupsdSaveAllSubscriptions(void)
   * Create the subscriptions.conf file...
   */
 
-  snprintf(temp, sizeof(temp), "%s/subscriptions.conf", ServerRoot);
-  snprintf(backup, sizeof(backup), "%s/subscriptions.conf.O", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/subscriptions.conf", ServerRoot);
 
-  if (rename(temp, backup))
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup subscriptions.conf - %s",
-                      strerror(errno));
-  }
-
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save subscriptions.conf - %s",
-                    strerror(errno));
-
-    if (rename(backup, temp))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to restore subscriptions.conf - %s",
-                      strerror(errno));
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Saving subscriptions.conf...");
 
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving subscriptions.conf...");
 
  /*
   * Write a small header to the file...
@@ -1224,7 +1194,7 @@ cupsdSaveAllSubscriptions(void)
     cupsFilePuts(fp, "</Subscription>\n");
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 
