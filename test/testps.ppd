@@ -2,9 +2,9 @@
 *%
 *% "$Id: testps.ppd 6649 2007-07-11 21:46:42Z mike $"
 *%
-*%   Test PS PPD file for the Common UNIX Printing System (CUPS).
+*%   Test PS PPD file for CUPS.
 *%
-*%   Copyright 2007 by Apple Inc.
+*%   Copyright 2007-2011 by Apple Inc.
 *%   Copyright 1997-2005 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 *%
 *FormatVersion:	"4.3"
 *FileVersion:	"1.1"
-*LanguageVersion: English 
+*LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TESTPS.PPD"
 *Manufacturer:	"ESP"
@@ -79,7 +79,7 @@
 *PageRegion EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
-*DefaultImageableArea: Letter 
+*DefaultImageableArea: Letter
 *ImageableArea Letter/US Letter:	"18 36 594 756"
 *ImageableArea Legal/US Legal:		"18 36 594 972"
 *ImageableArea Executive/US Executive:	"18 36 504 684"

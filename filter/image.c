@@ -1,9 +1,9 @@
 /*
  * "$Id: image.c 7473 2008-04-21 17:51:58Z mike $"
  *
- *   Base image support for the Common UNIX Printing System (CUPS).
+ *   Base image support for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

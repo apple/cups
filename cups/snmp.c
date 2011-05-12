@@ -1425,6 +1425,9 @@ asn1_get_string(
     char          *string,		/* I  - String buffer */
     int           strsize)		/* I  - String buffer size */
 {
+  if (length > (bufend - *buffer))
+    length = bufend - *buffer;
+
   if (length < 0)
   {
    /*

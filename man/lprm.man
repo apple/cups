@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: lprm.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
-.\"   lprm man page for the Common UNIX Printing System (CUPS).
+.\"   lprm man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -59,7 +59,7 @@ Berkeley \fIlprm\fR command.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: lprm.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

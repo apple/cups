@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7920 2008-09-10 01:04:10Z mike $"
 #
-#   Notifier makefile for the Common UNIX Printing System (CUPS).
+#   Notifier makefile for CUPS.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the

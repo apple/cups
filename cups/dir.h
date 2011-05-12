@@ -1,11 +1,11 @@
 /*
  * "$Id: dir.h 7026 2007-10-19 00:57:45Z mike $"
  *
- *   Public directory definitions for the Common UNIX Printing System (CUPS).
+ *   Public directory definitions for CUPS.
  *
  *   This set of APIs abstracts enumeration of directory entries.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

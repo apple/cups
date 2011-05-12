@@ -1,9 +1,9 @@
 /*
  * "$Id: help-index.h 7615 2008-05-25 07:17:07Z mike $"
  *
- *   Online help index definitions for the Common UNIX Printing System (CUPS).
+ *   Online help index definitions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: ppdcfile.man 7607 2008-05-21 01:06:23Z mike $"
 .\"
-.\"   ppdcfile man page for the Common UNIX Printing System.
+.\"   ppdcfile man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -165,7 +165,7 @@ ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1)
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: ppdcfile.man 7607 2008-05-21 01:06:23Z mike $".
 .\"

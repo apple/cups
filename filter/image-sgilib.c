@@ -1,10 +1,9 @@
 /*
  * "$Id: image-sgilib.c 7221 2008-01-16 22:20:08Z mike $"
  *
- *   SGI image file format library routines for the Common UNIX Printing
- *   System (CUPS).
+ *   SGI image file format library routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

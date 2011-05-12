@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $"
 .\"
-.\"   mime.types man page for the Common UNIX Printing System (CUPS).
+.\"   mime.types man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -109,7 +109,7 @@ higher priority than "text/bar", "text/foo" will be chosen instead.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $".
 .\"

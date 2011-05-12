@@ -1,13 +1,13 @@
 /*
  * "$Id: image-photocd.c 7221 2008-01-16 22:20:08Z mike $"
  *
- *   PhotoCD routines for the Common UNIX Printing System (CUPS).
+ *   PhotoCD routines for CUPS.
  *
  *   PhotoCD support is currently limited to the 768x512 base image, which
  *   is only YCC encoded.  Support for the higher resolution images will
  *   require a lot of extra code...
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

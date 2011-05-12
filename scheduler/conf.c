@@ -1834,6 +1834,8 @@ static void
 mime_error_cb(void       *ctx,		/* I - Context pointer (unused) */
               const char *message)	/* I - Message */
 {
+  (void)ctx;
+
   cupsdLogMessage(CUPSD_LOG_ERROR, "%s", message);
 }
 
@@ -3946,14 +3948,9 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     }
     else if (!parse_aaa(op, line, value, linenum))
     {
-      if (op)
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown Policy Limit directive %s on line %d.",
-	                line, linenum);
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown Policy directive %s on line %d.",
-	                line, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unknown Policy Limit directive %s on line %d.",
+		      line, linenum);
 
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);

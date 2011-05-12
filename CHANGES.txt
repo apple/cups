@@ -1,8 +1,11 @@
-CHANGES.txt - 2011-05-10
+CHANGES.txt - 2011-05-11
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Fixed some minor issues discovered by a Coverity scan (STR #3838)
+	- The scheduler now more carefully creates and removes configuration,
+	  cache, and state files (STR #3715)
 	- The lpadmin command now allows default option values to be deleted
 	  (STR #2959)
 	- The lpadmin command now allows the cupsIPPSupplies and

@@ -1311,7 +1311,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
 
     snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	     job->id);
-    unlink(filename);
+    if (Classification)
+      cupsdRemoveFile(filename);
+    else
+      unlink(filename);
   }
 
   cupsdClearString(&job->username);
@@ -1330,7 +1333,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
     {
       snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 	       job->id, job->num_files);
-      unlink(filename);
+      if (Classification)
+	cupsdRemoveFile(filename);
+      else
+	unlink(filename);
 
       job->num_files --;
     }
@@ -1552,16 +1558,25 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   snprintf(jobfile, sizeof(jobfile), "%s/c%05d", RequestRoot, job->id);
   if ((fp = cupsFileOpen(jobfile, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to open job control file \"%s\" - %s!",
-		    job->id, jobfile, strerror(errno));
-    goto error;
+    char newfile[1024];			/* New job filename */
+
+    snprintf(newfile, sizeof(newfile), "%s/c%05d.N", RequestRoot, job->id);
+    if ((fp = cupsFileOpen(newfile, "r")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "[Job %d] Unable to open job control file \"%s\": %s",
+		      job->id, jobfile, strerror(errno));
+      goto error;
+    }
+
+    unlink(jobfile);
+    rename(newfile, jobfile);
   }
 
   if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL, job->attrs) != IPP_DATA)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to read job control file \"%s\"!", job->id,
+		    "[Job %d] Unable to read job control file \"%s\".", job->id,
 		    jobfile);
     cupsFileClose(fp);
     goto error;
@@ -1830,7 +1845,10 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   job->num_files = 0;
 
-  unlink(jobfile);
+  if (Classification)
+    cupsdRemoveFile(jobfile);
+  else
+    unlink(jobfile);
 
   return (0);
 }
@@ -1945,30 +1963,19 @@ void
 cupsdSaveAllJobs(void)
 {
   int		i;			/* Looping var */
-  cups_file_t	*fp;			/* Job cache file */
-  char		temp[1024];		/* Temporary string */
+  cups_file_t	*fp;			/* job.cache file */
+  char		filename[1024],		/* job.cache filename */
+		temp[1024];		/* Temporary string */
   cupsd_job_t	*job;			/* Current job */
   time_t	curtime;		/* Current time */
   struct tm	*curdate;		/* Current date */
 
 
-  snprintf(temp, sizeof(temp), "%s/job.cache", CacheDir);
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create job cache file \"%s\" - %s",
-                    temp, strerror(errno));
+  snprintf(filename, sizeof(filename), "%s/job.cache", CacheDir);
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
-  }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job cache file \"%s\"...", temp);
-
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...");
 
  /*
   * Write a small header to the file...
@@ -2004,7 +2011,7 @@ cupsdSaveAllJobs(void)
     cupsFilePuts(fp, "</Job>\n");
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 
@@ -2015,7 +2022,8 @@ cupsdSaveAllJobs(void)
 void
 cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 {
-  char		filename[1024];		/* Job control filename */
+  char		filename[1024],		/* Job control filename */
+		newfile[1024];		/* New job control filename */
   cups_file_t	*fp;			/* Job file */
 
 
@@ -2023,12 +2031,13 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
                   job, job->id, job->attrs);
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, job->id);
+  snprintf(newfile, sizeof(newfile), "%s/c%05d.N", RequestRoot, job->id);
 
-  if ((fp = cupsFileOpen(filename, "w")) == NULL)
+  if ((fp = cupsFileOpen(newfile, "w")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to create job control file \"%s\" - %s.",
-		    job->id, filename, strerror(errno));
+		    "[Job %d] Unable to create job control file \"%s\": %s",
+		    job->id, newfile, strerror(errno));
     return;
   }
 
@@ -2039,12 +2048,28 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 
   if (ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL,
                  job->attrs) != IPP_DATA)
+  {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "[Job %d] Unable to write job control file!", job->id);
+                    "[Job %d] Unable to write job control file.", job->id);
+    cupsFileClose(fp);
+    unlink(newfile);
+    return;
+  }
 
-  cupsFileClose(fp);
-
-  job->dirty = 0;
+  if (cupsFileClose(fp))
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Unable to close job control file: %s",
+		    job->id, strerror(errno));
+  else
+  {
+    unlink(filename);
+    if (rename(newfile, filename))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "[Job %d] Unable to finalize job control file: %s",
+		      job->id, strerror(errno));
+    else
+      job->dirty = 0;
+  }
 }
 
 
@@ -2468,7 +2493,10 @@ cupsdSetJobState(
 	  {
 	    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 		     job->id, i);
-	    unlink(filename);
+	    if (Classification)
+	      cupsdRemoveFile(filename);
+	    else
+	      unlink(filename);
 	  }
 
 	  if (job->num_files > 0)
@@ -2583,6 +2611,8 @@ compare_active_jobs(void *first,	/* I - First job */
   int	diff;				/* Difference */
 
 
+  (void)data;
+
   if ((diff = ((cupsd_job_t *)second)->priority -
               ((cupsd_job_t *)first)->priority) != 0)
     return (diff);
@@ -2600,6 +2630,8 @@ compare_jobs(void *first,		/* I - First job */
              void *second,		/* I - Second job */
 	     void *data)		/* I - App data (not used) */
 {
+  (void)data;
+
   return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
 }
 
@@ -3093,7 +3125,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   * Update the printer and job state.
   */
 
-  if (job_state != job->state_value)
+  if (set_job_state && job_state != job->state_value)
     cupsdSetJobState(job, job_state, CUPSD_JOB_DEFAULT, "%s", message);
 
   cupsdSetPrinterState(job->printer, printer_state,
@@ -3641,15 +3673,9 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
   * Open the job.cache file...
   */
 
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  if ((fp = cupsdOpenConfFile(filename)) == NULL)
   {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to open job cache file \"%s\": %s",
-                      filename, strerror(errno));
-
     load_request_root();
-
     return;
   }
 
@@ -3697,9 +3723,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       snprintf(jobfile, sizeof(jobfile), "%s/c%05d", RequestRoot, jobid);
       if (access(jobfile, 0))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away!",
-	                jobid);
-        continue;
+	snprintf(jobfile, sizeof(jobfile), "%s/c%05d.N", RequestRoot, jobid);
+	if (access(jobfile, 0))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away!",
+			  jobid);
+	  continue;
+	}
       }
 
       job = calloc(1, sizeof(cupsd_job_t));

@@ -1,9 +1,9 @@
 /*
  * "$Id: image-jpeg.c 7355 2008-02-28 20:49:40Z mike $"
  *
- *   JPEG image routines for the Common UNIX Printing System (CUPS).
+ *   JPEG image routines for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

@@ -1,9 +1,9 @@
 /*
  * "$Id: rasterbench.c 7376 2008-03-19 21:07:45Z mike $"
  *
- *   Raster benchmark program for the Common UNIX Printing System (CUPS).
+ *   Raster benchmark program for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

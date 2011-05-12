@@ -1,7 +1,9 @@
 /*
- *   Windows SSPI SSL implementation for the Common UNIX Printing System (CUPS).
+ * "$Id$"
  *
- *   Copyright 2010 by Apple Inc.
+ *   Windows SSPI SSL implementation for CUPS.
+ *
+ *   Copyright 2010-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -11,17 +13,23 @@
  *
  * Contents:
  *
- *   _sspiAlloc()                  - Allocate and initialize SSPI/SSL data structure
- *   _sspiAccept()                 - Accept a new SSL connection
- *   _sspiConnect()                - Connect an SSL connection
- *   _sspiFree()                   - Close and deallocate SSPI/SSL connection
- *   _sspiGetCredentials()         - Get credentials associated with connection
- *   _sspiPending()                - Return number of bytes available to read
- *   _sspiRead()                   - Read a buffer of bytes
- *   _sspiSetAllowsAnyRoot()       - Set client policy for untrusted root certs
- *   _sspiSetAllowsExpiredCerts()  - Set client policy for expired certs
- *   _sspiWrite()                  - Write a buffer of bytes
- *   sspi_verify_certificate()     - Verify a server certificate
+ *   sspi_alloc()                 - Allocate SSPI ssl object
+ *   _sspiGetCredentials()        - Retrieve an SSL/TLS certificate from the
+ *                                  system store If one cannot be found, one is
+ *                                  created.
+ *   _sspiConnect()               - Make an SSL connection. This function
+ *                                  assumes a TCP/IP connection has already been
+ *                                  successfully made
+ *   _sspiAccept()                - Accept an SSL/TLS connection
+ *   _sspiSetAllowsAnyRoot()      - Set the client cert policy for untrusted
+ *                                  root certs
+ *   _sspiSetAllowsExpiredCerts() - Set the client cert policy for expired root
+ *                                  certs
+ *   _sspiWrite()                 - Write a buffer to an ssl socket
+ *   _sspiRead()                  - Read a buffer from an ssl socket
+ *   _sspiPending()               - Returns the number of available bytes
+ *   _sspiFree()                  - Close a connection and free resources
+ *   sspi_verify_certificate()    - Verify a server certificate
  */
 
 /*
@@ -30,7 +38,7 @@
 
 #include "sspi-private.h"
 #include "debug-private.h"
- 
+
 
 /* required to link this library for certificate functions */
 #pragma comment(lib, "Crypt32.lib")
@@ -77,13 +85,13 @@ _sspiGetCredentials(_sspi_struct_t *conn,
 					/* I - Cert container name */
                     const TCHAR    *cn,	/* I - Common name of certificate */
                     BOOL           isServer)
-					/* I - Is caller a server? */	
+					/* I - Is caller a server? */
 {
   HCERTSTORE		store = NULL;	/* Certificate store */
   PCCERT_CONTEXT	storedContext = NULL;
-					/* Context created from the store */ 
+					/* Context created from the store */
   PCCERT_CONTEXT	createdContext = NULL;
-					/* Context created by us */ 
+					/* Context created by us */
   DWORD			dwSize = 0;	/* 32 bit size */
   PBYTE			p = NULL;	/* Temporary storage */
   HCRYPTPROV		hProv = (HCRYPTPROV) NULL;
@@ -139,7 +147,7 @@ _sspiGetCredentials(_sspi_struct_t *conn,
   }
 
   dwSize = 0;
-	
+
   if (!CertStrToName(X509_ASN_ENCODING, cn, CERT_OID_NAME_STR,
                      NULL, NULL, &dwSize, NULL))
   {
@@ -172,10 +180,10 @@ _sspiGetCredentials(_sspi_struct_t *conn,
 
   storedContext = CertFindCertificateInStore(store, X509_ASN_ENCODING|PKCS_7_ASN_ENCODING,
                                              0, CERT_FIND_SUBJECT_NAME, &sib, NULL);
-	
+
   if (!storedContext)
   {
-   /* 
+   /*
     * If we couldn't find the context, then we'll
     * create a new one
     */
@@ -201,7 +209,7 @@ _sspiGetCredentials(_sspi_struct_t *conn,
 
     createdContext = CertCreateSelfSignCertificate(hProv, &sib, 0, &kpi, NULL, NULL,
                                                    &et, &exts);
-	
+
     if (!createdContext)
     {
       DEBUG_printf(("_sspiGetCredentials: CertCreateSelfSignCertificate failed: %x",
@@ -254,7 +262,7 @@ _sspiGetCredentials(_sspi_struct_t *conn,
  /*
   * Create an SSPI credential.
   */
-  Status = AcquireCredentialsHandle(NULL, UNISP_NAME, 
+  Status = AcquireCredentialsHandle(NULL, UNISP_NAME,
                                     isServer ? SECPKG_CRED_INBOUND:SECPKG_CRED_OUTBOUND,
                                     NULL, &SchannelCred, NULL, NULL, &conn->creds,
                                     &tsExpiry);
@@ -299,7 +307,7 @@ cleanup:
  */
 BOOL					/* O - 1 on success, 0 on failure */
 _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
-             const CHAR *hostname)	/* I - Server hostname */	
+             const CHAR *hostname)	/* I - Server hostname */
 {
   PCCERT_CONTEXT	serverCert;	/* Server certificate */
   DWORD			dwSSPIFlags;	/* SSL connection attributes we want */
@@ -379,18 +387,18 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
 
   conn->decryptBufferUsed = 0;
 
- /* 
+ /*
   * Loop until the handshake is finished or an error occurs.
   */
   scRet = SEC_I_CONTINUE_NEEDED;
 
   while(scRet == SEC_I_CONTINUE_NEEDED        ||
         scRet == SEC_E_INCOMPLETE_MESSAGE     ||
-        scRet == SEC_I_INCOMPLETE_CREDENTIALS) 
+        scRet == SEC_I_INCOMPLETE_CREDENTIALS)
   {
     if ((conn->decryptBufferUsed == 0) || (scRet == SEC_E_INCOMPLETE_MESSAGE))
     {
-      if (conn->decryptBufferLength <= conn->decryptBufferUsed) 
+      if (conn->decryptBufferLength <= conn->decryptBufferUsed)
       {
         conn->decryptBufferLength += 4096;
         conn->decryptBuffer = (BYTE*) realloc(conn->decryptBuffer, conn->decryptBufferLength);
@@ -404,10 +412,10 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
           goto cleanup;
         }
       }
-			
-      cbData = recv(conn->sock, conn->decryptBuffer + conn->decryptBufferUsed, 
+
+      cbData = recv(conn->sock, conn->decryptBuffer + conn->decryptBufferUsed,
                     (int) (conn->decryptBufferLength - conn->decryptBufferUsed), 0);
-                
+
       if (cbData == SOCKET_ERROR)
       {
         DEBUG_printf(("_sspiConnect: recv failed: %d", WSAGetLastError()));
@@ -466,7 +474,7 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
                                       &outBuffer, &dwSSPIOutFlags, &tsExpiry);
 
    /*
-    * If InitializeSecurityContext was successful (or if the error was 
+    * If InitializeSecurityContext was successful (or if the error was
     * one of the special extended ones), send the contends of the output
     * buffer to the server.
     */
@@ -477,7 +485,7 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
       if (outBuffers[0].cbBuffer && outBuffers[0].pvBuffer)
       {
         cbData = send(conn->sock, outBuffers[0].pvBuffer, outBuffers[0].cbBuffer, 0);
-	            
+
         if ((cbData == SOCKET_ERROR) || !cbData)
         {
           DEBUG_printf(("_sspiConnect: send failed: %d", WSAGetLastError()));
@@ -505,7 +513,7 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
       continue;
 
    /*
-    * If InitializeSecurityContext returned SEC_E_OK, then the 
+    * If InitializeSecurityContext returned SEC_E_OK, then the
     * handshake completed successfully.
     */
     if (scRet == SEC_E_OK)
@@ -563,7 +571,7 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
 
    /*
     * If InitializeSecurityContext returned SEC_I_INCOMPLETE_CREDENTIALS,
-    * then the server just requested client authentication. 
+    * then the server just requested client authentication.
     */
     if (scRet == SEC_I_INCOMPLETE_CREDENTIALS)
     {
@@ -617,7 +625,7 @@ _sspiConnect(_sspi_struct_t *conn,	/* I - Client connection */
       ok = FALSE;
       goto cleanup;
     }
-    
+
    /*
     * Find out how big the header/trailer will be:
     */
@@ -669,7 +677,7 @@ _sspiAccept(_sspi_struct_t *conn)	/* I  - Client connection */
                 ASC_REQ_STREAM;
 
   conn->decryptBufferUsed = 0;
-    
+
  /*
   * Set OutBuffer for AcceptSecurityContext call
   */
@@ -681,11 +689,11 @@ _sspiAccept(_sspi_struct_t *conn)	/* I  - Client connection */
 
   while (scRet == SEC_I_CONTINUE_NEEDED    ||
          scRet == SEC_E_INCOMPLETE_MESSAGE ||
-         scRet == SEC_I_INCOMPLETE_CREDENTIALS) 
+         scRet == SEC_I_INCOMPLETE_CREDENTIALS)
   {
     if ((conn->decryptBufferUsed == 0) || (scRet == SEC_E_INCOMPLETE_MESSAGE))
     {
-      if (conn->decryptBufferLength <= conn->decryptBufferUsed) 
+      if (conn->decryptBufferLength <= conn->decryptBufferUsed)
       {
         conn->decryptBufferLength += 4096;
         conn->decryptBuffer = (BYTE*) realloc(conn->decryptBuffer,
@@ -792,7 +800,7 @@ _sspiAccept(_sspi_struct_t *conn)	/* I  - Client connection */
     if (scRet == SEC_E_OK)
     {
      /*
-      * If there's extra data then save it for 
+      * If there's extra data then save it for
       * next time we go to decrypt
       */
       if (inBuffers[1].BufferType == SECBUFFER_EXTRA)
@@ -928,7 +936,7 @@ _sspiWrite(_sspi_struct_t *conn,	/* I  - Client connection */
     size_t chunk = min(conn->streamSizes.cbMaximumMessage,	/* Size of data to write */
                        bytesLeft);
     SECURITY_STATUS scRet;					/* SSPI status */
-		
+
    /*
     * Copy user data into the buffer, starting
     * just past the header
@@ -968,7 +976,7 @@ _sspiWrite(_sspi_struct_t *conn,	/* I  - Client connection */
     }
 
    /*
-    * Send the data. Remember the size of 
+    * Send the data. Remember the size of
     * the total data to send is the size
     * of the header, the size of the data
     * the caller passed in and the size
@@ -984,7 +992,7 @@ _sspiWrite(_sspi_struct_t *conn,	/* I  - Client connection */
       DEBUG_printf(("_sspiWrite: send failed: %ld", WSAGetLastError()));
       goto cleanup;
     }
-		
+
     bytesLeft -= (int) chunk;
     index += (int) chunk;
   }
@@ -1061,13 +1069,13 @@ _sspiRead(_sspi_struct_t *conn,		/* I  - Client connection */
     do
     {
      /*
-      * If there is not enough space in the 
+      * If there is not enough space in the
       * buffer, then increase it's size
       */
-      if (conn->decryptBufferLength <= conn->decryptBufferUsed) 
+      if (conn->decryptBufferLength <= conn->decryptBufferUsed)
       {
         conn->decryptBufferLength += 4096;
-        conn->decryptBuffer = (BYTE*) realloc(conn->decryptBuffer, 
+        conn->decryptBuffer = (BYTE*) realloc(conn->decryptBuffer,
                                               conn->decryptBufferLength);
 
         if (!conn->decryptBuffer)
@@ -1205,7 +1213,7 @@ _sspiRead(_sspi_struct_t *conn,		/* I  - Client connection */
     * then save those back in decryptBuffer. They will
     * be processed the next time through the loop.
     */
-    if (pExtraBuffer) 
+    if (pExtraBuffer)
     {
       memmove(conn->decryptBuffer, pExtraBuffer->pvBuffer, pExtraBuffer->cbBuffer);
       conn->decryptBufferUsed = pExtraBuffer->cbBuffer;
@@ -1249,7 +1257,7 @@ _sspiFree(_sspi_struct_t *conn)		/* I  - Client connection */
     DWORD		dwType;		/* Type */
     DWORD		status;		/* Status */
 
-  /* 
+  /*
    * Notify schannel that we are about to close the connection.
    */
    dwType = SCHANNEL_SHUTDOWN;
@@ -1264,7 +1272,7 @@ _sspiFree(_sspi_struct_t *conn)		/* I  - Client connection */
 
    status = ApplyControlToken(&conn->context, &message);
 
-   if (SUCCEEDED(status)) 
+   if (SUCCEEDED(status))
    {
      PBYTE	pbMessage;		/* Message buffer */
      DWORD	cbMessage;		/* Message buffer count */
@@ -1292,7 +1300,7 @@ _sspiFree(_sspi_struct_t *conn)		/* I  - Client connection */
                                     dwSSPIFlags, SECURITY_NATIVE_DREP, NULL,
                                     &message, &dwSSPIOutFlags, &tsExpiry);
 
-      if (SUCCEEDED(status)) 
+      if (SUCCEEDED(status))
       {
         pbMessage = buffers[0].pvBuffer;
         cbMessage = buffers[0].cbBuffer;
@@ -1430,7 +1438,7 @@ sspi_verify_certificate(PCCERT_CONTEXT  serverCert,
 
  /*
   * Validate certificate chain.
-  */ 
+  */
   ZeroMemory(&httpsPolicy, sizeof(HTTPSPolicyCallbackData));
   httpsPolicy.cbStruct		= sizeof(HTTPSPolicyCallbackData);
   httpsPolicy.dwAuthType	= AUTHTYPE_SERVER;
@@ -1470,3 +1478,8 @@ cleanup:
 
   return (status);
 }
+
+
+/*
+ * End of "$Id$".
+ */

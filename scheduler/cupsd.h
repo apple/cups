@@ -178,57 +178,69 @@ VAR int			Launchd		VALUE(0);
  * Prototypes...
  */
 
-extern int	cupsdAddString(cups_array_t **a, const char *s);
-extern void	cupsdCheckProcess(void);
-extern void	cupsdClearString(char **s);
-extern void	cupsdFreeStrings(cups_array_t **a);
-extern void	cupsdHoldSignals(void);
-extern char	*cupsdMakeUUID(const char *name, int number,
-			       char *buffer, size_t bufsize);
-extern void	cupsdReleaseSignals(void);
-extern void	cupsdSetString(char **s, const char *v);
-extern void	cupsdSetStringf(char **s, const char *f, ...)
+/* env.c */
+extern void		cupsdInitEnv(void);
+extern int		cupsdLoadEnv(char *envp[], int envmax);
+extern void		cupsdSetEnv(const char *name, const char *value);
+extern void		cupsdSetEnvf(const char *name, const char *value, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
-extern void	cupsdStartServer(void);
-extern void	cupsdStopServer(void);
-extern void	cupsdClosePipe(int *fds);
-extern int	cupsdOpenPipe(int *fds);
+extern void		cupsdUpdateEnv(void);
 
-extern void	cupsdInitEnv(void);
-extern int	cupsdLoadEnv(char *envp[], int envmax);
-extern void	cupsdSetEnv(const char *name, const char *value);
-extern void	cupsdSetEnvf(const char *name, const char *value, ...)
+/* file.c */
+extern void		cupsdCleanFiles(const char *path, const char *pattern);
+extern int		cupsdCloseCreatedConfFile(cups_file_t *fp,
+			                          const char *filename);
+extern void		cupsdClosePipe(int *fds);
+extern cups_file_t	*cupsdCreateConfFile(const char *filename, mode_t mode);
+extern cups_file_t	*cupsdOpenConfFile(const char *filename);
+extern int		cupsdOpenPipe(int *fds);
+extern int		cupsdRemoveFile(const char *filename);
+
+/* main.c */
+extern int		cupsdAddString(cups_array_t **a, const char *s);
+extern void		cupsdCheckProcess(void);
+extern void		cupsdClearString(char **s);
+extern void		cupsdFreeStrings(cups_array_t **a);
+extern void		cupsdHoldSignals(void);
+extern char		*cupsdMakeUUID(const char *name, int number,
+				       char *buffer, size_t bufsize);
+extern void		cupsdReleaseSignals(void);
+extern void		cupsdSetString(char **s, const char *v);
+extern void		cupsdSetStringf(char **s, const char *f, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
-extern void	cupsdUpdateEnv(void);
 
-extern void	*cupsdCreateProfile(int job_id);
-extern void	cupsdDestroyProfile(void *profile);
-extern int	cupsdEndProcess(int pid, int force);
-extern const char *cupsdFinishProcess(int pid, char *name, int namelen,
-		                      int *job_id);
-extern int	cupsdStartProcess(const char *command, char *argv[],
-				  char *envp[], int infd, int outfd,
-				  int errfd, int backfd, int sidefd,
-				  int root, void *profile, cupsd_job_t *job,
-				  int *pid);
+/* process.c */
+extern void		*cupsdCreateProfile(int job_id);
+extern void		cupsdDestroyProfile(void *profile);
+extern int		cupsdEndProcess(int pid, int force);
+extern const char	*cupsdFinishProcess(int pid, char *name, int namelen,
+					    int *job_id);
+extern int		cupsdStartProcess(const char *command, char *argv[],
+					  char *envp[], int infd, int outfd,
+					  int errfd, int backfd, int sidefd,
+					  int root, void *profile,
+					  cupsd_job_t *job, int *pid);
 
-extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
-		               cupsd_selfunc_t write_cb, void *data);
-extern int	cupsdDoSelect(long timeout);
+/* select.c */
+extern int		cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
+			               cupsd_selfunc_t write_cb, void *data);
+extern int		cupsdDoSelect(long timeout);
 #ifdef CUPSD_IS_SELECTING
-extern int	cupsdIsSelecting(int fd);
+extern int		cupsdIsSelecting(int fd);
 #endif /* CUPSD_IS_SELECTING */
-extern void	cupsdRemoveSelect(int fd);
-extern void	cupsdStartSelect(void);
-extern void	cupsdStopSelect(void);
+extern void		cupsdRemoveSelect(int fd);
+extern void		cupsdStartSelect(void);
+extern void		cupsdStopSelect(void);
 
-extern int	cupsdRemoveFile(const char *filename);
+/* server.c */
+extern void		cupsdStartServer(void);
+extern void		cupsdStopServer(void);
 
 
 /*

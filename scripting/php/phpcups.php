@@ -3,9 +3,9 @@
 //
 // "$Id: phpcups.php 3603 2003-04-11 18:42:52Z mike $"
 //
-//   PHP test script for the Common UNIX Printing System (CUPS).
+//   PHP test script for CUPS.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 //
 //   These coded instructions, statements, and computer programs are the

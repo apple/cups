@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -313,8 +313,8 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED,	/* server-error-multiple-document-jobs-not-supported */
   IPP_PRINTER_IS_DEACTIVATED,		/* server-error-printer-is-deactivated */
 
-  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5@ */
-  IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5@ */
+  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/Mac OS X 10.7@ */
+  IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/Mac OS X 10.7@ */
   IPP_UPGRADE_REQUIRED			/* TLS upgrade required */
 } ipp_status_t;
 #define IPP_ERROR_JOB_CANCELLED IPP_ERROR_JOB_CANCELED

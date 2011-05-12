@@ -1,9 +1,9 @@
 <!--
   "$Id: api-ppd.header 7616 2008-05-28 00:34:13Z mike $"
 
-  PPD API header for the Common UNIX Printing System (CUPS).
+  PPD API header for CUPS.
 
-  Copyright 2008-2009 by Apple Inc.
+  Copyright 2008-2011 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright

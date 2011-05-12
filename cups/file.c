@@ -306,6 +306,8 @@ _cupsFileCheckFilter(
   const char	*prefix;		/* Messaging prefix */
 
 
+  (void)context;
+
   switch (result)
   {
     case _CUPS_FILE_CHECK_OK :

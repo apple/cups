@@ -343,9 +343,9 @@ div.contents ul.subcontents li {
 <!--
   "$Id$"
 
-  CUPS API header for the Common UNIX Printing System (CUPS).
+  CUPS API header for CUPS.
 
-  Copyright 2008-2009 by Apple Inc.
+  Copyright 2008-2011 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -1991,7 +1991,7 @@ Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server via the
 <a href="#cupsSetServer"><code>cupsSetServer</code></a> function need to do so in each thread for the same
 server to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cupsSetClientCertCB">cupsSetClientCertCB</a></h3>
 <p class="description">Set the client certificate callback.</p>
 <p class="code">
 void cupsSetClientCertCB (<br>
@@ -2013,7 +2013,7 @@ in a program. Multi-threaded programs that override the callback need to do
 so in each thread for the same callback to be used.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="cupsSetCredentials">cupsSetCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cupsSetCredentials">cupsSetCredentials</a></h3>
 <p class="description">Set the default credentials to be used for SSL/TLS
 connections.</p>
 <p class="code">
@@ -2180,7 +2180,7 @@ default server name and port.<br>
 Note: The current server is tracked separately for each thread in a program.
 Multi-threaded programs that override the server need to do so in each
 thread for the same server to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cupsSetServerCertCB">cupsSetServerCertCB</a></h3>
 <p class="description">Set the server certificate callback.</p>
 <p class="code">
 void cupsSetServerCertCB (<br>
@@ -2331,7 +2331,7 @@ program. Multi-threaded programs that override the user name with the
 <a href="#cupsSetUser"><code>cupsSetUser</code></a> function need to do so in each thread for the same user
 name to be used.</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
 <p class="description">Client credentials callback </p>
 <p class="code">
 typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls, cups_array_t *distinguished_names, void *user_data);
@@ -2371,7 +2371,7 @@ typedef const char *(*cups_password_cb_t)(const char *prompt);
 <p class="code">
 typedef unsigned cups_ptype_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="cups_server_cert_cb_t">cups_server_cert_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cups_server_cert_cb_t">cups_server_cert_cb_t</a></h3>
 <p class="description">Server credentials callback </p>
 <p class="code">
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *certs, void *user_data);

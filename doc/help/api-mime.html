@@ -394,13 +394,16 @@ including file size.">mimeFilter2</a></li>
 	<li><a href="#mimeLoad" title="Create a new MIME database from disk.">mimeLoad</a></li>
 	<li><a href="#mimeLoadFilters" title="Load filter definitions from disk.">mimeLoadFilters</a></li>
 	<li><a href="#mimeLoadTypes" title="Load type definitions from disk.">mimeLoadTypes</a></li>
+	<li><a href="#mimeNew" title="Create a new, empty MIME database.">mimeNew</a></li>
 	<li><a href="#mimeNextFilter" title="Get the next filter in the MIME database.">mimeNextFilter</a></li>
 	<li><a href="#mimeNextType" title="Get the next type in the MIME database.">mimeNextType</a></li>
 	<li><a href="#mimeNumFilters" title="Next type">mimeNumFilters</a></li>
 	<li><a href="#mimeNumTypes" title="MIME database">mimeNumTypes</a></li>
+	<li><a href="#mimeSetErrorCallback" title="Set the callback for error messages.">mimeSetErrorCallback</a></li>
 	<li><a href="#mimeType" title="Lookup a file type.">mimeType</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#const" title="MIME Database">const</a></li>
 	<li><a href="#mime_filter_t" title="MIME Conversion Filter Data">mime_filter_t</a></li>
 	<li><a href="#mime_magic_t" title="MIME Magic Data">mime_magic_t</a></li>
 	<li><a href="#mime_op_t" title="Types/structures...">mime_op_t</a></li>
@@ -434,7 +437,7 @@ including file size.">mimeFilter2</a></li>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *src,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *dst,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int cost,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *filter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filter<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -456,8 +459,8 @@ including file size.">mimeFilter2</a></li>
 <p class="code">
 <a href="#mime_type_t">mime_type_t</a> *mimeAddType (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *super,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *super,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -475,7 +478,7 @@ including file size.">mimeFilter2</a></li>
 <p class="code">
 int mimeAddTypeRule (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_type_t">mime_type_t</a> *mt,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *rule<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *rule<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -530,8 +533,8 @@ void mimeDeleteType (<br>
 <p class="code">
 <a href="#mime_type_t">mime_type_t</a> *mimeFileType (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *pathname,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *filename,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filename,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int *compression<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -644,8 +647,8 @@ cups_array_t *mimeFilter2 (<br>
 <p class="description">Create a new MIME database from disk.</p>
 <p class="code">
 <a href="#mime_t">mime_t</a> *mimeLoad (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *pathname,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *filterpath<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filterpath<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -664,8 +667,8 @@ create a MIME database from a single directory.</p>
 <p class="code">
 <a href="#mime_t">mime_t</a> *mimeLoadFilters (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *pathname,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *filterpath<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *filterpath<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -686,7 +689,7 @@ Use <a href="#mimeLoadTypes"><code>mimeLoadTypes</code></a> to load all types be
 <p class="code">
 <a href="#mime_t">mime_t</a> *mimeLoadTypes (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *pathname<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *pathname<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -700,6 +703,12 @@ Use <a href="#mimeLoadTypes"><code>mimeLoadTypes</code></a> to load all types be
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function loads all of the .types files from the specified directory.
 Use <a href="#mimeLoadFilters"><code>mimeLoadFilters</code></a> to load all filters after you load the types.</p>
+<h3 class="function"><a name="mimeNew">mimeNew</a></h3>
+<p class="description">Create a new, empty MIME database.</p>
+<p class="code">
+<a href="#mime_t">mime_t</a> *mimeNew (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">MIME database</p>
 <h3 class="function"><a name="mimeNextFilter">mimeNextFilter</a></h3>
 <p class="description">Get the next filter in the MIME database.</p>
 <p class="code">
@@ -752,13 +761,30 @@ int mimeNumTypes (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Get the number of types in a MIME database.</p>
+<h3 class="function"><a name="mimeSetErrorCallback">mimeSetErrorCallback</a></h3>
+<p class="description">Set the callback for error messages.</p>
+<p class="code">
+void mimeSetErrorCallback (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mime_error_cb_t cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *ctx<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>mime</dt>
+<dd class="description">MIME database</dd>
+<dt>cb</dt>
+<dd class="description">Callback function</dd>
+<dt>ctx</dt>
+<dd class="description">Context pointer for callback</dd>
+</dl>
 <h3 class="function"><a name="mimeType">mimeType</a></h3>
 <p class="description">Lookup a file type.</p>
 <p class="code">
 <a href="#mime_type_t">mime_type_t</a> *mimeType (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#mime_t">mime_t</a> *mime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *super,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *super,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#const">const</a> char *type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -772,6 +798,11 @@ int mimeNumTypes (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching file type definition</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="const">const</a></h3>
+<p class="description">MIME Database</p>
+<p class="code">
+typedef void (*constmime_error_cb_t)(void *;
+</p>
 <h3 class="typedef"><a name="mime_filter_t">mime_filter_t</a></h3>
 <p class="description">MIME Conversion Filter Data</p>
 <p class="code">

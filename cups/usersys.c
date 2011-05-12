@@ -185,7 +185,7 @@ cupsServer(void)
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 void
@@ -209,7 +209,7 @@ cupsSetClientCertCB(
  * program. Multi-threaded programs that override the setting need to do so in
  * each thread for the same setting to be used.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -376,7 +376,7 @@ cupsSetServer(const char *server)	/* I - Server name */
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 void

@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: cupsaccept.man 7930 2008-09-10 22:25:54Z mike $"
 .\"
-.\"   accept/reject man page for the Common UNIX Printing System (CUPS).
+.\"   accept/reject man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -73,7 +73,7 @@ require the root user to execute these commands.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: cupsaccept.man 7930 2008-09-10 22:25:54Z mike $".
 .\"

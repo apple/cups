@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-directories.m4 7799 2008-07-25 20:06:08Z mike $"
 dnl
-dnl   Directory stuff for the Common UNIX Printing System (CUPS).
+dnl   Directory stuff for CUPS.
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -153,7 +153,7 @@ if test x$rcdir = x; then
 			# Darwin and MacOS X...
 			if test -x /sbin/launchd; then
 				INITDDIR="/System/Library/LaunchDaemons"
-			else 
+			else
 				INITDDIR="/System/Library/StartupItems/PrintingServices"
 			fi
 			;;

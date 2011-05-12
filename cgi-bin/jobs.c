@@ -1,9 +1,9 @@
 /*
  * "$Id: jobs.c 7237 2008-01-22 01:38:39Z mike $"
  *
- *   Job status CGI for the Common UNIX Printing System (CUPS).
+ *   Job status CGI for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

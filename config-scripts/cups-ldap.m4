@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-ldap.m4 7800 2008-07-25 21:01:34Z mike $"
 dnl
-dnl   LDAP configuration stuff for the Common UNIX Printing System (CUPS).
+dnl   LDAP configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 2003-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

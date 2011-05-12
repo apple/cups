@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7940 2008-09-16 00:45:16Z mike $"
 #
-#   Template makefile for the Common UNIX Printing System (CUPS).
+#   Template makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the

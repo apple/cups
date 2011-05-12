@@ -1,9 +1,9 @@
 dnl
 dnl   "$Id$"
 dnl
-dnl   GSSAPI/Kerberos library detection.
+dnl   GSSAPI/Kerberos library detection for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl   This file contains Kerberos support code, copyright 2006 by

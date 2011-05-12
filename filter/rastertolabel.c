@@ -1307,8 +1307,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
     return (0);
   }
-
-  return (Page == 0);
 }
 
 

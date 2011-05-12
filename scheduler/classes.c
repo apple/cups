@@ -309,13 +309,8 @@ cupsdLoadAllClasses(void)
   */
 
   snprintf(line, sizeof(line), "%s/classes.conf", ServerRoot);
-  if ((fp = cupsFileOpen(line, "r")) == NULL)
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", line,
-		      strerror(errno));
+  if ((fp = cupsdOpenConfFile(line)) == NULL)
     return;
-  }
 
  /*
   * Read class configurations until we hit EOF...
@@ -691,8 +686,8 @@ void
 cupsdSaveAllClasses(void)
 {
   cups_file_t		*fp;		/* classes.conf file */
-  char			temp[1024],	/* Temporary string */
-			backup[1024],	/* printers.conf.O file */
+  char			filename[1024],	/* classes.conf filename */
+			temp[1024],	/* Temporary string */
 			value[2048],	/* Value string */
 			*name;		/* Current user name */
   cupsd_printer_t	*pclass;	/* Current printer class */
@@ -706,35 +701,12 @@ cupsdSaveAllClasses(void)
   * Create the classes.conf file...
   */
 
-  snprintf(temp, sizeof(temp), "%s/classes.conf", ServerRoot);
-  snprintf(backup, sizeof(backup), "%s/classes.conf.O", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/classes.conf", ServerRoot);
 
-  if (rename(temp, backup))
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup classes.conf - %s",
-                      strerror(errno));
-  }
-
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to save classes.conf - %s",
-                    strerror(errno));
-
-    if (rename(backup, temp))
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to restore classes.conf - %s",
-                      strerror(errno));
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Saving classes.conf...");
 
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), RunUser, Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving classes.conf...");
 
  /*
   * Write a small header to the file...
@@ -857,7 +829,7 @@ cupsdSaveAllClasses(void)
     cupsFilePuts(fp, "</Class>\n");
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 

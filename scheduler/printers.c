@@ -955,13 +955,8 @@ cupsdLoadAllPrinters(void)
   */
 
   snprintf(line, sizeof(line), "%s/printers.conf", ServerRoot);
-  if ((fp = cupsFileOpen(line, "r")) == NULL)
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", line,
-		      strerror(errno));
+  if ((fp = cupsdOpenConfFile(line)) == NULL)
     return;
-  }
 
  /*
   * Read printer configurations until we hit EOF...
@@ -1455,8 +1450,8 @@ cupsdSaveAllPrinters(void)
 {
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
-  char			temp[1024],	/* Temporary string */
-			backup[1024],	/* printers.conf.O file */
+  char			filename[1024],	/* printers.conf filename */
+			temp[1024],	/* Temporary string */
 			value[2048],	/* Value string */
 			*ptr,		/* Pointer into value */
 			*name;		/* Current user/group name */
@@ -1471,35 +1466,12 @@ cupsdSaveAllPrinters(void)
   * Create the printers.conf file...
   */
 
-  snprintf(temp, sizeof(temp), "%s/printers.conf", ServerRoot);
-  snprintf(backup, sizeof(backup), "%s/printers.conf.O", ServerRoot);
+  snprintf(filename, sizeof(filename), "%s/printers.conf", ServerRoot);
 
-  if (rename(temp, backup))
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to backup printers.conf - %s", strerror(errno));
-  }
-
-  if ((fp = cupsFileOpen(temp, "w")) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to save printers.conf - %s", strerror(errno));
-
-    if (rename(backup, temp))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to restore printers.conf - %s", strerror(errno));
+  if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm & 0600)) == NULL)
     return;
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_INFO, "Saving printers.conf...");
 
- /*
-  * Restrict access to the file...
-  */
-
-  fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), ConfigFilePerm & 0600);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving printers.conf...");
 
  /*
   * Write a small header to the file...
@@ -1754,7 +1726,7 @@ cupsdSaveAllPrinters(void)
 #endif /* __sgi */
   }
 
-  cupsFileClose(fp);
+  cupsdCloseCreatedConfFile(fp, filename);
 }
 
 
@@ -3867,6 +3839,8 @@ compare_printers(void *first,		/* I - First printer */
                  void *second,		/* I - Second printer */
 		 void *data)		/* I - App data (not used) */
 {
+  (void)data;
+
   return (strcasecmp(((cupsd_printer_t *)first)->name,
                      ((cupsd_printer_t *)second)->name));
 }

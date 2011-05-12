@@ -2815,7 +2815,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
             if (!strncasecmp(con->header, "Location:", 9))
 	    {
-  	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE);
+  	      if (!cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE))
+	      {
+	        cupsdCloseClient(con);
+		return;
+	      }
+
 	      con->sent_header = 2;
 
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
@@ -2829,7 +2834,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    }
 	    else
 	    {
-  	      cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE);
+  	      if (!cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE))
+	      {
+	        cupsdCloseClient(con);
+		return;
+	      }
+
 	      con->sent_header = 1;
 
 	      if (con->http.version == HTTP_1_1)
@@ -3808,60 +3818,42 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 static http_status_t			/* O - Status */
 install_conf_file(cupsd_client_t *con)	/* I - Connection */
 {
+  char		filename[1024];		/* Configuration filename */
+  mode_t	mode;			/* Permissions */
   cups_file_t	*in,			/* Input file */
 		*out;			/* Output file */
-  char		buffer[1024];		/* Copy buffer */
-  int		bytes;			/* Number of bytes */
-  char		conffile[1024],		/* Configuration filename */
-		newfile[1024],		/* New config filename */
-		oldfile[1024];		/* Old config filename */
-  struct stat	confinfo;		/* Config file info */
+  char		buffer[16384];		/* Copy buffer */
+  ssize_t	bytes;			/* Number of bytes */
 
 
  /*
-  * First construct the filenames...
-  */
-
-  snprintf(conffile, sizeof(conffile), "%s%s", ServerRoot, con->uri + 11);
-  snprintf(newfile, sizeof(newfile), "%s%s.N", ServerRoot, con->uri + 11);
-  snprintf(oldfile, sizeof(oldfile), "%s%s.O", ServerRoot, con->uri + 11);
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "Installing config file \"%s\"...", conffile);
-
- /*
-  * Get the owner, group, and permissions of the configuration file.
-  * If it doesn't exist, assign it to the User and Group in the
-  * cupsd.conf file with mode 0640 permissions.
-  */
-
-  if (stat(conffile, &confinfo))
-  {
-    confinfo.st_uid  = User;
-    confinfo.st_gid  = Group;
-    confinfo.st_mode = ConfigFilePerm;
-  }
-
- /*
-  * Open the request file and new config file...
+  * Open the request file...
   */
 
   if ((in = cupsFileOpen(con->filename, "rb")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open request file \"%s\" - %s",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open request file \"%s\": %s",
                     con->filename, strerror(errno));
     return (HTTP_SERVER_ERROR);
   }
 
-  if ((out = cupsFileOpen(newfile, "wb")) == NULL)
+ /*
+  * Open the new config file...
+  */
+
+  snprintf(filename, sizeof(filename), "%s%s", ServerRoot, con->uri + 11);
+  if (!strcmp(con->uri, "/admin/conf/printers.conf"))
+    mode = ConfigFilePerm & 0600;
+  else
+    mode = ConfigFilePerm;
+
+  if ((out = cupsdCreateConfFile(filename, mode)) == NULL)
   {
     cupsFileClose(in);
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open config file \"%s\" - %s",
-                    newfile, strerror(errno));
     return (HTTP_SERVER_ERROR);
   }
 
-  fchmod(cupsFileNumber(out), confinfo.st_mode);
-  fchown(cupsFileNumber(out), confinfo.st_uid, confinfo.st_gid);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Installing config file \"%s\"...", filename);
 
  /*
   * Copy from the request to the new config file...
@@ -3871,12 +3863,14 @@ install_conf_file(cupsd_client_t *con)	/* I - Connection */
     if (cupsFileWrite(out, buffer, bytes) < bytes)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to copy to config file \"%s\" - %s",
-        	      newfile, strerror(errno));
+                      "Unable to copy to config file \"%s\": %s",
+        	      filename, strerror(errno));
 
       cupsFileClose(in);
       cupsFileClose(out);
-      unlink(newfile);
+
+      snprintf(filename, sizeof(filename), "%s%s.N", ServerRoot, con->uri + 11);
+      cupsdRemoveFile(filename);
 
       return (HTTP_SERVER_ERROR);
     }
@@ -3886,64 +3880,16 @@ install_conf_file(cupsd_client_t *con)	/* I - Connection */
   */
 
   cupsFileClose(in);
-  if (cupsFileClose(out))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Error file closing config file \"%s\" - %s",
-                    newfile, strerror(errno));
 
-    unlink(newfile);
-
+  if (cupsdCloseCreatedConfFile(out, filename))
     return (HTTP_SERVER_ERROR);
-  }
 
  /*
   * Remove the request file...
   */
 
-  unlink(con->filename);
+  cupsdRemoveFile(con->filename);
   cupsdClearString(&con->filename);
-
- /*
-  * Unlink the old backup, rename the current config file to the backup
-  * filename, and rename the new config file to the config file name...
-  */
-
-  if (unlink(oldfile))
-    if (errno != ENOENT)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to remove backup config file \"%s\" - %s",
-        	      oldfile, strerror(errno));
-
-      unlink(newfile);
-
-      return (HTTP_SERVER_ERROR);
-    }
-
-  if (rename(conffile, oldfile))
-    if (errno != ENOENT)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to rename old config file \"%s\" - %s",
-        	      conffile, strerror(errno));
-
-      unlink(newfile);
-
-      return (HTTP_SERVER_ERROR);
-    }
-
-  if (rename(newfile, conffile))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to rename new config file \"%s\" - %s",
-                    newfile, strerror(errno));
-
-    rename(oldfile, conffile);
-    unlink(newfile);
-
-    return (HTTP_SERVER_ERROR);
-  }
 
  /*
   * If the cupsd.conf file was updated, set the NeedReload flag...
@@ -4016,8 +3962,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #ifdef HAVE_JAVA
@@ -4037,8 +3982,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_JAVA */
@@ -4059,8 +4003,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PERL */
@@ -4081,8 +4024,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PHP */
@@ -4103,8 +4045,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
-		    type ? type->type : "unknown");
+		    type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PYTHON */
@@ -4112,8 +4053,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		  "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
 		  "type=%s/%s) = 0", con, con->http.fd, filename, filestats,
-		  type ? type->super : "unknown",
-		  type ? type->type : "unknown");
+		  type->super, type->type);
   return (0);
 }
 

@@ -1,9 +1,9 @@
 /*
  * "$Id: language.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Multi-language support for the Common UNIX Printing System (CUPS).
+ *   Multi-language support for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

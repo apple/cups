@@ -8,7 +8,7 @@ ipp.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
 ipp.o: ../cups/http.h ../cups/md5-private.h ../cups/ipp-private.h
 ipp.o: ../cups/ipp.h ../cups/language-private.h ../cups/transcode.h
 ipp.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
-ipp.o: ../cups/sidechannel.h
+ipp.o: ../cups/sidechannel.h ../cups/array-private.h
 lpd.o: ../cups/http-private.h ../config.h ../cups/http.h
 lpd.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
 lpd.o: backend-private.h ../cups/cups-private.h ../cups/cups.h ../cups/file.h

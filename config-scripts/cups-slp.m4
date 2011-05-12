@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-slp.m4 7241 2008-01-22 22:34:52Z mike $"
 dnl
-dnl   OpenSLP configuration stuff for the Common UNIX Printing System (CUPS).
+dnl   OpenSLP configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

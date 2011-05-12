@@ -1,9 +1,9 @@
 <!--
   "$Id: api-httpipp.header 7258 2008-01-28 00:15:05Z mike $"
 
-  HTTP and IPP API header for the Common UNIX Printing System (CUPS).
+  HTTP and IPP API header for CUPS.
 
-  Copyright 2007-2009 by Apple Inc.
+  Copyright 2007-2011 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the

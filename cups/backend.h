@@ -1,9 +1,9 @@
 /*
  * "$Id: backend.h 7810 2008-07-29 01:11:15Z mike $"
  *
- *   Backend definitions for the Common UNIX Printing System (CUPS).
+ *   Backend definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -65,7 +65,7 @@ extern void		cupsBackendReport(const char *device_scheme,
 			                  const char *device_id,
 			                  const char *device_location)
 					  _CUPS_API_1_4;
-			                  
+
 
 #  ifdef __cplusplus
 }

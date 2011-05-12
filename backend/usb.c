@@ -1,9 +1,9 @@
 /*
  * "$Id: usb.c 7687 2008-06-24 01:28:36Z mike $"
  *
- *   USB port backend for the Common UNIX Printing System (CUPS).
+ *   USB port backend for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: cups-deviced.man.in 7646 2008-06-16 17:26:20Z mike $"
 .\"
-.\"   cups-deviced man page for the Common UNIX Printing System (CUPS).
+.\"   cups-deviced man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -38,7 +38,7 @@ backend(7), cupsd(8), cupsd.conf(5),
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: cups-deviced.man.in 7646 2008-06-16 17:26:20Z mike $".
 .\"

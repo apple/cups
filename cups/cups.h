@@ -3,7 +3,7 @@
  *
  *   API definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -170,13 +170,13 @@ typedef struct cups_job_s		/**** Job ****/
 } cups_job_t;
 
 typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls,
-				     cups_array_t *distinguished_names, 
+				     cups_array_t *distinguished_names,
 				     void *user_data);
-					/**** Client credentials callback @since CUPS 1.5@ ****/
+					/**** Client credentials callback @since CUPS 1.5/Mac OS X 10.7@ ****/
 
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls,
 				     cups_array_t *certs, void *user_data);
-					/**** Server credentials callback @since CUPS 1.5@ ****/
+					/**** Server credentials callback @since CUPS 1.5/Mac OS X 10.7@ ****/
 
 
 /*

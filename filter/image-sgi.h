@@ -1,10 +1,9 @@
 /*
  * "$Id: image-sgi.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   SGI image file format library definitions for the Common UNIX Printing
- *   System (CUPS).
+ *   SGI image file format library definitions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

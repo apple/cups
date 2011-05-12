@@ -1995,6 +1995,7 @@ _ppdCacheWriteFile(
   _pwg_map_t	*map;			/* Current map */
   cups_option_t	*option;		/* Current option */
   const char	*value;			/* Filter/pre-filter value */
+  char		newfile[1024];		/* New filename */
 
 
  /*
@@ -2011,7 +2012,8 @@ _ppdCacheWriteFile(
   * Open the file and write with compression...
   */
 
-  if ((fp = cupsFileOpen(filename, "w9")) == NULL)
+  snprintf(newfile, sizeof(newfile), "%s.N", filename);
+  if ((fp = cupsFileOpen(newfile, "w9")) == NULL)
   {
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
     return (0);
@@ -2142,7 +2144,14 @@ _ppdCacheWriteFile(
   * Close and return...
   */
 
-  return (!cupsFileClose(fp));
+  if (cupsFileClose(fp))
+  {
+    unlink(newfile);
+    return (0);
+  }
+
+  unlink(filename);
+  return (!rename(newfile, filename));
 }
 
 

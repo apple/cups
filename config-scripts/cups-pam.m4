@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-pam.m4 7960 2008-09-17 19:42:02Z mike $"
 dnl
-dnl   PAM stuff for the Common UNIX Printing System (CUPS).
+dnl   PAM stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

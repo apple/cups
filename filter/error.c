@@ -1,9 +1,9 @@
 /*
  * "$Id: error.c 7460 2008-04-16 02:19:54Z mike $"
  *
- *   Raster error handling for the Common UNIX Printing System (CUPS).
+ *   Raster error handling for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -192,7 +192,7 @@ get_error_buffer(void)
   _cups_raster_error_t *buf;		/* Pointer to error buffer */
 
 
- /* 
+ /*
   * Initialize the global data exactly once...
   */
 

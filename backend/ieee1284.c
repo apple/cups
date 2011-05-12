@@ -46,6 +46,15 @@ backendGetDeviceID(
     int        uri_size)		/* I - Size of buffer */
 {
 #ifdef __APPLE__ /* This function is a no-op */
+  (void)fd;
+  (void)device_id;
+  (void)device_id_size;
+  (void)make_model;
+  (void)make_model_size;
+  (void)scheme;
+  (void)uri;
+  (void)uri_size;
+
   return (-1);
 
 #else /* Get the device ID from the specified file descriptor... */
@@ -404,10 +413,7 @@ backendGetMakeModel(
 
       char	temp[1024];		/* Temporary make and model */
 
-      if (mfg)
-	snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
-      else
-	snprintf(temp, sizeof(temp), "%s", mdl);
+      snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
 
       _ppdNormalizeMakeAndModel(temp, make_model, make_model_size);
     }

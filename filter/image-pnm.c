@@ -1,9 +1,9 @@
 /*
  * "$Id: image-pnm.c 7374 2008-03-08 01:13:26Z mike $"
  *
- *   Portable Any Map file routines for the Common UNIX Printing System (CUPS).
+ *   Portable Any Map file routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

@@ -1,14 +1,14 @@
 /*
  * "$Id: file.h 7460 2008-04-16 02:19:54Z mike $"
  *
- *   Public file definitions for the Common UNIX Printing System (CUPS).
+ *   Public file definitions for CUPS.
  *
  *   Since stdio files max out at 256 files on many systems, we have to
  *   write similar functions without this limit.  At the same time, using
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

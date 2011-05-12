@@ -56,7 +56,7 @@ print_device(const char *uri,		/* I - Device URI */
 {
   int		use_bc;			/* Use backchannel path? */
   int		device_fd;		/* USB device */
-  size_t	tbytes;			/* Total number of bytes written */
+  ssize_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
 
 

@@ -1,9 +1,9 @@
 /*
  * "$Id: image-png.c 7437 2008-04-09 03:16:10Z mike $"
  *
- *   PNG image routines for the Common UNIX Printing System (CUPS).
+ *   PNG image routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

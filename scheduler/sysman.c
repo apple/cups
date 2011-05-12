@@ -774,6 +774,8 @@ sysEventTimerNotifier(
   cupsd_thread_data_t	*threadData;	/* Thread context data */
 
 
+  (void)timer;
+
   threadData = (cupsd_thread_data_t *)context;
 
  /*

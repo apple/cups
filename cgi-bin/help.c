@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Online help CGI for the Common UNIX Printing System (CUPS).
+ *   Online help CGI for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

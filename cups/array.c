@@ -722,7 +722,7 @@ cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
  * The free function ("cf") is used to automatically free/release elements when
  * removed or the array is deleted.
  *
- * @since CUPS 1.5@
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 cups_array_t *				/* O - Array */

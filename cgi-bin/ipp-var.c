@@ -1,9 +1,9 @@
 /*
  * "$Id: ipp-var.c 7940 2008-09-16 00:45:16Z mike $"
  *
- *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
+ *   CGI <-> IPP variable routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

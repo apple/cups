@@ -144,7 +144,7 @@ static cupsd_job_t *add_job(cupsd_client_t *con, cupsd_printer_t *printer,
 			    mime_type_t *filetype);
 static void	add_job_state_reasons(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_subscriptions(cupsd_client_t *con, cupsd_job_t *job);
-static void	add_job_uuid(cupsd_client_t *con, cupsd_job_t *job);
+static void	add_job_uuid(cupsd_job_t *job);
 static void	add_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(cupsd_client_t *con,
 		                          cupsd_printer_t *p);
@@ -1638,7 +1638,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
-  add_job_uuid(con, job);
+  add_job_uuid(job);
   apply_printer_defaults(printer, job);
 
   attr = ippFindAttribute(job->attrs, "requesting-user-name", IPP_TAG_NAME);
@@ -2325,8 +2325,7 @@ add_job_subscriptions(
  */
 
 static void
-add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
-             cupsd_job_t    *job)	/* I - Job */
+add_job_uuid(cupsd_job_t *job)		/* I - Job */
 {
   char			uuid[64];	/* job-uuid string */
 
@@ -3098,6 +3097,8 @@ apple_init_profile(
   CFStringRef		cflang,		/* Language string */
 			cftext;		/* Localized text */
 
+
+  (void)id;
 
  /*
   * Build the profile name dictionary...
@@ -5688,10 +5689,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   snprintf(buffer, sizeof(buffer), "%s/daemon/cups-driverd", ServerBin);
   snprintf(tempfile, sizeof(tempfile), "%s/%d.ppd", TempDir, con->http.fd);
   tempfd = open(tempfile, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-  if (tempfd < 0)
+  if (tempfd < 0 || cupsdOpenPipe(temppipe))
     return (-1);
-
-  cupsdOpenPipe(temppipe);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
@@ -10811,7 +10810,9 @@ send_http_error(
   cupsdLogMessage(status == HTTP_FORBIDDEN ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                   "Returning HTTP %s for %s (%s) from %s",
                   httpStatus(status),
-		  ippOpString(con->request->request.op.operation_id),
+		  con->request ?
+		      ippOpString(con->request->request.op.operation_id) :
+		      "no operation-id",
 		  uri ? uri->values[0].string.text : "no URI",
 		  con->http.hostname);
 

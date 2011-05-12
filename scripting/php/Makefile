@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 3572 2003-04-08 19:56:25Z mike $"
 #
-#   PHP Makefile for the Common UNIX Printing System (CUPS).
+#   PHP Makefile for CUPS.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the

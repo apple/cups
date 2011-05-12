@@ -1,13 +1,9 @@
 dnl
 dnl "$Id: cups-dnssd.m4 7890 2008-08-29 22:19:39Z mike $"
 dnl
-dnl   DNS Service Discovery (aka Bonjour) stuff for the Common UNIX Printing System (CUPS).
+dnl   DNS Service Discovery (aka Bonjour) stuff for CUPS.
 dnl
-dnl   http://www.dns-sd.org
-dnl   http://www.multicastdns.org/
-dnl   http://developer.apple.com/networking/bonjour/
-dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Apple Inc. and are protected by Federal copyright

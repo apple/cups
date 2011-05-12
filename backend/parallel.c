@@ -85,7 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		device_fd,		/* Parallel device */
 		use_bc;			/* Read back-channel data? */
   int		copies;			/* Number of copies to print */
-  size_t	tbytes;			/* Total number of bytes written */
+  ssize_t	tbytes;			/* Total number of bytes written */
   struct termios opts;			/* Parallel port options */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
