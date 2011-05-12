@@ -142,8 +142,7 @@ static void		cancel_job(http_t *http, const char *uri, int id,
 				   int version);
 static ipp_pstate_t	check_printer_state(http_t *http, const char *uri,
 		                            const char *resource,
-					    const char *user, int version,
-					    int job_id);
+					    const char *user, int version);
 #ifdef HAVE_LIBZ
 static void		compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
@@ -157,7 +156,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     ipp_attribute_t *doc_handling_sup);
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
-static void		report_printer_state(ipp_t *ipp, int job_id);
+static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
 static int		run_as_user(int argc, char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
@@ -848,7 +847,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 
-        report_printer_state(supported, 0);
+        report_printer_state(supported);
 
 	sleep(delay);
 
@@ -949,7 +948,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
 	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
 
-	report_printer_state(supported, 0);
+	report_printer_state(supported);
 
 	sleep(delay);
 
@@ -1057,7 +1056,7 @@ main(int  argc,				/* I - Number of command-line args */
 					"multiple-document-handling-supported",
 					IPP_TAG_KEYWORD);
 
-    report_printer_state(supported, 0);
+    report_printer_state(supported);
   }
   while (ipp_status > IPP_OK_CONFLICT);
 
@@ -1700,7 +1699,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Check the printer state and report it if necessary...
   */
 
-  check_printer_state(http, uri, resource, argv[2], version, job_id);
+  check_printer_state(http, uri, resource, argv[2], version);
 
  /*
   * Collect the final page count as needed...
@@ -1825,9 +1824,8 @@ check_printer_state(
     const char  *uri,			/* I - Printer URI */
     const char  *resource,		/* I - Resource path */
     const char  *user,			/* I - Username, if any */
-    int         version,		/* I - IPP version */
-    int         job_id)
-{
+    int         version)		/* I - IPP version */
+ {
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* Attribute in response */
@@ -1856,7 +1854,7 @@ check_printer_state(
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
-    report_printer_state(response, job_id);
+    report_printer_state(response);
 
     if ((attr = ippFindAttribute(response, "printer-state",
 				 IPP_TAG_ENUM)) != NULL)
@@ -1992,8 +1990,7 @@ monitor_printer(
       monitor->printer_state = check_printer_state(http, monitor->uri,
                                                    monitor->resource,
 						   monitor->user,
-						   monitor->version,
-						   monitor->job_id);
+						   monitor->version);
 
       if (monitor->job_id > 0)
       {
@@ -2422,8 +2419,7 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
  */
 
 static void
-report_printer_state(ipp_t *ipp,	/* I - IPP response */
-                     int   job_id)	/* I - Current job ID */
+report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   ipp_attribute_t	*pa,		/* printer-alert */
 			*pam,		/* printer-alert-message */

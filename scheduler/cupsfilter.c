@@ -717,6 +717,8 @@ check_cb(void              *context,	/* I - Context (command name) */
          _cups_fc_result_t result,	/* I - Result of check */
 	 const char        *message)	/* I - Localized message */
 {
+  (void)result;
+
   _cupsLangPrintf(stderr, _("%s: %s"), (char *)context, message);
 }
 

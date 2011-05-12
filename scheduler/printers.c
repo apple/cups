@@ -3839,6 +3839,8 @@ compare_printers(void *first,		/* I - First printer */
                  void *second,		/* I - Second printer */
 		 void *data)		/* I - App data (not used) */
 {
+  (void)data;
+
   return (strcasecmp(((cupsd_printer_t *)first)->name,
                      ((cupsd_printer_t *)second)->name));
 }

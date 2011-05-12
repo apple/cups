@@ -303,6 +303,9 @@ _cupsSetNegotiateAuthString(
 					/* Output token */
 
 
+  (void)method;
+  (void)resource;
+
 #  ifdef __APPLE__
  /*
   * If the weak-linked GSSAPI/Kerberos library is not present, don't try

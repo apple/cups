@@ -1013,6 +1013,11 @@ ldap_rebind_proc(
   struct berval	bval;			/* Bind value */
 #    endif /* LDAP_API_VERSION > 3000 */
 
+
+  (void)request;
+  (void)msgid;
+  (void)params;
+
  /*
   * Bind to new LDAP server...
   */
@@ -2309,6 +2314,7 @@ dnssdAddAlias(const void *key,		/* I - Key */
 	hostname[1024];			/* Complete hostname */
 
 
+  (void)key;
   (void)context;
 
   if (CFGetTypeID((CFStringRef)value) == CFStringGetTypeID() &&
@@ -2611,6 +2617,10 @@ dnssdRegisterCallback(
   cupsd_printer_t *p = (cupsd_printer_t *)context;
 					/* Current printer */
 
+
+  (void)sdRef;
+  (void)flags;
+  (void)domain;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterCallback(%s, %s) for %s (%s)",
                   name, regtype, p ? p->name : "Web Interface",

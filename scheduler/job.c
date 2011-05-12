@@ -1975,7 +1975,7 @@ cupsdSaveAllJobs(void)
   if ((fp = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
     return;
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...", filename);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Saving job.cache...");
 
  /*
   * Write a small header to the file...
@@ -2611,6 +2611,8 @@ compare_active_jobs(void *first,	/* I - First job */
   int	diff;				/* Difference */
 
 
+  (void)data;
+
   if ((diff = ((cupsd_job_t *)second)->priority -
               ((cupsd_job_t *)first)->priority) != 0)
     return (diff);
@@ -2628,6 +2630,8 @@ compare_jobs(void *first,		/* I - First job */
              void *second,		/* I - Second job */
 	     void *data)		/* I - App data (not used) */
 {
+  (void)data;
+
   return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
 }
 
@@ -3121,7 +3125,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   * Update the printer and job state.
   */
 
-  if (job_state != job->state_value)
+  if (set_job_state && job_state != job->state_value)
     cupsdSetJobState(job, job_state, CUPSD_JOB_DEFAULT, "%s", message);
 
   cupsdSetPrinterState(job->printer, printer_state,

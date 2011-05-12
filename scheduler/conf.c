@@ -1834,6 +1834,8 @@ static void
 mime_error_cb(void       *ctx,		/* I - Context pointer (unused) */
               const char *message)	/* I - Message */
 {
+  (void)ctx;
+
   cupsdLogMessage(CUPSD_LOG_ERROR, "%s", message);
 }
 
