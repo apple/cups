@@ -99,6 +99,20 @@ _cupsFileCheck(
 
 
  /*
+  * Does the filename contain a relative path ("../")?
+  */
+
+  if (strstr(filename, "../"))
+  {
+   /*
+    * Yes, fail it!
+    */
+
+    result = _CUPS_FILE_CHECK_RELATIVE_PATH;
+    goto finishup;
+  }
+
+ /*
   * Does the program even exist and is it accessible?
   */
 
@@ -284,6 +298,17 @@ _cupsFileCheck(
 		     _cupsLangString(lang, _("File \"%s\" is a directory.")),
 		     filename);
           break;
+
+      case _CUPS_FILE_CHECK_RELATIVE_PATH :
+	  if (filetype == _CUPS_FILE_CHECK_DIRECTORY)
+	    snprintf(message, sizeof(message),
+		     _cupsLangString(lang, _("Directory \"%s\" contains a "
+					     "relative path.")), filename);
+	  else
+	    snprintf(message, sizeof(message),
+		     _cupsLangString(lang, _("File \"%s\" contains a relative "
+					     "path.")), filename);
+          break;
     }
 
     (*cb)(context, result, message);
@@ -321,6 +346,7 @@ _cupsFileCheckFilter(
 	break;
 
     case _CUPS_FILE_CHECK_PERMISSIONS :
+    case _CUPS_FILE_CHECK_RELATIVE_PATH :
         prefix = "ERROR";
 	fputs("STATE: +cups-insecure-filter-warning\n", stderr);
 	break;

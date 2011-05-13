@@ -73,7 +73,8 @@ typedef enum				/**** _cupsFileCheck return values ****/
   _CUPS_FILE_CHECK_OK = 0,		/* Everything OK */
   _CUPS_FILE_CHECK_MISSING = 1,		/* File is missing */
   _CUPS_FILE_CHECK_PERMISSIONS = 2,	/* File (or parent dir) has bad perms */
-  _CUPS_FILE_CHECK_WRONG_TYPE = 3	/* File has wrong type */
+  _CUPS_FILE_CHECK_WRONG_TYPE = 3,	/* File has wrong type */
+  _CUPS_FILE_CHECK_RELATIVE_PATH = 4	/* File contains a relative path */
 } _cups_fc_result_t;
 
 typedef enum				/**** _cupsFileCheck file type values ****/

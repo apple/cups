@@ -761,9 +761,7 @@ cups_read_client_conf(
 
   if (!cg->ipp_port)
   {
-    const char		*ipp_port;	/* IPP_PORT environment variable */
-    struct servent	*service;	/* Port number info */
-
+    const char	*ipp_port;		/* IPP_PORT environment variable */
 
     if ((ipp_port = getenv("IPP_PORT")) != NULL)
     {
