@@ -770,11 +770,8 @@ cups_read_client_conf(
       if ((cg->ipp_port = atoi(ipp_port)) <= 0)
         cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
     }
-    else if ((service = getservbyname("ipp", NULL)) == NULL ||
-             service->s_port <= 0)
-      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
     else
-      cg->ipp_port = ntohs(service->s_port);
+      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
   }
 
 #ifdef HAVE_GSSAPI
