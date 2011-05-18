@@ -246,9 +246,9 @@ cupsdEndProcess(int pid,		/* I - Process ID */
   if (!pid)
     return (0);
   else if (force)
-    return (kill(pid, SIGKILL));
+    return (kill(-pid, SIGKILL));
   else
-    return (kill(pid, SIGTERM));
+    return (kill(-pid, SIGTERM));
 }
 
 
@@ -475,6 +475,19 @@ cupsdStartProcess(
 
     if (!root)
       nice(FilterNice);
+
+   /*
+    * Put this process in its own process group so that we can kill any child
+    * processes it creates.
+    */
+
+#ifdef HAVE_SETPGID
+    if (setpgid(0, 0))
+      exit(errno);
+#else
+    if (setpgrp())
+      exit(errno);
+#endif /* HAVE_SETPGID */
 
    /*
     * Change user to something "safe"...

@@ -166,6 +166,9 @@ AC_CHECK_FUNCS(random lrand48 arc4random)
 dnl Check for geteuid function.
 AC_CHECK_FUNCS(geteuid)
 
+dnl Check for setpgid function.
+AC_CHECK_FUNCS(setpgid)
+
 dnl Check for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)
 

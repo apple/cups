@@ -291,6 +291,13 @@
 
 
 /*
+ * Do we have the setpgid() function?
+ */
+
+/* #undef HAVE_SETPGID */
+
+
+/*
  * Do we have the vsyslog() function?
  */
 

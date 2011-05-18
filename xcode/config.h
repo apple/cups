@@ -230,6 +230,13 @@
 
 
 /*
+ * Do we have the setpgid() function?
+ */
+
+#define HAVE_SETPGID 1
+
+
+/*
  * Do we have the vsyslog() function?
  */
 

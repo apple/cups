@@ -1,8 +1,10 @@
-CHANGES.txt - 2011-05-11
+CHANGES.txt - 2011-05-18
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler now sets the process group for child processes and
+	  manages the group (STR #2829)
 	- Fixed some minor issues discovered by a Coverity scan (STR #3838)
 	- The scheduler now more carefully creates and removes configuration,
 	  cache, and state files (STR #3715)
