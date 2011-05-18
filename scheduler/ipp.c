@@ -10320,30 +10320,41 @@ save_auth_info(
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
+  for (i = 0;
+       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+       i ++)
+    cupsdClearString(job->auth_env + i);
+
   if (auth_info && auth_info->num_values == dest->num_auth_info_required)
   {
    /*
     * Write 1 to 3 auth values...
     */
 
-    cupsdClearString(&job->auth_username);
-    cupsdClearString(&job->auth_domain);
-    cupsdClearString(&job->auth_password);
-
-    for (i = 0; i < auth_info->num_values; i ++)
+    for (i = 0;
+         i < auth_info->num_values &&
+	     i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+	 i ++)
     {
       httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
                      strlen(auth_info->values[i].string.text));
       cupsFilePrintf(fp, "%s\n", line);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
-        cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "domain"))
-        cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "password"))
-        cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s",
+	                auth_info->values[i].string.text);
+      else if (!strcmp(dest->auth_info_required[i], "negotiate"))
+        cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s",
+	                auth_info->values[i].string.text);
+      else
+        cupsdSetStringf(job->auth_env + i, "AUTH_%s=%s",
+	                dest->auth_info_required[i],
 	                auth_info->values[i].string.text);
     }
   }
@@ -10356,8 +10367,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", con->username);
-    cupsdClearString(&job->auth_domain);
+    cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s", con->username);
 
    /*
     * Write the authenticated password...
@@ -10366,7 +10376,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
+    cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s", con->password);
   }
 
 #ifdef HAVE_GSSAPI

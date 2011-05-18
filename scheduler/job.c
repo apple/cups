@@ -997,12 +997,15 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   }
 
   envp[envc ++] = auth_info_required;
-  if (job->auth_username)
-    envp[envc ++] = job->auth_username;
-  if (job->auth_domain)
-    envp[envc ++] = job->auth_domain;
-  if (job->auth_password)
-    envp[envc ++] = job->auth_password;
+
+  for (i = 0;
+       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+       i ++)
+    if (job->auth_env[i])
+      envp[envc ++] = job->auth_env[i];
+    else
+      break;
+
   if (job->auth_uid)
     envp[envc ++] = job->auth_uid;
 
@@ -1297,6 +1300,7 @@ void
 cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
                cupsd_jobaction_t action)/* I - Action */
 {
+  int	i;				/* Looping var */
   char	filename[1024];			/* Job filename */
 
 
@@ -1319,9 +1323,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
 
   cupsdClearString(&job->username);
   cupsdClearString(&job->dest);
-  cupsdClearString(&job->auth_username);
-  cupsdClearString(&job->auth_domain);
-  cupsdClearString(&job->auth_password);
+  for (i = 0;
+       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+       i ++)
+    cupsdClearString(job->auth_env + i);
   cupsdClearString(&job->auth_uid);
 
   if (job->num_files > 0)
@@ -1525,6 +1530,7 @@ cupsdLoadAllJobs(void)
 int					/* O - 1 on success, 0 on failure */
 cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 {
+  int			i;		/* Looping var */
   char			jobfile[1024];	/* Job filename */
   cups_file_t		*fp;		/* Job file */
   int			fileid;		/* Current file ID */
@@ -1780,21 +1786,22 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   {
     snprintf(jobfile, sizeof(jobfile), "%s/a%05d", RequestRoot, job->id);
 
-    cupsdClearString(&job->auth_username);
-    cupsdClearString(&job->auth_domain);
-    cupsdClearString(&job->auth_password);
+    for (i = 0;
+	 i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+	 i ++)
+      cupsdClearString(job->auth_env + i);
     cupsdClearString(&job->auth_uid);
 
     if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
     {
-      int	i,			/* Looping var */
-		bytes;			/* Size of auth data */
+      int	bytes;			/* Size of auth data */
       char	line[255],		/* Line from file */
 		data[255];		/* Decoded data */
 
 
       for (i = 0;
            i < destptr->num_auth_info_required &&
+	       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])) &&
 	       cupsFileGets(fp, line, sizeof(line));
 	   i ++)
       {
@@ -1802,14 +1809,13 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
         httpDecode64_2(data, &bytes, line);
 
 	if (!strcmp(destptr->auth_info_required[i], "username"))
-	  cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", data);
+	  cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
 	else if (!strcmp(destptr->auth_info_required[i], "domain"))
-	  cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s", data);
+	  cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s", data);
 	else if (!strcmp(destptr->auth_info_required[i], "password"))
-	  cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", data);
-        else if (!strcmp(destptr->auth_info_required[i], "negotiate") &&
-	         isdigit(line[0] & 255))
-	  cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
+	  cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
+        else if (!strcmp(destptr->auth_info_required[i], "negotiate"))
+	  cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
       }
 
       if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
@@ -2477,9 +2483,11 @@ cupsdSetJobState(
 			  "Unable to remove authentication cache: %s",
 			  strerror(errno));
 
-	cupsdClearString(&job->auth_username);
-	cupsdClearString(&job->auth_domain);
-	cupsdClearString(&job->auth_password);
+	for (i = 0;
+	     i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+	     i ++)
+	  cupsdClearString(job->auth_env + i);
+
 	cupsdClearString(&job->auth_uid);
 
        /*

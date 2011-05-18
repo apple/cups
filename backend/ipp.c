@@ -2545,6 +2545,7 @@ run_as_user(int        argc,		/* I - Number of command-line args */
 	    const char *device_uri,	/* I - Device URI */
 	    int        fd)		/* I - File to print */
 {
+  const char		*auth_negotiate;/* AUTH_NEGOTIATE env var */
   xpc_connection_t	conn;		/* Connection to XPC service */
   xpc_object_t		request;	/* Request message dictionary */
   __block xpc_object_t	response;	/* Response message dictionary */
@@ -2605,6 +2606,8 @@ run_as_user(int        argc,		/* I - Number of command-line args */
   xpc_dictionary_set_string(request, "options", argv[5]);
   xpc_dictionary_set_string(request, "auth-info-required",
                             getenv("AUTH_INFO_REQUIRED"));
+  if ((auth_negotiate = getenv("AUTH_NEGOTIATE")) != NULL)
+    xpc_dictionary_set_string(request, "auth-negotiate", auth_negotiate);
   xpc_dictionary_set_fd(request, "stdin", fd);
   xpc_dictionary_set_fd(request, "stderr", 2);
   xpc_dictionary_set_fd(request, "side-channel", CUPS_SC_FD);
