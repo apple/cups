@@ -1356,15 +1356,18 @@ cupsdLoadAllPrinters(void)
           cupsdSetPrinterAttr(p, value, valueptr);
       }
     }
-    else
+    else if (strcasecmp(line, "Filter") &&
+             strcasecmp(line, "Prefilter") &&
+             strcasecmp(line, "Product"))
     {
      /*
-      * Something else we don't understand...
+      * Something else we don't understand (and that wasn't used in a prior
+      * release of CUPS...
       */
 
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown configuration directive %s on line %d of printers.conf.",
-	              line, linenum);
+                      "Unknown configuration directive %s on line %d of "
+		      "printers.conf.", line, linenum);
     }
   }
 
