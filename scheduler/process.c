@@ -77,6 +77,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		request[1024],		/* Quoted RequestRoot */
 		root[1024],		/* Quoted ServerRoot */
 		temp[1024];		/* Quoted TempDir */
+  const char	*nodebug;		/* " (with no-log)" for no debug */
 
 
   if (!UseProfiles)
@@ -108,24 +109,24 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsd_requote(root, ServerRoot, sizeof(root));
   cupsd_requote(temp, TempDir, sizeof(temp));
 
+  nodebug = LogLevel < CUPSD_LOG_DEBUG ? " (with no-log)" : "";
+
   cupsFilePuts(fp, "(version 1)\n");
-  if (LogLevel >= CUPSD_LOG_DEBUG)
-    cupsFilePuts(fp, "(debug deny)\n");
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"
                  "  (regex"
 		 " #\"^%s$\""		/* RequestRoot */
 		 " #\"^%s/\""		/* RequestRoot/... */
-		 "))\n",
-		 request, request);
+		 ")%s)\n",
+		 request, request, nodebug);
   if (!RunUser)
-    cupsFilePuts(fp,
-		 "(deny file-write* file-read-data file-read-metadata\n"
-		 "  (regex"
-		 " #\"^/Users$\""
-		 " #\"^/Users/\""
-		 "))\n");
+    cupsFilePrintf(fp,
+		   "(deny file-write* file-read-data file-read-metadata\n"
+		   "  (regex"
+		   " #\"^/Users$\""
+		   " #\"^/Users/\""
+		   ")%s)\n", nodebug);
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex"
@@ -139,8 +140,8 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 " #\"^/Library/\""
 		 " #\"^/System$\""
 		 " #\"^/System/\""
-		 "))\n",
-		 root, root);
+		 ")%s)\n",
+		 root, root, nodebug);
   /* Specifically allow applications to stat RequestRoot */
   cupsFilePrintf(fp,
                  "(allow file-read-metadata\n"
@@ -164,14 +165,14 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 " #\"^/Users/Shared/\""
 		 "))\n",
 		 temp, temp, cache, cache, request, request);
-  cupsFilePuts(fp,
-	       "(deny file-write*\n"
-	       "  (regex"
-	       " #\"^/Library/Printers/PPDs$\""
-	       " #\"^/Library/Printers/PPDs/\""
-	       " #\"^/Library/Printers/PPD Plugins$\""
-	       " #\"^/Library/Printers/PPD Plugins/\""
-	       "))\n");
+  cupsFilePrintf(fp,
+		 "(deny file-write*\n"
+		 "  (regex"
+		 " #\"^/Library/Printers/PPDs$\""
+		 " #\"^/Library/Printers/PPDs/\""
+		 " #\"^/Library/Printers/PPD Plugins$\""
+		 " #\"^/Library/Printers/PPD Plugins/\""
+		 ")%s)\n", nodebug);
   if (job_id)
   {
    /*
