@@ -245,10 +245,21 @@ cupsdEndProcess(int pid,		/* I - Process ID */
 
   if (!pid)
     return (0);
-  else if (force)
-    return (kill(-pid, SIGKILL));
+
+  if (!RunUser)
+  {
+   /*
+    * When running as root, cupsd puts child processes in their own process
+    * group.  Using "-pid" sends a signal to all processes in the group.
+    */
+
+    pid = -pid;
+  }
+
+  if (force)
+    return (kill(pid, SIGKILL));
   else
-    return (kill(-pid, SIGTERM));
+    return (kill(pid, SIGTERM));
 }
 
 
@@ -413,9 +424,42 @@ cupsdStartProcess(
   if ((*pid = fork()) == 0)
   {
    /*
-    * Child process goes here...
-    *
-    * Update stdin/stdout/stderr as needed...
+    * Child process goes here; update stderr as needed...
+    */
+
+    if (errfd != 2)
+    {
+      if (errfd < 0)
+        errfd = open("/dev/null", O_WRONLY);
+
+      if (errfd != 2)
+      {
+        dup2(errfd, 2);
+	close(errfd);
+      }
+    }
+
+   /*
+    * Put this process in its own process group so that we can kill any child
+    * processes it creates.
+    */
+
+#ifdef HAVE_SETPGID
+    if (!RunUser && setpgid(0, 0))
+    {
+      fprintf(stderr, "ERROR: %s (setpgid): %s\n", command, strerror(errno));
+      exit(1);
+    }
+#else
+    if (!RunUser && setpgrp())
+    {
+      fprintf(stderr, "ERROR: %s (setpgrp): %s\n", command, strerror(errno));
+      exit(1);
+    }
+#endif /* HAVE_SETPGID */
+
+   /*
+    * Update the remaining file descriptors as needed...
     */
 
     if (infd != 0)
@@ -442,18 +486,6 @@ cupsdStartProcess(
       }
     }
 
-    if (errfd != 2)
-    {
-      if (errfd < 0)
-        errfd = open("/dev/null", O_WRONLY);
-
-      if (errfd != 2)
-      {
-        dup2(errfd, 2);
-	close(errfd);
-      }
-    }
-
     if (backfd != 3 && backfd >= 0)
     {
       dup2(backfd, 3);
@@ -477,19 +509,6 @@ cupsdStartProcess(
       nice(FilterNice);
 
    /*
-    * Put this process in its own process group so that we can kill any child
-    * processes it creates.
-    */
-
-#ifdef HAVE_SETPGID
-    if (setpgid(0, 0))
-      exit(errno);
-#else
-    if (setpgrp())
-      exit(errno);
-#endif /* HAVE_SETPGID */
-
-   /*
     * Change user to something "safe"...
     */
 
@@ -500,13 +519,20 @@ cupsdStartProcess(
       */
 
       if (setgid(Group))
-	exit(errno);
+      {
+	fprintf(stderr, "ERROR: %s (setgid): %s\n", command, strerror(errno));
+	exit(1);
+      }
 
       if (setgroups(1, &Group))
-	exit(errno);
+      {
+	fprintf(stderr, "ERROR: %s (setgroups): %s\n", command,
+	        strerror(errno));
+	exit(1);
+      }
 
       if (setuid(User))
-        exit(errno);
+        exit(1);
     }
     else
     {
@@ -515,10 +541,17 @@ cupsdStartProcess(
       */
 
       if (setgid(Group) && !RunUser)
-        exit(errno);
+      {
+	fprintf(stderr, "ERROR: %s (setgid): %s\n", command, strerror(errno));
+	exit(1);
+      }
 
       if (setgroups(1, &Group) && !RunUser)
-        exit(errno);
+      {
+	fprintf(stderr, "ERROR: %s (setgroups): %s\n", command,
+	        strerror(errno));
+	exit(1);
+      }
     }
 
    /*
@@ -562,8 +595,7 @@ cupsdStartProcess(
     else
       execv(exec_path, argv);
 
-    perror(command);
-
+    fprintf(stderr, "ERROR: %s (execv): %s\n", command, strerror(errno));
     exit(1);
   }
   else if (*pid < 0)
