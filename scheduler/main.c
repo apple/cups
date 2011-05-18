@@ -1727,10 +1727,20 @@ process_children(void)
     else if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) stopped with status %d!",
-	                pid, name, WEXITSTATUS(status));
+      {
+        int code = WEXITSTATUS(status);	/* Exit code */
+
+        if (code > 100)
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "PID %d (%s) stopped with status %d (%s)", pid, name,
+			  code, strerror(code - 100));
+	else
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "PID %d (%s) stopped with status %d.", pid, name,
+			  code);
+      }
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d.",
 	                pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)

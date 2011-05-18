@@ -446,16 +446,10 @@ cupsdStartProcess(
 
 #ifdef HAVE_SETPGID
     if (!RunUser && setpgid(0, 0))
-    {
-      fprintf(stderr, "ERROR: %s (setpgid): %s\n", command, strerror(errno));
-      exit(1);
-    }
+      exit(errno + 100);
 #else
     if (!RunUser && setpgrp())
-    {
-      fprintf(stderr, "ERROR: %s (setpgrp): %s\n", command, strerror(errno));
-      exit(1);
-    }
+      exit(errno + 100);
 #endif /* HAVE_SETPGID */
 
    /*
@@ -519,20 +513,13 @@ cupsdStartProcess(
       */
 
       if (setgid(Group))
-      {
-	fprintf(stderr, "ERROR: %s (setgid): %s\n", command, strerror(errno));
-	exit(1);
-      }
+	exit(errno + 100);
 
       if (setgroups(1, &Group))
-      {
-	fprintf(stderr, "ERROR: %s (setgroups): %s\n", command,
-	        strerror(errno));
-	exit(1);
-      }
+	exit(errno + 100);
 
       if (setuid(User))
-        exit(1);
+	exit(errno + 100);
     }
     else
     {
@@ -541,17 +528,10 @@ cupsdStartProcess(
       */
 
       if (setgid(Group) && !RunUser)
-      {
-	fprintf(stderr, "ERROR: %s (setgid): %s\n", command, strerror(errno));
-	exit(1);
-      }
+	exit(errno + 100);
 
       if (setgroups(1, &Group) && !RunUser)
-      {
-	fprintf(stderr, "ERROR: %s (setgroups): %s\n", command,
-	        strerror(errno));
-	exit(1);
-      }
+	exit(errno + 100);
     }
 
    /*
@@ -595,8 +575,7 @@ cupsdStartProcess(
     else
       execv(exec_path, argv);
 
-    fprintf(stderr, "ERROR: %s (execv): %s\n", command, strerror(errno));
-    exit(1);
+    exit(errno + 100);
   }
   else if (*pid < 0)
   {
