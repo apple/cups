@@ -881,6 +881,15 @@ sysUpdate(void)
 
       cupsdCleanDirty();
 
+#ifdef kIOPMAssertionTypeDenySystemSleep
+     /*
+      * Tell the OS it is OK to sleep when we remove our assertion...
+      */
+
+      IOAllowPowerChange(sysevent.powerKernelPort,
+                         sysevent.powerNotificationID);
+
+#else
      /*
       * If we have no printing jobs, allow the power change immediately.
       * Otherwise set the SleepJobs time to 15 seconds in the future when
@@ -924,6 +933,7 @@ sysUpdate(void)
 			     sysevent.powerNotificationID);
 	}
       }
+#endif /* kIOPMAssertionTypeDenySystemSleep */
     }
 
     if (sysevent.event & SYSEVENT_WOKE)
