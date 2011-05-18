@@ -1916,7 +1916,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
 	value += 4;
 
-	while (isspace(*value & 255))
+	while (_cups_isspace(*value))
 	  value ++;
 
         if (!*value)
@@ -1927,9 +1927,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       * Find the end of the value...
       */
 
-      for (valptr = value; *valptr && !isspace(*valptr & 255); valptr ++);
+      for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
 
-      while (isspace(*valptr & 255))
+      while (_cups_isspace(*valptr))
         *valptr++ = '\0';
 
      /*
@@ -2145,7 +2145,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     *     Require user names
     */
 
-    for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+    for (valptr = value; !_cups_isspace(*valptr) && *valptr; valptr ++);
 
     if (*valptr)
       *valptr++ = '\0';
@@ -2168,7 +2168,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
     for (value = valptr; *value;)
     {
-      while (isspace(*value & 255))
+      while (_cups_isspace(*value))
 	value ++;
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -2201,7 +2201,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	* Grab literal name.
 	*/
 
-        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        for (valptr = value; !_cups_isspace(*valptr) && *valptr; valptr ++);
       }
 
       if (*valptr)
@@ -2209,7 +2209,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdAddName(loc, value);
 
-      for (value = valptr; isspace(*value & 255); value ++);
+      for (value = valptr; _cups_isspace(*value); value ++);
     }
   }
   else if (!strcasecmp(line, "Satisfy"))
@@ -2267,7 +2267,7 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
     */
 
     for (valend = valstart; *valend; valend ++)
-      if (isspace(*valend & 255) || *valend == ',')
+      if (_cups_isspace(*valend) || *valend == ',')
 	break;
 
     if (*valend)
@@ -2304,7 +2304,7 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
                       "Unknown FatalErrors kind \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
-      if (!isspace(*valstart & 255) || *valstart != ',')
+      if (!_cups_isspace(*valstart) || *valstart != ',')
 	break;
   }
 
@@ -2357,7 +2357,7 @@ parse_groups(const char *s)		/* I - Space-delimited groups */
       */
 
       for (valend = valstart; *valend; valend ++)
-	if (isspace(*valend) || *valend == ',')
+	if (_cups_isspace(*valend) || *valend == ',')
 	  break;
     }
 
@@ -2379,7 +2379,7 @@ parse_groups(const char *s)		/* I - Space-delimited groups */
 
     valstart = valend;
 
-    while (*valstart == ',' || isspace(*valstart))
+    while (*valstart == ',' || _cups_isspace(*valstart))
       valstart ++;
   }
 
@@ -2422,7 +2422,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
     */
 
     for (valend = valstart; *valend; valend ++)
-      if (isspace(*valend & 255) || *valend == ',')
+      if (_cups_isspace(*valend) || *valend == ',')
 	break;
 
     if (*valend)
@@ -2453,7 +2453,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
                       "Unknown browse protocol \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
-      if (!isspace(*valstart & 255) || *valstart != ',')
+      if (!_cups_isspace(*valstart) || *valstart != ',')
 	break;
   }
 
@@ -2830,7 +2830,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  * Skip leading whitespace...
 	  */
 
-	  while (isspace(*value & 255))
+	  while (_cups_isspace(*value))
 	    value ++;
 
 	  if (!*value)
@@ -2841,10 +2841,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  */
 
 	  for (valueptr = value;
-	       *valueptr && !isspace(*valueptr & 255);
+	       *valueptr && !_cups_isspace(*valueptr);
 	       valueptr ++);
 
-	  while (isspace(*valueptr & 255))
+	  while (_cups_isspace(*valueptr))
 	    *valueptr++ = '\0';
 
 	 /*
@@ -2965,7 +2965,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Skip leading whitespace...
 	*/
 
-	while (isspace(*value))
+	while (_cups_isspace(*value))
 	  value ++;
       }
 
@@ -2974,10 +2974,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       for (valueptr = value;
-	   *valueptr && !isspace(*valueptr & 255);
+	   *valueptr && !_cups_isspace(*valueptr);
 	   valueptr ++);
 
-      while (isspace(*valueptr & 255))
+      while (_cups_isspace(*valueptr))
 	*valueptr++ = '\0';
 
      /*
@@ -3047,7 +3047,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	valueptr += 3;
 
-	while (isspace(*valueptr))
+	while (_cups_isspace(*valueptr))
 	  valueptr ++;
       }
 
@@ -3412,7 +3412,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       for (; *value;)
       {
         for (valuelen = 0; value[valuelen]; valuelen ++)
-	  if (isspace(value[valuelen]) || value[valuelen] == ',')
+	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
 	    break;
 
         if (value[valuelen])
@@ -3424,16 +3424,37 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         cupsdSetEnv(value, NULL);
 
         for (value += valuelen; *value; value ++)
-	  if (!isspace(*value) || *value != ',')
+	  if (!_cups_isspace(*value) || *value != ',')
 	    break;
       }
     }
     else if (!strcasecmp(line, "ServerAlias") && value)
     {
+     /*
+      * ServerAlias name [... name]
+      */
+
       if (!ServerAlias)
         ServerAlias = cupsArrayNew(NULL, NULL);
 
-      cupsdAddAlias(ServerAlias, value);
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+	cupsdAddAlias(ServerAlias, value);
+
+        for (value += valuelen; *value; value ++)
+	  if (!_cups_isspace(*value) || *value != ',')
+	    break;
+      }
     }
     else if (!strcasecmp(line, "SetEnv") && value)
     {

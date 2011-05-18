@@ -3,6 +3,8 @@ CHANGES.txt - 2011-05-18
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler now allows the ServerAlias directive to contain multiple
+	  hostnames separated by spaces or commas (STR #3813)
 	- The scheduler now sets the process group for child processes and
 	  manages the group (STR #2829)
 	- Fixed some minor issues discovered by a Coverity scan (STR #3838)
