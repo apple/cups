@@ -72,6 +72,12 @@
 #include <grp.h>
 #include <cups/backend.h>
 #include <cups/dir.h>
+#ifdef __APPLE__
+#  include <IOKit/pwr_mgt/IOPMLib.h>
+#  ifdef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H
+#    include <IOKit/pwr_mgt/IOPMLibPrivate.h>
+#  endif /* HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
+#endif /* __APPLE__ */
 
 
 /*
@@ -347,7 +353,10 @@ cupsdCheckJobs(void)
     * Start pending jobs if the destination is available...
     */
 
-    if (job->state_value == IPP_JOB_PENDING && !NeedReload && !Sleeping &&
+    if (job->state_value == IPP_JOB_PENDING && !NeedReload &&
+#ifndef kIOPMAssertionTypeDenySystemSleep
+        !Sleeping &&
+#endif /* !kIOPMAssertionTypeDenySystemSleep */
         !DoingShutdown && !job->printer)
     {
       printer = cupsdFindDest(job->dest);

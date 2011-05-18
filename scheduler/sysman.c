@@ -216,11 +216,15 @@ cupsdSetBusyState(void)
 
 #ifdef kIOPMAssertionTypeDenySystemSleep
     if ((busy & 2) && !dark_wake)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Asserting dark wake.");
       IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
 			          kIOPMAssertionLevelOn,
 				  CFSTR("org.cups.cupsd"), &dark_wake);
+    }
     else if (!(busy & 2) && dark_wake)
     {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Releasing dark wake assertion.");
       IOPMAssertionRelease(dark_wake);
       dark_wake = 0;
     }
