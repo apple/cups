@@ -4100,6 +4100,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   if (!cupsdLoadJob(job))
     return;
 
+  if (job->printer_message)
+    cupsdSetString(&(job->printer_message->values[0].string.text), "");
+
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
   cupsdSetPrinterReasons(printer, "-cups-remote-pending,"
@@ -4143,9 +4146,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   job->status_buffer = cupsdStatBufNew(job->status_pipes[0], NULL);
   job->status_level  = CUPSD_LOG_INFO;
-
-  if (job->printer_message)
-    cupsdSetString(&(job->printer_message->values[0].string.text), "");
 
  /*
   * Create the backchannel pipes and make them non-blocking...
