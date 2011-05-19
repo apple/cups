@@ -3616,19 +3616,13 @@ add_printer_filter(
 
   if (strcmp(program, "-"))
   {
-    _cups_fc_result_t	result;		/* Result of file check */
-
     if (program[0] == '/')
       strlcpy(filename, program, sizeof(filename));
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    result = _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
-                            cupsdLogFCMessage, p);
-
-    if (result == _CUPS_FILE_CHECK_MISSING ||
-        result == _CUPS_FILE_CHECK_WRONG_TYPE)
-      return;
+    _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
+                   cupsdLogFCMessage, p);
   }
 
  /*
