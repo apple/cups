@@ -445,7 +445,7 @@ cupsRasterInterpretPPD(
         h->cupsNumColors = h->cupsColorSpace - CUPS_CSPACE_DEVICE1 + 1;
 
         if (h->cupsColorOrder == CUPS_ORDER_CHUNKED)
-          h->cupsBitrsPerPixel = h->cupsBitsPerColor * h->cupsNumColors;
+          h->cupsBitsPerPixel = h->cupsBitsPerColor * h->cupsNumColors;
 	else
 	  h->cupsBitsPerPixel = h->cupsBitsPerColor;
 	break;
