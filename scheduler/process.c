@@ -503,36 +503,21 @@ cupsdStartProcess(
       nice(FilterNice);
 
    /*
+    * Reset group membership to just the main one we belong to.
+    */
+
+    if (!RunUser && setgid(Group))
+      exit(errno + 100);
+
+    if (!RunUser && setgroups(1, &Group))
+      exit(errno + 100);
+
+   /*
     * Change user to something "safe"...
     */
 
-    if (!root && !RunUser)
-    {
-     /*
-      * Running as root, so change to non-priviledged user...
-      */
-
-      if (setgid(Group))
-	exit(errno + 100);
-
-      if (setgroups(1, &Group))
-	exit(errno + 100);
-
-      if (setuid(User))
-	exit(errno + 100);
-    }
-    else
-    {
-     /*
-      * Reset group membership to just the main one we belong to.
-      */
-
-      if (setgid(Group) && !RunUser)
-	exit(errno + 100);
-
-      if (setgroups(1, &Group) && !RunUser)
-	exit(errno + 100);
-    }
+    if (!RunUser && user && setuid(user))
+      exit(errno + 100);
 
    /*
     * Change umask to restrict permissions on created files...
