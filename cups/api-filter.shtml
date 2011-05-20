@@ -84,15 +84,16 @@ that further limit file system access, even for backends running as root. On
 Mac OS X, for example, no backend may write to a user's home directory.</p>
 </blockquote>
 
-<h3><a name="SIGNALS">Signal Handling</a><h3>
+<h3><a name="SIGNALS">Canceled Jobs and Signal Handling</a><h3>
 
 <p>The scheduler sends <code>SIGTERM</code> when a printing job is canceled or
 held. Filters, backends, and port monitors <em>must</em> catch
 <code>SIGTERM</code> and perform any cleanup necessary to produce a valid output
 file or return the printer to a known good state. The recommended behavior is to
-end the output on the current page.</p>
+end the output on the current page, preferably on the current line or object
+being printed.</p>
 
-<p>Filters and backends may also receive <code>SIGPIPE</code> when an upstream or downstream filter/backend exits with a non-zero status. Developers should generally <code>ignore SIGPIPE</code> at the beginning of <code>main()</code> with the following function call:</p>
+<p>Filters and backends may also receive <code>SIGPIPE</code> when an upstream or downstream filter/backend exits with a non-zero status. Developers should generally ignore <code>SIGPIPE</code> at the beginning of <code>main()</code> with the following function call:</p>
 
 <pre class="example">
 #include &lt;signal.h&gt;>
@@ -230,7 +231,8 @@ prefix strings:</p>
 
 	<dt>ATTR: attribute=value [attribute=value]</dt>
 	<dd>Sets the named printer or job attribute(s). Typically this is used
-	to set the <code>marker-colors</code>, <code>marker-levels</code>,
+	to set the <code>marker-colors</code>, <code>marker-high-levels</code>,
+	<code>marker-levels</code>, <code>marker-low-levels</code>,
 	<code>marker-message</code>, <code>marker-names</code>,
 	<code>marker-types</code>, <code>printer-alert</code>, and
 	<code>printer-alert-description</code> printer attributes. Standard
@@ -280,23 +282,15 @@ prefix strings:</p>
 	this is used to update installable options or default media settings
 	based on the printer configuration.</dd>
 
-	<dt>STATE: printer-state-reason [printer-state-reason ...]</dt>
 	<dt>STATE: + printer-state-reason [printer-state-reason ...]</dt>
 	<dt>STATE: - printer-state-reason [printer-state-reason ...]</dt>
-	<dd>Sets, adds, or removes printer-state-reason keywords to the
-	current queue. Typically this is used to indicate persistent media,
-	ink, toner, and configuration conditions or errors on a printer.
+	<dd>Sets or clears printer-state-reason keywords for the current queue.
+	Typically this is used to indicate persistent media, ink, toner, and
+	configuration conditions or errors on a printer.
 	<a href='#TABLE2'>Table 2</a> lists the standard state keywords -
-	use vendor-prefixed ("com.acme.foo") keywords for custom states.
-
-	<blockquote><b>Note:</b>
-
-	<p>"STATE:" messages often provide visible alerts to the user. For example, on
-	Mac OS X setting a printer-state-reason value with an "-error" or "-warning"
-	suffix will cause the printer's dock item to bounce if the corresponding reason
-	is localized with a cupsIPPReason keyword in the printer's PPD file.</p>
-
-	</blockquote></dd>
+	use vendor-prefixed ("com.example.foo") keywords for custom states. See
+	<a href="#MANAGING_STATE">Managing Printer State in a Filter</a> for more
+	information.
 
 	<dt>WARNING: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
@@ -385,59 +379,190 @@ the "DEBUG:" prefix string.</p>
 <tbody>
 <tr>
 	<td>connecting-to-device</td>
-	<td>Connecting to printer but not printing yet</td>
+	<td>Connecting to printer but not printing yet.</td>
 </tr>
 <tr>
 	<td>cover-open</td>
-	<td>A cover is open on the printer</td>
+	<td>The printer's cover is open.</td>
 </tr>
 <tr>
 	<td>input-tray-missing</td>
-	<td>An input tray is missing from the printer</td>
+	<td>The paper tray is missing.</td>
 </tr>
 <tr>
 	<td>marker-supply-empty</td>
-	<td>Out of ink</td>
+	<td>The printer is out of ink.</td>
 </tr>
 <tr>
 	<td>marker-supply-low</td>
-	<td>Low on ink</td>
+	<td>The printer is almost out of ink.</td>
 </tr>
 <tr>
 	<td>marker-waste-almost-full</td>
-	<td>Waste tank almost full</td>
+	<td>The printer's waste bin is almost full.</td>
 </tr>
 <tr>
 	<td>marker-waste-full</td>
-	<td>Waste tank full</td>
+	<td>The printer's waste bin is full.</td>
 </tr>
 <tr>
 	<td>media-empty</td>
-	<td>Out of media</td>
+	<td>The paper tray (any paper tray) is empty.</td>
 </tr>
 <tr>
 	<td>media-jam</td>
-	<td>Media is jammed in the printer</td>
+	<td>There is a paper jam.</td>
 </tr>
 <tr>
 	<td>media-low</td>
-	<td>Low on media</td>
+	<td>The paper tray (any paper tray) is almost empty.</td>
+</tr>
+<tr>
+	<td>media-needed</td>
+	<td>The paper tray needs to be filled (for a job that is printing).</td>
 </tr>
 <tr>
 	<td>paused</td>
-	<td>Stop the printer</td>
+	<td>Stop the printer.</td>
 </tr>
 <tr>
 	<td>timed-out</td>
-	<td>Unable to connect to printer</td>
+	<td>Unable to connect to printer.</td>
 </tr>
 <tr>
 	<td>toner-empty</td>
-	<td>Out of toner</td>
+	<td>The printer is out of toner.</td>
 </tr>
 <tr>
 	<td>toner-low</td>
-	<td>Low on toner</td>
+	<td>The printer is low on toner.</td>
+</tr>
+</tbody>
+</table></div>
+
+<h4><a name="MANAGING_STATE">Managing Printer State in a Filter</a></h4>
+
+<p>Filters are responsible for managing the state keywords they set using
+"STATE:" messages. Typically you will update <em>all</em> of the keywords that
+are used by the filter at startup, for example:</p>
+
+<pre class="example">
+if (foo_condition != 0)
+  fputs("STATE: +com.example.foo\n", stderr);
+else
+  fputs("STATE: -com.example.foo\n", stderr);
+
+if (bar_condition != 0)
+  fputs("STATE: +com.example.bar\n", stderr);
+else
+  fputs("STATE: -com.example.bar\n", stderr);
+</pre>
+
+<p>Then as conditions change, your filter sends "STATE: +keyword" or "STATE:
+-keyword" messages as necessary to set or clear the corresponding keyword,
+respectively.</p>
+
+<p>State keywords are often used to notify the user of issues that span across
+jobs, for example "media-empty-warning" that indicates one or more paper trays
+are empty. These keywords should not be cleared unless the corresponding issue
+no longer exists.</p>
+
+<p>Filters should clear job-related keywords on startup and exit so that they
+do not remain set between jobs.  For example, "connecting-to-device" is a job
+sub-state and not an issue that applies when a job is not printing.</p>
+
+<blockquote><b>Note:</b>
+
+<p>"STATE:" messages often provide visible alerts to the user. For example,
+on Mac OS X setting a printer-state-reason value with an "-error" or
+"-warning" suffix will cause the printer's dock item to bounce if the
+corresponding reason is localized with a cupsIPPReason keyword in the
+printer's PPD file.</p>
+
+<p>When providing a vendor-prefixed keyword, <em>always</em> provide the
+corresponding standard keyword (if any) to allow clients to respond to the
+condition correctly. For example, if you provide a vendor-prefixed keyword
+for a low cyan ink condition ("com.example.cyan-ink-low") you must also set the
+"marker-supply-low-warning" keyword. In such cases you should also refrain
+from localizing the vendor-prefixed keyword in the PPD file - otherwise both
+the generic and vendor-specific keyword will be shown in the user
+interface.</p>
+
+</blockquote></dd>
+
+<h4><a name="REPORTING_SUPPLIES">Reporting Supply Levels</a></h4>
+
+<p>CUPS tracks several "marker-*" attributes for ink/toner supply level
+reporting. These attributes allow applications to display the current supply
+levels for a printer without printer-specific software. <a href="#TABLE3">Table 3</a> lists the marker attributes and what they represent.</p>
+
+<p>Filters set marker attributes by sending "ATTR:" messages to stderr. For
+example, a filter supporting an inkjet printer with black and tri-color ink
+cartridges would use the following to initialize the supply attributes:</p>
+
+<pre class="example">
+fputs("ATTR: marker-colors=#000000,#00FFFF#FF00FF#FFFF00\n", stderr);
+fputs("ATTR: marker-low-levels=5,10\n", stderr);
+fputs("ATTR: marker-names=Black,Tri-Color\n", stderr);
+fputs("ATTR: marker-types=ink,ink\n", stderr);
+</pre>
+
+<p>Then periodically the filter queries the printer for its current supply
+levels and updates them with a separate "ATTR:" message:</p>
+
+<pre class="example">
+int black_level, tri_level;
+...
+fprintf(stderr, "ATTR: marker-levels=%d,%d\n", black_level, tri_level);
+</pre>
+
+<div class='table'><table width='80%' summary='Table 3: Supply Level Attributes'>
+<caption>Table 3: <a name='TABLE3'>Supply Level Attributes</a></caption>
+<thead>
+<tr>
+	<th>Attribute</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>marker-colors</td>
+	<td>A list of comma-separated colors; each color is either "none" or one or
+	more hex-encoded sRGB colors of the form "#RRGGBB".</td>
+</tr>
+<tr>
+	<td>marker-high-levels</td>
+	<td>A list of comma-separated "almost full" level values from 0 to 100; a
+	value of 100 should be used for supplies that are consumed/emptied like ink
+	cartridges.</td>
+</tr>
+<tr>
+	<td>marker-levels</td>
+	<td>A list of comma-separated level values for each supply. A value of -1
+	indicates the level is unavailable, -2 indicates unknown, and -3 indicates
+	the level is unknown but has not yet reached capacity. Values from 0 to 100
+	indicate the corresponding percentage.</td>
+</tr>
+<tr>
+	<td>marker-low-levels</td>
+	<td>A list of comma-separated "almost empty" level values from 0 to 100; a
+	value of 0 should be used for supplies that are filled like waste ink
+	tanks.</td>
+</tr>
+<tr>
+	<td>marker-message</td>
+	<td>A human-readable supply status message for the user like "12 pages of
+	ink remaining."</td>
+</tr>
+<tr>
+	<td>marker-names</td>
+	<td>A list of comma-separated supply names like "Cyan Ink", "Fuser",
+	etc.</td>
+</tr>
+<tr>
+	<td>marker-types</td>
+	<td>A list of comma-separated supply types; the types are listed in
+	<a href="#TABLE1">Table 1</a>.</td>
 </tr>
 </tbody>
 </table></div>
@@ -492,6 +617,38 @@ if (status == CUPS_SC_STATUS_OK && datalen > 0)
   data[datalen] = '\0';
 else
   data[0] = '\0';
+</pre>
+
+<h4><a name="DRAIN_OUTPUT">Forcing All Output to a Printer</a></h4>
+
+<p>The
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+function allows you to tell the backend to send all pending data to the printer.
+This is most often needed when sending query commands to the printer. For example:</p>
+
+<pre class="example">
+#include &lt;cups/cups.h&gt;
+#include &lt;cups/sidechannel.h&gt;
+
+char data[1024];
+int datalen = sizeof(data);
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+
+/* Flush pending output to stdout */
+fflush(stdout);
+
+/* Drain output to backend, waiting for up to 30 seconds */
+status = <a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a>(CUPS_SC_CMD_DRAIN_OUTPUT, data, &amp;datalen, 30.0);
+
+/* Read the response if the output was sent */
+if (status == CUPS_SC_STATUS_OK)
+{
+  ssize_t bytes;
+
+  /* Wait up to 10.0 seconds for back-channel data */
+  bytes = cupsBackChannelRead(data, sizeof(data), 10.0);
+  /* do something with the data from the printer */
+}
 </pre>
 
 <h3><a name="COMMUNICATING_FILTER">Communicating with Filters</a></h3>
