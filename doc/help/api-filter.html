@@ -386,6 +386,7 @@ div.contents ul.subcontents li {
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 	<li><a href="#SECURITY">Security Considerations</a></li>
 	<li><a href="#SIGNALS">Canceled Jobs and Signal Handling</a></li>
+	<li><a href="#PERMISSIONS">File Permissions</a></li>
 	<li><a href="#TEMPFILES">Temporary Files</a></li>
 	<li><a href="#COPIES">Copy Generation</a></li>
 	<li><a href="#EXITCODES">Exit Codes</a></li>
@@ -510,7 +511,7 @@ that further limit file system access, even for backends running as root. On
 Mac OS X, for example, no backend may write to a user's home directory.</p>
 </blockquote>
 
-<h3><a name="SIGNALS">Canceled Jobs and Signal Handling</a><h3>
+<h3><a name="SIGNALS">Canceled Jobs and Signal Handling</a></h3>
 
 <p>The scheduler sends <code>SIGTERM</code> when a printing job is canceled or
 held. Filters, backends, and port monitors <em>must</em> catch
