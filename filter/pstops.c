@@ -1271,7 +1271,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   int		level;			/* Embedded document level */
   pstops_page_t	*pageinfo;		/* Page information */
   int		first_page;		/* First page on N-up output? */
-  int		has_page_setup;		/* Does the page have %%Begin/EndPageSetup? */
+  int		has_page_setup = 0;	/* Does the page have %%Begin/EndPageSetup? */
   int		bounding_box[4];	/* PageBoundingBox */
 
 
@@ -1490,7 +1490,12 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 	                                        pageinfo->num_options,
                                         	&(pageinfo->options));
     }
-    else if (strncmp(line, "%%Include", 9))
+    else if (!strncmp(line, "%%BeginPageSetup", 16))
+    {
+      has_page_setup = 1;
+      break;
+    }
+    else
       break;
   }
 
@@ -1545,7 +1550,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   if (first_page)
     doc_puts(doc, "%%BeginPageSetup\n");
 
-  if ((has_page_setup = !strncmp(line, "%%BeginPageSetup", 16)) != 0)
+  if (has_page_setup)
   {
     int	feature = 0;			/* In a Begin/EndFeature block? */
 
@@ -1621,49 +1626,6 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   */
 
   start_nup(doc, number, 1, bounding_box);
-
- /*
-  * Finish the PageSetup section as needed...
-  */
-
-  if (has_page_setup)
-  {
-    int	feature = 0;			/* In a Begin/EndFeature block? */
-
-    doc_write(doc, line, linelen);
-
-    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
-    {
-      if (!strncmp(line, "%%EndPageSetup", 14))
-	break;
-      else if (!strncmp(line, "%%BeginFeature:", 15))
-      {
-	feature = 1;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%EndFeature", 12))
-      {
-	feature = 0;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%Include", 9))
-	continue;
-
-      if (!feature || (doc->number_up == 1 && !doc->fitplot))
-	doc_write(doc, line, linelen);
-    }
-
-   /*
-    * Skip %%EndPageSetup...
-    */
-
-    if (linelen > 0 && !strncmp(line, "%%EndPageSetup", 14))
-      linelen = cupsFileGetLine(fp, line, linesize);
-  }
 
   if (first_page)
     doc_puts(doc, "%%EndPageSetup\n");

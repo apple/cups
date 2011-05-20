@@ -3,6 +3,8 @@ CHANGES.txt - 2011-05-19
 
 CHANGES IN CUPS V1.5b1
 
+	- Updated the PostScript filter to support IncludeFeature in more
+	  circumstances (STR #3417)
 	- The schedule did not correctly parse some IPv6 addresses and masks in
 	  the cupsd.conf file (STR #3533)
 	- Fixed a case-insensitive string comparison issue for locales that do
