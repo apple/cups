@@ -3,7 +3,7 @@
  *
  *   File test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -429,7 +429,7 @@ random_tests(void)
   */
 
   unlink("testfile.dat");
-                    
+
  /*
   * Return the test status...
   */
@@ -676,7 +676,7 @@ read_write_tests(int compression)	/* I - Use compression? */
     for (i = 0; i < 1000; i ++)
       if (!cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
         break;
-      else if (strcasecmp(line, "TestLine") || !value || atoi(value) != i ||
+      else if (_cups_strcasecmp(line, "TestLine") || !value || atoi(value) != i ||
                linenum != (i + 2))
         break;
 
@@ -807,7 +807,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   */
 
   unlink(compression ? "testfile.dat.gz" : "testfile.dat");
-                    
+
  /*
   * Return the test status...
   */

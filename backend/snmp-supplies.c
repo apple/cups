@@ -471,7 +471,7 @@ backend_init_supplies(
 
   if ((ppd = ppdOpenFile(getenv("PPD"))) == NULL ||
       ((ppdattr = ppdFindAttr(ppd, "cupsSNMPSupplies", NULL)) != NULL &&
-       ppdattr->value && strcasecmp(ppdattr->value, "true")))
+       ppdattr->value && _cups_strcasecmp(ppdattr->value, "true")))
   {
     ppdClose(ppd);
     return;

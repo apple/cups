@@ -112,11 +112,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Parse the command...
     */
 
-    if (!strcasecmp(line, "AutoConfigure"))
+    if (!_cups_strcasecmp(line, "AutoConfigure"))
       auto_configure(ppd, argv[2]);
-    else if (!strcasecmp(line, "PrintSelfTestPage"))
+    else if (!_cups_strcasecmp(line, "PrintSelfTestPage"))
       print_self_test_page(ppd, argv[2]);
-    else if (!strcasecmp(line, "ReportLevels"))
+    else if (!_cups_strcasecmp(line, "ReportLevels"))
       report_levels(ppd, argv[2]);
     else
       fprintf(stderr, "ERROR: Invalid printer command \"%s\"!\n", line);

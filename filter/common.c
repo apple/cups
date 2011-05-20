@@ -95,8 +95,8 @@ SetCommonOptions(
 
   if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
   {
-    if (strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
-        strcasecmp(val, "false") != 0)
+    if (_cups_strcasecmp(val, "no") != 0 && _cups_strcasecmp(val, "off") != 0 &&
+        _cups_strcasecmp(val, "false") != 0)
     {
       if (ppd && ppd->landscape > 0)
         Orientation = 1;

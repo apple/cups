@@ -3,7 +3,7 @@
  *
  *   PPD constraint test program for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -81,7 +81,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       fputs("Resolved conflicts with the following options:\n   ", stdout);
       for (i = 0; i < num_options; i ++)
-        if (!option || strcasecmp(option, options[i].name))
+        if (!option || _cups_strcasecmp(option, options[i].name))
 	  printf(" %s=%s", options[i].name, options[i].value);
       putchar('\n');
 

@@ -748,7 +748,7 @@ cupsdLoadAllSubscriptions(void)
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!strcasecmp(line, "NextSubscriptionId") && value)
+    if (!_cups_strcasecmp(line, "NextSubscriptionId") && value)
     {
      /*
       * NextSubscriptionId NNN
@@ -758,7 +758,7 @@ cupsdLoadAllSubscriptions(void)
       if (i >= NextSubscriptionId && i > 0)
         NextSubscriptionId = i;
     }
-    else if (!strcasecmp(line, "<Subscription"))
+    else if (!_cups_strcasecmp(line, "<Subscription"))
     {
      /*
       * <Subscription #>
@@ -777,7 +777,7 @@ cupsdLoadAllSubscriptions(void)
         break;
       }
     }
-    else if (!strcasecmp(line, "</Subscription>"))
+    else if (!_cups_strcasecmp(line, "</Subscription>"))
     {
       if (!sub)
       {
@@ -799,7 +799,7 @@ cupsdLoadAllSubscriptions(void)
                       "Syntax error on line %d of subscriptions.conf.",
 	              linenum);
     }
-    else if (!strcasecmp(line, "Events"))
+    else if (!_cups_strcasecmp(line, "Events"))
     {
      /*
       * Events name
@@ -840,7 +840,7 @@ cupsdLoadAllSubscriptions(void)
 	value = valueptr;
       }
     }
-    else if (!strcasecmp(line, "Owner"))
+    else if (!_cups_strcasecmp(line, "Owner"))
     {
      /*
       * Owner
@@ -856,7 +856,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "Recipient"))
+    else if (!_cups_strcasecmp(line, "Recipient"))
     {
      /*
       * Recipient uri
@@ -872,7 +872,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "JobId"))
+    else if (!_cups_strcasecmp(line, "JobId"))
     {
      /*
       * JobId #
@@ -896,7 +896,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "PrinterName"))
+    else if (!_cups_strcasecmp(line, "PrinterName"))
     {
      /*
       * PrinterName name
@@ -920,7 +920,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "UserData"))
+    else if (!_cups_strcasecmp(line, "UserData"))
     {
      /*
       * UserData encoded-string
@@ -982,7 +982,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "LeaseDuration"))
+    else if (!_cups_strcasecmp(line, "LeaseDuration"))
     {
      /*
       * LeaseDuration #
@@ -1001,7 +1001,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "Interval"))
+    else if (!_cups_strcasecmp(line, "Interval"))
     {
      /*
       * Interval #
@@ -1017,7 +1017,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "ExpirationTime"))
+    else if (!_cups_strcasecmp(line, "ExpirationTime"))
     {
      /*
       * ExpirationTime #
@@ -1033,7 +1033,7 @@ cupsdLoadAllSubscriptions(void)
 	break;
       }
     }
-    else if (!strcasecmp(line, "NextEventId"))
+    else if (!_cups_strcasecmp(line, "NextEventId"))
     {
      /*
       * NextEventId #

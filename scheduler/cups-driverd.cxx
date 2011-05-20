@@ -101,7 +101,7 @@ typedef struct				/**** PPD record ****/
 		make_and_model[128],	/* NickName/ModelName */
 		device_id[256],		/* IEEE 1284 Device ID */
 		scheme[128];		/* PPD scheme */
-} ppd_rec_t; 
+} ppd_rec_t;
 
 typedef struct				/**** In-memory record ****/
 {
@@ -284,7 +284,7 @@ cat_drv(const char *name,		/* I - PPD name */
   const char	*datadir;		// CUPS_DATADIR env var
   ppdcSource	*src;			// PPD source file data
   ppdcDriver	*d;			// Current driver
-  cups_file_t	*out;			// Stdout via CUPS file API 
+  cups_file_t	*out;			// Stdout via CUPS file API
   char		message[2048],		// status-message
 		filename[1024],		// Full path to .drv file(s)
 		scheme[32],		// URI scheme ("drv")
@@ -745,7 +745,7 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
   * First compare manufacturers...
   */
 
-  if ((diff = strcasecmp(p0->record.make, p1->record.make)) != 0)
+  if ((diff = _cups_strcasecmp(p0->record.make, p1->record.make)) != 0)
     return (diff);
   else if ((diff = cupsdCompareNames(p0->record.make_and_model,
                                      p1->record.make_and_model)) != 0)
@@ -1160,7 +1160,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 	  }
       }
 
-      if (make && !strcasecmp(ppd->record.make, make))
+      if (make && !_cups_strcasecmp(ppd->record.make, make))
         ppd->matches ++;
 
       if (make_and_model_re &&
@@ -1188,7 +1188,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 	for (i = 0; i < PPD_MAX_PROD; i ++)
 	  if (!ppd->record.products[i][0])
 	    break;
-	  else if (!strcasecmp(ppd->record.products[i], product))
+	  else if (!_cups_strcasecmp(ppd->record.products[i], product))
 	  {
 	    ppd->matches += 3;
 	    break;
@@ -1200,7 +1200,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 	for (i = 0; i < PPD_MAX_VERS; i ++)
 	  if (!ppd->record.psversions[i][0])
 	    break;
-	  else if (!strcasecmp(ppd->record.psversions[i], psversion))
+	  else if (!_cups_strcasecmp(ppd->record.psversions[i], psversion))
 	  {
 	    ppd->matches ++;
 	    break;
@@ -1342,7 +1342,7 @@ list_ppds(int        request_id,	/* I - Request ID */
                ppd = (ppd_info_t *)cupsArrayNext(matches);
 	   ppd;
 	   ppd = (ppd_info_t *)cupsArrayNext(matches))
-	if (strcasecmp(this_make, ppd->record.make))
+	if (_cups_strcasecmp(this_make, ppd->record.make))
 	  break;
 
       cupsArrayPrev(matches);
@@ -1431,7 +1431,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
 
     if (nick_name)
       strlcpy(make_model, nick_name->value->value, sizeof(make_model));
-    else if (strncasecmp(d->model_name->value, d->manufacturer->value,
+    else if (_cups_strncasecmp(d->model_name->value, d->manufacturer->value,
                          strlen(d->manufacturer->value)))
       snprintf(make_model, sizeof(make_model), "%s %s, %s",
                d->manufacturer->value, d->model_name->value,
@@ -1441,7 +1441,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
                d->version->value);
 
     if ((cups_fax = d->find_attr("cupsFax", NULL)) != NULL &&
-        !strcasecmp(cups_fax->value->value, "true"))
+        !_cups_strcasecmp(cups_fax->value->value, "true"))
       type = PPD_TYPE_FAX;
     else if (d->type == PPDC_DRIVER_PS)
       type = PPD_TYPE_POSTSCRIPT;
@@ -1453,9 +1453,9 @@ load_drv(const char  *filename,		/* I - Actual filename */
                type = PPD_TYPE_POSTSCRIPT;
 	   filter;
 	   filter = (ppdcFilter *)d->filters->next())
-        if (strcasecmp(filter->mime_type->value, "application/vnd.cups-raster"))
+        if (_cups_strcasecmp(filter->mime_type->value, "application/vnd.cups-raster"))
 	  type = PPD_TYPE_RASTER;
-        else if (strcasecmp(filter->mime_type->value,
+        else if (_cups_strcasecmp(filter->mime_type->value,
 	                    "application/vnd.cups-pdf"))
 	  type = PPD_TYPE_PDF;
     }
@@ -2003,7 +2003,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 	sscanf(line, "%*[^:]:%63s", lang_version);
       else if (!strncmp(line, "*NickName:", 10))
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
-      else if (!strncasecmp(line, "*1284DeviceID:", 14))
+      else if (!_cups_strncasecmp(line, "*1284DeviceID:", 14))
       {
 	sscanf(line, "%*[^\"]\"%255[^\"]", device_id);
 
@@ -2071,7 +2071,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       {
         for (ptr = line + 9; isspace(*ptr & 255); ptr ++);
 
-	if (!strncasecmp(ptr, "true", 4))
+	if (!_cups_strncasecmp(ptr, "true", 4))
           type = PPD_TYPE_FAX;
       }
       else if (!strncmp(line, "*cupsFilter:", 12) && type == PPD_TYPE_POSTSCRIPT)
@@ -2149,7 +2149,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     while (isspace(manufacturer[0] & 255))
       _cups_strcpy(manufacturer, manufacturer + 1);
 
-    if (!strncasecmp(make_model, manufacturer, strlen(manufacturer)))
+    if (!_cups_strncasecmp(make_model, manufacturer, strlen(manufacturer)))
       strlcpy(temp, make_model, sizeof(temp));
     else
       snprintf(temp, sizeof(temp), "%s %s", manufacturer, make_model);
@@ -2182,10 +2182,10 @@ load_ppds(const char *d,		/* I - Actual directory */
       else
 	strcpy(manufacturer, "Other");
     }
-    else if (!strncasecmp(manufacturer, "LHAG", 4) ||
-             !strncasecmp(manufacturer, "linotype", 8))
+    else if (!_cups_strncasecmp(manufacturer, "LHAG", 4) ||
+             !_cups_strncasecmp(manufacturer, "linotype", 8))
       strcpy(manufacturer, "LHAG");
-    else if (!strncasecmp(manufacturer, "Hewlett", 7))
+    else if (!_cups_strncasecmp(manufacturer, "Hewlett", 7))
       strcpy(manufacturer, "HP");
 
    /*
@@ -2216,7 +2216,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
     for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
-      if (!strcasecmp(languages[i].version, lang_version))
+      if (!_cups_strcasecmp(languages[i].version, lang_version))
         break;
 
     if (i < (int)(sizeof(languages) / sizeof(languages[0])))
@@ -2434,14 +2434,14 @@ regex_device_id(const char *device_id)	/* I - IEEE-1284 device ID */
 
   while (*device_id && ptr < (res + sizeof(res) - 6))
   {
-    cmd = !strncasecmp(device_id, "COMMAND SET:", 12) ||
-          !strncasecmp(device_id, "CMD:", 4);
+    cmd = !_cups_strncasecmp(device_id, "COMMAND SET:", 12) ||
+          !_cups_strncasecmp(device_id, "CMD:", 4);
 
-    if (cmd || !strncasecmp(device_id, "MANUFACTURER:", 13) ||
-        !strncasecmp(device_id, "MFG:", 4) ||
-        !strncasecmp(device_id, "MFR:", 4) ||
-        !strncasecmp(device_id, "MODEL:", 6) ||
-        !strncasecmp(device_id, "MDL:", 4))
+    if (cmd || !_cups_strncasecmp(device_id, "MANUFACTURER:", 13) ||
+        !_cups_strncasecmp(device_id, "MFG:", 4) ||
+        !_cups_strncasecmp(device_id, "MFR:", 4) ||
+        !_cups_strncasecmp(device_id, "MODEL:", 6) ||
+        !_cups_strncasecmp(device_id, "MDL:", 4))
     {
       if (ptr > res)
       {

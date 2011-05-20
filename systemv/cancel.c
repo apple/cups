@@ -99,7 +99,7 @@ main(int  argc,				/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'a' : /* Cancel all jobs */
 	    purge = 1;
 	    op    = IPP_PURGE_JOBS;
@@ -283,7 +283,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Do the request and get back a response...
       */
 
-      if (op == IPP_PURGE_JOBS && (!user || strcasecmp(user, cupsUser())))
+      if (op == IPP_PURGE_JOBS && (!user || _cups_strcasecmp(user, cupsUser())))
         response = cupsDoRequest(http, request, "/admin/");
       else
         response = cupsDoRequest(http, request, "/jobs/");

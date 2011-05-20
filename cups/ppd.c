@@ -377,17 +377,17 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 cups_encoding_t				/* O - CUPS encoding value */
 _ppdGetEncoding(const char *name)	/* I - LanguageEncoding string */
 {
-  if (!strcasecmp(name, "ISOLatin1"))
+  if (!_cups_strcasecmp(name, "ISOLatin1"))
     return (CUPS_ISO8859_1);
-  else if (!strcasecmp(name, "ISOLatin2"))
+  else if (!_cups_strcasecmp(name, "ISOLatin2"))
     return (CUPS_ISO8859_2);
-  else if (!strcasecmp(name, "ISOLatin5"))
+  else if (!_cups_strcasecmp(name, "ISOLatin5"))
     return (CUPS_ISO8859_5);
-  else if (!strcasecmp(name, "JIS83-RKSJ"))
+  else if (!_cups_strcasecmp(name, "JIS83-RKSJ"))
     return (CUPS_JIS_X0213);
-  else if (!strcasecmp(name, "MacStandard"))
+  else if (!_cups_strcasecmp(name, "MacStandard"))
     return (CUPS_MAC_ROMAN);
-  else if (!strcasecmp(name, "WindowsANSI"))
+  else if (!_cups_strcasecmp(name, "WindowsANSI"))
     return (CUPS_WINDOWS_1252);
   else
     return (CUPS_UTF8);
@@ -906,7 +906,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	goto error;
       }
-      
+
       ppd->fonts                 = tempfonts;
       ppd->fonts[ppd->num_fonts] = _cupsStrAlloc(name);
       ppd->num_fonts ++;
@@ -1049,7 +1049,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-      if (option && !strcasecmp(option->keyword, keyword + 6))
+      if (option && !_cups_strcasecmp(option->keyword, keyword + 6))
         custom_option = option;
       else
         custom_option = ppdFindOption(ppd, keyword + 6);
@@ -1093,7 +1093,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	ppd_add_size(ppd, "Custom");
 
-	if (option && !strcasecmp(option->keyword, "PageRegion"))
+	if (option && !_cups_strcasecmp(option->keyword, "PageRegion"))
 	  custom_option = option;
 	else
 	  custom_option = ppdFindOption(ppd, "PageRegion");
@@ -1337,7 +1337,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * attribute...
       */
 
-      if (!strcasecmp(name, "PageRegion"))
+      if (!_cups_strcasecmp(name, "PageRegion"))
         strcpy(custom_name, "CustomPageSize");
       else
         snprintf(custom_name, sizeof(custom_name), "Custom%s", name);
@@ -1717,7 +1717,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
             constraint->choice1[0] = '\0';
             constraint->choice2[0] = '\0';
 	    break;
-	    
+
 	case 3 : /* Two options, one choice... */
 	   /*
 	    * Check for broken constraints like "* Option"...
@@ -1771,7 +1771,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
               constraint->choice2[0] = '\0';
 	    }
 	    break;
-	    
+
 	case 4 : /* Two options, two choices... */
 	   /*
 	    * Check for broken constraints like "* Option"...
@@ -2279,7 +2279,7 @@ static int				/* O - Result of comparison */
 ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
                   ppd_attr_t *b)	/* I - Second attribute */
 {
-  return (strcasecmp(a->name, b->name));
+  return (_cups_strcasecmp(a->name, b->name));
 }
 
 
@@ -2303,7 +2303,7 @@ static int				/* O - Result of comparison */
 ppd_compare_coptions(ppd_coption_t *a,	/* I - First option */
                      ppd_coption_t *b)	/* I - Second option */
 {
-  return (strcasecmp(a->keyword, b->keyword));
+  return (_cups_strcasecmp(a->keyword, b->keyword));
 }
 
 
@@ -2315,7 +2315,7 @@ static int				/* O - Result of comparison */
 ppd_compare_options(ppd_option_t *a,	/* I - First option */
                     ppd_option_t *b)	/* I - Second option */
 {
-  return (strcasecmp(a->keyword, b->keyword));
+  return (_cups_strcasecmp(a->keyword, b->keyword));
 }
 
 
@@ -2549,7 +2549,7 @@ ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
 
       return (NULL);
     }
-	    
+
     if (ppd->num_groups == 0)
       group = malloc(sizeof(ppd_group_t));
     else
@@ -3067,7 +3067,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	*/
 
         lineptr ++;
-	
+
 	textptr = text;
 
 	while (*lineptr != '\0' && *lineptr != '\n' && *lineptr != ':')
@@ -3090,7 +3090,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	  cg->ppd_status = PPD_ILLEGAL_TRANSLATION;
 	  return (0);
 	}
-	    
+
 	mask |= PPD_TEXT;
       }
     }

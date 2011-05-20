@@ -171,7 +171,7 @@ main(int  argc,				/* I - Argument Count */
     for (i = 0, encoding = CUPS_AUTO_ENCODING;
          i < (int)(sizeof(lang_encodings) / sizeof(lang_encodings[0]));
 	 i ++)
-      if (!strcasecmp(lang_encodings[i], argv[2]))
+      if (!_cups_strcasecmp(lang_encodings[i], argv[2]))
       {
         encoding = (cups_encoding_t)i;
 	break;

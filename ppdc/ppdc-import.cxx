@@ -3,7 +3,7 @@
 //
 //   PPD file import methods for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -101,7 +101,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 
     // Then add the stuff from the PPD file...
     if (ppd->modelname && ppd->manufacturer &&
-        !strncasecmp(ppd->modelname, ppd->manufacturer,
+        !_cups_strncasecmp(ppd->modelname, ppd->manufacturer,
                      strlen(ppd->manufacturer)))
     {
       ptr = ppd->modelname + strlen(ppd->manufacturer);
@@ -171,7 +171,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
     for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
     {
       // Don't do custom size here...
-      if (!strcasecmp(size->name, "Custom"))
+      if (!_cups_strcasecmp(size->name, "Custom"))
         continue;
 
       // Get the code for the PageSize and PageRegion options...
@@ -187,7 +187,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 
        driver->add_size(csize);
 
-       if (!strcasecmp(size_option->defchoice, size->name))
+       if (!_cups_strcasecmp(size_option->defchoice, size->name))
          driver->set_default_size(csize);
     }
 
@@ -215,7 +215,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
           cchoice = new ppdcChoice(choice->choice, choice->text, choice->code);
           coption->add_choice(cchoice);
 
-          if (!strcasecmp(option->defchoice, choice->choice))
+          if (!_cups_strcasecmp(option->defchoice, choice->choice))
             coption->set_defchoice(cchoice);
         }
       }

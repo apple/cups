@@ -3,7 +3,7 @@
  *
  *   Advanced PCL command filter for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -123,7 +123,7 @@ main(int  argc,					/* I - Number of command-line arguments */
     * Parse the command...
     */
 
-    if (strncasecmp(lineptr, "Clean", 5) == 0 &&
+    if (_cups_strncasecmp(lineptr, "Clean", 5) == 0 &&
         (ppd->model_number & PCL_INKJET))
     {
      /*

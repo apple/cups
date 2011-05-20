@@ -588,7 +588,7 @@ static int				/* O - Result of comparison */
 compare_vars(_cups_var_t *a,		/* I - First variable */
              _cups_var_t *b)		/* I - Second variable */
 {
-  return (strcasecmp(a->name, b->name));
+  return (_cups_strcasecmp(a->name, b->name));
 }
 
 
@@ -745,9 +745,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       */
 
       if (get_token(fp, temp, sizeof(temp), &linenum) &&
-          (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+          (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
       {
-        IgnoreErrors = !strcasecmp(temp, "yes");
+        IgnoreErrors = !_cups_strcasecmp(temp, "yes");
       }
       else
       {
@@ -1006,20 +1006,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
-      if (strcasecmp(token, "COUNT") &&
-          strcasecmp(token, "DEFINE-MATCH") &&
-          strcasecmp(token, "DEFINE-NO-MATCH") &&
-          strcasecmp(token, "DEFINE-VALUE") &&
-          strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-NOT-DEFINED") &&
-          strcasecmp(token, "IN-GROUP") &&
-          strcasecmp(token, "OF-TYPE") &&
-          strcasecmp(token, "SAME-COUNT-AS") &&
-          strcasecmp(token, "WITH-VALUE"))
+      if (_cups_strcasecmp(token, "COUNT") &&
+          _cups_strcasecmp(token, "DEFINE-MATCH") &&
+          _cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
+          _cups_strcasecmp(token, "DEFINE-VALUE") &&
+          _cups_strcasecmp(token, "IF-DEFINED") &&
+          _cups_strcasecmp(token, "IF-NOT-DEFINED") &&
+          _cups_strcasecmp(token, "IN-GROUP") &&
+          _cups_strcasecmp(token, "OF-TYPE") &&
+          _cups_strcasecmp(token, "SAME-COUNT-AS") &&
+          _cups_strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
-      if (strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-NOT-DEFINED"))
+      if (_cups_strcasecmp(token, "IF-DEFINED") &&
+          _cups_strcasecmp(token, "IF-NOT-DEFINED"))
         last_status = NULL;
 
       if (!strcmp(token, "}"))
@@ -1102,9 +1102,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	*/
 
 	if (get_token(fp, temp, sizeof(temp), &linenum) &&
-	    (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+	    (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
 	{
-	  ignore_errors = !strcasecmp(temp, "yes");
+	  ignore_errors = !_cups_strcasecmp(temp, "yes");
 	}
 	else
 	{
@@ -1115,7 +1115,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	continue;
       }
-      else if (!strcasecmp(token, "NAME"))
+      else if (!_cups_strcasecmp(token, "NAME"))
       {
        /*
         * Name of test...
@@ -1134,7 +1134,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  if (isdigit(temp[0] & 255))
 	    request_id = atoi(temp);
-	  else if (!strcasecmp(temp, "random"))
+	  else if (!_cups_strcasecmp(temp, "random"))
 	    request_id = (CUPS_RAND() % 1000) * 137 + 1;
 	  else
 	  {
@@ -1197,9 +1197,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	*/
 
 	if (get_token(fp, temp, sizeof(temp), &linenum) &&
-	    (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+	    (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
 	{
-	  skip_previous = !strcasecmp(temp, "yes");
+	  skip_previous = !_cups_strcasecmp(temp, "yes");
 	}
 	else
 	{
@@ -1241,7 +1241,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "VERSION"))
+      else if (!_cups_strcasecmp(token, "VERSION"))
       {
 	if (get_token(fp, temp, sizeof(temp), &linenum))
 	{
@@ -1271,7 +1271,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "RESOURCE"))
+      else if (!_cups_strcasecmp(token, "RESOURCE"))
       {
        /*
         * Resource name...
@@ -1284,7 +1284,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "OPERATION"))
+      else if (!_cups_strcasecmp(token, "OPERATION"))
       {
        /*
         * Operation...
@@ -1306,7 +1306,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "GROUP"))
+      else if (!_cups_strcasecmp(token, "GROUP"))
       {
        /*
         * Attribute group...
@@ -1331,7 +1331,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         group = value;
       }
-      else if (!strcasecmp(token, "DELAY"))
+      else if (!_cups_strcasecmp(token, "DELAY"))
       {
        /*
         * Delay before operation...
@@ -1361,7 +1361,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  usleep((int)(1000000.0 * delay));
 	}
       }
-      else if (!strcasecmp(token, "ATTR"))
+      else if (!_cups_strcasecmp(token, "ATTR"))
       {
        /*
         * Attribute...
@@ -1401,7 +1401,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         switch (value)
 	{
 	  case IPP_TAG_BOOLEAN :
-	      if (!strcasecmp(token, "true"))
+	      if (!_cups_strcasecmp(token, "true"))
 		ippAddBoolean(request, group, attr, 1);
               else
 		ippAddBoolean(request, group, attr, atoi(token));
@@ -1456,8 +1456,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
-	            (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
-	             strcasecmp(ptr, "other")))
+	            (_cups_strcasecmp(ptr, "dpi") && _cups_strcasecmp(ptr, "dpc") &&
+	             _cups_strcasecmp(ptr, "other")))
 	        {
 	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
 		                    token, linenum);
@@ -1465,10 +1465,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  goto test_exit;
 	        }
 
-	        if (!strcasecmp(ptr, "dpi"))
+	        if (!_cups_strcasecmp(ptr, "dpi"))
 	          ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
 	                           xres, yres);
-	        else if (!strcasecmp(ptr, "dpc"))
+	        else if (!_cups_strcasecmp(ptr, "dpc"))
 	          ippAddResolution(request, group, attr, IPP_RES_PER_CM,
 	                           xres, yres);
 	        else
@@ -1574,7 +1574,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      break;
 	}
       }
-      else if (!strcasecmp(token, "FILE"))
+      else if (!_cups_strcasecmp(token, "FILE"))
       {
        /*
         * File...
@@ -1590,7 +1590,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         expand_variables(vars, token, temp, sizeof(token));
 	get_filename(testfile, filename, token, sizeof(filename));
       }
-      else if (!strcasecmp(token, "STATUS"))
+      else if (!_cups_strcasecmp(token, "STATUS"))
       {
        /*
         * Status...
@@ -1626,7 +1626,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	last_status->if_defined   = NULL;
 	last_status->if_not_defined = NULL;
       }
-      else if (!strcasecmp(token, "EXPECT"))
+      else if (!_cups_strcasecmp(token, "EXPECT"))
       {
        /*
         * Expected attributes...
@@ -1664,7 +1664,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         else
 	  last_expect->name = strdup(token);
       }
-      else if (!strcasecmp(token, "COUNT"))
+      else if (!_cups_strcasecmp(token, "COUNT"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1690,7 +1690,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "DEFINE-MATCH"))
+      else if (!_cups_strcasecmp(token, "DEFINE-MATCH"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1710,7 +1710,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "DEFINE-NO-MATCH"))
+      else if (!_cups_strcasecmp(token, "DEFINE-NO-MATCH"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1730,7 +1730,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "DEFINE-VALUE"))
+      else if (!_cups_strcasecmp(token, "DEFINE-VALUE"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1750,7 +1750,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "OF-TYPE"))
+      else if (!_cups_strcasecmp(token, "OF-TYPE"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1770,7 +1770,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "IN-GROUP"))
+      else if (!_cups_strcasecmp(token, "IN-GROUP"))
       {
         ipp_tag_t	in_group;	/* IN-GROUP value */
 
@@ -1795,7 +1795,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "SAME-COUNT-AS"))
+      else if (!_cups_strcasecmp(token, "SAME-COUNT-AS"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1814,7 +1814,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "IF-DEFINED"))
+      else if (!_cups_strcasecmp(token, "IF-DEFINED"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1835,7 +1835,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "IF-NOT-DEFINED"))
+      else if (!_cups_strcasecmp(token, "IF-NOT-DEFINED"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1856,7 +1856,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "WITH-VALUE"))
+      else if (!_cups_strcasecmp(token, "WITH-VALUE"))
       {
       	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
@@ -1904,7 +1904,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "DISPLAY"))
+      else if (!_cups_strcasecmp(token, "DISPLAY"))
       {
        /*
         * Display attributes...
@@ -2264,7 +2264,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else if (!prev_pass)
       fprintf(stderr, "%s\n", cupsLastErrorString());
 
-    if (prev_pass && Output != _CUPS_OUTPUT_PLIST && 
+    if (prev_pass && Output != _CUPS_OUTPUT_PLIST &&
         Output != _CUPS_OUTPUT_QUIET && !Verbosity && num_displayed > 0)
     {
       if (Output >= _CUPS_OUTPUT_LIST)
@@ -2893,7 +2893,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
       else
 	goto col_error;
     }
-    else if (!strcasecmp(token, "MEMBER"))
+    else if (!_cups_strcasecmp(token, "MEMBER"))
     {
      /*
       * Attribute...
@@ -2931,7 +2931,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
       switch (value)
       {
 	case IPP_TAG_BOOLEAN :
-	    if (!strcasecmp(token, "true"))
+	    if (!_cups_strcasecmp(token, "true"))
 	      ippAddBoolean(col, IPP_TAG_ZERO, attr, 1);
 	    else
 	      ippAddBoolean(col, IPP_TAG_ZERO, attr, atoi(token));
@@ -2949,18 +2949,18 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      char	units[6];	/* Units */
 
 	      if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
-		  (strcasecmp(units, "dpi") && strcasecmp(units, "dpc") &&
-		   strcasecmp(units, "other")))
+		  (_cups_strcasecmp(units, "dpi") && _cups_strcasecmp(units, "dpc") &&
+		   _cups_strcasecmp(units, "other")))
 	      {
 		print_fatal_error("Bad resolution value \"%s\" on line %d.",
 				  token, *linenum);
 		goto col_error;
 	      }
 
-	      if (!strcasecmp(units, "dpi"))
+	      if (!_cups_strcasecmp(units, "dpi"))
 		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
 		                 IPP_RES_PER_INCH);
-	      else if (!strcasecmp(units, "dpc"))
+	      else if (!_cups_strcasecmp(units, "dpc"))
 		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
 		                 IPP_RES_PER_CM);
 	      else

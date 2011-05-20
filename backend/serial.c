@@ -318,7 +318,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Process the option...
       */
 
-      if (!strcasecmp(name, "baud"))
+      if (!_cups_strcasecmp(name, "baud"))
       {
        /*
         * Set the baud rate...
@@ -381,7 +381,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	}
 #endif /* B19200 == 19200 */
       }
-      else if (!strcasecmp(name, "bits"))
+      else if (!_cups_strcasecmp(name, "bits"))
       {
        /*
         * Set number of data bits...
@@ -402,25 +402,25 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 	}
       }
-      else if (!strcasecmp(name, "parity"))
+      else if (!_cups_strcasecmp(name, "parity"))
       {
        /*
 	* Set parity checking...
 	*/
 
-	if (!strcasecmp(value, "even"))
+	if (!_cups_strcasecmp(value, "even"))
 	{
 	  opts.c_cflag |= PARENB;
           opts.c_cflag &= ~PARODD;
 	}
-	else if (!strcasecmp(value, "odd"))
+	else if (!_cups_strcasecmp(value, "odd"))
 	{
 	  opts.c_cflag |= PARENB;
           opts.c_cflag |= PARODD;
 	}
-	else if (!strcasecmp(value, "none"))
+	else if (!_cups_strcasecmp(value, "none"))
 	  opts.c_cflag &= ~PARENB;
-	else if (!strcasecmp(value, "space"))
+	else if (!_cups_strcasecmp(value, "space"))
 	{
 	 /*
 	  * Note: we only support space parity with 7 bits per character...
@@ -430,7 +430,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
           opts.c_cflag |= CS8;
 	  opts.c_cflag &= ~PARENB;
         }
-	else if (!strcasecmp(value, "mark"))
+	else if (!_cups_strcasecmp(value, "mark"))
 	{
 	 /*
 	  * Note: we only support mark parity with 7 bits per character
@@ -443,29 +443,29 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
           opts.c_cflag |= CSTOPB;
         }
       }
-      else if (!strcasecmp(name, "flow"))
+      else if (!_cups_strcasecmp(name, "flow"))
       {
        /*
 	* Set flow control...
 	*/
 
-	if (!strcasecmp(value, "none"))
+	if (!_cups_strcasecmp(value, "none"))
 	{
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
 	}
-	else if (!strcasecmp(value, "soft"))
+	else if (!_cups_strcasecmp(value, "soft"))
 	{
 	  opts.c_iflag |= IXON | IXOFF;
           opts.c_cflag &= ~CRTSCTS;
 	}
-	else if (!strcasecmp(value, "hard") ||
-	         !strcasecmp(value, "rtscts"))
+	else if (!_cups_strcasecmp(value, "hard") ||
+	         !_cups_strcasecmp(value, "rtscts"))
         {
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag |= CRTSCTS;
 	}
-	else if (!strcasecmp(value, "dtrdsr"))
+	else if (!_cups_strcasecmp(value, "dtrdsr"))
 	{
 	  opts.c_iflag &= ~(IXON | IXOFF);
           opts.c_cflag &= ~CRTSCTS;
@@ -473,7 +473,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  dtrdsr = 1;
 	}
       }
-      else if (!strcasecmp(name, "stop"))
+      else if (!_cups_strcasecmp(name, "stop"))
       {
         switch (atoi(value))
 	{

@@ -3,7 +3,7 @@
  *
  *   Banner to PostScript filter for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -228,7 +228,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
     * Save keyword values in the appropriate places...
     */
 
-    if (!strcasecmp(line, "Footer"))
+    if (!_cups_strcasecmp(line, "Footer"))
     {
       if (banner->footer)
         fprintf(stderr, "DEBUG: Extra \"Footer\" on line %d of banner file\n",
@@ -236,7 +236,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
       else
         banner->footer = strdup(ptr);
     }
-    else if (!strcasecmp(line, "Header"))
+    else if (!_cups_strcasecmp(line, "Header"))
     {
       if (banner->header)
         fprintf(stderr, "DEBUG: Extra \"Header\" on line %d of banner file\n",
@@ -244,7 +244,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
       else
         banner->header = strdup(ptr);
     }
-    else if (!strcasecmp(line, "Image"))
+    else if (!_cups_strcasecmp(line, "Image"))
     {
       char	imagefile[1024];	/* Image filename */
 
@@ -267,14 +267,14 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
         cupsArrayAdd(banner->images, strdup(imagefile));
       }
     }
-    else if (!strcasecmp(line, "Notice"))
+    else if (!_cups_strcasecmp(line, "Notice"))
     {
       if (!banner->notices)
 	banner->notices = cupsArrayNew(NULL, NULL);
 
       cupsArrayAdd(banner->notices, strdup(ptr));
     }
-    else if (!strcasecmp(line, "Show"))
+    else if (!_cups_strcasecmp(line, "Show"))
     {
       char	*value;			/* Current value */
 
@@ -294,41 +294,41 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
        /*
         * Add the value to the show flags...
 	*/
-	if (!strcasecmp(value, "imageable-area"))
+	if (!_cups_strcasecmp(value, "imageable-area"))
 	  banner->show |= SHOW_IMAGEABLE_AREA;
-	else if (!strcasecmp(value, "job-billing"))
+	else if (!_cups_strcasecmp(value, "job-billing"))
 	  banner->show |= SHOW_JOB_BILLING;
-	else if (!strcasecmp(value, "job-id"))
+	else if (!_cups_strcasecmp(value, "job-id"))
 	  banner->show |= SHOW_JOB_ID;
-	else if (!strcasecmp(value, "job-name"))
+	else if (!_cups_strcasecmp(value, "job-name"))
 	  banner->show |= SHOW_JOB_NAME;
-	else if (!strcasecmp(value, "job-originating-host-name"))
+	else if (!_cups_strcasecmp(value, "job-originating-host-name"))
 	  banner->show |= SHOW_JOB_ORIGINATING_HOST_NAME;
-	else if (!strcasecmp(value, "job-originating-user-name"))
+	else if (!_cups_strcasecmp(value, "job-originating-user-name"))
 	  banner->show |= SHOW_JOB_ORIGINATING_USER_NAME;
-	else if (!strcasecmp(value, "job-uuid"))
+	else if (!_cups_strcasecmp(value, "job-uuid"))
 	  banner->show |= SHOW_JOB_UUID;
-	else if (!strcasecmp(value, "options"))
+	else if (!_cups_strcasecmp(value, "options"))
 	  banner->show |= SHOW_OPTIONS;
-	else if (!strcasecmp(value, "paper-name"))
+	else if (!_cups_strcasecmp(value, "paper-name"))
 	  banner->show |= SHOW_PAPER_NAME;
-	else if (!strcasecmp(value, "paper-size"))
+	else if (!_cups_strcasecmp(value, "paper-size"))
 	  banner->show |= SHOW_PAPER_SIZE;
-	else if (!strcasecmp(value, "printer-driver-name"))
+	else if (!_cups_strcasecmp(value, "printer-driver-name"))
 	  banner->show |= SHOW_PRINTER_DRIVER_NAME;
-	else if (!strcasecmp(value, "printer-driver-version"))
+	else if (!_cups_strcasecmp(value, "printer-driver-version"))
 	  banner->show |= SHOW_PRINTER_DRIVER_VERSION;
-	else if (!strcasecmp(value, "printer-info"))
+	else if (!_cups_strcasecmp(value, "printer-info"))
 	  banner->show |= SHOW_PRINTER_INFO;
-	else if (!strcasecmp(value, "printer-location"))
+	else if (!_cups_strcasecmp(value, "printer-location"))
 	  banner->show |= SHOW_PRINTER_LOCATION;
-	else if (!strcasecmp(value, "printer-make-and-model"))
+	else if (!_cups_strcasecmp(value, "printer-make-and-model"))
 	  banner->show |= SHOW_PRINTER_MAKE_AND_MODEL;
-	else if (!strcasecmp(value, "printer-name"))
+	else if (!_cups_strcasecmp(value, "printer-name"))
 	  banner->show |= SHOW_PRINTER_NAME;
-	else if (!strcasecmp(value, "time-at-creation"))
+	else if (!_cups_strcasecmp(value, "time-at-creation"))
 	  banner->show |= SHOW_TIME_AT_CREATION;
-	else if (!strcasecmp(value, "time-at-processing"))
+	else if (!_cups_strcasecmp(value, "time-at-processing"))
 	  banner->show |= SHOW_TIME_AT_PROCESSING;
 	else
         {
@@ -486,18 +486,18 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
   {
     for (j = 0; j < num_options; j ++)
     {
-      if (strcasecmp("media", options[j].name) &&
-	  strcasecmp("PageSize", options[j].name) &&
-	  strcasecmp("PageRegion", options[j].name) &&
-	  strcasecmp("InputSlot", options[j].name) &&
-	  strcasecmp("MediaType", options[j].name) &&
-	  strcasecmp("finishings", options[j].name) &&
-	  strcasecmp("sides", options[j].name) &&
-	  strcasecmp("Duplex", options[j].name) &&
-	  strcasecmp("orientation-requested", options[j].name) &&
-	  strcasecmp("landscape", options[j].name) &&
-	  strcasecmp("number-up", options[j].name) &&
-	  strcasecmp("OutputOrder", options[j].name))
+      if (_cups_strcasecmp("media", options[j].name) &&
+	  _cups_strcasecmp("PageSize", options[j].name) &&
+	  _cups_strcasecmp("PageRegion", options[j].name) &&
+	  _cups_strcasecmp("InputSlot", options[j].name) &&
+	  _cups_strcasecmp("MediaType", options[j].name) &&
+	  _cups_strcasecmp("finishings", options[j].name) &&
+	  _cups_strcasecmp("sides", options[j].name) &&
+	  _cups_strcasecmp("Duplex", options[j].name) &&
+	  _cups_strcasecmp("orientation-requested", options[j].name) &&
+	  _cups_strcasecmp("landscape", options[j].name) &&
+	  _cups_strcasecmp("number-up", options[j].name) &&
+	  _cups_strcasecmp("OutputOrder", options[j].name))
       continue;
 
       showlines ++;
@@ -675,23 +675,23 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
 
         for (j = 0; j < num_options; j ++)
 	{
-	  if (strcasecmp("media", options[j].name) &&
-	      strcasecmp("PageSize", options[j].name) &&
-	      strcasecmp("PageRegion", options[j].name) &&
-	      strcasecmp("InputSlot", options[j].name) &&
-	      strcasecmp("MediaType", options[j].name) &&
-	      strcasecmp("finishings", options[j].name) &&
-	      strcasecmp("sides", options[j].name) &&
-	      strcasecmp("Duplex", options[j].name) &&
-	      strcasecmp("orientation-requested", options[j].name) &&
-	      strcasecmp("landscape", options[j].name) &&
-	      strcasecmp("number-up", options[j].name) &&
-	      strcasecmp("OutputOrder", options[j].name))
+	  if (_cups_strcasecmp("media", options[j].name) &&
+	      _cups_strcasecmp("PageSize", options[j].name) &&
+	      _cups_strcasecmp("PageRegion", options[j].name) &&
+	      _cups_strcasecmp("InputSlot", options[j].name) &&
+	      _cups_strcasecmp("MediaType", options[j].name) &&
+	      _cups_strcasecmp("finishings", options[j].name) &&
+	      _cups_strcasecmp("sides", options[j].name) &&
+	      _cups_strcasecmp("Duplex", options[j].name) &&
+	      _cups_strcasecmp("orientation-requested", options[j].name) &&
+	      _cups_strcasecmp("landscape", options[j].name) &&
+	      _cups_strcasecmp("number-up", options[j].name) &&
+	      _cups_strcasecmp("OutputOrder", options[j].name))
           continue;
 
-          if (!strcasecmp("landscape", options[j].name))
+          if (!_cups_strcasecmp("landscape", options[j].name))
 	    strlcpy(text, "orientation-requested=landscape", sizeof(text));
-	  else if (!strcasecmp("orientation-requested", options[j].name))
+	  else if (!_cups_strcasecmp("orientation-requested", options[j].name))
 	  {
 	    switch (atoi(options[j].value))
 	    {

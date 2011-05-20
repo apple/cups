@@ -320,8 +320,8 @@ main(int  argc,				/* I - Number of command-line args */
     if ((val = cupsGetOption("fitplot", num_options, options)) == NULL)
       val = cupsGetOption("fit-to-page", num_options, options);
 
-    if (val && strcasecmp(val, "no") && strcasecmp(val, "off") &&
-	strcasecmp(val, "false"))
+    if (val && _cups_strcasecmp(val, "no") && _cups_strcasecmp(val, "off") &&
+	_cups_strcasecmp(val, "false"))
       fit = 1;
     else
       fit = 0;
@@ -341,8 +341,8 @@ main(int  argc,				/* I - Number of command-line args */
 
       if ((val = cupsGetOption("landscape", num_options, options)) != NULL)
       {
-	if (strcasecmp(val, "no") != 0 && strcasecmp(val, "off") != 0 &&
-	    strcasecmp(val, "false") != 0)
+	if (_cups_strcasecmp(val, "no") != 0 && _cups_strcasecmp(val, "off") != 0 &&
+	    _cups_strcasecmp(val, "false") != 0)
 	  orientation = 1;
       }
       else if ((val = cupsGetOption("orientation-requested", num_options,

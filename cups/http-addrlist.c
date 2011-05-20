@@ -124,9 +124,9 @@ httpAddrConnect(
     val = 1;
 #ifdef WIN32
     setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&val,
-               sizeof(val)); 
+               sizeof(val));
 #else
-    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)); 
+    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val));
 #endif /* WIN32 */
 
 #ifdef FD_CLOEXEC
@@ -278,7 +278,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   }
   else
 #endif /* AF_LOCAL */
-  if (!hostname || strcasecmp(hostname, "localhost"))
+  if (!hostname || _cups_strcasecmp(hostname, "localhost"))
   {
 #ifdef HAVE_GETADDRINFO
     struct addrinfo	hints,		/* Address lookup hints */
@@ -515,7 +515,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   * Detect some common errors and handle them sanely...
   */
 
-  if (!addr && (!hostname || !strcasecmp(hostname, "localhost")))
+  if (!addr && (!hostname || !_cups_strcasecmp(hostname, "localhost")))
   {
     struct servent	*port;		/* Port number for service */
     int			portnum;	/* Port number */
@@ -547,7 +547,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       return (NULL);
     }
 
-    if (hostname && !strcasecmp(hostname, "localhost"))
+    if (hostname && !_cups_strcasecmp(hostname, "localhost"))
     {
      /*
       * Unfortunately, some users ignore all of the warnings in the

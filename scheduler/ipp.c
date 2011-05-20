@@ -412,8 +412,8 @@ cupsdProcessIPPRequest(
                      "attributes-natural-language", NULL, DefaultLanguage);
 
       if (charset &&
-          strcasecmp(charset->values[0].string.text, "us-ascii") &&
-          strcasecmp(charset->values[0].string.text, "utf-8"))
+          _cups_strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          _cups_strcasecmp(charset->values[0].string.text, "utf-8"))
       {
        /*
         * Bad character set...
@@ -502,7 +502,7 @@ cupsdProcessIPPRequest(
 	  */
 
 	  if (!strcmp(username->values[0].string.text, "root") &&
-	      strcasecmp(con->http.hostname, "localhost") &&
+	      _cups_strcasecmp(con->http.hostname, "localhost") &&
 	      strcmp(con->username, "root"))
 	  {
 	   /*
@@ -1377,8 +1377,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (!printer->shared &&
-      strcasecmp(con->http.hostname, "localhost") &&
-      strcasecmp(con->http.hostname, ServerName))
+      _cups_strcasecmp(con->http.hostname, "localhost") &&
+      _cups_strcasecmp(con->http.hostname, ServerName))
   {
     send_ipp_status(con, IPP_NOT_AUTHORIZED,
                     _("The printer or class is not shared."));
@@ -4353,7 +4353,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       for (i = 0; i < job_ids->num_values; i ++)
       {
 	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL ||
-	    strcasecmp(job->dest, printer->name))
+	    _cups_strcasecmp(job->dest, printer->name))
 	  break;
       }
 
@@ -4463,7 +4463,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
 	if (job->state_value <= IPP_JOB_PROCESSING &&
-	    !strcasecmp(job->dest, printer->name))
+	    !_cups_strcasecmp(job->dest, printer->name))
 	  break;
 
       if (job)
@@ -4478,7 +4478,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
 	  if (job->state_value == IPP_JOB_STOPPED &&
-	      !strcasecmp(job->dest, printer->name))
+	      !_cups_strcasecmp(job->dest, printer->name))
 	    break;
 
 	if (job)
@@ -4884,7 +4884,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	  break;
       }
 #else
-      else if (!strcasecmp(username, name))
+      else if (!_cups_strcasecmp(username, name))
 	break;
 #endif /* HAVE_MBR_UID_TO_UUID */
 
@@ -5533,7 +5533,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      if (!strcasecmp(banner->filetype->type, "postscript"))
+	      if (!_cups_strcasecmp(banner->filetype->type, "postscript"))
 	      {
 	       /*
 	        * Need to quote strings for PS banners...
@@ -7798,7 +7798,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 	continue;
       }
 
-      if (username[0] && strcasecmp(username, job->username))
+      if (username[0] && _cups_strcasecmp(username, job->username))
 	continue;
 
       if (count > 0)
@@ -8506,7 +8506,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(!location ||
-	 (printer->location && !strcasecmp(printer->location, location))))
+	 (printer->location && !_cups_strcasecmp(printer->location, location))))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
@@ -8746,7 +8746,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if ((!printer || sub->dest == printer) && (!job || sub->job == job) &&
-        (!username[0] || !strcasecmp(username, sub->owner)))
+        (!username[0] || !_cups_strcasecmp(username, sub->owner)))
     {
       ippAddSeparator(con->response);
 
@@ -9198,7 +9198,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       * completed...
       */
 
-      if (strcasecmp(job->dest, src) ||
+      if (_cups_strcasecmp(job->dest, src) ||
           job->state_value > IPP_JOB_STOPPED)
 	continue;
 
@@ -9497,9 +9497,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Read any embedded job ticket info from PS files...
   */
 
-  if (!strcasecmp(filetype->super, "application") &&
-      (!strcasecmp(filetype->type, "postscript") ||
-       !strcasecmp(filetype->type, "pdf")))
+  if (!_cups_strcasecmp(filetype->super, "application") &&
+      (!_cups_strcasecmp(filetype->type, "postscript") ||
+       !_cups_strcasecmp(filetype->type, "pdf")))
     read_job_ticket(con);
 
  /*
@@ -12044,7 +12044,7 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
       if (cupsdCheckGroup(username, pw, name))
         break;
     }
-    else if (!strcasecmp(username, name))
+    else if (!_cups_strcasecmp(username, name))
       break;
   }
 

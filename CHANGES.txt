@@ -3,6 +3,8 @@ CHANGES.txt - 2011-05-19
 
 CHANGES IN CUPS V1.5b1
 
+	- Fixed a case-insensitive string comparison issue for locales that do
+	  not treat "I" and "i" as equivalent (STR #3800)
 	- The scheduler reported an incorrect job-printer-uri value when sharing
 	  was not enabled (STR #3639)
 	- The scheduler now allows the ServerAlias directive to contain multiple

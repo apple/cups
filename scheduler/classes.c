@@ -3,7 +3,7 @@
  *
  *   Printer class routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -325,8 +325,8 @@ cupsdLoadAllClasses(void)
     * Decode the directive...
     */
 
-    if (!strcasecmp(line, "<Class") ||
-        !strcasecmp(line, "<DefaultClass"))
+    if (!_cups_strcasecmp(line, "<Class") ||
+        !_cups_strcasecmp(line, "<DefaultClass"))
     {
      /*
       * <Class name> or <DefaultClass name>
@@ -354,14 +354,14 @@ cupsdLoadAllClasses(void)
 	p->accepting = 1;
 	p->state     = IPP_PRINTER_IDLE;
 
-        if (!strcasecmp(line, "<DefaultClass"))
+        if (!_cups_strcasecmp(line, "<DefaultClass"))
 	  DefaultPrinter = p;
       }
       else
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "</Class>"))
+    else if (!_cups_strcasecmp(line, "</Class>"))
     {
       if (p != NULL)
       {
@@ -377,7 +377,7 @@ cupsdLoadAllClasses(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "UUID"))
+    else if (!_cups_strcasecmp(line, "UUID"))
     {
       if (value && !strncmp(value, "urn:uuid:", 9))
         cupsdSetString(&(p->uuid), value);
@@ -385,24 +385,24 @@ cupsdLoadAllClasses(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Bad UUID on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "AuthInfoRequired"))
+    else if (!_cups_strcasecmp(line, "AuthInfoRequired"))
     {
       if (!cupsdSetAuthInfoRequired(p, value, NULL))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 			"Bad AuthInfoRequired on line %d of classes.conf.",
 			linenum);
     }
-    else if (!strcasecmp(line, "Info"))
+    else if (!_cups_strcasecmp(line, "Info"))
     {
       if (value)
         cupsdSetString(&p->info, value);
     }
-    else if (!strcasecmp(line, "Location"))
+    else if (!_cups_strcasecmp(line, "Location"))
     {
       if (value)
         cupsdSetString(&p->location, value);
     }
-    else if (!strcasecmp(line, "Option") && value)
+    else if (!_cups_strcasecmp(line, "Option") && value)
     {
      /*
       * Option name value
@@ -421,7 +421,7 @@ cupsdLoadAllClasses(void)
 	                               &(p->options));
       }
     }
-    else if (!strcasecmp(line, "Printer"))
+    else if (!_cups_strcasecmp(line, "Printer"))
     {
       if (!value)
       {
@@ -458,15 +458,15 @@ cupsdLoadAllClasses(void)
       if (temp)
         cupsdAddPrinterToClass(p, temp);
     }
-    else if (!strcasecmp(line, "State"))
+    else if (!_cups_strcasecmp(line, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (!strcasecmp(value, "idle"))
+      if (!_cups_strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (!strcasecmp(value, "stopped"))
+      else if (!_cups_strcasecmp(value, "stopped"))
       {
         p->state = IPP_PRINTER_STOPPED;
 
@@ -486,7 +486,7 @@ cupsdLoadAllClasses(void)
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
     }
-    else if (!strcasecmp(line, "StateMessage"))
+    else if (!_cups_strcasecmp(line, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -495,7 +495,7 @@ cupsdLoadAllClasses(void)
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
     }
-    else if (!strcasecmp(line, "StateTime"))
+    else if (!_cups_strcasecmp(line, "StateTime"))
     {
      /*
       * Set the state time...
@@ -504,49 +504,49 @@ cupsdLoadAllClasses(void)
       if (value)
         p->state_time = atoi(value);
     }
-    else if (!strcasecmp(line, "Accepting"))
+    else if (!_cups_strcasecmp(line, "Accepting"))
     {
      /*
       * Set the initial accepting state...
       */
 
       if (value &&
-          (!strcasecmp(value, "yes") ||
-           !strcasecmp(value, "on") ||
-           !strcasecmp(value, "true")))
+          (!_cups_strcasecmp(value, "yes") ||
+           !_cups_strcasecmp(value, "on") ||
+           !_cups_strcasecmp(value, "true")))
         p->accepting = 1;
       else if (value &&
-               (!strcasecmp(value, "no") ||
-        	!strcasecmp(value, "off") ||
-        	!strcasecmp(value, "false")))
+               (!_cups_strcasecmp(value, "no") ||
+        	!_cups_strcasecmp(value, "off") ||
+        	!_cups_strcasecmp(value, "false")))
         p->accepting = 0;
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
     }
-    else if (!strcasecmp(line, "Shared"))
+    else if (!_cups_strcasecmp(line, "Shared"))
     {
      /*
       * Set the initial shared state...
       */
 
       if (value &&
-          (!strcasecmp(value, "yes") ||
-           !strcasecmp(value, "on") ||
-           !strcasecmp(value, "true")))
+          (!_cups_strcasecmp(value, "yes") ||
+           !_cups_strcasecmp(value, "on") ||
+           !_cups_strcasecmp(value, "true")))
         p->shared = 1;
       else if (value &&
-               (!strcasecmp(value, "no") ||
-        	!strcasecmp(value, "off") ||
-        	!strcasecmp(value, "false")))
+               (!_cups_strcasecmp(value, "no") ||
+        	!_cups_strcasecmp(value, "off") ||
+        	!_cups_strcasecmp(value, "false")))
         p->shared = 0;
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
     }
-    else if (!strcasecmp(line, "JobSheets"))
+    else if (!_cups_strcasecmp(line, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -582,7 +582,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "AllowUser"))
+    else if (!_cups_strcasecmp(line, "AllowUser"))
     {
       if (value)
       {
@@ -593,7 +593,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "DenyUser"))
+    else if (!_cups_strcasecmp(line, "DenyUser"))
     {
       if (value)
       {
@@ -604,7 +604,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "QuotaPeriod"))
+    else if (!_cups_strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
@@ -612,7 +612,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "PageLimit"))
+    else if (!_cups_strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
@@ -620,7 +620,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "KLimit"))
+    else if (!_cups_strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
@@ -628,7 +628,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "OpPolicy"))
+    else if (!_cups_strcasecmp(line, "OpPolicy"))
     {
       if (value)
       {
@@ -649,7 +649,7 @@ cupsdLoadAllClasses(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!strcasecmp(line, "ErrorPolicy"))
+    else if (!_cups_strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
       {

@@ -145,7 +145,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
     * Look for logic words: AND, OR
     */
 
-    if (wlen == 3 && !strncasecmp(qptr, "AND", 3))
+    if (wlen == 3 && !_cups_strncasecmp(qptr, "AND", 3))
     {
      /*
       * Logical AND with the following text...
@@ -156,7 +156,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
 
       qptr = qend;
     }
-    else if (wlen == 2 && !strncasecmp(qptr, "OR", 2))
+    else if (wlen == 2 && !_cups_strncasecmp(qptr, "OR", 2))
     {
      /*
       * Logical OR with the following text...

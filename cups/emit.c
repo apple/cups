@@ -3,7 +3,7 @@
  *
  *   PPD code emission routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -417,7 +417,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 
     if ((charset = ppdFindAttr(ppd, "cupsPJLCharset", NULL)) != NULL)
     {
-      if (!charset->value || strcasecmp(charset->value, "UTF-8"))
+      if (!charset->value || _cups_strcasecmp(charset->value, "UTF-8"))
         charset = NULL;
     }
 
@@ -654,7 +654,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   {
     if (section == PPD_ORDER_JCL)
     {
-      if (!strcasecmp(choices[i]->choice, "Custom") &&
+      if (!_cups_strcasecmp(choices[i]->choice, "Custom") &&
 	  (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
 	      != NULL)
       {
@@ -690,16 +690,16 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
     {
       bufsize += 3;			/* [{\n */
 
-      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
-           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
-          !strcasecmp(choices[i]->choice, "Custom"))
+      if ((!_cups_strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !_cups_strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !_cups_strcasecmp(choices[i]->choice, "Custom"))
       {
         DEBUG_puts("2ppdEmitString: Custom size set!");
 
         bufsize += 37;			/* %%BeginFeature: *CustomPageSize True\n */
         bufsize += 50;			/* Five 9-digit numbers + newline */
       }
-      else if (!strcasecmp(choices[i]->choice, "Custom") &&
+      else if (!_cups_strcasecmp(choices[i]->choice, "Custom") &&
                (coption = ppdFindCustomOption(ppd,
 	                                      choices[i]->option->keyword))
 	           != NULL)
@@ -707,7 +707,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
         bufsize += 23 + strlen(choices[i]->option->keyword) + 6;
 					/* %%BeginFeature: *Customkeyword True\n */
 
-        
+
         for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 	     cparam;
 	     cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
@@ -770,7 +770,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   for (i = 0, bufptr = buffer; i < count; i ++, bufptr += strlen(bufptr))
     if (section == PPD_ORDER_JCL)
     {
-      if (!strcasecmp(choices[i]->choice, "Custom") &&
+      if (!_cups_strcasecmp(choices[i]->choice, "Custom") &&
 	  choices[i]->code &&
           (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
 	      != NULL)
@@ -871,9 +871,9 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       DEBUG_printf(("2ppdEmitString: Adding code for %s=%s...",
 		    choices[i]->option->keyword, choices[i]->choice));
 
-      if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
-           !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
-          !strcasecmp(choices[i]->choice, "Custom"))
+      if ((!_cups_strcasecmp(choices[i]->option->keyword, "PageSize") ||
+           !_cups_strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
+          !_cups_strcasecmp(choices[i]->choice, "Custom"))
       {
        /*
         * Variable size; write out standard size options, using the
@@ -986,7 +986,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
           bufptr += strlen(bufptr);
 	}
       }
-      else if (!strcasecmp(choices[i]->choice, "Custom") &&
+      else if (!_cups_strcasecmp(choices[i]->choice, "Custom") &&
                (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
 	           != NULL)
       {
@@ -1161,9 +1161,9 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
   if (!rpr)
     rpr = ppdFindAttr(ppd, "RequiresPageRegion", "All");
 
-  if (!strcasecmp(size->name, "Custom") ||
+  if (!_cups_strcasecmp(size->name, "Custom") ||
       (!manual_feed && !input_slot) ||
-      (manual_feed && !strcasecmp(manual_feed->choice, "False") &&
+      (manual_feed && !_cups_strcasecmp(manual_feed->choice, "False") &&
        (!input_slot || (input_slot->code && !input_slot->code[0]))) ||
       (!rpr && ppd->num_filters > 0))
   {
@@ -1173,7 +1173,7 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 
     ppdMarkOption(ppd, "PageSize", size->name);
   }
-  else if (rpr && rpr->value && !strcasecmp(rpr->value, "True"))
+  else if (rpr && rpr->value && !_cups_strcasecmp(rpr->value, "True"))
   {
    /*
     * Use PageRegion code...

@@ -715,8 +715,8 @@ mime_compare_types(mime_type_t *t0,	/* I - First type */
   int	i;				/* Result of comparison */
 
 
-  if ((i = strcasecmp(t0->super, t1->super)) == 0)
-    i = strcasecmp(t0->type, t1->type);
+  if ((i = _cups_strcasecmp(t0->super, t1->super)) == 0)
+    i = _cups_strcasecmp(t0->type, t1->type);
 
   return (i);
 }
@@ -917,7 +917,7 @@ mime_check_rules(
 	  if ((rules->offset + rules->length) > (fb->offset + fb->length))
 	    result = 0;
 	  else
-            result = (strncasecmp((char *)fb->buffer + rules->offset -
+            result = (_cups_strncasecmp((char *)fb->buffer + rules->offset -
 	                              fb->offset,
 	                          rules->value.stringv, rules->length) == 0);
 	  break;

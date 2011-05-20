@@ -443,7 +443,7 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
 	  pwg = _pwgMediaForPPD(name);
 	  if (pwg &&
 	      (suffix = name + strlen(name) - 10 /* .FullBleed */) > name &&
-	      !strcasecmp(suffix, ".FullBleed"))
+	      !_cups_strcasecmp(suffix, ".FullBleed"))
 	  {
 	   /*
 	    * Indicate that margins are set with the default values of 0.
@@ -586,7 +586,7 @@ _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
     struct lconv	*loc;		/* Locale data */
     int			custom;		/* Custom page size? */
 
-    if (!strncasecmp(ppd, "Custom.", 7))
+    if (!_cups_strncasecmp(ppd, "Custom.", 7))
     {
       custom = 1;
       factor = 2540.0 / 72.0;
@@ -608,34 +608,34 @@ _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
 
       if (ptr &&
 	  (!*ptr ||
-	   !strcasecmp(ptr, "FullBleed") ||
-	   !strcasecmp(ptr, ".FullBleed") ||
-	   !strcasecmp(ptr, "cm") ||
-	   !strcasecmp(ptr, "cm.FullBleed") ||
-	   !strcasecmp(ptr, "ft") ||
-	   !strcasecmp(ptr, "ft.FullBleed") ||
-	   !strcasecmp(ptr, "in") ||
-	   !strcasecmp(ptr, "in.FullBleed") ||
-	   !strcasecmp(ptr, "m") ||
-	   !strcasecmp(ptr, "m.FullBleed") ||
-	   !strcasecmp(ptr, "mm") ||
-	   !strcasecmp(ptr, "mm.FullBleed") ||
-	   !strcasecmp(ptr, "pt") ||
-	   !strcasecmp(ptr, "pt.FullBleed")))
+	   !_cups_strcasecmp(ptr, "FullBleed") ||
+	   !_cups_strcasecmp(ptr, ".FullBleed") ||
+	   !_cups_strcasecmp(ptr, "cm") ||
+	   !_cups_strcasecmp(ptr, "cm.FullBleed") ||
+	   !_cups_strcasecmp(ptr, "ft") ||
+	   !_cups_strcasecmp(ptr, "ft.FullBleed") ||
+	   !_cups_strcasecmp(ptr, "in") ||
+	   !_cups_strcasecmp(ptr, "in.FullBleed") ||
+	   !_cups_strcasecmp(ptr, "m") ||
+	   !_cups_strcasecmp(ptr, "m.FullBleed") ||
+	   !_cups_strcasecmp(ptr, "mm") ||
+	   !_cups_strcasecmp(ptr, "mm.FullBleed") ||
+	   !_cups_strcasecmp(ptr, "pt") ||
+	   !_cups_strcasecmp(ptr, "pt.FullBleed")))
       {
 	size = &(cg->pwg_media);
 
-	if (!strncasecmp(ptr, "cm", 2))
+	if (!_cups_strncasecmp(ptr, "cm", 2))
 	  factor = 1000.0;
-	else if (!strncasecmp(ptr, "ft", 2))
+	else if (!_cups_strncasecmp(ptr, "ft", 2))
 	  factor = 2540.0 * 12.0;
-	else if (!strncasecmp(ptr, "in", 2))
+	else if (!_cups_strncasecmp(ptr, "in", 2))
 	  factor = 2540.0;
-	else if (!strncasecmp(ptr, "mm", 2))
+	else if (!_cups_strncasecmp(ptr, "mm", 2))
 	  factor = 100.0;
 	else if (*ptr == 'm' || *ptr == 'M')
 	  factor = 100000.0;
-	else if (!strncasecmp(ptr, "pt", 2))
+	else if (!_cups_strncasecmp(ptr, "pt", 2))
 	  factor = 2540.0 / 72.0;
 
        /*

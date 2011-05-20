@@ -218,8 +218,6 @@
  */
 
 #undef HAVE_STRDUP
-#undef HAVE_STRCASECMP
-#undef HAVE_STRNCASECMP
 #undef HAVE_STRLCAT
 #undef HAVE_STRLCPY
 

@@ -3,7 +3,7 @@
  *
  *   SNMP functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -178,7 +178,7 @@ _cupsSNMPDefaultCommunity(void)
     {
       linenum = 0;
       while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
-	if (!strcasecmp(line, "Community") && value)
+	if (!_cups_strcasecmp(line, "Community") && value)
 	{
 	  strlcpy(cg->snmp_community, value, sizeof(cg->snmp_community));
 	  break;
@@ -728,7 +728,7 @@ _cupsSNMPWrite(
   packet.request_type = request_type;
   packet.request_id   = request_id;
   packet.object_type  = CUPS_ASN1_NULL_VALUE;
-  
+
   strlcpy(packet.community, community, sizeof(packet.community));
 
   for (i = 0; oid[i] >= 0 && i < (CUPS_SNMP_MAX_OID - 1); i ++)
@@ -963,7 +963,7 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
     }
   }
 }
-          
+
 
 /*
  * 'asn1_decode_snmp()' - Decode a SNMP packet.

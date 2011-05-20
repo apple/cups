@@ -78,7 +78,7 @@ ppdFindCustomParam(ppd_coption_t *opt,	/* I - Custom option */
   for (param = (ppd_cparam_t *)cupsArrayFirst(opt->params);
        param;
        param = (ppd_cparam_t *)cupsArrayNext(opt->params))
-    if (!strcasecmp(param->name, name))
+    if (!_cups_strcasecmp(param->name, name))
       break;
 
   return (param);

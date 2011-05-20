@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol support functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -566,25 +566,25 @@ ippErrorValue(const char *name)		/* I - Name */
 
 
   for (i = 0; i < (sizeof(ipp_status_oks) / sizeof(ipp_status_oks[0])); i ++)
-    if (!strcasecmp(name, ipp_status_oks[i]))
+    if (!_cups_strcasecmp(name, ipp_status_oks[i]))
       return ((ipp_status_t)i);
 
-  if (!strcasecmp(name, "redirection-other-site"))
+  if (!_cups_strcasecmp(name, "redirection-other-site"))
     return (IPP_REDIRECTION_OTHER_SITE);
 
-  if (!strcasecmp(name, "cups-see-other"))
+  if (!_cups_strcasecmp(name, "cups-see-other"))
     return (CUPS_SEE_OTHER);
 
   for (i = 0; i < (sizeof(ipp_status_400s) / sizeof(ipp_status_400s[0])); i ++)
-    if (!strcasecmp(name, ipp_status_400s[i]))
+    if (!_cups_strcasecmp(name, ipp_status_400s[i]))
       return ((ipp_status_t)(i + 0x400));
 
   for (i = 0; i < (sizeof(ipp_status_500s) / sizeof(ipp_status_500s[0])); i ++)
-    if (!strcasecmp(name, ipp_status_500s[i]))
+    if (!_cups_strcasecmp(name, ipp_status_500s[i]))
       return ((ipp_status_t)(i + 0x500));
 
   for (i = 0; i < (sizeof(ipp_status_1000s) / sizeof(ipp_status_1000s[0])); i ++)
-    if (!strcasecmp(name, ipp_status_1000s[i]))
+    if (!_cups_strcasecmp(name, ipp_status_1000s[i]))
       return ((ipp_status_t)(i + 0x1000));
 
   return ((ipp_status_t)-1);
@@ -639,24 +639,24 @@ ippOpValue(const char *name)		/* I - Textual name */
 
 
   for (i = 0; i < (sizeof(ipp_std_ops) / sizeof(ipp_std_ops[0])); i ++)
-    if (!strcasecmp(name, ipp_std_ops[i]))
+    if (!_cups_strcasecmp(name, ipp_std_ops[i]))
       return ((ipp_op_t)i);
 
-  if (!strcasecmp(name, "windows-ext"))
+  if (!_cups_strcasecmp(name, "windows-ext"))
     return (IPP_PRIVATE);
 
   for (i = 0; i < (sizeof(ipp_cups_ops) / sizeof(ipp_cups_ops[0])); i ++)
-    if (!strcasecmp(name, ipp_cups_ops[i]))
+    if (!_cups_strcasecmp(name, ipp_cups_ops[i]))
       return ((ipp_op_t)(i + 0x4001));
 
   for (i = 0; i < (sizeof(ipp_cups_ops2) / sizeof(ipp_cups_ops2[0])); i ++)
-    if (!strcasecmp(name, ipp_cups_ops2[i]))
+    if (!_cups_strcasecmp(name, ipp_cups_ops2[i]))
       return ((ipp_op_t)(i + 0x4027));
 
-  if (!strcasecmp(name, "CUPS-Add-Class"))
+  if (!_cups_strcasecmp(name, "CUPS-Add-Class"))
     return (CUPS_ADD_MODIFY_CLASS);
 
-  if (!strcasecmp(name, "CUPS-Add-Printer"))
+  if (!_cups_strcasecmp(name, "CUPS-Add-Printer"))
     return (CUPS_ADD_MODIFY_PRINTER);
 
   return ((ipp_op_t)-1);
@@ -732,30 +732,30 @@ ippTagValue(const char *name)		/* I - Tag name */
 
 
   for (i = 0; i < (sizeof(ipp_tag_names) / sizeof(ipp_tag_names[0])); i ++)
-    if (!strcasecmp(name, ipp_tag_names[i]))
+    if (!_cups_strcasecmp(name, ipp_tag_names[i]))
       return ((ipp_tag_t)i);
 
-  if (!strcasecmp(name, "operation"))
+  if (!_cups_strcasecmp(name, "operation"))
     return (IPP_TAG_OPERATION);
-  else if (!strcasecmp(name, "job"))
+  else if (!_cups_strcasecmp(name, "job"))
     return (IPP_TAG_JOB);
-  else if (!strcasecmp(name, "printer"))
+  else if (!_cups_strcasecmp(name, "printer"))
     return (IPP_TAG_PRINTER);
-  else if (!strcasecmp(name, "unsupported"))
+  else if (!_cups_strcasecmp(name, "unsupported"))
     return (IPP_TAG_UNSUPPORTED_GROUP);
-  else if (!strcasecmp(name, "subscription"))
+  else if (!_cups_strcasecmp(name, "subscription"))
     return (IPP_TAG_SUBSCRIPTION);
-  else if (!strcasecmp(name, "event"))
+  else if (!_cups_strcasecmp(name, "event"))
     return (IPP_TAG_EVENT_NOTIFICATION);
-  else if (!strcasecmp(name, "language"))
+  else if (!_cups_strcasecmp(name, "language"))
     return (IPP_TAG_LANGUAGE);
-  else if (!strcasecmp(name, "mimetype"))
+  else if (!_cups_strcasecmp(name, "mimetype"))
     return (IPP_TAG_MIMETYPE);
-  else if (!strcasecmp(name, "name"))
+  else if (!_cups_strcasecmp(name, "name"))
     return (IPP_TAG_NAME);
-  else if (!strcasecmp(name, "text"))
+  else if (!_cups_strcasecmp(name, "text"))
     return (IPP_TAG_TEXT);
-  else if (!strcasecmp(name, "begCollection"))
+  else if (!_cups_strcasecmp(name, "begCollection"))
     return (IPP_TAG_BEGIN_COLLECTION);
   else
     return (IPP_TAG_ZERO);

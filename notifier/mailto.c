@@ -453,21 +453,21 @@ load_configuration(void)
       return (0);
     }
 
-    if (!strcasecmp(line, "Cc"))
+    if (!_cups_strcasecmp(line, "Cc"))
       strlcpy(mailtoCc, value, sizeof(mailtoCc));
-    else if (!strcasecmp(line, "From"))
+    else if (!_cups_strcasecmp(line, "From"))
       strlcpy(mailtoFrom, value, sizeof(mailtoFrom));
-    else if (!strcasecmp(line, "Sendmail"))
+    else if (!_cups_strcasecmp(line, "Sendmail"))
     {
       strlcpy(mailtoSendmail, value, sizeof(mailtoSendmail));
       mailtoSMTPServer[0] = '\0';
     }
-    else if (!strcasecmp(line, "SMTPServer"))
+    else if (!_cups_strcasecmp(line, "SMTPServer"))
     {
       mailtoSendmail[0] = '\0';
       strlcpy(mailtoSMTPServer, value, sizeof(mailtoSMTPServer));
     }
-    else if (!strcasecmp(line, "Subject"))
+    else if (!_cups_strcasecmp(line, "Subject"))
       strlcpy(mailtoSubject, value, sizeof(mailtoSubject));
     else
     {

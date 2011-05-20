@@ -104,18 +104,18 @@ main(int  argc,				// I - Number of command-line arguments
         ppd_status_t	status;		// PPD open status
 	int		curline,	// Current line
 			linenum;	// Line number
-	
-	
+
+
         status = ppdLastError(&linenum);
-	
+
 	_cupsLangPrintf(stderr,
 	                _("%s: Unable to open PPD file: %s on line %d."),
 	                "ppdmerge", ppdErrorString(status), linenum);
         cupsFileRewind(infile);
-	
+
         line[0] = '\0';
 	curline = 0;
-	
+
         while (cupsFileGets(infile, line, sizeof(line)))
 	{
 	  curline ++;
@@ -128,7 +128,7 @@ main(int  argc,				// I - Number of command-line arguments
         cupsFileClose(infile);
 	return (1);
       }
-      
+
       // Figure out the locale...
       if ((locale = ppd_locale(ppd)) == NULL)
       {
@@ -147,13 +147,13 @@ main(int  argc,				// I - Number of command-line arguments
 	languages = _ppdGetLanguages(ppd);
 
         if (outname && !strcmp(inname, outname))
-	{	
+	{
 	  // Rename input filename so that we don't overwrite it...
 	  char bckname[1024];		// Backup filename
-	  
-	  
+
+
 	  snprintf(bckname, sizeof(bckname), "%s.bck", inname);
-	  
+
 	  if (rename(inname, bckname))
 	  {
 	    _cupsLangPrintf(stderr,
@@ -177,7 +177,7 @@ main(int  argc,				// I - Number of command-line arguments
 	                argv[i]);
         ppdClose(ppd);
       }
-      
+
       // Close and move on...
       cupsFileClose(infile);
     }
@@ -341,7 +341,7 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
   {
     vlen = strlen(languages[i].version);
 
-    if (!strncasecmp(ppd->lang_version, languages[i].version, vlen))
+    if (!_cups_strncasecmp(ppd->lang_version, languages[i].version, vlen))
     {
       if (ppd->lang_version[vlen] == '-' ||
           ppd->lang_version[vlen] == '_')

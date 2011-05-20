@@ -7,7 +7,7 @@
 //   the standard media and sample driver strings.  The results are picked up
 //   by GNU gettext and placed in the CUPS message catalog.
 //
-//   Copyright 2008-2010 by Apple Inc.
+//   Copyright 2008-2011 by Apple Inc.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Apple Inc. and are protected by Federal copyright
@@ -126,7 +126,7 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
     if (!g->options->count)
       continue;
 
-    if (strcasecmp(g->name->value, "General"))
+    if (_cups_strcasecmp(g->name->value, "General"))
       catalog->add_message(g->text->value);
 
     for (o = (ppdcOption *)g->options->first();

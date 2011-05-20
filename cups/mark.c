@@ -156,7 +156,7 @@ cupsMarkOptions(
 
       if (!page_size || !page_size[0])
       {
-        if (!strncasecmp(s, "Custom.", 7) || ppdPageSize(ppd, s))
+        if (!_cups_strncasecmp(s, "Custom.", 7) || ppdPageSize(ppd, s))
           ppd_mark_option(ppd, "PageSize", s);
         else if ((ppd_keyword = _ppdCacheGetPageSize(cache, NULL, s, NULL)) != NULL)
 	  ppd_mark_option(ppd, "PageSize", ppd_keyword);
@@ -241,7 +241,7 @@ cupsMarkOptions(
     }
 
     if (output_bin && !cupsGetOption("OutputBin", num_options, options) &&
-	(ppd_keyword = _ppdCacheGetOutputBin(cache, output_bin)) != NULL) 
+	(ppd_keyword = _ppdCacheGetOutputBin(cache, output_bin)) != NULL)
     {
      /*
       * Map output-bin to OutputBin...
@@ -271,14 +271,14 @@ cupsMarkOptions(
   */
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
-    if (!strcasecmp(optptr->name, "media") ||
-        !strcasecmp(optptr->name, "output-bin") ||
-	!strcasecmp(optptr->name, "output-mode") ||
-	!strcasecmp(optptr->name, "print-quality") ||
-	!strcasecmp(optptr->name, "sides"))
+    if (!_cups_strcasecmp(optptr->name, "media") ||
+        !_cups_strcasecmp(optptr->name, "output-bin") ||
+	!_cups_strcasecmp(optptr->name, "output-mode") ||
+	!_cups_strcasecmp(optptr->name, "print-quality") ||
+	!_cups_strcasecmp(optptr->name, "sides"))
       continue;
-    else if (!strcasecmp(optptr->name, "resolution") ||
-             !strcasecmp(optptr->name, "printer-resolution"))
+    else if (!_cups_strcasecmp(optptr->name, "resolution") ||
+             !_cups_strcasecmp(optptr->name, "printer-resolution"))
     {
       ppd_mark_option(ppd, "Resolution", optptr->value);
       ppd_mark_option(ppd, "SetResolution", optptr->value);
@@ -288,18 +288,18 @@ cupsMarkOptions(
       ppd_mark_option(ppd, "CNRes_PGP", optptr->value);
       	/* Canon */
     }
-    else if (!strcasecmp(optptr->name, "multiple-document-handling"))
+    else if (!_cups_strcasecmp(optptr->name, "multiple-document-handling"))
     {
       if (!cupsGetOption("Collate", num_options, options) &&
           ppdFindOption(ppd, "Collate"))
       {
-        if (strcasecmp(optptr->value, "separate-documents-uncollated-copies"))
+        if (_cups_strcasecmp(optptr->value, "separate-documents-uncollated-copies"))
 	  ppd_mark_option(ppd, "Collate", "True");
 	else
 	  ppd_mark_option(ppd, "Collate", "False");
       }
     }
-    else if (!strcasecmp(optptr->name, "finishings"))
+    else if (!_cups_strcasecmp(optptr->name, "finishings"))
     {
      /*
       * Lookup cupsIPPFinishings attributes for each value...
@@ -340,7 +340,7 @@ cupsMarkOptions(
         ppd_mark_choices(ppd, attr->value);
       }
     }
-    else if (!strcasecmp(optptr->name, "APPrinterPreset"))
+    else if (!_cups_strcasecmp(optptr->name, "APPrinterPreset"))
     {
      /*
       * Lookup APPrinterPreset value...
@@ -355,7 +355,7 @@ cupsMarkOptions(
         ppd_mark_choices(ppd, attr->value);
       }
     }
-    else if (!strcasecmp(optptr->name, "mirror"))
+    else if (!_cups_strcasecmp(optptr->name, "mirror"))
       ppd_mark_option(ppd, "MirrorPrint", optptr->value);
     else
       ppd_mark_option(ppd, optptr->name, optptr->value);
@@ -381,11 +381,11 @@ ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
   if (!o || !choice)
     return (NULL);
 
-  if (choice[0] == '{' || !strncasecmp(choice, "Custom.", 7))
+  if (choice[0] == '{' || !_cups_strncasecmp(choice, "Custom.", 7))
     choice = "Custom";
 
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (!strcasecmp(c->choice, choice))
+    if (!_cups_strcasecmp(c->choice, choice))
       return (c);
 
   return (NULL);
@@ -464,7 +464,7 @@ ppdFindOption(ppd_file_t *ppd,		/* I - PPD file data */
       for (j = group->num_options, optptr = group->options;
            j > 0;
 	   j --, optptr ++)
-        if (!strcasecmp(optptr->keyword, option))
+        if (!_cups_strcasecmp(optptr->keyword, option))
 	  return (optptr);
 
     return (NULL);
@@ -726,7 +726,7 @@ ppd_defaults(ppd_file_t  *ppd,		/* I - PPD file */
 
 
   for (i = g->num_options, o = g->options; i > 0; i --, o ++)
-    if (strcasecmp(o->keyword, "PageRegion") != 0)
+    if (_cups_strcasecmp(o->keyword, "PageRegion") != 0)
       ppdMarkOption(ppd, o->keyword, o->defchoice);
 
   for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
@@ -786,7 +786,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
   * it clears the regular InputSlot choices...
   */
 
-  if (!strcasecmp(option, "AP_D_InputSlot"))
+  if (!_cups_strcasecmp(option, "AP_D_InputSlot"))
   {
     cupsArraySave(ppd->options);
 
@@ -818,7 +818,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
   loc = localeconv();
 
-  if (!strncasecmp(choice, "Custom.", 7))
+  if (!_cups_strncasecmp(choice, "Custom.", 7))
   {
    /*
     * Handle a custom option...
@@ -827,7 +827,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
     if ((c = ppdFindChoice(o, "Custom")) == NULL)
       return;
 
-    if (!strcasecmp(option, "PageSize"))
+    if (!_cups_strcasecmp(option, "PageSize"))
     {
      /*
       * Handle custom page sizes...
@@ -867,15 +867,15 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
               if (units)
 	      {
-        	if (!strcasecmp(units, "cm"))
+        	if (!_cups_strcasecmp(units, "cm"))
 	          cparam->current.custom_points *= 72.0f / 2.54f;
-        	else if (!strcasecmp(units, "mm"))
+        	else if (!_cups_strcasecmp(units, "mm"))
 	          cparam->current.custom_points *= 72.0f / 25.4f;
-        	else if (!strcasecmp(units, "m"))
+        	else if (!_cups_strcasecmp(units, "m"))
 	          cparam->current.custom_points *= 72.0f / 0.0254f;
-        	else if (!strcasecmp(units, "in"))
+        	else if (!_cups_strcasecmp(units, "in"))
 	          cparam->current.custom_points *= 72.0f;
-        	else if (!strcasecmp(units, "ft"))
+        	else if (!_cups_strcasecmp(units, "ft"))
 	          cparam->current.custom_points *= 12.0f * 72.0f;
               }
 	      break;
@@ -944,15 +944,15 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
 	      if (units)
 	      {
-        	if (!strcasecmp(units, "cm"))
+        	if (!_cups_strcasecmp(units, "cm"))
 		  cparam->current.custom_points *= 72.0f / 2.54f;
-        	else if (!strcasecmp(units, "mm"))
+        	else if (!_cups_strcasecmp(units, "mm"))
 		  cparam->current.custom_points *= 72.0f / 25.4f;
-        	else if (!strcasecmp(units, "m"))
+        	else if (!_cups_strcasecmp(units, "m"))
 		  cparam->current.custom_points *= 72.0f / 0.0254f;
-        	else if (!strcasecmp(units, "in"))
+        	else if (!_cups_strcasecmp(units, "in"))
 		  cparam->current.custom_points *= 72.0f;
-        	else if (!strcasecmp(units, "ft"))
+        	else if (!_cups_strcasecmp(units, "ft"))
 		  cparam->current.custom_points *= 12.0f * 72.0f;
 	      }
 	      break;
@@ -978,7 +978,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
   else
   {
     for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-      if (!strcasecmp(c->choice, choice))
+      if (!_cups_strcasecmp(c->choice, choice))
         break;
 
     if (!i)
@@ -1001,14 +1001,14 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
       cupsArrayRemove(ppd->marked, oldc);
     }
 
-    if (!strcasecmp(option, "PageSize") || !strcasecmp(option, "PageRegion"))
+    if (!_cups_strcasecmp(option, "PageSize") || !_cups_strcasecmp(option, "PageRegion"))
     {
      /*
       * Mark current page size...
       */
 
       for (j = 0; j < ppd->num_sizes; j ++)
-	ppd->sizes[j].marked = !strcasecmp(ppd->sizes[j].name,
+	ppd->sizes[j].marked = !_cups_strcasecmp(ppd->sizes[j].name,
 		                           choice);
 
      /*
@@ -1018,7 +1018,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
       cupsArraySave(ppd->options);
 
-      if (!strcasecmp(option, "PageSize"))
+      if (!_cups_strcasecmp(option, "PageSize"))
       {
 	if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
         {
@@ -1045,7 +1045,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
       cupsArrayRestore(ppd->options);
     }
-    else if (!strcasecmp(option, "InputSlot"))
+    else if (!_cups_strcasecmp(option, "InputSlot"))
     {
      /*
       * Unmark ManualFeed option...
@@ -1065,8 +1065,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
       cupsArrayRestore(ppd->options);
     }
-    else if (!strcasecmp(option, "ManualFeed") &&
-	     !strcasecmp(choice, "True"))
+    else if (!_cups_strcasecmp(option, "ManualFeed") &&
+	     !_cups_strcasecmp(choice, "True"))
     {
      /*
       * Unmark InputSlot option...

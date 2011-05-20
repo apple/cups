@@ -3,7 +3,7 @@
  *
  *   CGI template function.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -423,7 +423,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	{
 	  if (uriencode)
 	    cgi_puturi(outptr, out);
-	  else if (!strcasecmp(name, "?cupsdconf_default"))
+	  else if (!_cups_strcasecmp(name, "?cupsdconf_default"))
 	    fputs(outptr, stdout);
 	  else
 	    cgi_puts(outptr, out);
@@ -536,16 +536,16 @@ cgi_copy(FILE *out,			/* I - Output file */
         switch (op)
 	{
 	  case '<' :
-	      result = strcasecmp(outptr, compare) < 0;
+	      result = _cups_strcasecmp(outptr, compare) < 0;
 	      break;
 	  case '>' :
-	      result = strcasecmp(outptr, compare) > 0;
+	      result = _cups_strcasecmp(outptr, compare) > 0;
 	      break;
 	  case '=' :
-	      result = strcasecmp(outptr, compare) == 0;
+	      result = _cups_strcasecmp(outptr, compare) == 0;
 	      break;
 	  case '!' :
-	      result = strcasecmp(outptr, compare) != 0;
+	      result = _cups_strcasecmp(outptr, compare) != 0;
 	      break;
 	  case '~' :
 	      fprintf(stderr, "DEBUG: Regular expression \"%s\"\n", compare);
@@ -664,7 +664,7 @@ cgi_puts(const char *s,			/* I - String to output */
       * Pass <A HREF="url"> and </A>, otherwise quote it...
       */
 
-      if (!strncasecmp(s, "<A HREF=\"", 9))
+      if (!_cups_strncasecmp(s, "<A HREF=\"", 9))
       {
         fputs("<A HREF=\"", out);
 	s += 9;
@@ -684,7 +684,7 @@ cgi_puts(const char *s,			/* I - String to output */
 
 	fputs("\">", out);
       }
-      else if (!strncasecmp(s, "</A>", 4))
+      else if (!_cups_strncasecmp(s, "</A>", 4))
       {
         fputs("</A>", out);
 	s += 3;

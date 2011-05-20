@@ -558,9 +558,9 @@ make_device_uri(
 
   if (mfg)
   {
-    if (!strcasecmp(mfg, "Hewlett-Packard"))
+    if (!_cups_strcasecmp(mfg, "Hewlett-Packard"))
       mfg = "HP";
-    else if (!strcasecmp(mfg, "Lexmark International"))
+    else if (!_cups_strcasecmp(mfg, "Lexmark International"))
       mfg = "Lexmark";
   }
   else

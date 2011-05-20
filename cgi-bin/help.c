@@ -342,12 +342,12 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         if (inbody)
 	{
-	  if (!strncasecmp(line, "</BODY>", 7))
+	  if (!_cups_strncasecmp(line, "</BODY>", 7))
 	    break;
 
 	  printf("%s\n", line);
         }
-	else if (!strncasecmp(line, "<BODY", 5))
+	else if (!_cups_strncasecmp(line, "<BODY", 5))
 	  inbody = 1;
       }
 

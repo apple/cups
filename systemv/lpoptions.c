@@ -3,7 +3,7 @@
  *
  *   Printer option program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -52,7 +52,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_dest_t	*dests;			/* Destinations */
   cups_dest_t	*dest;			/* Current destination */
   char		*printer,		/* Printer name */
-		*instance,		/* Instance name */ 
+		*instance,		/* Instance name */
  		*option;		/* Current option */
 
 
@@ -265,7 +265,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 
             for (j = 0; j < num_options; j ++)
-	      if (!strcasecmp(options[j].name, option))
+	      if (!_cups_strcasecmp(options[j].name, option))
 	      {
 	       /*
 	        * Remove this option...
@@ -421,7 +421,7 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
   {
-    if (!strcasecmp(option->keyword, "PageRegion"))
+    if (!_cups_strcasecmp(option->keyword, "PageRegion"))
       continue;
 
     snprintf(buffer, sizeof(buffer), "%s/%s:", option->keyword, option->text);
@@ -431,7 +431,7 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
          j > 0 && ptr < (buffer + sizeof(buffer) - 1);
 	 j --, choice ++)
     {
-      if (!strcasecmp(choice->choice, "Custom"))
+      if (!_cups_strcasecmp(choice->choice, "Custom"))
       {
         ppd_coption_t	*coption;	/* Custom option */
         ppd_cparam_t	*cparam;	/* Custom parameter */
@@ -452,8 +452,8 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 	    cupsArrayCount(coption->params) == 0)
 	  snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %sCustom",
 	           choice->marked ? "*" : "");
-        else if (!strcasecmp(option->keyword, "PageSize") ||
-	         !strcasecmp(option->keyword, "PageRegion"))
+        else if (!_cups_strcasecmp(option->keyword, "PageSize") ||
+	         !_cups_strcasecmp(option->keyword, "PageRegion"))
 	  snprintf(ptr, sizeof(buffer) - (ptr - buffer),
 	           " %sCustom.WIDTHxHEIGHT", choice->marked ? "*" : "");
         else

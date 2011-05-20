@@ -3,7 +3,7 @@
  *
  *   Banner routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -192,7 +192,7 @@ compare_banners(
     const cupsd_banner_t *b0,		/* I - First banner */
     const cupsd_banner_t *b1)		/* I - Second banner */
 {
-  return (strcasecmp(b0->name, b1->name));
+  return (_cups_strcasecmp(b0->name, b1->name));
 }
 
 

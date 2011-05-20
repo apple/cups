@@ -3,7 +3,7 @@
  *
  *   CGI form variable and array functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -328,9 +328,9 @@ cgiInitialize(void)
   * Grab form data from the corresponding location...
   */
 
-  if (!strcasecmp(method, "GET"))
+  if (!_cups_strcasecmp(method, "GET"))
     return (cgi_initialize_get());
-  else if (!strcasecmp(method, "POST") && content_type)
+  else if (!_cups_strcasecmp(method, "POST") && content_type)
   {
     const char *boundary = strstr(content_type, "boundary=");
 
@@ -607,7 +607,7 @@ cgi_compare_variables(
     const _cgi_var_t *v1,		/* I - First variable */
     const _cgi_var_t *v2)		/* I - Second variable */
 {
-  return (strcasecmp(v1->name, v2->name));
+  return (_cups_strcasecmp(v1->name, v2->name));
 }
 
 
@@ -824,7 +824,7 @@ cgi_initialize_multipart(
        /*
         * Copy file data to the temp file...
 	*/
-	
+
         ptr = line;
 
 	while ((ch = getchar()) != EOF)
@@ -928,7 +928,7 @@ cgi_initialize_multipart(
       filename[0] = '\0';
       mimetype[0] = '\0';
     }
-    else if (!strncasecmp(line, "Content-Disposition:", 20))
+    else if (!_cups_strncasecmp(line, "Content-Disposition:", 20))
     {
       if ((ptr = strstr(line + 20, " name=\"")) != NULL)
       {
@@ -946,7 +946,7 @@ cgi_initialize_multipart(
 	  *ptr = '\0';
       }
     }
-    else if (!strncasecmp(line, "Content-Type:", 13))
+    else if (!_cups_strncasecmp(line, "Content-Type:", 13))
     {
       for (ptr = line + 13; isspace(*ptr & 255); ptr ++);
 
@@ -1234,7 +1234,7 @@ cgi_set_sid(void)
   _cupsMD5Init(&md5);
   _cupsMD5Append(&md5, (unsigned char *)buffer, (int)strlen(buffer));
   _cupsMD5Finish(&md5, sum);
-  
+
   cgiSetCookie(CUPS_SID, httpMD5String(sum, sid), "/", NULL, 0, 0);
 
   return (cupsGetOption(CUPS_SID, num_cookies, cookies));

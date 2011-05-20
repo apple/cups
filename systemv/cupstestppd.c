@@ -616,7 +616,7 @@ main(int  argc,				/* I - Number of command-line args */
         ptr = attr->value;
 	if (*ptr == '4' && ptr[1] == '.')
 	{
-	  
+
 	  for (ptr += 2; *ptr; ptr ++)
 	    if (!isdigit(*ptr & 255))
 	      break;
@@ -697,8 +697,8 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (ppd->manufacturer != NULL)
       {
-        if (!strncasecmp(ppd->manufacturer, "Hewlett-Packard", 15) ||
-	    !strncasecmp(ppd->manufacturer, "Hewlett Packard", 15))
+        if (!_cups_strncasecmp(ppd->manufacturer, "Hewlett-Packard", 15) ||
+	    !_cups_strncasecmp(ppd->manufacturer, "Hewlett Packard", 15))
 	{
 	  if (verbose >= 0)
 	  {
@@ -713,8 +713,8 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  errors ++;
 	}
-        else if (!strncasecmp(ppd->manufacturer, "OkiData", 7) ||
-	         !strncasecmp(ppd->manufacturer, "Oki Data", 8))
+        else if (!_cups_strncasecmp(ppd->manufacturer, "OkiData", 7) ||
+	         !_cups_strncasecmp(ppd->manufacturer, "Oki Data", 8))
 	{
 	  if (verbose >= 0)
 	  {
@@ -1194,7 +1194,7 @@ main(int  argc,				/* I - Number of command-line args */
 
             errors ++;
 	  }
-	  
+
 	 /*
 	  * Loop through all options and choices...
 	  */
@@ -1332,7 +1332,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      !strcmp(attr->name, "DefaultTransfer"))
 	    continue;
 
-	  if (!strncmp(attr->name, "Default", 7) && 
+	  if (!strncmp(attr->name, "Default", 7) &&
 	      !ppdFindOption(ppd, attr->name + 7))
             _cupsLangPrintf(stdout,
 	                    _("        WARN    %s has no corresponding "
@@ -1380,7 +1380,7 @@ main(int  argc,				/* I - Number of command-line args */
 			    "5.3."));
 	  }
 
-	  if (!strcasecmp(ppd->pcfilename, "unused.ppd"))
+	  if (!_cups_strcasecmp(ppd->pcfilename, "unused.ppd"))
 	    _cupsLangPuts(stdout,
 	                  _("        WARN    PCFileName should contain a "
 	                    "unique filename.\n"
@@ -1466,7 +1466,7 @@ main(int  argc,				/* I - Number of command-line args */
 
      /*
       * Then list the options, if "-v" was provided...
-      */ 
+      */
 
       if (verbose > 1)
       {
@@ -1684,7 +1684,7 @@ check_basics(const char *filename)	/* I - PPD file to check */
         else if (eol != EOL_CR)
 	  mixed = 1;
       }
-      
+
       if (col > 0 && whitespace)
 	_cupsLangPrintf(stdout,
 		        _("        WARN    Line %d only contains whitespace."),
@@ -1841,7 +1841,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  *ptr = '\0';
 	}
 
-        if (!strncasecmp(option, "Custom", 6) && !strcasecmp(choice, "True"))
+        if (!_cups_strncasecmp(option, "Custom", 6) && !_cups_strcasecmp(choice, "True"))
 	{
 	  _cups_strcpy(option, option + 6);
 	  strcpy(choice, "Custom");
@@ -1856,7 +1856,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 			  _("      %s  Missing option %s in "
 			    "cupsUIConstraints %s: \"%s\""),
 			  prefix, option, constattr->spec, constattr->value);
-	  
+
 	  if (!warn)
 	    errors ++;
 
@@ -1885,9 +1885,9 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	else
 	{
 	  for (i = 0; i < o->num_choices; i ++)
-	    if (strcasecmp(o->choices[i].choice, "None") &&
-	        strcasecmp(o->choices[i].choice, "Off") &&
-	        strcasecmp(o->choices[i].choice, "False"))
+	    if (_cups_strcasecmp(o->choices[i].choice, "None") &&
+	        _cups_strcasecmp(o->choices[i].choice, "Off") &&
+	        _cups_strcasecmp(o->choices[i].choice, "False"))
             {
 	      num_options = cupsAddOption(option, o->choices[i].choice,
 	                                  num_options, &options);
@@ -1942,8 +1942,8 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
     for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
     {
-      if (!strncasecmp(c->option1, "Custom", 6) &&
-          !strcasecmp(c->choice1, "True"))
+      if (!_cups_strncasecmp(c->option1, "Custom", 6) &&
+          !_cups_strcasecmp(c->choice1, "True"))
       {
 	strcpy(option, c->option1 + 6);
 	strcpy(choice, "Custom");
@@ -1983,8 +1983,8 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  errors ++;
       }
 
-      if (!strncasecmp(c->option2, "Custom", 6) &&
-          !strcasecmp(c->choice2, "True"))
+      if (!_cups_strncasecmp(c->option2, "Custom", 6) &&
+          !_cups_strcasecmp(c->choice2, "True"))
       {
 	strcpy(option, c->option2 + 6);
 	strcpy(choice, "Custom");
@@ -2055,7 +2055,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 
   for (i = ppd->num_groups, groupa = ppd->groups; i > 1; i --, groupa ++)
     for (j = i - 1, groupb = groupa + 1; j > 0; j --, groupb ++)
-      if (!strcasecmp(groupa->name, groupb->name))
+      if (!_cups_strcasecmp(groupa->name, groupb->name))
       {
 	if (!errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL"));
@@ -2077,7 +2077,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
   {
     cupsArraySave(ppd->options);
     for (optionb = ppdNextOption(ppd); optionb; optionb = ppdNextOption(ppd))
-      if (!strcasecmp(optiona->keyword, optionb->keyword))
+      if (!_cups_strcasecmp(optiona->keyword, optionb->keyword))
       {
 	if (!errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL"));
@@ -2117,7 +2117,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 	  i --;
 	  break;
 	}
-        else if (!strcasecmp(choicea->choice, choiceb->choice))
+        else if (!_cups_strcasecmp(choicea->choice, choiceb->choice))
 	{
 	  if (!errors && !verbose)
 	    _cupsLangPuts(stdout, _(" FAIL"));
@@ -2478,8 +2478,8 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
   * APDialogExtension
   */
 
-  for (attr = ppdFindAttr(ppd, "APDialogExtension", NULL); 
-       attr != NULL; 
+  for (attr = ppdFindAttr(ppd, "APDialogExtension", NULL);
+       attr != NULL;
        attr = ppdFindNextAttr(ppd, "APDialogExtension", NULL))
   {
     if (strcmp(attr->name, "APDialogExtension"))
@@ -2495,7 +2495,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (!warn)
         errors ++;
     }
-    
+
     snprintf(pathprog, sizeof(pathprog), "%s%s", root,
              attr->value ? attr->value : "(null)");
 
@@ -3075,7 +3075,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         {
           snprintf(buf, sizeof(buf), "%s.Fullbleed", pwg_media->ppd);
 	  if (strcmp(size->name, buf))
-	    is_ok = 0;					
+	    is_ok = 0;
         }
         else if (size->width > size->length)
         {
@@ -3092,7 +3092,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	    {
 	      snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
 	      if (strcmp(size->name, buf))
-		is_ok = 0;					
+		is_ok = 0;
 	    }
 	  }
         }
@@ -3112,7 +3112,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
           else
             is_ok = 0;
         }
-        
+
         if (!is_ok)
           _cupsLangPrintf(stdout,
                           _("      %s  Size \"%s\" should be the Adobe "
@@ -3288,7 +3288,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	  * Check custom choices differently...
 	  */
 
-	  if (!strcasecmp(option->choices[j].choice, "Custom") &&
+	  if (!_cups_strcasecmp(option->choices[j].choice, "Custom") &&
 	      (coption = ppdFindCustomOption(ppd,
 					     option->keyword)) != NULL)
 	  {
@@ -3314,7 +3314,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 		errors ++;
 	    }
 
-	    if (strcasecmp(option->keyword, "PageSize"))
+	    if (_cups_strcasecmp(option->keyword, "PageSize"))
 	    {
 	      for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 		   cparam;
@@ -3498,9 +3498,9 @@ show_conflicts(ppd_file_t *ppd,		/* I - PPD to check */
 	  break;
 
       if (j == 0 ||
-          !strcasecmp(c1->choice, "None") ||
-          !strcasecmp(c1->choice, "Off") ||
-          !strcasecmp(c1->choice, "False"))
+          !_cups_strcasecmp(c1->choice, "None") ||
+          !_cups_strcasecmp(c1->choice, "Off") ||
+          !_cups_strcasecmp(c1->choice, "False"))
         c1 = NULL;
     }
 
@@ -3531,9 +3531,9 @@ show_conflicts(ppd_file_t *ppd,		/* I - PPD to check */
 	  break;
 
       if (j == 0 ||
-          !strcasecmp(c2->choice, "None") ||
-          !strcasecmp(c2->choice, "Off") ||
-          !strcasecmp(c2->choice, "False"))
+          !_cups_strcasecmp(c2->choice, "None") ||
+          !_cups_strcasecmp(c2->choice, "Off") ||
+          !_cups_strcasecmp(c2->choice, "False"))
         c2 = NULL;
     }
 

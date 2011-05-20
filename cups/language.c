@@ -668,7 +668,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     for (i = 0;
          i < (int)(sizeof(locale_encodings) / sizeof(locale_encodings[0]));
 	 i ++)
-      if (!strcasecmp(charset, locale_encodings[i]))
+      if (!_cups_strcasecmp(charset, locale_encodings[i]))
       {
 	encoding = (cups_encoding_t)i;
 	break;
@@ -680,14 +680,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       * Map alternate names for various character sets...
       */
 
-      if (!strcasecmp(charset, "iso-2022-jp") ||
-          !strcasecmp(charset, "sjis"))
+      if (!_cups_strcasecmp(charset, "iso-2022-jp") ||
+          !_cups_strcasecmp(charset, "sjis"))
 	encoding = CUPS_WINDOWS_932;
-      else if (!strcasecmp(charset, "iso-2022-cn"))
+      else if (!_cups_strcasecmp(charset, "iso-2022-cn"))
 	encoding = CUPS_WINDOWS_936;
-      else if (!strcasecmp(charset, "iso-2022-kr"))
+      else if (!_cups_strcasecmp(charset, "iso-2022-kr"))
 	encoding = CUPS_WINDOWS_949;
-      else if (!strcasecmp(charset, "big5"))
+      else if (!_cups_strcasecmp(charset, "big5"))
 	encoding = CUPS_WINDOWS_950;
     }
   }

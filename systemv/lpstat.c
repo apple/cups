@@ -3,7 +3,7 @@
  *
  *   "lpstat" command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -143,7 +143,7 @@ main(int  argc,				/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'W' : /* Show which jobs? */
 	    if (argv[i][2])
 	      which = argv[i] + 2;
@@ -517,7 +517,7 @@ check_dest(const char  *command,	/* I  - Command name */
   * Scan the name string for printer/class name(s)...
   */
 
-  for (dptr = name; *dptr;) 
+  for (dptr = name; *dptr;)
   {
    /*
     * Skip leading whitespace and commas...
@@ -756,7 +756,7 @@ show_accepting(const char  *printers,	/* I - Destinations */
         }
 
         for (i = 0; i < num_dests; i ++)
-	  if (!strcasecmp(dests[i].name, printer) && dests[i].instance)
+	  if (!_cups_strcasecmp(dests[i].name, printer) && dests[i].instance)
 	  {
             if (accepting)
 	      _cupsLangPrintf(stdout, _("%s/%s accepting requests since %s"),
@@ -911,7 +911,7 @@ show_classes(const char *dests)		/* I - Destinations */
 	                username, sizeof(username), server, sizeof(server),
 			&port, resource, sizeof(resource));
 
-        if (!strcasecmp(server, cupsServer()))
+        if (!_cups_strcasecmp(server, cupsServer()))
 	  http2 = CUPS_HTTP_DEFAULT;
 	else
 	  http2 = httpConnectEncrypt(server, port, cupsEncryption());
@@ -1193,7 +1193,7 @@ show_devices(const char  *printers,	/* I - Destinations */
 			  printer, device);
 
         for (i = 0; i < num_dests; i ++)
-	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
+	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
               _cupsLangPrintf(stdout,
@@ -1222,7 +1222,7 @@ show_devices(const char  *printers,	/* I - Destinations */
 	                  printer, device);
 
         for (i = 0; i < num_dests; i ++)
-	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
+	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
               _cupsLangPrintf(stdout, _("device for %s/%s: %s"),
@@ -1883,7 +1883,7 @@ show_printers(const char  *printers,	/* I - Destinations */
 	}
 
         for (i = 0; i < num_dests; i ++)
-	  if (!strcasecmp(printer, dests[i].name) && dests[i].instance)
+	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             switch (pstate)
 	    {

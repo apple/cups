@@ -457,10 +457,10 @@ compare_devices(cupsd_device_t *d0,	/* I - First device */
 
   if ((diff = cupsdCompareNames(d0->device_info, d1->device_info)) != 0)
     return (diff);
-  else if ((diff = strcasecmp(d0->device_class, d1->device_class)) != 0)
+  else if ((diff = _cups_strcasecmp(d0->device_class, d1->device_class)) != 0)
     return (diff);
   else
-    return (strcasecmp(d0->device_uri, d1->device_uri));
+    return (_cups_strcasecmp(d0->device_uri, d1->device_uri));
 }
 
 

@@ -46,7 +46,7 @@
 #include <sys/wait.h>
 #if defined(__APPLE__)
 #  include <libgen.h>
-#endif /* __APPLE__ */ 
+#endif /* __APPLE__ */
 
 
 /*
@@ -435,7 +435,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   sscanf(dsttype, "%15[^/]/%255s", super, type);
-  if (!strcasecmp(super, "printer"))
+  if (!_cups_strcasecmp(super, "printer"))
     dst = printer_type;
   else if ((dst = mimeType(mime, super, type)) == NULL)
   {
@@ -623,9 +623,9 @@ add_printer_filter(
   for (temptype = mimeFirstType(mime);
        temptype;
        temptype = mimeNextType(mime))
-    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
-         !strcasecmp(temptype->super, super)) &&
-        (type[0] == '*' || !strcasecmp(temptype->type, type)))
+    if (((super[0] == '*' && _cups_strcasecmp(temptype->super, "printer")) ||
+         !_cups_strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !_cups_strcasecmp(temptype->type, type)))
     {
       if (desttype != filtertype)
       {
@@ -818,7 +818,7 @@ exec_filter(const char *filter,		/* I - Filter to execute */
 
 
  /*
-  * Add special voodoo magic for MacOS X - this allows MacOS X 
+  * Add special voodoo magic for MacOS X - this allows MacOS X
   * programs to access their bundle resources properly...
   */
 
@@ -1362,15 +1362,15 @@ read_cupsd_conf(const char *filename)	/* I - File to read */
 
     while (cupsFileGetConf(fp, line, sizeof(line), &ptr, &linenum))
     {
-      if (!strcasecmp(line, "DataDir"))
+      if (!_cups_strcasecmp(line, "DataDir"))
         set_string(&DataDir, ptr);
-      else if (!strcasecmp(line, "FontPath"))
+      else if (!_cups_strcasecmp(line, "FontPath"))
         set_string(&FontPath, ptr);
-      else if (!strcasecmp(line, "RIPCache"))
+      else if (!_cups_strcasecmp(line, "RIPCache"))
         set_string(&RIPCache, ptr);
-      else if (!strcasecmp(line, "ServerBin"))
+      else if (!_cups_strcasecmp(line, "ServerBin"))
         set_string(&ServerBin, ptr);
-      else if (!strcasecmp(line, "ServerRoot"))
+      else if (!_cups_strcasecmp(line, "ServerRoot"))
         set_string(&ServerRoot, ptr);
     }
 

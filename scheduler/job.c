@@ -745,11 +745,11 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     banner_page = 0;
   else if (job->job_sheets == NULL)
     banner_page = 0;
-  else if (strcasecmp(job->job_sheets->values[0].string.text, "none") != 0 &&
+  else if (_cups_strcasecmp(job->job_sheets->values[0].string.text, "none") != 0 &&
 	   job->current_file == 0)
     banner_page = 1;
   else if (job->job_sheets->num_values > 1 &&
-	   strcasecmp(job->job_sheets->values[1].string.text, "none") != 0 &&
+	   _cups_strcasecmp(job->job_sheets->values[1].string.text, "none") != 0 &&
 	   job->current_file == (job->num_files - 1))
     banner_page = 1;
   else
@@ -1428,7 +1428,7 @@ cupsdGetPrinterJobCount(
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs), count = 0;
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-    if (job->dest && !strcasecmp(job->dest, dest))
+    if (job->dest && !_cups_strcasecmp(job->dest, dest))
       count ++;
 
   return (count);
@@ -1451,7 +1451,7 @@ cupsdGetUserJobCount(
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs), count = 0;
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-    if (!strcasecmp(job->username, username))
+    if (!_cups_strcasecmp(job->username, username))
       count ++;
 
   return (count);
@@ -3436,11 +3436,11 @@ get_options(cupsd_job_t *job,		/* I - Job */
            !strncmp(attr->name, "number-up", 9) ||
 	   !strcmp(attr->name, "page-ranges") ||
 	   !strcmp(attr->name, "page-set") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed") ||
-	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	   !_cups_strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
+	   !_cups_strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed") ||
+	   !_cups_strcasecmp(attr->name, "com.apple.print.PrintSettings."
 	                           "PMTotalSidesImaged..n.") ||
-	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	   !_cups_strcasecmp(attr->name, "com.apple.print.PrintSettings."
 	                           "PMTotalBeginPages..n.")) &&
 	  banner_page)
         continue;
@@ -3708,12 +3708,12 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!strcasecmp(line, "NextJobId"))
+    if (!_cups_strcasecmp(line, "NextJobId"))
     {
       if (value)
         NextJobId = atoi(value);
     }
-    else if (!strcasecmp(line, "<Job"))
+    else if (!_cups_strcasecmp(line, "<Job"))
     {
       if (job)
       {
@@ -3776,7 +3776,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	              "Missing <Job #> directive on line %d!", linenum);
       continue;
     }
-    else if (!strcasecmp(line, "</Job>"))
+    else if (!_cups_strcasecmp(line, "</Job>"))
     {
       cupsArrayAdd(Jobs, job);
 
@@ -3790,7 +3790,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d!", linenum);
       continue;
     }
-    else if (!strcasecmp(line, "State"))
+    else if (!_cups_strcasecmp(line, "State"))
     {
       job->state_value = (ipp_jstate_t)atoi(value);
 
@@ -3799,27 +3799,27 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       else if (job->state_value > IPP_JOB_COMPLETED)
         job->state_value = IPP_JOB_COMPLETED;
     }
-    else if (!strcasecmp(line, "HoldUntil"))
+    else if (!_cups_strcasecmp(line, "HoldUntil"))
     {
       job->hold_until = atoi(value);
     }
-    else if (!strcasecmp(line, "Priority"))
+    else if (!_cups_strcasecmp(line, "Priority"))
     {
       job->priority = atoi(value);
     }
-    else if (!strcasecmp(line, "Username"))
+    else if (!_cups_strcasecmp(line, "Username"))
     {
       cupsdSetString(&job->username, value);
     }
-    else if (!strcasecmp(line, "Destination"))
+    else if (!_cups_strcasecmp(line, "Destination"))
     {
       cupsdSetString(&job->dest, value);
     }
-    else if (!strcasecmp(line, "DestType"))
+    else if (!_cups_strcasecmp(line, "DestType"))
     {
       job->dtype = (cups_ptype_t)atoi(value);
     }
-    else if (!strcasecmp(line, "NumFiles"))
+    else if (!_cups_strcasecmp(line, "NumFiles"))
     {
       job->num_files = atoi(value);
 
@@ -3855,7 +3855,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	}
       }
     }
-    else if (!strcasecmp(line, "File"))
+    else if (!_cups_strcasecmp(line, "File"))
     {
       int	number,			/* File number */
 		compression;		/* Compression value */
@@ -3951,7 +3951,7 @@ load_next_job_id(const char *filename)	/* I - job.cache filename */
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
-    if (!strcasecmp(line, "NextJobId"))
+    if (!_cups_strcasecmp(line, "NextJobId"))
     {
       if (value)
       {
@@ -4342,7 +4342,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if (job->sheets)
       {
-        if (!strncasecmp(message, "total ", 6))
+        if (!_cups_strncasecmp(message, "total ", 6))
 	{
 	 /*
 	  * Got a total count of pages from a backend or filter...

@@ -86,8 +86,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.5svn"
-#define CUPS_MINIMAL "CUPS/1.5svn"
+#define CUPS_SVERSION "CUPS v1.5.0"
+#define CUPS_MINIMAL "CUPS/1.5.0"
 
 
 /*
@@ -277,8 +277,6 @@
  */
 
 #define HAVE_STRDUP 1
-#define HAVE_STRCASECMP 1
-#define HAVE_STRNCASECMP 1
 /* #undef HAVE_STRLCAT */
 /* #undef HAVE_STRLCPY */
 

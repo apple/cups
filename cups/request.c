@@ -657,7 +657,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Reconnect if the last response had a "Connection: close"...
   */
 
-  if (!strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
+  if (!_cups_strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
     if (httpReconnect(http))
     {
       _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);

@@ -3,7 +3,7 @@
  *
  *   Option routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -62,7 +62,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 
   DEBUG_printf(("2cupsAddOption(name=\"%s\", value=\"%s\", num_options=%d, "
                 "options=%p)", name, value, num_options, options));
- 
+
   if (!name || !name[0] || !value || !options || num_options < 0)
   {
     DEBUG_printf(("3cupsAddOption: Returning %d", num_options));
@@ -323,7 +323,7 @@ cupsParseOptions(
       * Boolean option...
       */
 
-      if (!strncasecmp(name, "no", 2))
+      if (!_cups_strncasecmp(name, "no", 2))
         num_options = cupsAddOption(name + 2, "false", num_options,
 	                            options);
       else
@@ -469,7 +469,7 @@ cupsRemoveOption(
   */
 
   for (i = num_options, option = *options; i > 0; i --, option ++)
-    if (!strcasecmp(name, option->name))
+    if (!_cups_strcasecmp(name, option->name))
       break;
 
   if (i)
@@ -590,7 +590,7 @@ static int				/* O - Result of comparison */
 cups_compare_options(cups_option_t *a,	/* I - First option */
 		     cups_option_t *b)	/* I - Second option */
 {
-  return (strcasecmp(a->name, b->name));
+  return (_cups_strcasecmp(a->name, b->name));
 }
 
 

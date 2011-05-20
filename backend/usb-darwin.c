@@ -1859,24 +1859,24 @@ static void parse_options(char *options,
     * Process the option...
     */
 
-    if (!strcasecmp(name, "waiteof"))
+    if (!_cups_strcasecmp(name, "waiteof"))
     {
-      if (!strcasecmp(value, "on") ||
-	  !strcasecmp(value, "yes") ||
-	  !strcasecmp(value, "true"))
+      if (!_cups_strcasecmp(value, "on") ||
+	  !_cups_strcasecmp(value, "yes") ||
+	  !_cups_strcasecmp(value, "true"))
 	*wait_eof = true;
-      else if (!strcasecmp(value, "off") ||
-	       !strcasecmp(value, "no") ||
-	       !strcasecmp(value, "false"))
+      else if (!_cups_strcasecmp(value, "off") ||
+	       !_cups_strcasecmp(value, "no") ||
+	       !_cups_strcasecmp(value, "false"))
 	*wait_eof = false;
       else
 	_cupsLangPrintFilter(stderr, "WARNING",
 			     _("Boolean expected for waiteof option \"%s\"."),
 			     value);
     }
-    else if (!strcasecmp(name, "serial"))
+    else if (!_cups_strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
-    else if (!strcasecmp(name, "location") && location)
+    else if (!_cups_strcasecmp(name, "location") && location)
       *location = strtol(value, NULL, 16);
   }
 }
@@ -2175,9 +2175,9 @@ static void parse_pserror(char *sockBuffer,
       pCommentEnd += 3;            /* Skip past "]%%" */
       *pCommentEnd = '\0';         /* There's always room for the nul */
 
-      if (strncasecmp(pCommentBegin, "%%[ Error:", 10) == 0)
+      if (_cups_strncasecmp(pCommentBegin, "%%[ Error:", 10) == 0)
 	logLevel = "DEBUG";
-      else if (strncasecmp(pCommentBegin, "%%[ Flushing", 12) == 0)
+      else if (_cups_strncasecmp(pCommentBegin, "%%[ Flushing", 12) == 0)
 	logLevel = "DEBUG";
       else
 	logLevel = "INFO";

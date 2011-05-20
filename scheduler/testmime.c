@@ -3,7 +3,7 @@
  *
  *   MIME test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -286,9 +286,9 @@ add_ppd_filter(mime_t      *mime,	/* I - MIME database */
   for (temptype = mimeFirstType(mime);
        temptype;
        temptype = mimeNextType(mime))
-    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
-         !strcasecmp(temptype->super, super)) &&
-        (type[0] == '*' || !strcasecmp(temptype->type, type)))
+    if (((super[0] == '*' && _cups_strcasecmp(temptype->super, "printer")) ||
+         !_cups_strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !_cups_strcasecmp(temptype->type, type)))
     {
       if (desttype != filtertype)
       {
