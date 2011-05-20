@@ -918,8 +918,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
 	  if (strcmp(scheme, "file") &&
-	      strcasecmp(hostname, ServerName) &&
-	      strcasecmp(hostname, "localhost") &&
+	      _cups_strcasecmp(hostname, ServerName) &&
+	      _cups_strcasecmp(hostname, "localhost") &&
 	      !isdigit(hostname[0]) && hostname[0] != '[')
 	  {
 	   /*
@@ -1076,10 +1076,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
     cupsdAuthorize(con);
 
-    if (!strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive",
+    if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive",
 	             10) && KeepAlive)
       con->http.keep_alive = HTTP_KEEPALIVE_ON;
-    else if (!strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "close", 5))
+    else if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "close", 5))
       con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
     if (!con->http.fields[HTTP_FIELD_HOST][0] &&
@@ -1128,7 +1128,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
       }
 
-      if (!strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
+      if (!_cups_strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_SSL
@@ -1200,7 +1200,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     }
     else
     {
-      if (!strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
+      if (!_cups_strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
 	  con->http.tls == NULL)
       {
 #ifdef HAVE_SSL
@@ -2372,7 +2372,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 
   if (code == HTTP_UNAUTHORIZED &&
       DefaultEncryption == HTTP_ENCRYPT_REQUIRED &&
-      strcasecmp(con->http.hostname, "localhost") &&
+      _cups_strcasecmp(con->http.hostname, "localhost") &&
       !con->http.tls)
   {
     code = HTTP_UPGRADE_REQUIRED;
@@ -2600,7 +2600,7 @@ cupsdSendHeader(
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
-        !strcasecmp(con->http.hostname, "localhost"))
+        !_cups_strcasecmp(con->http.hostname, "localhost"))
     {
      /*
       * Add a "trc" (try root certification) parameter for local non-Kerberos
@@ -2623,7 +2623,7 @@ cupsdSendHeader(
 	   name = (char *)cupsArrayNext(con->best->names))
       {
 #ifdef HAVE_AUTHORIZATION_H
-	if (!strncasecmp(name, "@AUTHKEY(", 9))
+	if (!_cups_strncasecmp(name, "@AUTHKEY(", 9))
 	{
 	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", name + 9);
 	  /* end parenthesis is stripped in conf.c */
@@ -2631,7 +2631,7 @@ cupsdSendHeader(
         }
 	else
 #endif /* HAVE_AUTHORIZATION_H */
-	if (!strcasecmp(name, "@SYSTEM"))
+	if (!_cups_strcasecmp(name, "@SYSTEM"))
 	{
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
@@ -2813,7 +2813,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    * Handle redirection and CGI status codes...
 	    */
 
-            if (!strncasecmp(con->header, "Location:", 9))
+            if (!_cups_strncasecmp(con->header, "Location:", 9))
 	    {
   	      if (!cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE))
 	      {
@@ -2826,7 +2826,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
 		return;
 	    }
-	    else if (!strncasecmp(con->header, "Status:", 7))
+	    else if (!_cups_strncasecmp(con->header, "Status:", 7))
 	    {
   	      cupsdSendError(con, (http_status_t)atoi(con->header + 7),
 	                     CUPSD_AUTH_NONE);
@@ -2850,7 +2850,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             }
 	  }
 
-	  if (strncasecmp(con->header, "Status:", 7))
+	  if (_cups_strncasecmp(con->header, "Status:", 7))
 	    httpPrintf(HTTP(con), "%s\r\n", con->header);
 
          /*
@@ -3035,7 +3035,7 @@ check_if_modified(
     while (isspace(*ptr) || *ptr == ';')
       ptr ++;
 
-    if (strncasecmp(ptr, "length=", 7) == 0)
+    if (_cups_strncasecmp(ptr, "length=", 7) == 0)
     {
       ptr += 7;
       size = strtoll(ptr, NULL, 10);
@@ -3937,7 +3937,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   * Check for known types...
   */
 
-  if (!type || strcasecmp(type->super, "application"))
+  if (!type || _cups_strcasecmp(type->super, "application"))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
@@ -3947,7 +3947,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     return (0);
   }
 
-  if (!strcasecmp(type->type, "x-httpd-cgi") &&
+  if (!_cups_strcasecmp(type->type, "x-httpd-cgi") &&
       (filestats->st_mode & 0111))
   {
    /*
@@ -3966,7 +3966,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     return (1);
   }
 #ifdef HAVE_JAVA
-  else if (!strcasecmp(type->type, "x-httpd-java"))
+  else if (!_cups_strcasecmp(type->type, "x-httpd-java"))
   {
    /*
     * "application/x-httpd-java" is a Java servlet.
@@ -3987,7 +3987,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   }
 #endif /* HAVE_JAVA */
 #ifdef HAVE_PERL
-  else if (!strcasecmp(type->type, "x-httpd-perl"))
+  else if (!_cups_strcasecmp(type->type, "x-httpd-perl"))
   {
    /*
     * "application/x-httpd-perl" is a Perl page.
@@ -4008,7 +4008,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   }
 #endif /* HAVE_PERL */
 #ifdef HAVE_PHP
-  else if (!strcasecmp(type->type, "x-httpd-php"))
+  else if (!_cups_strcasecmp(type->type, "x-httpd-php"))
   {
    /*
     * "application/x-httpd-php" is a PHP page.
@@ -4029,7 +4029,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   }
 #endif /* HAVE_PHP */
 #ifdef HAVE_PYTHON
-  else if (!strcasecmp(type->type, "x-httpd-python"))
+  else if (!_cups_strcasecmp(type->type, "x-httpd-python"))
   {
    /*
     * "application/x-httpd-python" is a Python page.
@@ -4973,13 +4973,13 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     * addresses when accessing CUPS via the loopback interface...
     */
 
-    return (!strcasecmp(host, "localhost") ||
-            !strncasecmp(host, "localhost:", 10) ||
-	    !strcasecmp(host, "localhost.") ||
-            !strncasecmp(host, "localhost.:", 11) ||
+    return (!_cups_strcasecmp(host, "localhost") ||
+            !_cups_strncasecmp(host, "localhost:", 10) ||
+	    !_cups_strcasecmp(host, "localhost.") ||
+            !_cups_strncasecmp(host, "localhost.:", 11) ||
 #ifdef __linux
-	    !strcasecmp(host, "localhost.localdomain") ||
-            !strncasecmp(host, "localhost.localdomain:", 22) ||
+	    !_cups_strcasecmp(host, "localhost.localdomain") ||
+            !_cups_strncasecmp(host, "localhost.localdomain:", 22) ||
 #endif /* __linux */
             !strcmp(host, "127.0.0.1") ||
 	    !strncmp(host, "127.0.0.1:", 10) ||
@@ -4993,8 +4993,8 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   */
 
   if ((end = strrchr(host, '.')) != NULL &&
-      (!strcasecmp(end, ".local") || !strncasecmp(end, ".local:", 7) ||
-       !strcasecmp(end, ".local.") || !strncasecmp(end, ".local.:", 8)))
+      (!_cups_strcasecmp(end, ".local") || !_cups_strncasecmp(end, ".local:", 7) ||
+       !_cups_strcasecmp(end, ".local.") || !_cups_strncasecmp(end, ".local.:", 8)))
     return (1);
 #endif /* HAVE_DNSSD */
 
@@ -5043,7 +5043,7 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     if (!strcmp(a->name, "*"))
       return (1);
 
-    if (!strncasecmp(host, a->name, a->namelen))
+    if (!_cups_strncasecmp(host, a->name, a->namelen))
     {
      /*
       * Prefix matches; check the character at the end - it must be ":", ".",
@@ -5069,7 +5069,7 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     if (!strcmp(a->name, "*"))
       return (1);
 
-    if (!strncasecmp(host, a->name, a->namelen))
+    if (!_cups_strncasecmp(host, a->name, a->namelen))
     {
      /*
       * Prefix matches; check the character at the end - it must be ":", ".",
@@ -5092,7 +5092,7 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
        netif;
        netif = (cupsd_netif_t *)cupsArrayNext(NetIFList))
   {
-    if (!strncasecmp(host, netif->hostname, netif->hostlen))
+    if (!_cups_strncasecmp(host, netif->hostname, netif->hostlen))
     {
      /*
       * Prefix matches; check the character at the end - it must be ":", ".",

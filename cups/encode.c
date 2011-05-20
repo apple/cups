@@ -3,7 +3,7 @@
  *
  *   Option encoding routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -271,8 +271,8 @@ cupsEncodeOptions2(
     * Skip document format options that are handled above...
     */
 
-    if (!strcasecmp(option->name, "raw") ||
-        !strcasecmp(option->name, "document-format") ||
+    if (!_cups_strcasecmp(option->name, "raw") ||
+        !_cups_strcasecmp(option->name, "document-format") ||
 	!option->name[0])
       continue;
 
@@ -302,8 +302,8 @@ cupsEncodeOptions2(
       else if (group_tag != IPP_TAG_PRINTER)
         continue;
 
-      if (!strcasecmp(option->value, "true") ||
-          !strcasecmp(option->value, "false"))
+      if (!_cups_strcasecmp(option->value, "true") ||
+          !_cups_strcasecmp(option->value, "false"))
 	value_tag = IPP_TAG_BOOLEAN;
       else
 	value_tag = IPP_TAG_NAME;
@@ -460,9 +460,9 @@ cupsEncodeOptions2(
             break;
 
 	case IPP_TAG_BOOLEAN :
-	    if (!strcasecmp(val, "true") ||
-	        !strcasecmp(val, "on") ||
-	        !strcasecmp(val, "yes"))
+	    if (!_cups_strcasecmp(val, "true") ||
+	        !_cups_strcasecmp(val, "on") ||
+	        !_cups_strcasecmp(val, "yes"))
 	    {
 	     /*
 	      * Boolean value - true...
@@ -524,7 +524,7 @@ cupsEncodeOptions2(
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 
-	    if (!strcasecmp(s, "dpc"))
+	    if (!_cups_strcasecmp(s, "dpc"))
               attr->values[j].resolution.units = IPP_RES_PER_CM;
             else
               attr->values[j].resolution.units = IPP_RES_PER_INCH;

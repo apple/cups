@@ -80,7 +80,7 @@ main(int  argc,				// I - Number of command-line arguments
   src             = new ppdcSource();
   use_model_name  = 0;
   verbose         = 0;
-  filenames       = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
+  filenames       = cupsArrayNew((cups_array_func_t)_cups_strcasecmp, NULL);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -213,7 +213,7 @@ main(int  argc,				// I - Number of command-line arguments
           case 'v' :			// Be verbose...
 	      verbose ++;
 	      break;
-	    
+
           case 'z' :			// Compress files...
 	      comp = 1;
 	      break;
@@ -237,7 +237,7 @@ main(int  argc,				// I - Number of command-line arguments
 		opt += strlen(opt) - 1;
 		break;
 	      }
-	    
+
 	  default :			// Unknown
 	      usage();
 	      break;
@@ -319,7 +319,7 @@ main(int  argc,				// I - Number of command-line arguments
 	// Write the PPD file for this driver...
 	if (use_model_name)
 	{
-	  if (!strncasecmp(d->model_name->value, d->manufacturer->value,
+	  if (!_cups_strncasecmp(d->model_name->value, d->manufacturer->value,
 	                   strlen(d->manufacturer->value)))
 	  {
 	    // Model name already starts with the manufacturer...

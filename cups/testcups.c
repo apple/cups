@@ -3,7 +3,7 @@
  *
  *   CUPS API test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -352,10 +352,10 @@ dests_equal(cups_dest_t *a,		/* I - First destination */
   if (!a || !b)
     return (0);
 
-  if (strcasecmp(a->name, b->name) ||
+  if (_cups_strcasecmp(a->name, b->name) ||
       (a->instance && !b->instance) ||
       (!a->instance && b->instance) ||
-      (a->instance && strcasecmp(a->instance, b->instance)) ||
+      (a->instance && _cups_strcasecmp(a->instance, b->instance)) ||
       a->num_options != b->num_options)
     return (0);
 
@@ -388,12 +388,12 @@ show_diffs(cups_dest_t *a,		/* I - First destination */
   puts("    Item                  cupsGetDest           cupsGetNamedDest");
   puts("    --------------------  --------------------  --------------------");
 
-  if (strcasecmp(a->name, b->name))
+  if (_cups_strcasecmp(a->name, b->name))
     printf("    name                  %-20.20s  %-20.20s\n", a->name, b->name);
 
   if ((a->instance && !b->instance) ||
       (!a->instance && b->instance) ||
-      (a->instance && strcasecmp(a->instance, b->instance)))
+      (a->instance && _cups_strcasecmp(a->instance, b->instance)))
     printf("    instance              %-20.20s  %-20.20s\n",
            a->instance ? a->instance : "(null)",
 	   b->instance ? b->instance : "(null)");

@@ -1358,7 +1358,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     *ptr++ = '\0';
     formats[num_formats++] = ptr;
 
-    if (!strcasecmp(ptr, "application/octet-stream"))
+    if (!_cups_strcasecmp(ptr, "application/octet-stream"))
       defformat = ptr;
   }
 
@@ -1367,17 +1367,17 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   prefix = "CMD:";
   for (i = 0; i < num_formats; i ++)
   {
-    if (!strcasecmp(formats[i], "application/pdf"))
+    if (!_cups_strcasecmp(formats[i], "application/pdf"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPDF", prefix);
-    else if (!strcasecmp(formats[i], "application/postscript"))
+    else if (!_cups_strcasecmp(formats[i], "application/postscript"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPS", prefix);
-    else if (!strcasecmp(formats[i], "application/vnd.hp-PCL"))
+    else if (!_cups_strcasecmp(formats[i], "application/vnd.hp-PCL"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPCL", prefix);
-    else if (!strcasecmp(formats[i], "image/jpeg"))
+    else if (!_cups_strcasecmp(formats[i], "image/jpeg"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sJPEG", prefix);
-    else if (!strcasecmp(formats[i], "image/png"))
+    else if (!_cups_strcasecmp(formats[i], "image/png"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%sPNG", prefix);
-    else if (strcasecmp(formats[i], "application/octet-stream"))
+    else if (_cups_strcasecmp(formats[i], "application/octet-stream"))
       snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s%s", prefix,
                formats[i]);
 
@@ -2147,7 +2147,7 @@ dnssd_callback(
             regtype, (int)errorCode);
     return;
   }
-  else if (strcasecmp(name, printer->dnssd_name))
+  else if (_cups_strcasecmp(name, printer->dnssd_name))
   {
     if (Verbosity)
       fprintf(stderr, "Now using DNS-SD service name \"%s\".\n", name);
@@ -2723,7 +2723,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 	(job_comparison == 0 && job->state != job_state) ||
 	(job_comparison > 0 && job->state < job_state) ||
 	job->id < first_job_id ||
-	(username && job->username && strcasecmp(username, job->username)))
+	(username && job->username && _cups_strcasecmp(username, job->username)))
       continue;
 
     if (count > 0)
@@ -2883,16 +2883,16 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
+  if (!_cups_strcasecmp(job->format, "image/jpeg"))
     snprintf(filename, sizeof(filename), "%s/%d.jpg",
              client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/png"))
+  else if (!_cups_strcasecmp(job->format, "image/png"))
     snprintf(filename, sizeof(filename), "%s/%d.png",
              client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/pdf"))
+  else if (!_cups_strcasecmp(job->format, "application/pdf"))
     snprintf(filename, sizeof(filename), "%s/%d.pdf",
              client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/postscript"))
+  else if (!_cups_strcasecmp(job->format, "application/postscript"))
     snprintf(filename, sizeof(filename), "%s/%d.ps",
              client->printer->directory, job->id);
   else
@@ -3221,7 +3221,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle HTTP Upgrade...
   */
 
-  if (!strcasecmp(client->http.fields[HTTP_FIELD_CONNECTION], "Upgrade"))
+  if (!_cups_strcasecmp(client->http.fields[HTTP_FIELD_CONNECTION], "Upgrade"))
   {
     if (!respond_http(client, HTTP_NOT_IMPLEMENTED, NULL, 0))
       return (0);
@@ -3521,8 +3521,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 		   language ? language->values[0].string.text : "en");
 
       if (charset &&
-          strcasecmp(charset->values[0].string.text, "us-ascii") &&
-          strcasecmp(charset->values[0].string.text, "utf-8"))
+          _cups_strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          _cups_strcasecmp(charset->values[0].string.text, "utf-8"))
       {
        /*
         * Bad character set...
@@ -4183,7 +4183,7 @@ valid_job_attributes(
 			            IPP_TAG_MIMETYPE)) != NULL)
   {
     for (i = 0; i < supported->num_values; i ++)
-      if (!strcasecmp(format, supported->values[i].string.text))
+      if (!_cups_strcasecmp(format, supported->values[i].string.text))
 	break;
 
     if (i >= supported->num_values)

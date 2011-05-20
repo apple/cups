@@ -297,16 +297,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Process the option...
       */
 
-      if (!strcasecmp(name, "banner"))
+      if (!_cups_strcasecmp(name, "banner"))
       {
        /*
         * Set the banner...
 	*/
 
-        banner = !value[0] || !strcasecmp(value, "on") ||
-		 !strcasecmp(value, "yes") || !strcasecmp(value, "true");
+        banner = !value[0] || !_cups_strcasecmp(value, "on") ||
+		 !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "format") && value[0])
+      else if (!_cups_strcasecmp(name, "format") && value[0])
       {
        /*
         * Set output format...
@@ -319,68 +319,68 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	                       _("Unknown format character: \"%c\"."),
 			       value[0]);
       }
-      else if (!strcasecmp(name, "mode") && value[0])
+      else if (!_cups_strcasecmp(name, "mode") && value[0])
       {
        /*
         * Set control/data order...
 	*/
 
-        if (!strcasecmp(value, "standard"))
+        if (!_cups_strcasecmp(value, "standard"))
 	  mode = MODE_STANDARD;
-	else if (!strcasecmp(value, "stream"))
+	else if (!_cups_strcasecmp(value, "stream"))
 	  mode = MODE_STREAM;
 	else
 	  _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("Unknown print mode: \"%s\"."), value);
       }
-      else if (!strcasecmp(name, "order") && value[0])
+      else if (!_cups_strcasecmp(name, "order") && value[0])
       {
        /*
         * Set control/data order...
 	*/
 
-        if (!strcasecmp(value, "control,data"))
+        if (!_cups_strcasecmp(value, "control,data"))
 	  order = ORDER_CONTROL_DATA;
-	else if (!strcasecmp(value, "data,control"))
+	else if (!_cups_strcasecmp(value, "data,control"))
 	  order = ORDER_DATA_CONTROL;
 	else
 	  _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("Unknown file order: \"%s\"."), value);
       }
-      else if (!strcasecmp(name, "reserve"))
+      else if (!_cups_strcasecmp(name, "reserve"))
       {
        /*
         * Set port reservation mode...
 	*/
 
-        if (!value[0] || !strcasecmp(value, "on") ||
-	    !strcasecmp(value, "yes") || !strcasecmp(value, "true") ||
-	    !strcasecmp(value, "rfc1179"))
+        if (!value[0] || !_cups_strcasecmp(value, "on") ||
+	    !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true") ||
+	    !_cups_strcasecmp(value, "rfc1179"))
 	  reserve = RESERVE_RFC1179;
-	else if (!strcasecmp(value, "any"))
+	else if (!_cups_strcasecmp(value, "any"))
 	  reserve = RESERVE_ANY;
 	else
 	  reserve = RESERVE_NONE;
       }
-      else if (!strcasecmp(name, "manual_copies"))
+      else if (!_cups_strcasecmp(name, "manual_copies"))
       {
        /*
         * Set manual copies...
 	*/
 
-        manual_copies = !value[0] || !strcasecmp(value, "on") ||
-	 		!strcasecmp(value, "yes") || !strcasecmp(value, "true");
+        manual_copies = !value[0] || !_cups_strcasecmp(value, "on") ||
+	 		!_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "sanitize_title"))
+      else if (!_cups_strcasecmp(name, "sanitize_title"))
       {
        /*
         * Set sanitize title...
 	*/
 
-        sanitize_title = !value[0] || !strcasecmp(value, "on") ||
-	 		 !strcasecmp(value, "yes") || !strcasecmp(value, "true");
+        sanitize_title = !value[0] || !_cups_strcasecmp(value, "on") ||
+	 		 !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "timeout"))
+      else if (!_cups_strcasecmp(name, "timeout"))
       {
        /*
         * Set the timeout...
@@ -389,7 +389,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	if (atoi(value) > 0)
 	  timeout = atoi(value);
       }
-      else if (!strcasecmp(name, "contimeout"))
+      else if (!_cups_strcasecmp(name, "contimeout"))
       {
        /*
         * Set the connection timeout...

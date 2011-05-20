@@ -364,6 +364,7 @@ cupsRasterInterpretPPD(
     case CUPS_CSPACE_WHITE :
     case CUPS_CSPACE_GOLD :
     case CUPS_CSPACE_SILVER :
+    case CUPS_CSPACE_SW :
         h->cupsNumColors    = 1;
         h->cupsBitsPerPixel = h->cupsBitsPerColor;
 	break;
@@ -424,6 +425,29 @@ cupsRasterInterpretPPD(
 	  h->cupsBitsPerPixel = h->cupsBitsPerColor;
 
         h->cupsNumColors = 4;
+	break;
+
+    case CUPS_CSPACE_DEVICE1 :
+    case CUPS_CSPACE_DEVICE2 :
+    case CUPS_CSPACE_DEVICE3 :
+    case CUPS_CSPACE_DEVICE4 :
+    case CUPS_CSPACE_DEVICE5 :
+    case CUPS_CSPACE_DEVICE6 :
+    case CUPS_CSPACE_DEVICE7 :
+    case CUPS_CSPACE_DEVICE8 :
+    case CUPS_CSPACE_DEVICE9 :
+    case CUPS_CSPACE_DEVICEA :
+    case CUPS_CSPACE_DEVICEB :
+    case CUPS_CSPACE_DEVICEC :
+    case CUPS_CSPACE_DEVICED :
+    case CUPS_CSPACE_DEVICEE :
+    case CUPS_CSPACE_DEVICEF :
+        h->cupsNumColors = h->cupsColorSpace - CUPS_CSPACE_DEVICE1 + 1;
+
+        if (h->cupsColorOrder == CUPS_ORDER_CHUNKED)
+          h->cupsBitsPerPixel = h->cupsBitsPerColor * h->cupsNumColors;
+	else
+	  h->cupsBitsPerPixel = h->cupsBitsPerColor;
 	break;
   }
 

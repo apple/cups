@@ -218,8 +218,6 @@
  */
 
 #undef HAVE_STRDUP
-#undef HAVE_STRCASECMP
-#undef HAVE_STRNCASECMP
 #undef HAVE_STRLCAT
 #undef HAVE_STRLCPY
 
@@ -229,6 +227,13 @@
  */
 
 #undef HAVE_GETEUID
+
+
+/*
+ * Do we have the setpgid() function?
+ */
+
+#undef HAVE_SETPGID
 
 
 /*

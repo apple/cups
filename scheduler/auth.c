@@ -252,7 +252,7 @@ cupsdAddNameMask(cups_array_t **masks,	/* IO - Masks array (created as needed) *
                   "cupsdAddNameMask(masks=%p(%p), name=\"%s\")",
                   masks, *masks, name);
 
-  if (!strcasecmp(name, "@LOCAL"))
+  if (!_cups_strcasecmp(name, "@LOCAL"))
   {
    /*
     * Deny *interface*...
@@ -261,7 +261,7 @@ cupsdAddNameMask(cups_array_t **masks,	/* IO - Masks array (created as needed) *
     temp.type           = CUPSD_AUTH_INTERFACE;
     temp.mask.name.name = (char *)"*";
   }
-  else if (!strncasecmp(name, "@IF(", 4))
+  else if (!_cups_strncasecmp(name, "@IF(", 4))
   {
    /*
     * Deny *interface*...
@@ -405,7 +405,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   }
 #ifdef HAVE_AUTHORIZATION_H
   else if (!strncmp(authorization, "AuthRef ", 8) &&
-           !strcasecmp(con->http.hostname, "localhost"))
+           !_cups_strcasecmp(con->http.hostname, "localhost"))
   {
     OSStatus		status;		/* Status */
     int			authlen;	/* Auth string length */
@@ -510,7 +510,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     for (name = (char *)cupsArrayFirst(con->best->names);
          name;
          name = (char *)cupsArrayNext(con->best->names))
-      if (!strncasecmp(name, "@AUTHKEY(", 9) || !strcasecmp(name, "@SYSTEM"))
+      if (!_cups_strncasecmp(name, "@AUTHKEY(", 9) || !_cups_strcasecmp(name, "@SYSTEM"))
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "PeerCred authentication not allowed for resource.");
@@ -571,7 +571,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   }
 #endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
-           !strcasecmp(con->http.hostname, "localhost"))
+           !_cups_strcasecmp(con->http.hostname, "localhost"))
   {
    /*
     * Get Local certificate authentication data...
@@ -1193,7 +1193,7 @@ cupsdCheckAccess(
   int	allow;				/* 1 if allowed, 0 otherwise */
 
 
-  if (!strcasecmp(name, "localhost"))
+  if (!_cups_strcasecmp(name, "localhost"))
   {
    /*
     * Access from localhost (127.0.0.1 or ::1) is always allowed...
@@ -1386,7 +1386,7 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
 	  * Check for exact name match...
 	  */
 
-          if (!strcasecmp(name, mask->mask.name.name))
+          if (!_cups_strcasecmp(name, mask->mask.name.name))
 	    return (1);
 
          /*
@@ -1395,7 +1395,7 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
 
 	  if (name_len >= mask->mask.name.length &&
 	      mask->mask.name.name[0] == '.' &&
-	      !strcasecmp(name + name_len - mask->mask.name.length,
+	      !_cups_strcasecmp(name + name_len - mask->mask.name.length,
 	                  mask->mask.name.name))
 	    return (1);
           break;
@@ -1465,7 +1465,7 @@ cupsdCheckGroup(
     */
 
     for (i = 0; group->gr_mem[i]; i ++)
-      if (!strcasecmp(username, group->gr_mem[i]))
+      if (!_cups_strcasecmp(username, group->gr_mem[i]))
 	return (1);
   }
 
@@ -1714,7 +1714,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
       */
 
       if (loc->length > bestlen && loc->location &&
-          !strncasecmp(uri, loc->location, loc->length) &&
+          !_cups_strncasecmp(uri, loc->location, loc->length) &&
 	  loc->location[0] == '/' &&
 	  (limit & loc->limit) != 0)
       {
@@ -1904,7 +1904,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
-      strcasecmp(con->http.hostname, "localhost") &&
+      _cups_strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == CUPSD_AUTH_SATISFY_ALL) &&
       !(type == CUPSD_AUTH_NEGOTIATE ||
         (type == CUPSD_AUTH_NONE && DefaultAuthType == CUPSD_AUTH_NEGOTIATE)))
@@ -2045,9 +2045,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
            name;
 	   name = (char *)cupsArrayNext(best->names))
       {
-	if (!strncasecmp(name, "@AUTHKEY(", 9) && check_authref(con, name + 9))
+	if (!_cups_strncasecmp(name, "@AUTHKEY(", 9) && check_authref(con, name + 9))
 	  return (HTTP_OK);
-	else if (!strcasecmp(name, "@SYSTEM") && SystemGroupAuthKey &&
+	else if (!_cups_strcasecmp(name, "@SYSTEM") && SystemGroupAuthKey &&
 		 check_authref(con, SystemGroupAuthKey))
 	  return (HTTP_OK);
       }
@@ -2060,10 +2060,10 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	 name;
 	 name = (char *)cupsArrayNext(best->names))
     {
-      if (!strcasecmp(name, "@OWNER") && owner &&
-          !strcasecmp(username, ownername))
+      if (!_cups_strcasecmp(name, "@OWNER") && owner &&
+          !_cups_strcasecmp(username, ownername))
 	return (HTTP_OK);
-      else if (!strcasecmp(name, "@SYSTEM"))
+      else if (!_cups_strcasecmp(name, "@SYSTEM"))
       {
         for (i = 0; i < NumSystemGroups; i ++)
 	  if (cupsdCheckGroup(username, pw, SystemGroups[i]))
@@ -2074,7 +2074,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
         if (cupsdCheckGroup(username, pw, name + 1))
           return (HTTP_OK);
       }
-      else if (!strcasecmp(username, name))
+      else if (!_cups_strcasecmp(username, name))
         return (HTTP_OK);
     }
 
@@ -2100,7 +2100,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
                     "cupsdIsAuthorized: Checking group \"%s\" membership...",
                     name);
 
-    if (!strcasecmp(name, "@SYSTEM"))
+    if (!_cups_strcasecmp(name, "@SYSTEM"))
     {
       for (i = 0; i < NumSystemGroups; i ++)
 	if (cupsdCheckGroup(username, pw, SystemGroups[i]))

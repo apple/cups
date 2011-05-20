@@ -195,7 +195,7 @@ cupsDoAuthentication(
 	     cupsUser(),
 	     http->hostname[0] == '/' ? "localhost" : http->hostname);
 
-    http->digest_tries  = strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
+    http->digest_tries  = _cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
                                       "Digest", 5) != 0;
     http->userpass[0]   = '\0';
 
@@ -679,7 +679,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   */
 
   if (!httpAddrLocalhost(http->hostaddr) &&
-      strcasecmp(http->hostname, "localhost") != 0)
+      _cups_strcasecmp(http->hostname, "localhost") != 0)
   {
     DEBUG_puts("8cups_local_auth: Not a local connection!");
     return (1);

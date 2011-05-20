@@ -467,7 +467,7 @@ static int				/* O - Result of comparison */
 compare_cache(snmp_cache_t *a,		/* I - First cache entry */
               snmp_cache_t *b)		/* I - Second cache entry */
 {
-  return (strcasecmp(a->addrname, b->addrname));
+  return (_cups_strcasecmp(a->addrname, b->addrname));
 }
 
 
@@ -509,7 +509,7 @@ fix_make_model(
   * that printer driver detection works better...
   */
 
-  if (!strncasecmp(old_make_model, "Hewlett-Packard", 15))
+  if (!_cups_strncasecmp(old_make_model, "Hewlett-Packard", 15))
   {
    /*
     * Strip leading Hewlett-Packard and hp prefixes and replace
@@ -521,7 +521,7 @@ fix_make_model(
     while (isspace(*mmptr & 255))
       mmptr ++;
 
-    if (!strncasecmp(mmptr, "hp", 2))
+    if (!_cups_strncasecmp(mmptr, "hp", 2))
     {
       mmptr += 2;
 
@@ -534,11 +534,11 @@ fix_make_model(
     make_model[2] = ' ';
     strlcpy(make_model + 3, mmptr, make_model_size - 3);
   }
-  else if (!strncasecmp(old_make_model, "deskjet", 7))
+  else if (!_cups_strncasecmp(old_make_model, "deskjet", 7))
     snprintf(make_model, make_model_size, "HP DeskJet%s", old_make_model + 7);
-  else if (!strncasecmp(old_make_model, "officejet", 9))
+  else if (!_cups_strncasecmp(old_make_model, "officejet", 9))
     snprintf(make_model, make_model_size, "HP OfficeJet%s", old_make_model + 9);
-  else if (!strncasecmp(old_make_model, "stylus_pro_", 11))
+  else if (!_cups_strncasecmp(old_make_model, "stylus_pro_", 11))
     snprintf(make_model, make_model_size, "EPSON Stylus Pro %s",
              old_make_model + 11);
   else
@@ -844,16 +844,16 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
       if (!value)
         fprintf(stderr, "ERROR: Missing value on line %d of %s!\n", linenum,
 	        filename);
-      else if (!strcasecmp(line, "Address"))
+      else if (!_cups_strcasecmp(line, "Address"))
       {
         if (!address)
           add_array(Addresses, value);
       }
-      else if (!strcasecmp(line, "Community"))
+      else if (!_cups_strcasecmp(line, "Community"))
         add_array(Communities, value);
-      else if (!strcasecmp(line, "DebugLevel"))
+      else if (!_cups_strcasecmp(line, "DebugLevel"))
         DebugLevel = atoi(value);
-      else if (!strcasecmp(line, "DeviceURI"))
+      else if (!_cups_strcasecmp(line, "DeviceURI"))
       {
         if (*value != '\"')
 	  fprintf(stderr,
@@ -862,12 +862,12 @@ read_snmp_conf(const char *address)	/* I - Single address to probe */
         else
 	  add_device_uri(value);
       }
-      else if (!strcasecmp(line, "HostNameLookups"))
-        HostNameLookups = !strcasecmp(value, "on") ||
-	                  !strcasecmp(value, "yes") ||
-	                  !strcasecmp(value, "true") ||
-	                  !strcasecmp(value, "double");
-      else if (!strcasecmp(line, "MaxRunTime"))
+      else if (!_cups_strcasecmp(line, "HostNameLookups"))
+        HostNameLookups = !_cups_strcasecmp(value, "on") ||
+	                  !_cups_strcasecmp(value, "yes") ||
+	                  !_cups_strcasecmp(value, "true") ||
+	                  !_cups_strcasecmp(value, "double");
+      else if (!_cups_strcasecmp(line, "MaxRunTime"))
         MaxRunTime = atoi(value);
       else
         fprintf(stderr, "ERROR: Unknown directive %s on line %d of %s!\n",

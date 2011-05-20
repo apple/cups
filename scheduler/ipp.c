@@ -412,8 +412,8 @@ cupsdProcessIPPRequest(
                      "attributes-natural-language", NULL, DefaultLanguage);
 
       if (charset &&
-          strcasecmp(charset->values[0].string.text, "us-ascii") &&
-          strcasecmp(charset->values[0].string.text, "utf-8"))
+          _cups_strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          _cups_strcasecmp(charset->values[0].string.text, "utf-8"))
       {
        /*
         * Bad character set...
@@ -502,7 +502,7 @@ cupsdProcessIPPRequest(
 	  */
 
 	  if (!strcmp(username->values[0].string.text, "root") &&
-	      strcasecmp(con->http.hostname, "localhost") &&
+	      _cups_strcasecmp(con->http.hostname, "localhost") &&
 	      strcmp(con->username, "root"))
 	  {
 	   /*
@@ -1377,8 +1377,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (!printer->shared &&
-      strcasecmp(con->http.hostname, "localhost") &&
-      strcasecmp(con->http.hostname, ServerName))
+      _cups_strcasecmp(con->http.hostname, "localhost") &&
+      _cups_strcasecmp(con->http.hostname, ServerName))
   {
     send_ipp_status(con, IPP_NOT_AUTHORIZED,
                     _("The printer or class is not shared."));
@@ -4353,7 +4353,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       for (i = 0; i < job_ids->num_values; i ++)
       {
 	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL ||
-	    strcasecmp(job->dest, printer->name))
+	    _cups_strcasecmp(job->dest, printer->name))
 	  break;
       }
 
@@ -4463,7 +4463,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	   job;
 	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
 	if (job->state_value <= IPP_JOB_PROCESSING &&
-	    !strcasecmp(job->dest, printer->name))
+	    !_cups_strcasecmp(job->dest, printer->name))
 	  break;
 
       if (job)
@@ -4478,7 +4478,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
 	  if (job->state_value == IPP_JOB_STOPPED &&
-	      !strcasecmp(job->dest, printer->name))
+	      !_cups_strcasecmp(job->dest, printer->name))
 	    break;
 
 	if (job)
@@ -4884,7 +4884,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	  break;
       }
 #else
-      else if (!strcasecmp(username, name))
+      else if (!_cups_strcasecmp(username, name))
 	break;
 #endif /* HAVE_MBR_UID_TO_UUID */
 
@@ -5267,20 +5267,24 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
+    if (!strcmp(fromattr->name, "job-printer-uri"))
+      continue;
+
     if (exclude &&
         (cupsArrayFind(exclude, fromattr->name) ||
 	 cupsArrayFind(exclude, "all")))
     {
      /*
       * We need to exclude this attribute for security reasons; we require the
-      * job-id and job-printer-uri attributes regardless of the security
-      * settings for IPP conformance.
+      * job-id attribute regardless of the security settings for IPP
+      * conformance.
+      *
+      * The job-printer-uri attribute is handled by copy_job_attrs().
       *
       * Subscription attribute security is handled by copy_subscription_attrs().
       */
 
-      if (strcmp(fromattr->name, "job-id") &&
-	  strcmp(fromattr->name, "job-printer-uri"))
+      if (strcmp(fromattr->name, "job-id"))
         continue;
     }
 
@@ -5529,7 +5533,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_KEYWORD :
 	  case IPP_TAG_CHARSET :
 	  case IPP_TAG_LANGUAGE :
-	      if (!strcasecmp(banner->filetype->type, "postscript"))
+	      if (!_cups_strcasecmp(banner->filetype->type, "postscript"))
 	      {
 	       /*
 	        * Need to quote strings for PS banners...
@@ -5942,10 +5946,6 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
   * Send the requested attributes for each job...
   */
 
-  httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-                   con->servername, con->serverport, "/jobs/%d",
-        	   job->id);
-
   if (!cupsArrayFind(exclude, "all"))
   {
     if ((!exclude || !cupsArrayFind(exclude, "document-count")) &&
@@ -5960,8 +5960,13 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 
     if ((!exclude || !cupsArrayFind(exclude, "job-more-info")) &&
         (!ra || cupsArrayFind(ra, "job-more-info")))
+    {
+      httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "http",
+                       NULL, con->servername, con->serverport, "/jobs/%d",
+		       job->id);
       ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
 		   "job-more-info", NULL, job_uri);
+    }
 
     if (job->state_value > IPP_JOB_PROCESSING &&
 	(!exclude || !cupsArrayFind(exclude, "job-preserved")) &&
@@ -5975,12 +5980,28 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 		    "job-printer-up-time", time(NULL));
   }
 
+  if (!ra || cupsArrayFind(ra, "job-printer-uri"))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+		     con->servername, con->serverport,
+		     job->dtype & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS) ?
+		         "/classes/%s" : "/printers/%s",
+		     job->dest);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+        	 "job-printer-uri", NULL, job_uri);
+  }
+
   if (!ra || cupsArrayFind(ra, "job-state-reasons"))
     add_job_state_reasons(con, job);
 
   if (!ra || cupsArrayFind(ra, "job-uri"))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+		     con->servername, con->serverport, "/jobs/%d",
+		     job->id);
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-uri", NULL, job_uri);
+  }
 
   copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0, exclude);
 }
@@ -7777,7 +7798,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 	continue;
       }
 
-      if (username[0] && strcasecmp(username, job->username))
+      if (username[0] && _cups_strcasecmp(username, job->username))
 	continue;
 
       if (count > 0)
@@ -8485,7 +8506,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(!location ||
-	 (printer->location && !strcasecmp(printer->location, location))))
+	 (printer->location && !_cups_strcasecmp(printer->location, location))))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
@@ -8725,7 +8746,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
        sub;
        sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
     if ((!printer || sub->dest == printer) && (!job || sub->job == job) &&
-        (!username[0] || !strcasecmp(username, sub->owner)))
+        (!username[0] || !_cups_strcasecmp(username, sub->owner)))
     {
       ippAddSeparator(con->response);
 
@@ -9177,7 +9198,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       * completed...
       */
 
-      if (strcasecmp(job->dest, src) ||
+      if (_cups_strcasecmp(job->dest, src) ||
           job->state_value > IPP_JOB_STOPPED)
 	continue;
 
@@ -9476,9 +9497,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Read any embedded job ticket info from PS files...
   */
 
-  if (!strcasecmp(filetype->super, "application") &&
-      (!strcasecmp(filetype->type, "postscript") ||
-       !strcasecmp(filetype->type, "pdf")))
+  if (!_cups_strcasecmp(filetype->super, "application") &&
+      (!_cups_strcasecmp(filetype->type, "postscript") ||
+       !_cups_strcasecmp(filetype->type, "pdf")))
     read_job_ticket(con);
 
  /*
@@ -10320,30 +10341,41 @@ save_auth_info(
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
+  for (i = 0;
+       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+       i ++)
+    cupsdClearString(job->auth_env + i);
+
   if (auth_info && auth_info->num_values == dest->num_auth_info_required)
   {
    /*
     * Write 1 to 3 auth values...
     */
 
-    cupsdClearString(&job->auth_username);
-    cupsdClearString(&job->auth_domain);
-    cupsdClearString(&job->auth_password);
-
-    for (i = 0; i < auth_info->num_values; i ++)
+    for (i = 0;
+         i < auth_info->num_values &&
+	     i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
+	 i ++)
     {
       httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
                      strlen(auth_info->values[i].string.text));
       cupsFilePrintf(fp, "%s\n", line);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
-        cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "domain"))
-        cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "password"))
-        cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s",
+        cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s",
+	                auth_info->values[i].string.text);
+      else if (!strcmp(dest->auth_info_required[i], "negotiate"))
+        cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s",
+	                auth_info->values[i].string.text);
+      else
+        cupsdSetStringf(job->auth_env + i, "AUTH_%s=%s",
+	                dest->auth_info_required[i],
 	                auth_info->values[i].string.text);
     }
   }
@@ -10356,8 +10388,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", con->username);
-    cupsdClearString(&job->auth_domain);
+    cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s", con->username);
 
    /*
     * Write the authenticated password...
@@ -10366,7 +10397,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
+    cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s", con->password);
   }
 
 #ifdef HAVE_GSSAPI
@@ -12013,7 +12044,7 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
       if (cupsdCheckGroup(username, pw, name))
         break;
     }
-    else if (!strcasecmp(username, name))
+    else if (!_cups_strcasecmp(username, name))
       break;
   }
 

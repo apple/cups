@@ -248,7 +248,7 @@ _cupsAppleCopyDefaultPrinter(void)
 
     return (NULL);
   }
-  
+
   DEBUG_printf(("1_cupsAppleCopyDefaultPrinter: Got locations, %d entries.",
                 (int)CFArrayGetCount(locations)));
 
@@ -404,12 +404,12 @@ _cupsAppleSetDefaultPrinter(
 /*
  * '_cupsAppleSetUseLastPrinter()' - Set whether to use the last used printer.
  */
- 
-void				
+
+void
 _cupsAppleSetUseLastPrinter(
     int uselast)			/* O - 1 to use last printer, 0 otherwise */
 {
-  CFPreferencesSetAppValue(kUseLastPrinter, 
+  CFPreferencesSetAppValue(kUseLastPrinter,
 			   uselast ? kCFBooleanTrue : kCFBooleanFalse,
 			   kCUPSPrintingPrefs);
   CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
@@ -688,7 +688,7 @@ _cupsGetDests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFAUL
           int	i;			/* Looping var */
 
 	  for (i = 0; i < attr->num_values; i ++)
-	    if (!strcasecmp(media_default, attr->values[i].string.text))
+	    if (!_cups_strcasecmp(media_default, attr->values[i].string.text))
 	    {
 	      num_options = cupsAddOption("media", media_default, num_options,
 	                                  &options);
@@ -715,7 +715,7 @@ _cupsGetDests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFAUL
           strlcpy(optname, attr->name, sizeof(optname));
 	  optname[ptr - attr->name] = '\0';
 
-	  if (strcasecmp(optname, "media") ||
+	  if (_cups_strcasecmp(optname, "media") ||
 	      !cupsGetOption("media", num_options, options))
 	    num_options = cupsAddOption(optname,
 					cups_make_string(attr, value,
@@ -1178,10 +1178,10 @@ cupsSetDefaultDest(
   */
 
   for (i = num_dests, dest = dests; i > 0; i --, dest ++)
-    dest->is_default = !strcasecmp(name, dest->name) &&
+    dest->is_default = !_cups_strcasecmp(name, dest->name) &&
                        ((!instance && !dest->instance) ||
 		        (instance && dest->instance &&
-			 !strcasecmp(instance, dest->instance)));
+			 !_cups_strcasecmp(instance, dest->instance)));
 }
 
 
@@ -1346,7 +1346,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
         if (temp &&
 	    (val = cupsGetOption(option->name, temp->num_options,
 	                         temp->options)) != NULL &&
-            !strcasecmp(val, option->value))
+            !_cups_strcasecmp(val, option->value))
 	  continue;
 
        /*
@@ -1360,7 +1360,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 	    fprintf(fp, "/%s", dest->instance);
           wrote = 1;
 	}
-        
+
         if (option->value[0])
 	{
 	  if (strchr(option->value, ' ') ||
@@ -1537,7 +1537,7 @@ appleCopyNetwork(void)
   CFStringRef		key;		/* Current network configuration key */
   CFDictionaryRef	ip_dict;	/* Network configuration data */
   CFStringRef		network = NULL;	/* Current network ID */
-  
+
 
   if ((dynamicStore = SCDynamicStoreCreate(NULL, CFSTR("libcups"), NULL,
                                            NULL)) != NULL)
@@ -1742,10 +1742,10 @@ cups_compare_dests(cups_dest_t *a,	/* I - First destination */
   int	diff;				/* Difference */
 
 
-  if ((diff = strcasecmp(a->name, b->name)) != 0)
+  if ((diff = _cups_strcasecmp(a->name, b->name)) != 0)
     return (diff);
   else if (a->instance && b->instance)
-    return (strcasecmp(a->instance, b->instance));
+    return (_cups_strcasecmp(a->instance, b->instance));
   else
     return ((a->instance && !b->instance) - (!a->instance && b->instance));
 }
@@ -1868,7 +1868,7 @@ cups_get_default(const char *filename,	/* I - File to read */
   char		line[8192],		/* Line from file */
 		*value,			/* Value for line */
 		*nameptr;		/* Pointer into name */
-  int		linenum;		/* Current line */  
+  int		linenum;		/* Current line */
 
 
   *namebuf = '\0';
@@ -1879,7 +1879,7 @@ cups_get_default(const char *filename,	/* I - File to read */
 
     while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
     {
-      if (!strcasecmp(line, "default") && value)
+      if (!_cups_strcasecmp(line, "default") && value)
       {
         strlcpy(namebuf, value, namesize);
 
@@ -1956,7 +1956,7 @@ cups_get_dests(
     DEBUG_printf(("9cups_get_dests: linenum=%d line=\"%s\" lineptr=\"%s\"",
                   linenum, line, lineptr));
 
-    if ((strcasecmp(line, "dest") && strcasecmp(line, "default")) || !lineptr)
+    if ((_cups_strcasecmp(line, "dest") && _cups_strcasecmp(line, "default")) || !lineptr)
     {
       DEBUG_puts("9cups_get_dests: Not a dest or default line...");
       continue;
@@ -2003,10 +2003,10 @@ cups_get_dests(
 
     if (match_name)
     {
-      if (strcasecmp(name, match_name) ||
+      if (_cups_strcasecmp(name, match_name) ||
           (!instance && match_inst) ||
 	  (instance && !match_inst) ||
-	  (instance && strcasecmp(instance, match_inst)))
+	  (instance && _cups_strcasecmp(instance, match_inst)))
 	continue;
 
       dest = *dests;
@@ -2053,7 +2053,7 @@ cups_get_dests(
     * Set this as default if needed...
     */
 
-    if (!user_default_set && !strcasecmp(line, "default"))
+    if (!user_default_set && !_cups_strcasecmp(line, "default"))
     {
       DEBUG_puts("9cups_get_dests: Setting as default...");
 
@@ -2068,7 +2068,7 @@ cups_get_dests(
   * Close the file and return...
   */
 
-  cupsFileClose(fp);      
+  cupsFileClose(fp);
 
   return (num_dests);
 }

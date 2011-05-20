@@ -3,7 +3,7 @@
  *
  *   String functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -571,7 +571,7 @@ _cupsStrStatistics(size_t *alloc_bytes,	/* O - Allocated bytes */
 
 void
 _cups_strcpy(char       *dst,		/* I - Destination string */
-            const char *src)		/* I - Source string */
+             const char *src)		/* I - Source string */
 {
   while (*src)
     *dst++ = *src++;
@@ -606,16 +606,15 @@ _cups_strdup(const char *s)		/* I - String to duplicate */
  * '_cups_strcasecmp()' - Do a case-insensitive comparison.
  */
 
-#ifndef HAVE_STRCASECMP
 int				/* O - Result of comparison (-1, 0, or 1) */
 _cups_strcasecmp(const char *s,	/* I - First string */
-                const char *t)	/* I - Second string */
+                 const char *t)	/* I - Second string */
 {
   while (*s != '\0' && *t != '\0')
   {
-    if (tolower(*s & 255) < tolower(*t & 255))
+    if (_cups_tolower(*s) < _cups_tolower(*t))
       return (-1);
-    else if (tolower(*s & 255) > tolower(*t & 255))
+    else if (_cups_tolower(*s) > _cups_tolower(*t))
       return (1);
 
     s ++;
@@ -629,13 +628,11 @@ _cups_strcasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#endif /* !HAVE_STRCASECMP */
 
 /*
  * '_cups_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
-#ifndef HAVE_STRNCASECMP
 int					/* O - Result of comparison (-1, 0, or 1) */
 _cups_strncasecmp(const char *s,	/* I - First string */
                   const char *t,	/* I - Second string */
@@ -643,9 +640,9 @@ _cups_strncasecmp(const char *s,	/* I - First string */
 {
   while (*s != '\0' && *t != '\0' && n > 0)
   {
-    if (tolower(*s & 255) < tolower(*t & 255))
+    if (_cups_tolower(*s) < _cups_tolower(*t))
       return (-1);
-    else if (tolower(*s & 255) > tolower(*t & 255))
+    else if (_cups_tolower(*s) > _cups_tolower(*t))
       return (1);
 
     s ++;
@@ -662,7 +659,6 @@ _cups_strncasecmp(const char *s,	/* I - First string */
   else
     return (-1);
 }
-#endif /* !HAVE_STRNCASECMP */
 
 
 #ifndef HAVE_STRLCAT

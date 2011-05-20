@@ -1056,7 +1056,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
   if (!http)
     return (-1);
 
-  if (!strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
+  if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
 
@@ -2699,7 +2699,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     * Be tolerants of servers that send unknown attribute fields...
     */
 
-    if (!strcasecmp(line, "expect"))
+    if (!_cups_strcasecmp(line, "expect"))
     {
      /*
       * "Expect: 100-continue" or similar...
@@ -2707,7 +2707,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
       http->expect = (http_status_t)atoi(value);
     }
-    else if (!strcasecmp(line, "cookie"))
+    else if (!_cups_strcasecmp(line, "cookie"))
     {
      /*
       * "Cookie: name=value[; name=value ...]" - replaces previous cookies...
@@ -3364,7 +3364,7 @@ http_field(const char *name)		/* I - String name */
 
 
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
-    if (strcasecmp(name, http_fields[i]) == 0)
+    if (_cups_strcasecmp(name, http_fields[i]) == 0)
       return ((http_field_t)i);
 
   return (HTTP_FIELD_UNKNOWN);

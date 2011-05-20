@@ -404,7 +404,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
         * If the name is not the same as the current destination, add it!
 	*/
 
-        if (strcasecmp(name, dest))
+        if (_cups_strcasecmp(name, dest))
 	{
 	  cgiSetArray("JOB_PRINTER_URI", i, attr->values[0].string.text);
 	  cgiSetArray("JOB_PRINTER_NAME", i, name);
@@ -906,12 +906,12 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
     * Map local access to a local URI...
     */
 
-    if (!strcasecmp(hostname, "127.0.0.1") ||
-	!strcasecmp(hostname, "[::1]") ||
-	!strcasecmp(hostname, "localhost") ||
-	!strncasecmp(hostname, "localhost.", 10) ||
-	!strcasecmp(hostname, server) ||
-	!strcasecmp(hostname, servername))
+    if (!_cups_strcasecmp(hostname, "127.0.0.1") ||
+	!_cups_strcasecmp(hostname, "[::1]") ||
+	!_cups_strcasecmp(hostname, "localhost") ||
+	!_cups_strncasecmp(hostname, "localhost.", 10) ||
+	!_cups_strcasecmp(hostname, server) ||
+	!_cups_strcasecmp(hostname, servername))
     {
      /*
       * Make URI relative to the current server...
@@ -1347,7 +1347,7 @@ cgiSetIPPVars(ipp_t      *response,	/* I - Response data to be copied... */
 	     (filter->value_tag >= IPP_TAG_TEXTLANG &&
 	      filter->value_tag <= IPP_TAG_MIMETYPE)) &&
 	    filter->values[0].string.text != NULL &&
-	    !strcasecmp(filter->values[0].string.text, filter_value))
+	    !_cups_strcasecmp(filter->values[0].string.text, filter_value))
 	  break;
 
       if (!filter)
@@ -1481,9 +1481,9 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
       first = 0;
 
     if ((var = cgiGetVariable("ORDER")) != NULL)
-      ascending = !strcasecmp(var, "asc");
+      ascending = !_cups_strcasecmp(var, "asc");
     else
-      ascending = !which_jobs || !strcasecmp(which_jobs, "not-completed");
+      ascending = !which_jobs || !_cups_strcasecmp(which_jobs, "not-completed");
 
     section = cgiGetVariable("SECTION");
 

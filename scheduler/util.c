@@ -36,13 +36,13 @@
 #ifdef __APPLE__
 #  include <libgen.h>
 extern char **environ;
-#endif /* __APPLE__ */ 
+#endif /* __APPLE__ */
 
 
 /*
  * 'cupsdCompareNames()' - Compare two names.
  *
- * This function basically does a strcasecmp() of the two strings,
+ * This function basically does a _cups_strcasecmp() of the two strings,
  * but is also aware of numbers so that "a2" < "a100".
  */
 
@@ -91,7 +91,7 @@ cupsdCompareNames(const char *s,	/* I - First string */
       else if (!isdigit(*s & 255) && isdigit(*t & 255))
         return (-1);
       else if (!isdigit(*s & 255) || !isdigit(*t & 255))
-        continue;     
+        continue;
 
       if (*s < *t)
         diff = -1;

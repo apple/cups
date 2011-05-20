@@ -3,7 +3,7 @@
  *
  *   IEEE-1284 support functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -304,9 +304,9 @@ backendGetDeviceID(
 
     if (mfg)
     {
-      if (!strcasecmp(mfg, "Hewlett-Packard"))
+      if (!_cups_strcasecmp(mfg, "Hewlett-Packard"))
         mfg = "HP";
-      else if (!strcasecmp(mfg, "Lexmark International"))
+      else if (!_cups_strcasecmp(mfg, "Lexmark International"))
         mfg = "Lexmark";
     }
     else
@@ -322,7 +322,7 @@ backendGetDeviceID(
     if (!mdl)
       mdl = "";
 
-    if (!strncasecmp(mdl, mfg, strlen(mfg)))
+    if (!_cups_strncasecmp(mdl, mfg, strlen(mfg)))
     {
       mdl += strlen(mfg);
 
@@ -397,7 +397,7 @@ backendGetMakeModel(
     if ((mfg = cupsGetOption("MANUFACTURER", num_values, values)) == NULL)
       mfg = cupsGetOption("MFG", num_values, values);
 
-    if (!mfg || !strncasecmp(mdl, mfg, strlen(mfg)))
+    if (!mfg || !_cups_strncasecmp(mdl, mfg, strlen(mfg)))
     {
      /*
       * Just copy the model string, since it has the manufacturer...

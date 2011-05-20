@@ -971,8 +971,8 @@ cupsdLoadAllPrinters(void)
     * Decode the directive...
     */
 
-    if (!strcasecmp(line, "<Printer") ||
-        !strcasecmp(line, "<DefaultPrinter"))
+    if (!_cups_strcasecmp(line, "<Printer") ||
+        !_cups_strcasecmp(line, "<DefaultPrinter"))
     {
      /*
       * <Printer name> or <DefaultPrinter name>
@@ -994,14 +994,14 @@ cupsdLoadAllPrinters(void)
         * Set the default printer as needed...
 	*/
 
-        if (!strcasecmp(line, "<DefaultPrinter"))
+        if (!_cups_strcasecmp(line, "<DefaultPrinter"))
 	  DefaultPrinter = p;
       }
       else
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "</Printer>"))
+    else if (!_cups_strcasecmp(line, "</Printer>"))
     {
       if (p != NULL)
       {
@@ -1047,7 +1047,7 @@ cupsdLoadAllPrinters(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "UUID"))
+    else if (!_cups_strcasecmp(line, "UUID"))
     {
       if (value && !strncmp(value, "urn:uuid:", 9))
         cupsdSetString(&(p->uuid), value);
@@ -1055,29 +1055,29 @@ cupsdLoadAllPrinters(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Bad UUID on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "AuthInfoRequired"))
+    else if (!_cups_strcasecmp(line, "AuthInfoRequired"))
     {
       if (!cupsdSetAuthInfoRequired(p, value, NULL))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 			"Bad AuthInfoRequired on line %d of printers.conf.",
 			linenum);
     }
-    else if (!strcasecmp(line, "Info"))
+    else if (!_cups_strcasecmp(line, "Info"))
     {
       if (value)
 	cupsdSetString(&p->info, value);
     }
-    else if (!strcasecmp(line, "MakeModel"))
+    else if (!_cups_strcasecmp(line, "MakeModel"))
     {
       if (value)
 	cupsdSetString(&p->make_model, value);
     }
-    else if (!strcasecmp(line, "Location"))
+    else if (!_cups_strcasecmp(line, "Location"))
     {
       if (value)
 	cupsdSetString(&p->location, value);
     }
-    else if (!strcasecmp(line, "DeviceURI"))
+    else if (!_cups_strcasecmp(line, "DeviceURI"))
     {
       if (value)
 	cupsdSetDeviceURI(p, value);
@@ -1085,7 +1085,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "Option") && value)
+    else if (!_cups_strcasecmp(line, "Option") && value)
     {
      /*
       * Option name value
@@ -1104,7 +1104,7 @@ cupsdLoadAllPrinters(void)
 	                               &(p->options));
       }
     }
-    else if (!strcasecmp(line, "PortMonitor"))
+    else if (!_cups_strcasecmp(line, "PortMonitor"))
     {
       if (value && strcmp(value, "none"))
 	cupsdSetString(&p->port_monitor, value);
@@ -1114,7 +1114,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "Reason"))
+    else if (!_cups_strcasecmp(line, "Reason"))
     {
       if (value &&
           strcmp(value, "connecting-to-device") &&
@@ -1136,15 +1136,15 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "State"))
+    else if (!_cups_strcasecmp(line, "State"))
     {
      /*
       * Set the initial queue state...
       */
 
-      if (value && !strcasecmp(value, "idle"))
+      if (value && !_cups_strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
-      else if (value && !strcasecmp(value, "stopped"))
+      else if (value && !_cups_strcasecmp(value, "stopped"))
       {
         p->state = IPP_PRINTER_STOPPED;
 
@@ -1163,7 +1163,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "StateMessage"))
+    else if (!_cups_strcasecmp(line, "StateMessage"))
     {
      /*
       * Set the initial queue state message...
@@ -1172,7 +1172,7 @@ cupsdLoadAllPrinters(void)
       if (value)
 	strlcpy(p->state_message, value, sizeof(p->state_message));
     }
-    else if (!strcasecmp(line, "StateTime"))
+    else if (!_cups_strcasecmp(line, "StateTime"))
     {
      /*
       * Set the state time...
@@ -1181,27 +1181,27 @@ cupsdLoadAllPrinters(void)
       if (value)
         p->state_time = atoi(value);
     }
-    else if (!strcasecmp(line, "Accepting"))
+    else if (!_cups_strcasecmp(line, "Accepting"))
     {
      /*
       * Set the initial accepting state...
       */
 
       if (value &&
-          (!strcasecmp(value, "yes") ||
-           !strcasecmp(value, "on") ||
-           !strcasecmp(value, "true")))
+          (!_cups_strcasecmp(value, "yes") ||
+           !_cups_strcasecmp(value, "on") ||
+           !_cups_strcasecmp(value, "true")))
         p->accepting = 1;
       else if (value &&
-               (!strcasecmp(value, "no") ||
-        	!strcasecmp(value, "off") ||
-        	!strcasecmp(value, "false")))
+               (!_cups_strcasecmp(value, "no") ||
+        	!_cups_strcasecmp(value, "off") ||
+        	!_cups_strcasecmp(value, "false")))
         p->accepting = 0;
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "Type"))
+    else if (!_cups_strcasecmp(line, "Type"))
     {
       if (value)
         p->type = atoi(value);
@@ -1209,27 +1209,27 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "Shared"))
+    else if (!_cups_strcasecmp(line, "Shared"))
     {
      /*
       * Set the initial shared state...
       */
 
       if (value &&
-          (!strcasecmp(value, "yes") ||
-           !strcasecmp(value, "on") ||
-           !strcasecmp(value, "true")))
+          (!_cups_strcasecmp(value, "yes") ||
+           !_cups_strcasecmp(value, "on") ||
+           !_cups_strcasecmp(value, "true")))
         p->shared = 1;
       else if (value &&
-               (!strcasecmp(value, "no") ||
-        	!strcasecmp(value, "off") ||
-        	!strcasecmp(value, "false")))
+               (!_cups_strcasecmp(value, "no") ||
+        	!_cups_strcasecmp(value, "off") ||
+        	!_cups_strcasecmp(value, "false")))
         p->shared = 0;
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "JobSheets"))
+    else if (!_cups_strcasecmp(line, "JobSheets"))
     {
      /*
       * Set the initial job sheets...
@@ -1261,7 +1261,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "AllowUser"))
+    else if (!_cups_strcasecmp(line, "AllowUser"))
     {
       if (value)
       {
@@ -1272,7 +1272,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "DenyUser"))
+    else if (!_cups_strcasecmp(line, "DenyUser"))
     {
       if (value)
       {
@@ -1283,7 +1283,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "QuotaPeriod"))
+    else if (!_cups_strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
@@ -1291,7 +1291,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "PageLimit"))
+    else if (!_cups_strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
@@ -1299,7 +1299,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "KLimit"))
+    else if (!_cups_strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
@@ -1307,7 +1307,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "OpPolicy"))
+    else if (!_cups_strcasecmp(line, "OpPolicy"))
     {
       if (value)
       {
@@ -1328,7 +1328,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "ErrorPolicy"))
+    else if (!_cups_strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
         cupsdSetString(&p->error_policy, value);
@@ -1336,7 +1336,7 @@ cupsdLoadAllPrinters(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!strcasecmp(line, "Attribute") && value)
+    else if (!_cups_strcasecmp(line, "Attribute") && value)
     {
       for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
@@ -1356,15 +1356,18 @@ cupsdLoadAllPrinters(void)
           cupsdSetPrinterAttr(p, value, valueptr);
       }
     }
-    else
+    else if (_cups_strcasecmp(line, "Filter") &&
+             _cups_strcasecmp(line, "Prefilter") &&
+             _cups_strcasecmp(line, "Product"))
     {
      /*
-      * Something else we don't understand...
+      * Something else we don't understand (and that wasn't used in a prior
+      * release of CUPS...
       */
 
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown configuration directive %s on line %d of printers.conf.",
-	              line, linenum);
+                      "Unknown configuration directive %s on line %d of "
+		      "printers.conf.", line, linenum);
     }
   }
 
@@ -3165,12 +3168,12 @@ cupsdValidateDest(
   * Change localhost to the server name...
   */
 
-  if (!strcasecmp(hostname, "localhost"))
+  if (!_cups_strcasecmp(hostname, "localhost"))
     strlcpy(hostname, ServerName, sizeof(hostname));
 
   strlcpy(localname, hostname, sizeof(localname));
 
-  if (!strcasecmp(hostname, ServerName))
+  if (!_cups_strcasecmp(hostname, ServerName))
   {
    /*
     * Localize the hostname...
@@ -3187,7 +3190,7 @@ cupsdValidateDest(
 
       while (lptr != NULL)
       {
-	if (!strcasecmp(lptr, sptr))
+	if (!_cups_strcasecmp(lptr, sptr))
 	{
           *lptr = '\0';
 	  break;
@@ -3207,8 +3210,8 @@ cupsdValidateDest(
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (!strcasecmp(p->hostname, localname) &&
-        !strcasecmp(p->name, rptr))
+    if (!_cups_strcasecmp(p->hostname, localname) &&
+        !_cups_strcasecmp(p->name, rptr))
     {
       if (printer)
         *printer = p;
@@ -3613,19 +3616,13 @@ add_printer_filter(
 
   if (strcmp(program, "-"))
   {
-    _cups_fc_result_t	result;		/* Result of file check */
-
     if (program[0] == '/')
       strlcpy(filename, program, sizeof(filename));
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    result = _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
-                            cupsdLogFCMessage, p);
-
-    if (result == _CUPS_FILE_CHECK_MISSING ||
-        result == _CUPS_FILE_CHECK_WRONG_TYPE)
-      return;
+    _cupsFileCheck(filename, _CUPS_FILE_CHECK_PROGRAM, !RunUser,
+                   cupsdLogFCMessage, p);
   }
 
  /*
@@ -3635,9 +3632,9 @@ add_printer_filter(
   for (temptype = mimeFirstType(MimeDatabase);
        temptype;
        temptype = mimeNextType(MimeDatabase))
-    if (((super[0] == '*' && strcasecmp(temptype->super, "printer")) ||
-         !strcasecmp(temptype->super, super)) &&
-        (type[0] == '*' || !strcasecmp(temptype->type, type)))
+    if (((super[0] == '*' && _cups_strcasecmp(temptype->super, "printer")) ||
+         !_cups_strcasecmp(temptype->super, super)) &&
+        (type[0] == '*' || !_cups_strcasecmp(temptype->type, type)))
     {
       if (desttype != filtertype)
       {
@@ -3720,7 +3717,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
        type;
        type = mimeNextType(MimeDatabase))
   {
-    if (!strcasecmp(type->super, "printer"))
+    if (!_cups_strcasecmp(type->super, "printer"))
       continue;
 
     snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
@@ -3803,20 +3800,20 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	 type;
 	 type = (mime_type_t *)cupsArrayNext(p->filetypes))
     {
-      if (!strcasecmp(type->super, "application"))
+      if (!_cups_strcasecmp(type->super, "application"))
       {
-        if (!strcasecmp(type->type, "pdf"))
+        if (!_cups_strcasecmp(type->type, "pdf"))
 	  strlcat(pdl, "application/pdf,", sizeof(pdl));
-        else if (!strcasecmp(type->type, "postscript"))
+        else if (!_cups_strcasecmp(type->type, "postscript"))
 	  strlcat(pdl, "application/postscript,", sizeof(pdl));
       }
-      else if (!strcasecmp(type->super, "image"))
+      else if (!_cups_strcasecmp(type->super, "image"))
       {
-        if (!strcasecmp(type->type, "jpeg"))
+        if (!_cups_strcasecmp(type->type, "jpeg"))
 	  strlcat(pdl, "image/jpeg,", sizeof(pdl));
-	else if (!strcasecmp(type->type, "png"))
+	else if (!_cups_strcasecmp(type->type, "png"))
 	  strlcat(pdl, "image/png,", sizeof(pdl));
-	else if (!strcasecmp(type->type, "pwg-raster"))
+	else if (!_cups_strcasecmp(type->type, "pwg-raster"))
 	  strlcat(pdl, "image/pwg-raster,", sizeof(pdl));
       }
     }
@@ -3841,7 +3838,7 @@ compare_printers(void *first,		/* I - First printer */
 {
   (void)data;
 
-  return (strcasecmp(((cupsd_printer_t *)first)->name,
+  return (_cups_strcasecmp(((cupsd_printer_t *)first)->name,
                      ((cupsd_printer_t *)second)->name));
 }
 
@@ -4034,7 +4031,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     if (!ppd->manual_copies)
       p->type |= CUPS_PRINTER_COPIES;
     if ((ppd_attr = ppdFindAttr(ppd, "cupsFax", NULL)) != NULL)
-      if (ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+      if (ppd_attr->value && !_cups_strcasecmp(ppd_attr->value, "true"))
 	p->type |= CUPS_PRINTER_FAX;
 
     ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
@@ -4455,10 +4452,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
     else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
-	      !strcasecmp(ppd_attr->value, "Reverse")) ||
+	      !_cups_strcasecmp(ppd_attr->value, "Reverse")) ||
 	     (!ppd_attr && ppd->manufacturer &&	/* "Compatibility heuristic" */
-	      (!strcasecmp(ppd->manufacturer, "epson") ||
-	       !strcasecmp(ppd->manufacturer, "lexmark"))))
+	      (!_cups_strcasecmp(ppd->manufacturer, "epson") ||
+	       !_cups_strcasecmp(ppd->manufacturer, "lexmark"))))
     {
      /*
       * Report that this printer has a single output bin that leaves pages face
@@ -4624,10 +4621,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		    "sides-supported", 3, NULL, sides);
 
-      if (!strcasecmp(duplex->defchoice, "DuplexTumble"))
+      if (!_cups_strcasecmp(duplex->defchoice, "DuplexTumble"))
 	ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		     "sides-default", NULL, "two-sided-short-edge");
-      else if (!strcasecmp(duplex->defchoice, "DuplexNoTumble"))
+      else if (!_cups_strcasecmp(duplex->defchoice, "DuplexNoTumble"))
 	ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		     "sides-default", NULL, "two-sided-long-edge");
       else
@@ -4666,10 +4663,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	p->type |= CUPS_PRINTER_SMALL;
 
     if ((ppd_attr = ppdFindAttr(ppd, "APICADriver", NULL)) != NULL &&
-        ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+        ppd_attr->value && !_cups_strcasecmp(ppd_attr->value, "true"))
     {
       if ((ppd_attr = ppdFindAttr(ppd, "APScannerOnly", NULL)) != NULL &&
-	  ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+	  ppd_attr->value && !_cups_strcasecmp(ppd_attr->value, "true"))
         p->type |= CUPS_PRINTER_SCANNER;
       else
         p->type |= CUPS_PRINTER_MFP;
@@ -4685,7 +4682,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	   filter;
 	   filter = (const char *)cupsArrayNext(p->pc->filters))
       {
-	if (!strncasecmp(filter, "application/vnd.cups-command", 28) &&
+	if (!_cups_strncasecmp(filter, "application/vnd.cups-command", 28) &&
 	    _cups_isspace(filter[28]))
 	{
 	  p->type |= CUPS_PRINTER_COMMANDS;

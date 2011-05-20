@@ -301,9 +301,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     num_options = cupsGetConflicts(ppd, "InputSlot", "Envelope", &options);
     if (num_options != 2 ||
         (val = cupsGetOption("PageRegion", num_options, options)) == NULL ||
-	strcasecmp(val, "Letter") ||
+	_cups_strcasecmp(val, "Letter") ||
 	(val = cupsGetOption("PageSize", num_options, options)) == NULL ||
-	strcasecmp(val, "Letter"))
+	_cups_strcasecmp(val, "Letter"))
     {
       printf("FAIL (%d options:", num_options);
       for (i = 0; i < num_options; i ++)
@@ -352,8 +352,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     num_options = 0;
     options     = NULL;
     if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
-        num_options == 1 && !strcasecmp(options[0].name, "InputSlot") &&
-	!strcasecmp(options[0].value, "Tray"))
+        num_options == 1 && !_cups_strcasecmp(options[0].name, "InputSlot") &&
+	!_cups_strcasecmp(options[0].value, "Tray"))
       puts("PASS (Resolved by changing InputSlot)");
     else if (num_options > 0)
     {
@@ -690,8 +690,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     num_options = 0;
     options     = NULL;
     if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
-        num_options == 1 && !strcasecmp(options->name, "Quality") &&
-	!strcasecmp(options->value, "Normal"))
+        num_options == 1 && !_cups_strcasecmp(options->name, "Quality") &&
+	!_cups_strcasecmp(options->value, "Normal"))
       puts("PASS");
     else if (num_options > 0)
     {

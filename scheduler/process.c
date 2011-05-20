@@ -77,6 +77,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		request[1024],		/* Quoted RequestRoot */
 		root[1024],		/* Quoted ServerRoot */
 		temp[1024];		/* Quoted TempDir */
+  const char	*nodebug;		/* " (with no-log)" for no debug */
 
 
   if (!UseProfiles)
@@ -108,24 +109,24 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsd_requote(root, ServerRoot, sizeof(root));
   cupsd_requote(temp, TempDir, sizeof(temp));
 
+  nodebug = LogLevel < CUPSD_LOG_DEBUG ? " (with no-log)" : "";
+
   cupsFilePuts(fp, "(version 1)\n");
-  if (LogLevel >= CUPSD_LOG_DEBUG)
-    cupsFilePuts(fp, "(debug deny)\n");
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"
                  "  (regex"
 		 " #\"^%s$\""		/* RequestRoot */
 		 " #\"^%s/\""		/* RequestRoot/... */
-		 "))\n",
-		 request, request);
+		 ")%s)\n",
+		 request, request, nodebug);
   if (!RunUser)
-    cupsFilePuts(fp,
-		 "(deny file-write* file-read-data file-read-metadata\n"
-		 "  (regex"
-		 " #\"^/Users$\""
-		 " #\"^/Users/\""
-		 "))\n");
+    cupsFilePrintf(fp,
+		   "(deny file-write* file-read-data file-read-metadata\n"
+		   "  (regex"
+		   " #\"^/Users$\""
+		   " #\"^/Users/\""
+		   ")%s)\n", nodebug);
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex"
@@ -139,8 +140,8 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 " #\"^/Library/\""
 		 " #\"^/System$\""
 		 " #\"^/System/\""
-		 "))\n",
-		 root, root);
+		 ")%s)\n",
+		 root, root, nodebug);
   /* Specifically allow applications to stat RequestRoot */
   cupsFilePrintf(fp,
                  "(allow file-read-metadata\n"
@@ -164,14 +165,14 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 " #\"^/Users/Shared/\""
 		 "))\n",
 		 temp, temp, cache, cache, request, request);
-  cupsFilePuts(fp,
-	       "(deny file-write*\n"
-	       "  (regex"
-	       " #\"^/Library/Printers/PPDs$\""
-	       " #\"^/Library/Printers/PPDs/\""
-	       " #\"^/Library/Printers/PPD Plugins$\""
-	       " #\"^/Library/Printers/PPD Plugins/\""
-	       "))\n");
+  cupsFilePrintf(fp,
+		 "(deny file-write*\n"
+		 "  (regex"
+		 " #\"^/Library/Printers/PPDs$\""
+		 " #\"^/Library/Printers/PPDs/\""
+		 " #\"^/Library/Printers/PPD Plugins$\""
+		 " #\"^/Library/Printers/PPD Plugins/\""
+		 ")%s)\n", nodebug);
   if (job_id)
   {
    /*
@@ -244,7 +245,18 @@ cupsdEndProcess(int pid,		/* I - Process ID */
 
   if (!pid)
     return (0);
-  else if (force)
+
+  if (!RunUser)
+  {
+   /*
+    * When running as root, cupsd puts child processes in their own process
+    * group.  Using "-pid" sends a signal to all processes in the group.
+    */
+
+    pid = -pid;
+  }
+
+  if (force)
     return (kill(pid, SIGKILL));
   else
     return (kill(pid, SIGTERM));
@@ -412,9 +424,36 @@ cupsdStartProcess(
   if ((*pid = fork()) == 0)
   {
    /*
-    * Child process goes here...
-    *
-    * Update stdin/stdout/stderr as needed...
+    * Child process goes here; update stderr as needed...
+    */
+
+    if (errfd != 2)
+    {
+      if (errfd < 0)
+        errfd = open("/dev/null", O_WRONLY);
+
+      if (errfd != 2)
+      {
+        dup2(errfd, 2);
+	close(errfd);
+      }
+    }
+
+   /*
+    * Put this process in its own process group so that we can kill any child
+    * processes it creates.
+    */
+
+#ifdef HAVE_SETPGID
+    if (!RunUser && setpgid(0, 0))
+      exit(errno + 100);
+#else
+    if (!RunUser && setpgrp())
+      exit(errno + 100);
+#endif /* HAVE_SETPGID */
+
+   /*
+    * Update the remaining file descriptors as needed...
     */
 
     if (infd != 0)
@@ -441,18 +480,6 @@ cupsdStartProcess(
       }
     }
 
-    if (errfd != 2)
-    {
-      if (errfd < 0)
-        errfd = open("/dev/null", O_WRONLY);
-
-      if (errfd != 2)
-      {
-        dup2(errfd, 2);
-	close(errfd);
-      }
-    }
-
     if (backfd != 3 && backfd >= 0)
     {
       dup2(backfd, 3);
@@ -476,36 +503,21 @@ cupsdStartProcess(
       nice(FilterNice);
 
    /*
+    * Reset group membership to just the main one we belong to.
+    */
+
+    if (!RunUser && setgid(Group))
+      exit(errno + 100);
+
+    if (!RunUser && setgroups(1, &Group))
+      exit(errno + 100);
+
+   /*
     * Change user to something "safe"...
     */
 
-    if (!root && !RunUser)
-    {
-     /*
-      * Running as root, so change to non-priviledged user...
-      */
-
-      if (setgid(Group))
-	exit(errno);
-
-      if (setgroups(1, &Group))
-	exit(errno);
-
-      if (setuid(User))
-        exit(errno);
-    }
-    else
-    {
-     /*
-      * Reset group membership to just the main one we belong to.
-      */
-
-      if (setgid(Group) && !RunUser)
-        exit(errno);
-
-      if (setgroups(1, &Group) && !RunUser)
-        exit(errno);
-    }
+    if (!RunUser && user && setuid(user))
+      exit(errno + 100);
 
    /*
     * Change umask to restrict permissions on created files...
@@ -548,9 +560,7 @@ cupsdStartProcess(
     else
       execv(exec_path, argv);
 
-    perror(command);
-
-    exit(1);
+    exit(errno + 100);
   }
   else if (*pid < 0)
   {

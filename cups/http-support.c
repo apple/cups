@@ -801,7 +801,7 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
   */
 
   for (i = 0; i < 12; i ++)
-    if (!strcasecmp(mon, http_months[i]))
+    if (!_cups_strcasecmp(mon, http_months[i]))
       break;
 
   if (i >= 12)
@@ -1001,7 +1001,7 @@ httpSeparateURI(
     *port = 443;
   else if (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps"))
     *port = 631;
-  else if (!strcasecmp(scheme, "lpd"))
+  else if (!_cups_strcasecmp(scheme, "lpd"))
     *port = 515;
   else if (!strcmp(scheme, "socket"))	/* Not yet registered with IANA... */
     *port = 9100;
@@ -1543,8 +1543,8 @@ _httpResolveURI(
 	  stimeout.tv_sec  = ((int)timeout) / 1000;
 	  stimeout.tv_usec = ((int)(timeout) * 1000) % 1000000;
 
-	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL, 
-		       timeout < 0.0 ? NULL : &stimeout); 
+	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL,
+		       timeout < 0.0 ? NULL : &stimeout);
 #endif /* HAVE_POLL */
 
 	  if (fds < 0)
@@ -1562,14 +1562,14 @@ _httpResolveURI(
 	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (domainsent == 0 && (domain && strcasecmp(domain, "local.")))
+	    if (domainsent == 0 && (domain && _cups_strcasecmp(domain, "local.")))
 	    {
 	      if (options & _HTTP_RESOLVE_STDERR)
 		fprintf(stderr,
 		        "DEBUG: Resolving \"%s\", regtype=\"%s\", "
 			"domain=\"%s\"...\n", hostname, regtype,
 			domain ? domain : "");
-  
+
 	      domainref = ref;
 	      if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection,
 	                            0, hostname, regtype, domain,
@@ -1651,7 +1651,7 @@ _httpResolveURI(
  */
 
 static const char *			/* O - New source pointer or NULL on error */
-http_copy_decode(char       *dst,	/* O - Destination buffer */ 
+http_copy_decode(char       *dst,	/* O - Destination buffer */
                  const char *src,	/* I - Source pointer */
 		 int        dstsize,	/* I - Destination size */
 		 const char *term,	/* I - Terminating characters */
@@ -1719,7 +1719,7 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
  */
 
 static char *				/* O - End of current URI */
-http_copy_encode(char       *dst,	/* O - Destination buffer */ 
+http_copy_encode(char       *dst,	/* O - Destination buffer */
                  const char *src,	/* I - Source pointer */
 		 char       *dstend,	/* I - End of destination buffer */
                  const char *reserved,	/* I - Extra reserved characters */
@@ -1841,7 +1841,7 @@ http_resolve_cb(
 
   if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
       (hostptr = hostTarget + strlen(hostTarget) - 7) > hostTarget &&
-      !strcasecmp(hostptr, ".local."))
+      !_cups_strcasecmp(hostptr, ".local."))
   {
    /*
     * OK, we got a .local name but the caller needs a real domain.  Start by
@@ -1867,7 +1867,7 @@ http_resolve_cb(
 	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
 
 	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
-	      strcasecmp(hostptr, ".local"))
+	      _cups_strcasecmp(hostptr, ".local"))
 	  {
 	    hostTarget = fqdn;
 	    break;

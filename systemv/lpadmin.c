@@ -443,7 +443,7 @@ main(int  argc,			/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'u' : /* Allow/deny users */
 	    if (argv[i][2])
 	      val = argv[i] + 2;
@@ -462,10 +462,10 @@ main(int  argc,			/* I - Number of command-line arguments */
               val = argv[i];
 	    }
 
-            if (!strncasecmp(val, "allow:", 6))
+            if (!_cups_strncasecmp(val, "allow:", 6))
 	      num_options = cupsAddOption("requesting-user-name-allowed",
 	                                  val + 6, num_options, &options);
-            else if (!strncasecmp(val, "deny:", 5))
+            else if (!_cups_strncasecmp(val, "deny:", 5))
 	      num_options = cupsAddOption("requesting-user-name-denied",
 	                                  val + 5, num_options, &options);
             else
@@ -579,7 +579,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    _cupsLangPuts(stderr,
 	                  _("lpadmin: Warning - content type list ignored."));
 	    break;
-	    
+
         case 'L' : /* Set the printer-location attribute */
 	    if (argv[i][2])
 	      num_options = cupsAddOption("printer-location", argv[i] + 2,
@@ -756,7 +756,7 @@ add_printer_to_class(http_t *http,	/* I - Server connection */
       (members = ippFindAttribute(response, "member-names",
                                   IPP_TAG_NAME)) != NULL)
     for (i = 0; i < members->num_values; i ++)
-      if (strcasecmp(printer, members->values[i].string.text) == 0)
+      if (_cups_strcasecmp(printer, members->values[i].string.text) == 0)
       {
         _cupsLangPrintf(stderr,
 	                _("lpadmin: Printer %s is already a member of class "
@@ -980,7 +980,7 @@ delete_printer_from_class(
   }
 
   for (i = 0; i < members->num_values; i ++)
-    if (!strcasecmp(printer, members->values[i].string.text))
+    if (!_cups_strcasecmp(printer, members->values[i].string.text))
       break;
 
   if (i >= members->num_values)
@@ -1302,10 +1302,10 @@ set_printer_options(
 
   if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
   {
-    if (!strcasecmp(protocol, "bcp"))
+    if (!_cups_strcasecmp(protocol, "bcp"))
       ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
                    NULL, "bcp");
-    else if (!strcasecmp(protocol, "tbcp"))
+    else if (!_cups_strcasecmp(protocol, "tbcp"))
       ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
                    NULL, "tbcp");
   }
@@ -1359,9 +1359,9 @@ set_printer_options(
       {
         wrote_ipp_supplies = 1;
         cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
-	               (!strcasecmp(boolval, "true") ||
-		        !strcasecmp(boolval, "yes") ||
-		        !strcasecmp(boolval, "on")) ? "True" : "False");
+	               (!_cups_strcasecmp(boolval, "true") ||
+		        !_cups_strcasecmp(boolval, "yes") ||
+		        !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
       }
       else if (!strncmp(line, "*cupsSNMPSupplies:", 18) &&
 	       (boolval = cupsGetOption("cupsSNMPSupplies", num_options,
@@ -1369,9 +1369,9 @@ set_printer_options(
       {
         wrote_snmp_supplies = 1;
         cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
-	               (!strcasecmp(boolval, "true") ||
-		        !strcasecmp(boolval, "yes") ||
-		        !strcasecmp(boolval, "on")) ? "True" : "False");
+	               (!_cups_strcasecmp(boolval, "true") ||
+		        !_cups_strcasecmp(boolval, "yes") ||
+		        !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
       }
       else if (strncmp(line, "*Default", 8))
         cupsFilePrintf(out, "%s\n", line);
@@ -1428,9 +1428,9 @@ set_printer_options(
 				 options)) != NULL)
     {
       cupsFilePrintf(out, "*cupsIPPSupplies: %s\n",
-		     (!strcasecmp(boolval, "true") ||
-		      !strcasecmp(boolval, "yes") ||
-		      !strcasecmp(boolval, "on")) ? "True" : "False");
+		     (!_cups_strcasecmp(boolval, "true") ||
+		      !_cups_strcasecmp(boolval, "yes") ||
+		      !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
     }
 
     if (!wrote_snmp_supplies &&
@@ -1438,9 +1438,9 @@ set_printer_options(
 			         options)) != NULL)
     {
       cupsFilePrintf(out, "*cupsSNMPSupplies: %s\n",
-		     (!strcasecmp(boolval, "true") ||
-		      !strcasecmp(boolval, "yes") ||
-		      !strcasecmp(boolval, "on")) ? "True" : "False");
+		     (!_cups_strcasecmp(boolval, "true") ||
+		      !_cups_strcasecmp(boolval, "yes") ||
+		      !_cups_strcasecmp(boolval, "on")) ? "True" : "False");
     }
 
     cupsFileClose(in);

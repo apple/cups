@@ -1869,9 +1869,9 @@
 		72220EB41333050100FCA411 /* libcups */ = {
 			isa = PBXGroup;
 			children = (
+				276683561337A8C5000D33D0 /* cups.strings */,
 				27D3037C134148CB00F022B1 /* libcups_s.exp */,
 				27D3037D134148CB00F022B1 /* libcups2.def */,
-				276683561337A8C5000D33D0 /* cups.strings */,
 				72220EB51333052D00FCA411 /* adminutil.c */,
 				72220EB81333056300FCA411 /* array.c */,
 				72220EBA1333056300FCA411 /* attr.c */,

@@ -3,7 +3,7 @@
  *
  *   RFC file to HTML conversion program.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -132,7 +132,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (!line[0])
       break;
-    else if (!strncasecmp(line, "Request for Comments:", 21))
+    else if (!_cups_strncasecmp(line, "Request for Comments:", 21))
       rfc = atoi(line + 21);
   }
 
@@ -385,7 +385,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       put_line(outfile, line);
 
-      intoc    = !strcasecmp(line, "Table of Contents");
+      intoc    = !_cups_strcasecmp(line, "Table of Contents");
       toclevel = 0;
     }
   }

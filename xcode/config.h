@@ -21,8 +21,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.5svn"
-#define CUPS_MINIMAL "CUPS/1.5svn"
+#define CUPS_SVERSION "CUPS v1.5.0"
+#define CUPS_MINIMAL "CUPS/1.5.0"
 
 
 /*
@@ -216,8 +216,6 @@
  */
 
 #define HAVE_STRDUP 1
-#define HAVE_STRCASECMP 1
-#define HAVE_STRNCASECMP 1
 #define HAVE_STRLCAT 1
 #define HAVE_STRLCPY 1
 
@@ -227,6 +225,13 @@
  */
 
 #define HAVE_GETEUID 1
+
+
+/*
+ * Do we have the setpgid() function?
+ */
+
+#define HAVE_SETPGID 1
 
 
 /*

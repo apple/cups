@@ -3,7 +3,7 @@
  *
  *   Private string definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -45,16 +45,6 @@
 
 
 /*
- * Stuff for WIN32 and OS/2...
- */
-
-#  if defined(WIN32) || defined(__EMX__)
-#    define strcasecmp	_stricmp
-#    define strncasecmp	_strnicmp
-#  endif /* WIN32 || __EMX__ */
-
-
-/*
  * C++ magic...
  */
 
@@ -82,10 +72,6 @@ typedef struct _cups_sp_item_s		/**** String Pool Item ****/
 /*
  * Replacements for the ctype macros that are not affected by locale, since we
  * really only care about testing for ASCII characters when parsing files, etc.
- * These are used only within libcups since the rest of CUPS doesn't call
- * setlocale() for LC_CTYPE and doesn't have to worry about third-party
- * libraries doing so (and if they do that is a bug: NetSNMP, I'm looking at
- * you!)
  *
  * The _CUPS_INLINE definition controls whether we get an inline function body,
  * and external function body, or an external definition.
@@ -127,11 +113,18 @@ _cups_isupper(int ch)			/* I - Character to test */
 {
   return (ch >= 'A' && ch <= 'Z');
 }
+
+_CUPS_INLINE int			/* O - Converted character */
+_cups_tolower(int ch)			/* I - Character to convert */
+{
+  return (_cups_isupper(ch) ? ch - 'A' + 'a' : ch);
+}
 #  else
 extern int _cups_isalnum(int ch);
 extern int _cups_isalpha(int ch);
 extern int _cups_isspace(int ch);
 extern int _cups_isupper(int ch);
+extern int _cups_tolower(int ch);
 #  endif /* _CUPS_INLINE */
 
 
@@ -146,15 +139,9 @@ extern char	*_cups_strdup(const char *);
 #    define strdup _cups_strdup
 #  endif /* !HAVE_STRDUP */
 
-#  ifndef HAVE_STRCASECMP
 extern int	_cups_strcasecmp(const char *, const char *);
-#    define strcasecmp _cups_strcasecmp
-#  endif /* !HAVE_STRCASECMP */
 
-#  ifndef HAVE_STRNCASECMP
 extern int	_cups_strncasecmp(const char *, const char *, size_t n);
-#    define strncasecmp _cups_strncasecmp
-#  endif /* !HAVE_STRNCASECMP */
 
 #  ifndef HAVE_STRLCAT
 extern size_t _cups_strlcat(char *, const char *, size_t);

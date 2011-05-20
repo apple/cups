@@ -759,7 +759,7 @@ cupsdReadConfiguration(void)
 
       if ((host = gethostbyname(temp)) != NULL)
       {
-        if (strcasecmp(temp, host->h_name))
+        if (_cups_strcasecmp(temp, host->h_name))
         {
 	  cupsdSetString(&ServerName, host->h_name);
 	  cupsdAddAlias(ServerAlias, host->h_name);
@@ -770,7 +770,7 @@ cupsdReadConfiguration(void)
         if (host->h_aliases)
 	{
           for (i = 0; host->h_aliases[i]; i ++)
-	    if (strcasecmp(temp, host->h_aliases[i]))
+	    if (_cups_strcasecmp(temp, host->h_aliases[i]))
 	    {
 	      cupsdAddAlias(ServerAlias, host->h_aliases[i]);
 	      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s",
@@ -1078,13 +1078,13 @@ cupsdReadConfiguration(void)
     else
 #endif /* HAVE_LIBPAPER */
     if (!DefaultLanguage ||
-        !strcasecmp(DefaultLanguage, "C") ||
-        !strcasecmp(DefaultLanguage, "POSIX") ||
-	!strcasecmp(DefaultLanguage, "en") ||
-	!strncasecmp(DefaultLanguage, "en.", 3) ||
-	!strncasecmp(DefaultLanguage, "en_US", 5) ||
-	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
-	!strncasecmp(DefaultLanguage, "fr_CA", 5))
+        !_cups_strcasecmp(DefaultLanguage, "C") ||
+        !_cups_strcasecmp(DefaultLanguage, "POSIX") ||
+	!_cups_strcasecmp(DefaultLanguage, "en") ||
+	!_cups_strncasecmp(DefaultLanguage, "en.", 3) ||
+	!_cups_strncasecmp(DefaultLanguage, "en_US", 5) ||
+	!_cups_strncasecmp(DefaultLanguage, "en_CA", 5) ||
+	!_cups_strncasecmp(DefaultLanguage, "fr_CA", 5))
     {
      /*
       * These are the only locales that will default to "letter" size...
@@ -1100,7 +1100,7 @@ cupsdReadConfiguration(void)
   * Update classification setting as needed...
   */
 
-  if (Classification && !strcasecmp(Classification, "none"))
+  if (Classification && !_cups_strcasecmp(Classification, "none"))
     cupsdClearString(&Classification);
 
   if (Classification)
@@ -1639,7 +1639,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   if (*value == '[')
   {
    /*
-    * Parse hexadecimal IPv6 address...
+    * Parse hexadecimal IPv6/IPv4 address...
     */
 
     family  = AF_INET6;
@@ -1654,12 +1654,55 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 	     ptr2;
 	     ptr2 = strchr(ptr2 + 1, ':'), j ++);
 
-        i = 7 - j;
-	ptr ++;
+        i = 6 - j;
+	ptr += 2;
+      }
+      else if (isdigit(*ptr & 255) && strchr(ptr + 1, '.') && i >= 6)
+      {
+       /*
+        * Read IPv4 dotted quad...
+        */
+
+	unsigned val[4] = { 0, 0, 0, 0 };
+					/* IPv4 address values */
+
+	ipcount = sscanf(ptr, "%u.%u.%u.%u", val + 0, val + 1, val + 2,
+	                 val + 3);
+
+       /*
+	* Range check the IP numbers...
+	*/
+
+	for (i = 0; i < ipcount; i ++)
+	  if (val[i] > 255)
+	    return (0);
+
+       /*
+	* Merge everything into a 32-bit IPv4 address in ip[3]...
+	*/
+
+	ip[3] = (((((val[0] << 8) | val[1]) << 8) | val[2]) << 8) | val[3];
+
+	if (ipcount < 4)
+	  mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
+
+       /*
+        * If the leading words are all 0's then this is an IPv4 address...
+        */
+
+        if (!val[0] && !val[1] && !val[2])
+	  family  = AF_INET;
+
+        while (isdigit(*ptr & 255) || *ptr == '.')
+          ptr ++;
+	break;
       }
       else if (isxdigit(*ptr & 255))
       {
         ipval = strtoul(ptr, (char **)&ptr, 16);
+
+	if (*ptr == ':' && ptr[1] != ':')
+	  ptr ++;
 
 	if (ipval > 0xffff)
 	  return (0);
@@ -1671,9 +1714,6 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       }
       else
         return (0);
-
-      while (*ptr == ':')
-        ptr ++;
     }
 
     if (*ptr != ']')
@@ -1691,7 +1731,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     * Parse dotted-decimal IPv4 address...
     */
 
-    unsigned val[4];			/* IPv4 address values */
+    unsigned val[4] = { 0, 0, 0, 0 };	/* IPv4 address values */
 
 
     family  = AF_INET;
@@ -1704,14 +1744,6 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     for (i = 0; i < ipcount; i ++)
       if (val[i] > 255)
         return (0);
-
-   /*
-    * Make sure the trailing values are zeroed, as some C libraries like
-    * glibc apparently like to fill the unused arguments with garbage...
-    */
-
-    for (i = ipcount; i < 4; i ++)
-      val[i] = 0;
 
    /*
     * Merge everything into a 32-bit IPv4 address in ip[3]...
@@ -1740,7 +1772,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       if (family != AF_INET)
         return (0);
 
-      if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2, mask + 3) != 4)
+      if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2,
+                 mask + 3) != 4)
         return (0);
 
       mask[3] |= ((((mask[0] << 8) | mask[1]) << 8) | mask[2]) << 8;
@@ -1855,15 +1888,15 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
  		mask[4];		/* IP netmask components */
 
 
-  if (!strcasecmp(line, "Encryption"))
+  if (!_cups_strcasecmp(line, "Encryption"))
   {
    /*
     * "Encryption xxx" - set required encryption level...
     */
 
-    if (!strcasecmp(value, "never"))
+    if (!_cups_strcasecmp(value, "never"))
       loc->encryption = HTTP_ENCRYPT_NEVER;
-    else if (!strcasecmp(value, "always"))
+    else if (!_cups_strcasecmp(value, "always"))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Encryption value \"%s\" on line %d is invalid in this "
@@ -1871,9 +1904,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       loc->encryption = HTTP_ENCRYPT_REQUIRED;
     }
-    else if (!strcasecmp(value, "required"))
+    else if (!_cups_strcasecmp(value, "required"))
       loc->encryption = HTTP_ENCRYPT_REQUIRED;
-    else if (!strcasecmp(value, "ifrequested"))
+    else if (!_cups_strcasecmp(value, "ifrequested"))
       loc->encryption = HTTP_ENCRYPT_IF_REQUESTED;
     else
     {
@@ -1882,15 +1915,15 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       return (0);
     }
   }
-  else if (!strcasecmp(line, "Order"))
+  else if (!_cups_strcasecmp(line, "Order"))
   {
    /*
     * "Order Deny,Allow" or "Order Allow,Deny"...
     */
 
-    if (!strncasecmp(value, "deny", 4))
+    if (!_cups_strncasecmp(value, "deny", 4))
       loc->order_type = CUPSD_AUTH_ALLOW;
-    else if (!strncasecmp(value, "allow", 5))
+    else if (!_cups_strncasecmp(value, "allow", 5))
       loc->order_type = CUPSD_AUTH_DENY;
     else
     {
@@ -1899,7 +1932,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       return (0);
     }
   }
-  else if (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny"))
+  else if (!_cups_strcasecmp(line, "Allow") || !_cups_strcasecmp(line, "Deny"))
   {
    /*
     * Allow [From] host/ip...
@@ -1908,7 +1941,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
     while (*value)
     {
-      if (!strncasecmp(value, "from", 4))
+      if (!_cups_strncasecmp(value, "from", 4))
       {
        /*
 	* Strip leading "from"...
@@ -1916,7 +1949,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
 	value += 4;
 
-	while (isspace(*value & 255))
+	while (_cups_isspace(*value))
 	  value ++;
 
         if (!*value)
@@ -1927,9 +1960,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       * Find the end of the value...
       */
 
-      for (valptr = value; *valptr && !isspace(*valptr & 255); valptr ++);
+      for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
 
-      while (isspace(*valptr & 255))
+      while (_cups_isspace(*valptr))
         *valptr++ = '\0';
 
      /*
@@ -1948,24 +1981,24 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
       */
 
-      if (!strcasecmp(value, "all"))
+      if (!_cups_strcasecmp(value, "all"))
       {
        /*
 	* All hosts...
 	*/
 
-	if (!strcasecmp(line, "Allow"))
+	if (!_cups_strcasecmp(line, "Allow"))
 	  cupsdAddIPMask(&(loc->allow), zeros, zeros);
 	else
 	  cupsdAddIPMask(&(loc->deny), zeros, zeros);
       }
-      else if (!strcasecmp(value, "none"))
+      else if (!_cups_strcasecmp(value, "none"))
       {
        /*
 	* No hosts...
 	*/
 
-	if (!strcasecmp(line, "Allow"))
+	if (!_cups_strcasecmp(line, "Allow"))
 	  cupsdAddIPMask(&(loc->allow), ones, zeros);
 	else
 	  cupsdAddIPMask(&(loc->deny), ones, zeros);
@@ -1984,7 +2017,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	if (value[0] == '*')
 	  value ++;
 
-	if (!strcasecmp(line, "Allow"))
+	if (!_cups_strcasecmp(line, "Allow"))
 	  cupsdAddNameMask(&(loc->allow), value);
 	else
 	  cupsdAddNameMask(&(loc->deny), value);
@@ -2002,7 +2035,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	  return (0);
 	}
 
-	if (!strcasecmp(line, "Allow"))
+	if (!_cups_strcasecmp(line, "Allow"))
 	  cupsdAddIPMask(&(loc->allow), ip, mask);
 	else
 	  cupsdAddIPMask(&(loc->deny), ip, mask);
@@ -2015,39 +2048,39 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       value = valptr;
     }
   }
-  else if (!strcasecmp(line, "AuthType"))
+  else if (!_cups_strcasecmp(line, "AuthType"))
   {
    /*
     * AuthType {none,basic,digest,basicdigest,negotiate,default}
     */
 
-    if (!strcasecmp(value, "none"))
+    if (!_cups_strcasecmp(value, "none"))
     {
       loc->type  = CUPSD_AUTH_NONE;
       loc->level = CUPSD_AUTH_ANON;
     }
-    else if (!strcasecmp(value, "basic"))
+    else if (!_cups_strcasecmp(value, "basic"))
     {
       loc->type = CUPSD_AUTH_BASIC;
 
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-    else if (!strcasecmp(value, "digest"))
+    else if (!_cups_strcasecmp(value, "digest"))
     {
       loc->type = CUPSD_AUTH_DIGEST;
 
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-    else if (!strcasecmp(value, "basicdigest"))
+    else if (!_cups_strcasecmp(value, "basicdigest"))
     {
       loc->type = CUPSD_AUTH_BASICDIGEST;
 
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-    else if (!strcasecmp(value, "default"))
+    else if (!_cups_strcasecmp(value, "default"))
     {
       loc->type = CUPSD_AUTH_DEFAULT;
 
@@ -2055,7 +2088,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	loc->level = CUPSD_AUTH_USER;
     }
 #ifdef HAVE_GSSAPI
-    else if (!strcasecmp(value, "negotiate"))
+    else if (!_cups_strcasecmp(value, "negotiate"))
     {
       loc->type = CUPSD_AUTH_NEGOTIATE;
 
@@ -2071,13 +2104,13 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       return (0);
     }
   }
-  else if (!strcasecmp(line, "AuthClass"))
+  else if (!_cups_strcasecmp(line, "AuthClass"))
   {
    /*
     * AuthClass anonymous, user, system, group
     */
 
-    if (!strcasecmp(value, "anonymous"))
+    if (!_cups_strcasecmp(value, "anonymous"))
     {
       loc->type  = CUPSD_AUTH_NONE;
       loc->level = CUPSD_AUTH_ANON;
@@ -2087,7 +2120,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 		      "it from line %d.",
 	              value, linenum);
     }
-    else if (!strcasecmp(value, "user"))
+    else if (!_cups_strcasecmp(value, "user"))
     {
       loc->level = CUPSD_AUTH_USER;
 
@@ -2096,7 +2129,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 		      "\"Require valid-user\" on line %d.",
 	              value, linenum);
     }
-    else if (!strcasecmp(value, "group"))
+    else if (!_cups_strcasecmp(value, "group"))
     {
       loc->level = CUPSD_AUTH_GROUP;
 
@@ -2105,7 +2138,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 		      "\"Require user @groupname\" on line %d.",
 	              value, linenum);
     }
-    else if (!strcasecmp(value, "system"))
+    else if (!_cups_strcasecmp(value, "system"))
     {
       loc->level = CUPSD_AUTH_GROUP;
 
@@ -2124,7 +2157,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       return (0);
     }
   }
-  else if (!strcasecmp(line, "AuthGroupName"))
+  else if (!_cups_strcasecmp(line, "AuthGroupName"))
   {
     cupsdAddName(loc, value);
 
@@ -2133,7 +2166,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 		    "using \"Require user @%s\" on line %d.",
 		    value, value, linenum);
   }
-  else if (!strcasecmp(line, "Require"))
+  else if (!_cups_strcasecmp(line, "Require"))
   {
    /*
     * Apache synonym for AuthClass and AuthGroupName...
@@ -2145,15 +2178,15 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     *     Require user names
     */
 
-    for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+    for (valptr = value; !_cups_isspace(*valptr) && *valptr; valptr ++);
 
     if (*valptr)
       *valptr++ = '\0';
 
-    if (!strcasecmp(value, "valid-user") ||
-        !strcasecmp(value, "user"))
+    if (!_cups_strcasecmp(value, "valid-user") ||
+        !_cups_strcasecmp(value, "user"))
       loc->level = CUPSD_AUTH_USER;
-    else if (!strcasecmp(value, "group"))
+    else if (!_cups_strcasecmp(value, "group"))
       loc->level = CUPSD_AUTH_GROUP;
     else
     {
@@ -2168,7 +2201,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
     for (value = valptr; *value;)
     {
-      while (isspace(*value & 255))
+      while (_cups_isspace(*value))
 	value ++;
 
 #ifdef HAVE_AUTHORIZATION_H
@@ -2201,7 +2234,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	* Grab literal name.
 	*/
 
-        for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+        for (valptr = value; !_cups_isspace(*valptr) && *valptr; valptr ++);
       }
 
       if (*valptr)
@@ -2209,14 +2242,14 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdAddName(loc, value);
 
-      for (value = valptr; isspace(*value & 255); value ++);
+      for (value = valptr; _cups_isspace(*value); value ++);
     }
   }
-  else if (!strcasecmp(line, "Satisfy"))
+  else if (!_cups_strcasecmp(line, "Satisfy"))
   {
-    if (!strcasecmp(value, "all"))
+    if (!_cups_strcasecmp(value, "all"))
       loc->satisfy = CUPSD_AUTH_SATISFY_ALL;
-    else if (!strcasecmp(value, "any"))
+    else if (!_cups_strcasecmp(value, "any"))
       loc->satisfy = CUPSD_AUTH_SATISFY_ANY;
     else
     {
@@ -2267,7 +2300,7 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
     */
 
     for (valend = valstart; *valend; valend ++)
-      if (isspace(*valend & 255) || *valend == ',')
+      if (_cups_isspace(*valend) || *valend == ',')
 	break;
 
     if (*valend)
@@ -2277,34 +2310,34 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
     * Add the error to the bitmask...
     */
 
-    if (!strcasecmp(valstart, "all"))
+    if (!_cups_strcasecmp(valstart, "all"))
       fatal = CUPSD_FATAL_ALL;
-    else if (!strcasecmp(valstart, "browse"))
+    else if (!_cups_strcasecmp(valstart, "browse"))
       fatal |= CUPSD_FATAL_BROWSE;
-    else if (!strcasecmp(valstart, "-browse"))
+    else if (!_cups_strcasecmp(valstart, "-browse"))
       fatal &= ~CUPSD_FATAL_BROWSE;
-    else if (!strcasecmp(valstart, "config"))
+    else if (!_cups_strcasecmp(valstart, "config"))
       fatal |= CUPSD_FATAL_CONFIG;
-    else if (!strcasecmp(valstart, "-config"))
+    else if (!_cups_strcasecmp(valstart, "-config"))
       fatal &= ~CUPSD_FATAL_CONFIG;
-    else if (!strcasecmp(valstart, "listen"))
+    else if (!_cups_strcasecmp(valstart, "listen"))
       fatal |= CUPSD_FATAL_LISTEN;
-    else if (!strcasecmp(valstart, "-listen"))
+    else if (!_cups_strcasecmp(valstart, "-listen"))
       fatal &= ~CUPSD_FATAL_LISTEN;
-    else if (!strcasecmp(valstart, "log"))
+    else if (!_cups_strcasecmp(valstart, "log"))
       fatal |= CUPSD_FATAL_LOG;
-    else if (!strcasecmp(valstart, "-log"))
+    else if (!_cups_strcasecmp(valstart, "-log"))
       fatal &= ~CUPSD_FATAL_LOG;
-    else if (!strcasecmp(valstart, "permissions"))
+    else if (!_cups_strcasecmp(valstart, "permissions"))
       fatal |= CUPSD_FATAL_PERMISSIONS;
-    else if (!strcasecmp(valstart, "-permissions"))
+    else if (!_cups_strcasecmp(valstart, "-permissions"))
       fatal &= ~CUPSD_FATAL_PERMISSIONS;
-    else if (strcasecmp(valstart, "none"))
+    else if (_cups_strcasecmp(valstart, "none"))
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unknown FatalErrors kind \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
-      if (!isspace(*valstart & 255) || *valstart != ',')
+      if (!_cups_isspace(*valstart) || *valstart != ',')
 	break;
   }
 
@@ -2357,7 +2390,7 @@ parse_groups(const char *s)		/* I - Space-delimited groups */
       */
 
       for (valend = valstart; *valend; valend ++)
-	if (isspace(*valend) || *valend == ',')
+	if (_cups_isspace(*valend) || *valend == ',')
 	  break;
     }
 
@@ -2379,7 +2412,7 @@ parse_groups(const char *s)		/* I - Space-delimited groups */
 
     valstart = valend;
 
-    while (*valstart == ',' || isspace(*valstart))
+    while (*valstart == ',' || _cups_isspace(*valstart))
       valstart ++;
   }
 
@@ -2422,7 +2455,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
     */
 
     for (valend = valstart; *valend; valend ++)
-      if (isspace(*valend & 255) || *valend == ',')
+      if (_cups_isspace(*valend) || *valend == ',')
 	break;
 
     if (*valend)
@@ -2432,28 +2465,28 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
     * Add the protocol to the bitmask...
     */
 
-    if (!strcasecmp(valstart, "cups"))
+    if (!_cups_strcasecmp(valstart, "cups"))
       protocols |= BROWSE_CUPS;
-    else if (!strcasecmp(valstart, "slp"))
+    else if (!_cups_strcasecmp(valstart, "slp"))
       protocols |= BROWSE_SLP;
-    else if (!strcasecmp(valstart, "ldap"))
+    else if (!_cups_strcasecmp(valstart, "ldap"))
       protocols |= BROWSE_LDAP;
-    else if (!strcasecmp(valstart, "dnssd") ||
-             !strcasecmp(valstart, "dns-sd") ||
-             !strcasecmp(valstart, "bonjour"))
+    else if (!_cups_strcasecmp(valstart, "dnssd") ||
+             !_cups_strcasecmp(valstart, "dns-sd") ||
+             !_cups_strcasecmp(valstart, "bonjour"))
       protocols |= BROWSE_DNSSD;
-    else if (!strcasecmp(valstart, "lpd"))
+    else if (!_cups_strcasecmp(valstart, "lpd"))
       protocols |= BROWSE_LPD;
-    else if (!strcasecmp(valstart, "smb"))
+    else if (!_cups_strcasecmp(valstart, "smb"))
       protocols |= BROWSE_SMB;
-    else if (!strcasecmp(valstart, "all"))
+    else if (!_cups_strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
-    else if (strcasecmp(valstart, "none"))
+    else if (_cups_strcasecmp(valstart, "none"))
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unknown browse protocol \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
-      if (!isspace(*valstart & 255) || *valstart != ',')
+      if (!_cups_isspace(*valstart) || *valstart != ',')
 	break;
   }
 
@@ -2503,7 +2536,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
     * Decode the directive...
     */
 
-    if (!strcasecmp(line, "Include") && value)
+    if (!_cups_strcasecmp(line, "Include") && value)
     {
      /*
       * Include filename
@@ -2524,7 +2557,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	cupsFileClose(incfile);
       }
     }
-    else if (!strcasecmp(line, "<Location") && value)
+    else if (!_cups_strcasecmp(line, "<Location") && value)
     {
      /*
       * <Location path>
@@ -2534,7 +2567,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (linenum == 0)
 	return (0);
     }
-    else if (!strcasecmp(line, "<Policy") && value)
+    else if (!_cups_strcasecmp(line, "<Policy") && value)
     {
      /*
       * <Policy name>
@@ -2544,25 +2577,25 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (linenum == 0)
 	return (0);
     }
-    else if (!strcasecmp(line, "FatalErrors"))
+    else if (!_cups_strcasecmp(line, "FatalErrors"))
       FatalErrors = parse_fatal_errors(value);
-    else if (!strcasecmp(line, "FaxRetryInterval") && value)
+    else if (!_cups_strcasecmp(line, "FaxRetryInterval") && value)
     {
       JobRetryInterval = atoi(value);
       cupsdLogMessage(CUPSD_LOG_WARN,
 		      "FaxRetryInterval is deprecated; use "
 		      "JobRetryInterval on line %d.", linenum);
     }
-    else if (!strcasecmp(line, "FaxRetryLimit") && value)
+    else if (!_cups_strcasecmp(line, "FaxRetryLimit") && value)
     {
       JobRetryLimit = atoi(value);
       cupsdLogMessage(CUPSD_LOG_WARN,
 		      "FaxRetryLimit is deprecated; use "
 		      "JobRetryLimit on line %d.", linenum);
     }
-    else if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen")
+    else if (!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
 #ifdef HAVE_SSL
-             || !strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen")
+             || !_cups_strcasecmp(line, "SSLPort") || !_cups_strcasecmp(line, "SSLListen")
 #endif /* HAVE_SSL */
 	     )
     {
@@ -2644,7 +2677,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	lis->fd = -1;
 
 #ifdef HAVE_SSL
-        if (!strcasecmp(line, "SSLPort") || !strcasecmp(line, "SSLListen"))
+        if (!_cups_strcasecmp(line, "SSLPort") || !_cups_strcasecmp(line, "SSLListen"))
           lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #endif /* HAVE_SSL */
 
@@ -2669,7 +2702,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       httpAddrFreeList(addrlist);
     }
-    else if (!strcasecmp(line, "BrowseAddress") && value)
+    else if (!_cups_strcasecmp(line, "BrowseAddress") && value)
     {
      /*
       * Add a browse address to the list...
@@ -2696,7 +2729,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(dira, 0, sizeof(cupsd_dirsvc_addr_t));
 
-      if (!strcasecmp(value, "@LOCAL"))
+      if (!_cups_strcasecmp(value, "@LOCAL"))
       {
        /*
 	* Send browse data to all local interfaces...
@@ -2705,7 +2738,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	strcpy(dira->iface, "*");
 	NumBrowsers ++;
       }
-      else if (!strncasecmp(value, "@IF(", 4))
+      else if (!_cups_strncasecmp(value, "@IF(", 4))
       {
        /*
 	* Send browse data to the named interface...
@@ -2750,7 +2783,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         cupsdLogMessage(CUPSD_LOG_ERROR, "Bad BrowseAddress %s at line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "BrowseOrder") && value)
+    else if (!_cups_strcasecmp(line, "BrowseOrder") && value)
     {
      /*
       * "BrowseOrder Deny,Allow" or "BrowseOrder Allow,Deny"...
@@ -2763,18 +2796,18 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unable to initialize browse access control list.");
-      else if (!strncasecmp(value, "deny", 4))
+      else if (!_cups_strncasecmp(value, "deny", 4))
         location->order_type = CUPSD_AUTH_ALLOW;
-      else if (!strncasecmp(value, "allow", 5))
+      else if (!_cups_strncasecmp(value, "allow", 5))
         location->order_type = CUPSD_AUTH_DENY;
       else
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unknown BrowseOrder value %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "BrowseProtocols") ||
-             !strcasecmp(line, "BrowseLocalProtocols") ||
-             !strcasecmp(line, "BrowseRemoteProtocols"))
+    else if (!_cups_strcasecmp(line, "BrowseProtocols") ||
+             !_cups_strcasecmp(line, "BrowseLocalProtocols") ||
+             !_cups_strcasecmp(line, "BrowseRemoteProtocols"))
     {
      /*
       * "BrowseProtocols name [... name]"
@@ -2792,13 +2825,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         break;
       }
 
-      if (strcasecmp(line, "BrowseLocalProtocols"))
+      if (_cups_strcasecmp(line, "BrowseLocalProtocols"))
         BrowseRemoteProtocols = protocols;
-      if (strcasecmp(line, "BrowseRemoteProtocols"))
+      if (_cups_strcasecmp(line, "BrowseRemoteProtocols"))
         BrowseLocalProtocols = protocols;
     }
-    else if ((!strcasecmp(line, "BrowseAllow") ||
-              !strcasecmp(line, "BrowseDeny")) && value)
+    else if ((!_cups_strcasecmp(line, "BrowseAllow") ||
+              !_cups_strcasecmp(line, "BrowseDeny")) && value)
     {
      /*
       * BrowseAllow [From] host/ip...
@@ -2815,7 +2848,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Unable to initialize browse access control list.");
       else
       {
-	if (!strncasecmp(value, "from", 4))
+	if (!_cups_strncasecmp(value, "from", 4))
 	{
 	 /*
 	  * Skip leading "from"...
@@ -2830,7 +2863,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  * Skip leading whitespace...
 	  */
 
-	  while (isspace(*value & 255))
+	  while (_cups_isspace(*value))
 	    value ++;
 
 	  if (!*value)
@@ -2841,10 +2874,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  */
 
 	  for (valueptr = value;
-	       *valueptr && !isspace(*valueptr & 255);
+	       *valueptr && !_cups_isspace(*valueptr);
 	       valueptr ++);
 
-	  while (isspace(*valueptr & 255))
+	  while (_cups_isspace(*valueptr))
 	    *valueptr++ = '\0';
 
 	 /*
@@ -2863,24 +2896,24 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
 	  */
 
-	  if (!strcasecmp(value, "all"))
+	  if (!_cups_strcasecmp(value, "all"))
 	  {
 	   /*
 	    * All hosts...
 	    */
 
-	    if (!strcasecmp(line, "BrowseAllow"))
+	    if (!_cups_strcasecmp(line, "BrowseAllow"))
 	      cupsdAddIPMask(&(location->allow), zeros, zeros);
 	    else
 	      cupsdAddIPMask(&(location->deny), zeros, zeros);
 	  }
-	  else if (!strcasecmp(value, "none"))
+	  else if (!_cups_strcasecmp(value, "none"))
 	  {
 	   /*
 	    * No hosts...
 	    */
 
-	    if (!strcasecmp(line, "BrowseAllow"))
+	    if (!_cups_strcasecmp(line, "BrowseAllow"))
 	      cupsdAddIPMask(&(location->allow), ones, zeros);
 	    else
 	      cupsdAddIPMask(&(location->deny), ones, zeros);
@@ -2897,7 +2930,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    * Host or domain name...
 	    */
 
-	    if (!strcasecmp(line, "BrowseAllow"))
+	    if (!_cups_strcasecmp(line, "BrowseAllow"))
 	      cupsdAddNameMask(&(location->allow), value);
 	    else
 	      cupsdAddNameMask(&(location->deny), value);
@@ -2915,7 +2948,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	      break;
 	    }
 
-	    if (!strcasecmp(line, "BrowseAllow"))
+	    if (!_cups_strcasecmp(line, "BrowseAllow"))
 	      cupsdAddIPMask(&(location->allow), ip, mask);
 	    else
 	      cupsdAddIPMask(&(location->deny), ip, mask);
@@ -2929,7 +2962,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	}
       }
     }
-    else if (!strcasecmp(line, "BrowseRelay") && value)
+    else if (!_cups_strcasecmp(line, "BrowseRelay") && value)
     {
      /*
       * BrowseRelay [from] source [to] destination
@@ -2953,7 +2986,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       memset(relay, 0, sizeof(cupsd_dirsvc_relay_t));
 
-      if (!strncasecmp(value, "from ", 5))
+      if (!_cups_strncasecmp(value, "from ", 5))
       {
        /*
 	* Skip leading "from"...
@@ -2965,7 +2998,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Skip leading whitespace...
 	*/
 
-	while (isspace(*value))
+	while (_cups_isspace(*value))
 	  value ++;
       }
 
@@ -2974,10 +3007,10 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       for (valueptr = value;
-	   *valueptr && !isspace(*valueptr & 255);
+	   *valueptr && !_cups_isspace(*valueptr);
 	   valueptr ++);
 
-      while (isspace(*valueptr & 255))
+      while (_cups_isspace(*valueptr))
 	*valueptr++ = '\0';
 
      /*
@@ -3039,7 +3072,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Get "to" address and port...
       */
 
-      if (!strncasecmp(valueptr, "to ", 3))
+      if (!_cups_strncasecmp(valueptr, "to ", 3))
       {
        /*
         * Strip leading "to"...
@@ -3047,7 +3080,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	valueptr += 3;
 
-	while (isspace(*valueptr))
+	while (_cups_isspace(*valueptr))
 	  valueptr ++;
       }
 
@@ -3092,7 +3125,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                valueptr, linenum);
       }
     }
-    else if (!strcasecmp(line, "BrowsePoll") && value)
+    else if (!_cups_strcasecmp(line, "BrowsePoll") && value)
     {
      /*
       * BrowsePoll address[:port]
@@ -3154,22 +3187,22 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       cupsdLogMessage(CUPSD_LOG_INFO, "Polling %s:%d", pollp->hostname,
 	              pollp->port);
     }
-    else if (!strcasecmp(line, "DefaultAuthType") && value)
+    else if (!_cups_strcasecmp(line, "DefaultAuthType") && value)
     {
      /*
       * DefaultAuthType {basic,digest,basicdigest,negotiate}
       */
 
-      if (!strcasecmp(value, "none"))
+      if (!_cups_strcasecmp(value, "none"))
 	DefaultAuthType = CUPSD_AUTH_NONE;
-      else if (!strcasecmp(value, "basic"))
+      else if (!_cups_strcasecmp(value, "basic"))
 	DefaultAuthType = CUPSD_AUTH_BASIC;
-      else if (!strcasecmp(value, "digest"))
+      else if (!_cups_strcasecmp(value, "digest"))
 	DefaultAuthType = CUPSD_AUTH_DIGEST;
-      else if (!strcasecmp(value, "basicdigest"))
+      else if (!_cups_strcasecmp(value, "basicdigest"))
 	DefaultAuthType = CUPSD_AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
-      else if (!strcasecmp(value, "negotiate"))
+      else if (!_cups_strcasecmp(value, "negotiate"))
         DefaultAuthType = CUPSD_AUTH_NEGOTIATE;
 #endif /* HAVE_GSSAPI */
       else
@@ -3182,17 +3215,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #ifdef HAVE_SSL
-    else if (!strcasecmp(line, "DefaultEncryption"))
+    else if (!_cups_strcasecmp(line, "DefaultEncryption"))
     {
      /*
       * DefaultEncryption {Never,IfRequested,Required}
       */
 
-      if (!value || !strcasecmp(value, "never"))
+      if (!value || !_cups_strcasecmp(value, "never"))
 	DefaultEncryption = HTTP_ENCRYPT_NEVER;
-      else if (!strcasecmp(value, "required"))
+      else if (!_cups_strcasecmp(value, "required"))
 	DefaultEncryption = HTTP_ENCRYPT_REQUIRED;
-      else if (!strcasecmp(value, "ifrequested"))
+      else if (!_cups_strcasecmp(value, "ifrequested"))
 	DefaultEncryption = HTTP_ENCRYPT_IF_REQUESTED;
       else
       {
@@ -3204,7 +3237,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #endif /* HAVE_SSL */
-    else if (!strcasecmp(line, "User") && value)
+    else if (!_cups_strcasecmp(line, "User") && value)
     {
      /*
       * User ID to run as...
@@ -3247,7 +3280,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                  value, linenum);
       }
     }
-    else if (!strcasecmp(line, "Group") && value)
+    else if (!_cups_strcasecmp(line, "Group") && value)
     {
      /*
       * Group ID to run as...
@@ -3268,7 +3301,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                  value, linenum);
       }
     }
-    else if (!strcasecmp(line, "SystemGroup") && value)
+    else if (!_cups_strcasecmp(line, "SystemGroup") && value)
     {
      /*
       * SystemGroup (admin) group(s)...
@@ -3279,101 +3312,101 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Unknown SystemGroup \"%s\" on line %d, ignoring.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "HostNameLookups") && value)
+    else if (!_cups_strcasecmp(line, "HostNameLookups") && value)
     {
      /*
       * Do hostname lookups?
       */
 
-      if (!strcasecmp(value, "off") || !strcasecmp(value, "no") ||
-          !strcasecmp(value, "false"))
+      if (!_cups_strcasecmp(value, "off") || !_cups_strcasecmp(value, "no") ||
+          !_cups_strcasecmp(value, "false"))
         HostNameLookups = 0;
-      else if (!strcasecmp(value, "on") || !strcasecmp(value, "yes") ||
-          !strcasecmp(value, "true"))
+      else if (!_cups_strcasecmp(value, "on") || !_cups_strcasecmp(value, "yes") ||
+          !_cups_strcasecmp(value, "true"))
         HostNameLookups = 1;
-      else if (!strcasecmp(value, "double"))
+      else if (!_cups_strcasecmp(value, "double"))
         HostNameLookups = 2;
       else
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown HostNameLookups %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "AccessLogLevel") && value)
+    else if (!_cups_strcasecmp(line, "AccessLogLevel") && value)
     {
      /*
       * Amount of logging to do to access log...
       */
 
-      if (!strcasecmp(value, "all"))
+      if (!_cups_strcasecmp(value, "all"))
         AccessLogLevel = CUPSD_ACCESSLOG_ALL;
-      else if (!strcasecmp(value, "actions"))
+      else if (!_cups_strcasecmp(value, "actions"))
         AccessLogLevel = CUPSD_ACCESSLOG_ACTIONS;
-      else if (!strcasecmp(value, "config"))
+      else if (!_cups_strcasecmp(value, "config"))
         AccessLogLevel = CUPSD_ACCESSLOG_CONFIG;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "LogLevel") && value)
+    else if (!_cups_strcasecmp(line, "LogLevel") && value)
     {
      /*
       * Amount of logging to do to error log...
       */
 
-      if (!strcasecmp(value, "debug2"))
+      if (!_cups_strcasecmp(value, "debug2"))
         LogLevel = CUPSD_LOG_DEBUG2;
-      else if (!strcasecmp(value, "debug"))
+      else if (!_cups_strcasecmp(value, "debug"))
         LogLevel = CUPSD_LOG_DEBUG;
-      else if (!strcasecmp(value, "info"))
+      else if (!_cups_strcasecmp(value, "info"))
         LogLevel = CUPSD_LOG_INFO;
-      else if (!strcasecmp(value, "notice"))
+      else if (!_cups_strcasecmp(value, "notice"))
         LogLevel = CUPSD_LOG_NOTICE;
-      else if (!strcasecmp(value, "warn"))
+      else if (!_cups_strcasecmp(value, "warn"))
         LogLevel = CUPSD_LOG_WARN;
-      else if (!strcasecmp(value, "error"))
+      else if (!_cups_strcasecmp(value, "error"))
         LogLevel = CUPSD_LOG_ERROR;
-      else if (!strcasecmp(value, "crit"))
+      else if (!_cups_strcasecmp(value, "crit"))
         LogLevel = CUPSD_LOG_CRIT;
-      else if (!strcasecmp(value, "alert"))
+      else if (!_cups_strcasecmp(value, "alert"))
         LogLevel = CUPSD_LOG_ALERT;
-      else if (!strcasecmp(value, "emerg"))
+      else if (!_cups_strcasecmp(value, "emerg"))
         LogLevel = CUPSD_LOG_EMERG;
-      else if (!strcasecmp(value, "none"))
+      else if (!_cups_strcasecmp(value, "none"))
         LogLevel = CUPSD_LOG_NONE;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogLevel %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "LogTimeFormat") && value)
+    else if (!_cups_strcasecmp(line, "LogTimeFormat") && value)
     {
      /*
       * Amount of logging to do to error log...
       */
 
-      if (!strcasecmp(value, "standard"))
+      if (!_cups_strcasecmp(value, "standard"))
         LogTimeFormat = CUPSD_TIME_STANDARD;
-      else if (!strcasecmp(value, "usecs"))
+      else if (!_cups_strcasecmp(value, "usecs"))
         LogTimeFormat = CUPSD_TIME_USECS;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogTimeFormat %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "PrintcapFormat") && value)
+    else if (!_cups_strcasecmp(line, "PrintcapFormat") && value)
     {
      /*
       * Format of printcap file?
       */
 
-      if (!strcasecmp(value, "bsd"))
+      if (!_cups_strcasecmp(value, "bsd"))
         PrintcapFormat = PRINTCAP_BSD;
-      else if (!strcasecmp(value, "plist"))
+      else if (!_cups_strcasecmp(value, "plist"))
         PrintcapFormat = PRINTCAP_PLIST;
-      else if (!strcasecmp(value, "solaris"))
+      else if (!_cups_strcasecmp(value, "solaris"))
         PrintcapFormat = PRINTCAP_SOLARIS;
       else
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown PrintcapFormat %s on line %d.",
 	                value, linenum);
     }
-    else if (!strcasecmp(line, "ServerTokens") && value)
+    else if (!_cups_strcasecmp(line, "ServerTokens") && value)
     {
      /*
       * Set the string used for the Server header...
@@ -3384,26 +3417,26 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       uname(&plat);
 
-      if (!strcasecmp(value, "ProductOnly"))
+      if (!_cups_strcasecmp(value, "ProductOnly"))
 	cupsdSetString(&ServerHeader, "CUPS");
-      else if (!strcasecmp(value, "Major"))
+      else if (!_cups_strcasecmp(value, "Major"))
 	cupsdSetString(&ServerHeader, "CUPS/1");
-      else if (!strcasecmp(value, "Minor"))
+      else if (!_cups_strcasecmp(value, "Minor"))
 	cupsdSetString(&ServerHeader, "CUPS/1.4");
-      else if (!strcasecmp(value, "Minimal"))
+      else if (!_cups_strcasecmp(value, "Minimal"))
 	cupsdSetString(&ServerHeader, CUPS_MINIMAL);
-      else if (!strcasecmp(value, "OS"))
+      else if (!_cups_strcasecmp(value, "OS"))
 	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
-      else if (!strcasecmp(value, "Full"))
+      else if (!_cups_strcasecmp(value, "Full"))
 	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/1.1",
 	                plat.sysname);
-      else if (!strcasecmp(value, "None"))
+      else if (!_cups_strcasecmp(value, "None"))
 	cupsdClearString(&ServerHeader);
       else
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d.",
                         value, linenum);
     }
-    else if (!strcasecmp(line, "PassEnv") && value)
+    else if (!_cups_strcasecmp(line, "PassEnv") && value)
     {
      /*
       * PassEnv variable [... variable]
@@ -3412,7 +3445,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       for (; *value;)
       {
         for (valuelen = 0; value[valuelen]; valuelen ++)
-	  if (isspace(value[valuelen]) || value[valuelen] == ',')
+	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
 	    break;
 
         if (value[valuelen])
@@ -3424,18 +3457,39 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         cupsdSetEnv(value, NULL);
 
         for (value += valuelen; *value; value ++)
-	  if (!isspace(*value) || *value != ',')
+	  if (!_cups_isspace(*value) || *value != ',')
 	    break;
       }
     }
-    else if (!strcasecmp(line, "ServerAlias") && value)
+    else if (!_cups_strcasecmp(line, "ServerAlias") && value)
     {
+     /*
+      * ServerAlias name [... name]
+      */
+
       if (!ServerAlias)
         ServerAlias = cupsArrayNew(NULL, NULL);
 
-      cupsdAddAlias(ServerAlias, value);
+      for (; *value;)
+      {
+        for (valuelen = 0; value[valuelen]; valuelen ++)
+	  if (_cups_isspace(value[valuelen]) || value[valuelen] == ',')
+	    break;
+
+        if (value[valuelen])
+        {
+	  value[valuelen] = '\0';
+	  valuelen ++;
+	}
+
+	cupsdAddAlias(ServerAlias, value);
+
+        for (value += valuelen; *value; value ++)
+	  if (!_cups_isspace(*value) || *value != ',')
+	    break;
+      }
     }
-    else if (!strcasecmp(line, "SetEnv") && value)
+    else if (!_cups_strcasecmp(line, "SetEnv") && value)
     {
      /*
       * SetEnv variable value
@@ -3460,15 +3514,15 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                linenum);
     }
 #ifdef HAVE_SSL
-    else if (!strcasecmp(line, "SSLOptions"))
+    else if (!_cups_strcasecmp(line, "SSLOptions"))
     {
      /*
       * SSLOptions options
       */
 
-      if (!value || !strcasecmp(value, "none"))
+      if (!value || !_cups_strcasecmp(value, "none"))
         SSLOptions = CUPSD_SSL_NONE;
-      else if (!strcasecmp(value, "noemptyfragments"))
+      else if (!_cups_strcasecmp(value, "noemptyfragments"))
         SSLOptions = CUPSD_SSL_NOEMPTY;
       else
         cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3483,7 +3537,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       for (i = NUM_VARS, var = variables; i > 0; i --, var ++)
-        if (!strcasecmp(line, var->name))
+        if (!_cups_strcasecmp(line, var->name))
 	  break;
 
       if (i == 0)
@@ -3542,17 +3596,17 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "Missing boolean value for %s on line %d.",
 			      line, linenum);
-            else if (!strcasecmp(value, "true") ||
-	             !strcasecmp(value, "on") ||
-		     !strcasecmp(value, "enabled") ||
-		     !strcasecmp(value, "yes") ||
+            else if (!_cups_strcasecmp(value, "true") ||
+	             !_cups_strcasecmp(value, "on") ||
+		     !_cups_strcasecmp(value, "enabled") ||
+		     !_cups_strcasecmp(value, "yes") ||
 		     atoi(value) != 0)
               *((int *)var->ptr) = TRUE;
-	    else if (!strcasecmp(value, "false") ||
-	             !strcasecmp(value, "off") ||
-		     !strcasecmp(value, "disabled") ||
-		     !strcasecmp(value, "no") ||
-		     !strcasecmp(value, "0"))
+	    else if (!_cups_strcasecmp(value, "false") ||
+	             !_cups_strcasecmp(value, "off") ||
+		     !_cups_strcasecmp(value, "disabled") ||
+		     !_cups_strcasecmp(value, "no") ||
+		     !_cups_strcasecmp(value, "0"))
               *((int *)var->ptr) = FALSE;
 	    else
               cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3630,10 +3684,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     * Decode the directive...
     */
 
-    if (!strcasecmp(line, "</Location>"))
+    if (!_cups_strcasecmp(line, "</Location>"))
       return (linenum);
-    else if (!strcasecmp(line, "<Limit") ||
-             !strcasecmp(line, "<LimitExcept"))
+    else if (!_cups_strcasecmp(line, "<Limit") ||
+             !_cups_strcasecmp(line, "<LimitExcept"))
     {
       if (!value)
       {
@@ -3678,13 +3732,13 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         for (value = valptr; isspace(*value & 255); value ++);
       }
 
-      if (!strcasecmp(line, "<LimitExcept"))
+      if (!_cups_strcasecmp(line, "<LimitExcept"))
         loc->limit = CUPSD_AUTH_LIMIT_ALL ^ loc->limit;
 
       parent->limit &= ~loc->limit;
     }
-    else if (!strcasecmp(line, "</Limit>") ||
-             !strcasecmp(line, "</LimitExcept>"))
+    else if (!_cups_strcasecmp(line, "</Limit>") ||
+             !_cups_strcasecmp(line, "</LimitExcept>"))
       loc = parent;
     else if (!parse_aaa(loc, line, value, linenum))
     {
@@ -3747,7 +3801,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     * Decode the directive...
     */
 
-    if (!strcasecmp(line, "</Policy>"))
+    if (!_cups_strcasecmp(line, "</Policy>"))
     {
       if (op)
         cupsdLogMessage(CUPSD_LOG_WARN,
@@ -3758,7 +3812,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       return (linenum);
     }
-    else if (!strcasecmp(line, "<Limit") && !op)
+    else if (!_cups_strcasecmp(line, "<Limit") && !op)
     {
       if (!value)
       {
@@ -3784,7 +3838,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
         if (num_ops < (int)(sizeof(ops) / sizeof(ops[0])))
 	{
-	  if (!strcasecmp(value, "All"))
+	  if (!_cups_strcasecmp(value, "All"))
 	    ops[num_ops] = IPP_ANY_OPERATION;
 	  else if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
 	    cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3817,7 +3871,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = cupsdAddPolicyOp(pol, NULL, ops[0]);
     }
-    else if (!strcasecmp(line, "</Limit>") && op)
+    else if (!_cups_strcasecmp(line, "</Limit>") && op)
     {
      /*
       * Finish the current operation limit...
@@ -3835,10 +3889,10 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = NULL;
     }
-    else if (!strcasecmp(line, "JobPrivateAccess") ||
-	     !strcasecmp(line, "JobPrivateValues") ||
-	     !strcasecmp(line, "SubscriptionPrivateAccess") ||
-	     !strcasecmp(line, "SubscriptionPrivateValues"))
+    else if (!_cups_strcasecmp(line, "JobPrivateAccess") ||
+	     !_cups_strcasecmp(line, "JobPrivateValues") ||
+	     !_cups_strcasecmp(line, "SubscriptionPrivateAccess") ||
+	     !_cups_strcasecmp(line, "SubscriptionPrivateValues"))
     {
       if (op)
       {
@@ -3869,13 +3923,13 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	  * Save it appropriately...
 	  */
 
-	  if (!strcasecmp(line, "JobPrivateAccess"))
+	  if (!_cups_strcasecmp(line, "JobPrivateAccess"))
 	  {
 	   /*
 	    * JobPrivateAccess {all|default|user/group list|@@ACL}
 	    */
 
-            if (!strcasecmp(value, "default"))
+            if (!_cups_strcasecmp(value, "default"))
 	    {
 	      cupsdAddString(&(pol->job_access), "@OWNER");
 	      cupsdAddString(&(pol->job_access), "@SYSTEM");
@@ -3883,13 +3937,13 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	    else
 	      cupsdAddString(&(pol->job_access), value);
 	  }
-	  else if (!strcasecmp(line, "JobPrivateValues"))
+	  else if (!_cups_strcasecmp(line, "JobPrivateValues"))
 	  {
 	   /*
 	    * JobPrivateValues {all|none|default|attribute list}
 	    */
 
-	    if (!strcasecmp(value, "default"))
+	    if (!_cups_strcasecmp(value, "default"))
 	    {
 	      cupsdAddString(&(pol->job_attrs), "job-name");
 	      cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
@@ -3898,13 +3952,13 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	    else
 	      cupsdAddString(&(pol->job_attrs), value);
 	  }
-	  else if (!strcasecmp(line, "SubscriptionPrivateAccess"))
+	  else if (!_cups_strcasecmp(line, "SubscriptionPrivateAccess"))
 	  {
 	   /*
 	    * SubscriptionPrivateAccess {all|default|user/group list|@@ACL}
 	    */
 
-            if (!strcasecmp(value, "default"))
+            if (!_cups_strcasecmp(value, "default"))
 	    {
 	      cupsdAddString(&(pol->sub_access), "@OWNER");
 	      cupsdAddString(&(pol->sub_access), "@SYSTEM");
@@ -3912,13 +3966,13 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	    else
 	      cupsdAddString(&(pol->sub_access), value);
 	  }
-	  else /* if (!strcasecmp(line, "SubscriptionPrivateValues")) */
+	  else /* if (!_cups_strcasecmp(line, "SubscriptionPrivateValues")) */
 	  {
 	   /*
 	    * SubscriptionPrivateValues {all|none|default|attribute list}
 	    */
 
-	    if (!strcasecmp(value, "default"))
+	    if (!_cups_strcasecmp(value, "default"))
 	    {
 	      cupsdAddString(&(pol->sub_attrs), "notify-events");
 	      cupsdAddString(&(pol->sub_attrs), "notify-pull-method");

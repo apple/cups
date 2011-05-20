@@ -153,7 +153,7 @@ AC_CHECK_HEADER(sys/vfs.h,AC_DEFINE(HAVE_SYS_VFS_H))
 AC_CHECK_FUNCS(statfs statvfs)
 
 dnl Checks for string functions.
-AC_CHECK_FUNCS(strdup strcasecmp strncasecmp strlcat strlcpy)
+AC_CHECK_FUNCS(strdup strlcat strlcpy)
 if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then
 	echo Forcing snprintf emulation for HP-UX.
 else
@@ -165,6 +165,9 @@ AC_CHECK_FUNCS(random lrand48 arc4random)
 
 dnl Check for geteuid function.
 AC_CHECK_FUNCS(geteuid)
+
+dnl Check for setpgid function.
+AC_CHECK_FUNCS(setpgid)
 
 dnl Check for vsyslog function.
 AC_CHECK_FUNCS(vsyslog)

@@ -496,7 +496,7 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
 
   request = ippNewRequest(IPP_CREATE_PRINTER_SUBSCRIPTION);
 
-  if (!strcasecmp(printer_uri, "#ALL#"))
+  if (!_cups_strcasecmp(printer_uri, "#ALL#"))
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/");
   else
@@ -611,7 +611,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 	if (attr->name && !strcmp(attr->name, "printer-uri-supported"))
 	{
 	  if ((ptr = strrchr(attr->values[0].string.text, '/')) != NULL &&
-	      (!name || strcasecmp(name, ptr + 1)))
+	      (!name || _cups_strcasecmp(name, ptr + 1)))
 	  {
 	   /*
 	    * Don't show the current class...
@@ -627,7 +627,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 	   attr = attr->next)
 	if (attr->name && !strcmp(attr->name, "printer-name"))
 	{
-	  if (!name || strcasecmp(name, attr->values[0].string.text))
+	  if (!name || _cups_strcasecmp(name, attr->values[0].string.text))
 	  {
 	   /*
 	    * Don't show the current class...
@@ -688,7 +688,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 	  {
 	    for (j = 0; j < num_printers; j ++)
 	    {
-	      if (!strcasecmp(attr->values[i].string.text,
+	      if (!_cups_strcasecmp(attr->values[i].string.text,
 	                      cgiGetArray("MEMBER_NAMES", j)))
 	      {
 		cgiSetArray("MEMBER_SELECTED", j, "SELECTED");
@@ -960,13 +960,13 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         *makeptr = '\0';
       else if ((makeptr = strchr(make, '-')) != NULL)
         *makeptr = '\0';
-      else if (!strncasecmp(make, "laserjet", 8) ||
-               !strncasecmp(make, "deskjet", 7) ||
-               !strncasecmp(make, "designjet", 9))
+      else if (!_cups_strncasecmp(make, "laserjet", 8) ||
+               !_cups_strncasecmp(make, "deskjet", 7) ||
+               !_cups_strncasecmp(make, "designjet", 9))
         strcpy(make, "HP");
-      else if (!strncasecmp(make, "phaser", 6))
+      else if (!_cups_strncasecmp(make, "phaser", 6))
         strcpy(make, "Xerox");
-      else if (!strncasecmp(make, "stylus", 6))
+      else if (!_cups_strncasecmp(make, "stylus", 6))
         strcpy(make, "Epson");
       else
         strcpy(make, "Generic");
@@ -1725,7 +1725,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     {
       val = cupsGetOption("DefaultAuthType", num_settings, settings);
 
-      if (!val || !strcasecmp(val, "Negotiate"))
+      if (!val || !_cups_strcasecmp(val, "Negotiate"))
         strlcpy(default_auth_type, "Basic", sizeof(default_auth_type));
       else
         strlcpy(default_auth_type, val, sizeof(default_auth_type));
@@ -1793,14 +1793,14 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 						    num_settings, settings));
 
     if (advanced && !changed)
-      changed = strcasecmp(local_protocols, current_local_protocols) ||
-		strcasecmp(remote_protocols, current_remote_protocols) ||
-		strcasecmp(browse_web_if, current_browse_web_if) ||
-		strcasecmp(preserve_job_history, current_preserve_job_history) ||
-		strcasecmp(preserve_job_files, current_preserve_job_files) ||
-		strcasecmp(max_clients, current_max_clients) ||
-		strcasecmp(max_jobs, current_max_jobs) ||
-		strcasecmp(max_log_size, current_max_log_size);
+      changed = _cups_strcasecmp(local_protocols, current_local_protocols) ||
+		_cups_strcasecmp(remote_protocols, current_remote_protocols) ||
+		_cups_strcasecmp(browse_web_if, current_browse_web_if) ||
+		_cups_strcasecmp(preserve_job_history, current_preserve_job_history) ||
+		_cups_strcasecmp(preserve_job_files, current_preserve_job_files) ||
+		_cups_strcasecmp(max_clients, current_max_clients) ||
+		_cups_strcasecmp(max_jobs, current_max_jobs) ||
+		_cups_strcasecmp(max_log_size, current_max_log_size);
 
     if (changed)
     {
@@ -1834,29 +1834,29 @@ do_config_server(http_t *http)		/* I - HTTP connection */
         * Add advanced settings...
 	*/
 
-	if (strcasecmp(local_protocols, current_local_protocols))
+	if (_cups_strcasecmp(local_protocols, current_local_protocols))
 	  num_settings = cupsAddOption("BrowseLocalProtocols", local_protocols,
 				       num_settings, &settings);
-	if (strcasecmp(remote_protocols, current_remote_protocols))
+	if (_cups_strcasecmp(remote_protocols, current_remote_protocols))
 	  num_settings = cupsAddOption("BrowseRemoteProtocols", remote_protocols,
 				       num_settings, &settings);
-	if (strcasecmp(browse_web_if, current_browse_web_if))
+	if (_cups_strcasecmp(browse_web_if, current_browse_web_if))
 	  num_settings = cupsAddOption("BrowseWebIF", browse_web_if,
 				       num_settings, &settings);
-	if (strcasecmp(preserve_job_history, current_preserve_job_history))
+	if (_cups_strcasecmp(preserve_job_history, current_preserve_job_history))
 	  num_settings = cupsAddOption("PreserveJobHistory",
 	                               preserve_job_history, num_settings,
 				       &settings);
-	if (strcasecmp(preserve_job_files, current_preserve_job_files))
+	if (_cups_strcasecmp(preserve_job_files, current_preserve_job_files))
 	  num_settings = cupsAddOption("PreserveJobFiles", preserve_job_files,
 	                               num_settings, &settings);
-        if (strcasecmp(max_clients, current_max_clients))
+        if (_cups_strcasecmp(max_clients, current_max_clients))
 	  num_settings = cupsAddOption("MaxClients", max_clients, num_settings,
 	                               &settings);
-        if (strcasecmp(max_jobs, current_max_jobs))
+        if (_cups_strcasecmp(max_jobs, current_max_jobs))
 	  num_settings = cupsAddOption("MaxJobs", max_jobs, num_settings,
 	                               &settings);
-        if (strcasecmp(max_log_size, current_max_log_size))
+        if (_cups_strcasecmp(max_log_size, current_max_log_size))
 	  num_settings = cupsAddOption("MaxLogSize", max_log_size, num_settings,
 	                               &settings);
       }
@@ -2379,7 +2379,7 @@ do_export(http_t *http)			/* I - HTTP connection */
         dest = cgiGetArray("PRINTER_NAME", i);
 
         for (j = 0; j < export_count; j ++)
-	  if (!strcasecmp(dest, cgiGetArray("EXPORT_NAME", j)))
+	  if (!_cups_strcasecmp(dest, cgiGetArray("EXPORT_NAME", j)))
             break;
 
         cgiSetArray("PRINTER_EXPORT", i, j < export_count ? "Y" : "");
@@ -2567,7 +2567,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	*/
 
 	if (device_info && device_make_and_model && device_uri &&
-	    strcasecmp(device_make_and_model, "unknown") &&
+	    _cups_strcasecmp(device_make_and_model, "unknown") &&
 	    strchr(device_uri, ':'))
 	{
 	 /*
@@ -2594,7 +2594,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    * suitable name.
 	    */
 
-            if (strncasecmp(device_info, "unknown", 7))
+            if (_cups_strncasecmp(device_info, "unknown", 7))
 	      ptr = device_info;
             else if ((ptr = strstr(device_uri, "://")) != NULL)
 	      ptr += 3;
@@ -2712,7 +2712,7 @@ do_menu(http_t *http)			/* I - HTTP connection */
   cgiSetVariable("HAVE_GSSAPI", "1");
 
   if ((val = cupsGetOption("DefaultAuthType", num_settings,
-                           settings)) != NULL && !strcasecmp(val, "Negotiate"))
+                           settings)) != NULL && !_cups_strcasecmp(val, "Negotiate"))
     cgiSetVariable("KERBEROS", "CHECKED");
   else
 #endif /* HAVE_GSSAPI */
@@ -2769,16 +2769,16 @@ do_menu(http_t *http)			/* I - HTTP connection */
                            settings)) == NULL)
     val = "No";
 
-  if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
-      !strcasecmp(val, "true"))
+  if (!_cups_strcasecmp(val, "yes") || !_cups_strcasecmp(val, "on") ||
+      !_cups_strcasecmp(val, "true"))
     cgiSetVariable("BROWSE_WEB_IF", "CHECKED");
 
   if ((val = cupsGetOption("PreserveJobHistory", num_settings,
                            settings)) == NULL)
     val = "Yes";
 
-  if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
-      !strcasecmp(val, "true"))
+  if (!_cups_strcasecmp(val, "yes") || !_cups_strcasecmp(val, "on") ||
+      !_cups_strcasecmp(val, "true"))
   {
     cgiSetVariable("PRESERVE_JOB_HISTORY", "CHECKED");
 
@@ -2786,8 +2786,8 @@ do_menu(http_t *http)			/* I - HTTP connection */
 			     settings)) == NULL)
       val = "No";
 
-    if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
-	!strcasecmp(val, "true"))
+    if (!_cups_strcasecmp(val, "yes") || !_cups_strcasecmp(val, "on") ||
+	!_cups_strcasecmp(val, "true"))
       cgiSetVariable("PRESERVE_JOB_FILES", "CHECKED");
   }
 
@@ -3530,9 +3530,9 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 		 cparam;
 		 cparam = ppdNextCustomParam(coption), m ++)
 	    {
-	      if (!strcasecmp(option->keyword, "PageSize") &&
-	          strcasecmp(cparam->name, "Width") &&
-		  strcasecmp(cparam->name, "Height"))
+	      if (!_cups_strcasecmp(option->keyword, "PageSize") &&
+	          _cups_strcasecmp(cparam->name, "Width") &&
+		  _cups_strcasecmp(cparam->name, "Height"))
               {
 	        m --;
 		continue;
@@ -3545,7 +3545,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	      switch (cparam->type)
 	      {
 		case PPD_CUSTOM_POINTS :
-		    if (!strncasecmp(option->defchoice, "Custom.", 7))
+		    if (!_cups_strncasecmp(option->defchoice, "Custom.", 7))
 		    {
 		      units = option->defchoice + strlen(option->defchoice) - 2;
 
@@ -4085,7 +4085,7 @@ get_option_value(
 
     return (NULL);
   }
-  else if (strcasecmp(val, "Custom") ||
+  else if (_cups_strcasecmp(val, "Custom") ||
            (coption = ppdFindCustomOption(ppd, name)) == NULL)
   {
    /*

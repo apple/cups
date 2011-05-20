@@ -1,8 +1,20 @@
-CHANGES.txt - 2011-05-11
+CHANGES.txt - 2011-05-20
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Updated the PostScript filter to support IncludeFeature in more
+	  circumstances (STR #3417)
+	- The schedule did not correctly parse some IPv6 addresses and masks in
+	  the cupsd.conf file (STR #3533)
+	- Fixed a case-insensitive string comparison issue for locales that do
+	  not treat "I" and "i" as equivalent (STR #3800)
+	- The scheduler reported an incorrect job-printer-uri value when sharing
+	  was not enabled (STR #3639)
+	- The scheduler now allows the ServerAlias directive to contain multiple
+	  hostnames separated by spaces or commas (STR #3813)
+	- The scheduler now sets the process group for child processes and
+	  manages the group (STR #2829)
 	- Fixed some minor issues discovered by a Coverity scan (STR #3838)
 	- The scheduler now more carefully creates and removes configuration,
 	  cache, and state files (STR #3715)
@@ -22,7 +34,7 @@ CHANGES IN CUPS V1.5b1
 	  sizes in PDF files when the user has not selected a particular media
 	  size (STR #3689)
 	- Added new PWG Raster filter for IPP Everywhere printer support.
-	- Added printer-uuid attribute.
+	- Added job-uuid, printer-uuid, and subscription-uuid attributes.
 	- Added support for the cupsSingleFile PPD keyword.
 	- Dropped support for the printer-state-history attribute (STR #3654)
 	- Added support for a new cupsIPPSupplies keyword in PPD files to allow

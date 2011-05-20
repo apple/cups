@@ -114,13 +114,13 @@ static const char * const pattrs[] =	/* Printer attributes we want */
 };
 static const char * const remote_job_states[] =
 {					/* Remote job state keywords */
-  "cups-remote-pending",
-  "cups-remote-pending-held",
-  "cups-remote-processing",
-  "cups-remote-stopped",
-  "cups-remote-canceled",
-  "cups-remote-aborted",
-  "cups-remote-completed"
+  "+cups-remote-pending",
+  "+cups-remote-pending-held",
+  "+cups-remote-processing",
+  "+cups-remote-stopped",
+  "+cups-remote-canceled",
+  "+cups-remote-aborted",
+  "+cups-remote-completed"
 };
 static _cups_mutex_t	report_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control access */
@@ -452,39 +452,39 @@ main(int  argc,				/* I - Number of command-line args */
       * Process the option...
       */
 
-      if (!strcasecmp(name, "waitjob"))
+      if (!_cups_strcasecmp(name, "waitjob"))
       {
        /*
         * Wait for job completion?
 	*/
 
-        waitjob = !strcasecmp(value, "on") ||
-	          !strcasecmp(value, "yes") ||
-	          !strcasecmp(value, "true");
+        waitjob = !_cups_strcasecmp(value, "on") ||
+	          !_cups_strcasecmp(value, "yes") ||
+	          !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "waitprinter"))
+      else if (!_cups_strcasecmp(name, "waitprinter"))
       {
        /*
         * Wait for printer idle?
 	*/
 
-        waitprinter = !strcasecmp(value, "on") ||
-	              !strcasecmp(value, "yes") ||
-	              !strcasecmp(value, "true");
+        waitprinter = !_cups_strcasecmp(value, "on") ||
+	              !_cups_strcasecmp(value, "yes") ||
+	              !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "encryption"))
+      else if (!_cups_strcasecmp(name, "encryption"))
       {
        /*
         * Enable/disable encryption?
 	*/
 
-        if (!strcasecmp(value, "always"))
+        if (!_cups_strcasecmp(value, "always"))
 	  cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
-        else if (!strcasecmp(value, "required"))
+        else if (!_cups_strcasecmp(value, "required"))
 	  cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-        else if (!strcasecmp(value, "never"))
+        else if (!_cups_strcasecmp(value, "never"))
 	  cupsSetEncryption(HTTP_ENCRYPT_NEVER);
-        else if (!strcasecmp(value, "ifrequested"))
+        else if (!_cups_strcasecmp(value, "ifrequested"))
 	  cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
 	else
 	{
@@ -493,7 +493,7 @@ main(int  argc,				/* I - Number of command-line args */
 			       value);
         }
       }
-      else if (!strcasecmp(name, "version"))
+      else if (!_cups_strcasecmp(name, "version"))
       {
         if (!strcmp(value, "1.0"))
 	  version = 10;
@@ -513,14 +513,14 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
 #ifdef HAVE_LIBZ
-      else if (!strcasecmp(name, "compression"))
+      else if (!_cups_strcasecmp(name, "compression"))
       {
-        if (!strcasecmp(value, "true") || !strcasecmp(value, "yes") ||
-	    !strcasecmp(value, "on") || !strcasecmp(value, "gzip"))
+        if (!_cups_strcasecmp(value, "true") || !_cups_strcasecmp(value, "yes") ||
+	    !_cups_strcasecmp(value, "on") || !_cups_strcasecmp(value, "gzip"))
 	  compression = "gzip";
       }
 #endif /* HAVE_LIBZ */
-      else if (!strcasecmp(name, "contimeout"))
+      else if (!_cups_strcasecmp(name, "contimeout"))
       {
        /*
         * Set the connection timeout...
@@ -551,9 +551,9 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc == 6)
   {
     num_files    = 0;
-    send_options = !strcasecmp(final_content_type, "application/pdf") ||
-                   !strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
-                   !strncasecmp(final_content_type, "image/", 6);
+    send_options = !_cups_strcasecmp(final_content_type, "application/pdf") ||
+                   !_cups_strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
+                   !_cups_strncasecmp(final_content_type, "image/", 6);
 
     fputs("DEBUG: Sending stdin for job...\n", stderr);
   }
@@ -925,7 +925,7 @@ main(int  argc,				/* I - Number of command-line args */
       else if (!printer_accepting)
         update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
 			     "cups-ipp-missing-printer-is-accepting-jobs");
-        
+
       if ((printer_state = ippFindAttribute(supported,
 					    "printer-state-reasons",
 					    IPP_TAG_KEYWORD)) != NULL && !busy)
@@ -1149,7 +1149,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
@@ -1158,7 +1158,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (!document_format)
     {
       for (i = 0; i < format_sup->num_values; i ++)
-	if (!strcasecmp("application/octet-stream",
+	if (!_cups_strcasecmp("application/octet-stream",
 	                format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
@@ -2225,7 +2225,7 @@ new_request(
       else if ((keyword = cupsGetOption("ColorModel", num_options,
 					options)) != NULL)
       {
-	if (!strcasecmp(keyword, "Gray"))
+	if (!_cups_strcasecmp(keyword, "Gray"))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
 			       NULL, "monochrome");
 	else
@@ -2240,13 +2240,13 @@ new_request(
       else if ((keyword = cupsGetOption("cupsPrintQuality", num_options,
 					options)) != NULL)
       {
-	if (!strcasecmp(keyword, "draft"))
+	if (!_cups_strcasecmp(keyword, "draft"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_DRAFT);
-	else if (!strcasecmp(keyword, "normal"))
+	else if (!_cups_strcasecmp(keyword, "normal"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_NORMAL);
-	else if (!strcasecmp(keyword, "high"))
+	else if (!_cups_strcasecmp(keyword, "high"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_HIGH);
       }
@@ -2258,13 +2258,13 @@ new_request(
                (keyword = cupsGetOption(pc->sides_option, num_options,
 					options)) != NULL)
       {
-	if (!strcasecmp(keyword, pc->sides_1sided))
+	if (!_cups_strcasecmp(keyword, pc->sides_1sided))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "one-sided");
-	else if (!strcasecmp(keyword, pc->sides_2sided_long))
+	else if (!_cups_strcasecmp(keyword, pc->sides_2sided_long))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-long-edge");
-	if (!strcasecmp(keyword, pc->sides_2sided_short))
+	if (!_cups_strcasecmp(keyword, pc->sides_2sided_short))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-short-edge");
       }
@@ -2272,7 +2272,7 @@ new_request(
       if (doc_handling_sup &&
  	  (keyword = cupsGetOption("collate", num_options, options)) != NULL)
       {
-        if (!strcasecmp(keyword, "true"))
+        if (!_cups_strcasecmp(keyword, "true"))
 	  collate_str = "separate-documents-collated-copies";
 	else
 	  collate_str = "separate-documents-uncollated-copies";
@@ -2496,7 +2496,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 
     if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL &&
         (ppdattr = ppdFindAttr(ppd, "cupsIPPSupplies", NULL)) != NULL &&
-        ppdattr->value && strcasecmp(ppdattr->value, "true"))
+        ppdattr->value && _cups_strcasecmp(ppdattr->value, "true"))
       ipp_supplies = 0;
     else
       ipp_supplies = 1;
@@ -2545,6 +2545,7 @@ run_as_user(int        argc,		/* I - Number of command-line args */
 	    const char *device_uri,	/* I - Device URI */
 	    int        fd)		/* I - File to print */
 {
+  const char		*auth_negotiate;/* AUTH_NEGOTIATE env var */
   xpc_connection_t	conn;		/* Connection to XPC service */
   xpc_object_t		request;	/* Request message dictionary */
   __block xpc_object_t	response;	/* Response message dictionary */
@@ -2605,6 +2606,8 @@ run_as_user(int        argc,		/* I - Number of command-line args */
   xpc_dictionary_set_string(request, "options", argv[5]);
   xpc_dictionary_set_string(request, "auth-info-required",
                             getenv("AUTH_INFO_REQUIRED"));
+  if ((auth_negotiate = getenv("AUTH_NEGOTIATE")) != NULL)
+    xpc_dictionary_set_string(request, "auth-negotiate", auth_negotiate);
   xpc_dictionary_set_fd(request, "stdin", fd);
   xpc_dictionary_set_fd(request, "stderr", 2);
   xpc_dictionary_set_fd(request, "side-channel", CUPS_SC_FD);

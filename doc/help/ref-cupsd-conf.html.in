@@ -2782,6 +2782,7 @@ HREF="#ServerName"><CODE>ServerName</CODE></A>.</P>
 ServerAlias althost
 ServerAlias foo.example.com
 ServerAlias bar.example.com
+ServerAlias one.example.com two.example.com
 ServerAlias *
 </PRE>
 

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "5 November 2010" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "18 May 2011" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -645,7 +645,9 @@ ServerAdmin user@domain.com
 .br
 Specifies the email address of the server administrator.
 .TP 5
-ServerAlias hostname
+ServerAlias hostname [... hostname]
+.TP 5
+ServerAlias *
 .br
 Specifies an alternate name that the server is known by. The special name "*"
 allows any name to be used.

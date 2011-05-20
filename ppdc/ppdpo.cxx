@@ -190,7 +190,7 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
     if (!g->options->count)
       continue;
 
-    if (strcasecmp(g->name->value, "General"))
+    if (_cups_strcasecmp(g->name->value, "General"))
       catalog->add_message(g->text->value);
 
     for (o = (ppdcOption *)g->options->first();

@@ -235,7 +235,7 @@ main(int  argc,				/* I - Number of command-line args */
                    kDNSServiceInterfaceIndexLocalOnly,
                    "_printer._tcp", NULL, browse_local_callback, devices);
 
-  pdl_datastream_ref = main_ref;  
+  pdl_datastream_ref = main_ref;
   DNSServiceBrowse(&pdl_datastream_ref, kDNSServiceFlagsShareConnection, 0,
                    "_pdl-datastream._tcp", NULL, browse_callback, devices);
 
@@ -325,8 +325,8 @@ main(int  argc,				/* I - Number of command-line args */
 
           if (!best)
 	    best = device;
-	  else if (strcasecmp(best->name, device->name) ||
-	           strcasecmp(best->domain, device->domain))
+	  else if (_cups_strcasecmp(best->name, device->name) ||
+	           _cups_strcasecmp(best->domain, device->domain))
           {
 	    unquote(uriName, best->fullName, sizeof(uriName));
 
@@ -573,12 +573,12 @@ get_device(cups_array_t *devices,	/* I - Device array */
   for (device = cupsArrayFind(devices, &key);
        device;
        device = cupsArrayNext(devices))
-    if (strcasecmp(device->name, key.name))
+    if (_cups_strcasecmp(device->name, key.name))
       break;
     else if (device->type == key.type)
     {
-      if (!strcasecmp(device->domain, "local.") &&
-          strcasecmp(device->domain, replyDomain))
+      if (!_cups_strcasecmp(device->domain, "local.") &&
+          _cups_strcasecmp(device->domain, replyDomain))
       {
        /*
         * Update the .local listing to use the "global" domain name instead.
@@ -696,8 +696,8 @@ query_callback(
        device;
        device = cupsArrayNext(devices))
   {
-    if (strcasecmp(device->name, dkey.name) ||
-        strcasecmp(device->domain, dkey.domain))
+    if (_cups_strcasecmp(device->name, dkey.name) ||
+        _cups_strcasecmp(device->domain, dkey.domain))
     {
       device = NULL;
       break;
@@ -758,7 +758,7 @@ query_callback(
 	else
 	  continue;
 
-        if (!strncasecmp(key, "usb_", 4))
+        if (!_cups_strncasecmp(key, "usb_", 4))
 	{
 	 /*
 	  * Add USB device ID information...
@@ -769,12 +769,12 @@ query_callback(
 	           key + 4, value);
         }
 
-        if (!strcasecmp(key, "usb_MFG") || !strcasecmp(key, "usb_MANU") ||
-	    !strcasecmp(key, "usb_MANUFACTURER"))
+        if (!_cups_strcasecmp(key, "usb_MFG") || !_cups_strcasecmp(key, "usb_MANU") ||
+	    !_cups_strcasecmp(key, "usb_MANUFACTURER"))
 	  strcpy(make_and_model, value);
-        else if (!strcasecmp(key, "usb_MDL") || !strcasecmp(key, "usb_MODEL"))
+        else if (!_cups_strcasecmp(key, "usb_MDL") || !_cups_strcasecmp(key, "usb_MODEL"))
 	  strcpy(model, value);
-	else if (!strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
+	else if (!_cups_strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
 	{
 	  if (value[0] == '(')
 	  {
@@ -790,18 +790,18 @@ query_callback(
 	  else
 	    strcpy(model, value);
         }
-	else if (!strcasecmp(key, "ty"))
+	else if (!_cups_strcasecmp(key, "ty"))
 	{
           strcpy(model, value);
 
 	  if ((ptr = strchr(model, ',')) != NULL)
 	    *ptr = '\0';
 	}
-	else if (!strcasecmp(key, "priority"))
+	else if (!_cups_strcasecmp(key, "priority"))
 	  device->priority = atoi(value);
 	else if ((device->type == CUPS_DEVICE_IPP ||
 	          device->type == CUPS_DEVICE_PRINTER) &&
-		 !strcasecmp(key, "printer-type"))
+		 !_cups_strcasecmp(key, "printer-type"))
 	{
 	 /*
 	  * This is a CUPS printer!
@@ -822,9 +822,9 @@ query_callback(
         if (make_and_model[0])
 	  snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
 	           make_and_model, model);
-        else if (!strncasecmp(model, "designjet ", 10))
+        else if (!_cups_strncasecmp(model, "designjet ", 10))
 	  snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s", model + 10);
-        else if (!strncasecmp(model, "stylus ", 7))
+        else if (!_cups_strncasecmp(model, "stylus ", 7))
 	  snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s", model + 7);
         else if ((ptr = strchr(model, ' ')) != NULL)
 	{

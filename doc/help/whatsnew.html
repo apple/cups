@@ -14,76 +14,33 @@
 
 <OL START="1">
 
-	<LI><EM>User defaults;</EM> Starting in CUPS 1.2, user defaults were
-	stored in the ~/.cups directory, and the old ~/.cupsrc and ~/.lpoptions
-	files were deprecated. Support for ~/.cupsrc and ~/.lpoptions have been
-	removed in CUPS 1.5.</LI>
+	<LI><EM>User defaults;</EM> Starting in CUPS 1.2, user defaults were stored in the ~/.cups directory, and the old ~/.cupsrc and ~/.lpoptions files were deprecated. Support for ~/.cupsrc and ~/.lpoptions have been removed in CUPS 1.5.</LI>
 
-	<LI><EM>IPP test tool;</EM> The ipptest is now a first-class user
-	program.</LI>
+	<LI><EM>IPP test tool;</EM> The <code>ipptool</code> IPP test tool is now a first-class user program.</LI>
 
+	<LI><EM>lpadmin;</EM> The <code>lpadmin</code> command now supports setting the cupsIPPSupplies and cupsSNMPSupplies keywords in PPDs and deleting options.</LI>
 </OL>
-
-
-<!--
-<H2 CLASS="title"><A NAME="WEBIF">Web Interface</A></H2>
-
-<OL START="10">
-
-	<LI><EM>;</EM><LI>
-
-</OL>
-
-
-<H2 CLASS="title"><A NAME="NETWORKING">Networking</A></H2>
-
-<OL START="17">
-
-	<LI><EM>;</EM><LI>
-
-</OL>
-
-
-<H2 CLASS="title"><A NAME="IPP">IPP Support</A></H2>
-
-<OL START="23">
-
-	<LI><EM>;</EM><LI>
-
-</OL>
--->
-
 
 <H2 CLASS="title"><A NAME="SCHEDULER">Scheduler</A></H2>
 
 <OL START="3">
 
-	<LI><EM>Filter security;</EM> Filters and backends must now have group
-	write permissions disabled.</LI>
+	<LI><EM>Filter security;</EM> Filters and backends must now have group write permissions disabled.</LI>
 
 </OL>
-
-
-<!--
-<H2 CLASS="title"><A NAME="DRIVERS">Printer Drivers</A></H2>
-
-<OL START="50">
-
-	<LI><EM>;</EM><LI>
-
-</OL>
--->
 
 
 <H2 CLASS="title"><A NAME="FILTERS">Print Filters</A></H2>
 
 <OL START="4">
 
-	<LI><EM>HP-GL/2 filter;</EM> The HP-GL/2 filter is no longer provided
-	with CUPS.</LI>
+	<LI><EM>HP-GL/2 filter;</EM> The HP-GL/2 filter is no longer provided with CUPS.</LI>
 
-	<LI><EM>SCSI backend;</EM> The SCSI backend is no longer provided with
-	CUPS.</LI>
+	<LI><EM>PDF filter;</EM> The PDF filter now supports new Poppler and Ghostscript options.</LI>
+
+	<LI><EM>PWG Raster driver;</EM> Added a new PWG Raster printer driver filter.</LI>
+
+	<LI><EM>SCSI backend;</EM> The SCSI backend is no longer provided with CUPS.</LI>
 
 </OL>
 
@@ -93,6 +50,8 @@
 <OL START="6">
 
 	<LI><EM>CUPS headers;</EM> Changes to the main CUPS header may require code changes to applications and toolkits. Users of PPD functions must now include the &lt;cups/ppd.h&gt; header file explicitly since the &lt;cups/cups.h&gt; header no longer does so.</LI>
+
+	<LI><EM>Raster support;</EM> The CUPS raster functions now support the creation of PWG Raster files and streams, and a new callback-based context function allows reading and writing from objects other than file descriptors.</LI>
 
 </OL>
 

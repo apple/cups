@@ -237,16 +237,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Process the option...
       */
 
-      if (!strcasecmp(name, "waiteof"))
+      if (!_cups_strcasecmp(name, "waiteof"))
       {
        /*
         * Set the wait-for-eof value...
 	*/
 
-        waiteof = !value[0] || !strcasecmp(value, "on") ||
-		  !strcasecmp(value, "yes") || !strcasecmp(value, "true");
+        waiteof = !value[0] || !_cups_strcasecmp(value, "on") ||
+		  !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
       }
-      else if (!strcasecmp(name, "contimeout"))
+      else if (!_cups_strcasecmp(name, "contimeout"))
       {
        /*
         * Set the connection timeout...

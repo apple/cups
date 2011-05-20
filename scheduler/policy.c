@@ -3,7 +3,7 @@
  *
  *   Policy routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -325,7 +325,7 @@ cupsdGetPrivateAttrs(
   */
 
   if ((name = (char *)cupsArrayFirst(attrs_ptr)) != NULL &&
-      !strcasecmp(name, "none"))
+      !_cups_strcasecmp(name, "none"))
   {
 #ifdef DEBUG
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: Returning NULL.");
@@ -371,7 +371,7 @@ cupsdGetPrivateAttrs(
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: name=%s", name);
 #endif /* DEBUG */
 
-    if (printer && !strcasecmp(name, "@ACL"))
+    if (printer && !_cups_strcasecmp(name, "@ACL"))
     {
       char	*acl;			/* Current ACL user/group */
 
@@ -397,12 +397,12 @@ cupsdGetPrivateAttrs(
 	  if (cupsdCheckGroup(username, pw, acl))
 	    break;
 	}
-	else if (!strcasecmp(username, acl))
+	else if (!_cups_strcasecmp(username, acl))
 	  break;
       }
     }
-    else if (owner && !strcasecmp(name, "@OWNER") &&
-             !strcasecmp(username, owner))
+    else if (owner && !_cups_strcasecmp(name, "@OWNER") &&
+             !_cups_strcasecmp(username, owner))
     {
 #ifdef DEBUG
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -411,7 +411,7 @@ cupsdGetPrivateAttrs(
 
       return (NULL);
     }
-    else if (!strcasecmp(name, "@SYSTEM"))
+    else if (!_cups_strcasecmp(name, "@SYSTEM"))
     {
       int i;				/* Looping var */
 
@@ -438,7 +438,7 @@ cupsdGetPrivateAttrs(
 	return (NULL);
       }
     }
-    else if (!strcasecmp(username, name))
+    else if (!_cups_strcasecmp(username, name))
     {
 #ifdef DEBUG
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: Returning NULL.");
@@ -480,7 +480,7 @@ static int				/* O - Result of comparison */
 compare_policies(cupsd_policy_t *a,	/* I - First policy */
                  cupsd_policy_t *b)	/* I - Second policy */
 {
-  return (strcasecmp(a->name, b->name));
+  return (_cups_strcasecmp(a->name, b->name));
 }
 
 

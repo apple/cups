@@ -3,7 +3,7 @@
  *
  *   Advanced EPSON ESC/P command filter for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -136,7 +136,7 @@ main(int  argc,					/* I - Number of command-line arguments */
     * Parse the command...
     */
 
-    if (strncasecmp(lineptr, "Clean", 5) == 0)
+    if (_cups_strncasecmp(lineptr, "Clean", 5) == 0)
     {
      /*
       * Clean heads...
@@ -144,7 +144,7 @@ main(int  argc,					/* I - Number of command-line arguments */
 
       cupsWritePrintData("CH\002\000\000\000", 6);
     }
-    else if (strncasecmp(lineptr, "PrintAlignmentPage", 18) == 0)
+    else if (_cups_strncasecmp(lineptr, "PrintAlignmentPage", 18) == 0)
     {
      /*
       * Print alignment page...
@@ -159,7 +159,7 @@ main(int  argc,					/* I - Number of command-line arguments */
       putchar(phase >> 8);
       feedpage = 1;
     }
-    else if (strncasecmp(lineptr, "PrintSelfTestPage", 17) == 0)
+    else if (_cups_strncasecmp(lineptr, "PrintSelfTestPage", 17) == 0)
     {
      /*
       * Print version info and nozzle check...
@@ -169,7 +169,7 @@ main(int  argc,					/* I - Number of command-line arguments */
       cupsWritePrintData("NC\002\000\000\000", 6);
       feedpage = 1;
     }
-    else if (strncasecmp(lineptr, "ReportLevels", 12) == 0)
+    else if (_cups_strncasecmp(lineptr, "ReportLevels", 12) == 0)
     {
      /*
       * Report ink levels...
@@ -177,7 +177,7 @@ main(int  argc,					/* I - Number of command-line arguments */
 
       cupsWritePrintData("IQ\001\000\001", 5);
     }
-    else if (strncasecmp(lineptr, "SetAlignment", 12) == 0)
+    else if (_cups_strncasecmp(lineptr, "SetAlignment", 12) == 0)
     {
      /*
       * Set head alignment...

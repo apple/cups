@@ -3,7 +3,7 @@
 //
 //   Option class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -100,7 +100,7 @@ ppdcOption::find_choice(const char *n)		// I - Name of choice
 
 
   for (c = (ppdcChoice *)choices->first(); c; c = (ppdcChoice *)choices->next())
-    if (!strcasecmp(n, c->name->value))
+    if (!_cups_strcasecmp(n, c->name->value))
       return (c);
 
   return (0);

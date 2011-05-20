@@ -374,7 +374,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   {
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
-          strcasecmp(attr->name, "printer-name") == 0 &&
+          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -936,7 +936,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   if (!cg->servername[0])
     cupsServer();
 
-  if (!strcasecmp(cg->servername, "localhost"))
+  if (!_cups_strcasecmp(cg->servername, "localhost"))
   {
     char	ppdname[1024];		/* PPD filename */
     struct stat	ppdinfo;		/* PPD file information */
@@ -1056,7 +1056,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
   DEBUG_printf(("2cupsGetPPD3: Local hostname=\"%s\"", localhost));
 
-  if (!strcasecmp(localhost, hostname))
+  if (!_cups_strcasecmp(localhost, hostname))
     strcpy(hostname, "localhost");
 
  /*
@@ -1073,7 +1073,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   * Reconnect to the correct server as needed...
   */
 
-  if (!strcasecmp(http_hostname, hostname) && port == http_port)
+  if (!_cups_strcasecmp(http_hostname, hostname) && port == http_port)
     http2 = http;
   else if ((http2 = httpConnectEncrypt(hostname, port,
                                        cupsEncryption())) == NULL)
@@ -1215,7 +1215,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   {
     for (attr = response->attrs; attr != NULL; attr = attr->next)
       if (attr->name != NULL &&
-          strcasecmp(attr->name, "printer-name") == 0 &&
+          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
           attr->value_tag == IPP_TAG_NAME)
       {
         if (n == 0)
@@ -1725,7 +1725,7 @@ cups_get_printer_uri(
 	    * Found a class!  Connect to the right server...
 	    */
 
-	    if (!strcasecmp(http_hostname, host) && *port == http_port)
+	    if (!_cups_strcasecmp(http_hostname, host) && *port == http_port)
 	      http2 = http;
 	    else if ((http2 = httpConnectEncrypt(host, *port,
 						 cupsEncryption())) == NULL)

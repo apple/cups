@@ -344,7 +344,8 @@ cupsdLogFCMessage(
       if (cupsdSetPrinterReasons(p, "+cups-missing-filter-warning"))
         cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, p, NULL, "%s", message);
     }
-    else if (result == _CUPS_FILE_CHECK_PERMISSIONS)
+    else if (result == _CUPS_FILE_CHECK_PERMISSIONS ||
+             result == _CUPS_FILE_CHECK_RELATIVE_PATH)
     {
       strlcpy(p->state_message, message, sizeof(p->state_message));
 

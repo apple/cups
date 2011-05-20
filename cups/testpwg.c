@@ -124,7 +124,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  puts("FAIL (Not Found)");
 	  status = 1;
 	}
-	else if (media && strcasecmp(pagesize, media->values[0].string.text))
+	else if (media && _cups_strcasecmp(pagesize, media->values[0].string.text))
 	{
 	  printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize,
 		 media->values[0].string.text);
@@ -288,7 +288,7 @@ test_pagesize(_ppd_cache_t *pc,		/* I - PWG mapping data */
       puts("FAIL (Not Found)");
       status = 1;
     }
-    else if (strcasecmp(pagesize, ppdsize))
+    else if (_cups_strcasecmp(pagesize, ppdsize))
     {
       printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize, ppdsize);
       status = 1;
@@ -307,7 +307,7 @@ test_pagesize(_ppd_cache_t *pc,		/* I - PWG mapping data */
       puts("FAIL (Not Found)");
       status = 1;
     }
-    else if (strcasecmp(pagesize, ppdsize))
+    else if (_cups_strcasecmp(pagesize, ppdsize))
     {
       printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize, ppdsize);
       status = 1;

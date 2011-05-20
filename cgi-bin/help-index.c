@@ -919,7 +919,7 @@ help_load_file(
     * Look for "<TITLE>", "<A NAME", or "<!-- SECTION:" prefix...
     */
 
-    if (!strncasecmp(line, "<!-- SECTION:", 13))
+    if (!_cups_strncasecmp(line, "<!-- SECTION:", 13))
     {
      /*
       * Got section line, copy it!
@@ -946,7 +946,7 @@ help_load_file(
     {
       ptr ++;
 
-      if (!strncasecmp(ptr, "TITLE>", 6))
+      if (!_cups_strncasecmp(ptr, "TITLE>", 6))
       {
        /*
         * Found the title...
@@ -955,7 +955,7 @@ help_load_file(
 	anchor = NULL;
 	ptr += 6;
       }
-      else if (!strncasecmp(ptr, "A NAME=", 7))
+      else if (!_cups_strncasecmp(ptr, "A NAME=", 7))
       {
        /*
         * Found an anchor...
@@ -1192,7 +1192,7 @@ help_load_file(
 				     sizeof(help_common_words[0])),
 				    sizeof(help_common_words[0]),
 				    (int (*)(const void *, const void *))
-				        strcasecmp))
+				        _cups_strcasecmp))
           help_add_word(node, temp);
       }
     }
@@ -1307,7 +1307,7 @@ help_sort_by_score(help_node_t *n1,	/* I - First node */
            (diff = strcmp(n1->section, n2->section)) != 0)
     return (diff);
 
-  return (strcasecmp(n1->text, n2->text));
+  return (_cups_strcasecmp(n1->text, n2->text));
 }
 
 
@@ -1322,7 +1322,7 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
   DEBUG_printf(("help_sort_words(w1=%p(\"%s\"), w2=%p(\"%s\"))\n",
                 w1, w1->text, w2, w2->text));
 
-  return (strcasecmp(w1->text, w2->text));
+  return (_cups_strcasecmp(w1->text, w2->text));
 }
 
 

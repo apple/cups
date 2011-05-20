@@ -500,10 +500,10 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
     * See if we only print even or odd pages...
     */
 
-    if (!strcasecmp(doc->page_set, "even") && (page & 1))
+    if (!_cups_strcasecmp(doc->page_set, "even") && (page & 1))
       return (0);
 
-    if (!strcasecmp(doc->page_set, "odd") && !(page & 1))
+    if (!_cups_strcasecmp(doc->page_set, "odd") && !(page & 1))
       return (0);
   }
 
@@ -1271,7 +1271,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   int		level;			/* Embedded document level */
   pstops_page_t	*pageinfo;		/* Page information */
   int		first_page;		/* First page on N-up output? */
-  int		has_page_setup;		/* Does the page have %%Begin/EndPageSetup? */
+  int		has_page_setup = 0;	/* Does the page have %%Begin/EndPageSetup? */
   int		bounding_box[4];	/* PageBoundingBox */
 
 
@@ -1490,7 +1490,12 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 	                                        pageinfo->num_options,
                                         	&(pageinfo->options));
     }
-    else if (strncmp(line, "%%Include", 9))
+    else if (!strncmp(line, "%%BeginPageSetup", 16))
+    {
+      has_page_setup = 1;
+      break;
+    }
+    else
       break;
   }
 
@@ -1545,7 +1550,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   if (first_page)
     doc_puts(doc, "%%BeginPageSetup\n");
 
-  if ((has_page_setup = !strncmp(line, "%%BeginPageSetup", 16)) != 0)
+  if (has_page_setup)
   {
     int	feature = 0;			/* In a Begin/EndFeature block? */
 
@@ -1621,49 +1626,6 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   */
 
   start_nup(doc, number, 1, bounding_box);
-
- /*
-  * Finish the PageSetup section as needed...
-  */
-
-  if (has_page_setup)
-  {
-    int	feature = 0;			/* In a Begin/EndFeature block? */
-
-    doc_write(doc, line, linelen);
-
-    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
-    {
-      if (!strncmp(line, "%%EndPageSetup", 14))
-	break;
-      else if (!strncmp(line, "%%BeginFeature:", 15))
-      {
-	feature = 1;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%EndFeature", 12))
-      {
-	feature = 0;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%Include", 9))
-	continue;
-
-      if (!feature || (doc->number_up == 1 && !doc->fitplot))
-	doc_write(doc, line, linelen);
-    }
-
-   /*
-    * Skip %%EndPageSetup...
-    */
-
-    if (linelen > 0 && !strncmp(line, "%%EndPageSetup", 14))
-      linelen = cupsFileGetLine(fp, line, linesize);
-  }
 
   if (first_page)
     doc_puts(doc, "%%EndPageSetup\n");
@@ -2482,12 +2444,12 @@ set_pstops_options(
     *   separate-documents-uncollated-copies allows for uncollated copies.
     */
 
-    doc->collate = strcasecmp(val, "separate-documents-uncollated-copies") != 0;
+    doc->collate = _cups_strcasecmp(val, "separate-documents-uncollated-copies") != 0;
   }
 
   if ((val = cupsGetOption("Collate", num_options, options)) != NULL &&
-      (!strcasecmp(val, "true") ||!strcasecmp(val, "on") ||
-       !strcasecmp(val, "yes")))
+      (!_cups_strcasecmp(val, "true") ||!_cups_strcasecmp(val, "on") ||
+       !_cups_strcasecmp(val, "yes")))
     doc->collate = 1;
 
  /*
@@ -2495,8 +2457,8 @@ set_pstops_options(
   */
 
   if ((val = cupsGetOption("emit-jcl", num_options, options)) != NULL &&
-      (!strcasecmp(val, "false") || !strcasecmp(val, "off") ||
-       !strcasecmp(val, "no") || !strcmp(val, "0")))
+      (!_cups_strcasecmp(val, "false") || !_cups_strcasecmp(val, "off") ||
+       !_cups_strcasecmp(val, "no") || !strcmp(val, "0")))
     doc->emit_jcl = 0;
   else
     doc->emit_jcl = 1;
@@ -2510,17 +2472,17 @@ set_pstops_options(
   if ((content_type = getenv("CONTENT_TYPE")) == NULL)
     content_type = "application/postscript";
 
-  if (!strcasecmp(content_type, "application/postscript"))
+  if (!_cups_strcasecmp(content_type, "application/postscript"))
   {
     if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-	!strcasecmp(val, "true"))
+	!_cups_strcasecmp(val, "true"))
       doc->fitplot = 1;
     else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
-	     !strcasecmp(val, "true"))
+	     !_cups_strcasecmp(val, "true"))
       doc->fitplot = 1;
     else if ((val = cupsGetOption("ipp-attribute-fidelity", num_options,
                                   options)) != NULL &&
-	     !strcasecmp(val, "true"))
+	     !_cups_strcasecmp(val, "true"))
       doc->fitplot = 1;
   }
 
@@ -2561,8 +2523,8 @@ set_pstops_options(
   else
     val = cupsGetOption("mirror", num_options, options);
 
-  if (val && (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
-              !strcasecmp(val, "yes")))
+  if (val && (!_cups_strcasecmp(val, "true") || !_cups_strcasecmp(val, "on") ||
+              !_cups_strcasecmp(val, "yes")))
     doc->mirror = 1;
 
  /*
@@ -2598,21 +2560,21 @@ set_pstops_options(
 
   if ((val = cupsGetOption("number-up-layout", num_options, options)) != NULL)
   {
-    if (!strcasecmp(val, "lrtb"))
+    if (!_cups_strcasecmp(val, "lrtb"))
       doc->number_up_layout = PSTOPS_LAYOUT_LRTB;
-    else if (!strcasecmp(val, "lrbt"))
+    else if (!_cups_strcasecmp(val, "lrbt"))
       doc->number_up_layout = PSTOPS_LAYOUT_LRBT;
-    else if (!strcasecmp(val, "rltb"))
+    else if (!_cups_strcasecmp(val, "rltb"))
       doc->number_up_layout = PSTOPS_LAYOUT_RLTB;
-    else if (!strcasecmp(val, "rlbt"))
+    else if (!_cups_strcasecmp(val, "rlbt"))
       doc->number_up_layout = PSTOPS_LAYOUT_RLBT;
-    else if (!strcasecmp(val, "tblr"))
+    else if (!_cups_strcasecmp(val, "tblr"))
       doc->number_up_layout = PSTOPS_LAYOUT_TBLR;
-    else if (!strcasecmp(val, "tbrl"))
+    else if (!_cups_strcasecmp(val, "tbrl"))
       doc->number_up_layout = PSTOPS_LAYOUT_TBRL;
-    else if (!strcasecmp(val, "btlr"))
+    else if (!_cups_strcasecmp(val, "btlr"))
       doc->number_up_layout = PSTOPS_LAYOUT_BTLR;
-    else if (!strcasecmp(val, "btrl"))
+    else if (!_cups_strcasecmp(val, "btrl"))
       doc->number_up_layout = PSTOPS_LAYOUT_BTRL;
     else
     {
@@ -2631,7 +2593,7 @@ set_pstops_options(
 
   if ((val = cupsGetOption("OutputOrder", num_options, options)) != NULL)
   {
-    if (!strcasecmp(val, "Reverse"))
+    if (!_cups_strcasecmp(val, "Reverse"))
       doc->output_order = 1;
   }
   else if (ppd)
@@ -2643,10 +2605,10 @@ set_pstops_options(
     if ((choice = ppdFindMarkedChoice(ppd, "OutputBin")) != NULL &&
         (attr = ppdFindAttr(ppd, "PageStackOrder", choice->choice)) != NULL &&
 	attr->value)
-      doc->output_order = !strcasecmp(attr->value, "Reverse");
+      doc->output_order = !_cups_strcasecmp(attr->value, "Reverse");
     else if ((attr = ppdFindAttr(ppd, "DefaultOutputOrder", NULL)) != NULL &&
              attr->value)
-      doc->output_order = !strcasecmp(attr->value, "Reverse");
+      doc->output_order = !_cups_strcasecmp(attr->value, "Reverse");
   }
 
  /*
@@ -2655,15 +2617,15 @@ set_pstops_options(
 
   if ((val = cupsGetOption("page-border", num_options, options)) != NULL)
   {
-    if (!strcasecmp(val, "none"))
+    if (!_cups_strcasecmp(val, "none"))
       doc->page_border = PSTOPS_BORDERNONE;
-    else if (!strcasecmp(val, "single"))
+    else if (!_cups_strcasecmp(val, "single"))
       doc->page_border = PSTOPS_BORDERSINGLE;
-    else if (!strcasecmp(val, "single-thick"))
+    else if (!_cups_strcasecmp(val, "single-thick"))
       doc->page_border = PSTOPS_BORDERSINGLE2;
-    else if (!strcasecmp(val, "double"))
+    else if (!_cups_strcasecmp(val, "double"))
       doc->page_border = PSTOPS_BORDERDOUBLE;
-    else if (!strcasecmp(val, "double-thick"))
+    else if (!_cups_strcasecmp(val, "double-thick"))
       doc->page_border = PSTOPS_BORDERDOUBLE2;
     else
     {
@@ -2723,7 +2685,7 @@ set_pstops_options(
     doc->slow_collate = 1;
 
     if ((choice = ppdFindMarkedChoice(ppd, "Collate")) != NULL &&
-        !strcasecmp(choice->choice, "True"))
+        !_cups_strcasecmp(choice->choice, "True"))
     {
      /*
       * Hardware collate option is selected, see if the option is
@@ -2749,7 +2711,7 @@ set_pstops_options(
   if (Duplex &&
        (doc->slow_collate || doc->slow_order ||
         ((attr = ppdFindAttr(ppd, "cupsEvenDuplex", NULL)) != NULL &&
-	 attr->value && !strcasecmp(attr->value, "true"))))
+	 attr->value && !_cups_strcasecmp(attr->value, "true"))))
     doc->slow_duplex = 1;
   else
     doc->slow_duplex = 0;

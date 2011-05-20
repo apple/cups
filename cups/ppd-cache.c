@@ -189,7 +189,7 @@ _ppdCacheCreateWithFile(
       _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
       goto create_error;
     }
-    else if (!strcasecmp(line, "Filter"))
+    else if (!_cups_strcasecmp(line, "Filter"))
     {
       if (!pc->filters)
         pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0,
@@ -198,7 +198,7 @@ _ppdCacheCreateWithFile(
 
       cupsArrayAdd(pc->filters, value);
     }
-    else if (!strcasecmp(line, "PreFilter"))
+    else if (!_cups_strcasecmp(line, "PreFilter"))
     {
       if (!pc->prefilters)
         pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0,
@@ -207,15 +207,15 @@ _ppdCacheCreateWithFile(
 
       cupsArrayAdd(pc->prefilters, value);
     }
-    else if (!strcasecmp(line, "Product"))
+    else if (!_cups_strcasecmp(line, "Product"))
     {
       pc->product = _cupsStrAlloc(value);
     }
-    else if (!strcasecmp(line, "SingleFile"))
+    else if (!_cups_strcasecmp(line, "SingleFile"))
     {
-      pc->single_file = !strcasecmp(value, "true");
+      pc->single_file = !_cups_strcasecmp(value, "true");
     }
-    else if (!strcasecmp(line, "IPP"))
+    else if (!_cups_strcasecmp(line, "IPP"))
     {
       off_t	pos = cupsFileTell(fp),	/* Position in file */
 		length = strtol(value, NULL, 10);
@@ -266,7 +266,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
     }
-    else if (!strcasecmp(line, "NumBins"))
+    else if (!_cups_strcasecmp(line, "NumBins"))
     {
       if (num_bins > 0)
       {
@@ -291,7 +291,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
     }
-    else if (!strcasecmp(line, "Bin"))
+    else if (!_cups_strcasecmp(line, "Bin"))
     {
       if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
       {
@@ -314,7 +314,7 @@ _ppdCacheCreateWithFile(
 
       pc->num_bins ++;
     }
-    else if (!strcasecmp(line, "NumSizes"))
+    else if (!_cups_strcasecmp(line, "NumSizes"))
     {
       if (num_sizes > 0)
       {
@@ -339,7 +339,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
     }
-    else if (!strcasecmp(line, "Size"))
+    else if (!_cups_strcasecmp(line, "Size"))
     {
       if (pc->num_sizes >= num_sizes)
       {
@@ -366,7 +366,7 @@ _ppdCacheCreateWithFile(
 
       pc->num_sizes ++;
     }
-    else if (!strcasecmp(line, "CustomSize"))
+    else if (!_cups_strcasecmp(line, "CustomSize"))
     {
       if (pc->custom_max_width > 0)
       {
@@ -396,11 +396,11 @@ _ppdCacheCreateWithFile(
 		       pc->custom_min_width, pc->custom_min_length);
       pc->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
     }
-    else if (!strcasecmp(line, "SourceOption"))
+    else if (!_cups_strcasecmp(line, "SourceOption"))
     {
       pc->source_option = _cupsStrAlloc(value);
     }
-    else if (!strcasecmp(line, "NumSources"))
+    else if (!_cups_strcasecmp(line, "NumSources"))
     {
       if (num_sources > 0)
       {
@@ -426,7 +426,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
     }
-    else if (!strcasecmp(line, "Source"))
+    else if (!_cups_strcasecmp(line, "Source"))
     {
       if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
       {
@@ -450,7 +450,7 @@ _ppdCacheCreateWithFile(
 
       pc->num_sources ++;
     }
-    else if (!strcasecmp(line, "NumTypes"))
+    else if (!_cups_strcasecmp(line, "NumTypes"))
     {
       if (num_types > 0)
       {
@@ -475,7 +475,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
     }
-    else if (!strcasecmp(line, "Type"))
+    else if (!_cups_strcasecmp(line, "Type"))
     {
       if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
       {
@@ -499,7 +499,7 @@ _ppdCacheCreateWithFile(
 
       pc->num_types ++;
     }
-    else if (!strcasecmp(line, "Preset"))
+    else if (!_cups_strcasecmp(line, "Preset"))
     {
      /*
       * Preset output-mode print-quality name=value ...
@@ -524,13 +524,13 @@ _ppdCacheCreateWithFile(
           cupsParseOptions(valueptr, 0,
 	                   pc->presets[print_color_mode] + print_quality);
     }
-    else if (!strcasecmp(line, "SidesOption"))
+    else if (!_cups_strcasecmp(line, "SidesOption"))
       pc->sides_option = _cupsStrAlloc(value);
-    else if (!strcasecmp(line, "Sides1Sided"))
+    else if (!_cups_strcasecmp(line, "Sides1Sided"))
       pc->sides_1sided = _cupsStrAlloc(value);
-    else if (!strcasecmp(line, "Sides2SidedLong"))
+    else if (!_cups_strcasecmp(line, "Sides2SidedLong"))
       pc->sides_2sided_long = _cupsStrAlloc(value);
-    else if (!strcasecmp(line, "Sides2SidedShort"))
+    else if (!_cups_strcasecmp(line, "Sides2SidedShort"))
       pc->sides_2sided_short = _cupsStrAlloc(value);
     else
     {
@@ -679,7 +679,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     * Don't copy over custom size...
     */
 
-    if (!strcasecmp(ppd_size->name, "Custom"))
+    if (!_cups_strcasecmp(ppd_size->name, "Custom"))
       continue;
 
    /*
@@ -850,33 +850,33 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	 i > 0;
 	 i --, choice ++, map ++)
     {
-      if (!strncasecmp(choice->choice, "Auto", 4) ||
-          !strcasecmp(choice->choice, "Default"))
+      if (!_cups_strncasecmp(choice->choice, "Auto", 4) ||
+          !_cups_strcasecmp(choice->choice, "Default"))
         pwg_name = "auto";
-      else if (!strcasecmp(choice->choice, "Cassette"))
+      else if (!_cups_strcasecmp(choice->choice, "Cassette"))
         pwg_name = "main";
-      else if (!strcasecmp(choice->choice, "PhotoTray"))
+      else if (!_cups_strcasecmp(choice->choice, "PhotoTray"))
         pwg_name = "photo";
-      else if (!strcasecmp(choice->choice, "CDTray"))
+      else if (!_cups_strcasecmp(choice->choice, "CDTray"))
         pwg_name = "disc";
-      else if (!strncasecmp(choice->choice, "Multipurpose", 12) ||
-               !strcasecmp(choice->choice, "MP") ||
-               !strcasecmp(choice->choice, "MPTray"))
+      else if (!_cups_strncasecmp(choice->choice, "Multipurpose", 12) ||
+               !_cups_strcasecmp(choice->choice, "MP") ||
+               !_cups_strcasecmp(choice->choice, "MPTray"))
         pwg_name = "alternate";
-      else if (!strcasecmp(choice->choice, "LargeCapacity"))
+      else if (!_cups_strcasecmp(choice->choice, "LargeCapacity"))
         pwg_name = "large-capacity";
-      else if (!strncasecmp(choice->choice, "Lower", 5))
+      else if (!_cups_strncasecmp(choice->choice, "Lower", 5))
         pwg_name = "bottom";
-      else if (!strncasecmp(choice->choice, "Middle", 6))
+      else if (!_cups_strncasecmp(choice->choice, "Middle", 6))
         pwg_name = "middle";
-      else if (!strncasecmp(choice->choice, "Upper", 5))
+      else if (!_cups_strncasecmp(choice->choice, "Upper", 5))
         pwg_name = "top";
-      else if (!strncasecmp(choice->choice, "Side", 4))
+      else if (!_cups_strncasecmp(choice->choice, "Side", 4))
         pwg_name = "side";
-      else if (!strcasecmp(choice->choice, "Roll") ||
-               !strcasecmp(choice->choice, "Roll1"))
+      else if (!_cups_strcasecmp(choice->choice, "Roll") ||
+               !_cups_strcasecmp(choice->choice, "Roll1"))
         pwg_name = "main-roll";
-      else if (!strcasecmp(choice->choice, "Roll2"))
+      else if (!_cups_strcasecmp(choice->choice, "Roll2"))
         pwg_name = "alternate-roll";
       else
       {
@@ -914,31 +914,31 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	 i > 0;
 	 i --, choice ++, map ++)
     {
-      if (!strncasecmp(choice->choice, "Auto", 4) ||
-          !strcasecmp(choice->choice, "Any") ||
-          !strcasecmp(choice->choice, "Default"))
+      if (!_cups_strncasecmp(choice->choice, "Auto", 4) ||
+          !_cups_strcasecmp(choice->choice, "Any") ||
+          !_cups_strcasecmp(choice->choice, "Default"))
         pwg_name = "auto";
-      else if (!strncasecmp(choice->choice, "Card", 4))
+      else if (!_cups_strncasecmp(choice->choice, "Card", 4))
         pwg_name = "cardstock";
-      else if (!strncasecmp(choice->choice, "Env", 3))
+      else if (!_cups_strncasecmp(choice->choice, "Env", 3))
         pwg_name = "envelope";
-      else if (!strncasecmp(choice->choice, "Gloss", 5))
+      else if (!_cups_strncasecmp(choice->choice, "Gloss", 5))
         pwg_name = "photographic-glossy";
-      else if (!strcasecmp(choice->choice, "HighGloss"))
+      else if (!_cups_strcasecmp(choice->choice, "HighGloss"))
         pwg_name = "photographic-high-gloss";
-      else if (!strcasecmp(choice->choice, "Matte"))
+      else if (!_cups_strcasecmp(choice->choice, "Matte"))
         pwg_name = "photographic-matte";
-      else if (!strncasecmp(choice->choice, "Plain", 5))
+      else if (!_cups_strncasecmp(choice->choice, "Plain", 5))
         pwg_name = "stationery";
-      else if (!strncasecmp(choice->choice, "Coated", 6))
+      else if (!_cups_strncasecmp(choice->choice, "Coated", 6))
         pwg_name = "stationery-coated";
-      else if (!strcasecmp(choice->choice, "Inkjet"))
+      else if (!_cups_strcasecmp(choice->choice, "Inkjet"))
         pwg_name = "stationery-inkjet";
-      else if (!strcasecmp(choice->choice, "Letterhead"))
+      else if (!_cups_strcasecmp(choice->choice, "Letterhead"))
         pwg_name = "stationery-letterhead";
-      else if (!strncasecmp(choice->choice, "Preprint", 8))
+      else if (!_cups_strncasecmp(choice->choice, "Preprint", 8))
         pwg_name = "stationery-preprinted";
-      else if (!strncasecmp(choice->choice, "Transparen", 10))
+      else if (!_cups_strncasecmp(choice->choice, "Transparen", 10))
         pwg_name = "transparency";
       else
       {
@@ -1057,7 +1057,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	}
 	else if (color_model_val)
 	{
-	  if (!strcasecmp(color_model_val, "Gray"))
+	  if (!_cups_strcasecmp(color_model_val, "Gray"))
 	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_MONOCHROME;
 	  else
 	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
@@ -1200,16 +1200,16 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
          i > 0;
 	 i --, choice ++)
     {
-      if ((!strcasecmp(choice->choice, "None") ||
-	   !strcasecmp(choice->choice, "False")) && !pc->sides_1sided)
+      if ((!_cups_strcasecmp(choice->choice, "None") ||
+	   !_cups_strcasecmp(choice->choice, "False")) && !pc->sides_1sided)
         pc->sides_1sided = _cupsStrAlloc(choice->choice);
-      else if ((!strcasecmp(choice->choice, "DuplexNoTumble") ||
-	        !strcasecmp(choice->choice, "LongEdge") ||
-	        !strcasecmp(choice->choice, "Top")) && !pc->sides_2sided_long)
+      else if ((!_cups_strcasecmp(choice->choice, "DuplexNoTumble") ||
+	        !_cups_strcasecmp(choice->choice, "LongEdge") ||
+	        !_cups_strcasecmp(choice->choice, "Top")) && !pc->sides_2sided_long)
         pc->sides_2sided_long = _cupsStrAlloc(choice->choice);
-      else if ((!strcasecmp(choice->choice, "DuplexTumble") ||
-	        !strcasecmp(choice->choice, "ShortEdge") ||
-	        !strcasecmp(choice->choice, "Bottom")) &&
+      else if ((!_cups_strcasecmp(choice->choice, "DuplexTumble") ||
+	        !_cups_strcasecmp(choice->choice, "ShortEdge") ||
+	        !_cups_strcasecmp(choice->choice, "Bottom")) &&
 	       !pc->sides_2sided_short)
         pc->sides_2sided_short = _cupsStrAlloc(choice->choice);
     }
@@ -1249,13 +1249,13 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   for (filter = (const char *)cupsArrayFirst(pc->filters);
        filter;
        filter = (const char *)cupsArrayNext(pc->filters))
-    if (!strncasecmp(filter, "application/vnd.cups-command", 28) &&
+    if (!_cups_strncasecmp(filter, "application/vnd.cups-command", 28) &&
         _cups_isspace(filter[28]))
       break;
 
   if (!filter &&
       ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) == NULL ||
-       strcasecmp(ppd_attr->value, "none")))
+       _cups_strcasecmp(ppd_attr->value, "none")))
   {
    /*
     * No command filter and no cupsCommands keyword telling us not to use one.
@@ -1266,7 +1266,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     for (filter = (const char *)cupsArrayFirst(pc->filters);
 	 filter;
 	 filter = (const char *)cupsArrayNext(pc->filters))
-      if (!strncasecmp(filter, "application/vnd.cups-postscript", 31) &&
+      if (!_cups_strncasecmp(filter, "application/vnd.cups-postscript", 31) &&
 	  _cups_isspace(filter[31]))
 	break;
 
@@ -1289,7 +1289,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   }
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsSingleFile", NULL)) != NULL)
-    pc->single_file = !strcasecmp(ppd_attr->value, "true");
+    pc->single_file = !_cups_strcasecmp(ppd_attr->value, "true");
 
  /*
   * Copy the product string, if any...
@@ -1427,7 +1427,7 @@ _ppdCacheGetBin(
 
 
   for (i = 0; i < pc->num_bins; i ++)
-    if (!strcasecmp(output_bin, pc->bins[i].ppd))
+    if (!_cups_strcasecmp(output_bin, pc->bins[i].ppd))
       return (pc->bins[i].pwg);
 
   return (NULL);
@@ -1491,7 +1491,7 @@ _ppdCacheGetInputSlot(
     int	i;				/* Looping var */
 
     for (i = 0; i < pc->num_sources; i ++)
-      if (!strcasecmp(keyword, pc->sources[i].pwg))
+      if (!_cups_strcasecmp(keyword, pc->sources[i].pwg))
         return (pc->sources[i].ppd);
   }
 
@@ -1545,7 +1545,7 @@ _ppdCacheGetMediaType(
     int	i;				/* Looping var */
 
     for (i = 0; i < pc->num_types; i ++)
-      if (!strcasecmp(keyword, pc->types[i].pwg))
+      if (!_cups_strcasecmp(keyword, pc->types[i].pwg))
         return (pc->types[i].ppd);
   }
 
@@ -1579,7 +1579,7 @@ _ppdCacheGetOutputBin(
 
 
   for (i = 0; i < pc->num_bins; i ++)
-    if (!strcasecmp(output_bin, pc->bins[i].pwg))
+    if (!_cups_strcasecmp(output_bin, pc->bins[i].pwg))
       return (pc->bins[i].ppd);
 
   return (NULL);
@@ -1667,8 +1667,8 @@ _ppdCacheGetPageSize(
       DEBUG_printf(("2_ppdCacheGetPageSize: size[%d]=[\"%s\" \"%s\"]",
                     (int)(size - pc->sizes), size->map.pwg, size->map.ppd));
 
-      if (!strcasecmp(ppd_name, size->map.ppd) ||
-          !strcasecmp(ppd_name, size->map.pwg))
+      if (!_cups_strcasecmp(ppd_name, size->map.ppd) ||
+          !_cups_strcasecmp(ppd_name, size->map.pwg))
       {
 	if (exact)
 	  *exact = 1;
@@ -1717,8 +1717,8 @@ _ppdCacheGetPageSize(
   closest  = NULL;
   dclosest = 999999999;
 
-  if (!ppd_name || strncasecmp(ppd_name, "Custom.", 7) ||
-      strncasecmp(ppd_name, "custom_", 7))
+  if (!ppd_name || _cups_strncasecmp(ppd_name, "Custom.", 7) ||
+      _cups_strncasecmp(ppd_name, "custom_", 7))
   {
     for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
     {
@@ -1846,7 +1846,7 @@ _ppdCacheGetSize(
   if (!pc || !page_size)
     return (NULL);
 
-  if (!strncasecmp(page_size, "Custom.", 7))
+  if (!_cups_strncasecmp(page_size, "Custom.", 7))
   {
    /*
     * Custom size; size name can be one of the following:
@@ -1872,27 +1872,27 @@ _ppdCacheGetSize(
     if (!ptr)
       return (NULL);
 
-    if (!strcasecmp(ptr, "in"))
+    if (!_cups_strcasecmp(ptr, "in"))
     {
       w *= 2540.0;
       l *= 2540.0;
     }
-    else if (!strcasecmp(ptr, "ft"))
+    else if (!_cups_strcasecmp(ptr, "ft"))
     {
       w *= 12.0 * 2540.0;
       l *= 12.0 * 2540.0;
     }
-    else if (!strcasecmp(ptr, "mm"))
+    else if (!_cups_strcasecmp(ptr, "mm"))
     {
       w *= 100.0;
       l *= 100.0;
     }
-    else if (!strcasecmp(ptr, "cm"))
+    else if (!_cups_strcasecmp(ptr, "cm"))
     {
       w *= 1000.0;
       l *= 1000.0;
     }
-    else if (!strcasecmp(ptr, "m"))
+    else if (!_cups_strcasecmp(ptr, "m"))
     {
       w *= 100000.0;
       l *= 100000.0;
@@ -1914,7 +1914,7 @@ _ppdCacheGetSize(
   */
 
   for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
-    if (!strcasecmp(page_size, size->map.ppd))
+    if (!_cups_strcasecmp(page_size, size->map.ppd))
       return (size);
 
   return (NULL);
@@ -1943,7 +1943,7 @@ _ppdCacheGetSource(
     return (NULL);
 
   for (i = pc->num_sources, source = pc->sources; i > 0; i --, source ++)
-    if (!strcasecmp(input_slot, source->ppd))
+    if (!_cups_strcasecmp(input_slot, source->ppd))
       return (source->pwg);
 
   return (NULL);
@@ -1972,7 +1972,7 @@ _ppdCacheGetType(
     return (NULL);
 
   for (i = pc->num_types, type = pc->types; i > 0; i --, type ++)
-    if (!strcasecmp(media_type, type->ppd))
+    if (!_cups_strcasecmp(media_type, type->ppd))
       return (type->pwg);
 
   return (NULL);
@@ -2173,27 +2173,27 @@ _pwgInputSlotForSource(
   if (!media_source || !name || namesize < PPD_MAX_NAME)
     return (NULL);
 
-  if (strcasecmp(media_source, "main"))
+  if (_cups_strcasecmp(media_source, "main"))
     strlcpy(name, "Cassette", namesize);
-  else if (strcasecmp(media_source, "alternate"))
+  else if (_cups_strcasecmp(media_source, "alternate"))
     strlcpy(name, "Multipurpose", namesize);
-  else if (strcasecmp(media_source, "large-capacity"))
+  else if (_cups_strcasecmp(media_source, "large-capacity"))
     strlcpy(name, "LargeCapacity", namesize);
-  else if (strcasecmp(media_source, "bottom"))
+  else if (_cups_strcasecmp(media_source, "bottom"))
     strlcpy(name, "Lower", namesize);
-  else if (strcasecmp(media_source, "middle"))
+  else if (_cups_strcasecmp(media_source, "middle"))
     strlcpy(name, "Middle", namesize);
-  else if (strcasecmp(media_source, "top"))
+  else if (_cups_strcasecmp(media_source, "top"))
     strlcpy(name, "Upper", namesize);
-  else if (strcasecmp(media_source, "rear"))
+  else if (_cups_strcasecmp(media_source, "rear"))
     strlcpy(name, "Rear", namesize);
-  else if (strcasecmp(media_source, "side"))
+  else if (_cups_strcasecmp(media_source, "side"))
     strlcpy(name, "Side", namesize);
-  else if (strcasecmp(media_source, "envelope"))
+  else if (_cups_strcasecmp(media_source, "envelope"))
     strlcpy(name, "Envelope", namesize);
-  else if (strcasecmp(media_source, "main-roll"))
+  else if (_cups_strcasecmp(media_source, "main-roll"))
     strlcpy(name, "Roll", namesize);
-  else if (strcasecmp(media_source, "alternate-roll"))
+  else if (_cups_strcasecmp(media_source, "alternate-roll"))
     strlcpy(name, "Roll2", namesize);
   else
     pwg_ppdize_name(media_source, name, namesize);
@@ -2220,29 +2220,29 @@ _pwgMediaTypeForType(
   if (!media_type || !name || namesize < PPD_MAX_NAME)
     return (NULL);
 
-  if (strcasecmp(media_type, "auto"))
+  if (_cups_strcasecmp(media_type, "auto"))
     strlcpy(name, "Auto", namesize);
-  else if (strcasecmp(media_type, "cardstock"))
+  else if (_cups_strcasecmp(media_type, "cardstock"))
     strlcpy(name, "Cardstock", namesize);
-  else if (strcasecmp(media_type, "envelope"))
+  else if (_cups_strcasecmp(media_type, "envelope"))
     strlcpy(name, "Envelope", namesize);
-  else if (strcasecmp(media_type, "photographic-glossy"))
+  else if (_cups_strcasecmp(media_type, "photographic-glossy"))
     strlcpy(name, "Glossy", namesize);
-  else if (strcasecmp(media_type, "photographic-high-gloss"))
+  else if (_cups_strcasecmp(media_type, "photographic-high-gloss"))
     strlcpy(name, "HighGloss", namesize);
-  else if (strcasecmp(media_type, "photographic-matte"))
+  else if (_cups_strcasecmp(media_type, "photographic-matte"))
     strlcpy(name, "Matte", namesize);
-  else if (strcasecmp(media_type, "stationery"))
+  else if (_cups_strcasecmp(media_type, "stationery"))
     strlcpy(name, "Plain", namesize);
-  else if (strcasecmp(media_type, "stationery-coated"))
+  else if (_cups_strcasecmp(media_type, "stationery-coated"))
     strlcpy(name, "Coated", namesize);
-  else if (strcasecmp(media_type, "stationery-inkjet"))
+  else if (_cups_strcasecmp(media_type, "stationery-inkjet"))
     strlcpy(name, "Inkjet", namesize);
-  else if (strcasecmp(media_type, "stationery-letterhead"))
+  else if (_cups_strcasecmp(media_type, "stationery-letterhead"))
     strlcpy(name, "Letterhead", namesize);
-  else if (strcasecmp(media_type, "stationery-preprinted"))
+  else if (_cups_strcasecmp(media_type, "stationery-preprinted"))
     strlcpy(name, "Preprinted", namesize);
-  else if (strcasecmp(media_type, "transparency"))
+  else if (_cups_strcasecmp(media_type, "transparency"))
     strlcpy(name, "Transparency", namesize);
   else
     pwg_ppdize_name(media_type, name, namesize);

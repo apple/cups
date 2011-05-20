@@ -653,36 +653,36 @@ cups_read_client_conf(
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
     if (!cups_encryption && cg->encryption == (http_encryption_t)-1 &&
-        !strcasecmp(line, "Encryption") && value)
+        !_cups_strcasecmp(line, "Encryption") && value)
     {
       strlcpy(encryption, value, sizeof(encryption));
       cups_encryption = encryption;
     }
     else if (!cups_server && (!cg->server[0] || !cg->ipp_port) &&
-             !strcasecmp(line, "ServerName") && value)
+             !_cups_strcasecmp(line, "ServerName") && value)
     {
       strlcpy(server_name, value, sizeof(server_name));
       cups_server = server_name;
     }
-    else if (!cups_anyroot && !strcasecmp(line, "AllowAnyRoot") && value)
+    else if (!cups_anyroot && !_cups_strcasecmp(line, "AllowAnyRoot") && value)
     {
       strlcpy(any_root, value, sizeof(any_root));
       cups_anyroot = any_root;
     }
-    else if (!cups_expiredroot && !strcasecmp(line, "AllowExpiredRoot") &&
+    else if (!cups_expiredroot && !_cups_strcasecmp(line, "AllowExpiredRoot") &&
              value)
     {
       strlcpy(expired_root, value, sizeof(expired_root));
       cups_expiredroot = expired_root;
     }
-    else if (!cups_expiredcerts && !strcasecmp(line, "AllowExpiredCerts") &&
+    else if (!cups_expiredcerts && !_cups_strcasecmp(line, "AllowExpiredCerts") &&
              value)
     {
       strlcpy(expired_certs, value, sizeof(expired_certs));
       cups_expiredcerts = expired_certs;
     }
 #ifdef HAVE_GSSAPI
-    else if (!cups_gssservicename && !strcasecmp(line, "GSSServiceName") &&
+    else if (!cups_gssservicename && !_cups_strcasecmp(line, "GSSServiceName") &&
              value)
     {
       strlcpy(gss_service_name, value, sizeof(gss_service_name));
@@ -697,11 +697,11 @@ cups_read_client_conf(
 
   if (cg->encryption == (http_encryption_t)-1 && cups_encryption)
   {
-    if (!strcasecmp(cups_encryption, "never"))
+    if (!_cups_strcasecmp(cups_encryption, "never"))
       cg->encryption = HTTP_ENCRYPT_NEVER;
-    else if (!strcasecmp(cups_encryption, "always"))
+    else if (!_cups_strcasecmp(cups_encryption, "always"))
       cg->encryption = HTTP_ENCRYPT_ALWAYS;
-    else if (!strcasecmp(cups_encryption, "required"))
+    else if (!_cups_strcasecmp(cups_encryption, "required"))
       cg->encryption = HTTP_ENCRYPT_REQUIRED;
     else
       cg->encryption = HTTP_ENCRYPT_IF_REQUESTED;
@@ -761,20 +761,15 @@ cups_read_client_conf(
 
   if (!cg->ipp_port)
   {
-    const char		*ipp_port;	/* IPP_PORT environment variable */
-    struct servent	*service;	/* Port number info */
-
+    const char	*ipp_port;		/* IPP_PORT environment variable */
 
     if ((ipp_port = getenv("IPP_PORT")) != NULL)
     {
       if ((cg->ipp_port = atoi(ipp_port)) <= 0)
         cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
     }
-    else if ((service = getservbyname("ipp", NULL)) == NULL ||
-             service->s_port <= 0)
-      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
     else
-      cg->ipp_port = ntohs(service->s_port);
+      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
   }
 
 #ifdef HAVE_GSSAPI
@@ -786,19 +781,19 @@ cups_read_client_conf(
 #endif /* HAVE_GSSAPI */
 
   if (cups_anyroot)
-    cg->any_root = !strcasecmp(cups_anyroot, "yes") ||
-		   !strcasecmp(cups_anyroot, "on")  ||
-		   !strcasecmp(cups_anyroot, "true");
+    cg->any_root = !_cups_strcasecmp(cups_anyroot, "yes") ||
+		   !_cups_strcasecmp(cups_anyroot, "on")  ||
+		   !_cups_strcasecmp(cups_anyroot, "true");
 
   if (cups_expiredroot)
-    cg->expired_root  = !strcasecmp(cups_expiredroot, "yes") ||
-			!strcasecmp(cups_expiredroot, "on")  ||
-			!strcasecmp(cups_expiredroot, "true");
+    cg->expired_root  = !_cups_strcasecmp(cups_expiredroot, "yes") ||
+			!_cups_strcasecmp(cups_expiredroot, "on")  ||
+			!_cups_strcasecmp(cups_expiredroot, "true");
 
   if (cups_expiredcerts)
-    cg->expired_certs = !strcasecmp(cups_expiredcerts, "yes") ||
-			!strcasecmp(cups_expiredcerts, "on")  ||
-			!strcasecmp(cups_expiredcerts, "true");
+    cg->expired_certs = !_cups_strcasecmp(cups_expiredcerts, "yes") ||
+			!_cups_strcasecmp(cups_expiredcerts, "on")  ||
+			!_cups_strcasecmp(cups_expiredcerts, "true");
 }
 
 

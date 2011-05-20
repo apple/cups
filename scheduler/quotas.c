@@ -3,7 +3,7 @@
  *
  *   Quota routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -146,8 +146,8 @@ cupsdUpdateQuota(
     * We only care about the current printer/class and user...
     */
 
-    if (strcasecmp(job->dest, p->name) != 0 ||
-        strcasecmp(job->username, q->username) != 0)
+    if (_cups_strcasecmp(job->dest, p->name) != 0 ||
+        _cups_strcasecmp(job->username, q->username) != 0)
       continue;
 
    /*
@@ -235,7 +235,7 @@ static int				/* O - Result of comparison */
 compare_quotas(const cupsd_quota_t *q1,	/* I - First quota record */
                const cupsd_quota_t *q2)	/* I - Second quota record */
 {
-  return (strcasecmp(q1->username, q2->username));
+  return (_cups_strcasecmp(q1->username, q2->username));
 }
 
 

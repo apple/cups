@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon interface for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -574,7 +574,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
       }
 
       if (info_attr && name_attr &&
-          !strcasecmp(name, info_attr->values[0].string.text))
+          !_cups_strcasecmp(name, info_attr->values[0].string.text))
       {
        /*
         * Found a match, use this one!
@@ -669,7 +669,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 	* Make sure we have "Dest name options" or "Default name options"...
 	*/
 
-	if ((strcasecmp(line, "Dest") && strcasecmp(line, "Default")) || !value)
+	if ((_cups_strcasecmp(line, "Dest") && _cups_strcasecmp(line, "Default")) || !value)
           continue;
 
        /*
@@ -686,7 +686,7 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 	* the loop - we're done!
 	*/
 
-	if (!strcasecmp(value, name))
+	if (!_cups_strcasecmp(value, name))
 	{
           num_options = cupsParseOptions(optptr, num_options, options);
 	  break;
