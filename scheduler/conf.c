@@ -1639,7 +1639,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
   if (*value == '[')
   {
    /*
-    * Parse hexadecimal IPv6 address...
+    * Parse hexadecimal IPv6/IPv4 address...
     */
 
     family  = AF_INET6;
@@ -1654,12 +1654,55 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 	     ptr2;
 	     ptr2 = strchr(ptr2 + 1, ':'), j ++);
 
-        i = 7 - j;
-	ptr ++;
+        i = 6 - j;
+	ptr += 2;
+      }
+      else if (isdigit(*ptr & 255) && strchr(ptr + 1, '.') && i >= 6)
+      {
+       /*
+        * Read IPv4 dotted quad...
+        */
+
+	unsigned val[4] = { 0, 0, 0, 0 };
+					/* IPv4 address values */
+
+	ipcount = sscanf(ptr, "%u.%u.%u.%u", val + 0, val + 1, val + 2,
+	                 val + 3);
+
+       /*
+	* Range check the IP numbers...
+	*/
+
+	for (i = 0; i < ipcount; i ++)
+	  if (val[i] > 255)
+	    return (0);
+
+       /*
+	* Merge everything into a 32-bit IPv4 address in ip[3]...
+	*/
+
+	ip[3] = (((((val[0] << 8) | val[1]) << 8) | val[2]) << 8) | val[3];
+
+	if (ipcount < 4)
+	  mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
+
+       /*
+        * If the leading words are all 0's then this is an IPv4 address...
+        */
+
+        if (!val[0] && !val[1] && !val[2])
+	  family  = AF_INET;
+
+        while (isdigit(*ptr & 255) || *ptr == '.')
+          ptr ++;
+	break;
       }
       else if (isxdigit(*ptr & 255))
       {
         ipval = strtoul(ptr, (char **)&ptr, 16);
+
+	if (*ptr == ':' && ptr[1] != ':')
+	  ptr ++;
 
 	if (ipval > 0xffff)
 	  return (0);
@@ -1671,9 +1714,6 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       }
       else
         return (0);
-
-      while (*ptr == ':')
-        ptr ++;
     }
 
     if (*ptr != ']')
@@ -1691,7 +1731,7 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     * Parse dotted-decimal IPv4 address...
     */
 
-    unsigned val[4];			/* IPv4 address values */
+    unsigned val[4] = { 0, 0, 0, 0 };	/* IPv4 address values */
 
 
     family  = AF_INET;
@@ -1704,14 +1744,6 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     for (i = 0; i < ipcount; i ++)
       if (val[i] > 255)
         return (0);
-
-   /*
-    * Make sure the trailing values are zeroed, as some C libraries like
-    * glibc apparently like to fill the unused arguments with garbage...
-    */
-
-    for (i = ipcount; i < 4; i ++)
-      val[i] = 0;
 
    /*
     * Merge everything into a 32-bit IPv4 address in ip[3]...
@@ -1740,7 +1772,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
       if (family != AF_INET)
         return (0);
 
-      if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2, mask + 3) != 4)
+      if (sscanf(maskval, "%u.%u.%u.%u", mask + 0, mask + 1, mask + 2,
+                 mask + 3) != 4)
         return (0);
 
       mask[3] |= ((((mask[0] << 8) | mask[1]) << 8) | mask[2]) << 8;
