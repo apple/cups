@@ -1,8 +1,10 @@
-CHANGES.txt - 2011-05-18
+CHANGES.txt - 2011-05-19
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler reported an incorrect job-printer-uri value when sharing
+	  was not enabled (STR #3639)
 	- The scheduler now allows the ServerAlias directive to contain multiple
 	  hostnames separated by spaces or commas (STR #3813)
 	- The scheduler now sets the process group for child processes and

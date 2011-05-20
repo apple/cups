@@ -5267,20 +5267,24 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
+    if (!strcmp(fromattr->name, "job-printer-uri"))
+      continue;
+
     if (exclude &&
         (cupsArrayFind(exclude, fromattr->name) ||
 	 cupsArrayFind(exclude, "all")))
     {
      /*
       * We need to exclude this attribute for security reasons; we require the
-      * job-id and job-printer-uri attributes regardless of the security
-      * settings for IPP conformance.
+      * job-id attribute regardless of the security settings for IPP
+      * conformance.
+      *
+      * The job-printer-uri attribute is handled by copy_job_attrs().
       *
       * Subscription attribute security is handled by copy_subscription_attrs().
       */
 
-      if (strcmp(fromattr->name, "job-id") &&
-	  strcmp(fromattr->name, "job-printer-uri"))
+      if (strcmp(fromattr->name, "job-id"))
         continue;
     }
 
@@ -5942,10 +5946,6 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
   * Send the requested attributes for each job...
   */
 
-  httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-                   con->servername, con->serverport, "/jobs/%d",
-        	   job->id);
-
   if (!cupsArrayFind(exclude, "all"))
   {
     if ((!exclude || !cupsArrayFind(exclude, "document-count")) &&
@@ -5960,8 +5960,13 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 
     if ((!exclude || !cupsArrayFind(exclude, "job-more-info")) &&
         (!ra || cupsArrayFind(ra, "job-more-info")))
+    {
+      httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "http",
+                       NULL, con->servername, con->serverport, "/jobs/%d",
+		       job->id);
       ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
 		   "job-more-info", NULL, job_uri);
+    }
 
     if (job->state_value > IPP_JOB_PROCESSING &&
 	(!exclude || !cupsArrayFind(exclude, "job-preserved")) &&
@@ -5975,12 +5980,28 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 		    "job-printer-up-time", time(NULL));
   }
 
+  if (!ra || cupsArrayFind(ra, "job-printer-uri"))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+		     con->servername, con->serverport,
+		     job->dtype & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS) ?
+		         "/classes/%s" : "/printers/%s",
+		     job->dest);
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+        	 "job-printer-uri", NULL, job_uri);
+  }
+
   if (!ra || cupsArrayFind(ra, "job-state-reasons"))
     add_job_state_reasons(con, job);
 
   if (!ra || cupsArrayFind(ra, "job-uri"))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+		     con->servername, con->serverport, "/jobs/%d",
+		     job->id);
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-uri", NULL, job_uri);
+  }
 
   copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0, exclude);
 }
