@@ -479,6 +479,7 @@ connection.">httpSetCredentials</a></li>
 	<li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
 	<li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
 	<li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
+	<li><a href="#httpSetTimeout" title="Set read/write timeouts and an optional callback.">httpSetTimeout</a></li>
 	<li><a href="#httpStatus" title="Return a short string describing a HTTP status code.">httpStatus</a></li>
 	<li><a href="#httpTrace" title="Send an TRACE request to the server.">httpTrace</a></li>
 	<li><a href="#httpUpdate" title="Update the current HTTP state for incoming data.">httpUpdate</a></li>
@@ -536,7 +537,7 @@ used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_t</a></li>
 	<li><a href="#http_auth_t" title="HTTP authentication types">http_auth_t</a></li>
-	<li><a href="#http_credential_t" title="Credential data ">http_credential_t</a></li>
+	<li><a href="#http_credential_t" title="HTTP credential data ">http_credential_t</a></li>
 	<li><a href="#http_encoding_t" title="HTTP transfer encoding values">http_encoding_t</a></li>
 	<li><a href="#http_encryption_t" title="HTTP encryption values">http_encryption_t</a></li>
 	<li><a href="#http_field_t" title="HTTP field names">http_field_t</a></li>
@@ -545,6 +546,7 @@ with a hostname. ">http_addrlist_t</a></li>
 are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_status_t" title="HTTP status codes">http_status_t</a></li>
 	<li><a href="#http_t" title="HTTP connection type">http_t</a></li>
+	<li><a href="#http_timeout_cb_t" title="HTTP timeout callback ">http_timeout_cb_t</a></li>
 	<li><a href="#http_uri_coding_t" title="URI en/decode flags">http_uri_coding_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
@@ -570,7 +572,7 @@ are server-oriented...">http_state_t</a></li>
 used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_s</a></li>
-	<li><a href="#http_credential_s" title="Credential data ">http_credential_s</a></li>
+	<li><a href="#http_credential_s" title="HTTP credential data ">http_credential_s</a></li>
 	<li><a href="#ipp_attribute_s" title="Attribute">ipp_attribute_s</a></li>
 	<li><a href="#ipp_s" title="IPP Request/Response/Notification">ipp_s</a></li>
 </ul></li>
@@ -2513,6 +2515,32 @@ void httpSetLength (<br>
 <dt>length</dt>
 <dd class="description">Length (0 for chunked)</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpSetTimeout">httpSetTimeout</a></h3>
+<p class="description">Set read/write timeouts and an optional callback.</p>
+<p class="code">
+void httpSetTimeout (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;double timeout,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_timeout_cb_t">http_timeout_cb_t</a> cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>timeout</dt>
+<dd class="description">Number of seconds for timeout,
+must be greater than 0</dd>
+<dt>cb</dt>
+<dd class="description">Callback function or NULL</dd>
+<dt>user_data</dt>
+<dd class="description">User data pointer</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The optional timeout callback receives both the HTTP connection and a user
+data pointer and must return 1 to continue or 0 to error (time) out.
+
+</p>
 <h3 class="function"><a name="httpStatus">httpStatus</a></h3>
 <p class="description">Return a short string describing a HTTP status code.</p>
 <p class="code">
@@ -3368,7 +3396,7 @@ typedef struct <a href="#http_addrlist_s">http_addrlist_s</a> / http_addrlist_t;
 typedef enum <a href="#http_auth_e">http_auth_e</a> http_auth_t;
 </p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
-<p class="description">Credential data </p>
+<p class="description">HTTP credential data </p>
 <p class="code">
 typedef struct <a href="#http_credential_s">http_credential_s</a> http_credential_t;
 </p>
@@ -3407,6 +3435,11 @@ typedef enum <a href="#http_status_e">http_status_e</a> http_status_t;
 <p class="description">HTTP connection type</p>
 <p class="code">
 typedef struct _http_s http_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_timeout_cb_t">http_timeout_cb_t</a></h3>
+<p class="description">HTTP timeout callback </p>
+<p class="code">
+typedef int (*http_timeout_cb_t)(<a href="#http_t">http_t</a> *http, void *user_data);
 </p>
 <h3 class="typedef"><a name="http_uri_coding_t">http_uri_coding_t</a></h3>
 <p class="description">URI en/decode flags</p>
@@ -3535,7 +3568,7 @@ with a hostname. </p>
 <dd class="description">Pointer to next address in list</dd>
 </dl>
 <h3 class="struct"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
-<p class="description">Credential data </p>
+<p class="description">HTTP credential data </p>
 <p class="code">struct http_credential_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *data;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;size_t datalen;<br>
