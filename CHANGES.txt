@@ -4,8 +4,13 @@ CHANGES.txt - 2011-05-26
 CHANGES IN CUPS V1.5b2
 
 	- Documentation updates.
+	- Localization updates (STR #3845)
 	- Compiler warning cleanup.
 	- Fixed PIE support for Linux (STR #3846)
+	- Made httpSetTimeout API public and use it in the IPP backend to avoid
+	  timeout errors.
+	- The scheduler incorrectly set the "authenticated" printer-type bit for
+	  remote queues using authentication.
 
 
 CHANGES IN CUPS V1.5b1
