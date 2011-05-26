@@ -138,7 +138,14 @@ if test -n "$GCC"; then
 	OLDCFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fPIE"
 	AC_TRY_COMPILE(,,
-		[PIEFLAGS="-fPIE -Wl,-pie"
+		[case "$CC" in
+			*clang)
+				PIEFLAGS="-fPIE -Wl,-pie"
+				;;
+			*)
+				PIEFLAGS="-fPIE -pie"
+				;;
+		esac
 		AC_MSG_RESULT(yes)],
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
@@ -146,11 +153,21 @@ if test -n "$GCC"; then
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
 		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+
 		# Additional warning options for development testing...
 		if test -d .svn; then
 			OPTIM="-Wshadow $OPTIM"
 			CFLAGS="-Werror-implicit-function-declaration $CFLAGS"
 			PHPOPTIONS="-Wno-shadow"
+		else
+			AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
+			OLDCFLAGS="$CFLAGS"
+			CFLAGS="$CFLAGS -Wno-tautological-compare"
+			AC_TRY_COMPILE(,,
+				[OPTIM="$OPTIM -Wno-tautological-compare"
+				AC_MSG_RESULT(yes)],
+				AC_MSG_RESULT(no))
+			CFLAGS="$OLDCFLAGS"
 		fi
 	fi
 
@@ -162,11 +179,6 @@ if test -n "$GCC"; then
 			# CUPS since we already use buffer-limited calls, but
 			# this will catch any additions that are broken.
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
-
-			if test x$enable_pie = xyes; then
-				# GCC 4 on Mac OS X needs -Wl,-pie as well
-				LDFLAGS="$LDFLAGS -Wl,-pie"
-			fi
 			;;
 
 		HP-UX*)

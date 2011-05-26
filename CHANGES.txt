@@ -1,5 +1,12 @@
-CHANGES.txt - 2011-05-20
+CHANGES.txt - 2011-05-26
 ------------------------
+
+CHANGES IN CUPS V1.5b2
+
+	- Documentation updates.
+	- Compiler warning cleanup.
+	- Fixed PIE support for Linux (STR #3846)
+
 
 CHANGES IN CUPS V1.5b1
 
