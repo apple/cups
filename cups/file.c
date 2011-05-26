@@ -89,7 +89,7 @@ _cupsFileCheck(
     int                 dorootchecks,	/* I - Check for root permissions? */
     _cups_fc_func_t     cb,		/* I - Callback function */
     void                *context)	/* I - Context pointer for callback */
-    
+
 {
   struct stat		fileinfo;	/* File information */
   char			message[1024],	/* Message string */
@@ -335,6 +335,7 @@ _cupsFileCheckFilter(
 
   switch (result)
   {
+    default :
     case _CUPS_FILE_CHECK_OK :
         prefix = "DEBUG2";
 	break;
