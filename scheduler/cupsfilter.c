@@ -400,16 +400,13 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
+  prefilter_type = NULL;
+
   if (all_filters)
-  {
     printer_type = add_printer_filters(command, mime, printer, ppdfile,
 				       &prefilter_type);
-  }
   else
-  {
     printer_type   = mimeType(mime, "application", "vnd.cups-postscript");
-    prefilter_type = NULL;
-  }
 
  /*
   * Get the source and destination types...
