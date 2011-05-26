@@ -387,9 +387,9 @@
 "1.50x2.00\"" = "1.50x2.00\"";
 "10" = "10";
 "10 inches/sec." = "10 inches/sec.";
-"10 x 11\"" = "10 x 11\"";
-"10 x 13\"" = "10 x 13\"";
-"10 x 14\"" = "10 x 14\"";
+"10 x 11" = "10 x 11";
+"10 x 13" = "10 x 13";
+"10 x 14" = "10 x 14";
 "100" = "100";
 "100 mm/sec." = "100 mm/sec.";
 "105" = "105";
@@ -399,7 +399,7 @@
 "115" = "115";
 "12" = "12";
 "12 inches/sec." = "12 inches/sec.";
-"12 x 11\"" = "12 x 11\"";
+"12 x 11" = "12 x 11";
 "120" = "120";
 "120 mm/sec." = "120 mm/sec.";
 "120x60dpi" = "120x60dpi";
@@ -409,7 +409,7 @@
 "14" = "14";
 "15" = "15";
 "15 mm/sec." = "15 mm/sec.";
-"15 x 11\"" = "15 x 11\"";
+"15 x 11" = "15 x 11";
 "150 mm/sec." = "150 mm/sec.";
 "150dpi" = "150dpi";
 "16" = "16";
@@ -456,6 +456,7 @@
 "29" = "29";
 "3" = "3";
 "3 inches/sec." = "3 inches/sec.";
+"3 x 5" = "3 x 5";
 "3.00x1.00\"" = "3.00x1.00\"";
 "3.00x1.25\"" = "3.00x1.25\"";
 "3.00x2.00\"" = "3.00x2.00\"";
@@ -466,6 +467,7 @@
 "3.25x5.50\"" = "3.25x5.50\"";
 "3.25x5.83\"" = "3.25x5.83\"";
 "3.25x7.83\"" = "3.25x7.83\"";
+"3.5 x 5" = "3.5 x 5";
 "3.5\" Disk" = "3.5\" Disk";
 "3.5\" Disk - 2 1/8 x 2 3/4\"" = "3.5\" Disk - 2 1/8 x 2 3/4\"";
 "3.50x1.00\"" = "3.50x1.00\"";
@@ -492,6 +494,7 @@
 "45" = "45";
 "5" = "5";
 "5 inches/sec." = "5 inches/sec.";
+"5 x 7" = "5 x 7";
 "50" = "50";
 "55" = "55";
 "6" = "6";
@@ -511,13 +514,13 @@
 "65" = "65";
 "7" = "7";
 "7 inches/sec." = "7 inches/sec.";
-"7 x 9\"" = "7 x 9\"";
+"7 x 9" = "7 x 9";
 "70" = "70";
 "720dpi" = "720dpi";
 "75" = "75";
 "8" = "8";
 "8 inches/sec." = "8 inches/sec.";
-"8 x 10\"" = "8 x 10\"";
+"8 x 10" = "8 x 10";
 "8.00x1.00\"" = "8.00x1.00\"";
 "8.00x2.00\"" = "8.00x2.00\"";
 "8.00x3.00\"" = "8.00x3.00\"";
@@ -530,8 +533,8 @@
 "85" = "85";
 "9" = "9";
 "9 inches/sec." = "9 inches/sec.";
-"9 x 11\"" = "9 x 11\"";
-"9 x 12\"" = "9 x 12\"";
+"9 x 11" = "9 x 11";
+"9 x 12" = "9 x 12";
 "9-Pin Series" = "9-Pin Series";
 "90" = "90";
 "95" = "95";
@@ -684,6 +687,7 @@
 "Destination \"%s\" is not accepting jobs." = "Destination \"%s\" is not accepting jobs.";
 "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s" = "Device: uri = %s\n        class = %s\n        info = %s\n        make-and-model = %s\n        device-id = %s\n        location = %s";
 "Direct Thermal Media" = "Direct Thermal Media";
+"Directory \"%s\" contains a relative path." = "Directory \"%s\" contains a relative path.";
 "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d).";
 "Directory \"%s\" is a file." = "Directory \"%s\" is a file.";
 "Directory \"%s\" not available: %s" = "Directory \"%s\" not available: %s";
@@ -779,6 +783,7 @@
 "FanFold German" = "FanFold German";
 "FanFold Legal German" = "FanFold Legal German";
 "Fanfold US" = "Fanfold US";
+"File \"%s\" contains a relative path." = "File \"%s\" contains a relative path.";
 "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)." = "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d).";
 "File \"%s\" is a directory." = "File \"%s\" is a directory.";
 "File \"%s\" not available: %s" = "File \"%s\" not available: %s";

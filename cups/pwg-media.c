@@ -103,8 +103,8 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_eur-edp_12x14in", NULL, NULL, 12, 14),
   _PWG_MEDIA_IN("na_arch-b_12x18in", "arch-b", "ARCHB", 12, 18),
   _PWG_MEDIA_IN("na_12x19_12x19in", NULL, "12x19", 12, 19),
-  _PWG_MEDIA_IN("na_b-plus_12x19.17in", NULL, "SuperB", 12, 19.17),
-  _PWG_MEDIA_IN("na_super-b_13x19in", "super-b", NULL, 13, 19),
+  _PWG_MEDIA_IN("na_b-plus_12x19.17in", NULL, NULL, 12, 19.17),
+  _PWG_MEDIA_IN("na_super-b_13x19in", "super-b", "SuperB", 13, 19),
   _PWG_MEDIA_IN("na_c_17x22in", "c", "AnsiC", 17, 22),
   _PWG_MEDIA_IN("na_arch-c_18x24in", "arch-c", "ARCHC", 18, 24),
   _PWG_MEDIA_IN("na_d_22x34in", "d", "AnsiD", 22, 34),
@@ -225,6 +225,9 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("om_pa-kai_267x389mm", NULL, NULL, 267, 389),
   _PWG_MEDIA_MM("om_dai-pa-kai_275x395mm", NULL, NULL, 275, 395),
   _PWG_MEDIA_MM("prc_10_324x458mm", NULL, "EnvPRC10", 324, 458),
+
+  /* Other English Standard Sheet Media Sizes */
+  _PWG_MEDIA_IN("oe_photo-l_3.5x5in", NULL, "3.5x5", 3.5, 5),
 
   /* Other Metric Standard Sheet Media Sizes */
   _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, NULL, 100, 150),
