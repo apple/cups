@@ -674,7 +674,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   }
 
   if (vars->timeout > 0.0)
-    _httpSetTimeout(http, vars->timeout, timeout_cb, NULL);
+    httpSetTimeout(http, vars->timeout, timeout_cb, NULL);
 
  /*
   * Loop on tests...

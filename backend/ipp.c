@@ -27,6 +27,7 @@
  *   report_attr()          - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
  *   run_as_user()          - Run the IPP backend as the printing user.
+ *   timeout_cb()           - Handle HTTP timeouts.
  *   sigterm_handler()      - Handle 'terminate' signals that stop the backend.
  */
 
@@ -162,6 +163,7 @@ static int		run_as_user(int argc, char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static void		sigterm_handler(int sig);
+static int		timeout_cb(http_t *http, void *user_data);
 static void		update_reasons(ipp_attribute_t *attr, const char *s);
 
 
@@ -551,6 +553,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc == 6)
   {
     num_files    = 0;
+    files        = NULL;
     send_options = !_cups_strcasecmp(final_content_type, "application/pdf") ||
                    !_cups_strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
                    !_cups_strncasecmp(final_content_type, "image/", 6);
@@ -631,6 +634,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   http = _httpCreate(hostname, port, addrlist, cupsEncryption(), AF_UNSPEC);
+  httpSetTimeout(http, 30.0, timeout_cb, NULL);
 
  /*
   * See if the printer supports SNMP...
@@ -1967,6 +1971,7 @@ monitor_printer(
 
   http = _httpCreate(monitor->hostname, monitor->port, NULL, monitor->encryption,
                      AF_UNSPEC);
+  httpSetTimeout(http, 30.0, timeout_cb, NULL);
   cupsSetPasswordCB(password_cb);
 
  /*
@@ -2758,6 +2763,21 @@ sigterm_handler(int sig)		/* I - Signal */
     unlink(tmpfilename);
 
   exit(1);
+}
+
+
+/*
+ * 'timeout_cb()' - Handle HTTP timeouts.
+ */
+
+static int				/* O - 1 to continue, 0 to cancel */
+timeout_cb(http_t *http,		/* I - Connection to server (unused) */
+           void   *user_data)		/* I - User data (unused) */
+{
+  (void)http;
+  (void)user_data;
+
+  return (!job_canceled);
 }
 
 

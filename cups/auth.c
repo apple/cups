@@ -361,7 +361,7 @@ _cupsSetNegotiateAuthString(
 
     snprintf(prompt, sizeof(prompt),
              _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
-	     cupsUser(), http->gssname);
+	     cupsUser(), http->gsshost);
 
     if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
       return (-1);
@@ -373,7 +373,7 @@ _cupsSetNegotiateAuthString(
     username = cupsUser();
     if (!strchr(username, '@'))
     {
-      snprintf(userbuf, sizeof(userbuf), "%s@%s", username, http->gssname);
+      snprintf(userbuf, sizeof(userbuf), "%s@%s", username, http->gsshost);
       username = userbuf;
     }
 

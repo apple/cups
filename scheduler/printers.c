@@ -1841,16 +1841,6 @@ cupsdSetAuthInfoRequired(
   if (!attr || attr->num_values > 4)
     return (0);
 
- /*
-  * Update the printer-type value as needed...
-  */
-
-  if (attr->num_values > 1 ||
-      strcmp(attr->values[0].string.text, "none"))
-    p->type |= CUPS_PRINTER_AUTHENTICATED;
-  else
-    p->type &= ~CUPS_PRINTER_AUTHENTICATED;
-
   for (i = 0; i < attr->num_values; i ++)
   {
     if (!strcmp(attr->values[i].string.text, "none"))

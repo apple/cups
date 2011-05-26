@@ -1,8 +1,24 @@
-CHANGES.txt - 2011-05-20
+CHANGES.txt - 2011-05-26
 ------------------------
+
+CHANGES IN CUPS V1.5b2
+
+	- Documentation updates.
+	- Localization updates (STR #3845)
+	- Compiler warning cleanup.
+	- Fixed PIE support for Linux (STR #3846)
+	- Made httpSetTimeout API public and use it in the IPP backend to avoid
+	  timeout errors.
+	- The scheduler incorrectly set the "authenticated" printer-type bit for
+	  remote queues using authentication.
+
 
 CHANGES IN CUPS V1.5b1
 
+	- The CUPS library now supports per-connection HTTP timeouts and
+	  callbacks.
+	- The CUPS library now supports (limited) SSL/TLS X.509 certificate
+	  validation and revocation (STR #1616)
 	- Updated the PostScript filter to support IncludeFeature in more
 	  circumstances (STR #3417)
 	- The schedule did not correctly parse some IPv6 addresses and masks in

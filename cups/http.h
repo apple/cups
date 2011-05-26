@@ -318,11 +318,15 @@ typedef struct http_addrlist_s		/**** Socket address list, which is
 
 typedef struct _http_s http_t;		/**** HTTP connection type ****/
 
-typedef struct http_credential_s	/**** Credential data @since CUPS 1.5/Mac OS X 10.7@ ****/
+typedef struct http_credential_s	/**** HTTP credential data @since CUPS 1.5/Mac OS X 10.7@ ****/
 {
   void		*data;			/* Pointer to credential data */
   size_t	datalen;		/* Credential length */
 } http_credential_t;
+
+typedef int (*http_timeout_cb_t)(http_t *http, void *user_data);
+					/**** HTTP timeout callback @since CUPS 1.5/Mac OS X 10.7@ ****/
+
 
 
 /*
@@ -447,7 +451,7 @@ extern char		*httpGetAuthString(http_t *http) _CUPS_API_1_3;
 extern void		httpSetAuthString(http_t *http, const char *scheme,
 			                  const char *data) _CUPS_API_1_3;
 
-/**** New in CUPS 1.5 ****/
+/**** New in CUPS 1.5/Mac OS X 10.7 ****/
 extern int		httpAddCredential(cups_array_t *credentials,
 			                  const void *data, size_t datalen)
 					  _CUPS_API_1_5;
@@ -457,6 +461,9 @@ extern int		httpCopyCredentials(http_t *http,
 extern void		httpFreeCredentials(cups_array_t *certs) _CUPS_API_1_5;
 extern int		httpSetCredentials(http_t *http, cups_array_t *certs)
 					   _CUPS_API_1_5;
+extern void		httpSetTimeout(http_t *http, double timeout,
+			               http_timeout_cb_t cb, void *user_data);
+
 
 /*
  * C++ magic...

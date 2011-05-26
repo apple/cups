@@ -13,15 +13,18 @@
  *   file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
-#media "10x11/10 x 11\"" 720 792
-#media "10x13/10 x 13\"" 720 936
-#media "10x14/10 x 14\"" 720 1008
-#media "12x11/12 x 11\"" 864 792
-#media "15x11/15 x 11\"" 1080 792
-#media "7x9/7 x 9\"" 504 648
-#media "8x10/8 x 10\"" 576 720
-#media "9x11/9 x 11\"" 648 792
-#media "9x12/9 x 12\"" 648 864
+#media "3x5/3 x 5" 216 360
+#media "3.5x5/3.5 x 5" 252 360
+#media "5x7/5 x 7" 360 504
+#media "10x11/10 x 11" 720 792
+#media "10x13/10 x 13" 720 936
+#media "10x14/10 x 14" 720 1008
+#media "12x11/12 x 11" 864 792
+#media "15x11/15 x 11" 1080 792
+#media "7x9/7 x 9" 504 648
+#media "8x10/8 x 10" 576 720
+#media "9x11/9 x 11" 648 792
+#media "9x12/9 x 12" 648 864
 #media "A0/A0" 2384 3370
 #media "A0.Transverse/A0 Long Edge" 3370 2384
 #media "A1/A1" 1684 2384

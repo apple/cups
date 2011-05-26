@@ -235,8 +235,6 @@ typedef void *http_tls_t;
 typedef void *http_tls_credentials_t;
 #  endif /* HAVE_LIBSSL */
 
-typedef int (*_http_timeout_cb_t)(http_t *http, void *user_data);
-
 struct _http_s				/**** HTTP connection structure. ****/
 {
   int			fd;		/* File descriptor for this socket */
@@ -297,7 +295,7 @@ struct _http_s				/**** HTTP connection structure. ****/
   /**** New in CUPS 1.5 ****/
   http_tls_credentials_t tls_credentials;
 					/* TLS credentials @since CUPS 1.5/Mac OS X 10.7@ */
-  _http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5/Mac OS X 10.7@ */
+  http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5/Mac OS X 10.7@ */
   void			*timeout_data;	/* User data pointer @since CUPS 1.5/Mac OS X 10.7@ */
   struct timeval	timeout_value;	/* Timeout in seconds */
 #  ifdef HAVE_GSSAPI
@@ -390,8 +388,6 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
-extern void		_httpSetTimeout(http_t *http, double timeout,
-			                _http_timeout_cb_t cb, void *user_data);
 extern int		_httpUpdate(http_t *http, http_status_t *status);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 

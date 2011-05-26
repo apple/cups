@@ -502,6 +502,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 	break;
 
+    default :
     case CUPS_CSPACE_RGB :
     case CUPS_CSPACE_RGBA :
     case CUPS_CSPACE_RGBW :

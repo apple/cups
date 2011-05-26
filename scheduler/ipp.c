@@ -3229,7 +3229,7 @@ apple_register_profiles(
   int			num_profiles;	/* Number of profiles */
   OSStatus		error = 0;	/* Last error */
   unsigned		device_id,	/* Printer device ID */
-			profile_id,	/* Profile ID */
+			profile_id = 0,	/* Profile ID */
 			default_profile_id = 0;
 					/* Default profile ID */
   CFMutableDictionaryRef device_name;	/* Printer device name dictionary */
@@ -3681,12 +3681,14 @@ apple_register_profiles(
 
     switch (ppd->colorspace)
     {
+      default :
       case PPD_CS_RGB :
       case PPD_CS_CMY :
           profile_id = _ppdHashName("RGB..");
           apple_init_profile(ppd, NULL, profile, profile_id, "RGB", "RGB",
 	                     NULL);
           break;
+
       case PPD_CS_RGBK :
       case PPD_CS_CMYK :
           profile_id = _ppdHashName("CMYK..");
@@ -3747,6 +3749,7 @@ apple_register_profiles(
 
     switch (ppd->colorspace)
     {
+      default :
       case PPD_CS_RGB :
       case PPD_CS_CMY :
           profile_id = _ppdHashName("RGB..");

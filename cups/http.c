@@ -80,7 +80,7 @@
  *   httpSetExpect()           - Set the Expect: header in a request.
  *   httpSetField()            - Set the value of an HTTP header.
  *   httpSetLength()           - Set the content-length and content-encoding.
- *   _httpSetTimeout()         - Set read/write timeouts and an optional
+ *   httpSetTimeout()          - Set read/write timeouts and an optional
  *                               callback.
  *   httpTrace()               - Send an TRACE request to the server.
  *   _httpUpdate()             - Update the current HTTP status for incoming
@@ -1314,8 +1314,11 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!_httpWait(http, http->blocking ? 30000 : 10000, 1))
+      while (!_httpWait(http, http->blocking ? 30000 : 10000, 1))
       {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	  continue;
+
         DEBUG_puts("3httpGets: Timed out!");
 #ifdef WIN32
         http->error = WSAETIMEDOUT;
@@ -1634,8 +1637,16 @@ _httpPeek(http_t *http,			/* I - Connection to server */
     * Buffer small reads for better performance...
     */
 
-    if (!http->blocking && !httpWait(http, 10000))
-      return (0);
+    if (!http->blocking)
+    {
+      while (!httpWait(http, 10000))
+      {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	  continue;
+
+	return (0);
+      }
+    }
 
     if (http->data_remaining > sizeof(http->buffer))
       bytes = sizeof(http->buffer);
@@ -1890,8 +1901,16 @@ httpRead2(http_t *http,			/* I - Connection to server */
     * Buffer small reads for better performance...
     */
 
-    if (!http->blocking && !httpWait(http, 10000))
-      return (0);
+    if (!http->blocking)
+    {
+      while (!httpWait(http, 10000))
+      {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	  continue;
+
+	return (0);
+      }
+    }
 
     if (http->data_remaining > sizeof(http->buffer))
       bytes = sizeof(http->buffer);
@@ -1978,16 +1997,32 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #ifdef HAVE_SSL
   else if (http->tls)
   {
-    if (!http->blocking && !httpWait(http, 10000))
-      return (0);
+    if (!http->blocking)
+    {
+      while (!httpWait(http, 10000))
+      {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	  continue;
+
+	return (0);
+      }
+    }
 
     bytes = (ssize_t)http_read_ssl(http, buffer, (int)length);
   }
 #endif /* HAVE_SSL */
   else
   {
-    if (!http->blocking && !httpWait(http, 10000))
-      return (0);
+    if (!http->blocking)
+    {
+      while (!httpWait(http, 10000))
+      {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	  continue;
+
+	return (0);
+      }
+    }
 
     DEBUG_printf(("2httpRead2: reading " CUPS_LLFMT " bytes from socket...",
                   CUPS_LLCAST length));
@@ -2097,8 +2132,11 @@ _httpReadCDSA(
     * Make sure we have data before we read...
     */
 
-    if (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, 10000, 0))
     {
+      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	continue;
+
       http->error = ETIMEDOUT;
       return (-1);
     }
@@ -2158,8 +2196,11 @@ _httpReadGNUTLS(
     * Make sure we have data before we read...
     */
 
-    if (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, 10000, 0))
     {
+      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	continue;
+
       http->error = ETIMEDOUT;
       return (-1);
     }
@@ -2520,19 +2561,21 @@ httpSetLength(http_t *http,		/* I - Connection to server */
 
 
 /*
- * '_httpSetTimeout()' - Set read/write timeouts and an optional callback.
+ * 'httpSetTimeout()' - Set read/write timeouts and an optional callback.
  *
  * The optional timeout callback receives both the HTTP connection and a user
- * data pointer and must return 1 to continue or 0 to error out.
+ * data pointer and must return 1 to continue or 0 to error (time) out.
+ *
+ * @since CUPS 1.5/Mac OS X 10.7@
  */
 
 void
-_httpSetTimeout(
-    http_t             *http,		/* I - Connection to server */
-    double             timeout,		/* I - Number of seconds for timeout,
+httpSetTimeout(
+    http_t            *http,		/* I - Connection to server */
+    double            timeout,		/* I - Number of seconds for timeout,
                                                must be greater than 0 */
-    _http_timeout_cb_t cb,		/* I - Callback function or NULL */
-    void               *user_data)	/* I - User data pointer */
+    http_timeout_cb_t cb,		/* I - Callback function or NULL */
+    void              *user_data)	/* I - User data pointer */
 {
   if (!http || timeout <= 0.0)
     return;
@@ -2553,6 +2596,7 @@ _httpSetTimeout(
                sizeof(timeout_value));
     setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
                sizeof(timeout_value));
+
 #else
     setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
@@ -3266,8 +3310,11 @@ http_bio_read(BIO  *h,			/* I - BIO data */
     * Make sure we have data before we read...
     */
 
-    if (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, 10000, 0))
     {
+      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	continue;
+
 #ifdef WIN32
       http->error = WSAETIMEDOUT;
 #else
