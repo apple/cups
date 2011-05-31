@@ -39,6 +39,7 @@
  *   cupsFilePeekChar()     - Peek at the next character from a file.
  *   cupsFilePrintf()       - Write a formatted string.
  *   cupsFilePutChar()      - Write a character.
+ *   cupsFilePutConf()      - Write a configuration line.
  *   cupsFilePuts()         - Write a string.
  *   cupsFileRead()         - Read from a file.
  *   cupsFileRewind()       - Set the current file position to the beginning of
@@ -52,6 +53,7 @@
  *   cupsFileWrite()        - Write to a file.
  *   cups_compress()        - Compress a buffer of data.
  *   cups_fill()            - Fill the input buffer.
+ *   cups_open()            - Safely open a file for writing.
  *   cups_read()            - Read from a file descriptor.
  *   cups_write()           - Write to a file descriptor.
  */
