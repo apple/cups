@@ -165,9 +165,10 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 
 <h4>Customizing the Profile Selection Keywords</h4>
 
-<p>The <tt>MediaType</tt> and <tt>Resolution</tt> main keywords can be reassigned to different main keywords, allowing drivers to do color profile selection based on different parameters. The <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> keywords define the mapping from selector to main keyword:</p>
+<p>The <tt>ColorModel</tt>, <tt>MediaType</tt>, and <tt>Resolution</tt> main keywords can be reassigned to different main keywords, allowing drivers to do color profile selection based on different parameters. The <tt>cupsICCQualifier1</tt>, <tt>cupsICCQualifier2</tt>, and <tt>cupsICCQualifier3</tt> keywords define the mapping from selector to main keyword:</p>
 
 <pre class='command'>
+*cupsICCQualifier1: MainKeyword1
 *cupsICCQualifier2: MainKeyword2
 *cupsICCQualifier3: MainKeyword3
 </pre>
@@ -175,6 +176,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <p>The default mapping is as follows:</p>
 
 <pre class='command'>
+*cupsICCQualifier1: ColorModel
 *cupsICCQualifier2: MediaType
 *cupsICCQualifier3: Resolution
 </pre>
