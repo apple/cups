@@ -44,6 +44,7 @@ typedef enum
 {
   CUPS_DEVICE_PRINTER = 0,		/* lpd://... */
   CUPS_DEVICE_IPP,			/* ipp://... */
+  CUPS_DEVICE_IPPS,			/* ipps://... */
   CUPS_DEVICE_FAX_IPP,			/* ipp://... */
   CUPS_DEVICE_PDL_DATASTREAM,		/* socket://... */
   CUPS_DEVICE_RIOUSBPRINT		/* riousbprint://... */
@@ -123,9 +124,11 @@ main(int  argc,				/* I - Number of command-line args */
 		fax_ipp_ref,		/* IPP fax service reference */
 		ipp_ref,		/* IPP service reference */
 		ipp_tls_ref,		/* IPP w/TLS service reference */
+		ipps_ref,		/* IPP service reference */
 		local_fax_ipp_ref,	/* Local IPP fax service reference */
 		local_ipp_ref,		/* Local IPP service reference */
 		local_ipp_tls_ref,	/* Local IPP w/TLS service reference */
+		local_ipps_ref,		/* Local IPP service reference */
 		local_printer_ref,	/* Local LPD service reference */
 		pdl_datastream_ref,	/* AppSocket service reference */
 		printer_ref,		/* LPD service reference */
@@ -215,6 +218,10 @@ main(int  argc,				/* I - Number of command-line args */
   DNSServiceBrowse(&ipp_tls_ref, kDNSServiceFlagsShareConnection, 0,
                    "_ipp-tls._tcp", NULL, browse_callback, devices);
 
+  ipps_ref = main_ref;
+  DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
+                   "_ipps._tcp", NULL, browse_callback, devices);
+
   local_fax_ipp_ref = main_ref;
   DNSServiceBrowse(&local_fax_ipp_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
@@ -229,6 +236,11 @@ main(int  argc,				/* I - Number of command-line args */
   DNSServiceBrowse(&local_ipp_tls_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
                    "_ipp-tls._tcp", NULL, browse_local_callback, devices);
+
+  local_ipps_ref = main_ref;
+  DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection,
+                   kDNSServiceInterfaceIndexLocalOnly,
+		   "_ipps._tcp", NULL, browse_local_callback, devices);
 
   local_printer_ref = main_ref;
   DNSServiceBrowse(&local_printer_ref, kDNSServiceFlagsShareConnection,
@@ -558,9 +570,11 @@ get_device(cups_array_t *devices,	/* I - Device array */
 
   key.name = (char *)serviceName;
 
-  if (!strcmp(regtype, "_ipp._tcp.") ||
-      !strcmp(regtype, "_ipp-tls._tcp."))
+  if (!strcmp(regtype, "_ipp._tcp."))
     key.type = CUPS_DEVICE_IPP;
+  else if (!strcmp(regtype, "_ipps._tcp.") ||
+	   !strcmp(regtype, "_ipp-tls._tcp."))
+    key.type = CUPS_DEVICE_IPPS;
   else if (!strcmp(regtype, "_fax-ipp._tcp."))
     key.type = CUPS_DEVICE_FAX_IPP;
   else if (!strcmp(regtype, "_printer._tcp."))
@@ -680,9 +694,11 @@ query_callback(
   if ((ptr = strstr(name, "._")) != NULL)
     *ptr = '\0';
 
-  if (strstr(fullName, "_ipp._tcp.") ||
-      strstr(fullName, "_ipp-tls._tcp."))
+  if (strstr(fullName, "_ipp._tcp."))
     dkey.type = CUPS_DEVICE_IPP;
+  else if (strstr(fullName, "_ipps._tcp.") ||
+           strstr(fullName, "_ipp-tls._tcp."))
+    dkey.type = CUPS_DEVICE_IPPS;
   else if (strstr(fullName, "_fax-ipp._tcp."))
     dkey.type = CUPS_DEVICE_FAX_IPP;
   else if (strstr(fullName, "_printer._tcp."))
@@ -754,9 +770,16 @@ query_callback(
 	  if (data < datanext)
 	    memcpy(value, data, datanext - data);
 	  value[datanext - data] = '\0';
+
+	  fprintf(stderr, "DEBUG2: query_callback: \"%s=%s\".\n",
+	          key, value);
 	}
 	else
+	{
+	  fprintf(stderr, "DEBUG2: query_callback: \"%s\" with no value.\n",
+	          key);
 	  continue;
+	}
 
         if (!_cups_strncasecmp(key, "usb_", 4))
 	{
@@ -800,6 +823,7 @@ query_callback(
 	else if (!_cups_strcasecmp(key, "priority"))
 	  device->priority = atoi(value);
 	else if ((device->type == CUPS_DEVICE_IPP ||
+	          device->type == CUPS_DEVICE_IPPS ||
 	          device->type == CUPS_DEVICE_PRINTER) &&
 		 !_cups_strcasecmp(key, "printer-type"))
 	{
