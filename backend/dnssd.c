@@ -44,6 +44,7 @@ typedef enum
 {
   CUPS_DEVICE_PRINTER = 0,		/* lpd://... */
   CUPS_DEVICE_IPP,			/* ipp://... */
+  CUPS_DEVICE_IPPS,			/* ipps://... */
   CUPS_DEVICE_FAX_IPP,			/* ipp://... */
   CUPS_DEVICE_PDL_DATASTREAM,		/* socket://... */
   CUPS_DEVICE_RIOUSBPRINT		/* riousbprint://... */
@@ -123,9 +124,11 @@ main(int  argc,				/* I - Number of command-line args */
 		fax_ipp_ref,		/* IPP fax service reference */
 		ipp_ref,		/* IPP service reference */
 		ipp_tls_ref,		/* IPP w/TLS service reference */
+		ipps_ref,		/* IPP service reference */
 		local_fax_ipp_ref,	/* Local IPP fax service reference */
 		local_ipp_ref,		/* Local IPP service reference */
 		local_ipp_tls_ref,	/* Local IPP w/TLS service reference */
+		local_ipps_ref,		/* Local IPP service reference */
 		local_printer_ref,	/* Local LPD service reference */
 		pdl_datastream_ref,	/* AppSocket service reference */
 		printer_ref,		/* LPD service reference */
@@ -215,6 +218,10 @@ main(int  argc,				/* I - Number of command-line args */
   DNSServiceBrowse(&ipp_tls_ref, kDNSServiceFlagsShareConnection, 0,
                    "_ipp-tls._tcp", NULL, browse_callback, devices);
 
+  ipps_ref = main_ref;
+  DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
+                   "_ipps._tcp", NULL, browse_callback, devices);
+
   local_fax_ipp_ref = main_ref;
   DNSServiceBrowse(&local_fax_ipp_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
@@ -229,6 +236,11 @@ main(int  argc,				/* I - Number of command-line args */
   DNSServiceBrowse(&local_ipp_tls_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
                    "_ipp-tls._tcp", NULL, browse_local_callback, devices);
+
+  local_ipps_ref = main_ref;
+  DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection,
+                   kDNSServiceInterfaceIndexLocalOnly,
+		   "_ipps._tcp", NULL, browse_local_callback, devices);
 
   local_printer_ref = main_ref;
   DNSServiceBrowse(&local_printer_ref, kDNSServiceFlagsShareConnection,
@@ -256,8 +268,8 @@ main(int  argc,				/* I - Number of command-line args */
     FD_ZERO(&input);
     FD_SET(fd, &input);
 
-    timeout.tv_sec  = 1;
-    timeout.tv_usec = 0;
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 250000;
 
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
       continue;
@@ -280,19 +292,26 @@ main(int  argc,				/* I - Number of command-line args */
       cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
-
+      int	sent;			/* Number of sent */
 
       for (device = (cups_device_t *)cupsArrayFirst(devices),
-               best = NULL, count = 0;
+               best = NULL, count = 0, sent = 0;
            device;
 	   device = (cups_device_t *)cupsArrayNext(devices))
+      {
+        if (device->sent)
+	  sent ++;
+
+        if (device->ref)
+	  count ++;
+
         if (!device->ref && !device->sent)
 	{
 	 /*
 	  * Found the device, now get the TXT record(s) for it...
 	  */
 
-          if (count < 10)
+          if (count < 20)
 	  {
 	    device->ref = main_ref;
 
@@ -338,6 +357,8 @@ main(int  argc,				/* I - Number of command-line args */
 	                      best->name, best->device_id, NULL);
 	    best->sent = 1;
 	    best       = device;
+
+	    sent ++;
 	  }
 	  else if (best->priority > device->priority ||
 	           (best->priority == device->priority &&
@@ -345,10 +366,17 @@ main(int  argc,				/* I - Number of command-line args */
           {
 	    best->sent = 1;
 	    best       = device;
+
+	    sent ++;
 	  }
 	  else
+	  {
 	    device->sent = 1;
+
+	    sent ++;
+	  }
         }
+      }
 
       if (best)
       {
@@ -361,7 +389,11 @@ main(int  argc,				/* I - Number of command-line args */
 	cupsBackendReport("network", device_uri, best->make_and_model,
 			  best->name, best->device_id, NULL);
 	best->sent = 1;
+	sent ++;
       }
+
+      if (sent == cupsArrayCount(devices))
+	break;
     }
   }
 
@@ -558,9 +590,11 @@ get_device(cups_array_t *devices,	/* I - Device array */
 
   key.name = (char *)serviceName;
 
-  if (!strcmp(regtype, "_ipp._tcp.") ||
-      !strcmp(regtype, "_ipp-tls._tcp."))
+  if (!strcmp(regtype, "_ipp._tcp."))
     key.type = CUPS_DEVICE_IPP;
+  else if (!strcmp(regtype, "_ipps._tcp.") ||
+	   !strcmp(regtype, "_ipp-tls._tcp."))
+    key.type = CUPS_DEVICE_IPPS;
   else if (!strcmp(regtype, "_fax-ipp._tcp."))
     key.type = CUPS_DEVICE_FAX_IPP;
   else if (!strcmp(regtype, "_printer._tcp."))
@@ -680,9 +714,11 @@ query_callback(
   if ((ptr = strstr(name, "._")) != NULL)
     *ptr = '\0';
 
-  if (strstr(fullName, "_ipp._tcp.") ||
-      strstr(fullName, "_ipp-tls._tcp."))
+  if (strstr(fullName, "_ipp._tcp."))
     dkey.type = CUPS_DEVICE_IPP;
+  else if (strstr(fullName, "_ipps._tcp.") ||
+           strstr(fullName, "_ipp-tls._tcp."))
+    dkey.type = CUPS_DEVICE_IPPS;
   else if (strstr(fullName, "_fax-ipp._tcp."))
     dkey.type = CUPS_DEVICE_FAX_IPP;
   else if (strstr(fullName, "_printer._tcp."))
@@ -754,9 +790,16 @@ query_callback(
 	  if (data < datanext)
 	    memcpy(value, data, datanext - data);
 	  value[datanext - data] = '\0';
+
+	  fprintf(stderr, "DEBUG2: query_callback: \"%s=%s\".\n",
+	          key, value);
 	}
 	else
+	{
+	  fprintf(stderr, "DEBUG2: query_callback: \"%s\" with no value.\n",
+	          key);
 	  continue;
+	}
 
         if (!_cups_strncasecmp(key, "usb_", 4))
 	{
@@ -800,6 +843,7 @@ query_callback(
 	else if (!_cups_strcasecmp(key, "priority"))
 	  device->priority = atoi(value);
 	else if ((device->type == CUPS_DEVICE_IPP ||
+	          device->type == CUPS_DEVICE_IPPS ||
 	          device->type == CUPS_DEVICE_PRINTER) &&
 		 !_cups_strcasecmp(key, "printer-type"))
 	{
