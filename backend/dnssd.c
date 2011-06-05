@@ -268,8 +268,8 @@ main(int  argc,				/* I - Number of command-line args */
     FD_ZERO(&input);
     FD_SET(fd, &input);
 
-    timeout.tv_sec  = 1;
-    timeout.tv_usec = 0;
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 250000;
 
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
       continue;
@@ -292,19 +292,26 @@ main(int  argc,				/* I - Number of command-line args */
       cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
-
+      int	sent;			/* Number of sent */
 
       for (device = (cups_device_t *)cupsArrayFirst(devices),
-               best = NULL, count = 0;
+               best = NULL, count = 0, sent = 0;
            device;
 	   device = (cups_device_t *)cupsArrayNext(devices))
+      {
+        if (device->sent)
+	  sent ++;
+
+        if (device->ref)
+	  count ++;
+
         if (!device->ref && !device->sent)
 	{
 	 /*
 	  * Found the device, now get the TXT record(s) for it...
 	  */
 
-          if (count < 10)
+          if (count < 20)
 	  {
 	    device->ref = main_ref;
 
@@ -350,6 +357,8 @@ main(int  argc,				/* I - Number of command-line args */
 	                      best->name, best->device_id, NULL);
 	    best->sent = 1;
 	    best       = device;
+
+	    sent ++;
 	  }
 	  else if (best->priority > device->priority ||
 	           (best->priority == device->priority &&
@@ -357,10 +366,17 @@ main(int  argc,				/* I - Number of command-line args */
           {
 	    best->sent = 1;
 	    best       = device;
+
+	    sent ++;
 	  }
 	  else
+	  {
 	    device->sent = 1;
+
+	    sent ++;
+	  }
         }
+      }
 
       if (best)
       {
@@ -373,7 +389,11 @@ main(int  argc,				/* I - Number of command-line args */
 	cupsBackendReport("network", device_uri, best->make_and_model,
 			  best->name, best->device_id, NULL);
 	best->sent = 1;
+	sent ++;
       }
+
+      if (sent == cupsArrayCount(devices))
+	break;
     }
   }
 

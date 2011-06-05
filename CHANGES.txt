@@ -1,5 +1,12 @@
-CHANGES.txt - 2011-05-26
+CHANGES.txt - 2011-06-05
 ------------------------
+
+CHANGES IN CUPS V1.5rc1
+
+	- The dnssd backend took too long to discover printers on large or busy
+	  networks with the new default timeout used by lpinfo and the web
+	  interface. This resulted in "lost" printers.
+
 
 CHANGES IN CUPS V1.5b2
 
