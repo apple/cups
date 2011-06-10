@@ -466,7 +466,7 @@ _httpAssembleUUID(const char *server,	/* I - Server name */
 
   snprintf(data, sizeof(data), "%s:%d:%s:%d:%04x:%04x", server,
            port, name ? name : server, number,
-	   CUPS_RAND() & 0xffff, CUPS_RAND() & 0xffff);
+	   (unsigned)CUPS_RAND() & 0xffff, (unsigned)CUPS_RAND() & 0xffff);
 
   _cupsMD5Init(&md5state);
   _cupsMD5Append(&md5state, (unsigned char *)data, strlen(data));

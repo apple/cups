@@ -436,10 +436,7 @@ backendWaitLoop(
 {
   fd_set	input;			/* Input set for reading */
   time_t	curtime,		/* Current time */
-		snmp_update = 0;
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+		snmp_update = 0;	/* Last SNMP status update */
 
 
   fprintf(stderr, "DEBUG: backendWaitLoop(snmp_fd=%d, addr=%p, side_cb=%p)\n",
