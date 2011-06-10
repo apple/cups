@@ -162,7 +162,7 @@ if test -n "$GCC"; then
 		else
 			AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
 			OLDCFLAGS="$CFLAGS"
-			CFLAGS="$CFLAGS -Wno-tautological-compare"
+			CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
 			AC_TRY_COMPILE(,,
 				[OPTIM="$OPTIM -Wno-tautological-compare"
 				AC_MSG_RESULT(yes)],
