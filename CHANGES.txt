@@ -3,7 +3,7 @@ CHANGES.txt - 2011-06-10
 
 CHANGES IN CUPS V1.5rc1
 
-	- Compile fixes (STR #3849)
+	- Compile fixes (STR #3849, STR #3850)
 	- The scheduler incorrectly allowed jobs to be held outside the pending
 	  or pending-held states.
 	- The cups-driverd program could crash when a PPD was renamed.
