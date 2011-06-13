@@ -4,6 +4,8 @@ CHANGES.txt - 2011-06-13
 CHANGES IN CUPS V1.5rc1
 
 	- Compile fixes (STR #3849, STR #3850)
+	- Fixed some compatibility issues migrating from the old usblp backend
+	  to the libusb backend (STR #3860)
 	- Fixed the wake-from-sleep printing behavior on Mac OS X.
 	- The scheduler incorrectly allowed jobs to be held from a terminating
 	  state.
