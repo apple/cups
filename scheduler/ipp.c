@@ -8889,11 +8889,15 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   * See if the job is in a state that allows holding...
   */
 
-  if (job->state_value > IPP_JOB_HELD)
+  if (job->state_value > IPP_JOB_STOPPED)
   {
-    cupsdLogJob(job, CUPSD_LOG_DEBUG, "Cannot hold job: job-state=%d",
-                job->state_value);
-    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Job #%d cannot be held."), jobid);
+   /*
+    * Return a "not-possible" error...
+    */
+
+    send_ipp_status(con, IPP_NOT_POSSIBLE,
+		    _("Job #%d is finished and cannot be altered."),
+		    job->id);
     return;
   }
 

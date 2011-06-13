@@ -1,11 +1,12 @@
-CHANGES.txt - 2011-06-10
+CHANGES.txt - 2011-06-13
 ------------------------
 
 CHANGES IN CUPS V1.5rc1
 
 	- Compile fixes (STR #3849, STR #3850)
-	- The scheduler incorrectly allowed jobs to be held outside the pending
-	  or pending-held states.
+	- Fixed the wake-from-sleep printing behavior on Mac OS X.
+	- The scheduler incorrectly allowed jobs to be held from a terminating
+	  state.
 	- The cups-driverd program could crash when a PPD was renamed.
 	- The dnssd backend took too long to discover printers on large or busy
 	  networks with the new default timeout used by lpinfo and the web
