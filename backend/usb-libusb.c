@@ -776,11 +776,15 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
   * Similarly, strip "?serial=NNN...NNN" as needed.
   */
 
-  if ((requested_ptr = strstr(requested_uri, "?interface=")) == NULL &&
-      (detected_ptr = strstr(detected_uri, "?interface=")) != NULL)
+  if ((requested_ptr = strstr(requested_uri, "?interface=")) == NULL)
+    requested_ptr = strstr(requested_uri, "&interface=");
+  if ((detected_ptr = strstr(detected_uri, "?interface=")) == NULL)
+    detected_ptr = strstr(detected_uri, "&interface=");
+
+  if (!requested_ptr && detected_ptr)
   {
    /*
-    * Strip "?interface=nnn" from the detected printer.
+    * Strip "[?&]interface=nnn" from the detected printer.
     */
 
     *detected_ptr = '\0';
@@ -788,7 +792,18 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
   else if (requested_ptr && !detected_ptr)
   {
    /*
-    * Strip "?interface=nnn" from the requested printer.
+    * Strip "[?&]interface=nnn" from the requested printer.
+    */
+
+    *requested_ptr = '\0';
+  }
+
+  if ((requested_ptr = strstr(requested_uri, "?serial=?")) != NULL)
+  {
+   /*
+    * Strip "?serial=?" from the requested printer.  This is a special
+    * case, as "?serial=?" means no serial number and not the serial
+    * number '?'.  This is not covered by the checks below...
     */
 
     *requested_ptr = '\0';
@@ -812,7 +827,7 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
     *requested_ptr = '\0';
   }
 
-  return (!strcmp(requested_uri, device_uri));
+  return (!strcmp(requested_uri, detected_uri));
 }
 
 
