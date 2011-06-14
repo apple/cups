@@ -264,12 +264,12 @@ backendGetDeviceID(
   */
 
   for (ptr = device_id; *ptr; ptr ++)
-    if (_cups_isspace(*c))
-      *c = ' ';
-    else if ((*c & 255) < ' ' || *c == 127)
+    if (_cups_isspace(*ptr))
+      *ptr = ' ';
+    else if ((*ptr & 255) < ' ' || *ptr == 127)
     {
       DEBUG_printf(("backendGetDeviceID: Bad device_id character %d.",
-                    *c & 255));
+                    *ptr & 255));
       *device_id = '\0';
       break;
     }
