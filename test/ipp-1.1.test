@@ -3,7 +3,7 @@
 #
 #   IPP/1.1 test suite.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -16,6 +16,10 @@
 #
 #   ./ipptool -f filename -t printer-uri ipp-1.1.test
 #
+
+# Regular expression for IPP URI schemes
+# Matches strings beginning with ipp:// or ipps://
+DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 # Test that a request-id value of 0 is not accepted.
 #
@@ -87,7 +91,7 @@
 	ATTR uri printer-uri $uri
 
 	STATUS successful-ok
-	EXPECT printer-uri-supported OF-TYPE uri
+	EXPECT printer-uri-supported OF-TYPE uri WITH-VALUE "$IPP_URI_SCHEME"
 }
 
 
@@ -144,7 +148,7 @@
 
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
-	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
 	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
@@ -237,7 +241,7 @@
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-security-supported
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-security-supported WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT uri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-authentication-supported
@@ -260,7 +264,7 @@
 
 	STATUS successful-ok
 
-	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !printer-name
 }
 
@@ -279,7 +283,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
@@ -337,7 +341,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -395,7 +399,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
@@ -515,7 +519,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
@@ -575,7 +579,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
@@ -655,7 +659,7 @@
 
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
-	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
 	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
@@ -700,7 +704,7 @@
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
