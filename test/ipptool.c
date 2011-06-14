@@ -2569,10 +2569,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("</array>");
     }
 
+    skip_error:
+
     if (Output == _CUPS_OUTPUT_PLIST)
       puts("</dict>");
-
-    skip_error:
 
     ippDelete(response);
     response = NULL;
