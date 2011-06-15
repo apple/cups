@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -79,7 +79,7 @@ Requires: %{name}-libs = %{epoch}:%{version}
 
 %description
 CUPS is the standards-based, open source printing system developed by
-Apple Inc. for Mac OS¨ X and other UNIX¨-like operating systems.
+Apple Inc. for Mac OSÂ® X and other UNIXÂ®-like operating systems.
 
 %description devel
 This package provides the CUPS headers and development environment.
@@ -190,10 +190,11 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
 /usr/lib/cups/backend/http
+/usr/lib/cups/backend/https
 %attr(0700,root,root) /usr/lib/cups/backend/ipp
+/usr/lib/cups/backend/ipps
 %attr(0700,root,root) /usr/lib/cups/backend/lpd
 /usr/lib/cups/backend/parallel
-/usr/lib/cups/backend/scsi
 /usr/lib/cups/backend/serial
 /usr/lib/cups/backend/snmp
 /usr/lib/cups/backend/socket
@@ -203,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-deviced
 /usr/lib/cups/daemon/cups-driverd
+/usr/lib/cups/daemon/cups-exec
 /usr/lib/cups/daemon/cups-polld
 %dir /usr/lib/cups/driver
 %dir /usr/lib/cups/filter
@@ -288,8 +290,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/*.conf.5.gz
 /usr/share/man/man5/ipptoolfile.5.gz
 /usr/share/man/man5/mime.*.5.gz
-%dir /usr/share/man/man7
-/usr/share/man/man7/drv*
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz

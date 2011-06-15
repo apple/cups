@@ -750,8 +750,11 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
   else if ((diff = cupsdCompareNames(p0->record.make_and_model,
                                      p1->record.make_and_model)) != 0)
     return (diff);
+  else if ((diff = strcmp(p0->record.languages[0],
+                          p1->record.languages[0])) != 0)
+    return (diff);
   else
-    return (strcmp(p0->record.languages[0], p1->record.languages[0]));
+    return (compare_names(p0, p1));
 }
 
 
@@ -1408,7 +1411,9 @@ load_drv(const char  *filename,		/* I - Actual filename */
   * Add a dummy entry for the file...
   */
 
-  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "drv", "", "", 0,
+		   "/%s", name);
+  add_ppd(name, uri, "", "", "", "", "", "", mtime, size, 0,
           PPD_TYPE_DRV, "drv");
   ChangedPPD = 1;
 

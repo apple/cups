@@ -505,6 +505,7 @@ make_device_uri(
 		*mdl,			/* Model */
 		*des,			/* Description */
 		*sern;			/* Serial number */
+  size_t	mfglen;			/* Length of manufacturer string */
   char		tempmfg[256],		/* Temporary manufacturer string */
 		tempsern[256],		/* Temporary serial number string */
 		*tempptr;		/* Pointer into temp string */
@@ -582,6 +583,16 @@ make_device_uri(
       *tempptr = '\0';
 
     mfg = tempmfg;
+  }
+
+  mfglen = strlen(mfg);
+
+  if (!strncasecmp(mdl, mfg, mfglen) && _cups_isspace(mdl[mfglen]))
+  {
+    mdl += mfglen + 1;
+
+    while (_cups_isspace(*mdl))
+      mdl ++;
   }
 
  /*
@@ -736,7 +747,87 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
          const char    *device_id,	/* I - IEEE-1284 device ID */
          const void    *data)		/* I - User data (make, model, S/N) */
 {
-  return (!strcmp((char *)data, device_uri));
+  char	requested_uri[1024],		/* Requested URI */
+	*requested_ptr,			/* Pointer into requested URI */
+	detected_uri[1024],		/* Detected URI */
+	*detected_ptr;			/* Pointer into detected URI */
+
+
+ /*
+  * If we have an exact match, stop now...
+  */
+
+  if (!strcmp((char *)data, device_uri))
+    return (1);
+
+ /*
+  * Work on copies of the URIs...
+  */
+
+  strlcpy(requested_uri, (char *)data, sizeof(requested_uri));
+  strlcpy(detected_uri, device_uri, sizeof(detected_uri));
+
+ /*
+  * libusb-discovered URIs can have an "interface" specification and this
+  * never happens for usblp-discovered URIs, so remove the "interface"
+  * specification from the URI which we are checking currently. This way a
+  * queue for a usblp-discovered printer can now be accessed via libusb.
+  *
+  * Similarly, strip "?serial=NNN...NNN" as needed.
+  */
+
+  if ((requested_ptr = strstr(requested_uri, "?interface=")) == NULL)
+    requested_ptr = strstr(requested_uri, "&interface=");
+  if ((detected_ptr = strstr(detected_uri, "?interface=")) == NULL)
+    detected_ptr = strstr(detected_uri, "&interface=");
+
+  if (!requested_ptr && detected_ptr)
+  {
+   /*
+    * Strip "[?&]interface=nnn" from the detected printer.
+    */
+
+    *detected_ptr = '\0';
+  }
+  else if (requested_ptr && !detected_ptr)
+  {
+   /*
+    * Strip "[?&]interface=nnn" from the requested printer.
+    */
+
+    *requested_ptr = '\0';
+  }
+
+  if ((requested_ptr = strstr(requested_uri, "?serial=?")) != NULL)
+  {
+   /*
+    * Strip "?serial=?" from the requested printer.  This is a special
+    * case, as "?serial=?" means no serial number and not the serial
+    * number '?'.  This is not covered by the checks below...
+    */
+
+    *requested_ptr = '\0';
+  }
+
+  if ((requested_ptr = strstr(requested_uri, "?serial=")) == NULL &&
+      (detected_ptr = strstr(detected_uri, "?serial=")) != NULL)
+  {
+   /*
+    * Strip "?serial=nnn" from the detected printer.
+    */
+
+    *detected_ptr = '\0';
+  }
+  else if (requested_ptr && !detected_ptr)
+  {
+   /*
+    * Strip "?serial=nnn" from the requested printer.
+    */
+
+    *requested_ptr = '\0';
+  }
+
+  return (!strcmp(requested_uri, detected_uri));
 }
 
 

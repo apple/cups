@@ -270,7 +270,7 @@ cupsResolveConflicts(
 	  * Resolver loop!
 	  */
 
-	  DEBUG_printf(("1ppdResolveConflicts: Resolver loop with %s!",
+	  DEBUG_printf(("1cupsResolveConflicts: Resolver loop with %s!",
 	                consts->resolver));
           goto error;
 	}
@@ -278,14 +278,14 @@ cupsResolveConflicts(
         if ((resolver = ppdFindAttr(ppd, "cupsUIResolver",
 	                            consts->resolver)) == NULL)
         {
-	  DEBUG_printf(("1ppdResolveConflicts: Resolver %s not found!",
+	  DEBUG_printf(("1cupsResolveConflicts: Resolver %s not found!",
 	                consts->resolver));
 	  goto error;
 	}
 
         if (!resolver->value)
 	{
-	  DEBUG_printf(("1ppdResolveConflicts: Resolver %s has no value!",
+	  DEBUG_printf(("1cupsResolveConflicts: Resolver %s has no value!",
 	                consts->resolver));
 	  goto error;
 	}
@@ -507,7 +507,7 @@ cupsResolveConflicts(
 
     if (!changed)
     {
-      DEBUG_puts("1ppdResolveConflicts: Unable to automatically resolve "
+      DEBUG_puts("1cupsResolveConflicts: Unable to automatically resolve "
 		 "constraint!");
       goto error;
     }

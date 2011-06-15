@@ -1,8 +1,19 @@
-CHANGES.txt - 2011-06-05
+CHANGES.txt - 2011-06-14
 ------------------------
 
 CHANGES IN CUPS V1.5rc1
 
+	- Compile fixes (STR #3849, STR #3850)
+	- The scheduler didn't check for empty values for several configuration
+	  directives (STR #3861)
+	- ipptool didn't generate valid XML when a test was skipped.
+	- Added additional error checking to the 1284 device ID code (STR #3858)
+	- Fixed some compatibility issues migrating from the old usblp backend
+	  to the libusb backend (STR #3860)
+	- Fixed the wake-from-sleep printing behavior on Mac OS X.
+	- The scheduler incorrectly allowed jobs to be held from a terminating
+	  state.
+	- The cups-driverd program could crash when a PPD was renamed.
 	- The dnssd backend took too long to discover printers on large or busy
 	  networks with the new default timeout used by lpinfo and the web
 	  interface. This resulted in "lost" printers.

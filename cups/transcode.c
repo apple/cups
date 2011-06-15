@@ -171,16 +171,17 @@ cupsCharsetToUTF8(
 
   if (map_to_utf8 != (iconv_t)-1)
   {
+    char *altdestptr = (char *)dest;	/* Silence bogus GCC type-punned */
+
     srclen       = strlen(src);
     outBytesLeft = maxout - 1;
 
-    iconv(map_to_utf8, (char **)&src, &srclen, (char **)&destptr,
-	  &outBytesLeft);
-    *destptr = '\0';
+    iconv(map_to_utf8, (char **)&src, &srclen, &altdestptr, &outBytesLeft);
+    *altdestptr = '\0';
 
     _cupsMutexUnlock(&map_mutex);
 
-    return ((int)(destptr - dest));
+    return ((int)(altdestptr - (char *)dest));
   }
 
   _cupsMutexUnlock(&map_mutex);
@@ -295,10 +296,12 @@ cupsUTF8ToCharset(
 
   if (map_from_utf8 != (iconv_t)-1)
   {
+    char *altsrc = (char *)src;		/* Silence bogus GCC type-punned */
+
     srclen       = strlen((char *)src);
     outBytesLeft = maxout - 1;
 
-    iconv(map_from_utf8, (char **)&src, &srclen, &destptr, &outBytesLeft);
+    iconv(map_from_utf8, &altsrc, &srclen, &destptr, &outBytesLeft);
     *destptr = '\0';
 
     _cupsMutexUnlock(&map_mutex);

@@ -2593,11 +2593,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		      "FaxRetryLimit is deprecated; use "
 		      "JobRetryLimit on line %d.", linenum);
     }
-    else if (!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
+    else if ((!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
 #ifdef HAVE_SSL
              || !_cups_strcasecmp(line, "SSLPort") || !_cups_strcasecmp(line, "SSLListen")
 #endif /* HAVE_SSL */
-	     )
+	     ) && value)
     {
      /*
       * Add listening address(es) to the list...
@@ -3740,6 +3740,12 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     else if (!_cups_strcasecmp(line, "</Limit>") ||
              !_cups_strcasecmp(line, "</LimitExcept>"))
       loc = parent;
+    else if (!value)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+	return (0);
+    }
     else if (!parse_aaa(loc, line, value, linenum))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3888,6 +3894,12 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       }
 
       op = NULL;
+    }
+    else if (!value)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+	return (0);
     }
     else if (!_cups_strcasecmp(line, "JobPrivateAccess") ||
 	     !_cups_strcasecmp(line, "JobPrivateValues") ||

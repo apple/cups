@@ -196,6 +196,10 @@ cupsdSetBusyState(void)
   if (job)
     newbusy |= 2;
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdSetBusyState: newbusy=\"%s\", busy=\"%s\"",
+                  busy_text[newbusy], busy_text[busy]);
+
  /*
   * Manage state changes...
   */
@@ -213,25 +217,23 @@ cupsdSetBusyState(void)
       vtran = 0;
     }
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
+  }
 
 #ifdef kIOPMAssertionTypeDenySystemSleep
-    if ((busy & 2) && !dark_wake)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Asserting dark wake.");
-      IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
-			          kIOPMAssertionLevelOn,
-				  CFSTR("org.cups.cupsd"), &dark_wake);
-    }
-    else if (!(busy & 2) && dark_wake)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Releasing dark wake assertion.");
-      IOPMAssertionRelease(dark_wake);
-      dark_wake = 0;
-    }
-#endif /* kIOPMAssertionTypeDenySystemSleep */
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetBusyState: %s", busy_text[busy]);
+  if (cupsArrayCount(PrintingJobs) > 0 && !dark_wake)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting dark wake.");
+    IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
+				kIOPMAssertionLevelOn,
+				CFSTR("org.cups.cupsd"), &dark_wake);
   }
+  else if (cupsArrayCount(PrintingJobs) == 0 && dark_wake)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Releasing dark wake assertion.");
+    IOPMAssertionRelease(dark_wake);
+    dark_wake = 0;
+  }
+#endif /* kIOPMAssertionTypeDenySystemSleep */
 }
 
 

@@ -3220,7 +3220,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate,
 				       ServerKey, GNUTLS_X509_FMT_PEM);
 
-  gnutls_init(&con->http.tls), GNUTLS_SERVER);
+  gnutls_init(&con->http.tls, GNUTLS_SERVER);
   gnutls_set_default_priority(con->http.tls);
   gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
   gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));

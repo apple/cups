@@ -2330,14 +2330,14 @@ cupsdSetJobState(
   if (!cupsdLoadJob(job))
     return;
 
-  /*
-   * Don't do anything if the state is unchanged and we aren't purging the
-   * job...
-   */
+ /*
+  * Don't do anything if the state is unchanged and we aren't purging the
+  * job...
+  */
 
-   oldstate = job->state_value;
-   if (newstate == oldstate && action != CUPSD_JOB_PURGE)
-     return;
+  oldstate = job->state_value;
+  if (newstate == oldstate && action != CUPSD_JOB_PURGE)
+    return;
 
  /*
   * Stop any processes that are working on the current job...
