@@ -948,7 +948,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   debug_printf("DEBUG: request-id=%d\n", packet.request_id);
   debug_printf("DEBUG: error-status=%d\n", packet.error_status);
 
-  if (packet.error_status)
+  if (packet.error_status && packet.request_id != DEVICE_TYPE)
     return;
 
  /*

@@ -1,9 +1,10 @@
-CHANGES.txt - 2011-06-16
+CHANGES.txt - 2011-06-18
 ------------------------
 
 CHANGES IN CUPS V1.5.0
 
-	- Need to limit TLS to v1.0 on Mac OS X.
+	- Needed to limit TLS to v1.0 on some versions of Mac OS X.
+	- The snmp backend did not work with some printers.
 
 
 CHANGES IN CUPS V1.5rc1
