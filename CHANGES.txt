@@ -1,8 +1,10 @@
-CHANGES.txt - 2011-06-18
+CHANGES.txt - 2011-07-05
 ------------------------
 
 CHANGES IN CUPS V1.5.0
 
+	- Documentation updates.
+	- Localization update (STR #3865)
 	- Needed to limit TLS to v1.0 on some versions of Mac OS X.
 	- The snmp backend did not work with some printers.
 
