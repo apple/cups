@@ -8,11 +8,7 @@
 
 <H1 CLASS="title">Using Kerberos Authentication</H1>
 
-<P>CUPS allows you to use a Key Distribution Center (KDC) for authentication
-on your local CUPS server and when printing to a remote authenticated queue.
-This document describes how to configure CUPS to use Kerberos authentication
-and provides links to the MIT help pages for configuring Kerberos on your
-systems and network.</P>
+<P>CUPS allows you to use a Key Distribution Center (KDC) for authentication on your local CUPS server and when printing to a remote authenticated queue. This document describes how to configure CUPS to use Kerberos authentication and provides links to the MIT help pages for configuring Kerberos on your systems and network.</P>
 
 
 <H2 CLASS="title"><A NAME="REQUIREMENTS">System Requirements</A></H2>
@@ -23,42 +19,31 @@ systems and network.</P>
 
 	<li>Heimdal Kerberos (any version) or MIT Kerberos (1.6.3 or newer)</li>
 
-	<li>Properly configured Domain Name System (DNS)
-	infrastructure:<ol type='a'>
-		<li>DNS server(s) with static IP addresses for all CUPS clients
-		and servers or configured to allow DHCP updates to the host
-		addresses</li>
+	<li>Properly configured Domain Name System (DNS) infrastructure (for your servers):<ol type='a'>
+		<li>DNS server(s) with static IP addresses for all CUPS servers or configured to allow DHCP updates to the host addresses and</li>
 		<li>All CUPS clients and servers configured to use the same
-		DNS server(s)</li>
+DNS server(s).</li>
 	</ol></li>
 
 	<li>Properly configured Kerberos infrastructure:<ol type='a'>
-		<li>KDC configured to allow CUPS clients and servers to obtain
-		Service Granting Tickets (SGTs) for the "ipp" service</li>
-		<li>LDAP-based user accounts - both OpenDirectory and
-		ActiveDirectory provide this with the KDC</li>
-		<li>CUPS clients and servers bound to the KDC and LDAP
-		server(s)</li>
+		<li>KDC configured to allow CUPS servers to obtain Service Granting Tickets (SGTs) for the "host" service,</li>
+		<li>LDAP-based user accounts - both OpenDirectory and ActiveDirectory provide this with the KDC, and</li>
+		<li>CUPS clients and servers bound to the same KDC and LDAP
+	server(s).</li>
 	</ol></li>
 
-	<li>An "ipp" Service Granting Ticket (SGT) for every CUPS client and
-	server</li>
+	<li>A "host" Service Granting Ticket (SGT) for every CUPS server</li>
 
 </ol>
 
 
 <H2 CLASS="title"><A NAME="KRB5">Configuring Kerberos on Your System</A></H2>
 
-<P>Before you can use Kerberos with CUPS, you will need to configure
-Kerberos on your system and setup a system as a KDC. Because this
-configuration is highly system and site-specific, please consult
-the following on-line resources provided by the creators of Kerberos
-at the Massachusetts Institute of Technology (MIT):</P>
+<P>Before you can use Kerberos with CUPS, you will need to configure Kerberos on your system and setup a system as a KDC. Because this configuration is highly system and site-specific, please consult the following on-line resources provided by the creators of Kerberos at the Massachusetts Institute of Technology (MIT):</P>
 
 <UL>
 
-	<LI><A HREF="http://web.mit.edu/kerberos/">Kerberos: The Network
-	Authentication Protocol</A></LI>
+	<LI><A HREF="http://web.mit.edu/kerberos/">Kerberos: The Network Authentication Protocol</A></LI>
 
 	<LI><A HREF="http://web.mit.edu/macdev/KfM/Common/Documentation/faq-osx.html">Kerberos
 	on Mac OS X Frequently Asked Questions</A></LI>
@@ -77,46 +62,28 @@ at the Massachusetts Institute of Technology (MIT):</P>
 
 <H2 CLASS="title"><A NAME="CUPS">Configuring CUPS to Use Kerberos</A></H2>
 
-<P>Once you have configured Kerberos on your system(s), you can then
-enable Kerberos authentication by selecting the <tt>Negotiate</tt>
-authentication type. The simplest way to do this is using the
-<tt>cupsctl(8)</tt> command:</P>
+<P>Once youhave configured Kerberos on your system(s), you can then enable Kerberos authentication by selecting the <tt>Negotiate</tt> authentication type. The simplest way to do this is using the <tt>cupsctl(8)</tt> command on your server(s):</P>
 
 <PRE CLASS="command">
 <KBD>cupsctl DefaultAuthType=Negotiate</KBD>
 </PRE>
 
-<P>You can also enable Kerberos from the web interface by checking the
-<VAR>Use Kerberos Authentication</VAR> box and clicking <VAR>Change
-Settings</VAR>:</P>
+<P>You can also enable Kerberos from the web interface by checking the <VAR>Use Kerberos Authentication</VAR> box and clicking <VAR>Change Settings</VAR>:</P>
 
 <PRE CLASS="command">
-http://localhost:631/admin
+http://server.example.com:631/admin
 </PRE>
 
-<P>After you have enabled Kerberos authentication, use the built-in
-"authenticated" policy or your own custom policies with the printers you
-will be sharing. See <a href="policies.html">Managing Operation Policies</a>
-for more information.</P>
+<P>After you have enabled Kerberos authentication, use the built-in "authenticated" policy or your own custom policies with the printers you will be sharing. See <a href="policies.html">Managing Operation Policies</a> for more information.</P>
 
 
 <H2 CLASS="title"><A NAME="IMPLEMENT">Implementation Information</A></H2>
 
-<P>CUPS implements Kerberos over HTTP using GSSAPI and the service name
-"host". Because of limitations in the HTTP GSSAPI protocol extension, only
-a single domain/KDC is supported for authentication.</P>
+<P>CUPS implements Kerberos over HTTP using GSSAPI and the service name "host". Because of limitations in the HTTP GSSAPI protocol extension, only a single domain/KDC is supported for authentication. The HTTP extension is described in <a href="http://tools.ietf.org/html/rfc4559">RFC 4559</a>.</P>
 
-<P>When doing printing tasks that require authentication, CUPS requests a
-single-use "ticket" from your login session to authenticate who you are.
-This ticket gives CUPS a username of the form "user@REALM", which is then
-converted to just "user" for purposes of user and group checks.</P>
+<P>When doing printing tasks that require authentication, CUPS requests single-use "tickets" from your login session to authenticate who you are. These tickets give CUPS a username of the form "user@REALM", which is then converted to just "user" for purposes of user and group checks.</P>
 
-<P>In order to support printing to a shared printer, CUPS has to ask the KDC
-for a copy of your credentials (this is called delegation) that can be sent to
-the remote server for authentication. Delegation only works when the system
-has a stable hostname which maps to the current address of the system, which
-is why you need a static IP address or DHCP that updates the DNS entry for your
-system.</P>
+<P>In order to support printing to a shared printer, CUPS runs the IPP backend as the owner of the print job so it can obtain the necessary credentials.</P>
 
 </BODY>
 </HTML>
