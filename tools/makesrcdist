@@ -54,7 +54,6 @@ cd ..
 echo Configuring...
 autoconf -f
 rm -rf autom4te*.cache
-rm -rf standards
 rm -rf tools
 cd ..
 
