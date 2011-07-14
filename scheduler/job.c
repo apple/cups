@@ -1343,17 +1343,22 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
     free(job->compressions);
     free(job->filetypes);
 
-    while (job->num_files > 0)
+    if (action == CUPSD_JOB_PURGE)
     {
-      snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
-	       job->id, job->num_files);
-      if (Classification)
-	cupsdRemoveFile(filename);
-      else
-	unlink(filename);
+      while (job->num_files > 0)
+      {
+	snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+		 job->id, job->num_files);
+	if (Classification)
+	  cupsdRemoveFile(filename);
+	else
+	  unlink(filename);
 
-      job->num_files --;
+	job->num_files --;
+      }
     }
+    else
+      job->num_files = 0;
   }
 
   if (job->history)

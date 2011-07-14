@@ -1,6 +1,13 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.8
+
+	- The scheduler would delete job data files when restarted (STR #3880)
+	- The network backends could crash if a printer returned a value of 0
+	  for the maximum capacity for a supply (STR #3875)
+
+
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
