@@ -1,4 +1,4 @@
-CHANGES.txt - 2011-07-05
+CHANGES.txt - 2011-07-25
 ------------------------
 
 CHANGES IN CUPS V1.5.0
