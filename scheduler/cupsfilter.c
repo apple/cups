@@ -329,7 +329,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 	  case 'u' : /* Delete PPD file after conversion */
-	      removeinfile = 1;
+	      removeppd = 1;
 	      break;
 
           case 'U' : /* Specify username... */

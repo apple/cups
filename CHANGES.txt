@@ -4,6 +4,7 @@ CHANGES.txt - 2011-08-02
 CHANGES IN CUPS V1.5.1
 
 	- Jobs canceled at the printer were retried by the IPP backend.
+	- "cupsfilter -u" deleted the input file instead of the PPD file.
 
 
 CHANGES IN CUPS V1.5.0
