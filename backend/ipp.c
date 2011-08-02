@@ -1407,6 +1407,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  goto cleanup;
 	}
       }
+      else if (ipp_status == IPP_ERROR_JOB_CANCELED)
+        goto cleanup;
       else
       {
        /*
