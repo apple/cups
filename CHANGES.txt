@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.5.1
 
 	- Jobs canceled at the printer were retried by the IPP backend.
 	- "cupsfilter -u" deleted the input file instead of the PPD file.
+	- The scheduler did not compute the cost of PPD filters defined using
+	  the cupsFilter2 keyword properly.
 
 
 CHANGES IN CUPS V1.5.0

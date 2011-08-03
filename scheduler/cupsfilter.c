@@ -629,7 +629,7 @@ add_printer_filter(
         filterptr = mimeAddFilter(mime, temptype, desttype, cost, program);
 
         if (!mimeFilterLookup(mime, desttype, filtertype))
-          mimeAddFilter(mime, desttype, filtertype, cost, "-");
+          mimeAddFilter(mime, desttype, filtertype, 0, "-");
       }
       else
         filterptr = mimeAddFilter(mime, temptype, filtertype, cost, program);
