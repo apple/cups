@@ -480,6 +480,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   int			filterfds[2][2] = { { -1, -1 }, { -1, -1 } };
 					/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
+  struct stat		fileinfo;	/* Job file information */
   char			**argv = NULL,	/* Filter command-line arguments */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
@@ -552,8 +553,14 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     * Local jobs get filtered...
     */
 
-    filters = mimeFilter(MimeDatabase, job->filetypes[job->current_file],
-                         job->printer->filetype, &(job->cost));
+    snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
+             job->id, job->current_file + 1);
+    if (stat(filename, &fileinfo))
+      fileinfo.st_size = 0;
+
+    filters = mimeFilter2(MimeDatabase, job->filetypes[job->current_file],
+                          fileinfo.st_size, job->printer->filetype,
+                          &(job->cost));
 
     if (!filters)
     {

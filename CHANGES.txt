@@ -1,4 +1,4 @@
-CHANGES.txt - 2011-08-02
+CHANGES.txt - 2011-08-05
 ------------------------
 
 CHANGES IN CUPS V1.5.1
@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.5.1
 	- "cupsfilter -u" deleted the input file instead of the PPD file.
 	- The scheduler did not compute the cost of PPD filters defined using
 	  the cupsFilter2 keyword properly.
+	- The scheduler did not correctly support the maxsize() attribute for
+	  PPD filters.
 
 
 CHANGES IN CUPS V1.5.0
