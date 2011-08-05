@@ -1770,7 +1770,7 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_DOCUMENT_FORMAT ||
            ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
-  else if (ipp_status > IPP_OK_CONFLICT)
+  else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
   {
