@@ -4,6 +4,7 @@ CHANGES.txt - 2011-08-05
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- "PAGE: total NNN" messages did not get logged properly (STR #3887)
 	- Updated the PWG Raster support to conform to the current draft of the
 	  PWG Raster Format specification.
 	- The PWG Raster filter did not always write the correct number of
