@@ -4,6 +4,8 @@ CHANGES.txt - 2011-08-05
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The image filters did not support loading images larger than the
+	  RIPCache setting (STR #3901)
 	- "PAGE: total NNN" messages did not get logged properly (STR #3887)
 	- Updated the PWG Raster support to conform to the current draft of the
 	  PWG Raster Format specification.
