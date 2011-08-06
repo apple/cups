@@ -648,11 +648,13 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
     if (code == max_code)
     {
-      *sp++ = firstcode;
-      code  = oldcode;
+      if (sp < (stack + 8192))
+	*sp++ = firstcode;
+
+      code = oldcode;
     }
 
-    while (code >= clear_code)
+    while (code >= clear_code && sp < (stack + 8192))
     {
       *sp++ = table[1][code];
       if (code == table[0][code])
@@ -661,8 +663,10 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
       code = table[0][code];
     }
 
-    *sp++ = firstcode = table[1][code];
-    code  = max_code;
+    if (sp < (stack + 8192))
+      *sp++ = firstcode = table[1][code];
+
+    code = max_code;
 
     if (code < 4096)
     {
