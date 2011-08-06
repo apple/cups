@@ -1525,7 +1525,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 		name[512],		/* ppd-name */
 		make[128],		/* ppd-make */
 		make_and_model[128],	/* ppd-make-and-model */
-		device_id[128],		/* ppd-device-id */
+		device_id[256],		/* ppd-device-id */
 		languages[128],		/* ppd-natural-language */
 		product[128],		/* ppd-product */
 		psversion[128],		/* ppd-psversion */
@@ -1656,7 +1656,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	strcpy(type_str, "postscript");
 
         if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
-	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
+	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%255[^\"]\""
 			 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
 			 "%*[ \t]\"%127[^\"]\"",
 	           name, languages, make, make_and_model,

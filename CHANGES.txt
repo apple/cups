@@ -4,6 +4,8 @@ CHANGES.txt - 2011-08-05
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The scheduler did not support 1284 device IDs reported by driver
+	  interface programs longer than 127 characters (STR #3871)
 	- The image filters did not support loading images larger than the
 	  RIPCache setting (STR #3901)
 	- "PAGE: total NNN" messages did not get logged properly (STR #3887)
