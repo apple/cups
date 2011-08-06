@@ -191,7 +191,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
     memset(line, white, linesize);
-    for (y = page_top; y > 0; y --)
+    for (y = page_bottom; y > 0; y --)
       if (!cupsRasterWritePixels(outras, line, outheader.cupsBytesPerLine))
       {
 	_cupsLangPrintFilter(stderr, "ERROR", _("Error sending raster data."));
