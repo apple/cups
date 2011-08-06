@@ -3,6 +3,7 @@ CHANGES.txt - 2011-08-05
 
 CHANGES IN CUPS V1.5.1
 
+	- Documentation updates (STR #3885)
 	- Badly formed GIF files could cause the image filters to crash
 	  (STR #3914)
 	- Jobs canceled at the printer were retried by the IPP backend.

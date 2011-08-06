@@ -2038,7 +2038,7 @@ LogFilePerm 0600
 <H3>Description</H3>
 
 <P>The <CODE>LogFilePerm</CODE> directive specifies the
-permissions to use when writing configuration files. The default
+permissions to use when writing log files. The default
 is @CUPS_LOG_FILE_PERM@.</P>
 
 
