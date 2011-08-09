@@ -505,7 +505,8 @@ cupsdReadConfiguration(void)
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");
-  cupsdSetString(&ServerHeader, "CUPS/1.4");
+  cupsdSetStringf(&ServerHeader, "CUPS/%d.%d", CUPS_VERSION_MAJOR,
+                  CUPS_VERSION_MINOR);
   cupsdSetString(&StateDir, CUPS_STATEDIR);
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
@@ -3420,15 +3421,16 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (!_cups_strcasecmp(value, "ProductOnly"))
 	cupsdSetString(&ServerHeader, "CUPS");
       else if (!_cups_strcasecmp(value, "Major"))
-	cupsdSetString(&ServerHeader, "CUPS/1");
+	cupsdSetStringf(&ServerHeader, "CUPS/%d", CUPS_VERSION_MAJOR);
       else if (!_cups_strcasecmp(value, "Minor"))
-	cupsdSetString(&ServerHeader, "CUPS/1.4");
+	cupsdSetStringf(&ServerHeader, "CUPS/%d.%d", CUPS_VERSION_MAJOR,
+	                CUPS_VERSION_MINOR);
       else if (!_cups_strcasecmp(value, "Minimal"))
 	cupsdSetString(&ServerHeader, CUPS_MINIMAL);
       else if (!_cups_strcasecmp(value, "OS"))
 	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
       else if (!_cups_strcasecmp(value, "Full"))
-	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/1.1",
+	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/2.1",
 	                plat.sysname);
       else if (!_cups_strcasecmp(value, "None"))
 	cupsdClearString(&ServerHeader);

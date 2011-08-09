@@ -3650,7 +3650,7 @@ add_printer_filter(
 	                  "add_printer_filter: %s: adding filter %s/%s %s/%s "
 	                  "0 -", p->name, desttype->super, desttype->type,
 		          filtertype->super, filtertype->type);
-          mimeAddFilter(MimeDatabase, desttype, filtertype, cost, "-");
+          mimeAddFilter(MimeDatabase, desttype, filtertype, 0, "-");
         }
       }
       else

@@ -353,7 +353,7 @@ gif_get_code(FILE *fp,			/* I - File to read from */
     * Read in another buffer...
     */
 
-    if ((count = gif_get_block (fp, buf + last_byte)) <= 0)
+    if ((count = gif_get_block(fp, buf + last_byte)) <= 0)
     {
      /*
       * Whoops, no more data!
@@ -582,19 +582,13 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     gif_get_code(fp, 0, 1);
 
    /*
-    * Wipe the decompressor table...
+    * Wipe the decompressor table (already mostly 0 due to the calloc above...)
     */
 
     fresh = 1;
 
-    for (i = 0; i < clear_code; i ++)
-    {
-      table[0][i] = 0;
+    for (i = 1; i < clear_code; i ++)
       table[1][i] = i;
-    }
-
-    for (; i < 4096; i ++)
-      table[0][i] = table[1][0] = 0;
 
     sp = stack;
 
@@ -605,29 +599,30 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     fresh = 0;
 
     do
+    {
       firstcode = oldcode = gif_get_code(fp, code_size, 0);
+    }
     while (firstcode == clear_code);
 
-    return (firstcode);
+    return (firstcode & 255);
   }
   else if (!table)
     return (0);
 
   if (sp > stack)
-    return (*--sp);
+    return ((*--sp) & 255);
 
-  while ((code = gif_get_code (fp, code_size, 0)) >= 0)
+  while ((code = gif_get_code(fp, code_size, 0)) >= 0)
   {
     if (code == clear_code)
     {
-      for (i = 0; i < clear_code; i ++)
-      {
-	table[0][i] = 0;
-	table[1][i] = i;
-      }
+     /*
+      * Clear/reset the compression table...
+      */
 
-      for (; i < 4096; i ++)
-	table[0][i] = table[1][i] = 0;
+      memset(table, 0, 2 * sizeof(gif_table_t));
+      for (i = 1; i < clear_code; i ++)
+	table[1][i] = i;
 
       code_size     = set_code_size + 1;
       max_code_size = 2 * clear_code;
@@ -637,12 +632,11 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
       firstcode = oldcode = gif_get_code(fp, code_size, 0);
 
-      return (firstcode);
+      return (firstcode & 255);
     }
-    else if (code == end_code)
+    else if (code == end_code || code > max_code)
     {
-      unsigned char	buf[260];
-
+      unsigned char	buf[260];	/* Block buffer */
 
       if (!gif_eof)
         while (gif_get_block(fp, buf) > 0);
@@ -652,13 +646,15 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
     incode = code;
 
-    if (code >= max_code)
+    if (code == max_code)
     {
-      *sp++ = firstcode;
-      code  = oldcode;
+      if (sp < (stack + 8192))
+	*sp++ = firstcode;
+
+      code = oldcode;
     }
 
-    while (code >= clear_code)
+    while (code >= clear_code && sp < (stack + 8192))
     {
       *sp++ = table[1][code];
       if (code == table[0][code])
@@ -667,8 +663,10 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
       code = table[0][code];
     }
 
-    *sp++ = firstcode = table[1][code];
-    code  = max_code;
+    if (sp < (stack + 8192))
+      *sp++ = firstcode = table[1][code];
+
+    code = max_code;
 
     if (code < 4096)
     {
@@ -686,10 +684,10 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
     oldcode = incode;
 
     if (sp > stack)
-      return (*--sp);
+      return ((*--sp) & 255);
   }
 
-  return (code);
+  return (code & 255);
 }
 
 

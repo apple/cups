@@ -165,7 +165,8 @@ static char	* const ipp_std_ops[] =
 		  "Cancel-Jobs",
 		  "Cancel-My-Jobs",
 		  "Resubmit-Job",
-		  "Close-Job"
+		  "Close-Job",
+		  "Identify-Printer"
 		},
 		* const ipp_cups_ops[] =
 		{

@@ -302,7 +302,7 @@ add_ppd_filter(mime_t      *mime,	/* I - MIME database */
           DEBUG_printf(("add_printer_filter: Adding filter %s/%s %s/%s 0 -",
 	                desttype->super, desttype->type, filtertype->super,
 	                filtertype->type));
-          mimeAddFilter(mime, desttype, filtertype, cost, "-");
+          mimeAddFilter(mime, desttype, filtertype, 0, "-");
         }
       }
       else

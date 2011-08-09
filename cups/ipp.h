@@ -241,6 +241,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_CANCEL_MY_JOBS,			/* Cancel-My-Jobs */
   IPP_RESUBMIT_JOB,			/* Resubmit-Job */
   IPP_CLOSE_JOB,			/* Close-Job */
+  IPP_IDENTIFY_PRINTER,			/* Identify-Printer (proposed IPP JPS3) */
   IPP_PRIVATE = 0x4000,			/* Reserved @private@ */
   CUPS_GET_DEFAULT,			/* Get the default printer */
   CUPS_GET_PRINTERS,			/* Get a list of printers and/or classes */

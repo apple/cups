@@ -1,5 +1,39 @@
-CHANGES.txt - 2011-06-14
+CHANGES.txt - 2011-08-06
 ------------------------
+
+CHANGES IN CUPS V1.5.1
+
+	- Documentation updates (STR #3885)
+	- The scheduler did not report the correct version in the Server: header
+	  (STR #3903)
+	- The scheduler did not support 1284 device IDs reported by driver
+	  interface programs longer than 127 characters (STR #3871)
+	- The image filters did not support loading images larger than the
+	  RIPCache setting (STR #3901)
+	- "PAGE: total NNN" messages did not get logged properly (STR #3887)
+	- Updated the PWG Raster support to conform to the current draft of the
+	  PWG Raster Format specification.
+	- The PWG Raster filter did not always write the correct number of
+	  padding lines on the bottom of the page (STR #3904)
+	- When reporting a denial-of-service attack from the domain socket, the
+	  address reported does not always contain the correct path (STR #3888)
+	- Badly formed GIF files could cause the image filters to crash
+	  (STR #3914)
+	- Jobs canceled at the printer were retried by the IPP backend.
+	- "cupsfilter -u" deleted the input file instead of the PPD file.
+	- The scheduler did not compute the cost of PPD filters defined using
+	  the cupsFilter2 keyword properly.
+	- The scheduler did not correctly support the maxsize() attribute for
+	  PPD filters.
+
+
+CHANGES IN CUPS V1.5.0
+
+	- Documentation updates.
+	- Localization update (STR #3865)
+	- Needed to limit TLS to v1.0 on some versions of Mac OS X.
+	- The snmp backend did not work with some printers.
+
 
 CHANGES IN CUPS V1.5rc1
 

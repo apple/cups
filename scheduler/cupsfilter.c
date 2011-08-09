@@ -329,7 +329,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 	  case 'u' : /* Delete PPD file after conversion */
-	      removeinfile = 1;
+	      removeppd = 1;
 	      break;
 
           case 'U' : /* Specify username... */
@@ -629,7 +629,7 @@ add_printer_filter(
         filterptr = mimeAddFilter(mime, temptype, desttype, cost, program);
 
         if (!mimeFilterLookup(mime, desttype, filtertype))
-          mimeAddFilter(mime, desttype, filtertype, cost, "-");
+          mimeAddFilter(mime, desttype, filtertype, 0, "-");
       }
       else
         filterptr = mimeAddFilter(mime, temptype, filtertype, cost, program);

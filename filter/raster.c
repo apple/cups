@@ -630,16 +630,54 @@ cupsRasterWriteHeader2(
     cups_page_header2_t	fh;		/* File page header */
 
     memset(&fh, 0, sizeof(fh));
-    fh.HWResolution[0]  = htonl(r->header.HWResolution[0]);
-    fh.HWResolution[1]  = htonl(r->header.HWResolution[1]);
-    fh.cupsWidth        = htonl(r->header.cupsWidth);
-    fh.cupsHeight       = htonl(r->header.cupsHeight);
-    fh.cupsBitsPerColor = htonl(r->header.cupsBitsPerColor);
-    fh.cupsBitsPerPixel = htonl(r->header.cupsBitsPerPixel);
-    fh.cupsBytesPerLine = htonl(r->header.cupsBytesPerLine);
-    fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
-    fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
-    fh.cupsNumColors    = htonl(r->header.cupsNumColors);
+    strlcpy(fh.MediaClass, "PwgRaster", sizeof(fh.MediaClass));
+    strlcpy(fh.MediaColor, r->header.MediaColor, sizeof(fh.MediaColor));
+    strlcpy(fh.MediaType, r->header.MediaType, sizeof(fh.MediaType));
+    strlcpy(fh.OutputType, r->header.OutputType, sizeof(fh.OutputType));
+    strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
+            sizeof(fh.cupsRenderingIntent));
+    strlcpy(fh.cupsPageSizeName, r->header.cupsPageSizeName,
+            sizeof(fh.cupsPageSizeName));
+
+    fh.CutMedia              = htonl(r->header.CutMedia);
+    fh.Duplex                = htonl(r->header.Duplex);
+    fh.HWResolution[0]       = htonl(r->header.HWResolution[0]);
+    fh.HWResolution[1]       = htonl(r->header.HWResolution[1]);
+    fh.ImagingBoundingBox[0] = htonl(r->header.ImagingBoundingBox[0]);
+    fh.ImagingBoundingBox[1] = htonl(r->header.ImagingBoundingBox[1]);
+    fh.ImagingBoundingBox[2] = htonl(r->header.ImagingBoundingBox[2]);
+    fh.ImagingBoundingBox[3] = htonl(r->header.ImagingBoundingBox[3]);
+    fh.InsertSheet           = htonl(r->header.InsertSheet);
+    fh.Jog                   = htonl(r->header.Jog);
+    fh.LeadingEdge           = htonl(r->header.LeadingEdge);
+    fh.ManualFeed            = htonl(r->header.ManualFeed);
+    fh.MediaPosition         = htonl(r->header.MediaPosition);
+    fh.MediaWeight           = htonl(r->header.MediaWeight);
+    fh.NumCopies             = htonl(r->header.NumCopies);
+    fh.Orientation           = htonl(r->header.Orientation);
+    fh.PageSize[0]           = htonl(r->header.PageSize[0]);
+    fh.PageSize[1]           = htonl(r->header.PageSize[1]);
+    fh.Tumble                = htonl(r->header.Tumble);
+    fh.cupsWidth             = htonl(r->header.cupsWidth);
+    fh.cupsHeight            = htonl(r->header.cupsHeight);
+    fh.cupsBitsPerColor      = htonl(r->header.cupsBitsPerColor);
+    fh.cupsBitsPerPixel      = htonl(r->header.cupsBitsPerPixel);
+    fh.cupsBytesPerLine      = htonl(r->header.cupsBytesPerLine);
+    fh.cupsColorOrder        = htonl(r->header.cupsColorOrder);
+    fh.cupsColorSpace        = htonl(r->header.cupsColorSpace);
+    fh.cupsNumColors         = htonl(r->header.cupsNumColors);
+    fh.cupsInteger[0]        = htonl(r->header.cupsInteger[0]);
+    fh.cupsInteger[1]        = htonl(r->header.cupsInteger[1]);
+    fh.cupsInteger[2]        = htonl(r->header.cupsInteger[2]);
+    fh.cupsInteger[3]        = htonl(r->header.cupsImagingBBox[0] *
+                                     r->header.HWResolution[0]);
+    fh.cupsInteger[4]        = htonl(r->header.cupsImagingBBox[1] *
+                                     r->header.HWResolution[1]);
+    fh.cupsInteger[5]        = htonl(r->header.cupsImagingBBox[2] *
+                                     r->header.HWResolution[0]);
+    fh.cupsInteger[6]        = htonl(r->header.cupsImagingBBox[3] *
+                                     r->header.HWResolution[1]);
+    fh.cupsInteger[7]        = htonl(0xffffff);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
   }

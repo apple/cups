@@ -692,6 +692,12 @@ do_raster_tests(cups_mode_t mode)	/* O - Write mode */
     expected.cupsHeight       = 256;
     expected.cupsBytesPerLine = 256;
 
+    if (mode == CUPS_RASTER_WRITE_PWG)
+    {
+      strlcpy(expected.MediaClass, "PwgRaster", sizeof(expected.MediaClass));
+      expected.cupsInteger[7] = 0xffffff;
+    }
+
     if (page & 1)
     {
       expected.cupsBytesPerLine *= 2;
