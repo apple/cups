@@ -1,9 +1,11 @@
-CHANGES.txt - 2011-08-06
+CHANGES.txt - 2011-08-10
 ------------------------
 
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The cupsSendRequest function did not flush remaining response data
+	  from a previous request, leading to apparent chunking issues.
 	- The scheduler did not report the correct version in the Server: header
 	  (STR #3903)
 	- The scheduler did not support 1284 device IDs reported by driver

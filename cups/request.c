@@ -343,7 +343,8 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
  *
  * Use this function to get the response for an IPP request sent using
  * cupsSendDocument() or cupsSendRequest(). For requests that return
- * additional data, use httpRead() after getting a successful response.
+ * additional data, use httpRead() after getting a successful response,
+ * otherwise call httpFlush() to complete the response processing.
  *
  * @since CUPS 1.4/Mac OS X 10.6@
  */
@@ -636,6 +637,20 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   if (!http)
     if ((http = _cupsConnect()) == NULL)
       return (HTTP_SERVICE_UNAVAILABLE);
+
+ /*
+  * If the prior request was not flushed out, do so now...
+  */
+
+  if (http->state == HTTP_GET_SEND ||
+      http->state == HTTP_POST_SEND)
+    httpFlush(http);
+  else if (http->state != HTTP_WAITING)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+
+    return (HTTP_ERROR);
+  }
 
 #ifdef HAVE_SSL
  /*
