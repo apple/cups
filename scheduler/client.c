@@ -3283,9 +3283,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
-    error = SSLSetProtocolVersionEnabled(con->http.tls, kSSLProtocol2, false);
-
-  if (!error)
     error = SSLSetConnection(con->http.tls, HTTP(con));
 
   if (!error)

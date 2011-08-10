@@ -3894,13 +3894,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!error)
   {
-    error = SSLSetProtocolVersionEnabled(http->tls, kSSLProtocol2, false);
-    DEBUG_printf(("4http_setup_ssl: SSLSetProtocolVersionEnabled, error=%d",
-                  (int)error));
-  }
-
-  if (!error)
-  {
     error = SSLSetAllowsAnyRoot(http->tls, any_root);
     DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot(%d), error=%d",
                   any_root, (int)error));
