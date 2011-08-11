@@ -3823,6 +3823,69 @@ print_xml_string(const char *element,	/* I - Element name or NULL */
       fputs("&lt;", stdout);
     else if (*s == '>')
       fputs("&gt;", stdout);
+    else if ((*s & 0xe0) == 0xc0)
+    {
+     /*
+      * Validate UTF-8 two-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s ++;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0xf0) == 0xe0)
+    {
+     /*
+      * Validate UTF-8 three-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s += 2;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0xf8) == 0xf0)
+    {
+     /*
+      * Validate UTF-8 four-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
+          (s[3] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s += 3;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
+    {
+     /*
+      * Invalid control character...
+      */
+
+      putchar('?');
+    }
     else
       putchar(*s);
 
