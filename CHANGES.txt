@@ -1,9 +1,11 @@
-CHANGES.txt - 2011-08-10
+CHANGES.txt - 2011-08-11
 ------------------------
 
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The scheduler no longer automatically logs debug messages for jobs
+	  that were held or canceled.
 	- The cupsSendRequest function did not flush remaining response data
 	  from a previous request, leading to apparent chunking issues.
 	- The scheduler did not report the correct version in the Server: header
