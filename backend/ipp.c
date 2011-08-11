@@ -111,7 +111,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-is-accepting-jobs",
   "printer-state",
   "printer-state-message",
-  "printer-state-reasons",
+  "printer-state-reasons"
 };
 static const char * const remote_job_states[] =
 {					/* Remote job state keywords */
