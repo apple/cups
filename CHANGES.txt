@@ -4,6 +4,7 @@ CHANGES.txt - 2011-08-11
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The PostScript filter did not mirror N-up output properly.
 	- The ipptool program did not validate UTF-8 strings in XML output.
 	- Fixed supply level reporting for some printers.
 	- The scheduler no longer automatically logs debug messages for jobs
