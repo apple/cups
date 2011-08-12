@@ -2824,6 +2824,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
       if (strcmp(reason, "none") &&
 	  strcmp(reason, "none-report") &&
 	  strcmp(reason, "paused") &&
+	  strncmp(reason, "spool-area-full", 15) &&
 	  strcmp(reason, "com.apple.print.recoverable-warning") &&
 	  strncmp(reason, "cups-", 5))
 	cupsArrayAdd(new_reasons, reason);
