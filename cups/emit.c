@@ -558,7 +558,7 @@ ppdEmitJCLEnd(ppd_file_t *ppd,		/* I - PPD file record */
 
   if (!ppd->jcl_end)
   {
-    if ((ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+    if (ppd->num_filters == 0)
       putc(0x04, fp);
 
     return (0);
@@ -1165,7 +1165,7 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
       (!manual_feed && !input_slot) ||
       (manual_feed && !_cups_strcasecmp(manual_feed->choice, "False") &&
        (!input_slot || (input_slot->code && !input_slot->code[0]))) ||
-      (!rpr && (ppd->num_filters > 0 || ppdFindAttr(ppd, "cupsFilter2", NULL))))
+      (!rpr && ppd->num_filters > 0))
   {
    /*
     * Use PageSize code...

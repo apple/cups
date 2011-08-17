@@ -811,8 +811,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     for (xpage = 0; xpage < xpages; xpage ++)
       for (ypage = 0; ypage < ypages; ypage ++, page ++)
       {
-        if (ppd &&
-            ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL))
+        if (ppd && ppd->num_filters == 0)
           fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
 
 	_cupsLangPrintFilter(stderr, "INFO", _("Printing page %d."), page);

@@ -138,8 +138,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (ppd && ppd->jcl_end)
       fputs(ppd->jcl_end, stdout);
-    else if (!ppd ||
-             (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+    else if (!ppd || ppd->num_filters == 0)
       putchar(0x04);
 
    /*

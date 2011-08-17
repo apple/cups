@@ -923,8 +923,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
     if (!doc->slow_order)
     {
-      if (!ppd ||
-          (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+      if (!ppd || !ppd->num_filters)
 	fprintf(stderr, "PAGE: %d %d\n", doc->page,
         	doc->slow_collate ? 1 : doc->copies);
 
@@ -1029,8 +1028,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
         number ++;
 
-	if (!ppd ||
-	    (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+	if (!ppd || !ppd->num_filters)
 	  fprintf(stderr, "PAGE: %d %d\n", number,
 	          doc->slow_collate ? 1 : doc->copies);
 
@@ -1173,7 +1171,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   * Finally, embed a copy of the file inside a %%Page...
   */
 
-  if (!ppd || (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+  if (!ppd || !ppd->num_filters)
     fprintf(stderr, "PAGE: 1 %d\n", doc->temp ? 1 : doc->copies);
 
   puts("%%Page: 1 1");
@@ -1222,8 +1220,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
       if (JobCanceled)
 	break;
 
-      if (!ppd ||
-          (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+      if (!ppd || !ppd->num_filters)
 	fputs("PAGE: 1 1\n", stderr);
 
       printf("%%%%Page: %d %d\n", copy + 1, copy + 1);
@@ -1527,8 +1524,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (!doc->slow_order && first_page)
   {
-    if (!ppd ||
-        (ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)))
+    if (!ppd || !ppd->num_filters)
       fprintf(stderr, "PAGE: %d %d\n", doc->page,
 	      doc->slow_collate ? 1 : doc->copies);
 

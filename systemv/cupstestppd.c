@@ -2340,9 +2340,26 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
   * cupsFilter
   */
 
-  for (i = 0; i < ppd->num_filters; i ++)
+  for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
   {
-    if (sscanf(ppd->filters[i], "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
+    if (strcmp(attr->name, "cupsFilter"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s."),
+			prefix, attr->name, "cupsFilter");
+
+      if (!warn)
+        errors ++;
+    }
+
+    if (!attr->value ||
+        sscanf(attr->value, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
                &cost, program) != 4)
     {
       if (!warn && !errors && !verbose)
@@ -2406,7 +2423,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
   }
 
  /*
-  * cupsFilter
+  * cupsFilter2
   */
 
   for (attr = ppdFindAttr(ppd, "cupsFilter2", NULL);
@@ -2428,7 +2445,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
     }
 
     if (!attr->value ||
-	sscanf(ppd->filters[i], "%15[^/]/%255s%15[^/]/%255s%d%*[ \t]%1023[^\n]",
+	sscanf(attr->value, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
 	       super, type, dstsuper, dsttype, &cost, program) != 6)
     {
       if (!warn && !errors && !verbose)

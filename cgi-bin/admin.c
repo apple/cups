@@ -3354,22 +3354,10 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
     if (ppd)
     {
-      if ((ppd->num_filters == 0 && !ppdFindAttr(ppd, "cupsFilter2", NULL)) ||
+      if (ppd->num_filters == 0 ||
           ((ppdattr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
            ppdattr->value && strstr(ppdattr->value, "AutoConfigure")))
         cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
-      else if ((ppdattr = ppdFindAttr(ppd, "cupsFilter2", NULL)) != NULL)
-      {
-        do
-        {
-	  if (!strncmp(ppdattr->value, "application/vnd.cups-postscript", 31))
-	  {
-	    cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
-	    break;
-	  }
-	}
-	while ((ppdattr = ppdFindNextAttr(ppd, "cupsFilter2", NULL)) != NULL);
-      }
       else
       {
         for (i = 0; i < ppd->num_filters; i ++)
