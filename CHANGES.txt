@@ -1,9 +1,11 @@
-CHANGES.txt - 2011-08-11
+CHANGES.txt - 2011-08-17
 ------------------------
 
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- ipptool's XML output used date/time values with timezone offsets,
+	  which are not supported by Mac OS X's NSDate class.
 	- Several programs did not support the cupsFilter2 keyword in PPD files.
 	- The IPP backend incorrectly reported spool-area-full states.
 	- cupsMarkOptions() did not protect against a bad PPD that was missing
