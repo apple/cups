@@ -3227,19 +3227,20 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
   gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
 
-  error = gnutls_handshake(con->http.tls);
-
-  if (error != GNUTLS_E_SUCCESS)
+  while ((error = gnutls_handshake(con->http.tls)) != GNUTLS_E_SUCCESS)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s",
-                    con->http.hostname, gnutls_strerror(error));
+    if (gnutls_error_is_fatal(error))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to encrypt connection from %s - %s",
+                      con->http.hostname, gnutls_strerror(error));
 
-    gnutls_deinit(con->http.tls);
-    gnutls_certificate_free_credentials(*credentials);
-    con->http.tls = NULL;
-    free(credentials);
-    return (0);
+      gnutls_deinit(con->http.tls);
+      gnutls_certificate_free_credentials(*credentials);
+      con->http.tls = NULL;
+      free(credentials);
+      return (0);
+    }
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",

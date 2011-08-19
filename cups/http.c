@@ -3760,7 +3760,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
 
-static int				/* O - Status of connection */
+static int				/* O - 0 on success, -1 on failure */
 http_setup_ssl(http_t *http)		/* I - Connection to server */
 {
   _cups_globals_t	*cg = _cupsGlobals();
@@ -3768,29 +3768,30 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   int			any_root;	/* Allow any root */
 
 #  ifdef HAVE_LIBSSL
-  SSL_CTX	*context;		/* Context for encryption */
-  BIO		*bio;			/* BIO data */
+  SSL_CTX		*context;	/* Context for encryption */
+  BIO			*bio;		/* BIO data */
+  const char		*message = NULL;/* Error message */
 #  elif defined(HAVE_GNUTLS)
+  int			status;		/* Status of handshake */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
-  OSStatus	error;			/* Error code */
-  const char	*message = NULL;	/* Error message */
-  char		*hostname;		/* Hostname */
+  OSStatus		error;		/* Error code */
+  char			*hostname;	/* Hostname */
+  const char		*message = NULL;/* Error message */
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
-  cups_array_t	*credentials;		/* Credentials array */
-  cups_array_t	*names;			/* CUPS distinguished names */
-  CFArrayRef	dn_array;		/* CF distinguished names array */
-  CFIndex	count;			/* Number of credentials */
-  CFDataRef	data;			/* Certificate data */
-  int		i;			/* Looping var */
-  http_credential_t
-		*credential;		/* Credential data */
+  cups_array_t		*credentials;	/* Credentials array */
+  cups_array_t		*names;		/* CUPS distinguished names */
+  CFArrayRef		dn_array;	/* CF distinguished names array */
+  CFIndex		count;		/* Number of credentials */
+  CFDataRef		data;		/* Certificate data */
+  int			i;		/* Looping var */
+  http_credential_t	*credential;	/* Credential data */
 #    endif /* HAVE_SECCERTIFICATECOPYDATA */
 #  elif defined(HAVE_SSPISSL)
-  TCHAR		username[256];		/* Username returned from GetUserName() */
-  TCHAR		commonName[256];	/* Common name for certificate */
-  DWORD		dwSize;			/* 32 bit size */
+  TCHAR			username[256];	/* Username returned from GetUserName() */
+  TCHAR			commonName[256];/* Common name for certificate */
+  DWORD			dwSize;		/* 32 bit size */
 #  endif /* HAVE_LIBSSL */
 
 
@@ -3818,12 +3819,13 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (SSL_connect(http->tls) != 1)
   {
-#    ifdef DEBUG
     unsigned long	error;	/* Error code */
 
     while ((error = ERR_get_error()) != 0)
-      DEBUG_printf(("8http_setup_ssl: %s", ERR_error_string(error, NULL)));
-#    endif /* DEBUG */
+    {
+      message = ERR_error_string(error, NULL);
+      DEBUG_printf(("8http_setup_ssl: %s", message));
+    }
 
     SSL_CTX_free(context);
     SSL_free(http->tls);
@@ -3836,7 +3838,12 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #    endif /* WIN32 */
     http->status = HTTP_ERROR;
 
-    return (HTTP_ERROR);
+    if (!message)
+      message = _("Unable to establish a secure connection to host.");
+
+    _cupsSetError(IPP_PKI_ERROR, message, 1);
+
+    return (-1);
   }
 
 #  elif defined(HAVE_GNUTLS)
@@ -3844,8 +3851,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
                     malloc(sizeof(gnutls_certificate_client_credentials));
   if (credentials == NULL)
   {
-    http->error = errno;
+    DEBUG_printf(("8http_setup_ssl: Unable to allocate credentials: %s",
+                  strerror(errno)));
+    http->error  = errno;
     http->status = HTTP_ERROR;
+    _cupsSetHTTPError(HTTP_ERROR);
 
     return (-1);
   }
@@ -3859,17 +3869,25 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   gnutls_transport_set_pull_function(http->tls, _httpReadGNUTLS);
   gnutls_transport_set_push_function(http->tls, _httpWriteGNUTLS);
 
-  if ((gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
+  while ((status = gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
   {
-    http->error  = errno;
-    http->status = HTTP_ERROR;
+    DEBUG_printf(("8http_setup_ssl: gnutls_handshake returned %d (%s)",
+                  status, gnutls_strerror(status)));
 
-    gnutls_deinit(http->tls);
-    gnutls_certificate_free_credentials(*credentials);
-    free(credentials);
-    http->tls = NULL;
+    if (gnutls_error_is_fatal(status))
+    {
+      http->error  = EIO;
+      http->status = HTTP_ERROR;
 
-    return (-1);
+      _cupsSetError(IPP_PKI_ERROR, gnutls_strerror(status), 0);
+
+      gnutls_deinit(http->tls);
+      gnutls_certificate_free_credentials(*credentials);
+      free(credentials);
+      http->tls = NULL;
+
+      return (-1);
+    }
   }
 
   http->tls_credentials = credentials;
@@ -3877,8 +3895,9 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
   if ((error = SSLNewContext(false, &http->tls)))
   {
-    http->error  = error;
+    http->error  = errno;
     http->status = HTTP_ERROR;
+    _cupsSetHTTPError(HTTP_ERROR);
 
     return (-1);
   }
@@ -4123,6 +4142,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   http->tls = _sspiAlloc();
 
   if (!http->tls)
+  {
     return (-1);
 
   http->tls->sock = http->fd;
@@ -4136,6 +4156,13 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   {
     _sspiFree(http->tls_credentials);
     http->tls_credentials = NULL;
+
+    http->error  = EIO;
+    http->status = HTTP_ERROR;
+
+    _cupsSetError(IPP_PKI_ERROR,
+                  _("Unable to establish a secure connection to host."), 1);
+
     return (-1);
   }
 
@@ -4146,6 +4173,13 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   {
     _sspiFree(http->tls_credentials);
     http->tls_credentials = NULL;
+
+    http->error  = EIO;
+    http->status = HTTP_ERROR;
+
+    _cupsSetError(IPP_PKI_ERROR,
+                  _("Unable to establish a secure connection to host."), 1);
+
     return (-1);
   }
 #  endif /* HAVE_CDSASSL */

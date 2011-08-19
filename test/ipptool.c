@@ -660,7 +660,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			  vars->family)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, strerror(errno));
+                      vars->port, cupsLastErrorString());
     pass = 0;
     goto test_exit;
   }
@@ -668,7 +668,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   if (httpReconnect(http))
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, strerror(errno));
+                      vars->port, cupsLastErrorString());
     pass = 0;
     goto test_exit;
   }
