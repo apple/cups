@@ -3807,6 +3807,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     any_root = cg->any_root;
 
 #  ifdef HAVE_LIBSSL
+  (void)any_root;
+
   context = SSL_CTX_new(SSLv23_client_method());
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
@@ -3815,7 +3817,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)http);
 
   http->tls = SSL_new(context);
-  SSL_set_bio(http->tls_credentials, bio, bio);
+  SSL_set_bio(http->tls, bio, bio);
 
   if (SSL_connect(http->tls) != 1)
   {
@@ -4200,11 +4202,11 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
 
-  context = SSL_get_SSL_CTX(http->tls_credentials);
+  context = SSL_get_SSL_CTX(http->tls);
 
-  SSL_shutdown(http->tls_credentials);
+  SSL_shutdown(http->tls);
   SSL_CTX_free(context);
-  SSL_free(http->tls_credentials);
+  SSL_free(http->tls);
 
 #  elif defined(HAVE_GNUTLS)
   gnutls_certificate_client_credentials *credentials;
