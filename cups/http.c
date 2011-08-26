@@ -2186,7 +2186,10 @@ _httpReadGNUTLS(
     size_t               length)	/* I - Number of bytes to read */
 {
   http_t	*http;			/* HTTP connection */
+  ssize_t	bytes;			/* Bytes read */
 
+
+  DEBUG_printf(("6_httpReadGNUTLS(ptr=%p, data=%p, length=%d)", ptr, data, (int)length));
 
   http = (http_t *)ptr;
 
@@ -2206,7 +2209,9 @@ _httpReadGNUTLS(
     }
   }
 
-  return (recv(http->fd, data, length, 0));
+  bytes = recv(http->fd, data, length, 0);
+  DEBUG_printf(("6_httpReadGNUTLS: bytes=%d", (int)bytes));
+  return (bytes);
 }
 #endif /* HAVE_SSL && HAVE_GNUTLS */
 
@@ -3189,7 +3194,16 @@ _httpWriteGNUTLS(
     const void           *data,		/* I - Data buffer */
     size_t               length)	/* I - Number of bytes to write */
 {
-  return (send(((http_t *)ptr)->fd, data, length, 0));
+  ssize_t bytes;			/* Bytes written */
+
+
+  DEBUG_printf(("6_httpWriteGNUTLS(ptr=%p, data=%p, length=%d)", ptr, data,
+                (int)length));
+  http_debug_hex("_httpWriteGNUTLS", data, (int)length);
+
+  bytes = send(((http_t *)ptr)->fd, data, length, 0);
+  DEBUG_printf(("_httpWriteGNUTLS: bytes=%d", (int)bytes));
+  return (bytes);
 }
 #endif /* HAVE_SSL && HAVE_GNUTLS */
 
@@ -3866,6 +3880,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   gnutls_init(&http->tls, GNUTLS_CLIENT);
   gnutls_set_default_priority(http->tls);
+  gnutls_server_name_set(http->tls, GNUTLS_NAME_DNS, http->hostname, strlen(http->hostname));
   gnutls_credentials_set(http->tls, GNUTLS_CRD_CERTIFICATE, *credentials);
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr)http);
   gnutls_transport_set_pull_function(http->tls, _httpReadGNUTLS);
