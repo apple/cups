@@ -310,11 +310,9 @@ dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
 INSTALLXPC=""
-LEGACY_BACKENDS="parallel"
 
 case $uname in
         Darwin*)
-		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 SERVERLIBS="$SERVERLIBS -framework IOKit -weak_framework ApplicationServices"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
@@ -394,7 +392,6 @@ AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(INSTALLXPC)
-AC_SUBST(LEGACY_BACKENDS)
 
 dnl Check for build components
 COMPONENTS="all"

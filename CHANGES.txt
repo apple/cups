@@ -1,5 +1,6 @@
-CHANGES.txt - 2011-08-17
-------------------------
+CHANGES.txt - 1.6b1 - 2011-08-27
+--------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- The serial and parallel backends have been removed (STR 3935)

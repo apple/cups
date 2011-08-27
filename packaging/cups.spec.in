@@ -194,8 +194,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0700,root,root) /usr/lib/cups/backend/ipp
 /usr/lib/cups/backend/ipps
 %attr(0700,root,root) /usr/lib/cups/backend/lpd
-/usr/lib/cups/backend/parallel
-/usr/lib/cups/backend/serial
 /usr/lib/cups/backend/snmp
 /usr/lib/cups/backend/socket
 /usr/lib/cups/backend/usb
