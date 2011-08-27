@@ -120,6 +120,7 @@ HEADERSPRIV =	\
 		md5-private.h \
 		ppd-private.h \
 		pwg-private.h \
+		raster-private.h \
 		snmp-private.h \
 		string-private.h \
 		thread-private.h

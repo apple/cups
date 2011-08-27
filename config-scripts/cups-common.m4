@@ -123,6 +123,7 @@ AC_SUBST(LIBPAPER)
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
 AC_CHECK_HEADER(crypt.h,AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_HEADER(langinfo.h,AC_DEFINE(HAVE_LANGINFO_H))
 AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
@@ -240,6 +241,15 @@ if test x$enable_tcp_wrappers = xyes; then
 			AC_DEFINE(HAVE_TCPD_H)
 			LIBWRAP="-lwrap")])
 fi
+
+dnl ZLIB
+LIBZ=""
+AC_CHECK_HEADER(zlib.h,
+    AC_CHECK_LIB(z, gzgets,
+	AC_DEFINE(HAVE_LIBZ)
+	LIBZ="-lz"
+	LIBS="$LIBS -lz"))
+AC_SUBST(LIBZ)
 
 dnl Flags for "ar" command...
 case $uname in
@@ -403,7 +413,7 @@ AC_ARG_WITH(components, [  --with-components       set components to build:
 
 case "$COMPONENTS" in
 	all)
-		BUILDDIRS="filter backend berkeley cgi-bin driver monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
+		BUILDDIRS="filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
 		;;
 
 	core)

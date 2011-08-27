@@ -3,4 +3,7 @@ CHANGES.txt - 1.6b1 - 2011-08-27
 
 CHANGES IN CUPS V1.6b1
 
+	- The bannertops, commandtoescpx, commandtopclx, imagetops,
+	  imagetoraster, pdftops, rastertoescpx, rastertopclx, and texttops
+	  filters have been removed (STR #3930)
 	- The serial and parallel backends have been removed (STR 3935)

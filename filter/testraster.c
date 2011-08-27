@@ -28,13 +28,7 @@
  * Include necessary headers...
  */
 
-#include "image-private.h"
-#ifdef WIN32
-#  include <io.h>
-#else
-#  include <unistd.h>
-#  include <fcntl.h>
-#endif /* WIN32 */
+#include <cups/raster-private.h>
 
 
 /*

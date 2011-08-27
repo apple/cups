@@ -28,8 +28,7 @@
  * Include necessary headers...
  */
 
-#include "image-private.h"
-#include <stdarg.h>
+#include <cups/raster-private.h>
 
 
 /*

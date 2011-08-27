@@ -133,9 +133,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Count lines in psglyphs, rewind, then count again.
     */
 
-    fputs("\ncupsFileOpen(\"../data/psglyphs\", \"r\"): ", stdout);
+    fputs("\ncupsFileOpen(\"../data/media.defs\", \"r\"): ", stdout);
 
-    if ((fp = cupsFileOpen("../data/psglyphs", "r")) == NULL)
+    if ((fp = cupsFileOpen("../data/media.defs", "r")) == NULL)
     {
       puts("FAIL");
       status ++;
@@ -145,9 +145,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
       fputs("cupsFileGets: ", stdout);
 
-      if ((count = count_lines(fp)) != 1051)
+      if ((count = count_lines(fp)) != 208)
       {
-        printf("FAIL (got %d lines, expected 1051)\n", count);
+        printf("FAIL (got %d lines, expected 208)\n", count);
 	status ++;
       }
       else
@@ -165,9 +165,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  puts("PASS");
 	  fputs("cupsFileGets: ", stdout);
 
-	  if ((count = count_lines(fp)) != 1051)
+	  if ((count = count_lines(fp)) != 208)
 	  {
-	    printf("FAIL (got %d lines, expected 1051)\n", count);
+	    printf("FAIL (got %d lines, expected 208)\n", count);
 	    status ++;
 	  }
 	  else

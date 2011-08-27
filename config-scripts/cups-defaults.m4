@@ -434,52 +434,6 @@ AC_ARG_WITH(ipp-port, [  --with-ipp-port         set port number for IPP, defaul
 AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
-dnl Filters
-AC_ARG_ENABLE(bannertops, [  --enable-bannertops     always build the banner filter ])
-AC_ARG_ENABLE(texttops, [  --enable-texttops       always build the text filter ])
-
-if test "x$enable_bannertops" = xno; then
-	BANNERTOPS=""
-	DEFAULT_BANNERTOPS="#"
-elif test "x$enable_bannertops" = xyes; then
-	BANNERTOPS="bannertops"
-	DEFAULT_BANNERTOPS=""
-elif test $uname = Darwin; then
-	BANNERTOPS=""
-	DEFAULT_BANNERTOPS="#"
-else
-	BANNERTOPS="bannertops"
-	DEFAULT_BANNERTOPS=""
-fi
-
-if test "x$enable_texttops" = xno; then
-	TEXTTOPS=""
-	DEFAULT_TEXTTOPS="#"
-elif test "x$enable_texttops" = xyes; then
-	TEXTTOPS="texttops"
-	DEFAULT_TEXTTOPS=""
-elif test $uname = Darwin; then
-	TEXTTOPS=""
-	DEFAULT_TEXTTOPS="#"
-else
-	TEXTTOPS="texttops"
-	DEFAULT_TEXTTOPS=""
-fi
-
-AC_SUBST(BANNERTOPS)
-AC_SUBST(DEFAULT_BANNERTOPS)
-AC_SUBST(DEFAULT_TEXTTOPS)
-AC_SUBST(TEXTTOPS)
-
-dnl Fonts
-if test "x$BANNERTOPS" = x -a "x$TEXTTOPS" = x; then
-	FONTS=""
-else
-	FONTS="fonts"
-fi
-
-AC_SUBST(FONTS)
-
 dnl Web interface...
 AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for Mac OS X])
 case "x$enable_webif" in

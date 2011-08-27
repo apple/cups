@@ -27,21 +27,15 @@ BANNERS	=	\
 		topsecret \
 		unclassified
 
-CHARSETS =	\
-		utf-8
-
 DATAFILES =	\
-		psglyphs \
 		testprint
 
 PPDCFILES =	\
 		epson.h \
-		escp.h \
 		font.defs \
 		hp.h \
 		label.h \
 		media.defs \
-		pcl.h \
 		raster.defs
 
 
@@ -96,12 +90,6 @@ install-data:
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
 	done
-	$(INSTALL_DIR) -m 755 $(DATADIR)/charsets
-	if test "x$(BANNERTOPS)" != x -o "x$(TEXTTOPS)" != x; then \
-		for file in $(CHARSETS); do \
-			$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
-		done; \
-	fi
 	$(INSTALL_DIR) -m 755 $(DATADIR)/data
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
@@ -143,9 +131,6 @@ uninstall:
 	for file in $(BANNERS); do \
 		$(RM) $(DATADIR)/banners/$$file; \
 	done
-	for file in $(CHARSETS); do \
-		$(RM) $(DATADIR)/charsets/$$file; \
-	done
 	for file in $(DATAFILES); do \
 		$(RM) $(DATADIR)/data/$$file; \
 	done
@@ -156,7 +141,6 @@ uninstall:
 	-$(RMDIR) $(DATADIR)/ppdc
 	-$(RMDIR) $(DATADIR)/model
 	-$(RMDIR) $(DATADIR)/data
-	-$(RMDIR) $(DATADIR)/charsets
 	-$(RMDIR) $(DATADIR)/banners
 	-$(RMDIR) $(DATADIR)
 
