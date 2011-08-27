@@ -20,7 +20,7 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups test $(BUILDDIRS) $(PHPDIR)
+DIRS	=	cups test $(BUILDDIRS)
 
 
 #
