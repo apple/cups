@@ -285,7 +285,7 @@ docset:	apihelp
 #
 
 sloc:
-	for dir in cups cupslite scheduler; do \
+	for dir in cups scheduler; do \
 		(cd $$dir; $(MAKE) $(MFLAGS) sloc) || exit 1;\
 	done
 
