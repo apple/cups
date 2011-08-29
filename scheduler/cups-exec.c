@@ -27,8 +27,10 @@
 #include <cups/string-private.h>
 #include <unistd.h>
 #ifdef HAVE_SANDBOX_H
-#  define __APPLE_API_PRIVATE
 #  include <sandbox.h>
+#  ifndef SANDBOX_NAMED_EXTERNAL
+#    define SANDBOX_NAMED_EXTERNAL  0x0003
+#  endif /* !SANDBOX_NAMED_EXTERNAL */
 #endif /* HAVE_SANDBOX_H */
 
 
