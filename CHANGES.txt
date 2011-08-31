@@ -1,8 +1,9 @@
-CHANGES.txt - 1.6b1 - 2011-08-27
+CHANGES.txt - 1.6b1 - 2011-08-30
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- The scheduler will no longer run programs with group write permission.
 	- The PHP module has been removed (STR #3932)
 	- The bannertops, commandtoescpx, commandtopclx, imagetops,
 	  imagetoraster, pdftops, rastertoescpx, rastertopclx, and texttops
