@@ -172,6 +172,10 @@ esac
 case $1 in
 	start | restart | reload)
 		if $IS_ON cups; then
+			if test -x /sbin/portrelease; then
+				/sbin/portrelease cups
+			fi
+
 			if test "$pid" != ""; then
 				kill -HUP $pid
 			else
