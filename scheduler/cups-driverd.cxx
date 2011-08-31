@@ -1411,9 +1411,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
   * Add a dummy entry for the file...
   */
 
-  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "drv", "", "", 0,
-		   "/%s", name);
-  add_ppd(name, uri, "", "", "", "", "", "", mtime, size, 0,
+  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
           PPD_TYPE_DRV, "drv");
   ChangedPPD = 1;
 
