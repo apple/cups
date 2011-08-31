@@ -452,19 +452,19 @@ cgiSetCookie(const char *name,		/* I - Name */
 
   printf("Set-Cookie: %s=%s;", name, value);
   if (path)
-    printf("; path=%s", path);
+    printf(" path=%s;", path);
   if (domain)
-    printf("; domain=%s", domain);
+    printf(" domain=%s;", domain);
   if (expires)
   {
     char	date[256];		/* Date string */
 
-    printf("; expires=%s", httpGetDateString2(expires, date, sizeof(date)));
+    printf(" expires=%s;", httpGetDateString2(expires, date, sizeof(date)));
   }
   if (secure)
-    puts("; secure;");
+    puts(" secure;");
   else
-    puts(";");
+    putchar('\n');
 }
 
 
