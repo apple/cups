@@ -496,7 +496,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&DataDir, CUPS_DATADIR);
   cupsdSetString(&DocumentRoot, CUPS_DOCROOT);
   cupsdSetString(&AccessLog, CUPS_LOGDIR "/access_log");
-  cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
+  cupsdClearString(&ErrorLog);
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
   cupsdSetString(&PageLogFormat,
                  "%p %u %j %T %P %C %{job-billing} "
@@ -717,6 +717,9 @@ cupsdReadConfiguration(void)
 
   if (!status)
     return (0);
+
+  if (!ErrorLog)
+    cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
 
   RunUser = getuid();
 
