@@ -54,7 +54,7 @@ if test "x$LANGUAGES" != x; then
 			LANGFILES="$LANGFILES templates/$lang/header.tmpl"
 		fi
 	done
-elif test "x$CUPS_BUNDLEDIR" != ""; then
+elif test "x$CUPS_BUNDLEDIR" != x; then
 	INSTALL_LANGUAGES="install-langbundle"
 	UNINSTALL_LANGUAGES="uninstall-langbundle"
 fi

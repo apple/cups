@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The configure script incorrectly used bundle-based localizations on
+	  Linux (STR #3938)
 	- The cups-driverd helper program did not cache .drv files properly,
 	  sometimes leading to a crash (STR #3921)
 	- CUPS did not build on stock Mac OS X installations.
