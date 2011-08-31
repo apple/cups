@@ -660,7 +660,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			  vars->family)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, strerror(errno));
+                      vars->port, cupsLastErrorString());
     pass = 0;
     goto test_exit;
   }
@@ -668,7 +668,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   if (httpReconnect(http))
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, strerror(errno));
+                      vars->port, cupsLastErrorString());
     pass = 0;
     goto test_exit;
   }
@@ -3251,18 +3251,17 @@ get_variable(_cups_vars_t *vars,	/* I - Variables */
 static char *				/* O - ISO 8601 date/time string */
 iso_date(ipp_uchar_t *date)		/* I - IPP (RFC 1903) date/time value */
 {
-  unsigned	year = (date[0] << 8) + date[1];
-					/* Year */
+  time_t	utctime;		/* UTC time since 1970 */
+  struct tm	*utcdate;		/* UTC date/time */
   static char	buffer[255];		/* String buffer */
 
 
-  if (date[9] == 0 && date[10] == 0)
-    snprintf(buffer, sizeof(buffer), "%04u-%02u-%02uT%02u:%02u:%02uZ",
-	     year, date[2], date[3], date[4], date[5], date[6]);
-  else
-    snprintf(buffer, sizeof(buffer), "%04u-%02u-%02uT%02u:%02u:%02u%c%02u%02u",
-	     year, date[2], date[3], date[4], date[5], date[6],
-	     date[8], date[9], date[10]);
+  utctime = ippDateToTime(date);
+  utcdate = gmtime(&utctime);
+
+  snprintf(buffer, sizeof(buffer), "%04d-%02d-%02dT%02d:%02d:%02dZ",
+	   utcdate->tm_year + 1900, utcdate->tm_mon + 1, utcdate->tm_mday,
+	   utcdate->tm_hour, utcdate->tm_min, utcdate->tm_sec);
 
   return (buffer);
 }
@@ -3823,6 +3822,69 @@ print_xml_string(const char *element,	/* I - Element name or NULL */
       fputs("&lt;", stdout);
     else if (*s == '>')
       fputs("&gt;", stdout);
+    else if ((*s & 0xe0) == 0xc0)
+    {
+     /*
+      * Validate UTF-8 two-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s ++;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0xf0) == 0xe0)
+    {
+     /*
+      * Validate UTF-8 three-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s += 2;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0xf8) == 0xf0)
+    {
+     /*
+      * Validate UTF-8 four-byte sequence...
+      */
+
+      if ((s[1] & 0xc0) != 0x80 || (s[2] & 0xc0) != 0x80 ||
+          (s[3] & 0xc0) != 0x80)
+      {
+        putchar('?');
+        s += 3;
+      }
+      else
+      {
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s++);
+        putchar(*s);
+      }
+    }
+    else if ((*s & 0x80) || (*s < ' ' && !isspace(*s & 255)))
+    {
+     /*
+      * Invalid control character...
+      */
+
+      putchar('?');
+    }
     else
       putchar(*s);
 

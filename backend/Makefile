@@ -21,13 +21,37 @@ include ../Makedefs
 # Object files...
 #
 
-RBACKENDS =	ipp lpd $(DNSSD_BACKEND)
-UBACKENDS =	$(LEGACY_BACKENDS) serial snmp socket usb
-UNITTESTS =	test1284 testbackend testsupplies
-TARGETS =	libbackend.a $(RBACKENDS) $(UBACKENDS)
-LIBOBJS	=	ieee1284.o network.o runloop.o snmp-supplies.o
-OBJS	=	ipp.o lpd.o dnssd.o parallel.o serial.o snmp.o \
-		socket.o test1284.o testbackend.o testsupplies.o usb.o
+RBACKENDS =	\
+		ipp \
+		lpd \
+		$(DNSSD_BACKEND)
+UBACKENDS =	\
+		snmp \
+		socket \
+		usb
+UNITTESTS =	\
+		test1284 \
+		testbackend \
+		testsupplies
+TARGETS =	\
+		libbackend.a \
+		$(RBACKENDS) \
+		$(UBACKENDS)
+LIBOBJS	=	\
+		ieee1284.o \
+		network.o \
+		runloop.o \
+		snmp-supplies.o
+OBJS	=	\
+		ipp.o \
+		lpd.o \
+		dnssd.o \
+		snmp.o \
+		socket.o \
+		test1284.o \
+		testbackend.o \
+		testsupplies.o \
+		usb.o
 
 
 #
@@ -56,7 +80,7 @@ unittests:	$(UNITTESTS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http mdns
+	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http https ipps mdns
 
 
 #
@@ -224,24 +248,6 @@ ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpd lpd.o libbackend.a $(LIBS)
-
-
-#
-# parallel
-#
-
-parallel:	parallel.o ../cups/$(LIBCUPS) libbackend.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o parallel parallel.o libbackend.a $(LIBS)
-
-
-#
-# serial
-#
-
-serial:	serial.o ../cups/$(LIBCUPS) libbackend.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o serial serial.o libbackend.a $(BACKLIBS) $(LIBS)
 
 
 #

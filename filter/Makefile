@@ -19,13 +19,9 @@ include ../Makedefs
 
 
 FILTERS	=	\
-		$(BANNERTOPS) \
 		commandtops \
 		gziptoany \
-		$(TEXTTOPS) \
 		pstops \
-		$(IMGFILTERS) \
-		$(PDFTOPS) \
 		rastertoepson \
 		rastertohp \
 		rastertolabel \
@@ -37,23 +33,18 @@ LIBTARGETS =	\
 		$(LIB64CUPSIMAGE)
 UNITTARGETS =	\
 		rasterbench \
-		testimage \
 		testraster
 TARGETS	=	\
 		$(LIBTARGETS) \
 		$(FILTERS)
 
-IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
-		image-photocd.o image-pix.o image-png.o image-pnm.o \
-		image-sgi.o image-sgilib.o image-sun.o image-tiff.o \
-		image-zoom.o image.o error.o interpret.o raster.o
+IMAGEOBJS =	error.o interpret.o raster.o
 IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
 IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 OBJS	=	$(IMAGEOBJS) \
-		bannertops.o commandtops.o gziptoany.o imagetops.o \
-		imagetoraster.o common.o pdftops.o pstext.o pstops.o \
+		commandtops.o gziptoany.o common.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
-		rastertopwg.o testimage.o testraster.o textcommon.o texttops.o
+		rastertopwg.o testraster.o
 
 
 #
@@ -139,8 +130,6 @@ install-exec:
 #
 
 install-headers:
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 
 
 #
@@ -200,8 +189,6 @@ uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(LIBDIR)/libcupsimage.so
 	$(RM) $(LIBDIR)/libcupsimage.so.2
 	-$(RMDIR) $(LIBDIR)
-	$(RM) $(INCLUDEDIR)/cups/image.h
-	-$(RMDIR) $(INCLUDEDIR)/cups
 
 uninstall32bit:
 	$(RM) $(LIB32DIR)/libcupsimage.so
@@ -284,16 +271,6 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header spec-ppd.header \
 		--intro spec-ppd.shtml \
-
-
-#
-# bannertops
-#
-
-bannertops:	bannertops.o pstext.o common.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ bannertops.o pstext.o common.o $(LINKCUPSIMAGE) \
-		$(IMGLIBS) $(LIBS)
 
 
 #
@@ -398,53 +375,12 @@ libcupsimage.a:	$(IMAGEOBJS)
 
 
 #
-# testimage
-#
-
-testimage:	testimage.o libcupsimage.a ../Makedefs
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testimage.o libcupsimage.a \
-		$(IMGLIBS) $(DSOLIBS) $(LIBS)
-
-
-#
-# imagetops
-#
-
-imagetops:	imagetops.o common.o $(LIBCUPSIMAGE) \
-		../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetops.o common.o $(LINKCUPSIMAGE) \
-		$(IMGLIBS) $(LIBS)
-
-
-#
-# imagetoraster
-#
-
-imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) \
-		../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ imagetoraster.o common.o $(LINKCUPSIMAGE) \
-		$(IMGLIBS) $(LIBS)
-
-
-#
 # pstops
 #
 
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS) -lm
-
-
-#
-# pdftops
-#
-
-pdftops:	pdftops.o common.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ pdftops.o common.o $(LIBS)
 
 
 #
@@ -503,16 +439,6 @@ testraster:	testraster.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 rasterbench:	rasterbench.o libcupsimage.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ rasterbench.o libcupsimage.a $(LIBS)
-
-
-#
-# texttops
-#
-
-texttops:	texttops.o textcommon.o common.o \
-		../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ texttops.o textcommon.o common.o $(LIBS)
 
 
 #

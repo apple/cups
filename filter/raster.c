@@ -45,13 +45,7 @@
  * Include necessary headers...
  */
 
-#include "image-private.h"
-#if defined(WIN32) || defined(__EMX__)
-#  include <io.h>
-#  include <winsock2.h>			/* for htonl() definition */
-#else
-#  include <unistd.h>
-#endif /* WIN32 || __EMX__ */
+#include <cups/raster-private.h>
 
 
 /*
@@ -347,7 +341,8 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
   int		count;			/* Repetition count */
 
 
-  if (r == NULL || r->mode != CUPS_RASTER_READ || r->remaining == 0)
+  if (r == NULL || r->mode != CUPS_RASTER_READ || r->remaining == 0 ||
+      r->header.cupsBytesPerLine == 0)
     return (0);
 
   if (!r->compressed)
@@ -933,7 +928,7 @@ cups_raster_read_header(
 
   cups_raster_update(r);
 
-  return (1);
+  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0);
 }
 
 

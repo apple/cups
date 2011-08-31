@@ -20,11 +20,11 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="1.5.1"
+CUPS_VERSION="1.6svn"
 CUPS_REVISION=""
-#if test -z "$CUPS_REVISION" -a -d .svn; then
-#	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-#fi
+if test -z "$CUPS_REVISION" -a -d .svn; then
+	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+fi
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],
@@ -123,6 +123,7 @@ AC_SUBST(LIBPAPER)
 
 dnl Checks for header files.
 AC_HEADER_STDC
+AC_CHECK_HEADER(stdlib.h,AC_DEFINE(HAVE_STDLIB_H))
 AC_CHECK_HEADER(crypt.h,AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_HEADER(langinfo.h,AC_DEFINE(HAVE_LANGINFO_H))
 AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
@@ -241,6 +242,15 @@ if test x$enable_tcp_wrappers = xyes; then
 			LIBWRAP="-lwrap")])
 fi
 
+dnl ZLIB
+LIBZ=""
+AC_CHECK_HEADER(zlib.h,
+    AC_CHECK_LIB(z, gzgets,
+	AC_DEFINE(HAVE_LIBZ)
+	LIBZ="-lz"
+	LIBS="$LIBS -lz"))
+AC_SUBST(LIBZ)
+
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)
@@ -310,11 +320,9 @@ dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
 INSTALLXPC=""
-LEGACY_BACKENDS="parallel"
 
 case $uname in
         Darwin*)
-		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 SERVERLIBS="$SERVERLIBS -framework IOKit -weak_framework ApplicationServices"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
@@ -394,7 +402,6 @@ AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(INSTALLXPC)
-AC_SUBST(LEGACY_BACKENDS)
 
 dnl Check for build components
 COMPONENTS="all"
@@ -406,7 +413,7 @@ AC_ARG_WITH(components, [  --with-components       set components to build:
 
 case "$COMPONENTS" in
 	all)
-		BUILDDIRS="filter backend berkeley cgi-bin driver monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
+		BUILDDIRS="filter backend berkeley cgi-bin monitor notifier ppdc scheduler systemv conf data desktop locale man doc examples templates"
 		;;
 
 	core)

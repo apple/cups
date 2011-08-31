@@ -3179,9 +3179,10 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   return (1);
 
 #  elif defined(HAVE_GNUTLS)
-  int		error;			/* Error code */
+  int		status;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
 					/* TLS credentials */
+  const char	*priority;		/* Priority string */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
@@ -3222,24 +3223,41 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   gnutls_init(&con->http.tls, GNUTLS_SERVER);
   gnutls_set_default_priority(con->http.tls);
-  gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
-  gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
-  gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
-
-  error = gnutls_handshake(con->http.tls);
-
-  if (error != GNUTLS_E_SUCCESS)
+  status = gnutls_priority_set_direct(con->http.tls,
+                                      "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:"
+                                      "+VERS-SSL3.0:%COMPAT", &priority);
+  if (status != GNUTLS_E_SUCCESS)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s",
-                    con->http.hostname, gnutls_strerror(error));
+                    "Unable to encrypt connection from %s - %s (%s)",
+                    con->http.hostname, gnutls_strerror(status), priority);
 
     gnutls_deinit(con->http.tls);
     gnutls_certificate_free_credentials(*credentials);
     con->http.tls = NULL;
     free(credentials);
     return (0);
+  }
+
+  gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
+  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
+  gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
+
+  while ((status = gnutls_handshake(con->http.tls)) != GNUTLS_E_SUCCESS)
+  {
+    if (gnutls_error_is_fatal(status))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to encrypt connection from %s - %s",
+                      con->http.hostname, gnutls_strerror(status));
+
+      gnutls_deinit(con->http.tls);
+      gnutls_certificate_free_credentials(*credentials);
+      con->http.tls = NULL;
+      free(credentials);
+      return (0);
+    }
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
@@ -3281,9 +3299,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   if (!error)
     error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
-
-  if (!error)
-    error = SSLSetProtocolVersionEnabled(con->http.tls, kSSLProtocol2, false);
 
   if (!error)
     error = SSLSetConnection(con->http.tls, HTTP(con));

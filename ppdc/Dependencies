@@ -154,8 +154,7 @@ ppdc-source.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
 ppdc-source.o: ../cups/http.h ../cups/md5-private.h ../cups/ipp-private.h
 ppdc-source.o: ../cups/ipp.h ../cups/language-private.h ../cups/transcode.h
 ppdc-source.o: ../cups/thread-private.h ../cups/raster.h ../cups/ppd.h
-ppdc-source.o: ../data/epson.h ../data/escp.h ../data/hp.h ../data/label.h
-ppdc-source.o: ../data/pcl.h
+ppdc-source.o: ../data/epson.h ../data/hp.h ../data/label.h
 ppdc-string.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
 ppdc-string.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
 ppdc-string.o: ../cups/ipp.h ../cups/http.h ../cups/array.h

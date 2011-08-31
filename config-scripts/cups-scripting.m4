@@ -68,17 +68,6 @@ else
 	AC_DEFINE(HAVE_PHP)
 fi
 
-PHPDIR=""
-if test "x$CUPS_PHP" != xno; then
-	AC_PATH_PROG(PHPCONFIG, php-config)
-
-	if test "x$PHPCONFIG" != x; then
-		PHPDIR="scripting/php"
-	fi
-fi
-
-AC_SUBST(PHPDIR)
-
 dnl Do we have Python?
 AC_ARG_WITH(python, [  --with-python           set Python interpreter for web interfaces ],
 	CUPS_PYTHON="$withval",

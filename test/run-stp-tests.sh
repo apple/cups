@@ -250,9 +250,7 @@ ln -s $root/backend/http /tmp/cups-$user/bin/backend
 ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
 ln -s $root/backend/mdns /tmp/cups-$user/bin/backend
-ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
 ln -s $root/backend/pseudo /tmp/cups-$user/bin/backend
-ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
@@ -260,16 +258,13 @@ ln -s $root/cgi-bin /tmp/cups-$user/bin
 ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
-ln -s $root/filter/bannertops /tmp/cups-$user/bin/filter
 ln -s $root/filter/commandtops /tmp/cups-$user/bin/filter
 ln -s $root/filter/gziptoany /tmp/cups-$user/bin/filter
-ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
 ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertolabel /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertopwg /tmp/cups-$user/bin/filter
-ln -s $root/filter/texttops /tmp/cups-$user/bin/filter
 
 ln -s $root/data/classified /tmp/cups-$user/share/banners
 ln -s $root/data/confidential /tmp/cups-$user/share/banners
@@ -277,24 +272,13 @@ ln -s $root/data/secret /tmp/cups-$user/share/banners
 ln -s $root/data/standard /tmp/cups-$user/share/banners
 ln -s $root/data/topsecret /tmp/cups-$user/share/banners
 ln -s $root/data/unclassified /tmp/cups-$user/share/banners
-ln -s $root/data /tmp/cups-$user/share/charmaps
-ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
-ln -s $root/fonts /tmp/cups-$user/share
 ln -s $root/ppdc/sample.drv /tmp/cups-$user/share/drv
 ln -s $root/conf/mime.types /tmp/cups-$user/share/mime
 ln -s $root/conf/mime.convs /tmp/cups-$user/share/mime
 ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
 ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
-
-if test -f $root/filter/imagetops; then
-	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
-fi
-
-if test -f $root/filter/imagetoraster; then
-	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
-fi
 
 #
 # Mac OS X filters and configuration files...
@@ -320,7 +304,13 @@ if test `uname` = Darwin; then
 		ln -s /usr/share/cups/mime/apple.* /tmp/cups-$user/share/mime
 	fi
 else
-	ln -s $root/filter/pdftops /tmp/cups-$user/bin/filter
+	ln -s /usr/lib/cups/filter/bannertops /tmp/cups-$user/bin/filter
+	ln -s /usr/lib/cups/filter/imagetops /tmp/cups-$user/bin/filter
+	ln -s /usr/lib/cups/filter/imagetoraster /tmp/cups-$user/bin/filter
+	ln -s /usr/lib/cups/filter/pdftops /tmp/cups-$user/bin/filter
+	ln -s /usr/lib/cups/filter/texttops /tmp/cups-$user/bin/filter
+
+	ln -s /usr/share/cups/mime/legacy.convs /tmp/cups-$user/share/mime
 fi
 
 #
@@ -553,7 +543,7 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=/tmp/cups-$user/cups-str-1.5-$date-$user.html
+strfile=/tmp/cups-$user/cups-str-1.6-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile

@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.c 7906 2008-09-03 20:19:43Z mike $"
+ * "$Id: ppd.c 9900 2011-08-17 20:59:46Z mike $"
  *
  *   PPD file routines for CUPS.
  *
@@ -43,6 +43,7 @@
  *   ppd_compare_coptions() - Compare two custom options.
  *   ppd_compare_options()  - Compare two options.
  *   ppd_decode()           - Decode a string value...
+ *   ppd_free_filters()     - Free the filters array.
  *   ppd_free_group()       - Free a single UI group.
  *   ppd_free_option()      - Free a single option.
  *   ppd_get_coption()      - Get a custom option record.
@@ -52,6 +53,7 @@
  *   ppd_hash_option()      - Generate a hash of the option name...
  *   ppd_read()             - Read a line from a PPD file, skipping comment
  *                            lines as necessary.
+ *   ppd_update_filters()   - Update the filters array as needed.
  */
 
 /*
@@ -110,6 +112,7 @@ static int		ppd_compare_coptions(ppd_coption_t *a,
 			                     ppd_coption_t *b);
 static int		ppd_compare_options(ppd_option_t *a, ppd_option_t *b);
 static int		ppd_decode(char *string);
+static void		ppd_free_filters(ppd_file_t *ppd);
 static void		ppd_free_group(ppd_group_t *group);
 static void		ppd_free_option(ppd_option_t *option);
 static ppd_coption_t	*ppd_get_coption(ppd_file_t *ppd, const char *name);
@@ -125,6 +128,8 @@ static int		ppd_read(cups_file_t *fp, _ppd_line_t *line,
 			         char *keyword, char *option, char *text,
 				 char **string, int ignoreblank,
 				 _cups_globals_t *cg);
+static int		ppd_update_filters(ppd_file_t *ppd,
+			                   _cups_globals_t *cg);
 
 
 /*
@@ -138,7 +143,6 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   ppd_emul_t		*emul;		/* Current emulation */
   ppd_group_t		*group;		/* Current group */
   char			**font;		/* Current font */
-  char			**filter;	/* Current filter */
   ppd_attr_t		**attr;		/* Current attribute */
   ppd_coption_t		*coption;	/* Current custom option */
   ppd_cparam_t		*cparam;	/* Current custom parameter */
@@ -211,13 +215,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   * Free any filters...
   */
 
-  if (ppd->num_filters > 0)
-  {
-    for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
-      _cupsStrFree(*filter);
-
-    ppd_free(ppd->filters);
-  }
+  ppd_free_filters(ppd);
 
  /*
   * Free any fonts...
@@ -880,11 +878,10 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd->num_filters ++;
 
      /*
-      * Copy filter string and prevent it from being freed below...
+      * Retain a copy of the filter string...
       */
 
-      *filter = string;
-      string  = NULL;
+      *filter = _cupsStrRetain(string);
     }
     else if (!strcmp(keyword, "Throughput"))
       ppd->throughput = atoi(string);
@@ -1962,6 +1959,17 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   }
 
  /*
+  * Update the filters array as needed...
+  */
+
+  if (!ppd_update_filters(ppd, cg))
+  {
+    ppdClose(ppd);
+
+    return (NULL);
+  }
+
+ /*
   * Create the sorted options array and set the option back-pointer for
   * each choice and custom option...
   */
@@ -2373,6 +2381,30 @@ ppd_decode(char *string)		/* I - String to decode */
   *outptr = '\0';
 
   return ((int)(outptr - string));
+}
+
+
+/*
+ * 'ppd_free_filters()' - Free the filters array.
+ */
+
+static void
+ppd_free_filters(ppd_file_t *ppd)	/* I - PPD file */
+{
+  int	i;				/* Looping var */
+  char	**filter;			/* Current filter */
+
+
+  if (ppd->num_filters > 0)
+  {
+    for (i = ppd->num_filters, filter = ppd->filters; i > 0; i --, filter ++)
+      _cupsStrFree(*filter);
+
+    ppd_free(ppd->filters);
+
+    ppd->num_filters = 0;
+    ppd->filters     = NULL;
+  }
 }
 
 
@@ -3140,5 +3172,125 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
 
 /*
- * End of "$Id: ppd.c 7906 2008-09-03 20:19:43Z mike $".
+ * 'ppd_update_filters()' - Update the filters array as needed.
+ *
+ * This function re-populates the filters array with cupsFilter2 entries that
+ * have been stripped of the destination MIME media types and any maxsize hints.
+ *
+ * (All for backwards-compatibility)
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+ppd_update_filters(ppd_file_t      *ppd,/* I - PPD file */
+                   _cups_globals_t *cg)	/* I - Global data */
+{
+  ppd_attr_t	*attr;			/* Current cupsFilter2 value */
+  char		srcsuper[16],		/* Source MIME media type */
+		srctype[256],
+		dstsuper[16],		/* Destination MIME media type */
+		dsttype[256],
+		program[1024],		/* Command to run */
+		*ptr,			/* Pointer into command to run */
+		buffer[1024],		/* Re-written cupsFilter value */
+		**filter;		/* Current filter */
+  int		cost;			/* Cost of filter */
+
+
+  DEBUG_printf(("4ppd_update_filters(ppd=%p, cg=%p)", ppd, cg));
+
+ /*
+  * See if we have any cupsFilter2 lines...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "cupsFilter2", NULL)) == NULL)
+  {
+    DEBUG_puts("5ppd_update_filters: No cupsFilter2 keywords present.");
+    return (1);
+  }
+
+ /*
+  * Yes, free the cupsFilter-defined filters and re-build...
+  */
+
+  ppd_free_filters(ppd);
+
+  do
+  {
+   /*
+    * Parse the cupsFilter2 string:
+    *
+    *   src/type dst/type cost program
+    *   src/type dst/type cost maxsize(n) program
+    */
+
+    DEBUG_printf(("5ppd_update_filters: cupsFilter2=\"%s\"", attr->value));
+
+    if (sscanf(attr->value, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
+	       srcsuper, srctype, dstsuper, dsttype, &cost, program) != 6)
+    {
+      DEBUG_puts("5ppd_update_filters: Bad cupsFilter2 line.");
+      cg->ppd_status = PPD_BAD_VALUE;
+
+      return (0);
+    }
+
+    DEBUG_printf(("5ppd_update_filters: srcsuper=\"%s\", srctype=\"%s\", "
+                  "dstsuper=\"%s\", dsttype=\"%s\", cost=%d, program=\"%s\"",
+		  srcsuper, srctype, dstsuper, dsttype, cost, program));
+
+    if (!strncmp(program, "maxsize(", 8) &&
+        (ptr = strchr(program + 8, ')')) != NULL)
+    {
+      DEBUG_puts("5ppd_update_filters: Found maxsize(nnn).");
+
+      ptr ++;
+      while (_cups_isspace(*ptr))
+	ptr ++;
+
+      _cups_strcpy(program, ptr);
+      DEBUG_printf(("5ppd_update_filters: New program=\"%s\"", program));
+    }
+
+   /*
+    * Convert to cupsFilter format:
+    *
+    *   src/type cost program
+    */
+
+    snprintf(buffer, sizeof(buffer), "%s/%s %d %s", srcsuper, srctype, cost,
+             program);
+    DEBUG_printf(("5ppd_update_filters: Adding \"%s\".", buffer));
+
+   /*
+    * Add a cupsFilter-compatible string to the filters array.
+    */
+
+    if (ppd->num_filters == 0)
+      filter = malloc(sizeof(char *));
+    else
+      filter = realloc(ppd->filters, sizeof(char *) * (ppd->num_filters + 1));
+
+    if (filter == NULL)
+    {
+      DEBUG_puts("5ppd_update_filters: Out of memory.");
+      cg->ppd_status = PPD_ALLOC_ERROR;
+
+      return (0);
+    }
+
+    ppd->filters     = filter;
+    filter           += ppd->num_filters;
+    ppd->num_filters ++;
+
+    *filter = _cupsStrAlloc(buffer);
+  }
+  while ((attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL)) != NULL);
+
+  DEBUG_puts("5ppd_update_filters: Completed OK.");
+  return (1);
+}
+
+
+/*
+ * End of "$Id: ppd.c 9900 2011-08-17 20:59:46Z mike $".
  */

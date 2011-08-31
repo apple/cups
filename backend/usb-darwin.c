@@ -761,24 +761,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   fprintf(stderr, "DEBUG: Sent %lld bytes...\n", (off_t)total_bytes);
 
-  if (!print_fd)
-  {
-   /*
-    * Re-enable the SIGTERM handler so pthread_kill() will work...
-    */
-
-    struct sigaction	action;		/* POSIX signal action */
-
-    memset(&action, 0, sizeof(action));
-
-    sigemptyset(&action.sa_mask);
-    sigaddset(&action.sa_mask, SIGTERM);
-    action.sa_handler = sigterm_handler;
-    sigaction(SIGTERM, &action, NULL);
-  }
-
  /*
-  * Wait for the side channel thread to exit...
+  * Signal the side channel thread to exit...
   */
 
   if (have_sidechannel)
@@ -805,44 +789,23 @@ print_device(const char *uri,		/* I - Device URI */
 				   &cond_timeout) != 0)
 	  break;
       }
-
-      if (!g.sidechannel_thread_done)
-      {
-       /*
-	* Force the side-channel thread to exit...
-	*/
-
-	fputs("DEBUG: Force the side-channel thread to exit...\n", stderr);
-	pthread_kill(sidechannel_thread_id, SIGTERM);
-      }
     }
 
     pthread_mutex_unlock(&g.sidechannel_thread_mutex);
-
-    pthread_join(sidechannel_thread_id, NULL);
-
-    pthread_cond_destroy(&g.sidechannel_thread_cond);
-    pthread_mutex_destroy(&g.sidechannel_thread_mutex);
   }
 
-  pthread_cond_destroy(&g.readwrite_lock_cond);
-  pthread_mutex_destroy(&g.readwrite_lock_mutex);
-
  /*
-  * Signal the read thread to stop...
+  * Signal the read thread to exit then wait 7 seconds for it to complete...
   */
 
   g.read_thread_stop = 1;
-
- /*
-  * Give the read thread WAIT_EOF_DELAY seconds to complete all the data. If
-  * we are not signaled in that time then force the thread to exit.
-  */
 
   pthread_mutex_lock(&g.read_thread_mutex);
 
   if (!g.read_thread_done)
   {
+    fputs("DEBUG: Waiting for read thread to exit...\n", stderr);
+
     gettimeofday(&tv, NULL);
     cond_timeout.tv_sec  = tv.tv_sec + WAIT_EOF_DELAY;
     cond_timeout.tv_nsec = tv.tv_usec * 1000;
@@ -854,24 +817,33 @@ print_device(const char *uri,		/* I - Device URI */
 	break;
     }
 
+   /*
+    * If it didn't exit abort the pending read and wait an additional second...
+    */
+  
     if (!g.read_thread_done)
     {
-     /*
-      * Force the read thread to exit...
-      */
+      fputs("DEBUG: Read thread still active, aborting the pending read...\n", 
+	    stderr);
 
       g.wait_eof = 0;
-      fputs("DEBUG: Force the read thread to exit...\n", stderr);
-      pthread_kill(read_thread_id, SIGTERM);
+
+      (*g.classdriver)->Abort(g.classdriver);
+
+      gettimeofday(&tv, NULL);
+      cond_timeout.tv_sec  = tv.tv_sec + 1;
+      cond_timeout.tv_nsec = tv.tv_usec * 1000;
+  
+      while (!g.read_thread_done)
+      {
+	if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+				   &cond_timeout) != 0)
+	  break;
+      }
     }
   }
 
   pthread_mutex_unlock(&g.read_thread_mutex);
-
-  pthread_join(read_thread_id, NULL);	/* wait for the read thread to return */
-
-  pthread_cond_destroy(&g.read_thread_cond);
-  pthread_mutex_destroy(&g.read_thread_mutex);
 
  /*
   * Close the connection and input file and general clean up...

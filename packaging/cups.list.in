@@ -280,10 +280,6 @@ f 0500 root sys $SERVERBIN/backend/lpd backend/lpd
 f 0500 root sys $SERVERBIN/backend/dnssd backend/dnssd
 l 0700 root sys $SERVERBIN/backend/mdns dnssd
 %endif
-%system !darwin
-f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
-%system all
-f 0555 root sys $SERVERBIN/backend/serial backend/serial
 f 0555 root sys $SERVERBIN/backend/snmp backend/snmp
 f 0555 root sys $SERVERBIN/backend/socket backend/socket
 f 0555 root sys $SERVERBIN/backend/usb backend/usb
@@ -299,27 +295,14 @@ f 0555 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
 f 0555 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
-f 0555 root sys $SERVERBIN/filter/bannertops filter/bannertops
-f 0555 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
-f 0555 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
 f 0555 root sys $SERVERBIN/filter/commandtops filter/commandtops
 f 0555 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
-%if IMGFILTERS
-f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
-f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
-%endif
-%if PDFTOPS
-f 0555 root sys $SERVERBIN/filter/pdftops filter/pdftops
-%endif
 f 0555 root sys $SERVERBIN/filter/pstops filter/pstops
-f 0555 root sys $SERVERBIN/filter/rastertoespcx driver/rastertoescpx
 f 0555 root sys $SERVERBIN/filter/rastertolabel filter/rastertolabel
 l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0555 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0555 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
-f 0555 root sys $SERVERBIN/filter/rastertopclx driver/rastertopclx
 f 0555 root sys $SERVERBIN/filter/rastertopwg filter/rastertopwg
-f 0555 root sys $SERVERBIN/filter/texttops filter/texttops
 d 0755 root sys $SERVERBIN/notifier -
 f 0555 root sys $SERVERBIN/notifier/mailto notifier/mailto
 

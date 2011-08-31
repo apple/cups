@@ -25,7 +25,6 @@ sinclude(config-scripts/cups-sharedlibs.m4)
 sinclude(config-scripts/cups-libtool.m4)
 sinclude(config-scripts/cups-compiler.m4)
 
-sinclude(config-scripts/cups-image.m4)
 sinclude(config-scripts/cups-network.m4)
 sinclude(config-scripts/cups-poll.m4)
 sinclude(config-scripts/cups-slp.m4)
@@ -38,7 +37,6 @@ sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-dnssd.m4)
 sinclude(config-scripts/cups-launchd.m4)
 sinclude(config-scripts/cups-defaults.m4)
-sinclude(config-scripts/cups-pdf.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
 INSTALL_LANGUAGES=""
@@ -56,7 +54,7 @@ if test "x$LANGUAGES" != x; then
 			LANGFILES="$LANGFILES templates/$lang/header.tmpl"
 		fi
 	done
-elif test "x$CUPS_BUNDLEDIR" != ""; then
+elif test "x$CUPS_BUNDLEDIR" != x; then
 	INSTALL_LANGUAGES="install-langbundle"
 	UNINSTALL_LANGUAGES="uninstall-langbundle"
 fi

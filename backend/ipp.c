@@ -111,7 +111,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-is-accepting-jobs",
   "printer-state",
   "printer-state-message",
-  "printer-state-reasons",
+  "printer-state-reasons"
 };
 static const char * const remote_job_states[] =
 {					/* Remote job state keywords */
@@ -2824,6 +2824,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
       if (strcmp(reason, "none") &&
 	  strcmp(reason, "none-report") &&
 	  strcmp(reason, "paused") &&
+	  strncmp(reason, "spool-area-full", 15) &&
 	  strcmp(reason, "com.apple.print.recoverable-warning") &&
 	  strncmp(reason, "cups-", 5))
 	cupsArrayAdd(new_reasons, reason);

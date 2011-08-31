@@ -2910,7 +2910,6 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
     int exit_code;			/* Exit code from backend */
 
-
    /*
     * Convert the status to an exit code.  Due to the way the W* macros are
     * implemented on MacOS X (bug?), we have to store the exit status in a
@@ -3163,7 +3162,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
   if (job->history)
   {
-    if (job->status)
+    if (job->status &&
+        (job->state_value == IPP_JOB_ABORTED ||
+         job->state_value == IPP_JOB_STOPPED))
       dump_job_history(job);
     else
       free_job_history(job);

@@ -1,10 +1,10 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in 7394 2008-03-21 23:41:43Z mike $"
-# 
+# "$Id: cups-config.in 9926 2011-08-27 09:23:01Z mike $"
+#
 #   CUPS configuration utility.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 #
 
 VERSION="@CUPS_VERSION@"
-APIVERSION="1.5"
+APIVERSION="1.6"
 BUILD="@CUPS_BUILD@"
 
 prefix=@prefix@
@@ -35,8 +35,7 @@ INSTALLSTATIC=@INSTALLSTATIC@
 # flags for C++ compiler:
 CFLAGS=""
 LDFLAGS="@EXPORT_LDFLAGS@"
-LIBS="@LIBGSSAPI@ @EXPORT_SSLLIBS@ @EXPORT_LIBZ@ @LIBS@"
-IMGLIBS="@EXPORT_LIBTIFF@ @EXPORT_LIBJPEG@ @EXPORT_LIBPNG@"
+LIBS="@LIBGSSAPI@ @EXPORT_SSLLIBS@ @LIBZ@ @LIBS@"
 
 # Check for local invocation...
 selfdir=`dirname $0`
@@ -46,9 +45,6 @@ if test -f "$selfdir/cups/cups.h"; then
     LDFLAGS="-L$selfdir/cups -L$selfdir/filter $LDFLAGS"
     libdir="$selfdir/cups"
     imagelibdir="$selfdir/filter"
-    if test ! -f "$selfdir/cups/raster.h"; then
-        ln -s ../filter/raster.h "$selfdir/cups"
-    fi
 else
     if test $includedir != /usr/include; then
 	CFLAGS="$CFLAGS -I$includedir"
@@ -68,7 +64,7 @@ usage ()
     echo "       cups-config --datadir"
     echo "       cups-config --help"
     echo "       cups-config --ldflags"
-    echo "       cups-config [--driver] [--image] [--static] --libs"
+    echo "       cups-config [--image] [--static] --libs"
     echo "       cups-config --serverbin"
     echo "       cups-config --serverroot"
     echo "       cups-config --version"
@@ -83,7 +79,6 @@ fi
 # Parse command line options
 static=no
 image=no
-driver=no
 
 while test $# -gt 0; do
     case $1 in
@@ -98,9 +93,6 @@ while test $# -gt 0; do
 	    ;;
 	--datadir)
 	    echo $cups_datadir
-	    ;;
-	--driver)
-	    driver=yes
 	    ;;
 	--help)
 	    usage 0
@@ -117,16 +109,10 @@ while test $# -gt 0; do
  	        if test $image = yes; then
  	            libs="@EXTLINKCUPSIMAGE@ $libs"
 		fi
- 	        if test $driver = yes; then
- 	            libs="@EXTLINKCUPSDRIVER@ $libs"
-		fi
 	    else
 	        libs="$libdir/libcups.a $LIBS";
  	        if test $image = yes; then
- 	            libs="$libdir/libcupsimage.a $IMGLIBS $libs"
-		fi
- 	        if test $driver = yes; then
- 	            libs="$libdir/libcupsdriver.a $libs"
+ 	            libs="$libdir/libcupsimage.a $libs"
 		fi
 	    fi
 	    echo $libs
@@ -156,5 +142,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in 7394 2008-03-21 23:41:43Z mike $".
+# End of "$Id: cups-config.in 9926 2011-08-27 09:23:01Z mike $".
 #

@@ -439,13 +439,29 @@ main(int  argc,				/* I - Number of command-line args */
           attr->value)
         ppdversion = (int)(10 * _cupsStrScand(attr->value, NULL, loc) + 0.5);
 
-      for (j = 0; j < ppd->num_filters; j ++)
-        if (strstr(ppd->filters[j], "application/vnd.cups-raster"))
-	{
-	  if (!test_raster(ppd, verbose))
-	    errors ++;
-	  break;
+      if ((attr = ppdFindAttr(ppd, "cupsFilter2", NULL)) != NULL)
+      {
+        do
+        {
+	  if (strstr(attr->value, "application/vnd.cups-raster"))
+	  {
+	    if (!test_raster(ppd, verbose))
+	      errors ++;
+	    break;
+	  }
 	}
+	while ((attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL)) != NULL);
+      }
+      else
+      {
+	for (j = 0; j < ppd->num_filters; j ++)
+	  if (strstr(ppd->filters[j], "application/vnd.cups-raster"))
+	  {
+	    if (!test_raster(ppd, verbose))
+	      errors ++;
+	    break;
+	  }
+      }
 
      /*
       * Look for default keywords with no matching option...
@@ -2309,6 +2325,8 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
   const char	*ptr;			/* Pointer into string */
   char		super[16],		/* Super-type for filter */
 		type[256],		/* Type for filter */
+		dstsuper[16],		/* Destination super-type for filter */
+		dsttype[256],		/* Destination type for filter */
 		program[1024],		/* Program/filter name */
 		pathprog[1024];		/* Complete path to program/filter */
   int		cost;			/* Cost of filter */
@@ -2322,9 +2340,26 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
   * cupsFilter
   */
 
-  for (i = 0; i < ppd->num_filters; i ++)
+  for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
   {
-    if (sscanf(ppd->filters[i], "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
+    if (strcmp(attr->name, "cupsFilter"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s."),
+			prefix, attr->name, "cupsFilter");
+
+      if (!warn)
+        errors ++;
+    }
+
+    if (!attr->value ||
+        sscanf(attr->value, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
                &cost, program) != 4)
     {
       if (!warn && !errors && !verbose)
@@ -2384,6 +2419,102 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       }
       else
         errors = valid_path("cupsFilter", pathprog, errors, verbose, warn);
+    }
+  }
+
+ /*
+  * cupsFilter2
+  */
+
+  for (attr = ppdFindAttr(ppd, "cupsFilter2", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL))
+  {
+    if (strcmp(attr->name, "cupsFilter2"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s."),
+			prefix, attr->name, "cupsFilter2");
+
+      if (!warn)
+        errors ++;
+    }
+
+    if (!attr->value ||
+	sscanf(attr->value, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
+	       super, type, dstsuper, dsttype, &cost, program) != 6)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad cupsFilter2 value \"%s\"."),
+			prefix, ppd->filters[i]);
+
+      if (!warn)
+        errors ++;
+    }
+    else if (strcmp(program, "-"))
+    {
+      if (strncmp(program, "maxsize(", 8) &&
+          (ptr = strchr(program + 8, ')')) != NULL)
+      {
+	ptr ++;
+	while (_cups_isspace(*ptr))
+	  ptr ++;
+
+	_cups_strcpy(program, ptr);
+      }
+
+      if (program[0] == '/')
+	snprintf(pathprog, sizeof(pathprog), "%s%s", root, program);
+      else
+      {
+	if ((ptr = getenv("CUPS_SERVERBIN")) == NULL)
+	  ptr = CUPS_SERVERBIN;
+
+	if (*ptr == '/' || !*root)
+	  snprintf(pathprog, sizeof(pathprog), "%s%s/filter/%s", root, ptr,
+		   program);
+	else
+	  snprintf(pathprog, sizeof(pathprog), "%s/%s/filter/%s", root, ptr,
+		   program);
+      }
+
+      if (stat(pathprog, &fileinfo))
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout, _("      %s  Missing %s file \"%s\"."),
+	                  prefix, "cupsFilter2", pathprog);
+
+	if (!warn)
+	  errors ++;
+      }
+      else if (fileinfo.st_uid != 0 ||
+               (fileinfo.st_mode & MODE_WRITE) ||
+	       (fileinfo.st_mode & MODE_MASK) != MODE_PROGRAM)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+	                  _("      %s  Bad permissions on %s file \"%s\"."),
+			  prefix, "cupsFilter2", pathprog);
+
+	if (!warn)
+	  errors ++;
+      }
+      else
+        errors = valid_path("cupsFilter2", pathprog, errors, verbose, warn);
     }
   }
 

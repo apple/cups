@@ -28,24 +28,6 @@ dnssd.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
 dnssd.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
 dnssd.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
 dnssd.o: ../cups/backend.h ../cups/sidechannel.h ../cups/array.h
-parallel.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
-parallel.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
-parallel.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
-parallel.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-parallel.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
-parallel.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-parallel.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-parallel.o: ../cups/transcode.h ../cups/thread-private.h
-parallel.o: ../cups/snmp-private.h ../cups/backend.h ../cups/sidechannel.h
-serial.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
-serial.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
-serial.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
-serial.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-serial.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
-serial.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-serial.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-serial.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
-serial.o: ../cups/backend.h ../cups/sidechannel.h
 snmp.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
 snmp.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 snmp.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
