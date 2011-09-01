@@ -1591,10 +1591,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
     */
 
     if (linelen > 0 && !strncmp(line, "%%EndPageSetup", 14))
-    {
-      linelen        = cupsFileGetLine(fp, line, linesize);
-      has_page_setup = 0;
-    }
+      linelen = cupsFileGetLine(fp, line, linesize);
   }
 
   if (first_page)

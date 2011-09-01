@@ -34,8 +34,8 @@
  *   httpConnectEncrypt()      - Connect to a HTTP server using encryption.
  *   httpCopyCredentials()     - Copy the credentials associated with an
  *                               encrypted connection.
- *   _httpConvertCredentials() - Convert credentials to the internal format.
  *   _httpCreate()             - Create an unconnected HTTP connection.
+ *   _httpCreateCredentials()  - Create credentials in the internal format.
  *   httpDelete()              - Send a DELETE request to the server.
  *   _httpDisconnect()         - Disconnect a HTTP connection.
  *   httpEncryption()          - Set the required encryption on the link.
@@ -557,64 +557,6 @@ httpCopyCredentials(
 
 
 /*
- * '_httpConvertCredentials()' - Convert credentials to the internal format.
- */
-
-http_tls_credentials_t			/* O - Internal credentials */
-_httpConvertCredentials(
-    cups_array_t *credentials)		/* I - Array of credentials */
-{
-  if (!credentials)
-    return (NULL);
-
-#  ifdef HAVE_LIBSSL
-  return (NULL);
-
-#  elif defined(HAVE_GNUTLS)
-  return (NULL);
-
-#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
-  CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
-  SecCertificateRef	secCert;	/* Certificate reference */
-  CFDataRef		data;		/* Credential data reference */
-  http_credential_t	*credential;	/* Credential data */
-
-
-  if ((peerCerts = CFArrayCreateMutable(kCFAllocatorDefault,
-				        cupsArrayCount(credentials),
-				        &kCFTypeArrayCallBacks)) == NULL)
-    return (NULL);
-
-  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
-       credential;
-       credential = (http_credential_t *)cupsArrayNext(credentials))
-  {
-    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
-			     credential->datalen)))
-    {
-      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
-              != NULL)
-      {
-	CFArrayAppendValue(peerCerts, secCert);
-	CFRelease(secCert);
-      }
-
-      CFRelease(data);
-    }
-  }
-
-  return (peerCerts);
-
-#  elif defined(HAVE_SSPISSL)
-  return (NULL);
-
-#  else
-  return (NULL);
-#  endif /* HAVE_LIBSSL */
-}
-
-
-/*
  * '_httpCreate()' - Create an unconnected HTTP connection.
  */
 
@@ -684,6 +626,64 @@ _httpCreate(
   */
 
   return (http);
+}
+
+
+/*
+ * '_httpCreateCredentials()' - Create credentials in the internal format.
+ */
+
+http_tls_credentials_t			/* O - Internal credentials */
+_httpCreateCredentials(
+    cups_array_t *credentials)		/* I - Array of credentials */
+{
+  if (!credentials)
+    return (NULL);
+
+#  ifdef HAVE_LIBSSL
+  return (NULL);
+
+#  elif defined(HAVE_GNUTLS)
+  return (NULL);
+
+#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+  CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFDataRef		data;		/* Credential data reference */
+  http_credential_t	*credential;	/* Credential data */
+
+
+  if ((peerCerts = CFArrayCreateMutable(kCFAllocatorDefault,
+				        cupsArrayCount(credentials),
+				        &kCFTypeArrayCallBacks)) == NULL)
+    return (NULL);
+
+  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
+       credential;
+       credential = (http_credential_t *)cupsArrayNext(credentials))
+  {
+    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
+			     credential->datalen)))
+    {
+      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
+              != NULL)
+      {
+	CFArrayAppendValue(peerCerts, secCert);
+	CFRelease(secCert);
+      }
+
+      CFRelease(data);
+    }
+  }
+
+  return (peerCerts);
+
+#  elif defined(HAVE_SSPISSL)
+  return (NULL);
+
+#  else
+  return (NULL);
+#  endif /* HAVE_LIBSSL */
 }
 
 
@@ -2422,7 +2422,7 @@ httpSetCredentials(http_t	*http,		/* I - Connection to server */
 
   _httpFreeCredentials(http->tls_credentials);
 
-  http->tls_credentials = _httpConvertCredentials(credentials);
+  http->tls_credentials = _httpCreateCredentials(credentials);
 
   return (http->tls_credentials ? 0 : -1);
 }

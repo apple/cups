@@ -371,12 +371,12 @@ extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
 					   char *buffer, size_t bufsize);
-extern http_tls_credentials_t
-			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,
 			             http_addrlist_t *addrlist,
 				     http_encryption_t encryption,
 				     int family);
+extern http_tls_credentials_t
+			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpDisconnect(http_t *http);

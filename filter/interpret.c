@@ -820,7 +820,7 @@ error_stack(_cups_ps_stack_t *st,	/* I - Stack */
   _cups_ps_obj_t	*obj;		/* Current object on stack */
 
 
-  _cupsRasterAddError(title);
+  _cupsRasterAddError("%s", title);
 
   for (obj = st->objs, c = st->num_objs; c > 0; c --, obj ++)
     error_object(obj);

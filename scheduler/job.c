@@ -3371,6 +3371,9 @@ get_options(cupsd_job_t *job,		/* I - Job */
   * Then allocate/reallocate the option buffer as needed...
   */
 
+  if (newlength == 0)			/* This can never happen, but Clang */
+    newlength = 1;			/* thinks it can... */
+
   if (newlength > optlength || !options)
   {
     if (!options)

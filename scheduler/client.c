@@ -17,33 +17,34 @@
  *
  * Contents:
  *
- *   cupsdAcceptClient()    - Accept a new client.
- *   cupsdCloseAllClients() - Close all remote clients immediately.
- *   cupsdCloseClient()     - Close a remote client.
- *   cupsdFlushHeader()     - Flush the header fields to the client.
- *   cupsdReadClient()      - Read data from a client.
- *   cupsdSendCommand()     - Send output from a command via HTTP.
- *   cupsdSendError()       - Send an error message via HTTP.
- *   cupsdSendHeader()      - Send an HTTP request.
- *   cupsdUpdateCGI()       - Read status messages from CGI scripts and
- *                            programs.
- *   cupsdWriteClient()     - Write data to a client as needed.
- *   check_if_modified()    - Decode an "If-Modified-Since" line.
- *   compare_clients()      - Compare two client connections.
- *   data_ready()           - Check whether data is available from a client.
- *   encrypt_client()       - Enable encryption for the client...
- *   get_cdsa_certificate() - Get a SSL/TLS certificate from the System
- *                            keychain.
- *   get_file()             - Get a filename and state info.
- *   install_conf_file()    - Install a configuration file.
- *   is_cgi()               - Is the resource a CGI script/program?
- *   is_path_absolute()     - Is a path absolute and free of relative elements
- *                            (i.e. "..").
- *   make_certificate()     - Make a self-signed SSL/TLS certificate.
- *   pipe_command()         - Pipe the output of a command to the remote client.
- *   valid_host()           - Is the Host: field valid?
- *   write_file()           - Send a file via HTTP.
- *   write_pipe()           - Flag that data is available on the CGI pipe.
+ *   cupsdAcceptClient()     - Accept a new client.
+ *   cupsdCloseAllClients()  - Close all remote clients immediately.
+ *   cupsdCloseClient()      - Close a remote client.
+ *   cupsdFlushHeader()      - Flush the header fields to the client.
+ *   cupsdReadClient()       - Read data from a client.
+ *   cupsdSendCommand()      - Send output from a command via HTTP.
+ *   cupsdSendError()        - Send an error message via HTTP.
+ *   cupsdSendHeader()       - Send an HTTP request.
+ *   cupsdUpdateCGI()        - Read status messages from CGI scripts and
+ *                             programs.
+ *   cupsdWriteClient()      - Write data to a client as needed.
+ *   check_if_modified()     - Decode an "If-Modified-Since" line.
+ *   compare_clients()       - Compare two client connections.
+ *   copy_cdsa_certificate() - Copy a SSL/TLS certificate from the System
+ *                             keychain.
+ *   data_ready()            - Check whether data is available from a client.
+ *   encrypt_client()        - Enable encryption for the client...
+ *   get_file()              - Get a filename and state info.
+ *   install_conf_file()     - Install a configuration file.
+ *   is_cgi()                - Is the resource a CGI script/program?
+ *   is_path_absolute()      - Is a path absolute and free of relative elements
+ *                             (i.e. "..").
+ *   make_certificate()      - Make a self-signed SSL/TLS certificate.
+ *   pipe_command()          - Pipe the output of a command to the remote
+ *                             client.
+ *   valid_host()            - Is the Host: field valid?
+ *   write_file()            - Send a file via HTTP.
+ *   write_pipe()            - Flag that data is available on the CGI pipe.
  */
 
 /*
@@ -65,13 +66,13 @@ static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 			                void *data);
+#ifdef HAVE_CDSASSL
+static CFArrayRef	copy_cdsa_certificate(cupsd_client_t *con);
+#endif /* HAVE_CDSASSL */
 static int		data_ready(cupsd_client_t *con);
 #ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
 #endif /* HAVE_SSL */
-#ifdef HAVE_CDSASSL
-static CFArrayRef	get_cdsa_certificate(cupsd_client_t *con);
-#endif /* HAVE_CDSASSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
@@ -3079,6 +3080,274 @@ compare_clients(cupsd_client_t *a,	/* I - First client */
 }
 
 
+#ifdef HAVE_CDSASSL
+/*
+ * 'copy_cdsa_certificate()' - Copy a SSL/TLS certificate from the System
+ *                             keychain.
+ */
+
+static CFArrayRef				/* O - Array of certificates */
+copy_cdsa_certificate(
+    cupsd_client_t *con)			/* I - Client connection */
+{
+  OSStatus		err;		/* Error info */
+  SecKeychainRef	keychain = NULL;/* Keychain reference */
+  SecIdentitySearchRef	search = NULL;	/* Search reference */
+  SecIdentityRef	identity = NULL;/* Identity */
+  CFArrayRef		certificates = NULL;
+					/* Certificate array */
+#  if HAVE_SECPOLICYCREATESSL
+  SecPolicyRef		policy = NULL;	/* Policy ref */
+  CFStringRef		servername = NULL;
+					/* Server name */
+  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
+  char			localname[1024];/* Local hostname */
+#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
+  SecPolicyRef		policy = NULL;	/* Policy ref */
+  SecPolicySearchRef	policy_search = NULL;
+					/* Policy search ref */
+  CSSM_DATA		options;	/* Policy options */
+  CSSM_APPLE_TP_SSL_OPTIONS
+			ssl_options;	/* SSL Option for hostname */
+  char			localname[1024];/* Local hostname */
+#  endif /* HAVE_SECPOLICYCREATESSL */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "copy_cdsa_certificate: Looking for certs for \"%s\"...",
+		  con->servername);
+
+  if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\" - %s (%d)",
+	            ServerCertificate, cssmErrorString(err), (int)err);
+    goto cleanup;
+  }
+
+#  if HAVE_SECPOLICYCREATESSL
+  servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
+					 kCFStringEncodingUTF8);
+
+  policy = SecPolicyCreateSSL(1, servername);
+
+  if (servername)
+    CFRelease(servername);
+
+  if (!policy)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
+    goto cleanup;
+  }
+
+  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+					  &kCFTypeDictionaryKeyCallBacks,
+					  &kCFTypeDictionaryValueCallBacks)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create query dictionary");
+    goto cleanup;
+  }
+
+  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
+  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
+  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
+  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
+
+  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+
+  if (err && DNSSDHostName)
+  {
+   /*
+    * Search for the connection server name failed; try the DNS-SD .local
+    * hostname instead...
+    */
+
+    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
+		    localname);
+
+    servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
+					   kCFStringEncodingUTF8);
+
+    CFRelease(policy);
+
+    policy = SecPolicyCreateSSL(1, servername);
+
+    if (servername)
+      CFRelease(servername);
+
+    if (!policy)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
+      goto cleanup;
+    }
+
+    CFDictionarySetValue(query, kSecMatchPolicy, policy);
+
+    err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+  }
+
+  if (err)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "Cannot find signing key in keychain \"%s\": %s (%d)",
+		    ServerCertificate, cssmErrorString(err), (int)err);
+    goto cleanup;
+  }
+
+#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
+ /*
+  * Use a policy to search for valid certificates whose common name matches the
+  * servername...
+  */
+
+  if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL,
+			    NULL, &policy_search))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
+    goto cleanup;
+  }
+
+  if (SecPolicySearchCopyNext(policy_search, &policy))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "Cannot find a policy to use for searching");
+    goto cleanup;
+  }
+
+  memset(&ssl_options, 0, sizeof(ssl_options));
+  ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
+  ssl_options.ServerName = con->servername;
+  ssl_options.ServerNameLen = strlen(con->servername);
+
+  options.Data = (uint8 *)&ssl_options;
+  options.Length = sizeof(ssl_options);
+
+  if (SecPolicySetValue(policy, &options))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "Cannot set policy value to use for searching");
+    goto cleanup;
+  }
+
+  if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					       keychain, FALSE, &search)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "Cannot create identity search reference: %s (%d)",
+		    cssmErrorString(err), (int)err);
+    goto cleanup;
+  }
+
+  err = SecIdentitySearchCopyNext(search, &identity);
+
+  if (err && DNSSDHostName)
+  {
+   /*
+    * Search for the connection server name failed; try the DNS-SD .local
+    * hostname instead...
+    */
+
+    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
+
+    ssl_options.ServerName    = localname;
+    ssl_options.ServerNameLen = strlen(localname);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
+		    localname);
+
+    if (SecPolicySetValue(policy, &options))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Cannot set policy value to use for searching");
+      goto cleanup;
+    }
+
+    CFRelease(search);
+    search = NULL;
+    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					       keychain, FALSE, &search)))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Cannot create identity search reference: %s (%d)",
+		      cssmErrorString(err), (int)err);
+      goto cleanup;
+    }
+
+    err = SecIdentitySearchCopyNext(search, &identity);
+
+  }
+
+  if (err)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "Cannot find signing key in keychain \"%s\": %s (%d)",
+		    ServerCertificate, cssmErrorString(err), (int)err);
+    goto cleanup;
+  }
+
+#  else
+ /*
+  * Assume there is exactly one SecIdentity in the keychain...
+  */
+
+  if ((err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search)))
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "Cannot create identity search reference (%d)", (int)err);
+    goto cleanup;
+  }
+
+  if ((err = SecIdentitySearchCopyNext(search, &identity)))
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "Cannot find signing key in keychain \"%s\": %s (%d)",
+		    ServerCertificate, cssmErrorString(err), (int)err);
+    goto cleanup;
+  }
+#  endif /* HAVE_SECPOLICYCREATESSL */
+
+  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "SecIdentity CFTypeID failure!");
+    goto cleanup;
+  }
+
+  if ((certificates = CFArrayCreate(NULL, (const void **)&identity,
+				  1, &kCFTypeArrayCallBacks)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
+    goto cleanup;
+  }
+
+  cleanup :
+
+  if (keychain)
+    CFRelease(keychain);
+  if (search)
+    CFRelease(search);
+  if (identity)
+    CFRelease(identity);
+
+#  if HAVE_SECPOLICYCREATESSL
+  if (policy)
+    CFRelease(policy);
+  if (query)
+    CFRelease(query);
+#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
+  if (policy)
+    CFRelease(policy);
+  if (policy_search)
+    CFRelease(policy_search);
+#  endif /* HAVE_SECPOLICYCREATESSL */
+
+  return (certificates);
+}
+#endif /* HAVE_CDSASSL */
+
+
 /*
  * 'data_ready()' - Check whether data is available from a client.
  */
@@ -3274,7 +3543,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
                   con->http.fd);
 
-  con->http.tls_credentials = get_cdsa_certificate(con);
+  con->http.tls_credentials = copy_cdsa_certificate(con);
 
   if (!con->http.tls_credentials)
   {
@@ -3283,7 +3552,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     */
 
     if (make_certificate(con))
-      con->http.tls_credentials = get_cdsa_certificate(con);
+      con->http.tls_credentials = copy_cdsa_certificate(con);
   }
 
   if (!con->http.tls_credentials)
@@ -3363,273 +3632,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 #  endif /* HAVE_LIBSSL */
 }
 #endif /* HAVE_SSL */
-
-
-#ifdef HAVE_CDSASSL
-/*
- * 'get_cdsa_certificate()' - Get a SSL/TLS certificate from the System keychain.
- */
-
-static CFArrayRef				/* O - Array of certificates */
-get_cdsa_certificate(
-    cupsd_client_t *con)			/* I - Client connection */
-{
-  OSStatus		err;		/* Error info */
-  SecKeychainRef	keychain = NULL;/* Keychain reference */
-  SecIdentitySearchRef	search = NULL;	/* Search reference */
-  SecIdentityRef	identity = NULL;/* Identity */
-  CFArrayRef		certificates = NULL;
-					/* Certificate array */
-#  if HAVE_SECPOLICYCREATESSL
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  CFStringRef		servername = NULL;
-					/* Server name */
-  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
-  char			localname[1024];/* Local hostname */
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  SecPolicySearchRef	policy_search = NULL;
-					/* Policy search ref */
-  CSSM_DATA		options;	/* Policy options */
-  CSSM_APPLE_TP_SSL_OPTIONS
-			ssl_options;	/* SSL Option for hostname */
-  char			localname[1024];/* Local hostname */
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
-		  con->servername);
-
-  if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\" - %s (%d)",
-	            ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  if HAVE_SECPOLICYCREATESSL
-  servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
-					 kCFStringEncodingUTF8);
-
-  policy = SecPolicyCreateSSL(1, servername);
-
-  if (servername)
-    CFRelease(servername);
-
-  if (!policy)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-    goto cleanup;
-  }
-
-  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					  &kCFTypeDictionaryKeyCallBacks,
-					  &kCFTypeDictionaryValueCallBacks)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create query dictionary");
-    goto cleanup;
-  }
-
-  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
-  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
-  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
-  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
-
-  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "get_cdsa_certificate: Looking for certs for \"%s\"...",
-		    localname);
-
-    servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
-					   kCFStringEncodingUTF8);
-
-    CFRelease(policy);
-
-    policy = SecPolicyCreateSSL(1, servername);
-
-    if (servername)
-      CFRelease(servername);
-
-    if (!policy)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-      goto cleanup;
-    }
-
-    CFDictionarySetValue(query, kSecMatchPolicy, policy);
-
-    err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-  }
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
- /*
-  * Use a policy to search for valid certificates whose common name matches the
-  * servername...
-  */
-
-  if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL,
-			    NULL, &policy_search))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
-    goto cleanup;
-  }
-
-  if (SecPolicySearchCopyNext(policy_search, &policy))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot find a policy to use for searching");
-    goto cleanup;
-  }
-
-  memset(&ssl_options, 0, sizeof(ssl_options));
-  ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
-  ssl_options.ServerName = con->servername;
-  ssl_options.ServerNameLen = strlen(con->servername);
-
-  options.Data = (uint8 *)&ssl_options;
-  options.Length = sizeof(ssl_options);
-
-  if (SecPolicySetValue(policy, &options))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot set policy value to use for searching");
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot create identity search reference: %s (%d)",
-		    cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-  err = SecIdentitySearchCopyNext(search, &identity);
-
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    ssl_options.ServerName    = localname;
-    ssl_options.ServerNameLen = strlen(localname);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "get_cdsa_certificate: Looking for certs for \"%s\"...",
-		    localname);
-
-    if (SecPolicySetValue(policy, &options))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot set policy value to use for searching");
-      goto cleanup;
-    }
-
-    CFRelease(search);
-    search = NULL;
-    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot create identity search reference: %s (%d)",
-		      cssmErrorString(err), (int)err);
-      goto cleanup;
-    }
-
-    err = SecIdentitySearchCopyNext(search, &identity);
-
-  }
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  else
- /*
-  * Assume there is exactly one SecIdentity in the keychain...
-  */
-
-  if ((err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot create identity search reference (%d)", (int)err);
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCopyNext(search, &identity)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "SecIdentity CFTypeID failure!");
-    goto cleanup;
-  }
-
-  if ((certificates = CFArrayCreate(NULL, (const void **)&identity,
-				  1, &kCFTypeArrayCallBacks)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
-    goto cleanup;
-  }
-
-  cleanup :
-
-  if (keychain)
-    CFRelease(keychain);
-  if (search)
-    CFRelease(search);
-  if (identity)
-    CFRelease(identity);
-
-#  if HAVE_SECPOLICYCREATESSL
-  if (policy)
-    CFRelease(policy);
-  if (query)
-    CFRelease(query);
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  if (policy)
-    CFRelease(policy);
-  if (policy_search)
-    CFRelease(policy_search);
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-  return (certificates);
-}
-#endif /* HAVE_CDSASSL */
 
 
 /*

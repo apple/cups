@@ -223,7 +223,7 @@ cupsSetCredentials(
     return (-1);
 
   _httpFreeCredentials(cg->tls_credentials);
-  cg->tls_credentials = _httpConvertCredentials(credentials);
+  cg->tls_credentials = _httpCreateCredentials(credentials);
 
   return (cg->tls_credentials ? 0 : -1);
 }
