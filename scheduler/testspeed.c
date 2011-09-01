@@ -40,7 +40,7 @@
 static int	do_test(const char *server, int port,
 		        http_encryption_t encryption, int requests,
 			int verbose);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 
 
 /*

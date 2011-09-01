@@ -47,7 +47,7 @@ static int	print_waiting(int outfd, int infd, char *dest);
 static int	remove_job(int outfd, int infd, char *dest, char **args);
 static int	status_long(int outfd, int infd, char *dest, char **args);
 static int	status_short(int outfd, int infd, char *dest, char **args);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 
 
 /*

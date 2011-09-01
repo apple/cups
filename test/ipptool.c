@@ -161,11 +161,7 @@ const char * const URIStatusStrings[] =	/* URI status strings */
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(_cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize)
-#ifdef __GNUC__
-__attribute((nonnull(1,2,3)))
-#endif /* __GNUC__ */
-;
+		                 size_t dstsize) __attribute((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(_cups_vars_t *vars, FILE *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src,
@@ -180,24 +176,18 @@ static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
 		          char **displayed, size_t *widths);
 static void	print_fatal_error(const char *s, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 1, 2)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_line(ipp_attribute_t *attr, int num_displayed,
 		           char **displayed, size_t *widths);
 static void	print_test_error(const char *s, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 1, 2)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_xml_header(void);
 static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
 static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
 static int	timeout_cb(http_t *http, void *user_data);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(ipp_attribute_t *attr, int print);
 static int      with_value(char *value, int regex, ipp_attribute_t *attr,
 		           int report);

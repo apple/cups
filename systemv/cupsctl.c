@@ -32,7 +32,7 @@
  * Local functions...
  */
 
-static void	usage(const char *opt);
+static void	usage(const char *opt) __attribute__((noreturn));
 
 
 /*

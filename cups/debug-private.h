@@ -18,6 +18,14 @@
 #ifndef _CUPS_DEBUG_PRIVATE_H_
 #  define _CUPS_DEBUG_PRIVATE_H_
 
+
+/*
+ * Include necessary headers...
+ */
+
+#  include <cups/versioning.h>
+
+
 /*
  * C++ magic...
  */
@@ -88,10 +96,7 @@ extern "C" {
 extern int	_cups_debug_fd;
 extern int	_cups_debug_level;
 extern void	DLLExport _cups_debug_printf(const char *format, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 1, 2)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 1, 2)));
 extern void	DLLExport _cups_debug_puts(const char *s);
 extern void	DLLExport _cups_debug_set(const char *logfile,
 					  const char *level, const char *filter,

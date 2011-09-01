@@ -45,7 +45,7 @@ const char	*SAMBAUser,
  */
 
 int	export_dest(http_t *http, const char *dest);
-void	usage(void);
+void	usage(void) __attribute__((noreturn));
 
 
 /*

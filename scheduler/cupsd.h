@@ -183,10 +183,7 @@ extern void		cupsdInitEnv(void);
 extern int		cupsdLoadEnv(char *envp[], int envmax);
 extern void		cupsdSetEnv(const char *name, const char *value);
 extern void		cupsdSetEnvf(const char *name, const char *value, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#endif /* __GNUC__ */
-;
+			__attribute__ ((__format__ (__printf__, 2, 3)));
 extern void		cupsdUpdateEnv(void);
 
 /* file.c */
@@ -210,10 +207,7 @@ extern char		*cupsdMakeUUID(const char *name, int number,
 extern void		cupsdReleaseSignals(void);
 extern void		cupsdSetString(char **s, const char *v);
 extern void		cupsdSetStringf(char **s, const char *f, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#endif /* __GNUC__ */
-;
+			__attribute__ ((__format__ (__printf__, 2, 3)));
 
 /* process.c */
 extern void		*cupsdCreateProfile(int job_id);

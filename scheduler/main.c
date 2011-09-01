@@ -84,7 +84,7 @@ static void		sigchld_handler(int sig);
 static void		sighup_handler(int sig);
 static void		sigterm_handler(int sig);
 static long		select_timeout(int fds);
-static void		usage(int status);
+static void		usage(int status) __attribute__((noreturn));
 
 
 /*
@@ -1514,7 +1514,7 @@ launchd_checkout(void)
 
   if (cupsArrayCount(ActiveJobs) || NumPolled ||
       (Browsing &&
-       (BrowseRemoteProtocols || 
+       (BrowseRemoteProtocols ||
         (BrowseLocalProtocols && cupsArrayCount(Printers)))))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,

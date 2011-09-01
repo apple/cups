@@ -149,10 +149,8 @@ extern void		cupsdSetJobState(cupsd_job_t *job,
 			                 ipp_jstate_t newstate,
 					 cupsd_jobaction_t action,
 					 const char *message, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 4, 5)))
-#endif /* __GNUC__ */
-;
+					__attribute__((__format__(__printf__,
+					                          4, 5)));
 extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
 			                 int kill_delay);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);

@@ -278,16 +278,10 @@ extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,
 		                   const char *message, ...);
 #endif /* HAVE_GSSAPI */
-extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 3, 4)))
-#endif /* __GNUC__ */
-;
+extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message,
+		            ...) __attribute__((__format__(__printf__, 3, 4)));
 extern int	cupsdLogMessage(int level, const char *message, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 2, 3)));
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);

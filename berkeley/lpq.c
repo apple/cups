@@ -39,7 +39,7 @@ static http_t	*connect_server(const char *, http_t *);
 static int	show_jobs(const char *, http_t *, const char *,
 		          const char *, const int, const int);
 static void	show_printer(const char *, http_t *, const char *);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 
 
 /*
