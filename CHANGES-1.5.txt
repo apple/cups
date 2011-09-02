@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The scheduler did not save or restore large Kerberos credentials for
+	  jobs.
 	- The dnssd backend did not properly browse for secure IPP printers.
 	- httpAssembleURI* did not properly escape all special characters in the
 	  username/password field.

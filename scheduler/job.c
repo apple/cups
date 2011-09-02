@@ -1816,8 +1816,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
     {
       int	bytes;			/* Size of auth data */
-      char	line[255],		/* Line from file */
-		data[255];		/* Decoded data */
+      char	line[65536],		/* Line from file */
+		data[65536];		/* Decoded data */
 
 
       for (i = 0;

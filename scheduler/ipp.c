@@ -10308,7 +10308,7 @@ save_auth_info(
   int			i;		/* Looping var */
   char			filename[1024];	/* Job authentication filename */
   cups_file_t		*fp;		/* Job authentication file */
-  char			line[2048];	/* Line for file */
+  char			line[65536];	/* Line for file */
   cupsd_printer_t	*dest;		/* Destination printer/class */
 
 
