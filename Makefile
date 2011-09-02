@@ -234,7 +234,11 @@ test:	all unittests
 
 check:	all unittests
 	echo Running CUPS test suite with defaults...
-	cd test; ./run-stp-tests.sh 1 0 n
+	cd test; ./run-stp-tests.sh 1 0 n n
+
+debugcheck:	all unittests
+	echo Running CUPS test suite with debug printfs...
+	cd test; ./run-stp-tests.sh 1 0 n y
 
 
 #

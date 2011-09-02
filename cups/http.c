@@ -107,6 +107,8 @@
  *   http_send()               - Send a request with all fields and the trailing
  *                               blank line.
  *   http_set_credentials()    - Set the SSL/TLS credentials.
+ *   http_set_timeout()        - Set the socket timeout values.
+ *   http_set_wait()           - Set the default wait value for reads.
  *   http_setup_ssl()          - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()       - Shut down SSL/TLS on a connection.
  *   http_threadid_cb()        - Return the current thread ID.
@@ -164,6 +166,8 @@ static int		http_read_ssl(http_t *http, char *buf, int len);
 #  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
 static int		http_set_credentials(http_t *http);
 #  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
+static void		http_set_timeout(int fd, double timeout);
+static void		http_set_wait(http_t *http);
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
@@ -311,7 +315,10 @@ httpBlocking(http_t *http,		/* I - Connection to server */
              int    b)			/* I - 1 = blocking, 0 = non-blocking */
 {
   if (http)
+  {
     http->blocking = b;
+    http_set_wait(http);
+  }
 }
 
 
@@ -620,6 +627,8 @@ _httpCreate(
     http->encryption = HTTP_ENCRYPT_ALWAYS;
   else
     http->encryption = encryption;
+
+  http_set_wait(http);
 
  /*
   * Return the new structure...
@@ -1314,7 +1323,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      while (!_httpWait(http, http->blocking ? 30000 : 10000, 1))
+      while (!_httpWait(http, http->wait_value, 1))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1639,7 +1648,7 @@ _httpPeek(http_t *http,			/* I - Connection to server */
 
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1903,7 +1912,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1999,7 +2008,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   {
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -2015,7 +2024,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   {
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -2132,7 +2141,7 @@ _httpReadCDSA(
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -2199,7 +2208,7 @@ _httpReadGNUTLS(
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -2292,24 +2301,8 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
   DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
 
-  if (http->timeout_value.tv_sec > 0)
-  {
-#ifdef WIN32
-    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
-			  http->timeout_value.tv_usec / 1000;
-			  		/* Timeout in milliseconds */
-
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-#else
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-#endif /* WIN32 */
-  }
+  if (http->timeout_value > 0)
+    http_set_timeout(http->fd, http->timeout_value);
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;
@@ -2585,30 +2578,14 @@ httpSetTimeout(
   if (!http || timeout <= 0.0)
     return;
 
-  http->timeout_cb            = cb;
-  http->timeout_data          = user_data;
-  http->timeout_value.tv_sec  = (int)timeout;
-  http->timeout_value.tv_usec = (int)(timeout * 1000000) % 1000000;
+  http->timeout_cb    = cb;
+  http->timeout_data  = user_data;
+  http->timeout_value = timeout;
 
   if (http->fd >= 0)
-  {
-#ifdef WIN32
-    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
-			  http->timeout_value.tv_usec / 1000;
-			  		/* Timeout in milliseconds */
+    http_set_timeout(http->fd, timeout);
 
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-
-#else
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-#endif /* WIN32 */
-  }
+  http_set_wait(http);
 }
 
 
@@ -3324,7 +3301,7 @@ http_bio_read(BIO  *h,			/* I - BIO data */
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -3771,6 +3748,52 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 
 
 /*
+ * 'http_set_timeout()' - Set the socket timeout values.
+ */
+
+static void
+http_set_timeout(int    fd,		/* I - File descriptor */
+                 double timeout)	/* I - Timeout in seconds */
+{
+#ifdef WIN32
+  DWORD tv = (DWORD)(timeout * 1000);
+				      /* Timeout in milliseconds */
+
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+
+#else
+  struct timeval tv;			/* Timeout in secs and usecs */
+
+  tv.tv_sec  = (int)timeout;
+  tv.tv_usec = (int)(1000000 * fmod(timeout, 1.0));
+
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+#endif /* WIN32 */
+}
+
+
+/*
+ * 'http_set_wait()' - Set the default wait value for reads.
+ */
+
+static void
+http_set_wait(http_t *http)		/* I - Connection to server */
+{
+  if (http->blocking)
+  {
+    http->wait_value = (int)(http->timeout_value * 1000);
+
+    if (http->wait_value <= 0)
+      http->wait_value = 60000;
+  }
+  else
+    http->wait_value = 10000;
+}
+
+
+/*
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
 
@@ -4014,7 +4037,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     {
       error = SSLHandshake(http->tls);
 
-      DEBUG_printf(("4_httpWait: SSLHandshake returned %d.", (int)error));
+      DEBUG_printf(("4http_setup_ssl: SSLHandshake returned %d.", (int)error));
 
       switch (error)
       {
@@ -4039,7 +4062,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		httpFreeCredentials(credentials);
 	      }
 
-	      DEBUG_printf(("4_httpWait: Server certificate callback returned "
+	      DEBUG_printf(("4http_setup_ssl: Server certificate callback returned "
 			    "%d.", (int)error));
 	    }
 	    break;
@@ -4080,7 +4103,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		error = (cg->client_cert_cb)(http, http->tls, names,
 					     cg->client_cert_data);
 
-		DEBUG_printf(("4_httpWait: Client certificate callback "
+		DEBUG_printf(("4http_setup_ssl: Client certificate callback "
 		              "returned %d.", (int)error));
 	      }
 
