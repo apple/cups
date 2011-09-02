@@ -658,12 +658,18 @@ cups_read_client_conf(
       strlcpy(encryption, value, sizeof(encryption));
       cups_encryption = encryption;
     }
+#ifndef __APPLE__
+   /*
+    * The Server directive is not supported on Mac OS X due to app sandboxing
+    * restrictions, i.e. not all apps request network access.
+    */
     else if (!cups_server && (!cg->server[0] || !cg->ipp_port) &&
              !_cups_strcasecmp(line, "ServerName") && value)
     {
       strlcpy(server_name, value, sizeof(server_name));
       cups_server = server_name;
     }
+#endif /* !__APPLE__ */
     else if (!cups_anyroot && !_cups_strcasecmp(line, "AllowAnyRoot") && value)
     {
       strlcpy(any_root, value, sizeof(any_root));
