@@ -4,6 +4,7 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The IPP backend sent the wrong margins in media-col.
 	- The scheduler did not save or restore large Kerberos credentials for
 	  jobs.
 	- The dnssd backend did not properly browse for secure IPP printers.
