@@ -4384,6 +4384,62 @@ http_write(http_t     *http,		/* I - Connection to server */
 
   while (length > 0)
   {
+    if (http->timeout_cb)
+    {
+#ifdef HAVE_POLL
+      struct pollfd	pfd;		/* Polled file descriptor */
+#else
+      fd_set		output_set;	/* Output ready for write? */
+      struct timeval	timeout;	/* Timeout value */
+#endif /* HAVE_POLL */
+      int		nfds;		/* Result from select()/poll() */
+
+      do
+      {
+#ifdef HAVE_POLL
+	pfd.fd     = http->fd;
+	pfd.events = POLLOUT;
+
+	while ((nfds = poll(&pfd, 1, http->wait_value)) < 0 &&
+	       (errno == EINTR || errno == EAGAIN));
+
+#else
+	do
+	{
+	  FD_ZERO(&output_set);
+	  FD_SET(http->fd, &output_set);
+
+	  timeout.tv_sec  = http->wait_value / 1000;
+	  timeout.tv_usec = 1000 * (http->wait_value % 1000);
+
+	  nfds = select(http->fd + 1, NULL, &output_set, NULL, &timeout);
+	}
+#  ifdef WIN32
+	while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
+			    WSAGetLastError() == WSAEWOULDBLOCK));
+#  else
+	while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
+
+        if (nfds < 0)
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+	else if (nfds == 0 && !(*http->timeout_cb)(http, http->timeout_data))
+	{
+#ifdef WIN32
+	  http->error = ESAEWOULDBLOCK;
+#else
+	  http->error = EWOULDBLOCK;
+#endif /* WIN32 */
+	  return (-1);
+	}
+      }
+      while (nfds <= 0);
+    }
+
 #ifdef HAVE_SSL
     if (http->tls)
       bytes = http_write_ssl(http, buffer, length);

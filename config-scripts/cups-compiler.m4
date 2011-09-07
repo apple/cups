@@ -100,9 +100,6 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
-PHPOPTIONS=""
-AC_SUBST(PHPOPTIONS)
-
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
 	if test -z "$OPTIM"; then
@@ -156,9 +153,7 @@ if test -n "$GCC"; then
 
 		# Additional warning options for development testing...
 		if test -d .svn; then
-			OPTIM="-Wshadow $OPTIM"
-			CFLAGS="-Werror-implicit-function-declaration $CFLAGS"
-			PHPOPTIONS="-Wno-shadow"
+			OPTIM="-Wshadow -Werror $OPTIM"
 		else
 			AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
 			OLDCFLAGS="$CFLAGS"

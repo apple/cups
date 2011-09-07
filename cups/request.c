@@ -283,26 +283,24 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       break;
     }
 
-    if (response)
+    if (response && outfile >= 0)
     {
-      if (outfile >= 0)
-      {
-       /*
-        * Write trailing data to file...
-	*/
+     /*
+      * Write trailing data to file...
+      */
 
-	while ((bytes = (int)httpRead2(http, buffer, sizeof(buffer))) > 0)
-	  if (write(outfile, buffer, bytes) < bytes)
-	    break;
-      }
-      else
-      {
-       /*
-        * Flush any remaining data...
-        */
+      while ((bytes = (int)httpRead2(http, buffer, sizeof(buffer))) > 0)
+	if (write(outfile, buffer, bytes) < bytes)
+	  break;
+    }
 
-        httpFlush(http);
-      }
+    if (http->state != HTTP_WAITING)
+    {
+     /*
+      * Flush any remaining data...
+      */
+
+      httpFlush(http);
     }
   }
 

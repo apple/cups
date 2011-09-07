@@ -636,7 +636,9 @@ cups_read_client_conf(
   char	line[1024],			/* Line from file */
         *value,				/* Pointer into line */
 	encryption[1024],		/* Encryption value */
+#ifndef __APPLE__
 	server_name[1024],		/* ServerName value */
+#endif /* !__APPLE__ */
 	any_root[1024],			/* AllowAnyRoot value */
 	expired_root[1024],		/* AllowExpiredRoot value */
 	expired_certs[1024];		/* AllowExpiredCerts value */
