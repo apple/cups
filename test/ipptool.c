@@ -38,6 +38,7 @@
  *   print_xml_string()  - Print an XML string with escaping.
  *   print_xml_trailer() - Print the XML trailer with success/fail value.
  *   set_variable()      - Set a variable value.
+ *   sigterm_handler()   - Handle SIGINT and SIGTERM.
  *   timeout_cb()        - Handle HTTP timeouts.
  *   usage()             - Show program usage.
  *   validate_attr()     - Determine whether an attribute is valid.
@@ -51,6 +52,7 @@
 #include <cups/cups-private.h>
 #include <cups/file-private.h>
 #include <regex.h>
+#include <sys/stat.h>
 
 #ifndef O_BINARY
 #  define O_BINARY 0
@@ -132,7 +134,8 @@ _cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
 					/* How to transfer requests */
 _cups_output_t	Output = _CUPS_OUTPUT_LIST;
 					/* Output mode */
-int		IgnoreErrors = 0,	/* Ignore errors? */
+int		Cancel = 0,		/* Cancel test? */
+		IgnoreErrors = 0,	/* Ignore errors? */
 		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0;		/* 1 if header is written */
@@ -161,11 +164,7 @@ const char * const URIStatusStrings[] =	/* URI status strings */
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(_cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize)
-#ifdef __GNUC__
-__attribute((nonnull(1,2,3)))
-#endif /* __GNUC__ */
-;
+		                 size_t dstsize) __attribute((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(_cups_vars_t *vars, FILE *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src,
@@ -180,24 +179,19 @@ static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
 		          char **displayed, size_t *widths);
 static void	print_fatal_error(const char *s, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 1, 2)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_line(ipp_attribute_t *attr, int num_displayed,
 		           char **displayed, size_t *widths);
 static void	print_test_error(const char *s, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 1, 2)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_xml_header(void);
 static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
 static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
+static void	sigterm_handler(int sig);
 static int	timeout_cb(http_t *http, void *user_data);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(ipp_attribute_t *attr, int print);
 static int      with_value(char *value, int regex, ipp_attribute_t *attr,
 		           int report);
@@ -227,6 +221,12 @@ main(int  argc,				/* I - Number of command-line args */
 					/* Global data */
 
 
+ /*
+  * Catch SIGINT and SIGTERM...
+  */
+
+  signal(SIGINT, sigterm_handler);
+  signal(SIGTERM, sigterm_handler);
 
  /*
   * Initialize the locale and variables...
@@ -613,9 +613,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   char		resource[512],		/* Resource for request */
 		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
-		temp[1024];		/* Temporary string */
-  ipp_t		*request = NULL;	/* IPP request */
-  ipp_t		*response = NULL;	/* IPP response */
+		temp[1024],		/* Temporary string */
+		buffer[8192];		/* Copy buffer */
+  ipp_t		*request = NULL,	/* IPP request */
+		*response = NULL;	/* IPP response */
+  size_t	length;			/* Length of IPP request */
+  http_status_t	status;			/* HTTP status */
+  int		fd;			/* File to send */
+  ssize_t	bytes;			/* Bytes read/written */
   char		attr[128];		/* Attribute name */
   ipp_op_t	op;			/* Operation */
   ipp_tag_t	group;			/* Current group */
@@ -686,7 +691,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   linenum    = 1;
   request_id = (CUPS_RAND() % 1000) * 137 + 1;
 
-  while (get_token(fp, token, sizeof(token), &linenum) != NULL)
+  while (!Cancel && get_token(fp, token, sizeof(token), &linenum) != NULL)
   {
    /*
     * Expect an open brace...
@@ -2000,48 +2005,105 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       goto skip_error;
     }
 
+    status = HTTP_OK;
+
     if (transfer == _CUPS_TRANSFER_CHUNKED ||
         (transfer == _CUPS_TRANSFER_AUTO && filename[0]))
     {
      /*
-      * Send request using chunking...
+      * Send request using chunking - a 0 length means "chunk".
       */
 
-      http_status_t status = cupsSendRequest(http, request, resource, 0);
+      length = 0;
+    }
+    else
+    {
+     /*
+      * Send request using content length...
+      */
 
-      if (status == HTTP_CONTINUE && filename[0])
+      length = ippLength(request);
+
+      if (filename[0])
       {
-        int	fd;			/* File to send */
-        char	buffer[8192];		/* Copy buffer */
-        ssize_t	bytes;			/* Bytes read/written */
+        struct stat	fileinfo;	/* File information */
 
-        if ((fd = open(filename, O_RDONLY | O_BINARY)) >= 0)
+        if (stat(filename, &fileinfo))
         {
-          while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-            if ((status = cupsWriteRequestData(http, buffer,
-                                               bytes)) != HTTP_CONTINUE)
-              break;
-        }
-        else
-	{
 	  snprintf(buffer, sizeof(buffer), "%s: %s", filename, strerror(errno));
 	  _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
 
           status = HTTP_ERROR;
+        }
+        else
+          length += fileinfo.st_size;
+      }
+    }
+
+   /*
+    * Send the request...
+    */
+
+    response = NULL;
+
+    if (status != HTTP_ERROR)
+    {
+      while (!response && !Cancel)
+      {
+	status = cupsSendRequest(http, request, resource, length);
+
+	if (!Cancel && status == HTTP_CONTINUE && request->state == IPP_DATA &&
+	    filename[0])
+	{
+	  if ((fd = open(filename, O_RDONLY | O_BINARY)) >= 0)
+	  {
+	    while (!Cancel && (bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	      if ((status = cupsWriteRequestData(http, buffer,
+						 bytes)) != HTTP_CONTINUE)
+		break;
+	  }
+	  else
+	  {
+	    snprintf(buffer, sizeof(buffer), "%s: %s", filename,
+	             strerror(errno));
+	    _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
+
+	    status = HTTP_ERROR;
+	  }
+	}
+
+       /*
+	* Get the server's response...
+	*/
+
+	if (!Cancel && (status == HTTP_CONTINUE || status == HTTP_OK))
+	{
+	  response = cupsGetResponse(http, resource);
+	  status   = http->status;
+	}
+	else
+	  httpFlush(http);
+
+	if ((status == HTTP_ERROR && cupsLastError() != IPP_INTERNAL_ERROR) ||
+	    (status >= HTTP_BAD_REQUEST && status != HTTP_UNAUTHORIZED &&
+	     status != HTTP_UPGRADE_REQUIRED))
+	{
+	  _cupsSetHTTPError(status);
+	  break;
+	}
+
+	if (http->state != HTTP_WAITING)
+	{
+	 /*
+	  * Flush any remaining data...
+	  */
+
+	  httpFlush(http);
 	}
       }
-
-      ippDelete(request);
-
-      if (status == HTTP_CONTINUE)
-	response = cupsGetResponse(http, resource);
-      else
-	response = NULL;
     }
-    else if (filename[0])
-      response = cupsDoFileRequest(http, request, resource, filename);
-    else
-      response = cupsDoRequest(http, request, resource);
+
+    ippDelete(request);
 
     request   = NULL;
     prev_pass = 1;
@@ -3957,6 +4019,19 @@ set_variable(_cups_vars_t *vars,	/* I - Variables */
 
 
 /*
+ * 'sigterm_handler()' - Handle SIGINT and SIGTERM.
+ */
+
+static void
+sigterm_handler(int sig)		/* I - Signal number (unused) */
+{
+  (void)sig;
+
+  Cancel = 1;
+}
+
+
+/*
  * 'timeout_cb()' - Handle HTTP timeouts.
  */
 
@@ -3967,6 +4042,7 @@ timeout_cb(http_t *http,		/* I - Connection to server (unused) */
   (void)http;
   (void)user_data;
 
+ /* Always cancel on timeout */
   return (0);
 }
 

@@ -200,10 +200,7 @@ static ssize_t		copy_trailer(cups_file_t *fp, pstops_doc_t *doc,
 static void		do_prolog(pstops_doc_t *doc, ppd_file_t *ppd);
 static void 		do_setup(pstops_doc_t *doc, ppd_file_t *ppd);
 static void		doc_printf(pstops_doc_t *doc, const char *format, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#endif /* __GNUC__ */
-;
+			__attribute__ ((__format__ (__printf__, 2, 3)));
 static void		doc_puts(pstops_doc_t *doc, const char *s);
 static void		doc_write(pstops_doc_t *doc, const char *s, size_t len);
 static void		end_nup(pstops_doc_t *doc, int number);
@@ -1594,10 +1591,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
     */
 
     if (linelen > 0 && !strncmp(line, "%%EndPageSetup", 14))
-    {
-      linelen        = cupsFileGetLine(fp, line, linesize);
-      has_page_setup = 0;
-    }
+      linelen = cupsFileGetLine(fp, line, linesize);
   }
 
   if (first_page)

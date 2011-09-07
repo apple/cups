@@ -245,14 +245,14 @@ struct _http_s				/**** HTTP connection structure. ****/
   http_status_t		status;		/* Status of last request */
   http_version_t	version;	/* Protocol version */
   http_keepalive_t	keep_alive;	/* Keep-alive supported? */
-  struct sockaddr_in	_hostaddr;	/* Address of connected host @deprecated@ */
+  struct sockaddr_in	_hostaddr;	/* Address of connected host (deprecated) */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
 			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
 					/* Field values */
   char			*data;		/* Pointer to data buffer */
   http_encoding_t	data_encoding;	/* Chunked or not */
-  int			_data_remaining;/* Number of bytes left @deprecated@ */
+  int			_data_remaining;/* Number of bytes left (deprecated) */
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
@@ -264,40 +264,41 @@ struct _http_s				/**** HTTP connection structure. ****/
   http_tls_t		tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
   /**** New in CUPS 1.1.19 ****/
-  fd_set		*input_set;	/* select() set for httpWait() @deprecated@ */
-  http_status_t		expect;		/* Expect: header @since CUPS 1.1.19@ */
-  char			*cookie;	/* Cookie value(s) @since CUPS 1.1.19@ */
+  fd_set		*input_set;	/* select() set for httpWait() (deprecated) */
+  http_status_t		expect;		/* Expect: header */
+  char			*cookie;	/* Cookie value(s) */
   /**** New in CUPS 1.1.20 ****/
   char			_authstring[HTTP_MAX_VALUE],
-					/* Current Authentication value. @deprecated@ */
+					/* Current Authentication value (deprecated) */
 			userpass[HTTP_MAX_VALUE];
-					/* Username:password string @since CUPS 1.1.20@ */
-  int			digest_tries;	/* Number of tries for digest auth @since CUPS 1.1.20@ */
+					/* Username:password string */
+  int			digest_tries;	/* Number of tries for digest auth */
   /**** New in CUPS 1.2 ****/
-  off_t			data_remaining;	/* Number of bytes left @since CUPS 1.2@ */
-  http_addr_t		*hostaddr;	/* Current host address and port @since CUPS 1.2@ */
-  http_addrlist_t	*addrlist;	/* List of valid addresses @since CUPS 1.2@ */
+  off_t			data_remaining;	/* Number of bytes left */
+  http_addr_t		*hostaddr;	/* Current host address and port */
+  http_addrlist_t	*addrlist;	/* List of valid addresses */
   char			wbuffer[HTTP_MAX_BUFFER];
 					/* Buffer for outgoing data */
-  int			wused;		/* Write buffer bytes used @since CUPS 1.2@ */
+  int			wused;		/* Write buffer bytes used */
   /**** New in CUPS 1.3 ****/
   char			*field_authorization;
-					/* Authorization field @since CUPS 1.3@ */
-  char			*authstring;	/* Current authorization field @since CUPS 1.3 */
+					/* Authorization field */
+  char			*authstring;	/* Current authorization field */
 #  ifdef HAVE_GSSAPI
-  gss_OID 		gssmech;	/* Authentication mechanism @since CUPS 1.3@ */
-  gss_ctx_id_t		gssctx;		/* Authentication context @since CUPS 1.3@ */
-  gss_name_t		gssname;	/* Authentication server name @since CUPS 1.3@ */
+  gss_OID 		gssmech;	/* Authentication mechanism */
+  gss_ctx_id_t		gssctx;		/* Authentication context */
+  gss_name_t		gssname;	/* Authentication server name */
 #  endif /* HAVE_GSSAPI */
 #  ifdef HAVE_AUTHORIZATION_H
-  AuthorizationRef	auth_ref;	/* Authorization ref @since CUPS 1.3@ */
+  AuthorizationRef	auth_ref;	/* Authorization ref */
 #  endif /* HAVE_AUTHORIZATION_H */
   /**** New in CUPS 1.5 ****/
   http_tls_credentials_t tls_credentials;
-					/* TLS credentials @since CUPS 1.5/Mac OS X 10.7@ */
-  http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5/Mac OS X 10.7@ */
-  void			*timeout_data;	/* User data pointer @since CUPS 1.5/Mac OS X 10.7@ */
-  struct timeval	timeout_value;	/* Timeout in seconds */
+					/* TLS credentials */
+  http_timeout_cb_t	timeout_cb;	/* Timeout callback */
+  void			*timeout_data;	/* User data pointer */
+  double		timeout_value;	/* Timeout in seconds */
+  int			wait_value;	/* httpWait value for timeout */
 #  ifdef HAVE_GSSAPI
   char			gsshost[256];	/* Hostname for Kerberos */
 #  endif /* HAVE_GSSAPI */
@@ -371,12 +372,12 @@ extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
 					   char *buffer, size_t bufsize);
-extern http_tls_credentials_t
-			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,
 			             http_addrlist_t *addrlist,
 				     http_encryption_t encryption,
 				     int family);
+extern http_tls_credentials_t
+			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpDisconnect(http_t *http);

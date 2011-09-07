@@ -161,7 +161,8 @@ static int		help_load_file(help_index_t *hi,
 static help_node_t	*help_new_node(const char *filename, const char *anchor,
 			               const char *section, const char *text,
 				       time_t mtime, off_t offset,
-				       size_t length);
+				       size_t length)
+				       __attribute__((nonnull(1,3,4)));
 static int		help_sort_by_name(help_node_t *p1, help_node_t *p2);
 static int		help_sort_by_score(help_node_t *p1, help_node_t *p2);
 static int		help_sort_words(help_word_t *w1, help_word_t *w2);
@@ -177,7 +178,7 @@ helpDeleteIndex(help_index_t *hi)	/* I - Help index */
   help_node_t	*node;			/* Current node */
 
 
-  DEBUG_printf(("helpDeleteIndex(hi=%p)\n", hi));
+  DEBUG_printf(("helpDeleteIndex(hi=%p)", hi));
 
   if (!hi)
     return;
@@ -209,8 +210,8 @@ helpFindNode(help_index_t *hi,		/* I - Index */
   help_node_t	key;			/* Search key */
 
 
-  DEBUG_printf(("helpFindNode(hi=%p, filename=\"%s\", anchor=\"%s\")\n",
-                hi, filename ? filename : "(nil)", anchor ? anchor : "(nil)"));
+  DEBUG_printf(("helpFindNode(hi=%p, filename=\"%s\", anchor=\"%s\")",
+                hi, filename, anchor));
 
  /*
   * Range check input...
@@ -259,7 +260,7 @@ helpLoadIndex(const char *hifile,	/* I - Index filename */
   help_word_t	*word;			/* Current word */
 
 
-  DEBUG_printf(("helpLoadIndex(hifile=\"%s\", directory=\"%s\")\n",
+  DEBUG_printf(("helpLoadIndex(hifile=\"%s\", directory=\"%s\")",
                 hifile, directory));
 
  /*
@@ -464,7 +465,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
   help_word_t	*word;			/* Current word */
 
 
-  DEBUG_printf(("helpSaveIndex(hi=%p, hifile=\"%s\")\n", hi, hifile));
+  DEBUG_printf(("helpSaveIndex(hi=%p, hifile=\"%s\")", hi, hifile));
 
  /*
   * Try creating a new index file...
@@ -545,9 +546,8 @@ helpSearchIndex(help_index_t *hi,	/* I - Index */
   int		matches;		/* Number of matches */
 
 
-  DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\", filename=\"%s\")\n",
-                hi, query ? query : "(nil)",
-		filename ? filename : "(nil)"));
+  DEBUG_printf(("helpSearchIndex(hi=%p, query=\"%s\", filename=\"%s\")",
+                hi, query, filename));
 
  /*
   * Range check...
@@ -670,7 +670,7 @@ help_add_word(help_node_t *n,		/* I - Node */
 		key;			/* Search key */
 
 
-  DEBUG_printf(("help_add_word(n=%p, text=\"%s\")\n", n, text));
+  DEBUG_printf(("2help_add_word(n=%p, text=\"%s\")", n, text));
 
  /*
   * Create the words array as needed...
@@ -723,7 +723,7 @@ help_delete_node(help_node_t *n)	/* I - Node */
   help_word_t	*w;			/* Current word */
 
 
-  DEBUG_printf(("help_delete_node(n=%p)\n", n));
+  DEBUG_printf(("2help_delete_node(n=%p)", n));
 
   if (!n)
     return;
@@ -758,7 +758,7 @@ help_delete_node(help_node_t *n)	/* I - Node */
 static void
 help_delete_word(help_word_t *w)	/* I - Word */
 {
-  DEBUG_printf(("help_delete_word(w=%p)\n", w));
+  DEBUG_printf(("2help_delete_word(w=%p)", w));
 
   if (!w)
     return;
@@ -789,8 +789,8 @@ help_load_directory(
   help_node_t	*node;			/* Current node */
 
 
-  DEBUG_printf(("help_load_directory(hi=%p, directory=\"%s\", relative=\"%s\")\n",
-                hi, directory ? directory : "(nil)", relative ? relative : "(nil)"));
+  DEBUG_printf(("2help_load_directory(hi=%p, directory=\"%s\", relative=\"%s\")",
+                hi, directory, relative));
 
  /*
   * Open the directory and scan it...
@@ -901,9 +901,8 @@ help_load_file(
   int		wordlen;		/* Length of word */
 
 
-  DEBUG_printf(("help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", mtime=%ld)\n",
-                hi, filename ? filename : "(nil)",
-		relative ? relative : "(nil)", mtime));
+  DEBUG_printf(("2help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", "
+                "mtime=%ld)", hi, filename, relative, mtime));
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (-1);
@@ -1229,11 +1228,9 @@ help_new_node(const char   *filename,	/* I - Filename */
   help_node_t	*n;			/* Node */
 
 
-  DEBUG_printf(("help_new_node(filename=\"%s\", anchor=\"%s\", text=\"%s\", "
-                "mtime=%ld, offset=%ld, length=%ld)\n",
-                filename ? filename : "(nil)", anchor ? anchor : "(nil)",
-		text ? text : "(nil)", (long)mtime, (long)offset,
-		(long)length));
+  DEBUG_printf(("2help_new_node(filename=\"%s\", anchor=\"%s\", text=\"%s\", "
+                "mtime=%ld, offset=%ld, length=%ld)", filename, anchor, text,
+                (long)mtime, (long)offset, (long)length));
 
   n = (help_node_t *)calloc(1, sizeof(help_node_t));
   if (!n)
@@ -1262,9 +1259,9 @@ help_sort_by_name(help_node_t *n1,	/* I - First node */
   int		diff;			/* Difference */
 
 
-  DEBUG_printf(("help_sort_by_name(n1=%p(%s#%s), n2=%p(%s#%s)\n",
-                n1, n1->filename, n1->anchor ? n1->anchor : "",
-		n2, n2->filename, n2->anchor ? n2->anchor : ""));
+  DEBUG_printf(("2help_sort_by_name(n1=%p(%s#%s), n2=%p(%s#%s)",
+                n1, n1->filename, n1->anchor,
+		n2, n2->filename, n2->anchor));
 
   if ((diff = strcmp(n1->filename, n2->filename)) != 0)
     return (diff);
@@ -1291,10 +1288,10 @@ help_sort_by_score(help_node_t *n1,	/* I - First node */
   int		diff;			/* Difference */
 
 
-  DEBUG_printf(("help_sort_by_score(n1=%p(%d \"%s\" \"%s\"), "
-                "n2=%p(%d \"%s\" \"%s\")\n",
-                n1, n1->score, n1->section ? n1->section : "", n1->text,
-                n2, n2->score, n2->section ? n2->section : "", n2->text));
+  DEBUG_printf(("2help_sort_by_score(n1=%p(%d \"%s\" \"%s\"), "
+                "n2=%p(%d \"%s\" \"%s\")",
+                n1, n1->score, n1->section, n1->text,
+                n2, n2->score, n2->section, n2->text));
 
   if (n1->score != n2->score)
     return (n2->score - n1->score);
@@ -1319,7 +1316,7 @@ static int				/* O - Difference */
 help_sort_words(help_word_t *w1,	/* I - Second word */
                 help_word_t *w2)	/* I - Second word */
 {
-  DEBUG_printf(("help_sort_words(w1=%p(\"%s\"), w2=%p(\"%s\"))\n",
+  DEBUG_printf(("2help_sort_words(w1=%p(\"%s\"), w2=%p(\"%s\"))",
                 w1, w1->text, w2, w2->text));
 
   return (_cups_strcasecmp(w1->text, w2->text));

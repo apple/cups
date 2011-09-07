@@ -419,7 +419,6 @@ _cupsSetNegotiateAuthString(
       }
     }
   }
-  else
 #endif /* HAVE_GSS_ACQUIRED_CRED_EX_F */
 
   if (GSS_ERROR(major_status))

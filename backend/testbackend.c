@@ -47,7 +47,7 @@ static int	job_canceled = 0;
  */
 
 static void	sigterm_handler(int sig);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 static void	walk_cb(const char *oid, const char *data, int datalen,
 		        void *context);
 
@@ -569,7 +569,7 @@ main(int  argc,				/* I - Number of command-line args */
     kill(data_pid, SIGTERM);
     kill(back_pid, SIGTERM);
   }
-  
+
   while ((pid = wait(&status)) > 0)
   {
     if (status)

@@ -357,10 +357,7 @@ extern void		httpInitialize(void);
 extern int		httpOptions(http_t *http, const char *uri);
 extern int		httpPost(http_t *http, const char *uri);
 extern int		httpPrintf(http_t *http, const char *format, ...)
-#  ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#  endif /* __GNUC__ */
-;
+			__attribute__ ((__format__ (__printf__, 2, 3)));
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED;
 extern int		httpReconnect(http_t *http);

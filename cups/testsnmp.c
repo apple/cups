@@ -36,7 +36,7 @@
 static void	print_packet(cups_snmp_t *packet, void *data);
 static int	show_oid(int fd, const char *community,
 		         http_addr_t *addr, const char *s, int walk);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 
 
 /*
@@ -119,7 +119,7 @@ main(int  argc,				/* I - Number of command-line args */
 		         ".1.3.6.1.2.1.43.10.2.1.4.1.1", walk))
       return (1);
   }
-  
+
   return (0);
 }
 

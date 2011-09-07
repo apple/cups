@@ -32,10 +32,7 @@ extern "C" {
  */
 
 extern void	_mimeError(mime_t *mime, const char *format, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 2, 3)));
 
 
 #  ifdef __cplusplus

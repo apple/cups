@@ -129,7 +129,7 @@ static int	check_translations(ppd_file_t *ppd, int errors, int verbose,
 		                   int warn);
 static void	show_conflicts(ppd_file_t *ppd, const char *prefix);
 static int	test_raster(ppd_file_t *ppd, int verbose);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 static int	valid_path(const char *keyword, const char *path, int errors,
 		           int verbose, int warn);
 static int	valid_utf8(const char *s);
@@ -2320,7 +2320,6 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 	      int        verbose,	/* I - Verbosity level */
 	      int        warn)		/* I - Warnings only? */
 {
-  int		i;			/* Looping var */
   ppd_attr_t	*attr;			/* PPD attribute */
   const char	*ptr;			/* Pointer into string */
   char		super[16],		/* Super-type for filter */
@@ -2368,7 +2367,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  Bad cupsFilter value \"%s\"."),
-			prefix, ppd->filters[i]);
+			prefix, attr->value);
 
       if (!warn)
         errors ++;
@@ -2454,7 +2453,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  Bad cupsFilter2 value \"%s\"."),
-			prefix, ppd->filters[i]);
+			prefix, attr->value);
 
       if (!warn)
         errors ++;

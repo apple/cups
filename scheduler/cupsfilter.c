@@ -102,7 +102,8 @@ static int		open_pipe(int *fds);
 static int		read_cupsd_conf(const char *filename);
 static void		set_string(char **s, const char *val);
 static void		sighandler(int sig);
-static void		usage(const char *command, const char *opt);
+static void		usage(const char *command, const char *opt)
+			__attribute__((noreturn));
 
 
 /*

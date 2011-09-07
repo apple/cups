@@ -17,33 +17,34 @@
  *
  * Contents:
  *
- *   cupsdAcceptClient()    - Accept a new client.
- *   cupsdCloseAllClients() - Close all remote clients immediately.
- *   cupsdCloseClient()     - Close a remote client.
- *   cupsdFlushHeader()     - Flush the header fields to the client.
- *   cupsdReadClient()      - Read data from a client.
- *   cupsdSendCommand()     - Send output from a command via HTTP.
- *   cupsdSendError()       - Send an error message via HTTP.
- *   cupsdSendHeader()      - Send an HTTP request.
- *   cupsdUpdateCGI()       - Read status messages from CGI scripts and
- *                            programs.
- *   cupsdWriteClient()     - Write data to a client as needed.
- *   check_if_modified()    - Decode an "If-Modified-Since" line.
- *   compare_clients()      - Compare two client connections.
- *   data_ready()           - Check whether data is available from a client.
- *   encrypt_client()       - Enable encryption for the client...
- *   get_cdsa_certificate() - Get a SSL/TLS certificate from the System
- *                            keychain.
- *   get_file()             - Get a filename and state info.
- *   install_conf_file()    - Install a configuration file.
- *   is_cgi()               - Is the resource a CGI script/program?
- *   is_path_absolute()     - Is a path absolute and free of relative elements
- *                            (i.e. "..").
- *   make_certificate()     - Make a self-signed SSL/TLS certificate.
- *   pipe_command()         - Pipe the output of a command to the remote client.
- *   valid_host()           - Is the Host: field valid?
- *   write_file()           - Send a file via HTTP.
- *   write_pipe()           - Flag that data is available on the CGI pipe.
+ *   cupsdAcceptClient()     - Accept a new client.
+ *   cupsdCloseAllClients()  - Close all remote clients immediately.
+ *   cupsdCloseClient()      - Close a remote client.
+ *   cupsdFlushHeader()      - Flush the header fields to the client.
+ *   cupsdReadClient()       - Read data from a client.
+ *   cupsdSendCommand()      - Send output from a command via HTTP.
+ *   cupsdSendError()        - Send an error message via HTTP.
+ *   cupsdSendHeader()       - Send an HTTP request.
+ *   cupsdUpdateCGI()        - Read status messages from CGI scripts and
+ *                             programs.
+ *   cupsdWriteClient()      - Write data to a client as needed.
+ *   check_if_modified()     - Decode an "If-Modified-Since" line.
+ *   compare_clients()       - Compare two client connections.
+ *   copy_cdsa_certificate() - Copy a SSL/TLS certificate from the System
+ *                             keychain.
+ *   data_ready()            - Check whether data is available from a client.
+ *   encrypt_client()        - Enable encryption for the client...
+ *   get_file()              - Get a filename and state info.
+ *   install_conf_file()     - Install a configuration file.
+ *   is_cgi()                - Is the resource a CGI script/program?
+ *   is_path_absolute()      - Is a path absolute and free of relative elements
+ *                             (i.e. "..").
+ *   make_certificate()      - Make a self-signed SSL/TLS certificate.
+ *   pipe_command()          - Pipe the output of a command to the remote
+ *                             client.
+ *   valid_host()            - Is the Host: field valid?
+ *   write_file()            - Send a file via HTTP.
+ *   write_pipe()            - Flag that data is available on the CGI pipe.
  */
 
 /*
@@ -58,6 +59,36 @@
 
 
 /*
+ * Local globals...
+ */
+
+static const char 	* const http_states[] =
+			{		/* HTTP state strings */
+			  "HTTP_WAITING",
+			  "HTTP_OPTIONS",
+			  "HTTP_GET",
+			  "HTTP_GET_SEND",
+			  "HTTP_HEAD",
+			  "HTTP_POST",
+			  "HTTP_POST_RECV",
+			  "HTTP_POST_SEND",
+			  "HTTP_PUT",
+			  "HTTP_PUT_RECV",
+			  "HTTP_DELETE",
+			  "HTTP_TRACE",
+			  "HTTP_CLOSE",
+			  "HTTP_STATUS"
+			};
+static const char 	* const ipp_states[] =
+			{		/* IPP state strings */
+			  "IPP_IDLE",
+			  "IPP_HEADER",
+			  "IPP_ATTRIBUTE",
+			  "IPP_DATA"
+			};
+
+
+/*
  * Local functions...
  */
 
@@ -65,13 +96,13 @@ static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 			                void *data);
+#ifdef HAVE_CDSASSL
+static CFArrayRef	copy_cdsa_certificate(cupsd_client_t *con);
+#endif /* HAVE_CDSASSL */
 static int		data_ready(cupsd_client_t *con);
 #ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
 #endif /* HAVE_SSL */
-#ifdef HAVE_CDSASSL
-static CFArrayRef	get_cdsa_certificate(cupsd_client_t *con);
-#endif /* HAVE_CDSASSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
@@ -156,9 +187,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     return;
   }
 
-  con->http.activity = time(NULL);
-  con->file          = -1;
-  con->http.hostaddr = &(con->clientaddr);
+  con->http.activity   = time(NULL);
+  con->file            = -1;
+  con->http.hostaddr   = &(con->clientaddr);
+  con->http.wait_value = 10000;
 
  /*
   * Accept the client and get the remote address...
@@ -354,11 +386,11 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
 #ifdef AF_LOCAL
   if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s (Domain)",
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s (Domain)",
                     con->http.fd, con->http.hostname);
   else
 #endif /* AF_LOCAL */
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAcceptClient: %d from %s:%d (IPv%d)",
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s:%d (IPv%d)",
                   con->http.fd, con->http.hostname,
 		  _httpAddrPort(con->http.hostaddr),
 		  _httpAddrFamily(con->http.hostaddr) == AF_INET ? 4 : 6);
@@ -487,7 +519,8 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 #endif /* HAVE_LIBSSL */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdCloseClient: %d", con->http.fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Closing connection.",
+                  con->http.fd);
 
  /*
   * Flush pending writes before closing...
@@ -717,18 +750,22 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   status = HTTP_CONTINUE;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		  "cupsdReadClient(con=%p(%d)) "
-		  "con->http.error=%d "
-		  "con->http.used=%d, "
-		  "con->http.state=%d "
-		  "con->data_encoding=HTTP_ENCODE_%s, "
-		  "con->data_remaining=" CUPS_LLFMT ", "
-		  "con->file=%d",
-		  con, con->http.fd, con->http.error, con->http.used,
-		  con->http.state,
+		  "[Client %d] cupsdReadClient "
+		  "error=%d, "
+		  "used=%d, "
+		  "state=%s, "
+		  "data_encoding=HTTP_ENCODE_%s, "
+		  "data_remaining=" CUPS_LLFMT ", "
+		  "request=%p(%s), "
+		  "file=%d",
+		  con->http.fd, con->http.error, con->http.used,
+		  http_states[con->http.state],
 		  con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
 		      "CHUNKED" : "LENGTH",
-		  CUPS_LLCAST con->http.data_remaining, con->file);
+		  CUPS_LLCAST con->http.data_remaining,
+		  con->request,
+		  con->request ? ipp_states[con->request->state] : "",
+		  con->file);
 
 #ifdef HAVE_SSL
   if (con->auto_ssl)
@@ -747,8 +784,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdReadClient: Saw first byte %02X, auto-negotiating "
-		      "SSL/TLS session...", buf[0] & 255);
+                      "[Client %d] Saw first byte %02X, auto-negotiating "
+		      "SSL/TLS session.", con->http.fd, buf[0] & 255);
 
       if (!encrypt_client(con))
         cupsdCloseClient(con);
@@ -769,12 +806,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	{
 	  if (con->http.error && con->http.error != EPIPE)
 	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-			    "cupsdReadClient: %d WAITING Closing for error %d "
+			    "[Client %d] HTTP_WAITING Closing for error %d "
 			    "(%s)", con->http.fd, con->http.error,
 			    strerror(con->http.error));
 	  else
 	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                    "cupsdReadClient: %d WAITING Closing on EOF",
+	                    "[Client %d] HTTP_WAITING Closing on EOF",
 			    con->http.fd);
 
 	  cupsdCloseClient(con);
@@ -846,7 +883,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (line[0])
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-				"Bad request line \"%s\" from %s!",
+				"[Client %d] Bad request line \"%s\" from %s.",
+			        con->http.fd,
 			        _httpEncodeURI(buf, line, sizeof(buf)),
 				con->http.hostname);
 		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
@@ -860,7 +898,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-		                "Bad request line \"%s\" from %s!",
+		                "[Client %d] Bad request line \"%s\" from %s.",
+			        con->http.fd,
 			        _httpEncodeURI(buf, line, sizeof(buf)),
 	                        con->http.hostname);
 		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
@@ -879,7 +918,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-		                "Unsupported request line \"%s\" from %s!",
+		                "[Client %d] Unsupported request line \"%s\" "
+		                "from %s.", con->http.fd,
 			        _httpEncodeURI(buf, line, sizeof(buf)),
 				con->http.hostname);
 	        cupsdSendError(con, HTTP_NOT_SUPPORTED, CUPSD_AUTH_NONE);
@@ -926,8 +966,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    * Nope, we don't do proxies...
 	    */
 
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad URI \"%s\" in request!",
-	                    con->uri);
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+	                    "[Client %d] Bad URI \"%s\" in request.",
+	                    con->http.fd, con->uri);
 	    cupsdSendError(con, HTTP_METHOD_NOT_ALLOWED, CUPSD_AUTH_NONE);
 	    cupsdCloseClient(con);
 	    return;
@@ -961,7 +1002,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  con->http.state = HTTP_HEAD;
 	else
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad operation \"%s\"!", operation);
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+	                  "[Client %d] Bad operation \"%s\".", con->http.fd,
+	                  operation);
 	  cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	  cupsdCloseClient(con);
 	  return;
@@ -970,7 +1013,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         gettimeofday(&(con->start), NULL);
         con->operation = con->http.state;
 
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %s %s HTTP/%d.%d",
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] %s %s HTTP/%d.%d",
 	                con->http.fd, operation, con->uri,
 		        con->http.version / 100, con->http.version % 100);
 
@@ -1001,13 +1044,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	{
 	  if (con->http.error && con->http.error != EPIPE)
 	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-			    "cupsdReadClient: %d FIELDS Closing for error %d "
-			    "(%s)", con->http.fd, con->http.error,
+			    "[Client %d] Closing for error %d (%s) while "
+			    "reading headers.",
+			    con->http.fd, con->http.error,
 			    strerror(con->http.error));
 	  else
 	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                    "cupsdReadClient: %d FIELDS Closing on EOF",
-			    con->http.fd);
+	                    "[Client %d] Closing on EOF while reading headers.",
+	                    con->http.fd);
 
 	  cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	  cupsdCloseClient(con);
@@ -1023,7 +1067,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "cupsdReadClient: %d Closing on EOF", con->http.fd);
+			  "[Client %d] Closing on EOF", con->http.fd);
           cupsdCloseClient(con);
 	  return;
 	}
@@ -1076,10 +1120,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
     cupsdAuthorize(con);
 
-    if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive",
-	             10) && KeepAlive)
+    if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION],
+                           "Keep-Alive", 10) && KeepAlive)
       con->http.keep_alive = HTTP_KEEPALIVE_ON;
-    else if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "close", 5))
+    else if (!_cups_strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION],
+                                "close", 5))
       con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
     if (!con->http.fields[HTTP_FIELD_HOST][0] &&
@@ -1091,7 +1136,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
       if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing Host: field in request!");
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "[Client %d] Missing Host: field in request.",
+                        con->http.fd);
 	cupsdCloseClient(con);
 	return;
       }
@@ -1104,8 +1151,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       */
 
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Request from \"%s\" using invalid Host: field \"%s\"",
-		      con->http.hostname, con->http.fields[HTTP_FIELD_HOST]);
+                      "[Client %d] Request from \"%s\" using invalid Host: "
+                      "field \"%s\"", con->http.fd, con->http.hostname,
+                      con->http.fields[HTTP_FIELD_HOST]);
 
       if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
       {
@@ -1190,7 +1238,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       */
 
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Request for non-absolute resource \"%s\"!", con->uri);
+                      "[Client %d] Request for non-absolute resource \"%s\".",
+                      con->http.fd, con->uri);
 
       if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
       {
@@ -1200,15 +1249,16 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     }
     else
     {
-      if (!_cups_strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Upgrade") &&
-	  con->http.tls == NULL)
+      if (!_cups_strcasecmp(con->http.fields[HTTP_FIELD_CONNECTION],
+                            "Upgrade") && con->http.tls == NULL)
       {
 #ifdef HAVE_SSL
        /*
         * Do encryption stuff...
 	*/
 
-	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
+	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL,
+	                     CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1693,7 +1743,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-			      "Request for subdirectory \"%s\"!", con->uri);
+			      "[Client %d] Request for subdirectory \"%s\".",
+			      con->http.fd, con->uri);
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
@@ -1751,8 +1802,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    if (con->file < 0)
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Unable to create request file %s: %s",
-	                      con->filename, strerror(errno));
+	                      "[Client %d] Unable to create request file "
+	                      "\"%s\": %s", con->http.fd, con->filename,
+	                      strerror(errno));
 
 	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
@@ -1888,7 +1940,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-			      "Request for subdirectory \"%s\"!", con->uri);
+			      "[Client %d] Request for subdirectory \"%s\".",
+			      con->http.fd, con->uri);
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
@@ -1989,12 +2042,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  {
 	    if (con->http.error && con->http.error != EPIPE)
 	      cupsdLogMessage(CUPSD_LOG_DEBUG,
-			      "cupsdReadClient: %d PUT_RECV Closing for error "
+			      "[Client %d] HTTP_PUT_RECV Closing for error "
 			      "%d (%s)", con->http.fd, con->http.error,
 			      strerror(con->http.error));
 	    else
 	      cupsdLogMessage(CUPSD_LOG_DEBUG,
-			      "cupsdReadClient: %d PUT_RECV Closing on EOF",
+			      "[Client %d] HTTP_PUT_RECV Closing on EOF",
 			      con->http.fd);
 
 	    cupsdCloseClient(con);
@@ -2007,8 +2060,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
             if (write(con->file, line, bytes) < bytes)
 	    {
               cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdReadClient: Unable to write %d bytes to %s: %s",
-	                      bytes, con->filename, strerror(errno));
+	                      "[Client %d] Unable to write %d bytes to "
+	                      "\"%s\": %s", con->http.fd, bytes, con->filename,
+	                      strerror(errno));
 
 	      close(con->file);
 	      con->file = -1;
@@ -2083,8 +2137,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	    {
               cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdReadClient: %d IPP Read Error!",
-			      con->http.fd);
+                              "[Client %d] IPP read error: %s", con->http.fd,
+                              cupsLastErrorString());
 
 	      cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	      cupsdCloseClient(con);
@@ -2103,7 +2157,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
             }
 	    else
 	    {
-	      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %d.%d %s %d",
+	      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] %d.%d %s %d",
 			      con->http.fd, con->request->request.op.version[0],
 			      con->request->request.op.version[1],
 			      ippOpString(con->request->request.op.operation_id),
@@ -2125,8 +2179,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    if (con->file < 0)
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Unable to create request file %s: %s",
-	                      con->filename, strerror(errno));
+	                      "[Client %d] Unable to create request file "
+	                      "\"%s\": %s", con->http.fd, con->filename,
+	                      strerror(errno));
 
 	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
@@ -2146,12 +2201,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    {
 	      if (con->http.error && con->http.error != EPIPE)
 		cupsdLogMessage(CUPSD_LOG_DEBUG,
-				"cupsdReadClient: %d POST_SEND Closing for "
+				"[Client %d] HTTP_POST_SEND Closing for "
 				"error %d (%s)", con->http.fd, con->http.error,
 				strerror(con->http.error));
 	      else
 		cupsdLogMessage(CUPSD_LOG_DEBUG,
-				"cupsdReadClient: %d POST_SEND Closing on EOF",
+				"[Client %d] HTTP_POST_SEND Closing on EOF",
 				con->http.fd);
 
 	      cupsdCloseClient(con);
@@ -2164,9 +2219,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               if (write(con->file, line, bytes) < bytes)
 	      {
         	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                	"cupsdReadClient: Unable to write %d bytes to "
-				"%s: %s", bytes, con->filename,
-				strerror(errno));
+	                	"[Client %d] Unable to write %d bytes to "
+	                	"\"%s\": %s", con->http.fd, bytes,
+	                	con->filename, strerror(errno));
 
 		close(con->file);
 		con->file = -1;
@@ -2186,8 +2241,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    else if (con->http.state != HTTP_POST_SEND)
 	    {
 	      cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                      "cupsdReadClient: %d Closing on unknown HTTP "
-			      "state %d", con->http.fd, con->http.state);
+	                      "[Client %d] Closing on unexpected state %s.",
+			      con->http.fd, http_states[con->http.state]);
 	      cupsdCloseClient(con);
 	      return;
 	    }
@@ -2279,7 +2334,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     if (!con->http.keep_alive)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "cupsdReadClient: %d Closing because Keep-Alive disabled",
+		      "[Client %d] Closing because Keep-Alive disabled",
 		      con->http.fd);
       cupsdCloseClient(con);
     }
@@ -2313,7 +2368,7 @@ cupsdSendCommand(
     if (fd < 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdSendCommand: %d Unable to open \"%s\" for reading: %s",
+                      "[Client %d] Unable to open \"%s\" for reading: %s",
                       con->http.fd, con->filename ? con->filename : "/dev/null",
 	              strerror(errno));
       return (0);
@@ -2329,11 +2384,11 @@ cupsdSendCommand(
   if (fd >= 0)
     close(fd);
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Started \"%s\" (pid=%d)", command,
-                  con->pipe_pid);
+  cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Started \"%s\" (pid=%d)",
+                  con->http.fd, command, con->pipe_pid);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendCommand: %d file=%d",
-                  con->http.fd, con->file);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] file=%d", con->http.fd,
+                  con->file);
 
   if (con->pipe_pid == 0)
     return (0);
@@ -2361,7 +2416,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	       int            auth_type)/* I - Authentication type */
 {
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdSendError(con=%p(%d), code=%d, auth_type=%d", con,
+                  "[Client %d] cupsdSendError code=%d, auth_type=%d",
 		  con->http.fd, code, auth_type);
 
 #ifdef HAVE_SSL
@@ -2517,10 +2572,6 @@ cupsdSendHeader(
     int            auth_type)		/* I - Type of authentication */
 {
   char		auth_str[1024];		/* Authorization string */
-#if 0 /* def HAVE_GSSAPI */
-  static char	*gss_buf = NULL;	/* Kerberos auth data buffer */
-  static int	gss_bufsize = 0;	/* Size of Kerberos auth data buffer */
-#endif /* HAVE_GSSAPI */
 
 
  /*
@@ -2650,7 +2701,7 @@ cupsdSendHeader(
     if (auth_str[0])
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "cupsdSendHeader: %d WWW-Authenticate: %s", con->http.fd,
+                      "[Client %d] WWW-Authenticate: %s", con->http.fd,
                       auth_str);
 
       if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
@@ -2731,11 +2782,23 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdWriteClient(con=%p(%d)) response=%p(%d), file=%d "
-		  "pipe_pid=%d state=%d",
-                  con, con->http.fd, con->response,
-		  con->response ? con->response->state : -1,
-		  con->file, con->pipe_pid, con->http.state);
+		  "[Client %d] cupsdWriteClient "
+		  "error=%d, "
+		  "used=%d, "
+		  "state=%s, "
+		  "data_encoding=HTTP_ENCODE_%s, "
+		  "data_remaining=" CUPS_LLFMT ", "
+		  "response=%p(%s), "
+		  "pipe_pid=%d, "
+		  "file=%d",
+		  con->http.fd, con->http.error, con->http.used,
+		  http_states[con->http.state],
+		  con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
+		      "CHUNKED" : "LENGTH",
+		  CUPS_LLCAST con->http.data_remaining,
+		  con->response,
+		  con->response ? ipp_states[con->response->state] : "",
+		  con->pipe_pid, con->file);
 
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
@@ -2746,8 +2809,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "cupsdWriteClient: %d Closing on unknown HTTP state %d",
-		    con->http.fd, con->http.state);
+		    "[Client %d] Closing on unexpected HTTP state %s.",
+		    con->http.fd, http_states[con->http.state]);
     cupsdCloseClient(con);
     return;
   }
@@ -2900,7 +2963,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       if (httpWrite2(HTTP(con), con->header, con->header_used) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_DEBUG,
-			"cupsdWriteClient: %d Closing for error %d (%s)",
+			"[Client %d] Closing for error %d (%s)",
 			con->http.fd, con->http.error,
 			strerror(con->http.error));
 	cupsdCloseClient(con);
@@ -2937,7 +3000,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	if (httpWrite2(HTTP(con), "", 0) < 0)
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "cupsdWriteClient: %d Closing for error %d (%s)",
+			  "[Client %d] Closing for error %d (%s)",
 			  con->http.fd, con->http.error,
 			  strerror(con->http.error));
 	  cupsdCloseClient(con);
@@ -2987,7 +3050,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     if (!con->http.keep_alive)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "cupsdWriteClient: %d Closing because Keep-Alive disabled",
+		      "[Client %d] Closing because Keep-Alive disabled.",
 		      con->http.fd);
       cupsdCloseClient(con);
       return;
@@ -3025,9 +3088,9 @@ check_if_modified(
     return (1);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "check_if_modified(con=%p(%d), "
+                  "[Client %d] check_if_modified "
 		  "filestats=%p(" CUPS_LLFMT ", %d)) If-Modified-Since=\"%s\"",
-                  con, con->http.fd, filestats, CUPS_LLCAST filestats->st_size,
+                  con->http.fd, filestats, CUPS_LLCAST filestats->st_size,
 		  (int)filestats->st_mtime, ptr);
 
   while (*ptr != '\0')
@@ -3079,299 +3142,14 @@ compare_clients(cupsd_client_t *a,	/* I - First client */
 }
 
 
-/*
- * 'data_ready()' - Check whether data is available from a client.
- */
-
-static int				/* O - 1 if data is ready, 0 otherwise */
-data_ready(cupsd_client_t *con)		/* I - Client */
-{
-  if (con->http.used > 0)
-    return (1);
-#ifdef HAVE_SSL
-  else if (con->http.tls)
-  {
-#  ifdef HAVE_LIBSSL
-    if (SSL_pending((SSL *)(con->http.tls)))
-      return (1);
-#  elif defined(HAVE_GNUTLS)
-    if (gnutls_record_check_pending(con->http.tls))
-      return (1);
-#  elif defined(HAVE_CDSASSL)
-    size_t bytes;			/* Bytes that are available */
-
-    if (!SSLGetBufferedReadSize(con->http.tls, &bytes) && bytes > 0)
-      return (1);
-#  endif /* HAVE_LIBSSL */
-  }
-#endif /* HAVE_SSL */
-
-  return (0);
-}
-
-
-#ifdef HAVE_SSL
-/*
- * 'encrypt_client()' - Enable encryption for the client...
- */
-
-static int				/* O - 1 on success, 0 on error */
-encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
-{
-#  ifdef HAVE_LIBSSL
-  SSL_CTX	*context;		/* Context for encryption */
-  BIO		*bio;			/* BIO data */
-  unsigned long	error;			/* Error code */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
-                  con->http.fd);
-
- /*
-  * Verify that we have a certificate...
-  */
-
-  if (access(ServerKey, 0) || access(ServerCertificate, 0))
-  {
-   /*
-    * Nope, make a self-signed certificate...
-    */
-
-    if (!make_certificate(con))
-      return (0);
-  }
-
- /*
-  * Create the SSL context and accept the connection...
-  */
-
-  context = SSL_CTX_new(SSLv23_server_method());
-
-  SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
-  if (SSLOptions & CUPSD_SSL_NOEMPTY)
-    SSL_CTX_set_options(context, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
-  SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
-  SSL_CTX_use_certificate_chain_file(context, ServerCertificate);
-
-  bio = BIO_new(_httpBIOMethods());
-  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));
-
-  con->http.tls = SSL_new(context);
-  SSL_set_bio(con->http.tls, bio, bio);
-
-  if (SSL_accept(con->http.tls) != 1)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to encrypt connection from %s!",
-                    con->http.hostname);
-
-    while ((error = ERR_get_error()) != 0)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", ERR_error_string(error, NULL));
-
-    SSL_CTX_free(context);
-    SSL_free(con->http.tls);
-    con->http.tls = NULL;
-    return (0);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  return (1);
-
-#  elif defined(HAVE_GNUTLS)
-  int		status;			/* Error code */
-  gnutls_certificate_server_credentials *credentials;
-					/* TLS credentials */
-  const char	*priority;		/* Priority string */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
-                  con->http.fd);
-
- /*
-  * Verify that we have a certificate...
-  */
-
-  if (access(ServerKey, 0) || access(ServerCertificate, 0))
-  {
-   /*
-    * Nope, make a self-signed certificate...
-    */
-
-    if (!make_certificate(con))
-      return (0);
-  }
-
- /*
-  * Create the SSL object and perform the SSL handshake...
-  */
-
-  credentials = (gnutls_certificate_server_credentials *)
-                    malloc(sizeof(gnutls_certificate_server_credentials));
-  if (credentials == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s",
-                    con->http.hostname, strerror(errno));
-
-    return (0);
-  }
-
-  gnutls_certificate_allocate_credentials(credentials);
-  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate,
-				       ServerKey, GNUTLS_X509_FMT_PEM);
-
-  gnutls_init(&con->http.tls, GNUTLS_SERVER);
-  gnutls_set_default_priority(con->http.tls);
-  status = gnutls_priority_set_direct(con->http.tls,
-                                      "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:"
-                                      "+VERS-SSL3.0:%COMPAT", &priority);
-  if (status != GNUTLS_E_SUCCESS)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s (%s)",
-                    con->http.hostname, gnutls_strerror(status), priority);
-
-    gnutls_deinit(con->http.tls);
-    gnutls_certificate_free_credentials(*credentials);
-    con->http.tls = NULL;
-    free(credentials);
-    return (0);
-  }
-
-  gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
-  gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
-  gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
-
-  while ((status = gnutls_handshake(con->http.tls)) != GNUTLS_E_SUCCESS)
-  {
-    if (gnutls_error_is_fatal(status))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to encrypt connection from %s - %s",
-                      con->http.hostname, gnutls_strerror(status));
-
-      gnutls_deinit(con->http.tls);
-      gnutls_certificate_free_credentials(*credentials);
-      con->http.tls = NULL;
-      free(credentials);
-      return (0);
-    }
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  con->http.tls_credentials = credentials;
-  return (1);
-
-#  elif defined(HAVE_CDSASSL)
-  OSStatus	error = 0;		/* Error code */
-  CFArrayRef	peerCerts;		/* Peer certificates */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
-                  con->http.fd);
-
-  con->http.tls_credentials = get_cdsa_certificate(con);
-
-  if (!con->http.tls_credentials)
-  {
-   /*
-    * No keychain (yet), make a self-signed certificate...
-    */
-
-    if (make_certificate(con))
-      con->http.tls_credentials = get_cdsa_certificate(con);
-  }
-
-  if (!con->http.tls_credentials)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-        	    "Could not find signing key in keychain \"%s\"",
-		    ServerCertificate);
-    error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
-  }
-
-  if (!error)
-    error = SSLNewContext(true, &con->http.tls);
-
-  if (!error)
-    error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
-
-  if (!error)
-    error = SSLSetConnection(con->http.tls, HTTP(con));
-
-  if (!error)
-    error = SSLSetAllowsExpiredCerts(con->http.tls, true);
-
-  if (!error)
-    error = SSLSetAllowsAnyRoot(con->http.tls, true);
-
-  if (!error)
-    error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
-
-  if (!error)
-  {
-   /*
-    * Perform SSL/TLS handshake
-    */
-
-    while ((error = SSLHandshake(con->http.tls)) == errSSLWouldBlock)
-      usleep(1000);
-  }
-
-  if (error)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s (%d)",
-                    con->http.hostname, cssmErrorString(error), (int)error);
-
-    con->http.error  = error;
-    con->http.status = HTTP_ERROR;
-
-    if (con->http.tls)
-    {
-      SSLDisposeContext(con->http.tls);
-      con->http.tls = NULL;
-    }
-
-    if (con->http.tls_credentials)
-    {
-      CFRelease(con->http.tls_credentials);
-      con->http.tls_credentials = NULL;
-    }
-
-    return (0);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  if (!SSLCopyPeerCertificates(con->http.tls, &peerCerts) && peerCerts)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
-		    (int)CFArrayGetCount(peerCerts));
-    CFRelease(peerCerts);
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
-
-  return (1);
-
-#  endif /* HAVE_LIBSSL */
-}
-#endif /* HAVE_SSL */
-
-
 #ifdef HAVE_CDSASSL
 /*
- * 'get_cdsa_certificate()' - Get a SSL/TLS certificate from the System keychain.
+ * 'copy_cdsa_certificate()' - Copy a SSL/TLS certificate from the System
+ *                             keychain.
  */
 
 static CFArrayRef				/* O - Array of certificates */
-get_cdsa_certificate(
+copy_cdsa_certificate(
     cupsd_client_t *con)			/* I - Client connection */
 {
   OSStatus		err;		/* Error info */
@@ -3398,7 +3176,7 @@ get_cdsa_certificate(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
+                  "copy_cdsa_certificate: Looking for certs for \"%s\"...",
 		  con->servername);
 
   if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
@@ -3448,7 +3226,7 @@ get_cdsa_certificate(
     snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
 		    localname);
 
     servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
@@ -3539,7 +3317,7 @@ get_cdsa_certificate(
     ssl_options.ServerNameLen = strlen(localname);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
 		    localname);
 
     if (SecPolicySetValue(policy, &options))
@@ -3630,6 +3408,292 @@ get_cdsa_certificate(
   return (certificates);
 }
 #endif /* HAVE_CDSASSL */
+
+
+/*
+ * 'data_ready()' - Check whether data is available from a client.
+ */
+
+static int				/* O - 1 if data is ready, 0 otherwise */
+data_ready(cupsd_client_t *con)		/* I - Client */
+{
+  if (con->http.used > 0)
+    return (1);
+#ifdef HAVE_SSL
+  else if (con->http.tls)
+  {
+#  ifdef HAVE_LIBSSL
+    if (SSL_pending((SSL *)(con->http.tls)))
+      return (1);
+#  elif defined(HAVE_GNUTLS)
+    if (gnutls_record_check_pending(con->http.tls))
+      return (1);
+#  elif defined(HAVE_CDSASSL)
+    size_t bytes;			/* Bytes that are available */
+
+    if (!SSLGetBufferedReadSize(con->http.tls, &bytes) && bytes > 0)
+      return (1);
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
+
+  return (0);
+}
+
+
+#ifdef HAVE_SSL
+/*
+ * 'encrypt_client()' - Enable encryption for the client...
+ */
+
+static int				/* O - 1 on success, 0 on error */
+encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
+{
+#  ifdef HAVE_LIBSSL
+  SSL_CTX	*context;		/* Context for encryption */
+  BIO		*bio;			/* BIO data */
+  unsigned long	error;			/* Error code */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
+                  con->http.fd);
+
+ /*
+  * Verify that we have a certificate...
+  */
+
+  if (access(ServerKey, 0) || access(ServerCertificate, 0))
+  {
+   /*
+    * Nope, make a self-signed certificate...
+    */
+
+    if (!make_certificate(con))
+      return (0);
+  }
+
+ /*
+  * Create the SSL context and accept the connection...
+  */
+
+  context = SSL_CTX_new(SSLv23_server_method());
+
+  SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
+  if (SSLOptions & CUPSD_SSL_NOEMPTY)
+    SSL_CTX_set_options(context, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
+  SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
+  SSL_CTX_use_certificate_chain_file(context, ServerCertificate);
+
+  bio = BIO_new(_httpBIOMethods());
+  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));
+
+  con->http.tls = SSL_new(context);
+  SSL_set_bio(con->http.tls, bio, bio);
+
+  if (SSL_accept(con->http.tls) != 1)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to encrypt connection from %s!",
+                    con->http.hostname);
+
+    while ((error = ERR_get_error()) != 0)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", ERR_error_string(error, NULL));
+
+    SSL_CTX_free(context);
+    SSL_free(con->http.tls);
+    con->http.tls = NULL;
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
+                  con->http.hostname);
+
+  return (1);
+
+#  elif defined(HAVE_GNUTLS)
+  int		status;			/* Error code */
+  gnutls_certificate_server_credentials *credentials;
+					/* TLS credentials */
+  const char	*priority;		/* Priority string */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
+                  con->http.fd);
+
+ /*
+  * Verify that we have a certificate...
+  */
+
+  if (access(ServerKey, 0) || access(ServerCertificate, 0))
+  {
+   /*
+    * Nope, make a self-signed certificate...
+    */
+
+    if (!make_certificate(con))
+      return (0);
+  }
+
+ /*
+  * Create the SSL object and perform the SSL handshake...
+  */
+
+  credentials = (gnutls_certificate_server_credentials *)
+                    malloc(sizeof(gnutls_certificate_server_credentials));
+  if (credentials == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to encrypt connection from %s - %s",
+                    con->http.hostname, strerror(errno));
+
+    return (0);
+  }
+
+  gnutls_certificate_allocate_credentials(credentials);
+  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate,
+				       ServerKey, GNUTLS_X509_FMT_PEM);
+
+  gnutls_init(&con->http.tls, GNUTLS_SERVER);
+  gnutls_set_default_priority(con->http.tls);
+  status = gnutls_priority_set_direct(con->http.tls,
+                                      "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:"
+                                      "+VERS-SSL3.0:%COMPAT", &priority);
+  if (status != GNUTLS_E_SUCCESS)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to encrypt connection from %s - %s (%s)",
+                    con->http.hostname, gnutls_strerror(status), priority);
+
+    gnutls_deinit(con->http.tls);
+    gnutls_certificate_free_credentials(*credentials);
+    con->http.tls = NULL;
+    free(credentials);
+    return (0);
+  }
+
+  gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
+  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
+  gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
+
+  while ((status = gnutls_handshake(con->http.tls)) != GNUTLS_E_SUCCESS)
+  {
+    if (gnutls_error_is_fatal(status))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to encrypt connection from %s - %s",
+                      con->http.hostname, gnutls_strerror(status));
+
+      gnutls_deinit(con->http.tls);
+      gnutls_certificate_free_credentials(*credentials);
+      con->http.tls = NULL;
+      free(credentials);
+      return (0);
+    }
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
+                  con->http.hostname);
+
+  con->http.tls_credentials = credentials;
+  return (1);
+
+#  elif defined(HAVE_CDSASSL)
+  OSStatus	error = 0;		/* Error code */
+  CFArrayRef	peerCerts;		/* Peer certificates */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
+                  con->http.fd);
+
+  con->http.tls_credentials = copy_cdsa_certificate(con);
+
+  if (!con->http.tls_credentials)
+  {
+   /*
+    * No keychain (yet), make a self-signed certificate...
+    */
+
+    if (make_certificate(con))
+      con->http.tls_credentials = copy_cdsa_certificate(con);
+  }
+
+  if (!con->http.tls_credentials)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+        	    "Could not find signing key in keychain \"%s\"",
+		    ServerCertificate);
+    error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
+  }
+
+  if (!error)
+    error = SSLNewContext(true, &con->http.tls);
+
+  if (!error)
+    error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
+
+  if (!error)
+    error = SSLSetConnection(con->http.tls, HTTP(con));
+
+  if (!error)
+    error = SSLSetAllowsExpiredCerts(con->http.tls, true);
+
+  if (!error)
+    error = SSLSetAllowsAnyRoot(con->http.tls, true);
+
+  if (!error)
+    error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
+
+  if (!error)
+  {
+   /*
+    * Perform SSL/TLS handshake
+    */
+
+    while ((error = SSLHandshake(con->http.tls)) == errSSLWouldBlock)
+      usleep(1000);
+  }
+
+  if (error)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to encrypt connection from %s - %s (%d)",
+                    con->http.hostname, cssmErrorString(error), (int)error);
+
+    con->http.error  = error;
+    con->http.status = HTTP_ERROR;
+
+    if (con->http.tls)
+    {
+      SSLDisposeContext(con->http.tls);
+      con->http.tls = NULL;
+    }
+
+    if (con->http.tls_credentials)
+    {
+      CFRelease(con->http.tls_credentials);
+      con->http.tls_credentials = NULL;
+    }
+
+    return (0);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
+                  con->http.hostname);
+
+  if (!SSLCopyPeerCertificates(con->http.tls, &peerCerts) && peerCerts)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
+		    (int)CFArrayGetCount(peerCerts));
+    CFRelease(peerCerts);
+  }
+  else
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
+
+  return (1);
+
+#  endif /* HAVE_LIBSSL */
+}
+#endif /* HAVE_SSL */
 
 
 /*
@@ -3815,8 +3879,8 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "get_file(con=%p(%d), filestats=%p, filename=%p, len=%d) = "
-		  "%s", con, con->http.fd, filestats, filename, len,
+                  "[Client %d] get_file filestats=%p, filename=%p, len=%d, "
+		  "returning \"%s\".", con->http.fd, filestats, filename, len,
 		  status ? "(null)" : filename);
 
   if (status)
@@ -3955,9 +4019,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   if (!type || _cups_strcasecmp(type->super, "application"))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 0", con, con->http.fd, filename, filestats,
-		    type ? type->super : "unknown",
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 0", con->http.fd, filename,
+		    filestats, type ? type->super : "unknown",
 		    type ? type->type : "unknown");
     return (0);
   }
@@ -3975,9 +4039,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
       cupsdSetStringf(&con->options, " %s", options);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type->super, type->type);
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 1", con->http.fd, filename,
+		    filestats, type->super, type->type);
     return (1);
   }
 #ifdef HAVE_JAVA
@@ -3995,9 +4059,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
       cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type->super, type->type);
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 1", con->http.fd, filename,
+		    filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_JAVA */
@@ -4016,9 +4080,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
       cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type->super, type->type);
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 1", con->http.fd, filename,
+		    filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PERL */
@@ -4037,9 +4101,9 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
       cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type->super, type->type);
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 1", con->http.fd, filename,
+		    filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PHP */
@@ -4058,17 +4122,17 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
       cupsdSetStringf(&con->options, " %s", filename);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		    "type=%s/%s) = 1", con, con->http.fd, filename, filestats,
-		    type->super, type->type);
+		    "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		    "type=%s/%s, returning 1", con->http.fd, filename,
+		    filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PYTHON */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		  "is_cgi(con=%p(%d), filename=\"%s\", filestats=%p, "
-		  "type=%s/%s) = 0", con, con->http.fd, filename, filestats,
-		  type->super, type->type);
+		  "[Client %d] is_cgi filename=\"%s\", filestats=%p, "
+		  "type=%s/%s, returning 0", con->http.fd, filename,
+		  filestats, type->super, type->type);
   return (0);
 }
 
@@ -4624,9 +4688,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "pipe_command(con=%p(%d), infile=%d, outfile=%p, "
-		  "command=\"%s\", options=\"%s\", root=%d)",
-                  con, con->http.fd, infile, outfile, command,
+                  "[Client %d] pipe_command infile=%d, outfile=%p, "
+		  "command=\"%s\", options=\"%s\", root=%d",
+                  con->http.fd, infile, outfile, command,
 		  options ? options : "(null)", root);
 
   argv[0] = command;
@@ -5139,8 +5203,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   con->file = open(filename, O_RDONLY);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "write_file(con=%p(%d), code=%d, filename=\"%s\" (%d), "
-		  "type=\"%s\", filestats=%p)", con, con->http.fd,
+                  "[Client %d] write_file code=%d, filename=\"%s\" (%d), "
+		  "type=\"%s\", filestats=%p", con->http.fd,
 		  code, filename, con->file, type ? type : "(null)", filestats);
 
   if (con->file < 0)
@@ -5188,8 +5252,8 @@ static void
 write_pipe(cupsd_client_t *con)		/* I - Client connection */
 {
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "write_pipe(con=%p(%d)) CGI output on fd %d",
-                  con, con->http.fd, con->file);
+                  "[Client %d] write_pipe CGI output on fd %d",
+                  con->http.fd, con->file);
 
   con->file_ready = 1;
 

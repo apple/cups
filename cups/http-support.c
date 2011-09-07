@@ -216,7 +216,7 @@ httpAssembleURI(
       * Add username@ first...
       */
 
-      ptr = http_copy_encode(ptr, username, end, "/?@", NULL,
+      ptr = http_copy_encode(ptr, username, end, "/?#[]@", NULL,
                              encoding & HTTP_URI_CODING_USERNAME);
 
       if (!ptr)

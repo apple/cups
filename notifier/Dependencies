@@ -6,19 +6,20 @@ dbus.o: ../cups/string-private.h ../config.h
 mailto.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
 mailto.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
 mailto.o: ../cups/language.h ../cups/string-private.h ../config.h
-mailto.o: ../cups/debug-private.h ../cups/ppd-private.h ../cups/ppd.h
-mailto.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
-mailto.o: ../cups/http.h ../cups/md5-private.h ../cups/ipp-private.h
-mailto.o: ../cups/ipp.h ../cups/language-private.h ../cups/transcode.h
-mailto.o: ../cups/thread-private.h
+mailto.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+mailto.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+mailto.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+mailto.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+mailto.o: ../cups/transcode.h ../cups/thread-private.h
 rss.o: ../cups/cups.h ../cups/file.h ../cups/versioning.h ../cups/ipp.h
 rss.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/language.h
 rss.o: ../cups/string-private.h ../config.h ../cups/array.h
 testnotify.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
 testnotify.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 testnotify.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
-testnotify.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-testnotify.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
-testnotify.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-testnotify.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-testnotify.o: ../cups/transcode.h ../cups/thread-private.h
+testnotify.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+testnotify.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+testnotify.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+testnotify.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+testnotify.o: ../cups/language-private.h ../cups/transcode.h
+testnotify.o: ../cups/thread-private.h

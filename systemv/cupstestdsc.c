@@ -35,7 +35,7 @@
  */
 
 static int	check_file(const char *filename);
-static void	usage(void);
+static void	usage(void) __attribute__((noreturn));
 
 
 /*

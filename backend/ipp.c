@@ -2194,15 +2194,15 @@ new_request(
 	  else if (!strcmp(media_col_sup->values[i].string.text,
 			   "media-bottom-margin"))
 	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-bottom-margin", size->left);
+			  "media-bottom-margin", size->bottom);
 	  else if (!strcmp(media_col_sup->values[i].string.text,
 			   "media-right-margin"))
 	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-right-margin", size->left);
+			  "media-right-margin", size->right);
 	  else if (!strcmp(media_col_sup->values[i].string.text,
 			   "media-top-margin"))
 	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-			  "media-top-margin", size->left);
+			  "media-top-margin", size->top);
 	  else if (!strcmp(media_col_sup->values[i].string.text,
 			   "media-source") && media_source)
 	    ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,

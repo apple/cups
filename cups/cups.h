@@ -36,18 +36,6 @@ typedef off_t ssize_t;			/* @private@ */
 
 
 /*
- * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get
- * a warning at compile-time.
- */
-
-#  if defined(__GNUC__) && __GNUC__ > 2
-#    define _CUPS_DEPRECATED __attribute__ ((__deprecated__))
-#  else
-#    define _CUPS_DEPRECATED
-#  endif /* __GNUC__ && __GNUC__ > 2 */
-
-
-/*
  * C++ magic...
  */
 

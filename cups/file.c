@@ -167,19 +167,13 @@ _cupsFileCheck(
   * Verify permission of the file itself:
   *
   * 1. Must be owned by root
-  * 2. Must not be writable by group unless group is root/wheel/admin
+  * 2. Must not be writable by group
   * 3. Must not be setuid
   * 4. Must not be writable by others
   */
 
   if (fileinfo.st_uid ||		/* 1. Must be owned by root */
-#ifdef __APPLE__
-      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
-       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
-#else
-      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
-					/* 2. Must not be writable by group */
-#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_IWGRP)  ||	/* 2. Must not be writable by group */
       (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
       (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
   {
@@ -218,13 +212,7 @@ _cupsFileCheck(
   }
 
   if (fileinfo.st_uid ||		/* 1. Must be owned by root */
-#ifdef __APPLE__
-      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid &&
-       fileinfo.st_gid != 80) ||	/* 2. Must not be writable by group */
-#else
-      ((fileinfo.st_mode & S_IWGRP) && fileinfo.st_gid) ||
-					/* 2. Must not be writable by group */
-#endif /* __APPLE__ */
+      (fileinfo.st_mode & S_IWGRP) ||	/* 2. Must not be writable by group */
       (fileinfo.st_mode & S_ISUID) ||	/* 3. Must not be setuid */
       (fileinfo.st_mode & S_IWOTH))	/* 4. Must not be writable by others */
   {

@@ -155,10 +155,7 @@ extern size_t _cups_strlcpy(char *, const char *, size_t);
 
 #  ifndef HAVE_SNPRINTF
 extern int	_cups_snprintf(char *, size_t, const char *, ...)
-#    ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 3, 4)))
-#    endif /* __GNUC__ */
-;
+		__attribute__ ((__format__ (__printf__, 3, 4)));
 #    define snprintf _cups_snprintf
 #  endif /* !HAVE_SNPRINTF */
 

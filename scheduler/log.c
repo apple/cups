@@ -516,7 +516,7 @@ cupsdLogMessage(int        level,	/* I - Log level */
   * See if we want to log this message...
   */
 
-  if (TestConfigFile || (level <= LogLevel && !ErrorLog))
+  if ((TestConfigFile || !ErrorLog) && level <= CUPSD_LOG_WARN)
   {
     va_start(ap, message);
     vfprintf(stderr, message, ap);

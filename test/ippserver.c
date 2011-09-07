@@ -285,11 +285,8 @@ static _ipp_job_t	*find_job(_ipp_client_t *client);
 static void		html_escape(_ipp_client_t *client, const char *s,
 			            size_t slen);
 static void		html_printf(_ipp_client_t *client, const char *format,
-			            ...)
-#  ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 2, 3)))
-#  endif /* __GNUC__ */
-;
+			            ...) __attribute__((__format__(__printf__,
+			                                           2, 3)));
 static void		ipp_cancel_job(_ipp_client_t *client);
 #if 0
 static void		ipp_create_job(_ipp_client_t *client);
@@ -317,12 +314,9 @@ static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *type, size_t length);
 static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
 			            const char *message, ...)
-#ifdef __GNUC__
-__attribute__ ((__format__ (__printf__, 3, 4)))
-#endif /* __GNUC__ */
-;
+			__attribute__ ((__format__ (__printf__, 3, 4)));
 static void		run_printer(_ipp_printer_t *printer);
-static void		usage(int status);
+static void		usage(int status) __attribute__((noreturn));
 static int		valid_job_attributes(_ipp_client_t *client);
 
 

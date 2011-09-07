@@ -213,6 +213,43 @@ case "$usevalgrind" in
 esac
 
 #
+# See if we want to do debug logging of the libraries...
+#
+
+echo ""
+echo "If CUPS was built with the --enable-debug-printfs configure option, you"
+echo "can enable debug logging of the libraries."
+echo ""
+echo $ac_n "Enter Y or a number from 0 to 9 to enable debug logging or N to not: [N] $ac_c"
+
+if test $# -gt 0; then
+	usedebugprintfs=$1
+	shift
+else
+	read usedebugprintfs
+fi
+echo ""
+
+case "$usedebugprintfs" in
+	Y* | y*)
+		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
+		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
+		CUPS_DEBUG_LEVEL=5; export CUPS_DEBUG_LEVEL
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetRespond|cupsSend).*$'; export CUPS_DEBUG_FILTER
+		;;
+
+	0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
+		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
+		CUPS_DEBUG_LEVEL=$usedebugprintf; export CUPS_DEBUG_LEVEL
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetRespond|cupsSend).*$'; export CUPS_DEBUG_FILTER
+		;;
+
+	*)
+		;;
+esac
+
+#
 # Start by creating temporary directories for the tests...
 #
 
@@ -338,6 +375,7 @@ CacheDir /tmp/cups-$user/share
 DataDir /tmp/cups-$user/share
 FontPath /tmp/cups-$user/share/fonts
 PassEnv LOCALEDIR
+PassEnv DYLD_INSERT_LIBRARIES
 DocumentRoot $root/doc
 RequestRoot /tmp/cups-$user/spool
 TempDir /tmp/cups-$user/spool/temp
@@ -476,8 +514,8 @@ echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cu
 echo ""
 
 if test `uname` = Darwin -a "x$valgrind" = x; then
-	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib \
-	$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
+	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib
+	../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 else
 	$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 fi

@@ -4,6 +4,14 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- The client.conf Server directive is no longer supported on Mac OS X
+	  10.7 and later.
+	- The IPP backend sent the wrong margins in media-col.
+	- The scheduler did not save or restore large Kerberos credentials for
+	  jobs.
+	- The dnssd backend did not properly browse for secure IPP printers.
+	- httpAssembleURI* did not properly escape all special characters in the
+	  username/password field.
 	- The scheduler now logs config file errors to stderr (STR #3936)
 	- The configure script incorrectly used bundle-based localizations on
 	  Linux (STR #3938)

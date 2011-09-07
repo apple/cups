@@ -3,32 +3,35 @@
 error.o: ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 error.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 error.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-error.o: ../cups/debug-private.h ../cups/string-private.h ../config.h
+error.o: ../cups/debug-private.h ../cups/versioning.h
+error.o: ../cups/string-private.h ../config.h
 interpret.o: ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 interpret.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 interpret.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-interpret.o: ../cups/debug-private.h ../cups/string-private.h ../config.h
+interpret.o: ../cups/debug-private.h ../cups/versioning.h
+interpret.o: ../cups/string-private.h ../config.h
 raster.o: ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 raster.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 raster.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-raster.o: ../cups/debug-private.h ../cups/string-private.h ../config.h
+raster.o: ../cups/debug-private.h ../cups/versioning.h
+raster.o: ../cups/string-private.h ../config.h
 commandtops.o: ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-commandtops.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-commandtops.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h
-commandtops.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
-commandtops.o: ../cups/array.h ../cups/language.h ../cups/pwg-private.h
-commandtops.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-commandtops.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-commandtops.o: ../cups/transcode.h ../cups/thread-private.h
-commandtops.o: ../cups/sidechannel.h
+commandtops.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.o: ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.o: ../cups/language-private.h ../cups/transcode.h
+commandtops.o: ../cups/thread-private.h ../cups/sidechannel.h
 gziptoany.o: ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-gziptoany.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-gziptoany.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
-gziptoany.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
-gziptoany.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
-gziptoany.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
-gziptoany.o: ../cups/language-private.h ../cups/transcode.h
-gziptoany.o: ../cups/thread-private.h
+gziptoany.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.o: ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.o: ../cups/transcode.h ../cups/thread-private.h
 common.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
@@ -63,39 +66,42 @@ rastertopwg.o: ../config.h
 testraster.o: ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 testraster.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
 testraster.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
-testraster.o: ../cups/cups.h ../cups/debug-private.h ../cups/string-private.h
-testraster.o: ../config.h
+testraster.o: ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.o: ../cups/string-private.h ../config.h
 # DO NOT DELETE
 
 error.32.o: error.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 error.32.o: error.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 error.32.o: error.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-error.32.o: error.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+error.32.o: error.c  ../cups/debug-private.h ../cups/versioning.h
+error.32.o: error.c  ../cups/string-private.h ../config.h
 interpret.32.o: interpret.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 interpret.32.o: interpret.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 interpret.32.o: interpret.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-interpret.32.o: interpret.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+interpret.32.o: interpret.c  ../cups/debug-private.h ../cups/versioning.h
+interpret.32.o: interpret.c  ../cups/string-private.h ../config.h
 raster.32.o: raster.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 raster.32.o: raster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 raster.32.o: raster.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-raster.32.o: raster.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+raster.32.o: raster.c  ../cups/debug-private.h ../cups/versioning.h
+raster.32.o: raster.c  ../cups/string-private.h ../config.h
 commandtops.32.o: commandtops.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-commandtops.32.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-commandtops.32.o: commandtops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
-commandtops.32.o: commandtops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
-commandtops.32.o: commandtops.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
-commandtops.32.o: commandtops.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-commandtops.32.o: commandtops.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-commandtops.32.o: commandtops.c  ../cups/transcode.h ../cups/thread-private.h
-commandtops.32.o: commandtops.c  ../cups/sidechannel.h
+commandtops.32.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.32.o: commandtops.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.32.o: commandtops.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.32.o: commandtops.c  ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.32.o: commandtops.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.32.o: commandtops.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.32.o: commandtops.c  ../cups/language-private.h ../cups/transcode.h
+commandtops.32.o: commandtops.c  ../cups/thread-private.h ../cups/sidechannel.h
 gziptoany.32.o: gziptoany.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-gziptoany.32.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-gziptoany.32.o: gziptoany.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
-gziptoany.32.o: gziptoany.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
-gziptoany.32.o: gziptoany.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
-gziptoany.32.o: gziptoany.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
-gziptoany.32.o: gziptoany.c  ../cups/language-private.h ../cups/transcode.h
-gziptoany.32.o: gziptoany.c  ../cups/thread-private.h
+gziptoany.32.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.32.o: gziptoany.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.32.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.32.o: gziptoany.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.32.o: gziptoany.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.32.o: gziptoany.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.32.o: gziptoany.c  ../cups/transcode.h ../cups/thread-private.h
 common.32.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.32.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.32.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
@@ -130,39 +136,42 @@ rastertopwg.32.o: rastertopwg.c  ../config.h
 testraster.32.o: testraster.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 testraster.32.o: testraster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
 testraster.32.o: testraster.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
-testraster.32.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/string-private.h
-testraster.32.o: testraster.c  ../config.h
+testraster.32.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.32.o: testraster.c  ../cups/string-private.h ../config.h
 # DO NOT DELETE
 
 error.64.o: error.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 error.64.o: error.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 error.64.o: error.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-error.64.o: error.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+error.64.o: error.c  ../cups/debug-private.h ../cups/versioning.h
+error.64.o: error.c  ../cups/string-private.h ../config.h
 interpret.64.o: interpret.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 interpret.64.o: interpret.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 interpret.64.o: interpret.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-interpret.64.o: interpret.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+interpret.64.o: interpret.c  ../cups/debug-private.h ../cups/versioning.h
+interpret.64.o: interpret.c  ../cups/string-private.h ../config.h
 raster.64.o: raster.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 raster.64.o: raster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 raster.64.o: raster.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
-raster.64.o: raster.c  ../cups/debug-private.h ../cups/string-private.h ../config.h
+raster.64.o: raster.c  ../cups/debug-private.h ../cups/versioning.h
+raster.64.o: raster.c  ../cups/string-private.h ../config.h
 commandtops.64.o: commandtops.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-commandtops.64.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-commandtops.64.o: commandtops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
-commandtops.64.o: commandtops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
-commandtops.64.o: commandtops.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
-commandtops.64.o: commandtops.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
-commandtops.64.o: commandtops.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-commandtops.64.o: commandtops.c  ../cups/transcode.h ../cups/thread-private.h
-commandtops.64.o: commandtops.c  ../cups/sidechannel.h
+commandtops.64.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.64.o: commandtops.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.64.o: commandtops.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.64.o: commandtops.c  ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.64.o: commandtops.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.64.o: commandtops.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.64.o: commandtops.c  ../cups/language-private.h ../cups/transcode.h
+commandtops.64.o: commandtops.c  ../cups/thread-private.h ../cups/sidechannel.h
 gziptoany.64.o: gziptoany.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
-gziptoany.64.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/ppd-private.h
-gziptoany.64.o: gziptoany.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
-gziptoany.64.o: gziptoany.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
-gziptoany.64.o: gziptoany.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
-gziptoany.64.o: gziptoany.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
-gziptoany.64.o: gziptoany.c  ../cups/language-private.h ../cups/transcode.h
-gziptoany.64.o: gziptoany.c  ../cups/thread-private.h
+gziptoany.64.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.64.o: gziptoany.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.64.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.64.o: gziptoany.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.64.o: gziptoany.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.64.o: gziptoany.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.64.o: gziptoany.c  ../cups/transcode.h ../cups/thread-private.h
 common.64.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.64.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.64.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
@@ -197,5 +206,5 @@ rastertopwg.64.o: rastertopwg.c  ../config.h
 testraster.64.o: testraster.c  ../cups/raster-private.h ../cups/raster.h ../cups/cups.h
 testraster.64.o: testraster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
 testraster.64.o: testraster.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
-testraster.64.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/string-private.h
-testraster.64.o: testraster.c  ../config.h
+testraster.64.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.64.o: testraster.c  ../cups/string-private.h ../config.h

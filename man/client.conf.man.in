@@ -12,11 +12,11 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "28 March 2011" "Apple Inc."
+.TH client.conf 5 "CUPS" "2 September 2011" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups
 .SH DESCRIPTION
-The \fIclient.conf\fR file configures the CUPS client and is 
+The \fIclient.conf\fR file configures the CUPS client and is
 normally located in the \fI@CUPS_SERVERROOT@\fR or \fI~/.cups\fR
 directory. Each line in the file can be a configuration
 directive, a blank line, or a comment. Comment lines start with
@@ -45,7 +45,7 @@ ServerName hostname-or-ip-address[:port]
 ServerName /domain/socket
 .br
 Specifies the address and optionally the port to use when connecting to the
-server.
+server. \fBNote: Not supported on Mac OS X 10.7 or later.\fR
 .SH SEE ALSO
 http://localhost:631/help
 .SH COPYRIGHT

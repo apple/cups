@@ -34,8 +34,8 @@
  *   httpConnectEncrypt()      - Connect to a HTTP server using encryption.
  *   httpCopyCredentials()     - Copy the credentials associated with an
  *                               encrypted connection.
- *   _httpConvertCredentials() - Convert credentials to the internal format.
  *   _httpCreate()             - Create an unconnected HTTP connection.
+ *   _httpCreateCredentials()  - Create credentials in the internal format.
  *   httpDelete()              - Send a DELETE request to the server.
  *   _httpDisconnect()         - Disconnect a HTTP connection.
  *   httpEncryption()          - Set the required encryption on the link.
@@ -107,6 +107,8 @@
  *   http_send()               - Send a request with all fields and the trailing
  *                               blank line.
  *   http_set_credentials()    - Set the SSL/TLS credentials.
+ *   http_set_timeout()        - Set the socket timeout values.
+ *   http_set_wait()           - Set the default wait value for reads.
  *   http_setup_ssl()          - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()       - Shut down SSL/TLS on a connection.
  *   http_threadid_cb()        - Return the current thread ID.
@@ -164,6 +166,8 @@ static int		http_read_ssl(http_t *http, char *buf, int len);
 #  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
 static int		http_set_credentials(http_t *http);
 #  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
+static void		http_set_timeout(int fd, double timeout);
+static void		http_set_wait(http_t *http);
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
@@ -311,7 +315,10 @@ httpBlocking(http_t *http,		/* I - Connection to server */
              int    b)			/* I - 1 = blocking, 0 = non-blocking */
 {
   if (http)
+  {
     http->blocking = b;
+    http_set_wait(http);
+  }
 }
 
 
@@ -557,64 +564,6 @@ httpCopyCredentials(
 
 
 /*
- * '_httpConvertCredentials()' - Convert credentials to the internal format.
- */
-
-http_tls_credentials_t			/* O - Internal credentials */
-_httpConvertCredentials(
-    cups_array_t *credentials)		/* I - Array of credentials */
-{
-  if (!credentials)
-    return (NULL);
-
-#  ifdef HAVE_LIBSSL
-  return (NULL);
-
-#  elif defined(HAVE_GNUTLS)
-  return (NULL);
-
-#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
-  CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
-  SecCertificateRef	secCert;	/* Certificate reference */
-  CFDataRef		data;		/* Credential data reference */
-  http_credential_t	*credential;	/* Credential data */
-
-
-  if ((peerCerts = CFArrayCreateMutable(kCFAllocatorDefault,
-				        cupsArrayCount(credentials),
-				        &kCFTypeArrayCallBacks)) == NULL)
-    return (NULL);
-
-  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
-       credential;
-       credential = (http_credential_t *)cupsArrayNext(credentials))
-  {
-    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
-			     credential->datalen)))
-    {
-      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
-              != NULL)
-      {
-	CFArrayAppendValue(peerCerts, secCert);
-	CFRelease(secCert);
-      }
-
-      CFRelease(data);
-    }
-  }
-
-  return (peerCerts);
-
-#  elif defined(HAVE_SSPISSL)
-  return (NULL);
-
-#  else
-  return (NULL);
-#  endif /* HAVE_LIBSSL */
-}
-
-
-/*
  * '_httpCreate()' - Create an unconnected HTTP connection.
  */
 
@@ -679,11 +628,71 @@ _httpCreate(
   else
     http->encryption = encryption;
 
+  http_set_wait(http);
+
  /*
   * Return the new structure...
   */
 
   return (http);
+}
+
+
+/*
+ * '_httpCreateCredentials()' - Create credentials in the internal format.
+ */
+
+http_tls_credentials_t			/* O - Internal credentials */
+_httpCreateCredentials(
+    cups_array_t *credentials)		/* I - Array of credentials */
+{
+  if (!credentials)
+    return (NULL);
+
+#  ifdef HAVE_LIBSSL
+  return (NULL);
+
+#  elif defined(HAVE_GNUTLS)
+  return (NULL);
+
+#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+  CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFDataRef		data;		/* Credential data reference */
+  http_credential_t	*credential;	/* Credential data */
+
+
+  if ((peerCerts = CFArrayCreateMutable(kCFAllocatorDefault,
+				        cupsArrayCount(credentials),
+				        &kCFTypeArrayCallBacks)) == NULL)
+    return (NULL);
+
+  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
+       credential;
+       credential = (http_credential_t *)cupsArrayNext(credentials))
+  {
+    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
+			     credential->datalen)))
+    {
+      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
+              != NULL)
+      {
+	CFArrayAppendValue(peerCerts, secCert);
+	CFRelease(secCert);
+      }
+
+      CFRelease(data);
+    }
+  }
+
+  return (peerCerts);
+
+#  elif defined(HAVE_SSPISSL)
+  return (NULL);
+
+#  else
+  return (NULL);
+#  endif /* HAVE_LIBSSL */
 }
 
 
@@ -1314,7 +1323,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      while (!_httpWait(http, http->blocking ? 30000 : 10000, 1))
+      while (!_httpWait(http, http->wait_value, 1))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1639,7 +1648,7 @@ _httpPeek(http_t *http,			/* I - Connection to server */
 
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1903,7 +1912,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -1999,7 +2008,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   {
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -2015,7 +2024,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   {
     if (!http->blocking)
     {
-      while (!httpWait(http, 10000))
+      while (!httpWait(http, http->wait_value))
       {
 	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	  continue;
@@ -2132,7 +2141,7 @@ _httpReadCDSA(
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -2199,7 +2208,7 @@ _httpReadGNUTLS(
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -2292,24 +2301,8 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
   DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
 
-  if (http->timeout_value.tv_sec > 0)
-  {
-#ifdef WIN32
-    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
-			  http->timeout_value.tv_usec / 1000;
-			  		/* Timeout in milliseconds */
-
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-#else
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-#endif /* WIN32 */
-  }
+  if (http->timeout_value > 0)
+    http_set_timeout(http->fd, http->timeout_value);
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;
@@ -2422,7 +2415,7 @@ httpSetCredentials(http_t	*http,		/* I - Connection to server */
 
   _httpFreeCredentials(http->tls_credentials);
 
-  http->tls_credentials = _httpConvertCredentials(credentials);
+  http->tls_credentials = _httpCreateCredentials(credentials);
 
   return (http->tls_credentials ? 0 : -1);
 }
@@ -2585,30 +2578,14 @@ httpSetTimeout(
   if (!http || timeout <= 0.0)
     return;
 
-  http->timeout_cb            = cb;
-  http->timeout_data          = user_data;
-  http->timeout_value.tv_sec  = (int)timeout;
-  http->timeout_value.tv_usec = (int)(timeout * 1000000) % 1000000;
+  http->timeout_cb    = cb;
+  http->timeout_data  = user_data;
+  http->timeout_value = timeout;
 
   if (http->fd >= 0)
-  {
-#ifdef WIN32
-    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
-			  http->timeout_value.tv_usec / 1000;
-			  		/* Timeout in milliseconds */
+    http_set_timeout(http->fd, timeout);
 
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
-               sizeof(timeout_value));
-
-#else
-    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
-               sizeof(http->timeout_value));
-#endif /* WIN32 */
-  }
+  http_set_wait(http);
 }
 
 
@@ -3324,7 +3301,7 @@ http_bio_read(BIO  *h,			/* I - BIO data */
     * Make sure we have data before we read...
     */
 
-    while (!_httpWait(http, 10000, 0))
+    while (!_httpWait(http, http->wait_value, 0))
     {
       if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	continue;
@@ -3771,6 +3748,52 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 
 
 /*
+ * 'http_set_timeout()' - Set the socket timeout values.
+ */
+
+static void
+http_set_timeout(int    fd,		/* I - File descriptor */
+                 double timeout)	/* I - Timeout in seconds */
+{
+#ifdef WIN32
+  DWORD tv = (DWORD)(timeout * 1000);
+				      /* Timeout in milliseconds */
+
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+
+#else
+  struct timeval tv;			/* Timeout in secs and usecs */
+
+  tv.tv_sec  = (int)timeout;
+  tv.tv_usec = (int)(1000000 * fmod(timeout, 1.0));
+
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+#endif /* WIN32 */
+}
+
+
+/*
+ * 'http_set_wait()' - Set the default wait value for reads.
+ */
+
+static void
+http_set_wait(http_t *http)		/* I - Connection to server */
+{
+  if (http->blocking)
+  {
+    http->wait_value = (int)(http->timeout_value * 1000);
+
+    if (http->wait_value <= 0)
+      http->wait_value = 60000;
+  }
+  else
+    http->wait_value = 10000;
+}
+
+
+/*
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
 
@@ -4014,7 +4037,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     {
       error = SSLHandshake(http->tls);
 
-      DEBUG_printf(("4_httpWait: SSLHandshake returned %d.", (int)error));
+      DEBUG_printf(("4http_setup_ssl: SSLHandshake returned %d.", (int)error));
 
       switch (error)
       {
@@ -4039,7 +4062,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		httpFreeCredentials(credentials);
 	      }
 
-	      DEBUG_printf(("4_httpWait: Server certificate callback returned "
+	      DEBUG_printf(("4http_setup_ssl: Server certificate callback returned "
 			    "%d.", (int)error));
 	    }
 	    break;
@@ -4080,7 +4103,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		error = (cg->client_cert_cb)(http, http->tls, names,
 					     cg->client_cert_data);
 
-		DEBUG_printf(("4_httpWait: Client certificate callback "
+		DEBUG_printf(("4http_setup_ssl: Client certificate callback "
 		              "returned %d.", (int)error));
 	      }
 
@@ -4361,6 +4384,62 @@ http_write(http_t     *http,		/* I - Connection to server */
 
   while (length > 0)
   {
+    if (http->timeout_cb)
+    {
+#ifdef HAVE_POLL
+      struct pollfd	pfd;		/* Polled file descriptor */
+#else
+      fd_set		output_set;	/* Output ready for write? */
+      struct timeval	timeout;	/* Timeout value */
+#endif /* HAVE_POLL */
+      int		nfds;		/* Result from select()/poll() */
+
+      do
+      {
+#ifdef HAVE_POLL
+	pfd.fd     = http->fd;
+	pfd.events = POLLOUT;
+
+	while ((nfds = poll(&pfd, 1, http->wait_value)) < 0 &&
+	       (errno == EINTR || errno == EAGAIN));
+
+#else
+	do
+	{
+	  FD_ZERO(&output_set);
+	  FD_SET(http->fd, &output_set);
+
+	  timeout.tv_sec  = http->wait_value / 1000;
+	  timeout.tv_usec = 1000 * (http->wait_value % 1000);
+
+	  nfds = select(http->fd + 1, NULL, &output_set, NULL, &timeout);
+	}
+#  ifdef WIN32
+	while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
+			    WSAGetLastError() == WSAEWOULDBLOCK));
+#  else
+	while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
+
+        if (nfds < 0)
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+	else if (nfds == 0 && !(*http->timeout_cb)(http, http->timeout_data))
+	{
+#ifdef WIN32
+	  http->error = ESAEWOULDBLOCK;
+#else
+	  http->error = EWOULDBLOCK;
+#endif /* WIN32 */
+	  return (-1);
+	}
+      }
+      while (nfds <= 0);
+    }
+
 #ifdef HAVE_SSL
     if (http->tls)
       bytes = http_write_ssl(http, buffer, length);
