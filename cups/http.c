@@ -1926,20 +1926,16 @@ httpRead2(http_t *http,			/* I - Connection to server */
     else
       bytes = http->data_remaining;
 
+    DEBUG_printf(("2httpRead2: Reading %d bytes into buffer.", (int)bytes));
+
 #ifdef HAVE_SSL
     if (http->tls)
       bytes = http_read_ssl(http, http->buffer, bytes);
     else
 #endif /* HAVE_SSL */
-    {
-      DEBUG_printf(("2httpRead2: reading %d bytes from socket into buffer...",
-                    (int)bytes));
+    bytes = recv(http->fd, http->buffer, bytes, 0);
 
-      bytes = recv(http->fd, http->buffer, bytes, 0);
-
-      DEBUG_printf(("2httpRead2: read %d bytes from socket into buffer...",
-                    (int)bytes));
-    }
+    DEBUG_printf(("2httpRead2: Read %d bytes into buffer.", (int)bytes));
 
     if (bytes > 0)
       http->used = bytes;
@@ -3354,7 +3350,7 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
   if (_cups_debug_fd < 0 || _cups_debug_level < 6)
     return;
 
-  DEBUG_printf(("6%s: %d bytes:\n", prefix, bytes));
+  DEBUG_printf(("6%s: %d bytes:", prefix, bytes));
 
   snprintf(line, sizeof(line), "6%s: ", prefix);
   start = line + strlen(line);
@@ -3461,7 +3457,8 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 
 
   error = SSLRead(http->tls, buf, len, &processed);
-
+  DEBUG_printf(("6http_read_ssl: error=%d, processed=%d", (int)error,
+                (int)processed));
   switch (error)
   {
     case 0 :
@@ -3474,7 +3471,7 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 	else
 	{
 	  result = -1;
-	  errno = EINTR;
+	  errno  = EINTR;
 	}
 	break;
 
@@ -3485,12 +3482,13 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 	else
 	{
 	  result = -1;
-	  errno = EPIPE;
+	  errno  = EPIPE;
 	}
 	break;
   }
 
   return (result);
+
 #  elif defined(HAVE_SSPISSL)
   return _sspiRead((_sspi_struct_t*) http->tls, buf, len);
 #  endif /* HAVE_LIBSSL */
