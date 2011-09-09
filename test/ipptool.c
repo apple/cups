@@ -2115,6 +2115,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (http->version != HTTP_1_1)
         prev_pass = pass = 0;
 
+      if (response->state != IPP_DATA)
+        prev_pass = pass = 0;
+
       if (response->request.status.request_id != request_id)
         prev_pass = pass = 0;
 
@@ -2411,6 +2414,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			 cupsLastErrorString());
       else
       {
+	if (response->state != IPP_DATA)
+	  print_test_error("Missing end-of-attributes-tag in response "
+	                   "(RFC 2910 section 3.5.1)");
+
 	if (version &&
 	    (response->request.status.version[0] != (version / 10) ||
 	     response->request.status.version[1] != (version % 10)))

@@ -1105,7 +1105,7 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
         break;
 
     case HTTP_ERROR :
-	_cupsSetError(IPP_INTERNAL_ERROR, httpStatus(status), 0);
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
         break;
 
     default :
