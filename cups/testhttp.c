@@ -167,7 +167,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i, j, k;		/* Looping vars */
   http_t	*http;			/* HTTP connection */
-  http_encryption_t encrypt;		/* Encryption type */
+  http_encryption_t encryption;		/* Encryption type */
   http_status_t	status;			/* Status of GET command */
   int		failures;		/* Number of test failures */
   char		buffer[8192];		/* Input buffer */
@@ -544,11 +544,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (!strcasecmp(scheme, "https") || !strcasecmp(scheme, "ipps") ||
         port == 443)
-      encrypt = HTTP_ENCRYPT_ALWAYS;
+      encryption = HTTP_ENCRYPT_ALWAYS;
     else
-      encrypt = HTTP_ENCRYPT_IF_REQUESTED;
+      encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-    http = httpConnectEncrypt(hostname, port, encrypt);
+    http = httpConnectEncrypt(hostname, port, encryption);
     if (http == NULL)
     {
       perror(hostname);

@@ -53,7 +53,9 @@
 #include <cups/file-private.h>
 #include <regex.h>
 #include <sys/stat.h>
-
+#ifndef WIN32
+#  include <signal.h>
+#endif /* WIN32 */
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
@@ -189,7 +191,9 @@ static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
 static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
+#ifndef WIN32
 static void	sigterm_handler(int sig);
+#endif /* WIN32 */
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(ipp_attribute_t *attr, int print);
@@ -222,12 +226,14 @@ main(int  argc,				/* I - Number of command-line args */
 					/* Global data */
 
 
+#ifndef WIN32
  /*
   * Catch SIGINT and SIGTERM...
   */
 
   signal(SIGINT, sigterm_handler);
   signal(SIGTERM, sigterm_handler);
+#endif /* !WIN32 */
 
  /*
   * Initialize the locale and variables...
@@ -4012,6 +4018,7 @@ set_variable(_cups_vars_t *vars,	/* I - Variables */
 }
 
 
+#ifndef WIN32
 /*
  * 'sigterm_handler()' - Handle SIGINT and SIGTERM.
  */
@@ -4023,6 +4030,7 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
 
   Cancel = 1;
 }
+#endif /* !WIN32 */
 
 
 /*

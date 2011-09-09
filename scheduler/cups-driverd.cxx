@@ -1196,6 +1196,12 @@ list_ppds(int        request_id,	/* I - Request ID */
 	    ppd->matches += 3;
 	    break;
 	  }
+	  else if (!_cups_strncasecmp(ppd->record.products[i], product,
+	                              product_len))
+	  {
+	    ppd->matches += 2;
+	    break;
+	  }
       }
 
       if (psversion)

@@ -2309,7 +2309,15 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    strncpy(tformat, bufformat, format - bufformat);
 	    tformat[format - bufformat] = '\0';
 
-	    bytes += cupsFilePrintf(fp, tformat, va_arg(ap, int));
+#  ifdef HAVE_LONG_LONG
+            if (size == 'L')
+	      bytes += cupsFilePrintf(fp, tformat, va_arg(ap, long long));
+	    else
+#  endif /* HAVE_LONG_LONG */
+            if (size == 'l')
+	      bytes += cupsFilePrintf(fp, tformat, va_arg(ap, long));
+	    else
+	      bytes += cupsFilePrintf(fp, tformat, va_arg(ap, int));
 	    break;
 
 	case 'p' : // Pointer value

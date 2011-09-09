@@ -124,6 +124,7 @@
 
 #include "cups-private.h"
 #include <fcntl.h>
+#include <math.h>
 #ifdef WIN32
 #  include <tchar.h>
 #else
@@ -3907,6 +3908,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 
 #  elif defined(HAVE_GNUTLS)
+  (void)any_root;
+
   credentials = (gnutls_certificate_client_credentials *)
                     malloc(sizeof(gnutls_certificate_client_credentials));
   if (credentials == NULL)
@@ -4227,7 +4230,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
+  _sspiSetAllowsAnyRoot(http->tls_credentials, any_root);
   _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
 
   if (!_sspiConnect(http->tls_credentials, http->hostname))
