@@ -211,7 +211,8 @@ main(int  argc,				/* I - Number of command-line args */
 			name[1024],	/* Name/value buffer */
 			*value,		/* Pointer to value */
 			filename[1024],	/* Real filename */
-			testname[1024];	/* Real test filename */
+			testname[1024],	/* Real test filename */
+			uri[1024];	/* Copy of printer URI */
   const char		*testfile;	/* Test file to use */
   int			interval,	/* Test interval in microseconds */
 			repeat;		/* Repeat count */
@@ -515,6 +516,10 @@ main(int  argc,				/* I - Number of command-line args */
 	cupsSetPasswordCB(password_cb);
 	set_variable(&vars, "uriuser", vars.userpass);
       }
+
+      httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), vars.scheme, NULL,
+                      vars.hostname, vars.port, vars.resource);
+      vars.uri = uri;
     }
     else
     {
@@ -2076,13 +2081,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	* Get the server's response...
 	*/
 
-	if (!Cancel && (status == HTTP_CONTINUE || status == HTTP_OK))
-	{
+        if (!Cancel && status != HTTP_ERROR)
+        {
 	  response = cupsGetResponse(http, resource);
-	  status   = http->status;
+	  status   = httpGetStatus(http);
 	}
-	else
-	  httpFlush(http);
 
 	if ((status == HTTP_ERROR && cupsLastError() != IPP_INTERNAL_ERROR) ||
 	    (status >= HTTP_BAD_REQUEST && status != HTTP_UNAUTHORIZED &&
@@ -2090,15 +2093,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  _cupsSetHTTPError(status);
 	  break;
-	}
-
-	if (http->state != HTTP_WAITING)
-	{
-	 /*
-	  * Flush any remaining data...
-	  */
-
-	  httpFlush(http);
 	}
       }
     }
