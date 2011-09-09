@@ -243,6 +243,7 @@ $MAN7EXT=@MAN7EXT@
 $MAN8EXT=@MAN8EXT@
 $MAN8DIR=@MAN8DIR@
 
+$LIBZ=@LIBZ@
 $DSOLIBS=@DSOLIBS@
 
 # Make sure the MD5 password file is now owned by CUPS_USER...
@@ -489,11 +490,7 @@ f 0444 root sys $DATADIR/banners/standard data/standard
 f 0444 root sys $DATADIR/banners/topsecret data/topsecret
 f 0444 root sys $DATADIR/banners/unclassified data/unclassified
 
-d 0755 root sys $DATADIR/charsets -
-f 0444 root sys $DATADIR/charsets/utf-8 data/utf-8
-
 d 0755 root sys $DATADIR/data -
-f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint data/testprint
 
 d 0755 root sys $DATADIR/drv -
@@ -501,9 +498,6 @@ f 0444 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
 
 d 0755 root sys $DATADIR/examples -
 f 0444 root sys $DATADIR/examples examples/*.drv
-
-d 0755 root sys $DATADIR/fonts -
-f 0444 root sys $DATADIR/fonts fonts/Monospace*
 
 d 0755 root sys $DATADIR/ipptool -
 f 0444 root sys $DATADIR/ipptool/create-printer-subscription.test test/create-printer-subscription.test
@@ -570,8 +564,9 @@ d 0755 root sys $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
-c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/ conf/*.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf conf/cupsd.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/snmp.conf conf/snmp.conf
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -
