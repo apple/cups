@@ -225,9 +225,7 @@ $XINETD=@XINETD@
 $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
-$IMGFILTERS=@IMGFILTERS@
 $MDNS=@MDNS@
-$PDFTOPS=@PDFTOPS@
 
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
@@ -582,10 +580,8 @@ f 0444 root sys $INCLUDEDIR/cups/array.h cups/array.h
 f 0444 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0444 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
 f 0444 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
-f 0444 root sys $INCLUDEDIR/cups/driver.h driver/driver.h
 f 0444 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
-f 0444 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0444 root sys $INCLUDEDIR/cups/mime.h scheduler/mime.h
 f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h
