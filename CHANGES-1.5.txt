@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- When possible, the IPP backend now stops sending job data early on a
+	  cancel.
 	- cupsSendRequest and cupsWriteRequestData did not properly read all
 	  HTTP headers, preventing authentication and encryption upgrades from
 	  working in all cases.
