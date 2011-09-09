@@ -1210,6 +1210,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\cups\ppd-cache.c"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\ppd.c"
 				>
 				<FileConfiguration
@@ -1246,15 +1250,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\cups\pwg-file.c"
-				>
-			</File>
-			<File
 				RelativePath="..\cups\pwg-media.c"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\pwg-ppd.c"
 				>
 			</File>
 			<File
@@ -1572,6 +1568,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\cups\ppd-private.h"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\ppd.h"
 				>
 			</File>
@@ -1584,7 +1584,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\cups\string.h"
+				RelativePath="..\cups\string-private.h"
 				>
 			</File>
 			<File

@@ -166,7 +166,7 @@ const char * const URIStatusStrings[] =	/* URI status strings */
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(_cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize) __attribute((nonnull(1,2,3)));
+		                 size_t dstsize) __attribute__((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(_cups_vars_t *vars, FILE *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src,
@@ -2091,14 +2091,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         {
 	  response = cupsGetResponse(http, resource);
 	  status   = httpGetStatus(http);
-	}
-
-	if ((status == HTTP_ERROR && cupsLastError() != IPP_INTERNAL_ERROR) ||
-	    (status >= HTTP_BAD_REQUEST && status != HTTP_UNAUTHORIZED &&
-	     status != HTTP_UPGRADE_REQUIRED))
-	{
-	  _cupsSetHTTPError(status);
-	  break;
 	}
       }
     }

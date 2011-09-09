@@ -4207,7 +4207,9 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!http->tls)
   {
+    _cupsSetHTTPError(HTTP_ERROR);
     return (-1);
+  }
 
   http->tls->sock = http->fd;
   dwSize          = sizeof(username) / sizeof(TCHAR);
@@ -4454,7 +4456,7 @@ http_write(http_t     *http,		/* I - Connection to server */
 	else if (nfds == 0 && !(*http->timeout_cb)(http, http->timeout_data))
 	{
 #ifdef WIN32
-	  http->error = ESAEWOULDBLOCK;
+	  http->error = WSAEWOULDBLOCK;
 #else
 	  http->error = EWOULDBLOCK;
 #endif /* WIN32 */

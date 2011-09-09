@@ -664,14 +664,14 @@ cupsRasterWriteHeader2(
     fh.cupsInteger[0]        = htonl(r->header.cupsInteger[0]);
     fh.cupsInteger[1]        = htonl(r->header.cupsInteger[1]);
     fh.cupsInteger[2]        = htonl(r->header.cupsInteger[2]);
-    fh.cupsInteger[3]        = htonl(r->header.cupsImagingBBox[0] *
-                                     r->header.HWResolution[0]);
-    fh.cupsInteger[4]        = htonl(r->header.cupsImagingBBox[1] *
-                                     r->header.HWResolution[1]);
-    fh.cupsInteger[5]        = htonl(r->header.cupsImagingBBox[2] *
-                                     r->header.HWResolution[0]);
-    fh.cupsInteger[6]        = htonl(r->header.cupsImagingBBox[3] *
-                                     r->header.HWResolution[1]);
+    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] *
+                                                r->header.HWResolution[0]));
+    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] *
+                                                r->header.HWResolution[1]));
+    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] *
+                                                r->header.HWResolution[0]));
+    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] *
+                                                r->header.HWResolution[1]));
     fh.cupsInteger[7]        = htonl(0xffffff);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
@@ -937,7 +937,7 @@ cups_raster_read_header(
  */
 
 static int				/* O - Bytes read or -1 */
-cups_raster_io(cups_raster_t *r,		/* I - Raster stream */
+cups_raster_io(cups_raster_t *r,	/* I - Raster stream */
            unsigned char *buf,		/* I - Buffer for read/write */
            int           bytes)		/* I - Number of bytes to read/write */
 {
@@ -947,7 +947,7 @@ cups_raster_io(cups_raster_t *r,		/* I - Raster stream */
 
   DEBUG_printf(("4cups_raster_io(r=%p, buf=%p, bytes=%d)", r, buf, bytes));
 
-  for (total = 0; total < bytes; total += count, buf += count)
+  for (total = 0; total < (size_t)bytes; total += count, buf += count)
   {
     count = (*r->iocb)(r->ctx, buf, bytes - total);
 

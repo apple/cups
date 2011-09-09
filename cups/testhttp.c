@@ -542,7 +542,7 @@ main(int  argc,				/* I - Number of command-line arguments */
                     hostname, sizeof(hostname), &port,
 		    resource, sizeof(resource));
 
-    if (!strcasecmp(scheme, "https") || !strcasecmp(scheme, "ipps") ||
+    if (!_cups_strcasecmp(scheme, "https") || !_cups_strcasecmp(scheme, "ipps") ||
         port == 443)
       encryption = HTTP_ENCRYPT_ALWAYS;
     else

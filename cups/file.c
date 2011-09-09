@@ -80,6 +80,7 @@ static ssize_t	cups_read(cups_file_t *fp, char *buf, size_t bytes);
 static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
 
 
+#ifndef WIN32
 /*
  * '_cupsFileCheck()' - Check the permissions of the given filename.
  */
@@ -345,6 +346,7 @@ _cupsFileCheckFilter(
 
   fprintf(stderr, "%s: %s\n", prefix, message);
 }
+#endif /* !WIN32 */
 
 
 /*
