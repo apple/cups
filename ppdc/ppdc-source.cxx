@@ -20,7 +20,7 @@
 //   ppdcSource::find_driver()        - Find a driver.
 //   ppdcSource::find_include()       - Find an include file.
 //   ppdcSource::find_po()            - Find a message catalog for the given
-//                                      locale...
+//                                      locale.
 //   ppdcSource::find_size()          - Find a media size.
 //   ppdcSource::find_variable()      - Find a variable.
 //   ppdcSource::get_attr()           - Get an attribute.
@@ -275,7 +275,7 @@ ppdcSource::find_include(
 
 
 //
-// 'ppdcSource::find_po()' - Find a message catalog for the given locale...
+// 'ppdcSource::find_po()' - Find a message catalog for the given locale.
 //
 
 ppdcCatalog *				// O - Message catalog or NULL
@@ -2273,6 +2273,8 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
       }
       else if (*format == 'h' || *format == 'l' || *format == 'L')
         size = *format++;
+      else
+        size = '\0';
 
       if (!*format)
         break;
