@@ -14,18 +14,22 @@
 #
 # Usage:
 #
-#   ./ipptool -f filename -t printer-uri ipp-1.1.test
+#   ./ipptool -f filename [-d document-uri=SOMEURI] -t printer-uri ipp-1.1.test
 #
 
-# Regular expression for IPP URI schemes
-# Matches strings beginning with ipp:// or ipps://
+# Regular expressions for URI schemes:
+#
+#   HTTP_URI_SCHEME - Matches strings beginning with http:// or https://
+#   IPP_URI_SCHEME  - Matches strings beginning with ipp:// or ipps://
+
+DEFINE HTTP_URI_SCHEME "/^https?://.+$$/"
 DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 # Test that a request-id value of 0 is not accepted.
 #
 # Required by: RFC 2911 section 3.1.1
 {
-	NAME "3.1.1: Bad request-id value 0"
+	NAME "RFC 2911 section 3.1.1: Bad request-id value 0"
 	REQUEST-ID 0
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -43,7 +47,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.1.4
 {
-	NAME "3.1.4: No Operation Attributes"
+	NAME "RFC 2911 section 3.1.4: No Operation Attributes"
 	REQUEST-ID random
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -52,7 +56,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "3.1.4: attributes-charset"
+	NAME "RFC 2911 section 3.1.4: attributes-charset"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -62,7 +66,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "3.1.4: attributes-natural-language"
+	NAME "RFC 2911 section 3.1.4: attributes-natural-language"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR naturalLanguage attributes-natural-language en
@@ -72,7 +76,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "3.1.4: attributes-natural-language + attributes-charset"
+	NAME "RFC 2911 section 3.1.4: attributes-natural-language + attributes-charset"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR naturalLanguage attributes-natural-language en
@@ -83,7 +87,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT !printer-uri-supported
 }
 {
-	NAME "3.1.4: attributes-charset + attributes-natural-language"
+	NAME "RFC 2911 section 3.1.4: attributes-charset + attributes-natural-language"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -100,7 +104,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 # Required by: RFC 2911 section 3.1.8
 {
 	# The name of the test...
-	NAME "3.1.8: Unsupported IPP version 0.0"
+	NAME "RFC 2911 section 3.1.8: Unsupported IPP version 0.0"
 	VERSION 0.0
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
@@ -117,7 +121,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2
 {
-	NAME "3.2: No printer-uri operation attribute"
+	NAME "RFC 2911 section 3.2: No printer-uri operation attribute"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -132,7 +136,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.1
 {
-	NAME "3.2.1: Print-Job Operation"
+	NAME "RFC 2911 section 3.2.1: Print-Job Operation"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -143,11 +147,13 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name $filename
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format application/octet-stream
+	ATTR mimeMediaType document-format $filetype
 	FILE $filename
 
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
@@ -159,18 +165,39 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	       IN-GROUP job-attributes-tag WITH-VALUE >-1
 }
 
+# Test Validate-Job operation
+#
+# Required by: RFC 2911 section 3.2.3
+{
+	NAME "RFC 2911 section 3.2.3: Validate-Job Operation"
+	OPERATION Validate-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+
+	STATUS successful-ok
+}
+
+
 # Test Get-Printer-Attributes operation
 #
 # Required by: RFC 2911 section 3.2.5
 {
-	NAME "3.2.5: Get-Printer-Attributes Operation (default)"
+	NAME "RFC 2911 section 3.2.5: Get-Printer-Attributes Operation (default)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR mimeMediaType document-format application/octet-stream
+	ATTR mimeMediaType document-format $filetype
 
 	STATUS successful-ok
 
@@ -217,8 +244,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?printer-location OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT ?printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT ?printer-message-from-operator OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
-	EXPECT ?printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT ?printer-more-info-manufacturer OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
+	EXPECT ?printer-more-info-manufacturer OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT ?printer-state-message OF-TYPE text IN-GROUP printer-attributes-tag
 	EXPECT ?reference-uri-schemes-supported OF-TYPE uriScheme IN-GROUP printer-attributes-tag
 	EXPECT charset-configured OF-TYPE charset IN-GROUP printer-attributes-tag COUNT 1
@@ -230,11 +257,21 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE 1.1
 	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0002 # Print-Job
+	EXPECT operations-supported WITH-VALUE 0x0003 DEFINE-MATCH HAVE_PRINT_URI # Print-URI
 	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
+	EXPECT operations-supported WITH-VALUE 0x0005 DEFINE-MATCH HAVE_CREATE_JOB # Create-Job
+	EXPECT operations-supported WITH-VALUE 0x0006 DEFINE-MATCH HAVE_SEND_DOCUMENT # Send-Document
+	EXPECT operations-supported WITH-VALUE 0x0007 DEFINE-MATCH HAVE_SEND_URI # Send-URI
 	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
 	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
 	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
 	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
+	EXPECT operations-supported WITH-VALUE 0x000c DEFINE-MATCH HAVE_HOLD_JOB # Hold-Job
+	EXPECT operations-supported WITH-VALUE 0x000d DEFINE-MATCH HAVE_RELEASE_JOB # Release-Job
+	EXPECT operations-supported WITH-VALUE 0x000e DEFINE-MATCH HAVE_RESTART_JOB # Restart-Job
+	EXPECT operations-supported WITH-VALUE 0x0010 DEFINE-MATCH HAVE_PAUSE_PRINTER # Pause-Printer
+	EXPECT operations-supported WITH-VALUE 0x0011 DEFINE-MATCH HAVE_RESUME_PRINTER # Resume-Printer
+	EXPECT operations-supported WITH-VALUE 0x0012 DEFINE-MATCH HAVE_PURGE_JOBS # Purge-Jobs
 	EXPECT pdl-override-supported OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{1,127}$$/"
@@ -252,14 +289,14 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.5
 {
-	NAME "3.2.5: Get-Printer-Attributes Operation (requested-attributes)"
+	NAME "RFC 2911 section 3.2.5: Get-Printer-Attributes Operation (requested-attributes)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR mimeMediaType document-format application/octet-stream
+	ATTR mimeMediaType document-format $filetype
 	ATTR keyword requested-attributes printer-uri-supported
 
 	STATUS successful-ok
@@ -273,7 +310,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.6
 {
-	NAME "3.2.6: Get-Jobs Operation (default)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (default)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -330,7 +367,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.6
 {
-	NAME "3.2.6: Get-Jobs Operation (requested-attributes)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (requested-attributes)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -342,8 +379,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
-	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
@@ -388,7 +425,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.6
 {
-	NAME "3.2.6: Get-Jobs Operation (my-jobs)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (my-jobs)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -450,7 +487,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	# use the authenticated username over the requesting-user-name value.
 	SKIP-IF-DEFINED uriuser
 
-	NAME "3.2.6: Get-Jobs Operation (my-jobs different user)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (my-jobs different user)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -508,7 +545,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.6
 {
-	NAME "3.2.6: Get-Jobs Operation (which-jobs=not-completed)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (which-jobs=not-completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -567,7 +604,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.6
 {
-	NAME "3.2.6: Get-Jobs Operation (which-jobs=completed)"
+	NAME "RFC 2911 section 3.2.6: Get-Jobs Operation (which-jobs=completed)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -626,7 +663,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.3.3
 {
-	NAME "3.3.3: Cancel-Job Operation (completed job)"
+	NAME "RFC 2911 section 3.3.3: Cancel-Job Operation (completed job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -643,7 +680,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.2.1
 {
-	NAME "3.2.1: Print-Job Operation"
+	NAME "RFC 2911 section 3.2.1: Print-Job Operation"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -654,11 +691,13 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name $filename
 	ATTR keyword compression none
-	ATTR mimeMediaType document-format application/octet-stream
+	ATTR mimeMediaType document-format $filetype
 	FILE $filename
 
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
@@ -675,7 +714,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.3.3
 {
-	NAME "3.3.3: Cancel-Job Operation (pending/processing job)"
+	NAME "RFC 2911 section 3.3.3: Cancel-Job Operation (pending/processing job)"
 	OPERATION Cancel-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -693,7 +732,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 #
 # Required by: RFC 2911 section 3.3.4
 {
-	NAME "3.3.4: Get-Job-Attributes Operation"
+	NAME "RFC 2911 section 3.3.4: Get-Job-Attributes Operation"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -705,8 +744,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
-	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
@@ -744,6 +783,322 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+}
+
+
+# Test Print-URI operation
+#
+# Defined by: RFC 2911 section 3.2.2
+{
+	SKIP-IF-NOT-DEFINED HAVE_PRINT_URI
+	SKIP-IF-NOT-DEFINED document-uri
+
+	NAME "RFC 2911 section 3.2.2: Print-URI Operation"
+	OPERATION Print-URI
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	ATTR uri document-uri $document-uri
+
+	STATUS successful-ok
+	STATUS client-error-document-access-error
+	STATUS client-error-document-format-not-supported
+	STATUS client-error-uri-scheme-not-supported
+	STATUS server-error-job-canceled
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+
+# Test Print-URI operation with bad document-uri
+#
+# Defined by: RFC 2911 section 3.2.2
+{
+	SKIP-IF-NOT-DEFINED HAVE_PRINT_URI
+
+	NAME "Print-URI with bad URI: Print-URI Operation"
+	OPERATION Print-URI
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	ATTR uri document-uri "bogus://bogus"
+
+	STATUS client-error-uri-scheme-not-supported
+
+	EXPECT !job-uri
+	EXPECT !job-id
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+}
+
+
+# Test Create-Job and Send-Document operations
+#
+# Defined by: RFC 2911 section 3.2.4 and 3.3.1
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "RFC 2911 section 3.2.4: Create-Job Operation"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "RFC 2911 section 3.3.1: Send-Document Operation"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	STATUS server-error-job-canceled
+}
+
+# Test Create-Job and Send-Document operations (no last-document)
+#
+# Defined by: RFC 2911 section 3.2.4 and 3.3.1
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "Send-Document missing last-document: Create-Job Operation"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "Send-Document missing last-document: Send-Document Operation"
+	OPERATION Send-Document
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	FILE $filename
+
+	STATUS client-error-bad-request
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "RFC 2911 section 3.3.3: Cancel-Job Operation"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+}
+
+# Test Create-Job and Send-URI operations
+#
+# Defined by: RFC 2911 section 3.2.4 and 3.3.2
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_URI
+	SKIP-IF-NOT-DEFINED document-uri
+
+	NAME "RFC 2911 section 3.2.4: Create-Job Operation"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+	SKIP-IF-NOT-DEFINED document-uri
+
+	NAME "RFC 2911 section 3.3.2: Send-URI Operation"
+	OPERATION Send-URI
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	ATTR uri document-uri $document-uri
+
+	STATUS successful-ok
+	STATUS client-error-document-access-error
+	STATUS client-error-document-format-not-supported
+	STATUS client-error-uri-scheme-not-supported
+	STATUS server-error-job-canceled
+}
+
+
+# Test Create-Job and Send-URI operations (bad URI)
+#
+# Defined by: RFC 2911 section 3.2.4 and 3.3.2
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_URI
+
+	NAME "Send-URI with bad URI: Create-Job Operation"
+	OPERATION Create-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+
+	STATUS successful-ok
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "Send-URI with bad URI: Send-URI Operation (bad URI)"
+	OPERATION Send-URI
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+	ATTR boolean last-document true
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	ATTR uri document-uri "bogus://bogus"
+
+	STATUS client-error-uri-scheme-not-supported
+}
+
+{
+	SKIP-IF-NOT-DEFINED HAVE_CREATE_JOB
+	SKIP-IF-NOT-DEFINED HAVE_SEND_DOCUMENT
+
+	NAME "Send-URI with bad URI: Cancel-Job Operation"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
 }
 
 

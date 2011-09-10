@@ -217,7 +217,8 @@ main(int  argc,				/* I - Number of command-line args */
 			filename[1024],	/* Real filename */
 			testname[1024],	/* Real test filename */
 			uri[1024];	/* Copy of printer URI */
-  const char		*testfile;	/* Test file to use */
+  const char		*ext,		/* Extension on filename */
+			*testfile;	/* Test file to use */
   int			interval,	/* Test interval in microseconds */
 			repeat;		/* Repeat count */
   _cups_vars_t		vars;		/* Variables */
@@ -401,6 +402,43 @@ main(int  argc,				/* I - Number of command-line args */
               }
               else
 		vars.filename = argv[i];
+
+              if ((ext = strrchr(vars.filename, '.')) != NULL)
+              {
+               /*
+                * Guess the MIME media type based on the extension...
+                */
+
+                if (!_cups_strcasecmp(ext, ".gif"))
+                  set_variable(&vars, "filetype", "image/gif");
+                else if (!_cups_strcasecmp(ext, ".htm") ||
+                         !_cups_strcasecmp(ext, ".html"))
+                  set_variable(&vars, "filetype", "text/html");
+                else if (!_cups_strcasecmp(ext, ".jpg"))
+                  set_variable(&vars, "filetype", "image/jpeg");
+                else if (!_cups_strcasecmp(ext, ".pdf"))
+                  set_variable(&vars, "filetype", "application/pdf");
+                else if (!_cups_strcasecmp(ext, ".png"))
+                  set_variable(&vars, "filetype", "image/png");
+                else if (!_cups_strcasecmp(ext, ".ps"))
+                  set_variable(&vars, "filetype", "application/postscript");
+                else if (!_cups_strcasecmp(ext, ".ras"))
+                  set_variable(&vars, "filetype", "image/pwg-raster");
+                else if (!_cups_strcasecmp(ext, ".txt"))
+                  set_variable(&vars, "filetype", "text/plain");
+                else if (!_cups_strcasecmp(ext, ".xps"))
+                  set_variable(&vars, "filetype", "application/openxps");
+                else
+		  set_variable(&vars, "filetype", "application/octet-stream");
+              }
+              else
+              {
+               /*
+                * Use the "auto-type" MIME media type...
+                */
+
+		set_variable(&vars, "filetype", "application/octet-stream");
+              }
 	      break;
 
           case 'i' : /* Test every N seconds */
@@ -2092,6 +2130,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  response = cupsGetResponse(http, resource);
 	  status   = httpGetStatus(http);
 	}
+
+	if (!Cancel && status == HTTP_ERROR)
+	  httpReconnect(http);
       }
     }
 
