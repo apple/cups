@@ -4966,9 +4966,7 @@ valid_doc_attributes(
 
     if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD ||
         strcmp(attr->values[0].string.text, "none"))
-    {
       respond_unsupported(client, attr);
-    }
     else
       fprintf(stderr, "%s %s compression=\"%s\"\n",
               client->http.hostname,
@@ -4984,9 +4982,7 @@ valid_doc_attributes(
                                IPP_TAG_ZERO)) != NULL)
   {
     if (attr->num_values != 1 || attr->value_tag != IPP_TAG_MIMETYPE)
-    {
       respond_unsupported(client, attr);
-    }
     else
     {
       format = attr->values[0].string.text;
@@ -5001,7 +4997,7 @@ valid_doc_attributes(
 
   if (!strcmp(format, "application/octet-stream") &&
       (client->request->request.op.operation_id == IPP_PRINT_JOB ||
-       client->request->request.op.operation_id != IPP_SEND_DOCUMENT))
+       client->request->request.op.operation_id == IPP_SEND_DOCUMENT))
   {
    /*
     * Auto-type the file using the first 4 bytes of the file...
@@ -5028,8 +5024,8 @@ valid_doc_attributes(
 	      ippOpString(client->request->request.op.operation_id), format);
 
     if (!attr)
-      ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
-                   "document-format", NULL, format);
+      attr = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+                          "document-format", NULL, format);
     else
     {
       _cupsStrFree(attr->values[0].string.text);
@@ -5037,7 +5033,8 @@ valid_doc_attributes(
     }
   }
 
-  if ((supported = ippFindAttribute(client->printer->attrs,
+  if (client->request->request.op.operation_id != IPP_CREATE_JOB &&
+      (supported = ippFindAttribute(client->printer->attrs,
                                     "document-format-supported",
 			            IPP_TAG_MIMETYPE)) != NULL)
   {
@@ -5045,10 +5042,8 @@ valid_doc_attributes(
       if (!_cups_strcasecmp(format, supported->values[i].string.text))
 	break;
 
-    if (i >= supported->num_values)
-    {
+    if (i >= supported->num_values && attr)
       respond_unsupported(client, attr);
-    }
   }
 
   return (!client->response->attrs ||
