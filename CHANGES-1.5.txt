@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- IPP messages containing mixed integer/rangeOfInteger values did not
+	  work (STR #3942)
 	- The ipptool program now provides additional diagnostics for badly-
 	  formatted responses (STR #3857)
 	- When possible, the IPP backend now stops sending job data early on a

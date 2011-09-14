@@ -1297,6 +1297,48 @@ ippReadIO(void       *src,		/* I - Data source */
 	        return (IPP_ERROR);
 	      }
             }
+	    else if (value_tag == IPP_TAG_INTEGER ||
+	             value_tag == IPP_TAG_RANGE)
+            {
+	     /*
+	      * Integer and rangeOfInteger values can sometimes be mixed; accept
+	      * sets of differing values...
+	      */
+
+	      if (tag != IPP_TAG_INTEGER && tag != IPP_TAG_RANGE)
+	      {
+		_cupsSetError(IPP_ERROR,
+		              _("IPP 1setOf attribute with incompatible value "
+		                "tags."), 1);
+		DEBUG_printf(("1ippReadIO: 1setOf value tag %x(%s) != %x(%s)",
+			      value_tag, ippTagString(value_tag), tag,
+			      ippTagString(tag)));
+		ipp_buffer_release(buffer);
+	        return (IPP_ERROR);
+	      }
+
+              if (value_tag == IPP_TAG_INTEGER && tag == IPP_TAG_RANGE)
+              {
+               /*
+                * Convert integer values to rangeOfInteger values...
+                */
+
+		int i;			/* Looping var */
+
+		DEBUG_printf(("1ippReadIO: Converting %s attribute to "
+		              "rangeOfInteger.", attr->name));
+
+		attr->value_tag = IPP_TAG_RANGE;
+
+                for (i = attr->num_values, value = attr->values;
+                     i > 0;
+                     i --, value ++)
+                {
+                  n                  = value->integer;
+                  value->range.lower = value->range.upper = n;
+                }
+              }
+            }
 	    else if (value_tag != tag)
 	    {
 	      _cupsSetError(IPP_ERROR,
@@ -1465,7 +1507,10 @@ ippReadIO(void       *src,		/* I - Data source */
 		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
 		    buffer[3];
 
-                value->integer = n;
+                if (value_tag == IPP_TAG_RANGE)
+                  value->range.lower = value->range.upper = n;
+                else
+		  value->integer = n;
 	        break;
 
 	    case IPP_TAG_BOOLEAN :
