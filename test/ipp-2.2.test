@@ -23,9 +23,9 @@ INCLUDE "ipp-2.1.test"
 
 # Test required printer description attribute support.
 #
-# Required by: PWG 5100.12 section 6.3
+# Required by: PWG 5100.12 section 6.4
 {
-	NAME "PWG 5100.12 section 6.3 - Required Printer Description Attributes"
+	NAME "PWG 5100.12 section 6.4 - Required Printer Description Attributes"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -37,56 +37,45 @@ INCLUDE "ipp-2.1.test"
 	STATUS successful-ok
 
 	# Job template attributes
-	EXPECT job-hold-until-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT job-hold-until-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-VALUE no-hold
-	EXPECT job-priority-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0,<101
-	EXPECT job-priority-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0,<101
-	EXPECT job-settable-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT job-sheets-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag
-	EXPECT job-sheets-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-VALUE none
-	EXPECT media-col-default OF-TYPE collection IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT media-col-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT media-col-supported WITH-VALUE media-size
-	EXPECT media-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT media-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
-
-	# Subscription attributes
-	EXPECT notify-events-default OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT notify-events-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT notify-lease-duration-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT notify-lease-duration-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag
-	EXPECT notify-max-events-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >1
-	EXPECT notify-pull-method-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE ippget
+	EXPECT number-up-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT number-up-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag WITH-VALUE >0
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-numbers"
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "pages"
+	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
 
 	# Printer description attributes
-	EXPECT ippget-event-life OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT multiple-operation-time-out OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+	EXPECT printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
+	EXPECT printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
+	EXPECT printer-device-id OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-message-from-operator OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "completed"
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "proof-print"
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "not-completed"
 
-	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
-	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
-	EXPECT operations-supported WITH-VALUE 0x000C # Hold-Job
-	EXPECT operations-supported WITH-VALUE 0x000D # Release-Job
-	EXPECT operations-supported WITH-VALUE 0x000E # Restart-Job
-	EXPECT operations-supported WITH-VALUE 0x0010 # Pause-Printer
-	EXPECT operations-supported WITH-VALUE 0x0011 # Resume-Printer
-	EXPECT operations-supported WITH-VALUE 0x0012 # Purge-Jobs
-	EXPECT operations-supported WITH-VALUE 0x0013 # Set-Printer-Attributes
-	EXPECT operations-supported WITH-VALUE 0x0014 # Set-Job-Attributes
-	EXPECT operations-supported WITH-VALUE 0x0015 # Get-Printer-Supported-Values
-	EXPECT operations-supported WITH-VALUE 0x0016 # Create-Printer-Subscriptions
-	EXPECT operations-supported WITH-VALUE 0x0018 # Get-Subscription-Attributes
-	EXPECT operations-supported WITH-VALUE 0x0019 # Get-Subscriptions
-	EXPECT operations-supported WITH-VALUE 0x001A # Renew-Subscription
-	EXPECT operations-supported WITH-VALUE 0x001B # Cancel-Subscription
-	EXPECT operations-supported WITH-VALUE 0x001C # Get-Notifications
-	EXPECT operations-supported WITH-VALUE 0x0022 # Enable-Printer
-	EXPECT operations-supported WITH-VALUE 0x0023 # Disable-Printer
-
-	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
-	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
-	EXPECT printer-settable-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
+	# Operations
+	EXPECT operations-supported WITH-VALUE 0x0024 # Pause-Printer-After-Current-Job
+	EXPECT operations-supported WITH-VALUE 0x0025 # Hold-New-Jobs
+	EXPECT operations-supported WITH-VALUE 0x0026 # Release-Held-New-Jobs
+	EXPECT operations-supported WITH-VALUE 0x0029 # Restart-Printer
+	EXPECT operations-supported WITH-VALUE 0x002A # Shutdown-Printer
+	EXPECT operations-supported WITH-VALUE 0x002B # Startup-Printer
+	EXPECT operations-supported WITH-VALUE 0x002C # Reprocess-Job
+	EXPECT operations-supported WITH-VALUE 0x002D # Cancel-Current-Job
+	EXPECT operations-supported WITH-VALUE 0x002E # Suspend-Current-Job
+	EXPECT operations-supported WITH-VALUE 0x002F # Resume-Job
+	EXPECT operations-supported WITH-VALUE 0x0030 # Promote-Job
+	EXPECT operations-supported WITH-VALUE 0x0031 # Schedule-Job-After
+	EXPECT operations-supported WITH-VALUE 0x0033 # Cancel-Document
+	EXPECT operations-supported WITH-VALUE 0x0034 # Get-Document-Attributes
+	EXPECT operations-supported WITH-VALUE 0x0035 # Get-Documents
+	EXPECT operations-supported WITH-VALUE 0x0037 # Set-Document-Attributes
+	EXPECT operations-supported WITH-VALUE 0x0038 # Cancel-Jobs
+	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
+	EXPECT operations-supported WITH-VALUE 0x003A # Resubmit-Job
+	EXPECT operations-supported WITH-VALUE 0x003B # Close-Job
 }
 
 

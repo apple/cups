@@ -1971,9 +1971,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Fill in the response info...
   */
 
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   LocalPort, job->id);
-
+  httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+                   con->servername, con->serverport, "/jobs/%d", job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -5027,8 +5026,8 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
   * Fill in the response info...
   */
 
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   LocalPort, job->id);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+                   con->servername, con->serverport, "/jobs/%d", job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -10586,6 +10585,14 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   * Do we have a file to print?
   */
 
+  if ((attr = ippFindAttribute(con->request, "last-document",
+	                       IPP_TAG_BOOLEAN)) == NULL)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("Missing last-document attribute in request."));
+    return;
+  }
+
   if (!con->filename)
   {
    /*
@@ -10593,10 +10600,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * used to close an "open" job by RFC 2911, section 3.3.2.
     */
 
-    if (job->num_files > 0 &&
-        (attr = ippFindAttribute(con->request, "last-document",
-	                         IPP_TAG_BOOLEAN)) != NULL &&
-        attr->values[0].boolean)
+    if (job->num_files > 0 && attr->values[0].boolean)
       goto last_document;
 
     send_ipp_status(con, IPP_BAD_REQUEST, _("No file in print request."));
@@ -10814,9 +10818,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   * Fill in the response info...
   */
 
-  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
-	   LocalPort, jobid);
-
+  httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
+                   con->servername, con->serverport, "/jobs/%d", jobid);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 

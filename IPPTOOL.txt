@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2011-05-20
+IPPTOOL.txt - 2011-09-14
 ------------------------
 
 
@@ -35,7 +35,7 @@ BASIC USAGE
 
         ipptool -c ipp://localhost/printers/myprinter get-jobs.test
 
-    which would produce something like this:
+    which will produce something like this:
 
 	job-id,job-state,job-name,job-originating-user-name
 	72,pending,testfile.pdf,msweet
@@ -46,12 +46,39 @@ BASIC USAGE
 
 CONFORMANCE TESTS
 
-    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, and IPP/2.1.
-    For a given printer URI, the following commands perform tests at each level:
+    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, IPP/2.1, and
+    IPP/2.2.  For a given printer URI, the following commands perform tests at
+    each level:
 
-        ipptool -t printer-uri ipp-1.1.test
-        ipptool -t -V 2.0 printer-uri ipp-2.0.test
-        ipptool -t -V 2.1 printer-uri ipp-2.1.test
+        ipptool -tf filename [options] printer-uri ipp-1.1.test
+        ipptool -tf filename [options] -V 2.0 printer-uri ipp-2.0.test
+        ipptool -tf filename [options] -V 2.1 printer-uri ipp-2.1.test
+        ipptool -tf filename [options] -V 2.2 printer-uri ipp-2.2.test
+
+    The filename must use a format supported by the printer; ipptool will guess
+    the MIME media type using the extension, otherwise application/octet stream
+    will be used.  The following standard test files are included:
+
+	color.jpg
+	document-a4.pdf
+	document-a4.ps
+	document-letter.pdf
+	document-letter.ps
+	gray.jpg
+	onepage-a4.pdf
+	onepage-a4.ps
+	onepage-letter.pdf
+	onepage-letter.ps
+
+    Print-by-reference (URL) printing can be tested by defining the document-uri
+    variable to a URL, for example:
+
+        ipptool -tf filename -d document-uri=your-url printer-uri ipp-1.1.test
+
+    The standard test files are available on cups.org under the "test"
+    directory, for example:
+
+	http://www.cups.org/test/document-a4.pdf
 
 
 READING THE DOCUMENTATION
