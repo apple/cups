@@ -117,7 +117,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     cupsFileClose(fp);
 
-    if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) != HTTP_OK)
+    if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) > IPP_OK_SUBST)
     {
       puts("Unable to finish document!");
       return (1);

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "11 May 2011" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "13 September 2011" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -266,6 +266,12 @@ Requires the EXPECT attribute to be in the specified group tag.
 OF-TYPE tag[,tag,...]
 Requires the EXPECT attribute to use the specified value tag(s).
 .TP 5
+REPEAT-MATCH
+.TP 5
+REPEAT-NO-MATCH
+Specifies that the current test should be repeated when the EXPECT condition
+matches or does not match.
+.TP 5
 SAME-COUNT-AS attribute-name
 Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
@@ -287,6 +293,12 @@ Makes the STATUS apply only if the specified variable is defined.
 .TP 5
 IF-NOT-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is not defined.
+.TP 5
+REPEAT-MATCH
+.TP 5
+REPEAT-NO-MATCH
+Specifies that the current test should be repeated when the response status-code
+matches or does not match the value specified by the STATUS directive.
 
 .SH OPERATION CODES
 Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from

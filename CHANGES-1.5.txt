@@ -4,6 +4,19 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- Fixed some IPP conformance issues in the scheduler.
+	- Added ipptool support for repeating requests.
+	- Added IPP/2.2 conformance tests and greatly improved the IPP/1.1
+	  conformance testing.
+	- IPP messages containing mixed integer/rangeOfInteger values did not
+	  work (STR #3942)
+	- The ipptool program now provides additional diagnostics for badly-
+	  formatted responses (STR #3857)
+	- When possible, the IPP backend now stops sending job data early on a
+	  cancel.
+	- cupsSendRequest and cupsWriteRequestData did not properly read all
+	  HTTP headers, preventing authentication and encryption upgrades from
+	  working in all cases.
 	- The client.conf Server directive is no longer supported on Mac OS X
 	  10.7 and later.
 	- The IPP backend sent the wrong margins in media-col.

@@ -496,8 +496,8 @@ cupsdCreateCommonData(void)
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "job-ids-supported", 1);
 
   /* job-k-octets-supported */
-  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "job-k-octets-supported", k_supported);
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "job-k-octets-supported", 0,
+              k_supported);
 
   /* job-priority-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,

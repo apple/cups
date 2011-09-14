@@ -298,7 +298,7 @@ gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(IMAGEOBJS) $(DSOLIBS) \
-		-L../cups $(LINKCUPS) -lm
+		-L../cups $(LINKCUPS)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -311,7 +311,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking 32-bit $@...
 	-mkdir 32bit
 	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(IMAGE32OBJS) $(DSOLIBS) \
-		-L../cups/32bit $(LINKCUPS) -lm
+		-L../cups/32bit $(LINKCUPS)
 
 
 #
@@ -322,7 +322,7 @@ libcupsimage.so.2 libcupsimage.sl.2:	$(IMAGEOBJS)
 	echo Linking 64-bit $@...
 	-mkdir 64bit
 	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(IMAGE64OBJS) $(DSOLIBS) \
-		-L../cups/64bit $(LINKCUPS) -lm
+		-L../cups/64bit $(LINKCUPS)
 
 
 #
@@ -335,7 +335,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) $(LIBCUPSIMAGEORDER)
 		-install_name $(libdir)/$@ \
 		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
-		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm
+		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS)
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib
 
@@ -347,7 +347,7 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) $(LIBCUPSIMAGEORDER)
 libcupsimage_s.a:	$(IMAGEOBJS) libcupsimage_s.exp
 	echo Linking $@...
 	$(DSO) $(DSOFLAGS) -Wl,-berok,-bexport:libcupsimage_s.exp \
-		-o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS) -lm
+		-o libcupsimage_s.o $(IMAGEOBJS) $(DSOLIBS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcupsimage_s.o
 
@@ -380,7 +380,7 @@ libcupsimage.a:	$(IMAGEOBJS)
 
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS) -lm
+	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS)
 
 
 #

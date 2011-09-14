@@ -225,9 +225,7 @@ $XINETD=@XINETD@
 $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
-$IMGFILTERS=@IMGFILTERS@
 $MDNS=@MDNS@
-$PDFTOPS=@PDFTOPS@
 
 $CUPS_USER=@CUPS_USER@
 $CUPS_GROUP=@CUPS_GROUP@
@@ -243,6 +241,7 @@ $MAN7EXT=@MAN7EXT@
 $MAN8EXT=@MAN8EXT@
 $MAN8DIR=@MAN8DIR@
 
+$LIBZ=@LIBZ@
 $DSOLIBS=@DSOLIBS@
 
 # Make sure the MD5 password file is now owned by CUPS_USER...
@@ -489,11 +488,7 @@ f 0444 root sys $DATADIR/banners/standard data/standard
 f 0444 root sys $DATADIR/banners/topsecret data/topsecret
 f 0444 root sys $DATADIR/banners/unclassified data/unclassified
 
-d 0755 root sys $DATADIR/charsets -
-f 0444 root sys $DATADIR/charsets/utf-8 data/utf-8
-
 d 0755 root sys $DATADIR/data -
-f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint data/testprint
 
 d 0755 root sys $DATADIR/drv -
@@ -501,9 +496,6 @@ f 0444 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
 
 d 0755 root sys $DATADIR/examples -
 f 0444 root sys $DATADIR/examples examples/*.drv
-
-d 0755 root sys $DATADIR/fonts -
-f 0444 root sys $DATADIR/fonts fonts/Monospace*
 
 d 0755 root sys $DATADIR/ipptool -
 f 0444 root sys $DATADIR/ipptool/create-printer-subscription.test test/create-printer-subscription.test
@@ -570,8 +562,9 @@ d 0755 root sys $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
-c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/ conf/*.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf conf/cupsd.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/snmp.conf conf/snmp.conf
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -
@@ -587,10 +580,8 @@ f 0444 root sys $INCLUDEDIR/cups/array.h cups/array.h
 f 0444 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0444 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
 f 0444 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
-f 0444 root sys $INCLUDEDIR/cups/driver.h driver/driver.h
 f 0444 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0444 root sys $INCLUDEDIR/cups/http.h cups/http.h
-f 0444 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0444 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0444 root sys $INCLUDEDIR/cups/mime.h scheduler/mime.h
 f 0444 root sys $INCLUDEDIR/cups/language.h cups/language.h

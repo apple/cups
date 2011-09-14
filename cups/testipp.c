@@ -3,7 +3,7 @@
  *
  *   IPP test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -39,147 +39,196 @@
 
 
 /*
+ * Local types...
+ */
+
+typedef struct _ippdata_t
+{
+  size_t	rpos,			/* Read position */
+		wused,			/* Bytes used */
+		wsize;			/* Max size of buffer */
+  ipp_uchar_t	*wbuffer;		/* Buffer */
+} _ippdata_t;
+
+
+/*
  * Local globals...
  */
 
-int		rpos;				/* Current position in buffer */
-ipp_uchar_t	wbuffer[8192];			/* Write buffer */
-int		wused;				/* Number of bytes in buffer */
-ipp_uchar_t	collection[] =			/* Collection buffer */
+ipp_uchar_t	collection[] =		/* Collection buffer */
 		{
-		  0x01, 0x01,			/* IPP version */
-		  0x00, 0x02,			/* Print-Job operation */
-		  0x00, 0x00, 0x00, 0x01,	/* Request ID */
+		  0x01, 0x01,		/* IPP version */
+		  0x00, 0x02,		/* Print-Job operation */
+		  0x00, 0x00, 0x00, 0x01,
+		  			/* Request ID */
 
 		  IPP_TAG_OPERATION,
 
 		  IPP_TAG_CHARSET,
-		  0x00, 0x12,			/* Name length + name */
+		  0x00, 0x12,		/* Name length + name */
 		  'a','t','t','r','i','b','u','t','e','s','-',
 		  'c','h','a','r','s','e','t',
-		  0x00, 0x05,			/* Value length + value */
+		  0x00, 0x05,		/* Value length + value */
 		  'u','t','f','-','8',
 
 		  IPP_TAG_LANGUAGE,
-		  0x00, 0x1b,			/* Name length + name */
+		  0x00, 0x1b,		/* Name length + name */
 		  'a','t','t','r','i','b','u','t','e','s','-',
 		  'n','a','t','u','r','a','l','-','l','a','n',
 		  'g','u','a','g','e',
-		  0x00, 0x02,			/* Value length + value */
+		  0x00, 0x02,		/* Value length + value */
 		  'e','n',
 
 		  IPP_TAG_URI,
-		  0x00, 0x0b,			/* Name length + name */
+		  0x00, 0x0b,		/* Name length + name */
 		  'p','r','i','n','t','e','r','-','u','r','i',
 		  0x00, 0x1c,			/* Value length + value */
 		  'i','p','p',':','/','/','l','o','c','a','l',
 		  'h','o','s','t','/','p','r','i','n','t','e',
 		  'r','s','/','f','o','o',
 
-		  IPP_TAG_JOB,			/* job group tag */
+		  IPP_TAG_JOB,		/* job group tag */
 
-		  IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
-		  0x00, 0x09,			/* Name length + name */
+		  IPP_TAG_BEGIN_COLLECTION,
+		  			/* begCollection tag */
+		  0x00, 0x09,		/* Name length + name */
 		  'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l',
-		  0x00, 0x00,			/* No value */
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0a,			/* Value length + value */
+		  0x00, 0x00,		/* No value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
-		    IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
-		    0x00, 0x00,			/* Name length + name */
-		    0x00, 0x00,			/* No value */
-		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x0b,		/* Value length + value */
+		    IPP_TAG_BEGIN_COLLECTION,
+		    			/* begCollection tag */
+		    0x00, 0x00,		/* Name length + name */
+		    0x00, 0x00,		/* No value */
+		      IPP_TAG_MEMBERNAME,
+		      			/* memberAttrName tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
-		      IPP_TAG_INTEGER,		/* integer tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x04,		/* Value length + value */
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x54, 0x56,
-		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x0b,		/* Value length + value */
+		      IPP_TAG_MEMBERNAME,
+		      			/* memberAttrName tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
-		      IPP_TAG_INTEGER,		/* integer tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x04,		/* Value length + value */
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x6d, 0x24,
-		    IPP_TAG_END_COLLECTION,	/* endCollection tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x00,			/* No value */
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0b,			/* Value length + value */
+		    IPP_TAG_END_COLLECTION,
+		    			/* endCollection tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x00,		/* No value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0b,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l', 'o', 'r',
-		    IPP_TAG_KEYWORD,		/* keyword tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x04,			/* Value length + value */
+		    IPP_TAG_KEYWORD,	/* keyword tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x04,		/* Value length + value */
 		    'b', 'l', 'u', 'e',
 
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0a,			/* Value length + value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 't', 'y', 'p', 'e',
-		    IPP_TAG_KEYWORD,		/* keyword tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x05,			/* Value length + value */
+		    IPP_TAG_KEYWORD,	/* keyword tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x05,		/* Value length + value */
 		    'p', 'l', 'a', 'i', 'n',
-		  IPP_TAG_END_COLLECTION,	/* endCollection tag */
-		  0x00, 0x00,			/* No name */
-		  0x00, 0x00,			/* No value */
+		  IPP_TAG_END_COLLECTION,
+		  			/* endCollection tag */
+		  0x00, 0x00,		/* No name */
+		  0x00, 0x00,		/* No value */
 
-		  IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
-		  0x00, 0x00,			/* No name */
-		  0x00, 0x00,			/* No value */
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0a,			/* Value length + value */
+		  IPP_TAG_BEGIN_COLLECTION,
+		  			/* begCollection tag */
+		  0x00, 0x00,		/* No name */
+		  0x00, 0x00,		/* No value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
-		    IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
-		    0x00, 0x00,			/* Name length + name */
-		    0x00, 0x00,			/* No value */
-		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x0b,		/* Value length + value */
+		    IPP_TAG_BEGIN_COLLECTION,
+		    			/* begCollection tag */
+		    0x00, 0x00,		/* Name length + name */
+		    0x00, 0x00,		/* No value */
+		      IPP_TAG_MEMBERNAME,
+		      			/* memberAttrName tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x0b,	/* Value length + value */
 		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
-		      IPP_TAG_INTEGER,		/* integer tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x04,		/* Value length + value */
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x52, 0x08,
-		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x0b,		/* Value length + value */
+		      IPP_TAG_MEMBERNAME,
+		      			/* memberAttrName tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x0b,	/* Value length + value */
 		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
-		      IPP_TAG_INTEGER,		/* integer tag */
-		      0x00, 0x00,		/* No name */
-		      0x00, 0x04,		/* Value length + value */
+		      IPP_TAG_INTEGER,	/* integer tag */
+		      0x00, 0x00,	/* No name */
+		      0x00, 0x04,	/* Value length + value */
 		      0x00, 0x00, 0x74, 0x04,
-		    IPP_TAG_END_COLLECTION,	/* endCollection tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x00,			/* No value */
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0b,			/* Value length + value */
+		    IPP_TAG_END_COLLECTION,
+		    			/* endCollection tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x00,		/* No value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0b,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l', 'o', 'r',
-		    IPP_TAG_KEYWORD,		/* keyword tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x05,			/* Value length + value */
+		    IPP_TAG_KEYWORD,	/* keyword tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x05,		/* Value length + value */
 		    'p', 'l', 'a', 'i', 'd',
 
-		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x0a,			/* Value length + value */
+		    IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x0a,		/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 't', 'y', 'p', 'e',
-		    IPP_TAG_KEYWORD,		/* keyword tag */
-		    0x00, 0x00,			/* No name */
-		    0x00, 0x06,			/* Value length + value */
+		    IPP_TAG_KEYWORD,	/* keyword tag */
+		    0x00, 0x00,		/* No name */
+		    0x00, 0x06,		/* Value length + value */
 		    'g', 'l', 'o', 's', 's', 'y',
-		  IPP_TAG_END_COLLECTION,	/* endCollection tag */
-		  0x00, 0x00,			/* No name */
-		  0x00, 0x00,			/* No value */
+		  IPP_TAG_END_COLLECTION,
+		  			/* endCollection tag */
+		  0x00, 0x00,		/* No name */
+		  0x00, 0x00,		/* No value */
 
-		  IPP_TAG_END			/* end tag */
+		  IPP_TAG_END		/* end tag */
+		};
+
+ipp_uchar_t	mixed[] =		/* Mixed value buffer */
+		{
+		  0x01, 0x01,		/* IPP version */
+		  0x00, 0x02,		/* Print-Job operation */
+		  0x00, 0x00, 0x00, 0x01,
+		  			/* Request ID */
+
+		  IPP_TAG_OPERATION,
+
+		  IPP_TAG_INTEGER,	/* integer tag */
+		  0x00, 0x1f,		/* Name length + name */
+		  'n', 'o', 't', 'i', 'f', 'y', '-', 'l', 'e', 'a', 's', 'e',
+		  '-', 'd', 'u', 'r', 'a', 't', 'i', 'o', 'n', '-', 's', 'u',
+		  'p', 'p', 'o', 'r', 't', 'e', 'd',
+		  0x00, 0x04,		/* Value length + value */
+		  0x00, 0x00, 0x00, 0x01,
+
+		  IPP_TAG_RANGE,	/* rangeOfInteger tag */
+		  0x00, 0x00,		/* No name */
+		  0x00, 0x08,		/* Value length + value */
+		  0x00, 0x00, 0x00, 0x10,
+		  0x00, 0x00, 0x00, 0x20,
+
+		  IPP_TAG_END		/* end tag */
 		};
 
 
@@ -189,8 +238,8 @@ ipp_uchar_t	collection[] =			/* Collection buffer */
 
 void	hex_dump(const char *title, ipp_uchar_t *buffer, int bytes);
 void	print_attributes(ipp_t *ipp, int indent);
-ssize_t	read_cb(void *data, ipp_uchar_t *buffer, size_t bytes);
-ssize_t	write_cb(void *data, ipp_uchar_t *buffer, size_t bytes);
+ssize_t	read_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
+ssize_t	write_cb(_ippdata_t *data, ipp_uchar_t *buffer, size_t bytes);
 
 
 /*
@@ -201,6 +250,8 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
+  _ippdata_t	data;		/* IPP buffer */
+  ipp_uchar_t	buffer[8192];	/* Write buffer data */
   ipp_t		*cols[2],	/* Collections */
 		*size;		/* media-size collection */
   ipp_t		*request;	/* Request */
@@ -280,33 +331,36 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     printf("Write Sample to Memory: ");
 
-    wused = 0;
-    while ((state = ippWriteIO(wbuffer, write_cb, 1, NULL,
+    data.wused   = 0;
+    data.wsize   = sizeof(buffer);
+    data.wbuffer = buffer;
+
+    while ((state = ippWriteIO(&data, (ipp_iocb_t)write_cb, 1, NULL,
                                request)) != IPP_DATA)
       if (state == IPP_ERROR)
 	break;
 
     if (state != IPP_DATA)
     {
-      printf("FAIL - %d bytes written.\n", wused);
+      printf("FAIL - %d bytes written.\n", (int)data.wused);
       status = 1;
     }
-    else if (wused != sizeof(collection))
+    else if (data.wused != sizeof(collection))
     {
-      printf("FAIL - wrote %d bytes, expected %d bytes!\n", wused,
+      printf("FAIL - wrote %d bytes, expected %d bytes!\n", (int)data.wused,
              (int)sizeof(collection));
-      hex_dump("Bytes Written", wbuffer, wused);
+      hex_dump("Bytes Written", data.wbuffer, data.wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
     }
-    else if (memcmp(wbuffer, collection, wused))
+    else if (memcmp(data.wbuffer, collection, data.wused))
     {
-      for (i = 0; i < wused; i ++)
-        if (wbuffer[i] != collection[i])
+      for (i = 0; i < data.wused; i ++)
+        if (data.wbuffer[i] != collection[i])
 	  break;
 
       printf("FAIL - output does not match baseline at 0x%04x!\n", i);
-      hex_dump("Bytes Written", wbuffer, wused);
+      hex_dump("Bytes Written", data.wbuffer, data.wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
     }
@@ -321,10 +375,11 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     printf("Read Sample from Memory: ");
 
-    request = ippNew();
-    rpos    = 0;
+    request     = ippNew();
+    data.rpos = 0;
 
-    while ((state = ippReadIO(wbuffer, read_cb, 1, NULL, request)) != IPP_DATA)
+    while ((state = ippReadIO(&data, (ipp_iocb_t)read_cb, 1, NULL,
+                              request)) != IPP_DATA)
       if (state == IPP_ERROR)
 	break;
 
@@ -332,12 +387,13 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     if (state != IPP_DATA)
     {
-      printf("FAIL - %d bytes read.\n", rpos);
+      printf("FAIL - %d bytes read.\n", (int)data.rpos);
       status = 1;
     }
-    else if (rpos != wused)
+    else if (data.rpos != data.wused)
     {
-      printf("FAIL - read %d bytes, expected %d bytes!\n", rpos, wused);
+      printf("FAIL - read %d bytes, expected %d bytes!\n", (int)data.rpos,
+             (int)data.wused);
       print_attributes(request, 8);
       status = 1;
     }
@@ -490,6 +546,82 @@ main(int  argc,			/* I - Number of command-line arguments */
 	  puts("PASS");
       }
     }
+
+    ippDelete(request);
+
+   /*
+    * Read the mixed data and confirm we converted everything to rangeOfInteger
+    * values...
+    */
+
+    printf("Read Mixed integer/rangeOfInteger from Memory: ");
+
+    request = ippNew();
+    data.rpos    = 0;
+    data.wused   = sizeof(mixed);
+    data.wsize   = sizeof(mixed);
+    data.wbuffer = mixed;
+
+    while ((state = ippReadIO(&data, (ipp_iocb_t)read_cb, 1, NULL,
+                              request)) != IPP_DATA)
+      if (state == IPP_ERROR)
+	break;
+
+    length = ippLength(request);
+
+    if (state != IPP_DATA)
+    {
+      printf("FAIL - %d bytes read.\n", (int)data.rpos);
+      status = 1;
+    }
+    else if (data.rpos != sizeof(mixed))
+    {
+      printf("FAIL - read %d bytes, expected %d bytes!\n", (int)data.rpos,
+             (int)sizeof(mixed));
+      print_attributes(request, 8);
+      status = 1;
+    }
+    else if (length != (sizeof(mixed) + 4))
+    {
+      printf("FAIL - wrong ippLength(), %d instead of %d bytes!\n",
+             length, (int)sizeof(mixed) + 4);
+      print_attributes(request, 8);
+      status = 1;
+    }
+    else
+      puts("PASS");
+
+    fputs("ippFindAttribute(notify-lease-duration-supported): ", stdout);
+    if ((attr = ippFindAttribute(request, "notify-lease-duration-supported",
+                                 IPP_TAG_ZERO)) == NULL)
+    {
+      puts("FAIL (not found)");
+      status = 1;
+    }
+    else if (attr->value_tag != IPP_TAG_RANGE)
+    {
+      printf("FAIL (wrong type - %s)\n", ippTagString(attr->value_tag));
+      status = 1;
+    }
+    else if (attr->num_values != 2)
+    {
+      printf("FAIL (wrong count - %d)\n", attr->num_values);
+      status = 1;
+    }
+    else if (attr->values[0].range.lower != 1 ||
+             attr->values[0].range.upper != 1 ||
+             attr->values[1].range.lower != 16 ||
+             attr->values[1].range.upper != 32)
+    {
+      printf("FAIL (wrong values - %d,%d and %d,%d)\n",
+             attr->values[0].range.lower,
+             attr->values[0].range.upper,
+             attr->values[1].range.lower,
+             attr->values[1].range.upper);
+      status = 1;
+    }
+    else
+      puts("PASS");
 
     ippDelete(request);
 
@@ -813,25 +945,28 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
  */
 
 ssize_t					/* O - Number of bytes read */
-read_cb(void        *data,		/* I - Data */
+read_cb(_ippdata_t   *data,		/* I - Data */
         ipp_uchar_t *buffer,		/* O - Buffer to read */
 	size_t      bytes)		/* I - Number of bytes to read */
 {
-  int	count;				/* Number of bytes */
+  size_t	count;			/* Number of bytes */
 
 
  /*
   * Copy bytes from the data buffer to the read buffer...
   */
 
-  for (count = bytes; count > 0 && rpos < wused; count --, rpos ++)
-    *buffer++ = wbuffer[rpos];
+  if ((count = data->wsize - data->rpos) > bytes)
+    count = bytes;
+
+  memcpy(buffer, data->wbuffer + data->rpos, count);
+  data->rpos += count;
 
  /*
   * Return the number of bytes read...
   */
 
-  return (bytes - count);
+  return (count);
 }
 
 
@@ -840,25 +975,28 @@ read_cb(void        *data,		/* I - Data */
  */
 
 ssize_t					/* O - Number of bytes written */
-write_cb(void        *data,		/* I - Data */
+write_cb(_ippdata_t   *data,		/* I - Data */
          ipp_uchar_t *buffer,		/* I - Buffer to write */
 	 size_t      bytes)		/* I - Number of bytes to write */
 {
-  int	count;				/* Number of bytes */
+  size_t	count;			/* Number of bytes */
 
 
  /*
   * Loop until all bytes are written...
   */
 
-  for (count = bytes; count > 0 && wused < sizeof(wbuffer); count --, wused ++)
-    wbuffer[wused] = *buffer++;
+  if ((count = data->wsize - data->wused) > bytes)
+    count = bytes;
+
+  memcpy(data->wbuffer + data->wused, buffer, count);
+  data->wused += count;
 
  /*
   * Return the number of bytes written...
   */
 
-  return (bytes - count);
+  return (count);
 }
 
 

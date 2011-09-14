@@ -19,7 +19,7 @@
 
 # Do all of the IPP/1.1 tests as an IPP/2.0 client
 #
-# Required by: PWG 5100.10 section 4.3
+# Required by: PWG 5100.12 section 4.3
 INCLUDE "ipp-1.1.test"
 
 
@@ -29,9 +29,9 @@ DEFINE MEDIA_REGEX "/^((custom|na|asme|roc|oe)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\
 
 # Test required printer description attribute support.
 #
-# Required by: PWG 5100.10 section 6.2
+# Required by: PWG 5100.12 section 6.2
 {
-	NAME "PWG 5100.10 section 6.2 - Required Printer Description Attributes"
+	NAME "PWG 5100.12 section 6.2 - Required Printer Description Attributes"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8

@@ -21,12 +21,23 @@ include ../Makedefs
 #
 
 TESTFILES	=	\
+			color.jpg \
 			create-printer-subscription.test \
+			document-a4.pdf \
+			document-a4.ps \
+			document-letter.pdf \
+			document-letter.ps \
 			get-completed-jobs.test \
 			get-jobs.test \
+			gray.jpg \
 			ipp-1.1.test \
 			ipp-2.0.test \
 			ipp-2.1.test \
+			ipp-2.2.test \
+			onepage-a4.pdf \
+			onepage-a4.ps \
+			onepage-letter.pdf \
+			onepage-letter.ps \
 			testfile.jpg \
 			testfile.pdf \
 			testfile.ps \

@@ -248,16 +248,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       while ((bytes = (int)read(infile, buffer, sizeof(buffer))) > 0)
       {
-	if (httpCheck(http))
-	{
-	  _httpUpdate(http, &status);
-
-	  if (status >= HTTP_MULTIPLE_CHOICES)
-	    break;
-        }
-
-  	if (httpWrite2(http, buffer, bytes) < bytes)
-          break;
+        if ((status = cupsWriteRequestData(http, buffer, bytes))
+                != HTTP_CONTINUE)
+	  break;
       }
     }
 
@@ -265,13 +258,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Get the server's response...
     */
 
-    if (status == HTTP_CONTINUE || status == HTTP_OK)
+    if (status != HTTP_ERROR)
     {
       response = cupsGetResponse(http, resource);
-      status   = http->status;
+      status   = httpGetStatus(http);
     }
-    else
-      httpFlush(http);
 
     DEBUG_printf(("2cupsDoIORequest: status=%d", status));
 
@@ -785,7 +776,17 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     */
 
     if (status >= HTTP_MULTIPLE_CHOICES)
+    {
+      _cupsSetHTTPError(status);
+
+      do
+      {
+	status = httpUpdate(http);
+      }
+      while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
+
       httpFlush(http);
+    }
 
     switch (status)
     {
@@ -922,6 +923,13 @@ cupsWriteRequestData(
       if (status >= HTTP_MULTIPLE_CHOICES)
       {
         _cupsSetHTTPError(status);
+
+	do
+	{
+	  status = httpUpdate(http);
+	}
+	while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
+
         httpFlush(http);
       }
 
@@ -1097,7 +1105,7 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
         break;
 
     case HTTP_ERROR :
-	_cupsSetError(IPP_INTERNAL_ERROR, httpStatus(status), 0);
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
         break;
 
     default :

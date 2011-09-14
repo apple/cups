@@ -3,7 +3,7 @@
 #
 #   IPP/2.1 test suite.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -23,9 +23,9 @@ INCLUDE "ipp-2.0.test"
 
 # Test required printer description attribute support.
 #
-# Required by: PWG 5100.10 section 6.3
+# Required by: PWG 5100.12 section 6.3
 {
-	NAME "PWG 5100.10 section 6.3 - Required Printer Description Attributes"
+	NAME "PWG 5100.12 section 6.3 - Required Printer Description Attributes"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -62,6 +62,7 @@ INCLUDE "ipp-2.0.test"
 	EXPECT ippget-event-life OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT multiple-operation-time-out OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 
+	# Operations
 	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
 	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
 	EXPECT operations-supported WITH-VALUE 0x000C # Hold-Job

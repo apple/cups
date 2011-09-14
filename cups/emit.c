@@ -286,7 +286,7 @@ ppdEmitAfterOrder(
   * Get the string...
   */
 
-  buffer = ppdEmitString(ppd, section, limit ? min_order : 0.0);
+  buffer = ppdEmitString(ppd, section, limit ? min_order : 0.0f);
 
  /*
   * Write it as needed and return...

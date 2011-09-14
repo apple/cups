@@ -1340,7 +1340,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  http_status = cupsWriteRequestData(http, buffer, bytes);
         }
 
-        while (http_status == HTTP_CONTINUE)
+        while (http_status == HTTP_CONTINUE &&
+               (!job_canceled || compatsize > 0))
 	{
 	 /*
 	  * Check for side-channel requests and more print data...
@@ -1508,7 +1509,8 @@ main(int  argc,				/* I - Number of command-line args */
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA &&
 	    (fd = open(files[i], O_RDONLY)) >= 0)
 	{
-	  while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	  while (!job_canceled &&
+	         (bytes = read(fd, buffer, sizeof(buffer))) > 0)
 	  {
 	    if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
 	      break;
