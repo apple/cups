@@ -2327,6 +2327,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
   http->hostaddr = &(addr->addr);
   http->error    = 0;
   http->status   = HTTP_CONTINUE;
+  http->state    = HTTP_WAITING;
 
 #ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)
