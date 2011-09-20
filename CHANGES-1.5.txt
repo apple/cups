@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- Updated the PWG raster support to match the current draft
+	  specification.
 	- Fixed some IPP conformance issues in the scheduler.
 	- Added ipptool support for repeating requests.
 	- Added IPP/2.2 conformance tests and greatly improved the IPP/1.1
