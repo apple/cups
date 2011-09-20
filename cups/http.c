@@ -2327,6 +2327,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
   http->hostaddr = &(addr->addr);
   http->error    = 0;
   http->status   = HTTP_CONTINUE;
+  http->state    = HTTP_WAITING;
 
 #ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)
@@ -4005,6 +4006,18 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 #    endif /* HAVE_SSLSETPROTOCOLVERSIONMAX */
 
+ /*
+  * In general, don't verify certificates since things like the common name
+  * often do not match...
+  */
+
+  if (!error)
+  {
+    error = SSLSetEnableCertVerify(http->tls, false);
+    DEBUG_printf(("4http_setup_ssl: SSLSetEnableCertVerify, error=%d",
+                  (int)error));
+  }
+
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
   if (!error)
   {
@@ -4030,19 +4043,17 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!error && cg->server_cert_cb != NULL)
   {
-    error = SSLSetEnableCertVerify(http->tls, false);
-    DEBUG_printf(("4http_setup_ssl: SSLSetEnableCertVerify, error=%d",
-                  (int)error));
-
-    if (!error)
-    {
-      error = SSLSetSessionOption(http->tls,
-				  kSSLSessionOptionBreakOnServerAuth, true);
-      DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnServerAuth, "
-                    "error=%d", (int)error));
-    }
+    error = SSLSetSessionOption(http->tls,
+				kSSLSessionOptionBreakOnServerAuth, true);
+    DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnServerAuth, "
+		  "error=%d", (int)error));
   }
 #    endif /* HAVE_SECCERTIFICATECOPYDATA */
+
+ /*
+  * Let the server know which hostname/domain we are trying to connect to
+  * in case it wants to serve up a certificate with a matching common name.
+  */
 
   if (!error)
   {
@@ -4086,8 +4097,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		httpFreeCredentials(credentials);
 	      }
 
-	      DEBUG_printf(("4http_setup_ssl: Server certificate callback returned "
-			    "%d.", (int)error));
+	      DEBUG_printf(("4http_setup_ssl: Server certificate callback "
+	                    "returned %d.", (int)error));
 	    }
 	    break;
 

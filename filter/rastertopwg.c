@@ -22,10 +22,8 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/language-private.h>
+#include <cups/cups-private.h>
 #include <cups/raster.h>
-#include <cups/string-private.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -54,6 +52,14 @@ main(int  argc,				/* I - Number of command-line args */
 			linesize,	/* Bytes per line */
 			lineoffset;	/* Offset into line */
   unsigned char		white;		/* White pixel */
+  ppd_file_t		*ppd;		/* PPD file */
+  ppd_attr_t		*back;		/* cupsBackSize attribute */
+  _ppd_cache_t		*cache;		/* PPD cache */
+  _pwg_size_t		*pwg_size;	/* PWG media size */
+  _pwg_media_t		*pwg_media;	/* PWG media name */
+  int	 		num_options;	/* Number of options */
+  cups_option_t		*options = NULL;/* Options */
+  const char		*val;		/* Option value */
 
 
   if (argc < 6 || argc > 7)
@@ -74,6 +80,16 @@ main(int  argc,				/* I - Number of command-line args */
 
   inras  = cupsRasterOpen(fd, CUPS_RASTER_READ);
   outras = cupsRasterOpen(1, CUPS_RASTER_WRITE_PWG);
+
+  ppd   = ppdOpenFile(getenv("PPD"));
+  back  = ppdFindAttr(ppd, "cupsBackSide", NULL);
+
+  num_options = cupsParseOptions(argv[5], 0, &options);
+
+  ppdMarkDefaults(ppd);
+  cupsMarkOptions(ppd, num_options, options);
+
+  cache = ppd ? ppd->cache : NULL;
 
   while (cupsRasterReadHeader2(inras, &inheader))
   {
@@ -126,6 +142,7 @@ main(int  argc,				/* I - Number of command-line args */
       case CUPS_CSPACE_DEVICEF :
           white = 0;
 	  break;
+
       default :
 	  _cupsLangPrintFilter(stderr, "ERROR", _("Unsupported raster data."));
 	  fprintf(stderr, "DEBUG: Unsupported cupsColorSpace %d on page %d.\n",
@@ -151,9 +168,235 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
     memcpy(&outheader, &inheader, sizeof(outheader));
-    outheader.cupsWidth  = page_width;
+    outheader.cupsWidth        = page_width;
     outheader.cupsHeight       = page_height;
     outheader.cupsBytesPerLine = linesize;
+
+    outheader.cupsInteger[14]  = 0;	/* VendorIdentifier */
+    outheader.cupsInteger[15]  = 0;	/* VendorLength */
+
+    if ((val = cupsGetOption("print-content-optimize", num_options,
+                             options)) != NULL)
+    {
+      if (!strcmp(val, "automatic"))
+        strlcpy(outheader.OutputType, "Automatic",
+                sizeof(outheader.OutputType));
+      else if (!strcmp(val, "graphics"))
+        strlcpy(outheader.OutputType, "Graphics", sizeof(outheader.OutputType));
+      else if (!strcmp(val, "photo"))
+        strlcpy(outheader.OutputType, "Photo", sizeof(outheader.OutputType));
+      else if (!strcmp(val, "text"))
+        strlcpy(outheader.OutputType, "Text", sizeof(outheader.OutputType));
+      else if (!strcmp(val, "text-and-graphics"))
+        strlcpy(outheader.OutputType, "TextAndGraphics",
+                sizeof(outheader.OutputType));
+      else
+      {
+        fprintf(stderr, "DEBUG: Unsupported print-content-type \"%s\".\n", val);
+        outheader.OutputType[0] = '\0';
+      }
+    }
+
+    if ((val = cupsGetOption("print-quality", num_options, options)) != NULL)
+    {
+      int quality = atoi(val);		/* print-quality value */
+
+      if (quality >= IPP_QUALITY_DRAFT && quality <= IPP_QUALITY_HIGH)
+	outheader.cupsInteger[8] = quality;
+      else
+      {
+	fprintf(stderr, "DEBUG: Unsupported print-quality %d.\n", quality);
+	outheader.cupsInteger[8] = 0;
+      }
+    }
+
+    if ((val = cupsGetOption("print-rendering-intent", num_options,
+                             options)) != NULL)
+    {
+      if (!strcmp(val, "absolute"))
+        strlcpy(outheader.cupsRenderingIntent, "Absolute",
+                sizeof(outheader.cupsRenderingIntent));
+      else if (!strcmp(val, "automatic"))
+        strlcpy(outheader.cupsRenderingIntent, "Automatic",
+                sizeof(outheader.cupsRenderingIntent));
+      else if (!strcmp(val, "perceptual"))
+        strlcpy(outheader.cupsRenderingIntent, "Perceptual",
+                sizeof(outheader.cupsRenderingIntent));
+      else if (!strcmp(val, "relative"))
+        strlcpy(outheader.cupsRenderingIntent, "Relative",
+                sizeof(outheader.cupsRenderingIntent));
+      else if (!strcmp(val, "relative-bpc"))
+        strlcpy(outheader.cupsRenderingIntent, "RelativeBpc",
+                sizeof(outheader.cupsRenderingIntent));
+      else if (!strcmp(val, "saturation"))
+        strlcpy(outheader.cupsRenderingIntent, "Saturation",
+                sizeof(outheader.cupsRenderingIntent));
+      else
+      {
+        fprintf(stderr, "DEBUG: Unsupported print-rendering-intent \"%s\".\n",
+                val);
+        outheader.cupsRenderingIntent[0] = '\0';
+      }
+    }
+
+    if (inheader.cupsPageSizeName[0] &&
+        (pwg_size = _ppdCacheGetSize(cache, inheader.cupsPageSizeName)) != NULL)
+    {
+      strlcpy(outheader.cupsPageSizeName, pwg_size->map.pwg,
+	      sizeof(outheader.cupsPageSizeName));
+    }
+    else
+    {
+      pwg_media = _pwgMediaForSize((int)(2540.0 * inheader.cupsPageSize[0] /
+                                         72.0),
+                                   (int)(2540.0 * inheader.cupsPageSize[1] /
+                                         72.0));
+
+      if (pwg_media)
+        strlcpy(outheader.cupsPageSizeName, pwg_media->pwg,
+                sizeof(outheader.cupsPageSizeName));
+      else
+      {
+        fprintf(stderr, "DEBUG: Unsupported PageSize %.2fx%.2f.\n",
+                inheader.cupsPageSize[0], inheader.cupsPageSize[1]);
+        outheader.cupsPageSizeName[0] = '\0';
+      }
+    }
+
+    if (inheader.Duplex && !(page & 1) &&
+        back && _cups_strcasecmp(back->value, "Normal"))
+    {
+      if (_cups_strcasecmp(back->value, "Flipped"))
+      {
+        if (inheader.Tumble)
+        {
+	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = 1;	/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_width - page_left -
+	                             inheader.cupsWidth;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_top;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_width - page_left;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_bottom;
+      					/* ImageBoxBottom */
+        }
+        else
+        {
+	  outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_left;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_bottom;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_left + inheader.cupsWidth;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_top;
+      					/* ImageBoxBottom */
+        }
+      }
+      else if (_cups_strcasecmp(back->value, "ManualTumble"))
+      {
+        if (inheader.Tumble)
+        {
+	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_width - page_left -
+	                             inheader.cupsWidth;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_bottom;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_width - page_left;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_top;
+      					/* ImageBoxBottom */
+        }
+        else
+        {
+	  outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = 1;	/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_left;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_top;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_left + inheader.cupsWidth;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_bottom;
+      					/* ImageBoxBottom */
+        }
+      }
+      else if (_cups_strcasecmp(back->value, "Rotated"))
+      {
+        if (inheader.Tumble)
+        {
+	  outheader.cupsInteger[1] = -1;/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = -1;/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_width - page_left -
+	                             inheader.cupsWidth;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_bottom;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_width - page_left;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_top;
+      					/* ImageBoxBottom */
+        }
+        else
+        {
+	  outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
+	  outheader.cupsInteger[2] = 1;	/* FeedTransform */
+
+	  outheader.cupsInteger[3] = page_left;
+					/* ImageBoxLeft */
+	  outheader.cupsInteger[4] = page_top;
+					/* ImageBoxTop */
+	  outheader.cupsInteger[5] = page_left + inheader.cupsWidth;
+      					/* ImageBoxRight */
+	  outheader.cupsInteger[6] = page_height - page_bottom;
+      					/* ImageBoxBottom */
+        }
+      }
+      else
+      {
+       /*
+        * Unsupported value...
+        */
+
+        fprintf(stderr, "DEBUG: Unsupported cupsBackSide \"%s\".\n", back->value);
+
+	outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
+	outheader.cupsInteger[2] = 1;	/* FeedTransform */
+
+	outheader.cupsInteger[3] = page_left;
+					/* ImageBoxLeft */
+	outheader.cupsInteger[4] = page_top;
+					/* ImageBoxTop */
+	outheader.cupsInteger[5] = page_left + inheader.cupsWidth;
+      					/* ImageBoxRight */
+	outheader.cupsInteger[6] = page_height - page_bottom;
+      					/* ImageBoxBottom */
+      }
+    }
+    else
+    {
+      outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
+      outheader.cupsInteger[2] = 1;	/* FeedTransform */
+
+      outheader.cupsInteger[3] = page_left;
+					/* ImageBoxLeft */
+      outheader.cupsInteger[4] = page_top;
+					/* ImageBoxTop */
+      outheader.cupsInteger[5] = page_left + inheader.cupsWidth;
+      					/* ImageBoxRight */
+      outheader.cupsInteger[6] = page_height - page_bottom;
+      					/* ImageBoxBottom */
+    }
 
     if (!cupsRasterWriteHeader2(outras, &outheader))
     {

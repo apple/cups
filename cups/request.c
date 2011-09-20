@@ -635,9 +635,14 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   if (http->state == HTTP_GET_SEND ||
       http->state == HTTP_POST_SEND)
+  {
+    DEBUG_puts("2cupsSendRequest: Flush prior response.");
     httpFlush(http);
+  }
   else if (http->state != HTTP_WAITING)
   {
+    DEBUG_printf(("1cupsSendRequest: Unknown HTTP state (%d), bailing.",
+                  http->state));
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (HTTP_ERROR);
@@ -654,7 +659,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       !httpAddrLocalhost(http->hostaddr) && !http->tls &&
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
   {
-    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+    DEBUG_puts("1cupsSendRequest: Unable to encrypt connection.");
     return (HTTP_SERVICE_UNAVAILABLE);
   }
 #endif /* HAVE_SSL */
@@ -664,11 +669,15 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   */
 
   if (!_cups_strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
+  {
+    DEBUG_puts("2cupsSendRequest: Connection: close");
+    httpClearFields(http);
     if (httpReconnect(http))
     {
-      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+      DEBUG_puts("1cupsSendRequest: Unable to reconnect.");
       return (HTTP_SERVICE_UNAVAILABLE);
     }
+  }
 
  /*
   * Loop until we can send the request without authorization problems.
@@ -713,9 +722,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     if (httpPost(http, resource))
     {
+      DEBUG_puts("2cupsSendRequest: POST failed, reconnecting.");
       if (httpReconnect(http))
       {
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+        DEBUG_puts("1cupsSendRequest: Unable to reconnect.");
         return (HTTP_SERVICE_UNAVAILABLE);
       }
       else
@@ -746,6 +756,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     if (state == IPP_ERROR)
     {
+      DEBUG_puts("1cupsSendRequest: Unable to send IPP request.");
+
       http->status = HTTP_ERROR;
       http->state  = HTTP_WAITING;
 
@@ -793,15 +805,21 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       case HTTP_ERROR :
       case HTTP_CONTINUE :
       case HTTP_OK :
+          DEBUG_printf(("1cupsSendRequest: Returning %d.", status));
           return (status);
 
       case HTTP_UNAUTHORIZED :
           if (cupsDoAuthentication(http, "POST", resource))
+	  {
+            DEBUG_puts("1cupsSendRequest: Returning HTTP_AUTHORIZATION_CANCELED.");
 	    return (HTTP_AUTHORIZATION_CANCELED);
+	  }
+
+          DEBUG_puts("2cupsSendRequest: Reconnecting after HTTP_UNAUTHORIZED.");
 
 	  if (httpReconnect(http))
 	  {
-	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    DEBUG_puts("1cupsSendRequest: Unable to reconnect.");
 	    return (HTTP_SERVICE_UNAVAILABLE);
 	  }
 	  break;
@@ -813,15 +831,19 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  * encryption...
 	  */
 
+          DEBUG_puts("2cupsSendRequest: Reconnecting after "
+	             "HTTP_UPGRADE_REQUIRED.");
+
 	  if (httpReconnect(http))
 	  {
-	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    DEBUG_puts("1cupsSendRequest: Unable to reconnect.");
 	    return (HTTP_SERVICE_UNAVAILABLE);
 	  }
 
+	  DEBUG_puts("2cupsSendRequest: Upgrading to TLS.");
 	  if (httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
 	  {
-	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    DEBUG_puts("1cupsSendRequest: Unable to encrypt connection.");
 	    return (HTTP_SERVICE_UNAVAILABLE);
 	  }
 	  break;
@@ -834,9 +856,12 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
 	  expect = (http_status_t)0;
 
+          DEBUG_puts("2cupsSendRequest: Reconnecting after "
+	             "HTTP_EXPECTATION_FAILED.");
+
 	  if (httpReconnect(http))
 	  {
-	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    DEBUG_puts("1cupsSendRequest: Unable to reconnect.");
 	    return (HTTP_SERVICE_UNAVAILABLE);
 	  }
 	  break;
