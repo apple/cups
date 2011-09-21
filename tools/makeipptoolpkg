@@ -27,7 +27,7 @@ if test $# = 0; then
 	echo Updating to get snapshot version...
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	fileversion=`date '+%Y%m%d'`
+	fileversion="1.6-`date '+%Y%m%d'`"
 	version=snapshots
 else
 	fileversion=$1

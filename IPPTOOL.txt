@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2011-09-20
+IPPTOOL.txt - 2011-09-21
 ------------------------
 
 
@@ -99,6 +99,34 @@ GETTING SUPPORT AND OTHER RESOURCES
 	http://www.cups.org/newsgroups.php
 
     See the CUPS web site at "http://www.cups.org/" for other resources.
+
+
+REPORTING BUGS
+
+    If you believe you have discovered a bug in ipptool, please fill out the
+    bug form at:
+
+	http://www.cups.org/str.php
+
+    Be sure to identify the version of CUPS and ipptool (if you downloaded the
+    standalone version) you are using, the printer (if any) and firmware
+    version, and include any files that apply.
+
+    If you downloaded the standalone version of ipptool, please also re-run the
+    test with debug logging enabled.  Run the following commands on Windows to
+    enable debug logging:
+
+	set CUPS_DEBUG_LOG=ipptool.log
+	set CUPS_DEBUG_LEVEL=6
+
+    For Linux and Mac OS X use:
+
+	CUPS_DEBUG_LOG=ipptool.log; export CUPS_DEBUG_LOG
+	CUPS_DEBUG_LEVEL=6; export CUPS_DEBUG_LEVEL
+
+    Then when you run the ipptool command a new "ipptool.log" file will be
+    created with detailed information - attach this file to the bug you file
+    as well.
 
 
 LEGAL STUFF
