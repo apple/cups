@@ -476,6 +476,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
                   attr ? attr->values[0].string.text :
 		      ippErrorString(response->request.status.status_code), 0);
   }
+  else if (status == HTTP_ERROR)
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(http->error), 0);
   else if (status != HTTP_OK)
     _cupsSetHTTPError(status);
 

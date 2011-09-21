@@ -1054,6 +1054,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     last_expect   = NULL;
     last_status   = NULL;
     filename[0]   = '\0';
+    skip_previous = 0;
     skip_test     = 0;
     version       = Version;
     transfer      = Transfer;
@@ -2138,11 +2139,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       * Send the request...
       */
 
-      response = NULL;
+      response    = NULL;
+      repeat_test = 0;
+      prev_pass   = 1;
 
       if (status != HTTP_ERROR)
       {
-	while (!response && !Cancel)
+	while (!response && !Cancel && prev_pass)
 	{
 	  status = cupsSendRequest(http, request, resource, length);
 
@@ -2184,13 +2187,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 #endif /* WIN32 */
 	  {
 	    if (httpReconnect(http))
-	    {
-	      print_fatal_error("Unable to connect to %s on port %d - %s",
-	                        vars->hostname, vars->port,
-	                        cupsLastErrorString());
-	      pass = 0;
-	      goto test_exit;
-	    }
+	      prev_pass = 0;
+	  }
+	  else if (status == HTTP_ERROR)
+	  {
+	    if (!Cancel)
+	      httpReconnect(http);
+
+	    prev_pass = 0;
 	  }
 	}
       }
@@ -2198,9 +2202,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
      /*
       * Check results of request...
       */
-
-      repeat_test = 0;
-      prev_pass   = 1;
 
       if (!response)
 	prev_pass = pass = 0;
@@ -4176,6 +4177,9 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
   (void)sig;
 
   Cancel = 1;
+
+  signal(SIGINT, SIG_DFL);
+  signal(SIGTERM, SIG_DFL);
 }
 #endif /* !WIN32 */
 

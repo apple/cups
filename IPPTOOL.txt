@@ -50,10 +50,10 @@ CONFORMANCE TESTS
     IPP/2.2.  For a given printer URI, the following commands perform tests at
     each level:
 
-        ipptool -tf filename [options] printer-uri ipp-1.1.test
-        ipptool -tf filename [options] -V 2.0 printer-uri ipp-2.0.test
-        ipptool -tf filename [options] -V 2.1 printer-uri ipp-2.1.test
-        ipptool -tf filename [options] -V 2.2 printer-uri ipp-2.2.test
+        ipptool -tf filename [options] -I printer-uri ipp-1.1.test
+        ipptool -tf filename [options] -I -V 2.0 printer-uri ipp-2.0.test
+        ipptool -tf filename [options] -I -V 2.1 printer-uri ipp-2.1.test
+        ipptool -tf filename [options] -I -V 2.2 printer-uri ipp-2.2.test
 
     The filename must use a format supported by the printer; ipptool will guess
     the MIME media type using the extension, otherwise application/octet stream
@@ -73,7 +73,7 @@ CONFORMANCE TESTS
     Print-by-reference (URL) printing can be tested by defining the document-uri
     variable to a URL, for example:
 
-        ipptool -tf filename -d document-uri=your-url printer-uri ipp-1.1.test
+        ipptool -tf filename -d document-uri=url -I printer-uri ipp-1.1.test
 
     The standard test files are available on cups.org under the "test"
     directory, for example:
