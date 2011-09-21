@@ -27,7 +27,7 @@ if test $# = 0; then
 	echo Updating to get snapshot version...
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	fileversion="1.5svn-r$rev"
+	fileversion=`date '+%Y%m%d'`
 	version=snapshots
 else
 	fileversion=$1
@@ -49,11 +49,17 @@ mkdir $pkgdir || exit 1
 echo Copying package files
 cp IPPTOOL.txt LICENSE.txt $pkgdir
 cp doc/help/man-ipptool*.html $pkgdir
+cp test/color.jpg $pkgdir
 cp test/create-printer-subscription.test $pkgdir
+cp test/document-*.pdf $pkgdir
+cp test/document-*.ps $pkgdir
 cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
 cp test/get-printer-attributes.test $pkgdir
+cp test/gray.jpg $pkgdir
 cp test/ipp-[12].*.test $pkgdir
 cp test/ipptool-static $pkgdir/ipptool
+cp test/onepage-*.pdf $pkgdir
+cp test/onepage-*.ps $pkgdir
 cp test/testfile.* $pkgdir
 
 if test `uname` = Darwin; then
