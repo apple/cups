@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2011-09-14
+IPPTOOL.txt - 2011-09-20
 ------------------------
 
 
@@ -79,6 +79,10 @@ CONFORMANCE TESTS
     directory, for example:
 
 	http://www.cups.org/test/document-a4.pdf
+
+    The "document" test files contain 4 pages each.  Doing the IPP conformance
+    tests will will produce up to 90 pages on various media, depending on the
+    printer.
 
 
 READING THE DOCUMENTATION
