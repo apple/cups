@@ -18,3 +18,5 @@ ipptool.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
 ipptool.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
 ipptool.o: ../cups/transcode.h ../cups/thread-private.h
 ipptool.o: ../cups/file-private.h ../cups/cups-private.h
+xmltotest.o: ../cups/cups.h ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+xmltotest.o: ../cups/http.h ../cups/array.h ../cups/language.h
