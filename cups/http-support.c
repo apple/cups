@@ -1824,16 +1824,35 @@ http_resolve_cb(
   if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, "rp",
                                     &valueLen)) != NULL)
   {
+    if (((char *)value)[0] == '/')
+    {
+     /*
+      * "rp" value (incorrectly) has a leading slash already...
+      */
+
+      memcpy(rp, value, valueLen);
+      rp[valueLen] = '\0';
+    }
+    else
+    {
+     /*
+      * Convert to resource by concatenating with a leading "/"...
+      */
+
+      rp[0] = '/';
+      memcpy(rp + 1, value, valueLen);
+      rp[valueLen + 1] = '\0';
+    }
+  }
+  else
+  {
    /*
-    * Convert to resource by concatenating with a leading "/"...
+    * Default "rp" value is blank, mapping to a path of "/"...
     */
 
     rp[0] = '/';
-    memcpy(rp + 1, value, valueLen);
-    rp[valueLen + 1] = '\0';
+    rp[1] = '\0';
   }
-  else
-    rp[0] = '\0';
 
  /*
   * Lookup the FQDN if needed...

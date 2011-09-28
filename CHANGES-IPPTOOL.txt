@@ -1,0 +1,53 @@
+CHANGES-IPPTOOL.txt - 2011-09-28
+--------------------------------
+
+This file provides a list of changes to the ipptool binary distribution posted
+on cups.org.
+
+
+2011-09-28
+
+	- Test output now includes a summary and overall score at the end.
+	- The MATCH-VALUE predicate now correctly deals with a failed EXPECT
+	  condition.
+	- The IPP/1.1 test suite now looks for legacy media names and uses them
+	  if the corresponding PWG standard names are not present.
+	- The IPP/1.1 test suite now tests the Print-Job+Release-Job when the
+	  printer supports the job-hold-until attribute, Hold-Job operation, and
+	  Release-Job operation.
+
+
+2011-09-21
+
+	- Fixes for HTTP chunking, timeout, and encryption issues reported by
+	  various users.
+	- Greatly improved IPP tests with added IPP/2.2 tests.
+	- New test documents - 1-page and 4-page mixed A4/Letter PDF/PS and a
+	  couple JPEGs.
+	- New REPEAT directives to programmatically repeat tests as needed.
+
+
+2011-08-16
+
+	- The Windows version no longer requires Visual Studio to be installed.
+	- The Windows version now supports SSL.
+	- Added "ipps" URI support.
+	- Added a new "-T" option.
+	- Added support for fractional seconds for the -i option and DELAY
+	  directive.
+	- Added support for authentication.
+	- Added DEFINE-MATCH, DEFINE-NO-MATCH, DEFINE-VALUE, IF-NOT-DEFINED,
+	  IGNORE-ERRORS, SKIP-IF-DEFINED, SKIP-IF-NOT-DEFINED,
+	  SKIP-PREVIOUS-ERROR directives.
+	- WITH-VALUE now supports variable expansion.
+	- Updated the IPP/1.1 conformance test to skip the "my-jobs different
+	  user" test if the printer URI contains a username.
+	- Updated the IPP conformance tests to validate media, media-default,
+	  and media-supported values.
+	- No longer error out if a Printer returns a different version number in
+	  the response when the request contains the version 0.0.
+
+
+2010-10-16
+
+	- Initial release of standalone binary.

@@ -44,7 +44,8 @@ TESTFILES	=	\
 			testfile.txt
 OBJS		=	\
 			ippserver.o \
-			ipptool.o
+			ipptool.o \
+			xmltotest.o
 TARGETS		=	\
 			ippserver \
 			ipptool \
@@ -178,6 +179,17 @@ ipptool-static:	ipptool.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# xmltotest
+#
+
+xmltotest: xmltotest.o ../cups/$(LIBUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ xmltotest.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) \
+		-lmxml
 
 
 #

@@ -774,7 +774,7 @@ query_callback(
 
         datalen = *data++;
 
-        if (!datalen || (data + datalen) >= dataend)
+        if (!datalen || (data + datalen) > dataend)
 	  break;
 
         datanext = data + datalen;

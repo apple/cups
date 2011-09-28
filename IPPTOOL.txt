@@ -1,5 +1,7 @@
-IPPTOOL.txt - 2011-09-14
+IPPTOOL.txt - 2011-09-28
 ------------------------
+
+See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
 
 
 INTRODUCTION
@@ -50,10 +52,10 @@ CONFORMANCE TESTS
     IPP/2.2.  For a given printer URI, the following commands perform tests at
     each level:
 
-        ipptool -tf filename [options] printer-uri ipp-1.1.test
-        ipptool -tf filename [options] -V 2.0 printer-uri ipp-2.0.test
-        ipptool -tf filename [options] -V 2.1 printer-uri ipp-2.1.test
-        ipptool -tf filename [options] -V 2.2 printer-uri ipp-2.2.test
+        ipptool -tf filename [options] -I printer-uri ipp-1.1.test
+        ipptool -tf filename [options] -I -V 2.0 printer-uri ipp-2.0.test
+        ipptool -tf filename [options] -I -V 2.1 printer-uri ipp-2.1.test
+        ipptool -tf filename [options] -I -V 2.2 printer-uri ipp-2.2.test
 
     The filename must use a format supported by the printer; ipptool will guess
     the MIME media type using the extension, otherwise application/octet stream
@@ -73,12 +75,16 @@ CONFORMANCE TESTS
     Print-by-reference (URL) printing can be tested by defining the document-uri
     variable to a URL, for example:
 
-        ipptool -tf filename -d document-uri=your-url printer-uri ipp-1.1.test
+        ipptool -tf filename -d document-uri=url -I printer-uri ipp-1.1.test
 
     The standard test files are available on cups.org under the "test"
     directory, for example:
 
 	http://www.cups.org/test/document-a4.pdf
+
+    The "document" test files contain 4 pages each.  Doing the IPP conformance
+    tests will will produce up to 90 pages on various media, depending on the
+    printer.
 
 
 READING THE DOCUMENTATION
@@ -97,14 +103,40 @@ GETTING SUPPORT AND OTHER RESOURCES
     See the CUPS web site at "http://www.cups.org/" for other resources.
 
 
+REPORTING BUGS
+
+    If you believe you have discovered a bug in ipptool, please fill out the
+    bug form at:
+
+	http://www.cups.org/str.php
+
+    Be sure to identify the version of CUPS and ipptool (if you downloaded the
+    standalone version) you are using, the printer (if any) and firmware
+    version, and include any files that apply.
+
+    If you downloaded the standalone version of ipptool, please also re-run the
+    test with debug logging enabled.  Run the following commands on Windows to
+    enable debug logging:
+
+	set CUPS_DEBUG_LOG=ipptool.log
+	set CUPS_DEBUG_LEVEL=6
+
+    For Linux and Mac OS X use:
+
+	CUPS_DEBUG_LOG=ipptool.log; export CUPS_DEBUG_LOG
+	CUPS_DEBUG_LEVEL=6; export CUPS_DEBUG_LEVEL
+
+    Then when you run the ipptool command a new "ipptool.log" file will be
+    created with detailed information - attach this file to the bug you file
+    as well.
+
+
 LEGAL STUFF
 
     CUPS is Copyright 2007-2011 by Apple Inc.  CUPS and the CUPS logo are
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
-
-    This software is based in part on the work of the Independent JPEG Group.
 
     CUPS is provided under the terms of version 2 of the GNU General Public
     License and GNU Library General Public License. This program is distributed

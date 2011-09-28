@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "13 September 2011" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "28 September 2011" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -251,7 +251,7 @@ effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
 DEFINE-VALUE variable-name
 Defines the variable to the value of the attribute when the EXPECT condition
-matches.
+matches. A side-effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
 IF-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is defined.

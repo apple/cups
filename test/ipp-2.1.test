@@ -14,7 +14,7 @@
 #
 # Usage:
 #
-#   ./ipptool -V 2.1 {-d PRINTER_IS_COLOR=1} -f filename -t printer-uri ipp-2.1.test
+#   ./ipptool -V 2.1 -f filename -t printer-uri ipp-2.1.test
 #
 
 # Do all of the IPP/1.1 and IPP/2.0 tests as an IPP/2.1 client

@@ -3768,6 +3768,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   return (error);
 }
 #  endif /* HAVE_CDSASSL && HAVE_SECCERTIFICATECOPYDATA */
+#endif /* HAVE_SSL */
 
 
 /*
@@ -3816,6 +3817,7 @@ http_set_wait(http_t *http)		/* I - Connection to server */
 }
 
 
+#ifdef HAVE_SSL
 /*
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
@@ -4263,10 +4265,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   return (0);
 }
-#endif /* HAVE_SSL */
 
 
-#ifdef HAVE_SSL
 /*
  * 'http_shutdown_ssl()' - Shut down SSL/TLS on a connection.
  */

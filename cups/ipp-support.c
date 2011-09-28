@@ -371,6 +371,16 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
             bufptr += strlen(ptr);
             break;
           }
+          else if (!strcmp(attr->name, "operations-supported"))
+          {
+            ptr = ippOpString(val->integer);
+
+            if (buffer && bufptr < bufend)
+              strlcpy(bufptr, ptr, bufend - bufptr + 1);
+
+            bufptr += strlen(ptr);
+            break;
+          }
 
       case IPP_TAG_INTEGER :
           if (buffer && bufptr < bufend)
@@ -621,7 +631,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * No, build an "unknown-xxxx" operation string...
   */
 
-  sprintf(cg->ipp_unknown, "unknown-%04x", op);
+  sprintf(cg->ipp_unknown, "0x%04x", op);
 
   return (cg->ipp_unknown);
 }
@@ -638,6 +648,9 @@ ippOpValue(const char *name)		/* I - Textual name */
 {
   int		i;
 
+
+  if (!strncmp(name, "0x", 2))
+    return ((ipp_op_t)strtol(name + 2, NULL, 16));
 
   for (i = 0; i < (sizeof(ipp_std_ops) / sizeof(ipp_std_ops[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_std_ops[i]))

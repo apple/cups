@@ -203,6 +203,22 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 
+	# Display some useful information to identify the test
+	DISPLAY printer-name
+	DISPLAY printer-make-and-model
+	DISPLAY color-supported
+	DISPLAY pages-per-minute
+	DISPLAY pages-per-minute-color
+	DISPLAY document-format-supported
+	DISPLAY finishings-supported
+	DISPLAY job-sheets-supported
+	DISPLAY media-supported
+	DISPLAY number-up-supported
+	DISPLAY operations-supported
+	DISPLAY print-quality-supported
+	DISPLAY reference-uri-schemes-supported
+	DISPLAY sizes-supported
+
 	# Job template attributes
 	EXPECT ?copies-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT ?copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
@@ -238,9 +254,9 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT document-format-supported WITH-VALUE "application/postscript" DEFINE-MATCH OPTIONAL_POSTSCRIPT
 	EXPECT document-format-supported WITH-VALUE "image/jpeg" DEFINE-MATCH OPTIONAL_JPEG
 	EXPECT job-sheets-supported WITH-VALUE "standard" DEFINE-MATCH OPTIONAL_STANDARD_SHEET
-	EXPECT media-supported WITH-VALUE "iso_a4_210x297mm" DEFINE-MATCH OPTIONAL_A4_MEDIA
-	EXPECT media-supported WITH-VALUE "na_letter_8.5x11in" DEFINE-MATCH OPTIONAL_LETTER_MEDIA
-	EXPECT media-supported WITH-VALUE "na_index-4x6_4x6in" DEFINE-MATCH OPTIONAL_4X6_MEDIA
+	EXPECT media-supported WITH-VALUE "/^(a4|iso-a4|iso_a4_210x297mm)$$/" DEFINE-VALUE OPTIONAL_A4_MEDIA
+	EXPECT media-supported WITH-VALUE "/^(letter|na-letter|na_letter_8.5x11in)$$/" DEFINE-VALUE OPTIONAL_LETTER_MEDIA
+	EXPECT media-supported WITH-VALUE "/^(index-4x6|na_index-4x6_4x6in)$$/" DEFINE-VALUE OPTIONAL_4X6_MEDIA
 	EXPECT number-up-supported WITH-VALUE 2 DEFINE-MATCH OPTIONAL_2UP
 	EXPECT print-quality WITH-VALUE 3 DEFINE-MATCH OPTIONAL_DRAFT_QUALITY
 	EXPECT print-quality WITH-VALUE 4 DEFINE-MATCH OPTIONAL_NORMAL_QUALITY
@@ -972,6 +988,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_DOCUMENT
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "RFC 2911 section 3.3.1: Send-Document Operation"
 	OPERATION Send-Document
@@ -1025,6 +1042,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_DOCUMENT
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "Send-Document missing last-document: Send-Document Operation"
 	OPERATION Send-Document
@@ -1045,6 +1063,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_DOCUMENT
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "RFC 2911 section 3.3.3: Cancel-Job Operation"
 	OPERATION Cancel-Job
@@ -1094,6 +1113,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_URI
 	SKIP-IF-NOT-DEFINED document-uri
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "RFC 2911 section 3.3.2: Send-URI Operation"
 	OPERATION Send-URI
@@ -1146,6 +1166,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_URI
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "Send-URI with bad URI: Send-URI Operation (bad URI)"
 	OPERATION Send-URI
@@ -1167,6 +1188,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_URI
+	SKIP-PREVIOUS-ERROR yes
 
 	NAME "Send-URI with bad URI: Cancel-Job Operation"
 	OPERATION Cancel-Job
@@ -1237,7 +1259,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	FILE document-a4.pdf
 
 	STATUS successful-ok
@@ -1273,7 +1295,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR keyword sides two-sided-long-edge
 	FILE document-a4.pdf
 
@@ -1309,7 +1331,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	FILE document-letter.pdf
 
 	STATUS successful-ok
@@ -1345,7 +1367,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR keyword sides two-sided-long-edge
 	FILE document-letter.pdf
 
@@ -1383,7 +1405,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	FILE document-a4.ps
 
 	STATUS successful-ok
@@ -1419,7 +1441,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR keyword sides two-sided-long-edge
 	FILE document-a4.ps
 
@@ -1455,7 +1477,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	FILE document-letter.ps
 
 	STATUS successful-ok
@@ -1491,7 +1513,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR keyword sides two-sided-long-edge
 	FILE document-letter.ps
 
@@ -1529,7 +1551,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	FILE color.jpg
 
 	STATUS successful-ok
@@ -1564,7 +1586,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	FILE color.jpg
 
 	STATUS successful-ok
@@ -1599,7 +1621,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_index-4x6_4x6in
+	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	FILE color.jpg
 
 	STATUS successful-ok
@@ -1634,7 +1656,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	FILE gray.jpg
 
 	STATUS successful-ok
@@ -1669,7 +1691,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	FILE gray.jpg
 
 	STATUS successful-ok
@@ -1704,7 +1726,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_index-4x6_4x6in
+	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	FILE gray.jpg
 
 	STATUS successful-ok
@@ -1742,7 +1764,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR keyword job-sheets standard
 	FILE document-a4.pdf
 
@@ -1779,7 +1801,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR keyword job-sheets standard
 	FILE document-a4.pdf
 
@@ -1816,7 +1838,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR keyword job-sheets standard
 	FILE document-a4.ps
 
@@ -1853,7 +1875,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR keyword job-sheets standard
 	FILE document-a4.ps
 
@@ -1892,7 +1914,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR integer number-up 2
 	FILE document-a4.pdf
 
@@ -1929,7 +1951,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR integer number-up 2
 	FILE document-letter.pdf
 
@@ -1966,7 +1988,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR integer number-up 2
 	FILE document-a4.ps
 
@@ -2003,7 +2025,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/postscript
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR integer number-up 2
 	FILE document-letter.ps
 
@@ -2042,7 +2064,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_index-4x6_4x6in
+	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 3
 	FILE color.jpeg
 
@@ -2079,7 +2101,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_index-4x6_4x6in
+	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 4
 	FILE color.jpeg
 
@@ -2116,7 +2138,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format image/jpeg
 	GROUP job-attributes-tag
-	ATTR keyword media na_index-4x6_4x6in
+	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 5
 	FILE color.jpeg
 
@@ -2153,7 +2175,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media iso_a4_210x297mm
+	ATTR keyword media $OPTIONAL_A4_MEDIA
 	ATTR enum print-quality 3
 	FILE document-a4.pdf
 
@@ -2190,7 +2212,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword compression none
 	ATTR mimeMediaType document-format application/pdf
 	GROUP job-attributes-tag
-	ATTR keyword media na_letter_8.5x11in
+	ATTR keyword media $OPTIONAL_LETTER_MEDIA
 	ATTR enum print-quality 3
 	FILE document-letter.pdf
 
@@ -2207,6 +2229,57 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
 	EXPECT ?number-of-intervening-jobs OF-TYPE integer
 	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+
+# Test hold/release in the context of Print-Job w/job-hold-until + Release-Job
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_HOLD_JOB
+
+	NAME "Print-Job with job-hold-until"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name "Test Document w/Hold"
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format $filetype
+	GROUP job-attributes-tag
+	ATTR keyword job-hold-until indefinite
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS server-error-job-canceled
+	STATUS server-error-busy REPEAT-MATCH
+
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+{
+	SKIP-IF-NOT-DEFINED OPTIONAL_HOLD_JOB
+
+	NAME "Release-Job"
+	OPERATION Release-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	STATUS client-error-not-possible
 }
 
 
