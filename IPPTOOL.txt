@@ -1,5 +1,7 @@
-IPPTOOL.txt - 2011-09-21
+IPPTOOL.txt - 2011-09-28
 ------------------------
+
+See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
 
 
 INTRODUCTION
@@ -135,8 +137,6 @@ LEGAL STUFF
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
-
-    This software is based in part on the work of the Independent JPEG Group.
 
     CUPS is provided under the terms of version 2 of the GNU General Public
     License and GNU Library General Public License. This program is distributed

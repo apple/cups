@@ -27,11 +27,9 @@ if test $# = 0; then
 	echo Updating to get snapshot version...
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	fileversion="1.6-`date '+%Y%m%d'`"
-	version=snapshots
+	fileversion="`date '+%Y%m%d'`-r$rev"
 else
 	fileversion=$1
-	version=$1
 fi
 
 if (svn st | grep -qv '^\?'); then
@@ -47,7 +45,7 @@ test -d $pkgdir && rm -r $pkgdir
 mkdir $pkgdir || exit 1
 
 echo Copying package files
-cp IPPTOOL.txt LICENSE.txt $pkgdir
+cp CHANGES-IPPTOOL.txt IPPTOOL.txt LICENSE.txt $pkgdir
 cp doc/help/man-ipptool*.html $pkgdir
 cp test/color.jpg $pkgdir
 cp test/create-printer-subscription.test $pkgdir
@@ -75,9 +73,9 @@ else
 fi
 
 if test -x /usr/bin/md5sum; then
-        (md5sum $pkgfile | awk '{print $1, "'$fileversion' cups/'$version'/" $2}')
+        (md5sum $pkgfile | awk '{print $1, "'$fileversion' cups/ipptool/" $2}')
 elif test -x /sbin/md5; then
-        (md5 $pkgfile | awk '{print $4, "'$fileversion' cups/'$version'/" substr($2, 2, length($2) - 2)}')
+        (md5 $pkgfile | awk '{print $4, "'$fileversion' cups/ipptool/" substr($2, 2, length($2) - 2)}')
 fi
 
 echo Removing temporary files...
