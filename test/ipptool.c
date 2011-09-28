@@ -144,7 +144,11 @@ int		Cancel = 0,		/* Cancel test? */
 		IgnoreErrors = 0,	/* Ignore errors? */
 		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
-		XMLHeader = 0;		/* 1 if header is written */
+		XMLHeader = 0,		/* 1 if header is written */
+		TestCount = 0,		/* Number of tests run */
+		PassCount = 0,		/* Number of passing tests */
+		FailCount = 0,		/* Number of failing tests */
+		SkipCount = 0;		/* Number of skipped tests */
 char		*Password = NULL;	/* Password from URI */
 const char * const URIStatusStrings[] =	/* URI status strings */
 {
@@ -398,15 +402,30 @@ main(int  argc,				/* I - Number of command-line args */
               if (vars.filename)
 		free(vars.filename);
 
-              if (access(argv[i], 0) && argv[i][0] != '/')
+              if (access(argv[i], 0))
               {
-                snprintf(filename, sizeof(filename), "%s/ipptool/%s",
-                         cg->cups_datadir, argv[i]);
-                if (access(argv[i], 0))
-		  vars.filename = strdup(argv[i]);
-                else
-                  vars.filename = strdup(filename);
-              }
+               /*
+                * Try filename.gz...
+                */
+
+		snprintf(filename, sizeof(filename), "%s.gz", argv[i]);
+                if (access(filename, 0) && filename[0] != '/')
+		{
+		  snprintf(filename, sizeof(filename), "%s/ipptool/%s",
+			   cg->cups_datadir, argv[i]);
+		  if (access(filename, 0))
+		  {
+		    snprintf(filename, sizeof(filename), "%s/ipptool/%s.gz",
+			     cg->cups_datadir, argv[i]);
+		    if (access(filename, 0))
+		      vars.filename = strdup(argv[i]);
+		  }
+		  else
+		    vars.filename = strdup(filename);
+		}
+		else
+		  vars.filename = strdup(filename);
+	      }
               else
 		vars.filename = strdup(argv[i]);
 
@@ -419,7 +438,9 @@ main(int  argc,				/* I - Number of command-line args */
                 if (!_cups_strcasecmp(ext, ".gif"))
                   set_variable(&vars, "filetype", "image/gif");
                 else if (!_cups_strcasecmp(ext, ".htm") ||
-                         !_cups_strcasecmp(ext, ".html"))
+                         !_cups_strcasecmp(ext, ".htm.gz") ||
+                         !_cups_strcasecmp(ext, ".html") ||
+                         !_cups_strcasecmp(ext, ".html.gz"))
                   set_variable(&vars, "filetype", "text/html");
                 else if (!_cups_strcasecmp(ext, ".jpg"))
                   set_variable(&vars, "filetype", "image/jpeg");
@@ -427,11 +448,14 @@ main(int  argc,				/* I - Number of command-line args */
                   set_variable(&vars, "filetype", "application/pdf");
                 else if (!_cups_strcasecmp(ext, ".png"))
                   set_variable(&vars, "filetype", "image/png");
-                else if (!_cups_strcasecmp(ext, ".ps"))
+                else if (!_cups_strcasecmp(ext, ".ps") ||
+                         !_cups_strcasecmp(ext, ".ps.gz"))
                   set_variable(&vars, "filetype", "application/postscript");
-                else if (!_cups_strcasecmp(ext, ".ras"))
+                else if (!_cups_strcasecmp(ext, ".ras") ||
+                         !_cups_strcasecmp(ext, ".ras.gz"))
                   set_variable(&vars, "filetype", "image/pwg-raster");
-                else if (!_cups_strcasecmp(ext, ".txt"))
+                else if (!_cups_strcasecmp(ext, ".txt") ||
+                         !_cups_strcasecmp(ext, ".txt.gz"))
                   set_variable(&vars, "filetype", "text/plain");
                 else if (!_cups_strcasecmp(ext, ".xps"))
                   set_variable(&vars, "filetype", "application/openxps");
@@ -627,6 +651,16 @@ main(int  argc,				/* I - Number of command-line args */
       do_tests(&vars, testfile);
     }
   }
+  else if (Output == _CUPS_OUTPUT_TEST && TestCount > 1)
+  {
+   /*
+    * Show a summary report if there were multiple tests...
+    */
+
+    printf("\nSummary: %d tests, %d passed, %d failed, %d skipped\n"
+           "Score: %d%%\n", TestCount, PassCount, FailCount, SkipCount,
+           100 * (PassCount + SkipCount) / TestCount);
+  }
 
  /*
   * Exit...
@@ -676,7 +710,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		*response = NULL;	/* IPP response */
   size_t	length;			/* Length of IPP request */
   http_status_t	status;			/* HTTP status */
-  int		fd;			/* File to send */
+  cups_file_t	*reqfile;		/* File to send */
   ssize_t	bytes;			/* Bytes read/written */
   char		attr[128];		/* Attribute name */
   ipp_op_t	op;			/* Operation */
@@ -2037,6 +2071,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     * Submit the IPP request...
     */
 
+    TestCount ++;
+
     request->request.op.version[0]   = version / 10;
     request->request.op.version[1]   = version % 10;
     request->request.op.operation_id = op;
@@ -2078,6 +2114,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     if ((skip_previous && !prev_pass) || skip_test)
     {
+      SkipCount ++;
+
       ippDelete(request);
       request = NULL;
 
@@ -2118,20 +2156,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	length = ippLength(request);
 
-	if (filename[0])
+	if (filename[0] && (reqfile = cupsFileOpen(filename, "r")) != NULL)
 	{
-	  struct stat	fileinfo;	/* File information */
+	 /*
+	  * Read the file to get the uncompressed file size...
+	  */
 
-	  if (stat(filename, &fileinfo))
-	  {
-	    snprintf(buffer, sizeof(buffer), "%s: %s", filename,
-	             strerror(errno));
-	    _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
+	  while ((bytes = cupsFileRead(reqfile, buffer, sizeof(buffer))) > 0)
+	    length += bytes;
 
-	    status = HTTP_ERROR;
-	  }
-	  else
-	    length += fileinfo.st_size;
+	  cupsFileClose(reqfile);
 	}
       }
 
@@ -2152,12 +2186,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  if (!Cancel && status == HTTP_CONTINUE &&
 	      request->state == IPP_DATA && filename[0])
 	  {
-	    if ((fd = open(filename, O_RDONLY | O_BINARY)) >= 0)
+	    if ((reqfile = cupsFileOpen(filename, "r")) != NULL)
 	    {
-	      while (!Cancel && (bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	      while (!Cancel &&
+	             (bytes = cupsFileRead(reqfile, buffer,
+	                                   sizeof(buffer))) > 0)
 		if ((status = cupsWriteRequestData(http, buffer,
 						   bytes)) != HTTP_CONTINUE)
 		  break;
+
+	      cupsFileClose(reqfile);
 	    }
 	    else
 	    {
@@ -2420,7 +2458,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     ippDelete(request);
 
-    request   = NULL;
+    request = NULL;
+
+    if (prev_pass)
+      PassCount ++;
+    else
+      FailCount ++;
 
     if (Output == _CUPS_OUTPUT_PLIST)
     {
