@@ -251,7 +251,7 @@ effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
 DEFINE-VALUE variable-name
 Defines the variable to the value of the attribute when the EXPECT condition
-matches.
+matches. A side-effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
 IF-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is defined.
