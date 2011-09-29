@@ -2375,7 +2375,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    {
 	      if (expect->define_no_match)
 		set_variable(vars, expect->define_no_match, "1");
-	      else if (!expect->define_match)
+	      else if (!expect->define_match && !expect->define_value)
 		prev_pass = pass = 0;
 
               if (expect->repeat_no_match)
