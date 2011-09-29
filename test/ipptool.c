@@ -734,6 +734,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   int		num_displayed = 0;	/* Number of displayed attributes */
   char		*displayed[200];	/* Displayed attributes */
   size_t	widths[200];		/* Width of columns */
+  cups_array_t	*a;			/* Duplicate attribute array */
 
 
  /*
@@ -2314,14 +2315,50 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      strlen(attrptr->values[0].string.text) > 1023)))
 	  prev_pass = pass = 0;
 
+	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
 	for (attrptr = response->attrs, group = attrptr->group_tag;
 	     attrptr;
 	     attrptr = attrptr->next)
 	{
-	  if (attrptr->group_tag < group && attrptr->group_tag != IPP_TAG_ZERO)
+	  if (attrptr->group_tag != group)
 	  {
-	    prev_pass = pass = 0;
-	    break;
+	    cupsArrayClear(a);
+
+            switch (attrptr->group_tag)
+            {
+              case IPP_TAG_OPERATION :
+                  prev_pass = pass = 0;
+                  break;
+
+              case IPP_TAG_UNSUPPORTED_GROUP :
+                  if (group != IPP_TAG_OPERATION)
+		    prev_pass = pass = 0;
+                  break;
+
+              case IPP_TAG_JOB :
+              case IPP_TAG_PRINTER :
+                  if (group != IPP_TAG_OPERATION &&
+                      group != IPP_TAG_UNSUPPORTED_GROUP)
+		    prev_pass = pass = 0;
+                  break;
+
+              case IPP_TAG_SUBSCRIPTION :
+                  if (group > attrptr->group_tag &&
+                      group != IPP_TAG_DOCUMENT)
+		    prev_pass = pass = 0;
+                  break;
+
+              default :
+                  if (group > attrptr->group_tag)
+		    prev_pass = pass = 0;
+                  break;
+            }
+
+            if (!pass)
+	      break;
+
+	    group = attrptr->group_tag;
 	  }
 
 	  if (!validate_attr(attrptr, 0))
@@ -2329,7 +2366,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    prev_pass = pass = 0;
 	    break;
 	  }
+
+          if (attrptr->name)
+          {
+            if (cupsArrayFind(a, attrptr->name))
+            {
+              prev_pass = pass = 0;
+              break;
+            }
+
+            cupsArrayAdd(a, attrptr->name);
+          }
 	}
+
+        cupsArrayDelete(a);
 
 	for (i = 0; i < num_statuses; i ++)
 	{
@@ -2695,17 +2745,70 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	                     (int)strlen(attrptr->values[0].string.text));
         }
 
+	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
 	for (attrptr = response->attrs, group = attrptr->group_tag;
 	     attrptr;
 	     attrptr = attrptr->next)
 	{
-	  if (attrptr->group_tag < group && attrptr->group_tag != IPP_TAG_ZERO)
-	    print_test_error("Attribute groups out of order (%s < %s)",
-	                     ippTagString(attrptr->group_tag),
-			     ippTagString(group));
+	  if (attrptr->group_tag != group)
+	  {
+	    cupsArrayClear(a);
+
+            switch (attrptr->group_tag)
+            {
+              case IPP_TAG_OPERATION :
+                  prev_pass = pass = 0;
+                  break;
+
+              case IPP_TAG_UNSUPPORTED_GROUP :
+                  if (group != IPP_TAG_OPERATION)
+		    print_test_error("Attribute groups out of order (%s < %s)",
+				     ippTagString(attrptr->group_tag),
+				     ippTagString(group));
+                  break;
+
+              case IPP_TAG_JOB :
+              case IPP_TAG_PRINTER :
+                  if (group != IPP_TAG_OPERATION &&
+                      group != IPP_TAG_UNSUPPORTED_GROUP)
+		    print_test_error("Attribute groups out of order (%s < %s)",
+				     ippTagString(attrptr->group_tag),
+				     ippTagString(group));
+                  break;
+
+              case IPP_TAG_SUBSCRIPTION :
+                  if (group > attrptr->group_tag &&
+                      group != IPP_TAG_DOCUMENT)
+		    print_test_error("Attribute groups out of order (%s < %s)",
+				     ippTagString(attrptr->group_tag),
+				     ippTagString(group));
+                  break;
+
+              default :
+                  if (group > attrptr->group_tag)
+		    print_test_error("Attribute groups out of order (%s < %s)",
+				     ippTagString(attrptr->group_tag),
+				     ippTagString(group));
+                  break;
+            }
+
+	    group = attrptr->group_tag;
+	  }
 
 	  validate_attr(attrptr, 1);
+
+          if (attrptr->name)
+          {
+            if (cupsArrayFind(a, attrptr->name))
+              print_test_error("Duplicate \"%s\" attribute in %s group",
+                               attrptr->name, ippTagString(group));
+
+            cupsArrayAdd(a, attrptr->name);
+          }
 	}
+
+        cupsArrayDelete(a);
 
 	for (i = 0; i < num_statuses; i ++)
 	{
