@@ -1,8 +1,15 @@
-CHANGES-IPPTOOL.txt - 2011-09-28
+CHANGES-IPPTOOL.txt - 2011-09-29
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2011-09-29
+
+	- Fixed one spot where DEFINE-VALUE was still treated as an error when
+	  the EXPECT test failed.
+	- uriScheme values were not displayed properly.
 
 
 2011-09-28

@@ -448,6 +448,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
       case IPP_TAG_KEYWORD :
       case IPP_TAG_CHARSET :
       case IPP_TAG_URI :
+      case IPP_TAG_URISCHEME :
       case IPP_TAG_MIMETYPE :
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_TEXTLANG :
