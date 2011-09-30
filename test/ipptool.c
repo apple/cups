@@ -2404,96 +2404,94 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (i == num_statuses && num_statuses > 0)
 	  prev_pass = pass = 0;
-	else
+
+	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
-	  for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
+	    continue;
+
+	  if (expect->if_not_defined &&
+	      get_variable(vars, expect->if_not_defined))
+	    continue;
+
+	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+
+	  if ((found && expect->not_expect) ||
+	      (!found && !(expect->not_expect || expect->optional)) ||
+	      (found && !expect_matches(expect, found->value_tag)) ||
+	      (found && expect->in_group &&
+	       found->group_tag != expect->in_group))
 	  {
-	    if (expect->if_defined && !get_variable(vars, expect->if_defined))
-	      continue;
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+	    else if (!expect->define_match && !expect->define_value)
+	      prev_pass = pass = 0;
 
-	    if (expect->if_not_defined &&
-		get_variable(vars, expect->if_not_defined))
-	      continue;
-
-	    found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
-
-	    if ((found && expect->not_expect) ||
-		(!found && !(expect->not_expect || expect->optional)) ||
-		(found && !expect_matches(expect, found->value_tag)) ||
-		(found && expect->in_group &&
-		 found->group_tag != expect->in_group))
-	    {
-	      if (expect->define_no_match)
-		set_variable(vars, expect->define_no_match, "1");
-	      else if (!expect->define_match && !expect->define_value)
-		prev_pass = pass = 0;
-
-              if (expect->repeat_no_match)
-                repeat_test = 1;
-
-	      continue;
-	    }
-
-	    if (found)
-	      _ippAttrString(found, buffer, sizeof(buffer));
-
-	    if (found &&
-		!with_value(expect->with_value, expect->with_regex, found, 0,
-		            buffer, sizeof(buffer)))
-	    {
-	      if (expect->define_no_match)
-		set_variable(vars, expect->define_no_match, "1");
-	      else if (!expect->define_match && !expect->define_value)
-		prev_pass = pass = 0;
-
-              if (expect->repeat_no_match)
-                repeat_test = 1;
-
-	      continue;
-	    }
-
-	    if (found && expect->count > 0 &&
-	        found->num_values != expect->count)
-	    {
-	      if (expect->define_no_match)
-		set_variable(vars, expect->define_no_match, "1");
-	      else if (!expect->define_match && !expect->define_value)
-		prev_pass = pass = 0;
-
-              if (expect->repeat_no_match)
-                repeat_test = 1;
-
-	      continue;
-	    }
-
-	    if (found && expect->same_count_as)
-	    {
-	      attrptr = ippFindAttribute(response, expect->same_count_as,
-					 IPP_TAG_ZERO);
-
-	      if (!attrptr || attrptr->num_values != found->num_values)
-	      {
-		if (expect->define_no_match)
-		  set_variable(vars, expect->define_no_match, "1");
-		else if (!expect->define_match && !expect->define_value)
-		  prev_pass = pass = 0;
-
-		if (expect->repeat_no_match)
-		  repeat_test = 1;
-
-		continue;
-	      }
-	    }
-
-	    if (found && expect->define_match)
-	      set_variable(vars, expect->define_match, "1");
-
-	    if (found && expect->define_value)
-	      set_variable(vars, expect->define_value, buffer);
-
-            if (found && expect->repeat_match)
+	    if (expect->repeat_no_match)
 	      repeat_test = 1;
+
+	    continue;
 	  }
+
+	  if (found)
+	    _ippAttrString(found, buffer, sizeof(buffer));
+
+	  if (found &&
+	      !with_value(expect->with_value, expect->with_regex, found, 0,
+			  buffer, sizeof(buffer)))
+	  {
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+	    else if (!expect->define_match && !expect->define_value)
+	      prev_pass = pass = 0;
+
+	    if (expect->repeat_no_match)
+	      repeat_test = 1;
+
+	    continue;
+	  }
+
+	  if (found && expect->count > 0 &&
+	      found->num_values != expect->count)
+	  {
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+	    else if (!expect->define_match && !expect->define_value)
+	      prev_pass = pass = 0;
+
+	    if (expect->repeat_no_match)
+	      repeat_test = 1;
+
+	    continue;
+	  }
+
+	  if (found && expect->same_count_as)
+	  {
+	    attrptr = ippFindAttribute(response, expect->same_count_as,
+				       IPP_TAG_ZERO);
+
+	    if (!attrptr || attrptr->num_values != found->num_values)
+	    {
+	      if (expect->define_no_match)
+		set_variable(vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value)
+		prev_pass = pass = 0;
+
+	      if (expect->repeat_no_match)
+		repeat_test = 1;
+
+	      continue;
+	    }
+	  }
+
+	  if (found && expect->define_match)
+	    set_variable(vars, expect->define_match, "1");
+
+	  if (found && expect->define_value)
+	    set_variable(vars, expect->define_value, buffer);
+
+	  if (found && expect->repeat_match)
+	    repeat_test = 1;
 	}
       }
 
@@ -2555,70 +2553,47 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else if (!prev_pass)
       fprintf(stderr, "%s\n", cupsLastErrorString());
 
-    if (prev_pass && Output != _CUPS_OUTPUT_PLIST &&
-        Output != _CUPS_OUTPUT_QUIET && !Verbosity && num_displayed > 0)
+    if (prev_pass && Output >= _CUPS_OUTPUT_LIST && !Verbosity &&
+        num_displayed > 0)
     {
-      if (Output >= _CUPS_OUTPUT_LIST)
+      size_t	width;			/* Length of value */
+
+      for (i = 0; i < num_displayed; i ++)
       {
-	size_t	width;			/* Length of value */
+	widths[i] = strlen(displayed[i]);
 
-
-        for (i = 0; i < num_displayed; i ++)
-        {
-          widths[i] = strlen(displayed[i]);
-
-          for (attrptr = ippFindAttribute(response, displayed[i], IPP_TAG_ZERO);
-               attrptr;
-               attrptr = ippFindNextAttribute(response, displayed[i],
-                                              IPP_TAG_ZERO))
-          {
-            width = _ippAttrString(attrptr, NULL, 0);
-            if (width > widths[i])
-              widths[i] = width;
-          }
-        }
-
-        if (Output == _CUPS_OUTPUT_CSV)
-	  print_csv(NULL, num_displayed, displayed, widths);
-	else
-	  print_line(NULL, num_displayed, displayed, widths);
-
-        attrptr = response->attrs;
-
-        while (attrptr)
-        {
-	  while (attrptr && attrptr->group_tag <= IPP_TAG_OPERATION)
-	    attrptr = attrptr->next;
-
-          if (attrptr)
-          {
-            if (Output == _CUPS_OUTPUT_CSV)
-	      print_csv(attrptr, num_displayed, displayed, widths);
-	    else
-	      print_line(attrptr, num_displayed, displayed, widths);
-
-            while (attrptr && attrptr->group_tag > IPP_TAG_OPERATION)
-              attrptr = attrptr->next;
-          }
-        }
-      }
-      else
-      {
-	for (attrptr = response->attrs;
-	     attrptr != NULL;
-	     attrptr = attrptr->next)
+	for (attrptr = ippFindAttribute(response, displayed[i], IPP_TAG_ZERO);
+	     attrptr;
+	     attrptr = ippFindNextAttribute(response, displayed[i],
+					    IPP_TAG_ZERO))
 	{
-	  if (attrptr->name)
-	  {
-	    for (i = 0; i < num_displayed; i ++)
-	    {
-	      if (!strcmp(displayed[i], attrptr->name))
-	      {
-		print_attr(attrptr, NULL);
-		break;
-	      }
-	    }
-	  }
+	  width = _ippAttrString(attrptr, NULL, 0);
+	  if (width > widths[i])
+	    widths[i] = width;
+	}
+      }
+
+      if (Output == _CUPS_OUTPUT_CSV)
+	print_csv(NULL, num_displayed, displayed, widths);
+      else
+	print_line(NULL, num_displayed, displayed, widths);
+
+      attrptr = response->attrs;
+
+      while (attrptr)
+      {
+	while (attrptr && attrptr->group_tag <= IPP_TAG_OPERATION)
+	  attrptr = attrptr->next;
+
+	if (attrptr)
+	{
+	  if (Output == _CUPS_OUTPUT_CSV)
+	    print_csv(attrptr, num_displayed, displayed, widths);
+	  else
+	    print_line(attrptr, num_displayed, displayed, widths);
+
+	  while (attrptr && attrptr->group_tag > IPP_TAG_OPERATION)
+	    attrptr = attrptr->next;
 	}
       }
     }
@@ -2918,6 +2893,27 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
       if (Output == _CUPS_OUTPUT_PLIST)
 	puts("</array>");
+    }
+
+    if (num_displayed > 0 && !Verbosity &&
+        (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
+    {
+      for (attrptr = response->attrs;
+	   attrptr != NULL;
+	   attrptr = attrptr->next)
+      {
+	if (attrptr->name)
+	{
+	  for (i = 0; i < num_displayed; i ++)
+	  {
+	    if (!strcmp(displayed[i], attrptr->name))
+	    {
+	      print_attr(attrptr, NULL);
+	      break;
+	    }
+	  }
+	}
+      }
     }
 
     skip_error:
