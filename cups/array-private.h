@@ -21,7 +21,7 @@
  * Include necessary headers...
  */
 
-#  include "array.h"
+#  include <cups/array.h>
 
 
 /*
