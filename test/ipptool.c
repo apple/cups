@@ -2925,6 +2925,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     if (Output == _CUPS_OUTPUT_PLIST)
       puts("</dict>");
 
+    fflush(stdout);
+
     ippDelete(response);
     response = NULL;
 

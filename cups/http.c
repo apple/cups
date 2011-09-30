@@ -167,8 +167,10 @@ static int		http_read_ssl(http_t *http, char *buf, int len);
 #  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
 static int		http_set_credentials(http_t *http);
 #  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
+#endif /* HAVE_SSL */
 static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
+#ifdef HAVE_SSL
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
