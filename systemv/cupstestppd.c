@@ -3286,7 +3286,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
 	                 ceil(size->length) : size->length;
 
-        if (fmod(width_tmp, 18.0) == 0.0 && fmod(length_tmp, 18.0) == 0.0)
+        if (fmod(width_tmp, 18.0) == 0.0 || fmod(length_tmp, 18.0) == 0.0)
         {
           width_inch  = width_tmp / 72.0;
           length_inch = length_tmp / 72.0;
@@ -3307,10 +3307,16 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         else if (size->width > size->length)
           strlcat(buf, ".Transverse", sizeof(buf));
 
-        if (strcmp(size->name, buf))
-          _cupsLangPrintf(stdout,
-                          _("      %s  Size \"%s\" should be \"%s\"."),
-                          prefix, size->name, buf);
+        if (_cups_strcasecmp(size->name, buf))
+        {
+          size_t buflen = strlen(buf);	/* Length of proposed name */
+
+          if (_cups_strncasecmp(size->name, buf, buflen) ||
+              strcmp(size->name + buflen, "in"))
+	    _cupsLangPrintf(stdout,
+			    _("      %s  Size \"%s\" should be \"%s\"."),
+			    prefix, size->name, buf);
+        }
       }
     }
   }
