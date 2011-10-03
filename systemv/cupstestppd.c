@@ -3262,7 +3262,16 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	    is_ok = 0;
         }
 	else
-	  is_ok = 0;
+	{
+	 /*
+	  * Check for EnvSizeName as well...
+	  */
+
+	  snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
+
+	  if (strcmp(size->name, buf))
+	    is_ok = 0;
+	}
 
         if (!is_ok)
           _cupsLangPrintf(stdout,
