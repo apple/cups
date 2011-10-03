@@ -50,10 +50,10 @@ DEFINE MEDIA_REGEX "/^((custom|na|asme|roc|oe)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\
 	EXPECT copies-supported OF-TYPE rangeOfInteger IN-GROUP printer-attributes-tag
 	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag
 	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3
-	EXPECT media-default OF-TYPE no-value|keyword|name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "no-value,$MEDIA_REGEX"
+	EXPECT media-default OF-TYPE no-value|keyword|name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$MEDIA_REGEX"
 	EXPECT ?media-ready OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-VALUE "$MEDIA_REGEX"
 	EXPECT media-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-VALUE "$MEDIA_REGEX"
-	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
+	EXPECT orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
 	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6
 	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
