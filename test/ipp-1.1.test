@@ -958,6 +958,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 # Defined by: RFC 2911 section 3.2.2
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_PRINT_URI
+	SKIP-IF-NOT-DEFINED document-uri
 
 	NAME "Print-URI with bad URI: Print-URI Operation"
 	OPERATION Print-URI
@@ -1193,6 +1194,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 {
 	SKIP-IF-NOT-DEFINED OPTIONAL_CREATE_JOB
 	SKIP-IF-NOT-DEFINED OPTIONAL_SEND_URI
+	SKIP-IF-NOT-DEFINED document-uri
 	SKIP-PREVIOUS-ERROR yes
 
 	NAME "Send-URI with bad URI: Send-URI Operation (bad URI)"
