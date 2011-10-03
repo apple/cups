@@ -2007,7 +2007,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  tokenptr = token + strlen(token) - 1;
 
-	  if (token[0] == '/' && tokenptr > token && *tokenptr == '/')
+	  if ((token[0] == '/' || !strncmp(token, "no-value,/", 10)) &&
+	      tokenptr > token && *tokenptr == '/')
 	  {
 	   /*
 	    * WITH-VALUE is a POSIX extended regular expression.
@@ -2017,7 +2018,17 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    last_expect->with_regex = 1;
 
 	    if (last_expect->with_value)
-	      memcpy(last_expect->with_value, token + 1, tokenptr - token - 1);
+	    {
+	      if (!strncmp(token, "no-value,/", 10))
+	      {
+	        memcpy(last_expect->with_value, "no-value,", 9);
+	        memcpy(last_expect->with_value + 9, token + 10,
+	               tokenptr - token - 10);
+	      }
+	      else
+	        memcpy(last_expect->with_value, token + 1,
+	               tokenptr - token - 1);
+	    }
 	  }
 	  else
 	  {
@@ -5326,6 +5337,9 @@ with_value(char            *value,	/* I - Value string */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :
+	if (!strncmp(value, "no-value,", 9))
+	  value += 9;
+
         if (regex)
 	{
 	 /*

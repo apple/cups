@@ -253,7 +253,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?job-priority-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0,<101
 	EXPECT ?job-sheets-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag
 	EXPECT ?job-sheets-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag WITH-VALUE none
-	EXPECT ?media-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT ?media-default OF-TYPE no-value|keyword|name IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT ?media-ready OF-TYPE keyword|name IN-GROUP printer-attributes-tag
 	EXPECT ?media-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
 	EXPECT ?multiple-document-handling-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(single-document|separate-documents-uncollated-copies|separate-documents-collated-copies|single-document-new-sheet)$$/"
@@ -261,7 +261,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?number-up-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT ?number-up-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag WITH-VALUE >0
 	EXPECT ?number-up-supported WITH-VALUE 1
-	EXPECT ?orientation-requested-default OF-TYPE enum,no-value IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
+	EXPECT ?orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
 	EXPECT ?orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6
 	EXPECT ?pages-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag
 	EXPECT ?print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
