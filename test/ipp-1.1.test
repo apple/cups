@@ -158,7 +158,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state WITH-VALUE 7,8,9 DEFINE-MATCH PRINT_JOB_COMPLETED
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
@@ -261,7 +261,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?number-up-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT ?number-up-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag WITH-VALUE >0
 	EXPECT ?number-up-supported WITH-VALUE 1
-	EXPECT ?orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
+	EXPECT ?orientation-requested-default OF-TYPE no-value|enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
 	EXPECT ?orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6
 	EXPECT ?pages-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag
 	EXPECT ?print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
@@ -432,19 +432,19 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
 	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-processing OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-completed OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT job-printer-up-time OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-creation OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-processing OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-completed OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-up-time OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-creation OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-processing OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-completed OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?number-of-intervening-jobs OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-message-from-operator OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-k-octets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
@@ -654,6 +654,22 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 }
 
 
+# Wait for job to complete...
+{
+	NAME "Get-Job-Attributes Until Job Complete"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6,<10 REPEAT-NO-MATCH
+}
+
+
 # Test Get-Jobs operation
 #
 # Required by: RFC 2911 section 3.2.6
@@ -666,7 +682,6 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
 	ATTR keyword which-jobs completed
-	DELAY 20
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
@@ -736,19 +751,19 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
 	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-processing OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-completed OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT job-printer-up-time OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-creation OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-processing OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-completed OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-up-time OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-creation OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-processing OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-completed OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?number-of-intervening-jobs OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-message-from-operator OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-k-octets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
@@ -817,7 +832,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -864,19 +879,19 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
 	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-processing OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT time-at-completed OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
-	EXPECT job-printer-up-time OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-creation OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-processing OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
-	EXPECT ?date-time-at-completed OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT job-printer-up-time OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-creation OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-processing OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-completed OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?number-of-intervening-jobs OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-message-from-operator OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-k-octets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
@@ -929,7 +944,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -989,7 +1004,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1043,7 +1058,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1113,7 +1128,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1167,7 +1182,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1244,7 +1259,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1281,7 +1296,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1318,7 +1333,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1353,7 +1368,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1390,7 +1405,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1427,7 +1442,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1464,7 +1479,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1499,7 +1514,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1536,7 +1551,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1573,7 +1588,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1608,7 +1623,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1643,7 +1658,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1678,7 +1693,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1713,7 +1728,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1748,7 +1763,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1787,7 +1802,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1824,7 +1839,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1861,7 +1876,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1898,7 +1913,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1937,7 +1952,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -1974,7 +1989,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2011,7 +2026,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2048,7 +2063,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2087,7 +2102,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2124,7 +2139,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2161,7 +2176,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2198,7 +2213,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2235,7 +2250,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
@@ -2270,7 +2285,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE >0
-	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-state OF-TYPE unknown|enum COUNT 1 IN-GROUP job-attributes-tag
 	       WITH-VALUE 3,4,5,6,7,8,9
 	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
