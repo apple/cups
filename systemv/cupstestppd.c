@@ -3180,7 +3180,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
    /*
     * Verify that the size name is Adobe standard name if it's a standard size
-    * and the dementional name if it's not a standard size.  Suffix should be
+    * and the dimentional name if it's not a standard size.  Suffix should be
     * .Fullbleed, etc., or numeric, e.g., Letter, Letter.Fullbleed,
     * Letter.Transverse, Letter1, Letter2, 4x8, 55x91mm, 55x91mm.Fullbleed, etc.
     */
@@ -3220,29 +3220,24 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	      is_ok = 0;
 	  }
         }
-        else if (size->width > size->length)
+        else if (strcmp(size->name, buf) && size->width > size->length)
         {
-	  if ((ptr = pwg_media->ppd + ppdlen - 7) >= pwg_media->ppd &&
-	      !strcmp(ptr, "Rotated"))
+          if (!strcmp(pwg_media->ppd, "DoublePostcardRotated"))
+            strlcpy(buf, "DoublePostcard", sizeof(buf));
+          else
+	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+
+	  if (strcmp(size->name, buf))
 	  {
+	    snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
 	    if (strcmp(size->name, buf))
 	      is_ok = 0;
-	  }
-	  else
-	  {
-	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
-	    if (strcmp(size->name, buf))
-	    {
-	      snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
-	      if (strcmp(size->name, buf))
-		is_ok = 0;
-	    }
 	  }
         }
 	else if (!strncmp(size->name, pwg_media->ppd, ppdlen))
 	{
 	 /*
-	  * Check for a proper qualifier (number or .something)...
+	  * Check for a proper qualifier (number, "Small", or .something)...
 	  */
 
 	  ptr = size->name + ppdlen;
@@ -3258,7 +3253,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	      }
             }
           }
-          else if (*ptr != '.' && *ptr)
+          else if (*ptr != '.' && *ptr && strcmp(ptr, "Small"))
 	    is_ok = 0;
         }
 	else
