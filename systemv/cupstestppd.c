@@ -3198,19 +3198,32 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
       if (pwg_media && pwg_media->ppd)
       {
+        size_t ppdlen = strlen(pwg_media->ppd);
+					/* Length of standard PPD name */
+
         strlcpy(buf, pwg_media->ppd, sizeof(buf));
 
         if (size->left == 0 && size->bottom == 0 &&
 	    size->right == size->width && size->top == size->length)
         {
           snprintf(buf, sizeof(buf), "%s.Fullbleed", pwg_media->ppd);
-	  if (strcmp(size->name, buf))
-	    is_ok = 0;
+	  if (_cups_strcasecmp(size->name, buf))
+	  {
+	   /*
+	    * Allow an additional qualifier such as ".WithTab"...
+	    */
+
+	    size_t buflen = strlen(buf);/* Length of full bleed name */
+
+            if (_cups_strncasecmp(size->name, buf, buflen) ||
+                size->name[buflen] != '.')
+	      is_ok = 0;
+	  }
         }
         else if (size->width > size->length)
         {
-	  if ((ptr = pwg_media->ppd + strlen(pwg_media->ppd) - 7)
-	          >= pwg_media->ppd && !strcmp(ptr, "Rotated"))
+	  if ((ptr = pwg_media->ppd + ppdlen - 7) >= pwg_media->ppd &&
+	      !strcmp(ptr, "Rotated"))
 	  {
 	    if (strcmp(size->name, buf))
 	      is_ok = 0;
@@ -3226,11 +3239,17 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	    }
 	  }
         }
-	else
-        {
-	  if ((!strncmp(size->name, pwg_media->ppd, strlen(pwg_media->ppd))))
+	else if (!strncmp(size->name, pwg_media->ppd, ppdlen))
+	{
+	 /*
+	  * Check for a proper qualifier (number or .something)...
+	  */
+
+	  ptr = size->name + ppdlen;
+
+	  if (isdigit(*ptr & 255))
           {
-            for (ptr = size->name + strlen(pwg_media->ppd); *ptr; ptr ++)
+            for (ptr ++; *ptr; ptr ++)
             {
               if (!isdigit(*ptr & 255))
 	      {
@@ -3239,9 +3258,11 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	      }
             }
           }
-          else
-            is_ok = 0;
+          else if (*ptr != '.' && *ptr)
+	    is_ok = 0;
         }
+	else
+	  is_ok = 0;
 
         if (!is_ok)
           _cupsLangPrintf(stdout,

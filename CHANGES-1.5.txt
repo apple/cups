@@ -4,6 +4,7 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885)
+	- Relaxed some of the page size checks in cupstestppd.
 	- The ipptool program now reports attributes that are repeated within
 	  the same attribute group.
 	- Updated the PWG raster support to match the current draft
