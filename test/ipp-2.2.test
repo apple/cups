@@ -46,6 +46,8 @@ INCLUDE "ipp-2.1.test"
 	# Printer description attributes
 	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+	EXPECT media-col-ready
+	EXPECT media-ready
 	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
 	EXPECT printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
 	EXPECT printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert

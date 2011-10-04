@@ -3,13 +3,17 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.1
 
-	- Documentation updates (STR #3885)
+	- Documentation updates (STR #3885, STR #3946)
+	- The DBUS notifier could crash (STR #3947)
+	- Relaxed some of the page size checks in cupstestppd.
+	- The ipptool program now reports attributes that are repeated within
+	  the same attribute group.
 	- Updated the PWG raster support to match the current draft
 	  specification.
 	- Fixed some IPP conformance issues in the scheduler.
 	- Added ipptool support for repeating requests.
-	- Added IPP/2.2 conformance tests and greatly improved the IPP/1.1
-	  conformance testing.
+	- Added IPP/2.2 conformance tests and greatly improved the IPP/1.1,
+	  IPP/2.0, and IPP/2.1 conformance testing.
 	- IPP messages containing mixed integer/rangeOfInteger values did not
 	  work (STR #3942)
 	- The ipptool program now provides additional diagnostics for badly-

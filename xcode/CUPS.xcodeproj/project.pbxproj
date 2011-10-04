@@ -1384,40 +1384,14 @@
 		7263EE3913330EC500BA4D44 /* libldap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libldap.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libldap.dylib; sourceTree = DEVELOPER_DIR; };
 		726AD6F7135E88F0002C930D /* ippserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ippserver; sourceTree = BUILT_PRODUCTS_DIR; };
 		726AD701135E8A90002C930D /* ippserver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ippserver.c; path = ../test/ippserver.c; sourceTree = "<group>"; };
-		7271881613746EA8001A2036 /* bannertops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = bannertops.c; path = ../filter/bannertops.c; sourceTree = "<group>"; };
 		7271881713746EA8001A2036 /* commandtops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = commandtops.c; path = ../filter/commandtops.c; sourceTree = "<group>"; };
 		7271881813746EA8001A2036 /* common.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = common.c; path = ../filter/common.c; sourceTree = "<group>"; };
 		7271881913746EA8001A2036 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../filter/common.h; sourceTree = "<group>"; };
 		7271881A13746EA8001A2036 /* gziptoany.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = gziptoany.c; path = ../filter/gziptoany.c; sourceTree = "<group>"; };
-		7271881B13746EA8001A2036 /* imagetops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = imagetops.c; path = ../filter/imagetops.c; sourceTree = "<group>"; };
-		7271881C13746EA8001A2036 /* imagetoraster.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = imagetoraster.c; path = ../filter/imagetoraster.c; sourceTree = "<group>"; };
-		7271881D13746EA8001A2036 /* pdftops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pdftops.c; path = ../filter/pdftops.c; sourceTree = "<group>"; };
-		7271881E13746EA8001A2036 /* pstext.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pstext.c; path = ../filter/pstext.c; sourceTree = "<group>"; };
-		7271881F13746EA8001A2036 /* pstext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pstext.h; path = ../filter/pstext.h; sourceTree = "<group>"; };
 		7271882013746EA8001A2036 /* pstops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pstops.c; path = ../filter/pstops.c; sourceTree = "<group>"; };
 		7271882113746EA8001A2036 /* rastertoepson.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = rastertoepson.c; path = ../filter/rastertoepson.c; sourceTree = "<group>"; };
 		7271882213746EA8001A2036 /* rastertohp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = rastertohp.c; path = ../filter/rastertohp.c; sourceTree = "<group>"; };
 		7271882313746EA8001A2036 /* rastertolabel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = rastertolabel.c; path = ../filter/rastertolabel.c; sourceTree = "<group>"; };
-		7271882413746EA8001A2036 /* textcommon.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = textcommon.c; path = ../filter/textcommon.c; sourceTree = "<group>"; };
-		7271882513746EA8001A2036 /* textcommon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = textcommon.h; path = ../filter/textcommon.h; sourceTree = "<group>"; };
-		7271882613746EA8001A2036 /* texttops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = texttops.c; path = ../filter/texttops.c; sourceTree = "<group>"; };
-		7271882B137498E4001A2036 /* image-bmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-bmp.c"; path = "../filter/image-bmp.c"; sourceTree = "<group>"; };
-		7271882C137498E4001A2036 /* image-colorspace.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-colorspace.c"; path = "../filter/image-colorspace.c"; sourceTree = "<group>"; };
-		7271882D137498E4001A2036 /* image-gif.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-gif.c"; path = "../filter/image-gif.c"; sourceTree = "<group>"; };
-		7271882E137498E4001A2036 /* image-jpeg.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-jpeg.c"; path = "../filter/image-jpeg.c"; sourceTree = "<group>"; };
-		7271882F137498E4001A2036 /* image-photocd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-photocd.c"; path = "../filter/image-photocd.c"; sourceTree = "<group>"; };
-		72718830137498E4001A2036 /* image-pix.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-pix.c"; path = "../filter/image-pix.c"; sourceTree = "<group>"; };
-		72718831137498E4001A2036 /* image-png.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-png.c"; path = "../filter/image-png.c"; sourceTree = "<group>"; };
-		72718832137498E4001A2036 /* image-pnm.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-pnm.c"; path = "../filter/image-pnm.c"; sourceTree = "<group>"; };
-		72718833137498E4001A2036 /* image-private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "image-private.h"; path = "../filter/image-private.h"; sourceTree = "<group>"; };
-		72718834137498E4001A2036 /* image-sgi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-sgi.c"; path = "../filter/image-sgi.c"; sourceTree = "<group>"; };
-		72718835137498E4001A2036 /* image-sgi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "image-sgi.h"; path = "../filter/image-sgi.h"; sourceTree = "<group>"; };
-		72718836137498E4001A2036 /* image-sgilib.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-sgilib.c"; path = "../filter/image-sgilib.c"; sourceTree = "<group>"; };
-		72718837137498E4001A2036 /* image-sun.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-sun.c"; path = "../filter/image-sun.c"; sourceTree = "<group>"; };
-		72718838137498E4001A2036 /* image-tiff.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-tiff.c"; path = "../filter/image-tiff.c"; sourceTree = "<group>"; };
-		72718839137498E4001A2036 /* image-zoom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "image-zoom.c"; path = "../filter/image-zoom.c"; sourceTree = "<group>"; };
-		7271883A137498E4001A2036 /* image.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = image.c; path = ../filter/image.c; sourceTree = "<group>"; };
-		7271883B137498E4001A2036 /* image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = image.h; path = ../filter/image.h; sourceTree = "<group>"; };
 		7271883C1374AB14001A2036 /* mime-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mime-private.h"; path = "../scheduler/mime-private.h"; sourceTree = "<group>"; };
 		72C16CB8137B195D007E4BF4 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = ../scheduler/file.c; sourceTree = SOURCE_ROOT; };
 		72F75A4C1336F31B004BB496 /* libcups_static.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2092,50 +2066,17 @@
 		7258EADC134594A8009286F1 /* filters */ = {
 			isa = PBXGroup;
 			children = (
-				7271881613746EA8001A2036 /* bannertops.c */,
 				7271881713746EA8001A2036 /* commandtops.c */,
 				7271881813746EA8001A2036 /* common.c */,
 				7271881913746EA8001A2036 /* common.h */,
 				7271881A13746EA8001A2036 /* gziptoany.c */,
-				7271881B13746EA8001A2036 /* imagetops.c */,
-				7271881C13746EA8001A2036 /* imagetoraster.c */,
-				7271881D13746EA8001A2036 /* pdftops.c */,
-				7271881E13746EA8001A2036 /* pstext.c */,
-				7271881F13746EA8001A2036 /* pstext.h */,
 				7271882013746EA8001A2036 /* pstops.c */,
 				7271882113746EA8001A2036 /* rastertoepson.c */,
 				7271882213746EA8001A2036 /* rastertohp.c */,
 				7271882313746EA8001A2036 /* rastertolabel.c */,
 				7258EAEC134594EB009286F1 /* rastertopwg.c */,
-				7271882413746EA8001A2036 /* textcommon.c */,
-				7271882513746EA8001A2036 /* textcommon.h */,
-				7271882613746EA8001A2036 /* texttops.c */,
 			);
 			name = filters;
-			sourceTree = "<group>";
-		};
-		7271882A1374988C001A2036 /* Unused */ = {
-			isa = PBXGroup;
-			children = (
-				7271882B137498E4001A2036 /* image-bmp.c */,
-				7271882C137498E4001A2036 /* image-colorspace.c */,
-				7271882D137498E4001A2036 /* image-gif.c */,
-				7271882E137498E4001A2036 /* image-jpeg.c */,
-				7271882F137498E4001A2036 /* image-photocd.c */,
-				72718830137498E4001A2036 /* image-pix.c */,
-				72718831137498E4001A2036 /* image-png.c */,
-				72718832137498E4001A2036 /* image-pnm.c */,
-				72718833137498E4001A2036 /* image-private.h */,
-				72718834137498E4001A2036 /* image-sgi.c */,
-				72718835137498E4001A2036 /* image-sgi.h */,
-				72718836137498E4001A2036 /* image-sgilib.c */,
-				72718837137498E4001A2036 /* image-sun.c */,
-				72718838137498E4001A2036 /* image-tiff.c */,
-				72718839137498E4001A2036 /* image-zoom.c */,
-				7271883A137498E4001A2036 /* image.c */,
-				7271883B137498E4001A2036 /* image.h */,
-			);
-			name = Unused;
 			sourceTree = "<group>";
 		};
 		72BF96351333042100B1EAD7 = {
@@ -2163,7 +2104,6 @@
 		72F75A681336FA42004BB496 /* libcupsimage */ = {
 			isa = PBXGroup;
 			children = (
-				7271882A1374988C001A2036 /* Unused */,
 				72F75A691336FA8A004BB496 /* error.c */,
 				72F75A6A1336FA8A004BB496 /* interpret.c */,
 				72F75A6B1336FA8A004BB496 /* raster.c */,
@@ -2860,7 +2800,7 @@
 		72BF96371333042100B1EAD7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0410;
+				LastUpgradeCheck = 0420;
 				ORGANIZATIONNAME = "Apple Inc.";
 			};
 			buildConfigurationList = 72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */;

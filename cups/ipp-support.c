@@ -100,8 +100,8 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 static char	* const ipp_std_ops[] =
 		{
 		  /* 0x0000 - 0x000f */
-		  "unknown-00",
-		  "unknown-01",
+		  "0x00",
+		  "0x01",
 		  "Print-Job",
 		  "Print-URI",
 		  "Validate-Job",
@@ -115,7 +115,7 @@ static char	* const ipp_std_ops[] =
 		  "Hold-Job",
 		  "Release-Job",
 		  "Restart-Job",
-		  "unknown-0f",
+		  "0x0f",
 
 		  /* 0x0010 - 0x001f */
 		  "Pause-Printer",
@@ -132,11 +132,11 @@ static char	* const ipp_std_ops[] =
 		  "Cancel-Subscription",
 		  "Get-Notifications",
 		  "Send-Notifications",
-		  "unknown-1e",
-		  "unknown-1f",
+		  "0x1e",
+		  "0x1f",
 
 		  /* 0x0020 - 0x002f */
-		  "unknown-20",
+		  "0x20",
 		  "Get-Printer-Support-Files",
 		  "Enable-Printer",
 		  "Disable-Printer",
@@ -156,7 +156,7 @@ static char	* const ipp_std_ops[] =
 		  /* 0x0030 - 0x003b */
 		  "Promote-Job",
 		  "Schedule-Job-After",
-		  "unknown-32",
+		  "0x32",
 		  "Cancel-Document",
 		  "Get-Document-Attributes",
 		  "Get-Documents",
@@ -206,46 +206,47 @@ static char	* const ipp_std_ops[] =
 					/* 0x06 */
 		  "event-notification-attributes-tag",
 					/* 0x07 */
-		  "unknown-08",		/* 0x08 */
-		  "unknown-09",		/* 0x09 */
-		  "unknown-0a",		/* 0x0a */
-		  "unknown-0b",		/* 0x0b */
-		  "unknown-0c",		/* 0x0c */
-		  "unknown-0d",		/* 0x0d */
-		  "unknown-0e",		/* 0x0e */
-		  "unknown-0f",		/* 0x0f */
+		  "0x08",		/* 0x08 */
+		  "document-attributes-tag",
+					/* 0x09 */
+		  "0x0a",		/* 0x0a */
+		  "0x0b",		/* 0x0b */
+		  "0x0c",		/* 0x0c */
+		  "0x0d",		/* 0x0d */
+		  "0x0e",		/* 0x0e */
+		  "0x0f",		/* 0x0f */
 		  "unsupported",	/* 0x10 */
 		  "default",		/* 0x11 */
 		  "unknown",		/* 0x12 */
 		  "no-value",		/* 0x13 */
-		  "unknown-14",		/* 0x14 */
+		  "0x14",		/* 0x14 */
 		  "not-settable",	/* 0x15 */
 		  "delete-attribute",	/* 0x16 */
 		  "admin-define",	/* 0x17 */
-		  "unknown-18",		/* 0x18 */
-		  "unknown-19",		/* 0x19 */
-		  "unknown-1a",		/* 0x1a */
-		  "unknown-1b",		/* 0x1b */
-		  "unknown-1c",		/* 0x1c */
-		  "unknown-1d",		/* 0x1d */
-		  "unknown-1e",		/* 0x1e */
-		  "unknown-1f",		/* 0x1f */
-		  "unknown-20",		/* 0x20 */
+		  "0x18",		/* 0x18 */
+		  "0x19",		/* 0x19 */
+		  "0x1a",		/* 0x1a */
+		  "0x1b",		/* 0x1b */
+		  "0x1c",		/* 0x1c */
+		  "0x1d",		/* 0x1d */
+		  "0x1e",		/* 0x1e */
+		  "0x1f",		/* 0x1f */
+		  "0x20",		/* 0x20 */
 		  "integer",		/* 0x21 */
 		  "boolean",		/* 0x22 */
 		  "enum",		/* 0x23 */
-		  "unknown-24",		/* 0x24 */
-		  "unknown-25",		/* 0x25 */
-		  "unknown-26",		/* 0x26 */
-		  "unknown-27",		/* 0x27 */
-		  "unknown-28",		/* 0x28 */
-		  "unknown-29",		/* 0x29 */
-		  "unknown-2a",		/* 0x2a */
-		  "unknown-2b",		/* 0x2b */
-		  "unknown-2c",		/* 0x2c */
-		  "unknown-2d",		/* 0x2d */
-		  "unknown-2e",		/* 0x2e */
-		  "unknown-2f",		/* 0x2f */
+		  "0x24",		/* 0x24 */
+		  "0x25",		/* 0x25 */
+		  "0x26",		/* 0x26 */
+		  "0x27",		/* 0x27 */
+		  "0x28",		/* 0x28 */
+		  "0x29",		/* 0x29 */
+		  "0x2a",		/* 0x2a */
+		  "0x2b",		/* 0x2b */
+		  "0x2c",		/* 0x2c */
+		  "0x2d",		/* 0x2d */
+		  "0x2e",		/* 0x2e */
+		  "0x2f",		/* 0x2f */
 		  "octetString",	/* 0x30 */
 		  "dateTime",		/* 0x31 */
 		  "resolution",		/* 0x32 */
@@ -254,18 +255,18 @@ static char	* const ipp_std_ops[] =
 		  "textWithLanguage",	/* 0x35 */
 		  "nameWithLanguage",	/* 0x36 */
 		  "endCollection",	/* 0x37 */
-		  "unknown-38",		/* 0x38 */
-		  "unknown-39",		/* 0x39 */
-		  "unknown-3a",		/* 0x3a */
-		  "unknown-3b",		/* 0x3b */
-		  "unknown-3c",		/* 0x3c */
-		  "unknown-3d",		/* 0x3d */
-		  "unknown-3e",		/* 0x3e */
-		  "unknown-3f",		/* 0x3f */
-		  "unknown-40",		/* 0x40 */
+		  "0x38",		/* 0x38 */
+		  "0x39",		/* 0x39 */
+		  "0x3a",		/* 0x3a */
+		  "0x3b",		/* 0x3b */
+		  "0x3c",		/* 0x3c */
+		  "0x3d",		/* 0x3d */
+		  "0x3e",		/* 0x3e */
+		  "0x3f",		/* 0x3f */
+		  "0x40",		/* 0x40 */
 		  "textWithoutLanguage",/* 0x41 */
 		  "nameWithoutLanguage",/* 0x42 */
-		  "unknown-43",		/* 0x43 */
+		  "0x43",		/* 0x43 */
 		  "keyword",		/* 0x44 */
 		  "uri",		/* 0x45 */
 		  "uriScheme",		/* 0x46 */
@@ -448,6 +449,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
       case IPP_TAG_KEYWORD :
       case IPP_TAG_CHARSET :
       case IPP_TAG_URI :
+      case IPP_TAG_URISCHEME :
       case IPP_TAG_MIMETYPE :
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_TEXTLANG :
@@ -555,10 +557,10 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
     return (ipp_status_1000s[error - IPP_AUTHENTICATION_CANCELED]);
 
  /*
-  * No, build an "unknown-xxxx" error string...
+  * No, build an "0xxxxx" error string...
   */
 
-  sprintf(cg->ipp_unknown, "unknown-%04x", error);
+  sprintf(cg->ipp_unknown, "0x%04x", error);
 
   return (cg->ipp_unknown);
 }
@@ -628,7 +630,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return (ipp_cups_ops2[0]);
 
  /*
-  * No, build an "unknown-xxxx" operation string...
+  * No, build an "0xxxxx" operation string...
   */
 
   sprintf(cg->ipp_unknown, "0x%04x", op);

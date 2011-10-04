@@ -3180,7 +3180,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
    /*
     * Verify that the size name is Adobe standard name if it's a standard size
-    * and the dementional name if it's not a standard size.  Suffix should be
+    * and the dimentional name if it's not a standard size.  Suffix should be
     * .Fullbleed, etc., or numeric, e.g., Letter, Letter.Fullbleed,
     * Letter.Transverse, Letter1, Letter2, 4x8, 55x91mm, 55x91mm.Fullbleed, etc.
     */
@@ -3198,39 +3198,53 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
       if (pwg_media && pwg_media->ppd)
       {
+        size_t ppdlen = strlen(pwg_media->ppd);
+					/* Length of standard PPD name */
+
         strlcpy(buf, pwg_media->ppd, sizeof(buf));
 
         if (size->left == 0 && size->bottom == 0 &&
 	    size->right == size->width && size->top == size->length)
         {
           snprintf(buf, sizeof(buf), "%s.Fullbleed", pwg_media->ppd);
-	  if (strcmp(size->name, buf))
-	    is_ok = 0;
-        }
-        else if (size->width > size->length)
-        {
-	  if ((ptr = pwg_media->ppd + strlen(pwg_media->ppd) - 7)
-	          >= pwg_media->ppd && !strcmp(ptr, "Rotated"))
+	  if (_cups_strcasecmp(size->name, buf))
 	  {
+	   /*
+	    * Allow an additional qualifier such as ".WithTab"...
+	    */
+
+	    size_t buflen = strlen(buf);/* Length of full bleed name */
+
+            if (_cups_strncasecmp(size->name, buf, buflen) ||
+                size->name[buflen] != '.')
+	      is_ok = 0;
+	  }
+        }
+        else if (strcmp(size->name, buf) && size->width > size->length)
+        {
+          if (!strcmp(pwg_media->ppd, "DoublePostcardRotated"))
+            strlcpy(buf, "DoublePostcard", sizeof(buf));
+          else
+	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+
+	  if (strcmp(size->name, buf))
+	  {
+	    snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
 	    if (strcmp(size->name, buf))
 	      is_ok = 0;
 	  }
-	  else
-	  {
-	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
-	    if (strcmp(size->name, buf))
-	    {
-	      snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
-	      if (strcmp(size->name, buf))
-		is_ok = 0;
-	    }
-	  }
         }
-	else
-        {
-	  if ((!strncmp(size->name, pwg_media->ppd, strlen(pwg_media->ppd))))
+	else if (!strncmp(size->name, pwg_media->ppd, ppdlen))
+	{
+	 /*
+	  * Check for a proper qualifier (number, "Small", or .something)...
+	  */
+
+	  ptr = size->name + ppdlen;
+
+	  if (isdigit(*ptr & 255))
           {
-            for (ptr = size->name + strlen(pwg_media->ppd); *ptr; ptr ++)
+            for (ptr ++; *ptr; ptr ++)
             {
               if (!isdigit(*ptr & 255))
 	      {
@@ -3239,9 +3253,20 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	      }
             }
           }
-          else
-            is_ok = 0;
+          else if (*ptr != '.' && *ptr && strcmp(ptr, "Small"))
+	    is_ok = 0;
         }
+	else
+	{
+	 /*
+	  * Check for EnvSizeName as well...
+	  */
+
+	  snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
+
+	  if (strcmp(size->name, buf))
+	    is_ok = 0;
+	}
 
         if (!is_ok)
           _cupsLangPrintf(stdout,
@@ -3256,7 +3281,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
 	                 ceil(size->length) : size->length;
 
-        if (fmod(width_tmp, 18.0) == 0.0 && fmod(length_tmp, 18.0) == 0.0)
+        if (fmod(width_tmp, 18.0) == 0.0 || fmod(length_tmp, 18.0) == 0.0)
         {
           width_inch  = width_tmp / 72.0;
           length_inch = length_tmp / 72.0;
@@ -3277,10 +3302,16 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         else if (size->width > size->length)
           strlcat(buf, ".Transverse", sizeof(buf));
 
-        if (strcmp(size->name, buf))
-          _cupsLangPrintf(stdout,
-                          _("      %s  Size \"%s\" should be \"%s\"."),
-                          prefix, size->name, buf);
+        if (_cups_strcasecmp(size->name, buf))
+        {
+          size_t buflen = strlen(buf);	/* Length of proposed name */
+
+          if (_cups_strncasecmp(size->name, buf, buflen) ||
+              strcmp(size->name + buflen, "in"))
+	    _cupsLangPrintf(stdout,
+			    _("      %s  Size \"%s\" should be \"%s\"."),
+			    prefix, size->name, buf);
+        }
       }
     }
   }

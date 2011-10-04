@@ -73,6 +73,7 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_UNSUPPORTED_GROUP,		/* Unsupported attributes group */
   IPP_TAG_SUBSCRIPTION,			/* Subscription group */
   IPP_TAG_EVENT_NOTIFICATION,		/* Event group */
+  IPP_TAG_DOCUMENT = 0x09,		/* Document group */
   IPP_TAG_UNSUPPORTED_VALUE = 0x10,	/* Unsupported value */
   IPP_TAG_DEFAULT,			/* Default value */
   IPP_TAG_UNKNOWN,			/* Unknown value */

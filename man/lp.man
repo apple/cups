@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lp 1 "CUPS" "31 March 2011" "Apple Inc."
+.TH lp 1 "CUPS" "3 October 2011" "Apple Inc."
 .SH NAME
 lp - print files
 .SH SYNOPSIS
@@ -127,10 +127,6 @@ Do not report the resulting job IDs (silent mode.)
 -t "name"
 .br
 Sets the job name.
-.TP 5
--u username
-.br
-Submits jobs as \fIusername\fR.
 .TP 5
 -H hh:mm
 .TP 5

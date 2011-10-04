@@ -265,6 +265,7 @@ static _ipp_job_t	*create_job(_ipp_client_t *client);
 static int		create_listener(int family, int *port);
 static ipp_t		*create_media_col(const char *media, const char *type,
 					  int width, int length, int margins);
+static ipp_t		*create_media_size(int width, int length);
 static _ipp_printer_t	*create_printer(const char *servername,
 			                const char *name, const char *location,
 			                const char *make, const char *model,
@@ -803,7 +804,7 @@ copy_job_attributes(
     _ipp_job_t    *job,			/* I - Job */
     cups_array_t  *ra)			/* I - requested-attributes */
 {
-  copy_attributes(client->response, job->attrs, ra, IPP_TAG_ZERO, 0);
+  copy_attributes(client->response, job->attrs, ra, IPP_TAG_JOB, 0);
 
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -1124,14 +1125,10 @@ create_media_col(const char *media,	/* I - Media name */
 		 int        margins)	/* I - Value for margins */
 {
   ipp_t	*media_col = ippNew(),		/* media-col value */
-	*media_size = ippNew();		/* media-size value */
+	*media_size = create_media_size(width, length);
+					/* media-size value */
   char	media_key[256];			/* media-key value */
 
-
-  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "x-dimension",
-                width);
-  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "y-dimension",
-                length);
 
   snprintf(media_key, sizeof(media_key), "%s_%s%s", media, type,
            margins == 0 ? "_borderless" : "");
@@ -1153,6 +1150,26 @@ create_media_col(const char *media,	/* I - Media name */
   ippDelete(media_size);
 
   return (media_col);
+}
+
+
+/*
+ * 'create_media_size()' - Create a media-size value.
+ */
+
+static ipp_t *				/* O - media-col collection */
+create_media_size(int width,		/* I - x-dimension in 2540ths */
+		  int length)		/* I - y-dimension in 2540ths */
+{
+  ipp_t	*media_size = ippNew();		/* media-size value */
+
+
+  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "x-dimension",
+                width);
+  ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "y-dimension",
+                length);
+
+  return (media_size);
 }
 
 
@@ -1192,8 +1209,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 			*ptr;		/* Pointer into string */
   const char		*prefix;	/* Prefix string */
   int			num_database;	/* Number of database values */
-  ipp_attribute_t	*media_col_database;
+  ipp_attribute_t	*media_col_database,
 					/* media-col-database value */
+			*media_size_supported;
+					/* media-size-supported value */
   ipp_t			*media_col_default;
 					/* media-col-default value */
   ipp_value_t		*media_col_value;
@@ -1275,9 +1294,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     IPP_QUALITY_NORMAL,
     IPP_QUALITY_HIGH
   };
-  static const char * const referenced_uri_scheme_supported[] =
-  {					/* referenced-uri-scheme-supported */
+  static const char * const reference_uri_schemes_supported[] =
+  {					/* reference-uri-schemes-supported */
     "file",
+    "ftp",
     "http"
 #ifdef HAVE_SSL
     , "https"
@@ -1624,12 +1644,31 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 		(int)(sizeof(media_supported) / sizeof(media_supported[0])),
 		NULL, media_supported);
 
+  /* media-size-supported */
+  media_size_supported = ippAddCollections(printer->attrs, IPP_TAG_PRINTER,
+                                           "media-size-supported",
+                                           (int)(sizeof(media_col_sizes) /
+                                                 sizeof(media_col_sizes[0])),
+                                           NULL);
+  for (i = 0;
+       i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
+       i ++)
+    media_size_supported->values[i].collection =
+        create_media_size(media_col_sizes[i][0], media_col_sizes[i][1]);
+
   /* media-top-margin-supported */
   ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                  "media-top-margin-supported",
 		 (int)(sizeof(media_xxx_margin_supported) /
 		       sizeof(media_xxx_margin_supported[0])),
 		 media_xxx_margin_supported);
+
+  /* media-type-supported */
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "media-type-supported",
+		(int)(sizeof(media_type_supported) /
+		      sizeof(media_type_supported[0])),
+		NULL, media_type_supported);
 
   /* multiple-document-handling-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
@@ -1742,13 +1781,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
                "printer-uri-supported", NULL, uri);
 
-  /* referenced-uri-scheme-supported */
+  /* reference-uri-scheme-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
                 IPP_TAG_URISCHEME | IPP_TAG_COPY,
-                "referenced-uri-scheme-supported",
-                (int)(sizeof(referenced_uri_scheme_supported) /
-                      sizeof(referenced_uri_scheme_supported[0])),
-                NULL, referenced_uri_scheme_supported);
+                "reference-uri-schemes-supported",
+                (int)(sizeof(reference_uri_schemes_supported) /
+                      sizeof(reference_uri_schemes_supported[0])),
+                NULL, reference_uri_schemes_supported);
 
   /* sides-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
