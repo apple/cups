@@ -1507,7 +1507,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		n = (((((buffer[0] << 8) | buffer[1]) << 8) | buffer[2]) << 8) |
 		    buffer[3];
 
-                if (value_tag == IPP_TAG_RANGE)
+                if (attr->value_tag == IPP_TAG_RANGE)
                   value->range.lower = value->range.upper = n;
                 else
 		  value->integer = n;
