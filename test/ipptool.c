@@ -2109,7 +2109,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  print_attr(attrptr, NULL);
       }
 
-      printf("    %-69.69s [", name);
+      printf("    %-68.68s [", name);
       fflush(stdout);
     }
 
