@@ -656,6 +656,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 # Wait for job to complete...
 {
+	SKIP-IF-NOT-DEFINED job-id
+
 	NAME "Get-Job-Attributes Until Job Complete"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
