@@ -274,6 +274,7 @@ extern "C" {
 #define CUPS_TC_csUTF32				1017
 #define CUPS_TC_csUTF32BE			1018
 #define CUPS_TC_csUTF32LE			1019
+#define CUPS_TC_csWindows31J			2024
 
 
 /*
