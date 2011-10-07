@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3946)
+	- The lpstat command would crash when then "-u" option was used by a
+	  non-administrator (STR #3953)
 	- Japanese supply level reporting did not always work.
 	- The DBUS notifier could crash (STR #3947)
 	- Relaxed some of the page size checks in cupstestppd.

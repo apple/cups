@@ -580,6 +580,9 @@ match_list(const char *list,		/* I - List of names */
   if (!list || !*list)
     return (1);
 
+  if (!name)
+    return (0);
+
   while (*list)
   {
    /*
