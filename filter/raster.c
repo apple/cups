@@ -504,7 +504,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       * Copy fragment from buffer...
       */
 
-      if ((unsigned)(bytes = r->pend - r->pcurrent) > remaining)
+      if ((unsigned)(bytes = (int)(r->pend - r->pcurrent)) > remaining)
         bytes = remaining;
 
       memcpy(p, r->pcurrent, bytes);
@@ -830,8 +830,8 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
     * Figure out the number of remaining bytes on the current line...
     */
 
-    if ((bytes = remaining) > (r->pend - r->pcurrent))
-      bytes = r->pend - r->pcurrent;
+    if ((bytes = remaining) > (int)(r->pend - r->pcurrent))
+      bytes = (int)(r->pend - r->pcurrent);
 
     if (r->count > 0)
     {
@@ -1047,8 +1047,10 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
   if ((size_t)count > r->bufsize)
   {
-    int offset = r->bufptr - r->buffer;	/* Offset to current start of buffer */
-    int end = r->bufend - r->buffer;	/* Offset to current end of buffer */
+    int offset = (int)(r->bufptr - r->buffer);
+					/* Offset to current start of buffer */
+    int end = (int)(r->bufend - r->buffer);
+					/* Offset to current end of buffer */
     unsigned char *rptr;		/* Pointer in read buffer */
 
     if (r->buffer)
@@ -1069,7 +1071,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   * Loop until we have read everything...
   */
 
-  for (total = 0, remaining = r->bufend - r->bufptr;
+  for (total = 0, remaining = (int)(r->bufend - r->bufptr);
        total < bytes;
        total += count, buf += count)
   {
@@ -1387,7 +1389,7 @@ cups_raster_write(
     }
   }
 
-  return (cups_raster_io(r, r->buffer, wptr - r->buffer));
+  return (cups_raster_io(r, r->buffer, (int)(wptr - r->buffer)));
 }
 
 
@@ -1405,7 +1407,11 @@ cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
   ssize_t	count;			/* Number of bytes read */
 
 
+#ifdef WIN32 /* Sigh */
+  while ((count = read(fd, buf, (unsigned)bytes)) < 0)
+#else
   while ((count = read(fd, buf, bytes)) < 0)
+#endif /* WIN32 */
     if (errno != EINTR && errno != EAGAIN)
       return (-1);
 
@@ -1453,7 +1459,11 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
   ssize_t	count;			/* Number of bytes written */
 
 
+#ifdef WIN32 /* Sigh */
+  while ((count = write(fd, buf, (unsigned)bytes)) < 0)
+#else
   while ((count = write(fd, buf, bytes)) < 0)
+#endif /* WIN32 */
     if (errno != EINTR && errno != EAGAIN)
       return (-1);
 

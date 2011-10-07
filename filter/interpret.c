@@ -1387,7 +1387,7 @@ setpagedevice(
   * Found the start of the dictionary, empty the stack to this point...
   */
 
-  st->num_objs = obj - st->objs;
+  st->num_objs = (int)(obj - st->objs);
 
  /*
   * Now pull /name and value pairs from the dictionary...

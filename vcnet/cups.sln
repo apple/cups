@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipptool", "ipptool.vcproj",
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
 	EndProjectSection
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ipptool-installer", "ipptool-installer.vdproj", "{6AEA263B-92C0-426F-B5FF-F7F5917B704A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -84,6 +86,14 @@ Global
 		{B246D91E-61F2-4433-BFD2-6C2A96FBD4D4}.Release|Win32.Build.0 = Release|Win32
 		{B246D91E-61F2-4433-BFD2-6C2A96FBD4D4}.Release|x64.ActiveCfg = Release|x64
 		{B246D91E-61F2-4433-BFD2-6C2A96FBD4D4}.Release|x64.Build.0 = Release|x64
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Debug|Win32.ActiveCfg = Debug
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Debug|Win32.Build.0 = Debug
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Debug|x64.ActiveCfg = Debug
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Debug|x64.Build.0 = Debug
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Release|Win32.ActiveCfg = Release
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Release|Win32.Build.0 = Release
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Release|x64.ActiveCfg = Release
+		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
