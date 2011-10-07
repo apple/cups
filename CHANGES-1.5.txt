@@ -4,6 +4,7 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3946)
+	- Build fixes (STR #3956)
 	- The lpstat command would crash when then "-u" option was used by a
 	  non-administrator (STR #3953)
 	- Japanese supply level reporting did not always work.

@@ -3199,10 +3199,13 @@ _httpWriteGNUTLS(
 
   DEBUG_printf(("6_httpWriteGNUTLS(ptr=%p, data=%p, length=%d)", ptr, data,
                 (int)length));
+#ifdef DEBUG
   http_debug_hex("_httpWriteGNUTLS", data, (int)length);
+#endif /* DEBUG */
 
   bytes = send(((http_t *)ptr)->fd, data, length, 0);
   DEBUG_printf(("_httpWriteGNUTLS: bytes=%d", (int)bytes));
+
   return (bytes);
 }
 #endif /* HAVE_SSL && HAVE_GNUTLS */
