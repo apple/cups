@@ -65,6 +65,8 @@ extern const char *cssmErrorString(int error);
 #    ifdef HAVE_GSS_GSSAPI_SPI_H
 #      include <GSS/gssapi_spi.h>
 #    else
+#      define GSS_AUTH_IDENTITY_TYPE_1 1
+#      define gss_acquire_cred_ex_f __ApplePrivate_gss_acquire_cred_ex_f
 typedef struct gss_auth_identity
 {
   uint32_t type;

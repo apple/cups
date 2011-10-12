@@ -389,7 +389,17 @@ case $uname in
 
 		dnl Check for sandbox/Seatbelt support
 		if test $uversion -ge 100; then
-		    AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
+			AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
+		fi
+		if test $uversion -ge 110; then
+			# Broken public headers in 10.7...
+			AC_MSG_CHECKING(for sandbox/private.h presence)
+			if test -f /usr/local/include/sandbox/private.h; then
+				AC_MSG_RESULT(yes)
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Run 'sudo mkdir -p /usr/local/include/sandbox' and 'sudo touch /usr/local/include/sandbox/private.h' to build CUPS.)
+			fi
 		fi
 
 		dnl Check for XPC support
