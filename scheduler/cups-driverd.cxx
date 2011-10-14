@@ -1774,7 +1774,8 @@ load_ppds(const char *d,		/* I - Actual directory */
 		product[256],		/* Product */
 		psversion[256],		/* PSVersion */
 		temp[512];		/* Temporary make and model */
-  int		model_number,		/* cupsModelNumber */
+  int		install_group,		/* In the installable options group? */
+		model_number,		/* cupsModelNumber */
 		type;			/* ppd-type */
   cups_array_t	*products,		/* Product array */
 		*psversions,		/* PSVersion array */
@@ -1998,6 +1999,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     lang_encoding[0] = '\0';
     strcpy(lang_version, "en");
     model_number     = 0;
+    install_group    = 0;
     type             = PPD_TYPE_POSTSCRIPT;
 
     while (cupsFileGets(fp, line, sizeof(line)) != NULL)
@@ -2092,15 +2094,19 @@ load_ppds(const char *d,		/* I - Actual directory */
       }
       else if (!strncmp(line, "*cupsModelNumber:", 17))
         sscanf(line, "*cupsModelNumber:%d", &model_number);
+      else if (!strncmp(line, "*OpenGroup: Installable", 23))
+        install_group = 1;
+      else if (!strncmp(line, "*CloseGroup:", 12))
+        install_group = 0;
       else if (!strncmp(line, "*OpenUI", 7))
       {
        /*
         * Stop early if we have a NickName or ModelName attributes
-	* before the first OpenUI...
+	* before the first non-installable OpenUI...
 	*/
 
-        if ((model_name[0] || nick_name[0]) && cupsArrayCount(products) > 0 &&
-	    cupsArrayCount(psversions) > 0)
+        if (!install_group && (model_name[0] || nick_name[0]) &&
+            cupsArrayCount(products) > 0 && cupsArrayCount(psversions) > 0)
 	  break;
       }
     }
