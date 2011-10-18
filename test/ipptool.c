@@ -5264,7 +5264,7 @@ with_value(char            *value,	/* I - Value string */
 		  }
 		  break;
 	      case '>' :
-	          if (attr->values[i].range.lower > intvalue)
+	          if (attr->values[i].range.upper > intvalue)
 	          {
 	            snprintf(matchbuf, matchlen, "%d-%d",
 	                     attr->values[i].range.lower,
