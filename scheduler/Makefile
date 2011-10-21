@@ -215,10 +215,6 @@ install-exec:
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) -m 500 cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
-	-if test "x`uname`" = xDarwin; then \
-		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
-		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
-	fi
 	echo Installing programs in $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/daemon
