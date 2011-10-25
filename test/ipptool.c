@@ -2327,6 +2327,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             switch (attrptr->group_tag)
             {
+              case IPP_TAG_ZERO :
+                  break;
+
               case IPP_TAG_OPERATION :
                   prev_pass = pass = 0;
                   break;
@@ -2358,7 +2361,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
             if (!pass)
 	      break;
 
-	    group = attrptr->group_tag;
+	    if (attrptr->group_tag != IPP_TAG_ZERO)
+	      group = attrptr->group_tag;
 	  }
 
 	  if (!validate_attr(attrptr, 0))
@@ -2535,18 +2539,19 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     {
       puts(prev_pass ? "PASS]" : "FAIL]");
 
-      if (Verbosity && response)
+      if (!prev_pass || (Verbosity && response))
       {
 	printf("        RECEIVED: %lu bytes in response\n",
 	       (unsigned long)ippLength(response));
-	printf("        status-code = %x (%s)\n", cupsLastError(),
-	       ippErrorString(cupsLastError()));
+	printf("        status-code = %s (%s)\n", ippErrorString(cupsLastError()),
+	       cupsLastErrorString());
 
-	for (attrptr = response->attrs;
-	     attrptr != NULL;
-	     attrptr = attrptr->next)
-	{
-	  print_attr(attrptr, NULL);
+        if (response)
+        {
+	  for (attrptr = response->attrs;
+	       attrptr != NULL;
+	       attrptr = attrptr->next)
+	    print_attr(attrptr, NULL);
 	}
       }
     }
@@ -2732,6 +2737,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             switch (attrptr->group_tag)
             {
+              case IPP_TAG_ZERO :
+                  break;
+
               case IPP_TAG_OPERATION :
                   prev_pass = pass = 0;
                   break;
@@ -2768,7 +2776,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
                   break;
             }
 
-	    group = attrptr->group_tag;
+	    if (attrptr->group_tag != IPP_TAG_ZERO)
+	      group = attrptr->group_tag;
 	  }
 
 	  validate_attr(attrptr, 1);
