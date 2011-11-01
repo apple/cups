@@ -80,7 +80,7 @@ static const char * const lang_encodings[] =
 			  "cp1256",		"cp1257",
 			  "cp1258",		"koi8-r",
 			  "koi8-u",		"iso-8859-11",
-			  "iso-8859-16",	"mac-roman",
+			  "iso-8859-16",	"mac",
 			  "unknown",		"unknown",
 			  "unknown",		"unknown",
 			  "unknown",		"unknown",
