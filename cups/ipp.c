@@ -1582,12 +1582,12 @@ ippDeleteAttribute(
        /*
 	* Found it, remove the attribute from the list...
 	*/
-    
+
 	if (prev)
 	  prev->next = current->next;
 	else
 	  ipp->attrs = current->next;
-    
+
 	if (current == ipp->last)
 	  ipp->last = prev;
 
@@ -2176,11 +2176,11 @@ ippNew(void)
   if ((temp = (ipp_t *)calloc(1, sizeof(ipp_t))) != NULL)
   {
    /*
-    * Default to IPP 1.1...
+    * Default to IPP 2.0...
     */
 
-    temp->request.any.version[0] = 1;
-    temp->request.any.version[1] = 1;
+    temp->request.any.version[0] = 2;
+    temp->request.any.version[1] = 0;
     temp->use                    = 1;
   }
 
@@ -2205,6 +2205,9 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
 {
   ipp_t		*request;		/* IPP request message */
   cups_lang_t	*language;		/* Current language localization */
+  static int	request_id = 0;		/* Current request ID */
+  static _cups_mutex_t request_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for request ID */
 
 
   DEBUG_printf(("ippNewRequest(op=%02x(%s))", op, ippOpString(op)));
@@ -2220,8 +2223,12 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
   * Set the operation and request ID...
   */
 
+  _cupsMutexLock(&request_mutex);
+
   request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
+  request->request.op.request_id   = ++request_id;
+
+  _cupsMutexUnlock(&request_mutex);
 
  /*
   * Use UTF-8 as the character set...
@@ -3098,7 +3105,7 @@ ippSetCollection(
   {
     if (value->collection)
       ippDelete(value->collection);
-    
+
     value->collection = colvalue;
     colvalue->use ++;
   }
@@ -3146,7 +3153,7 @@ ippSetGroupTag(
 
   return (1);
 }
-  
+
 
 /*
  * 'ippSetInteger()' - Set an integer or enum value in an attribute.
@@ -3225,7 +3232,7 @@ ippSetName(ipp_t           *ipp,	/* I  - IPP message */
   {
     if ((*attr)->name)
       _cupsStrFree((*attr)->name);
-    
+
     (*attr)->name = temp;
   }
 
@@ -4802,7 +4809,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
       case IPP_TAG_NAMELANG :
 	  if (element == 0 && count == attr->num_values && attr->values[0].string.language)
 	    _cupsStrFree(attr->values[0].string.language);
-  
+
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_RESERVED_STRING :
@@ -4817,7 +4824,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	       i --, value ++)
 	    _cupsStrFree(value->string.text);
 	  break;
-  
+
       case IPP_TAG_DEFAULT :
       case IPP_TAG_UNKNOWN :
       case IPP_TAG_NOVALUE :
@@ -4831,14 +4838,14 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
       case IPP_TAG_RESOLUTION :
       case IPP_TAG_RANGE :
 	  break;
-  
+
       case IPP_TAG_BEGIN_COLLECTION :
 	  for (i = count, value = attr->values + element;
 	       i > 0;
 	       i --, value ++)
 	    ippDelete(value->collection);
 	  break;
-  
+
       case IPP_TAG_STRING :
       default :
 	  for (i = count, value = attr->values + element;
