@@ -2019,7 +2019,7 @@ add_job_state_reasons(
     cupsd_job_t    *job)		/* I - Job info */
 {
   cupsd_printer_t	*dest;		/* Destination printer */
-
+  ipp_attribute_t	*attr;		/* job-hold attribute */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
                   con, con->http.fd, job ? job->id : 0);
@@ -2038,10 +2038,11 @@ add_job_state_reasons(
         break;
 
     case IPP_JOB_HELD :
-        if (ippFindAttribute(job->attrs, "job-hold-until",
-	                     IPP_TAG_KEYWORD) != NULL ||
-	    ippFindAttribute(job->attrs, "job-hold-until",
-	                     IPP_TAG_NAME) != NULL)
+        if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+				     IPP_TAG_KEYWORD)) == NULL)
+	  attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+	if (!attr || strcmp(attr->values[0].string.text, "no-hold"))
           ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 	               "job-state-reasons", NULL, "job-hold-until-specified");
         else
