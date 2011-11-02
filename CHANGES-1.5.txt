@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3946)
 	- Build fixes (STR #3956)
+	- The scheduler incorrectly used free() on a POSIX ACL value, which
+	  could cause a crash (STR #3970)
 	- PPD files using the MacStandard encoding did not work.
 	- The web interface did not work on some platforms (STR #3902)
 	- The lpstat command would crash when then "-u" option was used by a
