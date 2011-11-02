@@ -3941,7 +3941,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   _pwg_map_t	*pwgsource,		/* Current PWG source */
 		*pwgtype;		/* Current PWG type */
   ipp_attribute_t *attr;		/* Attribute data */
-  ipp_value_t	*val;			/* Attribute value */
+  _ipp_value_t	*val;			/* Attribute value */
   int		num_finishings,		/* Number of finishings */
 		finishings[5];		/* finishings-supported values */
   int		num_qualities,		/* Number of print-quality values */

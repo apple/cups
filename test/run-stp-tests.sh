@@ -203,12 +203,17 @@ echo ""
 
 case "$usevalgrind" in
 	Y* | y*)
-		valgrind="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
+		VALGRIND="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
+		if test `uname` = Darwin; then
+			VALGRIND="$VALGRIND --dsymutil=yes"
+		fi
+		export VALGRIND
 		echo "Using Valgrind; log files can be found in /tmp/cups-$user/log..."
 		;;
 
 	*)
-		valgrind=""
+		VALGRIND=""
+		export VALGRIND
 		;;
 esac
 
@@ -510,14 +515,14 @@ export LC_MESSAGES
 #
 
 echo "Starting scheduler:"
-echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &"
+echo "    $VALGRIND ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &"
 echo ""
 
-if test `uname` = Darwin -a "x$valgrind" = x; then
+if test `uname` = Darwin -a "x$VALGRIND" = x; then
 	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib
 	../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 else
-	$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
+	$VALGRIND ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 fi
 
 cupsd=$!
@@ -604,7 +609,7 @@ for file in 4*.test; do
 	echo $ac_n "Performing $file: $ac_c"
 	echo "" >>$strfile
 
-	./ipptool -tI ipp://localhost:$port/printers $file >> $strfile
+	$VALGRIND ./ipptool -tI ipp://localhost:$port/printers $file >> $strfile
 	status=$?
 
 	if test $status != 0; then

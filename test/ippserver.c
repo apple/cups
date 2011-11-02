@@ -18,7 +18,6 @@
  *   main()			  - Main entry to the sample server.
  *   clean_jobs()		  - Clean out old (completed) jobs.
  *   compare_jobs()		  - Compare two jobs.
- *   copy_attribute()		  - Copy a single attribute.
  *   copy_attributes()		  - Copy attributes from one request to
  *				    another.
  *   copy_job_attrs()		  - Copy job attributes to the response.
@@ -254,8 +253,6 @@ typedef struct _ipp_client_s		/**** Client data ****/
 
 static void		clean_jobs(_ipp_printer_t *printer);
 static int		compare_jobs(_ipp_job_t *a, _ipp_job_t *b);
-static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
-		                        ipp_tag_t group_tag, int quickcopy);
 static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra,
 			                ipp_tag_t group_tag, int quickcopy);
 static void		copy_job_attributes(_ipp_client_t *client,
@@ -577,191 +574,6 @@ compare_jobs(_ipp_job_t *a,		/* I - First job */
 
 
 /*
- * 'copy_attribute()' - Copy a single attribute.
- */
-
-static ipp_attribute_t *		/* O - New attribute */
-copy_attribute(
-    ipp_t           *to,		/* O - Destination request/response */
-    ipp_attribute_t *attr,		/* I - Attribute to copy */
-    ipp_tag_t       group_tag,		/* I - Group to put the copy in */
-    int             quickcopy)		/* I - Do a quick copy? */
-{
-  int			i;		/* Looping var */
-  ipp_attribute_t	*toattr;	/* Destination attribute */
-
-
-  if (Verbosity && attr->name)
-  {
-    char	buffer[2048];		/* Attribute value */
-
-    _ippAttrString(attr, buffer, sizeof(buffer));
-
-    fprintf(stderr, "Copying %s (%s%s) %s\n", attr->name,
-	    attr->num_values > 1 ? "1setOf " : "",
-	    ippTagString(attr->value_tag & ~IPP_TAG_COPY), buffer);
-  }
-
-  switch (attr->value_tag & ~IPP_TAG_COPY)
-  {
-    case IPP_TAG_ZERO :
-        toattr = ippAddSeparator(to);
-	break;
-
-    case IPP_TAG_INTEGER :
-    case IPP_TAG_ENUM :
-        toattr = ippAddIntegers(to, group_tag, attr->value_tag,
-	                        attr->name, attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].integer = attr->values[i].integer;
-        break;
-
-    case IPP_TAG_BOOLEAN :
-        toattr = ippAddBooleans(to, group_tag, attr->name,
-	                        attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].boolean = attr->values[i].boolean;
-        break;
-
-    case IPP_TAG_TEXT :
-    case IPP_TAG_NAME :
-    case IPP_TAG_KEYWORD :
-    case IPP_TAG_URI :
-    case IPP_TAG_URISCHEME :
-    case IPP_TAG_CHARSET :
-    case IPP_TAG_LANGUAGE :
-    case IPP_TAG_MIMETYPE :
-        toattr = ippAddStrings(to, group_tag,
-	                       (ipp_tag_t)(attr->value_tag | quickcopy),
-	                       attr->name, attr->num_values, NULL, NULL);
-
-        if (quickcopy)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text = attr->values[i].string.text;
-        }
-	else
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text =
-	        _cupsStrAlloc(attr->values[i].string.text);
-	}
-        break;
-
-    case IPP_TAG_DATE :
-        toattr = ippAddDate(to, group_tag, attr->name,
-	                    attr->values[0].date);
-        break;
-
-    case IPP_TAG_RESOLUTION :
-        toattr = ippAddResolutions(to, group_tag, attr->name,
-	                           attr->num_values, IPP_RES_PER_INCH,
-				   NULL, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].resolution.xres  = attr->values[i].resolution.xres;
-	  toattr->values[i].resolution.yres  = attr->values[i].resolution.yres;
-	  toattr->values[i].resolution.units = attr->values[i].resolution.units;
-	}
-        break;
-
-    case IPP_TAG_RANGE :
-        toattr = ippAddRanges(to, group_tag, attr->name,
-	                      attr->num_values, NULL, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].range.lower = attr->values[i].range.lower;
-	  toattr->values[i].range.upper = attr->values[i].range.upper;
-	}
-        break;
-
-    case IPP_TAG_TEXTLANG :
-    case IPP_TAG_NAMELANG :
-        toattr = ippAddStrings(to, group_tag,
-	                       (ipp_tag_t)(attr->value_tag | quickcopy),
-	                       attr->name, attr->num_values, NULL, NULL);
-
-        if (quickcopy)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-            toattr->values[i].string.charset = attr->values[i].string.charset;
-	    toattr->values[i].string.text    = attr->values[i].string.text;
-          }
-        }
-	else
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-	    if (!i)
-              toattr->values[i].string.charset =
-	          _cupsStrAlloc(attr->values[i].string.charset);
-	    else
-              toattr->values[i].string.charset =
-	          toattr->values[0].string.charset;
-
-	    toattr->values[i].string.text =
-	        _cupsStrAlloc(attr->values[i].string.text);
-          }
-        }
-        break;
-
-    case IPP_TAG_BEGIN_COLLECTION :
-        toattr = ippAddCollections(to, group_tag, attr->name,
-	                           attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].collection = attr->values[i].collection;
-	  attr->values[i].collection->use ++;
-	}
-        break;
-
-    case IPP_TAG_STRING :
-        if (quickcopy)
-	{
-	  toattr = ippAddOctetString(to, group_tag, attr->name, NULL, 0);
-	  toattr->value_tag |= quickcopy;
-	  toattr->values[0].unknown.data   = attr->values[0].unknown.data;
-	  toattr->values[0].unknown.length = attr->values[0].unknown.length;
-	}
-	else
-	  toattr = ippAddOctetString(to, attr->group_tag, attr->name,
-				     attr->values[0].unknown.data,
-				     attr->values[0].unknown.length);
-        break;
-
-    default :
-        toattr = ippAddIntegers(to, group_tag, attr->value_tag,
-	                        attr->name, attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].unknown.length = attr->values[i].unknown.length;
-
-	  if (toattr->values[i].unknown.length > 0)
-	  {
-	    if ((toattr->values[i].unknown.data =
-	             malloc(toattr->values[i].unknown.length)) == NULL)
-	      toattr->values[i].unknown.length = 0;
-	    else
-	      memcpy(toattr->values[i].unknown.data,
-		     attr->values[i].unknown.data,
-		     toattr->values[i].unknown.length);
-	  }
-	}
-        break; /* anti-compiler-warning-code */
-  }
-
-  return (toattr);
-}
-
-
-/*
  * 'copy_attributes()' - Copy attributes from one request to another.
  */
 
@@ -789,7 +601,7 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
       continue;
 
     if (!ra || cupsArrayFind(ra, fromattr->name))
-      copy_attribute(to, fromattr, fromattr->group_tag, quickcopy);
+      ippCopyAttribute(to, fromattr, quickcopy);
   }
 }
 
@@ -1215,7 +1027,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 					/* media-size-supported value */
   ipp_t			*media_col_default;
 					/* media-col-default value */
-  ipp_value_t		*media_col_value;
+  _ipp_value_t		*media_col_value;
 					/* Current media-col-database value */
   int			k_supported;	/* Maximum file size supported */
 #ifdef HAVE_STATVFS
@@ -2084,7 +1896,7 @@ debug_attributes(const char *title,	/* I - Title */
 
     if (attr->name)
     {
-      _ippAttrString(attr, buffer, sizeof(buffer));
+      ippAttributeString(attr, buffer, sizeof(buffer));
       fprintf(stderr, "    %s (%s%s) %s\n", attr->name,
 	      attr->num_values > 1 ? "1setOf " : "",
 	      ippTagString(attr->value_tag), buffer);
@@ -4978,12 +4790,16 @@ respond_unsupported(
     _ipp_client_t   *client,		/* I - Client */
     ipp_attribute_t *attr)		/* I - Atribute */
 {
+  ipp_attribute_t	*temp;		/* Copy of attribute */
+
+
   if (!client->response->attrs)
     respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.",
 		attr->name, attr->num_values > 1 ? "1setOf " : "",
 		ippTagString(attr->value_tag));
 
-  copy_attribute(client->response, attr, IPP_TAG_UNSUPPORTED_GROUP, 0);
+  temp = ippCopyAttribute(client->response, attr, 0);
+  ippSetGroupTag(client->response, &temp, IPP_TAG_UNSUPPORTED_GROUP);
 }
 
 

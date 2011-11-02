@@ -3,7 +3,7 @@
  *
  *   Scheduler notification tester for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,6 +28,7 @@
 #include <cups/debug-private.h>
 #include <cups/string-private.h>
 #include <signal.h>
+#include <cups/ipp-private.h>	/* TODO: Update so we don't need this */
 
 
 /*
@@ -302,7 +303,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
   int			i;		/* Looping var */
   ipp_tag_t		group;		/* Current group */
   ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_value_t		*val;		/* Current value */
+  _ipp_value_t		*val;		/* Current value */
   static const char * const tags[] =	/* Value/group tag strings */
 			{
 			  "reserved-00",

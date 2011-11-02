@@ -45,7 +45,6 @@
  *                                 feed URI.
  *   check_quotas()              - Check quotas for a printer and user.
  *   close_job()                 - Close a multi-file job.
- *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   copy_banner()               - Copy a banner file to the requests directory
  *                                 for the specified job.
@@ -169,8 +168,6 @@ static void	cancel_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	cancel_subscription(cupsd_client_t *con, int id);
 static int	check_rss_recipient(const char *recipient);
 static int	check_quotas(cupsd_client_t *con, cupsd_printer_t *p);
-static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
-		                        int quickcopy);
 static void	close_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
 		           ipp_tag_t group, int quickcopy,
@@ -1717,10 +1714,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 	    {
 	      _cupsStrFree(attr->values[i].string.text);
 	      attr->values[i].string.text = NULL;
-	      if (attr->values[i].string.charset)
+	      if (attr->values[i].string.language)
 	      {
-		_cupsStrFree(attr->values[i].string.charset);
-		attr->values[i].string.charset = NULL;
+		_cupsStrFree(attr->values[i].string.language);
+		attr->values[i].string.language = NULL;
 	      }
             }
 
@@ -2298,7 +2295,7 @@ add_job_subscriptions(
       * Free and remove this attribute...
       */
 
-      _ippFreeAttr(attr);
+      ippDeleteAttribute(NULL, attr);
 
       if (prev)
         prev->next = next;
@@ -5049,192 +5046,6 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
 /*
- * 'copy_attribute()' - Copy a single attribute.
- */
-
-static ipp_attribute_t *		/* O - New attribute */
-copy_attribute(
-    ipp_t           *to,		/* O - Destination request/response */
-    ipp_attribute_t *attr,		/* I - Attribute to copy */
-    int             quickcopy)		/* I - Do a quick copy? */
-{
-  int			i;		/* Looping var */
-  ipp_attribute_t	*toattr;	/* Destination attribute */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "copy_attribute(%p, %p[%s,%x,%x])", to, attr,
-        	  attr->name ? attr->name : "(null)", attr->group_tag,
-		  attr->value_tag);
-
-  switch (attr->value_tag & ~IPP_TAG_COPY)
-  {
-    case IPP_TAG_ZERO :
-        toattr = ippAddSeparator(to);
-	break;
-
-    case IPP_TAG_INTEGER :
-    case IPP_TAG_ENUM :
-        toattr = ippAddIntegers(to, attr->group_tag, attr->value_tag,
-	                        attr->name, attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].integer = attr->values[i].integer;
-        break;
-
-    case IPP_TAG_BOOLEAN :
-        toattr = ippAddBooleans(to, attr->group_tag, attr->name,
-	                        attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	  toattr->values[i].boolean = attr->values[i].boolean;
-        break;
-
-    case IPP_TAG_STRING :
-    case IPP_TAG_TEXT :
-    case IPP_TAG_NAME :
-    case IPP_TAG_KEYWORD :
-    case IPP_TAG_URI :
-    case IPP_TAG_URISCHEME :
-    case IPP_TAG_CHARSET :
-    case IPP_TAG_LANGUAGE :
-    case IPP_TAG_MIMETYPE :
-        toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | quickcopy),
-	                       attr->name, attr->num_values, NULL, NULL);
-
-        if (quickcopy)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text = attr->values[i].string.text;
-        }
-	else if (attr->value_tag & IPP_TAG_COPY)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text =
-	        _cupsStrAlloc(attr->values[i].string.text);
-	}
-	else
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	    toattr->values[i].string.text =
-	        _cupsStrRetain(attr->values[i].string.text);
-	}
-        break;
-
-    case IPP_TAG_DATE :
-        toattr = ippAddDate(to, attr->group_tag, attr->name,
-	                    attr->values[0].date);
-        break;
-
-    case IPP_TAG_RESOLUTION :
-        toattr = ippAddResolutions(to, attr->group_tag, attr->name,
-	                           attr->num_values, IPP_RES_PER_INCH,
-				   NULL, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].resolution.xres  = attr->values[i].resolution.xres;
-	  toattr->values[i].resolution.yres  = attr->values[i].resolution.yres;
-	  toattr->values[i].resolution.units = attr->values[i].resolution.units;
-	}
-        break;
-
-    case IPP_TAG_RANGE :
-        toattr = ippAddRanges(to, attr->group_tag, attr->name,
-	                      attr->num_values, NULL, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].range.lower = attr->values[i].range.lower;
-	  toattr->values[i].range.upper = attr->values[i].range.upper;
-	}
-        break;
-
-    case IPP_TAG_TEXTLANG :
-    case IPP_TAG_NAMELANG :
-        toattr = ippAddStrings(to, attr->group_tag,
-	                       (ipp_tag_t)(attr->value_tag | quickcopy),
-	                       attr->name, attr->num_values, NULL, NULL);
-
-        if (quickcopy)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-            toattr->values[i].string.charset = attr->values[i].string.charset;
-	    toattr->values[i].string.text    = attr->values[i].string.text;
-          }
-        }
-	else if (attr->value_tag & IPP_TAG_COPY)
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-	    if (!i)
-              toattr->values[i].string.charset =
-	          _cupsStrAlloc(attr->values[i].string.charset);
-	    else
-              toattr->values[i].string.charset =
-	          toattr->values[0].string.charset;
-
-	    toattr->values[i].string.text =
-	        _cupsStrAlloc(attr->values[i].string.text);
-          }
-        }
-	else
-	{
-          for (i = 0; i < attr->num_values; i ++)
-	  {
-	    if (!i)
-              toattr->values[i].string.charset =
-	          _cupsStrRetain(attr->values[i].string.charset);
-	    else
-              toattr->values[i].string.charset =
-	          toattr->values[0].string.charset;
-
-	    toattr->values[i].string.text =
-	        _cupsStrRetain(attr->values[i].string.text);
-          }
-        }
-        break;
-
-    case IPP_TAG_BEGIN_COLLECTION :
-        toattr = ippAddCollections(to, attr->group_tag, attr->name,
-	                           attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].collection = attr->values[i].collection;
-	  attr->values[i].collection->use ++;
-	}
-        break;
-
-    default :
-        toattr = ippAddIntegers(to, attr->group_tag, attr->value_tag,
-	                        attr->name, attr->num_values, NULL);
-
-        for (i = 0; i < attr->num_values; i ++)
-	{
-	  toattr->values[i].unknown.length = attr->values[i].unknown.length;
-
-	  if (toattr->values[i].unknown.length > 0)
-	  {
-	    if ((toattr->values[i].unknown.data =
-	             malloc(toattr->values[i].unknown.length)) == NULL)
-	      toattr->values[i].unknown.length = 0;
-	    else
-	      memcpy(toattr->values[i].unknown.data,
-		     attr->values[i].unknown.data,
-		     toattr->values[i].unknown.length);
-	  }
-	}
-        break; /* anti-compiler-warning-code */
-  }
-
-  return (toattr);
-}
-
-
-/*
  * 'copy_attrs()' - Copy attributes from one request to another.
  */
 
@@ -5301,7 +5112,7 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
 	   !strcmp(fromattr->name, "media-col-database")))
 	continue;
 
-      copy_attribute(to, fromattr, quickcopy);
+      ippCopyAttribute(to, fromattr, quickcopy);
     }
   }
 }
@@ -9741,14 +9552,14 @@ read_job_ticket(cupsd_client_t *con)	/* I - Client connection */
       if (con->request->last == attr2)
         con->request->last = prev2;
 
-      _ippFreeAttr(attr2);
+      ippDeleteAttribute(NULL, attr2);
     }
 
    /*
     * Add new option by copying it...
     */
 
-    copy_attribute(con->request, attr, 0);
+    ippCopyAttribute(con->request, attr, 0);
   }
 
  /*
@@ -11205,9 +11016,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       send_ipp_status(con, IPP_ATTRIBUTES_NOT_SETTABLE,
                       _("%s cannot be changed."), attr->name);
 
-      if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
-        attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
-
+      attr2 = ippCopyAttribute(con->response, attr, 0);
+      ippSetGroupTag(con->response, &attr2, IPP_TAG_UNSUPPORTED_GROUP);
       continue;
     }
 
@@ -11221,8 +11031,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       {
 	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-priority value."));
 
-	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
-          attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+	attr2 = ippCopyAttribute(con->response, attr, 0);
+	ippSetGroupTag(con->response, &attr2, IPP_TAG_UNSUPPORTED_GROUP);
       }
       else if (job->state_value >= IPP_JOB_PROCESSING)
       {
@@ -11251,8 +11061,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       {
 	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-state value."));
 
-	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
-          attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+	attr2 = ippCopyAttribute(con->response, attr, 0);
+	ippSetGroupTag(con->response, &attr2, IPP_TAG_UNSUPPORTED_GROUP);
       }
       else
       {
@@ -11326,13 +11136,13 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       if (job->attrs->last == attr2)
         job->attrs->last = job->attrs->prev;
 
-      _ippFreeAttr(attr2);
+      ippDeleteAttribute(NULL, attr2);
 
      /*
       * Then copy the attribute...
       */
 
-      copy_attribute(job->attrs, attr, 0);
+      ippCopyAttribute(job->attrs, attr, 0);
 
      /*
       * See if the job-name or job-hold-until is being changed.
@@ -11373,7 +11183,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
         if (attr2 == job->attrs->last)
 	  job->attrs->last = job->attrs->prev;
 
-        _ippFreeAttr(attr2);
+        ippDeleteAttribute(NULL, attr2);
 
         event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
       }
@@ -11384,7 +11194,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       * Add new option by copying it...
       */
 
-      copy_attribute(job->attrs, attr, 0);
+      ippCopyAttribute(job->attrs, attr, 0);
 
       event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
     }
