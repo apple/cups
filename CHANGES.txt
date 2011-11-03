@@ -3,6 +3,8 @@ CHANGES.txt - 1.6b1 - 2011-11-02
 
 CHANGES IN CUPS V1.6b1
 
+	- The PPD APIs are now deprecated and will be removed in a future
+	  version of CUPS (STR #3927)
 	- The default IPP version for requests is now 2.0 (STR #3929)
 	- The IPP APIs no longer expose the ipp_t or ipp_attribute_t structures
 	  and instead provide accessor functions (STR #3928)

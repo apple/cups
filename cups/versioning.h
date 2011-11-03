@@ -75,11 +75,11 @@
  * a warning at compile-time.
  */
 
-#  if defined(__GNUC__) && __GNUC__ > 2
+#  if defined(__GNUC__) && __GNUC__ > 2 && !defined(_CUPS_SOURCE)
 #    define _CUPS_DEPRECATED __attribute__ ((__deprecated__))
 #  else
 #    define _CUPS_DEPRECATED
-#  endif /* __GNUC__ && __GNUC__ > 2 */
+#  endif /* __GNUC__ && __GNUC__ > 2 && !_CUPS_SOURCE */
 
 #  ifndef __GNUC__
 #    define __attribute__(x)

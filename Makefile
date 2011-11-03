@@ -246,13 +246,13 @@ debugcheck:	all unittests
 #
 
 apihelp:
-	for dir in cgi-bin cups filter driver ppdc scheduler; do\
+	for dir in cgi-bin cups filter ppdc scheduler; do\
 		echo Generating API help in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) apihelp) || exit 1;\
 	done
 
 framedhelp:
-	for dir in cgi-bin cups filter driver ppdc scheduler; do\
+	for dir in cgi-bin cups filter ppdc scheduler; do\
 		echo Generating framed API help in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
 	done

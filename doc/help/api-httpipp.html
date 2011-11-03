@@ -448,9 +448,11 @@ address records for the specified name.">httpGetHostByName</a></li>
 content-length or transfer-encoding fields.">httpGetLength</a></li>
 	<li><a href="#httpGetLength2" title="Get the amount of data remaining from the
 content-length or transfer-encoding fields.">httpGetLength2</a></li>
+	<li><a href="#httpGetState" title="Get the current state of the HTTP request.">httpGetState</a></li>
 	<li><a href="#httpGetStatus" title="Get the status of the last HTTP request.">httpGetStatus</a></li>
 	<li><a href="#httpGetSubField" title="Get a sub-field value.">httpGetSubField</a></li>
 	<li><a href="#httpGetSubField2" title="Get a sub-field value.">httpGetSubField2</a></li>
+	<li><a href="#httpGetVersion" title="Get the HTTP version at the other end.">httpGetVersion</a></li>
 	<li><a href="#httpGets" title="Get a line of text from a HTTP connection.">httpGets</a></li>
 	<li><a href="#httpHead" title="Send a HEAD request to the server.">httpHead</a></li>
 	<li><a href="#httpInitialize" title="Initialize the HTTP interface library and set the
@@ -494,6 +496,7 @@ connection.">httpSetCredentials</a></li>
 	<li><a href="#ippAddInteger" title="Add a integer attribute to an IPP message.">ippAddInteger</a></li>
 	<li><a href="#ippAddIntegers" title="Add an array of integer values.">ippAddIntegers</a></li>
 	<li><a href="#ippAddOctetString" title="Add an octetString value to an IPP message.">ippAddOctetString</a></li>
+	<li><a href="#ippAddOutOfBand" title="Add an out-of-band value to an IPP message.">ippAddOutOfBand</a></li>
 	<li><a href="#ippAddRange" title="Add a range of values to an IPP message.">ippAddRange</a></li>
 	<li><a href="#ippAddRanges" title="Add ranges of values to an IPP message.">ippAddRanges</a></li>
 	<li><a href="#ippAddResolution" title="Add a resolution value to an IPP message.">ippAddResolution</a></li>
@@ -501,24 +504,58 @@ connection.">httpSetCredentials</a></li>
 	<li><a href="#ippAddSeparator" title="Add a group separator to an IPP message.">ippAddSeparator</a></li>
 	<li><a href="#ippAddString" title="Add a language-encoded string to an IPP message.">ippAddString</a></li>
 	<li><a href="#ippAddStrings" title="Add language-encoded strings to an IPP message.">ippAddStrings</a></li>
+	<li><a href="#ippAttributeString" title="Convert the attribute's value to a string.">ippAttributeString</a></li>
+	<li><a href="#ippCopyAttribute" title="Copy an attribute.">ippCopyAttribute</a></li>
+	<li><a href="#ippCopyAttributes" title="Copy attributes from one IPP message to another.">ippCopyAttributes</a></li>
 	<li><a href="#ippDateToTime" title="Convert from RFC 1903 Date/Time format to UNIX time
 in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippDelete" title="Delete an IPP message.">ippDelete</a></li>
 	<li><a href="#ippDeleteAttribute" title="Delete a single attribute in an IPP message.">ippDeleteAttribute</a></li>
+	<li><a href="#ippDeleteValues" title="Delete values in an attribute.">ippDeleteValues</a></li>
+	<li><a href="#ippEnumString" title="Return a string corresponding to the enum value.">ippEnumString</a></li>
+	<li><a href="#ippEnumValue" title="Return the value associated with a given enum string.">ippEnumValue</a></li>
 	<li><a href="#ippErrorString" title="Return a name for the given status code.">ippErrorString</a></li>
 	<li><a href="#ippErrorValue" title="Return a status code for the given name.">ippErrorValue</a></li>
 	<li><a href="#ippFindAttribute" title="Find a named attribute in a request...">ippFindAttribute</a></li>
 	<li><a href="#ippFindNextAttribute" title="Find the next named attribute in a request...">ippFindNextAttribute</a></li>
+	<li><a href="#ippFirstAttribute" title="Return the first attribute in the message.">ippFirstAttribute</a></li>
+	<li><a href="#ippGetBoolean" title="Get a boolean value for an attribute.">ippGetBoolean</a></li>
+	<li><a href="#ippGetCollection" title="Get a collection value for an attribute.">ippGetCollection</a></li>
+	<li><a href="#ippGetCount" title="Get the number of values in an attribute.">ippGetCount</a></li>
+	<li><a href="#ippGetGroupTag" title="Get the group associated with an attribute.">ippGetGroupTag</a></li>
+	<li><a href="#ippGetInteger" title="Get the integer/enum value for an attribute.">ippGetInteger</a></li>
+	<li><a href="#ippGetName" title="Get the attribute name.">ippGetName</a></li>
+	<li><a href="#ippGetOperation" title="Get the operation ID in an IPP message.">ippGetOperation</a></li>
+	<li><a href="#ippGetRequestId" title="Get the request ID from an IPP message.">ippGetRequestId</a></li>
+	<li><a href="#ippGetResolution" title="Get a resolution value for an attribute.">ippGetResolution</a></li>
+	<li><a href="#ippGetStatusCode" title="Get the status code from an IPP response or event message.">ippGetStatusCode</a></li>
+	<li><a href="#ippGetString" title="Return the value...">ippGetString</a></li>
+	<li><a href="#ippGetValueTag" title="Get the value tag for an attribute.">ippGetValueTag</a></li>
+	<li><a href="#ippGetVersion" title="Get the major and minor version number from an IPP message.">ippGetVersion</a></li>
 	<li><a href="#ippLength" title="Compute the length of an IPP message.">ippLength</a></li>
 	<li><a href="#ippNew" title="Allocate a new IPP message.">ippNew</a></li>
 	<li><a href="#ippNewRequest" title="Allocate a new IPP request message.">ippNewRequest</a></li>
+	<li><a href="#ippNextAttribute" title="Return the next attribute in the message.">ippNextAttribute</a></li>
 	<li><a href="#ippOpString" title="Return a name for the given operation id.">ippOpString</a></li>
 	<li><a href="#ippOpValue" title="Return an operation id for the given name.">ippOpValue</a></li>
 	<li><a href="#ippPort" title="Return the default IPP port number.">ippPort</a></li>
 	<li><a href="#ippRead" title="Read data for an IPP message from a HTTP connection.">ippRead</a></li>
 	<li><a href="#ippReadFile" title="Read data for an IPP message from a file.">ippReadFile</a></li>
 	<li><a href="#ippReadIO" title="Read data for an IPP message.">ippReadIO</a></li>
+	<li><a href="#ippSetBoolean" title="Set a boolean value in an attribute.">ippSetBoolean</a></li>
+	<li><a href="#ippSetCollection" title="Set a collection value in an attribute.">ippSetCollection</a></li>
+	<li><a href="#ippSetGroupTag" title="Set the group tag of an attribute.">ippSetGroupTag</a></li>
+	<li><a href="#ippSetInteger" title="Set an integer or enum value in an attribute.">ippSetInteger</a></li>
+	<li><a href="#ippSetName" title="Set the name of an attribute.">ippSetName</a></li>
+	<li><a href="#ippSetOperation" title="Set the operation ID in an IPP request message.">ippSetOperation</a></li>
 	<li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
+	<li><a href="#ippSetRange" title="Set a rangeOfInteger value in an attribute.">ippSetRange</a></li>
+	<li><a href="#ippSetRequestId" title="Set the request ID in an IPP message.">ippSetRequestId</a></li>
+	<li><a href="#ippSetResolution" title="Set a resolution value in an attribute.">ippSetResolution</a></li>
+	<li><a href="#ippSetStatusCode" title="Set the status code in an IPP response or event message.">ippSetStatusCode</a></li>
+	<li><a href="#ippSetString" title="Set a string value in an attribute.">ippSetString</a></li>
+	<li><a href="#ippSetValueTag" title="Set the value tag of an attribute.">ippSetValueTag</a></li>
+	<li><a href="#ippSetVersion" title="Set the version number in an IPP message.">ippSetVersion</a></li>
 	<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
 	<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
 	<li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
@@ -550,21 +587,19 @@ are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_uri_coding_t" title="URI en/decode flags">http_uri_coding_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
-	<li><a href="#ipp_attribute_t" title="Attribute">ipp_attribute_t</a></li>
+	<li><a href="#ipp_attribute_t" title="IPP attribute">ipp_attribute_t</a></li>
+	<li><a href="#ipp_copycb_t" title="Prototypes...">ipp_copycb_t</a></li>
+	<li><a href="#ipp_dstate_t" title="Document states">ipp_dstate_t</a></li>
 	<li><a href="#ipp_finish_t" title="Finishings">ipp_finish_t</a></li>
 	<li><a href="#ipp_iocb_t" title="IPP IO Callback Function ">ipp_iocb_t</a></li>
-	<li><a href="#ipp_jstate_t" title="Job states">ipp_jstate_t</a></li>
-	<li><a href="#ipp_op_t" title="IPP operations">ipp_op_t</a></li>
+	<li><a href="#ipp_jcollate_t" title="Job collation types">ipp_jcollate_t</a></li>
 	<li><a href="#ipp_orient_t" title="Orientation values">ipp_orient_t</a></li>
 	<li><a href="#ipp_pstate_t" title="Printer states">ipp_pstate_t</a></li>
 	<li><a href="#ipp_quality_t" title="Qualities">ipp_quality_t</a></li>
-	<li><a href="#ipp_request_t" title="Request Header">ipp_request_t</a></li>
 	<li><a href="#ipp_res_t" title="Resolution units">ipp_res_t</a></li>
 	<li><a href="#ipp_state_t" title="IPP states">ipp_state_t</a></li>
-	<li><a href="#ipp_t" title="Attribute Value">ipp_t</a></li>
-	<li><a href="#ipp_uchar_t" title="IPP status codes">ipp_uchar_t</a></li>
-	<li><a href="#ipp_tag_t" title="Format tags for attributes">ipp_tag_t</a></li>
-	<li><a href="#ipp_value_t" title="Attribute Value">ipp_value_t</a></li>
+	<li><a href="#ipp_t" title="IPP request/response data">ipp_t</a></li>
+	<li><a href="#ipp_uchar_t" title="Unsigned 8-bit integer/character">ipp_uchar_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#gss_auth_identity" title="Local functions...">gss_auth_identity</a></li>
@@ -573,12 +608,6 @@ used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_s</a></li>
 	<li><a href="#http_credential_s" title="HTTP credential data ">http_credential_s</a></li>
-	<li><a href="#ipp_attribute_s" title="Attribute">ipp_attribute_s</a></li>
-	<li><a href="#ipp_s" title="IPP Request/Response/Notification">ipp_s</a></li>
-</ul></li>
-<li><a href="#UNIONS">Unions</a><ul class="code">
-	<li><a href="#ipp_request_u" title="Request Header">ipp_request_u</a></li>
-	<li><a href="#ipp_value_u" title="Attribute Value">ipp_value_u</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#http_auth_e" title="HTTP authentication types">http_auth_e</a></li>
@@ -592,7 +621,9 @@ are server-oriented...">http_state_e</a></li>
 	<li><a href="#http_uri_coding_e" title="URI en/decode flags">http_uri_coding_e</a></li>
 	<li><a href="#http_uri_status_e" title="URI separation status ">http_uri_status_e</a></li>
 	<li><a href="#http_version_e" title="HTTP version numbers">http_version_e</a></li>
+	<li><a href="#ipp_dstate_e" title="Document states">ipp_dstate_e</a></li>
 	<li><a href="#ipp_finish_e" title="Finishings">ipp_finish_e</a></li>
+	<li><a href="#ipp_jcollate_e" title="Job collation types">ipp_jcollate_e</a></li>
 	<li><a href="#ipp_jstate_e" title="Job states">ipp_jstate_e</a></li>
 	<li><a href="#ipp_op_e" title="IPP operations">ipp_op_e</a></li>
 	<li><a href="#ipp_orient_e" title="Orientation values">ipp_orient_e</a></li>
@@ -1066,7 +1097,7 @@ void cupsEncodeOptions2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *options,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group_tag<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group_tag<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1186,7 +1217,8 @@ the request respectively.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use this function to get the response for an IPP request sent using
 cupsSendDocument() or cupsSendRequest(). For requests that return
-additional data, use httpRead() after getting a successful response.
+additional data, use httpRead() after getting a successful response,
+otherwise call httpFlush() to complete the response processing.
 
 </p>
 <h3 class="function"><a name="cupsLastError">cupsLastError</a></h3>
@@ -2026,6 +2058,19 @@ off_t httpGetLength2 (<br>
 content larger than 2^31 - 1.
 
 </p>
+<h3 class="function"><a name="httpGetState">httpGetState</a></h3>
+<p class="description">Get the current state of the HTTP request.</p>
+<p class="code">
+<a href="#http_state_t">http_state_t</a> httpGetState (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP state</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetStatus">httpGetStatus</a></h3>
 <p class="description">Get the status of the last HTTP request.</p>
 <p class="code">
@@ -2086,6 +2131,19 @@ char *httpGetSubField2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Value or NULL</p>
+<h3 class="function"><a name="httpGetVersion">httpGetVersion</a></h3>
+<p class="description">Get the HTTP version at the other end.</p>
+<p class="code">
+<a href="#http_version_t">http_version_t</a> httpGetVersion (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Version number</p>
 <h3 class="function"><a name="httpGets">httpGets</a></h3>
 <p class="description">Get a line of text from a HTTP connection.</p>
 <p class="code">
@@ -2650,7 +2708,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddBoolean (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char value<br>
 );</p>
@@ -2667,12 +2725,21 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><a name="ippAddBooleans">ippAddBooleans</a></h3>
 <p class="description">Add an array of boolean values.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddBooleans (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *values<br>
@@ -2692,12 +2759,21 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippAddCollection">ippAddCollection</a></h3>
 <p class="description">Add a collection value.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollection (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *value<br>
 );</p>
@@ -2714,12 +2790,23 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippAddCollections">ippAddCollections</a></h3>
 <p class="description">Add an array of collection values.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollections (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const <a href="#ipp_t">ipp_t</a> **values<br>
@@ -2739,12 +2826,23 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
+
+</p>
 <h3 class="function"><a name="ippAddDate">ippAddDate</a></h3>
 <p class="description">Add a date attribute to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddDate (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const <a href="#ipp_uchar_t">ipp_uchar_t</a> *value<br>
 );</p>
@@ -2761,13 +2859,22 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><a name="ippAddInteger">ippAddInteger</a></h3>
 <p class="description">Add a integer attribute to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddInteger (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int value<br>
 );</p>
@@ -2777,7 +2884,7 @@ ssize_t httpWrite2 (<br>
 <dd class="description">IPP message</dd>
 <dt>group</dt>
 <dd class="description">IPP group</dd>
-<dt>type</dt>
+<dt>value_tag</dt>
 <dd class="description">Type of attribute</dd>
 <dt>name</dt>
 <dd class="description">Name of attribute</dd>
@@ -2786,13 +2893,25 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+Supported values include enum (<code>IPP_TAG_ENUM</code>) and integer
+(<code>IPP_TAG_INTEGER</code>).</p>
 <h3 class="function"><a name="ippAddIntegers">ippAddIntegers</a></h3>
 <p class="description">Add an array of integer values.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddIntegers (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *values<br>
@@ -2803,7 +2922,7 @@ ssize_t httpWrite2 (<br>
 <dd class="description">IPP message</dd>
 <dt>group</dt>
 <dd class="description">IPP group</dd>
-<dt>type</dt>
+<dt>value_tag</dt>
 <dd class="description">Type of attribute</dd>
 <dt>name</dt>
 <dd class="description">Name of attribute</dd>
@@ -2814,12 +2933,24 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+Supported values include enum (<code>IPP_TAG_ENUM</code>) and integer
+(<code>IPP_TAG_INTEGER</code>).</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippAddOctetString">ippAddOctetString</a></h3>
 <p class="description">Add an octetString value to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddOctetString (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const void *data,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int datalen<br>
@@ -2839,12 +2970,62 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippAddOutOfBand">ippAddOutOfBand</a></h3>
+<p class="description">Add an out-of-band value to an IPP message.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddOutOfBand (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>group</dt>
+<dd class="description">IPP group</dd>
+<dt>value_tag</dt>
+<dd class="description">Type of attribute</dd>
+<dt>name</dt>
+<dd class="description">Name of attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+Supported out-of-band values include unsupported-value
+(<code>IPP_TAG_UNSUPPORTED_VALUE</code>), default (<code>IPP_TAG_DEFAULT</code>), unknown
+(<code>IPP_TAG_UNKNOWN</code>), no-value (<code>IPP_TAG_NOVALUE</code>), not-settable
+(<code>IPP_TAG_NOTSETTABLE</code>), delete-attribute (<code>IPP_TAG_DELETEATTR</code>), and
+admin-define (<code>IPP_TAG_ADMINDEFINE</code>).
+
+</p>
 <h3 class="function"><a name="ippAddRange">ippAddRange</a></h3>
 <p class="description">Add a range of values to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddRange (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int lower,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int upper<br>
@@ -2864,12 +3045,23 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+The <code>lower</code> parameter must be less than or equal to the <code>upper</code> parameter.</p>
 <h3 class="function"><a name="ippAddRanges">ippAddRanges</a></h3>
 <p class="description">Add ranges of values to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddRanges (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *lower,<br>
@@ -2892,12 +3084,21 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><a name="ippAddResolution">ippAddResolution</a></h3>
 <p class="description">Add a resolution value to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddResolution (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> units,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int xres,<br>
@@ -2920,12 +3121,21 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><a name="ippAddResolutions">ippAddResolutions</a></h3>
 <p class="description">Add resolution values to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddResolutions (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> units,<br>
@@ -2951,6 +3161,15 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
 <h3 class="function"><a name="ippAddSeparator">ippAddSeparator</a></h3>
 <p class="description">Add a group separator to an IPP message.</p>
 <p class="code">
@@ -2964,15 +3183,18 @@ ssize_t httpWrite2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.</p>
 <h3 class="function"><a name="ippAddString">ippAddString</a></h3>
 <p class="description">Add a language-encoded string to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddString (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *charset,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *language,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -2981,27 +3203,46 @@ ssize_t httpWrite2 (<br>
 <dd class="description">IPP message</dd>
 <dt>group</dt>
 <dd class="description">IPP group</dd>
-<dt>type</dt>
+<dt>value_tag</dt>
 <dd class="description">Type of attribute</dd>
 <dt>name</dt>
 <dd class="description">Name of attribute</dd>
-<dt>charset</dt>
-<dd class="description">Character set</dd>
+<dt>language</dt>
+<dd class="description">Language code</dd>
 <dt>value</dt>
 <dd class="description">Value</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+Supported string values include charset (<code>IPP_TAG_CHARSET</code>), keyword
+(<code>IPP_TAG_KEYWORD</code>), language (<code>IPP_TAG_LANGUAGE</code>), mimeMediaType
+(<code>IPP_TAG_MIMETYPE</code>), name (<code>IPP_TAG_NAME</code>), nameWithLanguage
+(<code>IPP_TAG_NAMELANG), text (</code>code IPP_TAG_TEXT@), textWithLanguage
+(<code>IPP_TAG_TEXTLANG</code>), uri (<code>IPP_TAG_URI</code>), and uriScheme
+(<code>IPP_TAG_URISCHEME</code>).<br>
+<br>
+The <code>language</code> parameter must be non-<code>NULL</code> for nameWithLanguage and
+textWithLanguage string values and must be <code>NULL</code> for all other string values.</p>
 <h3 class="function"><a name="ippAddStrings">ippAddStrings</a></h3>
 <p class="description">Add language-encoded strings to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddStrings (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *charset,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *language,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *const *values<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -3010,19 +3251,126 @@ ssize_t httpWrite2 (<br>
 <dd class="description">IPP message</dd>
 <dt>group</dt>
 <dd class="description">IPP group</dd>
-<dt>type</dt>
+<dt>value_tag</dt>
 <dd class="description">Type of attribute</dd>
 <dt>name</dt>
 <dd class="description">Name of attribute</dd>
 <dt>num_values</dt>
 <dd class="description">Number of values</dd>
-<dt>charset</dt>
-<dd class="description">Character set</dd>
+<dt>language</dt>
+<dd class="description">Language code (<code>NULL</code> for default)</dd>
 <dt>values</dt>
 <dd class="description">Values</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).<br>
+<br>
+Supported string values include charset (<code>IPP_TAG_CHARSET</code>), keyword
+(<code>IPP_TAG_KEYWORD</code>), language (<code>IPP_TAG_LANGUAGE</code>), mimeMediaType
+(<code>IPP_TAG_MIMETYPE</code>), name (<code>IPP_TAG_NAME</code>), nameWithLanguage
+(<code>IPP_TAG_NAMELANG), text (</code>code IPP_TAG_TEXT@), textWithLanguage
+(<code>IPP_TAG_TEXTLANG</code>), uri (<code>IPP_TAG_URI</code>), and uriScheme
+(<code>IPP_TAG_URISCHEME</code>).<br>
+<br>
+The <code>language</code> parameter must be non-<code>NULL</code> for nameWithLanguage and
+textWithLanguage string values and must be <code>NULL</code> for all other string values.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippAttributeString">ippAttributeString</a></h3>
+<p class="description">Convert the attribute's value to a string.</p>
+<p class="code">
+size_t ippAttributeString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">Attribute</dd>
+<dt>buffer</dt>
+<dd class="description">String buffer or NULL</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of string buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes less nul</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns the number of bytes that would be written, not including the
+trailing nul. The buffer pointer can be NULL to get the required length,
+just like (v)snprintf.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippCopyAttribute">ippCopyAttribute</a></h3>
+<p class="description">Copy an attribute.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *ippCopyAttribute (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *srcattr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int quickcopy<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dst</dt>
+<dd class="description">Destination IPP message</dd>
+<dt>srcattr</dt>
+<dd class="description">Attribute to copy</dd>
+<dt>quickcopy</dt>
+<dd class="description">1 for a referenced copy, 0 for normal</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The specified attribute, <code>attr</code>, is copied to the destination IPP message.
+When <code>quickcopy</code> is non-zero, a &quot;shallow&quot; reference copy of the attribute is
+created - this should only be done as long as the original source IPP message will
+not be freed for the life of the destination.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippCopyAttributes">ippCopyAttributes</a></h3>
+<p class="description">Copy attributes from one IPP message to another.</p>
+<p class="code">
+int ippCopyAttributes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *dst,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *src,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int quickcopy,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_copycb_t">ipp_copycb_t</a> cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *context<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dst</dt>
+<dd class="description">Destination IPP message</dd>
+<dt>src</dt>
+<dd class="description">Source IPP message</dd>
+<dt>quickcopy</dt>
+<dd class="description">1 for a referenced copy, 0 for normal</dd>
+<dt>cb</dt>
+<dd class="description">Copy callback or <code>NULL</code> for none</dd>
+<dt>context</dt>
+<dd class="description">Context pointer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Zero or more attributes are copied from the source IPP message, @code@ src, to the
+destination IPP message, <code>dst</code>. When <code>quickcopy</code> is non-zero, a &quot;shallow&quot;
+reference copy of the attribute is created - this should only be done as long as the
+original source IPP message will not be freed for the life of the destination.<br>
+<br>
+The <code>cb</code> and <code>context</code> parameters provide a generic way to &quot;filter&quot; the
+attributes that are copied - the function must return 1 to copy the attribute or
+0 to skip it. The function may also choose to do a partial copy of the source attribute
+itself.
+
+</p>
 <h3 class="function"><a name="ippDateToTime">ippDateToTime</a></h3>
 <p class="description">Convert from RFC 1903 Date/Time format to UNIX time
 in seconds.</p>
@@ -3062,6 +3410,67 @@ void ippDeleteAttribute (<br>
 <dt>attr</dt>
 <dd class="description">Attribute to delete</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippDeleteValues">ippDeleteValues</a></h3>
+<p class="description">Delete values in an attribute.</p>
+<p class="code">
+int ippDeleteValues (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int count<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">Attribute</dd>
+<dt>element</dt>
+<dd class="description">Index of first value to delete (0-based)</dd>
+<dt>count</dt>
+<dd class="description">Number of values to delete</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies the first value to delete, starting at 0. It
+must be less than the number of values returned by <a href="#ippGetCount"><code>ippGetCount</code></a>.<br>
+<br>
+Deleting all values in an attribute deletes the attribute.
+
+</p>
+<h3 class="function"><a name="ippEnumString">ippEnumString</a></h3>
+<p class="description">Return a string corresponding to the enum value.</p>
+<p class="code">
+const char *ippEnumString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *attrname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int enumvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attrname</dt>
+<dd class="description">Attribute name</dd>
+<dt>enumvalue</dt>
+<dd class="description">Enum value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Enum string</p>
+<h3 class="function"><a name="ippEnumValue">ippEnumValue</a></h3>
+<p class="description">Return the value associated with a given enum string.</p>
+<p class="code">
+int ippEnumValue (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *attrname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *enumstring<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attrname</dt>
+<dd class="description">Attribute name</dd>
+<dt>enumstring</dt>
+<dd class="description">Enum string</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Enum value or -1 if unknown</p>
 <h3 class="function"><a name="ippErrorString">ippErrorString</a></h3>
 <p class="description">Return a name for the given status code.</p>
 <p class="code">
@@ -3094,7 +3503,7 @@ ipp_status_t ippErrorValue (<br>
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3113,7 +3522,7 @@ ipp_status_t ippErrorValue (<br>
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindNextAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3126,6 +3535,239 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippFirstAttribute">ippFirstAttribute</a></h3>
+<p class="description">Return the first attribute in the message.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFirstAttribute (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">First attribute or <code>NULL</code> if none</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetBoolean">ippGetBoolean</a></h3>
+<p class="description">Get a boolean value for an attribute.</p>
+<p class="code">
+int ippGetBoolean (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Boolean value or -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetCollection">ippGetCollection</a></h3>
+<p class="description">Get a collection value for an attribute.</p>
+<p class="code">
+<a href="#ipp_t">ipp_t</a> *ippGetCollection (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Collection value or <code>NULL</code> on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetCount">ippGetCount</a></h3>
+<p class="description">Get the number of values in an attribute.</p>
+<p class="code">
+int ippGetCount (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of values or -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetGroupTag">ippGetGroupTag</a></h3>
+<p class="description">Get the group associated with an attribute.</p>
+<p class="code">
+ipp_tag_t ippGetGroupTag (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Group tag or <code>IPP_TAG_ZERO</code> on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetInteger">ippGetInteger</a></h3>
+<p class="description">Get the integer/enum value for an attribute.</p>
+<p class="code">
+int ippGetInteger (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value or -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetName">ippGetName</a></h3>
+<p class="description">Get the attribute name.</p>
+<p class="code">
+const char *ippGetName (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Attribute name or <code>NULL</code> for separators</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetOperation">ippGetOperation</a></h3>
+<p class="description">Get the operation ID in an IPP message.</p>
+<p class="code">
+ipp_op_t ippGetOperation (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP request message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Operation ID or -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetRequestId">ippGetRequestId</a></h3>
+<p class="description">Get the request ID from an IPP message.</p>
+<p class="code">
+int ippGetRequestId (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Request ID or -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetResolution">ippGetResolution</a></h3>
+<p class="description">Get a resolution value for an attribute.</p>
+<p class="code">
+int ippGetResolution (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *yres,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> *units<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>yres</dt>
+<dd class="description">Vertical/feed resolution</dd>
+<dt>units</dt>
+<dd class="description">Units for resolution</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Horizontal/cross feed resolution or -1</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetStatusCode">ippGetStatusCode</a></h3>
+<p class="description">Get the status code from an IPP response or event message.</p>
+<p class="code">
+ipp_status_t ippGetStatusCode (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP response or event message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status code in IPP message</p>
+<h3 class="function"><a name="ippGetString">ippGetString</a></h3>
+<p class="description">Return the value...</p>
+<p class="code">
+const char *ippGetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char **language<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>language</dt>
+<dd class="description">Language code (<code>NULL</code> for don't care)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Get the string and optionally the language code for an attribute.</p>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetValueTag">ippGetValueTag</a></h3>
+<p class="description">Get the value tag for an attribute.</p>
+<p class="code">
+ipp_tag_t ippGetValueTag (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value tag or <code>IPP_TAG_ZERO</code> on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetVersion">ippGetVersion</a></h3>
+<p class="description">Get the major and minor version number from an IPP message.</p>
+<p class="code">
+int ippGetVersion (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *minor<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>minor</dt>
+<dd class="description">Minor version number or <code>NULL</code></dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Major version number or -1 on error</p>
 <h3 class="function"><a name="ippLength">ippLength</a></h3>
 <p class="description">Compute the length of an IPP message.</p>
 <p class="code">
@@ -3149,7 +3791,7 @@ size_t ippLength (<br>
 <p class="description">Allocate a new IPP request message.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *ippNewRequest (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_op_t">ipp_op_t</a> op<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_op_t op<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3164,11 +3806,24 @@ attributes-natural-language attributes added. The
 attributes-natural-language value is derived from the current locale.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippNextAttribute">ippNextAttribute</a></h3>
+<p class="description">Return the next attribute in the message.</p>
+<p class="code">
+<a href="#ipp_attribute_t">ipp_attribute_t</a> *ippNextAttribute (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Next attribute or <code>NULL</code> if none</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippOpString">ippOpString</a></h3>
 <p class="description">Return a name for the given operation id.</p>
 <p class="code">
 const char *ippOpString (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_op_t">ipp_op_t</a> op<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_op_t op<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3180,7 +3835,7 @@ const char *ippOpString (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippOpValue">ippOpValue</a></h3>
 <p class="description">Return an operation id for the given name.</p>
 <p class="code">
-<a href="#ipp_op_t">ipp_op_t</a> ippOpValue (<br>
+ipp_op_t ippOpValue (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -3253,6 +3908,181 @@ int ippPort (void);</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetBoolean">ippSetBoolean</a></h3>
+<p class="description">Set a boolean value in an attribute.</p>
+<p class="code">
+int ippSetBoolean (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int boolvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>boolvalue</dt>
+<dd class="description">Boolean value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetCollection">ippSetCollection</a></h3>
+<p class="description">Set a collection value in an attribute.</p>
+<p class="code">
+int ippSetCollection (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *colvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>colvalue</dt>
+<dd class="description">Collection value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetGroupTag">ippSetGroupTag</a></h3>
+<p class="description">Set the group tag of an attribute.</p>
+<p class="code">
+int ippSetGroupTag (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group_tag<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">Attribute</dd>
+<dt>group_tag</dt>
+<dd class="description">Group tag</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>group</code> parameter specifies the IPP attribute group tag: none
+(<code>IPP_TAG_ZERO</code>, for member attributes), document (<code>IPP_TAG_DOCUMENT</code>),
+event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
+(<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
+(<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetInteger">ippSetInteger</a></h3>
+<p class="description">Set an integer or enum value in an attribute.</p>
+<p class="code">
+int ippSetInteger (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int intvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>intvalue</dt>
+<dd class="description">Integer/enum value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetName">ippSetName</a></h3>
+<p class="description">Set the name of an attribute.</p>
+<p class="code">
+int ippSetName (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>name</dt>
+<dd class="description">Attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetOperation">ippSetOperation</a></h3>
+<p class="description">Set the operation ID in an IPP request message.</p>
+<p class="code">
+int ippSetOperation (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_op_t op<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP request message</dd>
+<dt>op</dt>
+<dd class="description">Operation ID</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.
+
+</p>
 <h3 class="function"><a name="ippSetPort">ippSetPort</a></h3>
 <p class="description">Set the default port number.</p>
 <p class="code">
@@ -3264,11 +4094,224 @@ void ippSetPort (<br>
 <dt>p</dt>
 <dd class="description">Port number to use</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetRange">ippSetRange</a></h3>
+<p class="description">Set a rangeOfInteger value in an attribute.</p>
+<p class="code">
+int ippSetRange (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int lowervalue,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int uppervalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>lowervalue</dt>
+<dd class="description">Lower bound for range</dd>
+<dt>uppervalue</dt>
+<dd class="description">Upper bound for range</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetRequestId">ippSetRequestId</a></h3>
+<p class="description">Set the request ID in an IPP message.</p>
+<p class="code">
+int ippSetRequestId (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int request_id<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>request_id</dt>
+<dd class="description">Request ID</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>request_id</code> parameter must be greater than 0.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetResolution">ippSetResolution</a></h3>
+<p class="description">Set a resolution value in an attribute.</p>
+<p class="code">
+int ippSetResolution (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> unitsvalue,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int xresvalue,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int yresvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>unitsvalue</dt>
+<dd class="description">Resolution units</dd>
+<dt>xresvalue</dt>
+<dd class="description">Horizontal/cross feed resolution</dd>
+<dt>yresvalue</dt>
+<dd class="description">Vertical/feed resolution</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetStatusCode">ippSetStatusCode</a></h3>
+<p class="description">Set the status code in an IPP response or event message.</p>
+<p class="code">
+int ippSetStatusCode (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_status_t status<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP response or event message</dd>
+<dt>status</dt>
+<dd class="description">Status code</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetString">ippSetString</a></h3>
+<p class="description">Set a string value in an attribute.</p>
+<p class="code">
+int ippSetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *strvalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>strvalue</dt>
+<dd class="description">String value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetValueTag">ippSetValueTag</a></h3>
+<p class="description">Set the value tag of an attribute.</p>
+<p class="code">
+int ippSetValueTag (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t value_tag<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>value_tag</dt>
+<dd class="description">Value tag</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+Integer (<code>IPP_TAG_INTEGER</code>) values can be promoted to rangeOfInteger
+(<code>IPP_TAG_RANGE</code>) values, the various string tags can be promoted to name
+(<code>IPP_TAG_NAME</code>) or nameWithLanguage (<code>IPP_TAG_NAMELANG</code>) values, text
+(<code>IPP_TAG_TEXT</code>) values can be promoted to textWithLanguage
+(<code>IPP_TAG_TEXTLANG</code>) values, and all values can be demoted to the various
+out-of-band value tags such as no-value (<code>IPP_TAG_NOVALUE</code>). All other changes
+will be rejected.<br>
+<br>
+Promoting a string attribute to nameWithLanguage or textWithLanguage adds the language
+code in the &quot;attributes-natural-language&quot; attribute or, if not present, the language
+code for the current locale.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetVersion">ippSetVersion</a></h3>
+<p class="description">Set the version number in an IPP message.</p>
+<p class="code">
+int ippSetVersion (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int major,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int minor<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>major</dt>
+<dd class="description">Major version number (major.minor)</dd>
+<dt>minor</dt>
+<dd class="description">Minor version number (major.minor)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using the
+<a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
 <p class="description">Return the tag name corresponding to a tag value.</p>
 <p class="code">
 const char *ippTagString (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> tag<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t tag<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -3284,7 +4327,7 @@ const char *ippTagString (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
 <p class="description">Return the tag value corresponding to a tag name.</p>
 <p class="code">
-<a href="#ipp_tag_t">ipp_tag_t</a> ippTagValue (<br>
+ipp_tag_t ippTagValue (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -3457,9 +4500,19 @@ typedef enum <a href="#http_uri_status_e">http_uri_status_e</a> http_uri_status_
 typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 </p>
 <h3 class="typedef"><a name="ipp_attribute_t">ipp_attribute_t</a></h3>
-<p class="description">Attribute</p>
+<p class="description">IPP attribute</p>
 <p class="code">
-typedef struct <a href="#ipp_attribute_s">ipp_attribute_s</a> ipp_attribute_t;
+typedef struct _ipp_attribute_s ipp_attribute_t;
+</p>
+<h3 class="typedef"><a name="ipp_copycb_t">ipp_copycb_t</a></h3>
+<p class="description">Prototypes...</p>
+<p class="code">
+typedef int (*ipp_copycb_t)(void *context, <a href="#ipp_t">ipp_t</a> *dst, <a href="#ipp_attribute_t">ipp_attribute_t</a> *attr);
+</p>
+<h3 class="typedef"><a name="ipp_dstate_t">ipp_dstate_t</a></h3>
+<p class="description">Document states</p>
+<p class="code">
+typedef enum <a href="#ipp_dstate_e">ipp_dstate_e</a> ipp_dstate_t;
 </p>
 <h3 class="typedef"><a name="ipp_finish_t">ipp_finish_t</a></h3>
 <p class="description">Finishings</p>
@@ -3469,17 +4522,12 @@ typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ipp_iocb_t">ipp_iocb_t</a></h3>
 <p class="description">IPP IO Callback Function </p>
 <p class="code">
-typedef ssize_t (*ipp_iocb_t)(void *, <a href="#ipp_uchar_t">ipp_uchar_t</a> *, size_t);
+typedef ssize_t (*ipp_iocb_t)(void *context, <a href="#ipp_uchar_t">ipp_uchar_t</a> *buffer, size_t bytes);
 </p>
-<h3 class="typedef"><a name="ipp_jstate_t">ipp_jstate_t</a></h3>
-<p class="description">Job states</p>
+<h3 class="typedef"><a name="ipp_jcollate_t">ipp_jcollate_t</a></h3>
+<p class="description">Job collation types</p>
 <p class="code">
-typedef enum <a href="#ipp_jstate_e">ipp_jstate_e</a> ipp_jstate_t;
-</p>
-<h3 class="typedef"><a name="ipp_op_t">ipp_op_t</a></h3>
-<p class="description">IPP operations</p>
-<p class="code">
-typedef enum <a href="#ipp_op_e">ipp_op_e</a> ipp_op_t;
+typedef enum <a href="#ipp_jcollate_e">ipp_jcollate_e</a> ipp_jcollate_t;
 </p>
 <h3 class="typedef"><a name="ipp_orient_t">ipp_orient_t</a></h3>
 <p class="description">Orientation values</p>
@@ -3496,11 +4544,6 @@ typedef enum <a href="#ipp_pstate_e">ipp_pstate_e</a> ipp_pstate_t;
 <p class="code">
 typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 </p>
-<h3 class="typedef"><a name="ipp_request_t">ipp_request_t</a></h3>
-<p class="description">Request Header</p>
-<p class="code">
-typedef union <a href="#ipp_request_u">ipp_request_u</a> ipp_request_t;
-</p>
 <h3 class="typedef"><a name="ipp_res_t">ipp_res_t</a></h3>
 <p class="description">Resolution units</p>
 <p class="code">
@@ -3512,24 +4555,14 @@ typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 </p>
 <h3 class="typedef"><a name="ipp_t">ipp_t</a></h3>
-<p class="description">Attribute Value</p>
+<p class="description">IPP request/response data</p>
 <p class="code">
-typedef struct <a href="#ipp_s">ipp_s</a> ipp_t;
+typedef struct _ipp_s ipp_t;
 </p>
 <h3 class="typedef"><a name="ipp_uchar_t">ipp_uchar_t</a></h3>
-<p class="description">IPP status codes</p>
+<p class="description">Unsigned 8-bit integer/character</p>
 <p class="code">
-typedef typedef unsigned char ipp_uchar_t;
-</p>
-<h3 class="typedef"><a name="ipp_tag_t">ipp_tag_t</a></h3>
-<p class="description">Format tags for attributes</p>
-<p class="code">
-typedef enum <a href="#ipp_tag_e">ipp_tag_e</a> ipp_tag_t;
-</p>
-<h3 class="typedef"><a name="ipp_value_t">ipp_value_t</a></h3>
-<p class="description">Attribute Value</p>
-<p class="code">
-typedef union <a href="#ipp_value_u">ipp_value_u</a> ipp_value_t;
+typedef unsigned char ipp_uchar_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
 <h3 class="struct"><a name="gss_auth_identity">gss_auth_identity</a></h3>
@@ -3579,86 +4612,6 @@ with a hostname. </p>
 <dd class="description">Pointer to credential data</dd>
 <dt>datalen </dt>
 <dd class="description">Credential length</dd>
-</dl>
-<h3 class="struct"><a name="ipp_attribute_s">ipp_attribute_s</a></h3>
-<p class="description">Attribute</p>
-<p class="code">struct ipp_attribute_s {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *name;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;struct <a href="#ipp_attribute_s">ipp_attribute_s</a> *next;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int num_values;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group_tag, value_tag;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_value_t">ipp_value_t</a> values[1];<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>name </dt>
-<dd class="description">Name of attribute</dd>
-<dt>next </dt>
-<dd class="description">Next attribute in list</dd>
-<dt>num_values </dt>
-<dd class="description">Number of values</dd>
-<dt>value_tag </dt>
-<dd class="description">What type of value is it?</dd>
-<dt>values[1] </dt>
-<dd class="description">Values</dd>
-</dl>
-<h3 class="struct"><a name="ipp_s">ipp_s</a></h3>
-<p class="description">IPP Request/Response/Notification</p>
-<p class="code">struct ipp_s {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attrs;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *current;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> curtag;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *last;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *prev;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_request_t">ipp_request_t</a> request;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_state_t">ipp_state_t</a> state;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int use;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>attrs </dt>
-<dd class="description">Attributes</dd>
-<dt>current </dt>
-<dd class="description">Current attribute (for read/write)</dd>
-<dt>curtag </dt>
-<dd class="description">Current attribute group tag</dd>
-<dt>last </dt>
-<dd class="description">Last attribute in list</dd>
-<dt>prev <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Previous attribute (for read) </dd>
-<dt>request </dt>
-<dd class="description">Request header</dd>
-<dt>state </dt>
-<dd class="description">State of request</dd>
-<dt>use <span class="info">&nbsp;CUPS 1.4.4/Mac OS X 10.6.?&nbsp;</span></dt>
-<dd class="description">Use count </dd>
-</dl>
-<h2 class="title"><a name="UNIONS">Unions</a></h2>
-<h3 class="union"><a name="ipp_request_u">ipp_request_u</a></h3>
-<p class="description">Request Header</p>
-<p class="code">union ipp_request_u {<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-</dl>
-<h3 class="union"><a name="ipp_value_u">ipp_value_u</a></h3>
-<p class="description">Attribute Value</p>
-<p class="code">union ipp_value_u {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char boolean;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *collection;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_uchar_t">ipp_uchar_t</a> date[11];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int integer;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>boolean </dt>
-<dd class="description">Boolean value</dd>
-<dt>collection <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
-<dd class="description">Collection value </dd>
-<dt>date[11] </dt>
-<dd class="description">Date/time value</dd>
-<dt>integer </dt>
-<dd class="description">Integer/enumerated value</dd>
 </dl>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
 <h3 class="enumeration"><a name="http_auth_e">http_auth_e</a></h3>
@@ -3960,6 +4913,16 @@ are server-oriented...</p>
 <dt>HTTP_1_1 </dt>
 <dd class="description">HTTP/1.1</dd>
 </dl>
+<h3 class="enumeration"><a name="ipp_dstate_e">ipp_dstate_e</a></h3>
+<p class="description">Document states</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>IPP_DOCUMENT_ABORTED </dt>
+<dt>IPP_DOCUMENT_CANCELED </dt>
+<dt>IPP_DOCUMENT_COMPLETED </dt>
+<dt>IPP_DOCUMENT_PENDING </dt>
+<dt>IPP_DOCUMENT_PROCESSING </dt>
+</dl>
 <h3 class="enumeration"><a name="ipp_finish_e">ipp_finish_e</a></h3>
 <p class="description">Finishings</p>
 <h4 class="constants">Constants</h4>
@@ -4020,6 +4983,22 @@ are server-oriented...</p>
 <dd class="description">Staple top right corner</dd>
 <dt>IPP_FINISHINGS_TRIM </dt>
 <dd class="description">Trim (any type)</dd>
+<dt>IPP_FINISHINGS_TRIM_AFTER_COPIES </dt>
+<dd class="description">Trim output after each copy</dd>
+<dt>IPP_FINISHINGS_TRIM_AFTER_DOCUMENTS </dt>
+<dd class="description">Trim output after each document</dd>
+<dt>IPP_FINISHINGS_TRIM_AFTER_JOB </dt>
+<dd class="description">Trim output after job</dd>
+<dt>IPP_FINISHINGS_TRIM_AFTER_PAGES </dt>
+<dd class="description">Trim output after each page</dd>
+</dl>
+<h3 class="enumeration"><a name="ipp_jcollate_e">ipp_jcollate_e</a></h3>
+<p class="description">Job collation types</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>IPP_JOB_COLLATED_DOCUMENTS </dt>
+<dt>IPP_JOB_UNCOLLATED_DOCUMENTS </dt>
+<dt>IPP_JOB_UNCOLLATED_SHEETS </dt>
 </dl>
 <h3 class="enumeration"><a name="ipp_jstate_e">ipp_jstate_e</a></h3>
 <p class="description">Job states</p>
@@ -4112,6 +5091,8 @@ are server-oriented...</p>
 <dd class="description">Get subscription attributes </dd>
 <dt>IPP_HOLD_JOB </dt>
 <dd class="description">Hold a job for printing</dd>
+<dt>IPP_IDENTIFY_PRINTER </dt>
+<dd class="description">Identify-Printer (proposed IPP JPS3)</dd>
 <dt>IPP_PAUSE_PRINTER </dt>
 <dd class="description">Stop a printer</dd>
 <dt>IPP_PRINT_JOB </dt>
@@ -4224,14 +5205,20 @@ are server-oriented...</p>
 <dd class="description">client-error-document-format-not-supported</dd>
 <dt>IPP_DOCUMENT_FORMAT_ERROR </dt>
 <dd class="description">client-error-document-format-error</dd>
+<dt>IPP_DOCUMENT_PASSWORD_ERROR </dt>
+<dd class="description">client-error-document-password-error</dd>
+<dt>IPP_DOCUMENT_PERMISSION_ERROR </dt>
+<dd class="description">client-error-document-permission-error</dd>
+<dt>IPP_DOCUMENT_SECURITY_ERROR </dt>
+<dd class="description">client-error-document-security-error</dd>
+<dt>IPP_DOCUMENT_UNPRINTABLE_ERROR </dt>
+<dd class="description">client-error-document-unprintable-error</dd>
 <dt>IPP_ERROR_JOB_CANCELED </dt>
 <dd class="description">server-error-job-canceled</dd>
 <dt>IPP_FORBIDDEN </dt>
 <dd class="description">client-error-forbidden</dd>
 <dt>IPP_GONE </dt>
 <dd class="description">client-error-gone</dd>
-<dt>IPP_IGNORED_ALL_NOTIFICATIONS </dt>
-<dd class="description">client-error-ignored-all-notifications</dd>
 <dt>IPP_IGNORED_ALL_SUBSCRIPTIONS </dt>
 <dd class="description">client-error-ignored-all-subscriptions</dd>
 <dt>IPP_INTERNAL_ERROR </dt>
@@ -4250,14 +5237,10 @@ are server-oriented...</p>
 <dd class="description">client-error-not-possible</dd>
 <dt>IPP_OK </dt>
 <dd class="description">successful-ok</dd>
-<dt>IPP_OK_BUT_CANCEL_SUBSCRIPTION </dt>
-<dd class="description">successful-ok-but-cancel-subscription</dd>
 <dt>IPP_OK_CONFLICT </dt>
 <dd class="description">successful-ok-conflicting-attributes</dd>
 <dt>IPP_OK_EVENTS_COMPLETE </dt>
 <dd class="description">successful-ok-events-complete</dd>
-<dt>IPP_OK_IGNORED_NOTIFICATIONS </dt>
-<dd class="description">successful-ok-ignored-notifications</dd>
 <dt>IPP_OK_IGNORED_SUBSCRIPTIONS </dt>
 <dd class="description">successful-ok-ignored-subscriptions</dd>
 <dt>IPP_OK_SUBST </dt>
@@ -4272,8 +5255,6 @@ are server-oriented...</p>
 <dd class="description">server-error-busy</dd>
 <dt>IPP_PRINTER_IS_DEACTIVATED </dt>
 <dd class="description">server-error-printer-is-deactivated</dd>
-<dt>IPP_PRINT_SUPPORT_FILE_NOT_FOUND </dt>
-<dd class="description">client-error-print-support-file-not-found</dd>
 <dt>IPP_REQUEST_ENTITY </dt>
 <dd class="description">client-error-request-entity-too-large</dd>
 <dt>IPP_REQUEST_VALUE </dt>
@@ -4305,14 +5286,14 @@ are server-oriented...</p>
 <dd class="description">Boolean value</dd>
 <dt>IPP_TAG_CHARSET </dt>
 <dd class="description">Character set value</dd>
-<dt>IPP_TAG_COPY </dt>
-<dd class="description">Bitflag for copied attribute values</dd>
 <dt>IPP_TAG_DATE </dt>
 <dd class="description">Date/time value</dd>
 <dt>IPP_TAG_DEFAULT </dt>
 <dd class="description">Default value</dd>
 <dt>IPP_TAG_DELETEATTR </dt>
 <dd class="description">Delete-attribute value</dd>
+<dt>IPP_TAG_DOCUMENT </dt>
+<dd class="description">Document group</dd>
 <dt>IPP_TAG_END </dt>
 <dd class="description">End-of-attributes</dd>
 <dt>IPP_TAG_END_COLLECTION </dt>
@@ -4321,6 +5302,8 @@ are server-oriented...</p>
 <dd class="description">Enumeration value</dd>
 <dt>IPP_TAG_EVENT_NOTIFICATION </dt>
 <dd class="description">Event group</dd>
+<dt>IPP_TAG_EXTENSION </dt>
+<dd class="description">Extension point for 32-bit tags</dd>
 <dt>IPP_TAG_INTEGER </dt>
 <dd class="description">Integer value</dd>
 <dt>IPP_TAG_JOB </dt>
@@ -4329,8 +5312,6 @@ are server-oriented...</p>
 <dd class="description">Keyword value</dd>
 <dt>IPP_TAG_LANGUAGE </dt>
 <dd class="description">Language value</dd>
-<dt>IPP_TAG_MASK </dt>
-<dd class="description">Mask for copied attribute values</dd>
 <dt>IPP_TAG_MEMBERNAME </dt>
 <dd class="description">Collection member name value</dd>
 <dt>IPP_TAG_MIMETYPE </dt>
