@@ -299,6 +299,8 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_ERROR_JOB_CANCELED,		/* server-error-job-canceled */
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED,	/* server-error-multiple-document-jobs-not-supported */
   IPP_PRINTER_IS_DEACTIVATED,		/* server-error-printer-is-deactivated */
+  IPP_TOO_MANY_JOBS,			/* server-error-too-many-jobs */
+  IPP_TOO_MANY_DOCUMENTS,		/* server-error-too-many-documents */
 
   IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/Mac OS X 10.7@ */
   IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/Mac OS X 10.7@ */
