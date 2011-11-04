@@ -586,8 +586,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
     ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
 		  CUPS_PRINTER_LOCAL);
     ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
-		  CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
-		      CUPS_PRINTER_IMPLICIT);
+		  CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
 
    /*
     * Do the request and get back a response...
@@ -1560,8 +1559,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     const char		*debug_logging,	/* DEBUG_LOGGING value */
 			*remote_admin,	/* REMOTE_ADMIN value */
 			*remote_any,	/* REMOTE_ANY value */
-			*remote_printers,
-					/* REMOTE_PRINTERS value */
 			*share_printers,/* SHARE_PRINTERS value */
 			*user_cancel_any,
 					/* USER_CANCEL_ANY value */
@@ -1577,10 +1574,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 					/* MaxJobs value */
 			*max_log_size = NULL;
 					/* MaxLogSize value */
-    char		local_protocols[255],
-					/* BrowseLocalProtocols */
-			remote_protocols[255];
-					/* BrowseRemoteProtocols */
     const char		*current_browse_web_if,
 					/* BrowseWebIF value */
 			*current_preserve_job_history,
@@ -1591,12 +1584,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 					/* MaxClients value */
 			*current_max_jobs,
 					/* MaxJobs value */
-			*current_max_log_size,
+			*current_max_log_size;
 					/* MaxLogSize value */
-			*current_local_protocols,
-					/* BrowseLocalProtocols */
-			*current_remote_protocols;
-					/* BrowseRemoteProtocols */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
@@ -1611,7 +1600,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     debug_logging        = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
     remote_admin         = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
     remote_any           = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
-    remote_printers      = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
     share_printers       = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
     user_cancel_any      = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
 
@@ -1637,66 +1625,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
       if (!max_log_size || atof(max_log_size) <= 0.0)
 	max_log_size = "1m";
-
-      if (cgiGetVariable("BROWSE_LOCAL_CUPS"))
-	strcpy(local_protocols, "cups");
-      else
-	local_protocols[0] = '\0';
-
-#ifdef HAVE_DNSSD
-      if (cgiGetVariable("BROWSE_LOCAL_DNSSD"))
-      {
-	if (local_protocols[0])
-	  strcat(local_protocols, " dnssd");
-	else
-	  strcat(local_protocols, "dnssd");
-      }
-#endif /* HAVE_DNSSD */
-
-#ifdef HAVE_LDAP
-      if (cgiGetVariable("BROWSE_LOCAL_LDAP"))
-      {
-	if (local_protocols[0])
-	  strcat(local_protocols, " ldap");
-	else
-	  strcat(local_protocols, "ldap");
-      }
-#endif /* HAVE_LDAP */
-
-#ifdef HAVE_LIBSLP
-      if (cgiGetVariable("BROWSE_LOCAL_SLP"))
-      {
-	if (local_protocols[0])
-	  strcat(local_protocols, " slp");
-	else
-	  strcat(local_protocols, "slp");
-      }
-#endif /* HAVE_SLP */
-
-      if (cgiGetVariable("BROWSE_REMOTE_CUPS"))
-	strcpy(remote_protocols, "cups");
-      else
-	remote_protocols[0] = '\0';
-
-#ifdef HAVE_LDAP
-      if (cgiGetVariable("BROWSE_REMOTE_LDAP"))
-      {
-	if (remote_protocols[0])
-	  strcat(remote_protocols, " ldap");
-	else
-	  strcat(remote_protocols, "ldap");
-      }
-#endif /* HAVE_LDAP */
-
-#ifdef HAVE_LIBSLP
-      if (cgiGetVariable("BROWSE_REMOTE_SLP"))
-      {
-	if (remote_protocols[0])
-	  strcat(remote_protocols, " slp");
-	else
-	  strcat(remote_protocols, "slp");
-      }
-#endif /* HAVE_SLP */
     }
 
    /*
@@ -1760,16 +1688,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                               settings)) == NULL)
       current_max_log_size = "1m";
 
-    if ((current_local_protocols = cupsGetOption("BrowseLocalProtocols",
-                                                 num_settings,
-						settings)) == NULL)
-      current_local_protocols = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
-
-    if ((current_remote_protocols = cupsGetOption("BrowseRemoteProtocols",
-                                                  num_settings,
-						  settings)) == NULL)
-      current_remote_protocols = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
-
    /*
     * See if the settings have changed...
     */
@@ -1780,8 +1698,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 						 num_settings, settings)) ||
 	      strcmp(remote_any, cupsGetOption(CUPS_SERVER_REMOTE_ANY,
 					       num_settings, settings)) ||
-	      strcmp(remote_printers, cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS,
-						    num_settings, settings)) ||
 	      strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
 						   num_settings, settings)) ||
 #ifdef HAVE_GSSAPI
@@ -1793,9 +1709,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 						    num_settings, settings));
 
     if (advanced && !changed)
-      changed = _cups_strcasecmp(local_protocols, current_local_protocols) ||
-		_cups_strcasecmp(remote_protocols, current_remote_protocols) ||
-		_cups_strcasecmp(browse_web_if, current_browse_web_if) ||
+      changed = _cups_strcasecmp(browse_web_if, current_browse_web_if) ||
 		_cups_strcasecmp(preserve_job_history, current_preserve_job_history) ||
 		_cups_strcasecmp(preserve_job_files, current_preserve_job_files) ||
 		_cups_strcasecmp(max_clients, current_max_clients) ||
@@ -1817,8 +1731,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                                    remote_admin, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
                                    remote_any, num_settings, &settings);
-      num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                   remote_printers, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
                                    share_printers, num_settings, &settings);
       num_settings = cupsAddOption(CUPS_SERVER_USER_CANCEL_ANY,
@@ -1834,12 +1746,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
         * Add advanced settings...
 	*/
 
-	if (_cups_strcasecmp(local_protocols, current_local_protocols))
-	  num_settings = cupsAddOption("BrowseLocalProtocols", local_protocols,
-				       num_settings, &settings);
-	if (_cups_strcasecmp(remote_protocols, current_remote_protocols))
-	  num_settings = cupsAddOption("BrowseRemoteProtocols", remote_protocols,
-				       num_settings, &settings);
 	if (_cups_strcasecmp(browse_web_if, current_browse_web_if))
 	  num_settings = cupsAddOption("BrowseWebIF", browse_web_if,
 				       num_settings, &settings);
@@ -1878,7 +1784,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       else
       {
         if (advanced)
-	  cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect&URL=/admin/?ADVANCEDSETTINGS=YES");
+	  cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect&"
+	                                 "URL=/admin/?ADVANCEDSETTINGS=YES");
         else
 	  cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
 	cgiStartHTML(cgiText(_("Change Settings")));
@@ -2359,8 +2266,7 @@ do_export(http_t *http)			/* I - HTTP connection */
                 "printer-type", 0);
 
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type-mask", CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
-		                     CUPS_PRINTER_IMPLICIT);
+                "printer-type-mask", CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
@@ -2696,10 +2602,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
                            settings)) != NULL && atoi(val))
     cgiSetVariable("REMOTE_ANY", "CHECKED");
 
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
-                           settings)) != NULL && atoi(val))
-    cgiSetVariable("REMOTE_PRINTERS", "CHECKED");
-
   if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, num_settings,
                            settings)) != NULL && atoi(val))
     cgiSetVariable("SHARE_PRINTERS", "CHECKED");
@@ -2721,49 +2623,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
 #ifdef HAVE_DNSSD
   cgiSetVariable("HAVE_DNSSD", "1");
 #endif /* HAVE_DNSSD */
-
-#ifdef HAVE_LDAP
-  cgiSetVariable("HAVE_LDAP", "1");
-#endif /* HAVE_LDAP */
-
-#ifdef HAVE_LIBSLP
-  cgiSetVariable("HAVE_LIBSLP", "1");
-#endif /* HAVE_LIBSLP */
-
-  if ((val = cupsGetOption("BrowseRemoteProtocols", num_settings,
-                           settings)) == NULL)
-    if ((val = cupsGetOption("BrowseProtocols", num_settings,
-                           settings)) == NULL)
-      val = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
-
-  if (strstr(val, "cups") || strstr(val, "CUPS"))
-    cgiSetVariable("BROWSE_REMOTE_CUPS", "CHECKED");
-
-  if (strstr(val, "ldap") || strstr(val, "LDAP"))
-    cgiSetVariable("BROWSE_REMOTE_LDAP", "CHECKED");
-
-  if (strstr(val, "slp") || strstr(val, "SLP"))
-    cgiSetVariable("BROWSE_REMOTE_SLP", "CHECKED");
-
-  if ((val = cupsGetOption("BrowseLocalProtocols", num_settings,
-                           settings)) == NULL)
-    if ((val = cupsGetOption("BrowseProtocols", num_settings,
-                           settings)) == NULL)
-      val = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
-
-  if (strstr(val, "cups") || strstr(val, "CUPS"))
-    cgiSetVariable("BROWSE_LOCAL_CUPS", "CHECKED");
-
-  if (strstr(val, "dnssd") || strstr(val, "DNSSD") ||
-      strstr(val, "dns-sd") || strstr(val, "DNS-SD") ||
-      strstr(val, "bonjour") || strstr(val, "BONJOUR"))
-    cgiSetVariable("BROWSE_LOCAL_DNSSD", "CHECKED");
-
-  if (strstr(val, "ldap") || strstr(val, "LDAP"))
-    cgiSetVariable("BROWSE_LOCAL_LDAP", "CHECKED");
-
-  if (strstr(val, "slp") || strstr(val, "SLP"))
-    cgiSetVariable("BROWSE_LOCAL_SLP", "CHECKED");
 
   if ((val = cupsGetOption("BrowseWebIF", num_settings,
                            settings)) == NULL)

@@ -3,7 +3,7 @@
  *
  *   System management definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -20,10 +20,10 @@
 #define CUPSD_DIRTY_NONE	0	/* Nothing is dirty */
 #define CUPSD_DIRTY_PRINTERS	1	/* printers.conf is dirty */
 #define CUPSD_DIRTY_CLASSES	2	/* classes.conf is dirty */
-#define CUPSD_DIRTY_REMOTE	4	/* remote.cache is dirty */
-#define CUPSD_DIRTY_PRINTCAP	8	/* printcap is dirty */
-#define CUPSD_DIRTY_JOBS	16	/* jobs.cache or "c" file(s) are dirty */
-#define CUPSD_DIRTY_SUBSCRIPTIONS 32	/* subscriptions.conf is dirty */
+#define CUPSD_DIRTY_PRINTCAP	4	/* printcap is dirty */
+#define CUPSD_DIRTY_JOBS	8	/* jobs.cache or "c" file(s) are dirty */
+#define CUPSD_DIRTY_SUBSCRIPTIONS 16	/* subscriptions.conf is dirty */
+
 
 /*
  * Globals...

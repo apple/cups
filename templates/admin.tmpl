@@ -45,19 +45,9 @@
 <P><A HREF="/admin/">Advanced <SMALL>&#x25bc;</SMALL></A><BR>
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
-<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocols\:
-<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_CUPS" {?browse_remote_cups}> CUPS
-{HAVE_LDAP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_LDAP" {?browse_remote_ldap}> LDAP:}
-{HAVE_LIBSLP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_SLP" {?browse_remote_slp}> SLP:}<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max clients\:
 <INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocols\:
-<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_CUPS" {?browse_local_cups}> CUPS
-{HAVE_DNSSD?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_DNSSD" {?browse_local_dnssd}> DNS-SD:}
-{HAVE_LDAP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_LDAP" {?browse_local_ldap}> LDAP:}
-{HAVE_LIBSLP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_SLP" {?browse_local_slp}> SLP:}<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Advertise web interface<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
@@ -75,7 +65,6 @@
 
 <P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Advanced <SMALL>&#x25b6;</SMALL></A><BR>
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
-<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
 <INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>

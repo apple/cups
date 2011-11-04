@@ -193,12 +193,6 @@ VAR int			MaxClients		VALUE(100),
 					/* Support the Keep-Alive option? */
 			KeepAliveTimeout	VALUE(DEFAULT_KEEPALIVE),
 					/* Timeout between requests */
-			ImplicitClasses		VALUE(TRUE),
-					/* Are classes implicitly created? */
-			ImplicitAnyClasses	VALUE(FALSE),
-					/* Create AnyPrinter classes? */
-			HideImplicitMembers	VALUE(TRUE),
-					/* Hide implicit class members? */
 			FileDevice		VALUE(FALSE),
 					/* Allow file: devices? */
 			FilterLimit		VALUE(0),

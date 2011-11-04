@@ -83,12 +83,6 @@ main(int  argc,				/* I - Number of command-line args */
         else if (!strcmp(argv[i], "--no-remote-any"))
 	  num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY, "0",
 	                               num_settings, &settings);
-        else if (!strcmp(argv[i], "--remote-printers"))
-	  num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS, "1",
-	                               num_settings, &settings);
-        else if (!strcmp(argv[i], "--no-remote-printers"))
-	  num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS, "0",
-	                               num_settings, &settings);
         else if (!strcmp(argv[i], "--share-printers"))
 	  num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS, "1",
 	                               num_settings, &settings);
@@ -219,8 +213,6 @@ usage(const char *opt)			/* I - Option character/string */
                           "administration on/off."));
   _cupsLangPuts(stdout, _("  --[no-]remote-any       Allow/prevent access "
                           "from the Internet."));
-  _cupsLangPuts(stdout, _("  --[no-]remote-printers  Show/hide remote "
-                          "printers."));
   _cupsLangPuts(stdout, _("  --[no-]share-printers   Turn printer sharing "
                           "on/off."));
   _cupsLangPuts(stdout, _("  --[no-]user-cancel-any  Allow/prevent users to "
