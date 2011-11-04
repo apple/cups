@@ -92,7 +92,9 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "server-error-busy",
 		  "server-error-job-canceled",
 		  "server-error-multiple-document-jobs-not-supported",
-		  "server-error-printer-is-deactivated"
+		  "server-error-printer-is-deactivated",
+		  "server-error-too-many-jobs",
+		  "server-error-too-many-documents"
 		},
 		* const ipp_status_1000s[] =		/* CUPS internal */
 		{
