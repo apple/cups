@@ -4620,6 +4620,9 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
   strlcpy(username, get_username(con), sizeof(username));
 
+  if ((name = strchr(username, '@')) != NULL)
+    *name = '\0';			/* Strip @REALM */
+
  /*
   * Check global active job limits for printers and users...
   */
