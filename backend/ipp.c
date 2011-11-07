@@ -1393,6 +1393,7 @@ main(int  argc,				/* I - Number of command-line args */
         break;
 
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+          ipp_status == IPP_NOT_POSSIBLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
 	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
@@ -1550,6 +1551,7 @@ main(int  argc,				/* I - Number of command-line args */
       copies_remaining --;
     }
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+             ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
     else
@@ -1622,6 +1624,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (ipp_status > IPP_OK_CONFLICT)
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
+	    ipp_status != IPP_NOT_POSSIBLE &&
 	    ipp_status != IPP_PRINTER_BUSY)
 	{
 	  ippDelete(response);
@@ -1669,7 +1672,9 @@ main(int  argc,				/* I - Number of command-line args */
 	    break;
 	  }
 	}
-	else
+	else if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
+		 ipp_status != IPP_NOT_POSSIBLE &&
+		 ipp_status != IPP_PRINTER_BUSY)
 	{
 	 /*
 	  * If the printer does not return a job-state attribute, it does not
