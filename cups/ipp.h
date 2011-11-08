@@ -470,6 +470,8 @@ extern int		ippGetBoolean(ipp_attribute_t *attr, int element)
 extern ipp_t		*ippGetCollection(ipp_attribute_t *attr,
 			                  int element) _CUPS_API_1_6;
 extern int		ippGetCount(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern const ipp_uchar_t *ippGetDate(ipp_attribute_t *attr, int element)
+			             _CUPS_API_1_6;
 extern ipp_tag_t	ippGetGroupTag(ipp_attribute_t *attr) _CUPS_API_1_6;
 extern int		ippGetInteger(ipp_attribute_t *attr, int element)
 			              _CUPS_API_1_6;
@@ -488,6 +490,9 @@ extern int		ippSetBoolean(ipp_t *ipp, ipp_attribute_t **attr,
 			              int element, int boolvalue) _CUPS_API_1_6;
 extern int		ippSetCollection(ipp_t *ipp, ipp_attribute_t **attr,
 			                 int element, ipp_t *colvalue) _CUPS_API_1_6;
+extern int		ippSetDate(ipp_t *ipp, ipp_attribute_t **attr,
+			            int element, const ipp_uchar_t *datevalue)
+				    _CUPS_API_1_6;
 extern int		ippSetGroupTag(ipp_t *ipp, ipp_attribute_t **attr,
 			               ipp_tag_t group_tag) _CUPS_API_1_6;
 extern int		ippSetInteger(ipp_t *ipp, ipp_attribute_t **attr,
