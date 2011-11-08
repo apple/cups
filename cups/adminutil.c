@@ -970,8 +970,6 @@ cupsAdminGetServerSettings(
 		remote_admin = 0,	/* Remote administration allowed? */
 		remote_any = 0,		/* Remote access from anywhere allowed? */
 		browsing = 1,		/* Browsing enabled? */
-		browse_allow = 1,	/* Browse address set? */
-		browse_address = 0,	/* Browse address set? */
 		cancel_policy = 1,	/* Cancel-job policy set? */
 		debug_logging = 0;	/* LogLevel debug set? */
     int		linenum = 0,		/* Line number in file */
@@ -1020,26 +1018,16 @@ cupsAdminGetServerSettings(
       }
       else if (!_cups_strcasecmp(line, "Browsing"))
       {
-	browsing = !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "on") ||
+	browsing = !_cups_strcasecmp(value, "yes") ||
+	           !_cups_strcasecmp(value, "on") ||
 	           !_cups_strcasecmp(value, "true");
-      }
-      else if (!_cups_strcasecmp(line, "BrowseAddress"))
-      {
-	browse_address = 1;
-      }
-      else if (!_cups_strcasecmp(line, "BrowseAllow"))
-      {
-	browse_allow = 1;
-      }
-      else if (!_cups_strcasecmp(line, "BrowseOrder"))
-      {
-	browse_allow = !_cups_strncasecmp(value, "deny,", 5);
       }
       else if (!_cups_strcasecmp(line, "LogLevel"))
       {
 	debug_logging = !_cups_strncasecmp(value, "debug", 5);
       }
-      else if (!_cups_strcasecmp(line, "<Policy") && !_cups_strcasecmp(value, "default"))
+      else if (!_cups_strcasecmp(line, "<Policy") &&
+               !_cups_strcasecmp(value, "default"))
       {
 	in_policy = 1;
       }
@@ -1063,7 +1051,8 @@ cupsAdminGetServerSettings(
 	  if (*valptr)
 	    *valptr++ = '\0';
 
-          if (!_cups_strcasecmp(value, "cancel-job") || !_cups_strcasecmp(value, "all"))
+          if (!_cups_strcasecmp(value, "cancel-job") ||
+              !_cups_strcasecmp(value, "all"))
 	  {
 	    in_cancel_job = 1;
 	    break;
@@ -1091,7 +1080,8 @@ cupsAdminGetServerSettings(
 	in_location       = 0;
       }
       else if (!_cups_strcasecmp(line, "Allow") && value &&
-               _cups_strcasecmp(value, "localhost") && _cups_strcasecmp(value, "127.0.0.1")
+               _cups_strcasecmp(value, "localhost") &&
+               _cups_strcasecmp(value, "127.0.0.1")
 #ifdef AF_LOCAL
 	       && *value != '/'
 #endif /* AF_LOCAL */
@@ -1135,15 +1125,9 @@ cupsAdminGetServerSettings(
 					   cg->cupsd_num_settings,
 					   &(cg->cupsd_settings));
 
-    cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                           (browsing && browse_allow) ?
-					       "1" : "0",
-					   cg->cupsd_num_settings,
-					   &(cg->cupsd_settings));
-
     cg->cupsd_num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,
-                                           (remote_access && browsing &&
-					    browse_address) ? "1" : "0",
+                                           (remote_access && browsing) ? "1" :
+                                                                         "0",
 					   cg->cupsd_num_settings,
 					   &(cg->cupsd_settings));
 
@@ -1204,8 +1188,7 @@ cupsAdminSetServerSettings(
 		in_conf_location,	/* In the /admin/conf location? */
 		in_root_location;	/* In the / location? */
   const char	*val;			/* Setting value */
-  int		remote_printers,	/* Show remote printers */
-		share_printers,		/* Share local printers */
+  int		share_printers,		/* Share local printers */
 		remote_admin,		/* Remote administration allowed? */
 		remote_any,		/* Remote access from anywhere? */
 		user_cancel_any,	/* Cancel-job policy set? */
@@ -1219,8 +1202,7 @@ cupsAdminSetServerSettings(
 		wrote_root_location;	/* Wrote the / location? */
   int		indent;			/* Indentation */
   int		cupsd_num_settings;	/* New number of settings */
-  int		old_remote_printers,	/* Show remote printers */
-		old_share_printers,	/* Share local printers */
+  int		old_share_printers,	/* Share local printers */
 		old_remote_admin,	/* Remote administration allowed? */
 		old_user_cancel_any,	/* Cancel-job policy set? */
 		old_debug_logging;	/* LogLevel debug set? */
@@ -1294,15 +1276,6 @@ cupsAdminSetServerSettings(
   DEBUG_printf(("1cupsAdminSetServerSettings: old remote_any=%d",
                 remote_any));
 
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, cupsd_num_settings,
-                           cupsd_settings)) != NULL)
-    old_remote_printers = atoi(val);
-  else
-    old_remote_printers = 1;
-
-  DEBUG_printf(("1cupsAdminSetServerSettings: old remote_printers=%d",
-                old_remote_printers));
-
   if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, cupsd_num_settings,
                            cupsd_settings)) != NULL)
     old_share_printers = atoi(val);
@@ -1373,26 +1346,6 @@ cupsAdminSetServerSettings(
 
   DEBUG_printf(("1cupsAdminSetServerSettings: remote_admin=%d",
                 remote_admin));
-
-  if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, num_settings,
-                           settings)) != NULL)
-  {
-    remote_printers = atoi(val);
-
-    if (remote_printers == old_remote_printers)
-    {
-     /*
-      * No change to this setting...
-      */
-
-      remote_printers = -1;
-    }
-  }
-  else
-    remote_printers = -1;
-
-  DEBUG_printf(("1cupsAdminSetServerSettings: remote_printers=%d",
-                remote_printers));
 
   if ((val = cupsGetOption(CUPS_SERVER_SHARE_PRINTERS, num_settings,
                            settings)) != NULL)
@@ -1517,80 +1470,33 @@ cupsAdminSetServerSettings(
         cupsFilePrintf(temp, "Listen %s\n", value);
     }
     else if ((!_cups_strcasecmp(line, "Browsing") ||
-              !_cups_strcasecmp(line, "BrowseAddress") ||
-              !_cups_strcasecmp(line, "BrowseAllow") ||
-              !_cups_strcasecmp(line, "BrowseDeny") ||
-              !_cups_strcasecmp(line, "BrowseLocalProtocols") ||
-              !_cups_strcasecmp(line, "BrowseRemoteProtocols") ||
-              !_cups_strcasecmp(line, "BrowseOrder")) &&
-	     (remote_printers >= 0 || share_printers >= 0))
+              !_cups_strcasecmp(line, "BrowseLocalProtocols")) &&
+	     share_printers >= 0)
     {
       if (!wrote_browsing)
       {
-	int new_remote_printers = (remote_printers > 0 ||
-				   (remote_printers == -1 &&
-				    old_remote_printers > 0));
 	int new_share_printers = (share_printers > 0 ||
 				  (share_printers == -1 &&
 				   old_share_printers > 0));
 
         wrote_browsing = 1;
 
-        if (new_remote_printers || new_share_printers)
+        if (new_share_printers)
 	{
 	  const char *localp = cupsGetOption("BrowseLocalProtocols",
 					     num_settings, settings);
-	  const char *remotep = cupsGetOption("BrowseRemoteProtocols",
-					      num_settings, settings);
 
           if (!localp || !localp[0])
 	    localp = cupsGetOption("BrowseLocalProtocols", cupsd_num_settings,
 	                           cupsd_settings);
 
-          if (!remotep)
-	    remotep = cupsGetOption("BrowseRemoteProtocols", cupsd_num_settings,
-	                            cupsd_settings);
-
-	  if (new_remote_printers && new_share_printers)
-	    cupsFilePuts(temp,
-	                 "# Enable printer sharing and shared printers.\n");
-	  else if (new_remote_printers)
-	    cupsFilePuts(temp,
-	                 "# Show shared printers on the local network.\n");
-	  else
-	    cupsFilePuts(temp,
-	                 "# Share local printers on the local network.\n");
-
+	  cupsFilePuts(temp, "# Share local printers on the local network.\n");
 	  cupsFilePuts(temp, "Browsing On\n");
-	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
 
-	  if (new_remote_printers)
-	  {
-	    cupsFilePuts(temp, "BrowseAllow all\n");
+	  if (!localp)
+	    localp = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
 
-	    if (!remotep)
-	      remotep = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
-
-	    cupsFilePrintf(temp, "BrowseRemoteProtocols %s\n", remotep);
-          }
-	  else
-	    cupsFilePuts(temp, "BrowseRemoteProtocols\n");
-
-	  cupsd_num_settings = cupsAddOption("BrowseRemoteProtocols", remotep,
-					     cupsd_num_settings,
-					     &cupsd_settings);
-
-	  if (new_share_printers)
-	  {
-	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
-
-	    if (!localp)
-	      localp = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
-
-	    cupsFilePrintf(temp, "BrowseLocalProtocols %s\n", localp);
-	  }
-	  else
-	    cupsFilePuts(temp, "BrowseLocalProtocols\n");
+	  cupsFilePrintf(temp, "BrowseLocalProtocols %s\n", localp);
 
 	  cupsd_num_settings = cupsAddOption("BrowseLocalProtocols", localp,
 					     cupsd_num_settings,
@@ -1598,8 +1504,7 @@ cupsAdminSetServerSettings(
         }
 	else
 	{
-	  cupsFilePuts(temp,
-	               "# Disable printer sharing and shared printers.\n");
+	  cupsFilePuts(temp, "# Disable printer sharing.\n");
 	  cupsFilePuts(temp, "Browsing Off\n");
 	}
       }
@@ -1865,25 +1770,12 @@ cupsAdminSetServerSettings(
   * Write any missing info...
   */
 
-  if (!wrote_browsing && (remote_printers >= 0 || share_printers >= 0))
+  if (!wrote_browsing && share_printers >= 0)
   {
-    if (remote_printers > 0 || share_printers > 0)
+    if (share_printers > 0)
     {
-      if (remote_printers > 0 && share_printers > 0)
-	cupsFilePuts(temp, "# Enable printer sharing and shared printers.\n");
-      else if (remote_printers > 0)
-	cupsFilePuts(temp, "# Show shared printers on the local network.\n");
-      else
-	cupsFilePuts(temp, "# Share local printers on the local network.\n");
-
+      cupsFilePuts(temp, "# Share local printers on the local network.\n");
       cupsFilePuts(temp, "Browsing On\n");
-      cupsFilePuts(temp, "BrowseOrder allow,deny\n");
-
-      if (remote_printers > 0)
-	cupsFilePuts(temp, "BrowseAllow all\n");
-
-      if (share_printers > 0)
-	cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
     }
     else
     {
@@ -2089,15 +1981,6 @@ cupsAdminSetServerSettings(
     cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_ANY,
                                        remote_any ? "1" : "0",
 				       cupsd_num_settings, &cupsd_settings);
-
-    if (remote_printers >= 0)
-      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                	 remote_printers ? "1" : "0",
-					 cupsd_num_settings, &cupsd_settings);
-    else
-      cupsd_num_settings = cupsAddOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                	 old_remote_printers ? "1" : "0",
-					 cupsd_num_settings, &cupsd_settings);
 
     if (share_printers >= 0)
       cupsd_num_settings = cupsAddOption(CUPS_SERVER_SHARE_PRINTERS,

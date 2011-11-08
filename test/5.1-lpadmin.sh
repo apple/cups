@@ -17,7 +17,7 @@
 echo "Add Printer Test"
 echo ""
 echo "    lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/deskjet.ppd"
-../systemv/lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/deskjet.ppd 2>&1
+$VALGRIND ../systemv/lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/deskjet.ppd 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -29,7 +29,7 @@ echo ""
 echo "Modify Printer Test"
 echo ""
 echo "    lpadmin -p Test3 -v file:/tmp/Test3 -o PageSize=A4"
-../systemv/lpadmin -p Test3 -v file:/tmp/Test3 -o PageSize=A4 2>&1
+$VALGRIND ../systemv/lpadmin -p Test3 -v file:/tmp/Test3 -o PageSize=A4 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -41,7 +41,7 @@ echo ""
 echo "Delete Printer Test"
 echo ""
 echo "    lpadmin -x Test3"
-../systemv/lpadmin -x Test3 2>&1
+$VALGRIND ../systemv/lpadmin -x Test3 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1

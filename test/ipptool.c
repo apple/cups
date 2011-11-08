@@ -1146,7 +1146,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
 				          (lastcol->num_values + 1) *
-				          sizeof(ipp_value_t))) == NULL)
+				          sizeof(_ipp_value_t))) == NULL)
 	  {
 	    print_fatal_error("Unable to allocate memory on line %d.", linenum);
 	    pass = 0;
@@ -1499,21 +1499,22 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
 
         expand_variables(vars, token, temp, sizeof(token));
+        attrptr = NULL;
 
         switch (value)
 	{
 	  case IPP_TAG_BOOLEAN :
 	      if (!_cups_strcasecmp(token, "true"))
-		ippAddBoolean(request, group, attr, 1);
+		attrptr = ippAddBoolean(request, group, attr, 1);
               else
-		ippAddBoolean(request, group, attr, atoi(token));
+		attrptr = ippAddBoolean(request, group, attr, atoi(token));
 	      break;
 
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strchr(token, ','))
-		ippAddInteger(request, group, value, attr,
-		              strtol(token, &tokenptr, 0));
+		attrptr = ippAddInteger(request, group, value, attr,
+		                        strtol(token, &tokenptr, 0));
 	      else
 	      {
 	        int	values[100],	/* Values */
@@ -1532,7 +1533,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  num_values ++;
 		}
 
-		ippAddIntegers(request, group, value, attr, num_values, values);
+		attrptr = ippAddIntegers(request, group, value, attr, num_values, values);
 	      }
 
 	      if (!tokenptr || *tokenptr)
@@ -1568,14 +1569,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (!_cups_strcasecmp(ptr, "dpi"))
-	          ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
-	                           xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
+	                                     xres, yres);
 	        else if (!_cups_strcasecmp(ptr, "dpc"))
-	          ippAddResolution(request, group, attr, IPP_RES_PER_CM,
-	                           xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_CM,
+	                                     xres, yres);
 	        else
-	          ippAddResolution(request, group, attr, (ipp_res_t)0,
-	                           xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, (ipp_res_t)0,
+	                                     xres, yres);
 	      }
 	      break;
 
@@ -1600,8 +1601,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  goto test_exit;
 		}
 
-		ippAddRanges(request, group, attr, num_vals / 2, lowers,
-		             uppers);
+		attrptr = ippAddRanges(request, group, attr, num_vals / 2, lowers,
+		                       uppers);
 	      }
 	      break;
 
@@ -1613,7 +1614,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
                 if (col)
                 {
-		  lastcol = ippAddCollection(request, group, attr, col);
+		  attrptr = lastcol = ippAddCollection(request, group, attr, col);
 		  ippDelete(col);
 		}
 		else
@@ -1648,7 +1649,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  case IPP_TAG_LANGUAGE :
 	  case IPP_TAG_MIMETYPE :
 	      if (!strchr(token, ','))
-	        ippAddString(request, group, value, attr, NULL, token);
+	        attrptr = ippAddString(request, group, value, attr, NULL, token);
 	      else
 	      {
 	       /*
@@ -1670,10 +1671,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  num_values ++;
 		}
 
-	        ippAddStrings(request, group, value, attr, num_values,
-		              NULL, (const char **)values);
+	        attrptr = ippAddStrings(request, group, value, attr, num_values,
+		                        NULL, (const char **)values);
 	      }
 	      break;
+	}
+
+	if (!attrptr)
+	{
+	  print_fatal_error("Unable to add attribute on line %d: %s", linenum,
+	                    cupsLastErrorString());
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!_cups_strcasecmp(token, "FILE"))
@@ -2327,6 +2336,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             switch (attrptr->group_tag)
             {
+              case IPP_TAG_ZERO :
+                  break;
+
               case IPP_TAG_OPERATION :
                   prev_pass = pass = 0;
                   break;
@@ -2358,7 +2370,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
             if (!pass)
 	      break;
 
-	    group = attrptr->group_tag;
+	    if (attrptr->group_tag != IPP_TAG_ZERO)
+	      group = attrptr->group_tag;
 	  }
 
 	  if (!validate_attr(attrptr, 0))
@@ -2434,7 +2447,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  }
 
 	  if (found)
-	    _ippAttrString(found, buffer, sizeof(buffer));
+	    ippAttributeString(found, buffer, sizeof(buffer));
 
 	  if (found &&
 	      !with_value(expect->with_value, expect->with_regex, found, 0,
@@ -2535,18 +2548,19 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     {
       puts(prev_pass ? "PASS]" : "FAIL]");
 
-      if (Verbosity && response)
+      if (!prev_pass || (Verbosity && response))
       {
 	printf("        RECEIVED: %lu bytes in response\n",
 	       (unsigned long)ippLength(response));
-	printf("        status-code = %x (%s)\n", cupsLastError(),
-	       ippErrorString(cupsLastError()));
+	printf("        status-code = %s (%s)\n", ippErrorString(cupsLastError()),
+	       cupsLastErrorString());
 
-	for (attrptr = response->attrs;
-	     attrptr != NULL;
-	     attrptr = attrptr->next)
-	{
-	  print_attr(attrptr, NULL);
+        if (response)
+        {
+	  for (attrptr = response->attrs;
+	       attrptr != NULL;
+	       attrptr = attrptr->next)
+	    print_attr(attrptr, NULL);
 	}
       }
     }
@@ -2567,7 +2581,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	     attrptr = ippFindNextAttribute(response, displayed[i],
 					    IPP_TAG_ZERO))
 	{
-	  width = _ippAttrString(attrptr, NULL, 0);
+	  width = ippAttributeString(attrptr, NULL, 0);
 	  if (width > widths[i])
 	    widths[i] = width;
 	}
@@ -2732,6 +2746,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             switch (attrptr->group_tag)
             {
+              case IPP_TAG_ZERO :
+                  break;
+
               case IPP_TAG_OPERATION :
                   prev_pass = pass = 0;
                   break;
@@ -2768,7 +2785,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
                   break;
             }
 
-	    group = attrptr->group_tag;
+	    if (attrptr->group_tag != IPP_TAG_ZERO)
+	      group = attrptr->group_tag;
 	  }
 
 	  validate_attr(attrptr, 1);
@@ -3216,7 +3234,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 
 	if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
 				        (lastcol->num_values + 1) *
-					sizeof(ipp_value_t))) == NULL)
+					sizeof(_ipp_value_t))) == NULL)
 	{
 	  print_fatal_error("Unable to allocate memory on line %d.", *linenum);
 	  goto col_error;
@@ -3737,14 +3755,14 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
 	    if (Output == _CUPS_OUTPUT_PLIST)
 	    {
 	      fputs("<dict><key>language</key><string>", stdout);
-	      print_xml_string(NULL, attr->values[i].string.charset);
+	      print_xml_string(NULL, attr->values[i].string.language);
 	      fputs("</string><key>string</key><string>", stdout);
 	      print_xml_string(NULL, attr->values[i].string.text);
 	      puts("</string></dict>");
 	    }
 	    else
-	      printf("\"%s\"(%s) ", attr->values[i].string.text,
-		     attr->values[i].string.charset);
+	      printf("\"%s\"[%s] ", attr->values[i].string.text,
+		     attr->values[i].string.language);
 	  break;
 
       case IPP_TAG_BEGIN_COLLECTION :
@@ -3798,7 +3816,7 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
 	     ippTagString(attr->value_tag));
     }
 
-    _ippAttrString(attr, buffer, sizeof(buffer));
+    ippAttributeString(attr, buffer, sizeof(buffer));
     puts(buffer);
   }
 }
@@ -3870,8 +3888,8 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
 	  for (i = 0; i < attr->num_values; i ++)
-	    printf("\"%s\",%s ", attr->values[i].string.text,
-		   attr->values[i].string.charset);
+	    printf("\"%s\"[%s] ", attr->values[i].string.text,
+		   attr->values[i].string.language);
 	  break;
 
       case IPP_TAG_BEGIN_COLLECTION :
@@ -3941,7 +3959,7 @@ print_csv(
           break;
         else if (!strcmp(current->name, displayed[i]))
         {
-          _ippAttrString(current, buffer, maxlength);
+          ippAttributeString(current, buffer, maxlength);
           break;
         }
       }
@@ -4062,7 +4080,7 @@ print_line(
           break;
         else if (!strcmp(current->name, displayed[i]))
         {
-          _ippAttrString(current, buffer, maxlength);
+          ippAttributeString(current, buffer, maxlength);
           break;
         }
       }
@@ -5264,7 +5282,7 @@ with_value(char            *value,	/* I - Value string */
 		  }
 		  break;
 	      case '>' :
-	          if (attr->values[i].range.lower > intvalue)
+	          if (attr->values[i].range.upper > intvalue)
 	          {
 	            snprintf(matchbuf, matchlen, "%d-%d",
 	                     attr->values[i].range.lower,

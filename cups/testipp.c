@@ -758,7 +758,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
   int			i;		/* Looping var */
   ipp_tag_t		group;		/* Current group */
   ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_value_t		*val;		/* Current value */
+  _ipp_value_t		*val;		/* Current value */
   static const char * const tags[] =	/* Value/group tag strings */
 			{
 			  "reserved-00",

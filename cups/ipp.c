@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 7847 2008-08-19 04:22:14Z mike $"
+ * "$Id: ipp.c 10102 2011-11-02 23:52:39Z mike $"
  *
  *   Internet Printing Protocol functions for CUPS.
  *
@@ -16,44 +16,90 @@
  *
  * Contents:
  *
- *   ippAddBoolean()        - Add a boolean attribute to an IPP message.
- *   ippAddBooleans()       - Add an array of boolean values.
- *   ippAddDate()           - Add a date attribute to an IPP message.
- *   ippAddInteger()        - Add a integer attribute to an IPP message.
- *   ippAddIntegers()       - Add an array of integer values.
+ *   ippAddBoolean()	    - Add a boolean attribute to an IPP message.
+ *   ippAddBooleans()	    - Add an array of boolean values.
+ *   ippAddCollection()     - Add a collection value.
+ *   ippAddCollections()    - Add an array of collection values.
+ *   ippAddDate()	    - Add a date attribute to an IPP message.
+ *   ippAddInteger()	    - Add a integer attribute to an IPP message.
+ *   ippAddIntegers()	    - Add an array of integer values.
  *   ippAddOctetString()    - Add an octetString value to an IPP message.
- *   ippAddString()         - Add a language-encoded string to an IPP message.
- *   ippAddStrings()        - Add language-encoded strings to an IPP message.
- *   ippAddRange()          - Add a range of values to an IPP message.
- *   ippAddRanges()         - Add ranges of values to an IPP message.
+ *   ippAddOutOfBand()	    - Add an out-of-band value to an IPP message.
+ *   ippAddRange()	    - Add a range of values to an IPP message.
+ *   ippAddRanges()	    - Add ranges of values to an IPP message.
  *   ippAddResolution()     - Add a resolution value to an IPP message.
  *   ippAddResolutions()    - Add resolution values to an IPP message.
- *   ippAddSeparator()      - Add a group separator to an IPP message.
- *   ippDateToTime()        - Convert from RFC 1903 Date/Time format to
- *                            UNIX time in seconds.
- *   ippDelete()            - Delete an IPP message.
+ *   ippAddSeparator()	    - Add a group separator to an IPP message.
+ *   ippAddString()	    - Add a language-encoded string to an IPP message.
+ *   ippAddStrings()	    - Add language-encoded strings to an IPP message.
+ *   ippCopyAttribute()     - Copy an attribute.
+ *   ippCopyAttributes()    - Copy attributes from one IPP message to another.
+ *   ippDateToTime()	    - Convert from RFC 1903 Date/Time format to UNIX
+ *			      time in seconds.
+ *   ippDelete()	    - Delete an IPP message.
  *   ippDeleteAttribute()   - Delete a single attribute in an IPP message.
+ *   ippDeleteValues()	    - Delete values in an attribute.
  *   ippFindAttribute()     - Find a named attribute in a request...
  *   ippFindNextAttribute() - Find the next named attribute in a request...
- *   ippLength()            - Compute the length of an IPP message.
- *   ippNew()               - Allocate a new IPP message.
- *   ippNewRequest()        - Allocate a new IPP message.
- *   ippRead()              - Read data for an IPP message from a HTTP
- *                            connection.
- *   ippReadFile()          - Read data for an IPP message from a file.
- *   ippReadIO()            - Read data for an IPP message.
- *   ippTimeToDate()        - Convert from UNIX time to RFC 1903 format.
- *   ippWrite()             - Write data for an IPP message to a HTTP
- *                            connection.
- *   ippWriteFile()         - Write data for an IPP message to a file.
- *   ippWriteIO()           - Write data for an IPP message.
- *   _ippAddAttr()          - Add a new attribute to the request.
- *   _ippFreeAttr()         - Free an attribute.
- *   ipp_length()           - Compute the length of an IPP message or
- *                            collection value.
- *   ipp_read_http()        - Semi-blocking read on a HTTP connection...
- *   ipp_read_file()        - Read IPP data from a file.
- *   ipp_write_file()       - Write IPP data to a file.
+ *   ippFirstAttribute()    - Return the first attribute in the message.
+ *   ippGetBoolean()	    - Get a boolean value for an attribute.
+ *   ippGetCollection()     - Get a collection value for an attribute.
+ *   ippGetCount()	    - Get the number of values in an attribute.
+ *   ippGetGroupTag()	    - Get the group associated with an attribute.
+ *   ippGetInteger()	    - Get the integer/enum value for an attribute.
+ *   ippGetName()	    - Get the attribute name.
+ *   ippGetOperation()	    - Get the operation ID in an IPP message.
+ *   ippGetRequestId()	    - Get the request ID from an IPP message.
+ *   ippGetResolution()     - Get a resolution value for an attribute.
+ *   ippGetStatusCode()     - Get the status code from an IPP response or event
+ *			      message.
+ *   ippGetString()	    - Get the string and optionally the language code
+ *			      for an attribute.
+ *   ippGetValueTag()	    - Get the value tag for an attribute.
+ *   ippGetVersion()	    - Get the major and minor version number from an
+ *			      IPP message.
+ *   ippLength()	    - Compute the length of an IPP message.
+ *   ippNextAttribute()     - Return the next attribute in the message.
+ *   ippNew()		    - Allocate a new IPP message.
+ *   ippNewRequest()	    - Allocate a new IPP request message.
+ *   ippRead()		    - Read data for an IPP message from a HTTP
+ *			      connection.
+ *   ippReadFile()	    - Read data for an IPP message from a file.
+ *   ippReadIO()	    - Read data for an IPP message.
+ *   ippSetBoolean()	    - Set a boolean value in an attribute.
+ *   ippSetCollection()     - Set a collection value in an attribute.
+ *   ippSetGroupTag()	    - Set the group tag of an attribute.
+ *   ippSetInteger()	    - Set an integer or enum value in an attribute.
+ *   ippSetName()	    - Set the name of an attribute.
+ *   ippSetOperation()	    - Set the operation ID in an IPP request message.
+ *   ippSetRange()	    - Set a rangeOfInteger value in an attribute.
+ *   ippSetRequestId()	    - Set the request ID in an IPP message.
+ *   ippSetResolution()     - Set a resolution value in an attribute.
+ *   ippSetStatusCode()     - Set the status code in an IPP response or event
+ *			      message.
+ *   ippSetString()	    - Set a string value in an attribute.
+ *   ippSetValueTag()	    - Set the value tag of an attribute.
+ *   ippSetVersion()	    - Set the version number in an IPP message.
+ *   ippTimeToDate()	    - Convert from UNIX time to RFC 1903 format.
+ *   ippWrite() 	    - Write data for an IPP message to a HTTP
+ *			      connection.
+ *   ippWriteFile()	    - Write data for an IPP message to a file.
+ *   ippWriteIO()	    - Write data for an IPP message.
+ *   ipp_add_attr()	    - Add a new attribute to the message.
+ *   ipp_buffer_get()	    - Get a read/write buffer.
+ *   ipp_buffer_release()   - Release a read/write buffer.
+ *   ipp_free_values()	    - Free attribute values.
+ *   ipp_get_code()	    - Convert a C locale/charset name into an IPP
+ *			      language/charset code.
+ *   ipp_lang_code()	    - Convert a C locale name into an IPP language
+ *			      code.
+ *   ipp_length()	    - Compute the length of an IPP message or
+ *			      collection value.
+ *   ipp_read_http()	    - Semi-blocking read on a HTTP connection...
+ *   ipp_read_file()	    - Read IPP data from a file.
+ *   ipp_set_value()	    - Get the value element from an attribute,
+ *			      expanding it as needed.
+ *   ipp_write_file()	    - Write IPP data to a file.
  */
 
 /*
@@ -70,19 +116,34 @@
  * Local functions...
  */
 
+static ipp_attribute_t	*ipp_add_attr(ipp_t *ipp, const char *name, ipp_tag_t  group_tag,
+			              ipp_tag_t value_tag, int num_values);
 static unsigned char	*ipp_buffer_get(void);
 static void		ipp_buffer_release(unsigned char *b);
+static void		ipp_free_values(ipp_attribute_t *attr, int element, int count);
+static char		*ipp_get_code(const char *locale, char *buffer, size_t bufsize);
+static char		*ipp_lang_code(const char *locale, char *buffer, size_t bufsize);
 static size_t		ipp_length(ipp_t *ipp, int collection);
 static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
 			              size_t length);
 static ssize_t		ipp_read_file(int *fd, ipp_uchar_t *buffer,
 			              size_t length);
+static _ipp_value_t	*ipp_set_value(ipp_t *ipp, ipp_attribute_t **attr, int element);
 static ssize_t		ipp_write_file(int *fd, ipp_uchar_t *buffer,
 			               size_t length);
 
 
 /*
  * 'ippAddBoolean()' - Add a boolean attribute to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -97,15 +158,21 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
   DEBUG_printf(("ippAddBoolean(ipp=%p, group=%02x(%s), name=\"%s\", value=%d)",
                 ipp, group, ippTagString(group), name, value));
 
-  if (!ipp || !name)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_BOOLEAN, 1)) == NULL)
     return (NULL);
 
-  attr->name              = _cupsStrAlloc(name);
-  attr->group_tag         = group;
-  attr->value_tag         = IPP_TAG_BOOLEAN;
   attr->values[0].boolean = value;
 
   return (attr);
@@ -114,6 +181,15 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddBooleans()' - Add an array of boolean values.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -125,28 +201,36 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddBooleans(ipp=%p, group=%02x(%s), name=\"%s\", "
                 "num_values=%d, values=%p)", ipp, group, ippTagString(group),
                 name, num_values, values));
 
-  if (!ipp || !name || num_values < 1)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_BOOLEAN, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_BOOLEAN;
-
-  if (values != NULL)
-    for (i = 0, value = attr->values;
-	 i < num_values;
-	 i ++, value ++)
-      value->boolean = values[i];
+  if (values)
+  {
+    for (i = num_values, value = attr->values;
+	 i > 0;
+	 i --, value ++)
+      value->boolean = *values++;
+  }
 
   return (attr);
 }
@@ -154,6 +238,15 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddCollection()' - Add a collection value.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
  * @since CUPS 1.1.19/Mac OS X 10.3@
  */
@@ -170,15 +263,21 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
   DEBUG_printf(("ippAddCollection(ipp=%p, group=%02x(%s), name=\"%s\", "
                 "value=%p)", ipp, group, ippTagString(group), name, value));
 
-  if (!ipp || !name)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_BEGIN_COLLECTION, 1)) == NULL)
     return (NULL);
 
-  attr->name                 = _cupsStrAlloc(name);
-  attr->group_tag            = group;
-  attr->value_tag            = IPP_TAG_BEGIN_COLLECTION;
   attr->values[0].collection = value;
 
   value->use ++;
@@ -189,6 +288,15 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
 
 /*
  * 'ippAddCollections()' - Add an array of collection values.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
  * @since CUPS 1.1.19/Mac OS X 10.3@
  */
@@ -203,30 +311,37 @@ ippAddCollections(
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddCollections(ipp=%p, group=%02x(%s), name=\"%s\", "
                 "num_values=%d, values=%p)", ipp, group, ippTagString(group),
                 name, num_values, values));
 
-  if (!ipp || !name || num_values < 1)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_BEGIN_COLLECTION,
+                           num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_BEGIN_COLLECTION;
-
-  if (values != NULL)
+  if (values)
   {
-    for (i = 0, value = attr->values;
-	 i < num_values;
-	 i ++, value ++)
+    for (i = num_values, value = attr->values;
+	 i > 0;
+	 i --, value ++)
     {
-      value->collection = (ipp_t *)values[i];
+      value->collection = (ipp_t *)*values++;
       value->collection->use ++;
     }
   }
@@ -237,6 +352,15 @@ ippAddCollections(
 
 /*
  * 'ippAddDate()' - Add a date attribute to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -251,15 +375,21 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP message */
   DEBUG_printf(("ippAddDate(ipp=%p, group=%02x(%s), name=\"%s\", value=%p)",
                 ipp, group, ippTagString(group), name, value));
 
-  if (!ipp || !name || !value)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || !value || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_DATE, 1)) == NULL)
     return (NULL);
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_DATE;
   memcpy(attr->values[0].date, value, 11);
 
   return (attr);
@@ -268,12 +398,24 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP message */
 
 /*
  * 'ippAddInteger()' - Add a integer attribute to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported values include enum (@code IPP_TAG_ENUM@) and integer
+ * (@code IPP_TAG_INTEGER@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
 ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
               ipp_tag_t  group,		/* I - IPP group */
-	      ipp_tag_t  type,		/* I - Type of attribute */
+	      ipp_tag_t  value_tag,	/* I - Type of attribute */
               const char *name,		/* I - Name of attribute */
               int        value)		/* I - Value of attribute */
 {
@@ -282,17 +424,40 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
 
   DEBUG_printf(("ippAddInteger(ipp=%p, group=%02x(%s), type=%02x(%s), "
                 "name=\"%s\", value=%d)", ipp, group, ippTagString(group),
-		type, ippTagString(type), name, value));
+		value_tag, ippTagString(value_tag), name, value));
 
-  if (!ipp || !name)
+  value_tag &= IPP_TAG_MASK;
+
+ /*
+  * Special-case for legacy usage: map out-of-band attributes to new ippAddOutOfBand
+  * function...
+  */
+
+  if (value_tag >= IPP_TAG_UNSUPPORTED_VALUE && value_tag <= IPP_TAG_ADMINDEFINE)
+    return (ippAddOutOfBand(ipp, group, value_tag, name));
+
+ /*
+  * Range check input...
+  */
+
+#if 0
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (value_tag != IPP_TAG_INTEGER && value_tag != IPP_TAG_ENUM))
+    return (NULL);
+#else
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
+    return (NULL);
+#endif /* 0 */
+
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, value_tag, 1)) == NULL)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
-    return (NULL);
-
-  attr->name              = _cupsStrAlloc(name);
-  attr->group_tag         = group;
-  attr->value_tag         = type;
   attr->values[0].integer = value;
 
   return (attr);
@@ -301,41 +466,71 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddIntegers()' - Add an array of integer values.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported values include enum (@code IPP_TAG_ENUM@) and integer
+ * (@code IPP_TAG_INTEGER@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
 ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
                ipp_tag_t  group,	/* I - IPP group */
-	       ipp_tag_t  type,		/* I - Type of attribute */
+	       ipp_tag_t  value_tag,	/* I - Type of attribute */
 	       const char *name,	/* I - Name of attribute */
 	       int        num_values,	/* I - Number of values */
 	       const int  *values)	/* I - Values */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddIntegers(ipp=%p, group=%02x(%s), type=%02x(%s), "
                 "name=\"%s\", num_values=%d, values=%p)", ipp,
-		group, ippTagString(group), type, ippTagString(type), name,
+		group, ippTagString(group), value_tag, ippTagString(value_tag), name,
 		num_values, values));
 
-  if (!ipp || !name || num_values < 1)
+  value_tag &= IPP_TAG_MASK;
+
+ /*
+  * Range check input...
+  */
+
+#if 0
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (value_tag != IPP_TAG_INTEGER && value_tag != IPP_TAG_ENUM) ||
+      num_values < 1)
+    return (NULL);
+#else
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1)
+    return (NULL);
+#endif /* 0 */
+
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, value_tag, num_values)) == NULL)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
-    return (NULL);
-
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = type;
-
-  if (values != NULL)
-    for (i = 0, value = attr->values;
-	 i < num_values;
-	 i ++, value ++)
-      value->integer = values[i];
+  if (values)
+  {
+    for (i = num_values, value = attr->values;
+	 i > 0;
+	 i --, value ++)
+      value->integer = *values++;
+  }
 
   return (attr);
 }
@@ -343,6 +538,15 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddOctetString()' - Add an octetString value to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  *
  * @since CUPS 1.2/Mac OS X 10.5@
  */
@@ -357,19 +561,17 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  if (ipp == NULL || name == NULL)
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_STRING, 1)) == NULL)
     return (NULL);
 
  /*
   * Initialize the attribute data...
   */
 
-  attr->name                     = _cupsStrAlloc(name);
-  attr->group_tag                = group;
-  attr->value_tag                = IPP_TAG_STRING;
   attr->values[0].unknown.length = datalen;
 
   if (data)
@@ -392,164 +594,74 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
 
 /*
- * 'ippAddString()' - Add a language-encoded string to an IPP message.
+ * 'ippAddOutOfBand()' - Add an out-of-band value to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported out-of-band values include unsupported-value
+ * (@code IPP_TAG_UNSUPPORTED_VALUE@), default (@code IPP_TAG_DEFAULT@), unknown
+ * (@code IPP_TAG_UNKNOWN@), no-value (@code IPP_TAG_NOVALUE@), not-settable
+ * (@code IPP_TAG_NOTSETTABLE@), delete-attribute (@code IPP_TAG_DELETEATTR@), and
+ * admin-define (@code IPP_TAG_ADMINDEFINE@).
+ *
+ * @since CUPS 1.6@
  */
 
-ipp_attribute_t *			/* O - New attribute */
-ippAddString(ipp_t      *ipp,		/* I - IPP message */
-             ipp_tag_t  group,		/* I - IPP group */
-	     ipp_tag_t  type,		/* I - Type of attribute */
-             const char *name,		/* I - Name of attribute */
-             const char *charset,	/* I - Character set */
-             const char *value)		/* I - Value */
+ipp_attribute_t	*			/* O - New attribute */
+ippAddOutOfBand(ipp_t      *ipp,	/* I - IPP message */
+                ipp_tag_t  group,	/* I - IPP group */
+                ipp_tag_t  value_tag,	/* I - Type of attribute */
+		const char *name)	/* I - Name of attribute */
 {
-  ipp_attribute_t	*attr;		/* New attribute */
-  char			buffer[1024],	/* Language/charset value buffer */
-			*bufptr;	/* Pointer into buffer */
+  DEBUG_printf(("ippAddOutOfBand(ipp=%p, group=%02x(%s), value_tag=%02x(%s), "
+                "name=\"%s\")", ipp, group, ippTagString(group), value_tag,
+                ippTagString(value_tag), name));
 
-
-  DEBUG_printf(("ippAddString(ipp=%p, group=%02x(%s), type=%02x(%s), "
-                "name=\"%s\", charset=\"%s\", value=\"%s\")", ipp,
-		group, ippTagString(group), type, ippTagString(type), name,
-		charset, value));
-
-  if (!ipp || !name)
-    return (NULL);
-
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
-    return (NULL);
+  value_tag &= IPP_TAG_MASK;
 
  /*
-  * Force value to be English for the POSIX locale...
+  * Range check input...
   */
 
-  if (type == IPP_TAG_LANGUAGE && !_cups_strcasecmp(value, "C"))
-    value = "en";
-
- /*
-  * Convert language and charset values to lowercase and change _ to - as
-  * needed...
-  */
-
-  if ((type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET) && value)
-  {
-    strlcpy(buffer, value, sizeof(buffer));
-    value = buffer;
-
-    for (bufptr = buffer; *bufptr; bufptr ++)
-      if (*bufptr == '_')
-        *bufptr = '-';
-      else
-        *bufptr = tolower(*bufptr & 255);
-  }
-
- /*
-  * Initialize the attribute data...
-  */
-
-  attr->name                     = _cupsStrAlloc(name);
-  attr->group_tag                = group;
-  attr->value_tag                = type;
-  attr->values[0].string.charset = ((int)type & IPP_TAG_COPY) ? (char *)charset :
-                                   charset ? _cupsStrAlloc(charset) : NULL;
-  attr->values[0].string.text    = ((int)type & IPP_TAG_COPY) ? (char *)value :
-                                   value ? _cupsStrAlloc(value) : NULL;
-
-  return (attr);
-}
-
-
-/*
- * 'ippAddStrings()' - Add language-encoded strings to an IPP message.
- */
-
-ipp_attribute_t *			/* O - New attribute */
-ippAddStrings(
-    ipp_t              *ipp,		/* I - IPP message */
-    ipp_tag_t          group,		/* I - IPP group */
-    ipp_tag_t          type,		/* I - Type of attribute */
-    const char         *name,		/* I - Name of attribute */
-    int                num_values,	/* I - Number of values */
-    const char         *charset,	/* I - Character set */
-    const char * const *values)		/* I - Values */
-{
-  int			i;		/* Looping var */
-  ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
-  char			buffer[1024],	/* Language/charset value buffer */
-			*bufptr;	/* Pointer into buffer */
-
-
-  DEBUG_printf(("ippAddStrings(ipp=%p, group=%02x(%s), type=%02x(%s), "
-                "name=\"%s\", num_values=%d, charset=\"%s\", values=%p)", ipp,
-		group, ippTagString(group), type, ippTagString(type), name,
-		num_values, charset, values));
-
-  if (!ipp || !name || num_values < 1)
-    return (NULL);
-
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (value_tag != IPP_TAG_UNSUPPORTED_VALUE &&
+       value_tag != IPP_TAG_DEFAULT &&
+       value_tag != IPP_TAG_UNKNOWN &&
+       value_tag != IPP_TAG_NOVALUE &&
+       value_tag != IPP_TAG_NOTSETTABLE &&
+       value_tag != IPP_TAG_DELETEATTR &&
+       value_tag != IPP_TAG_ADMINDEFINE))
     return (NULL);
 
  /*
-  * Initialize the attribute data...
+  * Create the attribute...
   */
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = type;
-
-  for (i = 0, value = attr->values;
-       i < num_values;
-       i ++, value ++)
-  {
-    if (i == 0)
-      value->string.charset = ((int)type & IPP_TAG_COPY) ? (char *)charset :
-                                   charset ? _cupsStrAlloc(charset) : NULL;
-    else
-      value->string.charset = attr->values[0].string.charset;
-
-    if (values != NULL)
-    {
-      if ((int)type & IPP_TAG_COPY)
-        value->string.text = (char *)values[i];
-      else if (type == IPP_TAG_LANGUAGE && !_cups_strcasecmp(values[i], "C"))
-      {
-       /*
-	* Force language to be English for the POSIX locale...
-	*/
-
-	value->string.text = ((int)type & IPP_TAG_COPY) ? "en" :
-                                      _cupsStrAlloc("en");
-      }
-      else if (type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET)
-      {
-       /*
-	* Convert language values to lowercase and change _ to - as needed...
-	*/
-
-	strlcpy(buffer, values[i], sizeof(buffer));
-
-	for (bufptr = buffer; *bufptr; bufptr ++)
-	  if (*bufptr == '_')
-	    *bufptr = '-';
-	  else
-	    *bufptr = tolower(*bufptr & 255);
-
-	value->string.text = _cupsStrAlloc(buffer);
-      }
-      else
-	value->string.text = _cupsStrAlloc(values[i]);
-
-    }
-  }
-
-  return (attr);
+  return (ipp_add_attr(ipp, name, group, value_tag, 1));
 }
 
 
 /*
  * 'ippAddRange()' - Add a range of values to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * The @code lower@ parameter must be less than or equal to the @code upper@ parameter.
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -566,15 +678,21 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP message */
                 "upper=%d)", ipp, group, ippTagString(group), name, lower,
 		upper));
 
-  if (!ipp || !name)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_RANGE, 1)) == NULL)
     return (NULL);
 
-  attr->name                  = _cupsStrAlloc(name);
-  attr->group_tag             = group;
-  attr->value_tag             = IPP_TAG_RANGE;
   attr->values[0].range.lower = lower;
   attr->values[0].range.upper = upper;
 
@@ -584,6 +702,15 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddRanges()' - Add ranges of values to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -596,31 +723,39 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddRanges(ipp=%p, group=%02x(%s), name=\"%s\", "
                 "num_values=%d, lower=%p, upper=%p)", ipp, group,
 		ippTagString(group), name, num_values, lower, upper));
 
-  if (!ipp || !name || num_values < 1)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_RANGE, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_RANGE;
-
-  if (lower != NULL && upper != NULL)
-    for (i = 0, value = attr->values;
-	 i < num_values;
-	 i ++, value ++)
+  if (lower && upper)
+  {
+    for (i = num_values, value = attr->values;
+	 i > 0;
+	 i --, value ++)
     {
-      value->range.lower = lower[i];
-      value->range.upper = upper[i];
+      value->range.lower = *lower++;
+      value->range.upper = *upper++;
     }
+  }
 
   return (attr);
 }
@@ -628,6 +763,15 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
 
 /*
  * 'ippAddResolution()' - Add a resolution value to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -645,15 +789,23 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
                 "units=%d, xres=%d, yres=%d)", ipp, group,
 		ippTagString(group), name, units, xres, yres));
 
-  if (!ipp || !name)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      units < IPP_RES_PER_INCH || units > IPP_RES_PER_CM ||
+      xres < 0 || yres < 0)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 1)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_RESOLUTION, 1)) == NULL)
     return (NULL);
 
-  attr->name                       = _cupsStrAlloc(name);
-  attr->group_tag                  = group;
-  attr->value_tag                  = IPP_TAG_RESOLUTION;
   attr->values[0].resolution.xres  = xres;
   attr->values[0].resolution.yres  = yres;
   attr->values[0].resolution.units = units;
@@ -664,6 +816,15 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
 
 /*
  * 'ippAddResolutions()' - Add resolution values to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -677,32 +838,41 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippAddResolutions(ipp=%p, group=%02x(%s), name=\"%s\", "
                 "num_value=%d, units=%d, xres=%p, yres=%p)", ipp, group,
 		ippTagString(group), name, num_values, units, xres, yres));
 
-  if (!ipp || !name || num_values < 1)
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1 ||
+      units < IPP_RES_PER_INCH || units > IPP_RES_PER_CM)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, num_values)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_RESOLUTION, num_values)) == NULL)
     return (NULL);
 
-  attr->name      = _cupsStrAlloc(name);
-  attr->group_tag = group;
-  attr->value_tag = IPP_TAG_RESOLUTION;
-
-  if (xres != NULL && yres != NULL)
-    for (i = 0, value = attr->values;
-	 i < num_values;
-	 i ++, value ++)
+  if (xres && yres)
+  {
+    for (i = num_values, value = attr->values;
+	 i > 0;
+	 i --, value ++)
     {
-      value->resolution.xres  = xres[i];
-      value->resolution.yres  = yres[i];
+      value->resolution.xres  = *xres++;
+      value->resolution.yres  = *yres++;
       value->resolution.units = units;
     }
+  }
 
   return (attr);
 }
@@ -710,26 +880,578 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
 
 /*
  * 'ippAddSeparator()' - Add a group separator to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
  */
 
 ipp_attribute_t *			/* O - New attribute */
 ippAddSeparator(ipp_t *ipp)		/* I - IPP message */
 {
-  ipp_attribute_t	*attr;		/* New attribute */
-
-
   DEBUG_printf(("ippAddSeparator(ipp=%p)", ipp));
+
+ /*
+  * Range check input...
+  */
 
   if (!ipp)
     return (NULL);
 
-  if ((attr = _ippAddAttr(ipp, 0)) == NULL)
+ /*
+  * Create the attribute...
+  */
+
+  return (ipp_add_attr(ipp, NULL, IPP_TAG_ZERO, IPP_TAG_ZERO, 0));
+}
+
+
+/*
+ * 'ippAddString()' - Add a language-encoded string to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported string values include charset (@code IPP_TAG_CHARSET@), keyword
+ * (@code IPP_TAG_KEYWORD@), language (@code IPP_TAG_LANGUAGE@), mimeMediaType
+ * (@code IPP_TAG_MIMETYPE@), name (@code IPP_TAG_NAME@), nameWithLanguage
+ * (@code IPP_TAG_NAMELANG), text (@code IPP_TAG_TEXT@), textWithLanguage
+ * (@code IPP_TAG_TEXTLANG@), uri (@code IPP_TAG_URI@), and uriScheme
+ * (@code IPP_TAG_URISCHEME@).
+ *
+ * The @code language@ parameter must be non-@code NULL@ for nameWithLanguage and
+ * textWithLanguage string values and must be @code NULL@ for all other string values.
+ */
+
+ipp_attribute_t *			/* O - New attribute */
+ippAddString(ipp_t      *ipp,		/* I - IPP message */
+             ipp_tag_t  group,		/* I - IPP group */
+	     ipp_tag_t  value_tag,	/* I - Type of attribute */
+             const char *name,		/* I - Name of attribute */
+             const char *language,	/* I - Language code */
+             const char *value)		/* I - Value */
+{
+  ipp_tag_t		temp_tag;	/* Temporary value tag (masked) */
+  ipp_attribute_t	*attr;		/* New attribute */
+  char			code[32];	/* Charset/language code buffer */
+
+
+  DEBUG_printf(("ippAddString(ipp=%p, group=%02x(%s), value_tag=%02x(%s), "
+                "name=\"%s\", language=\"%s\", value=\"%s\")", ipp,
+		group, ippTagString(group), value_tag, ippTagString(value_tag), name,
+		language, value));
+
+ /*
+  * Range check input...
+  */
+
+  temp_tag = (ipp_tag_t)((int)value_tag & IPP_TAG_MASK);
+
+#if 0
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (temp_tag < IPP_TAG_TEXT && temp_tag != IPP_TAG_TEXTLANG &&
+       temp_tag != IPP_TAG_NAMELANG) || temp_tag > IPP_TAG_MIMETYPE)
     return (NULL);
 
-  attr->group_tag = IPP_TAG_ZERO;
-  attr->value_tag = IPP_TAG_ZERO;
+  if ((temp_tag == IPP_TAG_TEXTLANG || temp_tag == IPP_TAG_NAMELANG)
+          != (language != NULL))
+    return (NULL);
+#else
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
+    return (NULL);
+#endif /* 0 */
+
+ /*
+  * See if we need to map charset, language, or locale values...
+  */
+
+  if (language && ((int)value_tag & IPP_TAG_COPY) &&
+      strcmp(language, ipp_lang_code(language, code, sizeof(code))))
+    value_tag = temp_tag;		/* Don't do a fast copy */
+  else if (value && value_tag == (ipp_tag_t)(IPP_TAG_CHARSET | IPP_TAG_COPY) &&
+           strcmp(value, ipp_get_code(value, code, sizeof(code))))
+    value_tag = temp_tag;		/* Don't do a fast copy */
+  else if (value && value_tag == (ipp_tag_t)(IPP_TAG_LANGUAGE | IPP_TAG_COPY) &&
+           strcmp(value, ipp_lang_code(value, code, sizeof(code))))
+    value_tag = temp_tag;		/* Don't do a fast copy */
+
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, value_tag, 1)) == NULL)
+    return (NULL);
+
+ /*
+  * Initialize the attribute data...
+  */
+
+  if ((int)value_tag & IPP_TAG_COPY)
+  {
+    attr->values[0].string.language = (char *)language;
+    attr->values[0].string.text     = (char *)value;
+  }
+  else
+  {
+    if (language)
+      attr->values[0].string.language = _cupsStrAlloc(ipp_lang_code(language, code,
+						      sizeof(code)));
+
+    if (value_tag == IPP_TAG_CHARSET)
+      attr->values[0].string.text = _cupsStrAlloc(ipp_get_code(value, code,
+                                                               sizeof(code)));
+    else if (value_tag == IPP_TAG_LANGUAGE)
+      attr->values[0].string.text = _cupsStrAlloc(ipp_lang_code(value, code,
+                                                                sizeof(code)));
+    else
+      attr->values[0].string.text = _cupsStrAlloc(value);
+  }
 
   return (attr);
+}
+
+
+/*
+ * 'ippAddStrings()' - Add language-encoded strings to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported string values include charset (@code IPP_TAG_CHARSET@), keyword
+ * (@code IPP_TAG_KEYWORD@), language (@code IPP_TAG_LANGUAGE@), mimeMediaType
+ * (@code IPP_TAG_MIMETYPE@), name (@code IPP_TAG_NAME@), nameWithLanguage
+ * (@code IPP_TAG_NAMELANG), text (@code IPP_TAG_TEXT@), textWithLanguage
+ * (@code IPP_TAG_TEXTLANG@), uri (@code IPP_TAG_URI@), and uriScheme
+ * (@code IPP_TAG_URISCHEME@).
+ *
+ * The @code language@ parameter must be non-@code NULL@ for nameWithLanguage and
+ * textWithLanguage string values and must be @code NULL@ for all other string values.
+ */
+
+ipp_attribute_t *			/* O - New attribute */
+ippAddStrings(
+    ipp_t              *ipp,		/* I - IPP message */
+    ipp_tag_t          group,		/* I - IPP group */
+    ipp_tag_t          value_tag,	/* I - Type of attribute */
+    const char         *name,		/* I - Name of attribute */
+    int                num_values,	/* I - Number of values */
+    const char         *language,	/* I - Language code (@code NULL@ for default) */
+    const char * const *values)		/* I - Values */
+{
+  int			i;		/* Looping var */
+  ipp_tag_t		temp_tag;	/* Temporary value tag (masked) */
+  ipp_attribute_t	*attr;		/* New attribute */
+  _ipp_value_t		*value;		/* Current value */
+  char			code[32];	/* Language/charset value buffer */
+
+
+  DEBUG_printf(("ippAddStrings(ipp=%p, group=%02x(%s), value_tag=%02x(%s), "
+                "name=\"%s\", num_values=%d, language=\"%s\", values=%p)", ipp,
+		group, ippTagString(group), value_tag, ippTagString(value_tag), name,
+		num_values, language, values));
+
+ /*
+  * Range check input...
+  */
+
+  temp_tag = (ipp_tag_t)((int)value_tag & IPP_TAG_MASK);
+
+#if 0
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (temp_tag < IPP_TAG_TEXT && temp_tag != IPP_TAG_TEXTLANG &&
+       temp_tag != IPP_TAG_NAMELANG) || temp_tag > IPP_TAG_MIMETYPE ||
+      num_values < 1)
+    return (NULL);
+
+  if ((temp_tag == IPP_TAG_TEXTLANG || temp_tag == IPP_TAG_NAMELANG)
+          != (language != NULL))
+    return (NULL);
+#else
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      num_values < 1)
+    return (NULL);
+#endif /* 0 */
+
+ /*
+  * See if we need to map charset, language, or locale values...
+  */
+
+  if (language && ((int)value_tag & IPP_TAG_COPY) &&
+      strcmp(language, ipp_lang_code(language, code, sizeof(code))))
+    value_tag = temp_tag;		/* Don't do a fast copy */
+  else if (values && value_tag == (ipp_tag_t)(IPP_TAG_CHARSET | IPP_TAG_COPY))
+  {
+    for (i = 0; i < num_values; i ++)
+      if (strcmp(values[i], ipp_get_code(values[i], code, sizeof(code))))
+      {
+	value_tag = temp_tag;		/* Don't do a fast copy */
+        break;
+      }
+  }
+  else if (values && value_tag == (ipp_tag_t)(IPP_TAG_LANGUAGE | IPP_TAG_COPY))
+  {
+    for (i = 0; i < num_values; i ++)
+      if (strcmp(values[i], ipp_lang_code(values[i], code, sizeof(code))))
+      {
+	value_tag = temp_tag;		/* Don't do a fast copy */
+        break;
+      }
+  }
+
+ /*
+  * Create the attribute...
+  */
+
+  if ((attr = ipp_add_attr(ipp, name, group, value_tag, num_values)) == NULL)
+    return (NULL);
+
+ /*
+  * Initialize the attribute data...
+  */
+
+  for (i = num_values, value = attr->values;
+       i > 0;
+       i --, value ++)
+  {
+    if (language)
+    {
+      if (value == attr->values)
+      {
+        if ((int)value_tag & IPP_TAG_COPY)
+          value->string.language = (char *)language;
+        else
+          value->string.language = _cupsStrAlloc(ipp_lang_code(language, code,
+                                                               sizeof(code)));
+      }
+      else
+	value->string.language = attr->values[0].string.language;
+    }
+
+    if (values)
+    {
+      if ((int)value_tag & IPP_TAG_COPY)
+        value->string.text = (char *)*values++;
+      else if (value_tag == IPP_TAG_CHARSET)
+	value->string.text = _cupsStrAlloc(ipp_get_code(*values++, code, sizeof(code)));
+      else if (value_tag == IPP_TAG_LANGUAGE)
+	value->string.text = _cupsStrAlloc(ipp_lang_code(*values++, code, sizeof(code)));
+      else
+	value->string.text = _cupsStrAlloc(*values++);
+    }
+  }
+
+  return (attr);
+}
+
+
+/*
+ * 'ippCopyAttribute()' - Copy an attribute.
+ *
+ * The specified attribute, @code attr@, is copied to the destination IPP message.
+ * When @code quickcopy@ is non-zero, a "shallow" reference copy of the attribute is
+ * created - this should only be done as long as the original source IPP message will
+ * not be freed for the life of the destination.
+ *
+ * @since CUPS 1.6@
+ */
+
+
+ipp_attribute_t *			/* O - New attribute */
+ippCopyAttribute(
+    ipp_t           *dst,		/* I - Destination IPP message */
+    ipp_attribute_t *srcattr,		/* I - Attribute to copy */
+    int             quickcopy)		/* I - 1 for a referenced copy, 0 for normal */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*dstattr;	/* Destination attribute */
+  _ipp_value_t		*srcval,	/* Source value */
+			*dstval;	/* Destination value */
+
+
+  DEBUG_printf(("ippCopyAttribute(dst=%p, srcattr=%p, quickcopy=%d)", dst, srcattr,
+                quickcopy));
+
+ /*
+  * Range check input...
+  */
+
+  if (!dst || !srcattr)
+    return (NULL);
+
+ /*
+  * Copy it...
+  */
+
+  quickcopy = quickcopy ? IPP_TAG_COPY : 0;
+
+  switch (srcattr->value_tag & ~IPP_TAG_COPY)
+  {
+    case IPP_TAG_ZERO :
+        dstattr = ippAddSeparator(dst);
+	break;
+
+    case IPP_TAG_INTEGER :
+    case IPP_TAG_ENUM :
+        dstattr = ippAddIntegers(dst, srcattr->group_tag, srcattr->value_tag,
+	                         srcattr->name, srcattr->num_values, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	  dstval->integer = srcval->integer;
+        break;
+
+    case IPP_TAG_BOOLEAN :
+        dstattr = ippAddBooleans(dst, srcattr->group_tag, srcattr->name,
+	                        srcattr->num_values, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	  dstval->boolean = srcval->boolean;
+        break;
+
+    case IPP_TAG_TEXT :
+    case IPP_TAG_NAME :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+        dstattr = ippAddStrings(dst, srcattr->group_tag,
+	                        (ipp_tag_t)(srcattr->value_tag | quickcopy),
+	                        srcattr->name, srcattr->num_values, NULL, NULL);
+        if (!dstattr)
+          break;
+
+        if (quickcopy)
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	    dstval->string.text = srcval->string.text;
+        }
+	else if (srcattr->value_tag & IPP_TAG_COPY)
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	    dstval->string.text = _cupsStrAlloc(srcval->string.text);
+	}
+	else
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	    dstval->string.text = _cupsStrRetain(srcval->string.text);
+	}
+        break;
+
+    case IPP_TAG_DATE :
+        if (srcattr->num_values != 1)
+          return (NULL);
+
+        dstattr = ippAddDate(dst, srcattr->group_tag, srcattr->name,
+	                     srcattr->values[0].date);
+        break;
+
+    case IPP_TAG_RESOLUTION :
+        dstattr = ippAddResolutions(dst, srcattr->group_tag, srcattr->name,
+	                            srcattr->num_values, IPP_RES_PER_INCH,
+				    NULL, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	{
+	  dstval->resolution.xres  = srcval->resolution.xres;
+	  dstval->resolution.yres  = srcval->resolution.yres;
+	  dstval->resolution.units = srcval->resolution.units;
+	}
+        break;
+
+    case IPP_TAG_RANGE :
+        dstattr = ippAddRanges(dst, srcattr->group_tag, srcattr->name,
+	                       srcattr->num_values, NULL, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	{
+	  dstval->range.lower = srcval->range.lower;
+	  dstval->range.upper = srcval->range.upper;
+	}
+        break;
+
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAMELANG :
+        dstattr = ippAddStrings(dst, srcattr->group_tag,
+	                        (ipp_tag_t)(srcattr->value_tag | quickcopy),
+	                        srcattr->name, srcattr->num_values, NULL, NULL);
+        if (!dstattr)
+          break;
+
+        if (quickcopy)
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	  {
+            dstval->string.language = srcval->string.language;
+	    dstval->string.text     = srcval->string.text;
+          }
+        }
+	else if (srcattr->value_tag & IPP_TAG_COPY)
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	  {
+	    if (srcval == srcattr->values)
+              dstval->string.language = _cupsStrAlloc(srcval->string.language);
+	    else
+              dstval->string.language = dstattr->values[0].string.language;
+
+	    dstval->string.text = _cupsStrAlloc(srcval->string.text);
+          }
+        }
+	else
+	{
+	  for (i = srcattr->num_values, srcval = srcattr->values,
+	           dstval = dstattr->values;
+	       i > 0;
+	       i --, srcval ++, dstval ++)
+	  {
+	    if (srcval == srcattr->values)
+              dstval->string.language = _cupsStrRetain(srcval->string.language);
+	    else
+              dstval->string.language = dstattr->values[0].string.language;
+
+	    dstval->string.text = _cupsStrRetain(srcval->string.text);
+          }
+        }
+        break;
+
+    case IPP_TAG_BEGIN_COLLECTION :
+        dstattr = ippAddCollections(dst, srcattr->group_tag, srcattr->name,
+	                            srcattr->num_values, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	{
+	  dstval->collection = srcval->collection;
+	  srcval->collection->use ++;
+	}
+        break;
+
+    case IPP_TAG_STRING :
+    default :
+        /* TODO: Implement quick copy for unknown/octetString values */
+        dstattr = ippAddIntegers(dst, srcattr->group_tag, srcattr->value_tag,
+	                         srcattr->name, srcattr->num_values, NULL);
+        if (!dstattr)
+          break;
+
+        for (i = srcattr->num_values, srcval = srcattr->values, dstval = dstattr->values;
+             i > 0;
+             i --, srcval ++, dstval ++)
+	{
+	  dstval->unknown.length = srcval->unknown.length;
+
+	  if (dstval->unknown.length > 0)
+	  {
+	    if ((dstval->unknown.data = malloc(dstval->unknown.length)) == NULL)
+	      dstval->unknown.length = 0;
+	    else
+	      memcpy(dstval->unknown.data, srcval->unknown.data, dstval->unknown.length);
+	  }
+	}
+        break; /* anti-compiler-warning-code */
+  }
+
+  return (dstattr);
+}
+
+
+/*
+ * 'ippCopyAttributes()' - Copy attributes from one IPP message to another.
+ *
+ * Zero or more attributes are copied from the source IPP message, @code@ src, to the
+ * destination IPP message, @code dst@. When @code quickcopy@ is non-zero, a "shallow"
+ * reference copy of the attribute is created - this should only be done as long as the
+ * original source IPP message will not be freed for the life of the destination.
+ *
+ * The @code cb@ and @code context@ parameters provide a generic way to "filter" the
+ * attributes that are copied - the function must return 1 to copy the attribute or
+ * 0 to skip it. The function may also choose to do a partial copy of the source attribute
+ * itself.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on error */
+ippCopyAttributes(
+    ipp_t        *dst,			/* I - Destination IPP message */
+    ipp_t        *src,			/* I - Source IPP message */
+    int          quickcopy,		/* I - 1 for a referenced copy, 0 for normal */
+    ipp_copycb_t cb,			/* I - Copy callback or @code NULL@ for none */
+    void         *context)		/* I - Context pointer */
+{
+  ipp_attribute_t	*srcattr;	/* Source attribute */
+
+
+  DEBUG_printf(("ippCopyAttributes(dst=%p, src=%p, quickcopy=%d, cb=%p, context=%p)",
+                dst, src, quickcopy, cb, context));
+
+ /*
+  * Range check input...
+  */
+
+  if (!dst || !src)
+    return (0);
+
+ /*
+  * Loop through source attributes and copy as needed...
+  */
+
+  for (srcattr = src->attrs; srcattr; srcattr = srcattr->next)
+    if (!cb || (*cb)(context, dst, srcattr))
+      if (!ippCopyAttribute(dst, srcattr, quickcopy))
+        return (0);
+
+  return (1);
 }
 
 
@@ -808,7 +1530,13 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
     next = attr->next;
-    _ippFreeAttr(attr);
+
+    ipp_free_values(attr, 0, attr->num_values);
+
+    if (attr->name)
+      _cupsStrFree(attr->name);
+
+    free(attr);
   }
 
   free(ipp);
@@ -834,33 +1562,98 @@ ippDeleteAttribute(
                 attr ? attr->name : "(null)"));
 
  /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return;
+
+ /*
   * Find the attribute in the list...
   */
 
-  for (current = ipp->attrs, prev = NULL;
-       current != NULL && current != attr;
-       prev = current, current = current->next);
-
-  if (current)
+  if (ipp)
   {
-   /*
-    * Found it, remove the attribute from the list...
-    */
+    for (current = ipp->attrs, prev = NULL;
+	 current;
+	 prev = current, current = current->next)
+      if (current == attr)
+      {
+       /*
+	* Found it, remove the attribute from the list...
+	*/
 
-    if (prev)
-      prev->next = current->next;
-    else
-      ipp->attrs = current->next;
+	if (prev)
+	  prev->next = current->next;
+	else
+	  ipp->attrs = current->next;
 
-    if (current == ipp->last)
-      ipp->last = prev;
+	if (current == ipp->last)
+	  ipp->last = prev;
 
-   /*
-    * Free memory used by the attribute...
-    */
+        break;
+      }
 
-    _ippFreeAttr(current);
+    if (!current)
+      return;
   }
+
+ /*
+  * Free memory used by the attribute...
+  */
+
+  ipp_free_values(attr, 0, attr->num_values);
+
+  if (attr->name)
+    _cupsStrFree(attr->name);
+
+  free(attr);
+}
+
+
+/*
+ * 'ippDeleteValues()' - Delete values in an attribute.
+ *
+ * The @code element@ parameter specifies the first value to delete, starting at 0. It
+ * must be less than the number of values returned by @link ippGetCount@.
+ *
+ * Deleting all values in an attribute deletes the attribute.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippDeleteValues(
+    ipp_t           *ipp,		/* I - IPP message */
+    ipp_attribute_t *attr,		/* I - Attribute */
+    int             element,		/* I - Index of first value to delete (0-based) */
+    int             count)		/* I - Number of values to delete */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || element < 0 || element >= attr->num_values || count <= 0 ||
+      (element + count) >= attr->num_values)
+    return (0);
+
+ /*
+  * If we are deleting all values, just delete the attribute entirely.
+  */
+
+  if (count == attr->num_values)
+  {
+    ippDeleteAttribute(ipp, attr);
+    return (1);
+  }
+
+ /*
+  * Otherwise free the values in question and return.
+  */
+
+  ipp_free_values(attr, element, count);
+
+  return (1);
 }
 
 
@@ -949,6 +1742,391 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
 
 
 /*
+ * 'ippFirstAttribute()' - Return the first attribute in the message.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_attribute_t	*			/* O - First attribute or @code NULL@ if none */
+ippFirstAttribute(ipp_t *ipp)		/* I - IPP message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (NULL);
+
+ /*
+  * Return the first attribute...
+  */
+
+  return (ipp->current = ipp->attrs);
+}
+
+
+/*
+ * 'ippGetBoolean()' - Get a boolean value for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Boolean value or -1 on error */
+ippGetBoolean(ipp_attribute_t *attr,	/* I - IPP attribute */
+              int             element)	/* I - Value number (0-based) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_BOOLEAN ||
+      element < 0 || element >= attr->num_values)
+    return (-1);
+
+ /*
+  * Return the value...
+  */
+
+  return (attr->values[element].boolean);
+}
+
+
+/*
+ * 'ippGetCollection()' - Get a collection value for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_t *					/* O - Collection value or @code NULL@ on error */
+ippGetCollection(
+    ipp_attribute_t *attr,		/* I - IPP attribute */
+    int             element)		/* I - Value number (0-based) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_BEGIN_COLLECTION ||
+      element < 0 || element >= attr->num_values)
+    return (NULL);
+
+ /*
+  * Return the value...
+  */
+
+  return (attr->values[element].collection);
+}
+
+
+/*
+ * 'ippGetCount()' - Get the number of values in an attribute.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Number of values or -1 on error */
+ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return (-1);
+
+ /*
+  * Return the number of values...
+  */
+
+  return (attr->num_values);
+}
+
+
+/*
+ * 'ippGetGroupTag()' - Get the group associated with an attribute.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_tag_t				/* O - Group tag or @code IPP_TAG_ZERO@ on error */
+ippGetGroupTag(ipp_attribute_t *attr)	/* I - IPP attribute */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return (IPP_TAG_ZERO);
+
+ /*
+  * Return the group...
+  */
+
+  return (attr->group_tag);
+}
+
+
+/*
+ * 'ippGetInteger()' - Get the integer/enum value for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Value or -1 on error */
+ippGetInteger(ipp_attribute_t *attr,	/* I - IPP attribute */
+              int             element)	/* I - Value number (0-based) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || (attr->value_tag != IPP_TAG_INTEGER && attr->value_tag != IPP_TAG_ENUM) ||
+      element < 0 || element >= attr->num_values)
+    return (-1);
+
+ /*
+  * Return the value...
+  */
+
+  return (attr->values[element].integer);
+}
+
+
+/*
+ * 'ippGetName()' - Get the attribute name.
+ *
+ * @since CUPS 1.6@
+ */
+
+const char *				/* O - Attribute name or @code NULL@ for separators */
+ippGetName(ipp_attribute_t *attr)	/* I - IPP attribute */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return (NULL);
+
+ /*
+  * Return the name...
+  */
+
+  return (attr->name);
+}
+
+
+/*
+ * 'ippGetOperation()' - Get the operation ID in an IPP message.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_op_t				/* O - Operation ID or -1 on error */
+ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return ((ipp_op_t)-1);
+
+ /*
+  * Return the value...
+  */
+
+  return (ipp->request.op.operation_id);
+}
+
+
+/*
+ * 'ippGetRequestId()' - Get the request ID from an IPP message.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Request ID or -1 on error */
+ippGetRequestId(ipp_t *ipp)		/* I - IPP message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (-1);
+
+ /*
+  * Return the request ID...
+  */
+
+  return (ipp->request.any.request_id);
+}
+
+
+/*
+ * 'ippGetResolution()' - Get a resolution value for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Horizontal/cross feed resolution or -1 */
+ippGetResolution(
+    ipp_attribute_t *attr,		/* I - IPP attribute */
+    int             element,		/* I - Value number (0-based) */
+    int             *yres,		/* O - Vertical/feed resolution */
+    ipp_res_t       *units)		/* O - Units for resolution */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_RESOLUTION ||
+      element < 0 || element >= attr->num_values)
+    return (-1);
+
+ /*
+  * Return the value...
+  */
+
+  if (yres)
+    *yres = attr->values[element].resolution.yres;
+
+  if (units)
+    *units = attr->values[element].resolution.units;
+
+  return (attr->values[element].resolution.xres);
+}
+
+
+/*
+ * 'ippGetStatusCode()' - Get the status code from an IPP response or event message.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_status_t				/* O - Status code in IPP message */
+ippGetStatusCode(ipp_t *ipp)		/* I - IPP response or event message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (IPP_INTERNAL_ERROR);
+
+ /*
+  * Return the value...
+  */
+
+  return (ipp->request.status.status_code);
+}
+
+
+/*
+ * 'ippGetString()' - Get the string and optionally the language code for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+const char *
+ippGetString(ipp_attribute_t *attr,	/* I - IPP attribute */
+             int             element,	/* I - Value number (0-based) */
+	     const char      **language)/* O - Language code (@code NULL@ for don't care) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || element < 0 || element >= attr->num_values ||
+      (attr->value_tag != IPP_TAG_TEXTLANG && attr->value_tag != IPP_TAG_NAMELANG &&
+       (attr->value_tag < IPP_TAG_TEXT || attr->value_tag > IPP_TAG_MIMETYPE)))
+    return (NULL);
+
+ /*
+  * Return the value...
+  */
+
+  if (language)
+    *language = attr->values[element].string.language;
+
+  return (attr->values[element].string.text);
+}
+
+
+/*
+ * 'ippGetValueTag()' - Get the value tag for an attribute.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_tag_t				/* O - Value tag or @code IPP_TAG_ZERO@ on error */
+ippGetValueTag(ipp_attribute_t *attr)	/* I - IPP attribute */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return (IPP_TAG_ZERO);
+
+ /*
+  * Return the value...
+  */
+
+  return (attr->value_tag);
+}
+
+
+/*
+ * 'ippGetVersion()' - Get the major and minor version number from an IPP message.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Major version number or -1 on error */
+ippGetVersion(ipp_t *ipp,		/* I - IPP message */
+              int   *minor)		/* O - Minor version number or @code NULL@ */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+  {
+    if (minor)
+      *minor = -1;
+
+    return (-1);
+  }
+
+ /*
+  * Return the value...
+  */
+
+  if (minor)
+    *minor = ipp->request.any.version[1];
+
+  return (ipp->request.any.version[0]);
+}
+
+
+/*
  * 'ippLength()' - Compute the length of an IPP message.
  */
 
@@ -956,6 +2134,30 @@ size_t					/* O - Size of IPP message */
 ippLength(ipp_t *ipp)			/* I - IPP message */
 {
   return (ipp_length(ipp, 0));
+}
+
+
+/*
+ * 'ippNextAttribute()' - Return the next attribute in the message.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_attribute_t *			/* O - Next attribute or @code NULL@ if none */
+ippNextAttribute(ipp_t *ipp)		/* I - IPP message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !ipp->current)
+    return (NULL);
+
+ /*
+  * Return the next attribute...
+  */
+
+  return (ipp->current = ipp->current->next);
 }
 
 
@@ -974,11 +2176,11 @@ ippNew(void)
   if ((temp = (ipp_t *)calloc(1, sizeof(ipp_t))) != NULL)
   {
    /*
-    * Default to IPP 1.1...
+    * Default to IPP 2.0...
     */
 
-    temp->request.any.version[0] = 1;
-    temp->request.any.version[1] = 1;
+    temp->request.any.version[0] = 2;
+    temp->request.any.version[1] = 0;
     temp->use                    = 1;
   }
 
@@ -1003,6 +2205,9 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
 {
   ipp_t		*request;		/* IPP request message */
   cups_lang_t	*language;		/* Current language localization */
+  static int	request_id = 0;		/* Current request ID */
+  static _cups_mutex_t request_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for request ID */
 
 
   DEBUG_printf(("ippNewRequest(op=%02x(%s))", op, ippOpString(op)));
@@ -1018,8 +2223,12 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
   * Set the operation and request ID...
   */
 
+  _cupsMutexLock(&request_mutex);
+
   request->request.op.operation_id = op;
-  request->request.op.request_id   = 1;
+  request->request.op.request_id   = ++request_id;
+
+  _cupsMutexUnlock(&request_mutex);
 
  /*
   * Use UTF-8 as the character set...
@@ -1104,7 +2313,7 @@ ippReadIO(void       *src,		/* I - Data source */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
   ipp_tag_t		value_tag;	/* Current value tag */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippReadIO(src=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)",
@@ -1186,6 +2395,34 @@ ippReadIO(void       *src,		/* I - Data source */
 	  */
 
           tag = (ipp_tag_t)buffer[0];
+          if (tag == IPP_TAG_EXTENSION)
+          {
+           /*
+            * Read 32-bit "extension" tag...
+            */
+
+	    if ((*cb)(src, buffer, 4) < 1)
+	    {
+	      DEBUG_puts("1ippReadIO: Callback returned EOF/error");
+	      ipp_buffer_release(buffer);
+	      return (IPP_ERROR);
+	    }
+
+	    tag = (ipp_tag_t)((((((buffer[0] << 8) | buffer[1]) << 8) |
+	                        buffer[2]) << 8) | buffer[3]);
+
+            if (tag & IPP_TAG_COPY)
+            {
+             /*
+              * Fail if the high bit is set in the tag...
+              */
+
+	      _cupsSetError(IPP_ERROR, _("IPP extension tag larger than 0x7FFFFFFF."), 1);
+	      DEBUG_printf(("1ippReadIO: bad name length %d.", n));
+	      ipp_buffer_release(buffer);
+	      return (IPP_ERROR);
+            }
+          }
 
 	  if (tag == IPP_TAG_END)
 	  {
@@ -1296,6 +2533,13 @@ ippReadIO(void       *src,		/* I - Data source */
 		ipp_buffer_release(buffer);
 	        return (IPP_ERROR);
 	      }
+
+              if (value_tag != tag)
+              {
+                DEBUG_printf(("1ippReadIO: Converting %s attribute from %s to %s.",
+                              attr->name, ippTagString(value_tag), ippTagString(tag)));
+		ippSetValueTag(ipp, &attr, tag);
+	      }
             }
 	    else if (value_tag == IPP_TAG_INTEGER ||
 	             value_tag == IPP_TAG_RANGE)
@@ -1323,20 +2567,9 @@ ippReadIO(void       *src,		/* I - Data source */
                 * Convert integer values to rangeOfInteger values...
                 */
 
-		int i;			/* Looping var */
-
 		DEBUG_printf(("1ippReadIO: Converting %s attribute to "
 		              "rangeOfInteger.", attr->name));
-
-		attr->value_tag = IPP_TAG_RANGE;
-
-                for (i = attr->num_values, value = attr->values;
-                     i > 0;
-                     i --, value ++)
-                {
-                  n                  = value->integer;
-                  value->range.lower = value->range.upper = n;
-                }
+                ippSetValueTag(ipp, &attr, IPP_TAG_RANGE);
               }
             }
 	    else if (value_tag != tag)
@@ -1355,42 +2588,10 @@ ippReadIO(void       *src,		/* I - Data source */
 	    * Finally, reallocate the attribute array as needed...
 	    */
 
-	    if (attr->num_values == 1 ||
-	        (attr->num_values > 0 &&
-	         (attr->num_values & (IPP_MAX_VALUES - 1)) == 0))
+	    if ((value = ipp_set_value(ipp, &attr, attr->num_values)) == NULL)
 	    {
-	      ipp_attribute_t	*temp;	/* Pointer to new buffer */
-
-              DEBUG_printf(("2ippReadIO: reallocating for up to %d values...",
-	                    attr->num_values + IPP_MAX_VALUES));
-
-             /*
-	      * Reallocate memory...
-	      */
-
-              if ((temp = realloc(attr, sizeof(ipp_attribute_t) +
-	                                (attr->num_values + IPP_MAX_VALUES - 1) *
-					sizeof(ipp_value_t))) == NULL)
-	      {
-		_cupsSetHTTPError(HTTP_ERROR);
-	        DEBUG_puts("1ippReadIO: Unable to resize attribute");
-		ipp_buffer_release(buffer);
-	        return (IPP_ERROR);
-	      }
-
-              if (temp != attr)
-	      {
-               /*
-		* Reset pointers in the list...
-		*/
-
-        	if (ipp->prev)
-	          ipp->prev->next = temp;
-		else
-	          ipp->attrs = temp;
-
-        	attr = ipp->current = ipp->last = temp;
-	      }
+	      ipp_buffer_release(buffer);
+	      return (IPP_ERROR);
 	    }
 	  }
 	  else if (tag == IPP_TAG_MEMBERNAME)
@@ -1410,14 +2611,13 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ippAddAttr(ipp, 1);
+	    attr = ipp->current = ipp_add_attr(ipp, NULL, ipp->curtag, IPP_TAG_ZERO, 1);
 
-	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, "
-	                  "ipp->prev=%p", ipp->current, ipp->prev));
+	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, ipp->prev=%p",
+	                  ipp->current, ipp->prev));
 
-	    attr->group_tag  = ipp->curtag;
-	    attr->value_tag  = IPP_TAG_ZERO;
 	    attr->num_values = 0;
+	    value            = attr->values;
 	  }
 	  else if (tag != IPP_TAG_END_COLLECTION)
 	  {
@@ -1437,7 +2637,8 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    if ((attr = ipp->current = _ippAddAttr(ipp, 1)) == NULL)
+	    if ((attr = ipp->current = ipp_add_attr(ipp, (char *)buffer, ipp->curtag, tag,
+	                                            1)) == NULL)
 	    {
 	      _cupsSetHTTPError(HTTP_ERROR);
 	      DEBUG_puts("1ippReadIO: unable to allocate attribute.");
@@ -1448,18 +2649,14 @@ ippReadIO(void       *src,		/* I - Data source */
 	    DEBUG_printf(("2ippReadIO: name=\"%s\", ipp->current=%p, "
 	                  "ipp->prev=%p", buffer, ipp->current, ipp->prev));
 
-	    attr->group_tag  = ipp->curtag;
-	    attr->value_tag  = tag;
-	    attr->name       = _cupsStrAlloc((char *)buffer);
 	    attr->num_values = 0;
+	    value            = attr->values;
 	  }
 	  else
-	    attr = NULL;
-
-          if (tag != IPP_TAG_END_COLLECTION)
-            value = attr->values + attr->num_values;
-	  else
+	  {
+	    attr  = NULL;
 	    value = NULL;
+	  }
 
 	  if ((*cb)(src, buffer, 2) < 2)
 	  {
@@ -1574,8 +2771,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_DATE :
 		if (n != 11)
 		{
-		  _cupsSetError(IPP_ERROR, _("IPP date value not 11 bytes."),
-		                1);
+		  _cupsSetError(IPP_ERROR, _("IPP date value not 11 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  ipp_buffer_release(buffer);
 		  return (IPP_ERROR);
@@ -1676,9 +2872,6 @@ ippReadIO(void       *src,		/* I - Data source */
 		*    language
 		*    text-length
 		*    text
-		*
-		* The "charset" field name is an unfortunate typo from
-		* CUPS 1.0...
 		*/
 
 		n = (bufptr[0] << 8) | bufptr[1];
@@ -1696,7 +2889,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		memcpy(string, bufptr + 2, n);
 		string[n] = '\0';
 
-		value->string.charset = _cupsStrAlloc((char *)string);
+		value->string.language = _cupsStrAlloc((char *)string);
 
                 bufptr += 2 + n;
 		n = (bufptr[0] << 8) | bufptr[1];
@@ -1831,6 +3024,675 @@ ippReadIO(void       *src,		/* I - Data source */
 
 
 /*
+ * 'ippSetBoolean()' - Set a boolean value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
+              ipp_attribute_t **attr,	/* IO - IPP attribute */
+              int             element,	/* I  - Value number (0-based) */
+              int             boolvalue)/* I  - Boolean value */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_BOOLEAN ||
+      element < 0 || element > (*attr)->num_values)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+    value->boolean = boolvalue;
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetCollection()' - Set a collection value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetCollection(
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - IPP attribute */
+    int             element,		/* I  - Value number (0-based) */
+    ipp_t           *colvalue)		/* I  - Collection value */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_BEGIN_COLLECTION ||
+      element < 0 || element > (*attr)->num_values || !colvalue)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    if (value->collection)
+      ippDelete(value->collection);
+
+    value->collection = colvalue;
+    colvalue->use ++;
+  }
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetGroupTag()' - Set the group tag of an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
+ * event notification (@code IPP_TAG_EVENT_NOTIFICATION@), operation
+ * (@code IPP_TAG_OPERATION@), printer (@code IPP_TAG_PRINTER@), subscription
+ * (@code IPP_TAG_SUBSCRIPTION@), or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetGroupTag(
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - Attribute */
+    ipp_tag_t       group_tag)		/* I  - Group tag */
+{
+ /*
+  * Range check input - group tag must be 0x01 to 0x0F, per RFC 2911...
+  */
+
+  if (!ipp || !attr || group_tag < IPP_TAG_ZERO || group_tag == IPP_TAG_END ||
+      group_tag >= IPP_TAG_UNSUPPORTED_VALUE)
+    return (0);
+
+ /*
+  * Set the group tag and return...
+  */
+
+  (*attr)->group_tag = group_tag;
+
+  return (1);
+}
+
+
+/*
+ * 'ippSetInteger()' - Set an integer or enum value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
+              ipp_attribute_t **attr,	/* IO - IPP attribute */
+              int             element,	/* I  - Value number (0-based) */
+              int             intvalue)	/* I  - Integer/enum value */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr ||
+      ((*attr)->value_tag != IPP_TAG_INTEGER && (*attr)->value_tag != IPP_TAG_ENUM) ||
+      element < 0 || element > (*attr)->num_values)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+    value->integer = intvalue;
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetName()' - Set the name of an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetName(ipp_t           *ipp,	/* I  - IPP message */
+	   ipp_attribute_t **attr,	/* IO - IPP attribute */
+	   const char      *name)	/* I  - Attribute name */
+{
+  char	*temp;				/* Temporary name value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((temp = _cupsStrAlloc(name)) != NULL)
+  {
+    if ((*attr)->name)
+      _cupsStrFree((*attr)->name);
+
+    (*attr)->name = temp;
+  }
+
+  return (temp != NULL);
+}
+
+
+/*
+ * 'ippSetOperation()' - Set the operation ID in an IPP request message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
+                ipp_op_t op)		/* I - Operation ID */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (0);
+
+ /*
+  * Set the operation and return...
+  */
+
+  ipp->request.op.operation_id = op;
+
+  return (1);
+}
+
+
+/*
+ * 'ippSetRange()' - Set a rangeOfInteger value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
+            ipp_attribute_t **attr,	/* IO - IPP attribute */
+            int             element,	/* I  - Value number (0-based) */
+	    int             lowervalue,	/* I  - Lower bound for range */
+	    int             uppervalue)	/* I  - Upper bound for range */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_RANGE ||
+      element < 0 || element > (*attr)->num_values || lowervalue > uppervalue)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    value->range.lower = lowervalue;
+    value->range.upper = uppervalue;
+  }
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetRequestId()' - Set the request ID in an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code request_id@ parameter must be greater than 0.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
+                int   request_id)	/* I - Request ID */
+{
+ /*
+  * Range check input; not checking request_id values since ipptool wants to send
+  * invalid values for conformance testing and a bad request_id does not affect the
+  * encoding of a message...
+  */
+
+  if (!ipp)
+    return (0);
+
+ /*
+  * Set the request ID and return...
+  */
+
+  ipp->request.any.request_id = request_id;
+
+  return (1);
+}
+
+
+/*
+ * 'ippSetResolution()' - Set a resolution value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetResolution(
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - IPP attribute */
+    int             element,		/* I  - Value number (0-based) */
+    ipp_res_t       unitsvalue,		/* I  - Resolution units */
+    int             xresvalue,		/* I  - Horizontal/cross feed resolution */
+    int             yresvalue)		/* I  - Vertical/feed resolution */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_RESOLUTION ||
+      element < 0 || element > (*attr)->num_values || xresvalue <= 0 || yresvalue <= 0 ||
+      unitsvalue < IPP_RES_PER_INCH || unitsvalue > IPP_RES_PER_CM)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    value->resolution.units = unitsvalue;
+    value->resolution.xres  = xresvalue;
+    value->resolution.yres  = yresvalue;
+  }
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetStatusCode()' - Set the status code in an IPP response or event message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
+                 ipp_status_t status)	/* I - Status code */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (0);
+
+ /*
+  * Set the status code and return...
+  */
+
+  ipp->request.status.status_code = status;
+
+  return (1);
+
+}
+
+
+/*
+ * 'ippSetString()' - Set a string value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetString(ipp_t           *ipp,	/* I  - IPP message */
+             ipp_attribute_t **attr,	/* IO - IPP attribute */
+             int             element,	/* I  - Value number (0-based) */
+	     const char      *strvalue)	/* I  - String value */
+{
+  char		*temp;			/* Temporary string */
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_INTEGER ||
+      element < 0 || element > (*attr)->num_values || !strvalue)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    if (element > 0)
+      value->string.language = (*attr)->values[0].string.language;
+
+    if ((int)((*attr)->value_tag) & IPP_TAG_COPY)
+      value->string.text = (char *)strvalue;
+    else if ((temp = _cupsStrAlloc(strvalue)) != NULL)
+    {
+      if (value->string.text)
+        _cupsStrFree(value->string.text);
+
+      value->string.text = temp;
+    }
+    else
+      return (0);
+  }
+
+  return (value != NULL);
+}
+
+
+/*
+ * 'ippSetValueTag()' - Set the value tag of an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * Integer (@code IPP_TAG_INTEGER@) values can be promoted to rangeOfInteger
+ * (@code IPP_TAG_RANGE@) values, the various string tags can be promoted to name
+ * (@code IPP_TAG_NAME@) or nameWithLanguage (@code IPP_TAG_NAMELANG@) values, text
+ * (@code IPP_TAG_TEXT@) values can be promoted to textWithLanguage
+ * (@code IPP_TAG_TEXTLANG@) values, and all values can be demoted to the various
+ * out-of-band value tags such as no-value (@code IPP_TAG_NOVALUE@). All other changes
+ * will be rejected.
+ *
+ * Promoting a string attribute to nameWithLanguage or textWithLanguage adds the language
+ * code in the "attributes-natural-language" attribute or, if not present, the language
+ * code for the current locale.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetValueTag(
+    ipp_t          *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - IPP attribute */
+    ipp_tag_t       value_tag)		/* I  - Value tag */
+{
+  int		i;			/* Looping var */
+  _ipp_value_t	*value;			/* Current value */
+  int		integer;		/* Current integer value */
+  cups_lang_t	*language;		/* Current language */
+  char		code[32];		/* Language code */
+  ipp_tag_t	temp_tag;		/* Temporary value tag */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr)
+    return (0);
+
+ /*
+  * If there is no change, return immediately...
+  */
+
+  if (value_tag == (*attr)->value_tag)
+    return (1);
+
+ /*
+  * Otherwise implement changes as needed...
+  */
+
+  temp_tag = (ipp_tag_t)((int)((*attr)->value_tag) & IPP_TAG_MASK);
+
+  switch (value_tag)
+  {
+    case IPP_TAG_UNSUPPORTED_VALUE :
+    case IPP_TAG_DEFAULT :
+    case IPP_TAG_UNKNOWN :
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_NOTSETTABLE :
+    case IPP_TAG_DELETEATTR :
+    case IPP_TAG_ADMINDEFINE :
+       /*
+        * Free any existing values...
+        */
+
+        if ((*attr)->num_values > 0)
+          ipp_free_values(*attr, 0, (*attr)->num_values);
+
+       /*
+        * Set out-of-band value...
+        */
+
+        (*attr)->value_tag = value_tag;
+        break;
+
+    case IPP_TAG_RANGE :
+        if (temp_tag != IPP_TAG_INTEGER)
+          return (0);
+
+        for (i = (*attr)->num_values, value = (*attr)->values;
+             i > 0;
+             i --, value ++)
+        {
+          integer            = value->integer;
+          value->range.lower = value->range.upper = integer;
+        }
+
+        (*attr)->value_tag = IPP_TAG_RANGE;
+        break;
+
+    case IPP_TAG_NAME :
+        if (temp_tag != IPP_TAG_KEYWORD && temp_tag != IPP_TAG_URI &&
+            temp_tag != IPP_TAG_URISCHEME && temp_tag != IPP_TAG_LANGUAGE &&
+            temp_tag != IPP_TAG_MIMETYPE)
+          return (0);
+
+        (*attr)->value_tag = (ipp_tag_t)(IPP_TAG_NAME | ((*attr)->value_tag & IPP_TAG_COPY));
+        break;
+
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXTLANG :
+        if (value_tag == IPP_TAG_NAMELANG &&
+            (temp_tag != IPP_TAG_NAME && temp_tag != IPP_TAG_KEYWORD &&
+             temp_tag != IPP_TAG_URI && temp_tag != IPP_TAG_URISCHEME &&
+             temp_tag != IPP_TAG_LANGUAGE && temp_tag != IPP_TAG_MIMETYPE))
+          return (0);
+
+        if (value_tag == IPP_TAG_TEXTLANG && temp_tag != IPP_TAG_TEXT)
+          return (0);
+
+        if (ipp->attrs && ipp->attrs->next && ipp->attrs->next->name &&
+            !strcmp(ipp->attrs->next->name, "attributes-natural-language"))
+        {
+         /*
+          * Use the language code from the IPP message...
+          */
+
+	  (*attr)->values[0].string.language =
+	      _cupsStrAlloc(ipp->attrs->next->values[0].string.text);
+        }
+        else
+        {
+         /*
+          * Otherwise, use the language code corresponding to the locale...
+          */
+
+	  language = cupsLangDefault();
+	  (*attr)->values[0].string.language = _cupsStrAlloc(ipp_lang_code(language->language,
+									code,
+									sizeof(code)));
+        }
+
+        for (i = (*attr)->num_values - 1, value = (*attr)->values + 1;
+             i > 0;
+             i --, value ++)
+          value->string.language = (*attr)->values[0].string.language;
+
+        if ((int)(*attr)->value_tag & IPP_TAG_COPY)
+        {
+         /*
+          * Make copies of all values...
+          */
+
+	  for (i = (*attr)->num_values, value = (*attr)->values;
+	       i > 0;
+	       i --, value ++)
+	    value->string.text = _cupsStrAlloc(value->string.text);
+        }
+
+        (*attr)->value_tag = IPP_TAG_NAMELANG;
+        break;
+
+    case IPP_TAG_KEYWORD :
+        if (temp_tag == IPP_TAG_NAME || temp_tag == IPP_TAG_NAMELANG)
+          break;			/* Silently "allow" name -> keyword */
+
+    default :
+        return (0);
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'ippSetVersion()' - Set the version number in an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using the
+ * @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetVersion(ipp_t *ipp,		/* I - IPP message */
+              int   major,		/* I - Major version number (major.minor) */
+              int   minor)		/* I - Minor version number (major.minor) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || major < 0 || minor < 0)
+    return (0);
+
+ /*
+  * Set the version number...
+  */
+
+  ipp->request.any.version[0] = major;
+  ipp->request.any.version[1] = minor;
+
+  return (1);
+}
+
+
+/*
  * 'ippTimeToDate()' - Convert from UNIX time to RFC 1903 format.
  */
 
@@ -1931,7 +3793,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
   unsigned char		*buffer,	/* Data buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
   DEBUG_printf(("ippWriteIO(dst=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)",
@@ -2044,9 +3906,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 			ippTagString(attr->value_tag)));
 
          /*
-	  * Write the attribute tag and name.  The current implementation
-	  * does not support the extension value tags above 0x7f, so all
-	  * value tags are 1 byte.
+	  * Write the attribute tag and name.
 	  *
 	  * The attribute name length does not include the trailing nul
 	  * character in the source string.
@@ -2061,7 +3921,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    * overflow the buffer...
 	    */
 
-            if ((n = (int)strlen(attr->name)) > (IPP_BUF_SIZE - 4))
+            if ((n = (int)strlen(attr->name)) > (IPP_BUF_SIZE - 8))
 	    {
 	      DEBUG_printf(("1ippWriteIO: Attribute name too long (%d)", n));
 	      ipp_buffer_release(buffer);
@@ -2077,7 +3937,17 @@ ippWriteIO(void       *dst,		/* I - Destination */
             DEBUG_printf(("2ippWriteIO: writing name=%d,\"%s\"", n,
 	                  attr->name));
 
-            *bufptr++ = attr->value_tag;
+            if (attr->value_tag > 0xff)
+            {
+              *bufptr++ = IPP_TAG_EXTENSION;
+	      *bufptr++ = attr->value_tag >> 24;
+	      *bufptr++ = attr->value_tag >> 16;
+	      *bufptr++ = attr->value_tag >> 8;
+	      *bufptr++ = attr->value_tag;
+            }
+            else
+	      *bufptr++ = attr->value_tag;
+
 	    *bufptr++ = n >> 8;
 	    *bufptr++ = n;
 	    memcpy(bufptr, attr->name, n);
@@ -2090,7 +3960,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    * overflow the buffer...
 	    */
 
-            if ((n = (int)strlen(attr->name)) > (IPP_BUF_SIZE - 7))
+            if ((n = (int)strlen(attr->name)) > (IPP_BUF_SIZE - 12))
 	    {
 	      DEBUG_printf(("1ippWriteIO: Attribute name too long (%d)", n));
 	      ipp_buffer_release(buffer);
@@ -2118,7 +3988,17 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    memcpy(bufptr, attr->name, n);
 	    bufptr += n;
 
-            *bufptr++ = attr->value_tag;
+            if (attr->value_tag > 0xff)
+            {
+              *bufptr++ = IPP_TAG_EXTENSION;
+	      *bufptr++ = attr->value_tag >> 24;
+	      *bufptr++ = attr->value_tag >> 16;
+	      *bufptr++ = attr->value_tag >> 8;
+	      *bufptr++ = attr->value_tag;
+            }
+            else
+	      *bufptr++ = attr->value_tag;
+
             *bufptr++ = 0;
             *bufptr++ = 0;
 	  }
@@ -2129,6 +4009,17 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	  switch (attr->value_tag & ~IPP_TAG_COPY)
 	  {
+	    case IPP_TAG_UNSUPPORTED_VALUE :
+	    case IPP_TAG_DEFAULT :
+	    case IPP_TAG_UNKNOWN :
+	    case IPP_TAG_NOVALUE :
+	    case IPP_TAG_NOTSETTABLE :
+	    case IPP_TAG_DELETEATTR :
+	    case IPP_TAG_ADMINDEFINE :
+		*bufptr++ = 0;
+		*bufptr++ = 0;
+	        break;
+
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
 	        for (i = 0, value = attr->values;
@@ -2501,8 +4392,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   n = 4;
 
-		  if (value->string.charset != NULL)
-                    n += (int)strlen(value->string.charset);
+		  if (value->string.language != NULL)
+                    n += (int)strlen(value->string.language);
 
 		  if (value->string.text != NULL)
                     n += (int)strlen(value->string.text);
@@ -2532,19 +4423,19 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
-                 /* Length of charset */
-		  if (value->string.charset != NULL)
-		    n = (int)strlen(value->string.charset);
+                 /* Length of language */
+		  if (value->string.language != NULL)
+		    n = (int)strlen(value->string.language);
 		  else
 		    n = 0;
 
 	          *bufptr++ = n >> 8;
 		  *bufptr++ = n;
 
-                 /* Charset */
+                 /* Language */
 		  if (n > 0)
 		  {
-		    memcpy(bufptr, value->string.charset, n);
+		    memcpy(bufptr, value->string.language, n);
 		    bufptr += n;
 		  }
 
@@ -2782,122 +4673,71 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 
 /*
- * '_ippAddAttr()' - Add a new attribute to the request.
+ * 'ipp_add_attr()' - Add a new attribute to the message.
  */
 
-ipp_attribute_t *			/* O - New attribute */
-_ippAddAttr(ipp_t *ipp,			/* I - IPP message */
-            int   num_values)		/* I - Number of values */
+static ipp_attribute_t *		/* O - New attribute */
+ipp_add_attr(ipp_t      *ipp,		/* I - IPP message */
+             const char *name,		/* I - Attribute name or NULL */
+             ipp_tag_t  group_tag,	/* I - Group tag or IPP_TAG_ZERO */
+             ipp_tag_t  value_tag,	/* I - Value tag or IPP_TAG_ZERO */
+             int        num_values)	/* I - Number of values */
 {
+  int			alloc_values;	/* Number of values to allocate */
   ipp_attribute_t	*attr;		/* New attribute */
 
 
-  DEBUG_printf(("4_ippAddAttr(ipp=%p, num_values=%d)", ipp, num_values));
+  DEBUG_printf(("4ipp_add_attr(ipp=%p, name=\"%s\", group_tag=0x%x, value_tag=0x%x, "
+                "num_values=%d)", ipp, name, group_tag, value_tag, num_values));
+
+ /*
+  * Range check input...
+  */
 
   if (!ipp || num_values < 0)
     return (NULL);
 
-  attr = calloc(sizeof(ipp_attribute_t) +
-                (num_values - 1) * sizeof(ipp_value_t), 1);
+ /*
+  * Allocate memory, rounding the allocation up as needed...
+  */
 
-  if (attr != NULL)
+  if (num_values <= 1)
+    alloc_values = num_values;
+  else
+    alloc_values = (num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
+
+  attr = calloc(sizeof(ipp_attribute_t) +
+                (alloc_values - 1) * sizeof(_ipp_value_t), 1);
+
+  if (attr)
   {
+   /*
+    * Initialize attribute...
+    */
+
+    if (name)
+      attr->name = _cupsStrAlloc(name);
+
+    attr->group_tag  = group_tag;
+    attr->value_tag  = value_tag;
     attr->num_values = num_values;
 
-    if (ipp->last == NULL)
-      ipp->attrs = attr;
-    else
-      ipp->last->next = attr;
+   /*
+    * Add it to the end of the linked list...
+    */
 
-    ipp->last = attr;
+    if (ipp->last)
+      ipp->last->next = attr;
+    else
+      ipp->attrs = attr;
+
+    ipp->prev = ipp->last;
+    ipp->last = ipp->current = attr;
   }
 
-  DEBUG_printf(("5_ippAddAttr: Returning %p", attr));
+  DEBUG_printf(("5ipp_add_attr: Returning %p", attr));
 
   return (attr);
-}
-
-
-/*
- * '_ippFreeAttr()' - Free an attribute.
- */
-
-void
-_ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
-{
-  int		i;			/* Looping var */
-  ipp_value_t	*value;			/* Current value */
-
-
-  DEBUG_printf(("4_ippFreeAttr(attr=%p)", attr));
-
-  switch (attr->value_tag)
-  {
-    case IPP_TAG_TEXT :
-    case IPP_TAG_NAME :
-    case IPP_TAG_RESERVED_STRING :
-    case IPP_TAG_KEYWORD :
-    case IPP_TAG_URI :
-    case IPP_TAG_URISCHEME :
-    case IPP_TAG_CHARSET :
-    case IPP_TAG_LANGUAGE :
-    case IPP_TAG_MIMETYPE :
-	for (i = 0, value = attr->values;
-	     i < attr->num_values;
-	     i ++, value ++)
-	  _cupsStrFree(value->string.text);
-	break;
-
-    case IPP_TAG_TEXTLANG :
-    case IPP_TAG_NAMELANG :
-	for (i = 0, value = attr->values;
-	     i < attr->num_values;
-	     i ++, value ++)
-	{
-	  if (value->string.charset && i == 0)
-	    _cupsStrFree(value->string.charset);
-	  _cupsStrFree(value->string.text);
-	}
-	break;
-
-    case IPP_TAG_INTEGER :
-    case IPP_TAG_ENUM :
-    case IPP_TAG_BOOLEAN :
-    case IPP_TAG_DATE :
-    case IPP_TAG_RESOLUTION :
-    case IPP_TAG_RANGE :
-	break;
-
-    case IPP_TAG_BEGIN_COLLECTION :
-	for (i = 0, value = attr->values;
-	     i < attr->num_values;
-	     i ++, value ++)
-          ippDelete(value->collection);
-	break;
-
-    case IPP_TAG_STRING :
-	for (i = 0, value = attr->values;
-	     i < attr->num_values;
-	     i ++, value ++)
-	  free(value->unknown.data);
-        break;
-
-    default :
-        if (!((int)attr->value_tag & IPP_TAG_COPY))
-	{
-	  for (i = 0, value = attr->values;
-	       i < attr->num_values;
-	       i ++, value ++)
-            if (value->unknown.data)
-	      free(value->unknown.data);
-        }
-	break;
-  }
-
-  if (attr->name)
-    _cupsStrFree(attr->name);
-
-  free(attr);
 }
 
 
@@ -2943,6 +4783,157 @@ ipp_buffer_release(unsigned char *b)	/* I - Buffer to release */
 
 
 /*
+ * 'ipp_free_values()' - Free attribute values.
+ */
+
+static void
+ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
+                int             element,/* I - First value to free */
+                int             count)	/* I - Number of values to free */
+{
+  int		i;			/* Looping var */
+  _ipp_value_t	*value;			/* Current value */
+
+
+  DEBUG_printf(("4ipp_free_values(attr=%p, element=%d, count=%d)", attr, element, count));
+
+  if (!(attr->value_tag & IPP_TAG_COPY))
+  {
+   /*
+    * Free values as needed...
+    */
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_TEXTLANG :
+      case IPP_TAG_NAMELANG :
+	  if (element == 0 && count == attr->num_values && attr->values[0].string.language)
+	    _cupsStrFree(attr->values[0].string.language);
+
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_RESERVED_STRING :
+      case IPP_TAG_KEYWORD :
+      case IPP_TAG_URI :
+      case IPP_TAG_URISCHEME :
+      case IPP_TAG_CHARSET :
+      case IPP_TAG_LANGUAGE :
+      case IPP_TAG_MIMETYPE :
+	  for (i = count, value = attr->values + element;
+	       i > 0;
+	       i --, value ++)
+	    _cupsStrFree(value->string.text);
+	  break;
+
+      case IPP_TAG_DEFAULT :
+      case IPP_TAG_UNKNOWN :
+      case IPP_TAG_NOVALUE :
+      case IPP_TAG_NOTSETTABLE :
+      case IPP_TAG_DELETEATTR :
+      case IPP_TAG_ADMINDEFINE :
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+      case IPP_TAG_BOOLEAN :
+      case IPP_TAG_DATE :
+      case IPP_TAG_RESOLUTION :
+      case IPP_TAG_RANGE :
+	  break;
+
+      case IPP_TAG_BEGIN_COLLECTION :
+	  for (i = count, value = attr->values + element;
+	       i > 0;
+	       i --, value ++)
+	    ippDelete(value->collection);
+	  break;
+
+      case IPP_TAG_STRING :
+      default :
+	  for (i = count, value = attr->values + element;
+	       i > 0;
+	       i --, value ++)
+	    if (value->unknown.data)
+	      free(value->unknown.data);
+	  break;
+    }
+  }
+
+ /*
+  * If we are not freeing values from the end, move the remaining values up...
+  */
+
+  if ((element + count) < attr->num_values)
+    memmove(attr->values + element, attr->values + element + count,
+            (attr->num_values - count - element) * sizeof(_ipp_value_t));
+
+  attr->num_values -= count;
+}
+
+
+/*
+ * 'ipp_get_code()' - Convert a C locale/charset name into an IPP language/charset code.
+ *
+ * This typically converts strings of the form "ll_CC", "ll-REGION", and "CHARSET_NUMBER"
+ * to "ll-cc", "ll-region", and "charset-number", respectively.
+ */
+
+static char *				/* O - Language code string */
+ipp_get_code(const char *value,		/* I - Locale/charset string */
+             char       *buffer,	/* I - String buffer */
+             size_t     bufsize)	/* I - Size of string buffer */
+{
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend;			/* End of buffer */
+
+
+ /*
+  * Convert values to lowercase and change _ to - as needed...
+  */
+
+  for (bufptr = buffer, bufend = buffer + bufsize - 1;
+       *value && bufptr < bufend;
+       value ++)
+    if (*value == '_')
+      *bufptr++ = '-';
+    else
+      *bufptr++ = _cups_tolower(*value);
+
+  *bufptr = '\0';
+
+ /*
+  * Return the converted string...
+  */
+
+  return (buffer);
+}
+
+
+/*
+ * 'ipp_lang_code()' - Convert a C locale name into an IPP language code.
+ *
+ * This typically converts strings of the form "ll_CC" and "ll-REGION" to "ll-cc" and
+ * "ll-region", respectively.  It also converts the "C" (POSIX) locale to "en".
+ */
+
+static char *				/* O - Language code string */
+ipp_lang_code(const char *locale,	/* I - Locale string */
+              char       *buffer,	/* I - String buffer */
+              size_t     bufsize)	/* I - Size of string buffer */
+{
+ /*
+  * Map POSIX ("C") locale to generic English, otherwise convert the locale string as-is.
+  */
+
+  if (!_cups_strcasecmp(locale, "c"))
+  {
+    strlcpy(buffer, "en", bufsize);
+    return (buffer);
+  }
+  else
+    return (ipp_get_code(locale, buffer, bufsize));
+}
+
+
+/*
  * 'ipp_length()' - Compute the length of an IPP message or collection value.
  */
 
@@ -2951,14 +4942,19 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
            int   collection)		/* I - 1 if a collection, 0 otherwise */
 {
   int			i;		/* Looping var */
-  int			bytes;		/* Number of bytes */
+  size_t		bytes;		/* Number of bytes */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		group;		/* Current group */
-  ipp_value_t		*value;		/* Current value */
+  _ipp_value_t		*value;		/* Current value */
 
 
-  if (ipp == NULL)
+  DEBUG_printf(("3ipp_length(ipp=%p, collection=%d)", ipp, collection));
+
+  if (!ipp)
+  {
+    DEBUG_puts("4ipp_length: Returning 0 bytes");
     return (0);
+  }
 
  /*
   * Start with 8 bytes for the IPP message header...
@@ -2986,12 +4982,15 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
     if (!attr->name)
       continue;
 
-    DEBUG_printf(("9ipp_length: attr->name=\"%s\", attr->num_values=%d, "
-                  "bytes=%d", attr->name, attr->num_values, bytes));
+    DEBUG_printf(("5ipp_length: attr->name=\"%s\", attr->num_values=%d, "
+                  "bytes=" CUPS_LLFMT, attr->name, attr->num_values, CUPS_LLCAST bytes));
 
-    bytes += (int)strlen(attr->name);	/* Name */
-    bytes += attr->num_values;		/* Value tag for each value */
+    if (attr->value_tag < IPP_TAG_EXTENSION)
+      bytes += attr->num_values;	/* Value tag for each value */
+    else
+      bytes += 5 * attr->num_values;	/* Value tag for each value */
     bytes += 2 * attr->num_values;	/* Name lengths */
+    bytes += (int)strlen(attr->name);	/* Name */
     bytes += 2 * attr->num_values;	/* Value lengths */
 
     if (collection)
@@ -2999,6 +4998,15 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 
     switch (attr->value_tag & ~IPP_TAG_COPY)
     {
+      case IPP_TAG_UNSUPPORTED_VALUE :
+      case IPP_TAG_DEFAULT :
+      case IPP_TAG_UNKNOWN :
+      case IPP_TAG_NOVALUE :
+      case IPP_TAG_NOTSETTABLE :
+      case IPP_TAG_DELETEATTR :
+      case IPP_TAG_ADMINDEFINE :
+          break;
+
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
           bytes += 4 * attr->num_values;
@@ -3019,8 +5027,8 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-	    if (value->string.text != NULL)
-	      bytes += (int)strlen(value->string.text);
+	    if (value->string.text)
+	      bytes += strlen(value->string.text);
 	  break;
 
       case IPP_TAG_DATE :
@@ -3043,11 +5051,11 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	       i < attr->num_values;
 	       i ++, value ++)
 	  {
-	    if (value->string.charset != NULL)
-	      bytes += (int)strlen(value->string.charset);
+	    if (value->string.language)
+	      bytes += strlen(value->string.language);
 
-	    if (value->string.text != NULL)
-	      bytes += (int)strlen(value->string.text);
+	    if (value->string.text)
+	      bytes += strlen(value->string.text);
 	  }
 	  break;
 
@@ -3055,7 +5063,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-            bytes += (int)ipp_length(value->collection, 1);
+            bytes += ipp_length(value->collection, 1);
 	  break;
 
       default :
@@ -3077,7 +5085,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
   else
     bytes ++;
 
-  DEBUG_printf(("8ipp_length: Returning %d bytes", bytes));
+  DEBUG_printf(("4ipp_length: Returning " CUPS_LLFMT " bytes", CUPS_LLCAST bytes));
 
   return (bytes);
 }
@@ -3232,6 +5240,126 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
 
 
 /*
+ * 'ipp_set_value()' - Get the value element from an attribute, expanding it as needed.
+ */
+
+static _ipp_value_t *			/* O  - IPP value element or NULL on error */
+ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
+              ipp_attribute_t **attr,	/* IO - IPP attribute */
+              int             element)	/* I  - Value number (0-based) */
+{
+  ipp_attribute_t	*temp,		/* New attribute pointer */
+			*current,	/* Current attribute in list */
+			*prev;		/* Previous attribute in list */
+  int			alloc_values;	/* Allocated values */
+
+
+ /*
+  * If we are setting an existing value element, return it...
+  */
+
+  temp = *attr;
+
+  if (temp->num_values <= 1)
+    alloc_values = temp->num_values;
+  else
+    alloc_values = (temp->num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
+
+  if (element < alloc_values)
+    return (temp->values + element);
+
+ /*
+  * Otherwise re-allocate the attribute - we allocate in groups of IPP_MAX_VALUE values
+  * when num_values > 1.
+  */
+
+  if (alloc_values < IPP_MAX_VALUES)
+    alloc_values = IPP_MAX_VALUES;
+  else
+    alloc_values += IPP_MAX_VALUES;
+
+  DEBUG_printf(("4ipp_set_value: Reallocating for up to %d values.", alloc_values));
+
+ /*
+  * Reallocate memory...
+  */
+
+  if ((temp = realloc(temp, sizeof(ipp_attribute_t) +
+			    (temp->num_values + IPP_MAX_VALUES - 1) *
+			    sizeof(_ipp_value_t))) == NULL)
+  {
+    _cupsSetHTTPError(HTTP_ERROR);
+    DEBUG_puts("4ipp_set_value: Unable to resize attribute.");
+    return (NULL);
+  }
+
+ /*
+  * Zero the new memory...
+  */
+
+  memset(temp->values + temp->num_values, 0,
+         (alloc_values - temp->num_values) * sizeof(_ipp_value_t));
+
+  if (temp != *attr)
+  {
+   /*
+    * Reset pointers in the list...
+    */
+
+    if (ipp->current == *attr && ipp->prev)
+    {
+     /*
+      * Use current "previous" pointer...
+      */
+
+      prev = ipp->prev;
+    }
+    else
+    {
+     /*
+      * Find this attribute in the linked list...
+      */
+
+      for (prev = NULL, current = ipp->attrs;
+	   current && current != *attr;
+	   prev = current, current = current->next);
+
+      if (!current)
+      {
+       /*
+	* This is a serious error!
+	*/
+
+	*attr = temp;
+	_cupsSetError(IPP_ERROR, _("IPP attribute is not a member of the message."), 1);
+	DEBUG_puts("4ipp_set_value: Unable to find attribute in message.");
+	return (NULL);
+      }
+    }
+
+    if (prev)
+      prev->next = temp;
+    else
+      ipp->attrs = temp;
+
+    ipp->current = temp;
+    ipp->prev    = prev;
+
+    if (ipp->last == *attr)
+      ipp->last = temp;
+
+    *attr = temp;
+  }
+
+ /*
+  * Return the value element...
+  */
+
+  return (temp->values + element);
+}
+
+
+/*
  * 'ipp_write_file()' - Write IPP data to a file.
  */
 
@@ -3248,29 +5376,6 @@ ipp_write_file(int         *fd,		/* I - File descriptor */
 }
 
 
-#ifdef __linux
 /*
- * The following symbol definitions are provided only for KDE
- * compatibility during the CUPS 1.2 testing period and will be
- * removed in a future release of CUPS.  These are PRIVATE APIs
- * from CUPS 1.1.x that the KDE developers chose to use...
- */
-
-ipp_attribute_t *			/* O - New attribute */
-_ipp_add_attr(ipp_t *ipp,		/* I - IPP message */
-              int   num_values)		/* I - Number of values */
-{
-  return (_ippAddAttr(ipp, num_values));
-}
-
-void
-_ipp_free_attr(ipp_attribute_t *attr)	/* I - Attribute to free */
-{
-  _ippFreeAttr(attr);
-}
-#endif /* __linux */
-
-
-/*
- * End of "$Id: ipp.c 7847 2008-08-19 04:22:14Z mike $".
+ * End of "$Id: ipp.c 10102 2011-11-02 23:52:39Z mike $".
  */

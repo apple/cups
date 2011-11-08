@@ -63,54 +63,14 @@ extern "C" {
  * Types and structures...
  */
 
-typedef enum ipp_tag_e			/**** Format tags for attributes ****/
+typedef enum ipp_dstate_e		/**** Document states ****/
 {
-  IPP_TAG_ZERO = 0x00,			/* Zero tag - used for separators */
-  IPP_TAG_OPERATION,			/* Operation group */
-  IPP_TAG_JOB,				/* Job group */
-  IPP_TAG_END,				/* End-of-attributes */
-  IPP_TAG_PRINTER,			/* Printer group */
-  IPP_TAG_UNSUPPORTED_GROUP,		/* Unsupported attributes group */
-  IPP_TAG_SUBSCRIPTION,			/* Subscription group */
-  IPP_TAG_EVENT_NOTIFICATION,		/* Event group */
-  IPP_TAG_DOCUMENT = 0x09,		/* Document group */
-  IPP_TAG_UNSUPPORTED_VALUE = 0x10,	/* Unsupported value */
-  IPP_TAG_DEFAULT,			/* Default value */
-  IPP_TAG_UNKNOWN,			/* Unknown value */
-  IPP_TAG_NOVALUE,			/* No-value value */
-  IPP_TAG_NOTSETTABLE = 0x15,		/* Not-settable value */
-  IPP_TAG_DELETEATTR,			/* Delete-attribute value */
-  IPP_TAG_ADMINDEFINE,			/* Admin-defined value */
-  IPP_TAG_INTEGER = 0x21,		/* Integer value */
-  IPP_TAG_BOOLEAN,			/* Boolean value */
-  IPP_TAG_ENUM,				/* Enumeration value */
-  IPP_TAG_STRING = 0x30,		/* Octet string value */
-  IPP_TAG_DATE,				/* Date/time value */
-  IPP_TAG_RESOLUTION,			/* Resolution value */
-  IPP_TAG_RANGE,			/* Range value */
-  IPP_TAG_BEGIN_COLLECTION,		/* Beginning of collection value */
-  IPP_TAG_TEXTLANG,			/* Text-with-language value */
-  IPP_TAG_NAMELANG,			/* Name-with-language value */
-  IPP_TAG_END_COLLECTION,		/* End of collection value */
-  IPP_TAG_TEXT = 0x41,			/* Text value */
-  IPP_TAG_NAME,				/* Name value */
-  IPP_TAG_RESERVED_STRING,		/* Reserved for future string value @private@ */
-  IPP_TAG_KEYWORD,			/* Keyword value */
-  IPP_TAG_URI,				/* URI value */
-  IPP_TAG_URISCHEME,			/* URI scheme value */
-  IPP_TAG_CHARSET,			/* Character set value */
-  IPP_TAG_LANGUAGE,			/* Language value */
-  IPP_TAG_MIMETYPE,			/* MIME media type value */
-  IPP_TAG_MEMBERNAME,			/* Collection member name value */
-  IPP_TAG_MASK = 0x7fffffff,		/* Mask for copied attribute values */
-  IPP_TAG_COPY = -0x7fffffff-1		/* Bitflag for copied attribute values */
-} ipp_tag_t;
-
-typedef enum ipp_res_e			/**** Resolution units ****/
-{
-  IPP_RES_PER_INCH = 3,			/* Pixels per inch */
-  IPP_RES_PER_CM			/* Pixels per centimeter */
-} ipp_res_t;
+  IPP_DOCUMENT_PENDING = 3,
+  IPP_DOCUMENT_PROCESSING = 5,
+  IPP_DOCUMENT_CANCELED = 7,
+  IPP_DOCUMENT_ABORTED,
+  IPP_DOCUMENT_COMPLETED
+} ipp_dstate_t;
 
 typedef enum ipp_finish_e		/**** Finishings ****/
 {
@@ -141,23 +101,19 @@ typedef enum ipp_finish_e		/**** Finishings ****/
   IPP_FINISHINGS_BIND_LEFT = 50,	/* Bind on left */
   IPP_FINISHINGS_BIND_TOP,		/* Bind on top */
   IPP_FINISHINGS_BIND_RIGHT,		/* Bind on right */
-  IPP_FINISHINGS_BIND_BOTTOM		/* Bind on bottom */
+  IPP_FINISHINGS_BIND_BOTTOM,		/* Bind on bottom */
+  IPP_FINISHINGS_TRIM_AFTER_PAGES = 60,	/* Trim output after each page */
+  IPP_FINISHINGS_TRIM_AFTER_DOCUMENTS,	/* Trim output after each document */
+  IPP_FINISHINGS_TRIM_AFTER_COPIES,	/* Trim output after each copy */
+  IPP_FINISHINGS_TRIM_AFTER_JOB		/* Trim output after job */
 } ipp_finish_t;
 
-typedef enum ipp_orient_e		/**** Orientation values ****/
+typedef enum ipp_jcollate_e		/**** Job collation types ****/
 {
-  IPP_PORTRAIT = 3,			/* No rotation */
-  IPP_LANDSCAPE,			/* 90 degrees counter-clockwise */
-  IPP_REVERSE_LANDSCAPE,		/* 90 degrees clockwise */
-  IPP_REVERSE_PORTRAIT			/* 180 degrees */
-} ipp_orient_t;
-
-typedef enum ipp_quality_e		/**** Qualities ****/
-{
-  IPP_QUALITY_DRAFT = 3,		/* Draft quality */
-  IPP_QUALITY_NORMAL,			/* Normal quality */
-  IPP_QUALITY_HIGH			/* High quality */
-} ipp_quality_t;
+  IPP_JOB_UNCOLLATED_SHEETS = 3,
+  IPP_JOB_COLLATED_DOCUMENTS,
+  IPP_JOB_UNCOLLATED_DOCUMENTS
+} ipp_jcollate_t;
 
 typedef enum ipp_jstate_e		/**** Job states ****/
 {
@@ -168,24 +124,9 @@ typedef enum ipp_jstate_e		/**** Job states ****/
   IPP_JOB_CANCELED,			/* Job has been canceled */
   IPP_JOB_ABORTED,			/* Job has aborted due to error */
   IPP_JOB_COMPLETED			/* Job has completed successfully */
-} ipp_jstate_t;
+  /* Legacy name for canceled state */
 #define IPP_JOB_CANCELLED IPP_JOB_CANCELED
-
-typedef enum ipp_pstate_e		/**** Printer states ****/
-{
-  IPP_PRINTER_IDLE = 3,			/* Printer is idle */
-  IPP_PRINTER_PROCESSING,		/* Printer is working */
-  IPP_PRINTER_STOPPED			/* Printer is stopped */
-} ipp_pstate_t;
-
-typedef enum ipp_state_e		/**** IPP states ****/
-{
-  IPP_ERROR = -1,			/* An error occurred */
-  IPP_IDLE,				/* Nothing is happening/request completed */
-  IPP_HEADER,				/* The request header needs to be sent/received */
-  IPP_ATTRIBUTE,			/* One or more attributes need to be sent/received */
-  IPP_DATA				/* IPP request data needs to be sent/received */
-} ipp_state_t;
+} ipp_jstate_t;
 
 typedef enum ipp_op_e			/**** IPP operations ****/
 {
@@ -216,7 +157,10 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2/Mac OS X 10.5@ */
   IPP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2/Mac OS X 10.5@ */
   IPP_SEND_NOTIFICATIONS,		/* Send notification events @private@ */
-  IPP_GET_PRINT_SUPPORT_FILES = 0x0021,	/* Get printer support files @private@ */
+  IPP_GET_RESOURCE_ATTRIBUTES,		/* Get resource attributes @private@ */
+  IPP_GET_RESOURCE_DATA,		/* Get resource data @private@ */
+  IPP_GET_RESOURCES,			/* Get list of resources @private@ */
+  IPP_GET_PRINT_SUPPORT_FILES,		/* Get printer support files @private@ */
   IPP_ENABLE_PRINTER,			/* Start a printer */
   IPP_DISABLE_PRINTER,			/* Stop a printer */
   IPP_PAUSE_PRINTER_AFTER_CURRENT_JOB,	/* Stop printer after the current job @private@ */
@@ -260,11 +204,48 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/Mac OS X 10.5@ */
   CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4/Mac OS X 10.6@ */
-} ipp_op_t;
 
-/* Old names for the operations */
+  /* Legacy names for the add operations */
 #define CUPS_ADD_PRINTER	CUPS_ADD_MODIFY_PRINTER
 #define CUPS_ADD_CLASS		CUPS_ADD_MODIFY_CLASS
+} ipp_op_t;
+
+typedef enum ipp_orient_e		/**** Orientation values ****/
+{
+  IPP_PORTRAIT = 3,			/* No rotation */
+  IPP_LANDSCAPE,			/* 90 degrees counter-clockwise */
+  IPP_REVERSE_LANDSCAPE,		/* 90 degrees clockwise */
+  IPP_REVERSE_PORTRAIT			/* 180 degrees */
+} ipp_orient_t;
+
+typedef enum ipp_pstate_e		/**** Printer states ****/
+{
+  IPP_PRINTER_IDLE = 3,			/* Printer is idle */
+  IPP_PRINTER_PROCESSING,		/* Printer is working */
+  IPP_PRINTER_STOPPED			/* Printer is stopped */
+} ipp_pstate_t;
+
+typedef enum ipp_quality_e		/**** Qualities ****/
+{
+  IPP_QUALITY_DRAFT = 3,		/* Draft quality */
+  IPP_QUALITY_NORMAL,			/* Normal quality */
+  IPP_QUALITY_HIGH			/* High quality */
+} ipp_quality_t;
+
+typedef enum ipp_res_e			/**** Resolution units ****/
+{
+  IPP_RES_PER_INCH = 3,			/* Pixels per inch */
+  IPP_RES_PER_CM			/* Pixels per centimeter */
+} ipp_res_t;
+
+typedef enum ipp_state_e		/**** IPP states ****/
+{
+  IPP_ERROR = -1,			/* An error occurred */
+  IPP_IDLE,				/* Nothing is happening/request completed */
+  IPP_HEADER,				/* The request header needs to be sent/received */
+  IPP_ATTRIBUTE,			/* One or more attributes need to be sent/received */
+  IPP_DATA				/* IPP request data needs to be sent/received */
+} ipp_state_t;
 
 typedef enum ipp_status_e		/**** IPP status codes ****/
 {
@@ -272,9 +253,9 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_OK_SUBST,				/* successful-ok-ignored-or-substituted-attributes */
   IPP_OK_CONFLICT,			/* successful-ok-conflicting-attributes */
   IPP_OK_IGNORED_SUBSCRIPTIONS,		/* successful-ok-ignored-subscriptions */
-  IPP_OK_IGNORED_NOTIFICATIONS,		/* successful-ok-ignored-notifications */
+  IPP_OK_IGNORED_NOTIFICATIONS,		/* successful-ok-ignored-notifications @private@ */
   IPP_OK_TOO_MANY_EVENTS,		/* successful-ok-too-many-events */
-  IPP_OK_BUT_CANCEL_SUBSCRIPTION,	/* successful-ok-but-cancel-subscription */
+  IPP_OK_BUT_CANCEL_SUBSCRIPTION,	/* successful-ok-but-cancel-subscription @private@ */
   IPP_OK_EVENTS_COMPLETE,		/* successful-ok-events-complete */
   IPP_REDIRECTION_OTHER_SITE = 0x200,	/* redirection-other-site @private@ */
   CUPS_SEE_OTHER = 0x280,		/* cups-see-other */
@@ -300,8 +281,12 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_ATTRIBUTES_NOT_SETTABLE,		/* client-error-attributes-not-settable */
   IPP_IGNORED_ALL_SUBSCRIPTIONS,	/* client-error-ignored-all-subscriptions */
   IPP_TOO_MANY_SUBSCRIPTIONS,		/* client-error-too-many-subscriptions */
-  IPP_IGNORED_ALL_NOTIFICATIONS,	/* client-error-ignored-all-notifications */
-  IPP_PRINT_SUPPORT_FILE_NOT_FOUND,	/* client-error-print-support-file-not-found */
+  IPP_IGNORED_ALL_NOTIFICATIONS,	/* client-error-ignored-all-notifications @private@ */
+  IPP_PRINT_SUPPORT_FILE_NOT_FOUND,	/* client-error-print-support-file-not-found @private@ */
+  IPP_DOCUMENT_PASSWORD_ERROR,		/* client-error-document-password-error */
+  IPP_DOCUMENT_PERMISSION_ERROR,	/* client-error-document-permission-error */
+  IPP_DOCUMENT_SECURITY_ERROR,		/* client-error-document-security-error */
+  IPP_DOCUMENT_UNPRINTABLE_ERROR,	/* client-error-document-unprintable-error */
 
   IPP_INTERNAL_ERROR = 0x0500,		/* server-error-internal-error */
   IPP_OPERATION_NOT_SUPPORTED,		/* server-error-operation-not-supported */
@@ -314,116 +299,75 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_ERROR_JOB_CANCELED,		/* server-error-job-canceled */
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED,	/* server-error-multiple-document-jobs-not-supported */
   IPP_PRINTER_IS_DEACTIVATED,		/* server-error-printer-is-deactivated */
+  IPP_TOO_MANY_JOBS,			/* server-error-too-many-jobs */
+  IPP_TOO_MANY_DOCUMENTS,		/* server-error-too-many-documents */
 
   IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/Mac OS X 10.7@ */
   IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/Mac OS X 10.7@ */
   IPP_UPGRADE_REQUIRED			/* TLS upgrade required */
-} ipp_status_t;
+
+  /* Legacy name for canceled status */
 #define IPP_ERROR_JOB_CANCELLED IPP_ERROR_JOB_CANCELED
 
+} ipp_status_t;
+
+typedef enum ipp_tag_e			/**** Format tags for attributes ****/
+{
+  IPP_TAG_ZERO = 0x00,			/* Zero tag - used for separators */
+  IPP_TAG_OPERATION,			/* Operation group */
+  IPP_TAG_JOB,				/* Job group */
+  IPP_TAG_END,				/* End-of-attributes */
+  IPP_TAG_PRINTER,			/* Printer group */
+  IPP_TAG_UNSUPPORTED_GROUP,		/* Unsupported attributes group */
+  IPP_TAG_SUBSCRIPTION,			/* Subscription group */
+  IPP_TAG_EVENT_NOTIFICATION,		/* Event group */
+  IPP_TAG_RESOURCE,			/* Resource group @private@ */
+  IPP_TAG_DOCUMENT,			/* Document group */
+  IPP_TAG_UNSUPPORTED_VALUE = 0x10,	/* Unsupported value */
+  IPP_TAG_DEFAULT,			/* Default value */
+  IPP_TAG_UNKNOWN,			/* Unknown value */
+  IPP_TAG_NOVALUE,			/* No-value value */
+  IPP_TAG_NOTSETTABLE = 0x15,		/* Not-settable value */
+  IPP_TAG_DELETEATTR,			/* Delete-attribute value */
+  IPP_TAG_ADMINDEFINE,			/* Admin-defined value */
+  IPP_TAG_INTEGER = 0x21,		/* Integer value */
+  IPP_TAG_BOOLEAN,			/* Boolean value */
+  IPP_TAG_ENUM,				/* Enumeration value */
+  IPP_TAG_STRING = 0x30,		/* Octet string value */
+  IPP_TAG_DATE,				/* Date/time value */
+  IPP_TAG_RESOLUTION,			/* Resolution value */
+  IPP_TAG_RANGE,			/* Range value */
+  IPP_TAG_BEGIN_COLLECTION,		/* Beginning of collection value */
+  IPP_TAG_TEXTLANG,			/* Text-with-language value */
+  IPP_TAG_NAMELANG,			/* Name-with-language value */
+  IPP_TAG_END_COLLECTION,		/* End of collection value */
+  IPP_TAG_TEXT = 0x41,			/* Text value */
+  IPP_TAG_NAME,				/* Name value */
+  IPP_TAG_RESERVED_STRING,		/* Reserved for future string value @private@ */
+  IPP_TAG_KEYWORD,			/* Keyword value */
+  IPP_TAG_URI,				/* URI value */
+  IPP_TAG_URISCHEME,			/* URI scheme value */
+  IPP_TAG_CHARSET,			/* Character set value */
+  IPP_TAG_LANGUAGE,			/* Language value */
+  IPP_TAG_MIMETYPE,			/* MIME media type value */
+  IPP_TAG_MEMBERNAME,			/* Collection member name value */
+  IPP_TAG_EXTENSION = 0x7f,		/* Extension point for 32-bit tags */
+  IPP_TAG_MASK = 0x7fffffff,		/* Mask for copied attribute values @private@ */
+  /* The following expression is used to avoid compiler warnings with +/-0x80000000 */
+  IPP_TAG_COPY = -0x7fffffff-1		/* Bitflag for copied attribute values @private@ */
+} ipp_tag_t;
+
 typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
+typedef struct _ipp_s ipp_t;		/**** IPP request/response data ****/
+typedef struct _ipp_attribute_s ipp_attribute_t;
+					/**** IPP attribute ****/
 
 /**** New in CUPS 1.2 ****/
-typedef ssize_t	(*ipp_iocb_t)(void *, ipp_uchar_t *, size_t);
+typedef ssize_t	(*ipp_iocb_t)(void *context, ipp_uchar_t *buffer, size_t bytes);
 					/**** IPP IO Callback Function @since CUPS 1.2/Mac OS X 10.5@ ****/
 
-typedef union ipp_request_u		/**** Request Header ****/
-{
-  struct				/* Any Header */
-  {
-    ipp_uchar_t	version[2];		/* Protocol version number */
-    int		op_status;		/* Operation ID or status code*/
-    int		request_id;		/* Request ID */
-  }		any;
-
-  struct				/* Operation Header */
-  {
-    ipp_uchar_t	version[2];		/* Protocol version number */
-    ipp_op_t	operation_id;		/* Operation ID */
-    int		request_id;		/* Request ID */
-  }		op;
-
-  struct				/* Status Header */
-  {
-    ipp_uchar_t	version[2];		/* Protocol version number */
-    ipp_status_t status_code;		/* Status code */
-    int		request_id;		/* Request ID */
-  }		status;
-
-  /**** New in CUPS 1.1.19 ****/
-  struct				/* Event Header @since CUPS 1.1.19/Mac OS X 10.3@ */
-  {
-    ipp_uchar_t	version[2];		/* Protocol version number */
-    ipp_status_t status_code;		/* Status code */
-    int		request_id;		/* Request ID */
-  }		event;
-} ipp_request_t;
-
-/**** New in CUPS 1.1.19 ****/
-typedef struct ipp_s ipp_t;
-
-typedef union ipp_value_u		/**** Attribute Value ****/
-{
-  int		integer;		/* Integer/enumerated value */
-
-  char		boolean;		/* Boolean value */
-
-  ipp_uchar_t	date[11];		/* Date/time value */
-
-  struct
-  {
-    int		xres,			/* Horizontal resolution */
-		yres;			/* Vertical resolution */
-    ipp_res_t	units;			/* Resolution units */
-  }		resolution;		/* Resolution value */
-
-  struct
-  {
-    int		lower,			/* Lower value */
-		upper;			/* Upper value */
-  }		range;			/* Range of integers value */
-
-  struct
-  {
-    char	*charset;		/* Character set */
-    char	*text;			/* String */
-  }		string;			/* String with language value */
-
-  struct
-  {
-    int		length;			/* Length of attribute */
-    void	*data;			/* Data in attribute */
-  }		unknown;		/* Unknown attribute type */
-
-/**** New in CUPS 1.1.19 ****/
-  ipp_t		*collection;		/* Collection value @since CUPS 1.1.19/Mac OS X 10.3@ */
-} ipp_value_t;
-
-typedef struct ipp_attribute_s		/**** Attribute ****/
-{
-  struct ipp_attribute_s *next;		/* Next attribute in list */
-  ipp_tag_t	group_tag,		/* Job/Printer/Operation group tag */
-		value_tag;		/* What type of value is it? */
-  char		*name;			/* Name of attribute */
-  int		num_values;		/* Number of values */
-  ipp_value_t	values[1];		/* Values */
-} ipp_attribute_t;
-
-struct ipp_s				/**** IPP Request/Response/Notification ****/
-{
-  ipp_state_t	state;			/* State of request */
-  ipp_request_t	request;		/* Request header */
-  ipp_attribute_t *attrs;		/* Attributes */
-  ipp_attribute_t *last;		/* Last attribute in list */
-  ipp_attribute_t *current;		/* Current attribute (for read/write) */
-  ipp_tag_t	curtag;			/* Current attribute group tag */
-
-/**** New in CUPS 1.2 ****/
-  ipp_attribute_t *prev;		/* Previous attribute (for read) @since CUPS 1.2/Mac OS X 10.5@ */
-
-/**** New in CUPS 1.4.4 ****/
-  int		use;			/* Use count @since CUPS 1.4.4/Mac OS X 10.6.?@ */
-};
+/**** New in CUPS 1.6 ****/
+typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
 
 
 /*
@@ -438,10 +382,10 @@ extern ipp_attribute_t	*ippAddBooleans(ipp_t *ipp, ipp_tag_t group,
 extern ipp_attribute_t	*ippAddDate(ipp_t *ipp, ipp_tag_t group,
 			            const char *name, const ipp_uchar_t *value);
 extern ipp_attribute_t	*ippAddInteger(ipp_t *ipp, ipp_tag_t group,
-			               ipp_tag_t type, const char *name,
+			               ipp_tag_t value_tag, const char *name,
 				       int value);
 extern ipp_attribute_t	*ippAddIntegers(ipp_t *ipp, ipp_tag_t group,
-			                ipp_tag_t type, const char *name,
+			                ipp_tag_t value_tag, const char *name,
 					int num_values, const int *values);
 extern ipp_attribute_t	*ippAddRange(ipp_t *ipp, ipp_tag_t group,
 			             const char *name, int lower, int upper);
@@ -457,19 +401,19 @@ extern ipp_attribute_t	*ippAddResolutions(ipp_t *ipp, ipp_tag_t group,
 					   const int *yres);
 extern ipp_attribute_t	*ippAddSeparator(ipp_t *ipp);
 extern ipp_attribute_t	*ippAddString(ipp_t *ipp, ipp_tag_t group,
-			              ipp_tag_t type, const char *name,
-				      const char *charset, const char *value);
+			              ipp_tag_t value_tag, const char *name,
+				      const char *language, const char *value);
 extern ipp_attribute_t	*ippAddStrings(ipp_t *ipp, ipp_tag_t group,
-			               ipp_tag_t type, const char *name,
-				       int num_values, const char *charset,
+			               ipp_tag_t value_tag, const char *name,
+				       int num_values, const char *language,
 				       const char * const *values);
 extern time_t		ippDateToTime(const ipp_uchar_t *date);
 extern void		ippDelete(ipp_t *ipp);
 extern const char	*ippErrorString(ipp_status_t error);
 extern ipp_attribute_t	*ippFindAttribute(ipp_t *ipp, const char *name,
-			                  ipp_tag_t type);
+			                  ipp_tag_t value_tag);
 extern ipp_attribute_t	*ippFindNextAttribute(ipp_t *ipp, const char *name,
-			                      ipp_tag_t type);
+			                      ipp_tag_t value_tag);
 extern size_t		ippLength(ipp_t *ipp);
 extern ipp_t		*ippNew(void);
 extern ipp_state_t	ippRead(http_t *http, ipp_t *ipp);
@@ -488,7 +432,7 @@ extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr) _CUPS_API_1_1
 extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
 extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
 
-/**** New in CUPS 1.2 ****/
+/**** New in CUPS 1.2/Mac OS X 10.5 ****/
 extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name,
 					   const void *data, int datalen) _CUPS_API_1_2;
@@ -501,9 +445,69 @@ extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 			           ipp_t *parent, ipp_t *ipp) _CUPS_API_1_2;
 
-/**** New in CUPS 1.4 ****/
+/**** New in CUPS 1.4/Mac OS X 10.6 ****/
 extern const char	*ippTagString(ipp_tag_t tag) _CUPS_API_1_4;
 extern ipp_tag_t	ippTagValue(const char *name) _CUPS_API_1_4;
+
+/**** New in CUPS 1.6 ****/
+extern ipp_attribute_t	*ippAddOutOfBand(ipp_t *ipp, ipp_tag_t group, ipp_tag_t value_tag,
+			                 const char *name);
+extern size_t		ippAttributeString(ipp_attribute_t *attr, char *buffer,
+			                   size_t bufsize) _CUPS_API_1_6;
+extern ipp_attribute_t	*ippCopyAttribute(ipp_t *dst, ipp_attribute_t *attr,
+			                 int quickcopy) _CUPS_API_1_6;
+extern int		ippCopyAttributes(ipp_t *dst, ipp_t *src,
+			                  int quickcopy, ipp_copycb_t cb, void *context)
+			                  _CUPS_API_1_6;
+extern int		ippDeleteValues(ipp_t *ipp, ipp_attribute_t *attr, int element,
+			                int count) _CUPS_API_1_6;
+extern const char	*ippEnumString(const char *attrname, int enumvalue) _CUPS_API_1_6;
+extern int		ippEnumValue(const char *attrname, const char *enumstring)
+			             _CUPS_API_1_6;
+extern ipp_attribute_t	*ippFirstAttribute(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippGetBoolean(ipp_attribute_t *attr, int element)
+			              _CUPS_API_1_6;
+extern ipp_t		*ippGetCollection(ipp_attribute_t *attr,
+			                  int element) _CUPS_API_1_6;
+extern int		ippGetCount(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern ipp_tag_t	ippGetGroupTag(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern int		ippGetInteger(ipp_attribute_t *attr, int element)
+			              _CUPS_API_1_6;
+extern const char	*ippGetName(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern ipp_op_t		ippGetOperation(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippGetRequestId(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippGetResolution(ipp_attribute_t *attr, int element,
+			                 int *yres, ipp_res_t *units) _CUPS_API_1_6;
+extern ipp_status_t	ippGetStatusCode(ipp_t *ipp) _CUPS_API_1_6;
+extern const char	*ippGetString(ipp_attribute_t *attr, int element,
+				      const char **language) _CUPS_API_1_6;
+extern ipp_tag_t	ippGetValueTag(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern int		ippGetVersion(ipp_t *ipp, int *minor) _CUPS_API_1_6;
+extern ipp_attribute_t	*ippNextAttribute(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippSetBoolean(ipp_t *ipp, ipp_attribute_t **attr,
+			              int element, int boolvalue) _CUPS_API_1_6;
+extern int		ippSetCollection(ipp_t *ipp, ipp_attribute_t **attr,
+			                 int element, ipp_t *colvalue) _CUPS_API_1_6;
+extern int		ippSetGroupTag(ipp_t *ipp, ipp_attribute_t **attr,
+			               ipp_tag_t group_tag) _CUPS_API_1_6;
+extern int		ippSetInteger(ipp_t *ipp, ipp_attribute_t **attr,
+			              int element, int intvalue) _CUPS_API_1_6;
+extern int		ippSetName(ipp_t *ipp, ipp_attribute_t **attr, const char *name)
+			           _CUPS_API_1_6;
+extern int		ippSetOperation(ipp_t *ipp, ipp_op_t op) _CUPS_API_1_6;
+extern int		ippSetRange(ipp_t *ipp, ipp_attribute_t **attr, int element,
+			            int lowervalue, int uppervalue) _CUPS_API_1_6;
+extern int		ippSetRequestId(ipp_t *ipp, int request_id)
+			                _CUPS_API_1_6;
+extern int		ippSetResolution(ipp_t *ipp, ipp_attribute_t **attr,
+			                 int element, ipp_res_t unitsvalue,
+			                 int xresvalue, int yresvalue) _CUPS_API_1_6;
+extern int		ippSetStatusCode(ipp_t *ipp, ipp_status_t status) _CUPS_API_1_6;
+extern int		ippSetString(ipp_t *ipp, ipp_attribute_t **attr,
+			             int element, const char *strvalue) _CUPS_API_1_6;
+extern int		ippSetValueTag(ipp_t *ipp, ipp_attribute_t **attr,
+			               ipp_tag_t value_tag) _CUPS_API_1_6;
+extern int		ippSetVersion(ipp_t *ipp, int major, int minor) _CUPS_API_1_6;
 
 
 /*

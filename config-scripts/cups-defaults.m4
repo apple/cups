@@ -64,7 +64,6 @@ AC_ARG_WITH(fatal_errors, [  --with-fatal-errors     set default FatalErrors val
 AC_SUBST(CUPS_FATAL_ERRORS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_FATAL_ERRORS, "$CUPS_FATAL_ERRORS")
 
-
 dnl Default LogLevel
 AC_ARG_WITH(log_level, [  --with-log-level        set default LogLevel value, default=warn],
 	CUPS_LOG_LEVEL="$withval",
@@ -91,16 +90,16 @@ fi
 AC_SUBST(CUPS_BROWSING)
 
 dnl Default BrowseLocalProtocols
-AC_ARG_WITH(local_protocols, [  --with-local-protocols  set default BrowseLocalProtocols, default="CUPS"],
+AC_ARG_WITH(local_protocols, [  --with-local-protocols  set default BrowseLocalProtocols, default=""],
 	default_local_protocols="$withval",
 	default_local_protocols="default")
 
 if test x$with_local_protocols != xno; then
 	if test "x$default_local_protocols" = "xdefault"; then
 		if test "x$DNSSDLIBS" != "x"; then
-		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS dnssd"
-	else
-		CUPS_BROWSE_LOCAL_PROTOCOLS="CUPS"
+			CUPS_BROWSE_LOCAL_PROTOCOLS="dnssd"
+		else
+			CUPS_BROWSE_LOCAL_PROTOCOLS=""
 		fi
 	else
 		CUPS_BROWSE_LOCAL_PROTOCOLS="$default_local_protocols"
@@ -113,41 +112,6 @@ AC_SUBST(CUPS_BROWSE_LOCAL_PROTOCOLS)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS,
 	"$CUPS_BROWSE_LOCAL_PROTOCOLS")
 
-dnl Default BrowseRemoteProtocols
-AC_ARG_WITH(remote_protocols, [  --with-remote-protocols set default BrowseRemoteProtocols, default="CUPS"],
-	default_remote_protocols="$withval",
-	default_remote_protocols="default")
-
-if test x$with_remote_protocols != xno; then
-	if test "x$default_remote_protocols" = "xdefault"; then
-		if test "$uname" = "Darwin" -a $uversion -ge 90; then
-			CUPS_BROWSE_REMOTE_PROTOCOLS=""
-		else
-			CUPS_BROWSE_REMOTE_PROTOCOLS="CUPS"
-		fi
-	else
-		CUPS_BROWSE_REMOTE_PROTOCOLS="$default_remote_protocols"
-	fi
-else
-	CUPS_BROWSE_REMOTE_PROTOCOLS=""
-fi
-
-AC_SUBST(CUPS_BROWSE_REMOTE_PROTOCOLS)
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS,
-	"$CUPS_BROWSE_REMOTE_PROTOCOLS")
-
-dnl Default BrowseShortNames
-AC_ARG_ENABLE(browse_short, [  --disable-browse-short-names
-			  disable BrowseShortNames by default])
-if test "x$enable_browse_short" = xno; then
-	CUPS_BROWSE_SHORT_NAMES="No"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_SHORT_NAMES, 0)
-else
-	CUPS_BROWSE_SHORT_NAMES="Yes"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_SHORT_NAMES, 1)
-fi
-AC_SUBST(CUPS_BROWSE_SHORT_NAMES)
-
 dnl Default DefaultShared
 AC_ARG_ENABLE(default_shared, [  --disable-default-shared
 			  disable DefaultShared by default])
@@ -159,38 +123,6 @@ else
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DEFAULT_SHARED, 1)
 fi
 AC_SUBST(CUPS_DEFAULT_SHARED)
-
-dnl Default ImplicitClasses
-AC_ARG_ENABLE(implicit, [  --disable-implicit-classes
-                          disable ImplicitClasses by default])
-if test "x$enable_implicit" = xno; then
-	CUPS_IMPLICIT_CLASSES="No"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IMPLICIT_CLASSES, 0)
-else
-	CUPS_IMPLICIT_CLASSES="Yes"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IMPLICIT_CLASSES, 1)
-fi
-AC_SUBST(CUPS_IMPLICIT_CLASSES)
-
-dnl Default UseNetworkDefault
-AC_ARG_ENABLE(use_network_default, [  --enable-use-network-default
-                          set UseNetworkDefault to Yes by default])
-if test "x$enable_use_network_default" != xno; then
-	AC_MSG_CHECKING(whether to use network default printers)
-	if test "x$enable_use_network_default" = xyes -o $uname != Darwin; then
-		CUPS_USE_NETWORK_DEFAULT="Yes"
-		AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 1)
-		AC_MSG_RESULT(yes)
-	else
-		CUPS_USE_NETWORK_DEFAULT="No"
-		AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 0)
-		AC_MSG_RESULT(no)
-	fi
-else
-	CUPS_USE_NETWORK_DEFAULT="No"
-	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_USE_NETWORK_DEFAULT, 0)
-fi
-AC_SUBST(CUPS_USE_NETWORK_DEFAULT)
 
 dnl Determine the correct username and group for this OS...
 AC_ARG_WITH(cups_user, [  --with-cups-user        set default user for CUPS],

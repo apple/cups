@@ -1,13 +1,14 @@
-CHANGES-IPPTOOL.txt - 2011-10-04
+CHANGES-IPPTOOL.txt - 2011-10-05
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
 
-2011-10-04
+2011-10-05
 
 	- Fixed a crasher bug that showed up on Windows.
+	- The IPP/1.1 test would hang if the initial Print-Job test failed.
 	- Fixed a typo in the IPP/2.0 test.
 
 

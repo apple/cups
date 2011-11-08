@@ -3,7 +3,19 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.1
 
-	- Documentation updates (STR #3885, STR #3946)
+	- Documentation updates (STR #3885, STR #3946, STR #3969)
+	- Build fixes (STR #3956)
+	- Group quota ACLs did not work with Kerberos (STR #3972)
+	- The IPP backend did not retry when a printer responded with
+	  client-error-not-possible (STR #3963)
+	- PostScript PPDs with filters used the wrong command filter (STR #3973)
+	- The scheduler incorrectly used free() on a POSIX ACL value, which
+	  could cause a crash (STR #3970)
+	- PPD files using the MacStandard encoding did not work.
+	- The web interface did not work on some platforms (STR #3902)
+	- The lpstat command would crash when then "-u" option was used by a
+	  non-administrator (STR #3953)
+	- Japanese supply level reporting did not always work.
 	- The DBUS notifier could crash (STR #3947)
 	- Relaxed some of the page size checks in cupstestppd.
 	- The ipptool program now reports attributes that are repeated within

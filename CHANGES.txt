@@ -1,8 +1,15 @@
-CHANGES.txt - 1.6b1 - 2011-08-30
+CHANGES.txt - 1.6b1 - 2011-11-03
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- CUPS no longer supports automatic remote printers or implicit classes
+	  via the CUPS, LDAP, or SLP protocols (STR #3922, STR #3923)
+	- The PPD APIs are now deprecated and will be removed in a future
+	  version of CUPS (STR #3927)
+	- The default IPP version for requests is now 2.0 (STR #3929)
+	- The IPP APIs no longer expose the ipp_t or ipp_attribute_t structures
+	  and instead provide accessor functions (STR #3928)
 	- The scheduler will no longer run programs with group write permission.
 	- The PHP module has been removed (STR #3932)
 	- The bannertops, commandtoescpx, commandtopclx, imagetops,

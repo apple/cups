@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 7724 2008-07-14 06:06:06Z mike $"
+ * "$Id: classes.c 10104 2011-11-04 06:37:03Z mike $"
  *
  *   Printer class routines for the CUPS scheduler.
  *
@@ -22,8 +22,6 @@
  *   cupsdFindClass()                - Find the named class.
  *   cupsdLoadAllClasses()           - Load classes from the classes.conf file.
  *   cupsdSaveAllClasses()           - Save classes to the classes.conf file.
- *   cupsdUpdateImplicitClasses()    - Update the accepting state of implicit
- *                                     classes.
  */
 
 /*
@@ -184,23 +182,8 @@ cupsdDeletePrinterFromClasses(
   for (c = (cupsd_printer_t *)cupsArrayFirst(Printers);
        c;
        c = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+    if (c->type & CUPS_PRINTER_CLASS)
       changed |= cupsdDeletePrinterFromClass(c, p);
-
- /*
-  * Then clean out any empty implicit classes...
-  */
-
-  for (c = (cupsd_printer_t *)cupsArrayFirst(ImplicitPrinters);
-       c;
-       c = (cupsd_printer_t *)cupsArrayNext(ImplicitPrinters))
-    if (c->num_printers == 0)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Deleting implicit class \"%s\"...",
-                      c->name);
-      cupsdDeletePrinter(c, 0);
-      changed = 1;
-    }
 
   return (changed);
 }
@@ -279,8 +262,7 @@ cupsdFindClass(const char *name)	/* I - Name of class */
   cupsd_printer_t	*c;		/* Current class/printer */
 
 
-  if ((c = cupsdFindDest(name)) != NULL &&
-      (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)))
+  if ((c = cupsdFindDest(name)) != NULL && (c->type & CUPS_PRINTER_CLASS))
     return (c);
   else
     return (NULL);
@@ -443,9 +425,8 @@ cupsdLoadAllClasses(void)
 	{
 	  cupsdSetString(&temp->make_model, "Remote Printer on unknown");
 
-          temp->state       = IPP_PRINTER_STOPPED;
-	  temp->type        |= CUPS_PRINTER_REMOTE;
-	  temp->browse_time = 2147483647;
+          temp->state = IPP_PRINTER_STOPPED;
+	  temp->type  |= CUPS_PRINTER_REMOTE;
 
 	  cupsdSetString(&temp->location, "Location Unknown");
 	  cupsdSetString(&temp->info, "No Information Available");
@@ -733,7 +714,6 @@ cupsdSaveAllClasses(void)
     */
 
     if ((pclass->type & CUPS_PRINTER_REMOTE) ||
-        (pclass->type & CUPS_PRINTER_IMPLICIT) ||
         !(pclass->type & CUPS_PRINTER_CLASS))
       continue;
 
@@ -834,35 +814,5 @@ cupsdSaveAllClasses(void)
 
 
 /*
- * 'cupsdUpdateImplicitClasses()' - Update the accepting state of implicit
- *                                  classes.
- */
-
-void
-cupsdUpdateImplicitClasses(void)
-{
-  int			i;		/* Looping var */
-  cupsd_printer_t	*pclass;	/* Current class */
-  int			accepting;	/* printer-is-accepting-jobs value */
-
-
-  for (pclass = (cupsd_printer_t *)cupsArrayFirst(ImplicitPrinters);
-       pclass;
-       pclass = (cupsd_printer_t *)cupsArrayNext(ImplicitPrinters))
-  {
-   /*
-    * Loop through the printers to come up with a composite state...
-    */
-
-    for (i = 0, accepting = 0; i < pclass->num_printers; i ++)
-      if ((accepting = pclass->printers[i]->accepting) != 0)
-	break;
-
-    pclass->accepting = accepting;
-  }
-}
-
-
-/*
- * End of "$Id: classes.c 7724 2008-07-14 06:06:06Z mike $".
+ * End of "$Id: classes.c 10104 2011-11-04 06:37:03Z mike $".
  */

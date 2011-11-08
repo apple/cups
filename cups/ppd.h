@@ -3,6 +3,10 @@
  *
  *   PostScript Printer Description definitions for CUPS.
  *
+ *   THESE APIS ARE DEPRECATED. TO COMPILE WITHOUT WARNINGS ADD
+ *   "-D_PPD_DEPRECATED" TO YOUR COMPILE OPTIONS.  THIS HEADER AND THESE
+ *   FUNCTIONS WILL BE REMOVED IN A FUTURE RELEASE OF CUPS.
+ *
  *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
@@ -44,6 +48,16 @@
 #  ifdef __cplusplus
 extern "C" {
 #  endif /* __cplusplus */
+
+
+/*
+ * Define _PPD_DEPRECATED to silence the warnings about PPD functions being
+ * deprecated...
+ */
+
+#  ifndef _PPD_DEPRECATED
+#    define _PPD_DEPRECATED _CUPS_DEPRECATED
+#  endif /* !_PPD_DEPRECATED */
 
 
 /*
@@ -361,7 +375,8 @@ extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
 extern int		ppdEmitJCL(ppd_file_t *ppd, FILE *fp, int job_id,
 			           const char *user, const char *title);
 extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
-extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd, const char *keyword);
+extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd,
+			                     const char *keyword);
 extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
 extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
 			            const char *option);
@@ -376,64 +391,67 @@ extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
 /**** New in CUPS 1.1.19 ****/
-extern const char	*ppdErrorString(ppd_status_t status) _CUPS_API_1_1_19;
+extern const char	*ppdErrorString(ppd_status_t status) _PPD_DEPRECATED;
 extern ppd_attr_t	*ppdFindAttr(ppd_file_t *ppd, const char *name,
-			             const char *spec) _CUPS_API_1_1_19;
+			             const char *spec) _PPD_DEPRECATED;
 extern ppd_attr_t	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
-			                 const char *spec) _CUPS_API_1_1_19;
-extern ppd_status_t	ppdLastError(int *line) _CUPS_API_1_1_19;
+			                 const char *spec) _PPD_DEPRECATED;
+extern ppd_status_t	ppdLastError(int *line) _PPD_DEPRECATED;
 
 /**** New in CUPS 1.1.20 ****/
-extern void		ppdSetConformance(ppd_conform_t c) _CUPS_API_1_1_20;
+extern void		ppdSetConformance(ppd_conform_t c) _PPD_DEPRECATED;
 
 /**** New in CUPS 1.2 ****/
 extern int		ppdCollect2(ppd_file_t *ppd, ppd_section_t section,
-			            float min_order, ppd_choice_t  ***choices) _CUPS_API_1_2;
+			            float min_order, ppd_choice_t  ***choices)
+			            _PPD_DEPRECATED;
 extern int		ppdEmitAfterOrder(ppd_file_t *ppd, FILE *fp,
 			                  ppd_section_t section, int limit,
-					  float min_order) _CUPS_API_1_2;
-extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp) _CUPS_API_1_2;
+					  float min_order) _PPD_DEPRECATED;
+extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp) _PPD_DEPRECATED;
 extern char		*ppdEmitString(ppd_file_t *ppd, ppd_section_t section,
-			               float min_order) _CUPS_API_1_2;
+			               float min_order) _PPD_DEPRECATED;
 extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
-			                     const char *keyword) _CUPS_API_1_2;
+			                     const char *keyword) _PPD_DEPRECATED;
 extern ppd_cparam_t	*ppdFindCustomParam(ppd_coption_t *opt,
-			                    const char *name) _CUPS_API_1_2;
-extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt) _CUPS_API_1_2;
-extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd) _CUPS_API_1_2;
-extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt) _CUPS_API_1_2;
-extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _CUPS_API_1_2;
-extern int		ppdLocalize(ppd_file_t *ppd) _CUPS_API_1_2;
-extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _CUPS_API_1_2;
+			                    const char *name) _PPD_DEPRECATED;
+extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt) _PPD_DEPRECATED;
+extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd) _PPD_DEPRECATED;
+extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt) _PPD_DEPRECATED;
+extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _PPD_DEPRECATED;
+extern int		ppdLocalize(ppd_file_t *ppd) _PPD_DEPRECATED;
+extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _PPD_DEPRECATED;
 
 /**** New in CUPS 1.3/Mac OS X 10.5 ****/
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
 					      char *buffer,
-					      size_t bufsize) _CUPS_API_1_3;
+					      size_t bufsize) _PPD_DEPRECATED;
 
 /**** New in CUPS 1.4/Mac OS X 10.6 ****/
 extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
 					 const char *choice,
 					 cups_option_t **options)
-					     _CUPS_API_1_4;
-extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
+					     _PPD_DEPRECATED;
+extern int		cupsResolveConflicts(ppd_file_t *ppd,
+			                     const char *option,
 			                     const char *choice,
 					     int *num_options,
 					     cups_option_t **options)
-					     _CUPS_API_1_4;
+					     _PPD_DEPRECATED;
 extern int		ppdInstallableConflict(ppd_file_t *ppd,
 			                       const char *option,
 					       const char *choice)
-					           _CUPS_API_1_4;
+					           _PPD_DEPRECATED;
 extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
-			                 const char *spec) _CUPS_API_1_4;
+			                 const char *spec) _PPD_DEPRECATED;
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
-			                       const char *name) _CUPS_API_1_4;
+			                       const char *name)
+			                       _PPD_DEPRECATED;
 extern int		ppdPageSizeLimits(ppd_file_t *ppd,
 			                  ppd_size_t *minimum,
-					  ppd_size_t *maximum) _CUPS_API_1_4;
+					  ppd_size_t *maximum) _PPD_DEPRECATED;
 
 
 /*

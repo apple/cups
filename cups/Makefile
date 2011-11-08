@@ -586,7 +586,7 @@ apihelp:
 		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
 	mxmldoc --tokens api-filedir.xml >../doc/help/api-filedir.tokens
 	$(RM) api-filedir.xml
-	mxmldoc --section "Programming" --title "PPD API" \
+	mxmldoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
 		api-ppd.xml \
@@ -638,7 +638,7 @@ framedhelp:
 		--header api-filedir.header --intro api-filedir.shtml \
 		file.h file.c dir.h dir.c
 	mxmldoc --framed api-ppd \
-		--section "Programming" --title "PPD API" \
+		--section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
 		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c \

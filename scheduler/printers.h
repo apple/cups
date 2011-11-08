@@ -61,9 +61,6 @@ struct cupsd_printer_s
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
-  char		*browse_attrs;		/* Attributes sent with browse data */
-  time_t	browse_expire;		/* Expiration time for printer */
-  time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
   char		*sanitized_device_uri;	/* Sanitized device URI */
   char		*port_monitor;		/* Port monitor */
@@ -116,10 +113,8 @@ VAR ipp_t		*CommonData	VALUE(NULL);
 					/* Common printer object attrs */
 VAR cups_array_t	*CommonDefaults	VALUE(NULL);
 					/* Common -default option names */
-VAR cups_array_t	*Printers	VALUE(NULL),
+VAR cups_array_t	*Printers	VALUE(NULL);
 					/* Printer list */
-			*ImplicitPrinters VALUE(NULL);
-					/* Implicit class printers */
 VAR cupsd_printer_t	*DefaultPrinter	VALUE(NULL);
 					/* Default printer */
 VAR char		*DefaultPolicy	VALUE(NULL);

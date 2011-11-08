@@ -801,6 +801,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
           break;
 
       case CUPS_TC_csShiftJIS :
+      case CUPS_TC_csWindows31J : /* Close enough for our purposes */
 	  cupsCharsetToUTF8((cups_utf8_t *)supplies[i - 1].name,
 	                    (char *)packet->object_value.string.bytes,
 		            sizeof(supplies[0].name), CUPS_JIS_X0213);

@@ -343,7 +343,8 @@ cupsEncodeOptions2(
     * Allocate memory for the attribute values...
     */
 
-    if ((attr = _ippAddAttr(ipp, count)) == NULL)
+    if ((attr = ippAddStrings(ipp, group_tag, value_tag, option->name, count,
+                              NULL, NULL)) == NULL)
     {
      /*
       * Ran out of memory!
@@ -352,19 +353,6 @@ cupsEncodeOptions2(
       DEBUG_puts("1cupsEncodeOptions2: Ran out of memory for attributes!");
       return;
     }
-
-   /*
-    * Now figure out what type of value we have...
-    */
-
-    attr->group_tag = group_tag;
-    attr->value_tag = value_tag;
-
-   /*
-    * Copy the name over...
-    */
-
-    attr->name = _cupsStrAlloc(option->name);
 
     if (count > 1)
     {

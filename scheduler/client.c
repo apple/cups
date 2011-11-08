@@ -2842,7 +2842,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     bytes     = ipp_state != IPP_ERROR &&
                 (con->file >= 0 || ipp_state != IPP_DATA);
   }
-  else if ((bytes = read(con->file, con->header,
+  else if ((bytes = read(con->file, con->header + con->header_used,
 			 sizeof(con->header) - con->header_used)) > 0)
   {
     con->header_used += bytes;

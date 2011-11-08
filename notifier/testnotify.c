@@ -113,7 +113,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
       fprintf(stderr, "DEBUG: %*s%s:\n\n", indent - 4, "", ippTagString(group));
     }
 
-    _ippAttrString(attr, buffer, sizeof(buffer));
+    ippAttributeString(attr, buffer, sizeof(buffer));
 
     fprintf(stderr, "DEBUG: %*s%s (%s%s) %s", indent, "", attr->name,
             attr->num_values > 1 ? "1setOf " : "",

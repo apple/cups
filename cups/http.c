@@ -19,103 +19,103 @@
  *
  * Contents:
  *
- *   httpAddCredential()       - Allocates and adds a single credential to an
- *                               array.
- *   _httpBIOMethods()         - Get the OpenSSL BIO methods for HTTP
- *                               connections.
- *   httpBlocking()            - Set blocking/non-blocking behavior on a
- *                               connection.
- *   httpCheck()               - Check to see if there is a pending response
- *                               from the server.
- *   httpClearCookie()         - Clear the cookie value(s).
- *   httpClearFields()         - Clear HTTP request fields.
- *   httpClose()               - Close an HTTP connection.
- *   httpConnect()             - Connect to a HTTP server.
- *   httpConnectEncrypt()      - Connect to a HTTP server using encryption.
- *   httpCopyCredentials()     - Copy the credentials associated with an
- *                               encrypted connection.
- *   _httpCreate()             - Create an unconnected HTTP connection.
- *   _httpCreateCredentials()  - Create credentials in the internal format.
- *   httpDelete()              - Send a DELETE request to the server.
- *   _httpDisconnect()         - Disconnect a HTTP connection.
- *   httpEncryption()          - Set the required encryption on the link.
- *   httpError()               - Get the last error on a connection.
- *   httpFlush()               - Flush data from a HTTP connection.
- *   httpFlushWrite()          - Flush data in write buffer.
- *   _httpFreeCredentials()    - Free internal credentials.
- *   httpFreeCredentials()     - Free an array of credentials.
- *   httpGet()                 - Send a GET request to the server.
- *   httpGetAuthString()       - Get the current authorization string.
- *   httpGetBlocking()         - Get the blocking/non-block state of a
- *                               connection.
- *   httpGetCookie()           - Get any cookie data from the response.
- *   httpGetFd()               - Get the file descriptor associated with a
- *                               connection.
- *   httpGetField()            - Get a field value from a request/response.
- *   httpGetLength()           - Get the amount of data remaining from the
- *                               content-length or transfer-encoding fields.
- *   httpGetLength2()          - Get the amount of data remaining from the
- *                               content-length or transfer-encoding fields.
- *   httpGetStatus()           - Get the status of the last HTTP request.
- *   httpGetSubField()         - Get a sub-field value.
- *   httpGetSubField2()        - Get a sub-field value.
- *   httpGets()                - Get a line of text from a HTTP connection.
- *   httpHead()                - Send a HEAD request to the server.
- *   httpInitialize()          - Initialize the HTTP interface library and set
- *                               the default HTTP proxy (if any).
- *   httpOptions()             - Send an OPTIONS request to the server.
- *   _httpPeek()               - Peek at data from a HTTP connection.
- *   httpPost()                - Send a POST request to the server.
- *   httpPrintf()              - Print a formatted string to a HTTP connection.
- *   httpPut()                 - Send a PUT request to the server.
- *   httpRead()                - Read data from a HTTP connection.
- *   httpRead2()               - Read data from a HTTP connection.
- *   _httpReadCDSA()           - Read function for the CDSA library.
- *   _httpReadGNUTLS()         - Read function for the GNU TLS library.
- *   httpReconnect()           - Reconnect to a HTTP server.
- *   httpSetAuthString()       - Set the current authorization string.
- *   httpSetCredentials()      - Set the credentials associated with an
- *                               encrypted connection.
- *   httpSetCookie()           - Set the cookie value(s).
- *   httpSetExpect()           - Set the Expect: header in a request.
- *   httpSetField()            - Set the value of an HTTP header.
- *   httpSetLength()           - Set the content-length and content-encoding.
- *   httpSetTimeout()          - Set read/write timeouts and an optional
- *                               callback.
- *   httpTrace()               - Send an TRACE request to the server.
- *   _httpUpdate()             - Update the current HTTP status for incoming
- *                               data.
- *   httpUpdate()              - Update the current HTTP state for incoming
- *                               data.
- *   _httpWait()               - Wait for data available on a connection (no
- *                               flush).
- *   httpWait()                - Wait for data available on a connection.
- *   httpWrite()               - Write data to a HTTP connection.
- *   httpWrite2()              - Write data to a HTTP connection.
- *   _httpWriteCDSA()          - Write function for the CDSA library.
- *   _httpWriteGNUTLS()        - Write function for the GNU TLS library.
- *   http_bio_ctrl()           - Control the HTTP connection.
- *   http_bio_free()           - Free OpenSSL data.
- *   http_bio_new()            - Initialize an OpenSSL BIO structure.
- *   http_bio_puts()           - Send a string for OpenSSL.
- *   http_bio_read()           - Read data for OpenSSL.
- *   http_bio_write()          - Write data for OpenSSL.
- *   http_debug_hex()          - Do a hex dump of a buffer.
- *   http_field()              - Return the field index for a field name.
- *   http_read_ssl()           - Read from a SSL/TLS connection.
- *   http_locking_cb()         - Lock/unlock a thread's mutex.
- *   http_send()               - Send a request with all fields and the trailing
- *                               blank line.
- *   http_set_credentials()    - Set the SSL/TLS credentials.
- *   http_set_timeout()        - Set the socket timeout values.
- *   http_set_wait()           - Set the default wait value for reads.
- *   http_setup_ssl()          - Set up SSL/TLS support on a connection.
- *   http_shutdown_ssl()       - Shut down SSL/TLS on a connection.
- *   http_threadid_cb()        - Return the current thread ID.
- *   http_upgrade()            - Force upgrade to TLS encryption.
- *   http_write()              - Write a buffer to a HTTP connection.
- *   http_write_chunk()        - Write a chunked buffer.
- *   http_write_ssl()          - Write to a SSL/TLS connection.
+ *   httpAddCredential()      - Allocates and adds a single credential to an
+ *				array.
+ *   _httpBIOMethods()	      - Get the OpenSSL BIO methods for HTTP
+ *				connections.
+ *   httpBlocking()	      - Set blocking/non-blocking behavior on a
+ *				connection.
+ *   httpCheck()	      - Check to see if there is a pending response
+ *				from the server.
+ *   httpClearCookie()	      - Clear the cookie value(s).
+ *   httpClearFields()	      - Clear HTTP request fields.
+ *   httpClose()	      - Close an HTTP connection.
+ *   httpConnect()	      - Connect to a HTTP server.
+ *   httpConnectEncrypt()     - Connect to a HTTP server using encryption.
+ *   httpCopyCredentials()    - Copy the credentials associated with an
+ *				encrypted connection.
+ *   _httpCreate()	      - Create an unconnected HTTP connection.
+ *   _httpCreateCredentials() - Create credentials in the internal format.
+ *   httpDelete()	      - Send a DELETE request to the server.
+ *   _httpDisconnect()	      - Disconnect a HTTP connection.
+ *   httpEncryption()	      - Set the required encryption on the link.
+ *   httpError()	      - Get the last error on a connection.
+ *   httpFlush()	      - Flush data from a HTTP connection.
+ *   httpFlushWrite()	      - Flush data in write buffer.
+ *   _httpFreeCredentials()   - Free internal credentials.
+ *   httpFreeCredentials()    - Free an array of credentials.
+ *   httpGet()		      - Send a GET request to the server.
+ *   httpGetAuthString()      - Get the current authorization string.
+ *   httpGetBlocking()	      - Get the blocking/non-block state of a
+ *				connection.
+ *   httpGetCookie()	      - Get any cookie data from the response.
+ *   httpGetFd()	      - Get the file descriptor associated with a
+ *				connection.
+ *   httpGetField()	      - Get a field value from a request/response.
+ *   httpGetLength()	      - Get the amount of data remaining from the
+ *				content-length or transfer-encoding fields.
+ *   httpGetLength2()	      - Get the amount of data remaining from the
+ *				content-length or transfer-encoding fields.
+ *   httpGets() 	      - Get a line of text from a HTTP connection.
+ *   httpGetState()	      - Get the current state of the HTTP request.
+ *   httpGetStatus()	      - Get the status of the last HTTP request.
+ *   httpGetSubField()	      - Get a sub-field value.
+ *   httpGetSubField2()       - Get a sub-field value.
+ *   httpGetVersion()	      - Get the HTTP version at the other end.
+ *   httpHead() 	      - Send a HEAD request to the server.
+ *   httpInitialize()	      - Initialize the HTTP interface library and set
+ *				the default HTTP proxy (if any).
+ *   httpOptions()	      - Send an OPTIONS request to the server.
+ *   _httpPeek()	      - Peek at data from a HTTP connection.
+ *   httpPost() 	      - Send a POST request to the server.
+ *   httpPrintf()	      - Print a formatted string to a HTTP connection.
+ *   httpPut()		      - Send a PUT request to the server.
+ *   httpRead() 	      - Read data from a HTTP connection.
+ *   httpRead2()	      - Read data from a HTTP connection.
+ *   _httpReadCDSA()	      - Read function for the CDSA library.
+ *   _httpReadGNUTLS()	      - Read function for the GNU TLS library.
+ *   httpReconnect()	      - Reconnect to a HTTP server.
+ *   httpSetAuthString()      - Set the current authorization string.
+ *   httpSetCredentials()     - Set the credentials associated with an
+ *				encrypted connection.
+ *   httpSetCookie()	      - Set the cookie value(s).
+ *   httpSetExpect()	      - Set the Expect: header in a request.
+ *   httpSetField()	      - Set the value of an HTTP header.
+ *   httpSetLength()	      - Set the content-length and content-encoding.
+ *   httpSetTimeout()	      - Set read/write timeouts and an optional
+ *				callback.
+ *   httpTrace()	      - Send an TRACE request to the server.
+ *   _httpUpdate()	      - Update the current HTTP status for incoming
+ *				data.
+ *   httpUpdate()	      - Update the current HTTP state for incoming
+ *				data.
+ *   _httpWait()	      - Wait for data available on a connection (no
+ *				flush).
+ *   httpWait() 	      - Wait for data available on a connection.
+ *   httpWrite()	      - Write data to a HTTP connection.
+ *   httpWrite2()	      - Write data to a HTTP connection.
+ *   _httpWriteCDSA()	      - Write function for the CDSA library.
+ *   _httpWriteGNUTLS()       - Write function for the GNU TLS library.
+ *   http_bio_ctrl()	      - Control the HTTP connection.
+ *   http_bio_free()	      - Free OpenSSL data.
+ *   http_bio_new()	      - Initialize an OpenSSL BIO structure.
+ *   http_bio_puts()	      - Send a string for OpenSSL.
+ *   http_bio_read()	      - Read data for OpenSSL.
+ *   http_bio_write()	      - Write data for OpenSSL.
+ *   http_debug_hex()	      - Do a hex dump of a buffer.
+ *   http_field()	      - Return the field index for a field name.
+ *   http_read_ssl()	      - Read from a SSL/TLS connection.
+ *   http_send()	      - Send a request with all fields and the trailing
+ *				blank line.
+ *   http_set_credentials()   - Set the SSL/TLS credentials.
+ *   http_set_timeout()       - Set the socket timeout values.
+ *   http_set_wait()	      - Set the default wait value for reads.
+ *   http_setup_ssl()	      - Set up SSL/TLS support on a connection.
+ *   http_shutdown_ssl()      - Shut down SSL/TLS on a connection.
+ *   http_upgrade()	      - Force upgrade to TLS encryption.
+ *   http_write()	      - Write a buffer to a HTTP connection.
+ *   http_write_chunk()       - Write a chunked buffer.
+ *   http_write_ssl()	      - Write to a SSL/TLS connection.
  */
 
 /*
@@ -1117,167 +1117,6 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
 
 
 /*
- * 'httpGetStatus()' - Get the status of the last HTTP request.
- *
- * @since CUPS 1.2/Mac OS X 10.5@
- */
-
-http_status_t				/* O - HTTP status */
-httpGetStatus(http_t *http)		/* I - Connection to server */
-{
-  return (http ? http->status : HTTP_ERROR);
-}
-
-
-/*
- * 'httpGetSubField()' - Get a sub-field value.
- *
- * @deprecated@
- */
-
-char *					/* O - Value or NULL */
-httpGetSubField(http_t       *http,	/* I - Connection to server */
-                http_field_t field,	/* I - Field index */
-                const char   *name,	/* I - Name of sub-field */
-		char         *value)	/* O - Value string */
-{
-  return (httpGetSubField2(http, field, name, value, HTTP_MAX_VALUE));
-}
-
-
-/*
- * 'httpGetSubField2()' - Get a sub-field value.
- *
- * @since CUPS 1.2/Mac OS X 10.5@
- */
-
-char *					/* O - Value or NULL */
-httpGetSubField2(http_t       *http,	/* I - Connection to server */
-                 http_field_t field,	/* I - Field index */
-                 const char   *name,	/* I - Name of sub-field */
-		 char         *value,	/* O - Value string */
-		 int          valuelen)	/* I - Size of value buffer */
-{
-  const char	*fptr;			/* Pointer into field */
-  char		temp[HTTP_MAX_VALUE],	/* Temporary buffer for name */
-		*ptr,			/* Pointer into string buffer */
-		*end;			/* End of value buffer */
-
-  DEBUG_printf(("2httpGetSubField2(http=%p, field=%d, name=\"%s\", value=%p, "
-                "valuelen=%d)", http, field, name, value, valuelen));
-
-  if (!http || !name || !value || valuelen < 2 ||
-      field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
-    return (NULL);
-
-  end = value + valuelen - 1;
-
-  for (fptr = http->fields[field]; *fptr;)
-  {
-   /*
-    * Skip leading whitespace...
-    */
-
-    while (_cups_isspace(*fptr))
-      fptr ++;
-
-    if (*fptr == ',')
-    {
-      fptr ++;
-      continue;
-    }
-
-   /*
-    * Get the sub-field name...
-    */
-
-    for (ptr = temp;
-         *fptr && *fptr != '=' && !_cups_isspace(*fptr) &&
-	     ptr < (temp + sizeof(temp) - 1);
-         *ptr++ = *fptr++);
-
-    *ptr = '\0';
-
-    DEBUG_printf(("4httpGetSubField2: name=\"%s\"", temp));
-
-   /*
-    * Skip trailing chars up to the '='...
-    */
-
-    while (_cups_isspace(*fptr))
-      fptr ++;
-
-    if (!*fptr)
-      break;
-
-    if (*fptr != '=')
-      continue;
-
-   /*
-    * Skip = and leading whitespace...
-    */
-
-    fptr ++;
-
-    while (_cups_isspace(*fptr))
-      fptr ++;
-
-    if (*fptr == '\"')
-    {
-     /*
-      * Read quoted string...
-      */
-
-      for (ptr = value, fptr ++;
-           *fptr && *fptr != '\"' && ptr < end;
-	   *ptr++ = *fptr++);
-
-      *ptr = '\0';
-
-      while (*fptr && *fptr != '\"')
-        fptr ++;
-
-      if (*fptr)
-        fptr ++;
-    }
-    else
-    {
-     /*
-      * Read unquoted string...
-      */
-
-      for (ptr = value;
-           *fptr && !_cups_isspace(*fptr) && *fptr != ',' && ptr < end;
-	   *ptr++ = *fptr++);
-
-      *ptr = '\0';
-
-      while (*fptr && !_cups_isspace(*fptr) && *fptr != ',')
-        fptr ++;
-    }
-
-    DEBUG_printf(("4httpGetSubField2: value=\"%s\"", value));
-
-   /*
-    * See if this is the one...
-    */
-
-    if (!strcmp(name, temp))
-    {
-      DEBUG_printf(("3httpGetSubField2: Returning \"%s\"", value));
-      return (value);
-    }
-  }
-
-  value[0] = '\0';
-
-  DEBUG_puts("3httpGetSubField2: Returning NULL");
-
-  return (NULL);
-}
-
-
-/*
  * 'httpGets()' - Get a line of text from a HTTP connection.
  */
 
@@ -1454,6 +1293,189 @@ httpGets(char   *line,			/* I - Line to read into */
   DEBUG_puts("3httpGets: No new line available!");
 
   return (NULL);
+}
+
+
+/*
+ * 'httpGetState()' - Get the current state of the HTTP request.
+ */
+
+http_state_t				/* O - HTTP state */
+httpGetState(http_t *http)		/* I - Connection to server */
+{
+  return (http ? http->state : HTTP_ERROR);
+}
+
+
+/*
+ * 'httpGetStatus()' - Get the status of the last HTTP request.
+ *
+ * @since CUPS 1.2/Mac OS X 10.5@
+ */
+
+http_status_t				/* O - HTTP status */
+httpGetStatus(http_t *http)		/* I - Connection to server */
+{
+  return (http ? http->status : HTTP_ERROR);
+}
+
+
+/*
+ * 'httpGetSubField()' - Get a sub-field value.
+ *
+ * @deprecated@
+ */
+
+char *					/* O - Value or NULL */
+httpGetSubField(http_t       *http,	/* I - Connection to server */
+                http_field_t field,	/* I - Field index */
+                const char   *name,	/* I - Name of sub-field */
+		char         *value)	/* O - Value string */
+{
+  return (httpGetSubField2(http, field, name, value, HTTP_MAX_VALUE));
+}
+
+
+/*
+ * 'httpGetSubField2()' - Get a sub-field value.
+ *
+ * @since CUPS 1.2/Mac OS X 10.5@
+ */
+
+char *					/* O - Value or NULL */
+httpGetSubField2(http_t       *http,	/* I - Connection to server */
+                 http_field_t field,	/* I - Field index */
+                 const char   *name,	/* I - Name of sub-field */
+		 char         *value,	/* O - Value string */
+		 int          valuelen)	/* I - Size of value buffer */
+{
+  const char	*fptr;			/* Pointer into field */
+  char		temp[HTTP_MAX_VALUE],	/* Temporary buffer for name */
+		*ptr,			/* Pointer into string buffer */
+		*end;			/* End of value buffer */
+
+  DEBUG_printf(("2httpGetSubField2(http=%p, field=%d, name=\"%s\", value=%p, "
+                "valuelen=%d)", http, field, name, value, valuelen));
+
+  if (!http || !name || !value || valuelen < 2 ||
+      field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
+    return (NULL);
+
+  end = value + valuelen - 1;
+
+  for (fptr = http->fields[field]; *fptr;)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (_cups_isspace(*fptr))
+      fptr ++;
+
+    if (*fptr == ',')
+    {
+      fptr ++;
+      continue;
+    }
+
+   /*
+    * Get the sub-field name...
+    */
+
+    for (ptr = temp;
+         *fptr && *fptr != '=' && !_cups_isspace(*fptr) &&
+	     ptr < (temp + sizeof(temp) - 1);
+         *ptr++ = *fptr++);
+
+    *ptr = '\0';
+
+    DEBUG_printf(("4httpGetSubField2: name=\"%s\"", temp));
+
+   /*
+    * Skip trailing chars up to the '='...
+    */
+
+    while (_cups_isspace(*fptr))
+      fptr ++;
+
+    if (!*fptr)
+      break;
+
+    if (*fptr != '=')
+      continue;
+
+   /*
+    * Skip = and leading whitespace...
+    */
+
+    fptr ++;
+
+    while (_cups_isspace(*fptr))
+      fptr ++;
+
+    if (*fptr == '\"')
+    {
+     /*
+      * Read quoted string...
+      */
+
+      for (ptr = value, fptr ++;
+           *fptr && *fptr != '\"' && ptr < end;
+	   *ptr++ = *fptr++);
+
+      *ptr = '\0';
+
+      while (*fptr && *fptr != '\"')
+        fptr ++;
+
+      if (*fptr)
+        fptr ++;
+    }
+    else
+    {
+     /*
+      * Read unquoted string...
+      */
+
+      for (ptr = value;
+           *fptr && !_cups_isspace(*fptr) && *fptr != ',' && ptr < end;
+	   *ptr++ = *fptr++);
+
+      *ptr = '\0';
+
+      while (*fptr && !_cups_isspace(*fptr) && *fptr != ',')
+        fptr ++;
+    }
+
+    DEBUG_printf(("4httpGetSubField2: value=\"%s\"", value));
+
+   /*
+    * See if this is the one...
+    */
+
+    if (!strcmp(name, temp))
+    {
+      DEBUG_printf(("3httpGetSubField2: Returning \"%s\"", value));
+      return (value);
+    }
+  }
+
+  value[0] = '\0';
+
+  DEBUG_puts("3httpGetSubField2: Returning NULL");
+
+  return (NULL);
+}
+
+
+/*
+ * 'httpGetVersion()' - Get the HTTP version at the other end.
+ */
+
+http_version_t				/* O - Version number */
+httpGetVersion(http_t *http)		/* I - Connection to server */
+{
+  return (http ? http->version : HTTP_1_0);
 }
 
 
@@ -3199,10 +3221,13 @@ _httpWriteGNUTLS(
 
   DEBUG_printf(("6_httpWriteGNUTLS(ptr=%p, data=%p, length=%d)", ptr, data,
                 (int)length));
+#ifdef DEBUG
   http_debug_hex("_httpWriteGNUTLS", data, (int)length);
+#endif /* DEBUG */
 
   bytes = send(((http_t *)ptr)->fd, data, length, 0);
   DEBUG_printf(("_httpWriteGNUTLS: bytes=%d", (int)bytes));
+
   return (bytes);
 }
 #endif /* HAVE_SSL && HAVE_GNUTLS */

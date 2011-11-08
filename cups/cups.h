@@ -97,7 +97,7 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_MEDIUM = 0x2000,		/* Can do Tabloid/B/C/A3/A2 */
   CUPS_PRINTER_LARGE = 0x4000,		/* Can do D/E/A1/A0 */
   CUPS_PRINTER_VARIABLE = 0x8000,	/* Can do variable sizes */
-  CUPS_PRINTER_IMPLICIT = 0x10000,	/* Implicit class */
+  CUPS_PRINTER_IMPLICIT = 0x10000,	/* Implicit class @private@ @since Deprecated@ */
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
@@ -105,7 +105,7 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2/Mac OS X 10.5@ */
-  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3/Mac OS X 10.5@ */
+  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @private@ @since Deprecated@ */
   CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device @since CUPS 1.4/Mac OS X 10.6@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities @since CUPS 1.4/Mac OS X 10.6@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */

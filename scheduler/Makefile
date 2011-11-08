@@ -51,8 +51,6 @@ COBJS	=	\
 		cups-deviced.o \
 		cups-exec.o \
 		cups-lpd.o \
-		cups-polld.o \
-		testdirsvc.o \
 		testlpd.o \
 		testmime.o \
 		testspeed.o \
@@ -68,7 +66,6 @@ LIBTARGETS =	\
 		libcupsmime.a
 
 UNITTARGETS =	\
-		testdirsvc \
 		testlpd \
 		testmime \
 		testspeed \
@@ -80,8 +77,7 @@ PROGRAMS =	\
 		cups-deviced \
 		cups-driverd \
 		cups-exec \
-		cups-lpd \
-		cups-polld
+		cups-lpd
 
 TARGETS	=	\
 		$(LIBTARGETS) \
@@ -215,10 +211,6 @@ install-exec:
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) -m 500 cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
-	-if test "x`uname`" = xDarwin; then \
-		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
-		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
-	fi
 	echo Installing programs in $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/daemon
@@ -439,15 +431,6 @@ cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
 
 
 #
-# Make the polling daemon, "cups-polld".
-#
-
-cups-polld:	cups-polld.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cups-polld cups-polld.o $(LIBS)
-
-
-#
 # libcupsmime.so.1, libcupsmime.sl.1
 #
 
@@ -504,15 +487,6 @@ libcupsmime.a:	$(LIBOBJS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
-
-
-#
-# Make the test program, "testdirsvc".
-#
-
-testdirsvc:	testdirsvc.o
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testdirsvc testdirsvc.o $(COMMONLIBS) $(NETLIBS)
 
 
 #

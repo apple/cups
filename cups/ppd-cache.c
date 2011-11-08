@@ -1271,7 +1271,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
     if (filter)
       cupsArrayAdd(pc->filters,
-                   "application/vnd.cups-command application/postscript 0 -");
+                   "application/vnd.cups-command application/postscript 100 "
+                   "commandtops");
   }
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsPreFilter", NULL)) != NULL)

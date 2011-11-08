@@ -4,7 +4,7 @@
 #
 #   Test the cancel command.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -17,9 +17,9 @@
 echo "Cancel Destination Test"
 echo ""
 echo "    lp -d Test1 -o job-hold-until=indefinite testfile.jpg"
-../systemv/lp -d Test1 -o job-hold-until=indefinite testfile.jpg 2>&1
+$VALGRIND ../systemv/lp -d Test1 -o job-hold-until=indefinite testfile.jpg 2>&1
 echo "    cancel Test1"
-../systemv/cancel Test1 2>&1
+$VALGRIND ../systemv/cancel Test1 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
@@ -31,7 +31,7 @@ echo ""
 echo "Cancel All Test"
 echo ""
 echo "    cancel -a"
-../systemv/cancel -a 2>&1
+$VALGRIND ../systemv/cancel -a 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1

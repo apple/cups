@@ -17,7 +17,7 @@
 echo "LPC Test"
 echo ""
 echo "    lpc status"
-../berkeley/lpc status 2>&1
+$VALGRIND ../berkeley/lpc status 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1

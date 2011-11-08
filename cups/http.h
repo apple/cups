@@ -459,7 +459,12 @@ extern void		httpFreeCredentials(cups_array_t *certs) _CUPS_API_1_5;
 extern int		httpSetCredentials(http_t *http, cups_array_t *certs)
 					   _CUPS_API_1_5;
 extern void		httpSetTimeout(http_t *http, double timeout,
-			               http_timeout_cb_t cb, void *user_data);
+			               http_timeout_cb_t cb, void *user_data)
+			               _CUPS_API_1_5;
+
+/**** New in CUPS 1.6 ****/
+extern http_state_t	httpGetState(http_t *http) _CUPS_API_1_6;
+extern http_version_t	httpGetVersion(http_t *http) _CUPS_API_1_6;
 
 
 /*

@@ -206,7 +206,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 	  *textptr = ',';
 
 	cupsdLogMessage(CUPSD_LOG_ERROR, "ACL: %s", text);
-	free(text);
+	acl_free(text);
       }
 #  endif /* HAVE_MBR_UID_TO_UUID */
 

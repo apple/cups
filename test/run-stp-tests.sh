@@ -203,12 +203,17 @@ echo ""
 
 case "$usevalgrind" in
 	Y* | y*)
-		valgrind="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
+		VALGRIND="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
+		if test `uname` = Darwin; then
+			VALGRIND="$VALGRIND --dsymutil=yes"
+		fi
+		export VALGRIND
 		echo "Using Valgrind; log files can be found in /tmp/cups-$user/log..."
 		;;
 
 	*)
-		valgrind=""
+		VALGRIND=""
+		export VALGRIND
 		;;
 esac
 
@@ -235,14 +240,14 @@ case "$usedebugprintfs" in
 		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
 		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
 		CUPS_DEBUG_LEVEL=5; export CUPS_DEBUG_LEVEL
-		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetRespond|cupsSend).*$'; export CUPS_DEBUG_FILTER
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
 		;;
 
 	0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
 		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
 		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
 		CUPS_DEBUG_LEVEL=$usedebugprintf; export CUPS_DEBUG_LEVEL
-		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetRespond|cupsSend).*$'; export CUPS_DEBUG_FILTER
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
 		;;
 
 	*)
@@ -510,14 +515,14 @@ export LC_MESSAGES
 #
 
 echo "Starting scheduler:"
-echo "    $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &"
+echo "    $VALGRIND ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &"
 echo ""
 
-if test `uname` = Darwin -a "x$valgrind" = x; then
+if test `uname` = Darwin -a "x$VALGRIND" = x; then
 	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib
 	../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 else
-	$valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
+	$VALGRIND ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 fi
 
 cupsd=$!
@@ -601,15 +606,17 @@ echo "<PRE>" >>$strfile
 
 fail=0
 for file in 4*.test; do
-	echo "Performing $file..."
+	echo $ac_n "Performing $file: $ac_c"
 	echo "" >>$strfile
 
-	./ipptool -t ipp://localhost:$port/printers $file | tee -a $strfile
+	$VALGRIND ./ipptool -tI ipp://localhost:$port/printers $file >> $strfile
 	status=$?
 
 	if test $status != 0; then
-		echo Test failed.
+		echo FAIL
 		fail=`expr $fail + 1`
+	else
+		echo PASS
 	fi
 done
 
@@ -629,16 +636,18 @@ echo $date by $user on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
 for file in 5*.sh; do
-	echo "Performing $file..."
+	echo $ac_n "Performing $file: $ac_c"
 	echo "" >>$strfile
 	echo "\"$file\":" >>$strfile
 
-	sh $file $pjobs $pprinters | tee -a $strfile
+	sh $file $pjobs $pprinters >> $strfile
 	status=$?
 
 	if test $status != 0; then
-		echo Test failed.
+		echo FAIL
 		fail=`expr $fail + 1`
+	else
+		echo PASS
 	fi
 done
 
