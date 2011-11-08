@@ -218,7 +218,6 @@ install-exec:
 	$(INSTALL_BIN) cups-driverd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-exec $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
-	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(PROGRAMS); do \
@@ -276,7 +275,6 @@ uninstall:
 	$(RM) $(SERVERBIN)/daemon/cups-driverd
 	$(RM) $(SERVERBIN)/daemon/cups-exec
 	$(RM) $(SERVERBIN)/daemon/cups-lpd
-	$(RM) $(SERVERBIN)/daemon/cups-polld
 	$(RM) $(BUILDROOT)/System/Library/Printers/Libraries/convert
 	-$(RMDIR) $(STATEDIR)/certs
 	-$(RMDIR) $(STATEDIR)
@@ -538,7 +536,7 @@ testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 
 sloc:
 	echo "cupsd: \c"
-	sloccount $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) cups-driverd.cxx cups-polld.c cups-lpd.c 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
+	sloccount $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) cups-driverd.cxx cups-lpd.c 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
 
 
 #
