@@ -77,6 +77,7 @@
  *   ippSetRange()	    - Set a rangeOfInteger value in an attribute.
  *   ippSetRequestId()	    - Set the request ID in an IPP message.
  *   ippSetResolution()     - Set a resolution value in an attribute.
+ *   ippSetState()          - Set the current state of the IPP message.
  *   ippSetStatusCode()     - Set the status code in an IPP response or event
  *			      message.
  *   ippSetString()	    - Set a string value in an attribute.
@@ -2043,6 +2044,30 @@ ippGetResolution(
 
 
 /*
+ * 'ippGetState()' - Get the IPP message state.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_state_t				/* O - IPP message state value */
+ippGetState(ipp_t *ipp)			/* I - IPP message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (IPP_IDLE);
+
+ /*
+  * Return the value...
+  */
+
+  return (ipp->state);
+}
+
+
+/*
  * 'ippGetStatusCode()' - Get the status code from an IPP response or event message.
  *
  * @since CUPS 1.6@
@@ -3474,6 +3499,34 @@ ippSetResolution(
 
 
 /*
+ * 'ippSetState()' - Set the current state of the IPP message.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetState(ipp_t       *ipp,		/* I - IPP message */
+            ipp_state_t state)		/* I - IPP state value */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (0);
+
+ /*
+  * Set the state and return...
+  */
+
+  ipp->state   = state;
+  ipp->current = NULL;
+
+  return (1);
+}
+
+
+/*
  * 'ippSetStatusCode()' - Set the status code in an IPP response or event message.
  *
  * The @code ipp@ parameter refers to an IPP message previously created using the
@@ -3500,7 +3553,6 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
   ipp->request.status.status_code = status;
 
   return (1);
-
 }
 
 
