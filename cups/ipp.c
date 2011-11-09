@@ -50,6 +50,7 @@
  *   ippGetInteger()	    - Get the integer/enum value for an attribute.
  *   ippGetName()	    - Get the attribute name.
  *   ippGetOperation()	    - Get the operation ID in an IPP message.
+ *   ippGetRange()          - Get a rangeOfInteger value from an attribute.
  *   ippGetRequestId()	    - Get the request ID from an IPP message.
  *   ippGetResolution()     - Get a resolution value for an attribute.
  *   ippGetStatusCode()     - Get the status code from an IPP response or event
@@ -1978,6 +1979,44 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
   */
 
   return (ipp->request.op.operation_id);
+}
+
+
+/*
+ * 'ippGetRange()' - Get a rangeOfInteger value from an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Lower value of range or -1 */
+ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
+	    int             element,	/* I - Value number (0-based) */
+	    int             *uppervalue)/* O - Upper value of range */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_RANGE ||
+      element < 0 || element >= attr->num_values)
+  {
+    if (uppervalue)
+      *uppervalue = -1;
+
+    return (-1);
+  }
+
+ /*
+  * Return the values...
+  */
+
+  if (uppervalue)
+    *uppervalue = attr->values[element].range.upper;
+
+  return (attr->values[element].range.lower);
 }
 
 

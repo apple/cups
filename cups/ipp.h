@@ -479,6 +479,8 @@ extern int		ippGetInteger(ipp_attribute_t *attr, int element)
 			              _CUPS_API_1_6;
 extern const char	*ippGetName(ipp_attribute_t *attr) _CUPS_API_1_6;
 extern ipp_op_t		ippGetOperation(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippGetRange(ipp_attribute_t *attr, int element,
+			            int *upper) _CUPS_API_1_6;
 extern int		ippGetRequestId(ipp_t *ipp) _CUPS_API_1_6;
 extern int		ippGetResolution(ipp_attribute_t *attr, int element,
 			                 int *yres, ipp_res_t *units)
