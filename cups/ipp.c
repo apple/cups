@@ -284,7 +284,8 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
 
   attr->values[0].collection = value;
 
-  value->use ++;
+  if (value)
+    value->use ++;
 
   return (attr);
 }
