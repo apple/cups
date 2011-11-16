@@ -1619,36 +1619,40 @@ ippDeleteAttribute(
 /*
  * 'ippDeleteValues()' - Delete values in an attribute.
  *
- * The @code element@ parameter specifies the first value to delete, starting at 0. It
- * must be less than the number of values returned by @link ippGetCount@.
+ * The @code element@ parameter specifies the first value to delete, starting at
+ * 0. It must be less than the number of values returned by @link ippGetCount@.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * Deleting all values in an attribute deletes the attribute.
  *
  * @since CUPS 1.6@
  */
 
-int					/* O - 1 on success, 0 on failure */
+int					/* O  - 1 on success, 0 on failure */
 ippDeleteValues(
-    ipp_t           *ipp,		/* I - IPP message */
-    ipp_attribute_t *attr,		/* I - Attribute */
-    int             element,		/* I - Index of first value to delete (0-based) */
-    int             count)		/* I - Number of values to delete */
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - Attribute */
+    int             element,		/* I  - Index of first value to delete (0-based) */
+    int             count)		/* I  - Number of values to delete */
 {
  /*
   * Range check input...
   */
 
-  if (!ipp || !attr || element < 0 || element >= attr->num_values || count <= 0 ||
-      (element + count) >= attr->num_values)
+  if (!ipp || !attr || !*attr ||
+      element < 0 || element >= (*attr)->num_values || count <= 0 ||
+      (element + count) >= (*attr)->num_values)
     return (0);
 
  /*
   * If we are deleting all values, just delete the attribute entirely.
   */
 
-  if (count == attr->num_values)
+  if (count == (*attr)->num_values)
   {
-    ippDeleteAttribute(ipp, attr);
+    ippDeleteAttribute(ipp, *attr);
+    *attr = NULL;
     return (1);
   }
 
@@ -1656,7 +1660,7 @@ ippDeleteValues(
   * Otherwise free the values in question and return.
   */
 
-  ipp_free_values(attr, element, count);
+  ipp_free_values(*attr, element, count);
 
   return (1);
 }

@@ -460,7 +460,7 @@ extern ipp_attribute_t	*ippCopyAttribute(ipp_t *dst, ipp_attribute_t *attr,
 extern int		ippCopyAttributes(ipp_t *dst, ipp_t *src,
 			                  int quickcopy, ipp_copycb_t cb,
 			                  void *context) _CUPS_API_1_6;
-extern int		ippDeleteValues(ipp_t *ipp, ipp_attribute_t *attr,
+extern int		ippDeleteValues(ipp_t *ipp, ipp_attribute_t **attr,
 			                int element, int count) _CUPS_API_1_6;
 extern const char	*ippEnumString(const char *attrname, int enumvalue)
 			               _CUPS_API_1_6;
