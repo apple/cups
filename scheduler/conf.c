@@ -945,7 +945,12 @@ cupsdReadConfiguration(void)
 
   if (!TempDir)
   {
+#ifdef __APPLE__
+    if ((tmpdir = getenv("TMPDIR")) != NULL &&
+        strncmp(tmpdir, "/private/tmp", 12))
+#else
     if ((tmpdir = getenv("TMPDIR")) != NULL)
+#endif /* __APPLE__ */
     {
      /*
       * TMPDIR is defined, see if it is OK for us to use...
