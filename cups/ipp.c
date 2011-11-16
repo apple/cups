@@ -3098,8 +3098,6 @@ ippReadIO(void       *src,		/* I - Data source */
 	        break;
 	  }
 
-          attr->num_values ++;
-
 	 /*
           * If blocking is disabled, stop here...
 	  */
@@ -4871,7 +4869,7 @@ ipp_add_attr(ipp_t      *ipp,		/* I - IPP message */
   */
 
   if (num_values <= 1)
-    alloc_values = num_values;
+    alloc_values = 1;
   else
     alloc_values = (num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
 
@@ -5409,7 +5407,8 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * 'ipp_set_value()' - Get the value element from an attribute, expanding it as needed.
+ * 'ipp_set_value()' - Get the value element from an attribute, expanding it as
+ *                     needed.
  */
 
 static _ipp_value_t *			/* O  - IPP value element or NULL on error */
@@ -5430,16 +5429,22 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
   temp = *attr;
 
   if (temp->num_values <= 1)
-    alloc_values = temp->num_values;
+    alloc_values = 1;
   else
-    alloc_values = (temp->num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
+    alloc_values = (temp->num_values + IPP_MAX_VALUES - 1) &
+                   ~(IPP_MAX_VALUES - 1);
 
   if (element < alloc_values)
+  {
+    if (element >= temp->num_values)
+      temp->num_values = element + 1;
+
     return (temp->values + element);
+  }
 
  /*
-  * Otherwise re-allocate the attribute - we allocate in groups of IPP_MAX_VALUE values
-  * when num_values > 1.
+  * Otherwise re-allocate the attribute - we allocate in groups of IPP_MAX_VALUE
+  * values when num_values > 1.
   */
 
   if (alloc_values < IPP_MAX_VALUES)
@@ -5447,15 +5452,15 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
   else
     alloc_values += IPP_MAX_VALUES;
 
-  DEBUG_printf(("4ipp_set_value: Reallocating for up to %d values.", alloc_values));
+  DEBUG_printf(("4ipp_set_value: Reallocating for up to %d values.",
+                alloc_values));
 
  /*
   * Reallocate memory...
   */
 
   if ((temp = realloc(temp, sizeof(ipp_attribute_t) +
-			    (temp->num_values + IPP_MAX_VALUES - 1) *
-			    sizeof(_ipp_value_t))) == NULL)
+			    (alloc_values - 1) * sizeof(_ipp_value_t))) == NULL)
   {
     _cupsSetHTTPError(HTTP_ERROR);
     DEBUG_puts("4ipp_set_value: Unable to resize attribute.");
@@ -5500,7 +5505,8 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
 	*/
 
 	*attr = temp;
-	_cupsSetError(IPP_ERROR, _("IPP attribute is not a member of the message."), 1);
+	_cupsSetError(IPP_ERROR,
+	              _("IPP attribute is not a member of the message."), 1);
 	DEBUG_puts("4ipp_set_value: Unable to find attribute in message.");
 	return (NULL);
       }
@@ -5523,6 +5529,9 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
  /*
   * Return the value element...
   */
+
+  if (element >= temp->num_values)
+    temp->num_values = element + 1;
 
   return (temp->values + element);
 }
