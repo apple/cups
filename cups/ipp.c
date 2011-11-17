@@ -2716,8 +2716,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, ipp->prev=%p",
 	                  ipp->current, ipp->prev));
 
-	    attr->num_values = 0;
-	    value            = attr->values;
+	    value = attr->values;
 	  }
 	  else if (tag != IPP_TAG_END_COLLECTION)
 	  {
@@ -2749,8 +2748,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    DEBUG_printf(("2ippReadIO: name=\"%s\", ipp->current=%p, "
 	                  "ipp->prev=%p", buffer, ipp->current, ipp->prev));
 
-	    attr->num_values = 0;
-	    value            = attr->values;
+	    value = attr->values;
 	  }
 	  else
 	  {
