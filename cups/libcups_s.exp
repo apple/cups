@@ -57,6 +57,8 @@ _ppdGetLanguages
 _ppdHashName
 _ppdLocalizedAttr
 _ppdNormalizeMakeAndModel
+_ppdOpen
+_ppdOpenFile
 _ppdParseOptions
 _pwgCreateWithFile
 _pwgDestroy

@@ -2840,7 +2840,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     snprintf(srcfile, sizeof(srcfile), "%s/ppd/%s.ppd", ServerRoot,
 	     printer->name);
-    if ((ppd = ppdOpenFile(srcfile)) != NULL)
+    if ((ppd = _ppdOpenFile(srcfile, _PPD_LOCALIZATION_NONE)) != NULL)
     {
       for (ppdattr = ppdFindAttr(ppd, "cupsPortMonitor", NULL);
 	   ppdattr;
@@ -3153,7 +3153,7 @@ apple_register_profiles(
   */
 
   snprintf(ppdfile, sizeof(ppdfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
-  if ((ppd = ppdOpenFile(ppdfile)) == NULL)
+  if ((ppd = _ppdOpenFile(ppdfile, _PPD_LOCALIZATION_ICC_PROFILES)) == NULL)
     return;
 
  /*
@@ -5491,11 +5491,22 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   }
 
  /*
+  * Open the source file for a copy...
+  */
+
+  if ((src = cupsFileOpen(tempfile, "rb")) == NULL)
+  {
+    unlink(tempfile);
+    return (-1);
+  }
+
+ /*
   * Read the source file and see what page sizes are supported...
   */
 
-  if ((ppd = ppdOpenFile(tempfile)) == NULL)
+  if ((ppd = _ppdOpen(src, _PPD_LOCALIZATION_NONE)) == NULL)
   {
+    cupsFileClose(src);
     unlink(tempfile);
     return (-1);
   }
@@ -5563,17 +5574,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   ppdClose(ppd);
 
  /*
-  * Open the source file for a copy...
-  */
-
-  if ((src = cupsFileOpen(tempfile, "rb")) == NULL)
-  {
-    cupsFreeOptions(num_defaults, defaults);
-    unlink(tempfile);
-    return (-1);
-  }
-
- /*
   * Open the destination file for a copy...
   */
 
@@ -5588,6 +5588,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
  /*
   * Copy the source file to the destination...
   */
+
+  cupsFileRewind(src);
 
   while (cupsFileGets(src, buffer, sizeof(buffer)))
   {
