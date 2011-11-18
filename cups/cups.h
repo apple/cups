@@ -30,6 +30,10 @@
 typedef off_t ssize_t;			/* @private@ */
 #  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
+#  ifdef __BLOCKS__
+#    include <dispatch/dispatch.h>
+#  endif /* __BLOCKS__ */
+
 #  include "file.h"
 #  include "ipp.h"
 #  include "language.h"
@@ -111,22 +115,6 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */
 };
 
-typedef const char *(*cups_password_cb_t)(const char *prompt);
-					/**** Password callback ****/
-
-typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
-					   const char *method,
-					   const char *resource,
-					   void *user_data);
-					/**** New password callback @since CUPS 1.4/Mac OS X 10.6@ ****/
-
-typedef void (*cups_device_cb_t)(const char *device_class,
-                                 const char *device_id, const char *device_info,
-                                 const char *device_make_and_model,
-                                 const char *device_uri,
-				 const char *device_location, void *user_data);
-					/**** Device callback @since CUPS 1.4/Mac OS X 10.6@ ****/
-
 typedef struct cups_option_s		/**** Printer Options ****/
 {
   char		*name;			/* Name of option */
@@ -161,6 +149,32 @@ typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls,
 				     cups_array_t *distinguished_names,
 				     void *user_data);
 					/**** Client credentials callback @since CUPS 1.5/Mac OS X 10.7@ ****/
+
+typedef int (*cups_dest_cb_t)(void *user_data, const char *name, const char *instance,
+			      int num_options, cups_option_t *options);
+			      		/**** Destination enumeration callback @since CUPS 1.6@ ****/
+
+#  ifdef __BLOCKS__
+typedef int (^cups_dest_block_t)(const char *name, const char *instance, int num_options,
+			         cups_option_t *options);
+			      		/**** Destination enumeration block @since CUPS 1.6@ ****/
+#  endif /* __BLOCKS__ */
+
+typedef void (*cups_device_cb_t)(const char *device_class,
+                                 const char *device_id, const char *device_info,
+                                 const char *device_make_and_model,
+                                 const char *device_uri,
+				 const char *device_location, void *user_data);
+					/**** Device callback @since CUPS 1.4/Mac OS X 10.6@ ****/
+
+typedef const char *(*cups_password_cb_t)(const char *prompt);
+					/**** Password callback ****/
+
+typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
+					   const char *method,
+					   const char *resource,
+					   void *user_data);
+					/**** New password callback @since CUPS 1.4/Mac OS X 10.6@ ****/
 
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls,
 				     cups_array_t *certs, void *user_data);
@@ -321,6 +335,12 @@ extern int		cupsSetCredentials(cups_array_t *certs) _CUPS_API_1_5;
 extern void		cupsSetServerCertCB(cups_server_cert_cb_t cb,
 					    void *user_data) _CUPS_API_1_5;
 
+/**** New in CUPS 1.6 ****/
+extern http_t		*cupsConnectDest(cups_dest_t *dest);
+extern int		cupsEnumDests(cups_dest_cb_t cb, void *user_data) _CUPS_API_1_6;
+#  ifdef __BLOCKS__
+extern int		cupsEnumDestsBlock(cups_dest_block_t block) _CUPS_API_1_6;
+#  endif /* __BLOCKS__ */
 
 #  ifdef __cplusplus
 }

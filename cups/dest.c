@@ -16,46 +16,80 @@
  *
  * Contents:
  *
- *   cupsAddDest()                  - Add a destination to the list of
- *                                    destinations.
+ *   cupsdDeregisterPrinter() - Stop sending broadcast information for a local
+ *				printer and remove any pending references to
+ *				remote printers.
+ *   cupsdRegisterPrinter()   - Start sending broadcast information for a
+ *				printer or update the broadcast contents.
+ *   cupsdStartBrowsing()     - Start sending and receiving broadcast
+ *				information.
+ *   cupsdStopBrowsing()      - Stop sending and receiving broadcast
+ *				information.
+ *   cupsdUpdateDNSSDName()   - Update the computer name we use for browsing...
+ *   dequote()		      - Remote quotes from a string.
+ *   dnssdAddAlias()	      - Add a DNS-SD alias name.
+ *   dnssdBuildTxtRecord()    - Build a TXT record from printer info.
+ *   dnssdComparePrinters()   - Compare the registered names of two printers.
+ *   dnssdDeregisterPrinter() - Stop sending broadcast information for a
+ *				printer.
+ *   dnssdPackTxtRecord()     - Pack an array of key/value pairs into the TXT
+ *				record format.
+ *   dnssdRegisterCallback()  - DNSServiceRegister callback.
+ *   dnssdRegisterPrinter()   - Start sending broadcast information for a
+ *				printer or update the broadcast contents.
+ *   dnssdStop()	      - Stop all DNS-SD registrations.
+ *   dnssdUpdate()	      - Handle DNS-SD queries.
+ *   get_auth_info_required() - Get the auth-info-required value to advertise.
+ *   get_hostconfig()	      - Get an /etc/hostconfig service setting.
+ *   update_lpd()	      - Update the LPD configuration as needed.
+ *   update_smb()	      - Update the SMB configuration as needed.
+ *   cupsAddDest()		    - Add a destination to the list of
+ *				      destinations.
  *   _cupsAppleCopyDefaultPaperID() - Get the default paper ID.
  *   _cupsAppleCopyDefaultPrinter() - Get the default printer at this location.
  *   _cupsAppleGetUseLastPrinter()  - Get whether to use the last used printer.
  *   _cupsAppleSetDefaultPaperID()  - Set the default paper id.
- *   _cupsAppleSetDefaultPrinter()  - Set the default printer for this location.
+ *   _cupsAppleSetDefaultPrinter()  - Set the default printer for this
+ *				      location.
  *   _cupsAppleSetUseLastPrinter()  - Set whether to use the last used printer.
- *   cupsFreeDests()                - Free the memory used by the list of
- *                                    destinations.
- *   cupsGetDest()                  - Get the named destination from the list.
- *   _cupsGetDests()                - Get destinations from a server.
- *   cupsGetDests()                 - Get the list of destinations from the
- *                                    default server.
- *   cupsGetDests2()                - Get the list of destinations from the
- *                                    specified server.
- *   cupsGetNamedDest()             - Get options for the named destination.
- *   cupsRemoveDest()               - Remove a destination from the destination
- *                                    list.
- *   cupsSetDefaultDest()           - Set the default destination.
- *   cupsSetDests()                 - Save the list of destinations for the
- *                                    default server.
- *   cupsSetDests2()                - Save the list of destinations for the
- *                                    specified server.
- *   _cupsUserDefault()             - Get the user default printer from
- *                                    environment variables and location
- *                                    information.
- *   appleCopyLocations()           - Copy the location history array.
- *   appleCopyNetwork()             - Get the network ID for the current
- *                                    location.
- *   appleGetPaperSize()            - Get the default paper size.
- *   appleGetPrinter()              - Get a printer from the history array.
- *   cups_add_dest()                - Add a destination to the array.
- *   cups_compare_dests()           - Compare two destinations.
- *   cups_find_dest()               - Find a destination using a binary search.
- *   cups_get_default()             - Get the default destination from an
- *                                    lpoptions file.
- *   cups_get_dests()               - Get destinations from a file.
- *   cups_make_string()             - Make a comma-separated string of values
- *                                    from an IPP attribute.
+ *   cupsConnectDest()		    - Connect to the server for a destination.
+ *   cupsEnumDests()		    - Enumerate available destinations with a
+ *				      callback function.
+ *   cupsEnumDestsBlock()	    - Enumerate available destinations with a
+ *				      block.
+ *   cupsFreeDests()		    - Free the memory used by the list of
+ *				      destinations.
+ *   cupsGetDest()		    - Get the named destination from the list.
+ *   _cupsGetDests()		    - Get destinations from a server.
+ *   cupsGetDests()		    - Get the list of destinations from the
+ *				      default server.
+ *   cupsGetDests2()		    - Get the list of destinations from the
+ *				      specified server.
+ *   cupsGetNamedDest() 	    - Get options for the named destination.
+ *   cupsRemoveDest()		    - Remove a destination from the destination
+ *				      list.
+ *   cupsSetDefaultDest()	    - Set the default destination.
+ *   cupsSetDests()		    - Save the list of destinations for the
+ *				      default server.
+ *   cupsSetDests2()		    - Save the list of destinations for the
+ *				      specified server.
+ *   _cupsUserDefault() 	    - Get the user default printer from
+ *				      environment variables and location
+ *				      information.
+ *   appleCopyLocations()	    - Copy the location history array.
+ *   appleCopyNetwork() 	    - Get the network ID for the current
+ *				      location.
+ *   appleGetPaperSize()	    - Get the default paper size.
+ *   appleGetPrinter()		    - Get a printer from the history array.
+ *   cups_add_dest()		    - Add a destination to the array.
+ *   cups_block_cb()		    - Enumeration callback for block API.
+ *   cups_compare_dests()	    - Compare two destinations.
+ *   cups_find_dest()		    - Find a destination using a binary search.
+ *   cups_get_default() 	    - Get the default destination from an
+ *				      lpoptions file.
+ *   cups_get_dests()		    - Get destinations from a file.
+ *   cups_make_string() 	    - Make a comma-separated string of values
+ *				      from an IPP attribute.
  */
 
 /*
@@ -85,25 +119,30 @@
  */
 
 #ifdef __APPLE__
-static CFArrayRef appleCopyLocations(void);
-static CFStringRef appleCopyNetwork(void);
-static char	*appleGetPaperSize(char *name, int namesize);
-static CFStringRef appleGetPrinter(CFArrayRef locations, CFStringRef network,
-		                   CFIndex *locindex);
+static CFArrayRef	appleCopyLocations(void);
+static CFStringRef	appleCopyNetwork(void);
+static char		*appleGetPaperSize(char *name, int namesize);
+static CFStringRef	appleGetPrinter(CFArrayRef locations, CFStringRef network,
+					CFIndex *locindex);
 #endif /* __APPLE__ */
-static cups_dest_t *cups_add_dest(const char *name, const char *instance,
-		                  int *num_dests, cups_dest_t **dests);
-static int	cups_compare_dests(cups_dest_t *a, cups_dest_t *b);
-static int	cups_find_dest(const char *name, const char *instance,
-			       int num_dests, cups_dest_t *dests, int prev,
-			       int *rdiff);
-static char	*cups_get_default(const char *filename, char *namebuf,
-				  size_t namesize, const char **instance);
-static int	cups_get_dests(const char *filename, const char *match_name,
-		               const char *match_inst, int user_default_set,
-			       int num_dests, cups_dest_t **dests);
-static char	*cups_make_string(ipp_attribute_t *attr, char *buffer,
-		                  size_t bufsize);
+static cups_dest_t	*cups_add_dest(const char *name, const char *instance,
+				       int *num_dests, cups_dest_t **dests);
+#ifdef __BLOCKS__
+static int		cups_block_cb(cups_dest_block_t block, const char *name,
+				      const char *instance, int num_options,
+				      cups_option_t *options);
+#endif /* __BLOCKS__ */
+static int		cups_compare_dests(cups_dest_t *a, cups_dest_t *b);
+static int		cups_find_dest(const char *name, const char *instance,
+				       int num_dests, cups_dest_t *dests, int prev,
+				       int *rdiff);
+static char		*cups_get_default(const char *filename, char *namebuf,
+					  size_t namesize, const char **instance);
+static int		cups_get_dests(const char *filename, const char *match_name,
+			               const char *match_inst, int user_default_set,
+				       int num_dests, cups_dest_t **dests);
+static char		*cups_make_string(ipp_attribute_t *attr, char *buffer,
+			                  size_t bufsize);
 
 
 /*
@@ -416,6 +455,65 @@ _cupsAppleSetUseLastPrinter(
   notify_post("com.apple.printerPrefsChange");
 }
 #endif /* __APPLE__ */
+
+
+/*
+ * 'cupsConnectDest()' - Connect to the server for a destination.
+ *
+ * @since CUPS 1.6@
+ */
+
+http_t *				/* O - Connection to server or @code NULL@ */
+cupsConnectDest(cups_dest_t *dest)	/* I - Destination */
+{
+  return (NULL);
+}
+
+
+/*
+ * 'cupsEnumDests()' - Enumerate available destinations with a callback function.
+ *
+ * Destinations are enumerated from one or more sources. The callback function receives
+ * the @code user_data@ pointer, destination name, instance, number of options, and
+ * options which can be used as input to the @link cupsAddDest@ function.  The function
+ * must return 1 to continue enumeration or 0 to stop.
+ *
+ * Enumeration happens on the current thread and does not return until all destinations
+ * have been enumerated or the callback function returns 0.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsEnumDests(cups_dest_cb_t cb,	/* I - Callback function */
+              void           *user_data)/* I - User data */
+{
+  return (0);
+}
+
+
+#  ifdef __BLOCKS__
+/*
+ * 'cupsEnumDestsBlock()' - Enumerate available destinations with a block.
+ *
+ * Destinations are enumerated from one or more sources. The block receives the
+ * destination name, instance, number of options, and options which can be used as input
+ * to the @link cupsAddDest@ function.  The block must return 1 to continue enumeration or
+ * 0 to stop.
+ *
+ * Enumeration happens on the current thread and does not return until all destinations
+ * have been enumerated or the block returns 0.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsEnumDestsBlock(
+    cups_dest_block_t block)		/* I - Block */
+{
+  return (cupsEnumDests((cups_dest_cb_t)cups_block_cb, (void *)block));
+}
+#  endif /* __BLOCKS__ */
 
 
 /*
@@ -1729,6 +1827,24 @@ cups_add_dest(const char  *name,	/* I  - Name of destination */
 
   return (dest);
 }
+
+
+#  ifdef __BLOCKS__
+/*
+ * 'cups_block_cb()' - Enumeration callback for block API.
+ */
+
+static int				/* O - 1 to continue, 0 to stop */
+cups_block_cb(
+    cups_dest_block_t block,		/* I - Block */
+    const char        *name,		/* I - Destination name */
+    const char        *instance,	/* I - Instance or @code NULL@ */
+    int               num_options,	/* I - Number of options */
+    cups_option_t     *options)		/* I - Options */
+{
+  return ((block)(name, instance, num_options, options));
+}
+#  endif /* __BLOCKS__ */
 
 
 /*
