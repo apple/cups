@@ -178,7 +178,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fputs("ppdOpenFile(test.ppd): ", stdout);
 
-    if ((ppd = ppdOpenFile("test.ppd")) != NULL)
+    if ((ppd = _ppdOpenFile("test.ppd", _PPD_LOCALIZATION_ALL)) != NULL)
       puts("PASS");
     else
     {

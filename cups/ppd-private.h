@@ -56,6 +56,14 @@ extern "C" {
  * Types and structures...
  */
 
+typedef enum _ppd_localization_e	/**** Selector for _ppdOpen ****/
+{
+  _PPD_LOCALIZATION_DEFAULT,		/* Load only the default localization */
+  _PPD_LOCALIZATION_ICC_PROFILES,	/* Load only the color profile localization */
+  _PPD_LOCALIZATION_NONE,		/* Load no localizations */
+  _PPD_LOCALIZATION_ALL			/* Load all localizations */
+} _ppd_localization_t;
+
 typedef enum _ppd_parse_e		/**** Selector for _ppdParseOptions ****/
 {
   _PPD_PARSE_OPTIONS,			/* Parse only the options */
@@ -163,6 +171,10 @@ extern ppd_attr_t	*_ppdLocalizedAttr(ppd_file_t *ppd, const char *keyword,
 extern char		*_ppdNormalizeMakeAndModel(const char *make_and_model,
 			                           char *buffer,
 						   size_t bufsize);
+extern ppd_file_t	*_ppdOpen(cups_file_t *fp,
+				  _ppd_localization_t localization);
+extern ppd_file_t	*_ppdOpenFile(const char *filename,
+				      _ppd_localization_t localization);
 extern int		_ppdParseOptions(const char *s, int num_options,
 			                 cups_option_t **options,
 					 _ppd_parse_t which);

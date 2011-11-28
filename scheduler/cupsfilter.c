@@ -659,7 +659,7 @@ add_printer_filters(
   mime_type_t	*printer_type;		/* Printer filter type */
 
 
-  if ((ppd = ppdOpenFile(ppdfile)) == NULL)
+  if ((ppd = _ppdOpenFile(ppdfile, _PPD_LOCALIZATION_NONE)) == NULL)
   {
     ppd_status_t	status;		/* PPD load status */
     int			linenum;	/* Line number */

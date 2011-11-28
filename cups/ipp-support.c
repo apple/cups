@@ -1036,6 +1036,7 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 {
   char			*bufptr,	/* Position in buffer */
 			*bufend,	/* End of buffer */
+			prefix = '{',	/* Prefix character */
 			temp[256];	/* Temporary string */
   ipp_attribute_t	*attr;		/* Current member attribute */
 
@@ -1043,14 +1044,15 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
-  if (buffer && bufptr < bufend)
-    *bufptr = '{';
-  bufptr ++;
-
   for (attr = col->attrs; attr; attr = attr->next)
   {
     if (!attr->name)
       continue;
+
+    if (buffer && bufptr < bufend)
+      *bufptr = prefix;
+    bufptr ++;
+    prefix = ' ';
 
     if (buffer && bufptr < bufend)
       bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
@@ -1061,6 +1063,13 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
       bufptr += ippAttributeString(attr, bufptr, bufend - bufptr + 1);
     else
       bufptr += ippAttributeString(attr, temp, sizeof(temp));
+  }
+
+  if (prefix == '{')
+  {
+    if (buffer && bufptr < bufend)
+      *bufptr = prefix;
+    bufptr ++;
   }
 
   if (buffer && bufptr < bufend)

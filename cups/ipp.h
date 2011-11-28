@@ -450,34 +450,42 @@ extern const char	*ippTagString(ipp_tag_t tag) _CUPS_API_1_4;
 extern ipp_tag_t	ippTagValue(const char *name) _CUPS_API_1_4;
 
 /**** New in CUPS 1.6 ****/
-extern ipp_attribute_t	*ippAddOutOfBand(ipp_t *ipp, ipp_tag_t group, ipp_tag_t value_tag,
-			                 const char *name);
+extern ipp_attribute_t	*ippAddOutOfBand(ipp_t *ipp, ipp_tag_t group,
+			                 ipp_tag_t value_tag, const char *name)
+			                 _CUPS_API_1_6;
 extern size_t		ippAttributeString(ipp_attribute_t *attr, char *buffer,
 			                   size_t bufsize) _CUPS_API_1_6;
 extern ipp_attribute_t	*ippCopyAttribute(ipp_t *dst, ipp_attribute_t *attr,
 			                 int quickcopy) _CUPS_API_1_6;
 extern int		ippCopyAttributes(ipp_t *dst, ipp_t *src,
-			                  int quickcopy, ipp_copycb_t cb, void *context)
-			                  _CUPS_API_1_6;
-extern int		ippDeleteValues(ipp_t *ipp, ipp_attribute_t *attr, int element,
-			                int count) _CUPS_API_1_6;
-extern const char	*ippEnumString(const char *attrname, int enumvalue) _CUPS_API_1_6;
-extern int		ippEnumValue(const char *attrname, const char *enumstring)
-			             _CUPS_API_1_6;
+			                  int quickcopy, ipp_copycb_t cb,
+			                  void *context) _CUPS_API_1_6;
+extern int		ippDeleteValues(ipp_t *ipp, ipp_attribute_t **attr,
+			                int element, int count) _CUPS_API_1_6;
+extern const char	*ippEnumString(const char *attrname, int enumvalue)
+			               _CUPS_API_1_6;
+extern int		ippEnumValue(const char *attrname,
+			             const char *enumstring) _CUPS_API_1_6;
 extern ipp_attribute_t	*ippFirstAttribute(ipp_t *ipp) _CUPS_API_1_6;
 extern int		ippGetBoolean(ipp_attribute_t *attr, int element)
 			              _CUPS_API_1_6;
 extern ipp_t		*ippGetCollection(ipp_attribute_t *attr,
 			                  int element) _CUPS_API_1_6;
 extern int		ippGetCount(ipp_attribute_t *attr) _CUPS_API_1_6;
+extern const ipp_uchar_t *ippGetDate(ipp_attribute_t *attr, int element)
+			             _CUPS_API_1_6;
 extern ipp_tag_t	ippGetGroupTag(ipp_attribute_t *attr) _CUPS_API_1_6;
 extern int		ippGetInteger(ipp_attribute_t *attr, int element)
 			              _CUPS_API_1_6;
 extern const char	*ippGetName(ipp_attribute_t *attr) _CUPS_API_1_6;
 extern ipp_op_t		ippGetOperation(ipp_t *ipp) _CUPS_API_1_6;
+extern int		ippGetRange(ipp_attribute_t *attr, int element,
+			            int *upper) _CUPS_API_1_6;
 extern int		ippGetRequestId(ipp_t *ipp) _CUPS_API_1_6;
 extern int		ippGetResolution(ipp_attribute_t *attr, int element,
-			                 int *yres, ipp_res_t *units) _CUPS_API_1_6;
+			                 int *yres, ipp_res_t *units)
+			                 _CUPS_API_1_6;
+extern ipp_state_t	ippGetState(ipp_t *ipp) _CUPS_API_1_6;
 extern ipp_status_t	ippGetStatusCode(ipp_t *ipp) _CUPS_API_1_6;
 extern const char	*ippGetString(ipp_attribute_t *attr, int element,
 				      const char **language) _CUPS_API_1_6;
@@ -487,27 +495,38 @@ extern ipp_attribute_t	*ippNextAttribute(ipp_t *ipp) _CUPS_API_1_6;
 extern int		ippSetBoolean(ipp_t *ipp, ipp_attribute_t **attr,
 			              int element, int boolvalue) _CUPS_API_1_6;
 extern int		ippSetCollection(ipp_t *ipp, ipp_attribute_t **attr,
-			                 int element, ipp_t *colvalue) _CUPS_API_1_6;
+			                 int element, ipp_t *colvalue)
+			                 _CUPS_API_1_6;
+extern int		ippSetDate(ipp_t *ipp, ipp_attribute_t **attr,
+			            int element, const ipp_uchar_t *datevalue)
+				    _CUPS_API_1_6;
 extern int		ippSetGroupTag(ipp_t *ipp, ipp_attribute_t **attr,
 			               ipp_tag_t group_tag) _CUPS_API_1_6;
 extern int		ippSetInteger(ipp_t *ipp, ipp_attribute_t **attr,
 			              int element, int intvalue) _CUPS_API_1_6;
-extern int		ippSetName(ipp_t *ipp, ipp_attribute_t **attr, const char *name)
-			           _CUPS_API_1_6;
+extern int		ippSetName(ipp_t *ipp, ipp_attribute_t **attr,
+			            const char *name) _CUPS_API_1_6;
 extern int		ippSetOperation(ipp_t *ipp, ipp_op_t op) _CUPS_API_1_6;
-extern int		ippSetRange(ipp_t *ipp, ipp_attribute_t **attr, int element,
-			            int lowervalue, int uppervalue) _CUPS_API_1_6;
+extern int		ippSetRange(ipp_t *ipp, ipp_attribute_t **attr,
+			            int element, int lowervalue, int uppervalue)
+			            _CUPS_API_1_6;
 extern int		ippSetRequestId(ipp_t *ipp, int request_id)
 			                _CUPS_API_1_6;
 extern int		ippSetResolution(ipp_t *ipp, ipp_attribute_t **attr,
 			                 int element, ipp_res_t unitsvalue,
-			                 int xresvalue, int yresvalue) _CUPS_API_1_6;
-extern int		ippSetStatusCode(ipp_t *ipp, ipp_status_t status) _CUPS_API_1_6;
+			                 int xresvalue, int yresvalue)
+			                 _CUPS_API_1_6;
+extern int		ippSetState(ipp_t *ipp, ipp_state_t state)
+			            _CUPS_API_1_6;
+extern int		ippSetStatusCode(ipp_t *ipp, ipp_status_t status)
+			                 _CUPS_API_1_6;
 extern int		ippSetString(ipp_t *ipp, ipp_attribute_t **attr,
-			             int element, const char *strvalue) _CUPS_API_1_6;
+			             int element, const char *strvalue)
+			             _CUPS_API_1_6;
 extern int		ippSetValueTag(ipp_t *ipp, ipp_attribute_t **attr,
 			               ipp_tag_t value_tag) _CUPS_API_1_6;
-extern int		ippSetVersion(ipp_t *ipp, int major, int minor) _CUPS_API_1_6;
+extern int		ippSetVersion(ipp_t *ipp, int major, int minor)
+			              _CUPS_API_1_6;
 
 
 /*

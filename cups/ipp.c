@@ -39,16 +39,18 @@
  *   ippDelete()	    - Delete an IPP message.
  *   ippDeleteAttribute()   - Delete a single attribute in an IPP message.
  *   ippDeleteValues()	    - Delete values in an attribute.
- *   ippFindAttribute()     - Find a named attribute in a request...
- *   ippFindNextAttribute() - Find the next named attribute in a request...
+ *   ippFindAttribute()     - Find a named attribute in a request.
+ *   ippFindNextAttribute() - Find the next named attribute in a request.
  *   ippFirstAttribute()    - Return the first attribute in the message.
  *   ippGetBoolean()	    - Get a boolean value for an attribute.
  *   ippGetCollection()     - Get a collection value for an attribute.
  *   ippGetCount()	    - Get the number of values in an attribute.
+ *   ippGetDate()           - Get a date value for an attribute.
  *   ippGetGroupTag()	    - Get the group associated with an attribute.
  *   ippGetInteger()	    - Get the integer/enum value for an attribute.
  *   ippGetName()	    - Get the attribute name.
  *   ippGetOperation()	    - Get the operation ID in an IPP message.
+ *   ippGetRange()          - Get a rangeOfInteger value from an attribute.
  *   ippGetRequestId()	    - Get the request ID from an IPP message.
  *   ippGetResolution()     - Get a resolution value for an attribute.
  *   ippGetStatusCode()     - Get the status code from an IPP response or event
@@ -68,6 +70,7 @@
  *   ippReadIO()	    - Read data for an IPP message.
  *   ippSetBoolean()	    - Set a boolean value in an attribute.
  *   ippSetCollection()     - Set a collection value in an attribute.
+ *   ippSetDate()           - Set a date value in an attribute.
  *   ippSetGroupTag()	    - Set the group tag of an attribute.
  *   ippSetInteger()	    - Set an integer or enum value in an attribute.
  *   ippSetName()	    - Set the name of an attribute.
@@ -75,6 +78,7 @@
  *   ippSetRange()	    - Set a rangeOfInteger value in an attribute.
  *   ippSetRequestId()	    - Set the request ID in an IPP message.
  *   ippSetResolution()     - Set a resolution value in an attribute.
+ *   ippSetState()          - Set the current state of the IPP message.
  *   ippSetStatusCode()     - Set the status code in an IPP response or event
  *			      message.
  *   ippSetString()	    - Set a string value in an attribute.
@@ -280,7 +284,8 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
 
   attr->values[0].collection = value;
 
-  value->use ++;
+  if (value)
+    value->use ++;
 
   return (attr);
 }
@@ -1614,36 +1619,40 @@ ippDeleteAttribute(
 /*
  * 'ippDeleteValues()' - Delete values in an attribute.
  *
- * The @code element@ parameter specifies the first value to delete, starting at 0. It
- * must be less than the number of values returned by @link ippGetCount@.
+ * The @code element@ parameter specifies the first value to delete, starting at
+ * 0. It must be less than the number of values returned by @link ippGetCount@.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
  *
  * Deleting all values in an attribute deletes the attribute.
  *
  * @since CUPS 1.6@
  */
 
-int					/* O - 1 on success, 0 on failure */
+int					/* O  - 1 on success, 0 on failure */
 ippDeleteValues(
-    ipp_t           *ipp,		/* I - IPP message */
-    ipp_attribute_t *attr,		/* I - Attribute */
-    int             element,		/* I - Index of first value to delete (0-based) */
-    int             count)		/* I - Number of values to delete */
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - Attribute */
+    int             element,		/* I  - Index of first value to delete (0-based) */
+    int             count)		/* I  - Number of values to delete */
 {
  /*
   * Range check input...
   */
 
-  if (!ipp || !attr || element < 0 || element >= attr->num_values || count <= 0 ||
-      (element + count) >= attr->num_values)
+  if (!ipp || !attr || !*attr ||
+      element < 0 || element >= (*attr)->num_values || count <= 0 ||
+      (element + count) >= (*attr)->num_values)
     return (0);
 
  /*
   * If we are deleting all values, just delete the attribute entirely.
   */
 
-  if (count == attr->num_values)
+  if (count == (*attr)->num_values)
   {
-    ippDeleteAttribute(ipp, attr);
+    ippDeleteAttribute(ipp, *attr);
+    *attr = NULL;
     return (1);
   }
 
@@ -1651,14 +1660,14 @@ ippDeleteValues(
   * Otherwise free the values in question and return.
   */
 
-  ipp_free_values(attr, element, count);
+  ipp_free_values(*attr, element, count);
 
   return (1);
 }
 
 
 /*
- * 'ippFindAttribute()' - Find a named attribute in a request...
+ * 'ippFindAttribute()' - Find a named attribute in a request.
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
@@ -1687,7 +1696,7 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP message */
 
 
 /*
- * 'ippFindNextAttribute()' - Find the next named attribute in a request...
+ * 'ippFindNextAttribute()' - Find the next named attribute in a request.
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
@@ -1849,6 +1858,35 @@ ippGetCount(ipp_attribute_t *attr)	/* I - IPP attribute */
 
 
 /*
+ * 'ippGetDate()' - Get a date value for an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+const ipp_uchar_t *			/* O - Date value or @code NULL@ */
+ippGetDate(ipp_attribute_t *attr,	/* I - IPP attribute */
+           int             element)	/* I - Value number (0-based) */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_DATE ||
+      element < 0 || element >= attr->num_values)
+    return (NULL);
+
+ /*
+  * Return the value...
+  */
+
+  return (attr->values[element].date);
+}
+
+
+/*
  * 'ippGetGroupTag()' - Get the group associated with an attribute.
  *
  * @since CUPS 1.6@
@@ -1950,6 +1988,44 @@ ippGetOperation(ipp_t *ipp)		/* I - IPP request message */
 
 
 /*
+ * 'ippGetRange()' - Get a rangeOfInteger value from an attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - Lower value of range or -1 */
+ippGetRange(ipp_attribute_t *attr,	/* I - IPP attribute */
+	    int             element,	/* I - Value number (0-based) */
+	    int             *uppervalue)/* O - Upper value of range */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_RANGE ||
+      element < 0 || element >= attr->num_values)
+  {
+    if (uppervalue)
+      *uppervalue = -1;
+
+    return (-1);
+  }
+
+ /*
+  * Return the values...
+  */
+
+  if (uppervalue)
+    *uppervalue = attr->values[element].range.upper;
+
+  return (attr->values[element].range.lower);
+}
+
+
+/*
  * 'ippGetRequestId()' - Get the request ID from an IPP message.
  *
  * @since CUPS 1.6@
@@ -2008,6 +2084,30 @@ ippGetResolution(
     *units = attr->values[element].resolution.units;
 
   return (attr->values[element].resolution.xres);
+}
+
+
+/*
+ * 'ippGetState()' - Get the IPP message state.
+ *
+ * @since CUPS 1.6@
+ */
+
+ipp_state_t				/* O - IPP message state value */
+ippGetState(ipp_t *ipp)			/* I - IPP message */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (IPP_IDLE);
+
+ /*
+  * Return the value...
+  */
+
+  return (ipp->state);
 }
 
 
@@ -2616,8 +2716,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, ipp->prev=%p",
 	                  ipp->current, ipp->prev));
 
-	    attr->num_values = 0;
-	    value            = attr->values;
+	    value = attr->values;
 	  }
 	  else if (tag != IPP_TAG_END_COLLECTION)
 	  {
@@ -2649,8 +2748,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    DEBUG_printf(("2ippReadIO: name=\"%s\", ipp->current=%p, "
 	                  "ipp->prev=%p", buffer, ipp->current, ipp->prev));
 
-	    attr->num_values = 0;
-	    value            = attr->values;
+	    value = attr->values;
 	  }
 	  else
 	  {
@@ -2998,8 +3096,6 @@ ippReadIO(void       *src,		/* I - Data source */
 	        break;
 	  }
 
-          attr->num_values ++;
-
 	 /*
           * If blocking is disabled, stop here...
 	  */
@@ -3038,7 +3134,7 @@ ippReadIO(void       *src,		/* I - Data source */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
+ippSetBoolean(ipp_t           *ipp,	/* IO - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element,	/* I  - Value number (0-based) */
               int             boolvalue)/* I  - Boolean value */
@@ -3081,7 +3177,7 @@ ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetCollection(
-    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_t           *ipp,		/* IO - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     int             element,		/* I  - Value number (0-based) */
     ipp_t           *colvalue)		/* I  - Collection value */
@@ -3115,6 +3211,48 @@ ippSetCollection(
 
 
 /*
+ * 'ippSetDate()' - Set a date value in an attribute.
+ *
+ * The @code ipp@ parameter refers to the IPP message containing the attribute that was
+ * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetDate(ipp_t             *ipp,	/* IO - IPP message */
+           ipp_attribute_t   **attr,	/* IO - IPP attribute */
+           int               element,	/* I  - Value number (0-based) */
+           const ipp_uchar_t *datevalue)/* I  - Date value */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_DATE ||
+      element < 0 || element > (*attr)->num_values || !datevalue)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+    memcpy(value->date, datevalue, sizeof(value->date));
+
+  return (value != NULL);
+}
+
+
+/*
  * 'ippSetGroupTag()' - Set the group tag of an attribute.
  *
  * The @code ipp@ parameter refers to the IPP message containing the attribute that was
@@ -3133,7 +3271,7 @@ ippSetCollection(
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetGroupTag(
-    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_t           *ipp,		/* IO - IPP message */
     ipp_attribute_t **attr,		/* IO - Attribute */
     ipp_tag_t       group_tag)		/* I  - Group tag */
 {
@@ -3170,7 +3308,7 @@ ippSetGroupTag(
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
+ippSetInteger(ipp_t           *ipp,	/* IO - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element,	/* I  - Value number (0-based) */
               int             intvalue)	/* I  - Integer/enum value */
@@ -3210,7 +3348,7 @@ ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetName(ipp_t           *ipp,	/* I  - IPP message */
+ippSetName(ipp_t           *ipp,	/* IO - IPP message */
 	   ipp_attribute_t **attr,	/* IO - IPP attribute */
 	   const char      *name)	/* I  - Attribute name */
 {
@@ -3285,7 +3423,7 @@ ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
+ippSetRange(ipp_t           *ipp,	/* IO - IPP message */
             ipp_attribute_t **attr,	/* IO - IPP attribute */
             int             element,	/* I  - Value number (0-based) */
 	    int             lowervalue,	/* I  - Lower bound for range */
@@ -3366,7 +3504,7 @@ ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetResolution(
-    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_t           *ipp,		/* IO - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     int             element,		/* I  - Value number (0-based) */
     ipp_res_t       unitsvalue,		/* I  - Resolution units */
@@ -3401,6 +3539,34 @@ ippSetResolution(
 
 
 /*
+ * 'ippSetState()' - Set the current state of the IPP message.
+ *
+ * @since CUPS 1.6@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+ippSetState(ipp_t       *ipp,		/* I - IPP message */
+            ipp_state_t state)		/* I - IPP state value */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!ipp)
+    return (0);
+
+ /*
+  * Set the state and return...
+  */
+
+  ipp->state   = state;
+  ipp->current = NULL;
+
+  return (1);
+}
+
+
+/*
  * 'ippSetStatusCode()' - Set the status code in an IPP response or event message.
  *
  * The @code ipp@ parameter refers to an IPP message previously created using the
@@ -3427,7 +3593,6 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
   ipp->request.status.status_code = status;
 
   return (1);
-
 }
 
 
@@ -3446,7 +3611,7 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetString(ipp_t           *ipp,	/* I  - IPP message */
+ippSetString(ipp_t           *ipp,	/* IO - IPP message */
              ipp_attribute_t **attr,	/* IO - IPP attribute */
              int             element,	/* I  - Value number (0-based) */
 	     const char      *strvalue)	/* I  - String value */
@@ -3514,7 +3679,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetValueTag(
-    ipp_t          *ipp,		/* I  - IPP message */
+    ipp_t          *ipp,		/* IO - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     ipp_tag_t       value_tag)		/* I  - Value tag */
 {
@@ -4702,7 +4867,7 @@ ipp_add_attr(ipp_t      *ipp,		/* I - IPP message */
   */
 
   if (num_values <= 1)
-    alloc_values = num_values;
+    alloc_values = 1;
   else
     alloc_values = (num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
 
@@ -5240,11 +5405,12 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
 
 
 /*
- * 'ipp_set_value()' - Get the value element from an attribute, expanding it as needed.
+ * 'ipp_set_value()' - Get the value element from an attribute, expanding it as
+ *                     needed.
  */
 
 static _ipp_value_t *			/* O  - IPP value element or NULL on error */
-ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
+ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element)	/* I  - Value number (0-based) */
 {
@@ -5261,16 +5427,22 @@ ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
   temp = *attr;
 
   if (temp->num_values <= 1)
-    alloc_values = temp->num_values;
+    alloc_values = 1;
   else
-    alloc_values = (temp->num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
+    alloc_values = (temp->num_values + IPP_MAX_VALUES - 1) &
+                   ~(IPP_MAX_VALUES - 1);
 
   if (element < alloc_values)
+  {
+    if (element >= temp->num_values)
+      temp->num_values = element + 1;
+
     return (temp->values + element);
+  }
 
  /*
-  * Otherwise re-allocate the attribute - we allocate in groups of IPP_MAX_VALUE values
-  * when num_values > 1.
+  * Otherwise re-allocate the attribute - we allocate in groups of IPP_MAX_VALUE
+  * values when num_values > 1.
   */
 
   if (alloc_values < IPP_MAX_VALUES)
@@ -5278,15 +5450,15 @@ ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
   else
     alloc_values += IPP_MAX_VALUES;
 
-  DEBUG_printf(("4ipp_set_value: Reallocating for up to %d values.", alloc_values));
+  DEBUG_printf(("4ipp_set_value: Reallocating for up to %d values.",
+                alloc_values));
 
  /*
   * Reallocate memory...
   */
 
   if ((temp = realloc(temp, sizeof(ipp_attribute_t) +
-			    (temp->num_values + IPP_MAX_VALUES - 1) *
-			    sizeof(_ipp_value_t))) == NULL)
+			    (alloc_values - 1) * sizeof(_ipp_value_t))) == NULL)
   {
     _cupsSetHTTPError(HTTP_ERROR);
     DEBUG_puts("4ipp_set_value: Unable to resize attribute.");
@@ -5331,7 +5503,8 @@ ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
 	*/
 
 	*attr = temp;
-	_cupsSetError(IPP_ERROR, _("IPP attribute is not a member of the message."), 1);
+	_cupsSetError(IPP_ERROR,
+	              _("IPP attribute is not a member of the message."), 1);
 	DEBUG_puts("4ipp_set_value: Unable to find attribute in message.");
 	return (NULL);
       }
@@ -5354,6 +5527,9 @@ ipp_set_value(ipp_t           *ipp,	/* I  - IPP message */
  /*
   * Return the value element...
   */
+
+  if (element >= temp->num_values)
+    temp->num_values = element + 1;
 
   return (temp->values + element);
 }
