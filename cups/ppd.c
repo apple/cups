@@ -681,7 +681,7 @@ _ppdOpen(
 
     if (localization != _PPD_LOCALIZATION_ALL &&
         (temp = strchr(keyword, '.')) != NULL &&
-        ((temp - keyword) == 3 || (temp - keyword) == 6) &&
+        ((temp - keyword) == 2 || (temp - keyword) == 5) &&
         _cups_isalpha(keyword[0]) &&
         _cups_isalpha(keyword[1]) &&
         (keyword[2] == '.' ||
