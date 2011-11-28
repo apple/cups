@@ -1604,7 +1604,8 @@ process_children(void)
 	    job->status = -status;	/* Backend failed */
 
 	  if (job->state_value == IPP_JOB_PROCESSING &&
-	      job->status_level > CUPSD_LOG_ERROR)
+	      job->status_level > CUPSD_LOG_ERROR &&
+	      (job->filters[i] || !WIFEXITED(status)))
 	  {
 	    char	message[1024];	/* New printer-state-message */
 
