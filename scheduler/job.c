@@ -4543,7 +4543,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       else
         ptr = message;
 
-      cupsdLogJob(job, loglevel, "%s", ptr);
+      if (*ptr)
+        cupsdLogJob(job, loglevel, "%s", ptr);
 
       if (loglevel < CUPSD_LOG_DEBUG &&
           strcmp(job->printer->state_message, ptr))
