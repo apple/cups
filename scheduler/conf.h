@@ -251,6 +251,14 @@ VAR char		*SystemGroupAuthKey	VALUE(NULL);
 					/* System group auth key */
 #endif /* HAVE_AUTHORIZATION_H */
 
+#ifdef HAVE_GSSAPI
+VAR char		*GSSServiceName		VALUE(NULL);
+					/* GSS service name */
+int			HaveServerCreds		VALUE(0);
+					/* Do we have server credentials? */
+gss_cred_id_t		ServerCreds;	/* Server's GSS credentials */
+#endif /* HAVE_GSSAPI */
+
 
 /*
  * Prototypes...
@@ -263,6 +271,7 @@ extern int	cupsdCheckPermissions(const char *filename,
 	 			      int user, int group, int is_dir,
 				      int create_dir);
 extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
+extern int	cupsdDefaultAuthType(void);
 extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
 extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result,

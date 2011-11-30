@@ -379,7 +379,23 @@ cupsdLogGSSMessage(
 		minor_status_string = GSS_C_EMPTY_BUFFER;
 					/* Minor status message */
   int		ret;			/* Return value */
+  char		buffer[8192];		/* Buffer for vsnprintf */
 
+
+  if (strchr(message, '%'))
+  {
+   /*
+    * Format the message string...
+    */
+
+    va_list	ap;			/* Pointer to arguments */
+
+    va_start(ap, message);
+    vsnprintf(buffer, sizeof(buffer), message, ap);
+    va_end(ap);
+
+    message = buffer;
+  }
 
   msg_ctx             = 0;
   err_major_status    = gss_display_status(&err_minor_status,

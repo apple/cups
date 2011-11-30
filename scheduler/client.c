@@ -187,8 +187,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     return;
   }
 
-  con->http.activity   = time(NULL);
   con->file            = -1;
+  con->http.activity   = time(NULL);
   con->http.hostaddr   = &(con->clientaddr);
   con->http.wait_value = 10000;
 
@@ -426,6 +426,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
     con->serverport = _httpAddrPort(&(lis->address));
   }
+
+ /*
+  * Add the connection to the array of active clients...
+  */
 
   cupsArrayAdd(Clients, con);
 
@@ -2626,7 +2630,7 @@ cupsdSendHeader(
     if (auth_type == CUPSD_AUTH_NONE)
     {
       if (!con->best || con->best->type <= CUPSD_AUTH_NONE)
-	auth_type = DefaultAuthType;
+	auth_type = cupsdDefaultAuthType();
       else
 	auth_type = con->best->type;
     }

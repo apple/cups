@@ -10608,7 +10608,7 @@ send_http_error(
       if (auth)
       {
         if (auth->type == CUPSD_AUTH_DEFAULT)
-	  auth_type = DefaultAuthType;
+	  auth_type = cupsdDefaultAuthType();
 	else
 	  auth_type = auth->type;
       }

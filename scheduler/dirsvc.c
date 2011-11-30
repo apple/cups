@@ -1141,7 +1141,7 @@ get_auth_info_required(
     int	auth_type;			/* Authentication type */
 
     if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
-      auth_type = DefaultAuthType;
+      auth_type = cupsdDefaultAuthType();
 
     switch (auth_type)
     {

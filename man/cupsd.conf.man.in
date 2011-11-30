@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "3 November 2011" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "30 November 2011" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -249,6 +249,11 @@ Group group-name-or-number
 .br
 Specifies the group name or ID that will be used when executing
 external programs.
+.TP 5
+GSSServiceName name
+.br
+Specifies the service name when using Kerberos authentication. The default
+service name is "@CUPS_DEFAULT_GSSSERVICENAME@".
 .TP 5
 HostNameLookups On
 .TP 5
