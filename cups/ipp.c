@@ -155,7 +155,7 @@ _cupsBufferGet(size_t size)		/* I - Size required */
   {
     if ((buffer = malloc(sizeof(_cups_buffer_t) + size - 1)) == NULL)
       return (NULL);
-  
+
     buffer->next     = cg->cups_buffers;
     buffer->size     = size;
     cg->cups_buffers = buffer;
@@ -2566,7 +2566,7 @@ ippReadIO(void       *src,		/* I - Data source */
               * Fail if the high bit is set in the tag...
               */
 
-	      _cupsSetError(IPP_ERROR, _("IPP extension tag larger than 0x7FFFFFFF."), 1);
+	      _cupsSetError(IPP_INTERNAL_ERROR, _("IPP extension tag larger than 0x7FFFFFFF."), 1);
 	      DEBUG_printf(("1ippReadIO: bad name length %d.", n));
 	      _cupsBufferRelease((char *)buffer);
 	      return (IPP_ERROR);
@@ -2620,7 +2620,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
           if (n >= IPP_BUF_SIZE)
 	  {
-	    _cupsSetError(IPP_ERROR, _("IPP name larger than 32767 bytes."), 1);
+	    _cupsSetError(IPP_INTERNAL_ERROR, _("IPP name larger than 32767 bytes."), 1);
 	    DEBUG_printf(("1ippReadIO: bad name length %d.", n));
 	    _cupsBufferRelease((char *)buffer);
 	    return (IPP_ERROR);
@@ -2637,7 +2637,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
             if (ipp->current == NULL)
 	    {
-	      _cupsSetError(IPP_ERROR, _("IPP attribute has no name."), 1);
+	      _cupsSetError(IPP_INTERNAL_ERROR, _("IPP attribute has no name."), 1);
 	      DEBUG_puts("1ippReadIO: Attribute without name and no current.");
 	      _cupsBufferRelease((char *)buffer);
 	      return (IPP_ERROR);
@@ -2673,7 +2673,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	          (tag < IPP_TAG_TEXT || tag > IPP_TAG_MIMETYPE) &&
 		  tag != IPP_TAG_NOVALUE)
 	      {
-		_cupsSetError(IPP_ERROR,
+		_cupsSetError(IPP_INTERNAL_ERROR,
 		              _("IPP 1setOf attribute with incompatible value "
 		                "tags."), 1);
 		DEBUG_printf(("1ippReadIO: 1setOf value tag %x(%s) != %x(%s)",
@@ -2700,7 +2700,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	      if (tag != IPP_TAG_INTEGER && tag != IPP_TAG_RANGE)
 	      {
-		_cupsSetError(IPP_ERROR,
+		_cupsSetError(IPP_INTERNAL_ERROR,
 		              _("IPP 1setOf attribute with incompatible value "
 		                "tags."), 1);
 		DEBUG_printf(("1ippReadIO: 1setOf value tag %x(%s) != %x(%s)",
@@ -2723,7 +2723,7 @@ ippReadIO(void       *src,		/* I - Data source */
             }
 	    else if (value_tag != tag)
 	    {
-	      _cupsSetError(IPP_ERROR,
+	      _cupsSetError(IPP_INTERNAL_ERROR,
 			    _("IPP 1setOf attribute with incompatible value "
 			      "tags."), 1);
 	      DEBUG_printf(("1ippReadIO: value tag %x(%s) != %x(%s)",
@@ -2751,7 +2751,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	    if (n)
 	    {
-	      _cupsSetError(IPP_ERROR, _("IPP member name is not empty."), 1);
+	      _cupsSetError(IPP_INTERNAL_ERROR, _("IPP member name is not empty."), 1);
 	      DEBUG_puts("1ippReadIO: member name not empty.");
 	      _cupsBufferRelease((char *)buffer);
 	      return (IPP_ERROR);
@@ -2817,7 +2817,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	  if (n >= IPP_BUF_SIZE)
 	  {
-	    _cupsSetError(IPP_ERROR,
+	    _cupsSetError(IPP_INTERNAL_ERROR,
 			  _("IPP value larger than 32767 bytes."), 1);
 	    DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 	    _cupsBufferRelease((char *)buffer);
@@ -2831,10 +2831,10 @@ ippReadIO(void       *src,		/* I - Data source */
 		if (n != 4)
 		{
 		  if (tag == IPP_TAG_INTEGER)
-		    _cupsSetError(IPP_ERROR,
+		    _cupsSetError(IPP_INTERNAL_ERROR,
 				  _("IPP integer value not 4 bytes."), 1);
 		  else
-		    _cupsSetError(IPP_ERROR,
+		    _cupsSetError(IPP_INTERNAL_ERROR,
 				  _("IPP enum value not 4 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -2860,7 +2860,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_BOOLEAN :
 		if (n != 1)
 		{
-		  _cupsSetError(IPP_ERROR, _("IPP boolean value not 1 byte."),
+		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP boolean value not 1 byte."),
 		                1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -2918,7 +2918,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_DATE :
 		if (n != 11)
 		{
-		  _cupsSetError(IPP_ERROR, _("IPP date value not 11 bytes."), 1);
+		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP date value not 11 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
@@ -2935,7 +2935,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_RESOLUTION :
 		if (n != 9)
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP resolution value not 9 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -2962,7 +2962,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_RANGE :
 		if (n != 8)
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP rangeOfInteger value not 8 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -2989,11 +2989,11 @@ ippReadIO(void       *src,		/* I - Data source */
 	        if (n < 4)
 		{
 		  if (tag == IPP_TAG_TEXTLANG)
-		    _cupsSetError(IPP_ERROR,
+		    _cupsSetError(IPP_INTERNAL_ERROR,
 		                  _("IPP textWithLanguage value less than "
 		                    "minimum 4 bytes."), 1);
 		  else
-		    _cupsSetError(IPP_ERROR,
+		    _cupsSetError(IPP_INTERNAL_ERROR,
 		                  _("IPP nameWithLanguage value less than "
 		                    "minimum 4 bytes."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
@@ -3026,7 +3026,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		if ((bufptr + 2 + n) >= (buffer + IPP_BUF_SIZE) ||
 		    n >= sizeof(string))
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP language length overflows value."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -3043,7 +3043,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 		if ((bufptr + 2 + n) >= (buffer + IPP_BUF_SIZE))
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP string length overflows value."), 1);
 		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
@@ -3063,7 +3063,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
                 if (n > 0)
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP begCollection value not 0 bytes."), 1);
 	          DEBUG_puts("1ippReadIO: begCollection tag with value length "
 		             "> 0.");
@@ -3084,7 +3084,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
                 if (n > 0)
 		{
-		  _cupsSetError(IPP_ERROR,
+		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP endCollection value not 0 bytes."), 1);
 	          DEBUG_puts("1ippReadIO: endCollection tag with value length "
 		             "> 0.");
@@ -5511,7 +5511,7 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
 	*/
 
 	*attr = temp;
-	_cupsSetError(IPP_ERROR,
+	_cupsSetError(IPP_INTERNAL_ERROR,
 	              _("IPP attribute is not a member of the message."), 1);
 	DEBUG_puts("4ipp_set_value: Unable to find attribute in message.");
 	return (NULL);

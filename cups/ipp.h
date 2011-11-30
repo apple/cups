@@ -130,6 +130,7 @@ typedef enum ipp_jstate_e		/**** Job states ****/
 
 typedef enum ipp_op_e			/**** IPP operations ****/
 {
+  IPP_OP_CUPS_INVALID = -1,		/* Invalid operation name for @link ippOpValue@ */
   IPP_PRINT_JOB = 0x0002,		/* Print a single file */
   IPP_PRINT_URI,			/* Print a single URL @private@ */
   IPP_VALIDATE_JOB,			/* Validate job options */
@@ -249,6 +250,7 @@ typedef enum ipp_state_e		/**** IPP states ****/
 
 typedef enum ipp_status_e		/**** IPP status codes ****/
 {
+  IPP_STATUS_CUPS_INVALID = -1,		/* Invalid status name for @link ippErrorValue@ */
   IPP_OK = 0x0000,			/* successful-ok */
   IPP_OK_SUBST,				/* successful-ok-ignored-or-substituted-attributes */
   IPP_OK_CONFLICT,			/* successful-ok-conflicting-attributes */
@@ -313,6 +315,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
 
 typedef enum ipp_tag_e			/**** Format tags for attributes ****/
 {
+  IPP_TAG_CUPS_INVALID = -1,		/* Invalid tag name for @link ippTagValue@ */
   IPP_TAG_ZERO = 0x00,			/* Zero tag - used for separators */
   IPP_TAG_OPERATION,			/* Operation group */
   IPP_TAG_JOB,				/* Job group */

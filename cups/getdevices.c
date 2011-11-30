@@ -3,7 +3,7 @@
  *
  *   cupsGetDevices implementation for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -258,7 +258,7 @@ cupsGetDevices(
   httpFlush(http);
 
   if (status == HTTP_ERROR)
-    _cupsSetError(IPP_ERROR, NULL, 0);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(http->error), 0);
   else
   {
     attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
