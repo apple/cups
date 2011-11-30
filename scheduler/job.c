@@ -4671,10 +4671,20 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
   if (job->state_value != IPP_JOB_PROCESSING &&
       job->status_level == CUPSD_LOG_INFO)
+  {
     cupsdSetString(&(job->printer_message->values[0].string.text), "");
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+  }
   else if (job->printer->state_message[0] && do_message)
+  {
     cupsdSetString(&(job->printer_message->values[0].string.text),
 		   job->printer->state_message);
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+  }
 
  /*
   * ... and the printer-state-reasons value...
@@ -4731,6 +4741,9 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
   for (i = 0; i < num_reasons; i ++)
     job->printer_reasons->values[i].string.text = _cupsStrAlloc(reasons[i]);
+
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
