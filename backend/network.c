@@ -71,7 +71,7 @@ backendNetworkSideCB(
 {
   cups_sc_command_t	command;	/* Request command */
   cups_sc_status_t	status;		/* Request/response status */
-  char			data[2048];	/* Request/response data */
+  char			data[65536];	/* Request/response data */
   int			datalen;	/* Request/response data size */
   const char		*device_id;	/* 1284DEVICEID env var */
 

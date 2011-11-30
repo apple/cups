@@ -1,6 +1,8 @@
 LIBRARY libcups2
 VERSION 2.9
 EXPORTS
+_cupsBufferGet
+_cupsBufferRelease
 _cupsGet1284Values
 _cupsGetDests
 _cupsGetPassword

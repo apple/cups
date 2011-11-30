@@ -1,8 +1,9 @@
-CHANGES.txt - 1.6b1 - 2011-11-03
+CHANGES.txt - 1.6b1 - 2011-11-29
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- cupsSideChannelSNMPGet/Walk now support OIDs and values up to 64k in length.
 	- CUPS no longer supports automatic remote printers or implicit classes
 	  via the CUPS, LDAP, or SLP protocols (STR #3922, STR #3923)
 	- The PPD APIs are now deprecated and will be removed in a future

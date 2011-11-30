@@ -50,6 +50,14 @@ extern "C" {
  * Types...
  */
 
+typedef struct _cups_buffer_s		/**** Read/write buffer ****/
+{
+  struct _cups_buffer_s	*next;		/* Next buffer in list */
+  size_t		size;		/* Size of buffer */
+  char			used,		/* Is this buffer used? */
+			d[1];		/* Data buffer */
+} _cups_buffer_t;
+
 typedef struct _cups_globals_s		/**** CUPS global state data ****/
 {
   /* Multiple places... */
@@ -95,7 +103,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
   /* ipp.c */
   ipp_uchar_t		ipp_date[11];	/* RFC-1903 date/time data */
-  _ipp_buffer_t		*ipp_buffers;	/* Buffer list */
+  _cups_buffer_t	*cups_buffers;	/* Buffer list */
 
   /* ipp-support.c */
   int			ipp_port;	/* IPP port number */
@@ -173,6 +181,9 @@ extern void		_cupsAppleSetDefaultPaperID(CFStringRef name);
 extern void		_cupsAppleSetDefaultPrinter(CFStringRef name);
 extern void		_cupsAppleSetUseLastPrinter(int uselast);
 #  endif /* __APPLE__ */
+
+extern char		*_cupsBufferGet(size_t size);
+extern void		_cupsBufferRelease(char *b);
 
 extern http_t		*_cupsConnect(void);
 extern int		_cupsGet1284Values(const char *device_id,
