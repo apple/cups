@@ -336,7 +336,7 @@ extern void		cupsSetServerCertCB(cups_server_cert_cb_t cb,
 					    void *user_data) _CUPS_API_1_5;
 
 /**** New in CUPS 1.6 ****/
-extern http_t		*cupsConnectDest(cups_dest_t *dest);
+extern http_t		*cupsConnectDest(cups_dest_t *dest) _CUPS_API_1_6;
 extern int		cupsEnumDests(cups_dest_cb_t cb, void *user_data) _CUPS_API_1_6;
 #  ifdef __BLOCKS__
 extern int		cupsEnumDestsBlock(cups_dest_block_t block) _CUPS_API_1_6;
