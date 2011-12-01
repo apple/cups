@@ -17,6 +17,7 @@
  *   cupsdAddAlias()          - Add a host alias.
  *   cupsdCheckPermissions()  - Fix the mode and ownership of a file or
  *                              directory.
+ *   cupsdDefaultAuthType()   - Get the default AuthType.
  *   cupsdFreeAliases()       - Free all of the alias entries.
  *   cupsdReadConfiguration() - Read the cupsd.conf file.
  *   get_address()            - Get an address + port number from a line.
