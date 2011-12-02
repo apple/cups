@@ -1116,7 +1116,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     copies_remaining = 1;
 
-    if (argc < 7 && !send_options)
+    if (argc < 7 && !_cups_strncasecmp(final_content_type, "image/", 6))
       copies = 1;
   }
   else
