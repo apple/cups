@@ -66,8 +66,10 @@
  * Local functions...
  */
 
+#ifdef HAVE_DNSSD
 static char	*get_auth_info_required(cupsd_printer_t *p, char *buffer,
 		                        size_t bufsize);
+#endif /* HAVE_DNSSD */
 #ifdef __APPLE__
 static int	get_hostconfig(const char *name);
 #endif /* __APPLE__ */
@@ -1082,7 +1084,6 @@ dnssdUpdate(void)
     dnssdStop();
   }
 }
-#endif /* HAVE_DNSSD */
 
 
 /*
@@ -1162,6 +1163,7 @@ get_auth_info_required(
 
   return ("none");
 }
+#endif /* HAVE_DNSSD */
 
 
 #ifdef __APPLE__

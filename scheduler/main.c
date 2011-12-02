@@ -120,7 +120,6 @@ main(int  argc,				/* I - Number of command-line args */
   cupsd_listener_t	*lis;		/* Current listener */
   time_t		current_time,	/* Current time */
 			activity,	/* Client activity timer */
-			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
 			report_time,	/* Malloc/client/job report time */
@@ -650,7 +649,6 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   current_time  = time(NULL);
-  browse_time   = current_time;
   event_time    = current_time;
   expire_time   = current_time;
   fds           = 1;
@@ -1877,11 +1875,9 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     }
 
  /*
-  * Adjust from absolute to relative time.  If p->browse_time above
-  * was 0 then we can end up with a negative value here, so check.
-  * We add 1 second to the timeout since events occur after the
-  * timeout expires, and limit the timeout to 86400 seconds (1 day)
-  * to avoid select() timeout limits present on some operating
+  * Adjust from absolute to relative time.  We add 1 second to the timeout since
+  * events occur after the timeout expires, and limit the timeout to 86400
+  * seconds (1 day) to avoid select() timeout limits present on some operating
   * systems...
   */
 
