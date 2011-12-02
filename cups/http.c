@@ -133,7 +133,7 @@
 #  include <sys/resource.h>
 #endif /* WIN32 */
 #ifdef HAVE_POLL
-#  include <sys/poll.h>
+#  include <poll.h>
 #endif /* HAVE_POLL */
 
 
