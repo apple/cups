@@ -1,8 +1,10 @@
-CHANGES.txt - 1.6b1 - 2011-11-30
+CHANGES.txt - 1.6b1 - 2011-12-02
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- The default password callback now supports passwords up to 127
+	  characters.
 	- The scheduler now supports a DefaultAuthType of "auto" to
 	  automatically choose between Basic (username/password) and Negotiate
 	  (Kerberos) authentication.

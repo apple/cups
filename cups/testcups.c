@@ -58,7 +58,19 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_job_t	*jobs;			/* Jobs for queue */
 
 
-  if (argc > 1)
+  if (argc == 2 && !strcmp(argv[1], "password"))
+  {
+    const char *pass = cupsGetPassword("Password:");
+					/* Password string */
+
+    if (pass)
+      printf("Password entered: %s\n", pass);
+    else
+      puts("No password entered.");
+
+    return (0);
+  }
+  else if (argc > 1)
   {
    /*
     * ./testcups printer file interval
