@@ -2284,6 +2284,7 @@ new_request(
       }
 
       if (doc_handling_sup &&
+          (!format || _cups_strncasecmp(format, "image/", 6)) &&
  	  (keyword = cupsGetOption("collate", num_options, options)) != NULL)
       {
         if (!_cups_strcasecmp(keyword, "true"))
