@@ -2088,7 +2088,7 @@ new_request(
     cups_option_t   *options,		/* I - Options to send */
     const char      *compression,	/* I - compression value or NULL */
     int             copies,		/* I - copies value or 0 */
-    const char      *format,		/* I - documet-format value or NULL */
+    const char      *format,		/* I - document-format value or NULL */
     _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
     ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
     ipp_attribute_t *doc_handling_sup)  /* I - multiple-document-handling-supported values */
