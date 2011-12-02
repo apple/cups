@@ -23,6 +23,12 @@ if test ! -f tools/makeipptoolpkg; then
         exit 1
 fi
 
+uname="`uname | awk '{print tolower($1)}'`"
+if test "x$1" = xlsb; then
+	shift
+	uname="linux-lsb"
+fi
+
 if test $# = 0; then
 	echo Updating to get snapshot version...
 	svn up
@@ -61,27 +67,21 @@ cp test/onepage-*.ps $pkgdir
 cp test/testfile.* $pkgdir
 
 if test `uname` = Darwin; then
-	echo Creating disk image...
 	pkgfile="$pkgdir-macosx-universal.dmg"
+	echo Creating disk image $pkgfile...
 	test -f $pkgfile && rm $pkgfile
 	hdiutil create -srcfolder $pkgdir $pkgfile
 	#sudo chown `whoami` $pkgfile
 else
-	echo Creating archive...
-	pkgfile="$pkgdir-`uname`-`uname -m`.tar.gz"
+	pkgfile="$pkgdir-$uname-`uname -m`.tar.gz"
+	echo Creating archive $pkgfile...
 	tar czf $pkgfile $pkgdir || exit 1
-fi
-
-if test -x /usr/bin/md5sum; then
-        (md5sum $pkgfile | awk '{print $1, "'$fileversion' cups/ipptool/" $2}')
-elif test -x /sbin/md5; then
-        (md5 $pkgfile | awk '{print $4, "'$fileversion' cups/ipptool/" substr($2, 2, length($2) - 2)}')
 fi
 
 echo Removing temporary files...
 rm -r $pkgdir
 
-echo "Done!"
+echo Done.
 
 #
 # End of "$Id$".
