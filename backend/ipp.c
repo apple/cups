@@ -2300,6 +2300,24 @@ new_request(
 	    break;
           }
       }
+
+      if ((keyword = cupsGetOption("StapleLocation", num_options,
+                                   options)) != NULL)
+      {
+	ipp_finish_t stapleChoice = IPP_FINISHINGS_NONE;
+					/* Finishing option */
+
+	if (!_cups_strcasecmp(keyword, "Single"))
+	  stapleChoice = IPP_FINISHINGS_STAPLE;
+	else if (!_cups_strcasecmp(keyword, "SinglePortrait"))
+	  stapleChoice = IPP_FINISHINGS_STAPLE_TOP_LEFT;
+	else if (!_cups_strcasecmp(keyword, "SingleLandscape"))
+	  stapleChoice = IPP_FINISHINGS_STAPLE_TOP_RIGHT;
+	
+	if (stapleChoice != IPP_FINISHINGS_NONE)
+	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
+	                stapleChoice);
+      }
     }
     else
     {
