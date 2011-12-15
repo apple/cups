@@ -3351,6 +3351,14 @@ get_options(cupsd_job_t *job,		/* I - Job */
         num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_short,
 				    num_pwgppds, &pwgppds);
     }
+
+   /*
+    * Map finishings values...
+    */
+
+    num_pwgppds = _ppdCacheGetFinishingOptions(pc, job->attrs,
+                                               IPP_FINISHINGS_NONE, num_pwgppds,
+                                               &pwgppds);
   }
 
  /*

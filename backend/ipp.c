@@ -2163,6 +2163,9 @@ new_request(
   {
     if (pc)
     {
+      int	num_finishings = 0,	/* Number of finishing values */
+		finishings[10];		/* Finishing enum values */
+
      /*
       * Send standard IPP attributes...
       */
@@ -2301,23 +2304,17 @@ new_request(
           }
       }
 
-      if ((keyword = cupsGetOption("StapleLocation", num_options,
-                                   options)) != NULL)
-      {
-	ipp_finish_t stapleChoice = IPP_FINISHINGS_NONE;
-					/* Finishing option */
+     /*
+      * Map finishing options...
+      */
 
-	if (!_cups_strcasecmp(keyword, "Single"))
-	  stapleChoice = IPP_FINISHINGS_STAPLE;
-	else if (!_cups_strcasecmp(keyword, "SinglePortrait"))
-	  stapleChoice = IPP_FINISHINGS_STAPLE_TOP_LEFT;
-	else if (!_cups_strcasecmp(keyword, "SingleLandscape"))
-	  stapleChoice = IPP_FINISHINGS_STAPLE_TOP_RIGHT;
-	
-	if (stapleChoice != IPP_FINISHINGS_NONE)
-	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
-	                stapleChoice);
-      }
+      num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options,
+                                                   (int)(sizeof(finishings) /
+                                                         sizeof(finishings[0])),
+                                                   finishings);
+      if (num_finishings > 0)
+	ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
+		       num_finishings, finishings);
     }
     else
     {
