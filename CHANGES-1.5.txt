@@ -5,6 +5,7 @@ CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3946, STR #3969)
 	- Build fixes (STR #3956)
+	- The DBUS notifier did not validate string parameters (STR #3984)
 	- Group quota ACLs did not work with Kerberos (STR #3972)
 	- The IPP backend did not retry when a printer responded with
 	  client-error-not-possible (STR #3963)

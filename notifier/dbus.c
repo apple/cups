@@ -3,7 +3,7 @@
  *
  *   D-Bus notifier for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *   Copyright (C) 2011 Red Hat, Inc.
  *   Copyright (C) 2007 Tim Waugh <twaugh@redhat.com>
  *   Copyright 1997-2005 by Easy Software Products.
@@ -220,6 +220,8 @@ main(int  argc,				/* I - Number of command-line args */
     const char		*signame = NULL;/* DBUS signal name */
     char		*printer_reasons = NULL;
 					/* Printer reasons string */
+    char		*job_reasons = NULL;
+					/* Job reasons string */
     const char		*nul = "";	/* Empty string value */
     int			no = 0;		/* Boolean "no" value */
     int			params = PARAMS_NONE;
@@ -364,7 +366,8 @@ main(int  argc,				/* I - Number of command-line args */
     if (attr)
     {
       const char *val = ippGetString(attr, 0, NULL);
-      dbus_message_iter_append_string(&iter, &val);
+      if (!dbus_message_iter_append_string(&iter, &val))
+        goto bail;
     }
     else
       goto bail;
@@ -381,7 +384,8 @@ main(int  argc,				/* I - Number of command-line args */
       if (attr)
       {
         const char *val = ippGetString(attr, 0, NULL);
-        dbus_message_iter_append_string(&iter, &val);
+        if (!dbus_message_iter_append_string(&iter, &val))
+	  goto bail;
       }
       else
       {
@@ -396,7 +400,8 @@ main(int  argc,				/* I - Number of command-line args */
         if (attr)
         {
           const char *val = ippGetString(attr, 0, NULL);
-          dbus_message_iter_append_string(&iter, &val);
+          if (!dbus_message_iter_append_string(&iter, &val))
+            goto bail;
         }
         else
           goto bail;
@@ -442,7 +447,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    strcpy(p, ippGetString(attr, i, NULL));
 	    p += strlen(p);
 	  }
-	  dbus_message_iter_append_string(&iter, &printer_reasons);
+	  if (!dbus_message_iter_append_string(&iter, &printer_reasons))
+	    goto bail;
 	}
 	else
 	  goto bail;
@@ -493,8 +499,24 @@ main(int  argc,				/* I - Number of command-line args */
       attr = ippFindAttribute(msg, "job-state-reasons", IPP_TAG_KEYWORD);
       if (attr)
       {
-        const char *val = ippGetString(attr, 0, NULL);
-        dbus_message_iter_append_string(&iter, &val);
+	int num_values = ippGetCount(attr);
+	for (reasons_length = 0, i = 0; i < num_values; i++)
+	  /* All need commas except the last, which needs a nul byte. */
+	  reasons_length += 1 + strlen(ippGetString(attr, i, NULL));
+	job_reasons = malloc(reasons_length);
+	if (!job_reasons)
+	  goto bail;
+	p = job_reasons;
+	for (i = 0; i < num_values; i++)
+	{
+	  if (i)
+	    *p++ = ',';
+
+	  strcpy(p, ippGetString(attr, i, NULL));
+	  p += strlen(p);
+	}
+	if (!dbus_message_iter_append_string(&iter, &job_reasons))
+	  goto bail;
       }
       else
 	goto bail;
@@ -504,7 +526,8 @@ main(int  argc,				/* I - Number of command-line args */
       if (attr)
       {
         const char *val = ippGetString(attr, 0, NULL);
-        dbus_message_iter_append_string(&iter, &val);
+        if (!dbus_message_iter_append_string(&iter, &val))
+          goto bail;
       }
       else
 	dbus_message_iter_append_string(&iter, &nul);
@@ -530,10 +553,14 @@ main(int  argc,				/* I - Number of command-line args */
 
     bail:
 
+    dbus_message_unref(message);
+
     if (printer_reasons)
       free(printer_reasons);
 
-    dbus_message_unref(message);
+    if (job_reasons)
+      free(job_reasons);
+
     ippDelete(msg);
   }
 
