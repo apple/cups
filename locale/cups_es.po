@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.5\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2011-12-07 11:13-0600\n"
+"POT-Creation-Date: 2012-01-03 20:47-0800\n"
 "PO-Revision-Date: 2011-06-18 19:16+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3947,6 +3947,9 @@ msgstr "El URI de la impresora es incorrecto o ya no existe."
 msgid "The printer is busy."
 msgstr "La impresora está ocupada."
 
+msgid "The printer is low on ink."
+msgstr ""
+
 msgid "The printer is low on toner."
 msgstr "La impresora tiene poco tóner."
 
@@ -3958,9 +3961,6 @@ msgstr "La impresora no responde."
 
 msgid "The printer is out of toner."
 msgstr "La impresora no tiene tóner."
-
-msgid "The printer is running low on ink."
-msgstr ""
 
 msgid "The printer is unreachable at this time."
 msgstr "La impresora es inalcanzable en este momento."

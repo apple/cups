@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.5\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2011-12-07 11:13-0600\n"
+"POT-Creation-Date: 2012-01-03 20:47-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2818,16 +2818,16 @@ msgstr ""
 msgid "Bad OrderDependency"
 msgstr ""
 
-#: cups/ppd-cache.c:144 cups/ppd-cache.c:189 cups/ppd-cache.c:227
-#: cups/ppd-cache.c:233 cups/ppd-cache.c:249 cups/ppd-cache.c:265
-#: cups/ppd-cache.c:274 cups/ppd-cache.c:282 cups/ppd-cache.c:299
-#: cups/ppd-cache.c:307 cups/ppd-cache.c:322 cups/ppd-cache.c:330
-#: cups/ppd-cache.c:348 cups/ppd-cache.c:360 cups/ppd-cache.c:375
-#: cups/ppd-cache.c:387 cups/ppd-cache.c:409 cups/ppd-cache.c:417
-#: cups/ppd-cache.c:435 cups/ppd-cache.c:443 cups/ppd-cache.c:458
-#: cups/ppd-cache.c:466 cups/ppd-cache.c:484 cups/ppd-cache.c:492
-#: cups/ppd-cache.c:519 cups/ppd-cache.c:546 cups/ppd-cache.c:554
-#: cups/ppd-cache.c:562
+#: cups/ppd-cache.c:148 cups/ppd-cache.c:193 cups/ppd-cache.c:231
+#: cups/ppd-cache.c:237 cups/ppd-cache.c:253 cups/ppd-cache.c:269
+#: cups/ppd-cache.c:278 cups/ppd-cache.c:286 cups/ppd-cache.c:303
+#: cups/ppd-cache.c:311 cups/ppd-cache.c:326 cups/ppd-cache.c:334
+#: cups/ppd-cache.c:352 cups/ppd-cache.c:364 cups/ppd-cache.c:379
+#: cups/ppd-cache.c:391 cups/ppd-cache.c:413 cups/ppd-cache.c:421
+#: cups/ppd-cache.c:439 cups/ppd-cache.c:447 cups/ppd-cache.c:462
+#: cups/ppd-cache.c:470 cups/ppd-cache.c:488 cups/ppd-cache.c:496
+#: cups/ppd-cache.c:523 cups/ppd-cache.c:567 cups/ppd-cache.c:575
+#: cups/ppd-cache.c:583
 msgid "Bad PPD cache file."
 msgstr ""
 
@@ -4316,11 +4316,11 @@ msgstr ""
 msgid "Options:"
 msgstr ""
 
-#: cups/ppd-cache.c:152
+#: cups/ppd-cache.c:156
 msgid "Out of date PPD cache file."
 msgstr ""
 
-#: cups/ppd-cache.c:1313
+#: cups/ppd-cache.c:1361
 msgid "Out of memory."
 msgstr ""
 
@@ -4910,6 +4910,10 @@ msgstr ""
 msgid "The printer is busy."
 msgstr ""
 
+#: cups/localize.c:335
+msgid "The printer is low on ink."
+msgstr ""
+
 #: cups/localize.c:313
 msgid "The printer is low on toner."
 msgstr ""
@@ -4925,10 +4929,6 @@ msgstr ""
 
 #: cups/localize.c:315
 msgid "The printer is out of toner."
-msgstr ""
-
-#: cups/localize.c:335
-msgid "The printer is running low on ink."
 msgstr ""
 
 #: backend/ipp.c:731 backend/lpd.c:835 backend/socket.c:367
@@ -5240,35 +5240,35 @@ msgstr ""
 msgid "Unable to edit cupsd.conf files larger than 1MB"
 msgstr ""
 
-#: cups/http.c:4205
+#: cups/http.c:4209
 msgid "Unable to establish a secure connection to host (certificate chain invalid)."
 msgstr ""
 
-#: cups/http.c:4195
+#: cups/http.c:4199
 msgid "Unable to establish a secure connection to host (certificate not yet valid)."
 msgstr ""
 
-#: cups/http.c:4190
+#: cups/http.c:4194
 msgid "Unable to establish a secure connection to host (expired certificate)."
 msgstr ""
 
-#: cups/http.c:4200
+#: cups/http.c:4204
 msgid "Unable to establish a secure connection to host (host name mismatch)."
 msgstr ""
 
-#: cups/http.c:4210
+#: cups/http.c:4214
 msgid "Unable to establish a secure connection to host (peer dropped connection before responding)."
 msgstr ""
 
-#: cups/http.c:4185
+#: cups/http.c:4189
 msgid "Unable to establish a secure connection to host (self-signed certificate)."
 msgstr ""
 
-#: cups/http.c:4180
+#: cups/http.c:4184
 msgid "Unable to establish a secure connection to host (untrusted certificate)."
 msgstr ""
 
-#: cups/http.c:3933 cups/http.c:4237 cups/http.c:4270 cups/http.c:4287
+#: cups/http.c:3937 cups/http.c:4241 cups/http.c:4274 cups/http.c:4291
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
@@ -5284,7 +5284,7 @@ msgstr ""
 msgid "Unable to generate compressed print file"
 msgstr ""
 
-#: backend/ipp.c:2724
+#: backend/ipp.c:2739
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5433,7 +5433,7 @@ msgstr ""
 msgid "Unable to set server default:"
 msgstr ""
 
-#: backend/ipp.c:2583 backend/ipp.c:2660 backend/ipp.c:2668
+#: backend/ipp.c:2598 backend/ipp.c:2675 backend/ipp.c:2683
 msgid "Unable to start backend process."
 msgstr ""
 

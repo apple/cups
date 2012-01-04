@@ -332,7 +332,7 @@ ppdLocalizeIPPReason(
       else if (!strncmp(reason, "output-area-full", 16))
 	message = _("The output bin is full.");
       else if (!strncmp(reason, "marker-supply-low", 17))
-	message = _("The printer is running low on ink.");		
+	message = _("The printer is low on ink.");		
       else if (!strncmp(reason, "marker-supply-empty", 19))
 	message = _("The printer may be out of ink.");
       else if (!strncmp(reason, "marker-waste-almost-full", 24))

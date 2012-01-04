@@ -1095,11 +1095,11 @@
 "The paper tray needs to be filled." = "The paper tray needs to be filled.";
 "The printer URI is incorrect or no longer exists." = "The printer URI is incorrect or no longer exists.";
 "The printer is busy." = "The printer is busy.";
+"The printer is low on ink." = "The printer is low on ink.";
 "The printer is low on toner." = "The printer is low on toner.";
 "The printer is not connected." = "The printer is not connected.";
 "The printer is not responding." = "The printer is not responding.";
 "The printer is out of toner." = "The printer is out of toner.";
-"The printer is running low on ink." = "The printer is running low on ink.";
 "The printer is unreachable at this time." = "The printer is unreachable at this time.";
 "The printer may be out of ink." = "The printer may be out of ink.";
 "The printer may not exist or is unavailable at this time." = "The printer may not exist or is unavailable at this time.";

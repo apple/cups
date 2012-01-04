@@ -33,7 +33,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups_1.4rc1_eu\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2011-12-07 11:13-0600\n"
+"POT-Creation-Date: 2012-01-03 20:47-0800\n"
 "PO-Revision-Date: 2009-07-03 19:34+0200\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
@@ -3736,6 +3736,9 @@ msgstr ""
 msgid "The printer is busy."
 msgstr ""
 
+msgid "The printer is low on ink."
+msgstr ""
+
 msgid "The printer is low on toner."
 msgstr ""
 
@@ -3746,9 +3749,6 @@ msgid "The printer is not responding."
 msgstr ""
 
 msgid "The printer is out of toner."
-msgstr ""
-
-msgid "The printer is running low on ink."
 msgstr ""
 
 msgid "The printer is unreachable at this time."

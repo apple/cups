@@ -66,7 +66,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_number-9_3.875x8.875in", "na-number-9-envelope", "Env9", 3.875, 8.875),
   _PWG_MEDIA_IN("na_index-4x6_4x6in", NULL, "4x6", 4, 6),
   _PWG_MEDIA_IN("na_number-10_4.125x9.5in", "na-number-10-envelope", "Env10", 4.125, 9.5),
-  _PWG_MEDIA_IN("na_a2_4.375x5.75in", NULL, NULL, 4.375, 5.75),
+  _PWG_MEDIA_IN("na_a2_4.375x5.75in", NULL, "EnvA2", 4.375, 5.75),
   _PWG_MEDIA_IN("na_number-11_4.5x10.375in", NULL, "Env11", 4.5, 10.375),
   _PWG_MEDIA_IN("na_number-12_4.75x11in", NULL, "Env12", 4.75, 11),
   _PWG_MEDIA_IN("na_5x7_5x7in", NULL, "5x7", 5, 7),
@@ -230,7 +230,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("oe_photo-l_3.5x5in", NULL, "3.5x5", 3.5, 5),
 
   /* Other Metric Standard Sheet Media Sizes */
-  _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, NULL, 100, 150),
+  _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, "om_small-photo", 100, 150),
   _PWG_MEDIA_MM("om_italian_110x230mm", NULL, "EnvItalian", 110, 230),
   _PWG_MEDIA_MM("om_postfix_114x229mm", NULL, NULL, 114, 229),
   _PWG_MEDIA_MM("om_large-photo_200x300", NULL, NULL, 200, 300),
