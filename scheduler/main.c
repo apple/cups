@@ -1715,7 +1715,7 @@ process_children(void)
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogJob(job, CUPSD_LOG_INFO,
-		    "Hint: Try setting the LogLevel to \"debug\" to find our "
+		    "Hint: Try setting the LogLevel to \"debug\" to find out "
 		    "more.");
     }
     else
