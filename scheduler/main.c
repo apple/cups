@@ -1568,7 +1568,12 @@ process_children(void)
     * Handle completed job filters...
     */
 
-    if (job_id > 0 && (job = cupsdFindJob(job_id)) != NULL)
+    if (job_id > 0)
+      job = cupsdFindJob(job_id);
+    else
+      job = NULL;
+
+    if (job)
     {
       for (i = 0; job->filters[i]; i ++)
 	if (job->filters[i] == pid)
@@ -1680,15 +1685,15 @@ process_children(void)
 
     if (status == SIGTERM || status == SIGKILL)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "PID %d (%s) was terminated normally with signal %d.",
-                      pid, name, status);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		  "PID %d (%s) was terminated normally with signal %d.", pid,
+		  name, status);
     }
     else if (status == SIGPIPE)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "PID %d (%s) did not catch or ignore signal %d.",
-                      pid, name, status);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		  "PID %d (%s) did not catch or ignore signal %d.", pid, name,
+		  status);
     }
     else if (status)
     {
@@ -1697,26 +1702,25 @@ process_children(void)
         int code = WEXITSTATUS(status);	/* Exit code */
 
         if (code > 100)
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "PID %d (%s) stopped with status %d (%s)", pid, name,
-			  code, strerror(code - 100));
+	  cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		      "PID %d (%s) stopped with status %d (%s)", pid, name,
+		      code, strerror(code - 100));
 	else
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "PID %d (%s) stopped with status %d.", pid, name,
-			  code);
+	  cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		      "PID %d (%s) stopped with status %d.", pid, name, code);
       }
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d.",
-	                pid, name, WTERMSIG(status));
+	cupsdLogJob(job, CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d.",
+		    pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)
-        cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Hint: Try setting the LogLevel to \"debug\" to find "
-			"out more.");
+        cupsdLogJob(job, CUPSD_LOG_INFO,
+		    "Hint: Try setting the LogLevel to \"debug\" to find our "
+		    "more.");
     }
     else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
-                      pid, name);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
+		  pid, name);
   }
 
  /*
