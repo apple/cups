@@ -753,8 +753,10 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     * want to keep it if it has a larger imageable area length.
     */
 
-    new_width      = _PWG_FROMPTS(ppd_size->width);
-    new_length     = _PWG_FROMPTS(ppd_size->length);
+    pwg_media      = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
+                                      _PWG_FROMPTS(ppd_size->length));
+    new_width      = pwg_media->width;
+    new_length     = pwg_media->length;
     new_left       = _PWG_FROMPTS(ppd_size->left);
     new_bottom     = _PWG_FROMPTS(ppd_size->bottom);
     new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
