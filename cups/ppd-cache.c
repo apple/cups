@@ -2005,7 +2005,8 @@ _ppdCacheGetSize(
     _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
     const char   *page_size)		/* I - PPD PageSize */
 {
-  int		i;
+  int		i;			/* Looping var */
+  _pwg_media_t	*media;			/* Media */  
   _pwg_size_t	*size;			/* Current size */
 
 
@@ -2084,8 +2085,25 @@ _ppdCacheGetSize(
   */
 
   for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
-    if (!_cups_strcasecmp(page_size, size->map.ppd))
+    if (!_cups_strcasecmp(page_size, size->map.ppd) ||
+        !_cups_strcasecmp(page_size, size->map.pwg))
       return (size);
+
+ /*
+  * Look up standard sizes...
+  */
+
+  if ((media = _pwgMediaForPPD(page_size)) == NULL)
+    if ((media = _pwgMediaForLegacy(page_size)) == NULL)
+      media = _pwgMediaForPWG(page_size);
+
+  if (media)
+  {
+    pc->custom_size.width  = media->width;
+    pc->custom_size.length = media->length;
+
+    return (&(pc->custom_size));
+  }
 
   return (NULL);
 }

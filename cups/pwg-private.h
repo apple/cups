@@ -39,7 +39,7 @@ extern "C" {
  */
 
 /* Convert from points to 2540ths */
-#  define _PWG_FROMPTS(n)	(int)((n) * 2540 / 72)
+#  define _PWG_FROMPTS(n)	(int)(((n) * 2540 + 36) / 72)
 /* Convert from 2540ths to points */
 #  define _PWG_TOPTS(n)		((n) * 72.0 / 2540.0)
 
