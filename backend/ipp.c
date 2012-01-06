@@ -2419,6 +2419,31 @@ new_request(
       if (num_finishings > 0)
 	ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
 		       num_finishings, finishings);
+
+     /*
+      * Map FaxOut options...
+      */
+
+      if ((keyword = cupsGetOption("phone", num_options, options)) != NULL)
+      {
+	ipp_t	*destination;		/* destination collection */
+	char	tel_uri[1024];		/* tel: URI */
+
+        destination = ippNew();
+
+        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel",
+                        NULL, NULL, 0, keyword);
+        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri",
+                     NULL, tel_uri);
+
+	if ((keyword = cupsGetOption("faxPrefix", num_options,
+	                             options)) != NULL && *keyword)
+	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT,
+	               "pre-dial-string", NULL, keyword);
+
+        ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
+        ippDelete(destination);
+      }
     }
     else
     {
