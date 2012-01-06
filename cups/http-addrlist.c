@@ -54,6 +54,7 @@ httpAddrConnect(
   if (!sock)
   {
     errno = EINVAL;
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
     return (NULL);
   }
 
@@ -256,7 +257,6 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   }
 #endif /* HAVE_RES_INIT */
 
-
  /*
   * Lookup the address the best way we can...
   */
@@ -357,6 +357,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  if (!temp)
 	  {
 	    httpAddrFreeList(first);
+	    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	    return (NULL);
 	  }
 
@@ -386,8 +387,13 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
       freeaddrinfo(results);
     }
-    else if (error == EAI_FAIL)
-      cg->need_res_init = 1;
+    else
+    {
+      if (error == EAI_FAIL)
+        cg->need_res_init = 1;
+
+      _cupsSetError(IPP_INTERNAL_ERROR, gai_strerror(error), 0);
+    }
 
 #else
     if (hostname)
@@ -505,8 +511,13 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  addr = temp;
 	}
       }
-      else if (h_errno == NO_RECOVERY)
-        cg->need_res_init = 1;
+      else
+      {
+        if (h_errno == NO_RECOVERY)
+          cg->need_res_init = 1;
+
+	_cupsSetError(IPP_INTERNAL_ERROR, hstrerror(h_errno), 0);
+      }
     }
 #endif /* HAVE_GETADDRINFO */
   }
@@ -544,6 +555,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     else
     {
       httpAddrFreeList(first);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, _("Unknown service name."), 1);
       return (NULL);
     }
 
@@ -566,6 +579,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -594,6 +608,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -625,6 +640,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -648,6 +664,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}

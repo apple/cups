@@ -606,6 +606,7 @@ _httpCreate(
 
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
     httpAddrFreeList(addrlist);
     return (NULL);
   }
@@ -2286,7 +2287,10 @@ httpReconnect(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
   if (!http)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
     return (-1);
+  }
 
 #ifdef HAVE_SSL
   if (http->tls)
