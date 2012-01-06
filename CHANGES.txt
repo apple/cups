@@ -1,8 +1,10 @@
-CHANGES.txt - 1.6b1 - 2011-12-02
+CHANGES.txt - 1.6b1 - 2012-01-06
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- Added a new MaxJobTime directive for cupsd that specifies the maximum
+	  amount of time allowed for a job to complete before it is canceled.
 	- The default password callback now supports passwords up to 127
 	  characters.
 	- The scheduler now supports a DefaultAuthType of "auto" to

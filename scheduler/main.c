@@ -1839,8 +1839,12 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       timeout = job->kill_time;
       why     = "kill unresponsive jobs";
     }
-
-    if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
+    else if (job->cancel_time && job->cancel_time < timeout)
+    {
+      timeout = job->cancel_time;
+      why     = "cancel stuck jobs";
+    }
+    else if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
     {
       timeout = job->hold_until;
       why     = "release held jobs";

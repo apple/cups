@@ -46,6 +46,7 @@ struct cupsd_job_s			/**** Job request ****/
   int			*compressions;	/* Compression status of each file */
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
+			cancel_time,	/* When to cancel/send SIGTERM */
 			kill_time,	/* When to send SIGKILL */
 			hold_until;	/* Hold expiration date/time */
   ipp_attribute_t	*state;		/* Job state */
@@ -99,8 +100,10 @@ VAR int			MaxJobs		VALUE(0),
 					/* Max number of active jobs */
 			MaxJobsPerUser	VALUE(0),
 					/* Max jobs per user */
-			MaxJobsPerPrinter VALUE(0);
+			MaxJobsPerPrinter VALUE(0),
 					/* Max jobs per printer */
+			MaxJobTime	VALUE(3 * 60 * 60);
+					/* Max time for a job */
 VAR int			JobAutoPurge	VALUE(0);
 					/* Automatically purge jobs */
 VAR cups_array_t	*Jobs		VALUE(NULL),

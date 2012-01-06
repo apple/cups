@@ -135,6 +135,7 @@ static const cupsd_var_t	variables[] =
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
+  { "MaxJobTime",		&MaxJobTime,		CUPSD_VARTYPE_INTEGER },
   { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
@@ -746,6 +747,7 @@ cupsdReadConfiguration(void)
   MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
+  MaxJobTime          = 3 * 60 * 60;	/* 3 hours */
   MaxCopies           = CUPS_DEFAULT_MAX_COPIES;
 
   cupsdDeleteAllPolicies();

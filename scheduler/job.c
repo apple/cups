@@ -297,10 +297,21 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job.",
 		      job->id);
 
       stop_job(job, CUPSD_JOB_FORCE);
+      continue;
+    }
+
+   /*
+    * Cancel stuck jobs...
+    */
+
+    if (job->cancel_time && job->cancel_time <= curtime)
+    {
+      cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
+                       "Canceling stuck job after %d seconds.", MaxJobTime);
       continue;
     }
 
@@ -4137,6 +4148,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->progress     = 0;
   job->printer      = printer;
   printer->job      = job;
+
+  if (MaxJobTime > 0)
+    job->cancel_time = time(NULL) + MaxJobTime;
+  else
+    job->cancel_time = 0;
 
  /*
   * Setup the last exit status and security profiles...
