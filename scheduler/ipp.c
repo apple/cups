@@ -3991,7 +3991,6 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsd_printer_t	*printer;	/* Job destination */
 
-
    /*
     * No auth data.  If we need to authenticate via Kerberos, send a
     * HTTP auth challenge, otherwise just return an IPP error...
@@ -10052,6 +10051,8 @@ save_auth_info(
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
+  cupsFilePuts(fp, "CUPSD-AUTH-V2\n");
+
   for (i = 0;
        i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
        i ++)
@@ -10070,7 +10071,7 @@ save_auth_info(
     {
       httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
                      strlen(auth_info->values[i].string.text));
-      cupsFilePrintf(fp, "%s\n", line);
+      cupsFilePutConf(fp, dest->auth_info_required[i], line);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
         cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s",
@@ -10085,10 +10086,30 @@ save_auth_info(
         cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s",
 	                auth_info->values[i].string.text);
       else
-        cupsdSetStringf(job->auth_env + i, "AUTH_%s=%s",
-	                dest->auth_info_required[i],
-	                auth_info->values[i].string.text);
+        i --;
     }
+  }
+  else if (auth_info && auth_info->num_values == 2 &&
+           dest->num_auth_info_required == 1 &&
+           !strcmp(dest->auth_info_required[0], "negotiate"))
+  {
+   /*
+    * Allow fallback to username+password for Kerberized queues...
+    */
+
+    httpEncode64_2(line, sizeof(line), auth_info->values[0].string.text,
+                   strlen(auth_info->values[0].string.text));
+    cupsFilePutConf(fp, "username", line);
+
+    cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s",
+                    auth_info->values[0].string.text);
+
+    httpEncode64_2(line, sizeof(line), auth_info->values[1].string.text,
+                   strlen(auth_info->values[1].string.text));
+    cupsFilePutConf(fp, "password", line);
+
+    cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s",
+                    auth_info->values[1].string.text);
   }
   else if (con->username[0])
   {
@@ -10097,7 +10118,7 @@ save_auth_info(
     */
 
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
-    cupsFilePrintf(fp, "%s\n", line);
+    cupsFilePutConf(fp, "username", line);
 
     cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s", con->username);
 
@@ -10106,7 +10127,7 @@ save_auth_info(
     */
 
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
-    cupsFilePrintf(fp, "%s\n", line);
+    cupsFilePutConf(fp, "password", line);
 
     cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s", con->password);
   }
@@ -10114,7 +10135,7 @@ save_auth_info(
 #ifdef HAVE_GSSAPI
   if (con->gss_uid > 0)
   {
-    cupsFilePrintf(fp, "%d\n", (int)con->gss_uid);
+    cupsFilePrintf(fp, "uid %d\n", (int)con->gss_uid);
     cupsdSetStringf(&job->auth_uid, "AUTH_UID=%d", (int)con->gss_uid);
   }
 #endif /* HAVE_GSSAPI */

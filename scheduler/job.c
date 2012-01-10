@@ -1822,32 +1822,52 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
     {
-      int	bytes;			/* Size of auth data */
+      int	bytes,			/* Size of auth data */
+		linenum = 1;		/* Current line number */
       char	line[65536],		/* Line from file */
+		*value,			/* Value from line */
 		data[65536];		/* Decoded data */
 
 
-      for (i = 0;
-           i < destptr->num_auth_info_required &&
-	       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])) &&
-	       cupsFileGets(fp, line, sizeof(line));
-	   i ++)
+      if (cupsFileGets(fp, line, sizeof(line)) &&
+          !strcmp(line, "CUPSD-AUTH-V2"))
       {
-        bytes = sizeof(data);
-        httpDecode64_2(data, &bytes, line);
+        i = 0;
+        while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+        {
+         /*
+          * Decode value...
+          */
 
-	if (!strcmp(destptr->auth_info_required[i], "username"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
-	else if (!strcmp(destptr->auth_info_required[i], "domain"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s", data);
-	else if (!strcmp(destptr->auth_info_required[i], "password"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
-        else if (!strcmp(destptr->auth_info_required[i], "negotiate"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	  bytes = sizeof(data);
+	  httpDecode64_2(data, &bytes, value);
+
+         /*
+          * Assign environment variables...
+          */
+
+          if (!strcmp(line, "uid"))
+          {
+            cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", value);
+            continue;
+          }
+          else if (i >= (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])))
+            break;
+          
+	  if (!strcmp(line, "username"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
+	  else if (!strcmp(line, "domain"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s", data);
+	  else if (!strcmp(line, "password"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
+	  else if (!strcmp(line, "negotiate"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	  else
+	    continue;
+
+	  i ++;
+	}
       }
-
-      if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
-        cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
 
       cupsFileClose(fp);
     }
