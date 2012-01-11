@@ -1,8 +1,16 @@
-CHANGES-IPPTOOL.txt - 2011-12-02
+CHANGES-IPPTOOL.txt - 2012-01-10
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2012-01-10
+
+	- Fixed an issue with the IPP/1.1 test file where the "waiting for job
+	  completion" test did not work.
+	- The attribute groups out of order error was not shown for the
+	  operation-attributes-tag group.
 
 
 2011-12-02

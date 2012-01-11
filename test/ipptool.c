@@ -3,7 +3,7 @@
  *
  *   ipptool command for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -17,6 +17,7 @@
  * Contents:
  *
  *   main()              - Parse options and do tests.
+ *   add_stringf()       - Add a formatted string to an array.
  *   compare_vars()      - Compare two variables.
  *   do_tests()          - Do tests as specified in the test file.
  *   expand_variables()  - Expand variables in a string.
@@ -33,7 +34,6 @@
  *   print_csv()         - Print a line of CSV text.
  *   print_fatal_error() - Print a fatal error message.
  *   print_line()        - Print a line of formatted or CSV text.
- *   print_test_error()  - Print a test error message.
  *   print_xml_header()  - Print a standard XML plist header.
  *   print_xml_string()  - Print an XML string with escaping.
  *   print_xml_trailer() - Print the XML trailer with success/fail value.
@@ -171,6 +171,8 @@ const char * const URIStatusStrings[] =	/* URI status strings */
  * Local functions...
  */
 
+static void	add_stringf(cups_array_t *a, const char *s, ...)
+		__attribute__ ((__format__ (__printf__, 2, 3)));
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(_cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
@@ -192,8 +194,6 @@ static void	print_fatal_error(const char *s, ...)
 		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_line(ipp_attribute_t *attr, int num_displayed,
 		           char **displayed, size_t *widths);
-static void	print_test_error(const char *s, ...)
-		__attribute__ ((__format__ (__printf__, 1, 2)));
 static void	print_xml_header(void);
 static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
@@ -204,9 +204,10 @@ static void	sigterm_handler(int sig);
 #endif /* WIN32 */
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
-static int	validate_attr(ipp_attribute_t *attr, int print);
-static int      with_value(char *value, int regex, ipp_attribute_t *attr,
-		           int report, char *matchbuf, size_t matchlen);
+static int	validate_attr(cups_array_t *errors, ipp_attribute_t *attr);
+static int      with_value(cups_array_t *errors, char *value, int regex,
+		           ipp_attribute_t *attr, char *matchbuf,
+		           size_t matchlen);
 
 
 /*
@@ -671,6 +672,42 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
+ * 'add_stringf()' - Add a formatted string to an array.
+ */
+
+static void
+add_stringf(cups_array_t *a,		/* I - Array */
+            const char   *s,		/* I - Printf-style format string */
+            ...)			/* I - Additional args as needed */
+{
+  char		buffer[10240];		/* Format buffer */
+  va_list	ap;			/* Argument pointer */
+
+
+ /*
+  * Don't bother is the array is NULL...
+  */
+
+  if (!a)
+    return;
+
+ /*
+  * Format the message...
+  */
+
+  va_start(ap, s);
+  vsnprintf(buffer, sizeof(buffer), s, ap);
+  va_end(ap);
+
+ /*
+  * Add it to the array...
+  */
+
+  cupsArrayAdd(a, buffer);
+}
+
+
+/*
  * 'compare_vars()' - Compare two variables.
  */
 
@@ -734,7 +771,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   int		num_displayed = 0;	/* Number of displayed attributes */
   char		*displayed[200];	/* Displayed attributes */
   size_t	widths[200];		/* Width of columns */
-  cups_array_t	*a;			/* Duplicate attribute array */
+  cups_array_t	*a,			/* Duplicate attribute array */
+		*errors = NULL;		/* Errors array */
+  const char	*error;			/* Current error */
 
 
  /*
@@ -779,6 +818,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
   CUPS_SRAND(time(NULL));
 
+  errors     = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup,
+                             (cups_afree_func_t)free);
   pass       = 1;
   linenum    = 1;
   request_id = (CUPS_RAND() % 1000) * 137 + 1;
@@ -2251,23 +2292,27 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       * Check results of request...
       */
 
+      cupsArrayClear(errors);
+
+      if (http->version != HTTP_1_1)
+	add_stringf(errors, "Bad HTTP version (%d.%d)", http->version / 100,
+		    http->version % 100);
+
       if (!response)
-	prev_pass = pass = 0;
+      {
+       /*
+        * No response, log error...
+        */
+
+	add_stringf(errors, "IPP request failed with status %s (%s)",
+		    ippErrorString(cupsLastError()),
+		    cupsLastErrorString());
+      }
       else
       {
-	if (http->version != HTTP_1_1)
-	  prev_pass = pass = 0;
-
-	if (response->state != IPP_DATA)
-	  prev_pass = pass = 0;
-
-	if (response->request.status.request_id != request_id)
-	  prev_pass = pass = 0;
-
-	if (version &&
-	    (response->request.status.version[0] != (version / 10) ||
-	     response->request.status.version[1] != (version % 10)))
-	  prev_pass = pass = 0;
+       /*
+        * Collect common attribute values...
+        */
 
 	if ((attrptr = ippFindAttribute(response, "job-id",
 					IPP_TAG_INTEGER)) != NULL)
@@ -2287,42 +2332,130 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  set_variable(vars, "notify-subscription-id", temp);
 	}
 
-	attrptr = response->attrs;
-	if (!attrptr || !attrptr->name ||
-	    attrptr->value_tag != IPP_TAG_CHARSET ||
-	    attrptr->group_tag != IPP_TAG_OPERATION ||
-	    attrptr->num_values != 1 ||
-	    strcmp(attrptr->name, "attributes-charset"))
-	  prev_pass = pass = 0;
+       /*
+        * Check response, validating groups and attributes and logging errors
+        * as needed...
+        */
 
-	if (attrptr)
+	if (response->state != IPP_DATA)
+	  add_stringf(errors,
+	              "Missing end-of-attributes-tag in response "
+		      "(RFC 2910 section 3.5.1)");
+
+	if (version &&
+	    (response->request.status.version[0] != (version / 10) ||
+	     response->request.status.version[1] != (version % 10)))
+          add_stringf(errors,
+                      "Bad version %d.%d in response - expected %d.%d "
+		      "(RFC 2911 section 3.1.8).",
+		      response->request.status.version[0],
+		      response->request.status.version[1],
+		      version / 10, version % 10);
+
+	if (response->request.status.request_id != request_id)
+	  add_stringf(errors,
+	              "Bad request ID %d in response - expected %d "
+		      "(RFC 2911 section 3.1.1)",
+		      response->request.status.request_id, request_id);
+
+	attrptr = response->attrs;
+	if (!attrptr)
+	  add_stringf(errors,
+	              "Missing first attribute \"attributes-charset "
+		      "(charset)\" in group operation-attributes-tag "
+		      "(RFC 2911 section 3.1.4).");
+	else
 	{
-	  attrptr = attrptr->next;
-	  if (!attrptr || !attrptr->name ||
-	      attrptr->value_tag != IPP_TAG_LANGUAGE ||
+	  if (!attrptr->name ||
+	      attrptr->value_tag != IPP_TAG_CHARSET ||
 	      attrptr->group_tag != IPP_TAG_OPERATION ||
 	      attrptr->num_values != 1 ||
-	      strcmp(attrptr->name, "attributes-natural-language"))
-	    prev_pass = pass = 0;
-	}
+	      strcmp(attrptr->name, "attributes-charset"))
+	    add_stringf(errors,
+	                "Bad first attribute \"%s (%s%s)\" in group %s, "
+			"expected \"attributes-charset (charset)\" in "
+			"group operation-attributes-tag (RFC 2911 section "
+			"3.1.4).",
+			attrptr->name ? attrptr->name : "(null)",
+			attrptr->num_values > 1 ? "1setOf " : "",
+			ippTagString(attrptr->value_tag),
+			ippTagString(attrptr->group_tag));
+
+	  attrptr = attrptr->next;
+	  if (!attrptr)
+	    add_stringf(errors,
+	                "Missing second attribute \"attributes-natural-"
+			"language (naturalLanguage)\" in group "
+			"operation-attributes-tag (RFC 2911 section "
+			"3.1.4).");
+	  else if (!attrptr->name ||
+	           attrptr->value_tag != IPP_TAG_LANGUAGE ||
+	           attrptr->group_tag != IPP_TAG_OPERATION ||
+	           attrptr->num_values != 1 ||
+	           strcmp(attrptr->name, "attributes-natural-language"))
+	    add_stringf(errors,
+	                "Bad first attribute \"%s (%s%s)\" in group %s, "
+			"expected \"attributes-natural-language "
+			"(naturalLanguage)\" in group "
+			"operation-attributes-tag (RFC 2911 section "
+			"3.1.4).",
+			attrptr->name ? attrptr->name : "(null)",
+			attrptr->num_values > 1 ? "1setOf " : "",
+			ippTagString(attrptr->value_tag),
+			ippTagString(attrptr->group_tag));
+        }
 
 	if ((attrptr = ippFindAttribute(response, "status-message",
-					IPP_TAG_ZERO)) != NULL &&
-	    (attrptr->value_tag != IPP_TAG_TEXT ||
-	     attrptr->group_tag != IPP_TAG_OPERATION ||
-	     attrptr->num_values != 1 ||
-	     (attrptr->value_tag == IPP_TAG_TEXT &&
-	      strlen(attrptr->values[0].string.text) > 255)))
-	  prev_pass = pass = 0;
+					 IPP_TAG_ZERO)) != NULL)
+	{
+	  if (attrptr->value_tag != IPP_TAG_TEXT)
+	    add_stringf(errors,
+	                "status-message (text(255)) has wrong value tag "
+			"%s (RFC 2911 section 3.1.6.2).",
+			ippTagString(attrptr->value_tag));
+	  if (attrptr->group_tag != IPP_TAG_OPERATION)
+	    add_stringf(errors,
+	                "status-message (text(255)) has wrong group tag "
+			"%s (RFC 2911 section 3.1.6.2).",
+			ippTagString(attrptr->group_tag));
+	  if (attrptr->num_values != 1)
+	    add_stringf(errors,
+	                "status-message (text(255)) has %d values "
+			"(RFC 2911 section 3.1.6.2).",
+			attrptr->num_values);
+	  if (attrptr->value_tag == IPP_TAG_TEXT &&
+	      strlen(attrptr->values[0].string.text) > 255)
+	    add_stringf(errors,
+	                "status-message (text(255)) has bad length %d"
+			" (RFC 2911 section 3.1.6.2).",
+			(int)strlen(attrptr->values[0].string.text));
+        }
 
 	if ((attrptr = ippFindAttribute(response, "detailed-status-message",
-					IPP_TAG_ZERO)) != NULL &&
-	    (attrptr->value_tag != IPP_TAG_TEXT ||
-	     attrptr->group_tag != IPP_TAG_OPERATION ||
-	     attrptr->num_values != 1 ||
-	     (attrptr->value_tag == IPP_TAG_TEXT &&
-	      strlen(attrptr->values[0].string.text) > 1023)))
-	  prev_pass = pass = 0;
+					 IPP_TAG_ZERO)) != NULL)
+	{
+	  if (attrptr->value_tag != IPP_TAG_TEXT)
+	    add_stringf(errors,
+	                "detailed-status-message (text(MAX)) has wrong "
+			"value tag %s (RFC 2911 section 3.1.6.3).",
+			ippTagString(attrptr->value_tag));
+	  if (attrptr->group_tag != IPP_TAG_OPERATION)
+	    add_stringf(errors,
+	                "detailed-status-message (text(MAX)) has wrong "
+			"group tag %s (RFC 2911 section 3.1.6.3).",
+			ippTagString(attrptr->group_tag));
+	  if (attrptr->num_values != 1)
+	    add_stringf(errors,
+	                "detailed-status-message (text(MAX)) has %d values"
+			" (RFC 2911 section 3.1.6.3).",
+			attrptr->num_values);
+	  if (attrptr->value_tag == IPP_TAG_TEXT &&
+	      strlen(attrptr->values[0].string.text) > 1023)
+	    add_stringf(errors,
+	                "detailed-status-message (text(MAX)) has bad "
+			"length %d (RFC 2911 section 3.1.6.3).",
+			(int)strlen(attrptr->values[0].string.text));
+        }
 
 	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
@@ -2332,7 +2465,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  if (attrptr->group_tag != group)
 	  {
+	    int out_of_order = 0;	/* Are attribute groups out-of-order? */
 	    cupsArrayClear(a);
+	    
 
             switch (attrptr->group_tag)
             {
@@ -2340,59 +2475,60 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
                   break;
 
               case IPP_TAG_OPERATION :
-                  prev_pass = pass = 0;
+                  out_of_order = 1;
                   break;
 
               case IPP_TAG_UNSUPPORTED_GROUP :
                   if (group != IPP_TAG_OPERATION)
-		    prev_pass = pass = 0;
+		    out_of_order = 1;
                   break;
 
               case IPP_TAG_JOB :
               case IPP_TAG_PRINTER :
                   if (group != IPP_TAG_OPERATION &&
                       group != IPP_TAG_UNSUPPORTED_GROUP)
-		    prev_pass = pass = 0;
+		    out_of_order = 1;
                   break;
 
               case IPP_TAG_SUBSCRIPTION :
                   if (group > attrptr->group_tag &&
                       group != IPP_TAG_DOCUMENT)
-		    prev_pass = pass = 0;
+		    out_of_order = 1;
                   break;
 
               default :
                   if (group > attrptr->group_tag)
-		    prev_pass = pass = 0;
+		    out_of_order = 1;
                   break;
             }
 
-            if (!pass)
-	      break;
+            if (out_of_order)
+	      add_stringf(errors, "Attribute groups out of order (%s < %s)",
+			  ippTagString(attrptr->group_tag),
+			  ippTagString(group));
 
 	    if (attrptr->group_tag != IPP_TAG_ZERO)
 	      group = attrptr->group_tag;
 	  }
 
-	  if (!validate_attr(attrptr, 0))
-	  {
-	    prev_pass = pass = 0;
-	    break;
-	  }
+	  validate_attr(errors, attrptr);
 
           if (attrptr->name)
           {
             if (cupsArrayFind(a, attrptr->name))
-            {
-              prev_pass = pass = 0;
-              break;
-            }
+              add_stringf(errors, "Duplicate \"%s\" attribute in %s group",
+			  attrptr->name, ippTagString(group));
 
             cupsArrayAdd(a, attrptr->name);
           }
 	}
 
         cupsArrayDelete(a);
+
+       /*
+        * Now check the test-defined expected status-code and attribute
+        * values...
+        */
 
 	for (i = 0; i < num_statuses; i ++)
 	{
@@ -2416,7 +2552,27 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
 
 	if (i == num_statuses && num_statuses > 0)
-	  prev_pass = pass = 0;
+	{
+	  for (i = 0; i < num_statuses; i ++)
+	  {
+	    if (statuses[i].if_defined &&
+		!get_variable(vars, statuses[i].if_defined))
+	      continue;
+
+	    if (statuses[i].if_not_defined &&
+		get_variable(vars, statuses[i].if_not_defined))
+	      continue;
+
+	    add_stringf(errors, "EXPECTED: STATUS %s (got %s)",
+			ippErrorString(statuses[i].status),
+			ippErrorString(cupsLastError()));
+	  }
+
+	  if ((attrptr = ippFindAttribute(response, "status-message",
+					  IPP_TAG_TEXT)) != NULL)
+	    add_stringf(errors, "status-message=\"%s\"",
+			attrptr->values[0].string.text);
+        }
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
@@ -2438,7 +2594,24 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
-	      prev_pass = pass = 0;
+	    {
+	      if (found && expect->not_expect)
+		add_stringf(errors, "NOT EXPECTED: %s", expect->name);
+	      else if (!found && !(expect->not_expect || expect->optional))
+		add_stringf(errors, "EXPECTED: %s", expect->name);
+	      else if (found)
+	      {
+		if (!expect_matches(expect, found->value_tag))
+		  add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
+			      expect->name, expect->of_type,
+			      ippTagString(found->value_tag));
+    
+		if (expect->in_group && found->group_tag != expect->in_group)
+		  add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
+			      expect->name, ippTagString(expect->in_group),
+			      ippTagString(found->group_tag));
+              }
+            }
 
 	    if (expect->repeat_no_match)
 	      repeat_test = 1;
@@ -2450,13 +2623,23 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    ippAttributeString(found, buffer, sizeof(buffer));
 
 	  if (found &&
-	      !with_value(expect->with_value, expect->with_regex, found, 0,
+	      !with_value(NULL, expect->with_value, expect->with_regex, found,
 			  buffer, sizeof(buffer)))
 	  {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
-	      prev_pass = pass = 0;
+	    {
+	      if (expect->with_regex)
+		add_stringf(errors, "EXPECTED: %s WITH-VALUE /%s/",
+			    expect->name, expect->with_value);
+	      else
+		add_stringf(errors, "EXPECTED: %s WITH-VALUE \"%s\"",
+			    expect->name, expect->with_value);
+
+	      with_value(errors, expect->with_value, expect->with_regex, found,
+	                 buffer, sizeof(buffer));
+	    }
 
 	    if (expect->repeat_no_match)
 	      repeat_test = 1;
@@ -2470,7 +2653,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
-	      prev_pass = pass = 0;
+	    {
+	      add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
+			  expect->count, found->num_values);
+	    }
 
 	    if (expect->repeat_no_match)
 	      repeat_test = 1;
@@ -2488,7 +2674,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      if (expect->define_no_match)
 		set_variable(vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value)
-		prev_pass = pass = 0;
+	      {
+		if (!attrptr)
+		  add_stringf(errors,
+			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+			      "(not returned)", expect->name,
+			      found->num_values, expect->same_count_as);
+		else if (attrptr->num_values != found->num_values)
+		  add_stringf(errors,
+			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+			      "(%d values)", expect->name, found->num_values,
+			      expect->same_count_as, attrptr->num_values);
+	      }
 
 	      if (expect->repeat_no_match)
 		repeat_test = 1;
@@ -2521,6 +2718,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     ippDelete(request);
 
     request = NULL;
+
+    if (cupsArrayCount(errors) > 0)
+      prev_pass = pass = 0;
 
     if (prev_pass)
       PassCount ++;
@@ -2617,300 +2817,21 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
 	puts("<key>Errors</key>");
 	puts("<array>");
+
+	for (error = (char *)cupsArrayFirst(errors);
+	     error;
+	     error = (char *)cupsArrayNext(errors))
+	  print_xml_string("string", error);
+
+	puts("</array>");
       }
-
-      if (http->version != HTTP_1_1)
-	print_test_error("Bad HTTP version (%d.%d)", http->version / 100,
-			 http->version % 100);
-
-      if (!response)
-	print_test_error("IPP request failed with status %s (%s)",
-			 ippErrorString(cupsLastError()),
-			 cupsLastErrorString());
       else
       {
-	if (response->state != IPP_DATA)
-	  print_test_error("Missing end-of-attributes-tag in response "
-	                   "(RFC 2910 section 3.5.1)");
-
-	if (version &&
-	    (response->request.status.version[0] != (version / 10) ||
-	     response->request.status.version[1] != (version % 10)))
-          print_test_error("Bad version %d.%d in response - expected %d.%d "
-	                   "(RFC 2911 section 3.1.8).",
-	                   response->request.status.version[0],
-			   response->request.status.version[1],
-			   version / 10, version % 10);
-
-	if (response->request.status.request_id != request_id)
-	  print_test_error("Bad request ID %d in response - expected %d "
-			   "(RFC 2911 section 3.1.1)",
-			   response->request.status.request_id, request_id);
-
-	attrptr = response->attrs;
-	if (!attrptr)
-	  print_test_error("Missing first attribute \"attributes-charset "
-	                   "(charset)\" in group operation-attributes-tag "
-			   "(RFC 2911 section 3.1.4).");
-	else
-	{
-	  if (!attrptr->name ||
-	      attrptr->value_tag != IPP_TAG_CHARSET ||
-	      attrptr->group_tag != IPP_TAG_OPERATION ||
-	      attrptr->num_values != 1 ||
-	      strcmp(attrptr->name, "attributes-charset"))
-	    print_test_error("Bad first attribute \"%s (%s%s)\" in group %s, "
-			     "expected \"attributes-charset (charset)\" in "
-			     "group operation-attributes-tag (RFC 2911 section "
-			     "3.1.4).",
-			     attrptr->name ? attrptr->name : "(null)",
-			     attrptr->num_values > 1 ? "1setOf " : "",
-			     ippTagString(attrptr->value_tag),
-			     ippTagString(attrptr->group_tag));
-
-	  attrptr = attrptr->next;
-	  if (!attrptr)
-	    print_test_error("Missing second attribute \"attributes-natural-"
-			     "language (naturalLanguage)\" in group "
-			     "operation-attributes-tag (RFC 2911 section "
-			     "3.1.4).");
-	  else if (!attrptr->name ||
-	           attrptr->value_tag != IPP_TAG_LANGUAGE ||
-	           attrptr->group_tag != IPP_TAG_OPERATION ||
-	           attrptr->num_values != 1 ||
-	           strcmp(attrptr->name, "attributes-natural-language"))
-	    print_test_error("Bad first attribute \"%s (%s%s)\" in group %s, "
-			     "expected \"attributes-natural-language "
-			     "(naturalLanguage)\" in group "
-			     "operation-attributes-tag (RFC 2911 section "
-			     "3.1.4).",
-			     attrptr->name ? attrptr->name : "(null)",
-			     attrptr->num_values > 1 ? "1setOf " : "",
-			     ippTagString(attrptr->value_tag),
-			     ippTagString(attrptr->group_tag));
-        }
-
-	if ((attrptr = ippFindAttribute(response, "status-message",
-					 IPP_TAG_ZERO)) != NULL)
-	{
-	  if (attrptr->value_tag != IPP_TAG_TEXT)
-	    print_test_error("status-message (text(255)) has wrong value tag "
-	                     "%s (RFC 2911 section 3.1.6.2).",
-			     ippTagString(attrptr->value_tag));
-	  if (attrptr->group_tag != IPP_TAG_OPERATION)
-	    print_test_error("status-message (text(255)) has wrong group tag "
-	                     "%s (RFC 2911 section 3.1.6.2).",
-			     ippTagString(attrptr->group_tag));
-	  if (attrptr->num_values != 1)
-	    print_test_error("status-message (text(255)) has %d values "
-	                     "(RFC 2911 section 3.1.6.2).",
-			     attrptr->num_values);
-	  if (attrptr->value_tag == IPP_TAG_TEXT &&
-	      strlen(attrptr->values[0].string.text) > 255)
-	    print_test_error("status-message (text(255)) has bad length %d"
-	                     " (RFC 2911 section 3.1.6.2).",
-	                     (int)strlen(attrptr->values[0].string.text));
-        }
-
-	if ((attrptr = ippFindAttribute(response, "detailed-status-message",
-					 IPP_TAG_ZERO)) != NULL)
-	{
-	  if (attrptr->value_tag != IPP_TAG_TEXT)
-	    print_test_error("detailed-status-message (text(MAX)) has wrong "
-	                     "value tag %s (RFC 2911 section 3.1.6.3).",
-			     ippTagString(attrptr->value_tag));
-	  if (attrptr->group_tag != IPP_TAG_OPERATION)
-	    print_test_error("detailed-status-message (text(MAX)) has wrong "
-	                     "group tag %s (RFC 2911 section 3.1.6.3).",
-			     ippTagString(attrptr->group_tag));
-	  if (attrptr->num_values != 1)
-	    print_test_error("detailed-status-message (text(MAX)) has %d values"
-			     " (RFC 2911 section 3.1.6.3).",
-			     attrptr->num_values);
-	  if (attrptr->value_tag == IPP_TAG_TEXT &&
-	      strlen(attrptr->values[0].string.text) > 1023)
-	    print_test_error("detailed-status-message (text(MAX)) has bad "
-			     "length %d (RFC 2911 section 3.1.6.3).",
-	                     (int)strlen(attrptr->values[0].string.text));
-        }
-
-	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-
-	for (attrptr = response->attrs, group = attrptr->group_tag;
-	     attrptr;
-	     attrptr = attrptr->next)
-	{
-	  if (attrptr->group_tag != group)
-	  {
-	    cupsArrayClear(a);
-
-            switch (attrptr->group_tag)
-            {
-              case IPP_TAG_ZERO :
-                  break;
-
-              case IPP_TAG_OPERATION :
-                  prev_pass = pass = 0;
-                  break;
-
-              case IPP_TAG_UNSUPPORTED_GROUP :
-                  if (group != IPP_TAG_OPERATION)
-		    print_test_error("Attribute groups out of order (%s < %s)",
-				     ippTagString(attrptr->group_tag),
-				     ippTagString(group));
-                  break;
-
-              case IPP_TAG_JOB :
-              case IPP_TAG_PRINTER :
-                  if (group != IPP_TAG_OPERATION &&
-                      group != IPP_TAG_UNSUPPORTED_GROUP)
-		    print_test_error("Attribute groups out of order (%s < %s)",
-				     ippTagString(attrptr->group_tag),
-				     ippTagString(group));
-                  break;
-
-              case IPP_TAG_SUBSCRIPTION :
-                  if (group > attrptr->group_tag &&
-                      group != IPP_TAG_DOCUMENT)
-		    print_test_error("Attribute groups out of order (%s < %s)",
-				     ippTagString(attrptr->group_tag),
-				     ippTagString(group));
-                  break;
-
-              default :
-                  if (group > attrptr->group_tag)
-		    print_test_error("Attribute groups out of order (%s < %s)",
-				     ippTagString(attrptr->group_tag),
-				     ippTagString(group));
-                  break;
-            }
-
-	    if (attrptr->group_tag != IPP_TAG_ZERO)
-	      group = attrptr->group_tag;
-	  }
-
-	  validate_attr(attrptr, 1);
-
-          if (attrptr->name)
-          {
-            if (cupsArrayFind(a, attrptr->name))
-              print_test_error("Duplicate \"%s\" attribute in %s group",
-                               attrptr->name, ippTagString(group));
-
-            cupsArrayAdd(a, attrptr->name);
-          }
-	}
-
-        cupsArrayDelete(a);
-
-	for (i = 0; i < num_statuses; i ++)
-	{
-	  if (statuses[i].if_defined &&
-	      !get_variable(vars, statuses[i].if_defined))
-	    continue;
-
-	  if (statuses[i].if_not_defined &&
-	      get_variable(vars, statuses[i].if_not_defined))
-	    continue;
-
-	  if (response->request.status.status_code == statuses[i].status)
-	    break;
-        }
-
-	if (i == num_statuses && num_statuses > 0)
-	{
-	  for (i = 0; i < num_statuses; i ++)
-	  {
-	    if (statuses[i].if_defined &&
-		!get_variable(vars, statuses[i].if_defined))
-	      continue;
-
-	    if (statuses[i].if_not_defined &&
-		get_variable(vars, statuses[i].if_not_defined))
-	      continue;
-
-	    print_test_error("EXPECTED: STATUS %s (got %s)",
-			     ippErrorString(statuses[i].status),
-			     ippErrorString(cupsLastError()));
-	  }
-
-	  if ((attrptr = ippFindAttribute(response, "status-message",
-					  IPP_TAG_TEXT)) != NULL)
-	    print_test_error("status-message=\"%s\"",
-	                     attrptr->values[0].string.text);
-        }
-
-	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
-	{
-	  if (expect->define_match || expect->define_no_match ||
-	      expect->define_value)
-	    continue;
-
-	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
-	    continue;
-
-	  if (expect->if_not_defined &&
-	      get_variable(vars, expect->if_not_defined))
-	    continue;
-
-	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
-
-	  if (found && expect->not_expect)
-            print_test_error("NOT EXPECTED: %s", expect->name);
-	  else if (!found && !(expect->not_expect || expect->optional))
-	    print_test_error("EXPECTED: %s", expect->name);
-	  else if (found)
-	  {
-	    if (!expect_matches(expect, found->value_tag))
-	      print_test_error("EXPECTED: %s OF-TYPE %s (got %s)",
-			       expect->name, expect->of_type,
-			       ippTagString(found->value_tag));
-
-	    if (expect->in_group && found->group_tag != expect->in_group)
-	      print_test_error("EXPECTED: %s IN-GROUP %s (got %s).",
-	                       expect->name, ippTagString(expect->in_group),
-			       ippTagString(found->group_tag));
-
-	    if (!with_value(expect->with_value, expect->with_regex, found, 0,
-	                    buffer, sizeof(buffer)))
-	    {
-	      if (expect->with_regex)
-		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
-				 expect->name, expect->with_value);
-	      else
-		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
-				 expect->name, expect->with_value);
-
-	      with_value(expect->with_value, expect->with_regex, found, 1,
-	                 buffer, sizeof(buffer));
-	    }
-
-	    if (expect->count > 0 && found->num_values != expect->count)
-	    {
-	      print_test_error("EXPECTED: %s COUNT %d (got %d)", expect->name,
-			       expect->count, found->num_values);
-	    }
-
-	    if (expect->same_count_as)
-	    {
-	      attrptr = ippFindAttribute(response, expect->same_count_as,
-					 IPP_TAG_ZERO);
-
-	      if (!attrptr)
-		print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-				 "(not returned)", expect->name,
-				 found->num_values, expect->same_count_as);
-	      else if (attrptr->num_values != found->num_values)
-		print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-				 "(%d values)", expect->name, found->num_values,
-				 expect->same_count_as, attrptr->num_values);
-	    }
-	  }
-	}
+	for (error = (char *)cupsArrayFirst(errors);
+	     error;
+	     error = (char *)cupsArrayNext(errors))
+	  printf("        %s\n", error);
       }
-
-      if (Output == _CUPS_OUTPUT_PLIST)
-	puts("</array>");
     }
 
     if (num_displayed > 0 && !Verbosity &&
@@ -2984,6 +2905,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   }
 
   test_exit:
+
+  cupsArrayDelete(errors);
 
   if (fp)
     fclose(fp);
@@ -4117,37 +4040,6 @@ print_line(
 
 
 /*
- * 'print_test_error()' - Print a test error message.
- */
-
-static void
-print_test_error(const char *s,		/* I - Printf-style format string */
-                 ...)			/* I - Additional arguments as needed */
-{
-  char		buffer[10240];		/* Format buffer */
-  va_list	ap;			/* Pointer to arguments */
-
-
- /*
-  * Format the error message...
-  */
-
-  va_start(ap, s);
-  vsnprintf(buffer, sizeof(buffer), s, ap);
-  va_end(ap);
-
- /*
-  * Then output it...
-  */
-
-  if (Output == _CUPS_OUTPUT_PLIST)
-    print_xml_string("string", buffer);
-  else
-    printf("        %s\n", buffer);
-}
-
-
-/*
  * 'print_xml_header()' - Print a standard XML plist header.
  */
 
@@ -4419,8 +4311,8 @@ usage(void)
  */
 
 static int				/* O - 1 if valid, 0 otherwise */
-validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
-              int             print)	/* I - 1 = report issues to stdout */
+validate_attr(cups_array_t    *errors,	/* I - Errors array */
+              ipp_attribute_t *attr)	/* I - Attribute to validate */
 {
   int		i;			/* Looping var */
   char		scheme[64],		/* Scheme from URI */
@@ -4455,18 +4347,18 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
   {
     valid = 0;
 
-    if (print)
-      print_test_error("\"%s\": Bad attribute name - invalid character (RFC "
-		       "2911 section 4.1.3).", attr->name);
+    add_stringf(errors,
+		"\"%s\": Bad attribute name - invalid character "
+		"(RFC 2911 section 4.1.3).", attr->name);
   }
 
   if ((ptr - attr->name) > 255)
   {
     valid = 0;
 
-    if (print)
-      print_test_error("\"%s\": Bad attribute name - bad length (RFC 2911 "
-		       "section 4.1.3).", attr->name);
+    add_stringf(errors,
+		"\"%s\": Bad attribute name - bad length "
+		"(RFC 2911 section 4.1.3).", attr->name);
   }
 
   switch (attr->value_tag)
@@ -4482,11 +4374,10 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad boolen value %d (RFC 2911 section "
-	                       "4.1.10).", attr->name, attr->values[i].boolean);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad boolen value %d "
+			"(RFC 2911 section 4.1.10).", attr->name,
+			attr->values[i].boolean);
 	  }
 	}
         break;
@@ -4498,12 +4389,10 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad enum value %d - out of range "
-	                       "(RFC 2911 section 4.1.4).", attr->name,
-			       attr->values[i].integer);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad enum value %d - out of range "
+			"(RFC 2911 section 4.1.4).", attr->name,
+			attr->values[i].integer);
 	  }
 	}
         break;
@@ -4515,12 +4404,10 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad octetString value - bad length %d "
-	                       "(RFC 2911 section 4.1.10).", attr->name,
-			       attr->values[i].unknown.length);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad octetString value - bad length %d "
+			"(RFC 2911 section 4.1.10).", attr->name,
+			attr->values[i].unknown.length);
 	  }
 	}
         break;
@@ -4534,99 +4421,81 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime month %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[2]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime month %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[2]);
 	  }
 
           if (date[3] < 1 || date[3] > 31)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime day %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[3]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime day %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[3]);
 	  }
 
           if (date[4] > 23)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime hours %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[4]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime hours %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[4]);
 	  }
 
           if (date[5] > 59)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime minutes %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[5]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime minutes %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[5]);
 	  }
 
           if (date[6] > 60)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime seconds %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[6]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime seconds %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[6]);
 	  }
 
           if (date[7] > 9)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime deciseconds %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[7]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime deciseconds %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[7]);
 	  }
 
           if (date[8] != '-' && date[8] != '+')
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[8]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime UTC sign '%c' "
+			"(RFC 2911 section 4.1.13).", attr->name, date[8]);
 	  }
 
           if (date[9] > 11)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime UTC hours %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[9]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime UTC hours %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[9]);
 	  }
 
           if (date[10] > 59)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad dateTime UTC minutes %u (RFC 2911 "
-	                       "section 4.1.13).", attr->name, date[10]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad dateTime UTC minutes %u "
+			"(RFC 2911 section 4.1.13).", attr->name, date[10]);
 	  }
 	}
         break;
@@ -4638,36 +4507,32 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad resolution value %dx%d%s - cross "
-	                       "feed resolution must be positive (RFC 2911 "
-			       "section 4.1.13).", attr->name,
-			       attr->values[i].resolution.xres,
-			       attr->values[i].resolution.yres,
-			       attr->values[i].resolution.units ==
-			           IPP_RES_PER_INCH ? "dpi" :
-			           attr->values[i].resolution.units ==
-			               IPP_RES_PER_CM ? "dpc" : "unknown");
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad resolution value %dx%d%s - cross "
+			"feed resolution must be positive "
+			"(RFC 2911 section 4.1.13).", attr->name,
+			attr->values[i].resolution.xres,
+			attr->values[i].resolution.yres,
+			attr->values[i].resolution.units ==
+			    IPP_RES_PER_INCH ? "dpi" :
+			    attr->values[i].resolution.units ==
+				IPP_RES_PER_CM ? "dpc" : "unknown");
 	  }
 
 	  if (attr->values[i].resolution.yres <= 0)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad resolution value %dx%d%s - feed "
-	                       "resolution must be positive (RFC 2911 section "
-			       "4.1.13).", attr->name,
-			       attr->values[i].resolution.xres,
-			       attr->values[i].resolution.yres,
-			       attr->values[i].resolution.units ==
-			           IPP_RES_PER_INCH ? "dpi" :
-			           attr->values[i].resolution.units ==
-			               IPP_RES_PER_CM ? "dpc" : "unknown");
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad resolution value %dx%d%s - feed "
+			"resolution must be positive "
+			"(RFC 2911 section 4.1.13).", attr->name,
+			attr->values[i].resolution.xres,
+			attr->values[i].resolution.yres,
+			attr->values[i].resolution.units ==
+			    IPP_RES_PER_INCH ? "dpi" :
+			    attr->values[i].resolution.units ==
+				IPP_RES_PER_CM ? "dpc" : "unknown");
 	  }
 
 	  if (attr->values[i].resolution.units != IPP_RES_PER_INCH &&
@@ -4675,17 +4540,15 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad resolution value %dx%d%s - bad "
-	                       "units value (RFC 2911 section 4.1.13).",
-			       attr->name, attr->values[i].resolution.xres,
-			       attr->values[i].resolution.yres,
-			       attr->values[i].resolution.units ==
-			           IPP_RES_PER_INCH ? "dpi" :
-			           attr->values[i].resolution.units ==
-			               IPP_RES_PER_CM ? "dpc" : "unknown");
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad resolution value %dx%d%s - bad "
+			"units value (RFC 2911 section 4.1.13).",
+			attr->name, attr->values[i].resolution.xres,
+			attr->values[i].resolution.yres,
+			attr->values[i].resolution.units ==
+			    IPP_RES_PER_INCH ? "dpi" :
+			    attr->values[i].resolution.units ==
+				IPP_RES_PER_CM ? "dpc" : "unknown");
 	  }
 	}
         break;
@@ -4697,13 +4560,11 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad rangeOfInteger value %d-%d - lower "
-	                       "greater than upper (RFC 2911 section 4.1.13).",
-			       attr->name, attr->values[i].range.lower,
-			       attr->values[i].range.upper);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad rangeOfInteger value %d-%d - lower "
+			"greater than upper (RFC 2911 section 4.1.13).",
+			attr->name, attr->values[i].range.lower,
+			attr->values[i].range.upper);
 	  }
 	}
         break;
@@ -4715,20 +4576,20 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	       colattr;
 	       colattr = colattr->next)
 	  {
-	    if (!validate_attr(colattr, 0))
+	    if (!validate_attr(NULL, colattr))
 	    {
 	      valid = 0;
 	      break;
 	    }
 	  }
 
-	  if (colattr && print)
+	  if (colattr && errors)
 	  {
-            print_test_error("\"%s\": Bad collection value.", attr->name);
+            add_stringf(errors, "\"%s\": Bad collection value.", attr->name);
 
 	    while (colattr)
 	    {
-	      validate_attr(colattr, print);
+	      validate_attr(errors, colattr);
 	      colattr = colattr->next;
 	    }
 	  }
@@ -4776,25 +4637,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad text value \"%s\" - bad UTF-8 "
-			       "sequence (RFC 2911 section 4.1.1).", attr->name,
-			       attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad text value \"%s\" - bad UTF-8 "
+			"sequence (RFC 2911 section 4.1.1).", attr->name,
+			attr->values[i].string.text);
 	  }
 
 	  if ((ptr - attr->values[i].string.text) > 1023)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad text value \"%s\" - bad length %d "
-			       "(RFC 2911 section 4.1.1).", attr->name,
-			       attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad text value \"%s\" - bad length %d "
+			"(RFC 2911 section 4.1.1).", attr->name,
+			attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -4840,25 +4697,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad name value \"%s\" - bad UTF-8 "
-			       "sequence (RFC 2911 section 4.1.2).", attr->name,
-			       attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad name value \"%s\" - bad UTF-8 "
+			"sequence (RFC 2911 section 4.1.2).", attr->name,
+			attr->values[i].string.text);
 	  }
 
 	  if ((ptr - attr->values[i].string.text) > 1023)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad name value \"%s\" - bad length %d "
-			       "(RFC 2911 section 4.1.2).", attr->name,
-			       attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad name value \"%s\" - bad length %d "
+			"(RFC 2911 section 4.1.2).", attr->name,
+			attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -4875,25 +4728,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad keyword value \"%s\" - invalid "
-			       "character (RFC 2911 section 4.1.3).",
-			       attr->name, attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad keyword value \"%s\" - invalid "
+			"character (RFC 2911 section 4.1.3).",
+			attr->name, attr->values[i].string.text);
 	  }
 
 	  if ((ptr - attr->values[i].string.text) > 255)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad keyword value \"%s\" - bad "
-			       "length %d (RFC 2911 section 4.1.3).",
-			       attr->name, attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad keyword value \"%s\" - bad "
+			"length %d (RFC 2911 section 4.1.3).",
+			attr->name, attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -4912,27 +4761,23 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad URI value \"%s\" - %s "
-	                       "(RFC 2911 section 4.1.5).", attr->name,
-	                       attr->values[i].string.text,
-			       URIStatusStrings[uri_status -
-			                        HTTP_URI_OVERFLOW]);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad URI value \"%s\" - %s "
+			"(RFC 2911 section 4.1.5).", attr->name,
+			attr->values[i].string.text,
+			URIStatusStrings[uri_status -
+					 HTTP_URI_OVERFLOW]);
 	  }
 
 	  if (strlen(attr->values[i].string.text) > 1023)
 	  {
 	    valid = 0;
 
-	    if (print)
-	      print_test_error("\"%s\": Bad URI value \"%s\" - bad length %d "
-	                       "(RFC 2911 section 4.1.5).", attr->name,
-	                       attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad URI value \"%s\" - bad length %d "
+			"(RFC 2911 section 4.1.5).", attr->name,
+			attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -4953,25 +4798,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad uriScheme value \"%s\" - bad "
-	                       "characters (RFC 2911 section 4.1.6).",
-			       attr->name, attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad uriScheme value \"%s\" - bad "
+			"characters (RFC 2911 section 4.1.6).",
+			attr->name, attr->values[i].string.text);
 	  }
 
 	  if ((ptr - attr->values[i].string.text) > 63)
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad uriScheme value \"%s\" - bad "
-	                       "length %d (RFC 2911 section 4.1.6).",
-			       attr->name, attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad uriScheme value \"%s\" - bad "
+			"length %d (RFC 2911 section 4.1.6).",
+			attr->name, attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -4988,25 +4829,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad charset value \"%s\" - bad "
-	                       "characters (RFC 2911 section 4.1.7).",
-			       attr->name, attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad charset value \"%s\" - bad "
+			"characters (RFC 2911 section 4.1.7).",
+			attr->name, attr->values[i].string.text);
 	  }
 
 	  if ((ptr - attr->values[i].string.text) > 40)
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad charset value \"%s\" - bad "
-	                       "length %d (RFC 2911 section 4.1.7).",
-			       attr->name, attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad charset value \"%s\" - bad "
+			"length %d (RFC 2911 section 4.1.7).",
+			attr->name, attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
         break;
@@ -5039,6 +4876,7 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
           regerror(i, &re, temp, sizeof(temp));
 	  print_fatal_error("Unable to compile naturalLanguage regular "
 	                    "expression: %s.", temp);
+	  break;
         }
 
         for (i = 0; i < attr->num_values; i ++)
@@ -5047,25 +4885,21 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad naturalLanguage value \"%s\" - bad "
-	                       "characters (RFC 2911 section 4.1.8).",
-			       attr->name, attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad naturalLanguage value \"%s\" - bad "
+			"characters (RFC 2911 section 4.1.8).",
+			attr->name, attr->values[i].string.text);
 	  }
 
 	  if (strlen(attr->values[i].string.text) > 63)
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad naturalLanguage value \"%s\" - bad "
-	                       "length %d (RFC 2911 section 4.1.8).",
-			       attr->name, attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad naturalLanguage value \"%s\" - bad "
+			"length %d (RFC 2911 section 4.1.8).",
+			attr->name, attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
 
@@ -5095,6 +4929,7 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
           regerror(i, &re, temp, sizeof(temp));
 	  print_fatal_error("Unable to compile mimeMediaType regular "
 	                    "expression: %s.", temp);
+	  break;
         }
 
         for (i = 0; i < attr->num_values; i ++)
@@ -5103,27 +4938,25 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad mimeMediaType value \"%s\" - bad "
-	                       "characters (RFC 2911 section 4.1.9).",
-			       attr->name, attr->values[i].string.text);
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad mimeMediaType value \"%s\" - bad "
+			"characters (RFC 2911 section 4.1.9).",
+			attr->name, attr->values[i].string.text);
 	  }
 
 	  if (strlen(attr->values[i].string.text) > 255)
 	  {
 	    valid = 0;
 
-            if (print)
-	      print_test_error("\"%s\": Bad mimeMediaType value \"%s\" - bad "
-	                       "length %d (RFC 2911 section 4.1.9).",
-			       attr->name, attr->values[i].string.text,
-			       (int)strlen(attr->values[i].string.text));
-            else
-	      break;
+	    add_stringf(errors,
+			"\"%s\": Bad mimeMediaType value \"%s\" - bad "
+			"length %d (RFC 2911 section 4.1.9).",
+			attr->name, attr->values[i].string.text,
+			(int)strlen(attr->values[i].string.text));
 	  }
 	}
+
+	regfree(&re);
         break;
 
     default :
@@ -5139,10 +4972,10 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
  */
 
 static int				/* O - 1 on match, 0 on non-match */
-with_value(char            *value,	/* I - Value string */
+with_value(cups_array_t    *errors,	/* I - Errors array */
+           char            *value,	/* I - Value string */
            int             regex,	/* I - Value is a regular expression */
            ipp_attribute_t *attr,	/* I - Attribute to compare */
-	   int             report,	/* I - 1 = report failures */
 	   char            *matchbuf,	/* I - Buffer to hold matching value */
 	   size_t          matchlen)	/* I - Length of match buffer */
 {
@@ -5223,10 +5056,11 @@ with_value(char            *value,	/* I - Value string */
 	  }
         }
 
-	if (report)
+	if (errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
-	    print_test_error("GOT: %s=%d", attr->name, attr->values[i].integer);
+	    add_stringf(errors, "GOT: %s=%d", attr->name,
+	                attr->values[i].integer);
 	}
 	break;
 
@@ -5294,10 +5128,10 @@ with_value(char            *value,	/* I - Value string */
 	  }
         }
 
-	if (report)
+	if (errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
-	    print_test_error("GOT: %s=%d-%d", attr->name,
+	    add_stringf(errors, "GOT: %s=%d-%d", attr->name,
 	                     attr->values[i].range.lower,
 	                     attr->values[i].range.upper);
 	}
@@ -5313,10 +5147,10 @@ with_value(char            *value,	/* I - Value string */
 	  }
 	}
 
-	if (report)
+	if (errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
-	    print_test_error("GOT: %s=%s", attr->name,
+	    add_stringf(errors, "GOT: %s=%s", attr->name,
 			     attr->values[i].boolean ? "true" : "false");
 	}
 	break;
@@ -5362,8 +5196,8 @@ with_value(char            *value,	/* I - Value string */
 	  {
 	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
 	    {
-	      if (report)
-	        print_test_error("GOT: %s=\"%s\"", attr->name,
+	      if (errors)
+	        add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
 		                 attr->values[i].string.text);
 	      else
 	        break;
@@ -5393,10 +5227,10 @@ with_value(char            *value,	/* I - Value string */
 	    }
 	  }
 
-	  if (report)
+	  if (errors)
 	  {
 	    for (i = 0; i < attr->num_values; i ++)
-	      print_test_error("GOT: %s=\"%s\"", attr->name,
+	      add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
 			       attr->values[i].string.text);
 	  }
 	}
