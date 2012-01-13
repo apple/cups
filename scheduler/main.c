@@ -1529,6 +1529,7 @@ process_children(void)
   cupsd_job_t	*job;			/* Current job */
   int		i;			/* Looping var */
   char		name[1024];		/* Process name */
+  const char	*type;			/* Type of program */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
@@ -1571,7 +1572,7 @@ process_children(void)
     if (job_id > 0)
       job = cupsdFindJob(job_id);
     else
-      job = NULL;
+      job  = NULL;
 
     if (job)
     {
@@ -1586,9 +1587,15 @@ process_children(void)
 	*/
 
 	if (job->filters[i])
+	{
 	  job->filters[i] = -pid;
+	  type            = "Filter";
+	}
 	else
+	{
 	  job->backend = -pid;
+	  type         = "Backend";
+	}
 
 	if (status && status != SIGTERM && status != SIGKILL &&
 	    status != SIGPIPE && job->status >= 0)
@@ -1615,7 +1622,7 @@ process_children(void)
 
 	    job->status_level = CUPSD_LOG_ERROR;
 
-	    snprintf(message, sizeof(message), "%s failed", name);
+	    snprintf(message, sizeof(message), "%s failed", type);
 
             if (job->printer)
 	    {
@@ -1710,7 +1717,7 @@ process_children(void)
 		      "PID %d (%s) stopped with status %d.", pid, name, code);
       }
       else
-	cupsdLogJob(job, CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d.",
+	cupsdLogJob(job, CUPSD_LOG_DEBUG, "PID %d (%s) crashed on signal %d.",
 		    pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)
