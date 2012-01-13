@@ -1853,7 +1853,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
           }
           else if (i >= (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])))
             break;
-          
+
 	  if (!strcmp(line, "username"))
 	    cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
 	  else if (!strcmp(line, "domain"))
@@ -4431,7 +4431,23 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	return;
       }
       else if (cupsdSetPrinterReasons(job->printer, message))
+      {
 	event |= CUPSD_EVENT_PRINTER_STATE;
+
+        if (MaxJobTime > 0 && strstr(message, "connecting-to-device") != NULL)
+        {
+         /*
+          * Reset cancel time after connecting to the device...
+          */
+
+          for (i = 0; i < job->printer->num_reasons; i ++)
+            if (!strcmp(job->printer->reasons[i], "connecting-to-device"))
+              break;
+
+          if (i >= job->printer->num_reasons)
+	    job->cancel_time = time(NULL) + MaxJobTime;
+        }
+      }
 
       update_job_attrs(job, 0);
     }
