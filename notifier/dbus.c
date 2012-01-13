@@ -475,6 +475,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (params >= PARAMS_JOB)
     {
+      char	*p;			/* Pointer into job_reasons */
+      size_t	reasons_length;		/* Required size of job_reasons */
+      int	i;			/* Looping var */
+
       /* UINT32 job-id */
       attr = ippFindAttribute(msg, "notify-job-id", IPP_TAG_INTEGER);
       if (attr)
