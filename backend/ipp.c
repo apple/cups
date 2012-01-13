@@ -1358,7 +1358,13 @@ main(int  argc,				/* I - Number of command-line args */
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
         if (num_files == 1)
-	  fd = open(files[0], O_RDONLY);
+        {
+	  if ((fd = open(files[0], O_RDONLY)) < 0)
+	  {
+	    _cupsLangPrintError("ERROR", _("Unable to open print file"));
+	    return (CUPS_BACKEND_FAILED);
+	  }
+	}
 	else
 	{
 	  fd          = 0;
@@ -1541,7 +1547,13 @@ main(int  argc,				/* I - Number of command-line args */
 	    http_status = cupsWriteRequestData(http, buffer, bytes);
 	  }
 	  else
-	    fd = open(files[i], O_RDONLY);
+	  {
+	    if ((fd = open(files[i], O_RDONLY)) < 0)
+	    {
+	      _cupsLangPrintError("ERROR", _("Unable to open print file"));
+	      return (CUPS_BACKEND_FAILED);
+	    }
+	  }
 	}
 	else
 	  fd = -1;
