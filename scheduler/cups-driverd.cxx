@@ -142,7 +142,7 @@ static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
 			             const ppd_info_t *p1);
-static int		dump_ppds_dat(void);
+static int		dump_ppds_dat(const char *filename);
 static void		free_array(cups_array_t *a);
 static int		list_ppds(int request_id, int limit, const char *opt);
 static int		load_drivers(cups_array_t *include,
@@ -174,8 +174,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc == 3 && !strcmp(argv[1], "cat"))
     return (cat_ppd(argv[2], 0));
-  else if (argc == 2 && !strcmp(argv[1], "dump"))
-    return (dump_ppds_dat());
+  else if ((argc == 2 || argc == 3) && !strcmp(argv[1], "dump"))
+    return (dump_ppds_dat(argv[2]));
   else if (argc == 4 && !strcmp(argv[1], "get"))
     return (cat_ppd(argv[3], atoi(argv[2])));
   else if (argc == 5 && !strcmp(argv[1], "list"))
@@ -763,9 +763,9 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
  */
 
 static int				/* O - Exit status */
-dump_ppds_dat(void)
+dump_ppds_dat(const char *filename)	/* I - Filename */
 {
-  char		filename[1024];		/* ppds.dat filename */
+  char		temp[1024];		/* ppds.dat filename */
   ppd_info_t	*ppd;			/* Current PPD */
 
 
@@ -773,7 +773,12 @@ dump_ppds_dat(void)
   * See if we a PPD database file...
   */
 
-  load_ppds_dat(filename, sizeof(filename), 0);
+  if (filename)
+    strlcpy(temp, filename, sizeof(temp));
+  else
+    temp[0] = '\0';
+
+  load_ppds_dat(temp, sizeof(temp), 0);
 
   puts("mtime,size,model_number,type,filename,name,languages0,products0,"
        "psversions0,make,make_and_model,device_id,scheme");
@@ -869,6 +874,7 @@ list_ppds(int        request_id,	/* I - Request ID */
   * See if we a PPD database file...
   */
 
+  filename[0] = '\0';
   load_ppds_dat(filename, sizeof(filename), 1);
 
  /*
@@ -2365,10 +2371,14 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
   PPDsByMakeModel = cupsArrayNew((cups_array_func_t)compare_ppds, NULL);
   ChangedPPD      = 0;
 
-  if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
-    cups_cachedir = CUPS_CACHEDIR;
+  if (!filename[0])
+  {
+    if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
+      cups_cachedir = CUPS_CACHEDIR;
 
-  snprintf(filename, filesize, "%s/ppds.dat", cups_cachedir);
+    snprintf(filename, filesize, "%s/ppds.dat", cups_cachedir);
+  }
+
   if ((fp = cupsFileOpen(filename, "r")) != NULL)
   {
    /*
