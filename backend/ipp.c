@@ -236,6 +236,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		create_job = 0,		/* Does printer support Create-Job? */
+		send_document = 0,	/* Does printer support Send-Document? */
 		validate_job = 0;	/* Does printer support Validate-Job? */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
@@ -1048,17 +1049,18 @@ main(int  argc,				/* I - Number of command-line args */
       for (i = 0; i < operations_sup->num_values; i ++)
       {
         if (operations_sup->values[i].integer == IPP_VALIDATE_JOB)
-	{
 	  validate_job = 1;
-	  if (create_job)
-	    break;
-	}
         else if (operations_sup->values[i].integer == IPP_CREATE_JOB)
-	{
 	  create_job = 1;
-	  if (validate_job)
-	    break;
-	}
+        else if (operations_sup->values[i].integer == IPP_SEND_DOCUMENT)
+	  send_document = 1;
+      }
+
+      if (!send_document)
+      {
+        fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
+              stderr);
+        create_job = 0;
       }
 
       if (!validate_job)
