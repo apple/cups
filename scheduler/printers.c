@@ -2111,7 +2111,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 
     if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
-      auth_type = DefaultAuthType;
+      auth_type = cupsdDefaultAuthType();
 
     if (auth_type == CUPSD_AUTH_BASIC || auth_type == CUPSD_AUTH_BASICDIGEST)
       auth_supported = "basic";

@@ -96,10 +96,14 @@ clean:
 	$(RM) mantohtml mantohtml.o
 	$(RM) $(MAN1) $(MAN5) $(MAN7) $(MAN8)
 	for file in $(MAN1); do \
-		$(RM) ../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
+		if test $$file != ipptool.$(MAN1EXT); then \
+			$(RM) ../doc/help/man-`basename $$file .$(MAN1EXT)`.html; \
+		fi \
 	done
 	for file in $(MAN5); do \
-		$(RM) ../doc/help/man-`basename $$file .$(MAN5EXT)`.html; \
+		if test $$file != ipptoolfile.$(MAN5EXT); then \
+			$(RM) ../doc/help/man-`basename $$file .$(MAN5EXT)`.html; \
+		fi \
 	done
 	for file in $(MAN7); do \
 		$(RM) ../doc/help/man-`basename $$file .$(MAN7EXT)`.html; \

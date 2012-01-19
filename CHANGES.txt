@@ -1,8 +1,20 @@
-CHANGES.txt - 1.6b1 - 2011-11-03
+CHANGES.txt - 1.6b1 - 2012-01-13
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- Added new destination connection and enumeration functions (STR #3924)
+	- Added new option, localization, and job submission functions that do
+	  not depend on PPD files (STR #3925)
+	- Added a new MaxJobTime directive for cupsd that specifies the maximum
+	  amount of time allowed for a job to complete before it is canceled.
+	- The default password callback now supports passwords up to 127
+	  characters.
+	- The scheduler now supports a DefaultAuthType of "auto" to
+	  automatically choose between Basic (username/password) and Negotiate
+	  (Kerberos) authentication.
+	- cupsSideChannelSNMPGet/Walk now support OIDs and values up to 64k in
+	  length.
 	- CUPS no longer supports automatic remote printers or implicit classes
 	  via the CUPS, LDAP, or SLP protocols (STR #3922, STR #3923)
 	- The PPD APIs are now deprecated and will be removed in a future

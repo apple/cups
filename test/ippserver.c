@@ -3,7 +3,7 @@
  *
  *   Sample IPP/2.0 server for CUPS.
  *
- *   Copyright 2010-2011 by Apple Inc.
+ *   Copyright 2010-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -3399,7 +3399,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   if (close(job->fd))
   {
-    int error = errno;		/* Write error */
+    int error = errno;			/* Write error */
 
     job->state = IPP_JOB_ABORTED;
     job->fd    = -1;
@@ -4797,6 +4797,8 @@ respond_unsupported(
     respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.",
 		attr->name, attr->num_values > 1 ? "1setOf " : "",
 		ippTagString(attr->value_tag));
+  else
+    ippSetStatusCode(client->response, IPP_ATTRIBUTES);
 
   temp = ippCopyAttribute(client->response, attr, 0);
   ippSetGroupTag(client->response, &temp, IPP_TAG_UNSUPPORTED_GROUP);

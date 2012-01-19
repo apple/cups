@@ -33,12 +33,12 @@
 
 #ifdef HAVE_EPOLL
 #  include <sys/epoll.h>
-#  include <sys/poll.h>
+#  include <poll.h>
 #elif defined(HAVE_KQUEUE)
 #  include <sys/event.h>
 #  include <sys/time.h>
 #elif defined(HAVE_POLL)
-#  include <sys/poll.h>
+#  include <poll.h>
 #elif defined(__hpux)
 #  include <sys/time.h>
 #else

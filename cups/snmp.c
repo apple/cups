@@ -61,7 +61,7 @@
 #include "cups-private.h"
 #include "snmp-private.h"
 #ifdef HAVE_POLL
-#  include <sys/poll.h>
+#  include <poll.h>
 #endif /* HAVE_POLL */
 
 

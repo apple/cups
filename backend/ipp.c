@@ -3,7 +3,7 @@
  *
  *   IPP backend for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -63,6 +63,7 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
   int			port,		/* Port number */
 			version,	/* IPP version */
 			job_id;		/* Job ID for submitted job */
+  const char		*job_name;	/* Job name for submitted job */
   http_encryption_t	encryption;	/* Use encryption? */
   ipp_jstate_t		job_state;	/* Current job state */
   ipp_pstate_t		printer_state;	/* Current printer state */
@@ -82,6 +83,8 @@ static const char * const jattrs[] =	/* Job attributes we want */
 {
   "job-impressions-completed",
   "job-media-sheets-completed",
+  "job-name",
+  "job-originating-user-name",
   "job-state",
   "job-state-reasons"
 };
@@ -205,6 +208,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		port;			/* Port number (not used) */
   char		portname[255];		/* Port name */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
+  char		print_job_name[1024];	/* Update job-name for Print-Job */
   http_status_t	http_status;		/* Status of HTTP request */
   ipp_status_t	ipp_status;		/* Status of IPP request */
   http_t	*http;			/* HTTP connection */
@@ -231,7 +235,9 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *doc_handling_sup;	/* multiple-document-handling-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
-  int		validate_job;		/* Does printer support Validate-Job? */
+  int		create_job = 0,		/* Does printer support Create-Job? */
+		send_document = 0,	/* Does printer support Send-Document? */
+		validate_job = 0;	/* Does printer support Validate-Job? */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
   const char	*content_type,		/* CONTENT_TYPE environment variable */
@@ -789,7 +795,6 @@ main(int  argc,				/* I - Number of command-line args */
   supported        = NULL;
   operations_sup   = NULL;
   doc_handling_sup = NULL;
-  validate_job     = 0;
 
   do
   {
@@ -1042,11 +1047,21 @@ main(int  argc,				/* I - Number of command-line args */
 			     "cups-ipp-missing-get-printer-attributes");
 
       for (i = 0; i < operations_sup->num_values; i ++)
+      {
         if (operations_sup->values[i].integer == IPP_VALIDATE_JOB)
-	{
 	  validate_job = 1;
-	  break;
-	}
+        else if (operations_sup->values[i].integer == IPP_CREATE_JOB)
+	  create_job = 1;
+        else if (operations_sup->values[i].integer == IPP_SEND_DOCUMENT)
+	  send_document = 1;
+      }
+
+      if (!send_document)
+      {
+        fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
+              stderr);
+        create_job = 0;
+      }
 
       if (!validate_job)
 	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
@@ -1116,7 +1131,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     copies_remaining = 1;
 
-    if (argc < 7 && !send_options)
+    if (argc < 7 && !_cups_strncasecmp(final_content_type, "image/", 6))
       copies = 1;
   }
   else
@@ -1220,6 +1235,17 @@ main(int  argc,				/* I - Number of command-line args */
   monitor.job_state     = IPP_JOB_PENDING;
   monitor.printer_state = IPP_PRINTER_IDLE;
 
+  if (create_job)
+  {
+    monitor.job_name = argv[3];
+  }
+  else
+  {
+    snprintf(print_job_name, sizeof(print_job_name), "%s - %s", argv[1],
+             argv[3]);
+    monitor.job_name = print_job_name;
+  }
+
   _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
 
  /*
@@ -1228,8 +1254,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (!job_canceled && validate_job)
   {
-    request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2], argv[3],
-                          num_options, options, compression,
+    request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2],
+                          monitor.job_name, num_options, options, compression,
 			  copies_sup ? copies : 1, document_format, pc,
 			  media_col_sup, doc_handling_sup);
 
@@ -1306,16 +1332,17 @@ main(int  argc,				/* I - Number of command-line args */
     if (job_canceled)
       break;
 
-    request = new_request(num_files > 1 ? IPP_CREATE_JOB : IPP_PRINT_JOB,
-			  version, uri, argv[2], argv[3], num_options, options,
-			  compression, copies_sup ? copies : 1, document_format,
-			  pc, media_col_sup, doc_handling_sup);
+    request = new_request((num_files > 1 || create_job) ? IPP_CREATE_JOB :
+                                                          IPP_PRINT_JOB,
+			  version, uri, argv[2], monitor.job_name, num_options,
+			  options, compression, copies_sup ? copies : 1,
+			  document_format, pc, media_col_sup, doc_handling_sup);
 
    /*
     * Do the request...
     */
 
-    if (num_files > 1)
+    if (num_files > 1 || create_job)
       response = cupsDoRequest(http, request, resource);
     else
     {
@@ -1333,7 +1360,13 @@ main(int  argc,				/* I - Number of command-line args */
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
         if (num_files == 1)
-	  fd = open(files[0], O_RDONLY);
+        {
+	  if ((fd = open(files[0], O_RDONLY)) < 0)
+	  {
+	    _cupsLangPrintError("ERROR", _("Unable to open print file"));
+	    return (CUPS_BACKEND_FAILED);
+	  }
+	}
 	else
 	{
 	  fd          = 0;
@@ -1382,7 +1415,7 @@ main(int  argc,				/* I - Number of command-line args */
     ipp_status = cupsLastError();
 
     fprintf(stderr, "DEBUG: %s: %s (%s)\n",
-            num_files > 1 ? "Create-Job" : "Print-Job",
+            (num_files > 1 || create_job) ? "Create-Job" : "Print-Job",
             ippErrorString(ipp_status), cupsLastErrorString());
 
     if (ipp_status > IPP_OK_CONFLICT)
@@ -1466,14 +1499,15 @@ main(int  argc,				/* I - Number of command-line args */
                            _("Print file accepted - job ID %d."), job_id);
     }
 
+    fprintf(stderr, "DEBUG: job-id=%d\n", job_id);
     ippDelete(response);
 
     if (job_canceled)
       break;
 
-    if (job_id && num_files > 1)
+    if (job_id && (num_files > 1 || create_job))
     {
-      for (i = 0; i < num_files; i ++)
+      for (i = 0; num_files == 0 || i < num_files; i ++)
       {
        /*
 	* Check for side-channel requests...
@@ -1499,16 +1533,34 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                        "requesting-user-name", NULL, argv[2]);
 
-        if ((i + 1) == num_files)
+        if ((i + 1) >= num_files)
 	  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
 
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-	             "document-format", NULL, content_type);
+	             "document-format", NULL, document_format);
 
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
-	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA &&
-	    (fd = open(files[i], O_RDONLY)) >= 0)
+	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
+	{
+	  if (num_files == 0)
+	  {
+	    fd          = 0;
+	    http_status = cupsWriteRequestData(http, buffer, bytes);
+	  }
+	  else
+	  {
+	    if ((fd = open(files[i], O_RDONLY)) < 0)
+	    {
+	      _cupsLangPrintError("ERROR", _("Unable to open print file"));
+	      return (CUPS_BACKEND_FAILED);
+	    }
+	  }
+	}
+	else
+	  fd = -1;
+
+	if (fd >= 0)
 	{
 	  while (!job_canceled &&
 	         (bytes = read(fd, buffer, sizeof(buffer))) > 0)
@@ -1525,7 +1577,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    }
 	  }
 
-	  close(fd);
+          if (fd > 0)
+	    close(fd);
 	}
 
 	ippDelete(cupsGetResponse(http, resource));
@@ -1542,6 +1595,8 @@ main(int  argc,				/* I - Number of command-line args */
 			       _("Unable to add document to print job."));
 	  break;
 	}
+	else if (num_files == 0 || fd < 0)
+	  break;
       }
     }
 
@@ -1972,6 +2027,11 @@ monitor_printer(
   ipp_attribute_t *attr;		/* Attribute in response */
   int		delay,			/* Current delay */
 		prev_delay;		/* Previous delay */
+  ipp_op_t	job_op;			/* Operation to use */
+  int		job_id;			/* Job ID */
+  const char	*job_name;		/* Job name */
+  ipp_jstate_t	job_state;		/* Job state */
+  const char	*job_user;		/* Job originating user name */
 
 
  /*
@@ -2006,46 +2066,95 @@ monitor_printer(
 						   monitor->user,
 						   monitor->version);
 
-      if (monitor->job_id > 0)
-      {
-       /*
-        * Check the status of the job itself...
-	*/
+     /*
+      * Check the status of the job itself...
+      */
 
-	request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
-	request->request.op.version[0] = monitor->version / 10;
-	request->request.op.version[1] = monitor->version % 10;
+      job_op  = monitor->job_id > 0 ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
+      request = ippNewRequest(job_op);
+      request->request.op.version[0] = monitor->version / 10;
+      request->request.op.version[1] = monitor->version % 10;
 
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-		     NULL, monitor->uri);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+		   NULL, monitor->uri);
+      if (job_op == IPP_GET_JOB_ATTRIBUTES)
 	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
-	              monitor->job_id);
+		      monitor->job_id);
 
-	if (monitor->user && monitor->user[0])
-	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		       "requesting-user-name", NULL, monitor->user);
+      if (monitor->user && monitor->user[0])
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		     "requesting-user-name", NULL, monitor->user);
 
-	ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-		      "requested-attributes",
-		      (int)(sizeof(jattrs) / sizeof(jattrs[0])), NULL, jattrs);
+      ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		    "requested-attributes",
+		    (int)(sizeof(jattrs) / sizeof(jattrs[0])), NULL, jattrs);
 
-       /*
-	* Do the request...
-	*/
+     /*
+      * Do the request...
+      */
 
-	response = cupsDoRequest(http, request, monitor->resource);
+      response = cupsDoRequest(http, request, monitor->resource);
 
-	fprintf(stderr, "DEBUG: Get-Job-Attributes: %s (%s)\n",
-		ippErrorString(cupsLastError()), cupsLastErrorString());
+      fprintf(stderr, "DEBUG: %s: %s (%s)\n", ippOpString(job_op),
+	      ippErrorString(cupsLastError()), cupsLastErrorString());
 
+      if (job_op == IPP_GET_JOB_ATTRIBUTES)
+      {
 	if ((attr = ippFindAttribute(response, "job-state",
 				     IPP_TAG_ENUM)) != NULL)
 	  monitor->job_state = (ipp_jstate_t)attr->values[0].integer;
 	else
 	  monitor->job_state = IPP_JOB_COMPLETED;
-
-	ippDelete(response);
       }
+      else
+      {
+        for (attr = response->attrs; attr; attr = attr->next)
+        {
+          job_id    = 0;
+          job_name  = NULL;
+          job_state = IPP_JOB_PENDING;
+          job_user  = NULL;
+
+          while (attr && attr->group_tag != IPP_TAG_JOB)
+            attr = attr->next;
+
+          if (!attr)
+            break;
+
+          while (attr && attr->group_tag == IPP_TAG_JOB)
+          {
+            if (!strcmp(attr->name, "job-id") &&
+                attr->value_tag == IPP_TAG_INTEGER)
+              job_id = attr->values[0].integer;
+            else if (!strcmp(attr->name, "job-name") &&
+		     (attr->value_tag == IPP_TAG_NAME ||
+		      attr->value_tag == IPP_TAG_NAMELANG))
+              job_name = attr->values[0].string.text;
+            else if (!strcmp(attr->name, "job-state") &&
+		     attr->value_tag == IPP_TAG_ENUM)
+              job_state = attr->values[0].integer;
+            else if (!strcmp(attr->name, "job-originating-user-name") &&
+		     (attr->value_tag == IPP_TAG_NAME ||
+		      attr->value_tag == IPP_TAG_NAMELANG))
+              job_user = attr->values[0].string.text;
+
+            attr = attr->next;
+          }
+
+          if (job_id > 0 && job_name && !strcmp(job_name, monitor->job_name) &&
+              job_user && monitor->user && !strcmp(job_user, monitor->user))
+          {
+            monitor->job_id    = job_id;
+            monitor->job_state = job_state;
+            break;
+          }
+
+          if (!attr)
+            break;
+        }
+      }
+
+      ippDelete(response);
 
      /*
       * Disconnect from the printer - we'll reconnect on the next poll...
@@ -2062,6 +2171,15 @@ monitor_printer(
 
     delay = _cupsNextDelay(delay, &prev_delay);
   }
+
+ /*
+  * Cancel the job if necessary...
+  */
+
+  if (job_canceled && monitor->job_id > 0)
+    if (!httpReconnect(http))
+      cancel_job(http, monitor->uri, monitor->job_id, monitor->resource,
+                 monitor->user, monitor->version);
 
  /*
   * Cleanup and return...
@@ -2088,7 +2206,7 @@ new_request(
     cups_option_t   *options,		/* I - Options to send */
     const char      *compression,	/* I - compression value or NULL */
     int             copies,		/* I - copies value or 0 */
-    const char      *format,		/* I - documet-format value or NULL */
+    const char      *format,		/* I - document-format value or NULL */
     _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
     ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
     ipp_attribute_t *doc_handling_sup)  /* I - multiple-document-handling-supported values */
@@ -2163,6 +2281,9 @@ new_request(
   {
     if (pc)
     {
+      int	num_finishings = 0,	/* Number of finishing values */
+		finishings[10];		/* Finishing enum values */
+
      /*
       * Send standard IPP attributes...
       */
@@ -2284,6 +2405,7 @@ new_request(
       }
 
       if (doc_handling_sup &&
+          (!format || _cups_strncasecmp(format, "image/", 6)) &&
  	  (keyword = cupsGetOption("collate", num_options, options)) != NULL)
       {
         if (!_cups_strcasecmp(keyword, "true"))
@@ -2298,6 +2420,43 @@ new_request(
 			 "multiple-document-handling", NULL, collate_str);
 	    break;
           }
+      }
+
+     /*
+      * Map finishing options...
+      */
+
+      num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options,
+                                                   (int)(sizeof(finishings) /
+                                                         sizeof(finishings[0])),
+                                                   finishings);
+      if (num_finishings > 0)
+	ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
+		       num_finishings, finishings);
+
+     /*
+      * Map FaxOut options...
+      */
+
+      if ((keyword = cupsGetOption("phone", num_options, options)) != NULL)
+      {
+	ipp_t	*destination;		/* destination collection */
+	char	tel_uri[1024];		/* tel: URI */
+
+        destination = ippNew();
+
+        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel",
+                        NULL, NULL, 0, keyword);
+        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri",
+                     NULL, tel_uri);
+
+	if ((keyword = cupsGetOption("faxPrefix", num_options,
+	                             options)) != NULL && *keyword)
+	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT,
+	               "pre-dial-string", NULL, keyword);
+
+        ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
+        ippDelete(destination);
       }
     }
     else

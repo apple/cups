@@ -3,7 +3,7 @@
 #
 #   IPP/1.1 test suite.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -668,7 +668,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
-	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6,<10 REPEAT-NO-MATCH
+	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >6 REPEAT-NO-MATCH
+	DISPLAY job-state
 }
 
 
@@ -1939,7 +1940,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "A4 Test Document, 2-Up"
+	ATTR name job-name "A4 Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-a4.pdf
 	ATTR keyword compression none
@@ -1976,7 +1977,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "US Letter Test Document, 2-Up"
+	ATTR name job-name "US Letter Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-letter.pdf
 	ATTR keyword compression none
@@ -2013,7 +2014,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "A4 Test Document, 2-Up"
+	ATTR name job-name "A4 Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-a4.ps
 	ATTR keyword compression none
@@ -2050,7 +2051,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "US Letter Test Document, 2-Up"
+	ATTR name job-name "US Letter Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-letter.ps
 	ATTR keyword compression none
@@ -2089,7 +2090,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "4x6 Color JPEG, Draft Quality"
+	ATTR name job-name "4x6 Color JPEG; Draft Quality"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name color.jpg
 	ATTR keyword compression none
@@ -2126,7 +2127,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "4x6 Color JPEG, Normal Quality"
+	ATTR name job-name "4x6 Color JPEG; Normal Quality"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name color.jpg
 	ATTR keyword compression none
@@ -2163,7 +2164,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "4x6 Color JPEG, High Quality"
+	ATTR name job-name "4x6 Color JPEG; High Quality"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name color.jpg
 	ATTR keyword compression none
@@ -2200,7 +2201,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "A4 Test Document, 2-Up"
+	ATTR name job-name "A4 Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-a4.pdf
 	ATTR keyword compression none
@@ -2237,7 +2238,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR name job-name "US Letter Test Document, 2-Up"
+	ATTR name job-name "US Letter Test Document; 2-Up"
 	ATTR boolean ipp-attribute-fidelity false
 	ATTR name document-name document-letter.pdf
 	ATTR keyword compression none

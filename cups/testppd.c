@@ -471,6 +471,26 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
 
    /*
+    * Custom sizes...
+    */
+
+    fputs("cupsMarkOptions(media=Custom.8x10in): ", stdout);
+    num_options = cupsAddOption("media", "Custom.8x10in", 0, &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    size = ppdPageSize(ppd, NULL);
+    if (!size || strcmp(size->name, "Custom") ||
+        size->width != 576 || size->length != 720)
+    {
+      printf("FAIL (%s - %gx%g)\n", size ? size->name : "unknown",
+             size ? size->width : 0.0, size ? size->length : 0.0);
+      status ++;
+    }
+    else
+      puts("PASS");
+
+   /*
     * Test localization...
     */
 

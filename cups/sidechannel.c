@@ -29,8 +29,7 @@
  */
 
 #include "sidechannel.h"
-#include "string-private.h"
-#include "debug-private.h"
+#include "cups-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -45,8 +44,16 @@
 #  include <sys/time.h>
 #endif /* !WIN32 */
 #ifdef HAVE_POLL
-#  include <sys/poll.h>
+#  include <poll.h>
 #endif /* HAVE_POLL */
+
+
+/*
+ * Buffer size for side-channel requests...
+ */
+
+#define _CUPS_SC_MAX_DATA	65535
+#define _CUPS_SC_MAX_BUFFER	65540
 
 
 /*
@@ -112,7 +119,7 @@ cupsSideChannelRead(
     int               *datalen,		/* IO - Size of data buffer on entry, number of bytes in buffer on return */
     double            timeout)		/* I  - Timeout in seconds */
 {
-  char		buffer[16388];		/* Message buffer */
+  char		*buffer;		/* Message buffer */
   int		bytes;			/* Bytes read */
   int		templen;		/* Data length from message */
   int		nfds;			/* Number of file descriptors */
@@ -164,7 +171,8 @@ cupsSideChannelRead(
 
   if  (nfds < 1)
   {
-    *status = nfds==0 ? CUPS_SC_STATUS_TIMEOUT : CUPS_SC_STATUS_IO_ERROR;
+    *command = CUPS_SC_CMD_NONE;
+    *status  = nfds==0 ? CUPS_SC_STATUS_TIMEOUT : CUPS_SC_STATUS_IO_ERROR;
     return (-1);
   }
 
@@ -175,16 +183,28 @@ cupsSideChannelRead(
   * -------  -------------------------------------------
   * 0        Command code
   * 1        Status code
-  * 2-3      Data length (network byte order) <= 16384
+  * 2-3      Data length (network byte order)
   * 4-N      Data
   */
 
-  while ((bytes = read(CUPS_SC_FD, buffer, sizeof(buffer))) < 0)
+  if ((buffer = _cupsBufferGet(_CUPS_SC_MAX_BUFFER)) == NULL)
+  {
+    *command = CUPS_SC_CMD_NONE;
+    *status  = CUPS_SC_STATUS_TOO_BIG;
+
+    return (-1);
+  }
+
+  while ((bytes = read(CUPS_SC_FD, buffer, _CUPS_SC_MAX_BUFFER)) < 0)
     if (errno != EINTR && errno != EAGAIN)
     {
       DEBUG_printf(("1cupsSideChannelRead: Read error: %s", strerror(errno)));
+
+      _cupsBufferRelease(buffer);
+
       *command = CUPS_SC_CMD_NONE;
       *status  = CUPS_SC_STATUS_IO_ERROR;
+
       return (-1);
     }
 
@@ -195,8 +215,12 @@ cupsSideChannelRead(
   if (bytes < 4)
   {
     DEBUG_printf(("1cupsSideChannelRead: Short read of %d bytes", bytes));
+
+    _cupsBufferRelease(buffer);
+
     *command = CUPS_SC_CMD_NONE;
     *status  = CUPS_SC_STATUS_BAD_MESSAGE;
+
     return (-1);
   }
 
@@ -208,8 +232,12 @@ cupsSideChannelRead(
       buffer[0] >= CUPS_SC_CMD_MAX)
   {
     DEBUG_printf(("1cupsSideChannelRead: Bad command %d!", buffer[0]));
+
+    _cupsBufferRelease(buffer);
+
     *command = CUPS_SC_CMD_NONE;
     *status  = CUPS_SC_STATUS_BAD_MESSAGE;
+
     return (-1);
   }
 
@@ -252,6 +280,8 @@ cupsSideChannelRead(
     memcpy(data, buffer + 4, templen);
   }
 
+  _cupsBufferRelease(buffer);
+
   DEBUG_printf(("1cupsSideChannelRead: Returning status=%d", *status));
 
   return (0);
@@ -290,7 +320,7 @@ cupsSideChannelSNMPGet(
 {
   cups_sc_status_t	status;		/* Status of command */
   cups_sc_command_t	rcommand;	/* Response command */
-  char			real_data[2048];/* Real data buffer for response */
+  char			*real_data;	/* Real data buffer for response */
   int			real_datalen,	/* Real length of data buffer */
 			real_oidlen;	/* Length of returned OID string */
 
@@ -316,12 +346,21 @@ cupsSideChannelSNMPGet(
                            (int)strlen(oid) + 1, timeout))
     return (CUPS_SC_STATUS_TIMEOUT);
 
-  real_datalen = sizeof(real_data);
+  if ((real_data = _cupsBufferGet(_CUPS_SC_MAX_BUFFER)) == NULL)
+    return (CUPS_SC_STATUS_TOO_BIG);
+
+  real_datalen = _CUPS_SC_MAX_BUFFER;
   if (cupsSideChannelRead(&rcommand, &status, real_data, &real_datalen, timeout))
+  {
+    _cupsBufferRelease(real_data);
     return (CUPS_SC_STATUS_TIMEOUT);
+  }
 
   if (rcommand != CUPS_SC_CMD_SNMP_GET)
+  {
+    _cupsBufferRelease(real_data);
     return (CUPS_SC_STATUS_BAD_MESSAGE);
+  }
 
   if (status == CUPS_SC_STATUS_OK)
   {
@@ -333,13 +372,18 @@ cupsSideChannelSNMPGet(
     real_datalen -= real_oidlen;
 
     if ((real_datalen + 1) > *datalen)
+    {
+      _cupsBufferRelease(real_data);
       return (CUPS_SC_STATUS_TOO_BIG);
+    }
 
     memcpy(data, real_data + real_oidlen, real_datalen);
     data[real_datalen] = '\0';
 
     *datalen = real_datalen;
   }
+
+  _cupsBufferRelease(real_data);
 
   return (status);
 }
@@ -382,7 +426,7 @@ cupsSideChannelSNMPWalk(
 {
   cups_sc_status_t	status;		/* Status of command */
   cups_sc_command_t	rcommand;	/* Response command */
-  char			real_data[2048];/* Real data buffer for response */
+  char			*real_data;	/* Real data buffer for response */
   int			real_datalen,	/* Real length of data buffer */
 			real_oidlen,	/* Length of returned OID string */
 			oidlen;		/* Length of first OID */
@@ -400,6 +444,9 @@ cupsSideChannelSNMPWalk(
   if (!oid || !*oid || !cb)
     return (CUPS_SC_STATUS_BAD_MESSAGE);
 
+  if ((real_data = _cupsBufferGet(_CUPS_SC_MAX_BUFFER)) == NULL)
+    return (CUPS_SC_STATUS_TOO_BIG);
+
  /*
   * Loop until the OIDs don't match...
   */
@@ -416,15 +463,24 @@ cupsSideChannelSNMPWalk(
 
     if (cupsSideChannelWrite(CUPS_SC_CMD_SNMP_GET_NEXT, CUPS_SC_STATUS_NONE,
                              current_oid, (int)strlen(current_oid) + 1, timeout))
+    {
+      _cupsBufferRelease(real_data);
       return (CUPS_SC_STATUS_TIMEOUT);
+    }
 
-    real_datalen = sizeof(real_data);
+    real_datalen = _CUPS_SC_MAX_BUFFER;
     if (cupsSideChannelRead(&rcommand, &status, real_data, &real_datalen,
                             timeout))
+    {
+      _cupsBufferRelease(real_data);
       return (CUPS_SC_STATUS_TIMEOUT);
+    }
 
     if (rcommand != CUPS_SC_CMD_SNMP_GET_NEXT)
+    {
+      _cupsBufferRelease(real_data);
       return (CUPS_SC_STATUS_BAD_MESSAGE);
+    }
 
     if (status == CUPS_SC_STATUS_OK)
     {
@@ -439,6 +495,7 @@ cupsSideChannelSNMPWalk(
         * Done with this set of OIDs...
 	*/
 
+	_cupsBufferRelease(real_data);
         return (CUPS_SC_STATUS_OK);
       }
 
@@ -464,6 +521,8 @@ cupsSideChannelSNMPWalk(
   }
   while (status == CUPS_SC_STATUS_OK);
 
+  _cupsBufferRelease(real_data);
+
   return (status);
 }
 
@@ -485,7 +544,7 @@ cupsSideChannelWrite(
     int               datalen,		/* I - Number of bytes of data */
     double            timeout)		/* I - Timeout in seconds */
 {
-  char		buffer[16388];		/* Message buffer */
+  char		*buffer;		/* Message buffer */
   int		bytes;			/* Bytes written */
 #ifdef HAVE_POLL
   struct pollfd	pfd;			/* Poll structure for poll() */
@@ -500,7 +559,7 @@ cupsSideChannelWrite(
   */
 
   if (command < CUPS_SC_CMD_SOFT_RESET || command >= CUPS_SC_CMD_MAX ||
-      datalen < 0 || datalen > 16384 || (datalen > 0 && !data))
+      datalen < 0 || datalen > _CUPS_SC_MAX_DATA || (datalen > 0 && !data))
     return (-1);
 
  /*
@@ -549,6 +608,9 @@ cupsSideChannelWrite(
   * 4-N      Data
   */
 
+  if ((buffer = _cupsBufferGet(datalen + 4)) == NULL)
+    return (-1);
+
   buffer[0] = command;
   buffer[1] = status;
   buffer[2] = datalen >> 8;
@@ -564,7 +626,12 @@ cupsSideChannelWrite(
 
   while (write(CUPS_SC_FD, buffer, bytes) < 0)
     if (errno != EINTR && errno != EAGAIN)
+    {
+      _cupsBufferRelease(buffer);
       return (-1);
+    }
+
+  _cupsBufferRelease(buffer);
 
   return (0);
 }

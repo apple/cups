@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2011 by Apple Inc.
+.\"   Copyright 2007-2012 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "3 November 2011" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "6 January 2012" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -250,6 +250,11 @@ Group group-name-or-number
 Specifies the group name or ID that will be used when executing
 external programs.
 .TP 5
+GSSServiceName name
+.br
+Specifies the service name when using Kerberos authentication. The default
+service name is "@CUPS_DEFAULT_GSSSERVICENAME@".
+.TP 5
 HostNameLookups On
 .TP 5
 HostNameLookups Off
@@ -392,6 +397,12 @@ Specifies the maximum number of simultaneous jobs per printer to support.
 MaxJobsPerUser number
 .br
 Specifies the maximum number of simultaneous jobs per user to support.
+.TP 5
+MaxJobTime seconds
+.br
+Specifies the maximum time a job may take to print before it is canceled. The
+default is 10800 seconds (3 hours). Set to 0 to disable cancellation of "stuck"
+jobs.
 .TP 5
 MaxLogSize number-bytes
 .br

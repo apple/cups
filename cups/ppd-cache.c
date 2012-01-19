@@ -65,6 +65,9 @@
  * Local functions...
  */
 
+static int	pwg_compare_finishings(_pwg_finishings_t *a,
+		                       _pwg_finishings_t *b);
+static void	pwg_free_finishings(_pwg_finishings_t *f);
 static void	pwg_ppdize_name(const char *ipp, char *name, size_t namesize);
 static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
 
@@ -86,6 +89,7 @@ _ppdCacheCreateWithFile(
   _ppd_cache_t	*pc;			/* PWG mapping data */
   _pwg_size_t	*size;			/* Current size */
   _pwg_map_t	*map;			/* Current map */
+  _pwg_finishings_t *finishings;	/* Current finishings option */
   int		linenum,		/* Current line number */
 		num_bins,		/* Number of bins in file */
 		num_sizes,		/* Number of sizes in file */
@@ -532,6 +536,23 @@ _ppdCacheCreateWithFile(
       pc->sides_2sided_long = _cupsStrAlloc(value);
     else if (!_cups_strcasecmp(line, "Sides2SidedShort"))
       pc->sides_2sided_short = _cupsStrAlloc(value);
+    else if (!_cups_strcasecmp(line, "Finishings"))
+    {
+      if (!pc->finishings)
+	pc->finishings =
+	    cupsArrayNew3((cups_array_func_t)pwg_compare_finishings,
+			  NULL, NULL, 0, NULL,
+			  (cups_afree_func_t)pwg_free_finishings);
+
+      if ((finishings = calloc(1, sizeof(_pwg_finishings_t))) == NULL)
+        goto create_error;
+
+      finishings->value       = strtol(value, &valueptr, 10);
+      finishings->num_options = cupsParseOptions(valueptr, 0,
+                                                 &(finishings->options));
+
+      cupsArrayAdd(pc->finishings, finishings);
+    }
     else
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
@@ -633,6 +654,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 			new_known_pwg;	/* New PWG name is well-known */
   _pwg_size_t           *new_size;	/* New size to add, if any */
   const char		*filter;	/* Current filter */
+  _pwg_finishings_t	*finishings;	/* Current finishings value */
 
 
   DEBUG_printf(("_ppdCacheCreateWithPPD(ppd=%p)", ppd));
@@ -731,8 +753,10 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     * want to keep it if it has a larger imageable area length.
     */
 
-    new_width      = _PWG_FROMPTS(ppd_size->width);
-    new_length     = _PWG_FROMPTS(ppd_size->length);
+    pwg_media      = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
+                                      _PWG_FROMPTS(ppd_size->length));
+    new_width      = pwg_media->width;
+    new_length     = pwg_media->length;
     new_left       = _PWG_FROMPTS(ppd_size->left);
     new_bottom     = _PWG_FROMPTS(ppd_size->bottom);
     new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
@@ -1299,6 +1323,32 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->product = _cupsStrAlloc(ppd->product);
 
  /*
+  * Copy finishings mapping data...
+  */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsIPPFinishings", NULL)) != NULL)
+  {
+    pc->finishings = cupsArrayNew3((cups_array_func_t)pwg_compare_finishings,
+                                   NULL, NULL, 0, NULL,
+                                   (cups_afree_func_t)pwg_free_finishings);
+
+    do
+    {
+      if ((finishings = calloc(1, sizeof(_pwg_finishings_t))) == NULL)
+        goto create_error;
+
+      finishings->value       = atoi(ppd_attr->spec);
+      finishings->num_options = _ppdParseOptions(ppd_attr->value, 0,
+                                                 &(finishings->options),
+                                                 _PPD_PARSE_OPTIONS);
+
+      cupsArrayAdd(pc->finishings, finishings);
+    }
+    while ((ppd_attr = ppdFindNextAttr(ppd, "cupsIPPFinishings",
+                                       NULL)) != NULL);
+  }
+
+ /*
   * Return the cache data...
   */
 
@@ -1396,6 +1446,7 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   _cupsStrFree(pc->product);
   cupsArrayDelete(pc->filters);
   cupsArrayDelete(pc->prefilters);
+  cupsArrayDelete(pc->finishings);
 
   free(pc);
 }
@@ -1435,6 +1486,127 @@ _ppdCacheGetBin(
 
 
 /*
+ * '_ppdCacheGetFinishingOptions()' - Get PPD finishing options for the given
+ *                                    IPP finishings value(s).
+ */
+
+int					/* O  - New number of options */
+_ppdCacheGetFinishingOptions(
+    _ppd_cache_t  *pc,			/* I  - PPD cache and mapping data */
+    ipp_t         *job,			/* I  - Job attributes or NULL */
+    ipp_finish_t  value,		/* I  - IPP finishings value of IPP_FINISHINGS_NONE */
+    int           num_options,		/* I  - Number of options */
+    cups_option_t **options)		/* IO - Options */
+{
+  int			i;		/* Looping var */
+  _pwg_finishings_t	*f,		/* PWG finishings options */
+			key;		/* Search key */
+  ipp_attribute_t	*attr;		/* Finishings attribute */
+  cups_option_t		*option;	/* Current finishings option */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pc || cupsArrayCount(pc->finishings) == 0 || !options ||
+      (!job && value == IPP_FINISHINGS_NONE))
+    return (num_options);
+
+ /*
+  * Apply finishing options...
+  */
+
+  if (job && (attr = ippFindAttribute(job, "finishings", IPP_TAG_ENUM)) != NULL)
+  {
+    int	num_values = ippGetCount(attr);	/* Number of values */
+
+    for (i = 0; i < num_values; i ++)
+    {
+      key.value = ippGetInteger(attr, i);
+
+      if ((f = cupsArrayFind(pc->finishings, &key)) != NULL)
+      {
+        int	j;			/* Another looping var */
+
+        for (j = f->num_options, option = f->options; j > 0; j --, option ++)
+          num_options = cupsAddOption(option->name, option->value,
+                                      num_options, options);
+      }
+    }
+  }
+  else if (value != IPP_FINISHINGS_NONE)
+  {
+    key.value = value;
+
+    if ((f = cupsArrayFind(pc->finishings, &key)) != NULL)
+    {
+      int	j;			/* Another looping var */
+
+      for (j = f->num_options, option = f->options; j > 0; j --, option ++)
+	num_options = cupsAddOption(option->name, option->value,
+				    num_options, options);
+    }
+  }
+
+  return (num_options);
+}
+
+
+/*
+ * '_ppdCacheGetFinishingValues()' - Get IPP finishings value(s) from the given
+ *                                   PPD options.
+ */
+
+int					/* O - Number of finishings values */
+_ppdCacheGetFinishingValues(
+    _ppd_cache_t  *pc,			/* I - PPD cache and mapping data */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options,		/* I - Options */
+    int           max_values,		/* I - Maximum number of finishings values */
+    int           *values)		/* O - Finishings values */
+{
+  int			i,		/* Looping var */
+			num_values = 0;	/* Number of values */
+  _pwg_finishings_t	*f;		/* Current finishings option */
+  cups_option_t		*option;	/* Current option */
+  const char		*val;		/* Value for option */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pc || !pc->finishings || num_options < 1 || max_values < 1 || !values)
+    return (0);
+
+ /*
+  * Go through the finishings options and see what is set...
+  */
+
+  for (f = (_pwg_finishings_t *)cupsArrayFirst(pc->finishings);
+       f;
+       f = (_pwg_finishings_t *)cupsArrayNext(pc->finishings))
+  {
+    for (i = f->num_options, option = f->options; i > 0; i --, option ++)
+      if ((val = cupsGetOption(option->name, num_options, options)) == NULL ||
+          _cups_strcasecmp(option->value, val))
+        break;
+
+    if (i == 0)
+    {
+      values[num_values ++] = f->value;
+
+      if (num_values >= max_values)
+        break;
+    }
+  }
+
+  return (num_values);
+}
+
+
+/*
  * '_ppdCacheGetInputSlot()' - Get the PPD InputSlot associated with the job
  *                        attributes or a keyword string.
  */
@@ -1465,7 +1637,7 @@ _ppdCacheGetInputSlot(
 
     media_col = ippFindAttribute(job, "media-col", IPP_TAG_BEGIN_COLLECTION);
     if (media_col &&
-        (media_source = ippFindAttribute(media_col->values[0].collection,
+        (media_source = ippFindAttribute(ippGetCollection(media_col, 0),
                                          "media-source",
 	                                 IPP_TAG_KEYWORD)) != NULL)
     {
@@ -1473,7 +1645,7 @@ _ppdCacheGetInputSlot(
       * Use the media-source value from media-col...
       */
 
-      keyword = media_source->values[0].string.text;
+      keyword = ippGetString(media_source, 0, NULL);
     }
     else if (_pwgInitSize(&size, job, &margins_set))
     {
@@ -1835,7 +2007,8 @@ _ppdCacheGetSize(
     _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
     const char   *page_size)		/* I - PPD PageSize */
 {
-  int		i;
+  int		i;			/* Looping var */
+  _pwg_media_t	*media;			/* Media */  
   _pwg_size_t	*size;			/* Current size */
 
 
@@ -1914,8 +2087,25 @@ _ppdCacheGetSize(
   */
 
   for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
-    if (!_cups_strcasecmp(page_size, size->map.ppd))
+    if (!_cups_strcasecmp(page_size, size->map.ppd) ||
+        !_cups_strcasecmp(page_size, size->map.pwg))
       return (size);
+
+ /*
+  * Look up standard sizes...
+  */
+
+  if ((media = _pwgMediaForPPD(page_size)) == NULL)
+    if ((media = _pwgMediaForLegacy(page_size)) == NULL)
+      media = _pwgMediaForPWG(page_size);
+
+  if (media)
+  {
+    pc->custom_size.width  = media->width;
+    pc->custom_size.length = media->length;
+
+    return (&(pc->custom_size));
+  }
 
   return (NULL);
 }
@@ -1989,13 +2179,14 @@ _ppdCacheWriteFile(
     const char   *filename,		/* I - File to write */
     ipp_t        *attrs)		/* I - Attributes to write, if any */
 {
-  int		i, j, k;		/* Looping vars */
-  cups_file_t	*fp;			/* Output file */
-  _pwg_size_t	*size;			/* Current size */
-  _pwg_map_t	*map;			/* Current map */
-  cups_option_t	*option;		/* Current option */
-  const char	*value;			/* Filter/pre-filter value */
-  char		newfile[1024];		/* New filename */
+  int			i, j, k;	/* Looping vars */
+  cups_file_t		*fp;		/* Output file */
+  _pwg_size_t		*size;		/* Current size */
+  _pwg_map_t		*map;		/* Current map */
+  _pwg_finishings_t	*f;		/* Current finishing option */
+  cups_option_t		*option;	/* Current option */
+  const char		*value;		/* Filter/pre-filter value */
+  char			newfile[1024];	/* New filename */
 
 
  /*
@@ -2127,6 +2318,20 @@ _ppdCacheWriteFile(
     cupsFilePutConf(fp, "PreFilter", value);
 
   cupsFilePrintf(fp, "SingleFile %s\n", pc->single_file ? "true" : "false");
+
+ /*
+  * Finishing options...
+  */
+
+  for (f = (_pwg_finishings_t *)cupsArrayFirst(pc->finishings);
+       f;
+       f = (_pwg_finishings_t *)cupsArrayNext(pc->finishings))
+  {
+    cupsFilePrintf(fp, "Finishings %d", f->value);
+    for (i = f->num_options, option = f->options; i > 0; i --, option ++)
+      cupsFilePrintf(fp, " %s=%s", option->name, option->value);
+    cupsFilePutChar(fp, '\n');
+  }
 
  /*
   * IPP attributes, if any...
@@ -2307,6 +2512,32 @@ _pwgPageSizeForMedia(
   }
 
   return (name);
+}
+
+
+/*
+ * 'pwg_compare_finishings()' - Compare two finishings values.
+ */
+
+static int				/* O- Result of comparison */
+pwg_compare_finishings(
+    _pwg_finishings_t *a,		/* I - First finishings value */
+    _pwg_finishings_t *b)		/* I - Second finishings value */
+{
+  return (b->value - a->value);
+}
+
+
+/*
+ * 'pwg_free_finishings()' - Free a finishings value.
+ */
+
+static void
+pwg_free_finishings(
+    _pwg_finishings_t *f)		/* I - Finishings value */
+{
+  cupsFreeOptions(f->num_options, f->options);
+  free(f);
 }
 
 

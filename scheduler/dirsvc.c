@@ -66,8 +66,10 @@
  * Local functions...
  */
 
+#ifdef HAVE_DNSSD
 static char	*get_auth_info_required(cupsd_printer_t *p, char *buffer,
 		                        size_t bufsize);
+#endif /* HAVE_DNSSD */
 #ifdef __APPLE__
 static int	get_hostconfig(const char *name);
 #endif /* __APPLE__ */
@@ -459,7 +461,8 @@ dnssdAddAlias(const void *key,		/* I - Key */
 	      void       *context)	/* I - Unused */
 {
   char	valueStr[1024],			/* Domain string */
-	hostname[1024];			/* Complete hostname */
+	hostname[1024],			/* Complete hostname */
+	*hostptr;			/* Pointer into hostname */
 
 
   (void)key;
@@ -470,6 +473,10 @@ dnssdAddAlias(const void *key,		/* I - Key */
                          kCFStringEncodingUTF8))
   {
     snprintf(hostname, sizeof(hostname), "%s.%s", DNSSDHostName, valueStr);
+    hostptr = hostname + strlen(hostname) - 1;
+    if (*hostptr == '.')
+      *hostptr = '\0';			/* Strip trailing dot */
+
     if (!DNSSDAlias)
       DNSSDAlias = cupsArrayNew(NULL, NULL);
 
@@ -1082,7 +1089,6 @@ dnssdUpdate(void)
     dnssdStop();
   }
 }
-#endif /* HAVE_DNSSD */
 
 
 /*
@@ -1141,7 +1147,7 @@ get_auth_info_required(
     int	auth_type;			/* Authentication type */
 
     if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
-      auth_type = DefaultAuthType;
+      auth_type = cupsdDefaultAuthType();
 
     switch (auth_type)
     {
@@ -1162,6 +1168,7 @@ get_auth_info_required(
 
   return ("none");
 }
+#endif /* HAVE_DNSSD */
 
 
 #ifdef __APPLE__

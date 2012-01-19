@@ -1,4 +1,6 @@
 _cups_debug_fd
+_cupsBufferGet
+_cupsBufferRelease
 _cupsGet1284Values
 _cupsGetDests
 _cupsGetPassword

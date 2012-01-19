@@ -301,14 +301,14 @@ cups_globals_alloc(void)
 static void
 cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 {
-  _ipp_buffer_t		*buffer,	/* Current IPP read/write buffer */
+  _cups_buffer_t	*buffer,	/* Current read/write buffer */
 			*next;		/* Next buffer */
 
 
   if (cg->last_status_message)
     _cupsStrFree(cg->last_status_message);
 
-  for (buffer = cg->ipp_buffers; buffer; buffer = next)
+  for (buffer = cg->cups_buffers; buffer; buffer = next)
   {
     next = buffer->next;
     free(buffer);

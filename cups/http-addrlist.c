@@ -3,7 +3,7 @@
  *
  *   HTTP address list routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,6 +15,8 @@
  * Contents:
  *
  *   httpAddrConnect()  - Connect to any of the addresses in the list.
+ *   httpAddrConnect2() - Connect to any of the addresses in the list with a
+ *                        timeout and optional cancel.
  *   httpAddrFreeList() - Free an address list.
  *   httpAddrGetList()  - Get a list of addresses for a hostname.
  */
@@ -27,6 +29,9 @@
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>
 #endif /* HAVE_RESOLV_H */
+#ifdef HAVE_POLL
+#  include <poll.h>
+#endif /* HAVE_POLL */
 
 
 /*
@@ -40,22 +45,60 @@ httpAddrConnect(
     http_addrlist_t *addrlist,		/* I - List of potential addresses */
     int             *sock)		/* O - Socket */
 {
+  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)", addrlist, sock));
+
+  return (httpAddrConnect2(addrlist, sock, 30000, NULL));
+}
+
+
+/*
+ * 'httpAddrConnect2()' - Connect to any of the addresses in the list with a
+ *                        timeout and optional cancel.
+ *
+ * @since CUPS 1.6@
+ */
+
+http_addrlist_t *			/* O - Connected address or NULL on failure */
+httpAddrConnect2(
+    http_addrlist_t *addrlist,		/* I - List of potential addresses */
+    int             *sock,		/* O - Socket */
+    int             msec,		/* I - Timeout in milliseconds */
+    int             *cancel)		/* I - Pointer to "cancel" variable */
+{
   int			val;		/* Socket option value */
-#ifdef __APPLE__
-  struct timeval	timeout;	/* Socket timeout value */
-#endif /* __APPLE__ */
+#ifdef O_NONBLOCK
+  socklen_t		len;		/* Length of value */
+  int			flags,		/* Socket flags */
+			remaining;	/* Remaining timeout */
+#endif /* O_NONBLOCK */
+#ifdef HAVE_POLL
+  struct pollfd		pfd;		/* Polled file descriptor */
+#else
+  fd_set		input_set,	/* select() input set */
+			output_set;	/* select() output set */
+  struct timeval	timeout;	/* Timeout */
+#endif /* HAVE_POLL */
+  int			nfds;		/* Result from select()/poll() */
 #ifdef DEBUG
   char			temp[256];	/* Temporary address string */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)", addrlist, sock));
+  DEBUG_printf(("httpAddrConnect2(addrlist=%p, sock=%p, msec=%d, cancel=%p)",
+                addrlist, sock, msec, cancel));
 
   if (!sock)
   {
     errno = EINVAL;
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
     return (NULL);
   }
+
+  if (cancel && *cancel)
+    return (NULL);
+
+  if (msec <= 0)
+    msec = INT_MAX;
 
  /*
   * Loop through each address until we connect or run out of addresses...
@@ -105,17 +148,6 @@ httpAddrConnect(
     setsockopt(*sock, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
-#ifdef __APPLE__
-   /*
-    * Use a 30-second read timeout when connecting to limit the amount of time
-    * we block...
-    */
-
-    timeout.tv_sec  = 30;
-    timeout.tv_usec = 0;
-    setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-#endif /* __APPLE__ */
-
    /*
     * Using TCP_NODELAY improves responsiveness, especially on systems
     * with a slow loopback interface...
@@ -137,6 +169,16 @@ httpAddrConnect(
     fcntl(*sock, F_SETFD, FD_CLOEXEC);
 #endif /* FD_CLOEXEC */
 
+#ifdef O_NONBLOCK
+   /*
+    * Do an asynchronous connect by setting the socket non-blocking...
+    */
+
+    flags = fcntl(*sock, F_GETFL, 0);
+    if (msec > 0)
+      fcntl(*sock, F_SETFL, flags | O_NONBLOCK);
+#endif /* O_NONBLOCK */
+
    /*
     * Then connect...
     */
@@ -147,8 +189,85 @@ httpAddrConnect(
       DEBUG_printf(("1httpAddrConnect: Connected to %s:%d...",
 		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		    _httpAddrPort(&(addrlist->addr))));
-      break;
+
+#ifdef O_NONBLOCK
+      fcntl(*sock, F_SETFL, flags);
+#endif /* O_NONBLOCK */
+
+      return (addrlist);
     }
+
+#ifdef O_NONBLOCK
+#  ifdef WIN32
+    if (errno == WSAEINPROGRESS)
+#  else
+    if (errno == EINPROGRESS)
+#  endif /* WIN32 */
+    {
+      for (remaining = msec; remaining > 0; remaining -= 250)
+      {
+#  ifdef HAVE_POLL
+	pfd.fd     = *sock;
+	pfd.events = POLLIN | POLLOUT;
+
+	while ((nfds = poll(&pfd, 1, remaining > 250 ? 250 : remaining)) < 0 &&
+	       (errno == EINTR || errno == EAGAIN));
+
+#  else
+	do
+	{
+	  if (cancel && *cancel)
+	  {
+	   /*
+	    * Close this socket and return...
+	    */
+
+#ifdef WIN32
+	    closesocket(*sock);
+#else
+	    close(*sock);
+#endif /* WIN32 */
+
+	    *sock = -1;
+
+	    return (NULL);
+	  }
+
+	  FD_ZERO(&input_set);
+	  FD_SET(*sock, &input_set);
+	  output_set = input_set;
+
+	  timeout.tv_sec  = 0;
+	  timeout.tv_usec = (remaining > 250 ? 250 : remaining) * 1000;
+
+	  nfds = select(*sock + 1, &input_set, &output_set, NULL, &timeout);
+	}
+#    ifdef WIN32
+	while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
+			    WSAGetLastError() == WSAEWOULDBLOCK));
+#    else
+	while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
+#    endif /* WIN32 */
+#  endif /* HAVE_POLL */
+
+        if (nfds > 0)
+        {
+          len = sizeof(val);
+          if (getsockopt(*sock, SOL_SOCKET, SO_ERROR, &val, &len) >= 0)
+          {
+	    DEBUG_printf(("1httpAddrConnect: Connected to %s:%d...",
+			  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+			  _httpAddrPort(&(addrlist->addr))));
+
+	    fcntl(*sock, F_SETFL, flags);
+	    return (addrlist);
+	  }
+
+          break;
+        }
+      }
+    }
+#endif /* O_NONBLOCK */
 
     DEBUG_printf(("1httpAddrConnect: Unable to connect to %s:%d: %s",
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
@@ -256,7 +375,6 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   }
 #endif /* HAVE_RES_INIT */
 
-
  /*
   * Lookup the address the best way we can...
   */
@@ -357,6 +475,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  if (!temp)
 	  {
 	    httpAddrFreeList(first);
+	    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	    return (NULL);
 	  }
 
@@ -386,8 +505,13 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
       freeaddrinfo(results);
     }
-    else if (error == EAI_FAIL)
-      cg->need_res_init = 1;
+    else
+    {
+      if (error == EAI_FAIL)
+        cg->need_res_init = 1;
+
+      _cupsSetError(IPP_INTERNAL_ERROR, gai_strerror(error), 0);
+    }
 
 #else
     if (hostname)
@@ -505,8 +629,13 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  addr = temp;
 	}
       }
-      else if (h_errno == NO_RECOVERY)
-        cg->need_res_init = 1;
+      else
+      {
+        if (h_errno == NO_RECOVERY)
+          cg->need_res_init = 1;
+
+	_cupsSetError(IPP_INTERNAL_ERROR, hstrerror(h_errno), 0);
+      }
     }
 #endif /* HAVE_GETADDRINFO */
   }
@@ -544,6 +673,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     else
     {
       httpAddrFreeList(first);
+
+      _cupsSetError(IPP_INTERNAL_ERROR, _("Unknown service name."), 1);
       return (NULL);
     }
 
@@ -566,6 +697,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -594,6 +726,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -625,6 +758,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -648,6 +782,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}

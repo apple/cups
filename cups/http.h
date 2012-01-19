@@ -3,7 +3,7 @@
  *
  *   Hyper-Text Transport Protocol definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -463,8 +463,13 @@ extern void		httpSetTimeout(http_t *http, double timeout,
 			               _CUPS_API_1_5;
 
 /**** New in CUPS 1.6 ****/
+extern http_addrlist_t	*httpAddrConnect2(http_addrlist_t *addrlist, int *sock,
+			                  int msec, int *cancel)
+			                  _CUPS_API_1_6;
 extern http_state_t	httpGetState(http_t *http) _CUPS_API_1_6;
 extern http_version_t	httpGetVersion(http_t *http) _CUPS_API_1_6;
+extern int		httpReconnect2(http_t *http, int msec, int *cancel)
+			               _CUPS_API_1_6;
 
 
 /*

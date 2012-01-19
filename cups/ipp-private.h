@@ -143,19 +143,14 @@ struct _ipp_s				/**** IPP Request/Response/Notification ****/
   int			use;		/* Use count @since CUPS 1.4.4/Mac OS X 10.6.?@ */
 };
 
-typedef struct _ipp_buffer_s		/**** Read/write buffer ****/
-{
-  unsigned char		d[IPP_BUF_SIZE];/* Data buffer */
-  struct _ipp_buffer_s	*next;		/* Next buffer in list */
-  int			used;		/* Is this buffer used? */
-} _ipp_buffer_t;
-
 typedef struct				/**** Attribute mapping data ****/
 {
   int		multivalue;		/* Option has multiple values? */
   const char	*name;			/* Option/attribute name */
   ipp_tag_t	value_tag;		/* Value tag for this attribute */
   ipp_tag_t	group_tag;		/* Group tag for this attribute */
+  ipp_tag_t	alt_group_tag;		/* Alternate group tag for this
+					 * attribute */
 } _ipp_option_t;
 
 

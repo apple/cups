@@ -3,7 +3,7 @@
  *
  *   HTTP routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -75,6 +75,8 @@
  *   _httpReadCDSA()	      - Read function for the CDSA library.
  *   _httpReadGNUTLS()	      - Read function for the GNU TLS library.
  *   httpReconnect()	      - Reconnect to a HTTP server.
+ *   httpReconnect2()	      - Reconnect to a HTTP server with timeout and
+ *				optional cancel.
  *   httpSetAuthString()      - Set the current authorization string.
  *   httpSetCredentials()     - Set the credentials associated with an
  *				encrypted connection.
@@ -133,18 +135,8 @@
 #  include <sys/resource.h>
 #endif /* WIN32 */
 #ifdef HAVE_POLL
-#  include <sys/poll.h>
+#  include <poll.h>
 #endif /* HAVE_POLL */
-
-
-/*
- * Some operating systems have done away with the Fxxxx constants for
- * the fcntl() call; this works around that "feature"...
- */
-
-#ifndef FNONBLK
-#  define FNONBLK O_NONBLOCK
-#endif /* !FNONBLK */
 
 
 /*
@@ -606,6 +598,7 @@ _httpCreate(
 
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
     httpAddrFreeList(addrlist);
     return (NULL);
   }
@@ -2276,6 +2269,22 @@ _httpReadGNUTLS(
 int					/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)		/* I - Connection to server */
 {
+  DEBUG_printf(("httpReconnect(http=%p)", http));
+
+  return (httpReconnect2(http, 30, NULL));
+}
+
+
+/*
+ * 'httpReconnect2()' - Reconnect to a HTTP server with timeout and optional
+ *                      cancel.
+ */
+
+int					/* O - 0 on success, non-zero on failure */
+httpReconnect2(http_t *http,		/* I - Connection to server */
+	       int    msec,		/* I - Timeout in milliseconds */
+	       int    *cancel)		/* I - Pointer to "cancel" variable */
+{
   http_addrlist_t	*addr;		/* Connected address */
 #ifdef DEBUG
   http_addrlist_t	*current;	/* Current address */
@@ -2283,10 +2292,14 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpReconnect(http=%p)", http));
+  DEBUG_printf(("httpReconnect(http=%p, msec=%d, cancel=%p)", http, msec,
+                cancel));
 
   if (!http)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
     return (-1);
+  }
 
 #ifdef HAVE_SSL
   if (http->tls)
@@ -2324,7 +2337,8 @@ httpReconnect(http_t *http)		/* I - Connection to server */
                   _httpAddrPort(&(current->addr))));
 #endif /* DEBUG */
 
-  if ((addr = httpAddrConnect(http->addrlist, &(http->fd))) == NULL)
+  if ((addr = httpAddrConnect2(http->addrlist, &(http->fd), msec,
+                               cancel)) == NULL)
   {
    /*
     * Unable to connect...
@@ -3855,6 +3869,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
   int			any_root;	/* Allow any root */
+  char			*hostname;	/* Hostname */
 
 #  ifdef HAVE_LIBSSL
   SSL_CTX		*context;	/* Context for encryption */
@@ -3866,7 +3881,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
   OSStatus		error;		/* Error code */
-  char			*hostname;	/* Hostname */
   const char		*message = NULL;/* Error message */
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
   cups_array_t		*credentials;	/* Credentials array */
@@ -3895,6 +3909,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   else
     any_root = cg->any_root;
 
+  hostname = httpAddrLocalhost(http->hostaddr) ? "localhost" : http->hostname;
+
 #  ifdef HAVE_LIBSSL
   (void)any_root;
 
@@ -3907,6 +3923,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   http->tls = SSL_new(context);
   SSL_set_bio(http->tls, bio, bio);
+
+  SSL_set_tlsext_host_name(http->tls, hostname);
 
   if (SSL_connect(http->tls) != 1)
   {
@@ -3957,7 +3975,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   gnutls_init(&http->tls, GNUTLS_CLIENT);
   gnutls_set_default_priority(http->tls);
-  gnutls_server_name_set(http->tls, GNUTLS_NAME_DNS, http->hostname, strlen(http->hostname));
+  gnutls_server_name_set(http->tls, GNUTLS_NAME_DNS, hostname,
+                         strlen(hostname));
   gnutls_credentials_set(http->tls, GNUTLS_CRD_CERTIFICATE, *credentials);
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr)http);
   gnutls_transport_set_pull_function(http->tls, _httpReadGNUTLS);
@@ -4086,8 +4105,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!error)
   {
-    hostname = httpAddrLocalhost(http->hostaddr) ? "localhost" : http->hostname;
-    error    = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
+    error = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
 
     DEBUG_printf(("4http_setup_ssl: SSLSetPeerDomainName, error=%d",
                   (int)error));
@@ -4275,7 +4293,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _sspiSetAllowsAnyRoot(http->tls_credentials, any_root);
   _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
 
-  if (!_sspiConnect(http->tls_credentials, http->hostname))
+  if (!_sspiConnect(http->tls_credentials, hostname))
   {
     _sspiFree(http->tls_credentials);
     http->tls_credentials = NULL;

@@ -47,7 +47,15 @@
 #  include <windows.h>
 #else
 #  include <pwd.h>
+#  include <termios.h>
 #endif /* WIN32 */
+
+
+/*
+ * Local constants...
+ */
+
+#define _CUPS_PASSCHAR	'*'		/* Character that is echoed for password */
 
 
 /*
@@ -485,29 +493,270 @@ cupsUser(void)
  * '_cupsGetPassword()' - Get a password from the user.
  */
 
-const char *				/* O - Password */
+const char *				/* O - Password or @code NULL@ if none */
 _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
 #ifdef WIN32
+  HANDLE		tty;		/* Console handle */
+  DWORD			mode;		/* Console mode */
+  char			passch,		/* Current key press */
+			*passptr,	/* Pointer into password string */
+			*passend;	/* End of password string */
+  ssize_t		passbytes;	/* Bytes read */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Thread globals */
+
+
  /*
-  * Currently no console password support is provided on Windows.
+  * Disable input echo and set raw input...
   */
 
-  return (NULL);
+  if ((tty = GetStdHandle(STD_INPUT_HANDLE)) == INVALID_HANDLE_VALUE)
+    return (NULL);
+
+  if (!GetConsoleMode(tty, &mode))
+    return (NULL);
+
+  if (!SetConsoleMode(tty, 0))
+    return (NULL);
+
+ /*
+  * Display the prompt...
+  */
+
+  printf("%s ", prompt);
+  fflush(stdout);
+
+ /*
+  * Read the password string from /dev/tty until we get interrupted or get a
+  * carriage return or newline...
+  */
+
+  passptr = cg->password;
+  passend = cg->password + sizeof(cg->password) - 1;
+
+  while ((passbytes = read(tty, &passch, 1)) == 1)
+  {
+    if (passch == 0x0A || passch == 0x0D)
+    {
+     /*
+      * Enter/return...
+      */
+
+      break;
+    }
+    else if (passch == 0x08 || passch == 0x7F)
+    {
+     /*
+      * Backspace/delete (erase character)...
+      */
+
+      if (passptr > cg->password)
+      {
+        passptr --;
+        fputs("\010 \010", stdout);
+      }
+      else
+        putchar(0x07);
+    }
+    else if (passch == 0x15)
+    {
+     /*
+      * CTRL+U (erase line)
+      */
+
+      if (passptr > cg->password)
+      {
+	while (passptr > cg->password)
+	{
+          passptr --;
+          fputs("\010 \010", stdout);
+        }
+      }
+      else
+        putchar(0x07);
+    }
+    else if (passch == 0x03)
+    {
+     /*
+      * CTRL+C...
+      */
+
+      passptr = cg->password;
+      break;
+    }
+    else if ((passch & 255) < 0x20 || passptr >= passend)
+      putchar(0x07);
+    else
+    {
+      *passptr++ = passch;
+      putchar(_CUPS_PASSCHAR);
+    }
+
+    fflush(stdout);
+  }
+
+  putchar('\n');
+  fflush(stdout);
+
+ /*
+  * Cleanup...
+  */
+
+  SetConsoleMode(tty, mode);
+
+ /*
+  * Return the proper value...
+  */
+
+  if (passbytes == 1 && passptr > cg->password)
+  {
+    *passptr = '\0';
+    return (cg->password);
+  }
+  else
+  {
+    memset(cg->password, 0, sizeof(cg->password));
+    return (NULL);
+  }
 
 #else
+  int			tty;		/* /dev/tty - never read from stdin */
+  struct termios	original,	/* Original input mode */
+			noecho;		/* No echo input mode */
+  char			passch,		/* Current key press */
+			*passptr,	/* Pointer into password string */
+			*passend;	/* End of password string */
+  ssize_t		passbytes;	/* Bytes read */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Thread globals */
+
+
  /*
-  * Use the standard getpass function to get a password from the console.  An
-  * empty password is treated as canceling the authentication request.
+  * Disable input echo and set raw input...
   */
 
-  const char	*password = getpass(prompt);
-					/* Password string */
-
-  if (!password || !password[0])
+  if ((tty = open("/dev/tty", O_RDONLY)) < 0)
     return (NULL);
+
+  if (tcgetattr(tty, &original))
+  {
+    close(tty);
+    return (NULL);
+  }
+
+  noecho = original;
+  noecho.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+  if (tcsetattr(tty, TCSAFLUSH, &noecho))
+  {
+    close(tty);
+    return (NULL);
+  }
+
+ /*
+  * Display the prompt...
+  */
+
+  printf("%s ", prompt);
+  fflush(stdout);
+
+ /*
+  * Read the password string from /dev/tty until we get interrupted or get a
+  * carriage return or newline...
+  */
+
+  passptr = cg->password;
+  passend = cg->password + sizeof(cg->password) - 1;
+
+  while ((passbytes = read(tty, &passch, 1)) == 1)
+  {
+    if (passch == noecho.c_cc[VEOL] || passch == noecho.c_cc[VEOL2] ||
+        passch == 0x0A || passch == 0x0D)
+    {
+     /*
+      * Enter/return...
+      */
+
+      break;
+    }
+    else if (passch == noecho.c_cc[VERASE] ||
+             passch == 0x08 || passch == 0x7F)
+    {
+     /*
+      * Backspace/delete (erase character)...
+      */
+
+      if (passptr > cg->password)
+      {
+        passptr --;
+        fputs("\010 \010", stdout);
+      }
+      else
+        putchar(0x07);
+    }
+    else if (passch == noecho.c_cc[VKILL])
+    {
+     /*
+      * CTRL+U (erase line)
+      */
+
+      if (passptr > cg->password)
+      {
+	while (passptr > cg->password)
+	{
+          passptr --;
+          fputs("\010 \010", stdout);
+        }
+      }
+      else
+        putchar(0x07);
+    }
+    else if (passch == noecho.c_cc[VINTR] || passch == noecho.c_cc[VQUIT] ||
+             passch == noecho.c_cc[VEOF])
+    {
+     /*
+      * CTRL+C, CTRL+D, or CTRL+Z...
+      */
+
+      passptr = cg->password;
+      break;
+    }
+    else if ((passch & 255) < 0x20 || passptr >= passend)
+      putchar(0x07);
+    else
+    {
+      *passptr++ = passch;
+      putchar(_CUPS_PASSCHAR);
+    }
+
+    fflush(stdout);
+  }
+
+  putchar('\n');
+  fflush(stdout);
+
+ /*
+  * Cleanup...
+  */
+
+  tcsetattr(tty, TCSAFLUSH, &original);
+  close(tty);
+
+ /*
+  * Return the proper value...
+  */
+
+  if (passbytes == 1 && passptr > cg->password)
+  {
+    *passptr = '\0';
+    return (cg->password);
+  }
   else
-    return (password);
+  {
+    memset(cg->password, 0, sizeof(cg->password));
+    return (NULL);
+  }
 #endif /* WIN32 */
 }
 

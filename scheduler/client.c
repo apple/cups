@@ -187,8 +187,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     return;
   }
 
-  con->http.activity   = time(NULL);
   con->file            = -1;
+  con->http.activity   = time(NULL);
   con->http.hostaddr   = &(con->clientaddr);
   con->http.wait_value = 10000;
 
@@ -426,6 +426,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
     con->serverport = _httpAddrPort(&(lis->address));
   }
+
+ /*
+  * Add the connection to the array of active clients...
+  */
 
   cupsArrayAdd(Clients, con);
 
@@ -2626,7 +2630,7 @@ cupsdSendHeader(
     if (auth_type == CUPSD_AUTH_NONE)
     {
       if (!con->best || con->best->type <= CUPSD_AUTH_NONE)
-	auth_type = DefaultAuthType;
+	auth_type = cupsdDefaultAuthType();
       else
 	auth_type = con->best->type;
     }
@@ -3492,7 +3496,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   if (SSL_accept(con->http.tls) != 1)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to encrypt connection from %s!",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to encrypt connection from %s.",
                     con->http.hostname);
 
     while ((error = ERR_get_error()) != 0)
@@ -3513,7 +3517,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   int		status;			/* Error code */
   gnutls_certificate_server_credentials *credentials;
 					/* TLS credentials */
-  const char	*priority;		/* Priority string */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
@@ -3554,21 +3557,6 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   gnutls_init(&con->http.tls, GNUTLS_SERVER);
   gnutls_set_default_priority(con->http.tls);
-  status = gnutls_priority_set_direct(con->http.tls,
-                                      "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:"
-                                      "+VERS-SSL3.0:%COMPAT", &priority);
-  if (status != GNUTLS_E_SUCCESS)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s (%s)",
-                    con->http.hostname, gnutls_strerror(status), priority);
-
-    gnutls_deinit(con->http.tls);
-    gnutls_certificate_free_credentials(*credentials);
-    con->http.tls = NULL;
-    free(credentials);
-    return (0);
-  }
 
   gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
   gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));

@@ -3,7 +3,7 @@
  *
  *   CUPS API test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -35,6 +35,7 @@
  */
 
 static int	dests_equal(cups_dest_t *a, cups_dest_t *b);
+static int	enum_cb(void *user_data, unsigned flags, cups_dest_t *dest);
 static void	show_diffs(cups_dest_t *a, cups_dest_t *b);
 
 
@@ -57,69 +58,106 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_jobs;		/* Number of jobs for queue */
   cups_job_t	*jobs;			/* Jobs for queue */
 
-
   if (argc > 1)
   {
-   /*
-    * ./testcups printer file interval
-    */
-
-    int		interval,		/* Interval between writes */
-		job_id;			/* Job ID */
-    cups_file_t	*fp;			/* Print file */
-    char	buffer[16384];		/* Read/write buffer */
-    ssize_t	bytes;			/* Bytes read/written */
-
-
-    if (argc != 4)
+    if (!strcmp(argv[1], "enum"))
     {
-      puts("Usage: ./testcups");
-      puts("       ./testcups printer file interval");
-      return (1);
+      int	msec;			/* Timeout in milliseconds */
+
+      if (argc >= 3)
+        msec = atoi(argv[2]) * 1000;
+      else
+        msec = 0;
+
+      cupsEnumDests(CUPS_DEST_FLAGS_NONE, msec, NULL, 0, 0, enum_cb, NULL);
     }
-
-    if ((fp = cupsFileOpen(argv[2], "r")) == NULL)
+    else if (!strcmp(argv[1], "password"))
     {
-      printf("Unable to open \"%s\": %s\n", argv[2], strerror(errno));
-      return (1);
+      const char *pass = cupsGetPassword("Password:");
+					  /* Password string */
+
+      if (pass)
+	printf("Password entered: %s\n", pass);
+      else
+	puts("No password entered.");
     }
-
-    if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, argv[1], "testcups", 0,
-                                NULL)) <= 0)
+    else if (!strcmp(argv[1], "print") && argc == 5)
     {
-      printf("Unable to create print job on %s: %s\n", argv[1],
-             cupsLastErrorString());
-      return (1);
-    }
+     /*
+      * ./testcups printer file interval
+      */
 
-    interval = atoi(argv[3]);
+      int		interval,	/* Interval between writes */
+			job_id;		/* Job ID */
+      cups_file_t	*fp;		/* Print file */
+      char		buffer[16384];	/* Read/write buffer */
+      ssize_t		bytes;		/* Bytes read/written */
 
-    if (cupsStartDocument(CUPS_HTTP_DEFAULT, argv[1], job_id, argv[2],
-                          CUPS_FORMAT_AUTO, 1) != HTTP_CONTINUE)
-    {
-      puts("Unable to start document!");
-      return (1);
-    }
-
-    while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
-    {
-      printf("Writing %d bytes...\n", (int)bytes);
-
-      if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
-			       bytes) != HTTP_CONTINUE)
+      if ((fp = cupsFileOpen(argv[3], "r")) == NULL)
       {
-        puts("Unable to write bytes!");
+	printf("Unable to open \"%s\": %s\n", argv[2], strerror(errno));
 	return (1);
       }
 
-      sleep(interval);
+      if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, argv[2], "testcups", 0,
+				  NULL)) <= 0)
+      {
+	printf("Unable to create print job on %s: %s\n", argv[1],
+	       cupsLastErrorString());
+	return (1);
+      }
+
+      interval = atoi(argv[4]);
+
+      if (cupsStartDocument(CUPS_HTTP_DEFAULT, argv[1], job_id, argv[2],
+			    CUPS_FORMAT_AUTO, 1) != HTTP_CONTINUE)
+      {
+	puts("Unable to start document!");
+	return (1);
+      }
+
+      while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
+      {
+	printf("Writing %d bytes...\n", (int)bytes);
+
+	if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
+				 bytes) != HTTP_CONTINUE)
+	{
+	  puts("Unable to write bytes!");
+	  return (1);
+	}
+
+        if (interval > 0)
+	  sleep(interval);
+      }
+
+      cupsFileClose(fp);
+
+      if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) > IPP_OK_SUBST)
+      {
+	puts("Unable to finish document!");
+	return (1);
+      }
     }
-
-    cupsFileClose(fp);
-
-    if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) > IPP_OK_SUBST)
+    else
     {
-      puts("Unable to finish document!");
+      puts("Usage:");
+      puts("");
+      puts("Run basic unit tests:");
+      puts("");
+      puts("    ./testcups");
+      puts("");
+      puts("Enumerate printers (for N seconds, -1 for indefinitely):");
+      puts("");
+      puts("    ./testcups enum [seconds]");
+      puts("");
+      puts("Ask for a password:");
+      puts("");
+      puts("    ./testcups password");
+      puts("");
+      puts("Print a file (interval controls delay between buffers in seconds):");
+      puts("");
+      puts("    ./testcups print printer file interval");
       return (1);
     }
 
@@ -364,6 +402,24 @@ dests_equal(cups_dest_t *a,		/* I - First destination */
                               b->options)) == NULL ||
         strcmp(aoption->value, bval))
       return (0);
+
+  return (1);
+}
+
+
+/*
+ * 'enum_cb()' - Report additions and removals.
+ */
+
+static int				/* O - 1 to continue, 0 to stop */
+enum_cb(void        *user_data,		/* I - User data (unused) */
+        unsigned    flags,		/* I - Destination flags */
+        cups_dest_t *dest)		/* I - Destination */
+{
+  if (flags & CUPS_DEST_FLAGS_REMOVED)
+    printf("Removed '%s'.\n", dest->name);
+  else
+    printf("Added '%s'.\n", dest->name);
 
   return (1);
 }

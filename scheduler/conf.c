@@ -17,6 +17,7 @@
  *   cupsdAddAlias()          - Add a host alias.
  *   cupsdCheckPermissions()  - Fix the mode and ownership of a file or
  *                              directory.
+ *   cupsdDefaultAuthType()   - Get the default AuthType.
  *   cupsdFreeAliases()       - Free all of the alias entries.
  *   cupsdReadConfiguration() - Read the cupsd.conf file.
  *   get_address()            - Get an address + port number from a line.
@@ -81,6 +82,8 @@ typedef struct
  * Local globals...
  */
 
+static int			default_auth_type	= CUPSD_AUTH_AUTO;
+					/* Default AuthType, if not specified */
 static const cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
@@ -108,6 +111,9 @@ static const cupsd_var_t	variables[] =
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
+#ifdef HAVE_GSSAPI
+  { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
+#endif /* HAVE_GSSAPI */
   { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
@@ -129,6 +135,7 @@ static const cupsd_var_t	variables[] =
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
+  { "MaxJobTime",		&MaxJobTime,		CUPSD_VARTYPE_INTEGER },
   { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
@@ -375,6 +382,118 @@ cupsdCheckPermissions(
 
 
 /*
+ * 'cupsdDefaultAuthType()' - Get the default AuthType.
+ *
+ * When the default_auth_type is "auto", this function tries to get the GSS
+ * credentials for the server.  If that succeeds we use Kerberos authentication,
+ * otherwise we do a fallback to Basic authentication against the local user
+ * accounts.
+ */
+
+int					/* O - Default AuthType value */
+cupsdDefaultAuthType(void)
+{
+#ifdef HAVE_GSSAPI
+  OM_uint32	major_status,		/* Major status code */
+		minor_status;		/* Minor status code */
+  gss_name_t	server_name;		/* Server name */
+  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
+					/* Service name token */
+  char		buf[1024];		/* Service name buffer */
+#endif /* HAVE_GSSAPI */
+
+
+ /*
+  * If we have already determined the correct default AuthType, use it...
+  */
+
+  if (default_auth_type != CUPSD_AUTH_AUTO)
+    return (default_auth_type);
+
+#ifdef HAVE_GSSAPI
+#  ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (gss_init_sec_context == NULL)
+    return (default_auth_type = CUPSD_AUTH_BASIC);
+#  endif /* __APPLE__ */
+
+ /*
+  * Try to obtain the server's GSS credentials (GSSServiceName@servername).  If
+  * that fails we must use Basic...
+  */
+
+  snprintf(buf, sizeof(buf), "%s@%s", GSSServiceName, ServerName);
+
+  token.value  = buf;
+  token.length = strlen(buf);
+  server_name  = GSS_C_NO_NAME;
+  major_status = gss_import_name(&minor_status, &token,
+	 			 GSS_C_NT_HOSTBASED_SERVICE,
+				 &server_name);
+
+  memset(&token, 0, sizeof(token));
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+		       "cupsdDefaultAuthType: gss_import_name(%s) failed", buf);
+    return (default_auth_type = CUPSD_AUTH_BASIC);
+  }
+
+  major_status = gss_display_name(&minor_status, server_name, &token, NULL);
+
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                       "cupsdDefaultAuthType: gss_display_name(%s) failed",
+                       buf);
+    return (default_auth_type = CUPSD_AUTH_BASIC);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdDefaultAuthType: Attempting to acquire Kerberos "
+                  "credentials for %s...", (char *)token.value);
+
+  ServerCreds  = GSS_C_NO_CREDENTIAL;
+  major_status = gss_acquire_cred(&minor_status, server_name, GSS_C_INDEFINITE,
+				  GSS_C_NO_OID_SET, GSS_C_ACCEPT,
+				  &ServerCreds, NULL, NULL);
+  if (GSS_ERROR(major_status))
+  {
+    cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
+                       "cupsdDefaultAuthType: gss_acquire_cred(%s) failed",
+                       (char *)token.value);
+    gss_release_name(&minor_status, &server_name);
+    gss_release_buffer(&minor_status, &token);
+    return (default_auth_type = CUPSD_AUTH_BASIC);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdDefaultAuthType: Kerberos credentials acquired "
+                  "successfully for %s.", (char *)token.value);
+
+  gss_release_name(&minor_status, &server_name);
+  gss_release_buffer(&minor_status, &token);
+
+  HaveServerCreds = 1;
+
+  return (default_auth_type = CUPSD_AUTH_NEGOTIATE);
+
+#else
+ /*
+  * No Kerberos support compiled in so just use Basic all the time...
+  */
+
+  return (default_auth_type = CUPSD_AUTH_BASIC);
+#endif /* HAVE_GSSAPI */
+}
+
+
+/*
  * 'cupsdFreeAliases()' - Free all of the alias entries.
  */
 
@@ -504,6 +623,21 @@ cupsdReadConfiguration(void)
 
   cupsdSetString(&TempDir, NULL);
 
+#ifdef HAVE_GSSAPI
+  cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
+
+  if (HaveServerCreds)
+  {
+    OM_uint32	minor_status;		/* Minor status code */
+
+    gss_release_cred(&minor_status, &ServerCreds);
+
+    HaveServerCreds = 0;
+  }
+
+  ServerCreds = GSS_C_NO_CREDENTIAL;
+#endif /* HAVE_GSSAPI */
+
  /*
   * Find the default user...
   */
@@ -560,7 +694,7 @@ cupsdReadConfiguration(void)
   AccessLogLevel           = CUPSD_ACCESSLOG_ACTIONS;
   ConfigFilePerm           = CUPS_DEFAULT_CONFIG_FILE_PERM;
   FatalErrors              = parse_fatal_errors(CUPS_DEFAULT_FATAL_ERRORS);
-  DefaultAuthType          = CUPSD_AUTH_BASIC;
+  default_auth_type          = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption        = HTTP_ENCRYPT_REQUIRED;
   SSLOptions               = CUPSD_SSL_NONE;
@@ -613,6 +747,7 @@ cupsdReadConfiguration(void)
   MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
   MaxJobsPerPrinter   = 0;
+  MaxJobTime          = 3 * 60 * 60;	/* 3 hours */
   MaxCopies           = CUPS_DEFAULT_MAX_COPIES;
 
   cupsdDeleteAllPolicies();
@@ -630,7 +765,7 @@ cupsdReadConfiguration(void)
   MaxLeaseDuration           = 0;
 
 #ifdef HAVE_LAUNCHD
-  LaunchdTimeout = DEFAULT_TIMEOUT + 10;
+  LaunchdTimeout = 10;
 #endif /* HAVE_LAUNCHD */
 
  /*
@@ -2625,24 +2760,26 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       BrowseLocalProtocols = protocols;
     }
-    else if (!_cups_strcasecmp(line, "DefaultAuthType") && value)
+    else if (!_cups_strcasecmp(line, "default_auth_type") && value)
     {
      /*
-      * DefaultAuthType {basic,digest,basicdigest,negotiate}
+      * default_auth_type {basic,digest,basicdigest,negotiate}
       */
 
       if (!_cups_strcasecmp(value, "none"))
-	DefaultAuthType = CUPSD_AUTH_NONE;
+	default_auth_type = CUPSD_AUTH_NONE;
       else if (!_cups_strcasecmp(value, "basic"))
-	DefaultAuthType = CUPSD_AUTH_BASIC;
+	default_auth_type = CUPSD_AUTH_BASIC;
       else if (!_cups_strcasecmp(value, "digest"))
-	DefaultAuthType = CUPSD_AUTH_DIGEST;
+	default_auth_type = CUPSD_AUTH_DIGEST;
       else if (!_cups_strcasecmp(value, "basicdigest"))
-	DefaultAuthType = CUPSD_AUTH_BASICDIGEST;
+	default_auth_type = CUPSD_AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
       else if (!_cups_strcasecmp(value, "negotiate"))
-        DefaultAuthType = CUPSD_AUTH_NEGOTIATE;
+        default_auth_type = CUPSD_AUTH_NEGOTIATE;
 #endif /* HAVE_GSSAPI */
+      else if (!_cups_strcasecmp(value, "auto"))
+        default_auth_type = CUPSD_AUTH_AUTO;
       else
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,

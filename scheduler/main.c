@@ -120,7 +120,6 @@ main(int  argc,				/* I - Number of command-line args */
   cupsd_listener_t	*lis;		/* Current listener */
   time_t		current_time,	/* Current time */
 			activity,	/* Client activity timer */
-			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
 			report_time,	/* Malloc/client/job report time */
@@ -650,7 +649,6 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   current_time  = time(NULL);
-  browse_time   = current_time;
   event_time    = current_time;
   expire_time   = current_time;
   fds           = 1;
@@ -1531,6 +1529,7 @@ process_children(void)
   cupsd_job_t	*job;			/* Current job */
   int		i;			/* Looping var */
   char		name[1024];		/* Process name */
+  const char	*type;			/* Type of program */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
@@ -1570,7 +1569,12 @@ process_children(void)
     * Handle completed job filters...
     */
 
-    if (job_id > 0 && (job = cupsdFindJob(job_id)) != NULL)
+    if (job_id > 0)
+      job = cupsdFindJob(job_id);
+    else
+      job  = NULL;
+
+    if (job)
     {
       for (i = 0; job->filters[i]; i ++)
 	if (job->filters[i] == pid)
@@ -1583,9 +1587,15 @@ process_children(void)
 	*/
 
 	if (job->filters[i])
+	{
 	  job->filters[i] = -pid;
+	  type            = "Filter";
+	}
 	else
+	{
 	  job->backend = -pid;
+	  type         = "Backend";
+	}
 
 	if (status && status != SIGTERM && status != SIGKILL &&
 	    status != SIGPIPE && job->status >= 0)
@@ -1604,14 +1614,15 @@ process_children(void)
 	    job->status = -status;	/* Backend failed */
 
 	  if (job->state_value == IPP_JOB_PROCESSING &&
-	      job->status_level > CUPSD_LOG_ERROR)
+	      job->status_level > CUPSD_LOG_ERROR &&
+	      (job->filters[i] || !WIFEXITED(status)))
 	  {
 	    char	message[1024];	/* New printer-state-message */
 
 
 	    job->status_level = CUPSD_LOG_ERROR;
 
-	    snprintf(message, sizeof(message), "%s failed", name);
+	    snprintf(message, sizeof(message), "%s failed", type);
 
             if (job->printer)
 	    {
@@ -1681,15 +1692,15 @@ process_children(void)
 
     if (status == SIGTERM || status == SIGKILL)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "PID %d (%s) was terminated normally with signal %d.",
-                      pid, name, status);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		  "PID %d (%s) was terminated normally with signal %d.", pid,
+		  name, status);
     }
     else if (status == SIGPIPE)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "PID %d (%s) did not catch or ignore signal %d.",
-                      pid, name, status);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		  "PID %d (%s) did not catch or ignore signal %d.", pid, name,
+		  status);
     }
     else if (status)
     {
@@ -1698,26 +1709,25 @@ process_children(void)
         int code = WEXITSTATUS(status);	/* Exit code */
 
         if (code > 100)
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "PID %d (%s) stopped with status %d (%s)", pid, name,
-			  code, strerror(code - 100));
+	  cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		      "PID %d (%s) stopped with status %d (%s)", pid, name,
+		      code, strerror(code - 100));
 	else
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "PID %d (%s) stopped with status %d.", pid, name,
-			  code);
+	  cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		      "PID %d (%s) stopped with status %d.", pid, name, code);
       }
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d.",
-	                pid, name, WTERMSIG(status));
+	cupsdLogJob(job, CUPSD_LOG_DEBUG, "PID %d (%s) crashed on signal %d.",
+		    pid, name, WTERMSIG(status));
 
       if (LogLevel < CUPSD_LOG_DEBUG)
-        cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Hint: Try setting the LogLevel to \"debug\" to find "
-			"out more.");
+        cupsdLogJob(job, CUPSD_LOG_INFO,
+		    "Hint: Try setting the LogLevel to \"debug\" to find out "
+		    "more.");
     }
     else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
-                      pid, name);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
+		  pid, name);
   }
 
  /*
@@ -1836,8 +1846,12 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
       timeout = job->kill_time;
       why     = "kill unresponsive jobs";
     }
-
-    if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
+    else if (job->cancel_time && job->cancel_time < timeout)
+    {
+      timeout = job->cancel_time;
+      why     = "cancel stuck jobs";
+    }
+    else if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
     {
       timeout = job->hold_until;
       why     = "release held jobs";
@@ -1876,11 +1890,9 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     }
 
  /*
-  * Adjust from absolute to relative time.  If p->browse_time above
-  * was 0 then we can end up with a negative value here, so check.
-  * We add 1 second to the timeout since events occur after the
-  * timeout expires, and limit the timeout to 86400 seconds (1 day)
-  * to avoid select() timeout limits present on some operating
+  * Adjust from absolute to relative time.  We add 1 second to the timeout since
+  * events occur after the timeout expires, and limit the timeout to 86400
+  * seconds (1 day) to avoid select() timeout limits present on some operating
   * systems...
   */
 

@@ -297,10 +297,21 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job.",
 		      job->id);
 
       stop_job(job, CUPSD_JOB_FORCE);
+      continue;
+    }
+
+   /*
+    * Cancel stuck jobs...
+    */
+
+    if (job->cancel_time && job->cancel_time <= curtime)
+    {
+      cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
+                       "Canceling stuck job after %d seconds.", MaxJobTime);
       continue;
     }
 
@@ -1811,32 +1822,52 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
     {
-      int	bytes;			/* Size of auth data */
+      int	bytes,			/* Size of auth data */
+		linenum = 1;		/* Current line number */
       char	line[65536],		/* Line from file */
+		*value,			/* Value from line */
 		data[65536];		/* Decoded data */
 
 
-      for (i = 0;
-           i < destptr->num_auth_info_required &&
-	       i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])) &&
-	       cupsFileGets(fp, line, sizeof(line));
-	   i ++)
+      if (cupsFileGets(fp, line, sizeof(line)) &&
+          !strcmp(line, "CUPSD-AUTH-V2"))
       {
-        bytes = sizeof(data);
-        httpDecode64_2(data, &bytes, line);
+        i = 0;
+        while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+        {
+         /*
+          * Decode value...
+          */
 
-	if (!strcmp(destptr->auth_info_required[i], "username"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
-	else if (!strcmp(destptr->auth_info_required[i], "domain"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s", data);
-	else if (!strcmp(destptr->auth_info_required[i], "password"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
-        else if (!strcmp(destptr->auth_info_required[i], "negotiate"))
-	  cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	  bytes = sizeof(data);
+	  httpDecode64_2(data, &bytes, value);
+
+         /*
+          * Assign environment variables...
+          */
+
+          if (!strcmp(line, "uid"))
+          {
+            cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", value);
+            continue;
+          }
+          else if (i >= (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0])))
+            break;
+
+	  if (!strcmp(line, "username"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s", data);
+	  else if (!strcmp(line, "domain"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_DOMAIN=%s", data);
+	  else if (!strcmp(line, "password"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
+	  else if (!strcmp(line, "negotiate"))
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	  else
+	    continue;
+
+	  i ++;
+	}
       }
-
-      if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
-        cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
 
       cupsFileClose(fp);
     }
@@ -3351,6 +3382,14 @@ get_options(cupsd_job_t *job,		/* I - Job */
         num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_short,
 				    num_pwgppds, &pwgppds);
     }
+
+   /*
+    * Map finishings values...
+    */
+
+    num_pwgppds = _ppdCacheGetFinishingOptions(pc, job->attrs,
+                                               IPP_FINISHINGS_NONE, num_pwgppds,
+                                               &pwgppds);
   }
 
  /*
@@ -4130,6 +4169,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->printer      = printer;
   printer->job      = job;
 
+  if (MaxJobTime > 0)
+    job->cancel_time = time(NULL) + MaxJobTime;
+  else
+    job->cancel_time = 0;
+
  /*
   * Setup the last exit status and security profiles...
   */
@@ -4387,7 +4431,23 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	return;
       }
       else if (cupsdSetPrinterReasons(job->printer, message))
+      {
 	event |= CUPSD_EVENT_PRINTER_STATE;
+
+        if (MaxJobTime > 0 && strstr(message, "connecting-to-device") != NULL)
+        {
+         /*
+          * Reset cancel time after connecting to the device...
+          */
+
+          for (i = 0; i < job->printer->num_reasons; i ++)
+            if (!strcmp(job->printer->reasons[i], "connecting-to-device"))
+              break;
+
+          if (i >= job->printer->num_reasons)
+	    job->cancel_time = time(NULL) + MaxJobTime;
+        }
+      }
 
       update_job_attrs(job, 0);
     }
@@ -4543,7 +4603,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       else
         ptr = message;
 
-      cupsdLogJob(job, loglevel, "%s", ptr);
+      if (*ptr)
+        cupsdLogJob(job, loglevel, "%s", ptr);
 
       if (loglevel < CUPSD_LOG_DEBUG &&
           strcmp(job->printer->state_message, ptr))
@@ -4671,10 +4732,20 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
   if (job->state_value != IPP_JOB_PROCESSING &&
       job->status_level == CUPSD_LOG_INFO)
+  {
     cupsdSetString(&(job->printer_message->values[0].string.text), "");
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+  }
   else if (job->printer->state_message[0] && do_message)
+  {
     cupsdSetString(&(job->printer_message->values[0].string.text),
 		   job->printer->state_message);
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+  }
 
  /*
   * ... and the printer-state-reasons value...
@@ -4731,6 +4802,9 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
   for (i = 0; i < num_reasons; i ++)
     job->printer_reasons->values[i].string.text = _cupsStrAlloc(reasons[i]);
+
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 

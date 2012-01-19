@@ -914,6 +914,20 @@ system-specific but is usually <CODE>lp</CODE> or
 <CODE>nobody</CODE>.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="GSSServiceName">GSSServiceName</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+GSSServiceName http
+GSSServiceName ipp
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>GSSServiceName</CODE> directive sets the Kerberos service name to use. The default is <CODE>@CUPS_DEFAULT_GSSSERVICE_NAME@</CODE> for compatibility with Microsoft Windows.</P>
+
+
 <H2 CLASS="title"><A NAME="HostNameLookups">HostNameLookups</A></H2>
 
 <H3>Examples</H3>
@@ -1722,6 +1736,25 @@ active jobs is completed, stopped, aborted, or canceled.</P>
 
 <P>Setting the maximum to 0 disables this functionality. The
 default setting is 0.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="MaxJobTime">MaxJobTime</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+MaxJobTime 10800
+MaxJobTime 0
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>MaxJobTime</CODE> directive controls the maximum number of
+seconds allowed for a job to complete printing before it is considered "stuck".
+The job is canceled automatically if it takes longer than the specified number of seconds to complete.</P>
+
+<p>Setting the maximum time to 0 disables this functionality. The default
+setting is 10800 seconds (3 hours).</P>
 
 
 <H2 CLASS="title"><A NAME="MaxLogSize">MaxLogSize</A></H2>

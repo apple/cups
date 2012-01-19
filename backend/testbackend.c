@@ -3,7 +3,7 @@
  *
  *   Backend test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -57,7 +57,7 @@ static void	walk_cb(const char *oid, const char *data, int datalen,
  *
  * Usage:
  *
- *    betest [-s] [-t] device-uri job-id user title copies options [file]
+ *    testbackend [-s] [-t] device-uri job-id user title copies options [file]
  */
 
 int					/* O - Exit status */
@@ -75,7 +75,9 @@ main(int  argc,				/* I - Number of command-line args */
   const char	*oid = ".1.3.6.1.2.1.43.10.2.1.4.1.1";
   					/* OID to lookup or walk */
   char		scheme[255],		/* Scheme in URI == backend */
-		backend[1024];		/* Backend path */
+		backend[1024],		/* Backend path */
+		libpath[1024],		/* Path for libcups */
+		*ptr;			/* Pointer into path */
   const char	*serverbin;		/* CUPS_SERVERBIN environment variable */
   int		fd,			/* Temporary file descriptor */
 		back_fds[2],		/* Back-channel pipe */
@@ -86,6 +88,23 @@ main(int  argc,				/* I - Number of command-line args */
 		pid,			/* Process ID */
 		status;			/* Exit status */
 
+
+ /*
+  * Get the current directory and point the run-time linker at the "cups"
+  * subdirectory...
+  */
+
+  if (getcwd(libpath, sizeof(libpath)) &&
+      (ptr = strrchr(libpath, '/')) != NULL && !strcmp(ptr, "/backend"))
+  {
+    strlcpy(ptr, "/cups", sizeof(libpath) - (ptr - libpath));
+    if (access(libpath, 0))
+#ifdef __APPLE__
+      setenv("DYLD_LIBRARY_PATH", libpath, 1);
+#else
+      setenv("LD_LIBRARY_PATH", libpath, 1);
+#endif /* __APPLE__ */
+  }
 
  /*
   * See if we have side-channel tests to do...

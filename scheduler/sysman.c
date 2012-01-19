@@ -870,13 +870,18 @@ sysUpdate(void)
 
 #ifdef kIOPMAssertionTypeDenySystemSleep
      /*
-      * Tell the OS it is OK to sleep when we remove our assertion...
+      * Remove our assertion as needed since the user wants the system to
+      * sleep (different than idle sleep)...
       */
 
-      IOAllowPowerChange(sysevent.powerKernelPort,
-                         sysevent.powerNotificationID);
+      if (dark_wake)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "Releasing dark wake assertion.");
+	IOPMAssertionRelease(dark_wake);
+	dark_wake = 0;
+      }
+#endif /* kIOPMAssertionTypeDenySystemSleep */
 
-#else
      /*
       * If we have no printing jobs, allow the power change immediately.
       * Otherwise set the SleepJobs time to 15 seconds in the future when
@@ -920,7 +925,6 @@ sysUpdate(void)
 			     sysevent.powerNotificationID);
 	}
       }
-#endif /* kIOPMAssertionTypeDenySystemSleep */
     }
 
     if (sysevent.event & SYSEVENT_WOKE)
@@ -929,6 +933,17 @@ sysUpdate(void)
       IOAllowPowerChange(sysevent.powerKernelPort,
                          sysevent.powerNotificationID);
       Sleeping = 0;
+
+#ifdef kIOPMAssertionTypeDenySystemSleep
+      if (cupsArrayCount(PrintingJobs) > 0 && !dark_wake)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting dark wake.");
+	IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
+				    kIOPMAssertionLevelOn,
+				    CFSTR("org.cups.cupsd"), &dark_wake);
+      }
+#endif /* kIOPMAssertionTypeDenySystemSleep */
+
       cupsdCheckJobs();
     }
 

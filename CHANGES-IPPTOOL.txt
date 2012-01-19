@@ -1,8 +1,28 @@
-CHANGES-IPPTOOL.txt - 2011-10-05
+CHANGES-IPPTOOL.txt - 2012-01-10
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2012-01-10
+
+	- Fixed an issue with the IPP/1.1 test file where the "waiting for job
+	  completion" test did not work.
+	- The attribute groups out of order error was not shown for the
+	  operation-attributes-tag group.
+
+
+2011-12-02
+
+	- Fixed a truncated XML output bug that would happen for certain errors.
+	- Fixed the order-of-groups tests.
+	- Fixed "WITH-VALUE >N" for rangeOfInteger attributes.
+	- The Windows installer was missing the get-printer-attributes.test
+	  file.
+	- The Linux binaries are now compiled for all LSB 4.x-compliant Linux
+	  distributions.
+	- The Linux binaries no longer support SSL or TLS.
 
 
 2011-10-05
