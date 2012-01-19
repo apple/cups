@@ -1,8 +1,11 @@
-CHANGES.txt - 1.6b1 - 2012-01-06
+CHANGES.txt - 1.6b1 - 2012-01-13
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- Added new destination connection and enumeration functions (STR #3924)
+	- Added new option, localization, and job submission functions that do
+	  not depend on PPD files (STR #3925)
 	- Added a new MaxJobTime directive for cupsd that specifies the maximum
 	  amount of time allowed for a job to complete before it is canceled.
 	- The default password callback now supports passwords up to 127

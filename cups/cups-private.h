@@ -3,7 +3,7 @@
  *
  *   Private definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -169,6 +169,40 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* PPD filename */
 } _cups_globals_t;
 
+typedef struct _cups_media_db_s		/* Media database */
+{
+  char		*color,			/* Media color, if any */
+		*key,			/* Media key, if any */
+		*info,			/* Media human-readable name, if any */
+		*size_name,		/* Media PWG size name, if provided */
+		*source,		/* Media source, if any */
+		*type;			/* Media type, if any */
+  int		width,			/* Width in hundredths of millimeters */
+		length,			/* Length in hundredths of
+					 * millimeters */
+		bottom,			/* Bottom margin in hundredths of
+					 * millimeters */
+		left,			/* Left margin in hundredths of
+					 * millimeters */
+		right,			/* Right margin in hundredths of
+					 * millimeters */
+		top;			/* Top margin in hundredths of
+					 * millimeters */
+} _cups_media_db_t;
+
+struct _cups_dinfo_s			/* Destination capability and status
+					 * information */
+{
+  const char		*uri;		/* Printer URI */
+  char			*resource;	/* Resource path */
+  ipp_t			*attrs;		/* Printer attributes */
+  cups_array_t		*constraints;	/* Job constraints */
+  cups_array_t		*localizations;	/* Localization information */
+  cups_array_t		*media_db;	/* Media database */
+  _cups_media_db_t	min_size,	/* Minimum size */
+			max_size;	/* Maximum size */
+};
+
 
 /*
  * Prototypes...
@@ -189,8 +223,11 @@ extern void		_cupsBufferRelease(char *b);
 extern http_t		*_cupsConnect(void);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
+extern const char	*_cupsGetDestResource(cups_dest_t *dest, char *resource,
+			                      size_t resourcesize);
 extern int		_cupsGetDests(http_t *http, ipp_op_t op,
-			              const char *name, cups_dest_t **dests);
+			              const char *name, cups_dest_t **dests,
+			              cups_ptype_t type, cups_ptype_t mask);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);

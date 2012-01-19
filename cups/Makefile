@@ -3,7 +3,7 @@
 #
 #   API library Makefile for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -32,6 +32,9 @@ LIBOBJS	=	\
 		custom.o \
 		debug.o \
 		dest.o \
+		dest-job.o \
+		dest-localization.o \
+		dest-options.o \
 		dir.o \
 		emit.o \
 		encode.o \
@@ -68,12 +71,7 @@ LIBOBJS	=	\
 		transcode.o \
 		usersys.o \
 		util.o
-LIB32OBJS	= $(LIBOBJS:.o=.32.o)
-LIB64OBJS	= $(LIBOBJS:.o=.64.o)
-OBJS	=	\
-		$(LIBOBJS) \
-		$(LIB32OBJS) \
-		$(LIB64OBJS) \
+TESTOBJS	= \
 		testadmin.o \
 		testarray.o \
 		testconflicts.o \
@@ -87,6 +85,14 @@ OBJS	=	\
 		testppd.o \
 		testpwg.o \
 		testsnmp.o
+
+LIB32OBJS	= $(LIBOBJS:.o=.32.o)
+LIB64OBJS	= $(LIBOBJS:.o=.64.o)
+OBJS	=	\
+		$(LIBOBJS) \
+		$(LIB32OBJS) \
+		$(LIB64OBJS) \
+		$(TESTOBJS)
 
 
 #
@@ -192,7 +198,7 @@ clean:
 
 depend:
 	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	makedepend -Y -I.. -fDependencies.tmp $(LIBOBJS:.o=.c) $(TESTOBJS:.o=.c) >/dev/null 2>&1
 	$(RM) Dependencies
 	cp Dependencies.tmp Dependencies
 	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies

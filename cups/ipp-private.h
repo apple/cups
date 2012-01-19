@@ -149,6 +149,8 @@ typedef struct				/**** Attribute mapping data ****/
   const char	*name;			/* Option/attribute name */
   ipp_tag_t	value_tag;		/* Value tag for this attribute */
   ipp_tag_t	group_tag;		/* Group tag for this attribute */
+  ipp_tag_t	alt_group_tag;		/* Alternate group tag for this
+					 * attribute */
 } _ipp_option_t;
 
 

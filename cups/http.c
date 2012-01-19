@@ -3,7 +3,7 @@
  *
  *   HTTP routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -75,6 +75,8 @@
  *   _httpReadCDSA()	      - Read function for the CDSA library.
  *   _httpReadGNUTLS()	      - Read function for the GNU TLS library.
  *   httpReconnect()	      - Reconnect to a HTTP server.
+ *   httpReconnect2()	      - Reconnect to a HTTP server with timeout and
+ *				optional cancel.
  *   httpSetAuthString()      - Set the current authorization string.
  *   httpSetCredentials()     - Set the credentials associated with an
  *				encrypted connection.
@@ -135,16 +137,6 @@
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
-
-
-/*
- * Some operating systems have done away with the Fxxxx constants for
- * the fcntl() call; this works around that "feature"...
- */
-
-#ifndef FNONBLK
-#  define FNONBLK O_NONBLOCK
-#endif /* !FNONBLK */
 
 
 /*
@@ -2277,6 +2269,22 @@ _httpReadGNUTLS(
 int					/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)		/* I - Connection to server */
 {
+  DEBUG_printf(("httpReconnect(http=%p)", http));
+
+  return (httpReconnect2(http, 30, NULL));
+}
+
+
+/*
+ * 'httpReconnect2()' - Reconnect to a HTTP server with timeout and optional
+ *                      cancel.
+ */
+
+int					/* O - 0 on success, non-zero on failure */
+httpReconnect2(http_t *http,		/* I - Connection to server */
+	       int    msec,		/* I - Timeout in milliseconds */
+	       int    *cancel)		/* I - Pointer to "cancel" variable */
+{
   http_addrlist_t	*addr;		/* Connected address */
 #ifdef DEBUG
   http_addrlist_t	*current;	/* Current address */
@@ -2284,7 +2292,8 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpReconnect(http=%p)", http));
+  DEBUG_printf(("httpReconnect(http=%p, msec=%d, cancel=%p)", http, msec,
+                cancel));
 
   if (!http)
   {
@@ -2328,7 +2337,8 @@ httpReconnect(http_t *http)		/* I - Connection to server */
                   _httpAddrPort(&(current->addr))));
 #endif /* DEBUG */
 
-  if ((addr = httpAddrConnect(http->addrlist, &(http->fd))) == NULL)
+  if ((addr = httpAddrConnect2(http->addrlist, &(http->fd), msec,
+                               cancel)) == NULL)
   {
    /*
     * Unable to connect...

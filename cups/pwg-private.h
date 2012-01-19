@@ -3,7 +3,7 @@
  *
  *   Private PWG media API definitions for CUPS.
  *
- *   Copyright 2009-2010 by Apple Inc.
+ *   Copyright 2009-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright

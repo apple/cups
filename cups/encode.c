@@ -47,15 +47,22 @@ static const _ipp_option_t ipp_options[] =
   { 0, "columns",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "columns-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "compression",		IPP_TAG_KEYWORD,	IPP_TAG_OPERATION },
-  { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "device-uri",		IPP_TAG_URI,		IPP_TAG_PRINTER },
+  { 1, "document-copies",	IPP_TAG_RANGE,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "document-format",	IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { 0, "document-format-default", IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
+  { 1, "document-numbers",	IPP_TAG_RANGE,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 1, "exclude-schemes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
-  { 1, "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 1, "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 1, "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
-  { 0, "fit-to-page",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "fit-to-page",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "fit-to-page-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "fitplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "fitplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -81,14 +88,20 @@ static const _ipp_option_t ipp_options[] =
   { 0, "marker-message",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 1, "marker-names",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { 1, "marker-types",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { 1, "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
-  { 0, "media-col",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB },
+  { 1, "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
+  { 0, "media-col",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "media-col-default",	IPP_TAG_BEGIN_COLLECTION, IPP_TAG_PRINTER },
-  { 0, "media-color",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "media-color",		IPP_TAG_KEYWORD,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 1, "media-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { 0, "media-key",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
-  { 0, "media-size",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB },
-  { 0, "media-type",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "media-key",		IPP_TAG_KEYWORD,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
+  { 0, "media-size",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
+  { 0, "media-type",		IPP_TAG_KEYWORD,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "mirror",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "mirror-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "natural-scaling",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -103,20 +116,27 @@ static const _ipp_option_t ipp_options[] =
   { 0, "notify-recipient-uri",	IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
   { 0, "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
   { 0, "notify-user-data",	IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
-  { 0, "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "number-up-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { 0, "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 0, "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "orientation-requested-default", IPP_TAG_ENUM,	IPP_TAG_PRINTER },
+  { 1, "overrides",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "page-bottom",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "page-bottom-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "page-left",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "page-left-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { 1, "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB },
+  { 1, "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 1, "page-ranges-default",	IPP_TAG_RANGE,		IPP_TAG_PRINTER },
   { 0, "page-right",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "page-right-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "page-top",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "page-top-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "pages",			IPP_TAG_RANGE,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "penwidth",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "penwidth-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "port-monitor",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
@@ -125,7 +145,8 @@ static const _ipp_option_t ipp_options[] =
   { 0, "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { 0, "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 0, "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { 1, "printer-commands",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
@@ -136,7 +157,8 @@ static const _ipp_option_t ipp_options[] =
   { 0, "printer-make-and-model", IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
   { 0, "printer-op-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
-  { 0, "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { 0, "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "printer-state",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { 0, "printer-state-change-time", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 1, "printer-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
@@ -154,12 +176,15 @@ static const _ipp_option_t ipp_options[] =
   { 0, "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "scaling",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { 0, "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
   { 0, "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { 0, "x-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { 0, "y-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB }
+  { 0, "x-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT },
+  { 0, "y-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
+							IPP_TAG_DOCUMENT }
 };
 
 
@@ -282,7 +307,7 @@ cupsEncodeOptions2(
 
     if ((match = _ippFindOption(option->name)) != NULL)
     {
-      if (match->group_tag != group_tag)
+      if (match->group_tag != group_tag && match->alt_group_tag != group_tag)
         continue;
 
       value_tag = match->value_tag;
@@ -294,9 +319,11 @@ cupsEncodeOptions2(
 
       namelen = (int)strlen(option->name);
 
-      if (namelen < 9 || strcmp(option->name + namelen - 8, "-default"))
+      if (namelen < 10 ||
+          (strcmp(option->name + namelen - 8, "-default") &&
+           strcmp(option->name + namelen - 10, "-supported")))
       {
-	if (group_tag != IPP_TAG_JOB)
+	if (group_tag != IPP_TAG_JOB && group_tag != IPP_TAG_DOCUMENT)
           continue;
       }
       else if (group_tag != IPP_TAG_PRINTER)
