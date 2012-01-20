@@ -3,7 +3,7 @@
 #
 #   Makefile for the CUPS PPD Compiler.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 2002-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -112,7 +112,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.cxx) >/dev/null 2>&1
+	$(CXX) -MM $(ALL_CXXFLAGS) $(OBJS:.o=.cxx) >Dependencies
 
 
 #

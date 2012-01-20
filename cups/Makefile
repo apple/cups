@@ -189,10 +189,7 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(LIBOBJS:.o=.c) $(TESTOBJS:.o=.c) >/dev/null 2>&1
-	$(RM) Dependencies
-	cp Dependencies.tmp Dependencies
+	$(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
 
 
 #
