@@ -147,6 +147,16 @@ AC_CHECK_HEADER(iconv.h,
 		SAVELIBS="$SAVELIBS $LIBS")
 	LIBS="$SAVELIBS")
 
+dnl Checks for Mini-XML (www.minixml.org)...
+LIBMXML=""
+AC_CHECK_HEADER(mxml.h,
+	SAVELIBS="$LIBS"
+	AC_SEARCH_LIBS(mmxlNewElement,mxml,
+		AC_DEFINE(HAVE_MXML_H)
+		LIBMXML="-lmxml")
+	LIBS="$SAVELIBS")
+AC_SUBST(LIBMXML)
+
 dnl Checks for statfs and its many headers...
 AC_CHECK_HEADER(sys/mount.h,AC_DEFINE(HAVE_SYS_MOUNT_H))
 AC_CHECK_HEADER(sys/statfs.h,AC_DEFINE(HAVE_SYS_STATFS_H))

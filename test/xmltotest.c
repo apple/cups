@@ -3,7 +3,7 @@
  *
  *   IANA XML registration to test file generator for CUPS.
  *
- *   Copyright 2011 by Apple Inc.
+ *   Copyright 2011-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -34,12 +34,14 @@
  *   write_expect() - Write an EXPECT test for an attribute.
  */
 
-#include <mxml.h>
+
+#include <config.h>
 #include <cups/cups.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-
+#ifdef HAVE_MXML_H
+#  include <mxml.h>
 /*
  * Local types...
  */
@@ -511,6 +513,15 @@ write_expect(_cups_reg_t *reg,		/* I - Registration information */
   else
     printf(" IN-GROUP %s\n", ippTagString(group));
 }
+
+
+#else /* !HAVE_MXML */
+int
+main(void)
+{
+  return (1);
+}
+#endif /* HAVE_MXML */
 
 
 /*

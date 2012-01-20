@@ -189,7 +189,7 @@ xmltotest: xmltotest.o ../cups/$(LIBUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ xmltotest.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) \
-		-lmxml
+		$(LIBMXML)
 
 
 #
