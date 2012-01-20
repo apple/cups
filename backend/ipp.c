@@ -2106,7 +2106,7 @@ monitor_printer(
 	else
 	  monitor->job_state = IPP_JOB_COMPLETED;
       }
-      else
+      else if (response)
       {
         for (attr = response->attrs; attr; attr = attr->next)
         {
