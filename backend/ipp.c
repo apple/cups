@@ -1686,6 +1686,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           _cupsLangPrintFilter(stderr, "ERROR",
 			       _("Unable to get print job status."));
+          ipp_status = IPP_OK;
           break;
 	}
       }
