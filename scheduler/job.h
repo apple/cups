@@ -50,6 +50,7 @@ struct cupsd_job_s			/**** Job request ****/
 			kill_time,	/* When to send SIGKILL */
 			hold_until;	/* Hold expiration date/time */
   ipp_attribute_t	*state;		/* Job state */
+  ipp_attribute_t	*reasons;	/* Job state reasons */
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
   ipp_attribute_t	*printer_message,
 					/* job-printer-state-message */

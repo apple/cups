@@ -2591,6 +2591,7 @@ cupsdSetPrinterState(
     ipp_pstate_t    s,			/* I - New state */
     int             update)		/* I - Update printers.conf? */
 {
+  cupsd_job_t	*job;			/* Current job */
   ipp_pstate_t	old_state;		/* Old printer state */
   static const char * const printer_states[] =
   {					/* State strings */
@@ -2634,6 +2635,17 @@ cupsdSetPrinterState(
     cupsdSetPrinterReasons(p, "+paused");
   else
     cupsdSetPrinterReasons(p, "-paused");
+
+  if (old_state != s)
+  {
+    for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	 job;
+	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+      if (job->reasons && job->state_value == IPP_JOB_PENDING &&
+	  !_cups_strcasecmp(job->dest, p->name))
+	ippSetString(job->attrs, &job->reasons, 0,
+		     s == IPP_PRINTER_STOPPED ? "printer-stopped" : "none");
+  }
 
  /*
   * Clear the message for the queue when going to processing...
