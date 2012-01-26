@@ -2271,7 +2271,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 {
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
-  return (httpReconnect2(http, 30, NULL));
+  return (httpReconnect2(http, 30000, NULL));
 }
 
 
@@ -2292,7 +2292,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpReconnect(http=%p, msec=%d, cancel=%p)", http, msec,
+  DEBUG_printf(("httpReconnect2(http=%p, msec=%d, cancel=%p)", http, msec,
                 cancel));
 
   if (!http)
@@ -2304,7 +2304,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #ifdef HAVE_SSL
   if (http->tls)
   {
-    DEBUG_puts("2httpReconnect: Shutting down SSL/TLS...");
+    DEBUG_puts("2httpReconnect2: Shutting down SSL/TLS...");
     http_shutdown_ssl(http);
   }
 #endif /* HAVE_SSL */
@@ -2315,7 +2315,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
   if (http->fd >= 0)
   {
-    DEBUG_printf(("2httpReconnect: Closing socket %d...", http->fd));
+    DEBUG_printf(("2httpReconnect2: Closing socket %d...", http->fd));
 
 #ifdef WIN32
     closesocket(http->fd);
@@ -2332,7 +2332,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
 #ifdef DEBUG
   for (current = http->addrlist; current; current = current->next)
-    DEBUG_printf(("2httpReconnect: Address %s:%d",
+    DEBUG_printf(("2httpReconnect2: Address %s:%d",
                   httpAddrString(&(current->addr), temp, sizeof(temp)),
                   _httpAddrPort(&(current->addr))));
 #endif /* DEBUG */
@@ -2351,13 +2351,13 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #endif /* WIN32 */
     http->status = HTTP_ERROR;
 
-    DEBUG_printf(("1httpReconnect: httpAddrConnect failed: %s",
+    DEBUG_printf(("1httpReconnect2: httpAddrConnect failed: %s",
                   strerror(http->error)));
 
     return (-1);
   }
 
-  DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
+  DEBUG_printf(("2httpReconnect2: New socket=%d", http->fd));
 
   if (http->timeout_value > 0)
     http_set_timeout(http->fd, http->timeout_value);
@@ -2389,7 +2389,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
 
-  DEBUG_printf(("1httpReconnect: Connected to %s:%d...",
+  DEBUG_printf(("1httpReconnect2: Connected to %s:%d...",
 		httpAddrString(http->hostaddr, temp, sizeof(temp)),
 		_httpAddrPort(http->hostaddr)));
 
