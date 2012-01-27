@@ -886,7 +886,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       else if (!_cups_strncasecmp(choice->choice, "Multipurpose", 12) ||
                !_cups_strcasecmp(choice->choice, "MP") ||
                !_cups_strcasecmp(choice->choice, "MPTray"))
-        pwg_name = "alternate";
+        pwg_name = "by-pass-tray";
       else if (!_cups_strcasecmp(choice->choice, "LargeCapacity"))
         pwg_name = "large-capacity";
       else if (!_cups_strncasecmp(choice->choice, "Lower", 5))
@@ -2008,7 +2008,7 @@ _ppdCacheGetSize(
     const char   *page_size)		/* I - PPD PageSize */
 {
   int		i;			/* Looping var */
-  _pwg_media_t	*media;			/* Media */  
+  _pwg_media_t	*media;			/* Media */
   _pwg_size_t	*size;			/* Current size */
 
 
