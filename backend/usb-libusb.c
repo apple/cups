@@ -3,7 +3,7 @@
  *
  *   Libusb interface code for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -423,21 +423,33 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * bytes.  The 1284 spec says the length is stored MSB first...
   */
 
-  length = (((unsigned)buffer[0] & 255) << 8) +
+  length = (((unsigned)buffer[0] & 255) << 8) |
 	   ((unsigned)buffer[1] & 255);
 
  /*
-  * Check to see if the length is larger than our buffer; first
-  * assume that the vendor incorrectly implemented the 1284 spec,
-  * and then limit the length to the size of our buffer...
+  * Check to see if the length is larger than our buffer or less than 14 bytes
+  * (the minimum valid device ID is "MFG:x;MDL:y;" with 2 bytes for the length).
+  *
+  * If the length is out-of-range, assume that the vendor incorrectly
+  * implemented the 1284 spec and re-read the length as LSB first,..
   */
 
-  if (length > bufsize)
-    length = (((unsigned)buffer[1] & 255) << 8) +
+  if (length > bufsize || length < 14)
+    length = (((unsigned)buffer[1] & 255) << 8) |
 	     ((unsigned)buffer[0] & 255);
 
   if (length > bufsize)
     length = bufsize;
+
+  if (length < 14)
+  {
+   /*
+    * Invalid device ID, clear it!
+    */
+
+    *buffer = '\0';
+    return (-1);
+  }
 
   length -= 2;
 
@@ -631,6 +643,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
             int           verbose)	/* I - Update connecting-to-device state? */
 {
   int	number;				/* Configuration/interface/altset numbers */
+  char	current;			/* Current configuration */
 
 
  /*
@@ -647,27 +660,37 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   if ((printer->handle = usb_open(printer->device)) == NULL)
     return (-1);
 
- /*
-  * Then set the desired configuration...
-  */
-
   if (verbose)
     fputs("STATE: +connecting-to-device\n", stderr);
 
+ /*
+  * Set the desired configuration, but only if it needs changing. Some
+  * printers (e.g., Samsung) don't like usb_set_configuration. It will succeed,
+  * but the following print job is sometimes silently lost by the printer.
+  */
+
+  if (usb_control_msg(printer->handle,
+                      USB_TYPE_STANDARD | USB_ENDPOINT_IN | USB_RECIP_DEVICE,
+                      8, /* GET_CONFIGURATION */
+                      0, 0, &current, 1, 5000) != 1)
+    current = 0;			/* Assume not configured */
+
   number = printer->device->config[printer->conf].bConfigurationValue;
-
-  if (usb_set_configuration(printer->handle, number) < 0)
+  if (number != current)
   {
-   /*
-    * If the set fails, chances are that the printer only supports a
-    * single configuration.  Technically these printers don't conform to
-    * the USB printer specification, but otherwise they'll work...
-    */
+    if (usb_set_configuration(printer->handle, number) < 0)
+    {
+     /*
+      * If the set fails, chances are that the printer only supports a
+      * single configuration.  Technically these printers don't conform to
+      * the USB printer specification, but otherwise they'll work...
+      */
 
-    if (errno != EBUSY)
-      fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
-              number, printer->device->descriptor.idVendor,
-	      printer->device->descriptor.idProduct);
+      if (errno != EBUSY)
+        fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
+                number, printer->device->descriptor.idVendor,
+	        printer->device->descriptor.idProduct);
+    }
   }
 
  /*
@@ -679,41 +702,35 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   while (usb_claim_interface(printer->handle, number) < 0)
   {
     if (errno != EBUSY)
-      fprintf(stderr, "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
+      fprintf(stderr,
+              "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
               number, printer->device->descriptor.idVendor,
 	      printer->device->descriptor.idProduct, strerror(errno));
 
     goto error;
   }
 
-#if 0 /* STR #3801: Claiming interface 0 causes problems with some printers */
-  if (number != 0)
-    while (usb_claim_interface(printer->handle, 0) < 0)
+ /*
+  * Set alternate setting, but only if there is more than one option.  Some
+  * printers (e.g., Samsung) don't like usb_set_altinterface.
+  */
+
+  if (printer->device->config[printer->conf].interface[printer->iface].
+          num_altsetting > 1)
+  {
+    number = printer->device->config[printer->conf].interface[printer->iface].
+                 altsetting[printer->altset].bAlternateSetting;
+
+    while (usb_set_altinterface(printer->handle, number) < 0)
     {
       if (errno != EBUSY)
-	fprintf(stderr, "DEBUG: Failed to claim interface 0 for %04x:%04x: %s\n",
-		printer->device->descriptor.idVendor,
-		printer->device->descriptor.idProduct, strerror(errno));
+        fprintf(stderr,
+                "DEBUG: Failed to set alternate interface %d for %04x:%04x: "
+                "%s\n", number, printer->device->descriptor.idVendor,
+	        printer->device->descriptor.idProduct, strerror(errno));
 
       goto error;
     }
-#endif /* 0 */
-
- /*
-  * Set alternate setting...
-  */
-
-  number = printer->device->config[printer->conf].interface[printer->iface].
-               altsetting[printer->altset].bAlternateSetting;
-  while (usb_set_altinterface(printer->handle, number) < 0)
-  {
-    if (errno != EBUSY)
-      fprintf(stderr,
-              "DEBUG: Failed to set alternate interface %d for %04x:%04x: %s\n",
-              number, printer->device->descriptor.idVendor,
-	      printer->device->descriptor.idProduct, strerror(errno));
-
-    goto error;
   }
 
   if (verbose)
