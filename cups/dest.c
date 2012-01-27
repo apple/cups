@@ -570,7 +570,7 @@ cupsConnectDest(
 		tempresource[1024];	/* Temporary resource buffer */
   int		port;			/* Port number */
   char		portstr[16];		/* Port number string */
-  http_encryption_t encrypt;		/* Encryption to use */
+  http_encryption_t encryption;		/* Encryption to use */
   http_addrlist_t *addrlist;		/* Address list for server */
   http_t	*http;			/* Connection to server */
 
@@ -667,11 +667,11 @@ cupsConnectDest(
   */
 
   if (!strcmp(scheme, "ipps") || port == 443)
-    encrypt = HTTP_ENCRYPT_ALWAYS;
+    encryption = HTTP_ENCRYPT_ALWAYS;
   else
-    encrypt = HTTP_ENCRYPT_IF_REQUESTED;
+    encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-  http = _httpCreate(hostname, port, addrlist, encrypt, AF_UNSPEC);
+  http = _httpCreate(hostname, port, addrlist, encryption, AF_UNSPEC);
 
  /*
   * Connect if requested...
