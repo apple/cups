@@ -32,7 +32,6 @@
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
-#include <sys/fcntl.h>
 
 
 /*
@@ -71,15 +70,15 @@ httpAddrConnect2(
   socklen_t		len;		/* Length of value */
   int			flags,		/* Socket flags */
 			remaining;	/* Remaining timeout */
-#endif /* O_NONBLOCK */
-#ifdef HAVE_POLL
+#  ifdef HAVE_POLL
   struct pollfd		pfd;		/* Polled file descriptor */
-#else
+#  else
   fd_set		input_set,	/* select() input set */
 			output_set;	/* select() output set */
   struct timeval	timeout;	/* Timeout */
-#endif /* HAVE_POLL */
+#  endif /* HAVE_POLL */
   int			nfds;		/* Result from select()/poll() */
+#endif /* O_NONBLOCK */
 #ifdef DEBUG
   char			temp[256];	/* Temporary address string */
 #endif /* DEBUG */

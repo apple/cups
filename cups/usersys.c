@@ -502,7 +502,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   char			passch,		/* Current key press */
 			*passptr,	/* Pointer into password string */
 			*passend;	/* End of password string */
-  ssize_t		passbytes;	/* Bytes read */
+  DWORD			passbytes;	/* Bytes read */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Thread globals */
 
@@ -535,7 +535,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   passptr = cg->password;
   passend = cg->password + sizeof(cg->password) - 1;
 
-  while ((passbytes = read(tty, &passch, 1)) == 1)
+  while (ReadFile(tty, &passch, 1, &passbytes, NULL))
   {
     if (passch == 0x0A || passch == 0x0D)
     {

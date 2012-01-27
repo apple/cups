@@ -905,22 +905,26 @@ cupsEnumDests(
 
   ipp_ref = data.main_ref;
   DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipp._tcp,_cups", NULL, cups_dnssd_browse_cb, &data);
+                   "_ipp._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipp_ref = data.main_ref;
   DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipp._tcp,_cups", NULL, cups_dnssd_local_cb, &data);
+                   "_ipp._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 
 #  ifdef HAVE_SSL
   ipps_ref = data.main_ref;
   DNSServiceBrowse(&ipps_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipps._tcp,_cups", NULL, cups_dnssd_browse_cb, &data);
+                   "_ipps._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipps_ref = data.main_ref;
   DNSServiceBrowse(&local_ipps_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipps._tcp,_cups", NULL, cups_dnssd_local_cb, &data);
+                   "_ipps._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 #  endif /* HAVE_SSL */
 
   if (msec < 0)
@@ -973,7 +977,8 @@ cupsEnumDests(
 				  kDNSServiceFlagsShareConnection,
 				  0, device->fullName,
 				  kDNSServiceType_TXT,
-				  kDNSServiceClass_IN, cups_dnssd_query_cb,
+				  kDNSServiceClass_IN,
+				  (DNSServiceQueryRecordReply)cups_dnssd_query_cb,
 				  &data) == kDNSServiceErr_NoError)
 	{
 	  count ++;

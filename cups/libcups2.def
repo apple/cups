@@ -17,6 +17,8 @@ _cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
+_cupsMutexLock
+_cupsMutexUnlock
 _cupsNextDelay
 _cupsSetError
 _cupsSetLocale
