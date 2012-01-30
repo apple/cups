@@ -3,7 +3,7 @@
  *
  *   SNMP discovery backend for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1112,11 +1112,17 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
     case DEVICE_URI :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
-	    !device->uri && packet.object_value.string.num_bytes > 0)
+	    !device->uri && packet.object_value.string.num_bytes > 3)
 	{
 	 /*
 	  * Update an existing cache entry...
 	  */
+
+          char	scheme[32],		/* URI scheme */
+		userpass[256],		/* Username:password in URI */
+		hostname[256],		/* Hostname in URI */
+		resource[1024];		/* Resource path in URI */
+	  int	port;			/* Port number in URI */
 
 	  if (!strncmp((char *)packet.object_value.string.bytes, "lpr:", 4))
 	  {
@@ -1127,7 +1133,13 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	    packet.object_value.string.bytes[2] = 'd';
 	  }
 
-	  device->uri = strdup((char *)packet.object_value.string.bytes);
+          if (httpSeparateURI(HTTP_URI_CODING_ALL,
+                              (char *)packet.object_value.string.bytes,
+                              scheme, sizeof(scheme),
+                              userpass, sizeof(userpass),
+                              hostname, sizeof(hostname), &port,
+                              resource, sizeof(resource)) >= HTTP_URI_OK)
+	    device->uri = strdup((char *)packet.object_value.string.bytes);
 	}
 	break;
   }
