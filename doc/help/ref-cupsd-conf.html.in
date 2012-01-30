@@ -441,9 +441,13 @@ ConfigFilePerm 0640
 
 <H3>Description</H3>
 
-<P>The <CODE>ConfigFilePerm</CODE> directive specifies the
-permissions to use when writing configuration files. The default
-is @CUPS_CONFIG_FILE_PERM@.</P>
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions to use when the scheduler writes configuration and cache files, typically in response to IPP or HTTP requests. The default is @CUPS_CONFIG_FILE_PERM@.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The permissions for the <VAR>printers.conf</VAR> file are always masked to only allow access from the scheduler user (typically root). This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system. There is no way to disable this security feature.</P>
+
+</BLOCKQUOTE>
 
 
 <H2 CLASS="title"><A NAME="DataDir">DataDir</A></H2>
