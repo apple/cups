@@ -4,7 +4,7 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3886, STR #3946, STR #3969)
-	- Localization updates (STR #3840, STR #3997)
+	- Localization updates (STR #3840, STR #3989, STR #3997)
 	- Build fixes (STR #3956)
 	- The SNMP backend did not validate the device URIs reported by printers
 	  (STR #4004)
