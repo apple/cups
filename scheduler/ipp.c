@@ -5586,10 +5586,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 
   if (!cupsArrayFind(exclude, "all"))
   {
-    if ((!exclude || !cupsArrayFind(exclude, "document-count")) &&
-        (!ra || cupsArrayFind(ra, "document-count")))
+    if ((!exclude || !cupsArrayFind(exclude, "number-of-documents")) &&
+        (!ra || cupsArrayFind(ra, "number-of-documents")))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-		    "document-count", job->num_files);
+		    "number-of-documents", job->num_files);
 
     if ((!exclude || !cupsArrayFind(exclude, "job-media-progress")) &&
         (!ra || cupsArrayFind(ra, "job-media-progress")))

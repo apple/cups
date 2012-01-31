@@ -3,7 +3,7 @@
  *
  *   PostScript filter for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -126,11 +126,9 @@ typedef struct				/**** Document information ****/
 		*ap_media_type,		/* AP_FIRSTPAGE_MediaType value */
 		*ap_page_region,	/* AP_FIRSTPAGE_PageRegion value */
 		*ap_page_size;		/* AP_FIRSTPAGE_PageSize value */
-  float		brightness;		/* brightness value */
   int		collate,		/* Collate copies? */
 		emit_jcl,		/* Emit JCL commands? */
 		fitplot;		/* Fit pages to media */
-  float		gamma;			/* gamma value */
   const char	*input_slot,		/* InputSlot value */
 		*manual_feed,		/* ManualFeed value */
 		*media_color,		/* MediaColor value */
@@ -1988,16 +1986,6 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   }
 
  /*
-  * Changes to the transfer function must be made AFTER any
-  * setpagedevice code...
-  */
-
-  if (doc->gamma != 1.0f || doc->brightness != 1.0f)
-    doc_printf(doc, "{ neg 1 add dup 0 lt { pop 1 } { %.3f exp neg 1 add } "
-	            "ifelse %.3f mul } bind settransfer\n",
-	       doc->gamma, doc->brightness);
-
- /*
   * Make sure we have rectclip and rectstroke procedures of some sort...
   */
 
@@ -2399,31 +2387,6 @@ set_pstops_options(
     doc->page_size = choice->choice;
 
  /*
-  * brightness
-  */
-
-  if ((val = cupsGetOption("brightness", num_options, options)) != NULL)
-  {
-   /*
-    * Get brightness value from 10 to 1000.
-    */
-
-    intval = atoi(val);
-
-    if (intval < 10 || intval > 1000)
-    {
-      _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Unsupported brightness value %s, using "
-			     "brightness=100."), val);
-      doc->brightness = 1.0f;
-    }
-    else
-      doc->brightness = intval * 0.01f;
-  }
-  else
-    doc->brightness = 1.0f;
-
- /*
   * collate, multiple-document-handling
   */
 
@@ -2479,31 +2442,6 @@ set_pstops_options(
 	     !_cups_strcasecmp(val, "true"))
       doc->fitplot = 1;
   }
-
- /*
-  * gamma
-  */
-
-  if ((val = cupsGetOption("gamma", num_options, options)) != NULL)
-  {
-   /*
-    * Get gamma value from 1 to 10000...
-    */
-
-    intval = atoi(val);
-
-    if (intval < 1 || intval > 10000)
-    {
-      _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Unsupported gamma value %s, using gamma=1000."),
-			   val);
-      doc->gamma = 1.0f;
-    }
-    else
-      doc->gamma = intval * 0.001f;
-  }
-  else
-    doc->gamma = 1.0f;
 
  /*
   * mirror/MirrorPrint

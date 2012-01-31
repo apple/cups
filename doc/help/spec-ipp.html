@@ -12,7 +12,7 @@
 
   CUPS IPP specification for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
+  Copyright 2007-2012 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -2152,84 +2152,17 @@ of the device-class attribute:
 
 <p>The auth-info attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
 
-<h4><a name="blackplot">blackplot (boolean)</a></h4>
-
-<p>The blackplot attribute specifies whether HP-GL/2 plot files should be
-rendered entirely in black ink (blackplot=true) or using the colors and shades
-specified in the file (blackplot=false). The default value is false.
-
-<h4><a name="brightness">brightness (integer(0:200))</a><span class="info">Deprecated</span></h4>
-
-<p>The brightness attribute specifies the overall brightness of the printed
-output in percent. A brightness of 100 is normal, while 200 is twice as
-bright and 50 is half as bright. The default value is 100.
-
-<p>Brightness is applied to the Cyan, Magenta, Yellow, and Black values using
-the function "f(x) = brightness / 100 * x".
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is deprecated and will be removed from a future CUPS
-release.</p>
-
-</blockquote>
-
-<h4><a name="columns">columns (integer(1:4))</a> <span class='info'>Deprecated</span></h4>
-
-<p>The columns attribute specifies the number of columns to generate when
-printing text files. The default value is 1.
-
 <h4><a name="cpi">cpi (type2 enum)</a></h4>
 
 <p>The cpi attribute specifies the number of characters per inch when
 printing text files. Only the values 10, 12, and 17 are currently
 supported. The default value is 10.
 
-<h4><a name="document-count">document-count (integer(1:MAX))</a></h4>
-
-<p>The document-count attribute specifies the number of documents that
-are present in the job.
-
 <h4><a name="fit-to-page">fit-to-page (boolean)</a><span class="info">CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The fit-to-page attribute specifies whether to scale documents to fit on the
 selected media (fit-to-page=true) or use the physical size specified in the
 document (fit-to-page=false). The default value is false.
-
-<h4><a name="fitplot">fitplot (boolean)</a><span class="info">Deprecated</span></h4>
-
-<p>The fitplot attribute specifies whether to scale HP-GL/2 plot files to
-fit on the selected media (fitplot=true) or use the physical scale specified
-in the plot file (fitplot=false). The default value is false.
-
-<h4><a name="gamma">gamma (integer(1:10000))</a><span class="info">Deprecated</span></h4>
-
-<p>The gamma attribute specifies the luminance correction for the output.
-A value of 1000 specifies no correction, while values of 2000 and 500 will
-generate lighter and darker output, respectively. The default value is
-1000.
-
-<p>Gamma is applied to the Red, Green, and Blue values (or luminance for
-grayscale output) using the function "f(x) = x<sup>(1000/gamma)</sup>".
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is deprecated and will be removed from a future CUPS
-release.</p>
-
-</blockquote>
-
-<h4><a name="hue">hue (integer(-180:180))</a><span class="info">Deprecated</span></h4>
-
-<p>The hue attribute specifies a color hue rotation when printing image
-files. The default value is 0.
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is deprecated and will be removed from a future CUPS
-release.</p>
-
-</blockquote>
 
 <h4><a name="job-billing">job-billing (text(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
@@ -2293,16 +2226,8 @@ The default value is 6.
 their X axis, which is useful for printing transfer images on
 special media. The default value is false.
 
-<h4><a name="natural-scaling">natural-scaling (integer(1:1000))</a><span class='info'>CUPS 1.1.9</span></h4>
-<p>The natural-scaling attribute specifies the scaling of image files with
-respect to the natural image size. A value of 100 specifies that the image
-file should exactly the natural size, while 50 is half the natural size
-and 200 is twice the natural size. The default value is 100.
+<h4><a name="number-up-layout">number-up-layout (type2 keyword)</a><span class='info'>Deprecated/Introduced in CUPS 1.1.15</span></h4>
 
-<p>The ppi option can be used to override the natural resolution of the
-image, which controls the natural size.
-
-<h4><a name="number-up-layout">number-up-layout (type2 keyword)</a><span class='info'>CUPS 1.1.15</span></h4>
 <p>The number-up-layout attribute specifies the order each input
 page is placed on each output page. The following keywords are
 presently defined:
@@ -2326,6 +2251,12 @@ presently defined:
 	<li><CODE>tbrl</CODE> - Top to bottom, right to left</li>
 
 </ul>
+
+<blockquote><b>Note:</b>
+
+<p>This attribute is deprecated in favor of the PWG presentation-direction-number-up attribute and will be removed in a future release.</p>
+
+</blockquote>
 
 <h4><a name="page-border">page-border (type2 keyword)</a><span class='info'>CUPS 1.1.15</span></h4>
 <p>The page-border attribute specifies whether a border is
@@ -2378,77 +2309,11 @@ supported keywords are "all", "even", and "odd". The default value is
 <p>The page-top attribute specifies the top margin in points (72 points
 equals 1 inch). The default value is the device physical margin.
 
-<h4><a name="penwidth">penwidth (integer(0:MAX))</a></h4>
-
-<p>The penwidth attribute specifies the default pen width in micrometers
-when printing HP-GL/2 plot files. The default value is 1000 (1 millimeter).
-
-<h4><a name="position">position (type2 keyword)</a></h4>
-
-<p>The position attribute specifies the location of image files on the
-media. The following keyword values are recognized:
-
-<ul>
-
-	<li><CODE>center</CODE> - Center the image on the page (default)
-
-	<li><CODE>top</CODE> - Print the image centered at the top of the page
-
-	<li><CODE>left</CODE> - Print the image centered on the left of page
-
-	<li><CODE>right</CODE> - Print the image centered on the right of the page
-
-	<li><CODE>top-left</CODE> - Print the image at the top left corner of
-	the page
-
-	<li><CODE>top-right</CODE> - Print the image at the top right corner of
-	the page
-
-	<li><CODE>bottom</CODE> - Print the image centered at the bottom of
-	the page
-
-	<li><CODE>bottom-left</CODE> - Print the image at the bottom left
-	corner of the page
-
-	<li><CODE>bottom-right</CODE> - Print the image at the bottom right
-	corner of the page
-
-</ul>
-
-<h4><a name="ppi">ppi (integer(1:MAX))</a></h4>
-
-<p>The ppi attribute specifies the resolution of an image file in pixels
-per inch. The default value is the resolution included with the file or
-128 if no resolution information is available.
-
 <h4><a name="prettyprint">prettyprint (boolean)</a></h4>
 
 <p>The prettyprint attribute specifies whether text files should be printed
 with a shaded header and keyword highlighting (prettyprint=true) or without
 additional formatting (prettyprint=false). The default value is false.
-
-<h4><a name="saturation">saturation (integer(0:200))</a><span class="info">Deprecated</span></h4>
-
-<p>The saturation attribute specifies the color saturation when
-printing image files. A saturation of 100 is normal, while values of 50
-and 200 will be half and twice as colorful, respectively. The default
-value is 100.
-
-<blockquote><b>Note:</b>
-
-<p>This attribute is deprecated and will be removed from a future CUPS
-release.</p>
-
-</blockquote>
-
-<h4><a name="scaling">scaling (integer(1:1000))</a></h4>
-
-<p>The scaling attribute specifies the scaling of image files with
-respect to the selected media. A value of 100 specifies that the image
-file should fit 100% of the page, or as much as possible given the
-image dimensions. The default value is unspecified.
-
-<p>The scaling attribute overrides the ppi attribute if specified.
 
 <h4><a name="wrap">wrap (boolean)</a></h4>
 
