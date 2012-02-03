@@ -2834,7 +2834,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
     }
 
-    if (num_displayed > 0 && !Verbosity &&
+    if (num_displayed > 0 && !Verbosity && response &&
         (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
     {
       for (attrptr = response->attrs;

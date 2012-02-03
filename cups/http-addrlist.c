@@ -98,7 +98,7 @@ httpAddrConnect2(
   if (cancel && *cancel)
     return (NULL);
 
-  if (msec <= 0)
+  if (msec <= 0 || getenv("CUPS_DISABLE_ASYNC_CONNECT"))
     msec = INT_MAX;
 
  /*
