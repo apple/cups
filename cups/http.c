@@ -2271,11 +2271,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 {
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
-#if 0 /* Change to 1 to disable async connect by default */
-  return (httpReconnect2(http, -1, NULL));
-#else
   return (httpReconnect2(http, 30000, NULL));
-#endif /* 0 */
 }
 
 
