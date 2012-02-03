@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\vcnet,.."
+				AdditionalIncludeDirectories="..\vcnet;..;..\vcnet\regex"
 				PreprocessorDefinitions="WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,6 +66,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:libcmt"
 				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="2"
@@ -207,7 +208,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="1"
-				AdditionalIncludeDirectories="..\vcnet,.."
+				AdditionalIncludeDirectories="..\vcnet;..;..\vcnet\regex"
 				PreprocessorDefinitions="WIN32;DEBUG;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -226,6 +227,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:libcmt"
 				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="1"

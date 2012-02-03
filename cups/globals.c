@@ -3,7 +3,7 @@
  *
  *   Global variable access routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -20,6 +20,7 @@
  *   _cupsGlobals()       - Return a pointer to thread local storage
  *   _cupsGlobalUnlock()  - Unlock the global mutex.
  *   DllMain()            - Main entry for library.
+ *   cups_fix_path()      - Fix a file path to use forward slashes consistently.
  *   cups_globals_alloc() - Allocate and initialize global data.
  *   cups_globals_free()  - Free global data.
  *   cups_globals_init()  - Initialize environment variables.
@@ -51,6 +52,9 @@ static _cups_mutex_t	cups_global_mutex = _CUPS_MUTEX_INITIALIZER;
  * Local functions...
  */
 
+#ifdef WIN32
+static void		cups_fix_path(char *path);
+#endif /* WIN32 */
 static _cups_globals_t	*cups_globals_alloc(void);
 static void		cups_globals_free(_cups_globals_t *g);
 #ifdef HAVE_PTHREAD_H
@@ -187,9 +191,9 @@ cups_globals_alloc(void)
 #ifdef WIN32
   HKEY		key;			/* Registry key */
   DWORD		size;			/* Size of string */
-  static char	installdir[1024],	/* Install directory */
-		confdir[1024],		/* Server root directory */
-		localedir[1024];	/* Locale directory */
+  static char	installdir[1024] = "",	/* Install directory */
+		confdir[1024] = "",	/* Server root directory */
+		localedir[1024] = "";	/* Locale directory */
 #endif /* WIN32 */
 
 
@@ -213,26 +217,46 @@ cups_globals_alloc(void)
   */
 
 #ifdef WIN32
- /*
-  * Open the registry...
-  */
-
-  strcpy(installdir, "C:/Program Files/cups.org");
-
-  if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ,
-                    &key))
+  if (!installdir[0])
   {
    /*
-    * Grab the installation directory...
+    * Open the registry...
     */
 
-    size = sizeof(installdir);
-    RegQueryValueEx(key, "installdir", NULL, NULL, installdir, &size);
-    RegCloseKey(key);
-  }
+    strcpy(installdir, "C:/Program Files/cups.org");
 
-  snprintf(confdir, sizeof(confdir), "%s/conf", installdir);
-  snprintf(localedir, sizeof(localedir), "%s/locale", installdir);
+    if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ,
+                      &key))
+    {
+     /*
+      * Grab the installation directory...
+      */
+
+      char  *ptr;			/* Pointer into installdir */
+
+      size = sizeof(installdir);
+      RegQueryValueEx(key, "installdir", NULL, NULL, installdir, &size);
+      RegCloseKey(key);
+
+      for (ptr = installdir; *ptr;)
+      {
+        if (*ptr == '\\')
+        {
+          if (ptr[1])
+            *ptr++ = '/';
+          else
+            *ptr = '\0';		/* Strip trailing \ */
+        }
+        else if (*ptr == '/' && !ptr[1])
+          *ptr = '\0';			/* Strip trailing / */
+        else
+          ptr ++;
+      }
+    }
+
+    snprintf(confdir, sizeof(confdir), "%s/conf", installdir);
+    snprintf(localedir, sizeof(localedir), "%s/locale", installdir);
+  }
 
   if ((cg->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
     cg->cups_datadir = installdir;
