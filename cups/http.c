@@ -2271,7 +2271,11 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 {
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
+#if 0 /* Change to 1 to disable async connect by default */
+  return (httpReconnect2(http, -1, NULL));
+#else
   return (httpReconnect2(http, 30000, NULL));
+#endif /* 0 */
 }
 
 
@@ -4480,6 +4484,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 
   while (length > 0)
   {
+    DEBUG_printf(("3http_write: About to write %d bytes.", (int)length));
+
     if (http->timeout_cb)
     {
 #ifdef HAVE_POLL
@@ -4542,6 +4548,9 @@ http_write(http_t     *http,		/* I - Connection to server */
     else
 #endif /* HAVE_SSL */
     bytes = send(http->fd, buffer, length, 0);
+
+    DEBUG_printf(("3http_write: Write of %d bytes returned %d.", (int)length,
+                  (int)bytes));
 
     if (bytes < 0)
     {

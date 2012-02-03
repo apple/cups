@@ -4282,7 +4282,7 @@ usage(void)
                           "content-length."));
   _cupsLangPuts(stderr, _("  -S                      Test with SSL "
 			  "encryption."));
-  _cupsLangPuts(stderr, _("  -T                      Set the receive/send "
+  _cupsLangPuts(stderr, _("  -T seconds              Set the receive/send "
                           "timeout in seconds."));
   _cupsLangPuts(stderr, _("  -V version              Set default IPP "
                           "version."));

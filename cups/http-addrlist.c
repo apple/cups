@@ -68,6 +68,7 @@ httpAddrConnect2(
   int			val;		/* Socket option value */
 #ifdef O_NONBLOCK
   socklen_t		len;		/* Length of value */
+  http_addr_t		peer;		/* Peer address */
   int			flags,		/* Socket flags */
 			remaining;	/* Remaining timeout */
 #  ifdef HAVE_POLL
@@ -106,6 +107,9 @@ httpAddrConnect2(
 
   while (addrlist)
   {
+    if (cancel && *cancel)
+      return (NULL);
+
    /*
     * Create the socket...
     */
@@ -174,11 +178,13 @@ httpAddrConnect2(
     * Do an asynchronous connect by setting the socket non-blocking...
     */
 
-    DEBUG_printf(("httpAddrConnect2: Setting non-blocking connect()"));
-
     flags = fcntl(*sock, F_GETFL, 0);
-    if (msec > 0)
+    if (msec != INT_MAX)
+    {
+      DEBUG_puts("httpAddrConnect2: Setting non-blocking connect()");
+
       fcntl(*sock, F_SETFL, flags | O_NONBLOCK);
+    }
 #endif /* O_NONBLOCK */
 
    /*
@@ -201,12 +207,15 @@ httpAddrConnect2(
 
 #ifdef O_NONBLOCK
 #  ifdef WIN32
-    if (errno == WSAEINPROGRESS)
+    if (WSAGetLastError() == WSAEINPROGRESS ||
+        WSAGetLastError() == WSAEWOULDBLOCK)
 #  else
-    if (errno == EINPROGRESS)
+    if (errno == EINPROGRESS || errno == EWOULDBLOCK)
 #  endif /* WIN32 */
     {
       DEBUG_puts("1httpAddrConnect2: Finishing async connect()");
+
+      fcntl(*sock, F_SETFL, flags);
 
       for (remaining = msec; remaining > 0; remaining -= 250)
       {
@@ -263,14 +272,13 @@ httpAddrConnect2(
 
         if (nfds > 0)
         {
-          len = sizeof(val);
-          if (getsockopt(*sock, SOL_SOCKET, SO_ERROR, &val, &len) >= 0)
+          len = sizeof(peer);
+          if (!getpeername(*sock, (struct sockaddr *)&peer, &len))
           {
 	    DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...",
-			  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-			  _httpAddrPort(&(addrlist->addr))));
+			  httpAddrString(&peer, temp, sizeof(temp)),
+			  _httpAddrPort(&peer)));
 
-	    fcntl(*sock, F_SETFL, flags);
 	    return (addrlist);
 	  }
 
