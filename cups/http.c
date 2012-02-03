@@ -1183,6 +1183,20 @@ httpGets(char   *line,			/* I - Line to read into */
 
       DEBUG_printf(("4httpGets: read %d bytes...", bytes));
 
+      if (bytes == 0)
+      {
+#ifdef HAVE_SSL
+        if (http->tls)
+	  bytes = http_read_ssl(http, http->buffer + http->used,
+	                        HTTP_MAX_BUFFER - http->used);
+        else
+#endif /* HAVE_SSL */
+          bytes = recv(http->fd, http->buffer + http->used,
+	               HTTP_MAX_BUFFER - http->used, 0);
+
+        DEBUG_printf(("4httpGets: re-read %d bytes...", bytes));
+      }
+
       if (bytes < 0)
       {
        /*

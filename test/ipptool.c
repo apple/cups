@@ -410,7 +410,11 @@ main(int  argc,				/* I - Number of command-line args */
                 */
 
 		snprintf(filename, sizeof(filename), "%s.gz", argv[i]);
-                if (access(filename, 0) && filename[0] != '/')
+                if (access(filename, 0) && filename[0] != '/'
+#ifdef WIN32
+                    && (!isalpha(filename[0] & 255) || filename[1] != ':')
+#endif /* WIN32 */
+                    )
 		{
 		  snprintf(filename, sizeof(filename), "%s/ipptool/%s",
 			   cg->cups_datadir, argv[i]);
@@ -609,7 +613,11 @@ main(int  argc,				/* I - Number of command-line args */
 	usage();
       }
 
-      if (access(argv[i], 0) && argv[i][0] != '/')
+      if (access(argv[i], 0) && argv[i][0] != '/'
+#ifdef WIN32
+          && (!isalpha(argv[i][0] & 255) || argv[i][1] != ':')
+#endif /* WIN32 */
+          )
       {
         snprintf(testname, sizeof(testname), "%s/ipptool/%s", cg->cups_datadir,
                  argv[i]);
@@ -3377,7 +3385,11 @@ get_filename(const char *testfile,	/* I - Current test file */
     if (*dstptr == '>')
       *dstptr = '\0';
   }
-  else if (*src == '/' || !strchr(testfile, '/'))
+  else if (*src == '/' || !strchr(testfile, '/')
+#ifdef WIN32
+           || (isalpha(*src & 255) && src[1] == ':')
+#endif /* WIN32 */
+           )
   {
    /*
     * Use the path as-is...

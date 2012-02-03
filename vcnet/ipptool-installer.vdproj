@@ -69,24 +69,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_74B742B520B14F79A27E79D5C03BF28A"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_74B742B520B14F79A27E79D5C03BF28A"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_74B742B520B14F79A27E79D5C03BF28A"
-        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_80DBA85C961E447CB92C95CE1F38C56B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -129,12 +111,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B4693CF77F174B50B7F709D52ADCE9F9"
-        "OwnerKey" = "8:_74B742B520B14F79A27E79D5C03BF28A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B9E79062FEF64745915546DDD5BF8D85"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -167,6 +143,12 @@
         {
         "MsmKey" = "8:_D5CD9D9AB1644688A1D54B1589BDF724"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E08A758E322B4E2CB42F938DACAF170E"
+        "OwnerKey" = "8:_FDF98621A4634DEF906A0D861910A8A3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -239,6 +221,24 @@
         {
         "MsmKey" = "8:_F22F5380A6E14A43A15A452C7C6F6C07"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FDF98621A4634DEF906A0D861910A8A3"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FDF98621A4634DEF906A0D861910A8A3"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FDF98621A4634DEF906A0D861910A8A3"
+        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -1025,14 +1025,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ipptool for Windows"
-        "ProductCode" = "8:{871F33BB-DD57-4DC5-8E26-F49DC2CE15B2}"
-        "PackageCode" = "8:{589120C7-2BEF-4B51-BFDE-9B6CD962B6C4}"
+        "ProductCode" = "8:{1DE94A15-34BC-4176-BFD6-C048A63D98C1}"
+        "PackageCode" = "8:{B597F9BF-D902-4EEC-B466-A3E8320B1CF9}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:12.02.0302"
+        "ProductVersion" = "8:12.02.0304"
         "Manufacturer" = "8:Apple Inc."
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.cups.org/str.php"
@@ -1549,11 +1549,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_74B742B520B14F79A27E79D5C03BF28A"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_E08A758E322B4E2CB42F938DACAF170E"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -1563,11 +1563,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B4693CF77F174B50B7F709D52ADCE9F9"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_FDF98621A4634DEF906A0D861910A8A3"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1582,7 +1582,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Debug\\regex.dll"
+            "SourcePath" = "8:Win32\\Debug\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
