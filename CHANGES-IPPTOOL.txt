@@ -1,11 +1,11 @@
-CHANGES-IPPTOOL.txt - 2012-02-03
+CHANGES-IPPTOOL.txt - 2012-02-06
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
 
-2012-02-03
+2012-02-06
 
 	- Fixed the packaging of ipptool on Windows (removed unnecessary DLLs)
 	- Fixed an crash in ipptool when mixing DISPLAY with -I and a failed
