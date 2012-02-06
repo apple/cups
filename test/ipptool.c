@@ -2288,12 +2288,38 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  }
 	  else if (status == HTTP_ERROR)
 	  {
-	    if (!Cancel)
-	      httpReconnect(http);
-
 	    prev_pass = 0;
+	    break;
+	  }
+	  else if (status != HTTP_OK)
+	  {
+	    httpFlush(http);
+	    break;
 	  }
 	}
+      }
+
+      if (!Cancel && status == HTTP_ERROR &&
+#ifdef WIN32
+	  http->error != WSAETIMEDOUT)
+#else
+	  http->error != ETIMEDOUT)
+#endif /* WIN32 */
+      {
+	if (httpReconnect(http))
+	  prev_pass = 0;
+      }
+      else if (status == HTTP_ERROR)
+      {
+        if (!Cancel)
+          httpReconnect(http);
+
+	prev_pass = 0;
+      }
+      else if (status != HTTP_OK)
+      {
+        httpFlush(http);
+        prev_pass = 0;
       }
 
      /*

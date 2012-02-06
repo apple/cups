@@ -1183,19 +1183,9 @@ httpGets(char   *line,			/* I - Line to read into */
 
       DEBUG_printf(("4httpGets: read %d bytes...", bytes));
 
-      if (bytes == 0)
-      {
-#ifdef HAVE_SSL
-        if (http->tls)
-	  bytes = http_read_ssl(http, http->buffer + http->used,
-	                        HTTP_MAX_BUFFER - http->used);
-        else
-#endif /* HAVE_SSL */
-          bytes = recv(http->fd, http->buffer + http->used,
-	               HTTP_MAX_BUFFER - http->used, 0);
-
-        DEBUG_printf(("4httpGets: re-read %d bytes...", bytes));
-      }
+#ifdef DEBUG
+      http_debug_hex("httpGets", http->buffer + http->used, bytes);
+#endif /* DEBUG */
 
       if (bytes < 0)
       {
@@ -2012,7 +2002,11 @@ httpRead2(http_t *http,			/* I - Connection to server */
     }
     while (bytes < 0);
 
-    DEBUG_printf(("2httpRead2: Read %d bytes into buffer.", (int)bytes));
+    DEBUG_printf(("2httpRead2: Read " CUPS_LLFMT " bytes into buffer.",
+                  CUPS_LLCAST bytes));
+#ifdef DEBUG
+    http_debug_hex("httpRead2", http->buffer, (int)bytes);
+#endif /* DEBUG */
 
     http->used = bytes;
   }
@@ -2115,6 +2109,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     DEBUG_printf(("2httpRead2: read " CUPS_LLFMT " bytes from socket...",
                   CUPS_LLCAST bytes));
+#ifdef DEBUG
+    http_debug_hex("httpRead2", buffer, (int)bytes);
+#endif /* DEBUG */
   }
 
   if (bytes > 0)
@@ -2159,10 +2156,6 @@ httpRead2(http_t *http,			/* I - Connection to server */
 	http->state = HTTP_WAITING;
     }
   }
-
-#ifdef DEBUG
-  http_debug_hex("httpRead2", buffer, (int)bytes);
-#endif /* DEBUG */
 
   return (bytes);
 }
