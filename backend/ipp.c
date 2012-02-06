@@ -1683,9 +1683,6 @@ main(int  argc,				/* I - Number of command-line args */
 	    ipp_status != IPP_PRINTER_BUSY)
 	{
 	  ippDelete(response);
-
-          _cupsLangPrintFilter(stderr, "ERROR",
-			       _("Unable to get print job status."));
           ipp_status = IPP_OK;
           break;
 	}
