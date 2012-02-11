@@ -1207,8 +1207,17 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
 
-    compatsize = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
-		                backendNetworkSideCB);
+    if ((compatsize = write(fd, buffer, bytes)) < 0)
+    {
+      perror("DEBUG: Unable to write temporary file");
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    if ((bytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
+		                backendNetworkSideCB)) < 0)
+      return (CUPS_BACKEND_FAILED);
+
+    compatsize += bytes;
 
     close(fd);
 
