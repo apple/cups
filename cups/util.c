@@ -899,6 +899,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 		resource[HTTP_MAX_URI];	/* Resource name */
   int		port;			/* Port number */
   http_status_t	status;			/* HTTP status from server */
+  char		tempfile[1024] = "";	/* Temporary filename */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -1090,7 +1091,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   if (buffer[0])
     fd = open(buffer, O_CREAT | O_TRUNC | O_WRONLY, 0600);
   else
-    fd = cupsTempFd(buffer, bufsize);
+    fd = cupsTempFd(tempfile, sizeof(tempfile));
 
   if (fd < 0)
   {
@@ -1125,13 +1126,23 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   if (status == HTTP_OK)
+  {
     *modtime = httpGetDateTime(httpGetField(http2, HTTP_FIELD_DATE));
+
+    if (tempfile[0])
+      strlcpy(buffer, tempfile, bufsize);
+  }
   else if (status != HTTP_NOT_MODIFIED)
   {
     _cupsSetHTTPError(status);
 
-    unlink(cg->ppd_filename);
+    if (buffer[0])
+      unlink(buffer);
+    else if (tempfile[0])
+      unlink(tempfile);
   }
+  else if (tempfile[0])
+    unlink(tempfile);
 
   if (http2 != http)
     httpClose(http2);

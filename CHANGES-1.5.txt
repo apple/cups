@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The cupsGetPPD3() function created a temporary file when one was not
+	  needed (STR #4018)
 	- The scheduler now ensures that job notifications contain a value for
 	  the notify-printer-uri attribute (STR #4014)
 	- The lp and lpr commands did not cancel jobs queued from stdin on an
