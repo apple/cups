@@ -1,6 +1,26 @@
 CHANGES-1.5.txt
 ---------------
 
+CHANGES IN CUPS V1.5.3
+
+	- The IPP backend no longer re-queues print jobs that are too large for
+	  the printer/server (STR #3977)
+	- The RPM spec file did not work (STR #4021)
+	- Encryption did not work when the server name ended with "."
+	  (STR #4011)
+	- The multi-purpose tray is now mapped to the IPP "by-pass-tray"
+	  (STR #4009)
+	- The correct media size was not always passed to IPP printers
+	  (STR #4001)
+	- Finishing options were not passed to IPP printers (STR #3995)
+	- Fixed iCloud-based Back to My Mac printing (STR #3996)
+
+
+CHANGES IN CUPS V1.5.2
+
+	- Reposted what should have been CUPS 1.5.1.
+
+
 CHANGES IN CUPS V1.5.1
 
 	- Documentation updates (STR #3885, STR #3886, STR #3946, STR #3969)

@@ -1469,6 +1469,14 @@ main(int  argc,				/* I - Number of command-line args */
 		       "Negotiate", 9))
 	    auth_info_required = "negotiate";
 	}
+	else if (ipp_status == IPP_REQUEST_VALUE)
+	{
+	 /*
+	  * Print file is too large, abort this job...
+	  */
+
+	  goto cleanup;
+	}
 	else
 	  sleep(10);
 
@@ -1609,6 +1617,14 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
+    else if (ipp_status == IPP_REQUEST_VALUE)
+    {
+     /*
+      * Print file is too large, abort this job...
+      */
+
+      goto cleanup;
+    }
     else
       copies_remaining --;
 
@@ -1830,6 +1846,11 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_DOCUMENT_FORMAT ||
            ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
+  else if (ipp_status == IPP_REQUEST_VALUE)
+  {
+    _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    return (CUPS_BACKEND_CANCEL);
+  }
   else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
