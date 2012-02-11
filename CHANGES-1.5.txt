@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The lp and lpr commands did not cancel jobs queued from stdin on an
+	  error (STR #4015)
 	- Fixed the IPP backend's handling of HTTP/1.0 compatibility (STR #3988)
 	- The IPP backend did not always setup username/password authentication
 	  for printers (STR #3985)

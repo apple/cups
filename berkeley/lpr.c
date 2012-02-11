@@ -3,7 +3,7 @@
  *
  *   "lpr" command for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -377,7 +377,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     const char		*format;	/* Document format */
     ssize_t		bytes;		/* Bytes read */
 
-
     if (cupsGetOption("raw", num_options, options))
       format = CUPS_FORMAT_RAW;
     else if ((format = cupsGetOption("document-format", num_options,
@@ -395,11 +394,16 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       _cupsLangPrintf(stderr, _("%s: Error - unable to queue from stdin - %s."),
 		      argv[0], httpStatus(status));
+      cupsFinishDocument(CUPS_HTTP_DEFAULT, printer);
+      cupsCancelJob2(CUPS_HTTP_DEFAULT, printer, job_id, 0);
       return (1);
     }
 
     if (cupsFinishDocument(CUPS_HTTP_DEFAULT, printer) != IPP_OK)
+    {
+      cupsCancelJob2(CUPS_HTTP_DEFAULT, printer, job_id, 0);
       job_id = 0;
+    }
   }
 
   if (job_id < 1)
