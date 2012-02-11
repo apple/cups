@@ -146,7 +146,11 @@ cupsdAddEvent(
       temp->time  = time(NULL);
       temp->attrs = ippNew();
       temp->job   = job;
-      temp->dest  = dest;
+
+      if (dest)
+        temp->dest = dest;
+      else if (job)
+        temp->dest = dest = cupsdFindPrinter(job->dest);
 
      /*
       * Add common event notification attributes...
