@@ -898,9 +898,13 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
       {
-	if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		     "Negotiate", 9))
+        const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+        				/* WWW-Authenticate field value */
+
+	if (!strncmp(www_auth, "Negotiate", 9))
 	  auth_info_required = "negotiate";
+        else if (www_auth[0])
+          auth_info_required = "username,password";
 
 	fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 	return (CUPS_BACKEND_AUTH_REQUIRED);
@@ -1277,23 +1281,13 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
 	     ipp_status == IPP_AUTHENTICATION_CANCELED)
     {
-     /*
-      * Update auth-info-required as needed...
-      */
+      const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+					/* WWW-Authenticate field value */
 
-      fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
-	      httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
-
-     /*
-      * Normal authentication goes through the password callback, which sets
-      * auth_info_required to "username,password".  Kerberos goes directly
-      * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
-      * here and set auth_info_required as needed...
-      */
-
-      if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		   "Negotiate", 9))
+      if (!strncmp(www_auth, "Negotiate", 9))
 	auth_info_required = "negotiate";
+      else if (www_auth[0])
+	auth_info_required = "username,password";
 
       goto cleanup;
     }
@@ -1455,19 +1449,13 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
 	{
-	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
-		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
-
-         /*
-	  * Normal authentication goes through the password callback, which sets
-	  * auth_info_required to "username,password".  Kerberos goes directly
-	  * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
-	  * here and set auth_info_required as needed...
-	  */
-
-	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		       "Negotiate", 9))
+	  const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+					/* WWW-Authenticate field value */
+  
+	  if (!strncmp(www_auth, "Negotiate", 9))
 	    auth_info_required = "negotiate";
+	  else if (www_auth[0])
+	    auth_info_required = "username,password";
 	}
 	else if (ipp_status == IPP_REQUEST_VALUE)
 	{
