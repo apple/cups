@@ -98,6 +98,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
 {
   "copies-supported",
   "cups-version",
+  "document-format-default",
   "document-format-supported",
   "marker-colors",
   "marker-high-levels",
@@ -229,6 +230,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *job_state;		/* job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
+  ipp_attribute_t *format_dflt;		/* document-format-default */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *operations_sup;	/* operations-supported */
@@ -995,6 +997,16 @@ main(int  argc,				/* I - Number of command-line args */
 
     cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
 
+    if ((format_dflt = ippFindAttribute(supported, "document-format-default",
+					IPP_TAG_MIMETYPE)) != NULL)
+    {
+      fprintf(stderr, "DEBUG: document-format-default (%d values)\n",
+	      format_dflt->num_values);
+      for (i = 0; i < format_dflt->num_values; i ++)
+	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
+	        format_dflt->values[i].string.text);
+    }
+
     if ((format_sup = ippFindAttribute(supported, "document-format-supported",
 	                               IPP_TAG_MIMETYPE)) != NULL)
     {
@@ -1172,17 +1184,21 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type,
+                            format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
       }
 
-    if (!document_format)
+    if (!document_format &&
+        (!format_dflt ||
+         _cups_strcasecmp(format_dflt->values[0].string.text,
+                          "application/octet-stream")))
     {
       for (i = 0; i < format_sup->num_values; i ++)
 	if (!_cups_strcasecmp("application/octet-stream",
-	                format_sup->values[i].string.text))
+			      format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
 	  break;

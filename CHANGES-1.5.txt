@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The IPP backend no longer specifies the document-format for auto-
+	  detect unless required (STR #3986)
 	- Added more supported color names for SNMP supplies (STR #3981)
 	- The default InputSlot setting was never used (STR #3957)
 	- POSIX ACLs are now set properly on certificate files (STR #3970)
