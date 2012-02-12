@@ -3,7 +3,7 @@
  *
  *   Job management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -3446,9 +3446,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
       if ((ppd = _ppdCacheGetInputSlot(pc, job->attrs, NULL)) != NULL)
 	num_pwgppds = cupsAddOption(pc->source_option, ppd, num_pwgppds,
 				    &pwgppds);
-      else if (!ippFindAttribute(job->attrs, "AP_D_InputSlot", IPP_TAG_ZERO))
-	num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds,
-	                            &pwgppds);
     }
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
 	(ppd = _ppdCacheGetMediaType(pc, job->attrs, NULL)) != NULL)

@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The default InputSlot setting was never used (STR #3957)
 	- POSIX ACLs are now set properly on certificate files (STR #3970)
 	- Supplies with commas in their names were not reported correctly
 	  (STR #4020)
