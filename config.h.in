@@ -687,7 +687,7 @@
  * Do we have libusb?
  */
 
-#undef HAVE_USB_H
+#undef HAVE_LIBUSB
 
 
 /*

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Libusb interface code for CUPS.
+ *   LIBUSB interface code for CUPS.
  *
  *   Copyright 2007-2012 by Apple Inc.
  *
@@ -29,9 +29,16 @@
  * Include necessary headers...
  */
 
-#include <usb.h>
+#include <libusb.h>
 #include <poll.h>
 #include <cups/cups-private.h>
+
+
+/*
+ * Local globals...
+ */
+
+static libusb_device	**list;		/* List of connected USB devices */
 
 
 /*
@@ -40,13 +47,15 @@
 
 typedef struct usb_printer_s		/**** USB Printer Data ****/
 {
-  struct usb_device	*device;	/* Device info */
+  struct libusb_device	*device;	/* Device info */
   int			conf,		/* Configuration */
 			iface,		/* Interface */
 			altset,		/* Alternate setting */
 			write_endp,	/* Write endpoint */
-			read_endp;	/* Read endpoint */
-  struct usb_dev_handle	*handle;	/* Open handle to device */
+                        read_endp,	/* Read endpoint */
+                        usblp_attached; /* Is the "usblp" kernel module
+					   attached? */
+  struct libusb_device_handle *handle;	/* Open handle to device */
 } usb_printer_t;
 
 typedef int (*usb_cb_t)(usb_printer_t *, const char *, const char *,
@@ -99,9 +108,10 @@ print_device(const char *uri,		/* I - Device URI */
 	     char	*argv[])	/* I - Command-line arguments */
 {
   usb_printer_t	*printer;		/* Printer */
-  ssize_t	bytes,			/* Bytes read/written */
+  int	        bytes,			/* Bytes to read/write */
+		transferred,		/* Bytes read/written */
 		tbytes;			/* Total bytes written */
-  char		buffer[512];		/* Print data buffer */
+  unsigned char	buffer[512];		/* Print data buffer */
   struct sigaction action;		/* Actions for POSIX signals */
   struct pollfd	pfds[2];		/* Poll descriptors */
 
@@ -172,8 +182,8 @@ print_device(const char *uri,		/* I - Device URI */
       {
 	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
-	  if (usb_bulk_write(printer->handle, printer->write_endp, buffer,
-	                        bytes, 3600000) < 0)
+	  if (libusb_bulk_transfer(printer->handle, printer->write_endp, buffer,
+				   bytes, &transferred, 3600000) < 0)
 	  {
 	    _cupsLangPrintFilter(stderr, "ERROR",
 			         _("Unable to send data to printer."));
@@ -203,6 +213,13 @@ print_device(const char *uri,		/* I - Device URI */
 
   close_device(printer);
 
+ /*
+  * Clean up ....
+  */
+
+  libusb_free_device_list(list, 1);
+  libusb_exit(NULL);
+
   return (CUPS_BACKEND_OK);
 }
 
@@ -214,6 +231,11 @@ print_device(const char *uri,		/* I - Device URI */
 static int				/* I - 0 on success, -1 on failure */
 close_device(usb_printer_t *printer)	/* I - Printer */
 {
+  struct libusb_device_descriptor devdesc;
+                                        /* Current device descriptor */
+  struct libusb_config_descriptor *confptr;
+                                        /* Pointer to current configuration */
+
   if (printer->handle)
   {
    /*
@@ -221,19 +243,30 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     * to the device...
     */
 
-    int number = printer->device->config[printer->conf].
-                     interface[printer->iface].
-		     altsetting[printer->altset].bInterfaceNumber;
-    usb_release_interface(printer->handle, number);
-
+    libusb_get_device_descriptor (printer->device, &devdesc);
+    libusb_get_config_descriptor (printer->device, printer->conf, &confptr);
+    int number = confptr->interface[printer->iface].
+      altsetting[printer->altset].bInterfaceNumber;
+    libusb_release_interface(printer->handle, number);
     if (number != 0)
-      usb_release_interface(printer->handle, 0);
+      libusb_release_interface(printer->handle, 0);
+
+   /*
+    * Re-attach "usblp" kernel module if it was attached before using this
+    * device
+    */
+    if (printer->usblp_attached == 1)
+      if (libusb_attach_kernel_driver(printer->handle, printer->iface) < 0)
+	fprintf(stderr, "DEBUG: Failed to re-attach \"usblp\" kernel module to %04x:%04x\n",
+		devdesc.idVendor, devdesc.idProduct);
+
+    libusb_free_config_descriptor(confptr);
 
    /*
     * Close the interface and return...
     */
 
-    usb_close(printer->handle);
+    libusb_close(printer->handle);
     printer->handle = NULL;
   }
 
@@ -249,15 +282,21 @@ static usb_printer_t *			/* O - Found printer */
 find_device(usb_cb_t   cb,		/* I - Callback function */
             const void *data)		/* I - User data for callback */
 {
-  struct usb_bus	*bus;		/* Current bus */
-  struct usb_device	*device;	/* Current device */
-  struct usb_config_descriptor *confptr;/* Pointer to current configuration */
-  struct usb_interface	*ifaceptr;	/* Pointer to current interface */
-  struct usb_interface_descriptor *altptr;
+  libusb_device         **list;         /* List of connected USB devices */
+  libusb_device         *device = NULL;	/* Current device */
+  struct libusb_device_descriptor devdesc;
+                                        /* Current device descriptor */
+  struct libusb_config_descriptor *confptr = NULL;
+                                        /* Pointer to current configuration */
+  const struct libusb_interface *ifaceptr = NULL;
+                                        /* Pointer to current interface */
+  const struct libusb_interface_descriptor *altptr = NULL;
 					/* Pointer to current alternate setting */
-  struct usb_endpoint_descriptor *endpptr;
+  const struct libusb_endpoint_descriptor *endpptr = NULL;
 					/* Pointer to current endpoint */
-  int			conf,		/* Current configuration */
+  ssize_t               numdevs,        /* number of connected devices */
+                        i = 0;
+  uint8_t		conf,		/* Current configuration */
 			iface,		/* Current interface */
 			altset,		/* Current alternate setting */
 			protocol,	/* Current protocol */
@@ -274,29 +313,34 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
   * Initialize libusb...
   */
 
-  usb_init();
-  fprintf(stderr, "DEBUG: usb_find_busses=%d\n", usb_find_busses());
-  fprintf(stderr, "DEBUG: usb_find_devices=%d\n", usb_find_devices());
+  libusb_init(NULL);
+  numdevs = libusb_get_device_list(NULL, &list);
+  fprintf(stderr, "DEBUG: libusb_get_device_list=%d\n", (int)numdevs);
 
  /*
   * Then loop through the devices it found...
   */
 
-  for (bus = usb_get_busses(); bus; bus = bus->next)
-    for (device = bus->devices; device; device = device->next)
+  if (numdevs > 0)
+    for (i = 0; i < numdevs; i++)
     {
+      device = list[i];
+
      /*
       * Ignore devices with no configuration data and anything that is not
       * a printer...
       */
 
-      if (!device->config || !device->descriptor.idVendor ||
-          !device->descriptor.idProduct)
+      libusb_get_device_descriptor (device, &devdesc);
+
+      if (!devdesc.bNumConfigurations || !devdesc.idVendor ||
+          !devdesc.idProduct)
 	continue;
 
-      for (conf = 0, confptr = device->config;
-           conf < device->descriptor.bNumConfigurations;
-	   conf ++, confptr ++)
+      for (conf = 0; conf < devdesc.bNumConfigurations; conf ++)
+      {
+	if (libusb_get_config_descriptor (device, conf, &confptr) < 0)
+	  continue;
         for (iface = 0, ifaceptr = confptr->interface;
 	     iface < confptr->bNumInterfaces;
 	     iface ++, ifaceptr ++)
@@ -317,7 +361,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	    * 1284.4 (packet mode) protocol as well.
 	    */
 
-	    if (altptr->bInterfaceClass != USB_CLASS_PRINTER ||
+	    if (altptr->bInterfaceClass != LIBUSB_CLASS_PRINTER ||
 	        altptr->bInterfaceSubClass != 1 ||
 		(altptr->bInterfaceProtocol != 1 &&	/* Unidirectional */
 		 altptr->bInterfaceProtocol != 2) ||	/* Bidirectional */
@@ -330,10 +374,10 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	    for (endp = 0, endpptr = altptr->endpoint;
 	         endp < altptr->bNumEndpoints;
 		 endp ++, endpptr ++)
-              if ((endpptr->bmAttributes & USB_ENDPOINT_TYPE_MASK) ==
-	              USB_ENDPOINT_TYPE_BULK)
+              if ((endpptr->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) ==
+	              LIBUSB_TRANSFER_TYPE_BULK)
 	      {
-	        if (endpptr->bEndpointAddress & USB_ENDPOINT_DIR_MASK)
+	        if (endpptr->bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK)
 		  read_endp = endp;
 		else
 		  write_endp = endp;
@@ -361,37 +405,42 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 
             if (!open_device(&printer, data != NULL))
 	    {
-	      if (!get_device_id(&printer, device_id, sizeof(device_id)))
-	      {
-                make_device_uri(&printer, device_id, device_uri,
-		                sizeof(device_uri));
+	      get_device_id(&printer, device_id, sizeof(device_id));
+	      make_device_uri(&printer, device_id, device_uri,
+			      sizeof(device_uri));
 
-	        if ((*cb)(&printer, device_uri, device_id, data))
-		{
-		  printer.read_endp  = printer.device->config[printer.conf].
-				           interface[printer.iface].
+	      if ((*cb)(&printer, device_uri, device_id, data))
+	      {
+		printer.read_endp  = confptr->interface[printer.iface].
 					   altsetting[printer.altset].
 					   endpoint[printer.read_endp].
 					   bEndpointAddress;
-		  printer.write_endp = printer.device->config[printer.conf].
-					   interface[printer.iface].
+		printer.write_endp = confptr->interface[printer.iface].
 					   altsetting[printer.altset].
 					   endpoint[printer.write_endp].
 					   bEndpointAddress;
-		  return (&printer);
-		}
+		return (&printer);
               }
 
               close_device(&printer);
 	    }
 	  }
 	}
+	libusb_free_config_descriptor(confptr);
+      }
     }
 
  /*
   * If we get this far without returning, then we haven't found a printer
   * to print to...
   */
+
+ /*
+  * Clean up ....
+  */
+
+  libusb_free_device_list(list, 1);
+  libusb_exit(NULL);
 
   return (NULL);
 }
@@ -409,10 +458,12 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   int	length;				/* Length of device ID */
 
 
-  if (usb_control_msg(printer->handle,
-                      USB_TYPE_CLASS | USB_ENDPOINT_IN | USB_RECIP_INTERFACE,
-		      0, printer->conf, (printer->iface << 8) | printer->altset,
-		      buffer, bufsize, 5000) < 0)
+  if (libusb_control_transfer(printer->handle,
+			      LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_ENDPOINT_IN |
+			      LIBUSB_RECIPIENT_INTERFACE,
+			      0, printer->conf,
+			      (printer->iface << 8) | printer->altset,
+			      (unsigned char *)buffer, bufsize, 5000) < 0)
   {
     *buffer = '\0';
     return (-1);
@@ -482,7 +533,8 @@ list_cb(usb_printer_t *printer,		/* I - Printer */
   * Get the device URI and make/model strings...
   */
 
-  backendGetMakeModel(device_id, make_model, sizeof(make_model));
+  if (backendGetMakeModel(device_id, make_model, sizeof(make_model)))
+    strlcpy(make_model, "Unknown", sizeof(make_model));
 
  /*
   * Report the printer...
@@ -510,12 +562,14 @@ make_device_uri(
     char          *uri,			/* I - Device URI buffer */
     size_t        uri_size)		/* I - Size of device URI buffer */
 {
+  struct libusb_device_descriptor devdesc;
+                                        /* Current device descriptor */
   char		options[1024];		/* Device URI options */
   int		num_values;		/* Number of 1284 parameters */
   cups_option_t	*values;		/* 1284 parameters */
   const char	*mfg,			/* Manufacturer */
 		*mdl,			/* Model */
-		*des,			/* Description */
+		*des = NULL,		/* Description */
 		*sern;			/* Serial number */
   size_t	mfglen;			/* Length of manufacturer string */
   char		tempmfg[256],		/* Temporary manufacturer string */
@@ -532,16 +586,18 @@ make_device_uri(
   if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
     if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
       if ((sern = cupsGetOption("SN", num_values, values)) == NULL &&
-          printer->device->descriptor.iSerialNumber)
+	  ((libusb_get_device_descriptor (printer->device, &devdesc) >= 0) &&
+	   devdesc.iSerialNumber))
       {
        /*
         * Try getting the serial number from the device itself...
 	*/
 
-        int length = usb_get_string_simple(printer->handle,
-	                                   printer->device->descriptor.
-					       iSerialNumber,
-				           tempsern, sizeof(tempsern) - 1);
+        int length =
+	  libusb_get_string_descriptor_ascii(printer->handle,
+					     devdesc.iSerialNumber,
+					     (unsigned char *)tempsern,
+					     sizeof(tempsern) - 1);
         if (length > 0)
 	{
 	  tempsern[length] = '\0';
@@ -597,6 +653,19 @@ make_device_uri(
     mfg = tempmfg;
   }
 
+  if (!mdl)
+  {
+   /*
+    * No model?  Use description...
+    */
+    if (des)
+      mdl = des; /* We remove the manufacturer name below */
+    else if (!strncasecmp(mfg, "Unknown", 7))
+      mdl = "Printer";
+    else
+      mdl = "Unknown Model";
+  }
+
   mfglen = strlen(mfg);
 
   if (!strncasecmp(mdl, mfg, mfglen) && _cups_isspace(mdl[mfglen]))
@@ -642,7 +711,13 @@ static int				/* O - 0 on success, -1 on error */
 open_device(usb_printer_t *printer,	/* I - Printer */
             int           verbose)	/* I - Update connecting-to-device state? */
 {
-  int	number;				/* Configuration/interface/altset numbers */
+  struct libusb_device_descriptor devdesc;
+					/* Current device descriptor */
+  struct libusb_config_descriptor *confptr = NULL;
+					/* Pointer to current configuration */
+  int	number1 = -1,			/* Configuration/interface/altset */
+	number2 = -1,			/* numbers */
+	errcode = 0;			/* Current error */
   char	current;			/* Current configuration */
 
 
@@ -657,7 +732,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   * Try opening the printer...
   */
 
-  if ((printer->handle = usb_open(printer->device)) == NULL)
+  if (libusb_open(printer->device, &printer->handle) < 0)
     return (-1);
 
   if (verbose)
@@ -665,20 +740,32 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
  /*
   * Set the desired configuration, but only if it needs changing. Some
-  * printers (e.g., Samsung) don't like usb_set_configuration. It will succeed,
-  * but the following print job is sometimes silently lost by the printer.
+  * printers (e.g., Samsung) don't like libusb_set_configuration.  It will
+  * succeed, but the following print job is sometimes silently lost by the
+  * printer.
   */
 
-  if (usb_control_msg(printer->handle,
-                      USB_TYPE_STANDARD | USB_ENDPOINT_IN | USB_RECIP_DEVICE,
-                      8, /* GET_CONFIGURATION */
-                      0, 0, &current, 1, 5000) != 1)
-    current = 0;			/* Assume not configured */
-
-  number = printer->device->config[printer->conf].bConfigurationValue;
-  if (number != current)
+  if (libusb_control_transfer(printer->handle,
+			      LIBUSB_REQUEST_TYPE_STANDARD |
+			          LIBUSB_ENDPOINT_IN | LIBUSB_RECIPIENT_DEVICE,
+			      8, /* GET_CONFIGURATION */
+			      0, 0, (unsigned char *)&current, 1, 5000) < 0)
   {
-    if (usb_set_configuration(printer->handle, number) < 0)
+   /*
+    * Failed - assume not configured.
+    */
+
+    current = 0;
+  }
+
+  libusb_get_device_descriptor(printer->device, &devdesc);
+  libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
+
+  number1 = confptr->bConfigurationValue;
+
+  if (number1 != current)
+  {
+    if ((errcode = libusb_set_configuration(printer->handle, number1)) < 0)
     {
      /*
       * If the set fails, chances are that the printer only supports a
@@ -686,52 +773,85 @@ open_device(usb_printer_t *printer,	/* I - Printer */
       * the USB printer specification, but otherwise they'll work...
       */
 
-      if (errno != EBUSY)
+      if (errcode != LIBUSB_ERROR_BUSY)
         fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
-                number, printer->device->descriptor.idVendor,
-	        printer->device->descriptor.idProduct);
+                number1, devdesc.idVendor, devdesc.idProduct);
     }
+  }
+
+ /*
+  * Get the "usblp" kernel module out of the way. This backend only
+  * works without the module attached.
+  */
+
+  errcode = libusb_kernel_driver_active(printer->handle, printer->iface);
+  if (errcode == 0)
+    printer->usblp_attached = 0;
+  else if (errcode == 1)
+  {
+    printer->usblp_attached = 1;
+
+    if ((errcode =
+	 libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
+    {
+      fprintf(stderr,
+              "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
+	      devdesc.idVendor, devdesc.idProduct);
+      goto error;
+    }
+  }
+  else
+  {
+    printer->usblp_attached = 0;
+
+    fprintf(stderr,
+            "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" kernel "
+            "module attached.\n", devdesc.idVendor, devdesc.idProduct);
+    goto error;
   }
 
  /*
   * Claim interfaces as needed...
   */
 
-  number = printer->device->config[printer->conf].interface[printer->iface].
-               altsetting[printer->altset].bInterfaceNumber;
-  while (usb_claim_interface(printer->handle, number) < 0)
+  number1 = confptr->interface[printer->iface].
+                altsetting[printer->altset].bInterfaceNumber;
+
+  while ((errcode = libusb_claim_interface(printer->handle, number1)) < 0)
   {
-    if (errno != EBUSY)
-      fprintf(stderr,
-              "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
-              number, printer->device->descriptor.idVendor,
-	      printer->device->descriptor.idProduct, strerror(errno));
+    if (errcode != LIBUSB_ERROR_BUSY)
+      fprintf(stderr, "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
+              number1, devdesc.idVendor, devdesc.idProduct, strerror(errno));
 
     goto error;
   }
 
  /*
-  * Set alternate setting, but only if there is more than one option.  Some
-  * printers (e.g., Samsung) don't like usb_set_altinterface.
+  * Set alternate setting, but only if there is more than one option.
+  * Some printers (e.g., Samsung) don't like libusb_set_interface_alt_setting.
   */
 
-  if (printer->device->config[printer->conf].interface[printer->iface].
-          num_altsetting > 1)
+  if (confptr->interface[printer->iface].num_altsetting > 1)
   {
-    number = printer->device->config[printer->conf].interface[printer->iface].
-                 altsetting[printer->altset].bAlternateSetting;
+    number1 = confptr->interface[printer->iface].
+                  altsetting[printer->altset].bInterfaceNumber;
+    number2 = confptr->interface[printer->iface].
+                  altsetting[printer->altset].bAlternateSetting;
 
-    while (usb_set_altinterface(printer->handle, number) < 0)
+    while ((errcode = libusb_set_interface_alt_setting(printer->handle, number1,
+                                                       number2)) < 0)
     {
-      if (errno != EBUSY)
+      if (errcode != LIBUSB_ERROR_BUSY)
         fprintf(stderr,
                 "DEBUG: Failed to set alternate interface %d for %04x:%04x: "
-                "%s\n", number, printer->device->descriptor.idVendor,
-	        printer->device->descriptor.idProduct, strerror(errno));
+                "%s\n", number2, devdesc.idVendor, devdesc.idProduct,
+                strerror(errno));
 
       goto error;
     }
   }
+  
+  libusb_free_config_descriptor(confptr);
 
   if (verbose)
     fputs("STATE: -connecting-to-device\n", stderr);
@@ -747,7 +867,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   if (verbose)
     fputs("STATE: -connecting-to-device\n", stderr);
 
-  usb_close(printer->handle);
+  libusb_close(printer->handle);
   printer->handle = NULL;
 
   return (-1);
@@ -856,9 +976,10 @@ static ssize_t				/* O - Number of bytes written */
 side_cb(usb_printer_t *printer,		/* I - Printer */
         int           print_fd)		/* I - File to print */
 {
-  ssize_t		bytes,		/* Bytes read/written */
+  int		        bytes,		/* Bytes read/written */
+                        transferred,
 			tbytes;		/* Total bytes written */
-  char			buffer[512];	/* Print data buffer */
+  unsigned char		buffer[512];	/* Print data buffer */
   struct pollfd		pfd;		/* Poll descriptor */
   cups_sc_command_t	command;	/* Request command */
   cups_sc_status_t	status;		/* Request/response status */
@@ -882,8 +1003,9 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
 	{
 	  if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	  {
-	    while (usb_bulk_write(printer->handle, printer->write_endp, buffer,
-				  bytes, 5000) < 0)
+	    while (libusb_bulk_transfer(printer->handle, printer->write_endp,
+					buffer,
+					bytes, &transferred, 5000) < 0)
 	    {
 	      _cupsLangPrintFilter(stderr, "ERROR",
 			           _("Unable to send data to printer."));
