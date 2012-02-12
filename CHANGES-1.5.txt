@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- Changed how timeouts are implemented in the LPD backend (STR #4013)
 	- The IPP backend no longer specifies the document-format for auto-
 	  detect unless required (STR #3986)
 	- Added more supported color names for SNMP supplies (STR #3981)
