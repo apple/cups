@@ -2561,17 +2561,23 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
+          *valptr++ = '\'';
           *valptr++ = '\"';
 	  for (attrptr = attr->values[i].string.text;
 	       *attrptr && valptr < (value + sizeof(value) - 10);
 	       attrptr ++)
 	  {
-	    if (*attrptr == '\\' || *attrptr == '\"')
+	    if (*attrptr == '\\' || *attrptr == '\"' || *attrptr == '\'')
+	    {
 	      *valptr++ = '\\';
+	      *valptr++ = '\\';
+	      *valptr++ = '\\';
+	    }
 
 	    *valptr++ = *attrptr;
 	  }
           *valptr++ = '\"';
+          *valptr++ = '\'';
           break;
 
       default :

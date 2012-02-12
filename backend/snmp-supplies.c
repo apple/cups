@@ -408,7 +408,7 @@ backend_init_supplies(
 		cachefilename[1024],	/* Cache filename */
 		description[CUPS_SNMP_MAX_STRING],
 					/* Device description string */
-		value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 2 + 3)],
+		value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 4 + 3)],
 					/* Value string */
 		*ptr,			/* Pointer into value string */
 		*name_ptr;		/* Pointer into name string */
@@ -659,7 +659,8 @@ backend_init_supplies(
   fprintf(stderr, "ATTR: marker-colors=%s\n", value);
 
  /*
-  * Output the marker-names attribute...
+  * Output the marker-names attribute (the double quoting is necessary to deal
+  * with embedded quotes and commas in the marker names...)
   */
 
   for (i = 0, ptr = value; i < num_supplies; i ++)
@@ -667,15 +668,21 @@ backend_init_supplies(
     if (i)
       *ptr++ = ',';
 
+    *ptr++ = '\'';
     *ptr++ = '\"';
     for (name_ptr = supplies[i].name; *name_ptr;)
     {
-      if (*name_ptr == '\\' || *name_ptr == '\"')
+      if (*name_ptr == '\\' || *name_ptr == '\"' || *name_ptr == '\'')
+      {
         *ptr++ = '\\';
+        *ptr++ = '\\';
+        *ptr++ = '\\';
+      }
 
       *ptr++ = *name_ptr++;
     }
     *ptr++ = '\"';
+    *ptr++ = '\'';
   }
 
   *ptr = '\0';
@@ -833,7 +840,6 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
           {
 	    char	*src, *dst;	/* Pointers into strings */
-
 
            /*
 	    * Loop safe because both the object_value and supplies char arrays
