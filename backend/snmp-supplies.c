@@ -719,16 +719,33 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
                 void        *data)	/* I - User data (unused) */
 {
   int	i, j, k;			/* Looping vars */
-  static const char * const colors[8][2] =
+  static const char * const colors[][2] =
   {					/* Standard color names */
-    { "black",   "#000000" },
-    { "blue",    "#0000FF" },
-    { "cyan",    "#00FFFF" },
-    { "green",   "#00FF00" },
-    { "magenta", "#FF00FF" },
-    { "red",     "#FF0000" },
-    { "white",   "#FFFFFF" },
-    { "yellow",  "#FFFF00" }
+    { "black",         "#000000" },
+    { "blue",          "#0000FF" },
+    { "brown",         "#A52A2A" },
+    { "cyan",          "#00FFFF" },
+    { "dark-gray",     "#404040" },
+    { "dark gray",     "#404040" },
+    { "dark-yellow",   "#FFCC00" },
+    { "dark yellow",   "#FFCC00" },
+    { "gold",          "#FFD700" },
+    { "gray",          "#808080" },
+    { "green",         "#00FF00" },
+    { "light-black",   "#606060" },
+    { "light black",   "#606060" },
+    { "light-cyan",    "#E0FFFF" },
+    { "light cyan",    "#E0FFFF" },
+    { "light-gray",    "#D3D3D3" },
+    { "light gray",    "#D3D3D3" },
+    { "light-magenta", "#FF77FF" },
+    { "light magenta", "#FF77FF" },
+    { "magenta",       "#FF00FF" },
+    { "orange",        "#FFA500" },
+    { "red",           "#FF0000" },
+    { "silver",        "#C0C0C0" },
+    { "white",         "#FFFFFF" },
+    { "yellow",        "#FFFF00" }
   };
 
 
@@ -750,7 +767,8 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       if (supplies[j].colorant == i)
       {
 	for (k = 0; k < (int)(sizeof(colors) / sizeof(colors[0])); k ++)
-	  if (!strcmp(colors[k][0], (char *)packet->object_value.string.bytes))
+	  if (!_cups_strcasecmp(colors[k][0],
+	                        (char *)packet->object_value.string.bytes))
 	  {
 	    strcpy(supplies[j].color, colors[k][1]);
 	    break;
