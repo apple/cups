@@ -310,9 +310,9 @@ ppdLocalizeIPPReason(
 		       !strncmp(reason, "shutdown", 8))
 	message = _("The printer is not connected.");
       else if (!strncmp(reason, "toner-low", 9))
-	message = _("The printer is low on toner.");
+	message = _("The printer is running low on toner.");
       else if (!strncmp(reason, "toner-empty", 11))
-	message = _("The printer is out of toner.");
+	message = _("The printer may be out of toner.");
       else if (!strncmp(reason, "cover-open", 10))
 	message = _("The printer's cover is open.");
       else if (!strncmp(reason, "interlock-open", 14))
