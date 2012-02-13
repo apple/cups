@@ -4066,15 +4066,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
                   cg->expired_root, (int)error));
   }
 
-#    ifdef HAVE_SSLSETPROTOCOLVERSIONMAX
-  if (!error)
-  {
-    error = SSLSetProtocolVersionMax(http->tls, kTLSProtocol1);
-    DEBUG_printf(("4http_setup_ssl: SSLSetProtocolVersionMax(kTLSProtocol1), "
-                  "error=%d", (int)error));
-  }
-#    endif /* HAVE_SSLSETPROTOCOLVERSIONMAX */
-
  /*
   * In general, don't verify certificates since things like the common name
   * often do not match...

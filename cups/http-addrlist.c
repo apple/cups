@@ -32,6 +32,7 @@
 #ifdef HAVE_POLL
 #  include <poll.h>
 #endif /* HAVE_POLL */
+#include <sys/fcntl.h>
 
 
 /*
@@ -177,6 +178,8 @@ httpAddrConnect2(
    /*
     * Do an asynchronous connect by setting the socket non-blocking...
     */
+
+    DEBUG_printf(("httpAddrConnect2: Setting non-blocking connect()"));
 
     flags = fcntl(*sock, F_GETFL, 0);
     if (msec != INT_MAX)

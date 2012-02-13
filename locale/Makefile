@@ -133,7 +133,7 @@ pot:	checkpo po2strings
 	cd ..; xgettext -o locale/cups.pot -cTRANSLATORS -s \
 		--keyword=_ --no-wrap \
 		--copyright-holder="Apple Inc." \
-		--package-name="CUPS" --package-version="1.5" \
+		--package-name="CUPS" --package-version="1.6" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c */*.cxx
 	(cat cups.header; tail +6 cups.pot; cat cups.footer) > cups.pot.N
@@ -141,6 +141,9 @@ pot:	checkpo po2strings
 	echo Checking cups.pot...
 	./checkpo cups.pot
 	for loc in *.po ; do \
+		if test $$loc = '*.po'; then \
+			break; \
+		fi; \
 		echo Merging changes into $$loc... ; \
 		msgmerge -o $$loc -s -N --no-location $$loc cups.pot ; \
 	done
