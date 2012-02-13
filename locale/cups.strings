@@ -206,6 +206,7 @@
 "  -R root-directory       Set alternate root." = "  -R root-directory       Set alternate root.";
 "  -S                      Test with SSL encryption." = "  -S                      Test with SSL encryption.";
 "  -T                      Set the receive/send timeout in seconds." = "  -T                      Set the receive/send timeout in seconds.";
+"  -T seconds              Set the receive/send timeout in seconds." = "  -T seconds              Set the receive/send timeout in seconds.";
 "  -U samba-user           Authenticate using the named SAMBA user." = "  -U samba-user           Authenticate using the named SAMBA user.";
 "  -U username             Set username for job." = "  -U username             Set username for job.";
 "  -U username             Specify username." = "  -U username             Specify username.";
@@ -624,6 +625,7 @@
 "Bad option + choice on line %d." = "Bad option + choice on line %d.";
 "Bad page-ranges values %d-%d." = "Bad page-ranges values %d-%d.";
 "Bad port-monitor \"%s\"." = "Bad port-monitor \"%s\".";
+"Bad printer URI." = "Bad printer URI.";
 "Bad printer-state value %d." = "Bad printer-state value %d.";
 "Bad request ID %d." = "Bad request ID %d.";
 "Bad request version number %d.%d." = "Bad request version number %d.%d.";
@@ -819,6 +821,7 @@
 "Internet Postage 3-Part" = "Internet Postage 3-Part";
 "Internet Postage 3-Part - 2 1/4 x 7\"" = "Internet Postage 3-Part - 2 1/4 x 7\"";
 "Internet Printing Protocol" = "Internet Printing Protocol";
+"Invalid media size." = "Invalid media size.";
 "JCL" = "JCL";
 "JIS B0" = "JIS B0";
 "JIS B1" = "JIS B1";
@@ -999,6 +1002,7 @@
 "Print file accepted - job ID unknown." = "Print file accepted - job ID unknown.";
 "Print file sent." = "Print file sent.";
 "Print file was not accepted." = "Print file was not accepted.";
+"Print job too large." = "Print job too large.";
 "Printer Added" = "Printer Added";
 "Printer Default" = "Printer Default";
 "Printer Deleted" = "Printer Deleted";
@@ -1006,7 +1010,7 @@
 "Printer Paused" = "Printer Paused";
 "Printer Settings" = "Printer Settings";
 "Printer busy, will retry in 10 seconds." = "Printer busy, will retry in 10 seconds.";
-"Printer did not respond after %d seconds." = "Printer did not respond after %d seconds.";
+"Printer did not respond." = "Printer did not respond.";
 "Printer does not support IPP/%d.%d, trying IPP/%s." = "Printer does not support IPP/%d.%d, trying IPP/%s.";
 "Printer is busy, will retry in 5 seconds." = "Printer is busy, will retry in 5 seconds.";
 "Printer is not currently connected." = "Printer is not currently connected.";
@@ -1095,11 +1099,11 @@
 "The paper tray needs to be filled." = "The paper tray needs to be filled.";
 "The printer URI is incorrect or no longer exists." = "The printer URI is incorrect or no longer exists.";
 "The printer is busy." = "The printer is busy.";
-"The printer is low on ink." = "The printer is low on ink.";
 "The printer is low on toner." = "The printer is low on toner.";
 "The printer is not connected." = "The printer is not connected.";
 "The printer is not responding." = "The printer is not responding.";
 "The printer is out of toner." = "The printer is out of toner.";
+"The printer is running low on ink." = "The printer is running low on ink.";
 "The printer is unreachable at this time." = "The printer is unreachable at this time.";
 "The printer may be out of ink." = "The printer may be out of ink.";
 "The printer may not exist or is unavailable at this time." = "The printer may not exist or is unavailable at this time.";
@@ -1187,7 +1191,6 @@
 "Unable to get class list:" = "Unable to get class list:";
 "Unable to get class status:" = "Unable to get class status:";
 "Unable to get list of printer drivers:" = "Unable to get list of printer drivers:";
-"Unable to get print job status." = "Unable to get print job status.";
 "Unable to get printer attributes:" = "Unable to get printer attributes:";
 "Unable to get printer list:" = "Unable to get printer list:";
 "Unable to get printer status." = "Unable to get printer status.";
@@ -1211,6 +1214,7 @@
 "Unable to print test page:" = "Unable to print test page:";
 "Unable to read print data" = "Unable to read print data";
 "Unable to read print data." = "Unable to read print data.";
+"Unable to resolve printer URI." = "Unable to resolve printer URI.";
 "Unable to run \"%s\": %s" = "Unable to run \"%s\": %s";
 "Unable to see in file" = "Unable to see in file";
 "Unable to send command to printer driver" = "Unable to send command to printer driver";
@@ -1230,19 +1234,19 @@
 "Unknown encryption option value: \"%s\"." = "Unknown encryption option value: \"%s\".";
 "Unknown file order: \"%s\"." = "Unknown file order: \"%s\".";
 "Unknown format character: \"%c\"." = "Unknown format character: \"%c\".";
+"Unknown media size name." = "Unknown media size name.";
 "Unknown option \"%s\" with value \"%s\"." = "Unknown option \"%s\" with value \"%s\".";
 "Unknown option \"%s\"." = "Unknown option \"%s\".";
 "Unknown print mode: \"%s\"." = "Unknown print mode: \"%s\".";
 "Unknown printer-error-policy \"%s\"." = "Unknown printer-error-policy \"%s\".";
 "Unknown printer-op-policy \"%s\"." = "Unknown printer-op-policy \"%s\".";
+"Unknown service name." = "Unknown service name.";
 "Unknown version option value: \"%s\"." = "Unknown version option value: \"%s\".";
-"Unsupported brightness value %s, using brightness=100." = "Unsupported brightness value %s, using brightness=100.";
 "Unsupported character set \"%s\"." = "Unsupported character set \"%s\".";
 "Unsupported compression \"%s\"." = "Unsupported compression \"%s\".";
 "Unsupported document-format \"%s\"." = "Unsupported document-format \"%s\".";
 "Unsupported document-format \"%s/%s\"." = "Unsupported document-format \"%s/%s\".";
 "Unsupported format \"%s\"." = "Unsupported format \"%s\".";
-"Unsupported gamma value %s, using gamma=1000." = "Unsupported gamma value %s, using gamma=1000.";
 "Unsupported margins." = "Unsupported margins.";
 "Unsupported media value." = "Unsupported media value.";
 "Unsupported number-up value %d, using number-up=1." = "Unsupported number-up value %d, using number-up=1.";

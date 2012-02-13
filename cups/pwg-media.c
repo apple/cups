@@ -117,7 +117,7 @@ static _pwg_media_t const cups_pwg_media[] =
 
   /* Chinese Standard Sheet Media Inch Sizes */
   _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, "roc16k", 7.75, 10.75),
-  _PWG_MEDIA_IN("roc_8k_10.75x15.5in", NULL, NULL, 10.75, 15.5),
+  _PWG_MEDIA_IN("roc_8k_10.75x15.5in", NULL, "roc8k", 10.75, 15.5),
 
   /* ISO Standard Sheet Media Sizes */
   _PWG_MEDIA_MM("iso_a10_26x37mm", "iso-a10", "A10", 26, 37),
@@ -128,7 +128,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("iso_a5_148x210mm", "iso-a5", "A5", 148, 210),
   _PWG_MEDIA_MM("iso_a5-extra_174x235mm", NULL, "A5Extra", 174, 235),
   _PWG_MEDIA_MM("iso_a4_210x297mm", "iso-a4", "A4", 210, 297),
-  _PWG_MEDIA_MM("iso_a4-tab_225x297mm", NULL, NULL, 225, 297),
+  _PWG_MEDIA_MM("iso_a4-tab_225x297mm", NULL, "A4Tab", 225, 297),
   _PWG_MEDIA_MM("iso_a4-extra_235.5x322.3mm", NULL, "A4Extra", 235.5, 322.3),
   _PWG_MEDIA_MM("iso_a3_297x420mm", "iso-a3", "A3", 297, 420),
   _PWG_MEDIA_MM("iso_a4x3_297x630mm", "iso-a4x3", NULL, 297, 630),
@@ -233,9 +233,9 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, "om_small-photo", 100, 150),
   _PWG_MEDIA_MM("om_italian_110x230mm", NULL, "EnvItalian", 110, 230),
   _PWG_MEDIA_MM("om_postfix_114x229mm", NULL, NULL, 114, 229),
-  _PWG_MEDIA_MM("om_large-photo_200x300", NULL, NULL, 200, 300),
+  _PWG_MEDIA_MM("om_large-photo_200x300", NULL, "om_large-photo", 200, 300),
   _PWG_MEDIA_MM("om_folio_210x330mm", "folio", "Folio", 210, 330),
-  _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, NULL, 215, 315),
+  _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, "FolioSP", 215, 315),
   _PWG_MEDIA_MM("om_invite_220x220mm", NULL, "EnvInvite", 220, 220)
 };
 
