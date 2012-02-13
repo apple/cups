@@ -3,7 +3,7 @@ dnl "$Id: configure.in 7833 2008-08-04 20:55:13Z mike $"
 dnl
 dnl   Configuration script for CUPS.
 dnl
-dnl   Copyright 2007-2011 by Apple Inc.
+dnl   Copyright 2007-2012 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,6 @@ sinclude(config-scripts/cups-common.m4)
 sinclude(config-scripts/cups-directories.m4)
 sinclude(config-scripts/cups-manpages.m4)
 
-sinclude(config-scripts/cups-3264.m4)
 sinclude(config-scripts/cups-sharedlibs.m4)
 sinclude(config-scripts/cups-libtool.m4)
 sinclude(config-scripts/cups-compiler.m4)

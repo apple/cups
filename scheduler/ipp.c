@@ -23,8 +23,6 @@
  *   add_class()                 - Add a class to the system.
  *   add_file()                  - Add a file to a job.
  *   add_job()                   - Add a job to a print queue.
- *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
- *                                 upon the job and printer state...
  *   add_job_subscriptions()     - Add any subscriptions for a job.
  *   add_job_uuid()              - Add job-uuid attribute to a job.
  *   add_printer()               - Add a printer to the system.
@@ -141,7 +139,6 @@ static int	add_file(cupsd_client_t *con, cupsd_job_t *job,
 		         mime_type_t *filetype, int compression);
 static cupsd_job_t *add_job(cupsd_client_t *con, cupsd_printer_t *printer,
 			    mime_type_t *filetype);
-static void	add_job_state_reasons(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_subscriptions(cupsd_client_t *con, cupsd_job_t *job);
 static void	add_job_uuid(cupsd_job_t *job);
 static void	add_printer(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -1710,6 +1707,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   job->state = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_ENUM,
                              "job-state", IPP_JOB_STOPPED);
   job->state_value = (ipp_jstate_t)job->state->values[0].integer;
+  job->reasons = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                              "job-state-reasons", NULL, "job-incoming");
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -1743,6 +1742,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
+
+    ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
   }
   else if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
   {
@@ -1754,6 +1755,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   {
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
+
+    ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
   if (!(printer->type & CUPS_PRINTER_REMOTE) || Classification)
@@ -1922,7 +1925,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state_value);
-  add_job_state_reasons(con, job);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons",
+               NULL, job->reasons->values[0].string.text);
 
   con->response->request.status.status_code = IPP_OK;
 
@@ -1950,76 +1954,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   return (job);
-}
-
-
-/*
- * 'add_job_state_reasons()' - Add the "job-state-reasons" attribute based
- *                             upon the job and printer state...
- */
-
-static void
-add_job_state_reasons(
-    cupsd_client_t *con,		/* I - Client connection */
-    cupsd_job_t    *job)		/* I - Job info */
-{
-  cupsd_printer_t	*dest;		/* Destination printer */
-  ipp_attribute_t	*attr;		/* job-hold attribute */
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job_state_reasons(%p[%d], %d)",
-                  con, con->http.fd, job ? job->id : 0);
-
-  switch (job ? job->state_value : IPP_JOB_CANCELED)
-  {
-    case IPP_JOB_PENDING :
-	dest = cupsdFindDest(job->dest);
-
-        if (dest && dest->state == IPP_PRINTER_STOPPED)
-          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "job-state-reasons", NULL, "printer-stopped");
-        else
-          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "job-state-reasons", NULL, "none");
-        break;
-
-    case IPP_JOB_HELD :
-        if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
-				     IPP_TAG_KEYWORD)) == NULL)
-	  attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-
-	if (!attr || strcmp(attr->values[0].string.text, "no-hold"))
-          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "job-state-reasons", NULL, "job-hold-until-specified");
-        else
-          ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "job-state-reasons", NULL, "job-incoming");
-        break;
-
-    case IPP_JOB_PROCESSING :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "job-printing");
-        break;
-
-    case IPP_JOB_STOPPED :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "job-stopped");
-        break;
-
-    case IPP_JOB_CANCELED :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "job-canceled-by-user");
-        break;
-
-    case IPP_JOB_ABORTED :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "aborted-by-system");
-        break;
-
-    case IPP_JOB_COMPLETED :
-        ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	             "job-state-reasons", NULL, "job-completed-successfully");
-        break;
-  }
 }
 
 
@@ -4927,8 +4861,6 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state_value);
 
-  add_job_state_reasons(con, job);
-
   con->response->request.status.status_code = IPP_OK;
 
  /*
@@ -5654,10 +5586,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 
   if (!cupsArrayFind(exclude, "all"))
   {
-    if ((!exclude || !cupsArrayFind(exclude, "document-count")) &&
-        (!ra || cupsArrayFind(ra, "document-count")))
+    if ((!exclude || !cupsArrayFind(exclude, "number-of-documents")) &&
+        (!ra || cupsArrayFind(ra, "number-of-documents")))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-		    "document-count", job->num_files);
+		    "number-of-documents", job->num_files);
 
     if ((!exclude || !cupsArrayFind(exclude, "job-media-progress")) &&
         (!ra || cupsArrayFind(ra, "job-media-progress")))
@@ -5696,9 +5628,6 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-printer-uri", NULL, job_uri);
   }
-
-  if (!ra || cupsArrayFind(ra, "job-state-reasons"))
-    add_job_state_reasons(con, job);
 
   if (!ra || cupsArrayFind(ra, "job-uri"))
   {
@@ -10553,6 +10482,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     {
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
+
+      ippSetString(job->attrs, &job->reasons, 0, "none");
     }
     else if (job->state_value == IPP_JOB_HELD)
     {
@@ -10564,7 +10495,11 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       {
 	job->state->values[0].integer = IPP_JOB_PENDING;
 	job->state_value              = IPP_JOB_PENDING;
+
+	ippSetString(job->attrs, &job->reasons, 0, "none");
       }
+      else
+	ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
     }
 
     job->dirty = 1;
@@ -10583,8 +10518,10 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       job->state->values[0].integer = IPP_JOB_HELD;
       job->state_value              = IPP_JOB_HELD;
       job->hold_until               = time(NULL) + MultipleOperationTimeout;
-      job->dirty                    = 1;
 
+      ippSetString(job->attrs, &job->reasons, 0, "job-incoming");
+
+      job->dirty = 1;
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     }
 
@@ -10604,7 +10541,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state_value);
-  add_job_state_reasons(con, job);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons",
+               NULL, job->reasons->values[0].string.text);
 
   con->response->request.status.status_code = IPP_OK;
 

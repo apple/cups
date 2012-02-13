@@ -1183,6 +1183,10 @@ httpGets(char   *line,			/* I - Line to read into */
 
       DEBUG_printf(("4httpGets: read %d bytes...", bytes));
 
+#ifdef DEBUG
+      http_debug_hex("httpGets", http->buffer + http->used, bytes);
+#endif /* DEBUG */
+
       if (bytes < 0)
       {
        /*
@@ -1998,7 +2002,11 @@ httpRead2(http_t *http,			/* I - Connection to server */
     }
     while (bytes < 0);
 
-    DEBUG_printf(("2httpRead2: Read %d bytes into buffer.", (int)bytes));
+    DEBUG_printf(("2httpRead2: Read " CUPS_LLFMT " bytes into buffer.",
+                  CUPS_LLCAST bytes));
+#ifdef DEBUG
+    http_debug_hex("httpRead2", http->buffer, (int)bytes);
+#endif /* DEBUG */
 
     http->used = bytes;
   }
@@ -2101,6 +2109,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     DEBUG_printf(("2httpRead2: read " CUPS_LLFMT " bytes from socket...",
                   CUPS_LLCAST bytes));
+#ifdef DEBUG
+    http_debug_hex("httpRead2", buffer, (int)bytes);
+#endif /* DEBUG */
   }
 
   if (bytes > 0)
@@ -2145,10 +2156,6 @@ httpRead2(http_t *http,			/* I - Connection to server */
 	http->state = HTTP_WAITING;
     }
   }
-
-#ifdef DEBUG
-  http_debug_hex("httpRead2", buffer, (int)bytes);
-#endif /* DEBUG */
 
   return (bytes);
 }
@@ -2271,7 +2278,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 {
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
-  return (httpReconnect2(http, 30, NULL));
+  return (httpReconnect2(http, 30000, NULL));
 }
 
 
@@ -2292,7 +2299,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpReconnect(http=%p, msec=%d, cancel=%p)", http, msec,
+  DEBUG_printf(("httpReconnect2(http=%p, msec=%d, cancel=%p)", http, msec,
                 cancel));
 
   if (!http)
@@ -2304,7 +2311,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #ifdef HAVE_SSL
   if (http->tls)
   {
-    DEBUG_puts("2httpReconnect: Shutting down SSL/TLS...");
+    DEBUG_puts("2httpReconnect2: Shutting down SSL/TLS...");
     http_shutdown_ssl(http);
   }
 #endif /* HAVE_SSL */
@@ -2315,7 +2322,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
   if (http->fd >= 0)
   {
-    DEBUG_printf(("2httpReconnect: Closing socket %d...", http->fd));
+    DEBUG_printf(("2httpReconnect2: Closing socket %d...", http->fd));
 
 #ifdef WIN32
     closesocket(http->fd);
@@ -2332,7 +2339,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
 #ifdef DEBUG
   for (current = http->addrlist; current; current = current->next)
-    DEBUG_printf(("2httpReconnect: Address %s:%d",
+    DEBUG_printf(("2httpReconnect2: Address %s:%d",
                   httpAddrString(&(current->addr), temp, sizeof(temp)),
                   _httpAddrPort(&(current->addr))));
 #endif /* DEBUG */
@@ -2351,13 +2358,13 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #endif /* WIN32 */
     http->status = HTTP_ERROR;
 
-    DEBUG_printf(("1httpReconnect: httpAddrConnect failed: %s",
+    DEBUG_printf(("1httpReconnect2: httpAddrConnect failed: %s",
                   strerror(http->error)));
 
     return (-1);
   }
 
-  DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
+  DEBUG_printf(("2httpReconnect2: New socket=%d", http->fd));
 
   if (http->timeout_value > 0)
     http_set_timeout(http->fd, http->timeout_value);
@@ -2389,7 +2396,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
 
-  DEBUG_printf(("1httpReconnect: Connected to %s:%d...",
+  DEBUG_printf(("1httpReconnect2: Connected to %s:%d...",
 		httpAddrString(http->hostaddr, temp, sizeof(temp)),
 		_httpAddrPort(http->hostaddr)));
 
@@ -3869,7 +3876,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
   int			any_root;	/* Allow any root */
-  char			*hostname;	/* Hostname */
+  char			hostname[256],	/* Hostname */
+			*hostptr;	/* Pointer into hostname */
 
 #  ifdef HAVE_LIBSSL
   SSL_CTX		*context;	/* Context for encryption */
@@ -3905,11 +3913,24 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   */
 
   if (httpAddrLocalhost(http->hostaddr))
+  {
     any_root = 1;
+    strlcpy(hostname, "localhost", sizeof(hostname));
+  }
   else
+  {
+   /*
+    * Otherwise use the system-wide setting and make sure the hostname we have
+    * does not end in a trailing dot.
+    */
+
     any_root = cg->any_root;
 
-  hostname = httpAddrLocalhost(http->hostaddr) ? "localhost" : http->hostname;
+    strlcpy(hostname, http->hostname, sizeof(hostname));
+    if ((hostptr = hostname + strlen(hostname) - 1) >= hostname &&
+        *hostptr == '.')
+      *hostptr = '\0';
+  }
 
 #  ifdef HAVE_LIBSSL
   (void)any_root;
@@ -4466,6 +4487,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 
   while (length > 0)
   {
+    DEBUG_printf(("3http_write: About to write %d bytes.", (int)length));
+
     if (http->timeout_cb)
     {
 #ifdef HAVE_POLL
@@ -4528,6 +4551,9 @@ http_write(http_t     *http,		/* I - Connection to server */
     else
 #endif /* HAVE_SSL */
     bytes = send(http->fd, buffer, length, 0);
+
+    DEBUG_printf(("3http_write: Write of %d bytes returned %d.", (int)length,
+                  (int)bytes));
 
     if (bytes < 0)
     {

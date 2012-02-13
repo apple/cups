@@ -3,7 +3,7 @@
  *
  *   Private debugging macros for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -101,6 +101,10 @@ extern void	DLLExport _cups_debug_puts(const char *s);
 extern void	DLLExport _cups_debug_set(const char *logfile,
 					  const char *level, const char *filter,
 					  int force);
+#  ifdef WIN32
+extern int	_cups_gettimeofday(struct timeval *tv, void *tz);
+#    define gettimeofday(a,b) _cups_gettimeofday(a, b)
+#  endif /* WIN32 */
 
 #  ifdef __cplusplus
 }

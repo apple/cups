@@ -1,8 +1,18 @@
-CHANGES-IPPTOOL.txt - 2012-01-10
+CHANGES-IPPTOOL.txt - 2012-02-06
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2012-02-06
+
+	- Fixed the packaging of ipptool on Windows (removed unnecessary DLLs)
+	- Fixed an crash in ipptool when mixing DISPLAY with -I and a failed
+	  request.
+	- Added a Print-Job test file.
+	- Added a "setdebug" batch file for Windows
+	- Added support for a CUPS_DISABLE_ASYNC_CONNECT environment variable.
 
 
 2012-01-10

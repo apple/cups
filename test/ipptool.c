@@ -410,7 +410,11 @@ main(int  argc,				/* I - Number of command-line args */
                 */
 
 		snprintf(filename, sizeof(filename), "%s.gz", argv[i]);
-                if (access(filename, 0) && filename[0] != '/')
+                if (access(filename, 0) && filename[0] != '/'
+#ifdef WIN32
+                    && (!isalpha(filename[0] & 255) || filename[1] != ':')
+#endif /* WIN32 */
+                    )
 		{
 		  snprintf(filename, sizeof(filename), "%s/ipptool/%s",
 			   cg->cups_datadir, argv[i]);
@@ -609,7 +613,11 @@ main(int  argc,				/* I - Number of command-line args */
 	usage();
       }
 
-      if (access(argv[i], 0) && argv[i][0] != '/')
+      if (access(argv[i], 0) && argv[i][0] != '/'
+#ifdef WIN32
+          && (!isalpha(argv[i][0] & 255) || argv[i][1] != ':')
+#endif /* WIN32 */
+          )
       {
         snprintf(testname, sizeof(testname), "%s/ipptool/%s", cg->cups_datadir,
                  argv[i]);
@@ -2280,12 +2288,38 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  }
 	  else if (status == HTTP_ERROR)
 	  {
-	    if (!Cancel)
-	      httpReconnect(http);
-
 	    prev_pass = 0;
+	    break;
+	  }
+	  else if (status != HTTP_OK)
+	  {
+	    httpFlush(http);
+	    break;
 	  }
 	}
+      }
+
+      if (!Cancel && status == HTTP_ERROR &&
+#ifdef WIN32
+	  http->error != WSAETIMEDOUT)
+#else
+	  http->error != ETIMEDOUT)
+#endif /* WIN32 */
+      {
+	if (httpReconnect(http))
+	  prev_pass = 0;
+      }
+      else if (status == HTTP_ERROR)
+      {
+        if (!Cancel)
+          httpReconnect(http);
+
+	prev_pass = 0;
+      }
+      else if (status != HTTP_OK)
+      {
+        httpFlush(http);
+        prev_pass = 0;
       }
 
      /*
@@ -2834,7 +2868,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
     }
 
-    if (num_displayed > 0 && !Verbosity &&
+    if (num_displayed > 0 && !Verbosity && response &&
         (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
     {
       for (attrptr = response->attrs;
@@ -3377,7 +3411,11 @@ get_filename(const char *testfile,	/* I - Current test file */
     if (*dstptr == '>')
       *dstptr = '\0';
   }
-  else if (*src == '/' || !strchr(testfile, '/'))
+  else if (*src == '/' || !strchr(testfile, '/')
+#ifdef WIN32
+           || (isalpha(*src & 255) && src[1] == ':')
+#endif /* WIN32 */
+           )
   {
    /*
     * Use the path as-is...
@@ -4282,7 +4320,7 @@ usage(void)
                           "content-length."));
   _cupsLangPuts(stderr, _("  -S                      Test with SSL "
 			  "encryption."));
-  _cupsLangPuts(stderr, _("  -T                      Set the receive/send "
+  _cupsLangPuts(stderr, _("  -T seconds              Set the receive/send "
                           "timeout in seconds."));
   _cupsLangPuts(stderr, _("  -V version              Set default IPP "
                           "version."));

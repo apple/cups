@@ -331,31 +331,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\regex\debug.c"
-				>
-			</File>
-			<File
 				RelativePath="..\test\ipptool.c"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\regcomp.c"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\regerror.c"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\regexec.c"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\regfree.c"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\split.c"
 				>
 			</File>
 		</Filter>
@@ -364,14 +340,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\regex\regex.h"
-				>
-			</File>
-			<File
-				RelativePath=".\regex\regex2.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

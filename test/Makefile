@@ -3,7 +3,7 @@
 #
 #   IPP test makefile for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -86,7 +86,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+	$(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
 
 
 #
@@ -189,7 +189,7 @@ xmltotest: xmltotest.o ../cups/$(LIBUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ xmltotest.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) \
-		-lmxml
+		$(LIBMXML)
 
 
 #

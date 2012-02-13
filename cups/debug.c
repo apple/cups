@@ -3,7 +3,7 @@
  *
  *   Debugging functions for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -32,22 +32,22 @@
 #  include <time.h>
 #  include <io.h>
 #  define getpid (int)GetCurrentProcessId
-static int				/* O  - 0 on success, -1 on failure */
-gettimeofday(struct timeval	*tv,	/* I  - Timeval struct */
-             void		*tz)	/* I  - Timezone */
-{   
+int					/* O  - 0 on success, -1 on failure */
+_cups_gettimeofday(struct timeval *tv,	/* I  - Timeval struct */
+                   void		  *tz)	/* I  - Timezone */
+{
   struct _timeb timebuffer;		/* Time buffer struct */
   _ftime(&timebuffer);
   tv->tv_sec  = (long)timebuffer.time;
-  tv->tv_usec = timebuffer.millitm * 1000;  
+  tv->tv_usec = timebuffer.millitm * 1000;
   return 0;
 }
 #else
 #  include <sys/time.h>
 #  include <unistd.h>
 #endif /* WIN32 */
-#include <fcntl.h>
 #include <regex.h>
+#include <fcntl.h>
 
 
 /*
@@ -336,41 +336,54 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = 'n';
+		bytes += 2;
 	      }
 	      else if (*s == '\r')
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = 'r';
+		bytes += 2;
 	      }
 	      else if (*s == '\t')
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = 't';
+		bytes += 2;
 	      }
 	      else if (*s == '\\')
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = '\\';
+		bytes += 2;
 	      }
 	      else if (*s == '\'')
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = '\'';
+		bytes += 2;
 	      }
 	      else if (*s == '\"')
 	      {
 	        *bufptr++ = '\\';
 		*bufptr++ = '\"';
+		bytes += 2;
 	      }
 	      else if ((*s & 255) < ' ')
 	      {
+	        if ((bufptr + 2) >= bufend)
+	          break;
+
 	        *bufptr++ = '\\';
 		*bufptr++ = '0';
 		*bufptr++ = '0' + *s / 8;
 		*bufptr++ = '0' + (*s & 7);
+		bytes += 4;
 	      }
 	      else
+	      {
 	        *bufptr++ = *s;
+		bytes ++;
+	      }
             }
 
             bufend ++;
@@ -463,15 +476,18 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 	   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000));
 
   va_start(ap, format);
-  debug_vsnprintf(buffer + 13, sizeof(buffer) - 14, format, ap);
+  bytes = debug_vsnprintf(buffer + 13, sizeof(buffer) - 14, format, ap) + 13;
   va_end(ap);
 
-  bytes = strlen(buffer);
-  if (buffer[bytes - 1] != '\n')
+  if (bytes >= (sizeof(buffer) - 1))
   {
-    buffer[bytes] = '\n';
-    bytes ++;
-    buffer[bytes] = '\0';
+    buffer[sizeof(buffer) - 2] = '\n';
+    bytes = sizeof(buffer) - 1;
+  }
+  else if (buffer[bytes - 1] != '\n')
+  {
+    buffer[bytes++] = '\n';
+    buffer[bytes]   = '\0';
   }
 
  /*
@@ -489,15 +505,74 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 void DLLExport
 _cups_debug_puts(const char *s)		/* I - String to output */
 {
-  char	format[4];			/* C%s */
+  struct timeval	curtime;	/* Current time */
+  char			buffer[2048];	/* Output buffer */
+  size_t		bytes;		/* Number of bytes in buffer */
+  int			level;		/* Log level in message */
 
 
-  format[0] = *s++;
-  format[1] = '%';
-  format[2] = 's';
-  format[3] = '\0';
+ /*
+  * See if we need to do any logging...
+  */
 
-  _cups_debug_printf(format, s);
+  if (!debug_init)
+    _cups_debug_set(getenv("CUPS_DEBUG_LOG"), getenv("CUPS_DEBUG_LEVEL"),
+                    getenv("CUPS_DEBUG_FILTER"), 0);
+
+  if (_cups_debug_fd < 0)
+    return;
+
+ /*
+  * Filter as needed...
+  */
+
+  if (isdigit(s[0]))
+    level = *s++ - '0';
+  else
+    level = 0;
+
+  if (level > _cups_debug_level)
+    return;
+
+  if (debug_filter)
+  {
+    int	result;				/* Filter result */
+
+    _cupsMutexLock(&debug_mutex);
+    result = regexec(debug_filter, s, 0, NULL, 0);
+    _cupsMutexUnlock(&debug_mutex);
+
+    if (result)
+      return;
+  }
+
+ /*
+  * Format the message...
+  */
+
+  gettimeofday(&curtime, NULL);
+  bytes = snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d.%03d %s",
+		   (int)((curtime.tv_sec / 3600) % 24),
+		   (int)((curtime.tv_sec / 60) % 60),
+		   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000),
+		   s);
+
+  if (bytes >= (sizeof(buffer) - 1))
+  {
+    buffer[sizeof(buffer) - 2] = '\n';
+    bytes = sizeof(buffer) - 1;
+  }
+  else if (buffer[bytes - 1] != '\n')
+  {
+    buffer[bytes++] = '\n';
+    buffer[bytes]   = '\0';
+  }
+
+ /*
+  * Write it out...
+  */
+
+  write(_cups_debug_fd, buffer, bytes);
 }
 
 

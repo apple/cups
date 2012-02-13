@@ -1,10 +1,55 @@
 CHANGES-1.5.txt
 ---------------
 
+CHANGES IN CUPS V1.5.3
+
+	- The USB backend now uses and requires LIBUSB 1.0 or later (STR #3477)
+	- The LIBUSB-based USB backend now supports the back-channel (STR #2890)
+	- Changed how timeouts are implemented in the LPD backend (STR #4013)
+	- The IPP backend no longer specifies the document-format for auto-
+	  detect unless required (STR #3986)
+	- Added more supported color names for SNMP supplies (STR #3981)
+	- The default InputSlot setting was never used (STR #3957)
+	- POSIX ACLs are now set properly on certificate files (STR #3970)
+	- Supplies with commas in their names were not reported correctly
+	  (STR #4020)
+	- The cupsGetPPD3() function created a temporary file when one was not
+	  needed (STR #4018)
+	- The scheduler now ensures that job notifications contain a value for
+	  the notify-printer-uri attribute (STR #4014)
+	- The lp and lpr commands did not cancel jobs queued from stdin on an
+	  error (STR #4015)
+	- Fixed the IPP backend's handling of HTTP/1.0 compatibility (STR #3988)
+	- The IPP backend did not always setup username/password authentication
+	  for printers (STR #3985)
+	- The IPP backend no longer re-queues print jobs that are too large for
+	  the printer/server (STR #3977)
+	- The RPM spec file did not work (STR #4021)
+	- Encryption did not work when the server name ended with "."
+	  (STR #4011)
+	- The multi-purpose tray is now mapped to the IPP "by-pass-tray"
+	  (STR #4009)
+	- The correct media size was not always passed to IPP printers
+	  (STR #4001)
+	- Finishing options were not passed to IPP printers (STR #3995)
+	- Fixed iCloud-based Back to My Mac printing (STR #3996)
+
+
+CHANGES IN CUPS V1.5.2
+
+	- Reposted what should have been CUPS 1.5.1.
+
+
 CHANGES IN CUPS V1.5.1
 
-	- Documentation updates (STR #3885, STR #3946, STR #3969)
-	- Build fixes (STR #3956)
+	- Documentation updates (STR #3885, STR #3886, STR #3946, STR #3969)
+	- Localization updates (STR #3840, STR #3989, STR #3997)
+	- Build fixes (STR #3956, STR #3999)
+	- The SNMP backend did not validate the device URIs reported by printers
+	  (STR #4004)
+	- cupsBackendReport() did not handle newlines in 1284 Device IDs
+	  (STR #4005)
+	- USB backend fixes for libusb (STR #3965, STR #3978)
 	- The DBUS notifier did not validate string parameters (STR #3984)
 	- Group quota ACLs did not work with Kerberos (STR #3972)
 	- The IPP backend did not retry when a printer responded with

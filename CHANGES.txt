@@ -1,8 +1,18 @@
-CHANGES.txt - 1.6b1 - 2012-01-13
+CHANGES.txt - 1.6b1 - 2012-01-30
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- The configure script and build system no longer support building of
+	  separate 32-bit and 64-bit libraries.
+	- The "brightness", "columns", "fitplot", "gamma", "hue",
+	  "natural-scaling", "penwidth", "position", "ppi", "saturation", and
+	  "scaling" options are not longer supported (STR #4010)
+	- The "page-bottom", "page-left", "page-right", "page-top",
+	  "prettyprint", and "wrap" options have been deprecated (STR #4010)
+	- The scheduler now reports the standard "number-of-documents" attribute
+	  instead of the CUPS-specific "document-count" attribute in
+	  job objects.
 	- Added new destination connection and enumeration functions (STR #3924)
 	- Added new option, localization, and job submission functions that do
 	  not depend on PPD files (STR #3925)

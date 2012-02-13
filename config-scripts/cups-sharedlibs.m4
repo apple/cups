@@ -3,7 +3,7 @@ dnl "$Id: cups-sharedlibs.m4 7630 2008-06-09 22:31:44Z mike $"
 dnl
 dnl   Shared library support for CUPS.
 dnl
-dnl   Copyright 2007-2010 by Apple Inc.
+dnl   Copyright 2007-2012 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -133,16 +133,9 @@ else
 	DSOXX=":"
 fi
 
-# 32-bit and 64-bit libraries need variations of the standard
-# DSOFLAGS...
-DSO32FLAGS="$DSOFLAGS"
-DSO64FLAGS="$DSOFLAGS"
-
 AC_SUBST(DSO)
 AC_SUBST(DSOXX)
 AC_SUBST(DSOFLAGS)
-AC_SUBST(DSO32FLAGS)
-AC_SUBST(DSO64FLAGS)
 AC_SUBST(LIBCUPS)
 AC_SUBST(LIBCUPSBASE)
 AC_SUBST(LIBCUPSCGI)
@@ -198,13 +191,9 @@ if test "$DSO" != ":"; then
 			case "$uarch" in
 				ia64)
 					DSOFLAGS="-Wl,+s,+b,$libdir $DSOFLAGS"
-					DSO32FLAGS="-Wl,+s,+b,$LIB32DIR $DSO32FLAGS"
-					DSO64FLAGS="-Wl,+s,+b,$LIB64DIR $DSO64FLAGS"
 					;;
 				*)
                 			DSOFLAGS="+s +b $libdir $DSOFLAGS"
-                			DSO32FLAGS="+s +b $LIB32DIR $DSO32FLAGS"
-                			DSO64FLAGS="+s +b $LIB64DIR $DSO64FLAGS"
 					;;
 			esac
                 	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
@@ -214,8 +203,6 @@ if test "$DSO" != ":"; then
                 	# Solaris...
 			if test $exec_prefix != /usr; then
 				DSOFLAGS="-R$libdir $DSOFLAGS"
-				DSO32FLAGS="-R$LIB32DIR $DSO32FLAGS"
-				DSO64FLAGS="-R$LIB64DIR $DSO64FLAGS"
 				LDFLAGS="$LDFLAGS -R$libdir"
 				EXPORT_LDFLAGS="-R$libdir"
 			fi
@@ -224,8 +211,6 @@ if test "$DSO" != ":"; then
                         # *BSD...
 			if test $exec_prefix != /usr; then
 				DSOFLAGS="-Wl,-R$libdir $DSOFLAGS"
-				DSO32FLAGS="-Wl,-R$LIB32DIR $DSO32FLAGS"
-				DSO64FLAGS="-Wl,-R$LIB64DIR $DSO64FLAGS"
 				LDFLAGS="$LDFLAGS -Wl,-R$libdir"
 				EXPORT_LDFLAGS="-Wl,-R$libdir"
 			fi
@@ -234,8 +219,6 @@ if test "$DSO" != ":"; then
                         # IRIX, Linux, and HURD...
 			if test $exec_prefix != /usr; then
 				DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
-				DSO32FLAGS="-Wl,-rpath,$LIB32DIR $DSO32FLAGS"
-				DSO64FLAGS="-Wl,-rpath,$LIB64DIR $DSO64FLAGS"
 				LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
 				EXPORT_LDFLAGS="-Wl,-rpath,$libdir"
 			fi

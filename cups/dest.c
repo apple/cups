@@ -570,7 +570,7 @@ cupsConnectDest(
 		tempresource[1024];	/* Temporary resource buffer */
   int		port;			/* Port number */
   char		portstr[16];		/* Port number string */
-  http_encryption_t encrypt;		/* Encryption to use */
+  http_encryption_t encryption;		/* Encryption to use */
   http_addrlist_t *addrlist;		/* Address list for server */
   http_t	*http;			/* Connection to server */
 
@@ -667,11 +667,11 @@ cupsConnectDest(
   */
 
   if (!strcmp(scheme, "ipps") || port == 443)
-    encrypt = HTTP_ENCRYPT_ALWAYS;
+    encryption = HTTP_ENCRYPT_ALWAYS;
   else
-    encrypt = HTTP_ENCRYPT_IF_REQUESTED;
+    encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-  http = _httpCreate(hostname, port, addrlist, encrypt, AF_UNSPEC);
+  http = _httpCreate(hostname, port, addrlist, encryption, AF_UNSPEC);
 
  /*
   * Connect if requested...
@@ -905,22 +905,26 @@ cupsEnumDests(
 
   ipp_ref = data.main_ref;
   DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipp._tcp,_cups", NULL, cups_dnssd_browse_cb, &data);
+                   "_ipp._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipp_ref = data.main_ref;
   DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipp._tcp,_cups", NULL, cups_dnssd_local_cb, &data);
+                   "_ipp._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 
 #  ifdef HAVE_SSL
   ipps_ref = data.main_ref;
   DNSServiceBrowse(&ipps_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipps._tcp,_cups", NULL, cups_dnssd_browse_cb, &data);
+                   "_ipps._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipps_ref = data.main_ref;
   DNSServiceBrowse(&local_ipps_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipps._tcp,_cups", NULL, cups_dnssd_local_cb, &data);
+                   "_ipps._tcp,_cups", NULL,
+                   (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 #  endif /* HAVE_SSL */
 
   if (msec < 0)
@@ -973,7 +977,8 @@ cupsEnumDests(
 				  kDNSServiceFlagsShareConnection,
 				  0, device->fullName,
 				  kDNSServiceType_TXT,
-				  kDNSServiceClass_IN, cups_dnssd_query_cb,
+				  kDNSServiceClass_IN,
+				  (DNSServiceQueryRecordReply)cups_dnssd_query_cb,
 				  &data) == kDNSServiceErr_NoError)
 	{
 	  count ++;

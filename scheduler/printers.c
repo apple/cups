@@ -3,7 +3,7 @@
  *
  *   Printer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1915,7 +1915,9 @@ cupsdSetPrinterAttr(
   ipp_attribute_t	*attr;		/* Attribute */
   int			i,		/* Looping var */
 			count;		/* Number of values */
-  char			*ptr;		/* Pointer into value */
+  char			*ptr,		/* Pointer into value */
+			*start,		/* Start of value */
+			quote;		/* Quote character */
   ipp_tag_t		value_tag;	/* Value tag for this attribute */
 
 
@@ -1933,9 +1935,21 @@ cupsdSetPrinterAttr(
   * Count the number of values...
   */
 
-  for (count = 1, ptr = value;
-       (ptr = strchr(ptr, ',')) != NULL;
-       ptr ++, count ++);
+  for (count = 1, quote = '\0', ptr = value;
+       *ptr;
+       ptr ++)
+  {
+    if (*ptr == quote)
+      quote = '\0';
+    else if (quote)
+      continue;
+    else if (*ptr == '\\' && ptr[1])
+      ptr ++;
+    else if (*ptr == '\'' || *ptr == '\"')
+      quote = *ptr;
+    else if (*ptr == '.')
+      count ++;
+  }
 
  /*
   * Then add or update the attribute as needed...
@@ -2019,15 +2033,33 @@ cupsdSetPrinterAttr(
       return;
     }
 
-    for (i = 0; i < count; i ++)
+    for (i = 0, quote = '\0', ptr = value; i < count; i ++)
     {
-      if ((ptr = strchr(value, ',')) != NULL)
-        *ptr++ = '\0';
+      for (start = ptr; *ptr; ptr ++)
+      {
+	if (*ptr == quote)
+	  *ptr = quote = '\0';
+	else if (quote)
+	  continue;
+	else if (*ptr == '\\' && ptr[1])
+	  _cups_strcpy(ptr, ptr + 1);
+	else if (*ptr == '\'' || *ptr == '\"')
+	{
+	  quote = *ptr;
 
-      attr->values[i].string.text = _cupsStrAlloc(value);
+	  if (ptr == start)
+	    start ++;
+	  else
+	    _cups_strcpy(ptr, ptr + 1);
+	}
+	else if (*ptr == '.')
+	{
+	  *ptr++ = '\0';
+	  break;
+	}
+      }
 
-      if (ptr)
-        value = ptr;
+      attr->values[i].string.text = _cupsStrAlloc(start);
     }
   }
 }
@@ -2591,6 +2623,7 @@ cupsdSetPrinterState(
     ipp_pstate_t    s,			/* I - New state */
     int             update)		/* I - Update printers.conf? */
 {
+  cupsd_job_t	*job;			/* Current job */
   ipp_pstate_t	old_state;		/* Old printer state */
   static const char * const printer_states[] =
   {					/* State strings */
@@ -2634,6 +2667,17 @@ cupsdSetPrinterState(
     cupsdSetPrinterReasons(p, "+paused");
   else
     cupsdSetPrinterReasons(p, "-paused");
+
+  if (old_state != s)
+  {
+    for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	 job;
+	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+      if (job->reasons && job->state_value == IPP_JOB_PENDING &&
+	  !_cups_strcasecmp(job->dest, p->name))
+	ippSetString(job->attrs, &job->reasons, 0,
+		     s == IPP_PRINTER_STOPPED ? "printer-stopped" : "none");
+  }
 
  /*
   * Clear the message for the queue when going to processing...

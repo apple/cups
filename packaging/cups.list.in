@@ -3,7 +3,7 @@
 #
 #   ESP Package Manager (EPM) file list for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2011 by Apple Inc.
+%copyright 2007-2012 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -405,42 +405,6 @@ f 0555 root sys $LIBDIR/libcupsmime.so.1 scheduler/libcupsmime.so.1 nostrip()
 l 0755 root sys $LIBDIR/libcupsmime.so libcupsmime.so.1
 f 0555 root sys $LIBDIR/libcupsppdc.so.1 ppdc/libcupsppdc.so.1 nostrip()
 l 0755 root sys $LIBDIR/libcupsppdc.so libcupsppdc.so.1
-%system all
-%subpackage
-%endif
-
-%if LIB32DIR
-%subpackage libs
-f 0555 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2 nostrip()
-l 0755 root sys $LIB32DIR/libcups.so libcups.so.2
-f 0555 root sys $LIB32DIR/libcupscgi.so.1 cgi-bin/libcupscgi.32.so.1 nostrip()
-l 0755 root sys $LIB32DIR/libcupscgi.so libcupscgi.so.1
-f 0555 root sys $LIB32DIR/libcupsdriver.so.1 driver/libcupsdriver.32.so.1 nostrip()
-l 0755 root sys $LIB32DIR/libcupsdriver.so libcupsdriver.so.1
-f 0555 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2 nostrip()
-l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
-f 0555 root sys $LIB32DIR/libcupsmime.so.1 scheduler/libcupsmime.32.so.1 nostrip()
-l 0755 root sys $LIB32DIR/libcupsmime.so libcupsmime.so.1
-f 0555 root sys $LIB32DIR/libcupsppdc.so.1 ppdc/libcupsppdc.32.so.1 nostrip()
-l 0755 root sys $LIB32DIR/libcupsppdc.so libcupsppdc.so.1
-%system all
-%subpackage
-%endif
-
-%if LIB64DIR
-%subpackage libs
-f 0555 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2 nostrip()
-l 0755 root sys $LIB64DIR/libcups.so libcups.so.2
-f 0555 root sys $LIB64DIR/libcupscgi.so.1 cgi-bin/libcupscgi.64.so.1 nostrip()
-l 0755 root sys $LIB64DIR/libcupscgi.so libcupscgi.so.1
-f 0555 root sys $LIB64DIR/libcupsdriver.so.1 driver/libcupsdriver.64.so.1 nostrip()
-l 0755 root sys $LIB64DIR/libcupsdriver.so libcupsdriver.so.1
-f 0555 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2 nostrip()
-l 0755 root sys $LIB64DIR/libcupsimage.so libcupsimage.so.2
-f 0555 root sys $LIB64DIR/libcupsmime.so.1 scheduler/libcupsmime.64.so.1 nostrip()
-l 0755 root sys $LIB64DIR/libcupsmime.so libcupsmime.so.1
-f 0555 root sys $LIB64DIR/libcupsppdc.so.1 ppdc/libcupsppdc.64.so.1 nostrip()
-l 0755 root sys $LIB64DIR/libcupsppdc.so libcupsppdc.so.1
 %system all
 %subpackage
 %endif

@@ -4,7 +4,7 @@
 #
 #   Make an ipptool package for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -64,6 +64,7 @@ cp test/ipp-[12].*.test $pkgdir
 cp test/ipptool-static $pkgdir/ipptool
 cp test/onepage-*.pdf $pkgdir
 cp test/onepage-*.ps $pkgdir
+cp test/print-job.test $pkgdir
 cp test/testfile.* $pkgdir
 
 if test `uname` = Darwin; then
@@ -71,7 +72,6 @@ if test `uname` = Darwin; then
 	echo Creating disk image $pkgfile...
 	test -f $pkgfile && rm $pkgfile
 	hdiutil create -srcfolder $pkgdir $pkgfile
-	#sudo chown `whoami` $pkgfile
 else
 	pkgfile="$pkgdir-$uname-`uname -m`.tar.gz"
 	echo Creating archive $pkgfile...

@@ -98,6 +98,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
 {
   "copies-supported",
   "cups-version",
+  "document-format-default",
   "document-format-supported",
   "marker-colors",
   "marker-high-levels",
@@ -229,6 +230,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *job_state;		/* job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
+  ipp_attribute_t *format_dflt;		/* document-format-default */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *operations_sup;	/* operations-supported */
@@ -898,9 +900,13 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
       {
-	if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		     "Negotiate", 9))
+        const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+        				/* WWW-Authenticate field value */
+
+	if (!strncmp(www_auth, "Negotiate", 9))
 	  auth_info_required = "negotiate";
+        else if (www_auth[0])
+          auth_info_required = "username,password";
 
 	fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 	return (CUPS_BACKEND_AUTH_REQUIRED);
@@ -990,6 +996,16 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
     cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
+
+    if ((format_dflt = ippFindAttribute(supported, "document-format-default",
+					IPP_TAG_MIMETYPE)) != NULL)
+    {
+      fprintf(stderr, "DEBUG: document-format-default (%d values)\n",
+	      format_dflt->num_values);
+      for (i = 0; i < format_dflt->num_values; i ++)
+	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
+	        format_dflt->values[i].string.text);
+    }
 
     if ((format_sup = ippFindAttribute(supported, "document-format-supported",
 	                               IPP_TAG_MIMETYPE)) != NULL)
@@ -1168,17 +1184,21 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type,
+                            format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
       }
 
-    if (!document_format)
+    if (!document_format &&
+        (!format_dflt ||
+         _cups_strcasecmp(format_dflt->values[0].string.text,
+                          "application/octet-stream")))
     {
       for (i = 0; i < format_sup->num_values; i ++)
 	if (!_cups_strcasecmp("application/octet-stream",
-	                format_sup->values[i].string.text))
+			      format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
 	  break;
@@ -1203,8 +1223,17 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
 
-    compatsize = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
-		                backendNetworkSideCB);
+    if ((compatsize = write(fd, buffer, bytes)) < 0)
+    {
+      perror("DEBUG: Unable to write temporary file");
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    if ((bytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
+		                backendNetworkSideCB)) < 0)
+      return (CUPS_BACKEND_FAILED);
+
+    compatsize += bytes;
 
     close(fd);
 
@@ -1277,23 +1306,13 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
 	     ipp_status == IPP_AUTHENTICATION_CANCELED)
     {
-     /*
-      * Update auth-info-required as needed...
-      */
+      const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+					/* WWW-Authenticate field value */
 
-      fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
-	      httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
-
-     /*
-      * Normal authentication goes through the password callback, which sets
-      * auth_info_required to "username,password".  Kerberos goes directly
-      * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
-      * here and set auth_info_required as needed...
-      */
-
-      if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		   "Negotiate", 9))
+      if (!strncmp(www_auth, "Negotiate", 9))
 	auth_info_required = "negotiate";
+      else if (www_auth[0])
+	auth_info_required = "username,password";
 
       goto cleanup;
     }
@@ -1455,19 +1474,21 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
 	{
-	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
-		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
-
-         /*
-	  * Normal authentication goes through the password callback, which sets
-	  * auth_info_required to "username,password".  Kerberos goes directly
-	  * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
-	  * here and set auth_info_required as needed...
+	  const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
+					/* WWW-Authenticate field value */
+  
+	  if (!strncmp(www_auth, "Negotiate", 9))
+	    auth_info_required = "negotiate";
+	  else if (www_auth[0])
+	    auth_info_required = "username,password";
+	}
+	else if (ipp_status == IPP_REQUEST_VALUE)
+	{
+	 /*
+	  * Print file is too large, abort this job...
 	  */
 
-	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-		       "Negotiate", 9))
-	    auth_info_required = "negotiate";
+	  goto cleanup;
 	}
 	else
 	  sleep(10);
@@ -1609,6 +1630,14 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
+    else if (ipp_status == IPP_REQUEST_VALUE)
+    {
+     /*
+      * Print file is too large, abort this job...
+      */
+
+      goto cleanup;
+    }
     else
       copies_remaining --;
 
@@ -1683,9 +1712,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    ipp_status != IPP_PRINTER_BUSY)
 	{
 	  ippDelete(response);
-
-          _cupsLangPrintFilter(stderr, "ERROR",
-			       _("Unable to get print job status."));
+          ipp_status = IPP_OK;
           break;
 	}
       }
@@ -1832,6 +1859,11 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_DOCUMENT_FORMAT ||
            ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
+  else if (ipp_status == IPP_REQUEST_VALUE)
+  {
+    _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    return (CUPS_BACKEND_CANCEL);
+  }
   else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
@@ -2106,7 +2138,7 @@ monitor_printer(
 	else
 	  monitor->job_state = IPP_JOB_COMPLETED;
       }
-      else
+      else if (response)
       {
         for (attr = response->attrs; attr; attr = attr->next)
         {
@@ -2545,17 +2577,23 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
+          *valptr++ = '\'';
           *valptr++ = '\"';
 	  for (attrptr = attr->values[i].string.text;
 	       *attrptr && valptr < (value + sizeof(value) - 10);
 	       attrptr ++)
 	  {
-	    if (*attrptr == '\\' || *attrptr == '\"')
+	    if (*attrptr == '\\' || *attrptr == '\"' || *attrptr == '\'')
+	    {
 	      *valptr++ = '\\';
+	      *valptr++ = '\\';
+	      *valptr++ = '\\';
+	    }
 
 	    *valptr++ = *attrptr;
 	  }
           *valptr++ = '\"';
+          *valptr++ = '\'';
           break;
 
       default :

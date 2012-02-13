@@ -3,7 +3,7 @@
  *
  *   Job management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -572,12 +572,13 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     if (!filters)
     {
       cupsdLogJob(job, CUPSD_LOG_ERROR,
-		  "Unable to convert file %d to printable format!",
+		  "Unable to convert file %d to printable format.",
 		  job->current_file);
 
       abort_message = "Aborting job because it cannot be printed.";
       abort_state   = IPP_JOB_ABORTED;
 
+      ippSetString(job->attrs, &job->reasons, 0, "document-unprintable-error");
       goto abort_job;
     }
 
@@ -726,11 +727,13 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   if (cupsArrayCount(filters) > MAX_FILTERS)
   {
     cupsdLogJob(job, CUPSD_LOG_DEBUG,
-		"Too many filters (%d > %d), unable to print!",
+		"Too many filters (%d > %d), unable to print.",
 		cupsArrayCount(filters), MAX_FILTERS);
 
     abort_message = "Aborting job because it needs too many filters to print.";
     abort_state   = IPP_JOB_ABORTED;
+
+    ippSetString(job->attrs, &job->reasons, 0, "document-unprintable-error");
 
     goto abort_job;
   }
@@ -745,7 +748,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     if ((job->job_sheets =
          ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_ZERO)) != NULL)
       cupsdLogJob(job, CUPSD_LOG_DEBUG,
-		  "... but someone added one without setting job_sheets!");
+		  "... but someone added one without setting job_sheets.");
   }
   else if (job->job_sheets->num_values == 1)
     cupsdLogJob(job, CUPSD_LOG_DEBUG, "job-sheets=%s",
@@ -1579,7 +1582,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   if ((job->attrs = ippNew()) == NULL)
   {
-    cupsdLogJob(job, CUPSD_LOG_ERROR, "Ran out of memory for job attributes!");
+    cupsdLogJob(job, CUPSD_LOG_ERROR, "Ran out of memory for job attributes.");
     return (0);
   }
 
@@ -1626,7 +1629,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Missing or bad time-at-creation attribute in "
-		    "control file!", job->id);
+		    "control file.", job->id);
     goto error;
   }
 
@@ -1635,7 +1638,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Missing or bad job-state attribute in control "
-		    "file!", job->id);
+		    "file.", job->id);
     goto error;
   }
 
@@ -1647,7 +1650,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
                                  IPP_TAG_URI)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] No job-printer-uri attribute in control file!",
+		      "[Job %d] No job-printer-uri attribute in control file.",
 		      job->id);
       goto error;
     }
@@ -1656,7 +1659,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
                                   &destptr)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] Unable to queue job for destination \"%s\"!",
+		      "[Job %d] Unable to queue job for destination \"%s\".",
 		      job->id, attr->values[0].string.text);
       goto error;
     }
@@ -1666,9 +1669,71 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   else if ((destptr = cupsdFindDest(job->dest)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to queue job for destination \"%s\"!",
+		    "[Job %d] Unable to queue job for destination \"%s\".",
 		    job->id, job->dest);
     goto error;
+  }
+
+  if ((job->reasons = ippFindAttribute(job->attrs, "job-state-reasons",
+                                       IPP_TAG_KEYWORD)) == NULL)
+  {
+    const char	*reason;		/* job-state-reason keyword */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "[Job %d] Adding missing job-state-reasons attribute to "
+		    " control file.", job->id);
+
+    switch (job->state_value)
+    {
+      case IPP_JOB_PENDING :
+          if (destptr->state == IPP_PRINTER_STOPPED)
+            reason = "printer-stopped";
+          else
+            reason = "none";
+          break;
+
+      case IPP_JOB_HELD :
+          if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+                                       IPP_TAG_ZERO)) != NULL &&
+              (attr->value_tag == IPP_TAG_NAME ||
+	       attr->value_tag == IPP_TAG_NAMELANG ||
+	       attr->value_tag == IPP_TAG_KEYWORD) &&
+	      strcmp(attr->values[0].string.text, "no-hold"))
+	    reason = "job-hold-until-specified";
+	  else
+	    reason = "job-incoming";
+          break;
+
+      case IPP_JOB_PROCESSING :
+          reason = "job-printing";
+          break;
+
+      case IPP_JOB_STOPPED :
+          reason = "job-stopped";
+          break;
+
+      case IPP_JOB_CANCELED :
+          reason = "job-canceled-by-user";
+          break;
+
+      case IPP_JOB_ABORTED :
+          reason = "aborted-by-system";
+          break;
+
+      case IPP_JOB_COMPLETED :
+          reason = "job-completed-successfully";
+          break;
+    }
+
+    job->reasons = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+                                "job-state-reasons", NULL, reason);
+  }
+  else if (job->state_value == IPP_JOB_PENDING)
+  {
+    if (destptr->state == IPP_PRINTER_STOPPED)
+      ippSetString(job->attrs, &job->reasons, 0, "printer-stopped");
+    else
+      ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
   job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
@@ -1682,7 +1747,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] Missing or bad job-priority attribute in "
-		      "control file!", job->id);
+		      "control file.", job->id);
       goto error;
     }
 
@@ -1696,7 +1761,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] Missing or bad job-originating-user-name "
-		      "attribute in control file!", job->id);
+		      "attribute in control file.", job->id);
       goto error;
     }
 
@@ -1764,7 +1829,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
         if (!compressions || !filetypes)
 	{
           cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "[Job %d] Ran out of memory for job file types!",
+	                  "[Job %d] Ran out of memory for job file types.",
 			  job->id);
 
 	  ippDelete(job->attrs);
@@ -2415,6 +2480,7 @@ cupsdSetJobState(
     case IPP_JOB_CANCELED :
     case IPP_JOB_COMPLETED :
 	set_time(job, "time-at-completed");
+	ippSetString(job->attrs, &job->reasons, 0, "processing-to-stop-point");
         break;
   }
 
@@ -2913,14 +2979,21 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
     case IPP_JOB_COMPLETED :
 	job_state = IPP_JOB_COMPLETED;
 	message   = "Job completed.";
+
+	ippSetString(job->attrs, &job->reasons, 0,
+	             "job-completed-successfully");
         break;
 
     case IPP_JOB_STOPPED :
         message = "Job stopped.";
+
+	ippSetString(job->attrs, &job->reasons, 0, "job-stopped");
 	break;
 
     case IPP_JOB_CANCELED :
         message = "Job canceled.";
+
+	ippSetString(job->attrs, &job->reasons, 0, "job-canceled-by-user");
 	break;
 
     case IPP_JOB_ABORTED :
@@ -2946,7 +3019,10 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
     if (WIFEXITED(exit_code))
       exit_code = WEXITSTATUS(exit_code);
     else
+    {
+      ippSetString(job->attrs, &job->reasons, 0, "cups-backend-crashed");
       exit_code = job->status;
+    }
 
     cupsdLogJob(job, CUPSD_LOG_INFO, "Backend returned status %d (%s)",
 		exit_code,
@@ -2982,6 +3058,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    {
 	      job_state = IPP_JOB_PENDING;
 	      message   = "Retrying job on another printer.";
+
+	      ippSetString(job->attrs, &job->reasons, 0,
+	                   "resources-are-not-ready");
 	    }
           }
 	  else if (!strcmp(job->printer->error_policy, "retry-current-job"))
@@ -2995,6 +3074,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    {
 	      job_state = IPP_JOB_PENDING;
 	      message   = "Retrying job on same printer.";
+
+	      ippSetString(job->attrs, &job->reasons, 0, "none");
 	    }
           }
 	  else if ((job->printer->type & CUPS_PRINTER_FAX) ||
@@ -3021,6 +3102,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 			 JobRetryLimit);
 		job_state = IPP_JOB_ABORTED;
 		message   = buffer;
+
+		ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	      }
 	      else
 	      {
@@ -3035,6 +3118,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		job->hold_until = time(NULL) + JobRetryInterval;
 		job_state       = IPP_JOB_HELD;
 		message         = buffer;
+
+		ippSetString(job->attrs, &job->reasons, 0,
+		             "resources-are-not-ready");
 	      }
             }
 	  }
@@ -3044,6 +3130,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    job_state = IPP_JOB_ABORTED;
 	    message   = "Job aborted due to backend errors; please consult "
 	                "the error_log file for details.";
+
+	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	  }
 	  else if (job->state_value == IPP_JOB_PROCESSING)
           {
@@ -3051,6 +3139,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    printer_state = IPP_PRINTER_STOPPED;
 	    message       = "Printer stopped due to backend errors; please "
 			    "consult the error_log file for details.";
+
+	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
           break;
 
@@ -3064,6 +3154,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    job_state = IPP_JOB_ABORTED;
 	    message   = "Job aborted due to backend errors; please consult "
 			"the error_log file for details.";
+
+	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	  }
           break;
 
@@ -3075,6 +3167,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    */
 
 	    cupsdSetJobHoldUntil(job, "indefinite", 1);
+	    ippSetString(job->attrs, &job->reasons, 0,
+	                 "job-hold-until-specified");
 
 	    job_state = IPP_JOB_HELD;
 	    message   = "Job held indefinitely due to backend errors; please "
@@ -3092,7 +3186,12 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 			  "consult the error_log file for details.";
 
 	  if (job_state == IPP_JOB_COMPLETED)
+	  {
 	    job_state = IPP_JOB_PENDING;
+
+	    ippSetString(job->attrs, &job->reasons, 0,
+	                 "resources-are-not-ready");
+	  }
           break;
 
       case CUPS_BACKEND_AUTH_REQUIRED :
@@ -3106,6 +3205,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	    job_state = IPP_JOB_HELD;
 	    message   = "Job held for authentication.";
+
+	    ippSetString(job->attrs, &job->reasons, 0,
+	                 "cups-held-for-authentication");
           }
           break;
 
@@ -3130,6 +3232,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		       JobRetryLimit);
 	      job_state = IPP_JOB_ABORTED;
 	      message   = buffer;
+
+	      ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
 	    }
 	    else
 	    {
@@ -3144,6 +3248,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	      job->hold_until = time(NULL) + JobRetryInterval;
 	      job_state       = IPP_JOB_HELD;
 	      message         = buffer;
+
+	      ippSetString(job->attrs, &job->reasons, 0,
+	                   "resources-are-not-ready");
 	    }
 	  }
           break;
@@ -3157,6 +3264,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	  {
 	    job_state = IPP_JOB_PENDING;
 	    message   = "Retrying job on same printer.";
+
+	    ippSetString(job->attrs, &job->reasons, 0, "none");
 	  }
           break;
     }
@@ -3172,6 +3281,11 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
       job_state = IPP_JOB_STOPPED;
       message   = "Job stopped due to filter errors; please consult the "
 		  "error_log file for details.";
+
+      if (WIFSIGNALED(job->status))
+	ippSetString(job->attrs, &job->reasons, 0, "cups-filter-crashed");
+      else
+	ippSetString(job->attrs, &job->reasons, 0, "job-completed-with-errors");
     }
   }
 
@@ -3332,9 +3446,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
       if ((ppd = _ppdCacheGetInputSlot(pc, job->attrs, NULL)) != NULL)
 	num_pwgppds = cupsAddOption(pc->source_option, ppd, num_pwgppds,
 				    &pwgppds);
-      else if (!ippFindAttribute(job->attrs, "AP_D_InputSlot", IPP_TAG_ZERO))
-	num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds,
-	                            &pwgppds);
     }
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
 	(ppd = _ppdCacheGetMediaType(pc, job->attrs, NULL)) != NULL)
@@ -3418,7 +3529,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
     if (!optptr)
     {
       cupsdLogJob(job, CUPSD_LOG_CRIT,
-		  "Unable to allocate " CUPS_LLFMT " bytes for option buffer!",
+		  "Unable to allocate " CUPS_LLFMT " bytes for option buffer.",
 		  CUPS_LLCAST newlength);
       return (NULL);
     }
@@ -3767,14 +3878,14 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       if (job)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d!",
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d.",
 	                linenum);
         continue;
       }
 
       if (!value)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d!", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d.", linenum);
 	continue;
       }
 
@@ -3782,7 +3893,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (jobid < 1)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d!", jobid,
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d.", jobid,
 	                linenum);
         continue;
       }
@@ -3793,7 +3904,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	snprintf(jobfile, sizeof(jobfile), "%s/c%05d.N", RequestRoot, jobid);
 	if (access(jobfile, 0))
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away!",
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away.",
 			  jobid);
 	  continue;
 	}
@@ -3803,7 +3914,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       if (!job)
       {
         cupsdLogMessage(CUPSD_LOG_EMERG,
-		        "[Job %d] Unable to allocate memory for job!", jobid);
+		        "[Job %d] Unable to allocate memory for job.", jobid);
         break;
       }
 
@@ -3823,7 +3934,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else if (!job)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "Missing <Job #> directive on line %d!", linenum);
+	              "Missing <Job #> directive on line %d.", linenum);
       continue;
     }
     else if (!_cups_strcasecmp(line, "</Job>"))
@@ -3837,7 +3948,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     }
     else if (!value)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d!", linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
       continue;
     }
     else if (!_cups_strcasecmp(line, "State"))
@@ -3875,7 +3986,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (job->num_files < 0)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d!",
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d.",
 	                job->num_files, linenum);
         job->num_files = 0;
 	continue;
@@ -3887,7 +3998,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	         job->id);
         if (access(jobfile, 0))
 	{
-	  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Data files have gone away!",
+	  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Data files have gone away.",
 	                  job->id);
           job->num_files = 0;
 	  continue;
@@ -3899,7 +4010,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
         if (!job->filetypes || !job->compressions)
 	{
 	  cupsdLogMessage(CUPSD_LOG_EMERG,
-		          "[Job %d] Unable to allocate memory for %d files!",
+		          "[Job %d] Unable to allocate memory for %d files.",
 		          job->id, job->num_files);
           break;
 	}
@@ -3916,13 +4027,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       if (sscanf(value, "%d%*[ \t]%15[^/]/%255s%d", &number, super, type,
                  &compression) != 4)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d!", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d.", linenum);
 	continue;
       }
 
       if (number < 1 || number > job->num_files)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d!",
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d.",
 	                number, linenum);
         continue;
       }
@@ -3939,7 +4050,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	*/
 
         cupsdLogMessage(CUPSD_LOG_ERROR,
-		        "[Job %d] Unknown MIME type %s/%s for file %d!",
+		        "[Job %d] Unknown MIME type %s/%s for file %d.",
 		        job->id, super, type, number + 1);
 
         snprintf(jobfile, sizeof(jobfile), "%s/d%05d-%03d", RequestRoot,
@@ -3957,7 +4068,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       }
     }
     else
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d.",
                       line, linenum);
   }
 
@@ -4057,7 +4168,7 @@ load_request_root(void)
 
       if ((job = calloc(sizeof(cupsd_job_t), 1)) == NULL)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Ran out of memory for jobs!");
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Ran out of memory for jobs.");
 	cupsDirClose(dir);
 	return;
       }
@@ -4138,6 +4249,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->num_files == 0)
   {
+    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
     cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_DEFAULT,
                      "Aborting job because it has no files.");
     return;
@@ -4153,6 +4265,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   if (job->printer_message)
     cupsdSetString(&(job->printer_message->values[0].string.text), "");
 
+  ippSetString(job->attrs, &job->reasons, 0, "job-printing");
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
   cupsdSetPrinterReasons(printer, "-cups-remote-pending,"
@@ -4337,6 +4450,7 @@ unload_job(cupsd_job_t *job)		/* I - Job */
 
   job->attrs           = NULL;
   job->state           = NULL;
+  job->reasons         = NULL;
   job->sheets          = NULL;
   job->job_sheets      = NULL;
   job->printer_message = NULL;

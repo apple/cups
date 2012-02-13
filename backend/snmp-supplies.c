@@ -3,7 +3,7 @@
  *
  *   SNMP supplies functions for CUPS.
  *
- *   Copyright 2008-2011 by Apple Inc.
+ *   Copyright 2008-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -408,7 +408,7 @@ backend_init_supplies(
 		cachefilename[1024],	/* Cache filename */
 		description[CUPS_SNMP_MAX_STRING],
 					/* Device description string */
-		value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 2 + 3)],
+		value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 4 + 3)],
 					/* Value string */
 		*ptr,			/* Pointer into value string */
 		*name_ptr;		/* Pointer into name string */
@@ -659,7 +659,8 @@ backend_init_supplies(
   fprintf(stderr, "ATTR: marker-colors=%s\n", value);
 
  /*
-  * Output the marker-names attribute...
+  * Output the marker-names attribute (the double quoting is necessary to deal
+  * with embedded quotes and commas in the marker names...)
   */
 
   for (i = 0, ptr = value; i < num_supplies; i ++)
@@ -667,15 +668,21 @@ backend_init_supplies(
     if (i)
       *ptr++ = ',';
 
+    *ptr++ = '\'';
     *ptr++ = '\"';
     for (name_ptr = supplies[i].name; *name_ptr;)
     {
-      if (*name_ptr == '\\' || *name_ptr == '\"')
+      if (*name_ptr == '\\' || *name_ptr == '\"' || *name_ptr == '\'')
+      {
         *ptr++ = '\\';
+        *ptr++ = '\\';
+        *ptr++ = '\\';
+      }
 
       *ptr++ = *name_ptr++;
     }
     *ptr++ = '\"';
+    *ptr++ = '\'';
   }
 
   *ptr = '\0';
@@ -712,16 +719,33 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
                 void        *data)	/* I - User data (unused) */
 {
   int	i, j, k;			/* Looping vars */
-  static const char * const colors[8][2] =
+  static const char * const colors[][2] =
   {					/* Standard color names */
-    { "black",   "#000000" },
-    { "blue",    "#0000FF" },
-    { "cyan",    "#00FFFF" },
-    { "green",   "#00FF00" },
-    { "magenta", "#FF00FF" },
-    { "red",     "#FF0000" },
-    { "white",   "#FFFFFF" },
-    { "yellow",  "#FFFF00" }
+    { "black",         "#000000" },
+    { "blue",          "#0000FF" },
+    { "brown",         "#A52A2A" },
+    { "cyan",          "#00FFFF" },
+    { "dark-gray",     "#404040" },
+    { "dark gray",     "#404040" },
+    { "dark-yellow",   "#FFCC00" },
+    { "dark yellow",   "#FFCC00" },
+    { "gold",          "#FFD700" },
+    { "gray",          "#808080" },
+    { "green",         "#00FF00" },
+    { "light-black",   "#606060" },
+    { "light black",   "#606060" },
+    { "light-cyan",    "#E0FFFF" },
+    { "light cyan",    "#E0FFFF" },
+    { "light-gray",    "#D3D3D3" },
+    { "light gray",    "#D3D3D3" },
+    { "light-magenta", "#FF77FF" },
+    { "light magenta", "#FF77FF" },
+    { "magenta",       "#FF00FF" },
+    { "orange",        "#FFA500" },
+    { "red",           "#FF0000" },
+    { "silver",        "#C0C0C0" },
+    { "white",         "#FFFFFF" },
+    { "yellow",        "#FFFF00" }
   };
 
 
@@ -743,7 +767,8 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       if (supplies[j].colorant == i)
       {
 	for (k = 0; k < (int)(sizeof(colors) / sizeof(colors[0])); k ++)
-	  if (!strcmp(colors[k][0], (char *)packet->object_value.string.bytes))
+	  if (!_cups_strcasecmp(colors[k][0],
+	                        (char *)packet->object_value.string.bytes))
 	  {
 	    strcpy(supplies[j].color, colors[k][1]);
 	    break;
@@ -833,7 +858,6 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
           {
 	    char	*src, *dst;	/* Pointers into strings */
-
 
            /*
 	    * Loop safe because both the object_value and supplies char arrays

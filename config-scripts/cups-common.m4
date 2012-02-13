@@ -147,6 +147,16 @@ AC_CHECK_HEADER(iconv.h,
 		SAVELIBS="$SAVELIBS $LIBS")
 	LIBS="$SAVELIBS")
 
+dnl Checks for Mini-XML (www.minixml.org)...
+LIBMXML=""
+AC_CHECK_HEADER(mxml.h,
+	SAVELIBS="$LIBS"
+	AC_SEARCH_LIBS(mmxlNewElement,mxml,
+		AC_DEFINE(HAVE_MXML_H)
+		LIBMXML="-lmxml")
+	LIBS="$SAVELIBS")
+AC_SUBST(LIBMXML)
+
 dnl Checks for statfs and its many headers...
 AC_CHECK_HEADER(sys/mount.h,AC_DEFINE(HAVE_SYS_MOUNT_H))
 AC_CHECK_HEADER(sys/statfs.h,AC_DEFINE(HAVE_SYS_STATFS_H))
@@ -223,11 +233,16 @@ else
 	check_libusb=no
 fi
 
-if test $check_libusb = yes; then
-	AC_CHECK_LIB(usb, usb_get_string_simple,[
-		AC_CHECK_HEADER(usb.h,
-			AC_DEFINE(HAVE_USB_H)
-			LIBUSB="-lusb")])
+if test $check_libusb = yes -a "x$PKGCONFIG" != x; then
+	AC_MSG_CHECKING(for libusb-1.0)
+	if $PKGCONFIG --exists libusb-1.0; then
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_LIBUSB)
+		CFLAGS="$CFLAGS `$PKGCONFIG --cflags libusb-1.0`"
+		LIBUSB="`$PKGCONFIG --libs libusb-1.0`"
+	else
+		AC_MSG_RESULT(no)
+	fi
 fi
 
 dnl See if we have libwrap for TCP wrappers support...

@@ -1921,8 +1921,7 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       continue;
     }
-    else if ((ptr = filename + strlen(filename) - 6) > filename &&
-             !strcmp(ptr, ".plist"))
+    else if (strstr(filename, ".plist"))
     {
      /*
       * Skip plist files in the PPDs directory...

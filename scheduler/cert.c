@@ -121,6 +121,8 @@ cupsdAddCert(int        pid,		/* I - Process ID */
       * groups can access it...
       */
 
+      int	j;			/* Looping var */
+
 #  ifdef HAVE_MBR_UID_TO_UUID
      /*
       * On MacOS X, ACLs use UUIDs instead of GIDs...
@@ -134,6 +136,13 @@ cupsdAddCert(int        pid,		/* I - Process ID */
         * Add each group ID to the ACL...
 	*/
 
+        for (j = 0; j < i; j ++)
+	  if (SystemGroupIDs[j] == SystemGroupIDs[i])
+            break;
+
+        if (j < i)
+          continue;			/* Skip duplicate groups */
+
         acl_create_entry(&acl, &entry);
 	acl_get_permset(entry, &permset);
 	acl_add_perm(permset, ACL_READ_DATA);
@@ -142,6 +151,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 	acl_set_qualifier(entry, &group);
 	acl_set_permset(entry, permset);
       }
+
 #  else
      /*
       * POSIX ACLs need permissions for owner, group, other, and mask
@@ -184,6 +194,13 @@ cupsdAddCert(int        pid,		/* I - Process ID */
         * Add each group ID to the ACL...
 	*/
 
+        for (j = 0; j < i; j ++)
+	  if (SystemGroupIDs[j] == SystemGroupIDs[i])
+            break;
+
+        if (j < i)
+          continue;			/* Skip duplicate groups */
+
         acl_create_entry(&acl, &entry);
 	acl_get_permset(entry, &permset);
 	acl_add_perm(permset, ACL_READ);
@@ -195,7 +212,6 @@ cupsdAddCert(int        pid,		/* I - Process ID */
       if (acl_valid(acl))
       {
         char *text, *textptr;		/* Temporary string */
-
 
         cupsdLogMessage(CUPSD_LOG_ERROR, "ACL did not validate: %s",
 	                strerror(errno));
