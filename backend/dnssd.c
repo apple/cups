@@ -3,7 +3,7 @@
  *
  *   DNS-SD discovery backend for CUPS.
  *
- *   Copyright 2008-2011 by Apple Inc.
+ *   Copyright 2008-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -43,8 +43,8 @@
 typedef enum
 {
   CUPS_DEVICE_PRINTER = 0,		/* lpd://... */
-  CUPS_DEVICE_IPP,			/* ipp://... */
   CUPS_DEVICE_IPPS,			/* ipps://... */
+  CUPS_DEVICE_IPP,			/* ipp://... */
   CUPS_DEVICE_FAX_IPP,			/* ipp://... */
   CUPS_DEVICE_PDL_DATASTREAM,		/* socket://... */
   CUPS_DEVICE_RIOUSBPRINT		/* riousbprint://... */
