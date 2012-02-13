@@ -898,7 +898,9 @@ main(int  argc,				/* I - Number of command-line args */
 
 	return (CUPS_BACKEND_STOP);
       }
-      else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+      else if (ipp_status == IPP_NOT_AUTHORIZED ||
+               ipp_status == IPP_FORBIDDEN ||
+               ipp_status == IPP_AUTHENTICATION_CANCELED)
       {
         const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
         				/* WWW-Authenticate field value */
@@ -1472,11 +1474,12 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Print file was not accepted."));
 
-	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+	    ipp_status == IPP_AUTHENTICATION_CANCELED)
 	{
 	  const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 					/* WWW-Authenticate field value */
-  
+
 	  if (!strncmp(www_auth, "Negotiate", 9))
 	    auth_info_required = "negotiate";
 	  else if (www_auth[0])
