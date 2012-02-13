@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The cups-driverd program could temporarily "forget" a PPD file if it
+	  was updated in place.
 	- The dnssd backend now prefers IPPS over IPP.
 	- The USB backend now uses and requires LIBUSB 1.0 or later (STR #3477)
 	- The LIBUSB-based USB backend now supports the back-channel (STR #2890)

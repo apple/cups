@@ -7,7 +7,7 @@
  *   created from driver information files, and dynamically generated PPD files
  *   using driver helper programs.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2299,17 +2299,19 @@ load_ppds(const char *d,		/* I - Actual directory */
       ppd->record.model_number = model_number;
       ppd->record.type         = type;
 
+      strlcpy(ppd->record.filename, name, sizeof(ppd->record.filename));
       strlcpy(ppd->record.name, name, sizeof(ppd->record.name));
-      strlcpy(ppd->record.make, manufacturer, sizeof(ppd->record.make));
-      strlcpy(ppd->record.make_and_model, make_model,
-              sizeof(ppd->record.make_and_model));
       strlcpy(ppd->record.languages[0], lang_version,
               sizeof(ppd->record.languages[0]));
       strlcpy(ppd->record.products[0], (char *)cupsArrayFirst(products),
               sizeof(ppd->record.products[0]));
       strlcpy(ppd->record.psversions[0], (char *)cupsArrayFirst(psversions),
               sizeof(ppd->record.psversions[0]));
+      strlcpy(ppd->record.make, manufacturer, sizeof(ppd->record.make));
+      strlcpy(ppd->record.make_and_model, make_model,
+              sizeof(ppd->record.make_and_model));
       strlcpy(ppd->record.device_id, device_id, sizeof(ppd->record.device_id));
+      strlcpy(ppd->record.scheme, "file", sizeof(ppd->record.scheme));
     }
 
    /*
