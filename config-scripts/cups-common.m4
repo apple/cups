@@ -225,24 +225,20 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing])
 LIBUSB=""
 AC_SUBST(LIBUSB)
 
-if test x$enable_libusb = xyes; then
-	check_libusb=yes
-elif test x$enable_libusb != xno -a $uname != Darwin; then
-	check_libusb=yes
-else
-	check_libusb=no
-fi
-
-if test $check_libusb = yes -a "x$PKGCONFIG" != x; then
-	AC_MSG_CHECKING(for libusb-1.0)
-	if $PKGCONFIG --exists libusb-1.0; then
-		AC_MSG_RESULT(yes)
-		AC_DEFINE(HAVE_LIBUSB)
-		CFLAGS="$CFLAGS `$PKGCONFIG --cflags libusb-1.0`"
-		LIBUSB="`$PKGCONFIG --libs libusb-1.0`"
-	else
-		AC_MSG_RESULT(no)
+if test "x$PKGCONFIG" != x; then
+	if test x$enable_libusb = xyes -o $uname != Darwin; then
+		AC_MSG_CHECKING(for libusb-1.0)
+		if $PKGCONFIG --exists libusb-1.0; then
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_LIBUSB)
+			CFLAGS="$CFLAGS `$PKGCONFIG --cflags libusb-1.0`"
+			LIBUSB="`$PKGCONFIG --libs libusb-1.0`"
+		else
+			AC_MSG_RESULT(no)
+		fi
 	fi
+elif x$enable_libusb = xyes; then
+	AC_MSG_ERROR(Need pkg-config to enable libusb support.)
 fi
 
 dnl See if we have libwrap for TCP wrappers support...
