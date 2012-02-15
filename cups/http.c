@@ -1668,6 +1668,8 @@ _httpPeek(http_t *http,			/* I - Connection to server */
     * Buffer small reads for better performance...
     */
 
+    ssize_t	buflen;			/* Length of read for buffer */
+
     if (!http->blocking)
     {
       while (!httpWait(http, http->wait_value))
@@ -1680,48 +1682,69 @@ _httpPeek(http_t *http,			/* I - Connection to server */
     }
 
     if (http->data_remaining > sizeof(http->buffer))
-      bytes = sizeof(http->buffer);
+      buflen = sizeof(http->buffer);
     else
-      bytes = http->data_remaining;
+      buflen = http->data_remaining;
 
+    DEBUG_printf(("2_httpPeek: Reading %d bytes into buffer.", (int)buflen));
+
+    do
+    {
 #ifdef HAVE_SSL
-    if (http->tls)
-      bytes = http_read_ssl(http, http->buffer, bytes);
-    else
+      if (http->tls)
+	bytes = http_read_ssl(http, http->buffer, buflen);
+      else
 #endif /* HAVE_SSL */
-    {
-      DEBUG_printf(("2_httpPeek: reading %d bytes from socket into buffer...",
-                    (int)bytes));
+      bytes = recv(http->fd, http->buffer, buflen, 0);
 
-      bytes = recv(http->fd, http->buffer, bytes, 0);
-
-      DEBUG_printf(("2_httpPeek: read %d bytes from socket into buffer...",
-                    (int)bytes));
-    }
-
-    if (bytes > 0)
-      http->used = bytes;
-    else if (bytes < 0)
-    {
+      if (bytes < 0)
+      {
 #ifdef WIN32
-      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
-      {
-        http->error = WSAGetLastError();
-        return (-1);
-      }
+	if (WSAGetLastError() != WSAEINTR)
+	{
+	  http->error = WSAGetLastError();
+	  return (-1);
+	}
+	else if (WSAGetLastError() == WSAEWOULDBLOCK)
+	{
+	  if (!http->timeout_cb ||
+	      !(*http->timeout_cb)(http, http->timeout_data))
+	  {
+	    http->error = WSAEWOULDBLOCK;
+	    return (-1);
+	  }
+	}
 #else
-      if (errno != EINTR && errno != EAGAIN)
-      {
-        http->error = errno;
-        return (-1);
-      }
+	if (errno == EWOULDBLOCK || errno == EAGAIN)
+	{
+	  if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	  {
+	    http->error = errno;
+	    return (-1);
+	  }
+	  else if (!http->timeout_cb && errno != EAGAIN)
+	  {
+	    http->error = errno;
+	    return (-1);
+	  }
+	}
+	else if (errno != EINTR)
+	{
+	  http->error = errno;
+	  return (-1);
+	}
 #endif /* WIN32 */
+      }
     }
-    else
-    {
-      http->error = EPIPE;
-      return (0);
-    }
+    while (bytes < 0);
+
+    DEBUG_printf(("2_httpPeek: Read " CUPS_LLFMT " bytes into buffer.",
+                  CUPS_LLCAST bytes));
+#ifdef DEBUG
+    http_debug_hex("_httpPeek", http->buffer, (int)bytes);
+#endif /* DEBUG */
+
+    http->used = bytes;
   }
 
   if (http->used > 0)
