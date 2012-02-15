@@ -171,6 +171,8 @@ _ppdCacheCreateWithFile(
     goto create_error;
   }
 
+  pc->max_copies = 9999;
+
  /*
   * Read the file...
   */
@@ -553,6 +555,8 @@ _ppdCacheCreateWithFile(
 
       cupsArrayAdd(pc->finishings, finishings);
     }
+    else if (!_cups_strcasecmp(line, "MaxCopies"))
+      pc->max_copies = atoi(value);
     else
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
@@ -1347,6 +1351,17 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     while ((ppd_attr = ppdFindNextAttr(ppd, "cupsIPPFinishings",
                                        NULL)) != NULL);
   }
+
+ /*
+  * Max copies...
+  */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsMaxCopies", NULL)) != NULL)
+    pc->max_copies = atoi(ppd_attr->value);
+  else if (ppd->manual_copies)
+    pc->max_copies = 1;
+  else
+    pc->max_copies = 9999;
 
  /*
   * Return the cache data...
@@ -2332,6 +2347,12 @@ _ppdCacheWriteFile(
       cupsFilePrintf(fp, " %s=%s", option->name, option->value);
     cupsFilePutChar(fp, '\n');
   }
+
+ /*
+  * Max copies...
+  */
+
+  cupsFilePrintf(fp, "MaxCopies %d\n", pc->max_copies);
 
  /*
   * IPP attributes, if any...

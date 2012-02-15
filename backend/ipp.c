@@ -2478,6 +2478,9 @@ new_request(
 			 "multiple-document-handling", NULL, collate_str);
 	    break;
           }
+
+        if (i >= doc_handling_sup->num_values)
+          copies = 1;
       }
 
      /*
@@ -2526,7 +2529,7 @@ new_request(
       cupsEncodeOptions(request, num_options, options);
     }
 
-    if (copies > 1)
+    if (copies > 1 && copies <= pc->max_copies)
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
 
