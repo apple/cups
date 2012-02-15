@@ -1507,15 +1507,19 @@ _httpResolveURI(
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
       localref = ref;
-      if (DNSServiceResolve(&localref, kDNSServiceFlagsShareConnection, 0,
-			    hostname, regtype, "local.", http_resolve_cb,
+      if (DNSServiceResolve(&localref,
+                            kDNSServiceFlagsShareConnection |
+                                kDNSServiceFlagsTimeout, 0, hostname, regtype,
+			    "local.", http_resolve_cb,
 			    &uribuf) == kDNSServiceErr_NoError)
       {
 	int	fds;			/* Number of ready descriptors */
 	time_t	timeout,		/* Poll timeout */
-		start_time = time(NULL);/* Start time */
+		start_time = time(NULL),/* Start time */
+		end_time = start_time + 90;
+					/* End time */
 
-	for (;;)
+	while (time(NULL) < end_time)
 	{
 	  if (options & _HTTP_RESOLVE_STDERR)
 	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
@@ -1527,27 +1531,27 @@ _httpResolveURI(
 	  }
 
 	 /*
-	  * For the first minute (or forever if we have a callback), wakeup
-	  * every 2 seconds to emit a "looking for printer" message...
+	  * Wakeup every 2 seconds to emit a "looking for printer" message...
 	  */
 
-	  timeout = (time(NULL) < (start_time + 60) || cb) ? 2000 : -1;
+	  if ((timeout = end_time - time(NULL)) > 2)
+	    timeout = 2;
 
 #ifdef HAVE_POLL
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
-	  fds = poll(&polldata, 1, timeout);
+	  fds = poll(&polldata, 1, 1000 * timeout);
 
 #else /* select() */
 	  FD_ZERO(&input_set);
 	  FD_SET(DNSServiceRefSockFD(ref), &input_set);
 
-	  stimeout.tv_sec  = ((int)timeout) / 1000;
-	  stimeout.tv_usec = ((int)(timeout) * 1000) % 1000000;
+	  stimeout.tv_sec  = timeout;
+	  stimeout.tv_usec = 0;
 
 	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL,
-		       timeout < 0.0 ? NULL : &stimeout);
+		       &stimeout);
 #endif /* HAVE_POLL */
 
 	  if (fds < 0)
@@ -1565,7 +1569,7 @@ _httpResolveURI(
 	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (domainsent == 0 && (domain && _cups_strcasecmp(domain, "local.")))
+	    if (domainsent == 0 && domain && _cups_strcasecmp(domain, "local."))
 	    {
 	      if (options & _HTTP_RESOLVE_STDERR)
 		fprintf(stderr,
@@ -1574,10 +1578,12 @@ _httpResolveURI(
 			domain ? domain : "");
 
 	      domainref = ref;
-	      if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection,
+	      if (DNSServiceResolve(&domainref,
+	                            kDNSServiceFlagsShareConnection |
+	                                kDNSServiceFlagsTimeout,
 	                            0, hostname, regtype, domain,
-				    http_resolve_cb, &uribuf)
-		      == kDNSServiceErr_NoError)
+				    http_resolve_cb,
+				    &uribuf) == kDNSServiceErr_NoError)
 		domainsent = 1;
 	    }
 
@@ -1615,11 +1621,15 @@ _httpResolveURI(
     if (options & _HTTP_RESOLVE_STDERR)
     {
       if (uri)
+      {
         fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
+	fputs("STATE: -connecting-to-device,offline-report\n", stderr);
+      }
       else
+      {
         fputs("DEBUG: Unable to resolve URI\n", stderr);
-
-      fputs("STATE: -connecting-to-device,offline-report\n", stderr);
+	fputs("STATE: -connecting-to-device\n", stderr);
+      }
     }
 
 #else
