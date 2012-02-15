@@ -3673,7 +3673,11 @@ ippSetString(ipp_t           *ipp,	/* IO - IPP message */
   * Range check input...
   */
 
-  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_INTEGER ||
+  if (!ipp || !attr || !*attr ||
+      ((*attr)->value_tag != IPP_TAG_TEXTLANG &&
+      (*attr)->value_tag != IPP_TAG_NAMELANG &&
+       ((*attr)->value_tag < IPP_TAG_TEXT ||
+        (*attr)->value_tag > IPP_TAG_MIMETYPE)) ||
       element < 0 || element > (*attr)->num_values || !strvalue)
     return (0);
 
