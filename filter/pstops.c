@@ -2330,6 +2330,7 @@ set_pstops_options(
   ppd_option_t	*option;		/* PPD option */
   ppd_choice_t	*choice;		/* PPD choice */
   const char	*content_type;		/* Original content type */
+  int		max_copies;		/* Maximum number of copies supported */
 
 
  /*
@@ -2592,7 +2593,16 @@ set_pstops_options(
   * Now figure out if we have to force collated copies, etc.
   */
 
-  if (ppd && ppd->manual_copies && Duplex && doc->copies > 1)
+  if ((attr = ppdFindAttr(ppd, "cupsMaxCopies", NULL)) != NULL)
+    max_copies = atoi(attr->value);
+  else if (ppd && ppd->manual_copies)
+    max_copies = 1;
+  else
+    max_copies = 9999;
+
+  if (doc->copies > max_copies)
+    doc->collate = 1;
+  else if (ppd && ppd->manual_copies && Duplex && doc->copies > 1)
   {
    /*
     * Force collated copies when printing a duplexed document to
@@ -2616,7 +2626,8 @@ set_pstops_options(
 
     doc->slow_collate = 1;
 
-    if ((choice = ppdFindMarkedChoice(ppd, "Collate")) != NULL &&
+    if (doc->copies <= max_copies &&
+        (choice = ppdFindMarkedChoice(ppd, "Collate")) != NULL &&
         !_cups_strcasecmp(choice->choice, "True"))
     {
      /*
