@@ -4264,6 +4264,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   if (!cupsdLoadJob(job))
     return;
 
+  if (!job->printer_message)
+    job->printer_message = ippFindAttribute(job->attrs,
+                                            "job-printer-state-message",
+                                            IPP_TAG_TEXT);
   if (job->printer_message)
     cupsdSetString(&(job->printer_message->values[0].string.text), "");
 
