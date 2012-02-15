@@ -124,7 +124,8 @@ cupsDoAuthentication(
     const char *method,			/* I - Request method ("GET", "POST", "PUT") */
     const char *resource)		/* I - Resource path */
 {
-  const char	*password;		/* Password string */
+  const char	*password,		/* Password string */
+		*www_auth;		/* WWW-Authenticate header */
   char		prompt[1024],		/* Prompt for user */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
@@ -179,9 +180,11 @@ cupsDoAuthentication(
   * Nope, see if we should retry the current username:password...
   */
 
+  www_auth = http->fields[HTTP_FIELD_WWW_AUTHENTICATE];
+
   if ((http->digest_tries > 1 || !http->userpass[0]) &&
-      (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) ||
-       !strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6)))
+      (!_cups_strncasecmp(www_auth, "Basic", 5) ||
+       !_cups_strncasecmp(www_auth, "Digest", 6)))
   {
    /*
     * Nope - get a new password from the user...
@@ -197,8 +200,7 @@ cupsDoAuthentication(
 	     cupsUser(),
 	     http->hostname[0] == '/' ? "localhost" : http->hostname);
 
-    http->digest_tries  = _cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE],
-                                      "Digest", 5) != 0;
+    http->digest_tries  = _cups_strncasecmp(www_auth, "Digest", 6) != 0;
     http->userpass[0]   = '\0';
 
     if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
@@ -227,7 +229,7 @@ cupsDoAuthentication(
   */
 
 #ifdef HAVE_GSSAPI
-  if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
+  if (!_cups_strncasecmp(www_auth, "Negotiate", 9))
   {
    /*
     * Kerberos authentication...
@@ -241,7 +243,7 @@ cupsDoAuthentication(
   }
   else
 #endif /* HAVE_GSSAPI */
-  if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5))
+  if (!_cups_strncasecmp(www_auth, "Basic", 5))
   {
    /*
     * Basic authentication...
@@ -254,7 +256,7 @@ cupsDoAuthentication(
                    (int)strlen(http->userpass));
     httpSetAuthString(http, "Basic", encode);
   }
-  else if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
+  else if (!_cups_strncasecmp(www_auth, "Digest", 6))
   {
    /*
     * Digest authentication...
@@ -277,7 +279,7 @@ cupsDoAuthentication(
   else
   {
     DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"",
-                  http->fields[HTTP_FIELD_WWW_AUTHENTICATE]));
+                  www_auth));
     http->status = HTTP_AUTHORIZATION_CANCELED;
     return (-1);
   }
