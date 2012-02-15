@@ -757,10 +757,13 @@ httpGetDateString2(time_t t,		/* I - UNIX time */
 
 
   tdate = gmtime(&t);
-  snprintf(s, slen, "%s, %02d %s %d %02d:%02d:%02d GMT",
-           http_days[tdate->tm_wday], tdate->tm_mday,
-	   http_months[tdate->tm_mon], tdate->tm_year + 1900,
-	   tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+  if (tdate)
+    snprintf(s, slen, "%s, %02d %s %d %02d:%02d:%02d GMT",
+	     http_days[tdate->tm_wday], tdate->tm_mday,
+	     http_months[tdate->tm_mon], tdate->tm_year + 1900,
+	     tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+  else
+    s[0] = '\0';
 
   return (s);
 }
