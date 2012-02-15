@@ -9530,6 +9530,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job job-hold-until value changed by user.");
+    ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
  /*
