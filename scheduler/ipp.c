@@ -3076,6 +3076,7 @@ apple_register_profiles(
         cupsdLogMessage(CUPSD_LOG_ERROR,
                         "%s: ICC Profile \"%s\" does not exist.", p->name,
                         iccfile);
+        cupsdSetPrinterReasons(p, "+cups-missing-filter-warning");
 	continue;
       }
 
