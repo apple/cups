@@ -1675,6 +1675,21 @@ copies to 100.</P>
 </BLOCKQUOTE>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="MaxHoldTime">MaxHoldTime</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+MaxHoldTime 10800
+MaxHoldTime 0
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>MaxHoldTime</CODE> directive controls the maximum number of seconds allowed for a job to remain in the "indefinite" hold state. The job is canceled automatically if it remains held indefinitely longer than the specified number of seconds.</P>
+
+<p>The default setting is 0 which disables this functionality.</P>
+
 
 <H2 CLASS="title"><A NAME="MaxJobs">MaxJobs</A></H2>
 

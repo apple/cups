@@ -2247,6 +2247,8 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
   * Update the hold time...
   */
 
+  job->cancel_time = 0;
+
   if (!strcmp(when, "indefinite") || !strcmp(when, "auth-info-required"))
   {
    /*
@@ -2254,6 +2256,9 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     */
 
     job->hold_until = 0;
+
+    if (MaxHoldTime > 0)
+      job->cancel_time = time(NULL) + MaxHoldTime;
   }
   else if (!strcmp(when, "day-time"))
   {
