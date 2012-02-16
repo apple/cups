@@ -32,8 +32,10 @@ struct cupsd_client_s
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
   int			type;		/* AuthType for username */
-  char			username[256],	/* Username from Authorization: line */
-			password[33],	/* Password from Authorization: line */
+  char			username[HTTP_MAX_VALUE],
+					/* Username from Authorization: line */
+			password[HTTP_MAX_VALUE],
+					/* Password from Authorization: line */
 			uri[HTTP_MAX_URI],
 					/* Localized URL/URI for GET/PUT */
 			*filename,	/* Filename of output file */

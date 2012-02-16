@@ -4,6 +4,8 @@ CHANGES.txt - 1.6b1 - 2012-02-15
 CHANGES IN CUPS V1.6b1
 
 	- Documentation updates (STR #3980, STR #4010)
+	- Added support for usernames and passwords longer than 32 characters
+	  (STR #2856)
 	- Added a new MaxHoldTime directive to automatically cancel jobs that
 	  have been held indefinitely after a specific number of seconds
 	  (STR #2291)
