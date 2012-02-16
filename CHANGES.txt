@@ -1,8 +1,9 @@
-CHANGES.txt - 1.6b1 - 2012-01-30
+CHANGES.txt - 1.6b1 - 2012-02-15
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- Documentation updates (STR #3980)
 	- The configure script and build system no longer support building of
 	  separate 32-bit and 64-bit libraries.
 	- The "brightness", "columns", "fitplot", "gamma", "hue",

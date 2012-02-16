@@ -36,7 +36,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
  4        Require user @OWNER @SYSTEM
  5        Order deny,allow
  6      &lt;/Limit>
- 7    
+ 7
  8      # All administration operations require an administrator
       to authenticate...
  9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
@@ -45,7 +45,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 11        Require user @SYSTEM
 12        Order deny,allow
 13      &lt;/Limit>
-14    
+14
 15      # All printer operations require a printer operator
       to authenticate...
 16      &lt;Limit Pause-Printer Resume-Printer
@@ -59,14 +59,14 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 18        Require user <em>varies by OS</em>
 19        Order deny,allow
 20      &lt;/Limit>
-21    
+21
 22      # Only the owner or an administrator can cancel or
       authenticate a job...
 23      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
 24        Require user @OWNER @SYSTEM
 25        Order deny,allow
 26      &lt;/Limit>
-27    
+27
 28      &lt;Limit All>
 29        Order deny,allow
 30      &lt;/Limit>
@@ -106,7 +106,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 11        Require user @SYSTEM
 12        Order deny,allow
 13      &lt;/Limit>
-14    
+14
 15      # All printer operations require a printer operator
       to authenticate...
 16      &lt;Limit Pause-Printer Resume-Printer
@@ -380,12 +380,12 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Prints a job after others.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-Default</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Default</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Gets the server/network default printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-Printers</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Printers</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Gets a list of printers and/or classes.</TD>
 </TR>
@@ -395,12 +395,12 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Adds or modifies a printer.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Delete-Printer</TT></TD>
+	<TD NOWRAP><TT>CUPS-Delete-Printer</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Removes a printer.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-Classes</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Classes</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Gets a list of classes.</TD>
 </TR>
@@ -410,7 +410,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Adds or modifies a class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Delete-Class</TT></TD>
+	<TD NOWRAP><TT>CUPS-Delete-Class</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Removes a class.</TD>
 </TR>
@@ -427,17 +427,17 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	attribute to false.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Set-Default</TT></TD>
+	<TD NOWRAP><TT>CUPS-Set-Default</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Sets the server/network default printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-Devices</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Devices</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Gets a list of printer devices.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-PPDs</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-PPDs</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Gets a list of printer drivers or manufacturers.</TD>
 </TR>
@@ -459,6 +459,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 </TBODY>
 </TABLE></DIV>
 
+<P>* = These operations only apply to the default policy.</P>
 
 <H2 CLASS="title"><A NAME="CREATING">Creating Your Own Policies</A></H2>
 
@@ -556,7 +557,7 @@ Allow from @LOCAL</PRE></TD>
  5        Order allow,deny
  6        Allow from 10.0.2.0/24
  7      &lt;/Limit>
- 8    
+ 8
  9      # All administration operations require a lab technician
       or an administrator to authenticate...
 10      &lt;Limit Pause-Printer Resume-Printer
