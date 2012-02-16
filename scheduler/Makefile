@@ -17,6 +17,7 @@ include ../Makedefs
 
 CUPSDOBJS =	\
 		auth.o \
+		avahi.o \
 		banners.o \
 		cert.o \
 		classes.o \
@@ -39,7 +40,8 @@ CUPSDOBJS =	\
 		server.o \
 		statbuf.o \
 		subscriptions.o \
-		sysman.o
+		sysman.o \
+		timeout.o
 LIBOBJS =	\
 		filter.o \
 		mime.o \
