@@ -3,7 +3,7 @@ CHANGES.txt - 1.6b1 - 2012-02-15
 
 CHANGES IN CUPS V1.6b1
 
-	- Documentation updates (STR #3980)
+	- Documentation updates (STR #3980, STR #4010)
 	- CUPS now prefers the suffix "dpcm" when reporting resolution in dots-
 	  per-centimeter (STR #4006)
 	- The configure script and build system no longer support building of
