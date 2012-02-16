@@ -4976,7 +4976,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	      cupsFilePrintf(out, "%dx%d%s", attr->values[i].resolution.xres,
 		      attr->values[i].resolution.yres,
 		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			  "dpi" : "dpc");
+			  "dpi" : "dpcm");
 	      break;
 
 	  case IPP_TAG_URI :
@@ -11271,7 +11271,7 @@ set_printer_defaults(
           sprintf(value, "%dx%d%s", attr->values[0].resolution.xres,
 	          attr->values[0].resolution.yres,
 		  attr->values[0].resolution.units == IPP_RES_PER_INCH ?
-		      "dpi" : "dpc");
+		      "dpi" : "dpcm");
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));

@@ -3,7 +3,7 @@
  *
  *   Option encoding routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -539,7 +539,8 @@ cupsEncodeOptions2(
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 
-	    if (!_cups_strcasecmp(s, "dpc"))
+	    if (!_cups_strcasecmp(s, "dpc") ||
+	        !_cups_strcasecmp(s, "dpcm"))
               attr->values[j].resolution.units = IPP_RES_PER_CM;
             else
               attr->values[j].resolution.units = IPP_RES_PER_INCH;

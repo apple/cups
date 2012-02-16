@@ -3659,7 +3659,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	               "%dx%d%s", attr->values[i].resolution.xres,
 		       attr->values[i].resolution.yres,
 		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			   "dpi" : "dpc");
+			   "dpi" : "dpcm");
 	      break;
 
           case IPP_TAG_STRING :
