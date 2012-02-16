@@ -112,9 +112,7 @@
 
 #ifdef __APPLE__
 #  include <ApplicationServices/ApplicationServices.h>
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
 extern CFUUIDRef ColorSyncCreateUUIDFromUInt32(unsigned id);
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 #  include <CoreFoundation/CoreFoundation.h>
 #  ifdef HAVE_MEMBERSHIP_H
 #    include <membership.h>
@@ -147,11 +145,7 @@ static void	add_printer_state_reasons(cupsd_client_t *con,
 static void	add_queued_job_count(cupsd_client_t *con, cupsd_printer_t *p);
 #ifdef __APPLE__
 static void	apple_init_profile(ppd_file_t *ppd, cups_array_t *languages,
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
                                    CFMutableDictionaryRef profile,
-#  else
-		                   CMDeviceProfileInfo *profile,
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 				   unsigned id, const char *name,
 				   const char *text, const char *iccfile);
 static void	apple_register_profiles(cupsd_printer_t *p);
@@ -2897,19 +2891,13 @@ static void
 apple_init_profile(
     ppd_file_t             *ppd,	/* I - PPD file */
     cups_array_t	   *languages,	/* I - Languages in the PPD file */
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
     CFMutableDictionaryRef profile,	/* I - Profile dictionary */
-#  else
-    CMDeviceProfileInfo    *profile,	/* I - Profile record */
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
     unsigned               id,		/* I - Profile ID */
     const char             *name,	/* I - Profile name */
     const char             *text,	/* I - Profile UI text */
     const char             *iccfile)	/* I - ICC filename */
 {
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
   CFURLRef		url;		/* URL for profile filename */
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
   CFMutableDictionaryRef dict;		/* Dictionary for name */
   char			*language;	/* Current language */
   ppd_attr_t		*attr;		/* Profile attribute */
@@ -2988,7 +2976,6 @@ apple_init_profile(
   * Fill in the profile data...
   */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
  if (iccfile)
  {
     url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
@@ -3004,17 +2991,6 @@ apple_init_profile(
 
   CFDictionarySetValue(profile, kColorSyncDeviceModeDescriptions, dict);
   CFRelease(dict);
-
-#  else
-  profile->dataVersion        = cmDeviceProfileInfoVersion1;
-  profile->profileID          = id;
-  profile->profileLoc.locType = iccfile ? cmPathBasedProfile : cmNoProfileBase;
-  profile->profileName        = dict;
-
-  if (iccfile)
-    strlcpy(profile->profileLoc.u.pathLoc.path, iccfile,
-	    sizeof(profile->profileLoc.u.pathLoc.path));
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 }
 
 
@@ -3054,33 +3030,17 @@ apple_register_profiles(
   CFMutableDictionaryRef device_name;	/* Printer device name dictionary */
   CFStringRef		printer_name;	/* Printer name string */
   cups_array_t		*languages;	/* Languages array */
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
   CFMutableDictionaryRef profiles,	/* Dictionary of profiles */
 			profile;	/* Current profile info dictionary */
   CFStringRef		dict_key;	/* Key in factory profile dictionary */
-#  else
-  CMDeviceScope		scope =		/* Scope of the registration */
-			{
-			  kCFPreferencesAnyUser,
-			  kCFPreferencesCurrentHost
-			};
-  CMDeviceProfileArrayPtr profiles;	/* Profiles */
-  CMDeviceProfileInfo	*profile;	/* Current profile */
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
 
  /*
   * Make sure ColorSync is available...
   */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
   if (ColorSyncRegisterDevice == NULL)
     return;
-
-#  else
-  if (CMRegisterColorDevice == NULL)
-    return;
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
  /*
   * Try opening the PPD file for this printer...
@@ -3116,13 +3076,13 @@ apple_register_profiles(
         cupsdLogMessage(CUPSD_LOG_ERROR,
                         "%s: ICC Profile \"%s\" does not exist.", p->name,
                         iccfile);
+        cupsdSetPrinterReasons(p, "+cups-missing-filter-warning");
 	continue;
       }
 
       num_profiles ++;
     }
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
  /*
   * Create a dictionary for the factory profiles...
   */
@@ -3137,7 +3097,6 @@ apple_register_profiles(
     ppdClose(ppd);
     return;
   }
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
  /*
   * If we have profiles, add them...
@@ -3207,25 +3166,6 @@ apple_register_profiles(
 	q3_choice = NULL;
     }
 
-#  ifndef HAVE_COLORSYNCREGISTERDEVICE
-   /*
-    * Build the array of profiles...
-    *
-    * Note: This calloc actually requests slightly more memory than needed.
-    */
-
-    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to allocate memory for factory profiles.");
-      ppdClose(ppd);
-      return;
-    }
-
-    profiles->profileCount = num_profiles;
-    profile = profiles->profiles;
-#  endif /* !HAVE_COLORSYNCREGISTERDEVICE */
-
    /*
     * Loop through the profiles listed in the PPD...
     */
@@ -3267,7 +3207,6 @@ apple_register_profiles(
 	else
 	  profile_id = atoi(attr->spec);
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
 	profile = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					    &kCFTypeDictionaryKeyCallBacks,
 					    &kCFTypeDictionaryValueCallBacks);
@@ -3292,13 +3231,6 @@ apple_register_profiles(
 	}
 
 	CFRelease(profile);
-
-#  else
-        apple_init_profile(ppd, languages, profile, profile_id, attr->spec,
-	                   attr->text[0] ? attr->text : attr->spec, iccfile);
-
-	profile ++;
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
        /*
         * See if this is the default profile...
@@ -3368,23 +3300,6 @@ apple_register_profiles(
 
     num_profiles = cm_option->num_choices;
 
-#  ifndef HAVE_COLORSYNCREGISTERDEVICE
-   /*
-    * Create an array for the factory profiles...
-    */
-
-    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to allocate memory for factory profiles.");
-      ppdClose(ppd);
-      return;
-    }
-
-    profiles->profileCount = num_profiles;
-    profile = profiles->profiles;
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
-
     for (i = cm_option->num_choices, cm_choice = cm_option->choices;
          i > 0;
 	 i --, cm_choice ++)
@@ -3404,7 +3319,6 @@ apple_register_profiles(
       snprintf(selector, sizeof(selector), "%s..", profile_name);
       profile_id = _ppdHashName(selector);
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
       profile = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					  &kCFTypeDictionaryKeyCallBacks,
 					  &kCFTypeDictionaryValueCallBacks);
@@ -3430,12 +3344,6 @@ apple_register_profiles(
 
       CFRelease(profile);
 
-#  else
-      apple_init_profile(ppd, NULL, profile, profile_id, cm_choice->choice,
-                         cm_choice->text, NULL);
-      profile ++;
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
-
       if (cm_choice->marked)
         default_profile_id = profile_id;
     }
@@ -3450,7 +3358,6 @@ apple_register_profiles(
 
     num_profiles = (attr && ppd->colorspace == PPD_CS_GRAY) ? 1 : 2;
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
    /*
     * Add the grayscale profile first.  We always have a grayscale profile.
     */
@@ -3538,61 +3445,6 @@ apple_register_profiles(
     }
 
     CFRelease(profile);
-
-#  else
-   /*
-    * Create an array for the factory profiles...
-    */
-
-    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to allocate memory for factory profiles.");
-      ppdClose(ppd);
-      return;
-    }
-
-    profiles->profileCount = num_profiles;
-
-   /*
-    * Add the grayscale profile first.  We always have a grayscale profile.
-    */
-
-    profile_id = _ppdHashName("Gray..");
-    apple_init_profile(ppd, NULL, profiles->profiles, profile_id, "Gray",
-                       "Gray", NULL);
-
-   /*
-    * Then add the RGB/CMYK/DeviceN color profile...
-    */
-
-    switch (ppd->colorspace)
-    {
-      default :
-      case PPD_CS_RGB :
-      case PPD_CS_CMY :
-          profile_id = _ppdHashName("RGB..");
-          apple_init_profile(ppd, NULL, profiles->profiles + 1, profile_id,
-	                     "RGB", "RGB", NULL);
-          break;
-      case PPD_CS_RGBK :
-      case PPD_CS_CMYK :
-          profile_id = _ppdHashName("CMYK..");
-          apple_init_profile(ppd, NULL, profiles->profiles + 1, profile_id,
-	                     "CMYK", "CMYK", NULL);
-          break;
-
-      case PPD_CS_GRAY :
-          if (attr)
-	    break;
-
-      case PPD_CS_N :
-          profile_id = _ppdHashName("DeviceN..");
-          apple_init_profile(ppd, NULL, profiles->profiles + 1, profile_id,
-	                     "DeviceN", "DeviceN", NULL);
-          break;
-    }
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
   }
 
   if (num_profiles > 0)
@@ -3604,7 +3456,6 @@ apple_register_profiles(
     if (!default_profile_id)
       default_profile_id = profile_id;	/* Last profile */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
     dict_key = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR("%u"),
                                         default_profile_id);
     if (dict_key)
@@ -3613,7 +3464,6 @@ apple_register_profiles(
                            dict_key);
       CFRelease(dict_key);
     }
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
    /*
     * Get the device ID hash and pathelogical name dictionary.
@@ -3631,13 +3481,10 @@ apple_register_profiles(
 
     if (device_name && printer_name)
     {
-      CFDictionarySetValue(device_name, CFSTR("en_US"), printer_name);
-
      /*
       * Register the device with ColorSync...
       */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
       CFTypeRef		deviceDictKeys[] =
       {					/* Device keys */
         kColorSyncDeviceDescriptions,
@@ -3654,6 +3501,8 @@ apple_register_profiles(
       };
       CFDictionaryRef	deviceDict;	/* Device dictionary */
       CFUUIDRef		deviceUUID;	/* Device UUID */
+
+      CFDictionarySetValue(device_name, CFSTR("en_US"), printer_name);
 
       deviceDict = CFDictionaryCreate(kCFAllocatorDefault,
 				      (const void **)deviceDictKeys,
@@ -3674,19 +3523,6 @@ apple_register_profiles(
 
       if (deviceDict)
         CFRelease(deviceDict);
-
-#  else
-      error = CMRegisterColorDevice(cmPrinterDeviceClass, device_id,
-                                    device_name, &scope);
-
-     /*
-      * Register the profiles...
-      */
-
-      if (error == noErr)
-	error = CMSetDeviceFactoryProfiles(cmPrinterDeviceClass, device_id,
-					   default_profile_id, profiles);
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
     }
     else
       error = 1000;
@@ -3711,20 +3547,7 @@ apple_register_profiles(
   * Free any memory we used...
   */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
   CFRelease(profiles);
-
-#  else
-  if (num_profiles > 0)
-  {
-    for (profile = profiles->profiles;
-	 num_profiles > 0;
-	 profile ++, num_profiles --)
-      CFRelease(profile->profileName);
-
-    free(profiles);
-  }
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 
   ppdClose(ppd);
 }
@@ -3743,7 +3566,6 @@ apple_unregister_profiles(
   * Make sure ColorSync is available...
   */
 
-#  ifdef HAVE_COLORSYNCREGISTERDEVICE
   if (ColorSyncUnregisterDevice != NULL)
   {
    /*
@@ -3761,11 +3583,6 @@ apple_unregister_profiles(
       CFRelease(deviceUUID);
     }
   }
-
-#  else
-  if (CMUnregisterColorDevice != NULL)
-    CMUnregisterColorDevice(cmPrinterDeviceClass, _ppdHashName(p->name));
-#  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 }
 #endif /* __APPLE__ */
 
@@ -5159,7 +4976,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	      cupsFilePrintf(out, "%dx%d%s", attr->values[i].resolution.xres,
 		      attr->values[i].resolution.yres,
 		      attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			  "dpi" : "dpc");
+			  "dpi" : "dpcm");
 	      break;
 
 	  case IPP_TAG_URI :
@@ -9713,6 +9530,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job job-hold-until value changed by user.");
+    ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
  /*
@@ -11453,7 +11271,7 @@ set_printer_defaults(
           sprintf(value, "%dx%d%s", attr->values[0].resolution.xres,
 	          attr->values[0].resolution.yres,
 		  attr->values[0].resolution.units == IPP_RES_PER_INCH ?
-		      "dpi" : "dpc");
+		      "dpi" : "dpcm");
           printer->num_options = cupsAddOption(name, value,
 					       printer->num_options,
 					       &(printer->options));

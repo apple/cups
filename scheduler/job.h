@@ -99,6 +99,8 @@ VAR int			MaxJobs		VALUE(0),
 					/* Max number of jobs */
 			MaxActiveJobs	VALUE(0),
 					/* Max number of active jobs */
+			MaxHoldTime	VALUE(0),
+					/* Max time for indefinite hold */
 			MaxJobsPerUser	VALUE(0),
 					/* Max jobs per user */
 			MaxJobsPerPrinter VALUE(0),

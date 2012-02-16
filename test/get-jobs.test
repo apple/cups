@@ -3,7 +3,7 @@
 #
 #   Get list of not-completed jobs.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -31,7 +31,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR keyword requested-attributes
-	     job-id,job-state,job-name,job-originating-user-name,job-media-sheets,job-media-sheets-completed,job-impressions,job-impressions-completed
+	     job-id,job-state,job-state-reasons,job-name,job-originating-user-name,job-media-sheets,job-media-sheets-completed,job-impressions,job-impressions-completed
 
 	# What statuses are OK?
 	STATUS successful-ok

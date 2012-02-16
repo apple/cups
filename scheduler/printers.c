@@ -1947,7 +1947,7 @@ cupsdSetPrinterAttr(
       ptr ++;
     else if (*ptr == '\'' || *ptr == '\"')
       quote = *ptr;
-    else if (*ptr == '.')
+    else if (*ptr == ',')
       count ++;
   }
 
@@ -2052,7 +2052,7 @@ cupsdSetPrinterAttr(
 	  else
 	    _cups_strcpy(ptr, ptr + 1);
 	}
-	else if (*ptr == '.')
+	else if (*ptr == ',')
 	{
 	  *ptr++ = '\0';
 	  break;

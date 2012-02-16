@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "6 January 2012" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "15 February 2012" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -386,6 +386,11 @@ MaxCopies number
 .br
 Specifies the maximum number of copies that a user can print of each job.
 .TP 5
+MaxHoldTime seconds
+.br
+Specifies the maximum time a job may remain in the "indefinite" hold state
+before it is canceled. Set to 0 to disable cancellation of held jobs.
+.TP 5
 MaxJobs number
 .br
 Specifies the maximum number of simultaneous jobs to support.
@@ -634,7 +639,7 @@ Specifies whether the web interface is enabled.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2011 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $".
 .\"

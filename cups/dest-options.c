@@ -187,7 +187,7 @@ cupsCheckDestSupported(
 
           if (!strcmp(temp, "dpi"))
             units_value = IPP_RES_PER_INCH;
-          else if (!strcmp(temp, "dpc"))
+          else if (!strcmp(temp, "dpc") || !strcmp(temp, "dpcm"))
             units_value = IPP_RES_PER_CM;
           else
             return (0);

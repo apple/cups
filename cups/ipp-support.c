@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol support functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -487,12 +487,12 @@ ippAttributeString(
             bufptr += snprintf(bufptr, bufend - bufptr + 1, "%dx%d%s",
                                val->resolution.xres, val->resolution.yres,
                                val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpc");
+                                   "dpi" : "dpcm");
           else
             bufptr += snprintf(temp, sizeof(temp), "%dx%d%s",
                                val->resolution.xres, val->resolution.yres,
                                val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpc");
+                                   "dpi" : "dpcm");
           break;
 
       case IPP_TAG_DATE :

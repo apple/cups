@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	2	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	3	/* Version number in cache file */
 
 
 /*
@@ -141,6 +141,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 		*prefilters;		/* cupsPreFilter values */
   int		single_file;		/* cupsSingleFile value */
   cups_array_t	*finishings;		/* cupsIPPFinishings values */
+  int		max_copies;		/* cupsMaxCopies value */
 };
 
 

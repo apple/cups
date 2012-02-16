@@ -379,10 +379,17 @@
 
 
 /*
- * Do we have DNS Service Discovery (aka Bonjour)?
+ * Do we have mDNSResponder for DNS Service Discovery (aka Bonjour)?
  */
 
 #undef HAVE_DNSSD
+
+
+/*
+ * Do we have Avahi for DNS Service Discovery (aka Bonjour)?
+ */
+
+#undef HAVE_AVAHI
 
 
 /*
@@ -721,13 +728,6 @@
  */
 
 #undef CUPS_BUNDLEDIR
-
-
-/*
- * Do we have the ColorSyncRegisterDevice function?
- */
-
-#undef HAVE_COLORSYNCREGISTERDEVICE
 
 
 /*

@@ -98,12 +98,18 @@ main(int  argc,				/* I - Number of command-line args */
       (ptr = strrchr(libpath, '/')) != NULL && !strcmp(ptr, "/backend"))
   {
     strlcpy(ptr, "/cups", sizeof(libpath) - (ptr - libpath));
-    if (access(libpath, 0))
+    if (!access(libpath, 0))
+    {
 #ifdef __APPLE__
+      fprintf(stderr, "Setting DYLD_LIBRARY_PATH to \"%s\".\n", libpath);
       setenv("DYLD_LIBRARY_PATH", libpath, 1);
 #else
+      fprintf(stderr, "Setting LD_LIBRARY_PATH to \"%s\".\n", libpath);
       setenv("LD_LIBRARY_PATH", libpath, 1);
 #endif /* __APPLE__ */
+    }
+    else
+      perror(libpath);
   }
 
  /*

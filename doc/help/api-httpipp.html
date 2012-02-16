@@ -468,6 +468,8 @@ request-uri.">httpMD5Final</a></li>
 	<li><a href="#httpRead" title="Read data from a HTTP connection.">httpRead</a></li>
 	<li><a href="#httpRead2" title="Read data from a HTTP connection.">httpRead2</a></li>
 	<li><a href="#httpReconnect" title="Reconnect to a HTTP server.">httpReconnect</a></li>
+	<li><a href="#httpReconnect2" title="Reconnect to a HTTP server with timeout and optional
+cancel.">httpReconnect2</a></li>
 	<li><a href="#httpSeparate" title="Separate a Universal Resource Identifier into its
 components.">httpSeparate</a></li>
 	<li><a href="#httpSeparate2" title="Separate a Universal Resource Identifier into its
@@ -516,18 +518,21 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippEnumValue" title="Return the value associated with a given enum string.">ippEnumValue</a></li>
 	<li><a href="#ippErrorString" title="Return a name for the given status code.">ippErrorString</a></li>
 	<li><a href="#ippErrorValue" title="Return a status code for the given name.">ippErrorValue</a></li>
-	<li><a href="#ippFindAttribute" title="Find a named attribute in a request...">ippFindAttribute</a></li>
-	<li><a href="#ippFindNextAttribute" title="Find the next named attribute in a request...">ippFindNextAttribute</a></li>
+	<li><a href="#ippFindAttribute" title="Find a named attribute in a request.">ippFindAttribute</a></li>
+	<li><a href="#ippFindNextAttribute" title="Find the next named attribute in a request.">ippFindNextAttribute</a></li>
 	<li><a href="#ippFirstAttribute" title="Return the first attribute in the message.">ippFirstAttribute</a></li>
 	<li><a href="#ippGetBoolean" title="Get a boolean value for an attribute.">ippGetBoolean</a></li>
 	<li><a href="#ippGetCollection" title="Get a collection value for an attribute.">ippGetCollection</a></li>
 	<li><a href="#ippGetCount" title="Get the number of values in an attribute.">ippGetCount</a></li>
+	<li><a href="#ippGetDate" title="Get a date value for an attribute.">ippGetDate</a></li>
 	<li><a href="#ippGetGroupTag" title="Get the group associated with an attribute.">ippGetGroupTag</a></li>
 	<li><a href="#ippGetInteger" title="Get the integer/enum value for an attribute.">ippGetInteger</a></li>
 	<li><a href="#ippGetName" title="Get the attribute name.">ippGetName</a></li>
 	<li><a href="#ippGetOperation" title="Get the operation ID in an IPP message.">ippGetOperation</a></li>
+	<li><a href="#ippGetRange" title="Get a rangeOfInteger value from an attribute.">ippGetRange</a></li>
 	<li><a href="#ippGetRequestId" title="Get the request ID from an IPP message.">ippGetRequestId</a></li>
 	<li><a href="#ippGetResolution" title="Get a resolution value for an attribute.">ippGetResolution</a></li>
+	<li><a href="#ippGetState" title="Get the IPP message state.">ippGetState</a></li>
 	<li><a href="#ippGetStatusCode" title="Get the status code from an IPP response or event message.">ippGetStatusCode</a></li>
 	<li><a href="#ippGetString" title="Return the value...">ippGetString</a></li>
 	<li><a href="#ippGetValueTag" title="Get the value tag for an attribute.">ippGetValueTag</a></li>
@@ -544,6 +549,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippReadIO" title="Read data for an IPP message.">ippReadIO</a></li>
 	<li><a href="#ippSetBoolean" title="Set a boolean value in an attribute.">ippSetBoolean</a></li>
 	<li><a href="#ippSetCollection" title="Set a collection value in an attribute.">ippSetCollection</a></li>
+	<li><a href="#ippSetDate" title="Set a date value in an attribute.">ippSetDate</a></li>
 	<li><a href="#ippSetGroupTag" title="Set the group tag of an attribute.">ippSetGroupTag</a></li>
 	<li><a href="#ippSetInteger" title="Set an integer or enum value in an attribute.">ippSetInteger</a></li>
 	<li><a href="#ippSetName" title="Set the name of an attribute.">ippSetName</a></li>
@@ -552,6 +558,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippSetRange" title="Set a rangeOfInteger value in an attribute.">ippSetRange</a></li>
 	<li><a href="#ippSetRequestId" title="Set the request ID in an IPP message.">ippSetRequestId</a></li>
 	<li><a href="#ippSetResolution" title="Set a resolution value in an attribute.">ippSetResolution</a></li>
+	<li><a href="#ippSetState" title="Set the current state of the IPP message.">ippSetState</a></li>
 	<li><a href="#ippSetStatusCode" title="Set the status code in an IPP response or event message.">ippSetStatusCode</a></li>
 	<li><a href="#ippSetString" title="Set a string value in an attribute.">ippSetString</a></li>
 	<li><a href="#ippSetValueTag" title="Set the value tag of an attribute.">ippSetValueTag</a></li>
@@ -2350,6 +2357,26 @@ int httpReconnect (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, non-zero on failure</p>
+<h3 class="function"><a name="httpReconnect2">httpReconnect2</a></h3>
+<p class="description">Reconnect to a HTTP server with timeout and optional
+cancel.</p>
+<p class="code">
+int httpReconnect2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int msec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cancel<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>msec</dt>
+<dd class="description">Timeout in milliseconds</dd>
+<dt>cancel</dt>
+<dd class="description">Pointer to &quot;cancel&quot; variable</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, non-zero on failure</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpSeparate">httpSeparate</a></h3>
 <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
@@ -3415,7 +3442,7 @@ void ippDeleteAttribute (<br>
 <p class="code">
 int ippDeleteValues (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int count<br>
 );</p>
@@ -3433,8 +3460,10 @@ int ippDeleteValues (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The <code>element</code> parameter specifies the first value to delete, starting at 0. It
-must be less than the number of values returned by <a href="#ippGetCount"><code>ippGetCount</code></a>.<br>
+<p class="discussion">The <code>element</code> parameter specifies the first value to delete, starting at
+0. It must be less than the number of values returned by <a href="#ippGetCount"><code>ippGetCount</code></a>.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
 <br>
 Deleting all values in an attribute deletes the attribute.
 
@@ -3498,7 +3527,7 @@ ipp_status_t ippErrorValue (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">IPP status code</p>
 <h3 class="function"><a name="ippFindAttribute">ippFindAttribute</a></h3>
-<p class="description">Find a named attribute in a request...</p>
+<p class="description">Find a named attribute in a request.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
@@ -3517,7 +3546,7 @@ ipp_status_t ippErrorValue (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
 <h3 class="function"><a name="ippFindNextAttribute">ippFindNextAttribute</a></h3>
-<p class="description">Find the next named attribute in a request...</p>
+<p class="description">Find the next named attribute in a request.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindNextAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
@@ -3603,6 +3632,27 @@ int ippGetCount (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of values or -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetDate">ippGetDate</a></h3>
+<p class="description">Get a date value for an attribute.</p>
+<p class="code">
+const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippGetDate (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Date value or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetGroupTag">ippGetGroupTag</a></h3>
 <p class="description">Get the group associated with an attribute.</p>
 <p class="code">
@@ -3663,6 +3713,30 @@ ipp_op_t ippGetOperation (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Operation ID or -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetRange">ippGetRange</a></h3>
+<p class="description">Get a rangeOfInteger value from an attribute.</p>
+<p class="code">
+int ippGetRange (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *uppervalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>uppervalue</dt>
+<dd class="description">Upper value of range</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Lower value of range or -1</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetRequestId">ippGetRequestId</a></h3>
 <p class="description">Get the request ID from an IPP message.</p>
 <p class="code">
@@ -3703,6 +3777,19 @@ int ippGetResolution (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetState">ippGetState</a></h3>
+<p class="description">Get the IPP message state.</p>
+<p class="code">
+<a href="#ipp_state_t">ipp_state_t</a> ippGetState (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">IPP message state value</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetStatusCode">ippGetStatusCode</a></h3>
 <p class="description">Get the status code from an IPP response or event message.</p>
 <p class="code">
@@ -3972,6 +4059,38 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetDate">ippSetDate</a></h3>
+<p class="description">Set a date value in an attribute.</p>
+<p class="code">
+int ippSetDate (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#ipp_uchar_t">ipp_uchar_t</a> *datevalue<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>datevalue</dt>
+<dd class="description">Date value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to the IPP message containing the attribute that was
+previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetGroupTag">ippSetGroupTag</a></h3>
 <p class="description">Set the group tag of an attribute.</p>
 <p class="code">
@@ -4190,6 +4309,22 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetState">ippSetState</a></h3>
+<p class="description">Set the current state of the IPP message.</p>
+<p class="code">
+int ippSetState (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_state_t">ipp_state_t</a> state<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>state</dt>
+<dd class="description">IPP state value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetStatusCode">ippSetStatusCode</a></h3>
 <p class="description">Set the status code in an IPP response or event message.</p>
 <p class="code">
@@ -5093,6 +5228,8 @@ are server-oriented...</p>
 <dd class="description">Hold a job for printing</dd>
 <dt>IPP_IDENTIFY_PRINTER </dt>
 <dd class="description">Identify-Printer (proposed IPP JPS3)</dd>
+<dt>IPP_OP_CUPS_INVALID </dt>
+<dd class="description">Invalid operation name for <a href="#ippOpValue"><code>ippOpValue</code></a></dd>
 <dt>IPP_PAUSE_PRINTER </dt>
 <dd class="description">Stop a printer</dd>
 <dt>IPP_PRINT_JOB </dt>
@@ -5261,10 +5398,16 @@ are server-oriented...</p>
 <dd class="description">client-error-request-value-too-long</dd>
 <dt>IPP_SERVICE_UNAVAILABLE </dt>
 <dd class="description">server-error-service-unavailable</dd>
+<dt>IPP_STATUS_CUPS_INVALID </dt>
+<dd class="description">Invalid status name for <a href="#ippErrorValue"><code>ippErrorValue</code></a></dd>
 <dt>IPP_TEMPORARY_ERROR </dt>
 <dd class="description">server-error-temporary-error</dd>
 <dt>IPP_TIMEOUT </dt>
 <dd class="description">client-error-timeout</dd>
+<dt>IPP_TOO_MANY_DOCUMENTS </dt>
+<dd class="description">server-error-too-many-documents</dd>
+<dt>IPP_TOO_MANY_JOBS </dt>
+<dd class="description">server-error-too-many-jobs</dd>
 <dt>IPP_TOO_MANY_SUBSCRIPTIONS </dt>
 <dd class="description">client-error-too-many-subscriptions</dd>
 <dt>IPP_UPGRADE_REQUIRED </dt>
@@ -5286,6 +5429,8 @@ are server-oriented...</p>
 <dd class="description">Boolean value</dd>
 <dt>IPP_TAG_CHARSET </dt>
 <dd class="description">Character set value</dd>
+<dt>IPP_TAG_CUPS_INVALID </dt>
+<dd class="description">Invalid tag name for <a href="#ippTagValue"><code>ippTagValue</code></a></dd>
 <dt>IPP_TAG_DATE </dt>
 <dd class="description">Date/time value</dd>
 <dt>IPP_TAG_DEFAULT </dt>

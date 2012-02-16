@@ -1,8 +1,21 @@
-CHANGES.txt - 1.6b1 - 2012-01-30
+CHANGES.txt - 1.6b1 - 2012-02-15
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
+	- Documentation updates (STR #3927, STR #3980, STR #4010)
+	- CUPS now supports a User directive in client.conf and the CUPS_USER
+	  environment variable for overriding the default username (STR #3114)
+	- Now set the PJL USERNAME variable as needed (STR #3100)
+	- Added support for usernames and passwords longer than 32 characters
+	  (STR #2856)
+	- Added a new MaxHoldTime directive to automatically cancel jobs that
+	  have been held indefinitely after a specific number of seconds
+	  (STR #2291)
+	- The LPD backend now uses the originating host name when it is not the
+	  local system (STR #2053)
+	- CUPS now prefers the suffix "dpcm" when reporting resolution in dots-
+	  per-centimeter (STR #4006)
 	- The configure script and build system no longer support building of
 	  separate 32-bit and 64-bit libraries.
 	- The "brightness", "columns", "fitplot", "gamma", "hue",

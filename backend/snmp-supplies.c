@@ -149,7 +149,7 @@ static const int	prtMarkerSuppliesType[] =
 
 static const backend_state_t const printer_states[] =
 			{
-			  { CUPS_TC_lowPaper, "media-low-report" },
+			  /* { CUPS_TC_lowPaper, "media-low-report" }, */
 			  { CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty, "media-empty-warning" },
 			  /* { CUPS_TC_lowToner, "toner-low-report" }, */ /* now use prtMarkerSupplies */
 			  /* { CUPS_TC_noToner, "toner-empty-warning" }, */ /* now use prtMarkerSupplies */

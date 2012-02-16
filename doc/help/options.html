@@ -95,8 +95,8 @@ printing.</P>
 printer options using the <CODE>-o</CODE> option:</P>
 
 <PRE CLASS="command">
-lp -o landscape -o scaling=75 -o media=A4 filename.jpg
-lpr -o landscape -o scaling=75 -o media=A4 filename.jpg
+lp -o landscape -o fit-to-page -o media=A4 filename.jpg
+lpr -o landscape -o fit-to-page -o media=A4 filename.jpg
 </PRE>
 
 <P>The available printer options vary depending on the printer.
@@ -661,118 +661,6 @@ lp -o nowrap filename
 lpr -o nowrap filename
 </PRE>
 
-
-<H2 CLASS="title"><SPAN CLASS="info">Not Supported on Mac OS X</SPAN><A NAME="IMAGEOPTIONS">Image Options</A></H2>
-
-<P>CUPS supports several options that are only used when printing
-image files. These options have absolutely no effect on PostScript, PDF,
-HP-GL/2, or text files.</P>
-
-<H3><A NAME="position">Positioning Images</A></H3>
-
-<P>The <CODE>-o position=name</CODE> option specifies the position of the
-image on the page:
-
-<UL>
-
-	<LI><CODE>center</CODE> - Center the image on the page (default)
-
-	<LI><CODE>top</CODE> - Print the image centered at the top of the page
-
-	<LI><CODE>left</CODE> - Print the image centered on the left of page
-
-	<LI><CODE>right</CODE> - Print the image centered on the right of the page
-
-	<LI><CODE>top-left</CODE> - Print the image at the top left corner of
-	the page
-
-	<LI><CODE>top-right</CODE> - Print the image at the top right corner of
-	the page
-
-	<LI><CODE>bottom</CODE> - Print the image centered at the bottom of
-	the page
-
-	<LI><CODE>bottom-left</CODE> - Print the image at the bottom left
-	corner of the page
-
-	<LI><CODE>bottom-right</CODE> - Print the image at the bottom right
-	corner of the page
-
-</UL>
-
-<H3><A NAME="scaling">Scaling Images</A></H3>
-
-<P>The <CODE>-o scaling=percent</CODE>, <CODE>-o
-ppi=value</CODE>, and <CODE>-o natural-scaling=percent</CODE>
-options change the size of a printed image:
-
-<PRE CLASS="command">
-lp -o scaling=<EM>percent</EM> filename 
-lp -o ppi=<EM>value</EM> filename
-lpr -o natural-scaling=<EM>percent</EM> filename
-</PRE>
-
-<P>The <CODE>scaling=percent</CODE> value is a number from 1 to 800
-specifying the size in relation to the page (<EM>not</EM> the image.) A
-scaling of 100 percent will fill the page as completely as the image
-aspect ratio allows. A scaling of 200 percent will print on up to 4
-pages.
-
-<P>The <CODE>ppi=value</CODE> value is a number from 1 to 1200 specifying the
-resolution of the image in pixels per inch. An image that is 3000x2400
-pixels will print 10x8 inches at 300 pixels per inch, for example. If
-the specified resolution makes the image larger than the page, multiple
-pages will be printed to satisfy the request.
-
-<P>The <CODE>natural-scaling=percent</CODE> value is a number
-from 1 to 800 specifying the size in relation to the natural
-image size. A scaling of 100 percent will print the image at its
-natural size, while a scaling of 50 percent will print the image
-at half its natural size. If the specified scaling makes the
-image larger than the page, multiple pages will be printed to
-satisfy the request.
-
-
-<H2 CLASS="title"><A NAME="HPGL2OPTIONS">HP-GL/2 Options</A></H2>
-
-<P>CUPS supports several options that are only used when printing
-HP-GL/2 files. These options have absolutely no effect on PostScript, PDF,
-image, or text files.</P>
-
-<H3><A NAME="blackplot">Printing in Black</A></H3>
-
-<P>The <CODE>-o blackplot</CODE> option specifies that all pens should
-plot in black:</P>
-
-<PRE CLASS="command">
-lp -o blackplot filename
-lpr -o blackplot filename
-</PRE>
-
-<P>The default is to use the colors defined in the plot file or the
-standard pen colors defined in the HP-GL/2 reference manual from
-Hewlett Packard.
-
-<H3><A NAME="penwidth">Setting the Default Pen Width</A></H3>
-
-<P>The <CODE>-o penwidth=value</CODE> option specifies the default pen
-width for HP-GL/2 files:</P>
-
-<PRE CLASS="command">
-lp -o penwidth=<EM>value</EM> filename
-lpr -o penwidth=<EM>value</EM> filename
-</PRE>
-
-<P>The pen width <CODE>value</CODE> specifies the pen width in micrometers.
-The default value of 1000 produces lines that are 1 millimeter in width.
-Specifying a pen width of 0 produces lines that are exactly 1 pixel wide.</P>
-
-<BLOCKQUOTE><B>Note:</B>
-
-<P>This option is ignored when the pen widths are set in the plot
-file.
-
-</BLOCKQUOTE>
 
 </BODY>
 </HTML>

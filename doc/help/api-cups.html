@@ -400,8 +400,13 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
 	<li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
 	<li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
+	<li><a href="#cupsConnectDest" title="Connect to the server for a destination.">cupsConnectDest</a></li>
+	<li><a href="#cupsConnectDestBlock" title="Connect to the server for a destination.">cupsConnectDestBlock</a></li>
+	<li><a href="#cupsCopyDest" title="Callback block">cupsCopyDest</a></li>
 	<li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
 	<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
+	<li><a href="#cupsEnumDests" title="Enumerate available destinations with a callback function.">cupsEnumDests</a></li>
+	<li><a href="#cupsEnumDestsBlock" title="Enumerate available destinations with a block.">cupsEnumDestsBlock</a></li>
 	<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
 	<li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
 	<li><a href="#cupsFreeJobs" title="Free memory used by job data.">cupsFreeJobs</a></li>
@@ -463,27 +468,40 @@ connections.">cupsSetCredentials</a></li>
 	<li><a href="#cupsUser" title="Return the current user's name.">cupsUser</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_client_cert_cb_t" title="Client credentials callback ">cups_client_cert_cb_t</a></li>
+	<li><a href="#cups_client_cert_cb_t" title="Client credentials callback
+">cups_client_cert_cb_t</a></li>
+	<li><a href="#cups_dest_block_t" title="Destination enumeration block
+">cups_dest_block_t</a></li>
+	<li><a href="#cups_dest_cb_t" title="Destination enumeration callback
+">cups_dest_cb_t</a></li>
 	<li><a href="#cups_dest_t" title="Destination">cups_dest_t</a></li>
-	<li><a href="#cups_device_cb_t" title="Device callback ">cups_device_cb_t</a></li>
+	<li><a href="#cups_device_cb_t" title="Device callback
+">cups_device_cb_t</a></li>
+	<li><a href="#cups_dinfo_t" title="Destination capability and status
+information ">cups_dinfo_t</a></li>
 	<li><a href="#cups_job_t" title="Job">cups_job_t</a></li>
 	<li><a href="#cups_option_t" title="Printer Options">cups_option_t</a></li>
-	<li><a href="#cups_password_cb2_t" title="New password callback ">cups_password_cb2_t</a></li>
+	<li><a href="#cups_password_cb2_t" title="New password callback
+">cups_password_cb2_t</a></li>
 	<li><a href="#cups_password_cb_t" title="Password callback">cups_password_cb_t</a></li>
 	<li><a href="#cups_ptype_t" title="Printer type/capability bits">cups_ptype_t</a></li>
-	<li><a href="#cups_server_cert_cb_t" title="Server credentials callback ">cups_server_cert_cb_t</a></li>
+	<li><a href="#cups_server_cert_cb_t" title="Server credentials callback
+">cups_server_cert_cb_t</a></li>
+	<li><a href="#cups_size_t" title="Media Size ">cups_size_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#cups_dest_s" title="Destination">cups_dest_s</a></li>
 	<li><a href="#cups_job_s" title="Job">cups_job_s</a></li>
 	<li><a href="#cups_option_s" title="Printer Options">cups_option_s</a></li>
+	<li><a href="#cups_size_s" title="Media Size ">cups_size_s</a></li>
 </ul></li>
 <li><a href="#VARIABLES">Variables</a><ul class="code">
 	<li><a href="#CF_RETURNS_RETAINED" title="Get the Apple language identifier associated with a
 locale ID.">CF_RETURNS_RETAINED</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
-	<li><a href="#cups_ptype_e" title="Printer type/capability bit constants">cups_ptype_e</a></li>
+	<li><a href="#cups_ptype_e" title="Printer type/capability bit
+constants">cups_ptype_e</a></li>
 </ul></li>
 </ul>
 <!--
@@ -1152,6 +1170,108 @@ Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cu
 the cause of any failure.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cupsConnectDest">cupsConnectDest</a></h3>
+<p class="description">Connect to the server for a destination.</p>
+<p class="code">
+http_t *cupsConnectDest (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int msec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cancel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t resourcesize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_cb_t">cups_dest_cb_t</a> cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>flags</dt>
+<dd class="description">Connection flags</dd>
+<dt>msec</dt>
+<dd class="description">Timeout in milliseconds</dd>
+<dt>cancel</dt>
+<dd class="description">Pointer to &quot;cancel&quot; variable</dd>
+<dt>resource</dt>
+<dd class="description">Resource buffer</dd>
+<dt>resourcesize</dt>
+<dd class="description">Size of resource buffer</dd>
+<dt>cb</dt>
+<dd class="description">Callback function</dd>
+<dt>user_data</dt>
+<dd class="description">User data pointer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Connection to server or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Connect to the destination, returning a new http_t connection object and
+optionally the resource path to use for the destination.  These calls will
+block until a connection is made, the timeout expires, the integer pointed
+to by &quot;cancel&quot; is non-zero, or the callback function (or block) returns 0,
+The caller is responsible for calling httpClose() on the returned object.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cupsConnectDestBlock">cupsConnectDestBlock</a></h3>
+<p class="description">Connect to the server for a destination.</p>
+<p class="code">
+http_t *cupsConnectDestBlock (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int msec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cancel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t resourcesize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_block_t">cups_dest_block_t</a> block<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>flags</dt>
+<dd class="description">Connection flags</dd>
+<dt>msec</dt>
+<dd class="description">Timeout in milliseconds</dd>
+<dt>cancel</dt>
+<dd class="description">Pointer to &quot;cancel&quot; variable</dd>
+<dt>resource</dt>
+<dd class="description">Resource buffer</dd>
+<dt>resourcesize</dt>
+<dd class="description">Size of resource buffer</dd>
+<dt>block</dt>
+<dd class="description">Callback block</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Connection to server or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Connect to the destination, returning a new http_t connection object and
+optionally the resource path to use for the destination.  These calls will
+block until a connection is made, the timeout expires, the integer pointed
+to by &quot;cancel&quot; is non-zero, or the callback function (or block) returns 0,
+The caller is responsible for calling httpClose() on the returned object.
+
+</p>
+<h3 class="function"><a name="cupsCopyDest">cupsCopyDest</a></h3>
+<p class="description">Callback block</p>
+<p class="code">
+int cupsCopyDest (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_dests,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> **dests<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dest</dt>
+<dt>num_dests</dt>
+<dt>dests</dt>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Copy a destination.</p>
+<p class="discussion">Make a copy of the destination to an array of destinations (or just a single
+copy) - for use with the cupsEnumDests* functions. The caller is responsible
+for calling cupsFreeDests() on the returned object(s).
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsCreateJob">cupsCreateJob</a></h3>
 <p class="description">Create an empty job for streaming.</p>
 <p class="code">
@@ -1201,6 +1321,86 @@ Note: The current encryption setting is tracked separately for each thread
 in a program. Multi-threaded programs that override the setting via the
 <a href="#cupsSetEncryption"><code>cupsSetEncryption</code></a> function need to do so in each thread for the same
 setting to be used.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cupsEnumDests">cupsEnumDests</a></h3>
+<p class="description">Enumerate available destinations with a callback function.</p>
+<p class="code">
+int cupsEnumDests (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int msec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cancel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ptype_t">cups_ptype_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ptype_t">cups_ptype_t</a> mask,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_cb_t">cups_dest_cb_t</a> cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>flags</dt>
+<dd class="description">Enumeration flags</dd>
+<dt>msec</dt>
+<dd class="description">Timeout in milliseconds,
+-1 for indefinite</dd>
+<dt>cancel</dt>
+<dd class="description">Pointer to &quot;cancel&quot; variable</dd>
+<dt>type</dt>
+<dd class="description">Printer type bits</dd>
+<dt>mask</dt>
+<dd class="description">Mask for printer type bits</dd>
+<dt>cb</dt>
+<dd class="description">Callback function</dd>
+<dt>user_data</dt>
+<dd class="description">User data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Destinations are enumerated from one or more sources. The callback function
+receives the <code>user_data</code> pointer, destination name, instance, number of
+options, and options which can be used as input to the <a href="#cupsAddDest"><code>cupsAddDest</code></a>
+function.  The function must return 1 to continue enumeration or 0 to stop.<br>
+<br>
+Enumeration happens on the current thread and does not return until all
+destinations have been enumerated or the callback function returns 0.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cupsEnumDestsBlock">cupsEnumDestsBlock</a></h3>
+<p class="description">Enumerate available destinations with a block.</p>
+<p class="code">
+int cupsEnumDestsBlock (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *cancel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ptype_t">cups_ptype_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_ptype_t">cups_ptype_t</a> mask,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_block_t">cups_dest_block_t</a> block<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>flags</dt>
+<dd class="description">Enumeration flags</dd>
+<dt>timeout</dt>
+<dd class="description">Timeout in milliseconds, 0 for indefinite</dd>
+<dt>cancel</dt>
+<dd class="description">Pointer to &quot;cancel&quot; variable</dd>
+<dt>type</dt>
+<dd class="description">Printer type bits</dd>
+<dt>mask</dt>
+<dd class="description">Mask for printer type bits</dd>
+<dt>block</dt>
+<dd class="description">Block</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Destinations are enumerated from one or more sources. The block receives the
+destination name, instance, number of options, and options which can be used
+as input to the <a href="#cupsAddDest"><code>cupsAddDest</code></a> function.  The block must return 1 to
+continue enumeration or 0 to stop.<br>
+<br>
+Enumeration happens on the current thread and does not return until all
+destinations have been enumerated or the block returns 0.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
 <p class="description">Finish sending a document.</p>
 <p class="code">
@@ -2332,9 +2532,22 @@ program. Multi-threaded programs that override the user name with the
 name to be used.</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
-<p class="description">Client credentials callback </p>
+<p class="description">Client credentials callback
+</p>
 <p class="code">
 typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls, cups_array_t *distinguished_names, void *user_data);
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cups_dest_block_t">cups_dest_block_t</a></h3>
+<p class="description">Destination enumeration block
+</p>
+<p class="code">
+typedef int (*cups_dest_block_t(unsigned flags, <a href="#cups_dest_t">cups_dest_t</a> *dest);
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cups_dest_cb_t">cups_dest_cb_t</a></h3>
+<p class="description">Destination enumeration callback
+</p>
+<p class="code">
+typedef int (*cups_dest_cb_t)(void *user_data, unsigned flags, <a href="#cups_dest_t">cups_dest_t</a> *dest);
 </p>
 <h3 class="typedef"><a name="cups_dest_t">cups_dest_t</a></h3>
 <p class="description">Destination</p>
@@ -2342,9 +2555,16 @@ typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls, cups_array_t *dist
 typedef struct <a href="#cups_dest_s">cups_dest_s</a> cups_dest_t;
 </p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cups_device_cb_t">cups_device_cb_t</a></h3>
-<p class="description">Device callback </p>
+<p class="description">Device callback
+</p>
 <p class="code">
 typedef void (*cups_device_cb_t)(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, void *user_data);
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cups_dinfo_t">cups_dinfo_t</a></h3>
+<p class="description">Destination capability and status
+information </p>
+<p class="code">
+typedef struct _cups_dinfo_s cups_dinfo_t;
 </p>
 <h3 class="typedef"><a name="cups_job_t">cups_job_t</a></h3>
 <p class="description">Job</p>
@@ -2357,7 +2577,8 @@ typedef struct <a href="#cups_job_s">cups_job_s</a> cups_job_t;
 typedef struct <a href="#cups_option_s">cups_option_s</a> cups_option_t;
 </p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cups_password_cb2_t">cups_password_cb2_t</a></h3>
-<p class="description">New password callback </p>
+<p class="description">New password callback
+</p>
 <p class="code">
 typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data);
 </p>
@@ -2372,9 +2593,15 @@ typedef const char *(*cups_password_cb_t)(const char *prompt);
 typedef unsigned cups_ptype_t;
 </p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="cups_server_cert_cb_t">cups_server_cert_cb_t</a></h3>
-<p class="description">Server credentials callback </p>
+<p class="description">Server credentials callback
+</p>
 <p class="code">
 typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *certs, void *user_data);
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cups_size_t">cups_size_t</a></h3>
+<p class="description">Media Size </p>
+<p class="code">
+typedef struct <a href="#cups_size_s">cups_size_s</a> cups_size_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
 <h3 class="struct"><a name="cups_dest_s">cups_dest_s</a></h3>
@@ -2449,6 +2676,20 @@ typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *cert
 <dt>value </dt>
 <dd class="description">Value of option</dd>
 </dl>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="cups_size_s">cups_size_s</a></h3>
+<p class="description">Media Size </p>
+<p class="code">struct cups_size_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char media[128];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width, length, bottom, left, right, top;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>media[128] </dt>
+<dd class="description">Media name to use</dd>
+<dt>top </dt>
+<dd class="description">Top margin in hundredths of
+millimeters</dd>
+</dl>
 <h2 class="title"><a name="VARIABLES">Variables</a></h2>
 <h3 class="variable"><a name="CF_RETURNS_RETAINED">CF_RETURNS_RETAINED</a></h3>
 <p class="description">Get the Apple language identifier associated with a
@@ -2456,11 +2697,13 @@ locale ID.</p>
 <p class="code">const char *locale) CF_RETURNS_RETAINED;</p>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
 <h3 class="enumeration"><a name="cups_ptype_e">cups_ptype_e</a></h3>
-<p class="description">Printer type/capability bit constants</p>
+<p class="description">Printer type/capability bit
+constants</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_PRINTER_AUTHENTICATED <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Printer requires authentication </dd>
+<dd class="description">Printer requires authentication
+</dd>
 <dt>CUPS_PRINTER_BIND </dt>
 <dd class="description">Can bind output</dd>
 <dt>CUPS_PRINTER_BW </dt>
@@ -2472,7 +2715,8 @@ locale ID.</p>
 <dt>CUPS_PRINTER_COLOR </dt>
 <dd class="description">Can do color printing</dd>
 <dt>CUPS_PRINTER_COMMANDS <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Printer supports maintenance commands </dd>
+<dd class="description">Printer supports maintenance commands
+</dd>
 <dt>CUPS_PRINTER_COPIES </dt>
 <dd class="description">Can do copies</dd>
 <dt>CUPS_PRINTER_COVER </dt>
@@ -2480,15 +2724,12 @@ locale ID.</p>
 <dt>CUPS_PRINTER_DEFAULT </dt>
 <dd class="description">Default printer on network</dd>
 <dt>CUPS_PRINTER_DELETE <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Delete printer </dd>
-<dt>CUPS_PRINTER_DISCOVERED <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Printer was automatically discovered and added </dd>
+<dd class="description">Delete printer
+</dd>
 <dt>CUPS_PRINTER_DUPLEX </dt>
 <dd class="description">Can do duplexing</dd>
 <dt>CUPS_PRINTER_FAX </dt>
 <dd class="description">Fax queue</dd>
-<dt>CUPS_PRINTER_IMPLICIT </dt>
-<dd class="description">Implicit class</dd>
 <dt>CUPS_PRINTER_LARGE </dt>
 <dd class="description">Can do D/E/A1/A0</dd>
 <dt>CUPS_PRINTER_LOCAL </dt>
@@ -2496,9 +2737,11 @@ locale ID.</p>
 <dt>CUPS_PRINTER_MEDIUM </dt>
 <dd class="description">Can do Tabloid/B/C/A3/A2</dd>
 <dt>CUPS_PRINTER_MFP <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
-<dd class="description">Printer with scanning capabilities </dd>
+<dd class="description">Printer with scanning capabilities
+</dd>
 <dt>CUPS_PRINTER_NOT_SHARED <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Printer is not shared </dd>
+<dd class="description">Printer is not shared
+</dd>
 <dt>CUPS_PRINTER_PUNCH </dt>
 <dd class="description">Can punch output</dd>
 <dt>CUPS_PRINTER_REJECTING </dt>
@@ -2506,7 +2749,8 @@ locale ID.</p>
 <dt>CUPS_PRINTER_REMOTE </dt>
 <dd class="description">Remote printer or class</dd>
 <dt>CUPS_PRINTER_SCANNER <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
-<dd class="description">Scanner-only device </dd>
+<dd class="description">Scanner-only device
+</dd>
 <dt>CUPS_PRINTER_SMALL </dt>
 <dd class="description">Can do Letter/Legal/A4</dd>
 <dt>CUPS_PRINTER_SORT </dt>

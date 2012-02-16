@@ -3,7 +3,7 @@
 .\"
 .\"   client.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2011 by Apple Inc.
+.\"   Copyright 2007-2012 by Apple Inc.
 .\"   Copyright 2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "2 September 2011" "Apple Inc."
+.TH client.conf 5 "CUPS" "15 February 2012" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups
 .SH DESCRIPTION
@@ -46,10 +46,14 @@ ServerName /domain/socket
 .br
 Specifies the address and optionally the port to use when connecting to the
 server. \fBNote: Not supported on Mac OS X 10.7 or later.\fR
+.TP 5
+User name
+.br
+Specifies the default user name to use for requests.
 .SH SEE ALSO
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2011 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id: client.conf.man.in 6649 2007-07-11 21:46:42Z mike $".
 .\"

@@ -3,7 +3,7 @@
  *
  *   Authorization routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -130,8 +130,8 @@ static void		to64(char *s, unsigned long v, int n);
 #if HAVE_LIBPAM
 typedef struct cupsd_authdata_s		/**** Authentication data ****/
 {
-  char	username[33],			/* Username string */
-	password[33];			/* Password string */
+  char	username[HTTP_MAX_VALUE],	/* Username string */
+	password[HTTP_MAX_VALUE];	/* Password string */
 } cupsd_authdata_t;
 #endif /* HAVE_LIBPAM */
 
@@ -322,8 +322,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   int		type;			/* Authentication type */
   const char	*authorization;		/* Pointer into Authorization string */
   char		*ptr,			/* Pointer into string */
-		username[256],		/* Username string */
-		password[33];		/* Password string */
+		username[HTTP_MAX_VALUE],
+					/* Username string */
+		password[HTTP_MAX_VALUE];
+					/* Password string */
   cupsd_cert_t	*localuser;		/* Certificate username */
   char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
 		md5[33],		/* MD5 password */

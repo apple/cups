@@ -3,7 +3,7 @@
  *
  *   Scheduler notification tester for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -453,7 +453,7 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
       case IPP_TAG_RESOLUTION :
           for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
 	    printf(" %dx%d%s", val->resolution.xres, val->resolution.yres,
-	           val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpc");
+	           val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           putchar('\n');
           break;
 

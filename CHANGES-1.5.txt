@@ -3,11 +3,12 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The cups-driverd program could temporarily "forget" a PPD file if it
+	  was updated in place.
+	- The dnssd backend now prefers IPPS over IPP.
 	- The USB backend now uses and requires LIBUSB 1.0 or later (STR #3477)
 	- The LIBUSB-based USB backend now supports the back-channel (STR #2890)
 	- Changed how timeouts are implemented in the LPD backend (STR #4013)
-	- The IPP backend no longer specifies the document-format for auto-
-	  detect unless required (STR #3986)
 	- Added more supported color names for SNMP supplies (STR #3981)
 	- The default InputSlot setting was never used (STR #3957)
 	- POSIX ACLs are now set properly on certificate files (STR #3970)

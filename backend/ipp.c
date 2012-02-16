@@ -90,7 +90,9 @@ static const char * const jattrs[] =	/* Job attributes we want */
 };
 static int		job_canceled = 0;
 					/* Job cancelled? */
-static char		*password = NULL;
+static char		username[256] = "",
+					/* Username for device URI */
+			*password = NULL;
 					/* Password for device URI */
 static int		password_tries = 0;
 					/* Password tries */
@@ -98,7 +100,6 @@ static const char * const pattrs[] =	/* Printer attributes we want */
 {
   "copies-supported",
   "cups-version",
-  "document-format-default",
   "document-format-supported",
   "marker-colors",
   "marker-high-levels",
@@ -190,7 +191,6 @@ main(int  argc,				/* I - Number of command-line args */
   const char	*device_uri;		/* Device URI */
   char		scheme[255],		/* Scheme in URI */
 		hostname[1024],		/* Hostname */
-		username[255],		/* Username info */
 		resource[1024],		/* Resource info (printer name) */
 		addrname[256],		/* Address name */
 		*optptr,		/* Pointer to URI options */
@@ -230,7 +230,6 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *job_state;		/* job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
-  ipp_attribute_t *format_dflt;		/* document-format-default */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *operations_sup;	/* operations-supported */
@@ -612,7 +611,10 @@ main(int  argc,				/* I - Number of command-line args */
     const char *ptr = getenv("AUTH_USERNAME");
 
     if (ptr)
+    {
+      strlcpy(username, ptr, sizeof(username));
       cupsSetUser(ptr);
+    }
 
     password = getenv("AUTH_PASSWORD");
   }
@@ -841,7 +843,9 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
             ippErrorString(ipp_status), cupsLastErrorString());
 
-    if (ipp_status > IPP_OK_CONFLICT)
+    if (ipp_status <= IPP_OK_CONFLICT)
+      password_tries = 0;
+    else
     {
       fprintf(stderr, "DEBUG: Get-Printer-Attributes returned %s.\n",
               ippErrorString(ipp_status));
@@ -898,7 +902,8 @@ main(int  argc,				/* I - Number of command-line args */
 
 	return (CUPS_BACKEND_STOP);
       }
-      else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+      else if (ipp_status == IPP_FORBIDDEN ||
+               ipp_status == IPP_AUTHENTICATION_CANCELED)
       {
         const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
         				/* WWW-Authenticate field value */
@@ -911,7 +916,7 @@ main(int  argc,				/* I - Number of command-line args */
 	fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 	return (CUPS_BACKEND_AUTH_REQUIRED);
       }
-      else
+      else if (ipp_status != IPP_NOT_AUTHORIZED)
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Unable to get printer status."));
@@ -996,16 +1001,6 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
     cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
-
-    if ((format_dflt = ippFindAttribute(supported, "document-format-default",
-					IPP_TAG_MIMETYPE)) != NULL)
-    {
-      fprintf(stderr, "DEBUG: document-format-default (%d values)\n",
-	      format_dflt->num_values);
-      for (i = 0; i < format_dflt->num_values; i ++)
-	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
-	        format_dflt->values[i].string.text);
-    }
 
     if ((format_sup = ippFindAttribute(supported, "document-format-supported",
 	                               IPP_TAG_MIMETYPE)) != NULL)
@@ -1184,21 +1179,17 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type,
-                            format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
       }
 
-    if (!document_format &&
-        (!format_dflt ||
-         _cups_strcasecmp(format_dflt->values[0].string.text,
-                          "application/octet-stream")))
+    if (!document_format)
     {
       for (i = 0; i < format_sup->num_values; i ++)
 	if (!_cups_strcasecmp("application/octet-stream",
-			      format_sup->values[i].string.text))
+	                format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
 	  break;
@@ -1303,7 +1294,7 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
       sleep(10);
     }
-    else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+    else if (ipp_status == IPP_FORBIDDEN ||
 	     ipp_status == IPP_AUTHENTICATION_CANCELED)
     {
       const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
@@ -1463,6 +1454,8 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_ERROR_JOB_CANCELED)
         goto cleanup;
+      else if (ipp_status == IPP_NOT_AUTHORIZED)
+        continue;
       else
       {
        /*
@@ -1472,11 +1465,12 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Print file was not accepted."));
 
-	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+        if (ipp_status == IPP_FORBIDDEN ||
+            ipp_status == IPP_AUTHENTICATION_CANCELED)
 	{
 	  const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 					/* WWW-Authenticate field value */
-  
+
 	  if (!strncmp(www_auth, "Negotiate", 9))
 	    auth_info_required = "negotiate";
 	  else if (www_auth[0])
@@ -1515,6 +1509,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
+      password_tries = 0;
       monitor.job_id = job_id = job_id_attr->values[0].integer;
       _cupsLangPrintFilter(stderr, "INFO",
                            _("Print file accepted - job ID %d."), job_id);
@@ -1616,8 +1611,13 @@ main(int  argc,				/* I - Number of command-line args */
 			       _("Unable to add document to print job."));
 	  break;
 	}
-	else if (num_files == 0 || fd < 0)
-	  break;
+	else
+	{
+	  password_tries = 0;
+
+	  if (num_files == 0 || fd < 0)
+	    break;
+	}
       }
     }
 
@@ -1705,7 +1705,9 @@ main(int  argc,				/* I - Number of command-line args */
       fprintf(stderr, "DEBUG: Get-Job-Attributes: %s (%s)\n",
 	      ippErrorString(ipp_status), cupsLastErrorString());
 
-      if (ipp_status > IPP_OK_CONFLICT)
+      if (ipp_status <= IPP_OK_CONFLICT)
+	password_tries = 0;
+      else
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
 	    ipp_status != IPP_NOT_POSSIBLE &&
@@ -1966,6 +1968,9 @@ check_printer_state(
   fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
 	  ippErrorString(cupsLastError()), cupsLastErrorString());
 
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+    password_tries = 0;
+
  /*
   * Return the printer-state value...
   */
@@ -2073,6 +2078,8 @@ monitor_printer(
   http = _httpCreate(monitor->hostname, monitor->port, NULL, monitor->encryption,
                      AF_UNSPEC);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
+  if (username[0])
+    cupsSetUser(username);
   cupsSetPasswordCB(password_cb);
 
  /*
@@ -2129,6 +2136,9 @@ monitor_printer(
 
       fprintf(stderr, "DEBUG: %s: %s (%s)\n", ippOpString(job_op),
 	      ippErrorString(cupsLastError()), cupsLastErrorString());
+
+      if (cupsLastError() <= IPP_OK_CONFLICT)
+        password_tries = 0;
 
       if (job_op == IPP_GET_JOB_ATTRIBUTES)
       {
@@ -2452,6 +2462,9 @@ new_request(
 			 "multiple-document-handling", NULL, collate_str);
 	    break;
           }
+
+        if (i >= doc_handling_sup->num_values)
+          copies = 1;
       }
 
      /*
@@ -2500,7 +2513,7 @@ new_request(
       cupsEncodeOptions(request, num_options, options);
     }
 
-    if (copies > 1)
+    if (copies > 1 && copies <= pc->max_copies)
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
 
@@ -2515,6 +2528,9 @@ new_request(
 static const char *			/* O - Password  */
 password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
+  fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\"), password=%p, "
+          "password_tries=%d\n", prompt, password, password_tries);
+
   (void)prompt;
 
  /*

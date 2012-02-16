@@ -66,6 +66,7 @@ static void	cups_read_client_conf(cups_file_t *fp,
 		                      _cups_globals_t *cg,
 		                      const char *cups_encryption,
 				      const char *cups_server,
+				      const char *cups_user,
 #ifdef HAVE_GSSAPI
                                       const char *cups_gssservicename,
 #endif /* HAVE_GSSAPI */
@@ -435,55 +436,11 @@ cupsSetUser(const char *user)		/* I - User name */
 const char *				/* O - User name */
 cupsUser(void)
 {
-  const char	*user;			/* USER environment variable */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (!cg->user[0])
-  {
-#ifdef WIN32
-   /*
-    * Get the current user name from the OS...
-    */
-
-    DWORD	size;			/* Size of string */
-
-    size = sizeof(cg->user);
-    if (!GetUserName(cg->user, &size))
-#else
-   /*
-    * Get the user name corresponding to the current UID...
-    */
-
-    struct passwd	*pwd;		/* User/password entry */
-
-    setpwent();
-    if ((pwd = getpwuid(getuid())) != NULL)
-    {
-     /*
-      * Found a match!
-      */
-
-      strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
-    }
-    else
-#endif /* WIN32 */
-    if ((user = getenv("USER")) != NULL)
-    {
-     /*
-      * Use the username from the "USER" environment variable...
-      */
-      strlcpy(cg->user, user, sizeof(cg->user));
-    }
-    else
-    {
-     /*
-      * Use the default "unknown" user name...
-      */
-
-      strcpy(cg->user, "unknown");
-    }
-  }
+    _cupsSetDefaults();
 
   return (cg->user);
 }
@@ -791,6 +748,7 @@ _cupsSetDefaults(void)
   const char	*home,			/* Home directory of user */
 		*cups_encryption,	/* CUPS_ENCRYPTION env var */
 		*cups_server,		/* CUPS_SERVER env var */
+		*cups_user,		/* CUPS_USER/USER env var */
 #ifdef HAVE_GSSAPI
 		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
@@ -816,13 +774,16 @@ _cupsSetDefaults(void)
   cups_expiredroot    = getenv("CUPS_EXPIREDROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
 
+  if ((cups_user = getenv("CUPS_USER")) == NULL)
+    cups_user = getenv("USER");
+
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
   * files to get the default values...
   */
 
   if (cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
-      !cg->ipp_port)
+      !cg->user[0] || !cg->ipp_port)
   {
     if ((home = getenv("HOME")) != NULL)
     {
@@ -852,7 +813,7 @@ _cupsSetDefaults(void)
     * functions handle NULL cups_file_t pointers...
     */
 
-    cups_read_client_conf(fp, cg, cups_encryption, cups_server,
+    cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
 #ifdef HAVE_GSSAPI
 			  cups_gssservicename,
 #endif /* HAVE_GSSAPI */
@@ -873,6 +834,7 @@ cups_read_client_conf(
     _cups_globals_t *cg,		/* I - Global data */
     const char      *cups_encryption,	/* I - CUPS_ENCRYPTION env var */
     const char      *cups_server,	/* I - CUPS_SERVER env var */
+    const char      *cups_user,		/* I - CUPS_USER env var */
 #ifdef HAVE_GSSAPI
     const char      *cups_gssservicename,
 					/* I - CUPS_GSSSERVICENAME env var */
@@ -888,6 +850,7 @@ cups_read_client_conf(
 #ifndef __APPLE__
 	server_name[1024],		/* ServerName value */
 #endif /* !__APPLE__ */
+	user[256],			/* User value */
 	any_root[1024],			/* AllowAnyRoot value */
 	expired_root[1024],		/* AllowExpiredRoot value */
 	expired_certs[1024];		/* AllowExpiredCerts value */
@@ -921,6 +884,11 @@ cups_read_client_conf(
       cups_server = server_name;
     }
 #endif /* !__APPLE__ */
+    else if (!cups_user && !_cups_strcasecmp(line, "User") && value)
+    {
+      strlcpy(user, value, sizeof(user));
+      cups_user = user;
+    }
     else if (!cups_anyroot && !_cups_strcasecmp(line, "AllowAnyRoot") && value)
     {
       strlcpy(any_root, value, sizeof(any_root));
@@ -1027,6 +995,49 @@ cups_read_client_conf(
     }
     else
       cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
+  }
+
+  if (!cg->user[0])
+  {
+    if (cups_user)
+      strlcpy(cg->user, cups_user, sizeof(cg->user));
+    else
+    {
+#ifdef WIN32
+     /*
+      * Get the current user name from the OS...
+      */
+
+      DWORD	size;			/* Size of string */
+
+      size = sizeof(cg->user);
+      if (!GetUserName(cg->user, &size))
+#else
+     /*
+      * Get the user name corresponding to the current UID...
+      */
+
+      struct passwd	*pwd;		/* User/password entry */
+
+      setpwent();
+      if ((pwd = getpwuid(getuid())) != NULL)
+      {
+       /*
+	* Found a match!
+	*/
+
+	strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
+      }
+      else
+#endif /* WIN32 */
+      {
+       /*
+	* Use the default "unknown" user name...
+	*/
+
+	strcpy(cg->user, "unknown");
+      }
+    }
   }
 
 #ifdef HAVE_GSSAPI

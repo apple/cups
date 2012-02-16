@@ -3,7 +3,7 @@
  *
  *   PPD code emission routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -519,15 +519,27 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     */
 
     if (display && strcmp(display->value, "job"))
-    {
       fprintf(fp, "@PJL JOB NAME = \"%s\"\n", temp);
-
-      if (display && !strcmp(display->value, "rdymsg"))
-        fprintf(fp, "@PJL RDYMSG DISPLAY = \"%s\"\n", displaymsg);
-    }
+    else if (display && !strcmp(display->value, "rdymsg"))
+      fprintf(fp, "@PJL RDYMSG DISPLAY = \"%s\"\n", displaymsg);
     else
       fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%s\"\n", temp,
 	      displaymsg);
+
+   /*
+    * Replace double quotes with single quotes and UTF-8 characters with
+    * question marks so that the user does not cause a PJL syntax error.
+    */
+
+    strlcpy(temp, user, sizeof(temp));
+
+    for (ptr = temp; *ptr; ptr ++)
+      if (*ptr == '\"')
+        *ptr = '\'';
+      else if (!charset && (*ptr & 128))
+        *ptr = '?';
+
+    fprintf(fp, "@PJL SET USERNAME = \"%s\"\n", temp);
   }
   else
     fputs(ppd->jcl_begin, fp);

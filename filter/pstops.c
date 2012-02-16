@@ -128,7 +128,7 @@ typedef struct				/**** Document information ****/
 		*ap_page_size;		/* AP_FIRSTPAGE_PageSize value */
   int		collate,		/* Collate copies? */
 		emit_jcl,		/* Emit JCL commands? */
-		fitplot;		/* Fit pages to media */
+		fit_to_page;		/* Fit pages to media */
   const char	*input_slot,		/* InputSlot value */
 		*manual_feed,		/* ManualFeed value */
 		*media_color,		/* MediaColor value */
@@ -978,7 +978,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
         puts("%%Trailer");
 	printf("%%%%Pages: %d\n", cupsArrayCount(doc->pages));
-	if (doc->number_up > 1 || doc->fitplot)
+	if (doc->number_up > 1 || doc->fit_to_page)
 	  printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
 		 PageLeft, PageBottom, PageRight, PageTop);
 	else
@@ -1382,7 +1382,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
       }
-      else if (doc->number_up == 1 && !doc->fitplot  && Orientation)
+      else if (doc->number_up == 1 && !doc->fit_to_page  && Orientation)
       {
         int	temp_bbox[4];		/* Temporary bounding box */
 
@@ -1480,7 +1480,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       * %%IncludeFeature: *MainKeyword OptionKeyword
       */
 
-      if (doc->number_up == 1 &&!doc->fitplot)
+      if (doc->number_up == 1 &&!doc->fit_to_page)
 	pageinfo->num_options = include_feature(ppd, line,
 	                                        pageinfo->num_options,
                                         	&(pageinfo->options));
@@ -1557,14 +1557,14 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       {
 	feature = 1;
 
-	if (doc->number_up > 1 || doc->fitplot)
+	if (doc->number_up > 1 || doc->fit_to_page)
 	  continue;
       }
       else if (!strncmp(line, "%%EndFeature", 12))
       {
 	feature = 0;
 
-	if (doc->number_up > 1 || doc->fitplot)
+	if (doc->number_up > 1 || doc->fit_to_page)
 	  continue;
       }
       else if (!strncmp(line, "%%IncludeFeature:", 17))
@@ -1580,7 +1580,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       if (line[0] != '%' && !feature)
         break;
 
-      if (!feature || (doc->number_up == 1 && !doc->fitplot))
+      if (!feature || (doc->number_up == 1 && !doc->fit_to_page))
 	doc_write(doc, line, linelen);
     }
 
@@ -1803,7 +1803,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	* %%IncludeFeature: *MainKeyword OptionKeyword
 	*/
 
-        if (doc->number_up == 1 && !doc->fitplot)
+        if (doc->number_up == 1 && !doc->fit_to_page)
 	  num_options = include_feature(ppd, line, num_options, &options);
       }
       else if (strncmp(line, "%%BeginSetup", 12))
@@ -1868,7 +1868,7 @@ copy_trailer(cups_file_t  *fp,		/* I - File to read from */
   fprintf(stderr, "DEBUG: Wrote %d pages...\n", number);
 
   printf("%%%%Pages: %d\n", number);
-  if (doc->number_up > 1 || doc->fitplot)
+  if (doc->number_up > 1 || doc->fit_to_page)
     printf("%%%%BoundingBox: %.0f %.0f %.0f %.0f\n",
 	   PageLeft, PageBottom, PageRight, PageTop);
   else
@@ -2330,6 +2330,7 @@ set_pstops_options(
   ppd_option_t	*option;		/* PPD option */
   ppd_choice_t	*choice;		/* PPD choice */
   const char	*content_type;		/* Original content type */
+  int		max_copies;		/* Maximum number of copies supported */
 
 
  /*
@@ -2421,7 +2422,7 @@ set_pstops_options(
     doc->emit_jcl = 1;
 
  /*
-  * fitplot/fit-to-page/ipp-attribute-fidelity
+  * fit-to-page/ipp-attribute-fidelity
   *
   * (Only for original PostScript content)
   */
@@ -2431,16 +2432,13 @@ set_pstops_options(
 
   if (!_cups_strcasecmp(content_type, "application/postscript"))
   {
-    if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+    if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
 	!_cups_strcasecmp(val, "true"))
-      doc->fitplot = 1;
-    else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
-	     !_cups_strcasecmp(val, "true"))
-      doc->fitplot = 1;
+      doc->fit_to_page = 1;
     else if ((val = cupsGetOption("ipp-attribute-fidelity", num_options,
                                   options)) != NULL &&
 	     !_cups_strcasecmp(val, "true"))
-      doc->fitplot = 1;
+      doc->fit_to_page = 1;
   }
 
  /*
@@ -2592,7 +2590,16 @@ set_pstops_options(
   * Now figure out if we have to force collated copies, etc.
   */
 
-  if (ppd && ppd->manual_copies && Duplex && doc->copies > 1)
+  if ((attr = ppdFindAttr(ppd, "cupsMaxCopies", NULL)) != NULL)
+    max_copies = atoi(attr->value);
+  else if (ppd && ppd->manual_copies)
+    max_copies = 1;
+  else
+    max_copies = 9999;
+
+  if (doc->copies > max_copies)
+    doc->collate = 1;
+  else if (ppd && ppd->manual_copies && Duplex && doc->copies > 1)
   {
    /*
     * Force collated copies when printing a duplexed document to
@@ -2616,7 +2623,8 @@ set_pstops_options(
 
     doc->slow_collate = 1;
 
-    if ((choice = ppdFindMarkedChoice(ppd, "Collate")) != NULL &&
+    if (doc->copies <= max_copies &&
+        (choice = ppdFindMarkedChoice(ppd, "Collate")) != NULL &&
         !_cups_strcasecmp(choice->choice, "True"))
     {
      /*
@@ -2773,7 +2781,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
   pagew = PageRight - PageLeft;
   pagel = PageTop - PageBottom;
 
-  if (doc->fitplot)
+  if (doc->fit_to_page)
   {
     bboxx = bounding_box[0];
     bboxy = bounding_box[1];
@@ -2820,18 +2828,18 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
     doc_printf(doc, "%.1f 0.0 translate -1 1 scale\n", PageWidth);
 
  /*
-  * Offset and scale as necessary for fitplot/fit-to-page/number-up...
+  * Offset and scale as necessary for fit_to_page/fit-to-page/number-up...
   */
 
   if (Duplex && doc->number_up > 1 && ((number / doc->number_up) & 1))
     doc_printf(doc, "%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
-  else if (doc->number_up > 1 || doc->fitplot)
+  else if (doc->number_up > 1 || doc->fit_to_page)
     doc_printf(doc, "%.1f %.1f translate\n", PageLeft, PageBottom);
 
   switch (doc->number_up)
   {
     default :
-        if (doc->fitplot)
+        if (doc->fit_to_page)
 	{
           w = pagew;
           l = w * bboxl / bboxw;
@@ -3157,7 +3165,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
     doc_puts(doc, "grestore\n");
   }
 
-  if (doc->fitplot)
+  if (doc->fit_to_page)
   {
    /*
     * Offset the page by its bounding box...
@@ -3167,7 +3175,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
                -bounding_box[1]);
   }
 
-  if (doc->fitplot || doc->number_up > 1)
+  if (doc->fit_to_page || doc->number_up > 1)
   {
    /*
     * Clip the page to the page's bounding box...

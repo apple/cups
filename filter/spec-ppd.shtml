@@ -1307,6 +1307,19 @@ are approximate".</p>
 *cupsMarkerNotice: "Supply levels are approximate."
 </pre>
 
+<h3><span class='info'>CUPS 1.6</span><a name='cupsMaxCopies'>cupsMaxCopies</a></h3>
+
+<p class='summary'>*cupsMaxCopies: integer</p>
+
+<p>This integer keyword notifies the filters that the destination printer supports up to N copies in hardware. The default value is <code>9999</code>.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Tell the RIP filters we can do up to 99 copies</em>
+*cupsMaxCopies: 99
+</pre>
+
 <h3><a name='cupsModelNumber'>cupsModelNumber</a></h3>
 
 <p class='summary'>*cupsModelNumber: number</p>
@@ -1763,6 +1776,15 @@ the device.</p>
 
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.6</h3>
+
+<ul>
+
+	<li>Added <a href="#cupsMaxCopies"><tt>cupsMaxCopies</tt></a> keyword.</li>
+
+</ul>
+
 
 <h3>Changes in CUPS 1.5</h3>
 

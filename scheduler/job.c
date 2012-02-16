@@ -2239,11 +2239,15 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->dirty = 1;
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     }
+
+    ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
   }
 
  /*
   * Update the hold time...
   */
+
+  job->cancel_time = 0;
 
   if (!strcmp(when, "indefinite") || !strcmp(when, "auth-info-required"))
   {
@@ -2252,6 +2256,9 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     */
 
     job->hold_until = 0;
+
+    if (MaxHoldTime > 0)
+      job->cancel_time = time(NULL) + MaxHoldTime;
   }
   else if (!strcmp(when, "day-time"))
   {
@@ -3657,7 +3664,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	               "%dx%d%s", attr->values[i].resolution.xres,
 		       attr->values[i].resolution.yres,
 		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			   "dpi" : "dpc");
+			   "dpi" : "dpcm");
 	      break;
 
           case IPP_TAG_STRING :
@@ -4262,6 +4269,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   if (!cupsdLoadJob(job))
     return;
 
+  if (!job->printer_message)
+    job->printer_message = ippFindAttribute(job->attrs,
+                                            "job-printer-state-message",
+                                            IPP_TAG_TEXT);
   if (job->printer_message)
     cupsdSetString(&(job->printer_message->values[0].string.text), "");
 

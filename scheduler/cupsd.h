@@ -140,6 +140,15 @@ extern const char *cups_hstrerror(int);
 
 typedef void (*cupsd_selfunc_t)(void *data);
 
+#ifdef HAVE_AVAHI
+/*
+ * Timeout callback function type...
+ */
+
+typedef struct _cupsd_timeout_s cupsd_timeout_t;
+typedef void (*cupsd_timeoutfunc_t)(cupsd_timeout_t *timeout, void *data);
+#endif /* HAVE_AVAHI */
+
 
 /*
  * Globals...
@@ -172,6 +181,12 @@ VAR krb5_context	KerberosContext VALUE(NULL);
 VAR int			Launchd		VALUE(0);
 					/* Running from launchd */
 #endif /* HAVE_LAUNCH_H */
+
+#ifdef HAVE_AVAHI
+VAR cups_array_t	*Timeouts	VALUE(NULL);
+					/* Timed callbacks for main loop */
+#endif /* HAVE_AVAHI */
+
 
 
 /*
@@ -235,6 +250,19 @@ extern void		cupsdStopSelect(void);
 /* server.c */
 extern void		cupsdStartServer(void);
 extern void		cupsdStopServer(void);
+
+#ifdef HAVE_AVAHI
+extern cupsd_timeout_t	*cupsdAddTimeout(const struct timeval *tv,
+					 cupsd_timeoutfunc_t cb,
+					 void *data);
+extern cupsd_timeout_t	*cupsdNextTimeout(long *delay);
+extern void		cupsdRemoveTimeout(cupsd_timeout_t *timeout);
+extern void		cupsdRunTimeout(cupsd_timeout_t *timeout);
+extern void		cupsdUpdateTimeout(cupsd_timeout_t *timeout,
+					   const struct timeval *tv);
+#endif /* HAVE_AVAHI */
+
+extern int		cupsdRemoveFile(const char *filename);
 
 
 /*

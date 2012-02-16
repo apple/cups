@@ -1608,7 +1608,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
-	            (_cups_strcasecmp(ptr, "dpi") && _cups_strcasecmp(ptr, "dpc") &&
+	            (_cups_strcasecmp(ptr, "dpi") &&
+	             _cups_strcasecmp(ptr, "dpc") &&
+	             _cups_strcasecmp(ptr, "dpcm") &&
 	             _cups_strcasecmp(ptr, "other")))
 	        {
 	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
@@ -1620,7 +1622,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        if (!_cups_strcasecmp(ptr, "dpi"))
 	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
 	                                     xres, yres);
-	        else if (!_cups_strcasecmp(ptr, "dpc"))
+	        else if (!_cups_strcasecmp(ptr, "dpc") ||
+	                 !_cups_strcasecmp(ptr, "dpcm"))
 	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_CM,
 	                                     xres, yres);
 	        else
@@ -2501,7 +2504,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    int out_of_order = 0;	/* Are attribute groups out-of-order? */
 	    cupsArrayClear(a);
-	    
+
 
             switch (attrptr->group_tag)
             {
@@ -2639,7 +2642,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
 			      expect->name, expect->of_type,
 			      ippTagString(found->value_tag));
-    
+
 		if (expect->in_group && found->group_tag != expect->in_group)
 		  add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
 			      expect->name, ippTagString(expect->in_group),
@@ -3273,7 +3276,9 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      char	units[6];	/* Units */
 
 	      if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
-		  (_cups_strcasecmp(units, "dpi") && _cups_strcasecmp(units, "dpc") &&
+		  (_cups_strcasecmp(units, "dpi") &&
+		   _cups_strcasecmp(units, "dpc") &&
+		   _cups_strcasecmp(units, "dpcm") &&
 		   _cups_strcasecmp(units, "other")))
 	      {
 		print_fatal_error("Bad resolution value \"%s\" on line %d.",
@@ -3284,7 +3289,8 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      if (!_cups_strcasecmp(units, "dpi"))
 		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
 		                 IPP_RES_PER_INCH);
-	      else if (!_cups_strcasecmp(units, "dpc"))
+	      else if (!_cups_strcasecmp(units, "dpc") ||
+	               !_cups_strcasecmp(units, "dpcm"))
 		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
 		                 IPP_RES_PER_CM);
 	      else
@@ -3679,12 +3685,12 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
 		     attr->values[i].resolution.xres,
 		     attr->values[i].resolution.yres,
 		     attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			 "dpi" : "dpc");
+			 "dpi" : "dpcm");
 	    else
 	      printf("%dx%d%s ", attr->values[i].resolution.xres,
 		     attr->values[i].resolution.yres,
 		     attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-			 "dpi" : "dpc");
+			 "dpi" : "dpcm");
 	  break;
 
       case IPP_TAG_DATE :
@@ -3831,7 +3837,7 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
 	    printf("%dx%d%s ", attr->values[i].resolution.xres,
 		   attr->values[i].resolution.yres,
 		   attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-		       "dpi" : "dpc");
+		       "dpi" : "dpcm");
 	  break;
 
       case IPP_TAG_STRING :
@@ -4554,7 +4560,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].resolution.units ==
 			    IPP_RES_PER_INCH ? "dpi" :
 			    attr->values[i].resolution.units ==
-				IPP_RES_PER_CM ? "dpc" : "unknown");
+				IPP_RES_PER_CM ? "dpcm" : "unknown");
 	  }
 
 	  if (attr->values[i].resolution.yres <= 0)
@@ -4570,7 +4576,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].resolution.units ==
 			    IPP_RES_PER_INCH ? "dpi" :
 			    attr->values[i].resolution.units ==
-				IPP_RES_PER_CM ? "dpc" : "unknown");
+				IPP_RES_PER_CM ? "dpcm" : "unknown");
 	  }
 
 	  if (attr->values[i].resolution.units != IPP_RES_PER_INCH &&
@@ -4586,7 +4592,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].resolution.units ==
 			    IPP_RES_PER_INCH ? "dpi" :
 			    attr->values[i].resolution.units ==
-				IPP_RES_PER_CM ? "dpc" : "unknown");
+				IPP_RES_PER_CM ? "dpcm" : "unknown");
 	  }
 	}
         break;

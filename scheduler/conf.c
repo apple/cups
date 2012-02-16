@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -132,6 +132,7 @@ static const cupsd_var_t	variables[] =
   { "MaxClientsPerHost",	&MaxClientsPerHost,	CUPSD_VARTYPE_INTEGER },
   { "MaxCopies",		&MaxCopies,		CUPSD_VARTYPE_INTEGER },
   { "MaxEvents",		&MaxEvents,		CUPSD_VARTYPE_INTEGER },
+  { "MaxHoldTime",		&MaxHoldTime,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
@@ -743,6 +744,7 @@ cupsdReadConfiguration(void)
   JobHistory          = DEFAULT_HISTORY;
   JobFiles            = DEFAULT_FILES;
   JobAutoPurge        = 0;
+  MaxHoldTime         = 0;
   MaxJobs             = 500;
   MaxActiveJobs       = 0;
   MaxJobsPerUser      = 0;
