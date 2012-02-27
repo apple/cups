@@ -237,7 +237,7 @@ if test "x$PKGCONFIG" != x; then
 			AC_MSG_RESULT(no)
 		fi
 	fi
-elif x$enable_libusb = xyes; then
+elif test x$enable_libusb = xyes; then
 	AC_MSG_ERROR(Need pkg-config to enable libusb support.)
 fi
 
