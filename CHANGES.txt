@@ -1,9 +1,11 @@
-CHANGES.txt - 1.6b1 - 2012-02-15
+CHANGES.txt - 1.6b1 - 2012-02-28
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
 	- Documentation updates (STR #3927, STR #3980, STR #4010)
+	- Added a new WITH-ALL-VALUES directive to ipptool EXPECT predicates
+	  (STR #3949)
 	- CUPS now supports a User directive in client.conf and the CUPS_USER
 	  environment variable for overriding the default username (STR #3114)
 	- Now set the PJL USERNAME variable as needed (STR #3100)
