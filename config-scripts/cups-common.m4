@@ -411,6 +411,8 @@ case $uname in
 		AC_CHECK_HEADER(xpc/xpc.h,
 			AC_DEFINE(HAVE_XPC)
 			INSTALLXPC="install-xpc")
+		AC_CHECK_HEADER(xpc/private.h,
+			AC_DEFINE(HAVE_XPC_PRIVATE_H))
                 ;;
 esac
 

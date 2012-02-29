@@ -735,6 +735,7 @@
  */
 
 #undef HAVE_XPC
+#undef HAVE_XPC_PRIVATE_H
 
 
 /*

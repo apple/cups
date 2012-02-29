@@ -45,8 +45,12 @@
 #  define kPMPrintUIToolAgent	"com.apple.printuitool.agent"
 #  define kPMStartJob		100
 #  define kPMWaitForJob		101
+#  ifdef HAVE_XPC_PRIVATE_H
+#    include <xpc/private.h>
+#  else
 extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
 		                              uid_t uid);
+#  endif /* HAVE_XPC_PRIVATE_H */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 
 
