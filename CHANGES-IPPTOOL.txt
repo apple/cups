@@ -1,8 +1,19 @@
-CHANGES-IPPTOOL.txt - 2012-02-06
+CHANGES-IPPTOOL.txt - 2012-02-28
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2012-02-28
+
+	- Changed behavior of WITH-VALUES "/regex/" to not require all values to
+	  match.
+	- Added WITH-ALL-VALUES directive for EXPECT predicates that require all
+	  values to match.
+	- Updated test files to use WITH-ALL-VALUES where necessary.
+	- Updated test files to use new ABNF for media names from PWG Media
+	  Names 2.0.
 
 
 2012-02-06

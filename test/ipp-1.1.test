@@ -95,7 +95,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR uri printer-uri $uri
 
 	STATUS successful-ok
-	EXPECT printer-uri-supported OF-TYPE uri WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT printer-uri-supported OF-TYPE uri WITH-ALL-VALUES "$IPP_URI_SCHEME"
 }
 
 
@@ -325,7 +325,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-security-supported WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-security-supported WITH-ALL-VALUES "$IPP_URI_SCHEME"
 	EXPECT queued-job-count OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT uri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-authentication-supported
@@ -348,7 +348,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 
-	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$IPP_URI_SCHEME"
 	EXPECT !printer-name
 }
 

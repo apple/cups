@@ -78,7 +78,11 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "client-error-ignored-all-subscriptions",
 		  "client-error-too-many-subscriptions",
 		  "(client-error-ignored-all-notifications)",
-		  "(client-error-client-print-support-file-not-found)"
+		  "(client-error-client-print-support-file-not-found)",
+		  "client-error-document-password-error",
+		  "client-error-document-permission-error",
+		  "client-error-document-security-error",
+		  "client-error-document-unprintable-error"
 		},
 		* const ipp_status_500s[] =		/* Server errors */
 		{
@@ -158,7 +162,7 @@ static const char * const ipp_std_ops[] =
 		  "Suspend-Current-Job",
 		  "Resume-Job",
 
-		  /* 0x0030 - 0x003b */
+		  /* 0x0030 - 0x003d */
 		  "Promote-Job",
 		  "Schedule-Job-After",
 		  "0x32",
@@ -171,7 +175,8 @@ static const char * const ipp_std_ops[] =
 		  "Cancel-My-Jobs",
 		  "Resubmit-Job",
 		  "Close-Job",
-		  "Identify-Printer"
+		  "Identify-Printer",
+		  "Validate-Document"
 		},
 		* const ipp_cups_ops[] =
 		{

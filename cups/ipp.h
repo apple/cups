@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -188,6 +188,7 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_RESUBMIT_JOB,			/* Resubmit-Job */
   IPP_CLOSE_JOB,			/* Close-Job */
   IPP_IDENTIFY_PRINTER,			/* Identify-Printer (proposed IPP JPS3) */
+  IPP_VALIDATE_DOCUMENT,		/* Validate-Document (proposed IPP JPS3) */
   IPP_PRIVATE = 0x4000,			/* Reserved @private@ */
   CUPS_GET_DEFAULT,			/* Get the default printer */
   CUPS_GET_PRINTERS,			/* Get a list of printers and/or classes */
