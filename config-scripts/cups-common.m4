@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Common configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2011 by Apple Inc.
+dnl   Copyright 2007-2012 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -50,6 +50,7 @@ AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
+AC_PATH_PROG(GZIP,gzip)
 AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(LD,ld)
 AC_PATH_PROG(LN,ln)
@@ -255,12 +256,17 @@ if test x$enable_tcp_wrappers = xyes; then
 fi
 
 dnl ZLIB
+INSTALL_GZIP=""
 LIBZ=""
 AC_CHECK_HEADER(zlib.h,
     AC_CHECK_LIB(z, gzgets,
 	AC_DEFINE(HAVE_LIBZ)
 	LIBZ="-lz"
-	LIBS="$LIBS -lz"))
+	LIBS="$LIBS -lz"
+	if test "x$GZIP" != z; then
+		INSTALL_GZIP="-z"
+	fi))
+AC_SUBST(INSTALL_GZIP)
 AC_SUBST(LIBZ)
 
 dnl Flags for "ar" command...

@@ -4,7 +4,7 @@
 #
 # Install a program, script, or datafile.
 #
-# Copyright 2008-2009 by Apple Inc.
+# Copyright 2008-2012 by Apple Inc.
 #
 # This script is not compatible with BSD (or any other) install program, as it
 # allows owner and group changes to fail with a warning and makes sure that the
@@ -46,6 +46,7 @@ chgrpprog="${CHGRPPROG-chgrp}"
 stripprog="${STRIPPROG-strip}"
 rmprog="${RMPROG-rm}"
 mkdirprog="${MKDIRPROG-mkdir}"
+gzipprog="${GZIPPROG-gzip}"
 
 transformbasename=""
 transform_arg=""
@@ -59,6 +60,11 @@ mvcmd="$mvprog"
 src=""
 dst=""
 dir_arg=""
+
+function gzipcp {
+	# gzipcp from to
+	$gzipprog -9 <"$1" >"$2"
+}
 
 while [ x"$1" != x ]; do
 	case $1 in
@@ -101,6 +107,12 @@ while [ x"$1" != x ]; do
 		continue
 		;;
 
+		-z)
+		instcmd="gzipcp"
+		shift
+		continue
+		;;
+
 		*)
 		if [ x"$src" = x ]; then
 			src="$1"
@@ -121,7 +133,7 @@ fi
 if [ x"$dir_arg" != x ]; then
 	dst="$src"
 	src=""
-	
+
 	if [ -d "$dst" ]; then
 		instcmd=:
 	else
@@ -129,13 +141,13 @@ if [ x"$dir_arg" != x ]; then
 	fi
 else
 	# Waiting for this to be detected by the "$instcmd $src $dsttmp" command
-	# might cause directories to be created, which would be especially bad 
+	# might cause directories to be created, which would be especially bad
 	# if $src (and thus $dsttmp) contains '*'.
 	if [ ! -f "$src" -a ! -d "$src" ]; then
 		echo "install: $src does not exist"
 		exit 1
 	fi
-	
+
 	if [ x"$dst" = x ]; then
 		echo "install: No destination specified"
 		exit 1

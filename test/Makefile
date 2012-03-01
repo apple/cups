@@ -20,20 +20,13 @@ include ../Makedefs
 # Sample test files.
 #
 
-TESTFILES	=	\
+DATAFILES	=	\
 			color.jpg \
-			create-printer-subscription.test \
 			document-a4.pdf \
 			document-a4.ps \
 			document-letter.pdf \
 			document-letter.ps \
-			get-completed-jobs.test \
-			get-jobs.test \
 			gray.jpg \
-			ipp-1.1.test \
-			ipp-2.0.test \
-			ipp-2.1.test \
-			ipp-2.2.test \
 			onepage-a4.pdf \
 			onepage-a4.ps \
 			onepage-letter.pdf \
@@ -42,6 +35,15 @@ TESTFILES	=	\
 			testfile.pdf \
 			testfile.ps \
 			testfile.txt
+TESTFILES	=	\
+			create-printer-subscription.test \
+			get-completed-jobs.test \
+			get-jobs.test \
+			get-printer-attributes.test \
+			ipp-1.1.test \
+			ipp-2.0.test \
+			ipp-2.1.test \
+			ipp-2.2.test
 OBJS		=	\
 			ippserver.o \
 			ipptool.o \
@@ -103,6 +105,9 @@ install:	all install-data install-headers install-libs install-exec
 install-data:
 	echo Installing sample ipptool files in $(DATADIR)/ipptool...
 	$(INSTALL_DIR) -m 755 $(DATADIR)/ipptool
+	for file in $(DATAFILES); do \
+		$(INSTALL_COMPDATA) $$file $(DATADIR)/ipptool; \
+	done
 	for file in $(TESTFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/ipptool; \
 	done
@@ -141,6 +146,14 @@ install-libs:
 #
 
 uninstall:
+	echo Uninstalling sample ipptool files from $(DATADIR)/ipptool...
+	for file in $(DATAFILES); do \
+		$(RM) $(DATADIR)/ipptool/$$file; \
+	done
+	for file in $(TESTFILES); do \
+		$(RM) $(DATADIR)/ipptool/$$file; \
+	done
+	-$(RMDIR) $(DATADIR)/ipptool
 
 
 #
