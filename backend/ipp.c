@@ -1183,7 +1183,8 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type,
+                            format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
@@ -1193,13 +1194,16 @@ main(int  argc,				/* I - Number of command-line args */
     {
       for (i = 0; i < format_sup->num_values; i ++)
 	if (!_cups_strcasecmp("application/octet-stream",
-	                format_sup->values[i].string.text))
+	                      format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
 	  break;
 	}
     }
   }
+
+  fprintf(stderr, "DEBUG: final_content_type=\"%s\", document_format=\"%s\"\n",
+          final_content_type, document_format ? document_format : "(null)");
 
  /*
   * If the printer does not support HTTP/1.1 (which IPP requires), copy stdin
