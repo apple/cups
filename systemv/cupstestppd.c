@@ -147,6 +147,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		len;			/* Length of option name */
   char		*opt;			/* Option character */
   const char	*ptr;			/* Pointer into string */
+  cups_file_t	*fp;			/* PPD file */
   int		files;			/* Number of files */
   int		verbose;		/* Want verbose output? */
   int		warn;			/* Which errors to just warn about */
@@ -303,7 +304,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Read from stdin...
 	*/
 
-        ppd = ppdOpen(stdin);
+        ppd = _ppdOpen(cupsFileStdin(), _PPD_LOCALIZATION_ALL);
 
         if (verbose >= 0)
           printf("%s:", (ppd && ppd->pcfilename) ? ppd->pcfilename : "(stdin)");
@@ -317,7 +318,24 @@ main(int  argc,				/* I - Number of command-line args */
         if (verbose >= 0)
           printf("%s:", argv[i]);
 
-        ppd = ppdOpenFile(argv[i]);
+        if ((fp = cupsFileOpen(argv[i], "r")) != NULL)
+        {
+          ppd = _ppdOpen(fp, _PPD_LOCALIZATION_ALL);
+          cupsFileClose(fp);
+        }
+        else
+        {
+	  status = ERROR_FILE_OPEN;
+
+	  if (verbose >= 0)
+          {
+            _cupsLangPuts(stdout, _(" FAIL"));
+            _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Unable to open PPD file - %s"),
+			    strerror(errno));
+	    continue;
+          }
+        }
       }
 
       if (ppd == NULL)
