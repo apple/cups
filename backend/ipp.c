@@ -1556,8 +1556,9 @@ main(int  argc,				/* I - Number of command-line args */
         if ((i + 1) >= num_files)
 	  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
 
-        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-	             "document-format", NULL, document_format);
+	if (document_format)
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+		       "document-format", NULL, document_format);
 
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
