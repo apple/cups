@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- Missing localizations caused empty output (STR #4033)
 	- The cups-driverd program could temporarily "forget" a PPD file if it
 	  was updated in place.
 	- The dnssd backend now prefers IPPS over IPP.

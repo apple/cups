@@ -938,7 +938,22 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
       */
 
       if (m)
-        cupsArrayAdd(a, m);
+      {
+        if (m->str[0])
+        {
+          cupsArrayAdd(a, m);
+        }
+        else
+        {
+         /*
+          * Translation is empty, don't add it... (STR #4033)
+          */
+
+          free(m->id);
+          free(m->str);
+          free(m);
+        }
+      }
 
      /*
       * Create a new message with the given msgid string...
@@ -1016,7 +1031,22 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
   */
 
   if (m)
-    cupsArrayAdd(a, m);
+  {
+    if (m->str[0])
+    {
+      cupsArrayAdd(a, m);
+    }
+    else
+    {
+     /*
+      * Translation is empty, don't add it... (STR #4033)
+      */
+
+      free(m->id);
+      free(m->str);
+      free(m);
+    }
+  }
 
  /*
   * Close the message catalog file and return the new array...
