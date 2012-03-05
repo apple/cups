@@ -3,7 +3,7 @@
  *
  *   Backend support definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -258,6 +258,20 @@ extern "C" {
 #define CUPS_TC_staples				32
 #define CUPS_TC_inserts				33
 #define CUPS_TC_covers				34
+
+#define CUPS_TC_tenThousandthsOfInches		3
+#define CUPS_TC_micrometers			4
+#define CUPS_TC_impressions			7
+#define CUPS_TC_sheets				8
+#define CUPS_TC_hours				11
+#define CUPS_TC_thousandthsOfOunces		12
+#define CUPS_TC_tenthsOfGrams			13
+#define CUPS_TC_hundrethsOfFluidOunces		14
+#define CUPS_TC_tenthsOfMilliliters		15
+#define CUPS_TC_feet				16
+#define CUPS_TC_meters				17
+#define CUPS_TC_items				18
+#define CUPS_TC_percent				19
 
 /* These come from RFC 3808 to define character sets we support */
 /* Also see http://www.iana.org/assignments/character-sets */

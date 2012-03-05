@@ -150,6 +150,13 @@ static const int	prtMarkerSuppliesType[] =
 			(sizeof(prtMarkerSuppliesType) /
 			 sizeof(prtMarkerSuppliesType[0]));
 			 		/* Offset to supply index */
+static const int	prtMarkerSuppliesSupplyUnit[] =
+			{ CUPS_OID_prtMarkerSuppliesSupplyUnit, -1 },
+					/* Units OID */
+			prtMarkerSuppliesSupplyUnitOffset =
+			(sizeof(prtMarkerSuppliesSupplyUnit) /
+			 sizeof(prtMarkerSuppliesSupplyUnit[0]));
+					/* Offset to supply index */
 
 static const backend_state_t const printer_states[] =
 			{
@@ -962,6 +969,26 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       num_supplies = i;
 
     supplies[i - 1].type = packet->object_value.integer;
+  }
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesSupplyUnit))
+  {
+   /*
+    * Get units for capacity...
+    */
+
+    i = packet->object_name[prtMarkerSuppliesSupplyUnitOffset];
+    if (i < 1 || i > CUPS_MAX_SUPPLIES ||
+        packet->object_type != CUPS_ASN1_INTEGER)
+      return;
+
+    fprintf(stderr, "DEBUG2: prtMarkerSuppliesSupplyUnit.1.%d = %d\n", i,
+            packet->object_value.integer);
+
+    if (i > num_supplies)
+      num_supplies = i;
+
+    if (packet->object_value.integer == CUPS_TC_percent)
+      supplies[i - 1].max_capacity = 100;
   }
 }
 

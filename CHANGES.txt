@@ -4,6 +4,8 @@ CHANGES.txt - 1.6b1 - 2012-03-05
 CHANGES IN CUPS V1.6b1
 
 	- Documentation updates (STR #3927, STR #3980, STR #4010)
+	- The network backends now deal with printers that report their levels
+	  in percent but do not specify a maximum capacity of 100 (STR #3551)
 	- The network backends now report full/almost-full waste bins in
 	  printers along with end-of-life for cleaning pads (STR #4017)
 	- Added a configure option to set the permissions of the installed
