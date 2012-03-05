@@ -949,7 +949,9 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
     if (i > num_supplies)
       num_supplies = i;
 
-    supplies[i - 1].max_capacity = packet->object_value.integer;
+    if (supplies[i - 1].max_capacity == 0 &&
+        packet->object_value.integer > 0)
+      supplies[i - 1].max_capacity = packet->object_value.integer;
   }
   else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesType))
   {
