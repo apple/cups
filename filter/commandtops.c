@@ -283,7 +283,14 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
 
     printf("/cups_query_keyword (?%s) def\n", option->keyword);
 					/* Set keyword for error reporting */
-    printf("{ %s } stopped clear\n", attr->value);
+    fputs("{ (", stdout);
+    for (valptr = attr->value; *valptr; valptr ++)
+    {
+      if (*valptr == '(' || *valptr == ')' || *valptr == '\\')
+        putchar('\\');
+      putchar(*valptr);
+    }
+    fputs(") cvx exec } stopped clear\n", stdout);
     					/* Send query code */
     fflush(stdout);
 
@@ -360,10 +367,15 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
       * Verify the result is a valid option choice...
       */
 
-      if (!strcasecmp(buffer, "Unknown"))
-        break;
-      else if (!ppdFindChoice(option, buffer))
+      if (!ppdFindChoice(option, buffer))
+      {
+	if (!strcasecmp(buffer, "Unknown"))
+	  break;
+
+	bufptr    = buffer;
+	buffer[0] = '\0';
         continue;
+      }
 
      /*
       * Write out the result and move on to the next option...
