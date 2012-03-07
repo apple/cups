@@ -205,7 +205,6 @@
 "  -P filename.ppd         Set PPD file." = "  -P filename.ppd         Set PPD file.";
 "  -R root-directory       Set alternate root." = "  -R root-directory       Set alternate root.";
 "  -S                      Test with SSL encryption." = "  -S                      Test with SSL encryption.";
-"  -T                      Set the receive/send timeout in seconds." = "  -T                      Set the receive/send timeout in seconds.";
 "  -T seconds              Set the receive/send timeout in seconds." = "  -T seconds              Set the receive/send timeout in seconds.";
 "  -U samba-user           Authenticate using the named SAMBA user." = "  -U samba-user           Authenticate using the named SAMBA user.";
 "  -U username             Set username for job." = "  -U username             Set username for job.";
@@ -822,6 +821,7 @@
 "Internet Postage 3-Part - 2 1/4 x 7\"" = "Internet Postage 3-Part - 2 1/4 x 7\"";
 "Internet Printing Protocol" = "Internet Printing Protocol";
 "Invalid media size." = "Invalid media size.";
+"Invalid printer command \"%s\"." = "Invalid printer command \"%s\".";
 "JCL" = "JCL";
 "JIS B0" = "JIS B0";
 "JIS B1" = "JIS B1";
@@ -1099,13 +1099,13 @@
 "The paper tray needs to be filled." = "The paper tray needs to be filled.";
 "The printer URI is incorrect or no longer exists." = "The printer URI is incorrect or no longer exists.";
 "The printer is busy." = "The printer is busy.";
-"The printer is low on toner." = "The printer is low on toner.";
 "The printer is not connected." = "The printer is not connected.";
 "The printer is not responding." = "The printer is not responding.";
-"The printer is out of toner." = "The printer is out of toner.";
 "The printer is running low on ink." = "The printer is running low on ink.";
+"The printer is running low on toner." = "The printer is running low on toner.";
 "The printer is unreachable at this time." = "The printer is unreachable at this time.";
 "The printer may be out of ink." = "The printer may be out of ink.";
+"The printer may be out of toner." = "The printer may be out of toner.";
 "The printer may not exist or is unavailable at this time." = "The printer may not exist or is unavailable at this time.";
 "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)." = "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#).";
 "The printer or class does not exist." = "The printer or class does not exist.";
@@ -1158,6 +1158,7 @@
 "Unable to change printer-is-shared attribute:" = "Unable to change printer-is-shared attribute:";
 "Unable to change printer:" = "Unable to change printer:";
 "Unable to change server settings:" = "Unable to change server settings:";
+"Unable to configure printer options." = "Unable to configure printer options.";
 "Unable to connect to host." = "Unable to connect to host.";
 "Unable to contact printer, queuing on next printer in class." = "Unable to contact printer, queuing on next printer in class.";
 "Unable to copy 64-bit CUPS printer driver files (%d)." = "Unable to copy 64-bit CUPS printer driver files (%d).";

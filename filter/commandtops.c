@@ -36,7 +36,7 @@
  * Local functions...
  */
 
-static void	auto_configure(ppd_file_t *ppd, const char *user);
+static int	auto_configure(ppd_file_t *ppd, const char *user);
 static void	begin_ps(ppd_file_t *ppd, const char *user);
 static void	end_ps(ppd_file_t *ppd);
 static void	print_self_test_page(ppd_file_t *ppd, const char *user);
@@ -51,6 +51,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		status = 0;		/* Exit status */
   cups_file_t	*fp;			/* Command file */
   char		line[1024],		/* Line from file */
 		*value;			/* Value on line */
@@ -113,16 +114,20 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     if (!_cups_strcasecmp(line, "AutoConfigure"))
-      auto_configure(ppd, argv[2]);
+      status |= auto_configure(ppd, argv[2]);
     else if (!_cups_strcasecmp(line, "PrintSelfTestPage"))
       print_self_test_page(ppd, argv[2]);
     else if (!_cups_strcasecmp(line, "ReportLevels"))
       report_levels(ppd, argv[2]);
     else
-      fprintf(stderr, "ERROR: Invalid printer command \"%s\"!\n", line);
+    {
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Invalid printer command \"%s\"."), line);
+      status = 1;
+    }
   }
 
-  return (0);
+  return (status);
 }
 
 
@@ -131,10 +136,11 @@ main(int  argc,				/* I - Number of command-line arguments */
  *                      query commands and/or SNMP lookups.
  */
 
-static void
+static int				/* O - Exit status */
 auto_configure(ppd_file_t *ppd,		/* I - PPD file */
                const char *user)	/* I - Printing user */
 {
+  int		status = 0;		/* Exit status */
   ppd_option_t	*option;		/* Current option in PPD */
   ppd_attr_t	*attr;			/* Query command attribute */
   const char	*valptr;		/* Pointer into attribute value */
@@ -155,7 +161,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
   {
     fputs("DEBUG: Unable to auto-configure PostScript Printer - no "
           "bidirectional I/O available!\n", stderr);
-    return;
+    return (1);
   }
 
  /*
@@ -339,7 +345,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
 	bufptr = buffer;
       }
 
-      fprintf(stderr, "DEBUG: Got \"%s\" (%d bytes)\n", bufptr, (int)bytes);
+      fprintf(stderr, "DEBUG: Got %d bytes.\n", (int)bytes);
 
      /*
       * Skip blank lines...
@@ -391,9 +397,12 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
     */
 
     if (bytes <= 0)
+    {
       fprintf(stderr,
 	      "DEBUG: No answer to query for option %s within 10 seconds.\n",
 	      option->keyword);
+      status = 1;
+    }
   }
 
  /*
@@ -402,6 +411,16 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
 
   fflush(stdout);
   end_ps(ppd);
+
+ /*
+  * Return...
+  */
+
+  if (status)
+    _cupsLangPrintFilter(stderr, "WARNING",
+                         _("Unable to configure printer options."));
+
+  return (status);
 }
 
 
