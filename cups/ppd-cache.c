@@ -753,12 +753,15 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
 
    /*
-    * If we have a similar paper with non-zero margins then we only
-    * want to keep it if it has a larger imageable area length.
+    * If we have a similar paper with non-zero margins then we only want to
+    * keep it if it has a larger imageable area length.  The NULL check is for
+    * dimensions that are <= 0...
     */
 
-    pwg_media      = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
-                                      _PWG_FROMPTS(ppd_size->length));
+    if ((pwg_media = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
+                                      _PWG_FROMPTS(ppd_size->length))) == NULL)
+      continue;
+
     new_width      = pwg_media->width;
     new_length     = pwg_media->length;
     new_left       = _PWG_FROMPTS(ppd_size->left);
