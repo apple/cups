@@ -4548,7 +4548,21 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     return (0);
   }
 
-  cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n",
+  cupsFilePrintf(fp,
+                 "%s\n"			/* Enter key and certificate label */
+                 "r\n"			/* Generate RSA key pair */
+                 "2048\n"		/* Key size in bits */
+                 "y\n"			/* OK (y = yes) */
+                 "b\n"			/* Usage (b=signing/encryption) */
+                 "s\n"			/* Sign with SHA1 */
+                 "y\n"			/* OK (y = yes) */
+                 "%s\n"			/* Common name */
+                 "\n"			/* Country (default) */
+                 "\n"			/* Organization (default) */
+                 "\n"			/* Organizational unit (default) */
+                 "\n"			/* State/Province (default) */
+                 "%s\n"			/* Email address */
+                 "y\n",			/* OK (y = yes) */
         	 servername, servername, ServerAdmin);
   cupsFileClose(fp);
 
