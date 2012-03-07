@@ -172,14 +172,14 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
   * error handler allows us to log PostScript errors to cupsd.
   */
 
-  puts("errordict /handleerror {\n"
+  puts("/cups_handleerror {\n"
        "  $error /newerror false put\n"
        "  (:PostScript error in \") print cups_query_keyword print (\": ) "
        "print\n"
        "  $error /errorname get 128 string cvs print\n"
        "  (; offending command:) print $error /command get 128 string cvs "
        "print (\n) print flush\n"
-       "} bind put\n"
+       "} bind def\n"
        "errordict /timeout {} put\n"
        "/cups_query_keyword (?Unknown) def\n");
   fflush(stdout);
@@ -290,7 +290,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
         putchar('\\');
       putchar(*valptr);
     }
-    fputs(") cvx exec } stopped clear\n", stdout);
+    fputs(") cvx exec } stopped { cups_handleerror } if clear\n", stdout);
     					/* Send query code */
     fflush(stdout);
 
