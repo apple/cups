@@ -447,6 +447,7 @@ class ppdcFile				//// File
 {
   public:
 
+  bool		close_on_delete;	// Close file on delete?
   cups_file_t	*fp;			// File pointer
   const char	*filename;		// Filename
   int		line;			// Line in file
