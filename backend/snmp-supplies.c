@@ -187,7 +187,7 @@ static const backend_state_t const supply_states[] =
 			  { CUPS_TONER_EMPTY, "toner-empty-warning" },
 			  { CUPS_WASTE_ALMOST_FULL, "waste-receptacle-almost-full-report" },
 			  { CUPS_WASTE_FULL, "waste-receptacle-full-warning" },
-			  { CUPS_CLEANER_NEAR_EOL, "cleaner-near-eol-report" },
+			  { CUPS_CLEANER_NEAR_EOL, "cleaner-life-almost-over-report" },
 			  { CUPS_CLEANER_LIFE_OVER, "cleaner-life-over-warning" },
 			};
 
