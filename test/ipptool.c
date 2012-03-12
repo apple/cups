@@ -2060,6 +2060,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       else if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") ||
                !_cups_strcasecmp(token, "WITH-VALUE"))
       {
+	if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") && last_expect)
+	  last_expect->with_flags = _CUPS_WITH_ALL;
+
       	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing %s value on line %d.", token, linenum);
@@ -2098,9 +2101,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    last_expect->with_value = strdup(token);
 	    last_expect->with_flags |= _CUPS_WITH_LITERAL;
 	  }
-
-          if (!_cups_strcasecmp(token, "WITH-ALL-VALUES"))
-            last_expect->with_flags |= _CUPS_WITH_ALL;
 	}
 	else
 	{
