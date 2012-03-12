@@ -39,7 +39,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*query;			/* Search query */
   const char	*cache_dir;		/* CUPS_CACHEDIR environment variable */
   const char	*docroot;		/* CUPS_DOCROOT environment variable */
-  const char	*helpfile;		/* Current help file */
+  const char	*helpfile,		/* Current help file */
+		*helptitle = NULL;	/* Current help title */
   const char	*topic;			/* Current topic */
   char		topic_data[1024];	/* Topic form data */
   const char	*section;		/* Current section */
@@ -88,7 +89,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     perror(filename);
 
     cgiStartHTML(cgiText(_("Online Help")));
-    cgiSetVariable("ERROR", "Unable to load help index!");
+    cgiSetVariable("ERROR", cgiText(_("Unable to load help index.")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
 
@@ -129,7 +130,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       perror(filename);
 
       cgiStartHTML(cgiText(_("Online Help")));
-      cgiSetVariable("ERROR", "Unable to access help file!");
+      cgiSetVariable("ERROR", cgiText(_("Unable to access help file.")));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
@@ -139,7 +140,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((n = helpFindNode(hi, helpfile, NULL)) == NULL)
     {
       cgiStartHTML(cgiText(_("Online Help")));
-      cgiSetVariable("ERROR", "Help file not in index!");
+      cgiSetVariable("ERROR", cgiText(_("Help file not in index.")));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
@@ -147,12 +148,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
-    * Set the page title and save the help file...
+    * Save the page title and help file...
     */
 
-    cgiSetVariable("HELPFILE", helpfile);
-    cgiSetVariable("HELPTITLE", n->text);
-    cgiSetVariable("TOPIC", n->section);
+    helptitle = n->text;
+    topic     = n->section;
 
    /*
     * Send a standard page header...
@@ -170,6 +170,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     cgiStartHTML(cgiText(_("Online Help")));
+
+    topic = cgiGetVariable("TOPIC");
   }
 
  /*
@@ -180,7 +182,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     cgiSetVariable("QUERY", "");
 
   query = cgiGetVariable("QUERY");
-  topic = cgiGetVariable("TOPIC");
   si    = helpSearchIndex(hi, query, topic, helpfile);
 
   cgiClearVariables();
@@ -188,6 +189,10 @@ main(int  argc,				/* I - Number of command-line arguments */
     cgiSetVariable("QUERY", query);
   if (topic)
     cgiSetVariable("TOPIC", topic);
+  if (helpfile)
+    cgiSetVariable("HELPFILE", helpfile);
+  if (helptitle)
+    cgiSetVariable("HELPTITLE", helptitle);
 
   fprintf(stderr, "DEBUG: query=\"%s\", topic=\"%s\"\n",
           query ? query : "(null)", topic ? topic : "(null)");
@@ -356,7 +361,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       perror(filename);
-      cgiSetVariable("ERROR", "Unable to open help file.");
+      cgiSetVariable("ERROR", cgiText(_("Unable to open help file.")));
       cgiCopyTemplateLang("error.tmpl");
     }
   }
