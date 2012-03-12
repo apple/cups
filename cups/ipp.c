@@ -5349,10 +5349,6 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
     }
     else
     {
-     /*
-      * Wait a maximum of 1 second for data...
-      */
-
       if (!http->blocking)
       {
        /*

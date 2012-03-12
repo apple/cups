@@ -2084,7 +2084,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    */
 
 	    last_expect->with_value = calloc(1, tokenptr - token);
-	    last_expect->with_flags = _CUPS_WITH_REGEX;
+	    last_expect->with_flags |= _CUPS_WITH_REGEX;
 
 	    if (last_expect->with_value)
 	      memcpy(last_expect->with_value, token + 1, tokenptr - token - 1);
@@ -2096,7 +2096,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    */
 
 	    last_expect->with_value = strdup(token);
-	    last_expect->with_flags = _CUPS_WITH_LITERAL;
+	    last_expect->with_flags |= _CUPS_WITH_LITERAL;
 	  }
 
           if (!_cups_strcasecmp(token, "WITH-ALL-VALUES"))
