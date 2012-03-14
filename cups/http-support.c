@@ -1508,8 +1508,7 @@ _httpResolveURI(
     {
       localref = ref;
       if (DNSServiceResolve(&localref,
-                            kDNSServiceFlagsShareConnection |
-                                kDNSServiceFlagsTimeout, 0, hostname, regtype,
+                            kDNSServiceFlagsShareConnection, 0, hostname, regtype,
 			    "local.", http_resolve_cb,
 			    &uribuf) == kDNSServiceErr_NoError)
       {
@@ -1547,7 +1546,11 @@ _httpResolveURI(
 	  FD_ZERO(&input_set);
 	  FD_SET(DNSServiceRefSockFD(ref), &input_set);
 
+#ifdef WIN32
+	  stimeout.tv_sec  = (long)timeout;
+#else
 	  stimeout.tv_sec  = timeout;
+#endif /* WIN32 */
 	  stimeout.tv_usec = 0;
 
 	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL,
@@ -1579,8 +1582,7 @@ _httpResolveURI(
 
 	      domainref = ref;
 	      if (DNSServiceResolve(&domainref,
-	                            kDNSServiceFlagsShareConnection |
-	                                kDNSServiceFlagsTimeout,
+	                            kDNSServiceFlagsShareConnection,
 	                            0, hostname, regtype, domain,
 				    http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)

@@ -3,7 +3,7 @@
  *
  *   Configuration file for CUPS on Windows.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -86,8 +86,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.5.0"
-#define CUPS_MINIMAL "CUPS/1.5.0"
+#define CUPS_SVERSION "CUPS v1.6.0"
+#define CUPS_MINIMAL "CUPS/1.6.0"
 
 
 /*
