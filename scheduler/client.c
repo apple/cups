@@ -3,7 +3,7 @@
  *
  *   Client routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
