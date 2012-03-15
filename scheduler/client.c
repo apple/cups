@@ -3167,6 +3167,7 @@ copy_cdsa_certificate(
   CFStringRef		servername = NULL;
 					/* Server name */
   CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
+  CFArrayRef		list = NULL;	/* Keychain list */
   char			localname[1024];/* Local hostname */
 #  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
   SecPolicyRef		policy = NULL;	/* Policy ref */
@@ -3213,10 +3214,16 @@ copy_cdsa_certificate(
     goto cleanup;
   }
 
+  list = CFArrayCreate(kCFAllocatorDefault, &keychain, 1,
+                       &kCFTypeArrayCallBacks);
+
   CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
   CFDictionaryAddValue(query, kSecMatchPolicy, policy);
   CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
   CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
+  CFDictionaryAddValue(query, kSecMatchSearchList, list);
+
+  CFRelease(list);
 
   err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
 
@@ -4226,7 +4233,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     }
 
     for (bytes = 0; bytes < 262144; bytes ++)
-      cupsFilePutChar(fp, random());
+      cupsFilePutChar(fp, CUPS_RAND());
 
     cupsFileClose(fp);
 
