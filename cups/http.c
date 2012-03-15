@@ -4163,7 +4163,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    break;
 
 	case errSSLWouldBlock :
-	    usleep(1000);
+	    error = noErr;		/* Force a retry */
+	    usleep(1000);		/* in 1 millisecond */
 	    break;
 
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
