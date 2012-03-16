@@ -336,57 +336,61 @@ matches or does not match.
 <dd>Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
 </dd>
-<dt>WITH-VALUE "literal string"
-</dt>
-<dd></dd>
 <dt>WITH-ALL-VALUES "literal string"
 </dt>
-<dd>Requires that one/all values of the EXPECT attribute to match the literal string. Comparisons are case-sensitive.
+<dd>Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
 </dd>
-<dt>WITH-VALUE "&lt;number"
+<dt>WITH-ALL-VALUES &lt;number
 </dt>
 <dd></dd>
-<dt>WITH-VALUE "=number"
+<dt>WITH-ALL-VALUES =number
 </dt>
 <dd></dd>
-<dt>WITH-VALUE ">number"
+<dt>WITH-ALL-VALUES >number
 </dt>
 <dd></dd>
-<dt>WITH-VALUE "number[,number,...]"
+<dt>WITH-ALL-VALUES number[,number,...]
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+</dd>
+<dt>WITH-ALL-VALUES "false"
 </dt>
 <dd></dd>
-<dt>WITH-ALL-VALUES "&lt;number"
+<dt>WITH-ALL-VALUES "true"
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the boolean value given.
+</dd>
+<dt>WITH-ALL-VALUES "/regular expression/"
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+</dd>
+<dt>WITH-VALUE "literal string"
+</dt>
+<dd>Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
+</dd>
+<dt>WITH-VALUE &lt;number
 </dt>
 <dd></dd>
-<dt>WITH-ALL-VALUES "=number"
+<dt>WITH-VALUE =number
 </dt>
 <dd></dd>
-<dt>WITH-ALL-VALUES ">number"
+<dt>WITH-VALUE >number
 </dt>
 <dd></dd>
-<dt>WITH-ALL-VALUES "number[,number,...]"
+<dt>WITH-VALUE number[,number,...]
 </dt>
-<dd>Requires that one/all values of the EXPECT attribute to match the number(s) or numeric comparisons. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+<dd>Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
 </dd>
 <dt>WITH-VALUE "false"
 </dt>
 <dd></dd>
 <dt>WITH-VALUE "true"
 </dt>
-<dd></dd>
-<dt>WITH-ALL-VALUES "false"
-</dt>
-<dd></dd>
-<dt>WITH-ALL-VALUES "true"
-</dt>
-<dd>Requires that one/all values of the EXPECT attribute to match the boolean value given.
+<dd>Requires that at least one value of the EXPECT attribute matches the boolean value given.
 </dd>
 <dt>WITH-VALUE "/regular expression/"
 </dt>
-<dd></dd>
-<dt>WITH-ALL-VALUES "/regular expression/"
-</dt>
-<dd>Requires that one/all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dd>Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
 
 </dd>
 </dl>

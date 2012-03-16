@@ -3214,7 +3214,7 @@ copy_cdsa_certificate(
     goto cleanup;
   }
 
-  list = CFArrayCreate(kCFAllocatorDefault, &keychain, 1,
+  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1,
                        &kCFTypeArrayCallBacks);
 
   CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
