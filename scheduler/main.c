@@ -1779,6 +1779,9 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
 #endif /* HAVE_AVAHI */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "select_timeout: JobHistoryUpdate=%ld",
+		  (long)JobHistoryUpdate);
+
  /*
   * Check to see if any of the clients have pending data to be
   * processed; if so, the timeout should be 0...

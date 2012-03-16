@@ -165,6 +165,7 @@ extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
 			                 int kill_delay);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
+extern void		cupsdUpdateJobs(void);
 
 
 /*

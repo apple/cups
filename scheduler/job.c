@@ -43,6 +43,7 @@
  *   cupsdSetJobState() 	- Set the state of the specified print job.
  *   cupsdStopAllJobs() 	- Stop all print jobs.
  *   cupsdUnloadCompletedJobs() - Flush completed job history from memory.
+ *   cupsdUpdateJobs()          - Update the history/file files for all jobs.
  *   compare_active_jobs()	- Compare the job IDs and priorities of two
  *				  jobs.
  *   compare_jobs()		- Compare the job IDs of two jobs.
@@ -455,6 +456,10 @@ cupsdCleanJobs(void)
   time_t	curtime;		/* Current time */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdCleanJobs: MaxJobs=%d, JobHistory=%d, JobFiles=%d",
+                  MaxJobs, JobHistory, JobFiles);
+
   if (MaxJobs <= 0 && JobHistory == INT_MAX && JobFiles == INT_MAX)
     return;
 
@@ -481,13 +486,23 @@ cupsdCleanJobs(void)
       {
         cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing document files.");
         remove_job_files(job);
+
+        if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+	  JobHistoryUpdate = job->history_time;
       }
-      else if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
-	JobHistoryUpdate = job->history_time;
-      else if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
-	JobHistoryUpdate = job->file_time;
+      else
+      {
+        if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+	  JobHistoryUpdate = job->history_time;
+
+	if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
+	  JobHistoryUpdate = job->file_time;
+      }
     }
   }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCleanJobs: JobHistoryUpdate=%ld",
+                  (long)JobHistoryUpdate);
 }
 
 
@@ -1639,9 +1654,20 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   job->history_time = 0;
 
   if (job->state_value >= IPP_JOB_CANCELED &&
-      (attr = ippFindAttribute(job->attrs, "time-at-completion",
+      (attr = ippFindAttribute(job->attrs, "time-at-completed",
 			       IPP_TAG_INTEGER)) != NULL)
   {
+    if (JobHistory < INT_MAX)
+      job->history_time = attr->values[0].integer + JobHistory;
+    else
+      job->history_time = INT_MAX;
+
+    if (job->history_time < time(NULL))
+      goto error;			/* Expired, remove from history */
+
+    if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+      JobHistoryUpdate = job->history_time;
+
     if (JobFiles < INT_MAX)
       job->file_time = attr->values[0].integer + JobFiles;
     else
@@ -1650,13 +1676,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
       JobHistoryUpdate = job->file_time;
 
-    if (JobHistory < INT_MAX)
-      job->history_time = attr->values[0].integer + JobHistory;
-    else
-      job->history_time = INT_MAX;
-
-    if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
-      JobHistoryUpdate = job->history_time;
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdLoadJob: JobHistoryUpdate=%ld",
+		    (long)JobHistoryUpdate);
   }
 
   if (!job->dest)
@@ -2682,6 +2703,62 @@ cupsdUnloadCompletedJobs(void)
 
       unload_job(job);
     }
+}
+
+
+/*
+ * 'cupsdUpdateJobs()' - Update the history/file files for all jobs.
+ */
+
+void
+cupsdUpdateJobs(void)
+{
+  cupsd_job_t		*job;		/* Current job */
+  time_t		curtime;	/* Current time */
+  ipp_attribute_t	*attr;		/* time-at-completed attribute */
+
+
+  curtime          = time(NULL);
+  JobHistoryUpdate = 0;
+
+  for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
+       job;
+       job = (cupsd_job_t *)cupsArrayNext(Jobs))
+  {
+    if (job->state_value >= IPP_JOB_CANCELED &&
+        (attr = ippFindAttribute(job->attrs, "time-at-completed",
+                                 IPP_TAG_INTEGER)) != NULL)
+    {
+     /*
+      * Update history/file expiration times...
+      */
+
+      if (JobHistory < INT_MAX)
+	job->history_time = attr->values[0].integer + JobHistory;
+      else
+	job->history_time = INT_MAX;
+
+      if (job->history_time < curtime)
+      {
+        cupsdDeleteJob(job, CUPSD_JOB_PURGE);
+        continue;
+      }
+
+      if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+	JobHistoryUpdate = job->history_time;
+
+      if (JobFiles < INT_MAX)
+	job->file_time = attr->values[0].integer + JobFiles;
+      else
+	job->file_time = INT_MAX;
+
+      if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
+	JobHistoryUpdate = job->file_time;
+    }
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdUpdateAllJobs: JobHistoryUpdate=%ld",
+                  (long)JobHistoryUpdate);
 }
 
 
@@ -4253,23 +4330,34 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
 
   curtime = time(NULL);
 
+  cupsdLogJob(job, CUPSD_LOG_DEBUG, "%s=%ld", name, (long)curtime);
+
   if ((attr = ippFindAttribute(job->attrs, name, IPP_TAG_ZERO)) != NULL)
   {
     attr->value_tag         = IPP_TAG_INTEGER;
     attr->values[0].integer = curtime;
   }
 
-  if (!strcmp(name, "time-at-completion"))
+  if (!strcmp(name, "time-at-completed"))
   {
+    if (JobHistory < INT_MAX)
+      job->history_time = attr->values[0].integer + JobHistory;
+    else
+      job->history_time = INT_MAX;
+
+    if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+      JobHistoryUpdate = job->history_time;
+
     if (JobFiles < INT_MAX)
       job->file_time = attr->values[0].integer + JobFiles;
     else
       job->file_time = INT_MAX;
 
-    if (JobHistory < INT_MAX)
-      job->history_time = attr->values[0].integer + JobHistory;
-    else
-      job->history_time = INT_MAX;
+    if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
+      JobHistoryUpdate = job->file_time;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_time: JobHistoryUpdate=%ld",
+		    (long)JobHistoryUpdate);
   }
 }
 

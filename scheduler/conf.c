@@ -1559,6 +1559,12 @@ cupsdReadConfiguration(void)
     cupsdCreateCommonData();
 
    /*
+    * Update all jobs as needed...
+    */
+
+    cupsdUpdateJobs();
+
+   /*
     * Update all printers as needed...
     */
 
