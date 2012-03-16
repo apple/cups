@@ -53,10 +53,13 @@
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
 {have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
-<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOB_HISTORY" {?preserve_job_history}> Preserve job history<BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of jobs\:
+<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Preserve job history<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum jobs (0 for no limit)\:
 <INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOB_FILES" {?preserve_job_files}> Preserve job print files<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Metadata\:
+<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retain Documents\:
+<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting<BR>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max log file size\:
 <INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>

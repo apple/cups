@@ -97,6 +97,8 @@ VAR int			JobHistory	VALUE(INT_MAX);
 					/* Preserve job history? */
 VAR int			JobFiles	VALUE(86400);
 					/* Preserve job files? */
+VAR time_t		JobHistoryUpdate VALUE(0);
+					/* Time for next job history update */
 VAR int			MaxJobs		VALUE(0),
 					/* Max number of jobs */
 			MaxActiveJobs	VALUE(0),

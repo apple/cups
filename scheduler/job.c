@@ -458,7 +458,8 @@ cupsdCleanJobs(void)
   if (MaxJobs <= 0 && JobHistory == INT_MAX && JobFiles == INT_MAX)
     return;
 
-  curtime = time(NULL);
+  curtime          = time(NULL);
+  JobHistoryUpdate = 0;
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
@@ -472,9 +473,19 @@ cupsdCleanJobs(void)
 
       if ((MaxJobs > 0 && cupsArrayCount(Jobs) >= MaxJobs) ||
           (job->history_time && job->history_time <= curtime))
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing from history.");
 	cupsdDeleteJob(job, CUPSD_JOB_PURGE);
+      }
       else if (job->file_time && job->file_time <= curtime)
+      {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing document files.");
         remove_job_files(job);
+      }
+      else if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+	JobHistoryUpdate = job->history_time;
+      else if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
+	JobHistoryUpdate = job->file_time;
     }
   }
 }
@@ -1636,10 +1647,16 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     else
       job->file_time = INT_MAX;
 
+    if (job->file_time < JobHistoryUpdate || !JobHistoryUpdate)
+      JobHistoryUpdate = job->file_time;
+
     if (JobHistory < INT_MAX)
       job->history_time = attr->values[0].integer + JobHistory;
     else
       job->history_time = INT_MAX;
+
+    if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
+      JobHistoryUpdate = job->history_time;
   }
 
   if (!job->dest)
@@ -4192,6 +4209,8 @@ remove_job_files(cupsd_job_t *job)	/* I - Job */
   job->num_files    = 0;
   job->filetypes    = NULL;
   job->compressions = NULL;
+
+  LastEvent |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
 }
 
 
@@ -4215,6 +4234,8 @@ remove_job_history(cupsd_job_t *job)	/* I - Job */
     cupsdRemoveFile(filename);
   else
     unlink(filename);
+
+  LastEvent |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
 }
 
 
