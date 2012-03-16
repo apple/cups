@@ -1481,13 +1481,27 @@ the standard SNMP Printer MIB OIDs for supply levels. The default value is
 
 <p>This required keyword describes which version of the CUPS
 PPD file extensions was used. Currently it must be the string
-"1.0", "1.1", "1.2", or "1.3".</p>
+"1.0", "1.1", "1.2", "1.3", "1.4", "1.5", or "1.6".</p>
 
 <p>Example:</p>
 
 <pre class='command'>
 <em>*% Specify a CUPS 1.2 driver</em>
 *cupsVersion: "1.2"
+</pre>
+
+
+<h3><span class="info">CUPS 1.6</span><a name="JCLToPDFInterpreter">JCLToPDFInterpreter</a></h3>
+
+<p class="summary">*JCLToPDFInterpreter: "JCL"</p>
+
+<p>This keyword provfides the JCL command to insert a PDF job file into a printer-ready data stream. The JCL command is added after the <tt>JCLBegin</tt> value and any commands for JCL options in the PPD file.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% PJL command to start the PDF interpreter</em>
+*JCLToPDFInterpreter: "@PJL ENTER LANGUAGE = PDF&lt;0A&gt;"
 </pre>
 
 
@@ -1782,6 +1796,10 @@ the device.</p>
 <ul>
 
 	<li>Added <a href="#cupsMaxCopies"><tt>cupsMaxCopies</tt></a> keyword.</li>
+
+	<li>Documented <a href="#JCLToPDFInterpreter"><tt>JCLToPDFInterpreter</tt></a> keyword.</li>
+
+	<li>Updated <a href="#cupsVersion"><tt>cupsVersion</tt></a> keyword documentation to list all current releases of CUPS.</li>
 
 </ul>
 
