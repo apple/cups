@@ -348,11 +348,6 @@ _cupsAppleCopyDefaultPrinter(void)
     return (NULL);
   }
 
-//#  ifdef DEBUG
-//  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-//  DEBUG_printf(("2_cupsUserDefault: network=\"%s\"", name));
-//#  endif /* DEBUG */
-
  /*
   * Lookup the network in the preferences...
   */
