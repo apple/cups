@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The scheduler could crash if a PPD file contained an invalid paper
+	  size (STR #4049)
 	- The CUPS polling daemon did not reinitialize its connection to the
 	  remote server on errors in all cases (STR #4031)
 	- PostScript auto-configuration was slow and unreliable with some

@@ -3,7 +3,7 @@
  *
  *   PPD test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1085,7 +1085,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Check for PaperDimension...
 	  */
 
-          if (size->width == 0.0 && size->length == 0.0)
+          if (size->width <= 0.0 && size->length <= 0.0)
 	  {
 	    if (verbose >= 0)
 	    {
@@ -3138,8 +3138,9 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
       continue;
     }
-    else if (warn != 2 && size->name[0] == 'w' &&
-             sscanf(size->name, "w%dh%d", &width, &length) == 2)
+
+    if (warn != 2 && size->name[0] == 'w' &&
+        sscanf(size->name, "w%dh%d", &width, &length) == 2)
     {
      /*
       * Validate device-specific size wNNNhNNN should have proper width and
