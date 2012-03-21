@@ -3610,6 +3610,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	      cupsdAddString(&(pol->job_attrs), "job-name");
 	      cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
 	      cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+	      cupsdAddString(&(pol->job_attrs), "phone");
 	    }
 	    else
 	      cupsdAddString(&(pol->job_attrs), value);
@@ -3834,6 +3835,7 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
     cupsdAddString(&(pol->job_attrs), "job-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+    cupsdAddString(&(pol->job_attrs), "phone");
   }
 
   if (!pol->sub_access)
