@@ -387,7 +387,6 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
       * Write out the result and move on to the next option...
       */
 
-      fprintf(stderr, "DEBUG: Default%s=%s\n", option->keyword, buffer);
       fprintf(stderr, "PPD: Default%s=%s\n", option->keyword, buffer);
       break;
     }
@@ -420,7 +419,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
     _cupsLangPrintFilter(stderr, "WARNING",
                          _("Unable to configure printer options."));
 
-  return (status);
+  return (0);
 }
 
 
