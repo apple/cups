@@ -1019,7 +1019,7 @@ JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
 
 <P>The <CODE>JobPrivateValues</CODE> directive specifies the list of job values
 to make private. The "default" values are "job-name",
-"job-originating-host-name", and "job-originating-user-name".</P>
+"job-originating-host-name", "job-originating-user-name", and "phone".</P>
 
 <P>The <CODE>JobPrivateValues</CODE> directive must appear inside a <A
 HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
