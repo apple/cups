@@ -3,7 +3,7 @@
  *
  *   Common run loop APIs for CUPS backends.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -434,9 +434,11 @@ backendWaitLoop(
     int          use_bc,		/* I - Use back-channel? */
     _cups_sccb_t side_cb)		/* I - Side-channel callback */
 {
-  fd_set	input;			/* Input set for reading */
-  time_t	curtime,		/* Current time */
-		snmp_update = 0;	/* Last SNMP status update */
+  int			nfds;		/* Number of file descriptors */
+  fd_set		input;		/* Input set for reading */
+  time_t		curtime,	/* Current time */
+			snmp_update = 0;/* Last SNMP status update */
+  struct timeval	timeout;	/* Timeout for select() */
 
 
   fprintf(stderr, "DEBUG: backendWaitLoop(snmp_fd=%d, addr=%p, side_cb=%p)\n",
@@ -445,6 +447,9 @@ backendWaitLoop(
  /*
   * Now loop until we receive data from stdin...
   */
+
+  if (snmp_fd >= 0)
+    snmp_update = time(NULL) + 5;
 
   for (;;)
   {
@@ -457,7 +462,18 @@ backendWaitLoop(
     if (side_cb)
       FD_SET(CUPS_SC_FD, &input);
 
-    if (select(CUPS_SC_FD + 1, &input, NULL, NULL, NULL) < 0)
+    if (snmp_fd >= 0)
+    {
+      curtime         = time(NULL);
+      timeout.tv_sec  = curtime >= snmp_update ? 0 : snmp_update - curtime;
+      timeout.tv_usec = 0;
+
+      nfds = select(CUPS_SC_FD + 1, &input, NULL, NULL, &timeout);
+    }
+    else
+      nfds = select(CUPS_SC_FD + 1, &input, NULL, NULL, NULL);
+
+    if (nfds < 0)
     {
      /*
       * Pause printing to clear any pending errors...
@@ -501,10 +517,10 @@ backendWaitLoop(
     * Do SNMP updates periodically...
     */
 
-    if (snmp_fd >= 0 && time(&curtime) >= snmp_update)
+    if (snmp_fd >= 0 && curtime >= snmp_update)
     {
       if (backendSNMPSupplies(snmp_fd, addr, NULL, NULL))
-        snmp_update = INT_MAX;
+        snmp_fd = -1;
       else
         snmp_update = curtime + 5;
     }

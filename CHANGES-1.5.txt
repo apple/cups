@@ -3,6 +3,9 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- The network backends did not check SNMP supply levels regularly
+	  (STR #4040)
+	- The online help always included the "help on help" text (STR #4042)
 	- Fixed a SSL handshake issue on OS X (STR #4045)
 	- The scheduler could crash if a PPD file contained an invalid paper
 	  size (STR #4049)
