@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- Fixed compile problem with old versions of OpenSSL (STR #4036)
 	- The network backends did not check SNMP supply levels regularly
 	  (STR #4040)
 	- The online help always included the "help on help" text (STR #4042)
