@@ -133,6 +133,11 @@ extern void	cupsdStopListening(void);
 extern void	cupsdUpdateCGI(void);
 extern void	cupsdWriteClient(cupsd_client_t *con);
 
+#ifdef HAVE_SSL
+extern int	cupsdEndTLS(cupsd_client_t *con);
+extern int	cupsdStartTLS(cupsd_client_t *con);
+#endif /* HAVE_SSL */
+
 
 /*
  * End of "$Id$".
