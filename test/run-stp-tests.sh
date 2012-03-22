@@ -457,9 +457,9 @@ fi
 echo "Setting up environment variables for test..."
 
 if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
 else
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$LD_LIBRARY_PATH"
 fi
 
 export LD_LIBRARY_PATH
@@ -471,17 +471,17 @@ fi
 export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
 else
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$DYLD_LIBRARY_PATH"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$DYLD_LIBRARY_PATH"
 fi
 
 export DYLD_LIBRARY_PATH
 
 if test "x$SHLIB_PATH" = x; then
-	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
+	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc"
 else
-	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$SHLIB_PATH"
+	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/ppdc:$SHLIB_PATH"
 fi
 
 export SHLIB_PATH
