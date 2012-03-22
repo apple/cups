@@ -436,7 +436,7 @@ backendWaitLoop(
 {
   int			nfds;		/* Number of file descriptors */
   fd_set		input;		/* Input set for reading */
-  time_t		curtime,	/* Current time */
+  time_t		curtime = 0,	/* Current time */
 			snmp_update = 0;/* Last SNMP status update */
   struct timeval	timeout;	/* Timeout for select() */
 

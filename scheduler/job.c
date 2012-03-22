@@ -1721,6 +1721,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
     switch (job->state_value)
     {
+      default :
       case IPP_JOB_PENDING :
           if (destptr->state == IPP_PRINTER_STOPPED)
             reason = "printer-stopped";

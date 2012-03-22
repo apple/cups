@@ -19,7 +19,7 @@
 #    include "tls-darwin.c"
 #  elif defined(HAVE_GNUTLS)
 #    include "tls-gnutls.c"
-#  elif defined(HAVE_OPENSSL)
+#  elif defined(HAVE_LIBSSL)
 #    include "tls-openssl.c"
 #  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */

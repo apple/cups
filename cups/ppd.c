@@ -462,8 +462,8 @@ _ppdOpen(
   ppd_attr_t		*custom_attr;	/* CustomFoo attribute */
   char			ll[4],		/* Language + '.' */
 			ll_CC[7];	/* Language + country + '.' */
-  size_t		ll_len,		/* Language length */
-			ll_CC_len;	/* Language + country length */
+  size_t		ll_len = 0,	/* Language length */
+			ll_CC_len = 0;	/* Language + country length */
   static const char * const ui_keywords[] =
 			{
 #ifdef CUPS_USE_FULL_UI_KEYWORDS_LIST
