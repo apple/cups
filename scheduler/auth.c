@@ -847,8 +847,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      */
 
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Username \"%s\" has no password.", con->http.fd,
-        	              username);
+	                      "[Client %d] Username \"%s\" has no password.",
+	                      con->http.fd, username);
 	      return;
 	    }
 
