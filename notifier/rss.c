@@ -3,7 +3,7 @@
  *
  *   RSS notifier for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -252,7 +252,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
      /*
       * Save the messages to the file again, uploading as needed...
-      */ 
+      */
 
       if (save_rss(rss, newname, baseurl))
       {
@@ -553,6 +553,15 @@ load_rss(cups_array_t *rss,		/* I - RSS messages */
     else if ((start = strstr(line, "<guid>")) != NULL)
       sequence_number = atoi(start + 6);
   }
+
+  if (subject)
+    free(subject);
+
+  if (text)
+    free(text);
+
+  if (link_url)
+    free(link_url);
 
   fclose(fp);
 }

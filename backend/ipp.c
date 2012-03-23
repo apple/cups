@@ -1582,10 +1582,11 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (fd >= 0)
 	{
-	  while (!job_canceled &&
+	  while (!job_canceled && http_status == HTTP_CONTINUE &&
 	         (bytes = read(fd, buffer, sizeof(buffer))) > 0)
 	  {
-	    if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
+	    if ((http_status = cupsWriteRequestData(http, buffer, bytes))
+	            != HTTP_CONTINUE)
 	      break;
 	    else
 	    {
@@ -2484,7 +2485,7 @@ new_request(
 	  * Multi-page image formats will have copies applied by the upstream
 	  * filters...
 	  */
-  
+
 	  copies = 1;
 	}
       }
@@ -2554,7 +2555,7 @@ new_request(
       cupsEncodeOptions(request, num_options, options);
     }
 
-    if (copies > 1 && copies <= pc->max_copies)
+    if (copies > 1 && (!pc || copies <= pc->max_copies))
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
 

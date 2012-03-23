@@ -821,7 +821,7 @@ cups_create_media_db(
     mdb.top    =
     mdb.bottom = 1270; /* Default 1/2" top/bottom margins */
 
-    for (i = media_col_db->num_values, val = media_col_db->values;
+    for (i = media_attr->num_values, val = media_attr->values;
          i > 0;
          i --, val ++)
     {

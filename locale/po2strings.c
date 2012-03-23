@@ -3,7 +3,7 @@
  *
  *   Convert a GNU gettext .po file to an Apple .strings file.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -175,7 +175,7 @@ main(int  argc,				/* I - Number of command-line args */
      /*
       * Find start of value...
       */
-      
+
       if ((ptr = strchr(s, '\"')) == NULL)
 	continue;
 
@@ -196,15 +196,18 @@ main(int  argc,				/* I - Number of command-line args */
 	  if (*msgid)
             cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 	                   (use_msgid || !*msgstr) ? msgid : msgstr);
-
-	  free(msgid);
-	  free(msgstr);
 	}
+
+	if (msgid)
+	  free(msgid);
+
+	if (msgstr)
+	  free(msgstr);
 
         msgid  = strdup(ptr);
 	msgstr = NULL;
       }
-      else if (s[0] == '\"' )
+      else if (s[0] == '\"' && (msgid || msgstr))
       {
        /*
 	* Append to current string...
@@ -215,6 +218,9 @@ main(int  argc,				/* I - Number of command-line args */
 	if ((temp = realloc(msgstr ? msgstr : msgid,
 			    length + strlen(ptr) + 1)) == NULL)
 	{
+	  free(msgid);
+	  if (msgstr)
+	    free(msgstr);
 	  perror("Unable to allocate string");
 	  return (1);
 	}
@@ -250,8 +256,12 @@ main(int  argc,				/* I - Number of command-line args */
 	* Set the string...
 	*/
 
+        if (msgstr)
+          free(msgstr);
+
 	if ((msgstr = strdup(ptr)) == NULL)
 	{
+	  free(msgid);
 	  perror("Unable to allocate msgstr");
 	  return (1);
 	}
@@ -264,10 +274,13 @@ main(int  argc,				/* I - Number of command-line args */
     if (*msgid)
       cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 		     (use_msgid || !*msgstr) ? msgid : msgstr);
-
-    free(msgid);
-    free(msgstr);
   }
+
+  if (msgid)
+    free(msgid);
+
+  if (msgstr)
+    free(msgstr);
 
   cupsFileClose(po);
   cupsFileClose(strings);

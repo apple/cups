@@ -84,7 +84,8 @@ static void		browse_callback(DNSServiceRef sdRef,
 				        DNSServiceErrorType errorCode,
 				        const char *serviceName,
 				        const char *regtype,
-				        const char *replyDomain, void *context);
+				        const char *replyDomain, void *context)
+					__attribute__((nonnull(1,5,6,7,8)));
 static void		browse_local_callback(DNSServiceRef sdRef,
 					      DNSServiceFlags flags,
 					      uint32_t interfaceIndex,
@@ -92,13 +93,15 @@ static void		browse_local_callback(DNSServiceRef sdRef,
 					      const char *serviceName,
 					      const char *regtype,
 					      const char *replyDomain,
-					      void *context);
+					      void *context)
+					      __attribute__((nonnull(1,5,6,7,8)));
 static int		compare_devices(cups_device_t *a, cups_device_t *b);
 static void		exec_backend(char **argv);
 static cups_device_t	*get_device(cups_array_t *devices,
 			            const char *serviceName,
 			            const char *regtype,
-				    const char *replyDomain);
+				    const char *replyDomain)
+				    __attribute__((nonnull(1,2,3,4)));
 static void		query_callback(DNSServiceRef sdRef,
 			               DNSServiceFlags flags,
 				       uint32_t interfaceIndex,
@@ -106,9 +109,11 @@ static void		query_callback(DNSServiceRef sdRef,
 				       const char *fullName, uint16_t rrtype,
 				       uint16_t rrclass, uint16_t rdlen,
 				       const void *rdata, uint32_t ttl,
-				       void *context);
+				       void *context)
+				       __attribute__((nonnull(1,5,9,11)));
 static void		sigterm_handler(int sig);
-static void		unquote(char *dst, const char *src, size_t dstsize);
+static void		unquote(char *dst, const char *src, size_t dstsize)
+			    __attribute__((nonnull(1,2)));
 
 
 /*
