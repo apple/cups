@@ -383,7 +383,7 @@ typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
  * exposed in CUPS 1.6.
  */
 
-#  ifdef _CUPS_SOURCE
+#  if defined(_CUPS_SOURCE) || defined(_CUPS_IPP_PRIVATE_H_)
      /* Building CUPS */
 #    define _IPP_PRIVATE_STRUCTURES 1
 #  elif defined(__APPLE__)
@@ -394,7 +394,7 @@ typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
        /* Building for 10.7 and earlier */
 #      define _IPP_PRIVATE_STRUCTURES 1
 #    endif /* MAC_OS_X_VERSION_10_8 && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8 */
-#  endif /* _CUPS_SOURCE */
+#  endif /* _CUPS_SOURCE || _CUPS_IPP_PRIVATE_H_ */
 
 #  ifdef _IPP_PRIVATE_STRUCTURES
 typedef union _ipp_request_u		/**** Request Header ****/
