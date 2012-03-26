@@ -675,15 +675,9 @@ The constant <code>CUPS_HTTP_DEFAULT</code> can be used with all of the
 <code>cups</code> functions to refer to the default CUPS server - the functions
 create a per-thread <a href='#http_t'><code>http_t</code></a> as needed.</p>
 
-<p>The IPP APIs use two structures for requests (messages sent to the CUPS
-scheduler) and responses (messages sent back to your application from the
-scheduler). The <a href='#ipp_t'><code>ipp_t</code></a> structure holds a
-complete request or response and is allocated using the
-<a href='#ippNew'><code>ippNew</code></a> or
-<a href='#ippNewRequest'><code>ippNewRequest</code></a> functions and
-freed using the <a href='#ippDelete'><code>ippDelete</code></a> function.</p>
+<p>The IPP APIs use two opaque structures for requests (messages sent to the CUPS scheduler) and responses (messages sent back to your application from the scheduler). The <a href='#ipp_t'><code>ipp_t</code></a> type holds a complete request or response and is allocated using the <a href='#ippNew'><code>ippNew</code></a> or <a href='#ippNewRequest'><code>ippNewRequest</code></a> functions and freed using the <a href='#ippDelete'><code>ippDelete</code></a> function.</p>
 
-<p>The second structure is called <a href='#ipp_attribute_t'><code>ipp_attribute_t</code></a> and holds a single IPP attribute which consists of a group tag (<a href='#ippGetGroupTag'><code>ippGetGroupTag</code></a>), a value type tag (<a href='#ippGetValueTag'><code>ippGetValueTag</code></a>), the attribute name (<a href='#ippGetName'><code>ippGetName</code></a>), and 1 or more values (<a href='#ippGetCount'><code>ippGetCount</code></a>, <a href='#ippGetBoolean'><code>ippGetBoolean</code></a>, <a href='#ippGetCollection'><code>ippGetCollection</code></a>, <a href='#ippGetDate'><code>ippGetDate</code></a>, <a href='#ippGetInteger'><code>ippGetInteger</code></a>, <a href='#ippGetRange'><code>ippGetRange</code></a>, <a href='#ippGetResolution'><code>ippGetResolution</code></a>, and <a href='#ippGetString'><code>ippGetString</code></a>). Attributes are added to an <a href='#ipp_t'><code>ipp_t</code></a> pointer using one of the <code>ippAdd</code> functions. For example, use <a href='#ippAddString'><code>ippAddString</code></a> to add the "printer-uri" and "requesting-user-name" string attributes to a request:</p>
+<p>The second opaque structure is called <a href='#ipp_attribute_t'><code>ipp_attribute_t</code></a> and holds a single IPP attribute which consists of a group tag (<a href='#ippGetGroupTag'><code>ippGetGroupTag</code></a>), a value type tag (<a href='#ippGetValueTag'><code>ippGetValueTag</code></a>), the attribute name (<a href='#ippGetName'><code>ippGetName</code></a>), and 1 or more values (<a href='#ippGetCount'><code>ippGetCount</code></a>, <a href='#ippGetBoolean'><code>ippGetBoolean</code></a>, <a href='#ippGetCollection'><code>ippGetCollection</code></a>, <a href='#ippGetDate'><code>ippGetDate</code></a>, <a href='#ippGetInteger'><code>ippGetInteger</code></a>, <a href='#ippGetRange'><code>ippGetRange</code></a>, <a href='#ippGetResolution'><code>ippGetResolution</code></a>, and <a href='#ippGetString'><code>ippGetString</code></a>). Attributes are added to an <a href='#ipp_t'><code>ipp_t</code></a> pointer using one of the <code>ippAdd</code> functions. For example, use <a href='#ippAddString'><code>ippAddString</code></a> to add the "printer-uri" and "requesting-user-name" string attributes to a request:</p>
 
 <pre class='example'>
 <a href='#ipp_t'>ipp_t</a> *request = <a href='#ippNewRequest'>ippNewRequest</a>(IPP_GET_JOBS);
