@@ -36,6 +36,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ipptool-installer", "ipptoo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex.vcproj", "{18950A1B-D37A-40C7-B2DF-C12986C0526E}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ipptool-installer", "libcups2-installer.vdproj", "{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -106,6 +108,14 @@ Global
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|Win32.ActiveCfg = Release|Win32
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|Win32.Build.0 = Release|Win32
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|x64.ActiveCfg = Release|Win32
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|Win32.ActiveCfg = Debug
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|Win32.Build.0 = Debug
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|x64.ActiveCfg = Debug
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|x64.Build.0 = Debug
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|Win32.ActiveCfg = Release
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|Win32.Build.0 = Release
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|x64.ActiveCfg = Release
+		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
