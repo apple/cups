@@ -92,7 +92,7 @@ backendNetworkSideCB(
 	  status = CUPS_SC_STATUS_NOT_IMPLEMENTED;
 	else if (backendDrainOutput(print_fd, device_fd))
 	  status = CUPS_SC_STATUS_IO_ERROR;
-	else 
+	else
           status = CUPS_SC_STATUS_OK;
 
 	datalen = 0;
@@ -119,8 +119,35 @@ backendNetworkSideCB(
 
         if (snmp_fd >= 0)
 	{
+	  char		*dataptr;	/* Pointer into data */
 	  cups_snmp_t	packet;		/* Packet from printer */
+          const char	*snmp_value;	/* CUPS_SNMP_VALUE env var */
 
+          if ((snmp_value = getenv("CUPS_SNMP_VALUE")) != NULL)
+          {
+            const char	*snmp_count;	/* CUPS_SNMP_COUNT env var */
+            int		count;		/* Repetition count */
+
+            if ((snmp_count = getenv("CUPS_SNMP_COUNT")) != NULL)
+            {
+              if ((count = atoi(snmp_count)) <= 0)
+                count = 1;
+            }
+            else
+              count = 1;
+
+	    for (dataptr = data + strlen(data) + 1;
+	         count > 0 && dataptr < (data + sizeof(data) - 1);
+	         count --, dataptr += strlen(dataptr))
+	      strlcpy(dataptr, snmp_value, sizeof(data) - (dataptr - data));
+
+	    fprintf(stderr, "DEBUG: Returning %s %s\n", data,
+	            data + strlen(data) + 1);
+
+	    status  = CUPS_SC_STATUS_OK;
+	    datalen = dataptr - data;
+	    break;
+          }
 
           if (!_cupsSNMPStringToOID(data, packet.object_name, CUPS_SNMP_MAX_OID))
 	  {
@@ -141,7 +168,6 @@ backendNetworkSideCB(
           {
 	    if (_cupsSNMPRead(snmp_fd, &packet, 1.0))
 	    {
-	      char	*dataptr;	/* Pointer into data */
 	      int	i;		/* Looping var */
 
 
@@ -172,7 +198,7 @@ backendNetworkSideCB(
 	        case CUPS_ASN1_OCTET_STRING :
 		    if (packet.object_value.string.num_bytes < 0)
 		      i = 0;
-		    else if (packet.object_value.string.num_bytes < 
+		    else if (packet.object_value.string.num_bytes <
 			     (sizeof(data) - (dataptr - data)))
 		      i = packet.object_value.string.num_bytes;
 		    else
