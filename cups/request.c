@@ -643,11 +643,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   }
   else if (http->state != HTTP_WAITING)
   {
-    DEBUG_printf(("1cupsSendRequest: Unknown HTTP state (%d), bailing.",
-                  http->state));
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
-
-    return (HTTP_ERROR);
+    DEBUG_printf(("1cupsSendRequest: Unknown HTTP state (%d), "
+                  "reconnecting.", http->state));
+    if (httpReconnect(http))
+      return (HTTP_ERROR);
   }
 
 #ifdef HAVE_SSL
