@@ -3215,17 +3215,27 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 			   _PWG_FROMPTS(size->width);
       pwg_media      = _pwgMediaForSize(width_2540ths, length_2540ths);
 
-      if (pwg_media && pwg_media->ppd)
+      if (pwg_media && pwg_media->ppd && (pwg_media->ppd[0] < 'a' || pwg_media->ppd[0] > 'z'))
       {
         size_t ppdlen = strlen(pwg_media->ppd);
 					/* Length of standard PPD name */
 
         strlcpy(buf, pwg_media->ppd, sizeof(buf));
 
+        if (strcmp(size->name, buf) && size->width > size->length)
+        {
+          if (!strcmp(pwg_media->ppd, "DoublePostcardRotated"))
+            strlcpy(buf, "DoublePostcard", sizeof(buf));
+          else if (strstr(size->name, ".Transverse"))
+            snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
+          else
+            snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+        }
+        
         if (size->left == 0 && size->bottom == 0 &&
 	    size->right == size->width && size->top == size->length)
         {
-          snprintf(buf, sizeof(buf), "%s.Fullbleed", pwg_media->ppd);
+          strlcat(buf, ".Fullbleed", sizeof(buf) - strlen(buf));
 	  if (_cups_strcasecmp(size->name, buf))
 	  {
 	   /*
@@ -3236,20 +3246,6 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
             if (_cups_strncasecmp(size->name, buf, buflen) ||
                 size->name[buflen] != '.')
-	      is_ok = 0;
-	  }
-        }
-        else if (strcmp(size->name, buf) && size->width > size->length)
-        {
-          if (!strcmp(pwg_media->ppd, "DoublePostcardRotated"))
-            strlcpy(buf, "DoublePostcard", sizeof(buf));
-          else
-	    snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
-
-	  if (strcmp(size->name, buf))
-	  {
-	    snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
-	    if (strcmp(size->name, buf))
 	      is_ok = 0;
 	  }
         }
@@ -3281,7 +3277,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	  * Check for EnvSizeName as well...
 	  */
 
-          if (strncmp(pwg_media->ppd, "Env", 3))
+      if (strncmp(pwg_media->ppd, "Env", 3) && 
+          !strncmp(size->name, "Env", 3))
             snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
 
 	  if (strcmp(size->name, buf))
@@ -3327,7 +3324,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
           size_t buflen = strlen(buf);	/* Length of proposed name */
 
           if (_cups_strncasecmp(size->name, buf, buflen) ||
-              strcmp(size->name + buflen, "in"))
+              (strcmp(size->name + buflen, "in") &&
+               size->name[buflen] != '.'))
 	    _cupsLangPrintf(stdout,
 			    _("      %s  Size \"%s\" should be \"%s\"."),
 			    prefix, size->name, buf);
