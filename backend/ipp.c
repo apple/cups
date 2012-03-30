@@ -645,6 +645,9 @@ main(int  argc,				/* I - Number of command-line args */
       update_reasons(NULL, "-connecting-to-device");
       return (CUPS_BACKEND_STOP);
     }
+
+    if (job_canceled)
+      return (CUPS_BACKEND_OK);
   }
 
   http = _httpCreate(hostname, port, addrlist, cupsEncryption(), AF_UNSPEC);
@@ -772,7 +775,9 @@ main(int  argc,				/* I - Number of command-line args */
   }
   while (http->fd < 0);
 
-  if (job_canceled || !http)
+  if (job_canceled)
+    return (CUPS_BACKEND_OK);
+  else if (!http)
     return (CUPS_BACKEND_FAILED);
 
   update_reasons(NULL, "-connecting-to-device");
@@ -1092,7 +1097,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     report_printer_state(supported);
   }
-  while (ipp_status > IPP_OK_CONFLICT);
+  while (!job_canceled && ipp_status > IPP_OK_CONFLICT);
+
+  if (job_canceled)
+    return (CUPS_BACKEND_OK);
 
  /*
   * See if the printer is accepting jobs and is not stopped; if either
