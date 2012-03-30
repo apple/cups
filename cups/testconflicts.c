@@ -3,7 +3,7 @@
  *
  *   PPD constraint test program for CUPS.
  *
- *   Copyright 2008-2011 by Apple Inc.
+ *   Copyright 2008-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -91,7 +91,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (option)
     {
       free(option);
+      option = NULL;
+    }
+
+    if (choice)
+    {
       free(choice);
+      choice = NULL;
     }
 
     printf("\nNew Option(s): ");
@@ -117,6 +123,11 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("Options Conflict!");
     cupsFreeOptions(num_options, options);
   }
+
+  if (option)
+    free(option);
+  if (choice)
+    free(choice);
 
   return (0);
 }

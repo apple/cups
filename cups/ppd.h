@@ -7,7 +7,7 @@
  *   -D_PPD_DEPRECATED="" TO YOUR COMPILE OPTIONS.  THIS HEADER AND THESE
  *   FUNCTIONS WILL BE REMOVED IN A FUTURE RELEASE OF CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -56,7 +56,19 @@ extern "C" {
  */
 
 #  ifndef _PPD_DEPRECATED
-#    define _PPD_DEPRECATED _CUPS_DEPRECATED
+#    if defined(__APPLE__)
+#      if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+         /* Building for 10.7 and earlier */
+#        define _PPD_DEPRECATED
+#      elif !defined(MAC_OS_X_VERSION_10_8)
+	 /* Building for 10.7 and earlier */
+#        define _PPD_DEPRECATED
+#      else
+#        define _PPD_DEPRECATED _CUPS_DEPRECATED
+#      endif /* MAC_OS_X_VERSION_10_8 && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8 */
+#    else
+#      define _PPD_DEPRECATED _CUPS_DEPRECATED
+#    endif /* __APPLE__ */
 #  endif /* !_PPD_DEPRECATED */
 
 

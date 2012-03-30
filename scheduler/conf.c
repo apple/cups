@@ -65,6 +65,7 @@
 typedef enum
 {
   CUPSD_VARTYPE_INTEGER,		/* Integer option */
+  CUPSD_VARTYPE_TIME,			/* Time interval option */
   CUPSD_VARTYPE_STRING,			/* String option */
   CUPSD_VARTYPE_BOOLEAN,		/* Boolean option */
   CUPSD_VARTYPE_PATHNAME		/* File/directory name option */
@@ -99,11 +100,11 @@ static const cupsd_var_t	variables[] =
   { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_INTEGER },
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
-  { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
+  { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_TIME },
   { "DefaultPaperSize",		&DefaultPaperSize,	CUPSD_VARTYPE_STRING },
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
-  { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_INTEGER },
+  { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_TIME },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
   { "ErrorPolicy",		&ErrorPolicy,		CUPSD_VARTYPE_STRING },
@@ -114,13 +115,13 @@ static const cupsd_var_t	variables[] =
 #ifdef HAVE_GSSAPI
   { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_GSSAPI */
-  { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_INTEGER },
+  { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_TIME },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
-  { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
-  { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_TIME },
+  { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_TIME },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
-  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_TIME },
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
@@ -132,30 +133,30 @@ static const cupsd_var_t	variables[] =
   { "MaxClientsPerHost",	&MaxClientsPerHost,	CUPSD_VARTYPE_INTEGER },
   { "MaxCopies",		&MaxCopies,		CUPSD_VARTYPE_INTEGER },
   { "MaxEvents",		&MaxEvents,		CUPSD_VARTYPE_INTEGER },
-  { "MaxHoldTime",		&MaxHoldTime,		CUPSD_VARTYPE_INTEGER },
+  { "MaxHoldTime",		&MaxHoldTime,		CUPSD_VARTYPE_TIME },
   { "MaxJobs",			&MaxJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerPrinter",	&MaxJobsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
   { "MaxJobTime",		&MaxJobTime,		CUPSD_VARTYPE_INTEGER },
-  { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_INTEGER },
+  { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_TIME },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptions",		&MaxSubscriptions,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerJob",	&MaxSubscriptionsPerJob,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerPrinter",&MaxSubscriptionsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerUser",	&MaxSubscriptionsPerUser,	CUPSD_VARTYPE_INTEGER },
-  { "MultipleOperationTimeout",	&MultipleOperationTimeout,	CUPSD_VARTYPE_INTEGER },
+  { "MultipleOperationTimeout",	&MultipleOperationTimeout,	CUPSD_VARTYPE_TIME },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "PageLogFormat",		&PageLogFormat,		CUPSD_VARTYPE_STRING },
-  { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_BOOLEAN },
-  { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_BOOLEAN },
+  { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_TIME },
+  { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_TIME },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
   { "PrintcapGUI",		&PrintcapGUI,		CUPSD_VARTYPE_STRING },
-  { "ReloadTimeout",		&ReloadTimeout,		CUPSD_VARTYPE_INTEGER },
+  { "ReloadTimeout",		&ReloadTimeout,		CUPSD_VARTYPE_TIME },
   { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
-  { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_INTEGER },
+  { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_TIME },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
@@ -172,7 +173,7 @@ static const cupsd_var_t	variables[] =
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_AUTHORIZATION_H */
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_PATHNAME },
-  { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
+  { "Timeout",			&Timeout,		CUPSD_VARTYPE_TIME },
   { "WebInterface",		&WebInterface,		CUPSD_VARTYPE_BOOLEAN }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
@@ -1556,6 +1557,12 @@ cupsdReadConfiguration(void)
     */
 
     cupsdCreateCommonData();
+
+   /*
+    * Update all jobs as needed...
+    */
+
+    cupsdUpdateJobs();
 
    /*
     * Update all printers as needed...
@@ -3140,11 +3147,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "Missing integer value for %s on line %d.",
 			      line, linenum);
+	    else if (!isdigit(*value & 255))
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Bad integer value for %s on line %d.",
+			      line, linenum);
 	    else
 	    {
 	      int	n;		/* Number */
 	      char	*units;		/* Units */
-
 
               n = strtol(value, &units, 0);
 
@@ -3158,6 +3168,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 		  n *= 1024;
 		else if (tolower(units[0] & 255) == 't')
 		  n *= 262144;
+		else
+		{
+		  cupsdLogMessage(CUPSD_LOG_ERROR,
+				  "Unknown integer value for %s on line %d.",
+				  line, linenum);
+		  break;
+		}
 	      }
 
               if (n < 0)
@@ -3166,6 +3183,61 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 				line, linenum);
 	      else
 		*((int *)var->ptr) = n;
+	    }
+	    break;
+
+        case CUPSD_VARTYPE_TIME :
+	    if (!value)
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Missing time interval value for %s on line %d.",
+			      line, linenum);
+	    else if (!_cups_strncasecmp(line, "PreserveJob", 11) &&
+	             (!_cups_strcasecmp(value, "true") ||
+		      !_cups_strcasecmp(value, "on") ||
+		      !_cups_strcasecmp(value, "enabled") ||
+		      !_cups_strcasecmp(value, "yes")))
+	      *((int *)var->ptr) = INT_MAX;
+	    else if (!_cups_strcasecmp(value, "false") ||
+	             !_cups_strcasecmp(value, "off") ||
+	             !_cups_strcasecmp(value, "disabled") ||
+	             !_cups_strcasecmp(value, "no"))
+	      *((int *)var->ptr) = 0;
+	    else if (!isdigit(*value & 255))
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Unknown time interval value for %s on line %d.",
+			      line, linenum);
+	    else
+	    {
+	      double	n;		/* Number */
+	      char	*units;		/* Units */
+
+              n = strtod(value, &units);
+
+	      if (units && *units)
+	      {
+        	if (tolower(units[0] & 255) == 'w')
+		  n *= 7 * 24 * 60 * 60;
+        	else if (tolower(units[0] & 255) == 'd')
+		  n *= 24 * 60 * 60;
+		else if (tolower(units[0] & 255) == 'h')
+		  n *= 60 * 60;
+		else if (tolower(units[0] & 255) == 'm')
+		  n *= 60;
+		else
+		{
+		  cupsdLogMessage(CUPSD_LOG_ERROR,
+				  "Unknown time interval value for %s on line "
+				  "%d.", line, linenum);
+		  break;
+		}
+	      }
+
+              if (n < 0.0 || n > INT_MAX)
+		cupsdLogMessage(CUPSD_LOG_ERROR,
+	                	"Bad time value for %s on line %d.",
+				line, linenum);
+	      else
+		*((int *)var->ptr) = (int)n;
 	    }
 	    break;
 
@@ -3538,6 +3610,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	      cupsdAddString(&(pol->job_attrs), "job-name");
 	      cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
 	      cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+	      cupsdAddString(&(pol->job_attrs), "phone");
 	    }
 	    else
 	      cupsdAddString(&(pol->job_attrs), value);
@@ -3762,6 +3835,7 @@ set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
     cupsdAddString(&(pol->job_attrs), "job-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
     cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+    cupsdAddString(&(pol->job_attrs), "phone");
   }
 
   if (!pol->sub_access)

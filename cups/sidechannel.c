@@ -3,7 +3,7 @@
  *
  *   Side-channel API code for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -150,7 +150,7 @@ cupsSideChannelRead(
   pfd.fd     = CUPS_SC_FD;
   pfd.events = POLLIN;
 
-  while ((nfds = poll(&pfd, 1, 
+  while ((nfds = poll(&pfd, 1,
 		      timeout < 0.0 ? -1 : (long)(timeout * 1000))) < 0 &&
 	 (errno == EINTR || errno == EAGAIN))
     ;
@@ -162,14 +162,14 @@ cupsSideChannelRead(
   stimeout.tv_sec  = (int)timeout;
   stimeout.tv_usec = (int)(timeout * 1000000) % 1000000;
 
-  while ((nfds = select(CUPS_SC_FD + 1, &input_set, NULL, NULL, 
+  while ((nfds = select(CUPS_SC_FD + 1, &input_set, NULL, NULL,
 			timeout < 0.0 ? NULL : &stimeout)) < 0 &&
 	 (errno == EINTR || errno == EAGAIN))
     ;
 
 #endif /* HAVE_POLL */
 
-  if  (nfds < 1)
+  if (nfds < 1)
   {
     *command = CUPS_SC_CMD_NONE;
     *status  = nfds==0 ? CUPS_SC_STATUS_TIMEOUT : CUPS_SC_STATUS_IO_ERROR;
@@ -308,7 +308,7 @@ cupsSideChannelRead(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the SNMP query.
  *
- * @since CUPS 1.4/Mac OS X 10.6@ 
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 cups_sc_status_t			/* O  - Query status */
@@ -414,7 +414,7 @@ cupsSideChannelSNMPGet(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the first SNMP query.
  *
- * @since CUPS 1.4/Mac OS X 10.6@ 
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 cups_sc_status_t			/* O - Status of first query of @code CUPS_SC_STATUS_OK@ on success */
@@ -509,7 +509,7 @@ cupsSideChannelSNMPWalk(
       * Call the callback with the OID and data...
       */
 
-      (*cb)(real_data, real_data + real_oidlen, real_datalen, context); 
+      (*cb)(real_data, real_data + real_oidlen, real_datalen, context);
 
      /*
       * Update the current OID...

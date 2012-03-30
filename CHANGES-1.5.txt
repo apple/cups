@@ -3,6 +3,18 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- Fixed compile problem with old versions of OpenSSL (STR #4036)
+	- The network backends did not check SNMP supply levels regularly
+	  (STR #4040)
+	- The online help always included the "help on help" text (STR #4042)
+	- Fixed a SSL handshake issue on OS X (STR #4045)
+	- The scheduler could crash if a PPD file contained an invalid paper
+	  size (STR #4049)
+	- The CUPS polling daemon did not reinitialize its connection to the
+	  remote server on errors in all cases (STR #4031)
+	- PostScript auto-configuration was slow and unreliable with some
+	  printers (STR #4028)
+	- Missing localizations caused empty output (STR #4033)
 	- The cups-driverd program could temporarily "forget" a PPD file if it
 	  was updated in place.
 	- The dnssd backend now prefers IPPS over IPP.

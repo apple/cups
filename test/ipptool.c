@@ -81,6 +81,13 @@ typedef enum _cups_output_e		/**** Output mode ****/
   _CUPS_OUTPUT_CSV			/* Comma-separated values output */
 } _cups_output_t;
 
+typedef enum _cups_with_e		/**** WITH flags ****/
+{
+  _CUPS_WITH_LITERAL = 0,		/* Match string is a literal value */
+  _CUPS_WITH_ALL = 1,			/* Must match all values */
+  _CUPS_WITH_REGEX = 2			/* Match string is a regular expression */
+} _cups_with_t;
+
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
   int		optional,		/* Optional attribute? */
@@ -96,7 +103,7 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*define_value;		/* Variable to define with value */
   int		repeat_match,		/* Repeat test on match */
 		repeat_no_match,	/* Repeat test on no match */
-		with_regex,		/* WITH-VALUE is a regular expression */
+		with_flags,		/* WITH flags  */
 		count;			/* Expected count if > 0 */
   ipp_tag_t	in_group;		/* IN-GROUP value */
 } _cups_expect_t;
@@ -205,7 +212,7 @@ static void	sigterm_handler(int sig);
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(cups_array_t *errors, ipp_attribute_t *attr);
-static int      with_value(cups_array_t *errors, char *value, int regex,
+static int      with_value(cups_array_t *errors, char *value, int flags,
 		           ipp_attribute_t *attr, char *matchbuf,
 		           size_t matchlen);
 
@@ -1164,6 +1171,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           _cups_strcasecmp(token, "REPEAT-MATCH") &&
           _cups_strcasecmp(token, "REPEAT-NO-MATCH") &&
           _cups_strcasecmp(token, "SAME-COUNT-AS") &&
+          _cups_strcasecmp(token, "WITH-ALL-VALUES") &&
           _cups_strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
@@ -2049,11 +2057,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!_cups_strcasecmp(token, "WITH-VALUE"))
+      else if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") ||
+               !_cups_strcasecmp(token, "WITH-VALUE"))
       {
+	if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") && last_expect)
+	  last_expect->with_flags = _CUPS_WITH_ALL;
+
       	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
-	  print_fatal_error("Missing WITH-VALUE value on line %d.", linenum);
+	  print_fatal_error("Missing %s value on line %d.", token, linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2075,7 +2087,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    */
 
 	    last_expect->with_value = calloc(1, tokenptr - token);
-	    last_expect->with_regex = 1;
+	    last_expect->with_flags |= _CUPS_WITH_REGEX;
 
 	    if (last_expect->with_value)
 	      memcpy(last_expect->with_value, token + 1, tokenptr - token - 1);
@@ -2087,11 +2099,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    */
 
 	    last_expect->with_value = strdup(token);
+	    last_expect->with_flags |= _CUPS_WITH_LITERAL;
 	  }
 	}
 	else
 	{
-	  print_fatal_error("WITH-VALUE without a preceding EXPECT on line %d.",
+	  print_fatal_error("%s without a preceding EXPECT on line %d.", token,
 		            linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -2660,21 +2673,27 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    ippAttributeString(found, buffer, sizeof(buffer));
 
 	  if (found &&
-	      !with_value(NULL, expect->with_value, expect->with_regex, found,
+	      !with_value(NULL, expect->with_value, expect->with_flags, found,
 			  buffer, sizeof(buffer)))
 	  {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
 	    else if (!expect->define_match && !expect->define_value)
 	    {
-	      if (expect->with_regex)
-		add_stringf(errors, "EXPECTED: %s WITH-VALUE /%s/",
-			    expect->name, expect->with_value);
+	      if (expect->with_flags & _CUPS_WITH_REGEX)
+		add_stringf(errors, "EXPECTED: %s %s /%s/",
+			    expect->name,
+			    (expect->with_flags & _CUPS_WITH_ALL) ?
+			        "WITH-ALL-VALUES" : "WITH-VALUE",
+			    expect->with_value);
 	      else
-		add_stringf(errors, "EXPECTED: %s WITH-VALUE \"%s\"",
-			    expect->name, expect->with_value);
+		add_stringf(errors, "EXPECTED: %s %s \"%s\"",
+			    expect->name,
+			    (expect->with_flags & _CUPS_WITH_ALL) ?
+			        "WITH-ALL-VALUES" : "WITH-VALUE",
+			    expect->with_value);
 
-	      with_value(errors, expect->with_value, expect->with_regex, found,
+	      with_value(errors, expect->with_value, expect->with_flags, found,
 	                 buffer, sizeof(buffer));
 	    }
 
@@ -5018,16 +5037,18 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 static int				/* O - 1 on match, 0 on non-match */
 with_value(cups_array_t    *errors,	/* I - Errors array */
            char            *value,	/* I - Value string */
-           int             regex,	/* I - Value is a regular expression */
+           int             flags,	/* I - Flags for match */
            ipp_attribute_t *attr,	/* I - Attribute to compare */
 	   char            *matchbuf,	/* I - Buffer to hold matching value */
 	   size_t          matchlen)	/* I - Length of match buffer */
 {
-  int	i;				/* Looping var */
+  int	i,				/* Looping var */
+	match;				/* Match? */
   char	*valptr;			/* Pointer into value */
 
 
   *matchbuf = '\0';
+  match     = (flags & _CUPS_WITH_ALL) ? 1 : 0;
 
  /*
   * NULL matches everything.
@@ -5048,8 +5069,8 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
         {
 	  char	op,			/* Comparison operator */
 	  	*nextptr;		/* Next pointer */
-	  int	intvalue;		/* Integer value */
-
+	  int	intvalue,		/* Integer value */
+	  	valmatch = 0;		/* Does the current value match? */
 
           valptr = value;
 
@@ -5073,34 +5094,35 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 	      break;
 	    valptr = nextptr;
 
-	    switch (op)
+            if ((op == '=' && attr->values[i].integer == intvalue) ||
+                (op == '<' && attr->values[i].integer < intvalue) ||
+                (op == '>' && attr->values[i].integer > intvalue))
 	    {
-	      case '=' :
-	          if (attr->values[i].integer == intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d", attr->values[i].integer);
-		    return (1);
-		  }
-		  break;
-	      case '<' :
-	          if (attr->values[i].integer < intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d", attr->values[i].integer);
-		    return (1);
-		  }
-		  break;
-	      case '>' :
-	          if (attr->values[i].integer > intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d", attr->values[i].integer);
-		    return (1);
-		  }
-		  break;
+	      if (!matchbuf[0])
+		snprintf(matchbuf, matchlen, "%d",
+			 attr->values[i].integer);
+
+	      valmatch = 1;
+	      break;
 	    }
 	  }
+
+          if (flags & _CUPS_WITH_ALL)
+          {
+            if (!valmatch)
+            {
+              match = 0;
+              break;
+            }
+          }
+          else if (valmatch)
+          {
+            match = 1;
+            break;
+          }
         }
 
-	if (errors)
+        if (!match && errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
 	    add_stringf(errors, "GOT: %s=%d", attr->name,
@@ -5113,8 +5135,8 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
         {
 	  char	op,			/* Comparison operator */
 	  	*nextptr;		/* Next pointer */
-	  int	intvalue;		/* Integer value */
-
+	  int	intvalue,		/* Integer value */
+	  	valmatch = 0;		/* Does the current value match? */
 
           valptr = value;
 
@@ -5138,41 +5160,37 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 	      break;
 	    valptr = nextptr;
 
-	    switch (op)
+            if ((op == '=' && (attr->values[i].range.lower == intvalue ||
+			       attr->values[i].range.upper == intvalue)) ||
+		(op == '<' && attr->values[i].range.upper < intvalue) ||
+		(op == '>' && attr->values[i].range.upper > intvalue))
 	    {
-	      case '=' :
-	          if (attr->values[i].range.lower == intvalue ||
-		      attr->values[i].range.upper == intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d-%d",
-	                     attr->values[i].range.lower,
-	                     attr->values[i].range.upper);
-		    return (1);
-		  }
-		  break;
-	      case '<' :
-	          if (attr->values[i].range.upper < intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d-%d",
-	                     attr->values[i].range.lower,
-	                     attr->values[i].range.upper);
-		    return (1);
-		  }
-		  break;
-	      case '>' :
-	          if (attr->values[i].range.upper > intvalue)
-	          {
-	            snprintf(matchbuf, matchlen, "%d-%d",
-	                     attr->values[i].range.lower,
-	                     attr->values[i].range.upper);
-		    return (1);
-		  }
-		  break;
+	      if (!matchbuf[0])
+		snprintf(matchbuf, matchlen, "%d-%d",
+			 attr->values[0].range.lower,
+			 attr->values[0].range.upper);
+
+	      valmatch = 1;
+	      break;
 	    }
 	  }
+
+          if (flags & _CUPS_WITH_ALL)
+          {
+            if (!valmatch)
+            {
+              match = 0;
+              break;
+            }
+          }
+          else if (valmatch)
+          {
+            match = 1;
+            break;
+          }
         }
 
-	if (errors)
+        if (!match && errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
 	    add_stringf(errors, "GOT: %s=%d-%d", attr->name,
@@ -5186,12 +5204,23 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 	{
           if (!strcmp(value, "true") == attr->values[i].boolean)
           {
-            strlcpy(matchbuf, value, matchlen);
-	    return (1);
+            if (!matchbuf[0])
+	      strlcpy(matchbuf, value, matchlen);
+
+	    if (!(flags & _CUPS_WITH_ALL))
+	    {
+	      match = 1;
+	      break;
+	    }
+	  }
+	  else if (flags & _CUPS_WITH_ALL)
+	  {
+	    match = 0;
+	    break;
 	  }
 	}
 
-	if (errors)
+	if (!match && errors)
 	{
 	  for (i = 0; i < attr->num_values; i ++)
 	    add_stringf(errors, "GOT: %s=%s", attr->name,
@@ -5213,7 +5242,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :
-        if (regex)
+        if (flags & _CUPS_WITH_REGEX)
 	{
 	 /*
 	  * Value is an extended, case-sensitive POSIX regular expression...
@@ -5238,53 +5267,66 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	    if (!regexec(&re, attr->values[i].string.text, 0, NULL, 0))
 	    {
-	      if (errors)
-	        add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
-		                 attr->values[i].string.text);
-	      else
+	      if (!matchbuf[0])
+		strlcpy(matchbuf, attr->values[i].string.text, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
 	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
 	    }
 	  }
 
 	  regfree(&re);
-
-          if (i == attr->num_values)
-            strlcpy(matchbuf, attr->values[0].string.text, matchlen);
-
-          return (i == attr->num_values);
 	}
 	else
 	{
 	 /*
-	  * Value is a literal string, see if at least one value matches the
-	  * literal string...
+	  * Value is a literal string, see if the value(s) match...
 	  */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
 	    if (!strcmp(value, attr->values[i].string.text))
 	    {
-	      strlcpy(matchbuf, attr->values[i].string.text, matchlen);
-	      return (1);
+	      if (!matchbuf[0])
+		strlcpy(matchbuf, attr->values[i].string.text, matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
 	    }
 	  }
-
-	  if (errors)
-	  {
-	    for (i = 0; i < attr->num_values; i ++)
-	      add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
-			       attr->values[i].string.text);
-	  }
 	}
+
+        if (!match && errors)
+        {
+	  for (i = 0; i < attr->num_values; i ++)
+	    add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
+			     attr->values[i].string.text);
+        }
 	break;
 
     default :
         break;
   }
 
-  return (0);
+  return (match);
 }
 
 

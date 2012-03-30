@@ -573,13 +573,13 @@ main(int  argc,				/* I - Number of command-line args */
 
       length   = sizeof(buffer);
       scstatus = cupsSideChannelSNMPGet(oid, buffer, &length, 5.0);
-      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %s\n", oid,
-	     statuses[scstatus], buffer);
+      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %d bytes (%s)\n", oid,
+	     statuses[scstatus], (int)length, buffer);
 
       length   = sizeof(buffer);
       scstatus = cupsSideChannelSNMPGet(oid, buffer, &length, 5.0);
-      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %s\n", oid,
-	     statuses[scstatus], buffer);
+      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %d bytes (%s)\n", oid,
+	     statuses[scstatus], (int)length, buffer);
     }
 
     length   = 0;
@@ -638,13 +638,13 @@ sigterm_handler(int sig)		/* I - Signal */
 static void
 usage(void)
 {
-  puts("Usage: testbackend [-cancel] [-d] [-ps | -pcl] [-s [-oid OID] "
+  puts("Usage: testbackend [-cancel] [-d] [-ps | -pcl] [-s [-get OID] "
        "[-walk OID]] [-t] device-uri job-id user title copies options [file]");
   puts("");
   puts("Options:");
   puts("  -cancel     Simulate a canceled print job after 2 seconds.");
   puts("  -d          Show log messages from backend.");
-  puts("  -oid OID    Lookup the specified SNMP OID.");
+  puts("  -get OID    Lookup the specified SNMP OID.");
   puts("              (.1.3.6.1.2.1.43.10.2.1.4.1.1 is a good one for printers)");
   puts("  -pcl        Send PCL+PJL query and test page to backend.");
   puts("  -ps         Send PostScript query and test page to backend.");
@@ -667,7 +667,7 @@ walk_cb(const char *oid,		/* I - OID */
 	int        datalen,		/* I - Length of data */
 	void       *context)		/* I - Context (unused) */
 {
-  printf("CUPS_SC_CMD_SNMP_WALK %s=%s (%d bytes)\n", oid, data, datalen);
+  printf("CUPS_SC_CMD_SNMP_WALK %s, %d bytes (%s)\n", oid, datalen, data);
 }
 
 

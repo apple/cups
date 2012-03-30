@@ -45,8 +45,12 @@
 #  define kPMPrintUIToolAgent	"com.apple.printuitool.agent"
 #  define kPMStartJob		100
 #  define kPMWaitForJob		101
+#  ifdef HAVE_XPC_PRIVATE_H
+#    include <xpc/private.h>
+#  else
 extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
 		                              uid_t uid);
+#  endif /* HAVE_XPC_PRIVATE_H */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 
 
@@ -1139,12 +1143,7 @@ main(int  argc,				/* I - Number of command-line args */
   copies = atoi(argv[4]);
 
   if (copies_sup || argc < 7)
-  {
     copies_remaining = 1;
-
-    if (argc < 7 && !_cups_strncasecmp(final_content_type, "image/", 6))
-      copies = 1;
-  }
   else
     copies_remaining = copies;
 
@@ -1179,7 +1178,8 @@ main(int  argc,				/* I - Number of command-line args */
   if (format_sup != NULL)
   {
     for (i = 0; i < format_sup->num_values; i ++)
-      if (!_cups_strcasecmp(final_content_type, format_sup->values[i].string.text))
+      if (!_cups_strcasecmp(final_content_type,
+                            format_sup->values[i].string.text))
       {
         document_format = final_content_type;
 	break;
@@ -1189,13 +1189,16 @@ main(int  argc,				/* I - Number of command-line args */
     {
       for (i = 0; i < format_sup->num_values; i ++)
 	if (!_cups_strcasecmp("application/octet-stream",
-	                format_sup->values[i].string.text))
+	                      format_sup->values[i].string.text))
 	{
 	  document_format = "application/octet-stream";
 	  break;
 	}
     }
   }
+
+  fprintf(stderr, "DEBUG: final_content_type=\"%s\", document_format=\"%s\"\n",
+          final_content_type, document_format ? document_format : "(null)");
 
  /*
   * If the printer does not support HTTP/1.1 (which IPP requires), copy stdin
@@ -1552,8 +1555,9 @@ main(int  argc,				/* I - Number of command-line args */
         if ((i + 1) >= num_files)
 	  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
 
-        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-	             "document-format", NULL, document_format);
+	if (document_format)
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+		       "document-format", NULL, document_format);
 
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
@@ -1578,10 +1582,11 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (fd >= 0)
 	{
-	  while (!job_canceled &&
+	  while (!job_canceled && http_status == HTTP_CONTINUE &&
 	         (bytes = read(fd, buffer, sizeof(buffer))) > 0)
 	  {
-	    if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
+	    if ((http_status = cupsWriteRequestData(http, buffer, bytes))
+	            != HTTP_CONTINUE)
 	      break;
 	    else
 	    {
@@ -2446,9 +2451,46 @@ new_request(
 		       NULL, "two-sided-short-edge");
       }
 
-      if (doc_handling_sup &&
-          (!format || _cups_strncasecmp(format, "image/", 6)) &&
- 	  (keyword = cupsGetOption("collate", num_options, options)) != NULL)
+      if ((keyword = cupsGetOption("multiple-document-handling",
+				   num_options, options)) != NULL)
+      {
+        if (strstr(keyword, "uncollated"))
+          keyword = "false";
+        else
+          keyword = "true";
+      }
+      else if ((keyword = cupsGetOption("collate", num_options,
+                                        options)) == NULL)
+        keyword = "true";
+
+      if (format)
+      {
+        if (!_cups_strcasecmp(format, "image/gif") ||
+	    !_cups_strcasecmp(format, "image/jp2") ||
+	    !_cups_strcasecmp(format, "image/jpeg") ||
+	    !_cups_strcasecmp(format, "image/png") ||
+	    !_cups_strcasecmp(format, "image/tiff") ||
+	    !_cups_strncasecmp(format, "image/x-", 8))
+	{
+	 /*
+	  * Collation makes no sense for single page image formats...
+	  */
+
+	  keyword = "false";
+	}
+	else if (!_cups_strncasecmp(format, "image/", 6) ||
+	         !_cups_strcasecmp(format, "application/vnd.cups-raster"))
+	{
+	 /*
+	  * Multi-page image formats will have copies applied by the upstream
+	  * filters...
+	  */
+
+	  copies = 1;
+	}
+      }
+
+      if (doc_handling_sup)
       {
         if (!_cups_strcasecmp(keyword, "true"))
 	  collate_str = "separate-documents-collated-copies";
@@ -2513,7 +2555,7 @@ new_request(
       cupsEncodeOptions(request, num_options, options);
     }
 
-    if (copies > 1 && copies <= pc->max_copies)
+    if (copies > 1 && (!pc || copies <= pc->max_copies))
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
 

@@ -3,7 +3,7 @@
 .\"
 .\"   ipptoolfile man page for CUPS.
 .\"
-.\"   Copyright 2010-2011 by Apple Inc.
+.\"   Copyright 2010-2012 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "28 September 2011" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "14 March 2012" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -276,14 +276,45 @@ SAME-COUNT-AS attribute-name
 Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
 .TP 5
+WITH-ALL-VALUES "literal string"
+Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
+.TP 5
+WITH-ALL-VALUES <number
+.TP 5
+WITH-ALL-VALUES =number
+.TP 5
+WITH-ALL-VALUES >number
+.TP 5
+WITH-ALL-VALUES number[,number,...]
+Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
+.TP 5
+WITH-ALL-VALUES "false"
+.TP 5
+WITH-ALL-VALUES "true"
+Requires that all values of the EXPECT attribute match the boolean value given.
+.TP 5
+WITH-ALL-VALUES "/regular expression/"
+Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+.TP 5
 WITH-VALUE "literal string"
-Requires at least one value of the EXPECT attribute to match the literal string.
-Comparisons are case-sensitive.
+Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
+.TP 5
+WITH-VALUE <number
+.TP 5
+WITH-VALUE =number
+.TP 5
+WITH-VALUE >number
+.TP 5
+WITH-VALUE number[,number,...]
+Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "<" and ">" operators only check the upper bound of the range.
+.TP 5
+WITH-VALUE "false"
+.TP 5
+WITH-VALUE "true"
+Requires that at least one value of the EXPECT attribute matches the boolean value given.
 .TP 5
 WITH-VALUE "/regular expression/"
-Requires that all values of the EXPECT attribute match the regular expression,
-which must conform to the POSIX regular expression syntax.
-Comparisons are case-sensitive.
+Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
 
 .SH STATUS PREDICATES
 The following predicates are understood following the STATUS test directive:
@@ -343,6 +374,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Get-Subscriptions
     Hold-Job
     Hold-New-Jobs
+    Identify-Printer
     Pause-Printer
     Pause-Printer-After-Current-Job
     Print-Job
@@ -367,6 +399,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Shutdown-Printer
     Startup-Printer
     Suspend-Current-Job
+    Validate-Document
     Validate-Job
 .fi
 
@@ -384,6 +417,10 @@ Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
     client-error-document-access-error
     client-error-document-format-error
     client-error-document-format-not-supported
+    client-error-document-password-error
+    client-error-document-permission-error
+    client-error-document-security-error
+    client-error-document-unprintable-error
     client-error-forbidden
     client-error-gone
     client-error-ignored-all-notifications
@@ -517,7 +554,7 @@ Inserts the username from the URI provided to \fIipptool\fR, if any.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007-2011 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

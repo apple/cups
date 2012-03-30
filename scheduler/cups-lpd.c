@@ -237,7 +237,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     list = NULL;
   else
   {
-    for (list = dest + 1; *list && !isspace(*list & 255); list ++);
+    for (list = dest; *list && !isspace(*list & 255); list ++);
 
     while (isspace(*list & 255))
       *list++ = '\0';

@@ -3,7 +3,7 @@
  *
  *   Client routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -17,34 +17,30 @@
  *
  * Contents:
  *
- *   cupsdAcceptClient()     - Accept a new client.
- *   cupsdCloseAllClients()  - Close all remote clients immediately.
- *   cupsdCloseClient()      - Close a remote client.
- *   cupsdFlushHeader()      - Flush the header fields to the client.
- *   cupsdReadClient()       - Read data from a client.
- *   cupsdSendCommand()      - Send output from a command via HTTP.
- *   cupsdSendError()        - Send an error message via HTTP.
- *   cupsdSendHeader()       - Send an HTTP request.
- *   cupsdUpdateCGI()        - Read status messages from CGI scripts and
- *                             programs.
- *   cupsdWriteClient()      - Write data to a client as needed.
- *   check_if_modified()     - Decode an "If-Modified-Since" line.
- *   compare_clients()       - Compare two client connections.
- *   copy_cdsa_certificate() - Copy a SSL/TLS certificate from the System
- *                             keychain.
- *   data_ready()            - Check whether data is available from a client.
- *   encrypt_client()        - Enable encryption for the client...
- *   get_file()              - Get a filename and state info.
- *   install_conf_file()     - Install a configuration file.
- *   is_cgi()                - Is the resource a CGI script/program?
- *   is_path_absolute()      - Is a path absolute and free of relative elements
- *                             (i.e. "..").
- *   make_certificate()      - Make a self-signed SSL/TLS certificate.
- *   pipe_command()          - Pipe the output of a command to the remote
- *                             client.
- *   valid_host()            - Is the Host: field valid?
- *   write_file()            - Send a file via HTTP.
- *   write_pipe()            - Flag that data is available on the CGI pipe.
+ *   cupsdAcceptClient()    - Accept a new client.
+ *   cupsdCloseAllClients() - Close all remote clients immediately.
+ *   cupsdCloseClient()     - Close a remote client.
+ *   cupsdFlushHeader()     - Flush the header fields to the client.
+ *   cupsdReadClient()	    - Read data from a client.
+ *   cupsdSendCommand()     - Send output from a command via HTTP.
+ *   cupsdSendError()	    - Send an error message via HTTP.
+ *   cupsdSendHeader()	    - Send an HTTP request.
+ *   cupsdUpdateCGI()	    - Read status messages from CGI scripts and
+ *			      programs.
+ *   cupsdWriteClient()     - Write data to a client as needed.
+ *   check_if_modified()    - Decode an "If-Modified-Since" line.
+ *   compare_clients()	    - Compare two client connections.
+ *   data_ready()	    - Check whether data is available from a client.
+ *   get_file() 	    - Get a filename and state info.
+ *   install_conf_file()    - Install a configuration file.
+ *   is_cgi()		    - Is the resource a CGI script/program?
+ *   is_path_absolute()     - Is a path absolute and free of relative elements
+ *			      (i.e. "..").
+ *   pipe_command()	    - Pipe the output of a command to the remote
+ *			      client.
+ *   valid_host()	    - Is the Host: field valid?
+ *   write_file()	    - Send a file via HTTP.
+ *   write_pipe()	    - Flag that data is available on the CGI pipe.
  */
 
 /*
@@ -96,22 +92,13 @@ static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 			                void *data);
-#ifdef HAVE_CDSASSL
-static CFArrayRef	copy_cdsa_certificate(cupsd_client_t *con);
-#endif /* HAVE_CDSASSL */
 static int		data_ready(cupsd_client_t *con);
-#ifdef HAVE_SSL
-static int		encrypt_client(cupsd_client_t *con);
-#endif /* HAVE_SSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_conf_file(cupsd_client_t *con);
 static int		is_cgi(cupsd_client_t *con, const char *filename,
 		               struct stat *filestats, mime_type_t *type);
 static int		is_path_absolute(const char *path);
-#ifdef HAVE_SSL
-static int		make_certificate(cupsd_client_t *con);
-#endif /* HAVE_SSL */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
 static int		valid_host(cupsd_client_t *con);
@@ -474,7 +461,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
     con->http.encryption = HTTP_ENCRYPT_ALWAYS;
 
-    if (!encrypt_client(con))
+    if (!cupsdStartTLS(con))
       cupsdCloseClient(con);
   }
   else
@@ -513,12 +500,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 {
   int		partial;		/* Do partial close for SSL? */
 #ifdef HAVE_LIBSSL
-  SSL_CTX	*context;		/* Context for encryption */
-  unsigned long	error;			/* Error code */
 #elif defined(HAVE_GNUTLS)
-  int		error;			/* Error code */
-  gnutls_certificate_server_credentials *credentials;
-					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
 #endif /* HAVE_LIBSSL */
 
@@ -543,60 +525,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
   {
     partial = 1;
 
-#  ifdef HAVE_LIBSSL
-    context = SSL_get_SSL_CTX(con->http.tls);
-
-    switch (SSL_shutdown(con->http.tls))
-    {
-      case 1 :
-          cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "SSL shutdown successful!");
-	  break;
-      case -1 :
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Fatal error during SSL shutdown!");
-      default :
-	  while ((error = ERR_get_error()) != 0)
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "SSL shutdown failed: %s",
-	                    ERR_error_string(error, NULL));
-          break;
-    }
-
-    SSL_CTX_free(context);
-    SSL_free(con->http.tls);
-
-#  elif defined(HAVE_GNUTLS)
-    credentials = (gnutls_certificate_server_credentials *)(con->http.tls_credentials);
-
-    error = gnutls_bye(con->http.tls, GNUTLS_SHUT_WR);
-    switch (error)
-    {
-      case GNUTLS_E_SUCCESS:
-	cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "SSL shutdown successful!");
-	break;
-      default:
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "SSL shutdown failed: %s", gnutls_strerror(error));
-	break;
-    }
-
-    gnutls_deinit(con->http.tls);
-    gnutls_certificate_free_credentials(*credentials);
-    free(credentials);
-
-#  elif defined(HAVE_CDSASSL)
-    while (SSLClose(con->http.tls) == errSSLWouldBlock)
-      usleep(1000);
-
-    SSLDisposeContext(con->http.tls);
-
-    if (con->http.tls_credentials)
-      CFRelease(con->http.tls_credentials);
-
-#  endif /* HAVE_LIBSSL */
-
-    con->http.tls = NULL;
+    cupsdEndTLS(con);
   }
 #endif /* HAVE_SSL */
 
@@ -791,7 +720,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
                       "[Client %d] Saw first byte %02X, auto-negotiating "
 		      "SSL/TLS session.", con->http.fd, buf[0] & 255);
 
-      if (!encrypt_client(con))
+      if (!cupsdStartTLS(con))
         cupsdCloseClient(con);
 
       return;
@@ -1205,7 +1134,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
-        if (!encrypt_client(con))
+        if (!cupsdStartTLS(con))
         {
 	  cupsdCloseClient(con);
 	  return;
@@ -1279,7 +1208,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
-        if (!encrypt_client(con))
+        if (!cupsdStartTLS(con))
         {
 	  cupsdCloseClient(con);
 	  return;
@@ -3146,274 +3075,6 @@ compare_clients(cupsd_client_t *a,	/* I - First client */
 }
 
 
-#ifdef HAVE_CDSASSL
-/*
- * 'copy_cdsa_certificate()' - Copy a SSL/TLS certificate from the System
- *                             keychain.
- */
-
-static CFArrayRef				/* O - Array of certificates */
-copy_cdsa_certificate(
-    cupsd_client_t *con)			/* I - Client connection */
-{
-  OSStatus		err;		/* Error info */
-  SecKeychainRef	keychain = NULL;/* Keychain reference */
-  SecIdentitySearchRef	search = NULL;	/* Search reference */
-  SecIdentityRef	identity = NULL;/* Identity */
-  CFArrayRef		certificates = NULL;
-					/* Certificate array */
-#  if HAVE_SECPOLICYCREATESSL
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  CFStringRef		servername = NULL;
-					/* Server name */
-  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
-  char			localname[1024];/* Local hostname */
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  SecPolicySearchRef	policy_search = NULL;
-					/* Policy search ref */
-  CSSM_DATA		options;	/* Policy options */
-  CSSM_APPLE_TP_SSL_OPTIONS
-			ssl_options;	/* SSL Option for hostname */
-  char			localname[1024];/* Local hostname */
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "copy_cdsa_certificate: Looking for certs for \"%s\"...",
-		  con->servername);
-
-  if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\" - %s (%d)",
-	            ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  if HAVE_SECPOLICYCREATESSL
-  servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
-					 kCFStringEncodingUTF8);
-
-  policy = SecPolicyCreateSSL(1, servername);
-
-  if (servername)
-    CFRelease(servername);
-
-  if (!policy)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-    goto cleanup;
-  }
-
-  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					  &kCFTypeDictionaryKeyCallBacks,
-					  &kCFTypeDictionaryValueCallBacks)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create query dictionary");
-    goto cleanup;
-  }
-
-  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
-  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
-  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
-  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
-
-  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
-		    localname);
-
-    servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
-					   kCFStringEncodingUTF8);
-
-    CFRelease(policy);
-
-    policy = SecPolicyCreateSSL(1, servername);
-
-    if (servername)
-      CFRelease(servername);
-
-    if (!policy)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-      goto cleanup;
-    }
-
-    CFDictionarySetValue(query, kSecMatchPolicy, policy);
-
-    err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-  }
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
- /*
-  * Use a policy to search for valid certificates whose common name matches the
-  * servername...
-  */
-
-  if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL,
-			    NULL, &policy_search))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
-    goto cleanup;
-  }
-
-  if (SecPolicySearchCopyNext(policy_search, &policy))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot find a policy to use for searching");
-    goto cleanup;
-  }
-
-  memset(&ssl_options, 0, sizeof(ssl_options));
-  ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
-  ssl_options.ServerName = con->servername;
-  ssl_options.ServerNameLen = strlen(con->servername);
-
-  options.Data = (uint8 *)&ssl_options;
-  options.Length = sizeof(ssl_options);
-
-  if (SecPolicySetValue(policy, &options))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot set policy value to use for searching");
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot create identity search reference: %s (%d)",
-		    cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-  err = SecIdentitySearchCopyNext(search, &identity);
-
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    ssl_options.ServerName    = localname;
-    ssl_options.ServerNameLen = strlen(localname);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
-		    localname);
-
-    if (SecPolicySetValue(policy, &options))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot set policy value to use for searching");
-      goto cleanup;
-    }
-
-    CFRelease(search);
-    search = NULL;
-    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot create identity search reference: %s (%d)",
-		      cssmErrorString(err), (int)err);
-      goto cleanup;
-    }
-
-    err = SecIdentitySearchCopyNext(search, &identity);
-
-  }
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  else
- /*
-  * Assume there is exactly one SecIdentity in the keychain...
-  */
-
-  if ((err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot create identity search reference (%d)", (int)err);
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCopyNext(search, &identity)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "SecIdentity CFTypeID failure!");
-    goto cleanup;
-  }
-
-  if ((certificates = CFArrayCreate(NULL, (const void **)&identity,
-				  1, &kCFTypeArrayCallBacks)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
-    goto cleanup;
-  }
-
-  cleanup :
-
-  if (keychain)
-    CFRelease(keychain);
-  if (search)
-    CFRelease(search);
-  if (identity)
-    CFRelease(identity);
-
-#  if HAVE_SECPOLICYCREATESSL
-  if (policy)
-    CFRelease(policy);
-  if (query)
-    CFRelease(query);
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  if (policy)
-    CFRelease(policy);
-  if (policy_search)
-    CFRelease(policy_search);
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
-  return (certificates);
-}
-#endif /* HAVE_CDSASSL */
-
-
 /*
  * 'data_ready()' - Check whether data is available from a client.
  */
@@ -3443,245 +3104,6 @@ data_ready(cupsd_client_t *con)		/* I - Client */
 
   return (0);
 }
-
-
-#ifdef HAVE_SSL
-/*
- * 'encrypt_client()' - Enable encryption for the client...
- */
-
-static int				/* O - 1 on success, 0 on error */
-encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
-{
-#  ifdef HAVE_LIBSSL
-  SSL_CTX	*context;		/* Context for encryption */
-  BIO		*bio;			/* BIO data */
-  unsigned long	error;			/* Error code */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
-                  con->http.fd);
-
- /*
-  * Verify that we have a certificate...
-  */
-
-  if (access(ServerKey, 0) || access(ServerCertificate, 0))
-  {
-   /*
-    * Nope, make a self-signed certificate...
-    */
-
-    if (!make_certificate(con))
-      return (0);
-  }
-
- /*
-  * Create the SSL context and accept the connection...
-  */
-
-  context = SSL_CTX_new(SSLv23_server_method());
-
-  SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
-  if (SSLOptions & CUPSD_SSL_NOEMPTY)
-    SSL_CTX_set_options(context, SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS);
-  SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
-  SSL_CTX_use_certificate_chain_file(context, ServerCertificate);
-
-  bio = BIO_new(_httpBIOMethods());
-  BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));
-
-  con->http.tls = SSL_new(context);
-  SSL_set_bio(con->http.tls, bio, bio);
-
-  if (SSL_accept(con->http.tls) != 1)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to encrypt connection from %s.",
-                    con->http.hostname);
-
-    while ((error = ERR_get_error()) != 0)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", ERR_error_string(error, NULL));
-
-    SSL_CTX_free(context);
-    SSL_free(con->http.tls);
-    con->http.tls = NULL;
-    return (0);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  return (1);
-
-#  elif defined(HAVE_GNUTLS)
-  int		status;			/* Error code */
-  gnutls_certificate_server_credentials *credentials;
-					/* TLS credentials */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
-                  con->http.fd);
-
- /*
-  * Verify that we have a certificate...
-  */
-
-  if (access(ServerKey, 0) || access(ServerCertificate, 0))
-  {
-   /*
-    * Nope, make a self-signed certificate...
-    */
-
-    if (!make_certificate(con))
-      return (0);
-  }
-
- /*
-  * Create the SSL object and perform the SSL handshake...
-  */
-
-  credentials = (gnutls_certificate_server_credentials *)
-                    malloc(sizeof(gnutls_certificate_server_credentials));
-  if (credentials == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s",
-                    con->http.hostname, strerror(errno));
-
-    return (0);
-  }
-
-  gnutls_certificate_allocate_credentials(credentials);
-  gnutls_certificate_set_x509_key_file(*credentials, ServerCertificate,
-				       ServerKey, GNUTLS_X509_FMT_PEM);
-
-  gnutls_init(&con->http.tls, GNUTLS_SERVER);
-  gnutls_set_default_priority(con->http.tls);
-
-  gnutls_credentials_set(con->http.tls, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(con->http.tls, (gnutls_transport_ptr)HTTP(con));
-  gnutls_transport_set_pull_function(con->http.tls, _httpReadGNUTLS);
-  gnutls_transport_set_push_function(con->http.tls, _httpWriteGNUTLS);
-
-  while ((status = gnutls_handshake(con->http.tls)) != GNUTLS_E_SUCCESS)
-  {
-    if (gnutls_error_is_fatal(status))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to encrypt connection from %s - %s",
-                      con->http.hostname, gnutls_strerror(status));
-
-      gnutls_deinit(con->http.tls);
-      gnutls_certificate_free_credentials(*credentials);
-      con->http.tls = NULL;
-      free(credentials);
-      return (0);
-    }
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  con->http.tls_credentials = credentials;
-  return (1);
-
-#  elif defined(HAVE_CDSASSL)
-  OSStatus	error = 0;		/* Error code */
-  CFArrayRef	peerCerts;		/* Peer certificates */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
-                  con->http.fd);
-
-  con->http.tls_credentials = copy_cdsa_certificate(con);
-
-  if (!con->http.tls_credentials)
-  {
-   /*
-    * No keychain (yet), make a self-signed certificate...
-    */
-
-    if (make_certificate(con))
-      con->http.tls_credentials = copy_cdsa_certificate(con);
-  }
-
-  if (!con->http.tls_credentials)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-        	    "Could not find signing key in keychain \"%s\"",
-		    ServerCertificate);
-    error = errSSLBadCert; /* errSSLBadConfiguration is a better choice, but not available on 10.2.x */
-  }
-
-  if (!error)
-    error = SSLNewContext(true, &con->http.tls);
-
-  if (!error)
-    error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
-
-  if (!error)
-    error = SSLSetConnection(con->http.tls, HTTP(con));
-
-  if (!error)
-    error = SSLSetAllowsExpiredCerts(con->http.tls, true);
-
-  if (!error)
-    error = SSLSetAllowsAnyRoot(con->http.tls, true);
-
-  if (!error)
-    error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
-
-  if (!error)
-  {
-   /*
-    * Perform SSL/TLS handshake
-    */
-
-    while ((error = SSLHandshake(con->http.tls)) == errSSLWouldBlock)
-      usleep(1000);
-  }
-
-  if (error)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s (%d)",
-                    con->http.hostname, cssmErrorString(error), (int)error);
-
-    con->http.error  = error;
-    con->http.status = HTTP_ERROR;
-
-    if (con->http.tls)
-    {
-      SSLDisposeContext(con->http.tls);
-      con->http.tls = NULL;
-    }
-
-    if (con->http.tls_credentials)
-    {
-      CFRelease(con->http.tls_credentials);
-      con->http.tls_credentials = NULL;
-    }
-
-    return (0);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  if (!SSLCopyPeerCertificates(con->http.tls, &peerCerts) && peerCerts)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
-		    (int)CFArrayGetCount(peerCerts));
-    CFRelease(peerCerts);
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
-
-  return (1);
-
-#  endif /* HAVE_LIBSSL */
-}
-#endif /* HAVE_SSL */
 
 
 /*
@@ -4158,461 +3580,6 @@ is_path_absolute(const char *path)	/* I - Input path */
 
   return (1);
 }
-
-
-#ifdef HAVE_SSL
-/*
- * 'make_certificate()' - Make a self-signed SSL/TLS certificate.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-make_certificate(cupsd_client_t *con)	/* I - Client connection */
-{
-#if defined(HAVE_LIBSSL) && defined(HAVE_WAITPID)
-  int		pid,			/* Process ID of command */
-		status;			/* Status of command */
-  char		command[1024],		/* Command */
-		*argv[12],		/* Command-line arguments */
-		*envp[MAX_ENV + 1],	/* Environment variables */
-		infofile[1024],		/* Type-in information for cert */
-		seedfile[1024];		/* Random number seed file */
-  int		envc,			/* Number of environment variables */
-		bytes;			/* Bytes written */
-  cups_file_t	*fp;			/* Seed/info file */
-  int		infofd;			/* Info file descriptor */
-
-
- /*
-  * Run the "openssl" command to seed the random number generator and
-  * generate a self-signed certificate that is good for 10 years:
-  *
-  *     openssl rand -rand seedfile 1
-  *
-  *     openssl req -new -x509 -keyout ServerKey \
-  *             -out ServerCertificate -days 3650 -nodes
-  *
-  * The seeding step is crucial in ensuring that the openssl command
-  * does not block on systems without sufficient entropy...
-  */
-
-  if (!cupsFileFind("openssl", getenv("PATH"), 1, command, sizeof(command)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "No SSL certificate and openssl command not found!");
-    return (0);
-  }
-
-  if (access("/dev/urandom", 0))
-  {
-   /*
-    * If the system doesn't provide /dev/urandom, then any random source
-    * will probably be blocking-style, so generate some random data to
-    * use as a seed for the certificate.  Note that we have already
-    * seeded the random number generator in cupsdInitCerts()...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Seeding the random number generator...");
-
-   /*
-    * Write the seed file...
-    */
-
-    if ((fp = cupsTempFile2(seedfile, sizeof(seedfile))) == NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create seed file %s - %s",
-                      seedfile, strerror(errno));
-      return (0);
-    }
-
-    for (bytes = 0; bytes < 262144; bytes ++)
-      cupsFilePutChar(fp, random());
-
-    cupsFileClose(fp);
-
-   /*
-    * Run the openssl command to seed its random number generator...
-    */
-
-    argv[0] = "openssl";
-    argv[1] = "rand";
-    argv[2] = "-rand";
-    argv[3] = seedfile;
-    argv[4] = "1";
-    argv[5] = NULL;
-
-    envc = cupsdLoadEnv(envp, MAX_ENV);
-    envp[envc] = NULL;
-
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
-                           NULL, &pid))
-    {
-      unlink(seedfile);
-      return (0);
-    }
-
-    while (waitpid(pid, &status, 0) < 0)
-      if (errno != EINTR)
-      {
-	status = 1;
-	break;
-      }
-
-    cupsdFinishProcess(pid, command, sizeof(command), NULL);
-
-   /*
-    * Remove the seed file, as it is no longer needed...
-    */
-
-    unlink(seedfile);
-
-    if (status)
-    {
-      if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-                	"Unable to seed random number generator - "
-			"the openssl command stopped with status %d!",
-	        	WEXITSTATUS(status));
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-                	"Unable to seed random number generator - "
-			"the openssl command crashed on signal %d!",
-	        	WTERMSIG(status));
-
-      return (0);
-    }
-  }
-
- /*
-  * Create a file with the certificate information fields...
-  *
-  * Note: This assumes that the default questions are asked by the openssl
-  * command...
-  */
-
-  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create certificate information file %s - %s",
-                    infofile, strerror(errno));
-    return (0);
-  }
-
-  cupsFilePrintf(fp, ".\n.\n.\n%s\n.\n%s\n%s\n",
-                 ServerName, ServerName, ServerAdmin);
-  cupsFileClose(fp);
-
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Generating SSL server key and certificate...");
-
-  argv[0]  = "openssl";
-  argv[1]  = "req";
-  argv[2]  = "-new";
-  argv[3]  = "-x509";
-  argv[4]  = "-keyout";
-  argv[5]  = ServerKey;
-  argv[6]  = "-out";
-  argv[7]  = ServerCertificate;
-  argv[8]  = "-days";
-  argv[9]  = "3650";
-  argv[10] = "-nodes";
-  argv[11] = NULL;
-
-  cupsdLoadEnv(envp, MAX_ENV);
-
-  infofd = open(infofile, O_RDONLY);
-
-  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         NULL, &pid))
-  {
-    close(infofd);
-    unlink(infofile);
-    return (0);
-  }
-
-  close(infofd);
-  unlink(infofile);
-
-  while (waitpid(pid, &status, 0) < 0)
-    if (errno != EINTR)
-    {
-      status = 1;
-      break;
-    }
-
-  cupsdFinishProcess(pid, command, sizeof(command), NULL);
-
-  if (status)
-  {
-    if (WIFEXITED(status))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the openssl command stopped with status %d!",
-	              WEXITSTATUS(status));
-    else
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the openssl command crashed on signal %d!",
-	              WTERMSIG(status));
-  }
-  else
-  {
-    cupsdLogMessage(CUPSD_LOG_INFO, "Created SSL server key file \"%s\"...",
-		    ServerKey);
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created SSL server certificate file \"%s\"...",
-		    ServerCertificate);
-  }
-
-  return (!status);
-
-#elif defined(HAVE_GNUTLS)
-  gnutls_x509_crt	crt;		/* Self-signed certificate */
-  gnutls_x509_privkey	key;		/* Encryption key */
-  cups_lang_t		*language;	/* Default language info */
-  cups_file_t		*fp;		/* Key/cert file */
-  unsigned char		buffer[8192];	/* Buffer for x509 data */
-  size_t		bytes;		/* Number of bytes of data */
-  unsigned char		serial[4];	/* Serial number buffer */
-  time_t		curtime;	/* Current time */
-  int			result;		/* Result of GNU TLS calls */
-
-
- /*
-  * Create the encryption key...
-  */
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "Generating SSL server key...");
-
-  gnutls_x509_privkey_init(&key);
-  gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 2048, 0);
-
- /*
-  * Save it...
-  */
-
-  bytes = sizeof(buffer);
-
-  if ((result = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM,
-                                           buffer, &bytes)) < 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to export SSL server key - %s",
-                    gnutls_strerror(result));
-    gnutls_x509_privkey_deinit(key);
-    return (0);
-  }
-  else if ((fp = cupsFileOpen(ServerKey, "w")) != NULL)
-  {
-    cupsFileWrite(fp, (char *)buffer, bytes);
-    cupsFileClose(fp);
-
-    cupsdLogMessage(CUPSD_LOG_INFO, "Created SSL server key file \"%s\"...",
-		    ServerKey);
-  }
-  else
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create SSL server key file \"%s\" - %s",
-		    ServerKey, strerror(errno));
-    gnutls_x509_privkey_deinit(key);
-    return (0);
-  }
-
- /*
-  * Create the self-signed certificate...
-  */
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "Generating self-signed SSL certificate...");
-
-  language  = cupsLangDefault();
-  curtime   = time(NULL);
-  serial[0] = curtime >> 24;
-  serial[1] = curtime >> 16;
-  serial[2] = curtime >> 8;
-  serial[3] = curtime;
-
-  gnutls_x509_crt_init(&crt);
-  if (strlen(language->language) == 5)
-    gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COUNTRY_NAME, 0,
-                                  language->language + 3, 2);
-  else
-    gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COUNTRY_NAME, 0,
-                                  "US", 2);
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_COMMON_NAME, 0,
-                                ServerName, strlen(ServerName));
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
-                                ServerName, strlen(ServerName));
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-                                0, "Unknown", 7);
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
-                                "Unknown", 7);
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_X520_LOCALITY_NAME, 0,
-                                "Unknown", 7);
-  gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_PKCS9_EMAIL, 0,
-                                ServerAdmin, strlen(ServerAdmin));
-  gnutls_x509_crt_set_key(crt, key);
-  gnutls_x509_crt_set_serial(crt, serial, sizeof(serial));
-  gnutls_x509_crt_set_activation_time(crt, curtime);
-  gnutls_x509_crt_set_expiration_time(crt, curtime + 10 * 365 * 86400);
-  gnutls_x509_crt_set_ca_status(crt, 0);
-  gnutls_x509_crt_set_subject_alternative_name(crt, GNUTLS_SAN_DNSNAME,
-                                               ServerName);
-  gnutls_x509_crt_set_key_purpose_oid(crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
-  gnutls_x509_crt_set_key_usage(crt, GNUTLS_KEY_KEY_ENCIPHERMENT);
-  gnutls_x509_crt_set_version(crt, 3);
-
-  bytes = sizeof(buffer);
-  if (gnutls_x509_crt_get_key_id(crt, 0, buffer, &bytes) >= 0)
-    gnutls_x509_crt_set_subject_key_id(crt, buffer, bytes);
-
-  gnutls_x509_crt_sign(crt, crt, key);
-
- /*
-  * Save it...
-  */
-
-  bytes = sizeof(buffer);
-  if ((result = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM,
-                                       buffer, &bytes)) < 0)
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to export SSL server certificate - %s",
-		    gnutls_strerror(result));
-  else if ((fp = cupsFileOpen(ServerCertificate, "w")) != NULL)
-  {
-    cupsFileWrite(fp, (char *)buffer, bytes);
-    cupsFileClose(fp);
-
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created SSL server certificate file \"%s\"...",
-		    ServerCertificate);
-  }
-  else
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create SSL server certificate file \"%s\" - %s",
-		    ServerCertificate, strerror(errno));
-
- /*
-  * Cleanup...
-  */
-
-  gnutls_x509_crt_deinit(crt);
-  gnutls_x509_privkey_deinit(key);
-
-  return (1);
-
-#elif defined(HAVE_CDSASSL) && defined(HAVE_WAITPID)
-  int		pid,			/* Process ID of command */
-		status;			/* Status of command */
-  char		command[1024],		/* Command */
-		*argv[4],		/* Command-line arguments */
-		*envp[MAX_ENV + 1],	/* Environment variables */
-		keychain[1024],		/* Keychain argument */
-		infofile[1024],		/* Type-in information for cert */
-		localname[1024],	/* Local hostname */
-		*servername;		/* Name of server in cert */
-  cups_file_t	*fp;			/* Seed/info file */
-  int		infofd;			/* Info file descriptor */
-
-
-  if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
-  {
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-    servername = localname;
-  }
-  else
-    servername = con->servername;
-
- /*
-  * Run the "certtool" command to generate a self-signed certificate...
-  */
-
-  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "No SSL certificate and certtool command not found!");
-    return (0);
-  }
-
- /*
-  * Create a file with the certificate information fields...
-  *
-  * Note: This assumes that the default questions are asked by the certtool
-  * command...
-  */
-
-  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create certificate information file %s - %s",
-                    infofile, strerror(errno));
-    return (0);
-  }
-
-  cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n",
-        	 servername, servername, ServerAdmin);
-  cupsFileClose(fp);
-
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Generating SSL server key and certificate...");
-
-  snprintf(keychain, sizeof(keychain), "k=%s", ServerCertificate);
-
-  argv[0] = "certtool";
-  argv[1] = "c";
-  argv[2] = keychain;
-  argv[3] = NULL;
-
-  cupsdLoadEnv(envp, MAX_ENV);
-
-  infofd = open(infofile, O_RDONLY);
-
-  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         NULL, &pid))
-  {
-    close(infofd);
-    unlink(infofile);
-    return (0);
-  }
-
-  close(infofd);
-  unlink(infofile);
-
-  while (waitpid(pid, &status, 0) < 0)
-    if (errno != EINTR)
-    {
-      status = 1;
-      break;
-    }
-
-  cupsdFinishProcess(pid, command, sizeof(command), NULL);
-
-  if (status)
-  {
-    if (WIFEXITED(status))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the certtool command stopped with status %d!",
-	              WEXITSTATUS(status));
-    else
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the certtool command crashed on signal %d!",
-	              WTERMSIG(status));
-  }
-  else
-  {
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created SSL server certificate file \"%s\"...",
-		    ServerCertificate);
-  }
-
-  return (!status);
-
-#else
-  return (0);
-#endif /* HAVE_LIBSSL && HAVE_WAITPID */
-}
-#endif /* HAVE_SSL */
 
 
 /*

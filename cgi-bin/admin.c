@@ -1557,6 +1557,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     int			advanced,	/* Advanced settings shown? */
 			changed;	/* Have settings changed? */
     const char		*debug_logging,	/* DEBUG_LOGGING value */
+			*preserve_jobs = NULL,
+					/* PRESERVE_JOBS value */
 			*remote_admin,	/* REMOTE_ADMIN value */
 			*remote_any,	/* REMOTE_ANY value */
 			*share_printers,/* SHARE_PRINTERS value */
@@ -1611,19 +1613,36 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       */
 
       browse_web_if        = cgiGetVariable("BROWSE_WEB_IF") ? "Yes" : "No";
-      preserve_job_history = cgiGetVariable("PRESERVE_JOB_HISTORY") ? "Yes" : "No";
-      preserve_job_files   = cgiGetVariable("PRESERVE_JOB_FILES") ? "Yes" : "No";
       max_clients          = cgiGetVariable("MAX_CLIENTS");
-      max_jobs             = cgiGetVariable("MAX_JOBS");
       max_log_size         = cgiGetVariable("MAX_LOG_SIZE");
+      preserve_jobs        = cgiGetVariable("PRESERVE_JOBS");
+
+      if (preserve_jobs)
+      {
+        max_jobs             = cgiGetVariable("MAX_JOBS");
+	preserve_job_history = cgiGetVariable("PRESERVE_JOB_HISTORY");
+	preserve_job_files   = cgiGetVariable("PRESERVE_JOB_FILES");
+
+	if (!max_jobs || atoi(max_jobs) < 0)
+	  max_jobs = "500";
+
+	if (!preserve_job_history)
+	  preserve_job_history = "On";
+
+	if (!preserve_job_files)
+	  preserve_job_files = "1d";
+      }
+      else
+      {
+        max_jobs             = "0";
+        preserve_job_history = "No";
+        preserve_job_files   = "No";
+      }
 
       if (!max_clients || atoi(max_clients) <= 0)
 	max_clients = "100";
 
-      if (!max_jobs || atoi(max_jobs) <= 0)
-	max_jobs = "500";
-
-      if (!max_log_size || atof(max_log_size) <= 0.0)
+      if (!max_log_size || atoi(max_log_size) <= 0.0)
 	max_log_size = "1m";
     }
 
@@ -1674,7 +1693,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if ((current_preserve_job_files = cupsGetOption("PreserveJobFiles",
                                                     num_settings,
 						    settings)) == NULL)
-      current_preserve_job_files = "No";
+      current_preserve_job_files = "1d";
 
     if ((current_max_clients = cupsGetOption("MaxClients", num_settings,
                                              settings)) == NULL)
@@ -2636,18 +2655,25 @@ do_menu(http_t *http)			/* I - HTTP connection */
                            settings)) == NULL)
     val = "Yes";
 
-  if (!_cups_strcasecmp(val, "yes") || !_cups_strcasecmp(val, "on") ||
-      !_cups_strcasecmp(val, "true"))
+  if (val &&
+      (!_cups_strcasecmp(val, "0") || !_cups_strcasecmp(val, "no") ||
+       !_cups_strcasecmp(val, "off") || !_cups_strcasecmp(val, "false") ||
+       !_cups_strcasecmp(val, "disabled")))
   {
-    cgiSetVariable("PRESERVE_JOB_HISTORY", "CHECKED");
+    cgiSetVariable("PRESERVE_JOB_HISTORY", "0");
+    cgiSetVariable("PRESERVE_JOB_FILES", "0");
+  }
+  else
+  {
+    cgiSetVariable("PRESERVE_JOBS", "CHECKED");
+    cgiSetVariable("PRESERVE_JOB_HISTORY", val);
 
     if ((val = cupsGetOption("PreserveJobFiles", num_settings,
 			     settings)) == NULL)
-      val = "No";
+      val = "1d";
 
-    if (!_cups_strcasecmp(val, "yes") || !_cups_strcasecmp(val, "on") ||
-	!_cups_strcasecmp(val, "true"))
-      cgiSetVariable("PRESERVE_JOB_FILES", "CHECKED");
+    cgiSetVariable("PRESERVE_JOB_FILES", val);
+
   }
 
   if ((val = cupsGetOption("MaxClients", num_settings, settings)) == NULL)

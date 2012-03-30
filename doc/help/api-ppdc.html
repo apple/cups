@@ -1016,12 +1016,15 @@ void ~ppdcDriver (void);</p>
 <p class="description">// File</p>
 <p class="code">class ppdcFile {<br>
 &nbsp;&nbsp;public:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;bool close_on_delete;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *filename;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int line;<br>
 };</p>
 <h4 class="members">Members</h4>
 <dl>
+<dt>close_on_delete </dt>
+<dd class="description">Close file on delete?</dd>
 <dt>filename </dt>
 <dd class="description">Filename</dd>
 <dt>fp </dt>

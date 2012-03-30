@@ -4163,7 +4163,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    break;
 
 	case errSSLWouldBlock :
-	    usleep(1000);
+	    error = noErr;		/* Force a retry */
+	    usleep(1000);		/* in 1 millisecond */
 	    break;
 
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
@@ -4199,7 +4200,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		  {
 		    data = (CFDataRef)CFArrayGetValueAtIndex(dn_array, i);
 
-		    if ((credential = malloc(sizeof(*credential))))
+		    if ((credential = malloc(sizeof(*credential))) != NULL)
 		    {
 		      credential->datalen = CFDataGetLength(data);
 		      if ((credential->data = malloc(credential->datalen)))
@@ -4520,7 +4521,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 	pfd.events = POLLOUT;
 
 	while ((nfds = poll(&pfd, 1, http->wait_value)) < 0 &&
-	       (errno == EINTR || errno == EAGAIN));
+	       (errno == EINTR || errno == EAGAIN))
+	  /* do nothing */;
 
 #else
 	do

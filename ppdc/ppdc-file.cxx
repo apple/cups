@@ -42,8 +42,9 @@ ppdcFile::ppdcFile(const char  *f,		// I - File to open
   else
     fp = cupsFileOpen(f, "r");
 
-  filename = f;
-  line     = 1;
+  close_on_delete = !ffp;
+  filename        = f;
+  line            = 1;
 
   if (!fp)
     _cupsLangPrintf(stderr, _("ppdc: Unable to open %s: %s"), f,
@@ -57,7 +58,7 @@ ppdcFile::ppdcFile(const char  *f,		// I - File to open
 
 ppdcFile::~ppdcFile()
 {
-  if (fp)
+  if (close_on_delete && fp)
     cupsFileClose(fp);
 }
 

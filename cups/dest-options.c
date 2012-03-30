@@ -15,7 +15,7 @@
  *
  * Contents:
  *
-﻿ *   cupsCheckDestSupported() - Check that the option and value are supported
+﻿*   cupsCheckDestSupported() - Check that the option and value are supported
  *				by the destination.
  *   cupsCopyDestConflicts()  - Get conflicts and resolutions for a new
  *				option/value pair.
@@ -292,7 +292,7 @@ cupsCopyDestConflicts(
     return (0);
 
  /*
-  * Check for an resolve any conflicts...
+  * Check for and resolve any conflicts...
   */
 
   /* TODO: implement me! */
@@ -821,7 +821,7 @@ cups_create_media_db(
     mdb.top    =
     mdb.bottom = 1270; /* Default 1/2" top/bottom margins */
 
-    for (i = media_col_db->num_values, val = media_col_db->values;
+    for (i = media_attr->num_values, val = media_attr->values;
          i > 0;
          i --, val ++)
     {

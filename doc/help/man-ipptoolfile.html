@@ -336,16 +336,61 @@ matches or does not match.
 <dd>Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
 </dd>
+<dt>WITH-ALL-VALUES "literal string"
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
+</dd>
+<dt>WITH-ALL-VALUES &lt;number
+</dt>
+<dd></dd>
+<dt>WITH-ALL-VALUES =number
+</dt>
+<dd></dd>
+<dt>WITH-ALL-VALUES >number
+</dt>
+<dd></dd>
+<dt>WITH-ALL-VALUES number[,number,...]
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+</dd>
+<dt>WITH-ALL-VALUES "false"
+</dt>
+<dd></dd>
+<dt>WITH-ALL-VALUES "true"
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the boolean value given.
+</dd>
+<dt>WITH-ALL-VALUES "/regular expression/"
+</dt>
+<dd>Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+</dd>
 <dt>WITH-VALUE "literal string"
 </dt>
-<dd>Requires at least one value of the EXPECT attribute to match the literal string.
-Comparisons are case-sensitive.
+<dd>Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
+</dd>
+<dt>WITH-VALUE &lt;number
+</dt>
+<dd></dd>
+<dt>WITH-VALUE =number
+</dt>
+<dd></dd>
+<dt>WITH-VALUE >number
+</dt>
+<dd></dd>
+<dt>WITH-VALUE number[,number,...]
+</dt>
+<dd>Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+</dd>
+<dt>WITH-VALUE "false"
+</dt>
+<dd></dd>
+<dt>WITH-VALUE "true"
+</dt>
+<dd>Requires that at least one value of the EXPECT attribute matches the boolean value given.
 </dd>
 <dt>WITH-VALUE "/regular expression/"
 </dt>
-<dd>Requires that all values of the EXPECT attribute match the regular expression,
-which must conform to the POSIX regular expression syntax.
-Comparisons are case-sensitive.
+<dd>Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
 
 </dd>
 </dl>
@@ -413,6 +458,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Get-Subscriptions
     Hold-Job
     Hold-New-Jobs
+    Identify-Printer
     Pause-Printer
     Pause-Printer-After-Current-Job
     Print-Job
@@ -437,6 +483,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Shutdown-Printer
     Startup-Printer
     Suspend-Current-Job
+    Validate-Document
     Validate-Job
 </pre>
 
@@ -454,6 +501,10 @@ Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
     client-error-document-access-error
     client-error-document-format-error
     client-error-document-format-not-supported
+    client-error-document-password-error
+    client-error-document-permission-error
+    client-error-document-security-error
+    client-error-document-unprintable-error
     client-error-forbidden
     client-error-gone
     client-error-ignored-all-notifications
@@ -601,7 +652,7 @@ no notify-subscription-id has been seen.
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
 
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2011 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 
 </body>
 </html>

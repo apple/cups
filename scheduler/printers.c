@@ -640,8 +640,7 @@ cupsdCreateCommonData(void)
 
   /* operations-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                 "operations-supported",
-                 sizeof(ops) / sizeof(ops[0]) + JobFiles - 1, ops);
+                 "operations-supported", sizeof(ops) / sizeof(ops[0]), ops);
 
   /* orientation-requested-supported */
   ippAddIntegers(CommonData, IPP_TAG_PRINTER, IPP_TAG_ENUM,

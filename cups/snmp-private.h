@@ -31,9 +31,10 @@
  */
 
 #define CUPS_SNMP_PORT		161	/* SNMP well-known port */
+#define CUPS_SNMP_MAX_COMMUNITY	512	/* Maximum size of community name */
 #define CUPS_SNMP_MAX_OID	128	/* Maximum number of OID numbers */
 #define CUPS_SNMP_MAX_PACKET	1472	/* Maximum size of SNMP packet */
-#define CUPS_SNMP_MAX_STRING	512	/* Maximum size of string */
+#define CUPS_SNMP_MAX_STRING	65536	/* Maximum size of string */
 #define CUPS_SNMP_VERSION_1	0	/* SNMPv1 */
 
 
@@ -84,7 +85,7 @@ typedef struct cups_snmp_s		/**** SNMP data packet ****/
   const char	*error;			/* Encode/decode error */
   http_addr_t	address;		/* Source address */
   int		version;		/* Version number */
-  char		community[CUPS_SNMP_MAX_STRING];
+  char		community[CUPS_SNMP_MAX_COMMUNITY];
 					/* Community name */
   cups_asn1_t	request_type;		/* Request type */
   int		request_id;		/* request-id value */

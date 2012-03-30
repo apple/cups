@@ -36,14 +36,18 @@
 #define CUPS_MAX_SUPPLIES	32	/* Maximum number of supplies for a printer */
 #define CUPS_SUPPLY_TIMEOUT	2.0	/* Timeout for SNMP lookups */
 
-#define CUPS_DEVELOPER_LOW		1
-#define CUPS_DEVELOPER_EMPTY		2
-#define CUPS_MARKER_SUPPLY_LOW		4
-#define CUPS_MARKER_SUPPLY_EMPTY	8
-#define CUPS_OPC_NEAR_EOL		16
-#define CUPS_OPC_LIFE_OVER		32
-#define CUPS_TONER_LOW			64
-#define CUPS_TONER_EMPTY		128
+#define CUPS_DEVELOPER_LOW	0x0001
+#define CUPS_DEVELOPER_EMPTY	0x0002
+#define CUPS_MARKER_SUPPLY_LOW	0x0004
+#define CUPS_MARKER_SUPPLY_EMPTY 0x0008
+#define CUPS_OPC_NEAR_EOL	0x0010
+#define CUPS_OPC_LIFE_OVER	0x0020
+#define CUPS_TONER_LOW		0x0040
+#define CUPS_TONER_EMPTY	0x0080
+#define CUPS_WASTE_ALMOST_FULL	0x0100
+#define CUPS_WASTE_FULL		0x0200
+#define CUPS_CLEANER_NEAR_EOL	0x0400	/* Proposed JPS3 */
+#define CUPS_CLEANER_LIFE_OVER	0x0800	/* Proposed JPS3 */
 
 
 /*
@@ -146,6 +150,13 @@ static const int	prtMarkerSuppliesType[] =
 			(sizeof(prtMarkerSuppliesType) /
 			 sizeof(prtMarkerSuppliesType[0]));
 			 		/* Offset to supply index */
+static const int	prtMarkerSuppliesSupplyUnit[] =
+			{ CUPS_OID_prtMarkerSuppliesSupplyUnit, -1 },
+					/* Units OID */
+			prtMarkerSuppliesSupplyUnitOffset =
+			(sizeof(prtMarkerSuppliesSupplyUnit) /
+			 sizeof(prtMarkerSuppliesSupplyUnit[0]));
+					/* Offset to supply index */
 
 static const backend_state_t const printer_states[] =
 			{
@@ -173,7 +184,11 @@ static const backend_state_t const supply_states[] =
 			  { CUPS_OPC_NEAR_EOL, "opc-near-eol-report" },
 			  { CUPS_OPC_LIFE_OVER, "opc-life-over-warning" },
 			  { CUPS_TONER_LOW, "toner-low-report" },
-			  { CUPS_TONER_EMPTY, "toner-empty-warning" }
+			  { CUPS_TONER_EMPTY, "toner-empty-warning" },
+			  { CUPS_WASTE_ALMOST_FULL, "waste-receptacle-almost-full-report" },
+			  { CUPS_WASTE_FULL, "waste-receptacle-full-warning" },
+			  { CUPS_CLEANER_NEAR_EOL, "cleaner-life-almost-over-report" },
+			  { CUPS_CLEANER_LIFE_OVER, "cleaner-life-over-warning" },
 			};
 
 
@@ -245,9 +260,6 @@ backendSNMPSupplies(
               else
                 new_supply_state |= CUPS_TONER_LOW;
               break;
-          case CUPS_TC_wasteToner :
-          case CUPS_TC_wasteInk :
-              break;
           case CUPS_TC_ink :
           case CUPS_TC_inkCartridge :
           case CUPS_TC_inkRibbon :
@@ -272,6 +284,23 @@ backendSNMPSupplies(
                 new_supply_state |= CUPS_OPC_LIFE_OVER;
               else
                 new_supply_state |= CUPS_OPC_NEAR_EOL;
+              break;
+          case CUPS_TC_wasteInk :
+          case CUPS_TC_wastePaper :
+          case CUPS_TC_wasteToner :
+          case CUPS_TC_wasteWater :
+          case CUPS_TC_wasteWax :
+              if (percent <= 1)
+                new_supply_state |= CUPS_WASTE_FULL;
+              else
+                new_supply_state |= CUPS_WASTE_ALMOST_FULL;
+              break;
+          case CUPS_TC_cleanerUnit :
+          case CUPS_TC_fuserCleaningPad :
+              if (percent <= 1)
+                new_supply_state |= CUPS_CLEANER_LIFE_OVER;
+              else
+                new_supply_state |= CUPS_CLEANER_NEAR_EOL;
               break;
         }
       }
@@ -920,7 +949,9 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
     if (i > num_supplies)
       num_supplies = i;
 
-    supplies[i - 1].max_capacity = packet->object_value.integer;
+    if (supplies[i - 1].max_capacity == 0 &&
+        packet->object_value.integer > 0)
+      supplies[i - 1].max_capacity = packet->object_value.integer;
   }
   else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesType))
   {
@@ -940,6 +971,26 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       num_supplies = i;
 
     supplies[i - 1].type = packet->object_value.integer;
+  }
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesSupplyUnit))
+  {
+   /*
+    * Get units for capacity...
+    */
+
+    i = packet->object_name[prtMarkerSuppliesSupplyUnitOffset];
+    if (i < 1 || i > CUPS_MAX_SUPPLIES ||
+        packet->object_type != CUPS_ASN1_INTEGER)
+      return;
+
+    fprintf(stderr, "DEBUG2: prtMarkerSuppliesSupplyUnit.1.%d = %d\n", i,
+            packet->object_value.integer);
+
+    if (i > num_supplies)
+      num_supplies = i;
+
+    if (packet->object_value.integer == CUPS_TC_percent)
+      supplies[i - 1].max_capacity = 100;
   }
 }
 

@@ -1573,7 +1573,7 @@ cupsStartDocument(
   if ((request = ippNewRequest(IPP_SEND_DOCUMENT)) == NULL)
   {
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOMEM), 0);
-    return (0);
+    return (HTTP_ERROR);
   }
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri), "ipp",

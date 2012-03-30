@@ -3,7 +3,7 @@
  *
  *   PPD test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -147,6 +147,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		len;			/* Length of option name */
   char		*opt;			/* Option character */
   const char	*ptr;			/* Pointer into string */
+  cups_file_t	*fp;			/* PPD file */
   int		files;			/* Number of files */
   int		verbose;		/* Want verbose output? */
   int		warn;			/* Which errors to just warn about */
@@ -303,7 +304,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Read from stdin...
 	*/
 
-        ppd = ppdOpen(stdin);
+        ppd = _ppdOpen(cupsFileStdin(), _PPD_LOCALIZATION_ALL);
 
         if (verbose >= 0)
           printf("%s:", (ppd && ppd->pcfilename) ? ppd->pcfilename : "(stdin)");
@@ -317,7 +318,24 @@ main(int  argc,				/* I - Number of command-line args */
         if (verbose >= 0)
           printf("%s:", argv[i]);
 
-        ppd = ppdOpenFile(argv[i]);
+        if ((fp = cupsFileOpen(argv[i], "r")) != NULL)
+        {
+          ppd = _ppdOpen(fp, _PPD_LOCALIZATION_ALL);
+          cupsFileClose(fp);
+        }
+        else
+        {
+	  status = ERROR_FILE_OPEN;
+
+	  if (verbose >= 0)
+          {
+            _cupsLangPuts(stdout, _(" FAIL"));
+            _cupsLangPrintf(stdout,
+	                    _("      **FAIL**  Unable to open PPD file - %s"),
+			    strerror(errno));
+	    continue;
+          }
+        }
       }
 
       if (ppd == NULL)
@@ -1067,7 +1085,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Check for PaperDimension...
 	  */
 
-          if (size->width == 0.0 && size->length == 0.0)
+          if (size->width <= 0.0 && size->length <= 0.0)
 	  {
 	    if (verbose >= 0)
 	    {
@@ -3120,8 +3138,9 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
       continue;
     }
-    else if (warn != 2 && size->name[0] == 'w' &&
-             sscanf(size->name, "w%dh%d", &width, &length) == 2)
+
+    if (warn != 2 && size->name[0] == 'w' &&
+        sscanf(size->name, "w%dh%d", &width, &length) == 2)
     {
      /*
       * Validate device-specific size wNNNhNNN should have proper width and
@@ -3262,7 +3281,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	  * Check for EnvSizeName as well...
 	  */
 
-	  snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
+          if (strncmp(pwg_media->ppd, "Env", 3))
+            snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
 
 	  if (strcmp(size->name, buf))
 	    is_ok = 0;

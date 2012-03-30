@@ -513,7 +513,8 @@ extern int		cupsCheckDestSupported(http_t *http, cups_dest_t *dest,
 			                       const char *option,
 					       const char *value) _CUPS_API_1_6;
 extern ipp_status_t	cupsCloseDestJob(http_t *http, cups_dest_t *dest,
-			                 int job_id) _CUPS_API_1_6;
+			                 cups_dinfo_t *info, int job_id)
+			                 _CUPS_API_1_6;
 extern http_t		*cupsConnectDest(cups_dest_t *dest, unsigned flags,
 			                 int msec, int *cancel,
 					 char *resource, size_t resourcesize,
@@ -558,7 +559,9 @@ extern int		cupsEnumDestsBlock(unsigned flags, int msec,
 					   _CUPS_API_1_6;
 #  endif /* __BLOCKS__ */
 extern ipp_status_t	cupsFinishDestDocument(http_t *http,
-			                       cups_dest_t *dest) _CUPS_API_1_6;
+			                       cups_dest_t *dest,
+			                       cups_dinfo_t *info)
+			                       _CUPS_API_1_6;
 extern void		cupsFreeDestInfo(cups_dinfo_t *dinfo) _CUPS_API_1_6;
 extern int		cupsGetDestMediaByName(http_t *http, cups_dest_t *dest,
 			                       cups_dinfo_t *dinfo,

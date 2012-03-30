@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -120,17 +120,24 @@
  * Local functions...
  */
 
-static ipp_attribute_t	*ipp_add_attr(ipp_t *ipp, const char *name, ipp_tag_t  group_tag,
-			              ipp_tag_t value_tag, int num_values);
-static void		ipp_free_values(ipp_attribute_t *attr, int element, int count);
-static char		*ipp_get_code(const char *locale, char *buffer, size_t bufsize);
-static char		*ipp_lang_code(const char *locale, char *buffer, size_t bufsize);
+static ipp_attribute_t	*ipp_add_attr(ipp_t *ipp, const char *name,
+			              ipp_tag_t  group_tag, ipp_tag_t value_tag,
+			              int num_values);
+static void		ipp_free_values(ipp_attribute_t *attr, int element,
+			                int count);
+static char		*ipp_get_code(const char *locale, char *buffer,
+			              size_t bufsize)
+			              __attribute__((nonnull(1,2)));
+static char		*ipp_lang_code(const char *locale, char *buffer,
+			               size_t bufsize)
+			               __attribute__((nonnull(1,2)));
 static size_t		ipp_length(ipp_t *ipp, int collection);
 static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
 			              size_t length);
 static ssize_t		ipp_read_file(int *fd, ipp_uchar_t *buffer,
 			              size_t length);
-static _ipp_value_t	*ipp_set_value(ipp_t *ipp, ipp_attribute_t **attr, int element);
+static _ipp_value_t	*ipp_set_value(ipp_t *ipp, ipp_attribute_t **attr,
+			               int element);
 static ssize_t		ipp_write_file(int *fd, ipp_uchar_t *buffer,
 			               size_t length);
 
@@ -1058,14 +1065,17 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
       attr->values[0].string.language = _cupsStrAlloc(ipp_lang_code(language, code,
 						      sizeof(code)));
 
-    if (value_tag == IPP_TAG_CHARSET)
-      attr->values[0].string.text = _cupsStrAlloc(ipp_get_code(value, code,
-                                                               sizeof(code)));
-    else if (value_tag == IPP_TAG_LANGUAGE)
-      attr->values[0].string.text = _cupsStrAlloc(ipp_lang_code(value, code,
-                                                                sizeof(code)));
-    else
-      attr->values[0].string.text = _cupsStrAlloc(value);
+    if (value)
+    {
+      if (value_tag == IPP_TAG_CHARSET)
+	attr->values[0].string.text = _cupsStrAlloc(ipp_get_code(value, code,
+								 sizeof(code)));
+      else if (value_tag == IPP_TAG_LANGUAGE)
+	attr->values[0].string.text = _cupsStrAlloc(ipp_lang_code(value, code,
+								  sizeof(code)));
+      else
+	attr->values[0].string.text = _cupsStrAlloc(value);
+    }
   }
 
   return (attr);
@@ -2467,7 +2477,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
   DEBUG_printf(("ippReadIO(src=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)",
                 src, cb, blocking, parent, ipp));
-  DEBUG_printf(("2ippReadIO: ipp->state=%d", ipp->state));
+  DEBUG_printf(("2ippReadIO: ipp->state=%d", ipp ? ipp->state : IPP_ERROR));
 
   if (!src || !ipp)
     return (IPP_ERROR);
@@ -5349,10 +5359,6 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
     }
     else
     {
-     /*
-      * Wait a maximum of 1 second for data...
-      */
-
       if (!http->blocking)
       {
        /*

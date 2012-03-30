@@ -348,11 +348,6 @@ _cupsAppleCopyDefaultPrinter(void)
     return (NULL);
   }
 
-//#  ifdef DEBUG
-//  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-//  DEBUG_printf(("2_cupsUserDefault: network=\"%s\"", name));
-//#  endif /* DEBUG */
-
  /*
   * Lookup the network in the preferences...
   */
@@ -837,7 +832,7 @@ cupsEnumDests(
 {
   int			i,		/* Looping var */
 			num_dests;	/* Number of destinations */
-  cups_dest_t		*dests,		/* Destinations */
+  cups_dest_t		*dests = NULL,	/* Destinations */
 			*dest;		/* Current destination */
 #ifdef HAVE_DNSSD
   int			nfds,		/* Number of files responded */
@@ -1934,7 +1929,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 #endif /* WIN32 */
   char		filename[1024];		/* lpoptions file */
   int		num_temps;		/* Number of temporary destinations */
-  cups_dest_t	*temps,			/* Temporary destinations */
+  cups_dest_t	*temps = NULL,		/* Temporary destinations */
 		*temp;			/* Current temporary dest */
   const char	*val;			/* Value of temporary option */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -2801,11 +2796,9 @@ cups_dnssd_query_cb(
 			model[256],	/* Model */
 			uriname[1024],	/* Name for URI */
 			uri[1024];	/* Printer URI */
-    cups_ptype_t	type;		/* Device type */
 
     device->state     = _CUPS_DNSSD_PENDING;
     make_and_model[0] = '\0';
-    type              = CUPS_PRINTER_REMOTE;
 
     strcpy(model, "Unknown");
 
@@ -2881,7 +2874,6 @@ cups_dnssd_query_cb(
         device->dest.num_options = cupsAddOption("printer-type", value,
                                                  device->dest.num_options,
                                                  &device->dest.options);
-        type = strtol(value, NULL, 0);
       }
     }
 

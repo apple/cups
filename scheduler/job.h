@@ -47,8 +47,10 @@ struct cupsd_job_s			/**** Job request ****/
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
 			cancel_time,	/* When to cancel/send SIGTERM */
-			kill_time,	/* When to send SIGKILL */
-			hold_until;	/* Hold expiration date/time */
+			file_time,	/* Job file retain time */
+			history_time,	/* Job history retain time */
+			hold_until,	/* Hold expiration date/time */
+			kill_time;	/* When to send SIGKILL */
   ipp_attribute_t	*state;		/* Job state */
   ipp_attribute_t	*reasons;	/* Job state reasons */
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
@@ -91,10 +93,12 @@ typedef struct cupsd_joblog_s		/**** Job log message ****/
  * Globals...
  */
 
-VAR int			JobHistory	VALUE(1);
+VAR int			JobHistory	VALUE(INT_MAX);
 					/* Preserve job history? */
-VAR int			JobFiles	VALUE(0);
+VAR int			JobFiles	VALUE(86400);
 					/* Preserve job files? */
+VAR time_t		JobHistoryUpdate VALUE(0);
+					/* Time for next job history update */
 VAR int			MaxJobs		VALUE(0),
 					/* Max number of jobs */
 			MaxActiveJobs	VALUE(0),
@@ -161,6 +165,7 @@ extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
 			                 int kill_delay);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
+extern void		cupsdUpdateJobs(void);
 
 
 /*

@@ -981,9 +981,15 @@ main(int  argc,				/* I - Number of command-line args */
     if ((current_time - senddoc_time) >= 10)
     {
       cupsdCheckJobs();
-      cupsdCleanJobs();
       senddoc_time = current_time;
     }
+
+   /*
+    * Clean job history...
+    */
+
+    if (JobHistoryUpdate && current_time >= JobHistoryUpdate)
+      cupsdCleanJobs();
 
    /*
     * Log statistics at most once a minute when in debug mode...
@@ -1773,6 +1779,9 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
 #endif /* HAVE_AVAHI */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "select_timeout: JobHistoryUpdate=%ld",
+		  (long)JobHistoryUpdate);
+
  /*
   * Check to see if any of the clients have pending data to be
   * processed; if so, the timeout should be 0...
@@ -1865,29 +1874,38 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   }
 
  /*
-  * Check for any active jobs...
+  * Check for any job activity...
   */
+
+  if (JobHistoryUpdate && timeout > JobHistoryUpdate)
+  {
+    timeout = JobHistoryUpdate;
+    why     = "update job history";
+  }
 
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
   {
+    if (job->cancel_time && job->cancel_time < timeout)
+    {
+      timeout = job->cancel_time;
+      why     = "cancel stuck jobs";
+    }
+
     if (job->kill_time && job->kill_time < timeout)
     {
       timeout = job->kill_time;
       why     = "kill unresponsive jobs";
     }
-    else if (job->cancel_time && job->cancel_time < timeout)
-    {
-      timeout = job->cancel_time;
-      why     = "cancel stuck jobs";
-    }
-    else if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
+
+    if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
     {
       timeout = job->hold_until;
       why     = "release held jobs";
     }
-    else if (job->state_value == IPP_JOB_PENDING && timeout > (now + 10))
+
+    if (job->state_value == IPP_JOB_PENDING && timeout > (now + 10))
     {
       timeout = now + 10;
       why     = "start pending jobs";

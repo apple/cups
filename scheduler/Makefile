@@ -41,7 +41,8 @@ CUPSDOBJS =	\
 		statbuf.o \
 		subscriptions.o \
 		sysman.o \
-		timeout.o
+		timeout.o \
+		tls.o
 LIBOBJS =	\
 		filter.o \
 		mime.o \
@@ -211,7 +212,7 @@ install-data:
 install-exec:
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	$(INSTALL_BIN) -m 500 cupsd $(SBINDIR)
+	$(INSTALL_BIN) -m $(CUPS_CUPSD_FILE_PERM) cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	echo Installing programs in $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
@@ -380,6 +381,8 @@ cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(SERVERLIBS) $(DNSSDLIBS) $(LIBGSSAPI) \
 		$(LIBWRAP)
+
+tls.o:	tls-darwin.c tls-gnutls.c tls-openssl.c
 
 
 #

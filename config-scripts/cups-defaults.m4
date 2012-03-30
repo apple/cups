@@ -3,7 +3,7 @@ dnl "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $"
 dnl
 dnl   Default cupsd configuration settings for CUPS.
 dnl
-dnl   Copyright 2007-2011 by Apple Inc.
+dnl   Copyright 2007-2012 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -14,7 +14,7 @@ dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Default languages...
-LANGUAGES="`ls -1 locale/cups_*.po | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
+LANGUAGES="`ls -1 locale/cups_*.po 2>/dev/null | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
 
 AC_ARG_WITH(languages, [  --with-languages        set installed languages, default=all ],[
 	case "$withval" in
@@ -25,7 +25,7 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 AC_SUBST(LANGUAGES)
 
 dnl Mac OS X bundle-based localization support
-AC_ARG_WITH(bundledir, [  --with-bundledir     set Mac OS X localization bundle directory ],
+AC_ARG_WITH(bundledir, [  --with-bundledir        set Mac OS X localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
 	if test "x$uname" = xDarwin -a $uversion -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
@@ -49,6 +49,12 @@ AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFileP
 	fi)
 AC_SUBST(CUPS_CONFIG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_CONFIG_FILE_PERM, 0$CUPS_CONFIG_FILE_PERM)
+
+dnl Default permissions for cupsd
+AC_ARG_WITH(cupsd_file_perm, [  --with-cupsd-file-perm  set default cupsd permissions, default=0500],
+	CUPS_CUPSD_FILE_PERM="$withval",
+	CUPS_CUPSD_FILE_PERM="500")
+AC_SUBST(CUPS_CUPSD_FILE_PERM)
 
 dnl Default LogFilePerm
 AC_ARG_WITH(log_file_perm, [  --with-log-file-perm    set default LogFilePerm value, default=0644],
