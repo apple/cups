@@ -206,6 +206,9 @@ testsupplies:	testsupplies.o libbackend.a ../cups/$(LIBCUPSSTATIC)
 	$(CC) $(LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
+	if test -x /usr/bin/dsymutil; then \
+		/usr/bin/dsymutil testsupplies; \
+	fi
 
 
 #
