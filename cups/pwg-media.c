@@ -204,6 +204,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("jpn_chou4_90x205mm", NULL, "EnvChou4", 90, 205),
   _PWG_MEDIA_MM("jpn_hagaki_100x148mm", NULL, "Postcard", 100, 148),
   _PWG_MEDIA_MM("jpn_you4_105x235mm", NULL, "EnvYou4", 105, 235),
+  _PWG_MEDIA_MM("jpn_you6_98x190mm", NULL, "EnvYou6", 98, 190),
   _PWG_MEDIA_MM("jpn_chou2_111.1x146mm", NULL, NULL, 111.1, 146),
   _PWG_MEDIA_MM("jpn_chou3_120x235mm", NULL, "EnvChou3", 120, 235),
   _PWG_MEDIA_MM("jpn_oufuku_148x200mm", NULL, "DoublePostcardRotated", 148, 200),
