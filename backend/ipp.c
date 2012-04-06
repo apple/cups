@@ -1802,7 +1802,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Cancel the job as needed...
   */
 
-  if (job_canceled && job_id)
+  if (job_canceled > 0 && job_id > 0)
     cancel_job(http, uri, job_id, resource, argv[2], version);
 
  /*
@@ -1874,9 +1874,13 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_DOCUMENT_FORMAT ||
            ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
-  else if (ipp_status == IPP_REQUEST_VALUE)
+  else if (ipp_status == IPP_REQUEST_VALUE || job_canceled < 0)
   {
-    _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    if (ipp_status == IPP_REQUEST_VALUE)
+      _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    else
+      _cupsLangPrintFilter(stderr, "ERROR", _("Print job canceled at printer."));
+
     return (CUPS_BACKEND_CANCEL);
   }
   else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
@@ -2147,7 +2151,7 @@ monitor_printer(
 
       response = cupsDoRequest(http, request, monitor->resource);
 
-      fprintf(stderr, "DEBUG: %s: %s (%s)\n", ippOpString(job_op),
+      fprintf(stderr, "DEBUG: (monitor) %s: %s (%s)\n", ippOpString(job_op),
 	      ippErrorString(cupsLastError()), cupsLastErrorString());
 
       if (cupsLastError() <= IPP_OK_CONFLICT)
@@ -2211,6 +2215,14 @@ monitor_printer(
 
       ippDelete(response);
 
+      fprintf(stderr, "DEBUG: (monitor) job-state=%s\n",
+              ippEnumString("job-state", monitor->job_state));
+
+      if (!job_canceled &&
+          (monitor->job_state == IPP_JOB_CANCELED ||
+	   monitor->job_state == IPP_JOB_ABORTED))
+	job_canceled = -1;
+
      /*
       * Disconnect from the printer - we'll reconnect on the next poll...
       */
@@ -2231,7 +2243,7 @@ monitor_printer(
   * Cancel the job if necessary...
   */
 
-  if (job_canceled && monitor->job_id > 0)
+  if (job_canceled > 0 && monitor->job_id > 0)
     if (!httpReconnect(http))
       cancel_job(http, monitor->uri, monitor->job_id, monitor->resource,
                  monitor->user, monitor->version);
@@ -3008,6 +3020,8 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
+  write(2, "DEBUG: Got SIGTERM.\n", 20);
+
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
   if (child_pid)
   {
@@ -3021,6 +3035,8 @@ sigterm_handler(int sig)		/* I - Signal */
    /*
     * Flag that the job should be canceled...
     */
+
+    write(2, "DEBUG: job_canceled = 1.\n", 25);
 
     job_canceled = 1;
     return;

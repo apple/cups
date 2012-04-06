@@ -3189,16 +3189,15 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
       case CUPS_BACKEND_CANCEL :
          /*
-	  * Abort the job...
+	  * Cancel the job...
 	  */
 
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
-	    job_state = IPP_JOB_ABORTED;
-	    message   = "Job aborted due to backend errors; please consult "
-			"the error_log file for details.";
+	    job_state = IPP_JOB_CANCELED;
+	    message   = "Job canceled at printer.";
 
-	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
+	    ippSetString(job->attrs, &job->reasons, 0, "canceled-at-device");
 	  }
           break;
 
