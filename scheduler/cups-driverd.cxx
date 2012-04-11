@@ -2700,6 +2700,8 @@ load_tar(const char  *filename,		/* I - Actual filename */
   * Add a dummy entry for the file...
   */
 
+  (void)filename;
+
   add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
           PPD_TYPE_ARCHIVE, "file");
   ChangedPPD = 1;

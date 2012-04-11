@@ -860,6 +860,8 @@ cupsEnumDests(
   * Range check input...
   */
 
+  (void)flags;
+
   if (!cb)
     return (0);
 
