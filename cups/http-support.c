@@ -139,23 +139,19 @@ static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
 #endif /* HAVE_DNSSD */
 
 #ifdef HAVE_AVAHI
-static void	avahi_resolve_uri_client_cb(AvahiClient *client,
-					    AvahiClientState state,
-					    void *simple_poll);
-static void	avahi_resolve_uri_resolver_cb(AvahiServiceResolver *resolver,
-					      AvahiIfIndex interface,
-					      AvahiProtocol protocol,
-					      AvahiResolverEvent event,
-					      const char *name,
-					      const char *type,
-					      const char *domain,
-					      const char *host_name,
-					      const AvahiAddress *address,
-					      uint16_t port,
-					      AvahiStringList *txt,
-					      AvahiLookupResultFlags flags,
-					      void *context);
+static void	http_client_cb(AvahiClient *client,
+			       AvahiClientState state, void *simple_poll);
+static void	http_resolve_cb(AvahiServiceResolver *resolver,
+				AvahiIfIndex interface,
+				AvahiProtocol protocol,
+				AvahiResolverEvent event,
+				const char *name, const char *type,
+				const char *domain, const char *host_name,
+				const AvahiAddress *address, uint16_t port,
+				AvahiStringList *txt,
+				AvahiLookupResultFlags flags, void *context);
 #endif /* HAVE_AVAHI */
+
 
 /*
  * 'httpAssembleURI()' - Assemble a uniform resource identifier from its
@@ -1467,6 +1463,7 @@ _httpResolveURI(
     char		*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     _http_uribuf_t	uribuf;		/* URI buffer */
+    int			offline = 0;	/* offline-report state set? */
 #  ifdef HAVE_DNSSD
 #    ifdef WIN32
 #      pragma comment(lib, "dnssd.lib")
@@ -1474,8 +1471,7 @@ _httpResolveURI(
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref,	/* DNS-SD service reference for domain */
 			localref;	/* DNS-SD service reference for .local */
-    int			domainsent = 0,	/* Send the domain resolve? */
-			offline = 0;	/* offline-report state set? */
+    int			domainsent = 0;	/* Send the domain resolve? */
 #    ifdef HAVE_POLL
     struct pollfd	polldata;	/* Polling data */
 #    else /* select() */
@@ -1671,10 +1667,12 @@ _httpResolveURI(
 	  				/* Start time */
 			end_time = start_time + 90;
 					/* End time */
+          int           pstatus;	/* Poll status */
 
-	  avahi_simple_poll_iterate(uribuf.poll, 2);
+	  pstatus = avahi_simple_poll_iterate(uribuf.poll, 2);
 
-	  if (!resolved_uri[0] && domain && _cups_strcasecmp(domain, "local."))
+	  if (pstatus == 0 && !resolved_uri[0] && domain &&
+	      _cups_strcasecmp(domain, "local."))
 	  {
 	   /*
 	    * Resolve for .local hasn't returned anything, try the listed
@@ -1687,9 +1685,10 @@ _httpResolveURI(
 				       http_resolve_cb, &uribuf);
           }
 
-          do
+	  while (!pstatus && !resolved_uri[0] && time(NULL) < end_time)
           {
-  	    avahi_simple_poll_iterate(uribuf.poll, 1);
+  	    if ((pstatus = avahi_simple_poll_iterate(uribuf.poll, 1)) != 0)
+  	      break;
 
 	   /*
 	    * If it hasn't resolved within 5 seconds set the offline-report
@@ -1703,7 +1702,6 @@ _httpResolveURI(
 	      offline = 1;
 	    }
           }
-	  while (!resolved_uri[0] && time(NULL) < end_time);
 
 	 /*
 	  * Collect the result (if we got one).
@@ -2183,7 +2181,7 @@ http_resolve_cb(
   avahi_address_snprint(addr, sizeof(addr), address);
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
                   NULL, addr, port, rp);
-  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", urfbuf->buffer));
+  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
 }
