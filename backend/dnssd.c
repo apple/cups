@@ -399,10 +399,10 @@ main(int  argc,				/* I - Number of command-line args */
       announce = 1;
 
 #elif defined(HAVE_AVAHI)
-    avahi_got_callback = 0;
+    got_callback = 0;
 
     if ((error = avahi_simple_poll_iterate(simple_poll, 3)) != 0 &&
-        r != EINTR)
+        errno != EINTR)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -412,7 +412,7 @@ main(int  argc,				/* I - Number of command-line args */
       break;
     }
 
-    if (avahi_got_callback)
+    if (got_callback)
       announce = 1;
 #endif /* HAVE_DNSSD */
 
@@ -473,7 +473,7 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_AVAHI
-	if (!device->resolved)
+	if (!device->ref)
 	  continue;
         else
 #endif /* HAVE_AVAHI */
@@ -708,8 +708,8 @@ browse_callback(
 	            "DEBUG: browse_callback: Failed to resolve service \"%s\": "
 	            "%s\n", name, avahi_strerror(avahi_client_errno(client)));
 	  }
-	}
 #endif /* 0 */
+	}
 	break;
 
     case AVAHI_BROWSER_REMOVE:
@@ -1245,7 +1245,7 @@ query_callback(
 	device->make_and_model = strdup(model);
 
 #  ifdef HAVE_AVAHI
-      avahi_got_callback = 1;
+      got_callback = 1;
 #  endif /* HAVE_AVAHI */
 
       break;
