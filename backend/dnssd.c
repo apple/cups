@@ -94,8 +94,7 @@ static int		job_canceled = 0;
 #ifdef HAVE_AVAHI
 static AvahiSimplePoll	*simple_poll = NULL;
 					/* Poll information */
-static int		got_callback = 0;
-					/* Got a callback? */
+static int		got_data = 0;	/* Got data from poll? */
 #endif /* HAVE_AVAHI */
 
 
@@ -154,8 +153,10 @@ static void		query_callback(DNSServiceRef sdRef,
 				       const void *rdata, uint32_t ttl,
 				       void *context)
 				       __attribute__((nonnull(1,5,9,11)));
-#endif /* HAVE_DNSSD */
-#ifdef HAVE_AVAHI
+#elif defined(HAVE_AVAHI)
+static int		poll_callback(struct pollfd *pollfds,
+			              unsigned int num_pollfds, int timeout,
+			              void *context);
 static void		query_callback(AvahiRecordBrowser *browser,
 				       AvahiIfIndex interface,
 				       AvahiProtocol protocol,
@@ -165,7 +166,7 @@ static void		query_callback(AvahiRecordBrowser *browser,
 				       size_t rdlen,
 				       AvahiLookupResultFlags flags,
 				       void *context);
-#endif /* HAVE_AVAHI */
+#endif /* HAVE_DNSSD */
 static void		sigterm_handler(int sig);
 static void		unquote(char *dst, const char *src, size_t dstsize)
 			    __attribute__((nonnull(1,2)));
@@ -334,6 +335,8 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
+  avahi_simple_poll_set_func(simple_poll, poll_callback, NULL);
+
   client = avahi_client_new(avahi_simple_poll_get(simple_poll),
 			    0, client_callback, simple_poll, &error);
   if (!client)
@@ -382,8 +385,8 @@ main(int  argc,				/* I - Number of command-line args */
     FD_ZERO(&input);
     FD_SET(fd, &input);
 
-    timeout.tv_sec  = 0;
-    timeout.tv_usec = 250000;
+    timeout.tv_sec  = 2;
+    timeout.tv_usec = 500000;
 
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
       continue;
@@ -400,10 +403,9 @@ main(int  argc,				/* I - Number of command-line args */
       announce = 1;
 
 #elif defined(HAVE_AVAHI)
-    got_callback = 0;
+    got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(simple_poll, 3)) != 0 &&
-        errno != EINTR)
+    if ((error = avahi_simple_poll_iterate(simple_poll, 2500)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -413,9 +415,11 @@ main(int  argc,				/* I - Number of command-line args */
       break;
     }
 
-    if (got_callback)
+    if (!got_data)
       announce = 1;
 #endif /* HAVE_DNSSD */
+
+/*    fprintf(stderr, "DEBUG: announce=%d\n", announce);*/
 
     if (announce)
     {
@@ -448,7 +452,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Found the device, now get the TXT record(s) for it...
 	  */
 
-          if (count < 20)
+          if (count < 50)
 	  {
 	    fprintf(stderr, "DEBUG: Querying \"%s\"...\n", device->fullName);
 
@@ -551,6 +555,8 @@ main(int  argc,				/* I - Number of command-line args */
 	best->sent = 1;
 	sent ++;
       }
+
+      fprintf(stderr, "DEBUG: sent=%d, count=%d\n", sent, count);
 
       if (sent == cupsArrayCount(devices))
 	break;
@@ -706,7 +712,6 @@ browse_callback(
 	  */
 
 	  get_device((cups_array_t *)context, name, type, domain);
-	  got_callback = 1;
 	}
 	break;
 
@@ -942,6 +947,37 @@ get_device(cups_array_t *devices,	/* I - Device array */
 
   return (device);
 }
+
+
+#ifdef HAVE_AVAHI
+/*
+ * 'poll_callback()' - Wait for input on the specified file descriptors.
+ *
+ * Note: This function is needed because avahi_simple_poll_iterate is broken
+ *       and always uses a timeout of 0 (!) milliseconds.
+ *       (Avahi Ticket #364)
+ */
+
+static int				/* O - Number of file descriptors matching */
+poll_callback(
+    struct pollfd *pollfds,		/* I - File descriptors */
+    unsigned int  num_pollfds,		/* I - Number of file descriptors */
+    int           timeout,		/* I - Timeout in milliseconds */
+    void          *context)		/* I - User data (unused) */
+{
+  int	val;				/* Return value */
+
+
+  val = poll(pollfds, num_pollfds, 2500);
+
+  if (val < 0)
+    fprintf(stderr, "DEBUG: poll_callback: %s\n", strerror(errno));
+  else if (val > 0)
+    got_data = 1;
+
+  return (val);
+}
+#endif /* HAVE_AVAHI */
 
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
@@ -1188,10 +1224,6 @@ query_callback(
   }
   else
     device->make_and_model = strdup(model);
-
-#  ifdef HAVE_AVAHI
-  got_callback = 1;
-#  endif /* HAVE_AVAHI */
 }
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
