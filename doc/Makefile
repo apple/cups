@@ -94,6 +94,7 @@ HELPFILES	=	\
 			help/man-ppdi.html \
 			help/man-ppdmerge.html \
 			help/man-ppdpo.html \
+			help/man-snmpbackend.html \
 			help/network.html \
 			help/options.html \
 			help/overview.html \

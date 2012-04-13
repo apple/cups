@@ -78,6 +78,7 @@ AC_OUTPUT(Makedefs
 	  man/cupsd.conf.man
 	  man/cupsd.man
 	  man/lpoptions.man
+	  man/snmpbackend.man
 	  scheduler/cups-lpd.xinetd
 	  scheduler/cups.sh
 	  scheduler/cups.xml

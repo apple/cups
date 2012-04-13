@@ -1,0 +1,97 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   SNMP backend man page for CUPS.
+.\"
+.\"   Copyright 2012 by Apple Inc.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH snmpbackend 8 "CUPS" "13 April 2012" "Apple Inc."
+
+.SH NAME
+snmpbackend \- cups snmp backend
+.SH SYNOPSIS
+.B @CUPS_SERVERBIN@/backend/snmp
+.I ip-address-or-hostname
+.br
+.B lpinfo -v --include-schemes snmp
+.SH DESCRIPTION
+The CUPS SNMP backend provides legacy discovery and identification of network
+printers using SNMPv1. When used for discovery through the scheduler, the
+backend will list all printers that respond to a broadcast SNMPv1 query with the
+"public" community name. Additional queries are then sent to printers that
+respond in order to determine the correct device URI, make and model, and other
+information needed for printing.
+.LP
+In the first form, the SNMP backend is run directly by the user to look up the
+device URI and other information when you have an IP address or hostname. This
+can be used for programs that need to configure print queues where the user has
+supplied an address but nothing else.
+.LP
+In the second form, the SNMP backend is run indirectly using the \fIlpinfo(8)\fR
+command. The output provides all printers detected via SNMP on the configured
+broadcast addresses. \fBNote\fR: no broadcast addresses are configured by
+default.
+.SH CONFIGURATION
+The SNMP backend reads the @CUPS_SERVERROOT@/snmp.conf configuration file, if
+present, to set the default broadcast address, community name, and logging
+level. Each line consists of a directive followed by whitespace and any values
+associated with the directive:
+.TP 5
+Address @IF(name)
+.TP 5
+Address @LOCAL
+.TP 5
+Address ip-address-or-hostname
+.br
+Specifies a (broadcast) address for discovery. "@LOCAL" adds all of the IPv4 and
+IPv6 broadcast addresses for active, non-point-to-point network interfaces,
+while "@IF(name)" adds the IPv4 and IPv6 broadcast addresses associated with the
+named interface. There is no default address.
+.TP 5
+Community name
+.br
+Specifies the community name to use. Only a single community name may be
+specified. The default community name is "public".
+.TP 5
+DebugLevel number
+.br
+Specifies the logging level from 0 (none) to 3 (everything). Typically only used
+for debugging (thus the name). The default debug level is 0. The
+CUPS_DEBUG_LEVEL environment variable can be used to override the default value.
+.TP 5
+DeviceURI "regular expression" device-uri [... device-uri]
+.br
+Specifies one or more device URIs that should be used for a given make and model
+string. The regular expression is used to match the detected make and model, and
+the device URI strings must be of the form "scheme://%s[:port]/[path]", where
+"%s" represents the detected address or hostname. There are no default device
+URI matching rules.
+.TP 5
+HostNameLookups on
+.TP 5
+HostNameLookups off
+.br
+Specifies whether the backend tries to do a reverse lookup of the detected
+printer's address. The default is off.
+.TP 5
+MaxRunTime seconds
+.br
+Specifies the maximum amount of time the backend will wait for a response. The
+default is 120 seconds (2 minutes). The CUPS_MAX_RUN_TIME environment variable
+can be used to override the default value.
+.SH SEE ALSO
+\fIbackend(7)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR,
+\fIlpinfo(8)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

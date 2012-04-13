@@ -64,7 +64,8 @@ MAN8	=	cupsaccept.$(MAN8EXT) \
 		lpadmin.$(MAN8EXT) \
 		lpinfo.$(MAN8EXT) \
 		lpmove.$(MAN8EXT) \
-		lpc.$(MAN8EXT)
+		lpc.$(MAN8EXT) \
+		snmpbackend.$(MAN8EXT)
 
 
 #

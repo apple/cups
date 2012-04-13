@@ -14,7 +14,7 @@
  *
  * Contents:
  *
-﻿*   cupsdAddJob()		- Add a new job to the job queue.
+ *   cupsdAddJob()		- Add a new job to the job queue.
  *   cupsdCancelJobs()		- Cancel all jobs for the given
  *				  destination/user.
  *   cupsdCheckJobs()		- Check the pending jobs and start any if the
