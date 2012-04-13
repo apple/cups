@@ -385,7 +385,7 @@ main(int  argc,				/* I - Number of command-line args */
     FD_ZERO(&input);
     FD_SET(fd, &input);
 
-    timeout.tv_sec  = 2;
+    timeout.tv_sec  = 0;
     timeout.tv_usec = 500000;
 
     if (select(fd + 1, &input, NULL, NULL, &timeout) < 0)
@@ -405,7 +405,7 @@ main(int  argc,				/* I - Number of command-line args */
 #elif defined(HAVE_AVAHI)
     got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(simple_poll, 2500)) > 0)
+    if ((error = avahi_simple_poll_iterate(simple_poll, 500)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -968,7 +968,7 @@ poll_callback(
   int	val;				/* Return value */
 
 
-  val = poll(pollfds, num_pollfds, 2500);
+  val = poll(pollfds, num_pollfds, 500);
 
   if (val < 0)
     fprintf(stderr, "DEBUG: poll_callback: %s\n", strerror(errno));
