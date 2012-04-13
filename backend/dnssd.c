@@ -990,6 +990,15 @@ query_callback(
   char		*ptr;			/* Pointer into string */
   cups_device_t	*device = (cups_device_t *)context;
 					/* Device */
+  const uint8_t	*data,			/* Pointer into data */
+		*datanext,		/* Next key/value pair */
+		*dataend;		/* End of entire TXT record */
+  uint8_t	datalen;		/* Length of current key/value pair */
+  char		key[256],		/* Key string */
+		value[256],		/* Value string */
+		make_and_model[512],	/* Manufacturer and model */
+		model[256],		/* Model */
+		device_id[2048];	/* 1284 device ID */
 
 
 #  ifdef HAVE_DNSSD
@@ -1034,18 +1043,6 @@ query_callback(
   * Pull out the priority and make and model from the TXT
   * record and save it...
   */
-
-  const uint8_t	*data,		/* Pointer into data */
-		    *datanext,	/* Next key/value pair */
-		    *dataend;	/* End of entire TXT record */
-  uint8_t		datalen;	/* Length of current key/value pair */
-  char		key[256],	/* Key string */
-		    value[256],	/* Value string */
-		    make_and_model[512],
-				    /* Manufacturer and model */
-		    model[256],	/* Model */
-		    device_id[2048];/* 1284 device ID */
-
 
   device_id[0]      = '\0';
   make_and_model[0] = '\0';
