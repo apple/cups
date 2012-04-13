@@ -475,7 +475,7 @@ main(int  argc,				/* I - Number of command-line args */
 	                                                device->fullName,
 	                                                AVAHI_DNS_CLASS_IN,
 	                                                AVAHI_DNS_TYPE_TXT,
-	                                                AVAHI_LOOKUP_NO_ADDRESS,
+	                                                0,
 				                        query_callback,
 				                        device)) == NULL)
 	      fprintf(stderr,
@@ -706,6 +706,7 @@ browse_callback(
 	  */
 
 	  get_device((cups_array_t *)context, name, type, domain);
+	  got_callback = 1;
 	}
 	break;
 
