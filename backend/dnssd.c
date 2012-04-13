@@ -1023,12 +1023,9 @@ query_callback(
   if (event != AVAHI_BROWSER_NEW)
   {
     if (event == AVAHI_BROWSER_FAILURE)
-    {
       fprintf(stderr, "ERROR: %s\n",
-	       avahi_strerror(avahi_client_errno(client)));
-    }
+	      avahi_strerror(avahi_client_errno(client)));
 
-//    avahi_record_browser_free(browser);
     return;
   }
 #  endif /* HAVE_DNSSD */
