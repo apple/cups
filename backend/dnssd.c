@@ -962,11 +962,14 @@ static int				/* O - Number of file descriptors matching */
 poll_callback(
     struct pollfd *pollfds,		/* I - File descriptors */
     unsigned int  num_pollfds,		/* I - Number of file descriptors */
-    int           timeout,		/* I - Timeout in milliseconds */
+    int           timeout,		/* I - Timeout in milliseconds (unused) */
     void          *context)		/* I - User data (unused) */
 {
   int	val;				/* Return value */
 
+
+  (void)timeout;
+  (void)context;
 
   val = poll(pollfds, num_pollfds, 500);
 

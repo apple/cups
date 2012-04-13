@@ -141,6 +141,8 @@ static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
 #ifdef HAVE_AVAHI
 static void	http_client_cb(AvahiClient *client,
 			       AvahiClientState state, void *simple_poll);
+static int	http_poll_cb(struct pollfd *pollfds, unsigned int num_pollfds,
+		             int timeout, void *context);
 static void	http_resolve_cb(AvahiServiceResolver *resolver,
 				AvahiIfIndex interface,
 				AvahiProtocol protocol,
@@ -1654,6 +1656,8 @@ _httpResolveURI(
 #  else /* HAVE_AVAHI */
     if ((uribuf.poll = avahi_simple_poll_new()) != NULL)
     {
+      avahi_simple_poll_set_func(uribuf.poll, http_poll_cb, NULL);
+
       if ((client = avahi_client_new(avahi_simple_poll_get(uribuf.poll),
 				      0, http_client_cb,
 				      &uribuf, &error)) != NULL)
@@ -1669,7 +1673,7 @@ _httpResolveURI(
 					/* End time */
           int           pstatus;	/* Poll status */
 
-	  pstatus = avahi_simple_poll_iterate(uribuf.poll, 2);
+	  pstatus = avahi_simple_poll_iterate(uribuf.poll, 2000);
 
 	  if (pstatus == 0 && !resolved_uri[0] && domain &&
 	      _cups_strcasecmp(domain, "local."))
@@ -1687,7 +1691,7 @@ _httpResolveURI(
 
 	  while (!pstatus && !resolved_uri[0] && time(NULL) < end_time)
           {
-  	    if ((pstatus = avahi_simple_poll_iterate(uribuf.poll, 1)) != 0)
+  	    if ((pstatus = avahi_simple_poll_iterate(uribuf.poll, 2000)) != 0)
   	      break;
 
 	   /*
@@ -2055,6 +2059,28 @@ http_resolve_cb(
 
 #elif defined(HAVE_AVAHI)
 /*
+ * 'http_poll_cb()' - Wait for input on the specified file descriptors.
+ *
+ * Note: This function is needed because avahi_simple_poll_iterate is broken
+ *       and always uses a timeout of 0 (!) milliseconds.
+ *       (Avahi Ticket #364)
+ */
+
+static int				/* O - Number of file descriptors matching */
+http_poll_cb(
+    struct pollfd *pollfds,		/* I - File descriptors */
+    unsigned int  num_pollfds,		/* I - Number of file descriptors */
+    int           timeout,		/* I - Timeout in milliseconds (used) */
+    void          *context)		/* I - User data (unused) */
+{
+  (void)timeout;
+  (void)context;
+
+  return (poll(pollfds, num_pollfds, 2000));
+}
+
+
+/*
  * 'http_resolve_cb()' - Build a device URI for the given service name.
  */
 
@@ -2067,7 +2093,7 @@ http_resolve_cb(
     const char             *name,	/* I - Service name */
     const char             *type,	/* I - Registration type */
     const char             *domain,	/* I - Domain (unused) */
-    const char             *host_name,	/* I - Hostname */
+    const char             *hostTarget,	/* I - Hostname */
     const AvahiAddress     *address,	/* I - Address (unused) */
     uint16_t               port,	/* I - Port number */
     AvahiStringList        *txt,	/* I - TXT record */
@@ -2076,21 +2102,21 @@ http_resolve_cb(
 {
   _http_uribuf_t	*uribuf = (_http_uribuf_t *)context;
 					/* URI buffer */
-  const char		*scheme;	/* URI scheme */
-  char			rp[257];	/* Remote printer */
+  const char		*scheme,	/* URI scheme */
+			*hostptr;	/* Pointer into hostTarget */
+  char			rp[257],	/* Remote printer */
+			fqdn[256];	/* FQDN of the .local name */
   AvahiStringList	*pair;		/* Current TXT record key/value pair */
   char			*value;		/* Value for "rp" key */
   size_t		valueLen = 0;	/* Length of "rp" key */
-  char			addr[AVAHI_ADDRESS_STR_MAX];
-					/* Address string */
 
 
   DEBUG_printf(("7http_resolve_cb(resolver=%p, "
 		"interface=%d, protocol=%d, event=%d, name=\"%s\", "
-		"type=\"%s\", domain=\"%s\", host_name=\"%s\", address=%p, "
+		"type=\"%s\", domain=\"%s\", hostTarget=\"%s\", address=%p, "
 		"port=%d, txt=%p, flags=%d, context=%p)",
 		resolver, interface, protocol, event, name, type, domain,
-		host_name, address, port, txt, flags, context));
+		hostTarget, address, port, txt, flags, context));
 
   if (event != AVAHI_RESOLVER_FOUND)
   {
@@ -2170,17 +2196,59 @@ http_resolve_cb(
   }
 
  /*
-  * Assemble the final device URI using the raw IP address.  This is crap, but
-  * necessary because Avahi isn't properly integrated with the host name
-  * resolver on Linux...  However, this is likely to cause problems since the
-  * client's notion of address may be different than the server's (for example
-  * if a VPN is in use and providing a gateway to the remote server).  This
-  * needs to be resolved in future Linux OS's...
+  * Lookup the FQDN if needed...
   */
 
-  avahi_address_snprint(addr, sizeof(addr), address);
+  if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
+      (hostptr = hostTarget + strlen(hostTarget) - 6) > hostTarget &&
+      !_cups_strcasecmp(hostptr, ".local"))
+  {
+   /*
+    * OK, we got a .local name but the caller needs a real domain.  Start by
+    * getting the IP address of the .local name and then do reverse-lookups...
+    */
+
+    http_addrlist_t	*addrlist,	/* List of addresses */
+			*addr;		/* Current address */
+
+    DEBUG_printf(("8http_resolve_cb: Looking up \"%s\".", hostTarget));
+
+    snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
+    if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
+    {
+      for (addr = addrlist; addr; addr = addr->next)
+      {
+        int error = getnameinfo(&(addr->addr.addr),
+	                        httpAddrLength(&(addr->addr)),
+			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+
+        if (!error)
+	{
+	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
+
+	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
+	      _cups_strcasecmp(hostptr, ".local"))
+	  {
+	    hostTarget = fqdn;
+	    break;
+	  }
+	}
+#ifdef DEBUG
+	else
+	  DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
+			error));
+#endif /* DEBUG */
+      }
+    }
+  }
+
+ /*
+  * Assemble the final device URI using the resolved hostname...
+  */
+
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
-                  NULL, addr, port, rp);
+                  NULL, hostTarget, port, rp);
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
