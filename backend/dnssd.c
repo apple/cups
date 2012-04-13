@@ -92,6 +92,8 @@ typedef struct
 static int		job_canceled = 0;
 					/* Set to 1 on SIGTERM */
 #ifdef HAVE_AVAHI
+static AvahiSimplePoll	*simple_poll = NULL;
+					/* Poll information */
 static int		got_callback = 0;
 					/* Got a callback? */
 #endif /* HAVE_AVAHI */
@@ -154,10 +156,10 @@ static void		query_callback(DNSServiceRef sdRef,
 				       __attribute__((nonnull(1,5,9,11)));
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_AVAHI
-static void		query_callback(AvahiServiceResolver *resolver,
+static void		query_callback(AvahiRecordBrowser *browser,
 				       AvahiIfIndex interface,
 				       AvahiProtocol protocol,
-				       AvahiResolverEvent event,
+				       AvahiBrowserEvent event,
 				       const char *name, uint16_t rrclass,
 				       uint16_t rrtype, const void *rdata,
 				       size_t rdlen,
@@ -200,7 +202,6 @@ main(int  argc,				/* I - Number of command-line args */
 		riousbprint_ref;	/* Remote IO service reference */
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_AVAHI
-  AvahiSimplePoll *simple_poll = NULL;	/* Poll information */
   AvahiClient	*client;		/* Client information */
   int		error;			/* Error code, if any */
 #endif /* HAVE_AVAHI */
@@ -438,7 +439,6 @@ main(int  argc,				/* I - Number of command-line args */
         if (device->sent)
 	  sent ++;
 
-#ifdef HAVE_DNSSD
         if (device->ref)
 	  count ++;
 
@@ -450,34 +450,45 @@ main(int  argc,				/* I - Number of command-line args */
 
           if (count < 20)
 	  {
-	    device->ref = main_ref;
-
 	    fprintf(stderr, "DEBUG: Querying \"%s\"...\n", device->fullName);
+
+#ifdef HAVE_DNSSD
+	    device->ref = main_ref;
 
 	    status = DNSServiceQueryRecord(&(device->ref),
 				           kDNSServiceFlagsShareConnection,
 				           0, device->fullName,
 					   kDNSServiceType_TXT,
 				           kDNSServiceClass_IN, query_callback,
-				           devices);
+				           device);
             if (status != kDNSServiceErr_NoError)
-	    {
-	      fputs("ERROR: Unable to query for TXT records!\n", stderr);
-	      fprintf(stderr, "DEBUG: DNSServiceQueryRecord returned %d\n",
-	              status);
-            }
+	      fprintf(stderr,
+	              "ERROR: Unable to query \"%s\" for TXT records: %d\n",
+	              device->fullName, status);
+	              			/* Users never see this */
 	    else
 	      count ++;
+
+#else
+	    if ((device->ref = avahi_record_browser_new(client, AVAHI_IF_UNSPEC,
+	                                                AVAHI_PROTO_UNSPEC,
+	                                                device->fullName,
+	                                                AVAHI_DNS_CLASS_IN,
+	                                                AVAHI_DNS_TYPE_TXT,
+	                                                AVAHI_LOOKUP_NO_ADDRESS,
+				                        query_callback,
+				                        device)) == NULL)
+	      fprintf(stderr,
+	              "ERROR: Unable to query \"%s\" for TXT records: %s\n",
+	              device->fullName,
+	              avahi_strerror(avahi_client_errno(client)));
+	              			/* Users never see this */
+	    else
+	      count ++;
+#endif /* HAVE_AVAHI */
           }
 	}
-	else
-#endif /* HAVE_DNSSD */
-#ifdef HAVE_AVAHI
-	if (!device->ref)
-	  continue;
-        else
-#endif /* HAVE_AVAHI */
-	if (!device->sent)
+	else if (!device->sent)
 	{
 #ifdef HAVE_DNSSD
 	 /*
@@ -485,8 +496,11 @@ main(int  argc,				/* I - Number of command-line args */
 	  */
 
 	  DNSServiceRefDeallocate(device->ref);
-	  device->ref = 0;
+#else
+          avahi_record_browser_free(device->ref);
 #endif /* HAVE_DNSSD */
+
+	  device->ref = NULL;
 
           if (!best)
 	    best = device;
@@ -654,7 +668,7 @@ browse_callback(
     const char             *type,	/* I - Registration type */
     const char             *domain,	/* I - Domain */
     AvahiLookupResultFlags flags,	/* I - Flags */
-    void                   *context)	/* I - User data (unused) */
+    void                   *context)	/* I - Devices array */
 {
   AvahiClient *client = avahi_service_browser_get_client(browser);
 					/* Client information */
@@ -692,23 +706,6 @@ browse_callback(
 	  */
 
 	  get_device((cups_array_t *)context, name, type, domain);
-#if 0
-
-	 /*
-	  * Now look for a TXT entry.
-	  */
-
-
-	  if (avahi_record_browser_new(client, interface, protocol,
-				       fullname /* name, type, domain */,
-				       AVAHI_PROTO_UNSPEC, 0,
-				       avahi_query_callback, context) == NULL)
-	  {
-	    fprintf(stderr,
-	            "DEBUG: browse_callback: Failed to resolve service \"%s\": "
-	            "%s\n", name, avahi_strerror(avahi_client_errno(client)));
-	  }
-#endif /* 0 */
 	}
 	break;
 
@@ -926,9 +923,6 @@ get_device(cups_array_t *devices,	/* I - Device array */
   device->domain   = strdup(replyDomain);
   device->type     = key.type;
   device->priority = 50;
-#ifdef HAVE_AVAHI
-  device->resolved = 0;
-#endif /* HAVE_AVAHI */
 
   cupsArrayAdd(devices, device);
 
@@ -967,7 +961,7 @@ query_callback(
     uint16_t            rdlen,		/* I - Length of record data */
     const void          *rdata,		/* I - Record data */
     uint32_t            ttl,		/* I - Time-to-live */
-    void                *context)	/* I - Devices array */
+    void                *context)	/* I - Device */
 {
 #  else
 /*
@@ -976,26 +970,25 @@ query_callback(
 
 static void
 query_callback(
-    AvahiServiceResolver   *resolver,	/* I - Service resolver */
-    AvahiIfIndex           interface,	/* I - Interface index (unused) */
+    AvahiRecordBrowser     *browser,	/* I - Record browser */
+    AvahiIfIndex           interfaceIndex,
+					/* I - Interface index (unused) */
     AvahiProtocol          protocol,	/* I - Network protocol (unused) */
-    AvahiResolverEvent     event,	/* I - What happened? */
+    AvahiBrowserEvent      event,	/* I - What happened? */
     const char             *fullName,	/* I - Service name */
     uint16_t               rrclass,	/* I - Record class */
     uint16_t               rrtype,	/* I - Record type */
     const void             *rdata,	/* I - TXT record */
     size_t                 rdlen,	/* I - Length of TXT record */
     AvahiLookupResultFlags flags,	/* I - Flags */
-    void                   *context)	/* I - Devices array */
+    void                   *context)	/* I - Device */
 {
-  AvahiClient		*client = avahi_service_resolver_get_client(resolver);
+  AvahiClient		*client = avahi_record_browser_get_client(browser);
 					/* Client information */
 #  endif /* HAVE_DNSSD */
-  cups_array_t	*devices;		/* Device array */
-  char		name[1024],		/* Service name */
-		*ptr;			/* Pointer into string */
-  cups_device_t	dkey,			/* Search key */
-		*device;		/* Device */
+  char		*ptr;			/* Pointer into string */
+  cups_device_t	*device = (cups_device_t *)context;
+					/* Device */
 
 
 #  ifdef HAVE_DNSSD
@@ -1015,245 +1008,195 @@ query_callback(
     return;
 
 #  else
-  fprintf(stderr, "DEBUG2: query_callback(resolver=%p, interfaceIndex=%d, "
+  fprintf(stderr, "DEBUG2: query_callback(browser=%p, interfaceIndex=%d, "
                   "protocol=%d, event=%d, fullName=\"%s\", rrclass=%u, "
 		  "rrtype=%u, rdata=%p, rdlen=%u, flags=%x, context=%p)\n",
-          resolver, interfaceIndex, protocol, event,
-	  fullName ? fullName : "(null)", rrclass, rrtype, rdata, rdlen, flags,
-	  context);
+          browser, interfaceIndex, protocol, event,
+	  fullName ? fullName : "(null)", rrclass, rrtype, rdata,
+	  (unsigned)rdlen, flags, context);
 
  /*
   * Only process "add" data...
   */
 
-  if (event != AVAHI_RESOLVER_FOUND)
+  if (event != AVAHI_BROWSER_NEW)
   {
-    if (event == AVAHI_RESOLVER_FAILURE)
+    if (event == AVAHI_BROWSER_FAILURE)
     {
       fprintf(stderr, "ERROR: %s\n",
 	       avahi_strerror(avahi_client_errno(client)));
     }
 
-    avahi_service_resolver_free(resolver);
+//    avahi_record_browser_free(browser);
     return;
   }
 #  endif /* HAVE_DNSSD */
 
  /*
-  * Lookup the service in the devices array.
+  * Pull out the priority and make and model from the TXT
+  * record and save it...
   */
 
-  devices   = (cups_array_t *)context;
-  dkey.name = name;
+  const uint8_t	*data,		/* Pointer into data */
+		    *datanext,	/* Next key/value pair */
+		    *dataend;	/* End of entire TXT record */
+  uint8_t		datalen;	/* Length of current key/value pair */
+  char		key[256],	/* Key string */
+		    value[256],	/* Value string */
+		    make_and_model[512],
+				    /* Manufacturer and model */
+		    model[256],	/* Model */
+		    device_id[2048];/* 1284 device ID */
 
-  unquote(name, fullName, sizeof(name));
 
-  if ((dkey.domain = strstr(name, "._tcp.")) != NULL)
-    dkey.domain += 6;
-  else
-    dkey.domain = (char *)"local.";
+  device_id[0]      = '\0';
+  make_and_model[0] = '\0';
 
-  if ((ptr = strstr(name, "._")) != NULL)
+  strcpy(model, "Unknown");
+
+  for (data = rdata, dataend = data + rdlen;
+       data < dataend;
+       data = datanext)
+  {
+   /*
+    * Read a key/value pair starting with an 8-bit length.  Since the
+    * length is 8 bits and the size of the key/value buffers is 256, we
+    * don't need to check for overflow...
+    */
+
+    datalen = *data++;
+
+    if (!datalen || (data + datalen) > dataend)
+      break;
+
+    datanext = data + datalen;
+
+    for (ptr = key; data < datanext && *data != '='; data ++)
+      *ptr++ = *data;
     *ptr = '\0';
 
-  if (strstr(fullName, "_ipp._tcp."))
-    dkey.type = CUPS_DEVICE_IPP;
-  else if (strstr(fullName, "_ipps._tcp.") ||
-           strstr(fullName, "_ipp-tls._tcp."))
-    dkey.type = CUPS_DEVICE_IPPS;
-  else if (strstr(fullName, "_fax-ipp._tcp."))
-    dkey.type = CUPS_DEVICE_FAX_IPP;
-  else if (strstr(fullName, "_printer._tcp."))
-    dkey.type = CUPS_DEVICE_PRINTER;
-  else if (strstr(fullName, "_pdl-datastream._tcp."))
-    dkey.type = CUPS_DEVICE_PDL_DATASTREAM;
-  else
-    dkey.type = CUPS_DEVICE_RIOUSBPRINT;
-
-  for (device = cupsArrayFind(devices, &dkey);
-       device;
-       device = cupsArrayNext(devices))
-  {
-    if (_cups_strcasecmp(device->name, dkey.name) ||
-        _cups_strcasecmp(device->domain, dkey.domain))
+    if (data < datanext && *data == '=')
     {
-      device = NULL;
-      break;
+      data ++;
+
+      if (data < datanext)
+	memcpy(value, data, datanext - data);
+      value[datanext - data] = '\0';
+
+      fprintf(stderr, "DEBUG2: query_callback: \"%s=%s\".\n",
+	      key, value);
     }
-    else if (device->type == dkey.type)
+    else
+    {
+      fprintf(stderr, "DEBUG2: query_callback: \"%s\" with no value.\n",
+	      key);
+      continue;
+    }
+
+    if (!_cups_strncasecmp(key, "usb_", 4))
     {
      /*
-      * Found it, pull out the priority and make and model from the TXT
-      * record and save it...
+      * Add USB device ID information...
       */
 
-      const uint8_t	*data,		/* Pointer into data */
-			*datanext,	/* Next key/value pair */
-			*dataend;	/* End of entire TXT record */
-      uint8_t		datalen;	/* Length of current key/value pair */
-      char		key[256],	/* Key string */
-			value[256],	/* Value string */
-			make_and_model[512],
-				      	/* Manufacturer and model */
-			model[256],	/* Model */
-			device_id[2048];/* 1284 device ID */
+      ptr = device_id + strlen(device_id);
+      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s:%s;",
+	       key + 4, value);
+    }
 
-
-      device_id[0]      = '\0';
-      make_and_model[0] = '\0';
-
-      strcpy(model, "Unknown");
-
-      for (data = rdata, dataend = data + rdlen;
-           data < dataend;
-           data = datanext)
+    if (!_cups_strcasecmp(key, "usb_MFG") || !_cups_strcasecmp(key, "usb_MANU") ||
+	!_cups_strcasecmp(key, "usb_MANUFACTURER"))
+      strcpy(make_and_model, value);
+    else if (!_cups_strcasecmp(key, "usb_MDL") || !_cups_strcasecmp(key, "usb_MODEL"))
+      strcpy(model, value);
+    else if (!_cups_strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
+    {
+      if (value[0] == '(')
       {
        /*
-        * Read a key/value pair starting with an 8-bit length.  Since the
-	* length is 8 bits and the size of the key/value buffers is 256, we
-	* don't need to check for overflow...
+	* Strip parenthesis...
 	*/
 
-        datalen = *data++;
+	if ((ptr = value + strlen(value) - 1) > value && *ptr == ')')
+	  *ptr = '\0';
 
-        if (!datalen || (data + datalen) > dataend)
-	  break;
+	strcpy(model, value + 1);
+      }
+      else
+	strcpy(model, value);
+    }
+    else if (!_cups_strcasecmp(key, "ty"))
+    {
+      strcpy(model, value);
 
-        datanext = data + datalen;
-
-        for (ptr = key; data < datanext && *data != '='; data ++)
-	  *ptr++ = *data;
+      if ((ptr = strchr(model, ',')) != NULL)
 	*ptr = '\0';
+    }
+    else if (!_cups_strcasecmp(key, "priority"))
+      device->priority = atoi(value);
+    else if ((device->type == CUPS_DEVICE_IPP ||
+	      device->type == CUPS_DEVICE_IPPS ||
+	      device->type == CUPS_DEVICE_PRINTER) &&
+	     !_cups_strcasecmp(key, "printer-type"))
+    {
+     /*
+      * This is a CUPS printer!
+      */
 
-	if (data < datanext && *data == '=')
-	{
-	  data ++;
+      device->cups_shared = 1;
 
-	  if (data < datanext)
-	    memcpy(value, data, datanext - data);
-	  value[datanext - data] = '\0';
-
-	  fprintf(stderr, "DEBUG2: query_callback: \"%s=%s\".\n",
-	          key, value);
-	}
-	else
-	{
-	  fprintf(stderr, "DEBUG2: query_callback: \"%s\" with no value.\n",
-	          key);
-	  continue;
-	}
-
-        if (!_cups_strncasecmp(key, "usb_", 4))
-	{
-	 /*
-	  * Add USB device ID information...
-	  */
-
-	  ptr = device_id + strlen(device_id);
-	  snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s:%s;",
-	           key + 4, value);
-        }
-
-        if (!_cups_strcasecmp(key, "usb_MFG") || !_cups_strcasecmp(key, "usb_MANU") ||
-	    !_cups_strcasecmp(key, "usb_MANUFACTURER"))
-	  strcpy(make_and_model, value);
-        else if (!_cups_strcasecmp(key, "usb_MDL") || !_cups_strcasecmp(key, "usb_MODEL"))
-	  strcpy(model, value);
-	else if (!_cups_strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
-	{
-	  if (value[0] == '(')
-	  {
-	   /*
-	    * Strip parenthesis...
-	    */
-
-            if ((ptr = value + strlen(value) - 1) > value && *ptr == ')')
-	      *ptr = '\0';
-
-	    strcpy(model, value + 1);
-	  }
-	  else
-	    strcpy(model, value);
-        }
-	else if (!_cups_strcasecmp(key, "ty"))
-	{
-          strcpy(model, value);
-
-	  if ((ptr = strchr(model, ',')) != NULL)
-	    *ptr = '\0';
-	}
-	else if (!_cups_strcasecmp(key, "priority"))
-	  device->priority = atoi(value);
-	else if ((device->type == CUPS_DEVICE_IPP ||
-	          device->type == CUPS_DEVICE_IPPS ||
-	          device->type == CUPS_DEVICE_PRINTER) &&
-		 !_cups_strcasecmp(key, "printer-type"))
-	{
-	 /*
-	  * This is a CUPS printer!
-	  */
-
-	  device->cups_shared = 1;
-
-	  if (device->type == CUPS_DEVICE_PRINTER)
-	    device->sent = 1;
-	}
-      }
-
-      if (device->device_id)
-        free(device->device_id);
-
-      if (!device_id[0] && strcmp(model, "Unknown"))
-      {
-        if (make_and_model[0])
-	  snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
-	           make_and_model, model);
-        else if (!_cups_strncasecmp(model, "designjet ", 10))
-	  snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s", model + 10);
-        else if (!_cups_strncasecmp(model, "stylus ", 7))
-	  snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s", model + 7);
-        else if ((ptr = strchr(model, ' ')) != NULL)
-	{
-	 /*
-	  * Assume the first word is the make...
-	  */
-
-          memcpy(make_and_model, model, ptr - model);
-	  make_and_model[ptr - model] = '\0';
-
-	  snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",
-		   make_and_model, ptr + 1);
-        }
-      }
-
-      if (device_id[0])
-        device->device_id = strdup(device_id);
-      else
-        device->device_id = NULL;
-
-      if (device->make_and_model)
-	free(device->make_and_model);
-
-      if (make_and_model[0])
-      {
-	strlcat(make_and_model, " ", sizeof(make_and_model));
-	strlcat(make_and_model, model, sizeof(make_and_model));
-
-	device->make_and_model = strdup(make_and_model);
-      }
-      else
-	device->make_and_model = strdup(model);
-
-#  ifdef HAVE_AVAHI
-      got_callback = 1;
-#  endif /* HAVE_AVAHI */
-
-      break;
+      if (device->type == CUPS_DEVICE_PRINTER)
+	device->sent = 1;
     }
   }
 
-  if (!device)
-    fprintf(stderr, "DEBUG: Ignoring TXT record for \"%s\"...\n", fullName);
+  if (device->device_id)
+    free(device->device_id);
+
+  if (!device_id[0] && strcmp(model, "Unknown"))
+  {
+    if (make_and_model[0])
+      snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
+	       make_and_model, model);
+    else if (!_cups_strncasecmp(model, "designjet ", 10))
+      snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s", model + 10);
+    else if (!_cups_strncasecmp(model, "stylus ", 7))
+      snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s", model + 7);
+    else if ((ptr = strchr(model, ' ')) != NULL)
+    {
+     /*
+      * Assume the first word is the make...
+      */
+
+      memcpy(make_and_model, model, ptr - model);
+      make_and_model[ptr - model] = '\0';
+
+      snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",
+	       make_and_model, ptr + 1);
+    }
+  }
+
+  if (device_id[0])
+    device->device_id = strdup(device_id);
+  else
+    device->device_id = NULL;
+
+  if (device->make_and_model)
+    free(device->make_and_model);
+
+  if (make_and_model[0])
+  {
+    strlcat(make_and_model, " ", sizeof(make_and_model));
+    strlcat(make_and_model, model, sizeof(make_and_model));
+
+    device->make_and_model = strdup(make_and_model);
+  }
+  else
+    device->make_and_model = strdup(model);
+
+#  ifdef HAVE_AVAHI
+  got_callback = 1;
+#  endif /* HAVE_AVAHI */
 }
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
