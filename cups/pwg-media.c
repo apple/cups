@@ -761,8 +761,11 @@ _pwgMediaForSize(int width,		/* I - Width in 2540ths */
 		 int length)		/* I - Length in 2540ths */
 {
   int		i;			/* Looping var */
-  _pwg_media_t	*media;			/* Current media */
-  int		dw, dl;			/* Difference in width and length */
+  _pwg_media_t	*media,			/* Current media */
+		*best_media = NULL;	/* Best match */
+  int		dw, dl,			/* Difference in width and length */
+		best_dw = 999,		/* Best difference in width and length */
+		best_dl = 999;
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
@@ -787,12 +790,24 @@ _pwgMediaForSize(int width,		/* I - Width in 2540ths */
     * is just about 176/2540ths...
     */
 
-    dw = media->width - width;
-    dl = media->length - length;
+    dw = abs(media->width - width);
+    dl = abs(media->length - length);
 
-    if (dw > -176 && dw < 176 && dl > -176 && dl < 176)
+    if (!dw && !dl)
       return (media);
+    else if (dw < 176 && dl < 176)
+    {
+      if (dw <= best_dw && dl <= best_dl)
+      {
+        best_media = media;
+        best_dw    = dw;
+        best_dl    = dl;
+      }
+    }
   }
+
+  if (best_media)
+    return (best_media);
 
  /*
   * Not a standard size; convert it to a PWG custom name of the form:

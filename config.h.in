@@ -752,6 +752,22 @@
 #undef HAVE_MXML_H
 
 
+/*
+ * Do we have the C99 abs() function?
+ */
+
+#undef HAVE_ABS
+#if !defined(HAVE_ABS) && !defined(abs)
+#  if defined(__GNUC__) || __STDC_VERSION__ >= 199901L
+#    define abs(x) _cups_abs(x)
+static inline int _cups_abs(int i) { return (i < 0 : -i : i); }
+#  elif defined(_MSC_VER)
+#    define abs(x) _cups_abs(x)
+static __inline int _cups_abs(int i) { return (i < 0 : -i : i); }
+#  else
+#    define abs(x) ((x) < 0 ? -(x) : (x))
+#  endif /* !HAVE_ABS && !abs */
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
