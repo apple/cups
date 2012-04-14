@@ -44,6 +44,7 @@
  *   http_client_cb()	  - Client callback for resolving URI.
  *   http_copy_decode()   - Copy and decode a URI.
  *   http_copy_encode()   - Copy and encode a URI.
+ *   http_poll_cb()       - Wait for input on the specified file descriptors.
  *   http_resolve_cb()	  - Build a device URI for the given service name.
  *   http_resolve_cb()	  - Build a device URI for the given service name.
  */

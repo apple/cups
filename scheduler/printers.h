@@ -3,7 +3,7 @@
  *
  *   Printer definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,6 +15,10 @@
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
+#elif defined(HAVE_AVAHI)
+#  include <avahi-client/client.h>
+#  include <avahi-client/publish.h>
+#  include <avahi-common/thread-watch.h>
 #endif /* HAVE_DNSSD */
 #include <cups/pwg-private.h>
 
@@ -92,16 +96,27 @@ struct cupsd_printer_s
   time_t	marker_time;		/* Last time marker attributes were updated */
   _ppd_cache_t	*pc;			/* PPD cache and mapping data */
 
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   char		*reg_name,		/* Name used for service registration */
-		*pdl,			/* pdl value for TXT record */
-		*ipp_txt,		/* IPP TXT record contents */
-		*printer_txt;		/* LPD TXT record contents */
-  int		ipp_len,		/* IPP TXT record length */
-		printer_len;		/* LPD TXT record length */
-  DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp,_cups */
+		*pdl;			/* pdl value for TXT record */
+#  ifdef HAVE_DNSSD
+  TXTRecordRef	ipp_txt,		/* IPP(S) TXT record contents */
+		printer_txt;		/* LPD TXT record contents */
+  DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp */
+#    ifdef HAVE_SSL
+		ipps_ref,		/* Reference for _ipps._tcp */
+#    endif /* HAVE_SSL */
 		printer_ref;		/* Reference for _printer._tcp */
-#endif /* HAVE_DNSSD */
+#  else /* HAVE_AVAHI */
+  AvahiStringList *ipp_txt,		/* IPP(S) TXT record contents */
+		*printer_txt;		/* LPD TXT record contents */
+  AvahiEntryGroup *ipp_ref,		/* Reference for _ipp._tcp */
+#    ifdef HAVE_SSL
+		*ipps_ref,		/* Reference for _ipps._tcp */
+#    endif /* HAVE_SSL */
+		*printer_ref;		/* Reference for _printer._tcp */
+#  endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 };
 
 
