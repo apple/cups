@@ -837,9 +837,10 @@ cupsdDeletePrinter(
   cupsdClearString(&p->alert);
   cupsdClearString(&p->alert_description);
 
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   cupsdClearString(&p->pdl);
-#endif /* HAVE_DNSSD */
+  cupsdClearString(&p->reg_name);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   cupsArrayDelete(p->filetypes);
 
@@ -3571,7 +3572,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
     attr->values[i].string.text = _cupsStrAlloc(mimetype);
   }
 
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   {
     char		pdl[1024];	/* Buffer to build pdl list */
     mime_filter_t	*filter;	/* MIME filter looping var */
@@ -3627,7 +3628,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 
     cupsdSetString(&p->pdl, pdl);
   }
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 }
 
 

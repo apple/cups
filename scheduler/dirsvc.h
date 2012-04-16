@@ -39,8 +39,8 @@ VAR char		*DNSSDComputerName VALUE(NULL),
 					/* Computer/server name */
 			*DNSSDHostName	VALUE(NULL),
 					/* Hostname */
-			*DNSSDRegType VALUE(NULL);
-					/* Bonjour registration type */
+			*DNSSDSubTypes VALUE(NULL);
+					/* Bonjour registration subtypes */
 VAR cups_array_t	*DNSSDAlias	VALUE(NULL);
 					/* List of dynamic ServerAlias's */
 VAR int			DNSSDPort	VALUE(0);
@@ -48,18 +48,16 @@ VAR int			DNSSDPort	VALUE(0);
 VAR cups_array_t	*DNSSDPrinters	VALUE(NULL);
 					/* Printers we have registered */
 #  ifdef HAVE_DNSSD
-VAR DNSServiceRef	DNSSDRef	VALUE(NULL),
+VAR DNSServiceRef	DNSSDMaster	VALUE(NULL);
 					/* Master DNS-SD service reference */
-			WebIFRef	VALUE(NULL);
-					/* Service reference for the web interface */
-#  else
-VAR AvahiThreadedPoll	*DNSSDPoll	VALUE(NULL);
-					/* Threaded polling interface for Avahi */
+#  else /* HAVE_AVAHI */
+VAR AvahiThreadedPoll	*DNSSDMaster	VALUE(NULL);
+					/* Master polling interface for Avahi */
 VAR AvahiClient		*DNSSDClient	VALUE(NULL);
 					/* Client information */
-VAR AvahiEntryGroup	*WebIFRef	VALUE(NULL);
-					/* Service reference for the web interface */
 #  endif /* HAVE_DNSSD */
+VAR cupsd_srv_t		WebIFSrv	VALUE(NULL);
+					/* Service reference for the web interface */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 VAR char		*LPDConfigFile	VALUE(NULL),

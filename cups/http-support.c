@@ -63,12 +63,11 @@
 #  else
 #    include <sys/select.h>
 #  endif /* WIN32 */
-#endif /* HAVE_DNSSD */
-#ifdef HAVE_AVAHI
+#elif defined(HAVE_AVAHI)
 #  include <avahi-client/client.h>
 #  include <avahi-client/lookup.h>
 #  include <avahi-common/simple-watch.h>
-#endif /* HAVE_AVAHI */
+#endif /* HAVE_DNSSD */
 
 
 /*

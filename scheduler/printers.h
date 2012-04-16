@@ -37,6 +37,20 @@ typedef struct
 
 
 /*
+ * DNS-SD types to make the code cleaner/clearer...
+ */
+
+#ifdef HAVE_DNSSD
+typedef DNSServiceRef cupsd_srv_t;	/* Service reference */
+typedef TXTRecordRef cupsd_txt_t;	/* TXT record */
+
+#elif defined(HAVE_AVAHI)
+typedef AvahiEntryGroup *cupsd_srv_t;	/* Service reference */
+typedef AvahiStringList *cupsd_txt_t;	/* TXT record */
+#endif /* HAVE_DNSSD */
+
+
+/*
  * Printer/class information structure...
  */
 
@@ -99,22 +113,14 @@ struct cupsd_printer_s
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   char		*reg_name,		/* Name used for service registration */
 		*pdl;			/* pdl value for TXT record */
-#  ifdef HAVE_DNSSD
-  TXTRecordRef	ipp_txt,		/* IPP(S) TXT record contents */
+  cupsd_txt_t	ipp_txt,		/* IPP(S) TXT record contents */
 		printer_txt;		/* LPD TXT record contents */
-  DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp */
+  cupsd_srv_t	ipp_srv;		/* IPP service(s) */
+#  ifdef HAVE_DNSSD
 #    ifdef HAVE_SSL
-		ipps_ref,		/* Reference for _ipps._tcp */
+  cupsd_srv_t	ipps_srv;		/* IPPS service(s) */
 #    endif /* HAVE_SSL */
-		printer_ref;		/* Reference for _printer._tcp */
-#  else /* HAVE_AVAHI */
-  AvahiStringList *ipp_txt,		/* IPP(S) TXT record contents */
-		*printer_txt;		/* LPD TXT record contents */
-  AvahiEntryGroup *ipp_ref,		/* Reference for _ipp._tcp */
-#    ifdef HAVE_SSL
-		*ipps_ref,		/* Reference for _ipps._tcp */
-#    endif /* HAVE_SSL */
-		*printer_ref;		/* Reference for _printer._tcp */
+  cupsd_srv_t	printer_srv;		/* LPD service */
 #  endif /* HAVE_DNSSD */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 };
