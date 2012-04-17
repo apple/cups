@@ -1,9 +1,10 @@
-CHANGES.txt - 1.6b1 - 2012-03-16
+CHANGES.txt - 1.6b1 - 2012-04-17
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
 
 	- Documentation updates (STR #3927, STR #3980, STR #4010)
+	- CUPS now supports Bonjour using Avahi (STR #3066)
 	- The PreserveJobFiles and PreserveJobHistory directives now support
 	  specification of a time interval (STR #3143)
 	- PPD files can now be archived in (gzip'd) tar files to further reduce

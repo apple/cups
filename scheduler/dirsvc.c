@@ -14,31 +14,33 @@
  *
  * Contents:
  *
- *   cupsdDeregisterPrinter() - Stop sending broadcast information for a local
- *				printer and remove any pending references to
- *				remote printers.
- *   cupsdRegisterPrinter()   - Start sending broadcast information for a
- *				printer or update the broadcast contents.
- *   cupsdStartBrowsing()     - Start sending and receiving broadcast
- *				information.
- *   cupsdStopBrowsing()      - Stop sending and receiving broadcast
- *				information.
- *   cupsdUpdateDNSSDName()   - Update the computer name we use for browsing...
- *   dnssdAddAlias()	      - Add a DNS-SD alias name.
- *   dnssdBuildTxtRecord()    - Build a TXT record from printer info.
- *   dnssdDeregisterPrinter() - Stop sending broadcast information for a
- *				printer.
- *   dnssdPackTxtRecord()     - Pack an array of key/value pairs into the TXT
- *				record format.
- *   dnssdRegisterCallback()  - DNSServiceRegister callback.
- *   dnssdRegisterPrinter()   - Start sending broadcast information for a
- *				printer or update the broadcast contents.
- *   dnssdStop()	      - Stop all DNS-SD registrations.
- *   dnssdUpdate()	      - Handle DNS-SD queries.
- *   get_auth_info_required() - Get the auth-info-required value to advertise.
- *   get_hostconfig()	      - Get an /etc/hostconfig service setting.
- *   update_lpd()	      - Update the LPD configuration as needed.
- *   update_smb()	      - Update the SMB configuration as needed.
+ *   cupsdDeregisterPrinter()  - Stop sending broadcast information for a local
+ *				 printer and remove any pending references to
+ *				 remote printers.
+ *   cupsdRegisterPrinter()    - Start sending broadcast information for a
+ *				 printer or update the broadcast contents.
+ *   cupsdStartBrowsing()      - Start sending and receiving broadcast
+ *				 information.
+ *   cupsdStopBrowsing()       - Stop sending and receiving broadcast
+ *				 information.
+ *   cupsdUpdateDNSSDName()    - Update the computer name we use for
+ *				 browsing...
+ *   dnssdAddAlias()	       - Add a DNS-SD alias name.
+ *   dnssdBuildTxtRecord()     - Build a TXT record from printer info.
+ *   dnssdDeregisterInstance() - Deregister a DNS-SD service instance.
+ *   dnssdDeregisterPrinter()  - Deregister all services for a printer.
+ *   dnssdErrorString()        - Return an error string for an error code.
+ *   dnssdRegisterCallback()   - Free a TXT record.
+ *   dnssdRegisterCallback()   - DNSServiceRegister callback.
+ *   dnssdRegisterInstance()   - Register an instance of a printer service.
+ *   dnssdRegisterPrinter()    - Start sending broadcast information for a
+ *				 printer or update the broadcast contents.
+ *   dnssdStop()	       - Stop all DNS-SD registrations.
+ *   dnssdUpdate()	       - Handle DNS-SD queries.
+ *   get_auth_info_required()  - Get the auth-info-required value to advertise.
+ *   get_hostconfig()	       - Get an /etc/hostconfig service setting.
+ *   update_lpd()	       - Update the LPD configuration as needed.
+ *   update_smb()	       - Update the SMB configuration as needed.
  */
 
 /*
@@ -707,14 +709,8 @@ dnssdBuildTxtRecord(
   for (i = 0, txt = NULL; i < count; i ++)
     txt = avahi_string_list_add_printf(txt, "%s=%s", keyvalue[i][0],
                                        keyvalue[i][1]);
-
-  AvahiStringList *temp;
-  for (temp = txt; temp; temp = temp->next)
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "DNS-SD TXT %s %s", p->name, temp->text);
 #  endif /* HAVE_DNSSD */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdBuildTxtRecord: Returning %p", txt);
- 
   return (txt);
 }
 
@@ -1005,11 +1001,6 @@ dnssdRegisterInstance(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
 		  "Registering \"%s\" with DNS-SD type \"%s\".", name, type);
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "dnssdRegisterInstance(src=%p, p=%p, name=\"%s\", "
-                  "type=\"%s\", subtypes=\"%s\", port=%d, txt=%p, commit=%d)",
-                  srv, p, name, type, subtypes ? subtypes : "(null)", port,
-                  txt ? *txt : NULL, commit);
 
   if (p && !srv)
   {
@@ -1158,7 +1149,7 @@ dnssdRegisterInstance(
       cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD commit of \"%s\" failed.",
                       name);
   }
-     
+
   avahi_threaded_poll_unlock(DNSSDMaster);
 #  endif /* HAVE_DNSSD */
 
