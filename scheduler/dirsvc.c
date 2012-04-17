@@ -64,14 +64,14 @@
  */
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-static char	*get_auth_info_required(cupsd_printer_t *p, char *buffer,
-		                        size_t bufsize);
+static char		*get_auth_info_required(cupsd_printer_t *p,
+			                        char *buffer, size_t bufsize);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 #ifdef __APPLE__
-static int	get_hostconfig(const char *name);
+static int		get_hostconfig(const char *name);
 #endif /* __APPLE__ */
-static void	update_lpd(int onoff);
-static void	update_smb(int onoff);
+static void		update_lpd(int onoff);
+static void		update_smb(int onoff);
 
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
@@ -102,10 +102,12 @@ static int		dnssdRegisterInstance(cupsd_srv_t *srv,
 					      cupsd_printer_t *p,
 					      char *name, const char *type,
 					      const char *subtypes, int port,
-					      cupsd_txt_t *txt);
+					      cupsd_txt_t *txt, int commit);
 static void		dnssdRegisterPrinter(cupsd_printer_t *p);
 static void		dnssdStop(void);
+#  ifdef HAVE_DNSSD
 static void		dnssdUpdate(void);
+#  endif /* HAVE_DNSSD */
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
@@ -208,7 +210,32 @@ cupsdStartBrowsing(void)
     }
 
 #  else /* HAVE_AVAHI */
-    /* TODO: Create poll thread and client */
+    if ((DNSSDMaster = avahi_threaded_poll_new()) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create DNS-SD thread.");
+
+      if (FatalErrors & CUPSD_FATAL_BROWSE)
+	cupsdEndProcess(getpid(), 0);
+    }
+    else
+    {
+      int error;			/* Error code, if any */
+
+      DNSSDClient = avahi_client_new(avahi_threaded_poll_get(DNSSDMaster), 0,
+                                     NULL, NULL, &error);
+
+      if (DNSSDClient == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "Unable to communicate with avahi-daemon: %s",
+                        dnssdErrorString(error));
+
+        if (FatalErrors & CUPSD_FATAL_BROWSE)
+	  cupsdEndProcess(getpid(), 0);
+      }
+
+      avahi_threaded_poll_start(DNSSDMaster);
+    }
 #  endif /* HAVE_DNSSD */
 
    /*
@@ -428,9 +455,9 @@ cupsdUpdateDNSSDName(void)
 #  endif /* HAVE_SYSTEMCONFIGURATION */
 #  ifdef HAVE_AVAHI
   {
-   /* TODO: use avahi APIs to get hostname */
-    cupsdSetString(&DNSSDComputerName, ServerName);
-    cupsdSetString(&DNSSDHostName, ServerName);
+    cupsdSetString(&DNSSDComputerName, avahi_client_get_host_name(DNSSDClient));
+    cupsdSetString(&DNSSDHostName,
+                   avahi_client_get_host_name_fqdn(DNSSDClient));
   }
 #  else /* HAVE_DNSSD */
   {
@@ -452,7 +479,7 @@ cupsdUpdateDNSSDName(void)
 
     dnssdDeregisterInstance(&WebIFSrv);
     dnssdRegisterInstance(&WebIFSrv, NULL, webif, "_http._tcp", "_printer",
-                          DNSSDPort, NULL);
+                          DNSSDPort, NULL, 1);
   }
 }
 
@@ -545,10 +572,18 @@ dnssdBuildTxtRecord(
     keyvalue[count  ][0] = "ty";
     keyvalue[count++][1] = p->make_model ? p->make_model : "Unknown";
 
-    snprintf(admin_hostname, sizeof(admin_hostname), "%s.local.",
-             DNSSDHostName);
+    if (strstr(DNSSDHostName, ".local"))
+      strlcpy(admin_hostname, DNSSDHostName, sizeof(admin_hostname));
+    else
+      snprintf(admin_hostname, sizeof(admin_hostname), "%s.local.",
+               DNSSDHostName);
     httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str),
-		     "http", NULL, admin_hostname, DNSSDPort, "/%s/%s",
+#  ifdef HAVE_SSL
+		     "https",
+#  else
+		     "http",
+#  endif /* HAVE_SSL */
+		     NULL, admin_hostname, DNSSDPort, "/%s/%s",
 		     (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
 		     p->name);
     keyvalue[count  ][0] = "adminurl";
@@ -669,12 +704,17 @@ dnssdBuildTxtRecord(
   }
 
 #  else
-  txt = avahi_string_list_new(NULL);
+  for (i = 0, txt = NULL; i < count; i ++)
+    txt = avahi_string_list_add_printf(txt, "%s=%s", keyvalue[i][0],
+                                       keyvalue[i][1]);
 
-  for (i = 0; i < count; i ++)
-    avahi_string_list_add_printf(txt, "%s=%s", keyvalue[i][0], keyvalue[i][1]);
+  AvahiStringList *temp;
+  for (temp = txt; temp; temp = temp->next)
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "DNS-SD TXT %s %s", p->name, temp->text);
 #  endif /* HAVE_DNSSD */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdBuildTxtRecord: Returning %p", txt);
+ 
   return (txt);
 }
 
@@ -692,8 +732,11 @@ dnssdDeregisterInstance(
 
 #  ifdef HAVE_DNSSD
   DNSServiceRefDeallocate(*srv);
+
 #  else /* HAVE_AVAHI */
+  avahi_threaded_poll_lock(DNSSDMaster);
   avahi_entry_group_free(*srv);
+  avahi_threaded_poll_unlock(DNSSDMaster);
 #  endif /* HAVE_DNSSD */
 
   *srv = NULL;
@@ -724,9 +767,6 @@ dnssdDeregisterPrinter(
 #    endif /* HAVE_SSL */
     dnssdDeregisterInstance(&p->printer_srv);
 #  endif /* HAVE_DNSSD */
-
-    dnssdFreeTxtRecord(&p->ipp_txt);
-    dnssdFreeTxtRecord(&p->printer_txt);
   }
 
  /*
@@ -955,7 +995,8 @@ dnssdRegisterInstance(
     const char      *type,		/* I - DNS-SD service type */
     const char      *subtypes,		/* I - Subtypes to register or NULL */
     int             port,		/* I - Port number or 0 */
-    cupsd_txt_t     *txt)		/* I - TXT record */
+    cupsd_txt_t     *txt,		/* I - TXT record */
+    int             commit)		/* I - Commit registration? */
 {
   char	temp[256],			/* Temporary string */
 	*ptr;				/* Pointer into string */
@@ -964,6 +1005,11 @@ dnssdRegisterInstance(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
 		  "Registering \"%s\" with DNS-SD type \"%s\".", name, type);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "dnssdRegisterInstance(src=%p, p=%p, name=\"%s\", "
+                  "type=\"%s\", subtypes=\"%s\", port=%d, txt=%p, commit=%d)",
+                  srv, p, name, type, subtypes ? subtypes : "(null)", port,
+                  txt ? *txt : NULL, commit);
 
   if (p && !srv)
   {
@@ -986,16 +1032,23 @@ dnssdRegisterInstance(
 #  endif /* HAVE_DNSSD */
   }
 
-#  ifdef HAVE_AVAHI
+#  ifdef HAVE_DNSSD
+  (void)commit;
+
+#  else /* HAVE_AVAHI */
+  avahi_threaded_poll_lock(DNSSDMaster);
+
   if (!*srv)
     *srv = avahi_entry_group_new(DNSSDClient, dnssdRegisterCallback, NULL);
   if (!*srv)
   {
+    avahi_threaded_poll_unlock(DNSSDMaster);
+
     cupsdLogMessage(CUPSD_LOG_WARN, "DNS-SD registration of \"%s\" failed: %s",
                     name, dnssdErrorString(avahi_client_errno(DNSSDClient)));
-    return;
+    return (0);
   }
-#  endif /* HAVE_AVAHI */
+#  endif /* HAVE_DNSSD */
 
  /*
   * Make sure the name is <= 63 octets, and when we truncate be sure to
@@ -1033,9 +1086,20 @@ dnssdRegisterInstance(
 			     dnssdRegisterCallback, p);
 
 #  else /* HAVE_AVAHI */
+  if (txt)
+  {
+    AvahiStringList *temptxt;
+    for (temptxt = *txt; temptxt; temptxt = temptxt->next)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS_SD \"%s\" %s", name, temptxt->text);
+  }
+
   error = avahi_entry_group_add_service_strlst(*srv, AVAHI_IF_UNSPEC,
                                                AVAHI_PROTO_UNSPEC, 0, name,
-                                               type, NULL, NULL, port, *txt);
+                                               type, NULL, NULL, port,
+                                               txt ? *txt : NULL);
+  if (error)
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD service add for \"%s\" failed.",
+                    name);
 
   if (!error && subtypes)
   {
@@ -1079,14 +1143,33 @@ dnssdRegisterInstance(
                                                     AVAHI_PROTO_UNSPEC, 0,
                                                     name, type, NULL, subtype);
       if (error)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "DNS-SD subtype %s registration for \"%s\" failed." ,
+                        subtype, name);
         break;
+      }
     }
   }
+
+  if (!error && commit)
+  {
+    if ((error = avahi_entry_group_commit(*srv)) != 0)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD commit of \"%s\" failed.",
+                      name);
+  }
+     
+  avahi_threaded_poll_unlock(DNSSDMaster);
 #  endif /* HAVE_DNSSD */
 
   if (error)
+  {
     cupsdLogMessage(CUPSD_LOG_WARN, "DNS-SD registration of \"%s\" failed: %s",
                     name, dnssdErrorString(error));
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD type: %s", type);
+    if (subtypes)
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "DNS-SD sub-types: %s", subtypes);
+  }
 
   return (!error);
 }
@@ -1100,10 +1183,11 @@ dnssdRegisterInstance(
 static void
 dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 {
-  char	name[256];			/* Service name */
-  int	printer_port;			/* LPD port number */
-  int	status;				/* Registration status */
-
+  char		name[256];		/* Service name */
+  int		printer_port;		/* LPD port number */
+  int		status;			/* Registration status */
+  cupsd_txt_t	ipp_txt,		/* IPP(S) TXT record */
+ 		printer_txt;		/* LPD TXT record */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterPrinter(%s) %s", p->name,
                   !p->ipp_srv ? "new" : "update");
@@ -1148,8 +1232,8 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   * to share via LPD...
   */
 
-  p->ipp_txt     = dnssdBuildTxtRecord(p, 0);
-  p->printer_txt = dnssdBuildTxtRecord(p, 1);
+  ipp_txt     = dnssdBuildTxtRecord(p, 0);
+  printer_txt = dnssdBuildTxtRecord(p, 1);
 
   if (BrowseLocalProtocols & BROWSE_LPD)
     printer_port = 515;
@@ -1157,7 +1241,13 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     printer_port = 0;
 
   status = dnssdRegisterInstance(NULL, p, name, "_printer._tcp", NULL,
-                                 printer_port, &p->printer_txt);
+                                 printer_port, &printer_txt, 0);
+
+#  ifdef HAVE_SSL
+  if (status)
+    dnssdRegisterInstance(NULL, p, name, "_ipps._tcp", DNSSDSubTypes,
+			  DNSSDPort, &ipp_txt, 0);
+#  endif /* HAVE_SSL */
 
   if (status)
   {
@@ -1167,17 +1257,14 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
     if (p->type & CUPS_PRINTER_FAX)
       status = dnssdRegisterInstance(NULL, p, name, "_fax-ipp._tcp",
-                                     DNSSDSubTypes, DNSSDPort, &p->ipp_txt);
+                                     DNSSDSubTypes, DNSSDPort, &ipp_txt, 1);
     else
       status = dnssdRegisterInstance(NULL, p, name, "_ipp._tcp", DNSSDSubTypes,
-                                     DNSSDPort, &p->ipp_txt);
+                                     DNSSDPort, &ipp_txt, 1);
   }
 
-#  ifdef HAVE_SSL
-  if (status)
-    dnssdRegisterInstance(NULL, p, name, "_ipps._tcp", DNSSDSubTypes,
-			  DNSSDPort, &p->ipp_txt);
-#  endif /* HAVE_SSL */
+  dnssdFreeTxtRecord(&ipp_txt);
+  dnssdFreeTxtRecord(&printer_txt);
 
   if (status)
   {
@@ -1194,9 +1281,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
    /*
     * Registration failed for this printer...
     */
-
-    dnssdFreeTxtRecord(&p->ipp_txt);
-    dnssdFreeTxtRecord(&p->printer_txt);
 
     dnssdDeregisterInstance(&p->ipp_srv);
 
@@ -1233,16 +1317,21 @@ dnssdStop(void)
   * Shutdown the rest of the service refs...
   */
 
-  if (WebIFSrv)
-  {
-    DNSServiceRefDeallocate(WebIFSrv);
-    WebIFSrv = NULL;
-  }
+  dnssdDeregisterInstance(&WebIFSrv);
 
+#  ifdef HAVE_DNSSD
   cupsdRemoveSelect(DNSServiceRefSockFD(DNSSDMaster));
 
   DNSServiceRefDeallocate(DNSSDMaster);
   DNSSDMaster = NULL;
+
+#  else /* HAVE_AVAHI */
+  avahi_client_free(DNSSDClient);
+  DNSSDClient = NULL;
+
+  avahi_threaded_poll_free(DNSSDMaster);
+  DNSSDMaster = NULL;
+#  endif /* HAVE_DNSSD */
 
   cupsArrayDelete(DNSSDPrinters);
   DNSSDPrinters = NULL;

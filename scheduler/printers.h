@@ -18,6 +18,7 @@
 #elif defined(HAVE_AVAHI)
 #  include <avahi-client/client.h>
 #  include <avahi-client/publish.h>
+#  include <avahi-common/error.h>
 #  include <avahi-common/thread-watch.h>
 #endif /* HAVE_DNSSD */
 #include <cups/pwg-private.h>
@@ -113,8 +114,6 @@ struct cupsd_printer_s
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   char		*reg_name,		/* Name used for service registration */
 		*pdl;			/* pdl value for TXT record */
-  cupsd_txt_t	ipp_txt,		/* IPP(S) TXT record contents */
-		printer_txt;		/* LPD TXT record contents */
   cupsd_srv_t	ipp_srv;		/* IPP service(s) */
 #  ifdef HAVE_DNSSD
 #    ifdef HAVE_SSL
