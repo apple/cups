@@ -1963,7 +1963,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  else if (!strcmp(line, "password"))
 	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
 	  else if (!strcmp(line, "negotiate"))
-	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", data);
 	  else
 	    continue;
 
