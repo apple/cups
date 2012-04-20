@@ -1604,7 +1604,7 @@ process_children(void)
 	}
 
 	if (status && status != SIGTERM && status != SIGKILL &&
-	    status != SIGPIPE && job->status >= 0)
+	    status != SIGPIPE)
 	{
 	 /*
 	  * An error occurred; save the exit status so we know to stop
@@ -1612,12 +1612,24 @@ process_children(void)
 	  *
 	  * A negative status indicates that the backend failed and the
 	  * printer needs to be stopped.
+	  *
+	  * In order to preserve the most serious status, we always log
+	  * when a process dies due to a signal (e.g. SIGABRT, SIGSEGV,
+	  * and SIGBUS) and prefer to log the backend exit status over a
+	  * filter's.
 	  */
 
-	  if (job->filters[i])
-	    job->status = status;	/* Filter failed */
-	  else
-	    job->status = -status;	/* Backend failed */
+	  int old_status = abs(job->status);
+
+          if (WIFSIGNALED(status) ||	/* This process crashed, or */
+              !job->status ||		/* No process had a status, or */
+              (!job->filters[i] && WIFEXITED(old_status)))
+          {				/* Backend and filter didn't crash */
+	    if (job->filters[i])
+	      job->status = status;	/* Filter failed */
+	    else
+	      job->status = -status;	/* Backend failed */
+          }
 
 	  if (job->state_value == IPP_JOB_PROCESSING &&
 	      job->status_level > CUPSD_LOG_ERROR &&
