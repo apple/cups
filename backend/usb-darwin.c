@@ -1,7 +1,7 @@
 /*
 * "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $"
 *
-* Copyright 2005-2011 Apple Inc. All rights reserved.
+* Copyright 2005-2012 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -820,10 +820,10 @@ print_device(const char *uri,		/* I - Device URI */
    /*
     * If it didn't exit abort the pending read and wait an additional second...
     */
-  
+
     if (!g.read_thread_done)
     {
-      fputs("DEBUG: Read thread still active, aborting the pending read...\n", 
+      fputs("DEBUG: Read thread still active, aborting the pending read...\n",
 	    stderr);
 
       g.wait_eof = 0;
@@ -833,7 +833,7 @@ print_device(const char *uri,		/* I - Device URI */
       gettimeofday(&tv, NULL);
       cond_timeout.tv_sec  = tv.tv_sec + 1;
       cond_timeout.tv_nsec = tv.tv_usec * 1000;
-  
+
       while (!g.read_thread_done)
       {
 	if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
@@ -1283,7 +1283,7 @@ static Boolean find_device_cb(void *refcon,
   if (!keepLooking && g.status_timer != NULL)
   {
     fputs("STATE: -offline-report\n", stderr);
-    _cupsLangPrintFilter(stderr, "INFO", _("Printer is now online."));
+    _cupsLangPrintFilter(stderr, "INFO", _("The printer is now online."));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
     g.status_timer = NULL;
@@ -1304,7 +1304,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
   (void)info;
 
   fputs("STATE: +offline-report\n", stderr);
-  _cupsLangPrintFilter(stderr, "INFO", _("Printer is offline."));
+  _cupsLangPrintFilter(stderr, "INFO", _("The printer is offline."));
 
   if (getenv("CLASS") != NULL)
   {

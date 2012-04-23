@@ -71,7 +71,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     _cupsLangPrintf(stderr,
-                    _("Usage: %s job-id user title copies options file"),
+                    _("Usage: %s job-id user title copies options [file]"),
                     argv[0]);
     return (1);
   }

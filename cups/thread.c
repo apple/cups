@@ -3,7 +3,7 @@
  *
  *   Threading primitives for CUPS.
  *
- *   Copyright 2009-2010 by Apple Inc.
+ *   Copyright 2009-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -113,7 +113,7 @@ _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
  * '_cupsThreadCreate()' - Create a thread.
  */
 
-int					/* O - 0 on failure, 1 on success */	
+int					/* O - 0 on failure, 1 on success */
 _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
@@ -223,7 +223,7 @@ _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
  * '_cupsThreadCreate()' - Create a thread.
  */
 
-int					/* O - 0 on failure, 1 on success */	
+int					/* O - 0 on failure, 1 on success */
 _cupsThreadCreate(
     _cups_thread_func_t func,		/* I - Entry point */
     void                *arg)		/* I - Entry point context */
@@ -308,6 +308,25 @@ void
 _cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
 {
   (void)rwlock;
+}
+
+
+/*
+ * '_cupsThreadCreate()' - Create a thread.
+ */
+
+int					/* O - 0 on failure, 1 on success */
+_cupsThreadCreate(
+    _cups_thread_func_t func,		/* I - Entry point */
+    void                *arg)		/* I - Entry point context */
+{
+  fputs("DEBUG: CUPS was compiled without threading support, no thread "
+        "created.\n", stderr);
+
+  (void)func;
+  (void)arg;
+
+  return (0);
 }
 #endif /* HAVE_PTHREAD_H */
 

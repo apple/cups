@@ -1,6 +1,6 @@
                           CUPS License Agreement
 
-		      Copyright 2007-2011 by Apple Inc.
+		      Copyright 2007-2012 by Apple Inc.
 			     1 Infinite Loop
 			  Cupertino, CA 95014 USA
 
@@ -68,11 +68,11 @@ the following special exceptions:
 	   source code of the Apple OS-Developed Software.
 
 	b. An Apple Operating System means any operating system
-	   software developed and/or marketed by Apple Computer,
-	   Inc., including but not limited to all existing
-	   releases and versions of Apple's Darwin, Mac OS X,
-	   and Mac OS X Server products and all follow-on
-	   releases and future versions thereof.
+	   software developed and/or marketed by Apple Inc.,
+	   including but not limited to all existing releases and
+	   versions of Apple's Darwin, OS X, and OS X Server
+	   products and all follow-on releases and future
+	   versions thereof.
 
 	c. This exception is only available for Apple
 	   OS-Developed Software and does not apply to software

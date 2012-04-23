@@ -58,10 +58,10 @@ extern "C" {
 #  ifndef _PPD_DEPRECATED
 #    if defined(__APPLE__)
 #      if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
-         /* Building for 10.7 and earlier */
+         /* Building for OS X 10.7 and earlier */
 #        define _PPD_DEPRECATED
 #      elif !defined(MAC_OS_X_VERSION_10_8)
-	 /* Building for 10.7 and earlier */
+	 /* Building for OS X 10.7 and earlier */
 #        define _PPD_DEPRECATED
 #      else
 #        define _PPD_DEPRECATED _CUPS_DEPRECATED
@@ -119,7 +119,7 @@ typedef enum ppd_cs_e			/**** Colorspaces ****/
   PPD_CS_N				/* DeviceN colorspace */
 } ppd_cs_t;
 
-typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19/Mac OS X 10.3@ ****/
+typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19/OS X 10.3@ ****/
 {
   PPD_OK = 0,				/* OK */
   PPD_FILE_OPEN_ERROR,			/* Unable to open PPD file */
@@ -148,16 +148,16 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19/Mac OS X 10.3@ 
   PPD_MAX_STATUS			/* @private@ */
 } ppd_status_t;
 
-enum ppd_conform_e			/**** Conformance Levels @since CUPS 1.1.19/Mac OS X 10.3@ ****/
+enum ppd_conform_e			/**** Conformance Levels @since CUPS 1.1.19/OS X 10.3@ ****/
 {
   PPD_CONFORM_RELAXED,			/* Relax whitespace and control char */
   PPD_CONFORM_STRICT			/* Require strict conformance */
 };
 
 typedef enum ppd_conform_e ppd_conform_t;
-					/**** Conformance Levels @since CUPS 1.1.19/Mac OS X 10.3@ ****/
+					/**** Conformance Levels @since CUPS 1.1.19/OS X 10.3@ ****/
 
-typedef struct ppd_attr_s		/**** PPD Attribute Structure @since CUPS 1.1.19/Mac OS X 10.3@ ****/
+typedef struct ppd_attr_s		/**** PPD Attribute Structure @since CUPS 1.1.19/OS X 10.3@ ****/
 {
   char		name[PPD_MAX_NAME];	/* Name of attribute (cupsXYZ) */
   char		spec[PPD_MAX_NAME];	/* Specifier string, if any */
@@ -198,7 +198,7 @@ typedef struct ppd_group_s		/**** Groups ****/
    ****/
   char		text[PPD_MAX_TEXT - PPD_MAX_NAME];
   					/* Human-readable group name */
-  char		name[PPD_MAX_NAME];	/* Group name @since CUPS 1.1.18/Mac OS X 10.3@ */
+  char		name[PPD_MAX_NAME];	/* Group name @since CUPS 1.1.18/OS X 10.3@ */
   int		num_options;		/* Number of options */
   ppd_option_t	*options;		/* Options */
   int		num_subgroups;		/* Number of sub-groups */
@@ -243,8 +243,8 @@ typedef struct ppd_profile_s		/**** sRGB Color Profiles ****/
   float		matrix[3][3];		/* Transform matrix */
 } ppd_profile_t;
 
-/**** New in CUPS 1.2/Mac OS X 10.5 ****/
-typedef enum ppd_cptype_e		/**** Custom Parameter Type @since CUPS 1.2/Mac OS X 10.5@ ****/
+/**** New in CUPS 1.2/OS X 10.5 ****/
+typedef enum ppd_cptype_e		/**** Custom Parameter Type @since CUPS 1.2/OS X 10.5@ ****/
 {
   PPD_CUSTOM_CURVE,			/* Curve value for f(x) = x^value */
   PPD_CUSTOM_INT,			/* Integer number value */
@@ -256,7 +256,7 @@ typedef enum ppd_cptype_e		/**** Custom Parameter Type @since CUPS 1.2/Mac OS X 
   PPD_CUSTOM_STRING			/* String of characters */
 } ppd_cptype_t;
 
-typedef union ppd_cplimit_u		/**** Custom Parameter Limit @since CUPS 1.2/Mac OS X 10.5@ ****/
+typedef union ppd_cplimit_u		/**** Custom Parameter Limit @since CUPS 1.2/OS X 10.5@ ****/
 {
   float		custom_curve;		/* Gamma value */
   int		custom_int;		/* Integer value */
@@ -268,7 +268,7 @@ typedef union ppd_cplimit_u		/**** Custom Parameter Limit @since CUPS 1.2/Mac OS
   int		custom_string;		/* String length */
 } ppd_cplimit_t;
 
-typedef union ppd_cpvalue_u		/**** Custom Parameter Value @since CUPS 1.2/Mac OS X 10.5@ ****/
+typedef union ppd_cpvalue_u		/**** Custom Parameter Value @since CUPS 1.2/OS X 10.5@ ****/
 {
   float		custom_curve;		/* Gamma value */
   int		custom_int;		/* Integer value */
@@ -280,7 +280,7 @@ typedef union ppd_cpvalue_u		/**** Custom Parameter Value @since CUPS 1.2/Mac OS
   char		*custom_string;		/* String value */
 } ppd_cpvalue_t;
 
-typedef struct ppd_cparam_s		/**** Custom Parameter @since CUPS 1.2/Mac OS X 10.5@ ****/
+typedef struct ppd_cparam_s		/**** Custom Parameter @since CUPS 1.2/OS X 10.5@ ****/
 {
   char		name[PPD_MAX_NAME];	/* Parameter name */
   char		text[PPD_MAX_TEXT];	/* Human-readable text */
@@ -291,7 +291,7 @@ typedef struct ppd_cparam_s		/**** Custom Parameter @since CUPS 1.2/Mac OS X 10.
   ppd_cpvalue_t	current;		/* Current value */
 } ppd_cparam_t;
 
-typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2/Mac OS X 10.5@ ****/
+typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2/OS X 10.5@ ****/
 {
   char		keyword[PPD_MAX_NAME];	/* Name of option that is being extended... */
   ppd_option_t	*option;		/* Option that is being extended... */
@@ -300,7 +300,7 @@ typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2/Mac OS X 10.5@
 } ppd_coption_t;
 
 typedef struct _ppd_cache_s _ppd_cache_t;
-					/**** PPD cache and mapping data @since CUPS 1.5/Mac OS X 10.7@ @private@ ****/
+					/**** PPD cache and mapping data @since CUPS 1.5/OS X 10.7@ @private@ ****/
 
 typedef struct ppd_file_s		/**** PPD File ****/
 {
@@ -348,25 +348,25 @@ typedef struct ppd_file_s		/**** PPD File ****/
   int		flip_duplex;		/* 1 = Flip page for back sides @deprecated@ */
 
   /**** New in CUPS 1.1.19 ****/
-  char		*protocols;		/* Protocols (BCP, TBCP) string @since CUPS 1.1.19/Mac OS X 10.3@ */
-  char		*pcfilename;		/* PCFileName string @since CUPS 1.1.19/Mac OS X 10.3@ */
-  int		num_attrs;		/* Number of attributes @since CUPS 1.1.19/Mac OS X 10.3@ @private@ */
-  int		cur_attr;		/* Current attribute @since CUPS 1.1.19/Mac OS X 10.3@ @private@ */
-  ppd_attr_t	**attrs;		/* Attributes @since CUPS 1.1.19/Mac OS X 10.3@ @private@ */
+  char		*protocols;		/* Protocols (BCP, TBCP) string @since CUPS 1.1.19/OS X 10.3@ */
+  char		*pcfilename;		/* PCFileName string @since CUPS 1.1.19/OS X 10.3@ */
+  int		num_attrs;		/* Number of attributes @since CUPS 1.1.19/OS X 10.3@ @private@ */
+  int		cur_attr;		/* Current attribute @since CUPS 1.1.19/OS X 10.3@ @private@ */
+  ppd_attr_t	**attrs;		/* Attributes @since CUPS 1.1.19/OS X 10.3@ @private@ */
 
-  /**** New in CUPS 1.2/Mac OS X 10.5 ****/
-  cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
-  cups_array_t	*options;		/* Option lookup array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
-  cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
+  /**** New in CUPS 1.2/OS X 10.5 ****/
+  cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2/OS X 10.5@ @private@ */
+  cups_array_t	*options;		/* Option lookup array @since CUPS 1.2/OS X 10.5@ @private@ */
+  cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2/OS X 10.5@ @private@ */
 
-  /**** New in CUPS 1.3/Mac OS X 10.5 ****/
-  cups_array_t	*marked;		/* Marked choices @since CUPS 1.3/Mac OS X 10.5@ @private@ */
+  /**** New in CUPS 1.3/OS X 10.5 ****/
+  cups_array_t	*marked;		/* Marked choices @since CUPS 1.3/OS X 10.5@ @private@ */
 
-  /**** New in CUPS 1.4/Mac OS X 10.6 ****/
-  cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
+  /**** New in CUPS 1.4/OS X 10.6 ****/
+  cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/OS X 10.6@ @private@ */
 
   /**** New in CUPS 1.5 ****/
-  _ppd_cache_t	*cache;			/* PPD cache and mapping data @since CUPS 1.5/Mac OS X 10.7@ @private@ */
+  _ppd_cache_t	*cache;			/* PPD cache and mapping data @since CUPS 1.5/OS X 10.7@ @private@ */
 } ppd_file_t;
 
 
@@ -434,14 +434,14 @@ extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern int		ppdLocalize(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _PPD_DEPRECATED;
 
-/**** New in CUPS 1.3/Mac OS X 10.5 ****/
+/**** New in CUPS 1.3/OS X 10.5 ****/
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
 					      char *buffer,
 					      size_t bufsize) _PPD_DEPRECATED;
 
-/**** New in CUPS 1.4/Mac OS X 10.6 ****/
+/**** New in CUPS 1.4/OS X 10.6 ****/
 extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
 					 const char *choice,
 					 cups_option_t **options)

@@ -616,7 +616,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   if (recv(fd, &status, 1, 0) < 1)
   {
-    _cupsLangPrintFilter(stderr, "WARNING", _("Printer did not respond."));
+    _cupsLangPrintFilter(stderr, "WARNING", _("The printer did not respond."));
     status = errno;
   }
 
@@ -825,7 +825,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-	                           _("The printer is busy."));
+	                           _("The printer is in use."));
 	      break;
         }
 
@@ -1006,7 +1006,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
         if (read(fd, &status, 1) < 1)
 	{
 	  _cupsLangPrintFilter(stderr, "WARNING",
-	                       _("Printer did not respond."));
+	                       _("The printer did not respond."));
 	  status = errno;
 	}
       }
@@ -1088,7 +1088,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
           if (recv(fd, &status, 1, 0) < 1)
 	  {
 	    _cupsLangPrintFilter(stderr, "WARNING",
-			         _("Printer did not respond."));
+			         _("The printer did not respond."));
 	    status = 0;
           }
 	}
@@ -1138,7 +1138,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
         if (read(fd, &status, 1) < 1)
 	{
 	  _cupsLangPrintFilter(stderr, "WARNING",
-			       _("Printer did not respond."));
+			       _("The printer did not respond."));
 	  status = errno;
 	}
       }

@@ -3,7 +3,7 @@
  *
  *   Configuration file definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,7 +69,7 @@ typedef enum
 
 #define PRINTCAP_BSD		0	/* Berkeley LPD format */
 #define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
-#define PRINTCAP_PLIST		2	/* Mac OS X plist format */
+#define PRINTCAP_PLIST		2	/* OS X plist format */
 
 
 /*

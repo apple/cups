@@ -74,6 +74,7 @@ AC_OUTPUT(Makedefs
 	  man/cups-deviced.man
 	  man/cups-driverd.man
 	  man/cups-lpd.man
+	  man/cups-snmp.man
 	  man/cupsaddsmb.man
 	  man/cupsd.conf.man
 	  man/cupsd.man

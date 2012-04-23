@@ -599,7 +599,7 @@
 
 
 /*
- * Do we have Mac OS X 10.4's mbr_XXX functions?
+ * Do we have OS X 10.4's mbr_XXX functions?
  */
 
 /* #undef HAVE_MEMBERSHIP_H */
@@ -761,7 +761,7 @@
 
 
 /*
- * Location of Mac OS X localization bundle, if any.
+ * Location of OS X localization bundle, if any.
  */
 
 /* #undef CUPS_BUNDLEDIR */

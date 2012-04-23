@@ -323,7 +323,7 @@ ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
 #
-# Mac OS X filters and configuration files...
+# Local filters and configuration files...
 #
 
 if test `uname` = Darwin; then

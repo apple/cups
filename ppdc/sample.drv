@@ -44,15 +44,6 @@
 //#po zh_TW ""
 
 // MediaSize sizes used by label drivers...
-#media "w81h252/Address - 1 1/8 x 3 1/2\"" 81 252
-#media "w101h252/Large Address - 1 4/10 x 3 1/2\"" 101 252
-#media "w54h144/Return Address - 3/4 x 2\"" 54 144
-#media "w167h288/Shipping Address - 2 5/16 x 4\"" 167 288
-#media "w162h540/Internet Postage 2-Part - 2 1/4 x 7 1/2\"" 162 540
-#media "w162h504/Internet Postage 3-Part - 2 1/4 x 7\"" 162 504
-#media "w41h248/File Folder - 9/16 x 3 7/16\"" 41 248
-#media "w41h144/Hanging Folder - 9/16 x 2\"" 41 144
-#media "w153h198/3.5\" Disk - 2 1/8 x 2 3/4\"" 153 198
 #media "w90h18/1.25x0.25\"" 90 18
 #media "w90h162/1.25x2.25\"" 90 162
 #media "w108h18/1.50x0.25\"" 108 18
@@ -117,7 +108,7 @@ Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright 2007-2011 by Apple Inc."
+Copyright "Copyright 2007-2012 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "These coded instructions, statements, and computer programs are the"

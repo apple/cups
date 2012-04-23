@@ -569,7 +569,7 @@
 
 
 /*
- * Do we have Mac OS X 10.4's mbr_XXX functions?
+ * Do we have OS X 10.4's mbr_XXX functions?
  */
 
 #undef HAVE_MEMBERSHIP_H
@@ -731,7 +731,7 @@
 
 
 /*
- * Location of Mac OS X localization bundle, if any.
+ * Location of OS X localization bundle, if any.
  */
 
 #undef CUPS_BUNDLEDIR
@@ -751,6 +751,23 @@
 
 #undef HAVE_MXML_H
 
+
+/*
+ * Do we have the C99 abs() function?
+ */
+
+#undef HAVE_ABS
+#if !defined(HAVE_ABS) && !defined(abs)
+#  if defined(__GNUC__) || __STDC_VERSION__ >= 199901L
+#    define abs(x) _cups_abs(x)
+static inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  elif defined(_MSC_VER)
+#    define abs(x) _cups_abs(x)
+static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  else
+#    define abs(x) ((x) < 0 ? -(x) : (x))
+#  endif /* __GNUC__ || __STDC_VERSION__ */
+#endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
 

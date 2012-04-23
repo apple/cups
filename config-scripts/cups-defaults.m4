@@ -24,8 +24,8 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 	esac])
 AC_SUBST(LANGUAGES)
 
-dnl Mac OS X bundle-based localization support
-AC_ARG_WITH(bundledir, [  --with-bundledir        set Mac OS X localization bundle directory ],
+dnl OS X bundle-based localization support
+AC_ARG_WITH(bundledir, [  --with-bundledir        set OS X localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
 	if test "x$uname" = xDarwin -a $uversion -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
@@ -102,7 +102,7 @@ AC_ARG_WITH(local_protocols, [  --with-local-protocols  set default BrowseLocalP
 
 if test x$with_local_protocols != xno; then
 	if test "x$default_local_protocols" = "xdefault"; then
-		if test "x$DNSSDLIBS" != "x"; then
+		if test "x$DNSSD_BACKEND" != "x"; then
 			CUPS_BROWSE_LOCAL_PROTOCOLS="dnssd"
 		else
 			CUPS_BROWSE_LOCAL_PROTOCOLS=""
@@ -373,7 +373,7 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl Web interface...
-AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for Mac OS X])
+AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for OS X])
 case "x$enable_webif" in
 	xno)
 		CUPS_WEBIF=No

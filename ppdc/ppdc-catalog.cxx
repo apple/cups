@@ -3,7 +3,7 @@
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -206,8 +206,8 @@ ppdcCatalog::load_messages(
   else if (!strcmp(ptr, ".strings"))
   {
    /*
-    * Read messages in Mac OS X ".strings" format, which are UTF-16 text
-    * files of the format:
+    * Read messages in OS X ".strings" format, which are UTF-16 text files of
+    * the format:
     *
     *     "id" = "str";
     *
@@ -318,7 +318,7 @@ ppdcCatalog::load_messages(
     int	which,				// In msgid?
 	haveid,				// Did we get a msgid string?
 	havestr;			// Did we get a msgstr string?
-		
+
     linenum = 0;
     id[0]   = '\0';
     str[0]  = '\0';

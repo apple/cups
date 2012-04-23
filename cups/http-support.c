@@ -3,7 +3,7 @@
  *
  *   HTTP support routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,33 +16,37 @@
  *
  * Contents:
  *
- *   httpAssembleURI()    - Assemble a uniform resource identifier from its
- *                          components.
+ *   httpAssembleURI()	  - Assemble a uniform resource identifier from its
+ *			    components.
  *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
- *                          components with a formatted resource.
+ *			    components with a formatted resource.
  *   _httpAssembleUUID()  - Make a UUID URI conforming to RFC 4122.
- *   httpDecode64()       - Base64-decode a string.
- *   httpDecode64_2()     - Base64-decode a string.
- *   httpEncode64()       - Base64-encode a string.
- *   httpEncode64_2()     - Base64-encode a string.
+ *   httpDecode64()	  - Base64-decode a string.
+ *   httpDecode64_2()	  - Base64-decode a string.
+ *   httpEncode64()	  - Base64-encode a string.
+ *   httpEncode64_2()	  - Base64-encode a string.
  *   httpGetDateString()  - Get a formatted date/time string from a time value.
  *   httpGetDateString2() - Get a formatted date/time string from a time value.
- *   httpGetDateTime()    - Get a time value from a formatted date/time string.
- *   httpSeparate()       - Separate a Universal Resource Identifier into its
- *                          components.
- *   httpSeparate2()      - Separate a Universal Resource Identifier into its
- *                          components.
- *   httpSeparateURI()    - Separate a Universal Resource Identifier into its
- *                          components.
- *   httpStatus()         - Return a short string describing a HTTP status code.
- *   _cups_hstrerror()    - hstrerror() emulation function for Solaris and
- *                          others.
- *   _httpDecodeURI()     - Percent-decode a HTTP request URI.
- *   _httpEncodeURI()     - Percent-encode a HTTP request URI.
- *   _httpResolveURI()    - Resolve a DNS-SD URI.
+ *   httpGetDateTime()	  - Get a time value from a formatted date/time string.
+ *   httpSeparate()	  - Separate a Universal Resource Identifier into its
+ *			    components.
+ *   httpSeparate2()	  - Separate a Universal Resource Identifier into its
+ *			    components.
+ *   httpSeparateURI()	  - Separate a Universal Resource Identifier into its
+ *			    components.
+ *   httpStatus()	  - Return a short string describing a HTTP status
+ *			    code.
+ *   _cups_hstrerror()	  - hstrerror() emulation function for Solaris and
+ *			    others.
+ *   _httpDecodeURI()	  - Percent-decode a HTTP request URI.
+ *   _httpEncodeURI()	  - Percent-encode a HTTP request URI.
+ *   _httpResolveURI()	  - Resolve a DNS-SD URI.
+ *   http_client_cb()	  - Client callback for resolving URI.
  *   http_copy_decode()   - Copy and decode a URI.
  *   http_copy_encode()   - Copy and encode a URI.
- *   http_resolve_cb()    - Build a device URI for the given service name.
+ *   http_poll_cb()       - Wait for input on the specified file descriptors.
+ *   http_resolve_cb()	  - Build a device URI for the given service name.
+ *   http_resolve_cb()	  - Build a device URI for the given service name.
  */
 
 /*
@@ -59,6 +63,10 @@
 #  else
 #    include <sys/select.h>
 #  endif /* WIN32 */
+#elif defined(HAVE_AVAHI)
+#  include <avahi-client/client.h>
+#  include <avahi-client/lookup.h>
+#  include <avahi-common/simple-watch.h>
 #endif /* HAVE_DNSSD */
 
 
@@ -68,9 +76,12 @@
 
 typedef struct _http_uribuf_s		/* URI buffer */
 {
-  char		*buffer;		/* Pointer to buffer */
-  size_t	bufsize;		/* Size of buffer */
-  int		options;		/* Options passed to _httpResolveURI */
+#ifdef HAVE_AVAHI
+  AvahiSimplePoll	*poll;		/* Poll state */
+#endif /* HAVE_AVAHI */
+  char			*buffer;	/* Pointer to buffer */
+  size_t		bufsize;	/* Size of buffer */
+  int			options;	/* Options passed to _httpResolveURI */
 } _http_uribuf_t;
 
 
@@ -127,6 +138,22 @@ static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
 					void *context);
 #endif /* HAVE_DNSSD */
 
+#ifdef HAVE_AVAHI
+static void	http_client_cb(AvahiClient *client,
+			       AvahiClientState state, void *simple_poll);
+static int	http_poll_cb(struct pollfd *pollfds, unsigned int num_pollfds,
+		             int timeout, void *context);
+static void	http_resolve_cb(AvahiServiceResolver *resolver,
+				AvahiIfIndex interface,
+				AvahiProtocol protocol,
+				AvahiResolverEvent event,
+				const char *name, const char *type,
+				const char *domain, const char *host_name,
+				const AvahiAddress *address, uint16_t port,
+				AvahiStringList *txt,
+				AvahiLookupResultFlags flags, void *context);
+#endif /* HAVE_AVAHI */
+
 
 /*
  * 'httpAssembleURI()' - Assemble a uniform resource identifier from its
@@ -137,7 +164,7 @@ static void DNSSD_API	http_resolve_cb(DNSServiceRef sdRef,
  * place of traditional string functions whenever you need to create a
  * URI string.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 http_uri_status_t			/* O - URI status */
@@ -387,7 +414,7 @@ httpAssembleURI(
  * this function in place of traditional string functions whenever
  * you need to create a URI string.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 http_uri_status_t			/* O - URI status */
@@ -517,7 +544,7 @@ httpDecode64(char       *out,		/* I - String to write to */
 /*
  * 'httpDecode64_2()' - Base64-decode a string.
  *
- * @since CUPS 1.1.21/Mac OS X 10.4@
+ * @since CUPS 1.1.21/OS X 10.4@
  */
 
 char *					/* O  - Decoded string */
@@ -636,7 +663,7 @@ httpEncode64(char       *out,		/* I - String to write to */
 /*
  * 'httpEncode64_2()' - Base64-encode a string.
  *
- * @since CUPS 1.1.21/Mac OS X 10.4@
+ * @since CUPS 1.1.21/OS X 10.4@
  */
 
 char *					/* O - Encoded string */
@@ -745,7 +772,7 @@ httpGetDateString(time_t t)		/* I - UNIX time */
 /*
  * 'httpGetDateString2()' - Get a formatted date/time string from a time value.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 const char *				/* O - Date/time string */
@@ -865,7 +892,7 @@ httpSeparate(const char *uri,		/* I - Universal Resource Identifier */
  *
  * This function is deprecated; use the httpSeparateURI() function instead.
  *
- * @since CUPS 1.1.21/Mac OS X 10.4@
+ * @since CUPS 1.1.21/OS X 10.4@
  * @deprecated@
  */
 
@@ -890,7 +917,7 @@ httpSeparate2(const char *uri,		/* I - Universal Resource Identifier */
  * 'httpSeparateURI()' - Separate a Universal Resource Identifier into its
  *                       components.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 http_uri_status_t			/* O - Result of separation */
@@ -1434,24 +1461,29 @@ _httpResolveURI(
 
   if (strstr(hostname, "._tcp"))
   {
-#ifdef HAVE_DNSSD
-#  ifdef WIN32
-#    pragma comment(lib, "dnssd.lib")
-#  endif /* WIN32 */
-    DNSServiceRef	ref,		/* DNS-SD master service reference */
-			domainref,	/* DNS-SD service reference for domain */
-			localref;	/* DNS-SD service reference for .local */
-    int			domainsent = 0,	/* Send the domain resolve? */
-			offline = 0;	/* offline-report state set? */
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     char		*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     _http_uribuf_t	uribuf;		/* URI buffer */
-#ifdef HAVE_POLL
+    int			offline = 0;	/* offline-report state set? */
+#  ifdef HAVE_DNSSD
+#    ifdef WIN32
+#      pragma comment(lib, "dnssd.lib")
+#    endif /* WIN32 */
+    DNSServiceRef	ref,		/* DNS-SD master service reference */
+			domainref,	/* DNS-SD service reference for domain */
+			localref;	/* DNS-SD service reference for .local */
+    int			domainsent = 0;	/* Send the domain resolve? */
+#    ifdef HAVE_POLL
     struct pollfd	polldata;	/* Polling data */
-#else /* select() */
+#    else /* select() */
     fd_set		input_set;	/* Input set for select() */
     struct timeval	stimeout;	/* Timeout value for select() */
-#endif /* HAVE_POLL */
+#    endif /* HAVE_POLL */
+#  elif defined(HAVE_AVAHI)
+    AvahiClient		*client;	/* Client information */
+    int			error;		/* Status */
+#  endif /* HAVE_DNSSD */
 
     if (options & _HTTP_RESOLVE_STDERR)
       fprintf(stderr, "DEBUG: Resolving \"%s\"...\n", hostname);
@@ -1491,6 +1523,7 @@ _httpResolveURI(
     uribuf.buffer   = resolved_uri;
     uribuf.bufsize  = resolved_size;
     uribuf.options  = options;
+
     resolved_uri[0] = '\0';
 
     DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
@@ -1504,6 +1537,7 @@ _httpResolveURI(
 
     uri = NULL;
 
+#  ifdef HAVE_DNSSD
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
       localref = ref;
@@ -1536,26 +1570,26 @@ _httpResolveURI(
 	  if ((timeout = end_time - time(NULL)) > 2)
 	    timeout = 2;
 
-#ifdef HAVE_POLL
+#    ifdef HAVE_POLL
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
 	  fds = poll(&polldata, 1, 1000 * timeout);
 
-#else /* select() */
+#    else /* select() */
 	  FD_ZERO(&input_set);
 	  FD_SET(DNSServiceRefSockFD(ref), &input_set);
 
-#ifdef WIN32
+#      ifdef WIN32
 	  stimeout.tv_sec  = (long)timeout;
-#else
+#      else
 	  stimeout.tv_sec  = timeout;
-#endif /* WIN32 */
+#      endif /* WIN32 */
 	  stimeout.tv_usec = 0;
 
 	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL,
 		       &stimeout);
-#endif /* HAVE_POLL */
+#    endif /* HAVE_POLL */
 
 	  if (fds < 0)
 	  {
@@ -1619,6 +1653,74 @@ _httpResolveURI(
 
       DNSServiceRefDeallocate(ref);
     }
+#  else /* HAVE_AVAHI */
+    if ((uribuf.poll = avahi_simple_poll_new()) != NULL)
+    {
+      avahi_simple_poll_set_func(uribuf.poll, http_poll_cb, NULL);
+
+      if ((client = avahi_client_new(avahi_simple_poll_get(uribuf.poll),
+				      0, http_client_cb,
+				      &uribuf, &error)) != NULL)
+      {
+	if (avahi_service_resolver_new(client, AVAHI_IF_UNSPEC,
+				       AVAHI_PROTO_UNSPEC, hostname,
+				       regtype, "local.", AVAHI_PROTO_UNSPEC, 0,
+				       http_resolve_cb, &uribuf) != NULL)
+	{
+	  time_t	start_time = time(NULL),
+	  				/* Start time */
+			end_time = start_time + 90;
+					/* End time */
+          int           pstatus;	/* Poll status */
+
+	  pstatus = avahi_simple_poll_iterate(uribuf.poll, 2000);
+
+	  if (pstatus == 0 && !resolved_uri[0] && domain &&
+	      _cups_strcasecmp(domain, "local."))
+	  {
+	   /*
+	    * Resolve for .local hasn't returned anything, try the listed
+	    * domain...
+	    */
+
+	    avahi_service_resolver_new(client, AVAHI_IF_UNSPEC,
+				       AVAHI_PROTO_UNSPEC, hostname,
+				       regtype, domain, AVAHI_PROTO_UNSPEC, 0,
+				       http_resolve_cb, &uribuf);
+          }
+
+	  while (!pstatus && !resolved_uri[0] && time(NULL) < end_time)
+          {
+  	    if ((pstatus = avahi_simple_poll_iterate(uribuf.poll, 2000)) != 0)
+  	      break;
+
+	   /*
+	    * If it hasn't resolved within 5 seconds set the offline-report
+	    * printer-state-reason...
+	    */
+
+	    if ((options & _HTTP_RESOLVE_STDERR) && offline == 0 &&
+	        time(NULL) > (start_time + 5))
+	    {
+	      fputs("STATE: +offline-report\n", stderr);
+	      offline = 1;
+	    }
+          }
+
+	 /*
+	  * Collect the result (if we got one).
+	  */
+
+	  if (resolved_uri[0])
+	    uri = resolved_uri;
+	}
+
+	avahi_client_free(client);
+      }
+
+      avahi_simple_poll_free(uribuf.poll);
+    }
+#  endif /* HAVE_DNSSD */
 
     if (options & _HTTP_RESOLVE_STDERR)
     {
@@ -1634,13 +1736,13 @@ _httpResolveURI(
       }
     }
 
-#else
+#else /* HAVE_DNSSD || HAVE_AVAHI */
    /*
     * No DNS-SD support...
     */
 
     uri = NULL;
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
     if ((options & _HTTP_RESOLVE_STDERR) && !uri)
       _cupsLangPrintFilter(stderr, "ERROR", _("Unable to find printer."));
@@ -1659,6 +1761,35 @@ _httpResolveURI(
 
   return (uri);
 }
+
+
+#ifdef HAVE_AVAHI
+/*
+ * 'http_client_cb()' - Client callback for resolving URI.
+ */
+
+static void
+http_client_cb(
+    AvahiClient      *client,		/* I - Client information */
+    AvahiClientState state,		/* I - Current state */
+    void             *context)		/* I - Pointer to URI buffer */
+{
+  DEBUG_printf(("7http_client_cb(client=%p, state=%d, context=%p)", client,
+                state, context));
+
+ /*
+  * If the connection drops, quit.
+  */
+
+  if (state == AVAHI_CLIENT_FAILURE)
+  {
+    _http_uribuf_t *uribuf = (_http_uribuf_t *)context;
+					/* URI buffer */
+
+    avahi_simple_poll_quit(uribuf->poll);
+  }
+}
+#endif /* HAVE_AVAHI */
 
 
 /*
@@ -1796,13 +1927,16 @@ http_resolve_cb(
     const unsigned char *txtRecord,	/* I - TXT record data */
     void                *context)	/* I - Pointer to URI buffer */
 {
+  _http_uribuf_t	*uribuf = (_http_uribuf_t *)context;
+					/* URI buffer */
   const char		*scheme,	/* URI scheme */
-			*hostptr;	/* Pointer into hostTarget */
-  char			rp[257],	/* Remote printer */
+			*hostptr,	/* Pointer into hostTarget */
+			*reskey,	/* "rp" or "rfo" */
+			*resdefault;	/* Default path */
+  char			resource[257],	/* Remote path */
 			fqdn[256];	/* FQDN of the .local name */
   const void		*value;		/* Value from TXT record */
   uint8_t		valueLen;	/* Length of value */
-  _http_uribuf_t	*uribuf;	/* URI buffer */
 
 
   DEBUG_printf(("7http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, "
@@ -1810,8 +1944,6 @@ http_resolve_cb(
 	        "txtLen=%u, txtRecord=%p, context=%p)", sdRef, flags,
 	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
 	        txtRecord, context));
-
-  uribuf = (_http_uribuf_t *)context;
 
  /*
   * Figure out the scheme from the full name...
@@ -1836,17 +1968,29 @@ http_resolve_cb(
   * Extract the "remote printer" key from the TXT record...
   */
 
-  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, "rp",
+  if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+  {
+    reskey     = "rfo";
+    resdefault = "/ipp/faxout";
+  }
+  else
+  {
+    reskey     = "rp";
+    resdefault = "/";
+  }
+
+  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, reskey,
                                     &valueLen)) != NULL)
   {
     if (((char *)value)[0] == '/')
     {
      /*
-      * "rp" value (incorrectly) has a leading slash already...
+      * Value (incorrectly) has a leading slash already...
       */
 
-      memcpy(rp, value, valueLen);
-      rp[valueLen] = '\0';
+      memcpy(resource, value, valueLen);
+      resource[valueLen] = '\0';
     }
     else
     {
@@ -1854,19 +1998,18 @@ http_resolve_cb(
       * Convert to resource by concatenating with a leading "/"...
       */
 
-      rp[0] = '/';
-      memcpy(rp + 1, value, valueLen);
-      rp[valueLen + 1] = '\0';
+      resource[0] = '/';
+      memcpy(resource + 1, value, valueLen);
+      resource[valueLen + 1] = '\0';
     }
   }
   else
   {
    /*
-    * Default "rp" value is blank, mapping to a path of "/"...
+    * Use the default value...
     */
 
-    rp[0] = '/';
-    rp[1] = '\0';
+    strlcpy(resource, resdefault, sizeof(resource));
   }
 
  /*
@@ -1922,9 +2065,219 @@ http_resolve_cb(
   */
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
-                  NULL, hostTarget, ntohs(port), rp);
+                  NULL, hostTarget, ntohs(port), resource);
 
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
+}
+
+#elif defined(HAVE_AVAHI)
+/*
+ * 'http_poll_cb()' - Wait for input on the specified file descriptors.
+ *
+ * Note: This function is needed because avahi_simple_poll_iterate is broken
+ *       and always uses a timeout of 0 (!) milliseconds.
+ *       (Avahi Ticket #364)
+ */
+
+static int				/* O - Number of file descriptors matching */
+http_poll_cb(
+    struct pollfd *pollfds,		/* I - File descriptors */
+    unsigned int  num_pollfds,		/* I - Number of file descriptors */
+    int           timeout,		/* I - Timeout in milliseconds (used) */
+    void          *context)		/* I - User data (unused) */
+{
+  (void)timeout;
+  (void)context;
+
+  return (poll(pollfds, num_pollfds, 2000));
+}
+
+
+/*
+ * 'http_resolve_cb()' - Build a device URI for the given service name.
+ */
+
+static void
+http_resolve_cb(
+    AvahiServiceResolver   *resolver,	/* I - Resolver (unused) */
+    AvahiIfIndex           interface,	/* I - Interface index (unused) */
+    AvahiProtocol          protocol,	/* I - Network protocol (unused) */
+    AvahiResolverEvent     event,	/* I - Event (found, etc.) */
+    const char             *name,	/* I - Service name */
+    const char             *type,	/* I - Registration type */
+    const char             *domain,	/* I - Domain (unused) */
+    const char             *hostTarget,	/* I - Hostname */
+    const AvahiAddress     *address,	/* I - Address (unused) */
+    uint16_t               port,	/* I - Port number */
+    AvahiStringList        *txt,	/* I - TXT record */
+    AvahiLookupResultFlags flags,	/* I - Lookup flags (unused) */
+    void                   *context)	/* I - Pointer to URI buffer */
+{
+  _http_uribuf_t	*uribuf = (_http_uribuf_t *)context;
+					/* URI buffer */
+  const char		*scheme,	/* URI scheme */
+			*hostptr,	/* Pointer into hostTarget */
+			*reskey,	/* "rp" or "rfo" */
+			*resdefault;	/* Default path */
+  char			resource[257],	/* Remote path */
+			fqdn[256];	/* FQDN of the .local name */
+  AvahiStringList	*pair;		/* Current TXT record key/value pair */
+  char			*value;		/* Value for "rp" key */
+  size_t		valueLen = 0;	/* Length of "rp" key */
+
+
+  DEBUG_printf(("7http_resolve_cb(resolver=%p, "
+		"interface=%d, protocol=%d, event=%d, name=\"%s\", "
+		"type=\"%s\", domain=\"%s\", hostTarget=\"%s\", address=%p, "
+		"port=%d, txt=%p, flags=%d, context=%p)",
+		resolver, interface, protocol, event, name, type, domain,
+		hostTarget, address, port, txt, flags, context));
+
+  if (event != AVAHI_RESOLVER_FOUND)
+  {
+    avahi_service_resolver_free(resolver);
+    avahi_simple_poll_quit(uribuf->poll);
+    return;
+  }
+
+ /*
+  * Figure out the scheme from the full name...
+  */
+
+  if (strstr(type, "_ipp."))
+    scheme = "ipp";
+  else if (strstr(type, "_printer."))
+    scheme = "lpd";
+  else if (strstr(type, "_pdl-datastream."))
+    scheme = "socket";
+  else
+    scheme = "riousbprint";
+
+  if (!strncmp(type, "_ipps.", 6) || !strncmp(type, "_ipp-tls.", 9))
+    scheme = "ipps";
+  else if (!strncmp(type, "_ipp.", 5) || !strncmp(type, "_fax-ipp.", 9))
+    scheme = "ipp";
+  else if (!strncmp(type, "_http.", 6))
+    scheme = "http";
+  else if (!strncmp(type, "_https.", 7))
+    scheme = "https";
+  else if (!strncmp(type, "_printer.", 9))
+    scheme = "lpd";
+  else if (!strncmp(type, "_pdl-datastream.", 16))
+    scheme = "socket";
+  else
+  {
+    avahi_service_resolver_free(resolver);
+    avahi_simple_poll_quit(uribuf->poll);
+    return;
+  }
+
+ /*
+  * Extract the remote resource key from the TXT record...
+  */
+
+  if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+  {
+    reskey     = "rfo";
+    resdefault = "/ipp/faxout";
+  }
+  else
+  {
+    reskey     = "rp";
+    resdefault = "/";
+  }
+
+  if ((pair = avahi_string_list_find(txt, reskey)) != NULL)
+  {
+    avahi_string_list_get_pair(pair, NULL, &value, &valueLen);
+
+    if (value[0] == '/')
+    {
+     /*
+      * Value (incorrectly) has a leading slash already...
+      */
+
+      memcpy(resource, value, valueLen);
+      resource[valueLen] = '\0';
+    }
+    else
+    {
+     /*
+      * Convert to resource by concatenating with a leading "/"...
+      */
+
+      resource[0] = '/';
+      memcpy(resource + 1, value, valueLen);
+      resource[valueLen + 1] = '\0';
+    }
+  }
+  else
+  {
+   /*
+    * Use the default value...
+    */
+
+    strlcpy(resource, resdefault, sizeof(resource));
+  }
+
+ /*
+  * Lookup the FQDN if needed...
+  */
+
+  if ((uribuf->options & _HTTP_RESOLVE_FQDN) &&
+      (hostptr = hostTarget + strlen(hostTarget) - 6) > hostTarget &&
+      !_cups_strcasecmp(hostptr, ".local"))
+  {
+   /*
+    * OK, we got a .local name but the caller needs a real domain.  Start by
+    * getting the IP address of the .local name and then do reverse-lookups...
+    */
+
+    http_addrlist_t	*addrlist,	/* List of addresses */
+			*addr;		/* Current address */
+
+    DEBUG_printf(("8http_resolve_cb: Looking up \"%s\".", hostTarget));
+
+    snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
+    if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
+    {
+      for (addr = addrlist; addr; addr = addr->next)
+      {
+        int error = getnameinfo(&(addr->addr.addr),
+	                        httpAddrLength(&(addr->addr)),
+			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+
+        if (!error)
+	{
+	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
+
+	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
+	      _cups_strcasecmp(hostptr, ".local"))
+	  {
+	    hostTarget = fqdn;
+	    break;
+	  }
+	}
+#ifdef DEBUG
+	else
+	  DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
+			error));
+#endif /* DEBUG */
+      }
+    }
+  }
+
+ /*
+  * Assemble the final device URI using the resolved hostname...
+  */
+
+  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
+                  NULL, hostTarget, port, resource);
+  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
+
+  avahi_simple_poll_quit(uribuf->poll);
 }
 #endif /* HAVE_DNSSD */
 

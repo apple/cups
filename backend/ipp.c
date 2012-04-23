@@ -645,6 +645,9 @@ main(int  argc,				/* I - Number of command-line args */
       update_reasons(NULL, "-connecting-to-device");
       return (CUPS_BACKEND_STOP);
     }
+
+    if (job_canceled)
+      return (CUPS_BACKEND_OK);
   }
 
   http = _httpCreate(hostname, port, addrlist, cupsEncryption(), AF_UNSPEC);
@@ -749,7 +752,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-	                           _("The printer is busy."));
+	                           _("The printer is in use."));
 	      break;
         }
 
@@ -772,7 +775,9 @@ main(int  argc,				/* I - Number of command-line args */
   }
   while (http->fd < 0);
 
-  if (job_canceled || !http)
+  if (job_canceled)
+    return (CUPS_BACKEND_OK);
+  else if (!http)
     return (CUPS_BACKEND_FAILED);
 
   update_reasons(NULL, "-connecting-to-device");
@@ -864,7 +869,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 
         report_printer_state(supported);
 
@@ -882,14 +887,14 @@ main(int  argc,				/* I - Number of command-line args */
         if (version >= 20)
 	{
 	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("Printer does not support IPP/%d.%d, trying "
+			       _("The printer does not support IPP/%d.%d, trying "
 			         "IPP/%s."), version / 10, version % 10, "1.1");
 	  version = 11;
 	}
 	else
 	{
 	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("Printer does not support IPP/%d.%d, trying "
+			       _("The printer does not support IPP/%d.%d, trying "
 			         "IPP/%s."), version / 10, version % 10, "1.0");
 	  version = 10;
         }
@@ -970,7 +975,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (busy)
       {
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 
 	report_printer_state(supported);
 
@@ -1092,7 +1097,10 @@ main(int  argc,				/* I - Number of command-line args */
 
     report_printer_state(supported);
   }
-  while (ipp_status > IPP_OK_CONFLICT);
+  while (!job_canceled && ipp_status > IPP_OK_CONFLICT);
+
+  if (job_canceled)
+    return (CUPS_BACKEND_OK);
 
  /*
   * See if the printer is accepting jobs and is not stopped; if either
@@ -1294,7 +1302,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (ipp_status == IPP_SERVICE_UNAVAILABLE || ipp_status == IPP_PRINTER_BUSY)
     {
-      _cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+      _cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
       sleep(10);
     }
     else if (ipp_status == IPP_FORBIDDEN ||
@@ -1442,7 +1450,7 @@ main(int  argc,				/* I - Number of command-line args */
           ipp_status == IPP_NOT_POSSIBLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 	sleep(10);
 
 	if (num_files == 0)
@@ -1794,7 +1802,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Cancel the job as needed...
   */
 
-  if (job_canceled && job_id)
+  if (job_canceled > 0 && job_id > 0)
     cancel_job(http, uri, job_id, resource, argv[2], version);
 
  /*
@@ -1866,18 +1874,19 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status == IPP_DOCUMENT_FORMAT ||
            ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
-  else if (ipp_status == IPP_REQUEST_VALUE)
+  else if (ipp_status == IPP_REQUEST_VALUE || job_canceled < 0)
   {
-    _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    if (ipp_status == IPP_REQUEST_VALUE)
+      _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    else
+      _cupsLangPrintFilter(stderr, "ERROR", _("Print job canceled at printer."));
+
     return (CUPS_BACKEND_CANCEL);
   }
   else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
-  {
-    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
     return (CUPS_BACKEND_OK);
-  }
 }
 
 
@@ -2139,7 +2148,7 @@ monitor_printer(
 
       response = cupsDoRequest(http, request, monitor->resource);
 
-      fprintf(stderr, "DEBUG: %s: %s (%s)\n", ippOpString(job_op),
+      fprintf(stderr, "DEBUG: (monitor) %s: %s (%s)\n", ippOpString(job_op),
 	      ippErrorString(cupsLastError()), cupsLastErrorString());
 
       if (cupsLastError() <= IPP_OK_CONFLICT)
@@ -2203,6 +2212,14 @@ monitor_printer(
 
       ippDelete(response);
 
+      fprintf(stderr, "DEBUG: (monitor) job-state=%s\n",
+              ippEnumString("job-state", monitor->job_state));
+
+      if (!job_canceled &&
+          (monitor->job_state == IPP_JOB_CANCELED ||
+	   monitor->job_state == IPP_JOB_ABORTED))
+	job_canceled = -1;
+
      /*
       * Disconnect from the printer - we'll reconnect on the next poll...
       */
@@ -2223,7 +2240,7 @@ monitor_printer(
   * Cancel the job if necessary...
   */
 
-  if (job_canceled && monitor->job_id > 0)
+  if (job_canceled > 0 && monitor->job_id > 0)
     if (!httpReconnect(http))
       cancel_job(http, monitor->uri, monitor->job_id, monitor->resource,
                  monitor->user, monitor->version);
@@ -3000,6 +3017,8 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
+  write(2, "DEBUG: Got SIGTERM.\n", 20);
+
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
   if (child_pid)
   {
@@ -3013,6 +3032,8 @@ sigterm_handler(int sig)		/* I - Signal */
    /*
     * Flag that the job should be canceled...
     */
+
+    write(2, "DEBUG: job_canceled = 1.\n", 25);
 
     job_canceled = 1;
     return;

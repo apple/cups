@@ -204,6 +204,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("jpn_chou4_90x205mm", NULL, "EnvChou4", 90, 205),
   _PWG_MEDIA_MM("jpn_hagaki_100x148mm", NULL, "Postcard", 100, 148),
   _PWG_MEDIA_MM("jpn_you4_105x235mm", NULL, "EnvYou4", 105, 235),
+  _PWG_MEDIA_MM("jpn_you6_98x190mm", NULL, "EnvYou6", 98, 190),
   _PWG_MEDIA_MM("jpn_chou2_111.1x146mm", NULL, NULL, 111.1, 146),
   _PWG_MEDIA_MM("jpn_chou3_120x235mm", NULL, "EnvChou3", 120, 235),
   _PWG_MEDIA_MM("jpn_oufuku_148x200mm", NULL, "DoublePostcardRotated", 148, 200),
@@ -760,8 +761,11 @@ _pwgMediaForSize(int width,		/* I - Width in 2540ths */
 		 int length)		/* I - Length in 2540ths */
 {
   int		i;			/* Looping var */
-  _pwg_media_t	*media;			/* Current media */
-  int		dw, dl;			/* Difference in width and length */
+  _pwg_media_t	*media,			/* Current media */
+		*best_media = NULL;	/* Best match */
+  int		dw, dl,			/* Difference in width and length */
+		best_dw = 999,		/* Best difference in width and length */
+		best_dl = 999;
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
@@ -786,12 +790,24 @@ _pwgMediaForSize(int width,		/* I - Width in 2540ths */
     * is just about 176/2540ths...
     */
 
-    dw = media->width - width;
-    dl = media->length - length;
+    dw = abs(media->width - width);
+    dl = abs(media->length - length);
 
-    if (dw > -176 && dw < 176 && dl > -176 && dl < 176)
+    if (!dw && !dl)
       return (media);
+    else if (dw < 176 && dl < 176)
+    {
+      if (dw <= best_dw && dl <= best_dl)
+      {
+        best_media = media;
+        best_dw    = dw;
+        best_dl    = dl;
+      }
+    }
   }
+
+  if (best_media)
+    return (best_media);
 
  /*
   * Not a standard size; convert it to a PWG custom name of the form:

@@ -93,8 +93,9 @@ dnl Check for pkg-config, which is used for some other tests later on...
 AC_PATH_PROG(PKGCONFIG, pkg-config)
 
 dnl Check for libraries...
-AC_SEARCH_LIBS(fmod, m)
+AC_SEARCH_LIBS(abs, m, AC_DEFINE(HAVE_ABS))
 AC_SEARCH_LIBS(crypt, crypt)
+AC_SEARCH_LIBS(fmod, m)
 AC_SEARCH_LIBS(getspent, sec gen)
 
 LIBMALLOC=""

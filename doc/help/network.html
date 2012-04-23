@@ -397,21 +397,19 @@ lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option
 
 <H2 CLASS="title"><A NAME="SNMP">Troubleshooting SNMP Discovery Problems</A></H2>
 
-<P>Whenever you view the administration web page or a list of supported device URIs, the <tt>snmp</tt> backend will probe the local network(s) using Simple Network Management Protocol (SNMP) broadcasts. Printers that respond to these broadcasts are then interrogated for the make and model and supported protocols, yielding a device URI that can be used to add the printer.</P> 
+<P>Whenever you view the administration web page or a list of supported device URIs, the <tt>snmp</tt> backend can probe the local network(s) using Simple Network Management Protocol (SNMP) v1 broadcasts. Printers that respond to these broadcasts are then interrogated for the make, model, and supported protocols, yielding a device URI that can be used to add the printer.</P>
 
-<P>That said, the SNMP requests sometimes expose problems in vendor SNMP or IPP implementations. If you are experiencing long delays in loading the CUPS web interface administration page, or if you don't see your printer listed, the following instructions will help you to diagnose those problems and/or provide important feedback to the CUPS developers so that we can correct problems and improve the SNMP backend in future releases.</P>
+<P>That said, the SNMP requests sometimes expose problems in vendor implementations. If you are experiencing long delays in loading the CUPS web interface administration page, or if you don't see your printer listed, the following instructions will help you to diagnose those problems and/or provide important feedback to the CUPS developers so that we can correct problems and improve the SNMP backend in future releases.</P>
 
 <H3>Quick Fixes</H3>
 
-<P>If you don't use "public" as your community name, create a text file called <VAR>/etc/cups/snmp.conf</VAR> and put the following line in it:</P>
+<P>If you don't use "public" as your community name, edit or create (as needed) a text file called <VAR>/etc/cups/snmp.conf</VAR> and put the following line in it:</P>
 
 <PRE CLASS="command">
 Community <I>your community name</I>
 </PRE>
 
-<P>If you have more than one community name, list them all on separate lines.</P>
-
-<P>If you don't support SNMP v1 on your network, you are currently "out of luck". That said, we will be adding v2, v2c, and v3 support in future CUPS releases once we have a handle on the actual requirements people have for such things. Please file or update an <A HREF="http://www.cups.org/str.php">SNMP enhancement request</A> with <em>specific</em> requirements you have - what you need supported, why you need it supported, and how you would like to see the functionality provided/exposed - so that we can do it "right" the first time.</P>
+<P>The SNMP backend will not be able to find any printers on your network if SNMP v1 or broadcasting are not supported on your network.</P>
 
 <H3>Basic Debugging</H3>
 

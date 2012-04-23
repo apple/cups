@@ -69,7 +69,7 @@
               dup [612 792] (Letter) put
               dup [612 1008] (Legal) put
               dup [595 842] (A4) put
-              {exch aload pop 4 index sub abs 5 le exch 
+              {exch aload pop 4 index sub abs 5 le exch
                5 index sub abs 5 le and
               {exch pop exit} {pop} ifelse
       } bind forall = flush pop pop
@@ -166,7 +166,7 @@
               dup [612 792] (Letter) put
               dup [612 1008] (Legal) put
               dup [595 842] (A4) put
-              {exch aload pop 4 index sub abs 5 le exch 
+              {exch aload pop 4 index sub abs 5 le exch
                5 index sub abs 5 le and
               {exch pop exit} {pop} ifelse
       } bind forall = flush pop pop
@@ -264,9 +264,9 @@ information file.</P>
 <p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
 
 
-<h2 class='title'><a name='MACOSX'>Adding Mac OS X Features</a></h2>
+<h2 class='title'><a name='MACOSX'>Adding OS X Features</a></h2>
 
-<p>Mac OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
+<p>OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin

@@ -3,7 +3,7 @@
 .\"
 .\"   cupsfilter man page for CUPS.
 .\"
-.\"   Copyright 2007-2010 by Apple Inc.
+.\"   Copyright 2007-2012 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -18,7 +18,7 @@ cupsfilter \- convert a file to another format using cups filters
 .B cupsfilter
 [ -c
 .I config-file
-] [ -d 
+] [ -d
 .I printer
 ] [ -e ] -j
 .I job-id[,N]
@@ -85,7 +85,7 @@ This will be addressed in a future CUPS release.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2010 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id: cupsfilter.man 7936 2008-09-11 03:12:59Z mike $".
 .\"

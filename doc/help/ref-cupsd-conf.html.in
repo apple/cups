@@ -44,7 +44,7 @@ automatically handles restarting the scheduler.</P>
 
 <BLOCKQUOTE><B>Note:</B>
 
-<P>The specification of time units ("w" for weeks, "h" for hours, etc.) in the various time interval directives is new in CUPS 1.6. Prior releases of CUPS only supported time intervals in seconds.</P>
+<P>The specification of time units ("w" for weeks, "h" for hours, etc.) in the various time interval directives is new in CUPS 1.6/OS X 10.8. Prior releases of CUPS only supported time intervals in seconds.</P>
 
 </BLOCKQUOTE>
 
@@ -341,7 +341,7 @@ quotas. This option has no effect if quotas are not enabled. The
 default setting is <CODE>No</CODE>.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLocalProtocols">BrowseLocalProtocols</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="BrowseLocalProtocols">BrowseLocalProtocols</A></H2>
 
 <H3>Examples</H3>
 
@@ -470,7 +470,7 @@ DataDir /usr/share/cups
 for data files.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultAuthType">DefaultAuthType</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="DefaultAuthType">DefaultAuthType</A></H2>
 
 <H3>Examples</H3>
 
@@ -488,7 +488,7 @@ of authentication to use for IPP operations that require a
 username. The default is <CODE>Basic</CODE>.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultEncryption">DefaultEncryption</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="DefaultEncryption">DefaultEncryption</A></H2>
 
 <H3>Examples</H3>
 
@@ -526,7 +526,7 @@ language localization file exists for it. The default language
 is "en" for English.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
 
 <H3>Examples</H3>
 
@@ -546,7 +546,7 @@ of <CODE>None</CODE> tells the scheduler to not set the default paper
 size.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
 
 <H3>Examples</H3>
 
@@ -565,7 +565,7 @@ policy to use for IPP operation. The default is
 and other job operations.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
 
 <H3>Examples</H3>
 
@@ -633,7 +633,7 @@ HREF="#Location"><CODE>Location</CODE></A> or <A
 HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="DirtyCleanInterval">DirtyCleanInterval</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="DirtyCleanInterval">DirtyCleanInterval</A></H2>
 
 <H3>Examples</H3>
 
@@ -726,7 +726,7 @@ default error log file is <VAR>@CUPS_LOGDIR@/error_log</VAR>.</P>
 information to the system log instead of a plain file.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3/Mac OS X 10.5</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3/OS X 10.5</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
 
 <H3>Examples</H3>
 
@@ -765,7 +765,7 @@ printer.</P>
 
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
 
 <H3>Examples</H3>
 
@@ -926,7 +926,7 @@ system-specific but is usually <CODE>lp</CODE> or
 <CODE>nobody</CODE>.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="GSSServiceName">GSSServiceName</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6/OS X 10.8</SPAN><A NAME="GSSServiceName">GSSServiceName</A></H2>
 
 <H3>Examples</H3>
 
@@ -1025,7 +1025,7 @@ to make private. The "default" values are "job-name",
 HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="JobRetryInterval">JobRetryInterval</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="JobRetryInterval">JobRetryInterval</A></H2>
 
 <H3>Examples</H3>
 
@@ -1044,7 +1044,7 @@ JobRetryInterval 30
 <P>The default is <CODE>30</CODE> (30 seconds).</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="JobKillDelay">JobKillDelay</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="JobKillDelay">JobKillDelay</A></H2>
 
 <H3>Examples</H3>
 
@@ -1063,7 +1063,7 @@ JobKillDelay 30
 <P>The default is <CODE>30</CODE> (30 seconds).</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="JobRetryLimit">JobRetryLimit</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="JobRetryLimit">JobRetryLimit</A></H2>
 
 <H3>Examples</H3>
 
@@ -1150,7 +1150,7 @@ The request type names are case-sensitive for compatibility with
 Apache.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="LimitIPP">Limit (Policy)</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="LimitIPP">Limit (Policy)</A></H2>
 
 <H3>Examples</H3>
 
@@ -1690,7 +1690,7 @@ copies to 100.</P>
 </BLOCKQUOTE>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="MaxHoldTime">MaxHoldTime</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6/OS X 10.8</SPAN><A NAME="MaxHoldTime">MaxHoldTime</A></H2>
 
 <H3>Examples</H3>
 
@@ -1774,7 +1774,7 @@ active jobs is completed, stopped, aborted, or canceled.</P>
 default setting is 0.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="MaxJobTime">MaxJobTime</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6/OS X 10.8</SPAN><A NAME="MaxJobTime">MaxJobTime</A></H2>
 
 <H3>Examples</H3>
 
@@ -1838,7 +1838,7 @@ HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 directive instead.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
 
 <H3>Examples</H3>
 
@@ -1960,7 +1960,7 @@ recognized:</P>
 <P>The default is "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}".</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="PassEnv">PassEnv</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="PassEnv">PassEnv</A></H2>
 
 <H3>Examples</H3>
 
@@ -1979,7 +1979,7 @@ scheduler only passes the <CODE>DYLD_LIBRARY_PATH</CODE>,
 environment variables to child processes.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="Policy">Policy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="Policy">Policy</A></H2>
 
 <H3>Examples</H3>
 
@@ -2135,7 +2135,7 @@ PrintcapFormat plist
 <H3>Description</H3>
 
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output format of the
-printcap file. The default is to generate the plist format on Mac OS X, the
+printcap file. The default is to generate the plist format on OS X, the
 Solaris format on Solaris, and the BSD format on other operating systems.</P>
 
 
@@ -2516,7 +2516,7 @@ the text that is returned. The default is
 </TABLE></DIV>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="SetEnv">SetEnv</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="SetEnv">SetEnv</A></H2>
 
 <H3>Examples</H3>
 
@@ -2695,7 +2695,7 @@ to wait before an active HTTP or IPP request times out in seconds (no suffix), m
 <P>The default timeout is <CODE>5m</CODE> (five minutes).</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="UseNetworkDefault">UseNetworkDefault</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="UseNetworkDefault">UseNetworkDefault</A></H2>
 
 <H3>Examples</H3>
 

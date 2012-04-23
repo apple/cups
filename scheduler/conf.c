@@ -90,7 +90,7 @@ static const cupsd_var_t	variables[] =
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_DNSSD
-  { "BrowseDNSSDRegType",	&DNSSDRegType,		CUPSD_VARTYPE_STRING },
+  { "BrowseDNSSDSubTypes",	&DNSSDSubTypes,		CUPSD_VARTYPE_STRING },
 #endif /* HAVE_DNSSD */
   { "BrowseWebIF",		&BrowseWebIF,		CUPSD_VARTYPE_BOOLEAN },
   { "Browsing",			&Browsing,		CUPSD_VARTYPE_BOOLEAN },
@@ -734,7 +734,7 @@ cupsdReadConfiguration(void)
   DefaultShared            = CUPS_DEFAULT_DEFAULT_SHARED;
 
 #ifdef HAVE_DNSSD
-  cupsdSetString(&DNSSDRegType, "_ipp._tcp,_cups");
+  cupsdSetString(&DNSSDSubTypes, "_cups,_print");
 #endif /* HAVE_DNSSD */
 
   cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);

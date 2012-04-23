@@ -544,7 +544,7 @@ _cupsAppleSetUseLastPrinter(
  * to by "cancel" is non-zero, or the callback function (or block) returns 0,
  * The caller is responsible for calling httpClose() on the returned object.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 http_t *				/* O - Connection to server or @code NULL@ */
@@ -710,7 +710,7 @@ cupsConnectDest(
  * to by "cancel" is non-zero, or the callback function (or block) returns 0,
  * The caller is responsible for calling httpClose() on the returned object.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 http_t *				/* O - Connection to server or @code NULL@ */
@@ -736,7 +736,7 @@ cupsConnectDestBlock(
  * copy) - for use with the cupsEnumDests* functions. The caller is responsible
  * for calling cupsFreeDests() on the returned object(s).
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int
@@ -816,7 +816,7 @@ cupsCopyDest(cups_dest_t *dest,
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the callback function returns 0.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -859,6 +859,8 @@ cupsEnumDests(
  /*
   * Range check input...
   */
+
+  (void)flags;
 
   if (!cb)
     return (0);
@@ -1028,7 +1030,7 @@ cupsEnumDests(
  * Enumeration happens on the current thread and does not return until all
  * destinations have been enumerated or the block returns 0.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1208,7 +1210,7 @@ _cupsGetDestResource(
  * Free the memory used by the destination array using the @link cupsFreeDests@
  * function.
  *
- * Note: On Mac OS X this function also gets the default paper from the system
+ * Note: On OS X this function also gets the default paper from the system
  * preferences (~/L/P/org.cups.PrintingPrefs.plist) and includes it in the
  * options array for each destination that supports it.
  */
@@ -1501,7 +1503,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * Use the @link cupsFreeDests@ function to free the destination list and
  * the @link cupsGetDest@ function to find a particular destination.
  *
- * @since CUPS 1.1.21/Mac OS X 10.4@
+ * @since CUPS 1.1.21/OS X 10.4@
  */
 
 int					/* O - Number of destinations */
@@ -1684,7 +1686,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
  * The returned destination must be freed using @link cupsFreeDests@ with a
  * "num_dests" value of 1.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */
@@ -1809,7 +1811,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
  * @link cupsSetDests@ or @link cupsSetDests2@ functions to save the new
  * options for the user.
  *
- * @since CUPS 1.3/Mac OS X 10.5@
+ * @since CUPS 1.3/OS X 10.5@
  */
 
 int					/* O  - New number of destinations */
@@ -1855,7 +1857,7 @@ cupsRemoveDest(const char  *name,	/* I  - Destination name */
 /*
  * 'cupsSetDefaultDest()' - Set the default destination.
  *
- * @since CUPS 1.3/Mac OS X 10.5@
+ * @since CUPS 1.3/OS X 10.5@
  */
 
 void
@@ -1910,7 +1912,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  * This function saves the destinations to /etc/cups/lpoptions when run
  * as root and ~/.cups/lpoptions when run as a normal user.
  *
- * @since CUPS 1.1.21/Mac OS X 10.4@
+ * @since CUPS 1.1.21/OS X 10.4@
  */
 
 int					/* O - 0 on success, -1 on error */

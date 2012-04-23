@@ -62,7 +62,7 @@ static int		cups_is_close_media_db(_cups_media_db_t *a,
  *
  * Returns 1 if supported, 0 otherwise.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 if supported, 0 otherwise */
@@ -249,7 +249,7 @@ cupsCheckDestSupported(
  * If cupsCopyDestConflicts returns 1 but "num_resolved" and "resolved" are set
  * to 0 and NULL, respectively, then the conflict cannot be resolved.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 if there is a conflict */
@@ -308,7 +308,7 @@ cupsCopyDestConflicts(
  * The caller is responsible for calling @link cupsFreeDestInfo@ on the return
  * value. @code NULL@ is returned on error.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 cups_dinfo_t *				/* O - Destination information */
@@ -459,7 +459,7 @@ cupsFreeDestInfo(cups_dinfo_t *dinfo)	/* I - Destination information */
  *
  * Returns 1 when there is a match and 0 if there is not a match.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 on match, 0 on failure */
@@ -525,7 +525,7 @@ cupsGetDestMediaByName(
  *
  * Returns 1 when there is a match and 0 if there is not a match.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 int					/* O - 1 on match, 0 on failure */

@@ -92,7 +92,8 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
       if (errno != EAGAIN || errno != EINTR)
       {
-        _cupsLangPrintError("ERROR", _("Unable to read print data"));
+	fprintf(stderr, "DEBUG: Read failed: %s\n", strerror(errno));
+	_cupsLangPrintFilter(stderr, "ERROR", _("Unable to read print data."));
 	return (-1);
       }
 
@@ -250,7 +251,7 @@ backendRunLoop(
 	{
 	  fputs("STATE: +offline-report\n", stderr);
 	  _cupsLangPrintFilter(stderr, "INFO",
-	                       _("Printer is not currently connected."));
+	                       _("The printer is not connected."));
 	  offline = 1;
 	}
 	else if (errno == EINTR && total_bytes == 0)
@@ -319,7 +320,9 @@ backendRunLoop(
 
 	if (errno != EAGAIN || errno != EINTR)
 	{
-	  _cupsLangPrintError("ERROR", _("Unable to read print data"));
+	  fprintf(stderr, "DEBUG: Read failed: %s\n", strerror(errno));
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unable to read print data."));
 	  return (-1);
 	}
 
@@ -368,7 +371,7 @@ backendRunLoop(
 	  {
 	    fputs("STATE: +offline-report\n", stderr);
 	    _cupsLangPrintFilter(stderr, "INFO",
-	                         _("Printer is not currently connected."));
+	                         _("The printer is not connected."));
 	    offline = 1;
 	  }
 	}
@@ -389,7 +392,8 @@ backendRunLoop(
 	if (offline && update_state)
 	{
 	  fputs("STATE: -offline-report\n", stderr);
-	  _cupsLangPrintFilter(stderr, "INFO", _("Printer is now connected."));
+	  _cupsLangPrintFilter(stderr, "INFO",
+	                       _("The printer is now connected."));
 	  offline = 0;
 	}
 

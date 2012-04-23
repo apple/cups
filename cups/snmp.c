@@ -1085,7 +1085,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 		    packet->object_value.string.num_bytes = length;
 		    asn1_get_string(&bufptr, bufend, length,
 		                    (char *)packet->object_value.string.bytes,
-				    CUPS_SNMP_MAX_STRING);
+				    sizeof(packet->object_value.string.bytes));
 	            break;
 
 	        case CUPS_ASN1_OID :

@@ -595,9 +595,9 @@ are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
 	<li><a href="#ipp_attribute_t" title="IPP attribute">ipp_attribute_t</a></li>
-	<li><a href="#ipp_copycb_t" title="The following structures are PRIVATE starting with CUPS 1.6.  Please use the
-new accessor functions available in CUPS 1.6 and later, as these definitions
-will be moved to a private header file in a future release.">ipp_copycb_t</a></li>
+	<li><a href="#ipp_copycb_t" title="The following structures are PRIVATE starting with CUPS 1.6/OS X 10.8.
+Please use the new accessor functions available in CUPS 1.6 and later, as
+these definitions will be moved to a private header file in a future release.">ipp_copycb_t</a></li>
 	<li><a href="#ipp_dstate_t" title="Document states">ipp_dstate_t</a></li>
 	<li><a href="#ipp_finish_t" title="Finishings">ipp_finish_t</a></li>
 	<li><a href="#ipp_iocb_t" title="IPP IO Callback Function ">ipp_iocb_t</a></li>
@@ -617,6 +617,7 @@ used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_s</a></li>
 	<li><a href="#http_credential_s" title="HTTP credential data ">http_credential_s</a></li>
+	<li><a href="#pollfd" title="User data (unused)">pollfd</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#http_auth_e" title="HTTP authentication types">http_auth_e</a></li>
@@ -962,7 +963,7 @@ if (status == HTTP_CONTINUE)
 <a href='#ippDelete'>ippDelete</a>(request);
 </pre>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsDoAuthentication">cupsDoAuthentication</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsDoAuthentication">cupsDoAuthentication</a></h3>
 <p class="description">Authenticate a request.</p>
 <p class="code">
 int cupsDoAuthentication (<br>
@@ -1012,7 +1013,7 @@ status, prior to resubmitting your request.
 <p class="discussion">This function sends the IPP request to the specified server, retrying
 and authenticating as necessary.  The request is freed with <a href="#ippDelete"><code>ippDelete</code></a>
 after receiving a valid IPP response.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="cupsDoIORequest">cupsDoIORequest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsDoIORequest">cupsDoIORequest</a></h3>
 <p class="description">Do an IPP request with file descriptors.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *cupsDoIORequest (<br>
@@ -1093,7 +1094,7 @@ void cupsEncodeOptions (<br>
 <p class="discussion">This function adds operation, job, and then subscription attributes,
 in that order. Use the cupsEncodeOptions2() function to add attributes
 for a single group.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsEncodeOptions2">cupsEncodeOptions2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsEncodeOptions2">cupsEncodeOptions2</a></h3>
 <p class="description">Encode printer options into IPP attributes for a group.</p>
 <p class="code">
 void cupsEncodeOptions2 (<br>
@@ -1119,7 +1120,7 @@ function multiple times for each group, or use cupsEncodeOptions()
 to add the standard groups.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
 <p class="description">Get available printer devices.</p>
 <p class="code">
 ipp_status_t cupsGetDevices (<br>
@@ -1155,7 +1156,7 @@ parameters provide comma-delimited lists of backends to include or omit from
 the request respectively.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsGetFd">cupsGetFd</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsGetFd">cupsGetFd</a></h3>
 <p class="description">Get a file from the server.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsGetFd (<br>
@@ -1178,7 +1179,7 @@ the request respectively.
 <p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
 <p class="description">Get a file from the server.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsGetFile (<br>
@@ -1201,7 +1202,7 @@ the request respectively.
 <p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
 <p class="description">Get a response to an IPP request.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *cupsGetResponse (<br>
@@ -1230,13 +1231,13 @@ otherwise call httpFlush() to complete the response processing.
 ipp_status_t cupsLastError (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">IPP status code from last request</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsLastErrorString">cupsLastErrorString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsLastErrorString">cupsLastErrorString</a></h3>
 <p class="description">Return the last IPP status-message.</p>
 <p class="code">
 const char *cupsLastErrorString (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">status-message text from last request</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsPutFd">cupsPutFd</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsPutFd">cupsPutFd</a></h3>
 <p class="description">Put a file on the server.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsPutFd (<br>
@@ -1260,7 +1261,7 @@ const char *cupsLastErrorString (void);</p>
 successfully.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsPutFile">cupsPutFile</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsPutFile">cupsPutFile</a></h3>
 <p class="description">Put a file on the server.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsPutFile (<br>
@@ -1284,7 +1285,7 @@ successfully.
 successfully.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsReadResponseData">cupsReadResponseData</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsReadResponseData">cupsReadResponseData</a></h3>
 <p class="description">Read additional data after the IPP response.</p>
 <p class="code">
 ssize_t cupsReadResponseData (<br>
@@ -1308,7 +1309,7 @@ ssize_t cupsReadResponseData (<br>
 files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
 <p class="description">Send an IPP request.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsSendRequest (<br>
@@ -1340,7 +1341,7 @@ Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
 request is not freed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>
 <p class="description">Write additional data after an IPP request.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsWriteRequestData (<br>
@@ -1364,7 +1365,7 @@ request is not freed.
 after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpAddCredential">httpAddCredential</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="httpAddCredential">httpAddCredential</a></h3>
 <p class="description">Allocates and adds a single credential to an array.</p>
 <p class="code">
 int httpAddCredential (<br>
@@ -1387,7 +1388,7 @@ int httpAddCredential (<br>
 <p class="discussion">Use <code>cupsArrayNew(NULL, NULL)</code> to create a credentials array.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrAny">httpAddrAny</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrAny">httpAddrAny</a></h3>
 <p class="description">Check for the &quot;any&quot; address.</p>
 <p class="code">
 int httpAddrAny (<br>
@@ -1400,7 +1401,7 @@ int httpAddrAny (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if &quot;any&quot;, 0 otherwise</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrEqual">httpAddrEqual</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrEqual">httpAddrEqual</a></h3>
 <p class="description">Compare two addresses.</p>
 <p class="code">
 int httpAddrEqual (<br>
@@ -1416,7 +1417,7 @@ int httpAddrEqual (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if equal, 0 if not</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrLength">httpAddrLength</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrLength">httpAddrLength</a></h3>
 <p class="description">Return the length of the address in bytes.</p>
 <p class="code">
 int httpAddrLength (<br>
@@ -1429,7 +1430,7 @@ int httpAddrLength (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Length in bytes</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrLocalhost">httpAddrLocalhost</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrLocalhost">httpAddrLocalhost</a></h3>
 <p class="description">Check for the local loopback address.</p>
 <p class="code">
 int httpAddrLocalhost (<br>
@@ -1442,7 +1443,7 @@ int httpAddrLocalhost (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if local host, 0 otherwise</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrLookup">httpAddrLookup</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrLookup">httpAddrLookup</a></h3>
 <p class="description">Lookup the hostname associated with the address.</p>
 <p class="code">
 char *httpAddrLookup (<br>
@@ -1461,7 +1462,7 @@ char *httpAddrLookup (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Host name</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrString">httpAddrString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAddrString">httpAddrString</a></h3>
 <p class="description">Convert an address to a numeric string.</p>
 <p class="code">
 char *httpAddrString (<br>
@@ -1480,7 +1481,7 @@ char *httpAddrString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Numeric address string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAssembleURI">httpAssembleURI</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAssembleURI">httpAssembleURI</a></h3>
 <p class="description">Assemble a uniform resource identifier from its
 components.</p>
 <p class="code">
@@ -1522,7 +1523,7 @@ place of traditional string functions whenever you need to create a
 URI string.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAssembleURIf">httpAssembleURIf</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpAssembleURIf">httpAssembleURIf</a></h3>
 <p class="description">Assemble a uniform resource identifier from its
 components with a formatted resource.</p>
 <p class="code">
@@ -1595,7 +1596,7 @@ int httpCheck (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 = no data, 1 = data available</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="httpClearCookie">httpClearCookie</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="httpClearCookie">httpClearCookie</a></h3>
 <p class="description">Clear the cookie value(s).</p>
 <p class="code">
 void httpClearCookie (<br>
@@ -1667,7 +1668,7 @@ void httpClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New HTTP connection</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
 <p class="description">Copy the credentials associated with an encrypted
 connection.</p>
 <p class="code">
@@ -1705,7 +1706,7 @@ char *httpDecode64 (<br>
 which provides buffer length arguments.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/Mac OS X 10.4&nbsp;</span><a name="httpDecode64_2">httpDecode64_2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="httpDecode64_2">httpDecode64_2</a></h3>
 <p class="description">Base64-decode a string.</p>
 <p class="code">
 char *httpDecode64_2 (<br>
@@ -1761,7 +1762,7 @@ char *httpEncode64 (<br>
 which provides buffer length arguments.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/Mac OS X 10.4&nbsp;</span><a name="httpEncode64_2">httpEncode64_2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="httpEncode64_2">httpEncode64_2</a></h3>
 <p class="description">Base64-encode a string.</p>
 <p class="code">
 char *httpEncode64_2 (<br>
@@ -1823,7 +1824,7 @@ void httpFlush (<br>
 <dt>http</dt>
 <dd class="description">Connection to server</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpFlushWrite">httpFlushWrite</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpFlushWrite">httpFlushWrite</a></h3>
 <p class="description">Flush data in write buffer.</p>
 <p class="code">
 int httpFlushWrite (<br>
@@ -1863,7 +1864,7 @@ int httpGet (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="httpGetAuthString">httpGetAuthString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="httpGetAuthString">httpGetAuthString</a></h3>
 <p class="description">Get the current authorization string.</p>
 <p class="code">
 char *httpGetAuthString (<br>
@@ -1883,7 +1884,7 @@ string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
 value.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetBlocking">httpGetBlocking</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetBlocking">httpGetBlocking</a></h3>
 <p class="description">Get the blocking/non-block state of a connection.</p>
 <p class="code">
 int httpGetBlocking (<br>
@@ -1896,7 +1897,7 @@ int httpGetBlocking (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if blocking, 0 if non-blocking</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="httpGetCookie">httpGetCookie</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="httpGetCookie">httpGetCookie</a></h3>
 <p class="description">Get any cookie data from the response.</p>
 <p class="code">
 const char *httpGetCookie (<br>
@@ -1922,7 +1923,7 @@ const char *httpGetDateString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Date/time string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetDateString2">httpGetDateString2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetDateString2">httpGetDateString2</a></h3>
 <p class="description">Get a formatted date/time string from a time value.</p>
 <p class="code">
 const char *httpGetDateString2 (<br>
@@ -1954,7 +1955,7 @@ time_t httpGetDateTime (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">UNIX time</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetFd">httpGetFd</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetFd">httpGetFd</a></h3>
 <p class="description">Get the file descriptor associated with a connection.</p>
 <p class="code">
 int httpGetFd (<br>
@@ -1997,7 +1998,7 @@ struct hostent *httpGetHostByName (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Host entry</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetHostname">httpGetHostname</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetHostname">httpGetHostname</a></h3>
 <p class="description">Get the FQDN for the connection or local system.</p>
 <p class="code">
 const char *httpGetHostname (<br>
@@ -2042,7 +2043,7 @@ int httpGetLength (<br>
 2^31 - 1; use httpGetLength2() instead.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetLength2">httpGetLength2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetLength2">httpGetLength2</a></h3>
 <p class="description">Get the amount of data remaining from the
 content-length or transfer-encoding fields.</p>
 <p class="code">
@@ -2074,7 +2075,7 @@ content larger than 2^31 - 1.
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetStatus">httpGetStatus</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetStatus">httpGetStatus</a></h3>
 <p class="description">Get the status of the last HTTP request.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> httpGetStatus (<br>
@@ -2109,7 +2110,7 @@ char *httpGetSubField (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Value or NULL</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpGetSubField2">httpGetSubField2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpGetSubField2">httpGetSubField2</a></h3>
 <p class="description">Get a sub-field value.</p>
 <p class="code">
 char *httpGetSubField2 (<br>
@@ -2321,7 +2322,7 @@ int httpRead (<br>
 read more than 2GB of data.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpRead2">httpRead2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpRead2">httpRead2</a></h3>
 <p class="description">Read data from a HTTP connection.</p>
 <p class="code">
 ssize_t httpRead2 (<br>
@@ -2404,7 +2405,7 @@ void httpSeparate (<br>
 <p class="discussion">This function is deprecated; use the httpSeparateURI() function instead.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/Mac OS X 10.4&nbsp;</span><a name="httpSeparate2">httpSeparate2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="httpSeparate2">httpSeparate2</a></h3>
 <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
 <p class="code">
@@ -2448,7 +2449,7 @@ void httpSeparate2 (<br>
 
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpSeparateURI">httpSeparateURI</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSeparateURI">httpSeparateURI</a></h3>
 <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
 <p class="code">
@@ -2492,7 +2493,7 @@ components.</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Result of separation</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="httpSetAuthString">httpSetAuthString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="httpSetAuthString">httpSetAuthString</a></h3>
 <p class="description">Set the current authorization string.</p>
 <p class="code">
 void httpSetAuthString (<br>
@@ -2516,7 +2517,7 @@ HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
 httpHead(), httpOptions(), httpPost, or httpPut().
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="httpSetCookie">httpSetCookie</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="httpSetCookie">httpSetCookie</a></h3>
 <p class="description">Set the cookie value(s).</p>
 <p class="code">
 void httpSetCookie (<br>
@@ -2530,7 +2531,7 @@ void httpSetCookie (<br>
 <dt>cookie</dt>
 <dd class="description">Cookie string</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpSetCredentials">httpSetCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="httpSetCredentials">httpSetCredentials</a></h3>
 <p class="description">Set the credentials associated with an encrypted
 connection.</p>
 <p class="code">
@@ -2547,7 +2548,7 @@ int httpSetCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
 <p class="description">Set the Expect: header in a request.</p>
 <p class="code">
 void httpSetExpect (<br>
@@ -2582,7 +2583,7 @@ void httpSetField (<br>
 <dt>value</dt>
 <dd class="description">Value</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpSetLength">httpSetLength</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetLength">httpSetLength</a></h3>
 <p class="description">Set the content-length and content-encoding.</p>
 <p class="code">
 void httpSetLength (<br>
@@ -2596,7 +2597,7 @@ void httpSetLength (<br>
 <dt>length</dt>
 <dd class="description">Length (0 for chunked)</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="httpSetTimeout">httpSetTimeout</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="httpSetTimeout">httpSetTimeout</a></h3>
 <p class="description">Set read/write timeouts and an optional callback.</p>
 <p class="code">
 void httpSetTimeout (<br>
@@ -2667,7 +2668,7 @@ int httpTrace (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="httpWait">httpWait</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="httpWait">httpWait</a></h3>
 <p class="description">Wait for data available on a connection.</p>
 <p class="code">
 int httpWait (<br>
@@ -2707,7 +2708,7 @@ int httpWrite (<br>
 write more than 2GB of data.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpWrite2">httpWrite2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpWrite2">httpWrite2</a></h3>
 <p class="description">Write data to a HTTP connection.</p>
 <p class="code">
 ssize_t httpWrite2 (<br>
@@ -2791,7 +2792,7 @@ The <code>group</code> parameter specifies the IPP attribute group tag: none
 event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 (<code>IPP_TAG_OPERATION</code>), printer (<code>IPP_TAG_PRINTER</code>), subscription
 (<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippAddCollection">ippAddCollection</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ippAddCollection">ippAddCollection</a></h3>
 <p class="description">Add a collection value.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollection (<br>
@@ -2824,7 +2825,7 @@ event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 (<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippAddCollections">ippAddCollections</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ippAddCollections">ippAddCollections</a></h3>
 <p class="description">Add an array of collection values.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollections (<br>
@@ -2968,7 +2969,7 @@ event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 <br>
 Supported values include enum (<code>IPP_TAG_ENUM</code>) and integer
 (<code>IPP_TAG_INTEGER</code>).</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippAddOctetString">ippAddOctetString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippAddOctetString">ippAddOctetString</a></h3>
 <p class="description">Add an octetString value to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddOctetString (<br>
@@ -3004,7 +3005,7 @@ event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 (<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippAddOutOfBand">ippAddOutOfBand</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippAddOutOfBand">ippAddOutOfBand</a></h3>
 <p class="description">Add an out-of-band value to an IPP message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddOutOfBand (<br>
@@ -3306,7 +3307,7 @@ Supported string values include charset (<code>IPP_TAG_CHARSET</code>), keyword
 <br>
 The <code>language</code> parameter must be non-<code>NULL</code> for nameWithLanguage and
 textWithLanguage string values and must be <code>NULL</code> for all other string values.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippAttributeString">ippAttributeString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippAttributeString">ippAttributeString</a></h3>
 <p class="description">Convert the attribute's value to a string.</p>
 <p class="code">
 size_t ippAttributeString (<br>
@@ -3331,7 +3332,7 @@ trailing nul. The buffer pointer can be NULL to get the required length,
 just like (v)snprintf.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippCopyAttribute">ippCopyAttribute</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippCopyAttribute">ippCopyAttribute</a></h3>
 <p class="description">Copy an attribute.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippCopyAttribute (<br>
@@ -3357,7 +3358,7 @@ created - this should only be done as long as the original source IPP message wi
 not be freed for the life of the destination.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippCopyAttributes">ippCopyAttributes</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippCopyAttributes">ippCopyAttributes</a></h3>
 <p class="description">Copy attributes from one IPP message to another.</p>
 <p class="code">
 int ippCopyAttributes (<br>
@@ -3419,7 +3420,7 @@ void ippDelete (<br>
 <dt>ipp</dt>
 <dd class="description">IPP message</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippDeleteAttribute">ippDeleteAttribute</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ippDeleteAttribute">ippDeleteAttribute</a></h3>
 <p class="description">Delete a single attribute in an IPP message.</p>
 <p class="code">
 void ippDeleteAttribute (<br>
@@ -3433,7 +3434,7 @@ void ippDeleteAttribute (<br>
 <dt>attr</dt>
 <dd class="description">Attribute to delete</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippDeleteValues">ippDeleteValues</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippDeleteValues">ippDeleteValues</a></h3>
 <p class="description">Delete values in an attribute.</p>
 <p class="code">
 int ippDeleteValues (<br>
@@ -3509,7 +3510,7 @@ const char *ippErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Text string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippErrorValue">ippErrorValue</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippErrorValue">ippErrorValue</a></h3>
 <p class="description">Return a status code for the given name.</p>
 <p class="code">
 ipp_status_t ippErrorValue (<br>
@@ -3560,7 +3561,7 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippFirstAttribute">ippFirstAttribute</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippFirstAttribute">ippFirstAttribute</a></h3>
 <p class="description">Return the first attribute in the message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFirstAttribute (<br>
@@ -3573,7 +3574,7 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">First attribute or <code>NULL</code> if none</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetBoolean">ippGetBoolean</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetBoolean">ippGetBoolean</a></h3>
 <p class="description">Get a boolean value for an attribute.</p>
 <p class="code">
 int ippGetBoolean (<br>
@@ -3594,7 +3595,7 @@ int ippGetBoolean (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetCollection">ippGetCollection</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetCollection">ippGetCollection</a></h3>
 <p class="description">Get a collection value for an attribute.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *ippGetCollection (<br>
@@ -3615,7 +3616,7 @@ int ippGetBoolean (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetCount">ippGetCount</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetCount">ippGetCount</a></h3>
 <p class="description">Get the number of values in an attribute.</p>
 <p class="code">
 int ippGetCount (<br>
@@ -3628,7 +3629,7 @@ int ippGetCount (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of values or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetDate">ippGetDate</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetDate">ippGetDate</a></h3>
 <p class="description">Get a date value for an attribute.</p>
 <p class="code">
 const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippGetDate (<br>
@@ -3649,7 +3650,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippGetDate (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetGroupTag">ippGetGroupTag</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetGroupTag">ippGetGroupTag</a></h3>
 <p class="description">Get the group associated with an attribute.</p>
 <p class="code">
 ipp_tag_t ippGetGroupTag (<br>
@@ -3662,7 +3663,7 @@ ipp_tag_t ippGetGroupTag (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Group tag or <code>IPP_TAG_ZERO</code> on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetInteger">ippGetInteger</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetInteger">ippGetInteger</a></h3>
 <p class="description">Get the integer/enum value for an attribute.</p>
 <p class="code">
 int ippGetInteger (<br>
@@ -3683,7 +3684,7 @@ int ippGetInteger (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetName">ippGetName</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetName">ippGetName</a></h3>
 <p class="description">Get the attribute name.</p>
 <p class="code">
 const char *ippGetName (<br>
@@ -3696,7 +3697,7 @@ const char *ippGetName (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Attribute name or <code>NULL</code> for separators</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetOperation">ippGetOperation</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetOperation">ippGetOperation</a></h3>
 <p class="description">Get the operation ID in an IPP message.</p>
 <p class="code">
 ipp_op_t ippGetOperation (<br>
@@ -3709,7 +3710,7 @@ ipp_op_t ippGetOperation (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Operation ID or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetRange">ippGetRange</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetRange">ippGetRange</a></h3>
 <p class="description">Get a rangeOfInteger value from an attribute.</p>
 <p class="code">
 int ippGetRange (<br>
@@ -3733,7 +3734,7 @@ int ippGetRange (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetRequestId">ippGetRequestId</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetRequestId">ippGetRequestId</a></h3>
 <p class="description">Get the request ID from an IPP message.</p>
 <p class="code">
 int ippGetRequestId (<br>
@@ -3746,7 +3747,7 @@ int ippGetRequestId (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Request ID or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetResolution">ippGetResolution</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetResolution">ippGetResolution</a></h3>
 <p class="description">Get a resolution value for an attribute.</p>
 <p class="code">
 int ippGetResolution (<br>
@@ -3773,7 +3774,7 @@ int ippGetResolution (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetState">ippGetState</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetState">ippGetState</a></h3>
 <p class="description">Get the IPP message state.</p>
 <p class="code">
 <a href="#ipp_state_t">ipp_state_t</a> ippGetState (<br>
@@ -3786,7 +3787,7 @@ int ippGetResolution (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">IPP message state value</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetStatusCode">ippGetStatusCode</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetStatusCode">ippGetStatusCode</a></h3>
 <p class="description">Get the status code from an IPP response or event message.</p>
 <p class="code">
 ipp_status_t ippGetStatusCode (<br>
@@ -3822,7 +3823,7 @@ const char *ippGetString (<br>
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetValueTag">ippGetValueTag</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetValueTag">ippGetValueTag</a></h3>
 <p class="description">Get the value tag for an attribute.</p>
 <p class="code">
 ipp_tag_t ippGetValueTag (<br>
@@ -3835,7 +3836,7 @@ ipp_tag_t ippGetValueTag (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Value tag or <code>IPP_TAG_ZERO</code> on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippGetVersion">ippGetVersion</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetVersion">ippGetVersion</a></h3>
 <p class="description">Get the major and minor version number from an IPP message.</p>
 <p class="code">
 int ippGetVersion (<br>
@@ -3870,7 +3871,7 @@ size_t ippLength (<br>
 <a href="#ipp_t">ipp_t</a> *ippNew (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New IPP message</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippNewRequest">ippNewRequest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippNewRequest">ippNewRequest</a></h3>
 <p class="description">Allocate a new IPP request message.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *ippNewRequest (<br>
@@ -3889,7 +3890,7 @@ attributes-natural-language attributes added. The
 attributes-natural-language value is derived from the current locale.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippNextAttribute">ippNextAttribute</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippNextAttribute">ippNextAttribute</a></h3>
 <p class="description">Return the next attribute in the message.</p>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippNextAttribute (<br>
@@ -3902,7 +3903,7 @@ attributes-natural-language value is derived from the current locale.
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Next attribute or <code>NULL</code> if none</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippOpString">ippOpString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippOpString">ippOpString</a></h3>
 <p class="description">Return a name for the given operation id.</p>
 <p class="code">
 const char *ippOpString (<br>
@@ -3915,7 +3916,7 @@ const char *ippOpString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Name</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippOpValue">ippOpValue</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippOpValue">ippOpValue</a></h3>
 <p class="description">Return an operation id for the given name.</p>
 <p class="code">
 ipp_op_t ippOpValue (<br>
@@ -3950,7 +3951,7 @@ int ippPort (void);</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippReadFile">ippReadFile</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ippReadFile">ippReadFile</a></h3>
 <p class="description">Read data for an IPP message from a file.</p>
 <p class="code">
 <a href="#ipp_state_t">ipp_state_t</a> ippReadFile (<br>
@@ -3966,7 +3967,7 @@ int ippPort (void);</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippReadIO">ippReadIO</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippReadIO">ippReadIO</a></h3>
 <p class="description">Read data for an IPP message.</p>
 <p class="code">
 <a href="#ipp_state_t">ipp_state_t</a> ippReadIO (<br>
@@ -3991,7 +3992,7 @@ int ippPort (void);</p>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetBoolean">ippSetBoolean</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetBoolean">ippSetBoolean</a></h3>
 <p class="description">Set a boolean value in an attribute.</p>
 <p class="code">
 int ippSetBoolean (<br>
@@ -4023,7 +4024,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetCollection">ippSetCollection</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetCollection">ippSetCollection</a></h3>
 <p class="description">Set a collection value in an attribute.</p>
 <p class="code">
 int ippSetCollection (<br>
@@ -4055,7 +4056,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetDate">ippSetDate</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetDate">ippSetDate</a></h3>
 <p class="description">Set a date value in an attribute.</p>
 <p class="code">
 int ippSetDate (<br>
@@ -4087,7 +4088,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetGroupTag">ippSetGroupTag</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetGroupTag">ippSetGroupTag</a></h3>
 <p class="description">Set the group tag of an attribute.</p>
 <p class="code">
 int ippSetGroupTag (<br>
@@ -4119,7 +4120,7 @@ event notification (<code>IPP_TAG_EVENT_NOTIFICATION</code>), operation
 (<code>IPP_TAG_SUBSCRIPTION</code>), or unsupported (<code>IPP_TAG_UNSUPPORTED_GROUP</code>).
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetInteger">ippSetInteger</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetInteger">ippSetInteger</a></h3>
 <p class="description">Set an integer or enum value in an attribute.</p>
 <p class="code">
 int ippSetInteger (<br>
@@ -4151,7 +4152,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetName">ippSetName</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetName">ippSetName</a></h3>
 <p class="description">Set the name of an attribute.</p>
 <p class="code">
 int ippSetName (<br>
@@ -4177,7 +4178,7 @@ previously created using the <a href="#ippNew"><code>ippNew</code></a> or <a hre
 The <code>attr</code> parameter may be modified as a result of setting the value.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetOperation">ippSetOperation</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetOperation">ippSetOperation</a></h3>
 <p class="description">Set the operation ID in an IPP request message.</p>
 <p class="code">
 int ippSetOperation (<br>
@@ -4209,7 +4210,7 @@ void ippSetPort (<br>
 <dt>p</dt>
 <dd class="description">Port number to use</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetRange">ippSetRange</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetRange">ippSetRange</a></h3>
 <p class="description">Set a rangeOfInteger value in an attribute.</p>
 <p class="code">
 int ippSetRange (<br>
@@ -4244,7 +4245,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetRequestId">ippSetRequestId</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetRequestId">ippSetRequestId</a></h3>
 <p class="description">Set the request ID in an IPP message.</p>
 <p class="code">
 int ippSetRequestId (<br>
@@ -4267,7 +4268,7 @@ int ippSetRequestId (<br>
 The <code>request_id</code> parameter must be greater than 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetResolution">ippSetResolution</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetResolution">ippSetResolution</a></h3>
 <p class="description">Set a resolution value in an attribute.</p>
 <p class="code">
 int ippSetResolution (<br>
@@ -4305,7 +4306,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetState">ippSetState</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetState">ippSetState</a></h3>
 <p class="description">Set the current state of the IPP message.</p>
 <p class="code">
 int ippSetState (<br>
@@ -4321,7 +4322,7 @@ int ippSetState (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetStatusCode">ippSetStatusCode</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetStatusCode">ippSetStatusCode</a></h3>
 <p class="description">Set the status code in an IPP response or event message.</p>
 <p class="code">
 int ippSetStatusCode (<br>
@@ -4342,7 +4343,7 @@ int ippSetStatusCode (<br>
 <a href="#ippNew"><code>ippNew</code></a> or <a href="#ippNewRequest"><code>ippNewRequest</code></a> functions.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetString">ippSetString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetString">ippSetString</a></h3>
 <p class="description">Set a string value in an attribute.</p>
 <p class="code">
 int ippSetString (<br>
@@ -4374,7 +4375,7 @@ The <code>element</code> parameter specifies which value to set from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetValueTag">ippSetValueTag</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetValueTag">ippSetValueTag</a></h3>
 <p class="description">Set the value tag of an attribute.</p>
 <p class="code">
 int ippSetValueTag (<br>
@@ -4412,7 +4413,7 @@ code in the &quot;attributes-natural-language&quot; attribute or, if not present
 code for the current locale.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.6&nbsp;</span><a name="ippSetVersion">ippSetVersion</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetVersion">ippSetVersion</a></h3>
 <p class="description">Set the version number in an IPP message.</p>
 <p class="code">
 int ippSetVersion (<br>
@@ -4438,7 +4439,7 @@ int ippSetVersion (<br>
 The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
 <p class="description">Return the tag name corresponding to a tag value.</p>
 <p class="code">
 const char *ippTagString (<br>
@@ -4455,7 +4456,7 @@ const char *ippTagString (<br>
 <p class="discussion">The returned names are defined in RFC 2911 and 3382.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
 <p class="description">Return the tag value corresponding to a tag name.</p>
 <p class="code">
 ipp_tag_t ippTagValue (<br>
@@ -4501,7 +4502,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ippWriteFile">ippWriteFile</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span><a name="ippWriteFile">ippWriteFile</a></h3>
 <p class="description">Write data for an IPP message to a file.</p>
 <p class="code">
 <a href="#ipp_state_t">ipp_state_t</a> ippWriteFile (<br>
@@ -4517,7 +4518,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ippWriteIO">ippWriteIO</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ippWriteIO">ippWriteIO</a></h3>
 <p class="description">Write data for an IPP message.</p>
 <p class="code">
 <a href="#ipp_state_t">ipp_state_t</a> ippWriteIO (<br>
@@ -4548,7 +4549,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <p class="code">
 typedef struct <a href="#gss_auth_identity">gss_auth_identity</a> gss_auth_identity_desc;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addr_t">http_addr_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="http_addr_t">http_addr_t</a></h3>
 <p class="description">Socket address union, which
 makes using IPv6 and other
 address types easier and
@@ -4556,7 +4557,7 @@ more portable. </p>
 <p class="code">
 typedef union _http_addr_u / http_addr_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addrlist_t">http_addrlist_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="http_addrlist_t">http_addrlist_t</a></h3>
 <p class="description">Socket address list, which is
 used to enumerate all of the
 addresses that are associated
@@ -4569,7 +4570,7 @@ typedef struct <a href="#http_addrlist_s">http_addrlist_s</a> / http_addrlist_t;
 <p class="code">
 typedef enum <a href="#http_auth_e">http_auth_e</a> http_auth_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
 <p class="description">HTTP credential data </p>
 <p class="code">
 typedef struct <a href="#http_credential_s">http_credential_s</a> http_credential_t;
@@ -4610,7 +4611,7 @@ typedef enum <a href="#http_status_e">http_status_e</a> http_status_t;
 <p class="code">
 typedef struct _http_s http_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_timeout_cb_t">http_timeout_cb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="http_timeout_cb_t">http_timeout_cb_t</a></h3>
 <p class="description">HTTP timeout callback </p>
 <p class="code">
 typedef int (*http_timeout_cb_t)(<a href="#http_t">http_t</a> *http, void *user_data);
@@ -4636,9 +4637,9 @@ typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 typedef struct _ipp_attribute_s ipp_attribute_t;
 </p>
 <h3 class="typedef"><a name="ipp_copycb_t">ipp_copycb_t</a></h3>
-<p class="description">The following structures are PRIVATE starting with CUPS 1.6.  Please use the
-new accessor functions available in CUPS 1.6 and later, as these definitions
-will be moved to a private header file in a future release.</p>
+<p class="description">The following structures are PRIVATE starting with CUPS 1.6/OS X 10.8.
+Please use the new accessor functions available in CUPS 1.6 and later, as
+these definitions will be moved to a private header file in a future release.</p>
 <p class="code">
 typedef int (*ipp_copycb_t)(void *context, <a href="#ipp_t">ipp_t</a> *dst, <a href="#ipp_attribute_t">ipp_attribute_t</a> *attr);
 </p>
@@ -4652,7 +4653,7 @@ typedef enum <a href="#ipp_dstate_e">ipp_dstate_e</a> ipp_dstate_t;
 <p class="code">
 typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ipp_iocb_t">ipp_iocb_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="ipp_iocb_t">ipp_iocb_t</a></h3>
 <p class="description">IPP IO Callback Function </p>
 <p class="code">
 typedef ssize_t (*ipp_iocb_t)(void *context, <a href="#ipp_uchar_t">ipp_uchar_t</a> *buffer, size_t bytes);
@@ -4717,7 +4718,7 @@ typedef unsigned char ipp_uchar_t;
 <dt>type </dt>
 <dt>username </dt>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addrlist_s">http_addrlist_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="http_addrlist_s">http_addrlist_s</a></h3>
 <p class="description">Socket address list, which is
 used to enumerate all of the
 addresses that are associated
@@ -4733,7 +4734,7 @@ with a hostname. </p>
 <dt>next </dt>
 <dd class="description">Pointer to next address in list</dd>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
 <p class="description">HTTP credential data </p>
 <p class="code">struct http_credential_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *data;<br>
@@ -4745,6 +4746,17 @@ with a hostname. </p>
 <dd class="description">Pointer to credential data</dd>
 <dt>datalen </dt>
 <dd class="description">Credential length</dd>
+</dl>
+<h3 class="struct"><a name="pollfd">pollfd</a></h3>
+<p class="description">User data (unused)</p>
+<p class="code">struct pollfd *pollfds, unsigned int num_pollfds, int timeout, void *context) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void) context;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void) timeout;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>context </dt>
+<dt>timeout </dt>
 </dl>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
 <h3 class="enumeration"><a name="http_auth_e">http_auth_e</a></h3>
@@ -4761,7 +4773,7 @@ with a hostname. </p>
 <dd class="description">MD5-session authentication in use</dd>
 <dt>HTTP_AUTH_MD5_SESS_INT </dt>
 <dd class="description">MD5-session authentication in use for body</dd>
-<dt>HTTP_AUTH_NEGOTIATE <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
+<dt>HTTP_AUTH_NEGOTIATE <span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span></dt>
 <dd class="description">GSSAPI authentication in use </dd>
 <dt>HTTP_AUTH_NONE </dt>
 <dd class="description">No authentication in use</dd>
@@ -4954,7 +4966,7 @@ are server-oriented...</p>
 <dd class="description">Only a partial file was recieved/sent</dd>
 <dt>HTTP_PAYMENT_REQUIRED </dt>
 <dd class="description">Payment required</dd>
-<dt>HTTP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
+<dt>HTTP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_PRECONDITION </dt>
 <dd class="description">Precondition failed</dd>
@@ -5162,7 +5174,7 @@ are server-oriented...</p>
 <dd class="description">Add or modify a class</dd>
 <dt>CUPS_ADD_MODIFY_PRINTER </dt>
 <dd class="description">Add or modify a printer</dd>
-<dt>CUPS_AUTHENTICATE_JOB <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_AUTHENTICATE_JOB <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Authenticate a job </dd>
 <dt>CUPS_DELETE_CLASS </dt>
 <dd class="description">Delete a class</dd>
@@ -5174,9 +5186,9 @@ are server-oriented...</p>
 <dd class="description">Get the default printer</dd>
 <dt>CUPS_GET_DEVICES </dt>
 <dd class="description">Get a list of supported devices</dd>
-<dt>CUPS_GET_DOCUMENT <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
+<dt>CUPS_GET_DOCUMENT <span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span></dt>
 <dd class="description">Get a document file </dd>
-<dt>CUPS_GET_PPD <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_GET_PPD <span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get a PPD file </dd>
 <dt>CUPS_GET_PPDS </dt>
 <dd class="description">Get a list of supported drivers</dd>
@@ -5194,15 +5206,15 @@ are server-oriented...</p>
 <dd class="description">Cancel-Jobs</dd>
 <dt>IPP_CANCEL_MY_JOBS </dt>
 <dd class="description">Cancel-My-Jobs</dd>
-<dt>IPP_CANCEL_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_CANCEL_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Cancel a subscription </dd>
 <dt>IPP_CLOSE_JOB </dt>
 <dd class="description">Close-Job</dd>
 <dt>IPP_CREATE_JOB </dt>
 <dd class="description">Create an empty print job</dd>
-<dt>IPP_CREATE_JOB_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_CREATE_JOB_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Create a job subscription </dd>
-<dt>IPP_CREATE_PRINTER_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_CREATE_PRINTER_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Create a printer subscription </dd>
 <dt>IPP_DISABLE_PRINTER </dt>
 <dd class="description">Stop a printer</dd>
@@ -5212,15 +5224,15 @@ are server-oriented...</p>
 <dd class="description">Get a list of jobs</dd>
 <dt>IPP_GET_JOB_ATTRIBUTES </dt>
 <dd class="description">Get job attributes</dd>
-<dt>IPP_GET_NOTIFICATIONS <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_GET_NOTIFICATIONS <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get notification events </dd>
 <dt>IPP_GET_PRINTER_ATTRIBUTES </dt>
 <dd class="description">Get printer attributes</dd>
 <dt>IPP_GET_PRINTER_SUPPORTED_VALUES </dt>
 <dd class="description">Get supported attribute values</dd>
-<dt>IPP_GET_SUBSCRIPTIONS <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_GET_SUBSCRIPTIONS <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get list of subscriptions </dd>
-<dt>IPP_GET_SUBSCRIPTION_ATTRIBUTES <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_GET_SUBSCRIPTION_ATTRIBUTES <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get subscription attributes </dd>
 <dt>IPP_HOLD_JOB </dt>
 <dd class="description">Hold a job for printing</dd>
@@ -5236,7 +5248,7 @@ are server-oriented...</p>
 <dd class="description">Cancel all jobs</dd>
 <dt>IPP_RELEASE_JOB </dt>
 <dd class="description">Release a job for printing</dd>
-<dt>IPP_RENEW_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>IPP_RENEW_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Renew a printer subscription </dd>
 <dt>IPP_RESTART_JOB </dt>
 <dd class="description">Reprint a job</dd>
@@ -5322,7 +5334,7 @@ are server-oriented...</p>
 <dd class="description">client-error-attributes-or-values-not-supported</dd>
 <dt>IPP_ATTRIBUTES_NOT_SETTABLE </dt>
 <dd class="description">client-error-attributes-not-settable</dd>
-<dt>IPP_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
+<dt>IPP_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">Authentication canceled by user </dd>
 <dt>IPP_BAD_REQUEST </dt>
 <dd class="description">client-error-bad-request</dd>
@@ -5386,7 +5398,7 @@ are server-oriented...</p>
 <dd class="description">successful-ok-too-many-events</dd>
 <dt>IPP_OPERATION_NOT_SUPPORTED </dt>
 <dd class="description">server-error-operation-not-supported</dd>
-<dt>IPP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
+<dt>IPP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">Error negotiating a secure connection </dd>
 <dt>IPP_PRINTER_BUSY </dt>
 <dd class="description">server-error-busy</dd>

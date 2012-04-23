@@ -136,7 +136,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
  * do so in each thread for the same function to be used.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 const char *				/* O - Password */
@@ -194,7 +194,7 @@ cupsServer(void)
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5/Mac OS X 10.7@
+ * @since CUPS 1.5/OS X 10.7@
  */
 
 void
@@ -218,7 +218,7 @@ cupsSetClientCertCB(
  * program. Multi-threaded programs that override the setting need to do so in
  * each thread for the same setting to be used.
  *
- * @since CUPS 1.5/Mac OS X 10.7@
+ * @since CUPS 1.5/OS X 10.7@
  */
 
 int					/* O - Status of call (0 = success) */
@@ -304,7 +304,7 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 void
@@ -385,7 +385,7 @@ cupsSetServer(const char *server)	/* I - Server name */
  * in a program. Multi-threaded programs that override the callback need to do
  * so in each thread for the same callback to be used.
  *
- * @since CUPS 1.5/Mac OS X 10.7@
+ * @since CUPS 1.5/OS X 10.7@
  */
 
 void
@@ -874,7 +874,7 @@ cups_read_client_conf(
     }
 #ifndef __APPLE__
    /*
-    * The Server directive is not supported on Mac OS X due to app sandboxing
+    * The Server directive is not supported on OS X due to app sandboxing
     * restrictions, i.e. not all apps request network access.
     */
     else if (!cups_server && (!cg->server[0] || !cg->ipp_port) &&

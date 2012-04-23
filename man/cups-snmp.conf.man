@@ -3,7 +3,7 @@
 .\"
 .\"   snmp.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2011 by Apple Inc.
+.\"   Copyright 2007-2012 by Apple Inc.
 .\"   Copyright 2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,24 +12,22 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH snmp.conf 5 "CUPS" "31 July 2006" "Apple Inc."
+.TH snmp.conf 5 "CUPS" "23 April 2012" "Apple Inc."
+
 .SH NAME
 snmp.conf \- snmp configuration file for cups
 .SH DESCRIPTION
-The \fIsnmp.conf\fR file configures the CUPS SNMP printer
-discovery backend and is  normally located in the \fI/etc/cups\fR
-directory. Each line in the file can be a configuration
-directive, a blank line, or a comment. Comment lines start with
-the # character.
+The \fIsnmp.conf\fR file configures how the standard CUPS network backends
+(http, https, ipp, ipps, lpd, snmp, and socket) access printer information using
+SNMPv1 and is normally located in the \fI/etc/cups\fR directory. Each line in
+the file can be a configuration directive, a blank line, or a comment. Comment
+lines start with the # character.
 .LP
-The SNMP backend uses the SNMPv1 protocol to discover network
-printers, collecting information from the Host MIB along with
-intelligent port probes to determine the correct device URI and
-make and model for each printer. Future versions of CUPS will
-likely support the new Port Monitor MIB as well.
+The Community and DebugLevel directives are used by all backends. The remainder
+apply only to the SNMP backend (\fIcups-snmp(8)\fR).
 .SH DIRECTIVES
-The following directives are understood by the SNMP backend.
-Consult the on-line help for detailed descriptions:
+The following directives are understood by the CUPS network backends. Consult
+the on-line help for detailed descriptions:
 .TP 5
 Address @IF(\fIname\fR)
 .TP 5
@@ -37,37 +35,44 @@ Address @LOCAL
 .TP 5
 Address \fIaddress\fR
 .br
-Sends SNMP broadcast queries to the specified address(es). The
-default address is "@LOCAL" which broadcasts to all LAN
-interfaces.
+Sends SNMP broadcast queries to the specified address(es). There is no default
+for the broadcast address.
 .TP 5
 Community \fIname\fR
 .br
-Specifies a SNMP community to query. The default community is
-"public".
+Specifies the community name to use. Only a single community name may be
+specified. The default community name is "public".
 .TP 5
-DebugLevel \fIN\fR
+DebugLevel number
 .br
-Sets the debug logging level to \fIN\fR; 0 disables debug
-logging, 1 enables basic logging, 2 displays SNMP values, and 3
-displays raw hex data.
+Specifies the logging level from 0 (none) to 3 (everything). Typically only used
+for debugging (thus the name). The default debug level is 0.
+.TP 5
+DeviceURI "regular expression" device-uri [... device-uri]
+.br
+Specifies one or more device URIs that should be used for a given make and model
+string. The regular expression is used to match the detected make and model, and
+the device URI strings must be of the form "scheme://%s[:port]/[path]", where
+"%s" represents the detected address or hostname. There are no default device
+URI matching rules.
 .TP 5
 HostNameLookups on
 .TP 5
 HostNameLookups off
 .br
-Specifies whether the addresses of printers should be converted
-to hostnames or left as numeric IP addresses. The default is
-"off".
+Specifies whether the addresses of printers should be converted to hostnames or
+left as numeric IP addresses. The default is "off".
 .TP 5
 MaxRunTime \fIseconds\fR
 .br
-Specifies the maximum number of seconds that the SNMP backend
-will scan the network for printers.
+Specifies the maximum number of seconds that the SNMP backend will scan the
+network for printers. The default is 120 seconds (2 minutes).
 .SH SEE ALSO
+cups-snmp(8),
+.br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2011 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id: cups-snmp.conf.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

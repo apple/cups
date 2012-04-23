@@ -438,7 +438,7 @@ page header structure.">cupsRasterWriteHeader2</a></li>
 
   Raster API introduction for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
+  Copyright 2007-2012 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -457,7 +457,7 @@ avoid incompatibilities with newer versions of CUPS.</p>
 
 <p>Two kinds of CUPS filters use the CUPS raster API - raster image processor
 (RIP) filters such as <code>pstoraster</code> and <code>cgpdftoraster</code>
-(Mac OS X) that produce CUPS raster files and printer driver filters that
+(OS X) that produce CUPS raster files and printer driver filters that
 convert CUPS raster files into a format usable by the printer. Printer
 driver filters are by far the most common.</p>
 
@@ -577,7 +577,7 @@ the memory used to read the raster file:</p>
 
 <ul class="code">
 
-	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
 	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a version 2 page header structure.">cupsRasterReadHeader2</a></li>
 	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
 
@@ -588,10 +588,10 @@ the memory used to read the raster file:</p>
 <ul class="code">
 
 	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
-	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
 	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a></li>
 	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
-	
+
 </ul>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><a name="cupsRasterClose">cupsRasterClose</a></h3>
@@ -608,7 +608,7 @@ void cupsRasterClose (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The file descriptor associated with the raster stream must be closed
 separately as needed.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
 <p class="description">Interpret PPD commands to create a page header.</p>
 <p class="code">
 int cupsRasterInterpretPPD (<br>
@@ -743,7 +743,7 @@ of the version 2 page header data. This function handles reading version 2
 page headers and copying only the version 1 data into the provided buffer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterReadHeader2">cupsRasterReadHeader2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterReadHeader2">cupsRasterReadHeader2</a></h3>
 <p class="description">Read a raster page header and store it in a
 version 2 page header structure.</p>
 <p class="code">
@@ -804,7 +804,7 @@ unsigned cupsRasterWriteHeader (<br>
 <p class="discussion">This function is deprecated. Use <a href="#cupsRasterWriteHeader2"><code>cupsRasterWriteHeader2</code></a> instead.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterWriteHeader2">cupsRasterWriteHeader2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterWriteHeader2">cupsRasterWriteHeader2</a></h3>
 <p class="description">Write a raster page header from a version 2
 page header structure.</p>
 <p class="code">
@@ -899,7 +899,7 @@ typedef enum <a href="#cups_order_e">cups_order_e</a> cups_order_t;
 <p class="code">
 typedef enum <a href="#cups_orient_e">cups_orient_e</a> cups_orient_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
 <p class="description">Version 2 page header </p>
 <p class="code">
 typedef struct <a href="#cups_page_header2_s">cups_page_header2_s</a> cups_page_header2_t;
@@ -920,7 +920,7 @@ typedef ssize_t (*cups_raster_iocb_t)(void *ctx, unsigned char *buffer, size_t l
 typedef struct _cups_raster_s cups_raster_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
 <p class="description">Version 2 page header </p>
 <p class="code">struct cups_page_header2_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
@@ -1033,7 +1033,7 @@ typedef struct _cups_raster_s cups_raster_t;
 <dd class="description">Number of bits for each color</dd>
 <dt>cupsBitsPerPixel </dt>
 <dd class="description">Number of bits for each pixel</dd>
-<dt>cupsBorderlessScalingFactor <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsBorderlessScalingFactor <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Scaling that was applied to page data </dd>
 <dt>cupsBytesPerLine </dt>
 <dd class="description">Number of bytes per line</dd>
@@ -1045,26 +1045,26 @@ typedef struct _cups_raster_s cups_raster_t;
 <dd class="description">Device compression to use</dd>
 <dt>cupsHeight </dt>
 <dd class="description">Height of page image in pixels</dd>
-<dt>cupsImagingBBox[4] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsImagingBBox[4] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Floating point ImagingBoundingBox
 (scaling factor not applied, left,
 bottom, right, top) </dd>
-<dt>cupsInteger[16] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsInteger[16] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined integer values </dd>
-<dt>cupsMarkerType[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsMarkerType[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Ink/toner type </dd>
 <dt>cupsMediaType </dt>
 <dd class="description">Media type code</dd>
-<dt>cupsNumColors <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsNumColors <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Number of color compoents </dd>
-<dt>cupsPageSizeName[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsPageSizeName[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">PageSize name </dd>
-<dt>cupsPageSize[2] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsPageSize[2] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Floating point PageSize (scaling *
 factor not applied) </dd>
-<dt>cupsReal[16] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsReal[16] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined floating-point values </dd>
-<dt>cupsRenderingIntent[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsRenderingIntent[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Color rendering intent </dd>
 <dt>cupsRowCount </dt>
 <dd class="description">Rows per band</dd>
@@ -1072,7 +1072,7 @@ factor not applied) </dd>
 <dd class="description">Feed between bands</dd>
 <dt>cupsRowStep </dt>
 <dd class="description">Spacing between lines</dd>
-<dt>cupsString[16][64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>cupsString[16][64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined string values </dd>
 <dt>cupsWidth </dt>
 <dd class="description">Width of page image in pixels</dd>
@@ -1232,9 +1232,9 @@ factor not applied) </dd>
 <dl>
 <dt>CUPS_CSPACE_ADOBERGB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
 <dd class="description">Red, green, blue (Adobe RGB) </dd>
-<dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE Lab </dd>
-<dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE XYZ </dd>
 <dt>CUPS_CSPACE_CMY </dt>
 <dd class="description">Cyan, magenta, yellow (DeviceCMY)</dd>
@@ -1276,35 +1276,35 @@ factor not applied) </dd>
 <dd class="description">Gold, magenta, yellow, silver </dd>
 <dt>CUPS_CSPACE_GOLD <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">Gold foil </dd>
-<dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 1 color </dd>
-<dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 2 colors </dd>
-<dt>CUPS_CSPACE_ICC3 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC3 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 3 colors </dd>
-<dt>CUPS_CSPACE_ICC4 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC4 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 4 colors </dd>
-<dt>CUPS_CSPACE_ICC5 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC5 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 5 colors </dd>
-<dt>CUPS_CSPACE_ICC6 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC6 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 6 colors </dd>
-<dt>CUPS_CSPACE_ICC7 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC7 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 7 colors </dd>
-<dt>CUPS_CSPACE_ICC8 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC8 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 8 colors </dd>
-<dt>CUPS_CSPACE_ICC9 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC9 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 9 colors </dd>
-<dt>CUPS_CSPACE_ICCA <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCA <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 10 colors </dd>
-<dt>CUPS_CSPACE_ICCB <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCB <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 11 colors </dd>
-<dt>CUPS_CSPACE_ICCC <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCC <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 12 colors </dd>
-<dt>CUPS_CSPACE_ICCD <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCD <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 13 colors </dd>
-<dt>CUPS_CSPACE_ICCE <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCE <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 14 colors </dd>
-<dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 15 colors </dd>
 <dt>CUPS_CSPACE_K </dt>
 <dd class="description">Black (DeviceK)</dd>
@@ -1316,7 +1316,7 @@ factor not applied) </dd>
 <dd class="description">Red, green, blue (DeviceRGB, sRGB by default)</dd>
 <dt>CUPS_CSPACE_RGBA </dt>
 <dd class="description">Red, green, blue, alpha (DeviceRGB, sRGB by default)</dd>
-<dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Red, green, blue, white (DeviceRGB, sRGB by default) </dd>
 <dt>CUPS_CSPACE_SILVER <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">Silver foil </dd>
@@ -1382,9 +1382,9 @@ factor not applied) </dd>
 <dd class="description">Open stream for reading</dd>
 <dt>CUPS_RASTER_WRITE </dt>
 <dd class="description">Open stream for writing</dd>
-<dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
+<dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Open stream for compressed writing </dd>
-<dt>CUPS_RASTER_WRITE_PWG <span class="info">&nbsp;CUPS 1.5/Mac OS X 10.7&nbsp;</span></dt>
+<dt>CUPS_RASTER_WRITE_PWG <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">Open stream for compressed writing in PWG mode </dd>
 </dl>
 <h3 class="enumeration"><a name="cups_order_e">cups_order_e</a></h3>

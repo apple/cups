@@ -35,7 +35,7 @@
  * The returned string is stored in the localization array and will become
  * invalid if the localization array is deleted.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 const char *				/* O - Localized string */
@@ -56,7 +56,7 @@ cupsLocalizeDestOption(
  * The returned string is stored in the localization array and will become
  * invalid if the localization array is deleted.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 const char *				/* O - Localized string */

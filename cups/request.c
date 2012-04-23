@@ -3,7 +3,7 @@
  *
  *   IPP utilities for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -112,7 +112,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
  * If "outfile" is a valid file descriptor, cupsDoIORequest() copies
  * all of the data after the IPP response message to the file.
  *
- * @since CUPS 1.3/Mac OS X 10.5@
+ * @since CUPS 1.3/OS X 10.5@
  */
 
 ipp_t *					/* O - Response data */
@@ -335,7 +335,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
  * additional data, use httpRead() after getting a successful response,
  * otherwise call httpFlush() to complete the response processing.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 ipp_t *					/* O - Response or @code NULL@ on HTTP error */
@@ -499,7 +499,7 @@ cupsLastError(void)
 /*
  * 'cupsLastErrorString()' - Return the last IPP status-message.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 const char *				/* O - status-message text from last request */
@@ -545,7 +545,7 @@ _cupsNextDelay(int current,		/* I  - Current delay value or 0 */
  * This function is used after cupsGetResponse() to read the PPD or document
  * files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 ssize_t					/* O - Bytes read, 0 on EOF, -1 on error */
@@ -592,7 +592,7 @@ cupsReadResponseData(
  * Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
  * request is not freed.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 http_status_t				/* O - Initial HTTP status */
@@ -884,7 +884,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  * This function is used after @link cupsSendRequest@ to provide a PPD and
  * after @link cupsStartDocument@ to provide a document file.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 http_status_t				/* O - @code HTTP_CONTINUE@ if OK or HTTP status on error */

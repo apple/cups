@@ -3,7 +3,7 @@
  *
  *   Private SNMP definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,7 +34,7 @@
 #define CUPS_SNMP_MAX_COMMUNITY	512	/* Maximum size of community name */
 #define CUPS_SNMP_MAX_OID	128	/* Maximum number of OID numbers */
 #define CUPS_SNMP_MAX_PACKET	1472	/* Maximum size of SNMP packet */
-#define CUPS_SNMP_MAX_STRING	65536	/* Maximum size of string */
+#define CUPS_SNMP_MAX_STRING	1024	/* Maximum size of string */
 #define CUPS_SNMP_VERSION_1	0	/* SNMPv1 */
 
 

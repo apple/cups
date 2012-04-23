@@ -3,7 +3,7 @@
  *
  *   Directory services definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,24 +34,31 @@ VAR int			Browsing	VALUE(TRUE),
 			BrowseLocalProtocols
 					VALUE(BROWSE_ALL);
 					/* Protocols to support for local printers */
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
 VAR char		*DNSSDComputerName VALUE(NULL),
 					/* Computer/server name */
 			*DNSSDHostName	VALUE(NULL),
 					/* Hostname */
-			*DNSSDRegType VALUE(NULL);
-					/* Bonjour registration type */
+			*DNSSDSubTypes VALUE(NULL);
+					/* Bonjour registration subtypes */
 VAR cups_array_t	*DNSSDAlias	VALUE(NULL);
 					/* List of dynamic ServerAlias's */
 VAR int			DNSSDPort	VALUE(0);
 					/* Port number to register */
 VAR cups_array_t	*DNSSDPrinters	VALUE(NULL);
 					/* Printers we have registered */
-VAR DNSServiceRef	DNSSDRef	VALUE(NULL),
+#  ifdef HAVE_DNSSD
+VAR DNSServiceRef	DNSSDMaster	VALUE(NULL);
 					/* Master DNS-SD service reference */
-			WebIFRef	VALUE(NULL);
+#  else /* HAVE_AVAHI */
+VAR AvahiThreadedPoll	*DNSSDMaster	VALUE(NULL);
+					/* Master polling interface for Avahi */
+VAR AvahiClient		*DNSSDClient	VALUE(NULL);
+					/* Client information */
+#  endif /* HAVE_DNSSD */
+VAR cupsd_srv_t		WebIFSrv	VALUE(NULL);
 					/* Service reference for the web interface */
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 VAR char		*LPDConfigFile	VALUE(NULL),
 					/* LPD configuration file */
@@ -67,9 +74,9 @@ extern void	cupsdDeregisterPrinter(cupsd_printer_t *p, int removeit);
 extern void	cupsdRegisterPrinter(cupsd_printer_t *p);
 extern void	cupsdStartBrowsing(void);
 extern void	cupsdStopBrowsing(void);
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
 extern void	cupsdUpdateDNSSDName(void);
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
 
 /*

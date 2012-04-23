@@ -3,7 +3,7 @@
  *
  *   Administration CGI for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -523,7 +523,7 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
   else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(_("Add RSS Subscription"));
-    cgiShowIPPError(_("Unable to add RSS subscription:"));
+    cgiShowIPPError(_("Unable to add RSS subscription"));
   }
   else
   {
@@ -810,8 +810,8 @@ do_am_class(http_t *http,		/* I - HTTP connection */
   else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(title);
-    cgiShowIPPError(modify ? _("Unable to modify class:") :
-                             _("Unable to add class:"));
+    cgiShowIPPError(modify ? _("Unable to modify class") :
+                             _("Unable to add class"));
   }
   else
   {
@@ -1055,8 +1055,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       else
       {
 	cgiStartHTML(title);
-	cgiShowIPPError(modify ? _("Unable to modify printer:") :
-				 _("Unable to add printer:"));
+	cgiShowIPPError(modify ? _("Unable to modify printer") :
+				 _("Unable to add printer"));
 	cgiEndHTML();
         return;
       }
@@ -1317,7 +1317,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     else
     {
       cgiStartHTML(title);
-      cgiShowIPPError(_("Unable to get list of printer drivers:"));
+      cgiShowIPPError(_("Unable to get list of printer drivers"));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
     }
@@ -1415,8 +1415,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(title);
-      cgiShowIPPError(modify ? _("Unable to modify printer:") :
-                               _("Unable to add printer:"));
+      cgiShowIPPError(modify ? _("Unable to modify printer") :
+                               _("Unable to add printer"));
     }
     else if (modify)
     {
@@ -1522,7 +1522,7 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
   else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(_("Cancel RSS Subscription"));
-    cgiShowIPPError(_("Unable to cancel RSS subscription:"));
+    cgiShowIPPError(_("Unable to cancel RSS subscription"));
   }
   else
   {
@@ -1654,7 +1654,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     {
       cgiStartHTML(cgiText(_("Change Settings")));
       cgiSetVariable("MESSAGE",
-                     cgiText(_("Unable to change server settings:")));
+                     cgiText(_("Unable to change server settings")));
       cgiSetVariable("ERROR", cupsLastErrorString());
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -1796,7 +1796,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
 	cgiStartHTML(cgiText(_("Change Settings")));
 	cgiSetVariable("MESSAGE",
-                       cgiText(_("Unable to change server settings:")));
+                       cgiText(_("Unable to change server settings")));
 	cgiSetVariable("ERROR", cupsLastErrorString());
 	cgiCopyTemplateLang("error.tmpl");
       }
@@ -1847,7 +1847,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if ((tempfd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to create temporary file:")));
+      cgiSetVariable("MESSAGE", cgiText(_("Unable to create temporary file")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -1859,7 +1859,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if ((temp = cupsFileOpenFd(tempfd, "w")) == NULL)
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to create temporary file:")));
+      cgiSetVariable("MESSAGE", cgiText(_("Unable to create temporary file")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -1909,7 +1909,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     else if (status != HTTP_CREATED)
     {
       cgiSetVariable("MESSAGE",
-                     cgiText(_("Unable to upload cupsd.conf file:")));
+                     cgiText(_("Unable to upload cupsd.conf file")));
       cgiSetVariable("ERROR", httpStatus(status));
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
@@ -1956,7 +1956,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiSetVariable("MESSAGE",
-                     cgiText(_("Unable to access cupsd.conf file:")));
+                     cgiText(_("Unable to access cupsd.conf file")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -1969,7 +1969,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     {
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiSetVariable("MESSAGE",
-                     cgiText(_("Unable to access cupsd.conf file:")));
+                     cgiText(_("Unable to access cupsd.conf file")));
       cgiSetVariable("ERROR",
                      cgiText(_("Unable to edit cupsd.conf files larger than "
 		               "1MB")));
@@ -1993,7 +1993,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiSetVariable("MESSAGE",
-                     cgiText(_("Unable to access cupsd.conf file:")));
+                     cgiText(_("Unable to access cupsd.conf file")));
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -2150,7 +2150,7 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   cgiStartHTML(cgiText(_("Delete Class")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
-    cgiShowIPPError(_("Unable to delete class:"));
+    cgiShowIPPError(_("Unable to delete class"));
   else
     cgiCopyTemplateLang("class-deleted.tmpl");
 
@@ -2235,7 +2235,7 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   cgiStartHTML(cgiText(_("Delete Printer")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
-    cgiShowIPPError(_("Unable to delete printer:"));
+    cgiShowIPPError(_("Unable to delete printer"));
   else
     cgiCopyTemplateLang("printer-deleted.tmpl");
 
@@ -2639,10 +2639,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
 #endif /* HAVE_GSSAPI */
   cgiSetVariable("KERBEROS", "");
 
-#ifdef HAVE_DNSSD
-  cgiSetVariable("HAVE_DNSSD", "1");
-#endif /* HAVE_DNSSD */
-
   if ((val = cupsGetOption("BrowseWebIF", num_settings,
                            settings)) == NULL)
     val = "No";
@@ -2841,7 +2837,7 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
       exit(0);
     }
     else if (cupsLastError() > IPP_OK_CONFLICT)
-      cgiShowIPPError(_("Unable to get printer attributes:"));
+      cgiShowIPPError(_("Unable to get printer attributes"));
     else
       cgiCopyTemplateLang("users.tmpl");
 
@@ -2991,7 +2987,7 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
     else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(cgiText(_("Set Allowed Users")));
-      cgiShowIPPError(_("Unable to change printer:"));
+      cgiShowIPPError(_("Unable to change printer"));
     }
     else
     {
@@ -3078,7 +3074,7 @@ do_set_default(http_t *http)		/* I - HTTP connection */
   else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(title);
-    cgiShowIPPError(_("Unable to set server default:"));
+    cgiShowIPPError(_("Unable to set server default"));
   }
   else
   {
@@ -3187,7 +3183,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     if ((ppd = ppdOpenFile(filename)) == NULL)
     {
       cgiSetVariable("ERROR", ppdErrorString(ppdLastError(&i)));
-      cgiSetVariable("MESSAGE", cgiText(_("Unable to open PPD file:")));
+      cgiSetVariable("MESSAGE", cgiText(_("Unable to open PPD file")));
       cgiStartHTML(title);
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -3808,7 +3804,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     else if (cupsLastError() > IPP_OK_CONFLICT)
     {
       cgiStartHTML(title);
-      cgiShowIPPError(_("Unable to set options:"));
+      cgiShowIPPError(_("Unable to set options"));
     }
     else
     {
@@ -3907,7 +3903,7 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
   else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     cgiStartHTML(cgiText(_("Set Publishing")));
-    cgiShowIPPError(_("Unable to change printer-is-shared attribute:"));
+    cgiShowIPPError(_("Unable to change printer-is-shared attribute"));
   }
   else
   {

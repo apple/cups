@@ -3,7 +3,7 @@
 //
 //   PPD file compiler main entry for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2011 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -449,8 +449,7 @@ usage(void)
                           "as the filename."));
   _cupsLangPuts(stdout, _("  -t                      Test PPDs instead of "
                           "generating them."));
-  _cupsLangPuts(stdout, _("  -v                      Be verbose (more v's for "
-                          "more verbosity)."));
+  _cupsLangPuts(stdout, _("  -v                      Be verbose."));
   _cupsLangPuts(stdout, _("  -z                      Compress PPD files using "
                           "GNU zip."));
   _cupsLangPuts(stdout, _("  --cr                    End lines with CR (Mac "
@@ -458,7 +457,7 @@ usage(void)
   _cupsLangPuts(stdout, _("  --crlf                  End lines with CR + LF "
                           "(Windows)."));
   _cupsLangPuts(stdout, _("  --lf                    End lines with LF "
-                          "(UNIX/Linux/Mac OS X)."));
+                          "(UNIX/Linux/OS X)."));
 
   exit(1);
 }

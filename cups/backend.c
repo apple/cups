@@ -44,7 +44,7 @@ static void	quote_string(const char *s);
  * variable or the device URI passed in argv[0], whichever is found
  * first.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 const char *				/* O - Device URI or @code NULL@ */
@@ -54,6 +54,8 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
 		*auth_info_required;	/* AUTH_INFO_REQUIRED env var */
   _cups_globals_t *cg = _cupsGlobals();	/* Global info */
   int		options;		/* Resolve options */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_attr_t	*ppdattr;		/* PPD attribute */
 
 
   if ((device_uri = getenv("DEVICE_URI")) == NULL)
@@ -69,6 +71,15 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
       !strcmp(auth_info_required, "negotiate"))
     options |= _HTTP_RESOLVE_FQDN;
 
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
+  {
+    if ((ppdattr = ppdFindAttr(ppd, "cupsIPPFaxOut", NULL)) != NULL &&
+        !_cups_strcasecmp(ppdattr->value, "true"))
+      options |= _HTTP_RESOLVE_FAXOUT;
+
+    ppdClose(ppd);
+  }
+
   return (_httpResolveURI(device_uri, cg->resolved_uri,
                           sizeof(cg->resolved_uri), options, NULL, NULL));
 }
@@ -81,7 +92,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
  * It handles quoting of special characters in the device-make-and-model,
  * device-info, device-id, and device-location strings.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 void

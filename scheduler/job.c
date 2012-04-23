@@ -14,7 +14,7 @@
  *
  * Contents:
  *
-﻿*   cupsdAddJob()		- Add a new job to the job queue.
+ *   cupsdAddJob()		- Add a new job to the job queue.
  *   cupsdCancelJobs()		- Cancel all jobs for the given
  *				  destination/user.
  *   cupsdCheckJobs()		- Check the pending jobs and start any if the
@@ -1963,7 +1963,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  else if (!strcmp(line, "password"))
 	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
 	  else if (!strcmp(line, "negotiate"))
-	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", line);
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", data);
 	  else
 	    continue;
 
@@ -3189,16 +3189,15 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
       case CUPS_BACKEND_CANCEL :
          /*
-	  * Abort the job...
+	  * Cancel the job...
 	  */
 
 	  if (job_state == IPP_JOB_COMPLETED)
 	  {
-	    job_state = IPP_JOB_ABORTED;
-	    message   = "Job aborted due to backend errors; please consult "
-			"the error_log file for details.";
+	    job_state = IPP_JOB_CANCELED;
+	    message   = "Job canceled at printer.";
 
-	    ippSetString(job->attrs, &job->reasons, 0, "aborted-by-system");
+	    ippSetString(job->attrs, &job->reasons, 0, "canceled-at-device");
 	  }
           break;
 

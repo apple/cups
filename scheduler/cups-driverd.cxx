@@ -928,7 +928,7 @@ get_file(const char *name,		/* I - Name */
        slash > printerDriver))
   {
    /*
-    * Map ppd-name to Mac OS X standard locations...
+    * Map ppd-name to OS X standard locations...
     */
 
     snprintf(buffer, bufsize, "/%s", name);
@@ -1099,7 +1099,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
 #ifdef __APPLE__
  /*
-  * Load PPDs from standard Mac OS X locations...
+  * Load PPDs from standard OS X locations...
   */
 
   load_ppds("/Library/Printers",
@@ -1502,52 +1502,52 @@ list_ppds(int        request_id,	/* I - Request ID */
     if (request_id)
     {
       cupsdSendIPPGroup(IPP_TAG_PRINTER);
-  
+
       if (send_name)
 	cupsdSendIPPString(IPP_TAG_NAME, "ppd-name", ppd->record.name);
-  
+
       if (send_natural_language)
       {
 	cupsdSendIPPString(IPP_TAG_LANGUAGE, "ppd-natural-language",
 			   ppd->record.languages[0]);
-  
+
 	for (i = 1; i < PPD_MAX_LANG && ppd->record.languages[i][0]; i ++)
 	  cupsdSendIPPString(IPP_TAG_LANGUAGE, "", ppd->record.languages[i]);
       }
-  
+
       if (send_make)
 	cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make", ppd->record.make);
-  
+
       if (send_make_and_model)
 	cupsdSendIPPString(IPP_TAG_TEXT, "ppd-make-and-model",
 			   ppd->record.make_and_model);
-  
+
       if (send_device_id)
 	cupsdSendIPPString(IPP_TAG_TEXT, "ppd-device-id",
 			   ppd->record.device_id);
-  
+
       if (send_product)
       {
 	cupsdSendIPPString(IPP_TAG_TEXT, "ppd-product",
 			   ppd->record.products[0]);
-  
+
 	for (i = 1; i < PPD_MAX_PROD && ppd->record.products[i][0]; i ++)
 	  cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.products[i]);
       }
-  
+
       if (send_psversion)
       {
 	cupsdSendIPPString(IPP_TAG_TEXT, "ppd-psversion",
 			   ppd->record.psversions[0]);
-  
+
 	for (i = 1; i < PPD_MAX_VERS && ppd->record.psversions[i][0]; i ++)
 	  cupsdSendIPPString(IPP_TAG_TEXT, "", ppd->record.psversions[i]);
       }
-  
+
       if (send_type)
 	cupsdSendIPPString(IPP_TAG_KEYWORD, "ppd-type",
 			   PPDTypes[ppd->record.type]);
-  
+
       if (send_model_number)
 	cupsdSendIPPInteger(IPP_TAG_INTEGER, "ppd-model-number",
 			    ppd->record.model_number);
@@ -2699,6 +2699,8 @@ load_tar(const char  *filename,		/* I - Actual filename */
  /*
   * Add a dummy entry for the file...
   */
+
+  (void)filename;
 
   add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
           PPD_TYPE_ARCHIVE, "file");

@@ -3,7 +3,7 @@
  *
  *   Private threading definitions for CUPS.
  *
- *   Copyright 2009-2010 by Apple Inc.
+ *   Copyright 2009-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -49,7 +49,7 @@ typedef pthread_key_t	_cups_threadkey_t;
 typedef void *(__stdcall *_cups_thread_func_t)(void *arg);
 typedef struct _cups_mutex_s
 {
-  int			m_init;		/* Flag for on-demand initialization */		
+  int			m_init;		/* Flag for on-demand initialization */
   CRITICAL_SECTION	m_criticalSection;
 					/* Win32 Critical Section */
 } _cups_mutex_t;
@@ -62,6 +62,7 @@ typedef DWORD	_cups_threadkey_t;
 #    define _cupsThreadSetData(k,p) TlsSetValue(k,p)
 
 #  else
+typedef void	*(*_cups_thread_func_t)(void *arg);
 typedef char	_cups_mutex_t;
 typedef char	_cups_rwlock_t;
 typedef void	*_cups_threadkey_t;

@@ -3,7 +3,7 @@
  *
  *   Page size functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -198,7 +198,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
  * If the specified PPD file does not support custom page sizes, both
  * "minimum" and "maximum" are filled with zeroes.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 int					/* O - 1 if custom sizes are supported, 0 otherwise */

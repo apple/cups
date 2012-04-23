@@ -3,7 +3,7 @@
  *
  *   Raster file definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -117,28 +117,28 @@ typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
   CUPS_CSPACE_GOLD = 13,		/* Gold foil @deprecated@ */
   CUPS_CSPACE_SILVER = 14,		/* Silver foil @deprecated@ */
 
-  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white (DeviceRGB, sRGB by default) @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white (DeviceRGB, sRGB by default) @since CUPS 1.2/OS X 10.5@ */
   CUPS_CSPACE_SW = 18,			/* Luminance (gamma 2.2) @since CUPS 1.4.5@ */
   CUPS_CSPACE_SRGB = 19,		/* Red, green, blue (sRGB) @since CUPS 1.4.5@ */
   CUPS_CSPACE_ADOBERGB = 20,		/* Red, green, blue (Adobe RGB) @since CUPS 1.4.5@ */
 
-  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
-  CUPS_CSPACE_ICCF = 46,		/* ICC-based, 15 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19/OS X 10.3@ */
+  CUPS_CSPACE_ICCF = 46,		/* ICC-based, 15 colors @since CUPS 1.1.19/OS X 10.3@ */
 
   CUPS_CSPACE_DEVICE1 = 48,		/* DeviceN, 1 color @since CUPS 1.4.5@ */
   CUPS_CSPACE_DEVICE2 = 49,		/* DeviceN, 2 colors @since CUPS 1.4.5@ */
@@ -186,8 +186,8 @@ enum cups_mode_e			/**** cupsRasterOpen modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
-  CUPS_RASTER_WRITE_COMPRESSED = 2,	/* Open stream for compressed writing @since CUPS 1.3/Mac OS X 10.5@ */
-  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5/Mac OS X 10.7@ */
+  CUPS_RASTER_WRITE_COMPRESSED = 2,	/* Open stream for compressed writing @since CUPS 1.3/OS X 10.5@ */
+  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5/OS X 10.7@ */
 };
 
 typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/
@@ -266,7 +266,7 @@ typedef struct cups_page_header_s	/**** Version 1 page header @deprecated@ ****/
 } cups_page_header_t;
 
 /**** New in CUPS 1.2 ****/
-typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2/Mac OS X 10.5@ ****/
+typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2/OS X 10.5@ ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -314,20 +314,20 @@ typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2/M
   unsigned	cupsRowStep;		/* Spacing between lines */
 
   /**** Version 2 Dictionary Values ****/
-  unsigned	cupsNumColors;		/* Number of color compoents @since CUPS 1.2/Mac OS X 10.5@ */
+  unsigned	cupsNumColors;		/* Number of color compoents @since CUPS 1.2/OS X 10.5@ */
   float		cupsBorderlessScalingFactor;
-					/* Scaling that was applied to page data @since CUPS 1.2/Mac OS X 10.5@ */
+					/* Scaling that was applied to page data @since CUPS 1.2/OS X 10.5@ */
   float		cupsPageSize[2];	/* Floating point PageSize (scaling *
-  					 * factor not applied) @since CUPS 1.2/Mac OS X 10.5@ */
+  					 * factor not applied) @since CUPS 1.2/OS X 10.5@ */
   float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox
 					 * (scaling factor not applied, left,
-					 * bottom, right, top) @since CUPS 1.2/Mac OS X 10.5@ */
-  unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2/Mac OS X 10.5@ */
-  float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2/Mac OS X 10.5@ */
-  char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2/Mac OS X 10.5@ */
-  char		cupsMarkerType[64];	/* Ink/toner type @since CUPS 1.2/Mac OS X 10.5@ */
-  char		cupsRenderingIntent[64];/* Color rendering intent @since CUPS 1.2/Mac OS X 10.5@ */
-  char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2/Mac OS X 10.5@ */
+					 * bottom, right, top) @since CUPS 1.2/OS X 10.5@ */
+  unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2/OS X 10.5@ */
+  float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2/OS X 10.5@ */
+  char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2/OS X 10.5@ */
+  char		cupsMarkerType[64];	/* Ink/toner type @since CUPS 1.2/OS X 10.5@ */
+  char		cupsRenderingIntent[64];/* Color rendering intent @since CUPS 1.2/OS X 10.5@ */
+  char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2/OS X 10.5@ */
 } cups_page_header2_t;
 
 typedef struct _cups_raster_s cups_raster_t;

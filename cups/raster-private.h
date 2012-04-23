@@ -36,7 +36,7 @@
 
 
 /*
- * min/max/abs macros...
+ * min/max macros...
  */
 
 #  ifndef max
@@ -45,9 +45,6 @@
 #  ifndef min
 #    define 	min(a,b)	((a) < (b) ? (a) : (b))
 #  endif /* !min */
-#  ifndef abs
-#    define	abs(a)		((a) < 0 ? -(a) : (a))
-#  endif /* !abs */
 
 
 /*

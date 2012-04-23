@@ -411,7 +411,7 @@ static size_t	ipp_col_string(ipp_t *col, char *buffer, size_t bufsize);
  * trailing nul. The buffer pointer can be NULL to get the required length,
  * just like (v)snprintf.
  *
- * @since CUPS 1.6@
+ * @since CUPS 1.6/OS X 10.8@
  */
 
 size_t					/* O - Number of bytes less nul */
@@ -821,7 +821,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 /*
  * 'ippErrorValue()' - Return a status code for the given name.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ipp_status_t				/* O - IPP status code */
@@ -859,7 +859,7 @@ ippErrorValue(const char *name)		/* I - Name */
 /*
  * 'ippOpString()' - Return a name for the given operation id.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 const char *				/* O - Name */
@@ -894,7 +894,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
 /*
  * 'ippOpValue()' - Return an operation id for the given name.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ipp_op_t				/* O - Operation ID */
@@ -970,7 +970,7 @@ ippSetPort(int p)			/* I - Port number to use */
  *
  * The returned names are defined in RFC 2911 and 3382.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 const char *				/* O - Tag name */
@@ -990,7 +990,7 @@ ippTagString(ipp_tag_t tag)		/* I - Tag value */
  *
  * The tag names are defined in RFC 2911 and 3382.
  *
- * @since CUPS 1.4/Mac OS X 10.6@
+ * @since CUPS 1.4/OS X 10.6@
  */
 
 ipp_tag_t				/* O - Tag value */

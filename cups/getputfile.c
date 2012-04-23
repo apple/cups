@@ -3,7 +3,7 @@
  *
  *   Get/put file functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -41,7 +41,7 @@
  *
  * This function returns @code HTTP_OK@ when the file is successfully retrieved.
  *
- * @since CUPS 1.1.20/Mac OS X 10.4@
+ * @since CUPS 1.1.20/OS X 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -187,7 +187,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
  *
  * This function returns @code HTTP_OK@ when the file is successfully retrieved.
  *
- * @since CUPS 1.1.20/Mac OS X 10.4@
+ * @since CUPS 1.1.20/OS X 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -255,7 +255,7 @@ cupsGetFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
  * This function returns @code HTTP_CREATED@ when the file is stored
  * successfully.
  *
- * @since CUPS 1.1.20/Mac OS X 10.4@
+ * @since CUPS 1.1.20/OS X 10.4@
  */
 
 http_status_t				/* O - HTTP status */
@@ -446,7 +446,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
  * This function returns @code HTTP_CREATED@ when the file is stored
  * successfully.
  *
- * @since CUPS 1.1.20/Mac OS X 10.4@
+ * @since CUPS 1.1.20/OS X 10.4@
  */
 
 http_status_t				/* O - HTTP status */

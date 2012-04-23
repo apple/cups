@@ -3,7 +3,7 @@
  *
  *   Job status CGI for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -195,7 +195,7 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
   cgiStartHTML(cgiText(_("Jobs")));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
-    cgiShowIPPError(_("Job operation failed:"));
+    cgiShowIPPError(_("Job operation failed"));
   else if (op == IPP_CANCEL_JOB)
     cgiCopyTemplateLang("job-cancel.tmpl");
   else if (op == IPP_HOLD_JOB)

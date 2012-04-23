@@ -3,7 +3,7 @@
  *
  *   PPD file routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -327,7 +327,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 /*
  * 'ppdErrorString()' - Returns the text assocated with a status.
  *
- * @since CUPS 1.1.19/Mac OS X 10.3@
+ * @since CUPS 1.1.19/OS X 10.3@
  */
 
 const char *				/* O - Status string */
@@ -397,7 +397,7 @@ _ppdGetEncoding(const char *name)	/* I - LanguageEncoding string */
 /*
  * 'ppdLastError()' - Return the status from the last ppdOpen*().
  *
- * @since CUPS 1.1.19/Mac OS X 10.3@
+ * @since CUPS 1.1.19/OS X 10.3@
  */
 
 ppd_status_t				/* O - Status code */
@@ -417,7 +417,7 @@ ppdLastError(int *line)			/* O - Line number */
 /*
  * '_ppdOpen()' - Read a PPD file into memory.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
@@ -2106,7 +2106,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 /*
  * 'ppdOpen2()' - Read a PPD file into memory.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
@@ -2231,7 +2231,7 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 /*
  * 'ppdSetConformance()' - Set the conformance level for PPD files.
  *
- * @since CUPS 1.1.20/Mac OS X 10.4@
+ * @since CUPS 1.1.20/OS X 10.4@
  */
 
 void
@@ -3062,7 +3062,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
     DEBUG_printf(("9ppd_read: LINE=\"%s\"", line->buffer));
 
    /*
-    * The dynamically created PPDs for older style Mac OS X
+    * The dynamically created PPDs for older style OS X
     * drivers include a large blob of data inserted as comments
     * at the end of the file.  As an optimization we can stop
     * reading the PPD when we get to the start of this data.
