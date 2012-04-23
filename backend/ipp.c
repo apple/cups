@@ -1886,10 +1886,7 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status > IPP_OK_CONFLICT && ipp_status != IPP_ERROR_JOB_CANCELED)
     return (CUPS_BACKEND_RETRY_CURRENT);
   else
-  {
-    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
     return (CUPS_BACKEND_OK);
-  }
 }
 
 
