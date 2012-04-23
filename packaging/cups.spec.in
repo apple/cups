@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -18,10 +18,16 @@
 # Conditional build options (--with name/--without name):
 #
 #   dbus     - Enable/disable DBUS support (default = enable)
+#   dnssd    - Enable/disable DNS-SD support (default = enable)
+#   static   - Enable/disable static libraries (default = enable)
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
 %{!?_with_dbus: %define _dbus --disable-dbus}
+
+%{!?_with_dnssd: %{!?_without_dnssd: %define _without_dnssd --without-dnssd}}
+%{?_with_dnssd: %define _dnssd --enable-dnssd}
+%{!?_with_dnssd: %define _dnssd --disable-dnssd}
 
 %{!?_with_static: %{!?_without_static: %define _without_static --without-static}}
 %{?_with_static: %define _static --enable-static}
@@ -34,7 +40,7 @@ Release: 0
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: http://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.bz2
+Source: http://ftp.cups.org/pub/cups/%{version}/cups-%{version}-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -67,7 +73,7 @@ Requires: %{name} = %{epoch}:%{version} xinetd
 
 %description
 CUPS is the standards-based, open source printing system developed by
-Apple Inc. for Mac OS® X and other UNIX®-like operating systems.
+Apple Inc. for OS X and other UNIX®-like operating systems.
 
 %description devel
 This package provides the CUPS headers and development environment.
@@ -83,7 +89,7 @@ This package provides LPD client support.
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
-    ./configure %{_dbus} %{_static}
+    ./configure %{_dbus} %{_dnssd} %{_static}
 # If we got this far, all prerequisite libraries must be here.
 make
 
@@ -172,6 +178,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lp*
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
+%if %{?_with_dnssd:1}%{!?_with_dnssd:0}
+/usr/lib/cups/backend/dnssd
+%endif
 /usr/lib/cups/backend/http
 /usr/lib/cups/backend/https
 %attr(0700,root,root) /usr/lib/cups/backend/ipp

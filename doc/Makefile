@@ -66,7 +66,6 @@ HELPFILES	=	\
 			help/man-cancel.html \
 			help/man-cups-config.html \
 			help/man-cups-lpd.html \
-			help/man-cups-polld.html \
 			help/man-cups-snmp.html \
 			help/man-cupsaddsmb.html \
 			help/man-cupsd.html \
