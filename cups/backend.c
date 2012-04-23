@@ -54,6 +54,8 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
 		*auth_info_required;	/* AUTH_INFO_REQUIRED env var */
   _cups_globals_t *cg = _cupsGlobals();	/* Global info */
   int		options;		/* Resolve options */
+  ppd_file_t	*ppd;			/* PPD file */
+  ppd_attr_t	*ppdattr;		/* PPD attribute */
 
 
   if ((device_uri = getenv("DEVICE_URI")) == NULL)
@@ -68,6 +70,15 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
   if ((auth_info_required = getenv("AUTH_INFO_REQUIRED")) != NULL &&
       !strcmp(auth_info_required, "negotiate"))
     options |= _HTTP_RESOLVE_FQDN;
+
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL)
+  {
+    if ((ppdattr = ppdFindAttr(ppd, "cupsIPPFaxOut", NULL)) != NULL &&
+        !_cups_strcasecmp(ppdattr->value, "true"))
+      options |= _HTTP_RESOLVE_FAXOUT;
+
+    ppdClose(ppd);
+  }
 
   return (_httpResolveURI(device_uri, cg->resolved_uri,
                           sizeof(cg->resolved_uri), options, NULL, NULL));

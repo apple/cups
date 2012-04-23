@@ -1930,8 +1930,10 @@ http_resolve_cb(
   _http_uribuf_t	*uribuf = (_http_uribuf_t *)context;
 					/* URI buffer */
   const char		*scheme,	/* URI scheme */
-			*hostptr;	/* Pointer into hostTarget */
-  char			rp[257],	/* Remote printer */
+			*hostptr,	/* Pointer into hostTarget */
+			*reskey,	/* "rp" or "rfo" */
+			*resdefault;	/* Default path */
+  char			resource[257],	/* Remote path */
 			fqdn[256];	/* FQDN of the .local name */
   const void		*value;		/* Value from TXT record */
   uint8_t		valueLen;	/* Length of value */
@@ -1966,17 +1968,29 @@ http_resolve_cb(
   * Extract the "remote printer" key from the TXT record...
   */
 
-  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, "rp",
+  if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+  {
+    reskey     = "rfo";
+    resdefault = "/ipp/faxout";
+  }
+  else
+  {
+    reskey     = "rp";
+    resdefault = "/";
+  }
+
+  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, reskey,
                                     &valueLen)) != NULL)
   {
     if (((char *)value)[0] == '/')
     {
      /*
-      * "rp" value (incorrectly) has a leading slash already...
+      * Value (incorrectly) has a leading slash already...
       */
 
-      memcpy(rp, value, valueLen);
-      rp[valueLen] = '\0';
+      memcpy(resource, value, valueLen);
+      resource[valueLen] = '\0';
     }
     else
     {
@@ -1984,19 +1998,18 @@ http_resolve_cb(
       * Convert to resource by concatenating with a leading "/"...
       */
 
-      rp[0] = '/';
-      memcpy(rp + 1, value, valueLen);
-      rp[valueLen + 1] = '\0';
+      resource[0] = '/';
+      memcpy(resource + 1, value, valueLen);
+      resource[valueLen + 1] = '\0';
     }
   }
   else
   {
    /*
-    * Default "rp" value is blank, mapping to a path of "/"...
+    * Use the default value...
     */
 
-    rp[0] = '/';
-    rp[1] = '\0';
+    strlcpy(resource, resdefault, sizeof(resource));
   }
 
  /*
@@ -2052,7 +2065,7 @@ http_resolve_cb(
   */
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
-                  NULL, hostTarget, ntohs(port), rp);
+                  NULL, hostTarget, ntohs(port), resource);
 
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }
@@ -2103,8 +2116,10 @@ http_resolve_cb(
   _http_uribuf_t	*uribuf = (_http_uribuf_t *)context;
 					/* URI buffer */
   const char		*scheme,	/* URI scheme */
-			*hostptr;	/* Pointer into hostTarget */
-  char			rp[257],	/* Remote printer */
+			*hostptr,	/* Pointer into hostTarget */
+			*reskey,	/* "rp" or "rfo" */
+			*resdefault;	/* Default path */
+  char			resource[257],	/* Remote path */
 			fqdn[256];	/* FQDN of the .local name */
   AvahiStringList	*pair;		/* Current TXT record key/value pair */
   char			*value;		/* Value for "rp" key */
@@ -2158,21 +2173,33 @@ http_resolve_cb(
   }
 
  /*
-  * Extract the remote printer key ("rp") from the TXT record...
+  * Extract the remote resource key from the TXT record...
   */
 
-  if ((pair = avahi_string_list_find(txt, "rp")) != NULL)
+  if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+  {
+    reskey     = "rfo";
+    resdefault = "/ipp/faxout";
+  }
+  else
+  {
+    reskey     = "rp";
+    resdefault = "/";
+  }
+
+  if ((pair = avahi_string_list_find(txt, reskey)) != NULL)
   {
     avahi_string_list_get_pair(pair, NULL, &value, &valueLen);
 
     if (value[0] == '/')
     {
      /*
-      * "rp" value (incorrectly) has a leading slash already...
+      * Value (incorrectly) has a leading slash already...
       */
 
-      memcpy(rp, value, valueLen);
-      rp[valueLen] = '\0';
+      memcpy(resource, value, valueLen);
+      resource[valueLen] = '\0';
     }
     else
     {
@@ -2180,19 +2207,18 @@ http_resolve_cb(
       * Convert to resource by concatenating with a leading "/"...
       */
 
-      rp[0] = '/';
-      memcpy(rp + 1, value, valueLen);
-      rp[valueLen + 1] = '\0';
+      resource[0] = '/';
+      memcpy(resource + 1, value, valueLen);
+      resource[valueLen + 1] = '\0';
     }
   }
   else
   {
    /*
-    * Default "rp" value is blank, mapping to a path of "/"...
+    * Use the default value...
     */
 
-    rp[0] = '/';
-    rp[1] = '\0';
+    strlcpy(resource, resdefault, sizeof(resource));
   }
 
  /*
@@ -2248,7 +2274,7 @@ http_resolve_cb(
   */
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
-                  NULL, hostTarget, port, rp);
+                  NULL, hostTarget, port, resource);
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
