@@ -3,7 +3,7 @@
  *
  *   Administration CGI for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2638,10 +2638,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
   else
 #endif /* HAVE_GSSAPI */
   cgiSetVariable("KERBEROS", "");
-
-#ifdef HAVE_DNSSD
-  cgiSetVariable("HAVE_DNSSD", "1");
-#endif /* HAVE_DNSSD */
 
   if ((val = cupsGetOption("BrowseWebIF", num_settings,
                            settings)) == NULL)
