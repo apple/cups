@@ -752,7 +752,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-	                           _("The printer is busy."));
+	                           _("The printer is in use."));
 	      break;
         }
 
@@ -869,7 +869,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 
         report_printer_state(supported);
 
@@ -887,14 +887,14 @@ main(int  argc,				/* I - Number of command-line args */
         if (version >= 20)
 	{
 	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("Printer does not support IPP/%d.%d, trying "
+			       _("The printer does not support IPP/%d.%d, trying "
 			         "IPP/%s."), version / 10, version % 10, "1.1");
 	  version = 11;
 	}
 	else
 	{
 	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("Printer does not support IPP/%d.%d, trying "
+			       _("The printer does not support IPP/%d.%d, trying "
 			         "IPP/%s."), version / 10, version % 10, "1.0");
 	  version = 10;
         }
@@ -975,7 +975,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (busy)
       {
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 
 	report_printer_state(supported);
 
@@ -1302,7 +1302,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (ipp_status == IPP_SERVICE_UNAVAILABLE || ipp_status == IPP_PRINTER_BUSY)
     {
-      _cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+      _cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
       sleep(10);
     }
     else if (ipp_status == IPP_FORBIDDEN ||
@@ -1450,7 +1450,7 @@ main(int  argc,				/* I - Number of command-line args */
           ipp_status == IPP_NOT_POSSIBLE ||
 	  ipp_status == IPP_PRINTER_BUSY)
       {
-	_cupsLangPrintFilter(stderr, "INFO", _("The printer is busy."));
+	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 	sleep(10);
 
 	if (num_files == 0)

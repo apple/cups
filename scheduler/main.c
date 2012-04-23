@@ -2016,8 +2016,7 @@ usage(int status)			/* O - Exit status */
 
   _cupsLangPuts(fp, _("Usage: cupsd [options]"));
   _cupsLangPuts(fp, _("Options:"));
-  _cupsLangPuts(fp, _("  -c config-file          Load alternate configuration "
-                      "file."));
+  _cupsLangPuts(fp, _("  -c cupsd.conf           Set cupsd.conf file to use."));
   _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
   _cupsLangPuts(fp, _("  -F                      Run in the foreground but "
                       "detach from console."));

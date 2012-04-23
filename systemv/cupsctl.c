@@ -3,7 +3,7 @@
  *
  *   Scheduler control program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -202,7 +202,7 @@ usage(const char *opt)			/* I - Option character/string */
   _cupsLangPuts(stdout, "");
   _cupsLangPuts(stdout, _("Options:"));
   _cupsLangPuts(stdout, "");
-  _cupsLangPuts(stdout, _("  -E                      Enable encryption."));
+  _cupsLangPuts(stdout, _("  -E                      Encrypt the connection."));
   _cupsLangPuts(stdout, _("  -U username             Specify username."));
   _cupsLangPuts(stdout, _("  -h server[:port]        Specify server "
                           "address."));

@@ -507,8 +507,8 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (Output == _CUPS_OUTPUT_PLIST && interval)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" is incompatible with "
-			                "\"-X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
+	                                "incompatible with -X\"."));
 		usage();
 	      }
 	      break;
@@ -531,8 +531,8 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (Output == _CUPS_OUTPUT_PLIST && repeat)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-n\" is incompatible with "
-			                "\"-X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
+	                                "incompatible with -X\"."));
 		usage();
 	      }
 	      break;
@@ -4338,8 +4338,8 @@ usage(void)
   _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
   _cupsLangPuts(stderr, _("  -C                      Send requests using "
                           "chunking (default)."));
-  _cupsLangPuts(stderr, _("  -E                      Test with TLS "
-                          "encryption."));
+  _cupsLangPuts(stdout, _("  -E                      Test with HTTP Upgrade to "
+                          "TLS."));
   _cupsLangPuts(stderr, _("  -I                      Ignore errors."));
   _cupsLangPuts(stderr, _("  -L                      Send requests using "
                           "content-length."));
@@ -4359,11 +4359,9 @@ usage(void)
                           "the given time interval."));
   _cupsLangPuts(stderr, _("  -n count                Repeat the last file the "
                           "given number of times."));
-  _cupsLangPuts(stderr, _("  -q                      Be quiet - no output "
-                          "except errors."));
+  _cupsLangPuts(stderr, _("  -q                      Run silently."));
   _cupsLangPuts(stderr, _("  -t                      Produce a test report."));
-  _cupsLangPuts(stderr, _("  -v                      Show all attributes sent "
-                          "and received."));
+  _cupsLangPuts(stderr, _("  -v                      Be verbose."));
 
   exit(1);
 }

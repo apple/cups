@@ -371,7 +371,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-	                           _("The printer is busy."));
+	                           _("The printer is in use."));
 	      break;
         }
 

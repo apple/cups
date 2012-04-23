@@ -3,7 +3,7 @@
 //
 //   PPD file message catalog program for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2011 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -256,8 +256,7 @@ usage(void)
                           "value."));
   _cupsLangPuts(stdout, _("  -I include-dir          Add include directory to "
                           "search path."));
-  _cupsLangPuts(stdout, _("  -v                      Be verbose (more v's for "
-                          "more verbosity)."));
+  _cupsLangPuts(stdout, _("  -v                      Be verbose."));
 
   exit(1);
 }

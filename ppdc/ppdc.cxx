@@ -449,8 +449,7 @@ usage(void)
                           "as the filename."));
   _cupsLangPuts(stdout, _("  -t                      Test PPDs instead of "
                           "generating them."));
-  _cupsLangPuts(stdout, _("  -v                      Be verbose (more v's for "
-                          "more verbosity)."));
+  _cupsLangPuts(stdout, _("  -v                      Be verbose."));
   _cupsLangPuts(stdout, _("  -z                      Compress PPD files using "
                           "GNU zip."));
   _cupsLangPuts(stdout, _("  --cr                    End lines with CR (Mac "
