@@ -3968,7 +3968,9 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   http->tls = SSL_new(context);
   SSL_set_bio(http->tls, bio, bio);
 
+#   ifdef HAVE_SSL_SET_TLSEXT_HOST_NAME
   SSL_set_tlsext_host_name(http->tls, hostname);
+#   endif /* HAVE_SSL_SET_TLSEXT_HOST_NAME */
 
   if (SSL_connect(http->tls) != 1)
   {
