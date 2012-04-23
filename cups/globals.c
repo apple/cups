@@ -44,8 +44,10 @@ static _cups_threadkey_t cups_globals_key = _CUPS_THREADKEY_INITIALIZER;
 static pthread_once_t	cups_globals_key_once = PTHREAD_ONCE_INIT;
 					/* One-time initialization object */
 #endif /* HAVE_PTHREAD_H */
+#if defined(HAVE_PTHREAD_H) || defined(WIN32)
 static _cups_mutex_t	cups_global_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Global critical section */
+#endif /* HAVE_PTHREAD_H || WIN32 */
 
 
 /*
@@ -56,7 +58,9 @@ static _cups_mutex_t	cups_global_mutex = _CUPS_MUTEX_INITIALIZER;
 static void		cups_fix_path(char *path);
 #endif /* WIN32 */
 static _cups_globals_t	*cups_globals_alloc(void);
+#if defined(HAVE_PTHREAD_H) || defined(WIN32)
 static void		cups_globals_free(_cups_globals_t *g);
+#endif /* HAVE_PTHREAD_H || WIN32 */
 #ifdef HAVE_PTHREAD_H
 static void		cups_globals_init(void);
 #endif /* HAVE_PTHREAD_H */
@@ -322,6 +326,7 @@ cups_globals_alloc(void)
  * 'cups_globals_free()' - Free global data.
  */
 
+#if defined(HAVE_PTHREAD_H) || defined(WIN32)
 static void
 cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 {
@@ -354,6 +359,7 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 
   free(cg);
 }
+#endif /* HAVE_PTHREAD_H || WIN32 */
 
 
 #ifdef HAVE_PTHREAD_H
