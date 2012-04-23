@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.3
 
+	- Compiling without threading support failed (STR #4060)
 	- Fixed compile problem with old versions of OpenSSL (STR #4036)
 	- The network backends did not check SNMP supply levels regularly
 	  (STR #4040)
@@ -37,7 +38,7 @@ CHANGES IN CUPS V1.5.3
 	  for printers (STR #3985)
 	- The IPP backend no longer re-queues print jobs that are too large for
 	  the printer/server (STR #3977)
-	- The RPM spec file did not work (STR #4021)
+	- The RPM spec file did not work (STR #4021, STR #4057)
 	- Encryption did not work when the server name ended with "."
 	  (STR #4011)
 	- The multi-purpose tray is now mapped to the IPP "by-pass-tray"
