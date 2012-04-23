@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.5.0 - 2011-07-25
+INSTALL - CUPS v1.6.0 - 2012-04-23
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
@@ -6,7 +6,7 @@ information on CUPS see the file called "README.txt".  A complete change log can
 be found in "CHANGES.txt".
 
 **** IF YOU HAVE A NON-POSTSCRIPT PRINTER AND ARE NOT       ****
-**** RUNNING MAC OS X, YOU WILL ALSO NEED TO INSTALL GPL    ****
+**** RUNNING OS X, YOU WILL ALSO NEED TO INSTALL GPL        ****
 **** GHOSTSCRIPT WITH THE "cups" DRIVER AFTER YOU INSTALL   ****
 **** CUPS.                                                  ****
 
@@ -34,7 +34,7 @@ BEFORE YOU BEGIN
     PostScript filter needed by non-PostScript printers.  You *must* download
     GPL Ghostscript separately from the CUPS web site if you want to print
     PostScript files to non-PostScript printers on operating systems other than
-    Mac OS X.
+    OS X.
 
 
 COMPILING THE SUBVERSION REPOSITORY CODE

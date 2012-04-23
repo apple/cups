@@ -150,13 +150,13 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_SET_PRINTER_ATTRIBUTES,		/* Set printer attributes @private@ */
   IPP_SET_JOB_ATTRIBUTES,		/* Set job attributes */
   IPP_GET_PRINTER_SUPPORTED_VALUES,	/* Get supported attribute values */
-  IPP_CREATE_PRINTER_SUBSCRIPTION,	/* Create a printer subscription @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_CREATE_JOB_SUBSCRIPTION,		/* Create a job subscription @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2/Mac OS X 10.5@ */
-  IPP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_CREATE_PRINTER_SUBSCRIPTION,	/* Create a printer subscription @since CUPS 1.2/OS X 10.5@ */
+  IPP_CREATE_JOB_SUBSCRIPTION,		/* Create a job subscription @since CUPS 1.2/OS X 10.5@ */
+  IPP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2/OS X 10.5@ */
+  IPP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2/OS X 10.5@ */
+  IPP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2/OS X 10.5@ */
+  IPP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2/OS X 10.5@ */
+  IPP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2/OS X 10.5@ */
   IPP_SEND_NOTIFICATIONS,		/* Send notification events @private@ */
   IPP_GET_RESOURCE_ATTRIBUTES,		/* Get resource attributes @private@ */
   IPP_GET_RESOURCE_DATA,		/* Get resource data @private@ */
@@ -203,9 +203,9 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   CUPS_GET_DEVICES,			/* Get a list of supported devices */
   CUPS_GET_PPDS,			/* Get a list of supported drivers */
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
-  CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/Mac OS X 10.5@ */
-  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/Mac OS X 10.5@ */
-  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4/Mac OS X 10.6@ */
+  CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/OS X 10.5@ */
+  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/OS X 10.5@ */
+  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4/OS X 10.6@ */
 
   /* Legacy names for the add operations */
 #define CUPS_ADD_PRINTER	CUPS_ADD_MODIFY_PRINTER
@@ -305,8 +305,8 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_TOO_MANY_JOBS,			/* server-error-too-many-jobs */
   IPP_TOO_MANY_DOCUMENTS,		/* server-error-too-many-documents */
 
-  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/Mac OS X 10.7@ */
-  IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/Mac OS X 10.7@ */
+  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/OS X 10.7@ */
+  IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
   IPP_UPGRADE_REQUIRED			/* TLS upgrade required */
 
   /* Legacy name for canceled status */
@@ -366,21 +366,22 @@ typedef struct _ipp_s ipp_t;		/**** IPP request/response data ****/
 typedef struct _ipp_attribute_s ipp_attribute_t;
 					/**** IPP attribute ****/
 
-/**** New in CUPS 1.2 ****/
+/**** New in CUPS 1.2/OS X 10.5 ****/
 typedef ssize_t	(*ipp_iocb_t)(void *context, ipp_uchar_t *buffer, size_t bytes);
-					/**** IPP IO Callback Function @since CUPS 1.2/Mac OS X 10.5@ ****/
+					/**** IPP IO Callback Function @since CUPS 1.2/OS X 10.5@ ****/
 
-/**** New in CUPS 1.6 ****/
+/**** New in CUPS 1.6/OS X 10.8 ****/
 typedef int (*ipp_copycb_t)(void *context, ipp_t *dst, ipp_attribute_t *attr);
 
 
 /*
- * The following structures are PRIVATE starting with CUPS 1.6.  Please use the
- * new accessor functions available in CUPS 1.6 and later, as these definitions
- * will be moved to a private header file in a future release.
+ * The following structures are PRIVATE starting with CUPS 1.6/OS X 10.8.
+ * Please use the new accessor functions available in CUPS 1.6 and later, as
+ * these definitions will be moved to a private header file in a future release.
  *
  * Define _IPP_PRIVATE_STRUCTURES to cause the private IPP structures to be
- * exposed in CUPS 1.6.
+ * exposed in CUPS 1.6.  This happens automatically on OS X when compiling for
+ * a deployment target of 10.7 or earlier.
  */
 
 #  if defined(_CUPS_SOURCE) || defined(_CUPS_IPP_PRIVATE_H_)
@@ -421,7 +422,7 @@ typedef union _ipp_request_u		/**** Request Header ****/
   }		status;
 
   /**** New in CUPS 1.1.19 ****/
-  struct				/* Event Header @since CUPS 1.1.19/Mac OS X 10.3@ */
+  struct				/* Event Header @since CUPS 1.1.19/OS X 10.3@ */
   {
     ipp_uchar_t	version[2];		/* Protocol version number */
     ipp_status_t status_code;		/* Status code */
@@ -465,7 +466,7 @@ typedef union _ipp_value_u		/**** Attribute Value ****/
   }		unknown;		/* Unknown attribute type */
 
 /**** New in CUPS 1.1.19 ****/
-  ipp_t		*collection;		/* Collection value @since CUPS 1.1.19/Mac OS X 10.3@ */
+  ipp_t		*collection;		/* Collection value @since CUPS 1.1.19/OS X 10.3@ */
 } _ipp_value_t;
 typedef _ipp_value_t ipp_value_t;	/**** Convenience typedef that will be removed @private@ ****/
 
@@ -489,10 +490,10 @@ struct _ipp_s				/**** IPP Request/Response/Notification ****/
   ipp_tag_t		curtag;		/* Current attribute group tag */
 
 /**** New in CUPS 1.2 ****/
-  ipp_attribute_t	*prev;		/* Previous attribute (for read) @since CUPS 1.2/Mac OS X 10.5@ */
+  ipp_attribute_t	*prev;		/* Previous attribute (for read) @since CUPS 1.2/OS X 10.5@ */
 
 /**** New in CUPS 1.4.4 ****/
-  int			use;		/* Use count @since CUPS 1.4.4/Mac OS X 10.6.?@ */
+  int			use;		/* Use count @since CUPS 1.4.4/OS X 10.6.?@ */
 };
 #  endif /* _IPP_PRIVATE_STRUCTURES */
 
@@ -559,7 +560,7 @@ extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr) _CUPS_API_1_1
 extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
 extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
 
-/**** New in CUPS 1.2/Mac OS X 10.5 ****/
+/**** New in CUPS 1.2/OS X 10.5 ****/
 extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name,
 					   const void *data, int datalen) _CUPS_API_1_2;
@@ -572,11 +573,11 @@ extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 			           ipp_t *parent, ipp_t *ipp) _CUPS_API_1_2;
 
-/**** New in CUPS 1.4/Mac OS X 10.6 ****/
+/**** New in CUPS 1.4/OS X 10.6 ****/
 extern const char	*ippTagString(ipp_tag_t tag) _CUPS_API_1_4;
 extern ipp_tag_t	ippTagValue(const char *name) _CUPS_API_1_4;
 
-/**** New in CUPS 1.6 ****/
+/**** New in CUPS 1.6/OS X 10.8 ****/
 extern ipp_attribute_t	*ippAddOutOfBand(ipp_t *ipp, ipp_tag_t group,
 			                 ipp_tag_t value_tag, const char *name)
 			                 _CUPS_API_1_6;

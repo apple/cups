@@ -260,7 +260,7 @@ created for developer snapshots.</P>
 
 <P>File and directory names may not exceed 16 characters in
 length to ensure compatibility with older UNIX filesystems. In
-addition, to avoid problems with case-insensitive filesystems, 
+addition, to avoid problems with case-insensitive filesystems,
 you may not use names which differ only by case, for example
 "ReadMe" and "README" are not allowed in the same directory.</P>
 
@@ -315,7 +315,7 @@ exports that tag, creating the files
 <P>Binary packages are not generally distributed by the CUPS
 team, however the <VAR>packaging/cups.spec</VAR> and
 <VAR>packaging/cups.list</VAR> files may be used to create binary
-packages on Linux, Mac OS X, and UNIX. The
+packages on Linux, OS X, and UNIX. The
 <VAR>packaging/cups.spec</VAR> file produces a binary package
 using the <CODE>rpmbuild(8)</CODE> software:</P>
 
@@ -361,7 +361,7 @@ are available for each type of binary package:</P>
 </TR>
 <TR>
 	<TD>osx</TD>
-	<TD>Mac OS X Install</TD>
+	<TD>OS X Install</TD>
 </TR>
 <TR>
 	<TD>pkg</TD>
@@ -392,7 +392,7 @@ are available for each type of binary package:</P>
 <P>Finally, the <VAR>tools/testrpm</VAR> and
 <VAR>tools/testosx</VAR> scripts can be used to create binary
 packages from the current working copy for testing on Linux and
-Mac OS X, respectively:</P>
+OS X, respectively:</P>
 
 <PRE CLASS="command">
 tools/testrpm
@@ -947,7 +947,7 @@ name=value</PRE>
 		<LI><CODE>$(name)</CODE>; substitutes the value of "name",</LI>
 		<LI><CODE>($name:.old=.new)</CODE>; substitutes the value of "name"
 		with the filename extensions ".old" changed to ".new",</LI>
-		<LI><CODE>$(MAKEFLAGS)</CODE>; substitutes the 
+		<LI><CODE>$(MAKEFLAGS)</CODE>; substitutes the
 		command-line options passed to the program
 		without the leading hyphen (-),</LI>
 		<LI><CODE>$$</CODE>; substitutes a single <CODE>$</CODE> character,</LI>

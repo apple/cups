@@ -67,6 +67,7 @@ HELPFILES	=	\
 			help/man-cups-config.html \
 			help/man-cups-lpd.html \
 			help/man-cups-polld.html \
+			help/man-cups-snmp.html \
 			help/man-cupsaddsmb.html \
 			help/man-cupsd.html \
 			help/man-cupsenable.html \
@@ -94,7 +95,6 @@ HELPFILES	=	\
 			help/man-ppdi.html \
 			help/man-ppdmerge.html \
 			help/man-ppdpo.html \
-			help/man-snmpbackend.html \
 			help/network.html \
 			help/options.html \
 			help/overview.html \

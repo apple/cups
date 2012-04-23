@@ -3,7 +3,7 @@
  *
  *   Process management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -365,8 +365,8 @@ cupsdStartProcess(
   if (envp)
   {
    /*
-    * Add special voodoo magic for Mac OS X - this allows Mac OS X
-    * programs to access their bundle resources properly...
+    * Add special voodoo magic for OS X - this allows OS X programs to access
+    * their bundle resources properly...
     */
 
     if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
@@ -577,7 +577,7 @@ cupsdStartProcess(
   {
     if (!process_array)
       process_array = cupsArrayNew((cups_array_func_t)compare_procs, NULL);
- 
+
     if (process_array)
     {
       if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)

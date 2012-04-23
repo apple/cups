@@ -3,7 +3,7 @@
 //
 //   PPD file compiler main entry for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2011 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -458,7 +458,7 @@ usage(void)
   _cupsLangPuts(stdout, _("  --crlf                  End lines with CR + LF "
                           "(Windows)."));
   _cupsLangPuts(stdout, _("  --lf                    End lines with LF "
-                          "(UNIX/Linux/Mac OS X)."));
+                          "(UNIX/Linux/OS X)."));
 
   exit(1);
 }

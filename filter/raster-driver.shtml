@@ -172,9 +172,9 @@
 
 <p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
 
-<h3><span class='info'>Since Mac OS X 10.5</span>Custom Color Matching Support</h3>
+<h3><span class='info'>Since OS X 10.5</span>Custom Color Matching Support</h3>
 
-<p>Mac OS X printer drivers that are based on an existing standard RGB colorspace can tell the system to use the corresponding colorspace instead of an arbitrary ICC color profile when doing color management. The <a href='#APCustom'><tt>APSupportsCustomColorMatching</tt></a> and <tt>APDefaultCustomColorMatchingProfile</tt> attributes can be used to enable this mode:</p>
+<p>OS X printer drivers that are based on an existing standard RGB colorspace can tell the system to use the corresponding colorspace instead of an arbitrary ICC color profile when doing color management. The <a href='#APCustom'><tt>APSupportsCustomColorMatching</tt></a> and <tt>APDefaultCustomColorMatchingProfile</tt> attributes can be used to enable this mode:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APSupportsCustomColorMatching "" true
@@ -182,9 +182,9 @@
 </pre>
 
 
-<h2 class='title'><a name='MACOSX'>Adding Mac OS X Features</a></h2>
+<h2 class='title'><a name='MACOSX'>Adding OS X Features</a></h2>
 
-<p>Mac OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
+<p>OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
 
 <pre class='example'>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH backend 7 "CUPS" "13 April 2012" "Apple Inc."
+.TH backend 7 "CUPS" "23 April 2012" "Apple Inc."
 
 .SH NAME
 backend \- cups backend transmission interfaces
@@ -24,13 +24,12 @@ job user title num-copies options [
 .I filename
 ]
 .SH DESCRIPTION
-Backends are a special type of \fIfilter(7)\fR which is used to
-send print data to and discover different devices on the system.
+Backends are a special type of \fIfilter(7)\fR which is used to send print data
+to and discover different devices on the system.
 .LP
-Like filters, backends must be capable of reading from a filename
-on the command-line or from the standard input, copying the
-standard input to a temporary file as required by the physical
-interface.
+Like filters, backends must be capable of reading from a filename on the
+command-line or from the standard input, copying the standard input to a
+temporary file as required by the physical interface.
 .LP
 The command name (argv[0]) is set to the device URI of the destination printer.
 Starting with CUPS 1.1.22, any authentication information in argv[0] is removed,
@@ -162,8 +161,8 @@ The scheduler will retry the job immediately without allowing intervening jobs.
 .PP
 All other exit code values are reserved.
 .SH SEE ALSO
-\fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR, \fIlpinfo(8)\fR,
-\fIsnmpbackend(8)\fR,
+\fIcups-snmp(8)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR,
+\fIlpinfo(8)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT

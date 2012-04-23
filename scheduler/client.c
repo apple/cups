@@ -2591,7 +2591,7 @@ cupsdSendHeader(
       * requests when the request requires system group membership - then the
       * client knows the root certificate can/should be used.
       *
-      * Also, for Mac OS X we also look for @AUTHKEY and add an "authkey"
+      * Also, for OS X we also look for @AUTHKEY and add an "authkey"
       * parameter as needed...
       */
 

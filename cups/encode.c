@@ -227,7 +227,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
  * function multiple times for each group, or use cupsEncodeOptions()
  * to add the standard groups.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 void

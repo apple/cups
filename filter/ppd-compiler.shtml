@@ -205,7 +205,7 @@ follows:</P>
 
 	<LI>Bits per color. In the example file, we define 8 bits per color, for
 	a continuous-tone grayscale output. All versions of CUPS support 1 and
-	8 bits per color.  CUPS 1.2 and higher (Mac OS X 10.5 and higher) also
+	8 bits per color.  CUPS 1.2 and higher (OS X 10.5 and higher) also
 	supports 16 bits per color.</LI>
 
 	<LI>Rows per band. In the example file, we define 0 rows per band to

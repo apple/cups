@@ -12,122 +12,45 @@
 
 <h2><a name="BASICS">The Basics</h2>
 
-<p>A "server" is any machine that communicates directly to a printer. A "client"
-is any machine that sends print jobs to a server for final printing. Clients can
-also be servers if they communicate directly with any printers of their own.</p>
+<p>A "server" is any machine that communicates directly to a printer. A "client" is any machine that sends print jobs to a server for final printing. Clients can also be servers if they communicate directly with any printers of their own.</p>
 
-<p>By default, CUPS uses the Internet Printing Protocol (IPP) to send jobs from
-a client to a server. When printing to legacy print servers you may also use the
-Line Printer Daemon (LPD) when printing to older UNIX-based servers or Server
-Message Block (SMB) when printing to Windows<sup>&reg;</sup> servers.</p>
+<p>By default, CUPS uses the Internet Printing Protocol (IPP) to send jobs from a client to a server. When printing to legacy print servers you may also use the Line Printer Daemon (LPD) protocol when printing to older UNIX-based servers or Server Message Block (SMB) when printing to Windows<sup>&reg;</sup> servers.</p>
 
-<p>Clients can automatically discover and access shared printers via CUPS
-browsing, IPP, Service Location Protocol (SLP), and Lightweight Directory Access
-Protocol (LDAP). DNS Service Discovery (DNS-SD a.k.a. Bonjour<sup>&reg;</sup>)
-and SMB browsing can also be used to manually discover and access shared
-printers.</p>
+<p>Clients can automatically discover and access shared printers via DNS Service Discovery (DNS-SD a.k.a. Bonjour<sup>&reg;</sup>). SMB browsing can also be used to manually discover and access shared printers when <a href="http://www.samba.org/">Samba</a> is installed.</p>
 
 
 <h2><a name="SERVER_CONFIG">Configuring the Server</a></h2>
 
-<p>You must enable printer sharing on the server before clients can print
-through it. The simplest way to do this is to use the
-<a href="man-cupsctl.html">cupsctl(8)</a> command on the server:</p>
+<p>You must enable printer sharing on the server before clients can print through it. The simplest way to do this is to use the <a href="man-cupsctl.html">cupsctl(8)</a> command on the server:</p>
 
 <pre class="command">
 cupsctl --share-printers
 </pre>
 
-<p>By default, the above command will allow printing from other clients on the
-same subnet as your server. To allow printing from any subnet, use the following
-command instead:</p>
+<p>By default, the above command will allow printing from other clients on the same subnet as your server. To allow printing from any subnet, use the following command instead:</p>
 
 <pre class="command">
 cupsctl --share-printers --remote-any
 </pre>
 
-<p>Next, you need to choose which protocols to use for printer sharing. The
-default is CUPS browsing and DNS-SD on Mac OS X and CUPS browsing alone on
-other platforms. To set the sharing protocols, run the <b>cupsctl</b> command
-to set the
-<a href="ref-cupsd-conf.html#BrowseLocalProtocols">BrowseLocalProtocols</a>
-value. For example, run the following command to allow shared printing via
-CUPS, DNS-SD, LPD, and SMB:</p>
+<p>Next, tag each printer that you want to share using the <a href="man-lpadmin.html">lpadmin(8)</a> command on the server, for example:</p>
 
 <pre class="command">
-cupsctl 'BrowseLocalProtocols="cups dnssd lpd smb"'
+lpadmin -p printer -o printer-is-shared=true
 </pre>
 
-
-<h2><a name="AUTO_CUPS">Automatic Configuration using CUPS Browsing</a></h2>
-
-<p>CUPS browsing works by periodically broadcasting information about printers
-that are being shared to client systems on the same subnet. Each client
-maintains its own list of shared printers, and when more than one server shares
-the same printer (or the same kind of printer) the client uses all of the
-servers and printers to provide high-availability and failsafe printing.</p>
-
-<p>To configure printers on the same subnet, <em>do nothing</em>. Each client
-should see the available printers within 30 seconds automatically. The printer
-and class lists are updated automatically as printers and servers are added or
-removed.</p>
-
-<blockquote><b>Note:</b>
-
-<p>Due to user interface changes in Mac OS X 10.5, CUPS shared printers will not
-automatically appear in the print dialog. Instead, you must first run the
-following command to enable CUPS browsing on your system:</p>
+<p>You can require authentication for shared printing by setting the policy on each printer, for example:</p>
 
 <pre class="command">
-cupsctl BrowseRemoteProtocols=cups
-</pre>
-
-<p>Then choose each of the CUPS shared printers you want to see in the print
-dialog by adding them, either from the <var>Add Printer...</var> item in the
-print dialog or from the <var>Print &amp; Fax</var> preference pane in the
-<var>System Preferences</var> window.</p>
-
-</blockquote>
-
-<h3><a name="BROWSE_POLL">Seeing Printers on Other Subnets</a></h3>
-
-<p>You can automatically access printers on other subnets by adding
-<a href="ref-cupsd-conf.html#BrowsePoll"><code>BrowsePoll</code></a> lines
-to the <var>cupsd.conf</var> file on your local system. For a single
-server you can use the <b>cupsctl</b> command:</p>
-
-<pre class="command">
-cupsctl BrowsePoll=server:port
-</pre>
-
-<p>For multiple servers, use the CUPS web interface (http://localhost:631/admin)
-to edit the configuration file instead. Enter one <code>BrowsePoll</code> line
-per server at the bottom of the file, as follows:</p>
-
-<pre class="example">
-BrowsePoll server1:port
-BrowsePoll server2:port
-BrowsePoll server3:port
-</pre>
-
-<p>If you have more than one client on your subnet that wants to see the
-printers on those servers, add a
-<a href="ref-cupsd-conf.html#BrowseRelay"><code>BrowseRely</code></a> line
-to the <var>cupsd.conf</var> file on your local system using the <b>cupsctl</b>
-command:</p>
-
-<pre class="command">
-cupsctl 'BrowseRelay="127.0.0.1 @LOCAL"'
-</pre>
-
-<p>or CUPS web interface (again, at the bottom of the file):</p>
-
-<pre class="example">
-BrowseRelay 127.0.0.1 @LOCAL
+lpadmin -p printer -o printer-op-policy=authenticated
 </pre>
 
 
 <h2><a name="AUTO_IPP">Automatic Configuration using IPP</a></h2>
+
+<blockquote><b>Note:</b>
+<p>This method of configuration does not work on OS X 10.7 or later because sandboxed applications do not always have direct network access.</p>
+</blockquote>
 
 <p>CUPS can be configured to run without a local spooler and send all jobs to a
 single server. However, if that server goes down then all printing will be
@@ -166,6 +89,10 @@ port. The environment variable overrides both the user and system
 
 
 <h2><a name="MANUAL">Manual Configuration of Print Queues</a></h2>
+
+<blockquote><b>Note:</b>
+<p>This method of configuration does not work on OS X 10.7 or later because sandboxed applications do not always have direct network access.</p>
+</blockquote>
 
 <p>The most tedious method of configuring client machines is to configure
 each remote queue by hand using the <a href="man-lpadmin.html">lpadmin(8)</a>

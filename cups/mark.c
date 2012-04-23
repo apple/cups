@@ -3,7 +3,7 @@
  *
  *   Option marking routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -575,7 +575,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ppd_option_t *				/* O - First option or @code NULL@ */
@@ -593,7 +593,7 @@ ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2/Mac OS X 10.5@
+ * @since CUPS 1.2/OS X 10.5@
  */
 
 ppd_option_t *				/* O - Next option or @code NULL@ */

@@ -3,7 +3,7 @@
  *
  *   API versioning definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -24,11 +24,9 @@
  * which add compiler-specific attributes that flag functions that are
  * deprecated or added in particular releases.
  *
- * On Mac OS X, the _CUPS_API_* constants are defined based on the values of
+ * On OS X, the _CUPS_API_* constants are defined based on the values of
  * the MAC_OS_X_VERSION_MIN_ALLOWED and MAC_OS_X_VERSION_MAX_ALLOWED constants
  * provided by the compiler.
- *
- *
  */
 
 #  if defined(__APPLE__) && !defined(_CUPS_SOURCE)

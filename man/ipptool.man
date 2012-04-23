@@ -3,7 +3,7 @@
 .\"
 .\"   ipptool man page for CUPS.
 .\"
-.\"   Copyright 2010 by Apple Inc.
+.\"   Copyright 2010-2012 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -108,12 +108,25 @@ Send email notifications to "user@example.com" when "myprinter" changes:
 .SH STANDARD FILES
 The following standard files are available:
 .nf
+    color.jpg
     create-printer-subscription.test
+    document-a4.pdf
+    document-a4.ps
+    document-letter.pdf
+    document-letter.ps
     get-completed-jobs.test
     get-jobs.test
+    get-printer-attributes.test
+    gray.jpg
     ipp-1.1.test
     ipp-2.0.test
     ipp-2.1.test
+    ipp-2.2.test
+    onepage-a4.pdf
+    onepage-a4.ps
+    onepage-letter.pdf
+    onepage-letter.ps
+    print-job.test
     testfile.jpg
     testfile.pdf
     testfile.ps
@@ -124,7 +137,7 @@ The following standard files are available:
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2010 by Apple Inc.
+Copyright 2007-2012 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

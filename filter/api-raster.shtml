@@ -3,7 +3,7 @@
 
   Raster API introduction for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
+  Copyright 2007-2012 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -22,7 +22,7 @@ avoid incompatibilities with newer versions of CUPS.</p>
 
 <p>Two kinds of CUPS filters use the CUPS raster API - raster image processor
 (RIP) filters such as <code>pstoraster</code> and <code>cgpdftoraster</code>
-(Mac OS X) that produce CUPS raster files and printer driver filters that
+(OS X) that produce CUPS raster files and printer driver filters that
 convert CUPS raster files into a format usable by the printer. Printer
 driver filters are by far the most common.</p>
 
@@ -142,7 +142,7 @@ the memory used to read the raster file:</p>
 
 <ul class="code">
 
-	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
 	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a version 2 page header structure.">cupsRasterReadHeader2</a></li>
 	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
 
@@ -153,8 +153,8 @@ the memory used to read the raster file:</p>
 <ul class="code">
 
 	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
-	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
 	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a></li>
 	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
-	
+
 </ul>
