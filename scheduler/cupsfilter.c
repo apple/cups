@@ -1420,11 +1420,11 @@ sighandler(int s)			/* I - Signal number */
  */
 
 static void
-usage(const char *command,		/* I - Command name */
-      const char *opt)			/* I - Incorrect option, if any */
+usage(const char *opt)			/* I - Incorrect option, if any */
 {
   if (opt)
-    _cupsLangPrintf(stderr, _("%s: Unknown option \"%c\"."), command, *opt);
+    _cupsLangPrintf(stderr, _("%s: Unknown option \"%c\"."), "cupsfilter",
+                    *opt);
 
   _cupsLangPuts(stdout, _("Usage: cupsfilter [ options ] filename"));
   _cupsLangPuts(stdout, _("Options:"));

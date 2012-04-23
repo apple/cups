@@ -93,7 +93,7 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
       if (errno != EAGAIN || errno != EINTR)
       {
 	fprintf(stderr, "DEBUG: Read failed: %s\n", strerror(errno));
-	_cupsLangPrintFilter("ERROR", _("Unable to read print data."));
+	_cupsLangPrintFilter(stderr, "ERROR", _("Unable to read print data."));
 	return (-1);
       }
 
@@ -321,7 +321,8 @@ backendRunLoop(
 	if (errno != EAGAIN || errno != EINTR)
 	{
 	  fprintf(stderr, "DEBUG: Read failed: %s\n", strerror(errno));
-	  _cupsLangPrintFilter("ERROR", _("Unable to read print data."));
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unable to read print data."));
 	  return (-1);
 	}
 
