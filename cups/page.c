@@ -34,7 +34,7 @@
 
 
 /*
- * 'ppdPageSize()' - Get the page size record for the given size.
+ * 'ppdPageSize()' - Get the page size record for the named size.
  */
 
 ppd_size_t *				/* O - Size record for page or NULL */
