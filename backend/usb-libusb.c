@@ -537,10 +537,10 @@ print_device(const char *uri,		/* I - Device URI */
    /*
     * If it didn't exit abort the pending read and wait an additional second...
     */
-  
+
     if (!g.read_thread_done)
     {
-      fputs("DEBUG: Read thread still active, aborting the pending read...\n", 
+      fputs("DEBUG: Read thread still active, aborting the pending read...\n",
 	    stderr);
 
       g.wait_eof = 0;
@@ -548,7 +548,7 @@ print_device(const char *uri,		/* I - Device URI */
       gettimeofday(&tv, NULL);
       cond_timeout.tv_sec  = tv.tv_sec + 1;
       cond_timeout.tv_nsec = tv.tv_usec * 1000;
-  
+
       while (!g.read_thread_done)
       {
 	if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
@@ -602,8 +602,8 @@ close_device(usb_printer_t *printer)	/* I - Printer */
 
     int number;				/* Interface number */
 
-    libusb_get_device_descriptor (printer->device, &devdesc);
-    libusb_get_config_descriptor (printer->device, printer->conf, &confptr);
+    libusb_get_device_descriptor(printer->device, &devdesc);
+    libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
     number = confptr->interface[printer->iface].
                  altsetting[printer->altset].bInterfaceNumber;
     libusb_release_interface(printer->handle, number);
@@ -694,7 +694,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
       * a printer...
       */
 
-      libusb_get_device_descriptor (device, &devdesc);
+      libusb_get_device_descriptor(device, &devdesc);
 
       if (!devdesc.bNumConfigurations || !devdesc.idVendor ||
           !devdesc.idProduct)
@@ -702,7 +702,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 
       for (conf = 0; conf < devdesc.bNumConfigurations; conf ++)
       {
-	if (libusb_get_config_descriptor (device, conf, &confptr) < 0)
+	if (libusb_get_config_descriptor(device, conf, &confptr) < 0)
 	  continue;
         for (iface = 0, ifaceptr = confptr->interface;
 	     iface < confptr->bNumInterfaces;
@@ -950,7 +950,7 @@ make_device_uri(
   if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
     if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
       if ((sern = cupsGetOption("SN", num_values, values)) == NULL &&
-	  ((libusb_get_device_descriptor (printer->device, &devdesc) >= 0) &&
+	  ((libusb_get_device_descriptor(printer->device, &devdesc) >= 0) &&
 	   devdesc.iSerialNumber))
       {
        /*
@@ -1106,8 +1106,8 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 		0, 0, (unsigned char *)&current, 1, 5000) < 0)
     current = 0;			/* Assume not configured */
 
-  libusb_get_device_descriptor (printer->device, &devdesc);
-  libusb_get_config_descriptor (printer->device, printer->conf, &confptr);
+  libusb_get_device_descriptor(printer->device, &devdesc);
+  libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
   number1 = confptr->bConfigurationValue;
 
   if (number1 != current)
