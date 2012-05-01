@@ -147,8 +147,8 @@ static const _apple_language_locale_t apple_language_locale[] =
 {					/* Locale to language ID LUT */
   { "en",      "en_US" },
   { "nb",      "no" },
-  { "zh-Hans", "zh_CN" },
-  { "zh-Hant", "zh_TW" }
+  { "zh-Hant", "zh_CN" },
+  { "zh-Hans", "zh_TW" }
 };
 #endif /* __APPLE__ */
 
