@@ -4,7 +4,7 @@
 #
 #   Test the lp command.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -28,8 +28,8 @@ echo ""
 
 echo "LP Destination Test"
 echo ""
-echo "    lp -d Test2 testfile.jpg"
-$VALGRIND ../systemv/lp -d Test2 testfile.jpg 2>&1
+echo "    lp -d Test3 -o fit-to-page testfile.jpg"
+$VALGRIND ../systemv/lp -d Test3 -o fit-to-page testfile.jpg 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
