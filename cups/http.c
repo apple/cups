@@ -2170,14 +2170,10 @@ httpRead2(http_t *http,			/* I - Connection to server */
   {
     if (http->data_encoding == HTTP_ENCODE_CHUNKED)
       httpGets(len, sizeof(len), http);
-
-    if (http->data_encoding != HTTP_ENCODE_CHUNKED)
-    {
-      if (http->state == HTTP_POST_RECV)
-	http->state ++;
-      else
-	http->state = HTTP_WAITING;
-    }
+    else if (http->state == HTTP_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_WAITING;
   }
 
   return (bytes);

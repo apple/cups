@@ -5287,9 +5287,8 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
               ipp_uchar_t *buffer,	/* O - Buffer for data */
 	      size_t      length)	/* I - Total length */
 {
-  int		tbytes,			/* Total bytes read */
-		bytes;			/* Bytes read this pass */
-  char		len[32];		/* Length string */
+  int	tbytes,				/* Total bytes read */
+	bytes;				/* Bytes read this pass */
 
 
   DEBUG_printf(("7ipp_read_http(http=%p, buffer=%p, length=%d)",
@@ -5309,87 +5308,36 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
     if (http->state == HTTP_WAITING)
       break;
 
-    if (http->used > 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
+    if (http->used == 0 && !http->blocking)
     {
      /*
-      * Do "fast read" from HTTP buffer directly...
+      * Wait up to 10 seconds for more data on non-blocking sockets...
       */
 
-      if (http->used > (int)(length - tbytes))
-        bytes = (int)(length - tbytes);
-      else
-        bytes = http->used;
-
-      if (bytes == 1)
-	buffer[0] = http->buffer[0];
-      else
-	memcpy(buffer, http->buffer, bytes);
-
-      http->used           -= bytes;
-      http->data_remaining -= bytes;
-
-      if (http->data_remaining <= INT_MAX)
-	http->_data_remaining = (int)http->data_remaining;
-      else
-	http->_data_remaining = INT_MAX;
-
-      if (http->used > 0)
-	memmove(http->buffer, http->buffer + bytes, http->used);
-
-      if (http->data_remaining == 0)
-      {
-	if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	{
-	 /*
-	  * Get the trailing CR LF after the chunk...
-	  */
-
-	  if (!httpGets(len, sizeof(len), http))
-	    return (-1);
-	}
-
-	if (http->data_encoding != HTTP_ENCODE_CHUNKED)
-	{
-	  if (http->state == HTTP_POST_RECV)
-	    http->state ++;
-	  else
-	    http->state = HTTP_WAITING;
-	}
-      }
-    }
-    else
-    {
-      if (!http->blocking)
+      if (!httpWait(http, 10000))
       {
        /*
-        * Wait up to 10 seconds for more data on non-blocking sockets...
+	* Signal no data...
 	*/
 
-	if (!httpWait(http, 10000))
-	{
-	 /*
-          * Signal no data...
-	  */
-
-          bytes = -1;
-	  break;
-	}
+	bytes = -1;
+	break;
       }
-
-      if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
-      {
-#ifdef WIN32
-        break;
-#else
-        if (errno != EAGAIN && errno != EINTR)
-	  break;
-
-	bytes = 0;
-#endif /* WIN32 */
-      }
-      else if (bytes == 0)
-        break;
     }
+
+    if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
+    {
+#ifdef WIN32
+      break;
+#else
+      if (errno != EAGAIN && errno != EINTR)
+	break;
+
+      bytes = 0;
+#endif /* WIN32 */
+    }
+    else if (bytes == 0)
+      break;
   }
 
  /*
