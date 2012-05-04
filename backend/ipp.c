@@ -1328,7 +1328,8 @@ main(int  argc,				/* I - Number of command-line args */
 			   "cups-ipp-missing-validate-job");
       break;
     }
-    else if (ipp_status < IPP_REDIRECTION_OTHER_SITE)
+    else if (ipp_status < IPP_REDIRECTION_OTHER_SITE ||
+             ipp_status == IPP_BAD_REQUEST)
       break;
   }
 
