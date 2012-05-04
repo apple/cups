@@ -2357,6 +2357,23 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   }
 
  /*
+  * Reset all state (except fields, which may be reused)...
+  */
+
+  http->state           = HTTP_WAITING;
+  http->status          = HTTP_CONTINUE;
+  http->version         = HTTP_1_1;
+  http->keep_alive      = HTTP_KEEPALIVE_OFF;
+  memset(&http->_hostaddr, 0, sizeof(http->_hostaddr));
+  http->data_encoding   = HTTP_ENCODE_LENGTH;
+  http->_data_remaining = 0;
+  http->used            = 0;
+  http->expect          = 0;
+  http->data_remaining  = 0;
+  http->hostaddr        = NULL;
+  http->wused           = 0;
+
+ /*
   * Connect to the server...
   */
 
@@ -2394,8 +2411,6 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;
-  http->status   = HTTP_CONTINUE;
-  http->state    = HTTP_WAITING;
 
 #ifdef HAVE_SSL
   if (http->encryption == HTTP_ENCRYPT_ALWAYS)
