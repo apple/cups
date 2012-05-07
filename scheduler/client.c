@@ -4026,9 +4026,19 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   * Check if the hostname is something.local (Bonjour); if so, allow it.
   */
 
-  if ((end = strrchr(host, '.')) != NULL &&
-      (!_cups_strcasecmp(end, ".local") || !_cups_strncasecmp(end, ".local:", 7) ||
-       !_cups_strcasecmp(end, ".local.") || !_cups_strncasecmp(end, ".local.:", 8)))
+  if ((end = strrchr(host, '.')) != NULL && end > host &&
+      (!end[1] || end[1] == ':'))
+  {
+   /*
+    * "." on end, work back to second-to-last "."...
+    */
+    for (end --; end > host && *end != '.'; end --);
+  }
+
+  if (end && (!_cups_strcasecmp(end, ".local") ||
+	      !_cups_strncasecmp(end, ".local:", 7) ||
+	      !_cups_strcasecmp(end, ".local.") ||
+	      !_cups_strncasecmp(end, ".local.:", 8)))
     return (1);
 #endif /* HAVE_DNSSD */
 
