@@ -4832,7 +4832,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     else if (!strncmp(p->device_uri, "ipp://", 6) &&
 	     (strstr(p->device_uri, "/printers/") != NULL ||
 	      strstr(p->device_uri, "/classes/") != NULL ||
-	      (strstr(p->device_uri, "._ipp.") != NULL &&
+	      ((strstr(p->device_uri, "._ipp.") != NULL ||
+	        strstr(p->device_uri, "._ipps.") != NULL) &&
 	       !strcmp(p->device_uri + strlen(p->device_uri) - 5,
 		       "/cups"))))
     {
