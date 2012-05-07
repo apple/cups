@@ -456,6 +456,9 @@ main(int  argc,				/* I - Number of command-line args */
                   set_variable(&vars, "filetype", "text/html");
                 else if (!_cups_strcasecmp(ext, ".jpg"))
                   set_variable(&vars, "filetype", "image/jpeg");
+                else if (!_cups_strcasecmp(ext, ".pcl") ||
+                         !_cups_strcasecmp(ext, ".pcl.gz"))
+                  set_variable(&vars, "filetype", "application/vnd.hp-PCL");
                 else if (!_cups_strcasecmp(ext, ".pdf"))
                   set_variable(&vars, "filetype", "application/pdf");
                 else if (!_cups_strcasecmp(ext, ".png"))

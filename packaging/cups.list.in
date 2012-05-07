@@ -472,6 +472,7 @@ f 0444 root sys $DATADIR/ipptool/print-job.test test/print-job.test
 f 0444 root sys $DATADIR/ipptool test/document-*.p*
 f 0444 root sys $DATADIR/ipptool test/ipp-*.test
 f 0444 root sys $DATADIR/ipptool test/onepage-*.p*
+f 0444 root sys $DATADIR/ipptool test/testfile.*
 f 0444 root sys $DATADIR/ipptool/color.jpg test/color.jpg
 f 0444 root sys $DATADIR/ipptool/gray.jpg test/gray.jpg
 
