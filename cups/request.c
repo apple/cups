@@ -417,7 +417,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
       http->status = status = HTTP_ERROR;
-      http->error  = EIO;
+      http->error  = EINVAL;
     }
   }
   else if (status != HTTP_ERROR)

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "14 March 2012" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "11 May 2012" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -266,6 +266,10 @@ Requires the EXPECT attribute to be in the specified group tag.
 OF-TYPE tag[,tag,...]
 Requires the EXPECT attribute to use the specified value tag(s).
 .TP 5
+REPEAT-LIMIT number
+.br
+Specifies the maximum number of times to repeat. The default value is 1000.
+.TP 5
 REPEAT-MATCH
 .TP 5
 REPEAT-NO-MATCH
@@ -324,6 +328,10 @@ Makes the STATUS apply only if the specified variable is defined.
 .TP 5
 IF-NOT-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is not defined.
+.TP 5
+REPEAT-LIMIT number
+.br
+Specifies the maximum number of times to repeat. The default value is 1000.
 .TP 5
 REPEAT-MATCH
 .TP 5
