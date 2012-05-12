@@ -2577,7 +2577,7 @@ ippReadIO(void       *src,		/* I - Data source */
               */
 
 	      _cupsSetError(IPP_INTERNAL_ERROR, _("IPP extension tag larger than 0x7FFFFFFF."), 1);
-	      DEBUG_printf(("1ippReadIO: bad name length %d.", n));
+	      DEBUG_printf(("1ippReadIO: bad tag 0x%x.", tag));
 	      _cupsBufferRelease((char *)buffer);
 	      return (IPP_ERROR);
             }
@@ -2846,7 +2846,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  else
 		    _cupsSetError(IPP_INTERNAL_ERROR,
 				  _("IPP enum value not 4 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad integer value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2872,7 +2872,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP boolean value not 1 byte."),
 		                1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad boolean value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2913,11 +2913,14 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
-		if ((*cb)(src, buffer, n) < n)
-		{
-		  DEBUG_puts("1ippReadIO: unable to read string value.");
-		  _cupsBufferRelease((char *)buffer);
-		  return (IPP_ERROR);
+	        if (n > 0)
+	        {
+		  if ((*cb)(src, buffer, n) < n)
+		  {
+		    DEBUG_puts("1ippReadIO: unable to read string value.");
+		    _cupsBufferRelease((char *)buffer);
+		    return (IPP_ERROR);
+		  }
 		}
 
 		buffer[n] = '\0';
@@ -2929,7 +2932,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		if (n != 11)
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP date value not 11 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad date value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2947,7 +2950,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP resolution value not 9 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad resolution value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2974,7 +2977,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP rangeOfInteger value not 8 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad rangeOfInteger value length "
+		                "%d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3006,7 +3010,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		    _cupsSetError(IPP_INTERNAL_ERROR,
 		                  _("IPP nameWithLanguage value less than "
 		                    "minimum 4 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad stringWithLanguage value "
+		                "length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3038,7 +3043,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP language length overflows value."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad language value length %d.",
+		                n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3055,7 +3061,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP string length overflows value."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad string value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3110,7 +3116,15 @@ ippReadIO(void       *src,		/* I - Data source */
 		* we need to carry over...
 		*/
 
-	        if ((*cb)(src, buffer, n) < n)
+		if (n == 0)
+		{
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP memberName value is empty."), 1);
+	          DEBUG_puts("1ippReadIO: Empty member name value.");
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
+		else if ((*cb)(src, buffer, n) < n)
 		{
 	          DEBUG_puts("1ippReadIO: Unable to read member name value.");
 		  _cupsBufferRelease((char *)buffer);
