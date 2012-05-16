@@ -139,6 +139,7 @@ typedef enum _cups_dnssd_state_e	/* Enumerated device state */
   _CUPS_DNSSD_PENDING,
   _CUPS_DNSSD_ACTIVE,
   _CUPS_DNSSD_LOCAL,
+  _CUPS_DNSSD_INCOMPATIBLE,
   _CUPS_DNSSD_ERROR
 } _cups_dnssd_state_t;
 
@@ -964,25 +965,25 @@ cupsEnumDests(
 
   ipp_ref = data.main_ref;
   DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipp._tcp,_cups", NULL,
+                   "_ipp._tcp", NULL,
                    (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipp_ref = data.main_ref;
   DNSServiceBrowse(&local_ipp_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipp._tcp,_cups", NULL,
+                   "_ipp._tcp", NULL,
                    (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 
 #    ifdef HAVE_SSL
   ipps_ref = data.main_ref;
   DNSServiceBrowse(&ipps_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipps._tcp,_cups", NULL,
+                   "_ipps._tcp", NULL,
                    (DNSServiceBrowseReply)cups_dnssd_browse_cb, &data);
 
   local_ipps_ref = data.main_ref;
   DNSServiceBrowse(&local_ipps_ref, kDNSServiceFlagsShareConnection,
                    kDNSServiceInterfaceIndexLocalOnly,
-                   "_ipps._tcp,_cups", NULL,
+                   "_ipps._tcp", NULL,
                    (DNSServiceBrowseReply)cups_dnssd_local_cb, &data);
 #    endif /* HAVE_SSL */
 
@@ -1122,11 +1123,14 @@ cupsEnumDests(
       }
       else if (device->ref && device->state == _CUPS_DNSSD_PENDING)
       {
-	if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, &device->dest))
-	{
-	  remaining = -1;
-	  break;
-	}
+        if ((device->type & mask) == type)
+        {
+	  if (!(*cb)(user_data, CUPS_DEST_FLAGS_NONE, &device->dest))
+	  {
+	    remaining = -1;
+	    break;
+	  }
+        }
 
         device->state = _CUPS_DNSSD_ACTIVE;
       }
@@ -3134,6 +3138,10 @@ cups_dnssd_query_cb(
 			model[256],	/* Model */
 			uriname[1024],	/* Name for URI */
 			uri[1024];	/* Printer URI */
+    cups_ptype_t	type = CUPS_PRINTER_REMOTE | CUPS_PRINTER_BW;
+					/* Printer type */
+    int			saw_printer_type = 0;
+					/* Did we see a printer-type key? */
 
     device->state     = _CUPS_DNSSD_PENDING;
     make_and_model[0] = '\0';
@@ -3207,17 +3215,101 @@ cups_dnssd_query_cb(
 	if ((ptr = strchr(model, ',')) != NULL)
 	  *ptr = '\0';
       }
+      else if (!_cups_strcasecmp(key, "note"))
+        device->dest.num_options = cupsAddOption("printer-location", value,
+						 device->dest.num_options,
+						 &device->dest.options);
+      else if (!_cups_strcasecmp(key, "pdl"))
+      {
+       /*
+        * Look for PDF-capable printers; only PDF-capable printers are shown.
+        */
+
+        const char	*start, *next;	/* Pointer into value */
+        int		have_pdf = 0;	/* Have PDF? */
+
+        for (start = value; start && *start; start = next)
+        {
+          if (!_cups_strncasecmp(start, "application/pdf", 15) &&
+              (!start[15] || start[15] == ','))
+          {
+            have_pdf = 1;
+            break;
+          }
+
+          if ((next = strchr(start, ',')) != NULL)
+            next ++;
+        }
+
+        if (!have_pdf)
+          device->state = _CUPS_DNSSD_INCOMPATIBLE;
+      }
       else if (!_cups_strcasecmp(key, "printer-type"))
       {
-        device->dest.num_options = cupsAddOption("printer-type", value,
-                                                 device->dest.num_options,
-                                                 &device->dest.options);
+       /*
+        * Value is either NNNN or 0xXXXX
+        */
+
+	saw_printer_type = 1;
+        type             = strtol(value, NULL, 0);
+      }
+      else if (!saw_printer_type)
+      {
+	if (!_cups_strcasecmp(key, "air") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_AUTHENTICATED;
+	else if (!_cups_strcasecmp(key, "bind") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_BIND;
+	else if (!_cups_strcasecmp(key, "collate") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_COLLATE;
+	else if (!_cups_strcasecmp(key, "color") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_COLOR;
+	else if (!_cups_strcasecmp(key, "copies") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_COPIES;
+	else if (!_cups_strcasecmp(key, "duplex") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_DUPLEX;
+	else if (!_cups_strcasecmp(key, "fax") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_MFP;
+	else if (!_cups_strcasecmp(key, "papercustom") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_VARIABLE;
+	else if (!_cups_strcasecmp(key, "papermax"))
+	{
+	  if (!_cups_strcasecmp(value, "legal-a4"))
+	    type |= CUPS_PRINTER_SMALL;
+	  else if (!_cups_strcasecmp(value, "isoc-a2"))
+	    type |= CUPS_PRINTER_MEDIUM;
+	  else if (!_cups_strcasecmp(value, ">isoc-a2"))
+	    type |= CUPS_PRINTER_LARGE;
+	}
+	else if (!_cups_strcasecmp(key, "punch") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_PUNCH;
+	else if (!_cups_strcasecmp(key, "scan") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_MFP;
+	else if (!_cups_strcasecmp(key, "sort") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_SORT;
+	else if (!_cups_strcasecmp(key, "staple") &&
+		 !_cups_strcasecmp(value, "t"))
+	  type |= CUPS_PRINTER_STAPLE;
       }
     }
 
    /*
-    * Save the make-and-model...
+    * Save the printer-xxx values...
     */
+
+    device->dest.num_options = cupsAddOption("printer-info", name,
+					     device->dest.num_options,
+					     &device->dest.options);
 
     if (make_and_model[0])
     {
@@ -3235,6 +3327,12 @@ cups_dnssd_query_cb(
 					       device->dest.num_options,
 					       &device->dest.options);
 
+    device->type = type;
+    snprintf(value, sizeof(value), "%u", type);
+    device->dest.num_options = cupsAddOption("printer-type", value,
+					     device->dest.num_options,
+					     &device->dest.options);
+
    /*
     * Save the URI...
     */
@@ -3242,7 +3340,7 @@ cups_dnssd_query_cb(
     cups_dnssd_unquote(uriname, device->fullName, sizeof(uriname));
     httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri),
                     !strcmp(device->regtype, "_ipps._tcp") ? "ipps" : "ipp",
-                    NULL, uriname, 0, "/cups");
+                    NULL, uriname, 0, saw_printer_type ? "/cups" : "/");
 
     DEBUG_printf(("6cups_dnssd_query: printer-uri-supported=\"%s\"", uri));
 
