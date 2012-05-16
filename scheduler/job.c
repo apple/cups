@@ -287,16 +287,25 @@ cupsdCheckJobs(void)
   time_t		curtime;	/* Current time */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d",
-                  cupsArrayCount(ActiveJobs), Sleeping, NeedReload);
-
   curtime = time(NULL);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d, "
+                  "curtime=%ld", cupsArrayCount(ActiveJobs), Sleeping,
+                  NeedReload, (long)curtime);
 
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdCheckJobs: Job %d - dest=\"%s\", printer=%p, "
+                    "state=%d, cancel_time=%ld, hold_until=%ld, kill_time=%ld, "
+                    "pending_cost=%d, pending_timeout=%ld", job->id, job->dest,
+                    job->printer, job->state_value, (long)job->cancel_time,
+                    (long)job->hold_until, (long)job->kill_time,
+                    job->pending_cost, (long)job->pending_timeout);
+
    /*
     * Kill jobs if they are unresponsive...
     */
@@ -338,7 +347,6 @@ cupsdCheckJobs(void)
 	*/
 
         cupsd_client_t	*con;		/* Current client connection */
-
 
 	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	     con;
@@ -431,7 +439,7 @@ cupsdCheckJobs(void)
           cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
 
-        if (printer->state == IPP_PRINTER_IDLE)
+        if (!printer->job && printer->state == IPP_PRINTER_IDLE)
         {
 	 /*
 	  * Start the job...
