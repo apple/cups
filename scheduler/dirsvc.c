@@ -52,12 +52,8 @@
 
 #if defined(HAVE_DNSSD) && defined(__APPLE__)
 #  include <nameser.h>
-#  ifdef HAVE_COREFOUNDATION
-#    include <CoreFoundation/CoreFoundation.h>
-#  endif /* HAVE_COREFOUNDATION */
-#  ifdef HAVE_SYSTEMCONFIGURATION
-#    include <SystemConfiguration/SystemConfiguration.h>
-#  endif /* HAVE_SYSTEMCONFIGURATION */
+#  include <CoreFoundation/CoreFoundation.h>
+#  include <SystemConfiguration/SystemConfiguration.h>
 #endif /* HAVE_DNSSD && __APPLE__ */
 
 
@@ -140,8 +136,10 @@ cupsdDeregisterPrinter(
   * Announce the deletion...
   */
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (removeit && (BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDMaster)
     dnssdDeregisterPrinter(p, 1);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 }
 
 
@@ -160,8 +158,10 @@ cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
       (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_SCANNER)))
     return;
 
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if ((BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDMaster)
     dnssdRegisterPrinter(p);
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 }
 
 
@@ -342,13 +342,13 @@ void
 cupsdUpdateDNSSDName(void)
 {
   char		webif[1024];		/* Web interface share name */
-#  ifdef HAVE_SYSTEMCONFIGURATION
+#  ifdef __APPLE__
   SCDynamicStoreRef sc;			/* Context for dynamic store */
   CFDictionaryRef btmm;			/* Back-to-My-Mac domains */
   CFStringEncoding nameEncoding;	/* Encoding of computer name */
   CFStringRef	nameRef;		/* Host name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
-#  endif /* HAVE_SYSTEMCONFIGURATION */
+#  endif /* __APPLE__ */
 
 
  /*
@@ -363,7 +363,7 @@ cupsdUpdateDNSSDName(void)
   * Get the computer name as a c-string...
   */
 
-#  ifdef HAVE_SYSTEMCONFIGURATION
+#  ifdef __APPLE__
   sc = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("cupsd"), NULL, NULL);
 
   if (sc)
@@ -454,7 +454,7 @@ cupsdUpdateDNSSDName(void)
     CFRelease(sc);
   }
   else
-#  endif /* HAVE_SYSTEMCONFIGURATION */
+#  endif /* __APPLE__ */
 #  ifdef HAVE_AVAHI
   {
     cupsdSetString(&DNSSDComputerName, avahi_client_get_host_name(DNSSDClient));

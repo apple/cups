@@ -173,7 +173,9 @@ copy_cdsa_certificate(
 					/* Server name */
   CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
   CFArrayRef		list = NULL;	/* Keychain list */
+#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   char			localname[1024];/* Local hostname */
+#    endif /* HAVE_DNSSD || HAVE_AVAHI */
 #  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
   SecPolicyRef		policy = NULL;	/* Policy ref */
   SecPolicySearchRef	policy_search = NULL;
@@ -232,6 +234,7 @@ copy_cdsa_certificate(
 
   err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
 
+#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (err && DNSSDHostName)
   {
    /*
@@ -265,6 +268,7 @@ copy_cdsa_certificate(
 
     err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
   }
+#    endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   if (err)
   {
@@ -320,6 +324,7 @@ copy_cdsa_certificate(
 
   err = SecIdentitySearchCopyNext(search, &identity);
 
+#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (err && DNSSDHostName)
   {
    /*
@@ -357,6 +362,7 @@ copy_cdsa_certificate(
     err = SecIdentitySearchCopyNext(search, &identity);
 
   }
+#    endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   if (err)
   {
@@ -439,18 +445,22 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 		*envp[MAX_ENV + 1],	/* Environment variables */
 		keychain[1024],		/* Keychain argument */
 		infofile[1024],		/* Type-in information for cert */
+#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
 		localname[1024],	/* Local hostname */
+#  endif /* HAVE_DNSSD || HAVE_AVAHI */
 		*servername;		/* Name of server in cert */
   cups_file_t	*fp;			/* Seed/info file */
   int		infofd;			/* Info file descriptor */
 
 
+#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
   {
     snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
     servername = localname;
   }
   else
+#  endif /* HAVE_DNSSD || HAVE_AVAHI */
     servername = con->servername;
 
  /*

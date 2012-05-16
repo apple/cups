@@ -538,14 +538,6 @@
 
 
 /*
- * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
- */
-
-#undef HAVE_COREFOUNDATION
-#undef HAVE_SYSTEMCONFIGURATION
-
-
-/*
  * Do we have CoreFoundation public and private headers?
  */
 

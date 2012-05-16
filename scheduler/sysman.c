@@ -974,11 +974,13 @@ sysUpdate(void)
 	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
 	  cupsdDeregisterPrinter(p, 1);
 
+#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
        /*
         * Update the computer name and BTMM domain list...
 	*/
 
 	cupsdUpdateDNSSDName();
+#  endif /* HAVE_DNSSD || HAVE_AVAHI */
 
        /*
 	* Now re-register them...
