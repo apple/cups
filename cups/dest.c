@@ -659,14 +659,14 @@ cupsConnectDest(
     return (NULL);
   }
 
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (strstr(uri, "._tcp"))
   {
     if ((uri = cups_dnssd_resolve(dest, uri, msec, cancel, cb,
                                   user_data)) == NULL)
       return (NULL);
   }
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
                       userpass, sizeof(userpass), hostname, sizeof(hostname),
@@ -889,13 +889,13 @@ cupsEnumDests(
   cups_dest_t		*dests = NULL,	/* Destinations */
 			*dest;		/* Current destination */
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  int			nfds,		/* Number of files responded */
-			count,		/* Number of queries started */
+  int			count,		/* Number of queries started */
 			remaining;	/* Remainder of timeout */
   _cups_dnssd_data_t	data;		/* Data for callback */
   _cups_dnssd_device_t	*device;	/* Current device */
 #  ifdef HAVE_DNSSD
-  int			main_fd;	/* File descriptor for lookups */
+  int			nfds,		/* Number of files responded */
+			main_fd;	/* File descriptor for lookups */
   DNSServiceRef		ipp_ref,	/* IPP browser */
 			local_ipp_ref;	/* Local IPP browser */
 #    ifdef HAVE_SSL
@@ -1051,7 +1051,7 @@ cupsEnumDests(
 #  else /* HAVE_AVAHI */
     data.got_data = 0;
 
-    if ((error = avahi_simple_poll_iterate(data.simple_poll, 500)) > 0)
+    if ((error = avahi_simple_poll_iterate(data.simple_poll, 250)) > 0)
     {
      /*
       * We've been told to exit the loop.  Perhaps the connection to
@@ -1060,6 +1060,9 @@ cupsEnumDests(
 
       break;
     }
+
+    if (!data.got_data)
+      remaining -= 250;
 #  endif /* HAVE_DNSSD */
 
     for (device = (_cups_dnssd_device_t *)cupsArrayFirst(data.devices),
@@ -2995,7 +2998,7 @@ cups_dnssd_local_cb(
  */
 
 static int				/* O - Number of file descriptors matching */
-poll_callback(
+cups_dnssd_poll_cb(
     struct pollfd *pollfds,		/* I - File descriptors */
     unsigned int  num_pollfds,		/* I - Number of file descriptors */
     int           timeout,		/* I - Timeout in milliseconds (unused) */
@@ -3008,7 +3011,7 @@ poll_callback(
 
   (void)timeout;
 
-  val = poll(pollfds, num_pollfds, 500);
+  val = poll(pollfds, num_pollfds, 250);
 
   if (val < 0)
   {

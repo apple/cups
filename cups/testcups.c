@@ -58,6 +58,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_jobs;		/* Number of jobs for queue */
   cups_job_t	*jobs;			/* Jobs for queue */
 
+
   if (argc > 1)
   {
     if (!strcmp(argv[1], "enum"))
@@ -417,9 +418,13 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
         cups_dest_t *dest)		/* I - Destination */
 {
   if (flags & CUPS_DEST_FLAGS_REMOVED)
-    printf("Removed '%s'.\n", dest->name);
+    printf("Removed '%s' (%s).\n", dest->name,
+           cupsGetOption("printer-uri-supported", dest->num_options,
+                         dest->options));
   else
-    printf("Added '%s'.\n", dest->name);
+    printf("Added '%s' (%s).\n", dest->name,
+           cupsGetOption("printer-uri-supported", dest->num_options,
+                         dest->options));
 
   return (1);
 }
