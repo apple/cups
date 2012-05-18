@@ -671,7 +671,7 @@ cat_tar(const char *name,		/* I - PPD name */
 
       for (total = 0; total < curinfo.st_size; total += bytes)
       {
-        if ((bytes = (curinfo.st_size - total)) > sizeof(buffer))
+        if ((size_t)(bytes = (curinfo.st_size - total)) > sizeof(buffer))
           bytes = sizeof(buffer);
 
         if ((bytes = cupsFileRead(fp, buffer, bytes)) < 0)
