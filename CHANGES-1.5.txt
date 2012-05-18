@@ -1,6 +1,12 @@
 CHANGES-1.5.txt
 ---------------
 
+CHANGES IN CUPS V1.5.4
+
+	- The libusb-based USB backend did not work on non-Linux platforms
+	  (STR #4088)
+
+
 CHANGES IN CUPS V1.5.3
 
 	- httpReconnect() did not reset the read/write buffers (STR #4065)
