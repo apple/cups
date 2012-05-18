@@ -73,10 +73,10 @@ static void		update_smb(int onoff);
 
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-#  ifdef HAVE_COREFOUNDATION
+#  ifdef __APPLE__
 static void		dnssdAddAlias(const void *key, const void *value,
 			              void *context);
-#  endif /* HAVE_COREFOUNDATION */
+#  endif /* __APPLE__ */
 static cupsd_txt_t	dnssdBuildTxtRecord(cupsd_printer_t *p, int for_lpd);
 static void		dnssdDeregisterInstance(cupsd_srv_t *srv);
 static void		dnssdDeregisterPrinter(cupsd_printer_t *p,
@@ -486,7 +486,7 @@ cupsdUpdateDNSSDName(void)
 }
 
 
-#  ifdef HAVE_COREFOUNDATION
+#  ifdef __APPLE__
 /*
  * 'dnssdAddAlias()' - Add a DNS-SD alias name.
  */
@@ -524,7 +524,7 @@ dnssdAddAlias(const void *key,		/* I - Key */
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Bad Back to My Mac domain in dynamic store!");
 }
-#  endif /* HAVE_COREFOUNDATION */
+#  endif /* __APPLE__ */
 
 
 /*
