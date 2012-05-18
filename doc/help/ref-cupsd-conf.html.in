@@ -2585,6 +2585,23 @@ on for secure connections. Multiple <CODE>SSLPort</CODE> lines
 can be specified to listen on multiple ports.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6</SPAN><A NAME="StrictConformance">StrictConformance</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+StrictConformance No
+StrictConformance Yes
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>StrictConformance</CODE> directive specifies whether the scheduler
+requires strict IPP conformance for client requests, for example to not allow
+document attributes in a Create-Job request. The default is
+<code>No</code>.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="SubscriptionPrivateAccess">SubscriptionPrivateAccess</A></H2>
 
 <H3>Examples</H3>

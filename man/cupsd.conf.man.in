@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "15 February 2012" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "18 May 2012" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -590,6 +590,13 @@ Sets SSL/TLS protocol options for encrypted connections.
 SSLPort
 .br
 Listens on the specified port for encrypted connections.
+.TP 5
+StrictConformance Yes
+.TP 5
+StrictConformance No
+.br
+Specifies whether the scheduler requires clients to strictly adhere to the IPP
+specifications. The default is No.
 .TP 5
 SubscriptionPrivateAccess all
 .TP 5

@@ -5795,8 +5795,16 @@ static void
 create_job(cupsd_client_t  *con,	/* I - Client connection */
 	   ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  int			i;		/* Looping var */
   cupsd_printer_t	*printer;	/* Printer */
   cupsd_job_t		*job;		/* New job */
+  static const char * const forbidden_attrs[] =
+  {					/* List of forbidden attributes */
+    "compression",
+    "document-format",
+    "document-name",
+    "document-natural-language"
+  };
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "create_job(%p[%d], %s)", con,
@@ -5816,6 +5824,29 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
                     _("The printer or class does not exist."));
     return;
   }
+
+ /*
+  * Check for invalid Create-Job attributes and log a warning or error depending
+  * on whether cupsd is running in "strict conformance" mode...
+  */
+
+  for (i = 0;
+       i < (int)(sizeof(forbidden_attrs) / sizeof(forbidden_attrs[0]));
+       i ++)
+    if (ippFindAttribute(con->request, forbidden_attrs[i], IPP_TAG_ZERO))
+    {
+      if (StrictConformance)
+      {
+	send_ipp_status(con, IPP_BAD_REQUEST,
+			_("The '%s' operation attribute cannot be supplied in a "
+			  "Create-Job request."), forbidden_attrs[i]);
+	return;
+      }
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "Unexpected '%s' operation attribute in a Create-Job "
+                      "request.", forbidden_attrs[i]);
+    }
 
  /*
   * Create the job object...

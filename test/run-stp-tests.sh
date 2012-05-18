@@ -368,6 +368,7 @@ else
 fi
 
 cat >/tmp/cups-$user/cupsd.conf <<EOF
+StrictConformance Yes
 Browsing Off
 FileDevice yes
 Printcap

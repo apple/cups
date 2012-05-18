@@ -2569,7 +2569,7 @@ new_request(
       * When talking to another CUPS server, send all options...
       */
 
-      cupsEncodeOptions(request, num_options, options);
+      cupsEncodeOptions2(request, num_options, options, IPP_TAG_JOB);
     }
 
     if (copies > 1 && (!pc || copies <= pc->max_copies))
