@@ -2322,7 +2322,7 @@ new_request(
     fprintf(stderr, "DEBUG: job-name=\"%s\"\n", title);
   }
 
-  if (format)
+  if (format && op != IPP_CREATE_JOB)
   {
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 		 "document-format", NULL, format);
@@ -2330,7 +2330,7 @@ new_request(
   }
 
 #ifdef HAVE_LIBZ
-  if (compression)
+  if (compression && op != IPP_CREATE_JOB)
   {
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
 		 "compression", NULL, compression);
