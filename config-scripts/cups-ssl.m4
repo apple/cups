@@ -124,7 +124,7 @@ if test x$enable_ssl != xno; then
 
     dnl Check for the OpenSSL library last...
     if test $have_ssl = 0 -a "x$enable_openssl" != "xno"; then
-	AC_CHECK_HEADER(openssl/ssl.h,
+	AC_CHECK_HEADER(openssl/ssl.h,[
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
 	    SAVELIBS="$LIBS"
@@ -155,11 +155,10 @@ if test x$enable_ssl != xno; then
 
 	    if test "x${SSLLIBS}" != "x"; then
 		LIBS="$SAVELIBS $SSLLIBS"
-		AC_CHECK_FUNC(SSL_set_tlsext_host_name,
-		    [AC_DEFINE(HAVE_SSL_SET_TLSEXT_HOST_NAME)])
+		AC_CHECK_FUNCS(SSL_set_tlsext_host_name)
 	    fi
 
-	    LIBS="$SAVELIBS")
+	    LIBS="$SAVELIBS"])
     fi
 fi
 
