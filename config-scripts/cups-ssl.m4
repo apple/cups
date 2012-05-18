@@ -149,12 +149,15 @@ if test x$enable_ssl != xno; then
 		    $libcrypto)
 
 		if test "x${SSLLIBS}" != "x"; then
-		    LIBS="$SAVELIBS $SSLLIBS"
-		    AC_CHECK_FUNC(SSL_set_tlsext_host_name,
-			AC_DEFINE(HAVE_SSL_SET_TLSEXT_HOST_NAME))
 		    break
 		fi
 	    done
+
+	    if test "x${SSLLIBS}" != "x"; then
+		LIBS="$SAVELIBS $SSLLIBS"
+		AC_CHECK_FUNC(SSL_set_tlsext_host_name,
+		    [AC_DEFINE(HAVE_SSL_SET_TLSEXT_HOST_NAME)])
+	    fi
 
 	    LIBS="$SAVELIBS")
     fi
