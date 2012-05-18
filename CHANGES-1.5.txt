@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- The scheduler now sets the CUPS_MAX_MESSAGE environment variable for
+	  filters (STR #4074)
 	- Fixed a build issue when using older versions of autoconf (STR #4084)
 	- The IPP backend now treats the client-error-not-possible status code
 	  as a job history issue, allowing IPP printing to Windows to work
