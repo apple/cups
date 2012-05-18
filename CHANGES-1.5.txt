@@ -3,6 +3,9 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- The IPP backend now treats the client-error-not-possible status code
+	  as a job history issue, allowing IPP printing to Windows to work
+	  (STR #4047)
 	- The IPP backend incorrectly included the document-format and
 	  compression attributes in Create-Job requests (STR #4086)
 	- The libusb-based USB backend did not work on non-Linux platforms

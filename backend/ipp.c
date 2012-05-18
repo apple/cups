@@ -1702,7 +1702,7 @@ main(int  argc,				/* I - Number of command-line args */
       response   = cupsDoRequest(http, request, resource);
       ipp_status = cupsLastError();
 
-      if (ipp_status == IPP_NOT_FOUND)
+      if (ipp_status == IPP_NOT_FOUND || ipp_status == IPP_NOT_POSSIBLE)
       {
        /*
         * Job has gone away and/or the server has no job history...
@@ -1724,7 +1724,6 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
-	    ipp_status != IPP_NOT_POSSIBLE &&
 	    ipp_status != IPP_PRINTER_BUSY)
 	{
 	  ippDelete(response);
