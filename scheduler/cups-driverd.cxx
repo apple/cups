@@ -1997,7 +1997,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   cups_array_t	*products,		/* Product array */
 		*psversions,		/* PSVersion array */
 		*cups_languages;	/* cupsLanguages array */
-  int		new_ppd = !ppd;		/* Is this a new PPD? */
+  int		new_ppd;		/* Is this a new PPD? */
   struct				/* LanguageVersion translation table */
   {
     const char	*version,		/* LanguageVersion string */

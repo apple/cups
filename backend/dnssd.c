@@ -587,10 +587,7 @@ browse_callback(
                   "interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
 		  "regtype=\"%s\", replyDomain=\"%s\", context=%p)\n",
           sdRef, flags, interfaceIndex, errorCode,
-	  serviceName ? serviceName : "(null)",
-	  regtype ? regtype : "(null)",
-	  replyDomain ? replyDomain : "(null)",
-	  context);
+	  serviceName, regtype, replyDomain, context);
 
  /*
   * Only process "add" data...
@@ -629,10 +626,7 @@ browse_local_callback(
                   "interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
 		  "regtype=\"%s\", replyDomain=\"%s\", context=%p)\n",
           sdRef, flags, interfaceIndex, errorCode,
-	  serviceName ? serviceName : "(null)",
-	  regtype ? regtype : "(null)",
-	  replyDomain ? replyDomain : "(null)",
-	  context);
+	  serviceName, regtype, replyDomain, context);
 
  /*
   * Only process "add" data...
