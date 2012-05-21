@@ -18,6 +18,21 @@
 argcount=$#
 
 #
+# Don't allow "make check" or "make test" to be run by root...
+#
+
+if test "x`id -u`" = x0; then
+	echo Please run this as a normal user. Not supported when run as root.
+	exit 1
+fi
+
+#
+# Force the permissions of the files we create...
+#
+
+umask 2
+
+#
 # Make the IPP test program...
 #
 
