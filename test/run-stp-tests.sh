@@ -30,7 +30,7 @@ fi
 # Force the permissions of the files we create...
 #
 
-umask 2
+umask 022
 
 #
 # Make the IPP test program...
