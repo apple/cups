@@ -1311,7 +1311,7 @@ colord_get_qualifier_format(
   else if (ppdFindAttr(ppd, "DefaultColorSpace", NULL))
     tmp = "ColorSpace";
   else
-    tmp = ""
+    tmp = "";
 
   format[0] = strdup(tmp);
 
