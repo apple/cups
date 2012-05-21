@@ -89,7 +89,7 @@ main(int  argc,				/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'H' : /* Connect to host */
 	    if (argv[i][2] != '\0')
               cupsSetServer(argv[i] + 2);
@@ -401,8 +401,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (cupsFinishDocument(CUPS_HTTP_DEFAULT, printer) != IPP_OK)
     {
+      _cupsLangPrintf(stderr, "%s: %s", argv[0], cupsLastErrorString());
       cupsCancelJob2(CUPS_HTTP_DEFAULT, printer, job_id, 0);
-      job_id = 0;
+      return (1);
     }
   }
 
