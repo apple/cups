@@ -12,6 +12,32 @@
  *   which should have been included with this file.  If this file is
  *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
+ *   Original DBUS/colord code is Copyright 2011 Red Hat, Inc.
+ *
+ *   Redistribution and use in source and binary forms, with or without
+ *   modification, are permitted provided that the following conditions
+ *   are met:
+ *
+ *   Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright
+ *   notice, this list of conditions and the following disclaimer in the
+ *   documentation and/or other materials provided with the distribution.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *   COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ *   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ *   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ *   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ *   OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  * Contents:
  *
  */
@@ -27,7 +53,55 @@
 #  include <ApplicationServices/ApplicationServices.h>
 extern CFUUIDRef ColorSyncCreateUUIDFromUInt32(unsigned id);
 #  include <CoreFoundation/CoreFoundation.h>
+#elif defined(HAVE_DBUS)
+#  include <dbus/dbus.h>
+
+/*
+ * Defines used by colord. See the reference docs for further details:
+ *
+ *   http://colord.hughsie.com/api/ref-dbus.html
+ */
+
+#  define COLORD_SCOPE_NORMAL	"normal"
+					/* System scope */
+#  define COLORD_SCOPE_TEMP	"temp"	/* Process scope */
+#  define COLORD_SCOPE_DISK	"disk"	/* Lives forever, as stored in DB */
+
+#  define COLORD_RELATION_SOFT	"soft"	/* Mapping is not default */
+#  define COLORD_RELATION_HARD	"hard"	/* Explicitly mapped profile */
+
+#  define COLORD_SPACE_RGB	"rgb"	/* RGB colorspace */
+#  define COLORD_SPACE_CMYK	"cmyk"	/* CMYK colorspace */
+#  define COLORD_SPACE_GRAY	"gray"	/* Gray colorspace */
+#  define COLORD_SPACE_UNKNOWN	"unknown"
+					/* Unknown colorspace */
+
+#  define COLORD_MODE_PHYSICAL	"physical"
+					/* Actual device */
+#  define COLORD_MODE_VIRTUAL	"virtual"
+					/* Virtual device with no hardware */
+
+#  define COLORD_KIND_PRINTER	"printer"
+					/* printing output device */
+
+#  define COLORD_DBUS_MSG(p,m)	dbus_message_new_method_call(\
+					"org.freedesktop.ColorManager", (p),\
+                                        "org.freedesktop.ColorManager", (m))
+                                        /* Macro to make new colord messages */
+#  define COLORD_DBUS_PATH	"/org/freedesktop/ColorManager"
+					/* Path for color management system */
+#  define COLORD_DBUS_TIMEOUT	5000	/* Timeout for connecting to colord in ms */
 #endif /* __APPLE__ */
+
+
+/*
+ * Local globals...
+ */
+
+#if !defined(__APPLE__) && defined(HAVE_DBUS)
+static DBusConnection *colord_con = NULL;
+					/* DBUS connection for colord */
+#endif /* !__APPLE__ && HAVE_DBUS */
 
 
 /*
@@ -41,6 +115,28 @@ static void	apple_init_profile(ppd_file_t *ppd, cups_array_t *languages,
 				   const char *text, const char *iccfile);
 static void	apple_register_profiles(cupsd_printer_t *p);
 static void	apple_unregister_profiles(cupsd_printer_t *p);
+
+#elif defined(HAVE_DBUS)
+static void	colord_create_device(cupsd_printer_t *p, ppd_file_t *ppd,
+				     cups_array_t *profiles,
+				     const char *colorspace, char **format,
+				     const char *relation, const char *scope);
+static void	colord_create_profile(cups_array_t *profiles,
+				      const char *printer_name,
+				      const char *qualifier,
+				      const char *colorspace,
+				      char **format, const char *iccfile,
+				      const char *scope);
+static void	colord_delete_device(const char *device_id);
+static void	colord_device_add_profile(const char *device_path,
+					  const char *profile_path,
+					  const char *relation);
+static void	colord_dict_add_strings(DBusMessageIter *dict,
+					const char *key, const char *value);
+static char	*colord_find_device(const char *device_id);
+static void	colord_get_qualifier_format(ppd_file_t *ppd, char *format[3]);
+static void	colord_register_printer(cupsd_printer_t *p);
+static void	colord_unregister_printer(cupsd_printer_t *p);
 #endif /* __APPLE__ */
 
 
@@ -56,7 +152,8 @@ cupsdRegisterColor(cupsd_printer_t *p)	/* I - Printer */
   apple_register_profiles(p);
 
 #elif defined(HAVE_DBUS)
-  /* colord stuff goes here */
+  colord_unregister_printer(p);
+  colord_register_printer(p);
 #endif /* __APPLE__ */
 }
 
@@ -69,7 +166,7 @@ void
 cupsdStartColor(void)
 {
 #if !defined(__APPLE__) && defined(HAVE_DBUS)
-  /* colord stuff goes here */
+  colord_con = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
 #endif /* !__APPLE__ && HAVE_DBUS */
 }
 
@@ -82,7 +179,8 @@ void
 cupsdStopColor(void)
 {
 #if !defined(__APPLE__) && defined(HAVE_DBUS)
-  /* colord stuff goes here */
+  dbus_connection_unref(colord_con);
+  colord_con = NULL;
 #endif /* !__APPLE__ && HAVE_DBUS */
 }
 
@@ -98,7 +196,7 @@ cupsdUnregisterColor(cupsd_printer_t *p)/* I - Printer */
   apple_unregister_profiles(p);
 
 #elif defined(HAVE_DBUS)
-  /* colord stuff goes here */
+  colord_unregister_printer(p);
 #endif /* __APPLE__ */
 }
 
@@ -239,7 +337,6 @@ apple_register_profiles(
   const char		*q1_choice,	/* ColorModel (or other) choice */
 			*q2_choice,	/* MediaType (or other) choice */
 			*q3_choice;	/* Resolution (or other) choice */
-  const char		*profile_key;	/* Profile keyword */
   ppd_option_t		*cm_option;	/* Color model option */
   ppd_choice_t		*cm_choice;	/* Color model choice */
   int			num_profiles;	/* Number of profiles */
@@ -275,15 +372,9 @@ apple_register_profiles(
   * See if we have any profiles...
   */
 
-  if ((attr = ppdFindAttr(ppd, "APTiogaProfile", NULL)) != NULL)
-    profile_key = "APTiogaProfile";
-  else
-  {
-    attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
-    profile_key = "cupsICCProfile";
-  }
-
-  for (num_profiles = 0; attr; attr = ppdFindNextAttr(ppd, profile_key, NULL))
+  for (num_profiles = 0, attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
     if (attr->spec[0] && attr->value && attr->value[0])
     {
       if (attr->value[0] != '/')
@@ -325,67 +416,51 @@ apple_register_profiles(
 
   if (num_profiles > 0)
   {
-    if (profile_key[0] == 'A')
+   /*
+    * For CUPS PPDs, figure out the default profile selector values...
+    */
+
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL &&
+	attr->value && attr->value[0])
     {
-     /*
-      * For Tioga PPDs, get the default profile using the DefaultAPTiogaProfile
-      * attribute...
-      */
+      snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+      q1_attr = ppdFindAttr(ppd, q_keyword, NULL);
+    }
+    else if ((q1_attr = ppdFindAttr(ppd, "DefaultColorModel", NULL)) == NULL)
+      q1_attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
 
-      if ((attr = ppdFindAttr(ppd, "DefaultAPTiogaProfile", NULL)) != NULL &&
-	  attr->value)
-        default_profile_id = atoi(attr->value);
+    if (q1_attr && q1_attr->value && q1_attr->value[0])
+      q1_choice = q1_attr->value;
+    else
+      q1_choice = "";
 
-      q1_choice = q2_choice = q3_choice = NULL;
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL &&
+	attr->value && attr->value[0])
+    {
+      snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+      q2_attr = ppdFindAttr(ppd, q_keyword, NULL);
     }
     else
+      q2_attr = ppdFindAttr(ppd, "DefaultMediaType", NULL);
+
+    if (q2_attr && q2_attr->value && q2_attr->value[0])
+      q2_choice = q2_attr->value;
+    else
+      q2_choice = NULL;
+
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL &&
+	attr->value && attr->value[0])
     {
-     /*
-      * For CUPS PPDs, figure out the default profile selector values...
-      */
-
-      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL &&
-	  attr->value && attr->value[0])
-      {
-	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
-	q1_attr = ppdFindAttr(ppd, q_keyword, NULL);
-      }
-      else if ((q1_attr = ppdFindAttr(ppd, "DefaultColorModel", NULL)) == NULL)
-	q1_attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
-
-      if (q1_attr && q1_attr->value && q1_attr->value[0])
-	q1_choice = q1_attr->value;
-      else
-	q1_choice = "";
-
-      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL &&
-	  attr->value && attr->value[0])
-      {
-	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
-	q2_attr = ppdFindAttr(ppd, q_keyword, NULL);
-      }
-      else
-	q2_attr = ppdFindAttr(ppd, "DefaultMediaType", NULL);
-
-      if (q2_attr && q2_attr->value && q2_attr->value[0])
-	q2_choice = q2_attr->value;
-      else
-	q2_choice = NULL;
-
-      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL &&
-	  attr->value && attr->value[0])
-      {
-	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
-	q3_attr = ppdFindAttr(ppd, q_keyword, NULL);
-      }
-      else
-	q3_attr = ppdFindAttr(ppd, "DefaultResolution", NULL);
-
-      if (q3_attr && q3_attr->value && q3_attr->value[0])
-	q3_choice = q3_attr->value;
-      else
-	q3_choice = NULL;
+      snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+      q3_attr = ppdFindAttr(ppd, q_keyword, NULL);
     }
+    else
+      q3_attr = ppdFindAttr(ppd, "DefaultResolution", NULL);
+
+    if (q3_attr && q3_attr->value && q3_attr->value[0])
+      q3_choice = q3_attr->value;
+    else
+      q3_choice = NULL;
 
    /*
     * Loop through the profiles listed in the PPD...
@@ -393,9 +468,9 @@ apple_register_profiles(
 
     languages = _ppdGetLanguages(ppd);
 
-    for (attr = ppdFindAttr(ppd, profile_key, NULL);
+    for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
 	 attr;
-	 attr = ppdFindNextAttr(ppd, profile_key, NULL))
+	 attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
       if (attr->spec[0] && attr->value && attr->value[0])
       {
        /*
@@ -412,21 +487,16 @@ apple_register_profiles(
 	                   cupsdLogFCMessage, p))
 	  continue;
 
-        if (profile_key[0] == 'c')
-	{
-	  cupsArraySave(ppd->sorted_attrs);
+	cupsArraySave(ppd->sorted_attrs);
 
-	  if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
-					    attr->spec)) != NULL &&
-	      profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
-	    profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
-	  else
-	    profile_id = _ppdHashName(attr->spec);
-
-	  cupsArrayRestore(ppd->sorted_attrs);
-        }
+	if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
+					  attr->spec)) != NULL &&
+	    profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
+	  profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
 	else
-	  profile_id = atoi(attr->spec);
+	  profile_id = _ppdHashName(attr->spec);
+
+	cupsArrayRestore(ppd->sorted_attrs);
 
 	profile = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					    &kCFTypeDictionaryKeyCallBacks,
@@ -789,12 +859,6 @@ apple_unregister_profiles(
 
   if (ColorSyncUnregisterDevice != NULL)
   {
-   /*
-    * Because we may have registered the printer profiles using a prior device
-    * ID-based UUID, remove both the old style UUID and current UUID for the
-    * printer.
-    */
-
     CFUUIDRef deviceUUID;		/* Device UUID */
 
     deviceUUID = ColorSyncCreateUUIDFromUInt32(_ppdHashName(p->name));
@@ -805,10 +869,626 @@ apple_unregister_profiles(
     }
   }
 }
+
+
 #elif defined(HAVE_DBUS)
+/*
+ * 'colord_create_device()' - Create a device and register profiles.
+ */
+
+static void
+colord_create_device(
+    cupsd_printer_t *p,			/* I - Printer */
+    ppd_file_t      *ppd,		/* I - PPD file */
+    cups_array_t    *profiles,		/* I - Profiles array */
+    const char      *colorspace,	/* I - Device colorspace, e.g. 'rgb' */
+    char            **format,		/* I - Device qualifier format */
+    const char      *relation,		/* I - Profile relation, either 'soft'
+					       or 'hard' */
+    const char      *scope)		/* I - The scope of the device, e.g.
+					       'normal', 'temp' or 'disk' */
+{
+  DBusMessage	*message = NULL;	/* D-Bus request */
+  DBusMessage	*reply = NULL;		/* D-Bus reply */
+  DBusMessageIter args;			/* D-Bus method arguments */
+  DBusMessageIter dict;			/* D-Bus method arguments */
+  DBusError	error;			/* D-Bus error */
+  const char	*device_path;		/* Device object path */
+  const char	*profile_path;		/* Profile path */
+  char		*default_profile_path = NULL;
+					/* Default profile path */
+  char		device_id[1024];	/* Device ID as understood by colord */
+  char		format_str[1024];	/* Qualifier format as a string */
 
 
-/* colord stuff goes here */
+ /*
+  * Create the device...
+  */
+
+  snprintf(device_id, sizeof(device_id), "cups-%s", p->name);
+  device_path = device_id;
+
+  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "CreateDevice");
+
+  dbus_message_iter_init_append(message, &args);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_path);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &scope);
+
+  snprintf(format_str, sizeof(format_str), "%s.%s.%s", format[0], format[1],
+           format[2]);
+
+  dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY, "{ss}", &dict);
+  colord_dict_add_strings(&dict, "Colorspace", colorspace);
+  colord_dict_add_strings(&dict, "Mode", COLORD_MODE_PHYSICAL);
+  if (ppd->manufacturer)
+    colord_dict_add_strings(&dict, "Vendor", ppd->manufacturer);
+  if (ppd->modelname)
+    colord_dict_add_strings(&dict, "Model", ppd->modelname);
+  if (p->sanitized_device_uri)
+    colord_dict_add_strings(&dict, "Serial", p->sanitized_device_uri);
+  colord_dict_add_strings(&dict, "Format", format_str);
+  colord_dict_add_strings(&dict, "Kind", COLORD_KIND_PRINTER);
+  dbus_message_iter_close_container(&args, &dict);
+
+ /*
+  * Send the CreateDevice request synchronously...
+  */
+
+  dbus_error_init(&error);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Calling CreateDevice(%s,%s)", device_id,
+                  scope);
+  reply = dbus_connection_send_with_reply_and_block(colord_con, message,
+                                                    COLORD_DBUS_TIMEOUT,
+                                                    &error);
+  if (!reply)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN, "CreateDevice failed: %s:%s", error.name,
+                    error.message);
+    dbus_error_free(&error);
+    goto out;
+  }
+
+ /*
+  * Get reply data...
+  */
+
+  dbus_message_iter_init(reply, &args);
+  if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "CreateDevice failed: Incorrect reply type.");
+    goto out;
+  }
+
+  dbus_message_iter_get_basic(&args, &device_path);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Created device \"%s\".", device_path);
+
+ /*
+  * Add profiles...
+  */
+
+  for (profile_path = cupsArrayFirst(profiles);
+       profile_path;
+       profile_path = cupsArrayNext(profiles))
+  {
+    colord_device_add_profile(device_path, profile_path, relation);
+  }
+
+out:
+
+  if (default_profile_path)
+    free(default_profile_path);
+
+  if (message)
+    dbus_message_unref(message);
+
+  if (reply)
+    dbus_message_unref(reply);
+}
+
+
+/*
+ * 'colord_create_profile()' - Create a color profile for a printer.
+ */
+
+static void
+colord_create_profile(
+    cups_array_t *profiles,		/* I - Profiles array */
+    const char   *printer_name,		/* I - Printer name */
+    const char   *qualifier,		/* I - Profile qualifier */
+    const char   *colorspace,		/* I - Profile colorspace */
+    char         **format,		/* I - Profile qualifier format */
+    const char   *iccfile,		/* I - ICC filename */
+    const char   *scope)		/* I - The scope of the profile, e.g.
+				               'normal', 'temp' or 'disk' */
+{
+  DBusMessage	*message = NULL;        /* D-Bus request */
+  DBusMessage	*reply = NULL;          /* D-Bus reply */
+  DBusMessageIter args;			/* D-Bus method arguments */
+  DBusMessageIter dict;			/* D-Bus method arguments */
+  DBusError	error;			/* D-Bus error */
+  char		*idstr;			/* Profile ID string */
+  size_t	idstrlen;		/* Profile ID allocated length */
+  const char	*profile_path;		/* Device object path */
+  char		format_str[1024];	/* Qualifier format as a string */
+
+
+ /*
+  * Create the profile...
+  */
+
+  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "CreateProfile");
+
+  idstrlen = strlen(printer_name) + 1 + strlen(qualifier) + 1;
+  if ((idstr = malloc(idstrlen)) == NULL)
+    goto out;
+  snprintf(idstr, idstrlen, "%s-%s", printer_name, qualifier);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Using profile ID \"%s\".", idstr);
+
+  dbus_message_iter_init_append(message, &args);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &idstr);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &scope);
+
+  snprintf(format_str, sizeof(format_str), "%s.%s.%s", format[0], format[1],
+           format[2]);
+
+  dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY, "{ss}", &dict);
+  colord_dict_add_strings(&dict, "Qualifier", qualifier);
+  colord_dict_add_strings(&dict, "Format", format_str);
+  colord_dict_add_strings(&dict, "Colorspace", colorspace);
+  if (iccfile)
+    colord_dict_add_strings(&dict, "Filename", iccfile);
+  dbus_message_iter_close_container(&args, &dict);
+
+ /*
+  * Send the CreateProfile request synchronously...
+  */
+
+  dbus_error_init(&error);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Calling CreateProfile(%s,%s)", idstr,
+                  scope);
+  reply = dbus_connection_send_with_reply_and_block(colord_con, message,
+                                                    COLORD_DBUS_TIMEOUT,
+                                                    &error);
+  if (!reply)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN, "CreateProfile failed: %s:%s", error.name,
+                    error.message);
+    dbus_error_free(&error);
+    goto out;
+  }
+
+ /*
+  * Get reply data...
+  */
+
+  dbus_message_iter_init(reply, &args);
+  if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "CreateProfile failed: Incorrect reply type.");
+    goto out;
+  }
+
+  dbus_message_iter_get_basic(&args, &profile_path);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Created profile \"%s\".", profile_path);
+  cupsArrayAdd(profiles, strdup(profile_path));
+
+out:
+
+  if (message)
+    dbus_message_unref(message);
+
+  if (reply)
+    dbus_message_unref(reply);
+
+  if (idstr)
+    free(idstr);
+}
+
+
+/*
+ * 'colord_delete_device()' - Delete a device
+ */
+
+static void
+colord_delete_device(
+    const char *device_id)		/* I - Device ID string */
+{
+  DBusMessage	*message = NULL;	/* D-Bus request */
+  DBusMessage	*reply = NULL;		/* D-Bus reply */
+  DBusMessageIter args;			/* D-Bus method arguments */
+  DBusError	error;			/* D-Bus error */
+  char		*device_path;		/* Device object path */
+
+
+ /*
+  * Find the device...
+  */
+
+  if ((device_path = colord_find_device(device_id)) == NULL)
+    goto out;
+
+ /*
+  * Delete the device...
+  */
+
+  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "DeleteDevice");
+
+  dbus_message_iter_init_append(message, &args);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_id);
+
+ /*
+  * Send the DeleteDevice request synchronously...
+  */
+
+  dbus_error_init(&error);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Calling DeleteDevice(%s)", device_id);
+  reply = dbus_connection_send_with_reply_and_block(colord_con, message,
+                                                    COLORD_DBUS_TIMEOUT,
+                                                    &error);
+  if (!reply)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "DeleteDevice failed: %s:%s", error.name,
+                    error.message);
+    dbus_error_free(&error);
+    goto out;
+  }
+
+out:
+
+  if (device_path)
+    free(device_path);
+
+  if (message)
+    dbus_message_unref(message);
+
+  if (reply)
+    dbus_message_unref(reply);
+}
+
+
+/*
+ * 'colord_device_add_profile()' - Assign a profile to a device.
+ */
+
+static void
+colord_device_add_profile(
+    const char *device_path,		/* I - Device object path */
+    const char *profile_path,		/* I - Profile object path */
+    const char *relation)		/* I - Device relation, either
+					       'soft' or 'hard' */
+{
+  DBusMessage	*message = NULL;	/* D-Bus request */
+  DBusMessage	*reply = NULL;		/* D-Bus reply */
+  DBusMessageIter args;			/* D-Bus method arguments */
+  DBusError	error;			/* D-Bus error */
+
+
+  message = COLORD_DBUS_MSG(device_path, "AddProfile");
+
+  dbus_message_iter_init_append(message, &args);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &relation);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_OBJECT_PATH, &profile_path);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Calling %s:AddProfile(%s) [%s]",
+                  device_path, profile_path, relation);
+
+ /*
+  * Send the AddProfile request synchronously...
+  */
+
+  dbus_error_init(&error);
+  reply = dbus_connection_send_with_reply_and_block(colord_con, message,
+                                                    COLORD_DBUS_TIMEOUT,
+                                                    &error);
+  if (!reply)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN, "AddProfile failed: %s:%s", error.name,
+                    error.message);
+    dbus_error_free(&error);
+    goto out;
+  }
+
+out:
+
+  if (message)
+    dbus_message_unref(message);
+
+  if (reply)
+    dbus_message_unref(reply);
+}
+
+
+/*
+ * 'colord_dict_add_strings()' - Add two strings to a dictionary.
+ */
+
+static void
+colord_dict_add_strings(
+    DBusMessageIter *dict,		/* I - Dictionary */
+    const char      *key,		/* I - Key string */
+    const char      *value)		/* I - Value string */
+{
+  DBusMessageIter	entry;		/* Entry to add */
+
+
+  dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY, NULL, &entry);
+  dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+  dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &value);
+  dbus_message_iter_close_container(dict, &entry);
+}
+
+
+/*
+ * 'colord_find_device()' - Finds a device
+ */
+
+static char *				/* O - Device path or NULL */
+colord_find_device(
+    const char *device_id)		/* I - Device ID string */
+{
+  DBusMessage	*message = NULL;	/* D-Bus request */
+  DBusMessage	*reply = NULL;		/* D-Bus reply */
+  DBusMessageIter args;			/* D-Bus method arguments */
+  DBusError	error;			/* D-Bus error */
+  const char	*device_path_tmp;	/* Device object path */
+  char		*device_path = NULL;	/* Device object path */
+
+
+  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "FindDeviceById");
+
+  dbus_message_iter_init_append(message, &args);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_id);
+
+ /*
+  * Send the FindDeviceById request synchronously...
+  */
+
+  dbus_error_init(&error);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Calling FindDeviceById(%s)", device_id);
+  reply = dbus_connection_send_with_reply_and_block(colord_con, message,
+                                                    COLORD_DBUS_TIMEOUT,
+                                                    &error);
+  if (!reply)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "FindDeviceById failed: %s:%s",
+		    error.name, error.message);
+    dbus_error_free(&error);
+    goto out;
+  }
+
+ /*
+  * Get reply data...
+  */
+
+  dbus_message_iter_init(reply, &args);
+  if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "FindDeviceById failed: Incorrect reply type.");
+    goto out;
+  }
+
+  dbus_message_iter_get_basic(&args, &device_path_tmp);
+  if (device_path_tmp)
+    device_path = strdup(device_path_tmp);
+
+out:
+
+  if (message)
+    dbus_message_unref(message);
+
+  if (reply)
+    dbus_message_unref(reply);
+
+  return (device_path);
+}
+
+
+/*
+ * 'colord_get_qualifier_format()' - Get the qualifier format.
+ *
+ * Note: Returns a value of "ColorSpace.MediaType.Resolution" by default.
+ */
+
+static void
+colord_get_qualifier_format(
+    ppd_file_t *ppd,			/* I - PPD file data */
+    char       *format[3])		/* I - Format tuple */
+{
+  const char	*tmp;			/* Temporary string */
+  ppd_attr_t	*attr;			/* Profile attributes */
+
+
+ /*
+  * Get 1st section...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL)
+    tmp = attr->value;
+  else if (ppdFindAttr(ppd, "DefaultColorModel", NULL))
+    tmp = "ColorModel";
+  else if (ppdFindAttr(ppd, "DefaultColorSpace", NULL))
+    tmp = "ColorSpace";
+  else
+    tmp = ""
+
+  format[0] = strdup(tmp);
+
+ /*
+  * Get 2nd section...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL)
+    tmp = attr->value;
+  else
+    tmp = "MediaType";
+
+  format[1] = strdup(tmp);
+
+ /*
+  * Get 3rd section...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL)
+    tmp = attr->value;
+  else
+    tmp = "Resolution";
+
+  format[2] = strdup(tmp);
+}
+
+
+/*
+ * 'colord_register_printer()' - Register profiles for a printer.
+ */
+
+static void
+colord_register_printer(
+    cupsd_printer_t *p)			/* I - printer */
+{
+  char		ppdfile[1024],		/* PPD filename */
+		iccfile[1024];		/* ICC filename */
+  ppd_file_t	*ppd;			/* PPD file */
+  cups_array_t	*profiles;		/* Profile paths array */
+  ppd_attr_t	*attr;			/* Profile attributes */
+  const char	*device_colorspace;	/* Device colorspace */
+  char		*format[3];		/* Qualifier format tuple */
+
+
+ /*
+  * Ensure we have a D-Bus connection...
+  */
+
+  if (!colord_con)
+    return;
+
+ /*
+  * Try opening the PPD file for this printer...
+  */
+
+  snprintf(ppdfile, sizeof(ppdfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
+  if ((ppd = _ppdOpenFile(ppdfile, _PPD_LOCALIZATION_ICC_PROFILES)) == NULL)
+    return;
+
+ /*
+  * Find out the qualifier format
+  */
+
+  colord_get_qualifier_format(ppd, format);
+
+ /*
+  * See if we have any embedded profiles...
+  */
+
+  profiles = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup,
+			   (cups_afree_func_t)free);
+  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+    if (attr->spec[0] && attr->value && attr->value[0])
+    {
+      if (attr->value[0] != '/')
+        snprintf(iccfile, sizeof(iccfile), "%s/profiles/%s", DataDir,
+                 attr->value);
+      else
+        strlcpy(iccfile, attr->value, sizeof(iccfile));
+
+      if (_cupsFileCheck(iccfile, _CUPS_FILE_CHECK_FILE, !RunUser,
+			 cupsdLogFCMessage, p))
+	continue;
+
+      colord_create_profile(profiles, p->name, attr->spec, COLORD_SPACE_UNKNOWN,
+			    format, iccfile, COLORD_SCOPE_TEMP);
+    }
+
+ /*
+  * Add the grayscale profile first.  We always have a grayscale profile.
+  */
+
+  colord_create_profile(profiles, p->name, "Gray..", COLORD_SPACE_GRAY,
+                        format, NULL, COLORD_SCOPE_TEMP);
+
+ /*
+  * Then add the RGB/CMYK/DeviceN color profile...
+  */
+
+  device_colorspace = "unknown";
+  switch (ppd->colorspace)
+  {
+    case PPD_CS_RGB :
+    case PPD_CS_CMY :
+        device_colorspace = COLORD_SPACE_RGB;
+        colord_create_profile(profiles, p->name, "RGB..", COLORD_SPACE_RGB,
+			      format, NULL, COLORD_SCOPE_TEMP);
+        break;
+
+    case PPD_CS_RGBK :
+    case PPD_CS_CMYK :
+        device_colorspace = COLORD_SPACE_CMYK;
+        colord_create_profile(profiles, p->name, "CMYK..", COLORD_SPACE_CMYK,
+                              format, NULL, COLORD_SCOPE_TEMP);
+        break;
+
+    case PPD_CS_GRAY :
+        device_colorspace = COLORD_SPACE_GRAY;
+        break;
+
+    case PPD_CS_N :
+        colord_create_profile(profiles, p->name, "DeviceN..",
+                              COLORD_SPACE_UNKNOWN, format, NULL,
+			      COLORD_SCOPE_TEMP);
+        break;
+  }
+
+ /*
+  * Register the device with colord.
+  */
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Registering ICC color profiles for \"%s\".",
+                  p->name);
+  colord_create_device(p, ppd, profiles, device_colorspace, format,
+		       COLORD_RELATION_SOFT, COLORD_SCOPE_TEMP);
+
+ /*
+  * Free any memory we used...
+  */
+
+  cupsArrayDelete(profiles);
+
+  free(format[0]);
+  free(format[1]);
+  free(format[2]);
+
+  ppdClose(ppd);
+}
+
+
+/*
+ * 'colord_unregister_printer()' - Unregister profiles for a printer.
+ */
+
+static void
+colord_unregister_printer(
+    cupsd_printer_t *p)			/* I - printer */
+{
+  char	device_id[1024];		/* Device ID as understood by colord */
+
+
+ /*
+  * Ensure we have a D-Bus connection...
+  */
+
+  if (!colord_con)
+    return;
+
+ /*
+  * Just delete the device itself, and leave the profiles registered
+  */
+
+  snprintf(device_id, sizeof(device_id), "cups-%s", p->name);
+  colord_delete_device(device_id);
+}
 #endif /* __APPLE__ */
 
 
