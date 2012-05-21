@@ -21,6 +21,7 @@ CUPSDOBJS =	\
 		cert.o \
 		classes.o \
 		client.o \
+		colorman.o \
 		conf.o \
 		dirsvc.o \
 		env.o \

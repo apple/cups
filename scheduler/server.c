@@ -3,7 +3,7 @@
  *
  *   Server start/stop routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -44,6 +44,12 @@ static int		started = 0;	/* Did we start the server already? */
 void
 cupsdStartServer(void)
 {
+ /*
+  * Start color management (as needed)...
+  */
+
+  cupsdStartColor();
+
  /*
   * Create the default security profile...
   */
@@ -94,7 +100,13 @@ cupsdStopServer(void)
     return;
 
  /*
-  * Close all network clients and stop all jobs...
+  * Stop color management (as needed)...
+  */
+
+  cupsdStopColor();
+
+ /*
+  * Close all network clients...
   */
 
   cupsdCloseAllClients();
