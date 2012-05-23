@@ -4954,6 +4954,8 @@ log_ipp_conformance(
     message = "Printer does not support REQUIRED Validate-Job operation.";
   else if (!strcmp(reason, "missing-get-printer-attributes"))
     message = "Printer does not support REQUIRED Get-Printer-Attributes operation.";
+  else if (!strcmp(reason, "missing-send-document"))
+    message = "Printer supports Create-Job but not Send-Document operation.";
   else if (!strcmp(reason, "missing-job-history"))
     message = "Printer does not provide REQUIRED job history.";
   else if (!strcmp(reason, "missing-job-id"))

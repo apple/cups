@@ -1085,6 +1085,9 @@ main(int  argc,				/* I - Number of command-line args */
         fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
               stderr);
         create_job = 0;
+
+	update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+                             "cups-ipp-missing-send-document");
       }
 
       if (!validate_job)
