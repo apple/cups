@@ -15,6 +15,28 @@
  *
  * Contents:
  *
+ *   cupsCheckDestSupported()  - Check that the option and value are supported
+ *				 by the destination.
+ *   cupsCopyDestConflicts()   - Get conflicts and resolutions for a new
+ *				 option/value pair.
+ *   cupsCopyDestInfo()        - Get the supported values/capabilities for the
+ *				 destination.
+ *   cupsFreeDestInfo()        - Free destination information obtained using
+ *				 @link cupsCopyDestInfo@.
+ *   cupsGetDestMediaByName()  - Get media names, dimensions, and margins.
+ *   cupsGetDestMediaBySize()  - Get media names, dimensions, and margins.
+ *   cups_add_dconstres()      - Add a constraint or resolver to an array.
+ *   cups_compare_dconstres()  - Compare to resolver entries.
+ *   cups_compare_media_db()   - Compare two media entries.
+ *   cups_copy_media_db()      - Copy a media entry.
+ *   cups_create_constraints() - Create the constraints and resolvers arrays.
+ *   cups_create_defaults()    - Create the -default option array.
+ *   cups_create_media_db()    - Create the media database.
+ *   cups_free_media_cb()      - Free a media entry.
+ *   cups_get_media_db()       - Lookup the media entry for a given size.
+ *   cups_is_close_media_db()  - Compare two media entries to see if they are
+ *				 close to the same size.
+ *   cups_test_constraints()   - Test constraints.
  */
 
 /*
