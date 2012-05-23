@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- The IPP backend no longer tries to get the job status for printers
+	  that do not implement the required operation (STR #4083)
 	- Sending a document in an unsupported format to an IPP printer now
 	  automatically cancels the job (STR #4093)
 	- Fix some error reporting issues when printing from /dev/null and

@@ -66,7 +66,8 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
 			*resource;	/* Resource path */
   int			port,		/* Port number */
 			version,	/* IPP version */
-			job_id;		/* Job ID for submitted job */
+			job_id,		/* Job ID for submitted job */
+			get_job_attrs;	/* Support Get-Job-Attributes? */
   const char		*job_name;	/* Job name for submitted job */
   http_encryption_t	encryption;	/* Use encryption? */
   ipp_jstate_t		job_state;	/* Current job state */
@@ -241,6 +242,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		create_job = 0,		/* Does printer support Create-Job? */
+		get_job_attrs = 0,	/* Does printer support Get-Job-Attributes? */
 		send_document = 0,	/* Does printer support Send-Document? */
 		validate_job = 0;	/* Does printer support Validate-Job? */
   int		copies,			/* Number of copies for job */
@@ -1074,6 +1076,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  create_job = 1;
         else if (operations_sup->values[i].integer == IPP_SEND_DOCUMENT)
 	  send_document = 1;
+        else if (operations_sup->values[i].integer == IPP_GET_JOB_ATTRIBUTES)
+	  get_job_attrs = 1;
       }
 
       if (!send_document)
@@ -1262,6 +1266,7 @@ main(int  argc,				/* I - Number of command-line args */
   monitor.port          = port;
   monitor.version       = version;
   monitor.job_id        = 0;
+  monitor.get_job_attrs = get_job_attrs;
   monitor.encryption    = cupsEncryption();
   monitor.job_state     = IPP_JOB_PENDING;
   monitor.printer_state = IPP_PRINTER_IDLE;
@@ -1661,7 +1666,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Wait for the job to complete...
     */
 
-    if (!job_id || !waitjob)
+    if (!job_id || !waitjob || !get_job_attrs)
       continue;
 
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for job to complete."));
@@ -2128,7 +2133,8 @@ monitor_printer(
       * Check the status of the job itself...
       */
 
-      job_op  = monitor->job_id > 0 ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
+      job_op  = (monitor->job_id > 0 && monitor->get_job_attrs) ?
+                    IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS;
       request = ippNewRequest(job_op);
       request->request.op.version[0] = monitor->version / 10;
       request->request.op.version[1] = monitor->version % 10;
