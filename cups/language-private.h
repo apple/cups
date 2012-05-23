@@ -71,6 +71,7 @@ extern const char	*_cupsLangString(cups_lang_t *lang,
 extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename, int unquote);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
+extern cups_array_t	*_cupsMessageNew(void *context);
 extern void		_cupsSetLocale(char *argv[]);
 
 

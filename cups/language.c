@@ -17,26 +17,27 @@
  * Contents:
  *
  *   _cupsAppleLanguage()   - Get the Apple language identifier associated with
- *                            a locale ID.
+ *			      a locale ID.
  *   _cupsEncodingName()    - Return the character encoding name string for the
- *                            given encoding enumeration.
- *   cupsLangDefault()      - Return the default language.
- *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.) for
- *                            the given language.
- *   cupsLangFlush()        - Flush all language data out of the cache.
- *   cupsLangFree()         - Free language data.
- *   cupsLangGet()          - Get a language.
- *   _cupsLangString()      - Get a message string.
+ *			      given encoding enumeration.
+ *   cupsLangDefault()	    - Return the default language.
+ *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.)
+ *			      for the given language.
+ *   cupsLangFlush()	    - Flush all language data out of the cache.
+ *   cupsLangFree()	    - Free language data.
+ *   cupsLangGet()	    - Get a language.
+ *   _cupsLangString()	    - Get a message string.
  *   _cupsMessageFree()     - Free a messages array.
  *   _cupsMessageLoad()     - Load a .po file into a messages array.
  *   _cupsMessageLookup()   - Lookup a message string.
+ *   _cupsMessageNew()	    - Make a new message catalog array.
  *   appleLangDefault()     - Get the default locale string.
  *   appleMessageLoad()     - Load a message catalog from a localizable bundle.
  *   cups_cache_lookup()    - Lookup a language in the cache...
  *   cups_message_compare() - Compare two messages.
  *   cups_message_free()    - Free a message.
  *   cups_message_load()    - Load the message catalog for a language.
- *   cups_unquote()         - Unquote characters in strings...
+ *   cups_unquote()	    - Unquote characters in strings...
  */
 
 /*
@@ -854,10 +855,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
   * Create an array to hold the messages...
   */
 
-  if ((a = cupsArrayNew3((cups_array_func_t)cups_message_compare, NULL,
-                         (cups_ahash_func_t)NULL, 0,
-			 (cups_acopy_func_t)NULL,
-			 (cups_afree_func_t)cups_message_free)) == NULL)
+  if ((a = _cupsMessageNew(NULL)) == NULL)
   {
     DEBUG_puts("5_cupsMessageLoad: Unable to allocate array!");
     return (NULL);
@@ -1140,6 +1138,20 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
 }
 
 
+/*
+ * '_cupsMessageNew()' - Make a new message catalog array.
+ */
+
+cups_array_t *				/* O - Array */
+_cupsMessageNew(void *context)		/* I - User data */
+{
+  return (cupsArrayNew3((cups_array_func_t)cups_message_compare, context,
+                        (cups_ahash_func_t)NULL, 0,
+			(cups_acopy_func_t)NULL,
+			(cups_afree_func_t)cups_message_free));
+}
+
+
 #ifdef __APPLE__
 /*
  * 'appleLangDefault()' - Get the default locale string.
@@ -1374,10 +1386,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
   * plist as the user data.
   */
 
-  return (cupsArrayNew3((cups_array_func_t)cups_message_compare, (void *)plist,
-                        (cups_ahash_func_t)NULL, 0,
-			(cups_acopy_func_t)NULL,
-			(cups_afree_func_t)cups_message_free));
+  return (_cupsMessageNew((void *)plist));
 }
 #  endif /* CUPS_BUNDLEDIR */
 #endif /* __APPLE__ */
