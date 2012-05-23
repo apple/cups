@@ -3363,6 +3363,21 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   cupsArrayRemove(PrintingJobs, job);
 
  /*
+  * Apply any PPD updates...
+  */
+
+  if (job->num_keywords)
+  {
+    if (cupsdUpdatePrinterPPD(job->printer, job->num_keywords, job->keywords))
+      cupsdSetPrinterAttrs(job->printer);
+
+    cupsFreeOptions(job->num_keywords, job->keywords);
+
+    job->num_keywords = 0;
+    job->keywords     = NULL;
+  }
+
+ /*
   * Clear the printer <-> job association...
   */
 
@@ -4827,18 +4842,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * Set attribute(s)...
       */
 
-      int		num_keywords;	/* Number of keywords */
-      cups_option_t	*keywords;	/* Keywords */
-
-
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "PPD: %s", message);
 
-      num_keywords = cupsParseOptions(message, 0, &keywords);
-
-      if (cupsdUpdatePrinterPPD(job->printer, num_keywords, keywords))
-        cupsdSetPrinterAttrs(job->printer);
-
-      cupsFreeOptions(num_keywords, keywords);
+      job->num_keywords = cupsParseOptions(message, job->num_keywords,
+                                           &job->keywords);
     }
     else
     {

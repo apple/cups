@@ -80,6 +80,8 @@ struct cupsd_job_s			/**** Job request ****/
   void			*profile;	/* Security profile */
   cups_array_t		*history;	/* Debug log history */
   int			progress;	/* Printing progress */
+  int			num_keywords;	/* Number of PPD keywords */
+  cups_option_t		*keywords;	/* PPD keywords */
 };
 
 typedef struct cupsd_joblog_s		/**** Job log message ****/
