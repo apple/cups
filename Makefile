@@ -275,10 +275,10 @@ docset:	apihelp
 		doc/help/api-*.tokens
 	$(RM) doc/help/api-*.tokens
 	echo Indexing docset...
-	/Developer/usr/bin/docsetutil index org.cups.docset
+	/Applications/Xcode.app/Contents/Developer/usr/bin/docsetutil index org.cups.docset
 	echo Generating docset archive and feed...
 	$(RM) org.cups.docset.atom
-	/Developer/usr/bin/docsetutil package --output org.cups.docset.xar \
+	/Applications/Xcode.app/Contents/Developer/usr/bin/docsetutil package --output org.cups.docset.xar \
 		--atom org.cups.docset.atom \
 		--download-url http://www.cups.org/org.cups.docset.xar \
 		org.cups.docset
