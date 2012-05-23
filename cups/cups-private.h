@@ -190,13 +190,22 @@ typedef struct _cups_media_db_s		/* Media database */
 					 * millimeters */
 } _cups_media_db_t;
 
+typedef struct _cups_dconstres_s	/* Constraint/resolver */
+{
+  char	*name;				/* Name of resolver */
+  ipp_t	*collection;			/* Collection containing attrs */
+} _cups_dconstres_t;
+
 struct _cups_dinfo_s			/* Destination capability and status
 					 * information */
 {
   const char		*uri;		/* Printer URI */
   char			*resource;	/* Resource path */
   ipp_t			*attrs;		/* Printer attributes */
+  int			num_defaults;	/* Number of default options */
+  cups_option_t		*defaults;	/* Default options */
   cups_array_t		*constraints;	/* Job constraints */
+  cups_array_t		*resolvers;	/* Job resolvers */
   cups_array_t		*localizations;	/* Localization information */
   cups_array_t		*media_db;	/* Media database */
   _cups_media_db_t	min_size,	/* Minimum size */
