@@ -1089,8 +1089,44 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   if (libusb_open(printer->device, &printer->handle) < 0)
     return (-1);
 
+  printer->usblp_attached = 0;
+
   if (verbose)
     fputs("STATE: +connecting-to-device\n", stderr);
+
+  if ((errcode = libusb_get_device_descriptor (printer->device, &devdesc)) < 0)
+  {
+    fprintf(stderr, "DEBUG: Failed to get device descriptor, code: %d\n",
+	    errcode);
+    goto error;
+  }
+
+ /*
+  * Get the "usblp" kernel module out of the way. This backend only
+  * works without the module attached.
+  */
+
+  errcode = libusb_kernel_driver_active(printer->handle, printer->iface);
+  if (errcode == 0)
+    printer->usblp_attached = 0;
+  else if (errcode == 1)
+  {
+    printer->usblp_attached = 1;
+    if ((errcode =
+	 libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
+    {
+      fprintf(stderr, "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
+	      devdesc.idVendor, devdesc.idProduct);
+      goto error;
+    }
+  }
+  else
+  {
+    printer->usblp_attached = 0;
+    fprintf(stderr, "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" kernel module attached\n",
+	      devdesc.idVendor, devdesc.idProduct);
+    goto error;
+  }
 
  /*
   * Set the desired configuration, but only if it needs changing. Some
@@ -1168,11 +1204,13 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   while ((errcode = libusb_claim_interface(printer->handle, number1)) < 0)
   {
     if (errcode != LIBUSB_ERROR_BUSY)
+    {
       fprintf(stderr,
               "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
               number1, devdesc.idVendor, devdesc.idProduct, strerror(errno));
 
-    goto error;
+      goto error;
+    }
   }
 
  /*
@@ -1192,12 +1230,14 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 	   < 0)
     {
       if (errcode != LIBUSB_ERROR_BUSY)
+      {
         fprintf(stderr,
                 "DEBUG: Failed to set alternate interface %d for %04x:%04x: "
                 "%s\n",
                 number2, devdesc.idVendor, devdesc.idProduct, strerror(errno));
 
-      goto error;
+	goto error;
+      }
     }
   }
 

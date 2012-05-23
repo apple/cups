@@ -3,6 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- Multiple libusb backend fixes (STR #4098, STR #4100)
 	- The IPP backend no longer tries to get the job status for printers
 	  that do not implement the required operation (STR #4083)
 	- Sending a document in an unsupported format to an IPP printer now
