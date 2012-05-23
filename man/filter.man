@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "CUPS" "13 April 2012" "Apple Inc."
+.TH filter 7 "CUPS" "18 May 2012" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -168,6 +168,11 @@ CUPS_FILETYPE
 .br
 The type of file being printed: "job-sheet" for a banner page and "document"
 for a regular print file.
+.TP 5
+CUPS_MAX_MESSAGE
+.br
+The maximum size of a message sent to stderr, including any leading prefix and
+the trailing newline.
 .TP 5
 CUPS_SERVERROOT
 .br

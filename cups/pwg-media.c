@@ -15,17 +15,6 @@
  *
  * Contents:
  *
- *   _pwgGenerateSize()   - Generate a PWG size keyword.
- *   _pwgInitSize()       - Initialize a PWG size using IPP job template
- *                          attributes.
- *   _pwgMediaForLegacy() - Find a PWG media size by ISO/IPP legacy name.
- *   _pwgMediaForPPD()    - Find a PWG media size by Adobe PPD name.
- *   _pwgMediaForPWG()    - Find a PWG media size by 5101.1 self-describing
- *                          name.
- *   _pwgMediaForSize()   - Get the PWG media name for a given size.
- *   pwg_compare_legacy() - Compare two sizes using the legacy names.
- *   pwg_compare_ppd()    - Compare two sizes using the PPD names.
- *   pwg_compare_pwg()    - Compare two sizes using the PWG names.
  */
 
 /*
@@ -242,6 +231,83 @@ static _pwg_media_t const cups_pwg_media[] =
 
 
 /*
+ * '_pwgFormatInches()' - Convert and format PWG units as inches.
+ */
+
+char *					/* O - String */
+_pwgFormatInches(char   *buf,		/* I - Buffer */
+                 size_t bufsize,	/* I - Size of buffer */
+                 int    val)		/* I - Value in hundredths of millimeters */
+{
+  int	thousandths,			/* Thousandths of inches */
+	integer,			/* Integer portion */
+	fraction;			/* Fractional portion */
+
+
+ /*
+  * Convert hundredths of millimeters to thousandths of inches and round to
+  * the nearest thousandth.
+  */
+
+  thousandths = (val * 1000 + 1270) / 2540;
+  integer     = thousandths / 1000;
+  fraction    = thousandths % 1000;
+
+ /*
+  * Format as a pair of integers (avoids locale stuff), avoiding trailing
+  * zeros...
+  */
+
+  if (fraction == 0)
+    snprintf(buf, bufsize, "%d", integer);
+  else if (fraction % 10)
+    snprintf(buf, bufsize, "%d.%03d", integer, fraction);
+  else if (fraction % 100)
+    snprintf(buf, bufsize, "%d.%02d", integer, fraction / 10);
+  else
+    snprintf(buf, bufsize, "%d.%01d", integer, fraction / 100);
+
+  return (buf);
+}
+
+
+/*
+ * '_pwgFormatMillimeters()' - Convert and format PWG units as millimeters.
+ */
+
+char *					/* O - String */
+_pwgFormatMillimeters(char   *buf,	/* I - Buffer */
+                      size_t bufsize,	/* I - Size of buffer */
+                      int    val)	/* I - Value in hundredths of millimeters */
+{
+  int	integer,			/* Integer portion */
+	fraction;			/* Fractional portion */
+
+
+ /*
+  * Convert hundredths of millimeters to integer and fractional portions.
+  */
+
+  integer     = val / 100;
+  fraction    = val % 100;
+
+ /*
+  * Format as a pair of integers (avoids locale stuff), avoiding trailing
+  * zeros...
+  */
+
+  if (fraction == 0)
+    snprintf(buf, bufsize, "%d", integer);
+  else if (fraction % 10)
+    snprintf(buf, bufsize, "%d.%02d", integer, fraction);
+  else
+    snprintf(buf, bufsize, "%d.%01d", integer, fraction / 10);
+
+  return (buf);
+}
+
+
+/*
  * '_pwgGenerateSize()' - Generate a PWG size keyword.
  */
 
@@ -253,15 +319,12 @@ _pwgGenerateSize(char       *keyword,	/* I - Keyword buffer */
 		 int        width,	/* I - Width of page in 2540ths */
 		 int        length)	/* I - Length of page in 2540ths */
 {
-  struct lconv	*loc;			/* Locale conversion data */
-  double	uwidth,			/* Width in inches or millimeters */
-		ulength;		/* Height in inches or millimeters */
   const char	*units;			/* Units to report */
   char		usize[12 + 1 + 12 + 3],	/* Unit size: NNNNNNNNNNNNxNNNNNNNNNNNNuu */
 		*uptr;			/* Pointer into unit size */
+  char		*(*format)(char *, size_t, int);
+					/* Formatting function */
 
-
-  loc = localeconv();
 
   if ((width % 635) == 0 && (length % 635) == 0)
   {
@@ -269,9 +332,8 @@ _pwgGenerateSize(char       *keyword,	/* I - Keyword buffer */
     * Use inches since the size is a multiple of 1/4 inch.
     */
 
-    uwidth  = width / 2540.0;
-    ulength = length / 2540.0;
     units   = "in";
+    format  = _pwgFormatInches;
 
     if (!prefix)
       prefix = "oe";
@@ -282,26 +344,25 @@ _pwgGenerateSize(char       *keyword,	/* I - Keyword buffer */
     * Use millimeters since the size is not a multiple of 1/4 inch.
     */
 
-    uwidth  = width * 0.01;
-    ulength = length * 0.01;
     units   = "mm";
+    format  = _pwgFormatMillimeters;
 
     if (!prefix)
       prefix = "om";
   }
 
   uptr = usize;
-  _cupsStrFormatd(uptr, uptr + 12, uwidth, loc);
+  (*format)(uptr, sizeof(usize) - (uptr - usize), width);
   uptr += strlen(uptr);
   *uptr++ = 'x';
-  _cupsStrFormatd(uptr, uptr + 12, ulength, loc);
+  (*format)(uptr, sizeof(usize) - (uptr - usize), length);
   uptr += strlen(uptr);
 
  /*
   * Safe because usize can hold up to 12 + 1 + 12 + 4 bytes.
   */
 
-  strcpy(uptr, units);
+  memcpy(uptr, units, 3);
 
   if (!name)
     name = usize;

@@ -415,9 +415,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       ippDelete(response);
       response = NULL;
 
-      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
       http->status = status = HTTP_ERROR;
-      http->error  = EIO;
+      http->error  = EINVAL;
     }
   }
   else if (status != HTTP_ERROR)
@@ -476,10 +475,6 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
                   attr ? attr->values[0].string.text :
 		      ippErrorString(response->request.status.status_code), 0);
   }
-  else if (status == HTTP_ERROR)
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(http->error), 0);
-  else if (status != HTTP_OK)
-    _cupsSetHTTPError(status);
 
   return (response);
 }

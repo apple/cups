@@ -101,7 +101,8 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
 		*define_value;		/* Variable to define with value */
-  int		repeat_match,		/* Repeat test on match */
+  int		repeat_limit,		/* Maximum number of times to repeat */
+		repeat_match,		/* Repeat test on match */
 		repeat_no_match,	/* Repeat test on no match */
 		with_flags,		/* WITH flags  */
 		count;			/* Expected count if > 0 */
@@ -113,7 +114,8 @@ typedef struct _cups_status_s		/**** Status info ****/
   ipp_status_t	status;			/* Expected status code */
   char		*if_defined,		/* Only if variable is defined */
 		*if_not_defined;	/* Only if variable is not defined */
-  int		repeat_match,		/* Repeat the test when it does not match */
+  int		repeat_limit,		/* Maximum number of times to repeat */
+		repeat_match,		/* Repeat the test when it does not match */
 		repeat_no_match;	/* Repeat the test when it matches */
 } _cups_status_t;
 
@@ -456,6 +458,9 @@ main(int  argc,				/* I - Number of command-line args */
                   set_variable(&vars, "filetype", "text/html");
                 else if (!_cups_strcasecmp(ext, ".jpg"))
                   set_variable(&vars, "filetype", "image/jpeg");
+                else if (!_cups_strcasecmp(ext, ".pcl") ||
+                         !_cups_strcasecmp(ext, ".pcl.gz"))
+                  set_variable(&vars, "filetype", "application/vnd.hp-PCL");
                 else if (!_cups_strcasecmp(ext, ".pdf"))
                   set_variable(&vars, "filetype", "application/pdf");
                 else if (!_cups_strcasecmp(ext, ".png"))
@@ -750,6 +755,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		show_header = 1,	/* Show the test header? */
 		ignore_errors,		/* Ignore test failures? */
 		skip_previous = 0,	/* Skip on previous test failure? */
+		repeat_count,		/* Repeat count */
+		repeat_interval,	/* Repeat interval */
+		repeat_prev,		/* Previous repeat interval */
 		repeat_test;		/* Repeat a test? */
   http_t	*http = NULL;		/* HTTP connection to server */
   FILE		*fp = NULL;		/* Test file */
@@ -1168,6 +1176,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           _cups_strcasecmp(token, "IF-NOT-DEFINED") &&
           _cups_strcasecmp(token, "IN-GROUP") &&
           _cups_strcasecmp(token, "OF-TYPE") &&
+          _cups_strcasecmp(token, "REPEAT-LIMIT") &&
           _cups_strcasecmp(token, "REPEAT-MATCH") &&
           _cups_strcasecmp(token, "REPEAT-NO-MATCH") &&
           _cups_strcasecmp(token, "SAME-COUNT-AS") &&
@@ -1177,6 +1186,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
       if (_cups_strcasecmp(token, "IF-DEFINED") &&
           _cups_strcasecmp(token, "IF-NOT-DEFINED") &&
+          _cups_strcasecmp(token, "REPEAT-LIMIT") &&
           _cups_strcasecmp(token, "REPEAT-MATCH") &&
           _cups_strcasecmp(token, "REPEAT-NO-MATCH"))
         last_status = NULL;
@@ -1796,6 +1806,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	last_status->if_defined      = NULL;
 	last_status->if_not_defined  = NULL;
+	last_status->repeat_limit    = 1000;
 	last_status->repeat_match    = 0;
 	last_status->repeat_no_match = 0;
       }
@@ -1823,6 +1834,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	num_expects ++;
 
 	memset(last_expect, 0, sizeof(_cups_expect_t));
+	last_expect->repeat_limit = 1000;
 
         if (token[0] == '!')
         {
@@ -1964,6 +1976,33 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("IN-GROUP without a preceding EXPECT on line %d.",
 	                    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!_cups_strcasecmp(token, "REPEAT-LIMIT"))
+      {
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing REPEAT-LIMIT value on line %d.", linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+	else if (atoi(token) <= 0)
+	{
+	  print_fatal_error("Bad REPEAT-LIMIT value on line %d.", linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+        if (last_status)
+          last_status->repeat_limit = atoi(token);
+	else if (last_expect)
+	  last_expect->repeat_limit = atoi(token);
+	else
+	{
+	  print_fatal_error("REPEAT-LIMIT without a preceding EXPECT or STATUS "
+	                    "on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2210,8 +2249,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       goto skip_error;
     }
 
+    repeat_count    = 0;
+    repeat_interval = 1;
+    repeat_prev     = 1;
+
     do
     {
+      repeat_count ++;
+
       status = HTTP_OK;
 
       if (transfer == _CUPS_TRANSFER_CHUNKED ||
@@ -2292,7 +2337,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    status   = httpGetStatus(http);
 	  }
 
-	  if (!Cancel && status == HTTP_ERROR &&
+	  if (!Cancel && status == HTTP_ERROR && http->error != EINVAL &&
 #ifdef WIN32
 	      http->error != WSAETIMEDOUT)
 #else
@@ -2315,7 +2360,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
       }
 
-      if (!Cancel && status == HTTP_ERROR &&
+      if (!Cancel && status == HTTP_ERROR && http->error != EINVAL &&
 #ifdef WIN32
 	  http->error != WSAETIMEDOUT)
 #else
@@ -2592,12 +2637,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  if (response->request.status.status_code == statuses[i].status)
 	  {
-	    if (statuses[i].repeat_match)
+	    if (statuses[i].repeat_match &&
+	        repeat_count < statuses[i].repeat_limit)
 	      repeat_test = 1;
 
 	    break;
 	  }
-	  else if (statuses[i].repeat_no_match)
+	  else if (statuses[i].repeat_no_match &&
+		   repeat_count < statuses[i].repeat_limit)
 	    repeat_test = 1;
 	}
 
@@ -2663,7 +2710,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
               }
             }
 
-	    if (expect->repeat_no_match)
+	    if (expect->repeat_no_match &&
+		repeat_count < expect->repeat_limit)
 	      repeat_test = 1;
 
 	    continue;
@@ -2697,7 +2745,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	                 buffer, sizeof(buffer));
 	    }
 
-	    if (expect->repeat_no_match)
+	    if (expect->repeat_no_match &&
+		repeat_count < expect->repeat_limit)
 	      repeat_test = 1;
 
 	    continue;
@@ -2714,7 +2763,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			  expect->count, found->num_values);
 	    }
 
-	    if (expect->repeat_no_match)
+	    if (expect->repeat_no_match &&
+		repeat_count < expect->repeat_limit)
 	      repeat_test = 1;
 
 	    continue;
@@ -2743,7 +2793,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			      expect->same_count_as, attrptr->num_values);
 	      }
 
-	      if (expect->repeat_no_match)
+	      if (expect->repeat_no_match &&
+	          repeat_count < expect->repeat_limit)
 		repeat_test = 1;
 
 	      continue;
@@ -2756,7 +2807,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  if (found && expect->define_value)
 	    set_variable(vars, expect->define_value, buffer);
 
-	  if (found && expect->repeat_match)
+	  if (found && expect->repeat_match &&
+	      repeat_count < expect->repeat_limit)
 	    repeat_test = 1;
 	}
       }
@@ -2767,7 +2819,22 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       */
 
       if (repeat_test)
-        sleep(1);
+      {
+	if (Output == _CUPS_OUTPUT_TEST)
+        {
+          printf("%04d]\n", repeat_count);
+          fflush(stdout);
+        }
+
+        sleep(repeat_interval);
+        repeat_interval = _cupsNextDelay(repeat_interval, &repeat_prev);
+
+	if (Output == _CUPS_OUTPUT_TEST)
+	{
+	  printf("    %-68.68s [", name);
+	  fflush(stdout);
+	}
+      }
     }
     while (repeat_test);
 

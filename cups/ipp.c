@@ -2577,7 +2577,7 @@ ippReadIO(void       *src,		/* I - Data source */
               */
 
 	      _cupsSetError(IPP_INTERNAL_ERROR, _("IPP extension tag larger than 0x7FFFFFFF."), 1);
-	      DEBUG_printf(("1ippReadIO: bad name length %d.", n));
+	      DEBUG_printf(("1ippReadIO: bad tag 0x%x.", tag));
 	      _cupsBufferRelease((char *)buffer);
 	      return (IPP_ERROR);
             }
@@ -2846,7 +2846,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  else
 		    _cupsSetError(IPP_INTERNAL_ERROR,
 				  _("IPP enum value not 4 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad integer value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2872,7 +2872,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP boolean value not 1 byte."),
 		                1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad boolean value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2913,11 +2913,14 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
-		if ((*cb)(src, buffer, n) < n)
-		{
-		  DEBUG_puts("1ippReadIO: unable to read string value.");
-		  _cupsBufferRelease((char *)buffer);
-		  return (IPP_ERROR);
+	        if (n > 0)
+	        {
+		  if ((*cb)(src, buffer, n) < n)
+		  {
+		    DEBUG_puts("1ippReadIO: unable to read string value.");
+		    _cupsBufferRelease((char *)buffer);
+		    return (IPP_ERROR);
+		  }
 		}
 
 		buffer[n] = '\0';
@@ -2929,7 +2932,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		if (n != 11)
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR, _("IPP date value not 11 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad date value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2947,7 +2950,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP resolution value not 9 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad resolution value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -2974,7 +2977,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP rangeOfInteger value not 8 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad rangeOfInteger value length "
+		                "%d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3006,7 +3010,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		    _cupsSetError(IPP_INTERNAL_ERROR,
 		                  _("IPP nameWithLanguage value less than "
 		                    "minimum 4 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad stringWithLanguage value "
+		                "length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3038,7 +3043,8 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP language length overflows value."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad language value length %d.",
+		                n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3055,7 +3061,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP string length overflows value."), 1);
-		  DEBUG_printf(("1ippReadIO: bad value length %d.", n));
+		  DEBUG_printf(("1ippReadIO: bad string value length %d.", n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3110,7 +3116,15 @@ ippReadIO(void       *src,		/* I - Data source */
 		* we need to carry over...
 		*/
 
-	        if ((*cb)(src, buffer, n) < n)
+		if (n == 0)
+		{
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP memberName value is empty."), 1);
+	          DEBUG_puts("1ippReadIO: Empty member name value.");
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
+		else if ((*cb)(src, buffer, n) < n)
 		{
 	          DEBUG_puts("1ippReadIO: Unable to read member name value.");
 		  _cupsBufferRelease((char *)buffer);
@@ -5287,9 +5301,8 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
               ipp_uchar_t *buffer,	/* O - Buffer for data */
 	      size_t      length)	/* I - Total length */
 {
-  int		tbytes,			/* Total bytes read */
-		bytes;			/* Bytes read this pass */
-  char		len[32];		/* Length string */
+  int	tbytes,				/* Total bytes read */
+	bytes;				/* Bytes read this pass */
 
 
   DEBUG_printf(("7ipp_read_http(http=%p, buffer=%p, length=%d)",
@@ -5309,87 +5322,36 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
     if (http->state == HTTP_WAITING)
       break;
 
-    if (http->used > 0 && http->data_encoding == HTTP_ENCODE_LENGTH)
+    if (http->used == 0 && !http->blocking)
     {
      /*
-      * Do "fast read" from HTTP buffer directly...
+      * Wait up to 10 seconds for more data on non-blocking sockets...
       */
 
-      if (http->used > (int)(length - tbytes))
-        bytes = (int)(length - tbytes);
-      else
-        bytes = http->used;
-
-      if (bytes == 1)
-	buffer[0] = http->buffer[0];
-      else
-	memcpy(buffer, http->buffer, bytes);
-
-      http->used           -= bytes;
-      http->data_remaining -= bytes;
-
-      if (http->data_remaining <= INT_MAX)
-	http->_data_remaining = (int)http->data_remaining;
-      else
-	http->_data_remaining = INT_MAX;
-
-      if (http->used > 0)
-	memmove(http->buffer, http->buffer + bytes, http->used);
-
-      if (http->data_remaining == 0)
-      {
-	if (http->data_encoding == HTTP_ENCODE_CHUNKED)
-	{
-	 /*
-	  * Get the trailing CR LF after the chunk...
-	  */
-
-	  if (!httpGets(len, sizeof(len), http))
-	    return (-1);
-	}
-
-	if (http->data_encoding != HTTP_ENCODE_CHUNKED)
-	{
-	  if (http->state == HTTP_POST_RECV)
-	    http->state ++;
-	  else
-	    http->state = HTTP_WAITING;
-	}
-      }
-    }
-    else
-    {
-      if (!http->blocking)
+      if (!httpWait(http, 10000))
       {
        /*
-        * Wait up to 10 seconds for more data on non-blocking sockets...
+	* Signal no data...
 	*/
 
-	if (!httpWait(http, 10000))
-	{
-	 /*
-          * Signal no data...
-	  */
-
-          bytes = -1;
-	  break;
-	}
+	bytes = -1;
+	break;
       }
-
-      if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
-      {
-#ifdef WIN32
-        break;
-#else
-        if (errno != EAGAIN && errno != EINTR)
-	  break;
-
-	bytes = 0;
-#endif /* WIN32 */
-      }
-      else if (bytes == 0)
-        break;
     }
+
+    if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
+    {
+#ifdef WIN32
+      break;
+#else
+      if (errno != EAGAIN && errno != EINTR)
+	break;
+
+      bytes = 0;
+#endif /* WIN32 */
+    }
+    else if (bytes == 0)
+      break;
   }
 
  /*

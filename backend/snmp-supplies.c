@@ -49,6 +49,9 @@
 #define CUPS_CLEANER_NEAR_EOL	0x0400	/* Proposed JPS3 */
 #define CUPS_CLEANER_LIFE_OVER	0x0800	/* Proposed JPS3 */
 
+#define CUPS_SNMP_NONE		0x0000
+#define CUPS_SNMP_CAPACITY	0x0001	/* Supply levels reported as percentages */
+
 
 /*
  * Local structures...
@@ -79,6 +82,8 @@ static http_addr_t	current_addr;	/* Current address */
 static int		current_state = -1;
 					/* Current device state bits */
 static int		charset = -1;	/* Character set for supply names */
+static unsigned		quirks = CUPS_SNMP_NONE;
+					/* Quirks we have to work around */
 static int		num_supplies = 0;
 					/* Number of supplies found */
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
@@ -246,6 +251,9 @@ backendSNMPSupplies(
     {
       if (supplies[i].max_capacity > 0 && supplies[i].level >= 0)
 	percent = 100 * supplies[i].level / supplies[i].max_capacity;
+      else if (supplies[i].level >= 0 && supplies[i].level <= 100 &&
+               (quirks & CUPS_SNMP_CAPACITY))
+        percent = supplies[i].level;
       else
         percent = 50;
 
@@ -308,7 +316,8 @@ backendSNMPSupplies(
       if (i)
         *ptr++ = ',';
 
-      if (supplies[i].max_capacity > 0 && supplies[i].level >= 0)
+      if ((supplies[i].max_capacity > 0 || (quirks & CUPS_SNMP_CAPACITY)) &&
+          supplies[i].level >= 0)
         sprintf(ptr, "%d", percent);
       else
         strcpy(ptr, "-1");
@@ -504,6 +513,12 @@ backend_init_supplies(
   {
     ppdClose(ppd);
     return;
+  }
+
+  if ((ppdattr = ppdFindAttr(ppd, "cupsSNMPQuirks", NULL)) != NULL)
+  {
+    if (!_cups_strcasecmp(ppdattr->value, "capacity"))
+      quirks |= CUPS_SNMP_CAPACITY;
   }
 
   ppdClose(ppd);
@@ -932,7 +947,8 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
     supplies[i - 1].level = packet->object_value.integer;
   }
-  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesMaxCapacity))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesMaxCapacity) &&
+           !(quirks & CUPS_SNMP_CAPACITY))
   {
    /*
     * Get max capacity...

@@ -4006,6 +4006,41 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       }
 
      /*
+      * media-size-supported
+      */
+
+      num_media = p->pc->num_sizes;
+      if (p->pc->custom_min_keyword)
+	num_media ++;
+
+      if ((attr = ippAddCollections(p->ppd_attrs, IPP_TAG_PRINTER,
+				    "media-size-supported", num_media,
+				    NULL)) != NULL)
+      {
+	val = attr->values;
+
+        for (i = p->pc->num_sizes, pwgsize = p->pc->sizes;
+	     i > 0;
+	     i --, pwgsize ++, val ++)
+	{
+	  val->collection = ippNew();
+	  ippAddInteger(val->collection, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+	                "x-dimension", pwgsize->width);
+	  ippAddInteger(val->collection, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+	                "y-dimension", pwgsize->length);
+        }
+
+        if (p->pc->custom_min_keyword)
+	{
+	  val->collection = ippNew();
+	  ippAddRange(val->collection, IPP_TAG_PRINTER, "x-dimension",
+	              p->pc->custom_min_width, p->pc->custom_max_width);
+	  ippAddRange(val->collection, IPP_TAG_PRINTER, "y-dimension",
+	              p->pc->custom_min_length, p->pc->custom_max_length);
+        }
+      }
+
+     /*
       * media-source-supported
       */
 
@@ -4797,7 +4832,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     else if (!strncmp(p->device_uri, "ipp://", 6) &&
 	     (strstr(p->device_uri, "/printers/") != NULL ||
 	      strstr(p->device_uri, "/classes/") != NULL ||
-	      (strstr(p->device_uri, "._ipp.") != NULL &&
+	      ((strstr(p->device_uri, "._ipp.") != NULL ||
+	        strstr(p->device_uri, "._ipps.") != NULL) &&
 	       !strcmp(p->device_uri + strlen(p->device_uri) - 5,
 		       "/cups"))))
     {
@@ -4918,6 +4954,8 @@ log_ipp_conformance(
     message = "Printer does not support REQUIRED Validate-Job operation.";
   else if (!strcmp(reason, "missing-get-printer-attributes"))
     message = "Printer does not support REQUIRED Get-Printer-Attributes operation.";
+  else if (!strcmp(reason, "missing-send-document"))
+    message = "Printer supports Create-Job but not Send-Document operation.";
   else if (!strcmp(reason, "missing-job-history"))
     message = "Printer does not provide REQUIRED job history.";
   else if (!strcmp(reason, "missing-job-id"))

@@ -46,7 +46,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		i, j;			/* Looping vars */
   int		job_id;			/* Job ID */
   char		*printer,		/* Printer name */
-		*instance,		/* Instance name */ 
+		*instance,		/* Instance name */
 		*val,			/* Option value */
 		*title;			/* Job title */
   int		priority;		/* Job priority (1-100) */
@@ -121,7 +121,7 @@ main(int  argc,				/* I - Number of command-line arguments */
               cupsSetUser(argv[i]);
 	    }
 	    break;
-	    
+
         case 'c' : /* Copy to spool dir (always enabled) */
 	    break;
 
@@ -629,8 +629,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (cupsFinishDocument(CUPS_HTTP_DEFAULT, printer) != IPP_OK)
     {
+      _cupsLangPrintf(stderr, "%s: %s", argv[0], cupsLastErrorString());
       cupsCancelJob2(CUPS_HTTP_DEFAULT, printer, job_id, 0);
-      job_id = 0;
+      return (1);
     }
   }
 

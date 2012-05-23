@@ -58,18 +58,107 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_jobs;		/* Number of jobs for queue */
   cups_job_t	*jobs;			/* Jobs for queue */
 
+
   if (argc > 1)
   {
     if (!strcmp(argv[1], "enum"))
     {
-      int	msec;			/* Timeout in milliseconds */
+      cups_ptype_t	mask = CUPS_PRINTER_LOCAL,
+					/* Printer type mask */
+			type = CUPS_PRINTER_LOCAL;
+					/* Printer type */
+      int		msec = 0;	/* Timeout in milliseconds */
 
-      if (argc >= 3)
-        msec = atoi(argv[2]) * 1000;
-      else
-        msec = 0;
 
-      cupsEnumDests(CUPS_DEST_FLAGS_NONE, msec, NULL, 0, 0, enum_cb, NULL);
+      for (i = 2; i < argc; i ++)
+        if (isdigit(argv[i][0] & 255) || argv[i][0] == '.')
+          msec = (int)(atof(argv[i]) * 1000);
+        else if (!_cups_strcasecmp(argv[i], "bw"))
+        {
+          mask |= CUPS_PRINTER_BW;
+          type |= CUPS_PRINTER_BW;
+        }
+        else if (!_cups_strcasecmp(argv[i], "color"))
+        {
+          mask |= CUPS_PRINTER_COLOR;
+          type |= CUPS_PRINTER_COLOR;
+        }
+        else if (!_cups_strcasecmp(argv[i], "mono"))
+        {
+          mask |= CUPS_PRINTER_COLOR;
+        }
+        else if (!_cups_strcasecmp(argv[i], "duplex"))
+        {
+          mask |= CUPS_PRINTER_DUPLEX;
+          type |= CUPS_PRINTER_DUPLEX;
+        }
+        else if (!_cups_strcasecmp(argv[i], "simplex"))
+        {
+          mask |= CUPS_PRINTER_DUPLEX;
+        }
+        else if (!_cups_strcasecmp(argv[i], "staple"))
+        {
+          mask |= CUPS_PRINTER_STAPLE;
+          type |= CUPS_PRINTER_STAPLE;
+        }
+        else if (!_cups_strcasecmp(argv[i], "copies"))
+        {
+          mask |= CUPS_PRINTER_COPIES;
+          type |= CUPS_PRINTER_COPIES;
+        }
+        else if (!_cups_strcasecmp(argv[i], "collate"))
+        {
+          mask |= CUPS_PRINTER_COLLATE;
+          type |= CUPS_PRINTER_COLLATE;
+        }
+        else if (!_cups_strcasecmp(argv[i], "punch"))
+        {
+          mask |= CUPS_PRINTER_PUNCH;
+          type |= CUPS_PRINTER_PUNCH;
+        }
+        else if (!_cups_strcasecmp(argv[i], "cover"))
+        {
+          mask |= CUPS_PRINTER_COVER;
+          type |= CUPS_PRINTER_COVER;
+        }
+        else if (!_cups_strcasecmp(argv[i], "bind"))
+        {
+          mask |= CUPS_PRINTER_BIND;
+          type |= CUPS_PRINTER_BIND;
+        }
+        else if (!_cups_strcasecmp(argv[i], "sort"))
+        {
+          mask |= CUPS_PRINTER_SORT;
+          type |= CUPS_PRINTER_SORT;
+        }
+        else if (!_cups_strcasecmp(argv[i], "mfp"))
+        {
+          mask |= CUPS_PRINTER_MFP;
+          type |= CUPS_PRINTER_MFP;
+        }
+        else if (!_cups_strcasecmp(argv[i], "printer"))
+        {
+          mask |= CUPS_PRINTER_MFP;
+        }
+        else if (!_cups_strcasecmp(argv[i], "large"))
+        {
+          mask |= CUPS_PRINTER_LARGE;
+          type |= CUPS_PRINTER_LARGE;
+        }
+        else if (!_cups_strcasecmp(argv[i], "medium"))
+        {
+          mask |= CUPS_PRINTER_MEDIUM;
+          type |= CUPS_PRINTER_MEDIUM;
+        }
+        else if (!_cups_strcasecmp(argv[i], "small"))
+        {
+          mask |= CUPS_PRINTER_SMALL;
+          type |= CUPS_PRINTER_SMALL;
+        }
+        else
+          fprintf(stderr, "Unknown argument \"%s\" ignored...\n", argv[i]);
+
+      cupsEnumDests(CUPS_DEST_FLAGS_NONE, msec, NULL, type, mask, enum_cb, NULL);
     }
     else if (!strcmp(argv[1], "password"))
     {
@@ -416,10 +505,19 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
         unsigned    flags,		/* I - Destination flags */
         cups_dest_t *dest)		/* I - Destination */
 {
+  int		i;			/* Looping var */
+  cups_option_t	*option;		/* Current option */
+
+
   if (flags & CUPS_DEST_FLAGS_REMOVED)
-    printf("Removed '%s'.\n", dest->name);
+    printf("Removed '%s':\n", dest->name);
   else
-    printf("Added '%s'.\n", dest->name);
+    printf("Added '%s':\n", dest->name);
+
+  for (i = dest->num_options, option = dest->options; i > 0; i --, option ++)
+    printf("    %s=\"%s\"\n", option->name, option->value);
+
+  putchar('\n');
 
   return (1);
 }

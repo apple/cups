@@ -3,7 +3,7 @@
  *
  *   Xcode documentation set generator.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#include "cgi.h"
+#include "cgi-private.h"
 #include <errno.h>
 
 

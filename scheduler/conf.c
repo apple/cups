@@ -169,6 +169,7 @@ static const cupsd_var_t	variables[] =
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
+  { "StrictConformance",	&StrictConformance,	CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_AUTHORIZATION_H */
@@ -722,10 +723,11 @@ cupsdReadConfiguration(void)
   MaxLogSize               = 1024 * 1024;
   MaxRequestSize           = 0;
   MultipleOperationTimeout = DEFAULT_TIMEOUT;
+  NumSystemGroups          = 0;
   ReloadTimeout	           = DEFAULT_KEEPALIVE;
   RootCertDuration         = 300;
+  StrictConformance        = FALSE;
   Timeout                  = DEFAULT_TIMEOUT;
-  NumSystemGroups          = 0;
   WebInterface             = CUPS_DEFAULT_WEBIF;
 
   BrowseLocalProtocols     = parse_protocols(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS);

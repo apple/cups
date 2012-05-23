@@ -15,23 +15,28 @@
  *
  * Contents:
  *
-﻿*   cupsCheckDestSupported() - Check that the option and value are supported
- *				by the destination.
- *   cupsCopyDestConflicts()  - Get conflicts and resolutions for a new
- *				option/value pair.
- *   cupsCopyDestInfo()       - Get the supported values/capabilities for the
- *				destination.
- *   cupsFreeDestInfo()       - Free destination information obtained using
- *				@link cupsCopyDestInfo@.
- *   cupsGetDestMediaByName() - Get media names, dimensions, and margins.
- *   cupsGetDestMediaBySize() - Get media names, dimensions, and margins.
- *   cups_compare_media_db()  - Compare two media entries.
- *   cups_copy_media_db()     - Copy a media entry.
- *   cups_create_media_db()   - Create the media database.
- *   cups_free_media_cb()     - Free a media entry.
- *   cups_get_media_db()      - Lookup the media entry for a given size.
- *   cups_is_close_media_db() - Compare two media entries to see if they are
- *				close to the same size.
+ *   cupsCheckDestSupported()  - Check that the option and value are supported
+ *				 by the destination.
+ *   cupsCopyDestConflicts()   - Get conflicts and resolutions for a new
+ *				 option/value pair.
+ *   cupsCopyDestInfo()        - Get the supported values/capabilities for the
+ *				 destination.
+ *   cupsFreeDestInfo()        - Free destination information obtained using
+ *				 @link cupsCopyDestInfo@.
+ *   cupsGetDestMediaByName()  - Get media names, dimensions, and margins.
+ *   cupsGetDestMediaBySize()  - Get media names, dimensions, and margins.
+ *   cups_add_dconstres()      - Add a constraint or resolver to an array.
+ *   cups_compare_dconstres()  - Compare to resolver entries.
+ *   cups_compare_media_db()   - Compare two media entries.
+ *   cups_copy_media_db()      - Copy a media entry.
+ *   cups_create_constraints() - Create the constraints and resolvers arrays.
+ *   cups_create_defaults()    - Create the -default option array.
+ *   cups_create_media_db()    - Create the media database.
+ *   cups_free_media_cb()      - Free a media entry.
+ *   cups_get_media_db()       - Lookup the media entry for a given size.
+ *   cups_is_close_media_db()  - Compare two media entries to see if they are
+ *				 close to the same size.
+ *   cups_test_constraints()   - Test constraints.
  */
 
 /*
@@ -45,9 +50,14 @@
  * Local functions...
  */
 
+static void		cups_add_dconstres(cups_array_t *a, ipp_t *collection);
+static int		cups_compare_dconstres(_cups_dconstres_t *a,
+			                       _cups_dconstres_t *b);
 static int		cups_compare_media_db(_cups_media_db_t *a,
 			                      _cups_media_db_t *b);
 static _cups_media_db_t	*cups_copy_media_db(_cups_media_db_t *mdb);
+static void		cups_create_constraints(cups_dinfo_t *dinfo);
+static void		cups_create_defaults(cups_dinfo_t *dinfo);
 static void		cups_create_media_db(cups_dinfo_t *dinfo);
 static void		cups_free_media_db(_cups_media_db_t *mdb);
 static int		cups_get_media_db(cups_dinfo_t *dinfo,
@@ -55,6 +65,14 @@ static int		cups_get_media_db(cups_dinfo_t *dinfo,
 			                  cups_size_t *size);
 static int		cups_is_close_media_db(_cups_media_db_t *a,
 			                       _cups_media_db_t *b);
+static cups_array_t	*cups_test_constraints(cups_dinfo_t *dinfo,
+					       const char *new_option,
+					       const char *new_value,
+					       int num_options,
+					       cups_option_t *options,
+					       int *num_conflicts,
+					       cups_option_t **conflicts);
+
 
 /*
  * 'cupsCheckDestSupported()' - Check that the option and value are supported
@@ -176,6 +194,15 @@ cupsCheckDestSupported(
       case IPP_TAG_BOOLEAN :
           return (attr->values[0].boolean);
 
+      case IPP_TAG_RANGE :
+          int_value = atoi(value);
+
+          for (i = 0; i < attr->num_values; i ++)
+            if (int_value >= attr->values[i].range.lower &&
+                int_value <= attr->values[i].range.upper)
+              return (1);
+          break;
+
       case IPP_TAG_RESOLUTION :
           if (sscanf(value, "%dx%d%15s", &xres_value, &yres_value, temp) != 3)
           {
@@ -239,7 +266,8 @@ cupsCheckDestSupported(
  * user.  "new_option" and "new_value" are the setting the user has just
  * changed.
  *
- * Returns 1 if there is a conflict and 0 otherwise.
+ * Returns 1 if there is a conflict, 0 if there are no conflicts, and -1 if
+ * there was an unrecoverable error such as a resolver loop.
  *
  * If "num_conflicts" and "conflicts" are not NULL, they are set to contain the
  * list of conflicting option/value pairs.  Similarly, if "num_resolved" and
@@ -252,7 +280,7 @@ cupsCheckDestSupported(
  * @since CUPS 1.6/OS X 10.8@
  */
 
-int					/* O - 1 if there is a conflict */
+int					/* O - 1 if there is a conflict, 0 if none, -1 on error */
 cupsCopyDestConflicts(
     http_t        *http,		/* I - Connection to destination */
     cups_dest_t   *dest,		/* I - Destination */
@@ -266,6 +294,27 @@ cupsCopyDestConflicts(
     int           *num_resolved,	/* O - Number of options to resolve */
     cups_option_t **resolved)		/* O - Resolved options */
 {
+  int		i,			/* Looping var */
+		have_conflicts = 0,	/* Do we have conflicts? */
+		changed,		/* Did we change something? */
+		tries,			/* Number of tries for resolution */
+		num_myconf = 0,		/* My number of conflicting options */
+		num_myres = 0;		/* My number of resolved options */
+  cups_option_t	*myconf = NULL,		/* My conflicting options */
+		*myres = NULL,		/* My resolved options */
+		*myoption,		/* My current option */
+		*option;		/* Current option */
+  cups_array_t	*active,		/* Active conflicts */
+		*pass = NULL,		/* Resolvers for this pass */
+		*resolvers = NULL,	/* Resolvers we have used */
+		*test;			/* Test array for conflicts */
+  _cups_dconstres_t *c,			/* Current constraint */
+		*r;			/* Current resolver */
+  ipp_attribute_t *attr;		/* Current attribute */
+  char		value[2048];		/* Current attribute value as string */
+  const char	*myvalue;		/* Current value of an option */
+
+
  /*
   * Clear returned values...
   */
@@ -286,18 +335,223 @@ cupsCopyDestConflicts(
   * Range check input...
   */
 
-  if (!http || !dest || !dinfo || !new_option || !new_value ||
+  if (!http || !dest || !dinfo ||
       (num_conflicts != NULL) != (conflicts != NULL) ||
       (num_resolved != NULL) != (resolved != NULL))
     return (0);
 
  /*
-  * Check for and resolve any conflicts...
+  * Load constraints as needed...
   */
 
-  /* TODO: implement me! */
+  if (!dinfo->constraints)
+    cups_create_constraints(dinfo);
 
-  return (0);
+  if (cupsArrayCount(dinfo->constraints) == 0)
+    return (0);
+
+  if (!dinfo->num_defaults)
+    cups_create_defaults(dinfo);
+
+ /*
+  * If we are resolving, create a shadow array...
+  */
+
+  if (num_resolved)
+  {
+    for (i = num_options, option = options; i > 0; i --, option ++)
+      num_myres = cupsAddOption(option->name, option->value, num_myres, &myres);
+
+    if (new_option && new_value)
+      num_myres = cupsAddOption(new_option, new_value, num_myres, &myres);
+  }
+  else
+  {
+    num_myres = num_options;
+    myres     = options;
+  }
+
+ /*
+  * Check for any conflicts...
+  */
+
+  if (num_resolved)
+    pass = cupsArrayNew((cups_array_func_t)cups_compare_dconstres, NULL);
+
+  for (tries = 0; tries < 100; tries ++)
+  {
+   /*
+    * Check for any conflicts...
+    */
+
+    if (num_conflicts || num_resolved)
+    {
+      cupsFreeOptions(num_myconf, myconf);
+
+      num_myconf = 0;
+      myconf     = NULL;
+      active     = cups_test_constraints(dinfo, new_option, new_value,
+                                         num_myres, myres, &num_myconf,
+                                         &myconf);
+    }
+    else
+      active = cups_test_constraints(dinfo, new_option, new_value, num_myres,
+				     myres, NULL, NULL);
+
+    have_conflicts = (active != NULL);
+
+    if (!active || !num_resolved)
+      break;				/* All done */
+
+   /*
+    * Scan the constraints that were triggered to apply resolvers...
+    */
+
+    if (!resolvers)
+      resolvers = cupsArrayNew((cups_array_func_t)cups_compare_dconstres, NULL);
+
+    for (c = (_cups_dconstres_t *)cupsArrayFirst(active), changed = 0;
+         c;
+         c = (_cups_dconstres_t *)cupsArrayNext(active))
+    {
+      if (cupsArrayFind(pass, c))
+        continue;			/* Already applied this resolver... */
+
+      if (cupsArrayFind(resolvers, c))
+      {
+        DEBUG_printf(("1cupsCopyDestConflicts: Resolver loop with %s.",
+                      c->name));
+        have_conflicts = -1;
+        goto cleanup;
+      }
+
+      if ((r = cupsArrayFind(dinfo->resolvers, c)) == NULL)
+      {
+        DEBUG_printf(("1cupsCopyDestConflicts: Resolver %s not found.",
+                      c->name));
+        have_conflicts = -1;
+        goto cleanup;
+      }
+
+     /*
+      * Add the options from the resolver...
+      */
+
+      cupsArrayAdd(pass, r);
+      cupsArrayAdd(resolvers, r);
+
+      for (attr = ippFirstAttribute(r->collection);
+           attr;
+           attr = ippNextAttribute(r->collection))
+      {
+        if (new_option && !strcmp(attr->name, new_option))
+          continue;			/* Ignore this if we just changed it */
+
+        if (ippAttributeString(attr, value, sizeof(value)) >= sizeof(value))
+          continue;			/* Ignore if the value is too long */
+
+        if ((test = cups_test_constraints(dinfo, attr->name, value, num_myres,
+                                          myres, NULL, NULL)) == NULL)
+        {
+         /*
+          * That worked, flag it...
+          */
+
+          changed = 1;
+        }
+        else
+          cupsArrayDelete(test);
+
+       /*
+	* Add the option/value from the resolver regardless of whether it
+	* worked; this makes sure that we can cascade several changes to
+	* make things resolve...
+	*/
+
+	num_myres = cupsAddOption(attr->name, value, num_myres, &myres);
+      }
+    }
+
+    if (!changed)
+    {
+      DEBUG_puts("1cupsCopyDestConflicts: Unable to resolve constraints.");
+      have_conflicts = -1;
+      goto cleanup;
+    }
+
+    cupsArrayClear(pass);
+
+    cupsArrayDelete(active);
+    active = NULL;
+  }
+
+  if (tries >= 0)
+  {
+    DEBUG_puts("1cupsCopyDestConflicts: Unable to resolve after 100 tries.");
+    have_conflicts = -1;
+    goto cleanup;
+  }
+
+ /*
+  * Copy resolved options as needed...
+  */
+
+  if (num_resolved)
+  {
+    for (i = num_myres, myoption = myres; i > 0; i --, myoption ++)
+    {
+      if ((myvalue = cupsGetOption(myoption->name, num_options,
+                                   options)) == NULL ||
+          strcmp(myvalue, myoption->value))
+      {
+        if (new_option && !strcmp(new_option, myoption->name) &&
+            new_value && !strcmp(new_value, myoption->value))
+          continue;
+
+        *num_resolved = cupsAddOption(myoption->name, myoption->value,
+                                      *num_resolved, resolved);
+      }
+    }
+  }
+
+ /*
+  * Clean up...
+  */
+
+  cleanup:
+
+  cupsArrayDelete(active);
+  cupsArrayDelete(pass);
+  cupsArrayDelete(resolvers);
+
+  if (num_resolved)
+  {
+   /*
+    * Free shadow copy of options...
+    */
+
+    cupsFreeOptions(num_myres, myres);
+  }
+
+  if (num_conflicts)
+  {
+   /*
+    * Return conflicting options to caller...
+    */
+
+    *num_conflicts = num_myconf;
+    *conflicts     = myconf;
+  }
+  else
+  {
+   /*
+    * Free conflicting options...
+    */
+
+    cupsFreeOptions(num_myconf, myconf);
+  }
+
+  return (have_conflicts);
 }
 
 
@@ -319,6 +573,9 @@ cupsCopyDestInfo(
   cups_dinfo_t	*dinfo;			/* Destination information */
   ipp_t		*request,		/* Get-Printer-Attributes request */
 		*response;		/* Supported attributes */
+  int		tries,			/* Number of tries so far */
+		delay,			/* Current retry delay */
+		prev_delay;		/* Next retry delay */
   const char	*uri;			/* Printer URI */
   char		resource[1024];		/* Resource path */
   int		version;		/* IPP version */
@@ -352,7 +609,10 @@ cupsCopyDestInfo(
   * Get the supported attributes...
   */
 
-  version = 20;
+  delay      = 1;
+  prev_delay = 1;
+  tries      = 0;
+  version    = 20;
 
   do
   {
@@ -383,11 +643,22 @@ cupsCopyDestInfo(
 
       if (status == IPP_VERSION_NOT_SUPPORTED && version > 11)
         version = 11;
+      else if (status == IPP_PRINTER_BUSY)
+      {
+        sleep(delay);
+
+        delay = _cupsNextDelay(delay, &prev_delay);
+      }
       else
         return (NULL);
     }
+
+    tries ++;
   }
-  while (!response);
+  while (!response && tries < 10);
+
+  if (!response)
+    return (NULL);
 
  /*
   * Allocate a cups_dinfo_t structure and return it...
@@ -429,13 +700,14 @@ cupsFreeDestInfo(cups_dinfo_t *dinfo)	/* I - Destination information */
 
   _cupsStrFree(dinfo->resource);
 
-  ippDelete(dinfo->attrs);
-
   cupsArrayDelete(dinfo->constraints);
+  cupsArrayDelete(dinfo->resolvers);
 
   cupsArrayDelete(dinfo->localizations);
 
   cupsArrayDelete(dinfo->media_db);
+
+  ippDelete(dinfo->attrs);
 
   free(dinfo);
 }
@@ -577,6 +849,46 @@ cupsGetDestMediaBySize(
 
 
 /*
+ * 'cups_add_dconstres()' - Add a constraint or resolver to an array.
+ */
+
+static void
+cups_add_dconstres(
+    cups_array_t *a,			/* I - Array */
+    ipp_t        *collection)		/* I - Collection value */
+{
+  ipp_attribute_t	*attr;		/* Attribute */
+  _cups_dconstres_t	*temp;		/* Current constraint/resolver */
+
+
+  if ((attr = ippFindAttribute(collection, "resolver-name",
+                               IPP_TAG_NAME)) == NULL)
+    return;
+
+  if ((temp = calloc(1, sizeof(_cups_dconstres_t))) == NULL)
+    return;
+
+  temp->name       = attr->values[0].string.text;
+  temp->collection = collection;
+
+  cupsArrayAdd(a, temp);
+}
+
+
+/*
+ * 'cups_compare_dconstres()' - Compare to resolver entries.
+ */
+
+static int				/* O - Result of comparison */
+cups_compare_dconstres(
+    _cups_dconstres_t *a,		/* I - First resolver */
+    _cups_dconstres_t *b)		/* I - Second resolver */
+{
+  return (strcmp(a->name, b->name));
+}
+
+
+/*
  * 'cups_compare_media_db()' - Compare two media entries.
  */
 
@@ -630,6 +942,93 @@ cups_copy_media_db(
   temp->top    = mdb->top;
 
   return (temp);
+}
+
+
+/*
+ * 'cups_create_constraints()' - Create the constraints and resolvers arrays.
+ */
+
+static void
+cups_create_constraints(
+    cups_dinfo_t *dinfo)		/* I - Destination information */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Attribute */
+  _ipp_value_t		*val;		/* Current value */
+
+
+  dinfo->constraints = cupsArrayNew3(NULL, NULL, NULL, 0, NULL,
+                                     (cups_afree_func_t)free);
+  dinfo->resolvers   = cupsArrayNew3((cups_array_func_t)cups_compare_dconstres,
+				     NULL, NULL, 0, NULL,
+                                     (cups_afree_func_t)free);
+
+  if ((attr = ippFindAttribute(dinfo->attrs, "job-constraints-supported",
+			       IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  {
+    for (i = attr->num_values, val = attr->values; i > 0; i --, val ++)
+      cups_add_dconstres(dinfo->constraints, val->collection);
+  }
+
+  if ((attr = ippFindAttribute(dinfo->attrs, "job-resolvers-supported",
+			       IPP_TAG_BEGIN_COLLECTION)) != NULL)
+  {
+    for (i = attr->num_values, val = attr->values; i > 0; i --, val ++)
+      cups_add_dconstres(dinfo->resolvers, val->collection);
+  }
+}
+
+
+/*
+ * 'cups_create_defaults()' - Create the -default option array.
+ *
+ * TODO: Need to support collection defaults...
+ */
+
+static void
+cups_create_defaults(
+    cups_dinfo_t *dinfo)		/* I - Destination information */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+  char			name[IPP_MAX_NAME + 1],
+					/* Current name */
+			*nameptr,	/* Pointer into current name */
+			value[2048];	/* Current value */
+
+
+ /*
+  * Iterate through the printer attributes looking for xxx-default and adding
+  * xxx=value to the defaults option array.
+  */
+
+  for (attr = ippFirstAttribute(dinfo->attrs);
+       attr;
+       attr = ippNextAttribute(dinfo->attrs))
+  {
+    if (!attr->name || attr->group_tag != IPP_TAG_PRINTER)
+      continue;
+
+    if (attr->value_tag == IPP_TAG_BEGIN_COLLECTION)
+      continue;				/* TODO: STR #4096 */
+
+    if ((nameptr = attr->name + strlen(attr->name) - 8) <= attr->name ||
+        strcmp(nameptr, "-default"))
+      continue;
+
+    strlcpy(name, attr->name, sizeof(name));
+    if ((nameptr = name + strlen(name) - 8) <= name ||
+        strcmp(nameptr, "-default"))
+      continue;
+
+    *nameptr = '\0';
+
+    if (ippAttributeString(attr, value, sizeof(value)) >= sizeof(value))
+      continue;
+
+    dinfo->num_defaults = cupsAddOption(name, value, dinfo->num_defaults,
+                                        &dinfo->defaults);
+  }
 }
 
 
@@ -1156,6 +1555,208 @@ cups_is_close_media_db(
 
   return (dwidth >= -176 && dwidth <= 176 &&
           dlength >= -176 && dlength <= 176);
+}
+
+
+/*
+ * 'cups_test_constraints()' - Test constraints.
+ *
+ * TODO: STR #4096 - Need to properly support media-col contraints...
+ */
+
+static cups_array_t *			/* O - Active constraints */
+cups_test_constraints(
+    cups_dinfo_t  *dinfo,		/* I - Destination information */
+    const char    *new_option,		/* I - Newly selected option */
+    const char    *new_value,		/* I - Newly selected value */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options,		/* I - Options */
+    int           *num_conflicts,	/* O - Number of conflicting options */
+    cups_option_t **conflicts)		/* O - Conflicting options */
+{
+  int			i,		/* Looping var */
+			match;		/* Value matches? */
+  int			num_matching;	/* Number of matching options */
+  cups_option_t		*matching;	/* Matching options */
+  _cups_dconstres_t	*c;		/* Current constraint */
+  cups_array_t		*active = NULL;	/* Active constraints */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  _ipp_value_t		*attrval;	/* Current attribute value */
+  const char		*value;		/* Current value */
+  char			temp[1024];	/* Temporary string */
+  int			int_value;	/* Integer value */
+  int			xres_value,	/* Horizontal resolution */
+			yres_value;	/* Vertical resolution */
+  ipp_res_t		units_value;	/* Resolution units */
+
+
+  for (c = (_cups_dconstres_t *)cupsArrayFirst(dinfo->constraints);
+       c;
+       c = (_cups_dconstres_t *)cupsArrayNext(dinfo->constraints))
+  {
+    num_matching = 0;
+    matching     = NULL;
+
+    for (attr = ippFirstAttribute(c->collection);
+         attr;
+         attr = ippNextAttribute(c->collection))
+    {
+      if (attr->value_tag == IPP_TAG_BEGIN_COLLECTION)
+        break;				/* TODO: STR #4096 */
+
+     /*
+      * Get the value for the current attribute in the constraint...
+      */
+
+      if (new_option && new_value && !strcmp(attr->name, new_option))
+        value = new_value;
+      else if ((value = cupsGetOption(attr->name, num_options,
+                                      options)) == NULL)
+        value = cupsGetOption(attr->name, dinfo->num_defaults, dinfo->defaults);
+
+      if (!value)
+      {
+       /*
+        * Not set so this constraint does not apply...
+        */
+
+        break;
+      }
+
+      match = 0;
+
+      switch (attr->value_tag)
+      {
+        case IPP_TAG_INTEGER :
+        case IPP_TAG_ENUM :
+	    int_value = atoi(value);
+
+	    for (i = attr->num_values, attrval = attr->values;
+	         i > 0;
+	         i --, attrval ++)
+	    {
+	      if (attrval->integer == int_value)
+	      {
+		match = 1;
+		break;
+	      }
+            }
+            break;
+
+        case IPP_TAG_BOOLEAN :
+	    int_value = !strcmp(value, "true");
+
+	    for (i = attr->num_values, attrval = attr->values;
+	         i > 0;
+	         i --, attrval ++)
+	    {
+	      if (attrval->boolean == int_value)
+	      {
+		match = 1;
+		break;
+	      }
+            }
+            break;
+
+        case IPP_TAG_RANGE :
+	    int_value = atoi(value);
+
+	    for (i = attr->num_values, attrval = attr->values;
+	         i > 0;
+	         i --, attrval ++)
+	    {
+	      if (int_value >= attrval->range.lower &&
+	          int_value <= attrval->range.upper)
+	      {
+		match = 1;
+		break;
+	      }
+            }
+            break;
+
+        case IPP_TAG_RESOLUTION :
+	    if (sscanf(value, "%dx%d%15s", &xres_value, &yres_value, temp) != 3)
+	    {
+	      if (sscanf(value, "%d%15s", &xres_value, temp) != 2)
+		break;
+
+	      yres_value = xres_value;
+	    }
+
+	    if (!strcmp(temp, "dpi"))
+	      units_value = IPP_RES_PER_INCH;
+	    else if (!strcmp(temp, "dpc") || !strcmp(temp, "dpcm"))
+	      units_value = IPP_RES_PER_CM;
+	    else
+	      break;
+
+	    for (i = attr->num_values, attrval = attr->values;
+		 i > 0;
+		 i --, attrval ++)
+	    {
+	      if (attrval->resolution.xres == xres_value &&
+		  attrval->resolution.yres == yres_value &&
+		  attrval->resolution.units == units_value)
+	      {
+	      	match = 1;
+		break;
+	      }
+	    }
+            break;
+
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_MIMETYPE :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	    for (i = attr->num_values, attrval = attr->values;
+	         i > 0;
+	         i --, attrval ++)
+	    {
+	      if (!strcmp(attrval->string.text, value))
+	      {
+		match = 1;
+		break;
+	      }
+            }
+	    break;
+
+        default :
+            break;
+      }
+
+      if (!match)
+        break;
+
+      num_matching = cupsAddOption(attr->name, value, num_matching, &matching);
+    }
+
+    if (!attr)
+    {
+      if (!active)
+        active = cupsArrayNew(NULL, NULL);
+
+      cupsArrayAdd(active, c);
+
+      if (num_conflicts && conflicts)
+      {
+        cups_option_t	*moption;	/* Matching option */
+
+        for (i = num_matching, moption = matching; i > 0; i --, moption ++)
+          *num_conflicts = cupsAddOption(moption->name, moption->value,
+					 *num_conflicts, conflicts);
+      }
+    }
+
+    cupsFreeOptions(num_matching, matching);
+  }
+
+  return (active);
 }
 
 

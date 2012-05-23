@@ -331,7 +331,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_AVAHI
   if ((simple_poll = avahi_simple_poll_new()) == NULL)
   {
-    fputs("DEBUG: Unable to create avahi simple poll object.\n", stderr);
+    fputs("DEBUG: Unable to create Avahi simple poll object.\n", stderr);
     return (1);
   }
 
@@ -341,7 +341,7 @@ main(int  argc,				/* I - Number of command-line args */
 			    0, client_callback, simple_poll, &error);
   if (!client)
   {
-    fputs("DEBUG: Unable to create avahi client.\n", stderr);
+    fputs("DEBUG: Unable to create Avahi client.\n", stderr);
     return (1);
   }
 
@@ -587,10 +587,7 @@ browse_callback(
                   "interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
 		  "regtype=\"%s\", replyDomain=\"%s\", context=%p)\n",
           sdRef, flags, interfaceIndex, errorCode,
-	  serviceName ? serviceName : "(null)",
-	  regtype ? regtype : "(null)",
-	  replyDomain ? replyDomain : "(null)",
-	  context);
+	  serviceName, regtype, replyDomain, context);
 
  /*
   * Only process "add" data...
@@ -629,10 +626,7 @@ browse_local_callback(
                   "interfaceIndex=%d, errorCode=%d, serviceName=\"%s\", "
 		  "regtype=\"%s\", replyDomain=\"%s\", context=%p)\n",
           sdRef, flags, interfaceIndex, errorCode,
-	  serviceName ? serviceName : "(null)",
-	  regtype ? regtype : "(null)",
-	  replyDomain ? replyDomain : "(null)",
-	  context);
+	  serviceName, regtype, replyDomain, context);
 
  /*
   * Only process "add" data...
@@ -907,7 +901,7 @@ get_device(cups_array_t *devices,	/* I - Device array */
 	                            replyDomain);
 #else /* HAVE_AVAHI */
 	avahi_service_name_join(fullName, kDNSServiceMaxDomainName,
-				 serviceName, regtype, replyDomain);
+				serviceName, regtype, replyDomain);
 #endif /* HAVE_DNSSD */
 
 	free(device->fullName);

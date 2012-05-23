@@ -34,12 +34,10 @@
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>
 #endif /* HAVE_RESOLV_H */
-#ifdef HAVE_COREFOUNDATION
+#ifdef __APPLE__
 #  include <CoreFoundation/CoreFoundation.h>
-#endif /* HAVE_COREFOUNDATION */
-#ifdef HAVE_SYSTEMCONFIGURATION
 #  include <SystemConfiguration/SystemConfiguration.h>
-#endif /* HAVE_SYSTEMCONFIGURATION */
+#endif /* __APPLE__ */
 
 
 /*

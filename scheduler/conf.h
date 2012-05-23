@@ -169,6 +169,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Amount of automatic debug history */
 			FatalErrors		VALUE(CUPSD_FATAL_CONFIG),
 					/* Which errors are fatal? */
+			StrictConformance	VALUE(FALSE),
+					/* Require strict IPP conformance? */
 			LogFilePerm		VALUE(0644);
 					/* Permissions for log files */
 VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);

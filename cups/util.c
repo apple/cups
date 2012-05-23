@@ -248,7 +248,8 @@ cupsCreateJob(
   if (title)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
                  title);
-  cupsEncodeOptions(request, num_options, options);
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_JOB);
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_SUBSCRIPTION);
 
  /*
   * Send the request and get the job-id...

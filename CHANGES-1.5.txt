@@ -1,8 +1,30 @@
 CHANGES-1.5.txt
 ---------------
 
+CHANGES IN CUPS V1.5.4
+
+	- Multiple libusb backend fixes (STR #4098, STR #4100)
+	- The IPP backend no longer tries to get the job status for printers
+	  that do not implement the required operation (STR #4083)
+	- Sending a document in an unsupported format to an IPP printer now
+	  automatically cancels the job (STR #4093)
+	- Fix some error reporting issues when printing from /dev/null and
+	  other unusual situations (STR #4015)
+	- The scheduler now sets the CUPS_MAX_MESSAGE environment variable for
+	  filters (STR #4074)
+	- Fixed a build issue when using older versions of autoconf (STR #4084)
+	- The IPP backend now treats the client-error-not-possible status code
+	  as a job history issue, allowing IPP printing to Windows to work
+	  (STR #4047)
+	- The IPP backend incorrectly included the document-format and
+	  compression attributes in Create-Job requests (STR #4086)
+	- The libusb-based USB backend did not work on non-Linux platforms
+	  (STR #4088)
+
+
 CHANGES IN CUPS V1.5.3
 
+	- httpReconnect() did not reset the read/write buffers (STR #4065)
 	- Compiling without threading support failed (STR #4060)
 	- Fixed compile problem with old versions of OpenSSL (STR #4036)
 	- The network backends did not check SNMP supply levels regularly

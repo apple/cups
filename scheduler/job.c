@@ -287,16 +287,25 @@ cupsdCheckJobs(void)
   time_t		curtime;	/* Current time */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d",
-                  cupsArrayCount(ActiveJobs), Sleeping, NeedReload);
-
   curtime = time(NULL);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d, "
+                  "curtime=%ld", cupsArrayCount(ActiveJobs), Sleeping,
+                  NeedReload, (long)curtime);
 
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdCheckJobs: Job %d - dest=\"%s\", printer=%p, "
+                    "state=%d, cancel_time=%ld, hold_until=%ld, kill_time=%ld, "
+                    "pending_cost=%d, pending_timeout=%ld", job->id, job->dest,
+                    job->printer, job->state_value, (long)job->cancel_time,
+                    (long)job->hold_until, (long)job->kill_time,
+                    job->pending_cost, (long)job->pending_timeout);
+
    /*
     * Kill jobs if they are unresponsive...
     */
@@ -338,7 +347,6 @@ cupsdCheckJobs(void)
 	*/
 
         cupsd_client_t	*con;		/* Current client connection */
-
 
 	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	     con;
@@ -431,7 +439,7 @@ cupsdCheckJobs(void)
           cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
 
-        if (printer->state == IPP_PRINTER_IDLE)
+        if (!printer->job && printer->state == IPP_PRINTER_IDLE)
         {
 	 /*
 	  * Start the job...
@@ -3355,6 +3363,21 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   cupsArrayRemove(PrintingJobs, job);
 
  /*
+  * Apply any PPD updates...
+  */
+
+  if (job->num_keywords)
+  {
+    if (cupsdUpdatePrinterPPD(job->printer, job->num_keywords, job->keywords))
+      cupsdSetPrinterAttrs(job->printer);
+
+    cupsFreeOptions(job->num_keywords, job->keywords);
+
+    job->num_keywords = 0;
+    job->keywords     = NULL;
+  }
+
+ /*
   * Clear the printer <-> job association...
   */
 
@@ -4819,18 +4842,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * Set attribute(s)...
       */
 
-      int		num_keywords;	/* Number of keywords */
-      cups_option_t	*keywords;	/* Keywords */
-
-
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "PPD: %s", message);
 
-      num_keywords = cupsParseOptions(message, 0, &keywords);
-
-      if (cupsdUpdatePrinterPPD(job->printer, num_keywords, keywords))
-        cupsdSetPrinterAttrs(job->printer);
-
-      cupsFreeOptions(num_keywords, keywords);
+      job->num_keywords = cupsParseOptions(message, job->num_keywords,
+                                           &job->keywords);
     }
     else
     {

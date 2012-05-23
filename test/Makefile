@@ -32,6 +32,7 @@ DATAFILES	=	\
 			onepage-letter.pdf \
 			onepage-letter.ps \
 			testfile.jpg \
+			testfile.pcl \
 			testfile.pdf \
 			testfile.ps \
 			testfile.txt

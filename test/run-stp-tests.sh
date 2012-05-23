@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -16,6 +16,21 @@
 #
 
 argcount=$#
+
+#
+# Don't allow "make check" or "make test" to be run by root...
+#
+
+if test "x`id -u`" = x0; then
+	echo Please run this as a normal user. Not supported when run as root.
+	exit 1
+fi
+
+#
+# Force the permissions of the files we create...
+#
+
+umask 022
 
 #
 # Make the IPP test program...
@@ -368,10 +383,11 @@ else
 fi
 
 cat >/tmp/cups-$user/cupsd.conf <<EOF
+StrictConformance Yes
 Browsing Off
 FileDevice yes
 Printcap
-Listen 127.0.0.1:$port
+Listen localhost:$port
 User $user
 ServerRoot /tmp/cups-$user
 StateDir /tmp/cups-$user
@@ -395,9 +411,7 @@ LogTimeFormat usecs
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
-Order Deny,Allow
-Deny from all
-Allow from 127.0.0.1
+Order Allow,Deny
 $encryption
 </Limit>
 </Policy>
@@ -605,11 +619,18 @@ echo `date "+%Y-%m-%d"` by $user on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
 fail=0
-for file in 4*.test; do
+for file in 4*.test ipp-2.1.test; do
 	echo $ac_n "Performing $file: $ac_c"
 	echo "" >>$strfile
 
-	$VALGRIND ./ipptool -tI ipp://localhost:$port/printers $file >> $strfile
+	if test $file = ipp-2.1.test; then
+		uri="ipp://localhost:$port/printers/Test1"
+		options="-V 2.1 -d NOPRINT=1 -f testfile.ps"
+	else
+		uri="ipp://localhost:$port/printers"
+		options=""
+	fi
+	$VALGRIND ./ipptool -tI $options $uri $file >> $strfile
 	status=$?
 
 	if test $status != 0; then
@@ -710,9 +731,21 @@ else
 	echo "<P>PASS: Printer 'Test2' correctly produced $count page(s).</P>" >>$strfile
 fi
 
+# Paged printed on Test3
+count=`$GREP '^Test3 ' /tmp/cups-$user/log/page_log | grep -v total | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+expected=2
+if test $count != $expected; then
+	echo "FAIL: Printer 'Test3' produced $count page(s), expected $expected."
+	echo "<P>FAIL: Printer 'Test3' produced $count page(s), expected $expected.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: Printer 'Test3' correctly produced $count page(s)."
+	echo "<P>PASS: Printer 'Test3' correctly produced $count page(s).</P>" >>$strfile
+fi
+
 # Requests logged
 count=`wc -l /tmp/cups-$user/log/access_log | awk '{print $1}'`
-expected=`expr 37 + 18 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+expected=`expr 37 + 18 + 28 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
 if test $count != $expected; then
 	echo "FAIL: $count requests logged, expected $expected."
 	echo "<P>FAIL: $count requests logged, expected $expected.</P>" >>$strfile
@@ -782,10 +815,10 @@ fi
 
 # Error log messages
 count=`$GREP '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 18; then
-	echo "FAIL: $count error messages, expected 18."
+if test $count != 33; then
+	echo "FAIL: $count error messages, expected 33."
 	$GREP '^E ' /tmp/cups-$user/log/error_log
-	echo "<P>FAIL: $count error messages, expected 18.</P>" >>$strfile
+	echo "<P>FAIL: $count error messages, expected 33.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	$GREP '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
