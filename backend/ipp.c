@@ -1305,6 +1305,8 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
       sleep(10);
     }
+    else if (ipp_status == IPP_DOCUMENT_FORMAT)
+      goto cleanup;
     else if (ipp_status == IPP_FORBIDDEN ||
 	     ipp_status == IPP_AUTHENTICATION_CANCELED)
     {
@@ -1871,13 +1873,16 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
-  else if (ipp_status == IPP_DOCUMENT_FORMAT ||
-           ipp_status == IPP_CONFLICT)
+  else if (ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
-  else if (ipp_status == IPP_REQUEST_VALUE || job_canceled < 0)
+  else if (ipp_status == IPP_REQUEST_VALUE ||
+           ipp_status == IPP_DOCUMENT_FORMAT || job_canceled < 0)
   {
     if (ipp_status == IPP_REQUEST_VALUE)
       _cupsLangPrintFilter(stderr, "ERROR", _("Print job too large."));
+    else if (ipp_status == IPP_DOCUMENT_FORMAT)
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Printer cannot print supplied content."));
     else
       _cupsLangPrintFilter(stderr, "ERROR", _("Print job canceled at printer."));
 

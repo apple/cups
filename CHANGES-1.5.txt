@@ -3,6 +3,8 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- Sending a document in an unsupported format to an IPP printer now
+	  automatically cancels the job (STR #4093)
 	- Fix some error reporting issues when printing from /dev/null and
 	  other unusual situations (STR #4015)
 	- The scheduler now sets the CUPS_MAX_MESSAGE environment variable for
