@@ -166,7 +166,15 @@ void
 cupsdStartColor(void)
 {
 #if !defined(__APPLE__) && defined(HAVE_DBUS)
+  cupsd_printer_t	*p;		/* Current printer */
+
+
   colord_con = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    cupsdRegisterColor(p);
 #endif /* !__APPLE__ && HAVE_DBUS */
 }
 
