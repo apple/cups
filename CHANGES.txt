@@ -1,4 +1,4 @@
-CHANGES.txt - 1.6b1 - 2012-05-22
+CHANGES.txt - 1.6b1 - 2012-05-24
 --------------------------------
 
 CHANGES IN CUPS V1.6b1
