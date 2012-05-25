@@ -292,7 +292,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsreject.8.gz
 /usr/share/man/man8/cups-deviced.8.gz
 /usr/share/man/man8/cups-driverd.8.gz
-/usr/share/man/man8/cups-polld.8.gz
+/usr/share/man/man8/cups-snmp.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
 /usr/share/man/man8/lpinfo.8.gz
