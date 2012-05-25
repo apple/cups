@@ -148,8 +148,11 @@ void
 cupsdRegisterColor(cupsd_printer_t *p)	/* I - Printer */
 {
 #ifdef __APPLE__
-  apple_unregister_profiles(p);
-  apple_register_profiles(p);
+  if (!RunUser)
+  {
+    apple_unregister_profiles(p);
+    apple_register_profiles(p);
+  }
 
 #elif defined(HAVE_DBUS)
   colord_unregister_printer(p);
@@ -201,7 +204,8 @@ void
 cupsdUnregisterColor(cupsd_printer_t *p)/* I - Printer */
 {
 #ifdef __APPLE__
-  apple_unregister_profiles(p);
+  if (!RunUser)
+    apple_unregister_profiles(p);
 
 #elif defined(HAVE_DBUS)
   colord_unregister_printer(p);
