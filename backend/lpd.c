@@ -936,7 +936,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       return (CUPS_BACKEND_FAILED);
     }
 
-    if (orighost)
+    if (orighost && _cups_strcasecmp(orighost, "localhost"))
       strlcpy(localhost, orighost, sizeof(localhost));
     else
       httpGetHostname(NULL, localhost, sizeof(localhost));
