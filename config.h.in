@@ -346,13 +346,6 @@
 
 
 /*
- * Do we have the SSLSetProtocolVersionMax function?
- */
-
-#undef HAVE_SSLSETPROTOCOLVERSIONMAX
-
-
-/*
  * Do we have the cssmErrorString function?
  */
 
