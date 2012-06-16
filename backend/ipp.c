@@ -1080,7 +1080,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  get_job_attrs = 1;
       }
 
-      if (!send_document)
+      if (create_job && !send_document)
       {
         fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
               stderr);
