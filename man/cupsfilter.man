@@ -11,18 +11,22 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "CUPS" "4 March 2010" "Apple Inc."
+.TH cupsfilter 8 "CUPS" "20 June 2012" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
 .B cupsfilter
-[ -c
+[ -D ] [ -U
+.I user
+] [ -c
 .I config-file
 ] [ -d
 .I printer
-] [ -e ] -j
+] [ -e ] [ -i
+.I mime/type
+] [ -j
 .I job-id[,N]
-[ -m
+] [ -m
 .I mime/type
 ] [ -n
 .I copies
@@ -32,13 +36,21 @@ cupsfilter \- convert a file to another format using cups filters
 .I filename.ppd
 ] [ -t
 .I title
-]
+] [ -u ]
 .I filename
 .SH DESCRIPTION
 \fIcupsfilter\fR is a front-end to the CUPS filter subsystem which allows you
 to convert a file to a specific format, just as if you had printed the file
 through CUPS. By default, \fIcupsfilter\fR generates a PDF file.
 .SH OPTIONS
+.TP 5
+-D
+.br
+Delete the input file after conversion.
+.TP 5
+-U user
+.br
+Specifies the username passed to the filters. The default is the name of the current user.
 .TP 5
 -c config-file
 .br
@@ -50,6 +62,11 @@ Uses information from the named printer.
 -e
 .br
 Use every filter from the PPD file.
+.TP 5
+-i mime/type
+.br
+Specifies the source file type. The default file type is guessed using the
+filename and contents of the file.
 .TP 5
 -j job-id[,N]
 .br
@@ -77,9 +94,10 @@ Specifies the PPD file to use.
 -t title
 .br
 Specifies the document title.
-.SH KNOWN ISSUES
-\fIcupsfilter\fR currently does not use the filters defined in the PPD file.
-This will be addressed in a future CUPS release.
+.TP 5
+-u
+.br
+Delete the PPD file after conversion.
 .SH SEE ALSO
 \fIcupsd.conf(5)\fR
 .br
