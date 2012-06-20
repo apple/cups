@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon interface for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -744,8 +744,7 @@ print_file(http_t     *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
 
-  if (last)
-    ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last);
 
  /*
   * Do the request...
