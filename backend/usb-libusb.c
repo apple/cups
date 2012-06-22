@@ -13,7 +13,7 @@
  *
  * Contents:
  *
-﻿ *   list_devices()	  - List the available printers.
+ *   list_devices()	  - List the available printers.
  *   print_device()	  - Print a file to a USB device.
  *   close_device()	  - Close the connection to the USB printer.
  *   find_device()	  - Find or enumerate USB printers.
@@ -603,7 +603,7 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     int errcode;			/* Return value of libusb function */
     int number;				/* Interface number */
 
-    errcode = 
+    errcode =
       libusb_get_config_descriptor (printer->device, printer->conf, &confptr);
     if (errcode >= 0)
     {
@@ -1156,7 +1156,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 		0, 0, (unsigned char *)&current, 1, 5000) < 0)
     current = 0;			/* Assume not configured */
 
-  if ((errcode = 
+  if ((errcode =
        libusb_get_config_descriptor (printer->device, printer->conf, &confptr))
       < 0)
   {
