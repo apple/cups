@@ -1,4 +1,4 @@
-CREDITS.txt - 2010-03-13
+CREDITS.txt - 2012-06-22
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -30,6 +30,7 @@ like to thank the following individuals for their contributions:
     Wes Morgan                     - *BSD fixes.
     Daniel Nylander                - Swedish localization.
     Niklas 'Nille' Åkerström       - Swedish localization.
+    Naruiko Ogasawara              - Japanese localization.
     Giulio Orsero                  - Bug fixes and testing.
     Michal Osowiecki               - Polish localization.
     Citra Paska                    - Indonesian localization.
