@@ -1,8 +1,9 @@
-CHANGES.txt - 1.6b1 - 2012-05-30
---------------------------------
+CHANGES.txt - 1.6rc1 - 2012-06-21
+---------------------------------
 
 CHANGES IN CUPS V1.6rc1
 
+	- Added a new Japanese localization (STR #4122)
 	- The LPD backend incorrectly used "localhost" in the control file
 	  instead of the current hostname.
 
