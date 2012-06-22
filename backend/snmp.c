@@ -251,7 +251,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 #ifdef AF_INET6
   if ((ipv6 = _cupsSNMPOpen(AF_INET6)) < 0)
-    return (1);
+    perror("DEBUG: Unable to create IPv6 socket");
 #else
   ipv6 = -1;
 #endif /* AF_INET6 */

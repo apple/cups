@@ -4,6 +4,8 @@ CHANGES.txt - 1.6rc1 - 2012-06-21
 CHANGES IN CUPS V1.6rc1
 
 	- Added a new Japanese localization (STR #4122)
+	- The SNMP backend no longer exits if it is unable to obtain an IPv6
+	  socket (STR #4109)
 	- The LPD backend incorrectly used "localhost" in the control file
 	  instead of the current hostname.
 
