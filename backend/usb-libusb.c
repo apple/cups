@@ -600,30 +600,38 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     * to the device...
     */
 
+    int errcode;			/* Return value of libusb function */
     int number;				/* Interface number */
 
-    libusb_get_device_descriptor(printer->device, &devdesc);
-    libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
-    number = confptr->interface[printer->iface].
-                 altsetting[printer->altset].bInterfaceNumber;
-    libusb_release_interface(printer->handle, number);
-    if (number != 0)
-      libusb_release_interface(printer->handle, 0);
-
-   /*
-    * Re-attach "usblp" kernel module if it was attached before using this
-    * device
-    */
-
-    if (printer->usblp_attached == 1)
+    errcode = 
+      libusb_get_config_descriptor (printer->device, printer->conf, &confptr);
+    if (errcode >= 0)
     {
-      if (libusb_attach_kernel_driver(printer->handle, printer->iface) < 0)
-	fprintf(stderr,
-	        "DEBUG: Failed to re-attach \"usblp\" kernel module to "
-	        "%04x:%04x\n", devdesc.idVendor, devdesc.idProduct);
-    }
+      number = confptr->interface[printer->iface].
+	altsetting[printer->altset].bInterfaceNumber;
+      libusb_release_interface(printer->handle, number);
+      if (number != 0)
+	libusb_release_interface(printer->handle, 0);
 
-    libusb_free_config_descriptor(confptr);
+     /*
+      * Re-attach "usblp" kernel module if it was attached before using this
+      * device
+      */
+      if (printer->usblp_attached == 1)
+	if (libusb_attach_kernel_driver(printer->handle, printer->iface) < 0)
+	{
+	  errcode = libusb_get_device_descriptor (printer->device, &devdesc);
+	  if (errcode < 0)
+	    fprintf(stderr,
+		    "DEBUG: Failed to re-attach \"usblp\" kernel module\n");
+	  else
+	    fprintf(stderr,
+		    "DEBUG: Failed to re-attach \"usblp\" kernel module to "
+		    "%04x:%04x\n", devdesc.idVendor, devdesc.idProduct);
+	}
+
+      libusb_free_config_descriptor(confptr);
+    }
 
    /*
     * Close the interface and return...
@@ -694,7 +702,8 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
       * a printer...
       */
 
-      libusb_get_device_descriptor(device, &devdesc);
+      if (libusb_get_device_descriptor (device, &devdesc) < 0)
+	continue;
 
       if (!devdesc.bNumConfigurations || !devdesc.idVendor ||
           !devdesc.idProduct)
@@ -1123,9 +1132,14 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   else
   {
     printer->usblp_attached = 0;
-    fprintf(stderr, "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" kernel module attached\n",
-	      devdesc.idVendor, devdesc.idProduct);
-    goto error;
+
+    if (errcode != LIBUSB_ERROR_NOT_SUPPORTED)
+    {
+      fprintf(stderr,
+	      "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" "
+	      "kernel module attached\n", devdesc.idVendor, devdesc.idProduct);
+      goto error;
+    }
   }
 
  /*
@@ -1142,8 +1156,14 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 		0, 0, (unsigned char *)&current, 1, 5000) < 0)
     current = 0;			/* Assume not configured */
 
-  libusb_get_device_descriptor(printer->device, &devdesc);
-  libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
+  if ((errcode = 
+       libusb_get_config_descriptor (printer->device, printer->conf, &confptr))
+      < 0)
+  {
+    fprintf(stderr, "DEBUG: Failed to get config descriptor for %04x:%04x\n",
+	    devdesc.idVendor, devdesc.idProduct);
+    goto error;
+  }
   number1 = confptr->bConfigurationValue;
 
   if (number1 != current)
@@ -1159,38 +1179,6 @@ open_device(usb_printer_t *printer,	/* I - Printer */
       if (errcode != LIBUSB_ERROR_BUSY)
         fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
 		number1, devdesc.idVendor, devdesc.idProduct);
-    }
-  }
-
- /*
-  * Get the "usblp" kernel module out of the way. This backend only
-  * works without the module attached.
-  */
-
-  errcode = libusb_kernel_driver_active(printer->handle, printer->iface);
-  if (errcode == 0)
-    printer->usblp_attached = 0;
-  else if (errcode == 1)
-  {
-    printer->usblp_attached = 1;
-    if ((errcode =
-	 libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
-    {
-      fprintf(stderr, "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
-	      devdesc.idVendor, devdesc.idProduct);
-      goto error;
-    }
-  }
-  else
-  {
-    printer->usblp_attached = 0;
-
-    if (errcode != LIBUSB_ERROR_NOT_SUPPORTED)
-    {
-      fprintf(stderr,
-              "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" "
-              "kernel module attached\n", devdesc.idVendor, devdesc.idProduct);
-      goto error;
     }
   }
 

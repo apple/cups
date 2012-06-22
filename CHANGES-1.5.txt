@@ -4,6 +4,7 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.4
 
 	- Documentation updates (STR #4112)
+	- Fixed a crash in the libusb-based USB backend (STR #4099)
 	- The cups-lpd mini-daemon no longer handled jobs with multiple copies
 	  (STR #4118)
 	- Multiple libusb backend fixes (STR #4098, STR #4100)
