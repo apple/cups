@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.4
 
 	- Documentation updates (STR #4112)
+	- Localized empty strings contained the message catalog metadata
+	  (STR #4119)
 	- Fixed a crash in the libusb-based USB backend (STR #4099)
 	- The cups-lpd mini-daemon no longer handled jobs with multiple copies
 	  (STR #4118)
