@@ -3,7 +3,7 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
-	- Documentation updates (STR #4112, STR #4130, STR #4131, STR #4134)
+	- Documentation updates (STR #4112, STR #4130, STR #4134)
 	- Fixes for libusb-based USB backend (STR #4128)
 	- The lpq command did not show the owner or title of jobs unless passed
 	  a username on the command-line (STR #4135)
