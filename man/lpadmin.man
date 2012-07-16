@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "CUPS" "10 May 2011" "Apple Inc."
+.TH lpadmin 8 "CUPS" "16 July 2012" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -182,10 +182,9 @@ user-level access control off.
 .TP 5
 -v "device-uri"
 .br
-Sets the \fIdevice-uri\fR attribute of the printer queue.  If
-\fIdevice-uri\fR is a filename it is automatically converted to
-the form \fIfile:///file/name\fR. Use the \fI-v\fR option with the
-\fIlpinfo(8)\fR command to get a list of supported device URIs and schemes.
+Sets the \fIdevice-uri\fR attribute of the printer queue. Use the \fI-v\fR
+option with the \fIlpinfo(8)\fR command to get a list of supported device URIs
+and schemes.
 .TP 5
 -D "info"
 .br
