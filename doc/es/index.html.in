@@ -32,7 +32,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <H1>CUPS @CUPS_VERSION@</H1>
 
 <P>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en
-est&aacute;ndares desarrollado por <A HREF="http://www.apple.com/">Apple Inc.</A> para Mac
+est&aacute;ndares desarrollado por <A HREF="http://www.apple.com/">Apple Inc.</A> para
 OS<SUP>&reg;</SUP> X y otros sistemas operativos tipo UNIX<SUP>&reg;</SUP>.</P>
 
 </TD>

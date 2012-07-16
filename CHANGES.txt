@@ -4,7 +4,7 @@ CHANGES.txt - 1.6.0 - 2012-07-16
 CHANGES IN CUPS V1.6.0
 
 	- Document changes (STR #4131)
-	- Added a new Spanish localization (STR #4137)
+	- Added new Catalan (STR #4107) and Spanish (STR #4137) localizations.
 
 
 CHANGES IN CUPS V1.6rc1

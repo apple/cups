@@ -32,7 +32,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <H1>CUPS @CUPS_VERSION@</H1>
 
 <P>CUPS is the standards-based, open source printing system developed by
-<A HREF="http://www.apple.com/">Apple Inc.</A> for Mac OS<SUP>&reg;</SUP> X and
+<A HREF="http://www.apple.com/">Apple Inc.</A> for OS<SUP>&reg;</SUP> X and
 other UNIX<SUP>&reg;</SUP>-like operating systems.</P>
 
 </TD>

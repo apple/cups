@@ -31,7 +31,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 
 <H1>CUPS @CUPS_VERSION@</H1>
 
-<P>CUPS は、Mac OS<SUP>&reg;</SUP> X およびその他の UNIX <SUP>&reg;</SUP> 系 OS のために、
+<P>CUPS は、OS<SUP>&reg;</SUP> X およびその他の UNIX <SUP>&reg;</SUP> 系 OS のために、
 <A HREF="http://www.apple.com/">Apple Inc.</A>
 によって開発された標準ベースのオープンソース印刷システムです。</P>
 
