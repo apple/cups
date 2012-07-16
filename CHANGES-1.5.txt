@@ -4,6 +4,8 @@ CHANGES-1.5.txt
 CHANGES IN CUPS V1.5.4
 
 	- Documentation updates (STR #4112)
+	- The lpq command did not show the owner or title of jobs unless passed
+	  a username on the command-line (STR #4135)
 	- Localized empty strings contained the message catalog metadata
 	  (STR #4119)
 	- Fixed a crash in the libusb-based USB backend (STR #4099)

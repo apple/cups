@@ -3,7 +3,7 @@
  *
  *   "lpq" command for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -371,6 +371,7 @@ show_jobs(const char *command,		/* I - Command name */
   *    attributes-natural-language
   *    job-uri or printer-uri
   *    requested-attributes
+  *    requesting-user-name
   */
 
   request = ippNewRequest(id ? IPP_GET_JOB_ATTRIBUTES : IPP_GET_JOBS);
@@ -399,6 +400,9 @@ show_jobs(const char *command,		/* I - Command name */
                  "requesting-user-name", NULL, user);
     ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
   }
+  else
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+                 "requesting-user-name", NULL, cupsUser());
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes",
@@ -447,8 +451,8 @@ show_jobs(const char *command,		/* I - Command name */
       jobpriority = 50;
 #endif /* __osf__ */
       jobstate    = IPP_JOB_PENDING;
-      jobname     = "untitled";
-      jobuser     = NULL;
+      jobname     = "unknown";
+      jobuser     = "unknown";
       jobdest     = NULL;
       jobcopies   = 1;
 
