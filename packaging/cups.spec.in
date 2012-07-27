@@ -27,6 +27,7 @@
 
 %{!?_with_dnssd: %{!?_without_dnssd: %define _without_dnssd --without-dnssd}}
 %{?_with_dnssd: %define _dnssd --enable-dnssd}
+%{?_with_dnssd: %define _dnssd_backend /usr/lib/cups/backend/dnssd}
 %{!?_with_dnssd: %define _dnssd --disable-dnssd}
 
 %{!?_with_static: %{!?_without_static: %define _without_static --without-static}}
@@ -178,9 +179,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/lp*
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
-%if %{?_with_dnssd:1}%{!?_with_dnssd:0}
-/usr/lib/cups/backend/dnssd
-%endif
+%{_dnssd_backend}
 /usr/lib/cups/backend/http
 /usr/lib/cups/backend/https
 %attr(0700,root,root) /usr/lib/cups/backend/ipp
