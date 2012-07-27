@@ -1,5 +1,10 @@
-CHANGES.txt - 1.6.0 - 2012-07-16
+CHANGES.txt - 1.6.1 - 2012-07-27
 --------------------------------
+
+CHANGES IN CUPS V1.6.1
+
+	- RPM packaging fixes (STR #4145)
+
 
 CHANGES IN CUPS V1.6.0
 
