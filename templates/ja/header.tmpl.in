@@ -14,12 +14,12 @@
 <TR HEIGHT="36">
 <TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
 SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
-<TD CLASS="unsel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=admin?:un}sel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=classes?:un}sel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Help&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=jobs?:un}sel"><A HREF="/jobs/">&nbsp;&nbsp;Jobs&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=printers?:un}sel"><A HREF="/printers/">&nbsp;&nbsp;Printers&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/">&nbsp;&nbsp;ホーム&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=admin?:un}sel"><A HREF="/admin">&nbsp;&nbsp;管理&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=classes?:un}sel"><A HREF="/classes/">&nbsp;&nbsp;クラス&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;ヘルプ&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=jobs?:un}sel"><A HREF="/jobs/">&nbsp;&nbsp;ジョブ&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=printers?:un}sel"><A HREF="/printers/">&nbsp;&nbsp;プリンター&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
 TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
 VALUE="{SECTION=help?{?QUERY}:}" AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
