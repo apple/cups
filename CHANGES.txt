@@ -3,6 +3,7 @@ CHANGES.txt - 1.6.1 - 2012-07-27
 
 CHANGES IN CUPS V1.6.1
 
+	- Documentation fix (STR #4149)
 	- RPM packaging fixes (STR #4145)
 	- The Japanese and English web interface headers were swapped
 	  (STR #4148)
