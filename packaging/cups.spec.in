@@ -25,7 +25,7 @@
 %{?_with_dbus: %define _dbus --enable-dbus}
 %{!?_with_dbus: %define _dbus --disable-dbus}
 
-%{!?_with_dnssd: %{!?_without_dnssd: %define _without_dnssd --without-dnssd}}
+%{!?_with_dnssd: %{!?_without_dnssd: %define _with_dnssd --with-dnssd}}
 %{?_with_dnssd: %define _dnssd --enable-dnssd}
 %{!?_with_dnssd: %define _dnssd --disable-dnssd}
 
