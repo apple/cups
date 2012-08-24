@@ -3,7 +3,7 @@
 //
 //   Driver info file for CUPS-supplied PPDs.
 //
-//   Copyright 2007-2011 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 1993-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -103,7 +103,7 @@
 #media "w576h468/8.00x6.50\"" 576 468
 
 // Common stuff for all drivers...
-Attribute "cupsVersion" "" "1.6"
+Attribute "cupsVersion" "" "1.7"
 Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
