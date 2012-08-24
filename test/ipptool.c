@@ -2660,9 +2660,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		get_variable(vars, statuses[i].if_not_defined))
 	      continue;
 
-	    add_stringf(errors, "EXPECTED: STATUS %s (got %s)",
-			ippErrorString(statuses[i].status),
-			ippErrorString(cupsLastError()));
+            if (!statuses[i].repeat_match)
+	      add_stringf(errors, "EXPECTED: STATUS %s (got %s)",
+			  ippErrorString(statuses[i].status),
+			  ippErrorString(cupsLastError()));
 	  }
 
 	  if ((attrptr = ippFindAttribute(response, "status-message",
@@ -2726,7 +2727,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
+	    else if (!expect->define_match && !expect->define_value &&
+	             !expect->repeat_match && !expect->repeat_no_match)
 	    {
 	      if (expect->with_flags & _CUPS_WITH_REGEX)
 		add_stringf(errors, "EXPECTED: %s %s /%s/",

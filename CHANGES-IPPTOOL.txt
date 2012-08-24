@@ -1,8 +1,14 @@
-CHANGES-IPPTOOL.txt - 2012-02-28
+CHANGES-IPPTOOL.txt - 2012-08-23
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2012-MM-DD
+
+	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
+	  out.
 
 
 2012-02-28
