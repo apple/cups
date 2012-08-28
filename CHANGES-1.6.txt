@@ -3,6 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
+	- Some Bonjour features were not available on systems with Avahi
+	  (STR #4156)
 	- CUPS now includes the port number in the Host: header for HTTP
 	  requests.
 	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
