@@ -70,7 +70,7 @@ typedef struct usb_printer_s		/**** USB Printer Data ****/
 			read_endp,	/* Read endpoint */
 			protocol,	/* Protocol: 1 = Uni-di, 2 = Bi-di. */
 			usblp_attached,	/* "usblp" kernel module attached? */
-			opened_for_job;	/* Set to 1 by print_device() */
+			reset_after_job; /* Set to 1 by print_device() */
   unsigned int		quirks;		/* Quirks flags */
   struct libusb_device_handle *handle;	/* Open handle to device */
 } usb_printer_t;
@@ -122,6 +122,8 @@ struct quirk_printer_struct {
 #define USBLP_QUIRK_USB_INIT	0x2	/* needs vendor USB init string */
 #define USBLP_QUIRK_BAD_CLASS	0x4	/* descriptor uses vendor-specific
 					   Class or SubClass */
+#define USBLP_QUIRK_RESET	0x4000	/* After printing do a reset
+					   for clean-up */
 #define USBLP_QUIRK_NO_REATTACH	0x8000	/* After printing we cannot re-attach
 					   the usblp kernel module */
 
@@ -141,15 +143,21 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x0409, 0xf1be, USBLP_QUIRK_BIDIR }, /* NEC Picty800 (HP OEM) */
 	{ 0x0482, 0x0010, USBLP_QUIRK_BIDIR }, /* Kyocera Mita FS 820,
 						  by zut <kernel@zut.de> */
+	{ 0x04a9, 0x10a2, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4200
+			    Printer, http://www.cups.org/str.php?L4155 */
+	{ 0x04a9, 0x10b6, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4300
+			    Printer, https://bugs.launchpad.net/bugs/1032385 */
 	{ 0x04f9, 0x000d, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
 						  HL-1440 Laser Printer */
 	{ 0x04b8, 0x0202, USBLP_QUIRK_BAD_CLASS }, /* Seiko Epson Receipt
 						      Printer M129C */
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
-			  USBLP_QUIRK_NO_REATTACH },
+			  USBLP_QUIRK_NO_REATTACH |
+	                  USBLP_QUIRK_RESET },
 	/* Prolific Technology, Inc. PL2305 Parallel Port
 	   (USB -> Parallel adapter) */
+	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices */
 	{ 0, 0 }
 };
 
@@ -256,7 +264,12 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
   g.print_fd = print_fd;
-  g.printer->opened_for_job = 1;
+
+ /*
+  * Some devices need a reset after finishing a job, these devices are
+  * marked with the USBLP_QUIRK_RESET quirk.
+  */
+  g.printer->reset_after_job = (g.printer->quirks & USBLP_QUIRK_RESET ? 1 : 0);
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
@@ -772,7 +785,7 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     * Reset the device to clean up after the job
     */
 
-    if (printer->opened_for_job == 1)
+    if (printer->reset_after_job == 1)
     {
       if ((errcode = libusb_reset_device(printer->handle)) < 0)
 	fprintf(stderr,
@@ -1288,7 +1301,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   }
 
   printer->usblp_attached = 0;
-  printer->opened_for_job = 0;
+  printer->reset_after_job = 0;
 
   if (verbose)
     fputs("STATE: +connecting-to-device\n", stderr);
@@ -1586,7 +1599,8 @@ static unsigned int quirks(int vendor, int product)
   for (i = 0; quirk_printers[i].vendorId; i++)
   {
     if (vendor == quirk_printers[i].vendorId &&
-	product == quirk_printers[i].productId)
+	(quirk_printers[i].productId == 0x0000 ||
+	 product == quirk_printers[i].productId))
       return quirk_printers[i].quirks;
   }
   return 0;
