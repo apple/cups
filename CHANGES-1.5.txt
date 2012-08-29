@@ -3,6 +3,15 @@ CHANGES-1.5.txt
 
 CHANGES IN CUPS V1.5.4
 
+	- Documentation updates (STR #4112, STR #4130, STR #4134)
+	- Fixes for libusb-based USB backend (STR #4128)
+	- The lpq command did not show the owner or title of jobs unless passed
+	  a username on the command-line (STR #4135)
+	- Localized empty strings contained the message catalog metadata
+	  (STR #4119)
+	- Fixed a crash in the libusb-based USB backend (STR #4099)
+	- The cups-lpd mini-daemon no longer handled jobs with multiple copies
+	  (STR #4118)
 	- Multiple libusb backend fixes (STR #4098, STR #4100)
 	- The IPP backend no longer tries to get the job status for printers
 	  that do not implement the required operation (STR #4083)

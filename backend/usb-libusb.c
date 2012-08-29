@@ -13,7 +13,7 @@
  *
  * Contents:
  *
-﻿ *   list_devices()	  - List the available printers.
+ *   list_devices()	  - List the available printers.
  *   print_device()	  - Print a file to a USB device.
  *   close_device()	  - Close the connection to the USB printer.
  *   find_device()	  - Find or enumerate USB printers.
@@ -22,6 +22,9 @@
  *   make_device_uri()	  - Create a device URI for a USB printer.
  *   open_device()	  - Open a connection to the USB printer.
  *   print_cb() 	  - Find a USB printer for printing.
+ *   printer_class_soft_reset()' - Do the soft reset request specific to
+ *                          printers
+ *   quirks()	 	  - Get the known quirks of a given printer model
  *   read_thread()	  - Thread to read the backchannel data on.
  *   sidechannel_thread() - Handle side-channel requests.
  *   soft_reset()	  - Send a soft reset to the device.
@@ -60,13 +63,15 @@ typedef struct usb_printer_s		/**** USB Printer Data ****/
 {
   struct libusb_device	*device;	/* Device info */
   int			conf,		/* Configuration */
+			origconf,	/* Original configuration */
 			iface,		/* Interface */
 			altset,		/* Alternate setting */
 			write_endp,	/* Write endpoint */
-                        read_endp,	/* Read endpoint */
+			read_endp,	/* Read endpoint */
 			protocol,	/* Protocol: 1 = Uni-di, 2 = Bi-di. */
-                        usblp_attached; /* Is the "usblp" kernel module
-					   attached? */
+			usblp_attached,	/* "usblp" kernel module attached? */
+			reset_after_job; /* Set to 1 by print_device() */
+  unsigned int		quirks;		/* Quirks flags */
   struct libusb_device_handle *handle;	/* Open handle to device */
 } usb_printer_t;
 
@@ -99,6 +104,63 @@ typedef struct usb_globals_s
   int			sidechannel_thread_done;
 } usb_globals_t;
 
+/*
+ * Quirks: various printer quirks are handled by this table & its flags.
+ *
+ * This is copied from the usblp kernel module. So we can easily copy and paste
+ * new quirks from the module.
+ */
+
+struct quirk_printer_struct {
+	int vendorId;
+	int productId;
+	unsigned int quirks;
+};
+
+#define USBLP_QUIRK_BIDIR	0x1	/* reports bidir but requires
+					   unidirectional mode (no INs/reads) */
+#define USBLP_QUIRK_USB_INIT	0x2	/* needs vendor USB init string */
+#define USBLP_QUIRK_BAD_CLASS	0x4	/* descriptor uses vendor-specific
+					   Class or SubClass */
+#define USBLP_QUIRK_RESET	0x4000	/* After printing do a reset
+					   for clean-up */
+#define USBLP_QUIRK_NO_REATTACH	0x8000	/* After printing we cannot re-attach
+					   the usblp kernel module */
+
+static const struct quirk_printer_struct quirk_printers[] = {
+	{ 0x03f0, 0x0004, USBLP_QUIRK_BIDIR }, /* HP DeskJet 895C */
+	{ 0x03f0, 0x0104, USBLP_QUIRK_BIDIR }, /* HP DeskJet 880C */
+	{ 0x03f0, 0x0204, USBLP_QUIRK_BIDIR }, /* HP DeskJet 815C */
+	{ 0x03f0, 0x0304, USBLP_QUIRK_BIDIR }, /* HP DeskJet 810C/812C */
+	{ 0x03f0, 0x0404, USBLP_QUIRK_BIDIR }, /* HP DeskJet 830C */
+	{ 0x03f0, 0x0504, USBLP_QUIRK_BIDIR }, /* HP DeskJet 885C */
+	{ 0x03f0, 0x0604, USBLP_QUIRK_BIDIR }, /* HP DeskJet 840C */
+	{ 0x03f0, 0x0804, USBLP_QUIRK_BIDIR }, /* HP DeskJet 816C */
+	{ 0x03f0, 0x1104, USBLP_QUIRK_BIDIR }, /* HP Deskjet 959C */
+	{ 0x0409, 0xefbe, USBLP_QUIRK_BIDIR }, /* NEC Picty900 (HP OEM) */
+	{ 0x0409, 0xbef4, USBLP_QUIRK_BIDIR }, /* NEC Picty760 (HP OEM) */
+	{ 0x0409, 0xf0be, USBLP_QUIRK_BIDIR }, /* NEC Picty920 (HP OEM) */
+	{ 0x0409, 0xf1be, USBLP_QUIRK_BIDIR }, /* NEC Picty800 (HP OEM) */
+	{ 0x0482, 0x0010, USBLP_QUIRK_BIDIR }, /* Kyocera Mita FS 820,
+						  by zut <kernel@zut.de> */
+	{ 0x04a9, 0x10a2, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4200
+			    Printer, http://www.cups.org/str.php?L4155 */
+	{ 0x04a9, 0x10b6, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4300
+			    Printer, https://bugs.launchpad.net/bugs/1032385 */
+	{ 0x04f9, 0x000d, USBLP_QUIRK_BIDIR |
+			  USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
+						  HL-1440 Laser Printer */
+	{ 0x04b8, 0x0202, USBLP_QUIRK_BAD_CLASS }, /* Seiko Epson Receipt
+						      Printer M129C */
+	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
+			  USBLP_QUIRK_NO_REATTACH |
+	                  USBLP_QUIRK_RESET },
+	/* Prolific Technology, Inc. PL2305 Parallel Port
+	   (USB -> Parallel adapter) */
+	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices */
+	{ 0, 0 }
+};
+
 
 /*
  * Globals...
@@ -124,6 +186,8 @@ static char		*make_device_uri(usb_printer_t *printer,
 static int		open_device(usb_printer_t *printer, int verbose);
 static int		print_cb(usb_printer_t *printer, const char *device_uri,
 			         const char *device_id, const void *data);
+static int		printer_class_soft_reset(usb_printer_t *printer);
+static unsigned int	quirks(int vendor, int product);
 static void		*read_thread(void *reference);
 static void		*sidechannel_thread(void *reference);
 static void		soft_reset(void);
@@ -163,7 +227,8 @@ print_device(const char *uri,		/* I - Device URI */
 		iostatus;		/* Current IO status */
   pthread_t	read_thread_id,		/* Read thread */
 		sidechannel_thread_id;	/* Side-channel thread */
-  int		have_sidechannel = 0;	/* Was the side-channel thread started? */
+  int		have_sidechannel = 0,	/* Was the side-channel thread started? */
+		have_backchannel = 0;   /* Do we have a back channel? */
   struct stat   sidechannel_info;	/* Side-channel file descriptor info */
   unsigned char	print_buffer[8192],	/* Print data buffer */
 		*print_ptr;		/* Pointer into print data buffer */
@@ -172,6 +237,9 @@ print_device(const char *uri,		/* I - Device URI */
   struct timeval *timeout,		/* Timeout pointer */
 		tv;			/* Time value */
   struct timespec cond_timeout;		/* pthread condition timeout */
+  int		num_opts;		/* Number of options */
+  cups_option_t	*opts;			/* Options */
+  const char	*val;			/* Option value */
 
 
  /*
@@ -187,6 +255,7 @@ print_device(const char *uri,		/* I - Device URI */
   * Connect to the printer...
   */
 
+  fprintf(stderr, "DEBUG: Printing on printer with URI: %s\n", uri);
   while ((g.printer = find_device(print_cb, uri)) == NULL)
   {
     _cupsLangPrintFilter(stderr, "INFO",
@@ -195,6 +264,12 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
   g.print_fd = print_fd;
+
+ /*
+  * Some devices need a reset after finishing a job, these devices are
+  * marked with the USBLP_QUIRK_RESET quirk.
+  */
+  g.printer->reset_after_job = (g.printer->quirks & USBLP_QUIRK_RESET ? 1 : 0);
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
@@ -240,24 +315,61 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
  /*
+  * Debug mode: If option "usb-unidir" is given, always deactivate
+  * backchannel
+  */
+
+  num_opts = cupsParseOptions(argv[5], 0, &opts);
+  val = cupsGetOption("usb-unidir", num_opts, opts);
+  if (val && strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
+  {
+    g.printer->read_endp = -1;
+    fprintf(stderr, "DEBUG: Forced uni-directional communication "
+	    "via \"usb-unidir\" option.\n");
+  }
+
+ /*
+  * Debug mode: If option "usb-no-reattach" is given, do not re-attach
+  * the usblp kernel module after the job has completed.
+  */
+
+  val = cupsGetOption("usb-no-reattach", num_opts, opts);
+  if (val && strcasecmp(val, "no") && strcasecmp(val, "off") &&
+      strcasecmp(val, "false"))
+  {
+    g.printer->usblp_attached = 0;
+    fprintf(stderr, "DEBUG: Forced not re-attaching the usblp kernel module "
+	    "after the job via \"usb-no-reattach\" option.\n");
+  }
+
+ /*
   * Get the read thread going...
   */
 
-  g.read_thread_stop = 0;
-  g.read_thread_done = 0;
-
-  pthread_cond_init(&g.read_thread_cond, NULL);
-  pthread_mutex_init(&g.read_thread_mutex, NULL);
-
-  if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
+  if (g.printer->read_endp != -1)
   {
-    fprintf(stderr, "DEBUG: Fatal USB error.\n");
-    _cupsLangPrintFilter(stderr, "ERROR",
-                         _("There was an unrecoverable USB error."));
-    fputs("DEBUG: Couldn't create read thread.\n", stderr);
-    close_device(g.printer);
-    return (CUPS_BACKEND_STOP);
+    have_backchannel = 1;
+
+    g.read_thread_stop = 0;
+    g.read_thread_done = 0;
+
+    pthread_cond_init(&g.read_thread_cond, NULL);
+    pthread_mutex_init(&g.read_thread_mutex, NULL);
+
+    if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
+    {
+      fprintf(stderr, "DEBUG: Fatal USB error.\n");
+      _cupsLangPrintFilter(stderr, "ERROR",
+			   _("There was an unrecoverable USB error."));
+      fputs("DEBUG: Couldn't create read thread.\n", stderr);
+      close_device(g.printer);
+      return (CUPS_BACKEND_STOP);
+    }
   }
+  else
+    fprintf(stderr, "DEBUG: Uni-directional device/mode, back channel "
+	    "deactivated.\n");
 
  /*
   * The main thread sends the print file...
@@ -515,38 +627,18 @@ print_device(const char *uri,		/* I - Device URI */
   * Signal the read thread to exit then wait 7 seconds for it to complete...
   */
 
-  g.read_thread_stop = 1;
-
-  pthread_mutex_lock(&g.read_thread_mutex);
-
-  if (!g.read_thread_done)
+  if (have_backchannel)
   {
-    fputs("DEBUG: Waiting for read thread to exit...\n", stderr);
+    g.read_thread_stop = 1;
 
-    gettimeofday(&tv, NULL);
-    cond_timeout.tv_sec  = tv.tv_sec + WAIT_EOF_DELAY;
-    cond_timeout.tv_nsec = tv.tv_usec * 1000;
-
-    while (!g.read_thread_done)
-    {
-      if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
-				 &cond_timeout) != 0)
-	break;
-    }
-
-   /*
-    * If it didn't exit abort the pending read and wait an additional second...
-    */
+    pthread_mutex_lock(&g.read_thread_mutex);
 
     if (!g.read_thread_done)
     {
-      fputs("DEBUG: Read thread still active, aborting the pending read...\n",
-	    stderr);
-
-      g.wait_eof = 0;
+      fputs("DEBUG: Waiting for read thread to exit...\n", stderr);
 
       gettimeofday(&tv, NULL);
-      cond_timeout.tv_sec  = tv.tv_sec + 1;
+      cond_timeout.tv_sec  = tv.tv_sec + WAIT_EOF_DELAY;
       cond_timeout.tv_nsec = tv.tv_usec * 1000;
 
       while (!g.read_thread_done)
@@ -555,10 +647,34 @@ print_device(const char *uri,		/* I - Device URI */
 				   &cond_timeout) != 0)
 	  break;
       }
-    }
-  }
 
-  pthread_mutex_unlock(&g.read_thread_mutex);
+      /*
+       * If it didn't exit abort the pending read and wait an additional
+       * second...
+       */
+  
+      if (!g.read_thread_done)
+      {
+	fputs("DEBUG: Read thread still active, aborting the pending read...\n", 
+	      stderr);
+
+	g.wait_eof = 0;
+
+	gettimeofday(&tv, NULL);
+	cond_timeout.tv_sec  = tv.tv_sec + 1;
+	cond_timeout.tv_nsec = tv.tv_usec * 1000;
+  
+	while (!g.read_thread_done)
+	{
+	  if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+				     &cond_timeout) != 0)
+	    break;
+	}
+      }
+    }
+
+    pthread_mutex_unlock(&g.read_thread_mutex);
+  }
 
   if (print_fd)
     close(print_fd);
@@ -600,30 +716,85 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     * to the device...
     */
 
-    int number;				/* Interface number */
+    int errcode;			/* Return value of libusb function */
+    int number1,			/* Interface number */
+	number2;			/* Configuration number */
 
-    libusb_get_device_descriptor(printer->device, &devdesc);
-    libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
-    number = confptr->interface[printer->iface].
-                 altsetting[printer->altset].bInterfaceNumber;
-    libusb_release_interface(printer->handle, number);
-    if (number != 0)
-      libusb_release_interface(printer->handle, 0);
+    errcode =
+      libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
+    if (errcode >= 0)
+    {
+      number1 = confptr->interface[printer->iface].
+	altsetting[printer->altset].bInterfaceNumber;
+      libusb_release_interface(printer->handle, number1);
+
+      number2 = confptr->bConfigurationValue;
+
+      libusb_free_config_descriptor(confptr);
+
+     /*
+      * If we have changed the configuration from one valid configuration
+      * to another, restore the old one
+      */
+      if (printer->origconf > 0 && printer->origconf != number2)
+      {
+	fprintf(stderr, "DEBUG: Restoring USB device configuration: %d -> %d\n", 
+		number2, printer->origconf);
+	if ((errcode = libusb_set_configuration(printer->handle,
+						printer->origconf)) < 0)
+	{
+	  if (errcode != LIBUSB_ERROR_BUSY)
+	  {
+	    errcode =
+	      libusb_get_device_descriptor (printer->device, &devdesc);
+	    if (errcode < 0)
+	      fprintf(stderr,
+		      "DEBUG: Failed to set configuration %d\n",
+		      printer->origconf);
+	    else
+	      fprintf(stderr,
+		      "DEBUG: Failed to set configuration %d for %04x:%04x\n",
+		      printer->origconf, devdesc.idVendor, devdesc.idProduct);
+	  }
+	}
+      }
+
+     /*
+      * Re-attach "usblp" kernel module if it was attached before using this
+      * device
+      */
+      if (printer->usblp_attached == 1)
+	if (libusb_attach_kernel_driver(printer->handle, number1) < 0)
+	{
+	  errcode = libusb_get_device_descriptor (printer->device, &devdesc);
+	  if (errcode < 0)
+	    fprintf(stderr,
+		    "DEBUG: Failed to re-attach \"usblp\" kernel module\n");
+	  else
+	    fprintf(stderr,
+		    "DEBUG: Failed to re-attach \"usblp\" kernel module to "
+		    "%04x:%04x\n", devdesc.idVendor, devdesc.idProduct);
+	}
+    }
+    else
+      fprintf(stderr,
+	      "DEBUG: Failed to get configuration descriptor %d\n",
+	      printer->conf);
 
    /*
-    * Re-attach "usblp" kernel module if it was attached before using this
-    * device
+    * Reset the device to clean up after the job
     */
 
-    if (printer->usblp_attached == 1)
+    if (printer->reset_after_job == 1)
     {
-      if (libusb_attach_kernel_driver(printer->handle, printer->iface) < 0)
+      if ((errcode = libusb_reset_device(printer->handle)) < 0)
 	fprintf(stderr,
-	        "DEBUG: Failed to re-attach \"usblp\" kernel module to "
-	        "%04x:%04x\n", devdesc.idVendor, devdesc.idProduct);
+		"DEBUG: Device reset failed, error code: %d\n",
+		errcode);
+      else
+	fprintf(stderr,
+		"DEBUG: Resetting printer.\n");
     }
-
-    libusb_free_config_descriptor(confptr);
 
    /*
     * Close the interface and return...
@@ -694,11 +865,14 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
       * a printer...
       */
 
-      libusb_get_device_descriptor(device, &devdesc);
+      if (libusb_get_device_descriptor(device, &devdesc) < 0)
+	continue;
 
       if (!devdesc.bNumConfigurations || !devdesc.idVendor ||
           !devdesc.idProduct)
 	continue;
+
+      printer.quirks   = quirks(devdesc.idVendor, devdesc.idProduct);
 
       for (conf = 0; conf < devdesc.bNumConfigurations; conf ++)
       {
@@ -724,12 +898,17 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	    * 1284.4 (packet mode) protocol as well.
 	    */
 
-	    if (altptr->bInterfaceClass != LIBUSB_CLASS_PRINTER ||
-	        altptr->bInterfaceSubClass != 1 ||
+	    if (((altptr->bInterfaceClass != LIBUSB_CLASS_PRINTER ||
+		  altptr->bInterfaceSubClass != 1) && 
+		 ((printer.quirks & USBLP_QUIRK_BAD_CLASS) == 0)) ||
 		(altptr->bInterfaceProtocol != 1 &&	/* Unidirectional */
 		 altptr->bInterfaceProtocol != 2) ||	/* Bidirectional */
 		altptr->bInterfaceProtocol < protocol)
 	      continue;
+
+	    if (printer.quirks & USBLP_QUIRK_BAD_CLASS)
+	      fprintf(stderr, "DEBUG: Printer does not report class 7 and/or "
+		      "subclass 1 but works as a printer anyway\n");
 
 	    read_endp  = -1;
 	    write_endp = -1;
@@ -755,7 +934,10 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
               protocol           = altptr->bInterfaceProtocol;
 	      printer.altset     = altset;
 	      printer.write_endp = write_endp;
-	      printer.read_endp  = read_endp;
+	      if (protocol > 1)
+		printer.read_endp = read_endp;
+	      else
+		printer.read_endp = -1;
 	    }
 	  }
 
@@ -773,16 +955,41 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	      make_device_uri(&printer, device_id, device_uri,
 			      sizeof(device_uri));
 
+	      fprintf(stderr, "DEBUG2: Printer found with device ID: %s "
+		      "Device URI: %s\n",
+		      device_id, device_uri);
+
 	      if ((*cb)(&printer, device_uri, device_id, data))
 	      {
-		printer.read_endp  = confptr->interface[printer.iface].
-					   altsetting[printer.altset].
-					   endpoint[printer.read_endp].
-					   bEndpointAddress;
+		fprintf(stderr, "DEBUG: Device protocol: %d\n",
+			printer.protocol);
+		if (printer.quirks & USBLP_QUIRK_BIDIR)
+		{
+		  printer.read_endp = -1;
+		  fprintf(stderr, "DEBUG: Printer reports bi-di support "
+			  "but in reality works only uni-directionally\n");
+		}
+		if (printer.read_endp != -1)
+		{
+		  printer.read_endp = confptr->interface[printer.iface].
+					    altsetting[printer.altset].
+					    endpoint[printer.read_endp].
+					    bEndpointAddress;
+		}
+		else
+		  fprintf(stderr, "DEBUG: Uni-directional USB communication " 
+			  "only!\n");
 		printer.write_endp = confptr->interface[printer.iface].
 					   altsetting[printer.altset].
 					   endpoint[printer.write_endp].
 					   bEndpointAddress;
+		if (printer.quirks & USBLP_QUIRK_NO_REATTACH)
+		{
+		  printer.usblp_attached = 0;
+		  fprintf(stderr, "DEBUG: Printer does not like usblp "
+			  "kernel module to be re-attached after job\n");
+		}
+		libusb_free_config_descriptor(confptr);
 		return (&printer);
               }
 
@@ -1086,15 +1293,20 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   * Try opening the printer...
   */
 
-  if (libusb_open(printer->device, &printer->handle) < 0)
+  if ((errcode = libusb_open(printer->device, &printer->handle)) < 0)
+  {
+    fprintf(stderr, "DEBUG: Failed to open device, code: %d\n",
+	    errcode);
     return (-1);
+  }
 
   printer->usblp_attached = 0;
+  printer->reset_after_job = 0;
 
   if (verbose)
     fputs("STATE: +connecting-to-device\n", stderr);
 
-  if ((errcode = libusb_get_device_descriptor (printer->device, &devdesc)) < 0)
+  if ((errcode = libusb_get_device_descriptor(printer->device, &devdesc)) < 0)
   {
     fprintf(stderr, "DEBUG: Failed to get device descriptor, code: %d\n",
 	    errcode);
@@ -1142,12 +1354,22 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 		0, 0, (unsigned char *)&current, 1, 5000) < 0)
     current = 0;			/* Assume not configured */
 
-  libusb_get_device_descriptor(printer->device, &devdesc);
-  libusb_get_config_descriptor(printer->device, printer->conf, &confptr);
+  printer->origconf = current;
+
+  if ((errcode = 
+       libusb_get_config_descriptor (printer->device, printer->conf, &confptr))
+      < 0)
+  {
+    fprintf(stderr, "DEBUG: Failed to get config descriptor for %04x:%04x\n",
+	    devdesc.idVendor, devdesc.idProduct);
+    goto error;
+  }
   number1 = confptr->bConfigurationValue;
 
   if (number1 != current)
   {
+    fprintf(stderr, "DEBUG: Switching USB device configuration: %d -> %d\n", 
+	    current, number1);
     if ((errcode = libusb_set_configuration(printer->handle, number1)) < 0)
     {
      /*
@@ -1159,38 +1381,6 @@ open_device(usb_printer_t *printer,	/* I - Printer */
       if (errcode != LIBUSB_ERROR_BUSY)
         fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
 		number1, devdesc.idVendor, devdesc.idProduct);
-    }
-  }
-
- /*
-  * Get the "usblp" kernel module out of the way. This backend only
-  * works without the module attached.
-  */
-
-  errcode = libusb_kernel_driver_active(printer->handle, printer->iface);
-  if (errcode == 0)
-    printer->usblp_attached = 0;
-  else if (errcode == 1)
-  {
-    printer->usblp_attached = 1;
-    if ((errcode =
-	 libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
-    {
-      fprintf(stderr, "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
-	      devdesc.idVendor, devdesc.idProduct);
-      goto error;
-    }
-  }
-  else
-  {
-    printer->usblp_attached = 0;
-
-    if (errcode != LIBUSB_ERROR_NOT_SUPPORTED)
-    {
-      fprintf(stderr,
-              "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" "
-              "kernel module attached\n", devdesc.idVendor, devdesc.idProduct);
-      goto error;
     }
   }
 
@@ -1355,6 +1545,65 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
   }
 
   return (!strcmp(requested_uri, detected_uri));
+}
+
+
+/*
+ * 'printer_class_soft_reset()' - Do the soft reset request specific to printers
+ *
+ * This soft reset is specific to the printer device class and is much less
+ * invasive than the general USB reset libusb_reset_device(). Especially it
+ * does never happen that the USB addressing and configuration changes. What
+ * is actually done is that all buffers get flushed and the bulk IN and OUT
+ * pipes get reset to their default states. This clears all stall conditions.
+ * See http://cholla.mmto.org/computers/linux/usb/usbprint11.pdf
+ */
+
+static int				/* O - 0 on success, < 0 on error */
+printer_class_soft_reset(usb_printer_t *printer) /* I - Printer */
+{
+  struct libusb_config_descriptor *confptr = NULL;
+                                        /* Pointer to current configuration */
+  int interface,
+      errcode;
+
+  if (libusb_get_config_descriptor(printer->device, printer->conf, &confptr)
+      < 0)
+    interface = printer->iface;
+  else
+    interface = confptr->interface[printer->iface].
+      altsetting[printer->altset].bInterfaceNumber;
+  libusb_free_config_descriptor(confptr);
+  if ((errcode = libusb_control_transfer(printer->handle,
+					 LIBUSB_REQUEST_TYPE_CLASS |
+					 LIBUSB_ENDPOINT_OUT |
+					 LIBUSB_RECIPIENT_OTHER,
+					 2, 0, interface, NULL, 0, 5000)) < 0)
+    errcode = libusb_control_transfer(printer->handle,
+				      LIBUSB_REQUEST_TYPE_CLASS |
+				      LIBUSB_ENDPOINT_OUT |
+				      LIBUSB_RECIPIENT_INTERFACE,
+				      2, 0, interface, NULL, 0, 5000);
+  return errcode;
+}
+
+
+/*
+ * 'quirks()' - Get the known quirks of a given printer model
+ */
+
+static unsigned int quirks(int vendor, int product)
+{
+  int i;
+
+  for (i = 0; quirk_printers[i].vendorId; i++)
+  {
+    if (vendor == quirk_printers[i].vendorId &&
+	(quirk_printers[i].productId == 0x0000 ||
+	 product == quirk_printers[i].productId))
+      return quirk_printers[i].quirks;
+  }
+  return 0;
 }
 
 
@@ -1632,7 +1881,7 @@ static void soft_reset(void)
   * Send the reset...
   */
 
-  libusb_reset_device (g.printer->handle);
+  printer_class_soft_reset(g.printer);
 
  /*
   * Release the I/O lock...

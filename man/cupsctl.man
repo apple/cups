@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsctl 8 "CUPS" "10 January 2011" "Apple Inc."
+.TH cupsctl 8 "CUPS" "16 July 2012" "Apple Inc."
 .SH NAME
 cupsctl \- configure cupsd.conf options
 .SH SYNOPSIS
@@ -22,7 +22,7 @@ cupsctl \- configure cupsd.conf options
 ] [ -h
 .I server[:port]
 ] [ --[no-]debug-logging ] [ --[no-]remote-admin ] [ --[no-]remote-any ]
-[ --[no-]remote-printers ] [ --[no-]share-printers ] [ --[no-]user-cancel-any ]
+[ --[no-]share-printers ] [ --[no-]user-cancel-any ]
 [
 .I name=value
 ]
@@ -56,11 +56,6 @@ Enables or disables remote administration.
 --[no-]remote-any
 .br
 Enables or disables printing from any address, e.g. the Internet.
-.TP 5
---[no-]remote-printers
-.br
-Enables or disables the display of remote printers shared via the CUPS, LDAP,
-or SLP protocols.
 .TP 5
 --[no-]share-printers
 .br

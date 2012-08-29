@@ -60,6 +60,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
 #ifdef HAVE_SANDBOX_H
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
  /*
   * Run in a separate security profile...
   */

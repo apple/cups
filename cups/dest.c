@@ -2679,8 +2679,10 @@ cups_dnssd_browse_cb(
     AvahiLookupResultFlags flags,	/* I - Flags */
     void                   *context)	/* I - Devices array */
 {
+#ifdef DEBUG
   AvahiClient		*client = avahi_service_browser_get_client(browser);
 					/* Client information */
+#endif /* DEBUG */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */
 
@@ -3064,8 +3066,10 @@ cups_dnssd_query_cb(
     AvahiLookupResultFlags flags,	/* I - Flags */
     void                   *context)	/* I - Enumeration data */
 {
+#    ifdef DEBUG
   AvahiClient		*client = avahi_record_browser_get_client(browser);
 					/* Client information */
+#    endif /* DEBUG */
 #  endif /* HAVE_DNSSD */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */

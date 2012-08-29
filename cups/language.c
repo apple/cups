@@ -788,7 +788,7 @@ _cupsLangString(cups_lang_t *lang,	/* I - Language */
   * Range check input...
   */
 
-  if (!lang || !message)
+  if (!lang || !message || !*message)
     return (message);
 
   _cupsMutexLock(&lang_mutex);

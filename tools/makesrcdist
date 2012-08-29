@@ -26,9 +26,9 @@ if test $# = 0; then
 
 	# Compute version for snapshot
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
-	version="1.6svn"
+	version="1.7svn"
 	revision="-r$rev"
-	fileversion="1.6svn-r$rev"
+	fileversion="1.7svn-r$rev"
 	fileurl="http://ftp.easysw.com/pub/cups/test/cups-$fileversion-source.tar."
 	url="."
 else
@@ -41,8 +41,8 @@ else
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
 	echo Validating sources...
-	cupsversionpatch=`echo $version | awk -F. '{print $3}'`
-	cupsversion=`printf "1.06%02d" $cupsversionpatch`
+	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
+	cupsversion=`printf "1.07%02d" $cupsversionpatch`
 
 	temp=`grep CUPS_VERSION cups/cups.h | grep -v CUPS_VERSION_ | awk '{print $4}'`
 	if test "$temp" != $cupsversion; then

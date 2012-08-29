@@ -169,7 +169,7 @@ static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
-static int		run_as_user(int argc, char *argv[], uid_t uid,
+static int		run_as_user(char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static void		sigterm_handler(int sig);
@@ -348,7 +348,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (uid > 0)
     {
       if (argc == 6)
-        return (run_as_user(argc, argv, uid, device_uri, 0));
+        return (run_as_user(argv, uid, device_uri, 0));
       else
       {
         int status = 0;			/* Exit status */
@@ -357,7 +357,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  if ((fd = open(argv[i], O_RDONLY)) >= 0)
 	  {
-	    status = run_as_user(argc, argv, uid, device_uri, fd);
+	    status = run_as_user(argv, uid, device_uri, fd);
 	    close(fd);
 	  }
 	  else
@@ -1080,7 +1080,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  get_job_attrs = 1;
       }
 
-      if (!send_document)
+      if (create_job && !send_document)
       {
         fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
               stderr);
@@ -2839,8 +2839,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
  */
 
 static int				/* O - Exit status */
-run_as_user(int        argc,		/* I - Number of command-line args */
-	    char       *argv[],		/* I - Command-line arguments */
+run_as_user(char       *argv[],		/* I - Command-line arguments */
 	    uid_t      uid,		/* I - User ID */
 	    const char *device_uri,	/* I - Device URI */
 	    int        fd)		/* I - File to print */

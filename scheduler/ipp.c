@@ -4813,7 +4813,7 @@ copy_printer_attrs(
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
 
-#ifdef HAVE_DNSSD
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   if (!ra || cupsArrayFind(ra, "printer-dns-sd-name"))
   {
     if (printer->reg_name)
@@ -4823,7 +4823,7 @@ copy_printer_attrs(
       ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
                    "printer-dns-sd-name", 0);
   }
-#endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 
   if (!ra || cupsArrayFind(ra, "printer-error-policy"))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
