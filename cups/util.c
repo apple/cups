@@ -1636,6 +1636,7 @@ cups_get_printer_uri(
 					/* Hostname associated with connection */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
+		  "device-uri",
 		  "member-uris",
 		  "printer-uri-supported",
 		  "printer-type"
@@ -1696,7 +1697,32 @@ cups_get_printer_uri(
 
   if ((response = cupsDoRequest(http, request, "/")) != NULL)
   {
-    if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
+    const char *device_uri = NULL;	/* device-uri value */
+
+    if ((attr = ippFindAttribute(response, "device-uri",
+                                 IPP_TAG_URI)) != NULL)
+      device_uri = attr->values[0].string.text;
+
+    if (device_uri &&
+        ((strstr(device_uri, "._ipp.") != NULL ||
+          strstr(device_uri, "._ipps.") != NULL) &&
+         !strcmp(device_uri + strlen(device_uri) - 5, "/cups")))
+    {
+     /*
+      * Statically-configured Bonjour shared printer.
+      */
+
+      httpSeparateURI(HTTP_URI_CODING_ALL,
+                      _httpResolveURI(device_uri, uri, sizeof(uri),
+                                      _HTTP_RESOLVE_DEFAULT, NULL, NULL),
+                      scheme, sizeof(scheme), username, sizeof(username),
+		      host, hostsize, port, resource, resourcesize);
+      ippDelete(response);
+
+      return (1);
+    }
+    else if ((attr = ippFindAttribute(response, "member-uris",
+                                      IPP_TAG_URI)) != NULL)
     {
      /*
       * Get the first actual printer name in the class...

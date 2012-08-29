@@ -3,8 +3,10 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
-	- The scheduler did not recognize dnssd: or ipps: URIs as CUPS shared
+	- The scheduler did not recognize dnssd: or ipps: URIs as Bonjour shared
 	  queues (STR #4158)
+	- Applications could not get the PPD file for statically-configured
+	  Bonjour-shared print queues (STR #4159)
 	- The cupsd.conf file included obsolete browsing directives (STR #4157)
 	- Fixed a USB backend compatibility issue on systems using libusb
 	  (STR #4155)
