@@ -2449,7 +2449,7 @@ appleCopyNetwork(void)
  * 'appleGetPaperSize()' - Get the default paper size.
  */
 
-char *					/* O - Default paper size */
+static char *				/* O - Default paper size */
 appleGetPaperSize(char *name,		/* I - Paper size name buffer */
                   int  namesize)	/* I - Size of buffer */
 {
