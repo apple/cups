@@ -1410,13 +1410,13 @@ changed.<br>
 Returns 1 if there is a conflict, 0 if there are no conflicts, and -1 if
 there was an unrecoverable error such as a resolver loop.<br>
 <br>
-If &quot;num_conflicts&quot; and &quot;conflicts&quot; are not NULL, they are set to contain the
-list of conflicting option/value pairs.  Similarly, if &quot;num_resolved&quot; and
-&quot;resolved&quot; are not NULL they will be set to the list of changes needed to
-resolve the conflict.<br>
+If &quot;num_conflicts&quot; and &quot;conflicts&quot; are not <code>NULL</code>, they are set to
+contain the list of conflicting option/value pairs.  Similarly, if
+&quot;num_resolved&quot; and &quot;resolved&quot; are not <code>NULL</code> they will be set to the
+list of changes needed to resolve the conflict.<br>
 <br>
 If cupsCopyDestConflicts returns 1 but &quot;num_resolved&quot; and &quot;resolved&quot; are set
-to 0 and NULL, respectively, then the conflict cannot be resolved.
+to 0 and <code>NULL</code>, respectively, then the conflict cannot be resolved.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCopyDestInfo">cupsCopyDestInfo</a></h3>
@@ -1809,14 +1809,13 @@ int cupsGetDestMediaByName (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on match, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;media&quot; string is a PWG media name, while &quot;width&quot; and &quot;length&quot; are the
-dimensions in hundredths of millimeters.  &quot;flags&quot; provides some matching
+<p class="discussion">The &quot;media&quot; string is a PWG media name.  &quot;Flags&quot; provides some matching
 guidance (multiple flags can be combined):<br>
 <br>
-CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer
-CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size
-CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing
-CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size
+CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer,
+CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size,
+CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing,
+CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size, and
 CUPS_MEDIA_FLAGS_READY      = if the printer supports media sensing, find the
 size amongst the &quot;ready&quot; media.<br>
 <br>
@@ -1859,14 +1858,13 @@ of millimeters</dd>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on match, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;media&quot; string is a PWG media name, while &quot;width&quot; and &quot;length&quot; are the
-dimensions in hundredths of millimeters.  &quot;flags&quot; provides some matching
-guidance (multiple flags can be combined):<br>
+<p class="discussion">&quot;Width&quot; and &quot;length&quot; are the dimensions in hundredths of millimeters.
+&quot;Flags&quot; provides some matching guidance (multiple flags can be combined):<br>
 <br>
-CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer
-CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size
-CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing
-CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size
+CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer,
+CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size,
+CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing,
+CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size, and
 CUPS_MEDIA_FLAGS_READY      = if the printer supports media sensing, find the
 size amongst the &quot;ready&quot; media.<br>
 <br>
