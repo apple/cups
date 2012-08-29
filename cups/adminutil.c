@@ -65,7 +65,7 @@ static void		write_option(cups_file_t *dstfp, int order,
 /*
  * 'cupsAdminCreateWindowsPPD()' - Create the Windows PPD file for a printer.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @deprecated@
  */
 
 char *					/* O - PPD file or NULL */
@@ -393,7 +393,7 @@ cupsAdminCreateWindowsPPD(
 /*
  * 'cupsAdminExportSamba()' - Export a printer to Samba.
  *
- * @since CUPS 1.2/OS X 10.5@
+ * @deprecated@
  */
 
 int					/* O - 1 on success, 0 on failure */
