@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -163,7 +163,7 @@ cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
   if (!s || !*s)
     return (NULL);
   else
-    return (_cupsArrayNewStrings(s));
+    return (_cupsArrayNewStrings(s, ','));
 }
 
 

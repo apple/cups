@@ -410,7 +410,11 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsIPPFinishings">cupsIPPFinishings</a></li>
 	<li><a href="#cupsIPPReason">cupsIPPReason</a></li>
 	<li><a href="#cupsIPPSupplies">cupsIPPSupplies</a></li>
+	<li><a href="#cupsJobAccountId">cupsJobAccountId</a></li>
+	<li><a href="#cupsJobAccountingUserId">cupsJobAccountingUserId</a></li>
+	<li><a href="#cupsJobPassword">cupsJobPassword</a></li>
 	<li><a href="#cupsLanguages">cupsLanguages</a></li>
+	<li><a href="#cupsMandatory">cupsMandatory</a></li>
 	<li><a href="#cupsManualCopies">cupsManualCopies</a></li>
 	<li><a href="#cupsMarkerName">cupsMarkerName</a></li>
 	<li><a href="#cupsMarkerNotice">cupsMarkerNotice</a></li>
@@ -1706,6 +1710,49 @@ http://www.vendor.com/help"
 *cupsIPPSupplies: False
 </pre>
 
+
+<h3><span class='info'>CUPS 1.7</span><a name='cupsJobAccountId'>cupsJobAccountId</a></h3>
+
+<p class='summary'>*cupsJobAccountId: boolean</p>
+
+<p>This keyword defines whether the printer accepts the job-account-id IPP attribute.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer accepts the job-account-id IPP attribute.</em>
+*cupsJobAccountId: True
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7</span><a name='cupsJobAccountingUserId'>cupsJobAccountingUserId</a></h3>
+
+<p class='summary'>*cupsJobAccountingUserId: boolean</p>
+
+<p>This keyword defines whether the printer accepts the job-accounting-user-id IPP attribute.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer accepts the job-accounting-user-id IPP attribute.</em>
+*cupsJobAccountingUserId: True
+</pre>
+
+
+<h3><span class='info'>CUPS 1.7</span><a name='cupsJobPassword'>cupsJobPassword</a></h3>
+
+<p class='summary'>*cupsJobPassword: "format"</p>
+
+<p>This keyword defines the format of the job-password IPP attribute, if supported by the printer. Currently the only supported format is "1111" indicating a 4-digit PIN code.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify the printer supports 4-digit PIN codes.</em>
+*cupsJobPassword: "1111"
+</pre>
+
+
 <h3><span class='info'>CUPS 1.2/OS X 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
 
 <p class='summary'>*cupsLanguages: "locale list"</p>
@@ -1720,6 +1767,21 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 <em>*% Specify Canadian, UK, and US English, and Canadian and French French</em>
 *cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
 </pre>
+
+
+<h3><span class='info'>CUPS 1.7</span><a name='cupsMandatory'>cupsMandatory</a></h3>
+
+<p class='summary'>*cupsMandatory: "attribute1 attribute2 ... attributeN"</p>
+
+<p>This keyword defines a list of IPP attributes that must be provided when submitting a print job creation request.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify that the user must supply a job-password</em>
+*cupsMandatory: "job-password job-password-encryption"
+</pre>
+
 
 <h3><a name='cupsManualCopies'>cupsManualCopies</a></h3>
 
@@ -2248,6 +2310,18 @@ the device.</p>
 
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.7</h3>
+
+<ul>
+
+	<li>Added <a href="#cupsJobAccountId"><tt>cupsJobAccountId</tt></a>,
+	<a href="#cupsJobAccountingUserId"><tt>cupsJobAccountingUserId</tt></a>,
+	<a href="#cupsJobPassword"><tt>cupsJobPassword</tt></a>,
+	<a href="#cupsMandatory"><tt>cupsMandatory</tt></a> keywords.</li>
+
+</ul>
+
 
 <h3>Changes in CUPS 1.6</h3>
 

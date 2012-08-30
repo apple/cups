@@ -1274,6 +1274,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr,		/* Current attribute */
 		*auth_info;		/* auth-info attribute */
+  const char	*mandatory;		/* Current mandatory job attribute */
   const char	*val;			/* Default option value */
   int		priority;		/* Job priority */
   cupsd_job_t	*job;			/* Current job */
@@ -1350,8 +1351,29 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
  /*
   * Validate job template attributes; for now just document-format,
-  * copies, number-up, and page-ranges...
+  * copies, job-sheets, number-up, page-ranges, mandatory attributes, and
+  * media...
   */
+
+  if (printer->pc)
+  {
+    for (mandatory = (char *)cupsArrayFirst(printer->pc->mandatory);
+	 mandatory;
+	 mandatory = (char *)cupsArrayNext(printer->pc->mandatory))
+    {
+      if (!ippFindAttribute(con->request, mandatory, IPP_TAG_ZERO))
+      {
+       /*
+	* Missing a required attribute...
+	*/
+
+	send_ipp_status(con, IPP_CONFLICT,
+			_("The \"%s\" attribute is required for print jobs."),
+			mandatory);
+	return (NULL);
+      }
+    }
+  }
 
   if (filetype && printer->filetypes &&
       !cupsArrayFind(printer->filetypes, filetype))

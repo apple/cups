@@ -190,10 +190,17 @@ cupsDoAuthentication(
     * Nope - get a new password from the user...
     */
 
+    char default_username[HTTP_MAX_VALUE];
+					/* Default username */
+
     cg = _cupsGlobals();
 
     if (!cg->lang_default)
       cg->lang_default = cupsLangDefault();
+
+    if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+                        default_username))
+      cupsSetUser(default_username);
 
     snprintf(prompt, sizeof(prompt),
              _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),

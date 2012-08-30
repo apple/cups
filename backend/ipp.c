@@ -331,7 +331,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((auth_info_required = getenv("AUTH_INFO_REQUIRED")) == NULL)
     auth_info_required = "none";
 
-  state_reasons = _cupsArrayNewStrings(getenv("PRINTER_STATE_REASONS"));
+  state_reasons = _cupsArrayNewStrings(getenv("PRINTER_STATE_REASONS"), ',');
 
 #ifdef HAVE_GSSAPI
  /*
@@ -2297,7 +2297,8 @@ new_request(
 		*media_size;		/* media-size value */
   const char	*media_source,		/* media-source value */
 		*media_type,		/* media-type value */
-		*collate_str;		/* multiple-document-handling value */
+		*collate_str,		/* multiple-document-handling value */
+		*mandatory;		/* Mandatory attributes */
 
 
  /*
@@ -2366,6 +2367,85 @@ new_request(
       * Send standard IPP attributes...
       */
 
+      if (pc->password &&
+          (keyword = cupsGetOption("job-password", num_options,
+                                   options)) != NULL)
+      {
+        ippAddOctetString(request, IPP_TAG_OPERATION, "job-password",
+                          keyword, strlen(keyword));
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                     "job-password-encryption", NULL, "none");
+      }
+
+      if (pc->account_id &&
+          (keyword = cupsGetOption("job-account-id", num_options,
+                                   options)) != NULL)
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
+                     NULL, keyword);
+
+      if (pc->account_id &&
+          (keyword = cupsGetOption("job-accounting-user-id", num_options,
+                                   options)) != NULL)
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,
+                     "job-accounting-user-id", NULL, keyword);
+
+      for (mandatory = (char *)cupsArrayFirst(pc->mandatory);
+           mandatory;
+           mandatory = (char *)cupsArrayNext(pc->mandatory))
+      {
+        if (strcmp(mandatory, "copies") &&
+            strcmp(mandatory, "destination-uris") &&
+            strcmp(mandatory, "finishings") &&
+            strcmp(mandatory, "job-account-id") &&
+            strcmp(mandatory, "job-accounting-user-id") &&
+            strcmp(mandatory, "job-password") &&
+            strcmp(mandatory, "media") &&
+            strncmp(mandatory, "media-col", 9) &&
+            strcmp(mandatory, "multiple-document-handling") &&
+            strcmp(mandatory, "output-bin") &&
+            strcmp(mandatory, "print-color-mode") &&
+            strcmp(mandatory, "print-quality") &&
+            strcmp(mandatory, "sides") &&
+            (keyword = cupsGetOption(mandatory, num_options, options)) != NULL)
+	{
+	  _ipp_option_t *opt = _ippFindOption(mandatory);
+					/* Option type */
+          ipp_tag_t	value_tag = opt ? opt->value_tag : IPP_TAG_NAME;
+					/* Value type */
+
+          switch (value_tag)
+          {
+            case IPP_TAG_INTEGER :
+            case IPP_TAG_ENUM :
+                ippAddInteger(request, IPP_TAG_JOB, value_tag, mandatory,
+                              atoi(keyword));
+                break;
+            case IPP_TAG_BOOLEAN :
+                ippAddBoolean(request, IPP_TAG_JOB, mandatory,
+                              !_cups_strcasecmp(keyword, "true"));
+                break;
+            case IPP_TAG_RANGE :
+                {
+                  int lower, upper;	/* Range */
+
+		  if (sscanf(keyword, "%d-%d", &lower, &upper) != 2)
+		    lower = upper = atoi(keyword);
+
+		  ippAddRange(request, IPP_TAG_JOB, mandatory, lower, upper);
+                }
+                break;
+            case IPP_TAG_STRING :
+                ippAddOctetString(request, IPP_TAG_JOB, mandatory, keyword,
+                                  strlen(keyword));
+                break;
+            default :
+                ippAddString(request, IPP_TAG_JOB, value_tag, mandatory,
+                             NULL, keyword);
+                break;
+	  }
+	}
+      }
+
       if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
 	keyword = cupsGetOption("media", num_options, options);
 
@@ -2431,19 +2511,19 @@ new_request(
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
 		     NULL, keyword);
 
-      if ((keyword = cupsGetOption("output-mode", num_options,
+      if ((keyword = cupsGetOption("print-color-mode", num_options,
 				   options)) != NULL)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "print-color-mode",
 		     NULL, keyword);
       else if ((keyword = cupsGetOption("ColorModel", num_options,
 					options)) != NULL)
       {
 	if (!_cups_strcasecmp(keyword, "Gray"))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			       NULL, "monochrome");
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "print-color-mode", NULL, "monochrome");
 	else
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			   NULL, "color");
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "print-color-mode", NULL, "color");
       }
 
       if ((keyword = cupsGetOption("print-quality", num_options,
@@ -3133,7 +3213,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
     else
       op = '\0';
 
-    new_reasons = _cupsArrayNewStrings(s);
+    new_reasons = _cupsArrayNewStrings(s, ',');
   }
   else
     return;

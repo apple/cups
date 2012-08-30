@@ -557,6 +557,19 @@ _ppdCacheCreateWithFile(
     }
     else if (!_cups_strcasecmp(line, "MaxCopies"))
       pc->max_copies = atoi(value);
+    else if (!_cups_strcasecmp(line, "JobAccountId"))
+      pc->account_id = !_cups_strcasecmp(value, "true");
+    else if (!_cups_strcasecmp(line, "JobAccountingUserId"))
+      pc->accounting_user_id = !_cups_strcasecmp(value, "true");
+    else if (!_cups_strcasecmp(line, "JobPassword"))
+      pc->password = _cupsStrAlloc(value);
+    else if (!_cups_strcasecmp(line, "Mandatory"))
+    {
+      if (pc->mandatory)
+        _cupsArrayAddStrings(pc->mandatory, value, ' ');
+      else
+        pc->mandatory = _cupsArrayNewStrings(value, ' ');
+    }
     else
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
@@ -1367,6 +1380,23 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->max_copies = 9999;
 
  /*
+  * cupsJobAccountId, cupsJobAccountingUserId, cupsJobPassword, and
+  * cupsMandatory.
+  */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsJobAccountId", NULL)) != NULL)
+    pc->account_id = !_cups_strcasecmp(ppd_attr->value, "true");
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsJobAccountingUserId", NULL)) != NULL)
+    pc->accounting_user_id = !_cups_strcasecmp(ppd_attr->value, "true");
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsJobPassword", NULL)) != NULL)
+    pc->password = _cupsStrAlloc(ppd_attr->value);
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
+    pc->mandatory = _cupsArrayNewStrings(ppd_attr->value, ' ');
+
+ /*
   * Return the cache data...
   */
 
@@ -1465,6 +1495,10 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   cupsArrayDelete(pc->filters);
   cupsArrayDelete(pc->prefilters);
   cupsArrayDelete(pc->finishings);
+
+  _cupsStrFree(pc->password);
+
+  cupsArrayDelete(pc->mandatory);
 
   free(pc);
 }
@@ -2356,6 +2390,22 @@ _ppdCacheWriteFile(
   */
 
   cupsFilePrintf(fp, "MaxCopies %d\n", pc->max_copies);
+
+ /*
+  * Accounting/quota/PIN/managed printing values...
+  */
+
+  cupsFilePrintf(fp, "AccountId %s\n", pc->account_id ? "true" : "false");
+  cupsFilePrintf(fp, "AccountingUserId %s\n",
+                 pc->accounting_user_id ? "true" : "false");
+
+  if (pc->password)
+    cupsFilePutConf(fp, "Password", pc->password);
+
+  for (value = (char *)cupsArrayFirst(pc->mandatory);
+       value;
+       value = (char *)cupsArrayNext(pc->mandatory))
+    cupsFilePutConf(fp, "Mandatory", value);
 
  /*
   * IPP attributes, if any...
