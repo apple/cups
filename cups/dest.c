@@ -319,7 +319,8 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
     if (instance && !cupsGetDest(name, NULL, num_dests, *dests))
       return (num_dests);
 
-    dest = cups_add_dest(name, instance, &num_dests, dests);
+    if ((dest = cups_add_dest(name, instance, &num_dests, dests)) == NULL)
+      return (num_dests);
 
    /*
     * Find the base dest again now the array has been realloc'd.
