@@ -486,7 +486,7 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
         if ((media = ippFindAttribute(job, "PageSize", IPP_TAG_NAME)) == NULL)
 	  media = ippFindAttribute(job, "PageRegion", IPP_TAG_NAME);
 
-    if (media)
+    if (media && media->values[0].string.text)
     {
       const char *name = media->values[0].string.text;
 					/* Name string */
