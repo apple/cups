@@ -684,7 +684,7 @@ print_device(const char *uri,		/* I - Device URI */
 
        /*
 	* Ignore timeout errors, but retain the number of bytes written to
-	* avoid sending duplicate data (<rdar://problem/6254911>)...
+	* avoid sending duplicate data...
 	*/
 
 	if (iostatus == kIOUSBTransactionTimeout)
@@ -707,7 +707,7 @@ print_device(const char *uri,		/* I - Device URI */
 
        /*
 	* Retry a write after an aborted write since we probably just got
-	* SIGTERM (<rdar://problem/6860126>)...
+	* SIGTERM...
 	*/
 
 	else if (iostatus == kIOReturnAborted)
