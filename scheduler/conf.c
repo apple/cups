@@ -227,7 +227,7 @@ cupsdAddAlias(cups_array_t *aliases,	/* I - Array of aliases */
     return;
 
   a->namelen = namelen;
-  strcpy(a->name, name);		/* OK since a->name is allocated */
+  memcpy(a->name, name, namelen + 1);	/* OK since a->name is allocated */
 
   cupsArrayAdd(aliases, a);
 }

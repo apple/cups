@@ -3,7 +3,7 @@
  *
  *   Log file routines for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -198,7 +198,7 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 
     cupsFileClose(*lf);
 
-    strcpy(backname, filename);
+    strlcpy(backname, filename, sizeof(backname));
     strlcat(backname, ".O", sizeof(backname));
 
     unlink(backname);
@@ -485,7 +485,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
       if ((temp = malloc(sizeof(cupsd_joblog_t) + strlen(log_line))) != NULL)
       {
         temp->time = time(NULL);
-	strcpy(temp->message, log_line);
+	strlcpy(temp->message, log_line, sizeof(temp->message));
       }
 
       if (!job->history)
@@ -603,7 +603,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
   if (!PageLogFormat)
     return (1);
 
-  strcpy(number, "1");
+  strlcpy(number, "1", sizeof(number));
   copies = 1;
   sscanf(page, "%255s%d", number, &copies);
 

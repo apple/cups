@@ -358,7 +358,7 @@ cupsSetServer(const char *server)	/* I - Server name */
     }
 
     if (cg->server[0] == '/')
-      strcpy(cg->servername, "localhost");
+      strlcpy(cg->servername, "localhost", sizeof(cg->servername));
     else
       strlcpy(cg->servername, cg->server, sizeof(cg->servername));
   }
@@ -949,7 +949,7 @@ cups_read_client_conf(
         value = NULL;
 
       if (cg->server[0] == '/')
-	strcpy(cg->servername, "localhost");
+	strlcpy(cg->servername, "localhost", sizeof(cg->servername));
       else
 	strlcpy(cg->servername, cg->server, sizeof(cg->servername));
     }
@@ -1035,7 +1035,7 @@ cups_read_client_conf(
 	* Use the default "unknown" user name...
 	*/
 
-	strcpy(cg->user, "unknown");
+	strlcpy(cg->user, "unknown", sizeof(cg->user));
       }
     }
   }

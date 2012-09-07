@@ -1173,7 +1173,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
     if (sscanf(authorization, "%255s", scheme) != 1)
-      strcpy(scheme, "UNKNOWN");
+      strlcpy(scheme, "UNKNOWN", sizeof(scheme));
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Client %d] Bad authentication data \"%s ...\"",

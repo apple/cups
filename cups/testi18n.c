@@ -3,7 +3,7 @@
  *
  *   Internationalization test for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -282,7 +282,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("cupsCharsetToUTF8(CUPS_ISO8859_1): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_ISO8859_1);
   if (len != strlen((char *)utf8latin))
@@ -333,7 +333,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("cupsCharsetToUTF8(CUPS_ISO8859_7): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_ISO8859_7);
   if (len != strlen((char *)utf8greek))
@@ -379,7 +379,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("cupsCharsetToUTF8(CUPS_WINDOWS_932): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_WINDOWS_932);
   if (len != strlen((char *)utf8japan))
@@ -426,7 +426,7 @@ main(int  argc,				/* I - Argument Count */
 #ifndef __linux
   fputs("cupsCharsetToUTF8(CUPS_EUC_JP): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_EUC_JP);
   if (len != strlen((char *)utf8japan))
@@ -473,7 +473,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("cupsCharsetToUTF8(CUPS_WINDOWS_950): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_WINDOWS_950);
   if (len != strlen((char *)utf8taiwan))
@@ -519,7 +519,7 @@ main(int  argc,				/* I - Argument Count */
 
   fputs("cupsCharsetToUTF8(CUPS_EUC_TW): ", stdout);
 
-  strcpy(legsrc, legdest);
+  strlcpy(legsrc, legdest, sizeof(legsrc));
 
   len = cupsCharsetToUTF8(utf8dest, legsrc, 1024, CUPS_EUC_TW);
   if (len != strlen((char *)utf8taiwan))

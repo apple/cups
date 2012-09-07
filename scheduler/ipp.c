@@ -8270,8 +8270,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Auto-type it!
     */
 
-    strcpy(super, "application");
-    strcpy(type, "octet-stream");
+    strlcpy(super, "application", sizeof(super));
+    strlcpy(type, "octet-stream", sizeof(type));
   }
 
   if (!strcmp(super, "application") && !strcmp(type, "octet-stream"))
@@ -8639,7 +8639,8 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
-    strcpy(printer->state_message, "Rejecting Jobs");
+    strlcpy(printer->state_message, "Rejecting Jobs",
+            sizeof(printer->state_message));
   else
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
@@ -9499,8 +9500,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * No document format attribute?  Auto-type it!
     */
 
-    strcpy(super, "application");
-    strcpy(type, "octet-stream");
+    strlcpy(super, "application", sizeof(super));
+    strlcpy(type, "octet-stream", sizeof(type));
   }
 
   if (!strcmp(super, "application") && !strcmp(type, "octet-stream"))
@@ -10745,7 +10746,7 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
-    strcpy(printer->state_message, "Paused");
+    strlcpy(printer->state_message, "Paused", sizeof(printer->state_message));
   else
   {
     strlcpy(printer->state_message, attr->values[0].string.text,

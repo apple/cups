@@ -129,7 +129,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
       *nameptr = '\0';
 
       if (!strncmp(name, "printer_state_history", 21))
-        strcpy(name, "printer_state_history");
+        strlcpy(name, "printer_state_history", sizeof(name));
 
      /*
       * Possibly add it to the list of attributes...

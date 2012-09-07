@@ -229,16 +229,8 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 
             if (bufptr)
 	    {
-	      if ((bufptr + strlen(temp)) > bufend)
-	      {
-		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
-		bufptr = bufend;
-	      }
-	      else
-	      {
-		strcpy(bufptr, temp);
-		bufptr += strlen(temp);
-	      }
+	      strlcpy(bufptr, temp, (size_t)(bufend - bufptr));
+	      bufptr += strlen(bufptr);
 	    }
 	    break;
 
@@ -267,16 +259,8 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    if (bufptr)
 	    {
-	      if ((bufptr + strlen(temp)) > bufend)
-	      {
-		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
-		bufptr = bufend;
-	      }
-	      else
-	      {
-		strcpy(bufptr, temp);
-		bufptr += strlen(temp);
-	      }
+	      strlcpy(bufptr, temp, (size_t)(bufend - bufptr));
+	      bufptr += strlen(bufptr);
 	    }
 	    break;
 
@@ -290,16 +274,8 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	    if (bufptr)
 	    {
-	      if ((bufptr + strlen(temp)) > bufend)
-	      {
-		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
-		bufptr = bufend;
-	      }
-	      else
-	      {
-		strcpy(bufptr, temp);
-		bufptr += strlen(temp);
-	      }
+	      strlcpy(bufptr, temp, (size_t)(bufend - bufptr));
+	      bufptr += strlen(bufptr);
 	    }
 	    break;
 

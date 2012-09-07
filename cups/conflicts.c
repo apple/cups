@@ -930,7 +930,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
       if (!_cups_strncasecmp(option, "Custom", 6) && !_cups_strcasecmp(choice, "True"))
       {
 	_cups_strcpy(option, option + 6);
-	strcpy(choice, "Custom");
+	strlcpy(choice, "Custom", sizeof(choice));
       }
 
       constptr->option      = ppdFindOption(ppd, option);

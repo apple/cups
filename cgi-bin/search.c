@@ -3,7 +3,7 @@
  *
  *   Search routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -208,7 +208,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       * Add the prefix string...
       */
 
-      strcpy(sptr, prefix);
+      memcpy(sptr, prefix, strlen(prefix) + 1);
       sptr += strlen(sptr);
 
      /*
@@ -249,16 +249,16 @@ cgiCompileSearch(const char *query)	/* I - Query string */
 	  return (NULL);
 	}
 
-        strcpy(sptr, ".*|.*");
+        memcpy(sptr, ".*|.*", 6);
 	sptr += 5;
 
-	strcpy(sptr, lword2);
+	memcpy(sptr, lword2, strlen(lword2) + 1);
 	sptr += strlen(sptr);
 
-        strcpy(sptr, ".*");
+        memcpy(sptr, ".*", 3);
 	sptr += 2;
 
-	strcpy(sptr, lword);
+	memcpy(sptr, lword, strlen(lword) + 1);
 	sptr += strlen(sptr);
 
         free(lword);
@@ -287,7 +287,7 @@ cgiCompileSearch(const char *query)	/* I - Query string */
     free(lword);
 
   if (sptr > s)
-    strcpy(sptr, ".*");
+    memcpy(sptr, ".*", 3);
   else
   {
    /*

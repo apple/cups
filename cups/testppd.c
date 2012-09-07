@@ -3,7 +3,7 @@
  *
  *   PPD test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -897,7 +897,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
       if ((realsize = readlink(filename, realfile, sizeof(realfile) - 1)) < 0)
-        strcpy(realfile, "Unknown");
+        strlcpy(realfile, "Unknown", sizeof(realfile));
       else
         realfile[realsize] = '\0';
 

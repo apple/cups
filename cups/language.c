@@ -446,7 +446,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Set the character set to UTF-8...
   */
 
-  strcpy(charset, "UTF8");
+  strlcpy(charset, "UTF8", sizeof(charset));
 
  /*
   * Apple's setlocale doesn't give us the user's localization
@@ -582,7 +582,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   */
 
   if (!charset[0])
-    strcpy(charset, "UTF8");
+    strlcpy(charset, "UTF8", sizeof(charset));
 
  /*
   * Parse the language string passed in to a locale string. "C" is the
@@ -597,7 +597,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   if (language == NULL || !language[0] ||
       !strcmp(language, "POSIX"))
-    strcpy(langname, "C");
+    strlcpy(langname, "C", sizeof(langname));
   else
   {
    /*
@@ -646,7 +646,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
     if (strlen(langname) != 2)
     {
-      strcpy(langname, "C");
+      strlcpy(langname, "C", sizeof(langname));
       country[0] = '\0';
       charset[0] = '\0';
     }
@@ -701,7 +701,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   if (country[0])
     snprintf(real, sizeof(real), "%s_%s", langname, country);
   else
-    strcpy(real, langname);
+    strlcpy(real, langname, sizeof(real));
 
   _cupsMutexLock(&lang_mutex);
 
@@ -847,6 +847,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
 			*ptr,		/* Pointer into buffer */
 			*temp;		/* New string */
   int			length;		/* Length of combined strings */
+  size_t		ptrlen;		/* Length of string */
 
 
   DEBUG_printf(("4_cupsMessageLoad(filename=\"%s\")", filename));
@@ -978,9 +979,10 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
       */
 
       length = (int)strlen(m->str ? m->str : m->id);
+      ptrlen = strlen(ptr);
 
       if ((temp = realloc(m->str ? m->str : m->id,
-                          length + strlen(ptr) + 1)) == NULL)
+                          length + ptrlen + 1)) == NULL)
       {
         if (m->str)
 	  free(m->str);
@@ -995,25 +997,25 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
       {
        /*
         * Copy the new portion to the end of the msgstr string - safe
-	* to use strcpy because the buffer is allocated to the correct
+	* to use memcpy because the buffer is allocated to the correct
 	* size...
 	*/
 
         m->str = temp;
 
-	strcpy(m->str + length, ptr);
+	memcpy(m->str + length, ptr, ptrlen + 1);
       }
       else
       {
        /*
         * Copy the new portion to the end of the msgid string - safe
-	* to use strcpy because the buffer is allocated to the correct
+	* to use memcpy because the buffer is allocated to the correct
 	* size...
 	*/
 
         m->id = temp;
 
-	strcpy(m->id + length, ptr);
+	memcpy(m->id + length, ptr, ptrlen + 1);
       }
     }
     else if (!strncmp(s, "msgstr", 6) && m)

@@ -771,7 +771,7 @@ escape_options(
     if (sptr > s)
       *sptr++ = ' ';
 
-    strcpy(sptr, option->name);
+    strlcpy(sptr, option->name, bytes - (sptr - s));
     sptr += strlen(sptr);
     *sptr++ = '=';
 
