@@ -1791,7 +1791,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * need to set a default if one exists...
     */
 
-    if (dest == NULL && defprinter != NULL)
+    if (!dest && *dests && defprinter)
     {
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;

@@ -3116,7 +3116,15 @@ ippReadIO(void       *src,		/* I - Data source */
 		* we need to carry over...
 		*/
 
-		if (n == 0)
+                if (!attr)
+                {
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP memberName with no attribute."), 1);
+	          DEBUG_puts("1ippReadIO: Member name without attribute.");
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+                }
+		else if (n == 0)
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP memberName value is empty."), 1);

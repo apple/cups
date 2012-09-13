@@ -4235,6 +4235,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 			       credential->datalen);
 			cupsArrayAdd(names, credential);
 		      }
+		      else
+		        free(credential);
 		    }
 		  }
 		}
