@@ -3790,6 +3790,41 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
 	  break;
 
       case IPP_TAG_STRING :
+          for (i = 0; i < attr->num_values; i ++)
+          {
+            if (Output == _CUPS_OUTPUT_PLIST)
+            {
+	      char	buffer[IPP_MAX_LENGTH * 5 / 4 + 1];
+					/* Output buffer */
+
+              printf("<data>%s</data>\n",
+                     httpEncode64_2(buffer, sizeof(buffer),
+                                    attr->values[i].unknown.data,
+                                    attr->values[i].unknown.length));
+            }
+            else
+            {
+              char	*ptr,		/* Pointer into data */
+        		*end;		/* End of data */
+
+              putchar('\"');
+              for (ptr = attr->values[i].unknown.data,
+                       end = ptr + attr->values[i].unknown.length;
+                   ptr < end;
+                   ptr ++)
+              {
+                if (*ptr == '\\' || *ptr == '\"')
+                  printf("\\%c", *ptr);
+                else if (!isprint(*ptr & 255))
+                  printf("\\%03o", *ptr & 255);
+                else
+                  putchar(*ptr);
+              }
+              putchar('\"');
+            }
+          }
+          break;
+
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
