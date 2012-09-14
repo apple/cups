@@ -5004,7 +5004,8 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
   _ipp_value_t	*value;			/* Current value */
 
 
-  DEBUG_printf(("4ipp_free_values(attr=%p, element=%d, count=%d)", attr, element, count));
+  DEBUG_printf(("4ipp_free_values(attr=%p, element=%d, count=%d)", attr,
+                element, count));
 
   if (!(attr->value_tag & IPP_TAG_COPY))
   {
@@ -5016,8 +5017,12 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
     {
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
-	  if (element == 0 && count == attr->num_values && attr->values[0].string.language)
+	  if (element == 0 && count == attr->num_values &&
+	      attr->values[0].string.language)
+	  {
 	    _cupsStrFree(attr->values[0].string.language);
+	    attr->values[0].string.language = NULL;
+	  }
 
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
@@ -5031,7 +5036,10 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	  for (i = count, value = attr->values + element;
 	       i > 0;
 	       i --, value ++)
+	  {
 	    _cupsStrFree(value->string.text);
+	    value->string.text = NULL;
+	  }
 	  break;
 
       case IPP_TAG_DEFAULT :
@@ -5052,7 +5060,10 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	  for (i = count, value = attr->values + element;
 	       i > 0;
 	       i --, value ++)
+	  {
 	    ippDelete(value->collection);
+	    value->collection = NULL;
+	  }
 	  break;
 
       case IPP_TAG_STRING :
@@ -5060,8 +5071,13 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	  for (i = count, value = attr->values + element;
 	       i > 0;
 	       i --, value ++)
+	  {
 	    if (value->unknown.data)
+	    {
 	      free(value->unknown.data);
+	      value->unknown.data = NULL;
+	    }
+	  }
 	  break;
     }
   }
