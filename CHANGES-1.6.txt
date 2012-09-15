@@ -4,6 +4,8 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- The network backends now support disabling of SNMP supply level
+	  queries via the "snmp" URI option (STR #4106)
 	- The IPP backend did not specify the compression used (STR #4181)
 	- ipptool did not support octetString values.
 	- The scheduler did not recognize dnssd: or ipps: URIs as Bonjour shared
