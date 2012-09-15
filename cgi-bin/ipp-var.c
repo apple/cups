@@ -1432,7 +1432,7 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
         	 "ipp://localhost/");
 
-  if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
+  if ((which_jobs = cgiGetVariable("which_jobs")) != NULL && *which_jobs)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                  NULL, which_jobs);
 
@@ -1480,10 +1480,11 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if (first < 0)
       first = 0;
 
-    if ((var = cgiGetVariable("ORDER")) != NULL)
+    if ((var = cgiGetVariable("ORDER")) != NULL && *var)
       ascending = !_cups_strcasecmp(var, "asc");
     else
-      ascending = !which_jobs || !_cups_strcasecmp(which_jobs, "not-completed");
+      ascending = !which_jobs || !*which_jobs ||
+                  !_cups_strcasecmp(which_jobs, "not-completed");
 
     section = cgiGetVariable("SECTION");
 

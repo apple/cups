@@ -4,6 +4,8 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- The web interface did not preserve the order of classes, jobs, or
+	  printers (STR #4170)
 	- The network backends now support disabling of SNMP supply level
 	  queries via the "snmp" URI option (STR #4106)
 	- The IPP backend did not specify the compression used (STR #4181)
