@@ -1578,6 +1578,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 		       "document-format", NULL, document_format);
 
+        if (compression)
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		       "compression", NULL, compression);
+
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
