@@ -4,6 +4,8 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- The scheduler no longer allows job-name values that are not valid
+	  network Unicode strings (STR #4072)
 	- The web interface did not preserve the order of classes, jobs, or
 	  printers (STR #4170)
 	- The network backends now support disabling of SNMP supply level

@@ -10943,7 +10943,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   http_status_t		status;		/* Policy status */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*auth_info;	/* auth-info attribute */
-  ipp_attribute_t	*format;	/* Document-format attribute */
+  ipp_attribute_t	*format,	/* Document-format attribute */
+			*name;		/* Job-name attribute */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			super[MIME_MAX_SUPER],
 					/* Supertype of file */
@@ -10970,7 +10971,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
       )
     {
       send_ipp_status(con, IPP_ATTRIBUTES,
-                      _("Unsupported compression \"%s\"."),
+                      _("Unsupported 'compression' value \"%s\"."),
         	      attr->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	           "compression", NULL, attr->values[0].string.text);
@@ -10988,7 +10989,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
                super, type) != 2)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad 'document-format' value \"%s\"."),
 		      format->values[0].string.text);
       return;
     }
@@ -10999,11 +11001,79 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Hint: Do you have the raw file printing rules enabled?");
       send_ipp_status(con, IPP_DOCUMENT_FORMAT,
-                      _("Unsupported document-format \"%s\"."),
+                      _("Unsupported 'document-format' value \"%s\"."),
 		      format->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                    "document-format", NULL, format->values[0].string.text);
       return;
+    }
+  }
+
+ /*
+  * Is the job-name valid?
+  */
+
+  if ((name = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) != NULL)
+  {
+    int bad_name = 0;			/* Is the job-name value bad? */
+
+    if ((name->value_tag != IPP_TAG_NAME && name->value_tag != IPP_TAG_NAMELANG) ||
+        name->num_values != 1)
+    {
+      bad_name = 1;
+    }
+    else
+    {
+     /*
+      * Validate that job-name conforms to RFC 5198 (Network Unicode) and
+      * IPP Everywhere requirements for "name" values...
+      */
+
+      const unsigned char *nameptr;	/* Pointer into "job-name" attribute */
+
+      for (nameptr = (unsigned char *)name->values[0].string.text;
+           *nameptr;
+           nameptr ++)
+      {
+        if (*nameptr < ' ' && *nameptr != '\t')
+          break;
+        else if (*nameptr == 0x7f)
+          break;
+        else if ((*nameptr & 0xe0) == 0xc0 &&
+                 (nameptr[1] & 0xc0) != 0x80)
+          break;
+        else if ((*nameptr & 0xf0) == 0xe0 &&
+                 ((nameptr[1] & 0xc0) != 0x80 ||
+                  (nameptr[2] & 0xc0) != 0x80))
+          break;
+        else if ((*nameptr & 0xf8) == 0xf0 &&
+                 ((nameptr[1] & 0xc0) != 0x80 ||
+                  (nameptr[2] & 0xc0) != 0x80 ||
+                  (nameptr[3] & 0xc0) != 0x80))
+          break;
+        else if (*nameptr & 0x80)
+          break;
+      }
+
+      if (*nameptr)
+        bad_name = 1;
+    }
+
+    if (bad_name)
+    {
+      if (StrictConformance)
+      {
+	send_ipp_status(con, IPP_ATTRIBUTES,
+	                _("Unsupported 'job-name' value."));
+	ippCopyAttribute(con->response, name, 0);
+	return;
+      }
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_WARN,
+                        "Unsupported 'job-name' value, deleting from request.");
+        ippDeleteAttribute(con->request, name);
+      }
     }
   }
 
