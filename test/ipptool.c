@@ -1702,6 +1702,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      }
 	      break;
 
+          case IPP_TAG_STRING :
+              attrptr = ippAddOctetString(request, group, attr, token,
+                                          strlen(token));
+	      break;
+
 	  default :
 	      print_fatal_error("Unsupported ATTR value tag %s on line %d.",
 				ippTagString(value), linenum);
