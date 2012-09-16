@@ -11039,18 +11039,30 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
           break;
         else if (*nameptr == 0x7f)
           break;
-        else if ((*nameptr & 0xe0) == 0xc0 &&
-                 (nameptr[1] & 0xc0) != 0x80)
-          break;
-        else if ((*nameptr & 0xf0) == 0xe0 &&
-                 ((nameptr[1] & 0xc0) != 0x80 ||
-                  (nameptr[2] & 0xc0) != 0x80))
-          break;
-        else if ((*nameptr & 0xf8) == 0xf0 &&
-                 ((nameptr[1] & 0xc0) != 0x80 ||
-                  (nameptr[2] & 0xc0) != 0x80 ||
-                  (nameptr[3] & 0xc0) != 0x80))
-          break;
+        else if ((*nameptr & 0xe0) == 0xc0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80)
+            break;
+
+          nameptr ++;
+        }
+        else if ((*nameptr & 0xf0) == 0xe0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80 ||
+              (nameptr[2] & 0xc0) != 0x80)
+	    break;
+
+	  nameptr += 2;
+	}
+        else if ((*nameptr & 0xf8) == 0xf0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80 ||
+	      (nameptr[2] & 0xc0) != 0x80 ||
+	      (nameptr[3] & 0xc0) != 0x80)
+	    break;
+
+	  nameptr += 3;
+	}
         else if (*nameptr & 0x80)
           break;
       }
