@@ -10554,6 +10554,7 @@ set_printer_defaults(
           break;
 
       case IPP_TAG_NAME :
+      case IPP_TAG_TEXT :
       case IPP_TAG_KEYWORD :
       case IPP_TAG_URI :
           printer->num_options = cupsAddOption(name,

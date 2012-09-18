@@ -16,19 +16,22 @@
  *
  * Contents:
  *
- *   main()                 - Send a file to the printer or server.
- *   cancel_job()           - Cancel a print job.
+ *   main()		    - Send a file to the printer or server.
+ *   cancel_job()	    - Cancel a print job.
  *   check_printer_state()  - Check the printer state.
- *   compress_files()       - Compress print files.
- *   monitor_printer()      - Monitor the printer state.
- *   new_request()          - Create a new print creation or validation request.
- *   password_cb()          - Disable the password prompt for
- *                            cupsDoFileRequest().
- *   report_attr()          - Report an IPP attribute value.
+ *   compress_files()	    - Compress print files.
+ *   monitor_printer()	    - Monitor the printer state.
+ *   new_request()	    - Create a new print creation or validation
+ *			      request.
+ *   password_cb()	    - Disable the password prompt for
+ *			      cupsDoFileRequest().
+ *   quote_string()	    - Quote a string value.
+ *   report_attr()	    - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
- *   run_as_user()          - Run the IPP backend as the printing user.
- *   timeout_cb()           - Handle HTTP timeouts.
- *   sigterm_handler()      - Handle 'terminate' signals that stop the backend.
+ *   run_as_user()	    - Run the IPP backend as the printing user.
+ *   sigterm_handler()	    - Handle 'terminate' signals that stop the backend.
+ *   timeout_cb()	    - Handle HTTP timeouts.
+ *   update_reasons()	    - Update the printer-state-reasons values.
  */
 
 /*
@@ -165,7 +168,10 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     const char *format, _ppd_cache_t *pc,
 				     ipp_attribute_t *media_col_sup,
 				     ipp_attribute_t *doc_handling_sup);
-static const char	*password_cb(const char *);
+static const char	*password_cb(const char *prompt, http_t *http,
+			             const char *method, const char *resource,
+			             void *user_data);
+static const char	*quote_string(const char *s, char *q, size_t qsize);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
@@ -606,12 +612,12 @@ main(int  argc,				/* I - Number of command-line args */
   * Set the authentication info, if any...
   */
 
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2(password_cb, NULL);
 
   if (username[0])
   {
    /*
-    * Use authenticaion information in the device URI...
+    * Use authentication information in the device URI...
     */
 
     if ((password = strchr(username, ':')) != NULL)
@@ -2125,7 +2131,7 @@ monitor_printer(
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2(password_cb, NULL);
 
  /*
   * Loop until the job is canceled, aborted, or completed.
@@ -2697,18 +2703,38 @@ new_request(
  */
 
 static const char *			/* O - Password  */
-password_cb(const char *prompt)		/* I - Prompt (not used) */
+password_cb(const char *prompt,		/* I - Prompt (not used) */
+            http_t     *http,		/* I - Connection */
+            const char *method,		/* I - Request method (not used) */
+            const char *resource,	/* I - Resource path (not used) */
+            void       *user_data)	/* I - User data (not used) */
 {
+  char	def_username[HTTP_MAX_VALUE];	/* Default username */
+
+
   fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\"), password=%p, "
           "password_tries=%d\n", prompt, password, password_tries);
 
   (void)prompt;
+  (void)method;
+  (void)resource;
+  (void)user_data;
 
  /*
   * Remember that we need to authenticate...
   */
 
   auth_info_required = "username,password";
+
+  if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+                      def_username))
+  {
+    char	quoted[HTTP_MAX_VALUE * 2 + 4];
+					/* Quoted string */
+
+    fprintf(stderr, "ATTR: auth-info-default=%s,\n",
+            quote_string(def_username, quoted, sizeof(quoted)));
+  }
 
   if (password && *password && password_tries < 3)
   {
@@ -2728,6 +2754,56 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 
 
 /*
+ * 'quote_string()' - Quote a string value.
+ */
+
+static const char *			/* O - Quoted string */
+quote_string(const char *s,		/* I - String */
+             char       *q,		/* I - Quoted string buffer */
+             size_t     qsize)		/* I - Size of quoted string buffer */
+{
+  char	*qptr,				/* Pointer into string buffer */
+	*qend;				/* End of string buffer */
+
+
+  qptr = q;
+  qend = q + qsize - 5;
+
+  if (qend < q)
+  {
+    *q = '\0';
+    return (q);
+  }
+
+  *qptr++ = '\'';
+  *qptr++ = '\"';
+
+  while (*s && qptr < qend)
+  {
+    if (*s == '\\' || *s == '\"' || *s == '\'')
+    {
+      if (q < (qend - 3))
+      {
+	*qptr++ = '\\';
+	*qptr++ = '\\';
+	*qptr++ = '\\';
+      }
+      else
+        break;
+    }
+
+    *qptr++ = *s++;
+  }
+
+  *qptr++ = '\"';
+  *qptr++ = '\'';
+  *qptr   = '\0';
+
+  return (q);
+}
+
+
+/*
  * 'report_attr()' - Report an IPP attribute value.
  */
 
@@ -2736,8 +2812,7 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
 {
   int		i;			/* Looping var */
   char		value[1024],		/* Value string */
-		*valptr,		/* Pointer into value string */
-		*attrptr;		/* Pointer into attribute value */
+		*valptr;		/* Pointer into value string */
   const char	*cached;		/* Cached attribute */
 
 
@@ -2764,23 +2839,9 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-          *valptr++ = '\'';
-          *valptr++ = '\"';
-	  for (attrptr = attr->values[i].string.text;
-	       *attrptr && valptr < (value + sizeof(value) - 10);
-	       attrptr ++)
-	  {
-	    if (*attrptr == '\\' || *attrptr == '\"' || *attrptr == '\'')
-	    {
-	      *valptr++ = '\\';
-	      *valptr++ = '\\';
-	      *valptr++ = '\\';
-	    }
-
-	    *valptr++ = *attrptr;
-	  }
-          *valptr++ = '\"';
-          *valptr++ = '\'';
+          quote_string(attr->values[i].string.text, valptr,
+                       value + sizeof(value) - valptr);
+          valptr += strlen(valptr);
           break;
 
       default :

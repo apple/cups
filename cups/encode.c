@@ -39,6 +39,7 @@
 static const _ipp_option_t ipp_options[] =
 {
   { 1, "auth-info",		IPP_TAG_TEXT,		IPP_TAG_JOB },
+  { 1, "auth-info-default",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 1, "auth-info-required",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "blackplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
