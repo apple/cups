@@ -1279,6 +1279,16 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * If the printer only claims to support IPP/1.0, or if the user specifically
+  * included version=1.0 in the URI, then do not try to use Create-Job or
+  * Send-Document.  This is another dreaded compatibility hack, but unfortunately
+  * there are enough broken printers out there that we need this for now...
+  */
+
+  if (version == 10)
+    create_job = send_document = 0;
+
+ /*
   * Start monitoring the printer in the background...
   */
 
@@ -1494,10 +1504,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  goto cleanup;
 	}
       }
-      else if (ipp_status == IPP_ERROR_JOB_CANCELED)
+      else if (ipp_status == IPP_ERROR_JOB_CANCELED ||
+               ipp_status == IPP_NOT_AUTHORIZED)
         goto cleanup;
-      else if (ipp_status == IPP_NOT_AUTHORIZED)
-        continue;
       else
       {
        /*
@@ -1678,11 +1687,32 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
-    else if (ipp_status == IPP_REQUEST_VALUE)
+    else if (ipp_status == IPP_REQUEST_VALUE ||
+             ipp_status == IPP_ERROR_JOB_CANCELED ||
+             ipp_status == IPP_NOT_AUTHORIZED)
     {
      /*
-      * Print file is too large, abort this job...
+      * Print file is too large, job was canceled, or we need new
+      * authentication data...
       */
+
+      goto cleanup;
+    }
+    else if (ipp_status == IPP_NOT_FOUND)
+    {
+     /*
+      * Printer does not actually implement support for Create-Job/
+      * Send-Document, so log the conformance issue and stop the printer.
+      */
+
+      fputs("DEBUG: This printer claims to support Create-Job and "
+            "Send-Document, but those operations failed.\n", stderr);
+      fputs("DEBUG: Add '?version=1.0' to the device URI to use legacy "
+            "compatibility mode.\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-send-document");
+
+      ipp_status = IPP_INTERNAL_ERROR;	/* Force queue to stop */
 
       goto cleanup;
     }
