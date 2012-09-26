@@ -623,7 +623,8 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
 
   if (!ipp || !name || group < IPP_TAG_ZERO ||
-      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE)
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      datalen < 0 || datalen > IPP_MAX_OCTETSTRING)
     return (NULL);
 
   if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_STRING, 1)) == NULL)
@@ -999,7 +1000,8 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
 {
   ipp_tag_t		temp_tag;	/* Temporary value tag (masked) */
   ipp_attribute_t	*attr;		/* New attribute */
-  char			code[32];	/* Charset/language code buffer */
+  char			code[IPP_MAX_LANGUAGE];
+					/* Charset/language code buffer */
 
 
   DEBUG_printf(("ippAddString(ipp=%p, group=%02x(%s), value_tag=%02x(%s), "
@@ -2466,13 +2468,25 @@ ippReadIO(void       *src,		/* I - Data source */
 {
   int			n;		/* Length of data */
   unsigned char		*buffer,	/* Data buffer */
-			string[IPP_MAX_NAME],
+			string[IPP_MAX_TEXT],
 					/* Small string buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
   ipp_tag_t		value_tag;	/* Current value tag */
   _ipp_value_t		*value;		/* Current value */
+  static const int	maxlen[] =	/* Maximum length of strings */
+  {
+    IPP_MAX_TEXT - 1,
+    IPP_MAX_NAME - 1,
+    0,
+    IPP_MAX_KEYWORD - 1,
+    IPP_MAX_URI - 1,
+    IPP_MAX_URISCHEME - 1,
+    IPP_MAX_CHARSET - 1,
+    IPP_MAX_LANGUAGE - 1,
+    IPP_MAX_MIMETYPE - 1
+  };
 
 
   DEBUG_printf(("ippReadIO(src=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)",
@@ -2913,6 +2927,16 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
+	        if (n > maxlen[tag - IPP_TAG_TEXT])
+	        {
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP string value too large."), 1);
+		  DEBUG_printf(("1ippReadIO: bad %s value length %d.",
+		                ippTagString(tag), n));
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+	        }
+
 	        if (n > 0)
 	        {
 		  if ((*cb)(src, buffer, n) < n)
@@ -3015,6 +3039,21 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
+		else if (n > (2 + IPP_MAX_LANGUAGE + IPP_MAX_TEXT))
+		{
+		  if (tag == IPP_TAG_TEXTLANG)
+		    _cupsSetError(IPP_INTERNAL_ERROR,
+		                  _("IPP textWithLanguage value more than "
+		                    "maximum 1090 bytes."), 1);
+		  else
+		    _cupsSetError(IPP_INTERNAL_ERROR,
+		                  _("IPP nameWithLanguage value more than "
+		                    "maximum 1090 bytes."), 1);
+		  DEBUG_printf(("1ippReadIO: bad stringWithLanguage value "
+		                "length %d.", n));
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
 
 	        if ((*cb)(src, buffer, n) < n)
 		{
@@ -3048,6 +3087,15 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
+		else if (n >= IPP_MAX_LANGUAGE)
+		{
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP language length too large."), 1);
+		  DEBUG_printf(("1ippReadIO: bad language value length %d.",
+		                n));
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
 
 		memcpy(string, bufptr + 2, n);
 		string[n] = '\0';
@@ -3062,6 +3110,15 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP string length overflows value."), 1);
 		  DEBUG_printf(("1ippReadIO: bad string value length %d.", n));
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
+		else if (n >= IPP_MAX_TEXT)
+		{
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP text length too large."), 1);
+		  DEBUG_printf(("1ippReadIO: bad text value length %d.",
+		                n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -3154,7 +3211,18 @@ ippReadIO(void       *src,		/* I - Data source */
 		break;
 
             default : /* Other unsupported values */
+                if (tag == IPP_TAG_STRING && n > IPP_MAX_OCTETSTRING)
+		{
+		  _cupsSetError(IPP_INTERNAL_ERROR,
+		                _("IPP octetString length too large."), 1);
+		  DEBUG_printf(("1ippReadIO: bad octetString value length %d.",
+		                n));
+		  _cupsBufferRelease((char *)buffer);
+		  return (IPP_ERROR);
+		}
+
                 value->unknown.length = n;
+
 	        if (n > 0)
 		{
 		  if ((value->unknown.data = malloc(n)) == NULL)

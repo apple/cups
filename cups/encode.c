@@ -78,12 +78,11 @@ static const _ipp_option_t ipp_options[] =
   { 0, "job-accounting-user-id-default", IPP_TAG_NAME,  IPP_TAG_PRINTER },
   { 0, "job-hold-until",	IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "job-id",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
-  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-impressions-completed", IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "job-k-octets",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-k-octets-completed",IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
-  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
-  { 0, "job-impressions-completed", IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-media-sheets",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-media-sheets-completed", IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-page-limit",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
