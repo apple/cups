@@ -4,6 +4,7 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- The scheduler no longer accepts or sends job description attributes.
 	- The IPP backend now works around some conformance issues for broken
 	  printers (STR #4190)
 	- cupsBackendReport() now filters out all control characters from the

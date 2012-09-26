@@ -1286,6 +1286,21 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *media_col,		/* media-col attribute */
 		*media_margin;		/* media-*-margin attribute */
   ipp_t		*unsup_col;		/* media-col in unsupported response */
+  static const char * const readonly[] =/* List of read-only attributes */
+  {
+    "job-id",
+    "job-k-octets",
+    /*"job-impressions",*/		/* For now we allow this since cupsd can't count */
+    "job-impressions-completed",
+    "job-media-sheets",
+    "job-media-sheets-completed",
+    "job-state",
+    "job-state-message",
+    "job-state-reasons",
+    "time-at-completed",
+    "time-at-creation",
+    "time-at-processing"
+  };
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
@@ -1354,6 +1369,27 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * copies, job-sheets, number-up, page-ranges, mandatory attributes, and
   * media...
   */
+
+  for (i = 0; i < (int)(sizeof(readonly) / sizeof(readonly[0])); i ++)
+  {
+    if ((attr = ippFindAttribute(con->request, readonly[i],
+                                 IPP_TAG_ZERO)) != NULL)
+    {
+      ippDeleteAttribute(con->request, attr);
+
+      if (StrictConformance)
+      {
+	send_ipp_status(con, IPP_BAD_REQUEST,
+			_("The '%s' Job Description attribute cannot be "
+			  "supplied in a job creation request."), readonly[i]);
+	return (NULL);
+      }
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "Unexpected '%s' Job Description attribute in a job "
+                      "creation request.", readonly[i]);
+    }
+  }
 
   if (printer->pc)
   {
