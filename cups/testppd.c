@@ -150,6 +150,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		maxsize,		/* Maximum size */
 		*size;			/* Current size */
   ppd_attr_t	*attr;			/* Current attribute */
+  _ppd_cache_t	*pc;			/* PPD cache */
 
 
   status = 0;
@@ -1073,6 +1074,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 	   attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
         printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
 	       attr->text, attr->value ? attr->value : "");
+
+      puts("\nPPD Cache:");
+      if ((pc = _ppdCacheCreateWithPPD(ppd)) == NULL)
+        printf("    Unable to create: %s\n", cupsLastErrorString());
+      else
+      {
+        _ppdCacheWriteFile(pc, "t.cache", NULL);
+        puts("    Wrote t.cache.");
+      }
     }
 
     if (!strncmp(argv[1], "-d", 2))

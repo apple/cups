@@ -3829,6 +3829,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     p->pc = _ppdCacheCreateWithPPD(ppd);
 
+    if (!p->pc)
+      cupsdLogMessage(CUPSD_LOG_WARN, "Unable to create cache of \"%s\": %s",
+                      ppd_name, cupsLastErrorString());
+
     ppdMarkDefaults(ppd);
 
     if (ppd->color_device)
@@ -3844,15 +3848,15 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
 		  ppd->color_device);
 
-    if (p->pc->account_id)
+    if (p->pc && p->pc->account_id)
       ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "job-account-id-supported",
                     1);
 
-    if (p->pc->accounting_user_id)
+    if (p->pc && p->pc->accounting_user_id)
       ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER,
                     "job-accounting-user-id-supported", 1);
 
-    if (p->pc->password)
+    if (p->pc && p->pc->password)
     {
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "job-password-encryption-supported", NULL, "none");
@@ -4363,7 +4367,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Mandatory job attributes, if any...
     */
 
-    if (cupsArrayCount(p->pc->mandatory) > 0)
+    if (p->pc && cupsArrayCount(p->pc->mandatory) > 0)
     {
       int	count = cupsArrayCount(p->pc->mandatory);
 					/* Number of mandatory attributes */
