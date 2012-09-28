@@ -1689,11 +1689,12 @@ main(int  argc,				/* I - Number of command-line args */
       continue;
     else if (ipp_status == IPP_REQUEST_VALUE ||
              ipp_status == IPP_ERROR_JOB_CANCELED ||
-             ipp_status == IPP_NOT_AUTHORIZED)
+             ipp_status == IPP_NOT_AUTHORIZED ||
+             ipp_status == IPP_INTERNAL_ERROR)
     {
      /*
-      * Print file is too large, job was canceled, or we need new
-      * authentication data...
+      * Print file is too large, job was canceled, we need new
+      * authentication data, or we had some sort of error...
       */
 
       goto cleanup;
