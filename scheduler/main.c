@@ -65,9 +65,14 @@
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
 #  include <malloc.h>
 #endif /* HAVE_MALLOC_H && HAVE_MALLINFO */
+
 #ifdef HAVE_NOTIFY_H
 #  include <notify.h>
 #endif /* HAVE_NOTIFY_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
 
 
 /*
@@ -361,15 +366,15 @@ main(int  argc,				/* I - Number of command-line args */
       }
     }
 
-#ifdef __OpenBSD__
+#if defined(__OpenBSD__) && OpenBSD < 201211
    /*
     * Call _thread_sys_closefrom() so the child process doesn't reset the
     * parent's file descriptors to be blocking.  This is a workaround for a
-    * limitation of userland libpthread on OpenBSD.
+    * limitation of userland libpthread on older versions of OpenBSD.
     */
 
     _thread_sys_closefrom(0);
-#endif /* __OpenBSD__ */
+#endif /* __OpenBSD__ && OpenBSD < 201211 */
 
    /*
     * Since CoreFoundation and DBUS both create fork-unsafe data on execution of
