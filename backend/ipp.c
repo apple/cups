@@ -952,6 +952,8 @@ main(int  argc,				/* I - Number of command-line args */
 	_cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Unable to get printer status."));
         sleep(10);
+
+	httpReconnect(http);
       }
 
       ippDelete(supported);
