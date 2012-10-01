@@ -89,7 +89,11 @@ extern const char *cssmErrorString(int error);
 typedef struct xucred cupsd_ucred_t;
 #  define CUPSD_UCRED_UID(c) (c).cr_uid
 #else
+#  ifndef __OpenBSD__
 typedef struct ucred cupsd_ucred_t;
+#  else
+typedef struct sockpeercred cupsd_ucred_t;
+#  endif
 #  define CUPSD_UCRED_UID(c) (c).uid
 #endif /* HAVE_SYS_UCRED_H */
 #ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
