@@ -21,7 +21,7 @@ process using the startup script for your operating system:</P>
 
 <UL>
 
-	<LI>AIX, IRIX, Linux, Solaris:
+	<LI>AIX, Linux, Solaris:
 	<PRE CLASS="command">
 /etc/init.d/cups restart
 	</PRE></LI>
@@ -2137,22 +2137,6 @@ PrintcapFormat plist
 <P>The <CODE>PrintcapFormat</CODE> directive controls the output format of the
 printcap file. The default is to generate the plist format on OS X, the
 Solaris format on Solaris, and the BSD format on other operating systems.</P>
-
-
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.13</SPAN><A NAME="PrintcapGUI">PrintcapGUI</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-PrintGUI /usr/bin/glpoptions
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>PrintcapGUI</CODE> directive sets the program to
-associate with the IRIX printer GUI interface script which is
-used by IRIX applications to display printer-specific options.
-There is no default program.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.21</SPAN><A NAME="ReloadTimeout">ReloadTimeout</A></H2>

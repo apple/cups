@@ -316,7 +316,6 @@ dist:	all
 	case `uname` in \
 		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
 		Darwin*) $(MAKE) $(MFLAGS) osx;; \
-		IRIX*) $(MAKE) $(MFLAGS) tardist;; \
 		Linux*) test ! -x /usr/bin/rpm || $(MAKE) $(MFLAGS) rpm;; \
 		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac

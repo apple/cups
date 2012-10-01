@@ -129,10 +129,6 @@ main(int  argc,				/* I - Number of command-line args */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-#ifdef __sgi
-  cups_file_t		*fp;		/* Fake lpsched lock file */
-  struct stat		statbuf;	/* Needed for checking lpsched FIFO */
-#endif /* __sgi */
   int			run_as_child = 0;
 					/* Needed for background fork/exec */
 #ifdef __APPLE__
@@ -564,28 +560,6 @@ main(int  argc,				/* I - Number of command-line args */
   signal(SIGPIPE, SIG_IGN);
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
-
-#ifdef __sgi
- /*
-  * Try to create a fake lpsched lock file if one is not already there.
-  * Some Adobe applications need it under IRIX in order to enable
-  * printing...
-  */
-
-  if ((fp = cupsFileOpen("/var/spool/lp/SCHEDLOCK", "w")) == NULL)
-  {
-    syslog(LOG_LPR, "Unable to create fake lpsched lock file "
-                    "\"/var/spool/lp/SCHEDLOCK\"\' - %s!",
-           strerror(errno));
-  }
-  else
-  {
-    fchmod(cupsFileNumber(fp), 0644);
-    fchown(cupsFileNumber(fp), User, Group);
-
-    cupsFileClose(fp);
-  }
-#endif /* __sgi */
 
  /*
   * Initialize authentication certificates...
@@ -1130,18 +1104,6 @@ main(int  argc,				/* I - Number of command-line args */
   if (KerberosContext)
     krb5_free_context(KerberosContext);
 #endif /* HAVE_GSSAPI */
-
-#ifdef __sgi
- /*
-  * Remove the fake IRIX lpsched lock file, but only if the existing
-  * file is not a FIFO which indicates that the real IRIX lpsched is
-  * running...
-  */
-
-  if (!stat("/var/spool/lp/FIFO", &statbuf))
-    if (!S_ISFIFO(statbuf.st_mode))
-      unlink("/var/spool/lp/SCHEDLOCK");
-#endif /* __sgi */
 
   cupsdStopSelect();
 

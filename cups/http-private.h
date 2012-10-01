@@ -73,14 +73,14 @@
 #    include <Security/Authorization.h>
 #  endif /* HAVE_AUTHORIZATION_H */
 
-#  if defined(__sgi) || (defined(__APPLE__) && !defined(_SOCKLEN_T))
+#  if defined(__APPLE__) && !defined(_SOCKLEN_T)
 /*
- * IRIX and MacOS X 10.2.x do not define socklen_t, and in fact use an int instead of
+ * MacOS X 10.2.x does not define socklen_t, and in fact uses an int instead of
  * unsigned type for length values...
  */
 
 typedef int socklen_t;
-#  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
+#  endif /* __APPLE__ && !_SOCKLEN_T */
 
 #  include <cups/http.h>
 #  include "md5-private.h"

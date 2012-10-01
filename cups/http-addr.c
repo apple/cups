@@ -162,13 +162,6 @@ httpAddrLocalhost(
 }
 
 
-#ifdef __sgi
-#  define ADDR_CAST (struct sockaddr *)
-#else
-#  define ADDR_CAST (char *)
-#endif /* __sgi */
-
-
 /*
  * 'httpAddrLookup()' - Lookup the hostname associated with the address.
  *
@@ -267,11 +260,11 @@ httpAddrLookup(
 
 #  ifdef AF_INET6
     if (addr->addr.sa_family == AF_INET6)
-      host = gethostbyaddr(ADDR_CAST &(addr->ipv6.sin6_addr),
+      host = gethostbyaddr((char *)&(addr->ipv6.sin6_addr),
                 	   sizeof(struct in_addr), AF_INET6);
     else
 #  endif /* AF_INET6 */
-    host = gethostbyaddr(ADDR_CAST &(addr->ipv4.sin_addr),
+    host = gethostbyaddr((char *)&(addr->ipv4.sin_addr),
                 	 sizeof(struct in_addr), AF_INET);
 
     if (host == NULL)

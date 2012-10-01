@@ -202,19 +202,6 @@ else
 				OPTIM="+z $OPTIM"
 			fi
 			;;
-        	IRIX)
-			if test -z "$OPTIM"; then
-				if test "x$with_optim" = x; then
-					OPTIM="-O2"
-				else
-					OPTIM="$with_optim $OPTIM"
-				fi
-			fi
-
-			if test "x$with_optim" = x; then
-				OPTIM="-fullwarn -woff 1183,1209,1349,1506,3201 $OPTIM"
-			fi
-			;;
 		OSF*)
 			# Tru64 UNIX aka Digital UNIX aka OSF/1
 			if test -z "$OPTIM"; then

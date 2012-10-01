@@ -215,8 +215,8 @@ if test "$DSO" != ":"; then
 				EXPORT_LDFLAGS="-Wl,-R$libdir"
 			fi
 			;;
-                IRIX | Linux | GNU)
-                        # IRIX, Linux, and HURD...
+                Linux | GNU)
+                        # Linux, and HURD...
 			if test $exec_prefix != /usr; then
 				DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
 				LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"

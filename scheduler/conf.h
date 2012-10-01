@@ -147,8 +147,6 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Temporary directory */
 			*Printcap		VALUE(NULL),
 					/* Printcap file */
-			*PrintcapGUI		VALUE(NULL),
-					/* GUI program to use for IRIX */
 			*FontPath		VALUE(NULL),
 					/* Font search path */
 			*RemoteRoot		VALUE(NULL),

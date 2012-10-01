@@ -49,10 +49,6 @@
  *   load_ppd()                 - Load a cached PPD file, updating the cache as
  *                                needed.
  *   new_media_col()            - Create a media-col collection value.
- *   write_irix_config()        - Update the config files used by the IRIX
- *                                desktop tools.
- *   write_irix_state()         - Update the status files used by IRIX printing
- *                                desktop tools.
  *   write_xml_string()         - Write a string with XML escaping.
  */
 
@@ -96,10 +92,6 @@ static void	load_ppd(cupsd_printer_t *p);
 static void	log_ipp_conformance(cupsd_printer_t *p, const char *reason);
 static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
 		               const char *type);
-#ifdef __sgi
-static void	write_irix_config(cupsd_printer_t *p);
-static void	write_irix_state(cupsd_printer_t *p);
-#endif /* __sgi */
 static void	write_xml_string(cups_file_t *fp, const char *s);
 
 
@@ -720,9 +712,6 @@ cupsdDeletePrinter(
 {
   int	i,				/* Looping var */
 	changed = 0;			/* Class changed? */
-#ifdef __sgi
-  char	filename[1024];			/* Interface script filename */
-#endif /* __sgi */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeletePrinter(p=%p(%s), update=%d)",
@@ -754,31 +743,6 @@ cupsdDeletePrinter(
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdDeletePrinter: Removing %s from Printers", p->name);
   cupsArrayRemove(Printers, p);
-
- /*
-  * Remove the dummy interface/icon/option files under IRIX...
-  */
-
-#ifdef __sgi
-  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
-  unlink(filename);
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui",
-           p->name);
-  unlink(filename);
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
-  unlink(filename);
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.config", p->name);
-  unlink(filename);
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.status", p->name);
-  unlink(filename);
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
-  unlink(filename);
-#endif /* __sgi */
 
  /*
   * If p is the default printer, assign a different one...
@@ -1657,14 +1621,6 @@ cupsdSaveAllPrinters(void)
                      (long)printer->marker_time);
 
     cupsFilePuts(fp, "</Printer>\n");
-
-#ifdef __sgi
-    /*
-     * Make IRIX desktop & printer status happy
-     */
-
-    write_irix_state(printer);
-#endif /* __sgi */
   }
 
   cupsdCloseCreatedConfFile(fp, filename);
@@ -2457,15 +2413,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
   add_printer_defaults(p);
 
-#ifdef __sgi
- /*
-  * Write the IRIX printer config and status files...
-  */
-
-  write_irix_config(p);
-  write_irix_state(p);
-#endif /* __sgi */
-
  /*
   * Let the browse protocols reflect the change
   */
@@ -2653,10 +2600,6 @@ cupsdSetPrinterState(
     */
 
     p->state_time = time(NULL);
-
-#ifdef __sgi
-    write_irix_state(p);
-#endif /* __sgi */
   }
 
  /*
@@ -3044,16 +2987,6 @@ cupsdWritePrintcap(void)
   cups_file_t		*fp;		/* Printcap file */
   cupsd_printer_t	*p;		/* Current printer */
 
-
-#ifdef __sgi
- /*
-  * Update the IRIX printer state for the default printer; if
-  * no printers remain, then the default printer file will be
-  * removed...
-  */
-
-  write_irix_state(DefaultPrinter);
-#endif /* __sgi */
 
  /*
   * See if we have a printcap file; if not, don't bother writing it.
@@ -5077,261 +5010,6 @@ new_media_col(_pwg_size_t *size,	/* I - media-size/margin values */
 
   return (media_col);
 }
-
-
-#ifdef __sgi
-/*
- * 'write_irix_config()' - Update the config files used by the IRIX
- *                         desktop tools.
- */
-
-static void
-write_irix_config(cupsd_printer_t *p)	/* I - Printer to update */
-{
-  char		filename[1024];		/* Interface script filename */
-  cups_file_t	*fp;			/* Interface script file */
-  ipp_attribute_t *attr;		/* Attribute data */
-
-
- /*
-  * Add dummy interface and GUI scripts to fool SGI's "challenged" printing
-  * tools.  First the interface script that tells the tools what kind of
-  * printer we have...
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/interface/%s", p->name);
-
-  if (p->type & CUPS_PRINTER_CLASS)
-    unlink(filename);
-  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-  {
-    cupsFilePuts(fp, "#!/bin/sh\n");
-
-    if ((attr = ippFindAttribute(p->attrs, "printer-make-and-model",
-                                 IPP_TAG_TEXT)) != NULL)
-      cupsFilePrintf(fp, "NAME=\"%s\"\n", attr->values[0].string.text);
-    else if (p->type & CUPS_PRINTER_CLASS)
-      cupsFilePuts(fp, "NAME=\"Printer Class\"\n");
-    else
-      cupsFilePuts(fp, "NAME=\"Remote Destination\"\n");
-
-    if (p->type & CUPS_PRINTER_COLOR)
-      cupsFilePuts(fp, "TYPE=ColorPostScript\n");
-    else
-      cupsFilePuts(fp, "TYPE=MonoPostScript\n");
-
-    cupsFilePrintf(fp, "HOSTNAME=%s\n", ServerName);
-    cupsFilePrintf(fp, "HOSTPRINTER=%s\n", p->name);
-
-    cupsFileClose(fp);
-
-    chmod(filename, 0755);
-    chown(filename, User, Group);
-  }
-
- /*
-  * Then the member file that tells which device file the queue is connected
-  * to...  Networked printers use "/dev/null" in this file, so that's what
-  * we use (the actual device URI can confuse some apps...)
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/member/%s", p->name);
-
-  if (p->type & CUPS_PRINTER_CLASS)
-    unlink(filename);
-  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-  {
-    cupsFilePuts(fp, "/dev/null\n");
-
-    cupsFileClose(fp);
-
-    chmod(filename, 0644);
-    chown(filename, User, Group);
-  }
-
- /*
-  * The gui_interface file is a script or program that launches a GUI
-  * option panel for the printer, using options specified on the
-  * command-line in the third argument.  The option panel must send
-  * any printing options to stdout on a single line when the user
-  * accepts them, or nothing if the user cancels the dialog.
-  *
-  * The default options panel program is /usr/bin/glpoptions, from
-  * the ESP Print Pro software.  You can select another using the
-  * PrintcapGUI option.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/gui_interface/ELF/%s.gui", p->name);
-
-  if (p->type & CUPS_PRINTER_CLASS)
-    unlink(filename);
-  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-  {
-    cupsFilePuts(fp, "#!/bin/sh\n");
-    cupsFilePrintf(fp, "%s -d %s -o \"$3\"\n", PrintcapGUI, p->name);
-
-    cupsFileClose(fp);
-
-    chmod(filename, 0755);
-    chown(filename, User, Group);
-  }
-
- /*
-  * The POD config file is needed by the printstatus command to show
-  * the printer location and device.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.config", p->name);
-
-  if (p->type & CUPS_PRINTER_CLASS)
-    unlink(filename);
-  else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-  {
-    cupsFilePrintf(fp, "Printer Class      | %s\n",
-            (p->type & CUPS_PRINTER_COLOR) ? "ColorPostScript" : "MonoPostScript");
-    cupsFilePrintf(fp, "Printer Model      | %s\n", p->make_model ? p->make_model : "");
-    cupsFilePrintf(fp, "Location Code      | %s\n", p->location ? p->location : "");
-    cupsFilePrintf(fp, "Physical Location  | %s\n", p->info ? p->info : "");
-    cupsFilePrintf(fp, "Port Path          | %s\n", p->device_uri);
-    cupsFilePrintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
-    cupsFilePrintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
-    cupsFilePuts(fp, "Status Update Wait | 10 seconds\n");
-
-    cupsFileClose(fp);
-
-    chmod(filename, 0664);
-    chown(filename, User, Group);
-  }
-}
-
-
-/*
- * 'write_irix_state()' - Update the status files used by IRIX printing
- *                        desktop tools.
- */
-
-static void
-write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
-{
-  char		filename[1024];		/* Interface script filename */
-  cups_file_t	*fp;			/* Interface script file */
-  int		tag;			/* Status tag value */
-
-
-  if (p)
-  {
-   /*
-    * The POD status file is needed for the printstatus window to
-    * provide the current status of the printer.
-    */
-
-    snprintf(filename, sizeof(filename), "/var/spool/lp/pod/%s.status", p->name);
-
-    if (p->type & CUPS_PRINTER_CLASS)
-      unlink(filename);
-    else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-    {
-      cupsFilePrintf(fp, "Operational Status | %s\n",
-              (p->state == IPP_PRINTER_IDLE)       ? "Idle" :
-              (p->state == IPP_PRINTER_PROCESSING) ? "Busy" :
-                                                     "Faulted");
-      cupsFilePrintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
-      cupsFilePrintf(fp, "Information        | 02 00 00 | Device URI: %s\n",
-              p->device_uri);
-      cupsFilePrintf(fp, "Information        | 03 00 00 | %s jobs\n",
-              p->accepting ? "Accepting" : "Not accepting");
-      cupsFilePrintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
-
-      cupsFileClose(fp);
-
-      chmod(filename, 0664);
-      chown(filename, User, Group);
-    }
-
-   /*
-    * The activeicons file is needed to provide desktop icons for printers:
-    *
-    * [ quoted from /usr/lib/print/tagit ]
-    *
-    * --- Type of printer tags (base values)
-    *
-    * Dumb=66048			# 0x10200
-    * DumbColor=66080		# 0x10220
-    * Raster=66112		# 0x10240
-    * ColorRaster=66144		# 0x10260
-    * Plotter=66176		# 0x10280
-    * PostScript=66208		# 0x102A0
-    * ColorPostScript=66240	# 0x102C0
-    * MonoPostScript=66272	# 0x102E0
-    *
-    * --- Printer state modifiers for local printers
-    *
-    * Idle=0			# 0x0
-    * Busy=1			# 0x1
-    * Faulted=2			# 0x2
-    * Unknown=3			# 0x3 (Faulted due to unknown reason)
-    *
-    * --- Printer state modifiers for network printers
-    *
-    * NetIdle=8			# 0x8
-    * NetBusy=9			# 0x9
-    * NetFaulted=10		# 0xA
-    * NetUnknown=11		# 0xB (Faulted due to unknown reason)
-    */
-
-    snprintf(filename, sizeof(filename), "/var/spool/lp/activeicons/%s", p->name);
-
-    if (p->type & CUPS_PRINTER_CLASS)
-      unlink(filename);
-    else if ((fp = cupsFileOpen(filename, "w")) != NULL)
-    {
-      if (p->type & CUPS_PRINTER_COLOR)
-	tag = 66240;
-      else
-	tag = 66272;
-
-      if (p->type & CUPS_PRINTER_REMOTE)
-	tag |= 8;
-
-      if (p->state == IPP_PRINTER_PROCESSING)
-	tag |= 1;
-
-      else if (p->state == IPP_PRINTER_STOPPED)
-	tag |= 2;
-
-      cupsFilePuts(fp, "#!/bin/sh\n");
-      cupsFilePrintf(fp, "#Tag %d\n", tag);
-
-      cupsFileClose(fp);
-
-      chmod(filename, 0755);
-      chown(filename, User, Group);
-    }
-  }
-
- /*
-  * The default file is needed by the printers window to show
-  * the default printer.
-  */
-
-  snprintf(filename, sizeof(filename), "/var/spool/lp/default");
-
-  if (DefaultPrinter != NULL)
-  {
-    if ((fp = cupsFileOpen(filename, "w")) != NULL)
-    {
-      cupsFilePrintf(fp, "%s\n", DefaultPrinter->name);
-
-      cupsFileClose(fp);
-
-      chmod(filename, 0644);
-      chown(filename, User, Group);
-    }
-  }
-  else
-    unlink(filename);
-}
-#endif /* __sgi */
 
 
 /*

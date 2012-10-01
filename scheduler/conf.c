@@ -151,7 +151,6 @@ static const cupsd_var_t	variables[] =
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_TIME },
   { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_TIME },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
-  { "PrintcapGUI",		&PrintcapGUI,		CUPSD_VARTYPE_STRING },
   { "ReloadTimeout",		&ReloadTimeout,		CUPSD_VARTYPE_TIME },
   { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
@@ -580,7 +579,6 @@ cupsdReadConfiguration(void)
                  "%p %u %j %T %P %C %{job-billing} "
 		 "%{job-originating-host-name} %{job-name} %{media} %{sides}");
   cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
-  cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");
   cupsdSetStringf(&ServerHeader, "CUPS/%d.%d", CUPS_VERSION_MAJOR,
