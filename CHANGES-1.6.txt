@@ -27,7 +27,7 @@ CHANGES IN CUPS V1.6.2
 	  Bonjour-shared print queues (STR #4159)
 	- The cupsd.conf file included obsolete browsing directives (STR #4157)
 	- Fixed a USB backend compatibility issue on systems using libusb
-	  (STR #4155)
+	  (STR #4155, STR #4191)
 	- Some Bonjour features were not available on systems with Avahi
 	  (STR #4156)
 	- CUPS now includes the port number in the Host: header for HTTP

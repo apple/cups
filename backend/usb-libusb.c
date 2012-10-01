@@ -147,17 +147,37 @@ static const struct quirk_printer_struct quirk_printers[] = {
 			    Printer, http://www.cups.org/str.php?L4155 */
 	{ 0x04a9, 0x10b6, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4300
 			    Printer, https://bugs.launchpad.net/bugs/1032385 */
+	{ 0x04a9, 0x170c, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP500
+			    Printer, https://bugs.launchpad.net/bugs/1032456 */
+	{ 0x04a9, 0x1717, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP510
+			    Printer, https://bugs.launchpad.net/bugs/1050009 */
+	{ 0x04a9, 0x173d, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP550
+			    Printer, http://www.cups.org/str.php?L4155 */
+	{ 0x04a9, 0x173e, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP560
+			    Printer, http://www.cups.org/str.php?L4155 */
+	{ 0x04f9, 0x001a, USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
+						  HL-1430 Laser Printer,
+				     https://bugs.launchpad.net/bugs/1038695 */
 	{ 0x04f9, 0x000d, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
-						  HL-1440 Laser Printer */
+						  HL-1440 Laser Printer,
+				     https://bugs.launchpad.net/bugs/1000253 */
+	{ 0x06bc, 0x000b, USBLP_QUIRK_NO_REATTACH }, /* Oki Data Corp.
+						  Okipage 14ex Printer,
+				     https://bugs.launchpad.net/bugs/872483 */
+	{ 0x06bc, 0x01c7, USBLP_QUIRK_NO_REATTACH }, /* Oki Data Corp. B410d,
+				     https://bugs.launchpad.net/bugs/872483 */
 	{ 0x04b8, 0x0202, USBLP_QUIRK_BAD_CLASS }, /* Seiko Epson Receipt
 						      Printer M129C */
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH |
 	                  USBLP_QUIRK_RESET },
 	/* Prolific Technology, Inc. PL2305 Parallel Port
-	   (USB -> Parallel adapter) */
-	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices */
+	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
+	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices,
+				     https://bugs.launchpad.net/bugs/1032456 */
+	{ 0x0a5f, 0x0000, USBLP_QUIRK_BIDIR }, /* All Zebra devices,
+				     https://bugs.launchpad.net/bugs/1001028 */
 	{ 0, 0 }
 };
 
