@@ -518,7 +518,7 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
 		api-cups.xml \
-		cups.h adminutil.c dest.c language.c notify.c \
+		cups.h adminutil.c dest*.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --tokens help/api-cups.html api-cups.xml >../doc/help/api-cups.tokens
@@ -573,7 +573,7 @@ framedhelp:
 		--section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h adminutil.c dest.c language.c notify.c \
+		cups.h adminutil.c dest*.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c
 	mxmldoc --framed api-filedir \

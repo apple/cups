@@ -1880,7 +1880,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
         if (!_cups_strncasecmp(option, "Custom", 6) && !_cups_strcasecmp(choice, "True"))
 	{
 	  _cups_strcpy(option, option + 6);
-	  strcpy(choice, "Custom");
+	  strlcpy(choice, "Custom", sizeof(choice));
 	}
 
         if ((o = ppdFindOption(ppd, option)) == NULL)
@@ -1981,13 +1981,13 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
       if (!_cups_strncasecmp(c->option1, "Custom", 6) &&
           !_cups_strcasecmp(c->choice1, "True"))
       {
-	strcpy(option, c->option1 + 6);
-	strcpy(choice, "Custom");
+	strlcpy(option, c->option1 + 6, sizeof(option));
+	strlcpy(choice, "Custom", sizeof(choice));
       }
       else
       {
-	strcpy(option, c->option1);
-	strcpy(choice, c->choice1);
+	strlcpy(option, c->option1, sizeof(option));
+	strlcpy(choice, c->choice1, sizeof(choice));
       }
 
       if ((o = ppdFindOption(ppd, option)) == NULL)
@@ -2022,13 +2022,13 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
       if (!_cups_strncasecmp(c->option2, "Custom", 6) &&
           !_cups_strcasecmp(c->choice2, "True"))
       {
-	strcpy(option, c->option2 + 6);
-	strcpy(choice, "Custom");
+	strlcpy(option, c->option2 + 6, sizeof(option));
+	strlcpy(choice, "Custom", sizeof(choice));
       }
       else
       {
-	strcpy(option, c->option2);
-	strcpy(choice, c->choice2);
+	strlcpy(option, c->option2, sizeof(option));
+	strlcpy(choice, c->choice2, sizeof(choice));
       }
 
       if ((o = ppdFindOption(ppd, option)) == NULL)

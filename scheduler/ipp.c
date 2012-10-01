@@ -1274,6 +1274,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   http_status_t	status;			/* Policy status */
   ipp_attribute_t *attr,		/* Current attribute */
 		*auth_info;		/* auth-info attribute */
+  const char	*mandatory;		/* Current mandatory job attribute */
   const char	*val;			/* Default option value */
   int		priority;		/* Job priority */
   cupsd_job_t	*job;			/* Current job */
@@ -1285,6 +1286,21 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *media_col,		/* media-col attribute */
 		*media_margin;		/* media-*-margin attribute */
   ipp_t		*unsup_col;		/* media-col in unsupported response */
+  static const char * const readonly[] =/* List of read-only attributes */
+  {
+    "job-id",
+    "job-k-octets",
+    /*"job-impressions",*/		/* For now we allow this since cupsd can't count */
+    "job-impressions-completed",
+    "job-media-sheets",
+    "job-media-sheets-completed",
+    "job-state",
+    "job-state-message",
+    "job-state-reasons",
+    "time-at-completed",
+    "time-at-creation",
+    "time-at-processing"
+  };
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
@@ -1350,8 +1366,50 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
  /*
   * Validate job template attributes; for now just document-format,
-  * copies, number-up, and page-ranges...
+  * copies, job-sheets, number-up, page-ranges, mandatory attributes, and
+  * media...
   */
+
+  for (i = 0; i < (int)(sizeof(readonly) / sizeof(readonly[0])); i ++)
+  {
+    if ((attr = ippFindAttribute(con->request, readonly[i],
+                                 IPP_TAG_ZERO)) != NULL)
+    {
+      ippDeleteAttribute(con->request, attr);
+
+      if (StrictConformance)
+      {
+	send_ipp_status(con, IPP_BAD_REQUEST,
+			_("The '%s' Job Description attribute cannot be "
+			  "supplied in a job creation request."), readonly[i]);
+	return (NULL);
+      }
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "Unexpected '%s' Job Description attribute in a job "
+                      "creation request.", readonly[i]);
+    }
+  }
+
+  if (printer->pc)
+  {
+    for (mandatory = (char *)cupsArrayFirst(printer->pc->mandatory);
+	 mandatory;
+	 mandatory = (char *)cupsArrayNext(printer->pc->mandatory))
+    {
+      if (!ippFindAttribute(con->request, mandatory, IPP_TAG_ZERO))
+      {
+       /*
+	* Missing a required attribute...
+	*/
+
+	send_ipp_status(con, IPP_CONFLICT,
+			_("The \"%s\" attribute is required for print jobs."),
+			mandatory);
+	return (NULL);
+      }
+    }
+  }
 
   if (filetype && printer->filetypes &&
       !cupsArrayFind(printer->filetypes, filetype))
@@ -8248,8 +8306,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Auto-type it!
     */
 
-    strcpy(super, "application");
-    strcpy(type, "octet-stream");
+    strlcpy(super, "application", sizeof(super));
+    strlcpy(type, "octet-stream", sizeof(type));
   }
 
   if (!strcmp(super, "application") && !strcmp(type, "octet-stream"))
@@ -8617,7 +8675,8 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
-    strcpy(printer->state_message, "Rejecting Jobs");
+    strlcpy(printer->state_message, "Rejecting Jobs",
+            sizeof(printer->state_message));
   else
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
@@ -9477,8 +9536,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * No document format attribute?  Auto-type it!
     */
 
-    strcpy(super, "application");
-    strcpy(type, "octet-stream");
+    strlcpy(super, "application", sizeof(super));
+    strlcpy(type, "octet-stream", sizeof(type));
   }
 
   if (!strcmp(super, "application") && !strcmp(type, "octet-stream"))
@@ -10531,6 +10590,7 @@ set_printer_defaults(
           break;
 
       case IPP_TAG_NAME :
+      case IPP_TAG_TEXT :
       case IPP_TAG_KEYWORD :
       case IPP_TAG_URI :
           printer->num_options = cupsAddOption(name,
@@ -10723,7 +10783,7 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) == NULL)
-    strcpy(printer->state_message, "Paused");
+    strlcpy(printer->state_message, "Paused", sizeof(printer->state_message));
   else
   {
     strlcpy(printer->state_message, attr->values[0].string.text,
@@ -10920,7 +10980,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   http_status_t		status;		/* Policy status */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*auth_info;	/* auth-info attribute */
-  ipp_attribute_t	*format;	/* Document-format attribute */
+  ipp_attribute_t	*format,	/* Document-format attribute */
+			*name;		/* Job-name attribute */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			super[MIME_MAX_SUPER],
 					/* Supertype of file */
@@ -10947,7 +11008,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
       )
     {
       send_ipp_status(con, IPP_ATTRIBUTES,
-                      _("Unsupported compression \"%s\"."),
+                      _("Unsupported 'compression' value \"%s\"."),
         	      attr->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
 	           "compression", NULL, attr->values[0].string.text);
@@ -10965,7 +11026,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
                super, type) != 2)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad 'document-format' value \"%s\"."),
 		      format->values[0].string.text);
       return;
     }
@@ -10976,11 +11038,91 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Hint: Do you have the raw file printing rules enabled?");
       send_ipp_status(con, IPP_DOCUMENT_FORMAT,
-                      _("Unsupported document-format \"%s\"."),
+                      _("Unsupported 'document-format' value \"%s\"."),
 		      format->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                    "document-format", NULL, format->values[0].string.text);
       return;
+    }
+  }
+
+ /*
+  * Is the job-name valid?
+  */
+
+  if ((name = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) != NULL)
+  {
+    int bad_name = 0;			/* Is the job-name value bad? */
+
+    if ((name->value_tag != IPP_TAG_NAME && name->value_tag != IPP_TAG_NAMELANG) ||
+        name->num_values != 1)
+    {
+      bad_name = 1;
+    }
+    else
+    {
+     /*
+      * Validate that job-name conforms to RFC 5198 (Network Unicode) and
+      * IPP Everywhere requirements for "name" values...
+      */
+
+      const unsigned char *nameptr;	/* Pointer into "job-name" attribute */
+
+      for (nameptr = (unsigned char *)name->values[0].string.text;
+           *nameptr;
+           nameptr ++)
+      {
+        if (*nameptr < ' ' && *nameptr != '\t')
+          break;
+        else if (*nameptr == 0x7f)
+          break;
+        else if ((*nameptr & 0xe0) == 0xc0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80)
+            break;
+
+          nameptr ++;
+        }
+        else if ((*nameptr & 0xf0) == 0xe0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80 ||
+              (nameptr[2] & 0xc0) != 0x80)
+	    break;
+
+	  nameptr += 2;
+	}
+        else if ((*nameptr & 0xf8) == 0xf0)
+        {
+          if ((nameptr[1] & 0xc0) != 0x80 ||
+	      (nameptr[2] & 0xc0) != 0x80 ||
+	      (nameptr[3] & 0xc0) != 0x80)
+	    break;
+
+	  nameptr += 3;
+	}
+        else if (*nameptr & 0x80)
+          break;
+      }
+
+      if (*nameptr)
+        bad_name = 1;
+    }
+
+    if (bad_name)
+    {
+      if (StrictConformance)
+      {
+	send_ipp_status(con, IPP_ATTRIBUTES,
+	                _("Unsupported 'job-name' value."));
+	ippCopyAttribute(con->response, name, 0);
+	return;
+      }
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_WARN,
+                        "Unsupported 'job-name' value, deleting from request.");
+        ippDeleteAttribute(con->request, name);
+      }
     }
   }
 

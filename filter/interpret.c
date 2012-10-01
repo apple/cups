@@ -200,7 +200,7 @@ cupsRasterInterpretPPD(
   h->cupsImagingBBox[2]          = 612.0f;
   h->cupsImagingBBox[3]          = 792.0f;
 
-  strcpy(h->cupsPageSizeName, "Letter");
+  strlcpy(h->cupsPageSizeName, "Letter", sizeof(h->cupsPageSizeName));
 
 #ifdef __APPLE__
  /*

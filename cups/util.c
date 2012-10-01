@@ -605,7 +605,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
     }
   }
   else
-    strcpy(uri, "ipp://localhost/");
+    strlcpy(uri, "ipp://localhost/", sizeof(uri));
 
   if (!http)
     if ((http = _cupsConnect()) == NULL)
@@ -1059,7 +1059,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   DEBUG_printf(("2cupsGetPPD3: Local hostname=\"%s\"", localhost));
 
   if (!_cups_strcasecmp(localhost, hostname))
-    strcpy(hostname, "localhost");
+    strlcpy(hostname, "localhost", sizeof(hostname));
 
  /*
   * Get the hostname and port number we are connected to...

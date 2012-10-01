@@ -3,13 +3,32 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
+	- Documentation fixes
+	- OpenBSD build fix (STR #4195, STR #4196)
+	- The scheduler could crash when using Avahi (STR #4183, STR #4192)
+	- The IPP backend could get stuck in an endless loop on certain network
+	  errors (STR #4194)
+	- 32-bit builds failed on Debian (STR #4133)
+	- The scheduler no longer accepts or sends job description attributes.
+	- The IPP backend now works around some conformance issues for broken
+	  printers (STR #4190)
+	- cupsBackendReport() now filters out all control characters from the
+	  reported 1284 device IDs (STR #4124)
+	- The scheduler no longer allows job-name values that are not valid
+	  network Unicode strings (STR #4072)
+	- The web interface did not preserve the order of classes, jobs, or
+	  printers (STR #4170)
+	- The network backends now support disabling of SNMP supply level
+	  queries via the "snmp" URI option (STR #4106)
+	- The IPP backend did not specify the compression used (STR #4181)
+	- ipptool did not support octetString values.
 	- The scheduler did not recognize dnssd: or ipps: URIs as Bonjour shared
 	  queues (STR #4158)
 	- Applications could not get the PPD file for statically-configured
 	  Bonjour-shared print queues (STR #4159)
 	- The cupsd.conf file included obsolete browsing directives (STR #4157)
 	- Fixed a USB backend compatibility issue on systems using libusb
-	  (STR #4155)
+	  (STR #4155, STR #4191)
 	- Some Bonjour features were not available on systems with Avahi
 	  (STR #4156)
 	- CUPS now includes the port number in the Host: header for HTTP

@@ -319,7 +319,8 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
     if (instance && !cupsGetDest(name, NULL, num_dests, *dests))
       return (num_dests);
 
-    dest = cups_add_dest(name, instance, &num_dests, dests);
+    if ((dest = cups_add_dest(name, instance, &num_dests, dests)) == NULL)
+      return (num_dests);
 
    /*
     * Find the base dest again now the array has been realloc'd.
@@ -1409,6 +1410,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 		  "printer-is-shared",
 		  "printer-location",
 		  "printer-make-and-model",
+		  "printer-mandatory-job-attributes",
 		  "printer-name",
 		  "printer-state",
 		  "printer-state-change-time",
@@ -1514,6 +1516,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 	    !strcmp(attr->name, "printer-info") ||
 	    !strcmp(attr->name, "printer-is-shared") ||
 	    !strcmp(attr->name, "printer-make-and-model") ||
+	    !strcmp(attr->name, "printer-mandatory-job-attributes") ||
 	    !strcmp(attr->name, "printer-state") ||
 	    !strcmp(attr->name, "printer-state-change-time") ||
 	    !strcmp(attr->name, "printer-type") ||
@@ -1788,7 +1791,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * need to set a default if one exists...
     */
 
-    if (dest == NULL && defprinter != NULL)
+    if (!dest && *dests && defprinter)
     {
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;
@@ -2449,7 +2452,7 @@ appleCopyNetwork(void)
  * 'appleGetPaperSize()' - Get the default paper size.
  */
 
-char *					/* O - Default paper size */
+static char *				/* O - Default paper size */
 appleGetPaperSize(char *name,		/* I - Paper size name buffer */
                   int  namesize)	/* I - Size of buffer */
 {
@@ -3150,7 +3153,7 @@ cups_dnssd_query_cb(
     device->state     = _CUPS_DNSSD_PENDING;
     make_and_model[0] = '\0';
 
-    strcpy(model, "Unknown");
+    strlcpy(model, "Unknown", sizeof(model));
 
     for (txt = rdata, txtend = txt + rdlen;
 	 txt < txtend;
@@ -3192,10 +3195,10 @@ cups_dnssd_query_cb(
       if (!_cups_strcasecmp(key, "usb_MFG") ||
           !_cups_strcasecmp(key, "usb_MANU") ||
 	  !_cups_strcasecmp(key, "usb_MANUFACTURER"))
-	strcpy(make_and_model, value);
+	strlcpy(make_and_model, value, sizeof(make_and_model));
       else if (!_cups_strcasecmp(key, "usb_MDL") ||
                !_cups_strcasecmp(key, "usb_MODEL"))
-	strcpy(model, value);
+	strlcpy(model, value, sizeof(model));
       else if (!_cups_strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
       {
 	if (value[0] == '(')
@@ -3207,14 +3210,14 @@ cups_dnssd_query_cb(
 	  if ((ptr = value + strlen(value) - 1) > value && *ptr == ')')
 	    *ptr = '\0';
 
-	  strcpy(model, value + 1);
+	  strlcpy(model, value + 1, sizeof(model));
 	}
 	else
-	  strcpy(model, value);
+	  strlcpy(model, value, sizeof(model));
       }
       else if (!_cups_strcasecmp(key, "ty"))
       {
-	strcpy(model, value);
+	strlcpy(model, value, sizeof(model));
 
 	if ((ptr = strchr(model, ',')) != NULL)
 	  *ptr = '\0';

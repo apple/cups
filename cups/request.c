@@ -51,9 +51,9 @@
 /*
  * 'cupsDoFileRequest()' - Do an IPP request with a file.
  *
- * This function sends the IPP request to the specified server, retrying
- * and authenticating as necessary.  The request is freed with @link ippDelete@
- * after receiving a valid IPP response.
+ * This function sends the IPP request and attached file to the specified
+ * server, retrying and authenticating as necessary.  The request is freed with
+ * @link ippDelete@.
  */
 
 ipp_t *					/* O - Response data */
@@ -102,14 +102,14 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
 /*
  * 'cupsDoIORequest()' - Do an IPP request with file descriptors.
  *
- * This function sends the IPP request to the specified server, retrying
- * and authenticating as necessary.  The request is freed with ippDelete()
- * after receiving a valid IPP response.
+ * This function sends the IPP request with the optional input file "infile" to
+ * the specified server, retrying and authenticating as necessary.  The request
+ * is freed with @link ippDelete@.
  *
- * If "infile" is a valid file descriptor, cupsDoIORequest() copies
+ * If "infile" is a valid file descriptor, @code cupsDoIORequest@ copies
  * all of the data from the file after the IPP request message.
  *
- * If "outfile" is a valid file descriptor, cupsDoIORequest() copies
+ * If "outfile" is a valid file descriptor, @code cupsDoIORequest@ copies
  * all of the data after the IPP response message to the file.
  *
  * @since CUPS 1.3/OS X 10.5@
@@ -309,8 +309,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  * 'cupsDoRequest()' - Do an IPP request.
  *
  * This function sends the IPP request to the specified server, retrying
- * and authenticating as necessary.  The request is freed with ippDelete()
- * after receiving a valid IPP response.
+ * and authenticating as necessary.  The request is freed with @link ippDelete@.
  */
 
 ipp_t *					/* O - Response data */
@@ -331,9 +330,9 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
  * 'cupsGetResponse()' - Get a response to an IPP request.
  *
  * Use this function to get the response for an IPP request sent using
- * cupsSendDocument() or cupsSendRequest(). For requests that return
- * additional data, use httpRead() after getting a successful response,
- * otherwise call httpFlush() to complete the response processing.
+ * @link cupsSendRequest@. For requests that return additional data, use
+ * @link cupsReadResponseData@ after getting a successful response,
+ * otherwise call @link httpFlush@ to complete the response processing.
  *
  * @since CUPS 1.4/OS X 10.6@
  */
@@ -481,7 +480,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
 
 /*
- * 'cupsLastError()' - Return the last IPP status code.
+ * 'cupsLastError()' - Return the last IPP status code received on the current
+ *                     thread.
  */
 
 ipp_status_t				/* O - IPP status code from last request */
@@ -492,7 +492,8 @@ cupsLastError(void)
 
 
 /*
- * 'cupsLastErrorString()' - Return the last IPP status-message.
+ * 'cupsLastErrorString()' - Return the last IPP status-message received on the
+ *                           current thread.
  *
  * @since CUPS 1.2/OS X 10.5@
  */
@@ -537,8 +538,9 @@ _cupsNextDelay(int current,		/* I  - Current delay value or 0 */
 /*
  * 'cupsReadResponseData()' - Read additional data after the IPP response.
  *
- * This function is used after cupsGetResponse() to read the PPD or document
- * files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
+ * This function is used after @link cupsGetResponse@ to read the PPD or document
+ * files from @code CUPS_GET_PPD@ and @code CUPS_GET_DOCUMENT@ requests,
+ * respectively.
  *
  * @since CUPS 1.4/OS X 10.6@
  */
@@ -579,13 +581,17 @@ cupsReadResponseData(
 /*
  * 'cupsSendRequest()' - Send an IPP request.
  *
- * Use httpWrite() to write any additional data (document, PPD file, etc.)
- * for the request, cupsGetResponse() to get the IPP response, and httpRead()
- * to read any additional data following the response. Only one request can be
- * sent/queued at a time.
+ * Use @link cupsWriteRequestData@ to write any additional data (document, PPD
+ * file, etc.) for the request, @link cupsGetResponse@ to get the IPP response,
+ * and @link cupsReadResponseData@ to read any additional data following the
+ * response. Only one request can be sent/queued at a time per @code http_t@
+ * connection.
  *
- * Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
- * request is not freed.
+ * Returns the initial HTTP status code, which will be @code HTTP_CONTINUE@
+ * on a successful send of the request.
+ *
+ * Note: Unlike @link cupsDoFileRequest@, @link cupsDoIORequest@, and
+ * @link cupsDoRequest@, the request is NOT freed with @link ippDelete@.
  *
  * @since CUPS 1.4/OS X 10.6@
  */

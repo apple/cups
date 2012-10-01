@@ -54,8 +54,16 @@ extern "C" {
  * Common limits...
  */
 
+#  define IPP_MAX_CHARSET	64	/* Maximum length of charset values w/nul */
+#  define IPP_MAX_KEYWORD	256	/* Maximum length of keyword values w/nul */
+#  define IPP_MAX_LANGUAGE	64	/* Maximum length of naturalLanguage values w/nul */
 #  define IPP_MAX_LENGTH	32767	/* Maximum size of any single value */
-#  define IPP_MAX_NAME		256	/* Maximum length of common name values */
+#  define IPP_MAX_MIMETYPE	256	/* Maximum length of mimeMediaType values w/nul */
+#  define IPP_MAX_NAME		256	/* Maximum length of common name values w/nul */
+#  define IPP_MAX_OCTETSTRING	1023	/* Maximum length of octetString values w/o nul */
+#  define IPP_MAX_TEXT		1024	/* Maximum length of text values w/nul */
+#  define IPP_MAX_URI		1024	/* Maximum length of uri values w/nul */
+#  define IPP_MAX_URISCHEME	64	/* Maximum length of uriScheme values w/nul */
 #  define IPP_MAX_VALUES	8	/* Power-of-2 allocation increment */
 
 

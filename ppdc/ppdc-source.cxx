@@ -943,7 +943,7 @@ ppdcSource::get_filter(ppdcFile *fp)	// I - File to read
     while (isspace(*ptr))
       ptr ++;
 
-    strcpy(program, ptr);
+    strlcpy(program, ptr, sizeof(program));
   }
   else
   {
@@ -1706,7 +1706,7 @@ ppdcSource::get_po(ppdcFile *fp)	// I - File to read
   if ((baseptr = strrchr(basedir, '/')) != NULL)
     *baseptr = '\0';
   else
-    strcpy(basedir, ".");
+    strlcpy(basedir, ".", sizeof(basedir));
 
   // Find the po file...
   pofilename[0] = '\0';
@@ -2630,7 +2630,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       if ((baseptr = strrchr(basedir, '/')) != NULL)
 	*baseptr = '\0';
       else
-	strcpy(basedir, ".");
+	strlcpy(basedir, ".", sizeof(basedir));
 
       // Find the include file...
       if (find_include(inctemp, basedir, incname, sizeof(incname)))

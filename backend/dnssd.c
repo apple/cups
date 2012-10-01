@@ -1080,7 +1080,7 @@ query_callback(
   device_id[0]      = '\0';
   make_and_model[0] = '\0';
 
-  strcpy(model, "Unknown");
+  strlcpy(model, "Unknown", sizeof(model));
 
   for (data = rdata, dataend = data + rdlen;
        data < dataend;
@@ -1134,9 +1134,9 @@ query_callback(
 
     if (!_cups_strcasecmp(key, "usb_MFG") || !_cups_strcasecmp(key, "usb_MANU") ||
 	!_cups_strcasecmp(key, "usb_MANUFACTURER"))
-      strcpy(make_and_model, value);
+      strlcpy(make_and_model, value, sizeof(make_and_model));
     else if (!_cups_strcasecmp(key, "usb_MDL") || !_cups_strcasecmp(key, "usb_MODEL"))
-      strcpy(model, value);
+      strlcpy(model, value, sizeof(model));
     else if (!_cups_strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
     {
       if (value[0] == '(')
@@ -1148,14 +1148,14 @@ query_callback(
 	if ((ptr = value + strlen(value) - 1) > value && *ptr == ')')
 	  *ptr = '\0';
 
-	strcpy(model, value + 1);
+	strlcpy(model, value + 1, sizeof(model));
       }
       else
-	strcpy(model, value);
+	strlcpy(model, value, sizeof(model));
     }
     else if (!_cups_strcasecmp(key, "ty"))
     {
-      strcpy(model, value);
+      strlcpy(model, value, sizeof(model));
 
       if ((ptr = strchr(model, ',')) != NULL)
 	*ptr = '\0';

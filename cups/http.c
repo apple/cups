@@ -2646,7 +2646,8 @@ httpSetLength(http_t *http,		/* I - Connection to server */
 
   if (!length)
   {
-    strcpy(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked");
+    strlcpy(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked",
+            HTTP_MAX_VALUE);
     http->fields[HTTP_FIELD_CONTENT_LENGTH][0] = '\0';
   }
   else
@@ -2991,8 +2992,11 @@ _httpWait(http_t *http,			/* I - Connection to server */
   pfd.fd     = http->fd;
   pfd.events = POLLIN;
 
-  while ((nfds = poll(&pfd, 1, msec)) < 0 &&
-         (errno == EINTR || errno == EAGAIN));
+  do
+  {
+    nfds = poll(&pfd, 1, msec);
+  }
+  while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
 
 #else
   do
@@ -3469,12 +3473,12 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
 
     while (j < 16)
     {
-      strcpy(ptr, "  ");
+      memcpy(ptr, "  ", 3);
       ptr += 2;
       j ++;
     }
 
-    strcpy(ptr, "  ");
+    memcpy(ptr, "  ", 3);
     ptr += 2;
 
     for (j = 0; j < 16 && (i + j) < bytes; j ++)
@@ -4231,6 +4235,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 			       credential->datalen);
 			cupsArrayAdd(names, credential);
 		      }
+		      else
+		        free(credential);
 		    }
 		  }
 		}

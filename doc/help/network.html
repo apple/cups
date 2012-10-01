@@ -93,16 +93,22 @@ page on the device.</P>
 
 <PRE>
 socket://<i>ip-address-or-hostname</i>
-socket://<i>ip-address-or-hostname</i>/?waiteof=false
+socket://<i>ip-address-or-hostname</i>/?option=value
+socket://<i>ip-address-or-hostname</i>/?option=value&option=value
 socket://<i>ip-address-or-hostname</i>:<i>port-number</i>
-socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?waiteof=false
+socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value
+socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value&option=value
 </PRE>
+
+<P>The "contimeout" option controls the number of seconds that the backend will wait to obtain a connection to the printer. The default is 1 week.</P>
+
+<P>The "snmp" option controls whether the <tt>socket</tt> backend queries for supply and page count information via SNMP.</P>
 
 <P>The "waiteof" option controls whether the <tt>socket</tt> backend waits for the printer to complete the printing of the job. The default is to wait.</P>
 
 <H3><A NAME="IPP">Internet Printing Protocol (IPP)</A></H3>
 
-<P>IPP is the only protocol that CUPS supports natively and is supported by some network printers and print servers. However, since many printers do not implement IPP properly, only use IPP when the vendor actually documents official support for it. IPP printing normally happens over port 631 and uses the <tt>http</tt> and <tt>ipp</tt> URI schemes:</P>
+<P>IPP is the only protocol that CUPS supports natively and is supported by some network printers and print servers. However, since many printers do not implement IPP properly, only use IPP when the vendor actually documents official support for it. IPP printing normally happens over port 631 and uses the <tt>http</tt>, <tt>ipp</tt>, and <tt>ipps</tt> URI schemes:</P>
 
 <PRE>
 http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
@@ -114,6 +120,12 @@ ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&option=value
 ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
 ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
 ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipps://<i>ip-address-or-hostname</i>/<i>resource</i>
+ipps://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value</i>
+ipps://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
+ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
+ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
 </PRE>
 
 <P>The <tt>ipp</tt> backend supports many options, which are summarized in <A HREF="#TABLE2">Table 2</A>.</P>
@@ -148,16 +160,20 @@ ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option
 	<TD>Specifies that the connection to the IPP server should be encrypted using TLS.</TD>
 </TR>
 <TR>
-	<TD><TT>version=1.0</TT></TD>
-	<TD>Specifies that version 1.0 of the IPP protocol should be used instead of the default version 1.1.</TD>
+	<TD><TT>snmp=false</TT></TD>
+	<TD>Specifies that SNMP supply and page count queries should not be performed.</TD>
 </TR>
 <TR>
-	<TD><TT>version=2.0</TT></TD>
-	<TD>Specifies that version 2.0 of the IPP protocol should be used instead of the default version 1.1.</TD>
+	<TD><TT>version=1.0</TT></TD>
+	<TD>Specifies that version 1.0 of the IPP protocol should be used instead of the default version 2.0.</TD>
+</TR>
+<TR>
+	<TD><TT>version=1.1</TT></TD>
+	<TD>Specifies that version 1.1 of the IPP protocol should be used instead of the default version 2.0.</TD>
 </TR>
 <TR>
 	<TD><TT>version=2.1</TT></TD>
-	<TD>Specifies that version 2.1 of the IPP protocol should be used instead of the default version 1.1.</TD>
+	<TD>Specifies that version 2.1 of the IPP protocol should be used instead of the default version 2.0.</TD>
 </TR>
 <TR>
 	<TD><TT>waitjob=false</TT></TD>
@@ -265,6 +281,10 @@ lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option
 <TR>
 	<TD><TT>sanitize_title=yes</TT></TD>
 	<TD>Specifies that the job title string should be restricted to ASCII characters.</TD>
+</TR>
+<TR>
+	<TD><TT>snmp=false</TT></TD>
+	<TD>Specifies that SNMP supply and page count queries should not be performed.</TD>
 </TR>
 <TR>
 	<TD><TT>timeout=<I>seconds</I></TT></TD>

@@ -269,6 +269,7 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					const char *icon,
 					const char *docformats, int ppm,
 					int ppm_color, int duplex, int port,
+					int pin,
 #ifdef HAVE_DNSSD
 					const char *regtype,
 #endif /* HAVE_DNSSD */
@@ -360,7 +361,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		port = 8631,		/* Port number (0 = auto) TODO: FIX */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
-		ppm_color = 0;		/* Pages per minute for color */
+		ppm_color = 0,		/* Pages per minute for color */
+		pin = 0;		/* PIN printing mode? */
   char		directory[1024] = "";	/* Spool directory */
   _ipp_printer_t *printer;		/* Printer object */
 
@@ -385,6 +387,10 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(1);
 	      make = argv[i];
 	      break;
+
+          case 'P' : /* -P (PIN printing mode) */
+              pin = 1;
+              break;
 
 	  case 'd' : /* -d spool-directory */
 	      i ++;
@@ -507,7 +513,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((printer = create_printer(servername, name, location, make, model, icon,
-                                formats, ppm, ppm_color, duplex, port,
+                                formats, ppm, ppm_color, duplex, port, pin,
 #ifdef HAVE_DNSSD
 				regtype,
 #endif /* HAVE_DNSSD */
@@ -1002,6 +1008,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       int        ppm_color,	/* I - Pages per minute in color (0 for gray) */
 	       int        duplex,	/* I - 1 = duplex, 0 = simplex */
 	       int        port,		/* I - Port for listeners or 0 for auto */
+	       int        pin,		/* I - Require PIN printing */
 #ifdef HAVE_DNSSD
 	       const char *regtype,	/* I - Bonjour service type */
 #endif /* HAVE_DNSSD */
@@ -1072,7 +1079,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   {					/* job-creation-attributes-supported values */
     "copies",
     "ipp-attribute-fidelity",
+    "job-account-id",
+    "job-accounting-user-id",
     "job-name",
+    "job-password",
     "job-priority",
     "media",
     "media-col",
@@ -1322,6 +1332,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "ipp-versions-supported",
 		sizeof(versions) / sizeof(versions[0]), NULL, versions);
 
+  /* job-account-id-supported */
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-account-id-supported", 1);
+
+  /* job-accounting-user-id-supported */
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER,
+                "job-accounting-user-id-supported", 1);
+
   /* job-creation-attributes-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "job-creation-attributes-supported",
@@ -1331,6 +1348,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   /* job-k-octets-supported */
   ippAddRange(printer->attrs, IPP_TAG_PRINTER, "job-k-octets-supported", 0,
 	      k_supported);
+
+  /* job-password-supported */
+  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-password-supported", 4);
 
   /* job-priority-default */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1572,6 +1593,20 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   /* printer-make-and-model */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
                "printer-make-and-model", NULL, make_model);
+
+  /* printer-mandatory-job-attributes */
+  if (pin)
+  {
+    static const char * const names[] =
+    {
+      "job-accounting-user-id",
+      "job-password"
+    };
+
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                  "printer-mandatory-job-attributes",
+                  (int)(sizeof(names) / sizeof(names[0])), NULL, names);
+  }
 
   /* printer-more-info */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,

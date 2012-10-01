@@ -16,19 +16,22 @@
  *
  * Contents:
  *
- *   main()                 - Send a file to the printer or server.
- *   cancel_job()           - Cancel a print job.
+ *   main()		    - Send a file to the printer or server.
+ *   cancel_job()	    - Cancel a print job.
  *   check_printer_state()  - Check the printer state.
- *   compress_files()       - Compress print files.
- *   monitor_printer()      - Monitor the printer state.
- *   new_request()          - Create a new print creation or validation request.
- *   password_cb()          - Disable the password prompt for
- *                            cupsDoFileRequest().
- *   report_attr()          - Report an IPP attribute value.
+ *   compress_files()	    - Compress print files.
+ *   monitor_printer()	    - Monitor the printer state.
+ *   new_request()	    - Create a new print creation or validation
+ *			      request.
+ *   password_cb()	    - Disable the password prompt for
+ *			      cupsDoFileRequest().
+ *   quote_string()	    - Quote a string value.
+ *   report_attr()	    - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
- *   run_as_user()          - Run the IPP backend as the printing user.
- *   timeout_cb()           - Handle HTTP timeouts.
- *   sigterm_handler()      - Handle 'terminate' signals that stop the backend.
+ *   run_as_user()	    - Run the IPP backend as the printing user.
+ *   sigterm_handler()	    - Handle 'terminate' signals that stop the backend.
+ *   timeout_cb()	    - Handle HTTP timeouts.
+ *   update_reasons()	    - Update the printer-state-reasons values.
  */
 
 /*
@@ -165,7 +168,10 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     const char *format, _ppd_cache_t *pc,
 				     ipp_attribute_t *media_col_sup,
 				     ipp_attribute_t *doc_handling_sup);
-static const char	*password_cb(const char *);
+static const char	*password_cb(const char *prompt, http_t *http,
+			             const char *method, const char *resource,
+			             void *user_data);
+static const char	*quote_string(const char *s, char *q, size_t qsize);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
@@ -203,6 +209,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
   http_addrlist_t *addrlist;		/* Address of printer */
+  int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd,		/* SNMP socket */
 		start_count,		/* Page count via SNMP at start */
 		page_count,		/* Page count via SNMP */
@@ -331,7 +338,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((auth_info_required = getenv("AUTH_INFO_REQUIRED")) == NULL)
     auth_info_required = "none";
 
-  state_reasons = _cupsArrayNewStrings(getenv("PRINTER_STATE_REASONS"));
+  state_reasons = _cupsArrayNewStrings(getenv("PRINTER_STATE_REASONS"), ',');
 
 #ifdef HAVE_GSSAPI
  /*
@@ -508,6 +515,16 @@ main(int  argc,				/* I - Number of command-line args */
 			       value);
         }
       }
+      else if (!_cups_strcasecmp(name, "snmp"))
+      {
+        /*
+         * Enable/disable SNMP stuff...
+         */
+
+         snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
+                        _cups_strcasecmp(value, "yes") ||
+                        _cups_strcasecmp(value, "true");
+      }
       else if (!_cups_strcasecmp(name, "version"))
       {
         if (!strcmp(value, "1.0"))
@@ -595,12 +612,12 @@ main(int  argc,				/* I - Number of command-line args */
   * Set the authentication info, if any...
   */
 
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2(password_cb, NULL);
 
   if (username[0])
   {
    /*
-    * Use authenticaion information in the device URI...
+    * Use authentication information in the device URI...
     */
 
     if ((password = strchr(username, ':')) != NULL)
@@ -659,11 +676,14 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports SNMP...
   */
 
-  if ((snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family)) >= 0)
-  {
+  if (snmp_enabled)
+    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
+  else
+    snmp_fd = -1;
+
+  if (snmp_fd >= 0)
     have_supplies = !backendSNMPSupplies(snmp_fd, &(addrlist->addr),
                                          &start_count, NULL);
-  }
   else
     have_supplies = start_count = 0;
 
@@ -932,6 +952,8 @@ main(int  argc,				/* I - Number of command-line args */
 	_cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Unable to get printer status."));
         sleep(10);
+
+	httpReconnect(http);
       }
 
       ippDelete(supported);
@@ -1259,6 +1281,16 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * If the printer only claims to support IPP/1.0, or if the user specifically
+  * included version=1.0 in the URI, then do not try to use Create-Job or
+  * Send-Document.  This is another dreaded compatibility hack, but unfortunately
+  * there are enough broken printers out there that we need this for now...
+  */
+
+  if (version == 10)
+    create_job = send_document = 0;
+
+ /*
   * Start monitoring the printer in the background...
   */
 
@@ -1474,10 +1506,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  goto cleanup;
 	}
       }
-      else if (ipp_status == IPP_ERROR_JOB_CANCELED)
+      else if (ipp_status == IPP_ERROR_JOB_CANCELED ||
+               ipp_status == IPP_NOT_AUTHORIZED)
         goto cleanup;
-      else if (ipp_status == IPP_NOT_AUTHORIZED)
-        continue;
       else
       {
        /*
@@ -1578,6 +1609,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 		       "document-format", NULL, document_format);
 
+        if (compression)
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		       "compression", NULL, compression);
+
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
@@ -1654,11 +1689,33 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
-    else if (ipp_status == IPP_REQUEST_VALUE)
+    else if (ipp_status == IPP_REQUEST_VALUE ||
+             ipp_status == IPP_ERROR_JOB_CANCELED ||
+             ipp_status == IPP_NOT_AUTHORIZED ||
+             ipp_status == IPP_INTERNAL_ERROR)
     {
      /*
-      * Print file is too large, abort this job...
+      * Print file is too large, job was canceled, we need new
+      * authentication data, or we had some sort of error...
       */
+
+      goto cleanup;
+    }
+    else if (ipp_status == IPP_NOT_FOUND)
+    {
+     /*
+      * Printer does not actually implement support for Create-Job/
+      * Send-Document, so log the conformance issue and stop the printer.
+      */
+
+      fputs("DEBUG: This printer claims to support Create-Job and "
+            "Send-Document, but those operations failed.\n", stderr);
+      fputs("DEBUG: Add '?version=1.0' to the device URI to use legacy "
+            "compatibility mode.\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-send-document");
+
+      ipp_status = IPP_INTERNAL_ERROR;	/* Force queue to stop */
 
       goto cleanup;
     }
@@ -2107,7 +2164,7 @@ monitor_printer(
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2(password_cb, NULL);
 
  /*
   * Loop until the job is canceled, aborted, or completed.
@@ -2297,7 +2354,8 @@ new_request(
 		*media_size;		/* media-size value */
   const char	*media_source,		/* media-source value */
 		*media_type,		/* media-type value */
-		*collate_str;		/* multiple-document-handling value */
+		*collate_str,		/* multiple-document-handling value */
+		*mandatory;		/* Mandatory attributes */
 
 
  /*
@@ -2366,6 +2424,85 @@ new_request(
       * Send standard IPP attributes...
       */
 
+      if (pc->password &&
+          (keyword = cupsGetOption("job-password", num_options,
+                                   options)) != NULL)
+      {
+        ippAddOctetString(request, IPP_TAG_OPERATION, "job-password",
+                          keyword, strlen(keyword));
+        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                     "job-password-encryption", NULL, "none");
+      }
+
+      if (pc->account_id &&
+          (keyword = cupsGetOption("job-account-id", num_options,
+                                   options)) != NULL)
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
+                     NULL, keyword);
+
+      if (pc->account_id &&
+          (keyword = cupsGetOption("job-accounting-user-id", num_options,
+                                   options)) != NULL)
+        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,
+                     "job-accounting-user-id", NULL, keyword);
+
+      for (mandatory = (char *)cupsArrayFirst(pc->mandatory);
+           mandatory;
+           mandatory = (char *)cupsArrayNext(pc->mandatory))
+      {
+        if (strcmp(mandatory, "copies") &&
+            strcmp(mandatory, "destination-uris") &&
+            strcmp(mandatory, "finishings") &&
+            strcmp(mandatory, "job-account-id") &&
+            strcmp(mandatory, "job-accounting-user-id") &&
+            strcmp(mandatory, "job-password") &&
+            strcmp(mandatory, "media") &&
+            strncmp(mandatory, "media-col", 9) &&
+            strcmp(mandatory, "multiple-document-handling") &&
+            strcmp(mandatory, "output-bin") &&
+            strcmp(mandatory, "print-color-mode") &&
+            strcmp(mandatory, "print-quality") &&
+            strcmp(mandatory, "sides") &&
+            (keyword = cupsGetOption(mandatory, num_options, options)) != NULL)
+	{
+	  _ipp_option_t *opt = _ippFindOption(mandatory);
+					/* Option type */
+          ipp_tag_t	value_tag = opt ? opt->value_tag : IPP_TAG_NAME;
+					/* Value type */
+
+          switch (value_tag)
+          {
+            case IPP_TAG_INTEGER :
+            case IPP_TAG_ENUM :
+                ippAddInteger(request, IPP_TAG_JOB, value_tag, mandatory,
+                              atoi(keyword));
+                break;
+            case IPP_TAG_BOOLEAN :
+                ippAddBoolean(request, IPP_TAG_JOB, mandatory,
+                              !_cups_strcasecmp(keyword, "true"));
+                break;
+            case IPP_TAG_RANGE :
+                {
+                  int lower, upper;	/* Range */
+
+		  if (sscanf(keyword, "%d-%d", &lower, &upper) != 2)
+		    lower = upper = atoi(keyword);
+
+		  ippAddRange(request, IPP_TAG_JOB, mandatory, lower, upper);
+                }
+                break;
+            case IPP_TAG_STRING :
+                ippAddOctetString(request, IPP_TAG_JOB, mandatory, keyword,
+                                  strlen(keyword));
+                break;
+            default :
+                ippAddString(request, IPP_TAG_JOB, value_tag, mandatory,
+                             NULL, keyword);
+                break;
+	  }
+	}
+      }
+
       if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
 	keyword = cupsGetOption("media", num_options, options);
 
@@ -2431,19 +2568,19 @@ new_request(
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
 		     NULL, keyword);
 
-      if ((keyword = cupsGetOption("output-mode", num_options,
+      if ((keyword = cupsGetOption("print-color-mode", num_options,
 				   options)) != NULL)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "print-color-mode",
 		     NULL, keyword);
       else if ((keyword = cupsGetOption("ColorModel", num_options,
 					options)) != NULL)
       {
 	if (!_cups_strcasecmp(keyword, "Gray"))
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			       NULL, "monochrome");
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "print-color-mode", NULL, "monochrome");
 	else
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			   NULL, "color");
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+	               "print-color-mode", NULL, "color");
       }
 
       if ((keyword = cupsGetOption("print-quality", num_options,
@@ -2599,18 +2736,38 @@ new_request(
  */
 
 static const char *			/* O - Password  */
-password_cb(const char *prompt)		/* I - Prompt (not used) */
+password_cb(const char *prompt,		/* I - Prompt (not used) */
+            http_t     *http,		/* I - Connection */
+            const char *method,		/* I - Request method (not used) */
+            const char *resource,	/* I - Resource path (not used) */
+            void       *user_data)	/* I - User data (not used) */
 {
+  char	def_username[HTTP_MAX_VALUE];	/* Default username */
+
+
   fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\"), password=%p, "
           "password_tries=%d\n", prompt, password, password_tries);
 
   (void)prompt;
+  (void)method;
+  (void)resource;
+  (void)user_data;
 
  /*
   * Remember that we need to authenticate...
   */
 
   auth_info_required = "username,password";
+
+  if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+                      def_username))
+  {
+    char	quoted[HTTP_MAX_VALUE * 2 + 4];
+					/* Quoted string */
+
+    fprintf(stderr, "ATTR: auth-info-default=%s,\n",
+            quote_string(def_username, quoted, sizeof(quoted)));
+  }
 
   if (password && *password && password_tries < 3)
   {
@@ -2630,6 +2787,56 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 
 
 /*
+ * 'quote_string()' - Quote a string value.
+ */
+
+static const char *			/* O - Quoted string */
+quote_string(const char *s,		/* I - String */
+             char       *q,		/* I - Quoted string buffer */
+             size_t     qsize)		/* I - Size of quoted string buffer */
+{
+  char	*qptr,				/* Pointer into string buffer */
+	*qend;				/* End of string buffer */
+
+
+  qptr = q;
+  qend = q + qsize - 5;
+
+  if (qend < q)
+  {
+    *q = '\0';
+    return (q);
+  }
+
+  *qptr++ = '\'';
+  *qptr++ = '\"';
+
+  while (*s && qptr < qend)
+  {
+    if (*s == '\\' || *s == '\"' || *s == '\'')
+    {
+      if (q < (qend - 3))
+      {
+	*qptr++ = '\\';
+	*qptr++ = '\\';
+	*qptr++ = '\\';
+      }
+      else
+        break;
+    }
+
+    *qptr++ = *s++;
+  }
+
+  *qptr++ = '\"';
+  *qptr++ = '\'';
+  *qptr   = '\0';
+
+  return (q);
+}
+
+
+/*
  * 'report_attr()' - Report an IPP attribute value.
  */
 
@@ -2638,8 +2845,7 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
 {
   int		i;			/* Looping var */
   char		value[1024],		/* Value string */
-		*valptr,		/* Pointer into value string */
-		*attrptr;		/* Pointer into attribute value */
+		*valptr;		/* Pointer into value string */
   const char	*cached;		/* Cached attribute */
 
 
@@ -2666,23 +2872,9 @@ report_attr(ipp_attribute_t *attr)	/* I - Attribute */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-          *valptr++ = '\'';
-          *valptr++ = '\"';
-	  for (attrptr = attr->values[i].string.text;
-	       *attrptr && valptr < (value + sizeof(value) - 10);
-	       attrptr ++)
-	  {
-	    if (*attrptr == '\\' || *attrptr == '\"' || *attrptr == '\'')
-	    {
-	      *valptr++ = '\\';
-	      *valptr++ = '\\';
-	      *valptr++ = '\\';
-	    }
-
-	    *valptr++ = *attrptr;
-	  }
-          *valptr++ = '\"';
-          *valptr++ = '\'';
+          quote_string(attr->values[i].string.text, valptr,
+                       value + sizeof(value) - valptr);
+          valptr += strlen(valptr);
           break;
 
       default :
@@ -3133,7 +3325,7 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
     else
       op = '\0';
 
-    new_reasons = _cupsArrayNewStrings(s);
+    new_reasons = _cupsArrayNewStrings(s, ',');
   }
   else
     return;

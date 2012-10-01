@@ -527,7 +527,7 @@ show_jobs(const char *command,		/* I - Command name */
       */
 
       if (jobstate == IPP_JOB_PROCESSING)
-	strcpy(rankstr, "active");
+	strlcpy(rankstr, "active", sizeof(rankstr));
       else
       {
        /*

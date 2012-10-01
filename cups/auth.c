@@ -190,10 +190,17 @@ cupsDoAuthentication(
     * Nope - get a new password from the user...
     */
 
+    char default_username[HTTP_MAX_VALUE];
+					/* Default username */
+
     cg = _cupsGlobals();
 
     if (!cg->lang_default)
       cg->lang_default = cupsLangDefault();
+
+    if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+                        default_username))
+      cupsSetUser(default_username);
 
     snprintf(prompt, sizeof(prompt),
              _cupsLangString(cg->lang_default, _("Password for %s on %s? ")),
@@ -458,7 +465,7 @@ _cupsSetNegotiateAuthString(
       authsize         = sizeof(http->_authstring);
     }
 
-    strcpy(http->authstring, "Negotiate ");
+    strlcpy(http->authstring, "Negotiate ", authsize);
     httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
 		   output_token.length);
 

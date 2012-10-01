@@ -213,10 +213,12 @@ main(int  argc,				/* I - Number of command-line args */
 	* Append to current string...
 	*/
 
+        size_t ptrlen = strlen(ptr);	/* Length of string */
+
 	length = (int)strlen(msgstr ? msgstr : msgid);
 
 	if ((temp = realloc(msgstr ? msgstr : msgid,
-			    length + strlen(ptr) + 1)) == NULL)
+			    length + ptrlen + 1)) == NULL)
 	{
 	  free(msgid);
 	  if (msgstr)
@@ -235,7 +237,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  msgstr = temp;
 
-	  strcpy(msgstr + length, ptr);
+	  memcpy(msgstr + length, ptr, ptrlen + 1);
 	}
 	else
 	{
@@ -247,7 +249,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  msgid = temp;
 
-	  strcpy(msgid + length, ptr);
+	  memcpy(msgid + length, ptr, ptrlen + 1);
 	}
       }
       else if (!strncmp(s, "msgstr", 6) && msgid)

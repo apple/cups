@@ -1877,7 +1877,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
         device_id[0] = '\0';
 	product[0]   = '\0';
 	psversion[0] = '\0';
-	strcpy(type_str, "postscript");
+	strlcpy(type_str, "postscript", sizeof(type_str));
 
         if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
 	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%255[^\"]\""
@@ -2043,7 +2043,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
   manufacturer[0]  = '\0';
   device_id[0]     = '\0';
   lang_encoding[0] = '\0';
-  strcpy(lang_version, "en");
+  strlcpy(lang_version, "en", sizeof(lang_version));
   model_number     = 0;
   install_group    = 0;
   type             = PPD_TYPE_POSTSCRIPT;
@@ -2166,7 +2166,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
     cupsCharsetToUTF8((cups_utf8_t *)make_model, nick_name,
 		      sizeof(make_model), _ppdGetEncoding(lang_encoding));
   else
-    strcpy(make_model, model_name);
+    strlcpy(make_model, model_name, sizeof(make_model));
 
   while (isspace(make_model[0] & 255))
     _cups_strcpy(make_model, make_model + 1);
@@ -2236,13 +2236,13 @@ load_ppd(const char  *filename,		/* I - Real filename */
     if (*ptr && ptr > manufacturer)
       *ptr = '\0';
     else
-      strcpy(manufacturer, "Other");
+      strlcpy(manufacturer, "Other", sizeof(manufacturer));
   }
   else if (!_cups_strncasecmp(manufacturer, "LHAG", 4) ||
 	   !_cups_strncasecmp(manufacturer, "linotype", 8))
-    strcpy(manufacturer, "LHAG");
+    strlcpy(manufacturer, "LHAG", sizeof(manufacturer));
   else if (!_cups_strncasecmp(manufacturer, "Hewlett", 7))
-    strcpy(manufacturer, "HP");
+    strlcpy(manufacturer, "HP", sizeof(manufacturer));
 
  /*
   * Fix the lang_version as needed...
@@ -2290,7 +2290,7 @@ load_ppd(const char  *filename,		/* I - Real filename */
     * Unknown language; use "xx"...
     */
 
-    strcpy(lang_version, "xx");
+    strlcpy(lang_version, "xx", sizeof(lang_version));
   }
 
  /*
@@ -2519,8 +2519,8 @@ load_ppds(const char *d,		/* I - Actual directory */
     * See if this file has been scanned before...
     */
 
-    strcpy(key.record.filename, name);
-    strcpy(key.record.name, name);
+    strlcpy(key.record.filename, name, sizeof(key.record.filename));
+    strlcpy(key.record.name, name, sizeof(key.record.name));
 
     ppd = (ppd_info_t *)cupsArrayFind(PPDsByName, &key);
 

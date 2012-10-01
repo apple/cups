@@ -3,7 +3,7 @@
  *
  *   Array test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -139,7 +139,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  /*
   * cupsArrayCount()
   */
- 
+
   fputs("cupsArrayCount: ", stdout);
   if (cupsArrayCount(array) == 4)
     puts("PASS");
@@ -319,7 +319,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * the same buffer in the first place... :)
       */
 
-      strcpy(word, text);
+      strlcpy(word, text, sizeof(word));
 
      /*
       * Grab the next word and compare...

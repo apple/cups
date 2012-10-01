@@ -1437,7 +1437,7 @@ show_jobs(const char *dests,		/* I - Destinations */
 	  */
 
 	  if (!strftime(date, sizeof(date), "%b %d %H:%M", jobdate))
-	    strcpy(date, "Unknown");
+	    strlcpy(date, "Unknown", sizeof(date));
 
 	  _cupsLangPrintf(stdout, "%s;%s;%d;%s;%s",
 	                  temp, username ? username : "unknown",
@@ -1446,7 +1446,7 @@ show_jobs(const char *dests,		/* I - Destinations */
 	else
 	{
 	  if (!strftime(date, sizeof(date), "%c", jobdate))
-	    strcpy(date, "Unknown");
+	    strlcpy(date, "Unknown", sizeof(date));
 
           if (ranking)
 	    _cupsLangPrintf(stdout, "%3d %-21s %-13s %8.0f %s",

@@ -234,9 +234,12 @@ cupsdStartBrowsing(void)
 
         if (FatalErrors & CUPSD_FATAL_BROWSE)
 	  cupsdEndProcess(getpid(), 0);
-      }
 
-      avahi_threaded_poll_start(DNSSDMaster);
+        avahi_threaded_poll_free(DNSSDMaster);
+        DNSSDMaster = NULL;
+      }
+      else
+	avahi_threaded_poll_start(DNSSDMaster);
     }
 #  endif /* HAVE_DNSSD */
 
@@ -457,14 +460,26 @@ cupsdUpdateDNSSDName(void)
 #  endif /* __APPLE__ */
 #  ifdef HAVE_AVAHI
   {
-    cupsdSetString(&DNSSDComputerName, avahi_client_get_host_name(DNSSDClient));
-    cupsdSetString(&DNSSDHostName,
-                   avahi_client_get_host_name_fqdn(DNSSDClient));
+    const char	*host_name = avahi_client_get_host_name(DNSSDClient);
+    const char	*host_fqdn = avahi_client_get_host_name_fqdn(DNSSDClient);
+
+    cupsdSetString(&DNSSDComputerName, host_name ? host_name : ServerName);
+
+    if (host_fqdn)
+      cupsdSetString(&DNSSDHostName, host_fqdn);
+    else if (strchr(ServerName, '.'))
+      cupsdSetString(&DNSSDHostName, ServerName);
+    else
+      cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
   }
 #  else /* HAVE_DNSSD */
   {
     cupsdSetString(&DNSSDComputerName, ServerName);
-    cupsdSetString(&DNSSDHostName, ServerName);
+
+    if (strchr(ServerName, '.'))
+      cupsdSetString(&DNSSDHostName, ServerName);
+    else
+      cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
   }
 #  endif /* HAVE_AVAHI */
 

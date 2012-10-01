@@ -348,9 +348,9 @@ cupsdCreateCommonData(void)
 		  "multiple-document-handling",
 		  "number-up",
 		  "output-bin",
-		  "output-mode",
 		  "orientation-requested",
 		  "page-ranges",
+		  "print-color-mode",
 		  "print-quality",
 		  "printer-resolution",
 		  "sides"
@@ -367,9 +367,9 @@ cupsdCreateCommonData(void)
 		  "multiple-document-handling",
 		  "number-up",
 		  "output-bin",
-		  "output-mode",
 		  "orientation-requested",
 		  "page-ranges",
+		  "print-color-mode",
 		  "print-quality",
 		  "printer-resolution",
 		  "sides"
@@ -3248,6 +3248,9 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("copies-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("document-format-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("finishings-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-account-id-default"));
+    cupsArrayAdd(CommonDefaults,
+                 _cupsStrAlloc("job-accounting-user-id-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-hold-until-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-priority-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-sheets-default"));
@@ -3753,7 +3756,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		qualities[3];		/* print-quality values */
   int		num_margins,		/* Number of media-*-margin-supported values */
 		margins[16];		/* media-*-margin-supported values */
-  const char	*filter;		/* Current filter */
+  const char	*filter,		/* Current filter */
+		*mandatory;		/* Current mandatory attribute */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one-sided",
@@ -3825,6 +3829,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     p->pc = _ppdCacheCreateWithPPD(ppd);
 
+    if (!p->pc)
+      cupsdLogMessage(CUPSD_LOG_WARN, "Unable to create cache of \"%s\": %s",
+                      ppd_name, cupsLastErrorString());
+
     ppdMarkDefaults(ppd);
 
     if (ppd->color_device)
@@ -3839,6 +3847,23 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
 		  ppd->color_device);
+
+    if (p->pc && p->pc->account_id)
+      ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "job-account-id-supported",
+                    1);
+
+    if (p->pc && p->pc->accounting_user_id)
+      ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER,
+                    "job-accounting-user-id-supported", 1);
+
+    if (p->pc && p->pc->password)
+    {
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "job-password-encryption-supported", NULL, "none");
+      ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                    "job-password-supported", strlen(p->pc->password));
+    }
+
     if (ppd->throughput)
     {
       ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -4314,38 +4339,48 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
 
    /*
-    * output-mode and print-color-mode...
+    * print-color-mode...
     */
 
     if (ppd->color_device)
     {
-      static const char * const output_modes[] =
+      static const char * const color_modes[] =
       {
         "monochrome",
 	"color"
       };
 
       ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                    "output-mode-supported", 2, NULL, output_modes);
-      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                   "output-mode-default", NULL, "color");
-
-      ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                    "print-color-mode-supported", 2, NULL, output_modes);
+                    "print-color-mode-supported", 2, NULL, color_modes);
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "print-color-mode-default", NULL, "color");
     }
     else
     {
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                   "output-mode-supported", NULL, "monochrome");
-      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                   "output-mode-default", NULL, "monochrome");
-
-      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "print-color-mode-supported", NULL, "monochrome");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "print-color-mode-default", NULL, "monochrome");
+    }
+
+   /*
+    * Mandatory job attributes, if any...
+    */
+
+    if (p->pc && cupsArrayCount(p->pc->mandatory) > 0)
+    {
+      int	count = cupsArrayCount(p->pc->mandatory);
+					/* Number of mandatory attributes */
+
+      attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                           "printer-mandatory-job-attributes", count, NULL,
+                           NULL);
+
+      for (val = attr->values,
+               mandatory = (char *)cupsArrayFirst(p->pc->mandatory);
+           mandatory;
+           val ++, mandatory = (char *)cupsArrayNext(p->pc->mandatory))
+        val->string.text = _cupsStrRetain(mandatory);
     }
 
    /*

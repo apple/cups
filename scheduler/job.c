@@ -903,7 +903,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
                           IPP_TAG_LANGUAGE);
 
 #ifdef __APPLE__
-  strcpy(apple_language, "APPLE_LANGUAGE=");
+  strlcpy(apple_language, "APPLE_LANGUAGE=", sizeof(apple_language));
   _cupsAppleLanguage(attr->values[0].string.text,
 		     apple_language + 15, sizeof(apple_language) - 15);
 #endif /* __APPLE__ */
@@ -916,7 +916,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 	* the POSIX locale...
 	*/
 
-	strcpy(lang, "LANG=C");
+	strlcpy(lang, "LANG=C", sizeof(lang));
 	break;
 
     case 2 :
@@ -974,14 +974,15 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       * All of these strcpy's are safe because we allocated the psr string...
       */
 
-      strcpy(printer_state_reasons, "PRINTER_STATE_REASONS=");
+      strlcpy(printer_state_reasons, "PRINTER_STATE_REASONS=", psrlen);
       for (psrptr = printer_state_reasons + 22, i = 0;
            i < job->printer->num_reasons;
 	   i ++)
       {
         if (i)
 	  *psrptr++ = ',';
-	strcpy(psrptr, job->printer->reasons[i]);
+	strlcpy(psrptr, job->printer->reasons[i],
+	        psrlen - (psrptr - printer_state_reasons));
 	psrptr += strlen(psrptr);
       }
     }
@@ -3441,19 +3442,16 @@ get_options(cupsd_job_t *job,		/* I - Job */
                         "com.apple.print.DocumentTicket.PMSpoolFormat",
 			IPP_TAG_ZERO) &&
       !ippFindAttribute(job->attrs, "APPrinterPreset", IPP_TAG_ZERO) &&
-      (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
-       ippFindAttribute(job->attrs, "print-color-mode", IPP_TAG_ZERO) ||
+      (ippFindAttribute(job->attrs, "print-color-mode", IPP_TAG_ZERO) ||
        ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
    /*
-    * Map output-mode and print-quality to a preset...
+    * Map print-color-mode and print-quality to a preset...
     */
 
     if ((attr = ippFindAttribute(job->attrs, "print-color-mode",
-				 IPP_TAG_KEYWORD)) == NULL)
-      attr = ippFindAttribute(job->attrs, "output-mode", IPP_TAG_KEYWORD);
-
-    if (attr && !strcmp(attr->values[0].string.text, "monochrome"))
+				 IPP_TAG_KEYWORD)) != NULL &&
+        !strcmp(attr->values[0].string.text, "monochrome"))
       print_color_mode = _PWG_PRINT_COLOR_MODE_MONOCHROME;
     else
       print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
@@ -3645,13 +3643,22 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
-      if (!strcmp(attr->name, "job-hold-until"))
+      if (!strcmp(attr->name, "job-hold-until") ||
+          !strcmp(attr->name, "job-id") ||
+          !strcmp(attr->name, "job-k-octets") ||
+          !strcmp(attr->name, "job-media-sheets") ||
+          !strcmp(attr->name, "job-media-sheets-completed") ||
+          !strcmp(attr->name, "job-state") ||
+          !strcmp(attr->name, "job-state-reasons"))
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) &&
+          strcmp(attr->name, "job-account-id") &&
+          strcmp(attr->name, "job-accounting-user-id") &&
           strcmp(attr->name, "job-billing") &&
           strcmp(attr->name, "job-impressions") &&
           strcmp(attr->name, "job-originating-host-name") &&
+          strcmp(attr->name, "job-password") &&
           strcmp(attr->name, "job-uuid") &&
           !(job->printer->type & CUPS_PRINTER_REMOTE))
 	continue;
@@ -3758,10 +3765,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
   for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
   {
     *optptr++ = ' ';
-    strcpy(optptr, pwgppd->name);
+    strlcpy(optptr, pwgppd->name, optlength - (optptr - options));
     optptr += strlen(optptr);
     *optptr++ = '=';
-    strcpy(optptr, pwgppd->value);
+    strlcpy(optptr, pwgppd->value, optlength - (optptr - options));
     optptr += strlen(optptr);
   }
 
@@ -4734,10 +4741,20 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cups_option_t	*attrs;		/* Attributes */
       const char	*attr;		/* Attribute */
 
-
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "ATTR: %s", message);
 
       num_attrs = cupsParseOptions(message, 0, &attrs);
+
+      if ((attr = cupsGetOption("auth-info-default", num_attrs,
+                                attrs)) != NULL)
+      {
+        job->printer->num_options = cupsAddOption("auth-info", attr,
+						  job->printer->num_options,
+						  &(job->printer->options));
+	cupsdSetPrinterAttrs(job->printer);
+
+	cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+      }
 
       if ((attr = cupsGetOption("auth-info-required", num_attrs,
                                 attrs)) != NULL)

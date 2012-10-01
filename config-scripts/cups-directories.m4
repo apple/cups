@@ -106,7 +106,7 @@ if test "$libdir" = "\${exec_prefix}/lib"; then
 			libdir="$exec_prefix/lib32"
 			;;
 		Linux*)
-			if test -d /usr/lib64; then
+			if test -d /usr/lib64 -a ! -d /usr/lib64/fakeroot; then
 				libdir="$exec_prefix/lib64"
 			fi
 			;;

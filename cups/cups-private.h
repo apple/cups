@@ -24,6 +24,7 @@
 
 #  include "string-private.h"
 #  include "debug-private.h"
+#  include "array-private.h"
 #  include "ipp-private.h"
 #  include "http-private.h"
 #  include "language-private.h"

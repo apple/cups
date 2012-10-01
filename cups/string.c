@@ -3,7 +3,7 @@
  *
  *   String functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,6 +69,7 @@ static int	compare_sp_items(_cups_sp_item_t *a, _cups_sp_item_t *b);
 char *					/* O - String pointer */
 _cupsStrAlloc(const char *s)		/* I - String */
 {
+  size_t		slen;		/* Length of string */
   _cups_sp_item_t	*item,		/* String pool item */
 			*key;		/* Search key */
 
@@ -128,7 +129,8 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * Not found, so allocate a new one...
   */
 
-  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t) + strlen(s));
+  slen = strlen(s);
+  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t) + slen);
   if (!item)
   {
     _cupsMutexUnlock(&sp_mutex);
@@ -137,7 +139,7 @@ _cupsStrAlloc(const char *s)		/* I - String */
   }
 
   item->ref_count = 1;
-  strcpy(item->str, s);
+  memcpy(item->str, s, slen + 1);
 
 #ifdef DEBUG_GUARDS
   item->guard = _CUPS_STR_GUARD;
@@ -588,16 +590,18 @@ _cups_strcpy(char       *dst,		/* I - Destination string */
 char 	*				/* O - New string pointer */
 _cups_strdup(const char *s)		/* I - String to duplicate */
 {
-  char	*t;				/* New string pointer */
+  char		*t;			/* New string pointer */
+  size_t	slen;			/* Length of string */
 
 
-  if (s == NULL)
+  if (!s)
     return (NULL);
 
-  if ((t = malloc(strlen(s) + 1)) == NULL)
+  slen = strlen(s);
+  if ((t = malloc(slen + 1)) == NULL)
     return (NULL);
 
-  return (strcpy(t, s));
+  return (memcpy(t, s, slen + 1));
 }
 #endif /* !HAVE_STRDUP */
 

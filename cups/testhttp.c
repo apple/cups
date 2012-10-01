@@ -3,7 +3,7 @@
  *
  *   HTTP test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -218,7 +218,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("httpGetDateString()/httpGetDateTime(): ", stdout);
 
     start = time(NULL);
-    strcpy(buffer, httpGetDateString(start));
+    strlcpy(buffer, httpGetDateString(start), sizeof(buffer));
     current = httpGetDateTime(buffer);
 
     i = (int)(current - start);

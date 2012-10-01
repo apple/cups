@@ -227,7 +227,7 @@ cups_globals_alloc(void)
     * Open the registry...
     */
 
-    strcpy(installdir, "C:/Program Files/cups.org");
+    strlcpy(installdir, "C:/Program Files/cups.org", sizeof(installdir));
 
     if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ,
                       &key))

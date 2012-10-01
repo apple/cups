@@ -392,13 +392,13 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get local address - %s",
                     strerror(errno));
 
-    strcpy(con->servername, "localhost");
+    strlcpy(con->servername, "localhost", sizeof(con->servername));
     con->serverport = LocalPort;
   }
 #ifdef AF_LOCAL
   else if (_httpAddrFamily(&temp) == AF_LOCAL)
   {
-    strcpy(con->servername, "localhost");
+    strlcpy(con->servername, "localhost", sizeof(con->servername));
     con->serverport = LocalPort;
   }
 #endif /* AF_LOCAL */
@@ -912,7 +912,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * con->uri are HTTP_MAX_URI bytes in size...
 	  */
 
-          strcpy(con->uri, resource);
+          strlcpy(con->uri, resource, sizeof(con->uri));
 	}
 
        /*
@@ -1489,7 +1489,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
               {
 		if (type == NULL)
-	          strcpy(line, "text/plain");
+	          strlcpy(line, "text/plain", sizeof(line));
 		else
 	          snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
@@ -1914,7 +1914,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
 	      if (type == NULL)
-		strcpy(line, "text/plain");
+		strlcpy(line, "text/plain", sizeof(line));
 	      else
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
@@ -3776,7 +3776,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	  * the POSIX locale...
 	  */
 
-	  strcpy(lang, "LANG=C");
+	  strlcpy(lang, "LANG=C", sizeof(lang));
 	  break;
 
       case 2 :
@@ -3804,9 +3804,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   else if (con->language)
     snprintf(lang, sizeof(lang), "LANG=%s.UTF8", con->language->language);
   else
-    strcpy(lang, "LANG=C");
+    strlcpy(lang, "LANG=C", sizeof(lang));
 
-  strcpy(remote_addr, "REMOTE_ADDR=");
+  strlcpy(remote_addr, "REMOTE_ADDR=", sizeof(remote_addr));
   httpAddrString(con->http.hostaddr, remote_addr + 12,
                  sizeof(remote_addr) - 12);
 

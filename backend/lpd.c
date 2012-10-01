@@ -126,6 +126,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		port;			/* Port number */
   char		portname[256];		/* Port name (string) */
   http_addrlist_t *addrlist;		/* List of addresses for printer */
+  int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd;		/* SNMP socket */
   int		fd;			/* Print file */
   int		status;			/* Status of LPD job */
@@ -356,7 +357,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         if (!value[0] || !_cups_strcasecmp(value, "on") ||
-	    !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true") ||
+	    !_cups_strcasecmp(value, "yes") ||
+	    !_cups_strcasecmp(value, "true") ||
 	    !_cups_strcasecmp(value, "rfc1179"))
 	  reserve = RESERVE_RFC1179;
 	else if (!_cups_strcasecmp(value, "any"))
@@ -371,7 +373,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         manual_copies = !value[0] || !_cups_strcasecmp(value, "on") ||
-	 		!_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
+	 		!_cups_strcasecmp(value, "yes") ||
+	 		!_cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "sanitize_title"))
       {
@@ -380,7 +383,18 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         sanitize_title = !value[0] || !_cups_strcasecmp(value, "on") ||
-	 		 !_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "true");
+	 		 !_cups_strcasecmp(value, "yes") ||
+	 		 !_cups_strcasecmp(value, "true");
+      }
+      else if (!_cups_strcasecmp(name, "snmp"))
+      {
+        /*
+         * Enable/disable SNMP stuff...
+         */
+
+         snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
+                        _cups_strcasecmp(value, "yes") ||
+                        _cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "timeout"))
       {
@@ -428,7 +442,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     }
   }
 
-  snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
+  if (snmp_enabled)
+    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
+  else
+    snmp_fd = -1;
 
  /*
   * Wait for data from the filter...

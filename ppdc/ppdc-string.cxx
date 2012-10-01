@@ -3,7 +3,7 @@
 //
 //   Shared string class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2012 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -36,8 +36,10 @@ ppdcString::ppdcString(const char *v)	// I - String
 
   if (v)
   {
-    value = new char[strlen(v) + 1];
-    strcpy(value, v);
+    size_t vlen = strlen(v);
+
+    value = new char[vlen + 1];
+    memcpy(value, v, vlen + 1);
   }
   else
     value = 0;

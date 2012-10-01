@@ -89,7 +89,11 @@ extern const char *cssmErrorString(int error);
 typedef struct xucred cupsd_ucred_t;
 #  define CUPSD_UCRED_UID(c) (c).cr_uid
 #else
+#  ifndef __OpenBSD__
 typedef struct ucred cupsd_ucred_t;
+#  else
+typedef struct sockpeercred cupsd_ucred_t;
+#  endif
 #  define CUPSD_UCRED_UID(c) (c).uid
 #endif /* HAVE_SYS_UCRED_H */
 #ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
@@ -1173,7 +1177,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
     if (sscanf(authorization, "%255s", scheme) != 1)
-      strcpy(scheme, "UNKNOWN");
+      strlcpy(scheme, "UNKNOWN", sizeof(scheme));
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Client %d] Bad authentication data \"%s ...\"",

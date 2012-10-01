@@ -684,7 +684,7 @@ print_device(const char *uri,		/* I - Device URI */
 
        /*
 	* Ignore timeout errors, but retain the number of bytes written to
-	* avoid sending duplicate data (<rdar://problem/6254911>)...
+	* avoid sending duplicate data...
 	*/
 
 	if (iostatus == kIOUSBTransactionTimeout)
@@ -707,7 +707,7 @@ print_device(const char *uri,		/* I - Device URI */
 
        /*
 	* Retry a write after an aborted write since we probably just got
-	* SIGTERM (<rdar://problem/6860126>)...
+	* SIGTERM...
 	*/
 
 	else if (iostatus == kIOReturnAborted)
@@ -1180,12 +1180,12 @@ static Boolean list_device_cb(void *refcon,
       if (!make ||
           !CFStringGetCString(make, makestr, sizeof(makestr),
 			      kCFStringEncodingUTF8))
-        strcpy(makestr, "Unknown");
+        strlcpy(makestr, "Unknown", sizeof(makestr));
 
       if (!model ||
           !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
 			      kCFStringEncodingUTF8))
-        strcpy(modelstr + 1, "Printer");
+        strlcpy(modelstr + 1, "Printer", sizeof(modelstr) - 1);
 
       optionsstr[0] = '\0';
       if (serial != NULL)
@@ -2164,7 +2164,7 @@ static void parse_pserror(char *sockBuffer,
     }
 
     /* move everything over... */
-    strcpy(gErrorBuffer, pLineEnd);
+    strlcpy(gErrorBuffer, pLineEnd, sizeof(gErrorBuffer));
     gErrorBufferPtr = gErrorBuffer;
     pLineEnd = (char *)next_line((const char *)gErrorBuffer);
   }

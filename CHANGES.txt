@@ -1,5 +1,7 @@
-CHANGES.txt - 1.7b1 - 2012-08-10
+CHANGES.txt - 1.7b1 - 2012-08-30
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- CUPS now supports higher-level PIN printing, external accounting
+	  systems, and "print here" printing environments (STR #4169)
