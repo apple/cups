@@ -234,9 +234,12 @@ cupsdStartBrowsing(void)
 
         if (FatalErrors & CUPSD_FATAL_BROWSE)
 	  cupsdEndProcess(getpid(), 0);
-      }
 
-      avahi_threaded_poll_start(DNSSDMaster);
+        avahi_threaded_poll_free(DNSSDMaster);
+        DNSSDMaster = NULL;
+      }
+      else
+	avahi_threaded_poll_start(DNSSDMaster);
     }
 #  endif /* HAVE_DNSSD */
 
