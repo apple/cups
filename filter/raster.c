@@ -46,6 +46,9 @@
  */
 
 #include <cups/raster-private.h>
+#ifdef HAVE_STDINT_H
+#  include <stdint.h>
+#endif /* HAVE_STDINT_H */
 
 
 /*

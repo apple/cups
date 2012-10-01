@@ -175,6 +175,13 @@
 
 
 /*
+ * Use <stdint.h>?
+ */
+
+#undef HAVE_STDINT_H
+
+
+/*
  * Use <string.h>, <strings.h>, and/or <bstring.h>?
  */
 
