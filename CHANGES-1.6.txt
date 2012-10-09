@@ -4,6 +4,8 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- The SNMP backend now tries to work around broken printers that use a
+	  newline to separate key/value pairs.
 	- The IPP backend did not send a cancel request to printers when a job
 	  was canceled and the printer did not support Create-Job.
 	- Fixed EPM packaging files (STR #4199)
