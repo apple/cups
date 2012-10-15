@@ -3655,6 +3655,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
       if (!strncmp(attr->name, "job-", 4) &&
           strcmp(attr->name, "job-account-id") &&
           strcmp(attr->name, "job-accounting-user-id") &&
+          strcmp(attr->name, "job-authorization-uri") &&
           strcmp(attr->name, "job-billing") &&
           strcmp(attr->name, "job-impressions") &&
           strcmp(attr->name, "job-originating-host-name") &&

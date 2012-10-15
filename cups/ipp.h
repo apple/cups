@@ -113,7 +113,26 @@ typedef enum ipp_finish_e		/**** Finishings ****/
   IPP_FINISHINGS_TRIM_AFTER_PAGES = 60,	/* Trim output after each page */
   IPP_FINISHINGS_TRIM_AFTER_DOCUMENTS,	/* Trim output after each document */
   IPP_FINISHINGS_TRIM_AFTER_COPIES,	/* Trim output after each copy */
-  IPP_FINISHINGS_TRIM_AFTER_JOB		/* Trim output after job */
+  IPP_FINISHINGS_TRIM_AFTER_JOB,	/* Trim output after job */
+
+  /* Proposed extensions for finishings */
+  CUPS_FINISHINGS_PUNCH_TOP_LEFT = 0x40000046,
+					/* Punch 1 hole top left */
+  CUPS_FINISHINGS_PUNCH_BOTTOM_LEFT,	/* Punch 1 hole bottom left */
+  CUPS_FINISHINGS_PUNCH_TOP_RIGHT,	/* Punch 1 hole top right */
+  CUPS_FINISHINGS_PUNCH_BOTTOM_RIGHT,	/* Punch 1 hole bottom right */
+  CUPS_FINISHINGS_PUNCH_DUAL_LEFT,	/* Punch 2 holes left side */
+  CUPS_FINISHINGS_PUNCH_DUAL_TOP,	/* Punch 2 holes top edge */
+  CUPS_FINISHINGS_PUNCH_DUAL_RIGHT,	/* Punch 2 holes right side */
+  CUPS_FINISHINGS_PUNCH_DUAL_BOTTOM,	/* Punch 2 holes bottom edge */
+  CUPS_FINISHINGS_PUNCH_TRIPLE_LEFT,	/* Punch 3 holes left side */
+  CUPS_FINISHINGS_PUNCH_TRIPLE_TOP,	/* Punch 3 holes top edge */
+  CUPS_FINISHINGS_PUNCH_TRIPLE_RIGHT,	/* Punch 3 holes right side */
+  CUPS_FINISHINGS_PUNCH_TRIPLE_BOTTOM,	/* Punch 3 holes bottom edge */
+  CUPS_FINISHINGS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side */
+  CUPS_FINISHINGS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
+  CUPS_FINISHINGS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
+  CUPS_FINISHINGS_PUNCH_QUAD_BOTTOM	/* Punch 4 holes bottom edge */
 } ipp_finish_t;
 
 typedef enum ipp_jcollate_e		/**** Job collation types ****/

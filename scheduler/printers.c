@@ -3781,6 +3781,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
 		  ppd->color_device);
 
+    if (p->pc && p->pc->charge_info_uri)
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+                   "printer-charge-info-uri", NULL, p->pc->charge_info_uri);
+
     if (p->pc && p->pc->account_id)
       ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "job-account-id-supported",
                     1);

@@ -560,6 +560,8 @@ _ppdCacheCreateWithFile(
     }
     else if (!_cups_strcasecmp(line, "MaxCopies"))
       pc->max_copies = atoi(value);
+    else if (!_cups_strcasecmp(line, "ChargeInfoURI"))
+      pc->charge_info_uri = _cupsStrAlloc(value);
     else if (!_cups_strcasecmp(line, "JobAccountId"))
       pc->account_id = !_cups_strcasecmp(value, "true");
     else if (!_cups_strcasecmp(line, "JobAccountingUserId"))
@@ -1380,9 +1382,12 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->max_copies = 9999;
 
  /*
-  * cupsJobAccountId, cupsJobAccountingUserId, cupsJobPassword, and
-  * cupsMandatory.
+  * cupsChargeInfoURI, cupsJobAccountId, cupsJobAccountingUserId,
+  * cupsJobPassword, and cupsMandatory.
   */
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsChargeInfoURI", NULL)) != NULL)
+    pc->charge_info_uri = _cupsStrAlloc(ppd_attr->value);
 
   if ((ppd_attr = ppdFindAttr(ppd, "cupsJobAccountId", NULL)) != NULL)
     pc->account_id = !_cups_strcasecmp(ppd_attr->value, "true");
@@ -1496,6 +1501,7 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   cupsArrayDelete(pc->prefilters);
   cupsArrayDelete(pc->finishings);
 
+  _cupsStrFree(pc->charge_info_uri);
   _cupsStrFree(pc->password);
 
   cupsArrayDelete(pc->mandatory);
@@ -2394,6 +2400,9 @@ _ppdCacheWriteFile(
  /*
   * Accounting/quota/PIN/managed printing values...
   */
+
+  if (pc->charge_info_uri)
+    cupsFilePutConf(fp, "ChargeInfoURI", pc->charge_info_uri);
 
   cupsFilePrintf(fp, "AccountId %s\n", pc->account_id ? "true" : "false");
   cupsFilePrintf(fp, "AccountingUserId %s\n",
