@@ -293,7 +293,6 @@ f 0555 root sys $SERVERBIN/cgi-bin/printers.cgi cgi-bin/printers.cgi
 d 0755 root sys $SERVERBIN/daemon -
 f 0555 root sys $SERVERBIN/daemon/cups-deviced scheduler/cups-deviced
 f 0555 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
-f 0555 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
 f 0555 root sys $SERVERBIN/filter/commandtops filter/commandtops
@@ -366,8 +365,6 @@ f 0555 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.sl libcups.sl.2
 f 0555 root sys $LIBDIR/libcupscgi.sl.1 cgi-bin/libcupscgi.sl.1 nostrip()
 l 0755 root sys $LIBDIR/libcupscgi.sl libcupscgi.sl.1
-f 0555 root sys $LIBDIR/libcupsdriver.sl.1 driver/libcupsdriver.sl.1 nostrip()
-l 0755 root sys $LIBDIR/libcupsdriver.sl libcupsdriver.sl.1
 f 0555 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
 f 0555 root sys $LIBDIR/libcupsmime.sl.1 scheduler/libcupsmime.sl.1 nostrip()
@@ -377,7 +374,6 @@ l 0755 root sys $LIBDIR/libcupsppdc.sl libcupsppdc.sl.1
 %system aix
 f 0555 root sys $LIBDIR/libcups_s.a cups/libcups_s.a nostrip()
 f 0555 root sys $LIBDIR/libcupscgi_s.a cgi-bin/libcupscgi_s.a nostrip()
-f 0555 root sys $LIBDIR/libcupsdriver_s.a driver/libcupsdriver_s.a nostrip()
 f 0555 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a nostrip()
 f 0555 root sys $LIBDIR/libcupsmime_s.a scheduler/libcupsmime_s.a nostrip()
 f 0555 root sys $LIBDIR/libcupsppdc_s.a ppdc/libcupsppdc_s.a nostrip()
@@ -386,8 +382,6 @@ f 0555 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcups.dylib libcups.2.dylib
 f 0555 root sys $LIBDIR/libcupscgi.1.dylib cgi-bin/libcupscgi.1.dylib nostrip()
 l 0755 root sys $LIBDIR/libcupscgi.dylib libcupscgi.1.dylib
-f 0555 root sys $LIBDIR/libcupsdriver.1.dylib driver/libcupsdriver.1.dylib nostrip()
-l 0755 root sys $LIBDIR/libcupsdriver.dylib libcupsdriver.1.dylib
 f 0555 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
 f 0555 root sys $LIBDIR/libcupsmime.1.dylib scheduler/libcupsmime.1.dylib nostrip()
@@ -399,8 +393,6 @@ f 0555 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.so libcups.so.2
 f 0555 root sys $LIBDIR/libcupscgi.so.1 cgi-bin/libcupscgi.so.1 nostrip()
 l 0755 root sys $LIBDIR/libcupscgi.so libcupscgi.so.1
-f 0555 root sys $LIBDIR/libcupsdriver.so.1 driver/libcupsdriver.so.1 nostrip()
-l 0755 root sys $LIBDIR/libcupsdriver.so libcupsdriver.so.1
 f 0555 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 f 0555 root sys $LIBDIR/libcupsmime.so.1 scheduler/libcupsmime.so.1 nostrip()
@@ -418,7 +410,9 @@ d 1770 root $CUPS_GROUP $REQUESTS/tmp -
 d 0775 root $CUPS_GROUP $CACHEDIR -
 d 0775 root $CUPS_GROUP $CACHEDIR/rss -
 #d 0755 root $CUPS_GROUP $CACHEDIR/ppd -
+%system !darwin
 d 0755 root $CUPS_GROUP $STATEDIR -
+%system all
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
@@ -530,7 +524,7 @@ f 0444 root sys $DATADIR/templates templates/*.tmpl
 #f 0444 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
 
 # Config files
-d 0755 root sys $SERVERROOT -
+d 0755 root $CUPS_GROUP $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -

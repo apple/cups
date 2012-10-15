@@ -28,12 +28,6 @@ if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
         		AMANDIR="/usr/share/man"
         		PMANDIR="/usr/share/man"
         		;;
-        	IRIX)
-        		# SGI IRIX
-        		mandir="/usr/share/catman/u_man"
-        		AMANDIR="/usr/share/catman/a_man"
-        		PMANDIR="/usr/share/catman/p_man"
-        		;;
         	*)
         		# All others
         		mandir="/usr/man"
@@ -51,14 +45,6 @@ AC_SUBST(PMANDIR)
 
 dnl Setup manpage extensions...
 case "$uname" in
-	IRIX*)
-		# SGI IRIX
-		MAN1EXT=1
-		MAN5EXT=5
-		MAN7EXT=7
-		MAN8EXT=1m
-		MAN8DIR=1
-		;;
 	SunOS* | HP-UX*)
 		# Solaris and HP-UX
 		MAN1EXT=1

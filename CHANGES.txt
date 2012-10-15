@@ -1,7 +1,11 @@
-CHANGES.txt - 1.7b1 - 2012-08-30
+CHANGES.txt - 1.7b1 - 2012-09-30
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
 	- CUPS now supports higher-level PIN printing, external accounting
 	  systems, and "print here" printing environments (STR #4169)
+	- IRIX is no longer a supported operating system (STR #4092)
+	- The PPD compiler now supports JCL options properly (STR #4115)
+	- The web interface now checks whether the web browser has cookies
+	  enabled and displays a suitable error message (STR #4141)

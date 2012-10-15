@@ -459,6 +459,7 @@ cupsdUpdateDNSSDName(void)
   else
 #  endif /* __APPLE__ */
 #  ifdef HAVE_AVAHI
+  if (DNSSDClient)
   {
     const char	*host_name = avahi_client_get_host_name(DNSSDClient);
     const char	*host_fqdn = avahi_client_get_host_name_fqdn(DNSSDClient);
@@ -472,7 +473,8 @@ cupsdUpdateDNSSDName(void)
     else
       cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
   }
-#  else /* HAVE_DNSSD */
+  else
+#  endif /* HAVE_AVAHI */
   {
     cupsdSetString(&DNSSDComputerName, ServerName);
 
@@ -481,7 +483,6 @@ cupsdUpdateDNSSDName(void)
     else
       cupsdSetStringf(&DNSSDHostName, "%s.local", ServerName);
   }
-#  endif /* HAVE_AVAHI */
 
  /*
   * Then (re)register the web interface if enabled...

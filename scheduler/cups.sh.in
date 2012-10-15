@@ -4,7 +4,7 @@
 #
 #   Startup/shutdown script for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -35,18 +35,6 @@
 #### OS-Dependent Configuration
 
 case "`uname`" in
-	IRIX*)
-		IS_ON=/sbin/chkconfig
-
-		if $IS_ON verbose; then
-			ECHO=echo
-		else
-			ECHO=:
-		fi
-		ECHO_OK=:
-		ECHO_ERROR=:
-		;;
-
 	*BSD*)
         	IS_ON=:
 		ECHO=echo
@@ -147,7 +135,7 @@ case "`uname`" in
 	HP-UX* | AIX* | SINIX*)
 		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
-	IRIX* | SunOS*)
+	SunOS*)
 		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
 		;;
 	UnixWare*)

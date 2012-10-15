@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -49,15 +49,14 @@
 /*
  * Design Notes for Poll/Select API in CUPSD
  * -----------------------------------------
- * 
+ *
  * SUPPORTED APIS
- * 
+ *
  *     OS              select  poll    epoll   kqueue  /dev/poll
  *     --------------  ------  ------  ------  ------  ---------
  *     AIX             YES     YES     NO      NO      NO
  *     FreeBSD         YES     YES     NO      YES     NO
  *     HP-UX           YES     YES     NO      NO      NO
- *     IRIX            YES     YES     NO      NO      NO
  *     Linux           YES     YES     YES     NO      NO
  *     MacOS X         YES     YES     NO      YES     NO
  *     NetBSD          YES     YES     NO      YES     NO
@@ -65,22 +64,22 @@
  *     Solaris         YES     YES     NO      NO      YES
  *     Tru64           YES     YES     NO      NO      NO
  *     Windows         YES     NO      NO      NO      NO
- * 
- * 
+ *
+ *
  * HIGH-LEVEL API
- * 
+ *
  *     typedef void (*cupsd_selfunc_t)(void *data);
- * 
+ *
  *     void cupsdStartSelect(void);
  *     void cupsdStopSelect(void);
  *     void cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
  *                         cupsd_selfunc_t write_cb, void *data);
  *     void cupsdRemoveSelect(int fd);
  *     int cupsdDoSelect(int timeout);
- * 
- * 
+ *
+ *
  * IMPLEMENTATION STRATEGY
- * 
+ *
  *     0. Common Stuff
  *         a. CUPS array of file descriptor to callback functions
  *            and data + temporary array of removed fd's.
@@ -103,7 +102,7 @@
  *            working sets.
  *         d. cupsdStopSelect() frees all of the memory used by the
  *            CUPS array and fd_set's.
- * 
+ *
  *     2. poll() - O(n log n)
  *         a. Regular array of pollfd, sorted the same as the CUPS
  *            array.
@@ -117,7 +116,7 @@
  *         e. cupsdRemoveSelect() flags the pollfd array as invalid.
  *         f. cupsdStopSelect() frees all of the memory used by the
  *            CUPS array and pollfd array.
- * 
+ *
  *     3. epoll() - O(n)
  *         a. cupsdStartSelect() creates epoll file descriptor using
  *            epoll_create() with the maximum fd count, and
@@ -133,7 +132,7 @@
  *            the callback record.
  *         d. cupsdStopSelect() closes the epoll file descriptor and
  *            frees all of the memory used by the event buffer.
- * 
+ *
  *     4. kqueue() - O(n)
  *         b. cupsdStartSelect() creates kqueue file descriptor
  *            using kqueue() function and allocates a global event
@@ -146,7 +145,7 @@
  *            find the callback record.
  *         e. cupsdStopSelect() closes the kqueue() file descriptor
  *            and frees all of the memory used by the event buffer.
- * 
+ *
  *     5. /dev/poll - O(n log n) - NOT YET IMPLEMENTED
  *         a. cupsdStartSelect() opens /dev/poll and allocates an
  *            array of pollfd structs; on failure to open /dev/poll,

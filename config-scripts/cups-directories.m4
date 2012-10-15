@@ -102,9 +102,6 @@ fi
 dnl Fix "libdir" variable...
 if test "$libdir" = "\${exec_prefix}/lib"; then
 	case "$uname" in
-		IRIX*)
-			libdir="$exec_prefix/lib32"
-			;;
 		Linux*)
 			if test -d /usr/lib64 -a ! -d /usr/lib64/fakeroot; then
 				libdir="$exec_prefix/lib64"
@@ -167,13 +164,6 @@ if test x$rcdir = x; then
 			RCLEVELS="2"
 			RCSTART="380"
 			RCSTOP="620"
-			;;
-
-		IRIX*)
-			# IRIX
-			INITDIR="/etc"
-			RCSTART="60"
-			RCSTOP="25"
 			;;
 
 		Linux | GNU | GNU/k*BSD*)

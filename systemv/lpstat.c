@@ -205,38 +205,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 	    break;
 
-#ifdef __sgi
-        case 'b' : /* Show both the local and remote status */
-	    op = 'b';
-
-	    if (argv[i][2])
-	    {
-	     /*
-	      * The local and remote status are separated by a blank line;
-	      * since all CUPS jobs are networked, we only output the
-	      * second list for now...  In the future, we might further
-	      * emulate this by listing the remote server's queue, but
-	      * for now this is enough to make the SGI printstatus program
-	      * happy...
-	      */
-
-              check_dest(argv[0], argv[i] + 2, &num_dests, &dests);
-
-	      puts("");
-	      status |= show_jobs(argv[i] + 2, NULL, 3, ranking, which);
-	    }
-	    else
-	    {
-	      _cupsLangPrintf(stderr,
-	                      _("%s: Error - expected destination after "
-			        "\"-b\" option."),
-			      argv[0]);
-
-	      return (1);
-	    }
-	    break;
-#endif /* __sgi */
-
         case 'c' : /* Show classes and members */
 	    op = 'c';
 
@@ -299,18 +267,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'l' : /* Long status or long job status */
-#ifdef __sgi
-	    op = 'l';
-
-	    if (argv[i][2])
-	    {
-              check_dest(argv[0], argv[i] + 2, &num_dests, &dests);
-
-	      status |= show_jobs(argv[i] + 2, NULL, 3, ranking, which);
-	    }
-	    else
-#endif /* __sgi */
-	      long_status = 2;
+	    long_status = 2;
 	    break;
 
         case 'o' : /* Show jobs by destination */

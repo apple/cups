@@ -6,8 +6,16 @@
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
 	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
 	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
+	<SCRIPT TYPE="text/javascript"><!--
+	/* Show an error if cookies are disabled */
+	function check_cookies() {
+	  if (!navigator.cookieEnabled) {
+		document.getElementById('body').innerHTML = 'This page uses cookies to prevent common cross-site attacks. Please enable cookies in your browser.';
+	  }
+	}
+	--></SCRIPT>
 </HEAD>
-<BODY>
+<BODY ONLOAD="check_cookies();">
 <TABLE CLASS="page" SUMMARY="{title}">
 <TR><TD CLASS="body">
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
@@ -27,3 +35,4 @@ VALUE="{SECTION=help?{?QUERY}:}" AUTOSAVE="org.cups.help" RESULTS="20"></FORM></
 </TR>
 <TR><TD COLSPAN="9">&nbsp;</TD></TR>
 </TABLE>
+<DIV ID="body">

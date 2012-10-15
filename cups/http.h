@@ -36,9 +36,6 @@ typedef off_t ssize_t;			/* @private@ */
 #    include <winsock2.h>
 #    include <ws2tcpip.h>
 #  else
-#    ifdef __sgi
-#      define INET6			/* IRIX IPv6 support... */
-#    endif /* __sgi */
 #    include <unistd.h>
 #    include <sys/time.h>
 #    include <sys/socket.h>

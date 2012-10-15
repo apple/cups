@@ -257,7 +257,6 @@ list_devices(void)
 
     close(fd);
   }
-#elif defined(__sgi)
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
   int	i;			/* Looping var */
   int	fd;			/* File descriptor */

@@ -38,13 +38,7 @@ host <I>hostname</I> {
 
 <H3><A NAME="BOOTP">Configuring the IP Address Using BOOTP</A></H3>
 
-<P>The BOOTP protocol is used when you need to provide additional information such as the location of a configuration file to the network interface. Using the standard <TT>bootpd(8)</TT> program supplied with UNIX you simply need to add a line to the <VAR>/etc/bootptab</VAR> file; for IRIX:</P>
-
-<PRE CLASS="command">
-myprinter 08:00:69:00:12:34 192.0.2.2 <VAR>myprinter.boot</VAR>
-</PRE>
-
-<P>Newer versions of <TT>bootpd</TT> use a different format:</P>
+<P>The BOOTP protocol is used when you need to provide additional information such as the location of a configuration file to the network interface. Using the standard <TT>bootpd(8)</TT> program supplied with UNIX you simply need to add a line to the <VAR>/etc/bootptab</VAR> file:</P>
 
 <PRE CLASS="command">
 myprinter:ha=080069001234:ip=192.0.2.2:<VAR>t144=myprinter.boot</VAR>

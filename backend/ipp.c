@@ -89,6 +89,7 @@ static int		child_pid = 0;	/* Child process ID */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static const char * const jattrs[] =	/* Job attributes we want */
 {
+  "job-id",
   "job-impressions-completed",
   "job-media-sheets-completed",
   "job-name",
