@@ -268,8 +268,8 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_OK_TOO_MANY_EVENTS,		/* successful-ok-too-many-events */
   IPP_OK_BUT_CANCEL_SUBSCRIPTION,	/* successful-ok-but-cancel-subscription @private@ */
   IPP_OK_EVENTS_COMPLETE,		/* successful-ok-events-complete */
-  IPP_REDIRECTION_OTHER_SITE = 0x200,	/* redirection-other-site @private@ */
-  CUPS_SEE_OTHER = 0x280,		/* cups-see-other */
+  IPP_REDIRECTION_OTHER_SITE = 0x0200,	/* redirection-other-site @private@ */
+  CUPS_SEE_OTHER = 0x0280,		/* cups-see-other */
   IPP_BAD_REQUEST = 0x0400,		/* client-error-bad-request */
   IPP_FORBIDDEN,			/* client-error-forbidden */
   IPP_NOT_AUTHENTICATED,		/* client-error-not-authenticated */
@@ -299,6 +299,12 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_DOCUMENT_SECURITY_ERROR,		/* client-error-document-security-error */
   IPP_DOCUMENT_UNPRINTABLE_ERROR,	/* client-error-document-unprintable-error */
 
+  /* Proposed extensions for paid printing */
+  CUPS_ACCOUNT_INFO_NEEDED = 0x049C,	/* cups-error-account-info-needed @since CUPS 1.7@ */
+  CUPS_ACCOUNT_CLOSED,			/* cups-error-account-closed @since CUPS 1.7@ */
+  CUPS_ACCOUNT_LIMIT_REACHED,		/* cups-error-account-limit-reached @since CUPS 1.7@ */
+  CUPS_ACCOUNT_AUTHORIZATION_FAILED,	/* cups-error-account-authorization-failed @since CUPS 1.7@ */
+
   IPP_INTERNAL_ERROR = 0x0500,		/* server-error-internal-error */
   IPP_OPERATION_NOT_SUPPORTED,		/* server-error-operation-not-supported */
   IPP_SERVICE_UNAVAILABLE,		/* server-error-service-unavailable */
@@ -313,13 +319,16 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_TOO_MANY_JOBS,			/* server-error-too-many-jobs */
   IPP_TOO_MANY_DOCUMENTS,		/* server-error-too-many-documents */
 
-  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5/OS X 10.7@ */
-  IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
-  IPP_UPGRADE_REQUIRED			/* TLS upgrade required */
+  /* These are internal and never sent over the wire... */
+  CUPS_AUTHENTICATION_CANCELED = 0x1000,/* cups-authentication-canceled - Authentication canceled by user @since CUPS 1.5/OS X 10.7@ */
+  CUPS_PKI_ERROR,			/* cups-pki-error - Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
+  CUPS_UPGRADE_REQUIRED			/* cups-upgrade-required - TLS upgrade required */
 
-  /* Legacy name for canceled status */
+  /* Legacy names */
+#define IPP_AUTHENTICATION_CANCELED CUPS_AUTHENTICATION_CANCELED
 #define IPP_ERROR_JOB_CANCELLED IPP_ERROR_JOB_CANCELED
-
+#define IPP_PKI_ERROR CUPS_PKI_ERROR
+#define IPP_UPGRADE_REQUIRED CUPS_UPGRADE_REQUIRED
 } ipp_status_t;
 
 typedef enum ipp_tag_e			/**** Format tags for attributes ****/
