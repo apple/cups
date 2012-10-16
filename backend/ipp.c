@@ -58,6 +58,18 @@ extern void	xpc_connection_set_target_uid(xpc_connection_t connection,
 
 
 /*
+ * Bits for job-state-reasons we care about...
+ */
+
+#define _CUPS_JSR_ACCOUNT_AUTHORIZATION_FAILED	0x01
+#define _CUPS_JSR_ACCOUNT_CLOSED		0x02
+#define _CUPS_JSR_ACCOUNT_INFO_NEEDED		0x04
+#define _CUPS_JSR_ACCOUNT_LIMIT_REACHED		0x08
+#define _CUPS_JSR_JOB_PASSWORD_WAIT		0x10
+#define _CUPS_JSR_JOB_RELEASE_WAIT		0x20
+
+
+/*
  * Types...
  */
 
@@ -70,6 +82,7 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
   int			port,		/* Port number */
 			version,	/* IPP version */
 			job_id,		/* Job ID for submitted job */
+			job_reasons,	/* Job state reasons bits */
 			get_job_attrs;	/* Support Get-Job-Attributes? */
   const char		*job_name;	/* Job name for submitted job */
   http_encryption_t	encryption;	/* Use encryption? */
@@ -1346,7 +1359,11 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
       sleep(10);
     }
-    else if (ipp_status == IPP_DOCUMENT_FORMAT)
+    else if (ipp_status == IPP_DOCUMENT_FORMAT ||
+             ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
+             ipp_status == CUPS_ACCOUNT_CLOSED ||
+             ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
+             ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
       goto cleanup;
     else if (ipp_status == IPP_FORBIDDEN ||
 	     ipp_status == IPP_AUTHENTICATION_CANCELED)
@@ -1508,7 +1525,11 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
       else if (ipp_status == IPP_ERROR_JOB_CANCELED ||
-               ipp_status == IPP_NOT_AUTHORIZED)
+               ipp_status == IPP_NOT_AUTHORIZED ||
+	       ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
+	       ipp_status == CUPS_ACCOUNT_CLOSED ||
+	       ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
+	       ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
         goto cleanup;
       else
       {
@@ -1693,6 +1714,10 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_REQUEST_VALUE ||
              ipp_status == IPP_ERROR_JOB_CANCELED ||
              ipp_status == IPP_NOT_AUTHORIZED ||
+             ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
+             ipp_status == CUPS_ACCOUNT_CLOSED ||
+             ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
+             ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED ||
              ipp_status == IPP_INTERNAL_ERROR)
     {
      /*
@@ -1934,8 +1959,21 @@ main(int  argc,				/* I - Number of command-line args */
       ipp_status <= IPP_OK_CONFLICT)
     fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 
+  if (ipp_status == CUPS_ACCOUNT_INFO_NEEDED)
+    fputs("JOBSTATE: account-info-needed\n", stderr);
+  else if (ipp_status == CUPS_ACCOUNT_CLOSED)
+    fputs("JOBSTATE: account-closed\n", stderr);
+  else if (ipp_status == CUPS_ACCOUNT_LIMIT_REACHED)
+    fputs("JOBSTATE: account-limit-reached\n", stderr);
+  else if (ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+    fputs("JOBSTATE: account-authorization-failed\n", stderr);
+
   if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
-      ipp_status == IPP_AUTHENTICATION_CANCELED)
+      ipp_status == IPP_AUTHENTICATION_CANCELED ||
+      ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
+      ipp_status == CUPS_ACCOUNT_CLOSED ||
+      ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
+      ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
@@ -2173,6 +2211,8 @@ monitor_printer(
 
   delay = _cupsNextDelay(0, &prev_delay);
 
+  monitor->job_reasons = 0;
+
   while (monitor->job_state < IPP_JOB_CANCELED && !job_canceled)
   {
    /*
@@ -2279,6 +2319,50 @@ monitor_printer(
 
           if (!attr)
             break;
+        }
+      }
+
+      if ((attr = ippFindAttribute(response, "job-state-reasons",
+                                   IPP_TAG_KEYWORD)) != NULL)
+      {
+        int	i, new_reasons = 0;	/* Looping var, new reasons */
+
+        for (i = 0; i < attr->num_values; i ++)
+        {
+          if (!strcmp(attr->values[i].string.text,
+                      "account-authorization-failed"))
+            new_reasons |= _CUPS_JSR_ACCOUNT_AUTHORIZATION_FAILED;
+          else if (!strcmp(attr->values[i].string.text, "account-closed"))
+            new_reasons |= _CUPS_JSR_ACCOUNT_CLOSED;
+          else if (!strcmp(attr->values[i].string.text, "account-info-needed"))
+            new_reasons |= _CUPS_JSR_ACCOUNT_INFO_NEEDED;
+          else if (!strcmp(attr->values[i].string.text,
+                           "account-limit-reached"))
+            new_reasons |= _CUPS_JSR_ACCOUNT_LIMIT_REACHED;
+          else if (!strcmp(attr->values[i].string.text, "job-password-wait"))
+            new_reasons |= _CUPS_JSR_JOB_PASSWORD_WAIT;
+          else if (!strcmp(attr->values[i].string.text, "job-release-wait"))
+            new_reasons |= _CUPS_JSR_JOB_RELEASE_WAIT;
+        }
+
+        if (new_reasons != monitor->job_reasons)
+        {
+	  if (new_reasons & _CUPS_JSR_ACCOUNT_AUTHORIZATION_FAILED)
+	    fputs("JOBSTATE: account-authorization-failed\n", stderr);
+	  else if (new_reasons & _CUPS_JSR_ACCOUNT_CLOSED)
+	    fputs("JOBSTATE: account-closed\n", stderr);
+	  else if (new_reasons & _CUPS_JSR_ACCOUNT_INFO_NEEDED)
+	    fputs("JOBSTATE: account-info-needed\n", stderr);
+	  else if (new_reasons & _CUPS_JSR_ACCOUNT_LIMIT_REACHED)
+	    fputs("JOBSTATE: account-limit-reached\n", stderr);
+	  else if (new_reasons & _CUPS_JSR_JOB_PASSWORD_WAIT)
+	    fputs("JOBSTATE: job-password-wait\n", stderr);
+	  else if (new_reasons & _CUPS_JSR_JOB_RELEASE_WAIT)
+	    fputs("JOBSTATE: job-release-wait\n", stderr);
+	  else
+	    fputs("JOBSTATE: job-printing\n", stderr);
+
+	  monitor->job_reasons = new_reasons;
         }
       }
 

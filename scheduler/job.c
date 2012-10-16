@@ -3257,8 +3257,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    job_state = IPP_JOB_HELD;
 	    message   = "Job held for authentication.";
 
-	    ippSetString(job->attrs, &job->reasons, 0,
-	                 "cups-held-for-authentication");
+            if (strncmp(job->reasons->values[0].string.text, "account-", 8))
+	      ippSetString(job->attrs, &job->reasons, 0,
+			   "cups-held-for-authentication");
           }
           break;
 
@@ -4701,6 +4702,17 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       if (job->sheets)
 	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
 		      "Printed %d page(s).", job->sheets->values[0].integer);
+    }
+    else if (loglevel == CUPSD_LOG_JOBSTATE)
+    {
+     /*
+      * Support "keyword" to set job-state-reasons to the specified keyword.
+      * This is sufficient for the current paid printing stuff.
+      */
+
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "JOBSTATE: %s", message);
+
+      ippSetString(job->attrs, &job->reasons, 0, message);
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {
