@@ -1702,6 +1702,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      }
 	      break;
 
+          case IPP_TAG_STRING :
+              attrptr = ippAddOctetString(request, group, attr, token,
+                                          strlen(token));
+	      break;
+
 	  default :
 	      print_fatal_error("Unsupported ATTR value tag %s on line %d.",
 				ippTagString(value), linenum);
@@ -2660,9 +2665,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		get_variable(vars, statuses[i].if_not_defined))
 	      continue;
 
-	    add_stringf(errors, "EXPECTED: STATUS %s (got %s)",
-			ippErrorString(statuses[i].status),
-			ippErrorString(cupsLastError()));
+            if (!statuses[i].repeat_match)
+	      add_stringf(errors, "EXPECTED: STATUS %s (got %s)",
+			  ippErrorString(statuses[i].status),
+			  ippErrorString(cupsLastError()));
 	  }
 
 	  if ((attrptr = ippFindAttribute(response, "status-message",
@@ -2726,7 +2732,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
+	    else if (!expect->define_match && !expect->define_value &&
+	             !expect->repeat_match && !expect->repeat_no_match)
 	    {
 	      if (expect->with_flags & _CUPS_WITH_REGEX)
 		add_stringf(errors, "EXPECTED: %s %s /%s/",
@@ -3788,6 +3795,41 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
 	  break;
 
       case IPP_TAG_STRING :
+          for (i = 0; i < attr->num_values; i ++)
+          {
+            if (Output == _CUPS_OUTPUT_PLIST)
+            {
+	      char	buffer[IPP_MAX_LENGTH * 5 / 4 + 1];
+					/* Output buffer */
+
+              printf("<data>%s</data>\n",
+                     httpEncode64_2(buffer, sizeof(buffer),
+                                    attr->values[i].unknown.data,
+                                    attr->values[i].unknown.length));
+            }
+            else
+            {
+              char	*ptr,		/* Pointer into data */
+        		*end;		/* End of data */
+
+              putchar('\"');
+              for (ptr = attr->values[i].unknown.data,
+                       end = ptr + attr->values[i].unknown.length;
+                   ptr < end;
+                   ptr ++)
+              {
+                if (*ptr == '\\' || *ptr == '\"')
+                  printf("\\%c", *ptr);
+                else if (!isprint(*ptr & 255))
+                  printf("\\%03o", *ptr & 255);
+                else
+                  putchar(*ptr);
+              }
+              putchar('\"');
+            }
+          }
+          break;
+
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :

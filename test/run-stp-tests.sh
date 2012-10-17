@@ -368,6 +368,11 @@ else
 	ln -s /usr/lib/cups/filter/texttops /tmp/cups-$user/bin/filter
 
 	ln -s /usr/share/cups/mime/legacy.convs /tmp/cups-$user/share/mime
+	ln -s /usr/share/cups/charsets /tmp/cups-$user/share
+	if test -f $root/data/psglyphs; then
+		ln -s /usr/share/cups/data/psglyphs $root/data
+	fi
+	ln -s /usr/share/cups/fonts /tmp/cups-$user/share
 fi
 
 #

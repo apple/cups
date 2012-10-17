@@ -1,0 +1,44 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Inactiva:{printer_state=4?Processing:Paused}},
+{printer_is_accepting_jobs=0?No accepta tasques:Accepta tasques},
+{server_is_sharing_printers=0?No:{printer_is_shared=0?Not:}} Compartida{default_name={printer_name}?, Servidor per defecte:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Manteniment</OPTION>
+<OPTION VALUE="print-test-page">Imprimeix una p&agrave;gina de prova</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Resume Class</OPTION>:<OPTION VALUE="stop-class">Pausa la classe</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accepta Tasques</OPTION>:<OPTION VALUE="reject-jobs">No acceptis tasques</OPTION>}
+<OPTION VALUE="move-jobs">Mou totes les tasques</OPTION>
+<OPTION VALUE="purge-jobs">Cancel&middot;a totes les tasques</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administraci&oacute;</OPTION>
+<OPTION VALUE="modify-class">Modifica la classe</OPTION>
+<OPTION VALUE="delete-class">Esborra la classe</OPTION>
+<OPTION VALUE="set-class-options">Aplica les opcions per defecte</OPTION>
+<OPTION VALUE="set-as-default">Configura com a servidor per defecte</OPTION>
+<OPTION VALUE="set-allowed-users">Gestiona els permisos dels usuaris</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Descripci&oacute;:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Ubicaci&oacute:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Membres:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Per defecte:</TH><TD>plantilles={job_sheets_default}
+mitj&agrave;={media_default?{media_default}:unknown}
+{sides_default?laterals={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

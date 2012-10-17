@@ -1,0 +1,47 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Inactiva:{printer_state=4?Processant:En pausa}},
+{printer_is_accepting_jobs=0?Refusa les tasques:Accepta tasques},
+{server_is_sharing_printers=0?No:{printer_is_shared=0?No:}} Compartida{default_name={printer_name}?, Servidor per defecte:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Manteniment</OPTION>
+<OPTION VALUE="print-test-page">Imprimeix una p&agrave;gina de prova</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Neteja els cap&ccedil;als</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Imprimeix la p&agrave;gina de prova pr&ograve;pia</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Repr&egrave;n la impressora</OPTION>:<OPTION VALUE="stop-printer">Pausa la impressora</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accepta tasques</OPTION>:<OPTION VALUE="reject-jobs">Refusa les tasques</OPTION>}
+<OPTION VALUE="move-jobs">Mou totes les tasques</OPTION>
+<OPTION VALUE="purge-jobs">Cancel&middot;la totes les tasques</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administraci&oacute;</OPTION>
+<OPTION VALUE="modify-printer">Modifica la impressora</OPTION>
+<OPTION VALUE="delete-printer">Elimina la impressora</OPTION>
+<OPTION VALUE="set-printer-options">Torna a les opcions per defecte</OPTION>
+<OPTION VALUE="set-as-default">Configura com a servidor per defecte</OPTION>
+<OPTION VALUE="set-allowed-users">Configura els permisos dels usuaris</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Descripci&oacute;:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Ubicaci&oacute;:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Controlador:</TH><TD>{printer_make_and_model} ({color_supported=1?color:escala de grisos}{sides_supported?, impressió a doble cara:})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Connexi&oacute;:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Configuraci&oacute; per defecte:</TH><TD>Fulls de tasques={job_sheets_default}
+safata={media_default?{media_default}:desconeguda}
+{sides_default?cares={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

@@ -304,7 +304,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.9.0 \
+		-current_version 2.10.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -333,7 +333,7 @@ libcups_s.a:	$(LIBOBJS) libcups_s.exp
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:9 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:10 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -518,7 +518,7 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
 		api-cups.xml \
-		cups.h adminutil.c dest.c language.c notify.c \
+		cups.h adminutil.c dest*.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --tokens help/api-cups.html api-cups.xml >../doc/help/api-cups.tokens
@@ -573,7 +573,7 @@ framedhelp:
 		--section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h adminutil.c dest.c language.c notify.c \
+		cups.h adminutil.c dest*.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c
 	mxmldoc --framed api-filedir \

@@ -25,7 +25,7 @@
 %{?_with_dbus: %define _dbus --enable-dbus}
 %{!?_with_dbus: %define _dbus --disable-dbus}
 
-%{!?_with_dnssd: %{!?_without_dnssd: %define _without_dnssd --without-dnssd}}
+%{!?_with_dnssd: %{!?_without_dnssd: %define _with_dnssd --with-dnssd}}
 %{?_with_dnssd: %define _dnssd --enable-dnssd}
 %{!?_with_dnssd: %define _dnssd --disable-dnssd}
 
@@ -179,6 +179,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
 %if %{?_with_dnssd:1}%{!?_with_dnssd:0}
+# DNS-SD
 /usr/lib/cups/backend/dnssd
 %endif
 /usr/lib/cups/backend/http
@@ -195,7 +196,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-deviced
 /usr/lib/cups/daemon/cups-driverd
 /usr/lib/cups/daemon/cups-exec
-/usr/lib/cups/daemon/cups-polld
 %dir /usr/lib/cups/driver
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/*
@@ -208,14 +208,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups
 %dir /usr/share/cups/banners
 /usr/share/cups/banners/*
-%dir /usr/share/cups/charsets
-/usr/share/cups/charsets/*
 %dir /usr/share/cups/data
 /usr/share/cups/data/*
 %dir /usr/share/cups/drv
 /usr/share/cups/drv/*
-%dir /usr/share/cups/fonts
-/usr/share/cups/fonts/*
 %dir /usr/share/cups/ipptool
 /usr/share/cups/ipptool/*
 %dir /usr/share/cups/mime
@@ -227,22 +223,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
-%dir /usr/share/doc/cups/de
-/usr/share/doc/cups/de/*
-%dir /usr/share/doc/cups/es
-/usr/share/doc/cups/es/*
-%dir /usr/share/doc/cups/eu
-/usr/share/doc/cups/eu/*
-%dir /usr/share/doc/cups/id
-/usr/share/doc/cups/id/*
-%dir /usr/share/doc/cups/it
-/usr/share/doc/cups/it/*
-%dir /usr/share/doc/cups/ja
-/usr/share/doc/cups/ja/*
-%dir /usr/share/doc/cups/pl
-/usr/share/doc/cups/pl/*
-%dir /usr/share/doc/cups/ru
-/usr/share/doc/cups/ru/*
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/accounting.html
 /usr/share/doc/cups/help/cgi.html
@@ -262,7 +242,20 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
-/usr/share/locale/*
+
+%dir /usr/share/doc/cups/ca
+/usr/share/doc/cups/ca/*
+%dir /usr/share/doc/cups/es
+/usr/share/doc/cups/es/*
+%dir /usr/share/doc/cups/ja
+/usr/share/doc/cups/ja/*
+
+%dir /usr/share/locale/ca
+/usr/share/locale/ca/cups_ca.po
+%dir /usr/share/locale/es
+/usr/share/locale/es/cups_es.po
+%dir /usr/share/locale/ja
+/usr/share/locale/ja/cups_ja.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
@@ -292,7 +285,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsreject.8.gz
 /usr/share/man/man8/cups-deviced.8.gz
 /usr/share/man/man8/cups-driverd.8.gz
-/usr/share/man/man8/cups-polld.8.gz
+/usr/share/man/man8/cups-snmp.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz
 /usr/share/man/man8/lpinfo.8.gz

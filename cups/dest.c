@@ -1788,7 +1788,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * need to set a default if one exists...
     */
 
-    if (dest == NULL && defprinter != NULL)
+    if (!dest && *dests && defprinter)
     {
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;
@@ -2449,7 +2449,7 @@ appleCopyNetwork(void)
  * 'appleGetPaperSize()' - Get the default paper size.
  */
 
-char *					/* O - Default paper size */
+static char *				/* O - Default paper size */
 appleGetPaperSize(char *name,		/* I - Paper size name buffer */
                   int  namesize)	/* I - Size of buffer */
 {
@@ -2679,8 +2679,10 @@ cups_dnssd_browse_cb(
     AvahiLookupResultFlags flags,	/* I - Flags */
     void                   *context)	/* I - Devices array */
 {
+#ifdef DEBUG
   AvahiClient		*client = avahi_service_browser_get_client(browser);
 					/* Client information */
+#endif /* DEBUG */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */
 
@@ -3064,8 +3066,10 @@ cups_dnssd_query_cb(
     AvahiLookupResultFlags flags,	/* I - Flags */
     void                   *context)	/* I - Enumeration data */
 {
+#    ifdef DEBUG
   AvahiClient		*client = avahi_record_browser_get_client(browser);
 					/* Client information */
+#    endif /* DEBUG */
 #  endif /* HAVE_DNSSD */
   _cups_dnssd_data_t	*data = (_cups_dnssd_data_t *)context;
 					/* Enumeration data */

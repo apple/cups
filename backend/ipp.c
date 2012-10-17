@@ -86,6 +86,7 @@ static int		child_pid = 0;	/* Child process ID */
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static const char * const jattrs[] =	/* Job attributes we want */
 {
+  "job-id",
   "job-impressions-completed",
   "job-media-sheets-completed",
   "job-name",
@@ -169,7 +170,7 @@ static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
-static int		run_as_user(int argc, char *argv[], uid_t uid,
+static int		run_as_user(char *argv[], uid_t uid,
 			            const char *device_uri, int fd);
 #endif /* HAVE_GSSAPI && HAVE_XPC */
 static void		sigterm_handler(int sig);
@@ -203,6 +204,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
   http_addrlist_t *addrlist;		/* Address of printer */
+  int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd,		/* SNMP socket */
 		start_count,		/* Page count via SNMP at start */
 		page_count,		/* Page count via SNMP */
@@ -348,7 +350,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (uid > 0)
     {
       if (argc == 6)
-        return (run_as_user(argc, argv, uid, device_uri, 0));
+        return (run_as_user(argv, uid, device_uri, 0));
       else
       {
         int status = 0;			/* Exit status */
@@ -357,7 +359,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  if ((fd = open(argv[i], O_RDONLY)) >= 0)
 	  {
-	    status = run_as_user(argc, argv, uid, device_uri, fd);
+	    status = run_as_user(argv, uid, device_uri, fd);
 	    close(fd);
 	  }
 	  else
@@ -507,6 +509,16 @@ main(int  argc,				/* I - Number of command-line args */
 			       _("Unknown encryption option value: \"%s\"."),
 			       value);
         }
+      }
+      else if (!_cups_strcasecmp(name, "snmp"))
+      {
+        /*
+         * Enable/disable SNMP stuff...
+         */
+
+         snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
+                        _cups_strcasecmp(value, "yes") ||
+                        _cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "version"))
       {
@@ -659,11 +671,14 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports SNMP...
   */
 
-  if ((snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family)) >= 0)
-  {
+  if (snmp_enabled)
+    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
+  else
+    snmp_fd = -1;
+
+  if (snmp_fd >= 0)
     have_supplies = !backendSNMPSupplies(snmp_fd, &(addrlist->addr),
                                          &start_count, NULL);
-  }
   else
     have_supplies = start_count = 0;
 
@@ -932,6 +947,8 @@ main(int  argc,				/* I - Number of command-line args */
 	_cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Unable to get printer status."));
         sleep(10);
+
+	httpReconnect(http);
       }
 
       ippDelete(supported);
@@ -1080,7 +1097,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  get_job_attrs = 1;
       }
 
-      if (!send_document)
+      if (create_job && !send_document)
       {
         fputs("DEBUG: Printer supports Create-Job but not Send-Document.\n",
               stderr);
@@ -1257,6 +1274,16 @@ main(int  argc,				/* I - Number of command-line args */
     if (!stat(files[0], &fileinfo))
       compatsize = fileinfo.st_size;
   }
+
+ /*
+  * If the printer only claims to support IPP/1.0, or if the user specifically
+  * included version=1.0 in the URI, then do not try to use Create-Job or
+  * Send-Document.  This is another dreaded compatibility hack, but unfortunately
+  * there are enough broken printers out there that we need this for now...
+  */
+
+  if (version == 10)
+    create_job = send_document = 0;
 
  /*
   * Start monitoring the printer in the background...
@@ -1474,10 +1501,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  goto cleanup;
 	}
       }
-      else if (ipp_status == IPP_ERROR_JOB_CANCELED)
+      else if (ipp_status == IPP_ERROR_JOB_CANCELED ||
+               ipp_status == IPP_NOT_AUTHORIZED)
         goto cleanup;
-      else if (ipp_status == IPP_NOT_AUTHORIZED)
-        continue;
       else
       {
        /*
@@ -1578,6 +1604,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 		       "document-format", NULL, document_format);
 
+        if (compression)
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		       "compression", NULL, compression);
+
 	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
 	http_status = cupsSendRequest(http, request, resource, 0);
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
@@ -1654,11 +1684,33 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
       continue;
-    else if (ipp_status == IPP_REQUEST_VALUE)
+    else if (ipp_status == IPP_REQUEST_VALUE ||
+             ipp_status == IPP_ERROR_JOB_CANCELED ||
+             ipp_status == IPP_NOT_AUTHORIZED ||
+             ipp_status == IPP_INTERNAL_ERROR)
     {
      /*
-      * Print file is too large, abort this job...
+      * Print file is too large, job was canceled, we need new
+      * authentication data, or we had some sort of error...
       */
+
+      goto cleanup;
+    }
+    else if (ipp_status == IPP_NOT_FOUND)
+    {
+     /*
+      * Printer does not actually implement support for Create-Job/
+      * Send-Document, so log the conformance issue and stop the printer.
+      */
+
+      fputs("DEBUG: This printer claims to support Create-Job and "
+            "Send-Document, but those operations failed.\n", stderr);
+      fputs("DEBUG: Add '?version=1.0' to the device URI to use legacy "
+            "compatibility mode.\n", stderr);
+      update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			   "cups-ipp-missing-send-document");
+
+      ipp_status = IPP_INTERNAL_ERROR;	/* Force queue to stop */
 
       goto cleanup;
     }
@@ -2839,8 +2891,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
  */
 
 static int				/* O - Exit status */
-run_as_user(int        argc,		/* I - Number of command-line args */
-	    char       *argv[],		/* I - Command-line arguments */
+run_as_user(char       *argv[],		/* I - Command-line arguments */
 	    uid_t      uid,		/* I - User ID */
 	    const char *device_uri,	/* I - Device URI */
 	    int        fd)		/* I - File to print */

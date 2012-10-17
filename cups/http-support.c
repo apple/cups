@@ -82,6 +82,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
   char			*buffer;	/* Pointer to buffer */
   size_t		bufsize;	/* Size of buffer */
   int			options;	/* Options passed to _httpResolveURI */
+  const char		*resource;	/* Resource from URI */
 } _http_uribuf_t;
 
 
@@ -1523,6 +1524,7 @@ _httpResolveURI(
     uribuf.buffer   = resolved_uri;
     uribuf.bufsize  = resolved_size;
     uribuf.options  = options;
+    uribuf.resource = resource;
 
     resolved_uri[0] = '\0';
 
@@ -2064,8 +2066,14 @@ http_resolve_cb(
   * Assemble the final device URI...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
-                  NULL, hostTarget, ntohs(port), resource);
+  if ((!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
+      !strcmp(uribuf->resource, "/cups"))
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
+                     scheme, NULL, hostTarget, ntohs(port), "%s?snmp=false",
+                     resource);
+  else
+    httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
+                    scheme, NULL, hostTarget, ntohs(port), resource);
 
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }

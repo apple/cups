@@ -4829,13 +4829,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		   "printer-make-and-model", NULL,
 		   "Local System V Printer");
     }
-    else if (!strncmp(p->device_uri, "ipp://", 6) &&
-	     (strstr(p->device_uri, "/printers/") != NULL ||
-	      strstr(p->device_uri, "/classes/") != NULL ||
-	      ((strstr(p->device_uri, "._ipp.") != NULL ||
-	        strstr(p->device_uri, "._ipps.") != NULL) &&
-	       !strcmp(p->device_uri + strlen(p->device_uri) - 5,
-		       "/cups"))))
+    else if (((!strncmp(p->device_uri, "ipp://", 6) ||
+               !strncmp(p->device_uri, "ipps://", 7)) &&
+	      (strstr(p->device_uri, "/printers/") != NULL ||
+	       strstr(p->device_uri, "/classes/") != NULL)) ||
+	     ((strstr(p->device_uri, "._ipp.") != NULL ||
+	       strstr(p->device_uri, "._ipps.") != NULL) &&
+	      !strcmp(p->device_uri + strlen(p->device_uri) - 5, "/cups")))
     {
      /*
       * Tell the client this is really a hard-wired remote printer.

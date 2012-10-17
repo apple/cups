@@ -175,6 +175,13 @@
 
 
 /*
+ * Use <stdint.h>?
+ */
+
+#undef HAVE_STDINT_H
+
+
+/*
  * Use <string.h>, <strings.h>, and/or <bstring.h>?
  */
 
@@ -346,36 +353,10 @@
 
 
 /*
- * Do we have the SSLSetProtocolVersionMax function?
- */
-
-#undef HAVE_SSLSETPROTOCOLVERSIONMAX
-
-
-/*
  * Do we have the cssmErrorString function?
  */
 
 #undef HAVE_CSSMERRORSTRING
-
-
-/*
- * Do we have the SLP library?
- */
-
-#undef HAVE_LIBSLP
-
-
-/*
- * Do we have an LDAP library?
- */
-
-#undef HAVE_LDAP
-#undef HAVE_OPENLDAP
-#undef HAVE_MOZILLA_LDAP
-#undef HAVE_LDAP_SSL_H
-#undef HAVE_LDAP_SSL
-#undef HAVE_LDAP_REBIND_PROC
 
 
 /*

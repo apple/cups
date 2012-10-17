@@ -391,23 +391,34 @@ div.contents ul.subcontents li {
 	<li><a href="#PASSWORDS_AND_AUTHENTICATION">Passwords and Authentication</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-	<li><a href="#appleGetPaperSize" title="Get the default paper size.">appleGetPaperSize</a></li>
 	<li><a href="#cupsAddDest" title="Add a destination to the list of destinations.">cupsAddDest</a></li>
 	<li><a href="#cupsAddOption" title="Add an option to an option array.">cupsAddOption</a></li>
 	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
 	<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
 	<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
 	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
+	<li><a href="#cupsCancelDestJob" title="Include necessary headers...">cupsCancelDestJob</a></li>
 	<li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
 	<li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
+	<li><a href="#cupsCheckDestSupported" title="Check that the option and value are supported
+by the destination.">cupsCheckDestSupported</a></li>
+	<li><a href="#cupsCloseDestJob" title="Close a job and start printing.">cupsCloseDestJob</a></li>
 	<li><a href="#cupsConnectDest" title="Connect to the server for a destination.">cupsConnectDest</a></li>
 	<li><a href="#cupsConnectDestBlock" title="Connect to the server for a destination.">cupsConnectDestBlock</a></li>
 	<li><a href="#cupsCopyDest" title="Callback block">cupsCopyDest</a></li>
+	<li><a href="#cupsCopyDestConflicts" title="Get conflicts and resolutions for a new
+option/value pair.">cupsCopyDestConflicts</a></li>
+	<li><a href="#cupsCopyDestInfo" title="Get the supported values/capabilities for the
+destination.">cupsCopyDestInfo</a></li>
+	<li><a href="#cupsCreateDestJob" title="Create a job on a destination.">cupsCreateDestJob</a></li>
 	<li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
 	<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
 	<li><a href="#cupsEnumDests" title="Enumerate available destinations with a callback function.">cupsEnumDests</a></li>
 	<li><a href="#cupsEnumDestsBlock" title="Enumerate available destinations with a block.">cupsEnumDestsBlock</a></li>
+	<li><a href="#cupsFinishDestDocument" title="Finish the current document.">cupsFinishDestDocument</a></li>
 	<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
+	<li><a href="#cupsFreeDestInfo" title="Free destination information obtained using
+cupsCopyDestInfo.">cupsFreeDestInfo</a></li>
 	<li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
 	<li><a href="#cupsFreeJobs" title="Free memory used by job data.">cupsFreeJobs</a></li>
 	<li><a href="#cupsFreeOptions" title="Free all memory used by options.">cupsFreeOptions</a></li>
@@ -415,6 +426,8 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsGetDefault" title="Get the default printer or class for the default server.">cupsGetDefault</a></li>
 	<li><a href="#cupsGetDefault2" title="Get the default printer or class for the specified server.">cupsGetDefault2</a></li>
 	<li><a href="#cupsGetDest" title="Get the named destination from the list.">cupsGetDest</a></li>
+	<li><a href="#cupsGetDestMediaByName" title="Get media names, dimensions, and margins.">cupsGetDestMediaByName</a></li>
+	<li><a href="#cupsGetDestMediaBySize" title="Get media names, dimensions, and margins.">cupsGetDestMediaBySize</a></li>
 	<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
 	<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
 	<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
@@ -436,6 +449,10 @@ for the given language.">cupsLangEncoding</a></li>
 	<li><a href="#cupsLangFlush" title="Flush all language data out of the cache.">cupsLangFlush</a></li>
 	<li><a href="#cupsLangFree" title="Free language data.">cupsLangFree</a></li>
 	<li><a href="#cupsLangGet" title="Get a language.">cupsLangGet</a></li>
+	<li><a href="#cupsLocalizeDestOption" title="Get the localized string for a destination
+option.">cupsLocalizeDestOption</a></li>
+	<li><a href="#cupsLocalizeDestValue" title="Get the localized string for a destination
+option+value pair.">cupsLocalizeDestValue</a></li>
 	<li><a href="#cupsNotifySubject" title="Return the subject for the given notification message.">cupsNotifySubject</a></li>
 	<li><a href="#cupsNotifyText" title="Return the text for the given notification message.">cupsNotifyText</a></li>
 	<li><a href="#cupsParseOptions" title="Parse options from a command-line argument.">cupsParseOptions</a></li>
@@ -461,6 +478,7 @@ connections.">cupsSetCredentials</a></li>
 	<li><a href="#cupsSetServer" title="Set the default server name and port.">cupsSetServer</a></li>
 	<li><a href="#cupsSetServerCertCB" title="Set the server certificate callback.">cupsSetServerCertCB</a></li>
 	<li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
+	<li><a href="#cupsStartDestDocument" title="Start a new document.">cupsStartDestDocument</a></li>
 	<li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
 	<li><a href="#cupsTempFd" title="Creates a temporary file.">cupsTempFd</a></li>
 	<li><a href="#cupsTempFile" title="Generates a temporary filename.">cupsTempFile</a></li>
@@ -949,22 +967,6 @@ fields for the username and password. The username should default to the
 string returned by the <a href="#cupsUser"><code>cupsUser</code></a>
 function.</p>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><a name="appleGetPaperSize">appleGetPaperSize</a></h3>
-<p class="description">Get the default paper size.</p>
-<p class="code">
-char *appleGetPaperSize (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int namesize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-<dd class="description">Paper size name buffer</dd>
-<dt>namesize</dt>
-<dd class="description">Size of buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Default paper size</p>
 <h3 class="function"><a name="cupsAddDest">cupsAddDest</a></h3>
 <p class="description">Add a destination to the list of destinations.</p>
 <p class="code">
@@ -1116,6 +1118,31 @@ int cupsAdminSetServerSettings (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
+<h3 class="function"><a name="cupsCancelDestJob">cupsCancelDestJob</a></h3>
+<p class="description">Include necessary headers...</p>
+<p class="code">
+ipp_status_t cupsCancelDestJob (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int job_id<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Cancel a job on a destination.</p>
+<p class="discussion">The &quot;job_id&quot; is the number returned by cupsCreateDestJob.<br>
+<br>
+Returns IPP_OK on success and IPP_NOT_AUTHORIZED or IPP_FORBIDDEN on
+failure.
+
+</p>
 <h3 class="function"><a name="cupsCancelJob">cupsCancelJob</a></h3>
 <p class="description">Cancel a print job on the default server.</p>
 <p class="code">
@@ -1169,6 +1196,64 @@ to cancel the current job on the named destination.<br>
 <br>
 Use the <a href="#cupsLastError"><code>cupsLastError</code></a> and <a href="#cupsLastErrorString"><code>cupsLastErrorString</code></a> functions to get
 the cause of any failure.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCheckDestSupported">cupsCheckDestSupported</a></h3>
+<p class="description">Check that the option and value are supported
+by the destination.</p>
+<p class="code">
+int cupsCheckDestSupported (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if supported, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns 1 if supported, 0 otherwise.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCloseDestJob">cupsCloseDestJob</a></h3>
+<p class="description">Close a job and start printing.</p>
+<p class="code">
+ipp_status_t cupsCloseDestJob (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *info,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int job_id<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>info</dt>
+<dd class="description">Destination information</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">IPP status code</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Use when the last call to cupsStartDocument passed 0 for &quot;last_document&quot;.
+&quot;job_id&quot; is the job ID returned by cupsCreateDestJob. Returns <code>IPP_OK</code>
+on success.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsConnectDest">cupsConnectDest</a></h3>
@@ -1271,6 +1356,125 @@ int cupsCopyDest (<br>
 <p class="discussion">Make a copy of the destination to an array of destinations (or just a single
 copy) - for use with the cupsEnumDests* functions. The caller is responsible
 for calling cupsFreeDests() on the returned object(s).
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCopyDestConflicts">cupsCopyDestConflicts</a></h3>
+<p class="description">Get conflicts and resolutions for a new
+option/value pair.</p>
+<p class="code">
+int cupsCopyDestConflicts (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_option_t">cups_option_t</a> *options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *new_option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *new_value,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *num_conflicts,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_option_t">cups_option_t</a> **conflicts,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *num_resolved,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_option_t">cups_option_t</a> **resolved<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>num_options</dt>
+<dd class="description">Number of current options</dd>
+<dt>options</dt>
+<dd class="description">Current options</dd>
+<dt>new_option</dt>
+<dd class="description">New option</dd>
+<dt>new_value</dt>
+<dd class="description">New value</dd>
+<dt>num_conflicts</dt>
+<dd class="description">Number of conflicting options</dd>
+<dt>conflicts</dt>
+<dd class="description">Conflicting options</dd>
+<dt>num_resolved</dt>
+<dd class="description">Number of options to resolve</dd>
+<dt>resolved</dt>
+<dd class="description">Resolved options</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if there is a conflict, 0 if none, -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">&quot;num_options&quot; and &quot;options&quot; represent the currently selected options by the
+user.  &quot;new_option&quot; and &quot;new_value&quot; are the setting the user has just
+changed.<br>
+<br>
+Returns 1 if there is a conflict, 0 if there are no conflicts, and -1 if
+there was an unrecoverable error such as a resolver loop.<br>
+<br>
+If &quot;num_conflicts&quot; and &quot;conflicts&quot; are not <code>NULL</code>, they are set to
+contain the list of conflicting option/value pairs.  Similarly, if
+&quot;num_resolved&quot; and &quot;resolved&quot; are not <code>NULL</code> they will be set to the
+list of changes needed to resolve the conflict.<br>
+<br>
+If cupsCopyDestConflicts returns 1 but &quot;num_resolved&quot; and &quot;resolved&quot; are set
+to 0 and <code>NULL</code>, respectively, then the conflict cannot be resolved.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCopyDestInfo">cupsCopyDestInfo</a></h3>
+<p class="description">Get the supported values/capabilities for the
+destination.</p>
+<p class="code">
+<a href="#cups_dinfo_t">cups_dinfo_t</a> *cupsCopyDestInfo (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Destination information</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The caller is responsible for calling <a href="#cupsFreeDestInfo"><code>cupsFreeDestInfo</code></a> on the return
+value. <code>NULL</code> is returned on error.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsCreateDestJob">cupsCreateDestJob</a></h3>
+<p class="description">Create a job on a destination.</p>
+<p class="code">
+ipp_status_t cupsCreateDestJob (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *info,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *job_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *title,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_option_t">cups_option_t</a> *options<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>info</dt>
+<dd class="description">Destination information</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID or 0 on error</dd>
+<dt>title</dt>
+<dd class="description">Job name</dd>
+<dt>num_options</dt>
+<dd class="description">Number of job options</dd>
+<dt>options</dt>
+<dd class="description">Job options</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">IPP status code</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns <code>IPP_OK</code> or <code>IPP_OK_SUBST</code> on success, saving the job ID
+in the variable pointed to by &quot;job_id&quot;.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsCreateJob">cupsCreateJob</a></h3>
@@ -1402,6 +1606,29 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the block returns 0.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsFinishDestDocument">cupsFinishDestDocument</a></h3>
+<p class="description">Finish the current document.</p>
+<p class="code">
+ipp_status_t cupsFinishDestDocument (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *info<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>info</dt>
+<dd class="description">Destination information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status of document submission</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns <code>IPP_OK</code> or <code>IPP_OK_SUBST</code> on success.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
 <p class="description">Finish sending a document.</p>
 <p class="code">
@@ -1422,6 +1649,18 @@ ipp_status_t cupsFinishDocument (<br>
 <p class="discussion">The document must have been started using <a href="#cupsStartDocument"><code>cupsStartDocument</code></a>.
 
 </p>
+<h3 class="function"><a name="cupsFreeDestInfo">cupsFreeDestInfo</a></h3>
+<p class="description">Free destination information obtained using
+<a href="#cupsCopyDestInfo"><code>cupsCopyDestInfo</code></a>.</p>
+<p class="code">
+void cupsFreeDestInfo (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+</dl>
 <h3 class="function"><a name="cupsFreeDests">cupsFreeDests</a></h3>
 <p class="description">Free the memory used by the list of destinations.</p>
 <p class="code">
@@ -1541,6 +1780,99 @@ not support the lpoptions-defined default printer.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> or <a href="#cupsGetDests2"><code>cupsGetDests2</code></a> functions to get a
 list of supported destinations for the current user.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaByName">cupsGetDestMediaByName</a></h3>
+<p class="description">Get media names, dimensions, and margins.</p>
+<p class="code">
+int cupsGetDestMediaByName (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>media</dt>
+<dd class="description">Media name</dd>
+<dt>flags</dt>
+<dd class="description">Media matching flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on match, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;media&quot; string is a PWG media name.  &quot;Flags&quot; provides some matching
+guidance (multiple flags can be combined):<br>
+<br>
+CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer,
+CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size,
+CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing,
+CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size, and
+CUPS_MEDIA_FLAGS_READY      = if the printer supports media sensing, find the
+size amongst the &quot;ready&quot; media.<br>
+<br>
+The matching result (if any) is returned in the &quot;cups_size_t&quot; structure.<br>
+<br>
+Returns 1 when there is a match and 0 if there is not a match.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaBySize">cupsGetDestMediaBySize</a></h3>
+<p class="description">Get media names, dimensions, and margins.</p>
+<p class="code">
+int cupsGetDestMediaBySize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int length,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>width</dt>
+<dd class="description">Media width in hundredths of
+of millimeters</dd>
+<dt>length</dt>
+<dd class="description">Media length in hundredths of
+of millimeters</dd>
+<dt>flags</dt>
+<dd class="description">Media matching flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on match, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">&quot;Width&quot; and &quot;length&quot; are the dimensions in hundredths of millimeters.
+&quot;Flags&quot; provides some matching guidance (multiple flags can be combined):<br>
+<br>
+CUPS_MEDIA_FLAGS_DEFAULT    = find the closest size supported by the printer,
+CUPS_MEDIA_FLAGS_BORDERLESS = find a borderless size,
+CUPS_MEDIA_FLAGS_DUPLEX     = find a size compatible with 2-sided printing,
+CUPS_MEDIA_FLAGS_EXACT      = find an exact match for the size, and
+CUPS_MEDIA_FLAGS_READY      = if the printer supports media sensing, find the
+size amongst the &quot;ready&quot; media.<br>
+<br>
+The matching result (if any) is returned in the &quot;cups_size_t&quot; structure.<br>
+<br>
+Returns 1 when there is a match and 0 if there is not a match.
+
+</p>
 <h3 class="function"><a name="cupsGetDests">cupsGetDests</a></h3>
 <p class="description">Get the list of destinations from the default server.</p>
 <p class="code">
@@ -1945,6 +2277,65 @@ cups_lang_t *cupsLangGet (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Language data</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsLocalizeDestOption">cupsLocalizeDestOption</a></h3>
+<p class="description">Get the localized string for a destination
+option.</p>
+<p class="code">
+const char *cupsLocalizeDestOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option to localize</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized string</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned string is stored in the destination information and will become
+invalid if the destination information is deleted.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsLocalizeDestValue">cupsLocalizeDestValue</a></h3>
+<p class="description">Get the localized string for a destination
+option+value pair.</p>
+<p class="code">
+const char *cupsLocalizeDestValue (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option to localize</dd>
+<dt>value</dt>
+<dd class="description">Value to localize</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized string</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned string is stored in the destination information and will become
+invalid if the destination information is deleted.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsNotifySubject">cupsNotifySubject</a></h3>
 <p class="description">Return the subject for the given notification message.</p>
 <p class="code">
@@ -2420,6 +2811,52 @@ void cupsSetUser (<br>
 Note: The current user name is tracked separately for each thread in a
 program. Multi-threaded programs that override the user name need to do so
 in each thread for the same user name to be used.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsStartDestDocument">cupsStartDestDocument</a></h3>
+<p class="description">Start a new document.</p>
+<p class="code">
+http_status_t cupsStartDestDocument (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *info,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int job_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *docname,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *format,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_option_t">cups_option_t</a> *options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int last_document<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>info</dt>
+<dd class="description">Destination information</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID</dd>
+<dt>docname</dt>
+<dd class="description">Document name</dd>
+<dt>format</dt>
+<dd class="description">Document format</dd>
+<dt>num_options</dt>
+<dd class="description">Number of document options</dd>
+<dt>options</dt>
+<dd class="description">Document options</dd>
+<dt>last_document</dt>
+<dd class="description">1 if this is the last document</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status of document creation</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">&quot;job_id&quot; is the job ID returned by cupsCreateDestJob.  &quot;docname&quot; is the name
+of the document/file being printed, &quot;format&quot; is the MIME media type for the
+document (see CUPS_FORMAT_xxx constants), and &quot;num_options&quot; and &quot;options&quot;
+are the options do be applied to the document. &quot;last_document&quot; should be 1
+if this is the last document to be submitted in the job.  Returns
+<code>HTTP_CONTINUE</code> on success.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsStartDocument">cupsStartDocument</a></h3>
 <p class="description">Add a document to a job created with cupsCreateJob().</p>
 <p class="code">

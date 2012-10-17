@@ -20,11 +20,11 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="1.6svn"
+CUPS_VERSION="1.6.1"
 CUPS_REVISION=""
-if test -z "$CUPS_REVISION" -a -d .svn; then
-	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-fi
+#if test -z "$CUPS_REVISION" -a -d .svn; then
+#	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+#fi
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],
@@ -130,6 +130,7 @@ AC_CHECK_HEADER(crypt.h,AC_DEFINE(HAVE_CRYPT_H))
 AC_CHECK_HEADER(langinfo.h,AC_DEFINE(HAVE_LANGINFO_H))
 AC_CHECK_HEADER(malloc.h,AC_DEFINE(HAVE_MALLOC_H))
 AC_CHECK_HEADER(shadow.h,AC_DEFINE(HAVE_SHADOW_H))
+AC_CHECK_HEADER(stdint.h,AC_DEFINE(HAVE_STDINT_H))
 AC_CHECK_HEADER(string.h,AC_DEFINE(HAVE_STRING_H))
 AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H))
 AC_CHECK_HEADER(bstring.h,AC_DEFINE(HAVE_BSTRING_H))

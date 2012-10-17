@@ -41,7 +41,7 @@ else
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
 	echo Validating sources...
-	cupsversionpatch=`echo $version | awk -F. '{print $3}'`
+	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
 	cupsversion=`printf "1.06%02d" $cupsversionpatch`
 
 	temp=`grep CUPS_VERSION cups/cups.h | grep -v CUPS_VERSION_ | awk '{print $4}'`
@@ -75,7 +75,7 @@ else
 	fi
 
 	echo Creating tag for release...
-	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
+	svn copy https://svn.easysw.com/public/cups/branches/branch-1.6 "$url" \
 		-m "Tag $version" || exit 1
 fi
 

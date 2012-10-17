@@ -3702,8 +3702,17 @@ http_send(http_t       *http,	/* I - Connection to server */
       DEBUG_printf(("9http_send: %s: %s", http_fields[i],
                     httpGetField(http, i)));
 
-      if (httpPrintf(http, "%s: %s\r\n", http_fields[i],
-		     httpGetField(http, i)) < 1)
+      if (i == HTTP_FIELD_HOST)
+      {
+	if (httpPrintf(http, "Host: %s:%d\r\n", httpGetField(http, i),
+	               _httpAddrPort(http->hostaddr)) < 1)
+	{
+	  http->status = HTTP_ERROR;
+	  return (-1);
+	}
+      }
+      else if (httpPrintf(http, "%s: %s\r\n", http_fields[i],
+		          httpGetField(http, i)) < 1)
       {
 	http->status = HTTP_ERROR;
 	return (-1);
@@ -4222,6 +4231,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 			       credential->datalen);
 			cupsArrayAdd(names, credential);
 		      }
+		      else
+		        free(credential);
 		    }
 		  }
 		}

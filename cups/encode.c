@@ -71,13 +71,22 @@ static const _ipp_option_t ipp_options[] =
   { 0, "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 1, "include-schemes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
-  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-id",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-impressions-completed", IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "job-k-octets",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-k-octets-completed",IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-media-sheets",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-media-sheets-completed", IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-page-limit",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-quota-period",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 1, "job-sheets",		IPP_TAG_NAME,		IPP_TAG_JOB },
   { 1, "job-sheets-default",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "job-state",		IPP_TAG_ENUM,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-state-message",	IPP_TAG_TEXT,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "job-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-uuid",		IPP_TAG_URI,		IPP_TAG_JOB },
   { 0, "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 1, "marker-change-time",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
@@ -179,6 +188,9 @@ static const _ipp_option_t ipp_options[] =
   { 0, "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB,
 							IPP_TAG_DOCUMENT },
   { 0, "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "time-at-completed",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "time-at-creation",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
+  { 0, "time-at-processing",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "x-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB,

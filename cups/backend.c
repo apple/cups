@@ -136,7 +136,7 @@ quote_string(const char *s)		/* I - String to write */
       if (*s == '\\' || *s == '\"')
 	putchar('\\');
 
-      if (*s == '\n')
+      if (((*s & 255) < ' ' && *s != '\t') || *s == 0x7f)
         putchar(' ');
       else
         putchar(*s);

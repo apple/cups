@@ -395,8 +395,10 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsGetFd" title="Get a file from the server.">cupsGetFd</a></li>
 	<li><a href="#cupsGetFile" title="Get a file from the server.">cupsGetFile</a></li>
 	<li><a href="#cupsGetResponse" title="Get a response to an IPP request.">cupsGetResponse</a></li>
-	<li><a href="#cupsLastError" title="Return the last IPP status code.">cupsLastError</a></li>
-	<li><a href="#cupsLastErrorString" title="Return the last IPP status-message.">cupsLastErrorString</a></li>
+	<li><a href="#cupsLastError" title="Return the last IPP status code received on the current
+thread.">cupsLastError</a></li>
+	<li><a href="#cupsLastErrorString" title="Return the last IPP status-message received on the
+current thread.">cupsLastErrorString</a></li>
 	<li><a href="#cupsPutFd" title="Put a file on the server.">cupsPutFd</a></li>
 	<li><a href="#cupsPutFile" title="Put a file on the server.">cupsPutFile</a></li>
 	<li><a href="#cupsReadResponseData" title="Read additional data after the IPP response.">cupsReadResponseData</a></li>
@@ -1010,9 +1012,9 @@ status, prior to resubmitting your request.
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Response data</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function sends the IPP request to the specified server, retrying
-and authenticating as necessary.  The request is freed with <a href="#ippDelete"><code>ippDelete</code></a>
-after receiving a valid IPP response.</p>
+<p class="discussion">This function sends the IPP request and attached file to the specified
+server, retrying and authenticating as necessary.  The request is freed with
+<a href="#ippDelete"><code>ippDelete</code></a>.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsDoIORequest">cupsDoIORequest</a></h3>
 <p class="description">Do an IPP request with file descriptors.</p>
 <p class="code">
@@ -1039,14 +1041,14 @@ after receiving a valid IPP response.</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Response data</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function sends the IPP request to the specified server, retrying
-and authenticating as necessary.  The request is freed with ippDelete()
-after receiving a valid IPP response.<br>
+<p class="discussion">This function sends the IPP request with the optional input file &quot;infile&quot; to
+the specified server, retrying and authenticating as necessary.  The request
+is freed with <a href="#ippDelete"><code>ippDelete</code></a>.<br>
 <br>
-If &quot;infile&quot; is a valid file descriptor, cupsDoIORequest() copies
+If &quot;infile&quot; is a valid file descriptor, <code>cupsDoIORequest</code> copies
 all of the data from the file after the IPP request message.<br>
 <br>
-If &quot;outfile&quot; is a valid file descriptor, cupsDoIORequest() copies
+If &quot;outfile&quot; is a valid file descriptor, <code>cupsDoIORequest</code> copies
 all of the data after the IPP response message to the file.
 
 </p>
@@ -1071,8 +1073,7 @@ all of the data after the IPP response message to the file.
 <p class="description">Response data</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function sends the IPP request to the specified server, retrying
-and authenticating as necessary.  The request is freed with ippDelete()
-after receiving a valid IPP response.</p>
+and authenticating as necessary.  The request is freed with <a href="#ippDelete"><code>ippDelete</code></a>.</p>
 <h3 class="function"><a name="cupsEncodeOptions">cupsEncodeOptions</a></h3>
 <p class="description">Encode printer options into IPP attributes.</p>
 <p class="code">
@@ -1220,19 +1221,21 @@ the request respectively.
 <p class="description">Response or <code>NULL</code> on HTTP error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use this function to get the response for an IPP request sent using
-cupsSendDocument() or cupsSendRequest(). For requests that return
-additional data, use httpRead() after getting a successful response,
-otherwise call httpFlush() to complete the response processing.
+<a href="#cupsSendRequest"><code>cupsSendRequest</code></a>. For requests that return additional data, use
+<a href="#cupsReadResponseData"><code>cupsReadResponseData</code></a> after getting a successful response,
+otherwise call <a href="#httpFlush"><code>httpFlush</code></a> to complete the response processing.
 
 </p>
 <h3 class="function"><a name="cupsLastError">cupsLastError</a></h3>
-<p class="description">Return the last IPP status code.</p>
+<p class="description">Return the last IPP status code received on the current
+thread.</p>
 <p class="code">
 ipp_status_t cupsLastError (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">IPP status code from last request</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsLastErrorString">cupsLastErrorString</a></h3>
-<p class="description">Return the last IPP status-message.</p>
+<p class="description">Return the last IPP status-message received on the
+current thread.</p>
 <p class="code">
 const char *cupsLastErrorString (void);</p>
 <h4 class="returnvalue">Return Value</h4>
@@ -1305,8 +1308,9 @@ ssize_t cupsReadResponseData (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Bytes read, 0 on EOF, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is used after cupsGetResponse() to read the PPD or document
-files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
+<p class="discussion">This function is used after <a href="#cupsGetResponse"><code>cupsGetResponse</code></a> to read the PPD or document
+files from <code>CUPS_GET_PPD</code> and <code>CUPS_GET_DOCUMENT</code> requests,
+respectively.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
@@ -1332,13 +1336,17 @@ files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Initial HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Use httpWrite() to write any additional data (document, PPD file, etc.)
-for the request, cupsGetResponse() to get the IPP response, and httpRead()
-to read any additional data following the response. Only one request can be
-sent/queued at a time.<br>
+<p class="discussion">Use <a href="#cupsWriteRequestData"><code>cupsWriteRequestData</code></a> to write any additional data (document, PPD
+file, etc.) for the request, <a href="#cupsGetResponse"><code>cupsGetResponse</code></a> to get the IPP response,
+and <a href="#cupsReadResponseData"><code>cupsReadResponseData</code></a> to read any additional data following the
+response. Only one request can be sent/queued at a time per <code>http_t</code>
+connection.<br>
 <br>
-Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
-request is not freed.
+Returns the initial HTTP status code, which will be <code>HTTP_CONTINUE</code>
+on a successful send of the request.<br>
+<br>
+Note: Unlike <a href="#cupsDoFileRequest"><code>cupsDoFileRequest</code></a>, <a href="#cupsDoIORequest"><code>cupsDoIORequest</code></a>, and
+<a href="#cupsDoRequest"><code>cupsDoRequest</code></a>, the request is NOT freed with <a href="#ippDelete"><code>ippDelete</code></a>.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>

@@ -776,6 +776,7 @@
 "IPP integer value not 4 bytes." = "IPP integer value not 4 bytes.";
 "IPP language length overflows value." = "IPP language length overflows value.";
 "IPP member name is not empty." = "IPP member name is not empty.";
+"IPP memberName value is empty." = "IPP memberName value is empty.";
 "IPP name larger than 32767 bytes." = "IPP name larger than 32767 bytes.";
 "IPP nameWithLanguage value less than minimum 4 bytes." = "IPP nameWithLanguage value less than minimum 4 bytes.";
 "IPP rangeOfInteger value not 8 bytes." = "IPP rangeOfInteger value not 8 bytes.";
@@ -987,6 +988,7 @@
 "Printer Modified" = "Printer Modified";
 "Printer Paused" = "Printer Paused";
 "Printer Settings" = "Printer Settings";
+"Printer cannot print supplied content." = "Printer cannot print supplied content.";
 "Printer:" = "Printer:";
 "Printers" = "Printers";
 "Printing page %d, %d%% complete." = "Printing page %d, %d%% complete.";
@@ -1044,6 +1046,7 @@
 "Tear-Off" = "Tear-Off";
 "Tear-Off Adjust Position" = "Tear-Off Adjust Position";
 "The %s attribute cannot be provided with job-ids." = "The %s attribute cannot be provided with job-ids.";
+"The '%s' operation attribute cannot be supplied in a Create-Job request." = "The '%s' operation attribute cannot be supplied in a Create-Job request.";
 "The PPD file \"%s\" could not be found." = "The PPD file \"%s\" could not be found.";
 "The PPD file \"%s\" could not be opened: %s" = "The PPD file \"%s\" could not be opened: %s";
 "The PPD file could not be opened." = "The PPD file could not be opened.";

@@ -397,7 +397,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
     sprintf(val, "%d", count);
     cgiSetVariable("TOTAL", val);
 
-    if ((var = cgiGetVariable("ORDER")) != NULL)
+    if ((var = cgiGetVariable("ORDER")) != NULL && *var)
       ascending = !_cups_strcasecmp(var, "asc");
     else
       ascending = 1;

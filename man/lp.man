@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lp 1 "CUPS" "3 October 2011" "Apple Inc."
+.TH lp 1 "CUPS" "16 July 2012" "Apple Inc."
 .SH NAME
 lp - print files
 .SH SYNOPSIS
@@ -179,7 +179,7 @@ Prints on one or two sides of the paper. The value
 (unrotated) pages, while "two-sided-short-edge" is used for
 landscape pages.
 .TP 5
--o fitplot
+-o fit-to-page
 .br
 Scales the print file to fit on the page.
 .TP 5
@@ -194,12 +194,6 @@ Scales the print file to fit on the page.
 -o number-up=16
 .br
 Prints multiple document pages on each output page.
-.TP 5
--o scaling=number
-.br
-Scales image files to use up to \fInumber\fR percent of the page.
-Values greater than 100 cause the image file to be printed across
-multiple pages.
 .TP 5
 -o cpi=N
 .br

@@ -56,12 +56,6 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
 		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
 
-		dnl Check for SSLSetProtocolVersionMax...
-		SAVELIBS="$LIBS"
-		LIBS="$LIBS -framework Security"
-		AC_CHECK_FUNC(SSLSetProtocolVersionMax)
-		LIBS="$SAVELIBS"
-
 		dnl Check for SecCertificateCopyData..
 		AC_MSG_CHECKING(for SecCertificateCopyData)
 		if test $uversion -ge 100; then

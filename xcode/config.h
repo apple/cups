@@ -4,7 +4,7 @@
  *
  *   Configuration file for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -21,8 +21,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.5.0"
-#define CUPS_MINIMAL "CUPS/1.5.0"
+#define CUPS_SVERSION "CUPS v1.6.0"
+#define CUPS_MINIMAL "CUPS/1.6.0"
 
 
 /*
@@ -63,12 +63,8 @@
  */
 
 #define CUPS_DEFAULT_BROWSING 1
-#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "CUPS dnssd"
-#define CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS ""
-#define CUPS_DEFAULT_BROWSE_SHORT_NAMES 1
+#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "dnssd"
 #define CUPS_DEFAULT_DEFAULT_SHARED 1
-#define CUPS_DEFAULT_IMPLICIT_CLASSES 1
-#define CUPS_DEFAULT_USE_NETWORK_DEFAULT 0
 
 
 /*
@@ -187,6 +183,7 @@
 #define HAVE_STRINGS_H 1
 /* #undef HAVE_BSTRING_H */
 
+
 /*
  * Do we have the long long type?
  */
@@ -201,6 +198,7 @@
 #  define CUPS_LLCAST	(long)
 #endif /* HAVE_LONG_LONG */
 
+
 /*
  * Do we have the strtoll() function?
  */
@@ -210,6 +208,7 @@
 #ifndef HAVE_STRTOLL
 #  define strtoll(nptr,endptr,base) strtol((nptr), (endptr), (base))
 #endif /* !HAVE_STRTOLL */
+
 
 /*
  * Do we have the strXXX() functions?
@@ -298,17 +297,25 @@
 
 
 /*
+ * Do we have the SSL_set_tlsext_host_name function?
+ */
+
+/* #undef HAVE_SSL_SET_TLSEXT_HOST_NAME */
+
+
+/*
  * What Security framework headers do we have?
  */
 
 #define HAVE_AUTHORIZATION_H 1
+#define HAVE_SECBASEPRIV_H 1
 #define HAVE_SECCERTIFICATE_H 1
+#define HAVE_SECIDENTITYSEARCHPRIV_H 1
 #define HAVE_SECITEM_H 1
-/* #undef HAVE_SECITEMPRIV_H */
+#define HAVE_SECITEMPRIV_H 1
 #define HAVE_SECPOLICY_H 1
-/* #undef HAVE_SECPOLICYPRIV_H */
-/* #undef HAVE_SECBASEPRIV_H */
-/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
+#define HAVE_SECPOLICYPRIV_H 1
+#define HAVE_SECURETRANSPORTPRIV_H 1
 
 
 /*
@@ -347,25 +354,6 @@
 
 
 /*
- * Do we have the SLP library?
- */
-
-/* #undef HAVE_LIBSLP */
-
-
-/*
- * Do we have an LDAP library?
- */
-
-#define HAVE_LDAP 1
-#define HAVE_OPENLDAP 1
-/* #undef HAVE_MOZILLA_LDAP */
-/* #undef HAVE_LDAP_SSL_H */
-/* #undef HAVE_LDAP_SSL */
-#define HAVE_LDAP_REBIND_PROC 1
-
-
-/*
  * Do we have libpaper?
  */
 
@@ -373,10 +361,17 @@
 
 
 /*
- * Do we have DNS Service Discovery (aka Bonjour)?
+ * Do we have mDNSResponder for DNS Service Discovery (aka Bonjour)?
  */
 
 #define HAVE_DNSSD 1
+
+
+/*
+ * Do we have Avahi for DNS Service Discovery (aka Bonjour)?
+ */
+
+/* #undef HAVE_AVAHI */
 
 
 /*
@@ -504,7 +499,8 @@
  */
 
 /* #undef HAVE_PDFTOPS */
-#define CUPS_PDFTOPS ""
+/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
+#define CUPS_PDFTOPS	"/usr/bin/pdftops"
 
 
 /*
@@ -512,15 +508,8 @@
  */
 
 /* #undef HAVE_GHOSTSCRIPT */
-#define CUPS_GHOSTSCRIPT ""
-
-
-/*
- * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
- */
-
-#define HAVE_COREFOUNDATION 1
-#define HAVE_SYSTEMCONFIGURATION 1
+/* #undef HAVE_GHOSTSCRIPT_PS2WRITE */
+#define CUPS_GHOSTSCRIPT "/usr/bin/gs"
 
 
 /*
@@ -528,8 +517,8 @@
  */
 
 #define HAVE_COREFOUNDATION_H 1
-/* #undef HAVE_CFPRIV_H */
-/* #undef HAVE_CFBUNDLEPRIV_H */
+#define HAVE_CFPRIV_H 1
+#define HAVE_CFBUNDLEPRIV_H 1
 
 
 /*
@@ -547,11 +536,11 @@
 
 
 /*
- * Do we have MacOSX 10.4's mbr_XXX functions?
+ * Do we have OS X 10.4's mbr_XXX functions?
  */
 
 #define HAVE_MEMBERSHIP_H 1
-/* #undef HAVE_MEMBERSHIPPRIV_H */
+#define HAVE_MEMBERSHIPPRIV_H 1
 #define HAVE_MBR_UID_TO_UUID 1
 
 
@@ -564,6 +553,13 @@
 
 
 /*
+ * Do we have Darwin's IOKit private headers?
+ */
+
+#define HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H 1
+
+
+/*
  * Do we have DBUS?
  */
 
@@ -572,25 +568,18 @@
 
 
 /*
- * Do we have the AppleTalk/at_proto.h header?
- */
-
-/* #undef HAVE_APPLETALK_AT_PROTO_H */
-
-
-/*
  * Do we have the GSSAPI support library (for Kerberos support)?
  */
 
-/* #undef HAVE_GSS_ACQUIRE_CRED_EX_F */
+#define HAVE_GSS_ACQUIRE_CRED_EX_F 1
 #define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
-/* #undef HAVE_GSS_GSSAPI_H */
-/* #undef HAVE_GSS_GSSAPI_SPI_H */
+#define HAVE_GSS_GSSAPI_H 1
+#define HAVE_GSS_GSSAPI_SPI_H 1
 #define HAVE_GSSAPI 1
-#define HAVE_GSSAPI_H 1
-#define HAVE_GSSAPI_GSSAPI_H 1
-#define HAVE_GSSAPI_GSSAPI_GENERIC_H 1
-#define HAVE_GSSAPI_GSSAPI_KRB5_H 1
+/* #undef HAVE_GSSAPI_GENERIC_H */
+/* #undef HAVE_GSSAPI_GSSAPI_H */
+/* #undef HAVE_GSSAPI_H */
+#define HAVE_GSSAPI_KRB5_H 1
 #define HAVE_KRB5_H 1
 
 
@@ -679,7 +668,7 @@
  * Do we have libusb?
  */
 
-/* #undef HAVE_USB_H */
+/* #undef HAVE_LIBUSB */
 
 
 /*
@@ -709,25 +698,43 @@
 
 
 /*
- * Location of Mac OS X localization bundle, if any.
+ * Location of OS X localization bundle, if any.
  */
 
 #define CUPS_BUNDLEDIR "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
 
 
 /*
- * Do we have the ColorSyncRegisterDevice function?
- */
-
-#define HAVE_COLORSYNCREGISTERDEVICE 1
-
-
-/*
  * Do we have XPC?
  */
 
-/* #undef HAVE_XPC */
+#define HAVE_XPC 1
+#define HAVE_XPC_PRIVATE_H 1
 
+
+/*
+ * Do we have Mini-XML?
+ */
+
+/* #undef HAVE_MXML_H */
+
+
+/*
+ * Do we have the C99 abs() function?
+ */
+
+#define HAVE_ABS 1
+#if !defined(HAVE_ABS) && !defined(abs)
+#  if defined(__GNUC__) || __STDC_VERSION__ >= 199901L
+#    define abs(x) _cups_abs(x)
+static inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  elif defined(_MSC_VER)
+#    define abs(x) _cups_abs(x)
+static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  else
+#    define abs(x) ((x) < 0 ? -(x) : (x))
+#  endif /* __GNUC__ || __STDC_VERSION__ */
+#endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
 
