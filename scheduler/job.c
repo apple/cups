@@ -2978,7 +2978,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   * rarely have current information for network devices...
   */
 
-  if (strncmp(job->printer->device_uri, "usb:", 4))
+  if (strncmp(job->printer->device_uri, "usb:", 4) &&
+      strncmp(job->printer->device_uri, "ippusb:", 4))
     cupsdSetPrinterReasons(job->printer, "-offline-report");
 
  /*
