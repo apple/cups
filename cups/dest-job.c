@@ -15,7 +15,7 @@
  *
  * Contents:
  *
-﻿ *   cupsCancelDestJob()      - Cancel a job on a destination.
+ *   cupsCancelDestJob()      - Cancel a job on a destination.
  *   cupsCloseDestJob()       - Close a job and start printing.
  *   cupsCreateDestJob()      - Create a job on a destination.
  *   cupsFinishDestDocument() - Finish the current document.

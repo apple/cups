@@ -3,7 +3,7 @@
  *
  *   TBCP port monitor for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -93,11 +93,8 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     linelen = sizeof(line);
-    if (psgets(line, &linelen, fp) == NULL)
-    {
-      fputs("ERROR: Empty print file!\n", stderr);
-      return (1);
-    }
+    if (!psgets(line, &linelen, fp))
+      break;
 
    /*
     * Handle leading PJL fun...
