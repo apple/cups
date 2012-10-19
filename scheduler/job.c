@@ -2990,10 +2990,11 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   job->profile = NULL;
 
  /*
-  * Clear the unresponsive job watchdog timer...
+  * Clear the unresponsive job watchdog timers...
   */
 
-  job->kill_time = 0;
+  job->cancel_time = 0;
+  job->kill_time   = 0;
 
  /*
   * Close pipes and status buffer...
