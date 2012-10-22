@@ -922,16 +922,18 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (version >= 20)
 	{
-	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("The printer does not support IPP/%d.%d, trying "
-			         "IPP/%s."), version / 10, version % 10, "1.1");
+	  _cupsLangPrintFilter(stderr, "INFO", _("Preparing to print."));
+	  fprintf(stderr,
+	          "DEBUG: The printer does not support IPP/%d.%d, trying "
+	          "IPP/1.1.\n", version / 10, version % 10);
 	  version = 11;
 	}
 	else
 	{
-	  _cupsLangPrintFilter(stderr, "INFO",
-			       _("The printer does not support IPP/%d.%d, trying "
-			         "IPP/%s."), version / 10, version % 10, "1.0");
+	  _cupsLangPrintFilter(stderr, "INFO", _("Preparing to print."));
+	  fprintf(stderr,
+	          "DEBUG: The printer does not support IPP/%d.%d, trying "
+	          "IPP/1.0.\n", version / 10, version % 10);
 	  version = 10;
         }
 
@@ -940,8 +942,8 @@ main(int  argc,				/* I - Number of command-line args */
       else if (ipp_status == IPP_NOT_FOUND)
       {
         _cupsLangPrintFilter(stderr, "ERROR",
-			     _("The printer URI is incorrect or no longer "
-		               "exists."));
+			     _("The printer configuration is incorrect or the "
+			       "printer no longer exists."));
 
 	ippDelete(supported);
 
@@ -1538,7 +1540,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
         _cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Print file was not accepted."));
+	                     _("Print job was not accepted."));
 
         if (ipp_status == IPP_FORBIDDEN ||
             ipp_status == IPP_AUTHENTICATION_CANCELED)
@@ -1576,8 +1578,7 @@ main(int  argc,				/* I - Number of command-line args */
     else if ((job_id_attr = ippFindAttribute(response, "job-id",
                                              IPP_TAG_INTEGER)) == NULL)
     {
-      _cupsLangPrintFilter(stderr, "INFO",
-			   _("Print file accepted - job ID unknown."));
+      fputs("DEBUG: Print job accepted - job ID unknown.\n", stderr);
       update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
 			   "cups-ipp-missing-job-id");
       job_id = 0;
@@ -1586,11 +1587,9 @@ main(int  argc,				/* I - Number of command-line args */
     {
       password_tries = 0;
       monitor.job_id = job_id = job_id_attr->values[0].integer;
-      _cupsLangPrintFilter(stderr, "INFO",
-                           _("Print file accepted - job ID %d."), job_id);
+      fprintf(stderr, "DEBUG: Print job accepted - job ID %d.\n", job_id);
     }
 
-    fprintf(stderr, "DEBUG: job-id=%d\n", job_id);
     ippDelete(response);
 
     if (job_canceled)
