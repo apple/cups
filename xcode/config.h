@@ -308,14 +308,14 @@
  */
 
 #define HAVE_AUTHORIZATION_H 1
-#define HAVE_SECBASEPRIV_H 1
+/* #undef HAVE_SECBASEPRIV_H */
 #define HAVE_SECCERTIFICATE_H 1
-#define HAVE_SECIDENTITYSEARCHPRIV_H 1
+/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
 #define HAVE_SECITEM_H 1
-#define HAVE_SECITEMPRIV_H 1
+/* #undef HAVE_SECITEMPRIV_H */
 #define HAVE_SECPOLICY_H 1
-#define HAVE_SECPOLICYPRIV_H 1
-#define HAVE_SECURETRANSPORTPRIV_H 1
+/* #undef HAVE_SECPOLICYPRIV_H */
+/* #undef HAVE_SECURETRANSPORTPRIV_H */
 
 
 /*
@@ -517,8 +517,8 @@
  */
 
 #define HAVE_COREFOUNDATION_H 1
-#define HAVE_CFPRIV_H 1
-#define HAVE_CFBUNDLEPRIV_H 1
+/* #undef HAVE_CFPRIV_H */
+/* #undef HAVE_CFBUNDLEPRIV_H */
 
 
 /*
@@ -540,7 +540,7 @@
  */
 
 #define HAVE_MEMBERSHIP_H 1
-#define HAVE_MEMBERSHIPPRIV_H 1
+/* #undef HAVE_MEMBERSHIPPRIV_H */
 #define HAVE_MBR_UID_TO_UUID 1
 
 
@@ -556,7 +556,7 @@
  * Do we have Darwin's IOKit private headers?
  */
 
-#define HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H 1
+/* #undef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
 
 
 /*
@@ -574,7 +574,7 @@
 #define HAVE_GSS_ACQUIRE_CRED_EX_F 1
 #define HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
 #define HAVE_GSS_GSSAPI_H 1
-#define HAVE_GSS_GSSAPI_SPI_H 1
+/* #undef HAVE_GSS_GSSAPI_SPI_H */
 #define HAVE_GSSAPI 1
 /* #undef HAVE_GSSAPI_GENERIC_H */
 /* #undef HAVE_GSSAPI_GSSAPI_H */
@@ -709,7 +709,7 @@
  */
 
 #define HAVE_XPC 1
-#define HAVE_XPC_PRIVATE_H 1
+/* #undef HAVE_XPC_PRIVATE_H */
 
 
 /*

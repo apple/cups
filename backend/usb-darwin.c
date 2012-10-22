@@ -2133,7 +2133,11 @@ static void sigquit_handler(int sig, siginfo_t *si, void *unused)
   char	pathbuf[PROC_PIDPATHINFO_MAXSIZE];
   static char msgbuf[256] = "";
 
-  if (proc_pidpath(si->si_pid, pathbuf, sizeof(pathbuf)) > 0 && 
+
+  (void)sig;
+  (void)unused;
+
+  if (proc_pidpath(si->si_pid, pathbuf, sizeof(pathbuf)) > 0 &&
       (path = basename(pathbuf)) != NULL)
     snprintf(msgbuf, sizeof(msgbuf), "SIGQUIT sent by %s(%d)", path, (int)si->si_pid);
   else
