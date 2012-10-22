@@ -15,6 +15,19 @@
  *
  * Contents:
  *
+ *   _pwgFormatInches()      - Convert and format PWG units as inches.
+ *   _pwgFormatMillimeters() - Convert and format PWG units as millimeters.
+ *   _pwgGenerateSize()      - Generate a PWG size keyword.
+ *   _pwgInitSize()	     - Initialize a PWG size using IPP job template
+ *			       attributes.
+ *   _pwgMediaForLegacy()    - Find a PWG media size by ISO/IPP legacy name.
+ *   _pwgMediaForPPD()	     - Find a PWG media size by Adobe PPD name.
+ *   _pwgMediaForPWG()	     - Find a PWG media size by 5101.1 self-describing
+ *			       name.
+ *   _pwgMediaForSize()      - Get the PWG media name for a given size.
+ *   pwg_compare_legacy()    - Compare two sizes using the legacy names.
+ *   pwg_compare_ppd()	     - Compare two sizes using the PPD names.
+ *   pwg_compare_pwg()	     - Compare two sizes using the PWG names.
  */
 
 /*
@@ -74,6 +87,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_fanfold-eur_8.5x12in", NULL, "FanFoldGerman", 8.5, 12),
   _PWG_MEDIA_IN("na_letter-plus_8.5x12.69in", NULL, "LetterPlus", 8.5, 12.69),
   _PWG_MEDIA_IN("na_foolscap_8.5x13in", NULL, "FanFoldGermanLegal", 8.5, 13),
+  _PWG_MEDIA_IN("na_oficio_8.5x13.4in", NULL, "Oficio", 8.5, 13.4),
   _PWG_MEDIA_IN("na_legal_8.5x14in", "na-legal", "Legal", 8.5, 14),
   _PWG_MEDIA_IN("na_super-a_8.94x14in", NULL, "SuperA", 8.94, 14),
   _PWG_MEDIA_IN("na_9x11_9x11in", "na-9x11-envelope", "9x11", 9, 11),
@@ -103,10 +117,6 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_e_34x44in", "e", "AnsiE", 34, 44),
   _PWG_MEDIA_IN("na_arch-e_36x48in", "arch-e", "ARCHE", 36, 48),
   _PWG_MEDIA_IN("na_f_44x68in", NULL, "AnsiF", 44, 68),
-
-  /* Chinese Standard Sheet Media Inch Sizes */
-  _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, "roc16k", 7.75, 10.75),
-  _PWG_MEDIA_IN("roc_8k_10.75x15.5in", NULL, "roc8k", 10.75, 15.5),
 
   /* ISO Standard Sheet Media Sizes */
   _PWG_MEDIA_MM("iso_a10_26x37mm", "iso-a10", "A10", 26, 37),
@@ -170,6 +180,10 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("iso_c1_648x917mm", "iso-c1", "EnvC1", 648, 917),
   _PWG_MEDIA_MM("iso_c0_917x1297mm", "iso-c0", "EnvC0", 917, 1297),
   _PWG_MEDIA_MM("iso_dl_110x220mm", "iso-designated", "EnvDL", 110, 220),
+  _PWG_MEDIA_MM("iso_ra4_215x305mm", "iso-ra4", NULL, 215, 305),
+  _PWG_MEDIA_MM("iso_sra4_225x320mm", "iso-sra4", NULL, 225, 320),
+  _PWG_MEDIA_MM("iso_ra3_305x430mm", "iso-ra3", NULL, 305, 430),
+  _PWG_MEDIA_MM("iso_sra3_320x450mm", "iso-sra3", NULL, 320, 450),
   _PWG_MEDIA_MM("iso_ra2_430x610mm", "iso-ra2", NULL, 430, 610),
   _PWG_MEDIA_MM("iso_sra2_450x640mm", "iso-sra2", NULL, 450, 640),
   _PWG_MEDIA_MM("iso_ra1_610x860mm", "iso-ra1", NULL, 610, 860),
@@ -190,15 +204,21 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("jis_b1_728x1030mm", "jis-b1", "B1", 728, 1030),
   _PWG_MEDIA_MM("jis_b0_1030x1456mm", "jis-b0", "B0", 1030, 1456),
   _PWG_MEDIA_MM("jis_exec_216x330mm", NULL, NULL, 216, 330),
+  _PWG_MEDIA_MM("jpn_kaku2_240x332mm", NULL, "EnvKaku2", 240, 332),
+  _PWG_MEDIA_MM("jpn_kaku3_216x277mm", NULL, "EnvKaku3", 216, 277),
+  _PWG_MEDIA_MM("jpn_kaku4_197x267mm", NULL, "EnvKaku4", 197, 267),
+  _PWG_MEDIA_MM("jpn_kaku5_190x240mm", NULL, "EnvKaku5", 190, 240),
+  _PWG_MEDIA_MM("jpn_kaku7_142x205mm", NULL, "EnvKaku7", 142, 205),
+  _PWG_MEDIA_MM("jpn_kaku8_119x197mm", NULL, "EnvKaku8", 119, 197),
   _PWG_MEDIA_MM("jpn_chou4_90x205mm", NULL, "EnvChou4", 90, 205),
   _PWG_MEDIA_MM("jpn_hagaki_100x148mm", NULL, "Postcard", 100, 148),
   _PWG_MEDIA_MM("jpn_you4_105x235mm", NULL, "EnvYou4", 105, 235),
   _PWG_MEDIA_MM("jpn_you6_98x190mm", NULL, "EnvYou6", 98, 190),
   _PWG_MEDIA_MM("jpn_chou2_111.1x146mm", NULL, NULL, 111.1, 146),
   _PWG_MEDIA_MM("jpn_chou3_120x235mm", NULL, "EnvChou3", 120, 235),
+  _PWG_MEDIA_MM("jpn_chou40_90x225mm", NULL, "EnvChou40", 90, 225),
   _PWG_MEDIA_MM("jpn_oufuku_148x200mm", NULL, "DoublePostcardRotated", 148, 200),
   _PWG_MEDIA_MM("jpn_kahu_240x322.1mm", NULL, NULL, 240, 322.1),
-  _PWG_MEDIA_MM("jpn_kaku2_240x332mm", NULL, "EnvKaku2", 240, 332),
 
   /* Chinese Standard Sheet Media Sizes */
   _PWG_MEDIA_MM("prc_32k_97x151mm", NULL, "PRC32K", 97, 151),
@@ -216,6 +236,10 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("om_dai-pa-kai_275x395mm", NULL, NULL, 275, 395),
   _PWG_MEDIA_MM("prc_10_324x458mm", NULL, "EnvPRC10", 324, 458),
 
+  /* Chinese Standard Sheet Media Inch Sizes */
+  _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, "roc16k", 7.75, 10.75),
+  _PWG_MEDIA_IN("roc_8k_10.75x15.5in", NULL, "roc8k", 10.75, 15.5),
+
   /* Other English Standard Sheet Media Sizes */
   _PWG_MEDIA_IN("oe_photo-l_3.5x5in", NULL, "3.5x5", 3.5, 5),
 
@@ -226,7 +250,8 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("om_large-photo_200x300", NULL, "om_large-photo", 200, 300),
   _PWG_MEDIA_MM("om_folio_210x330mm", "folio", "Folio", 210, 330),
   _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, "FolioSP", 215, 315),
-  _PWG_MEDIA_MM("om_invite_220x220mm", NULL, "EnvInvite", 220, 220)
+  _PWG_MEDIA_MM("om_invite_220x220mm", NULL, "EnvInvite", 220, 220),
+  _PWG_MEDIA_MM("om_small-photo_100x200mm", NULL, "om_wide-photo", 100, 200)
 };
 
 
