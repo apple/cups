@@ -2397,7 +2397,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     if (httpPrintf(HTTP(con), "Connection: Upgrade\r\n") < 0)
       return (0);
 
-  if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n") < 0)
+  if (httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n") < 0)
     return (0);
 #endif /* HAVE_SSL */
 

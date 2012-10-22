@@ -3690,7 +3690,7 @@ http_send(http_t       *http,	/* I - Connection to server */
   if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
   {
     httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
-    httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0,SSL/2.0,SSL/3.0");
+    httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
   }
 #endif /* HAVE_SSL */
 
@@ -4459,7 +4459,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
 
   httpClearFields(http);
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
-  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2, TLS/1.1, TLS/1.0, SSL/3.0");
+  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
 
   if ((ret = httpOptions(http, "*")) == 0)
   {
