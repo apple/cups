@@ -156,8 +156,14 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
   int		status = 1;		/* Status of add */
 
 
+  DEBUG_printf(("_cupsArrayAddStrings(a=%p, s=\"%s\", delim='%c')", a, s,
+                delim));
+
   if (!a || !s || !*s)
+  {
+    DEBUG_puts("1_cupsArrayAddStrings: Returning 0");
     return (0);
+  }
 
   if (delim == ' ')
   {
@@ -165,22 +171,32 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
     * Skip leading whitespace...
     */
 
+    DEBUG_puts("1_cupsArrayAddStrings: Skipping leading whitespace.");
+
     while (*s && isspace(*s & 255))
       s ++;
+
+    DEBUG_printf(("1_cupsArrayAddStrings: Remaining string \"%s\".", s));
   }
 
-  if (!strchr(s, delim) ||
-      (delim == ' ' && !strchr(s, '\t') && !strchr(s, '\n')))
+  if (!strchr(s, delim) &&
+      (delim != ' ' || (!strchr(s, '\t') && !strchr(s, '\n'))))
   {
    /*
     * String doesn't contain a delimiter, so add it as a single value...
     */
 
+    DEBUG_puts("1_cupsArrayAddStrings: No delimiter seen, adding a single "
+               "value.");
+
     if (!cupsArrayFind(a, (void *)s))
       status = cupsArrayAdd(a, (void *)s);
   }
   else if ((buffer = strdup(s)) == NULL)
+  {
+    DEBUG_puts("1_cupsArrayAddStrings: Unable to duplicate string.");
     status = 0;
+  }
   else
   {
     for (start = end = buffer; *end; start = end)
@@ -202,12 +218,17 @@ _cupsArrayAddStrings(cups_array_t *a,	/* I - Array */
       else
         end = start + strlen(start);
 
+      DEBUG_printf(("1_cupsArrayAddStrings: Adding \"%s\", end=\"%s\"", start,
+                    end));
+
       if (!cupsArrayFind(a, start))
         status &= cupsArrayAdd(a, start);
     }
 
     free(buffer);
   }
+
+  DEBUG_printf(("1_cupsArrayAddStrings: Returning %d.", status));
 
   return (status);
 }

@@ -27,7 +27,7 @@
 
 #include "string-private.h"
 #include "debug-private.h"
-#include "array.h"
+#include "array-private.h"
 #include "dir.h"
 
 
@@ -403,6 +403,68 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   cupsArrayDelete(array);
   cupsArrayDelete(dup_array);
+
+ /*
+  * Test the array with string functions...
+  */
+
+  fputs("_cupsArrayNewStrings(\"foo bar\", ' '): ", stdout);
+  array = _cupsArrayNewStrings("foo bar", ' ');
+  if (!array)
+  {
+    status = 1;
+    puts("FAIL (unable to create array)");
+  }
+  else if (cupsArrayCount(array) != 2)
+  {
+    status = 1;
+    printf("FAIL (got %d elements, expected 2)\n", cupsArrayCount(array));
+  }
+  else if (strcmp(text = (char *)cupsArrayFirst(array), "bar"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"bar\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "foo"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"foo\")\n", text);
+  }
+  else
+    puts("PASS");
+
+  fputs("_cupsArrayAddStrings(array, \"foo2,bar2\", ','): ", stdout);
+  _cupsArrayAddStrings(array, "foo2,bar2", ',');
+
+  if (cupsArrayCount(array) != 4)
+  {
+    status = 1;
+    printf("FAIL (got %d elements, expected 4)\n", cupsArrayCount(array));
+  }
+  else if (strcmp(text = (char *)cupsArrayFirst(array), "bar"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"bar\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "bar2"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"bar2\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "foo"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"foo\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "foo2"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"foo2\")\n", text);
+  }
+  else
+    puts("PASS");
+
+  cupsArrayDelete(array);
 
  /*
   * Summarize the results and return...
