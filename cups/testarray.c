@@ -408,22 +408,32 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Test the array with string functions...
   */
 
-  fputs("_cupsArrayNewStrings(\"foo bar\", ' '): ", stdout);
-  array = _cupsArrayNewStrings("foo bar", ' ');
+  fputs("_cupsArrayNewStrings(\" \\t\\nfoo bar\\tboo\\nfar\", ' '): ", stdout);
+  array = _cupsArrayNewStrings(" \t\nfoo bar\tboo\nfar", ' ');
   if (!array)
   {
     status = 1;
     puts("FAIL (unable to create array)");
   }
-  else if (cupsArrayCount(array) != 2)
+  else if (cupsArrayCount(array) != 4)
   {
     status = 1;
-    printf("FAIL (got %d elements, expected 2)\n", cupsArrayCount(array));
+    printf("FAIL (got %d elements, expected 4)\n", cupsArrayCount(array));
   }
   else if (strcmp(text = (char *)cupsArrayFirst(array), "bar"))
   {
     status = 1;
     printf("FAIL (first element \"%s\", expected \"bar\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "boo"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"boo\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "far"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"far\")\n", text);
   }
   else if (strcmp(text = (char *)cupsArrayNext(array), "foo"))
   {
@@ -436,10 +446,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   fputs("_cupsArrayAddStrings(array, \"foo2,bar2\", ','): ", stdout);
   _cupsArrayAddStrings(array, "foo2,bar2", ',');
 
-  if (cupsArrayCount(array) != 4)
+  if (cupsArrayCount(array) != 6)
   {
     status = 1;
-    printf("FAIL (got %d elements, expected 4)\n", cupsArrayCount(array));
+    printf("FAIL (got %d elements, expected 6)\n", cupsArrayCount(array));
   }
   else if (strcmp(text = (char *)cupsArrayFirst(array), "bar"))
   {
@@ -450,6 +460,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     status = 1;
     printf("FAIL (first element \"%s\", expected \"bar2\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "boo"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"boo\")\n", text);
+  }
+  else if (strcmp(text = (char *)cupsArrayNext(array), "far"))
+  {
+    status = 1;
+    printf("FAIL (first element \"%s\", expected \"far\")\n", text);
   }
   else if (strcmp(text = (char *)cupsArrayNext(array), "foo"))
   {
