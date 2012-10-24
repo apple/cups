@@ -1079,7 +1079,7 @@ ippOpValue(const char *name)		/* I - Textual name */
   if (!_cups_strcasecmp(name, "CUPS-Add-Printer"))
     return (CUPS_ADD_MODIFY_PRINTER);
 
-  return ((ipp_op_t)-1);
+  return (CUPS_INVALID_OPERATION);
 }
 
 

@@ -3,7 +3,7 @@
  *
  *   Private IPP definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -54,6 +54,7 @@ typedef struct				/**** Attribute mapping data ****/
   ipp_tag_t	group_tag;		/* Group tag for this attribute */
   ipp_tag_t	alt_group_tag;		/* Alternate group tag for this
 					 * attribute */
+  const ipp_op_t *operations;		/* Allowed operations for this attr */
 } _ipp_option_t;
 
 
@@ -61,8 +62,10 @@ typedef struct				/**** Attribute mapping data ****/
  * Prototypes for private functions...
  */
 
+#ifdef DEBUG
+extern const char	*_ippCheckOptions(void);
+#endif /* DEBUG */
 extern _ipp_option_t	*_ippFindOption(const char *name);
-
 
 /*
  * C++ magic...

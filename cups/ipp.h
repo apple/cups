@@ -157,7 +157,8 @@ typedef enum ipp_jstate_e		/**** Job states ****/
 
 typedef enum ipp_op_e			/**** IPP operations ****/
 {
-  IPP_OP_CUPS_INVALID = -1,		/* Invalid operation name for @link ippOpValue@ */
+  CUPS_INVALID_OPERATION = -1,		/* Invalid operation name for @link ippOpValue@ */
+  CUPS_NO_OPERATION = 0,		/* No operation @private@ */
   IPP_PRINT_JOB = 0x0002,		/* Print a single file */
   IPP_PRINT_URI,			/* Print a single URL @private@ */
   IPP_VALIDATE_JOB,			/* Validate job options */
@@ -234,7 +235,8 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/OS X 10.5@ */
   CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4/OS X 10.6@ */
 
-  /* Legacy names for the add operations */
+  /* Legacy names */
+#define IPP_OP_CUPS_INVALID	CUPS_INVALID_OPERATION
 #define CUPS_ADD_PRINTER	CUPS_ADD_MODIFY_PRINTER
 #define CUPS_ADD_CLASS		CUPS_ADD_MODIFY_CLASS
 } ipp_op_t;
