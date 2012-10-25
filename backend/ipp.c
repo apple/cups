@@ -2440,6 +2440,9 @@ new_request(
 		*media_type,		/* media-type value */
 		*collate_str,		/* multiple-document-handling value */
 		*mandatory;		/* Mandatory attributes */
+  ipp_tag_t	group;			/* Current group */
+  ipp_attribute_t *attr;		/* Current attribute */
+  char		buffer[1024];		/* Value buffer */
 
 
  /*
@@ -2508,14 +2511,21 @@ new_request(
       * Send standard IPP attributes...
       */
 
+      fputs("DEBUG: Adding standard IPP operation/job attributes.\n", stderr);
+
       if (pc->password &&
           (keyword = cupsGetOption("job-password", num_options,
                                    options)) != NULL)
       {
         ippAddOctetString(request, IPP_TAG_OPERATION, "job-password",
                           keyword, strlen(keyword));
+
+        if ((keyword = cupsGetOption("job-password-encryption", num_options,
+				     options)) == NULL)
+	  keyword = "none";
+
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                     "job-password-encryption", NULL, "none");
+                     "job-password-encryption", NULL, keyword);
       }
 
       if (pc->account_id &&
@@ -2540,6 +2550,7 @@ new_request(
             strcmp(mandatory, "job-account-id") &&
             strcmp(mandatory, "job-accounting-user-id") &&
             strcmp(mandatory, "job-password") &&
+            strcmp(mandatory, "job-password-encryption") &&
             strcmp(mandatory, "media") &&
             strncmp(mandatory, "media-col", 9) &&
             strcmp(mandatory, "multiple-document-handling") &&
@@ -2804,12 +2815,42 @@ new_request(
       * When talking to another CUPS server, send all options...
       */
 
+      fputs("DEBUG: Adding all operation/job attributes.\n", stderr);
+      cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
       cupsEncodeOptions2(request, num_options, options, IPP_TAG_JOB);
     }
 
     if (copies > 1 && (!pc || copies <= pc->max_copies))
       ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
   }
+
+  fprintf(stderr, "DEBUG: IPP/%d.%d %s #%d\n", version / 10, version % 10,
+          ippOpString(ippGetOperation(request)), ippGetRequestId(request));
+  for (group = IPP_TAG_ZERO, attr = ippFirstAttribute(request);
+       attr;
+       attr = ippNextAttribute(request))
+  {
+    const char *name = ippGetName(attr);
+
+    if (!name)
+    {
+      group = IPP_TAG_ZERO;
+      continue;
+    }
+
+    if (group != ippGetGroupTag(attr))
+    {
+      group = ippGetGroupTag(attr);
+      fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(group));
+    }
+
+    ippAttributeString(attr, buffer, sizeof(buffer));
+    fprintf(stderr, "DEBUG: %s %s%s %s\n", name,
+            ippGetCount(attr) > 1 ? "1setOf " : "",
+            ippTagString(ippGetValueTag(attr)), buffer);
+  }
+
+  fprintf(stderr, "DEBUG: ---- %s ----\n", ippTagString(IPP_TAG_END));
 
   return (request);
 }
