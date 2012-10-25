@@ -1741,9 +1741,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
                 for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
 		{
-		  *ptr++ = '\0';
-		  values[num_values] = ptr;
-		  num_values ++;
+		  if (ptr > token && ptr[-1] == '\\')
+		    _cups_strcpy(ptr - 1, ptr);
+		  else
+		  {
+		    *ptr++ = '\0';
+		    values[num_values] = ptr;
+		    num_values ++;
+		  }
 		}
 
 	        attrptr = ippAddStrings(request, group, value, attr, num_values,
