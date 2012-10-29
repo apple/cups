@@ -1710,7 +1710,21 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
+    {
+      if (argc == 6)
+      {
+       /*
+        * Need to reprocess the entire job; if we have a job ID, cancel the
+        * job first...
+        */
+
+	if (job_id > 0)
+	  cancel_job(http, uri, job_id, resource, argv[2], version);
+
+        goto cleanup;
+      }
       continue;
+    }
     else if (ipp_status == IPP_REQUEST_VALUE ||
              ipp_status == IPP_ERROR_JOB_CANCELED ||
              ipp_status == IPP_NOT_AUTHORIZED ||
