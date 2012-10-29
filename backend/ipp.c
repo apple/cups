@@ -248,6 +248,7 @@ main(int  argc,				/* I - Number of command-line args */
 		prev_delay;		/* Previous delay */
   const char	*compression;		/* Compression mode */
   int		waitjob,		/* Wait for job complete? */
+		waitjob_tries = 0,	/* Number of times we've waited */
 		waitprinter;		/* Wait for printer ready? */
   _cups_monitor_t monitor;		/* Monitoring data */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
@@ -1816,12 +1817,22 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
-	    ipp_status != IPP_PRINTER_BUSY &&
-	    ipp_status != IPP_INTERNAL_ERROR)
+	    ipp_status != IPP_PRINTER_BUSY)
 	{
 	  ippDelete(response);
           ipp_status = IPP_OK;
           break;
+	}
+	else if (ipp_status == IPP_INTERNAL_ERROR)
+	{
+	  waitjob_tries ++;
+
+	  if (waitjob_tries > 4)
+	  {
+	    ippDelete(response);
+	    ipp_status = IPP_OK;
+	    break;
+	  }
 	}
       }
 
