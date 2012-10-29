@@ -3445,7 +3445,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	case IPP_TAG_STRING :
 	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, strlen(token));
 	    break;
-          
+
 	default :
 	    if (!strchr(token, ','))
 	      ippAddString(col, IPP_TAG_ZERO, value, attr, NULL, token);
@@ -4578,7 +4578,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
     case IPP_TAG_STRING :
         for (i = 0; i < attr->num_values; i ++)
 	{
-	  if (attr->values[i].unknown.length > 1023)
+	  if (attr->values[i].unknown.length > IPP_MAX_OCTETSTRING)
 	  {
 	    valid = 0;
 
@@ -4821,7 +4821,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 1023)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_TEXT - 1))
 	  {
 	    valid = 0;
 
@@ -4881,7 +4881,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 1023)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_NAME - 1))
 	  {
 	    valid = 0;
 
@@ -4912,7 +4912,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 255)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_KEYWORD - 1))
 	  {
 	    valid = 0;
 
@@ -4947,7 +4947,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 					 HTTP_URI_OVERFLOW]);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 1023)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_URI - 1))
 	  {
 	    valid = 0;
 
@@ -4982,7 +4982,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 63)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_URISCHEME - 1))
 	  {
 	    valid = 0;
 
@@ -5013,7 +5013,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 40)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_CHARSET - 1))
 	  {
 	    valid = 0;
 
@@ -5069,7 +5069,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 63)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_LANGUAGE - 1))
 	  {
 	    valid = 0;
 
@@ -5122,7 +5122,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 255)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_MIMETYPE - 1))
 	  {
 	    valid = 0;
 

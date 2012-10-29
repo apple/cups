@@ -624,7 +624,7 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
   if (!ipp || !name || group < IPP_TAG_ZERO ||
       group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
-      datalen < 0 || datalen > IPP_MAX_OCTETSTRING)
+      datalen < 0 || datalen > IPP_MAX_LENGTH)
     return (NULL);
 
   if ((attr = ipp_add_attr(ipp, name, group, IPP_TAG_STRING, 1)) == NULL)
@@ -3211,7 +3211,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		break;
 
             default : /* Other unsupported values */
-                if (tag == IPP_TAG_STRING && n > IPP_MAX_OCTETSTRING)
+                if (tag == IPP_TAG_STRING && n > IPP_MAX_LENGTH)
 		{
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP octetString length too large."), 1);
