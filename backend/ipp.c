@@ -1816,7 +1816,8 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	if (ipp_status != IPP_SERVICE_UNAVAILABLE &&
-	    ipp_status != IPP_PRINTER_BUSY)
+	    ipp_status != IPP_PRINTER_BUSY &&
+	    ipp_status != IPP_INTERNAL_ERROR)
 	{
 	  ippDelete(response);
           ipp_status = IPP_OK;
