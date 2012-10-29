@@ -3442,7 +3442,10 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      goto col_error;
 	    }
 	    break;
-
+	case IPP_TAG_STRING :
+	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, strlen(token));
+	    break;
+          
 	default :
 	    if (!strchr(token, ','))
 	      ippAddString(col, IPP_TAG_ZERO, value, attr, NULL, token);
