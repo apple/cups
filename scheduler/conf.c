@@ -2680,7 +2680,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	     lis;
 	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
           if (httpAddrEqual(&(addr->addr), &(lis->address)) &&
-	      _httpAddrPort(&(addr->addr)) == _httpAddrPort(&(lis->address)))
+	      httpAddrPort(&(addr->addr)) == httpAddrPort(&(lis->address)))
 	    break;
 
         if (lis)
@@ -2736,11 +2736,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	else
 #endif /* AF_LOCAL */
 	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv%d)", temp,
-                        _httpAddrPort(&(lis->address)),
+                        httpAddrPort(&(lis->address)),
 			_httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
 
         if (!httpAddrLocalhost(&(lis->address)))
-	  RemotePort = _httpAddrPort(&(lis->address));
+	  RemotePort = httpAddrPort(&(lis->address));
       }
 
      /*

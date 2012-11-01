@@ -151,7 +151,7 @@ cupsdStartListening(void)
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
     httpAddrString(&(lis->address), s, sizeof(s));
-    p = _httpAddrPort(&(lis->address));
+    p = httpAddrPort(&(lis->address));
 
    /*
     * If needed, create a socket for listening...

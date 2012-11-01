@@ -169,6 +169,9 @@ typedef enum http_field_e		/**** HTTP field names ****/
   HTTP_FIELD_UPGRADE,			/* Upgrade field */
   HTTP_FIELD_USER_AGENT,		/* User-Agent field */
   HTTP_FIELD_WWW_AUTHENTICATE,		/* WWW-Authenticate field */
+  HTTP_FIELD_ACCEPT_ENCODING,		/* Accepting-Encoding field */
+  HTTP_FIELD_ALLOW,			/* Allow field */
+  HTTP_FIELD_SERVER,			/* Server field */
   HTTP_FIELD_MAX			/* Maximum field index */
 } http_field_t;
 
@@ -182,6 +185,7 @@ typedef enum http_state_e		/**** HTTP state values; states
 					 **** are server-oriented...
 					 ****/
 {
+  HTTP_STATE_ERROR = -1,		/* Error on socket */
   HTTP_WAITING,				/* Waiting for command */
   HTTP_OPTIONS,				/* OPTIONS command, waiting for blank line */
   HTTP_GET,				/* GET command, waiting for blank line */
@@ -195,7 +199,8 @@ typedef enum http_state_e		/**** HTTP state values; states
   HTTP_DELETE,				/* DELETE command, waiting for blank line */
   HTTP_TRACE,				/* TRACE command, waiting for blank line */
   HTTP_CLOSE,				/* CLOSE command, waiting for blank line */
-  HTTP_STATUS				/* Command complete, sending status */
+  HTTP_STATUS,				/* Command complete, sending status */
+  HTTP_STATE_UNKNOWN			/* Unknown request method, waiting for blank line */
 } http_state_t;
 
 typedef enum http_status_e		/**** HTTP status codes ****/
@@ -334,9 +339,11 @@ extern void		httpBlocking(http_t *http, int b);
 extern int		httpCheck(http_t *http);
 extern void		httpClearFields(http_t *http);
 extern void		httpClose(http_t *http);
-extern http_t		*httpConnect(const char *host, int port);
+extern http_t		*httpConnect(const char *host, int port)
+			             _CUPS_DEPRECATED;
 extern http_t		*httpConnectEncrypt(const char *host, int port,
-			                    http_encryption_t encryption);
+			                    http_encryption_t encryption)
+			                    _CUPS_DEPRECATED;
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
 extern int		httpError(http_t *http);
@@ -357,7 +364,7 @@ extern int		httpPrintf(http_t *http, const char *format, ...)
 			__attribute__ ((__format__ (__printf__, 2, 3)));
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED;
-extern int		httpReconnect(http_t *http);
+extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED;
 extern void		httpSeparate(const char *uri, char *method,
 			             char *username, char *host, int *port,
 				     char *resource) _CUPS_DEPRECATED;
@@ -467,6 +474,28 @@ extern http_state_t	httpGetState(http_t *http) _CUPS_API_1_6;
 extern http_version_t	httpGetVersion(http_t *http) _CUPS_API_1_6;
 extern int		httpReconnect2(http_t *http, int msec, int *cancel)
 			               _CUPS_API_1_6;
+
+
+/**** New in CUPS 1.7 ****/
+//extern int		httpAcceptsEncoding(http_t *http, const char *coding)
+//			                    _CUPS_API_1_7;
+extern http_t		*httpAcceptConnection(int fd, int blocking)
+			                      _CUPS_API_1_7;
+extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
+extern int		httpAddrListen(http_addr_t *addr, int port)
+			               _CUPS_API_1_7;
+extern int		httpAddrPort(http_addr_t *addr) _CUPS_API_1_7;
+extern http_t		*httpConnect2(const char *host, int port,
+				      http_addrlist_t *addrlist,
+				      int family, http_encryption_t encryption,
+				      int blocking, int msec, int *cancel)
+				      _CUPS_API_1_7;
+extern ssize_t		httpPeek(http_t *http, char *buffer, size_t length)
+			         _CUPS_API_1_7;
+extern http_state_t	httpReadRequest(http_t *http, char *resource,
+			                size_t resourcelen) _CUPS_API_1_7;
+extern http_state_t	httpWriteResponse(http_t *http,
+			                  http_status_t status) _CUPS_API_1_7;
 
 
 /*

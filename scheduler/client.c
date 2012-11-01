@@ -202,7 +202,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Save the connected port number...
   */
 
-  _httpAddrSetPort(con->http.hostaddr, _httpAddrPort(&(lis->address)));
+  _httpAddrSetPort(con->http.hostaddr, httpAddrPort(&(lis->address)));
 
 #ifdef AF_INET6
  /*
@@ -379,7 +379,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #endif /* AF_LOCAL */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s:%d (IPv%d)",
                   con->http.fd, con->http.hostname,
-		  _httpAddrPort(con->http.hostaddr),
+		  httpAddrPort(con->http.hostaddr),
 		  _httpAddrFamily(con->http.hostaddr) == AF_INET ? 4 : 6);
 
  /*
@@ -411,7 +411,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     else
       httpAddrString(&temp, con->servername, sizeof(con->servername));
 
-    con->serverport = _httpAddrPort(&(lis->address));
+    con->serverport = httpAddrPort(&(lis->address));
   }
 
  /*

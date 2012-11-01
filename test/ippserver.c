@@ -906,7 +906,7 @@ create_listener(int family,		/* I  - Address family */
       *port = 8631;
     }
     else
-      *port = _httpAddrPort(&address);
+      *port = httpAddrPort(&address);
 
     fprintf(stderr, "Listening on port %d.\n", *port);
   }
@@ -5032,7 +5032,7 @@ valid_doc_attributes(
     unsigned char	header[4];	/* First 4 bytes of file */
 
     memset(header, 0, sizeof(header));
-    _httpPeek(&(client->http), (char *)header, sizeof(header));
+    httpPeek(&(client->http), (char *)header, sizeof(header));
 
     if (!memcmp(header, "%PDF", 4))
       format = "application/pdf";

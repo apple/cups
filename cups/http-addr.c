@@ -14,16 +14,19 @@
  *
  * Contents:
  *
- *   httpAddrAny()       - Check for the "any" address.
- *   httpAddrEqual()     - Compare two addresses.
+ *   httpAddrAny()	 - Check for the "any" address.
+ *   httpAddrEqual()	 - Compare two addresses.
+ *   httpAddrLength()	 - Return the length of the address in bytes.
+ *   httpAddrListen()	 - Create a listening socket bound to the specified
+ *			   address and port.
  *   httpAddrLocalhost() - Check for the local loopback address.
- *   httpAddrLookup()    - Lookup the hostname associated with the address.
- *   _httpAddrPort()     - Get the port number associated with an address.
+ *   httpAddrLookup()	 - Lookup the hostname associated with the address.
+ *   httpAddrPort()	 - Get the port number associated with an address.
  *   _httpAddrSetPort()  - Set the port number associated with an address.
- *   httpAddrString()    - Convert an IP address to a dotted string.
- *   httpGetHostByName() - Lookup a hostname or IP address, and return
- *                         address records for the specified name.
- *   httpGetHostname()   - Get the FQDN for the local system.
+ *   httpAddrString()	 - Convert an address to a numeric string.
+ *   httpGetHostByName() - Lookup a hostname or IPv4 address, and return
+ *			   address records for the specified name.
+ *   httpGetHostname()	 - Get the FQDN for the connection or local system.
  */
 
 /*
@@ -127,6 +130,24 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
   else
     return (0);
 
+}
+
+
+/*
+ * 'httpAddrListen()' - Create a listening socket bound to the specified
+ *                      address and port.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O - Socket or -1 on error */
+httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
+               int         port)	/* I - Port number to bind to */
+{
+  (void)addr;
+  (void)port;
+
+  return (-1);
 }
 
 
@@ -290,11 +311,13 @@ httpAddrLookup(
 
 
 /*
- * '_httpAddrPort()' - Get the port number associated with an address.
+ * 'httpAddrPort()' - Get the port number associated with an address.
+ *
+ * @since CUPS 1.7@
  */
 
 int					/* O - Port number */
-_httpAddrPort(http_addr_t *addr)	/* I - Address */
+httpAddrPort(http_addr_t *addr)		/* I - Address */
 {
   if (!addr)
     return (ippPort());
@@ -306,6 +329,13 @@ _httpAddrPort(http_addr_t *addr)	/* I - Address */
     return (ntohs(addr->ipv4.sin_port));
   else
     return (ippPort());
+}
+
+int					/* O - Port number */
+_httpAddrPort(http_addr_t *addr)	/* I - Address */
+{
+ /* TODO: Remove in CUPS 1.8 */
+  return (httpAddrPort(addr));
 }
 
 

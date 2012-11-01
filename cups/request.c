@@ -993,7 +993,7 @@ _cupsConnect(void)
     */
 
     if (strcmp(cg->http->hostname, cg->server) ||
-        cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
+        cg->ipp_port != httpAddrPort(cg->http->hostaddr) ||
         (cg->http->encryption != cg->encryption &&
 	 cg->http->encryption == HTTP_ENCRYPT_NEVER))
     {

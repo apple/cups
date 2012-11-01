@@ -882,7 +882,7 @@ cupsAdminGetServerSettings(
       */
 
       if (strcmp(cg->http->hostname, cg->server) ||
-          cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
+          cg->ipp_port != httpAddrPort(cg->http->hostaddr) ||
 	  (cg->http->encryption != cg->encryption &&
 	   cg->http->encryption == HTTP_ENCRYPT_NEVER))
       {
@@ -901,8 +901,9 @@ cupsAdminGetServerSettings(
 
     if (!cg->http)
     {
-      if ((cg->http = _httpCreate(cupsServer(), ippPort(), NULL,
-                                  cupsEncryption(), AF_UNSPEC)) == NULL)
+      if ((cg->http = _httpCreate(cupsServer(), ippPort(), NULL, AF_UNSPEC,
+                                  cupsEncryption(), 1,
+                                  _HTTP_MODE_CLIENT)) == NULL)
       {
 	if (errno)
 	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);

@@ -410,7 +410,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
 	  httpAddrString(&(addr->addr), addrname, sizeof(addrname)),
-	  _httpAddrPort(&(addr->addr)));
+	  httpAddrPort(&(addr->addr)));
 
  /*
   * Print everything...

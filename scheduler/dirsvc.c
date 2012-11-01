@@ -258,7 +258,7 @@ cupsdStartBrowsing(void)
       if (httpAddrLocalhost(&(lis->address)))
 	continue;
 
-      DNSSDPort = _httpAddrPort(&(lis->address));
+      DNSSDPort = httpAddrPort(&(lis->address));
       break;
     }
 

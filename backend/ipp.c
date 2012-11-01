@@ -180,6 +180,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     int num_options, cups_option_t *options,
 				     const char *compression, int copies,
 				     const char *format, _ppd_cache_t *pc,
+				     ppd_file_t *ppd,
 				     ipp_attribute_t *media_col_sup,
 				     ipp_attribute_t *doc_handling_sup);
 static const char	*password_cb(const char *prompt, http_t *http,
@@ -279,8 +280,8 @@ main(int  argc,				/* I - Number of command-line args */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
-  ppd_file_t	*ppd;			/* PPD file */
-  _ppd_cache_t	*pc;			/* PPD cache and mapping data */
+  ppd_file_t	*ppd = NULL;		/* PPD file */
+  _ppd_cache_t	*pc = NULL;		/* PPD cache and mapping data */
   fd_set	input;			/* Input set for select() */
 
 
@@ -684,7 +685,8 @@ main(int  argc,				/* I - Number of command-line args */
       return (CUPS_BACKEND_OK);
   }
 
-  http = _httpCreate(hostname, port, addrlist, cupsEncryption(), AF_UNSPEC);
+  http = _httpCreate(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
+                     _HTTP_MODE_CLIENT);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
 
  /*
@@ -822,7 +824,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
 	  httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
-	  _httpAddrPort(http->hostaddr));
+	  httpAddrPort(http->hostaddr));
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -1206,7 +1208,6 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   options = NULL;
-  pc      = NULL;
 
   if (send_options)
   {
@@ -1221,7 +1222,8 @@ main(int  argc,				/* I - Number of command-line args */
       ppd = ppdOpenFile(getenv("PPD"));
       pc  = _ppdCacheCreateWithPPD(ppd);
 
-      ppdClose(ppd);
+      ppdMarkDefaults(ppd);
+      cupsMarkOptions(ppd, num_options, options);
     }
   }
   else
@@ -1344,7 +1346,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2],
                           monitor.job_name, num_options, options, compression,
-			  copies_sup ? copies : 1, document_format, pc,
+			  copies_sup ? copies : 1, document_format, pc, ppd,
 			  media_col_sup, doc_handling_sup);
 
     ippDelete(cupsDoRequest(http, request, resource));
@@ -1421,7 +1423,8 @@ main(int  argc,				/* I - Number of command-line args */
                                                           IPP_PRINT_JOB,
 			  version, uri, argv[2], monitor.job_name, num_options,
 			  options, compression, copies_sup ? copies : 1,
-			  document_format, pc, media_col_sup, doc_handling_sup);
+			  document_format, pc, ppd, media_col_sup,
+			  doc_handling_sup);
 
    /*
     * Do the request...
@@ -1955,6 +1958,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   cupsFreeOptions(num_options, options);
   _ppdCacheDestroy(pc);
+  ppdClose(ppd);
 
   httpClose(http);
 
@@ -2223,8 +2227,8 @@ monitor_printer(
   * Make a copy of the printer connection...
   */
 
-  http = _httpCreate(monitor->hostname, monitor->port, NULL, monitor->encryption,
-                     AF_UNSPEC);
+  http = _httpCreate(monitor->hostname, monitor->port, NULL, AF_UNSPEC,
+                     monitor->encryption, 1, _HTTP_MODE_CLIENT);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);
@@ -2453,6 +2457,7 @@ new_request(
     int             copies,		/* I - copies value or 0 */
     const char      *format,		/* I - document-format value or NULL */
     _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
+    ppd_file_t      *ppd,		/* I - PPD file data */
     ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
     ipp_attribute_t *doc_handling_sup)  /* I - multiple-document-handling-supported values */
 {
@@ -2532,6 +2537,7 @@ new_request(
     {
       int	num_finishings = 0,	/* Number of finishing values */
 		finishings[10];		/* Finishing enum values */
+      ppd_choice_t *choice;		/* Marked choice */
 
      /*
       * Send standard IPP attributes...
@@ -2682,8 +2688,10 @@ new_request(
 
       if ((keyword = cupsGetOption("output-bin", num_options,
 				   options)) == NULL)
-	keyword = _ppdCacheGetBin(pc, cupsGetOption("OutputBin", num_options,
-						    options));
+      {
+        if ((choice = ppdFindMarkedChoice(ppd, "OutputBin")) != NULL)
+	  keyword = _ppdCacheGetBin(pc, choice->choice);
+      }
 
       if (keyword)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
@@ -2693,10 +2701,9 @@ new_request(
 				   options)) != NULL)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "print-color-mode",
 		     NULL, keyword);
-      else if ((keyword = cupsGetOption("ColorModel", num_options,
-					options)) != NULL)
+      else if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
       {
-	if (!_cups_strcasecmp(keyword, "Gray"))
+	if (!_cups_strcasecmp(choice->choice, "Gray"))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 	               "print-color-mode", NULL, "monochrome");
 	else
@@ -2708,16 +2715,15 @@ new_request(
 				   options)) != NULL)
 	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 		      atoi(keyword));
-      else if ((keyword = cupsGetOption("cupsPrintQuality", num_options,
-					options)) != NULL)
+      else if ((choice = ppdFindMarkedChoice(ppd, "cupsPrintQuality")) != NULL)
       {
-	if (!_cups_strcasecmp(keyword, "draft"))
+	if (!_cups_strcasecmp(choice->choice, "draft"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_DRAFT);
-	else if (!_cups_strcasecmp(keyword, "normal"))
+	else if (!_cups_strcasecmp(choice->choice, "normal"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_NORMAL);
-	else if (!_cups_strcasecmp(keyword, "high"))
+	else if (!_cups_strcasecmp(choice->choice, "high"))
 	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
 			IPP_QUALITY_HIGH);
       }
@@ -2726,16 +2732,15 @@ new_request(
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		     NULL, keyword);
       else if (pc->sides_option &&
-               (keyword = cupsGetOption(pc->sides_option, num_options,
-					options)) != NULL)
+               (choice = ppdFindMarkedChoice(ppd, pc->sides_option)) != NULL)
       {
-	if (!_cups_strcasecmp(keyword, pc->sides_1sided))
+	if (!_cups_strcasecmp(choice->choice, pc->sides_1sided))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "one-sided");
-	else if (!_cups_strcasecmp(keyword, pc->sides_2sided_long))
+	else if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_long))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-long-edge");
-	if (!_cups_strcasecmp(keyword, pc->sides_2sided_short))
+	if (!_cups_strcasecmp(choice->choice, pc->sides_2sided_short))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-short-edge");
       }

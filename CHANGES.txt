@@ -1,8 +1,9 @@
-CHANGES.txt - 1.7b1 - 2012-10-15
+CHANGES.txt - 1.7b1 - 2012-10-31
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- CUPS now supports compressing and decompressing streamed data.
 	- CUPS now supports higher-level PIN printing, external accounting
 	  systems, and "print here" printing environments (STR #4169)
 	- IRIX is no longer a supported operating system (STR #4092)

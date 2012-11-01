@@ -1067,7 +1067,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
-  http_port = _httpAddrPort(http->hostaddr);
+  http_port = httpAddrPort(http->hostaddr);
 
   DEBUG_printf(("2cupsGetPPD3: Connection hostname=\"%s\", port=%d",
                 http_hostname, http_port));
@@ -1670,7 +1670,7 @@ cups_get_printer_uri(
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
-  http_port = _httpAddrPort(http->hostaddr);
+  http_port = httpAddrPort(http->hostaddr);
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following

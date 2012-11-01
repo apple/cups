@@ -707,7 +707,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
     */
 
     fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n", hostname,
-            _httpAddrPort(&(addrlist->addr)), printer);
+            httpAddrPort(&(addrlist->addr)), printer);
     _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,
@@ -889,7 +889,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 
     fprintf(stderr, "DEBUG: Connected to %s:%d (local port %d)...\n",
 	    httpAddrString(&(addr->addr), addrname, sizeof(addrname)),
-	    _httpAddrPort(&(addr->addr)), lport);
+	    httpAddrPort(&(addr->addr)), lport);
 
    /*
     * See if the printer supports SNMP...
