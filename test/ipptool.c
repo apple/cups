@@ -2147,6 +2147,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    * WITH-VALUE is a literal value...
 	    */
 
+	    char *ptr;			/* Pointer into value */
+
+            for (ptr = token; *ptr; ptr ++)
+            {
+	      if (*ptr == '\\' && ptr[1])
+	      {
+	       /*
+	        * Remove \ from \foo...
+	        */
+
+		_cups_strcpy(ptr, ptr + 1);
+	      }
+	    }
+
 	    last_expect->with_value = strdup(token);
 	    last_expect->with_flags |= _CUPS_WITH_LITERAL;
 	  }
