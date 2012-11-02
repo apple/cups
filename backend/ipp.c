@@ -1000,9 +1000,15 @@ main(int  argc,				/* I - Number of command-line args */
 
       if ((printer_state = ippFindAttribute(supported,
 					    "printer-state-reasons",
-					    IPP_TAG_KEYWORD)) != NULL && !busy)
+					    IPP_TAG_KEYWORD)) == NULL)
+      {
+        update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
+			     "cups-ipp-missing-printer-state-reasons");
+      }
+      else if (!busy)
       {
 	for (i = 0; i < printer_state->num_values; i ++)
+	{
 	  if (!strcmp(printer_state->values[0].string.text,
 	              "spool-area-full") ||
 	      !strncmp(printer_state->values[0].string.text, "spool-area-full-",
@@ -1011,10 +1017,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    busy = 1;
 	    break;
 	  }
+	}
       }
-      else
-        update_reasons(NULL, "+cups-ipp-conformance-failure-report,"
-			     "cups-ipp-missing-printer-state-reasons");
 
       if (busy)
       {
@@ -1077,6 +1081,12 @@ main(int  argc,				/* I - Number of command-line args */
     if ((operations_sup = ippFindAttribute(supported, "operations-supported",
 					   IPP_TAG_ENUM)) != NULL)
     {
+      fprintf(stderr, "DEBUG: operations-supported (%d values)\n",
+              operations_sup->num_values);
+      for (i = 0; i < operations_sup->num_values; i ++)
+        fprintf(stderr, "DEBUG: [%d] = %s\n", i,
+                ippOpString(operations_sup->values[i].integer));
+
       for (i = 0; i < operations_sup->num_values; i ++)
         if (operations_sup->values[i].integer == IPP_PRINT_JOB)
 	  break;
