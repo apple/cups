@@ -33,6 +33,8 @@
  *   ippAddResolutions()    - Add resolution values to an IPP message.
  *   ippAddSeparator()	    - Add a group separator to an IPP message.
  *   ippAddString()	    - Add a language-encoded string to an IPP message.
+ *   ippAddStringf()	    - Add a formatted string to an IPP message.
+ *   ippAddStringfv()	    - Add a formatted string to an IPP message.
  *   ippAddStrings()	    - Add language-encoded strings to an IPP message.
  *   ippCopyAttribute()     - Copy an attribute.
  *   ippCopyAttributes()    - Copy attributes from one IPP message to another.
@@ -47,14 +49,15 @@
  *   ippGetBoolean()	    - Get a boolean value for an attribute.
  *   ippGetCollection()     - Get a collection value for an attribute.
  *   ippGetCount()	    - Get the number of values in an attribute.
- *   ippGetDate()           - Get a date value for an attribute.
+ *   ippGetDate()	    - Get a date value for an attribute.
  *   ippGetGroupTag()	    - Get the group associated with an attribute.
  *   ippGetInteger()	    - Get the integer/enum value for an attribute.
  *   ippGetName()	    - Get the attribute name.
  *   ippGetOperation()	    - Get the operation ID in an IPP message.
- *   ippGetRange()          - Get a rangeOfInteger value from an attribute.
+ *   ippGetRange()	    - Get a rangeOfInteger value from an attribute.
  *   ippGetRequestId()	    - Get the request ID from an IPP message.
  *   ippGetResolution()     - Get a resolution value for an attribute.
+ *   ippGetState()	    - Get the IPP message state.
  *   ippGetStatusCode()     - Get the status code from an IPP response or event
  *			      message.
  *   ippGetString()	    - Get the string and optionally the language code
@@ -66,13 +69,14 @@
  *   ippNextAttribute()     - Return the next attribute in the message.
  *   ippNew()		    - Allocate a new IPP message.
  *   ippNewRequest()	    - Allocate a new IPP request message.
+ *   ippNewResponse()	    - Allocate a new IPP response message.
  *   ippRead()		    - Read data for an IPP message from a HTTP
  *			      connection.
  *   ippReadFile()	    - Read data for an IPP message from a file.
  *   ippReadIO()	    - Read data for an IPP message.
  *   ippSetBoolean()	    - Set a boolean value in an attribute.
  *   ippSetCollection()     - Set a collection value in an attribute.
- *   ippSetDate()           - Set a date value in an attribute.
+ *   ippSetDate()	    - Set a date value in an attribute.
  *   ippSetGroupTag()	    - Set the group tag of an attribute.
  *   ippSetInteger()	    - Set an integer or enum value in an attribute.
  *   ippSetName()	    - Set the name of an attribute.
@@ -80,7 +84,7 @@
  *   ippSetRange()	    - Set a rangeOfInteger value in an attribute.
  *   ippSetRequestId()	    - Set the request ID in an IPP message.
  *   ippSetResolution()     - Set a resolution value in an attribute.
- *   ippSetState()          - Set the current state of the IPP message.
+ *   ippSetState()	    - Set the current state of the IPP message.
  *   ippSetStatusCode()     - Set the status code in an IPP response or event
  *			      message.
  *   ippSetString()	    - Set a string value in an attribute.
@@ -196,8 +200,8 @@ _cupsBufferRelease(char *b)		/* I - Buffer to release */
 /*
  * 'ippAddBoolean()' - Add a boolean attribute to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -242,8 +246,8 @@ ippAddBoolean(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddBooleans()' - Add an array of boolean values.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -299,8 +303,8 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddCollection()' - Add a collection value.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -350,8 +354,8 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddCollections()' - Add an array of collection values.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -414,8 +418,8 @@ ippAddCollections(
 /*
  * 'ippAddDate()' - Add a date attribute to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -460,8 +464,8 @@ ippAddDate(ipp_t             *ipp,	/* I - IPP message */
 /*
  * 'ippAddInteger()' - Add a integer attribute to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -528,8 +532,8 @@ ippAddInteger(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddIntegers()' - Add an array of integer values.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -600,8 +604,8 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddOctetString()' - Add an octetString value to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -658,8 +662,8 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddOutOfBand()' - Add an out-of-band value to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -714,8 +718,8 @@ ippAddOutOfBand(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddRange()' - Add a range of values to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -765,8 +769,8 @@ ippAddRange(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddRanges()' - Add ranges of values to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -826,8 +830,8 @@ ippAddRanges(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddResolution()' - Add a resolution value to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -879,8 +883,8 @@ ippAddResolution(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddResolutions()' - Add resolution values to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -943,8 +947,8 @@ ippAddResolutions(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddSeparator()' - Add a group separator to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -970,8 +974,8 @@ ippAddSeparator(ipp_t *ipp)		/* I - IPP message */
 /*
  * 'ippAddString()' - Add a language-encoded string to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -1085,10 +1089,225 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
 
 
 /*
+ * 'ippAddStringf()' - Add a formatted string to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document
+ * (@code IPP_TAG_DOCUMENT@), event notification
+ * (@code IPP_TAG_EVENT_NOTIFICATION@), operation (@code IPP_TAG_OPERATION@),
+ * printer (@code IPP_TAG_PRINTER@), subscription (@code IPP_TAG_SUBSCRIPTION@),
+ * or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported string values include charset (@code IPP_TAG_CHARSET@), keyword
+ * (@code IPP_TAG_KEYWORD@), language (@code IPP_TAG_LANGUAGE@), mimeMediaType
+ * (@code IPP_TAG_MIMETYPE@), name (@code IPP_TAG_NAME@), nameWithLanguage
+ * (@code IPP_TAG_NAMELANG), text (@code IPP_TAG_TEXT@), textWithLanguage
+ * (@code IPP_TAG_TEXTLANG@), uri (@code IPP_TAG_URI@), and uriScheme
+ * (@code IPP_TAG_URISCHEME@).
+ *
+ * The @code language@ parameter must be non-@code NULL@ for nameWithLanguage
+ * and textWithLanguage string values and must be @code NULL@ for all other
+ * string values.
+ *
+ * The @code format@ parameter uses formatting characters compatible with the
+ * printf family of standard functions.  Additional arguments follow it as
+ * needed.  The formatted string is truncated as needed to the maximum length of
+ * the corresponding value type.
+ *
+ * @since CUPS 1.7@
+ */
+
+ipp_attribute_t *			/* O - New attribute */
+ippAddStringf(ipp_t      *ipp,		/* I - IPP message */
+              ipp_tag_t  group,		/* I - IPP group */
+	      ipp_tag_t  value_tag,	/* I - Type of attribute */
+	      const char *name,		/* I - Name of attribute */
+	      const char *language,	/* I - Language code (@code NULL@ for default) */
+	      const char *format,	/* I - Printf-style format string */
+	      ...)			/* I - Additional arguments as needed */
+{
+  ipp_attribute_t	*attr;		/* New attribute */
+  va_list		ap;		/* Argument pointer */
+
+
+  va_start(ap, format);
+  attr = ippAddStringfv(ipp, group, value_tag, name, language, format, ap);
+  va_end(ap);
+
+  return (attr);
+}
+
+
+/*
+ * 'ippAddStringfv()' - Add a formatted string to an IPP message.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
+ *
+ * The @code group@ parameter specifies the IPP attribute group tag: none
+ * (@code IPP_TAG_ZERO@, for member attributes), document
+ * (@code IPP_TAG_DOCUMENT@), event notification
+ * (@code IPP_TAG_EVENT_NOTIFICATION@), operation (@code IPP_TAG_OPERATION@),
+ * printer (@code IPP_TAG_PRINTER@), subscription (@code IPP_TAG_SUBSCRIPTION@),
+ * or unsupported (@code IPP_TAG_UNSUPPORTED_GROUP@).
+ *
+ * Supported string values include charset (@code IPP_TAG_CHARSET@), keyword
+ * (@code IPP_TAG_KEYWORD@), language (@code IPP_TAG_LANGUAGE@), mimeMediaType
+ * (@code IPP_TAG_MIMETYPE@), name (@code IPP_TAG_NAME@), nameWithLanguage
+ * (@code IPP_TAG_NAMELANG), text (@code IPP_TAG_TEXT@), textWithLanguage
+ * (@code IPP_TAG_TEXTLANG@), uri (@code IPP_TAG_URI@), and uriScheme
+ * (@code IPP_TAG_URISCHEME@).
+ *
+ * The @code language@ parameter must be non-@code NULL@ for nameWithLanguage
+ * and textWithLanguage string values and must be @code NULL@ for all other
+ * string values.
+ *
+ * The @code format@ parameter uses formatting characters compatible with the
+ * printf family of standard functions.  Additional arguments are passed in the
+ * stdarg pointer @code ap@.  The formatted string is truncated as needed to the
+ * maximum length of the corresponding value type.
+ *
+ * @since CUPS 1.7@
+ */
+
+ipp_attribute_t *			/* O - New attribute */
+ippAddStringfv(ipp_t      *ipp,		/* I - IPP message */
+               ipp_tag_t  group,	/* I - IPP group */
+	       ipp_tag_t  value_tag,	/* I - Type of attribute */
+	       const char *name,	/* I - Name of attribute */
+	       const char *language,	/* I - Language code (@code NULL@ for default) */
+	       const char *format,	/* I - Printf-style format string */
+	       va_list    ap)		/* I - Additional arguments */
+{
+  char		buffer[IPP_MAX_TEXT + 4];
+					/* Formatted text string */
+  ssize_t	bytes,			/* Length of formatted value */
+		max_bytes;		/* Maximum number of bytes for value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !name || group < IPP_TAG_ZERO ||
+      group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
+      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
+       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
+      !format || !ap)
+    return (NULL);
+
+  if ((value_tag == IPP_TAG_TEXTLANG || value_tag == IPP_TAG_NAMELANG)
+          != (language != NULL))
+    return (NULL);
+
+ /*
+  * Format the string...
+  */
+
+  if (!strcmp(format, "%s"))
+  {
+   /*
+    * Optimize the simple case...
+    */
+
+    const char *s = va_arg(ap, char *);
+
+    if (!s)
+      s = "(null)";
+
+    bytes = strlen(s);
+    strlcpy(buffer, s, sizeof(buffer));
+  }
+  else
+  {
+   /*
+    * Do a full formatting of the message...
+    */
+
+    if ((bytes = vsnprintf(buffer, sizeof(buffer), format, ap)) < 0)
+      return (NULL);
+  }
+
+ /*
+  * Limit the length of the string...
+  */
+
+  switch (value_tag)
+  {
+    default :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+        max_bytes = IPP_MAX_TEXT;
+        break;
+
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+        max_bytes = IPP_MAX_NAME;
+        break;
+
+    case IPP_TAG_CHARSET :
+        max_bytes = IPP_MAX_CHARSET;
+        break;
+
+    case IPP_TAG_KEYWORD :
+        max_bytes = IPP_MAX_KEYWORD;
+        break;
+
+    case IPP_TAG_LANGUAGE :
+        max_bytes = IPP_MAX_LANGUAGE;
+        break;
+
+    case IPP_TAG_MIMETYPE :
+        max_bytes = IPP_MAX_MIMETYPE;
+        break;
+
+    case IPP_TAG_URI :
+        max_bytes = IPP_MAX_URI;
+        break;
+
+    case IPP_TAG_URISCHEME :
+        max_bytes = IPP_MAX_URISCHEME;
+        break;
+  }
+
+  if (bytes >= max_bytes)
+  {
+    char	*bufmax,		/* Buffer at max_bytes */
+		*bufptr;		/* Pointer into buffer */
+
+    bufptr = buffer + strlen(buffer) - 1;
+    bufmax = buffer + max_bytes - 1;
+
+    while (bufptr > bufmax)
+    {
+      if (*bufptr & 0x80)
+      {
+        while ((*bufptr & 0xc0) == 0x80 && bufptr > buffer)
+          bufptr --;
+      }
+
+      bufptr --;
+    }
+
+    *bufptr = '\0';
+  }
+
+ /*
+  * Add the formatted string and return...
+  */
+
+  return (ippAddString(ipp, group, value_tag, name, language, buffer));
+}
+
+
+/*
  * 'ippAddStrings()' - Add language-encoded strings to an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code group@ parameter specifies the IPP attribute group tag: none
  * (@code IPP_TAG_ZERO@, for member attributes), document (@code IPP_TAG_DOCUMENT@),
@@ -2416,6 +2635,114 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
 
 
 /*
+ * 'ippNewResponse()' - Allocate a new IPP response message.
+ *
+ * The new response message is initialized with the same version-number,
+ * request-id, attributes-charset, and attributes-natural-language as the
+ * provided request message.  If the attributes-charset or
+ * attributes-natural-language attributes are missing from the request,
+ * "utf-8" and a value derived from the current locale are substituted,
+ * respectively.
+ *
+ * @since CUPS 1.7@
+ */
+
+ipp_t *					/* O - IPP response message */
+ippNewResponse(ipp_t *request)		/* I - IPP request message */
+{
+  ipp_t			*response;	/* IPP response message */
+  ipp_attribute_t	*attr;		/* Current attribute */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!request)
+    return (NULL);
+
+ /*
+  * Create a new IPP message...
+  */
+
+  if ((response = ippNew()) == NULL)
+    return (NULL);
+
+ /*
+  * Copy the request values over to the response...
+  */
+
+  response->request.status.version[0] = request->request.op.version[0];
+  response->request.status.version[1] = request->request.op.version[1];
+  response->request.status.request_id = request->request.op.request_id;
+
+ /*
+  * The first attribute MUST be attributes-charset...
+  */
+
+  attr = request->attrs;
+
+  if (attr && attr->name && !strcmp(attr->name, "attributes-charset") &&
+      attr->group_tag == IPP_TAG_OPERATION &&
+      attr->value_tag == IPP_TAG_CHARSET &&
+      attr->num_values == 1)
+  {
+   /*
+    * Copy charset from request...
+    */
+
+    ippAddString(response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+		 "attributes-charset", NULL, attr->values[0].string.text);
+  }
+  else
+  {
+   /*
+    * Use "utf-8" as the default...
+    */
+
+    ippAddString(response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+		 "attributes-charset", NULL, "utf-8");
+  }
+
+ /*
+  * Then attributes-natural-language...
+  */
+
+  if (attr)
+    attr = attr->next;
+
+  if (attr && attr->name &&
+      !strcmp(attr->name, "attributes-natural-language") &&
+      attr->group_tag == IPP_TAG_OPERATION &&
+      attr->value_tag == IPP_TAG_LANGUAGE &&
+      attr->num_values == 1)
+  {
+   /*
+    * Copy language from request...
+    */
+
+    ippAddString(response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+		 "attributes-natural-language", NULL,
+		 attr->values[0].string.text);
+  }
+  else
+  {
+   /*
+    * Use the language from the current locale...
+    */
+
+    cups_lang_t *language = cupsLangDefault();
+					/* Current locale */
+
+    ippAddString(response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+		 "attributes-natural-language", NULL, language->language);
+  }
+
+  return (response);
+}
+
+
+/*
  * 'ippRead()' - Read data for an IPP message from a HTTP connection.
  */
 
@@ -3271,8 +3598,8 @@ ippReadIO(void       *src,		/* I - Data source */
 /*
  * 'ippSetBoolean()' - Set a boolean value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3313,8 +3640,8 @@ ippSetBoolean(ipp_t           *ipp,	/* IO - IPP message */
 /*
  * 'ippSetCollection()' - Set a collection value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3362,8 +3689,8 @@ ippSetCollection(
 /*
  * 'ippSetDate()' - Set a date value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3404,8 +3731,8 @@ ippSetDate(ipp_t             *ipp,	/* IO - IPP message */
 /*
  * 'ippSetGroupTag()' - Set the group tag of an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3445,8 +3772,8 @@ ippSetGroupTag(
 /*
  * 'ippSetInteger()' - Set an integer or enum value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3488,8 +3815,8 @@ ippSetInteger(ipp_t           *ipp,	/* IO - IPP message */
 /*
  * 'ippSetName()' - Set the name of an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3530,8 +3857,8 @@ ippSetName(ipp_t           *ipp,	/* IO - IPP message */
 /*
  * 'ippSetOperation()' - Set the operation ID in an IPP request message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * @since CUPS 1.6/OS X 10.8@
  */
@@ -3560,8 +3887,8 @@ ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
 /*
  * 'ippSetRange()' - Set a rangeOfInteger value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3606,8 +3933,8 @@ ippSetRange(ipp_t           *ipp,	/* IO - IPP message */
 /*
  * 'ippSetRequestId()' - Set the request ID in an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code request_id@ parameter must be greater than 0.
  *
@@ -3640,8 +3967,8 @@ ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
 /*
  * 'ippSetResolution()' - Set a resolution value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3718,8 +4045,8 @@ ippSetState(ipp_t       *ipp,		/* I - IPP message */
 /*
  * 'ippSetStatusCode()' - Set the status code in an IPP response or event message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * @since CUPS 1.6/OS X 10.8@
  */
@@ -3748,8 +4075,8 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
 /*
  * 'ippSetString()' - Set a string value in an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3810,8 +4137,8 @@ ippSetString(ipp_t           *ipp,	/* IO - IPP message */
 /*
  * 'ippSetValueTag()' - Set the value tag of an attribute.
  *
- * The @code ipp@ parameter refers to the IPP message containing the attribute that was
- * previously created using the @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The @code attr@ parameter may be modified as a result of setting the value.
  *
@@ -3979,8 +4306,8 @@ ippSetValueTag(
 /*
  * 'ippSetVersion()' - Set the version number in an IPP message.
  *
- * The @code ipp@ parameter refers to an IPP message previously created using the
- * @link ippNew@ or @link ippNewRequest@ functions.
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
  *
  * The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
  *

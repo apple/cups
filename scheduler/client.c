@@ -1124,7 +1124,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
@@ -1198,7 +1198,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 

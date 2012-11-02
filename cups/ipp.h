@@ -694,6 +694,18 @@ extern int		ippSetValueTag(ipp_t *ipp, ipp_attribute_t **attr,
 extern int		ippSetVersion(ipp_t *ipp, int major, int minor)
 			              _CUPS_API_1_6;
 
+/**** New in CUPS 1.7 ****/
+extern ipp_attribute_t	*ippAddStringf(ipp_t *ipp, ipp_tag_t group,
+			               ipp_tag_t value_tag, const char *name,
+			               const char *language, const char *format,
+			               ...) _CUPS_API_1_7;
+extern ipp_attribute_t	*ippAddStringfv(ipp_t *ipp, ipp_tag_t group,
+					ipp_tag_t value_tag, const char *name,
+					const char *language,
+					const char *format, va_list ap)
+					_CUPS_API_1_7;
+extern ipp_t		*ippNewResponse(ipp_t *request) _CUPS_API_1_7;
+
 
 /*
  * C++ magic...

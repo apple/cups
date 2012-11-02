@@ -2463,11 +2463,104 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
                 char   *uri,		/* I - URI buffer */
 		size_t urilen)		/* I - Size of URI buffer */
 {
-  (void)http;
-  (void)uri;
-  (void)urilen;
+  char	line[4096],			/* HTTP request line */
+	*req_method,			/* HTTP request method */
+	*req_uri,			/* HTTP request URI */
+	*req_version;			/* HTTP request version number string */
 
-  return (HTTP_STATE_ERROR);
+
+ /*
+  * Range check input...
+  */
+
+  if (uri)
+    *uri = '\0';
+
+  if (!http || !uri || urilen < 1 || http->state != HTTP_WAITING)
+    return (HTTP_STATE_ERROR);
+
+ /*
+  * Read a line from the socket...
+  */
+
+  httpClearFields(http);
+
+  if (!httpGets(line, sizeof(line), http))
+    return (HTTP_STATE_ERROR);
+
+  if (!line[0])
+    return (HTTP_WAITING);
+
+ /*
+  * Parse it...
+  */
+
+  req_method = line;
+  req_uri    = line;
+
+  while (*req_uri && !isspace(*req_uri & 255))
+    req_uri ++;
+
+  if (!*req_uri)
+    return (HTTP_STATE_ERROR);
+
+  *req_uri++ = '\0';
+
+  while (*req_uri && isspace(*req_uri & 255))
+    req_uri ++;
+
+  req_version = req_uri;
+
+  while (*req_version && !isspace(*req_version & 255))
+    req_version ++;
+
+  if (!*req_version)
+    return (HTTP_STATE_ERROR);
+
+  *req_version++ = '\0';
+
+  while (*req_version && isspace(*req_version & 255))
+    req_version ++;
+
+ /*
+  * Validate...
+  */
+
+  if (!strcmp(req_method, "OPTIONS"))
+    http->state = HTTP_STATE_OPTIONS;
+  else if (!strcmp(req_method, "GET"))
+    http->state = HTTP_STATE_GET;
+  else if (!strcmp(req_method, "HEAD"))
+    http->state = HTTP_STATE_HEAD;
+  else if (!strcmp(req_method, "POST"))
+    http->state = HTTP_STATE_POST;
+  else if (!strcmp(req_method, "PUT"))
+    http->state = HTTP_STATE_PUT;
+  else if (!strcmp(req_method, "DELETE"))
+    http->state = HTTP_STATE_DELETE;
+  else if (!strcmp(req_method, "TRACE"))
+    http->state = HTTP_STATE_TRACE;
+  else if (!strcmp(req_method, "CONNECT"))
+    http->state = HTTP_STATE_CONNECT;
+  else
+    return (HTTP_STATE_UNKNOWN_METHOD);
+
+  if (!strcmp(req_version, "HTTP/1.0"))
+  {
+    http->version    = HTTP_VERSION_1_0;
+    http->keep_alive = HTTP_KEEPALIVE_OFF;
+  }
+  else if (!strcmp(req_version, "HTTP/1.1"))
+  {
+    http->version    = HTTP_VERSION_1_1;
+    http->keep_alive = HTTP_KEEPALIVE_ON;
+  }
+  else
+    return (HTTP_STATE_UNKNOWN_VERSION);
+
+  strlcpy(uri, req_uri, urilen);
+
+  return (http->state);
 }
 
 
@@ -3552,14 +3645,126 @@ _httpWriteGNUTLS(
  * @since CUPS 1.7@
  */
 
-http_state_t				/* O - New HTTP connection state */
+int					/* O - 0 on success, -1 on error */
 httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 		  http_status_t status)	/* I - Status code */
 {
-  (void)http;
-  (void)status;
+ /*
+  * Range check input...
+  */
 
-  return (HTTP_STATE_ERROR);
+  if (!http || status < HTTP_CONTINUE)
+    return (-1);
+
+ /*
+  * Set the various standard fields if they aren't already...
+  */
+
+  if (!http->fields[HTTP_FIELD_DATE][0])
+    httpSetField(http, HTTP_FIELD_DATE, httpGetDateString(time(NULL)));
+
+  if (status >= HTTP_BAD_REQUEST && http->keep_alive)
+  {
+    http->keep_alive = 0;
+    httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "");
+  }
+
+  if (http->version == HTTP_VERSION_1_1)
+  {
+    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+    {
+      if (http->keep_alive)
+	httpSetField(http, HTTP_FIELD_CONNECTION, "Keep-Alive");
+      else
+	httpSetField(http, HTTP_FIELD_CONNECTION, "close");
+    }
+
+    if (http->keep_alive && !http->fields[HTTP_FIELD_KEEP_ALIVE][0])
+      httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "timeout=10");
+  }
+
+#ifdef HAVE_SSL
+  if (status == HTTP_UPGRADE_REQUIRED)
+  {
+    if (!http->fields[HTTP_FIELD_CONNECTION][0])
+      httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
+
+    if (!http->fields[HTTP_FIELD_UPGRADE][0])
+      httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
+  }
+#endif /* HAVE_SSL */
+
+  if (!http->server)
+    httpSetField(http, HTTP_FIELD_SERVER, CUPS_MINIMAL);
+
+ /*
+  * Send the response header...
+  */
+
+  http->data_encoding = HTTP_ENCODING_FIELDS;
+
+  if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100,
+                 http->version % 100, (int)status, httpStatus(status)) < 0)
+  {
+    http->status        = HTTP_STATUS_ERROR;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
+    return (-1);
+  }
+
+  if (status != HTTP_CONTINUE)
+  {
+   /*
+    * 100 Continue doesn't have the rest of the response headers...
+    */
+
+    int		i;			/* Looping var */
+    const char	*value;			/* Field value */
+
+    for (i = 0; i < HTTP_FIELD_MAX; i ++)
+    {
+      if ((value = httpGetField(http, i)) != NULL && *value)
+      {
+	if (httpPrintf(http, "%s: %s\r\n", http_fields[i], value) < 1)
+	{
+	  http->status        = HTTP_STATUS_ERROR;
+	  http->data_encoding = HTTP_ENCODING_LENGTH;
+	  return (-1);
+	}
+      }
+    }
+
+    if (http->cookie)
+    {
+      if (httpPrintf(http, "Set-Cookie: %s path=/%s\r\n", http->cookie,
+                     http->tls ? " secure" : "") < 1)
+      {
+	http->status        = HTTP_ERROR;
+	http->data_encoding = HTTP_ENCODING_LENGTH;
+	return (-1);
+      }
+    }
+  }
+
+  if (httpWrite2(http, "\r\n", 2) < 2)
+  {
+    http->status        = HTTP_ERROR;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
+    return (-1);
+  }
+
+  if (httpFlushWrite(http) < 0)
+  {
+    http->status        = HTTP_ERROR;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
+    return (-1);
+  }
+
+  (void)httpGetLength2(http);
+
+  http_content_coding_start(http,
+			    httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
+
+  return (0);
 }
 
 
@@ -4009,16 +4214,16 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
  * 'http_send()' - Send a request with all fields and the trailing blank line.
  */
 
-static int			/* O - 0 on success, non-zero on error */
-http_send(http_t       *http,	/* I - Connection to server */
-          http_state_t request,	/* I - Request code */
-	  const char   *uri)	/* I - URI */
+static int				/* O - 0 on success, non-zero on error */
+http_send(http_t       *http,		/* I - Connection to server */
+          http_state_t request,		/* I - Request code */
+	  const char   *uri)		/* I - URI */
 {
-  int		i;		/* Looping var */
-  char		buf[1024];	/* Encoded URI buffer */
-  const char	*value;		/* Field value */
-  static const char * const codes[] =
-		{		/* Request code strings */
+  int		i;			/* Looping var */
+  char		buf[1024];		/* Encoded URI buffer */
+  const char	*value;			/* Field value */
+  static const char * const codes[] =	/* Request code strings */
+		{
 		  NULL,
 		  "OPTIONS",
 		  "GET",
