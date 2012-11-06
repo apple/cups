@@ -130,11 +130,11 @@ typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
   HTTP_ENCODING_CHUNKED,		/* Data is chunked */
   HTTP_ENCODING_FIELDS			/* Sending HTTP fields */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 #    define HTTP_ENCODE_LENGTH	HTTP_ENCODING_LENGTH
 #    define HTTP_ENCODE_CHUNKED	HTTP_ENCODING_CHUNKED
 #    define HTTP_ENCODE_FIELDS	HTTP_ENCODING_FIELDS
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_encoding_t;
 
 typedef enum http_encryption_e		/**** HTTP encryption values ****/
@@ -144,12 +144,12 @@ typedef enum http_encryption_e		/**** HTTP encryption values ****/
   HTTP_ENCRYPTION_REQUIRED,		/* Encryption is required (TLS upgrade) */
   HTTP_ENCRYPTION_ALWAYS		/* Always encrypt (SSL) */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 #    define HTTP_ENCRYPT_IF_REQUESTED	HTTP_ENCRYPTION_IF_REQUESTED
 #    define HTTP_ENCRYPT_NEVER		HTTP_ENCRYPTION_NEVER
 #    define HTTP_ENCRYPT_REQUIRED	HTTP_ENCRYPTION_REQUIRED
 #    define HTTP_ENCRYPT_ALWAYS		HTTP_ENCRYPTION_ALWAYS
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_encryption_t;
 
 typedef enum http_field_e		/**** HTTP field names ****/
@@ -216,7 +216,7 @@ typedef enum http_state_e		/**** HTTP state values; states
   HTTP_STATE_UNKNOWN_METHOD,		/* Unknown request method, waiting for blank line */
   HTTP_STATE_UNKNOWN_VERSION		/* Unknown request method, waiting for blank line */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 /* Old names for this enumeration */
 #    define HTTP_WAITING	HTTP_STATE_WAITING
 #    define HTTP_OPTIONS	HTTP_STATE_OPTIONS
@@ -232,7 +232,7 @@ typedef enum http_state_e		/**** HTTP state values; states
 #    define HTTP_TRACE		HTTP_STATE_TRACE
 #    define HTTP_CLOSE		HTTP_STATE_CONNECT
 #    define HTTP_STATUS		HTTP_STATE_STATUS
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_state_t;
 
 typedef enum http_status_e		/**** HTTP status codes ****/
@@ -289,7 +289,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   CUPS_STATUS_PKI_ERROR,		/* Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
   CUPS_STATUS_WEBIF_DISABLED		/* Web interface is disabled @private@ */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 /* Old names for this enumeration */
 #    define HTTP_ERROR			HTTP_STATUS_ERROR
 
@@ -341,7 +341,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 #    define HTTP_AUTHORIZATION_CANCELED	CUPS_STATUS_AUTHORIZATION_CANCELED
 #    define HTTP_PKI_ERROR		CUPS_STATUS_PKI_ERROR
 #    define HTTP_WEBIF_DISABLED		CUPS_STATUS_WEBIF_DISABLED
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_status_t;
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ****/
@@ -359,7 +359,7 @@ typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ***
   HTTP_URI_STATUS_UNKNOWN_SCHEME,	/* Unknown scheme in URI (warning) */
   HTTP_URI_STATUS_MISSING_RESOURCE	/* Missing resource in URI (warning) */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 #    define HTTP_URI_OVERFLOW		HTTP_URI_STATUS_OVERFLOW
 #    define HTTP_URI_BAD_ARGUMENTS	HTTP_URI_STATUS_BAD_ARGUMENTS
 #    define HTTP_URI_BAD_RESOURCE	HTTP_URI_STATUS_BAD_RESOURCE
@@ -372,7 +372,7 @@ typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ***
 #    define HTTP_URI_MISSING_SCHEME	HTTP_URI_STATUS_MISSING_SCHEME
 #    define HTTP_URI_UNKNOWN_SCHEME	HTTP_URI_STATUS_UNKNOWN_SCHEME
 #    define HTTP_URI_MISSING_RESOURCE	HTTP_URI_STATUS_MISSING_RESOURCE
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_uri_status_t;
 
 typedef enum http_uri_coding_e		/**** URI en/decode flags ****/
@@ -392,11 +392,11 @@ typedef enum http_version_e		/**** HTTP version numbers ****/
   HTTP_VERSION_1_0 = 100,		/* HTTP/1.0 */
   HTTP_VERSION_1_1 = 101		/* HTTP/1.1 */
 
-#  ifndef CUPS_NO_DEPRECATED
+#  ifndef _CUPS_NO_DEPRECATED
 #    define HTTP_0_9	HTTP_VERSION_0_9
 #    define HTTP_1_0	HTTP_VERSION_1_0
 #    define HTTP_1_1	HTTP_VERSION_1_1
-#  endif /* !CUPS_NO_DEPRECATED */
+#  endif /* !_CUPS_NO_DEPRECATED */
 } http_version_t;
 
 typedef union _http_addr_u		/**** Socket address union, which
