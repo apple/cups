@@ -438,17 +438,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
 
-#ifdef __APPLE__
- /*
-  * Wait up to 5 seconds to get any pending back-channel data...
-  */
-
-  wait_time = time(NULL) + 5;
-  while (wait_time >= time(&current_time))
-    if (wait_bc(device_fd, wait_time - current_time) <= 0)
-      break;
-#endif /* __APPLE__ */
-
   if (waiteof)
   {
    /*
