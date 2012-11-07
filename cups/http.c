@@ -716,7 +716,7 @@ _httpCreate(
   http->gssctx   = GSS_C_NO_CONTEXT;
   http->gssname  = GSS_C_NO_NAME;
 #endif /* HAVE_GSSAPI */
-  http->version  = HTTP_1_1;
+  http->version  = HTTP_VERSION_1_1;
 
   strlcpy(http->hostname, host, sizeof(http->hostname));
 
@@ -954,7 +954,7 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
     return (0);
   }
 
-  if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+  if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     bytes = http_write_chunk(http, http->wbuffer, http->wused);
   else
     bytes = http_write(http, http->wbuffer, http->wused);
@@ -1180,12 +1180,12 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
 
-    http->data_encoding  = HTTP_ENCODE_CHUNKED;
+    http->data_encoding  = HTTP_ENCODING_CHUNKED;
     http->data_remaining = 0;
   }
   else
   {
-    http->data_encoding = HTTP_ENCODE_LENGTH;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
 
    /*
     * The following is a hack for HTTP servers that don't send a
@@ -1587,7 +1587,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
 http_version_t				/* O - Version number */
 httpGetVersion(http_t *http)		/* I - Connection to server */
 {
-  return (http ? http->version : HTTP_1_0);
+  return (http ? http->version : HTTP_VERSION_1_0);
 }
 
 
@@ -1731,7 +1731,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
   if (length <= 0)
     return (0);
 
-  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+  if (http->data_encoding == HTTP_ENCODING_CHUNKED &&
       http->data_remaining <= 0)
   {
     DEBUG_puts("2httpPeek: Getting chunk length...");
@@ -1760,7 +1760,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
     * data, go idle...
     */
 
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
 
     if (http->state == HTTP_POST_RECV)
@@ -1772,7 +1772,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
     * Prevent future reads for this request...
     */
 
-    http->data_encoding = HTTP_ENCODE_LENGTH;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
 
     return (0);
   }
@@ -1952,7 +1952,7 @@ httpPrintf(http_t     *http,		/* I - Connection to server */
 
   DEBUG_printf(("3httpPrintf: %s", buf));
 
-  if (http->data_encoding == HTTP_ENCODE_FIELDS)
+  if (http->data_encoding == HTTP_ENCODING_FIELDS)
     return (httpWrite2(http, buf, bytes));
   else
   {
@@ -2027,7 +2027,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   if (length <= 0)
     return (0);
 
-  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+  if (http->data_encoding == HTTP_ENCODING_CHUNKED &&
       http->data_remaining <= 0)
   {
     DEBUG_puts("2httpRead2: Getting chunk length...");
@@ -2061,7 +2061,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
 
     if (http->state == HTTP_POST_RECV)
@@ -2073,7 +2073,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     * Prevent future reads for this request...
     */
 
-    http->data_encoding = HTTP_ENCODE_LENGTH;
+    http->data_encoding = HTTP_ENCODING_LENGTH;
 
     return (0);
   }
@@ -2332,7 +2332,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
     else if (http->state == HTTP_POST_RECV)
       http->state ++;
@@ -2476,14 +2476,25 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   if (uri)
     *uri = '\0';
 
-  if (!http || !uri || urilen < 1 || http->state != HTTP_WAITING)
+  if (!http || !uri || urilen < 1 || http->state != HTTP_STATE_WAITING)
     return (HTTP_STATE_ERROR);
+
+ /*
+  * Reset state...
+  */
+
+  httpClearFields(http);
+
+  http->activity       = time(NULL);
+  http->data_encoding  = HTTP_ENCODING_LENGTH;
+  http->data_remaining = 0;
+  http->keep_alive     = HTTP_KEEPALIVE_OFF;
+  http->status         = HTTP_STATUS_OK;
+  http->version        = HTTP_VERSION_1_1;
 
  /*
   * Read a line from the socket...
   */
-
-  httpClearFields(http);
 
   if (!httpGets(line, sizeof(line), http))
     return (HTTP_STATE_ERROR);
@@ -2637,12 +2648,12 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   * Reset all state (except fields, which may be reused)...
   */
 
-  http->state           = HTTP_WAITING;
-  http->status          = HTTP_CONTINUE;
-  http->version         = HTTP_1_1;
+  http->state           = HTTP_STATE_WAITING;
+  http->status          = HTTP_STATUS_CONTINUE;
+  http->version         = HTTP_VERSION_1_1;
   http->keep_alive      = HTTP_KEEPALIVE_OFF;
   memset(&http->_hostaddr, 0, sizeof(http->_hostaddr));
-  http->data_encoding   = HTTP_ENCODE_LENGTH;
+  http->data_encoding   = HTTP_ENCODING_LENGTH;
   http->_data_remaining = 0;
   http->used            = 0;
   http->expect          = 0;
@@ -2828,14 +2839,16 @@ httpSetCookie(http_t     *http,		/* I - Connection */
 /*
  * 'httpSetExpect()' - Set the Expect: header in a request.
  *
- * Currently only HTTP_CONTINUE is supported for the "expect" argument.
+ * Currently only @code HTTP_STATUS_CONTINUE@ is supported for the "expect"
+ * argument.
  *
  * @since CUPS 1.2/OS X 10.5@
  */
 
 void
 httpSetExpect(http_t        *http,	/* I - Connection to server */
-              http_status_t expect)	/* I - HTTP status to expect (HTTP_CONTINUE) */
+              http_status_t expect)	/* I - HTTP status to expect
+              				       (@code HTTP_CONTINUE@) */
 {
   if (http)
     http->expect = expect;
@@ -2937,7 +2950,7 @@ httpSetField(http_t       *http,	/* I - Connection to server */
   }
 #ifdef HAVE_LIBZ
   else if (field == HTTP_FIELD_CONTENT_ENCODING &&
-           http->data_encoding != HTTP_ENCODE_FIELDS)
+           http->data_encoding != HTTP_ENCODING_FIELDS)
     http_content_coding_start(http, value);
 #endif /* HAVE_LIBZ */
 }
@@ -3052,12 +3065,12 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     * Blank line means the start of the data section (if any).  Return
     * the result code, too...
     *
-    * If we get status 100 (HTTP_CONTINUE), then we *don't* change states.
-    * Instead, we just return HTTP_CONTINUE to the caller and keep on
-    * tryin'...
+    * If we get status 100 (HTTP_STATUS_CONTINUE), then we *don't* change
+    * states.  Instead, we just return HTTP_STATUS_CONTINUE to the caller and
+    * keep on tryin'...
     */
 
-    if (http->status == HTTP_CONTINUE)
+    if (http->status == HTTP_STATUS_CONTINUE)
     {
       *status = http->status;
       return (0);
@@ -3510,7 +3523,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       DEBUG_printf(("2httpWrite2: Writing " CUPS_LLFMT " bytes to socket...",
                     CUPS_LLCAST length));
 
-      if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+      if (http->data_encoding == HTTP_ENCODING_CHUNKED)
 	bytes = (ssize_t)http_write_chunk(http, buffer, (int)length);
       else
 	bytes = (ssize_t)http_write(http, buffer, (int)length);
@@ -3519,7 +3532,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
                     CUPS_LLCAST bytes));
     }
 
-    if (http->data_encoding == HTTP_ENCODE_LENGTH)
+    if (http->data_encoding == HTTP_ENCODING_LENGTH)
       http->data_remaining -= bytes;
   }
   else
@@ -3529,8 +3542,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   * Handle end-of-request processing...
   */
 
-  if ((http->data_encoding == HTTP_ENCODE_CHUNKED && length == 0) ||
-      (http->data_encoding == HTTP_ENCODE_LENGTH && http->data_remaining == 0))
+  if ((http->data_encoding == HTTP_ENCODING_CHUNKED && length == 0) ||
+      (http->data_encoding == HTTP_ENCODING_LENGTH && http->data_remaining == 0))
   {
    /*
     * Finished with the transfer; unless we are sending POST or PUT
@@ -3542,7 +3555,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     if (http->wused)
       httpFlushWrite(http);
 
-    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     {
      /*
       * Send a 0-length chunk at the end of the request...
@@ -3554,7 +3567,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Reset the data state...
       */
 
-      http->data_encoding  = HTTP_ENCODE_LENGTH;
+      http->data_encoding  = HTTP_ENCODING_LENGTH;
       http->data_remaining = 0;
     }
   }
@@ -4295,7 +4308,7 @@ http_send(http_t       *http,		/* I - Connection to server */
   */
 
   http->state         = request;
-  http->data_encoding = HTTP_ENCODE_FIELDS;
+  http->data_encoding = HTTP_ENCODING_FIELDS;
 
   if (request == HTTP_POST || request == HTTP_PUT)
     http->state ++;

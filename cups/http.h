@@ -182,9 +182,9 @@ typedef enum http_field_e		/**** HTTP field names ****/
   HTTP_FIELD_UPGRADE,			/* Upgrade field */
   HTTP_FIELD_USER_AGENT,		/* User-Agent field */
   HTTP_FIELD_WWW_AUTHENTICATE,		/* WWW-Authenticate field */
-  HTTP_FIELD_ACCEPT_ENCODING,		/* Accepting-Encoding field */
-  HTTP_FIELD_ALLOW,			/* Allow field */
-  HTTP_FIELD_SERVER,			/* Server field */
+  HTTP_FIELD_ACCEPT_ENCODING,		/* Accepting-Encoding field @since CUPS 1.7@ */
+  HTTP_FIELD_ALLOW,			/* Allow field @since CUPS 1.7@ */
+  HTTP_FIELD_SERVER,			/* Server field @since CUPS 1.7@ */
   HTTP_FIELD_MAX			/* Maximum field index */
 } http_field_t;
 
@@ -213,8 +213,8 @@ typedef enum http_state_e		/**** HTTP state values; states
   HTTP_STATE_TRACE,			/* TRACE command, waiting for blank line */
   HTTP_STATE_CONNECT,			/* CONNECT command, waiting for blank line */
   HTTP_STATE_STATUS,			/* Command complete, sending status */
-  HTTP_STATE_UNKNOWN_METHOD,		/* Unknown request method, waiting for blank line */
-  HTTP_STATE_UNKNOWN_VERSION		/* Unknown request method, waiting for blank line */
+  HTTP_STATE_UNKNOWN_METHOD,		/* Unknown request method, waiting for blank line @since CUPS 1.7@ */
+  HTTP_STATE_UNKNOWN_VERSION		/* Unknown request method, waiting for blank line @since CUPS 1.7@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 /* Old names for this enumeration */

@@ -76,6 +76,8 @@
  * Include necessary headers...
  */
 
+//#define _IPP_PRIVATE_STRUCTURES 0	/* Force non-private IPP stuff */
+//#define _CUPS_NO_DEPRECATED 1		/* Force no deprecated stuff */
 #include <cups/cups-private.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -195,6 +197,9 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 #ifdef HAVE_DNSSD
   DNSServiceRef		common_ref,	/* Shared service connection */
 			ipp_ref,	/* Bonjour IPP service */
+#  ifdef HAVE_SSL
+			ipps_ref,	/* Bonjour IPPS service */
+#  endif /* HAVE_SSL */
 			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
   TXTRecordRef		ipp_txt;	/* Bonjour IPP TXT record */
@@ -271,7 +276,7 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					int ppm_color, int duplex, int port,
 					int pin,
 #ifdef HAVE_DNSSD
-					const char *regtype,
+					const char *subtype,
 #endif /* HAVE_DNSSD */
 					const char *directory);
 static cups_array_t	*create_requested_array(_ipp_client_t *client);
@@ -356,7 +361,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*formats = "application/pdf,image/jpeg";
 	      				/* Supported formats */
 #ifdef HAVE_DNSSD
-  const char	*regtype = "_ipp._tcp";	/* Bonjour service type */
+  const char	*subtype = "_print";	/* Bonjour service subtype */
 #endif /* HAVE_DNSSD */
   int		port = 8631,		/* Port number (0 = auto) TODO: FIX */
 		duplex = 0,		/* Duplex mode */
@@ -450,11 +455,11 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 #ifdef HAVE_DNSSD
-	  case 'r' : /* -r regtype */
+	  case 'r' : /* -r subtype */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      regtype = argv[i];
+	      subtype = argv[i];
 	      break;
 #endif /* HAVE_DNSSD */
 
@@ -515,7 +520,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((printer = create_printer(servername, name, location, make, model, icon,
                                 formats, ppm, ppm_color, duplex, port, pin,
 #ifdef HAVE_DNSSD
-				regtype,
+				subtype,
 #endif /* HAVE_DNSSD */
 				directory)) == NULL)
     return (1);
@@ -1010,7 +1015,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       int        port,		/* I - Port for listeners or 0 for auto */
 	       int        pin,		/* I - Require PIN printing */
 #ifdef HAVE_DNSSD
-	       const char *regtype,	/* I - Bonjour service type */
+	       const char *subtype,	/* I - Bonjour service subtype */
 #endif /* HAVE_DNSSD */
 	       const char *directory)	/* I - Spool directory */
 {
@@ -1667,7 +1672,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   */
 
   if (!register_printer(printer, location, make, model, docformats, adminurl,
-                        ppm_color > 0, duplex, regtype))
+                        ppm_color > 0, duplex, subtype))
     goto bad_printer;
 #endif /* HAVE_DNSSD */
 
@@ -2022,6 +2027,10 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
   if (printer->ipp_ref)
     DNSServiceRefDeallocate(printer->ipp_ref);
 
+#  ifdef HAVE_SSL
+  if (printer->ipps_ref)
+    DNSServiceRefDeallocate(printer->ipps_ref);
+#  endif /* HAVE_SSL */
   if (printer->http_ref)
     DNSServiceRefDeallocate(printer->http_ref);
 
@@ -3897,169 +3906,96 @@ process_client(_ipp_client_t *client)	/* I - Client */
 int					/* O - 1 on success, 0 on failure */
 process_http(_ipp_client_t *client)	/* I - Client connection */
 {
-  char			line[4096],	/* Line from client... */
-			operation[64],	/* Operation code from socket */
-			uri[1024],	/* URI */
-			version[64],	/* HTTP version number string */
-			*ptr;		/* Pointer into strings */
-  int			major, minor;	/* HTTP version numbers */
-  http_status_t		status;		/* Transfer status */
-  ipp_state_t		state;		/* State of IPP transfer */
+  char			uri[1024];	/* URI */
+  http_state_t		http_state;	/* HTTP state */
+  http_status_t		http_status;	/* HTTP status */
+  ipp_state_t		ipp_state;	/* State of IPP transfer */
+  char			scheme[32],	/* Method/scheme */
+			userpass[128],	/* Username:password */
+			hostname[HTTP_MAX_HOST];
+					/* Hostname */
+  int			port;		/* Port number */
 
-
- /*
-  * Abort if we have an error on the connection...
-  */
-
-  if (client->http.error)
-    return (0);
 
  /*
   * Clear state variables...
   */
 
-  httpClearFields(&(client->http));
   ippDelete(client->request);
   ippDelete(client->response);
 
-  client->http.activity       = time(NULL);
-  client->http.version        = HTTP_1_1;
-  client->http.keep_alive     = HTTP_KEEPALIVE_OFF;
-  client->http.data_encoding  = HTTP_ENCODE_LENGTH;
-  client->http.data_remaining = 0;
-  client->request             = NULL;
-  client->response            = NULL;
-  client->operation           = HTTP_WAITING;
+  client->request   = NULL;
+  client->response  = NULL;
+  client->operation = HTTP_STATE_WAITING;
 
  /*
   * Read a request from the connection...
   */
 
-  while ((ptr = httpGets(line, sizeof(line) - 1, &(client->http))) != NULL)
-    if (*ptr)
-      break;
-
-  if (!ptr)
-    return (0);
+  while ((http_state = httpReadRequest(&(client->http), uri,
+                                       sizeof(uri))) == HTTP_STATE_WAITING)
+    usleep(1);
 
  /*
   * Parse the request line...
   */
 
-  fprintf(stderr, "%s %s\n", client->http.hostname, line);
+  fprintf(stderr, "%s %s\n", client->http.hostname, uri);
 
-  switch (sscanf(line, "%63s%1023s%63s", operation, uri, version))
+  if (http_state == HTTP_STATE_ERROR)
   {
-    case 1 :
-	fprintf(stderr, "%s Bad request line.\n", client->http.hostname);
-	respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
-	return (0);
-
-    case 2 :
-	client->http.version = HTTP_0_9;
-	break;
-
-    case 3 :
-	if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
-	{
-	  fprintf(stderr, "%s Bad HTTP version.\n", client->http.hostname);
-	  respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
-	  return (0);
-	}
-
-	if (major < 2)
-	{
-	  client->http.version = (http_version_t)(major * 100 + minor);
-	  if (client->http.version == HTTP_1_1)
-	    client->http.keep_alive = HTTP_KEEPALIVE_ON;
-	  else
-	    client->http.keep_alive = HTTP_KEEPALIVE_OFF;
-	}
-	else
-	{
-	  respond_http(client, HTTP_NOT_SUPPORTED, NULL, 0);
-	  return (0);
-	}
-	break;
+    fprintf(stderr, "%s Bad request line.\n", client->http.hostname);
+    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
+    return (0);
+  }
+  else if (http_state == HTTP_STATE_UNKNOWN_METHOD)
+  {
+    fprintf(stderr, "%s Bad/unknown operation.\n", client->http.hostname);
+    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
+    return (0);
+  }
+  else if (http_state == HTTP_STATE_UNKNOWN_VERSION)
+  {
+    fprintf(stderr, "%s Bad HTTP version.\n", client->http.hostname);
+    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
+    return (0);
   }
 
  /*
-  * Handle full URLs in the request line...
+  * Separate the URI into its components...
   */
 
-  if (!strncmp(client->uri, "http:", 5) || !strncmp(client->uri, "ipp:", 4))
+  if (httpSeparateURI(HTTP_URI_CODING_MOST, uri, scheme, sizeof(scheme),
+		      userpass, sizeof(userpass),
+		      hostname, sizeof(hostname), &port,
+		      client->uri, sizeof(client->uri)) < HTTP_URI_OK)
   {
-    char	scheme[32],		/* Method/scheme */
-		userpass[128],		/* Username:password */
-		hostname[HTTP_MAX_HOST];/* Hostname */
-    int		port;			/* Port number */
-
-   /*
-    * Separate the URI into its components...
-    */
-
-    if (httpSeparateURI(HTTP_URI_CODING_MOST, uri, scheme, sizeof(scheme),
-		        userpass, sizeof(userpass),
-		        hostname, sizeof(hostname), &port,
-		        client->uri, sizeof(client->uri)) < HTTP_URI_OK)
-    {
-      fprintf(stderr, "%s Bad URI \"%s\".\n", client->http.hostname, uri);
-      respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
-      return (0);
-    }
-  }
-  else
-  {
-   /*
-    * Decode URI
-    */
-
-    if (!_httpDecodeURI(client->uri, uri, sizeof(client->uri)))
-    {
-      fprintf(stderr, "%s Bad URI \"%s\".\n", client->http.hostname, uri);
-      respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
-      return (0);
-    }
+    fprintf(stderr, "%s Bad URI \"%s\".\n", client->http.hostname, uri);
+    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
+    return (0);
   }
 
  /*
   * Process the request...
   */
 
-  if (!strcmp(operation, "GET"))
-    client->http.state = HTTP_GET;
-  else if (!strcmp(operation, "POST"))
-    client->http.state = HTTP_POST;
-  else if (!strcmp(operation, "OPTIONS"))
-    client->http.state = HTTP_OPTIONS;
-  else if (!strcmp(operation, "HEAD"))
-    client->http.state = HTTP_HEAD;
-  else
-  {
-    fprintf(stderr, "%s Bad operation \"%s\".\n", client->http.hostname,
-            operation);
-    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
-    return (0);
-  }
-
-  client->start       = time(NULL);
-  client->operation   = client->http.state;
-  client->http.status = HTTP_OK;
+  client->start     = time(NULL);
+  client->operation = httpGetState(&(client->http));
 
  /*
   * Parse incoming parameters until the status changes...
   */
 
-  while ((status = httpUpdate(&(client->http))) == HTTP_CONTINUE);
+  while ((http_status = httpUpdate(&(client->http))) == HTTP_STATUS_CONTINUE);
 
-  if (status != HTTP_OK)
+  if (http_status != HTTP_STATUS_OK)
   {
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
 
   if (!client->http.fields[HTTP_FIELD_HOST][0] &&
-      client->http.version >= HTTP_1_1)
+      client->http.version >= HTTP_VERSION_1_1)
   {
    /*
     * HTTP/1.1 and higher require the "Host:" field...
@@ -4084,15 +4020,16 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   */
 
   if (client->http.expect &&
-      (client->operation == HTTP_POST || client->operation == HTTP_PUT))
+      (client->operation == HTTP_STATE_POST ||
+       client->operation == HTTP_STATE_PUT))
   {
-    if (client->http.expect == HTTP_CONTINUE)
+    if (client->http.expect == HTTP_STATUS_CONTINUE)
     {
      /*
       * Send 100-continue header...
       */
 
-      if (!respond_http(client, HTTP_CONTINUE, NULL, 0))
+      if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, 0))
 	return (0);
     }
     else
@@ -4101,13 +4038,13 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
       * Send 417-expectation-failed header...
       */
 
-      if (!respond_http(client, HTTP_EXPECTATION_FAILED, NULL, 0))
+      if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, 0))
 	return (0);
 
       httpPrintf(&(client->http), "Content-Length: 0\r\n");
       httpPrintf(&(client->http), "\r\n");
       httpFlushWrite(&(client->http));
-      client->http.data_encoding = HTTP_ENCODE_LENGTH;
+      client->http.data_encoding = HTTP_ENCODING_LENGTH;
     }
   }
 
@@ -4204,7 +4141,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     case HTTP_POST :
 	if (client->http.data_remaining < 0 ||
 	    (!client->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-	     client->http.data_encoding == HTTP_ENCODE_LENGTH))
+	     client->http.data_encoding == HTTP_ENCODING_LENGTH))
 	{
 	 /*
 	  * Negative content lengths are invalid...
@@ -4229,12 +4166,12 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	client->request = ippNew();
 
-        while ((state = ippRead(&(client->http), client->request)) != IPP_DATA)
-	  if (state == IPP_ERROR)
+        while ((ipp_state = ippRead(&(client->http), client->request)) != IPP_DATA)
+	  if (ipp_state == IPP_ERROR)
 	  {
             fprintf(stderr, "%s IPP read error (%s).\n", client->http.hostname,
 	            cupsLastErrorString());
-	    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
+	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
 	    return (0);
 	  }
 
@@ -4520,11 +4457,12 @@ register_printer(
     const char     *adminurl,		/* I - Web interface URL */
     int            color,		/* I - 1 = color, 0 = monochrome */
     int            duplex,		/* I - 1 = duplex, 0 = simplex */
-    const char     *regtype)		/* I - Service type */
+    const char     *subtype)		/* I - Service subtype */
 {
   DNSServiceErrorType	error;		/* Error from Bonjour */
   char			make_model[256],/* Make and model together */
-			product[256];	/* Product string */
+			product[256],	/* Product string */
+			regtype[256];	/* Bonjour service type */
 
 
  /*
@@ -4535,16 +4473,14 @@ register_printer(
   snprintf(product, sizeof(product), "(%s)", model);
 
   TXTRecordCreate(&(printer->ipp_txt), 1024, NULL);
-  TXTRecordSetValue(&(printer->ipp_txt), "txtvers", 1, "1");
-  TXTRecordSetValue(&(printer->ipp_txt), "qtotal", 1, "1");
   TXTRecordSetValue(&(printer->ipp_txt), "rp", 3, "ipp");
   TXTRecordSetValue(&(printer->ipp_txt), "ty", (uint8_t)strlen(make_model),
                     make_model);
   TXTRecordSetValue(&(printer->ipp_txt), "adminurl", (uint8_t)strlen(adminurl),
                     adminurl);
-  TXTRecordSetValue(&(printer->ipp_txt), "note", (uint8_t)strlen(location),
-                    location);
-  TXTRecordSetValue(&(printer->ipp_txt), "priority", 1, "0");
+  if (*location)
+    TXTRecordSetValue(&(printer->ipp_txt), "note", (uint8_t)strlen(location),
+		      location);
   TXTRecordSetValue(&(printer->ipp_txt), "product", (uint8_t)strlen(product),
                     product);
   TXTRecordSetValue(&(printer->ipp_txt), "pdl", (uint8_t)strlen(formats),
@@ -4555,7 +4491,6 @@ register_printer(
                     make);
   TXTRecordSetValue(&(printer->ipp_txt), "usb_MDL", (uint8_t)strlen(model),
                     model);
-  TXTRecordSetValue(&(printer->ipp_txt), "air", 4, "none");
 
  /*
   * Create a shared service reference for Bonjour...
@@ -4596,6 +4531,11 @@ register_printer(
 
   printer->ipp_ref = printer->common_ref;
 
+  if (subtype && *subtype)
+    snprintf(regtype, sizeof(regtype), "_ipp._tcp,%s", subtype);
+  else
+    strlcpy(regtype, "_ipp._tcp", sizeof(regtype));
+
   if ((error = DNSServiceRegister(&(printer->ipp_ref),
                                   kDNSServiceFlagsShareConnection,
                                   0 /* interfaceIndex */, printer->dnssd_name,
@@ -4610,6 +4550,35 @@ register_printer(
             printer->dnssd_name, regtype, error);
     return (0);
   }
+
+#  ifdef HAVE_SSL
+ /*
+  * Then register the _ipps._tcp (IPP) service type with the real port number to
+  * advertise our IPP printer...
+  */
+
+  printer->ipps_ref = printer->common_ref;
+
+  if (subtype && *subtype)
+    snprintf(regtype, sizeof(regtype), "_ipps._tcp,%s", subtype);
+  else
+    strlcpy(regtype, "_ipps._tcp", sizeof(regtype));
+
+  if ((error = DNSServiceRegister(&(printer->ipps_ref),
+                                  kDNSServiceFlagsShareConnection,
+                                  0 /* interfaceIndex */, printer->dnssd_name,
+				  regtype, NULL /* domain */,
+				  NULL /* host */, htons(printer->port),
+				  TXTRecordGetLength(&(printer->ipp_txt)),
+				  TXTRecordGetBytesPtr(&(printer->ipp_txt)),
+			          (DNSServiceRegisterReply)dnssd_callback,
+			          printer)) != kDNSServiceErr_NoError)
+  {
+    fprintf(stderr, "Unable to register \"%s.%s\": %d\n",
+            printer->dnssd_name, regtype, error);
+    return (0);
+  }
+#  endif /* HAVE_SSL */
 
  /*
   * Similarly, register the _http._tcp,_printer (HTTP) service type with the
@@ -4683,7 +4652,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
 
   httpFlushWrite(&(client->http));
 
-  client->http.data_encoding = HTTP_ENCODE_FIELDS;
+  client->http.data_encoding = HTTP_ENCODING_FIELDS;
 
   if (httpPrintf(&(client->http), "HTTP/%d.%d %d %s\r\n", client->http.version / 100,
                  client->http.version % 100, code, httpStatus(code)) < 0)
@@ -4755,7 +4724,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
 
     debug_attributes("Response", client->response, 2);
 
-    client->http.data_encoding  = HTTP_ENCODE_LENGTH;
+    client->http.data_encoding  = HTTP_ENCODING_LENGTH;
     client->http.data_remaining = (off_t)ippLength(client->response);
     client->response->state     = IPP_IDLE;
 
@@ -4763,7 +4732,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
       return (0);
   }
   else
-    client->http.data_encoding = HTTP_ENCODE_CHUNKED;
+    client->http.data_encoding = HTTP_ENCODING_CHUNKED;
 
  /*
   * Flush the data and return...
@@ -4934,7 +4903,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010 by Apple Inc. All rights reserved.");
+    puts(CUPS_SVERSION " - Copyright 2010-2012 by Apple Inc. All rights reserved.");
     puts("");
   }
 
@@ -4953,7 +4922,7 @@ usage(int status)			/* O - Exit status */
   puts("-m model                Model name (default=Printer)");
   puts("-n hostname             Hostname for printer");
   puts("-p port                 Port number (default=auto)");
-  puts("-r regtype              Bonjour service type (default=_ipp._tcp)");
+  puts("-r subtype              Bonjour service subtype (default=_print)");
   puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
   puts("-v[vvv]                 Be (very) verbose");
 
