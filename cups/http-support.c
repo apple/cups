@@ -1542,10 +1542,16 @@ _httpResolveURI(
 #  ifdef HAVE_DNSSD
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
+      int interface = kDNSServiceInterfaceIndexAny;
+					/* Lookup on any interface */
+
+      if (!strcmp(scheme, "ippusb"))
+        interface = kDNSServiceInterfaceIndexLocalOnly;
+
       localref = ref;
       if (DNSServiceResolve(&localref,
-                            kDNSServiceFlagsShareConnection, 0, hostname, regtype,
-			    "local.", http_resolve_cb,
+                            kDNSServiceFlagsShareConnection, interface,
+                            hostname, regtype, "local.", http_resolve_cb,
 			    &uribuf) == kDNSServiceErr_NoError)
       {
 	int	fds;			/* Number of ready descriptors */
@@ -1619,7 +1625,7 @@ _httpResolveURI(
 	      domainref = ref;
 	      if (DNSServiceResolve(&domainref,
 	                            kDNSServiceFlagsShareConnection,
-	                            0, hostname, regtype, domain,
+	                            interface, hostname, regtype, domain,
 				    http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)
 		domainsent = 1;
