@@ -4954,10 +4954,7 @@ valid_doc_attributes(
       attr = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
                           "document-format", NULL, format);
     else
-    {
-      _cupsStrFree(ippGetString(attr, 0, NULL));
-      ippGetString(attr, 0, NULL) = _cupsStrAlloc(format);
-    }
+      ippSetString(client->request, &attr, 0, format);
   }
 
   if (client->request->request.op.operation_id != IPP_CREATE_JOB &&
