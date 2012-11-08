@@ -2718,7 +2718,7 @@ new_request(
       color_attr_name = print_color_mode ? "print-color-mode" : "output-mode";
 
       if ((keyword = cupsGetOption("print-color-mode", num_options,
-				   options)) != NULL && print_color_mode)
+				   options)) != NULL)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, color_attr_name,
 		     NULL, keyword);
       else if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
