@@ -239,7 +239,7 @@ struct _ipp_job_s			/**** Job data ****/
 
 typedef struct _ipp_client_s		/**** Client data ****/
 {
-  http_t		http;		/* HTTP connection */
+  http_t		*http;		/* HTTP connection */
   ipp_t			*request,	/* IPP request */
 			*response;	/* IPP response */
   time_t		start;		/* Request start time */
@@ -247,6 +247,7 @@ typedef struct _ipp_client_s		/**** Client data ****/
   ipp_op_t		operation_id;	/* IPP operation-id */
   char			uri[1024];	/* Request URI */
   http_addr_t		addr;		/* Client address */
+  char			hostname[256];	/* Client hostname */
   _ipp_printer_t	*printer;	/* Printer */
   _ipp_job_t		*job;		/* Current job, if any */
 } _ipp_client_t;
@@ -721,8 +722,6 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
               int            sock)	/* I - Listen socket */
 {
   _ipp_client_t	*client;		/* Client */
-  int		val;			/* Parameter value */
-  socklen_t	addrlen;		/* Length of address */
 
 
   if ((client = calloc(1, sizeof(_ipp_client_t))) == NULL)
@@ -731,20 +730,13 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     return (NULL);
   }
 
-  client->printer         = printer;
-  client->http.activity   = time(NULL);
-  client->http.hostaddr   = &(client->addr);
-  client->http.blocking   = 1;
-  client->http.wait_value = 60000;
+  client->printer = printer;
 
  /*
   * Accept the client and get the remote address...
   */
 
-  addrlen = sizeof(http_addr_t);
-
-  if ((client->http.fd = accept(sock, (struct sockaddr *)&(client->addr),
-                                &addrlen)) < 0)
+  if ((client->http = httpAcceptConnection(sock, 1)) == NULL)
   {
     perror("Unable to accept client connection");
 
@@ -753,23 +745,10 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     return (NULL);
   }
 
-  httpAddrString(&(client->addr), client->http.hostname,
-		 sizeof(client->http.hostname));
+  httpGetHostname(client->http, client->hostname, sizeof(client->hostname));
 
   if (Verbosity)
-    fprintf(stderr, "Accepted connection from %s (%s)\n", client->http.hostname,
-	    client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
-
- /*
-  * Using TCP_NODELAY improves responsiveness, especially on systems
-  * with a slow loopback interface.  Since we write large buffers
-  * when sending print files and requests, there shouldn't be any
-  * performance penalty for this...
-  */
-
-  val = 1;
-  setsockopt(client->http.fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val,
-             sizeof(val));
+    fprintf(stderr, "Accepted connection from %s\n", client->hostname);
 
   return (client);
 }
@@ -1954,27 +1933,21 @@ static void
 delete_client(_ipp_client_t *client)	/* I - Client */
 {
   if (Verbosity)
-    fprintf(stderr, "Closing connection from %s (%s)\n", client->http.hostname,
-	    client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
+    fprintf(stderr, "Closing connection from %s\n", client->hostname);
 
  /*
   * Flush pending writes before closing...
   */
 
-  httpFlushWrite(&(client->http));
-
-  if (client->http.fd >= 0)
-    close(client->http.fd);
+  httpFlushWrite(client->http);
 
  /*
   * Free memory...
   */
 
-  httpClearCookie(&(client->http));
-  httpClearFields(&(client->http));
+  httpClose(client->http);
 
   ippDelete(client->request);
-
   ippDelete(client->response);
 
   free(client);
@@ -2150,12 +2123,12 @@ html_escape(_ipp_client_t *client,	/* I - Client */
     if (*s == '&' || *s == '<')
     {
       if (s > start)
-        httpWrite2(&(client->http), start, s - start);
+        httpWrite2(client->http, start, s - start);
 
       if (*s == '&')
-        httpWrite2(&(client->http), "&amp;", 5);
+        httpWrite2(client->http, "&amp;", 5);
       else
-        httpWrite2(&(client->http), "&lt;", 4);
+        httpWrite2(client->http, "&lt;", 4);
 
       start = s + 1;
     }
@@ -2164,7 +2137,7 @@ html_escape(_ipp_client_t *client,	/* I - Client */
   }
 
   if (s > start)
-    httpWrite2(&(client->http), start, s - start);
+    httpWrite2(client->http, start, s - start);
 }
 
 
@@ -2201,14 +2174,14 @@ html_printf(_ipp_client_t *client,	/* I - Client */
     if (*format == '%')
     {
       if (format > start)
-        httpWrite2(&(client->http), start, format - start);
+        httpWrite2(client->http, start, format - start);
 
       tptr    = tformat;
       *tptr++ = *format++;
 
       if (*format == '%')
       {
-        httpWrite2(&(client->http), "%", 1);
+        httpWrite2(client->http, "%", 1);
         format ++;
 	continue;
       }
@@ -2321,7 +2294,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 
 	    sprintf(temp, tformat, va_arg(ap, double));
 
-            httpWrite2(&(client->http), temp, strlen(temp));
+            httpWrite2(client->http, temp, strlen(temp));
 	    break;
 
         case 'B' : /* Integer formats */
@@ -2345,7 +2318,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 	    else
 	      sprintf(temp, tformat, va_arg(ap, int));
 
-            httpWrite2(&(client->http), temp, strlen(temp));
+            httpWrite2(client->http, temp, strlen(temp));
 	    break;
 
 	case 'p' : /* Pointer value */
@@ -2354,7 +2327,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
 
 	    sprintf(temp, tformat, va_arg(ap, void *));
 
-            httpWrite2(&(client->http), temp, strlen(temp));
+            httpWrite2(client->http, temp, strlen(temp));
 	    break;
 
         case 'c' : /* Character or character array */
@@ -2381,7 +2354,7 @@ html_printf(_ipp_client_t *client,	/* I - Client */
   }
 
   if (format > start)
-    httpWrite2(&(client->http), start, format - start);
+    httpWrite2(client->http, start, format - start);
 
   va_end(ap);
 }
@@ -2470,7 +2443,7 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
 
   if (!valid_job_attributes(client))
   {
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -2478,7 +2451,7 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http.state == HTTP_POST_RECV)
+  if (client->http->state == HTTP_POST_RECV)
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Unexpected document data following request.");
@@ -2562,7 +2535,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 
   if ((attr = ippFindAttribute(client->request, "which-jobs",
                                IPP_TAG_KEYWORD)) != NULL)
-    fprintf(stderr, "%s Get-Jobs which-jobs=%s", client->http.hostname,
+    fprintf(stderr, "%s Get-Jobs which-jobs=%s", client->http->hostname,
             attr->values[0].string.text);
 
   if (!attr || !strcmp(attr->values[0].string.text, "not-completed"))
@@ -2629,7 +2602,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   {
     limit = attr->values[0].integer;
 
-    fprintf(stderr, "%s Get-Jobs limit=%d", client->http.hostname, limit);
+    fprintf(stderr, "%s Get-Jobs limit=%d", client->http->hostname, limit);
   }
   else
     limit = 0;
@@ -2639,7 +2612,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   {
     first_job_id = attr->values[0].integer;
 
-    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->http.hostname,
+    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->http->hostname,
             first_job_id);
   }
   else
@@ -2654,7 +2627,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   if ((attr = ippFindAttribute(client->request, "my-jobs",
                                IPP_TAG_BOOLEAN)) != NULL)
   {
-    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->http.hostname,
+    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->http->hostname,
             attr->values[0].boolean ? "true" : "false");
 
     if (attr->values[0].boolean)
@@ -2670,7 +2643,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
       username = attr->values[0].string.text;
 
       fprintf(stderr, "%s Get-Jobs requesting-user-name=\"%s\"\n",
-              client->http.hostname, username);
+              client->http->hostname, username);
     }
   }
 
@@ -2840,7 +2813,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
   if (!valid_job_attributes(client))
   {
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -2848,7 +2821,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http.state == HTTP_POST_SEND)
+  if (client->http->state == HTTP_POST_SEND)
   {
     respond_ipp(client, IPP_BAD_REQUEST, "No file in request.");
     return;
@@ -2893,7 +2866,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
     return;
   }
 
-  while ((bytes = httpRead2(&(client->http), buffer, sizeof(buffer))) > 0)
+  while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
     if (write(job->fd, buffer, bytes) < bytes)
     {
@@ -3022,7 +2995,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
   if (!valid_job_attributes(client))
   {
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3030,7 +3003,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http.state == HTTP_POST_RECV)
+  if (client->http->state == HTTP_POST_RECV)
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Unexpected document data following request.");
@@ -3311,7 +3284,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   if ((job = find_job(client)) == NULL)
   {
     respond_ipp(client, IPP_NOT_FOUND, "Job does not exist.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3323,14 +3296,14 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   if (job->state > IPP_JOB_HELD)
   {
     respond_ipp(client, IPP_NOT_POSSIBLE, "Job is not in a pending state.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
   else if (job->filename || job->fd >= 0)
   {
     respond_ipp(client, IPP_MULTIPLE_JOBS_NOT_SUPPORTED,
                 "Multiple document jobs are not supported.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3339,14 +3312,14 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Missing required last-document attribute.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
   else if (attr->value_tag != IPP_TAG_BOOLEAN || attr->num_values != 1 ||
            !attr->values[0].boolean)
   {
     respond_unsupported(client, attr);
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3356,7 +3329,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   if (!valid_doc_attributes(client))
   {
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3405,7 +3378,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
     return;
   }
 
-  while ((bytes = httpRead2(&(client->http), buffer, sizeof(buffer))) > 0)
+  while ((bytes = httpRead2(client->http, buffer, sizeof(buffer))) > 0)
   {
     if (write(job->fd, buffer, bytes) < bytes)
     {
@@ -3541,7 +3514,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   if ((job = find_job(client)) == NULL)
   {
     respond_ipp(client, IPP_NOT_FOUND, "Job does not exist.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3553,14 +3526,14 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   if (job->state > IPP_JOB_HELD)
   {
     respond_ipp(client, IPP_NOT_POSSIBLE, "Job is not in a pending state.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
   else if (job->filename || job->fd >= 0)
   {
     respond_ipp(client, IPP_MULTIPLE_JOBS_NOT_SUPPORTED,
                 "Multiple document jobs are not supported.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3569,14 +3542,14 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Missing required last-document attribute.");
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
   else if (attr->value_tag != IPP_TAG_BOOLEAN || attr->num_values != 1 ||
            !attr->values[0].boolean)
   {
     respond_unsupported(client, attr);
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3586,7 +3559,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
   if (!valid_doc_attributes(client))
   {
-    httpFlush(&(client->http));
+    httpFlush(client->http);
     return;
   }
 
@@ -3594,7 +3567,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http.state == HTTP_POST_RECV)
+  if (client->http->state == HTTP_POST_RECV)
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Unexpected document data following request.");
@@ -3885,7 +3858,7 @@ process_client(_ipp_client_t *client)	/* I - Client */
   * Loop until we are out of requests or timeout (30 seconds)...
   */
 
-  while (httpWait(&(client->http), 30000))
+  while (httpWait(client->http, 30000))
     if (!process_http(client))
       break;
 
@@ -3932,7 +3905,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Read a request from the connection...
   */
 
-  while ((http_state = httpReadRequest(&(client->http), uri,
+  while ((http_state = httpReadRequest(client->http, uri,
                                        sizeof(uri))) == HTTP_STATE_WAITING)
     usleep(1);
 
@@ -3940,23 +3913,23 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Parse the request line...
   */
 
-  fprintf(stderr, "%s %s\n", client->http.hostname, uri);
+  fprintf(stderr, "%s %s\n", client->http->hostname, uri);
 
   if (http_state == HTTP_STATE_ERROR)
   {
-    fprintf(stderr, "%s Bad request line.\n", client->http.hostname);
+    fprintf(stderr, "%s Bad request line.\n", client->http->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_METHOD)
   {
-    fprintf(stderr, "%s Bad/unknown operation.\n", client->http.hostname);
+    fprintf(stderr, "%s Bad/unknown operation.\n", client->http->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_VERSION)
   {
-    fprintf(stderr, "%s Bad HTTP version.\n", client->http.hostname);
+    fprintf(stderr, "%s Bad HTTP version.\n", client->http->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
@@ -3970,7 +3943,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		      hostname, sizeof(hostname), &port,
 		      client->uri, sizeof(client->uri)) < HTTP_URI_OK)
   {
-    fprintf(stderr, "%s Bad URI \"%s\".\n", client->http.hostname, uri);
+    fprintf(stderr, "%s Bad URI \"%s\".\n", client->http->hostname, uri);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
@@ -3980,13 +3953,13 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   */
 
   client->start     = time(NULL);
-  client->operation = httpGetState(&(client->http));
+  client->operation = httpGetState(client->http);
 
  /*
   * Parse incoming parameters until the status changes...
   */
 
-  while ((http_status = httpUpdate(&(client->http))) == HTTP_STATUS_CONTINUE);
+  while ((http_status = httpUpdate(client->http)) == HTTP_STATUS_CONTINUE);
 
   if (http_status != HTTP_STATUS_OK)
   {
@@ -3994,8 +3967,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     return (0);
   }
 
-  if (!client->http.fields[HTTP_FIELD_HOST][0] &&
-      client->http.version >= HTTP_VERSION_1_1)
+  if (!client->http->fields[HTTP_FIELD_HOST][0] &&
+      client->http->version >= HTTP_VERSION_1_1)
   {
    /*
     * HTTP/1.1 and higher require the "Host:" field...
@@ -4009,7 +3982,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle HTTP Upgrade...
   */
 
-  if (!_cups_strcasecmp(client->http.fields[HTTP_FIELD_CONNECTION], "Upgrade"))
+  if (!_cups_strcasecmp(client->http->fields[HTTP_FIELD_CONNECTION], "Upgrade"))
   {
     if (!respond_http(client, HTTP_NOT_IMPLEMENTED, NULL, 0))
       return (0);
@@ -4019,11 +3992,11 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle HTTP Expect...
   */
 
-  if (client->http.expect &&
+  if (client->http->expect &&
       (client->operation == HTTP_STATE_POST ||
        client->operation == HTTP_STATE_PUT))
   {
-    if (client->http.expect == HTTP_STATUS_CONTINUE)
+    if (client->http->expect == HTTP_STATUS_CONTINUE)
     {
      /*
       * Send 100-continue header...
@@ -4041,10 +4014,10 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
       if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, 0))
 	return (0);
 
-      httpPrintf(&(client->http), "Content-Length: 0\r\n");
-      httpPrintf(&(client->http), "\r\n");
-      httpFlushWrite(&(client->http));
-      client->http.data_encoding = HTTP_ENCODING_LENGTH;
+      httpPrintf(client->http, "Content-Length: 0\r\n");
+      httpPrintf(client->http, "\r\n");
+      httpFlushWrite(client->http);
+      client->http->data_encoding = HTTP_ENCODING_LENGTH;
     }
   }
 
@@ -4092,9 +4065,9 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	    }
 
 	    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-	      httpWrite2(&(client->http), buffer, bytes);
+	      httpWrite2(client->http, buffer, bytes);
 
-	    httpFlushWrite(&(client->http));
+	    httpFlushWrite(client->http);
 
 	    close(fd);
 	  }
@@ -4130,7 +4103,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		          client->printer->state == IPP_PRINTER_PROCESSING ?
 			  "Printing" : "Stopped",
 		      cupsArrayCount(client->printer->jobs));
-          httpWrite2(&(client->http), "", 0);
+          httpWrite2(client->http, "", 0);
 
 	  return (1);
 	}
@@ -4139,9 +4112,9 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	break;
 
     case HTTP_POST :
-	if (client->http.data_remaining < 0 ||
-	    (!client->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-	     client->http.data_encoding == HTTP_ENCODING_LENGTH))
+	if (client->http->data_remaining < 0 ||
+	    (!client->http->fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
+	     client->http->data_encoding == HTTP_ENCODING_LENGTH))
 	{
 	 /*
 	  * Negative content lengths are invalid...
@@ -4150,7 +4123,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  return (respond_http(client, HTTP_BAD_REQUEST, NULL, 0));
 	}
 
-	if (strcmp(client->http.fields[HTTP_FIELD_CONTENT_TYPE],
+	if (strcmp(client->http->fields[HTTP_FIELD_CONTENT_TYPE],
 	           "application/ipp"))
         {
 	 /*
@@ -4166,10 +4139,10 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	client->request = ippNew();
 
-        while ((ipp_state = ippRead(&(client->http), client->request)) != IPP_DATA)
+        while ((ipp_state = ippRead(client->http, client->request)) != IPP_DATA)
 	  if (ipp_state == IPP_ERROR)
 	  {
-            fprintf(stderr, "%s IPP read error (%s).\n", client->http.hostname,
+            fprintf(stderr, "%s IPP read error (%s).\n", client->http->hostname,
 	            cupsLastErrorString());
 	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
 	    return (0);
@@ -4209,15 +4182,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   * First build an empty response message for this request...
   */
 
-  client->operation_id = client->request->request.op.operation_id;
-  client->response     = ippNew();
-
-  client->response->request.status.version[0] =
-      client->request->request.op.version[0];
-  client->response->request.status.version[1] =
-      client->request->request.op.version[1];
-  client->response->request.status.request_id =
-      client->request->request.op.request_id;
+  client->operation_id = ippGetOperation(client->request);
+  client->response     = ippNewResponse(client->request);
 
  /*
   * Then validate the request header and required attributes...
@@ -4301,14 +4267,6 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
       else
 	uri = NULL;
 
-      ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-		   "attributes-charset", NULL,
-		   charset ? charset->values[0].string.text : "utf-8");
-
-      ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-		   "attributes-natural-language", NULL,
-		   language ? language->values[0].string.text : "en");
-
       if (charset &&
           _cups_strcasecmp(charset->values[0].string.text, "us-ascii") &&
           _cups_strcasecmp(charset->values[0].string.text, "utf-8"))
@@ -4344,7 +4302,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
         * Try processing the operation...
 	*/
 
-        if (client->http.expect == HTTP_CONTINUE)
+        if (client->http->expect == HTTP_CONTINUE)
 	{
 	 /*
 	  * Send 100-continue header...
@@ -4409,8 +4367,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   * Send the HTTP header and return...
   */
 
-  if (client->http.state != HTTP_POST_SEND)
-    httpFlush(&(client->http));		/* Flush trailing (junk) data */
+  if (client->http->state != HTTP_POST_SEND)
+    httpFlush(client->http);		/* Flush trailing (junk) data */
 
   return (respond_http(client, HTTP_OK, "application/ipp",
                        ippLength(client->response)));
@@ -4619,24 +4577,22 @@ respond_http(_ipp_client_t *client,	/* I - Client */
   char	message[1024];			/* Text message */
 
 
-  fprintf(stderr, "%s %s\n", client->http.hostname, httpStatus(code));
+  fprintf(stderr, "%s %s\n", client->http->hostname, httpStatus(code));
 
-  if (code == HTTP_CONTINUE)
+  if (code == HTTP_STATUS_CONTINUE)
   {
    /*
     * 100-continue doesn't send any headers...
     */
 
-    return (httpPrintf(&(client->http), "HTTP/%d.%d 100 Continue\r\n\r\n",
-		       client->http.version / 100,
-		       client->http.version % 100) > 0);
+    return (httpWriteResponse(client->http, HTTP_STATUS_CONTINUE) == 0);
   }
 
  /*
   * Format an error message...
   */
 
-  if (!type && !length && code != HTTP_OK)
+  if (!type && !length && code != HTTP_STATUS_OK)
   {
     snprintf(message, sizeof(message), "%d - %s\n", code, httpStatus(code));
 
@@ -4647,60 +4603,26 @@ respond_http(_ipp_client_t *client,	/* I - Client */
     message[0] = '\0';
 
  /*
-  * Send the HTTP status header...
+  * Send the HTTP response header...
   */
 
-  httpFlushWrite(&(client->http));
-
-  client->http.data_encoding = HTTP_ENCODING_FIELDS;
-
-  if (httpPrintf(&(client->http), "HTTP/%d.%d %d %s\r\n", client->http.version / 100,
-                 client->http.version % 100, code, httpStatus(code)) < 0)
-    return (0);
-
- /*
-  * Follow the header with the response fields...
-  */
-
-  if (httpPrintf(&(client->http), "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
-    return (0);
-
-  if (client->http.keep_alive && client->http.version >= HTTP_1_0)
-  {
-    if (httpPrintf(&(client->http),
-                   "Connection: Keep-Alive\r\n"
-                   "Keep-Alive: timeout=10\r\n") < 0)
-      return (0);
-  }
+  httpClearFields(client->http);
 
   if (code == HTTP_METHOD_NOT_ALLOWED || client->operation == HTTP_OPTIONS)
-  {
-    if (httpPrintf(&(client->http), "Allow: GET, HEAD, OPTIONS, POST\r\n") < 0)
-      return (0);
-  }
+    httpSetField(client->http, HTTP_FIELD_ALLOW, "GET, HEAD, OPTIONS, POST");
 
   if (type)
   {
     if (!strcmp(type, "text/html"))
-    {
-      if (httpPrintf(&(client->http),
-                     "Content-Type: text/html; charset=utf-8\r\n") < 0)
-	return (0);
-    }
-    else if (httpPrintf(&(client->http), "Content-Type: %s\r\n", type) < 0)
-      return (0);
+      httpSetField(client->http, HTTP_FIELD_CONTENT_TYPE,
+                   "text/html; charset=utf-8");
+    else
+      httpSetField(client->http, HTTP_FIELD_CONTENT_TYPE, type);
   }
 
-  if (length == 0 && !message[0])
-  {
-    if (httpPrintf(&(client->http), "Transfer-Encoding: chunked\r\n\r\n") < 0)
-      return (0);
-  }
-  else if (httpPrintf(&(client->http), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
-                      CUPS_LLCAST length) < 0)
-    return (0);
+  httpSetLength(client->http, length);
 
-  if (httpFlushWrite(&(client->http)) < 0)
+  if (httpWriteResponse(client->http, code) < 0)
     return (0);
 
  /*
@@ -4713,7 +4635,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
     * Send a plain text message.
     */
 
-    if (httpPrintf(&(client->http), "%s", message) < 0)
+    if (httpPrintf(client->http, "%s", message) < 0)
       return (0);
   }
   else if (client->response)
@@ -4724,21 +4646,17 @@ respond_http(_ipp_client_t *client,	/* I - Client */
 
     debug_attributes("Response", client->response, 2);
 
-    client->http.data_encoding  = HTTP_ENCODING_LENGTH;
-    client->http.data_remaining = (off_t)ippLength(client->response);
-    client->response->state     = IPP_IDLE;
+    client->response->state = IPP_IDLE;
 
-    if (ippWrite(&(client->http), client->response) != IPP_DATA)
+    if (ippWrite(client->http, client->response) != IPP_DATA)
       return (0);
   }
-  else
-    client->http.data_encoding = HTTP_ENCODING_CHUNKED;
 
  /*
   * Flush the data and return...
   */
 
-  return (httpFlushWrite(&(client->http)) >= 0);
+  return (httpFlushWrite(client->http) >= 0);
 }
 
 
@@ -4752,36 +4670,31 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 	    const char    *message,	/* I - printf-style status-message */
 	    ...)			/* I - Additional args as needed */
 {
-  va_list	ap;			/* Pointer to additional args */
-  char		formatted[1024];	/* Formatted errror message */
+  const char	*formatted = NULL;	/* Formatted message */
 
 
-  client->response->request.status.status_code = status;
-
-  if (!client->response->attrs)
-  {
-    ippAddString(client->response, IPP_TAG_OPERATION,
-                 IPP_TAG_CHARSET | IPP_TAG_COPY, "attributes-charset", NULL,
-		 "utf-8");
-    ippAddString(client->response, IPP_TAG_OPERATION,
-                 IPP_TAG_LANGUAGE | IPP_TAG_COPY, "attributes-natural-language",
-		 NULL, "en-us");
-  }
+  ippSetStatusCode(client->response, status);
 
   if (message)
   {
+    va_list		ap;		/* Pointer to additional args */
+    ipp_attribute_t	*attr;		/* New status-message attribute */
+
     va_start(ap, message);
-    vsnprintf(formatted, sizeof(formatted), message, ap);
+    attr = ippAddStringfv(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+                          "status-message", NULL, message, ap);
     va_end(ap);
 
-    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
-		 "status-message", NULL, formatted);
+    formatted = ippGetString(attr, 0, NULL);
   }
-  else
-    formatted[0] = '\0';
 
-  fprintf(stderr, "%s %s %s (%s)\n", client->http.hostname,
-          ippOpString(client->operation_id), ippErrorString(status), formatted);
+  if (formatted)
+    fprintf(stderr, "%s %s %s (%s)\n", client->http->hostname,
+	    ippOpString(client->operation_id), ippErrorString(status),
+	    formatted);
+  else
+    fprintf(stderr, "%s %s %s\n", client->http->hostname,
+	    ippOpString(client->operation_id), ippErrorString(status));
 }
 
 
@@ -4964,7 +4877,7 @@ valid_doc_attributes(
       respond_unsupported(client, attr);
     else
       fprintf(stderr, "%s %s compression=\"%s\"\n",
-              client->http.hostname,
+              client->http->hostname,
               ippOpString(client->request->request.op.operation_id),
               attr->values[0].string.text);
   }
@@ -4983,7 +4896,7 @@ valid_doc_attributes(
       format = attr->values[0].string.text;
 
       fprintf(stderr, "%s %s document-format=\"%s\"\n",
-	      client->http.hostname,
+	      client->http->hostname,
 	      ippOpString(client->request->request.op.operation_id), format);
     }
   }
@@ -5001,7 +4914,7 @@ valid_doc_attributes(
     unsigned char	header[4];	/* First 4 bytes of file */
 
     memset(header, 0, sizeof(header));
-    httpPeek(&(client->http), (char *)header, sizeof(header));
+    httpPeek(client->http, (char *)header, sizeof(header));
 
     if (!memcmp(header, "%PDF", 4))
       format = "application/pdf";
@@ -5015,7 +4928,7 @@ valid_doc_attributes(
 
     if (format)
       fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
-	      client->http.hostname,
+	      client->http->hostname,
 	      ippOpString(client->request->request.op.operation_id), format);
 
     if (!attr)

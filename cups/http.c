@@ -284,10 +284,76 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
                      int blocking)	/* I - 1 if the connection should be
         				       blocking, 0 otherwise */
 {
-  (void)fd;
-  (void)blocking;
+  http_t		*http;		/* HTTP connection */
+  http_addrlist_t	addrlist;	/* Dummy address list */
+  socklen_t		addrlen;	/* Length of address */
+  int			val;		/* Socket option value */
 
-  return (NULL);
+
+ /*
+  * Range check input...
+  */
+
+  if (fd < 0)
+    return (NULL);
+
+ /*
+  * Create the client connection...
+  */
+
+  memset(&addrlist, 0, sizeof(addrlist));
+
+  if ((http = _httpCreate(NULL, 0, &addrlist, AF_UNSPEC,
+                          HTTP_ENCRYPTION_IF_REQUESTED, blocking,
+                          _HTTP_MODE_SERVER)) == NULL)
+    return (NULL);
+
+ /*
+  * Accept the client and get the remote address...
+  */
+
+  addrlen = sizeof(http_addr_t);
+
+  if ((http->fd = accept(fd, (struct sockaddr *)&(http->addrlist->addr),
+			 &addrlen)) < 0)
+  {
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
+    httpClose(http);
+
+    return (NULL);
+  }
+
+  httpAddrString(&(http->addrlist->addr), http->hostname,
+		 sizeof(http->hostname));
+
+#ifdef SO_NOSIGPIPE
+ /*
+  * Disable SIGPIPE for this socket.
+  */
+
+  val = 1;
+  setsockopt(http->fd, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+#endif /* SO_NOSIGPIPE */
+
+ /*
+  * Using TCP_NODELAY improves responsiveness, especially on systems
+  * with a slow loopback interface.  Since we write large buffers
+  * when sending print files and requests, there shouldn't be any
+  * performance penalty for this...
+  */
+
+  val = 1;
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
+
+#ifdef FD_CLOEXEC
+ /*
+  * Close this socket when starting another process...
+  */
+
+  fcntl(http->fd, F_SETFD, FD_CLOEXEC);
+#endif /* FD_CLOEXEC */
+
+  return (http);
 }
 
 
@@ -397,10 +463,13 @@ httpClearFields(http_t *http)		/* I - Connection to server */
   {
     memset(http->fields, 0, sizeof(http->fields));
 
-    if (http->hostname[0] == '/')
-      httpSetField(http, HTTP_FIELD_HOST, "localhost");
-    else
-      httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+    if (http->mode == _HTTP_MODE_CLIENT)
+    {
+      if (http->hostname[0] == '/')
+	httpSetField(http, HTTP_FIELD_HOST, "localhost");
+      else
+	httpSetField(http, HTTP_FIELD_HOST, http->hostname);
+    }
 
     if (http->field_authorization)
     {
@@ -669,7 +738,7 @@ _httpCreate(
                 "encryption=%d, blocking=%d, mode=%d)", host, port, addrlist,
                 family, encryption, blocking, mode));
 
-  if (!host)
+  if (!host && mode == _HTTP_MODE_CLIENT)
     return (NULL);
 
   httpInitialize();
@@ -718,10 +787,11 @@ _httpCreate(
 #endif /* HAVE_GSSAPI */
   http->version  = HTTP_VERSION_1_1;
 
-  strlcpy(http->hostname, host, sizeof(http->hostname));
+  if (host)
+    strlcpy(http->hostname, host, sizeof(http->hostname));
 
   if (port == 443)			/* Always use encryption for https */
-    http->encryption = HTTP_ENCRYPT_ALWAYS;
+    http->encryption = HTTP_ENCRYPTION_ALWAYS;
   else
     http->encryption = encryption;
 
@@ -1950,7 +2020,7 @@ httpPrintf(http_t     *http,		/* I - Connection to server */
   bytes = vsnprintf(buf, sizeof(buf), format, ap);
   va_end(ap);
 
-  DEBUG_printf(("3httpPrintf: %s", buf));
+  DEBUG_printf(("3httpPrintf: (%d bytes) %s", bytes, buf));
 
   if (http->data_encoding == HTTP_ENCODING_FIELDS)
     return (httpWrite2(http, buf, bytes));
@@ -2473,11 +2543,17 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   * Range check input...
   */
 
+  DEBUG_printf(("httpReadRequest(http=%p, uri=%p, urilen=" CUPS_LLFMT ")",
+                http, uri, CUPS_LLCAST urilen));
+
   if (uri)
     *uri = '\0';
 
   if (!http || !uri || urilen < 1 || http->state != HTTP_STATE_WAITING)
+  {
+    DEBUG_puts("1httpReadRequest: Returning HTTP_STATE_ERROR");
     return (HTTP_STATE_ERROR);
+  }
 
  /*
   * Reset state...
@@ -2497,10 +2573,18 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   */
 
   if (!httpGets(line, sizeof(line), http))
+  {
+    DEBUG_puts("1httpReadRequest: Unable to read, returning HTTP_STATE_ERROR");
     return (HTTP_STATE_ERROR);
+  }
 
   if (!line[0])
-    return (HTTP_WAITING);
+  {
+    DEBUG_puts("1httpReadRequest: Blank line, returning HTTP_STATE_WAITING");
+    return (HTTP_STATE_WAITING);
+  }
+
+  DEBUG_printf(("1httpReadRequest: %s", line));
 
  /*
   * Parse it...
@@ -2513,7 +2597,10 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
     req_uri ++;
 
   if (!*req_uri)
+  {
+    DEBUG_puts("1httpReadRequest: No request URI.");
     return (HTTP_STATE_ERROR);
+  }
 
   *req_uri++ = '\0';
 
@@ -2526,7 +2613,10 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
     req_version ++;
 
   if (!*req_version)
+  {
+    DEBUG_puts("1httpReadRequest: No request protocol version.");
     return (HTTP_STATE_ERROR);
+  }
 
   *req_version++ = '\0';
 
@@ -2554,7 +2644,10 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else if (!strcmp(req_method, "CONNECT"))
     http->state = HTTP_STATE_CONNECT;
   else
+  {
+    DEBUG_printf(("1httpReadRequest: Unknown method \"%s\".", req_method));
     return (HTTP_STATE_UNKNOWN_METHOD);
+  }
 
   if (!strcmp(req_version, "HTTP/1.0"))
   {
@@ -2567,8 +2660,13 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
     http->keep_alive = HTTP_KEEPALIVE_ON;
   }
   else
+  {
+    DEBUG_printf(("1httpReadRequest: Unknown version \"%s\".", req_version));
     return (HTTP_STATE_UNKNOWN_VERSION);
+  }
 
+  DEBUG_printf(("1httpReadRequest: URI is %s, returning %d.", req_uri,
+                http->state));
   strlcpy(uri, req_uri, urilen);
 
   return (http->state);
@@ -3447,8 +3545,11 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   * Range check input...
   */
 
-  if (http == NULL || buffer == NULL)
+  if (!http || !buffer)
+  {
+    DEBUG_puts("1httpWrite2: Returning -1 due to bad input.");
     return (-1);
+  }
 
  /*
   * Mark activity on the connection...
@@ -3463,6 +3564,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
 #ifdef HAVE_LIBZ
   if (http->coding)
   {
+    DEBUG_printf(("1httpWrite2: http->coding=%d", http->coding));
+
     if (length == 0)
     {
       http_content_coding_finish(http);
@@ -3477,8 +3580,13 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
 
       while (deflate(&(http->stream), Z_NO_FLUSH) == Z_OK)
       {
+	http->wused = sizeof(http->wbuffer) - http->stream.avail_out;
+
 	if (httpFlushWrite(http) < 0)
+	{
+	  DEBUG_puts("1httpWrite2: Unable to flush, returning -1.");
 	  return (-1);
+	}
 
 	http->stream.next_out  = (Bytef *)http->wbuffer;
 	http->stream.avail_out = sizeof(http->wbuffer);
@@ -3571,6 +3679,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       http->data_remaining = 0;
     }
   }
+
+  DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
 
   return (bytes);
 }
@@ -3666,8 +3776,13 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   * Range check input...
   */
 
+  DEBUG_printf(("httpWriteResponse(http=%p, status=%d)", http, status));
+
   if (!http || status < HTTP_CONTINUE)
+  {
+    DEBUG_puts("1httpWriteResponse: Bad input.");
     return (-1);
+  }
 
  /*
   * Set the various standard fields if they aren't already...
@@ -3991,8 +4106,15 @@ http_content_coding_start(
   _http_coding_t	coding;		/* Content coding value */
 
 
+  DEBUG_printf(("http_content_coding_start(http=%p, value=\"%s\")", http,
+                value));
+
   if (http->coding != _HTTP_CODING_IDENTITY)
+  {
+    DEBUG_printf(("1http_content_coding_start: http->coding already %d.",
+                  http->coding));
     return;
+  }
   else if (!strcmp(value, "x-gzip") || !strcmp(value, "gzip"))
   {
     if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
@@ -4002,9 +4124,12 @@ http_content_coding_start(
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
     else
+    {
+      DEBUG_puts("1http_content_coding_start: Not doing content coding.");
       return;
+    }
   }
-  else if (!strcmp(value, "x-deflate") || strcmp(value, "deflate"))
+  else if (!strcmp(value, "x-deflate") || !strcmp(value, "deflate"))
   {
     if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_DEFLATE :
@@ -4013,10 +4138,16 @@ http_content_coding_start(
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
     else
+    {
+      DEBUG_puts("1http_content_coding_start: Not doing content coding.");
       return;
+    }
   }
   else
+  {
+    DEBUG_puts("1http_content_coding_start: Not doing content coding.");
     return;
+  }
 
   memset(&(http->stream), 0, sizeof(http->stream));
 
@@ -4053,6 +4184,9 @@ http_content_coding_start(
   }
 
   http->coding = coding;
+
+  DEBUG_printf(("1http_content_coding_start: http->coding now %d.",
+		http->coding));
 }
 #endif /* HAVE_LIBZ */
 

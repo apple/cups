@@ -144,10 +144,23 @@ int					/* O - Socket or -1 on error */
 httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
                int         port)	/* I - Port number to bind to */
 {
+  int		fd = -1,		/* Socket */
+		val;			/* Socket value */
+
+
   (void)addr;
   (void)port;
 
-  return (-1);
+#ifdef SO_NOSIGPIPE
+ /*
+  * Disable SIGPIPE for this socket.
+  */
+
+  val = 1;
+  setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+#endif /* SO_NOSIGPIPE */
+
+  return (fd);
 }
 
 
