@@ -182,7 +182,8 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     const char *format, _ppd_cache_t *pc,
 				     ppd_file_t *ppd,
 				     ipp_attribute_t *media_col_sup,
-				     ipp_attribute_t *doc_handling_sup);
+				     ipp_attribute_t *doc_handling_sup,
+				     int print_color_mode);
 static const char	*password_cb(const char *prompt, http_t *http,
 			             const char *method, const char *resource,
 			             void *user_data);
@@ -267,7 +268,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		create_job = 0,		/* Does printer support Create-Job? */
 		get_job_attrs = 0,	/* Does printer support Get-Job-Attributes? */
 		send_document = 0,	/* Does printer support Send-Document? */
-		validate_job = 0;	/* Does printer support Validate-Job? */
+		validate_job = 0,	/* Does printer support Validate-Job? */
+		print_color_mode = 0;	/* Does printer support print-color-mode? */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
   const char	*content_type,		/* CONTENT_TYPE environment variable */
@@ -1078,6 +1080,10 @@ main(int  argc,				/* I - Number of command-line args */
 	        media_col_sup->values[i].string.text);
     }
 
+    print_color_mode = ippFindAttribute(supported,
+					"print-color-mode-supported",
+					IPP_TAG_KEYWORD) != NULL;
+
     if ((operations_sup = ippFindAttribute(supported, "operations-supported",
 					   IPP_TAG_ENUM)) != NULL)
     {
@@ -1357,7 +1363,7 @@ main(int  argc,				/* I - Number of command-line args */
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2],
                           monitor.job_name, num_options, options, compression,
 			  copies_sup ? copies : 1, document_format, pc, ppd,
-			  media_col_sup, doc_handling_sup);
+			  media_col_sup, doc_handling_sup, print_color_mode);
 
     ippDelete(cupsDoRequest(http, request, resource));
 
@@ -1434,7 +1440,7 @@ main(int  argc,				/* I - Number of command-line args */
 			  version, uri, argv[2], monitor.job_name, num_options,
 			  options, compression, copies_sup ? copies : 1,
 			  document_format, pc, ppd, media_col_sup,
-			  doc_handling_sup);
+			  doc_handling_sup, print_color_mode);
 
    /*
     * Do the request...
@@ -2469,7 +2475,8 @@ new_request(
     _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
     ppd_file_t      *ppd,		/* I - PPD file data */
     ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
-    ipp_attribute_t *doc_handling_sup)  /* I - multiple-document-handling-supported values */
+    ipp_attribute_t *doc_handling_sup,  /* I - multiple-document-handling-supported values */
+    int             print_color_mode)	/* I - Printer supports print-color-mode */
 {
   int		i;			/* Looping var */
   ipp_t		*request;		/* Request data */
@@ -2483,6 +2490,7 @@ new_request(
 		*mandatory;		/* Mandatory attributes */
   ipp_tag_t	group;			/* Current group */
   ipp_attribute_t *attr;		/* Current attribute */
+  const char	*color_attr_name;	/* Supported color attribute */
   char		buffer[1024];		/* Value buffer */
 
 
@@ -2707,18 +2715,20 @@ new_request(
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
 		     NULL, keyword);
 
+      color_attr_name = print_color_mode ? "print-color-mode" : "output-mode";
+
       if ((keyword = cupsGetOption("print-color-mode", num_options,
-				   options)) != NULL)
-	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "print-color-mode",
+				   options)) != NULL && print_color_mode)
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, color_attr_name,
 		     NULL, keyword);
       else if ((choice = ppdFindMarkedChoice(ppd, "ColorModel")) != NULL)
       {
 	if (!_cups_strcasecmp(choice->choice, "Gray"))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "print-color-mode", NULL, "monochrome");
+	               color_attr_name, NULL, "monochrome");
 	else
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-	               "print-color-mode", NULL, "color");
+	               color_attr_name, NULL, "color");
       }
 
       if ((keyword = cupsGetOption("print-quality", num_options,
