@@ -2469,7 +2469,7 @@ ippGetValueTag(ipp_attribute_t *attr)	/* I - IPP attribute */
   * Return the value...
   */
 
-  return (attr->value_tag);
+  return (attr->value_tag & IPP_TAG_MASK);
 }
 
 

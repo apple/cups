@@ -224,7 +224,7 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 struct _ipp_job_s			/**** Job data ****/
 {
   int			id;		/* Job ID */
-  char			*name,		/* job-name */
+  const char		*name,		/* job-name */
 			*username,	/* job-originating-user-name */
 			*format;	/* document-format */
   ipp_jstate_t		state;		/* job-state value */
@@ -602,17 +602,22 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
   if (!to || !from)
     return;
 
-  for (fromattr = from->attrs; fromattr; fromattr = fromattr->next)
+  for (fromattr = ippFirstAttribute(from);
+       fromattr;
+       fromattr = ippNextAttribute(from))
   {
    /*
     * Filter attributes as needed...
     */
 
-    if ((group_tag != IPP_TAG_ZERO && fromattr->group_tag != group_tag &&
-         fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
+    ipp_tag_t fromgroup = ippGetGroupTag(fromattr);
+    const char *fromname = ippGetName(fromattr);
+
+    if ((group_tag != IPP_TAG_ZERO && fromgroup != group_tag &&
+         fromgroup != IPP_TAG_ZERO) || !fromname)
       continue;
 
-    if (!ra || cupsArrayFind(ra, fromattr->name))
+    if (!ra || cupsArrayFind(ra, (void *)fromname))
       ippCopyAttribute(to, fromattr, quickcopy);
   }
 }
@@ -799,8 +804,12 @@ create_job(_ipp_client_t *client)	/* I - Client */
   * Set all but the first two attributes to the job attributes group...
   */
 
-  for (attr = job->attrs->attrs->next->next; attr; attr = attr->next)
-    attr->group_tag = IPP_TAG_JOB;
+  for (ippFirstAttribute(job->attrs),
+           ippNextAttribute(job->attrs),
+           attr = ippNextAttribute(job->attrs);
+       attr;
+       attr = ippNextAttribute(job->attrs))
+    ippSetGroupTag(job->attrs, &attr, IPP_TAG_JOB);
 
  /*
   * Get the requesting-user-name, document format, and priority...
@@ -808,22 +817,19 @@ create_job(_ipp_client_t *client)	/* I - Client */
 
   if ((attr = ippFindAttribute(job->attrs, "requesting-user-name",
                                IPP_TAG_NAME)) != NULL)
-  {
-    _cupsStrFree(attr->name);
-    attr->name = _cupsStrAlloc("job-originating-user-name");
-  }
+    ippSetName(job->attrs, &attr, "job-originating-user-name");
   else
     attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME | IPP_TAG_COPY,
                         "job-originating-user-name", NULL, "anonymous");
 
   if (attr)
-    job->username = attr->values[0].string.text;
+    job->username = ippGetString(attr, 0, NULL);
   else
     job->username = "anonymous";
 
   if ((attr = ippFindAttribute(job->attrs, "document-format",
                                IPP_TAG_MIMETYPE)) != NULL)
-    job->format = attr->values[0].string.text;
+    job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
 
@@ -1018,8 +1024,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 					/* media-size-supported value */
   ipp_t			*media_col_default;
 					/* media-col-default value */
-  _ipp_value_t		*media_col_value;
-					/* Current media-col-database value */
+  int			media_col_index;/* Current media-col-database value */
   int			k_supported;	/* Maximum file size supported */
 #ifdef HAVE_STATVFS
   struct statvfs	spoolinfo;	/* FS info for spool directory */
@@ -1378,7 +1383,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   media_col_database = ippAddCollections(printer->attrs, IPP_TAG_PRINTER,
                                          "media-col-database", num_database,
 					 NULL);
-  for (media_col_value = media_col_database->values, i = 0;
+  for (media_col_index = 0, i = 0;
        i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
        i ++)
   {
@@ -1396,11 +1401,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       strncmp(media_type_supported[j], "photographic-", 13))
 	continue;
 
-      media_col_value->collection =
-          create_media_col(media_supported[i], media_type_supported[j],
-	                   media_col_sizes[i][0], media_col_sizes[i][1],
-			   media_xxx_margin_supported[1]);
-      media_col_value ++;
+      ippSetCollection(printer->attrs, &media_col_database, media_col_index,
+                       create_media_col(media_supported[i],
+                                        media_type_supported[j],
+					media_col_sizes[i][0],
+					media_col_sizes[i][1],
+					media_xxx_margin_supported[1]));
+      media_col_index ++;
 
       if (media_col_sizes[i][2] != _IPP_ENV_ONLY &&
 	  (!strcmp(media_type_supported[j], "auto") ||
@@ -1410,11 +1417,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
         * Add borderless version for this combination...
 	*/
 
-	media_col_value->collection =
-	    create_media_col(media_supported[i], media_type_supported[j],
-			     media_col_sizes[i][0], media_col_sizes[i][1],
-			     media_xxx_margin_supported[0]);
-	media_col_value ++;
+	ippSetCollection(printer->attrs, &media_col_database, media_col_index,
+                         create_media_col(media_supported[i],
+                                          media_type_supported[j],
+					  media_col_sizes[i][0],
+					  media_col_sizes[i][1],
+					  media_xxx_margin_supported[0]));
+	media_col_index ++;
       }
     }
   }
@@ -1470,8 +1479,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   for (i = 0;
        i < (int)(sizeof(media_col_sizes) / sizeof(media_col_sizes[0]));
        i ++)
-    media_size_supported->values[i].collection =
-        create_media_size(media_col_sizes[i][0], media_col_sizes[i][1]);
+    ippSetCollection(printer->attrs, &media_size_supported, i,
+		     create_media_size(media_col_sizes[i][0],
+		                       media_col_sizes[i][1]));
 
   /* media-top-margin-supported */
   ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1681,10 +1691,11 @@ static cups_array_t *			/* O - requested-attributes array */
 create_requested_array(
     _ipp_client_t *client)		/* I - Client */
 {
-  int			i;		/* Looping var */
+  int			i,		/* Looping var */
+			count;		/* Number of values */
   ipp_attribute_t	*requested;	/* requested-attributes attribute */
   cups_array_t		*ra;		/* Requested attributes array */
-  char			*value;		/* Current value */
+  const char		*value;		/* Current value */
 
 
  /*
@@ -1700,8 +1711,8 @@ create_requested_array(
   * If the attribute contains a single "all" keyword, return NULL...
   */
 
-  if (requested->num_values == 1 &&
-      !strcmp(requested->values[0].string.text, "all"))
+  count = ippGetCount(requested);
+  if (count == 1 && !strcmp(ippGetString(requested, 0, NULL), "all"))
     return (NULL);
 
  /*
@@ -1710,9 +1721,9 @@ create_requested_array(
 
   ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
-  for (i = 0; i < requested->num_values; i ++)
+  for (i = 0; i < count; i ++)
   {
-    value = requested->values[i].string.text;
+    value = ippGetString(requested, i, NULL);
 
     if (!strcmp(value, "job-template"))
     {
@@ -1868,7 +1879,7 @@ create_requested_array(
       cupsArrayAdd(ra, "notify-user-data");
     }
     else
-      cupsArrayAdd(ra, value);
+      cupsArrayAdd(ra, (void *)value);
   }
 
   return (ra);
@@ -1887,38 +1898,39 @@ debug_attributes(const char *title,	/* I - Title */
   ipp_tag_t		group_tag;	/* Current group */
   ipp_attribute_t	*attr;		/* Current attribute */
   char			buffer[2048];	/* String buffer for value */
+  int			major, minor;	/* Version */
 
 
   if (Verbosity <= 1)
     return;
 
   fprintf(stderr, "%s:\n", title);
-  fprintf(stderr, "  version=%d.%d\n", ipp->request.any.version[0],
-          ipp->request.any.version[1]);
+  major = ippGetVersion(ipp, &minor);
+  fprintf(stderr, "  version=%d.%d\n", major, minor);
   if (type == 1)
     fprintf(stderr, "  operation-id=%s(%04x)\n",
-            ippOpString(ipp->request.op.operation_id),
-            ipp->request.op.operation_id);
+            ippOpString(ippGetOperation(ipp)), ippGetOperation(ipp));
   else if (type == 2)
     fprintf(stderr, "  status-code=%s(%04x)\n",
-            ippErrorString(ipp->request.status.status_code),
-            ipp->request.status.status_code);
-  fprintf(stderr, "  request-id=%d\n\n", ipp->request.any.request_id);
+            ippErrorString(ippGetStatusCode(ipp)), ippGetStatusCode(ipp));
+  fprintf(stderr, "  request-id=%d\n\n", ippGetRequestId(ipp));
 
-  for (attr = ipp->attrs, group_tag = IPP_TAG_ZERO; attr; attr = attr->next)
+  for (attr = ippFirstAttribute(ipp), group_tag = IPP_TAG_ZERO;
+       attr;
+       attr = ippNextAttribute(ipp))
   {
-    if (attr->group_tag != group_tag)
+    if (ippGetGroupTag(attr) != group_tag)
     {
-      group_tag = attr->group_tag;
+      group_tag = ippGetGroupTag(attr);
       fprintf(stderr, "  %s\n", ippTagString(group_tag));
     }
 
-    if (attr->name)
+    if (ippGetName(attr))
     {
       ippAttributeString(attr, buffer, sizeof(buffer));
-      fprintf(stderr, "    %s (%s%s) %s\n", attr->name,
-	      attr->num_values > 1 ? "1setOf " : "",
-	      ippTagString(attr->value_tag), buffer);
+      fprintf(stderr, "    %s (%s%s) %s\n", ippGetName(attr),
+	      ippGetCount(attr) > 1 ? "1setOf " : "",
+	      ippTagString(ippGetValueTag(attr)), buffer);
     }
   }
 }
@@ -2085,14 +2097,15 @@ find_job(_ipp_client_t *client)		/* I - Client */
   if ((attr = ippFindAttribute(client->request, "job-uri",
                                IPP_TAG_URI)) != NULL)
   {
-    if (!strncmp(attr->values[0].string.text, client->printer->uri,
-                 client->printer->urilen) &&
-        attr->values[0].string.text[client->printer->urilen] == '/')
-      key.id = atoi(attr->values[0].string.text + client->printer->urilen + 1);
+    const char *uri = ippGetString(attr, 0, NULL);
+
+    if (!strncmp(uri, client->printer->uri, client->printer->urilen) &&
+        uri[client->printer->urilen] == '/')
+      key.id = atoi(uri + client->printer->urilen + 1);
   }
   else if ((attr = ippFindAttribute(client->request, "job-id",
                                     IPP_TAG_INTEGER)) != NULL)
-    key.id = attr->values[0].integer;
+    key.id = ippGetInteger(attr, 0);
 
   _cupsRWLockRead(&(client->printer->rwlock));
   job = (_ipp_job_t *)cupsArrayFind(client->printer->jobs, &key);
@@ -2519,6 +2532,8 @@ static void
 ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
+  const char		*which_jobs = NULL;
+					/* which-jobs values */
   int			job_comparison;	/* Job comparison */
   ipp_jstate_t		job_state;	/* job-state value */
   int			first_job_id,	/* First job ID */
@@ -2535,50 +2550,52 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 
   if ((attr = ippFindAttribute(client->request, "which-jobs",
                                IPP_TAG_KEYWORD)) != NULL)
-    fprintf(stderr, "%s Get-Jobs which-jobs=%s", client->http->hostname,
-            attr->values[0].string.text);
+  {
+    which_jobs = ippGetString(attr, 0, NULL);
+    fprintf(stderr, "%s Get-Jobs which-jobs=%s", client->hostname, which_jobs);
+  }
 
-  if (!attr || !strcmp(attr->values[0].string.text, "not-completed"))
+  if (!which_jobs || !strcmp(which_jobs, "not-completed"))
   {
     job_comparison = -1;
     job_state      = IPP_JOB_STOPPED;
   }
-  else if (!strcmp(attr->values[0].string.text, "completed"))
+  else if (!strcmp(which_jobs, "completed"))
   {
     job_comparison = 1;
     job_state      = IPP_JOB_CANCELED;
   }
-  else if (!strcmp(attr->values[0].string.text, "aborted"))
+  else if (!strcmp(which_jobs, "aborted"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_ABORTED;
   }
-  else if (!strcmp(attr->values[0].string.text, "all"))
+  else if (!strcmp(which_jobs, "all"))
   {
     job_comparison = 1;
     job_state      = IPP_JOB_PENDING;
   }
-  else if (!strcmp(attr->values[0].string.text, "canceled"))
+  else if (!strcmp(which_jobs, "canceled"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_CANCELED;
   }
-  else if (!strcmp(attr->values[0].string.text, "pending"))
+  else if (!strcmp(which_jobs, "pending"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_PENDING;
   }
-  else if (!strcmp(attr->values[0].string.text, "pending-held"))
+  else if (!strcmp(which_jobs, "pending-held"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_HELD;
   }
-  else if (!strcmp(attr->values[0].string.text, "processing"))
+  else if (!strcmp(which_jobs, "processing"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_PROCESSING;
   }
-  else if (!strcmp(attr->values[0].string.text, "processing-stopped"))
+  else if (!strcmp(which_jobs, "processing-stopped"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_STOPPED;
@@ -2586,10 +2603,9 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   else
   {
     respond_ipp(client, IPP_ATTRIBUTES,
-                "The which-jobs value \"%s\" is not supported.",
-                attr->values[0].string.text);
+                "The which-jobs value \"%s\" is not supported.", which_jobs);
     ippAddString(client->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-                 "which-jobs", NULL, attr->values[0].string.text);
+                 "which-jobs", NULL, which_jobs);
     return;
   }
 
@@ -2600,9 +2616,9 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   if ((attr = ippFindAttribute(client->request, "limit",
                                IPP_TAG_INTEGER)) != NULL)
   {
-    limit = attr->values[0].integer;
+    limit = ippGetInteger(attr, 0);
 
-    fprintf(stderr, "%s Get-Jobs limit=%d", client->http->hostname, limit);
+    fprintf(stderr, "%s Get-Jobs limit=%d", client->hostname, limit);
   }
   else
     limit = 0;
@@ -2610,9 +2626,9 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   if ((attr = ippFindAttribute(client->request, "first-job-id",
                                IPP_TAG_INTEGER)) != NULL)
   {
-    first_job_id = attr->values[0].integer;
+    first_job_id = ippGetInteger(attr, 0);
 
-    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->http->hostname,
+    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->hostname,
             first_job_id);
   }
   else
@@ -2627,10 +2643,12 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   if ((attr = ippFindAttribute(client->request, "my-jobs",
                                IPP_TAG_BOOLEAN)) != NULL)
   {
-    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->http->hostname,
-            attr->values[0].boolean ? "true" : "false");
+    int my_jobs = ippGetBoolean(attr, 0);
 
-    if (attr->values[0].boolean)
+    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->hostname,
+            my_jobs ? "true" : "false");
+
+    if (my_jobs)
     {
       if ((attr = ippFindAttribute(client->request, "requesting-user-name",
 					IPP_TAG_NAME)) == NULL)
@@ -2640,10 +2658,10 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 	return;
       }
 
-      username = attr->values[0].string.text;
+      username = ippGetString(attr, 0, NULL);
 
       fprintf(stderr, "%s Get-Jobs requesting-user-name=\"%s\"\n",
-              client->http->hostname, username);
+              client->hostname, username);
     }
   }
 
@@ -3021,13 +3039,13 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
     return;
   }
 
-  if (uri->num_values != 1)
+  if (ippGetCount(uri) != 1)
   {
     respond_ipp(client, IPP_BAD_REQUEST, "Too many document-uri values.");
     return;
   }
 
-  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text,
+  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, ippGetString(uri, 0, NULL),
                                scheme, sizeof(scheme), userpass,
                                sizeof(userpass), hostname, sizeof(hostname),
                                &port, resource, sizeof(resource));
@@ -3315,8 +3333,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
     httpFlush(client->http);
     return;
   }
-  else if (attr->value_tag != IPP_TAG_BOOLEAN || attr->num_values != 1 ||
-           !attr->values[0].boolean)
+  else if (ippGetValueTag(attr) != IPP_TAG_BOOLEAN || ippGetCount(attr) != 1 ||
+           !ippGetBoolean(attr, 0))
   {
     respond_unsupported(client, attr);
     httpFlush(client->http);
@@ -3341,7 +3359,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   if ((attr = ippFindAttribute(job->attrs, "document-format",
                                IPP_TAG_MIMETYPE)) != NULL)
-    job->format = attr->values[0].string.text;
+    job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
 
@@ -3545,8 +3563,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
     httpFlush(client->http);
     return;
   }
-  else if (attr->value_tag != IPP_TAG_BOOLEAN || attr->num_values != 1 ||
-           !attr->values[0].boolean)
+  else if (ippGetValueTag(attr) != IPP_TAG_BOOLEAN || ippGetCount(attr) != 1 ||
+           !ippGetBoolean(attr, 0))
   {
     respond_unsupported(client, attr);
     httpFlush(client->http);
@@ -3585,13 +3603,13 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
     return;
   }
 
-  if (uri->num_values != 1)
+  if (ippGetCount(uri) != 1)
   {
     respond_ipp(client, IPP_BAD_REQUEST, "Too many document-uri values.");
     return;
   }
 
-  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text,
+  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, ippGetString(uri, 0, NULL),
                                scheme, sizeof(scheme), userpass,
                                sizeof(userpass), hostname, sizeof(hostname),
                                &port, resource, sizeof(resource));
@@ -3628,7 +3646,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
   if ((attr = ippFindAttribute(job->attrs, "document-format",
                                IPP_TAG_MIMETYPE)) != NULL)
-    job->format = attr->values[0].string.text;
+    job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
 
@@ -3913,23 +3931,23 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Parse the request line...
   */
 
-  fprintf(stderr, "%s %s\n", client->http->hostname, uri);
+  fprintf(stderr, "%s %s\n", client->hostname, uri);
 
   if (http_state == HTTP_STATE_ERROR)
   {
-    fprintf(stderr, "%s Bad request line.\n", client->http->hostname);
+    fprintf(stderr, "%s Bad request line.\n", client->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_METHOD)
   {
-    fprintf(stderr, "%s Bad/unknown operation.\n", client->http->hostname);
+    fprintf(stderr, "%s Bad/unknown operation.\n", client->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_VERSION)
   {
-    fprintf(stderr, "%s Bad HTTP version.\n", client->http->hostname);
+    fprintf(stderr, "%s Bad HTTP version.\n", client->hostname);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
@@ -3943,7 +3961,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		      hostname, sizeof(hostname), &port,
 		      client->uri, sizeof(client->uri)) < HTTP_URI_OK)
   {
-    fprintf(stderr, "%s Bad URI \"%s\".\n", client->http->hostname, uri);
+    fprintf(stderr, "%s Bad URI \"%s\".\n", client->hostname, uri);
     respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
     return (0);
   }
@@ -4142,7 +4160,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
         while ((ipp_state = ippRead(client->http, client->request)) != IPP_DATA)
 	  if (ipp_state == IPP_ERROR)
 	  {
-            fprintf(stderr, "%s IPP read error (%s).\n", client->http->hostname,
+            fprintf(stderr, "%s IPP read error (%s).\n", client->hostname,
 	            cupsLastErrorString());
 	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
 	    return (0);
@@ -4174,6 +4192,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   ipp_attribute_t	*charset;	/* Character set attribute */
   ipp_attribute_t	*language;	/* Language attribute */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
+  int			major, minor;	/* Version number */
+  const char		*name;		/* Name of attribute */
 
 
   debug_attributes("Request", client->request, 1);
@@ -4189,22 +4209,21 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   * Then validate the request header and required attributes...
   */
 
-  if (client->request->request.any.version[0] < 1 ||
-      client->request->request.any.version[0] > 2)
+  major = ippGetVersion(client->request, &minor);
+
+  if (major < 1 || major > 2)
   {
    /*
     * Return an error, since we only support IPP 1.x and 2.x.
     */
 
     respond_ipp(client, IPP_VERSION_NOT_SUPPORTED,
-                "Bad request version number %d.%d.",
-		client->request->request.any.version[0],
-	        client->request->request.any.version[1]);
+                "Bad request version number %d.%d.", major, minor);
   }
-  else if (client->request->request.any.request_id <= 0)
+  else if (ippGetRequestId(client->request) <= 0)
     respond_ipp(client, IPP_BAD_REQUEST, "Bad request-id %d.",
-                client->request->request.any.request_id);
-  else if (!client->request->attrs)
+                ippGetRequestId(client->request));
+  else if (!ippFirstAttribute(client->request))
     respond_ipp(client, IPP_BAD_REQUEST, "No attributes in request.");
   else
   {
@@ -4213,22 +4232,23 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
     * don't repeat groups...
     */
 
-    for (attr = client->request->attrs, group = attr->group_tag;
+    for (attr = ippFirstAttribute(client->request),
+             group = ippGetGroupTag(attr);
 	 attr;
-	 attr = attr->next)
-      if (attr->group_tag < group && attr->group_tag != IPP_TAG_ZERO)
+	 attr = ippNextAttribute(client->request))
+      if (ippGetGroupTag(attr) < group && ippGetGroupTag(attr) != IPP_TAG_ZERO)
       {
        /*
 	* Out of order; return an error...
 	*/
 
 	respond_ipp(client, IPP_BAD_REQUEST,
-		       "Attribute groups are out of order (%x < %x).",
-		       attr->group_tag, group);
+		    "Attribute groups are out of order (%x < %x).",
+		    ippGetGroupTag(attr), group);
 	break;
       }
       else
-	group = attr->group_tag;
+	group = ippGetGroupTag(attr);
 
     if (!attr)
     {
@@ -4240,20 +4260,19 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
       *     printer-uri/job-uri
       */
 
-      attr = client->request->attrs;
-      if (attr && attr->name &&
-          !strcmp(attr->name, "attributes-charset") &&
-	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET)
+      attr = ippFirstAttribute(client->request);
+      name = ippGetName(attr);
+      if (attr && name && !strcmp(name, "attributes-charset") &&
+	  ippGetValueTag(attr) == IPP_TAG_CHARSET)
 	charset = attr;
       else
 	charset = NULL;
 
-      if (attr)
-        attr = attr->next;
+      attr = ippNextAttribute(client->request);
+      name = ippGetName(attr);
 
-      if (attr && attr->name &&
-          !strcmp(attr->name, "attributes-natural-language") &&
-	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
+      if (attr && name && !strcmp(name, "attributes-natural-language") &&
+	  ippGetValueTag(attr) == IPP_TAG_LANGUAGE)
 	language = attr;
       else
 	language = NULL;
@@ -4268,8 +4287,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	uri = NULL;
 
       if (charset &&
-          _cups_strcasecmp(charset->values[0].string.text, "us-ascii") &&
-          _cups_strcasecmp(charset->values[0].string.text, "utf-8"))
+          _cups_strcasecmp(ippGetString(charset, 0, NULL), "us-ascii") &&
+          _cups_strcasecmp(ippGetString(charset, 0, NULL), "utf-8"))
       {
        /*
         * Bad character set...
@@ -4277,7 +4296,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 
 	respond_ipp(client, IPP_BAD_REQUEST,
 	            "Unsupported character set \"%s\".",
-	            charset->values[0].string.text);
+	            ippGetString(charset, 0, NULL));
       }
       else if (!charset || !language || !uri)
       {
@@ -4289,12 +4308,12 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 
 	respond_ipp(client, IPP_BAD_REQUEST, "Missing required attributes.");
       }
-      else if (strcmp(uri->values[0].string.text, client->printer->uri) &&
-               strncmp(uri->values[0].string.text, client->printer->uri,
+      else if (strcmp(ippGetString(uri, 0, NULL), client->printer->uri) &&
+               strncmp(ippGetString(uri, 0, NULL), client->printer->uri,
 	               client->printer->urilen))
       {
-        respond_ipp(client, IPP_NOT_FOUND, "%s %s not found.", uri->name,
-	            uri->values[0].string.text);
+        respond_ipp(client, IPP_NOT_FOUND, "%s %s not found.", ippGetName(uri),
+	            ippGetString(uri, 0, NULL));
       }
       else
       {
@@ -4577,7 +4596,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
   char	message[1024];			/* Text message */
 
 
-  fprintf(stderr, "%s %s\n", client->http->hostname, httpStatus(code));
+  fprintf(stderr, "%s %s\n", client->hostname, httpStatus(code));
 
   if (code == HTTP_STATUS_CONTINUE)
   {
@@ -4689,11 +4708,11 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
   }
 
   if (formatted)
-    fprintf(stderr, "%s %s %s (%s)\n", client->http->hostname,
+    fprintf(stderr, "%s %s %s (%s)\n", client->hostname,
 	    ippOpString(client->operation_id), ippErrorString(status),
 	    formatted);
   else
-    fprintf(stderr, "%s %s %s\n", client->http->hostname,
+    fprintf(stderr, "%s %s %s\n", client->hostname,
 	    ippOpString(client->operation_id), ippErrorString(status));
 }
 
@@ -4712,8 +4731,8 @@ respond_unsupported(
 
   if (!client->response->attrs)
     respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.",
-		attr->name, attr->num_values > 1 ? "1setOf " : "",
-		ippTagString(attr->value_tag));
+		attr->name, ippGetCount(attr) > 1 ? "1setOf " : "",
+		ippTagString(ippGetValueTag(attr)));
   else
     ippSetStatusCode(client->response, IPP_ATTRIBUTES);
 
@@ -4872,14 +4891,14 @@ valid_doc_attributes(
     * If compression is specified, only accept "none"...
     */
 
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD ||
-        strcmp(attr->values[0].string.text, "none"))
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
+        strcmp(ippGetString(attr, 0, NULL), "none"))
       respond_unsupported(client, attr);
     else
       fprintf(stderr, "%s %s compression=\"%s\"\n",
-              client->http->hostname,
+              client->hostname,
               ippOpString(client->request->request.op.operation_id),
-              attr->values[0].string.text);
+              ippGetString(attr, 0, NULL));
   }
 
  /*
@@ -4889,14 +4908,14 @@ valid_doc_attributes(
   if ((attr = ippFindAttribute(client->request, "document-format",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_MIMETYPE)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_MIMETYPE)
       respond_unsupported(client, attr);
     else
     {
-      format = attr->values[0].string.text;
+      format = ippGetString(attr, 0, NULL);
 
       fprintf(stderr, "%s %s document-format=\"%s\"\n",
-	      client->http->hostname,
+	      client->hostname,
 	      ippOpString(client->request->request.op.operation_id), format);
     }
   }
@@ -4928,7 +4947,7 @@ valid_doc_attributes(
 
     if (format)
       fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
-	      client->http->hostname,
+	      client->hostname,
 	      ippOpString(client->request->request.op.operation_id), format);
 
     if (!attr)
@@ -4936,8 +4955,8 @@ valid_doc_attributes(
                           "document-format", NULL, format);
     else
     {
-      _cupsStrFree(attr->values[0].string.text);
-      attr->values[0].string.text = _cupsStrAlloc(format);
+      _cupsStrFree(ippGetString(attr, 0, NULL));
+      ippGetString(attr, 0, NULL) = _cupsStrAlloc(format);
     }
   }
 
@@ -4989,8 +5008,8 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "copies",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_INTEGER ||
-        attr->values[0].integer < 1 || attr->values[0].integer > 999)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_INTEGER ||
+        ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 999)
     {
       respond_unsupported(client, attr);
     }
@@ -4999,7 +5018,7 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "ipp-attribute-fidelity",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_BOOLEAN)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_BOOLEAN)
     {
       respond_unsupported(client, attr);
     }
@@ -5008,11 +5027,11 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "job-hold-until",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 ||
-        (attr->value_tag != IPP_TAG_NAME &&
-	 attr->value_tag != IPP_TAG_NAMELANG &&
-	 attr->value_tag != IPP_TAG_KEYWORD) ||
-	strcmp(attr->values[0].string.text, "no-hold"))
+    if (ippGetCount(attr) != 1 ||
+        (ippGetValueTag(attr) != IPP_TAG_NAME &&
+	 ippGetValueTag(attr) != IPP_TAG_NAMELANG &&
+	 ippGetValueTag(attr) != IPP_TAG_KEYWORD) ||
+	strcmp(ippGetString(attr, 0, NULL), "no-hold"))
     {
       respond_unsupported(client, attr);
     }
@@ -5021,9 +5040,9 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "job-name",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 ||
-        (attr->value_tag != IPP_TAG_NAME &&
-	 attr->value_tag != IPP_TAG_NAMELANG))
+    if (ippGetCount(attr) != 1 ||
+        (ippGetValueTag(attr) != IPP_TAG_NAME &&
+	 ippGetValueTag(attr) != IPP_TAG_NAMELANG))
     {
       respond_unsupported(client, attr);
     }
@@ -5032,8 +5051,8 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "job-priority",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_INTEGER ||
-        attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_INTEGER ||
+        ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 100)
     {
       respond_unsupported(client, attr);
     }
@@ -5042,11 +5061,11 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "job-sheets",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 ||
-        (attr->value_tag != IPP_TAG_NAME &&
-	 attr->value_tag != IPP_TAG_NAMELANG &&
-	 attr->value_tag != IPP_TAG_KEYWORD) ||
-	strcmp(attr->values[0].string.text, "none"))
+    if (ippGetCount(attr) != 1 ||
+        (ippGetValueTag(attr) != IPP_TAG_NAME &&
+	 ippGetValueTag(attr) != IPP_TAG_NAMELANG &&
+	 ippGetValueTag(attr) != IPP_TAG_KEYWORD) ||
+	strcmp(ippGetString(attr, 0, NULL), "none"))
     {
       respond_unsupported(client, attr);
     }
@@ -5055,10 +5074,10 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "media",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 ||
-        (attr->value_tag != IPP_TAG_NAME &&
-	 attr->value_tag != IPP_TAG_NAMELANG &&
-	 attr->value_tag != IPP_TAG_KEYWORD))
+    if (ippGetCount(attr) != 1 ||
+        (ippGetValueTag(attr) != IPP_TAG_NAME &&
+	 ippGetValueTag(attr) != IPP_TAG_NAMELANG &&
+	 ippGetValueTag(attr) != IPP_TAG_KEYWORD))
     {
       respond_unsupported(client, attr);
     }
@@ -5067,7 +5086,7 @@ valid_job_attributes(
       for (i = 0;
            i < (int)(sizeof(media_supported) / sizeof(media_supported[0]));
 	   i ++)
-        if (!strcmp(attr->values[0].string.text, media_supported[i]))
+        if (!strcmp(ippGetString(attr, 0, NULL), media_supported[i]))
 	  break;
 
       if (i >= (int)(sizeof(media_supported) / sizeof(media_supported[0])))
@@ -5080,7 +5099,7 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "media-col",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_BEGIN_COLLECTION)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
     {
       respond_unsupported(client, attr);
     }
@@ -5090,10 +5109,10 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "multiple-document-handling",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD ||
-        (strcmp(attr->values[0].string.text,
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
+        (strcmp(ippGetString(attr, 0, NULL),
 		"separate-documents-uncollated-copies") &&
-	 strcmp(attr->values[0].string.text,
+	 strcmp(ippGetString(attr, 0, NULL),
 		"separate-documents-collated-copies")))
     {
       respond_unsupported(client, attr);
@@ -5103,9 +5122,9 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "orientation-requested",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_ENUM ||
-        attr->values[0].integer < IPP_PORTRAIT ||
-        attr->values[0].integer > IPP_REVERSE_PORTRAIT)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_ENUM ||
+        ippGetInteger(attr, 0) < IPP_PORTRAIT ||
+        ippGetInteger(attr, 0) > IPP_REVERSE_PORTRAIT)
     {
       respond_unsupported(client, attr);
     }
@@ -5120,9 +5139,9 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "print-quality",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_ENUM ||
-        attr->values[0].integer < IPP_QUALITY_DRAFT ||
-        attr->values[0].integer > IPP_QUALITY_HIGH)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_ENUM ||
+        ippGetInteger(attr, 0) < IPP_QUALITY_DRAFT ||
+        ippGetInteger(attr, 0) > IPP_QUALITY_HIGH)
     {
       respond_unsupported(client, attr);
     }
@@ -5137,7 +5156,7 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "sides",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD)
     {
       respond_unsupported(client, attr);
     }
@@ -5146,7 +5165,7 @@ valid_job_attributes(
                                       IPP_TAG_KEYWORD)) != NULL)
     {
       for (i = 0; i < supported->num_values; i ++)
-        if (!strcmp(attr->values[0].string.text,
+        if (!strcmp(ippGetString(attr, 0, NULL),
 	            supported->values[i].string.text))
 	  break;
 
