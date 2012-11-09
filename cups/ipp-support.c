@@ -941,20 +941,25 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * See if the error code is a known value...
   */
 
-  if (error >= IPP_OK && error <= IPP_OK_EVENTS_COMPLETE)
+  if (error >= IPP_STATUS_OK && error <= IPP_STATUS_OK_EVENTS_COMPLETE)
     return (ipp_status_oks[error]);
-  else if (error == IPP_REDIRECTION_OTHER_SITE)
+  else if (error == IPP_STATUS_REDIRECTION_OTHER_SITE)
     return ("redirection-other-site");
-  else if (error == CUPS_SEE_OTHER)
+  else if (error == IPP_STATUS_CUPS_SEE_OTHER)
     return ("cups-see-other");
-  else if (error >= IPP_BAD_REQUEST && error <= IPP_DOCUMENT_UNPRINTABLE_ERROR)
-    return (ipp_status_400s[error - IPP_BAD_REQUEST]);
-  else if (error >= 0x480 && error <= CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+  else if (error >= IPP_STATUS_ERROR_BAD_REQUEST &&
+           error <= IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE)
+    return (ipp_status_400s[error - IPP_STATUS_ERROR_BAD_REQUEST]);
+  else if (error >= 0x480 &&
+           error <= IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
     return (ipp_status_480s[error - 0x0480]);
-  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_TOO_MANY_DOCUMENTS)
-    return (ipp_status_500s[error - IPP_INTERNAL_ERROR]);
-  else if (error >= IPP_AUTHENTICATION_CANCELED && error <= IPP_UPGRADE_REQUIRED)
-    return (ipp_status_1000s[error - IPP_AUTHENTICATION_CANCELED]);
+  else if (error >= IPP_STATUS_ERROR_INTERNAL &&
+           error <= IPP_STATUS_ERROR_TOO_MANY_DOCUMENTS)
+    return (ipp_status_500s[error - IPP_STATUS_ERROR_INTERNAL]);
+  else if (error >= IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED &&
+           error <= IPP_STATUS_ERROR_CUPS_UPGRADE_REQUIRED)
+    return (ipp_status_1000s[error -
+                             IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED]);
 
  /*
   * No, build an "0xxxxx" error string...
@@ -983,10 +988,10 @@ ippErrorValue(const char *name)		/* I - Name */
       return ((ipp_status_t)i);
 
   if (!_cups_strcasecmp(name, "redirection-other-site"))
-    return (IPP_REDIRECTION_OTHER_SITE);
+    return (IPP_STATUS_REDIRECTION_OTHER_SITE);
 
   if (!_cups_strcasecmp(name, "cups-see-other"))
-    return (CUPS_SEE_OTHER);
+    return (IPP_STATUS_CUPS_SEE_OTHER);
 
   for (i = 0; i < (sizeof(ipp_status_400s) / sizeof(ipp_status_400s[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_status_400s[i]))
@@ -1024,13 +1029,13 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * See if the operation ID is a known value...
   */
 
-  if (op >= IPP_PRINT_JOB && op <= IPP_CLOSE_JOB)
+  if (op >= IPP_OP_PRINT_JOB && op <= IPP_OP_CLOSE_JOB)
     return (ipp_std_ops[op]);
-  else if (op == IPP_PRIVATE)
+  else if (op == IPP_OP_PRIVATE)
     return ("windows-ext");
-  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_GET_PPD)
+  else if (op >= IPP_OP_CUPS_GET_DEFAULT && op <= IPP_OP_CUPS_GET_PPD)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
-  else if (op == CUPS_GET_DOCUMENT)
+  else if (op == IPP_OP_CUPS_GET_DOCUMENT)
     return (ipp_cups_ops2[0]);
 
  /*
@@ -1063,7 +1068,7 @@ ippOpValue(const char *name)		/* I - Textual name */
       return ((ipp_op_t)i);
 
   if (!_cups_strcasecmp(name, "windows-ext"))
-    return (IPP_PRIVATE);
+    return (IPP_OP_PRIVATE);
 
   for (i = 0; i < (sizeof(ipp_cups_ops) / sizeof(ipp_cups_ops[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_cups_ops[i]))
@@ -1074,12 +1079,12 @@ ippOpValue(const char *name)		/* I - Textual name */
       return ((ipp_op_t)(i + 0x4027));
 
   if (!_cups_strcasecmp(name, "CUPS-Add-Class"))
-    return (CUPS_ADD_MODIFY_CLASS);
+    return (IPP_OP_CUPS_ADD_MODIFY_CLASS);
 
   if (!_cups_strcasecmp(name, "CUPS-Add-Printer"))
-    return (CUPS_ADD_MODIFY_PRINTER);
+    return (IPP_OP_CUPS_ADD_MODIFY_PRINTER);
 
-  return (CUPS_INVALID_OPERATION);
+  return (IPP_OP_CUPS_INVALID);
 }
 
 

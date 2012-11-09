@@ -238,6 +238,7 @@ typedef enum http_state_e		/**** HTTP state values; states
 typedef enum http_status_e		/**** HTTP status codes ****/
 {
   HTTP_STATUS_ERROR = -1,		/* An error response from httpXxxx() */
+  HTTP_STATUS_NONE = 0,			/* No Expect value @since CUPS 1.7@ */
 
   HTTP_STATUS_CONTINUE = 100,		/* Everything OK, keep going... */
   HTTP_STATUS_SWITCHING_PROTOCOLS,	/* HTTP upgrade to TLS/SSL */
@@ -598,6 +599,7 @@ extern http_t		*httpConnect2(const char *host, int port,
 				      int family, http_encryption_t encryption,
 				      int blocking, int msec, int *cancel)
 				      _CUPS_API_1_7;
+extern http_status_t	httpGetExpect(http_t *http) _CUPS_API_1_7;
 extern ssize_t		httpPeek(http_t *http, char *buffer, size_t length)
 			         _CUPS_API_1_7;
 extern http_state_t	httpReadRequest(http_t *http, char *resource,

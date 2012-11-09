@@ -52,6 +52,7 @@
  *   httpGetBlocking()		  - Get the blocking/non-block state of a
  *				    connection.
  *   httpGetCookie()		  - Get any cookie data from the response.
+ *   httpGetExpect()              - Get the value of the Expect header, if any.
  *   httpGetFd()		  - Get the file descriptor associated with a
  *				    connection.
  *   httpGetField()		  - Get a field value from a request/response.
@@ -1148,6 +1149,25 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
 
 
 /*
+ * 'httpGetExpect()' - Get the value of the Expect header, if any.
+ *
+ * Returns @code HTTP_STATUS_NONE@ if there is no Expect header, otherwise
+ * returns the expected HTTP status code, typically @code HTTP_STATUS_CONTINUE@.
+ *
+ * @since CUPS 1.7@
+ */
+
+http_status_t				/* O - Expect: status, if any */
+httpGetExpect(http_t *http)		/* I - Connection to client */
+{
+  if (!http)
+    return (HTTP_STATUS_ERROR);
+  else
+    return (http->expect);
+}
+
+
+/*
  * 'httpGetFd()' - Get the file descriptor associated with a connection.
  *
  * @since CUPS 1.2/OS X 10.5@
@@ -1277,9 +1297,10 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
       else
         http->data_remaining = 2147483647;
     }
-    else
-      http->data_remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
-                                     NULL, 10);
+    else if ((http->data_remaining =
+                  strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
+			  NULL, 10)) < 0)
+      return (-1);
 
     DEBUG_printf(("4httpGetLength2: content_length=" CUPS_LLFMT,
                   CUPS_LLCAST http->data_remaining));
@@ -3192,12 +3213,18 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 	return (0);
       }
 
-      *status = HTTP_CONTINUE;
+      *status = HTTP_STATUS_CONTINUE;
       return (0);
     }
 #endif /* HAVE_SSL */
 
-    httpGetLength2(http);
+    if (httpGetLength2(http) < 0)
+    {
+      DEBUG_puts("1_httpUpdate: Bad Content-Length.");
+      http->error  = EINVAL;
+      http->status = *status = HTTP_ERROR;
+      return (0);
+    }
 
     switch (http->state)
     {
@@ -3280,7 +3307,8 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
   else
   {
     DEBUG_printf(("1_httpUpdate: Bad response line \"%s\"!", line));
-    *status = http->status = HTTP_ERROR;
+    http->error  = EINVAL;
+    http->status = *status = HTTP_ERROR;
     return (0);
   }
 

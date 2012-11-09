@@ -1375,19 +1375,20 @@ main(int  argc,				/* I - Number of command-line args */
     if (job_canceled)
       break;
 
-    if (ipp_status == IPP_SERVICE_UNAVAILABLE || ipp_status == IPP_PRINTER_BUSY)
+    if (ipp_status == IPP_STATUS_ERROR_SERVICE_UNAVAILABLE ||
+        ipp_status == IPP_STATUS_ERROR_BUSY)
     {
       _cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
       sleep(10);
     }
-    else if (ipp_status == IPP_DOCUMENT_FORMAT ||
-             ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
-             ipp_status == CUPS_ACCOUNT_CLOSED ||
-             ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
-             ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+    else if (ipp_status == IPP_STATUS_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
       goto cleanup;
-    else if (ipp_status == IPP_FORBIDDEN ||
-	     ipp_status == IPP_AUTHENTICATION_CANCELED)
+    else if (ipp_status == IPP_STATUS_ERROR_FORBIDDEN ||
+	     ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
     {
       const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 					/* WWW-Authenticate field value */
@@ -1399,7 +1400,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       goto cleanup;
     }
-    else if (ipp_status == IPP_OPERATION_NOT_SUPPORTED)
+    else if (ipp_status == IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED)
     {
      /*
       * This is all too common...
@@ -1529,9 +1530,9 @@ main(int  argc,				/* I - Number of command-line args */
       if (job_canceled)
         break;
 
-      if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
-          ipp_status == IPP_NOT_POSSIBLE ||
-	  ipp_status == IPP_PRINTER_BUSY)
+      if (ipp_status == IPP_STATUS_ERROR_SERVICE_UNAVAILABLE ||
+          ipp_status == IPP_STATUS_ERROR_NOT_POSSIBLE ||
+	  ipp_status == IPP_STATUS_ERROR_BUSY)
       {
 	_cupsLangPrintFilter(stderr, "INFO", _("The printer is in use."));
 	sleep(10);
@@ -1546,12 +1547,12 @@ main(int  argc,				/* I - Number of command-line args */
 	  goto cleanup;
 	}
       }
-      else if (ipp_status == IPP_ERROR_JOB_CANCELED ||
-               ipp_status == IPP_NOT_AUTHORIZED ||
-	       ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
-	       ipp_status == CUPS_ACCOUNT_CLOSED ||
-	       ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
-	       ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+      else if (ipp_status == IPP_STATUS_ERROR_JOB_CANCELED ||
+               ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED ||
+	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
+	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
+	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
+	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
         goto cleanup;
       else
       {
@@ -1562,8 +1563,8 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPrintFilter(stderr, "ERROR",
 	                     _("Print job was not accepted."));
 
-        if (ipp_status == IPP_FORBIDDEN ||
-            ipp_status == IPP_AUTHENTICATION_CANCELED)
+        if (ipp_status == IPP_STATUS_ERROR_FORBIDDEN ||
+            ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
 	{
 	  const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 					/* WWW-Authenticate field value */
@@ -1747,10 +1748,10 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_REQUEST_VALUE ||
              ipp_status == IPP_ERROR_JOB_CANCELED ||
              ipp_status == IPP_NOT_AUTHORIZED ||
-             ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
-             ipp_status == CUPS_ACCOUNT_CLOSED ||
-             ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
-             ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
+             ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED ||
              ipp_status == IPP_INTERNAL_ERROR)
     {
      /*
@@ -2004,21 +2005,21 @@ main(int  argc,				/* I - Number of command-line args */
       ipp_status <= IPP_OK_CONFLICT)
     fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 
-  if (ipp_status == CUPS_ACCOUNT_INFO_NEEDED)
+  if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED)
     fputs("JOBSTATE: account-info-needed\n", stderr);
-  else if (ipp_status == CUPS_ACCOUNT_CLOSED)
+  else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED)
     fputs("JOBSTATE: account-closed\n", stderr);
-  else if (ipp_status == CUPS_ACCOUNT_LIMIT_REACHED)
+  else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED)
     fputs("JOBSTATE: account-limit-reached\n", stderr);
-  else if (ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+  else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
     fputs("JOBSTATE: account-authorization-failed\n", stderr);
 
   if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
       ipp_status == IPP_AUTHENTICATION_CANCELED ||
-      ipp_status == CUPS_ACCOUNT_INFO_NEEDED ||
-      ipp_status == CUPS_ACCOUNT_CLOSED ||
-      ipp_status == CUPS_ACCOUNT_LIMIT_REACHED ||
-      ipp_status == CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
+      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
+      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
+      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);

@@ -73,12 +73,23 @@
  */
 
 /*
+ * Disable private and deprecated stuff so we can verify that the public API
+ * is sufficient to implement a server.
+ */
+
+#define _IPP_PRIVATE_STRUCTURES 0	/* Disable private IPP stuff */
+//#define _CUPS_NO_DEPRECATED 1		/* Disable deprecated stuff */
+
+
+/*
  * Include necessary headers...
  */
 
-//#define _IPP_PRIVATE_STRUCTURES 0	/* Force non-private IPP stuff */
-//#define _CUPS_NO_DEPRECATED 1		/* Force no deprecated stuff */
-#include <cups/cups-private.h>
+#include <cups/cups.h>			/* Public API */
+#include <config.h>			/* CUPS configuration header */
+#include <cups/string-private.h>	/* For string functions */
+#include <cups/thread-private.h>	/* For multithreading functions */
+
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
@@ -865,57 +876,24 @@ static int				/* O  - Listener socket or -1 on error */
 create_listener(int family,		/* I  - Address family */
                 int *port)		/* IO - Port number */
 {
-  int		sock,			/* Listener socket */
-		val;			/* Socket value */
-  http_addr_t	address;		/* Listen address */
-  socklen_t	addrlen;		/* Length of listen address */
+  int			sock;		/* Listener socket */
+  http_addrlist_t	*addrlist;	/* Listen address */
+  char			service[255];	/* Service port */
 
-
-  if ((sock = socket(family, SOCK_STREAM, 0)) < 0)
-    return (-1);
-
-  val = 1;
-  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-
-#ifdef IPV6_V6ONLY
-  if (family == AF_INET6)
-    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
-#endif /* IPV6_V6ONLY */
 
   if (!*port)
   {
-   /*
-    * Get the auto-assigned port number for the IPv4 socket...
-    */
-
-    /* TODO: This code does not appear to work - port is always 0... */
-    addrlen = sizeof(address);
-    if (getsockname(sock, (struct sockaddr *)&address, &addrlen))
-    {
-      perror("getsockname() failed");
-      *port = 8631;
-    }
-    else
-      *port = httpAddrPort(&address);
-
+    *port = 8000 + (getuid() % 1000);
     fprintf(stderr, "Listening on port %d.\n", *port);
   }
 
-  memset(&address, 0, sizeof(address));
-  address.addr.sa_family = family;
-  _httpAddrSetPort(&address, *port);
-
-  if (bind(sock, (struct sockaddr *)&address, httpAddrLength(&address)))
-  {
-    close(sock);
+  snprintf(service, sizeof(service), "%d", *port);
+  if ((addrlist = httpAddrGetList(NULL, family, service)) == NULL)
     return (-1);
-  }
 
-  if (listen(sock, 5))
-  {
-    close(sock);
-    return (-1);
-  }
+  sock = httpAddrListen(&(addrlist->addr), *port);
+
+  httpAddrFreeList(addrlist);
 
   return (sock);
 }
@@ -2464,9 +2442,9 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http->state == HTTP_POST_RECV)
+  if (httpGetState(client->http) == HTTP_STATE_POST_RECV)
   {
-    respond_ipp(client, IPP_BAD_REQUEST,
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
                 "Unexpected document data following request.");
     return;
   }
@@ -2839,7 +2817,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http->state == HTTP_POST_SEND)
+  if (httpGetState(client->http) == HTTP_STATE_POST_SEND)
   {
     respond_ipp(client, IPP_BAD_REQUEST, "No file in request.");
     return;
@@ -3021,7 +2999,7 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http->state == HTTP_POST_RECV)
+  if (httpGetState(client->http) == HTTP_POST_RECV)
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Unexpected document data following request.");
@@ -3585,7 +3563,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   * Do we have a file to print?
   */
 
-  if (client->http->state == HTTP_POST_RECV)
+  if (httpGetState(client->http) == HTTP_POST_RECV)
   {
     respond_ipp(client, IPP_BAD_REQUEST,
                 "Unexpected document data following request.");
@@ -3985,8 +3963,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     return (0);
   }
 
-  if (!client->http->fields[HTTP_FIELD_HOST][0] &&
-      client->http->version >= HTTP_VERSION_1_1)
+  if (!httpGetField(client->http, HTTP_FIELD_HOST)[0] &&
+      httpGetVersion(client->http) >= HTTP_VERSION_1_1)
   {
    /*
     * HTTP/1.1 and higher require the "Host:" field...
@@ -4000,7 +3978,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle HTTP Upgrade...
   */
 
-  if (!_cups_strcasecmp(client->http->fields[HTTP_FIELD_CONNECTION], "Upgrade"))
+  if (!_cups_strcasecmp(httpGetField(client->http, HTTP_FIELD_CONNECTION),
+                        "Upgrade"))
   {
     if (!respond_http(client, HTTP_NOT_IMPLEMENTED, NULL, 0))
       return (0);
@@ -4010,11 +3989,11 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle HTTP Expect...
   */
 
-  if (client->http->expect &&
+  if (httpGetExpect(client->http) &&
       (client->operation == HTTP_STATE_POST ||
        client->operation == HTTP_STATE_PUT))
   {
-    if (client->http->expect == HTTP_STATUS_CONTINUE)
+    if (httpGetExpect(client->http) == HTTP_STATUS_CONTINUE)
     {
      /*
       * Send 100-continue header...
@@ -4031,11 +4010,6 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
       if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, 0))
 	return (0);
-
-      httpPrintf(client->http, "Content-Length: 0\r\n");
-      httpPrintf(client->http, "\r\n");
-      httpFlushWrite(client->http);
-      client->http->data_encoding = HTTP_ENCODING_LENGTH;
     }
   }
 
@@ -4130,18 +4104,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	break;
 
     case HTTP_POST :
-	if (client->http->data_remaining < 0 ||
-	    (!client->http->fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
-	     client->http->data_encoding == HTTP_ENCODING_LENGTH))
-	{
-	 /*
-	  * Negative content lengths are invalid...
-	  */
-
-	  return (respond_http(client, HTTP_BAD_REQUEST, NULL, 0));
-	}
-
-	if (strcmp(client->http->fields[HTTP_FIELD_CONTENT_TYPE],
+	if (strcmp(httpGetField(client->http, HTTP_FIELD_CONTENT_TYPE),
 	           "application/ipp"))
         {
 	 /*
@@ -4157,14 +4120,17 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	client->request = ippNew();
 
-        while ((ipp_state = ippRead(client->http, client->request)) != IPP_DATA)
-	  if (ipp_state == IPP_ERROR)
+        while ((ipp_state = ippRead(client->http,
+                                    client->request)) != IPP_STATE_DATA)
+	{
+	  if (ipp_state == IPP_STATE_ERROR)
 	  {
             fprintf(stderr, "%s IPP read error (%s).\n", client->hostname,
 	            cupsLastErrorString());
 	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
 	    return (0);
 	  }
+	}
 
        /*
         * Now that we have the IPP request, process the request...
@@ -4321,7 +4287,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
         * Try processing the operation...
 	*/
 
-        if (client->http->expect == HTTP_CONTINUE)
+        if (httpGetExpect(client->http) == HTTP_CONTINUE)
 	{
 	 /*
 	  * Send 100-continue header...
@@ -4331,7 +4297,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	    return (0);
 	}
 
-	switch (client->request->request.op.operation_id)
+	switch (ippGetOperation(client->request))
 	{
 	  case IPP_PRINT_JOB :
               ipp_print_job(client);
@@ -4386,7 +4352,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   * Send the HTTP header and return...
   */
 
-  if (client->http->state != HTTP_POST_SEND)
+  if (httpGetState(client->http) != HTTP_POST_SEND)
     httpFlush(client->http);		/* Flush trailing (junk) data */
 
   return (respond_http(client, HTTP_OK, "application/ipp",
@@ -4665,9 +4631,9 @@ respond_http(_ipp_client_t *client,	/* I - Client */
 
     debug_attributes("Response", client->response, 2);
 
-    client->response->state = IPP_IDLE;
+    ippSetState(client->response, IPP_STATE_IDLE);
 
-    if (ippWrite(client->http, client->response) != IPP_DATA)
+    if (ippWrite(client->http, client->response) != IPP_STATE_DATA)
       return (0);
   }
 
@@ -4729,12 +4695,9 @@ respond_unsupported(
   ipp_attribute_t	*temp;		/* Copy of attribute */
 
 
-  if (!client->response->attrs)
-    respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.",
-		attr->name, ippGetCount(attr) > 1 ? "1setOf " : "",
-		ippTagString(ippGetValueTag(attr)));
-  else
-    ippSetStatusCode(client->response, IPP_ATTRIBUTES);
+  respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.",
+	      ippGetName(attr), ippGetCount(attr) > 1 ? "1setOf " : "",
+	      ippTagString(ippGetValueTag(attr)));
 
   temp = ippCopyAttribute(client->response, attr, 0);
   ippSetGroupTag(client->response, &temp, IPP_TAG_UNSUPPORTED_GROUP);
@@ -4874,7 +4837,8 @@ static int				/* O - 1 if valid, 0 if not */
 valid_doc_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
-  int			i;		/* Looping var */
+  int			i,		/* Looping var */
+			valid = 1;	/* Valid attributes? */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*supported;	/* document-format-supported */
   const char		*format = NULL;	/* document-format value */
@@ -4893,12 +4857,17 @@ valid_doc_attributes(
 
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
         strcmp(ippGetString(attr, 0, NULL), "none"))
+    {
       respond_unsupported(client, attr);
+      valid = 0;
+    }
     else
+    {
       fprintf(stderr, "%s %s compression=\"%s\"\n",
               client->hostname,
-              ippOpString(client->request->request.op.operation_id),
+              ippOpString(ippGetOperation(client->request)),
               ippGetString(attr, 0, NULL));
+    }
   }
 
  /*
@@ -4909,22 +4878,25 @@ valid_doc_attributes(
                                IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_MIMETYPE)
+    {
       respond_unsupported(client, attr);
+      valid = 0;
+    }
     else
     {
       format = ippGetString(attr, 0, NULL);
 
       fprintf(stderr, "%s %s document-format=\"%s\"\n",
 	      client->hostname,
-	      ippOpString(client->request->request.op.operation_id), format);
+	      ippOpString(ippGetOperation(client->request)), format);
     }
   }
   else
     format = "application/octet-stream";
 
   if (!strcmp(format, "application/octet-stream") &&
-      (client->request->request.op.operation_id == IPP_PRINT_JOB ||
-       client->request->request.op.operation_id == IPP_SEND_DOCUMENT))
+      (ippGetOperation(client->request) == IPP_PRINT_JOB ||
+       ippGetOperation(client->request) == IPP_SEND_DOCUMENT))
   {
    /*
     * Auto-type the file using the first 4 bytes of the file...
@@ -4948,7 +4920,7 @@ valid_doc_attributes(
     if (format)
       fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
 	      client->hostname,
-	      ippOpString(client->request->request.op.operation_id), format);
+	      ippOpString(ippGetOperation(client->request)), format);
 
     if (!attr)
       attr = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
@@ -4957,22 +4929,25 @@ valid_doc_attributes(
       ippSetString(client->request, &attr, 0, format);
   }
 
-  if (client->request->request.op.operation_id != IPP_CREATE_JOB &&
+  if (ippGetOperation(client->request) != IPP_CREATE_JOB &&
       (supported = ippFindAttribute(client->printer->attrs,
                                     "document-format-supported",
 			            IPP_TAG_MIMETYPE)) != NULL)
   {
-    for (i = 0; i < supported->num_values; i ++)
-      if (!_cups_strcasecmp(format, supported->values[i].string.text))
+    int count = ippGetCount(supported);
+
+    for (i = 0; i < count; i ++)
+      if (!_cups_strcasecmp(format, ippGetString(supported, i, NULL)))
 	break;
 
-    if (i >= supported->num_values && attr)
+    if (i >= count && attr)
+    {
       respond_unsupported(client, attr);
+      valid = 0;
+    }
   }
 
-  return (!client->response->attrs ||
-          !client->response->attrs->next ||
-          !client->response->attrs->next->next);
+  return (valid);
 }
 
 
@@ -4987,7 +4962,8 @@ static int				/* O - 1 if valid, 0 if not */
 valid_job_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
-  int			i;		/* Looping var */
+  int			i,		/* Looping var */
+			valid = 1;	/* Valid attributes? */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*supported;	/* xxx-supported attribute */
 
@@ -4996,7 +4972,7 @@ valid_job_attributes(
   * Check operation attributes...
   */
 
-  valid_doc_attributes(client);
+  valid = valid_doc_attributes(client);
 
  /*
   * Check the various job template attributes...
@@ -5009,6 +4985,7 @@ valid_job_attributes(
         ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 999)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5018,6 +4995,7 @@ valid_job_attributes(
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_BOOLEAN)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5031,6 +5009,7 @@ valid_job_attributes(
 	strcmp(ippGetString(attr, 0, NULL), "no-hold"))
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5042,6 +5021,7 @@ valid_job_attributes(
 	 ippGetValueTag(attr) != IPP_TAG_NAMELANG))
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5052,6 +5032,7 @@ valid_job_attributes(
         ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 100)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5065,6 +5046,7 @@ valid_job_attributes(
 	strcmp(ippGetString(attr, 0, NULL), "none"))
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5077,6 +5059,7 @@ valid_job_attributes(
 	 ippGetValueTag(attr) != IPP_TAG_KEYWORD))
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
     else
     {
@@ -5089,6 +5072,7 @@ valid_job_attributes(
       if (i >= (int)(sizeof(media_supported) / sizeof(media_supported[0])))
       {
 	respond_unsupported(client, attr);
+	valid = 0;
       }
     }
   }
@@ -5096,9 +5080,11 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "media-col",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
+    if (ippGetCount(attr) != 1 ||
+        ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
     /* TODO: check for valid media-col */
   }
@@ -5113,6 +5099,7 @@ valid_job_attributes(
 		"separate-documents-collated-copies")))
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5124,6 +5111,7 @@ valid_job_attributes(
         ippGetInteger(attr, 0) > IPP_REVERSE_PORTRAIT)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5131,6 +5119,7 @@ valid_job_attributes(
                                IPP_TAG_ZERO)) != NULL)
   {
     respond_unsupported(client, attr);
+      valid = 0;
   }
 
   if ((attr = ippFindAttribute(client->request, "print-quality",
@@ -5141,6 +5130,7 @@ valid_job_attributes(
         ippGetInteger(attr, 0) > IPP_QUALITY_HIGH)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
@@ -5148,6 +5138,7 @@ valid_job_attributes(
                                IPP_TAG_ZERO)) != NULL)
   {
     respond_unsupported(client, attr);
+    valid = 0;
   }
 
   if ((attr = ippFindAttribute(client->request, "sides",
@@ -5156,30 +5147,33 @@ valid_job_attributes(
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD)
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
 
     if ((supported = ippFindAttribute(client->printer->attrs, "sides",
                                       IPP_TAG_KEYWORD)) != NULL)
     {
-      for (i = 0; i < supported->num_values; i ++)
-        if (!strcmp(ippGetString(attr, 0, NULL),
-	            supported->values[i].string.text))
+      int count = ippGetCount(supported);
+      const char *sides = ippGetString(attr, 0, NULL);
+
+      for (i = 0; i < count; i ++)
+        if (!strcmp(sides, ippGetString(supported, i, NULL)))
 	  break;
 
-      if (i >= supported->num_values)
+      if (i >= count)
       {
 	respond_unsupported(client, attr);
+	valid = 0;
       }
     }
     else
     {
       respond_unsupported(client, attr);
+      valid = 0;
     }
   }
 
-  return (!client->response->attrs ||
-          !client->response->attrs->next ||
-          !client->response->attrs->next->next);
+  return (valid);
 }
 
 

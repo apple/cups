@@ -42,7 +42,7 @@ static const ipp_op_t ipp_job_creation[] =
   IPP_PRINT_JOB,
   IPP_PRINT_URI,
   IPP_CREATE_JOB,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_doc_creation[] =
@@ -51,7 +51,7 @@ static const ipp_op_t ipp_doc_creation[] =
   IPP_PRINT_URI,
   IPP_SEND_DOCUMENT,
   IPP_SEND_URI,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_sub_creation[] =
@@ -61,7 +61,7 @@ static const ipp_op_t ipp_sub_creation[] =
   IPP_CREATE_JOB,
   IPP_CREATE_PRINTER_SUBSCRIPTION,
   IPP_CREATE_JOB_SUBSCRIPTION,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_all_print[] =
@@ -71,7 +71,7 @@ static const ipp_op_t ipp_all_print[] =
   IPP_CREATE_JOB,
   IPP_SEND_DOCUMENT,
   IPP_SEND_URI,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_all_limit[] =
@@ -82,7 +82,7 @@ static const ipp_op_t ipp_all_limit[] =
   CUPS_GET_CLASSES,
   CUPS_GET_DEVICES,
   CUPS_GET_PPDS,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_set_printer[] =
@@ -90,39 +90,39 @@ static const ipp_op_t ipp_set_printer[] =
   IPP_SET_PRINTER_ATTRIBUTES,
   CUPS_ADD_MODIFY_PRINTER,
   CUPS_ADD_MODIFY_CLASS,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_am_class[] =
 {
   CUPS_ADD_MODIFY_CLASS,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_am_printer[] =
 {
   CUPS_ADD_MODIFY_PRINTER,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_schemes[] =
 {
   CUPS_GET_DEVICES,
   CUPS_GET_PPDS,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_get_ppds[] =
 {
   CUPS_GET_PPDS,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_ppd_name[] =
 {
   CUPS_ADD_MODIFY_PRINTER,
   CUPS_GET_PPD,
-  CUPS_NO_OPERATION
+  IPP_OP_CUPS_NONE
 };
 
 static const _ipp_option_t ipp_options[] =
@@ -528,13 +528,13 @@ cupsEncodeOptions2(
     * Verify that we send this attribute for this operation...
     */
 
-    while (*ops != CUPS_NO_OPERATION)
+    while (*ops != IPP_OP_CUPS_NONE)
       if (op == *ops)
         break;
       else
         ops ++;
 
-    if (*ops == CUPS_NO_OPERATION)
+    if (*ops == IPP_OP_CUPS_NONE)
     {
       DEBUG_printf(("2cupsEncodeOptions2: Skipping \"%s\".", option->name));
       continue;

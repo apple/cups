@@ -148,8 +148,46 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
 		val;			/* Socket value */
 
 
-  (void)addr;
-  (void)port;
+ /*
+  * Range check input...
+  */
+
+  if (!addr || port <= 0)
+    return (-1);
+
+  if ((fd = socket(addr->addr.sa_family, SOCK_STREAM, 0)) < 0)
+  {
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
+    return (-1);
+  }
+
+  val = 1;
+  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+#ifdef IPV6_V6ONLY
+  if (addr->addr.sa_family == AF_INET6)
+    setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+#endif /* IPV6_V6ONLY */
+
+  _httpAddrSetPort(addr, port);
+
+  if (bind(fd, (struct sockaddr *)addr, httpAddrLength(addr)))
+  {
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
+
+    close(fd);
+
+    return (-1);
+  }
+
+  if (listen(fd, 5))
+  {
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
+
+    close(fd);
+
+    return (-1);
+  }
 
 #ifdef SO_NOSIGPIPE
  /*
