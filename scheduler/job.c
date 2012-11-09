@@ -2978,7 +2978,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   */
 
   if (strncmp(job->printer->device_uri, "usb:", 4) &&
-      strncmp(job->printer->device_uri, "ippusb:", 4))
+      strncmp(job->printer->device_uri, "ippusb:", 7))
     cupsdSetPrinterReasons(job->printer, "-offline-report");
 
  /*
@@ -2989,10 +2989,11 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   job->profile = NULL;
 
  /*
-  * Clear the unresponsive job watchdog timer...
+  * Clear the unresponsive job watchdog timers...
   */
 
-  job->kill_time = 0;
+  job->cancel_time = 0;
+  job->kill_time   = 0;
 
  /*
   * Close pipes and status buffer...
@@ -3084,6 +3085,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		    exit_code == CUPS_BACKEND_HOLD ? "hold job" :
 		    exit_code == CUPS_BACKEND_STOP ? "stop printer" :
 		    exit_code == CUPS_BACKEND_CANCEL ? "cancel job" :
+		    exit_code == CUPS_BACKEND_RETRY ? "retry job later" :
+		    exit_code == CUPS_BACKEND_RETRY_CURRENT ? "retry job immediately" :
 		    exit_code < 0 ? "crashed" : "unknown");
 
    /*

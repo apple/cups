@@ -1695,7 +1695,9 @@ cups_get_printer_uri(
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  snprintf(resource, resourcesize, "/printers/%s", name);
+
+  if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
     const char *device_uri = NULL;	/* device-uri value */
 

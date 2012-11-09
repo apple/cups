@@ -3279,8 +3279,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	  * Check for EnvSizeName as well...
 	  */
 
-      if (strncmp(pwg_media->ppd, "Env", 3) &&
-          !strncmp(size->name, "Env", 3))
+	  if (strncmp(pwg_media->ppd, "Env", 3) &&
+	      !strncmp(size->name, "Env", 3))
             snprintf(buf, sizeof(buf), "Env%s", pwg_media->ppd);
 
 	  if (strcmp(size->name, buf))
