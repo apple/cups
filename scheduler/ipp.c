@@ -751,7 +751,6 @@ cupsdProcessIPPRequest(
 	{
 	  struct stat	fileinfo;	/* File information */
 
-
           if (!fstat(con->file, &fileinfo))
 	    length += fileinfo.st_size;
 	}

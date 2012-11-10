@@ -226,21 +226,23 @@ static const char * const http_fields[] =
 #ifdef DEBUG
 static const char * const http_states[] =
 			{
-			  "HTTP_WAITING",
-			  "HTTP_OPTIONS",
-			  "HTTP_GET",
-			  "HTTP_GET_SEND",
-			  "HTTP_HEAD",
-			  "HTTP_POST",
-			  "HTTP_POST_RECV",
-			  "HTTP_POST_SEND",
-			  "HTTP_PUT",
-			  "HTTP_PUT_RECV",
-			  "HTTP_DELETE",
-			  "HTTP_TRACE",
-			  "HTTP_CLOSE",
-			  "HTTP_STATUS",
-			  "HTTP_UNKNOWN_METHOD"
+			  "HTTP_STATE_ERROR",
+			  "HTTP_STATE_WAITING",
+			  "HTTP_STATE_OPTIONS",
+			  "HTTP_STATE_GET",
+			  "HTTP_STATE_GET_SEND",
+			  "HTTP_STATE_HEAD",
+			  "HTTP_STATE_POST",
+			  "HTTP_STATE_POST_RECV",
+			  "HTTP_STATE_POST_SEND",
+			  "HTTP_STATE_PUT",
+			  "HTTP_STATE_PUT_RECV",
+			  "HTTP_STATE_DELETE",
+			  "HTTP_STATE_TRACE",
+			  "HTTP_STATE_CONNECT",
+			  "HTTP_STATE_STATUS",
+			  "HTTP_STATE_UNKNOWN_METHOD",
+			  "HTTP_STATE_UNKNOWN_VERSION"
 			};
 #endif /* DEBUG */
 
@@ -957,7 +959,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%s", http,
-                http_states[http->state]));
+                http_states[http->state + 1]));
 
  /*
   * Temporarily set non-blocking mode so we don't get stuck in httpRead()...
@@ -980,13 +982,16 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
   http->blocking = blocking;
 
-  if (http->state == oldstate && http->state != HTTP_WAITING && http->fd >= 0)
+  if (http->state == oldstate && http->state != HTTP_STATE_WAITING &&
+      http->fd >= 0)
   {
    /*
     * Didn't get the data back, so close the current connection.
     */
 
-    http->state = HTTP_WAITING;
+    DEBUG_puts("1httpFlush: Setting state to HTTP_STATE_WAITING and closing.");
+
+    http->state = HTTP_STATE_WAITING;
 
 #ifdef HAVE_SSL
     if (http->tls)
@@ -1261,7 +1266,7 @@ off_t					/* O - Content length */
 httpGetLength2(http_t *http)		/* I - Connection to server */
 {
   DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
-                http_states[http->state]));
+                http_states[http->state + 1]));
 
   if (!http)
     return (-1);
@@ -1854,16 +1859,19 @@ httpPeek(http_t *http,			/* I - Connection to server */
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
 
-    if (http->state == HTTP_POST_RECV)
+    if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_WAITING;
+      http->state = HTTP_STATE_WAITING;
+
+    DEBUG_printf(("1httpPeek: 0-length chunk, set state to %s.",
+                  http_states[http->state + 1]));
 
    /*
     * Prevent future reads for this request...
     */
 
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    http->data_encoding = HTTP_ENCODING_FIELDS;
 
     return (0);
   }
@@ -2140,7 +2148,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   DEBUG_printf(("2httpRead2: data_remaining=" CUPS_LLFMT,
                 CUPS_LLCAST http->data_remaining));
 
-  if (http->data_remaining <= 0)
+  if (http->data_remaining <= 0 && http->data_encoding != HTTP_ENCODING_FIELDS)
   {
    /*
     * A zero-length chunk ends a transfer; unless we are reading POST
@@ -2155,16 +2163,19 @@ httpRead2(http_t *http,			/* I - Connection to server */
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
 
-    if (http->state == HTTP_POST_RECV)
+    if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_WAITING;
+      http->state = HTTP_STATE_WAITING;
+
+    DEBUG_printf(("1httpRead2: 0-length chunk, set state to %s.",
+                  http_states[http->state + 1]));
 
    /*
     * Prevent future reads for this request...
     */
 
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    http->data_encoding = HTTP_ENCODING_FIELDS;
 
     return (0);
   }
@@ -2425,10 +2436,16 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
-    else if (http->state == HTTP_POST_RECV)
-      http->state ++;
     else
-      http->state = HTTP_WAITING;
+    {
+      if (http->state == HTTP_STATE_POST_RECV)
+        http->state ++;
+      else
+        http->state = HTTP_STATE_WAITING;
+
+      DEBUG_printf(("1httpRead2: End of content, set state to %s.",
+                    http_states[http->state + 1]));
+    }
   }
 
   return (bytes);
@@ -2570,9 +2587,15 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   if (uri)
     *uri = '\0';
 
-  if (!http || !uri || urilen < 1 || http->state != HTTP_STATE_WAITING)
+  if (!http || !uri || urilen < 1)
   {
-    DEBUG_puts("1httpReadRequest: Returning HTTP_STATE_ERROR");
+    DEBUG_puts("1httpReadRequest: Bad arguments, returning HTTP_STATE_ERROR.");
+    return (HTTP_STATE_ERROR);
+  }
+  else if (http->state != HTTP_STATE_WAITING)
+  {
+    DEBUG_printf(("1httpReadRequest: Bad state %s, returning HTTP_STATE_ERROR.",
+                  http_states[http->state + 1]));
     return (HTTP_STATE_ERROR);
   }
 
@@ -2583,7 +2606,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   httpClearFields(http);
 
   http->activity       = time(NULL);
-  http->data_encoding  = HTTP_ENCODING_LENGTH;
+  http->data_encoding  = HTTP_ENCODING_FIELDS;
   http->data_remaining = 0;
   http->keep_alive     = HTTP_KEEPALIVE_OFF;
   http->status         = HTTP_STATUS_OK;
@@ -2670,6 +2693,9 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
     return (HTTP_STATE_UNKNOWN_METHOD);
   }
 
+  DEBUG_printf(("1httpReadRequest: Set state to %s.",
+                http_states[http->state + 1]));
+
   if (!strcmp(req_version, "HTTP/1.0"))
   {
     http->version    = HTTP_VERSION_1_0;
@@ -2686,8 +2712,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
     return (HTTP_STATE_UNKNOWN_VERSION);
   }
 
-  DEBUG_printf(("1httpReadRequest: URI is %s, returning %d.", req_uri,
-                http->state));
+  DEBUG_printf(("1httpReadRequest: URI is \"%s\".", req_uri));
   strlcpy(uri, req_uri, urilen);
 
   return (http->state);
@@ -2772,7 +2797,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   http->version         = HTTP_VERSION_1_1;
   http->keep_alive      = HTTP_KEEPALIVE_OFF;
   memset(&http->_hostaddr, 0, sizeof(http->_hostaddr));
-  http->data_encoding   = HTTP_ENCODING_LENGTH;
+  http->data_encoding   = HTTP_ENCODING_FIELDS;
   http->_data_remaining = 0;
   http->used            = 0;
   http->expect          = 0;
@@ -3164,7 +3189,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
 
   DEBUG_printf(("_httpUpdate(http=%p, status=%p), state=%s", http, status,
-                http_states[http->state]));
+                http_states[http->state + 1]));
 
  /*
   * Grab a single line from the connection...
@@ -3230,15 +3255,22 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     {
       case HTTP_GET :
       case HTTP_POST :
-      case HTTP_POST_RECV :
+      case HTTP_STATE_POST_RECV :
       case HTTP_PUT :
 	  http->state ++;
+
+	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
+	                http_states[http->state + 1]));
+
       case HTTP_POST_SEND :
       case HTTP_HEAD :
 	  break;
 
       default :
-	  http->state = HTTP_WAITING;
+	  http->state = HTTP_STATE_WAITING;
+
+	  DEBUG_puts("1_httpUpdate: Unknown state, reset state to "
+	             "HTTP_STATE_WAITING.");
 	  break;
     }
 
@@ -3327,7 +3359,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
-                http_states[http->state]));
+                http_states[http->state + 1]));
 
  /*
   * Flush pending data, if any...
@@ -3345,7 +3377,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   * If we haven't issued any commands, then there is nothing to "update"...
   */
 
-  if (http->state == HTTP_WAITING)
+  if (http->state == HTTP_STATE_WAITING)
     return (HTTP_CONTINUE);
 
  /*
@@ -3686,10 +3718,13 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     * data, go idle...
     */
 
-    DEBUG_puts("2httpWrite: changing states...");
+    DEBUG_puts("2httpWrite2: Changing states.");
 
     if (http->wused)
-      httpFlushWrite(http);
+    {
+      if (httpFlushWrite(http) < 0)
+        return (-1);
+    }
 
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     {
@@ -3703,9 +3738,17 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Reset the data state...
       */
 
-      http->data_encoding  = HTTP_ENCODING_LENGTH;
+      http->data_encoding  = HTTP_ENCODING_FIELDS;
       http->data_remaining = 0;
     }
+
+    if (http->state == HTTP_STATE_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_STATE_WAITING;
+
+    DEBUG_printf(("2httpWrite2: New state is %s.",
+                  http_states[http->state + 1]));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -3862,8 +3905,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100,
                  http->version % 100, (int)status, httpStatus(status)) < 0)
   {
-    http->status        = HTTP_STATUS_ERROR;
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    http->status = HTTP_STATUS_ERROR;
     return (-1);
   }
 
@@ -3882,8 +3924,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
       {
 	if (httpPrintf(http, "%s: %s\r\n", http_fields[i], value) < 1)
 	{
-	  http->status        = HTTP_STATUS_ERROR;
-	  http->data_encoding = HTTP_ENCODING_LENGTH;
+	  http->status = HTTP_STATUS_ERROR;
 	  return (-1);
 	}
       }
@@ -3894,8 +3935,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
       if (httpPrintf(http, "Set-Cookie: %s path=/%s\r\n", http->cookie,
                      http->tls ? " secure" : "") < 1)
       {
-	http->status        = HTTP_ERROR;
-	http->data_encoding = HTTP_ENCODING_LENGTH;
+	http->status = HTTP_ERROR;
 	return (-1);
       }
     }
@@ -3903,15 +3943,13 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   if (httpWrite2(http, "\r\n", 2) < 2)
   {
-    http->status        = HTTP_ERROR;
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    http->status = HTTP_ERROR;
     return (-1);
   }
 
   if (httpFlushWrite(http) < 0)
   {
-    http->status        = HTTP_ERROR;
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    http->status = HTTP_ERROR;
     return (-1);
   }
 
@@ -4148,7 +4186,7 @@ http_content_coding_start(
     if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
-    else if (http->state == HTTP_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
     else
@@ -4162,7 +4200,7 @@ http_content_coding_start(
     if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
-    else if (http->state == HTTP_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
     else
@@ -4520,7 +4558,7 @@ http_send(http_t       *http,		/* I - Connection to server */
     }
 
   if (http->expect == HTTP_CONTINUE && http->mode == _HTTP_MODE_CLIENT &&
-      (http->state == HTTP_POST_RECV || http->state == HTTP_PUT_RECV))
+      (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV))
     if (httpPrintf(http, "Expect: 100-continue\r\n") < 1)
     {
       http->status = HTTP_ERROR;

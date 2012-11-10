@@ -217,7 +217,6 @@ typedef enum http_state_e		/**** HTTP state values; states
   HTTP_STATE_UNKNOWN_VERSION		/* Unknown request method, waiting for blank line @since CUPS 1.7@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
-/* Old names for this enumeration */
 #    define HTTP_WAITING	HTTP_STATE_WAITING
 #    define HTTP_OPTIONS	HTTP_STATE_OPTIONS
 #    define HTTP_GET		HTTP_STATE_GET

@@ -1124,12 +1124,12 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   printer->ipv4          = -1;
   printer->ipv6          = -1;
-  printer->name          = _cupsStrAlloc(name);
+  printer->name          = strdup(name);
 #ifdef HAVE_DNSSD
-  printer->dnssd_name    = _cupsStrRetain(printer->name);
+  printer->dnssd_name    = strdup(printer->name);
 #endif /* HAVE_DNSSD */
-  printer->directory     = _cupsStrAlloc(directory);
-  printer->hostname      = _cupsStrAlloc(servername ? servername :
+  printer->directory     = strdup(directory);
+  printer->hostname      = strdup(servername ? servername :
                                              httpGetHostname(NULL, hostname,
                                                              sizeof(hostname)));
   printer->port          = port;
@@ -1140,8 +1140,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 		  printer->hostname, printer->port, "/ipp");
-  printer->uri    = _cupsStrAlloc(uri);
+  printer->uri    = strdup(uri);
   printer->urilen = strlen(uri);
+
+  if (icon)
+    printer->icon = strdup(icon);
 
   _cupsRWInit(&(printer->rwlock));
 
@@ -2003,19 +2006,19 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
   TXTRecordDeallocate(&(printer->ipp_txt));
 
   if (printer->dnssd_name)
-    _cupsStrFree(printer->dnssd_name);
+    free(printer->dnssd_name);
 #endif /* HAVE_DNSSD */
 
   if (printer->name)
-    _cupsStrFree(printer->name);
+    free(printer->name);
   if (printer->icon)
-    _cupsStrFree(printer->icon);
+    free(printer->icon);
   if (printer->directory)
-    _cupsStrFree(printer->directory);
+    free(printer->directory);
   if (printer->hostname)
-    _cupsStrFree(printer->hostname);
+    free(printer->hostname);
   if (printer->uri)
-    _cupsStrFree(printer->uri);
+    free(printer->uri);
 
   ippDelete(printer->attrs);
   cupsArrayDelete(printer->jobs);
@@ -2051,8 +2054,8 @@ dnssd_callback(
       fprintf(stderr, "Now using DNS-SD service name \"%s\".\n", name);
 
     /* No lock needed since only the main thread accesses/changes this */
-    _cupsStrFree(printer->dnssd_name);
-    printer->dnssd_name = _cupsStrAlloc(name);
+    free(printer->dnssd_name);
+    printer->dnssd_name = strdup(name);
   }
 }
 #endif /* HAVE_DNSSD */
@@ -4047,6 +4050,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  char		buffer[4096];	/* Copy buffer */
 	  ssize_t	bytes;		/* Bytes */
 
+          fprintf(stderr, "Icon file is \"%s\".\n", client->printer->icon);
+
           if (!stat(client->printer->icon, &fileinfo) &&
 	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
@@ -4086,7 +4091,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		      "</head>\n"
 		      "<body>\n"
 		      "</body>\n"
-		      "<h1>%s</h1>\n"
+		      "<h1><img align=\"right\" src=\"/icon.png\">%s</h1>\n"
 		      "<p>%s, %d job(s).</p>\n"
 		      "</body>\n"
 		      "</html>\n",

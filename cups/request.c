@@ -385,7 +385,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   {
     status = httpUpdate(http);
   }
-  while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
+  while (status == HTTP_STATUS_CONTINUE);
 
   DEBUG_printf(("2cupsGetResponse: status=%d", status));
 
