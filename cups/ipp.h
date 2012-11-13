@@ -594,11 +594,11 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_EXTENSION = 0x7f,		/* Extension point for 32-bit tags */
   IPP_TAG_CUPS_MASK = 0x7fffffff,	/* Mask for copied attribute values @private@ */
   /* The following expression is used to avoid compiler warnings with +/-0x80000000 */
-  IPP_TAG_CUPS_COPY = -0x7fffffff-1	/* Bitflag for copied attribute values @private@ */
+  IPP_TAG_CUPS_CONST = -0x7fffffff-1	/* Bitflag for copied/const attribute values @private@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_TAG_MASK		IPP_TAG_CUPS_MASK
-#    define IPP_TAG_COPY		IPP_TAG_CUPS_COPY
+#    define IPP_TAG_COPY		IPP_TAG_CUPS_CONST
 #  endif /* !_CUPS_NO_DEPRECATED */
 } ipp_tag_t;
 

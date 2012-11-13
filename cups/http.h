@@ -448,10 +448,10 @@ extern int		httpCheck(http_t *http);
 extern void		httpClearFields(http_t *http);
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port)
-			             _CUPS_DEPRECATED;
+			             _CUPS_DEPRECATED_MSG("Use httpConnect2 instead.");
 extern http_t		*httpConnectEncrypt(const char *host, int port,
 			                    http_encryption_t encryption)
-			                    _CUPS_DEPRECATED;
+			                    _CUPS_DEPRECATED_MSG("Use httpConnect2 instead.");
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
 extern int		httpError(http_t *http);
@@ -471,20 +471,20 @@ extern int		httpPost(http_t *http, const char *uri);
 extern int		httpPrintf(http_t *http, const char *format, ...)
 			__attribute__ ((__format__ (__printf__, 2, 3)));
 extern int		httpPut(http_t *http, const char *uri);
-extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED;
-extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED;
+extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpRead2 instead.");
+extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED_MSG("Use httpReconnect2 instead.");
 extern void		httpSeparate(const char *uri, char *method,
 			             char *username, char *host, int *port,
-				     char *resource) _CUPS_DEPRECATED;
+				     char *resource) _CUPS_DEPRECATED_MSG("Use httpSeparateURI instead.");
 extern void		httpSetField(http_t *http, http_field_t field,
 			             const char *value);
 extern const char	*httpStatus(http_status_t status);
 extern int		httpTrace(http_t *http, const char *uri);
 extern http_status_t	httpUpdate(http_t *http);
-extern int		httpWrite(http_t *http, const char *buffer, int length) _CUPS_DEPRECATED;
-extern char		*httpEncode64(char *out, const char *in) _CUPS_DEPRECATED;
-extern char		*httpDecode64(char *out, const char *in) _CUPS_DEPRECATED;
-extern int		httpGetLength(http_t *http) _CUPS_DEPRECATED;
+extern int		httpWrite(http_t *http, const char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpWrite2 instead.");
+extern char		*httpEncode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use httpEncode64_2 instead.");
+extern char		*httpDecode64(char *out, const char *in) _CUPS_DEPRECATED_MSG("Use httpDecode64_2 instead.");
+extern int		httpGetLength(http_t *http) _CUPS_DEPRECATED_MSG("Use httpGetLength2 instead.");
 extern char		*httpMD5(const char *, const char *, const char *,
 			         char [33]);
 extern char		*httpMD5Final(const char *, const char *, const char *,
@@ -505,7 +505,7 @@ extern void		httpSeparate2(const char *uri,
 			              char *method, int methodlen,
 			              char *username, int usernamelen,
 				      char *host, int hostlen, int *port,
-				      char *resource, int resourcelen) _CUPS_DEPRECATED;
+				      char *resource, int resourcelen) _CUPS_DEPRECATED_MSG("Use httpSeparateURI instead.");
 
 /**** New in CUPS 1.2/OS X 10.5 ****/
 extern int		httpAddrAny(const http_addr_t *addr) _CUPS_API_1_2;

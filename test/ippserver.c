@@ -375,7 +375,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
 #endif /* HAVE_DNSSD */
-  int		port = 8631,		/* Port number (0 = auto) TODO: FIX */
+  int		port = 8631,		/* Port number (0 = auto) */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
 		ppm_color = 0,		/* Pages per minute for color */
@@ -660,57 +660,57 @@ copy_job_attributes(
     {
       case IPP_JSTATE_PENDING :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
+	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
 		       NULL, "none");
 	  break;
 
       case IPP_JSTATE_HELD :
           if (job->fd >= 0)
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
-			 NULL, "job-incoming");
+	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 "job-state-reasons", NULL, "job-incoming");
 	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
-			 NULL, "job-hold-until-specified");
+	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 "job-state-reasons", NULL, "job-hold-until-specified");
           else
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
-			 NULL, "job-data-insufficient");
+	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 "job-state-reasons", NULL, "job-data-insufficient");
 	  break;
 
       case IPP_JSTATE_PROCESSING :
 	  if (job->cancel)
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
-			 NULL, "processing-to-stop-point");
+	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 "job-state-reasons", NULL, "processing-to-stop-point");
 	  else
 	    ippAddString(client->response, IPP_TAG_JOB,
-	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
-			 NULL, "job-printing");
+	                 IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	                 "job-state-reasons", NULL, "job-printing");
 	  break;
 
       case IPP_JSTATE_STOPPED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
+	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
 		       NULL, "job-stopped");
 	  break;
 
       case IPP_JSTATE_CANCELED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
+	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
 		       NULL, "job-canceled-by-user");
 	  break;
 
       case IPP_JSTATE_ABORTED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
+	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
 		       NULL, "aborted-by-system");
 	  break;
 
       case IPP_JSTATE_COMPLETED :
 	  ippAddString(client->response, IPP_TAG_JOB,
-	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "job-state-reasons",
+	               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST, "job-state-reasons",
 		       NULL, "job-completed-successfully");
 	  break;
     }
@@ -830,7 +830,8 @@ create_job(_ipp_client_t *client)	/* I - Client */
                                IPP_TAG_NAME)) != NULL)
     ippSetName(job->attrs, &attr, "job-originating-user-name");
   else
-    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME | IPP_TAG_CUPS_COPY,
+    attr = ippAddString(job->attrs, IPP_TAG_JOB,
+                        IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
                         "job-originating-user-name", NULL, "anonymous");
 
   if (attr)
@@ -1253,11 +1254,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->attrs = ippNew();
 
   /* charset-configured */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_CHARSET | IPP_TAG_CUPS_CONST,
                "charset-configured", NULL, "utf-8");
 
   /* charset-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_CHARSET | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_CHARSET | IPP_TAG_CUPS_CONST,
                 "charset-supported", sizeof(charsets) / sizeof(charsets[0]),
 		NULL, charsets);
 
@@ -1266,7 +1269,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 ppm_color > 0);
 
   /* compression-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
 	       "compression-supported", NULL, "none");
 
   /* copies-default */
@@ -1294,11 +1298,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "finishings-supported", IPP_FINISHINGS_NONE);
 
   /* generated-natural-language-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_LANGUAGE | IPP_TAG_CUPS_CONST,
                "generated-natural-language-supported", NULL, "en");
 
   /* ipp-versions-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "ipp-versions-supported",
 		sizeof(versions) / sizeof(versions[0]), NULL, versions);
 
@@ -1310,7 +1316,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "job-accounting-user-id-supported", 1);
 
   /* job-creation-attributes-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "job-creation-attributes-supported",
 		sizeof(job_creation) / sizeof(job_creation[0]),
 		NULL, job_creation);
@@ -1332,11 +1339,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "job-priority-supported", 100);
 
   /* job-sheets-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
                "job-sheets-default", NULL, "none");
 
   /* job-sheets-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_NAME | IPP_TAG_CUPS_CONST,
                "job-sheets-supported", NULL, "none");
 
   /* media-bottom-margin-supported */
@@ -1421,14 +1430,16 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippDelete(media_col_default);
 
   /* media-col-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "media-col-supported",
 		(int)(sizeof(media_col_supported) /
 		      sizeof(media_col_supported[0])), NULL,
 		media_col_supported);
 
   /* media-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "media-default", NULL, media_supported[0]);
 
   /* media-left-margin-supported */
@@ -1446,7 +1457,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 		 media_xxx_margin_supported);
 
   /* media-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "media-supported",
 		(int)(sizeof(media_supported) / sizeof(media_supported[0])),
 		NULL, media_supported);
@@ -1472,14 +1484,16 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 		 media_xxx_margin_supported);
 
   /* media-type-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "media-type-supported",
 		(int)(sizeof(media_type_supported) /
 		      sizeof(media_type_supported[0])),
 		NULL, media_type_supported);
 
   /* multiple-document-handling-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "multiple-document-handling-supported",
                 sizeof(multiple_document_handling) /
 		    sizeof(multiple_document_handling[0]), NULL,
@@ -1490,7 +1504,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "multiple-document-jobs-supported", 0);
 
   /* natural-language-configured */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_LANGUAGE | IPP_TAG_CUPS_CONST,
                "natural-language-configured", NULL, "en");
 
   /* number-up-default */
@@ -1514,11 +1529,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                  "orientation-requested-supported", 4, orients);
 
   /* output-bin-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "output-bin-default", NULL, "face-down");
 
   /* output-bin-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "output-bin-supported", NULL, "face-down");
 
   /* pages-per-minute */
@@ -1531,7 +1548,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                   "pages-per-minute-color", ppm_color);
 
   /* pdl-override-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "pdl-override-supported", NULL, "attempted");
 
   /* print-quality-default */
@@ -1605,30 +1623,35 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* reference-uri-scheme-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-                IPP_TAG_URISCHEME | IPP_TAG_CUPS_COPY,
+                IPP_TAG_URISCHEME | IPP_TAG_CUPS_CONST,
                 "reference-uri-schemes-supported",
                 (int)(sizeof(reference_uri_schemes_supported) /
                       sizeof(reference_uri_schemes_supported[0])),
                 NULL, reference_uri_schemes_supported);
 
   /* sides-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "sides-default", NULL, "one-sided");
 
   /* sides-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
 
   /* uri-authentication-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "uri-authentication-supported", NULL, "none");
 
   /* uri-security-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                "uri-security-supported", NULL, "none");
 
   /* which-jobs-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
                 "which-jobs-supported",
                 sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 
@@ -2458,7 +2481,8 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY, "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
+                "Currently printing another job.");
     return;
   }
 
@@ -2680,7 +2704,8 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 	(job_comparison == 0 && job->state != job_state) ||
 	(job_comparison > 0 && job->state < job_state) ||
 	job->id < first_job_id ||
-	(username && job->username && _cups_strcasecmp(username, job->username)))
+	(username && job->username &&
+	 _cups_strcasecmp(username, job->username)))
       continue;
 
     if (count > 0)
@@ -2720,7 +2745,7 @@ ipp_get_printer_attributes(
   _cupsRWLockRead(&(printer->rwlock));
 
   copy_attributes(client->response, printer->attrs, ra, IPP_TAG_ZERO,
-		  IPP_TAG_CUPS_COPY);
+		  IPP_TAG_CUPS_CONST);
 
   if (!ra || cupsArrayFind(ra, "printer-state"))
     ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
@@ -2730,8 +2755,8 @@ ipp_get_printer_attributes(
   {
     if (printer->state_reasons == _IPP_PSTATE_NONE)
       ippAddString(client->response, IPP_TAG_PRINTER,
-                   IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY, "printer-state-reasons",
-		   NULL, "none");
+                   IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                   "printer-state-reasons", NULL, "none");
     else
     {
       int			num_reasons = 0;/* Number of reasons */
@@ -2771,8 +2796,8 @@ ipp_get_printer_attributes(
 	reasons[num_reasons ++] = "toner-low-report";
 
       ippAddStrings(client->response, IPP_TAG_PRINTER,
-                    IPP_TAG_KEYWORD | IPP_TAG_CUPS_COPY,  "printer-state-reasons",
-		    num_reasons, NULL, reasons);
+                    IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+                    "printer-state-reasons", num_reasons, NULL, reasons);
     }
   }
 
@@ -2832,7 +2857,8 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY, "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
+                "Currently printing another job.");
     return;
   }
 
@@ -2897,7 +2923,8 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to read print file.");
     return;
   }
 
@@ -2910,8 +2937,8 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s",
-                strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3022,7 +3049,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
   if (ippGetCount(uri) != 1)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Too many document-uri values.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
+                "Too many document-uri values.");
     return;
   }
 
@@ -3043,15 +3071,15 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
       strcmp(scheme, "http"))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME, "URI scheme \"%s\" not supported.",
-                scheme);
+    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME,
+                "URI scheme \"%s\" not supported.", scheme);
     return;
   }
 
   if (!strcmp(scheme, "file") && access(resource, R_OK))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s",
-                strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                "Unable to access URI: %s", strerror(errno));
     return;
   }
 
@@ -3061,7 +3089,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY, "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
+                "Currently printing another job.");
     return;
   }
 
@@ -3098,8 +3127,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
   {
     if ((infile = open(resource, O_RDONLY)) < 0)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s",
-		  strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to access URI: %s", strerror(errno));
       return;
     }
 
@@ -3138,7 +3167,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
     encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    if ((http = httpConnectEncrypt(hostname, port, encryption)) == NULL)
+    if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption,
+                             1, 30000, NULL)) == NULL)
     {
       respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
                   "Unable to connect to %s: %s", hostname,
@@ -3156,8 +3186,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     if (httpGet(http, resource))
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s",
-		  strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to GET URI: %s", strerror(errno));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3173,8 +3203,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
     if (status != HTTP_STATUS_OK)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s",
-		  httpStatus(status));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to GET URI: %s", httpStatus(status));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3218,8 +3248,8 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s",
-		strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3294,7 +3324,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   if (job->state > IPP_JSTATE_HELD)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job is not in a pending state.");
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE,
+                "Job is not in a pending state.");
     httpFlush(client->http);
     return;
   }
@@ -3409,7 +3440,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to read print file.");
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to read print file.");
     return;
   }
 
@@ -3422,8 +3454,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s",
-                strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -3524,7 +3556,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
   if (job->state > IPP_JSTATE_HELD)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job is not in a pending state.");
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE,
+                "Job is not in a pending state.");
     httpFlush(client->http);
     return;
   }
@@ -3586,7 +3619,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
   if (ippGetCount(uri) != 1)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Too many document-uri values.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
+                "Too many document-uri values.");
     return;
   }
 
@@ -3607,15 +3641,15 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
       strcmp(scheme, "http"))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME, "URI scheme \"%s\" not supported.",
-                scheme);
+    respond_ipp(client, IPP_STATUS_ERROR_URI_SCHEME,
+                "URI scheme \"%s\" not supported.", scheme);
     return;
   }
 
   if (!strcmp(scheme, "file") && access(resource, R_OK))
   {
-    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s",
-                strerror(errno));
+    respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                "Unable to access URI: %s", strerror(errno));
     return;
   }
 
@@ -3668,8 +3702,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   {
     if ((infile = open(resource, O_RDONLY)) < 0)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to access URI: %s",
-		  strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to access URI: %s", strerror(errno));
       return;
     }
 
@@ -3708,7 +3742,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 #endif /* HAVE_SSL */
     encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    if ((http = httpConnectEncrypt(hostname, port, encryption)) == NULL)
+    if ((http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption,
+                             1, 30000, NULL)) == NULL)
     {
       respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
                   "Unable to connect to %s: %s", hostname,
@@ -3726,8 +3761,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     if (httpGet(http, resource))
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s",
-		  strerror(errno));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to GET URI: %s", strerror(errno));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3743,8 +3778,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
     if (status != HTTP_STATUS_OK)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS, "Unable to GET URI: %s",
-		  httpStatus(status));
+      respond_ipp(client, IPP_STATUS_ERROR_DOCUMENT_ACCESS,
+                  "Unable to GET URI: %s", httpStatus(status));
 
       job->state = IPP_JSTATE_ABORTED;
 
@@ -3788,8 +3823,8 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
     unlink(filename);
 
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to write print file: %s",
-		strerror(error));
+    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL,
+                "Unable to write print file: %s", strerror(error));
     return;
   }
 
@@ -4055,7 +4090,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
           if (!stat(client->printer->icon, &fileinfo) &&
 	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
-	    if (!respond_http(client, HTTP_STATUS_OK, "image/png", fileinfo.st_size))
+	    if (!respond_http(client, HTTP_STATUS_OK, "image/png",
+	                      fileinfo.st_size))
 	    {
 	      close(fd);
 	      return (0);
@@ -4195,7 +4231,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
     respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Bad request-id %d.",
                 ippGetRequestId(client->request));
   else if (!ippFirstAttribute(client->request))
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "No attributes in request.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
+                "No attributes in request.");
   else
   {
    /*
@@ -4277,14 +4314,15 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	* for all operations.
 	*/
 
-	respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Missing required attributes.");
+	respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
+	            "Missing required attributes.");
       }
       else if (strcmp(ippGetString(uri, 0, NULL), client->printer->uri) &&
                strncmp(ippGetString(uri, 0, NULL), client->printer->uri,
 	               client->printer->urilen))
       {
-        respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "%s %s not found.", ippGetName(uri),
-	            ippGetString(uri, 0, NULL));
+        respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "%s %s not found.",
+                    ippGetName(uri), ippGetString(uri, 0, NULL));
       }
       else
       {
@@ -4598,7 +4636,8 @@ respond_http(_ipp_client_t *client,	/* I - Client */
 
   httpClearFields(client->http);
 
-  if (code == HTTP_STATUS_METHOD_NOT_ALLOWED || client->operation == HTTP_STATE_OPTIONS)
+  if (code == HTTP_STATUS_METHOD_NOT_ALLOWED ||
+      client->operation == HTTP_STATE_OPTIONS)
     httpSetField(client->http, HTTP_FIELD_ALLOW, "GET, HEAD, OPTIONS, POST");
 
   if (type)
@@ -4700,8 +4739,9 @@ respond_unsupported(
   ipp_attribute_t	*temp;		/* Copy of attribute */
 
 
-  respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, "Unsupported %s %s%s value.",
-	      ippGetName(attr), ippGetCount(attr) > 1 ? "1setOf " : "",
+  respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES,
+              "Unsupported %s %s%s value.", ippGetName(attr),
+              ippGetCount(attr) > 1 ? "1setOf " : "",
 	      ippTagString(ippGetValueTag(attr)));
 
   temp = ippCopyAttribute(client->response, attr, 0);
@@ -4803,7 +4843,8 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2012 by Apple Inc. All rights reserved.");
+    puts(CUPS_SVERSION " - Copyright 2010-2012 by Apple Inc. All rights "
+         "reserved.");
     puts("");
   }
 

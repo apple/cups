@@ -78,16 +78,27 @@
  * a warning at compile-time.
  */
 
-#  if defined(__GNUC__) && __GNUC__ > 2 && !defined(_CUPS_SOURCE)
-#    define _CUPS_DEPRECATED __attribute__ ((__deprecated__))
+#  if defined(__GNUC__) && __GNUC__ > 2
+#    if defined(__clang__) && defined(_CUPS_NO_DEPRECATED)
+#      define _CUPS_DEPRECATED __attribute__ ((unavailable))
+#      define _CUPS_DEPRECATED_MSG(m) __attribute__ ((unavailable(m)))
+#    elif !defined(_CUPS_SOURCE) || defined(_CUPS_NO_DEPRECATED)
+#      define _CUPS_DEPRECATED __attribute__ ((deprecated))
+#      define _CUPS_DEPRECATED_MSG(m) __attribute__ ((deprecated(m)))
+#    else
+#      define _CUPS_DEPRECATED
+#      define _CUPS_DEPRECATED_MSG(m)
+#    endif /* !_CUPS_SOURCE || _CUPS_NO_DEPRECATED */
 #  else
 #    define _CUPS_DEPRECATED
-#  endif /* __GNUC__ && __GNUC__ > 2 && !_CUPS_SOURCE */
+#    define _CUPS_DEPRECATED_MSG(m)
+#  endif /* __GNUC__ && __GNUC__ > 2 */
 
 #  ifndef __GNUC__
 #    define __attribute__(x)
 #  endif /* !__GNUC__ */
 
+#
 #endif /* !_CUPS_VERSIONING_H_ */
 
 /*
