@@ -1753,7 +1753,7 @@ _httpResolveURI(
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
     if ((options & _HTTP_RESOLVE_STDERR) && !uri)
-      _cupsLangPrintFilter(stderr, "ERROR", _("Unable to find printer."));
+      _cupsLangPrintFilter(stderr, "INFO", _("Unable to find printer."));
   }
   else
   {
