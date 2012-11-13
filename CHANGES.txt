@@ -1,8 +1,9 @@
-CHANGES.txt - 1.7b1 - 2012-10-31
+CHANGES.txt - 1.7b1 - 2012-11-13
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- Added new HTTP APIs to support basic server functionality via libcups.
 	- CUPS now supports compressing and decompressing streamed data.
 	- CUPS now supports higher-level PIN printing, external accounting
 	  systems, and "print here" printing environments (STR #4169)
