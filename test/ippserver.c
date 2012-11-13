@@ -334,6 +334,7 @@ static int		register_printer(_ipp_printer_t *printer,
 					 int duplex, const char *regtype);
 #endif /* HAVE_DNSSD */
 static int		respond_http(_ipp_client_t *client, http_status_t code,
+				     const char *content_coding,
 				     const char *type, size_t length);
 static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
 			            const char *message, ...)
@@ -3922,6 +3923,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 			hostname[HTTP_MAX_HOST];
 					/* Hostname */
   int			port;		/* Port number */
+  const char		*encoding;	/* Content-Encoding value */
 
 
  /*
@@ -3952,19 +3954,19 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   if (http_state == HTTP_STATE_ERROR)
   {
     fprintf(stderr, "%s Bad request line.\n", client->hostname);
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_METHOD)
   {
     fprintf(stderr, "%s Bad/unknown operation.\n", client->hostname);
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_VERSION)
   {
     fprintf(stderr, "%s Bad HTTP version.\n", client->hostname);
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
 
@@ -3978,7 +3980,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 		      client->uri, sizeof(client->uri)) < HTTP_URI_STATUS_OK)
   {
     fprintf(stderr, "%s Bad URI \"%s\".\n", client->hostname, uri);
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
 
@@ -3997,7 +3999,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
   if (http_status != HTTP_STATUS_OK)
   {
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
 
@@ -4008,7 +4010,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     * HTTP/1.1 and higher require the "Host:" field...
     */
 
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
 
@@ -4019,7 +4021,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   if (!_cups_strcasecmp(httpGetField(client->http, HTTP_FIELD_CONNECTION),
                         "Upgrade"))
   {
-    if (!respond_http(client, HTTP_STATUS_NOT_IMPLEMENTED, NULL, 0))
+    if (!respond_http(client, HTTP_STATUS_NOT_IMPLEMENTED, NULL, NULL, 0))
       return (0);
   }
 
@@ -4037,7 +4039,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
       * Send 100-continue header...
       */
 
-      if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, 0))
+      if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
 	return (0);
     }
     else
@@ -4046,7 +4048,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
       * Send 417-expectation-failed header...
       */
 
-      if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, 0))
+      if (!respond_http(client, HTTP_STATUS_EXPECTATION_FAILED, NULL, NULL, 0))
 	return (0);
     }
   }
@@ -4055,6 +4057,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Handle new transfers...
   */
 
+  encoding = httpGetContentEncoding(client->http);
+
   switch (client->operation)
   {
     case HTTP_STATE_OPTIONS :
@@ -4062,15 +4066,15 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	* Do HEAD/OPTIONS command...
 	*/
 
-	return (respond_http(client, HTTP_STATUS_OK, NULL, 0));
+	return (respond_http(client, HTTP_STATUS_OK, NULL, NULL, 0));
 
     case HTTP_STATE_HEAD :
         if (!strcmp(client->uri, "/icon.png"))
-	  return (respond_http(client, HTTP_STATUS_OK, "image/png", 0));
+	  return (respond_http(client, HTTP_STATUS_OK, NULL, "image/png", 0));
 	else if (!strcmp(client->uri, "/"))
-	  return (respond_http(client, HTTP_STATUS_OK, "text/html", 0));
+	  return (respond_http(client, HTTP_STATUS_OK, NULL, "text/html", 0));
 	else
-	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, 0));
+	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
 	break;
 
     case HTTP_STATE_GET :
@@ -4090,7 +4094,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
           if (!stat(client->printer->icon, &fileinfo) &&
 	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
-	    if (!respond_http(client, HTTP_STATUS_OK, "image/png",
+	    if (!respond_http(client, HTTP_STATUS_OK, NULL, "image/png",
 	                      fileinfo.st_size))
 	    {
 	      close(fd);
@@ -4105,7 +4109,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	    close(fd);
 	  }
 	  else
-	    return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, 0));
+	    return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
 	}
 	else if (!strcmp(client->uri, "/"))
 	{
@@ -4113,7 +4117,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  * Show web status page...
 	  */
 
-          if (!respond_http(client, HTTP_STATUS_OK, "text/html", 0))
+          if (!respond_http(client, HTTP_STATUS_OK, encoding, "text/html", 0))
 	    return (0);
 
           html_printf(client,
@@ -4141,7 +4145,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  return (1);
 	}
 	else
-	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, 0));
+	  return (respond_http(client, HTTP_STATUS_NOT_FOUND, NULL, NULL, 0));
 	break;
 
     case HTTP_STATE_POST :
@@ -4152,7 +4156,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  * Not an IPP request...
 	  */
 
-	  return (respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0));
+	  return (respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0));
 	}
 
        /*
@@ -4168,7 +4172,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  {
             fprintf(stderr, "%s IPP read error (%s).\n", client->hostname,
 	            cupsLastErrorString());
-	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, 0);
+	    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
 	    return (0);
 	  }
 	}
@@ -4336,7 +4340,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	  * Send 100-continue header...
 	  */
 
-	  if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, 0))
+	  if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
 	    return (0);
 	}
 
@@ -4398,7 +4402,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   if (httpGetState(client->http) != HTTP_STATE_POST_SEND)
     httpFlush(client->http);		/* Flush trailing (junk) data */
 
-  return (respond_http(client, HTTP_STATUS_OK, "application/ipp",
+  return (respond_http(client, HTTP_STATUS_OK, NULL, "application/ipp",
                        ippLength(client->response)));
 }
 
@@ -4597,10 +4601,12 @@ register_printer(
  */
 
 int					/* O - 1 on success, 0 on failure */
-respond_http(_ipp_client_t *client,	/* I - Client */
-	     http_status_t code,	/* I - HTTP status of response */
-	     const char    *type,	/* I - MIME type of response */
-	     size_t        length)	/* I - Length of response */
+respond_http(
+    _ipp_client_t *client,		/* I - Client */
+    http_status_t code,			/* I - HTTP status of response */
+    const char    *content_encoding,	/* I - Content-Encoding of response */
+    const char    *type,		/* I - MIME media type of response */
+    size_t        length)		/* I - Length of response */
 {
   char	message[1024];			/* Text message */
 
@@ -4647,6 +4653,9 @@ respond_http(_ipp_client_t *client,	/* I - Client */
                    "text/html; charset=utf-8");
     else
       httpSetField(client->http, HTTP_FIELD_CONTENT_TYPE, type);
+
+    if (content_encoding)
+      httpSetField(client->http, HTTP_FIELD_CONTENT_ENCODING, content_encoding);
   }
 
   httpSetLength(client->http, length);

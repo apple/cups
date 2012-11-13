@@ -585,8 +585,6 @@ extern int		httpReconnect2(http_t *http, int msec, int *cancel)
 
 
 /**** New in CUPS 1.7 ****/
-//extern int		httpAcceptsEncoding(http_t *http, const char *coding)
-//			                    _CUPS_API_1_7;
 extern http_t		*httpAcceptConnection(int fd, int blocking)
 			                      _CUPS_API_1_7;
 extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
@@ -598,6 +596,7 @@ extern http_t		*httpConnect2(const char *host, int port,
 				      int family, http_encryption_t encryption,
 				      int blocking, int msec, int *cancel)
 				      _CUPS_API_1_7;
+extern const char	*httpGetContentEncoding(http_t *http) _CUPS_API_1_7;
 extern http_status_t	httpGetExpect(http_t *http) _CUPS_API_1_7;
 extern ssize_t		httpPeek(http_t *http, char *buffer, size_t length)
 			         _CUPS_API_1_7;

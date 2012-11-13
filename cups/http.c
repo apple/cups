@@ -48,6 +48,8 @@
  *   _httpFreeCredentials()	  - Free internal credentials.
  *   httpFreeCredentials()	  - Free an array of credentials.
  *   httpGet()			  - Send a GET request to the server.
+ *   httpGetContentEncoding()     - Get a common content encoding, if any,
+ *                                  between the client and server.
  *   httpGetAuthString()	  - Get the current authorization string.
  *   httpGetBlocking()		  - Get the blocking/non-block state of a
  *				    connection.
@@ -1021,7 +1023,8 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   int	bytes;				/* Bytes written */
 
 
-  DEBUG_printf(("httpFlushWrite(http=%p)", http));
+  DEBUG_printf(("httpFlushWrite(http=%p) data_encoding=%d", http,
+                http ? http->data_encoding : -1));
 
   if (!http || !http->wused)
   {
@@ -1103,6 +1106,94 @@ httpGet(http_t     *http,		/* I - Connection to server */
         const char *uri)		/* I - URI to get */
 {
   return (http_send(http, HTTP_GET, uri));
+}
+
+
+/*
+ * 'httpGetContentEncoding()' - Get a common content encoding, if any, between
+ *                              the client and server.
+ *
+ * This function uses the value of the Accepts-Encoding HTTP header and must be
+ * called after receiving a response from the server or a request from the
+ * client.  The value returned can be use in subsequent requests (for clients)
+ * or in the response (for servers) in order to compress the content stream.
+ *
+ * @since CUPS 1.7@
+ */
+
+const char *				/* O - Content-Coding value or
+					       @code NULL@ for the identity
+					       coding. */
+httpGetContentEncoding(http_t *http)	/* I - Connection to client/server */
+{
+#ifdef HAVE_LIBZ
+  if (http && http->accept_encoding)
+  {
+    int		i;			/* Looping var */
+    char	temp[HTTP_MAX_VALUE],	/* Copy of Accepts-Encoding value */
+		*start,			/* Start of coding value */
+		*end;			/* End of coding value */
+    double	qvalue;			/* "qvalue" for coding */
+    struct lconv *loc = localeconv();	/* Locale data */
+    static const char * const codings[] =
+    {					/* Supported content codings */
+      "deflate",
+      "gzip",
+      "x-deflate",
+      "x-gzip"
+    };
+
+    strlcpy(temp, http->accept_encoding, sizeof(temp));
+
+    for (start = temp; *start; start = end)
+    {
+     /*
+      * Find the end of the coding name...
+      */
+
+      qvalue = 1.0;
+      end    = start;
+      while (*end && *end != ';' && *end != ',' && !isspace(*end & 255))
+        end ++;
+
+      if (*end == ';')
+      {
+       /*
+        * Grab the qvalue as needed...
+        */
+
+        if (!strncmp(end, ";q=", 3))
+          qvalue = _cupsStrScand(end + 3, NULL, loc);
+
+       /*
+        * Skip past all attributes...
+        */
+
+        *end++ = '\0';
+        while (*end && *end != ',' && !isspace(*end & 255))
+          end ++;
+      }
+      else if (*end)
+        *end++ = '\0';
+
+      while (*end && isspace(*end & 255))
+	end ++;
+
+     /*
+      * Check value if it matches something we support...
+      */
+
+      if (qvalue <= 0.0)
+        continue;
+
+      for (i = 0; i < (int)(sizeof(codings) / sizeof(codings[0])); i ++)
+        if (!strcmp(start, codings[i]))
+          return (codings[i]);
+    }
+  }
+#endif /* HAVE_LIBZ */
+
+  return (NULL);
 }
 
 
@@ -1265,6 +1356,10 @@ httpGetLength(http_t *http)		/* I - Connection to server */
 off_t					/* O - Content length */
 httpGetLength2(http_t *http)		/* I - Connection to server */
 {
+  http_encoding_t	encoding;	/* Data encoding */
+  off_t			remaining;	/* Remaining length */
+
+
   DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
                 http_states[http->state + 1]));
 
@@ -1275,12 +1370,12 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
 
-    http->data_encoding  = HTTP_ENCODING_CHUNKED;
-    http->data_remaining = 0;
+    encoding  = HTTP_ENCODING_CHUNKED;
+    remaining = 0;
   }
   else
   {
-    http->data_encoding = HTTP_ENCODING_LENGTH;
+    encoding = HTTP_ENCODING_LENGTH;
 
    /*
     * The following is a hack for HTTP servers that don't send a
@@ -1298,25 +1393,35 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
       */
 
       if (http->status >= HTTP_MULTIPLE_CHOICES)
-        http->data_remaining = 0;
+        remaining = 0;
       else
-        http->data_remaining = 2147483647;
+        remaining = 2147483647;
     }
-    else if ((http->data_remaining =
-                  strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
-			  NULL, 10)) < 0)
+    else if ((remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
+			          NULL, 10)) < 0)
       return (-1);
 
     DEBUG_printf(("4httpGetLength2: content_length=" CUPS_LLFMT,
-                  CUPS_LLCAST http->data_remaining));
+                  CUPS_LLCAST remaining));
   }
 
-  if (http->data_remaining <= INT_MAX)
-    http->_data_remaining = (int)http->data_remaining;
-  else
-    http->_data_remaining = INT_MAX;
+  if ((http->mode == _HTTP_MODE_CLIENT &&
+       (http->state == HTTP_STATE_GET || http->state == HTTP_STATE_POST ||
+        http->state == HTTP_STATE_PUT)) ||
+      (http->mode == _HTTP_MODE_SERVER &&
+       (http->state == HTTP_STATE_GET_SEND ||
+        http->state == HTTP_STATE_POST_SEND)))
+  {
+    http->data_encoding  = encoding;
+    http->data_remaining = remaining;
 
-  return (http->data_remaining);
+    if (remaining <= INT_MAX)
+      http->_data_remaining = (int)remaining;
+    else
+      http->_data_remaining = INT_MAX;
+  }
+
+  return (remaining);
 }
 
 
@@ -3309,6 +3414,8 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     while (_cups_isspace(*value))
       value ++;
 
+    DEBUG_printf(("1_httpUpdate: Header %s: %s", line, value));
+
    /*
     * Be tolerants of servers that send unknown attribute fields...
     */
@@ -3952,6 +4059,11 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     http->status = HTTP_ERROR;
     return (-1);
   }
+
+ /*
+  * Force data_encoding and data_length to be set according to the response
+  * headers...
+  */
 
   (void)httpGetLength2(http);
 
