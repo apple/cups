@@ -123,6 +123,8 @@
  *   http_send()		  - Send a request with all fields and the
  *				    trailing blank line.
  *   http_set_credentials()	  - Set the SSL/TLS credentials.
+ *   http_set_length()            - Set the data_encoding and data_remaining
+ *                                  values.
  *   http_set_timeout() 	  - Set the socket timeout values.
  *   http_set_wait()		  - Set the default wait value for reads.
  *   http_setup_ssl()		  - Set up SSL/TLS support on a connection.
@@ -178,6 +180,7 @@ static int		http_read_ssl(http_t *http, char *buf, int len);
 static int		http_set_credentials(http_t *http);
 #  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
 #endif /* HAVE_SSL */
+static off_t		http_set_length(http_t *http);
 static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
 #ifdef HAVE_SSL
@@ -1356,7 +1359,6 @@ httpGetLength(http_t *http)		/* I - Connection to server */
 off_t					/* O - Content length */
 httpGetLength2(http_t *http)		/* I - Connection to server */
 {
-  http_encoding_t	encoding;	/* Data encoding */
   off_t			remaining;	/* Remaining length */
 
 
@@ -1369,19 +1371,15 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
   if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING], "chunked"))
   {
     DEBUG_puts("4httpGetLength2: chunked request!");
-
-    encoding  = HTTP_ENCODING_CHUNKED;
     remaining = 0;
   }
   else
   {
-    encoding = HTTP_ENCODING_LENGTH;
-
    /*
     * The following is a hack for HTTP servers that don't send a
-    * content-length or transfer-encoding field...
+    * Content-Length or Transfer-Encoding field...
     *
-    * If there is no content-length then the connection must close
+    * If there is no Content-Length then the connection must close
     * after the transfer is complete...
     */
 
@@ -1399,26 +1397,10 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
     }
     else if ((remaining = strtoll(http->fields[HTTP_FIELD_CONTENT_LENGTH],
 			          NULL, 10)) < 0)
-      return (-1);
+      remaining = -1;
 
     DEBUG_printf(("4httpGetLength2: content_length=" CUPS_LLFMT,
                   CUPS_LLCAST remaining));
-  }
-
-  if ((http->mode == _HTTP_MODE_CLIENT &&
-       (http->state == HTTP_STATE_GET || http->state == HTTP_STATE_POST ||
-        http->state == HTTP_STATE_PUT)) ||
-      (http->mode == _HTTP_MODE_SERVER &&
-       (http->state == HTTP_STATE_GET_SEND ||
-        http->state == HTTP_STATE_POST_SEND)))
-  {
-    http->data_encoding  = encoding;
-    http->data_remaining = remaining;
-
-    if (remaining <= INT_MAX)
-      http->_data_remaining = (int)remaining;
-    else
-      http->_data_remaining = INT_MAX;
   }
 
   return (remaining);
@@ -3348,7 +3330,12 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     }
 #endif /* HAVE_SSL */
 
-    if (httpGetLength2(http) < 0)
+/*    if (http->mode == _HTTP_MODE_CLIENT &&
+        (http->state == HTTP_STATE_GET ||
+         http->state == HTTP_STATE_POST_RECV))
+      http->data_encoding = HTTP_ENCODING_LENGTH;*/
+
+    if (http_set_length(http) < 0)
     {
       DEBUG_puts("1_httpUpdate: Bad Content-Length.");
       http->error  = EINVAL;
@@ -3956,7 +3943,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   DEBUG_printf(("httpWriteResponse(http=%p, status=%d)", http, status));
 
-  if (!http || status < HTTP_CONTINUE)
+  if (!http || status < HTTP_STATUS_CONTINUE)
   {
     DEBUG_puts("1httpWriteResponse: Bad input.");
     return (-1);
@@ -3990,7 +3977,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   }
 
 #ifdef HAVE_SSL
-  if (status == HTTP_UPGRADE_REQUIRED)
+  if (status == HTTP_STATUS_UPGRADE_REQUIRED)
   {
     if (!http->fields[HTTP_FIELD_CONNECTION][0])
       httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
@@ -4016,7 +4003,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     return (-1);
   }
 
-  if (status != HTTP_CONTINUE)
+  if (status != HTTP_STATUS_CONTINUE)
   {
    /*
     * 100 Continue doesn't have the rest of the response headers...
@@ -4060,15 +4047,22 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     return (-1);
   }
 
- /*
-  * Force data_encoding and data_length to be set according to the response
-  * headers...
-  */
+  if (status != HTTP_STATUS_CONTINUE)
+  {
+   /*
+    * Force data_encoding and data_length to be set according to the response
+    * headers...
+    */
 
-  (void)httpGetLength2(http);
+    http_set_length(http);
 
-  http_content_coding_start(http,
-			    httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
+   /*
+    * Then start any content encoding...
+    */
+
+    http_content_coding_start(http,
+			      httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
+  }
 
   return (0);
 }
@@ -4686,7 +4680,7 @@ http_send(http_t       *http,		/* I - Connection to server */
   if (httpFlushWrite(http) < 0)
     return (-1);
 
-  httpGetLength2(http);
+  http_set_length(http);
   httpClearFields(http);
 
  /*
@@ -4804,6 +4798,56 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 #  endif /* HAVE_CDSASSL && HAVE_SECCERTIFICATECOPYDATA */
 #endif /* HAVE_SSL */
 
+
+/*
+ * 'http_set_length()' - Set the data_encoding and data_remaining values.
+ */
+
+static off_t				/* O - Remainder or -1 on error */
+http_set_length(http_t *http)		/* I - Connection */
+{
+  off_t	remaining;			/* Remainder */
+
+
+  DEBUG_printf(("http_set_length(http=%p) mode=%d state=%s", http, http->mode,
+                http_states[http->state + 1]));
+
+  if ((remaining = httpGetLength2(http)) >= 0)
+  {
+    if (http->mode == _HTTP_MODE_SERVER &&
+	http->state != HTTP_STATE_GET_SEND &&
+	http->state != HTTP_STATE_POST)
+    {
+      DEBUG_puts("1http_set_length: Not setting data_encoding/remaining.");
+      return (remaining);
+    }
+
+    if (!_cups_strcasecmp(http->fields[HTTP_FIELD_TRANSFER_ENCODING],
+                          "chunked"))
+    {
+      DEBUG_puts("1http_set_length: Setting data_encoding to "
+                 "HTTP_ENCODING_CHUNKED.");
+      http->data_encoding  = HTTP_ENCODING_CHUNKED;
+    }
+    else
+    {
+      DEBUG_puts("1http_set_length: Setting data_encoding to "
+                 "HTTP_ENCODING_LENGTH.");
+      http->data_encoding = HTTP_ENCODING_LENGTH;
+    }
+
+    DEBUG_printf(("1http_set_length: Setting data_remaining to " CUPS_LLFMT ".",
+                  CUPS_LLCAST remaining));
+    http->data_remaining = remaining;
+
+    if (remaining <= INT_MAX)
+      http->_data_remaining = remaining;
+    else
+      http->_data_remaining = INT_MAX;
+  }
+
+  return (remaining);
+}
 
 /*
  * 'http_set_timeout()' - Set the socket timeout values.

@@ -3949,12 +3949,13 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Parse the request line...
   */
 
-  fprintf(stderr, "%s %s\n", client->hostname, uri);
-
   if (http_state == HTTP_STATE_ERROR)
   {
-    fprintf(stderr, "%s Bad request line.\n", client->hostname);
-    respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
+    if (httpError(client->http) == EPIPE)
+      fprintf(stderr, "%s Client closed connection.\n", client->hostname);
+    else
+      fprintf(stderr, "%s Bad request line.\n", client->hostname);
+
     return (0);
   }
   else if (http_state == HTTP_STATE_UNKNOWN_METHOD)
@@ -3969,6 +3970,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
     return (0);
   }
+
+  fprintf(stderr, "%s %s\n", client->hostname, uri);
 
  /*
   * Separate the URI into its components...
