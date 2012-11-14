@@ -36,6 +36,10 @@
  *   ippAddStringf()	    - Add a formatted string to an IPP message.
  *   ippAddStringfv()	    - Add a formatted string to an IPP message.
  *   ippAddStrings()	    - Add language-encoded strings to an IPP message.
+ *   ippContainsInteger()   - Determine whether an attribute contains the
+ *			      specified value or is within the list of ranges.
+ *   ippContainsString()    - Determine whether an attribute contains the
+ *			      specified string value.
  *   ippCopyAttribute()     - Copy an attribute.
  *   ippCopyAttributes()    - Copy attributes from one IPP message to another.
  *   ippDateToTime()	    - Convert from RFC 1903 Date/Time format to UNIX
@@ -88,6 +92,8 @@
  *   ippSetStatusCode()     - Set the status code in an IPP response or event
  *			      message.
  *   ippSetString()	    - Set a string value in an attribute.
+ *   ippSetStringf()	    - Set a formatted string value of an attribute.
+ *   ippSetStringf()	    - Set a formatted string value of an attribute.
  *   ippSetValueTag()	    - Set the value tag of an attribute.
  *   ippSetVersion()	    - Set the version number in an IPP message.
  *   ippTimeToDate()	    - Convert from UNIX time to RFC 1903 format.
@@ -1441,6 +1447,133 @@ ippAddStrings(
   }
 
   return (attr);
+}
+
+
+/*
+ * 'ippContainsInteger()' - Determine whether an attribute contains the
+ *                          specified value or is within the list of ranges.
+ *
+ * Returns non-zero when the attribute contains either a matching integer or
+ * enum value, or the value falls within one of the rangeOfInteger values for
+ * the attribute.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O - 1 on a match, 0 on no match */
+ippContainsInteger(
+    ipp_attribute_t *attr,		/* I - Attribute */
+    int             value)		/* I - Integer/enum value */
+{
+  int		i;			/* Looping var */
+  _ipp_value_t	*avalue;		/* Current attribute value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!attr)
+    return (0);
+
+  if (attr->value_tag != IPP_TAG_INTEGER && attr->value_tag != IPP_TAG_ENUM &&
+      attr->value_tag != IPP_TAG_RANGE)
+    return (0);
+
+ /*
+  * Compare...
+  */
+
+  if (attr->value_tag == IPP_TAG_RANGE)
+  {
+    for (i = attr->num_values, avalue = attr->values; i > 0; i --, avalue ++)
+      if (value >= avalue->range.lower && value <= avalue->range.upper)
+        return (1);
+  }
+  else
+  {
+    for (i = attr->num_values, avalue = attr->values; i > 0; i --, avalue ++)
+      if (value == avalue->integer)
+        return (1);
+  }
+
+  return (0);
+}
+
+
+/*
+ * 'ippContainsString()' - Determine whether an attribute contains the
+ *                         specified string value.
+ *
+ * Returns non-zero when the attribute contains a matching charset, keyword,
+ * language, mimeMediaType, name, text, URI, or URI scheme value.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O - 1 on a match, 0 on no match */
+ippContainsString(
+    ipp_attribute_t *attr,		/* I - Attribute */
+    const char      *value)		/* I - String value */
+{
+  int		i;			/* Looping var */
+  _ipp_value_t	*avalue;		/* Current attribute value */
+
+
+  DEBUG_printf(("ippContainsString(attr=%p, value=\"%s\")", attr, value));
+
+ /*
+  * Range check input...
+  */
+
+  if (!attr || !value)
+  {
+    DEBUG_puts("1ippContainsString: Returning 0 (bad input)");
+    return (0);
+  }
+
+ /*
+  * Compare...
+  */
+
+  DEBUG_printf(("1ippContainsString: attr %s, %s with %d values.",
+		attr->name, ippTagString(attr->value_tag),
+		attr->num_values));
+
+  switch (attr->value_tag & IPP_TAG_CUPS_MASK)
+  {
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+	for (i = attr->num_values, avalue = attr->values;
+	     i > 0;
+	     i --, avalue ++)
+	{
+	  DEBUG_printf(("1ippContainsString: value[%d]=\"%s\"",
+	                attr->num_values - i, avalue->string.text));
+
+	  if (!strcmp(value, avalue->string.text))
+	  {
+	    DEBUG_puts("1ippContainsString: Returning 1 (match)");
+	    return (1);
+	  }
+        }
+
+    default :
+        break;
+  }
+
+  DEBUG_puts("1ippContainsString: Returning 0 (no match)");
+
+  return (0);
 }
 
 
@@ -4131,6 +4264,192 @@ ippSetString(ipp_t           *ipp,	/* IO - IPP message */
   }
 
   return (value != NULL);
+}
+
+
+/*
+ * 'ippSetStringf()' - Set a formatted string value of an attribute.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * The @code format@ parameter uses formatting characters compatible with the
+ * printf family of standard functions.  Additional arguments follow it as
+ * needed.  The formatted string is truncated as needed to the maximum length of
+ * the corresponding value type.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetStringf(ipp_t           *ipp,	/* IO - IPP message */
+              ipp_attribute_t **attr,	/* IO - IPP attribute */
+              int             element,	/* I  - Value number (0-based) */
+	      const char      *format,	/* I  - Printf-style format string */
+	      ...)			/* I  - Additional arguments as needed */
+{
+  int		ret;			/* Return value */
+  va_list	ap;			/* Pointer to additional arguments */
+
+
+  va_start(ap, format);
+  ret = ippSetStringfv(ipp, attr, element, format, ap);
+  va_end(ap);
+
+  return (ret);
+}
+
+
+/*
+ * 'ippSetStringf()' - Set a formatted string value of an attribute.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * The @code format@ parameter uses formatting characters compatible with the
+ * printf family of standard functions.  Additional arguments follow it as
+ * needed.  The formatted string is truncated as needed to the maximum length of
+ * the corresponding value type.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetStringfv(ipp_t           *ipp,	/* IO - IPP message */
+               ipp_attribute_t **attr,	/* IO - IPP attribute */
+               int             element,	/* I  - Value number (0-based) */
+	       const char      *format,	/* I  - Printf-style format string */
+	       va_list         ap)	/* I  - Pointer to additional arguments */
+{
+  ipp_tag_t	value_tag;		/* Value tag */
+  char		buffer[IPP_MAX_TEXT + 4];
+					/* Formatted text string */
+  ssize_t	bytes,			/* Length of formatted value */
+		max_bytes;		/* Maximum number of bytes for value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (attr && *attr)
+    value_tag = (*attr)->value_tag & IPP_TAG_CUPS_MASK;
+  else
+    value_tag = IPP_TAG_ZERO;
+
+  if (!ipp || !attr || !*attr ||
+      (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
+       value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
+      !format || !ap)
+    return (0);
+
+ /*
+  * Format the string...
+  */
+
+  if (!strcmp(format, "%s"))
+  {
+   /*
+    * Optimize the simple case...
+    */
+
+    const char *s = va_arg(ap, char *);
+
+    if (!s)
+      s = "(null)";
+
+    bytes = strlen(s);
+    strlcpy(buffer, s, sizeof(buffer));
+  }
+  else
+  {
+   /*
+    * Do a full formatting of the message...
+    */
+
+    if ((bytes = vsnprintf(buffer, sizeof(buffer), format, ap)) < 0)
+      return (0);
+  }
+
+ /*
+  * Limit the length of the string...
+  */
+
+  switch (value_tag)
+  {
+    default :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+        max_bytes = IPP_MAX_TEXT;
+        break;
+
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+        max_bytes = IPP_MAX_NAME;
+        break;
+
+    case IPP_TAG_CHARSET :
+        max_bytes = IPP_MAX_CHARSET;
+        break;
+
+    case IPP_TAG_KEYWORD :
+        max_bytes = IPP_MAX_KEYWORD;
+        break;
+
+    case IPP_TAG_LANGUAGE :
+        max_bytes = IPP_MAX_LANGUAGE;
+        break;
+
+    case IPP_TAG_MIMETYPE :
+        max_bytes = IPP_MAX_MIMETYPE;
+        break;
+
+    case IPP_TAG_URI :
+        max_bytes = IPP_MAX_URI;
+        break;
+
+    case IPP_TAG_URISCHEME :
+        max_bytes = IPP_MAX_URISCHEME;
+        break;
+  }
+
+  if (bytes >= max_bytes)
+  {
+    char	*bufmax,		/* Buffer at max_bytes */
+		*bufptr;		/* Pointer into buffer */
+
+    bufptr = buffer + strlen(buffer) - 1;
+    bufmax = buffer + max_bytes - 1;
+
+    while (bufptr > bufmax)
+    {
+      if (*bufptr & 0x80)
+      {
+        while ((*bufptr & 0xc0) == 0x80 && bufptr > buffer)
+          bufptr --;
+      }
+
+      bufptr --;
+    }
+
+    *bufptr = '\0';
+  }
+
+ /*
+  * Set the formatted string and return...
+  */
+
+  return (ippSetString(ipp, attr, element, buffer));
 }
 
 

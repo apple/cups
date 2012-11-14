@@ -186,6 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		*addr;			/* Current address */
   off_t		length, total;		/* Length and total bytes */
   time_t	start, current;		/* Start and end time */
+  const char	*encoding;		/* Negotiated Content-Encoding */
   static const char * const uri_status_strings[] =
 		{
 		  "HTTP_URI_OVERFLOW",
@@ -554,9 +555,24 @@ main(int  argc,				/* I - Number of command-line arguments */
       perror(hostname);
       continue;
     }
-    printf("Requesting file \"%s\"...\n", resource);
+    printf("Checking file \"%s\"...\n", resource);
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
+    httpHead(http, resource);
+    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+
+    if (status == HTTP_OK)
+      puts("HEAD OK:");
+    else
+      printf("HEAD failed with status %d...\n", status);
+
+    encoding = httpGetContentEncoding(http);
+
+    printf("Requesting file \"%s\" (Accept-Encoding: %s)...\n", resource,
+           encoding ? encoding : "identity");
+    httpClearFields(http);
+    httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, encoding);
     httpGet(http, resource);
     while ((status = httpUpdate(http)) == HTTP_CONTINUE);
 

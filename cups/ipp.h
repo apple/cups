@@ -915,7 +915,17 @@ extern ipp_attribute_t	*ippAddStringfv(ipp_t *ipp, ipp_tag_t group,
 					const char *language,
 					const char *format, va_list ap)
 					_CUPS_API_1_7;
+extern int		ippContainsInteger(ipp_attribute_t *attr, int value)
+			                   _CUPS_API_1_7;
+extern int		ippContainsString(ipp_attribute_t *attr,
+			                  const char *value) _CUPS_API_1_7;
 extern ipp_t		*ippNewResponse(ipp_t *request) _CUPS_API_1_7;
+extern int		ippSetStringf(ipp_t *ipp, ipp_attribute_t **attr,
+			              int element, const char *format,
+				      ...) _CUPS_API_1_7;
+extern int		ippSetStringfv(ipp_t *ipp, ipp_attribute_t **attr,
+			               int element, const char *format,
+				       va_list ap) _CUPS_API_1_7;
 
 
 /*

@@ -1044,6 +1044,14 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     "us-ascii",
     "utf-8"
   };
+  static const char * const compressions[] =/* compression-supported values */
+  {
+#ifdef HAVE_LIBZ
+    "deflate",
+    "gzip",
+#endif /* HAVE_LIBZ */
+    "none"
+  };
   static const char * const job_creation[] =
   {					/* job-creation-attributes-supported values */
     "copies",
@@ -1270,9 +1278,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 ppm_color > 0);
 
   /* compression-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
-	       "compression-supported", NULL, "none");
+	       "compression-supported",
+	       (int)(sizeof(compressions) / sizeof(compressions[0])), NULL,
+	       compressions);
 
   /* copies-default */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -3924,6 +3934,25 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 					/* Hostname */
   int			port;		/* Port number */
   const char		*encoding;	/* Content-Encoding value */
+  static const char * const http_states[] =
+  {					/* Strings for logging HTTP method */
+    "WAITING",
+    "OPTIONS",
+    "GET",
+    "GET_SEND",
+    "HEAD",
+    "POST",
+    "POST_RECV",
+    "POST_SEND",
+    "PUT",
+    "PUT_RECV",
+    "DELETE",
+    "TRACE",
+    "CONNECT",
+    "STATUS",
+    "UNKNOWN_METHOD",
+    "UNKNOWN_VERSION"
+  };
 
 
  /*
@@ -3971,7 +4000,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     return (0);
   }
 
-  fprintf(stderr, "%s %s\n", client->hostname, uri);
+  fprintf(stderr, "%s %s %s\n", client->hostname, http_states[http_state],
+          uri);
 
  /*
   * Separate the URI into its components...
@@ -4251,6 +4281,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
              group = ippGetGroupTag(attr);
 	 attr;
 	 attr = ippNextAttribute(client->request))
+    {
       if (ippGetGroupTag(attr) < group && ippGetGroupTag(attr) != IPP_TAG_ZERO)
       {
        /*
@@ -4264,6 +4295,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
       }
       else
 	group = ippGetGroupTag(attr);
+    }
 
     if (!attr)
     {
@@ -4337,6 +4369,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
         * Try processing the operation...
 	*/
 
+#if 0 /* Already doing this in process_http()... */
         if (httpGetExpect(client->http) == HTTP_STATUS_CONTINUE)
 	{
 	 /*
@@ -4346,6 +4379,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	  if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
 	    return (0);
 	}
+#endif /* 0 */
 
 	switch (ippGetOperation(client->request))
 	{
@@ -4722,8 +4756,12 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
     ipp_attribute_t	*attr;		/* New status-message attribute */
 
     va_start(ap, message);
-    attr = ippAddStringfv(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
-                          "status-message", NULL, message, ap);
+    if ((attr = ippFindAttribute(client->response, "status-message",
+				 IPP_TAG_TEXT)) != NULL)
+      ippSetStringfv(client->response, &attr, 0, message, ap);
+    else
+      attr = ippAddStringfv(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+			    "status-message", NULL, message, ap);
     va_end(ap);
 
     formatted = ippGetString(attr, 0, NULL);
@@ -4895,11 +4933,16 @@ static int				/* O - 1 if valid, 0 if not */
 valid_doc_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
-  int			i,		/* Looping var */
-			valid = 1;	/* Valid attributes? */
+  int			valid = 1;	/* Valid attributes? */
+  ipp_op_t		op = ippGetOperation(client->request);
+					/* IPP operation */
+  const char		*op_name = ippOpString(op);
+					/* IPP operation name */
   ipp_attribute_t	*attr,		/* Current attribute */
-			*supported;	/* document-format-supported */
-  const char		*format = NULL;	/* document-format value */
+			*supported;	/* xxx-supported attribute */
+  const char		*compression = NULL,
+					/* compression value */
+			*format = NULL;	/* document-format value */
 
 
  /*
@@ -4910,11 +4953,18 @@ valid_doc_attributes(
                                IPP_TAG_ZERO)) != NULL)
   {
    /*
-    * If compression is specified, only accept "none"...
+    * If compression is specified, only accept a supported value in a Print-Job
+    * or Send-Document request...
     */
 
+    compression = ippGetString(attr, 0, NULL);
+    supported   = ippFindAttribute(client->printer->attrs,
+                                   "compression-supported", IPP_TAG_KEYWORD);
+
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
-        strcmp(ippGetString(attr, 0, NULL), "none"))
+        ippGetGroupTag(attr) != IPP_TAG_OPERATION ||
+        (op != IPP_OP_PRINT_JOB && op != IPP_OP_SEND_DOCUMENT) ||
+        !ippContainsString(supported, compression))
     {
       respond_unsupported(client, attr);
       valid = 0;
@@ -4922,9 +4972,10 @@ valid_doc_attributes(
     else
     {
       fprintf(stderr, "%s %s compression=\"%s\"\n",
-              client->hostname,
-              ippOpString(ippGetOperation(client->request)),
-              ippGetString(attr, 0, NULL));
+              client->hostname, op_name, compression);
+
+      if (strcmp(compression, "none"))
+        httpSetField(client->http, HTTP_FIELD_CONTENT_ENCODING, compression);
     }
   }
 
@@ -4935,7 +4986,8 @@ valid_doc_attributes(
   if ((attr = ippFindAttribute(client->request, "document-format",
                                IPP_TAG_ZERO)) != NULL)
   {
-    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_MIMETYPE)
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_MIMETYPE ||
+        ippGetGroupTag(attr) != IPP_TAG_OPERATION)
     {
       respond_unsupported(client, attr);
       valid = 0;
@@ -4945,8 +4997,7 @@ valid_doc_attributes(
       format = ippGetString(attr, 0, NULL);
 
       fprintf(stderr, "%s %s document-format=\"%s\"\n",
-	      client->hostname,
-	      ippOpString(ippGetOperation(client->request)), format);
+	      client->hostname, op_name, format);
     }
   }
   else
@@ -4977,8 +5028,7 @@ valid_doc_attributes(
 
     if (format)
       fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
-	      client->hostname,
-	      ippOpString(ippGetOperation(client->request)), format);
+	      client->hostname, op_name, format);
 
     if (!attr)
       attr = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
@@ -4987,22 +5037,14 @@ valid_doc_attributes(
       ippSetString(client->request, &attr, 0, format);
   }
 
-  if (ippGetOperation(client->request) != IPP_OP_CREATE_JOB &&
+  if (op != IPP_OP_CREATE_JOB &&
       (supported = ippFindAttribute(client->printer->attrs,
                                     "document-format-supported",
-			            IPP_TAG_MIMETYPE)) != NULL)
+			            IPP_TAG_MIMETYPE)) != NULL &&
+      !ippContainsString(supported, format))
   {
-    int count = ippGetCount(supported);
-
-    for (i = 0; i < count; i ++)
-      if (!_cups_strcasecmp(format, ippGetString(supported, i, NULL)))
-	break;
-
-    if (i >= count && attr)
-    {
-      respond_unsupported(client, attr);
-      valid = 0;
-    }
+    respond_unsupported(client, attr);
+    valid = 0;
   }
 
   return (valid);

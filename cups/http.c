@@ -467,6 +467,8 @@ httpClearCookie(http_t *http)		/* I - Connection to server */
 void
 httpClearFields(http_t *http)		/* I - Connection to server */
 {
+  DEBUG_printf(("httpClearFields(http=%p)", http));
+
   if (http)
   {
     memset(http->fields, 0, sizeof(http->fields));
@@ -1386,11 +1388,18 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
     if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
     {
      /*
-      * Default content length is 0 for errors and 2^31-1 for other
-      * successful requests...
+      * Default content length is 0 for errors and certain types of operations,
+      * and 2^31-1 for other successful requests...
       */
 
-      if (http->status >= HTTP_MULTIPLE_CHOICES)
+      if (http->status >= HTTP_MULTIPLE_CHOICES ||
+          http->state == HTTP_STATE_OPTIONS ||
+          (http->state == HTTP_STATE_GET && http->mode == _HTTP_MODE_SERVER) ||
+          http->state == HTTP_STATE_HEAD ||
+          (http->state == HTTP_STATE_PUT && http->mode == _HTTP_MODE_CLIENT) ||
+          http->state == HTTP_STATE_DELETE ||
+          http->state == HTTP_STATE_TRACE ||
+          http->state == HTTP_STATE_CONNECT)
         remaining = 0;
       else
         remaining = 2147483647;
@@ -2201,8 +2210,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT ")",
-                http, buffer, CUPS_LLCAST length));
+  DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
+                ") coding=%d", http, buffer, CUPS_LLCAST length,
+                http->coding));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -2232,8 +2242,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
     }
   }
 
-  DEBUG_printf(("2httpRead2: data_remaining=" CUPS_LLFMT,
-                CUPS_LLCAST http->data_remaining));
+  DEBUG_printf(("2httpRead2: data_remaining=" CUPS_LLFMT ", used=%d",
+                CUPS_LLCAST http->data_remaining, http->used));
 
   if (http->data_remaining <= 0 && http->data_encoding != HTTP_ENCODING_FIELDS)
   {
@@ -2266,7 +2276,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     return (0);
   }
-  else if (length > (size_t)http->data_remaining)
+  else if (http->data_encoding == HTTP_ENCODING_LENGTH &&
+           length > (size_t)http->data_remaining)
     length = (size_t)http->data_remaining;
 
 #ifdef HAVE_LIBZ
@@ -2361,24 +2372,51 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #ifdef HAVE_LIBZ
   if (http->coding)
   {
+    int		zerr;			/* Decompressor error */
+    off_t	comp_avail,		/* Maximum bytes for decompression */
+		comp_bytes;		/* Compressed bytes "used" */
+
+    if (http->used > http->data_remaining)
+      comp_avail = http->data_remaining;
+    else
+      comp_avail = http->used;
+
+    DEBUG_printf(("2httpRead2: length=%d, avail_in=%d", (int)length,
+                  (int)comp_avail));
+
     http->stream.next_in   = (Bytef *)http->buffer;
-    http->stream.avail_in  = http->used;
+    http->stream.avail_in  = comp_avail;
     http->stream.next_out  = (Bytef *)buffer;
     http->stream.avail_out = length;
 
-    if (inflate(&(http->stream), Z_NO_FLUSH) < Z_OK)
+    if ((zerr = inflate(&(http->stream), Z_SYNC_FLUSH)) < Z_OK)
     {
+      DEBUG_printf(("2httpRead2: zerr=%d", zerr));
       http->error = EIO;
       return (-1);
     }
 
-    bytes = length - http->stream.avail_out;
+    bytes      = length - http->stream.avail_out;
+    comp_bytes = comp_avail - http->stream.avail_in;
 
-    if (http->stream.avail_in < http->used)
+    DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d, bytes=%d, "
+                  "comp_bytes=%d", http->stream.avail_in,
+                  http->stream.avail_out, (int)bytes, (int)comp_bytes));
+
+    if ((http->used - comp_bytes) > 0)
     {
-      http->used = http->stream.avail_in;
+      http->used -= comp_bytes;
       memmove(http->buffer, http->stream.next_in, http->used);
     }
+    else
+      http->used = 0;
+
+   /*
+    * Adjust remaining bytes since chunk/content lengths are compressed while
+    * CUPS HTTP APIs return uncompressed sizes...
+    */
+
+    http->data_remaining += bytes - comp_bytes;
   }
   else
 #endif /* HAVE_LIBZ */
@@ -2516,15 +2554,15 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
   if (http->data_remaining == 0)
   {
-#ifdef HAVE_LIBZ
-    if (http->coding)
-      http_content_coding_finish(http);
-#endif /* HAVE_LIBZ */
-
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
     else
     {
+#ifdef HAVE_LIBZ
+      if (http->coding)
+	http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
+
       if (http->state == HTTP_STATE_POST_RECV)
         http->state ++;
       else
@@ -3095,6 +3133,9 @@ httpSetField(http_t       *http,	/* I - Connection to server */
              http_field_t field,	/* I - Field index */
 	     const char   *value)	/* I - Value */
 {
+  DEBUG_printf(("httpSetField(http=%p, field=%d(%s), value=\"%s\")", http,
+                field, http_fields[field], value));
+
   if (http == NULL ||
       field < HTTP_FIELD_ACCEPT_LANGUAGE ||
       field >= HTTP_FIELD_MAX ||
@@ -3182,7 +3223,10 @@ httpSetField(http_t       *http,	/* I - Connection to server */
 #ifdef HAVE_LIBZ
   else if (field == HTTP_FIELD_CONTENT_ENCODING &&
            http->data_encoding != HTTP_ENCODING_FIELDS)
+  {
+    DEBUG_puts("1httpSetField: Calling http_content_coding_start.");
     http_content_coding_start(http, value);
+  }
 #endif /* HAVE_LIBZ */
 }
 
@@ -3330,11 +3374,6 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     }
 #endif /* HAVE_SSL */
 
-/*    if (http->mode == _HTTP_MODE_CLIENT &&
-        (http->state == HTTP_STATE_GET ||
-         http->state == HTTP_STATE_POST_RECV))
-      http->data_encoding = HTTP_ENCODING_LENGTH;*/
-
     if (http_set_length(http) < 0)
     {
       DEBUG_puts("1_httpUpdate: Bad Content-Length.");
@@ -3367,6 +3406,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     }
 
 #ifdef HAVE_LIBZ
+    DEBUG_puts("1_httpUpdate: Calling http_content_coding_start.");
     http_content_coding_start(http,
                               httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
 #endif /* HAVE_LIBZ */
@@ -3387,6 +3427,8 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
       *status = http->status = HTTP_ERROR;
       return (0);
     }
+
+    httpClearFields(http);
 
     http->version = (http_version_t)(major * 100 + minor);
     *status       = http->status = (http_status_t)intstatus;
@@ -3736,14 +3778,17 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       {
 	http->wused = sizeof(http->wbuffer) - http->stream.avail_out;
 
-	if (httpFlushWrite(http) < 0)
-	{
-	  DEBUG_puts("1httpWrite2: Unable to flush, returning -1.");
-	  return (-1);
-	}
+        if (http->stream.avail_out == 0)
+        {
+	  if (httpFlushWrite(http) < 0)
+	  {
+	    DEBUG_puts("1httpWrite2: Unable to flush, returning -1.");
+	    return (-1);
+	  }
 
-	http->stream.next_out  = (Bytef *)http->wbuffer;
-	http->stream.avail_out = sizeof(http->wbuffer);
+	  http->stream.next_out  = (Bytef *)http->wbuffer;
+	  http->stream.avail_out = sizeof(http->wbuffer);
+	}
       }
 
       http->wused = sizeof(http->wbuffer) - http->stream.avail_out;
@@ -3937,6 +3982,10 @@ int					/* O - 0 on success, -1 on error */
 httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 		  http_status_t status)	/* I - Status code */
 {
+  http_encoding_t	old_encoding;	/* Old data_encoding value */
+  off_t			old_remaining;	/* Old data_remaining value */
+
+
  /*
   * Range check input...
   */
@@ -3990,10 +4039,21 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (!http->server)
     httpSetField(http, HTTP_FIELD_SERVER, CUPS_MINIMAL);
 
+#ifdef HAVE_LIBZ
+ /*
+  * Set the Accept-Encoding field if it isn't already...
+  */
+
+  if (!http->accept_encoding)
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, "gzip, deflate, identity");
+#endif /* HAVE_LIBZ */
+
  /*
   * Send the response header...
   */
 
+  old_encoding        = http->data_encoding;
+  old_remaining       = http->data_remaining;
   http->data_encoding = HTTP_ENCODING_FIELDS;
 
   if (httpPrintf(http, "HTTP/%d.%d %d %s\r\n", http->version / 100,
@@ -4047,7 +4107,31 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     return (-1);
   }
 
-  if (status != HTTP_STATUS_CONTINUE)
+  if (status == HTTP_STATUS_CONTINUE)
+  {
+   /*
+    * Restore the old data_encoding and data_length values...
+    */
+
+    http->data_encoding  = old_encoding;
+    http->data_remaining = old_remaining;
+
+    if (old_remaining <= INT_MAX)
+      http->_data_remaining = (int)old_remaining;
+    else
+      http->_data_remaining = INT_MAX;
+  }
+  else if (http->state == HTTP_STATE_OPTIONS ||
+           http->state == HTTP_STATE_HEAD ||
+           http->state == HTTP_STATE_PUT ||
+           http->state == HTTP_STATE_TRACE ||
+           http->state == HTTP_STATE_CONNECT)
+  {
+    DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
+                  "was %s.", http_states[http->state + 1]));
+    http->state = HTTP_STATE_WAITING;
+  }
+  else
   {
    /*
     * Force data_encoding and data_length to be set according to the response
@@ -4060,6 +4144,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     * Then start any content encoding...
     */
 
+    DEBUG_puts("1httpWriteResponse: Calling http_content_coding_start.");
     http_content_coding_start(http,
 			      httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
   }
@@ -4343,7 +4428,7 @@ http_content_coding_start(
 
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
-        if ((zerr = inflateInit(&(http->stream))) < Z_OK)
+        if ((zerr = inflateInit2(&(http->stream), 32 + 15)) < Z_OK)
         {
           http->status = HTTP_ERROR;
           http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
@@ -4827,7 +4912,7 @@ http_set_length(http_t *http)		/* I - Connection */
     {
       DEBUG_puts("1http_set_length: Setting data_encoding to "
                  "HTTP_ENCODING_CHUNKED.");
-      http->data_encoding  = HTTP_ENCODING_CHUNKED;
+      http->data_encoding = HTTP_ENCODING_CHUNKED;
     }
     else
     {
