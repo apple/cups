@@ -2276,7 +2276,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     return (0);
   }
-  else if (http->data_encoding == HTTP_ENCODING_LENGTH &&
+  else if ((http->data_encoding == HTTP_ENCODING_LENGTH ||
+            http->coding == _HTTP_CODING_IDENTITY) &&
            length > (size_t)http->data_remaining)
     length = (size_t)http->data_remaining;
 
