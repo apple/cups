@@ -1352,7 +1352,8 @@ main(int  argc,				/* I - Number of command-line args */
     monitor.job_name = print_job_name;
   }
 
-  _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
+  if (0)
+    _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
 
  /*
   * Validate access to the printer...

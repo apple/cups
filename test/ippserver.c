@@ -4712,6 +4712,9 @@ respond_http(
 
     if (httpPrintf(client->http, "%s", message) < 0)
       return (0);
+
+    if (httpWrite2(client->http, "", 0) < 0)
+      return (0);
   }
   else if (client->response)
   {
@@ -4727,11 +4730,7 @@ respond_http(
       return (0);
   }
 
- /*
-  * Flush the data and return...
-  */
-
-  return (httpFlushWrite(client->http) >= 0);
+  return (1);
 }
 
 

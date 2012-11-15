@@ -38,6 +38,10 @@
  */
 
 
+#ifdef DEBUG
+static int		cups_global_index = 0;
+					/* Next thread number */
+#endif /* DEBUG */
 static _cups_threadkey_t cups_globals_key = _CUPS_THREADKEY_INITIALIZER;
 					/* Thread local storage key */
 #ifdef HAVE_PTHREAD_H
@@ -215,6 +219,14 @@ cups_globals_alloc(void)
   cg->any_root      = 1;
   cg->expired_certs = 1;
   cg->expired_root  = 1;
+
+#ifdef DEBUG
+ /*
+  * Friendly thread ID for debugging...
+  */
+
+  cg->thread_id = ++ cups_global_index;
+#endif /* DEBUG */
 
  /*
   * Then set directories as appropriate...

@@ -3242,6 +3242,9 @@ void
 httpSetLength(http_t *http,		/* I - Connection to server */
               size_t length)		/* I - Length (0 for chunked) */
 {
+  DEBUG_printf(("httpSetLength(http=%p, length=" CUPS_LLFMT ")", http,
+                CUPS_LLCAST length));
+
   if (!http)
     return;
 
@@ -4902,7 +4905,8 @@ http_set_length(http_t *http)		/* I - Connection */
   {
     if (http->mode == _HTTP_MODE_SERVER &&
 	http->state != HTTP_STATE_GET_SEND &&
-	http->state != HTTP_STATE_POST)
+	http->state != HTTP_STATE_POST &&
+	http->state != HTTP_STATE_POST_SEND)
     {
       DEBUG_puts("1http_set_length: Not setting data_encoding/remaining.");
       return (remaining);
