@@ -3888,7 +3888,8 @@ ippSetGroupTag(
   * Range check input - group tag must be 0x01 to 0x0F, per RFC 2911...
   */
 
-  if (!ipp || !attr || group_tag < IPP_TAG_ZERO || group_tag == IPP_TAG_END ||
+  if (!ipp || !attr || !*attr ||
+      group_tag < IPP_TAG_ZERO || group_tag == IPP_TAG_END ||
       group_tag >= IPP_TAG_UNSUPPORTED_VALUE)
     return (0);
 
@@ -4494,7 +4495,7 @@ ippSetValueTag(
   * Range check input...
   */
 
-  if (!ipp || !attr)
+  if (!ipp || !attr || !*attr)
     return (0);
 
  /*
