@@ -606,7 +606,6 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   int			got_status;	/* Did we get the status? */
   ipp_state_t		state;		/* State of IPP processing */
   http_status_t		expect;		/* Expect: header to use */
-  ipp_attribute_t	*attr;		/* compression attribute */
 
 
   DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", "
@@ -809,15 +808,6 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     switch (status)
     {
       case HTTP_STATUS_CONTINUE :
-	  if ((attr = ippFindAttribute(request, "compression",
-				       IPP_TAG_KEYWORD)) != NULL)
-	  {
-	    const char *compression = ippGetString(attr, 0, NULL);
-
-	    if (strcmp(compression, "none"))
-	      httpSetField(http, HTTP_FIELD_CONTENT_ENCODING, compression);
-	  }
-
       case HTTP_STATUS_OK :
       case HTTP_STATUS_ERROR :
           DEBUG_printf(("1cupsSendRequest: Returning %d.", status));

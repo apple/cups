@@ -19,7 +19,6 @@
  *   main()		    - Send a file to the printer or server.
  *   cancel_job()	    - Cancel a print job.
  *   check_printer_state()  - Check the printer state.
- *   compress_files()	    - Compress print files.
  *   monitor_printer()	    - Monitor the printer state.
  *   new_request()	    - Create a new print creation or validation
  *			      request.
@@ -120,6 +119,9 @@ static int		password_tries = 0;
 					/* Password tries */
 static const char * const pattrs[] =	/* Printer attributes we want */
 {
+#ifdef HAVE_LIBZ
+  "compression-supported",
+#endif /* HAVE_LIBZ */
   "copies-supported",
   "cups-version",
   "document-format-supported",
@@ -171,9 +173,6 @@ static void		cancel_job(http_t *http, const char *uri, int id,
 static ipp_pstate_t	check_printer_state(http_t *http, const char *uri,
 		                            const char *resource,
 					    const char *user, int version);
-#ifdef HAVE_LIBZ
-static void		compress_files(int num_files, char **files);
-#endif /* HAVE_LIBZ */
 static void		*monitor_printer(_cups_monitor_t *monitor);
 static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 			             const char *user, const char *title,
@@ -257,6 +256,9 @@ main(int  argc,				/* I - Number of command-line args */
   int		job_id;			/* job-id value */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
   ipp_attribute_t *job_state;		/* job-state */
+#ifdef HAVE_LIBZ
+  ipp_attribute_t *compression_sup;	/* compression-supported */
+#endif /* HAVE_LIBZ */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
@@ -568,6 +570,13 @@ main(int  argc,				/* I - Number of command-line args */
         if (!_cups_strcasecmp(value, "true") || !_cups_strcasecmp(value, "yes") ||
 	    !_cups_strcasecmp(value, "on") || !_cups_strcasecmp(value, "gzip"))
 	  compression = "gzip";
+        else if (!_cups_strcasecmp(value, "deflate"))
+	  compression = "deflate";
+        else if (!_cups_strcasecmp(value, "false") ||
+                 !_cups_strcasecmp(value, "no") ||
+		 !_cups_strcasecmp(value, "off") ||
+		 !_cups_strcasecmp(value, "none"))
+	  compression = "none";
       }
 #endif /* HAVE_LIBZ */
       else if (!_cups_strcasecmp(name, "contimeout"))
@@ -617,11 +626,6 @@ main(int  argc,				/* I - Number of command-line args */
     num_files    = argc - 6;
     files        = argv + 6;
     send_options = 1;
-
-#ifdef HAVE_LIBZ
-    if (compression)
-      compress_files(num_files, files);
-#endif /* HAVE_LIBZ */
 
     fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
   }
@@ -842,6 +846,9 @@ main(int  argc,				/* I - Number of command-line args */
   * copies...
   */
 
+#ifdef HAVE_LIBZ
+  compression_sup  = NULL;
+#endif /* HAVE_LIBZ */
   copies_sup       = NULL;
   cups_version     = NULL;
   format_sup       = NULL;
@@ -1041,6 +1048,35 @@ main(int  argc,				/* I - Number of command-line args */
    /*
     * Check for supported attributes...
     */
+
+#ifdef HAVE_LIBZ
+    if ((compression_sup = ippFindAttribute(supported, "compression-supported",
+                                            IPP_TAG_KEYWORD)) != NULL)
+    {
+     /*
+      * Check whether the requested compression is supported and/or default to
+      * compression if supported...
+      */
+
+      if (compression && !ippContainsString(compression_sup, compression))
+      {
+        fprintf(stderr, "DEBUG: Printer does not support the requested "
+                        "compression value \"%s\".\n", compression);
+        compression = NULL;
+      }
+      else if (!compression)
+      {
+        if (ippContainsString(compression_sup, "gzip"))
+          compression = "gzip";
+        else if (ippContainsString(compression_sup, "deflate"))
+          compression = "deflate";
+
+        if (compression)
+          fprintf(stderr, "DEBUG: Automatically using \"%s\" compression.\n",
+                  compression);
+      }
+    }
+#endif /* HAVE_LIBZ */
 
     if ((copies_sup = ippFindAttribute(supported, "copies-supported",
 	                               IPP_TAG_RANGE)) != NULL)
@@ -1659,6 +1695,9 @@ main(int  argc,				/* I - Number of command-line args */
 	http_status = cupsSendRequest(http, request, resource, 0);
 	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
 	{
+	  if (compression && strcmp(compression, "none"))
+	    httpSetField(http, HTTP_FIELD_CONTENT_ENCODING, compression);
+
 	  if (num_files == 0)
 	  {
 	    fd          = 0;
@@ -1988,14 +2027,6 @@ main(int  argc,				/* I - Number of command-line args */
   if (tmpfilename[0])
     unlink(tmpfilename);
 
-#ifdef HAVE_LIBZ
-  if (compression)
-  {
-    for (i = 0; i < num_files; i ++)
-      unlink(files[i]);
-  }
-#endif /* HAVE_LIBZ */
-
  /*
   * Return the queue status...
   */
@@ -2146,77 +2177,6 @@ check_printer_state(
 
   return (printer_state);
 }
-
-
-#ifdef HAVE_LIBZ
-/*
- * 'compress_files()' - Compress print files.
- */
-
-static void
-compress_files(int  num_files,		/* I - Number of files */
-               char **files)		/* I - Files */
-{
-  int		i,			/* Looping var */
-		fd;			/* Temporary file descriptor */
-  ssize_t	bytes;			/* Bytes read/written */
-  size_t	total;			/* Total bytes read */
-  cups_file_t	*in,			/* Input file */
-		*out;			/* Output file */
-  struct stat	outinfo;		/* Output file information */
-  char		filename[1024],		/* Temporary filename */
-		buffer[32768];		/* Copy buffer */
-
-
-  fprintf(stderr, "DEBUG: Compressing %d job files...\n", num_files);
-  for (i = 0; i < num_files; i ++)
-  {
-    if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
-    {
-      _cupsLangPrintError("ERROR", _("Unable to create compressed print file"));
-      exit(CUPS_BACKEND_FAILED);
-    }
-
-    if ((out = cupsFileOpenFd(fd, "w9")) == NULL)
-    {
-      _cupsLangPrintError("ERROR", _("Unable to open compressed print file"));
-      exit(CUPS_BACKEND_FAILED);
-    }
-
-    if ((in = cupsFileOpen(files[i], "r")) == NULL)
-    {
-      _cupsLangPrintError("ERROR", _("Unable to open print file"));
-      cupsFileClose(out);
-      exit(CUPS_BACKEND_FAILED);
-    }
-
-    total = 0;
-    while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
-      if (cupsFileWrite(out, buffer, bytes) < bytes)
-      {
-	_cupsLangPrintError("ERROR",
-	                    _("Unable to generate compressed print file"));
-        cupsFileClose(in);
-        cupsFileClose(out);
-	exit(CUPS_BACKEND_FAILED);
-      }
-      else
-        total += bytes;
-
-    cupsFileClose(out);
-    cupsFileClose(in);
-
-    files[i] = strdup(filename);
-
-    if (!stat(filename, &outinfo))
-      fprintf(stderr,
-              "DEBUG: File %d compressed to %.1f%% of original size, "
-	      CUPS_LLFMT " bytes...\n",
-              i + 1, 100.0 * outinfo.st_size / total,
-	      CUPS_LLCAST outinfo.st_size);
-  }
-}
-#endif /* HAVE_LIBZ */
 
 
 /*
@@ -2538,7 +2498,7 @@ new_request(
   }
 
 #ifdef HAVE_LIBZ
-  if (compression && op != IPP_CREATE_JOB)
+  if (compression && op != IPP_OP_CREATE_JOB && op != IPP_OP_VALIDATE_JOB)
   {
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
 		 "compression", NULL, compression);

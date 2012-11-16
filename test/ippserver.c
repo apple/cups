@@ -5000,7 +5000,11 @@ valid_doc_attributes(
     }
   }
   else
+  {
     format = "application/octet-stream";
+    attr   = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+			  "document-format", NULL, format);
+  }
 
   if (!strcmp(format, "application/octet-stream") &&
       (ippGetOperation(client->request) == IPP_OP_PRINT_JOB ||
