@@ -181,6 +181,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   con->http.activity   = time(NULL);
   con->http.hostaddr   = &(con->clientaddr);
   con->http.wait_value = 10000;
+  con->http.mode       = _HTTP_MODE_SERVER;
 
  /*
   * Accept the client and get the remote address...

@@ -3388,17 +3388,17 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
     switch (http->state)
     {
-      case HTTP_GET :
-      case HTTP_POST :
+      case HTTP_STATE_GET :
+      case HTTP_STATE_POST :
       case HTTP_STATE_POST_RECV :
-      case HTTP_PUT :
+      case HTTP_STATE_PUT :
 	  http->state ++;
 
 	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
 	                http_states[http->state + 1]));
 
-      case HTTP_POST_SEND :
-      case HTTP_HEAD :
+      case HTTP_STATE_POST_SEND :
+      case HTTP_STATE_HEAD :
 	  break;
 
       default :
@@ -3861,8 +3861,6 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     * data, go idle...
     */
 
-    DEBUG_puts("2httpWrite2: Changing states.");
-
     if (http->wused)
     {
       if (httpFlushWrite(http) < 0)
@@ -3886,12 +3884,12 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     }
 
     if (http->state == HTTP_STATE_POST_RECV)
+    {
       http->state ++;
-    else
-      http->state = HTTP_STATE_WAITING;
 
-    DEBUG_printf(("2httpWrite2: New state is %s.",
-                  http_states[http->state + 1]));
+      DEBUG_printf(("2httpWrite2: Changed state to %s.",
+		    http_states[http->state + 1]));
+    }
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -4905,6 +4903,7 @@ http_set_length(http_t *http)		/* I - Connection */
   {
     if (http->mode == _HTTP_MODE_SERVER &&
 	http->state != HTTP_STATE_GET_SEND &&
+	http->state != HTTP_STATE_PUT &&
 	http->state != HTTP_STATE_POST &&
 	http->state != HTTP_STATE_POST_SEND)
     {
