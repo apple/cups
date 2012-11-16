@@ -1,4 +1,4 @@
-CHANGES-IPPTOOL.txt - 2012-09-15
+CHANGES-IPPTOOL.txt - 2012-11-16
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
@@ -10,6 +10,8 @@ on cups.org.
 	- ipptool did not support octetString values.
 	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
 	  out.
+	- ipptool did not support compressing documents in Print-Job or
+	  Send-Document requests.
 
 
 2012-02-28

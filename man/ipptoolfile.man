@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "11 May 2012" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "16 November 2012" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -150,6 +150,15 @@ ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { .
 Adds a collection attribute to the test request. Member attributes follow the
 same syntax as regular attributes and can themselves be nested collections.
 Multiple collection values can be supplied as needed.
+.TP 5
+COMPRESSION deflate
+.TP 5
+COMPRESSION gzip
+.TP 5
+COMPRESSION none
+.br
+Uses the specified compression on the document data following the attributes in
+a Print-Job or Send-Document request.
 .TP 5
 DELAY seconds
 Specifies a delay before this test will be run.
