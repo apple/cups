@@ -382,13 +382,6 @@ httpAddrPort(http_addr_t *addr)		/* I - Address */
     return (ippPort());
 }
 
-int					/* O - Port number */
-_httpAddrPort(http_addr_t *addr)	/* I - Address */
-{
- /* TODO: Remove in CUPS 1.8 */
-  return (httpAddrPort(addr));
-}
-
 
 /*
  * '_httpAddrSetPort()' - Set the port number associated with an address.

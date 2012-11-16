@@ -1500,6 +1500,9 @@ main(int  argc,				/* I - Number of command-line args */
       http_status = cupsSendRequest(http, request, resource, length);
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
+	if (compression && strcmp(compression, "none"))
+	  httpSetField(http, HTTP_FIELD_CONTENT_ENCODING, compression);
+
         if (num_files == 1)
         {
 	  if ((fd = open(files[0], O_RDONLY)) < 0)
@@ -1537,13 +1540,18 @@ main(int  argc,				/* I - Number of command-line args */
             {
 	      fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
 
-	      if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
+	      if ((http_status = cupsWriteRequestData(http, buffer, bytes))
+	              != HTTP_CONTINUE)
 		break;
 	    }
 	    else if (bytes == 0 || (errno != EINTR && errno != EAGAIN))
 	      break;
 	  }
 	}
+
+	if (http_status == HTTP_ERROR)
+	  fprintf(stderr, "DEBUG: Error writing document data for "
+			  "Print-Job: %s\n", strerror(httpError(http)));
 
         if (num_files == 1)
 	  close(fd);
@@ -1736,6 +1744,10 @@ main(int  argc,				/* I - Number of command-line args */
           if (fd > 0)
 	    close(fd);
 	}
+
+        if (http_status == HTTP_ERROR)
+          fprintf(stderr, "DEBUG: Error writing document data for "
+                          "Send-Document: %s\n", strerror(httpError(http)));
 
 	ippDelete(cupsGetResponse(http, resource));
 	ippDelete(request);

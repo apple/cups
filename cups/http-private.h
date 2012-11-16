@@ -403,9 +403,6 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  */
 
 #define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
-extern int		_httpAddrPort(http_addr_t *addr)
-			              _CUPS_DEPRECATED_MSG("Use httpAddrPort "
-			                                   "instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
@@ -422,8 +419,6 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
-extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
-			          _CUPS_DEPRECATED_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
