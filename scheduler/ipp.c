@@ -751,7 +751,6 @@ cupsdProcessIPPRequest(
 	{
 	  struct stat	fileinfo;	/* File information */
 
-
           if (!fstat(con->file, &fileinfo))
 	    length += fileinfo.st_size;
 	}
@@ -5315,6 +5314,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "date-time-at-completed");
       cupsArrayAdd(ra, "date-time-at-creation");
       cupsArrayAdd(ra, "date-time-at-processing");
+      cupsArrayAdd(ra, "job-charge-info");
       cupsArrayAdd(ra, "job-detailed-status-message");
       cupsArrayAdd(ra, "job-document-access-errors");
       cupsArrayAdd(ra, "job-id");
@@ -5384,6 +5384,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "pdl-override-supported");
       cupsArrayAdd(ra, "printer-alert");
       cupsArrayAdd(ra, "printer-alert-description");
+      cupsArrayAdd(ra, "printer-charge-info-uri");
       cupsArrayAdd(ra, "printer-commands");
       cupsArrayAdd(ra, "printer-current-time");
       cupsArrayAdd(ra, "printer-dns-sd-name");

@@ -264,7 +264,7 @@ cupsdNetIFUpdate(void)
 
       if (match)
       {
-        temp->port = _httpAddrPort(&(lis->address));
+        temp->port = httpAddrPort(&(lis->address));
 	break;
       }
     }

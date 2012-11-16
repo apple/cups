@@ -60,20 +60,23 @@
 
 static const char 	* const http_states[] =
 			{		/* HTTP state strings */
-			  "HTTP_WAITING",
-			  "HTTP_OPTIONS",
-			  "HTTP_GET",
-			  "HTTP_GET_SEND",
-			  "HTTP_HEAD",
-			  "HTTP_POST",
-			  "HTTP_POST_RECV",
-			  "HTTP_POST_SEND",
-			  "HTTP_PUT",
-			  "HTTP_PUT_RECV",
-			  "HTTP_DELETE",
-			  "HTTP_TRACE",
-			  "HTTP_CLOSE",
-			  "HTTP_STATUS"
+			  "HTTP_STATE_ERROR",
+			  "HTTP_STATE_WAITING",
+			  "HTTP_STATE_OPTIONS",
+			  "HTTP_STATE_GET",
+			  "HTTP_STATE_GET_SEND",
+			  "HTTP_STATE_HEAD",
+			  "HTTP_STATE_POST",
+			  "HTTP_STATE_POST_RECV",
+			  "HTTP_STATE_POST_SEND",
+			  "HTTP_STATE_PUT",
+			  "HTTP_STATE_PUT_RECV",
+			  "HTTP_STATE_DELETE",
+			  "HTTP_STATE_TRACE",
+			  "HTTP_STATE_CONNECT",
+			  "HTTP_STATE_STATUS",
+			  "HTTP_STATE_UNKNOWN_METHOD",
+			  "HTTP_STATE_UNKNOWN_VERSION"
 			};
 static const char 	* const ipp_states[] =
 			{		/* IPP state strings */
@@ -202,7 +205,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Save the connected port number...
   */
 
-  _httpAddrSetPort(con->http.hostaddr, _httpAddrPort(&(lis->address)));
+  _httpAddrSetPort(con->http.hostaddr, httpAddrPort(&(lis->address)));
 
 #ifdef AF_INET6
  /*
@@ -379,7 +382,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #endif /* AF_LOCAL */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s:%d (IPv%d)",
                   con->http.fd, con->http.hostname,
-		  _httpAddrPort(con->http.hostaddr),
+		  httpAddrPort(con->http.hostaddr),
 		  _httpAddrFamily(con->http.hostaddr) == AF_INET ? 4 : 6);
 
  /*
@@ -411,7 +414,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     else
       httpAddrString(&temp, con->servername, sizeof(con->servername));
 
-    con->serverport = _httpAddrPort(&(lis->address));
+    con->serverport = httpAddrPort(&(lis->address));
   }
 
  /*
@@ -687,12 +690,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		  "error=%d, "
 		  "used=%d, "
 		  "state=%s, "
-		  "data_encoding=HTTP_ENCODE_%s, "
+		  "data_encoding=HTTP_ENCODING_%s, "
 		  "data_remaining=" CUPS_LLFMT ", "
 		  "request=%p(%s), "
 		  "file=%d",
 		  con->http.fd, con->http.error, con->http.used,
-		  http_states[con->http.state],
+		  http_states[con->http.state + 1],
 		  con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
 		      "CHUNKED" : "LENGTH",
 		  CUPS_LLCAST con->http.data_remaining,
@@ -1124,7 +1127,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
@@ -1198,7 +1201,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 	httpPrintf(HTTP(con), "Connection: Upgrade\r\n");
-	httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n");
+	httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
 	httpPrintf(HTTP(con), "Content-Length: 0\r\n");
 	httpPrintf(HTTP(con), "\r\n");
 
@@ -1824,7 +1827,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 
-	      con->http.state = HTTP_WAITING;
+	      con->http.state = HTTP_STATE_WAITING;
+	      DEBUG_puts("cupsdReadClient: Set state to HTTP_STATE_WAITING "
+	                 "after HEAD.");
 	      break;
 	    }
 
@@ -1953,7 +1958,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      return;
 	    }
 
-            con->http.state = HTTP_WAITING;
+            con->http.state = HTTP_STATE_WAITING;
+	    DEBUG_puts("cupsdReadClient: Set state to HTTP_STATE_WAITING "
+		       "after HEAD.");
             break;
 
 	default :
@@ -2175,7 +2182,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    {
 	      cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                      "[Client %d] Closing on unexpected state %s.",
-			      con->http.fd, http_states[con->http.state]);
+			      con->http.fd, http_states[con->http.state + 1]);
 	      cupsdCloseClient(con);
 	      return;
 	    }
@@ -2397,7 +2404,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
     if (httpPrintf(HTTP(con), "Connection: Upgrade\r\n") < 0)
       return (0);
 
-  if (httpPrintf(HTTP(con), "Upgrade: TLS/1.0,HTTP/1.1\r\n") < 0)
+  if (httpPrintf(HTTP(con), "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n") < 0)
     return (0);
 #endif /* HAVE_SSL */
 
@@ -2487,7 +2494,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   if (cupsdFlushHeader(con) < 0)
     return (0);
 
-  con->http.state = HTTP_WAITING;
+  con->http.state = HTTP_STATE_WAITING;
+
+  DEBUG_puts("cupsdSendError: Set state to HTTP_STATE_WAITING.");
 
   return (1);
 }
@@ -2725,7 +2734,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		  "pipe_pid=%d, "
 		  "file=%d",
 		  con->http.fd, con->http.error, con->http.used,
-		  http_states[con->http.state],
+		  http_states[con->http.state + 1],
 		  con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
 		      "CHUNKED" : "LENGTH",
 		  CUPS_LLCAST con->http.data_remaining,
@@ -2743,7 +2752,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
 		    "[Client %d] Closing on unexpected HTTP state %s.",
-		    con->http.fd, http_states[con->http.state]);
+		    con->http.fd, http_states[con->http.state + 1]);
     cupsdCloseClient(con);
     return;
   }

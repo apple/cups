@@ -248,6 +248,7 @@ cupsCreateJob(
   if (title)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
                  title);
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_JOB);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_SUBSCRIPTION);
 
@@ -1066,7 +1067,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
-  http_port = _httpAddrPort(http->hostaddr);
+  http_port = httpAddrPort(http->hostaddr);
 
   DEBUG_printf(("2cupsGetPPD3: Connection hostname=\"%s\", port=%d",
                 http_hostname, http_port));
@@ -1669,7 +1670,7 @@ cups_get_printer_uri(
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
-  http_port = _httpAddrPort(http->hostaddr);
+  http_port = httpAddrPort(http->hostaddr);
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1695,7 +1696,9 @@ cups_get_printer_uri(
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  snprintf(resource, resourcesize, "/printers/%s", name);
+
+  if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
     const char *device_uri = NULL;	/* device-uri value */
 

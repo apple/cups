@@ -258,7 +258,7 @@ cupsdStartBrowsing(void)
       if (httpAddrLocalhost(&(lis->address)))
 	continue;
 
-      DNSSDPort = _httpAddrPort(&(lis->address));
+      DNSSDPort = httpAddrPort(&(lis->address));
       break;
     }
 
@@ -1333,6 +1333,8 @@ dnssdStop(void)
   DNSSDMaster = NULL;
 
 #  else /* HAVE_AVAHI */
+  avahi_threaded_poll_stop(DNSSDMaster);
+
   avahi_client_free(DNSSDClient);
   DNSSDClient = NULL;
 

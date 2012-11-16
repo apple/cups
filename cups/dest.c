@@ -722,7 +722,8 @@ cupsConnectDest(
   else
     encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-  http = _httpCreate(hostname, port, addrlist, encryption, AF_UNSPEC);
+  http = _httpCreate(hostname, port, addrlist, AF_UNSPEC, encryption, 1,
+                     _HTTP_MODE_CLIENT);
 
  /*
   * Connect if requested...

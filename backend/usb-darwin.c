@@ -96,6 +96,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
+#include <libproc.h>
 
 #include <spawn.h>
 #include <pthread.h>
@@ -134,6 +135,26 @@ extern char **environ;
 #define kUSBGenericTOPrinterClassDriver	CFSTR("/System/Library/Printers/Libraries/USBGenericPrintingClass.plugin")
 #define kUSBPrinterClassDeviceNotOpen	-9664	/*kPMInvalidIOMContext*/
 
+#define CRSetCrashLogMessage(m) _crc_make_setter(message, m)
+#define _crc_make_setter(attr, arg) (gCRAnnotations.attr = (uint64_t)(unsigned long)(arg))
+#define CRASH_REPORTER_CLIENT_HIDDEN __attribute__((visibility("hidden")))
+#define CRASHREPORTER_ANNOTATIONS_VERSION 4
+#define CRASHREPORTER_ANNOTATIONS_SECTION "__crash_info"
+
+struct crashreporter_annotations_t {
+	uint64_t version;		// unsigned long
+	uint64_t message;		// char *
+	uint64_t signature_string;	// char *
+	uint64_t backtrace;		// char *
+	uint64_t message2;		// char *
+	uint64_t thread;		// uint64_t
+	uint64_t dialog_mode;		// unsigned int
+};
+
+CRASH_REPORTER_CLIENT_HIDDEN 
+struct crashreporter_annotations_t gCRAnnotations 
+	__attribute__((section("__DATA," CRASHREPORTER_ANNOTATIONS_SECTION))) 
+	= { CRASHREPORTER_ANNOTATIONS_VERSION, 0, 0, 0, 0, 0, 0 };
 
 /*
  * Section 5.3 USB Printing Class spec
@@ -179,7 +200,7 @@ typedef struct classdriver_s		/**** g.classdriver context ****/
   UInt16		vendorID;		/* Vendor id */
   UInt16		productID;		/* Product id */
   printer_interface_t	interface;		/* identify the device to IOKit */
-  UInt8		  	outpipe;		/* mandatory bulkOut pipe */
+  UInt8			outpipe;		/* mandatory bulkOut pipe */
   UInt8			inpipe;			/* optional bulkIn pipe */
 
   /* general class requests */
@@ -293,6 +314,7 @@ static pid_t	child_pid;		/* Child PID */
 static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
 #endif /* __i386__ || __x86_64__ */
 static void sigterm_handler(int sig);	/* SIGTERM handler */
+static void sigquit_handler(int sig, siginfo_t *si, void *unused);
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -344,9 +366,19 @@ print_device(const char *uri,		/* I - Device URI */
   struct timeval  *timeout,		/* Timeout pointer */
 		  tv;			/* Time value */
   struct timespec cond_timeout;		/* pthread condition timeout */
+  struct sigaction action;		/* Actions for POSIX signals */
 
 
   (void)uri;
+
+ /*
+  * Catch SIGQUIT to determine who is sending it...
+  */
+
+  memset(&action, 0, sizeof(action));
+  action.sa_sigaction = sigquit_handler;
+  action.sa_flags = SA_SIGINFO;
+  sigaction(SIGQUIT, &action, NULL);
 
  /*
   * See if the side-channel descriptor is valid...
@@ -472,9 +504,6 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!print_fd)
   {
-    struct sigaction	action;		/* POSIX signal action */
-
-
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
@@ -2091,6 +2120,32 @@ sigterm_handler(int sig)		/* I - Signal */
     }
   }
 #endif /* __i386__ || __x86_64__ */
+}
+
+
+/*
+ * 'sigquit_handler()' - SIGQUIT handler.
+ */
+
+static void sigquit_handler(int sig, siginfo_t *si, void *unused)
+{
+  char  *path;
+  char	pathbuf[PROC_PIDPATHINFO_MAXSIZE];
+  static char msgbuf[256] = "";
+
+
+  (void)sig;
+  (void)unused;
+
+  if (proc_pidpath(si->si_pid, pathbuf, sizeof(pathbuf)) > 0 &&
+      (path = basename(pathbuf)) != NULL)
+    snprintf(msgbuf, sizeof(msgbuf), "SIGQUIT sent by %s(%d)", path, (int)si->si_pid);
+  else
+    snprintf(msgbuf, sizeof(msgbuf), "SIGQUIT sent by PID %d", (int)si->si_pid);
+
+  CRSetCrashLogMessage(msgbuf);
+
+  abort();
 }
 
 

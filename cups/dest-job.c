@@ -15,7 +15,7 @@
  *
  * Contents:
  *
-﻿ *   cupsCancelDestJob()      - Cancel a job on a destination.
+ *   cupsCancelDestJob()      - Cancel a job on a destination.
  *   cupsCloseDestJob()       - Close a job and start printing.
  *   cupsCreateDestJob()      - Create a job on a destination.
  *   cupsFinishDestDocument() - Finish the current document.
@@ -197,6 +197,7 @@ cupsCreateDestJob(
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
                  title);
 
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_JOB);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_SUBSCRIPTION);
 
@@ -339,6 +340,7 @@ cupsStartDestDocument(
                  "document-format", NULL, format);
   ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last_document);
 
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_DOCUMENT);
 
  /*

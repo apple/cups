@@ -188,7 +188,7 @@ cups_create_localizations(
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
 
   if (!_cups_strcasecmp(http_hostname, hostname) &&
-      port == _httpAddrPort(http->hostaddr))
+      port == httpAddrPort(http->hostaddr))
   {
    /*
     * Use the same connection...

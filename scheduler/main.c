@@ -1424,7 +1424,7 @@ launchd_checkin(void)
 	lis->fd = fd;
 
 #  ifdef HAVE_SSL
-	if (_httpAddrPort(&(lis->address)) == 443)
+	if (httpAddrPort(&(lis->address)) == 443)
 	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #  endif /* HAVE_SSL */
       }

@@ -3,7 +3,7 @@
  *
  *   Status buffer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2012 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -119,7 +119,7 @@ cupsdStatBufNew(int        fd,		/* I - File descriptor of pipe */
 char *					/* O - Line from buffer, "", or NULL */
 cupsdStatBufUpdate(
     cupsd_statbuf_t *sb,		/* I - Status buffer */
-    int             *loglevel,		/* O - Log level */ 
+    int             *loglevel,		/* O - Log level */
     char            *line,		/* I - Line buffer */
     int             linelen)		/* I - Size of line buffer */
 {
@@ -257,6 +257,11 @@ cupsdStatBufUpdate(
   {
     *loglevel = CUPSD_LOG_STATE;
     message   = sb->buffer + 6;
+  }
+  else if (!strncmp(sb->buffer, "JOBSTATE:", 9))
+  {
+    *loglevel = CUPSD_LOG_JOBSTATE;
+    message   = sb->buffer + 9;
   }
   else if (!strncmp(sb->buffer, "ATTR:", 5))
   {

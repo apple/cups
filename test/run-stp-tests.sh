@@ -605,7 +605,7 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=/tmp/cups-$user/cups-str-1.6-$date-$user.html
+strfile=/tmp/cups-$user/cups-str-1.7-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile

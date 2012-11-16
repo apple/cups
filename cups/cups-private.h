@@ -87,6 +87,11 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			resolved_uri[1024];
 					/* Buffer for cupsBackendDeviceURI */
 
+  /* debug.c */
+#  ifdef DEBUG
+  int			thread_id;	/* Friendly thread ID */
+#  endif /* DEBUG */
+
   /* file.c */
   cups_file_t		*stdio_files[3];/* stdin, stdout, stderr */
 

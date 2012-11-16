@@ -1,8 +1,13 @@
-CHANGES.txt - 1.7b1 - 2012-09-30
+CHANGES.txt - 1.7b1 - 2012-11-15
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- Added new IPP APIs for checking values (STR #4167)
+	- Added new IPP APis for adding and setting formatted strings.
+	- Added new HTTP APIs to support basic server functionality via libcups.
+	- CUPS now supports compressing and decompressing streamed data
+	  (STR #4168)
 	- CUPS now supports higher-level PIN printing, external accounting
 	  systems, and "print here" printing environments (STR #4169)
 	- IRIX is no longer a supported operating system (STR #4092)

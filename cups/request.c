@@ -385,7 +385,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   {
     status = httpUpdate(http);
   }
-  while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
+  while (status == HTTP_STATUS_CONTINUE);
 
   DEBUG_printf(("2cupsGetResponse: status=%d", status));
 
@@ -602,10 +602,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
                 const char *resource,	/* I - Resource path */
 		size_t     length)	/* I - Length of data to follow or @code CUPS_LENGTH_VARIABLE@ */
 {
-  http_status_t	status;			/* Status of HTTP request */
-  int		got_status;		/* Did we get the status? */
-  ipp_state_t	state;			/* State of IPP processing */
-  http_status_t	expect;			/* Expect: header to use */
+  http_status_t		status;		/* Status of HTTP request */
+  int			got_status;	/* Did we get the status? */
+  ipp_state_t		state;		/* State of IPP processing */
+  http_status_t		expect;		/* Expect: header to use */
 
 
   DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", "
@@ -789,28 +789,31 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Process the current HTTP status...
     */
 
-    if (status >= HTTP_MULTIPLE_CHOICES)
+    if (status >= HTTP_STATUS_MULTIPLE_CHOICES)
     {
+      int temp_status;			/* Temporary status */
+
       _cupsSetHTTPError(status);
 
       do
       {
-	status = httpUpdate(http);
+	temp_status = httpUpdate(http);
       }
-      while (status != HTTP_ERROR && http->state == HTTP_POST_RECV);
+      while (temp_status != HTTP_STATUS_ERROR &&
+             http->state == HTTP_STATE_POST_RECV);
 
       httpFlush(http);
     }
 
     switch (status)
     {
-      case HTTP_ERROR :
-      case HTTP_CONTINUE :
-      case HTTP_OK :
+      case HTTP_STATUS_CONTINUE :
+      case HTTP_STATUS_OK :
+      case HTTP_STATUS_ERROR :
           DEBUG_printf(("1cupsSendRequest: Returning %d.", status));
           return (status);
 
-      case HTTP_UNAUTHORIZED :
+      case HTTP_STATUS_UNAUTHORIZED :
           if (cupsDoAuthentication(http, "POST", resource))
 	  {
             DEBUG_puts("1cupsSendRequest: Returning HTTP_AUTHORIZATION_CANCELED.");
@@ -827,7 +830,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  break;
 
 #ifdef HAVE_SSL
-      case HTTP_UPGRADE_REQUIRED :
+      case HTTP_STATUS_UPGRADE_REQUIRED :
 	 /*
 	  * Flush any error message, reconnect, and then upgrade with
 	  * encryption...
@@ -851,7 +854,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  break;
 #endif /* HAVE_SSL */
 
-      case HTTP_EXPECTATION_FAILED :
+      case HTTP_STATUS_EXPECTATION_FAILED :
 	 /*
 	  * Don't try using the Expect: header the next time around...
 	  */
@@ -993,7 +996,7 @@ _cupsConnect(void)
     */
 
     if (strcmp(cg->http->hostname, cg->server) ||
-        cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
+        cg->ipp_port != httpAddrPort(cg->http->hostaddr) ||
         (cg->http->encryption != cg->encryption &&
 	 cg->http->encryption == HTTP_ENCRYPT_NEVER))
     {

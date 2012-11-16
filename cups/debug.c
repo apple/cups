@@ -68,8 +68,24 @@ int			_cups_debug_level = 1;
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
 static int		debug_init = 0;	/* Did we initialize debugging? */
-static _cups_mutex_t	debug_mutex = _CUPS_MUTEX_INITIALIZER;
+static _cups_mutex_t	debug_init_mutex = _CUPS_MUTEX_INITIALIZER,
 					/* Mutex to control initialization */
+			debug_log_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex to serialize log entries */
+
+
+/*
+ * 'debug_thread_id()' - Return an integer representing the current thread.
+ */
+
+static int				/* O - Local thread ID */
+debug_thread_id(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  return (cg->thread_id);
+}
 
 
 /*
@@ -433,9 +449,9 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   {
     int	result;				/* Filter result */
 
-    _cupsMutexLock(&debug_mutex);
+    _cupsMutexLock(&debug_init_mutex);
     result = regexec(debug_filter, format, 0, NULL, 0);
-    _cupsMutexUnlock(&debug_mutex);
+    _cupsMutexUnlock(&debug_init_mutex);
 
     if (result)
       return;
@@ -446,13 +462,13 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   */
 
   gettimeofday(&curtime, NULL);
-  snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d.%03d ",
-	   (int)((curtime.tv_sec / 3600) % 24),
+  snprintf(buffer, sizeof(buffer), "T%03d %02d:%02d:%02d.%03d  ",
+           debug_thread_id(), (int)((curtime.tv_sec / 3600) % 24),
 	   (int)((curtime.tv_sec / 60) % 60),
 	   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000));
 
   va_start(ap, format);
-  bytes = debug_vsnprintf(buffer + 13, sizeof(buffer) - 14, format, ap) + 13;
+  bytes = debug_vsnprintf(buffer + 19, sizeof(buffer) - 20, format, ap) + 19;
   va_end(ap);
 
   if (bytes >= (sizeof(buffer) - 1))
@@ -470,7 +486,9 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   * Write it out...
   */
 
+  _cupsMutexLock(&debug_log_mutex);
   write(_cups_debug_fd, buffer, bytes);
+  _cupsMutexUnlock(&debug_log_mutex);
 }
 
 
@@ -514,9 +532,9 @@ _cups_debug_puts(const char *s)		/* I - String to output */
   {
     int	result;				/* Filter result */
 
-    _cupsMutexLock(&debug_mutex);
+    _cupsMutexLock(&debug_init_mutex);
     result = regexec(debug_filter, s, 0, NULL, 0);
-    _cupsMutexUnlock(&debug_mutex);
+    _cupsMutexUnlock(&debug_init_mutex);
 
     if (result)
       return;
@@ -527,8 +545,8 @@ _cups_debug_puts(const char *s)		/* I - String to output */
   */
 
   gettimeofday(&curtime, NULL);
-  bytes = snprintf(buffer, sizeof(buffer), "%02d:%02d:%02d.%03d %s",
-		   (int)((curtime.tv_sec / 3600) % 24),
+  bytes = snprintf(buffer, sizeof(buffer), "T%03d %02d:%02d:%02d.%03d  %s",
+                   debug_thread_id(), (int)((curtime.tv_sec / 3600) % 24),
 		   (int)((curtime.tv_sec / 60) % 60),
 		   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000),
 		   s);
@@ -548,7 +566,9 @@ _cups_debug_puts(const char *s)		/* I - String to output */
   * Write it out...
   */
 
+  _cupsMutexLock(&debug_log_mutex);
   write(_cups_debug_fd, buffer, bytes);
+  _cupsMutexUnlock(&debug_log_mutex);
 }
 
 
@@ -562,7 +582,7 @@ _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
 		const char *filter,	/* I - Filter string or NULL */
 		int        force)	/* I - Force initialization */
 {
-  _cupsMutexLock(&debug_mutex);
+  _cupsMutexLock(&debug_init_mutex);
 
   if (!debug_init || force)
   {
@@ -624,7 +644,7 @@ _cups_debug_set(const char *logfile,	/* I - Log file or NULL */
     debug_init = 1;
   }
 
-  _cupsMutexUnlock(&debug_mutex);
+  _cupsMutexUnlock(&debug_init_mutex);
 }
 #endif /* DEBUG */
 

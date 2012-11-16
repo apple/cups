@@ -815,8 +815,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Connect to the server...
   */
 
-  if ((http = _httpCreate(vars->hostname, vars->port, NULL, vars->encryption,
-			  vars->family)) == NULL)
+  if ((http = _httpCreate(vars->hostname, vars->port, NULL, vars->family,
+                          vars->encryption, 1, _HTTP_MODE_CLIENT)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, cupsLastErrorString());
@@ -1741,9 +1741,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
                 for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
 		{
-		  *ptr++ = '\0';
-		  values[num_values] = ptr;
-		  num_values ++;
+		  if (ptr > token && ptr[-1] == '\\')
+		    _cups_strcpy(ptr - 1, ptr);
+		  else
+		  {
+		    *ptr++ = '\0';
+		    values[num_values] = ptr;
+		    num_values ++;
+		  }
 		}
 
 	        attrptr = ippAddStrings(request, group, value, attr, num_values,
@@ -2141,6 +2146,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	   /*
 	    * WITH-VALUE is a literal value...
 	    */
+
+	    char *ptr;			/* Pointer into value */
+
+            for (ptr = token; *ptr; ptr ++)
+            {
+	      if (*ptr == '\\' && ptr[1])
+	      {
+	       /*
+	        * Remove \ from \foo...
+	        */
+
+		_cups_strcpy(ptr, ptr + 1);
+	      }
+	    }
 
 	    last_expect->with_value = strdup(token);
 	    last_expect->with_flags |= _CUPS_WITH_LITERAL;
@@ -3437,6 +3456,9 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      goto col_error;
 	    }
 	    break;
+	case IPP_TAG_STRING :
+	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, strlen(token));
+	    break;
 
 	default :
 	    if (!strchr(token, ','))
@@ -4570,7 +4592,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
     case IPP_TAG_STRING :
         for (i = 0; i < attr->num_values; i ++)
 	{
-	  if (attr->values[i].unknown.length > 1023)
+	  if (attr->values[i].unknown.length > IPP_MAX_OCTETSTRING)
 	  {
 	    valid = 0;
 
@@ -4813,7 +4835,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 1023)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_TEXT - 1))
 	  {
 	    valid = 0;
 
@@ -4873,7 +4895,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 1023)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_NAME - 1))
 	  {
 	    valid = 0;
 
@@ -4904,7 +4926,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 255)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_KEYWORD - 1))
 	  {
 	    valid = 0;
 
@@ -4939,7 +4961,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 					 HTTP_URI_OVERFLOW]);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 1023)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_URI - 1))
 	  {
 	    valid = 0;
 
@@ -4974,7 +4996,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 63)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_URISCHEME - 1))
 	  {
 	    valid = 0;
 
@@ -5005,7 +5027,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if ((ptr - attr->values[i].string.text) > 40)
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_CHARSET - 1))
 	  {
 	    valid = 0;
 
@@ -5061,7 +5083,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 63)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_LANGUAGE - 1))
 	  {
 	    valid = 0;
 
@@ -5114,7 +5136,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			attr->name, attr->values[i].string.text);
 	  }
 
-	  if (strlen(attr->values[i].string.text) > 255)
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_MIMETYPE - 1))
 	  {
 	    valid = 0;
 

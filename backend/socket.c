@@ -73,10 +73,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
   time_t	start_time;		/* Time of first connect */
-#ifdef __APPLE__
-  time_t	current_time,		/* Current time */
-		wait_time;		/* Time to wait before shutting down socket */
-#endif /* __APPLE__ */
   int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
@@ -410,7 +406,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   fprintf(stderr, "DEBUG: Connected to %s:%d...\n",
 	  httpAddrString(&(addr->addr), addrname, sizeof(addrname)),
-	  _httpAddrPort(&(addr->addr)));
+	  httpAddrPort(&(addr->addr)));
 
  /*
   * Print everything...
@@ -437,17 +433,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
-
-#ifdef __APPLE__
- /*
-  * Wait up to 5 seconds to get any pending back-channel data...
-  */
-
-  wait_time = time(NULL) + 5;
-  while (wait_time >= time(&current_time))
-    if (wait_bc(device_fd, wait_time - current_time) <= 0)
-      break;
-#endif /* __APPLE__ */
 
   if (waiteof)
   {

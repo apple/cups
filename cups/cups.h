@@ -353,12 +353,12 @@ extern ipp_t		*cupsDoRequest(http_t *http, ipp_t *request,
 			               const char *resource);
 extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
-extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
+extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
 extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
 			            int myjobs, int whichjobs);
 extern const char	*cupsGetPPD(const char *name);
-extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED;
+extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
 extern ipp_status_t	cupsLastError(void);
 extern int		cupsPrintFile(const char *name, const char *filename,
 			              const char *title, int num_options,
@@ -366,7 +366,7 @@ extern int		cupsPrintFile(const char *name, const char *filename,
 extern int		cupsPrintFiles(const char *name, int num_files,
 			               const char **files, const char *title,
 				       int num_options, cups_option_t *options);
-extern char		*cupsTempFile(char *filename, int len) _CUPS_DEPRECATED;
+extern char		*cupsTempFile(char *filename, int len) _CUPS_DEPRECATED_MSG("Use cupsTempFd or cupsTempFile2 instead.");
 extern int		cupsTempFd(char *filename, int len);
 
 extern int		cupsAddDest(const char *name, const char *instance,

@@ -14,11 +14,12 @@
  *
  * Contents:
  *
- *   httpAddrConnect()  - Connect to any of the addresses in the list.
+ *   httpAddrConnect()	- Connect to any of the addresses in the list.
  *   httpAddrConnect2() - Connect to any of the addresses in the list with a
- *                        timeout and optional cancel.
+ *			  timeout and optional cancel.
+ *   httpAddrCopyList() - Copy an address list.
  *   httpAddrFreeList() - Free an address list.
- *   httpAddrGetList()  - Get a list of addresses for a hostname.
+ *   httpAddrGetList()	- Get a list of addresses for a hostname.
  */
 
 /*
@@ -119,7 +120,7 @@ httpAddrConnect2(
 
     DEBUG_printf(("2httpAddrConnect2: Trying %s:%d...",
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-		  _httpAddrPort(&(addrlist->addr))));
+		  httpAddrPort(&(addrlist->addr))));
 
     if ((*sock = (int)socket(_httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
                              0)) < 0)
@@ -201,7 +202,7 @@ httpAddrConnect2(
     {
       DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...",
 		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-		    _httpAddrPort(&(addrlist->addr))));
+		    httpAddrPort(&(addrlist->addr))));
 
 #ifdef O_NONBLOCK
       fcntl(*sock, F_SETFL, flags);
@@ -282,7 +283,7 @@ httpAddrConnect2(
           {
 	    DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...",
 			  httpAddrString(&peer, temp, sizeof(temp)),
-			  _httpAddrPort(&peer)));
+			  httpAddrPort(&peer)));
 
 	    return (addrlist);
 	  }
@@ -295,7 +296,7 @@ httpAddrConnect2(
 
     DEBUG_printf(("1httpAddrConnect2: Unable to connect to %s:%d: %s",
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-		  _httpAddrPort(&(addrlist->addr)), strerror(errno)));
+		  httpAddrPort(&(addrlist->addr)), strerror(errno)));
 
 #ifndef WIN32
     if (errno == EINPROGRESS)
@@ -324,6 +325,55 @@ httpAddrConnect2(
 #endif /* WIN32 */
 
   return (addrlist);
+}
+
+
+
+/*
+ * 'httpAddrCopyList()' - Copy an address list.
+ *
+ * @since CUPS 1.7@
+ */
+
+http_addrlist_t	*			/* O - New address list or @code NULL@ on error */
+httpAddrCopyList(
+    http_addrlist_t *src)		/* I - Source address list */
+{
+  http_addrlist_t	*dst = NULL,	/* First list entry */
+			*prev = NULL,	/* Previous list entry */
+			*current = NULL;/* Current list entry */
+
+
+  while (src)
+  {
+    if ((current = malloc(sizeof(http_addrlist_t))) == NULL)
+    {
+      current = dst;
+
+      while (current)
+      {
+        prev    = current;
+        current = current->next;
+
+        free(prev);
+      }
+
+      return (NULL);
+    }
+
+    memcpy(current, src, sizeof(http_addrlist_t));
+
+    current->next = NULL;
+
+    if (prev)
+      prev->next = current;
+    else
+      dst = current;
+
+    src = src->next;
+  }
+
+  return (dst);
 }
 
 

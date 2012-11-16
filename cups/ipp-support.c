@@ -84,6 +84,43 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "client-error-document-security-error",
 		  "client-error-document-unprintable-error"
 		},
+		* const ipp_status_480s[] =	/* Vendor client errors */
+		{
+		  /* 0x0480 - 0x048F */
+		  "0x0480",
+		  "0x0481",
+		  "0x0482",
+		  "0x0483",
+		  "0x0484",
+		  "0x0485",
+		  "0x0486",
+		  "0x0487",
+		  "0x0488",
+		  "0x0489",
+		  "0x048A",
+		  "0x048B",
+		  "0x048C",
+		  "0x048D",
+		  "0x048E",
+		  "0x048F",
+		  /* 0x0490 - 0x049F */
+		  "0x0490",
+		  "0x0491",
+		  "0x0492",
+		  "0x0493",
+		  "0x0494",
+		  "0x0495",
+		  "0x0496",
+		  "0x0497",
+		  "0x0498",
+		  "0x0499",
+		  "0x049A",
+		  "0x049B",
+		  "cups-error-account-info-needed",
+		  "cups-error-account-closed",
+		  "cups-error-account-limit-reached",
+		  "cups-error-account-authorization-failed"
+		},
 		* const ipp_status_500s[] =		/* Server errors */
 		{
 		  "server-error-internal-error",
@@ -102,7 +139,7 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		},
 		* const ipp_status_1000s[] =		/* CUPS internal */
 		{
-		  "cups-authorization-canceled",
+		  "cups-authentication-canceled",
 		  "cups-pki-error",
 		  "cups-upgrade-required"
 		};
@@ -359,6 +396,101 @@ static const char * const ipp_document_states[] =
 		  "trim-after-documents",
 		  "trim-after-copies",
 		  "trim-after-job"
+		},
+		* const ipp_finishings_vendor[] =
+		{
+		  /* 0x40000000 to 0x4000000F */
+		  "0x40000000",
+		  "0x40000001",
+		  "0x40000002",
+		  "0x40000003",
+		  "0x40000004",
+		  "0x40000005",
+		  "0x40000006",
+		  "0x40000007",
+		  "0x40000008",
+		  "0x40000009",
+		  "0x4000000A",
+		  "0x4000000B",
+		  "0x4000000C",
+		  "0x4000000D",
+		  "0x4000000E",
+		  "0x4000000F",
+		  /* 0x40000010 to 0x4000001F */
+		  "0x40000010",
+		  "0x40000011",
+		  "0x40000012",
+		  "0x40000013",
+		  "0x40000014",
+		  "0x40000015",
+		  "0x40000016",
+		  "0x40000017",
+		  "0x40000018",
+		  "0x40000019",
+		  "0x4000001A",
+		  "0x4000001B",
+		  "0x4000001C",
+		  "0x4000001D",
+		  "0x4000001E",
+		  "0x4000001F",
+		  /* 0x40000020 to 0x4000002F */
+		  "0x40000020",
+		  "0x40000021",
+		  "0x40000022",
+		  "0x40000023",
+		  "0x40000024",
+		  "0x40000025",
+		  "0x40000026",
+		  "0x40000027",
+		  "0x40000028",
+		  "0x40000029",
+		  "0x4000002A",
+		  "0x4000002B",
+		  "0x4000002C",
+		  "0x4000002D",
+		  "0x4000002E",
+		  "0x4000002F",
+		  /* 0x40000030 to 0x4000003F */
+		  "0x40000030",
+		  "0x40000031",
+		  "0x40000032",
+		  "0x40000033",
+		  "0x40000034",
+		  "0x40000035",
+		  "0x40000036",
+		  "0x40000037",
+		  "0x40000038",
+		  "0x40000039",
+		  "0x4000003A",
+		  "0x4000003B",
+		  "0x4000003C",
+		  "0x4000003D",
+		  "0x4000003E",
+		  "0x4000003F",
+		  /* 0x40000040 - 0x4000004F */
+		  "0x40000040",
+		  "0x40000041",
+		  "0x40000042",
+		  "0x40000043",
+		  "0x40000044",
+		  "0x40000045",
+		  "punch-top-left",
+		  "punch-bottom-left",
+		  "punch-top-right",
+		  "punch-bottom-right",
+		  "punch-dual-left",
+		  "punch-dual-top",
+		  "punch-dual-right",
+		  "punch-dual-bottom",
+		  "punch-triple-left",
+		  "punch-triple-top",
+		  /* 0x40000050 - 0x40000055 */
+		  "punch-triple-right",
+		  "punch-triple-bottom",
+		  "punch-quad-left",
+		  "punch-quad-top",
+		  "punch-quad-right",
+		  "punch-quad-bottom",
 		},
 		* const ipp_job_collation_types[] =
 		{			/* job-collation-type enums */
@@ -648,14 +780,21 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
       enumvalue <= (3 + (int)(sizeof(ipp_document_states) /
                               sizeof(ipp_document_states[0]))))
     return (ipp_document_states[enumvalue - 3]);
-  else if ((!strcmp(attrname, "finishings") ||
-            !strcmp(attrname, "finishings-actual") ||
-            !strcmp(attrname, "finishings-default") ||
-            !strcmp(attrname, "finishings-ready") ||
-            !strcmp(attrname, "finishings-supported")) &&
-           enumvalue >= 3 &&
-           enumvalue <= (3 + (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]))))
-    return (ipp_finishings[enumvalue - 3]);
+  else if (!strcmp(attrname, "finishings") ||
+	   !strcmp(attrname, "finishings-actual") ||
+	   !strcmp(attrname, "finishings-default") ||
+	   !strcmp(attrname, "finishings-ready") ||
+	   !strcmp(attrname, "finishings-supported"))
+  {
+    if (enumvalue >= 3 &&
+        enumvalue <= (3 + (int)(sizeof(ipp_finishings) /
+                                sizeof(ipp_finishings[0]))))
+      return (ipp_finishings[enumvalue - 3]);
+    else if (enumvalue >= 0x40000000 &&
+             enumvalue <= (0x40000000 + (int)(sizeof(ipp_finishings_vendor) /
+                                              sizeof(ipp_finishings_vendor[0]))))
+      return (ipp_finishings_vendor[enumvalue - 0x40000000]);
+  }
   else if ((!strcmp(attrname, "job-collation-type") ||
             !strcmp(attrname, "job-collation-type-actual")) &&
            enumvalue >= 3 &&
@@ -731,6 +870,13 @@ ippEnumValue(const char *attrname,	/* I - Attribute name */
 	   !strcmp(attrname, "finishings-ready") ||
 	   !strcmp(attrname, "finishings-supported"))
   {
+    for (i = 0;
+         i < (int)(sizeof(ipp_finishings_vendor) /
+                   sizeof(ipp_finishings_vendor[0]));
+         i ++)
+      if (!strcmp(enumstring, ipp_finishings_vendor[i]))
+	return (i + 0x40000000);
+
     num_strings = (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]));
     strings     = ipp_finishings;
   }
@@ -795,18 +941,25 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   * See if the error code is a known value...
   */
 
-  if (error >= IPP_OK && error <= IPP_OK_EVENTS_COMPLETE)
+  if (error >= IPP_STATUS_OK && error <= IPP_STATUS_OK_EVENTS_COMPLETE)
     return (ipp_status_oks[error]);
-  else if (error == IPP_REDIRECTION_OTHER_SITE)
+  else if (error == IPP_STATUS_REDIRECTION_OTHER_SITE)
     return ("redirection-other-site");
-  else if (error == CUPS_SEE_OTHER)
+  else if (error == IPP_STATUS_CUPS_SEE_OTHER)
     return ("cups-see-other");
-  else if (error >= IPP_BAD_REQUEST && error <= IPP_PRINT_SUPPORT_FILE_NOT_FOUND)
-    return (ipp_status_400s[error - IPP_BAD_REQUEST]);
-  else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
-    return (ipp_status_500s[error - IPP_INTERNAL_ERROR]);
-  else if (error >= IPP_AUTHENTICATION_CANCELED && error <= IPP_UPGRADE_REQUIRED)
-    return (ipp_status_1000s[error - IPP_AUTHENTICATION_CANCELED]);
+  else if (error >= IPP_STATUS_ERROR_BAD_REQUEST &&
+           error <= IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE)
+    return (ipp_status_400s[error - IPP_STATUS_ERROR_BAD_REQUEST]);
+  else if (error >= 0x480 &&
+           error <= IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+    return (ipp_status_480s[error - 0x0480]);
+  else if (error >= IPP_STATUS_ERROR_INTERNAL &&
+           error <= IPP_STATUS_ERROR_TOO_MANY_DOCUMENTS)
+    return (ipp_status_500s[error - IPP_STATUS_ERROR_INTERNAL]);
+  else if (error >= IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED &&
+           error <= IPP_STATUS_ERROR_CUPS_UPGRADE_REQUIRED)
+    return (ipp_status_1000s[error -
+                             IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED]);
 
  /*
   * No, build an "0xxxxx" error string...
@@ -835,14 +988,18 @@ ippErrorValue(const char *name)		/* I - Name */
       return ((ipp_status_t)i);
 
   if (!_cups_strcasecmp(name, "redirection-other-site"))
-    return (IPP_REDIRECTION_OTHER_SITE);
+    return (IPP_STATUS_REDIRECTION_OTHER_SITE);
 
   if (!_cups_strcasecmp(name, "cups-see-other"))
-    return (CUPS_SEE_OTHER);
+    return (IPP_STATUS_CUPS_SEE_OTHER);
 
   for (i = 0; i < (sizeof(ipp_status_400s) / sizeof(ipp_status_400s[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_status_400s[i]))
       return ((ipp_status_t)(i + 0x400));
+
+  for (i = 0; i < (sizeof(ipp_status_480s) / sizeof(ipp_status_480s[0])); i ++)
+    if (!_cups_strcasecmp(name, ipp_status_480s[i]))
+      return ((ipp_status_t)(i + 0x480));
 
   for (i = 0; i < (sizeof(ipp_status_500s) / sizeof(ipp_status_500s[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_status_500s[i]))
@@ -872,13 +1029,13 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * See if the operation ID is a known value...
   */
 
-  if (op >= IPP_PRINT_JOB && op <= IPP_CLOSE_JOB)
+  if (op >= IPP_OP_PRINT_JOB && op <= IPP_OP_CLOSE_JOB)
     return (ipp_std_ops[op]);
-  else if (op == IPP_PRIVATE)
+  else if (op == IPP_OP_PRIVATE)
     return ("windows-ext");
-  else if (op >= CUPS_GET_DEFAULT && op <= CUPS_GET_PPD)
+  else if (op >= IPP_OP_CUPS_GET_DEFAULT && op <= IPP_OP_CUPS_GET_PPD)
     return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
-  else if (op == CUPS_GET_DOCUMENT)
+  else if (op == IPP_OP_CUPS_GET_DOCUMENT)
     return (ipp_cups_ops2[0]);
 
  /*
@@ -911,7 +1068,7 @@ ippOpValue(const char *name)		/* I - Textual name */
       return ((ipp_op_t)i);
 
   if (!_cups_strcasecmp(name, "windows-ext"))
-    return (IPP_PRIVATE);
+    return (IPP_OP_PRIVATE);
 
   for (i = 0; i < (sizeof(ipp_cups_ops) / sizeof(ipp_cups_ops[0])); i ++)
     if (!_cups_strcasecmp(name, ipp_cups_ops[i]))
@@ -922,12 +1079,12 @@ ippOpValue(const char *name)		/* I - Textual name */
       return ((ipp_op_t)(i + 0x4027));
 
   if (!_cups_strcasecmp(name, "CUPS-Add-Class"))
-    return (CUPS_ADD_MODIFY_CLASS);
+    return (IPP_OP_CUPS_ADD_MODIFY_CLASS);
 
   if (!_cups_strcasecmp(name, "CUPS-Add-Printer"))
-    return (CUPS_ADD_MODIFY_PRINTER);
+    return (IPP_OP_CUPS_ADD_MODIFY_PRINTER);
 
-  return ((ipp_op_t)-1);
+  return (IPP_OP_CUPS_INVALID);
 }
 
 

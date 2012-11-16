@@ -136,6 +136,10 @@ typedef int socklen_t;
 #    endif /* HAVE_GETIFADDRS */
 #  endif /* !WIN32 */
 
+#  ifdef HAVE_LIBZ
+#    include <zlib.h>
+#  endif /* HAVE_LIBZ */
+
 
 /*
  * C++ magic...
@@ -236,7 +240,22 @@ typedef void *http_tls_t;
 typedef void *http_tls_credentials_t;
 #  endif /* HAVE_LIBSSL */
 
-struct _http_s				/**** HTTP connection structure. ****/
+typedef enum _http_coding_e		/**** HTTP content coding enumeration ****/
+{
+  _HTTP_CODING_IDENTITY,		/* No content coding */
+  _HTTP_CODING_GZIP,			/* LZ77+gzip decompression */
+  _HTTP_CODING_DEFLATE,			/* LZ77+zlib compression */
+  _HTTP_CODING_GUNZIP,			/* LZ77+gzip decompression */
+  _HTTP_CODING_INFLATE			/* LZ77+zlib decompression */
+} _http_coding_t;
+
+typedef enum _http_mode_e		/**** HTTP mode enumeration ****/
+{
+  _HTTP_MODE_CLIENT,			/* Client connected to server */
+  _HTTP_MODE_SERVER			/* Server connected (accepted) from client */
+} _http_mode_t;
+
+struct _http_s				/**** HTTP connection structure ****/
 {
   int			fd;		/* File descriptor for this socket */
   int			blocking;	/* To block or not to block */
@@ -249,8 +268,8 @@ struct _http_s				/**** HTTP connection structure. ****/
   struct sockaddr_in	_hostaddr;	/* Address of connected host (deprecated) */
   char			hostname[HTTP_MAX_HOST],
   					/* Name of connected host */
-			fields[HTTP_FIELD_MAX][HTTP_MAX_VALUE];
-					/* Field values */
+			fields[HTTP_FIELD_ACCEPT_ENCODING][HTTP_MAX_VALUE];
+					/* Field values up to Accept-Encoding */
   char			*data;		/* Pointer to data buffer */
   http_encoding_t	data_encoding;	/* Chunked or not */
   int			_data_remaining;/* Number of bytes left (deprecated) */
@@ -264,16 +283,19 @@ struct _http_s				/**** HTTP connection structure. ****/
   int			nonce_count;	/* Nonce count */
   http_tls_t		tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
+
   /**** New in CUPS 1.1.19 ****/
   fd_set		*input_set;	/* select() set for httpWait() (deprecated) */
   http_status_t		expect;		/* Expect: header */
   char			*cookie;	/* Cookie value(s) */
+
   /**** New in CUPS 1.1.20 ****/
   char			_authstring[HTTP_MAX_VALUE],
 					/* Current Authentication value (deprecated) */
 			userpass[HTTP_MAX_VALUE];
 					/* Username:password string */
   int			digest_tries;	/* Number of tries for digest auth */
+
   /**** New in CUPS 1.2 ****/
   off_t			data_remaining;	/* Number of bytes left */
   http_addr_t		*hostaddr;	/* Current host address and port */
@@ -281,6 +303,7 @@ struct _http_s				/**** HTTP connection structure. ****/
   char			wbuffer[HTTP_MAX_BUFFER];
 					/* Buffer for outgoing data */
   int			wused;		/* Write buffer bytes used */
+
   /**** New in CUPS 1.3 ****/
   char			*field_authorization;
 					/* Authorization field */
@@ -293,6 +316,7 @@ struct _http_s				/**** HTTP connection structure. ****/
 #  ifdef HAVE_AUTHORIZATION_H
   AuthorizationRef	auth_ref;	/* Authorization ref */
 #  endif /* HAVE_AUTHORIZATION_H */
+
   /**** New in CUPS 1.5 ****/
   http_tls_credentials_t tls_credentials;
 					/* TLS credentials */
@@ -303,6 +327,17 @@ struct _http_s				/**** HTTP connection structure. ****/
 #  ifdef HAVE_GSSAPI
   char			gsshost[256];	/* Hostname for Kerberos */
 #  endif /* HAVE_GSSAPI */
+
+  /**** New in CUPS 1.7 ****/
+  _http_mode_t		mode;		/* _HTTP_MODE_CLIENT or _HTTP_MODE_SERVER */
+  char			*accept_encoding,
+					/* Accept-Encoding field */
+			*allow,		/* Allow field */
+			*server;	/* Server field */
+#  ifdef HAVE_LIBZ
+  _http_coding_t	coding;		/* _HTTP_CODING_xxx */
+  z_stream		stream;		/* (De)compression stream */
+#  endif /* HAVE_LIBZ */
 };
 
 
@@ -368,15 +403,17 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  */
 
 #define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
-extern int		_httpAddrPort(http_addr_t *addr);
+extern int		_httpAddrPort(http_addr_t *addr)
+			              _CUPS_DEPRECATED_MSG("Use httpAddrPort "
+			                                   "instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
 					   char *buffer, size_t bufsize);
 extern http_t		*_httpCreate(const char *host, int port,
-			             http_addrlist_t *addrlist,
+			             http_addrlist_t *addrlist, int family,
 				     http_encryption_t encryption,
-				     int family);
+				     int blocking, _http_mode_t mode);
 extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
@@ -385,7 +422,8 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
-extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
+extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
+			          _CUPS_DEPRECATED_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),

@@ -263,6 +263,7 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_file_t	*fp;		/* File pointer */
   int		i;		/* Looping var */
   int		status;		/* Status of tests (0 = success, 1 = fail) */
+  const char	*name;		/* Option name */
 
 
   status = 0;
@@ -625,11 +626,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     ippDelete(request);
 
+#ifdef DEBUG
+   /*
+    * Test that private option array is sorted...
+    */
+
+    fputs("_ippCheckOptions: ", stdout);
+    if ((name = _ippCheckOptions()) == NULL)
+      puts("PASS");
+    else
+    {
+      printf("FAIL (\"%s\" out of order)\n", name);
+      status = 1;
+    }
+#endif /* DEBUG */
+
    /*
     * Test _ippFindOption() private API...
     */
 
-    fputs("_ippFindOption(printer-type): ", stdout);
+    fputs("_ippFindOption(\"printer-type\"): ", stdout);
     if (_ippFindOption("printer-type"))
       puts("PASS");
     else
