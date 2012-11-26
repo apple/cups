@@ -19,7 +19,7 @@ include ../Makedefs
 # Config files...
 #
 
-KEEP	=	cupsd.conf snmp.conf
+KEEP	=	cups-files.conf cupsd.conf snmp.conf
 REPLACE	=	mime.convs mime.types
 
 

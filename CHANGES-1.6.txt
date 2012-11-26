@@ -4,6 +4,9 @@ CHANGES-1.6.txt
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes
+	- Security: All file, directory, user, and group settings are now stored
+	  in a separate cups-files.conf configuration file that cannot be set
+	  through the CUPS web interface or APIs (STR #4223)
 	- The SNMP backend now tries to work around broken printers that use a
 	  newline to separate key/value pairs.
 	- The IPP backend did not send a cancel request to printers when a job
