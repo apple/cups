@@ -252,16 +252,16 @@ echo ""
 
 case "$usedebugprintfs" in
 	Y* | y*)
-		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
+		echo "Enabling debug printfs (level 5); log files can be found in /tmp/cups-$user/log..."
 		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
 		CUPS_DEBUG_LEVEL=5; export CUPS_DEBUG_LEVEL
 		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
 		;;
 
 	0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
-		echo "Enabling debug printfs; log files can be found in /tmp/cups-$user/log..."
+		echo "Enabling debug printfs (level $usedebugprintfs); log files can be found in /tmp/cups-$user/log..."
 		CUPS_DEBUG_LOG="/tmp/cups-$user/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
-		CUPS_DEBUG_LEVEL=$usedebugprintf; export CUPS_DEBUG_LEVEL
+		CUPS_DEBUG_LEVEL="$usedebugprintfs"; export CUPS_DEBUG_LEVEL
 		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
 		;;
 
@@ -390,26 +390,11 @@ fi
 cat >/tmp/cups-$user/cupsd.conf <<EOF
 StrictConformance Yes
 Browsing Off
-FileDevice yes
-Printcap
 Listen localhost:$port
-User $user
-ServerRoot /tmp/cups-$user
-StateDir /tmp/cups-$user
-ServerBin /tmp/cups-$user/bin
-CacheDir /tmp/cups-$user/share
-DataDir /tmp/cups-$user/share
-FontPath /tmp/cups-$user/share/fonts
 PassEnv LOCALEDIR
 PassEnv DYLD_INSERT_LIBRARIES
-DocumentRoot $root/doc
-RequestRoot /tmp/cups-$user/spool
-TempDir /tmp/cups-$user/spool/temp
 MaxSubscriptions 3
 MaxLogSize 0
-AccessLog /tmp/cups-$user/log/access_log
-ErrorLog /tmp/cups-$user/log/error_log
-PageLog /tmp/cups-$user/log/page_log
 AccessLogLevel actions
 LogLevel debug2
 LogTimeFormat usecs
@@ -420,6 +405,24 @@ Order Allow,Deny
 $encryption
 </Limit>
 </Policy>
+EOF
+
+cat >/tmp/cups-$user/cups-files.conf <<EOF
+FileDevice yes
+Printcap
+User $user
+ServerRoot /tmp/cups-$user
+StateDir /tmp/cups-$user
+ServerBin /tmp/cups-$user/bin
+CacheDir /tmp/cups-$user/share
+DataDir /tmp/cups-$user/share
+FontPath /tmp/cups-$user/share/fonts
+DocumentRoot $root/doc
+RequestRoot /tmp/cups-$user/spool
+TempDir /tmp/cups-$user/spool/temp
+AccessLog /tmp/cups-$user/log/access_log
+ErrorLog /tmp/cups-$user/log/error_log
+PageLog /tmp/cups-$user/log/page_log
 EOF
 
 #
@@ -567,6 +570,11 @@ if test "x$testtype" = x0; then
 	echo "LD_PRELOAD=\"$LD_PRELOAD\"; export LD_PRELOAD" >>$runcups
 	echo "LOCALEDIR=\"$LOCALEDIR\"; export LOCALEDIR" >>$runcups
 	echo "SHLIB_PATH=\"$SHLIB_PATH\"; export SHLIB_PATH" >>$runcups
+	if test "x$CUPS_DEBUG_LEVEL" != x; then
+		echo "CUPS_DEBUG_FILTER='$CUPS_DEBUG_FILTER'; export CUPS_DEBUG_FILTER" >>$runcups
+		echo "CUPS_DEBUG_LEVEL=$CUPS_DEBUG_LEVEL; export CUPS_DEBUG_LEVEL" >>$runcups
+		echo "CUPS_DEBUG_LOG='$CUPS_DEBUG_LOG'; export CUPS_DEBUG_LOG" >>$runcups
+	fi
 	echo "" >>$runcups
 	echo "# Run command..." >>$runcups
 	echo "exec \"\$@\"" >>$runcups

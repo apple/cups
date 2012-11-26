@@ -996,6 +996,11 @@ httpFlush(http_t *http)			/* I - Connection to server */
     * Didn't get the data back, so close the current connection.
     */
 
+#ifdef HAVE_LIBZ
+    if (http->coding)
+      http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
+
     DEBUG_puts("1httpFlush: Setting state to HTTP_STATE_WAITING and closing.");
 
     http->state = HTTP_STATE_WAITING;
@@ -1955,6 +1960,11 @@ httpPeek(http_t *http,			/* I - Connection to server */
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
       httpGets(len, sizeof(len), http);
 
+#ifdef HAVE_LIBZ
+    if (http->coding)
+      http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
+
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
@@ -2101,15 +2111,6 @@ httpPeek(http_t *http,			/* I - Connection to server */
   return (bytes);
 }
 
-ssize_t					/* O - Number of bytes copied */
-_httpPeek(http_t *http,			/* I - Connection to server */
-          char   *buffer,		/* I - Buffer for data */
-	  size_t length)		/* I - Maximum number of bytes */
-{
- /* TODO: Remove in CUPS 1.8 */
-  return (httpPeek(http, buffer, length));
-}
-
 
 /*
  * 'httpPost()' - Send a POST request to the server.
@@ -2226,20 +2227,33 @@ httpRead2(http_t *http,			/* I - Connection to server */
   if (http->data_encoding == HTTP_ENCODING_CHUNKED &&
       http->data_remaining <= 0)
   {
-    DEBUG_puts("2httpRead2: Getting chunk length...");
-
-    if (httpGets(len, sizeof(len), http) == NULL)
+    if (!httpGets(len, sizeof(len), http))
     {
-      DEBUG_puts("1httpRead2: Could not get length!");
+      DEBUG_puts("1httpRead2: Could not get chunk length.");
       return (0);
+    }
+
+    if (!len[0])
+    {
+      DEBUG_puts("1httpRead2: Blank chunk length, trying again...");
+      if (!httpGets(len, sizeof(len), http))
+      {
+	DEBUG_puts("1httpRead2: Could not get chunk length.");
+	return (0);
+      }
     }
 
     http->data_remaining = strtoll(len, NULL, 16);
+
     if (http->data_remaining < 0)
     {
-      DEBUG_puts("1httpRead2: Negative chunk length!");
+      DEBUG_printf(("1httpRead2: Negative chunk length \"%s\" (" CUPS_LLFMT ")",
+                    len, CUPS_LLCAST http->data_remaining));
       return (0);
     }
+
+    DEBUG_printf(("2httpRead2: Got chunk length \"%s\" (" CUPS_LLFMT ")", len,
+                  CUPS_LLCAST http->data_remaining));
   }
 
   DEBUG_printf(("2httpRead2: data_remaining=" CUPS_LLFMT ", used=%d",
@@ -2553,10 +2567,13 @@ httpRead2(http_t *http,			/* I - Connection to server */
     return (0);
   }
 
-  if (http->data_remaining == 0)
+  if (http->data_remaining <= 0)
   {
     if (http->data_encoding == HTTP_ENCODING_CHUNKED)
+    {
+      DEBUG_puts("1httpRead2: Reading trailing line for chunk.");
       httpGets(len, sizeof(len), http);
+    }
     else
     {
 #ifdef HAVE_LIBZ
@@ -3388,17 +3405,17 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
     switch (http->state)
     {
-      case HTTP_GET :
-      case HTTP_POST :
+      case HTTP_STATE_GET :
+      case HTTP_STATE_POST :
       case HTTP_STATE_POST_RECV :
-      case HTTP_PUT :
+      case HTTP_STATE_PUT :
 	  http->state ++;
 
 	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
 	                http_states[http->state + 1]));
 
-      case HTTP_POST_SEND :
-      case HTTP_HEAD :
+      case HTTP_STATE_POST_SEND :
+      case HTTP_STATE_HEAD :
 	  break;
 
       default :
@@ -3861,8 +3878,6 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     * data, go idle...
     */
 
-    DEBUG_puts("2httpWrite2: Changing states.");
-
     if (http->wused)
     {
       if (httpFlushWrite(http) < 0)
@@ -3886,12 +3901,17 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     }
 
     if (http->state == HTTP_STATE_POST_RECV)
-      http->state ++;
-    else
-      http->state = HTTP_STATE_WAITING;
+    {
+#ifdef HAVE_LIBZ
+      if (http->coding)
+        http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
 
-    DEBUG_printf(("2httpWrite2: New state is %s.",
-                  http_states[http->state + 1]));
+      http->state ++;
+
+      DEBUG_printf(("2httpWrite2: Changed state to %s.",
+		    http_states[http->state + 1]));
+    }
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -4905,6 +4925,7 @@ http_set_length(http_t *http)		/* I - Connection */
   {
     if (http->mode == _HTTP_MODE_SERVER &&
 	http->state != HTTP_STATE_GET_SEND &&
+	http->state != HTTP_STATE_PUT &&
 	http->state != HTTP_STATE_POST &&
 	http->state != HTTP_STATE_POST_SEND)
     {

@@ -765,7 +765,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
 		temp[1024],		/* Temporary string */
-		buffer[8192];		/* Copy buffer */
+		buffer[8192],		/* Copy buffer */
+		compression[16];	/* COMPRESSION value */
   ipp_t		*request = NULL,	/* IPP request */
 		*response = NULL;	/* IPP response */
   size_t	length;			/* Length of IPP request */
@@ -1146,17 +1147,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     strlcpy(resource, vars->resource, sizeof(resource));
 
     request_id ++;
-    request       = ippNew();
-    op            = (ipp_op_t)0;
-    group         = IPP_TAG_ZERO;
-    ignore_errors = IgnoreErrors;
-    last_expect   = NULL;
-    last_status   = NULL;
-    filename[0]   = '\0';
-    skip_previous = 0;
-    skip_test     = 0;
-    version       = Version;
-    transfer      = Transfer;
+    request        = ippNew();
+    op             = (ipp_op_t)0;
+    group          = IPP_TAG_ZERO;
+    ignore_errors  = IgnoreErrors;
+    last_expect    = NULL;
+    last_status    = NULL;
+    filename[0]    = '\0';
+    skip_previous  = 0;
+    skip_test      = 0;
+    version        = Version;
+    transfer       = Transfer;
+    compression[0] = '\0';
 
     strlcpy(name, testfile, sizeof(name));
     if (strrchr(name, '.') != NULL)
@@ -1239,6 +1241,40 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
 	else
 	{
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcmp(token, "COMPRESSION"))
+      {
+       /*
+	* COMPRESSION none
+	* COMPRESSION deflate
+	* COMPRESSION gzip
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  expand_variables(vars, compression, temp, sizeof(compression));
+#ifdef HAVE_LIBZ
+	  if (strcmp(compression, "none") && strcmp(compression, "deflate") &&
+	      strcmp(compression, "gzip"))
+#else
+	  if (strcmp(compression, "none"))
+#endif /* HAVE_LIBZ */
+          {
+	    print_fatal_error("Unsupported COMPRESSION value '%s' on line %d.",
+	                      compression, linenum);
+	    pass = 0;
+	    goto test_exit;
+          }
+
+          if (!strcmp(compression, "none"))
+            compression[0] = '\0';
+	}
+	else
+	{
+	  print_fatal_error("Missing COMPRESSION value on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2326,6 +2362,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	while (!response && !Cancel && prev_pass)
 	{
 	  status = cupsSendRequest(http, request, resource, length);
+
+#ifdef HAVE_LIBZ
+	  if (compression[0])
+	    httpSetField(http, HTTP_FIELD_CONTENT_ENCODING, compression);
+#endif /* HAVE_LIBZ */
 
 	  if (!Cancel && status == HTTP_CONTINUE &&
 	      request->state == IPP_DATA && filename[0])

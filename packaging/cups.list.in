@@ -528,6 +528,8 @@ d 0755 root $CUPS_GROUP $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cups-files.conf conf/cups-files.conf
+f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cups-files.conf.default conf/cups-files.conf
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf conf/cupsd.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/snmp.conf conf/snmp.conf
