@@ -3286,6 +3286,39 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 			"line %d.", value, linenum);
     }
 #endif /* HAVE_SSL */
+    else if (!_cups_strcasecmp(line, "AccessLog") ||
+             !_cups_strcasecmp(line, "CacheDir") ||
+             !_cups_strcasecmp(line, "ConfigFilePerm") ||
+             !_cups_strcasecmp(line, "DataDir") ||
+             !_cups_strcasecmp(line, "DocumentRoot") ||
+             !_cups_strcasecmp(line, "ErrorLog") ||
+             !_cups_strcasecmp(line, "FatalErrors") ||
+             !_cups_strcasecmp(line, "FileDevice") ||
+             !_cups_strcasecmp(line, "FontPath") ||
+             !_cups_strcasecmp(line, "Group") ||
+             !_cups_strcasecmp(line, "LogFilePerm") ||
+             !_cups_strcasecmp(line, "LPDConfigFile") ||
+             !_cups_strcasecmp(line, "PageLog") ||
+             !_cups_strcasecmp(line, "Printcap") ||
+             !_cups_strcasecmp(line, "PrintcapFormat") ||
+             !_cups_strcasecmp(line, "RequestRoot") ||
+             !_cups_strcasecmp(line, "ServerBin") ||
+             !_cups_strcasecmp(line, "ServerCertificate") ||
+             !_cups_strcasecmp(line, "ServerKey") ||
+             !_cups_strcasecmp(line, "ServerRoot") ||
+             !_cups_strcasecmp(line, "SMBConfigFile") ||
+             !_cups_strcasecmp(line, "StateDir") ||
+             !_cups_strcasecmp(line, "SystemGroup") ||
+             !_cups_strcasecmp(line, "SystemGroupAuthKey") ||
+             !_cups_strcasecmp(line, "TempDir") ||
+	     !_cups_strcasecmp(line, "User"))
+    {
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "Please move \"%s%s%s\" on line %d of %s to the %s file; "
+		      "this will become an error in a future release.",
+		      line, value ? " " : "", value ? value : "", linenum,
+		      ConfigurationFile, CupsFilesFile);
+    }
     else
       parse_variable(ConfigurationFile, linenum, line, value,
                      sizeof(cupsd_vars) / sizeof(cupsd_vars[0]), cupsd_vars);
