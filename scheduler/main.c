@@ -350,7 +350,10 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
   if (!ConfigurationFile)
+  {
     cupsdSetString(&ConfigurationFile, CUPS_SERVERROOT "/cupsd.conf");
+    cupsdSetString(&CupsFilesFile, CUPS_SERVERROOT "/cups-files.conf");
+  }
 
  /*
   * If the user hasn't specified "-f", run in the background...
