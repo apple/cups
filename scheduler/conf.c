@@ -140,7 +140,6 @@ static const cupsd_var_t	cupsd_vars[] =
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_TIME },
   { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_TIME },
   { "ReloadTimeout",		&ReloadTimeout,		CUPSD_VARTYPE_TIME },
-  { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
   { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_TIME },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
@@ -163,6 +162,7 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
+  { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
@@ -939,6 +939,13 @@ cupsdReadConfiguration(void)
       NumSystemGroups   = 1;
     }
   }
+
+ /*
+  * Make sure ConfigFilePerm and LogFilePerm have sane values...
+  */
+
+  ConfigFilePerm &= 0664;
+  LogFilePerm    &= 0664;
 
  /*
   * Open the system log for cupsd if necessary...
@@ -3301,6 +3308,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
              !_cups_strcasecmp(line, "PageLog") ||
              !_cups_strcasecmp(line, "Printcap") ||
              !_cups_strcasecmp(line, "PrintcapFormat") ||
+             !_cups_strcasecmp(line, "RemoteRoot") ||
              !_cups_strcasecmp(line, "RequestRoot") ||
              !_cups_strcasecmp(line, "ServerBin") ||
              !_cups_strcasecmp(line, "ServerCertificate") ||

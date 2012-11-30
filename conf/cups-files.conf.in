@@ -39,7 +39,7 @@ AccessLog @CUPS_LOGDIR@/access_log
 #DataDir @CUPS_DATADIR@
 
 # Location of the static web content served by the scheduler...
-#DocRoot @CUPS_DOCROOT@
+#DocumentRoot @CUPS_DOCROOT@
 
 # Location of the file logging all messages produced by the scheduler and any
 # helper programs; may be the name "syslog". If not an absolute path, the value
