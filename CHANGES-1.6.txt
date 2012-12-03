@@ -3,7 +3,7 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
-	- Documentation fixes
+	- Documentation fixes (STR #4239)
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
