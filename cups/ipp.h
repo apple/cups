@@ -23,6 +23,7 @@
  */
 
 #  include "http.h"
+#  include <stdarg.h>
 
 
 /*
