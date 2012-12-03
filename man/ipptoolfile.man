@@ -11,12 +11,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "16 November 2012" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "3 December 2012" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
 .SH DESCRIPTION
-The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curley braces, for example:
+The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
 .nf
 
     # This is a comment
@@ -547,7 +547,7 @@ $scheme
 Inserts the scheme from the URI provided to \fIipptool\fR.
 .TP 5
 $notify-subscription-id
-Inserts the last notify-subscription-id value returnd in a test response or 0 if
+Inserts the last notify-subscription-id value returned in a test response or 0 if
 no notify-subscription-id has been seen.
 .TP 5
 $port
