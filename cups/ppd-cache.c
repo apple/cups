@@ -69,7 +69,8 @@ static int	pwg_compare_finishings(_pwg_finishings_t *a,
 		                       _pwg_finishings_t *b);
 static void	pwg_free_finishings(_pwg_finishings_t *f);
 static void	pwg_ppdize_name(const char *ipp, char *name, size_t namesize);
-static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
+static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize,
+		                  const char *dashchars);
 
 
 /*
@@ -760,7 +761,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	pwg_name      = pwg_keyword;
 	new_known_pwg = 0;
 
-	pwg_unppdize_name(ppd_size->name, ppd_name, sizeof(ppd_name));
+	pwg_unppdize_name(ppd_size->name, ppd_name, sizeof(ppd_name), "_.");
 	_pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), NULL, ppd_name,
 			 _PWG_FROMPTS(ppd_size->width),
 			 _PWG_FROMPTS(ppd_size->length));
@@ -928,7 +929,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	*/
 
         pwg_name = pwg_keyword;
-	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword),
+	                  "_");
       }
 
       map->pwg = _cupsStrAlloc(pwg_name);
@@ -992,7 +994,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	*/
 
         pwg_name = pwg_keyword;
-	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword),
+	                  "_");
       }
 
       map->pwg = _cupsStrAlloc(pwg_name);
@@ -1021,7 +1024,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	 i > 0;
 	 i --, choice ++, map ++)
     {
-      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword), "_");
 
       map->pwg = _cupsStrAlloc(pwg_keyword);
       map->ppd = _cupsStrAlloc(choice->choice);
@@ -2661,7 +2664,8 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 static void
 pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 		  char       *name,	/* I - Name buffer */
-                  size_t     namesize)	/* I - Size of name buffer */
+                  size_t     namesize,	/* I - Size of name buffer */
+                  const char *dashchars)/* I - Characters to be replaced by dashes */
 {
   char	*ptr,				/* Pointer into name buffer */
 	*end;				/* End of name buffer */
@@ -2671,8 +2675,10 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
   {
     if (_cups_isalnum(*ppd) || *ppd == '-')
       *ptr++ = tolower(*ppd & 255);
-    else if (*ppd == '_' || *ppd == '.')
+    else if (strchr(dashchars, *ppd))
       *ptr++ = '-';
+    else
+      *ptr++ = *ppd;
 
     if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
 	_cups_isupper(ppd[1]) && ptr < end)
