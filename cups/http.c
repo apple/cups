@@ -2154,6 +2154,10 @@ httpPeek(http_t *http,			/* I - Connection to server */
   return (bytes);
 }
 
+/* For OS X 10.8 and earlier */
+ssize_t _httpPeek(http_t *http, char *buffer, size_t length)
+{ return (httpPeek(http, buffer, length)); }
+
 
 /*
  * 'httpPost()' - Send a POST request to the server.
