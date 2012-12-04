@@ -125,6 +125,7 @@ install-exec:
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp ipptool $(SYMROOT); \
+		dsymutil $(SYMROOT)/ipptool; \
 	fi
 
 

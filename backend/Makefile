@@ -136,6 +136,7 @@ install-exec:	$(INSTALLXPC)
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(TARGETS); do \
 			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
 		done \
 	fi
 

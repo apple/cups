@@ -3,7 +3,7 @@
 #
 #   Configuration file makefile for CUPS.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2012 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
