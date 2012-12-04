@@ -1981,7 +1981,9 @@ httpPeek(http_t *http,			/* I - Connection to server */
 
     return (0);
   }
-  else if (length > (size_t)http->data_remaining)
+  else if ((http->data_encoding == HTTP_ENCODING_LENGTH ||
+            http->coding == _HTTP_CODING_IDENTITY) &&
+           length > (size_t)http->data_remaining)
     length = (size_t)http->data_remaining;
 
   if (http->used == 0)
@@ -2069,6 +2071,47 @@ httpPeek(http_t *http,			/* I - Connection to server */
     http->used = bytes;
   }
 
+#ifdef HAVE_LIBZ
+  if (http->coding)
+  {
+    int		zerr;			/* Decompressor error */
+    off_t	comp_avail;		/* Maximum bytes for decompression */
+    z_stream	stream;			/* Copy of decompressor stream */
+
+    if (http->used > http->data_remaining)
+      comp_avail = http->data_remaining;
+    else
+      comp_avail = http->used;
+
+    DEBUG_printf(("2httpPeek: length=%d, avail_in=%d", (int)length,
+                  (int)comp_avail));
+
+    if (inflateCopy(&stream, &(http->stream)) != Z_OK)
+    {
+      DEBUG_puts("2httpPeek: Unable to copy decompressor stream.");
+      http->error = ENOMEM;
+      return (-1);
+    }
+
+    stream.next_in   = (Bytef *)http->buffer;
+    stream.avail_in  = comp_avail;
+    stream.next_out  = (Bytef *)buffer;
+    stream.avail_out = length;
+
+    zerr = inflate(&stream, Z_SYNC_FLUSH);
+    inflateEnd(&stream);
+
+    if (zerr < Z_OK)
+    {
+      DEBUG_printf(("2httpPeek: zerr=%d", zerr));
+      http->error = EIO;
+      return (-1);
+    }
+
+    bytes = length - http->stream.avail_out;
+  }
+  else
+#endif /* HAVE_LIBZ */
   if (http->used > 0)
   {
     if (length > (size_t)http->used)
