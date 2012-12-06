@@ -2853,10 +2853,10 @@ msgstr "Carpeta d'arxivador "
 #, c-format
 msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
+"in \"%s/cups-files.conf\"."
 msgstr ""
 "S'han deshabilitat els URIs dels dispositius de fitxers. Per habilitar-los, "
-"vegeu la directriu FileDevice a «%s/cupsd.conf»."
+"vegeu la directriu FileDevice a «%s/cups-files.conf»."
 
 #, c-format
 msgid "Finished page %d."

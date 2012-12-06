@@ -2426,7 +2426,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                _("File device URIs have been disabled. "
 	                  "To enable, see the FileDevice directive in "
-			  "\"%s/cupsd.conf\"."),
+			  "\"%s/cups-files.conf\"."),
 			ServerRoot);
 	return;
       }
