@@ -59,34 +59,7 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
 		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
 
-		dnl Check for SecCertificateCopyData..
-		AC_MSG_CHECKING(for SecCertificateCopyData)
-		if test $uversion -ge 100; then
-		    AC_DEFINE(HAVE_SECCERTIFICATECOPYDATA)
-		    AC_MSG_RESULT(yes)
-		else
-		    AC_MSG_RESULT(no)
-		fi
-
-		dnl Check for SecIdentitySearchCreateWithPolicy...
-		AC_MSG_CHECKING(for SecIdentitySearchCreateWithPolicy)
-		if test $uversion -ge 80; then
-		    AC_DEFINE(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-		    AC_MSG_RESULT(yes)
-		else
-		    AC_MSG_RESULT(no)
-		fi
-
-		dnl Check for SecPolicyCreateSSL...
-		AC_MSG_CHECKING(for SecPolicyCreateSSL)
-		if test $uversion -ge 110; then
-		    AC_DEFINE(HAVE_SECPOLICYCREATESSL)
-		    AC_MSG_RESULT(yes)
-		else
-		    AC_MSG_RESULT(no)
-		fi])
-
-		AC_DEFINE(HAVE_CSSMERRORSTRING)
+		AC_DEFINE(HAVE_CSSMERRORSTRING)])
 	fi
     fi
 

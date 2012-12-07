@@ -168,13 +168,6 @@
 
 
 /*
- * Do we have <scsi/sg.h>?
- */
-
-#undef HAVE_SCSI_SG_H
-
-
-/*
  * Use <stdint.h>?
  */
 
@@ -322,34 +315,6 @@
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
 #undef HAVE_SECURETRANSPORTPRIV_H
-
-
-/*
- * Do we have the SecCertificateCopyData function?
- */
-
-#undef HAVE_SECCERTIFICATECOPYDATA
-
-
-/*
- * Do we have the SecIdentitySearchCreateWithPolicy function?
- */
-
-#undef HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-#undef HAVE_SECPOLICYCREATESSL
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-#undef HAVE_SECPOLICYCREATESSL
 
 
 /*

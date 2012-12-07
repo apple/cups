@@ -176,9 +176,9 @@ static int		http_write_chunk(http_t *http, const char *buffer,
 			                 int length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
-#  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+#  ifdef HAVE_CDSASSL
 static int		http_set_credentials(http_t *http);
-#  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
+#  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 static off_t		http_set_length(http_t *http);
 static void		http_set_timeout(int fd, double timeout);
@@ -671,10 +671,10 @@ httpCopyCredentials(
 {
 #  ifdef HAVE_LIBSSL
 #  elif defined(HAVE_GNUTLS)
-#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+#  elif defined(HAVE_CDSASSL)
   OSStatus		error;		/* Error code */
+  SecTrustRef		peerTrust;	/* Peer trust reference */
   CFIndex		count;		/* Number of credentials */
-  CFArrayRef		peerCerts;	/* Peer certificates */
   SecCertificateRef	secCert;	/* Certificate reference */
   CFDataRef		data;		/* Certificate data */
   int			i;		/* Looping var */
@@ -694,14 +694,16 @@ httpCopyCredentials(
 #  elif defined(HAVE_GNUTLS)
   return (-1);
 
-#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
-  if (!(error = SSLCopyPeerCertificates(http->tls, &peerCerts)) && peerCerts)
+#  elif defined(HAVE_CDSASSL)
+  if (!(error = SSLCopyPeerTrust(http->tls, &peerTrust)) && peerTrust)
   {
     if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
     {
-      for (i = 0, count = CFArrayGetCount(peerCerts); i < count; i++)
+      count = SecTrustGetCertificateCount(peerTrust);
+
+      for (i = 0; i < count; i ++)
       {
-	secCert = (SecCertificateRef)CFArrayGetValueAtIndex(peerCerts, i);
+	secCert = SecTrustGetCertificateAtIndex(peerTrust, i);
 	if ((data = SecCertificateCopyData(secCert)))
 	{
 	  httpAddCredential(*credentials, CFDataGetBytePtr(data),
@@ -711,7 +713,7 @@ httpCopyCredentials(
       }
     }
 
-    CFRelease(peerCerts);
+    CFRelease(peerTrust);
   }
 
   return (error);
@@ -832,7 +834,7 @@ _httpCreateCredentials(
 #  elif defined(HAVE_GNUTLS)
   return (NULL);
 
-#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+#  elif defined(HAVE_CDSASSL)
   CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
   SecCertificateRef	secCert;	/* Certificate reference */
   CFDataRef		data;		/* Credential data reference */
@@ -4916,7 +4918,7 @@ http_send(http_t       *http,		/* I - Connection to server */
 
 
 #ifdef HAVE_SSL
-#  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
+#  if defined(HAVE_CDSASSL)
 /*
  * 'http_set_credentials()' - Set the SSL/TLS credentials.
  */
@@ -4939,7 +4941,6 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   if ((credentials = http->tls_credentials) == NULL)
     credentials = cg->tls_credentials;
 
-#    if HAVE_SECPOLICYCREATESSL
  /*
   * Otherwise root around in the user's keychain to see if one can be found...
   */
@@ -4994,7 +4995,6 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
     if (dn_array)
       CFRelease(dn_array);
   }
-#    endif /* HAVE_SECPOLICYCREATESSL */
 
   if (credentials)
   {
@@ -5007,7 +5007,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 
   return (error);
 }
-#  endif /* HAVE_CDSASSL && HAVE_SECCERTIFICATECOPYDATA */
+#  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 
 
@@ -5119,7 +5119,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 {
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Pointer to library globals */
-  int			any_root;	/* Allow any root */
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
 
@@ -5134,7 +5133,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
   OSStatus		error;		/* Error code */
   const char		*message = NULL;/* Error message */
-#    ifdef HAVE_SECCERTIFICATECOPYDATA
   cups_array_t		*credentials;	/* Credentials array */
   cups_array_t		*names;		/* CUPS distinguished names */
   CFArrayRef		dn_array;	/* CF distinguished names array */
@@ -5142,7 +5140,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   CFDataRef		data;		/* Certificate data */
   int			i;		/* Looping var */
   http_credential_t	*credential;	/* Credential data */
-#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 #  elif defined(HAVE_SSPISSL)
   TCHAR			username[256];	/* Username returned from GetUserName() */
   TCHAR			commonName[256];/* Common name for certificate */
@@ -5153,22 +5150,18 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("7http_setup_ssl(http=%p)", http));
 
  /*
-  * Always allow self-signed certificates for the local loopback address...
+  * Get the hostname to use for SSL...
   */
 
   if (httpAddrLocalhost(http->hostaddr))
   {
-    any_root = 1;
     strlcpy(hostname, "localhost", sizeof(hostname));
   }
   else
   {
    /*
-    * Otherwise use the system-wide setting and make sure the hostname we have
-    * does not end in a trailing dot.
+    * Otherwise make sure the hostname we have does not end in a trailing dot.
     */
-
-    any_root = cg->any_root;
 
     strlcpy(hostname, http->hostname, sizeof(hostname));
     if ((hostptr = hostname + strlen(hostname) - 1) >= hostname &&
@@ -5177,8 +5170,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 
 #  ifdef HAVE_LIBSSL
-  (void)any_root;
-
   context = SSL_CTX_new(SSLv23_client_method());
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
@@ -5223,8 +5214,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 
 #  elif defined(HAVE_GNUTLS)
-  (void)any_root;
-
   credentials = (gnutls_certificate_client_credentials *)
                     malloc(sizeof(gnutls_certificate_client_credentials));
   if (credentials == NULL)
@@ -5273,7 +5262,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   http->tls_credentials = credentials;
 
 #  elif defined(HAVE_CDSASSL)
-  if ((error = SSLNewContext(false, &http->tls)))
+  if ((http->tls = SSLCreateContext(kCFAllocatorDefault, kSSLClientSide,
+                                    kSSLStreamType)))
   {
     http->error  = errno;
     http->status = HTTP_ERROR;
@@ -5293,38 +5283,12 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!error)
   {
-    error = SSLSetAllowsAnyRoot(http->tls, any_root);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot(%d), error=%d",
-                  any_root, (int)error));
-  }
-
-  if (!error)
-  {
-    error = SSLSetAllowsExpiredCerts(http->tls, cg->expired_certs);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredCerts(%d), error=%d",
-                  cg->expired_certs, (int)error));
-  }
-
-  if (!error)
-  {
-    error = SSLSetAllowsExpiredRoots(http->tls, cg->expired_root);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredRoots(%d), error=%d",
-                  cg->expired_root, (int)error));
-  }
-
- /*
-  * In general, don't verify certificates since things like the common name
-  * often do not match...
-  */
-
-  if (!error)
-  {
-    error = SSLSetEnableCertVerify(http->tls, false);
-    DEBUG_printf(("4http_setup_ssl: SSLSetEnableCertVerify, error=%d",
+    error = SSLSetSessionOption(http->tls, kSSLSessionOptionBreakOnServerAuth,
+                                true);
+    DEBUG_printf(("4http_setup_ssl: SSLSetSessionOption, error=%d",
                   (int)error));
   }
 
-#    ifdef HAVE_SECCERTIFICATECOPYDATA
   if (!error)
   {
     if (cg->client_cert_cb)
@@ -5341,20 +5305,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
                     (int)error));
     }
   }
-
- /*
-  * If there's a server certificate callback installed let it evaluate the
-  * certificate(s) during the handshake...
-  */
-
-  if (!error && cg->server_cert_cb != NULL)
-  {
-    error = SSLSetSessionOption(http->tls,
-				kSSLSessionOptionBreakOnServerAuth, true);
-    DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnServerAuth, "
-		  "error=%d", (int)error));
-  }
-#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 
  /*
   * Let the server know which hostname/domain we are trying to connect to
@@ -5390,7 +5340,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    usleep(1000);		/* in 1 millisecond */
 	    break;
 
-#    ifdef HAVE_SECCERTIFICATECOPYDATA
 	case errSSLServerAuthCompleted :
 	    error = 0;
 	    if (cg->server_cert_cb)
@@ -5453,7 +5402,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	      httpFreeCredentials(names);
 	    }
 	    break;
-#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 
 	case errSSLUnknownRootCert :
 	    message = _("Unable to establish a secure connection to host "
@@ -5502,7 +5450,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->status = HTTP_ERROR;
     errno        = ECONNREFUSED;
 
-    SSLDisposeContext(http->tls);
+    CFRelease(http->tls);
     http->tls = NULL;
 
    /*
@@ -5551,7 +5499,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(http->tls_credentials, any_root);
+  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
   _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
 
   if (!_sspiConnect(http->tls_credentials, hostname))
@@ -5604,7 +5552,7 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
   while (SSLClose(http->tls) == errSSLWouldBlock)
     usleep(1000);
 
-  SSLDisposeContext(http->tls);
+  CFRelease(http->tls);
 
   if (http->tls_credentials)
     CFRelease(http->tls_credentials);
