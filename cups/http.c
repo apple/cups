@@ -4730,15 +4730,6 @@ http_send(http_t       *http,		/* I - Connection to server */
   if (!http->fields[HTTP_FIELD_USER_AGENT][0])
     httpSetField(http, HTTP_FIELD_USER_AGENT, CUPS_MINIMAL);
 
-#ifdef HAVE_LIBZ
- /*
-  * Set the Accept-Encoding field if it isn't already...
-  */
-
-  if (!http->accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, "gzip, deflate, identity");
-#endif /* HAVE_LIBZ */
-
  /*
   * Encode the URI as needed...
   */
