@@ -134,7 +134,7 @@ install-exec:	$(INSTALLXPC)
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(RBACKENDS) $(UBACKENDS); do \
 			cp $$file $(SYMROOT); \
 			dsymutil $(SYMROOT)/$$file; \
 		done \
