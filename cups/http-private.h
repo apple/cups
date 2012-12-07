@@ -291,7 +291,7 @@ struct _http_s				/**** HTTP connection structure ****/
 
   /**** New in CUPS 1.1.20 ****/
   char			_authstring[HTTP_MAX_VALUE],
-					/* Current Authentication value (deprecated) */
+					/* Current Authorization value (deprecated) */
 			userpass[HTTP_MAX_VALUE];
 					/* Username:password string */
   int			digest_tries;	/* Number of tries for digest auth */
@@ -307,7 +307,7 @@ struct _http_s				/**** HTTP connection structure ****/
   /**** New in CUPS 1.3 ****/
   char			*field_authorization;
 					/* Authorization field */
-  char			*authstring;	/* Current authorization field */
+  char			*authstring;	/* Current Authorization field */
 #  ifdef HAVE_GSSAPI
   gss_OID 		gssmech;	/* Authentication mechanism */
   gss_ctx_id_t		gssctx;		/* Authentication context */
@@ -333,7 +333,11 @@ struct _http_s				/**** HTTP connection structure ****/
   char			*accept_encoding,
 					/* Accept-Encoding field */
 			*allow,		/* Allow field */
-			*server;	/* Server field */
+			*server,	/* Server field */
+			*default_accept_encoding,
+			*default_server,
+			*default_user_agent;
+					/* Default field values */
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
   z_stream		stream;		/* (De)compression stream */

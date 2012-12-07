@@ -816,8 +816,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Connect to the server...
   */
 
-  if ((http = _httpCreate(vars->hostname, vars->port, NULL, vars->family,
-                          vars->encryption, 1, _HTTP_MODE_CLIENT)) == NULL)
+  if ((http = httpConnect2(vars->hostname, vars->port, NULL, vars->family,
+                           vars->encryption, 1, 30000, NULL)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, cupsLastErrorString());
@@ -825,13 +825,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     goto test_exit;
   }
 
-  if (httpReconnect(http))
-  {
-    print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, cupsLastErrorString());
-    pass = 0;
-    goto test_exit;
-  }
+#ifdef HAVE_LIBZ
+  httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING,
+                      "deflate, gzip, identity");
+#else
+  httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING, "identity");
+#endif /* HAVE_LIBZ */
 
   if (vars->timeout > 0.0)
     httpSetTimeout(http, vars->timeout, timeout_cb, NULL);

@@ -3171,6 +3171,56 @@ httpSetCookie(http_t     *http,		/* I - Connection */
 
 
 /*
+ * 'httpSetDefaultField()' - Set the default value of an HTTP header.
+ *
+ * Currently only HTTP_FIELD_ACCEPT_ENCODING, HTTP_FIELD_SERVER, and
+ * HTTP_FIELD_USER_AGENT can be set.
+ *
+ * @since CUPS 1.7@
+ */
+
+void
+httpSetDefaultField(http_t       *http,	/* I - Connection to server */
+                    http_field_t field,	/* I - Field index */
+	            const char   *value)/* I - Value */
+{
+  DEBUG_printf(("httpSetDefaultField(http=%p, field=%d(%s), value=\"%s\")",
+                http, field, http_fields[field], value));
+
+  if (!http)
+    return;
+
+  switch (field)
+  {
+    case HTTP_FIELD_ACCEPT_ENCODING :
+        if (http->default_accept_encoding)
+          _cupsStrFree(http->default_accept_encoding);
+
+        http->default_accept_encoding = value ? _cupsStrAlloc(value) : NULL;
+        break;
+
+    case HTTP_FIELD_SERVER :
+        if (http->default_server)
+          _cupsStrFree(http->default_server);
+
+        http->default_server = value ? _cupsStrAlloc(value) : NULL;
+        break;
+
+    case HTTP_FIELD_USER_AGENT :
+        if (http->default_user_agent)
+          _cupsStrFree(http->default_user_agent);
+
+        http->default_user_agent = value ? _cupsStrAlloc(value) : NULL;
+        break;
+
+    default :
+        DEBUG_puts("1httpSetDefaultField: Ignored.");
+	break;
+  }
+}
+
+
+/*
  * 'httpSetExpect()' - Set the Expect: header in a request.
  *
  * Currently only @code HTTP_STATUS_CONTINUE@ is supported for the "expect"
@@ -4108,15 +4158,20 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 #endif /* HAVE_SSL */
 
   if (!http->server)
-    httpSetField(http, HTTP_FIELD_SERVER, CUPS_MINIMAL);
+    httpSetField(http, HTTP_FIELD_SERVER,
+                 http->default_server ? http->default_server : CUPS_MINIMAL);
 
-#ifdef HAVE_LIBZ
  /*
   * Set the Accept-Encoding field if it isn't already...
   */
 
   if (!http->accept_encoding)
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, "gzip, deflate, identity");
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
+                 http->default_accept_encoding ? http->default_accept_encoding :
+#ifdef HAVE_LIBZ
+                                                 "gzip, deflate, identity");
+#else
+                                                 "identity");
 #endif /* HAVE_LIBZ */
 
  /*
@@ -4728,7 +4783,17 @@ http_send(http_t       *http,		/* I - Connection to server */
   */
 
   if (!http->fields[HTTP_FIELD_USER_AGENT][0])
-    httpSetField(http, HTTP_FIELD_USER_AGENT, CUPS_MINIMAL);
+    httpSetField(http, HTTP_FIELD_USER_AGENT,
+                 http->default_user_agent ? http->default_user_agent :
+                                            CUPS_MINIMAL);
+
+ /*
+  * Set the Accept-Encoding field if it isn't already...
+  */
+
+  if (!http->accept_encoding && http->default_accept_encoding)
+    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING,
+                 http->default_accept_encoding);
 
  /*
   * Encode the URI as needed...
