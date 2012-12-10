@@ -5262,15 +5262,28 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   http->tls_credentials = credentials;
 
 #  elif defined(HAVE_CDSASSL)
+#    if 1
   if ((http->tls = SSLCreateContext(kCFAllocatorDefault, kSSLClientSide,
                                     kSSLStreamType)))
   {
+    DEBUG_puts("4http_set_ssl: SSLCreateContext failed.");
     http->error  = errno;
     http->status = HTTP_ERROR;
     _cupsSetHTTPError(HTTP_ERROR);
 
     return (-1);
   }
+#    else
+  if ((error = SSLNewContext(false, &(http->tls))) != noErr)
+  {
+    DEBUG_printf(("4http_set_ssl: SSLNewContext failed, error=%d", (int)error));
+    http->error  = ENOMEM;
+    http->status = HTTP_ERROR;
+    _cupsSetHTTPError(HTTP_ERROR);
+
+    return (-1);
+  }
+#    endif /* 0 */
 
   error = SSLSetConnection(http->tls, http);
   DEBUG_printf(("4http_setup_ssl: SSLSetConnection, error=%d", (int)error));
