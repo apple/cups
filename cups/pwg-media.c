@@ -225,7 +225,6 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("prc_1_102x165mm", NULL, "EnvPRC1", 102, 165),
   _PWG_MEDIA_MM("prc_2_102x176mm", NULL, "EnvPRC2", 102, 176),
   _PWG_MEDIA_MM("prc_4_110x208mm", NULL, "EnvPRC4", 110, 208),
-  _PWG_MEDIA_MM("prc_5_110x220mm", NULL, "EnvPRC5", 110, 220),
   _PWG_MEDIA_MM("prc_8_120x309mm", NULL, "EnvPRC8", 120, 309),
   _PWG_MEDIA_MM("prc_6_120x320mm", NULL, NULL, 120, 320),
   _PWG_MEDIA_MM("prc_3_125x176mm", NULL, "EnvPRC3", 125, 176),

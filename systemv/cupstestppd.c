@@ -3238,6 +3238,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
             snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
           else
             snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+
+	  ppdlen = strlen(buf);
         }
 
         if (size->left == 0 && size->bottom == 0 &&
@@ -3306,7 +3308,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
 	                 ceil(size->length) : size->length;
 
-        if (fmod(width_tmp, 18.0) == 0.0 || fmod(length_tmp, 18.0) == 0.0)
+        if (fmod(width_tmp, 9.0) == 0.0 && fmod(length_tmp, 9.0) == 0.0)
         {
           width_inch  = width_tmp / 72.0;
           length_inch = length_tmp / 72.0;
