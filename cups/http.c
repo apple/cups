@@ -971,6 +971,13 @@ httpFlush(http_t *http)			/* I - Connection to server */
                 http_states[http->state + 1]));
 
  /*
+  * Nothing to do if we are in the "waiting" state...
+  */
+
+  if (http->state == HTTP_STATE_WAITING)
+    return;
+
+ /*
   * Temporarily set non-blocking mode so we don't get stuck in httpRead()...
   */
 
