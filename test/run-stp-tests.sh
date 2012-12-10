@@ -425,7 +425,7 @@ ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
 EOF
 
-if test $ssltype != 0 -a `uname` = Darwn; then
+if test $ssltype != 0 -a `uname` = Darwin; then
 	echo "ServerCertificate $HOME/Library/Keychains/login.keychain" >> /tmp/cups-$user/cups-files.conf
 fi
 
