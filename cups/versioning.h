@@ -79,7 +79,10 @@
  */
 
 #  if defined(__GNUC__) && __GNUC__ > 2
-#    if defined(__clang__) && defined(_CUPS_NO_DEPRECATED)
+#    ifndef __has_extension
+#      define __has_extension(x) 0
+#    endif /* !__has_extension */
+#    if __has_extension(attribute_unavailable_with_message) && defined(_CUPS_NO_DEPRECATED)
 #      define _CUPS_DEPRECATED __attribute__ ((unavailable))
 #      define _CUPS_DEPRECATED_MSG(m) __attribute__ ((unavailable(m)))
 #    elif !defined(_CUPS_SOURCE) || defined(_CUPS_NO_DEPRECATED)
@@ -98,7 +101,6 @@
 #    define __attribute__(x)
 #  endif /* !__GNUC__ */
 
-#
 #endif /* !_CUPS_VERSIONING_H_ */
 
 /*
