@@ -2627,7 +2627,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    int out_of_order = 0;	/* Are attribute groups out-of-order? */
 	    cupsArrayClear(a);
 
-
             switch (attrptr->group_tag)
             {
               case IPP_TAG_ZERO :

@@ -1288,10 +1288,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   static const char * const readonly[] =/* List of read-only attributes */
   {
     "job-id",
-    "job-k-octets",
-    /*"job-impressions",*/		/* For now we allow this since cupsd can't count */
+    "job-k-octets-completed",
     "job-impressions-completed",
-    "job-media-sheets",
     "job-media-sheets-completed",
     "job-state",
     "job-state-message",
@@ -1595,9 +1593,27 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                   priority);
   }
 
-  if (!ippFindAttribute(con->request, "job-name", IPP_TAG_NAME))
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) == NULL)
     ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                  "Untitled");
+  else if ((attr->value_tag != IPP_TAG_NAME &&
+            attr->value_tag != IPP_TAG_NAMELANG) ||
+           attr->num_values != 1)
+  {
+    send_ipp_status(con, IPP_ATTRIBUTES,
+                    _("Bad job-name value: Wrong type or count."));
+    if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
+      attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+    return (NULL);
+  }
+  else if (!ippValidateAttribute(attr))
+  {
+    send_ipp_status(con, IPP_ATTRIBUTES, _("Bad job-name value: %s"),
+                    cupsLastErrorString());
+    if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
+      attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+    return (NULL);
+  }
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
