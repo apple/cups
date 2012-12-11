@@ -576,6 +576,15 @@ _ppdCacheCreateWithFile(
       else
         pc->mandatory = _cupsArrayNewStrings(value, ' ');
     }
+    else if (!_cups_strcasecmp(line, "SupportFile"))
+    {
+      if (!pc->support_files)
+        pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0,
+                                          (cups_acopy_func_t)_cupsStrAlloc,
+                                          (cups_afree_func_t)_cupsStrFree);
+
+      cupsArrayAdd(pc->support_files, value);
+    }
     else
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
@@ -1405,6 +1414,22 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pc->mandatory = _cupsArrayNewStrings(ppd_attr->value, ' ');
 
  /*
+  * Support files...
+  */
+
+  pc->support_files = cupsArrayNew3(NULL, NULL, NULL, 0,
+				    (cups_acopy_func_t)_cupsStrAlloc,
+				    (cups_afree_func_t)_cupsStrFree);
+
+  for (ppd_attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       ppd_attr;
+       ppd_attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+    cupsArrayAdd(pc->support_files, ppd_attr->value);
+
+  if ((ppd_attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL)
+    cupsArrayAdd(pc->support_files, ppd_attr->value);
+
+ /*
   * Return the cache data...
   */
 
@@ -1508,6 +1533,8 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
   _cupsStrFree(pc->password);
 
   cupsArrayDelete(pc->mandatory);
+
+  cupsArrayDelete(pc->support_files);
 
   free(pc);
 }
@@ -2418,6 +2445,15 @@ _ppdCacheWriteFile(
        value;
        value = (char *)cupsArrayNext(pc->mandatory))
     cupsFilePutConf(fp, "Mandatory", value);
+
+ /*
+  * Support files...
+  */
+
+  for (value = (char *)cupsArrayFirst(pc->support_files);
+       value;
+       value = (char *)cupsArrayNext(pc->support_files))
+    cupsFilePutConf(fp, "SupportFile", value);
 
  /*
   * IPP attributes, if any...

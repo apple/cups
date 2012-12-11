@@ -1111,9 +1111,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * Now create processes for all of the filters...
   */
 
-  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			               "cups-insecure-filter-warning");
-
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -4407,6 +4404,9 @@ static void
 start_job(cupsd_job_t     *job,		/* I - Job ID */
           cupsd_printer_t *printer)	/* I - Printer to print job */
 {
+  const char	*filename;		/* Support filename */
+
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job(job=%p(%d), printer=%p(%s))",
                   job, job->id, printer, printer->name);
 
@@ -4459,6 +4459,25 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     job->cancel_time = time(NULL) + MaxJobTime;
   else
     job->cancel_time = 0;
+
+ /*
+  * Check for support files...
+  */
+
+  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			               "cups-insecure-filter-warning");
+
+  if (printer->pc)
+  {
+    for (filename = (const char *)cupsArrayFirst(printer->pc->support_files);
+         filename;
+         filename = (const char *)cupsArrayNext(printer->pc->support_files))
+    {
+      if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_FILE, !RunUser,
+			 cupsdLogFCMessage, printer))
+        break;
+    }
+  }
 
  /*
   * Setup the last exit status and security profiles...
