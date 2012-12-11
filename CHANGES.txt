@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7b1 - 2012-11-15
+CHANGES.txt - 1.7b1 - 2012-12-11
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
@@ -6,6 +6,7 @@ CHANGES IN CUPS V1.7b1
 	- Added new IPP APIs for checking values (STR #4167)
 	- Added new IPP APis for adding and setting formatted strings.
 	- Added new HTTP APIs to support basic server functionality via libcups.
+	- The dnssd backend now generates a 1284 device ID as needed (STR #3702)
 	- CUPS now supports compressing and decompressing streamed data
 	  (STR #4168)
 	- CUPS now supports higher-level PIN printing, external accounting

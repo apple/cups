@@ -1031,6 +1031,7 @@ query_callback(
 		value[256],		/* Value string */
 		make_and_model[512],	/* Manufacturer and model */
 		model[256],		/* Model */
+		pdl[256],		/* PDL */
 		device_id[2048];	/* 1284 device ID */
 
 
@@ -1079,6 +1080,7 @@ query_callback(
 
   device_id[0]      = '\0';
   make_and_model[0] = '\0';
+  pdl[0]            = '\0';
 
   strlcpy(model, "Unknown", sizeof(model));
 
@@ -1160,6 +1162,8 @@ query_callback(
       if ((ptr = strchr(model, ',')) != NULL)
 	*ptr = '\0';
     }
+    else if (!_cups_strcasecmp(key, "pdl"))
+      strlcpy(pdl, value, sizeof(pdl));
     else if (!_cups_strcasecmp(key, "priority"))
       device->priority = atoi(value);
     else if ((device->type == CUPS_DEVICE_IPP ||
@@ -1202,6 +1206,46 @@ query_callback(
       snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",
 	       make_and_model, ptr + 1);
     }
+  }
+
+  if (device_id[0] &&
+      !strstr(device_id, "CMD:") &&
+      !strstr(device_id, "COMMAND SET:") &&
+      (strstr(pdl, "application/pdf") ||
+       strstr(pdl, "application/postscript") ||
+       strstr(pdl, "application/vnd.hp-PCL") ||
+       strstr(pdl, "image/")))
+  {
+    value[0] = '\0';
+    if (strstr(pdl, "application/pdf"))
+      strlcat(value, ",PDF", sizeof(value));
+    if (strstr(pdl, "application/postscript"))
+      strlcat(value, ",PS", sizeof(value));
+    if (strstr(pdl, "application/vnd.hp-PCL"))
+      strlcat(value, ",PCL", sizeof(value));
+    for (ptr = strstr(pdl, "image/"); ptr; ptr = strstr(ptr, "image/"))
+    {
+      char *valptr = value + strlen(value);
+      					/* Pointer into value */
+
+      if (valptr < (value + sizeof(value) - 1))
+        *valptr++ = ',';
+
+      ptr += 6;
+      while (isalnum(*ptr & 255) || *ptr == '-' || *ptr == '.')
+      {
+        if (isalnum(*ptr & 255) && valptr < (value + sizeof(value) - 1))
+          *valptr++ = toupper(*ptr++ & 255);
+        else
+          break;
+      }
+
+      *valptr = '\0';
+    }
+
+    ptr = device_id + strlen(device_id);
+    snprintf(ptr, sizeof(device_id) - (ptr - device_id), "CMD:%s;",
+	     value + 1);
   }
 
   if (device_id[0])
