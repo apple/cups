@@ -4752,7 +4752,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
                           _("\"%s\": Bad boolen value %d "
-			    "(RFC 2911 section 4.1.10)."), attr->name,
+			    "(RFC 2911 section 4.1.11)."), attr->name,
 			  attr->values[i].boolean);
 	    return (0);
 	  }
@@ -4796,7 +4796,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime month %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[2]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[2]);
 	    return (0);
 	  }
 
@@ -4804,7 +4804,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime day %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[3]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[3]);
 	    return (0);
 	  }
 
@@ -4812,7 +4812,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime hours %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[4]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[4]);
 	    return (0);
 	  }
 
@@ -4820,7 +4820,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime minutes %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[5]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[5]);
 	    return (0);
 	  }
 
@@ -4828,7 +4828,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime seconds %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[6]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[6]);
 	    return (0);
 	  }
 
@@ -4836,7 +4836,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime deciseconds %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[7]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[7]);
 	    return (0);
 	  }
 
@@ -4844,7 +4844,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC sign '%c' "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[8]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[8]);
 	    return (0);
 	  }
 
@@ -4852,7 +4852,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC hours %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[9]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[9]);
 	    return (0);
 	  }
 
@@ -4860,7 +4860,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad dateTime UTC minutes %u "
-			    "(RFC 2911 section 4.1.13)."), attr->name, date[10]);
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[10]);
 	    return (0);
 	  }
 	}
@@ -4874,7 +4874,7 @@ ippValidateAttribute(
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - cross "
 			    "feed resolution must be positive "
-			    "(RFC 2911 section 4.1.13)."), attr->name,
+			    "(RFC 2911 section 4.1.15)."), attr->name,
 			  attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
@@ -4889,7 +4889,7 @@ ippValidateAttribute(
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - feed "
 			    "resolution must be positive "
-			    "(RFC 2911 section 4.1.13)."), attr->name,
+			    "(RFC 2911 section 4.1.15)."), attr->name,
 			  attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
@@ -4904,7 +4904,7 @@ ippValidateAttribute(
 	  {
 	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
 			  _("\"%s\": Bad resolution value %dx%d%s - bad "
-			    "units value (RFC 2911 section 4.1.13)."),
+			    "units value (RFC 2911 section 4.1.15)."),
 			  attr->name, attr->values[i].resolution.xres,
 			  attr->values[i].resolution.yres,
 			  attr->values[i].resolution.units ==
