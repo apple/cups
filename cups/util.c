@@ -948,10 +948,16 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   * See if the PPD file is available locally...
   */
 
-  if (!cg->servername[0])
-    cupsServer();
+  if (http)
+    httpGetHostname(http, hostname, sizeof(hostname));
+  else
+  {
+    strlcpy(hostname, cupsServer(), sizeof(hostname));
+    if (hostname[0] == '/')
+      strlcpy(hostname, "localhost", sizeof(hostname));
+  }
 
-  if (!_cups_strcasecmp(cg->servername, "localhost"))
+  if (!_cups_strcasecmp(hostname, "localhost"))
   {
     char	ppdname[1024];		/* PPD filename */
     struct stat	ppdinfo;		/* PPD file information */
