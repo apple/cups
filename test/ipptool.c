@@ -2299,8 +2299,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("<key>StatusCode</key>");
 	print_xml_string("string", "skip");
 	puts("<key>ResponseAttributes</key>");
-	puts("<dict>");
-	puts("</dict>");
+	puts("<dict />");
       }
       else if (Output == _CUPS_OUTPUT_TEST)
 	puts("SKIP]");
@@ -3023,7 +3022,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     }
 
     if (num_displayed > 0 && !Verbosity && response &&
-        (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
+        Output == _CUPS_OUTPUT_TEST)
     {
       for (attrptr = response->attrs;
 	   attrptr != NULL;
@@ -3784,8 +3783,11 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
   {
     if (!attr->name || (group && *group != attr->group_tag))
     {
-      puts("</dict>");
-      puts("<dict>");
+      if (attr->group_tag != IPP_TAG_ZERO)
+      {
+	puts("</dict>");
+	puts("<dict>");
+      }
 
       if (group)
         *group = attr->group_tag;
