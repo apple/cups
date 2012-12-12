@@ -1388,6 +1388,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
   char		optname[1024],		/* Option name */
 		value[2048],		/* Option value */
 		*ptr;			/* Pointer into name/value */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread global data */
   static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
 		  "auth-info-required",
@@ -1429,45 +1430,62 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
   appleGetPaperSize(media_default, sizeof(media_default));
 #endif /* __APPLE__ */
 
- /*
-  * Build a CUPS_GET_PRINTERS or IPP_GET_PRINTER_ATTRIBUTES request, which
-  * require the following attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    requesting-user-name
-  *    printer-uri [for IPP_GET_PRINTER_ATTRIBUTES]
-  */
-
-  request = ippNewRequest(op);
-
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
-		NULL, pattrs);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, cupsUser());
-
-  if (name && op != CUPS_GET_DEFAULT)
+  for (;;)
   {
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", ippPort(), "/printers/%s", name);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                 uri);
-  }
-  else if (mask)
-  {
-    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
-                  type);
-    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
-                  mask);
+   /*
+    * Build a CUPS_GET_PRINTERS or IPP_GET_PRINTER_ATTRIBUTES request, which
+    * require the following attributes:
+    *
+    *    attributes-charset
+    *    attributes-natural-language
+    *    requesting-user-name
+    *    printer-uri [for IPP_GET_PRINTER_ATTRIBUTES]
+    */
+
+    request = ippNewRequest(op);
+
+    ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
+
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		  "requested-attributes", sizeof(pattrs) / sizeof(pattrs[0]),
+		  NULL, pattrs);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		 "requesting-user-name", NULL, cupsUser());
+
+    if (name && op != CUPS_GET_DEFAULT)
+    {
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+		       "localhost", ippPort(), "/printers/%s", name);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+		   uri);
+    }
+    else if (mask)
+    {
+      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
+		    type);
+      ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
+		    mask);
+    }
+
+   /*
+    * Do the request and get back a response...
+    */
+
+    response = cupsDoRequest(http, request, "/");
+    if (cg->server_version != 20 || !response ||
+        cupsLastError() != IPP_BAD_REQUEST)
+      break;
+
+   /*
+    * Retry as an IPP/1.1 request...
+    */
+
+    cg->server_version = 11;
+    ippDelete(response);
   }
 
- /*
-  * Do the request and get back a response...
-  */
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  if (response)
   {
     for (attr = response->attrs; attr != NULL; attr = attr->next)
     {

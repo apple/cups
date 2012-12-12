@@ -2839,10 +2839,10 @@ msgstr "Carpeta de archivo"
 #, c-format
 msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
+"in \"%s/cups-files.conf\"."
 msgstr ""
 "Los URIs del dispositivo de archivo han sido deshabilitados. Para "
-"habilitarlos, vea la directiva FileDevice en \"%s/cupsd.conf\"."
+"habilitarlos, vea la directiva FileDevice en \"%s/cups-files.conf\"."
 
 #, c-format
 msgid "Finished page %d."

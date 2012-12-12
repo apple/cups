@@ -92,6 +92,9 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   int			thread_id;	/* Friendly thread ID */
 #  endif /* DEBUG */
 
+  /* dest.c, util.c */
+  int			server_version;	/* Server IPP version */
+
   /* file.c */
   cups_file_t		*stdio_files[3];/* stdin, stdout, stderr */
 

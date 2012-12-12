@@ -117,6 +117,7 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
 {
   char		uri[HTTP_MAX_URI];	/* Job/printer URI */
   ipp_t		*request;		/* IPP request */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread global data */
 
 
  /*
@@ -149,6 +150,8 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   request = ippNewRequest(job_id < 0 ? IPP_PURGE_JOBS : IPP_CANCEL_JOB);
+
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
 
   if (name)
   {
@@ -211,6 +214,7 @@ cupsCreateJob(
 		*response;		/* Create-Job response */
   ipp_attribute_t *attr;		/* job-id attribute */
   int		job_id = 0;		/* job-id value */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread global data */
 
 
   DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", "
@@ -236,6 +240,8 @@ cupsCreateJob(
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOMEM), 0);
     return (0);
   }
+
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri), "ipp",
                    NULL, "localhost", ippPort(), "/printers/%s", name);
@@ -363,6 +369,8 @@ cupsGetClasses(char ***classes)		/* O - Classes */
 
   request = ippNewRequest(CUPS_GET_CLASSES);
 
+  ippSetVersion(request, 1, 1);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
 
@@ -481,6 +489,8 @@ cupsGetDefault2(http_t *http)		/* I - Connection to server or @code CUPS_HTTP_DE
   */
 
   request = ippNewRequest(CUPS_GET_DEFAULT);
+
+  ippSetVersion(request, 1, 1);
 
  /*
   * Do the request and get back a response...
@@ -626,6 +636,8 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
   */
 
   request = ippNewRequest(IPP_GET_JOBS);
+
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -936,10 +948,16 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   * See if the PPD file is available locally...
   */
 
-  if (!cg->servername[0])
-    cupsServer();
+  if (http)
+    httpGetHostname(http, hostname, sizeof(hostname));
+  else
+  {
+    strlcpy(hostname, cupsServer(), sizeof(hostname));
+    if (hostname[0] == '/')
+      strlcpy(hostname, "localhost", sizeof(hostname));
+  }
 
-  if (!_cups_strcasecmp(cg->servername, "localhost"))
+  if (!_cups_strcasecmp(hostname, "localhost"))
   {
     char	ppdname[1024];		/* PPD filename */
     struct stat	ppdinfo;		/* PPD file information */
@@ -1209,6 +1227,8 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   request = ippNewRequest(CUPS_GET_PRINTERS);
 
+  ippSetVersion(request, 1, 1);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
 
@@ -1325,6 +1345,8 @@ cupsGetServerPPD(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   request = ippNewRequest(CUPS_GET_PPD);
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name", NULL,
                name);
 
@@ -1566,6 +1588,7 @@ cupsStartDocument(
 		printer_uri[1024];	/* Printer URI */
   ipp_t		*request;		/* Send-Document request */
   http_status_t	status;			/* HTTP status */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread global data */
 
 
  /*
@@ -1577,6 +1600,8 @@ cupsStartDocument(
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOMEM), 0);
     return (HTTP_ERROR);
   }
+
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri), "ipp",
                    NULL, "localhost", ippPort(), "/printers/%s", name);
@@ -1635,6 +1660,7 @@ cups_get_printer_uri(
 		classname[255],		/* Temporary class name */
 		http_hostname[HTTP_MAX_HOST];
 					/* Hostname associated with connection */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread global data */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
 		  "device-uri",
@@ -1683,6 +1709,8 @@ cups_get_printer_uri(
   */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+  ippSetVersion(request, cg->server_version / 10, cg->server_version % 10);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);

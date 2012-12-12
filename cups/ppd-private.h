@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	5	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	6	/* Version number in cache file */
 
 
 /*
@@ -147,6 +147,7 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*password;		/* cupsJobPassword value */
   cups_array_t	*mandatory;		/* cupsMandatory value */
   char		*charge_info_uri;	/* cupsChargeInfoURI value */
+  cups_array_t	*support_files;		/* Support files - ICC profiles, etc. */
 };
 
 

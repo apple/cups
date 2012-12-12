@@ -16,104 +16,107 @@
  *
  * Contents:
  *
- *   _cupsBufferGet()	    - Get a read/write buffer.
- *   _cupsBufferRelease()   - Release a read/write buffer.
- *   ippAddBoolean()	    - Add a boolean attribute to an IPP message.
- *   ippAddBooleans()	    - Add an array of boolean values.
- *   ippAddCollection()     - Add a collection value.
- *   ippAddCollections()    - Add an array of collection values.
- *   ippAddDate()	    - Add a date attribute to an IPP message.
- *   ippAddInteger()	    - Add a integer attribute to an IPP message.
- *   ippAddIntegers()	    - Add an array of integer values.
- *   ippAddOctetString()    - Add an octetString value to an IPP message.
- *   ippAddOutOfBand()	    - Add an out-of-band value to an IPP message.
- *   ippAddRange()	    - Add a range of values to an IPP message.
- *   ippAddRanges()	    - Add ranges of values to an IPP message.
- *   ippAddResolution()     - Add a resolution value to an IPP message.
- *   ippAddResolutions()    - Add resolution values to an IPP message.
- *   ippAddSeparator()	    - Add a group separator to an IPP message.
- *   ippAddString()	    - Add a language-encoded string to an IPP message.
- *   ippAddStringf()	    - Add a formatted string to an IPP message.
- *   ippAddStringfv()	    - Add a formatted string to an IPP message.
- *   ippAddStrings()	    - Add language-encoded strings to an IPP message.
- *   ippContainsInteger()   - Determine whether an attribute contains the
- *			      specified value or is within the list of ranges.
- *   ippContainsString()    - Determine whether an attribute contains the
- *			      specified string value.
- *   ippCopyAttribute()     - Copy an attribute.
- *   ippCopyAttributes()    - Copy attributes from one IPP message to another.
- *   ippDateToTime()	    - Convert from RFC 1903 Date/Time format to UNIX
- *			      time in seconds.
- *   ippDelete()	    - Delete an IPP message.
- *   ippDeleteAttribute()   - Delete a single attribute in an IPP message.
- *   ippDeleteValues()	    - Delete values in an attribute.
- *   ippFindAttribute()     - Find a named attribute in a request.
- *   ippFindNextAttribute() - Find the next named attribute in a request.
- *   ippFirstAttribute()    - Return the first attribute in the message.
- *   ippGetBoolean()	    - Get a boolean value for an attribute.
- *   ippGetCollection()     - Get a collection value for an attribute.
- *   ippGetCount()	    - Get the number of values in an attribute.
- *   ippGetDate()	    - Get a date value for an attribute.
- *   ippGetGroupTag()	    - Get the group associated with an attribute.
- *   ippGetInteger()	    - Get the integer/enum value for an attribute.
- *   ippGetName()	    - Get the attribute name.
- *   ippGetOperation()	    - Get the operation ID in an IPP message.
- *   ippGetRange()	    - Get a rangeOfInteger value from an attribute.
- *   ippGetRequestId()	    - Get the request ID from an IPP message.
- *   ippGetResolution()     - Get a resolution value for an attribute.
- *   ippGetState()	    - Get the IPP message state.
- *   ippGetStatusCode()     - Get the status code from an IPP response or event
- *			      message.
- *   ippGetString()	    - Get the string and optionally the language code
- *			      for an attribute.
- *   ippGetValueTag()	    - Get the value tag for an attribute.
- *   ippGetVersion()	    - Get the major and minor version number from an
- *			      IPP message.
- *   ippLength()	    - Compute the length of an IPP message.
- *   ippNextAttribute()     - Return the next attribute in the message.
- *   ippNew()		    - Allocate a new IPP message.
- *   ippNewRequest()	    - Allocate a new IPP request message.
- *   ippNewResponse()	    - Allocate a new IPP response message.
- *   ippRead()		    - Read data for an IPP message from a HTTP
- *			      connection.
- *   ippReadFile()	    - Read data for an IPP message from a file.
- *   ippReadIO()	    - Read data for an IPP message.
- *   ippSetBoolean()	    - Set a boolean value in an attribute.
- *   ippSetCollection()     - Set a collection value in an attribute.
- *   ippSetDate()	    - Set a date value in an attribute.
- *   ippSetGroupTag()	    - Set the group tag of an attribute.
- *   ippSetInteger()	    - Set an integer or enum value in an attribute.
- *   ippSetName()	    - Set the name of an attribute.
- *   ippSetOperation()	    - Set the operation ID in an IPP request message.
- *   ippSetRange()	    - Set a rangeOfInteger value in an attribute.
- *   ippSetRequestId()	    - Set the request ID in an IPP message.
- *   ippSetResolution()     - Set a resolution value in an attribute.
- *   ippSetState()	    - Set the current state of the IPP message.
- *   ippSetStatusCode()     - Set the status code in an IPP response or event
- *			      message.
- *   ippSetString()	    - Set a string value in an attribute.
- *   ippSetStringf()	    - Set a formatted string value of an attribute.
- *   ippSetStringf()	    - Set a formatted string value of an attribute.
- *   ippSetValueTag()	    - Set the value tag of an attribute.
- *   ippSetVersion()	    - Set the version number in an IPP message.
- *   ippTimeToDate()	    - Convert from UNIX time to RFC 1903 format.
- *   ippWrite() 	    - Write data for an IPP message to a HTTP
- *			      connection.
- *   ippWriteFile()	    - Write data for an IPP message to a file.
- *   ippWriteIO()	    - Write data for an IPP message.
- *   ipp_add_attr()	    - Add a new attribute to the message.
- *   ipp_free_values()	    - Free attribute values.
- *   ipp_get_code()	    - Convert a C locale/charset name into an IPP
- *			      language/charset code.
- *   ipp_lang_code()	    - Convert a C locale name into an IPP language
- *			      code.
- *   ipp_length()	    - Compute the length of an IPP message or
- *			      collection value.
- *   ipp_read_http()	    - Semi-blocking read on a HTTP connection...
- *   ipp_read_file()	    - Read IPP data from a file.
- *   ipp_set_value()	    - Get the value element from an attribute,
- *			      expanding it as needed.
- *   ipp_write_file()	    - Write IPP data to a file.
+ *   _cupsBufferGet()	     - Get a read/write buffer.
+ *   _cupsBufferRelease()    - Release a read/write buffer.
+ *   ippAddBoolean()	     - Add a boolean attribute to an IPP message.
+ *   ippAddBooleans()	     - Add an array of boolean values.
+ *   ippAddCollection()      - Add a collection value.
+ *   ippAddCollections()     - Add an array of collection values.
+ *   ippAddDate()	     - Add a date attribute to an IPP message.
+ *   ippAddInteger()	     - Add a integer attribute to an IPP message.
+ *   ippAddIntegers()	     - Add an array of integer values.
+ *   ippAddOctetString()     - Add an octetString value to an IPP message.
+ *   ippAddOutOfBand()	     - Add an out-of-band value to an IPP message.
+ *   ippAddRange()	     - Add a range of values to an IPP message.
+ *   ippAddRanges()	     - Add ranges of values to an IPP message.
+ *   ippAddResolution()      - Add a resolution value to an IPP message.
+ *   ippAddResolutions()     - Add resolution values to an IPP message.
+ *   ippAddSeparator()	     - Add a group separator to an IPP message.
+ *   ippAddString()	     - Add a language-encoded string to an IPP message.
+ *   ippAddStringf()	     - Add a formatted string to an IPP message.
+ *   ippAddStringfv()	     - Add a formatted string to an IPP message.
+ *   ippAddStrings()	     - Add language-encoded strings to an IPP message.
+ *   ippContainsInteger()    - Determine whether an attribute contains the
+ *			       specified value or is within the list of ranges.
+ *   ippContainsString()     - Determine whether an attribute contains the
+ *			       specified string value.
+ *   ippCopyAttribute()      - Copy an attribute.
+ *   ippCopyAttributes()     - Copy attributes from one IPP message to another.
+ *   ippDateToTime()	     - Convert from RFC 1903 Date/Time format to UNIX
+ *			       time in seconds.
+ *   ippDelete()	     - Delete an IPP message.
+ *   ippDeleteAttribute()    - Delete a single attribute in an IPP message.
+ *   ippDeleteValues()	     - Delete values in an attribute.
+ *   ippFindAttribute()      - Find a named attribute in a request.
+ *   ippFindNextAttribute()  - Find the next named attribute in a request.
+ *   ippFirstAttribute()     - Return the first attribute in the message.
+ *   ippGetBoolean()	     - Get a boolean value for an attribute.
+ *   ippGetCollection()      - Get a collection value for an attribute.
+ *   ippGetCount()	     - Get the number of values in an attribute.
+ *   ippGetDate()	     - Get a date value for an attribute.
+ *   ippGetGroupTag()	     - Get the group associated with an attribute.
+ *   ippGetInteger()	     - Get the integer/enum value for an attribute.
+ *   ippGetName()	     - Get the attribute name.
+ *   ippGetOperation()	     - Get the operation ID in an IPP message.
+ *   ippGetRange()	     - Get a rangeOfInteger value from an attribute.
+ *   ippGetRequestId()	     - Get the request ID from an IPP message.
+ *   ippGetResolution()      - Get a resolution value for an attribute.
+ *   ippGetState()	     - Get the IPP message state.
+ *   ippGetStatusCode()      - Get the status code from an IPP response or
+ *			       event message.
+ *   ippGetString()	     - Get the string and optionally the language code
+ *			       for an attribute.
+ *   ippGetValueTag()	     - Get the value tag for an attribute.
+ *   ippGetVersion()	     - Get the major and minor version number from an
+ *			       IPP message.
+ *   ippLength()	     - Compute the length of an IPP message.
+ *   ippNextAttribute()      - Return the next attribute in the message.
+ *   ippNew()		     - Allocate a new IPP message.
+ *   ippNewRequest()	     - Allocate a new IPP request message.
+ *   ippNewResponse()	     - Allocate a new IPP response message.
+ *   ippRead()		     - Read data for an IPP message from a HTTP
+ *			       connection.
+ *   ippReadFile()	     - Read data for an IPP message from a file.
+ *   ippReadIO()	     - Read data for an IPP message.
+ *   ippSetBoolean()	     - Set a boolean value in an attribute.
+ *   ippSetCollection()      - Set a collection value in an attribute.
+ *   ippSetDate()	     - Set a date value in an attribute.
+ *   ippSetGroupTag()	     - Set the group tag of an attribute.
+ *   ippSetInteger()	     - Set an integer or enum value in an attribute.
+ *   ippSetName()	     - Set the name of an attribute.
+ *   ippSetOperation()	     - Set the operation ID in an IPP request message.
+ *   ippSetRange()	     - Set a rangeOfInteger value in an attribute.
+ *   ippSetRequestId()	     - Set the request ID in an IPP message.
+ *   ippSetResolution()      - Set a resolution value in an attribute.
+ *   ippSetState()	     - Set the current state of the IPP message.
+ *   ippSetStatusCode()      - Set the status code in an IPP response or event
+ *			       message.
+ *   ippSetString()	     - Set a string value in an attribute.
+ *   ippSetStringf()	     - Set a formatted string value of an attribute.
+ *   ippSetStringf()	     - Set a formatted string value of an attribute.
+ *   ippSetValueTag()	     - Set the value tag of an attribute.
+ *   ippSetVersion()	     - Set the version number in an IPP message.
+ *   ippTimeToDate()	     - Convert from UNIX time to RFC 1903 format.
+ *   ippValidateAttribute()  - Validate the contents of an attribute.
+ *   ippValidateAttributes() - Validate all attributes in an IPP message.
+ *   ippWrite() 	     - Write data for an IPP message to a HTTP
+ *			       connection.
+ *   ippWriteFile()	     - Write data for an IPP message to a file.
+ *   ippWriteIO()	     - Write data for an IPP message.
+ *   ipp_add_attr()	     - Add a new attribute to the message.
+ *   ipp_free_values()	     - Free attribute values.
+ *   ipp_get_code()	     - Convert a C locale/charset name into an IPP
+ *			       language/charset code.
+ *   ipp_lang_code()	     - Convert a C locale name into an IPP language
+ *			       code.
+ *   ipp_length()	     - Compute the length of an IPP message or
+ *			       collection value.
+ *   ipp_read_http()	     - Semi-blocking read on a HTTP connection...
+ *   ipp_read_file()	     - Read IPP data from a file.
+ *   ipp_set_error()	     - Set a formatted, localized error string.
+ *   ipp_set_value()	     - Get the value element from an attribute,
+ *			       expanding it as needed.
+ *   ipp_write_file()	     - Write IPP data to a file.
  */
 
 /*
@@ -121,6 +124,7 @@
  */
 
 #include "cups-private.h"
+#include <regex.h>
 #ifdef WIN32
 #  include <io.h>
 #endif /* WIN32 */
@@ -146,6 +150,8 @@ static ssize_t		ipp_read_http(http_t *http, ipp_uchar_t *buffer,
 			              size_t length);
 static ssize_t		ipp_read_file(int *fd, ipp_uchar_t *buffer,
 			              size_t length);
+static void		ipp_set_error(ipp_status_t status, const char *format,
+			              ...);
 static _ipp_value_t	*ipp_set_value(ipp_t *ipp, ipp_attribute_t **attr,
 			               int element);
 static ssize_t		ipp_write_file(int *fd, ipp_uchar_t *buffer,
@@ -2935,18 +2941,6 @@ ippReadIO(void       *src,		/* I - Data source */
   ipp_tag_t		tag;		/* Current tag */
   ipp_tag_t		value_tag;	/* Current value tag */
   _ipp_value_t		*value;		/* Current value */
-  static const int	maxlen[] =	/* Maximum length of strings */
-  {
-    IPP_MAX_TEXT - 1,
-    IPP_MAX_NAME - 1,
-    0,
-    IPP_MAX_KEYWORD - 1,
-    IPP_MAX_URI - 1,
-    IPP_MAX_URISCHEME - 1,
-    IPP_MAX_CHARSET - 1,
-    IPP_MAX_LANGUAGE - 1,
-    IPP_MAX_MIMETYPE - 1
-  };
 
 
   DEBUG_printf(("ippReadIO(src=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)",
@@ -3387,16 +3381,6 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
-	        if (n > maxlen[tag - IPP_TAG_TEXT])
-	        {
-		  _cupsSetError(IPP_INTERNAL_ERROR,
-		                _("IPP string value too large."), 1);
-		  DEBUG_printf(("1ippReadIO: bad %s value length %d.",
-		                ippTagString(tag), n));
-		  _cupsBufferRelease((char *)buffer);
-		  return (IPP_ERROR);
-	        }
-
 	        if (n > 0)
 	        {
 		  if ((*cb)(src, buffer, n) < n)
@@ -3499,21 +3483,6 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
-		else if (n > (2 + IPP_MAX_LANGUAGE + IPP_MAX_TEXT))
-		{
-		  if (tag == IPP_TAG_TEXTLANG)
-		    _cupsSetError(IPP_INTERNAL_ERROR,
-		                  _("IPP textWithLanguage value more than "
-		                    "maximum 1090 bytes."), 1);
-		  else
-		    _cupsSetError(IPP_INTERNAL_ERROR,
-		                  _("IPP nameWithLanguage value more than "
-		                    "maximum 1090 bytes."), 1);
-		  DEBUG_printf(("1ippReadIO: bad stringWithLanguage value "
-		                "length %d.", n));
-		  _cupsBufferRelease((char *)buffer);
-		  return (IPP_ERROR);
-		}
 
 	        if ((*cb)(src, buffer, n) < n)
 		{
@@ -3570,15 +3539,6 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsSetError(IPP_INTERNAL_ERROR,
 		                _("IPP string length overflows value."), 1);
 		  DEBUG_printf(("1ippReadIO: bad string value length %d.", n));
-		  _cupsBufferRelease((char *)buffer);
-		  return (IPP_ERROR);
-		}
-		else if (n >= IPP_MAX_TEXT)
-		{
-		  _cupsSetError(IPP_INTERNAL_ERROR,
-		                _("IPP text length too large."), 1);
-		  DEBUG_printf(("1ippReadIO: bad text value length %d.",
-		                n));
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_ERROR);
 		}
@@ -4702,6 +4662,672 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
   date[10] = 0;
 
   return (date);
+}
+
+
+/*
+ * 'ippValidateAttribute()' - Validate the contents of an attribute.
+ *
+ * This function validates the contents of an attribute based on the name and
+ * value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
+ * failure, cupsLastErrorString() is set to a human-readable message.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O - 1 if valid, 0 otherwise */
+ippValidateAttribute(
+    ipp_attribute_t *attr)		/* I - Attribute */
+{
+  int		i;			/* Looping var */
+  char		scheme[64],		/* Scheme from URI */
+		userpass[256],		/* Username/password from URI */
+		hostname[256],		/* Hostname from URI */
+		resource[1024];		/* Resource from URI */
+  int		port,			/* Port number from URI */
+		uri_status;		/* URI separation status */
+  const char	*ptr;			/* Pointer into string */
+  ipp_attribute_t *colattr;		/* Collection attribute */
+  regex_t	re;			/* Regular expression */
+  ipp_uchar_t	*date;			/* Current date value */
+  static const char * const uri_status_strings[] =
+  {					/* URI status strings */
+    "URI too large",
+    "Bad arguments to function",
+    "Bad resource in URI",
+    "Bad port number in URI",
+    "Bad hostname/address in URI",
+    "Bad username in URI",
+    "Bad scheme in URI",
+    "Bad/empty URI",
+    "OK",
+    "Missing scheme in URI",
+    "Unknown scheme in URI",
+    "Missing resource in URI"
+  };
+
+
+ /*
+  * Skip separators.
+  */
+
+  if (!attr->name)
+    return (1);
+
+ /*
+  * Validate the attribute name.
+  */
+
+  for (ptr = attr->name; *ptr; ptr ++)
+    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' && *ptr != '_')
+      break;
+
+  if (*ptr || ptr == attr->name)
+  {
+    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+                  _("\"%s\": Bad attribute name - invalid character "
+		    "(RFC 2911 section 4.1.3)."), attr->name);
+    return (0);
+  }
+
+  if ((ptr - attr->name) > 255)
+  {
+    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+                  _("\"%s\": Bad attribute name - bad length %d "
+		    "(RFC 2911 section 4.1.3)."), attr->name,
+		  (int)(ptr - attr->name));
+    return (0);
+  }
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_INTEGER :
+        break;
+
+    case IPP_TAG_BOOLEAN :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].boolean != 0 &&
+	      attr->values[i].boolean != 1)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+                          _("\"%s\": Bad boolen value %d "
+			    "(RFC 2911 section 4.1.11)."), attr->name,
+			  attr->values[i].boolean);
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_ENUM :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].integer < 1)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad enum value %d - out of range "
+			    "(RFC 2911 section 4.1.4)."), attr->name,
+			    attr->values[i].integer);
+            return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_STRING :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].unknown.length > IPP_MAX_OCTETSTRING)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad octetString value - bad length %d "
+			    "(RFC 2911 section 4.1.10)."), attr->name,
+			    attr->values[i].unknown.length);
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_DATE :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  date = attr->values[i].date;
+
+          if (date[2] < 1 || date[2] > 12)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime month %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[2]);
+	    return (0);
+	  }
+
+          if (date[3] < 1 || date[3] > 31)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime day %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[3]);
+	    return (0);
+	  }
+
+          if (date[4] > 23)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime hours %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[4]);
+	    return (0);
+	  }
+
+          if (date[5] > 59)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime minutes %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[5]);
+	    return (0);
+	  }
+
+          if (date[6] > 60)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime seconds %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[6]);
+	    return (0);
+	  }
+
+          if (date[7] > 9)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime deciseconds %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[7]);
+	    return (0);
+	  }
+
+          if (date[8] != '-' && date[8] != '+')
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime UTC sign '%c' "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[8]);
+	    return (0);
+	  }
+
+          if (date[9] > 11)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime UTC hours %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[9]);
+	    return (0);
+	  }
+
+          if (date[10] > 59)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad dateTime UTC minutes %u "
+			    "(RFC 2911 section 4.1.14)."), attr->name, date[10]);
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_RESOLUTION :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].resolution.xres <= 0)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad resolution value %dx%d%s - cross "
+			    "feed resolution must be positive "
+			    "(RFC 2911 section 4.1.15)."), attr->name,
+			  attr->values[i].resolution.xres,
+			  attr->values[i].resolution.yres,
+			  attr->values[i].resolution.units ==
+			      IPP_RES_PER_INCH ? "dpi" :
+			      attr->values[i].resolution.units ==
+				  IPP_RES_PER_CM ? "dpcm" : "unknown");
+	    return (0);
+	  }
+
+	  if (attr->values[i].resolution.yres <= 0)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad resolution value %dx%d%s - feed "
+			    "resolution must be positive "
+			    "(RFC 2911 section 4.1.15)."), attr->name,
+			  attr->values[i].resolution.xres,
+			  attr->values[i].resolution.yres,
+			  attr->values[i].resolution.units ==
+			      IPP_RES_PER_INCH ? "dpi" :
+			      attr->values[i].resolution.units ==
+				  IPP_RES_PER_CM ? "dpcm" : "unknown");
+            return (0);
+	  }
+
+	  if (attr->values[i].resolution.units != IPP_RES_PER_INCH &&
+	      attr->values[i].resolution.units != IPP_RES_PER_CM)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad resolution value %dx%d%s - bad "
+			    "units value (RFC 2911 section 4.1.15)."),
+			  attr->name, attr->values[i].resolution.xres,
+			  attr->values[i].resolution.yres,
+			  attr->values[i].resolution.units ==
+			      IPP_RES_PER_INCH ? "dpi" :
+			      attr->values[i].resolution.units ==
+				  IPP_RES_PER_CM ? "dpcm" : "unknown");
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_RANGE :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].range.lower > attr->values[i].range.upper)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad rangeOfInteger value %d-%d - lower "
+			    "greater than upper (RFC 2911 section 4.1.13)."),
+			  attr->name, attr->values[i].range.lower,
+			  attr->values[i].range.upper);
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_BEGIN_COLLECTION :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (colattr = attr->values[i].collection->attrs;
+	       colattr;
+	       colattr = colattr->next)
+	  {
+	    if (!ippValidateAttribute(colattr))
+	      return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	  {
+	    if ((*ptr & 0xe0) == 0xc0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf0) == 0xe0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf8) == 0xf0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if (*ptr & 0x80)
+	      break;
+	  }
+
+	  if (*ptr)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad text value \"%s\" - bad UTF-8 "
+			    "sequence (RFC 2911 section 4.1.1)."), attr->name,
+			  attr->values[i].string.text);
+	    return (0);
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_TEXT - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad text value \"%s\" - bad length %d "
+			    "(RFC 2911 section 4.1.1)."), attr->name,
+			  attr->values[i].string.text,
+			  (int)(ptr - attr->values[i].string.text));
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	  {
+	    if ((*ptr & 0xe0) == 0xc0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf0) == 0xe0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf8) == 0xf0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if (*ptr & 0x80)
+	      break;
+	  }
+
+	  if (*ptr)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad name value \"%s\" - bad UTF-8 "
+			    "sequence (RFC 2911 section 4.1.2)."), attr->name,
+			  attr->values[i].string.text);
+	    return (0);
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_NAME - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad name value \"%s\" - bad length %d "
+			    "(RFC 2911 section 4.1.2)."), attr->name,
+			  attr->values[i].string.text,
+			  (int)(ptr - attr->values[i].string.text));
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_KEYWORD :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' &&
+	        *ptr != '_')
+	      break;
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad keyword value \"%s\" - invalid "
+			    "character (RFC 2911 section 4.1.3)."),
+			  attr->name, attr->values[i].string.text);
+	    return (0);
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_KEYWORD - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad keyword value \"%s\" - bad "
+			    "length %d (RFC 2911 section 4.1.3)."),
+			  attr->name, attr->values[i].string.text,
+			  (int)(ptr - attr->values[i].string.text));
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_URI :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL,
+	                               attr->values[i].string.text,
+				       scheme, sizeof(scheme),
+				       userpass, sizeof(userpass),
+				       hostname, sizeof(hostname),
+				       &port, resource, sizeof(resource));
+
+	  if (uri_status < HTTP_URI_OK)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad URI value \"%s\" - %s "
+			    "(RFC 2911 section 4.1.5)."), attr->name,
+			  attr->values[i].string.text,
+			  uri_status_strings[uri_status -
+					     HTTP_URI_OVERFLOW]);
+	    return (0);
+	  }
+
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_URI - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad URI value \"%s\" - bad length %d "
+			    "(RFC 2911 section 4.1.5)."), attr->name,
+			  attr->values[i].string.text,
+			  (int)strlen(attr->values[i].string.text));
+	  }
+	}
+        break;
+
+    case IPP_TAG_URISCHEME :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  ptr = attr->values[i].string.text;
+	  if (islower(*ptr & 255))
+	  {
+	    for (ptr ++; *ptr; ptr ++)
+	      if (!islower(*ptr & 255) && !isdigit(*ptr & 255) &&
+	          *ptr != '+' && *ptr != '-' && *ptr != '.')
+                break;
+	  }
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad uriScheme value \"%s\" - bad "
+			    "characters (RFC 2911 section 4.1.6)."),
+			  attr->name, attr->values[i].string.text);
+	    return (0);
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_URISCHEME - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad uriScheme value \"%s\" - bad "
+			    "length %d (RFC 2911 section 4.1.6)."),
+			  attr->name, attr->values[i].string.text,
+			  (int)(ptr - attr->values[i].string.text));
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_CHARSET :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	    if (!isprint(*ptr & 255) || isupper(*ptr & 255) ||
+	        isspace(*ptr & 255))
+	      break;
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad charset value \"%s\" - bad "
+			    "characters (RFC 2911 section 4.1.7)."),
+			  attr->name, attr->values[i].string.text);
+	    return (0);
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > (IPP_MAX_CHARSET - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad charset value \"%s\" - bad "
+			    "length %d (RFC 2911 section 4.1.7)."),
+			  attr->name, attr->values[i].string.text,
+			  (int)(ptr - attr->values[i].string.text));
+	    return (0);
+	  }
+	}
+        break;
+
+    case IPP_TAG_LANGUAGE :
+       /*
+        * The following regular expression is derived from the ABNF for
+	* language tags in RFC 4646.  All I can say is that this is the
+	* easiest way to check the values...
+	*/
+
+        if ((i = regcomp(&re,
+			 "^("
+			 "(([a-z]{2,3}(-[a-z][a-z][a-z]){0,3})|[a-z]{4,8})"
+								/* language */
+			 "(-[a-z][a-z][a-z][a-z]){0,1}"		/* script */
+			 "(-([a-z][a-z]|[0-9][0-9][0-9])){0,1}"	/* region */
+			 "(-([a-z]{5,8}|[0-9][0-9][0-9]))*"	/* variant */
+			 "(-[a-wy-z](-[a-z0-9]{2,8})+)*"	/* extension */
+			 "(-x(-[a-z0-9]{1,8})+)*"		/* privateuse */
+			 "|"
+			 "x(-[a-z0-9]{1,8})+"			/* privateuse */
+			 "|"
+			 "[a-z]{1,3}(-[a-z][0-9]{2,8}){1,2}"	/* grandfathered */
+			 ")$",
+			 REG_NOSUB | REG_EXTENDED)) != 0)
+        {
+          char	temp[256];		/* Temporary error string */
+
+          regerror(i, &re, temp, sizeof(temp));
+	  ipp_set_error(IPP_STATUS_ERROR_INTERNAL,
+			_("Unable to compile naturalLanguage regular "
+			  "expression: %s."), temp);
+	  return (0);
+        }
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad naturalLanguage value \"%s\" - bad "
+			    "characters (RFC 2911 section 4.1.8)."),
+			  attr->name, attr->values[i].string.text);
+	    regfree(&re);
+	    return (0);
+	  }
+
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_LANGUAGE - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad naturalLanguage value \"%s\" - bad "
+			    "length %d (RFC 2911 section 4.1.8)."),
+			  attr->name, attr->values[i].string.text,
+			  (int)strlen(attr->values[i].string.text));
+	    regfree(&re);
+	    return (0);
+	  }
+	}
+
+	regfree(&re);
+        break;
+
+    case IPP_TAG_MIMETYPE :
+       /*
+        * The following regular expression is derived from the ABNF for
+	* MIME media types in RFC 2045 and 4288.  All I can say is that this is
+	* the easiest way to check the values...
+	*/
+
+        if ((i = regcomp(&re,
+			 "^"
+			 "[-a-zA-Z0-9!#$&.+^_]{1,127}"		/* type-name */
+			 "/"
+			 "[-a-zA-Z0-9!#$&.+^_]{1,127}"		/* subtype-name */
+			 "(;[-a-zA-Z0-9!#$&.+^_]{1,127}="	/* parameter= */
+			 "([-a-zA-Z0-9!#$&.+^_]{1,127}|\"[^\"]*\"))*"
+			 					/* value */
+			 "$",
+			 REG_NOSUB | REG_EXTENDED)) != 0)
+        {
+          char	temp[256];		/* Temporary error string */
+
+          regerror(i, &re, temp, sizeof(temp));
+	  ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			_("Unable to compile mimeMediaType regular "
+			  "expression: %s."), temp);
+	  return (0);
+        }
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad mimeMediaType value \"%s\" - bad "
+			    "characters (RFC 2911 section 4.1.9)."),
+			  attr->name, attr->values[i].string.text);
+	    regfree(&re);
+	    return (0);
+	  }
+
+	  if (strlen(attr->values[i].string.text) > (IPP_MAX_MIMETYPE - 1))
+	  {
+	    ipp_set_error(IPP_STATUS_ERROR_BAD_REQUEST,
+			  _("\"%s\": Bad mimeMediaType value \"%s\" - bad "
+			    "length %d (RFC 2911 section 4.1.9)."),
+			  attr->name, attr->values[i].string.text,
+			  (int)strlen(attr->values[i].string.text));
+	    regfree(&re);
+	    return (0);
+	  }
+	}
+
+	regfree(&re);
+        break;
+
+    default :
+        break;
+  }
+
+  return (1);
+}
+
+
+/*
+ * 'ippValidateAttributes()' - Validate all attributes in an IPP message.
+ *
+ * This function validates the contents of the IPP message, including each
+ * attribute.  Like @link ippValidateAttribute@, cupsLastErrorString() is set
+ * to a human-readable message on failure.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O - 1 if valid, 0 otherwise */
+ippValidateAttributes(ipp_t *ipp)	/* I - IPP message */
+{
+  ipp_attribute_t	*attr;		/* Current attribute */
+
+
+  if (!ipp)
+    return (1);
+
+  for (attr = ipp->attrs; attr; attr = attr->next)
+    if (!ippValidateAttribute(attr))
+      return (0);
+
+  return (1);
 }
 
 
@@ -6120,6 +6746,29 @@ ipp_read_file(int         *fd,		/* I - File descriptor */
 #else
   return (read(*fd, buffer, length));
 #endif /* WIN32 */
+}
+
+
+/*
+ * 'ipp_set_error()' - Set a formatted, localized error string.
+ */
+
+static void
+ipp_set_error(ipp_status_t status,	/* I - Status code */
+              const char   *format,	/* I - Printf-style error string */
+	      ...)			/* I - Additional arguments as needed */
+{
+  va_list	ap;			/* Pointer to additional args */
+  char		buffer[2048];		/* Message buffer */
+  cups_lang_t	*lang = cupsLangDefault();
+					/* Current language */
+
+
+  va_start(ap, format);
+  vsnprintf(buffer, sizeof(buffer), _cupsLangString(lang, format), ap);
+  va_end(ap);
+
+  _cupsSetError(status, buffer, 0);
 }
 
 

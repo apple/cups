@@ -816,8 +816,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Connect to the server...
   */
 
-  if ((http = _httpCreate(vars->hostname, vars->port, NULL, vars->family,
-                          vars->encryption, 1, _HTTP_MODE_CLIENT)) == NULL)
+  if ((http = httpConnect2(vars->hostname, vars->port, NULL, vars->family,
+                           vars->encryption, 1, 30000, NULL)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, cupsLastErrorString());
@@ -825,13 +825,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     goto test_exit;
   }
 
-  if (httpReconnect(http))
-  {
-    print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
-                      vars->port, cupsLastErrorString());
-    pass = 0;
-    goto test_exit;
-  }
+#ifdef HAVE_LIBZ
+  httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING,
+                      "deflate, gzip, identity");
+#else
+  httpSetDefaultField(http, HTTP_FIELD_ACCEPT_ENCODING, "identity");
+#endif /* HAVE_LIBZ */
 
   if (vars->timeout > 0.0)
     httpSetTimeout(http, vars->timeout, timeout_cb, NULL);
@@ -2300,8 +2299,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("<key>StatusCode</key>");
 	print_xml_string("string", "skip");
 	puts("<key>ResponseAttributes</key>");
-	puts("<dict>");
-	puts("</dict>");
+	puts("<dict />");
       }
       else if (Output == _CUPS_OUTPUT_TEST)
 	puts("SKIP]");
@@ -2627,7 +2625,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    int out_of_order = 0;	/* Are attribute groups out-of-order? */
 	    cupsArrayClear(a);
-
 
             switch (attrptr->group_tag)
             {
@@ -3025,7 +3022,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     }
 
     if (num_displayed > 0 && !Verbosity && response &&
-        (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
+        Output == _CUPS_OUTPUT_TEST)
     {
       for (attrptr = response->attrs;
 	   attrptr != NULL;
@@ -3786,8 +3783,11 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
   {
     if (!attr->name || (group && *group != attr->group_tag))
     {
-      puts("</dict>");
-      puts("<dict>");
+      if (attr->group_tag != IPP_TAG_ZERO)
+      {
+	puts("</dict>");
+	puts("<dict>");
+      }
 
       if (group)
         *group = attr->group_tag;
@@ -4609,7 +4609,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad boolen value %d "
-			"(RFC 2911 section 4.1.10).", attr->name,
+			"(RFC 2911 section 4.1.11).", attr->name,
 			attr->values[i].boolean);
 	  }
 	}
@@ -4656,7 +4656,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime month %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[2]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[2]);
 	  }
 
           if (date[3] < 1 || date[3] > 31)
@@ -4665,7 +4665,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime day %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[3]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[3]);
 	  }
 
           if (date[4] > 23)
@@ -4674,7 +4674,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime hours %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[4]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[4]);
 	  }
 
           if (date[5] > 59)
@@ -4683,7 +4683,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime minutes %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[5]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[5]);
 	  }
 
           if (date[6] > 60)
@@ -4692,7 +4692,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime seconds %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[6]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[6]);
 	  }
 
           if (date[7] > 9)
@@ -4701,7 +4701,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime deciseconds %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[7]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[7]);
 	  }
 
           if (date[8] != '-' && date[8] != '+')
@@ -4710,7 +4710,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime UTC sign '%c' "
-			"(RFC 2911 section 4.1.13).", attr->name, date[8]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[8]);
 	  }
 
           if (date[9] > 11)
@@ -4719,7 +4719,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime UTC hours %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[9]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[9]);
 	  }
 
           if (date[10] > 59)
@@ -4728,7 +4728,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad dateTime UTC minutes %u "
-			"(RFC 2911 section 4.1.13).", attr->name, date[10]);
+			"(RFC 2911 section 4.1.14).", attr->name, date[10]);
 	  }
 	}
         break;
@@ -4743,7 +4743,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 	    add_stringf(errors,
 			"\"%s\": Bad resolution value %dx%d%s - cross "
 			"feed resolution must be positive "
-			"(RFC 2911 section 4.1.13).", attr->name,
+			"(RFC 2911 section 4.1.15).", attr->name,
 			attr->values[i].resolution.xres,
 			attr->values[i].resolution.yres,
 			attr->values[i].resolution.units ==
@@ -4759,7 +4759,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 	    add_stringf(errors,
 			"\"%s\": Bad resolution value %dx%d%s - feed "
 			"resolution must be positive "
-			"(RFC 2911 section 4.1.13).", attr->name,
+			"(RFC 2911 section 4.1.15).", attr->name,
 			attr->values[i].resolution.xres,
 			attr->values[i].resolution.yres,
 			attr->values[i].resolution.units ==
@@ -4775,7 +4775,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 
 	    add_stringf(errors,
 			"\"%s\": Bad resolution value %dx%d%s - bad "
-			"units value (RFC 2911 section 4.1.13).",
+			"units value (RFC 2911 section 4.1.15).",
 			attr->name, attr->values[i].resolution.xres,
 			attr->values[i].resolution.yres,
 			attr->values[i].resolution.units ==

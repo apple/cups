@@ -19,6 +19,13 @@ uversion=`uname -r | sed -e '1,$s/^[[^0-9]]*\([[0-9]]*\)\.\([[0-9]]*\).*/\1\2/'`
 uarch=`uname -m`
 
 case "$uname" in
+	Darwin*)
+		uname="Darwin"
+		if test $uversion -lt 120; then
+			AC_MSG_ERROR([Sorry, this version of CUPS requires OS X 10.8 or higher.])
+		fi
+		;;
+
 	GNU* | GNU/*)
 		uname="GNU"
 		;;

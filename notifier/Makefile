@@ -77,7 +77,10 @@ install-exec:
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(NOTIFIERS) $(SYMROOT); \
+		for file in $(NOTIFIERS); do \
+			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
+		done \
 	fi
 
 

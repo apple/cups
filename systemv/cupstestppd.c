@@ -3080,8 +3080,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
   const char	*prefix;		/* WARN/FAIL prefix */
   ppd_option_t	*page_size,		/* PageSize option */
 		*page_region;		/* PageRegion option */
-  _pwg_media_t  *pwg_media;             /* PWG media */
-  char          buf[1024];              /* PapeSize name that is supposed to be */
+  _pwg_media_t	*pwg_media;		/* PWG media */
+  char		buf[PPD_MAX_NAME];	/* PapeSize name that is supposed to be */
   const char	*ptr;			/* Pointer into string */
   int		width_2540ths,		/* PageSize width in 2540ths */
 		length_2540ths;		/* PageSize length in 2540ths */
@@ -3217,6 +3217,11 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 			   _PWG_FROMPTS(size->width);
       pwg_media      = _pwgMediaForSize(width_2540ths, length_2540ths);
 
+      if (pwg_media &&
+          (fabs(pwg_media->width - width_2540ths) > 34 ||
+           fabs(pwg_media->length - length_2540ths) > 34))
+        pwg_media = NULL;		/* Only flag matches within a point */
+
       if (pwg_media && pwg_media->ppd &&
           (pwg_media->ppd[0] < 'a' || pwg_media->ppd[0] > 'z'))
       {
@@ -3233,6 +3238,8 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
             snprintf(buf, sizeof(buf), "%s.Transverse", pwg_media->ppd);
           else
             snprintf(buf, sizeof(buf), "%sRotated", pwg_media->ppd);
+
+	  ppdlen = strlen(buf);
         }
 
         if (size->left == 0 && size->bottom == 0 &&
@@ -3301,7 +3308,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
         length_tmp = (fabs(size->length - ceil(size->length)) < 0.1) ?
 	                 ceil(size->length) : size->length;
 
-        if (fmod(width_tmp, 18.0) == 0.0 || fmod(length_tmp, 18.0) == 0.0)
+        if (fmod(width_tmp, 9.0) == 0.0 && fmod(length_tmp, 9.0) == 0.0)
         {
           width_inch  = width_tmp / 72.0;
           length_inch = length_tmp / 72.0;
@@ -3324,14 +3331,26 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
         if (_cups_strcasecmp(size->name, buf))
         {
-          size_t buflen = strlen(buf);	/* Length of proposed name */
+          size_t	buflen = strlen(buf);
+          				/* Length of proposed name */
 
           if (_cups_strncasecmp(size->name, buf, buflen) ||
               (strcmp(size->name + buflen, "in") &&
                size->name[buflen] != '.'))
-	    _cupsLangPrintf(stdout,
-			    _("      %s  Size \"%s\" should be \"%s\"."),
-			    prefix, size->name, buf);
+          {
+	    char	altbuf[PPD_MAX_NAME];
+					/* Alternate "wNNNhNNN" name */
+	    size_t	altlen;		/* Length of alternate name */
+
+	    snprintf(altbuf, sizeof(altbuf), "w%.0fh%.0f", size->width,
+	             size->length);
+	    altlen = strlen(altbuf);
+	    if (_cups_strncasecmp(size->name, altbuf, altlen) ||
+	        (size->name[altlen] && size->name[altlen] != '.'))
+	      _cupsLangPrintf(stdout,
+			      _("      %s  Size \"%s\" should be \"%s\"."),
+			      prefix, size->name, buf);
+	  }
         }
       }
     }

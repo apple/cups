@@ -251,6 +251,7 @@ install-libs: $(INSTALLSTATIC)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPS) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPS); \
 	fi
 
 installstatic:

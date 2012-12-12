@@ -3,10 +3,18 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
-	- Documentation fixes
+	- Documentation fixes (STR #4239)
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
+	- The XML output of ipptool contained empty dictionaries (STR #4136)
+	- The scheduler did not delete job control backup files (STR #4244)
+	- cupsGetPPD3 could return a local PPD instead of the correct remote
+	  PPD.
+	- The scheduler incorrectly advertised auth-info-required for local
+	  queues needing local authentication (STR #4205)
+	- CUPS 1.6 clients using the ServerName directive in client.conf did not
+	  work with CUPS 1.3.x or older servers (STR #4231)
 	- The SNMP backend now tries to work around broken printers that use a
 	  newline to separate key/value pairs.
 	- The IPP backend did not send a cancel request to printers when a job

@@ -23,6 +23,7 @@
  */
 
 #  include "http.h"
+#  include <stdarg.h>
 
 
 /*
@@ -926,6 +927,9 @@ extern int		ippSetStringf(ipp_t *ipp, ipp_attribute_t **attr,
 extern int		ippSetStringfv(ipp_t *ipp, ipp_attribute_t **attr,
 			               int element, const char *format,
 				       va_list ap) _CUPS_API_1_7;
+extern int		ippValidateAttribute(ipp_attribute_t *attr)
+			                     _CUPS_API_1_7;
+extern int		ippValidateAttributes(ipp_t *ipp) _CUPS_API_1_7;
 
 
 /*
