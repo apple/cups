@@ -7,6 +7,7 @@ CHANGES IN CUPS V1.6.2
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
+	- The scheduler did not delete job control backup files (STR #4244)
 	- cupsGetPPD3 could return a local PPD instead of the correct remote
 	  PPD.
 	- The scheduler incorrectly advertised auth-info-required for local

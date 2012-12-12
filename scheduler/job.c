@@ -2193,7 +2193,16 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   }
 
   if (!cupsdCloseCreatedConfFile(fp, filename))
+  {
+   /*
+    * Remove backup file and mark this job as clean...
+    */
+
+    strlcat(filename, ".O", sizeof(filename));
+    unlink(filename);
+
     job->dirty = 0;
+  }
 }
 
 
