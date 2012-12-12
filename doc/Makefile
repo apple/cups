@@ -105,6 +105,7 @@ HELPFILES	=	\
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \
 			help/ref-cupsd-conf.html \
+			help/ref-cups-files-conf.html \
 			help/ref-error_log.html \
 			help/ref-mailto-conf.html \
 			help/ref-page_log.html \

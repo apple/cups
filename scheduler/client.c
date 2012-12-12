@@ -3336,14 +3336,14 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   * Open the new config file...
   */
 
-  snprintf(filename, sizeof(filename), "%s/cupsd.conf", ServerRoot);
-  if ((out = cupsdCreateConfFile(filename, ConfigFilePerm)) == NULL)
+  if ((out = cupsdCreateConfFile(ConfigurationFile, ConfigFilePerm)) == NULL)
   {
     cupsFileClose(in);
     return (HTTP_SERVER_ERROR);
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Installing config file \"%s\"...", filename);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Installing config file \"%s\"...",
+                  ConfigurationFile);
 
  /*
   * Copy from the request to the new config file...
@@ -3354,12 +3354,12 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to copy to config file \"%s\": %s",
-        	      filename, strerror(errno));
+        	      ConfigurationFile, strerror(errno));
 
       cupsFileClose(in);
       cupsFileClose(out);
 
-      snprintf(filename, sizeof(filename), "%s%s.N", ServerRoot, con->uri + 11);
+      snprintf(filename, sizeof(filename), "%s.N", ConfigurationFile);
       cupsdRemoveFile(filename);
 
       return (HTTP_SERVER_ERROR);
@@ -3371,7 +3371,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
 
   cupsFileClose(in);
 
-  if (cupsdCloseCreatedConfFile(out, filename))
+  if (cupsdCloseCreatedConfFile(out, ConfigurationFile))
     return (HTTP_SERVER_ERROR);
 
  /*
