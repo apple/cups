@@ -116,7 +116,6 @@ HELPFILES	=	\
 			help/security.html \
 			help/sharing.html \
 			help/spec-banner.html \
-			help/spec-browsing.html \
 			help/spec-cmp.html \
 			help/spec-command.html \
 			help/spec-design.html \
