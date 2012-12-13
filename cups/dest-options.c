@@ -485,7 +485,7 @@ cupsCopyDestConflicts(
     active = NULL;
   }
 
-  if (tries >= 0)
+  if (tries >= 100)
   {
     DEBUG_puts("1cupsCopyDestConflicts: Unable to resolve after 100 tries.");
     have_conflicts = -1;

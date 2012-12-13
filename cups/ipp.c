@@ -3239,6 +3239,13 @@ ippReadIO(void       *src,		/* I - Data source */
 	      ipp->prev = ipp->current;
 
 	    attr = ipp->current = ipp_add_attr(ipp, NULL, ipp->curtag, IPP_TAG_ZERO, 1);
+	    if (!attr)
+	    {
+	      _cupsSetHTTPError(HTTP_ERROR);
+	      DEBUG_puts("1ippReadIO: unable to allocate attribute.");
+	      _cupsBufferRelease((char *)buffer);
+	      return (IPP_ERROR);
+	    }
 
 	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, ipp->prev=%p",
 	                  ipp->current, ipp->prev));
@@ -6364,6 +6371,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	    _cupsStrFree(attr->values[0].string.language);
 	    attr->values[0].string.language = NULL;
 	  }
+	  /* Fall through to other string values */
 
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :

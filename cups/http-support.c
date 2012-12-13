@@ -2064,6 +2064,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 
@@ -2279,6 +2281,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 
