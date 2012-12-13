@@ -1494,12 +1494,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         * Operation...
 	*/
 
-	if (!get_token(fp, token, sizeof(token), &linenum))
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing OPERATION code on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
+
+	expand_variables(vars, token, temp, sizeof(token));
 
 	if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
 	    (op = strtol(token, NULL, 0)) == 0)
@@ -1543,12 +1545,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         double delay;
 
-	if (!get_token(fp, token, sizeof(token), &linenum))
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing DELAY value on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
+
+	expand_variables(vars, token, temp, sizeof(token));
 
 	if ((delay = _cupsStrScand(token, NULL, localeconv())) <= 0.0)
 	{
