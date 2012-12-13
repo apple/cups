@@ -2475,8 +2475,10 @@ cupsdSetJobState(
   * Set the new job state...
   */
 
-  job->state->values[0].integer = newstate;
-  job->state_value              = newstate;
+  job->state_value = newstate;
+
+  if (job->state)
+    job->state->values[0].integer = newstate;
 
   switch (newstate)
   {
