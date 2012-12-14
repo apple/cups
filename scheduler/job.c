@@ -4760,7 +4760,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdStopPrinter(job->printer, 1);
 	return;
       }
-      else if (cupsdSetPrinterReasons(job->printer, message))
+      else if (message[0] && cupsdSetPrinterReasons(job->printer, message))
       {
 	event |= CUPSD_EVENT_PRINTER_STATE;
 
