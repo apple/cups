@@ -1873,6 +1873,12 @@ main(int  argc,				/* I - Number of command-line args */
       backendCheckSideChannel(snmp_fd, http->hostaddr);
 
      /*
+      * Check printer state...
+      */
+
+      check_printer_state(http, uri, resource, argv[2], version);
+
+     /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
       */
 
