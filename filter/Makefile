@@ -140,6 +140,7 @@ install-libs: $(INSTALLSTATIC)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSIMAGE) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSIMAGE); \
 	fi
 
 installstatic:
