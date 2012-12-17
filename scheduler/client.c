@@ -2580,14 +2580,7 @@ cupsdSendHeader(
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
-    {
-#  ifdef AF_LOCAL
-      if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
-        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
-      else
-#  endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
-    }
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
