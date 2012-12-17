@@ -946,7 +946,7 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       cupsdDeleteCert(0);
-      cupsdAddCert(0, "root", DefaultAuthType);
+      cupsdAddCert(0, "root", cupsdDefaultAuthType());
     }
 #endif /* !HAVE_AUTHORIZATION_H */
 
