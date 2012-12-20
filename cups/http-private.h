@@ -326,6 +326,7 @@ struct _http_s				/**** HTTP connection structure ****/
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
   z_stream		stream;		/* (De)compression stream */
+  Bytef			*dbuffer;	/* Decompression buffer */
 #  endif /* HAVE_LIBZ */
 };
 

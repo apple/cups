@@ -383,6 +383,7 @@ httpAddrPort(http_addr_t *addr)		/* I - Address */
 }
 
 /* For OS X 10.8 and earlier */
+extern int _httpAddrPort(http_addr_t *addr);
 int _httpAddrPort(http_addr_t *addr) { return (httpAddrPort(addr)); }
 
 
