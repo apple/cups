@@ -2375,8 +2375,10 @@ httpRead2(http_t *http,			/* I - Connection to server */
           else
             bytes = 0;
 
-          if (bytes <= 0)
+          if (bytes < 0)
             return (bytes);
+          else if (bytes == 0)
+            break;
 
           http->data_remaining  -= bytes;
           http->stream.avail_in += bytes;
@@ -4361,7 +4363,9 @@ http_content_coding_start(
           return;
         }
 
-        if ((zerr = inflateInit2(&(http->stream), 32 + 15)) < Z_OK)
+        if ((zerr = inflateInit2(&(http->stream),
+                                 coding == _HTTP_CODING_INFLATE ? 15 : 31))
+		< Z_OK)
         {
           free(http->dbuffer);
           http->dbuffer = NULL;
