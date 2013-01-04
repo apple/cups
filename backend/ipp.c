@@ -1066,10 +1066,10 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (!compression)
       {
-        if (ippContainsString(compression_sup, "deflate"))
-          compression = "deflate";
-        else if (ippContainsString(compression_sup, "gzip"))
+        if (ippContainsString(compression_sup, "gzip"))
           compression = "gzip";
+        else if (ippContainsString(compression_sup, "deflate"))
+          compression = "deflate";
 
         if (compression)
           fprintf(stderr, "DEBUG: Automatically using \"%s\" compression.\n",
