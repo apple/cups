@@ -2190,7 +2190,6 @@ httpPeek(http_t *http,			/* I - Connection to server */
 }
 
 /* For OS X 10.8 and earlier */
-extern ssize_t _httpPeek(http_t *http, char *buffer, size_t length);
 ssize_t _httpPeek(http_t *http, char *buffer, size_t length)
 { return (httpPeek(http, buffer, length)); }
 

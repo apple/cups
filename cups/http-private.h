@@ -3,7 +3,7 @@
  *
  *   Private HTTP definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -393,14 +393,18 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  */
 
 #define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
+extern int		_httpAddrPort(http_addr_t *addr)
+			              _CUPS_INTERNAL_MSG("Use httpAddrPort instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
 extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
-					   char *buffer, size_t bufsize);
+					   char *buffer, size_t bufsize)
+					   _CUPS_INTERNAL_MSG("Use httpAssembleUUID instead.");
 extern http_t		*_httpCreate(const char *host, int port,
 			             http_addrlist_t *addrlist, int family,
 				     http_encryption_t encryption,
-				     int blocking, _http_mode_t mode);
+				     int blocking, _http_mode_t mode)
+				     _CUPS_INTERNAL_MSG("Use httpConnect2 or httpAccept instead.");
 extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
@@ -409,6 +413,8 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
+extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
+			          _CUPS_INTERNAL_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
