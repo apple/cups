@@ -98,8 +98,8 @@ if test x$enable_gssapi != xno; then
 				fi
 			else
 				AC_MSG_RESULT(no)
-				if test $uversion -ge 110; then
-					# Broken public headers in 10.7...
+				if test $uversion -ge 110 -a $uversion -lt 120; then
+					# Broken public headers in 10.7.x...
 					AC_MSG_ERROR(Run 'sudo mkdir -p $gssdir/PrivateHeaders' and 'sudo touch $gssdir/PrivateHeaders/gssapi_spi.h' to build CUPS.)
 				fi
 			fi
