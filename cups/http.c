@@ -2395,6 +2395,14 @@ httpRead2(http_t *http,			/* I - Connection to server */
     if ((bytes = http_read_chunk(http, buffer, length)) > 0)
       http->data_remaining -= bytes;
   }
+  else if (http->data_remaining <= 0)
+  {
+   /*
+    * No more data to read...
+    */
+
+    return (0);
+  }
   else
   {
     DEBUG_printf(("1httpRead2: Reading up to %d bytes into buffer.",
