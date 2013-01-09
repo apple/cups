@@ -5155,8 +5155,6 @@ http_set_wait(http_t *http)		/* I - Connection to server */
 static int				/* O - 0 on success, -1 on failure */
 http_setup_ssl(http_t *http)		/* I - Connection to server */
 {
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Pointer to library globals */
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
 
@@ -5169,6 +5167,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
   OSStatus		error;		/* Error code */
   const char		*message = NULL;/* Error message */
   cups_array_t		*credentials;	/* Credentials array */
