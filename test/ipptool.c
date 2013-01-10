@@ -1858,6 +1858,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         last_status = statuses + num_statuses;
 	num_statuses ++;
 
+        last_status->define_match    = NULL;
+        last_status->define_no_match = NULL;
 	last_status->if_defined      = NULL;
 	last_status->if_not_defined  = NULL;
 	last_status->repeat_limit    = 1000;
@@ -3137,6 +3139,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(statuses[i].if_defined);
     if (statuses[i].if_not_defined)
       free(statuses[i].if_not_defined);
+      if (statuses[i].define_match)
+        free(statuses[i].define_match);
+      if (statuses[i].define_no_match)
+        free(statuses[i].define_no_match);
   }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
