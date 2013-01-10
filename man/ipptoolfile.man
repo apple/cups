@@ -3,7 +3,7 @@
 .\"
 .\"   ipptoolfile man page for CUPS.
 .\"
-.\"   Copyright 2010-2012 by Apple Inc.
+.\"   Copyright 2010-2013 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "3 December 2012" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "10 January 2013" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -332,6 +332,12 @@ Requires that at least one value of the EXPECT attribute matches the regular exp
 .SH STATUS PREDICATES
 The following predicates are understood following the STATUS test directive:
 .TP 5
+DEFINE-MATCH variable-name
+Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+.TP 5
+DEFINE-NO-MATCH variable-name
+Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+.TP 5
 IF-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is defined.
 .TP 5
@@ -571,7 +577,7 @@ Inserts the username from the URI provided to \fIipptool\fR, if any.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

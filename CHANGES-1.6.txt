@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.6.2
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
+	- The ipptool program now supports DEFINE-MATCH and DEFINE-NO-MATCH
+	  predicates for STATUS directives.
 	- Fixed a problem with local Kerberos authentication (STR #4140)
 	- Coverity scan: fixed some minor issues (STR #4242)
 	- The scheduler did not remove color profiles after deleting a printer
