@@ -1128,7 +1128,7 @@ colord_delete_device(
   message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "DeleteDevice");
 
   dbus_message_iter_init_append(message, &args);
-  dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_id);
+  dbus_message_iter_append_basic(&args, DBUS_TYPE_OBJECT_PATH, &device_id);
 
  /*
   * Send the DeleteDevice request synchronously...

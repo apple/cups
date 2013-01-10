@@ -2580,14 +2580,7 @@ cupsdSendHeader(
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
-    {
-#  ifdef AF_LOCAL
-      if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
-        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
-      else
-#  endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
-    }
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
@@ -3618,7 +3611,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
   ipp_attribute_t *attr;		/* attributes-natural-language attribute */
-  void		*ccache = NULL;		/* Kerberos credentials */
 
 
  /*
@@ -3970,7 +3962,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     */
 
     if (con->username[0])
-      cupsdAddCert(pid, con->username, ccache);
+      cupsdAddCert(pid, con->username, con->type);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] Started %s (PID %d)", command, pid);
 

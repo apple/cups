@@ -1116,11 +1116,20 @@ cupsdReadConfiguration(void)
   * Update TempDir to the default if it hasn't been set already...
   */
 
+#ifdef __APPLE__
+  if (TempDir && !RunUser &&
+      (!strncmp(TempDir, "/private/tmp", 12) || !strncmp(TempDir, "/tmp", 4)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot use %s for TempDir.", TempDir);
+    cupsdClearString(&TempDir);
+  }
+#endif /* __APPLE__ */
+
   if (!TempDir)
   {
 #ifdef __APPLE__
     if ((tmpdir = getenv("TMPDIR")) != NULL &&
-        strncmp(tmpdir, "/private/tmp", 12))
+        strncmp(tmpdir, "/private/tmp", 12) && strncmp(tmpdir, "/tmp", 4))
 #else
     if ((tmpdir = getenv("TMPDIR")) != NULL)
 #endif /* __APPLE__ */
@@ -1143,13 +1152,13 @@ cupsdReadConfiguration(void)
       else
         cupsdSetString(&TempDir, tmpdir);
     }
+  }
 
-    if (!TempDir)
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO, "Using default TempDir of %s/tmp...",
-	              RequestRoot);
-      cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
-    }
+  if (!TempDir)
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO, "Using default TempDir of %s/tmp...",
+		    RequestRoot);
+    cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
   }
 
  /*

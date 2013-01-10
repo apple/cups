@@ -3,7 +3,7 @@
  *
  *   IPP backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1066,10 +1066,10 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (!compression)
       {
-        if (ippContainsString(compression_sup, "deflate"))
-          compression = "deflate";
-        else if (ippContainsString(compression_sup, "gzip"))
+        if (ippContainsString(compression_sup, "gzip"))
           compression = "gzip";
+        else if (ippContainsString(compression_sup, "deflate"))
+          compression = "deflate";
 
         if (compression)
           fprintf(stderr, "DEBUG: Automatically using \"%s\" compression.\n",
@@ -1354,8 +1354,9 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * If the printer only claims to support IPP/1.0, or if the user specifically
   * included version=1.0 in the URI, then do not try to use Create-Job or
-  * Send-Document.  This is another dreaded compatibility hack, but unfortunately
-  * there are enough broken printers out there that we need this for now...
+  * Send-Document.  This is another dreaded compatibility hack, but
+  * unfortunately there are enough broken printers out there that we need
+  * this for now...
   */
 
   if (version == 10)
@@ -1812,6 +1813,27 @@ main(int  argc,				/* I - Number of command-line args */
 
       goto cleanup;
     }
+    else if (ipp_status == IPP_STATUS_ERROR_CUPS_UPGRADE_REQUIRED)
+    {
+     /*
+      * Server is configured incorrectly; the policy for Create-Job and
+      * Send-Document has to be the same (auth or no auth, encryption or
+      * no encryption).  Force the queue to stop since printing will never
+      * work.
+      */
+
+      fputs("DEBUG: The server or printer is configured incorrectly.\n",
+            stderr);
+      fputs("DEBUG: The policy for Create-Job and Send-Document must have the "
+            "same authentication and encryption requirements.\n", stderr);
+
+      ipp_status = IPP_STATUS_ERROR_INTERNAL;
+
+      if (job_id > 0)
+	cancel_job(http, uri, job_id, resource, argv[2], version);
+
+      goto cleanup;
+    }
     else if (ipp_status == IPP_NOT_FOUND)
     {
      /*
@@ -1849,6 +1871,12 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       backendCheckSideChannel(snmp_fd, http->hostaddr);
+
+     /*
+      * Check printer state...
+      */
+
+      check_printer_state(http, uri, resource, argv[2], version);
 
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...

@@ -414,6 +414,14 @@ parallel attribute.
 <h2 class="title"><a name="STATUS_PREDICATES">Status Predicates</a></h2>
 The following predicates are understood following the STATUS test directive:
 <dl>
+<dt>DEFINE-MATCH variable-name
+</dt>
+<dd>Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+</dd>
+<dt>DEFINE-NO-MATCH variable-name
+</dt>
+<dd>Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+</dd>
 <dt>IF-DEFINED variable-name
 </dt>
 <dd>Makes the STATUS apply only if the specified variable is defined.
@@ -674,7 +682,7 @@ no notify-subscription-id has been seen.
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
 
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 
 </body>
 </html>

@@ -3,7 +3,7 @@
  *
  *   HTTP support routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,8 @@
  *			    components.
  *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
  *			    components with a formatted resource.
- *   _httpAssembleUUID()  - Make a UUID URI conforming to RFC 4122.
+ *   httpAssembleUUID()   - Assemble a name-based UUID URN conforming to RFC
+ *                          4122.
  *   httpDecode64()	  - Base64-decode a string.
  *   httpDecode64_2()	  - Base64-decode a string.
  *   httpEncode64()	  - Base64-encode a string.
@@ -466,18 +467,22 @@ httpAssembleURIf(
 
 
 /*
- * '_httpAssembleUUID()' - Make a UUID URI conforming to RFC 4122.
+ * 'httpAssembleUUID()' - Assemble a name-based UUID URN conforming to RFC 4122.
+ *
+ * This function creates a unique 128-bit identifying number using the server
+ * name, port number, random data, and optionally an object name and/or object
+ * number.  The result is formatted as a UUID URN as defined in RFC 4122.
  *
  * The buffer needs to be at least 46 bytes in size.
  */
 
 char *					/* I - UUID string */
-_httpAssembleUUID(const char *server,	/* I - Server name */
-                  int        port,	/* I - Port number */
-		  const char *name,	/* I - Object name or NULL */
-                  int        number,	/* I - Object number or 0 */
-	          char       *buffer,	/* I - String buffer */
-	          size_t     bufsize)	/* I - Size of buffer */
+httpAssembleUUID(const char *server,	/* I - Server name */
+		 int        port,	/* I - Port number */
+		 const char *name,	/* I - Object name or NULL */
+		 int        number,	/* I - Object number or 0 */
+		 char       *buffer,	/* I - String buffer */
+		 size_t     bufsize)	/* I - Size of buffer */
 {
   char			data[1024];	/* Source string for MD5 */
   _cups_md5_state_t	md5state;	/* MD5 state */
@@ -512,6 +517,13 @@ _httpAssembleUUID(const char *server,	/* I - Server name */
 	   md5sum[14], md5sum[15]);
 
   return (buffer);
+}
+
+/* For OS X 10.8 and earlier */
+char *_httpAssembleUUID(const char *server, int port, const char *name,
+			int number, char *buffer, size_t bufsize)
+{
+  return (httpAssembleUUID(server, port, name, number, buffer, bufsize));
 }
 
 
@@ -2064,6 +2076,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 
@@ -2279,6 +2293,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 

@@ -409,6 +409,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (srctype)
   {
+   /* sscanf return value already checked above */
     sscanf(srctype, "%15[^/]/%255s", super, type);
     if ((src = mimeType(mime, super, type)) == NULL)
     {
@@ -426,6 +427,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
+ /* sscanf return value already checked above */
   sscanf(dsttype, "%15[^/]/%255s", super, type);
   if (!_cups_strcasecmp(super, "printer"))
     dst = printer_type;

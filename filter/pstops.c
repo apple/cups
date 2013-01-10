@@ -1303,7 +1303,8 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (doc->ap_input_slot || doc->ap_manual_feed)
   {
-    if (doc->page == 1)
+    if ((doc->page == 1 && (!doc->slow_order || !Duplex)) ||
+        (doc->page == 2 && doc->slow_order && Duplex))
     {
      /*
       * First page/sheet gets AP_FIRSTPAGE_* options...

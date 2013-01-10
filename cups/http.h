@@ -591,6 +591,10 @@ extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
 extern int		httpAddrListen(http_addr_t *addr, int port)
 			               _CUPS_API_1_7;
 extern int		httpAddrPort(http_addr_t *addr) _CUPS_API_1_7;
+extern char		*httpAssembleUUID(const char *server, int port,
+					  const char *name, int number,
+					  char *buffer, size_t bufsize)
+					  _CUPS_API_1_7;
 extern http_t		*httpConnect2(const char *host, int port,
 				      http_addrlist_t *addrlist,
 				      int family, http_encryption_t encryption,

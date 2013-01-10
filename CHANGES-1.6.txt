@@ -3,10 +3,23 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
-	- Documentation fixes (STR #4239)
+	- Documentation fixes (STR #4239, STR #4234)
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
+	- The ipptool program now supports DEFINE-MATCH and DEFINE-NO-MATCH
+	  predicates for STATUS directives.
+	- Fixed a problem with local Kerberos authentication (STR #4140)
+	- Coverity scan: fixed some minor issues (STR #4242)
+	- The scheduler did not remove color profiles after deleting a printer
+	  (STR #4232)
+	- The CUPS library did not always detect a timed out connection to the
+	  server which could cause temporary loss of printing from applications
+	  (STR #4187)
+	- The ipptool program now supports variable substitution in OPERATION
+	  and DELAY directives (STR #4175)
+	- The IPP backend now stops queues when the server configuration
+	  prevents successful job submission (STR #4125)
 	- The XML output of ipptool contained empty dictionaries (STR #4136)
 	- The scheduler did not delete job control backup files (STR #4244)
 	- cupsGetPPD3 could return a local PPD instead of the correct remote

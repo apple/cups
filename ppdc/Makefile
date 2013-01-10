@@ -178,6 +178,7 @@ install-libs: $(INSTALLSTATIC)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSPPDC) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSPPDC); \
 	fi
 
 installstatic:

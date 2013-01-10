@@ -672,10 +672,10 @@ print_device(const char *uri,		/* I - Device URI */
        * If it didn't exit abort the pending read and wait an additional
        * second...
        */
-  
+
       if (!g.read_thread_done)
       {
-	fputs("DEBUG: Read thread still active, aborting the pending read...\n", 
+	fputs("DEBUG: Read thread still active, aborting the pending read...\n",
 	      stderr);
 
 	g.wait_eof = 0;
@@ -683,7 +683,7 @@ print_device(const char *uri,		/* I - Device URI */
 	gettimeofday(&tv, NULL);
 	cond_timeout.tv_sec  = tv.tv_sec + 1;
 	cond_timeout.tv_nsec = tv.tv_usec * 1000;
-  
+
 	while (!g.read_thread_done)
 	{
 	  if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
@@ -695,9 +695,6 @@ print_device(const char *uri,		/* I - Device URI */
 
     pthread_mutex_unlock(&g.read_thread_mutex);
   }
-
-  if (print_fd)
-    close(print_fd);
 
  /*
   * Close the connection and input file and general clean up...
@@ -758,7 +755,7 @@ close_device(usb_printer_t *printer)	/* I - Printer */
       */
       if (printer->origconf > 0 && printer->origconf != number2)
       {
-	fprintf(stderr, "DEBUG: Restoring USB device configuration: %d -> %d\n", 
+	fprintf(stderr, "DEBUG: Restoring USB device configuration: %d -> %d\n",
 		number2, printer->origconf);
 	if ((errcode = libusb_set_configuration(printer->handle,
 						printer->origconf)) < 0)
@@ -919,7 +916,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	    */
 
 	    if (((altptr->bInterfaceClass != LIBUSB_CLASS_PRINTER ||
-		  altptr->bInterfaceSubClass != 1) && 
+		  altptr->bInterfaceSubClass != 1) &&
 		 ((printer.quirks & USBLP_QUIRK_BAD_CLASS) == 0)) ||
 		(altptr->bInterfaceProtocol != 1 &&	/* Unidirectional */
 		 altptr->bInterfaceProtocol != 2) ||	/* Bidirectional */
@@ -997,7 +994,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 					    bEndpointAddress;
 		}
 		else
-		  fprintf(stderr, "DEBUG: Uni-directional USB communication " 
+		  fprintf(stderr, "DEBUG: Uni-directional USB communication "
 			  "only!\n");
 		printer.write_endp = confptr->interface[printer.iface].
 					   altsetting[printer.altset].
@@ -1376,7 +1373,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
   printer->origconf = current;
 
-  if ((errcode = 
+  if ((errcode =
        libusb_get_config_descriptor (printer->device, printer->conf, &confptr))
       < 0)
   {
@@ -1388,7 +1385,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
   if (number1 != current)
   {
-    fprintf(stderr, "DEBUG: Switching USB device configuration: %d -> %d\n", 
+    fprintf(stderr, "DEBUG: Switching USB device configuration: %d -> %d\n",
 	    current, number1);
     if ((errcode = libusb_set_configuration(printer->handle, number1)) < 0)
     {

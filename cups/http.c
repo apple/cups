@@ -48,13 +48,13 @@
  *   _httpFreeCredentials()	  - Free internal credentials.
  *   httpFreeCredentials()	  - Free an array of credentials.
  *   httpGet()			  - Send a GET request to the server.
- *   httpGetContentEncoding()     - Get a common content encoding, if any,
- *                                  between the client and server.
+ *   httpGetContentEncoding()	  - Get a common content encoding, if any,
+ *				    between the client and server.
  *   httpGetAuthString()	  - Get the current authorization string.
  *   httpGetBlocking()		  - Get the blocking/non-block state of a
  *				    connection.
  *   httpGetCookie()		  - Get any cookie data from the response.
- *   httpGetExpect()              - Get the value of the Expect header, if any.
+ *   httpGetExpect()		  - Get the value of the Expect header, if any.
  *   httpGetFd()		  - Get the file descriptor associated with a
  *				    connection.
  *   httpGetField()		  - Get a field value from a request/response.
@@ -89,6 +89,7 @@
  *   httpSetCredentials()	  - Set the credentials associated with an
  *				    encrypted connection.
  *   httpSetCookie()		  - Set the cookie value(s).
+ *   httpSetDefaultField()	  - Set the default value of an HTTP header.
  *   httpSetExpect()		  - Set the Expect: header in a request.
  *   httpSetField()		  - Set the value of an HTTP header.
  *   httpSetLength()		  - Set the content-length and
@@ -119,12 +120,15 @@
  *   http_content_coding_start()  - Start doing content encoding.
  *   http_debug_hex()		  - Do a hex dump of a buffer.
  *   http_field()		  - Return the field index for a field name.
+ *   http_read()		  - Read a buffer from a HTTP connection.
+ *   http_read_buffered()	  - Do a buffered read from a HTTP connection.
+ *   http_read_chunk()		  - Read a chunk from a HTTP connection.
  *   http_read_ssl()		  - Read from a SSL/TLS connection.
  *   http_send()		  - Send a request with all fields and the
  *				    trailing blank line.
  *   http_set_credentials()	  - Set the SSL/TLS credentials.
- *   http_set_length()            - Set the data_encoding and data_remaining
- *                                  values.
+ *   http_set_length()		  - Set the data_encoding and data_remaining
+ *				    values.
  *   http_set_timeout() 	  - Set the socket timeout values.
  *   http_set_wait()		  - Set the default wait value for reads.
  *   http_setup_ssl()		  - Set up SSL/TLS support on a connection.
@@ -168,12 +172,15 @@ static void		http_debug_hex(const char *prefix, const char *buffer,
 			               int bytes);
 #endif /* DEBUG */
 static http_field_t	http_field(const char *name);
+static ssize_t		http_read(http_t *http, char *buffer, size_t length);
+static ssize_t		http_read_buffered(http_t *http, char *buffer, size_t length);
+static ssize_t		http_read_chunk(http_t *http, char *buffer, size_t length);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
-static int		http_write(http_t *http, const char *buffer,
-			           int length);
-static int		http_write_chunk(http_t *http, const char *buffer,
-			                 int length);
+static ssize_t		http_write(http_t *http, const char *buffer,
+			           size_t length);
+static ssize_t		http_write_chunk(http_t *http, const char *buffer,
+			                 size_t length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
 #  ifdef HAVE_CDSASSL
@@ -1449,7 +1456,7 @@ httpGets(char   *line,			/* I - Line to read into */
 
   DEBUG_printf(("2httpGets(line=%p, length=%d, http=%p)", line, length, http));
 
-  if (http == NULL || line == NULL)
+  if (!http || !line || length <= 1)
     return (NULL);
 
  /*
@@ -1493,20 +1500,10 @@ httpGets(char   *line,			/* I - Line to read into */
         return (NULL);
       }
 
-#ifdef HAVE_SSL
-      if (http->tls)
-	bytes = http_read_ssl(http, http->buffer + http->used,
-	                      HTTP_MAX_BUFFER - http->used);
-      else
-#endif /* HAVE_SSL */
-        bytes = recv(http->fd, http->buffer + http->used,
-	             HTTP_MAX_BUFFER - http->used, 0);
+      bytes = http_read(http, http->buffer + http->used,
+                        HTTP_MAX_BUFFER - http->used);
 
-      DEBUG_printf(("4httpGets: read %d bytes...", bytes));
-
-#ifdef DEBUG
-      http_debug_hex("httpGets", http->buffer + http->used, bytes);
-#endif /* DEBUG */
+      DEBUG_printf(("4httpGets: read %d bytes.", bytes));
 
       if (bytes < 0)
       {
@@ -1918,8 +1915,8 @@ httpOptions(http_t     *http,		/* I - Connection to server */
 
 ssize_t					/* O - Number of bytes copied */
 httpPeek(http_t *http,			/* I - Connection to server */
-          char   *buffer,		/* I - Buffer for data */
-	  size_t length)		/* I - Maximum number of bytes */
+         char   *buffer,		/* I - Buffer for data */
+	 size_t length)			/* I - Maximum number of bytes */
 {
   ssize_t	bytes;			/* Bytes read */
   char		len[32];		/* Length string */
@@ -1959,20 +1956,20 @@ httpPeek(http_t *http,			/* I - Connection to server */
   DEBUG_printf(("2httpPeek: data_remaining=" CUPS_LLFMT,
                 CUPS_LLCAST http->data_remaining));
 
-  if (http->data_remaining <= 0)
+  if (http->data_remaining <= 0 && http->data_encoding != HTTP_ENCODING_FIELDS)
   {
    /*
     * A zero-length chunk ends a transfer; unless we are reading POST
     * data, go idle...
     */
 
-    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-      httpGets(len, sizeof(len), http);
-
 #ifdef HAVE_LIBZ
     if (http->coding)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
+
+    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
+      httpGets(len, sizeof(len), http);
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
@@ -1990,12 +1987,15 @@ httpPeek(http_t *http,			/* I - Connection to server */
 
     return (0);
   }
-  else if ((http->data_encoding == HTTP_ENCODING_LENGTH ||
-            http->coding == _HTTP_CODING_IDENTITY) &&
-           length > (size_t)http->data_remaining)
+  else if (length > (size_t)http->data_remaining)
     length = (size_t)http->data_remaining;
 
+#ifdef HAVE_LIBZ
+  if (http->used == 0 &&
+      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0))
+#else
   if (http->used == 0)
+#endif /* HAVE_LIBZ */
   {
    /*
     * Buffer small reads for better performance...
@@ -2084,16 +2084,39 @@ httpPeek(http_t *http,			/* I - Connection to server */
   if (http->coding)
   {
     int		zerr;			/* Decompressor error */
-    off_t	comp_avail;		/* Maximum bytes for decompression */
     z_stream	stream;			/* Copy of decompressor stream */
 
-    if (http->used > http->data_remaining)
-      comp_avail = http->data_remaining;
-    else
-      comp_avail = http->used;
+    if (http->used > 0 && http->stream.avail_in < HTTP_MAX_BUFFER)
+    {
+      size_t buflen = buflen = HTTP_MAX_BUFFER - http->stream.avail_in;
+					/* Number of bytes to copy */
+
+      if (http->stream.avail_in > 0 &&
+	  http->stream.next_in > http->dbuffer)
+        memmove(http->dbuffer, http->stream.next_in, http->stream.avail_in);
+
+      http->stream.next_in = http->dbuffer;
+
+      if (buflen > http->data_remaining)
+        buflen = http->data_remaining;
+
+      if (buflen > http->used)
+        buflen = http->used;
+
+      DEBUG_printf(("1httpPeek: Copying %d more bytes of data into "
+		    "decompression buffer.", (int)buflen));
+
+      memcpy(http->dbuffer + http->stream.avail_in, http->buffer, buflen);
+      http->stream.avail_in += buflen;
+      http->used            -= buflen;
+      http->data_remaining  -= buflen;
+
+      if (http->used > 0)
+        memmove(http->buffer, http->buffer + buflen, http->used);
+    }
 
     DEBUG_printf(("2httpPeek: length=%d, avail_in=%d", (int)length,
-                  (int)comp_avail));
+                  (int)http->stream.avail_in));
 
     if (inflateCopy(&stream, &(http->stream)) != Z_OK)
     {
@@ -2102,8 +2125,6 @@ httpPeek(http_t *http,			/* I - Connection to server */
       return (-1);
     }
 
-    stream.next_in   = (Bytef *)http->buffer;
-    stream.avail_in  = comp_avail;
     stream.next_out  = (Bytef *)buffer;
     stream.avail_out = length;
 
@@ -2113,6 +2134,11 @@ httpPeek(http_t *http,			/* I - Connection to server */
     if (zerr < Z_OK)
     {
       DEBUG_printf(("2httpPeek: zerr=%d", zerr));
+#ifdef DEBUG
+      http_debug_hex("2httpPeek", (char *)http->dbuffer,
+		     http->stream.avail_in);
+#endif /* DEBUG */
+
       http->error = EIO;
       return (-1);
     }
@@ -2264,12 +2290,12 @@ httpRead2(http_t *http,			/* I - Connection to server */
 	  size_t length)		/* I - Maximum number of bytes */
 {
   ssize_t	bytes;			/* Bytes read */
-  char		len[32];		/* Length string */
 
 
   DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
-                ") coding=%d", http, buffer, CUPS_LLCAST length,
-                http->coding));
+                ") coding=%d data_encoding=%d data_remaining=" CUPS_LLFMT,
+                http, buffer, CUPS_LLCAST length, http->coding,
+                http->data_encoding, CUPS_LLCAST http->data_remaining));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -2280,371 +2306,135 @@ httpRead2(http_t *http,			/* I - Connection to server */
   if (length <= 0)
     return (0);
 
-  if (http->data_encoding == HTTP_ENCODING_CHUNKED &&
-      http->data_remaining <= 0)
+#ifdef HAVE_LIBZ
+  if (http->coding)
   {
-    if (!httpGets(len, sizeof(len), http))
+    do
     {
-      DEBUG_puts("1httpRead2: Could not get chunk length.");
-      return (0);
-    }
-
-    if (!len[0])
-    {
-      DEBUG_puts("1httpRead2: Blank chunk length, trying again...");
-      if (!httpGets(len, sizeof(len), http))
+      if (http->stream.avail_in > 0)
       {
-	DEBUG_puts("1httpRead2: Could not get chunk length.");
-	return (0);
+	int	zerr;			/* Decompressor error */
+
+	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d",
+	              (int)http->stream.avail_in, (int)length));
+
+	http->stream.next_out  = (Bytef *)buffer;
+	http->stream.avail_out = length;
+
+	if ((zerr = inflate(&(http->stream), Z_SYNC_FLUSH)) < Z_OK)
+	{
+	  DEBUG_printf(("2httpRead2: zerr=%d", zerr));
+#ifdef DEBUG
+          http_debug_hex("2httpRead2", (char *)http->dbuffer,
+                         http->stream.avail_in);
+#endif /* DEBUG */
+
+	  http->error = EIO;
+	  return (-1);
+	}
+
+	bytes = length - http->stream.avail_out;
+
+	DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d, bytes=%d",
+		      http->stream.avail_in, http->stream.avail_out,
+		      (int)bytes));
+      }
+      else
+        bytes = 0;
+
+      if (bytes == 0)
+      {
+        ssize_t buflen = HTTP_MAX_BUFFER - http->stream.avail_in;
+					/* Additional bytes for buffer */
+
+        if (buflen > 0)
+        {
+          if (http->stream.avail_in > 0 &&
+              http->stream.next_in > http->dbuffer)
+            memmove(http->dbuffer, http->stream.next_in, http->stream.avail_in);
+
+	  http->stream.next_in = http->dbuffer;
+
+          DEBUG_printf(("1httpRead2: Reading up to %d more bytes of data into "
+                        "decompression buffer.", (int)buflen));
+
+          if (http->data_remaining > 0)
+          {
+	    if (buflen > http->data_remaining)
+	      buflen = http->data_remaining;
+
+	    bytes = http_read_buffered(http,
+	                               (char *)http->dbuffer +
+	                                       http->stream.avail_in, buflen);
+          }
+          else if (http->data_encoding == HTTP_ENCODING_CHUNKED)
+            bytes = http_read_chunk(http,
+				    (char *)http->dbuffer +
+					http->stream.avail_in, buflen);
+          else
+            bytes = 0;
+
+          if (bytes < 0)
+            return (bytes);
+          else if (bytes == 0)
+            break;
+
+          http->data_remaining  -= bytes;
+          http->stream.avail_in += bytes;
+        }
+        else
+          return (0);
       }
     }
-
-    http->data_remaining = strtoll(len, NULL, 16);
-
-    if (http->data_remaining < 0)
-    {
-      DEBUG_printf(("1httpRead2: Negative chunk length \"%s\" (" CUPS_LLFMT ")",
-                    len, CUPS_LLCAST http->data_remaining));
-      return (0);
-    }
-
-    DEBUG_printf(("2httpRead2: Got chunk length \"%s\" (" CUPS_LLFMT ")", len,
-                  CUPS_LLCAST http->data_remaining));
+    while (bytes == 0);
   }
-
-  DEBUG_printf(("2httpRead2: data_remaining=" CUPS_LLFMT ", used=%d",
-                CUPS_LLCAST http->data_remaining, http->used));
-
-  if (http->data_remaining <= 0 && http->data_encoding != HTTP_ENCODING_FIELDS)
+  else
+#endif /* HAVE_LIBZ */
+  if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
+  {
+    if ((bytes = http_read_chunk(http, buffer, length)) > 0)
+      http->data_remaining -= bytes;
+  }
+  else if (http->data_remaining <= 0)
   {
    /*
-    * A zero-length chunk ends a transfer; unless we are reading POST
-    * data, go idle...
+    * No more data to read...
     */
 
+    return (0);
+  }
+  else
+  {
+    DEBUG_printf(("1httpRead2: Reading up to %d bytes into buffer.",
+                  (int)length));
+
+    if (length > http->data_remaining)
+      length = http->data_remaining;
+
+    if ((bytes = http_read_buffered(http, buffer, length)) > 0)
+      http->data_remaining -= bytes;
+  }
+
+  if (
+#ifdef HAVE_LIBZ
+      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0) &&
+#endif /* HAVE_LIBZ */
+      ((http->data_remaining <= 0 &&
+        http->data_encoding == HTTP_ENCODING_LENGTH) ||
+       (http->data_encoding == HTTP_ENCODING_CHUNKED && bytes == 0)))
+  {
 #ifdef HAVE_LIBZ
     if (http->coding)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
-
-    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-      httpGets(len, sizeof(len), http);
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
       http->state = HTTP_STATE_WAITING;
 
-    DEBUG_printf(("1httpRead2: 0-length chunk, set state to %s.",
-                  http_states[http->state + 1]));
-
-   /*
-    * Prevent future reads for this request...
-    */
-
-    http->data_encoding = HTTP_ENCODING_FIELDS;
-
-    return (0);
-  }
-  else if ((http->data_encoding == HTTP_ENCODING_LENGTH ||
-            http->coding == _HTTP_CODING_IDENTITY) &&
-           length > (size_t)http->data_remaining)
-    length = (size_t)http->data_remaining;
-
-#ifdef HAVE_LIBZ
-  if (http->used == 0 && (length <= 256 || http->coding))
-#else
-  if (http->used == 0 && length <= 256)
-#endif /* HAVE_LIBZ */
-  {
-   /*
-    * Buffer small/compressed reads for better performance...
-    */
-
-    ssize_t	buflen;			/* Length of read for buffer */
-
-    if (!http->blocking)
-    {
-      while (!httpWait(http, http->wait_value))
-      {
-	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
-	  continue;
-
-	return (0);
-      }
-    }
-
-    if (http->data_remaining > sizeof(http->buffer))
-      buflen = sizeof(http->buffer);
-    else
-      buflen = http->data_remaining;
-
-    DEBUG_printf(("2httpRead2: Reading %d bytes into buffer.", (int)buflen));
-
-    do
-    {
-#ifdef HAVE_SSL
-      if (http->tls)
-	bytes = http_read_ssl(http, http->buffer, buflen);
-      else
-#endif /* HAVE_SSL */
-      bytes = recv(http->fd, http->buffer, buflen, 0);
-
-      if (bytes < 0)
-      {
-#ifdef WIN32
-	if (WSAGetLastError() != WSAEINTR)
-	{
-	  http->error = WSAGetLastError();
-	  return (-1);
-	}
-	else if (WSAGetLastError() == WSAEWOULDBLOCK)
-	{
-	  if (!http->timeout_cb ||
-	      !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = WSAEWOULDBLOCK;
-	    return (-1);
-	  }
-	}
-#else
-	if (errno == EWOULDBLOCK || errno == EAGAIN)
-	{
-	  if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	  else if (!http->timeout_cb && errno != EAGAIN)
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	}
-	else if (errno != EINTR)
-	{
-	  http->error = errno;
-	  return (-1);
-	}
-#endif /* WIN32 */
-      }
-    }
-    while (bytes < 0);
-
-    DEBUG_printf(("2httpRead2: Read " CUPS_LLFMT " bytes into buffer.",
-                  CUPS_LLCAST bytes));
-#ifdef DEBUG
-    http_debug_hex("httpRead2", http->buffer, (int)bytes);
-#endif /* DEBUG */
-
-    http->used = bytes;
-  }
-
-#ifdef HAVE_LIBZ
-  if (http->coding)
-  {
-    int		zerr;			/* Decompressor error */
-    off_t	comp_avail,		/* Maximum bytes for decompression */
-		comp_bytes;		/* Compressed bytes "used" */
-
-    if (http->used > http->data_remaining)
-      comp_avail = http->data_remaining;
-    else
-      comp_avail = http->used;
-
-    DEBUG_printf(("2httpRead2: length=%d, avail_in=%d", (int)length,
-                  (int)comp_avail));
-
-    http->stream.next_in   = (Bytef *)http->buffer;
-    http->stream.avail_in  = comp_avail;
-    http->stream.next_out  = (Bytef *)buffer;
-    http->stream.avail_out = length;
-
-    if ((zerr = inflate(&(http->stream), Z_SYNC_FLUSH)) < Z_OK)
-    {
-      DEBUG_printf(("2httpRead2: zerr=%d", zerr));
-      http->error = EIO;
-      return (-1);
-    }
-
-    bytes      = length - http->stream.avail_out;
-    comp_bytes = comp_avail - http->stream.avail_in;
-
-    DEBUG_printf(("2httpRead2: avail_in=%d, avail_out=%d, bytes=%d, "
-                  "comp_bytes=%d", http->stream.avail_in,
-                  http->stream.avail_out, (int)bytes, (int)comp_bytes));
-
-    if ((http->used - comp_bytes) > 0)
-    {
-      http->used -= comp_bytes;
-      memmove(http->buffer, http->stream.next_in, http->used);
-    }
-    else
-      http->used = 0;
-
-   /*
-    * Adjust remaining bytes since chunk/content lengths are compressed while
-    * CUPS HTTP APIs return uncompressed sizes...
-    */
-
-    http->data_remaining += bytes - comp_bytes;
-  }
-  else
-#endif /* HAVE_LIBZ */
-  if (http->used > 0)
-  {
-    if (length > (size_t)http->used)
-      length = (size_t)http->used;
-
-    bytes = (ssize_t)length;
-
-    DEBUG_printf(("2httpRead2: grabbing %d bytes from input buffer...",
-                  (int)bytes));
-
-    memcpy(buffer, http->buffer, length);
-    http->used -= (int)length;
-
-    if (http->used > 0)
-      memmove(http->buffer, http->buffer + length, http->used);
-  }
-#ifdef HAVE_SSL
-  else if (http->tls)
-  {
-    if (!http->blocking)
-    {
-      while (!httpWait(http, http->wait_value))
-      {
-	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
-	  continue;
-
-	return (0);
-      }
-    }
-
-    while ((bytes = (ssize_t)http_read_ssl(http, buffer, (int)length)) < 0)
-    {
-#ifdef WIN32
-      if (WSAGetLastError() == WSAEWOULDBLOCK)
-      {
-        if (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-      }
-      else if (WSAGetLastError() != WSAEINTR)
-        break;
-#else
-      if (errno == EWOULDBLOCK || errno == EAGAIN)
-      {
-        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-        else if (!http->timeout_cb && errno != EAGAIN)
-	  break;
-      }
-      else if (errno != EINTR)
-        break;
-#endif /* WIN32 */
-    }
-  }
-#endif /* HAVE_SSL */
-  else
-  {
-    if (!http->blocking)
-    {
-      while (!httpWait(http, http->wait_value))
-      {
-	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
-	  continue;
-
-	return (0);
-      }
-    }
-
-    DEBUG_printf(("2httpRead2: reading " CUPS_LLFMT " bytes from socket...",
-                  CUPS_LLCAST length));
-
-#ifdef WIN32
-    while ((bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0)) < 0)
-    {
-      if (WSAGetLastError() == WSAEWOULDBLOCK)
-      {
-        if (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-      }
-      else if (WSAGetLastError() != WSAEINTR)
-        break;
-    }
-#else
-    while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
-    {
-      if (errno == EWOULDBLOCK || errno == EAGAIN)
-      {
-        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-        else if (!http->timeout_cb && errno != EAGAIN)
-	  break;
-      }
-      else if (errno != EINTR)
-        break;
-    }
-#endif /* WIN32 */
-
-    DEBUG_printf(("2httpRead2: read " CUPS_LLFMT " bytes from socket...",
-                  CUPS_LLCAST bytes));
-#ifdef DEBUG
-    http_debug_hex("httpRead2", buffer, (int)bytes);
-#endif /* DEBUG */
-  }
-
-  if (bytes > 0)
-  {
-    http->data_remaining -= bytes;
-
-    if (http->data_remaining <= INT_MAX)
-      http->_data_remaining = (int)http->data_remaining;
-    else
-      http->_data_remaining = INT_MAX;
-  }
-  else if (bytes < 0)
-  {
-#ifdef WIN32
-    if (WSAGetLastError() == WSAEINTR)
-      bytes = 0;
-    else
-      http->error = WSAGetLastError();
-#else
-    if (errno == EINTR || (errno == EAGAIN && !http->timeout_cb))
-      bytes = 0;
-    else
-      http->error = errno;
-#endif /* WIN32 */
-  }
-  else
-  {
-    http->error = EPIPE;
-    return (0);
-  }
-
-  if (http->data_remaining <= 0)
-  {
-    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-    {
-      DEBUG_puts("1httpRead2: Reading trailing line for chunk.");
-      httpGets(len, sizeof(len), http);
-    }
-    else
-    {
-#ifdef HAVE_LIBZ
-      if (http->coding)
-	http_content_coding_finish(http);
-#endif /* HAVE_LIBZ */
-
-      if (http->state == HTTP_STATE_POST_RECV)
-        http->state ++;
-      else
-        http->state = HTTP_STATE_WAITING;
-
-      DEBUG_printf(("1httpRead2: End of content, set state to %s.",
-                    http_states[http->state + 1]));
-    }
+    DEBUG_printf(("1httpRead2: End of content, set state to %s.",
+		  http_states[http->state + 1]));
   }
 
   return (bytes);
@@ -3809,6 +3599,14 @@ httpWait(http_t *http,			/* I - Connection to server */
     return (1);
   }
 
+#ifdef HAVE_LIBZ
+  if (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in > 0)
+  {
+    DEBUG_puts("3httpWait: Returning 1 since there is buffered data ready.");
+    return (1);
+  }
+#endif /* HAVE_LIBZ */
+
  /*
   * Flush pending data, if any...
   */
@@ -4475,6 +4273,8 @@ http_content_coding_finish(
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
         inflateEnd(&(http->stream));
+        free(http->dbuffer);
+        http->dbuffer = NULL;
         break;
 
     default :
@@ -4563,12 +4363,26 @@ http_content_coding_start(
 
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
-        if ((zerr = inflateInit2(&(http->stream), 32 + 15)) < Z_OK)
+        if ((http->dbuffer = malloc(HTTP_MAX_BUFFER)) == NULL)
         {
           http->status = HTTP_ERROR;
-          http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
+          http->error  = errno;
           return;
         }
+
+        if ((zerr = inflateInit2(&(http->stream),
+                                 coding == _HTTP_CODING_INFLATE ? 15 : 31))
+		< Z_OK)
+        {
+          free(http->dbuffer);
+          http->dbuffer = NULL;
+          http->status  = HTTP_ERROR;
+          http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
+          return;
+        }
+
+        http->stream.avail_in = 0;
+        http->stream.next_in  = http->dbuffer;
         break;
 
     default :
@@ -4655,6 +4469,231 @@ http_field(const char *name)		/* I - String name */
       return ((http_field_t)i);
 
   return (HTTP_FIELD_UNKNOWN);
+}
+
+
+/*
+ * 'http_read()' - Read a buffer from a HTTP connection.
+ *
+ * This function does the low-level read from the socket, retrying and timing
+ * out as needed.
+ */
+
+static ssize_t				/* O - Number of bytes read or -1 on error */
+http_read(http_t *http,			/* I - Connection to server */
+          char   *buffer,		/* I - Buffer */
+          size_t length)		/* I - Maximum bytes to read */
+{
+  ssize_t	bytes;			/* Bytes read */
+
+
+  DEBUG_printf(("http_read(http=%p, buffer=%p, length=" CUPS_LLFMT ")", http,
+                buffer, CUPS_LLCAST length));
+
+  if (!http->blocking)
+  {
+    while (!httpWait(http, http->wait_value))
+    {
+      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	continue;
+
+      DEBUG_puts("2http_read: Timeout.");
+      return (0);
+    }
+  }
+
+  DEBUG_printf(("2http_read: Reading %d bytes into buffer.", (int)length));
+
+  do
+  {
+#ifdef HAVE_SSL
+    if (http->tls)
+      bytes = http_read_ssl(http, buffer, length);
+    else
+#endif /* HAVE_SSL */
+    bytes = recv(http->fd, buffer, length, 0);
+
+    if (bytes < 0)
+    {
+#ifdef WIN32
+      if (WSAGetLastError() != WSAEINTR)
+      {
+	http->error = WSAGetLastError();
+	return (-1);
+      }
+      else if (WSAGetLastError() == WSAEWOULDBLOCK)
+      {
+	if (!http->timeout_cb ||
+	    !(*http->timeout_cb)(http, http->timeout_data))
+	{
+	  http->error = WSAEWOULDBLOCK;
+	  return (-1);
+	}
+      }
+#else
+      DEBUG_printf(("2http_read: %s", strerror(errno)));
+
+      if (errno == EWOULDBLOCK || errno == EAGAIN)
+      {
+	if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+	else if (!http->timeout_cb && errno != EAGAIN)
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+      }
+      else if (errno != EINTR)
+      {
+	http->error = errno;
+	return (-1);
+      }
+#endif /* WIN32 */
+    }
+  }
+  while (bytes < 0);
+
+  DEBUG_printf(("2http_read: Read " CUPS_LLFMT " bytes into buffer.",
+		CUPS_LLCAST bytes));
+#ifdef DEBUG
+  if (bytes > 0)
+    http_debug_hex("http_read", http->buffer, (int)bytes);
+#endif /* DEBUG */
+
+  if (bytes < 0)
+  {
+#ifdef WIN32
+    if (WSAGetLastError() == WSAEINTR)
+      bytes = 0;
+    else
+      http->error = WSAGetLastError();
+#else
+    if (errno == EINTR || (errno == EAGAIN && !http->timeout_cb))
+      bytes = 0;
+    else
+      http->error = errno;
+#endif /* WIN32 */
+  }
+  else if (bytes == 0)
+  {
+    http->error = EPIPE;
+    return (0);
+  }
+
+  return (bytes);
+}
+
+
+/*
+ * 'http_read_buffered()' - Do a buffered read from a HTTP connection.
+ *
+ * This function reads data from the HTTP buffer or from the socket, as needed.
+ */
+
+static ssize_t				/* O - Number of bytes read or -1 on error */
+http_read_buffered(http_t *http,	/* I - Connection to server */
+                   char   *buffer,	/* I - Buffer */
+                   size_t length)	/* I - Maximum bytes to read */
+{
+  ssize_t	bytes;			/* Bytes read */
+
+
+  DEBUG_printf(("http_read_buffered(http=%p, buffer=%p, length=" CUPS_LLFMT
+                ") used=%d",
+                http, buffer, CUPS_LLCAST length, http->used));
+
+  if (http->used > 0)
+  {
+    if (length > (size_t)http->used)
+      bytes = (size_t)http->used;
+    else
+      bytes = length;
+
+    DEBUG_printf(("2http_read: Grabbing %d bytes from input buffer.",
+                  (int)bytes));
+
+    memcpy(buffer, http->buffer, bytes);
+    http->used -= (int)bytes;
+
+    if (http->used > 0)
+      memmove(http->buffer, http->buffer + bytes, http->used);
+  }
+  else
+    bytes = http_read(http, buffer, length);
+
+  return (bytes);
+}
+
+
+/*
+ * 'http_read_chunk()' - Read a chunk from a HTTP connection.
+ *
+ * This function reads and validates the chunk length, then does a buffered read
+ * returning the number of bytes placed in the buffer.
+ */
+
+static ssize_t				/* O - Number of bytes read or -1 on error */
+http_read_chunk(http_t *http,		/* I - Connection to server */
+		char   *buffer,		/* I - Buffer */
+		size_t length)		/* I - Maximum bytes to read */
+{
+  DEBUG_printf(("http_read_chunk(http=%p, buffer=%p, length=" CUPS_LLFMT ")",
+                http, buffer, CUPS_LLCAST length));
+
+  if (http->data_remaining <= 0)
+  {
+    char	len[32];		/* Length string */
+
+    if (!httpGets(len, sizeof(len), http))
+    {
+      DEBUG_puts("1http_read_chunk: Could not get chunk length.");
+      return (0);
+    }
+
+    if (!len[0])
+    {
+      DEBUG_puts("1http_read_chunk: Blank chunk length, trying again...");
+      if (!httpGets(len, sizeof(len), http))
+      {
+	DEBUG_puts("1http_read_chunk: Could not get chunk length.");
+	return (0);
+      }
+    }
+
+    http->data_remaining = strtoll(len, NULL, 16);
+
+    if (http->data_remaining < 0)
+    {
+      DEBUG_printf(("1http_read_chunk: Negative chunk length \"%s\" ("
+                    CUPS_LLFMT ")", len, CUPS_LLCAST http->data_remaining));
+      return (0);
+    }
+
+    DEBUG_printf(("2http_read_chunk: Got chunk length \"%s\" (" CUPS_LLFMT ")",
+                  len, CUPS_LLCAST http->data_remaining));
+
+    if (http->data_remaining == 0)
+    {
+     /*
+      * 0-length chunk, grab trailing blank line...
+      */
+
+      httpGets(len, sizeof(len), http);
+    }
+  }
+
+  DEBUG_printf(("2http_read_chunk: data_remaining=" CUPS_LLFMT,
+                CUPS_LLCAST http->data_remaining));
+
+  if (http->data_remaining <= 0)
+    return (0);
+  else if (length > (size_t)http->data_remaining)
+    length = (size_t)http->data_remaining;
+
+  return (http_read_buffered(http, buffer, length));
 }
 
 
@@ -5124,8 +5163,6 @@ http_set_wait(http_t *http)		/* I - Connection to server */
 static int				/* O - 0 on success, -1 on failure */
 http_setup_ssl(http_t *http)		/* I - Connection to server */
 {
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Pointer to library globals */
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
 
@@ -5138,6 +5175,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
   OSStatus		error;		/* Error code */
   const char		*message = NULL;/* Error message */
   cups_array_t		*credentials;	/* Credentials array */
@@ -5667,17 +5706,17 @@ http_upgrade(http_t *http)		/* I - Connection to server */
  * 'http_write()' - Write a buffer to a HTTP connection.
  */
 
-static int				/* O - Number of bytes written */
+static ssize_t				/* O - Number of bytes written */
 http_write(http_t     *http,		/* I - Connection to server */
            const char *buffer,		/* I - Buffer for data */
-	   int        length)		/* I - Number of bytes to write */
+	   size_t     length)		/* I - Number of bytes to write */
 {
-  int	tbytes,				/* Total bytes sent */
-	bytes;				/* Bytes sent */
+  ssize_t	tbytes,			/* Total bytes sent */
+		bytes;			/* Bytes sent */
 
 
-  DEBUG_printf(("2http_write(http=%p, buffer=%p, length=%d)", http, buffer,
-                length));
+  DEBUG_printf(("2http_write(http=%p, buffer=%p, length=" CUPS_LLFMT ")", http,
+                buffer, CUPS_LLCAST length));
   http->error = 0;
   tbytes      = 0;
 
@@ -5749,8 +5788,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 #endif /* HAVE_SSL */
     bytes = send(http->fd, buffer, length, 0);
 
-    DEBUG_printf(("3http_write: Write of %d bytes returned %d.", (int)length,
-                  (int)bytes));
+    DEBUG_printf(("3http_write: Write of " CUPS_LLFMT " bytes returned "
+                  CUPS_LLFMT ".", CUPS_LLCAST length, CUPS_LLCAST bytes));
 
     if (bytes < 0)
     {
@@ -5805,7 +5844,7 @@ http_write(http_t     *http,		/* I - Connection to server */
   http_debug_hex("http_write", buffer - tbytes, tbytes);
 #endif /* DEBUG */
 
-  DEBUG_printf(("3http_write: Returning %d.", tbytes));
+  DEBUG_printf(("3http_write: Returning " CUPS_LLFMT ".", CUPS_LLCAST tbytes));
 
   return (tbytes);
 }
@@ -5815,38 +5854,38 @@ http_write(http_t     *http,		/* I - Connection to server */
  * 'http_write_chunk()' - Write a chunked buffer.
  */
 
-static int				/* O - Number bytes written */
+static ssize_t				/* O - Number bytes written */
 http_write_chunk(http_t     *http,	/* I - Connection to server */
                  const char *buffer,	/* I - Buffer to write */
-		 int        length)	/* I - Length of buffer */
+		 size_t        length)	/* I - Length of buffer */
 {
-  char	header[255];			/* Chunk header */
-  int	bytes;				/* Bytes written */
+  char		header[16];		/* Chunk header */
+  ssize_t	bytes;			/* Bytes written */
 
 
-  DEBUG_printf(("7http_write_chunk(http=%p, buffer=%p, length=%d)",
-                http, buffer, length));
+  DEBUG_printf(("7http_write_chunk(http=%p, buffer=%p, length=" CUPS_LLFMT ")",
+                http, buffer, CUPS_LLCAST length));
 
  /*
   * Write the chunk header, data, and trailer.
   */
 
-  sprintf(header, "%x\r\n", length);
-  if (http_write(http, header, (int)strlen(header)) < 0)
+  snprintf(header, sizeof(header), "%x\r\n", (unsigned)length);
+  if (http_write(http, header, strlen(header)) < 0)
   {
-    DEBUG_puts("8http_write_chunk: http_write of length failed!");
+    DEBUG_puts("8http_write_chunk: http_write of length failed.");
     return (-1);
   }
 
   if ((bytes = http_write(http, buffer, length)) < 0)
   {
-    DEBUG_puts("8http_write_chunk: http_write of buffer failed!");
+    DEBUG_puts("8http_write_chunk: http_write of buffer failed.");
     return (-1);
   }
 
   if (http_write(http, "\r\n", 2) < 0)
   {
-    DEBUG_puts("8http_write_chunk: http_write of CR LF failed!");
+    DEBUG_puts("8http_write_chunk: http_write of CR LF failed.");
     return (-1);
   }
 

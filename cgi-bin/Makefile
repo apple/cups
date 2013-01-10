@@ -154,6 +154,7 @@ install-libs: $(INSTALLSTATIC)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSCGI) $(SYMROOT); \
+		dsymutil $(SYMROOT)/$(LIBCUPSCGI); \
 	fi
 
 installstatic:

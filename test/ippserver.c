@@ -93,6 +93,7 @@
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <poll.h>

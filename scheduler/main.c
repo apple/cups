@@ -952,7 +952,7 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       cupsdDeleteCert(0);
-      cupsdAddCert(0, "root", NULL);
+      cupsdAddCert(0, "root", cupsdDefaultAuthType());
     }
 #endif /* !HAVE_AUTHORIZATION_H */
 
@@ -1143,23 +1143,6 @@ main(int  argc,				/* I - Number of command-line args */
   if (use_sysman)
     cupsdStopSystemMonitor();
 #endif /* __APPLE__ */
-
-#ifdef HAVE_GSSAPI
- /*
-  * Free the scheduler's Kerberos context...
-  */
-
-#  ifdef __APPLE__
- /*
-  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-  * to use it...
-  */
-
-  if (krb5_init_context != NULL)
-#  endif /* __APPLE__ */
-  if (KerberosContext)
-    krb5_free_context(KerberosContext);
-#endif /* HAVE_GSSAPI */
 
   cupsdStopSelect();
 

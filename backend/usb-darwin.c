@@ -151,9 +151,9 @@ struct crashreporter_annotations_t {
 	uint64_t dialog_mode;		// unsigned int
 };
 
-CRASH_REPORTER_CLIENT_HIDDEN 
-struct crashreporter_annotations_t gCRAnnotations 
-	__attribute__((section("__DATA," CRASHREPORTER_ANNOTATIONS_SECTION))) 
+CRASH_REPORTER_CLIENT_HIDDEN
+struct crashreporter_annotations_t gCRAnnotations
+	__attribute__((section("__DATA," CRASHREPORTER_ANNOTATIONS_SECTION)))
 	= { CRASHREPORTER_ANNOTATIONS_VERSION, 0, 0, 0, 0, 0, 0 };
 
 /*
@@ -280,6 +280,7 @@ typedef struct globals_s
  */
 
 globals_t g = { 0 };			/* Globals */
+int Iterating = 0;			/* Are we iterating the bus? */
 
 
 /*
@@ -1106,6 +1107,8 @@ sidechannel_thread(void *reference)
 static void iterate_printers(iterator_callback_t callBack,
 			     void *userdata)
 {
+  Iterating = 1;
+
   mach_port_t	masterPort = 0x0;
   kern_return_t kr = IOMasterPort (bootstrap_port, &masterPort);
 
@@ -1143,6 +1146,8 @@ static void iterate_printers(iterator_callback_t callBack,
     }
     mach_port_deallocate(mach_task_self(), masterPort);
   }
+
+  Iterating = 0;
 }
 
 
@@ -1431,7 +1436,7 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 
   _cups_fc_result_t result = _cupsFileCheck(bundlestr,
                                             _CUPS_FILE_CHECK_DIRECTORY, 1,
-                                            _cupsFileCheckFilter, NULL);
+                                            Iterating ? NULL : _cupsFileCheckFilter, NULL);
 
   if (result && driverPath)
     return (load_classdriver(NULL, interface, printerDriver));
