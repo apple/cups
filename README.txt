@@ -1,8 +1,15 @@
-README - CUPS v1.7b1 - 2012-08-10
+README - CUPS v1.7b1 - 2013-01-11
 ---------------------------------
 
-Looking for compile instructions?  Read the file "INSTALL.txt"
-instead...
+************************************************
+************************************************
+****                                        ****
+****  BETA SOFTWARE - USE AT YOUR OWN RISK  ****
+****                                        ****
+************************************************
+************************************************
+
+Looking for compile instructions?  Read the file "INSTALL.txt" instead...
 
 
 INTRODUCTION
