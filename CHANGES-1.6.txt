@@ -8,6 +8,7 @@ CHANGES IN CUPS V1.6.2
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
 	- Added a French localization (STR #4247)
+	- Added a Russian localization (STR #4228)
 	- The ipptool program now supports DEFINE-MATCH and DEFINE-NO-MATCH
 	  predicates for STATUS directives.
 	- Fixed a problem with local Kerberos authentication (STR #4140)
