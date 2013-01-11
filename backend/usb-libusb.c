@@ -173,6 +173,8 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH |
 	                  USBLP_QUIRK_RESET },
+	{ 0x0924, 0x3ce9, USBLP_QUIRK_NO_REATTACH }, /* Xerox Phaser 3124
+			  https://bugzilla.redhat.com/show_bug.cgi?id=867392 */
 	/* Prolific Technology, Inc. PL2305 Parallel Port
 	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
 	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices,
