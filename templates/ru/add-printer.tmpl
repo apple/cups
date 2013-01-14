@@ -1,0 +1,47 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Add Printer</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+{?current_make!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE" VALUE="{current_make}">:}
+{?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Название:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
+<SMALL>(может содержать любые символы кроме "/","#" и пробела)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Описание:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_INFO}"><BR>
+<SMALL>(расширенное описание, например "HP LaserJet с дуплексной печатью")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Расположение:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_LOCATION}"><BR>
+<SMALL>(месторасположение принтера, например, "Кабинет 55")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Подключение:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Совместный доступ:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
+Разрешить совместный доступ к этому принтеру</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Продолжить"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

@@ -131,13 +131,10 @@
 
 
 /*
- * Do we have various image libraries?
+ * Do we have ZLIB?
  */
 
-#undef HAVE_LIBPNG
 #undef HAVE_LIBZ
-#undef HAVE_LIBJPEG
-#undef HAVE_LIBTIFF
 
 
 /*

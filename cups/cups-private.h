@@ -3,7 +3,7 @@
  *
  *   Private definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -92,9 +92,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   int			thread_id;	/* Friendly thread ID */
 #  endif /* DEBUG */
 
-  /* dest.c, util.c */
-  int			server_version;	/* Server IPP version */
-
   /* file.c */
   cups_file_t		*stdio_files[3];/* stdin, stdout, stderr */
 
@@ -167,7 +164,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   cups_server_cert_cb_t	server_cert_cb;	/* Server certificate callback */
   void			*server_cert_data;
 					/* Server certificate user data */
-  int			any_root,	/* Allow any root */
+  int			server_version,	/* Server IPP version */
+			any_root,	/* Allow any root */
 			expired_certs,	/* Allow expired certs */
 			expired_root;	/* Allow expired root */
 

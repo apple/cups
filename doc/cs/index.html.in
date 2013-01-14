@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Hlavní strana - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Hlavní strana&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administrace&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Třídy tiskáren&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Nápověda&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Úlohy&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Tiskárny&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Hledat"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>CUPS je na bázi standardů otevřený zdrojový kód tiskového systému vyvinutý
+společností <A HREF="http://www.apple.com/">Apple Inc.</A> pro Mac OS<SUP>&reg;</SUP>
+X a jiné UNIX<SUP>&reg;</SUP>ové operační systémy.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS pro uživatele</H2>
+
+<P><A HREF="help/overview.html">Popis CUPS</A></P>
+
+<P><A HREF="help/options.html">Příkazová řádka tisku a Možnosti</A></P>
+
+<P><A HREF="help/whatsnew.html">Co je nového v CUPS 1.6</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Uživatelské fórum</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS pro administrátory</H2>
+
+<P><A HREF="admin">Přidání tiskáren a tříd</A></P>
+
+<P><A HREF="help/policies.html">Správa politik</A></P>
+
+<P><A HREF="help/accounting.html">Základní účtování tiskáren</A></P>
+
+<P><A HREF="help/security.html">Zabezpečení serveru</A></P>
+
+<P><A HREF="help/kerberos.html">Použití ověřování pomocí protokolu Kerberos</A></P>
+
+<P><A HREF="help/network.html">Použití síťových tiskáren</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">Konfigurační soubor cupsd.conf</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Hedat ovladače tiskárny</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS pro vývojáře</H2>
+
+<P><A HREF="help/api-overview.html">Úvod do CUPS programování</A></P>
+
+<P><A HREF="help/api-cups.html">CUPS API knihovny</A></P>
+
+<P><A HREF="help/api-filter.html">Programování filtrů a backendů</A></P>
+
+<P><A HREF="help/api-httpipp.html">HTTP a IPP API knihovny</A></P>
+
+<P><A HREF="help/api-ppd.html">PPD API knihovny</A></P>
+
+<P><A HREF="help/api-raster.html">Raster API knihovny</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">PPD kompilátor Driver Information File Reference</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Vývojářské fórum</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">CUPS a logo CUPS jsou ochranné známky společnosti
+<A HREF="http://www.apple.com">Apple Inc.</A> CUPS je chráněn autorskými
+právy 2007-2013 Apple Inc. Všechna práva vyhrazena.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

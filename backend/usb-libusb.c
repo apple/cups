@@ -3,7 +3,7 @@
  *
  *   LIBUSB interface code for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -122,6 +122,7 @@ struct quirk_printer_struct {
 #define USBLP_QUIRK_USB_INIT	0x2	/* needs vendor USB init string */
 #define USBLP_QUIRK_BAD_CLASS	0x4	/* descriptor uses vendor-specific
 					   Class or SubClass */
+#define USBLP_QUICK_BLACKLIST	0x8	/* these printers do not conform to the USB print spec */
 #define USBLP_QUIRK_RESET	0x4000	/* After printing do a reset
 					   for clean-up */
 #define USBLP_QUIRK_NO_REATTACH	0x8000	/* After printing we cannot re-attach
@@ -172,12 +173,43 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH |
 	                  USBLP_QUIRK_RESET },
+	{ 0x0924, 0x3ce9, USBLP_QUIRK_NO_REATTACH }, /* Xerox Phaser 3124
+			  https://bugzilla.redhat.com/show_bug.cgi?id=867392 */
 	/* Prolific Technology, Inc. PL2305 Parallel Port
 	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
 	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices,
 				     https://bugs.launchpad.net/bugs/1032456 */
 	{ 0x0a5f, 0x0000, USBLP_QUIRK_BIDIR }, /* All Zebra devices,
 				     https://bugs.launchpad.net/bugs/1001028 */
+	/* Canon */
+	{ 0x04a9, 0x304a, USBLP_QUIRK_BLACKLIST }, /* Canon CP-10 */
+	{ 0x04a9, 0x3063, USBLP_QUIRK_BLACKLIST }, /* Canon CP-100 */
+	{ 0x04a9, 0x307c, USBLP_QUIRK_BLACKLIST }, /* Canon CP-200 */
+	{ 0x04a9, 0x307d, USBLP_QUIRK_BLACKLIST }, /* Canon CP-300 */
+	{ 0x04a9, 0x30bd, USBLP_QUIRK_BLACKLIST }, /* Canon CP-220 */
+	{ 0x04a9, 0x30be, USBLP_QUIRK_BLACKLIST }, /* Canon CP-330 */
+	{ 0x04a9, 0x30f6, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP400 */
+	{ 0x04a9, 0x310b, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP600 */
+	{ 0x04a9, 0x3127, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP710 */
+	{ 0x04a9, 0x3128, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP510 */
+	{ 0x04a9, 0x3141, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES1 */
+	{ 0x04a9, 0x3142, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP730 */
+	{ 0x04a9, 0x3143, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP720 */
+	{ 0x04a9, 0x3170, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP750 */
+	{ 0x04a9, 0x3171, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP740 */
+	{ 0x04a9, 0x3185, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES2 */
+	{ 0x04a9, 0x3186, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES20 */
+	{ 0x04a9, 0x31aa, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP770 */
+	{ 0x04a9, 0x31ab, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP760 */
+	{ 0x04a9, 0x31b0, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES30 */
+	{ 0x04a9, 0x31dd, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP780 */
+	{ 0x04a9, 0x31ee, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES40 */
+	{ 0x04a9, 0x3214, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP800 */
+	{ 0x04a9, 0x3255, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP900 */
+	{ 0x04a9, 0x3256, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP810 */
+	{ 0x04a9, 0x30F5, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP500 */
+	{ 0x04a9, 0x31AF, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES3 */
+	 /* MISSING PIDs: CP520, CP530, CP790 */
 	{ 0, 0 }
 };
 
@@ -889,7 +921,14 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
           !devdesc.idProduct)
 	continue;
 
-      printer.quirks   = quirks(devdesc.idVendor, devdesc.idProduct);
+      printer.quirks = quirks(devdesc.idVendor, devdesc.idProduct);
+
+     /*
+      * Ignore blacklisted printers...
+      */
+
+      if (printer.quirks & USBLP_QUIRK_BLACKLIST)
+        continue;
 
       for (conf = 0; conf < devdesc.bNumConfigurations; conf ++)
       {
