@@ -1945,7 +1945,18 @@ httpPeek(http_t *http,			/* I - Connection to server */
       return (0);
     }
 
+    if (!len[0])
+    {
+      DEBUG_puts("1httpPeek: Blank chunk length, trying again...");
+      if (!httpGets(len, sizeof(len), http))
+      {
+	DEBUG_puts("1httpPeek: Could not get chunk length.");
+	return (0);
+      }
+    }
+
     http->data_remaining = strtoll(len, NULL, 16);
+
     if (http->data_remaining < 0)
     {
       DEBUG_puts("1httpPeek: Negative chunk length!");
@@ -2020,64 +2031,18 @@ httpPeek(http_t *http,			/* I - Connection to server */
       buflen = http->data_remaining;
 
     DEBUG_printf(("2httpPeek: Reading %d bytes into buffer.", (int)buflen));
-
-    do
-    {
-#ifdef HAVE_SSL
-      if (http->tls)
-	bytes = http_read_ssl(http, http->buffer, buflen);
-      else
-#endif /* HAVE_SSL */
-      bytes = recv(http->fd, http->buffer, buflen, 0);
-
-      if (bytes < 0)
-      {
-#ifdef WIN32
-	if (WSAGetLastError() != WSAEINTR)
-	{
-	  http->error = WSAGetLastError();
-	  return (-1);
-	}
-	else if (WSAGetLastError() == WSAEWOULDBLOCK)
-	{
-	  if (!http->timeout_cb ||
-	      !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = WSAEWOULDBLOCK;
-	    return (-1);
-	  }
-	}
-#else
-	if (errno == EWOULDBLOCK || errno == EAGAIN)
-	{
-	  if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	  else if (!http->timeout_cb && errno != EAGAIN)
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	}
-	else if (errno != EINTR)
-	{
-	  http->error = errno;
-	  return (-1);
-	}
-#endif /* WIN32 */
-      }
-    }
-    while (bytes < 0);
+    bytes = http_read(http, http->buffer, buflen);
 
     DEBUG_printf(("2httpPeek: Read " CUPS_LLFMT " bytes into buffer.",
                   CUPS_LLCAST bytes));
+    if (bytes > 0)
+    {
 #ifdef DEBUG
-    http_debug_hex("httpPeek", http->buffer, (int)bytes);
+      http_debug_hex("httpPeek", http->buffer, (int)bytes);
 #endif /* DEBUG */
 
-    http->used = bytes;
+      http->used = bytes;
+    }
   }
 
 #ifdef HAVE_LIBZ
@@ -2181,10 +2146,6 @@ httpPeek(http_t *http,			/* I - Connection to server */
     http->error = EPIPE;
     return (0);
   }
-
-#ifdef DEBUG
-  http_debug_hex("httpPeek", buffer, (int)bytes);
-#endif /* DEBUG */
 
   return (bytes);
 }
