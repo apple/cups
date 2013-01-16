@@ -152,6 +152,7 @@
 #  include <signal.h>
 #  include <sys/time.h>
 #  include <sys/resource.h>
+#  include <sys/utsname.h>
 #endif /* WIN32 */
 #ifdef HAVE_POLL
 #  include <poll.h>
@@ -4792,9 +4793,46 @@ http_send(http_t       *http,		/* I - Connection to server */
   */
 
   if (!http->fields[HTTP_FIELD_USER_AGENT][0])
-    httpSetField(http, HTTP_FIELD_USER_AGENT,
-                 http->default_user_agent ? http->default_user_agent :
-                                            CUPS_MINIMAL);
+  {
+    if (http->default_user_agent)
+    {
+      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_user_agent);
+    }
+    else
+    {
+#ifdef WIN32
+      SYSTEM_INFO	sysinfo;	/* System information */
+      OSVERSIONEX	version;	/* OS version info */
+
+      version.dwOSVersionInfoSize = sizeof(OSVERSIONEX);
+      GetVersionInfoEx(&version);
+      GetNativeSystemInfo(&sysinfo);
+
+      snprintf(buf, sizeof(buf), CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0",
+               version.major, version.minor,
+               sysinfo.wProcessorArchitecture
+                   == PROCESSOR_ARCHITECTURE_AMD64 ? "amd64" :
+                   sysinfo.wProcessorArchitecture
+                       == PROCESSOR_ARCHITECTURE_ARM ? "arm" :
+                   sysinfo.wProcessorArchitecture
+                       == PROCESSOR_ARCHITECTURE_IA64 ? "ia64" :
+                   sysinfo.wProcessorArchitecture
+                       == PROCESSOR_ARCHITECTURE_INTEL ? "intel" :
+                   "unknown");
+
+#else
+      struct utsname	name;		/* uname info */
+
+      uname(&name);
+
+      snprintf(buf, sizeof(buf), CUPS_MINIMAL " (%s %s; %s) IPP/2.0",
+               name.sysname, name.release, name.machine);
+#endif /* WIN32 */
+
+      DEBUG_printf(("8http_send: Default User-Agent: %s", buf));
+      httpSetField(http, HTTP_FIELD_USER_AGENT, buf);
+    }
+  }
 
  /*
   * Set the Accept-Encoding field if it isn't already...
