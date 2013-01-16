@@ -4948,61 +4948,6 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   if ((credentials = http->tls_credentials) == NULL)
     credentials = cg->tls_credentials;
 
- /*
-  * Otherwise root around in the user's keychain to see if one can be found...
-  */
-
-  if (!credentials)
-  {
-    CFDictionaryRef	query;		/* Query dictionary */
-    CFTypeRef		matches = NULL;	/* Matching credentials */
-    CFArrayRef		dn_array = NULL;/* Distinguished names array */
-    CFTypeRef		keys[]   = { kSecClass,
-				     kSecMatchLimit,
-				     kSecReturnRef };
-					/* Keys for dictionary */
-    CFTypeRef		values[] = { kSecClassCertificate,
-				     kSecMatchLimitOne,
-				     kCFBooleanTrue };
-					/* Values for dictionary */
-
-   /*
-    * Get the names associated with the server.
-    */
-
-    if ((error = SSLCopyDistinguishedNames(http->tls, &dn_array)) != noErr)
-    {
-      DEBUG_printf(("4http_set_credentials: SSLCopyDistinguishedNames, error=%d",
-                    (int)error));
-      return (error);
-    }
-
-   /*
-    * Create a query which will return all identities that can sign and match
-    * the passed in policy.
-    */
-
-    query = CFDictionaryCreate(NULL,
-			       (const void**)(&keys[0]),
-			       (const void**)(&values[0]),
-			       sizeof(keys) / sizeof(keys[0]),
-			       &kCFTypeDictionaryKeyCallBacks,
-			       &kCFTypeDictionaryValueCallBacks);
-    if (query)
-    {
-      error = SecItemCopyMatching(query, &matches);
-      DEBUG_printf(("4http_set_credentials: SecItemCopyMatching, error=%d",
-		    (int)error));
-      CFRelease(query);
-    }
-
-    if (matches)
-      CFRelease(matches);
-
-    if (dn_array)
-      CFRelease(dn_array);
-  }
-
   if (credentials)
   {
     error = SSLSetCertificate(http->tls, credentials);
