@@ -370,7 +370,8 @@ httpAddrCopyList(
     else
       dst = current;
 
-    src = src->next;
+    prev = current;
+    src  = src->next;
   }
 
   return (dst);
