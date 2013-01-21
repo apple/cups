@@ -1,8 +1,9 @@
-CHANGES.txt - 1.7b1 - 2012-12-11
+CHANGES.txt - 1.7b1 - 2013-01-21
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- Added a new "-x" option to the cancel command (STR #4103)
 	- Added new IPP APIs for checking values (STR #4167)
 	- Added new IPP APis for adding and setting formatted strings.
 	- Added new HTTP APIs to support basic server functionality via libcups.

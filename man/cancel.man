@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cancel 1 "CUPS" "20 March 2006" "Apple Inc."
+.TH cancel 1 "CUPS" "21 January 2013" "Apple Inc."
 .SH NAME
 cancel - cancel jobs
 .SH SYNOPSIS
@@ -23,7 +23,7 @@ cancel - cancel jobs
 .I hostname[:port]
 ] [ -u
 .I username
-] [
+] [ -x ] [
 .I id
 ] [
 .I destination
@@ -56,6 +56,10 @@ Chooses an alternate server.
 -u username
 .br
 Cancels jobs owned by \fIusername\fR.
+.TP 5
+-x
+.br
+Deletes job data files in addition to canceling.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to
 contain any printable character except SPACE, TAB, "/", or "#".

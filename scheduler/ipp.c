@@ -3,7 +3,7 @@
  *
  *   IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -3286,8 +3286,12 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     {
       for (i = 0; i < job_ids->num_values; i ++)
       {
-	if (!cupsdFindJob(job_ids->values[i].integer))
+	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
 	  break;
+
+        if (con->request->request.op.operation_id == IPP_CANCEL_MY_JOBS &&
+            _cups_strcasecmp(job->username, username))
+          break;
       }
 
       if (i < job_ids->num_values)
@@ -3343,6 +3347,10 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL ||
 	    _cups_strcasecmp(job->dest, printer->name))
 	  break;
+
+        if (con->request->request.op.operation_id == IPP_CANCEL_MY_JOBS &&
+            _cups_strcasecmp(job->username, username))
+          break;
       }
 
       if (i < job_ids->num_values)

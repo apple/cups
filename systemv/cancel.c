@@ -3,7 +3,7 @@
  *
  *   "cancel" command for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -101,8 +101,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'a' : /* Cancel all jobs */
-	    purge = 1;
-	    op    = IPP_PURGE_JOBS;
+	    op = IPP_CANCEL_JOBS;
 	    break;
 
         case 'h' : /* Connect to host */
@@ -149,6 +148,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      else
 		user = argv[i];
 	    }
+	    break;
+
+        case 'x' : /* Purge job(s) */
+	    purge = 1;
 	    break;
 
 	default :
@@ -271,19 +274,22 @@ main(int  argc,				/* I - Number of command-line arguments */
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                      "requesting-user-name", NULL, user);
 	ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
+
+        if (op == IPP_CANCEL_JOBS)
+          op = IPP_CANCEL_MY_JOBS;
       }
       else
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                      "requesting-user-name", NULL, cupsUser());
 
-      if (op == IPP_PURGE_JOBS)
+      if (purge)
 	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", purge);
 
      /*
       * Do the request and get back a response...
       */
 
-      if (op == IPP_PURGE_JOBS && (!user || _cups_strcasecmp(user, cupsUser())))
+      if (op == IPP_CANCEL_JOBS && (!user || _cups_strcasecmp(user, cupsUser())))
         response = cupsDoRequest(http, request, "/admin/");
       else
         response = cupsDoRequest(http, request, "/jobs/");
