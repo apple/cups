@@ -130,7 +130,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'u' : /* Username */
-	    op = IPP_PURGE_JOBS;
+	    op = IPP_CANCEL_MY_JOBS;
 
 	    if (argv[i][2] != '\0')
 	      user = argv[i] + 2;
