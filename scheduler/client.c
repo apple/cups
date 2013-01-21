@@ -1275,7 +1275,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       switch (con->http.state)
       {
 	case HTTP_GET_SEND :
-            if (!strncmp(con->uri, "/printers/", 10) &&
+            if ((!strncmp(con->uri, "/ppd/", 5) ||
+		 !strncmp(con->uri, "/printers/", 10)) &&
 		!strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
 	    {
 	     /*
@@ -1285,8 +1286,15 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
               con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
 
-              if ((p = cupsdFindPrinter(con->uri + 10)) != NULL)
+	      if (!strncmp(con->uri, "/ppd/", 5))
+		p = cupsdFindPrinter(con->uri + 5);
+	      else
+		p = cupsdFindPrinter(con->uri + 10);
+
+	      if (p)
+	      {
 		snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
+	      }
 	      else
 	      {
 		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
@@ -1298,7 +1306,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 	    }
-            else if ((!strncmp(con->uri, "/printers/", 10) ||
+            else if ((!strncmp(con->uri, "/icons/", 7) ||
+		      !strncmp(con->uri, "/printers/", 10) ||
 		      !strncmp(con->uri, "/classes/", 9)) &&
 		     !strcmp(con->uri + strlen(con->uri) - 4, ".png"))
 	    {
@@ -1309,7 +1318,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".png" */
 
-              if (!strncmp(con->uri, "/printers/", 10))
+              if (!strncmp(con->uri, "/icons/", 7))
+                p = cupsdFindPrinter(con->uri + 7);
+              else if (!strncmp(con->uri, "/printers/", 10))
                 p = cupsdFindPrinter(con->uri + 10);
               else
                 p = cupsdFindClass(con->uri + 9);
