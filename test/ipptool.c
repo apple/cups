@@ -2278,7 +2278,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (request->attrs)
       {
 	puts("<dict>");
-	for (attrptr = request->attrs, group = attrptr->group_tag;
+	for (attrptr = request->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	  print_attr(attrptr, &group);
@@ -2632,7 +2633,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
-	for (attrptr = response->attrs, group = attrptr->group_tag;
+	for (attrptr = response->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	{

@@ -12,6 +12,7 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228)
 	- Updated the Catalan localization (STR #4202)
+	- Fixed a bug where bad IPP responses could crash ipptool (STR #4262)
 	- Added a USB quirk rule for Xerox Phaser 3124 printers (STR #4217)
 	- Added USB blacklisting for printers that require a custom backend
 	  (STR #4218)

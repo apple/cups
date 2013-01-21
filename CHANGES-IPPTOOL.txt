@@ -1,4 +1,4 @@
-CHANGES-IPPTOOL.txt - 2013-01-10
+CHANGES-IPPTOOL.txt - 2013-01-21
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
@@ -14,6 +14,7 @@ on cups.org.
 	  requests.
 	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
 	  out.
+	- Fixed a bug where bad IPP responses would cause ipptool to crash.
 
 
 2012-02-28
