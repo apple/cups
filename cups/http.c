@@ -2340,8 +2340,13 @@ httpRead2(http_t *http,			/* I - Connection to server */
           else if (bytes == 0)
             break;
 
+          DEBUG_printf(("1httpRead2: Adding " CUPS_LLFMT " bytes to "
+                        "decompression buffer.", CUPS_LLCAST bytes));
+
           http->data_remaining  -= bytes;
           http->stream.avail_in += bytes;
+
+          bytes = 0;
         }
         else
           return (0);
