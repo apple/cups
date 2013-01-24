@@ -34,11 +34,13 @@
 #  ifdef WIN32
 #    include <io.h>
 #    include <winsock2.h>
+#    define CUPS_SOCAST (const char *)
 #  else
 #    include <unistd.h>
 #    include <fcntl.h>
 #    include <sys/socket.h>
 #    define closesocket(f) close(f)
+#    define CUPS_SOCAST
 #  endif /* WIN32 */
 
 #  ifdef HAVE_GSSAPI

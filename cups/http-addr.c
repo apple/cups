@@ -162,11 +162,11 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
   }
 
   val = 1;
-  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, CUPS_SOCAST &val, sizeof(val));
 
 #ifdef IPV6_V6ONLY
   if (addr->addr.sa_family == AF_INET6)
-    setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+    setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, CUPS_SOCAST &val, sizeof(val));
 #endif /* IPV6_V6ONLY */
 
   _httpAddrSetPort(addr, port);
@@ -195,7 +195,7 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
   */
 
   val = 1;
-  setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+  setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, CUPS_SOCAST &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
   return (fd);

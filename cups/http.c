@@ -347,7 +347,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
   */
 
   val = 1;
-  setsockopt(http->fd, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+  setsockopt(http->fd, SOL_SOCKET, SO_NOSIGPIPE, CUPS_SOCAST &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
  /*
@@ -358,7 +358,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
   */
 
   val = 1;
-  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, CUPS_SOCAST &val, sizeof(val));
 
 #ifdef FD_CLOEXEC
  /*
@@ -2253,10 +2253,18 @@ httpRead2(http_t *http,			/* I - Connection to server */
   ssize_t	bytes;			/* Bytes read */
 
 
+#ifdef HAVE_LIBZ
   DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
                 ") coding=%d data_encoding=%d data_remaining=" CUPS_LLFMT,
-                http, buffer, CUPS_LLCAST length, http->coding,
+                http, buffer, CUPS_LLCAST length,
+                http->coding,
                 http->data_encoding, CUPS_LLCAST http->data_remaining));
+#else
+  DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
+                ") data_encoding=%d data_remaining=" CUPS_LLFMT,
+                http, buffer, CUPS_LLCAST length,
+                http->data_encoding, CUPS_LLCAST http->data_remaining));
+#endif /* HAVE_LIBZ */
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -2374,8 +2382,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
     DEBUG_printf(("1httpRead2: Reading up to %d bytes into buffer.",
                   (int)length));
 
-    if (length > http->data_remaining)
-      length = http->data_remaining;
+    if (length > (size_t)http->data_remaining)
+      length = (size_t)http->data_remaining;
 
     if ((bytes = http_read_buffered(http, buffer, length)) > 0)
       http->data_remaining -= bytes;
@@ -4039,6 +4047,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
     http_set_length(http);
 
+#ifdef HAVE_LIBZ
    /*
     * Then start any content encoding...
     */
@@ -4046,6 +4055,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     DEBUG_puts("1httpWriteResponse: Calling http_content_coding_start.");
     http_content_coding_start(http,
 			      httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
+#endif /* HAVE_LIBZ */
   }
 
   return (0);
@@ -5035,8 +5045,8 @@ http_set_timeout(int    fd,		/* I - File descriptor */
   DWORD tv = (DWORD)(timeout * 1000);
 				      /* Timeout in milliseconds */
 
-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
 
 #else
   struct timeval tv;			/* Timeout in secs and usecs */
@@ -5044,8 +5054,8 @@ http_set_timeout(int    fd,		/* I - File descriptor */
   tv.tv_sec  = (int)timeout;
   tv.tv_usec = (int)(1000000 * fmod(timeout, 1.0));
 
-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
 #endif /* WIN32 */
 }
 

@@ -462,8 +462,8 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Thread globals */
 #ifdef WIN32
-  SYSTEM_INFO	sysinfo;	/* System information */
-  OSVERSIONEX	version;	/* OS version info */
+  SYSTEM_INFO		sysinfo;	/* System information */
+  OSVERSIONINFO		version;	/* OS version info */
 #else
   struct utsname	name;		/* uname info */
 #endif /* WIN32 */
@@ -476,13 +476,13 @@ cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ 
   }
 
 #ifdef WIN32
-  version.dwOSVersionInfoSize = sizeof(OSVERSIONEX);
-  GetVersionInfoEx(&version);
+  version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx(&version);
   GetNativeSystemInfo(&sysinfo);
 
   snprintf(cg->user_agent, sizeof(cg->user_agent),
            CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0",
-	   version.major, version.minor,
+	   version.dwMajorVersion, version.dwMinorVersion,
 	   sysinfo.wProcessorArchitecture
 	       == PROCESSOR_ARCHITECTURE_AMD64 ? "amd64" :
 	       sysinfo.wProcessorArchitecture

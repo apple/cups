@@ -3,7 +3,7 @@
  *
  *   Configuration file for CUPS on Windows.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -234,7 +234,7 @@
  * Use <stdint.h>?
  */
 
-#define HAVE_STDINT_H 1
+/* #undef HAVE_STDINT_H */
 
 
 /*

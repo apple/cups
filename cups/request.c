@@ -1015,8 +1015,13 @@ _cupsConnect(void)
 
       char ch;				/* Connection check byte */
 
+#ifdef WIN32
+      if (recv(cg->http->fd, &ch, 1, MSG_PEEK) < 0 &&
+          WSAGetLastError() != WSAEWOULDBLOCK)
+#else
       if (recv(cg->http->fd, &ch, 1, MSG_PEEK | MSG_DONTWAIT) < 0 &&
           errno != EWOULDBLOCK)
+#endif /* WIN32 */
       {
        /*
         * Nope, close the connection...
