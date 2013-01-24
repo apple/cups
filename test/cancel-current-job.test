@@ -1,5 +1,5 @@
 #
-# "$Id: get-jobs.test 9702 2011-04-20 21:16:08Z mike $"
+# "$Id$"
 #
 #   Cancel the currently printing job.
 #
@@ -61,5 +61,5 @@
 
 
 #
-# End of "$Id: get-jobs.test 9702 2011-04-20 21:16:08Z mike $".
+# End of "$Id$".
 #

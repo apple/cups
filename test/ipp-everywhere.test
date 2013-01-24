@@ -1,0 +1,170 @@
+#
+# "$Id$"
+#
+#   IPP Everywhere test suite.
+#
+#   Copyright 2007-2013 by Apple Inc.
+#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool -V 2.0 -t printer-uri ipp-everywhere.test
+#
+
+# Do all of the IPP/1.1 and IPP/2.0 tests
+INCLUDE "ipp-2.0.test"
+
+
+# Test required printer description attribute support.
+#
+# Required by: PWG 5100.14
+{
+	NAME "PWG 5100.14 section 5.1/5.2 - Required Operations and Attributes"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes all,media-col-database
+
+	STATUS successful-ok
+
+	# Operations
+	EXPECT operations-supported WITH-VALUE 0x0002 # Print-Job
+	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
+	EXPECT operations-supported WITH-VALUE 0x0005 # Create-Job
+	EXPECT operations-supported WITH-VALUE 0x0006 # Send-Document
+	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
+	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
+	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
+	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
+	EXPECT operations-supported WITH-VALUE 0x0039 # Cancel-My-Jobs
+	EXPECT operations-supported WITH-VALUE 0x003b # Close-Job
+	EXPECT operations-supported WITH-VALUE 0x003c # Identify-Printer
+
+	# Printer description attributes
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "deflate" DEFINE-MATCH SUPPORTS_DEFLATE
+	EXPECT compression-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "gzip" DEFINE-MATCH SUPPORTS_GZIP
+
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/pwg-raster"
+	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "/^(application/pdf|application/openxps)\$/" DEFINE-MATCH PDF_OR_OPENXPS
+
+	EXPECT feed-orientation-supported OF-TYPE keyword IN-GROUP printer-attributes-tag DEFINE-MATCH FEED_ORIENTATION_SUPPORTED
+	EXPECT feed-orientation-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED FEED_ORIENTATION_SUPPORTED
+
+	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag DEFINE-MATCH FINISHINGS_SUPPORTED
+	EXPECT finishings-default OF-TYPE enum IN-GROUP printer-attributes-tag IF-DEFINED FINISHINGS_SUPPORTED
+
+	EXPECT identify-actions-default OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)\$/"
+	EXPECT identify-actions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "/^(display|flash|sound|speak)\$/"
+
+	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-everywhere"
+
+	EXPECT job-account-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE 1 COUNT 1 DEFINE-MATCH JOB_ACCOUNT_ID_SUPPORTED
+	EXPECT job-account-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED JOB_ACCOUNT_ID_SUPPORTED
+
+	EXPECT job-accounting-user-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE 1 COUNT 1 DEFINE-MATCH JOB_ACCOUNTING_USER_ID_SUPPORTED
+	EXPECT job-accounting-user-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED JOB_ACCOUNTING_USER_ID_SUPPORTED
+
+	EXPECT job-constraints-supported OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH JOB_CONSTRAINTS_SUPPORTED
+	EXPECT job-resolvers-supported OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED JOB_CONSTRAINTS_SUPPORTED
+
+	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+
+	EXPECT job-preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+
+	EXPECT media-bottom-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+	EXPECT media-left-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+	EXPECT media-right-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+	EXPECT media-top-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
+
+	EXPECT media-col-database OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT media-col-ready OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT media-ready OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+
+	EXPECT media-size-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT media-source-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+
+	EXPECT media-type-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
+
+	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT multiple-operation-timeout OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+
+	EXPECT multiple-operation-timeout-action OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(abort-job|hold-job|process-job)\$/"
+
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number"
+	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "pages"
+
+	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1 IF-DEFINED PDF_OR_OPENXPS
+
+	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)\$/"
+	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)\$/"
+
+	EXPECT print-content-optimize-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|graphic|photo|text|text-and-graphic)\$/"
+	EXPECT print-content-optimize-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|graphic|photo|text|text-and-graphic)\$/"
+
+	EXPECT print-rendering-intent-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)\$/"
+	EXPECT print-rendering-intent-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|absolute|perceptual|relative|relative-bpc|saturation)\$/"
+
+	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
+	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
+
+	EXPECT printer-charge-info DEFINE-MATCH PRINTER_CHARGE_INFO
+	EXPECT ?printer-charge-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-charge-info-uri IF-DEFINED PRINTER_CHARGE_INFO
+	EXPECT ?printer-charge-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT printer-config-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-config-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
+
+	EXPECT printer-device-id OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^([-A-Za-z ]+:[^;]*;)+\$/"
+
+	EXPECT printer-geo-location OF-TYPE uri|unknown IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^geo:/"
+
+	EXPECT printer-get-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-format"
+
+	EXPECT ?printer-icc-profiles-supported OF-TYPE collection IN-GROUP printer-attributes-tag
+
+	EXPECT printer-icons OF-TYPE uri IN-GROUP printer-attributes-tag
+
+	EXPECT ?printer-mandatory-job-attributes OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT printer-organization OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT printer-organizational-unit OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 VALUE >-1
+
+	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply-description
+	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply
+
+	EXPECT printer-supply-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
+
+	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^urn:uuid:[0-9A-F]{8,8}-[0-9A-F]{4,4}-[0-9A-F]{4,4}-[0-9A-F]{4,4}-[0-9A-F]{12,12}/"
+
+	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
+	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+
+	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
+}
+
+
+#
+# End of "$Id$".
+#
