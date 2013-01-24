@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\vcnet;..;..\vcnet\regex"
-				PreprocessorDefinitions="WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ZLIB_WINAPI;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcmt"
-				AdditionalDependencies="ws2_32.lib advapi32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib zlibwapi.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\cups\libcups2.def"
@@ -129,7 +129,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\vcnet,.."
-				PreprocessorDefinitions="WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ZLIB_WINAPI;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -150,7 +150,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib advapi32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib zlibwapi.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\cups\libcups2.def"
@@ -209,7 +209,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				AdditionalIncludeDirectories="..\vcnet;..;..\vcnet\regex"
-				PreprocessorDefinitions="WIN32;DEBUG;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ZLIB_WINAPI;WIN32;DEBUG;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -228,7 +228,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcmt"
-				AdditionalDependencies="ws2_32.lib advapi32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib zlibwapi.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\cups\libcups2.def"
@@ -293,7 +293,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				AdditionalIncludeDirectories="..\vcnet,.."
-				PreprocessorDefinitions="WIN32;DEBUG;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="ZLIB_WINAPI;WIN32;DEBUG;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -311,7 +311,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib advapi32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib zlibwapi.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\cups\libcups2.def"

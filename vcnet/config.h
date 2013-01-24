@@ -200,7 +200,7 @@
  * Do we have ZLIB?
  */
 
-/* #undef HAVE_LIBZ */
+#define HAVE_LIBZ 1
 
 
 /*
