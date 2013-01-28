@@ -413,7 +413,10 @@ main(int  argc,				/* I - Number of command-line args */
               }
 
               if (vars.filename)
+              {
 		free(vars.filename);
+		vars.filename = NULL;
+	      }
 
               if (access(argv[i], 0))
               {
@@ -436,6 +439,8 @@ main(int  argc,				/* I - Number of command-line args */
 			     cg->cups_datadir, argv[i]);
 		    if (access(filename, 0))
 		      vars.filename = strdup(argv[i]);
+		    else
+		      vars.filename = strdup(filename);
 		  }
 		  else
 		    vars.filename = strdup(filename);

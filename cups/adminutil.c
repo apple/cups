@@ -901,9 +901,8 @@ cupsAdminGetServerSettings(
 
     if (!cg->http)
     {
-      if ((cg->http = _httpCreate(cupsServer(), ippPort(), NULL, AF_UNSPEC,
-                                  cupsEncryption(), 1,
-                                  _HTTP_MODE_CLIENT)) == NULL)
+      if ((cg->http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC,
+                                   cupsEncryption(), 1, 0, NULL)) == NULL)
       {
 	if (errno)
 	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);

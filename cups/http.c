@@ -37,7 +37,6 @@
  *   httpConnectEncrypt()	  - Connect to a HTTP server using encryption.
  *   httpCopyCredentials()	  - Copy the credentials associated with an
  *				    encrypted connection.
- *   _httpCreate()		  - Create an unconnected HTTP connection.
  *   _httpCreateCredentials()	  - Create credentials in the internal format.
  *   httpDelete()		  - Send a DELETE request to the server.
  *   _httpDisconnect()		  - Disconnect a HTTP connection.
@@ -118,6 +117,7 @@
  *   http_bio_write()		  - Write data for OpenSSL.
  *   http_content_coding_finish() - Finish doing any content encoding.
  *   http_content_coding_start()  - Start doing content encoding.
+ *   http_create()		  - Create an unconnected HTTP connection.
  *   http_debug_hex()		  - Do a hex dump of a buffer.
  *   http_field()		  - Return the field index for a field name.
  *   http_read()		  - Read a buffer from a HTTP connection.
@@ -167,6 +167,10 @@ static void		http_content_coding_finish(http_t *http);
 static void		http_content_coding_start(http_t *http,
 						  const char *value);
 #endif /* HAVE_LIBZ */
+static http_t		*http_create(const char *host, int port,
+			             http_addrlist_t *addrlist, int family,
+				     http_encryption_t encryption,
+				     int blocking, _http_mode_t mode);
 #ifdef DEBUG
 static void		http_debug_hex(const char *prefix, const char *buffer,
 			               int bytes);
@@ -318,7 +322,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
 
   memset(&addrlist, 0, sizeof(addrlist));
 
-  if ((http = _httpCreate(NULL, 0, &addrlist, AF_UNSPEC,
+  if ((http = http_create(NULL, 0, &addrlist, AF_UNSPEC,
                           HTTP_ENCRYPTION_IF_REQUESTED, blocking,
                           _HTTP_MODE_SERVER)) == NULL)
     return (NULL);
@@ -606,7 +610,7 @@ httpConnect2(
     int               family,		/* I - Address family to use or @code AF_UNSPEC@ for any */
     http_encryption_t encryption,	/* I - Type of encryption to use */
     int               blocking,		/* I - 1 for blocking connection, 0 for non-blocking */
-    int               msec,		/* I - Connection timeout in milliseconds */
+    int               msec,		/* I - Connection timeout in milliseconds, 0 means don't connect */
     int               *cancel)		/* I - Pointer to "cancel" variable */
 {
   http_t	*http;			/* New HTTP connection */
@@ -620,15 +624,15 @@ httpConnect2(
   * Create the HTTP structure...
   */
 
-  if ((http = _httpCreate(host, port, addrlist, family, encryption, blocking,
+  if ((http = http_create(host, port, addrlist, family, encryption, blocking,
                           _HTTP_MODE_CLIENT)) == NULL)
     return (NULL);
 
  /*
-  * Connect to the remote system...
+  * Optionally connect to the remote system...
   */
 
-  if (!httpReconnect2(http, msec, cancel))
+  if (msec == 0 || !httpReconnect2(http, msec, cancel))
     return (http);
 
  /*
@@ -731,96 +735,6 @@ httpCopyCredentials(
 #  else
   return (-1);
 #  endif /* HAVE_LIBSSL */
-}
-
-
-/*
- * '_httpCreate()' - Create an unconnected HTTP connection.
- */
-
-http_t *				/* O - HTTP connection */
-_httpCreate(
-    const char        *host,		/* I - Hostname */
-    int               port,		/* I - Port number */
-    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
-    int               family,		/* I - Address family or AF_UNSPEC */
-    http_encryption_t encryption,	/* I - Encryption to use */
-    int               blocking,		/* I - 1 for blocking mode */
-    _http_mode_t      mode)		/* I - _HTTP_MODE_CLIENT or _SERVER */
-{
-  http_t	*http;			/* New HTTP connection */
-  char		service[255];		/* Service name */
-  http_addrlist_t *myaddrlist = NULL;	/* My address list */
-
-
-  DEBUG_printf(("4_httpCreate(host=\"%s\", port=%d, addrlist=%p, family=%d, "
-                "encryption=%d, blocking=%d, mode=%d)", host, port, addrlist,
-                family, encryption, blocking, mode));
-
-  if (!host && mode == _HTTP_MODE_CLIENT)
-    return (NULL);
-
-  httpInitialize();
-
- /*
-  * Lookup the host...
-  */
-
-  if (addrlist)
-  {
-    myaddrlist = httpAddrCopyList(addrlist);
-  }
-  else
-  {
-    snprintf(service, sizeof(service), "%d", port);
-
-    myaddrlist = httpAddrGetList(host, family, service);
-  }
-
-  if (!myaddrlist)
-    return (NULL);
-
- /*
-  * Allocate memory for the structure...
-  */
-
-  if ((http = calloc(sizeof(http_t), 1)) == NULL)
-  {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
-    httpAddrFreeList(addrlist);
-    return (NULL);
-  }
-
- /*
-  * Initialize the HTTP data...
-  */
-
-  http->mode     = mode;
-  http->activity = time(NULL);
-  http->addrlist = myaddrlist;
-  http->blocking = blocking;
-  http->fd       = -1;
-#ifdef HAVE_GSSAPI
-  http->gssctx   = GSS_C_NO_CONTEXT;
-  http->gssname  = GSS_C_NO_NAME;
-#endif /* HAVE_GSSAPI */
-  http->version  = HTTP_VERSION_1_1;
-
-  if (host)
-    strlcpy(http->hostname, host, sizeof(http->hostname));
-
-  if (port == 443)			/* Always use encryption for https */
-    http->encryption = HTTP_ENCRYPTION_ALWAYS;
-  else
-    http->encryption = encryption;
-
-  http_set_wait(http);
-
- /*
-  * Return the new structure...
-  */
-
-  return (http);
 }
 
 
@@ -4371,6 +4285,102 @@ http_content_coding_start(
 		http->coding));
 }
 #endif /* HAVE_LIBZ */
+
+
+/*
+ * 'http_create()' - Create an unconnected HTTP connection.
+ */
+
+static http_t *				/* O - HTTP connection */
+http_create(
+    const char        *host,		/* I - Hostname */
+    int               port,		/* I - Port number */
+    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
+    int               family,		/* I - Address family or AF_UNSPEC */
+    http_encryption_t encryption,	/* I - Encryption to use */
+    int               blocking,		/* I - 1 for blocking mode */
+    _http_mode_t      mode)		/* I - _HTTP_MODE_CLIENT or _SERVER */
+{
+  http_t	*http;			/* New HTTP connection */
+  char		service[255];		/* Service name */
+  http_addrlist_t *myaddrlist = NULL;	/* My address list */
+
+
+  DEBUG_printf(("4http_create(host=\"%s\", port=%d, addrlist=%p, family=%d, "
+                "encryption=%d, blocking=%d, mode=%d)", host, port, addrlist,
+                family, encryption, blocking, mode));
+
+  if (!host && mode == _HTTP_MODE_CLIENT)
+    return (NULL);
+
+  httpInitialize();
+
+ /*
+  * Lookup the host...
+  */
+
+  if (addrlist)
+  {
+    myaddrlist = httpAddrCopyList(addrlist);
+  }
+  else
+  {
+    snprintf(service, sizeof(service), "%d", port);
+
+    myaddrlist = httpAddrGetList(host, family, service);
+  }
+
+  if (!myaddrlist)
+    return (NULL);
+
+ /*
+  * Allocate memory for the structure...
+  */
+
+  if ((http = calloc(sizeof(http_t), 1)) == NULL)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    httpAddrFreeList(addrlist);
+    return (NULL);
+  }
+
+ /*
+  * Initialize the HTTP data...
+  */
+
+  http->mode     = mode;
+  http->activity = time(NULL);
+  http->addrlist = myaddrlist;
+  http->blocking = blocking;
+  http->fd       = -1;
+#ifdef HAVE_GSSAPI
+  http->gssctx   = GSS_C_NO_CONTEXT;
+  http->gssname  = GSS_C_NO_NAME;
+#endif /* HAVE_GSSAPI */
+  http->version  = HTTP_VERSION_1_1;
+
+  if (host)
+    strlcpy(http->hostname, host, sizeof(http->hostname));
+
+  if (port == 443)			/* Always use encryption for https */
+    http->encryption = HTTP_ENCRYPTION_ALWAYS;
+  else
+    http->encryption = encryption;
+
+  http_set_wait(http);
+
+ /*
+  * Return the new structure...
+  */
+
+  return (http);
+}
+
+/* For OS X 10.8 and earlier */
+http_t *_httpCreate(const char *host, int port, http_addrlist_t *addrlist,
+		    http_encryption_t encryption, int family)
+{ return (http_create(host, port, addrlist, family, encryption, 1,
+                      _HTTP_MODE_CLIENT)); }
 
 
 #ifdef DEBUG

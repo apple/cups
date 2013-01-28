@@ -691,8 +691,8 @@ main(int  argc,				/* I - Number of command-line args */
       return (CUPS_BACKEND_OK);
   }
 
-  http = _httpCreate(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
-                     _HTTP_MODE_CLIENT);
+  http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, cupsEncryption(), 1,
+                      0, NULL);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
 
  /*
@@ -2244,8 +2244,8 @@ monitor_printer(
   * Make a copy of the printer connection...
   */
 
-  http = _httpCreate(monitor->hostname, monitor->port, NULL, AF_UNSPEC,
-                     monitor->encryption, 1, _HTTP_MODE_CLIENT);
+  http = httpConnect2(monitor->hostname, monitor->port, NULL, AF_UNSPEC,
+                      monitor->encryption, 1, 0, NULL);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);

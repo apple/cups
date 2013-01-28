@@ -3,7 +3,7 @@
  *
  *   User-defined destination (and option) support for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -722,8 +722,8 @@ cupsConnectDest(
   else
     encryption = HTTP_ENCRYPT_IF_REQUESTED;
 
-  http = _httpCreate(hostname, port, addrlist, AF_UNSPEC, encryption, 1,
-                     _HTTP_MODE_CLIENT);
+  http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, encryption, 1, 0,
+                      NULL);
 
  /*
   * Connect if requested...
