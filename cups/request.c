@@ -3,7 +3,7 @@
  *
  *   IPP utilities for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -46,6 +46,9 @@
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* O_BINARY */
+#ifndef MSG_DONTWAIT
+#  define MSG_DONTWAIT 0
+#endif /* !MSG_DONTWAIT */
 
 
 /*

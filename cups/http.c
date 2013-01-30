@@ -1962,6 +1962,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
 #ifdef HAVE_LIBZ
   if (http->coding)
   {
+#  ifdef HAVE_INFLATECOPY
     int		zerr;			/* Decompressor error */
     z_stream	stream;			/* Copy of decompressor stream */
 
@@ -2023,6 +2024,12 @@ httpPeek(http_t *http,			/* I - Connection to server */
     }
 
     bytes = length - http->stream.avail_out;
+
+#  else
+    DEBUG_puts("2httpPeek: No inflateCopy on this platform, httpPeek does not "
+               "work with compressed streams.");
+    return (-1);
+#  endif /* HAVE_INFLATECOPY */
   }
   else
 #endif /* HAVE_LIBZ */

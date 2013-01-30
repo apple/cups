@@ -136,6 +136,7 @@
  */
 
 #define HAVE_LIBZ 1
+#define HAVE_INFLATECOPY 1
 
 
 /*
