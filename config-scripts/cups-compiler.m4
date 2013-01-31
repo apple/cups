@@ -114,7 +114,12 @@ if test -n "$GCC"; then
 	OLDCFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fstack-protector"
 	AC_TRY_LINK(,,
-		OPTIM="$OPTIM -fstack-protector"
+		if test "x$LSB_BUILD" = xy; then
+			# Can't use stack-protector with LSB binaries...
+			OPTIM="$OPTIM -fno-stack-protector"
+		else
+			OPTIM="$OPTIM -fstack-protector"
+		fi
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
