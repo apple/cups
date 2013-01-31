@@ -4247,9 +4247,15 @@ http_content_coding_start(
         if (http->wused)
           httpFlushWrite(http);
 
+       /*
+        * Window size for compression is 11 bits - optimal based on PWG Raster
+        * sample files on pwg.org.  -11 is raw deflate, 27 is gzip, per ZLIB
+        * documentation.
+        */
+
         if ((zerr = deflateInit2(&(http->stream), Z_DEFAULT_COMPRESSION,
                                  Z_DEFLATED,
-				 coding == _HTTP_CODING_DEFLATE ? 11 : 27, 7,
+				 coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7,
 				 Z_DEFAULT_STRATEGY)) < Z_OK)
         {
           http->status = HTTP_ERROR;
@@ -4267,8 +4273,13 @@ http_content_coding_start(
           return;
         }
 
+       /*
+        * Window size for decompression is up to 15 bits (maximum supported).
+        * -15 is raw inflate, 31 is gunzip, per ZLIB documentation.
+        */
+
         if ((zerr = inflateInit2(&(http->stream),
-                                 coding == _HTTP_CODING_INFLATE ? 15 : 31))
+                                 coding == _HTTP_CODING_INFLATE ? -15 : 31))
 		< Z_OK)
         {
           free(http->dbuffer);
