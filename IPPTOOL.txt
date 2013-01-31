@@ -135,6 +135,7 @@ CONFORMANCE TESTS
     tests will will produce up to 90 pages on various media, depending on the
     printer.
 
+
 IPP EVERYWHERE TESTING
 
     The IPP Everywhere tests use sample PWG raster files available from:
@@ -143,7 +144,8 @@ IPP EVERYWHERE TESTING
 
     Extract the corresponding ZIP archives into the current directory before
     running the ipp-everywhere.test file.  The test file will attempt to print
-    each PWG Raster file that is supported by the printer being tested.
+    each PWG Raster file that is supported by the printer being tested - up to
+    372 pages including the 90 pages produced by the regular IPP test suite.
 
 
 READING THE DOCUMENTATION
