@@ -32,7 +32,7 @@ fi
 if test $# = 0; then
 	echo Updating to get snapshot version...
 	svn up
-	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
+	rev=`svn info . | grep Revision | awk '{print $2}'
 	fileversion="`date '+%Y%m%d'`-r$rev"
 else
 	fileversion=$1
