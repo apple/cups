@@ -151,8 +151,8 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 static const char * const ipp_std_ops[] =
 		{
 		  /* 0x0000 - 0x000f */
-		  "0x00",
-		  "0x01",
+		  "0x0000",
+		  "0x0001",
 		  "Print-Job",
 		  "Print-URI",
 		  "Validate-Job",
@@ -166,7 +166,7 @@ static const char * const ipp_std_ops[] =
 		  "Hold-Job",
 		  "Release-Job",
 		  "Restart-Job",
-		  "0x0f",
+		  "0x000f",
 
 		  /* 0x0010 - 0x001f */
 		  "Pause-Printer",
@@ -207,7 +207,7 @@ static const char * const ipp_std_ops[] =
 		  /* 0x0030 - 0x003d */
 		  "Promote-Job",
 		  "Schedule-Job-After",
-		  "0x32",
+		  "0x0032",
 		  "Cancel-Document",
 		  "Get-Document-Attributes",
 		  "Get-Documents",
@@ -1698,7 +1698,8 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
   else if (!strcmp(attrname, "job-state") &&
 	   enumvalue >= IPP_JOB_PENDING && enumvalue <= IPP_JOB_COMPLETED)
     return (ipp_job_states[enumvalue - IPP_JOB_PENDING]);
-  else if (!strcmp(attrname, "operations-supported"))
+  else if (!strcmp(attrname, "operations-supported") ||
+           !strcmp(attrname, "limit-operations-supported"))
     return (ippOpString((ipp_op_t)enumvalue));
   else if ((!strcmp(attrname, "orientation-requested") ||
             !strcmp(attrname, "orientation-requested-actual") ||
@@ -1923,7 +1924,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * See if the operation ID is a known value...
   */
 
-  if (op >= IPP_OP_PRINT_JOB && op <= IPP_OP_CLOSE_JOB)
+  if (op >= IPP_OP_PRINT_JOB && op <= IPP_OP_VALIDATE_DOCUMENT)
     return (ipp_std_ops[op]);
   else if (op == IPP_OP_PRIVATE)
     return ("windows-ext");
