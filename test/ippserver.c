@@ -3824,7 +3824,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     if (httpError(client->http) == EPIPE)
       fprintf(stderr, "%s Client closed connection.\n", client->hostname);
     else
-      fprintf(stderr, "%s Bad request line.\n", client->hostname);
+      fprintf(stderr, "%s Bad request line (%s).\n", client->hostname,
+              strerror(httpError(client->http)));
 
     return (0);
   }

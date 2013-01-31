@@ -48,6 +48,7 @@ TESTFILES	=	\
 			ipp-2.2.test \
 			ipp-everywhere.test \
 			print-job.test \
+			print-job-deflate.test \
 			print-job-gzip.test
 OBJS		=	\
 			ippserver.o \

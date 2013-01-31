@@ -478,7 +478,9 @@ main(int  argc,				/* I - Number of command-line args */
                 else if (!_cups_strcasecmp(ext, ".ps") ||
                          !_cups_strcasecmp(ext, ".ps.gz"))
                   set_variable(&vars, "filetype", "application/postscript");
-                else if (!_cups_strcasecmp(ext, ".ras") ||
+                else if (!_cups_strcasecmp(ext, ".pwg") ||
+                         !_cups_strcasecmp(ext, ".pwg.gz") ||
+                         !_cups_strcasecmp(ext, ".ras") ||
                          !_cups_strcasecmp(ext, ".ras.gz"))
                   set_variable(&vars, "filetype", "image/pwg-raster");
                 else if (!_cups_strcasecmp(ext, ".txt") ||

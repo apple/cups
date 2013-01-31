@@ -976,7 +976,18 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     bytes = http_write_chunk(http, http->wbuffer, http->wused);
   else
+  {
     bytes = http_write(http, http->wbuffer, http->wused);
+
+    if (bytes > 0 && http->data_encoding == HTTP_ENCODING_LENGTH)
+    {
+      http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0)
+      {
+      }
+    }
+  }
 
   http->wused = 0;
 
@@ -3677,6 +3688,11 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     * data, go idle...
     */
 
+#ifdef HAVE_LIBZ
+    if (http->coding)
+      http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
+
     if (http->wused)
     {
       if (httpFlushWrite(http) < 0)
@@ -3700,17 +3716,12 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     }
 
     if (http->state == HTTP_STATE_POST_RECV)
-    {
-#ifdef HAVE_LIBZ
-      if (http->coding)
-        http_content_coding_finish(http);
-#endif /* HAVE_LIBZ */
-
       http->state ++;
+    else
+      http->state = HTTP_STATE_WAITING;
 
-      DEBUG_printf(("2httpWrite2: Changed state to %s.",
-		    http_states[http->state + 1]));
-    }
+    DEBUG_printf(("2httpWrite2: Changed state to %s.",
+		  http_states[http->state + 1]));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));

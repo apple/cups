@@ -66,6 +66,7 @@ cp test/ipptool-static $pkgdir/ipptool
 cp test/onepage-*.pdf $pkgdir
 cp test/onepage-*.ps $pkgdir
 cp test/print-job.test $pkgdir
+cp test/print-job-deflate.test $pkgdir
 cp test/print-job-gzip.test $pkgdir
 cp test/testfile.* $pkgdir
 

@@ -18,7 +18,7 @@
 #
 
 # Do all of the IPP/1.1 and IPP/2.0 tests
-#INCLUDE "ipp-2.0.test"
+INCLUDE "ipp-2.0.test"
 
 
 # Test required printer description attribute support.
