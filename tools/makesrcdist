@@ -25,7 +25,7 @@ if test $# = 0; then
 	svn up
 
 	# Compute version for snapshot
-	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
+	rev=`svn info . | grep Revision: | awk '{print $2}'`
 	version="1.7svn"
 	revision="-r$rev"
 	fileversion="1.7svn-r$rev"
