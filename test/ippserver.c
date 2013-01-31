@@ -90,6 +90,8 @@
 #include <cups/string-private.h>	/* For string functions */
 #include <cups/thread-private.h>	/* For multithreading functions */
 
+#include <sys/wait.h>
+
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
