@@ -1,9 +1,13 @@
-CHANGES.txt - 1.7b1 - 2013-01-21
+CHANGES.txt - 1.7b1 - 2013-01-30
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
 	- Added a new "-x" option to the cancel command (STR #4103)
+	- Added new ippCreateRequestedArray API for generating a array of
+	  attributes from the requested-attributes attribute.
+	- The ipptool utility now supports compression, conditional tests based
+	  on the presence of files, and new DEFINE predicates for STATUS.
 	- Added new IPP APIs for checking values (STR #4167)
 	- Added new IPP APis for adding and setting formatted strings.
 	- Added new HTTP APIs to support basic server functionality via libcups.
