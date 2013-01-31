@@ -3,7 +3,7 @@
 //
 //   Source class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2012 by Apple Inc.
+//   Copyright 2007-2013 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -2292,7 +2292,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    strncpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, format - bufformat);
 	    tformat[format - bufformat] = '\0';
 
 	    bytes += cupsFilePrintf(fp, tformat, va_arg(ap, double));
@@ -2309,7 +2309,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    strncpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, format - bufformat);
 	    tformat[format - bufformat] = '\0';
 
 #  ifdef HAVE_LONG_LONG
@@ -2327,7 +2327,7 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 	    if ((format - bufformat + 1) > (int)sizeof(tformat))
 	      break;
 
-	    strncpy(tformat, bufformat, format - bufformat);
+	    memcpy(tformat, bufformat, format - bufformat);
 	    tformat[format - bufformat] = '\0';
 
 	    bytes += cupsFilePrintf(fp, tformat, va_arg(ap, void *));
