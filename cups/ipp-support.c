@@ -561,7 +561,8 @@ ippAttributeString(
   char		*bufptr,		/* Pointer into buffer */
 		*bufend,		/* End of buffer */
 		temp[256];		/* Temporary string */
-  const char	*ptr;			/* Pointer into string */
+  const char	*ptr,			/* Pointer into string */
+		*end;			/* Pointer to end of string */
   _ipp_value_t	*val;			/* Current value */
 
 
@@ -717,7 +718,8 @@ ippAttributeString(
           break;
 
       case IPP_TAG_STRING :
-          for (ptr = val->string.text; *ptr; ptr ++)
+          for (ptr = val->unknown.data, end = ptr + val->unknown.length;
+               ptr < end; ptr ++)
           {
             if (*ptr == '\\' || _cups_isspace(*ptr))
             {
@@ -1698,8 +1700,7 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
   else if (!strcmp(attrname, "job-state") &&
 	   enumvalue >= IPP_JOB_PENDING && enumvalue <= IPP_JOB_COMPLETED)
     return (ipp_job_states[enumvalue - IPP_JOB_PENDING]);
-  else if (!strcmp(attrname, "operations-supported") ||
-           !strcmp(attrname, "limit-operations-supported"))
+  else if (!strcmp(attrname, "operations-supported"))
     return (ippOpString((ipp_op_t)enumvalue));
   else if ((!strcmp(attrname, "orientation-requested") ||
             !strcmp(attrname, "orientation-requested-actual") ||
