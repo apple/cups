@@ -3,7 +3,7 @@
  *
  *   User, system, and password routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,20 +16,24 @@
  *
  * Contents:
  *
- *   cupsEncryption()        - Get the current encryption settings.
- *   cupsGetPassword()       - Get a password from the user.
+ *   cupsEncryption()	     - Get the current encryption settings.
+ *   cupsGetPassword()	     - Get a password from the user.
  *   cupsGetPassword2()      - Get a password from the user using the advanced
- *                             password callback.
- *   cupsServer()            - Return the hostname/address of the current
- *                             server.
+ *			       password callback.
+ *   cupsServer()	     - Return the hostname/address of the current
+ *			       server.
  *   cupsSetClientCertCB()   - Set the client certificate callback.
+ *   cupsSetCredentials()    - Set the default credentials to be used for
+ *			       SSL/TLS connections.
  *   cupsSetEncryption()     - Set the encryption preference.
  *   cupsSetPasswordCB()     - Set the password callback for CUPS.
  *   cupsSetPasswordCB2()    - Set the advanced password callback for CUPS.
- *   cupsSetServer()         - Set the default server name and port.
+ *   cupsSetServer()	     - Set the default server name and port.
  *   cupsSetServerCertCB()   - Set the server certificate callback.
- *   cupsSetUser()           - Set the default user name.
- *   cupsUser()              - Return the current user's name.
+ *   cupsSetUser()	     - Set the default user name.
+ *   cupsSetUserAgent()      - Set the default HTTP User-Agent string.
+ *   cupsUser() 	     - Return the current user's name.
+ *   cupsUserAgent()	     - Return the default HTTP User-Agent string.
  *   _cupsGetPassword()      - Get a password from the user.
  *   _cupsGSSServiceName()   - Get the GSS (Kerberos) service name.
  *   _cupsSetDefaults()      - Set the default server, port, and encryption.
@@ -48,6 +52,7 @@
 #else
 #  include <pwd.h>
 #  include <termios.h>
+#  include <sys/utsname.h>
 #endif /* WIN32 */
 
 
@@ -443,6 +448,62 @@ cupsSetUser(const char *user)		/* I - User name */
 
 
 /*
+ * 'cupsSetUserAgent()' - Set the default HTTP User-Agent string.
+ *
+ * Setting the string to NULL forces the default value containing the CUPS
+ * version, IPP version, and operating system version and architecture.
+ *
+ * @since CUPS 1.7@
+ */
+
+void
+cupsSetUserAgent(const char *user_agent)/* I - User-Agent string or @code NULL@ */
+{
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Thread globals */
+#ifdef WIN32
+  SYSTEM_INFO		sysinfo;	/* System information */
+  OSVERSIONINFO		version;	/* OS version info */
+#else
+  struct utsname	name;		/* uname info */
+#endif /* WIN32 */
+
+
+  if (user_agent)
+  {
+    strlcpy(cg->user_agent, user_agent, sizeof(cg->user_agent));
+    return;
+  }
+
+#ifdef WIN32
+  version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx(&version);
+  GetNativeSystemInfo(&sysinfo);
+
+  snprintf(cg->user_agent, sizeof(cg->user_agent),
+           CUPS_MINIMAL " (Windows %d.%d; %s) IPP/2.0",
+	   version.dwMajorVersion, version.dwMinorVersion,
+	   sysinfo.wProcessorArchitecture
+	       == PROCESSOR_ARCHITECTURE_AMD64 ? "amd64" :
+	       sysinfo.wProcessorArchitecture
+		   == PROCESSOR_ARCHITECTURE_ARM ? "arm" :
+	       sysinfo.wProcessorArchitecture
+		   == PROCESSOR_ARCHITECTURE_IA64 ? "ia64" :
+	       sysinfo.wProcessorArchitecture
+		   == PROCESSOR_ARCHITECTURE_INTEL ? "intel" :
+	       "unknown");
+
+#else
+  uname(&name);
+
+  snprintf(cg->user_agent, sizeof(cg->user_agent),
+           CUPS_MINIMAL " (%s %s; %s) IPP/2.0",
+	   name.sysname, name.release, name.machine);
+#endif /* WIN32 */
+}
+
+
+/*
  * 'cupsUser()' - Return the current user's name.
  *
  * Note: The current user name is tracked separately for each thread in a
@@ -461,6 +522,25 @@ cupsUser(void)
     _cupsSetDefaults();
 
   return (cg->user);
+}
+
+
+/*
+ * 'cupsUserAgent()' - Return the default HTTP User-Agent string.
+ *
+ * @since CUPS 1.7@
+ */
+
+const char *				/* O - User-Agent string */
+cupsUserAgent(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread globals */
+
+
+  if (!cg->user_agent[0])
+    cupsSetUserAgent(NULL);
+
+  return (cg->user_agent);
 }
 
 

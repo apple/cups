@@ -3,7 +3,7 @@
  *
  *   Sample IPP/2.0 server for CUPS.
  *
- *   Copyright 2010-2012 by Apple Inc.
+ *   Copyright 2010-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -89,6 +89,8 @@
 #include <config.h>			/* CUPS configuration header */
 #include <cups/string-private.h>	/* For string functions */
 #include <cups/thread-private.h>	/* For multithreading functions */
+
+#include <sys/wait.h>
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -222,7 +224,8 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 			*icon,		/* Icon filename */
 			*directory,	/* Spool directory */
 			*hostname,	/* Hostname */
-			*uri;		/* printer-uri-supported */
+			*uri,		/* printer-uri-supported */
+			*command;	/* Command to run with job file */
   int			port;		/* Port */
   size_t		urilen;		/* Length of printer URI */
   ipp_t			*attrs;		/* Static attributes */
@@ -292,8 +295,8 @@ static _ipp_printer_t	*create_printer(const char *servername,
 #ifdef HAVE_DNSSD
 					const char *subtype,
 #endif /* HAVE_DNSSD */
-					const char *directory);
-static cups_array_t	*create_requested_array(_ipp_client_t *client);
+					const char *directory,
+					const char *command);
 static void		debug_attributes(const char *title, ipp_t *ipp,
 			                 int response);
 static void		delete_client(_ipp_client_t *client);
@@ -367,13 +370,14 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option character */
+		*command = NULL,	/* Command to run with job files */
 		*servername = NULL,	/* Server host name */
 		*name = NULL,		/* Printer name */
 		*location = "",		/* Location of printer */
 		*make = "Test",		/* Manufacturer */
 		*model = "Printer",	/* Model */
 		*icon = "printer.png",	/* Icon file */
-		*formats = "application/pdf,image/jpeg";
+		*formats = "application/pdf,image/jpeg,image/pwg-raster";
 	      				/* Supported formats */
 #ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
@@ -411,6 +415,14 @@ main(int  argc,				/* I - Number of command-line args */
           case 'P' : /* -P (PIN printing mode) */
               pin = 1;
               break;
+
+          case 'c' : /* -c command */
+              i ++;
+	      if (i >= argc)
+	        usage(1);
+
+	      command = argv[i];
+	      break;
 
 	  case 'd' : /* -d spool-directory */
 	      i ++;
@@ -537,7 +549,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_DNSSD
 				subtype,
 #endif /* HAVE_DNSSD */
-				directory)) == NULL)
+				directory, command)) == NULL)
     return (1);
 
  /*
@@ -984,7 +996,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 #ifdef HAVE_DNSSD
 	       const char *subtype,	/* I - Bonjour service subtype */
 #endif /* HAVE_DNSSD */
-	       const char *directory)	/* I - Spool directory */
+	       const char *directory,	/* I - Spool directory */
+	       const char *command)	/* I - Command to run on job files */
 {
   int			i, j;		/* Looping vars */
   _ipp_printer_t	*printer;	/* Printer */
@@ -1095,6 +1108,20 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     IPP_QUALITY_NORMAL,
     IPP_QUALITY_HIGH
   };
+  static const int	pwg_raster_document_resolution_supported[] =
+  {
+    150,
+    300,
+    600
+  };
+  static const char * const pwg_raster_document_type_supported[] =
+  {
+    "black-1",
+    "cmyk-8",
+    "sgray-8",
+    "srgb-8",
+    "srgb-16"
+  };
   static const char * const reference_uri_schemes_supported[] =
   {					/* reference-uri-schemes-supported */
     "file",
@@ -1140,6 +1167,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 #ifdef HAVE_DNSSD
   printer->dnssd_name    = strdup(printer->name);
 #endif /* HAVE_DNSSD */
+  printer->command       = command ? strdup(command) : NULL;
   printer->directory     = strdup(directory);
   printer->hostname      = strdup(servername ? servername :
                                              httpGetHostname(NULL, hostname,
@@ -1151,7 +1179,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->next_job_id   = 1;
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-		  printer->hostname, printer->port, "/ipp");
+		  printer->hostname, printer->port, "/ipp/print");
   printer->uri    = strdup(uri);
   printer->urilen = strlen(uri);
 
@@ -1281,10 +1309,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* compression-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
-               IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
-	       "compression-supported",
-	       (int)(sizeof(compressions) / sizeof(compressions[0])), NULL,
-	       compressions);
+                IPP_TAG_KEYWORD | IPP_TAG_CUPS_CONST,
+	        "compression-supported",
+	        (int)(sizeof(compressions) / sizeof(compressions[0])), NULL,
+	        compressions);
 
   /* copies-default */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1634,6 +1662,29 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
                "printer-uri-supported", NULL, uri);
 
+  /* pwg-raster-document-xxx-supported */
+  for (i = 0; i < num_formats; i ++)
+    if (!_cups_strcasecmp(formats[i], "image/pwg-raster"))
+      break;
+
+  if (i < num_formats)
+  {
+    ippAddResolutions(printer->attrs, IPP_TAG_PRINTER,
+                      "pwg-raster-document-resolution-supported",
+                      (int)(sizeof(pwg_raster_document_resolution_supported) /
+                            sizeof(pwg_raster_document_resolution_supported[0])),
+                      IPP_RES_PER_INCH,
+                      pwg_raster_document_resolution_supported,
+                      pwg_raster_document_resolution_supported);
+    ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                 "pwg-raster-document-sheet-back", NULL, "normal");
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                  "pwg-raster-document-type-supported",
+                  (int)(sizeof(pwg_raster_document_type_supported) /
+                        sizeof(pwg_raster_document_type_supported[0])), NULL,
+                  pwg_raster_document_type_supported);
+  }
+
   /* reference-uri-scheme-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
                 IPP_TAG_URISCHEME | IPP_TAG_CUPS_CONST,
@@ -1697,209 +1748,6 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   delete_printer(printer);
   return (NULL);
-}
-
-
-/*
- * 'create_requested_array()' - Create an array for requested-attributes.
- */
-
-static cups_array_t *			/* O - requested-attributes array */
-create_requested_array(
-    _ipp_client_t *client)		/* I - Client */
-{
-  int			i,		/* Looping var */
-			count;		/* Number of values */
-  ipp_attribute_t	*requested;	/* requested-attributes attribute */
-  cups_array_t		*ra;		/* Requested attributes array */
-  const char		*value;		/* Current value */
-
-
- /*
-  * Get the requested-attributes attribute, and return NULL if we don't
-  * have one...
-  */
-
-  if ((requested = ippFindAttribute(client->request, "requested-attributes",
-                                    IPP_TAG_KEYWORD)) == NULL)
-    return (NULL);
-
- /*
-  * If the attribute contains a single "all" keyword, return NULL...
-  */
-
-  count = ippGetCount(requested);
-  if (count == 1 && !strcmp(ippGetString(requested, 0, NULL), "all"))
-    return (NULL);
-
- /*
-  * Create an array using "strcmp" as the comparison function...
-  */
-
-  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-
-  for (i = 0; i < count; i ++)
-  {
-    value = ippGetString(requested, i, NULL);
-
-    if (!strcmp(value, "job-template"))
-    {
-      cupsArrayAdd(ra, "copies");
-      cupsArrayAdd(ra, "copies-default");
-      cupsArrayAdd(ra, "copies-supported");
-      cupsArrayAdd(ra, "finishings");
-      cupsArrayAdd(ra, "finishings-default");
-      cupsArrayAdd(ra, "finishings-supported");
-      cupsArrayAdd(ra, "job-hold-until");
-      cupsArrayAdd(ra, "job-hold-until-default");
-      cupsArrayAdd(ra, "job-hold-until-supported");
-      cupsArrayAdd(ra, "job-priority");
-      cupsArrayAdd(ra, "job-priority-default");
-      cupsArrayAdd(ra, "job-priority-supported");
-      cupsArrayAdd(ra, "job-sheets");
-      cupsArrayAdd(ra, "job-sheets-default");
-      cupsArrayAdd(ra, "job-sheets-supported");
-      cupsArrayAdd(ra, "media");
-      cupsArrayAdd(ra, "media-col");
-      cupsArrayAdd(ra, "media-col-default");
-      cupsArrayAdd(ra, "media-col-supported");
-      cupsArrayAdd(ra, "media-default");
-      cupsArrayAdd(ra, "media-source-supported");
-      cupsArrayAdd(ra, "media-supported");
-      cupsArrayAdd(ra, "media-type-supported");
-      cupsArrayAdd(ra, "multiple-document-handling");
-      cupsArrayAdd(ra, "multiple-document-handling-default");
-      cupsArrayAdd(ra, "multiple-document-handling-supported");
-      cupsArrayAdd(ra, "number-up");
-      cupsArrayAdd(ra, "number-up-default");
-      cupsArrayAdd(ra, "number-up-supported");
-      cupsArrayAdd(ra, "orientation-requested");
-      cupsArrayAdd(ra, "orientation-requested-default");
-      cupsArrayAdd(ra, "orientation-requested-supported");
-      cupsArrayAdd(ra, "page-ranges");
-      cupsArrayAdd(ra, "page-ranges-supported");
-      cupsArrayAdd(ra, "printer-resolution");
-      cupsArrayAdd(ra, "printer-resolution-default");
-      cupsArrayAdd(ra, "printer-resolution-supported");
-      cupsArrayAdd(ra, "print-quality");
-      cupsArrayAdd(ra, "print-quality-default");
-      cupsArrayAdd(ra, "print-quality-supported");
-      cupsArrayAdd(ra, "sides");
-      cupsArrayAdd(ra, "sides-default");
-      cupsArrayAdd(ra, "sides-supported");
-    }
-    else if (!strcmp(value, "job-description"))
-    {
-      cupsArrayAdd(ra, "date-time-at-completed");
-      cupsArrayAdd(ra, "date-time-at-creation");
-      cupsArrayAdd(ra, "date-time-at-processing");
-      cupsArrayAdd(ra, "job-detailed-status-message");
-      cupsArrayAdd(ra, "job-document-access-errors");
-      cupsArrayAdd(ra, "job-id");
-      cupsArrayAdd(ra, "job-impressions");
-      cupsArrayAdd(ra, "job-impressions-completed");
-      cupsArrayAdd(ra, "job-k-octets");
-      cupsArrayAdd(ra, "job-k-octets-processed");
-      cupsArrayAdd(ra, "job-media-sheets");
-      cupsArrayAdd(ra, "job-media-sheets-completed");
-      cupsArrayAdd(ra, "job-message-from-operator");
-      cupsArrayAdd(ra, "job-more-info");
-      cupsArrayAdd(ra, "job-name");
-      cupsArrayAdd(ra, "job-originating-user-name");
-      cupsArrayAdd(ra, "job-printer-up-time");
-      cupsArrayAdd(ra, "job-printer-uri");
-      cupsArrayAdd(ra, "job-state");
-      cupsArrayAdd(ra, "job-state-message");
-      cupsArrayAdd(ra, "job-state-reasons");
-      cupsArrayAdd(ra, "job-uri");
-      cupsArrayAdd(ra, "number-of-documents");
-      cupsArrayAdd(ra, "number-of-intervening-jobs");
-      cupsArrayAdd(ra, "output-device-assigned");
-      cupsArrayAdd(ra, "time-at-completed");
-      cupsArrayAdd(ra, "time-at-creation");
-      cupsArrayAdd(ra, "time-at-processing");
-    }
-    else if (!strcmp(value, "printer-description"))
-    {
-      cupsArrayAdd(ra, "charset-configured");
-      cupsArrayAdd(ra, "charset-supported");
-      cupsArrayAdd(ra, "color-supported");
-      cupsArrayAdd(ra, "compression-supported");
-      cupsArrayAdd(ra, "document-format-default");
-      cupsArrayAdd(ra, "document-format-supported");
-      cupsArrayAdd(ra, "generated-natural-language-supported");
-      cupsArrayAdd(ra, "ipp-versions-supported");
-      cupsArrayAdd(ra, "job-impressions-supported");
-      cupsArrayAdd(ra, "job-k-octets-supported");
-      cupsArrayAdd(ra, "job-media-sheets-supported");
-      cupsArrayAdd(ra, "multiple-document-jobs-supported");
-      cupsArrayAdd(ra, "multiple-operation-time-out");
-      cupsArrayAdd(ra, "natural-language-configured");
-      cupsArrayAdd(ra, "notify-attributes-supported");
-      cupsArrayAdd(ra, "notify-lease-duration-default");
-      cupsArrayAdd(ra, "notify-lease-duration-supported");
-      cupsArrayAdd(ra, "notify-max-events-supported");
-      cupsArrayAdd(ra, "notify-events-default");
-      cupsArrayAdd(ra, "notify-events-supported");
-      cupsArrayAdd(ra, "notify-pull-method-supported");
-      cupsArrayAdd(ra, "notify-schemes-supported");
-      cupsArrayAdd(ra, "operations-supported");
-      cupsArrayAdd(ra, "pages-per-minute");
-      cupsArrayAdd(ra, "pages-per-minute-color");
-      cupsArrayAdd(ra, "pdl-override-supported");
-      cupsArrayAdd(ra, "printer-alert");
-      cupsArrayAdd(ra, "printer-alert-description");
-      cupsArrayAdd(ra, "printer-current-time");
-      cupsArrayAdd(ra, "printer-driver-installer");
-      cupsArrayAdd(ra, "printer-info");
-      cupsArrayAdd(ra, "printer-is-accepting-jobs");
-      cupsArrayAdd(ra, "printer-location");
-      cupsArrayAdd(ra, "printer-make-and-model");
-      cupsArrayAdd(ra, "printer-message-from-operator");
-      cupsArrayAdd(ra, "printer-more-info");
-      cupsArrayAdd(ra, "printer-more-info-manufacturer");
-      cupsArrayAdd(ra, "printer-name");
-      cupsArrayAdd(ra, "printer-state");
-      cupsArrayAdd(ra, "printer-state-message");
-      cupsArrayAdd(ra, "printer-state-reasons");
-      cupsArrayAdd(ra, "printer-up-time");
-      cupsArrayAdd(ra, "printer-uri-supported");
-      cupsArrayAdd(ra, "queued-job-count");
-      cupsArrayAdd(ra, "reference-uri-schemes-supported");
-      cupsArrayAdd(ra, "uri-authentication-supported");
-      cupsArrayAdd(ra, "uri-security-supported");
-    }
-    else if (!strcmp(value, "printer-defaults"))
-    {
-      cupsArrayAdd(ra, "copies-default");
-      cupsArrayAdd(ra, "document-format-default");
-      cupsArrayAdd(ra, "finishings-default");
-      cupsArrayAdd(ra, "job-hold-until-default");
-      cupsArrayAdd(ra, "job-priority-default");
-      cupsArrayAdd(ra, "job-sheets-default");
-      cupsArrayAdd(ra, "media-default");
-      cupsArrayAdd(ra, "media-col-default");
-      cupsArrayAdd(ra, "number-up-default");
-      cupsArrayAdd(ra, "orientation-requested-default");
-      cupsArrayAdd(ra, "sides-default");
-    }
-    else if (!strcmp(value, "subscription-template"))
-    {
-      cupsArrayAdd(ra, "notify-attributes");
-      cupsArrayAdd(ra, "notify-charset");
-      cupsArrayAdd(ra, "notify-events");
-      cupsArrayAdd(ra, "notify-lease-duration");
-      cupsArrayAdd(ra, "notify-natural-language");
-      cupsArrayAdd(ra, "notify-pull-method");
-      cupsArrayAdd(ra, "notify-recipient-uri");
-      cupsArrayAdd(ra, "notify-time-interval");
-      cupsArrayAdd(ra, "notify-user-data");
-    }
-    else
-      cupsArrayAdd(ra, (void *)value);
-  }
-
-  return (ra);
 }
 
 
@@ -2049,6 +1897,8 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
     free(printer->name);
   if (printer->icon)
     free(printer->icon);
+  if (printer->command)
+    free(printer->command);
   if (printer->directory)
     free(printer->directory);
   if (printer->hostname)
@@ -2536,7 +2386,7 @@ ipp_get_job_attributes(
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
 
-  ra = create_requested_array(client);
+  ra = ippCreateRequestedArray(client->request);
   copy_job_attributes(client, job, ra);
   cupsArrayDelete(ra);
 }
@@ -2687,19 +2537,7 @@ ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
   * OK, build a list of jobs for this printer...
   */
 
-  if ((ra = create_requested_array(client)) == NULL &&
-      !ippFindAttribute(client->request, "requested-attributes",
-                        IPP_TAG_KEYWORD))
-  {
-   /*
-    * IPP conformance - Get-Jobs has a default requested-attributes value of
-    * "job-id" and "job-uri".
-    */
-
-    ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-    cupsArrayAdd(ra, "job-id");
-    cupsArrayAdd(ra, "job-uri");
-  }
+  ra = ippCreateRequestedArray(client->request);
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
 
@@ -2750,7 +2588,7 @@ ipp_get_printer_attributes(
   * Send the attributes...
   */
 
-  ra      = create_requested_array(client);
+  ra      = ippCreateRequestedArray(client->request);
   printer = client->printer;
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
@@ -2884,6 +2722,9 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
              client->printer->directory, job->id);
   else if (!_cups_strcasecmp(job->format, "image/png"))
     snprintf(filename, sizeof(filename), "%s/%d.png",
+             client->printer->directory, job->id);
+  else if (!_cups_strcasecmp(job->format, "image/pwg-raster"))
+    snprintf(filename, sizeof(filename), "%s/%d.ras",
              client->printer->directory, job->id);
   else if (!_cups_strcasecmp(job->format, "application/pdf"))
     snprintf(filename, sizeof(filename), "%s/%d.pdf",
@@ -3985,7 +3826,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
     if (httpError(client->http) == EPIPE)
       fprintf(stderr, "%s Client closed connection.\n", client->hostname);
     else
-      fprintf(stderr, "%s Bad request line.\n", client->hostname);
+      fprintf(stderr, "%s Bad request line (%s).\n", client->hostname,
+              strerror(httpError(client->http)));
 
     return (0);
   }
@@ -4456,7 +4298,81 @@ process_job(_ipp_job_t *job)		/* I - Job */
   job->state          = IPP_JSTATE_PROCESSING;
   job->printer->state = IPP_PSTATE_PROCESSING;
 
-  sleep(5);
+  if (job->printer->command)
+  {
+   /*
+    * Execute a command with the job spool file and wait for it to complete...
+    */
+
+    int 	pid,			/* Process ID */
+		status;			/* Exit status */
+    time_t	start,			/* Start time */
+		end;			/* End time */
+
+    fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
+            job->filename);
+    time(&start);
+
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Child comes here...
+      */
+
+      execlp(job->printer->command, job->printer->command, job->filename,
+             (void *)NULL);
+      exit(errno);
+    }
+    else if (pid < 0)
+    {
+     /*
+      * Unable to fork process...
+      */
+
+      perror("Unable to start job processing command");
+    }
+    else
+    {
+     /*
+      * Wait for child to complete...
+      */
+
+#ifdef HAVE_WAITPID
+      while (waitpid(pid, &status, 0) < 0);
+#else
+      while (wait(&status) < 0);
+#endif /* HAVE_WAITPID */
+
+      if (status)
+      {
+        if (WIFEXITED(status))
+	  fprintf(stderr, "Command \"%s\" exited with status %d.\n",
+	          job->printer->command, WEXITSTATUS(status));
+        else
+	  fprintf(stderr, "Command \"%s\" terminated with signal %d.\n",
+	          job->printer->command, WTERMSIG(status));
+      }
+      else
+	fprintf(stderr, "Command \"%s\" completed successfully.\n",
+		job->printer->command);
+    }
+
+   /*
+    * Make sure processing takes at least 5 seconds...
+    */
+
+    time(&end);
+    if ((end - start) < 5)
+      sleep(5);
+  }
+  else
+  {
+   /*
+    * Sleep for a random amount of time to simulate job processing.
+    */
+
+    sleep(5 + (rand() % 11));
+  }
 
   if (job->cancel)
     job->state = IPP_JSTATE_CANCELED;
@@ -4964,7 +4880,8 @@ valid_doc_attributes(
 
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
         ippGetGroupTag(attr) != IPP_TAG_OPERATION ||
-        (op != IPP_OP_PRINT_JOB && op != IPP_OP_SEND_DOCUMENT) ||
+        (op != IPP_OP_PRINT_JOB && op != IPP_OP_SEND_DOCUMENT &&
+         op != IPP_OP_VALIDATE_JOB) ||
         !ippContainsString(supported, compression))
     {
       respond_unsupported(client, attr);

@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -399,6 +399,7 @@ AccessLogLevel actions
 LogLevel debug2
 LogTimeFormat usecs
 PreserveJobHistory Yes
+PreserveJobFiles No
 <Policy default>
 <Limit All>
 Order Allow,Deny

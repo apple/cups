@@ -590,6 +590,11 @@ extern http_status_t	cupsStartDestDocument(http_t *http, cups_dest_t *dest,
 					      cups_option_t *options,
 					      int last_document) _CUPS_API_1_6;
 
+/* New in CUPS 1.7 */
+extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
+extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
+
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */

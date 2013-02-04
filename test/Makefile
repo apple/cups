@@ -40,11 +40,16 @@ TESTFILES	=	\
 			create-printer-subscription.test \
 			get-completed-jobs.test \
 			get-jobs.test \
+			get-notifications.test \
 			get-printer-attributes.test \
 			ipp-1.1.test \
 			ipp-2.0.test \
 			ipp-2.1.test \
-			ipp-2.2.test
+			ipp-2.2.test \
+			ipp-everywhere.test \
+			print-job.test \
+			print-job-deflate.test \
+			print-job-gzip.test
 OBJS		=	\
 			ippserver.o \
 			ipptool.o \

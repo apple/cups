@@ -3,7 +3,7 @@ dnl "$Id: cups-compiler.m4 7871 2008-08-27 21:12:43Z mike $"
 dnl
 dnl   Compiler stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
+dnl   Copyright 2007-2013 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -114,29 +114,38 @@ if test -n "$GCC"; then
 	OLDCFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fstack-protector"
 	AC_TRY_LINK(,,
-		OPTIM="$OPTIM -fstack-protector"
+		if test "x$LSB_BUILD" = xy; then
+			# Can't use stack-protector with LSB binaries...
+			OPTIM="$OPTIM -fno-stack-protector"
+		else
+			OPTIM="$OPTIM -fstack-protector"
+		fi
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
 
-	# The -fPIE option is available with some versions of GCC and adds
-	# randomization of addresses, which avoids another class of exploits
-	# that depend on a fixed address for common functions.
-	AC_MSG_CHECKING(if GCC supports -fPIE)
-	OLDCFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -fPIE"
-	AC_TRY_COMPILE(,,
-		[case "$CC" in
-			*clang)
-				PIEFLAGS="-fPIE -Wl,-pie"
-				;;
-			*)
-				PIEFLAGS="-fPIE -pie"
-				;;
-		esac
-		AC_MSG_RESULT(yes)],
-		AC_MSG_RESULT(no))
-	CFLAGS="$OLDCFLAGS"
+	if test "x$LSB_BUILD" != xy; then
+		# The -fPIE option is available with some versions of GCC and
+		# adds randomization of addresses, which avoids another class of
+		# exploits that depend on a fixed address for common functions.
+		#
+		# Not available to LSB binaries...
+		AC_MSG_CHECKING(if GCC supports -fPIE)
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -fPIE"
+		AC_TRY_COMPILE(,,
+			[case "$CC" in
+				*clang)
+					PIEFLAGS="-fPIE -Wl,-pie"
+					;;
+				*)
+					PIEFLAGS="-fPIE -pie"
+					;;
+			esac
+			AC_MSG_RESULT(yes)],
+			AC_MSG_RESULT(no))
+		CFLAGS="$OLDCFLAGS"
+	fi
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...

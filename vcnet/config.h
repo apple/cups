@@ -3,7 +3,7 @@
  *
  *   Configuration file for CUPS on Windows.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -86,8 +86,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.6.0"
-#define CUPS_MINIMAL "CUPS/1.6.0"
+#define CUPS_SVERSION "CUPS v1.7.0"
+#define CUPS_MINIMAL "CUPS/1.7.0"
 
 
 /*
@@ -104,7 +104,7 @@
  * Default file permissions...
  */
 
-#define CUPS_DEFAULT_CONFIG_FILE_PERM 0644
+#define CUPS_DEFAULT_CONFIG_FILE_PERM 0640
 #define CUPS_DEFAULT_LOG_FILE_PERM 0644
 
 
@@ -128,12 +128,8 @@
  */
 
 #define CUPS_DEFAULT_BROWSING 1
-#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "CUPS dnssd"
-#define CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS ""
-#define CUPS_DEFAULT_BROWSE_SHORT_NAMES 1
+#define CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS ""
 #define CUPS_DEFAULT_DEFAULT_SHARED 1
-#define CUPS_DEFAULT_IMPLICIT_CLASSES 1
-#define CUPS_DEFAULT_USE_NETWORK_DEFAULT 0
 
 
 /*
@@ -173,6 +169,13 @@
 
 
 /*
+ * Default WebInterface value...
+ */
+
+#undef CUPS_DEFAULT_WEBIF
+
+
+/*
  * Where are files stored?
  *
  * Note: These are defaults, which can be overridden by environment
@@ -194,13 +197,11 @@
 
 
 /*
- * Do we have various image libraries?
+ * Do we have ZLIB?
  */
 
-/* #undef HAVE_LIBPNG */
-/* #undef HAVE_LIBZ */
-/* #undef HAVE_LIBJPEG */
-/* #undef HAVE_LIBTIFF */
+#define HAVE_LIBZ 1
+#define HAVE_INFLATECOPY 1
 
 
 /*
@@ -231,10 +232,10 @@
 
 
 /*
- * Do we have <scsi/sg.h>?
+ * Use <stdint.h>?
  */
 
-/* #undef HAVE_SCSI_SG_H */
+/* #undef HAVE_STDINT_H */
 
 
 /*
@@ -360,35 +361,25 @@
 
 
 /*
+ * Do we have the SSL_set_tlsext_host_name function?
+ */
+
+/* #undef HAVE_SSL_SET_TLSEXT_HOST_NAME */
+
+
+/*
  * What Security framework headers do we have?
  */
 
 /* #undef HAVE_AUTHORIZATION_H */
+/* #undef HAVE_SECBASEPRIV_H */
+/* #undef HAVE_SECCERTIFICATE_H */
+/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
+/* #undef HAVE_SECITEM_H */
+/* #undef HAVE_SECITEMPRIV_H */
 /* #undef HAVE_SECPOLICY_H */
 /* #undef HAVE_SECPOLICYPRIV_H */
-/* #undef HAVE_SECBASEPRIV_H */
-/* #undef HAVE_SECIDENTITYSEARCHPRIV_H */
-
-
-/*
- * Do we have the SecIdentitySearchCreateWithPolicy function?
- */
-
-/* #undef HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY */
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-/* #undef HAVE_SECPOLICYCREATESSL */
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-/* #undef HAVE_SECPOLICYCREATESSL */
+/* #undef HAVE_SECURETRANSPORTPRIV_H */
 
 
 /*
@@ -399,25 +390,6 @@
 
 
 /*
- * Do we have the SLP library?
- */
-
-/* #undef HAVE_LIBSLP */
-
-
-/*
- * Do we have an LDAP library?
- */
-
-/* #undef HAVE_LDAP */
-/* #undef HAVE_OPENLDAP */
-/* #undef HAVE_MOZILLA_LDAP */
-/* #undef HAVE_LDAP_SSL_H */
-/* #undef HAVE_LDAP_SSL */
-/* #undef HAVE_LDAP_REBIND_PROC */
-
-
-/*
  * Do we have libpaper?
  */
 
@@ -425,10 +397,24 @@
 
 
 /*
- * Do we have DNS Service Discovery (aka Bonjour)?
+ * Do we have mDNSResponder for DNS Service Discovery (aka Bonjour)?
  */
 
 #define HAVE_DNSSD 1
+
+
+/*
+ * Do we have Avahi for DNS Service Discovery (aka Bonjour)?
+ */
+
+#undef HAVE_AVAHI
+
+
+/*
+ * Do we have <sys/ioctl.h>?
+ */
+
+#undef HAVE_SYS_IOCTL_H
 
 
 /*
@@ -436,13 +422,6 @@
  */
 
 /* #undef HAVE_ST_GEN */
-
-
-/*
- * Do we have <sys/ioctl.h>?
- */
-
-/* #undef HAVE_SYS_IOCTL_H */
 
 
 /*
@@ -556,6 +535,7 @@
  */
 
 /* #undef HAVE_PDFTOPS */
+/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
 #define CUPS_PDFTOPS ""
 
 
@@ -565,14 +545,6 @@
 
 /* #undef HAVE_GHOSTSCRIPT */
 #define CUPS_GHOSTSCRIPT ""
-
-
-/*
- * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
- */
-
-/* #undef HAVE_COREFOUNDATION */
-/* #undef HAVE_SYSTEMCONFIGURATION */
 
 
 /*
@@ -639,11 +611,8 @@
 /* #undef HAVE_GSS_GSSAPI_H */
 /* #undef HAVE_GSS_GSSAPI_SPI_H */
 /* #undef HAVE_GSSAPI */
-/* #undef HAVE_GSSAPI_GENERIC_H */
 /* #undef HAVE_GSSAPI_GSSAPI_H */
 /* #undef HAVE_GSSAPI_H */
-/* #undef HAVE_GSSAPI_KRB5_H */
-/* #undef HAVE_KRB5_H */
 
 
 /*
@@ -731,7 +700,7 @@
  * Do we have libusb?
  */
 
-/* #undef HAVE_USB_H */
+/* #undef HAVE_LIBUSB */
 
 
 /*
@@ -768,18 +737,36 @@
 
 
 /*
- * Do we have the ColorSyncRegisterDevice function?
- */
-
-/* #undef HAVE_COLORSYNCREGISTERDEVICE */
-
-
-/*
  * Do we have XPC?
  */
 
 /* #undef HAVE_XPC */
+/* #undef HAVE_XPC_PRIVATE_H */
 
+
+/*
+ * Do we have Mini-XML?
+ */
+
+/* #undef HAVE_MXML_H */
+
+
+/*
+ * Do we have the C99 abs() function?
+ */
+
+/* #undef HAVE_ABS */
+#if !defined(HAVE_ABS) && !defined(abs)
+#  if defined(__GNUC__) || __STDC_VERSION__ >= 199901L
+#    define abs(x) _cups_abs(x)
+static inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  elif defined(_MSC_VER)
+#    define abs(x) _cups_abs(x)
+static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
+#  else
+#    define abs(x) ((x) < 0 ? -(x) : (x))
+#  endif /* __GNUC__ || __STDC_VERSION__ */
+#endif /* !HAVE_ABS && !abs */
 
 #endif /* !_CUPS_CONFIG_H_ */
 

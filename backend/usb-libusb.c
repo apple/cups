@@ -148,6 +148,8 @@ static const struct quirk_printer_struct quirk_printers[] = {
 			    Printer, http://www.cups.org/str.php?L4155 */
 	{ 0x04a9, 0x10b6, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4300
 			    Printer, https://bugs.launchpad.net/bugs/1032385 */
+	{ 0x04a9, 0x1721, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP210
+		      https://bugzilla.redhat.com/show_bug.cgi?id=847923#c53 */
 	{ 0x04a9, 0x170c, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP500
 			    Printer, https://bugs.launchpad.net/bugs/1032456 */
 	{ 0x04a9, 0x1717, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP510
@@ -175,6 +177,8 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	                  USBLP_QUIRK_RESET },
 	{ 0x0924, 0x3ce9, USBLP_QUIRK_NO_REATTACH }, /* Xerox Phaser 3124
 			  https://bugzilla.redhat.com/show_bug.cgi?id=867392 */
+	{ 0x0924, 0x4293, USBLP_QUIRK_NO_REATTACH }, /* Xerox WorkCentre 3210
+				     https://bugs.launchpad.net/bugs/1102470 */
 	/* Prolific Technology, Inc. PL2305 Parallel Port
 	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
 	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices,

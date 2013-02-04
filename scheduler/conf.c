@@ -590,7 +590,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");
-  cupsdSetStringf(&ServerHeader, "CUPS/%d.%d", CUPS_VERSION_MAJOR,
+  cupsdSetStringf(&ServerHeader, "CUPS/%d.%d IPP/2.1", CUPS_VERSION_MAJOR,
                   CUPS_VERSION_MINOR);
   cupsdSetString(&StateDir, CUPS_STATEDIR);
 
@@ -3182,19 +3182,20 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       uname(&plat);
 
       if (!_cups_strcasecmp(value, "ProductOnly"))
-	cupsdSetString(&ServerHeader, "CUPS");
+	cupsdSetString(&ServerHeader, "CUPS IPP");
       else if (!_cups_strcasecmp(value, "Major"))
-	cupsdSetStringf(&ServerHeader, "CUPS/%d", CUPS_VERSION_MAJOR);
+	cupsdSetStringf(&ServerHeader, "CUPS/%d IPP/2", CUPS_VERSION_MAJOR);
       else if (!_cups_strcasecmp(value, "Minor"))
-	cupsdSetStringf(&ServerHeader, "CUPS/%d.%d", CUPS_VERSION_MAJOR,
+	cupsdSetStringf(&ServerHeader, "CUPS/%d.%d IPP/2.1", CUPS_VERSION_MAJOR,
 	                CUPS_VERSION_MINOR);
       else if (!_cups_strcasecmp(value, "Minimal"))
-	cupsdSetString(&ServerHeader, CUPS_MINIMAL);
+	cupsdSetString(&ServerHeader, CUPS_MINIMAL " IPP/2.1");
       else if (!_cups_strcasecmp(value, "OS"))
-	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s)", plat.sysname);
+	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s %s) IPP/2.1",
+	                plat.sysname, plat.release);
       else if (!_cups_strcasecmp(value, "Full"))
-	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s) IPP/2.1",
-	                plat.sysname);
+	cupsdSetStringf(&ServerHeader, CUPS_MINIMAL " (%s %s; %s) IPP/2.1",
+	                plat.sysname, plat.release, plat.machine);
       else if (!_cups_strcasecmp(value, "None"))
 	cupsdClearString(&ServerHeader);
       else

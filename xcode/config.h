@@ -4,7 +4,7 @@
  *
  *   Configuration file for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -132,13 +132,11 @@
 
 
 /*
- * Do we have various image libraries?
+ * Do we have ZLIB?
  */
 
-/* #undef HAVE_LIBPNG */
 #define HAVE_LIBZ 1
-/* #undef HAVE_LIBJPEG */
-/* #undef HAVE_LIBTIFF */
+#define HAVE_INFLATECOPY 1
 
 
 /*
@@ -576,11 +574,8 @@
 #define HAVE_GSS_GSSAPI_H 1
 /* #undef HAVE_GSS_GSSAPI_SPI_H */
 #define HAVE_GSSAPI 1
-/* #undef HAVE_GSSAPI_GENERIC_H */
 /* #undef HAVE_GSSAPI_GSSAPI_H */
 /* #undef HAVE_GSSAPI_H */
-#define HAVE_GSSAPI_KRB5_H 1
-#define HAVE_KRB5_H 1
 
 
 /*

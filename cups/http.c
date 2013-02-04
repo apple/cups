@@ -3,7 +3,7 @@
  *
  *   HTTP routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -37,7 +37,6 @@
  *   httpConnectEncrypt()	  - Connect to a HTTP server using encryption.
  *   httpCopyCredentials()	  - Copy the credentials associated with an
  *				    encrypted connection.
- *   _httpCreate()		  - Create an unconnected HTTP connection.
  *   _httpCreateCredentials()	  - Create credentials in the internal format.
  *   httpDelete()		  - Send a DELETE request to the server.
  *   _httpDisconnect()		  - Disconnect a HTTP connection.
@@ -118,6 +117,7 @@
  *   http_bio_write()		  - Write data for OpenSSL.
  *   http_content_coding_finish() - Finish doing any content encoding.
  *   http_content_coding_start()  - Start doing content encoding.
+ *   http_create()		  - Create an unconnected HTTP connection.
  *   http_debug_hex()		  - Do a hex dump of a buffer.
  *   http_field()		  - Return the field index for a field name.
  *   http_read()		  - Read a buffer from a HTTP connection.
@@ -167,6 +167,10 @@ static void		http_content_coding_finish(http_t *http);
 static void		http_content_coding_start(http_t *http,
 						  const char *value);
 #endif /* HAVE_LIBZ */
+static http_t		*http_create(const char *host, int port,
+			             http_addrlist_t *addrlist, int family,
+				     http_encryption_t encryption,
+				     int blocking, _http_mode_t mode);
 #ifdef DEBUG
 static void		http_debug_hex(const char *prefix, const char *buffer,
 			               int bytes);
@@ -318,7 +322,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
 
   memset(&addrlist, 0, sizeof(addrlist));
 
-  if ((http = _httpCreate(NULL, 0, &addrlist, AF_UNSPEC,
+  if ((http = http_create(NULL, 0, &addrlist, AF_UNSPEC,
                           HTTP_ENCRYPTION_IF_REQUESTED, blocking,
                           _HTTP_MODE_SERVER)) == NULL)
     return (NULL);
@@ -347,7 +351,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
   */
 
   val = 1;
-  setsockopt(http->fd, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+  setsockopt(http->fd, SOL_SOCKET, SO_NOSIGPIPE, CUPS_SOCAST &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
  /*
@@ -358,7 +362,7 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
   */
 
   val = 1;
-  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, (char *)&val, sizeof(val));
+  setsockopt(http->fd, IPPROTO_TCP, TCP_NODELAY, CUPS_SOCAST &val, sizeof(val));
 
 #ifdef FD_CLOEXEC
  /*
@@ -606,7 +610,7 @@ httpConnect2(
     int               family,		/* I - Address family to use or @code AF_UNSPEC@ for any */
     http_encryption_t encryption,	/* I - Type of encryption to use */
     int               blocking,		/* I - 1 for blocking connection, 0 for non-blocking */
-    int               msec,		/* I - Connection timeout in milliseconds */
+    int               msec,		/* I - Connection timeout in milliseconds, 0 means don't connect */
     int               *cancel)		/* I - Pointer to "cancel" variable */
 {
   http_t	*http;			/* New HTTP connection */
@@ -620,15 +624,15 @@ httpConnect2(
   * Create the HTTP structure...
   */
 
-  if ((http = _httpCreate(host, port, addrlist, family, encryption, blocking,
+  if ((http = http_create(host, port, addrlist, family, encryption, blocking,
                           _HTTP_MODE_CLIENT)) == NULL)
     return (NULL);
 
  /*
-  * Connect to the remote system...
+  * Optionally connect to the remote system...
   */
 
-  if (!httpReconnect2(http, msec, cancel))
+  if (msec == 0 || !httpReconnect2(http, msec, cancel))
     return (http);
 
  /*
@@ -731,96 +735,6 @@ httpCopyCredentials(
 #  else
   return (-1);
 #  endif /* HAVE_LIBSSL */
-}
-
-
-/*
- * '_httpCreate()' - Create an unconnected HTTP connection.
- */
-
-http_t *				/* O - HTTP connection */
-_httpCreate(
-    const char        *host,		/* I - Hostname */
-    int               port,		/* I - Port number */
-    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
-    int               family,		/* I - Address family or AF_UNSPEC */
-    http_encryption_t encryption,	/* I - Encryption to use */
-    int               blocking,		/* I - 1 for blocking mode */
-    _http_mode_t      mode)		/* I - _HTTP_MODE_CLIENT or _SERVER */
-{
-  http_t	*http;			/* New HTTP connection */
-  char		service[255];		/* Service name */
-  http_addrlist_t *myaddrlist = NULL;	/* My address list */
-
-
-  DEBUG_printf(("4_httpCreate(host=\"%s\", port=%d, addrlist=%p, family=%d, "
-                "encryption=%d, blocking=%d, mode=%d)", host, port, addrlist,
-                family, encryption, blocking, mode));
-
-  if (!host && mode == _HTTP_MODE_CLIENT)
-    return (NULL);
-
-  httpInitialize();
-
- /*
-  * Lookup the host...
-  */
-
-  if (addrlist)
-  {
-    myaddrlist = httpAddrCopyList(addrlist);
-  }
-  else
-  {
-    snprintf(service, sizeof(service), "%d", port);
-
-    myaddrlist = httpAddrGetList(host, family, service);
-  }
-
-  if (!myaddrlist)
-    return (NULL);
-
- /*
-  * Allocate memory for the structure...
-  */
-
-  if ((http = calloc(sizeof(http_t), 1)) == NULL)
-  {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
-    httpAddrFreeList(addrlist);
-    return (NULL);
-  }
-
- /*
-  * Initialize the HTTP data...
-  */
-
-  http->mode     = mode;
-  http->activity = time(NULL);
-  http->addrlist = myaddrlist;
-  http->blocking = blocking;
-  http->fd       = -1;
-#ifdef HAVE_GSSAPI
-  http->gssctx   = GSS_C_NO_CONTEXT;
-  http->gssname  = GSS_C_NO_NAME;
-#endif /* HAVE_GSSAPI */
-  http->version  = HTTP_VERSION_1_1;
-
-  if (host)
-    strlcpy(http->hostname, host, sizeof(http->hostname));
-
-  if (port == 443)			/* Always use encryption for https */
-    http->encryption = HTTP_ENCRYPTION_ALWAYS;
-  else
-    http->encryption = encryption;
-
-  http_set_wait(http);
-
- /*
-  * Return the new structure...
-  */
-
-  return (http);
 }
 
 
@@ -1062,7 +976,18 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     bytes = http_write_chunk(http, http->wbuffer, http->wused);
   else
+  {
     bytes = http_write(http, http->wbuffer, http->wused);
+
+    if (bytes > 0 && http->data_encoding == HTTP_ENCODING_LENGTH)
+    {
+      http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0)
+      {
+      }
+    }
+  }
 
   http->wused = 0;
 
@@ -1945,7 +1870,18 @@ httpPeek(http_t *http,			/* I - Connection to server */
       return (0);
     }
 
+    if (!len[0])
+    {
+      DEBUG_puts("1httpPeek: Blank chunk length, trying again...");
+      if (!httpGets(len, sizeof(len), http))
+      {
+	DEBUG_puts("1httpPeek: Could not get chunk length.");
+	return (0);
+      }
+    }
+
     http->data_remaining = strtoll(len, NULL, 16);
+
     if (http->data_remaining < 0)
     {
       DEBUG_puts("1httpPeek: Negative chunk length!");
@@ -2020,69 +1956,24 @@ httpPeek(http_t *http,			/* I - Connection to server */
       buflen = http->data_remaining;
 
     DEBUG_printf(("2httpPeek: Reading %d bytes into buffer.", (int)buflen));
-
-    do
-    {
-#ifdef HAVE_SSL
-      if (http->tls)
-	bytes = http_read_ssl(http, http->buffer, buflen);
-      else
-#endif /* HAVE_SSL */
-      bytes = recv(http->fd, http->buffer, buflen, 0);
-
-      if (bytes < 0)
-      {
-#ifdef WIN32
-	if (WSAGetLastError() != WSAEINTR)
-	{
-	  http->error = WSAGetLastError();
-	  return (-1);
-	}
-	else if (WSAGetLastError() == WSAEWOULDBLOCK)
-	{
-	  if (!http->timeout_cb ||
-	      !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = WSAEWOULDBLOCK;
-	    return (-1);
-	  }
-	}
-#else
-	if (errno == EWOULDBLOCK || errno == EAGAIN)
-	{
-	  if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	  else if (!http->timeout_cb && errno != EAGAIN)
-	  {
-	    http->error = errno;
-	    return (-1);
-	  }
-	}
-	else if (errno != EINTR)
-	{
-	  http->error = errno;
-	  return (-1);
-	}
-#endif /* WIN32 */
-      }
-    }
-    while (bytes < 0);
+    bytes = http_read(http, http->buffer, buflen);
 
     DEBUG_printf(("2httpPeek: Read " CUPS_LLFMT " bytes into buffer.",
                   CUPS_LLCAST bytes));
+    if (bytes > 0)
+    {
 #ifdef DEBUG
-    http_debug_hex("httpPeek", http->buffer, (int)bytes);
+      http_debug_hex("httpPeek", http->buffer, (int)bytes);
 #endif /* DEBUG */
 
-    http->used = bytes;
+      http->used = bytes;
+    }
   }
 
 #ifdef HAVE_LIBZ
   if (http->coding)
   {
+#  ifdef HAVE_INFLATECOPY
     int		zerr;			/* Decompressor error */
     z_stream	stream;			/* Copy of decompressor stream */
 
@@ -2144,6 +2035,12 @@ httpPeek(http_t *http,			/* I - Connection to server */
     }
 
     bytes = length - http->stream.avail_out;
+
+#  else
+    DEBUG_puts("2httpPeek: No inflateCopy on this platform, httpPeek does not "
+               "work with compressed streams.");
+    return (-1);
+#  endif /* HAVE_INFLATECOPY */
   }
   else
 #endif /* HAVE_LIBZ */
@@ -2181,10 +2078,6 @@ httpPeek(http_t *http,			/* I - Connection to server */
     http->error = EPIPE;
     return (0);
   }
-
-#ifdef DEBUG
-  http_debug_hex("httpPeek", buffer, (int)bytes);
-#endif /* DEBUG */
 
   return (bytes);
 }
@@ -2292,10 +2185,18 @@ httpRead2(http_t *http,			/* I - Connection to server */
   ssize_t	bytes;			/* Bytes read */
 
 
+#ifdef HAVE_LIBZ
   DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
                 ") coding=%d data_encoding=%d data_remaining=" CUPS_LLFMT,
-                http, buffer, CUPS_LLCAST length, http->coding,
+                http, buffer, CUPS_LLCAST length,
+                http->coding,
                 http->data_encoding, CUPS_LLCAST http->data_remaining));
+#else
+  DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT
+                ") data_encoding=%d data_remaining=" CUPS_LLFMT,
+                http, buffer, CUPS_LLCAST length,
+                http->data_encoding, CUPS_LLCAST http->data_remaining));
+#endif /* HAVE_LIBZ */
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -2379,8 +2280,13 @@ httpRead2(http_t *http,			/* I - Connection to server */
           else if (bytes == 0)
             break;
 
+          DEBUG_printf(("1httpRead2: Adding " CUPS_LLFMT " bytes to "
+                        "decompression buffer.", CUPS_LLCAST bytes));
+
           http->data_remaining  -= bytes;
           http->stream.avail_in += bytes;
+
+          bytes = 0;
         }
         else
           return (0);
@@ -2408,8 +2314,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
     DEBUG_printf(("1httpRead2: Reading up to %d bytes into buffer.",
                   (int)length));
 
-    if (length > http->data_remaining)
-      length = http->data_remaining;
+    if (length > (size_t)http->data_remaining)
+      length = (size_t)http->data_remaining;
 
     if ((bytes = http_read_buffered(http, buffer, length)) > 0)
       http->data_remaining -= bytes;
@@ -3782,6 +3688,11 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     * data, go idle...
     */
 
+#ifdef HAVE_LIBZ
+    if (http->coding)
+      http_content_coding_finish(http);
+#endif /* HAVE_LIBZ */
+
     if (http->wused)
     {
       if (httpFlushWrite(http) < 0)
@@ -3805,17 +3716,12 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     }
 
     if (http->state == HTTP_STATE_POST_RECV)
-    {
-#ifdef HAVE_LIBZ
-      if (http->coding)
-        http_content_coding_finish(http);
-#endif /* HAVE_LIBZ */
-
       http->state ++;
+    else
+      http->state = HTTP_STATE_WAITING;
 
-      DEBUG_printf(("2httpWrite2: Changed state to %s.",
-		    http_states[http->state + 1]));
-    }
+    DEBUG_printf(("2httpWrite2: Changed state to %s.",
+		  http_states[http->state + 1]));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -4073,6 +3979,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
     http_set_length(http);
 
+#ifdef HAVE_LIBZ
    /*
     * Then start any content encoding...
     */
@@ -4080,6 +3987,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     DEBUG_puts("1httpWriteResponse: Calling http_content_coding_start.");
     http_content_coding_start(http,
 			      httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
+#endif /* HAVE_LIBZ */
   }
 
   return (0);
@@ -4350,9 +4258,15 @@ http_content_coding_start(
         if (http->wused)
           httpFlushWrite(http);
 
+       /*
+        * Window size for compression is 11 bits - optimal based on PWG Raster
+        * sample files on pwg.org.  -11 is raw deflate, 27 is gzip, per ZLIB
+        * documentation.
+        */
+
         if ((zerr = deflateInit2(&(http->stream), Z_DEFAULT_COMPRESSION,
                                  Z_DEFLATED,
-				 coding == _HTTP_CODING_DEFLATE ? 11 : 27, 7,
+				 coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7,
 				 Z_DEFAULT_STRATEGY)) < Z_OK)
         {
           http->status = HTTP_ERROR;
@@ -4370,8 +4284,13 @@ http_content_coding_start(
           return;
         }
 
+       /*
+        * Window size for decompression is up to 15 bits (maximum supported).
+        * -15 is raw inflate, 31 is gunzip, per ZLIB documentation.
+        */
+
         if ((zerr = inflateInit2(&(http->stream),
-                                 coding == _HTTP_CODING_INFLATE ? 15 : 31))
+                                 coding == _HTTP_CODING_INFLATE ? -15 : 31))
 		< Z_OK)
         {
           free(http->dbuffer);
@@ -4395,6 +4314,102 @@ http_content_coding_start(
 		http->coding));
 }
 #endif /* HAVE_LIBZ */
+
+
+/*
+ * 'http_create()' - Create an unconnected HTTP connection.
+ */
+
+static http_t *				/* O - HTTP connection */
+http_create(
+    const char        *host,		/* I - Hostname */
+    int               port,		/* I - Port number */
+    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
+    int               family,		/* I - Address family or AF_UNSPEC */
+    http_encryption_t encryption,	/* I - Encryption to use */
+    int               blocking,		/* I - 1 for blocking mode */
+    _http_mode_t      mode)		/* I - _HTTP_MODE_CLIENT or _SERVER */
+{
+  http_t	*http;			/* New HTTP connection */
+  char		service[255];		/* Service name */
+  http_addrlist_t *myaddrlist = NULL;	/* My address list */
+
+
+  DEBUG_printf(("4http_create(host=\"%s\", port=%d, addrlist=%p, family=%d, "
+                "encryption=%d, blocking=%d, mode=%d)", host, port, addrlist,
+                family, encryption, blocking, mode));
+
+  if (!host && mode == _HTTP_MODE_CLIENT)
+    return (NULL);
+
+  httpInitialize();
+
+ /*
+  * Lookup the host...
+  */
+
+  if (addrlist)
+  {
+    myaddrlist = httpAddrCopyList(addrlist);
+  }
+  else
+  {
+    snprintf(service, sizeof(service), "%d", port);
+
+    myaddrlist = httpAddrGetList(host, family, service);
+  }
+
+  if (!myaddrlist)
+    return (NULL);
+
+ /*
+  * Allocate memory for the structure...
+  */
+
+  if ((http = calloc(sizeof(http_t), 1)) == NULL)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    httpAddrFreeList(addrlist);
+    return (NULL);
+  }
+
+ /*
+  * Initialize the HTTP data...
+  */
+
+  http->mode     = mode;
+  http->activity = time(NULL);
+  http->addrlist = myaddrlist;
+  http->blocking = blocking;
+  http->fd       = -1;
+#ifdef HAVE_GSSAPI
+  http->gssctx   = GSS_C_NO_CONTEXT;
+  http->gssname  = GSS_C_NO_NAME;
+#endif /* HAVE_GSSAPI */
+  http->version  = HTTP_VERSION_1_1;
+
+  if (host)
+    strlcpy(http->hostname, host, sizeof(http->hostname));
+
+  if (port == 443)			/* Always use encryption for https */
+    http->encryption = HTTP_ENCRYPTION_ALWAYS;
+  else
+    http->encryption = encryption;
+
+  http_set_wait(http);
+
+ /*
+  * Return the new structure...
+  */
+
+  return (http);
+}
+
+/* For OS X 10.8 and earlier */
+http_t *_httpCreate(const char *host, int port, http_addrlist_t *addrlist,
+		    http_encryption_t encryption, int family)
+{ return (http_create(host, port, addrlist, family, encryption, 1,
+                      _HTTP_MODE_CLIENT)); }
 
 
 #ifdef DEBUG
@@ -4831,9 +4846,12 @@ http_send(http_t       *http,		/* I - Connection to server */
   */
 
   if (!http->fields[HTTP_FIELD_USER_AGENT][0])
-    httpSetField(http, HTTP_FIELD_USER_AGENT,
-                 http->default_user_agent ? http->default_user_agent :
-                                            CUPS_MINIMAL);
+  {
+    if (http->default_user_agent)
+      httpSetField(http, HTTP_FIELD_USER_AGENT, http->default_user_agent);
+    else
+      httpSetField(http, HTTP_FIELD_USER_AGENT, cupsUserAgent());
+  }
 
  /*
   * Set the Accept-Encoding field if it isn't already...
@@ -4987,61 +5005,6 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   if ((credentials = http->tls_credentials) == NULL)
     credentials = cg->tls_credentials;
 
- /*
-  * Otherwise root around in the user's keychain to see if one can be found...
-  */
-
-  if (!credentials)
-  {
-    CFDictionaryRef	query;		/* Query dictionary */
-    CFTypeRef		matches = NULL;	/* Matching credentials */
-    CFArrayRef		dn_array = NULL;/* Distinguished names array */
-    CFTypeRef		keys[]   = { kSecClass,
-				     kSecMatchLimit,
-				     kSecReturnRef };
-					/* Keys for dictionary */
-    CFTypeRef		values[] = { kSecClassCertificate,
-				     kSecMatchLimitOne,
-				     kCFBooleanTrue };
-					/* Values for dictionary */
-
-   /*
-    * Get the names associated with the server.
-    */
-
-    if ((error = SSLCopyDistinguishedNames(http->tls, &dn_array)) != noErr)
-    {
-      DEBUG_printf(("4http_set_credentials: SSLCopyDistinguishedNames, error=%d",
-                    (int)error));
-      return (error);
-    }
-
-   /*
-    * Create a query which will return all identities that can sign and match
-    * the passed in policy.
-    */
-
-    query = CFDictionaryCreate(NULL,
-			       (const void**)(&keys[0]),
-			       (const void**)(&values[0]),
-			       sizeof(keys) / sizeof(keys[0]),
-			       &kCFTypeDictionaryKeyCallBacks,
-			       &kCFTypeDictionaryValueCallBacks);
-    if (query)
-    {
-      error = SecItemCopyMatching(query, &matches);
-      DEBUG_printf(("4http_set_credentials: SecItemCopyMatching, error=%d",
-		    (int)error));
-      CFRelease(query);
-    }
-
-    if (matches)
-      CFRelease(matches);
-
-    if (dn_array)
-      CFRelease(dn_array);
-  }
-
   if (credentials)
   {
     error = SSLSetCertificate(http->tls, credentials);
@@ -5121,8 +5084,8 @@ http_set_timeout(int    fd,		/* I - File descriptor */
   DWORD tv = (DWORD)(timeout * 1000);
 				      /* Timeout in milliseconds */
 
-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
 
 #else
   struct timeval tv;			/* Timeout in secs and usecs */
@@ -5130,8 +5093,8 @@ http_set_timeout(int    fd,		/* I - File descriptor */
   tv.tv_sec  = (int)timeout;
   tv.tv_usec = (int)(1000000 * fmod(timeout, 1.0));
 
-  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, CUPS_SOCAST &tv, sizeof(tv));
+  setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, CUPS_SOCAST &tv, sizeof(tv));
 #endif /* WIN32 */
 }
 

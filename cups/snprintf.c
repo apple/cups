@@ -3,7 +3,7 @@
  *
  *   snprintf functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -296,13 +296,13 @@ _cups_vsnprintf(char       *buffer,	/* O - Output buffer */
 
 	      if (sign == '-')
 	      {
-		strncpy(bufptr, s, (size_t)slen);
+		memcpy(bufptr, s, (size_t)slen);
 		memset(bufptr + slen, ' ', (size_t)(width - slen));
 	      }
 	      else
 	      {
 		memset(bufptr, ' ', (size_t)(width - slen));
-		strncpy(bufptr + width - slen, s, (size_t)slen);
+		memcpy(bufptr + width - slen, s, (size_t)slen);
 	      }
 
 	      bufptr += width;

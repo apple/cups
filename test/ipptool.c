@@ -53,7 +53,9 @@
 #include <cups/file-private.h>
 #include <regex.h>
 #include <sys/stat.h>
-#ifndef WIN32
+#ifdef WIN32
+#  define R_OK 0
+#else
 #  include <signal.h>
 #endif /* WIN32 */
 #ifndef O_BINARY
@@ -413,7 +415,10 @@ main(int  argc,				/* I - Number of command-line args */
               }
 
               if (vars.filename)
+              {
 		free(vars.filename);
+		vars.filename = NULL;
+	      }
 
               if (access(argv[i], 0))
               {
@@ -436,6 +441,8 @@ main(int  argc,				/* I - Number of command-line args */
 			     cg->cups_datadir, argv[i]);
 		    if (access(filename, 0))
 		      vars.filename = strdup(argv[i]);
+		    else
+		      vars.filename = strdup(filename);
 		  }
 		  else
 		    vars.filename = strdup(filename);
@@ -471,7 +478,9 @@ main(int  argc,				/* I - Number of command-line args */
                 else if (!_cups_strcasecmp(ext, ".ps") ||
                          !_cups_strcasecmp(ext, ".ps.gz"))
                   set_variable(&vars, "filetype", "application/postscript");
-                else if (!_cups_strcasecmp(ext, ".ras") ||
+                else if (!_cups_strcasecmp(ext, ".pwg") ||
+                         !_cups_strcasecmp(ext, ".pwg.gz") ||
+                         !_cups_strcasecmp(ext, ".ras") ||
                          !_cups_strcasecmp(ext, ".ras.gz"))
                   set_variable(&vars, "filetype", "image/pwg-raster");
                 else if (!_cups_strcasecmp(ext, ".txt") ||
@@ -1379,6 +1388,28 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
+      else if (!strcmp(token, "SKIP-IF-MISSING"))
+      {
+       /*
+	* SKIP-IF-MISSING filename
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  expand_variables(vars, token, temp, sizeof(token));
+	  get_filename(testfile, filename, token, sizeof(filename));
+
+	  if (access(filename, R_OK))
+	    skip_test = 1;
+	}
+	else
+	{
+	  print_fatal_error("Missing SKIP-IF-MISSING filename on line %d.",
+			    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
       else if (!strcmp(token, "SKIP-IF-NOT-DEFINED"))
       {
        /*
@@ -1824,6 +1855,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         expand_variables(vars, token, temp, sizeof(token));
 	get_filename(testfile, filename, token, sizeof(filename));
+
+        if (access(filename, R_OK))
+        {
+	  print_fatal_error("Filename \"%s\" on line %d cannot be read.",
+	                    temp, linenum);
+	  print_fatal_error("Filename mapped to \"%s\".", filename);
+	  pass = 0;
+	  goto test_exit;
+        }
       }
       else if (!_cups_strcasecmp(token, "STATUS"))
       {
@@ -2278,7 +2318,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (request->attrs)
       {
 	puts("<dict>");
-	for (attrptr = request->attrs, group = attrptr->group_tag;
+	for (attrptr = request->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	  print_attr(attrptr, &group);
@@ -2632,7 +2673,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
-	for (attrptr = response->attrs, group = attrptr->group_tag;
+	for (attrptr = response->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	{
@@ -5249,7 +5291,8 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 {
   int	i,				/* Looping var */
 	match;				/* Match? */
-  char	*valptr;			/* Pointer into value */
+  char	temp[256],			/* Temporary value string */
+	*valptr;			/* Pointer into value */
 
 
   *matchbuf = '\0';
@@ -5433,6 +5476,63 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 	}
 	break;
 
+    case IPP_TAG_RESOLUTION :
+	for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].resolution.xres ==
+	          attr->values[i].resolution.yres)
+	    snprintf(temp, sizeof(temp), "%d%s",
+	             attr->values[i].resolution.xres,
+	             attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+	                 "dpi" : "dpcm");
+	  else
+	    snprintf(temp, sizeof(temp), "%dx%d%s",
+	             attr->values[i].resolution.xres,
+	             attr->values[i].resolution.yres,
+	             attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+	                 "dpi" : "dpcm");
+
+          if (!strcmp(value, temp))
+          {
+            if (!matchbuf[0])
+	      strlcpy(matchbuf, value, matchlen);
+
+	    if (!(flags & _CUPS_WITH_ALL))
+	    {
+	      match = 1;
+	      break;
+	    }
+	  }
+	  else if (flags & _CUPS_WITH_ALL)
+	  {
+	    match = 0;
+	    break;
+	  }
+	}
+
+	if (!match && errors)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (attr->values[i].resolution.xres ==
+		    attr->values[i].resolution.yres)
+	      snprintf(temp, sizeof(temp), "%d%s",
+		       attr->values[i].resolution.xres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpcm");
+	    else
+	      snprintf(temp, sizeof(temp), "%dx%d%s",
+		       attr->values[i].resolution.xres,
+		       attr->values[i].resolution.yres,
+		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+			   "dpi" : "dpcm");
+
+            if (strcmp(value, temp))
+	      add_stringf(errors, "GOT: %s=%s", attr->name, temp);
+	  }
+	}
+	break;
+
     case IPP_TAG_NOVALUE :
     case IPP_TAG_UNKNOWN :
 	return (1);
@@ -5457,8 +5557,6 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
           if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
 	  {
-	    char temp[256];		/* Temporary string */
-
             regerror(i, &re, temp, sizeof(temp));
 
 	    print_fatal_error("Unable to compile WITH-VALUE regular expression "

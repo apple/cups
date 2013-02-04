@@ -3,7 +3,7 @@
 #
 #   Create a printer subscription.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -14,13 +14,13 @@
 #
 # Usage:
 #
-#   ./ipptool -d recipient=uri printer-uri create-printer-subscription.test
+#   ./ipptool [-d recipient=uri] printer-uri create-printer-subscription.test
 #
-
 
 {
 	# The name of the test...
-	NAME "Create a printer subscription"
+	NAME "Create a push printer subscription"
+	SKIP-IF-NOT-DEFINED recipient
 
 	# The operation to use
 	OPERATION Create-Printer-Subscription
@@ -33,7 +33,33 @@
 
         GROUP subscription-attributes-tag
 	ATTR uri notify-recipient $recipient
-	ATTR keyword notify-events printer-state-changed
+	ATTR keyword notify-events printer-config-changed,printer-state-changed
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT notify-subscription-id OF-TYPE integer WITH-VALUE >0
+	DISPLAY notify-subscription-id
+}
+
+{
+	# The name of the test...
+	NAME "Create a pull printer subscription"
+	SKIP-IF-DEFINED recipient
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+
+	# The attributes to send
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+        GROUP subscription-attributes-tag
+	ATTR keyword notify-pull-method ippget
+	ATTR keyword notify-events printer-config-changed,printer-state-changed
 
 	# What statuses are OK?
 	STATUS successful-ok

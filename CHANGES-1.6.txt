@@ -3,7 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.2
 
-	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248)
+	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248,
+	  STR #4259)
 	- Security: All file, directory, user, and group settings are now stored
 	  in a separate cups-files.conf configuration file that cannot be set
 	  through the CUPS web interface or APIs (STR #4223)
@@ -11,7 +12,10 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228)
 	- Updated the Catalan localization (STR #4202)
-	- Added a USB quirk rule for Xerox Phaser 3124 printers (STR #4217)
+	- The lp command did not show errors for unknown "--foo" (STR #4261)
+	- Bad IPP responses could crash ipptool (STR #4262)
+	- Updated USB quirk rules for Canon and Xerox printers (STR #4217,
+	  STR #4263)
 	- Added USB blacklisting for printers that require a custom backend
 	  (STR #4218)
 	- The PPD compiler did not correctly JCL options (STR #4115, STR #4203)

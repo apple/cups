@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -920,6 +920,7 @@ extern int		ippContainsInteger(ipp_attribute_t *attr, int value)
 			                   _CUPS_API_1_7;
 extern int		ippContainsString(ipp_attribute_t *attr,
 			                  const char *value) _CUPS_API_1_7;
+extern cups_array_t	*ippCreateRequestedArray(ipp_t *request) _CUPS_API_1_7;
 extern ipp_t		*ippNewResponse(ipp_t *request) _CUPS_API_1_7;
 extern int		ippSetStringf(ipp_t *ipp, ipp_attribute_t **attr,
 			              int element, const char *format,

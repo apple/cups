@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-01-10
+IPPTOOL.txt - 2013-01-31
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
@@ -54,19 +54,26 @@ STANDARD TEST FILES
                                             state change notifications
         get-completed-jobs.test             Shows a list of completed jobs
         get-jobs.test                       Shows a list of pending jobs
+        get-notifications.test              Shows events for an ippget
+	                                    subscription.
         get-printer-attributes.test         Shows printer attributes
         ipp-1.1.test                        IPP/1.1 conformance test suite
         ipp-2.0.test                        IPP/2.0 conformance test suite
         ipp-2.1.test                        IPP/2.1 conformance test suite
         ipp-2.2.test                        IPP/2.2 conformance test suite
+        ipp-everywhere.test                 IPP Everywhere conformance test
+                                            suite
         print-job.test                      Prints a file
+        print-job-deflate.test              Prints a file, compressing with
+                                            deflate.
+        print-job-gzip.test                 Prints a file, compressing with gzip
 
 
 CONFORMANCE TESTS
 
-    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, IPP/2.1, and
-    IPP/2.2.  For a given printer URI, the following commands perform tests at
-    each level:
+    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, IPP/2.1,
+    IPP/2.2, and IPP Everywhere.  For a given printer URI, the following
+    commands perform tests at each level:
 
         ipptool -tf filename [options] -I printer-uri ipp-1.1.test
         ipptool -tf filename [options] -I -V 2.0 printer-uri ipp-2.0.test
@@ -104,6 +111,7 @@ CONFORMANCE TESTS
         -S           Test IPP over HTTPS (default for ipps: URIs)
         -T seconds   Set a timeout for responses in seconds
         -v           Be verbose, showing all attributes sent and received
+        -X           Produce XML (Apple plist) output
 
     The printer-uri must be a URI supported by the printer using the "ipp" or
     "ipps" scheme, for example:
@@ -126,6 +134,18 @@ CONFORMANCE TESTS
     The "document" test files contain 4 pages each.  Doing the IPP conformance
     tests will will produce up to 90 pages on various media, depending on the
     printer.
+
+
+IPP EVERYWHERE TESTING
+
+    The IPP Everywhere tests use sample PWG raster files available from:
+
+        ftp://ftp.pwg.org/pub/pwg/ipp/examples
+
+    Extract the corresponding ZIP archives into the current directory before
+    running the ipp-everywhere.test file.  The test file will attempt to print
+    each PWG Raster file that is supported by the printer being tested - up to
+    372 pages including the 90 pages produced by the regular IPP test suite.
 
 
 READING THE DOCUMENTATION

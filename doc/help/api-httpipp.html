@@ -420,6 +420,7 @@ address and port.">httpAddrListen</a></li>
 components.">httpAssembleURI</a></li>
 	<li><a href="#httpAssembleURIf" title="Assemble a uniform resource identifier from its
 components with a formatted resource.">httpAssembleURIf</a></li>
+	<li><a href="#httpAssembleUUID" title="Assemble a name-based UUID URN conforming to RFC 4122.">httpAssembleUUID</a></li>
 	<li><a href="#httpBlocking" title="Set blocking/non-blocking behavior on a connection.">httpBlocking</a></li>
 	<li><a href="#httpCheck" title="Check to see if there is a pending response from the server.">httpCheck</a></li>
 	<li><a href="#httpClearCookie" title="Clear the cookie value(s).">httpClearCookie</a></li>
@@ -493,6 +494,7 @@ components.">httpSeparateURI</a></li>
 	<li><a href="#httpSetCookie" title="Set the cookie value(s).">httpSetCookie</a></li>
 	<li><a href="#httpSetCredentials" title="Set the credentials associated with an encrypted
 connection.">httpSetCredentials</a></li>
+	<li><a href="#httpSetDefaultField" title="Set the default value of an HTTP header.">httpSetDefaultField</a></li>
 	<li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
 	<li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
 	<li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
@@ -529,6 +531,8 @@ specified value or is within the list of ranges.">ippContainsInteger</a></li>
 specified string value.">ippContainsString</a></li>
 	<li><a href="#ippCopyAttribute" title="Copy an attribute.">ippCopyAttribute</a></li>
 	<li><a href="#ippCopyAttributes" title="Copy attributes from one IPP message to another.">ippCopyAttributes</a></li>
+	<li><a href="#ippCreateRequestedArray" title="Create a CUPS array of attribute names from the
+given requested-attributes attribute.">ippCreateRequestedArray</a></li>
 	<li><a href="#ippDateToTime" title="Convert from RFC 1903 Date/Time format to UNIX time
 in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippDelete" title="Delete an IPP message.">ippDelete</a></li>
@@ -589,6 +593,8 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
 	<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
 	<li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
+	<li><a href="#ippValidateAttribute" title="Validate the contents of an attribute.">ippValidateAttribute</a></li>
+	<li><a href="#ippValidateAttributes" title="Validate all attributes in an IPP message.">ippValidateAttributes</a></li>
 	<li><a href="#ippWrite" title="Write data for an IPP message to a HTTP connection.">ippWrite</a></li>
 	<li><a href="#ippWriteFile" title="Write data for an IPP message to a file.">ippWriteFile</a></li>
 	<li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
@@ -1645,6 +1651,40 @@ this function in place of traditional string functions whenever
 you need to create a URI string.
 
 </p>
+<h3 class="function"><a name="httpAssembleUUID">httpAssembleUUID</a></h3>
+<p class="description">Assemble a name-based UUID URN conforming to RFC 4122.</p>
+<p class="code">
+char *httpAssembleUUID (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *server,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int port,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int number,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>server</dt>
+<dd class="description">Server name</dd>
+<dt>port</dt>
+<dd class="description">Port number</dd>
+<dt>name</dt>
+<dd class="description">Object name or NULL</dd>
+<dt>number</dt>
+<dd class="description">Object number or 0</dd>
+<dt>buffer</dt>
+<dd class="description">String buffer</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">UUID string</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function creates a unique 128-bit identifying number using the server
+name, port number, random data, and optionally an object name and/or object
+number.  The result is formatted as a UUID URN as defined in RFC 4122.<br>
+<br>
+The buffer needs to be at least 46 bytes in size.</p>
 <h3 class="function"><a name="httpBlocking">httpBlocking</a></h3>
 <p class="description">Set blocking/non-blocking behavior on a connection.</p>
 <p class="code">
@@ -1753,7 +1793,7 @@ void httpClose (<br>
 <dt>blocking</dt>
 <dd class="description">1 for blocking connection, 0 for non-blocking</dd>
 <dt>msec</dt>
-<dd class="description">Connection timeout in milliseconds</dd>
+<dd class="description">Connection timeout in milliseconds, 0 means don't connect</dd>
 <dt>cancel</dt>
 <dd class="description">Pointer to &quot;cancel&quot; variable</dd>
 </dl>
@@ -2755,6 +2795,28 @@ int httpSetCredentials (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="httpSetDefaultField">httpSetDefaultField</a></h3>
+<p class="description">Set the default value of an HTTP header.</p>
+<p class="code">
+void httpSetDefaultField (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_field_t">http_field_t</a> field,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>field</dt>
+<dd class="description">Field index</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Currently only HTTP_FIELD_ACCEPT_ENCODING, HTTP_FIELD_SERVER, and
+HTTP_FIELD_USER_AGENT can be set.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
 <p class="description">Set the Expect: header in a request.</p>
 <p class="code">
@@ -3781,6 +3843,35 @@ The <code>cb</code> and <code>context</code> parameters provide a generic way to
 attributes that are copied - the function must return 1 to copy the attribute or
 0 to skip it. The function may also choose to do a partial copy of the source attribute
 itself.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippCreateRequestedArray">ippCreateRequestedArray</a></h3>
+<p class="description">Create a CUPS array of attribute names from the
+given requested-attributes attribute.</p>
+<p class="code">
+cups_array_t *ippCreateRequestedArray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *request<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>request</dt>
+<dd class="description">IPP request</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">CUPS array or <code>NULL</code> if all</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function creates a (sorted) CUPS array of attribute names matching the
+list of &quot;requested-attribute&quot; values supplied in an IPP request.  All IANA-
+registered values are supported in addition to the CUPS IPP extension
+attributes.<br>
+<br>
+The <code>request</code> parameter specifies the request message that was read from
+the client.
+
+<code>NULL</code> is returned if all attributes should be returned.  Otherwise, the
+result is a sorted array of attribute names, where <code>cupsArrayFind(array,
+"attribute-name")</code> will return a non-NULL pointer.  The array must be freed
+using the <code>cupsArrayDelete</code> function.
 
 </p>
 <h3 class="function"><a name="ippDateToTime">ippDateToTime</a></h3>
@@ -4976,6 +5067,44 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">RFC-1903 date/time data</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippValidateAttribute">ippValidateAttribute</a></h3>
+<p class="description">Validate the contents of an attribute.</p>
+<p class="code">
+int ippValidateAttribute (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">Attribute</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if valid, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function validates the contents of an attribute based on the name and
+value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
+failure, cupsLastErrorString() is set to a human-readable message.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippValidateAttributes">ippValidateAttributes</a></h3>
+<p class="description">Validate all attributes in an IPP message.</p>
+<p class="code">
+int ippValidateAttributes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if valid, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function validates the contents of the IPP message, including each
+attribute.  Like <a href="#ippValidateAttribute"><code>ippValidateAttribute</code></a>, cupsLastErrorString() is set
+to a human-readable message on failure.
+
+</p>
 <h3 class="function"><a name="ippWrite">ippWrite</a></h3>
 <p class="description">Write data for an IPP message to a HTTP connection.</p>
 <p class="code">

@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2012-10-22 11:09-0400\n"
+"POT-Creation-Date: 2013-02-04 14:17-0500\n"
 "PO-Revision-Date: 2012-06-13 01:20+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -1155,6 +1155,169 @@ msgstr " 失敗"
 
 msgid " PASS"
 msgstr " 合格"
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+"4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
+"section 4.1.13)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+"4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+"positive (RFC 2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
+"2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+msgstr ""
 
 #, c-format
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
@@ -2309,6 +2472,13 @@ msgstr "\"%s\" は不正な document-format-default です。"
 msgid "Bad filename buffer"
 msgstr "不正なファイル名バッファーです。"
 
+#, c-format
+msgid "Bad job-name value: %s"
+msgstr ""
+
+msgid "Bad job-name value: Wrong type or count."
+msgstr ""
+
 msgid "Bad job-priority value."
 msgstr "不正な job-priority 値です。"
 
@@ -2838,8 +3008,8 @@ msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
 "in \"%s/cups-files.conf\"."
 msgstr ""
-"ファイルデバイス URI は無効になっています。有効にするには、\"%s/cups-files.conf\" "
-"の FileDevice ディレクティブを参照してください。"
+"ファイルデバイス URI は無効になっています。有効にするには、\"%s/cups-files."
+"conf\" の FileDevice ディレクティブを参照してください。"
 
 #, c-format
 msgid "Finished page %d."
@@ -2929,9 +3099,6 @@ msgstr "IPP 名が 32767 バイトより大きいです。"
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr "IPP の nameWithLanguage が最小値 4 バイト未満です。"
 
-msgid "IPP nameWithLanguage value more than maximum 1090 bytes."
-msgstr ""
-
 msgid "IPP octetString length too large."
 msgstr ""
 
@@ -2944,17 +3111,8 @@ msgstr "IPP の resolution は想定された 9 バイトになっていませ�
 msgid "IPP string length overflows value."
 msgstr "IPP の文字列長の値がオーバーフローしています。"
 
-msgid "IPP string value too large."
-msgstr ""
-
-msgid "IPP text length too large."
-msgstr ""
-
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr "IPP の textWithLanguage の値が最小値 4 バイト未満です。"
-
-msgid "IPP textWithLanguage value more than maximum 1090 bytes."
-msgstr ""
 
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP の値が 32767 バイト以上です。"
@@ -4087,6 +4245,14 @@ msgstr "printer-is-shared 属性を変更することができません"
 msgid "Unable to change server settings"
 msgstr "サーバーの設定を変更できません"
 
+#, c-format
+msgid "Unable to compile mimeMediaType regular expression: %s."
+msgstr ""
+
+#, c-format
+msgid "Unable to compile naturalLanguage regular expression: %s."
+msgstr ""
+
 msgid "Unable to configure printer options."
 msgstr "プリンターオプションを設定できません。"
 
@@ -4128,9 +4294,6 @@ msgstr ""
 #, c-format
 msgid "Unable to copy interface script - %s"
 msgstr "インターフェイススクリプトをコピーできません - %s"
-
-msgid "Unable to create compressed print file"
-msgstr "圧縮プリントファイルを作成できません"
 
 msgid "Unable to create printer-uri"
 msgstr "printer-uri を作成できません。"
@@ -4186,9 +4349,6 @@ msgstr "ジョブの宛先が見つかりません"
 
 msgid "Unable to find printer."
 msgstr "プリンターが見つかりません。"
-
-msgid "Unable to generate compressed print file"
-msgstr "圧縮プリントファイルを生成できません"
 
 msgid "Unable to get backend exit status."
 msgstr "バックエンドの終了ステータスを取得できません。"
@@ -4249,9 +4409,6 @@ msgstr "複数のジョブを移動できません"
 
 msgid "Unable to open PPD file"
 msgstr "PPD ファイルを読み込むことができません"
-
-msgid "Unable to open compressed print file"
-msgstr "圧縮プリントファイルを開けません"
 
 msgid "Unable to open cupsd.conf file:"
 msgstr "cupsd.conf ファイルを開けません:"
@@ -4622,8 +4779,17 @@ msgstr "cupsctl: \"-%c\"は未知のオプションです。"
 msgid "cupsd: Expected config filename after \"-c\" option."
 msgstr "cupsd: \"-c\" オプションのあとには設定ファイル名が必要です。"
 
+msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
+msgstr ""
+
+msgid "cupsd: Relative cups-files.conf filename not allowed."
+msgstr ""
+
 msgid "cupsd: Unable to get current directory."
 msgstr "cupsd: カレントディレクトリーを取得できません。"
+
+msgid "cupsd: Unable to get path to cups-files.conf file."
+msgstr ""
 
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting."
@@ -5515,3 +5681,12 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
 #~ msgstr "プリンターが IPP/%d.%d をサポートしていません。IPP/%s を試します。"
+
+#~ msgid "Unable to create compressed print file"
+#~ msgstr "圧縮プリントファイルを作成できません"
+
+#~ msgid "Unable to generate compressed print file"
+#~ msgstr "圧縮プリントファイルを生成できません"
+
+#~ msgid "Unable to open compressed print file"
+#~ msgstr "圧縮プリントファイルを開けません"

@@ -139,21 +139,16 @@ httpAddrConnect2(
     */
 
     val = 1;
-#ifdef WIN32
-    setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&val,
-               sizeof(val));
-#else
-    setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-#endif /* WIN32 */
+    setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, CUPS_SOCAST &val, sizeof(val));
 
 #ifdef SO_REUSEPORT
     val = 1;
-    setsockopt(*sock, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
+    setsockopt(*sock, SOL_SOCKET, SO_REUSEPORT, CUPS_SOCAST &val, sizeof(val));
 #endif /* SO_REUSEPORT */
 
 #ifdef SO_NOSIGPIPE
     val = 1;
-    setsockopt(*sock, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
+    setsockopt(*sock, SOL_SOCKET, SO_NOSIGPIPE, CUPS_SOCAST &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
    /*
@@ -162,12 +157,7 @@ httpAddrConnect2(
     */
 
     val = 1;
-#ifdef WIN32
-    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&val,
-               sizeof(val));
-#else
-    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val));
-#endif /* WIN32 */
+    setsockopt(*sock, IPPROTO_TCP, TCP_NODELAY, CUPS_SOCAST &val, sizeof(val));
 
 #ifdef FD_CLOEXEC
    /*
@@ -370,7 +360,8 @@ httpAddrCopyList(
     else
       dst = current;
 
-    src = src->next;
+    prev = current;
+    src  = src->next;
   }
 
   return (dst);

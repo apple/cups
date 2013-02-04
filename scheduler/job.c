@@ -3645,7 +3645,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
           attr->value_tag == IPP_TAG_MIMETYPE ||
 	  attr->value_tag == IPP_TAG_NAMELANG ||
 	  attr->value_tag == IPP_TAG_TEXTLANG ||
-	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid")) ||
+	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid") &&
+	   strcmp(attr->name, "job-authorization-uri")) ||
 	  attr->value_tag == IPP_TAG_URISCHEME ||
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;

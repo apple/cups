@@ -34,11 +34,13 @@
 #  ifdef WIN32
 #    include <io.h>
 #    include <winsock2.h>
+#    define CUPS_SOCAST (const char *)
 #  else
 #    include <unistd.h>
 #    include <fcntl.h>
 #    include <sys/socket.h>
 #    define closesocket(f) close(f)
+#    define CUPS_SOCAST
 #  endif /* WIN32 */
 
 #  ifdef HAVE_GSSAPI
@@ -401,9 +403,9 @@ extern char		*_httpAssembleUUID(const char *server, int port,
 					   char *buffer, size_t bufsize)
 					   _CUPS_INTERNAL_MSG("Use httpAssembleUUID instead.");
 extern http_t		*_httpCreate(const char *host, int port,
-			             http_addrlist_t *addrlist, int family,
+			             http_addrlist_t *addrlist,
 				     http_encryption_t encryption,
-				     int blocking, _http_mode_t mode)
+				     int family)
 				     _CUPS_INTERNAL_MSG("Use httpConnect2 or httpAccept instead.");
 extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);

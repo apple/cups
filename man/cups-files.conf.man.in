@@ -16,7 +16,7 @@
 .SH NAME
 cups-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
-The \fIcups-file.conf\fR file configures the files and directories used by the
+The \fIcups-files.conf\fR file configures the files and directories used by the
 CUPS scheduler, \fIcupsd(8)\fR.  It is normally located in the
 \fI@CUPS_SERVERROOT@\fR directory.
 .LP

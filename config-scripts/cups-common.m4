@@ -3,7 +3,7 @@ dnl "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $"
 dnl
 dnl   Common configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
+dnl   Copyright 2007-2013 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -264,6 +264,7 @@ AC_CHECK_HEADER(zlib.h,
 	AC_DEFINE(HAVE_LIBZ)
 	LIBZ="-lz"
 	LIBS="$LIBS -lz"
+	AC_CHECK_LIB(z, inflateCopy, AC_DEFINE(HAVE_INFLATECOPY))
 	if test "x$GZIP" != z; then
 		INSTALL_GZIP="-z"
 	fi))
@@ -305,7 +306,7 @@ else
 	DBUSDIR=""
 fi
 
-AC_ARG_ENABLE(dbus, [  --enable-dbus           build with DBUS support])
+AC_ARG_ENABLE(dbus, [  --disable-dbus           build without DBUS support])
 AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
 	DBUSDIR="$withval")
 

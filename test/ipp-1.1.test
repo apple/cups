@@ -2124,7 +2124,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	GROUP job-attributes-tag
 	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 3
-	FILE color.jpeg
+	FILE color.jpg
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
@@ -2162,7 +2162,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	GROUP job-attributes-tag
 	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 4
-	FILE color.jpeg
+	FILE color.jpg
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
@@ -2200,7 +2200,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	GROUP job-attributes-tag
 	ATTR keyword media $OPTIONAL_4X6_MEDIA
 	ATTR enum print-quality 5
-	FILE color.jpeg
+	FILE color.jpg
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled

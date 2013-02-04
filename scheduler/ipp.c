@@ -3,7 +3,7 @@
  *
  *   IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -3270,8 +3270,12 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     {
       for (i = 0; i < job_ids->num_values; i ++)
       {
-	if (!cupsdFindJob(job_ids->values[i].integer))
+	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
 	  break;
+
+        if (con->request->request.op.operation_id == IPP_CANCEL_MY_JOBS &&
+            _cups_strcasecmp(job->username, username))
+          break;
       }
 
       if (i < job_ids->num_values)
@@ -3327,6 +3331,10 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL ||
 	    _cups_strcasecmp(job->dest, printer->name))
 	  break;
+
+        if (con->request->request.op.operation_id == IPP_CANCEL_MY_JOBS &&
+            _cups_strcasecmp(job->username, username))
+          break;
       }
 
       if (i < job_ids->num_values)
@@ -4054,7 +4062,11 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
-    if (!strcmp(fromattr->name, "job-printer-uri"))
+    if (!strcmp(fromattr->name, "document-password") ||
+        !strcmp(fromattr->name, "job-authorization-uri") ||
+        !strcmp(fromattr->name, "job-password") ||
+        !strcmp(fromattr->name, "job-password-encryption") ||
+        !strcmp(fromattr->name, "job-printer-uri"))
       continue;
 
     if (exclude &&
@@ -5207,253 +5219,34 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 static cups_array_t *			/* O - Array of attributes or NULL */
 create_requested_array(ipp_t *request)	/* I - IPP request */
 {
-  int			i;		/* Looping var */
-  ipp_attribute_t	*requested;	/* requested-attributes attribute */
   cups_array_t		*ra;		/* Requested attributes array */
-  char			*value;		/* Current value */
 
 
  /*
-  * Get the requested-attributes attribute, and return NULL if we don't
-  * have one...
+  * Create the array for standard attributes...
   */
 
-  if ((requested = ippFindAttribute(request, "requested-attributes",
-                                    IPP_TAG_KEYWORD)) == NULL)
-    return (NULL);
+  ra = ippCreateRequestedArray(request);
 
  /*
-  * If the attribute contains a single "all" keyword, return NULL...
+  * Add CUPS defaults as needed...
   */
 
-  if (requested->num_values == 1 &&
-      !strcmp(requested->values[0].string.text, "all"))
-    return (NULL);
-
- /*
-  * Create an array using "strcmp" as the comparison function...
-  */
-
-  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-
-  for (i = 0; i < requested->num_values; i ++)
+  if (cupsArrayFind(ra, "printer-defaults"))
   {
-    value = requested->values[i].string.text;
+   /*
+    * Include user-set defaults...
+    */
 
-    if (!strcmp(value, "job-template"))
-    {
-      /* Only includes the set of Job Template attributes supported by CUPS */
-      cupsArrayAdd(ra, "copies");
-      cupsArrayAdd(ra, "copies-default");
-      cupsArrayAdd(ra, "copies-supported");
-      cupsArrayAdd(ra, "finishings");
-      cupsArrayAdd(ra, "finishings-default");
-      cupsArrayAdd(ra, "finishings-supported");
-      cupsArrayAdd(ra, "job-hold-until");
-      cupsArrayAdd(ra, "job-hold-until-default");
-      cupsArrayAdd(ra, "job-hold-until-supported");
-      cupsArrayAdd(ra, "job-priority");
-      cupsArrayAdd(ra, "job-priority-default");
-      cupsArrayAdd(ra, "job-priority-supported");
-      cupsArrayAdd(ra, "job-sheets");
-      cupsArrayAdd(ra, "job-sheets-default");
-      cupsArrayAdd(ra, "job-sheets-supported");
-      cupsArrayAdd(ra, "media");
-      cupsArrayAdd(ra, "media-col");
-      cupsArrayAdd(ra, "media-col-default");
-      cupsArrayAdd(ra, "media-default");
-      cupsArrayAdd(ra, "media-supported");
-      cupsArrayAdd(ra, "multiple-document-handling");
-      cupsArrayAdd(ra, "multiple-document-handling-default");
-      cupsArrayAdd(ra, "multiple-document-handling-supported");
-      cupsArrayAdd(ra, "number-up");
-      cupsArrayAdd(ra, "number-up-default");
-      cupsArrayAdd(ra, "number-up-layout");
-      cupsArrayAdd(ra, "number-up-layout-default");
-      cupsArrayAdd(ra, "number-up-layout-supported");
-      cupsArrayAdd(ra, "number-up-supported");
-      cupsArrayAdd(ra, "orientation-requested");
-      cupsArrayAdd(ra, "orientation-requested-default");
-      cupsArrayAdd(ra, "orientation-requested-supported");
-      cupsArrayAdd(ra, "output-bin");
-      cupsArrayAdd(ra, "output-bin-default");
-      cupsArrayAdd(ra, "output-bin-supported");
-      cupsArrayAdd(ra, "page-delivery");
-      cupsArrayAdd(ra, "page-delivery-default");
-      cupsArrayAdd(ra, "page-delivery-supported");
-      cupsArrayAdd(ra, "page-order-received");
-      cupsArrayAdd(ra, "page-order-received-default");
-      cupsArrayAdd(ra, "page-order-received-supported");
-      cupsArrayAdd(ra, "page-ranges");
-      cupsArrayAdd(ra, "page-ranges-supported");
-      cupsArrayAdd(ra, "presentation-direction-number-up");
-      cupsArrayAdd(ra, "presentation-direction-number-up-default");
-      cupsArrayAdd(ra, "presentation-direction-number-up-supported");
-      cupsArrayAdd(ra, "print-color-mode");
-      cupsArrayAdd(ra, "print-color-mode-default");
-      cupsArrayAdd(ra, "print-color-mode-supported");
-      cupsArrayAdd(ra, "print-content-optimize");
-      cupsArrayAdd(ra, "print-content-optimize-default");
-      cupsArrayAdd(ra, "print-content-optimize-supported");
-      cupsArrayAdd(ra, "print-quality");
-      cupsArrayAdd(ra, "print-quality-default");
-      cupsArrayAdd(ra, "print-quality-supported");
-      cupsArrayAdd(ra, "printer-resolution");
-      cupsArrayAdd(ra, "printer-resolution-default");
-      cupsArrayAdd(ra, "printer-resolution-supported");
-      cupsArrayAdd(ra, "sheet-collate");
-      cupsArrayAdd(ra, "sheet-collate-default");
-      cupsArrayAdd(ra, "sheet-collate-supported");
-      cupsArrayAdd(ra, "sides");
-      cupsArrayAdd(ra, "sides-default");
-      cupsArrayAdd(ra, "sides-supported");
-    }
-    else if (!strcmp(value, "job-description"))
-    {
-      /* Only includes the set of Job Description attributes supported by CUPS */
-      cupsArrayAdd(ra, "date-time-at-completed");
-      cupsArrayAdd(ra, "date-time-at-creation");
-      cupsArrayAdd(ra, "date-time-at-processing");
-      cupsArrayAdd(ra, "job-charge-info");
-      cupsArrayAdd(ra, "job-detailed-status-message");
-      cupsArrayAdd(ra, "job-document-access-errors");
-      cupsArrayAdd(ra, "job-id");
-      cupsArrayAdd(ra, "job-impressions");
-      cupsArrayAdd(ra, "job-impressions-completed");
-      cupsArrayAdd(ra, "job-k-octets");
-      cupsArrayAdd(ra, "job-k-octets-processed");
-      cupsArrayAdd(ra, "job-mandatory-attributes");
-      cupsArrayAdd(ra, "job-media-progress");
-      cupsArrayAdd(ra, "job-media-sheets");
-      cupsArrayAdd(ra, "job-media-sheets-completed");
-      cupsArrayAdd(ra, "job-message-from-operator");
-      cupsArrayAdd(ra, "job-more-info");
-      cupsArrayAdd(ra, "job-name");
-      cupsArrayAdd(ra, "job-originating-user-name");
-      cupsArrayAdd(ra, "job-printer-up-time");
-      cupsArrayAdd(ra, "job-printer-uri");
-      cupsArrayAdd(ra, "job-state");
-      cupsArrayAdd(ra, "job-state-message");
-      cupsArrayAdd(ra, "job-state-reasons");
-      cupsArrayAdd(ra, "job-uri");
-      cupsArrayAdd(ra, "number-of-documents");
-      cupsArrayAdd(ra, "number-of-intervening-jobs");
-      cupsArrayAdd(ra, "output-device-assigned");
-      cupsArrayAdd(ra, "time-at-completed");
-      cupsArrayAdd(ra, "time-at-creation");
-      cupsArrayAdd(ra, "time-at-processing");
-    }
-    else if (!strcmp(value, "printer-description"))
-    {
-      /* Only includes the set of Printer Description attributes supported by CUPS */
-      cupsArrayAdd(ra, "charset-configured");
-      cupsArrayAdd(ra, "charset-supported");
-      cupsArrayAdd(ra, "color-supported");
-      cupsArrayAdd(ra, "compression-supported");
-      cupsArrayAdd(ra, "document-format-default");
-      cupsArrayAdd(ra, "document-format-supported");
-      cupsArrayAdd(ra, "generated-natural-language-supported");
-      cupsArrayAdd(ra, "ipp-versions-supported");
-      cupsArrayAdd(ra, "job-creation-attributes-supported");
-      cupsArrayAdd(ra, "job-ids-supported");
-      cupsArrayAdd(ra, "job-impressions-supported");
-      cupsArrayAdd(ra, "job-k-octets-supported");
-      cupsArrayAdd(ra, "job-media-sheets-supported");
-      cupsArrayAdd(ra, "job-settable-attributes-supported");
-      cupsArrayAdd(ra, "jpeg-k-octets-supported");
-      cupsArrayAdd(ra, "jpeg-x-dimension-supported");
-      cupsArrayAdd(ra, "jpeg-y-dimension-supported");
-      cupsArrayAdd(ra, "media-bottom-margin-supported");
-      cupsArrayAdd(ra, "media-col-supported");
-      cupsArrayAdd(ra, "media-key-supported");
-      cupsArrayAdd(ra, "media-left-margin-supported");
-      cupsArrayAdd(ra, "media-right-margin-supported");
-      cupsArrayAdd(ra, "media-size-supported");
-      cupsArrayAdd(ra, "media-source-supported");
-      cupsArrayAdd(ra, "media-top-margin-supported");
-      cupsArrayAdd(ra, "media-type-supported");
-      cupsArrayAdd(ra, "multiple-document-jobs-supported");
-      cupsArrayAdd(ra, "multiple-operation-time-out");
-      cupsArrayAdd(ra, "natural-language-configured");
-      cupsArrayAdd(ra, "notify-max-events-supported");
-      cupsArrayAdd(ra, "notify-schemes-supported");
-      cupsArrayAdd(ra, "operations-supported");
-      cupsArrayAdd(ra, "pages-per-minute");
-      cupsArrayAdd(ra, "pages-per-minute-color");
-      cupsArrayAdd(ra, "pdf-k-octets-supported");
-      cupsArrayAdd(ra, "pdl-override-supported");
-      cupsArrayAdd(ra, "printer-alert");
-      cupsArrayAdd(ra, "printer-alert-description");
-      cupsArrayAdd(ra, "printer-charge-info-uri");
-      cupsArrayAdd(ra, "printer-commands");
-      cupsArrayAdd(ra, "printer-current-time");
-      cupsArrayAdd(ra, "printer-dns-sd-name");
-      cupsArrayAdd(ra, "printer-info");
-      cupsArrayAdd(ra, "printer-is-accepting-jobs");
-      cupsArrayAdd(ra, "printer-is-shared");
-      cupsArrayAdd(ra, "printer-location");
-      cupsArrayAdd(ra, "printer-make-and-model");
-      cupsArrayAdd(ra, "printer-message-from-operator");
-      cupsArrayAdd(ra, "printer-more-info");
-      cupsArrayAdd(ra, "printer-more-info-manufacturer");
-      cupsArrayAdd(ra, "printer-name");
-      cupsArrayAdd(ra, "printer-settable-attributes-supported");
-      cupsArrayAdd(ra, "printer-state");
-      cupsArrayAdd(ra, "printer-state-change-date-time");
-      cupsArrayAdd(ra, "printer-state-change-time");
-      cupsArrayAdd(ra, "printer-state-message");
-      cupsArrayAdd(ra, "printer-state-reasons");
-      cupsArrayAdd(ra, "printer-type");
-      cupsArrayAdd(ra, "printer-up-time");
-      cupsArrayAdd(ra, "printer-uri-supported");
-      cupsArrayAdd(ra, "queued-job-count");
-      cupsArrayAdd(ra, "reference-uri-schemes-supported");
-      cupsArrayAdd(ra, "uri-authentication-supported");
-      cupsArrayAdd(ra, "uri-security-supported");
-      cupsArrayAdd(ra, "which-jobs-supported");
-    }
-    else if (!strcmp(value, "printer-defaults"))
-    {
-      char	*name;			/* Option name */
+    char	*name;			/* Option name */
 
+    cupsArrayRemove(ra, "printer-defaults");
 
-      for (name = (char *)cupsArrayFirst(CommonDefaults);
-           name;
-	   name = (char *)cupsArrayNext(CommonDefaults))
+    for (name = (char *)cupsArrayFirst(CommonDefaults);
+	 name;
+	 name = (char *)cupsArrayNext(CommonDefaults))
+      if (!cupsArrayFind(ra, name))
         cupsArrayAdd(ra, name);
-    }
-    else if (!strcmp(value, "subscription-description"))
-    {
-      /* Only includes the set of Subscription Description attributes supported by CUPS */
-      cupsArrayAdd(ra, "notify-job-id");
-      cupsArrayAdd(ra, "notify-lease-expiration-time");
-      cupsArrayAdd(ra, "notify-printer-up-time");
-      cupsArrayAdd(ra, "notify-printer-uri");
-      cupsArrayAdd(ra, "notify-sequence-number");
-      cupsArrayAdd(ra, "notify-subscriber-user-name");
-      cupsArrayAdd(ra, "notify-subscription-id");
-    }
-    else if (!strcmp(value, "subscription-template"))
-    {
-      /* Only includes the set of Subscription Template attributes supported by CUPS */
-      cupsArrayAdd(ra, "notify-attributes");
-      cupsArrayAdd(ra, "notify-attributes-supported");
-      cupsArrayAdd(ra, "notify-charset");
-      cupsArrayAdd(ra, "notify-events");
-      cupsArrayAdd(ra, "notify-events-default");
-      cupsArrayAdd(ra, "notify-events-supported");
-      cupsArrayAdd(ra, "notify-lease-duration");
-      cupsArrayAdd(ra, "notify-lease-duration-default");
-      cupsArrayAdd(ra, "notify-lease-duration-supported");
-      cupsArrayAdd(ra, "notify-natural-language");
-      cupsArrayAdd(ra, "notify-pull-method");
-      cupsArrayAdd(ra, "notify-pull-method-supported");
-      cupsArrayAdd(ra, "notify-recipient-uri");
-      cupsArrayAdd(ra, "notify-time-interval");
-      cupsArrayAdd(ra, "notify-user-data");
-    }
-    else
-      cupsArrayAdd(ra, value);
   }
 
   return (ra);
@@ -6570,18 +6363,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   else
     username[0] = '\0';
 
-  if ((ra = create_requested_array(con->request)) == NULL &&
-      !ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD))
-  {
-   /*
-    * IPP conformance - Get-Jobs has a default requested-attributes value of
-    * "job-id" and "job-uri".
-    */
-
-    ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-    cupsArrayAdd(ra, "job-id");
-    cupsArrayAdd(ra, "job-uri");
-  }
+  ra = create_requested_array(con->request);
 
  /*
   * OK, build a list of jobs for this printer...

@@ -1,19 +1,22 @@
-CHANGES-IPPTOOL.txt - 2013-01-10
+CHANGES-IPPTOOL.txt - 2013-01-31
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
 
-2013-MM-DD
+2013-01-31
 
 	- Added support for DEFINE-MATCH and DEFINE-NO-MATCH as STATUS
 	  predicates.
+	- Added support for WITH-VALUE and resolution values.
+	- Added support for SKIP-IF-MISSING (skip test if file is missing)
 	- Added support for octetString values.
 	- Added support for document compression in Print-Job and Send-Document
 	  requests.
 	- Fixed REPEAT-MATCH for STATUS and EXPECT - was incorrectly erroring
 	  out.
+	- Fixed a bug where bad IPP responses would cause ipptool to crash.
 
 
 2012-02-28
