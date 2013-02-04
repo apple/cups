@@ -68,6 +68,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-' && argv[i][1])
+    {
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
@@ -101,7 +102,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'a' : /* Cancel all jobs */
-	    op = IPP_CANCEL_JOBS;
+	    op = purge ? IPP_PURGE_JOBS : IPP_CANCEL_JOBS;
 	    break;
 
         case 'h' : /* Connect to host */
@@ -152,6 +153,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         case 'x' : /* Purge job(s) */
 	    purge = 1;
+
+	    if (op == IPP_CANCEL_JOBS)
+	      op = IPP_PURGE_JOBS;
 	    break;
 
 	default :
@@ -160,6 +164,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 			    argv[0], argv[i][1]);
 	    return (1);
       }
+    }
     else
     {
      /*

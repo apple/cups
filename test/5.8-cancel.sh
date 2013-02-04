@@ -4,7 +4,7 @@
 #
 #   Test the cancel command.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -32,6 +32,18 @@ echo "Cancel All Test"
 echo ""
 echo "    cancel -a"
 $VALGRIND ../systemv/cancel -a 2>&1
+if test $? != 0; then
+	echo "    FAILED"
+	exit 1
+else
+	echo "    PASSED"
+fi
+echo ""
+
+echo "Purge All Test"
+echo ""
+echo "    cancel -a -x"
+$VALGRIND ../systemv/cancel -a -x 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
