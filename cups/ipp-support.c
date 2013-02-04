@@ -1038,6 +1038,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "date-time-at-completed",
     "date-time-at-creation",
     "date-time-at-processing",
+    "destination-statuses",
     "document-charset-supplied",
     "document-digital-signature-supplied",
     "document-format-details-supplied",
@@ -1058,6 +1059,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-accounting-sheets-actual",
     "job-accounting-user-id-actual",
     "job-attribute-fidelity",
+    "job-charge-info",			/* CUPS extension */
     "job-collation-type",
     "job-collation-type-actual",
     "job-copies-actual",
@@ -1142,6 +1144,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
   };
   static const char * const job_template[] =
   {					/* job-template group */
+    "confirmation-sheet-print",		/* IPP FaxOut */
+    "confirmation-sheet-print-default",
     "copies",
     "copies-default",
     "copies-supported",
@@ -1151,6 +1155,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "cover-front",
     "cover-front-default",
     "cover-front-supported",
+    "cover-sheet-info",			/* IPP FaxOut */
+    "cover-sheet-info-default",
+    "cover-sheet-info-supported",
+    "destination-uri-schemes-supported",/* IPP FaxOut */
+    "destination-uris",			/* IPP FaxOut */
+    "destination-uris-supported",
     "feed-orientation",
     "feed-orientation-default",
     "feed-orientation-supported",
@@ -1240,6 +1250,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-sheets-col-supported",
     "job-sheets-default",
     "job-sheets-supported",
+    "logo-uri-schemes-supported",
     "max-save-info-supported",
     "max-stitching-locations-supported",
     "media",
@@ -1273,6 +1284,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "multiple-document-handling",
     "multiple-document-handling-default",
     "multiple-document-handling-supported",
+    "number-of-retries",		/* IPP FaxOut */
+    "number-of-retries-default",
+    "number-of-retries-supported",
     "number-up",
     "number-up-default",
     "number-up-supported",
@@ -1325,6 +1339,12 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "proof-print",
     "proof-print-default",
     "proof-print-supported",
+    "retry-interval",			/* IPP FaxOut */
+    "retry-interval-default",
+    "retry-interval-supported",
+    "retry-timeout",			/* IPP FaxOut */
+    "retry-timeout-default",
+    "retry-timeout-supported",
     "save-disposition-supported",
     "save-document-format-default",
     "save-document-format-supported",
@@ -1396,9 +1416,11 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "generated-natural-language-supported",
     "identify-actions-default",
     "identify-actions-supported",
+    "input-source-supported",
     "ipp-features-supported",
     "ipp-versions-supported",
     "ippget-event-life",
+    "job-authorization-uri-supported",	/* CUPS extension */
     "job-constraints-supported",
     "job-creation-attributes-supported",
     "job-finishings-col-ready",
@@ -1427,6 +1449,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "media-ready",
     "member-names",			/* CUPS extension */
     "member-uris",			/* CUPS extension */
+    "multiple-destination-uris-supported",/* IPP FaxOut */
     "multiple-document-jobs-supported",
     "multiple-operation-time-out",
     "multiple-operation-time-out-action",
@@ -1448,6 +1471,10 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-device-id",
     "printer-dns-sd-name",		/* CUPS extension */
     "printer-driver-installer",
+    "printer-fax-log-uri",		/* IPP FaxOut */
+    "printer-fax-modem-info",		/* IPP FaxOut */
+    "printer-fax-modem-name",		/* IPP FaxOut */
+    "printer-fax-modem-number",		/* IPP FaxOut */
     "printer-geo-location",
     "printer-get-attributes-supported",
     "printer-icc-profiles",

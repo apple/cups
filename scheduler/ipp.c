@@ -4078,7 +4078,11 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
-    if (!strcmp(fromattr->name, "job-printer-uri"))
+    if (!strcmp(fromattr->name, "document-password") ||
+        !strcmp(fromattr->name, "job-authorization-uri") ||
+        !strcmp(fromattr->name, "job-password") ||
+        !strcmp(fromattr->name, "job-password-encryption") ||
+        !strcmp(fromattr->name, "job-printer-uri"))
       continue;
 
     if (exclude &&
