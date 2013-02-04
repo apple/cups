@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2012-10-22 11:09-0400\n"
+"POT-Creation-Date: 2013-02-04 14:17-0500\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1158,6 +1158,169 @@ msgstr " FALLO"
 
 msgid " PASS"
 msgstr " PASA"
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section "
+"4.1.3)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.9)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section "
+"4.1.8)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 "
+"section 4.1.13)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section "
+"4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be "
+"positive (RFC 2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC "
+"2911 section 4.1.15)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
+msgstr ""
+
+#, c-format
+msgid ""
+"\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
+msgstr ""
 
 #, c-format
 msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
@@ -2317,6 +2480,13 @@ msgstr "document-format-default \"%s\" incorrecto."
 msgid "Bad filename buffer"
 msgstr "Nombre de archivo del búfer incorrecto"
 
+#, c-format
+msgid "Bad job-name value: %s"
+msgstr ""
+
+msgid "Bad job-name value: Wrong type or count."
+msgstr ""
+
 msgid "Bad job-priority value."
 msgstr "Valor job-priority incorrecto."
 
@@ -2932,9 +3102,6 @@ msgstr "IPP nombre mayor de 32767 bytes."
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr "IPP el valor nameWithLanguage menor del mínimo de 4 bytes."
 
-msgid "IPP nameWithLanguage value more than maximum 1090 bytes."
-msgstr ""
-
 msgid "IPP octetString length too large."
 msgstr ""
 
@@ -2947,17 +3114,8 @@ msgstr "IPP el valor de la resolución no es de 9 bytes."
 msgid "IPP string length overflows value."
 msgstr "IPP la longitud de la cadena sobrepasa el valor."
 
-msgid "IPP string value too large."
-msgstr ""
-
-msgid "IPP text length too large."
-msgstr ""
-
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr "IPP el valor textWithLanguage menor del mínimo de 4 bytes."
-
-msgid "IPP textWithLanguage value more than maximum 1090 bytes."
-msgstr ""
 
 msgid "IPP value larger than 32767 bytes."
 msgstr "IPP valor mayor de 32767 bytes."
@@ -4094,6 +4252,14 @@ msgstr "No se ha podido cambiar el atributo printer-is-shared"
 msgid "Unable to change server settings"
 msgstr "No se ha podido cambiar la configuración del servidor"
 
+#, c-format
+msgid "Unable to compile mimeMediaType regular expression: %s."
+msgstr ""
+
+#, c-format
+msgid "Unable to compile naturalLanguage regular expression: %s."
+msgstr ""
+
 msgid "Unable to configure printer options."
 msgstr "No se han podido configurar las opciones de impresión."
 
@@ -4145,9 +4311,6 @@ msgstr ""
 #, c-format
 msgid "Unable to copy interface script - %s"
 msgstr "No se ha podido copiar el script de interfaz - %s"
-
-msgid "Unable to create compressed print file"
-msgstr "No se ha podido crear el archivo de impresión comprimido"
 
 msgid "Unable to create printer-uri"
 msgstr "No se ha podido crear printer-uri"
@@ -4217,9 +4380,6 @@ msgstr "No se ha podido encontrar destino para el trabajo"
 msgid "Unable to find printer."
 msgstr "No se ha podido encontrar la impresora."
 
-msgid "Unable to generate compressed print file"
-msgstr "No se ha podido crear el archivo de impresión comprimido"
-
 msgid "Unable to get backend exit status."
 msgstr "No se ha podido obtener el estado de salida del programa backend"
 
@@ -4280,9 +4440,6 @@ msgstr "No se han podido mover los trabajos"
 
 msgid "Unable to open PPD file"
 msgstr "No se ha podido abrir el archivo PPD"
-
-msgid "Unable to open compressed print file"
-msgstr "No se ha podido abrir el archivo de impresión comprimido"
 
 msgid "Unable to open cupsd.conf file:"
 msgstr "No se ha podido abrir el archivo cupsd.conf:"
@@ -4661,8 +4818,17 @@ msgstr ""
 "cupsd: Se esperaba un nombre de archivo de configuración tras la opción \"-c"
 "\"."
 
+msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
+msgstr ""
+
+msgid "cupsd: Relative cups-files.conf filename not allowed."
+msgstr ""
+
 msgid "cupsd: Unable to get current directory."
 msgstr "cupsd: No se ha podido obtener el directorio actual."
+
+msgid "cupsd: Unable to get path to cups-files.conf file."
+msgstr ""
 
 #, c-format
 msgid "cupsd: Unknown argument \"%s\" - aborting."
@@ -5523,3 +5689,12 @@ msgstr "variable-bindings usa una longitud indefinida"
 
 #~ msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
 #~ msgstr "La impresora no es compatible con IPP/%d.%d, probando IPP/%s."
+
+#~ msgid "Unable to create compressed print file"
+#~ msgstr "No se ha podido crear el archivo de impresión comprimido"
+
+#~ msgid "Unable to generate compressed print file"
+#~ msgstr "No se ha podido crear el archivo de impresión comprimido"
+
+#~ msgid "Unable to open compressed print file"
+#~ msgstr "No se ha podido abrir el archivo de impresión comprimido"

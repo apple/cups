@@ -478,12 +478,14 @@ connections.">cupsSetCredentials</a></li>
 	<li><a href="#cupsSetServer" title="Set the default server name and port.">cupsSetServer</a></li>
 	<li><a href="#cupsSetServerCertCB" title="Set the server certificate callback.">cupsSetServerCertCB</a></li>
 	<li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
+	<li><a href="#cupsSetUserAgent" title="Set the default HTTP User-Agent string.">cupsSetUserAgent</a></li>
 	<li><a href="#cupsStartDestDocument" title="Start a new document.">cupsStartDestDocument</a></li>
 	<li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
 	<li><a href="#cupsTempFd" title="Creates a temporary file.">cupsTempFd</a></li>
 	<li><a href="#cupsTempFile" title="Generates a temporary filename.">cupsTempFile</a></li>
 	<li><a href="#cupsTempFile2" title="Creates a temporary CUPS file.">cupsTempFile2</a></li>
 	<li><a href="#cupsUser" title="Return the current user's name.">cupsUser</a></li>
+	<li><a href="#cupsUserAgent" title="Return the default HTTP User-Agent string.">cupsUserAgent</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_client_cert_cb_t" title="Client credentials callback
@@ -2811,6 +2813,22 @@ void cupsSetUser (<br>
 Note: The current user name is tracked separately for each thread in a
 program. Multi-threaded programs that override the user name need to do so
 in each thread for the same user name to be used.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsSetUserAgent">cupsSetUserAgent</a></h3>
+<p class="description">Set the default HTTP User-Agent string.</p>
+<p class="code">
+void cupsSetUserAgent (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *user_agent<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>user_agent</dt>
+<dd class="description">User-Agent string or <code>NULL</code></dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Setting the string to NULL forces the default value containing the CUPS
+version, IPP version, and operating system version and architecture.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsStartDestDocument">cupsStartDestDocument</a></h3>
 <p class="description">Start a new document.</p>
 <p class="code">
@@ -2968,6 +2986,12 @@ const char *cupsUser (void);</p>
 program. Multi-threaded programs that override the user name with the
 <a href="#cupsSetUser"><code>cupsSetUser</code></a> function need to do so in each thread for the same user
 name to be used.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsUserAgent">cupsUserAgent</a></h3>
+<p class="description">Return the default HTTP User-Agent string.</p>
+<p class="code">
+const char *cupsUserAgent (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">User-Agent string</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
 <p class="description">Client credentials callback
