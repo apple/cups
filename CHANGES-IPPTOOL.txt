@@ -5,6 +5,13 @@ This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
 
+2013-02-nn
+
+	- The color.jpg test file used a progressive mode instead of the
+	  baseline JPEG mode.
+	- The IPP/1.1 test file referenced "color.jpeg" instead of "color.jpg".
+
+
 2013-01-31
 
 	- Added support for DEFINE-MATCH and DEFINE-NO-MATCH as STATUS
