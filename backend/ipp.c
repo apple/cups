@@ -262,6 +262,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
+  ipp_attribute_t *job_auth;		/* job-authorization-uri */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *operations_sup;	/* operations-supported */
   ipp_attribute_t *doc_handling_sup;	/* multiple-document-handling-supported */
@@ -1402,12 +1403,20 @@ main(int  argc,				/* I - Number of command-line args */
 			  copies_sup ? copies : 1, document_format, pc, ppd,
 			  media_col_sup, doc_handling_sup, print_color_mode);
 
-    ippDelete(cupsDoRequest(http, request, resource));
+    response = cupsDoRequest(http, request, resource);
 
     ipp_status = cupsLastError();
 
     fprintf(stderr, "DEBUG: Validate-Job: %s (%s)\n",
             ippErrorString(ipp_status), cupsLastErrorString());
+
+    if ((job_auth = ippFindAttribute(response, "job-authorization-uri",
+				     IPP_TAG_URI)) != NULL)
+      num_options = cupsAddOption("job-authorization-uri",
+                                  ippGetString(job_auth, 0, NULL), num_options,
+                                  &options);
+
+    ippDelete(response);
 
     if (job_canceled)
       break;
