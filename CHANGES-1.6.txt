@@ -26,7 +26,7 @@ CHANGES IN CUPS V1.6.2
 	- Fixed a problem with local Kerberos authentication (STR #4140)
 	- Coverity scan: fixed some minor issues (STR #4242)
 	- The scheduler did not remove color profiles after deleting a printer
-	  (STR #4232)
+	  (STR #4232, STR #4276)
 	- The CUPS library did not always detect a timed out connection to the
 	  server which could cause temporary loss of printing from applications
 	  (STR #4187)
