@@ -2286,6 +2286,18 @@ httpRead2(http_t *http,			/* I - Connection to server */
           http->data_remaining  -= bytes;
           http->stream.avail_in += bytes;
 
+	  if (http->data_remaining <= 0 &&
+	      http->data_encoding == HTTP_ENCODING_CHUNKED)
+	  {
+	   /*
+	    * Read the trailing blank line now...
+	    */
+
+	    char	len[32];		/* Length string */
+
+	    httpGets(len, sizeof(len), http);
+	  }
+
           bytes = 0;
         }
         else
@@ -2299,7 +2311,20 @@ httpRead2(http_t *http,			/* I - Connection to server */
   if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
   {
     if ((bytes = http_read_chunk(http, buffer, length)) > 0)
+    {
       http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0)
+      {
+       /*
+        * Read the trailing blank line now...
+        */
+
+        char	len[32];		/* Length string */
+
+        httpGets(len, sizeof(len), http);
+      }
+    }
   }
   else if (http->data_remaining <= 0)
   {
@@ -2318,7 +2343,21 @@ httpRead2(http_t *http,			/* I - Connection to server */
       length = (size_t)http->data_remaining;
 
     if ((bytes = http_read_buffered(http, buffer, length)) > 0)
+    {
       http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0 &&
+          http->data_encoding == HTTP_ENCODING_CHUNKED)
+      {
+       /*
+        * Read the trailing blank line now...
+        */
+
+        char	len[32];		/* Length string */
+
+        httpGets(len, sizeof(len), http);
+      }
+    }
   }
 
   if (
