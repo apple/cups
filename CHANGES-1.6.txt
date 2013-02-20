@@ -12,6 +12,8 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228)
 	- Updated the Catalan localization (STR #4202)
+	- cupsGetPPD did not work with statically-configured CUPS shared
+	  queues (STR #4178)
 	- The scheduler did not support long MIME media types (STR #4270)
 	- The cupsfilter command did not set the CHARSET environment variable
 	  for the text filters (STR #4273)
