@@ -1910,7 +1910,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpPeek: 0-length chunk, set state to %s.",
                   http_states[http->state + 1]));
@@ -2337,7 +2337,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpRead2: End of content, set state to %s.",
 		  http_states[http->state + 1]));
@@ -3223,8 +3223,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
       default :
 	  http->state = HTTP_STATE_WAITING;
 
-	  DEBUG_puts("1_httpUpdate: Unknown state, reset state to "
-	             "HTTP_STATE_WAITING.");
+	  DEBUG_puts("1_httpUpdate: Reset state to HTTP_STATE_WAITING.");
 	  break;
     }
 
@@ -3718,7 +3717,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("2httpWrite2: Changed state to %s.",
 		  http_states[http->state + 1]));
@@ -3964,7 +3963,8 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
            http->state == HTTP_STATE_HEAD ||
            http->state == HTTP_STATE_PUT ||
            http->state == HTTP_STATE_TRACE ||
-           http->state == HTTP_STATE_CONNECT)
+           http->state == HTTP_STATE_CONNECT ||
+           http->state == HTTP_STATE_STATUS)
   {
     DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
                   "was %s.", http_states[http->state + 1]));
