@@ -7,6 +7,9 @@ on cups.org.
 
 2013-02-nn
 
+	- The IPP/1.1 test file did not allow for sufficient retries when
+	  printing.
+	- The IPP Everywhere test file contained numerous errors.
 	- The color.jpg test file used a progressive mode instead of the
 	  baseline JPEG mode.
 	- The IPP/1.1 test file referenced "color.jpeg" instead of "color.jpg".
