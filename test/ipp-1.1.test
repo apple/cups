@@ -324,7 +324,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT pdl-override-supported OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{1,127}$$/"
+	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
