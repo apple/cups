@@ -2074,23 +2074,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 {
   int		i;			/* Looping var */
   char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
-  int		num_air;		/* Number of auth-info-required values */
-  const char	* const *air;		/* auth-info-required values */
   cupsd_location_t *auth;		/* Pointer to authentication element */
   const char	*auth_supported;	/* Authentication supported */
   ipp_t		*oldattrs;		/* Old printer attributes */
   ipp_attribute_t *attr;		/* Attribute data */
   char		*name,			/* Current user/group name */
 		*filter;		/* Current filter */
-  static const char * const air_none[] =
-		{			/* No authentication */
-		  "none"
-		};
-  static const char * const air_userpass[] =
-		{			/* Basic/Digest authentication */
-		  "username",
-		  "password"
-		};
 
 
   DEBUG_printf(("cupsdSetPrinterAttrs: entering name = %s, type = %x\n", p->name,
@@ -2114,19 +2103,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   auth_supported = "requesting-user-name";
-  num_air        = 1;
-  air            = air_none;
-
-  if (p->num_auth_info_required > 0 && strcmp(p->auth_info_required[0], "none"))
-  {
-    num_air = p->num_auth_info_required;
-    air     = p->auth_info_required;
-  }
-  else if (p->type & CUPS_PRINTER_AUTHENTICATED)
-  {
-    num_air = 2;
-    air     = air_userpass;
-  }
 
   if (p->type & CUPS_PRINTER_CLASS)
     snprintf(resource, sizeof(resource), "/classes/%s", p->name);
@@ -2205,8 +2181,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                 "job-k-limit", p->k_limit);
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-page-limit", p->page_limit);
-  ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		"auth-info-required", num_air, NULL, air);
+  if (p->num_auth_info_required > 0 && strcmp(p->auth_info_required[0], "none"))
+    ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		  "auth-info-required", p->num_auth_info_required, NULL,
+		  p->auth_info_required);
 
   if (cupsArrayCount(Banners) > 0)
   {

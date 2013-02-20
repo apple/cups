@@ -3,7 +3,7 @@
 .\"
 .\"   ipptoolfile man page for CUPS.
 .\"
-.\"   Copyright 2010-2012 by Apple Inc.
+.\"   Copyright 2010-2013 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,12 +11,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "11 May 2012" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "10 January 2013" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
 .SH DESCRIPTION
-The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curley braces, for example:
+The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
 .nf
 
     # This is a comment
@@ -323,6 +323,12 @@ Requires that at least one value of the EXPECT attribute matches the regular exp
 .SH STATUS PREDICATES
 The following predicates are understood following the STATUS test directive:
 .TP 5
+DEFINE-MATCH variable-name
+Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+.TP 5
+DEFINE-NO-MATCH variable-name
+Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+.TP 5
 IF-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is defined.
 .TP 5
@@ -538,7 +544,7 @@ $scheme
 Inserts the scheme from the URI provided to \fIipptool\fR.
 .TP 5
 $notify-subscription-id
-Inserts the last notify-subscription-id value returnd in a test response or 0 if
+Inserts the last notify-subscription-id value returned in a test response or 0 if
 no notify-subscription-id has been seen.
 .TP 5
 $port
@@ -562,7 +568,7 @@ Inserts the username from the URI provided to \fIipptool\fR, if any.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

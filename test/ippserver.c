@@ -80,6 +80,7 @@
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
+#include <limits.h>
 #include <sys/stat.h>
 #include <poll.h>
 #ifdef HAVE_SYS_MOUNT_H

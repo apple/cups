@@ -1,10 +1,51 @@
-CHANGES.txt - 1.6.2 - 2012-11-08
+CHANGES.txt - 1.6.2 - 2013-02-19
 --------------------------------
 
 
 CHANGES IN CUPS V1.6.2
 
-	- Documentation fixes
+	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248,
+	  STR #4259)
+	- Security: All file, directory, user, and group settings are now stored
+	  in a separate cups-files.conf configuration file that cannot be set
+	  through the CUPS web interface or APIs (STR #4223)
+	- Added a Czech localization (STR #4201)
+	- Added a French localization (STR #4247)
+	- Added a Russian localization (STR #4228)
+	- Updated the Catalan localization (STR #4202)
+	- cupsGetPPD did not work with statically-configured CUPS shared
+	  queues (STR #4178)
+	- The scheduler did not support long MIME media types (STR #4270)
+	- The cupsfilter command did not set the CHARSET environment variable
+	  for the text filters (STR #4273)
+	- The lp command did not show errors for unknown "--foo" (STR #4261)
+	- Bad IPP responses could crash ipptool (STR #4262)
+	- Updated USB quirk rules for Canon and Xerox printers (STR #4217,
+	  STR #4263)
+	- Added USB blacklisting for printers that require a custom backend
+	  (STR #4218)
+	- The PPD compiler did not correctly JCL options (STR #4115, STR #4203)
+	- The ipptool program now supports DEFINE-MATCH and DEFINE-NO-MATCH
+	  predicates for STATUS directives.
+	- Fixed a problem with local Kerberos authentication (STR #4140)
+	- Coverity scan: fixed some minor issues (STR #4242)
+	- The scheduler did not remove color profiles after deleting a printer
+	  (STR #4232, STR #4276)
+	- The CUPS library did not always detect a timed out connection to the
+	  server which could cause temporary loss of printing from applications
+	  (STR #4187)
+	- The ipptool program now supports variable substitution in OPERATION
+	  and DELAY directives (STR #4175)
+	- The IPP backend now stops queues when the server configuration
+	  prevents successful job submission (STR #4125)
+	- The XML output of ipptool contained empty dictionaries (STR #4136)
+	- The scheduler did not delete job control backup files (STR #4244)
+	- cupsGetPPD3 could return a local PPD instead of the correct remote
+	  PPD.
+	- The scheduler incorrectly advertised auth-info-required for local
+	  queues needing local authentication (STR #4205)
+	- CUPS 1.6 clients using the ServerName directive in client.conf did not
+	  work with CUPS 1.3.x or older servers (STR #4231)
 	- The SNMP backend now tries to work around broken printers that use a
 	  newline to separate key/value pairs.
 	- The IPP backend did not send a cancel request to printers when a job

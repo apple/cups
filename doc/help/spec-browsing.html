@@ -12,7 +12,7 @@
 
   CUPS Browse Protocol specification for CUPS.
 
-  Copyright 2008-2011 by Apple Inc.
+  Copyright 2008-2012 by Apple Inc.
   Copyright 1997-2005 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -24,7 +24,7 @@
 
 <BLOCKQUOTE><B>Note:</B>
 
-<P>The CUPS Browse Protocol is deprecated and will no longer be used in a future release of CUPS.</P>
+<P>The CUPS Browse Protocol was deprecated in CUPS 1.4 and is no longer supported.</P>
 
 </BLOCKQUOTE>
 
@@ -32,37 +32,37 @@
 
 <h2><a name='INTRO'>Introduction</a></h2>
 
-<p>This specification describes the CUPS browsing protocol which is used for
-printer sharing. The protocol is a UDP/IP-based broadcast service that
-operates on IP service port 631 by default. Each broadcast packet describes
+<p>This specification describes the CUPS browsing protocol which was used for
+printer sharing. The protocol was a UDP/IP-based broadcast service that
+operated on IP service port 631 by default. Each broadcast packet described
 a single printer or class being shared.</p>
 
 <p>For simple networks with a single subnet, a CUPS system sharing a printer
-(the <em>server</em>) will periodically broadcast that printer's availability
+(the <em>server</em>) would periodically broadcast that printer's availability
 and status information to the subnet. Every other CUPS system on the subnet
-(the <em>clients</em>) will receive the broadcast and make that printer
-available to local users. If a client stops receiving broadcasts from the
-server, or if the server sends a special "deleted" broadcast message, the
-client will remove its copy of the printer.</p>
+(the <em>clients</em>) would receive the broadcast and make that printer
+available to local users. If a client stopped receiving broadcasts from the
+server, or if the server sent a special "deleted" broadcast message, the
+client would remove its copy of the printer.</p>
 
-<p>For larger networks with multiple subnets, a relay configuration can be used
-where one or more client systems poll the server and then broadcast the
+<p>For larger networks with multiple subnets, a relay configuration could be used
+where one or more client systems polled the server and then broadcast the
 availability and status information for the server's shared printers to the
 clients' local subnets.</p>
 
-<p>A key feature of CUPS printer sharing is support for <em>implicit
+<p>A key feature of CUPS printer sharing was support for <em>implicit
 classes</em>, which are automatically-created classes for printers that are
-shared by multiple servers. These implicit classes provide automatic load
+shared by multiple servers. These implicit classes provided automatic load
 balancing and fail-safe printing functionality transparently to the user.</p>
 
 
 <h2><a name='SECURITY'>Security Considerations</a></h2>
 
-<p>Like most discovery protocols, CUPS browse packets are not encrypted or
-signed, so it is possible for malicious systems on a network to advertise
+<p>Like most discovery protocols, CUPS browse packets were not encrypted or
+signed, so it was possible for malicious systems on a network to advertise
 or remove printers on that network to cause denial of service or information
-disclosure. In order to combat this, CUPS logs incoming browse packets and
-provides access controls to limit browse packet reception to known hosts.</p>
+disclosure. In order to combat this, CUPS logged incoming browse packets and
+provided access controls to limit browse packet reception to known hosts.</p>
 
 
 <h2><a name='FORMAT'>Browse Packet Format</a></h2>

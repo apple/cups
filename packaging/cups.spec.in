@@ -135,6 +135,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
+/etc/cups/cups-files.conf.default
 /etc/cups/cupsd.conf.default
 %dir /etc/cups/interfaces
 %dir /etc/cups/ppd

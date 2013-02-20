@@ -3,7 +3,7 @@
  *
  *   Internet Printing Protocol functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2327,7 +2327,9 @@ ippNextAttribute(ipp_t *ipp)		/* I - IPP message */
 ipp_t *					/* O - New IPP message */
 ippNew(void)
 {
-  ipp_t	*temp;				/* New IPP message */
+  ipp_t			*temp;		/* New IPP message */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Global data */
 
 
   DEBUG_puts("ippNew()");
@@ -2335,11 +2337,11 @@ ippNew(void)
   if ((temp = (ipp_t *)calloc(1, sizeof(ipp_t))) != NULL)
   {
    /*
-    * Default to IPP 2.0...
+    * Set default version - usually 2.0...
     */
 
-    temp->request.any.version[0] = 2;
-    temp->request.any.version[1] = 0;
+    temp->request.any.version[0] = cg->server_version / 10;
+    temp->request.any.version[1] = cg->server_version % 10;
     temp->use                    = 1;
   }
 
@@ -2771,6 +2773,13 @@ ippReadIO(void       *src,		/* I - Data source */
 	      ipp->prev = ipp->current;
 
 	    attr = ipp->current = ipp_add_attr(ipp, NULL, ipp->curtag, IPP_TAG_ZERO, 1);
+	    if (!attr)
+	    {
+	      _cupsSetHTTPError(HTTP_ERROR);
+	      DEBUG_puts("1ippReadIO: unable to allocate attribute.");
+	      _cupsBufferRelease((char *)buffer);
+	      return (IPP_ERROR);
+	    }
 
 	    DEBUG_printf(("2ippReadIO: membername, ipp->current=%p, ipp->prev=%p",
 	                  ipp->current, ipp->prev));
@@ -5023,6 +5032,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 	    _cupsStrFree(attr->values[0].string.language);
 	    attr->values[0].string.language = NULL;
 	  }
+	  /* Fall through to other string values */
 
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :

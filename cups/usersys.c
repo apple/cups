@@ -341,13 +341,30 @@ cupsSetPasswordCB2(
 void
 cupsSetServer(const char *server)	/* I - Server name */
 {
-  char		*port;			/* Pointer to port */
+  char		*options,		/* Options */
+		*port;			/* Pointer to port */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   if (server)
   {
     strlcpy(cg->server, server, sizeof(cg->server));
+
+    if (cg->server[0] != '/' && (options = strrchr(cg->server, '/')) != NULL)
+    {
+      *options++ = '\0';
+
+      if (!strcmp(options, "version=1.0"))
+        cg->server_version = 10;
+      else if (!strcmp(options, "version=1.1"))
+        cg->server_version = 11;
+      else if (!strcmp(options, "version=2.0"))
+        cg->server_version = 20;
+      else if (!strcmp(options, "version=2.1"))
+        cg->server_version = 21;
+      else if (!strcmp(options, "version=2.2"))
+        cg->server_version = 22;
+    }
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
         !strchr(port, ']') && isdigit(port[1] & 255))
@@ -364,8 +381,9 @@ cupsSetServer(const char *server)	/* I - Server name */
   }
   else
   {
-    cg->server[0]     = '\0';
-    cg->servername[0] = '\0';
+    cg->server[0]      = '\0';
+    cg->servername[0]  = '\0';
+    cg->server_version = 20;
   }
 
   if (cg->http)

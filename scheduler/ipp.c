@@ -1574,9 +1574,71 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                   priority);
   }
 
-  if (!ippFindAttribute(con->request, "job-name", IPP_TAG_NAME))
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) == NULL)
     ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
                  "Untitled");
+  else if ((attr->value_tag != IPP_TAG_NAME &&
+            attr->value_tag != IPP_TAG_NAMELANG) ||
+           attr->num_values != 1)
+  {
+    send_ipp_status(con, IPP_ATTRIBUTES,
+                    _("Bad job-name value: Wrong type or count."));
+    if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
+      attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+    return (NULL);
+  }
+  else
+  {
+    const char	*ptr;			/* Pointer into string */
+
+    for (ptr = attr->values[0].string.text; *ptr; ptr ++)
+    {
+      if ((*ptr & 0xe0) == 0xc0)
+      {
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+      }
+      else if ((*ptr & 0xf0) == 0xe0)
+      {
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+      }
+      else if ((*ptr & 0xf8) == 0xf0)
+      {
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+	ptr ++;
+	if ((*ptr & 0xc0) != 0x80)
+	  break;
+      }
+      else if (*ptr & 0x80)
+	break;
+    }
+
+    if (*ptr || (ptr - attr->values[0].string.text) > (IPP_MAX_NAME - 1))
+    {
+      if (*ptr)
+	send_ipp_status(con, IPP_ATTRIBUTES,
+	                _("Bad job-name value: Bad UTF-8 sequence."));
+      else
+	send_ipp_status(con, IPP_ATTRIBUTES,
+	                _("Bad job-name value: Name too long."));
+
+      if ((attr = ippCopyAttribute(con->response, attr, 0)) != NULL)
+	attr->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
+
+      return (NULL);
+    }
+  }
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
@@ -2405,7 +2467,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
 	                _("File device URIs have been disabled. "
 	                  "To enable, see the FileDevice directive in "
-			  "\"%s/cupsd.conf\"."),
+			  "\"%s/cups-files.conf\"."),
 			ServerRoot);
 	return;
       }
@@ -8253,7 +8315,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Grab format from client...
     */
 
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super,
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]", super,
                type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
@@ -8270,7 +8332,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Use default document format...
     */
 
-    if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(default_format, "%15[^/]/%255[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Bad document-format \"%s\"."),
@@ -9484,7 +9546,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Grab format from client...
     */
 
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]",
                super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
@@ -9500,7 +9562,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Use default document format...
     */
 
-    if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(default_format, "%15[^/]/%255[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Bad document-format-default \"%s\"."), default_format);
@@ -10999,7 +11061,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((format = ippFindAttribute(con->request, "document-format",
                                  IPP_TAG_MIMETYPE)) != NULL)
   {
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]",
                super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,

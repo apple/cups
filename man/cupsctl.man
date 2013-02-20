@@ -3,7 +3,7 @@
 .\"
 .\"   cupsctl man page for CUPS.
 .\"
-.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 2007-2013 by Apple Inc.
 .\"   Copyright 2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsctl 8 "CUPS" "16 July 2012" "Apple Inc."
+.TH cupsctl 8 "CUPS" "11 January 2013" "Apple Inc."
 .SH NAME
 cupsctl \- configure cupsd.conf options
 .SH SYNOPSIS
@@ -82,12 +82,7 @@ Get the current debug logging state:
 .LP
 Disable printer sharing:
 .nf
-    cupsctl --no-shared-printers
-.fi
-.LP
-Enable printing using the file: pseudo-device:
-.nf
-    cupsctl FileDevice=Yes
+    cupsctl --no-share-printers
 .fi
 .SH KNOWN ISSUES
 You cannot set the Listen or Port directives using \fIcupsctl\fR.
@@ -96,7 +91,7 @@ You cannot set the Listen or Port directives using \fIcupsctl\fR.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 .\"
 .\" End of "$Id: cupsctl.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

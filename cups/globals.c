@@ -3,7 +3,7 @@
  *
  *   Global variable access routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -210,11 +210,12 @@ cups_globals_alloc(void)
   */
 
   memset(cg, 0, sizeof(_cups_globals_t));
-  cg->encryption    = (http_encryption_t)-1;
-  cg->password_cb   = (cups_password_cb2_t)_cupsGetPassword;
-  cg->any_root      = 1;
-  cg->expired_certs = 1;
-  cg->expired_root  = 1;
+  cg->encryption     = (http_encryption_t)-1;
+  cg->password_cb    = (cups_password_cb2_t)_cupsGetPassword;
+  cg->any_root       = 1;
+  cg->expired_certs  = 1;
+  cg->expired_root   = 1;
+  cg->server_version = 20;
 
  /*
   * Then set directories as appropriate...

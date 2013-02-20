@@ -41,6 +41,22 @@
 static int	log_linesize = 0;	/* Size of line for output file */
 static char	*log_line = NULL;	/* Line for output file */
 
+#ifdef HAVE_VSYSLOG
+static const int syslevels[] =		/* SYSLOG levels... */
+		{
+		  0,
+		  LOG_EMERG,
+		  LOG_ALERT,
+		  LOG_CRIT,
+		  LOG_ERR,
+		  LOG_WARNING,
+		  LOG_NOTICE,
+		  LOG_INFO,
+		  LOG_DEBUG,
+		  LOG_DEBUG
+		};
+#endif /* HAVE_VSYSLOG */
+
 
 /*
  * Local functions...
@@ -543,8 +559,12 @@ cupsdLogMessage(int        level,	/* I - Log level */
   if ((TestConfigFile || !ErrorLog) && level <= CUPSD_LOG_WARN)
   {
     va_start(ap, message);
+#ifdef HAVE_VSYSLOG
+    vsyslog(LOG_LPR | syslevels[level], message, ap);
+#else
     vfprintf(stderr, message, ap);
     putc('\n', stderr);
+#endif /* HAVE_VSYSLOG */
     va_end(ap);
 
     return (1);
@@ -984,21 +1004,6 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
 		  'D',
 		  'd'
 		};
-#ifdef HAVE_VSYSLOG
-  static const int	syslevels[] =	/* SYSLOG levels... */
-		{
-		  0,
-		  LOG_EMERG,
-		  LOG_ALERT,
-		  LOG_CRIT,
-		  LOG_ERR,
-		  LOG_WARNING,
-		  LOG_NOTICE,
-		  LOG_INFO,
-		  LOG_DEBUG,
-		  LOG_DEBUG
-		};
-#endif /* HAVE_VSYSLOG */
 
 
 #ifdef HAVE_VSYSLOG

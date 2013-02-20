@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 2007-2013 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,12 +12,15 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "18 May 2012" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "19 November 2012" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
 The \fIcupsd.conf\fR file configures the CUPS scheduler, \fIcupsd(8)\fR.  It
-is normally located in the \fI@CUPS_SERVERROOT@\fR directory.
+is normally located in the \fI@CUPS_SERVERROOT@\fR directory. \fBNote:\fR
+File, directory, and user configuration directives that used to be allowed in
+the \fIcupsd.conf\fR file are now stored in the \fIcups-files.conf(5)\fR instead
+in order to prevent certain types of privilege escalation attacks.
 .LP
 Each line in the file can be a configuration directive, a blank line,
 or a comment. Comment lines start with the # character. The
@@ -26,12 +29,6 @@ popular Apache web server software and are described below.
 .SH DIRECTIVES
 The following directives are understood by \fIcupsd(8)\fR. Consult the
 on-line help for detailed descriptions:
-.TP 5
-AccessLog filename
-.TP 5
-AccessLog syslog
-.br
-Defines the access log filename.
 .TP 5
 AccessLogLevel config
 .TP 5
@@ -60,20 +57,6 @@ Allow @IF(name)
 Allow @LOCAL
 .br
 Allows access from the named hosts or addresses.
-.TP 5
-AuthClass User
-.TP 5
-AuthClass Group
-.TP 5
-AuthClass System
-.br
-Specifies the authentication class (User, Group, System) -
-\fBthis directive is deprecated\fR.
-.TP 5
-AuthGroupName group-name
-.br
-Specifies the authentication group - \fBthis directive is
-deprecated\fR.
 .TP 5
 AuthType None
 .TP 5
@@ -108,7 +91,7 @@ Browsing Yes
 .TP 5
 Browsing No
 .br
-Specifies whether or not remote printer browsing should be enabled.
+Specifies whether or not shared printers should be advertised.
 .TP 5
 Classification banner
 .br
@@ -120,15 +103,6 @@ ClassifyOverride No
 .br
 Specifies whether to allow users to override the classification
 of individual print jobs.
-.TP 5
-ConfigFilePerm mode
-.br
-Specifies the permissions for all configuration files that the scheduler
-writes.
-.TP 5
-DataDir path
-.br
-Specified the directory where data files can be found.
 .TP 5
 DefaultAuthType Basic
 .TP 5
@@ -197,10 +171,6 @@ Specifies the delay for updating of configuration and state files. A value of 0
 causes the update to happen as soon as possible, typically within a few
 milliseconds.
 .TP 5
-DocumentRoot directory
-.br
-Specifies the root directory for the internal web server documents.
-.TP 5
 Encryption IfRequested
 .TP 5
 Encryption Never
@@ -210,28 +180,6 @@ Encryption Required
 Specifies the level of encryption that is required for a particular
 location.
 .TP 5
-ErrorLog filename
-.TP 5
-ErrorLog syslog
-.br
-Specifies the error log filename.
-.TP 5
-FatalErrors none
-.TP 5
-FatalErrors all -kind [... -kind]
-.TP 5
-FatalErrors kind [... kind]
-.br
-Specifies which errors are fatal, causing the scheduler to exit. "Kind" is
-"browse", "config", "listen", "log", or "permissions".
-.TP 5
-FileDevice Yes
-.TP 5
-FileDevice No
-.br
-Specifies whether the file pseudo-device can be used for new
-printer queues.
-.TP 5
 FilterLimit limit
 .br
 Specifies the maximum cost of filters that are run concurrently.
@@ -240,15 +188,6 @@ FilterNice nice-value
 .br
 Specifies the scheduling priority ("nice" value) of filters that
 are run to print a job.
-.TP 5
-FontPath directory[:directory:...]
-.br
-Specifies the search path for fonts.
-.TP 5
-Group group-name-or-number
-.br
-Specifies the group name or ID that will be used when executing
-external programs.
 .TP 5
 GSSServiceName name
 .br
@@ -341,10 +280,6 @@ LogDebugHistory #-messages
 Specifies the number of debugging messages that are logged when an error
 occurs in a print job.
 .TP 5
-LogFilePerm mode
-.br
-Specifies the permissions for all log files that the scheduler writes.
-.TP 5
 LogLevel alert
 .TP 5
 LogLevel crit
@@ -429,12 +364,6 @@ Order deny,allow
 .br
 Specifies the order of HTTP access control (allow,deny or deny,allow)
 .TP 5
-PageLog filename
-.TP 5
-PageLog syslog
-.br
-Specifies the page log filename.
-.TP 5
 PageLogFormat format string
 .br
 Specifies the format of page log lines.
@@ -464,15 +393,6 @@ PreserveJobHistory No
 Specifies whether or not to preserve the job history after they are
 printed.
 .TP 5
-Printcap
-.TP 5
-Printcap filename
-.br
-Specifies the filename for a printcap file that is updated
-automatically with a list of available printers (needed for
-legacy applications); specifying Printcap with no filename
-disables printcap generation.
-.TP 5
 PrintcapFormat bsd
 .TP 5
 PrintcapFormat plist
@@ -481,28 +401,10 @@ PrintcapFormat solaris
 .br
 Specifies the format of the printcap file.
 .TP 5
-PrintcapGUI
-.TP 5
-PrintcapGUI gui-program-filename
-.br
-Specifies whether to generate option panel definition files on
-some operating systems. When provided with no program filename,
-disables option panel definition files.
-.TP 5
 ReloadTimeout seconds
 .br
 Specifies the amount of time to wait for job completion before
 restarting the scheduler.
-.TP 5
-RemoteRoot user-name
-.br
-Specifies the username that is associated with unauthenticated root
-accesses.
-.TP 5
-RequestRoot directory
-.br
-Specifies the directory to store print jobs and other HTTP request
-data.
 .TP 5
 Require group group-name-list
 .TP 5
@@ -535,26 +437,9 @@ ServerAlias *
 Specifies an alternate name that the server is known by. The special name "*"
 allows any name to be used.
 .TP 5
-ServerBin directory
-.br
-Specifies the directory where backends, CGIs, daemons, and filters may
-be found.
-.TP 5
-ServerCertificate filename
-.br
-Specifies the encryption certificate to use.
-.TP 5
-ServerKey filename
-.br
-Specifies the encryption key to use.
-.TP 5
 ServerName hostname-or-ip-address
 .br
 Specifies the fully-qualified hostname of the server.
-.TP 5
-ServerRoot directory
-.br
-Specifies the directory where the server configuration files can be found.
 .TP 5
 ServerTokens Full
 .TP 5
@@ -619,34 +504,22 @@ Specifies the list of job values to make private. The "default" values are
 "notify-events", "notify-pull-method", "notify-recipient-uri",
 "notify-subscriber-user-name", and "notify-user-data".
 .TP 5
-SystemGroup group-name [group-name ...]
-.br
-Specifies the group(s) to use for System class authentication.
-.TP 5
-TempDir directory
-.br
-Specifies the directory where temporary files are stored.
-.TP 5
 Timeout seconds
 .br
 Specifies the HTTP request timeout in seconds.
-.TP 5
-User user-name
-.br
-Specifies the user name or ID that is used when running external programs.
 .TP 5
 WebInterface yes
 .TP 5
 WebInterface no
 Specifies whether the web interface is enabled.
 .SH SEE ALSO
-\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fImime.convs(5)\fR,
-\fImime.types(5)\fR, \fIprinters.conf(5)\fR,
+\fIclasses.conf(5)\fR, \fIcups-files.conf(5)\fR, \fIcupsd(8)\fR,
+\fImime.convs(5)\fR, \fImime.types(5)\fR, \fIprinters.conf(5)\fR,
 \fIsubscriptions.conf(5)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 .\"
 .\" End of "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $".
 .\"

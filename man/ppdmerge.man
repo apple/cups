@@ -3,7 +3,7 @@
 .\"
 .\"   ppdmerge man page for CUPS.
 .\"
-.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 2007-2013 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -41,7 +41,7 @@ cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdpo(1), ppdcfile(5)
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 .\"
 .\" End of "$Id: ppdmerge.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

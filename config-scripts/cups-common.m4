@@ -403,8 +403,8 @@ case $uname in
 		if test $uversion -ge 100; then
 			AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
 		fi
-		if test $uversion -ge 110; then
-			# Broken public headers in 10.7...
+		if test $uversion -ge 110 -a $uversion -lt 120; then
+			# Broken public headers in 10.7.x...
 			AC_MSG_CHECKING(for sandbox/private.h presence)
 			if test -f /usr/local/include/sandbox/private.h; then
 				AC_MSG_RESULT(yes)

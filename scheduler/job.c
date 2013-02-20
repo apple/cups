@@ -2195,7 +2195,16 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   }
 
   if (!cupsdCloseCreatedConfFile(fp, filename))
+  {
+   /*
+    * Remove backup file and mark this job as clean...
+    */
+
+    strlcat(filename, ".O", sizeof(filename));
+    unlink(filename);
+
     job->dirty = 0;
+  }
 }
 
 
@@ -2468,8 +2477,10 @@ cupsdSetJobState(
   * Set the new job state...
   */
 
-  job->state->values[0].integer = newstate;
-  job->state_value              = newstate;
+  job->state_value = newstate;
+
+  if (job->state)
+    job->state->values[0].integer = newstate;
 
   switch (newstate)
   {
@@ -4282,6 +4293,8 @@ load_request_root(void)
 	else
 	  unload_job(job);
       }
+      else
+        free(job);
     }
 
   cupsDirClose(dir);
@@ -4373,7 +4386,7 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
 
   if (!strcmp(name, "time-at-completed"))
   {
-    if (JobHistory < INT_MAX)
+    if (JobHistory < INT_MAX && attr)
       job->history_time = attr->values[0].integer + JobHistory;
     else
       job->history_time = INT_MAX;
@@ -4381,7 +4394,7 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
     if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
       JobHistoryUpdate = job->history_time;
 
-    if (JobFiles < INT_MAX)
+    if (JobFiles < INT_MAX && attr)
       job->file_time = attr->values[0].integer + JobFiles;
     else
       job->file_time = INT_MAX;
@@ -4713,7 +4726,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdStopPrinter(job->printer, 1);
 	return;
       }
-      else if (cupsdSetPrinterReasons(job->printer, message))
+      else if (message[0] && cupsdSetPrinterReasons(job->printer, message))
       {
 	event |= CUPSD_EVENT_PRINTER_STATE;
 

@@ -3631,8 +3631,8 @@ msgstr "ファイルフォルダー"
 #, c-format
 msgid ""
 "File device URIs have been disabled. To enable, see the FileDevice directive "
-"in \"%s/cupsd.conf\"."
-msgstr "ファイルデバイス URI は無効になっています。有効にするには、\"%s/cupsd.conf\" の FileDevice ディレクティブを参照してください。"
+"in \"%s/cups-files.conf\"."
+msgstr "ファイルデバイス URI は無効になっています。有効にするには、\"%s/cups-files.conf\" の FileDevice ディレクティブを参照してください。"
 
 #: filter/rastertoepson.c:1117 filter/rastertohp.c:845
 #: filter/rastertolabel.c:1273

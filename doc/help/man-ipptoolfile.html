@@ -11,7 +11,7 @@
 ipptoolfile - ipptool file format
 
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-The <a href='man-ipptool.html?TOPIC=Man+Pages'>ipptool(1)</a> program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curley braces, for example:
+The <a href='man-ipptool.html?TOPIC=Man+Pages'>ipptool(1)</a> program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
 <pre>
 
     # This is a comment
@@ -402,6 +402,14 @@ parallel attribute.
 <h2 class="title"><a name="STATUS_PREDICATES">Status Predicates</a></h2>
 The following predicates are understood following the STATUS test directive:
 <dl>
+<dt>DEFINE-MATCH variable-name
+</dt>
+<dd>Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+</dd>
+<dt>DEFINE-NO-MATCH variable-name
+</dt>
+<dd>Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+</dd>
 <dt>IF-DEFINED variable-name
 </dt>
 <dd>Makes the STATUS apply only if the specified variable is defined.
@@ -631,7 +639,7 @@ no job-uri has been seen.
 </dd>
 <dt>$notify-subscription-id
 </dt>
-<dd>Inserts the last notify-subscription-id value returnd in a test response or 0 if
+<dd>Inserts the last notify-subscription-id value returned in a test response or 0 if
 no notify-subscription-id has been seen.
 </dd>
 <dt>$port
@@ -662,7 +670,7 @@ no notify-subscription-id has been seen.
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
 
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2012 by Apple Inc.
+Copyright 2007-2013 by Apple Inc.
 
 </body>
 </html>

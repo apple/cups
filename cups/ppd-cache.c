@@ -69,7 +69,8 @@ static int	pwg_compare_finishings(_pwg_finishings_t *a,
 		                       _pwg_finishings_t *b);
 static void	pwg_free_finishings(_pwg_finishings_t *f);
 static void	pwg_ppdize_name(const char *ipp, char *name, size_t namesize);
-static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
+static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize,
+		                  const char *dashchars);
 
 
 /*
@@ -329,7 +330,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      if ((num_sizes = atoi(value)) <= 0 || num_sizes > 65536)
+      if ((num_sizes = atoi(value)) < 0 || num_sizes > 65536)
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumSizes value %d on line "
 	              "%d.", num_sizes, linenum));
@@ -337,12 +338,15 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      if ((pc->sizes = calloc(num_sizes, sizeof(_pwg_size_t))) == NULL)
+      if (num_sizes > 0)
       {
-        DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sizes.",
-	              num_sizes));
-	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
-	goto create_error;
+	if ((pc->sizes = calloc(num_sizes, sizeof(_pwg_size_t))) == NULL)
+	{
+	  DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sizes.",
+			num_sizes));
+	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  goto create_error;
+	}
       }
     }
     else if (!_cups_strcasecmp(line, "Size"))
@@ -684,148 +688,145 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Copy and convert size data...
   */
 
-  if (ppd->num_sizes == 0)
+  if (ppd->num_sizes > 0)
   {
-    DEBUG_puts("_ppdCacheCreateWithPPD: No page sizes in PPD.");
-    goto create_error;
-  }
-
-  if ((pc->sizes = calloc(ppd->num_sizes, sizeof(_pwg_size_t))) == NULL)
-  {
-    DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
-                  "_pwg_size_t's.", ppd->num_sizes));
-    goto create_error;
-  }
-
-  for (i = ppd->num_sizes, pwg_size = pc->sizes, ppd_size = ppd->sizes;
-       i > 0;
-       i --, ppd_size ++)
-  {
-   /*
-    * Don't copy over custom size...
-    */
-
-    if (!_cups_strcasecmp(ppd_size->name, "Custom"))
-      continue;
-
-   /*
-    * Convert the PPD size name to the corresponding PWG keyword name.
-    */
-
-    if ((pwg_media = _pwgMediaForPPD(ppd_size->name)) != NULL)
+    if ((pc->sizes = calloc(ppd->num_sizes, sizeof(_pwg_size_t))) == NULL)
     {
-     /*
-      * Standard name, do we have conflicts?
-      */
-
-      for (j = 0; j < pc->num_sizes; j ++)
-        if (!strcmp(pc->sizes[j].map.pwg, pwg_media->pwg))
-	{
-	  pwg_media = NULL;
-	  break;
-	}
+      DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
+		    "_pwg_size_t's.", ppd->num_sizes));
+      goto create_error;
     }
 
-    if (pwg_media)
+    for (i = ppd->num_sizes, pwg_size = pc->sizes, ppd_size = ppd->sizes;
+	 i > 0;
+	 i --, ppd_size ++)
     {
      /*
-      * Standard name and no conflicts, use it!
+      * Don't copy over custom size...
       */
 
-      pwg_name      = pwg_media->pwg;
-      new_known_pwg = 1;
-    }
-    else
-    {
+      if (!_cups_strcasecmp(ppd_size->name, "Custom"))
+	continue;
+
      /*
-      * Not a standard name; convert it to a PWG vendor name of the form:
-      *
-      *     pp_lowerppd_WIDTHxHEIGHTuu
+      * Convert the PPD size name to the corresponding PWG keyword name.
       */
 
-      pwg_name      = pwg_keyword;
-      new_known_pwg = 0;
-
-      pwg_unppdize_name(ppd_size->name, ppd_name, sizeof(ppd_name));
-      _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), NULL, ppd_name,
-		       _PWG_FROMPTS(ppd_size->width),
-		       _PWG_FROMPTS(ppd_size->length));
-    }
-
-   /*
-    * If we have a similar paper with non-zero margins then we only want to
-    * keep it if it has a larger imageable area length.  The NULL check is for
-    * dimensions that are <= 0...
-    */
-
-    if ((pwg_media = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
-                                      _PWG_FROMPTS(ppd_size->length))) == NULL)
-      continue;
-
-    new_width      = pwg_media->width;
-    new_length     = pwg_media->length;
-    new_left       = _PWG_FROMPTS(ppd_size->left);
-    new_bottom     = _PWG_FROMPTS(ppd_size->bottom);
-    new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
-    new_top        = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
-    new_imageable  = new_length - new_top - new_bottom;
-    new_borderless = new_bottom == 0 && new_top == 0 &&
-                     new_left == 0 && new_right == 0;
-
-    for (k = pc->num_sizes, similar = 0, old_size = pc->sizes, new_size = NULL;
-         k > 0 && !similar;
-         k --, old_size ++)
-    {
-      old_imageable  = old_size->length - old_size->top - old_size->bottom;
-      old_borderless = old_size->left == 0 && old_size->bottom == 0 &&
-	               old_size->right == 0 && old_size->top == 0;
-      old_known_pwg  = strncmp(old_size->map.pwg, "oe_", 3) &&
-		       strncmp(old_size->map.pwg, "om_", 3);
-
-      similar = old_borderless == new_borderless &&
-                _PWG_EQUIVALENT(old_size->width, new_width) &&
-	        _PWG_EQUIVALENT(old_size->length, new_length);
-
-      if (similar &&
-          (new_known_pwg || (!old_known_pwg && new_imageable > old_imageable)))
+      if ((pwg_media = _pwgMediaForPPD(ppd_size->name)) != NULL)
       {
        /*
-	* The new paper has a larger imageable area so it could replace
-	* the older paper.  Regardless of the imageable area, we always
-	* prefer the size with a well-known PWG name.
+	* Standard name, do we have conflicts?
 	*/
 
-	new_size = old_size;
-	_cupsStrFree(old_size->map.ppd);
-	_cupsStrFree(old_size->map.pwg);
+	for (j = 0; j < pc->num_sizes; j ++)
+	  if (!strcmp(pc->sizes[j].map.pwg, pwg_media->pwg))
+	  {
+	    pwg_media = NULL;
+	    break;
+	  }
       }
-    }
 
-    if (!similar)
-    {
+      if (pwg_media)
+      {
+       /*
+	* Standard name and no conflicts, use it!
+	*/
+
+	pwg_name      = pwg_media->pwg;
+	new_known_pwg = 1;
+      }
+      else
+      {
+       /*
+	* Not a standard name; convert it to a PWG vendor name of the form:
+	*
+	*     pp_lowerppd_WIDTHxHEIGHTuu
+	*/
+
+	pwg_name      = pwg_keyword;
+	new_known_pwg = 0;
+
+	pwg_unppdize_name(ppd_size->name, ppd_name, sizeof(ppd_name), "_.");
+	_pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), NULL, ppd_name,
+			 _PWG_FROMPTS(ppd_size->width),
+			 _PWG_FROMPTS(ppd_size->length));
+      }
+
      /*
-      * The paper was unique enough to deserve its own entry so add it to the
-      * end.
+      * If we have a similar paper with non-zero margins then we only want to
+      * keep it if it has a larger imageable area length.  The NULL check is for
+      * dimensions that are <= 0...
       */
 
-      new_size = pwg_size ++;
-      pc->num_sizes ++;
-    }
+      if ((pwg_media = _pwgMediaForSize(_PWG_FROMPTS(ppd_size->width),
+					_PWG_FROMPTS(ppd_size->length))) == NULL)
+	continue;
 
-    if (new_size)
-    {
-     /*
-      * Save this size...
-      */
+      new_width      = pwg_media->width;
+      new_length     = pwg_media->length;
+      new_left       = _PWG_FROMPTS(ppd_size->left);
+      new_bottom     = _PWG_FROMPTS(ppd_size->bottom);
+      new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
+      new_top        = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
+      new_imageable  = new_length - new_top - new_bottom;
+      new_borderless = new_bottom == 0 && new_top == 0 &&
+		       new_left == 0 && new_right == 0;
 
-      new_size->map.ppd = _cupsStrAlloc(ppd_size->name);
-      new_size->map.pwg = _cupsStrAlloc(pwg_name);
-      new_size->width   = new_width;
-      new_size->length  = new_length;
-      new_size->left    = new_left;
-      new_size->bottom  = new_bottom;
-      new_size->right   = new_right;
-      new_size->top     = new_top;
+      for (k = pc->num_sizes, similar = 0, old_size = pc->sizes, new_size = NULL;
+	   k > 0 && !similar;
+	   k --, old_size ++)
+      {
+	old_imageable  = old_size->length - old_size->top - old_size->bottom;
+	old_borderless = old_size->left == 0 && old_size->bottom == 0 &&
+			 old_size->right == 0 && old_size->top == 0;
+	old_known_pwg  = strncmp(old_size->map.pwg, "oe_", 3) &&
+			 strncmp(old_size->map.pwg, "om_", 3);
+
+	similar = old_borderless == new_borderless &&
+		  _PWG_EQUIVALENT(old_size->width, new_width) &&
+		  _PWG_EQUIVALENT(old_size->length, new_length);
+
+	if (similar &&
+	    (new_known_pwg || (!old_known_pwg && new_imageable > old_imageable)))
+	{
+	 /*
+	  * The new paper has a larger imageable area so it could replace
+	  * the older paper.  Regardless of the imageable area, we always
+	  * prefer the size with a well-known PWG name.
+	  */
+
+	  new_size = old_size;
+	  _cupsStrFree(old_size->map.ppd);
+	  _cupsStrFree(old_size->map.pwg);
+	}
+      }
+
+      if (!similar)
+      {
+       /*
+	* The paper was unique enough to deserve its own entry so add it to the
+	* end.
+	*/
+
+	new_size = pwg_size ++;
+	pc->num_sizes ++;
+      }
+
+      if (new_size)
+      {
+       /*
+	* Save this size...
+	*/
+
+	new_size->map.ppd = _cupsStrAlloc(ppd_size->name);
+	new_size->map.pwg = _cupsStrAlloc(pwg_name);
+	new_size->width   = new_width;
+	new_size->length  = new_length;
+	new_size->left    = new_left;
+	new_size->bottom  = new_bottom;
+	new_size->right   = new_right;
+	new_size->top     = new_top;
+      }
     }
   }
 
@@ -913,7 +914,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	*/
 
         pwg_name = pwg_keyword;
-	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword),
+	                  "_");
       }
 
       map->pwg = _cupsStrAlloc(pwg_name);
@@ -977,7 +979,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	*/
 
         pwg_name = pwg_keyword;
-	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+	pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword),
+	                  "_");
       }
 
       map->pwg = _cupsStrAlloc(pwg_name);
@@ -1006,7 +1009,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	 i > 0;
 	 i --, choice ++, map ++)
     {
-      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword), "_");
 
       map->pwg = _cupsStrAlloc(pwg_keyword);
       map->ppd = _cupsStrAlloc(choice->choice);
@@ -2602,7 +2605,8 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 static void
 pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 		  char       *name,	/* I - Name buffer */
-                  size_t     namesize)	/* I - Size of name buffer */
+                  size_t     namesize,	/* I - Size of name buffer */
+                  const char *dashchars)/* I - Characters to be replaced by dashes */
 {
   char	*ptr,				/* Pointer into name buffer */
 	*end;				/* End of name buffer */
@@ -2612,8 +2616,10 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
   {
     if (_cups_isalnum(*ppd) || *ppd == '-')
       *ptr++ = tolower(*ppd & 255);
-    else if (*ppd == '_' || *ppd == '.')
+    else if (strchr(dashchars, *ppd))
       *ptr++ = '-';
+    else
+      *ptr++ = *ppd;
 
     if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
 	_cups_isupper(ppd[1]) && ptr < end)

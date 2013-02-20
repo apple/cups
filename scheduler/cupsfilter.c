@@ -3,7 +3,7 @@
  *
  *   Filtering program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -409,6 +409,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (srctype)
   {
+   /* sscanf return value already checked above */
     sscanf(srctype, "%15[^/]/%255s", super, type);
     if ((src = mimeType(mime, super, type)) == NULL)
     {
@@ -426,6 +427,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
+ /* sscanf return value already checked above */
   sscanf(dsttype, "%15[^/]/%255s", super, type);
   if (!_cups_strcasecmp(super, "printer"))
     dst = printer_type;
@@ -915,7 +917,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 {
   int		i;			/* Looping var */
   const char	*argv[8],		/* Command-line arguments */
-		*envp[15],		/* Environment variables */
+		*envp[16],		/* Environment variables */
 		*temp;			/* Temporary string */
   char		*optstr,		/* Filter options */
 		content_type[1024],	/* CONTENT_TYPE */
@@ -1038,7 +1040,8 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   envp[11] = printer_name;
   envp[12] = rip_max_cache;
   envp[13] = userenv;
-  envp[14] = NULL;
+  envp[14] = "CHARSET=utf-8";
+  envp[15] = NULL;
 
   for (i = 0; argv[i]; i ++)
     fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);

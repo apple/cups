@@ -3,7 +3,7 @@
  *
  *   ipptool command for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -113,7 +113,10 @@ typedef struct _cups_status_s		/**** Status info ****/
 {
   ipp_status_t	status;			/* Expected status code */
   char		*if_defined,		/* Only if variable is defined */
-		*if_not_defined;	/* Only if variable is not defined */
+		*if_not_defined,	/* Only if variable is not defined */
+		*define_match,		/* Variable to define on match */
+		*define_no_match,	/* Variable to define on no-match */
+		*define_value;		/* Variable to define with value */
   int		repeat_limit,		/* Maximum number of times to repeat */
 		repeat_match,		/* Repeat the test when it does not match */
 		repeat_no_match;	/* Repeat the test when it matches */
@@ -1184,7 +1187,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           _cups_strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
-      if (_cups_strcasecmp(token, "IF-DEFINED") &&
+      if (_cups_strcasecmp(token, "DEFINE-MATCH") &&
+          _cups_strcasecmp(token, "DEFINE-NO-MATCH") &&
+	  _cups_strcasecmp(token, "IF-DEFINED") &&
           _cups_strcasecmp(token, "IF-NOT-DEFINED") &&
           _cups_strcasecmp(token, "REPEAT-LIMIT") &&
           _cups_strcasecmp(token, "REPEAT-MATCH") &&
@@ -1459,12 +1464,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         * Operation...
 	*/
 
-	if (!get_token(fp, token, sizeof(token), &linenum))
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing OPERATION code on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
+
+	expand_variables(vars, token, temp, sizeof(token));
 
 	if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
 	    (op = strtol(token, NULL, 0)) == 0)
@@ -1508,12 +1515,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         double delay;
 
-	if (!get_token(fp, token, sizeof(token), &linenum))
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing DELAY value on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
+
+	expand_variables(vars, token, temp, sizeof(token));
 
 	if ((delay = _cupsStrScand(token, NULL, localeconv())) <= 0.0)
 	{
@@ -1809,6 +1818,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         last_status = statuses + num_statuses;
 	num_statuses ++;
 
+        last_status->define_match    = NULL;
+        last_status->define_no_match = NULL;
 	last_status->if_defined      = NULL;
 	last_status->if_not_defined  = NULL;
 	last_status->repeat_limit    = 1000;
@@ -1892,10 +1903,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (last_expect)
 	  last_expect->define_match = strdup(token);
+	else if (last_status)
+	  last_status->define_match = strdup(token);
 	else
 	{
-	  print_fatal_error("DEFINE-MATCH without a preceding EXPECT on line "
-	                    "%d.", linenum);
+	  print_fatal_error("DEFINE-MATCH without a preceding EXPECT or STATUS "
+	                    "on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1912,10 +1925,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (last_expect)
 	  last_expect->define_no_match = strdup(token);
+	else if (last_status)
+	  last_status->define_no_match = strdup(token);
 	else
 	{
-	  print_fatal_error("DEFINE-NO-MATCH without a preceding EXPECT on "
-	                    "line %d.", linenum);
+	  print_fatal_error("DEFINE-NO-MATCH without a preceding EXPECT or "
+	                    "STATUS on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -1934,8 +1949,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  last_expect->define_value = strdup(token);
 	else
 	{
-	  print_fatal_error("DEFINE-VALUE without a preceding EXPECT on line "
-			    "%d.", linenum);
+	  print_fatal_error("DEFINE-VALUE without a preceding EXPECT on "
+	                    "line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2209,7 +2224,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (request->attrs)
       {
 	puts("<dict>");
-	for (attrptr = request->attrs, group = attrptr->group_tag;
+	for (attrptr = request->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	  print_attr(attrptr, &group);
@@ -2245,8 +2261,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("<key>StatusCode</key>");
 	print_xml_string("string", "skip");
 	puts("<key>ResponseAttributes</key>");
-	puts("<dict>");
-	puts("</dict>");
+	puts("<dict />");
       }
       else if (Output == _CUPS_OUTPUT_TEST)
 	puts("SKIP]");
@@ -2559,7 +2574,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	a = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
-	for (attrptr = response->attrs, group = attrptr->group_tag;
+	for (attrptr = response->attrs,
+	         group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	     attrptr;
 	     attrptr = attrptr->next)
 	{
@@ -2646,11 +2662,23 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        repeat_count < statuses[i].repeat_limit)
 	      repeat_test = 1;
 
-	    break;
+            if (statuses[i].define_match)
+              set_variable(vars, statuses[i].define_match, "1");
+
+            break;
 	  }
-	  else if (statuses[i].repeat_no_match &&
-		   repeat_count < statuses[i].repeat_limit)
-	    repeat_test = 1;
+	  else
+	  {
+	    if (statuses[i].repeat_no_match &&
+		repeat_count < statuses[i].repeat_limit)
+	      repeat_test = 1;
+
+            if (statuses[i].define_no_match)
+            {
+              set_variable(vars, statuses[i].define_no_match, "1");
+              break;
+            }
+          }
 	}
 
 	if (i == num_statuses && num_statuses > 0)
@@ -2965,7 +2993,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     }
 
     if (num_displayed > 0 && !Verbosity && response &&
-        (Output == _CUPS_OUTPUT_TEST || Output == _CUPS_OUTPUT_PLIST))
+        Output == _CUPS_OUTPUT_TEST)
     {
       for (attrptr = response->attrs;
 	   attrptr != NULL;
@@ -3001,6 +3029,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         free(statuses[i].if_defined);
       if (statuses[i].if_not_defined)
         free(statuses[i].if_not_defined);
+      if (statuses[i].define_match)
+        free(statuses[i].define_match);
+      if (statuses[i].define_no_match)
+        free(statuses[i].define_no_match);
     }
     num_statuses = 0;
 
@@ -3051,6 +3083,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(statuses[i].if_defined);
     if (statuses[i].if_not_defined)
       free(statuses[i].if_not_defined);
+      if (statuses[i].define_match)
+        free(statuses[i].define_match);
+      if (statuses[i].define_no_match)
+        free(statuses[i].define_no_match);
   }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
@@ -3723,8 +3759,11 @@ print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
   {
     if (!attr->name || (group && *group != attr->group_tag))
     {
-      puts("</dict>");
-      puts("<dict>");
+      if (attr->group_tag != IPP_TAG_ZERO)
+      {
+	puts("</dict>");
+	puts("<dict>");
+      }
 
       if (group)
         *group = attr->group_tag;

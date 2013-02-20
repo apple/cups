@@ -327,8 +327,7 @@ httpAssembleURI(
      /*
       * Otherwise, just copy the host string...
       */
-
-      ptr = http_copy_encode(ptr, host, end, ":/?#[]@\\\"", NULL,
+      ptr = http_copy_encode(ptr, host, end, "<>{}|^:/?#[]@\\\"", NULL,
                              encoding & HTTP_URI_CODING_HOSTNAME);
 
       if (!ptr)
@@ -2059,6 +2058,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 
@@ -2274,6 +2275,8 @@ http_resolve_cb(
 			error));
 #endif /* DEBUG */
       }
+
+      httpAddrFreeList(addrlist);
     }
   }
 

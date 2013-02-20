@@ -1,14 +1,20 @@
-INSTALL - CUPS v1.6.2 - 2012-10-24
+INSTALL - CUPS v1.6.2 - 2013-01-11
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
 be found in "CHANGES.txt".
 
-**** IF YOU HAVE A NON-POSTSCRIPT PRINTER AND ARE NOT       ****
-**** RUNNING OS X, YOU WILL ALSO NEED TO INSTALL GPL        ****
-**** GHOSTSCRIPT WITH THE "cups" DRIVER AFTER YOU INSTALL   ****
-**** CUPS.                                                  ****
+*******************************************************************************
+*******************************************************************************
+****                                                                       ****
+****  USING CUPS REQUIRES ADDITIONAL THIRD-PARTY SUPPORT SOFTWARE AND      ****
+****  PRINTER DRIVERS.  THESE ARE TYPICALLY INCLUDED WITH YOUR OPERATING   ****
+****  SYSTEM DISTRIBUTION.  APPLE DOES NOT ENDORSE OR SUPPORT THIRD-PARTY  ****
+****  SUPPORT SOFTWARE FOR CUPS.                                           ****
+****                                                                       ****
+*******************************************************************************
+*******************************************************************************
 
 
 BEFORE YOU BEGIN

@@ -1288,8 +1288,9 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * If the printer only claims to support IPP/1.0, or if the user specifically
   * included version=1.0 in the URI, then do not try to use Create-Job or
-  * Send-Document.  This is another dreaded compatibility hack, but unfortunately
-  * there are enough broken printers out there that we need this for now...
+  * Send-Document.  This is another dreaded compatibility hack, but
+  * unfortunately there are enough broken printers out there that we need
+  * this for now...
   */
 
   if (version == 10)
@@ -1717,6 +1718,27 @@ main(int  argc,				/* I - Number of command-line args */
       * Print file is too large, job was canceled, we need new
       * authentication data, or we had some sort of error...
       */
+
+      goto cleanup;
+    }
+    else if (ipp_status == IPP_UPGRADE_REQUIRED)
+    {
+     /*
+      * Server is configured incorrectly; the policy for Create-Job and
+      * Send-Document has to be the same (auth or no auth, encryption or
+      * no encryption).  Force the queue to stop since printing will never
+      * work.
+      */
+
+      fputs("DEBUG: The server or printer is configured incorrectly.\n",
+            stderr);
+      fputs("DEBUG: The policy for Create-Job and Send-Document must have the "
+            "same authentication and encryption requirements.\n", stderr);
+
+      ipp_status = IPP_INTERNAL_ERROR;
+
+      if (job_id > 0)
+	cancel_job(http, uri, job_id, resource, argv[2], version);
 
       goto cleanup;
     }

@@ -33,9 +33,9 @@ msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2012-05-23 16:24-0700\n"
-"PO-Revision-Date: 2012-05-26 12:28+0200\n"
+"PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
-"Language-Team: Catalan <ca@dodds.net> <>\n"
+"Language-Team: Catalan <ca@dodds.net>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1322,7 +1322,7 @@ msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
 msgstr ""
-"  -j id-tasca[,N]           Filtra el fitxer N a la tasca especificada (el "
+"  -j id-feina[,N]           Filtra el fitxer N a la feina especificada (el "
 "fitxer per defecte és 1)."
 
 #: scheduler/main.c:2024
@@ -1527,7 +1527,7 @@ msgstr "%s està preparada i imprimeix"
 #: filter/rastertolabel.c:1134
 #, c-format
 msgid "%s job-id user title copies options [file]"
-msgstr "%s identificador-tasca usuari títol còpies opcions [fitxer]"
+msgstr "%s identificador-feina usuari títol còpies opcions [fitxer]"
 
 #: systemv/lpstat.c:754
 #, c-format
@@ -1537,7 +1537,7 @@ msgstr "%s no accepta peticions des de %s -"
 #: scheduler/ipp.c:691
 #, c-format
 msgid "%s not supported."
-msgstr "no es permet l'ús de %s."
+msgstr "no és compatible amb l'ús de %s."
 
 #: systemv/lpstat.c:765
 #, c-format
@@ -1552,7 +1552,7 @@ msgstr "%s/%s no accepta peticions des de %s -"
 #: berkeley/lpq.c:552
 #, c-format
 msgid "%s: %-33.33s [job %d localhost]"
-msgstr "%s: %-33.33s [tasca %d localhost]"
+msgstr "%s: %-33.33s [feina %d localhost]"
 
 #. TRANSLATORS: Message is "subject: error"
 #: cups/langprintf.c:86 scheduler/cupsfilter.c:714 systemv/lpadmin.c:805
@@ -1584,7 +1584,7 @@ msgstr ""
 #: systemv/lp.c:231
 #, c-format
 msgid "%s: Error - bad job ID."
-msgstr "%s: error - ID de la tasca incorrecte."
+msgstr "%s: error - ID de la feina incorrecte."
 
 #: systemv/lp.c:219
 #, c-format
@@ -1597,7 +1597,7 @@ msgstr ""
 msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
 msgstr ""
 "%s: error - no es pot imprimir des d'stdin si s'indiquen els fitxers o "
-"l'identificador de la tasca."
+"l'identificador de la feina."
 
 #: systemv/lp.c:461
 #, c-format
@@ -1648,15 +1648,13 @@ msgstr "%s: error - s'esperava un nom per pausa després de l'opció «-H»."
 #: berkeley/lpr.c:103
 #, c-format
 msgid "%s: Error - expected hostname after \"-H\" option."
-msgstr ""
-"%s: error - s'esperava el nom de l'ordinador central després de l'opció «-H»."
+msgstr "%s: error - s'esperava el nom de l'amfitrió després de l'opció «-H»."
 
 #: berkeley/lpq.c:180 berkeley/lprm.c:123 systemv/cancel.c:124
 #: systemv/cupsaccept.c:123 systemv/lp.c:189 systemv/lpstat.c:291
 #, c-format
 msgid "%s: Error - expected hostname after \"-h\" option."
-msgstr ""
-"%s: error - s'esperava el nom de l'ordinador central després de l'opció «-h»."
+msgstr "%s: error - s'esperava el nom de l'amfitrió després de l'opció «-h»."
 
 #: systemv/lp.c:371
 #, c-format
@@ -1763,17 +1761,17 @@ msgstr "%s: error - el destí «%s/%s» és desconegut."
 #: systemv/cupsaccept.c:164 systemv/lp.c:496 systemv/lpstat.c:452
 #, c-format
 msgid "%s: Error - unknown option \"%c\"."
-msgstr "%s: error - la opció «%c» és desconeguda."
+msgstr "%s: error - l'opció «%c» és desconeguda."
 
 #: systemv/cupsaccept.c:157
 #, c-format
 msgid "%s: Error - unknown option \"%s\"."
-msgstr "%s: error - la opció «%s» és desconeguda."
+msgstr "%s: error - l'opció «%s» és desconeguda."
 
 #: systemv/lp.c:208
 #, c-format
 msgid "%s: Expected job ID after \"-i\" option."
-msgstr "%s: s'esperava l'ID d'una tasca després de l'opció «-i»."
+msgstr "%s: s'esperava l'ID d'una feina després de l'opció «-i»."
 
 #: systemv/lpstat.c:504 systemv/lpstat.c:543
 #, c-format
@@ -1788,7 +1786,7 @@ msgstr "%s: la cadena del filtre «%s» no és vàlida."
 #: systemv/lp.c:418
 #, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
-msgstr "%s: es necessita l'ID de la tasca («-i jobid») abans de «-H restart»."
+msgstr "%s: es necessita l'ID de la feina («-i jobid») abans de «-H restart»."
 
 #: scheduler/cupsfilter.c:458
 #, c-format
@@ -1865,8 +1863,8 @@ msgid ""
 "%s: Warning - \"%c\" format modifier not supported - output may not be "
 "correct."
 msgstr ""
-"%s: avís - no es permet l'us del modificador de format «%c» - el resultat "
-"pot no ser correcte."
+"%s: avís - no és compatible amb l'ús del modificador de format «%c» - el "
+"resultat pot no ser correcte."
 
 #: systemv/lp.c:468
 #, c-format
@@ -2844,7 +2842,7 @@ msgstr "ARCH E costat llarg"
 
 #: cgi-bin/classes.c:169 cgi-bin/printers.c:172
 msgid "Accept Jobs"
-msgstr "Accepta tasques"
+msgstr "Accepta feines"
 
 #: cups/http-support.c:1284
 msgid "Accepted"
@@ -3084,7 +3082,7 @@ msgstr "El valor %d de printer-state és incorrecte."
 #: scheduler/ipp.c:293
 #, c-format
 msgid "Bad request ID %d."
-msgstr "L'Identificador %d de la sol·licitud és incorrecte."
+msgstr "L'identificador %d de la sol·licitud és incorrecte."
 
 #: scheduler/ipp.c:278
 #, c-format
@@ -3130,7 +3128,7 @@ msgstr "Cancel·la la subscripció RSS"
 
 #: backend/ipp.c:1921
 msgid "Canceling print job."
-msgstr "Es cancel·la la tasca."
+msgstr "Es cancel·la feina."
 
 #: scheduler/ipp.c:2475
 msgid "Cannot share a remote Kerberized printer."
@@ -3314,7 +3312,7 @@ msgstr "Desabilitat"
 #: scheduler/ipp.c:6127
 #, c-format
 msgid "Document #%d does not exist in job #%d."
-msgstr "No s'ha trobat el document #%d a la tasca #%d."
+msgstr "No s'ha trobat el document #%d a la feina #%d."
 
 #: ppdc/sample.c:275
 msgid "Duplexer"
@@ -3983,7 +3981,7 @@ msgstr "JIS B9"
 #: scheduler/ipp.c:9051
 #, c-format
 msgid "Job #%d cannot be restarted - no files."
-msgstr "La tasca #%d no es pot tornar a iniciar - no hi ha fitxers."
+msgstr "La feina #%d no es pot tornar a iniciar - no hi ha fitxers."
 
 #: scheduler/ipp.c:2992 scheduler/ipp.c:3222 scheduler/ipp.c:3277
 #: scheduler/ipp.c:3454 scheduler/ipp.c:3900 scheduler/ipp.c:5720
@@ -3993,78 +3991,78 @@ msgstr "La tasca #%d no es pot tornar a iniciar - no hi ha fitxers."
 #: scheduler/ipp.c:9019 scheduler/ipp.c:9368 scheduler/ipp.c:9971
 #, c-format
 msgid "Job #%d does not exist."
-msgstr "La tasca #%d no existeix."
+msgstr "La feina #%d no existeix."
 
 #: scheduler/ipp.c:3486
 #, c-format
 msgid "Job #%d is already aborted - can't cancel."
-msgstr "La tasca #%d ja s'ha interromput: no es pot cancel·lar."
+msgstr "La feina #%d ja s'ha interromput: no es pot cancel·lar."
 
 #: scheduler/ipp.c:3480
 #, c-format
 msgid "Job #%d is already canceled - can't cancel."
-msgstr "La tasca #%d ja està cancel·lada: no es pot cancel·lar."
+msgstr "La feina #%d ja està cancel·lada: no es pot cancel·lar."
 
 #: scheduler/ipp.c:3492
 #, c-format
 msgid "Job #%d is already completed - can't cancel."
-msgstr "La tasca #%d ja s'ha acabat: no es pot cancel·lar."
+msgstr "La feina #%d ja s'ha acabat: no es pot cancel·lar."
 
 #: scheduler/ipp.c:7702 scheduler/ipp.c:7986 scheduler/ipp.c:9986
 #, c-format
 msgid "Job #%d is finished and cannot be altered."
-msgstr "La tasca #%d s'ha acabat i no es pot canviar."
+msgstr "La feina #%d s'ha acabat i no es pot canviar."
 
 #: scheduler/ipp.c:9033
 #, c-format
 msgid "Job #%d is not complete."
-msgstr "La tasca #%d no s'ha acabat."
+msgstr "La feina #%d no s'ha acabat."
 
 #: scheduler/ipp.c:3007
 #, c-format
 msgid "Job #%d is not held for authentication."
-msgstr "La tasca #%d no està aturada per ser autenticada."
+msgstr "La feina #%d no està aturada per ser autenticada."
 
 #: scheduler/ipp.c:8807
 #, c-format
 msgid "Job #%d is not held."
-msgstr "La tasca #%d no està aturada."
+msgstr "La feina #%d no està aturada."
 
 #: cgi-bin/ipp-var.c:1055
 msgid "Job Completed"
-msgstr "S'ha acabat la tasca"
+msgstr "S'ha acabat la feina"
 
 #: cgi-bin/ipp-var.c:1053
 msgid "Job Created"
-msgstr "S'ha creat la tasca"
+msgstr "S'ha creat la feina"
 
 #: cgi-bin/ipp-var.c:1059
 msgid "Job Options Changed"
-msgstr "S'han canviat les opcions de la tasca"
+msgstr "S'han canviat les opcions de la feina"
 
 #: cgi-bin/ipp-var.c:1057
 msgid "Job Stopped"
-msgstr "S'ha aturat la tasca"
+msgstr "S'ha aturat la feina"
 
 #: scheduler/ipp.c:10068
 msgid "Job is completed and cannot be changed."
-msgstr "La tasca s'ha finalitzat i no es pot canviar."
+msgstr "La feina s'ha finalitzat i no es pot canviar."
 
 #: cgi-bin/jobs.c:198
 msgid "Job operation failed"
-msgstr "Ha fallat l'operació de la tasca"
+msgstr "Ha fallat l'operació de la feina"
 
 #: scheduler/ipp.c:10104 scheduler/ipp.c:10123 scheduler/ipp.c:10134
 msgid "Job state cannot be changed."
-msgstr "L'estat de la tasca no es pot canviar."
+msgstr "L'estat de la feina no es pot canviar."
 
 #: scheduler/ipp.c:8899
 msgid "Job subscriptions cannot be renewed."
-msgstr "Les subscripcions a les tasca no es poden renovar."
+msgstr "Les subscripcions a les feines no es poden renovar."
 
 #: cgi-bin/jobs.c:103 cgi-bin/jobs.c:114 cgi-bin/jobs.c:195
 msgid "Jobs"
-msgstr "Tasques"
+msgstr "Feines"
 
 #: backend/lpd.c:185
 msgid "LPD/LPR Host or Printer"
@@ -4081,7 +4079,7 @@ msgstr "Capçalera de l'etiqueta"
 #: scheduler/ipp.c:2070 scheduler/ipp.c:5643
 #, c-format
 msgid "Language \"%s\" not supported."
-msgstr "No s'admet l'idioma «%s»."
+msgstr "L'idioma «%s» no està disponible."
 
 #: ppdc/sample.c:164
 msgid "Large Address"
@@ -4242,11 +4240,11 @@ msgstr "Modifica la impressora"
 
 #: cgi-bin/ipp-var.c:425 cgi-bin/ipp-var.c:516
 msgid "Move All Jobs"
-msgstr "Mou totes les tasques"
+msgstr "Mou totes les feines"
 
 #: cgi-bin/ipp-var.c:364 cgi-bin/ipp-var.c:423 cgi-bin/ipp-var.c:514
 msgid "Move Job"
-msgstr "Mou la tasca"
+msgstr "Mou la feina"
 
 #: cups/http-support.c:1290
 msgid "Moved Permanently"
@@ -4303,7 +4301,7 @@ msgstr "No hi ha cap connexió activa"
 #: scheduler/ipp.c:3403
 #, c-format
 msgid "No active jobs on %s."
-msgstr "No hi ha cap tasca activa a %s."
+msgstr "No hi ha cap feina activa a %s."
 
 #: scheduler/ipp.c:302
 msgid "No attributes in request."
@@ -4637,7 +4635,7 @@ msgstr "Densitat de la impressió"
 
 #: cups/notify.c:82
 msgid "Print Job:"
-msgstr "Tasca d'impressió:"
+msgstr "Feina d'impressió:"
 
 #: ppdc/sample.c:340
 msgid "Print Mode"
@@ -4670,11 +4668,11 @@ msgstr "Imprimeix i estripa"
 #: backend/ipp.c:1537
 #, c-format
 msgid "Print file accepted - job ID %d."
-msgstr "S'ha acceptat el fitxer d'impressió - ID de la tasca %d."
+msgstr "S'ha acceptat el fitxer d'impressió - ID de la feina %d."
 
 #: backend/ipp.c:1527
 msgid "Print file accepted - job ID unknown."
-msgstr "S'ha acceptat el fitxer d'impressió - l'ID de la tasca és desconegut."
+msgstr "S'ha acceptat el fitxer d'impressió - l'ID de la feina és desconegut."
 
 #: backend/socket.c:424 backend/usb-unix.c:191
 msgid "Print file sent."
@@ -4686,11 +4684,11 @@ msgstr "No s'ha acceptat el fitxer d'impressió."
 
 #: backend/ipp.c:1895
 msgid "Print job canceled at printer."
-msgstr "S'ha cancel·lat la tasca a la impressora."
+msgstr "S'ha cancel·lat la feina a la impressora."
 
 #: backend/ipp.c:1890
 msgid "Print job too large."
-msgstr "La tasca d'impressió és massa llarga."
+msgstr "La feina d'impressió és massa llarga."
 
 #: cgi-bin/ipp-var.c:1047
 msgid "Printer Added"
@@ -4736,7 +4734,7 @@ msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
 
 #: cgi-bin/classes.c:173 cgi-bin/printers.c:176
 msgid "Purge Jobs"
-msgstr "Purga les tasques"
+msgstr "Purga les feines"
 
 #: ppdc/sample.c:155
 msgid "Quarto"
@@ -4749,19 +4747,19 @@ msgstr "S'ha assolit el límit de la quota."
 #: berkeley/lpq.c:515
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr ""
-"Rang    Propietari   Tasca     Fitxer(s)                         Mida total"
+"Rang    Propietari   Feina     Fitxer(s)                         Mida total"
 
 #. TRANSLATORS: Pri is job priority.
 #: berkeley/lpq.c:511
 msgid ""
 "Rank   Owner      Pri  Job        Files                       Total Size"
 msgstr ""
-"Rang   Propietari      Pri  Tasca        Fitxers                       Mida "
+"Rang   Propietari      Pri  Feina        Fitxers                       Mida "
 "total"
 
 #: cgi-bin/classes.c:171 cgi-bin/printers.c:174
 msgid "Reject Jobs"
-msgstr "Rebutja tasques"
+msgstr "Rebutja feines"
 
 #: backend/lpd.c:1016 backend/lpd.c:1148
 #, c-format
@@ -4878,7 +4876,7 @@ msgstr "Paper especial"
 #: backend/lpd.c:1057
 #, c-format
 msgid "Spooling job, %.0f%% complete."
-msgstr "S'està posant a la cua la tasca. S'ha completat el %.0f%%."
+msgstr "S'està posant a la cua la feina. S'ha completat el %.0f%%."
 
 #: ppdc/sample.c:341
 msgid "Standard"
@@ -5065,7 +5063,8 @@ msgstr "La impressora no ha respost."
 #: backend/ipp.c:892 backend/ipp.c:899
 #, c-format
 msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
-msgstr "La impressora no admet el IPP/%d.%d, s'està intentant el IPP/%s."
+msgstr ""
+"La impressora no és compatible amb el IPP/%d.%d, s'està intentant el IPP/%s."
 
 #: backend/ipp.c:757 backend/ipp.c:874 backend/ipp.c:980 backend/ipp.c:1313
 #: backend/ipp.c:1464 backend/lpd.c:828 backend/socket.c:374
@@ -5315,12 +5314,12 @@ msgstr "No es pot afegir la classe"
 
 #: backend/ipp.c:1635
 msgid "Unable to add document to print job."
-msgstr "No es pot obrir el documenta la tasca."
+msgstr "No es pot obrir el documenta la feina."
 
 #: scheduler/ipp.c:1548
 #, c-format
 msgid "Unable to add job for destination \"%s\"."
-msgstr "No es pot afegir la tasca al destí «%s»."
+msgstr "No es pot afegir la feina al destí «%s»."
 
 #: cgi-bin/admin.c:1059 cgi-bin/admin.c:1419
 msgid "Unable to add printer"
@@ -5344,7 +5343,7 @@ msgstr "No es pot cancel·lar la subscripció RSS"
 
 #: backend/ipp.c:1942
 msgid "Unable to cancel print job."
-msgstr "No es pot cancel·lar la tasca d'impressió."
+msgstr "No es pot cancel·lar la feina d'impressió."
 
 #: cgi-bin/admin.c:2990
 msgid "Unable to change printer"
@@ -5364,7 +5363,7 @@ msgstr "No es poden configurar les opcions de la impressora."
 
 #: cups/adminutil.c:911 cups/request.c:1016
 msgid "Unable to connect to host."
-msgstr "No es pot connectar a l'ordinador central."
+msgstr "No es pot connectar a l'amfitrió."
 
 #: backend/ipp.c:713 backend/ipp.c:1138 backend/lpd.c:787 backend/socket.c:333
 #: backend/usb-unix.c:117
@@ -5497,11 +5496,11 @@ msgstr ""
 
 #: cups/http.c:4008 cups/http.c:4304 cups/http.c:4337 cups/http.c:4354
 msgid "Unable to establish a secure connection to host."
-msgstr "No es pot establir una connexió segura amb l'ordinador central."
+msgstr "No es pot establir una connexió segura amb l'amfitrió."
 
 #: cgi-bin/ipp-var.c:365
 msgid "Unable to find destination for job"
-msgstr "No es pot trobar el destí de la tasca"
+msgstr "No es pot trobar el destí de la feina"
 
 #: cups/http-support.c:1748
 msgid "Unable to find printer."
@@ -5513,7 +5512,7 @@ msgstr "No es pot generar el fitxer d'impressió comprimit"
 
 #: backend/ipp.c:3009
 msgid "Unable to get backend exit status."
-msgstr "No es pot obtenir el motiu de la sortida en segon pla"
+msgstr "No es pot obtenir el motiu de la sortida de l'execució en segon pla"
 
 #: cgi-bin/classes.c:450
 msgid "Unable to get class list"
@@ -5581,7 +5580,7 @@ msgstr "No es pot modificar la impressora"
 
 #: cgi-bin/ipp-var.c:432 cgi-bin/ipp-var.c:521
 msgid "Unable to move job"
-msgstr "No es pot moure la tasca"
+msgstr "No es pot moure la feina"
 
 #: cgi-bin/ipp-var.c:434 cgi-bin/ipp-var.c:523
 msgid "Unable to move jobs"
@@ -5606,7 +5605,7 @@ msgstr "No es pot obrir el fitxer de dispositiu"
 #: scheduler/ipp.c:6140
 #, c-format
 msgid "Unable to open document #%d in job #%d."
-msgstr "No es pot obrir el document #%d a la tasca #%d."
+msgstr "No es pot obrir el document #%d a la feina #%d."
 
 #: cgi-bin/help.c:364
 msgid "Unable to open help file."
@@ -5846,7 +5845,7 @@ msgstr ""
 #: monitor/tbcp.c:61
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]"
-msgstr "Sintaxi: %s id-tasca usuari títol còpies opcions [fitxer]"
+msgstr "Sintaxi: %s id-feina usuari títol còpies opcions [fitxer]"
 
 #: systemv/cupsaddsmb.c:281
 msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
@@ -5880,7 +5879,7 @@ msgstr "Sintaxi: ipptool [opcions] URI nomfitxer[ ... nomfitxerN]"
 
 #: systemv/lpmove.c:125
 msgid "Usage: lpmove job/src dest"
-msgstr "Sintaxi: lpmove tasca/font destí"
+msgstr "Sintaxi: lpmove feina/font destí"
 
 #: systemv/lpoptions.c:553
 msgid ""
@@ -5955,7 +5954,7 @@ msgstr "Version té una longitud indefinida"
 
 #: backend/ipp.c:1675
 msgid "Waiting for job to complete."
-msgstr "S'està esperant que acabi la tasca."
+msgstr "S'està esperant que acabi la feina."
 
 #: backend/usb-darwin.c:457 backend/usb-libusb.c:193
 msgid "Waiting for printer to become available."
@@ -6079,7 +6078,7 @@ msgstr "cupsfilter: el document número %d no és vàlid."
 #: scheduler/cupsfilter.c:1203
 #, c-format
 msgid "cupsfilter: Invalid job ID %d."
-msgstr "cupsfilter: la tasca %d no és vàlida."
+msgstr "cupsfilter: la feina %d no és vàlida."
 
 #: scheduler/cupsfilter.c:358
 msgid "cupsfilter: Only one filename can be specified."
@@ -6088,15 +6087,15 @@ msgstr "cupsfilter: només es pot especificar un nom de fitxer."
 #: scheduler/cupsfilter.c:1251
 #, c-format
 msgid "cupsfilter: Unable to get job file - %s"
-msgstr "cupsfilter: no es pot obtenir el fitxer de la tasca - %s"
+msgstr "cupsfilter: no es pot obtenir el fitxer de la feina - %s"
 
 #: systemv/cupstestppd.c:261
 msgid "cupstestppd: The -q option is incompatible with the -v option."
-msgstr "cupstestppd: l'opció -q no és compatible amb la opció -v."
+msgstr "cupstestppd: l'opció -q no és compatible amb l'opció -v."
 
 #: systemv/cupstestppd.c:277
 msgid "cupstestppd: The -v option is incompatible with the -q option."
-msgstr "cupstestppd: la opció -v no és compatible amb la opció -q."
+msgstr "cupstestppd: l'opció -v no és compatible amb l'opció -q."
 
 #: systemv/lpstat.c:1231 systemv/lpstat.c:1234 systemv/lpstat.c:1237
 #, c-format
@@ -6193,68 +6192,67 @@ msgstr "lpadmin: el nom de la classe només pot tenir caràcters imprimibles."
 
 #: systemv/lpadmin.c:614
 msgid "lpadmin: Expected PPD after \"-P\" option."
-msgstr "lpadmin: s'esperava un PPD després de la opció «-P»."
+msgstr "lpadmin: s'esperava un PPD després de l'opció «-P»."
 
 #: systemv/lpadmin.c:457
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
-msgstr "lpadmin: s'esperava allow/deny:llistausuaris després de la opció «-u»."
+msgstr "lpadmin: s'esperava allow/deny:llistausuaris després de l'opció «-u»."
 
 #: systemv/lpadmin.c:364
 msgid "lpadmin: Expected class after \"-r\" option."
-msgstr "lpadmin: s'esperava una classe després de la opció «-r»."
+msgstr "lpadmin: s'esperava una classe després de l'opció «-r»."
 
 #: systemv/lpadmin.c:120
 msgid "lpadmin: Expected class name after \"-c\" option."
-msgstr "lpadmin: s'esperava un nom de classe després de la opció «-c»."
+msgstr "lpadmin: s'esperava un nom de classe després de l'opció «-c»."
 
 #: systemv/lpadmin.c:558
 msgid "lpadmin: Expected description after \"-D\" option."
-msgstr "lpadmin: s'esperava una descripció després de la opció «-D»."
+msgstr "lpadmin: s'esperava una descripció després de l'opció «-D»."
 
 #: systemv/lpadmin.c:491
 msgid "lpadmin: Expected device URI after \"-v\" option."
-msgstr "lpadmin: s'esperava un URI de dispositiu després de la opció «-v»."
+msgstr "lpadmin: s'esperava un URI de dispositiu després de l'opció «-v»."
 
 #: systemv/lpadmin.c:574
 msgid "lpadmin: Expected file type(s) after \"-I\" option."
-msgstr "lpadmin: s'esperava un(s) tipus de fitxer(s) després de la opció «-I»."
+msgstr "lpadmin: s'esperava un(s) tipus de fitxer(s) després de l'opció «-I»."
 
 #: systemv/lpadmin.c:202
 msgid "lpadmin: Expected hostname after \"-h\" option."
-msgstr ""
-"lpadmin: s'esperava un nom d'ordinador central després de la opció «-h»."
+msgstr "lpadmin: s'esperava un nom d'amfitrió després de l'opció «-h»."
 
 #: systemv/lpadmin.c:221
 msgid "lpadmin: Expected interface after \"-i\" option."
-msgstr "lpadmin: s'esperava una interfície després de la opció «-i»."
+msgstr "lpadmin: s'esperava una interfície després de l'opció «-i»."
 
 #: systemv/lpadmin.c:594
 msgid "lpadmin: Expected location after \"-L\" option."
-msgstr "lpadmin: s'esperava una ubicació després de la opció «-L»."
+msgstr "lpadmin: s'esperava una ubicació després de l'opció «-L»."
 
 #: systemv/lpadmin.c:274
 msgid "lpadmin: Expected model after \"-m\" option."
-msgstr "lpadmin: s'esperava un model després de la opció «-m»."
+msgstr "lpadmin: s'esperava un model després de l'opció «-m»."
 
 #: systemv/lpadmin.c:417
 msgid "lpadmin: Expected name after \"-R\" option."
-msgstr "lpadmin: s'esperava un nom després de la opció «-R»."
+msgstr "lpadmin: s'esperava un nom després de l'opció «-R»."
 
 #: systemv/lpadmin.c:294
 msgid "lpadmin: Expected name=value after \"-o\" option."
-msgstr "lpadmin: s'esperava nom=valor després de la opció «-o»."
+msgstr "lpadmin: s'esperava nom=valor després de l'opció «-o»."
 
 #: systemv/lpadmin.c:313
 msgid "lpadmin: Expected printer after \"-p\" option."
-msgstr "lpadmin: s'esperava una impressora després de la opció «-p»."
+msgstr "lpadmin: s'esperava una impressora després de l'opció «-p»."
 
 #: systemv/lpadmin.c:164
 msgid "lpadmin: Expected printer name after \"-d\" option."
-msgstr "lpadmin: s'esperava un nom d'impressora després de la opció «-d»."
+msgstr "lpadmin: s'esperava un nom d'impressora després de l'opció «-d»."
 
 #: systemv/lpadmin.c:525
 msgid "lpadmin: Expected printer or class after \"-x\" option."
-msgstr "lpadmin: s'esperava un impressora o classe després de la opció «-x»."
+msgstr "lpadmin: s'esperava un impressora o classe després de l'opció «-x»."
 
 #: systemv/lpadmin.c:975
 msgid "lpadmin: No member names were seen."
@@ -6299,7 +6297,7 @@ msgid ""
 "lpadmin: Unable to delete option:\n"
 "         You must specify a printer name first."
 msgstr ""
-"lpadmin: no s'ha pogut esborrar la opció:\n"
+"lpadmin: no s'ha pogut esborrar l'opció:\n"
 "         Heu d'especificar primer un nom d'impressora."
 
 #: systemv/lpadmin.c:1339
@@ -6367,13 +6365,13 @@ msgstr "lpinfo: s'esperava una cadena de producte després de «--product!»."
 #: systemv/lpinfo.c:155
 msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
 msgstr ""
-"lpinfo: s'esperava una llista d'esquemes després de la opció «--exclude-"
+"lpinfo: s'esperava una llista d'esquemes després de l'opció «--exclude-"
 "schemes»."
 
 #: systemv/lpinfo.c:173
 msgid "lpinfo: Expected scheme list after \"--include-schemes\"."
 msgstr ""
-"lpinfo: s'esperava una llista d'esquemes després de la opció «--include-"
+"lpinfo: s'esperava una llista d'esquemes després de l'opció «--include-"
 "schemes»."
 
 #: systemv/lpinfo.c:241
@@ -6760,7 +6758,7 @@ msgstr ""
 #: ppdc/ppdc-catalog.cxx:341 ppdc/ppdc-catalog.cxx:353
 #, c-format
 msgid "ppdc: Expected quoted string on line %d of %s."
-msgstr "ppdc: s'esperava una cadena entre cometes a la línia %d de %s."
+msgstr "ppdc: s'esperava una cadena entre cometes dobles a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1004
 #, c-format
@@ -6895,18 +6893,18 @@ msgstr "ppdc: no s'ha donat el catàleg de missatges per l'idioma %s."
 #, c-format
 msgid "ppdc: Option %s defined in two different groups on line %d of %s."
 msgstr ""
-"ppdc: la opció %s està definida a dos grups diferents a la línia %d de %s."
+"ppdc: l'opció %s està definida a dos grups diferents a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:1644
 #, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s."
 msgstr ""
-"ppdc: la opció %s està redefinida amb un tipus diferent a la línia %d de %s."
+"ppdc: l'opció %s està redefinida amb un tipus diferent a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:705
 #, c-format
 msgid "ppdc: Option constraint must *name on line %d of %s."
-msgstr "ppdc: la opció de restricció ha d'incloure *nom a la línia %d de %s."
+msgstr "ppdc: l'opció de restricció ha d'incloure *nom a la línia %d de %s."
 
 #: ppdc/ppdc-source.cxx:2495
 #, c-format
@@ -7011,7 +7009,7 @@ msgstr ""
 #: ppdc/ppdc.cxx:365
 #, c-format
 msgid "ppdc: Warning - overlapping filename \"%s\"."
-msgstr "ppdc: avís - es superposa el nom del fitxer «%s»."
+msgstr "ppdc: avís - se superposa el nom del fitxer «%s»."
 
 #: ppdc/ppdc.cxx:380
 #, c-format
@@ -7031,7 +7029,7 @@ msgstr "ppdmerge: LanguageVersion «%s» incorrecte a %s."
 #: ppdc/ppdmerge.cxx:176
 #, c-format
 msgid "ppdmerge: Ignoring PPD file %s."
-msgstr "ppdmerge: el fitxer PPD %s s'ignora."
+msgstr "ppdmerge: s'ignora el fitxer PPD %s."
 
 #: ppdc/ppdmerge.cxx:160
 #, c-format

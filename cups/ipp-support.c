@@ -645,8 +645,8 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 
   if (!strcmp(attrname, "document-state") &&
       enumvalue >= 3 &&
-      enumvalue <= (3 + (int)(sizeof(ipp_document_states) /
-                              sizeof(ipp_document_states[0]))))
+      enumvalue < (3 + (int)(sizeof(ipp_document_states) /
+			     sizeof(ipp_document_states[0]))))
     return (ipp_document_states[enumvalue - 3]);
   else if ((!strcmp(attrname, "finishings") ||
             !strcmp(attrname, "finishings-actual") ||
@@ -654,13 +654,13 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
             !strcmp(attrname, "finishings-ready") ||
             !strcmp(attrname, "finishings-supported")) &&
            enumvalue >= 3 &&
-           enumvalue <= (3 + (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]))))
+           enumvalue < (3 + (int)(sizeof(ipp_finishings) / sizeof(ipp_finishings[0]))))
     return (ipp_finishings[enumvalue - 3]);
   else if ((!strcmp(attrname, "job-collation-type") ||
             !strcmp(attrname, "job-collation-type-actual")) &&
            enumvalue >= 3 &&
-           enumvalue <= (3 + (int)(sizeof(ipp_job_collation_types) /
-                                   sizeof(ipp_job_collation_types[0]))))
+           enumvalue < (3 + (int)(sizeof(ipp_job_collation_types) /
+				  sizeof(ipp_job_collation_types[0]))))
     return (ipp_job_collation_types[enumvalue - 3]);
   else if (!strcmp(attrname, "job-state") &&
 	   enumvalue >= IPP_JOB_PENDING && enumvalue <= IPP_JOB_COMPLETED)
@@ -672,16 +672,16 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
             !strcmp(attrname, "orientation-requested-default") ||
             !strcmp(attrname, "orientation-requested-supported")) &&
            enumvalue >= 3 &&
-           enumvalue <= (3 + (int)(sizeof(ipp_orientation_requesteds) /
-                                   sizeof(ipp_orientation_requesteds[0]))))
+           enumvalue < (3 + (int)(sizeof(ipp_orientation_requesteds) /
+				  sizeof(ipp_orientation_requesteds[0]))))
     return (ipp_orientation_requesteds[enumvalue - 3]);
   else if ((!strcmp(attrname, "print-quality") ||
             !strcmp(attrname, "print-quality-actual") ||
             !strcmp(attrname, "print-quality-default") ||
             !strcmp(attrname, "print-quality-supported")) &&
            enumvalue >= 3 &&
-           enumvalue <= (3 + (int)(sizeof(ipp_print_qualities) /
-                                   sizeof(ipp_print_qualities[0]))))
+           enumvalue < (3 + (int)(sizeof(ipp_print_qualities) /
+				  sizeof(ipp_print_qualities[0]))))
     return (ipp_print_qualities[enumvalue - 3]);
   else if (!strcmp(attrname, "printer-state") &&
            enumvalue >= IPP_PRINTER_IDLE && enumvalue <= IPP_PRINTER_STOPPED)

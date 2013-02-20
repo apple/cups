@@ -96,7 +96,9 @@ typedef struct
  */
 
 VAR char		*ConfigurationFile	VALUE(NULL),
-					/* Configuration file to use */
+					/* cupsd.conf file to use */
+			*CupsFilesFile		VALUE(NULL),
+					/* cups-files.conf file to use */
 			*ServerName		VALUE(NULL),
 					/* FQDN for server */
 			*ServerAdmin		VALUE(NULL),

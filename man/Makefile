@@ -39,6 +39,7 @@ MAN1	=	cancel.$(MAN1EXT) \
 		ppdpo.$(MAN1EXT)
 MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
+		cups-files.conf.$(MAN5EXT) \
 		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
 		ipptoolfile.$(MAN5EXT) \

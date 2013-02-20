@@ -3824,8 +3824,8 @@ msgstr "Carpeta de archivo"
 
 #: scheduler/ipp.c:2370
 #, c-format
-msgid "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
-msgstr "Los URIs del dispositivo de archivo han sido deshabilitados. Para habilitarlos, vea la directiva FileDevice en \"%s/cupsd.conf\"."
+msgid "File device URIs have been disabled. To enable, see the FileDevice directive in \"%s/cups-files.conf\"."
+msgstr "Los URIs del dispositivo de archivo han sido deshabilitados. Para habilitarlos, vea la directiva FileDevice en \"%s/cups-files.conf\"."
 
 #: filter/rastertoepson.c:1117
 #: filter/rastertohp.c:845
