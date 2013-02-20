@@ -1437,6 +1437,11 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "job-resolvers-supported",
     "job-settable-attributes-supported",
     "job-spooling-supported",
+    "jpeg-k-octets-supported",		/* CUPS extension */
+    "jpeg-x-dimension-supported",	/* CUPS extension */
+    "jpeg-y-dimension-supported",	/* CUPS extension */
+    "landscape-orientation-requested-preferred",
+					/* CUPS extension */
     "marker-change-time",		/* CUPS extension */
     "marker-colors",			/* CUPS extension */
     "marker-high-levels",		/* CUPS extension */
@@ -1457,6 +1462,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "operations-supported",
     "pages-per-minute",
     "pages-per-minute-color",
+    "pdf-k-octets-supported",		/* CUPS extension */
+    "pdf-versions-supported",		/* CUPS extension */
     "pdl-override-supported",
     "port-monitor",			/* CUPS extension */
     "port-monitor-supported",		/* CUPS extension */

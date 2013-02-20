@@ -3,7 +3,7 @@
 #
 #   IPP/1.1 test suite.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -156,7 +156,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -324,7 +324,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT pdl-override-supported OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{1,127}$$/"
+	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT printer-state OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT printer-up-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
@@ -833,7 +833,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -945,7 +945,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1262,7 +1262,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	STATUS successful-ok
 	STATUS client-error-document-format-not-supported
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1300,7 +1300,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1338,7 +1338,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1374,7 +1374,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1412,7 +1412,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1450,7 +1450,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1488,7 +1488,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1524,7 +1524,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1562,7 +1562,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1600,7 +1600,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1636,7 +1636,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1672,7 +1672,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1708,7 +1708,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1744,7 +1744,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1780,7 +1780,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1820,7 +1820,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1858,7 +1858,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1896,7 +1896,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1934,7 +1934,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -1974,7 +1974,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2012,7 +2012,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2050,7 +2050,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2088,7 +2088,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2128,7 +2128,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2166,7 +2166,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2204,7 +2204,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2242,7 +2242,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2280,7 +2280,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
@@ -2315,7 +2315,7 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 	STATUS successful-ok
 	STATUS server-error-job-canceled
-	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 10
+	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 
 	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag

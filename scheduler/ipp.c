@@ -8058,7 +8058,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Grab format from client...
     */
 
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]", super,
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]", super,
                type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
@@ -8075,7 +8075,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Use default document format...
     */
 
-    if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(default_format, "%15[^/]/%255[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Bad document-format \"%s\"."),
@@ -9290,7 +9290,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Grab format from client...
     */
 
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]",
                super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
@@ -9306,7 +9306,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Use default document format...
     */
 
-    if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
+    if (sscanf(default_format, "%15[^/]/%255[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Bad document-format-default \"%s\"."), default_format);
@@ -10806,7 +10806,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((format = ippFindAttribute(con->request, "document-format",
                                  IPP_TAG_MIMETYPE)) != NULL)
   {
-    if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
+    if (sscanf(format->values[0].string.text, "%15[^/]/%255[^;]",
                super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,

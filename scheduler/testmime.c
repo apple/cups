@@ -3,7 +3,7 @@
  *
  *   MIME test program for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -132,7 +132,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
-      sscanf(argv[i], "%15[^/]/%31s", super, type);
+      sscanf(argv[i], "%15[^/]/%255s", super, type);
       dst = mimeType(mime, super, type);
 
       filters = mimeFilter2(mime, src, srcinfo.st_size, dst, &cost);

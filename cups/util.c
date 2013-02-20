@@ -1713,12 +1713,14 @@ cups_get_printer_uri(
       device_uri = attr->values[0].string.text;
 
     if (device_uri &&
-        ((strstr(device_uri, "._ipp.") != NULL ||
-          strstr(device_uri, "._ipps.") != NULL) &&
-         !strcmp(device_uri + strlen(device_uri) - 5, "/cups")))
+        (!strncmp(device_uri, "ipp://", 6) ||
+         !strncmp(device_uri, "ipps://", 7) ||
+         ((strstr(device_uri, "._ipp.") != NULL ||
+           strstr(device_uri, "._ipps.") != NULL) &&
+          !strcmp(device_uri + strlen(device_uri) - 5, "/cups"))))
     {
      /*
-      * Statically-configured Bonjour shared printer.
+      * Statically-configured shared printer.
       */
 
       httpSeparateURI(HTTP_URI_CODING_ALL,

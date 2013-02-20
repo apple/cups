@@ -1,8 +1,19 @@
-CHANGES-IPPTOOL.txt - 2013-01-31
+CHANGES-IPPTOOL.txt - 2013-02-20
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+
+2013-02-nn
+
+	- The IPP/1.1 test file did not allow for sufficient retries when
+	  printing.
+	- The IPP/1.1 test file did not allow for empty printer-name values.
+	- The IPP Everywhere test file contained numerous errors.
+	- The color.jpg test file used a progressive mode instead of the
+	  baseline JPEG mode.
+	- The IPP/1.1 test file referenced "color.jpeg" instead of "color.jpg".
 
 
 2013-01-31

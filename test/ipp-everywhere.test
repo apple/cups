@@ -69,10 +69,10 @@ INCLUDE "ipp-2.0.test"
 
 	EXPECT ipp-features-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "ipp-everywhere"
 
-	EXPECT job-account-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE 1 COUNT 1 DEFINE-MATCH JOB_ACCOUNT_ID_SUPPORTED
+	EXPECT job-account-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true COUNT 1 DEFINE-MATCH JOB_ACCOUNT_ID_SUPPORTED
 	EXPECT job-account-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED JOB_ACCOUNT_ID_SUPPORTED
 
-	EXPECT job-accounting-user-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE 1 COUNT 1 DEFINE-MATCH JOB_ACCOUNTING_USER_ID_SUPPORTED
+	EXPECT job-accounting-user-id-supported OF-TYPE boolean IN-GROUP printer-attributes-tag WITH-VALUE true COUNT 1 DEFINE-MATCH JOB_ACCOUNTING_USER_ID_SUPPORTED
 	EXPECT job-accounting-user-id-default OF-TYPE name|no-value IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED JOB_ACCOUNTING_USER_ID_SUPPORTED
 
 	EXPECT job-constraints-supported OF-TYPE collection IN-GROUP printer-attributes-tag DEFINE-MATCH JOB_CONSTRAINTS_SUPPORTED
@@ -80,9 +80,9 @@ INCLUDE "ipp-2.0.test"
 
 	EXPECT job-creation-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+	EXPECT job-ids-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true
 
-	EXPECT job-preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1
+	EXPECT preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT media-bottom-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
 	EXPECT media-left-margin-supported OF-TYPE integer IN-GROUP printer-attributes-tag WITH-ALL-VALUES >-1
@@ -103,14 +103,14 @@ INCLUDE "ipp-2.0.test"
 
 	EXPECT multiple-document-jobs-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 
-	EXPECT multiple-operation-timeout OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT multiple-operation-time-out OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 
-	EXPECT multiple-operation-timeout-action OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(abort-job|hold-job|process-job)$/"
+	EXPECT multiple-operation-time-out-action OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(abort-job|hold-job|process-job)$/"
 
 	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "document-number"
 	EXPECT overrides-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE "pages"
 
-	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 1 IF-DEFINED PDF_OR_OPENXPS
+	EXPECT page-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE true IF-DEFINED PDF_OR_OPENXPS
 
 	EXPECT print-color-mode-default OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
 	EXPECT print-color-mode-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-ALL-VALUES "/^(auto|auto-monochrome|bi-level|color|highlight|monochrome|process-bi-level|process-monochrome)$/"
@@ -144,8 +144,8 @@ INCLUDE "ipp-2.0.test"
 
 	EXPECT ?printer-mandatory-job-attributes OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT printer-organization OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT printer-organizational-unit OF-TYPE keyword IN-GROUP printer-attributes-tag
+	EXPECT printer-organization OF-TYPE text IN-GROUP printer-attributes-tag
+	EXPECT printer-organizational-unit OF-TYPE text IN-GROUP printer-attributes-tag
 
 	EXPECT printer-state-change-date-time OF-TYPE dateTime IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >-1
@@ -153,9 +153,9 @@ INCLUDE "ipp-2.0.test"
 	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply-description
 	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply
 
-	EXPECT printer-supply-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT printer-supply-info-uri OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1
 
-	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^urn:uuid:[0-9A-F]{8,8}-[0-9A-F]{4,4}-[0-9A-F]{4,4}-[0-9A-F]{4,4}-[0-9A-F]{12,12}/"
+	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^urn:uuid:[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{12,12}/"
 
 	EXPECT pwg-raster-document-resolution-supported OF-TYPE resolution IN-GROUP printer-attributes-tag
 	EXPECT pwg-raster-document-resolution-supported WITH-VALUE 150dpi DEFINE-MATCH HAVE_150DPI
@@ -168,11 +168,11 @@ INCLUDE "ipp-2.0.test"
 	EXPECT pwg-raster-document-sheet-back OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT pwg-raster-document-type-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
-	EXPECT pwg-raster-document-type-supported WITH-VALUE "black-1" DEFINE-MATCH HAVE_BLACK_1
-	EXPECT pwg-raster-document-type-supported WITH-VALUE "cmyk-8" DEFINE-MATCH HAVE_CMYK_8
-	EXPECT pwg-raster-document-type-supported WITH-VALUE "sgray-8" DEFINE-MATCH HAVE_SGRAY_8
-	EXPECT pwg-raster-document-type-supported WITH-VALUE "srgb-8" DEFINE-MATCH HAVE_SRGB_8
-	EXPECT pwg-raster-document-type-supported WITH-VALUE "srgb-16" DEFINE-MATCH HAVE_SRGB_16
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "black_1" DEFINE-MATCH HAVE_BLACK_1
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "cmyk_8" DEFINE-MATCH HAVE_CMYK_8
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "sgray_8" DEFINE-MATCH HAVE_SGRAY_8
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "srgb_8" DEFINE-MATCH HAVE_SRGB_8
+	EXPECT pwg-raster-document-type-supported WITH-VALUE "srgb_16" DEFINE-MATCH HAVE_SRGB_16
 
 	EXPECT which-jobs-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 }
