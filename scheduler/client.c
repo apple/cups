@@ -2146,7 +2146,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	  if (con->http.state != HTTP_STATE_POST_SEND)
 	  {
-            if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
+	    if (!httpWait(HTTP(con), 0))
+	      return;
+            else if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	    {
 	      if (con->http.error && con->http.error != EPIPE)
 		cupsdLogMessage(CUPSD_LOG_DEBUG,
