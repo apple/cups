@@ -1382,7 +1382,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 	return (NULL);
       }
 
-      cupsdLogMessage(CUPSD_LOG_WARN,
+      cupsdLogMessage(CUPSD_LOG_INFO,
                       "Unexpected '%s' Job Description attribute in a job "
                       "creation request.", readonly[i]);
     }
