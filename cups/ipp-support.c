@@ -590,7 +590,7 @@ ippAttributeString(
         bufptr ++;
     }
 
-    switch (attr->value_tag & ~IPP_TAG_COPY)
+    switch (attr->value_tag & ~IPP_TAG_CUPS_CONST)
     {
       case IPP_TAG_ENUM :
           ptr = ippEnumString(attr->name, val->integer);
@@ -1577,7 +1577,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     * default to "all"...
     */
 
-    if (ippGetOperation(request) == IPP_GET_JOBS)
+    if (ippGetOperation(request) == IPP_OP_GET_JOBS)
     {
       ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
       cupsArrayAdd(ra, "job-id");
@@ -1732,8 +1732,8 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 				  sizeof(ipp_job_collation_types[0]))))
     return (ipp_job_collation_types[enumvalue - 3]);
   else if (!strcmp(attrname, "job-state") &&
-	   enumvalue >= IPP_JOB_PENDING && enumvalue <= IPP_JOB_COMPLETED)
-    return (ipp_job_states[enumvalue - IPP_JOB_PENDING]);
+	   enumvalue >= IPP_JSTATE_PENDING && enumvalue <= IPP_JSTATE_COMPLETED)
+    return (ipp_job_states[enumvalue - IPP_JSTATE_PENDING]);
   else if (!strcmp(attrname, "operations-supported"))
     return (ippOpString((ipp_op_t)enumvalue));
   else if ((!strcmp(attrname, "orientation-requested") ||
@@ -1753,8 +1753,8 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 				  sizeof(ipp_print_qualities[0]))))
     return (ipp_print_qualities[enumvalue - 3]);
   else if (!strcmp(attrname, "printer-state") &&
-           enumvalue >= IPP_PRINTER_IDLE && enumvalue <= IPP_PRINTER_STOPPED)
-    return (ipp_printer_states[enumvalue - IPP_PRINTER_IDLE]);
+           enumvalue >= IPP_PSTATE_IDLE && enumvalue <= IPP_PSTATE_STOPPED)
+    return (ipp_printer_states[enumvalue - IPP_PSTATE_IDLE]);
 
  /*
   * Not a standard enum value, just return the decimal equivalent...
@@ -1964,7 +1964,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   else if (op == IPP_OP_PRIVATE)
     return ("windows-ext");
   else if (op >= IPP_OP_CUPS_GET_DEFAULT && op <= IPP_OP_CUPS_GET_PPD)
-    return (ipp_cups_ops[op - CUPS_GET_DEFAULT]);
+    return (ipp_cups_ops[op - IPP_OP_CUPS_GET_DEFAULT]);
   else if (op == IPP_OP_CUPS_GET_DOCUMENT)
     return (ipp_cups_ops2[0]);
 
@@ -2063,7 +2063,7 @@ ippSetPort(int p)			/* I - Port number to use */
 const char *				/* O - Tag name */
 ippTagString(ipp_tag_t tag)		/* I - Tag value */
 {
-  tag &= IPP_TAG_MASK;
+  tag &= IPP_TAG_CUPS_MASK;
 
   if (tag < (ipp_tag_t)(sizeof(ipp_tag_names) / sizeof(ipp_tag_names[0])))
     return (ipp_tag_names[tag]);

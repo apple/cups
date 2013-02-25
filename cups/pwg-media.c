@@ -462,20 +462,20 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
       }
       else if (!x_dimension)
       {
-	_cupsSetError(IPP_INTERNAL_ERROR,
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		      _("Missing x-dimension in media-size."), 1);
         return (0);
       }
       else if (!y_dimension)
       {
-	_cupsSetError(IPP_INTERNAL_ERROR,
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		      _("Missing y-dimension in media-size."), 1);
         return (0);
       }
     }
     else
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Missing media-size in media-col."),
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Missing media-size in media-col."),
                     1);
       return (0);
     }
@@ -550,13 +550,13 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
       }
       else
       {
-        _cupsSetError(IPP_INTERNAL_ERROR, _("Unsupported media value."), 1);
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unsupported media value."), 1);
 	return (0);
       }
     }
     else
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Missing media or media-col."), 1);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Missing media or media-col."), 1);
       return (0);
     }
   }

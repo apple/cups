@@ -3,7 +3,7 @@
  *
  *   HTTP test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -51,93 +51,93 @@ typedef struct uri_test_s		/**** URI test cases ****/
 static uri_test_t	uri_tests[] =	/* URI test data */
 			{
 			  /* Start with valid URIs */
-			  { HTTP_URI_OK, "file:/filename",
+			  { HTTP_URI_STATUS_OK, "file:/filename",
 			    "file", "", "", "/filename", 0, 0 },
-			  { HTTP_URI_OK, "file:/filename%20with%20spaces",
+			  { HTTP_URI_STATUS_OK, "file:/filename%20with%20spaces",
 			    "file", "", "", "/filename with spaces", 0, 0 },
-			  { HTTP_URI_OK, "file:///filename",
+			  { HTTP_URI_STATUS_OK, "file:///filename",
 			    "file", "", "", "/filename", 0, 0 },
-			  { HTTP_URI_OK, "file:///filename%20with%20spaces",
+			  { HTTP_URI_STATUS_OK, "file:///filename%20with%20spaces",
 			    "file", "", "", "/filename with spaces", 0, 0 },
-			  { HTTP_URI_OK, "file://localhost/filename",
+			  { HTTP_URI_STATUS_OK, "file://localhost/filename",
 			    "file", "", "localhost", "/filename", 0, 0 },
-			  { HTTP_URI_OK, "file://localhost/filename%20with%20spaces",
+			  { HTTP_URI_STATUS_OK, "file://localhost/filename%20with%20spaces",
 			    "file", "", "localhost", "/filename with spaces", 0, 0 },
-			  { HTTP_URI_OK, "http://server/",
+			  { HTTP_URI_STATUS_OK, "http://server/",
 			    "http", "", "server", "/", 80, 0 },
-			  { HTTP_URI_OK, "http://username@server/",
+			  { HTTP_URI_STATUS_OK, "http://username@server/",
 			    "http", "username", "server", "/", 80, 0 },
-			  { HTTP_URI_OK, "http://username:passwor%64@server/",
+			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server/",
 			    "http", "username:password", "server", "/", 80, 0 },
-			  { HTTP_URI_OK, "http://username:passwor%64@server:8080/",
+			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server:8080/",
 			    "http", "username:password", "server", "/", 8080, 8080 },
-			  { HTTP_URI_OK, "http://username:passwor%64@server:8080/directory/filename",
+			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server:8080/directory/filename",
 			    "http", "username:password", "server", "/directory/filename", 8080, 8080 },
-			  { HTTP_URI_OK, "http://[2000::10:100]:631/ipp",
+			  { HTTP_URI_STATUS_OK, "http://[2000::10:100]:631/ipp",
 			    "http", "", "2000::10:100", "/ipp", 631, 631 },
-			  { HTTP_URI_OK, "https://username:passwor%64@server/directory/filename",
+			  { HTTP_URI_STATUS_OK, "https://username:passwor%64@server/directory/filename",
 			    "https", "username:password", "server", "/directory/filename", 443, 0 },
-			  { HTTP_URI_OK, "ipp://username:passwor%64@[::1]/ipp",
+			  { HTTP_URI_STATUS_OK, "ipp://username:passwor%64@[::1]/ipp",
 			    "ipp", "username:password", "::1", "/ipp", 631, 0 },
-			  { HTTP_URI_OK, "lpd://server/queue?reserve=yes",
+			  { HTTP_URI_STATUS_OK, "lpd://server/queue?reserve=yes",
 			    "lpd", "", "server", "/queue?reserve=yes", 515, 0 },
-			  { HTTP_URI_OK, "mailto:user@domain.com",
+			  { HTTP_URI_STATUS_OK, "mailto:user@domain.com",
 			    "mailto", "", "", "user@domain.com", 0, 0 },
-			  { HTTP_URI_OK, "socket://server/",
+			  { HTTP_URI_STATUS_OK, "socket://server/",
 			    "socket", "", "server", "/", 9100, 0 },
-			  { HTTP_URI_OK, "socket://192.168.1.1:9101/",
+			  { HTTP_URI_STATUS_OK, "socket://192.168.1.1:9101/",
 			    "socket", "", "192.168.1.1", "/", 9101, 9101 },
-			  { HTTP_URI_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
+			  { HTTP_URI_STATUS_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
-			  { HTTP_URI_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
+			  { HTTP_URI_STATUS_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
 			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0 },
-			  { HTTP_URI_OK, "lpd://Acme%20Laser%20(01%3A23%3A45).local._tcp._printer/",
+			  { HTTP_URI_STATUS_OK, "lpd://Acme%20Laser%20(01%3A23%3A45).local._tcp._printer/",
 			    "lpd", "", "Acme Laser (01:23:45).local._tcp._printer", "/", 515, 0 },
-			  { HTTP_URI_OK, "ipp://HP%20Officejet%204500%20G510n-z%20%40%20Will's%20MacBook%20Pro%2015%22._ipp._tcp.local./",
+			  { HTTP_URI_STATUS_OK, "ipp://HP%20Officejet%204500%20G510n-z%20%40%20Will's%20MacBook%20Pro%2015%22._ipp._tcp.local./",
 			    "ipp", "", "HP Officejet 4500 G510n-z @ Will's MacBook Pro 15\"._ipp._tcp.local.", "/", 631, 0 },
 
 			  /* Missing scheme */
-			  { HTTP_URI_MISSING_SCHEME, "/path/to/file/index.html",
+			  { HTTP_URI_STATUS_MISSING_SCHEME, "/path/to/file/index.html",
 			    "file", "", "", "/path/to/file/index.html", 0, 0 },
-			  { HTTP_URI_MISSING_SCHEME, "//server/ipp",
+			  { HTTP_URI_STATUS_MISSING_SCHEME, "//server/ipp",
 			    "ipp", "", "server", "/ipp", 631, 0 },
 
 			  /* Unknown scheme */
-			  { HTTP_URI_UNKNOWN_SCHEME, "vendor://server/resource",
+			  { HTTP_URI_STATUS_UNKNOWN_SCHEME, "vendor://server/resource",
 			    "vendor", "", "server", "/resource", 0, 0 },
 
 			  /* Missing resource */
-			  { HTTP_URI_MISSING_RESOURCE, "socket://[::192.168.2.1]",
+			  { HTTP_URI_STATUS_MISSING_RESOURCE, "socket://[::192.168.2.1]",
 			    "socket", "", "::192.168.2.1", "/", 9100, 0 },
-			  { HTTP_URI_MISSING_RESOURCE, "socket://192.168.1.1:9101",
+			  { HTTP_URI_STATUS_MISSING_RESOURCE, "socket://192.168.1.1:9101",
 			    "socket", "", "192.168.1.1", "/", 9101 },
 
 			  /* Bad URI */
-			  { HTTP_URI_BAD_URI, "",
+			  { HTTP_URI_STATUS_BAD_URI, "",
 			    "", "", "", "", 0, 0 },
 
 			  /* Bad scheme */
-			  { HTTP_URI_BAD_SCHEME, "bad_scheme://server/resource",
+			  { HTTP_URI_STATUS_BAD_SCHEME, "bad_scheme://server/resource",
 			    "", "", "", "", 0, 0 },
 
 			  /* Bad username */
-			  { HTTP_URI_BAD_USERNAME, "http://username:passwor%6@server/resource",
+			  { HTTP_URI_STATUS_BAD_USERNAME, "http://username:passwor%6@server/resource",
 			    "http", "", "", "", 80, 0 },
 
 			  /* Bad hostname */
-			  { HTTP_URI_BAD_HOSTNAME, "http://[/::1]/index.html",
+			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://[/::1]/index.html",
 			    "http", "", "", "", 80, 0 },
-			  { HTTP_URI_BAD_HOSTNAME, "http://[",
+			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://[",
 			    "http", "", "", "", 80, 0 },
-			  { HTTP_URI_BAD_HOSTNAME, "http://serve%7/index.html",
+			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://serve%7/index.html",
 			    "http", "", "", "", 80, 0 },
 
 			  /* Bad port number */
-			  { HTTP_URI_BAD_PORT, "http://127.0.0.1:9999a/index.html",
+			  { HTTP_URI_STATUS_BAD_PORT, "http://127.0.0.1:9999a/index.html",
 			    "http", "", "127.0.0.1", "", 0, 0 },
 
 			  /* Bad resource */
-			  { HTTP_URI_BAD_RESOURCE, "http://server/index.html%",
+			  { HTTP_URI_STATUS_BAD_RESOURCE, "http://server/index.html%",
 			    "http", "", "server", "", 80, 0 }
 			};
 static const char * const base64_tests[][2] =
@@ -189,18 +189,18 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*encoding;		/* Negotiated Content-Encoding */
   static const char * const uri_status_strings[] =
 		{
-		  "HTTP_URI_OVERFLOW",
-		  "HTTP_URI_BAD_ARGUMENTS",
-		  "HTTP_URI_BAD_RESOURCE",
-		  "HTTP_URI_BAD_PORT",
-		  "HTTP_URI_BAD_HOSTNAME",
-		  "HTTP_URI_BAD_USERNAME",
-		  "HTTP_URI_BAD_SCHEME",
-		  "HTTP_URI_BAD_URI",
-		  "HTTP_URI_OK",
-		  "HTTP_URI_MISSING_SCHEME",
-		  "HTTP_URI_UNKNOWN_SCHEME",
-		  "HTTP_URI_MISSING_RESOURCE"
+		  "HTTP_URI_STATUS_OVERFLOW",
+		  "HTTP_URI_STATUS_BAD_ARGUMENTS",
+		  "HTTP_URI_STATUS_BAD_RESOURCE",
+		  "HTTP_URI_STATUS_BAD_PORT",
+		  "HTTP_URI_STATUS_BAD_HOSTNAME",
+		  "HTTP_URI_STATUS_BAD_USERNAME",
+		  "HTTP_URI_STATUS_BAD_SCHEME",
+		  "HTTP_URI_STATUS_BAD_URI",
+		  "HTTP_URI_STATUS_OK",
+		  "HTTP_URI_STATUS_MISSING_SCHEME",
+		  "HTTP_URI_STATUS_UNKNOWN_SCHEME",
+		  "HTTP_URI_STATUS_MISSING_RESOURCE"
 		};
 
 
@@ -403,7 +403,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     for (i = 0, j = 0, k = 0;
          i < (int)(sizeof(uri_tests) / sizeof(uri_tests[0]));
 	 i ++)
-      if (uri_tests[i].result == HTTP_URI_OK &&
+      if (uri_tests[i].result == HTTP_URI_STATUS_OK &&
           !strstr(uri_tests[i].uri, "%64") &&
           strstr(uri_tests[i].uri, "//"))
       {
@@ -416,7 +416,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 				     uri_tests[i].assemble_port,
 				     uri_tests[i].resource);
 
-        if (uri_status != HTTP_URI_OK)
+        if (uri_status != HTTP_URI_STATUS_OK)
 	{
           failures ++;
 
@@ -545,11 +545,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (!_cups_strcasecmp(scheme, "https") || !_cups_strcasecmp(scheme, "ipps") ||
         port == 443)
-      encryption = HTTP_ENCRYPT_ALWAYS;
+      encryption = HTTP_ENCRYPTION_ALWAYS;
     else
-      encryption = HTTP_ENCRYPT_IF_REQUESTED;
+      encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    http = httpConnectEncrypt(hostname, port, encryption);
+    http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000,
+                        NULL);
     if (http == NULL)
     {
       perror(hostname);
@@ -559,9 +560,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     httpClearFields(http);
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     httpHead(http, resource);
-    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+    while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
 
-    if (status == HTTP_OK)
+    if (status == HTTP_STATUS_OK)
       puts("HEAD OK:");
     else
       printf("HEAD failed with status %d...\n", status);
@@ -574,9 +575,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
     httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, encoding);
     httpGet(http, resource);
-    while ((status = httpUpdate(http)) == HTTP_CONTINUE);
+    while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
 
-    if (status == HTTP_OK)
+    if (status == HTTP_STATUS_OK)
       puts("GET OK:");
     else
       printf("GET failed with status %d...\n", status);

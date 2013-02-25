@@ -3,7 +3,7 @@
  *
  *   HTTP address list routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -95,7 +95,7 @@ httpAddrConnect2(
   if (!sock)
   {
     errno = EINVAL;
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (NULL);
   }
 
@@ -309,9 +309,9 @@ httpAddrConnect2(
 
   if (!addrlist)
 #ifdef WIN32
-    _cupsSetError(IPP_SERVICE_UNAVAILABLE, "Connection failed", 0);
+    _cupsSetError(IPP_STATUS_ERROR_SERVICE_UNAVAILABLE, "Connection failed", 0);
 #else
-    _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_SERVICE_UNAVAILABLE, strerror(errno), 0);
 #endif /* WIN32 */
 
   return (addrlist);
@@ -549,7 +549,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  if (!temp)
 	  {
 	    httpAddrFreeList(first);
-	    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	    return (NULL);
 	  }
 
@@ -584,7 +584,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       if (error == EAI_FAIL)
         cg->need_res_init = 1;
 
-      _cupsSetError(IPP_INTERNAL_ERROR, gai_strerror(error), 0);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gai_strerror(error), 0);
     }
 
 #else
@@ -708,7 +708,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
         if (h_errno == NO_RECOVERY)
           cg->need_res_init = 1;
 
-	_cupsSetError(IPP_INTERNAL_ERROR, hstrerror(h_errno), 0);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, hstrerror(h_errno), 0);
       }
     }
 #endif /* HAVE_GETADDRINFO */
@@ -748,7 +748,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     {
       httpAddrFreeList(first);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Unknown service name."), 1);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unknown service name."), 1);
       return (NULL);
     }
 
@@ -771,7 +771,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
-	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -800,7 +800,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
-	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -832,7 +832,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
-	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}
@@ -856,7 +856,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	temp = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t));
 	if (!temp)
 	{
-	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	  httpAddrFreeList(first);
 	  return (NULL);
 	}

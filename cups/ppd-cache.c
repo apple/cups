@@ -3,7 +3,7 @@
  *
  *   PPD cache implementation for CUPS.
  *
- *   Copyright 2010-2012 by Apple Inc.
+ *   Copyright 2010-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -118,7 +118,7 @@ _ppdCacheCreateWithFile(
 
   if (!filename)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (NULL);
   }
 
@@ -128,7 +128,7 @@ _ppdCacheCreateWithFile(
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (NULL);
   }
 
@@ -138,7 +138,7 @@ _ppdCacheCreateWithFile(
 
   if (!cupsFileGets(fp, line, sizeof(line)))
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     DEBUG_puts("_ppdCacheCreateWithFile: Unable to read first line.");
     cupsFileClose(fp);
     return (NULL);
@@ -146,7 +146,7 @@ _ppdCacheCreateWithFile(
 
   if (strncmp(line, "#CUPS-PPD-CACHE-", 16))
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
     DEBUG_printf(("_ppdCacheCreateWithFile: Wrong first line \"%s\".", line));
     cupsFileClose(fp);
     return (NULL);
@@ -154,7 +154,7 @@ _ppdCacheCreateWithFile(
 
   if (atoi(line + 16) != _PPD_CACHE_VERSION)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Out of date PPD cache file."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Out of date PPD cache file."), 1);
     DEBUG_printf(("_ppdCacheCreateWithFile: Cache file has version %s, "
                   "expected %d.", line + 16, _PPD_CACHE_VERSION));
     cupsFileClose(fp);
@@ -167,7 +167,7 @@ _ppdCacheCreateWithFile(
 
   if ((pc = calloc(1, sizeof(_ppd_cache_t))) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     DEBUG_puts("_ppdCacheCreateWithFile: Unable to allocate _ppd_cache_t.");
     goto create_error;
   }
@@ -193,7 +193,7 @@ _ppdCacheCreateWithFile(
     {
       DEBUG_printf(("_ppdCacheCreateWithFile: Missing value on line %d.",
                     linenum));
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
       goto create_error;
     }
     else if (!_cups_strcasecmp(line, "Filter"))
@@ -231,13 +231,13 @@ _ppdCacheCreateWithFile(
       if (attrs && *attrs)
       {
         DEBUG_puts("_ppdCacheCreateWithFile: IPP listed multiple times.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
       else if (length <= 0)
       {
         DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP length.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -250,10 +250,10 @@ _ppdCacheCreateWithFile(
         *attrs = ippNew();
 
         if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
-		      *attrs) != IPP_DATA)
+		      *attrs) != IPP_STATE_DATA)
 	{
 	  DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP data.");
-	  _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	  goto create_error;
 	}
       }
@@ -269,7 +269,7 @@ _ppdCacheCreateWithFile(
       if (cupsFileTell(fp) != (pos + length))
       {
         DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP data.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
     }
@@ -278,7 +278,7 @@ _ppdCacheCreateWithFile(
       if (num_bins > 0)
       {
         DEBUG_puts("_ppdCacheCreateWithFile: NumBins listed multiple times.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -286,7 +286,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumBins value %d on line "
 		      "%d.", num_sizes, linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -294,7 +294,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d bins.",
 	              num_sizes));
-	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	goto create_error;
       }
     }
@@ -303,7 +303,7 @@ _ppdCacheCreateWithFile(
       if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad Bin on line %d.", linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -311,7 +311,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Too many Bin's on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -326,7 +326,7 @@ _ppdCacheCreateWithFile(
       if (num_sizes > 0)
       {
         DEBUG_puts("_ppdCacheCreateWithFile: NumSizes listed multiple times.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -334,7 +334,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumSizes value %d on line "
 	              "%d.", num_sizes, linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -344,7 +344,7 @@ _ppdCacheCreateWithFile(
 	{
 	  DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sizes.",
 			num_sizes));
-	  _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	  goto create_error;
 	}
       }
@@ -355,7 +355,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Too many Size's on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -367,7 +367,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad Size on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -382,7 +382,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Too many CustomSize's on line "
 	              "%d.", linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -394,7 +394,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad CustomSize on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -416,7 +416,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_puts("_ppdCacheCreateWithFile: NumSources listed multiple "
 	           "times.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -424,7 +424,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumSources value %d on "
 	              "line %d.", num_sources, linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -432,7 +432,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sources.",
 	              num_sources));
-	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	goto create_error;
       }
     }
@@ -442,7 +442,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad Source on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -450,7 +450,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Too many Source's on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -465,7 +465,7 @@ _ppdCacheCreateWithFile(
       if (num_types > 0)
       {
         DEBUG_puts("_ppdCacheCreateWithFile: NumTypes listed multiple times.");
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -473,7 +473,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumTypes value %d on "
 	              "line %d.", num_types, linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -481,7 +481,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d types.",
 	              num_types));
-	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
 	goto create_error;
       }
     }
@@ -491,7 +491,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad Type on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -499,7 +499,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Too many Type's on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -526,7 +526,7 @@ _ppdCacheCreateWithFile(
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Bad Preset on line %d.",
 	              linenum));
-	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
 	goto create_error;
       }
 
@@ -596,7 +596,7 @@ _ppdCacheCreateWithFile(
   {
     DEBUG_printf(("_ppdCacheCreateWithFile: Not enough sizes (%d < %d).",
                   pc->num_sizes, num_sizes));
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
     goto create_error;
   }
 
@@ -604,7 +604,7 @@ _ppdCacheCreateWithFile(
   {
     DEBUG_printf(("_ppdCacheCreateWithFile: Not enough sources (%d < %d).",
                   pc->num_sources, num_sources));
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
     goto create_error;
   }
 
@@ -612,7 +612,7 @@ _ppdCacheCreateWithFile(
   {
     DEBUG_printf(("_ppdCacheCreateWithFile: Not enough types (%d < %d).",
                   pc->num_types, num_types));
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad PPD cache file."), 1);
     goto create_error;
   }
 
@@ -1441,7 +1441,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   create_error:
 
-  _cupsSetError(IPP_INTERNAL_ERROR, _("Out of memory."), 1);
+  _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Out of memory."), 1);
   _ppdCacheDestroy(pc);
 
   return (NULL);
@@ -1580,11 +1580,11 @@ _ppdCacheGetBin(
 
 int					/* O  - New number of options */
 _ppdCacheGetFinishingOptions(
-    _ppd_cache_t  *pc,			/* I  - PPD cache and mapping data */
-    ipp_t         *job,			/* I  - Job attributes or NULL */
-    ipp_finish_t  value,		/* I  - IPP finishings value of IPP_FINISHINGS_NONE */
-    int           num_options,		/* I  - Number of options */
-    cups_option_t **options)		/* IO - Options */
+    _ppd_cache_t     *pc,		/* I  - PPD cache and mapping data */
+    ipp_t            *job,		/* I  - Job attributes or NULL */
+    ipp_finishings_t value,		/* I  - IPP finishings value of IPP_FINISHINGS_NONE */
+    int              num_options,	/* I  - Number of options */
+    cups_option_t    **options)		/* IO - Options */
 {
   int			i;		/* Looping var */
   _pwg_finishings_t	*f,		/* PWG finishings options */
@@ -2283,7 +2283,7 @@ _ppdCacheWriteFile(
 
   if (!pc || !filename)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -2294,7 +2294,7 @@ _ppdCacheWriteFile(
   snprintf(newfile, sizeof(newfile), "%s.N", filename);
   if ((fp = cupsFileOpen(newfile, "w9")) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     return (0);
   }
 
@@ -2463,7 +2463,7 @@ _ppdCacheWriteFile(
   {
     cupsFilePrintf(fp, "IPP " CUPS_LLFMT "\n", CUPS_LLCAST ippLength(attrs));
 
-    attrs->state = IPP_IDLE;
+    attrs->state = IPP_STATE_IDLE;
     ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL, attrs);
   }
 

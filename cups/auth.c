@@ -3,7 +3,7 @@
  *
  *   Authentication functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -112,7 +112,7 @@ static int	cups_local_auth(http_t *http);
 /*
  * 'cupsDoAuthentication()' - Authenticate a request.
  *
- * This function should be called in response to a @code HTTP_UNAUTHORIZED@
+ * This function should be called in response to a @code HTTP_STATUS_UNAUTHORIZED@
  * status, prior to resubmitting your request.
  *
  * @since CUPS 1.1.20/OS X 10.4@
@@ -164,14 +164,14 @@ cupsDoAuthentication(
       DEBUG_printf(("2cupsDoAuthentication: authstring=\"%s\"",
                     http->authstring));
 
-      if (http->status == HTTP_UNAUTHORIZED)
+      if (http->status == HTTP_STATUS_UNAUTHORIZED)
 	http->digest_tries ++;
 
       return (0);
     }
     else if (localauth == -1)
     {
-      http->status = HTTP_AUTHORIZATION_CANCELED;
+      http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
       return (-1);			/* Error or canceled */
     }
   }
@@ -212,22 +212,22 @@ cupsDoAuthentication(
 
     if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
     {
-      http->status = HTTP_AUTHORIZATION_CANCELED;
+      http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
       return (-1);
     }
 
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
   }
-  else if (http->status == HTTP_UNAUTHORIZED)
+  else if (http->status == HTTP_STATUS_UNAUTHORIZED)
     http->digest_tries ++;
 
-  if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+  if (http->status == HTTP_STATUS_UNAUTHORIZED && http->digest_tries >= 3)
   {
     DEBUG_printf(("1cupsDoAuthentication: Too many authentication tries (%d)",
 		  http->digest_tries));
 
-    http->status = HTTP_AUTHORIZATION_CANCELED;
+    http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
     return (-1);
   }
 
@@ -244,7 +244,7 @@ cupsDoAuthentication(
 
     if (_cupsSetNegotiateAuthString(http, method, resource))
     {
-      http->status = HTTP_AUTHORIZATION_CANCELED;
+      http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
       return (-1);
     }
   }
@@ -287,7 +287,7 @@ cupsDoAuthentication(
   {
     DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"",
                   www_auth));
-    http->status = HTTP_AUTHORIZATION_CANCELED;
+    http->status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
     return (-1);
   }
 

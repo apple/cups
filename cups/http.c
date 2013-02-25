@@ -591,7 +591,7 @@ http_t *				/* O - New HTTP connection */
 httpConnect(const char *host,		/* I - Host to connect to */
             int        port)		/* I - Port number */
 {
-  return (httpConnect2(host, port, NULL, AF_UNSPEC, HTTP_ENCRYPT_IF_REQUESTED,
+  return (httpConnect2(host, port, NULL, AF_UNSPEC, HTTP_ENCRYPTION_IF_REQUESTED,
                        1, 30000, NULL));
 }
 
@@ -804,7 +804,7 @@ int					/* O - Status of call (0 = success) */
 httpDelete(http_t     *http,		/* I - Connection to server */
            const char *uri)		/* I - URI to delete */
 {
-  return (http_send(http, HTTP_DELETE, uri));
+  return (http_send(http, HTTP_STATE_DELETE, uri));
 }
 
 
@@ -846,15 +846,15 @@ httpEncryption(http_t            *http,	/* I - Connection to server */
 
   http->encryption = e;
 
-  if ((http->encryption == HTTP_ENCRYPT_ALWAYS && !http->tls) ||
-      (http->encryption == HTTP_ENCRYPT_NEVER && http->tls))
-    return (httpReconnect(http));
-  else if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
+  if ((http->encryption == HTTP_ENCRYPTION_ALWAYS && !http->tls) ||
+      (http->encryption == HTTP_ENCRYPTION_NEVER && http->tls))
+    return (httpReconnect2(http, 30000, NULL));
+  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
     return (http_upgrade(http));
   else
     return (0);
 #else
-  if (e == HTTP_ENCRYPT_ALWAYS || e == HTTP_ENCRYPT_REQUIRED)
+  if (e == HTTP_ENCRYPTION_ALWAYS || e == HTTP_ENCRYPTION_REQUIRED)
     return (-1);
   else
     return (0);
@@ -1056,7 +1056,7 @@ int					/* O - Status of call (0 = success) */
 httpGet(http_t     *http,		/* I - Connection to server */
         const char *uri)		/* I - URI to get */
 {
-  return (http_send(http, HTTP_GET, uri));
+  return (http_send(http, HTTP_STATE_GET, uri));
 }
 
 
@@ -1338,7 +1338,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
       * and 2^31-1 for other successful requests...
       */
 
-      if (http->status >= HTTP_MULTIPLE_CHOICES ||
+      if (http->status >= HTTP_STATUS_MULTIPLE_CHOICES ||
           http->state == HTTP_STATE_OPTIONS ||
           (http->state == HTTP_STATE_GET && http->mode == _HTTP_MODE_SERVER) ||
           http->state == HTTP_STATE_HEAD ||
@@ -1728,7 +1728,7 @@ httpHead(http_t     *http,		/* I - Connection to server */
          const char *uri)		/* I - URI for head */
 {
   DEBUG_printf(("httpHead(http=%p, uri=\"%s\")", http, uri));
-  return (http_send(http, HTTP_HEAD, uri));
+  return (http_send(http, HTTP_STATE_HEAD, uri));
 }
 
 
@@ -1822,7 +1822,7 @@ int					/* O - Status of call (0 = success) */
 httpOptions(http_t     *http,		/* I - Connection to server */
             const char *uri)		/* I - URI for options */
 {
-  return (http_send(http, HTTP_OPTIONS, uri));
+  return (http_send(http, HTTP_STATE_OPTIONS, uri));
 }
 
 
@@ -2095,7 +2095,7 @@ int					/* O - Status of call (0 = success) */
 httpPost(http_t     *http,		/* I - Connection to server */
          const char *uri)		/* I - URI for post */
 {
-  return (http_send(http, HTTP_POST, uri));
+  return (http_send(http, HTTP_STATE_POST, uri));
 }
 
 
@@ -2149,7 +2149,7 @@ httpPut(http_t     *http,		/* I - Connection to server */
         const char *uri)		/* I - URI to put */
 {
   DEBUG_printf(("httpPut(http=%p, uri=\"%s\")", http, uri));
-  return (http_send(http, HTTP_PUT, uri));
+  return (http_send(http, HTTP_STATE_PUT, uri));
 }
 
 
@@ -2693,7 +2693,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
   if (!http)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (-1);
   }
 
@@ -2777,7 +2777,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   http->error    = 0;
 
 #ifdef HAVE_SSL
-  if (http->encryption == HTTP_ENCRYPT_ALWAYS)
+  if (http->encryption == HTTP_ENCRYPTION_ALWAYS)
   {
    /*
     * Always do encryption via SSL.
@@ -2794,7 +2794,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
       return (-1);
     }
   }
-  else if (http->encryption == HTTP_ENCRYPT_REQUIRED)
+  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED)
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
 
@@ -3160,7 +3160,7 @@ int					/* O - Status of call (0 = success) */
 httpTrace(http_t     *http,		/* I - Connection to server */
           const char *uri)		/* I - URI for trace */
 {
-  return (http_send(http, HTTP_TRACE, uri));
+  return (http_send(http, HTTP_STATE_TRACE, uri));
 }
 
 
@@ -3213,11 +3213,11 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
       return (0);
     }
 
-    if (http->status < HTTP_BAD_REQUEST)
+    if (http->status < HTTP_STATUS_BAD_REQUEST)
       http->digest_tries = 0;
 
 #ifdef HAVE_SSL
-    if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
+    if (http->status == HTTP_STATUS_SWITCHING_PROTOCOLS && !http->tls)
     {
       if (http_setup_ssl(http) != 0)
       {
@@ -3877,7 +3877,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (!http->fields[HTTP_FIELD_DATE][0])
     httpSetField(http, HTTP_FIELD_DATE, httpGetDateString(time(NULL)));
 
-  if (status >= HTTP_BAD_REQUEST && http->keep_alive)
+  if (status >= HTTP_STATUS_BAD_REQUEST && http->keep_alive)
   {
     http->keep_alive = 0;
     httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "");
@@ -4256,10 +4256,12 @@ http_content_coding_start(
   }
   else if (!strcmp(value, "x-gzip") || !strcmp(value, "gzip"))
   {
-    if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
+    if (http->state == HTTP_STATE_GET_SEND ||
+        http->state == HTTP_STATE_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
-    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV ||
+             http->state == HTTP_STATE_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
     else
@@ -4270,10 +4272,12 @@ http_content_coding_start(
   }
   else if (!strcmp(value, "x-deflate") || !strcmp(value, "deflate"))
   {
-    if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
+    if (http->state == HTTP_STATE_GET_SEND ||
+        http->state == HTTP_STATE_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
-    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV ||
+             http->state == HTTP_STATE_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
     else
@@ -4407,7 +4411,7 @@ http_create(
 
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     httpAddrFreeList(addrlist);
     return (NULL);
   }
@@ -4912,8 +4916,8 @@ http_send(http_t       *http,		/* I - Connection to server */
   */
 
   if (http->fd < 0 || http->status == HTTP_STATUS_ERROR ||
-      http->status >= HTTP_BAD_REQUEST)
-    if (httpReconnect(http))
+      http->status >= HTTP_STATUS_BAD_REQUEST)
+    if (httpReconnect2(http, 30000, NULL))
       return (-1);
 
  /*
@@ -4923,7 +4927,7 @@ http_send(http_t       *http,		/* I - Connection to server */
   if (http->wused)
   {
     if (httpFlushWrite(http) < 0)
-      if (httpReconnect(http))
+      if (httpReconnect2(http, 30000, NULL))
         return (-1);
   }
 
@@ -4934,13 +4938,13 @@ http_send(http_t       *http,		/* I - Connection to server */
   http->state         = request;
   http->data_encoding = HTTP_ENCODING_FIELDS;
 
-  if (request == HTTP_POST || request == HTTP_PUT)
+  if (request == HTTP_STATE_POST || request == HTTP_STATE_PUT)
     http->state ++;
 
   http->status = HTTP_STATUS_CONTINUE;
 
 #ifdef HAVE_SSL
-  if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
+  if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
   {
     httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
     httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
@@ -5518,7 +5522,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       message = _("Unable to establish a secure connection to host.");
 #endif /* HAVE_CSSMERRORSTRING */
 
-    _cupsSetError(IPP_PKI_ERROR, message, 1);
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, message, 1);
 
     return (-1);
   }

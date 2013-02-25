@@ -3,7 +3,7 @@
  *
  *   Option encoding routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -39,89 +39,89 @@
 
 static const ipp_op_t ipp_job_creation[] =
 {
-  IPP_PRINT_JOB,
-  IPP_PRINT_URI,
-  IPP_CREATE_JOB,
+  IPP_OP_PRINT_JOB,
+  IPP_OP_PRINT_URI,
+  IPP_OP_CREATE_JOB,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_doc_creation[] =
 {
-  IPP_PRINT_JOB,
-  IPP_PRINT_URI,
-  IPP_SEND_DOCUMENT,
-  IPP_SEND_URI,
+  IPP_OP_PRINT_JOB,
+  IPP_OP_PRINT_URI,
+  IPP_OP_SEND_DOCUMENT,
+  IPP_OP_SEND_URI,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_sub_creation[] =
 {
-  IPP_PRINT_JOB,
-  IPP_PRINT_URI,
-  IPP_CREATE_JOB,
-  IPP_CREATE_PRINTER_SUBSCRIPTION,
-  IPP_CREATE_JOB_SUBSCRIPTION,
+  IPP_OP_PRINT_JOB,
+  IPP_OP_PRINT_URI,
+  IPP_OP_CREATE_JOB,
+  IPP_OP_CREATE_PRINTER_SUBSCRIPTION,
+  IPP_OP_CREATE_JOB_SUBSCRIPTION,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_all_print[] =
 {
-  IPP_PRINT_JOB,
-  IPP_PRINT_URI,
-  IPP_CREATE_JOB,
-  IPP_SEND_DOCUMENT,
-  IPP_SEND_URI,
+  IPP_OP_PRINT_JOB,
+  IPP_OP_PRINT_URI,
+  IPP_OP_CREATE_JOB,
+  IPP_OP_SEND_DOCUMENT,
+  IPP_OP_SEND_URI,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_all_limit[] =
 {
-  IPP_GET_JOBS,
-  IPP_GET_PRINTER_ATTRIBUTES,
-  CUPS_GET_PRINTERS,
-  CUPS_GET_CLASSES,
-  CUPS_GET_DEVICES,
-  CUPS_GET_PPDS,
+  IPP_OP_GET_JOBS,
+  IPP_OP_GET_PRINTER_ATTRIBUTES,
+  IPP_OP_CUPS_GET_PRINTERS,
+  IPP_OP_CUPS_GET_CLASSES,
+  IPP_OP_CUPS_GET_DEVICES,
+  IPP_OP_CUPS_GET_PPDS,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t ipp_set_printer[] =
 {
-  IPP_SET_PRINTER_ATTRIBUTES,
-  CUPS_ADD_MODIFY_PRINTER,
-  CUPS_ADD_MODIFY_CLASS,
+  IPP_OP_SET_PRINTER_ATTRIBUTES,
+  IPP_OP_CUPS_ADD_MODIFY_PRINTER,
+  IPP_OP_CUPS_ADD_MODIFY_CLASS,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_am_class[] =
 {
-  CUPS_ADD_MODIFY_CLASS,
+  IPP_OP_CUPS_ADD_MODIFY_CLASS,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_am_printer[] =
 {
-  CUPS_ADD_MODIFY_PRINTER,
+  IPP_OP_CUPS_ADD_MODIFY_PRINTER,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_schemes[] =
 {
-  CUPS_GET_DEVICES,
-  CUPS_GET_PPDS,
+  IPP_OP_CUPS_GET_DEVICES,
+  IPP_OP_CUPS_GET_PPDS,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_get_ppds[] =
 {
-  CUPS_GET_PPDS,
+  IPP_OP_CUPS_GET_PPDS,
   IPP_OP_CUPS_NONE
 };
 
 static const ipp_op_t cups_ppd_name[] =
 {
-  CUPS_ADD_MODIFY_PRINTER,
-  CUPS_GET_PPD,
+  IPP_OP_CUPS_ADD_MODIFY_PRINTER,
+  IPP_OP_CUPS_GET_PPD,
   IPP_OP_CUPS_NONE
 };
 
@@ -423,8 +423,8 @@ cupsEncodeOptions2(
   op = ippGetOperation(ipp);
 
   if (group_tag == IPP_TAG_OPERATION &&
-      (op == IPP_PRINT_JOB || op == IPP_PRINT_URI ||
-       op == IPP_SEND_DOCUMENT || op == IPP_SEND_URI))
+      (op == IPP_OP_PRINT_JOB || op == IPP_OP_PRINT_URI ||
+       op == IPP_OP_SEND_DOCUMENT || op == IPP_OP_SEND_URI))
   {
    /*
     * Handle the document format stuff first...

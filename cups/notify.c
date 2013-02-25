@@ -3,7 +3,7 @@
  *
  *   Notification routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 2005-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -83,25 +83,25 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
 
     switch (job_state->values[0].integer)
     {
-      case IPP_JOB_PENDING :
+      case IPP_JSTATE_PENDING :
           state = _cupsLangString(lang, _("pending"));
 	  break;
-      case IPP_JOB_HELD :
+      case IPP_JSTATE_HELD :
           state = _cupsLangString(lang, _("held"));
 	  break;
-      case IPP_JOB_PROCESSING :
+      case IPP_JSTATE_PROCESSING :
           state = _cupsLangString(lang, _("processing"));
 	  break;
-      case IPP_JOB_STOPPED :
+      case IPP_JSTATE_STOPPED :
           state = _cupsLangString(lang, _("stopped"));
 	  break;
-      case IPP_JOB_CANCELED :
+      case IPP_JSTATE_CANCELED :
           state = _cupsLangString(lang, _("canceled"));
 	  break;
-      case IPP_JOB_ABORTED :
+      case IPP_JSTATE_ABORTED :
           state = _cupsLangString(lang, _("aborted"));
 	  break;
-      case IPP_JOB_COMPLETED :
+      case IPP_JSTATE_COMPLETED :
           state = _cupsLangString(lang, _("completed"));
 	  break;
       default :
@@ -127,13 +127,13 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
 
     switch (printer_state->values[0].integer)
     {
-      case IPP_PRINTER_IDLE :
+      case IPP_PSTATE_IDLE :
           state = _cupsLangString(lang, _("idle"));
 	  break;
-      case IPP_PRINTER_PROCESSING :
+      case IPP_PSTATE_PROCESSING :
           state = _cupsLangString(lang, _("processing"));
 	  break;
-      case IPP_PRINTER_STOPPED :
+      case IPP_PSTATE_STOPPED :
           state = _cupsLangString(lang, _("stopped"));
 	  break;
       default :

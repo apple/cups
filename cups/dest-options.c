@@ -3,7 +3,7 @@
  *
  *   Destination option/media support for CUPS.
  *
- *   Copyright 2012 by Apple Inc.
+ *   Copyright 2012-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -620,7 +620,7 @@ cupsCopyDestInfo(
     * Send a Get-Printer-Attributes request...
     */
 
-    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+    request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
 		 uri);
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
@@ -632,7 +632,7 @@ cupsCopyDestInfo(
     response = cupsDoRequest(http, request, resource);
     status   = cupsLastError();
 
-    if (status > IPP_OK_SUBST)
+    if (status > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
     {
       DEBUG_printf(("cupsCopyDestSupported: Get-Printer-Attributes for '%s' "
 		    "returned %s (%s)", dest->name, ippErrorString(status),
@@ -641,9 +641,9 @@ cupsCopyDestInfo(
       ippDelete(response);
       response = NULL;
 
-      if (status == IPP_VERSION_NOT_SUPPORTED && version > 11)
+      if (status == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED && version > 11)
         version = 11;
-      else if (status == IPP_PRINTER_BUSY)
+      else if (status == IPP_STATUS_ERROR_BUSY)
       {
         sleep(delay);
 
@@ -666,7 +666,7 @@ cupsCopyDestInfo(
 
   if ((dinfo = calloc(1, sizeof(cups_dinfo_t))) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     ippDelete(response);
     return (NULL);
   }
@@ -754,7 +754,7 @@ cupsGetDestMediaByName(
 
   if (!http || !dest || !dinfo || !media || !size)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -766,7 +766,7 @@ cupsGetDestMediaByName(
     if ((pwg = _pwgMediaForLegacy(media)) == NULL)
     {
       DEBUG_printf(("1cupsGetDestMediaByName: Unknown size '%s'.", media));
-      _cupsSetError(IPP_INTERNAL_ERROR, _("Unknown media size name."), 1);
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unknown media size name."), 1);
       return (0);
     }
 
@@ -822,7 +822,7 @@ cupsGetDestMediaBySize(
 
   if (!http || !dest || !dinfo || width <= 0 || length <= 0 || !size)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -834,7 +834,7 @@ cupsGetDestMediaBySize(
   {
     DEBUG_printf(("1cupsGetDestMediaBySize: Invalid size %dx%d.", width,
                   length));
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Invalid media size."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Invalid media size."), 1);
     return (0);
   }
 
