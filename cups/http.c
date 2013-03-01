@@ -133,6 +133,8 @@
  *   http_set_wait()		  - Set the default wait value for reads.
  *   http_setup_ssl()		  - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()	  - Shut down SSL/TLS on a connection.
+ *   http_state_string()          - Return the string associated with a given
+ *                                  HTTP state.
  *   http_upgrade()		  - Force upgrade to TLS encryption.
  *   http_write()		  - Write a buffer to a HTTP connection.
  *   http_write_chunk() 	  - Write a chunked buffer.
@@ -194,6 +196,9 @@ static int		http_set_credentials(http_t *http);
 static off_t		http_set_length(http_t *http);
 static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
+#ifdef DEBUG
+static const char	*http_state_string(http_state_t state);
+#endif /* DEBUG */
 #ifdef HAVE_SSL
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
@@ -239,28 +244,6 @@ static const char * const http_fields[] =
 			  "Allow",
 			  "Server"
 			};
-#ifdef DEBUG
-static const char * const http_states[] =
-			{
-			  "HTTP_STATE_ERROR",
-			  "HTTP_STATE_WAITING",
-			  "HTTP_STATE_OPTIONS",
-			  "HTTP_STATE_GET",
-			  "HTTP_STATE_GET_SEND",
-			  "HTTP_STATE_HEAD",
-			  "HTTP_STATE_POST",
-			  "HTTP_STATE_POST_RECV",
-			  "HTTP_STATE_POST_SEND",
-			  "HTTP_STATE_PUT",
-			  "HTTP_STATE_PUT_RECV",
-			  "HTTP_STATE_DELETE",
-			  "HTTP_STATE_TRACE",
-			  "HTTP_STATE_CONNECT",
-			  "HTTP_STATE_STATUS",
-			  "HTTP_STATE_UNKNOWN_METHOD",
-			  "HTTP_STATE_UNKNOWN_VERSION"
-			};
-#endif /* DEBUG */
 
 
 #if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
@@ -889,7 +872,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Nothing to do if we are in the "waiting" state...
@@ -1311,7 +1294,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
 
 
   DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if (!http)
     return (-1);
@@ -1913,7 +1896,7 @@ httpPeek(http_t *http,			/* I - Connection to server */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpPeek: 0-length chunk, set state to %s.",
-                  http_states[http->state + 1]));
+                  http_state_string(http->state)));
 
    /*
     * Prevent future reads for this request...
@@ -2379,7 +2362,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpRead2: End of content, set state to %s.",
-		  http_states[http->state + 1]));
+		  http_state_string(http->state)));
   }
 
   return (bytes);
@@ -2529,7 +2512,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else if (http->state != HTTP_STATE_WAITING)
   {
     DEBUG_printf(("1httpReadRequest: Bad state %s, returning HTTP_STATE_ERROR.",
-                  http_states[http->state + 1]));
+                  http_state_string(http->state)));
     return (HTTP_STATE_ERROR);
   }
 
@@ -2628,7 +2611,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   }
 
   DEBUG_printf(("1httpReadRequest: Set state to %s.",
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if (!strcmp(req_version, "HTTP/1.0"))
   {
@@ -3182,7 +3165,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
 
   DEBUG_printf(("_httpUpdate(http=%p, status=%p), state=%s", http, status,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Grab a single line from the connection...
@@ -3253,7 +3236,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 	  http->state ++;
 
 	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
-	                http_states[http->state + 1]));
+	                http_state_string(http->state)));
 
       case HTTP_STATE_POST_SEND :
       case HTTP_STATE_HEAD :
@@ -3356,7 +3339,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Flush pending data, if any...
@@ -3759,7 +3742,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("2httpWrite2: Changed state to %s.",
-		  http_states[http->state + 1]));
+		  http_state_string(http->state)));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -4006,7 +3989,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
            http->state == HTTP_STATE_STATUS)
   {
     DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
-                  "was %s.", http_states[http->state + 1]));
+                  "was %s.", http_state_string(http->state)));
     http->state = HTTP_STATE_WAITING;
   }
   else
@@ -5079,7 +5062,7 @@ http_set_length(http_t *http)		/* I - Connection */
 
 
   DEBUG_printf(("http_set_length(http=%p) mode=%d state=%s", http, http->mode,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if ((remaining = httpGetLength2(http)) >= 0)
   {
@@ -5623,6 +5606,45 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
   http->tls_credentials = NULL;
 }
 #endif /* HAVE_SSL */
+
+
+#ifdef DEBUG
+/*
+ * 'http_state_string()' - Return the string associated with a given HTTP state.
+ */
+
+static const char *			/* O - State string */
+http_state_string(http_state_t state)	/* I - HTTP state */
+{
+  static char buffer[255];		/* Unknown value buffer */
+  static const char * const states[] =	/* State strings */
+  {
+    "HTTP_STATE_ERROR",
+    "HTTP_STATE_WAITING",
+    "HTTP_STATE_OPTIONS",
+    "HTTP_STATE_GET",
+    "HTTP_STATE_GET_SEND",
+    "HTTP_STATE_HEAD",
+    "HTTP_STATE_POST",
+    "HTTP_STATE_POST_RECV",
+    "HTTP_STATE_POST_SEND",
+    "HTTP_STATE_PUT",
+    "HTTP_STATE_PUT_RECV",
+    "HTTP_STATE_DELETE",
+    "HTTP_STATE_TRACE",
+    "HTTP_STATE_CONNECT",
+    "HTTP_STATE_STATUS",
+    "HTTP_STATE_UNKNOWN_METHOD",
+    "HTTP_STATE_UNKNOWN_VERSION"
+  };
+
+  if (state >= HTTP_STATE_ERROR && state <= HTTP_STATE_UNKNOWN_VERSION)
+    return (states[state - HTTP_STATE_ERROR]);
+
+  snprintf(buffer, sizeof(buffer), "??? %d ???", (int)state);
+  return (buffer);
+}
+#endif /* DEBUG */
 
 
 #ifdef HAVE_SSL
