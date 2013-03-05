@@ -49,6 +49,9 @@
 
 #include "cupsd.h"
 
+#ifdef __APPLE__
+#  include <libproc.h>
+#endif /* __APPLE__ */
 #ifdef HAVE_TCPD_H
 #  include <tcpd.h>
 #endif /* HAVE_TCPD_H */
@@ -377,8 +380,31 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
 #ifdef AF_LOCAL
   if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
+  {
+#  ifdef __APPLE__
+    socklen_t	peersize;		/* Size of peer credentials */
+    pid_t	peerpid;		/* Peer process ID */
+    char	name[256];		/* Name of process */
+
+    peersize = sizeof(peerpid);
+    if (!getsockopt(con->http.fd, SOL_LOCAL, LOCAL_PEERPID, &peerpid,
+        &peersize))
+    {
+      if (!proc_name(peerpid, name, sizeof(name)))
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "[Client %d] Accepted from %s (Domain ???[%d])",
+			con->http.fd, con->http.hostname, (int)peerpid);
+      else
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "[Client %d] Accepted from %s (Domain %s[%d])",
+			con->http.fd, con->http.hostname, name, (int)peerpid);
+    }
+    else
+#  endif /* __APPLE__ */
+
     cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s (Domain)",
                     con->http.fd, con->http.hostname);
+  }
   else
 #endif /* AF_LOCAL */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Accepted from %s:%d (IPv%d)",

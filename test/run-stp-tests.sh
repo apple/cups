@@ -391,6 +391,7 @@ cat >/tmp/cups-$user/cupsd.conf <<EOF
 StrictConformance Yes
 Browsing Off
 Listen localhost:$port
+Listen /tmp/cups-$user/sock
 PassEnv LOCALEDIR
 PassEnv DYLD_INSERT_LIBRARIES
 MaxSubscriptions 3
