@@ -1869,6 +1869,12 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 						 fileid);
         }
 
+	if (compressions)
+	  job->compressions = compressions;
+
+	if (filetypes)
+	  job->filetypes = filetypes;
+
         if (!compressions || !filetypes)
 	{
           cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1877,12 +1883,6 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
 	  ippDelete(job->attrs);
 	  job->attrs = NULL;
-
-	  if (compressions)
-	    free(compressions);
-
-	  if (filetypes)
-	    free(filetypes);
 
 	  if (job->compressions)
 	  {
@@ -1900,9 +1900,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  return (0);
 	}
 
-        job->compressions = compressions;
-        job->filetypes    = filetypes;
-	job->num_files    = fileid;
+	job->num_files = fileid;
       }
 
       job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, jobfile, NULL,
@@ -4158,6 +4156,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d.",
                       line, linenum);
+  }
+
+  if (job)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "Missing </Job> directive on line %d.", linenum);
+    cupsdDeleteJob(job, CUPSD_JOB_PURGE);
   }
 
   cupsFileClose(fp);

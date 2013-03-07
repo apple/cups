@@ -1235,6 +1235,12 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 					   sizeof(mime_type_t *));
   }
 
+  if (compressions)
+    job->compressions = compressions;
+
+  if (filetypes)
+    job->filetypes = filetypes;
+
   if (!compressions || !filetypes)
   {
     cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
@@ -1247,9 +1253,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
     return (-1);
   }
 
-  job->compressions                 = compressions;
   job->compressions[job->num_files] = compression;
-  job->filetypes                    = filetypes;
   job->filetypes[job->num_files]    = filetype;
 
   job->num_files ++;
