@@ -3392,7 +3392,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
       cupsFileClose(out);
 
       snprintf(filename, sizeof(filename), "%s.N", ConfigurationFile);
-      cupsdRemoveFile(filename);
+      cupsdUnlinkOrRemoveFile(filename);
 
       return (HTTP_SERVER_ERROR);
     }
@@ -3410,7 +3410,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   * Remove the request file...
   */
 
-  cupsdRemoveFile(con->filename);
+  cupsdUnlinkOrRemoveFile(con->filename);
   cupsdClearString(&con->filename);
 
  /*
