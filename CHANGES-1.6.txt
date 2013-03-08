@@ -10,7 +10,7 @@ CHANGES IN CUPS V1.6.2
 	  through the CUPS web interface or APIs (STR #4223)
 	- Added a Czech localization (STR #4201)
 	- Added a French localization (STR #4247)
-	- Added a Russian localization (STR #4228)
+	- Added a Russian localization (STR #4228, STR #4285)
 	- Updated the Catalan localization (STR #4202)
 	- The IPP backend could crash if the printer disconnects early
 	  (STR #4284)
