@@ -12,6 +12,8 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228)
 	- Updated the Catalan localization (STR #4202)
+	- The IPP backend could crash if the printer disconnects early
+	  (STR #4284)
 	- cupsGetPPD did not work with statically-configured CUPS shared
 	  queues (STR #4178)
 	- The scheduler did not support long MIME media types (STR #4270)
