@@ -3,7 +3,7 @@
  *
  *   Main header file for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -187,6 +187,7 @@ extern cups_file_t	*cupsdCreateConfFile(const char *filename, mode_t mode);
 extern cups_file_t	*cupsdOpenConfFile(const char *filename);
 extern int		cupsdOpenPipe(int *fds);
 extern int		cupsdRemoveFile(const char *filename);
+extern int		cupsdUnlinkOrRemoveFile(const char *filename);
 
 /* main.c */
 extern int		cupsdAddString(cups_array_t **a, const char *s);

@@ -3,7 +3,7 @@
  *
  *   File functions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,15 +14,17 @@
  *
  * Contents:
  *
- *   cupsdCleanFiles()           - Clean out old files.
+ *   cupsdCleanFiles()		 - Clean out old files.
  *   cupsdCloseCreatedConfFile() - Close a created configuration file and move
- *                                 into place.
- *   cupsdClosePipe()            - Close a pipe as necessary.
- *   cupsdCreateConfFile()       - Create a configuration file safely.
- *   cupsdOpenConfFile()         - Open a configuration file.
- *   cupsdOpenPipe()             - Create a pipe which is closed on exec.
- *   cupsdRemoveFile()           - Remove a file using the 7-pass US DoD method.
- *   overwrite_data()            - Overwrite the data in a file.
+ *				   into place.
+ *   cupsdClosePipe()		 - Close a pipe as necessary.
+ *   cupsdCreateConfFile()	 - Create a configuration file safely.
+ *   cupsdOpenConfFile()	 - Open a configuration file.
+ *   cupsdOpenPipe()		 - Create a pipe which is closed on exec.
+ *   cupsdRemoveFile()		 - Remove a file securely.
+ *   cupsdUnlinkOrRemoveFile()	 - Unlink or securely remove a file depending
+ *				   on the configuration.
+ *   overwrite_data()		 - Overwrite the data in a file.
  */
 
 /*
@@ -43,7 +45,7 @@ static int	overwrite_data(int fd, const char *buffer, int bufsize,
 /*
  * 'cupsdCleanFiles()' - Clean out old files.
  */
- 
+
 void
 cupsdCleanFiles(const char *path,	/* I - Directory to clean */
                 const char *pattern)	/* I - Filename pattern or NULL */
@@ -65,7 +67,7 @@ cupsdCleanFiles(const char *path,	/* I - Directory to clean */
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "Cleaning out old files in \"%s\"...", path);
+  cupsdLogMessage(CUPSD_LOG_INFO, "Cleaning out old files in \"%s\".", path);
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {
@@ -81,13 +83,11 @@ cupsdCleanFiles(const char *path,	/* I - Directory to clean */
       status = rmdir(filename);
     }
     else
-      status = unlink(filename);
+      status = cupsdUnlinkOrRemoveFile(filename);
 
     if (status)
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to remove \"%s\" - %s", filename,
 		      strerror(errno));
-    else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "Removed \"%s\"...", filename);
   }
 
   cupsDirClose(dir);
@@ -123,7 +123,7 @@ cupsdCloseCreatedConfFile(
   snprintf(newfile, sizeof(newfile), "%s.N", filename);
   snprintf(oldfile, sizeof(oldfile), "%s.O", filename);
 
-  if ((cupsdRemoveFile(oldfile) && errno != ENOENT) ||
+  if ((cupsdUnlinkOrRemoveFile(oldfile) && errno != ENOENT) ||
       (rename(filename, oldfile) && errno != ENOENT) ||
       rename(newfile, filename))
   {
@@ -285,14 +285,27 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
 
 
 /*
- * 'cupsdRemoveFile()' - Remove a file using the 7-pass US DoD method.
+ * 'cupsdRemoveFile()' - Remove a file securely.
  */
 
 int					/* O - 0 on success, -1 on error */
 cupsdRemoveFile(const char *filename)	/* I - File to remove */
 {
 #ifdef HAVE_REMOVEFILE
-  return (removefile(filename, NULL, REMOVEFILE_SECURE_7_PASS));
+ /*
+  * See if the file exists...
+  */
+
+  if (access(filename, 0))
+    return (0);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Securely removing \"%s\".", filename);
+
+ /*
+  * Remove the file...
+  */
+
+  return (removefile(filename, NULL, REMOVEFILE_SECURE_1_PASS));
 
 #else
   int			fd;		/* File descriptor */
@@ -300,6 +313,15 @@ cupsdRemoveFile(const char *filename)	/* I - File to remove */
   char			buffer[512];	/* Data buffer */
   int			i;		/* Looping var */
 
+
+ /*
+  * See if the file exists...
+  */
+
+  if (access(filename, 0))
+    return (0);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Securely removing \"%s\".", filename);
 
  /*
   * First open the file for writing in exclusive mode.
@@ -330,30 +352,8 @@ cupsdRemoveFile(const char *filename)	/* I - File to remove */
   }
 
  /*
-  * Overwrite the file 7 times with 0xF6, 0x00, 0xFF, random, 0x00, 0xFF,
-  * and more random data.
+  * Overwrite the file with random data.
   */
-
-  memset(buffer, 0xF6, sizeof(buffer));
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
-
-  memset(buffer, 0x00, sizeof(buffer));
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
-
-  memset(buffer, 0xFF, sizeof(buffer));
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
 
   CUPS_SRAND(time(NULL));
 
@@ -365,36 +365,28 @@ cupsdRemoveFile(const char *filename)	/* I - File to remove */
     return (-1);
   }
 
-  memset(buffer, 0x00, sizeof(buffer));
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
-
-  memset(buffer, 0xFF, sizeof(buffer));
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
-
-  for (i = 0; i < sizeof(buffer); i ++)
-    buffer[i] = CUPS_RAND();
-  if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
-  {
-    close(fd);
-    return (-1);
-  }
-
  /*
-  * Whew!  Close the file (which will lead to the actual deletion) and
-  * return success...
+  * Close the file, which will lead to the actual deletion, and return...
   */
 
-  close(fd);
-  return (0);
+  return (close(fd));
 #endif /* HAVE_REMOVEFILE */
+}
+
+
+/*
+ * 'cupsdUnlinkOrRemoveFile()' - Unlink or securely remove a file depending
+ *                               on the configuration.
+ */
+
+int					/* O - 0 on success, -1 on error */
+cupsdUnlinkOrRemoveFile(
+    const char *filename)		/* I - Filename */
+{
+  if (Classification)
+    return (cupsdRemoveFile(filename));
+  else
+    return (unlink(filename));
 }
 
 

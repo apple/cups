@@ -4326,10 +4326,7 @@ remove_job_files(cupsd_job_t *job)	/* I - Job */
   {
     snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 	     job->id, i);
-    if (Classification)
-      cupsdRemoveFile(filename);
-    else
-      unlink(filename);
+    cupsdUnlinkOrRemoveFile(filename);
   }
 
   free(job->filetypes);
@@ -4360,10 +4357,7 @@ remove_job_history(cupsd_job_t *job)	/* I - Job */
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	   job->id);
-  if (Classification)
-    cupsdRemoveFile(filename);
-  else
-    unlink(filename);
+  cupsdUnlinkOrRemoveFile(filename);
 
   LastEvent |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
 }
