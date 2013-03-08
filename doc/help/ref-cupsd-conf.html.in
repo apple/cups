@@ -49,36 +49,6 @@ automatically handles restarting the scheduler.</P>
 </BLOCKQUOTE>
 
 
-<H2 CLASS="title"><A NAME="AccessLog">AccessLog</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-AccessLog /var/log/cups/access_log
-AccessLog /var/log/cups/access_log-%s
-AccessLog syslog
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>AccessLog</CODE> directive sets the name of the
-access log file. If the filename is not absolute then it is
-assumed to be relative to the <A
-HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-access log file is stored in "common log format" and can be used
-by any web access reporting tool to generate a report on CUPS
-server activity.</P>
-
-<P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.</P>
-
-<P>The special name "syslog" can be used to send the access
-information to the system log instead of a plain file.</P>
-
-<P>The default access log file is
-<VAR>@CUPS_LOGDIR@/access_log</VAR>.</P>
-
-
 <H2 CLASS="title"><A NAME="AccessLogLevel">AccessLogLevel</A></H2>
 
 <H3>Examples</H3>
@@ -360,40 +330,6 @@ used.</P>
 <P>The default is to not allow classification overrides.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.15</SPAN><A NAME="ConfigFilePerm">ConfigFilePerm</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-ConfigFilePerm 0644
-ConfigFilePerm 0640
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions to use when the scheduler writes configuration and cache files, typically in response to IPP or HTTP requests. The default is @CUPS_CONFIG_FILE_PERM@.</P>
-
-<BLOCKQUOTE><B>Note:</B>
-
-<P>The permissions for the <VAR>printers.conf</VAR> file are always masked to only allow access from the scheduler user (typically root). This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system. There is no way to disable this security feature.</P>
-
-</BLOCKQUOTE>
-
-
-<H2 CLASS="title"><A NAME="DataDir">DataDir</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-DataDir /usr/share/cups
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>DataDir</CODE> directive sets the directory to use
-for data files.</P>
-
-
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/OS X 10.5</SPAN><A NAME="DefaultAuthType">DefaultAuthType</A></H2>
 
 <H3>Examples</H3>
@@ -577,32 +513,6 @@ DirtyCleanInterval 0
 <P>The default value is <CODE>30</CODE> (30 seconds).</P>
 
 
-<H2 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-DocumentRoot /usr/share/doc/cups
-DocumentRoot /foo/bar/doc/cups
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>DocumentRoot</CODE> directive specifies the location
-of web content for the HTTP server in CUPS. If an absolute path
-is not specified then it is assumed to be relative to the <A
-HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default directory is <VAR>@CUPS_DOCROOT@</VAR>.</P>
-
-<P>Documents are first looked up in a sub-directory for the
-primary language requested by the client (e.g.
-<VAR>@CUPS_DOCROOT@/fr/...</VAR>) and then directly under
-the <CODE>DocumentRoot</CODE> directory (e.g.
-<VAR>@CUPS_DOCROOT@/...</VAR>), so it is possible to
-localize the web content by providing subdirectories for each
-language needed.</P>
-
-
 <H2 CLASS="title"><A NAME="Encryption">Encryption</A></H2>
 
 <H3>Examples</H3>
@@ -623,31 +533,6 @@ HREF="#Location"><CODE>Location</CODE></A> or <A
 HREF="#Limit"><CODE>Limit</CODE></A> section and specifies the
 encryption settings for that location. The default setting is
 <CODE>IfRequested</CODE> for all locations.</P>
-
-
-<H2 CLASS="title"><A NAME="ErrorLog">ErrorLog</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-ErrorLog /var/log/cups/error_log
-ErrorLog /var/log/cups/error_log-%s
-ErrorLog syslog
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>ErrorLog</CODE> directive sets the name of the error
-log file. If the filename is not absolute then it is assumed to
-be relative to the <A
-HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default error log file is <VAR>@CUPS_LOGDIR@/error_log</VAR>.</P>
-
-<P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.</P>
-
-<P>The special name "syslog" can be used to send the error
-information to the system log instead of a plain file.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3/OS X 10.5</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
@@ -686,91 +571,6 @@ printer.</P>
 	value</LI>
 
 </UL>
-
-
-
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/OS X 10.6</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-FatalErrors none
-FatalErrors all
-FatalErrors browse
-FatalErrors config
-FatalErrors listen
-FatalErrors log
-FatalErrors permissions
-FatalErrors all -permissions
-FatalErrors config permissions log
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>FatalErrors</CODE> directive determines whether certain kinds of
-errors are fatal. The following kinds of errors are currently recognized:</P>
-
-<UL>
-
-	<LI><CODE>none</CODE> - No errors are fatal</LI>
-
-	<LI><CODE>all</CODE> - All of the errors below are fatal</LI>
-
-	<LI><CODE>browse</CODE> - Browsing initialization errors are fatal,
-	for example failed binding to the CUPS browse port or failed connections
-	to LDAP servers</LI>
-
-	<LI><CODE>config</CODE> - Configuration file syntax errors are
-	fatal</LI>
-
-	<LI><CODE>listen</CODE> - Listen or Port errors are fatal, except for
-	IPv6 failures on the loopback or "any" addresses</LI>
-
-	<LI><CODE>log</CODE> - Log file creation or write errors are fatal</LI>
-
-	<LI><CODE>permissions</CODE> - Bad startup file permissions are
-	fatal, for example shared SSL certificate and key files with world-
-	read permissions</LI>
-
-</UL>
-
-<P>Multiple errors can be listed, and the form "-kind" can be used with
-<CODE>all</CODE> to remove specific kinds of errors. The default setting is
-<CODE>@CUPS_FATAL_ERRORS@</CODE>.</P>
-
-
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.18</SPAN><A NAME="FileDevice">FileDevice</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-FileDevice Yes
-FileDevice No
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>FileDevice</CODE> directive determines whether the
-scheduler allows new printers to be added using device URIs of
-the form <CODE>file:/filename</CODE>. File devices are most often
-used to test new printer drivers and do not support raw file
-printing.</P>
-
-<P>The default setting is <CODE>No</CODE>.</P>
-
-<BLOCKQUOTE><B>Note:</B>
-
-<P>File devices are managed by the scheduler. Since the
-scheduler normally runs as the root user, file devices
-can be used to overwrite system files and potentially
-gain unauthorized access to the system. If you must
-create printers using file devices, we recommend that
-you set the <CODE>FileDevice</CODE> directive to
-<CODE>Yes</CODE> for only as long as you need to add the
-printers to the system, and then reset the directive to
-<CODE>No</CODE>.</P>
-
-</BLOCKQUOTE>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.3</SPAN><A NAME="FilterLimit">FilterLimit</A></H2>
@@ -815,39 +615,6 @@ FilterNice 19
 value to assign to filter processes. The nice value ranges from
 0, the highest priority, to 19, the lowest priority. The default
 is 0.</P>
-
-
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.3</SPAN><A NAME="FontPath">FontPath</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-FontPath /foo/bar/fonts
-FontPath /usr/share/cups/fonts:/foo/bar/fonts
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>FontPath</CODE> directive specifies the font path to
-use when searching for fonts. The default font path is
-<CODE>/usr/share/cups/fonts</CODE>.</P>
-
-
-<H2 CLASS="title"><A NAME="Group">Group</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-Group lp
-Group nobody
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>Group</CODE> directive specifies the UNIX group that
-filter and CGI programs run as. The default group is
-system-specific but is usually <CODE>lp</CODE> or
-<CODE>nobody</CODE>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6/OS X 10.8</SPAN><A NAME="GSSServiceName">GSSServiceName</A></H2>
@@ -904,7 +671,7 @@ Include /foo/bar/filename
 <P>The <CODE>Include</CODE> directive includes the named file in
 the <CODE>cupsd.conf</CODE> file. If no leading path is provided,
 the file is assumed to be relative to the <A
-HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
+HREF="ref-cups-files-conf.html#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="JobPrivateAccess">JobPrivateAccess</A></H2>
@@ -1457,22 +1224,6 @@ error occurs during printing. The default is 200 messages. A value of 0
 disables debugging history entirely and is not recommended.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.15</SPAN><A NAME="LogFilePerm">LogFilePerm</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-LogFilePerm 0644
-LogFilePerm 0600
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>LogFilePerm</CODE> directive specifies the
-permissions to use when writing log files. The default
-is @CUPS_LOG_FILE_PERM@.</P>
-
-
 <H2 CLASS="title"><A NAME="LogLevel">LogLevel</A></H2>
 
 <H3>Examples</H3>
@@ -1493,7 +1244,7 @@ LogLevel debug2
 <H3>Description</H3>
 
 <P>The <CODE>LogLevel</CODE> directive specifies the level of
-logging for the <A HREF="#ErrorLog"><CODE>ErrorLog</CODE></A>
+logging for the <A HREF="ref-cups-files-conf.html#ErrorLog"><CODE>ErrorLog</CODE></A>
 file. The following values are recognized (each level logs
 everything under the preceding levels):</P>
 
@@ -1815,31 +1566,6 @@ control. The following values are supported:</P>
 <P>The <CODE>Order</CODE> directive must appear inside a <A
 HREF="#Location"><CODE>Location</CODE></A> or <A
 HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
-
-
-<H2 CLASS="title"><A NAME="PageLog">PageLog</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-PageLog /var/log/cups/page_log
-PageLog /var/log/cups/page_log-%s
-PageLog syslog
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>PageLog</CODE> directive sets the name of the page
-log file. If the filename is not absolute then it is assumed to
-be relative to the <A
-HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default page log file is <VAR>@CUPS_LOGDIR@/page_log</VAR>.</P>
-
-<P>The server name can be included in the filename by using
-<CODE>%s</CODE> in the name.</P>
-
-<P>The special name "syslog" can be used to send the page
-information to the system log instead of a plain file.</P>
 
 
 <H2 CLASS="title"><A NAME="PageLogFormat">PageLogFormat</A></H2>
