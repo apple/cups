@@ -140,7 +140,6 @@ static const cupsd_var_t	cupsd_vars[] =
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_TIME },
   { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_TIME },
   { "ReloadTimeout",		&ReloadTimeout,		CUPSD_VARTYPE_TIME },
-  { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RIPCache",			&RIPCache,		CUPSD_VARTYPE_STRING },
   { "RootCertDuration",		&RootCertDuration,	CUPSD_VARTYPE_TIME },
   { "ServerAdmin",		&ServerAdmin,		CUPSD_VARTYPE_STRING },
@@ -163,6 +162,7 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
+  { "RemoteRoot",		&RemoteRoot,		CUPSD_VARTYPE_STRING },
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
@@ -797,14 +797,22 @@ cupsdReadConfiguration(void)
     cupsFileClose(fp);
 
     if (!status)
+    {
+      if (TestConfigFile)
+        printf("\"%s\" contains errors.\n", CupsFilesFile);
+      else
+        syslog(LOG_LPR, "Unable to read \"%s\" due to errors.",
+               CupsFilesFile);
+
       return (0);
+    }
   }
   else if (errno == ENOENT)
     cupsdLogMessage(CUPSD_LOG_INFO, "No %s, using defaults.", CupsFilesFile);
   else
   {
-    cupsdLogMessage(CUPSD_LOG_CRIT, "Unable to open %s: %s", CupsFilesFile,
-                    strerror(errno));
+    syslog(LOG_LPR, "Unable to open \"%s\": %s", CupsFilesFile,
+	   strerror(errno));
     return (0);
   }
 
@@ -817,8 +825,8 @@ cupsdReadConfiguration(void)
 
   if ((fp = cupsFileOpen(ConfigurationFile, "r")) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_CRIT, "Unable to open %s: %s", ConfigurationFile,
-                    strerror(errno));
+    syslog(LOG_LPR, "Unable to open \"%s\": %s", ConfigurationFile,
+	   strerror(errno));
     return (0);
   }
 
@@ -827,7 +835,15 @@ cupsdReadConfiguration(void)
   cupsFileClose(fp);
 
   if (!status)
+  {
+    if (TestConfigFile)
+      printf("\"%s\" contains errors.\n", ConfigurationFile);
+    else
+      syslog(LOG_LPR, "Unable to read \"%s\" due to errors.",
+	     ConfigurationFile);
+
     return (0);
+  }
 
   RunUser = getuid();
 
@@ -939,6 +955,13 @@ cupsdReadConfiguration(void)
       NumSystemGroups   = 1;
     }
   }
+
+ /*
+  * Make sure ConfigFilePerm and LogFilePerm have sane values...
+  */
+
+  ConfigFilePerm &= 0664;
+  LogFilePerm    &= 0664;
 
  /*
   * Open the system log for cupsd if necessary...
@@ -1101,7 +1124,9 @@ cupsdReadConfiguration(void)
 			     Group, 1, 1) < 0 ||
        cupsdCheckPermissions(ServerRoot, "ssl", 0700, RunUser,
 			     Group, 1, 0) < 0 ||
-       cupsdCheckPermissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
+       cupsdCheckPermissions(ConfigurationFile, NULL, ConfigFilePerm, RunUser,
+			     Group, 0, 0) < 0 ||
+       cupsdCheckPermissions(CupsFilesFile, NULL, ConfigFilePerm, RunUser,
 			     Group, 0, 0) < 0 ||
        cupsdCheckPermissions(ServerRoot, "classes.conf", 0600, RunUser,
 			     Group, 0, 0) < 0 ||
@@ -3296,6 +3321,40 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 			"line %d.", value, linenum);
     }
 #endif /* HAVE_SSL */
+    else if (!_cups_strcasecmp(line, "AccessLog") ||
+             !_cups_strcasecmp(line, "CacheDir") ||
+             !_cups_strcasecmp(line, "ConfigFilePerm") ||
+             !_cups_strcasecmp(line, "DataDir") ||
+             !_cups_strcasecmp(line, "DocumentRoot") ||
+             !_cups_strcasecmp(line, "ErrorLog") ||
+             !_cups_strcasecmp(line, "FatalErrors") ||
+             !_cups_strcasecmp(line, "FileDevice") ||
+             !_cups_strcasecmp(line, "FontPath") ||
+             !_cups_strcasecmp(line, "Group") ||
+             !_cups_strcasecmp(line, "LogFilePerm") ||
+             !_cups_strcasecmp(line, "LPDConfigFile") ||
+             !_cups_strcasecmp(line, "PageLog") ||
+             !_cups_strcasecmp(line, "Printcap") ||
+             !_cups_strcasecmp(line, "PrintcapFormat") ||
+             !_cups_strcasecmp(line, "RemoteRoot") ||
+             !_cups_strcasecmp(line, "RequestRoot") ||
+             !_cups_strcasecmp(line, "ServerBin") ||
+             !_cups_strcasecmp(line, "ServerCertificate") ||
+             !_cups_strcasecmp(line, "ServerKey") ||
+             !_cups_strcasecmp(line, "ServerRoot") ||
+             !_cups_strcasecmp(line, "SMBConfigFile") ||
+             !_cups_strcasecmp(line, "StateDir") ||
+             !_cups_strcasecmp(line, "SystemGroup") ||
+             !_cups_strcasecmp(line, "SystemGroupAuthKey") ||
+             !_cups_strcasecmp(line, "TempDir") ||
+	     !_cups_strcasecmp(line, "User"))
+    {
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "Please move \"%s%s%s\" on line %d of %s to the %s file; "
+		      "this will become an error in a future release.",
+		      line, value ? " " : "", value ? value : "", linenum,
+		      ConfigurationFile, CupsFilesFile);
+    }
     else
       parse_variable(ConfigurationFile, linenum, line, value,
                      sizeof(cupsd_vars) / sizeof(cupsd_vars[0]), cupsd_vars);

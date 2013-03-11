@@ -110,6 +110,7 @@ install-exec:
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(FILTERS); do \
 			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
 		done \
 	fi
 

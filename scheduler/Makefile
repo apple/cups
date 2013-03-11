@@ -224,6 +224,7 @@ install-exec:
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(PROGRAMS); do \
 			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
 		done \
 	fi
 

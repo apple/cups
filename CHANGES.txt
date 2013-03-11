@@ -1,11 +1,17 @@
-CHANGES.txt - 1.7b1 - 2012-11-15
+CHANGES.txt - 1.7b1 - 2013-01-30
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- Added a new "-x" option to the cancel command (STR #4103)
+	- Added new ippCreateRequestedArray API for generating a array of
+	  attributes from the requested-attributes attribute.
+	- The ipptool utility now supports compression, conditional tests based
+	  on the presence of files, and new DEFINE predicates for STATUS.
 	- Added new IPP APIs for checking values (STR #4167)
 	- Added new IPP APis for adding and setting formatted strings.
 	- Added new HTTP APIs to support basic server functionality via libcups.
+	- The dnssd backend now generates a 1284 device ID as needed (STR #3702)
 	- CUPS now supports compressing and decompressing streamed data
 	  (STR #4168)
 	- CUPS now supports higher-level PIN printing, external accounting

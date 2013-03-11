@@ -3,7 +3,7 @@
  *
  *   cups-lpd test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -42,11 +42,11 @@
  */
 
 static int	do_command(int outfd, int infd, const char *command);
-static int	print_job(int outfd, int infd, char *dest, char **args);
+static int	print_job(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
 static int	print_waiting(int outfd, int infd, char *dest);
-static int	remove_job(int outfd, int infd, char *dest, char **args);
-static int	status_long(int outfd, int infd, char *dest, char **args);
-static int	status_short(int outfd, int infd, char *dest, char **args);
+static int	remove_job(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
+static int	status_long(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
+static int	status_short(int outfd, int infd, char *dest, char **args) __attribute__((nonnull(4)));
 static void	usage(void) __attribute__((noreturn));
 
 
@@ -76,7 +76,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   op              = NULL;
-  opargs          = NULL;
+  opargs          = argv + argc;
   dest            = NULL;
   cupslpd_argc    = 1;
   cupslpd_argv[0] = (char *)"cups-lpd";

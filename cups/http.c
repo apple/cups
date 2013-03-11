@@ -133,6 +133,8 @@
  *   http_set_wait()		  - Set the default wait value for reads.
  *   http_setup_ssl()		  - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()	  - Shut down SSL/TLS on a connection.
+ *   http_state_string()          - Return the string associated with a given
+ *                                  HTTP state.
  *   http_upgrade()		  - Force upgrade to TLS encryption.
  *   http_write()		  - Write a buffer to a HTTP connection.
  *   http_write_chunk() 	  - Write a chunked buffer.
@@ -194,6 +196,9 @@ static int		http_set_credentials(http_t *http);
 static off_t		http_set_length(http_t *http);
 static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
+#ifdef DEBUG
+static const char	*http_state_string(http_state_t state);
+#endif /* DEBUG */
 #ifdef HAVE_SSL
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
@@ -239,28 +244,6 @@ static const char * const http_fields[] =
 			  "Allow",
 			  "Server"
 			};
-#ifdef DEBUG
-static const char * const http_states[] =
-			{
-			  "HTTP_STATE_ERROR",
-			  "HTTP_STATE_WAITING",
-			  "HTTP_STATE_OPTIONS",
-			  "HTTP_STATE_GET",
-			  "HTTP_STATE_GET_SEND",
-			  "HTTP_STATE_HEAD",
-			  "HTTP_STATE_POST",
-			  "HTTP_STATE_POST_RECV",
-			  "HTTP_STATE_POST_SEND",
-			  "HTTP_STATE_PUT",
-			  "HTTP_STATE_PUT_RECV",
-			  "HTTP_STATE_DELETE",
-			  "HTTP_STATE_TRACE",
-			  "HTTP_STATE_CONNECT",
-			  "HTTP_STATE_STATUS",
-			  "HTTP_STATE_UNKNOWN_METHOD",
-			  "HTTP_STATE_UNKNOWN_VERSION"
-			};
-#endif /* DEBUG */
 
 
 #if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
@@ -591,7 +574,7 @@ http_t *				/* O - New HTTP connection */
 httpConnect(const char *host,		/* I - Host to connect to */
             int        port)		/* I - Port number */
 {
-  return (httpConnect2(host, port, NULL, AF_UNSPEC, HTTP_ENCRYPT_IF_REQUESTED,
+  return (httpConnect2(host, port, NULL, AF_UNSPEC, HTTP_ENCRYPTION_IF_REQUESTED,
                        1, 30000, NULL));
 }
 
@@ -804,7 +787,7 @@ int					/* O - Status of call (0 = success) */
 httpDelete(http_t     *http,		/* I - Connection to server */
            const char *uri)		/* I - URI to delete */
 {
-  return (http_send(http, HTTP_DELETE, uri));
+  return (http_send(http, HTTP_STATE_DELETE, uri));
 }
 
 
@@ -846,15 +829,15 @@ httpEncryption(http_t            *http,	/* I - Connection to server */
 
   http->encryption = e;
 
-  if ((http->encryption == HTTP_ENCRYPT_ALWAYS && !http->tls) ||
-      (http->encryption == HTTP_ENCRYPT_NEVER && http->tls))
-    return (httpReconnect(http));
-  else if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
+  if ((http->encryption == HTTP_ENCRYPTION_ALWAYS && !http->tls) ||
+      (http->encryption == HTTP_ENCRYPTION_NEVER && http->tls))
+    return (httpReconnect2(http, 30000, NULL));
+  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
     return (http_upgrade(http));
   else
     return (0);
 #else
-  if (e == HTTP_ENCRYPT_ALWAYS || e == HTTP_ENCRYPT_REQUIRED)
+  if (e == HTTP_ENCRYPTION_ALWAYS || e == HTTP_ENCRYPTION_REQUIRED)
     return (-1);
   else
     return (0);
@@ -889,7 +872,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Nothing to do if we are in the "waiting" state...
@@ -1056,7 +1039,7 @@ int					/* O - Status of call (0 = success) */
 httpGet(http_t     *http,		/* I - Connection to server */
         const char *uri)		/* I - URI to get */
 {
-  return (http_send(http, HTTP_GET, uri));
+  return (http_send(http, HTTP_STATE_GET, uri));
 }
 
 
@@ -1311,7 +1294,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
 
 
   DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if (!http)
     return (-1);
@@ -1338,7 +1321,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
       * and 2^31-1 for other successful requests...
       */
 
-      if (http->status >= HTTP_MULTIPLE_CHOICES ||
+      if (http->status >= HTTP_STATUS_MULTIPLE_CHOICES ||
           http->state == HTTP_STATE_OPTIONS ||
           (http->state == HTTP_STATE_GET && http->mode == _HTTP_MODE_SERVER) ||
           http->state == HTTP_STATE_HEAD ||
@@ -1556,7 +1539,7 @@ httpGetState(http_t *http)		/* I - Connection to server */
 http_status_t				/* O - HTTP status */
 httpGetStatus(http_t *http)		/* I - Connection to server */
 {
-  return (http ? http->status : HTTP_ERROR);
+  return (http ? http->status : HTTP_STATUS_ERROR);
 }
 
 
@@ -1728,7 +1711,7 @@ httpHead(http_t     *http,		/* I - Connection to server */
          const char *uri)		/* I - URI for head */
 {
   DEBUG_printf(("httpHead(http=%p, uri=\"%s\")", http, uri));
-  return (http_send(http, HTTP_HEAD, uri));
+  return (http_send(http, HTTP_STATE_HEAD, uri));
 }
 
 
@@ -1822,7 +1805,7 @@ int					/* O - Status of call (0 = success) */
 httpOptions(http_t     *http,		/* I - Connection to server */
             const char *uri)		/* I - URI for options */
 {
-  return (http_send(http, HTTP_OPTIONS, uri));
+  return (http_send(http, HTTP_STATE_OPTIONS, uri));
 }
 
 
@@ -1910,10 +1893,10 @@ httpPeek(http_t *http,			/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpPeek: 0-length chunk, set state to %s.",
-                  http_states[http->state + 1]));
+                  http_state_string(http->state)));
 
    /*
     * Prevent future reads for this request...
@@ -2095,7 +2078,7 @@ int					/* O - Status of call (0 = success) */
 httpPost(http_t     *http,		/* I - Connection to server */
          const char *uri)		/* I - URI for post */
 {
-  return (http_send(http, HTTP_POST, uri));
+  return (http_send(http, HTTP_STATE_POST, uri));
 }
 
 
@@ -2149,7 +2132,7 @@ httpPut(http_t     *http,		/* I - Connection to server */
         const char *uri)		/* I - URI to put */
 {
   DEBUG_printf(("httpPut(http=%p, uri=\"%s\")", http, uri));
-  return (http_send(http, HTTP_PUT, uri));
+  return (http_send(http, HTTP_STATE_PUT, uri));
 }
 
 
@@ -2286,6 +2269,18 @@ httpRead2(http_t *http,			/* I - Connection to server */
           http->data_remaining  -= bytes;
           http->stream.avail_in += bytes;
 
+	  if (http->data_remaining <= 0 &&
+	      http->data_encoding == HTTP_ENCODING_CHUNKED)
+	  {
+	   /*
+	    * Read the trailing blank line now...
+	    */
+
+	    char	len[32];		/* Length string */
+
+	    httpGets(len, sizeof(len), http);
+	  }
+
           bytes = 0;
         }
         else
@@ -2299,7 +2294,20 @@ httpRead2(http_t *http,			/* I - Connection to server */
   if (http->data_remaining == 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
   {
     if ((bytes = http_read_chunk(http, buffer, length)) > 0)
+    {
       http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0)
+      {
+       /*
+        * Read the trailing blank line now...
+        */
+
+        char	len[32];		/* Length string */
+
+        httpGets(len, sizeof(len), http);
+      }
+    }
   }
   else if (http->data_remaining <= 0)
   {
@@ -2318,7 +2326,21 @@ httpRead2(http_t *http,			/* I - Connection to server */
       length = (size_t)http->data_remaining;
 
     if ((bytes = http_read_buffered(http, buffer, length)) > 0)
+    {
       http->data_remaining -= bytes;
+
+      if (http->data_remaining <= 0 &&
+          http->data_encoding == HTTP_ENCODING_CHUNKED)
+      {
+       /*
+        * Read the trailing blank line now...
+        */
+
+        char	len[32];		/* Length string */
+
+        httpGets(len, sizeof(len), http);
+      }
+    }
   }
 
   if (
@@ -2337,10 +2359,10 @@ httpRead2(http_t *http,			/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpRead2: End of content, set state to %s.",
-		  http_states[http->state + 1]));
+		  http_state_string(http->state)));
   }
 
   return (bytes);
@@ -2490,7 +2512,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else if (http->state != HTTP_STATE_WAITING)
   {
     DEBUG_printf(("1httpReadRequest: Bad state %s, returning HTTP_STATE_ERROR.",
-                  http_states[http->state + 1]));
+                  http_state_string(http->state)));
     return (HTTP_STATE_ERROR);
   }
 
@@ -2589,7 +2611,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   }
 
   DEBUG_printf(("1httpReadRequest: Set state to %s.",
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if (!strcmp(req_version, "HTTP/1.0"))
   {
@@ -2654,7 +2676,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 
   if (!http)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (-1);
   }
 
@@ -2688,14 +2710,12 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   */
 
   http->state           = HTTP_STATE_WAITING;
-  http->status          = HTTP_STATUS_CONTINUE;
   http->version         = HTTP_VERSION_1_1;
   http->keep_alive      = HTTP_KEEPALIVE_OFF;
   memset(&http->_hostaddr, 0, sizeof(http->_hostaddr));
   http->data_encoding   = HTTP_ENCODING_FIELDS;
   http->_data_remaining = 0;
   http->used            = 0;
-  http->expect          = 0;
   http->data_remaining  = 0;
   http->hostaddr        = NULL;
   http->wused           = 0;
@@ -2723,7 +2743,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
 #else
     http->error  = errno;
 #endif /* WIN32 */
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
 
     DEBUG_printf(("1httpReconnect2: httpAddrConnect failed: %s",
                   strerror(http->error)));
@@ -2740,7 +2760,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
   http->error    = 0;
 
 #ifdef HAVE_SSL
-  if (http->encryption == HTTP_ENCRYPT_ALWAYS)
+  if (http->encryption == HTTP_ENCRYPTION_ALWAYS)
   {
    /*
     * Always do encryption via SSL.
@@ -2757,7 +2777,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
       return (-1);
     }
   }
-  else if (http->encryption == HTTP_ENCRYPT_REQUIRED)
+  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls_upgrade)
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
 
@@ -2937,8 +2957,10 @@ httpSetDefaultField(http_t       *http,	/* I - Connection to server */
 void
 httpSetExpect(http_t        *http,	/* I - Connection to server */
               http_status_t expect)	/* I - HTTP status to expect
-              				       (@code HTTP_CONTINUE@) */
+              				       (@code HTTP_STATUS_CONTINUE@) */
 {
+  DEBUG_printf(("httpSetExpect(http=%p, expect=%d)", http, expect));
+
   if (http)
     http->expect = expect;
 }
@@ -3121,7 +3143,7 @@ int					/* O - Status of call (0 = success) */
 httpTrace(http_t     *http,		/* I - Connection to server */
           const char *uri)		/* I - URI for trace */
 {
-  return (http_send(http, HTTP_TRACE, uri));
+  return (http_send(http, HTTP_STATE_TRACE, uri));
 }
 
 
@@ -3143,7 +3165,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
 
   DEBUG_printf(("_httpUpdate(http=%p, status=%p), state=%s", http, status,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Grab a single line from the connection...
@@ -3151,7 +3173,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
   if (!httpGets(line, sizeof(line), http))
   {
-    *status = HTTP_ERROR;
+    *status = HTTP_STATUS_ERROR;
     return (0);
   }
 
@@ -3174,11 +3196,11 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
       return (0);
     }
 
-    if (http->status < HTTP_BAD_REQUEST)
+    if (http->status < HTTP_STATUS_BAD_REQUEST)
       http->digest_tries = 0;
 
 #ifdef HAVE_SSL
-    if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
+    if (http->status == HTTP_STATUS_SWITCHING_PROTOCOLS && !http->tls)
     {
       if (http_setup_ssl(http) != 0)
       {
@@ -3188,7 +3210,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 	close(http->fd);
 #  endif /* WIN32 */
 
-	*status = http->status = HTTP_ERROR;
+	*status = http->status = HTTP_STATUS_ERROR;
 	return (0);
       }
 
@@ -3201,7 +3223,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
     {
       DEBUG_puts("1_httpUpdate: Bad Content-Length.");
       http->error  = EINVAL;
-      http->status = *status = HTTP_ERROR;
+      http->status = *status = HTTP_STATUS_ERROR;
       return (0);
     }
 
@@ -3214,7 +3236,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 	  http->state ++;
 
 	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
-	                http_states[http->state + 1]));
+	                http_state_string(http->state)));
 
       case HTTP_STATE_POST_SEND :
       case HTTP_STATE_HEAD :
@@ -3223,8 +3245,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
       default :
 	  http->state = HTTP_STATE_WAITING;
 
-	  DEBUG_puts("1_httpUpdate: Unknown state, reset state to "
-	             "HTTP_STATE_WAITING.");
+	  DEBUG_puts("1_httpUpdate: Reset state to HTTP_STATE_WAITING.");
 	  break;
     }
 
@@ -3247,7 +3268,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
 
     if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &intstatus) != 3)
     {
-      *status = http->status = HTTP_ERROR;
+      *status = http->status = HTTP_STATUS_ERROR;
       return (0);
     }
 
@@ -3299,7 +3320,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
   {
     DEBUG_printf(("1_httpUpdate: Bad response line \"%s\"!", line));
     http->error  = EINVAL;
-    http->status = *status = HTTP_ERROR;
+    http->status = *status = HTTP_STATUS_ERROR;
     return (0);
   }
 
@@ -3318,7 +3339,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
  /*
   * Flush pending data, if any...
@@ -3329,7 +3350,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
     DEBUG_puts("2httpUpdate: flushing buffer...");
 
     if (httpFlushWrite(http) < 0)
-      return (HTTP_ERROR);
+      return (HTTP_STATUS_ERROR);
   }
 
  /*
@@ -3337,7 +3358,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   */
 
   if (http->state == HTTP_STATE_WAITING)
-    return (HTTP_CONTINUE);
+    return (HTTP_STATUS_CONTINUE);
 
  /*
   * Grab all of the lines we can from the connection...
@@ -3349,7 +3370,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   * See if there was an error...
   */
 
-  if (http->error == EPIPE && http->status > HTTP_CONTINUE)
+  if (http->error == EPIPE && http->status > HTTP_STATUS_CONTINUE)
   {
     DEBUG_printf(("1httpUpdate: Returning status %d...", http->status));
     return (http->status);
@@ -3359,8 +3380,8 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   {
     DEBUG_printf(("1httpUpdate: socket error %d - %s", http->error,
                   strerror(http->error)));
-    http->status = HTTP_ERROR;
-    return (HTTP_ERROR);
+    http->status = HTTP_STATUS_ERROR;
+    return (HTTP_STATUS_ERROR);
   }
 
  /*
@@ -3718,10 +3739,10 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
     else
-      http->state = HTTP_STATE_WAITING;
+      http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("2httpWrite2: Changed state to %s.",
-		  http_states[http->state + 1]));
+		  http_state_string(http->state)));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -3839,7 +3860,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   if (!http->fields[HTTP_FIELD_DATE][0])
     httpSetField(http, HTTP_FIELD_DATE, httpGetDateString(time(NULL)));
 
-  if (status >= HTTP_BAD_REQUEST && http->keep_alive)
+  if (status >= HTTP_STATUS_BAD_REQUEST && http->keep_alive)
   {
     http->keep_alive = 0;
     httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "");
@@ -3928,7 +3949,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
       if (httpPrintf(http, "Set-Cookie: %s path=/%s\r\n", http->cookie,
                      http->tls ? " secure" : "") < 1)
       {
-	http->status = HTTP_ERROR;
+	http->status = HTTP_STATUS_ERROR;
 	return (-1);
       }
     }
@@ -3936,13 +3957,13 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   if (httpWrite2(http, "\r\n", 2) < 2)
   {
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
     return (-1);
   }
 
   if (httpFlushWrite(http) < 0)
   {
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
     return (-1);
   }
 
@@ -3964,10 +3985,11 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
            http->state == HTTP_STATE_HEAD ||
            http->state == HTTP_STATE_PUT ||
            http->state == HTTP_STATE_TRACE ||
-           http->state == HTTP_STATE_CONNECT)
+           http->state == HTTP_STATE_CONNECT ||
+           http->state == HTTP_STATE_STATUS)
   {
     DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
-                  "was %s.", http_states[http->state + 1]));
+                  "was %s.", http_state_string(http->state)));
     http->state = HTTP_STATE_WAITING;
   }
   else
@@ -4217,10 +4239,12 @@ http_content_coding_start(
   }
   else if (!strcmp(value, "x-gzip") || !strcmp(value, "gzip"))
   {
-    if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
+    if (http->state == HTTP_STATE_GET_SEND ||
+        http->state == HTTP_STATE_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
-    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV ||
+             http->state == HTTP_STATE_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_GZIP :
                                                  _HTTP_CODING_GUNZIP;
     else
@@ -4231,10 +4255,12 @@ http_content_coding_start(
   }
   else if (!strcmp(value, "x-deflate") || !strcmp(value, "deflate"))
   {
-    if (http->state == HTTP_GET_SEND || http->state == HTTP_POST_SEND)
+    if (http->state == HTTP_STATE_GET_SEND ||
+        http->state == HTTP_STATE_POST_SEND)
       coding = http->mode == _HTTP_MODE_SERVER ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
-    else if (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV)
+    else if (http->state == HTTP_STATE_POST_RECV ||
+             http->state == HTTP_STATE_PUT_RECV)
       coding = http->mode == _HTTP_MODE_CLIENT ? _HTTP_CODING_DEFLATE :
                                                  _HTTP_CODING_INFLATE;
     else
@@ -4269,7 +4295,7 @@ http_content_coding_start(
 				 coding == _HTTP_CODING_DEFLATE ? -11 : 27, 7,
 				 Z_DEFAULT_STRATEGY)) < Z_OK)
         {
-          http->status = HTTP_ERROR;
+          http->status = HTTP_STATUS_ERROR;
           http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
@@ -4279,7 +4305,7 @@ http_content_coding_start(
     case _HTTP_CODING_GUNZIP :
         if ((http->dbuffer = malloc(HTTP_MAX_BUFFER)) == NULL)
         {
-          http->status = HTTP_ERROR;
+          http->status = HTTP_STATUS_ERROR;
           http->error  = errno;
           return;
         }
@@ -4295,7 +4321,7 @@ http_content_coding_start(
         {
           free(http->dbuffer);
           http->dbuffer = NULL;
-          http->status  = HTTP_ERROR;
+          http->status  = HTTP_STATUS_ERROR;
           http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
@@ -4368,7 +4394,7 @@ http_create(
 
   if ((http = calloc(sizeof(http_t), 1)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     httpAddrFreeList(addrlist);
     return (NULL);
   }
@@ -4386,6 +4412,7 @@ http_create(
   http->gssctx   = GSS_C_NO_CONTEXT;
   http->gssname  = GSS_C_NO_NAME;
 #endif /* HAVE_GSSAPI */
+  http->status   = HTTP_STATUS_CONTINUE;
   http->version  = HTTP_VERSION_1_1;
 
   if (host)
@@ -4835,7 +4862,7 @@ http_send(http_t       *http,		/* I - Connection to server */
 		};
 
 
-  DEBUG_printf(("7http_send(http=%p, request=HTTP_%s, uri=\"%s\")",
+  DEBUG_printf(("4http_send(http=%p, request=HTTP_%s, uri=\"%s\")",
                 http, codes[request], uri));
 
   if (http == NULL || uri == NULL)
@@ -4871,10 +4898,15 @@ http_send(http_t       *http,		/* I - Connection to server */
   * See if we had an error the last time around; if so, reconnect...
   */
 
-  if (http->fd < 0 || http->status == HTTP_ERROR ||
-      http->status >= HTTP_BAD_REQUEST)
-    if (httpReconnect(http))
+  if (http->fd < 0 || http->status == HTTP_STATUS_ERROR ||
+      http->status >= HTTP_STATUS_BAD_REQUEST)
+  {
+    DEBUG_printf(("5http_send: Reconnecting, fd=%d, status=%d, tls_upgrade=%d",
+                  http->fd, http->status, http->tls_upgrade));
+
+    if (httpReconnect2(http, 30000, NULL))
       return (-1);
+  }
 
  /*
   * Flush any written data that is pending...
@@ -4883,7 +4915,7 @@ http_send(http_t       *http,		/* I - Connection to server */
   if (http->wused)
   {
     if (httpFlushWrite(http) < 0)
-      if (httpReconnect(http))
+      if (httpReconnect2(http, 30000, NULL))
         return (-1);
   }
 
@@ -4894,13 +4926,13 @@ http_send(http_t       *http,		/* I - Connection to server */
   http->state         = request;
   http->data_encoding = HTTP_ENCODING_FIELDS;
 
-  if (request == HTTP_POST || request == HTTP_PUT)
+  if (request == HTTP_STATE_POST || request == HTTP_STATE_PUT)
     http->state ++;
 
-  http->status = HTTP_CONTINUE;
+  http->status = HTTP_STATUS_CONTINUE;
 
 #ifdef HAVE_SSL
-  if (http->encryption == HTTP_ENCRYPT_REQUIRED && !http->tls)
+  if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
   {
     httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
     httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
@@ -4909,27 +4941,27 @@ http_send(http_t       *http,		/* I - Connection to server */
 
   if (httpPrintf(http, "%s %s HTTP/1.1\r\n", codes[request], buf) < 1)
   {
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
     return (-1);
   }
 
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
     if ((value = httpGetField(http, i)) != NULL && *value)
     {
-      DEBUG_printf(("9http_send: %s: %s", http_fields[i], value));
+      DEBUG_printf(("5http_send: %s: %s", http_fields[i], value));
 
       if (i == HTTP_FIELD_HOST)
       {
 	if (httpPrintf(http, "Host: %s:%d\r\n", value,
 	               httpAddrPort(http->hostaddr)) < 1)
 	{
-	  http->status = HTTP_ERROR;
+	  http->status = HTTP_STATUS_ERROR;
 	  return (-1);
 	}
       }
       else if (httpPrintf(http, "%s: %s\r\n", http_fields[i], value) < 1)
       {
-	http->status = HTTP_ERROR;
+	http->status = HTTP_STATUS_ERROR;
 	return (-1);
       }
     }
@@ -4937,21 +4969,25 @@ http_send(http_t       *http,		/* I - Connection to server */
   if (http->cookie)
     if (httpPrintf(http, "Cookie: $Version=0; %s\r\n", http->cookie) < 1)
     {
-      http->status = HTTP_ERROR;
+      http->status = HTTP_STATUS_ERROR;
       return (-1);
     }
 
-  if (http->expect == HTTP_CONTINUE && http->mode == _HTTP_MODE_CLIENT &&
-      (http->state == HTTP_STATE_POST_RECV || http->state == HTTP_PUT_RECV))
+  DEBUG_printf(("5http_send: expect=%d, mode=%d, state=%d", http->expect,
+                http->mode, http->state));
+
+  if (http->expect == HTTP_STATUS_CONTINUE && http->mode == _HTTP_MODE_CLIENT &&
+      (http->state == HTTP_STATE_POST_RECV ||
+       http->state == HTTP_STATE_PUT_RECV))
     if (httpPrintf(http, "Expect: 100-continue\r\n") < 1)
     {
-      http->status = HTTP_ERROR;
+      http->status = HTTP_STATUS_ERROR;
       return (-1);
     }
 
   if (httpPrintf(http, "\r\n") < 1)
   {
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
     return (-1);
   }
 
@@ -5031,7 +5067,7 @@ http_set_length(http_t *http)		/* I - Connection */
 
 
   DEBUG_printf(("http_set_length(http=%p) mode=%d state=%s", http, http->mode,
-                http_states[http->state + 1]));
+                http_state_string(http->state)));
 
   if ((remaining = httpGetLength2(http)) >= 0)
   {
@@ -5212,7 +5248,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #    else
     http->error  = errno;
 #    endif /* WIN32 */
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
 
     if (!message)
       message = _("Unable to establish a secure connection to host.");
@@ -5230,8 +5266,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     DEBUG_printf(("8http_setup_ssl: Unable to allocate credentials: %s",
                   strerror(errno)));
     http->error  = errno;
-    http->status = HTTP_ERROR;
-    _cupsSetHTTPError(HTTP_ERROR);
+    http->status = HTTP_STATUS_ERROR;
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
 
     return (-1);
   }
@@ -5255,7 +5291,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     if (gnutls_error_is_fatal(status))
     {
       http->error  = EIO;
-      http->status = HTTP_ERROR;
+      http->status = HTTP_STATUS_ERROR;
 
       _cupsSetError(IPP_PKI_ERROR, gnutls_strerror(status), 0);
 
@@ -5276,8 +5312,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   {
     DEBUG_puts("4http_setup_ssl: SSLCreateContext failed.");
     http->error  = errno = ENOMEM;
-    http->status = HTTP_ERROR;
-    _cupsSetHTTPError(HTTP_ERROR);
+    http->status = HTTP_STATUS_ERROR;
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
 
     return (-1);
   }
@@ -5457,7 +5493,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   if (error)
   {
     http->error  = error;
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
     errno        = ECONNREFUSED;
 
     CFRelease(http->tls);
@@ -5474,7 +5510,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       message = _("Unable to establish a secure connection to host.");
 #endif /* HAVE_CSSMERRORSTRING */
 
-    _cupsSetError(IPP_PKI_ERROR, message, 1);
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, message, 1);
 
     return (-1);
   }
@@ -5484,7 +5520,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!http->tls)
   {
-    _cupsSetHTTPError(HTTP_ERROR);
+    _cupsSetHTTPError(HTTP_STATUS_ERROR);
     return (-1);
   }
 
@@ -5501,7 +5537,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->tls_credentials = NULL;
 
     http->error  = EIO;
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
 
     _cupsSetError(IPP_PKI_ERROR,
                   _("Unable to establish a secure connection to host."), 1);
@@ -5518,7 +5554,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->tls_credentials = NULL;
 
     http->error  = EIO;
-    http->status = HTTP_ERROR;
+    http->status = HTTP_STATUS_ERROR;
 
     _cupsSetError(IPP_PKI_ERROR,
                   _("Unable to establish a secure connection to host."), 1);
@@ -5577,6 +5613,45 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
 #endif /* HAVE_SSL */
 
 
+#ifdef DEBUG
+/*
+ * 'http_state_string()' - Return the string associated with a given HTTP state.
+ */
+
+static const char *			/* O - State string */
+http_state_string(http_state_t state)	/* I - HTTP state */
+{
+  static char buffer[255];		/* Unknown value buffer */
+  static const char * const states[] =	/* State strings */
+  {
+    "HTTP_STATE_ERROR",
+    "HTTP_STATE_WAITING",
+    "HTTP_STATE_OPTIONS",
+    "HTTP_STATE_GET",
+    "HTTP_STATE_GET_SEND",
+    "HTTP_STATE_HEAD",
+    "HTTP_STATE_POST",
+    "HTTP_STATE_POST_RECV",
+    "HTTP_STATE_POST_SEND",
+    "HTTP_STATE_PUT",
+    "HTTP_STATE_PUT_RECV",
+    "HTTP_STATE_DELETE",
+    "HTTP_STATE_TRACE",
+    "HTTP_STATE_CONNECT",
+    "HTTP_STATE_STATUS",
+    "HTTP_STATE_UNKNOWN_METHOD",
+    "HTTP_STATE_UNKNOWN_VERSION"
+  };
+
+  if (state >= HTTP_STATE_ERROR && state <= HTTP_STATE_UNKNOWN_VERSION)
+    return (states[state - HTTP_STATE_ERROR]);
+
+  snprintf(buffer, sizeof(buffer), "??? %d ???", (int)state);
+  return (buffer);
+}
+#endif /* DEBUG */
+
+
 #ifdef HAVE_SSL
 /*
  * 'http_upgrade()' - Force upgrade to TLS encryption.
@@ -5610,6 +5685,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
   * encryption on the link...
   */
 
+  http->tls_upgrade         = 1;
   http->field_authorization = NULL;	/* Don't free the auth string */
 
   httpClearFields(http);
@@ -5622,7 +5698,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
     * Wait for the secure connection...
     */
 
-    while (httpUpdate(http) == HTTP_CONTINUE);
+    while (httpUpdate(http) == HTTP_STATUS_CONTINUE);
   }
 
  /*
@@ -5636,6 +5712,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
   http->expect              = myhttp.expect;
   http->field_authorization = myhttp.field_authorization;
   http->digest_tries        = myhttp.digest_tries;
+  http->tls_upgrade         = 0;
 
  /*
   * See if we actually went secure...

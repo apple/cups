@@ -638,6 +638,9 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
   {
     ch = *src++;
 
+    if (ch == '/' && !*src)
+      break;				/* Don't add trailing slash */
+
     if (strchr(".?*()[]^$\\", ch))
       *dstptr++ = '\\';
 

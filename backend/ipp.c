@@ -2042,7 +2042,8 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (have_supplies &&
-      !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
+      !backendSNMPSupplies(snmp_fd, &(http->addrlist->addr), &page_count,
+                           NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 

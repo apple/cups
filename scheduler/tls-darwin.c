@@ -40,7 +40,7 @@ cupsdEndTLS(cupsd_client_t *con)	/* I - Client connection */
   while (SSLClose(con->http.tls) == errSSLWouldBlock)
     usleep(1000);
 
-  SSLDisposeContext(con->http.tls);
+  CFRelease(con->http.tls);
   con->http.tls = NULL;
 
   if (con->http.tls_credentials)
@@ -58,7 +58,7 @@ int					/* O - 1 on success, 0 on error */
 cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
 {
   OSStatus	error = 0;		/* Error code */
-  CFArrayRef	peerCerts;		/* Peer certificates */
+  SecTrustRef	peerTrust;		/* Peer certificates */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
@@ -85,19 +85,14 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   }
 
   if (!error)
-    error = SSLNewContext(true, &con->http.tls);
+    con->http.tls = SSLCreateContext(kCFAllocatorDefault, kSSLServerSide,
+                                     kSSLStreamType);
 
   if (!error)
     error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
     error = SSLSetConnection(con->http.tls, HTTP(con));
-
-  if (!error)
-    error = SSLSetAllowsExpiredCerts(con->http.tls, true);
-
-  if (!error)
-    error = SSLSetAllowsAnyRoot(con->http.tls, true);
 
   if (!error)
     error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
@@ -123,7 +118,7 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
 
     if (con->http.tls)
     {
-      SSLDisposeContext(con->http.tls);
+      CFRelease(con->http.tls);
       con->http.tls = NULL;
     }
 
@@ -139,11 +134,11 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
                   con->http.hostname);
 
-  if (!SSLCopyPeerCertificates(con->http.tls, &peerCerts) && peerCerts)
+  if (!SSLCopyPeerTrust(con->http.tls, &peerTrust) && peerTrust)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
-		    (int)CFArrayGetCount(peerCerts));
-    CFRelease(peerCerts);
+		    (int)SecTrustGetCertificateCount(peerTrust));
+    CFRelease(peerTrust);
   }
   else
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates!");
@@ -167,7 +162,6 @@ copy_cdsa_certificate(
   SecIdentityRef	identity = NULL;/* Identity */
   CFArrayRef		certificates = NULL;
 					/* Certificate array */
-#  if HAVE_SECPOLICYCREATESSL
   SecPolicyRef		policy = NULL;	/* Policy ref */
   CFStringRef		servername = NULL;
 					/* Server name */
@@ -176,15 +170,6 @@ copy_cdsa_certificate(
 #    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   char			localname[1024];/* Local hostname */
 #    endif /* HAVE_DNSSD || HAVE_AVAHI */
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  SecPolicySearchRef	policy_search = NULL;
-					/* Policy search ref */
-  CSSM_DATA		options;	/* Policy options */
-  CSSM_APPLE_TP_SSL_OPTIONS
-			ssl_options;	/* SSL Option for hostname */
-  char			localname[1024];/* Local hostname */
-#  endif /* HAVE_SECPOLICYCREATESSL */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -198,7 +183,6 @@ copy_cdsa_certificate(
     goto cleanup;
   }
 
-#  if HAVE_SECPOLICYCREATESSL
   servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
 					 kCFStringEncodingUTF8);
 
@@ -278,121 +262,6 @@ copy_cdsa_certificate(
     goto cleanup;
   }
 
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
- /*
-  * Use a policy to search for valid certificates whose common name matches the
-  * servername...
-  */
-
-  if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL,
-			    NULL, &policy_search))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
-    goto cleanup;
-  }
-
-  if (SecPolicySearchCopyNext(policy_search, &policy))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot find a policy to use for searching");
-    goto cleanup;
-  }
-
-  memset(&ssl_options, 0, sizeof(ssl_options));
-  ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
-  ssl_options.ServerName = con->servername;
-  ssl_options.ServerNameLen = strlen(con->servername);
-
-  options.Data = (uint8 *)&ssl_options;
-  options.Length = sizeof(ssl_options);
-
-  if (SecPolicySetValue(policy, &options))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot set policy value to use for searching");
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Cannot create identity search reference: %s (%d)",
-		    cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-  err = SecIdentitySearchCopyNext(search, &identity);
-
-#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    ssl_options.ServerName    = localname;
-    ssl_options.ServerNameLen = strlen(localname);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "copy_cdsa_certificate: Looking for certs for \"%s\"...",
-		    localname);
-
-    if (SecPolicySetValue(policy, &options))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot set policy value to use for searching");
-      goto cleanup;
-    }
-
-    CFRelease(search);
-    search = NULL;
-    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
-					       keychain, FALSE, &search)))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Cannot create identity search reference: %s (%d)",
-		      cssmErrorString(err), (int)err);
-      goto cleanup;
-    }
-
-    err = SecIdentitySearchCopyNext(search, &identity);
-
-  }
-#    endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-#  else
- /*
-  * Assume there is exactly one SecIdentity in the keychain...
-  */
-
-  if ((err = SecIdentitySearchCreate(keychain, CSSM_KEYUSE_SIGN, &search)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot create identity search reference (%d)", (int)err);
-    goto cleanup;
-  }
-
-  if ((err = SecIdentitySearchCopyNext(search, &identity)))
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-#  endif /* HAVE_SECPOLICYCREATESSL */
-
   if (CFGetTypeID(identity) != SecIdentityGetTypeID())
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "SecIdentity CFTypeID failure!");
@@ -415,17 +284,10 @@ copy_cdsa_certificate(
   if (identity)
     CFRelease(identity);
 
-#  if HAVE_SECPOLICYCREATESSL
   if (policy)
     CFRelease(policy);
   if (query)
     CFRelease(query);
-#  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
-  if (policy)
-    CFRelease(policy);
-  if (policy_search)
-    CFRelease(policy_search);
-#  endif /* HAVE_SECPOLICYCREATESSL */
 
   return (certificates);
 }

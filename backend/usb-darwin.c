@@ -1,7 +1,7 @@
 /*
 * "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $"
 *
-* Copyright 2005-2012 Apple Inc. All rights reserved.
+* Copyright 2005-2013 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -1132,7 +1132,7 @@ static void iterate_printers(iterator_callback_t callBack,
     CFRelease(usb_klass);
     CFRelease(usb_subklass);
 
-    kr = IOServiceAddMatchingNotification(addNotification, kIOMatchedNotification, usbPrinterMatchDictionary, &device_added, &reference, &addIterator);
+    IOServiceAddMatchingNotification(addNotification, kIOMatchedNotification, usbPrinterMatchDictionary, &device_added, &reference, &addIterator);
     if (addIterator != 0x0)
     {
       device_added (&reference, addIterator);
@@ -1171,7 +1171,7 @@ static void device_added(void *userdata,
 
   /* One last call to the call back now that we are not longer have printers left to iterate...
    */
-  if (reference->keepRunning)
+  if (reference->keepRunning && reference->callback)
     reference->keepRunning = reference->callback(reference->userdata, 0x0);
 
   if (!reference->keepRunning)
@@ -1719,7 +1719,7 @@ static void copy_devicestring(io_service_t usbInterface,
 	kr = load_classdriver(NULL, interface, &klassDriver);
 
       if (kr == kIOReturnSuccess && klassDriver != NULL)
-	  kr = copy_deviceid(klassDriver, deviceID);
+	  copy_deviceid(klassDriver, deviceID);
 
       unload_classdriver(&klassDriver);
 

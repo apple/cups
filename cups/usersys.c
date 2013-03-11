@@ -86,7 +86,7 @@ static void	cups_read_client_conf(cups_file_t *fp,
  * The default encryption setting comes from the CUPS_ENCRYPTION
  * environment variable, then the ~/.cups/client.conf file, and finally the
  * /etc/cups/client.conf file. If not set, the default is
- * @code HTTP_ENCRYPT_IF_REQUESTED@.
+ * @code HTTP_ENCRYPTION_IF_REQUESTED@.
  *
  * Note: The current encryption setting is tracked separately for each thread
  * in a program. Multi-threaded programs that override the setting via the
@@ -249,7 +249,7 @@ cupsSetCredentials(
  * The default encryption setting comes from the CUPS_ENCRYPTION
  * environment variable, then the ~/.cups/client.conf file, and finally the
  * /etc/cups/client.conf file. If not set, the default is
- * @code HTTP_ENCRYPT_IF_REQUESTED@.
+ * @code HTTP_ENCRYPTION_IF_REQUESTED@.
  *
  * Note: The current encryption setting is tracked separately for each thread
  * in a program. Multi-threaded programs that override the setting need to do
@@ -1021,13 +1021,13 @@ cups_read_client_conf(
   if (cg->encryption == (http_encryption_t)-1 && cups_encryption)
   {
     if (!_cups_strcasecmp(cups_encryption, "never"))
-      cg->encryption = HTTP_ENCRYPT_NEVER;
+      cg->encryption = HTTP_ENCRYPTION_NEVER;
     else if (!_cups_strcasecmp(cups_encryption, "always"))
-      cg->encryption = HTTP_ENCRYPT_ALWAYS;
+      cg->encryption = HTTP_ENCRYPTION_ALWAYS;
     else if (!_cups_strcasecmp(cups_encryption, "required"))
-      cg->encryption = HTTP_ENCRYPT_REQUIRED;
+      cg->encryption = HTTP_ENCRYPTION_REQUIRED;
     else
-      cg->encryption = HTTP_ENCRYPT_IF_REQUESTED;
+      cg->encryption = HTTP_ENCRYPTION_IF_REQUESTED;
   }
 
   if ((!cg->server[0] || !cg->ipp_port) && cups_server)

@@ -1111,9 +1111,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * Now create processes for all of the filters...
   */
 
-  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			               "cups-insecure-filter-warning");
-
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -1872,6 +1869,12 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 						 fileid);
         }
 
+	if (compressions)
+	  job->compressions = compressions;
+
+	if (filetypes)
+	  job->filetypes = filetypes;
+
         if (!compressions || !filetypes)
 	{
           cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1880,12 +1883,6 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
 	  ippDelete(job->attrs);
 	  job->attrs = NULL;
-
-	  if (compressions)
-	    free(compressions);
-
-	  if (filetypes)
-	    free(filetypes);
 
 	  if (job->compressions)
 	  {
@@ -1903,9 +1900,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  return (0);
 	}
 
-        job->compressions = compressions;
-        job->filetypes    = filetypes;
-	job->num_files    = fileid;
+	job->num_files = fileid;
       }
 
       job->filetypes[fileid - 1] = mimeFileType(MimeDatabase, jobfile, NULL,
@@ -2196,7 +2191,16 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   }
 
   if (!cupsdCloseCreatedConfFile(fp, filename))
+  {
+   /*
+    * Remove backup file and mark this job as clean...
+    */
+
+    strlcat(filename, ".O", sizeof(filename));
+    unlink(filename);
+
     job->dirty = 0;
+  }
 }
 
 
@@ -4154,6 +4158,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
                       line, linenum);
   }
 
+  if (job)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "Missing </Job> directive on line %d.", linenum);
+    cupsdDeleteJob(job, CUPSD_JOB_PURGE);
+  }
+
   cupsFileClose(fp);
 }
 
@@ -4315,10 +4326,7 @@ remove_job_files(cupsd_job_t *job)	/* I - Job */
   {
     snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
 	     job->id, i);
-    if (Classification)
-      cupsdRemoveFile(filename);
-    else
-      unlink(filename);
+    cupsdUnlinkOrRemoveFile(filename);
   }
 
   free(job->filetypes);
@@ -4349,10 +4357,7 @@ remove_job_history(cupsd_job_t *job)	/* I - Job */
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot,
 	   job->id);
-  if (Classification)
-    cupsdRemoveFile(filename);
-  else
-    unlink(filename);
+  cupsdUnlinkOrRemoveFile(filename);
 
   LastEvent |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
 }
@@ -4412,6 +4417,9 @@ static void
 start_job(cupsd_job_t     *job,		/* I - Job ID */
           cupsd_printer_t *printer)	/* I - Printer to print job */
 {
+  const char	*filename;		/* Support filename */
+
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job(job=%p(%d), printer=%p(%s))",
                   job, job->id, printer, printer->name);
 
@@ -4464,6 +4472,25 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     job->cancel_time = time(NULL) + MaxJobTime;
   else
     job->cancel_time = 0;
+
+ /*
+  * Check for support files...
+  */
+
+  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			               "cups-insecure-filter-warning");
+
+  if (printer->pc)
+  {
+    for (filename = (const char *)cupsArrayFirst(printer->pc->support_files);
+         filename;
+         filename = (const char *)cupsArrayNext(printer->pc->support_files))
+    {
+      if (_cupsFileCheck(filename, _CUPS_FILE_CHECK_FILE, !RunUser,
+			 cupsdLogFCMessage, printer))
+        break;
+    }
+  }
 
  /*
   * Setup the last exit status and security profiles...

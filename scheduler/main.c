@@ -233,35 +233,6 @@ main(int  argc,				/* I - Number of command-line args */
 		cupsdSetStringf(&ConfigurationFile, "%s/%s", current, argv[i]);
 		free(current);
               }
-
-	      if (!CupsFilesFile)
-	      {
-	        char	*filename,	/* Copy of cupsd.conf filename */
-			*slash;		/* Final slash in cupsd.conf filename */
-		size_t	len;		/* Size of buffer */
-
-		len = strlen(ConfigurationFile) + 15;
-		if ((filename = malloc(len)) == NULL)
-		{
-		  _cupsLangPrintf(stderr,
-		                  _("cupsd: Unable to get path to "
-		                    "cups-files.conf file."));
-                  return (1);
-		}
-
-		strlcpy(filename, ConfigurationFile, len);
-		if ((slash = strrchr(filename, '/')) == NULL)
-		{
-		  _cupsLangPrintf(stderr,
-		                  _("cupsd: Unable to get path to "
-		                    "cups-files.conf file."));
-                  return (1);
-		}
-
-		strlcpy(slash, "/cups-files.conf", len - (slash - filename));
-		cupsdSetString(&CupsFilesFile, filename);
-		free(filename);
-	      }
 	      break;
 
           case 'f' : /* Run in foreground... */
@@ -351,6 +322,35 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!ConfigurationFile)
     cupsdSetString(&ConfigurationFile, CUPS_SERVERROOT "/cupsd.conf");
+
+  if (!CupsFilesFile)
+  {
+    char	*filename,		/* Copy of cupsd.conf filename */
+		*slash;			/* Final slash in cupsd.conf filename */
+    size_t	len;			/* Size of buffer */
+
+    len = strlen(ConfigurationFile) + 15;
+    if ((filename = malloc(len)) == NULL)
+    {
+      _cupsLangPrintf(stderr,
+		      _("cupsd: Unable to get path to "
+			"cups-files.conf file."));
+      return (1);
+    }
+
+    strlcpy(filename, ConfigurationFile, len);
+    if ((slash = strrchr(filename, '/')) == NULL)
+    {
+      _cupsLangPrintf(stderr,
+		      _("cupsd: Unable to get path to "
+			"cups-files.conf file."));
+      return (1);
+    }
+
+    strlcpy(slash, "/cups-files.conf", len - (slash - filename));
+    cupsdSetString(&CupsFilesFile, filename);
+    free(filename);
+  }
 
  /*
   * If the user hasn't specified "-f", run in the background...
@@ -535,17 +535,11 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (!cupsdReadConfiguration())
-  {
-    if (TestConfigFile)
-      printf("%s contains errors\n", ConfigurationFile);
-    else
-      syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-	     ConfigurationFile);
     return (1);
-  }
   else if (TestConfigFile)
   {
-    printf("%s is OK\n", ConfigurationFile);
+    printf("\"%s\" is OK.\n", CupsFilesFile);
+    printf("\"%s\" is OK.\n", ConfigurationFile);
     return (0);
   }
 

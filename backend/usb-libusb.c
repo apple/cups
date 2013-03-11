@@ -170,6 +170,8 @@ static const struct quirk_printer_struct quirk_printers[] = {
 				     https://bugs.launchpad.net/bugs/872483 */
 	{ 0x06bc, 0x01c7, USBLP_QUIRK_NO_REATTACH }, /* Oki Data Corp. B410d,
 				     https://bugs.launchpad.net/bugs/872483 */
+	{ 0x04b8, 0x0001, USBLP_QUIRK_BIDIR }, /* Seiko Epson Corp. Stylus Color 740 / Photo 750,
+				     http://bugs.debian.org/697970 */
 	{ 0x04b8, 0x0202, USBLP_QUIRK_BAD_CLASS }, /* Seiko Epson Receipt
 						      Printer M129C */
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |

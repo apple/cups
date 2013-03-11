@@ -21,8 +21,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.6.0"
-#define CUPS_MINIMAL "CUPS/1.6.0"
+#define CUPS_SVERSION "CUPS v1.7.0"
+#define CUPS_MINIMAL "CUPS/1.7.0"
 
 
 /*
@@ -167,10 +167,10 @@
 
 
 /*
- * Do we have <scsi/sg.h>?
+ * Use <stdint.h>?
  */
 
-/* #undef HAVE_SCSI_SG_H */
+#define HAVE_STDINT_H 1
 
 
 /*
@@ -314,34 +314,6 @@
 #define HAVE_SECPOLICY_H 1
 /* #undef HAVE_SECPOLICYPRIV_H */
 /* #undef HAVE_SECURETRANSPORTPRIV_H */
-
-
-/*
- * Do we have the SecCertificateCopyData function?
- */
-
-#define HAVE_SECCERTIFICATECOPYDATA 1
-
-
-/*
- * Do we have the SecIdentitySearchCreateWithPolicy function?
- */
-
-#define HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY 1
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-#define HAVE_SECPOLICYCREATESSL 1
-
-
-/*
- * Do we have the SecPolicyCreateSSL function?
- */
-
-#define HAVE_SECPOLICYCREATESSL 1
 
 
 /*

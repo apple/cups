@@ -554,7 +554,7 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
   ipp_t		*request,		/* Get-Job-Attributes request */
 		*response;		/* Get-Job-Attributes response */
   ipp_attribute_t *attr;		/* Current job attribute */
-  static const char const *job_attrs[] =/* Job attributes we want */
+  static const char * const job_attrs[] =/* Job attributes we want */
 		{
 		  "job-state",
 		  "job-printer-state-message"

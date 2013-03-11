@@ -3,7 +3,7 @@
  *
  *   CUPS API test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -199,7 +199,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       interval = atoi(argv[4]);
 
       if (cupsStartDocument(CUPS_HTTP_DEFAULT, argv[1], job_id, argv[2],
-			    CUPS_FORMAT_AUTO, 1) != HTTP_CONTINUE)
+			    CUPS_FORMAT_AUTO, 1) != HTTP_STATUS_CONTINUE)
       {
 	puts("Unable to start document!");
 	return (1);
@@ -210,7 +210,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	printf("Writing %d bytes...\n", (int)bytes);
 
 	if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
-				 bytes) != HTTP_CONTINUE)
+				 bytes) != HTTP_STATUS_CONTINUE)
 	{
 	  puts("Unable to write bytes!");
 	  return (1);
@@ -222,7 +222,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       cupsFileClose(fp);
 
-      if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) > IPP_OK_SUBST)
+      if (cupsFinishDocument(CUPS_HTTP_DEFAULT,
+                             argv[1]) > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
       {
 	puts("Unable to finish document!");
 	return (1);

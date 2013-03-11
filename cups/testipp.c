@@ -3,7 +3,7 @@
  *
  *   IPP test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -279,7 +279,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     request = ippNew();
     request->request.op.version[0]   = 0x01;
     request->request.op.version[1]   = 0x01;
-    request->request.op.operation_id = IPP_PRINT_JOB;
+    request->request.op.operation_id = IPP_OP_PRINT_JOB;
     request->request.op.request_id   = 1;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
@@ -337,11 +337,11 @@ main(int  argc,			/* I - Number of command-line arguments */
     data.wbuffer = buffer;
 
     while ((state = ippWriteIO(&data, (ipp_iocb_t)write_cb, 1, NULL,
-                               request)) != IPP_DATA)
-      if (state == IPP_ERROR)
+                               request)) != IPP_STATE_DATA)
+      if (state == IPP_STATE_ERROR)
 	break;
 
-    if (state != IPP_DATA)
+    if (state != IPP_STATE_DATA)
     {
       printf("FAIL - %d bytes written.\n", (int)data.wused);
       status = 1;
@@ -380,13 +380,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     data.rpos = 0;
 
     while ((state = ippReadIO(&data, (ipp_iocb_t)read_cb, 1, NULL,
-                              request)) != IPP_DATA)
-      if (state == IPP_ERROR)
+                              request)) != IPP_STATE_DATA)
+      if (state == IPP_STATE_ERROR)
 	break;
 
     length = ippLength(request);
 
-    if (state != IPP_DATA)
+    if (state != IPP_STATE_DATA)
     {
       printf("FAIL - %d bytes read.\n", (int)data.rpos);
       status = 1;
@@ -564,13 +564,13 @@ main(int  argc,			/* I - Number of command-line arguments */
     data.wbuffer = mixed;
 
     while ((state = ippReadIO(&data, (ipp_iocb_t)read_cb, 1, NULL,
-                              request)) != IPP_DATA)
-      if (state == IPP_ERROR)
+                              request)) != IPP_STATE_DATA)
+      if (state == IPP_STATE_ERROR)
 	break;
 
     length = ippLength(request);
 
-    if (state != IPP_DATA)
+    if (state != IPP_STATE_DATA)
     {
       printf("FAIL - %d bytes read.\n", (int)data.rpos);
       status = 1;
@@ -682,9 +682,9 @@ main(int  argc,			/* I - Number of command-line arguments */
 
       request = ippNew();
       while ((state = ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
-                                request)) == IPP_ATTRIBUTE);
+                                request)) == IPP_STATE_ATTRIBUTE);
 
-      if (state != IPP_DATA)
+      if (state != IPP_STATE_DATA)
       {
 	printf("Error reading IPP message from \"%s\"!\n", argv[i]);
 	status = 1;

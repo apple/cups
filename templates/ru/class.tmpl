@@ -1,0 +1,44 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Idle:{printer_state=4?печать:приостановлен}},
+{printer_is_accepting_jobs=0?Не принимает задания:Принимает задания},
+{server_is_sharing_printers=0?нет совместного доступа:{printer_is_shared=0?нет совместного доступа:разрешен совместный доступ}} {default_name={printer_name}?, Сервер по умолчанию:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Обслуживание</OPTION>
+<OPTION VALUE="print-test-page">Печать пробной страницы</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Данные группы</OPTION>:<OPTION VALUE="stop-class">Приостановить группу</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Принимать задания</OPTION>:<OPTION VALUE="reject-jobs">Не принимать задания</OPTION>}
+<OPTION VALUE="move-jobs">Переместить все задания</OPTION>
+<OPTION VALUE="purge-jobs">Отменить все задания</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Сохранить" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="Администрирование">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Администрирование</OPTION>
+<OPTION VALUE="modify-class">Изменить группу</OPTION>
+<OPTION VALUE="delete-class">Удалить группу</OPTION>
+<OPTION VALUE="set-class-options">Установить параметры по умолчанию</OPTION>
+<OPTION VALUE="set-as-default">Установить как принтер по умолчанию</OPTION>
+<OPTION VALUE="set-allowed-users">Список разрешенных пользователей</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Сохранить" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Описание:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Расположение:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Состав:</TH><TD>{?member_uris=?Нет принтеров:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">По умолчанию:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:неизвестный}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

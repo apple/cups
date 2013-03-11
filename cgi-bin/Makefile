@@ -120,6 +120,7 @@ install-exec:
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(CGIS); do \
 			cp $$file $(SYMROOT); \
+			dsymutil $(SYMROOT)/$$file; \
 		done \
 	fi
 

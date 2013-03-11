@@ -635,7 +635,7 @@ cupsConnectDest(
     if (resource)
       *resource = '\0';
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (NULL);
   }
 
@@ -652,7 +652,7 @@ cupsConnectDest(
   if ((uri = cupsGetOption("printer-uri-supported", dest->num_options,
                            dest->options)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOENT), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
 
     if (cb)
       (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_ERROR,
@@ -672,9 +672,9 @@ cupsConnectDest(
 
   if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
                       userpass, sizeof(userpass), hostname, sizeof(hostname),
-                      &port, resource, resourcesize) < HTTP_URI_OK)
+                      &port, resource, resourcesize) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
 
     if (cb)
       (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_ERROR,
@@ -718,9 +718,9 @@ cupsConnectDest(
   */
 
   if (!strcmp(scheme, "ipps") || port == 443)
-    encryption = HTTP_ENCRYPT_ALWAYS;
+    encryption = HTTP_ENCRYPTION_ALWAYS;
   else
-    encryption = HTTP_ENCRYPT_IF_REQUESTED;
+    encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
   http = httpConnect2(hostname, port, addrlist, AF_UNSPEC, encryption, 1, 0,
                       NULL);
@@ -933,7 +933,7 @@ cupsEnumDests(
   * Get the list of local printers and pass them to the callback function...
   */
 
-  num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, CUPS_GET_PRINTERS, NULL, &dests,
+  num_dests = _cupsGetDests(CUPS_HTTP_DEFAULT, IPP_OP_CUPS_GET_PRINTERS, NULL, &dests,
                             type, mask);
 
   for (i = num_dests, dest = dests;
@@ -1301,7 +1301,7 @@ _cupsGetDestResource(
     if (resource)
       *resource = '\0';
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (NULL);
   }
 
@@ -1315,7 +1315,7 @@ _cupsGetDestResource(
     if (resource)
       *resource = '\0';
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOENT), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(ENOENT), 0);
 
     return (NULL);
   }
@@ -1330,9 +1330,9 @@ _cupsGetDestResource(
 
   if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
                       userpass, sizeof(userpass), hostname, sizeof(hostname),
-                      &port, resource, resourcesize) < HTTP_URI_OK)
+                      &port, resource, resourcesize) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
 
     return (NULL);
   }
@@ -1344,12 +1344,12 @@ _cupsGetDestResource(
 /*
  * '_cupsGetDests()' - Get destinations from a server.
  *
- * "op" is CUPS_GET_PRINTERS to get a full list, CUPS_GET_DEFAULT to get the
- * system-wide default printer, or IPP_GET_PRINTER_ATTRIBUTES for a known
+ * "op" is IPP_OP_CUPS_GET_PRINTERS to get a full list, IPP_OP_CUPS_GET_DEFAULT to get the
+ * system-wide default printer, or IPP_OP_GET_PRINTER_ATTRIBUTES for a known
  * printer.
  *
  * "name" is the name of an existing printer and is only used when "op" is
- * IPP_GET_PRINTER_ATTRIBUTES.
+ * IPP_OP_GET_PRINTER_ATTRIBUTES.
  *
  * "dest" is initialized to point to the array of destinations.
  *
@@ -1430,13 +1430,13 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
 #endif /* __APPLE__ */
 
  /*
-  * Build a CUPS_GET_PRINTERS or IPP_GET_PRINTER_ATTRIBUTES request, which
+  * Build a IPP_OP_CUPS_GET_PRINTERS or IPP_OP_GET_PRINTER_ATTRIBUTES request, which
   * require the following attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
   *    requesting-user-name
-  *    printer-uri [for IPP_GET_PRINTER_ATTRIBUTES]
+  *    printer-uri [for IPP_OP_GET_PRINTER_ATTRIBUTES]
   */
 
   request = ippNewRequest(op);
@@ -1448,7 +1448,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, cupsUser());
 
-  if (name && op != CUPS_GET_DEFAULT)
+  if (name && op != IPP_OP_CUPS_GET_DEFAULT)
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                      "localhost", ippPort(), "/printers/%s", name);
@@ -1681,7 +1681,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if (!dests)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad NULL dests pointer"), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad NULL dests pointer"), 1);
     return (0);
   }
 
@@ -1690,9 +1690,9 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   *dests    = (cups_dest_t *)0;
-  num_dests = _cupsGetDests(http, CUPS_GET_PRINTERS, NULL, dests, 0, 0);
+  num_dests = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, dests, 0, 0);
 
-  if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
+  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
     cupsFreeDests(num_dests, *dests);
     *dests = (cups_dest_t *)0;
@@ -1813,7 +1813,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   if (num_dests > 0)
-    _cupsSetError(IPP_OK, NULL, 0);
+    _cupsSetError(IPP_STATUS_OK, NULL, 0);
 
   return (num_dests);
 }
@@ -1850,7 +1850,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 		defname[256];		/* Default printer name */
   const char	*home = getenv("HOME");	/* Home directory */
   int		set_as_default = 0;	/* Set returned destination as default */
-  ipp_op_t	op = IPP_GET_PRINTER_ATTRIBUTES;
+  ipp_op_t	op = IPP_OP_GET_PRINTER_ATTRIBUTES;
 					/* IPP operation to get server ops */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -1904,7 +1904,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
       * No locally-set default destination, ask the server...
       */
 
-      op = CUPS_GET_DEFAULT;
+      op = IPP_OP_CUPS_GET_DEFAULT;
     }
   }
 
@@ -1914,7 +1914,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!_cupsGetDests(http, op, name, &dest, 0, 0))
   {
-    if (op == CUPS_GET_DEFAULT || (name && !set_as_default))
+    if (op == IPP_OP_CUPS_GET_DEFAULT || (name && !set_as_default))
       return (NULL);
 
    /*
@@ -1922,7 +1922,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
     * configuration file does not exist.  Find out the real default.
     */
 
-    if (!_cupsGetDests(http, CUPS_GET_DEFAULT, NULL, &dest, 0, 0))
+    if (!_cupsGetDests(http, IPP_OP_CUPS_GET_DEFAULT, NULL, &dest, 0, 0))
       return (NULL);
   }
 
@@ -2099,9 +2099,9 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Get the server destinations...
   */
 
-  num_temps = _cupsGetDests(http, CUPS_GET_PRINTERS, NULL, &temps, 0, 0);
+  num_temps = _cupsGetDests(http, IPP_OP_CUPS_GET_PRINTERS, NULL, &temps, 0, 0);
 
-  if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
+  if (cupsLastError() >= IPP_STATUS_REDIRECTION_OTHER_SITE)
   {
     cupsFreeDests(num_temps, temps);
     return (-1);
@@ -3407,7 +3407,7 @@ cups_dnssd_resolve(
 			     _HTTP_RESOLVE_FQDN, cups_dnssd_resolve_cb,
 			     &resolve)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, _("Unable to resolve printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to resolve printer URI."), 1);
 
     if (cb)
       (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_ERROR,

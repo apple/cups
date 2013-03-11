@@ -3,7 +3,7 @@
  *
  *   Hyper-Text Transport Protocol definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -284,10 +284,10 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_STATUS_GATEWAY_TIMEOUT,		/* Gateway connection timed out */
   HTTP_STATUS_NOT_SUPPORTED,		/* HTTP version not supported */
 
-  CUPS_STATUS_AUTHORIZATION_CANCELED = 1000,
+  HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED = 1000,
 					/* User canceled authorization @since CUPS 1.4@ */
-  CUPS_STATUS_PKI_ERROR,		/* Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
-  CUPS_STATUS_WEBIF_DISABLED		/* Web interface is disabled @private@ */
+  HTTP_STATUS_CUPS_PKI_ERROR,		/* Error negotiating a secure connection @since CUPS 1.5/OS X 10.7@ */
+  HTTP_STATUS_CUPS_WEBIF_DISABLED	/* Web interface is disabled @private@ */
 
 #  ifndef _CUPS_NO_DEPRECATED
 /* Old names for this enumeration */
@@ -338,9 +338,9 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 #    define HTTP_GATEWAY_TIMEOUT	HTTP_STATUS_GATEWAY_TIMEOUT
 #    define HTTP_NOT_SUPPORTED		HTTP_STATUS_NOT_SUPPORTED
 
-#    define HTTP_AUTHORIZATION_CANCELED	CUPS_STATUS_AUTHORIZATION_CANCELED
-#    define HTTP_PKI_ERROR		CUPS_STATUS_PKI_ERROR
-#    define HTTP_WEBIF_DISABLED		CUPS_STATUS_WEBIF_DISABLED
+#    define HTTP_AUTHORIZATION_CANCELED	HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED
+#    define HTTP_PKI_ERROR		HTTP_STATUS_CUPS_PKI_ERROR
+#    define HTTP_WEBIF_DISABLED		HTTP_STATUS_CUPS_WEBIF_DISABLED
 #  endif /* !_CUPS_NO_DEPRECATED */
 } http_status_t;
 
