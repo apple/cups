@@ -1011,7 +1011,7 @@ int cupsDoAuthentication (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function should be called in response to a <code>HTTP_UNAUTHORIZED</code>
+<p class="discussion">This function should be called in response to a <code>HTTP_STATUS_UNAUTHORIZED</code>
 status, prior to resubmitting your request.
 
 </p>
@@ -1203,7 +1203,7 @@ http_status_t cupsGetFd (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+<p class="discussion">This function returns <code>HTTP_STATUS_OK</code> when the file is successfully retrieved.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
@@ -1226,7 +1226,7 @@ http_status_t cupsGetFile (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+<p class="discussion">This function returns <code>HTTP_STATUS_OK</code> when the file is successfully retrieved.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
@@ -1286,7 +1286,7 @@ http_status_t cupsPutFd (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_CREATED</code> when the file is stored
+<p class="discussion">This function returns <code>HTTP_STATUS_CREATED</code> when the file is stored
 successfully.
 
 </p>
@@ -1368,7 +1368,7 @@ and <a href="#cupsReadResponseData"><code>cupsReadResponseData</code></a> to rea
 response. Only one request can be sent/queued at a time per <code>http_t</code>
 connection.<br>
 <br>
-Returns the initial HTTP status code, which will be <code>HTTP_CONTINUE</code>
+Returns the initial HTTP status code, which will be <code>HTTP_STATUS_CONTINUE</code>
 on a successful send of the request.<br>
 <br>
 Note: Unlike <a href="#cupsDoFileRequest"><code>cupsDoFileRequest</code></a>, <a href="#cupsDoIORequest"><code>cupsDoIORequest</code></a>, and
@@ -1393,7 +1393,7 @@ http_status_t cupsWriteRequestData (<br>
 <dd class="description">Number of bytes to write</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description"><code>HTTP_CONTINUE</code> if OK or HTTP status on error</p>
+<p class="description"><code>HTTP_STATUS_CONTINUE</code> if OK or HTTP status on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function is used after <a href="#cupsSendRequest"><code>cupsSendRequest</code></a> to provide a PPD and
 after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
@@ -2830,7 +2830,7 @@ void httpSetExpect (<br>
 <dd class="description">Connection to server</dd>
 <dt>expect</dt>
 <dd class="description">HTTP status to expect
-(<code>HTTP_CONTINUE</code>)</dd>
+(<code>HTTP_STATUS_CONTINUE</code>)</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Currently only <code>HTTP_STATUS_CONTINUE</code> is supported for the &quot;expect&quot;
@@ -5538,10 +5538,6 @@ are server-oriented...</p>
 <p class="description">HTTP status codes</p>
 <h4 class="constants">Constants</h4>
 <dl>
-<dt>CUPS_STATUS_AUTHORIZATION_CANCELED <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
-<dd class="description">User canceled authorization </dd>
-<dt>CUPS_STATUS_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
-<dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_STATUS_ACCEPTED </dt>
 <dd class="description">DELETE command was successful</dd>
 <dt>HTTP_STATUS_BAD_GATEWAY </dt>
@@ -5554,6 +5550,10 @@ are server-oriented...</p>
 <dd class="description">Everything OK, keep going...</dd>
 <dt>HTTP_STATUS_CREATED </dt>
 <dd class="description">PUT command was successful</dd>
+<dt>HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dd class="description">User canceled authorization </dd>
+<dt>HTTP_STATUS_CUPS_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
+<dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_STATUS_ERROR </dt>
 <dd class="description">An error response from httpXxxx()</dd>
 <dt>HTTP_STATUS_EXPECTATION_FAILED </dt>
