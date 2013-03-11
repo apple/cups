@@ -2411,6 +2411,21 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     http_uri_status_t	uri_status;	/* URI separation status */
     char		old_device_uri[1024];
 					/* Old device URI */
+    static const char * const uri_status_strings[] =
+    {
+      "URI too large.",
+      "Bad arguments to function.",
+      "Bad resource path.",
+      "Bad port number.",
+      "Bad hostname/address.",
+      "Bad username/password.",
+      "Bad URI scheme.",
+      "Bad URI.",
+      "OK",
+      "Missing URI scheme.",
+      "Unknown URI scheme",
+      "Missing resource path."
+    };
 
 
     need_restart_job = 1;
@@ -2422,12 +2437,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 				 host, sizeof(host), &port,
 				 resource, sizeof(resource));
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "%s device-uri: %s", printer->name,
+		    uri_status_strings[uri_status - HTTP_URI_STATUS_OVERFLOW]);
+
     if (uri_status < HTTP_URI_OK)
     {
       send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"."),
 		      attr->values[0].string.text);
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "add_printer: httpSeparateURI returned %d", uri_status);
       return;
     }
 
