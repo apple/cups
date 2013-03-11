@@ -3,7 +3,7 @@
  *
  *   Private PWG media API definitions for CUPS.
  *
- *   Copyright 2009-2012 by Apple Inc.
+ *   Copyright 2009-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -35,63 +35,36 @@ extern "C" {
 
 
 /*
- * Macros...
+ * Deprecated stuff for prior users of the private PWG media API...
  */
 
-/* Convert from points to 2540ths */
-#  define _PWG_FROMPTS(n)	(int)(((n) * 2540 + 36) / 72)
-/* Convert from 2540ths to points */
-#  define _PWG_TOPTS(n)		((n) * 72.0 / 2540.0)
-
-
-/*
- * Types and structures...
- */
-
-typedef struct _pwg_map_s		/**** Map element - PPD to/from PWG */
-{
-  char		*pwg,			/* PWG media keyword */
-		*ppd;			/* PPD option keyword */
-} _pwg_map_t;
-
-typedef struct _pwg_media_s		/**** Common media size data ****/
-{
-  const char	*pwg,			/* PWG 5101.1 "self describing" name */
-		*legacy,		/* IPP/ISO legacy name */
-		*ppd;			/* Standard Adobe PPD name */
-  int		width,			/* Width in 2540ths */
-		length;			/* Length in 2540ths */
-} _pwg_media_t;
-
-typedef struct _pwg_size_s		/**** Size element - PPD to/from PWG */
-{
-  _pwg_map_t	map;			/* Map element */
-  int		width,			/* Width in 2540ths */
-		length,			/* Length in 2540ths */
-		left,			/* Left margin in 2540ths */
-		bottom,			/* Bottom margin in 2540ths */
-		right,			/* Right margin in 2540ths */
-		top;			/* Top margin in 2540ths */
-} _pwg_size_t;
+#  ifndef _CUPS_NO_DEPRECATED
+typedef struct pwg_map_s _pwg_map_t;
+typedef struct pwg_media_s _pwg_media_t;
+typedef struct pwg_size_s _pwg_size_t;
+#  endif /* _CUPS_NO_DEPRECATED */
 
 
 /*
  * Functions...
  */
 
-extern char		*_pwgFormatInches(char *buf, size_t bufsize, int val);
-extern char		*_pwgFormatMillimeters(char *buf, size_t bufsize,
-			                       int val);
 extern void		_pwgGenerateSize(char *keyword, size_t keysize,
 				         const char *prefix,
 					 const char *name,
-					 int width, int length);
-extern int		_pwgInitSize(_pwg_size_t *size, ipp_t *job,
-				     int *margins_set);
-extern _pwg_media_t	*_pwgMediaForLegacy(const char *legacy);
-extern _pwg_media_t	*_pwgMediaForPPD(const char *ppd);
-extern _pwg_media_t	*_pwgMediaForPWG(const char *pwg);
-extern _pwg_media_t	*_pwgMediaForSize(int width, int length);
+					 int width, int length)
+					 _CUPS_INTERNAL_MSG("Use pwgFormatSizeName instead.");
+extern int		_pwgInitSize(pwg_size_t *size, ipp_t *job,
+				     int *margins_set)
+				     _CUPS_INTERNAL_MSG("Use pwgInitSize instead.");
+extern pwg_media_t	*_pwgMediaForLegacy(const char *legacy)
+			    _CUPS_INTERNAL_MSG("Use pwgMediaForLegacy instead.");
+extern pwg_media_t	*_pwgMediaForPPD(const char *ppd)
+			    _CUPS_INTERNAL_MSG("Use pwgMediaForPPD instead.");
+extern pwg_media_t	*_pwgMediaForPWG(const char *pwg)
+			    _CUPS_INTERNAL_MSG("Use pwgMediaForPWG instead.");
+extern pwg_media_t	*_pwgMediaForSize(int width, int length)
+			    _CUPS_INTERNAL_MSG("Use pwgMediaForSize instead.");
 
 #  ifdef __cplusplus
 }

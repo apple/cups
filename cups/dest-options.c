@@ -61,7 +61,7 @@ static void		cups_create_defaults(cups_dinfo_t *dinfo);
 static void		cups_create_media_db(cups_dinfo_t *dinfo);
 static void		cups_free_media_db(_cups_media_db_t *mdb);
 static int		cups_get_media_db(cups_dinfo_t *dinfo,
-			                  _pwg_media_t *pwg, unsigned flags,
+			                  pwg_media_t *pwg, unsigned flags,
 			                  cups_size_t *size);
 static int		cups_is_close_media_db(_cups_media_db_t *a,
 			                       _cups_media_db_t *b);
@@ -133,7 +133,7 @@ cupsCheckDestSupported(
     * Check range of custom media sizes...
     */
 
-    _pwg_media_t	*pwg;		/* Current PWG media size info */
+    pwg_media_t	*pwg;		/* Current PWG media size info */
     int			min_width,	/* Minimum width */
 			min_length,	/* Minimum length */
 			max_width,	/* Maximum width */
@@ -151,13 +151,13 @@ cupsCheckDestSupported(
 	 i --, attrval ++)
     {
       if (!strncmp(attrval->string.text, "custom_min_", 11) &&
-          (pwg = _pwgMediaForPWG(attrval->string.text)) != NULL)
+          (pwg = pwgMediaForPWG(attrval->string.text)) != NULL)
       {
         min_width  = pwg->width;
         min_length = pwg->length;
       }
       else if (!strncmp(attrval->string.text, "custom_max_", 11) &&
-	       (pwg = _pwgMediaForPWG(attrval->string.text)) != NULL)
+	       (pwg = pwgMediaForPWG(attrval->string.text)) != NULL)
       {
         max_width  = pwg->width;
         max_length = pwg->length;
@@ -169,7 +169,7 @@ cupsCheckDestSupported(
     */
 
     if (min_width < INT_MAX && max_width > 0 &&
-        (pwg = _pwgMediaForPWG(value)) != NULL &&
+        (pwg = pwgMediaForPWG(value)) != NULL &&
         pwg->width >= min_width && pwg->width <= max_width &&
         pwg->length >= min_length && pwg->length <= max_length)
       return (1);
@@ -742,7 +742,7 @@ cupsGetDestMediaByName(
     unsigned     flags,			/* I - Media matching flags */
     cups_size_t  *size)			/* O - Media size information */
 {
-  _pwg_media_t		*pwg;		/* PWG media info */
+  pwg_media_t		*pwg;		/* PWG media info */
 
 
  /*
@@ -762,8 +762,8 @@ cupsGetDestMediaByName(
   * Lookup the media size name...
   */
 
-  if ((pwg = _pwgMediaForPWG(media)) == NULL)
-    if ((pwg = _pwgMediaForLegacy(media)) == NULL)
+  if ((pwg = pwgMediaForPWG(media)) == NULL)
+    if ((pwg = pwgMediaForLegacy(media)) == NULL)
     {
       DEBUG_printf(("1cupsGetDestMediaByName: Unknown size '%s'.", media));
       _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unknown media size name."), 1);
@@ -810,7 +810,7 @@ cupsGetDestMediaBySize(
     unsigned     flags,			/* I - Media matching flags */
     cups_size_t  *size)			/* O - Media size information */
 {
-  _pwg_media_t		*pwg;		/* PWG media info */
+  pwg_media_t		*pwg;		/* PWG media info */
 
 
  /*
@@ -830,7 +830,7 @@ cupsGetDestMediaBySize(
   * Lookup the media size name...
   */
 
-  if ((pwg = _pwgMediaForSize(width, length)) == NULL)
+  if ((pwg = pwgMediaForSize(width, length)) == NULL)
   {
     DEBUG_printf(("1cupsGetDestMediaBySize: Invalid size %dx%d.", width,
                   length));
@@ -1044,7 +1044,7 @@ cups_create_media_db(
 			*media_attr,	/* media-xxx */
 			*x_dimension,	/* x-dimension */
 			*y_dimension;	/* y-dimension */
-  _pwg_media_t		*pwg;		/* PWG media info */
+  pwg_media_t		*pwg;		/* PWG media info */
   _cups_media_db_t	mdb;		/* Media entry */
 
 
@@ -1222,8 +1222,8 @@ cups_create_media_db(
          i > 0;
          i --, val ++)
     {
-      if ((pwg = _pwgMediaForPWG(val->string.text)) == NULL)
-        if ((pwg = _pwgMediaForLegacy(val->string.text)) == NULL)
+      if ((pwg = pwgMediaForPWG(val->string.text)) == NULL)
+        if ((pwg = pwgMediaForLegacy(val->string.text)) == NULL)
 	{
 	  DEBUG_printf(("3cups_create_media_db: Ignoring unknown size '%s'.",
 			val->string.text));
@@ -1285,7 +1285,7 @@ cups_free_media_db(
 
 static int				/* O - 1 on match, 0 on failure */
 cups_get_media_db(cups_dinfo_t *dinfo,	/* I - Destination information */
-                  _pwg_media_t *pwg,	/* I - PWG media info */
+                  pwg_media_t *pwg,	/* I - PWG media info */
                   unsigned     flags,	/* I - Media matching flags */
                   cups_size_t *size)	/* O - Media size/margin/name info */
 {

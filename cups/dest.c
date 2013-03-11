@@ -2458,7 +2458,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
                   int  namesize)	/* I - Size of buffer */
 {
   CFStringRef	defaultPaperID;		/* Default paper ID */
-  _pwg_media_t	*pwgmedia;		/* PWG media size */
+  pwg_media_t	*pwgmedia;		/* PWG media size */
 
 
   defaultPaperID = _cupsAppleCopyDefaultPaperID();
@@ -2467,7 +2467,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
       !CFStringGetCString(defaultPaperID, name, namesize,
 			  kCFStringEncodingUTF8))
     name[0] = '\0';
-  else if ((pwgmedia = _pwgMediaForLegacy(name)) != NULL)
+  else if ((pwgmedia = pwgMediaForLegacy(name)) != NULL)
     strlcpy(name, pwgmedia->pwg, namesize);
 
   if (defaultPaperID)

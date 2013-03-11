@@ -1,9 +1,10 @@
-CHANGES.txt - 1.7b1 - 2013-01-30
+CHANGES.txt - 1.7b1 - 2013-03-11
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
 	- Added a new "-x" option to the cancel command (STR #4103)
+	- Made the PWG media handling APIs public (STR #4267)
 	- Added new ippCreateRequestedArray API for generating a array of
 	  attributes from the requested-attributes attribute.
 	- The ipptool utility now supports compression, conditional tests based

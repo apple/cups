@@ -3,7 +3,7 @@
  *
  *   API definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -37,6 +37,7 @@ typedef off_t ssize_t;			/* @private@ */
 #  include "file.h"
 #  include "ipp.h"
 #  include "language.h"
+#  include "pwg.h"
 
 
 /*

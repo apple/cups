@@ -3,7 +3,7 @@
  *
  *   Private PPD definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -112,9 +112,9 @@ typedef struct _pwg_finishings_s	/**** PWG finishings mapping data ****/
 struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
 {
   int		num_bins;		/* Number of output bins */
-  _pwg_map_t	*bins;			/* Output bins */
+  pwg_map_t	*bins;			/* Output bins */
   int		num_sizes;		/* Number of media sizes */
-  _pwg_size_t	*sizes;			/* Media sizes */
+  pwg_size_t	*sizes;			/* Media sizes */
   int		custom_max_width,	/* Maximum custom width in 2540ths */
 		custom_max_length,	/* Maximum custom length in 2540ths */
 		custom_min_width,	/* Minimum custom width in 2540ths */
@@ -122,12 +122,12 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*custom_max_keyword,	/* Maximum custom size PWG keyword */
 		*custom_min_keyword,	/* Minimum custom size PWG keyword */
 		custom_ppd_size[41];	/* Custom PPD size name */
-  _pwg_size_t	custom_size;		/* Custom size record */
+  pwg_size_t	custom_size;		/* Custom size record */
   char		*source_option;		/* PPD option for media source */
   int		num_sources;		/* Number of media sources */
-  _pwg_map_t	*sources;		/* Media sources */
+  pwg_map_t	*sources;		/* Media sources */
   int		num_types;		/* Number of media types */
-  _pwg_map_t	*types;			/* Media types */
+  pwg_map_t	*types;			/* Media types */
   int		num_presets[_PWG_PRINT_COLOR_MODE_MAX][_PWG_PRINT_QUALITY_MAX];
 					/* Number of print-color-mode/print-quality options */
   cups_option_t	*presets[_PWG_PRINT_COLOR_MODE_MAX][_PWG_PRINT_QUALITY_MAX];
@@ -179,7 +179,7 @@ extern const char	*_ppdCacheGetOutputBin(_ppd_cache_t *pc,
 			                       const char *keyword);
 extern const char	*_ppdCacheGetPageSize(_ppd_cache_t *pc, ipp_t *job,
 			                      const char *keyword, int *exact);
-extern _pwg_size_t	*_ppdCacheGetSize(_ppd_cache_t *pc,
+extern pwg_size_t	*_ppdCacheGetSize(_ppd_cache_t *pc,
 			                  const char *page_size);
 extern const char	*_ppdCacheGetSource(_ppd_cache_t *pc,
 			                    const char *input_slot);
@@ -207,7 +207,7 @@ extern const char	*_pwgInputSlotForSource(const char *media_source,
 			                        char *name, size_t namesize);
 extern const char	*_pwgMediaTypeForType(const char *media_type,
 					      char *name, size_t namesize);
-extern const char	*_pwgPageSizeForMedia(_pwg_media_t *media,
+extern const char	*_pwgPageSizeForMedia(pwg_media_t *media,
 			                      char *name, size_t namesize);
 
 

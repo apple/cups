@@ -131,7 +131,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   cups_array_t		*leg_size_lut,	/* Lookup table for legacy names */
 			*ppd_size_lut,	/* Lookup table for PPD names */
 			*pwg_size_lut;	/* Lookup table for PWG names */
-  _pwg_media_t		pwg_media;	/* PWG media data for custom size */
+  pwg_media_t		pwg_media;	/* PWG media data for custom size */
   char			pwg_name[65];	/* PWG media name for custom size */
 
   /* request.c */
