@@ -316,6 +316,7 @@ struct _http_s				/**** HTTP connection structure ****/
 #  endif /* HAVE_GSSAPI */
 
   /**** New in CUPS 1.7 ****/
+  int			tls_upgrade;	/* Non-zero if we are doing an upgrade */
   _http_mode_t		mode;		/* _HTTP_MODE_CLIENT or _HTTP_MODE_SERVER */
   char			*accept_encoding,
 					/* Accept-Encoding field */

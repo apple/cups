@@ -2777,7 +2777,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
       return (-1);
     }
   }
-  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED)
+  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls_upgrade)
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
 
@@ -4900,8 +4900,13 @@ http_send(http_t       *http,		/* I - Connection to server */
 
   if (http->fd < 0 || http->status == HTTP_STATUS_ERROR ||
       http->status >= HTTP_STATUS_BAD_REQUEST)
+  {
+    DEBUG_printf(("5http_send: Reconnecting, fd=%d, status=%d, tls_upgrade=%d",
+                  http->fd, http->status, http->tls_upgrade));
+
     if (httpReconnect2(http, 30000, NULL))
       return (-1);
+  }
 
  /*
   * Flush any written data that is pending...
@@ -5680,6 +5685,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
   * encryption on the link...
   */
 
+  http->tls_upgrade         = 1;
   http->field_authorization = NULL;	/* Don't free the auth string */
 
   httpClearFields(http);
@@ -5706,6 +5712,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
   http->expect              = myhttp.expect;
   http->field_authorization = myhttp.field_authorization;
   http->digest_tries        = myhttp.digest_tries;
+  http->tls_upgrade         = 0;
 
  /*
   * See if we actually went secure...
