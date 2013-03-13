@@ -12,6 +12,8 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228, STR #4285)
 	- Updated the Catalan localization (STR #4202)
+	- Local certificate authentication did not guard against an empty
+	  certification file (STR #4293)
 	- The scheduler did not reject device URIs with spaces.
 	- Added USB quirk rule for Epson Stylus Photo 750 (STR #4286)
 	- The IPP backend could crash if the printer disconnects early

@@ -667,8 +667,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   int			pid;		/* Current process ID */
   FILE			*fp;		/* Certificate file */
   char			trc[16],	/* Try Root Certificate parameter */
-			filename[1024],	/* Certificate filename */
-			certificate[33];/* Certificate string */
+			filename[1024];	/* Certificate filename */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 #  if defined(HAVE_AUTHORIZATION_H)
   OSStatus		status;		/* Status */
@@ -862,19 +861,25 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * Read the certificate from the file...
     */
 
-    fgets(certificate, sizeof(certificate), fp);
+    char	certificate[33],	/* Certificate string */
+		*certptr;		/* Pointer to certificate string */
+
+    certptr = fgets(certificate, sizeof(certificate), fp);
     fclose(fp);
 
-   /*
-    * Set the authorization string and return...
-    */
+    if (certptr)
+    {
+     /*
+      * Set the authorization string and return...
+      */
 
-    httpSetAuthString(http, "Local", certificate);
+      httpSetAuthString(http, "Local", certificate);
 
-    DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
-		  http->authstring));
+      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
+		    http->authstring));
 
-    return (0);
+      return (0);
+    }
   }
 
   return (1);
