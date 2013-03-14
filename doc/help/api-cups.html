@@ -415,6 +415,9 @@ destination.">cupsCopyDestInfo</a></li>
 	<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
 	<li><a href="#cupsEnumDests" title="Enumerate available destinations with a callback function.">cupsEnumDests</a></li>
 	<li><a href="#cupsEnumDestsBlock" title="Enumerate available destinations with a block.">cupsEnumDestsBlock</a></li>
+	<li><a href="#cupsFindDestDefault" title="Find the default value(s) for the given option.">cupsFindDestDefault</a></li>
+	<li><a href="#cupsFindDestReady" title="Find the default value(s) for the given option.">cupsFindDestReady</a></li>
+	<li><a href="#cupsFindDestSupported" title="Find the default value(s) for the given option.">cupsFindDestSupported</a></li>
 	<li><a href="#cupsFinishDestDocument" title="Finish the current document.">cupsFinishDestDocument</a></li>
 	<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
 	<li><a href="#cupsFreeDestInfo" title="Free destination information obtained using
@@ -426,8 +429,13 @@ cupsCopyDestInfo.">cupsFreeDestInfo</a></li>
 	<li><a href="#cupsGetDefault" title="Get the default printer or class for the default server.">cupsGetDefault</a></li>
 	<li><a href="#cupsGetDefault2" title="Get the default printer or class for the specified server.">cupsGetDefault2</a></li>
 	<li><a href="#cupsGetDest" title="Get the named destination from the list.">cupsGetDest</a></li>
+	<li><a href="#cupsGetDestMediaByIndex" title="Get a media name, dimension, and margins for a
+specific size.">cupsGetDestMediaByIndex</a></li>
 	<li><a href="#cupsGetDestMediaByName" title="Get media names, dimensions, and margins.">cupsGetDestMediaByName</a></li>
 	<li><a href="#cupsGetDestMediaBySize" title="Get media names, dimensions, and margins.">cupsGetDestMediaBySize</a></li>
+	<li><a href="#cupsGetDestMediaCount" title="Get the number of sizes supported by a
+destination.">cupsGetDestMediaCount</a></li>
+	<li><a href="#cupsGetDestMediaDefault" title="Get the default size for a destination.">cupsGetDestMediaDefault</a></li>
 	<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
 	<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
 	<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
@@ -1621,6 +1629,96 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the block returns 0.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestDefault (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestReady (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestSupported (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsFinishDestDocument">cupsFinishDestDocument</a></h3>
 <p class="description">Finish the current document.</p>
 <p class="code">
@@ -1795,6 +1893,41 @@ not support the lpoptions-defined default printer.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> or <a href="#cupsGetDests2"><code>cupsGetDests2</code></a> functions to get a
 list of supported destinations for the current user.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
+<p class="description">Get a media name, dimension, and margins for a
+specific size.</p>
+<p class="code">
+int cupsGetDestMediaByIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>n</dt>
+<dd class="description">Media size number (0-based)</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines which set of media are indexed.  For
+example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will get the Nth
+borderless size supported by the printer.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaByName">cupsGetDestMediaByName</a></h3>
 <p class="description">Get media names, dimensions, and margins.</p>
 <p class="code">
@@ -1886,6 +2019,66 @@ size amongst the &quot;ready&quot; media.<br>
 The matching result (if any) is returned in the &quot;cups_size_t&quot; structure.<br>
 <br>
 Returns 1 when there is a match and 0 if there is not a match.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
+<p class="description">Get the number of sizes supported by a
+destination.</p>
+<p class="code">
+int cupsGetDestMediaCount (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of sizes</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines the set of media sizes that are
+counted.  For example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return
+the number of borderless sizes.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
+<p class="description">Get the default size for a destination.</p>
+<p class="code">
+int cupsGetDestMediaDefault (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines which default size is returned.  For
+example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return the default
+borderless size, typically US Letter or A4, but sometimes 4x6 photo media.
 
 </p>
 <h3 class="function"><a name="cupsGetDests">cupsGetDests</a></h3>

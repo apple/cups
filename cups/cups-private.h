@@ -219,6 +219,11 @@ struct _cups_dinfo_s			/* Destination capability and status
   cups_array_t		*media_db;	/* Media database */
   _cups_media_db_t	min_size,	/* Minimum size */
 			max_size;	/* Maximum size */
+  unsigned		cached_flags;	/* Flags used for cached media */
+  cups_array_t		*cached_db;	/* Cache of media from last index/default */
+  time_t		ready_time;	/* When xxx-ready attributes were last queried */
+  ipp_t			*ready_attrs;	/* xxx-ready attributes */
+  cups_array_t		*ready_db;	/* media[-col]-ready media database */
 };
 
 

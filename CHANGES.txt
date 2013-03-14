@@ -5,6 +5,14 @@ CHANGES IN CUPS V1.7b1
 
 	- Added a new "-x" option to the cancel command (STR #4103)
 	- Made the PWG media handling APIs public (STR #4267)
+	- Implemented ready media support for the cupsGetDestMediaXxx APIs
+	  (STR #4289)
+	- Added new cupsFindDestDefault, cupsFindDestReady, and
+	  cupsFindDestSupported APIs (STR #4289)
+	- Added new cupsGetDestMediaByIndex, cupsGetDestMediaCount, and
+	  cupsGetDestMediaDefault APIs (STR #4289)
+	- Added new ippGet/SetOctetString APIs for getting and setting an
+	  octetString value (STR #4289)
 	- Added new ippCreateRequestedArray API for generating a array of
 	  attributes from the requested-attributes attribute.
 	- The ipptool utility now supports compression, conditional tests based

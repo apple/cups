@@ -552,6 +552,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippGetGroupTag" title="Get the group associated with an attribute.">ippGetGroupTag</a></li>
 	<li><a href="#ippGetInteger" title="Get the integer/enum value for an attribute.">ippGetInteger</a></li>
 	<li><a href="#ippGetName" title="Get the attribute name.">ippGetName</a></li>
+	<li><a href="#ippGetOctetString" title="Get an octetString value from an IPP attribute.">ippGetOctetString</a></li>
 	<li><a href="#ippGetOperation" title="Get the operation ID in an IPP message.">ippGetOperation</a></li>
 	<li><a href="#ippGetRange" title="Get a rangeOfInteger value from an attribute.">ippGetRange</a></li>
 	<li><a href="#ippGetRequestId" title="Get the request ID from an IPP message.">ippGetRequestId</a></li>
@@ -578,6 +579,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippSetGroupTag" title="Set the group tag of an attribute.">ippSetGroupTag</a></li>
 	<li><a href="#ippSetInteger" title="Set an integer or enum value in an attribute.">ippSetInteger</a></li>
 	<li><a href="#ippSetName" title="Set the name of an attribute.">ippSetName</a></li>
+	<li><a href="#ippSetOctetString" title="Set an octetString value in an IPP attribute.">ippSetOctetString</a></li>
 	<li><a href="#ippSetOperation" title="Set the operation ID in an IPP request message.">ippSetOperation</a></li>
 	<li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
 	<li><a href="#ippSetRange" title="Set a rangeOfInteger value in an attribute.">ippSetRange</a></li>
@@ -4176,6 +4178,30 @@ const char *ippGetName (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Attribute name or <code>NULL</code> for separators</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippGetOctetString">ippGetOctetString</a></h3>
+<p class="description">Get an octetString value from an IPP attribute.</p>
+<p class="code">
+void *ippGetOctetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *datalen<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>datalen</dt>
+<dd class="description">Length of octetString data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Pointer to octetString data</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetOperation">ippGetOperation</a></h3>
 <p class="description">Get the operation ID in an IPP message.</p>
 <p class="code">
@@ -4677,6 +4703,41 @@ int ippSetName (<br>
 the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ippNewRequest</code></a>, or  <a href="#ippNewResponse"><code>ippNewResponse</code></a> functions.<br>
 <br>
 The <code>attr</code> parameter may be modified as a result of setting the value.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippSetOctetString">ippSetOctetString</a></h3>
+<p class="description">Set an octetString value in an IPP attribute.</p>
+<p class="code">
+int ippSetOctetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const void *data,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int datalen<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>data</dt>
+<dd class="description">Pointer to octetString data</dd>
+<dt>datalen</dt>
+<dd class="description">Length of octetString data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using
+the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ippNewRequest</code></a>, or  <a href="#ippNewResponse"><code>ippNewResponse</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetOperation">ippSetOperation</a></h3>
