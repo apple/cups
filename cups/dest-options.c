@@ -671,6 +671,7 @@ cupsCopyDestInfo(
     return (NULL);
   }
 
+  dinfo->version  = version;
   dinfo->uri      = uri;
   dinfo->resource = _cupsStrAlloc(resource);
   dinfo->attrs    = response;

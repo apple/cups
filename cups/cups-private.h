@@ -207,6 +207,7 @@ typedef struct _cups_dconstres_s	/* Constraint/resolver */
 struct _cups_dinfo_s			/* Destination capability and status
 					 * information */
 {
+  int			version;	/* IPP version */
   const char		*uri;		/* Printer URI */
   char			*resource;	/* Resource path */
   ipp_t			*attrs;		/* Printer attributes */
