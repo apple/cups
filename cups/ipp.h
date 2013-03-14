@@ -144,7 +144,20 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side */
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM	/* Punch 4 holes bottom edge */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM,/* Punch 4 holes bottom edge */
+
+  IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN = 0x4000005A,
+					/* Accordian-fold the paper vertically into four sections */
+  IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
+  IPP_FINISHINGS_CUPS_FOLD_GATE,	/* Fold the top and bottom quarters of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_HALF,	/* Fold the paper in half vertically */
+  IPP_FINISHINGS_CUPS_FOLD_HALF_Z,	/* Fold the paper in half horizontally, then Z-fold the paper vertically */
+  IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE,	/* Fold the top quarter of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_LETTER,	/* Fold the paper into three sections vertically; sometimes also known as a C fold*/
+  IPP_FINISHINGS_CUPS_FOLD_PARALLEL,	/* Fold the paper in half vertically two times, yielding four sections */
+  IPP_FINISHINGS_CUPS_FOLD_POSTER,	/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold */
+  IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z */
 } ipp_finishings_t;
 #  ifndef _CUPS_NO_DEPRECATED
 typedef enum ipp_finishings_e ipp_finish_t;

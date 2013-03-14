@@ -489,13 +489,29 @@ static const char * const ipp_document_states[] =
 		  "punch-dual-bottom",
 		  "punch-triple-left",
 		  "punch-triple-top",
-		  /* 0x40000050 - 0x40000055 */
+		  /* 0x40000050 - 0x4000005F */
 		  "punch-triple-right",
 		  "punch-triple-bottom",
 		  "punch-quad-left",
 		  "punch-quad-top",
 		  "punch-quad-right",
 		  "punch-quad-bottom",
+		  "0x40000056",
+		  "0x40000057",
+		  "0x40000058",
+		  "0x40000059",
+		  "fold-accordian",
+		  "fold-double-gate",
+		  "fold-gate",
+		  "fold-half",
+		  "fold-half-z",
+		  "fold-left-gate",
+		  /* 0x40000060 - 0x40000064 */
+		  "fold-letter",
+		  "fold-parallel",
+		  "fold-poster",
+		  "fold-right-gate",
+		  "fold-z"
 		},
 		* const ipp_job_collation_types[] =
 		{			/* job-collation-type enums */
@@ -1714,7 +1730,10 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 	   !strcmp(attrname, "finishings-actual") ||
 	   !strcmp(attrname, "finishings-default") ||
 	   !strcmp(attrname, "finishings-ready") ||
-	   !strcmp(attrname, "finishings-supported"))
+	   !strcmp(attrname, "finishings-supported") ||
+	   !strcmp(attrname, "job-finishings") ||
+	   !strcmp(attrname, "job-finishings-default") ||
+	   !strcmp(attrname, "job-finishings-supported"))
   {
     if (enumvalue >= 3 &&
         enumvalue < (3 + (int)(sizeof(ipp_finishings) /
