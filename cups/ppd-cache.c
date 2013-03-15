@@ -38,7 +38,7 @@
  *   _ppdCacheWriteFile()      - Write PWG mapping data to a file.
  *   _pwgInputSlotForSource()  - Get the InputSlot name for the given PWG
  *                               media-source.
- *   pwgMediaTypeForType()    - Get the MediaType name for the given PWG
+ *   _pwgMediaTypeForType()    - Get the MediaType name for the given PWG
  *                               media-type.
  *   _pwgPageSizeForMedia()    - Get the PageSize name for the given media.
  *   pwg_ppdize_name()         - Convert an IPP keyword to a PPD keyword.
@@ -2530,12 +2530,12 @@ _pwgInputSlotForSource(
 
 
 /*
- * 'pwgMediaTypeForType()' - Get the MediaType name for the given PWG
+ * '_pwgMediaTypeForType()' - Get the MediaType name for the given PWG
  *                            media-type.
  */
 
 const char *				/* O - MediaType name */
-pwgMediaTypeForType(
+_pwgMediaTypeForType(
     const char *media_type,		/* I - PWG media-type */
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
