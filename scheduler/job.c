@@ -560,7 +560,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* CONTENT_TYPE env variable */
 			device_uri[1024],
 					/* DEVICE_URI env variable */
-			final_content_type[1024],
+			final_content_type[1024] = "",
 					/* FINAL_CONTENT_TYPE env variable */
 			lang[255],	/* LANG env variable */
 #ifdef __APPLE__
@@ -598,7 +598,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   memset(job->filters, 0, sizeof(job->filters));
 
-
   if (job->printer->raw)
   {
    /*
@@ -634,6 +633,23 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
       ippSetString(job->attrs, &job->reasons, 0, "document-unprintable-error");
       goto abort_job;
+    }
+
+    /* SET FINAL_CONTENT_TYPE HERE */
+    if (!job->printer->remote)
+    {
+      filter = (mime_filter_t *)cupsArrayLast(filters);
+
+      if (filter && filter->dst)
+      {
+	if ((ptr = strchr(filter->dst->type, '/')) != NULL)
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s", ptr + 1);
+	else
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
+		   filter->dst->type);
+      }
     }
 
    /*
@@ -1034,25 +1050,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
                                 "CUPS_FILETYPE=document";
 
-  if (!job->printer->remote && !job->printer->raw)
-  {
-    filter = (mime_filter_t *)cupsArrayLast(filters);
-
-    if (job->printer->port_monitor)
-      filter = (mime_filter_t *)cupsArrayPrev(filters);
-
-    if (filter && filter->dst)
-    {
-      if ((ptr = strchr(filter->dst->type, '/')) != NULL)
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s", ptr + 1);
-      else
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
-		 filter->dst->type);
-      envp[envc ++] = final_content_type;
-    }
-  }
+  if (final_content_type[0])
+    envp[envc ++] = final_content_type;
 
   if (Classification && !banner_page)
   {

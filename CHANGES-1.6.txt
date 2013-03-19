@@ -1,6 +1,12 @@
 CHANGES-1.6.txt
 ---------------
 
+CHANGES IN CUPS V1.6.3
+
+	- The scheduler incorrectly computed the final content type value when
+	  null filters were present.
+
+
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248,
