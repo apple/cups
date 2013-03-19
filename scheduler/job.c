@@ -635,10 +635,31 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       goto abort_job;
     }
 
-    /* SET FINAL_CONTENT_TYPE HERE */
+   /*
+    * Figure out the final content type...
+    */
+
+    cupsdLogJob(job, CUPSD_LOG_DEBUG, "%d filters for job:",
+                cupsArrayCount(filters));
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+         filter = (mime_filter_t *)cupsArrayNext(filters))
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "%s (%s/%s to %s/%s, cost %d)",
+		  filter->filter,
+		  filter->src ? filter->src->super : "???",
+		  filter->src ? filter->src->type : "???",
+		  filter->dst ? filter->dst->super : "???",
+		  filter->dst ? filter->dst->type : "???",
+		  filter->cost);
+
     if (!job->printer->remote)
     {
-      filter = (mime_filter_t *)cupsArrayLast(filters);
+      for (filter = (mime_filter_t *)cupsArrayLast(filters);
+           filter && filter->dst;
+           filter = (mime_filter_t *)cupsArrayPrev(filters))
+        if (strcmp(filter->dst->super, "printer") ||
+            strcmp(filter->dst->type, job->printer->name))
+          break;
 
       if (filter && filter->dst)
       {
