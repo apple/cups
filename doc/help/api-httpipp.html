@@ -1653,7 +1653,7 @@ this function in place of traditional string functions whenever
 you need to create a URI string.
 
 </p>
-<h3 class="function"><a name="httpAssembleUUID">httpAssembleUUID</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="httpAssembleUUID">httpAssembleUUID</a></h3>
 <p class="description">Assemble a name-based UUID URN conforming to RFC 4122.</p>
 <p class="code">
 char *httpAssembleUUID (<br>
@@ -1686,7 +1686,9 @@ char *httpAssembleUUID (<br>
 name, port number, random data, and optionally an object name and/or object
 number.  The result is formatted as a UUID URN as defined in RFC 4122.<br>
 <br>
-The buffer needs to be at least 46 bytes in size.</p>
+The buffer needs to be at least 46 bytes in size.
+
+</p>
 <h3 class="function"><a name="httpBlocking">httpBlocking</a></h3>
 <p class="description">Set blocking/non-blocking behavior on a connection.</p>
 <p class="code">
@@ -2815,8 +2817,8 @@ void httpSetDefaultField (<br>
 <dd class="description">Value</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Currently only HTTP_FIELD_ACCEPT_ENCODING, HTTP_FIELD_SERVER, and
-HTTP_FIELD_USER_AGENT can be set.
+<p class="discussion">Currently only <code>HTTP_FIELD_ACCEPT_ENCODING</code>, <code>HTTP_FIELD_SERVER</code>,
+and <code>HTTP_FIELD_USER_AGENT</code> can be set.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
@@ -5782,6 +5784,28 @@ are server-oriented...</p>
 <dd class="description">Fold to make booklet</dd>
 <dt>IPP_FINISHINGS_COVER </dt>
 <dd class="description">Add cover</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN </dt>
+<dd class="description">Accordian-fold the paper vertically into four sections</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE </dt>
+<dd class="description">Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_GATE </dt>
+<dd class="description">Fold the top and bottom quarters of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_HALF </dt>
+<dd class="description">Fold the paper in half vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_HALF_Z </dt>
+<dd class="description">Fold the paper in half horizontally, then Z-fold the paper vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE </dt>
+<dd class="description">Fold the top quarter of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_LETTER </dt>
+<dd class="description">Fold the paper into three sections vertically; sometimes also known as a C fold</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_PARALLEL </dt>
+<dd class="description">Fold the paper in half vertically two times, yielding four sections</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_POSTER </dt>
+<dd class="description">Fold the paper in half horizontally and vertically; sometimes also called a cross fold</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE </dt>
+<dd class="description">Fold the bottom quarter of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_Z </dt>
+<dd class="description">Fold the paper vertically into three sections, forming a Z</dd>
 <dt>IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_LEFT </dt>
 <dd class="description">Punch 1 hole bottom left</dd>
 <dt>IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_RIGHT </dt>
@@ -5826,7 +5850,7 @@ are server-oriented...</p>
 <dd class="description">Stitch along top edge</dd>
 <dt>IPP_FINISHINGS_FOLD </dt>
 <dd class="description">Fold (any type)</dd>
-<dt>IPP_FINISHINGS_JOB_OFFSET </dt>
+<dt>IPP_FINISHINGS_JOG_OFFSET </dt>
 <dd class="description">Offset for binding (any type)</dd>
 <dt>IPP_FINISHINGS_NONE </dt>
 <dd class="description">No finishing</dd>

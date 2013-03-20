@@ -474,6 +474,8 @@ httpAssembleURIf(
  * number.  The result is formatted as a UUID URN as defined in RFC 4122.
  *
  * The buffer needs to be at least 46 bytes in size.
+ *
+ * @since CUPS 1.7@
  */
 
 char *					/* I - UUID string */

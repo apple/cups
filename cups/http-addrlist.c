@@ -59,7 +59,7 @@ httpAddrConnect(
  * 'httpAddrConnect2()' - Connect to any of the addresses in the list with a
  *                        timeout and optional cancel.
  *
- * @since CUPS 1.6/OS X 10.8@
+ * @since CUPS 1.7@
  */
 
 http_addrlist_t *			/* O - Connected address or NULL on failure */
