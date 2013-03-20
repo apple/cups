@@ -671,7 +671,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   _pwg_print_quality_t	pwg_print_quality;
 					/* print-quality index */
   int			similar;	/* Are the old and new size similar? */
-  pwg_size_t           *old_size;	/* Current old size */
+  pwg_size_t		*old_size;	/* Current old size */
   int			old_imageable,	/* Old imageable length in 2540ths */
 			old_borderless,	/* Old borderless state */
 			old_known_pwg;	/* Old PWG name is well-known */
@@ -684,7 +684,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 			new_imageable,	/* New imageable length in 2540ths */
 			new_borderless,	/* New borderless state */
 			new_known_pwg;	/* New PWG name is well-known */
-  pwg_size_t           *new_size;	/* New size to add, if any */
+  pwg_size_t		*new_size;	/* New size to add, if any */
   const char		*filter;	/* Current filter */
   _pwg_finishings_t	*finishings;	/* Current finishings value */
 
@@ -1019,7 +1019,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
   {
     if ((pc->bins = calloc(output_bin->num_choices,
-                             sizeof(pwg_map_t))) == NULL)
+                           sizeof(pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
                     "pwg_map_t's for OutputBin.", output_bin->num_choices));
