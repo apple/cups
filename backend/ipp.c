@@ -1603,6 +1603,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_STATUS_ERROR_JOB_CANCELED ||
                ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED ||
+               ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES ||
 	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
 	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
 	       ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
@@ -2096,17 +2097,19 @@ main(int  argc,				/* I - Number of command-line args */
     fputs("JOBSTATE: account-authorization-failed\n", stderr);
 
   if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
-      ipp_status == IPP_AUTHENTICATION_CANCELED ||
-      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
-      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
-      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
-      ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+      ipp_status == IPP_AUTHENTICATION_CANCELED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
+  else if (ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
+	   ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
+	   ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
+	   ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
+    return (CUPS_BACKEND_HOLD);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
   else if (ipp_status == IPP_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else if (ipp_status == IPP_REQUEST_VALUE ||
+	   ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES ||
            ipp_status == IPP_DOCUMENT_FORMAT || job_canceled < 0)
   {
     if (ipp_status == IPP_REQUEST_VALUE)
@@ -2114,6 +2117,9 @@ main(int  argc,				/* I - Number of command-line args */
     else if (ipp_status == IPP_DOCUMENT_FORMAT)
       _cupsLangPrintFilter(stderr, "ERROR",
                            _("Printer cannot print supplied content."));
+    else if (ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES)
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Printer cannot print with supplied options."));
     else
       _cupsLangPrintFilter(stderr, "ERROR", _("Print job canceled at printer."));
 
@@ -2595,7 +2601,7 @@ new_request(
         ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
                      NULL, keyword);
 
-      if (pc->account_id &&
+      if (pc->accounting_user_id &&
           (keyword = cupsGetOption("job-accounting-user-id", num_options,
                                    options)) != NULL)
         ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,

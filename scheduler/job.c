@@ -3060,8 +3060,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	job_state = IPP_JOB_COMPLETED;
 	message   = "Job completed.";
 
-	ippSetString(job->attrs, &job->reasons, 0,
-	             "job-completed-successfully");
+        if (!job->status)
+	  ippSetString(job->attrs, &job->reasons, 0,
+		       "job-completed-successfully");
         break;
 
     case IPP_JOB_STOPPED :
@@ -3247,13 +3248,48 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    * Hold the job...
 	    */
 
-	    cupsdSetJobHoldUntil(job, "indefinite", 1);
-	    ippSetString(job->attrs, &job->reasons, 0,
-	                 "job-hold-until-specified");
+	    const char *reason = ippGetString(job->reasons, 0, NULL);
+
+	    cupsdLogJob(job, CUPSD_LOG_DEBUG, "job-state-reasons=\"%s\"",
+	                reason);
+
+	    if (!reason || strncmp(reason, "account-", 8))
+	    {
+	      cupsdSetJobHoldUntil(job, "indefinite", 1);
+
+	      ippSetString(job->attrs, &job->reasons, 0,
+			   "job-hold-until-specified");
+	      message = "Job held indefinitely due to backend errors; please "
+			"consult the error_log file for details.";
+            }
+            else if (!strcmp(reason, "account-info-needed"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account information is "
+	                "required.";
+            }
+            else if (!strcmp(reason, "account-closed"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account has been closed.";
+	    }
+            else if (!strcmp(reason, "account-limit-reached"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account limit has been "
+	                "reached.";
+	    }
+            else
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account authorization failed.";
+	    }
 
 	    job_state = IPP_JOB_HELD;
-	    message   = "Job held indefinitely due to backend errors; please "
-			"consult the error_log file for details.";
           }
           break;
 

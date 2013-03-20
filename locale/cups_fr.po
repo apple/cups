@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-03-08 13:23-0500\n"
+"POT-Creation-Date: 2013-03-20 15:42-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2969,6 +2969,9 @@ msgstr "Affranchissement Internet en 3 parties"
 msgid "Internet Printing Protocol"
 msgstr "Internet Printing Protocol"
 
+msgid "Invalid media name arguments."
+msgstr ""
+
 msgid "Invalid media size."
 msgstr ""
 
@@ -3563,6 +3566,9 @@ msgid "Printer Settings"
 msgstr "Réglages de l’imprimante"
 
 msgid "Printer cannot print supplied content."
+msgstr ""
+
+msgid "Printer cannot print with supplied options."
 msgstr ""
 
 msgid "Printer:"
