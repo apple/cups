@@ -102,7 +102,7 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_TRIM,			/* Trim (any type) */
   IPP_FINISHINGS_BALE,			/* Bale (any type) */
   IPP_FINISHINGS_BOOKLET_MAKER,		/* Fold to make booklet */
-  IPP_FINISHINGS_JOB_OFFSET,		/* Offset for binding (any type) */
+  IPP_FINISHINGS_JOG_OFFSET,		/* Offset for binding (any type) */
   IPP_FINISHINGS_STAPLE_TOP_LEFT = 20,	/* Staple top left corner */
   IPP_FINISHINGS_STAPLE_BOTTOM_LEFT,	/* Staple bottom left corner */
   IPP_FINISHINGS_STAPLE_TOP_RIGHT,	/* Staple top right corner */
@@ -160,6 +160,8 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z */
 } ipp_finishings_t;
 #  ifndef _CUPS_NO_DEPRECATED
+#    define IPP_FINISHINGS_JOB_OFFSET	IPP_FINISHINGS_JOG_OFFSET
+					/* Long-time misspelling... */
 typedef enum ipp_finishings_e ipp_finish_t;
 #  endif /* !_CUPS_NO_DEPRECATED */
 
