@@ -436,7 +436,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   {
     if (httpAddrLocalhost(&temp))
       strlcpy(con->servername, "localhost", sizeof(con->servername));
-    else if (HostNameLookups || RemotePort)
+    else if (HostNameLookups)
       httpAddrLookup(&temp, con->servername, sizeof(con->servername));
     else
       httpAddrString(&temp, con->servername, sizeof(con->servername));
