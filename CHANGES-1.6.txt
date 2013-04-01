@@ -3,6 +3,11 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.3
 
+	- Fixed a regression on the handling of auth keys on OS X if the
+	  cups-files.conf was not present or did not contain a SystemAuthKey
+	  value.
+	- The scheduler incorrectly did a reverse lookup of the server address
+	  when HostNameLookups was turned off (STR #4302)
 	- The scheduler incorrectly computed the final content type value when
 	  null filters were present.
 

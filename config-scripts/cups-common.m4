@@ -338,6 +338,7 @@ AC_SUBST(DBUS_NOTIFIERLIBS)
 
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
+CUPS_DEFAULT_SYSTEM_AUTHKEY=""
 CUPS_SYSTEM_AUTHKEY=""
 INSTALLXPC=""
 
@@ -385,10 +386,13 @@ case $uname in
 
 			if test "x$default_adminkey" != xdefault; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey $default_adminkey"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="$default_adminkey"
 			elif grep -q system.print.operator /etc/authorization; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.print.admin"
 			else
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.preferences"
 			fi
 
 			if test "x$default_operkey" != xdefault; then
@@ -426,6 +430,7 @@ esac
 
 AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SYSTEM_AUTHKEY, "$CUPS_DEFAULT_SYSTEM_AUTHKEY")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(INSTALLXPC)
 

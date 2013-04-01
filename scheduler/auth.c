@@ -513,18 +513,37 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     socklen_t		peersize;	/* Size of peer credentials */
 #ifdef HAVE_AUTHORIZATION_H
     const char		*name;		/* Authorizing name */
+    int			no_peer = 0;	/* Don't allow peer credentials? */
+
+   /*
+    * See if we should allow peer credentials...
+    */
 
     for (name = (char *)cupsArrayFirst(con->best->names);
          name;
          name = (char *)cupsArrayNext(con->best->names))
+    {
       if (!_cups_strncasecmp(name, "@AUTHKEY(", 9) ||
           !_cups_strcasecmp(name, "@SYSTEM"))
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "[Client %d] PeerCred authentication not allowed for "
-	                "resource.", con->http.fd);
-	return;
+       /* Normally don't want peer credentials if we need an auth key... */
+	no_peer = 1;
       }
+      else if (!_cups_strcasecmp(name, "@OWNER"))
+      {
+       /* but if @OWNER is present then we allow it... */
+        no_peer = 0;
+        break;
+      }
+    }
+
+    if (no_peer)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "[Client %d] PeerCred authentication not allowed for "
+		      "resource per AUTHKEY policy.", con->http.fd);
+      return;
+    }
 #endif /* HAVE_AUTHORIZATION_H */
 
     if ((pwd = getpwnam(authorization + 9)) == NULL)
