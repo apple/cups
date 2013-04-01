@@ -3,6 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.3
 
+	- The IPP backend could fail to pause a job for authentication
+	  (STR #4298)
 	- Fixed a regression on the handling of auth keys on OS X if the
 	  cups-files.conf was not present or did not contain a SystemAuthKey
 	  value.

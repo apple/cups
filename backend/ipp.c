@@ -115,8 +115,6 @@ static char		username[256] = "",
 					/* Username for device URI */
 			*password = NULL;
 					/* Password for device URI */
-static int		password_tries = 0;
-					/* Password tries */
 static const char * const pattrs[] =	/* Printer attributes we want */
 {
 #ifdef HAVE_LIBZ
@@ -185,7 +183,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     int print_color_mode);
 static const char	*password_cb(const char *prompt, http_t *http,
 			             const char *method, const char *resource,
-			             void *user_data);
+			             int *user_data);
 static const char	*quote_string(const char *s, char *q, size_t qsize);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
@@ -223,6 +221,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*name,			/* Name of option */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
+  int		password_tries = 0;	/* Password tries */
   http_addrlist_t *addrlist;		/* Address of printer */
   int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd,		/* SNMP socket */
@@ -635,7 +634,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Set the authentication info, if any...
   */
 
-  cupsSetPasswordCB2(password_cb, NULL);
+  cupsSetPasswordCB2((cups_password_cb2_t)password_cb, &password_tries);
 
   if (username[0])
   {
@@ -1888,6 +1887,9 @@ main(int  argc,				/* I - Number of command-line args */
 
       check_printer_state(http, uri, resource, argv[2], version);
 
+      if (cupsLastError() <= IPP_OK_CONFLICT)
+        password_tries = 0;
+
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
       */
@@ -2037,6 +2039,9 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   check_printer_state(http, uri, resource, argv[2], version);
+
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+    password_tries = 0;
 
  /*
   * Collect the final page count as needed...
@@ -2224,9 +2229,6 @@ check_printer_state(
   fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
 	  ippErrorString(cupsLastError()), cupsLastErrorString());
 
-  if (cupsLastError() <= IPP_OK_CONFLICT)
-    password_tries = 0;
-
  /*
   * Return the printer-state value...
   */
@@ -2254,6 +2256,7 @@ monitor_printer(
   const char	*job_name;		/* Job name */
   ipp_jstate_t	job_state;		/* Job state */
   const char	*job_user;		/* Job originating user name */
+  int		password_tries = 0;	/* Password tries */
 
 
  /*
@@ -2265,7 +2268,8 @@ monitor_printer(
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);
-  cupsSetPasswordCB2(password_cb, NULL);
+
+  cupsSetPasswordCB2((cups_password_cb2_t)password_cb, &password_tries);
 
  /*
   * Loop until the job is canceled, aborted, or completed.
@@ -2291,6 +2295,8 @@ monitor_printer(
                                                    monitor->resource,
 						   monitor->user,
 						   monitor->version);
+      if (cupsLastError() <= IPP_OK_CONFLICT)
+        password_tries = 0;
 
      /*
       * Check the status of the job itself...
@@ -2933,18 +2939,19 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
             http_t     *http,		/* I - Connection */
             const char *method,		/* I - Request method (not used) */
             const char *resource,	/* I - Resource path (not used) */
-            void       *user_data)	/* I - User data (not used) */
+            int        *password_tries)	/* I - Password tries */
 {
   char	def_username[HTTP_MAX_VALUE];	/* Default username */
 
 
-  fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\"), password=%p, "
-          "password_tries=%d\n", prompt, password, password_tries);
+  fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\", http=%p, method=\"%s\", "
+                  "resource=\"%s\", password_tries=%p(%d)), password=%p\n",
+          prompt, http, method, resource, password_tries, *password_tries,
+          password);
 
   (void)prompt;
   (void)method;
   (void)resource;
-  (void)user_data;
 
  /*
   * Remember that we need to authenticate...
@@ -2962,9 +2969,9 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
             quote_string(def_username, quoted, sizeof(quoted)));
   }
 
-  if (password && *password && password_tries < 3)
+  if (password && *password && *password_tries < 3)
   {
-    password_tries ++;
+    (*password_tries) ++;
 
     return (password);
   }
