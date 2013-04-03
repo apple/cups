@@ -917,7 +917,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 {
   int		i;			/* Looping var */
   const char	*argv[8],		/* Command-line arguments */
-		*envp[16],		/* Environment variables */
+		*envp[17],		/* Environment variables */
 		*temp;			/* Temporary string */
   char		*optstr,		/* Filter options */
 		content_type[1024],	/* CONTENT_TYPE */
@@ -925,6 +925,8 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 		cups_fontpath[1024],	/* CUPS_FONTPATH */
 		cups_serverbin[1024],	/* CUPS_SERVERBIN */
 		cups_serverroot[1024],	/* CUPS_SERVERROOT */
+		final_content_type[1024] = "",
+					/* FINAL_CONTENT_TYPE */
 		lang[1024],		/* LANG */
 		path[1024],		/* PATH */
 		ppd[1024],		/* PPD */
@@ -946,6 +948,39 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   cups_lang_t	*language;		/* Current language */
   cups_dest_t	*dest;			/* Destination information */
 
+
+ /*
+  * Figure out the final content type...
+  */
+
+  for (filter = (mime_filter_t *)cupsArrayLast(filters);
+       filter && filter->dst;
+       filter = (mime_filter_t *)cupsArrayPrev(filters))
+    if (strcmp(filter->dst->super, "printer"))
+      break;
+
+  if (filter && filter->dst)
+  {
+    const char *ptr;			/* Pointer in type name */
+
+    if ((ptr = strchr(filter->dst->type, '/')) != NULL)
+      snprintf(final_content_type, sizeof(final_content_type),
+	       "FINAL_CONTENT_TYPE=%s", ptr + 1);
+    else
+      snprintf(final_content_type, sizeof(final_content_type),
+	       "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
+	       filter->dst->type);
+  }
+
+ /*
+  * Remove NULL ("-") filters...
+  */
+
+  for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+       filter;
+       filter = (mime_filter_t *)cupsArrayNext(filters))
+    if (!strcmp(filter->filter, "-"))
+      cupsArrayRemove(filters, filter);
 
  /*
   * Setup the filter environment and command-line...
@@ -1041,7 +1076,13 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   envp[12] = rip_max_cache;
   envp[13] = userenv;
   envp[14] = "CHARSET=utf-8";
-  envp[15] = NULL;
+  if (final_content_type[0])
+  {
+    envp[15] = final_content_type;
+    envp[16] = NULL;
+  }
+  else
+    envp[15] = NULL;
 
   for (i = 0; argv[i]; i ++)
     fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);

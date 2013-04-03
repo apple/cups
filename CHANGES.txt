@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7b1 - 2013-03-11
+CHANGES.txt - 1.7b1 - 2013-04-03
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
+	  environment variable for filters.
 	- Added a new "-x" option to the cancel command (STR #4103)
 	- Made the PWG media handling APIs public (STR #4267)
 	- Implemented ready media support for the cupsGetDestMediaXxx APIs
