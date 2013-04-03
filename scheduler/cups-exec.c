@@ -31,6 +31,7 @@
 #  ifndef SANDBOX_NAMED_EXTERNAL
 #    define SANDBOX_NAMED_EXTERNAL  0x0003
 #  endif /* !SANDBOX_NAMED_EXTERNAL */
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif /* HAVE_SANDBOX_H */
 
 
@@ -60,7 +61,6 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
 #ifdef HAVE_SANDBOX_H
-#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
  /*
   * Run in a separate security profile...
   */

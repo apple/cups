@@ -202,6 +202,14 @@ depend:
 
 
 #
+# Run oclint to check code coverage...
+#
+
+oclint:
+	oclint -o=oclint.html -html $(LIBOBJS:.o=.c) -- $(ALL_CFLAGS)
+
+
+#
 # Install all targets...
 #
 

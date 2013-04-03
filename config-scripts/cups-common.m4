@@ -44,9 +44,9 @@ LDFLAGS="${LDFLAGS:=}"
 
 dnl Checks for programs...
 AC_PROG_AWK
-AC_PROG_CC
+AC_PROG_CC(clang cc gcc)
 AC_PROG_CPP
-AC_PROG_CXX
+AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)

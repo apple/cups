@@ -3,6 +3,7 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.3
 
+	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
 	- The IPP backend could fail to pause a job for authentication
 	  (STR #4298)
