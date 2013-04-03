@@ -5293,7 +5293,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       http->error  = EIO;
       http->status = HTTP_STATUS_ERROR;
 
-      _cupsSetError(IPP_PKI_ERROR, gnutls_strerror(status), 0);
+      _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, gnutls_strerror(status), 0);
 
       gnutls_deinit(http->tls);
       gnutls_certificate_free_credentials(*credentials);
