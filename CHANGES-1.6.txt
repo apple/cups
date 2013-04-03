@@ -3,6 +3,7 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.3
 
+	- Fixed a compile problem on AIX (STR #4307)
 	- The IPP backend could fail to pause a job for authentication
 	  (STR #4298)
 	- Fixed a regression on the handling of auth keys on OS X if the
