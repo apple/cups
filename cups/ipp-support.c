@@ -879,6 +879,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-content-optimize-actual",
     "print-quality-actual",
     "print-rendering-intent-actual",
+    "print-scaling-actual",		/* IPP Paid Printing */
     "printer-resolution-actual",
     "printer-up-time",
     "separator-sheets-actual",
@@ -971,6 +972,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "orientation-requested",
     "orientation-requested-default",
     "orientation-requested-supported",
+    "output-mode",			/* CUPS extension */
+    "output-mode-default",		/* CUPS extension */
+    "output-mode-supported",		/* CUPS extension */
     "overrides",
     "overrides-supported",
     "page-delivery",
@@ -1005,6 +1009,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-rendering-intent",
     "print-rendering-intent-default",
     "print-rendering-intent-supported",
+    "print-scaling",			/* IPP Paid Printing */
+    "print-scaling-default",		/* IPP Paid Printing */
+    "print-scaling-supported",		/* IPP Paid Printing */
     "printer-resolution",
     "printer-resolution-default",
     "printer-resolution-supported",
@@ -1139,6 +1146,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-content-optimize-actual",
     "print-quality-actual",
     "print-rendering-intent-actual",
+    "print-scaling-actual",		/* IPP Paid Printing */
     "printer-resolution-actual",
     "separator-sheets-actual",
     "sheet-collate-actual",
@@ -1315,6 +1323,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "output-device",
     "output-device-default",
     "output-device-supported",
+    "output-mode",			/* CUPS extension */
+    "output-mode-default",		/* CUPS extension */
+    "output-mode-supported",		/* CUPS extension */
     "overrides",
     "overrides-supported",
     "page-delivery",
@@ -1349,6 +1360,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-rendering-intent",
     "print-rendering-intent-default",
     "print-rendering-intent-supported",
+    "print-scaling",			/* IPP Paid Printing */
+    "print-scaling-default",		/* IPP Paid Printing */
+    "print-scaling-supported",		/* IPP Paid Printing */
     "printer-resolution",
     "printer-resolution-default",
     "printer-resolution-supported",
@@ -1504,6 +1518,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-icons",
     "printer-info",
     "printer-is-accepting-jobs",
+    "printer-is-shared",		/* CUPS extension */
+    "printer-kind",			/* IPP Paid Printing */
     "printer-location",
     "printer-make-and-model",
     "printer-mandatory-job-attributes",
@@ -1513,6 +1529,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-more-info",
     "printer-more-info-manufacturer",
     "printer-name",
+    "printer-native-formats",
     "printer-organization",
     "printer-organizational-unit",
     "printer-settable-attributes-supported",
@@ -1539,6 +1556,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "requesting-user-name-denied",	/* CUPS extension */
     "requesting-user-uri-supported",
     "subordinate-printers-supported",
+    "urf-supported",			/* CUPS extension */
     "uri-authentication-supported",
     "uri-security-supported",
     "user-defined-value-supported",
