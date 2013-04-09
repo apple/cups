@@ -358,7 +358,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   if (!http)
     http = _cupsConnect();
 
-  if (!http || (http->state != HTTP_STATE_POST_RECV && http->state != HTTP_STATE_POST_SEND))
+  if (!http || (http->state != HTTP_STATE_POST_RECV &&
+                http->state != HTTP_STATE_POST_SEND))
     return (NULL);
 
  /*
