@@ -3,6 +3,9 @@ CHANGES.txt - 1.7b1 - 2013-04-09
 
 CHANGES IN CUPS V1.7b1
 
+	- The configure script now supports a --with-rundir option to change
+	  the transient run-time state directory from the default to other
+	  locations like /run/cups (STR #4306)
 	- The scheduler now supports PPD lookups for classes (STR #4296)
 	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
 	  environment variable for filters.
