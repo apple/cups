@@ -1603,11 +1603,12 @@ static kern_return_t registry_close(void)
 static OSStatus copy_deviceid(classdriver_t **classdriver,
 			      CFStringRef *deviceID)
 {
-  CFStringRef devID = NULL,
-
-  deviceMake = NULL,
-  deviceModel = NULL,
-  deviceSerial = NULL;
+  CFStringRef devID = NULL;
+  CFStringRef deviceMake = NULL;
+  CFStringRef deviceModel = NULL;
+  CFStringRef deviceSerial = NULL;
+  
+  *deviceID = NULL;
 
   OSStatus err = (*classdriver)->GetDeviceID(classdriver, &devID, DEFAULT_TIMEOUT);
 
@@ -1653,12 +1654,10 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
 
       if (deviceSerial == NULL && desc.iSerialNumber != 0)
       {
-	CFStringRef data = NULL;
-	err = (*classdriver)->GetString(classdriver, desc.iSerialNumber, kUSBLanguageEnglish, DEFAULT_TIMEOUT, &data);
-	if (data != NULL)
+	err = (*classdriver)->GetString(classdriver, desc.iSerialNumber, kUSBLanguageEnglish, DEFAULT_TIMEOUT, &deviceSerial);
+	if (deviceSerial != NULL)
 	{
-	  CFStringAppendFormat(newDevID, NULL, CFSTR("SERN:%@;"), data);
-	  CFRelease(data);
+	  CFStringAppendFormat(newDevID, NULL, CFSTR("SERN:%@;"), deviceSerial);
 	}
       }
 
@@ -1675,6 +1674,21 @@ static OSStatus copy_deviceid(classdriver_t **classdriver,
   {
     *deviceID = devID;
   }
+
+  if (*deviceID == NULL)
+      return err;
+
+  /* Remove special characters from the serial number */
+  CFRange range = (deviceSerial != NULL ? CFStringFind(deviceSerial, CFSTR("+"), 0) : CFRangeMake(0, 0));
+  if (range.length == 1) {
+      range = CFStringFind(*deviceID, deviceSerial, 0);
+      
+      CFMutableStringRef deviceIDString = CFStringCreateMutableCopy(NULL, 0, *deviceID);
+      CFStringFindAndReplace(deviceIDString, CFSTR("+"), CFSTR(""), range, 0);
+      CFRelease(*deviceID);
+      *deviceID = deviceIDString;
+  }
+  
   release_deviceinfo(&deviceMake, &deviceModel, &deviceSerial);
 
   return err;

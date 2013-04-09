@@ -3,7 +3,7 @@
  *
  *   API definitions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -37,6 +37,7 @@ typedef off_t ssize_t;			/* @private@ */
 #  include "file.h"
 #  include "ipp.h"
 #  include "language.h"
+#  include "pwg.h"
 
 
 /*
@@ -591,6 +592,29 @@ extern http_status_t	cupsStartDestDocument(http_t *http, cups_dest_t *dest,
 					      int last_document) _CUPS_API_1_6;
 
 /* New in CUPS 1.7 */
+extern ipp_attribute_t	*cupsFindDestDefault(http_t *http, cups_dest_t *dest,
+			                     cups_dinfo_t *dinfo,
+			                     const char *option) _CUPS_API_1_7;
+extern ipp_attribute_t	*cupsFindDestReady(http_t *http, cups_dest_t *dest,
+					   cups_dinfo_t *dinfo,
+					   const char *option) _CUPS_API_1_7;
+extern ipp_attribute_t	*cupsFindDestSupported(http_t *http, cups_dest_t *dest,
+			                       cups_dinfo_t *dinfo,
+			                       const char *option)
+			                       _CUPS_API_1_7;
+extern int		cupsGetDestMediaByIndex(http_t *http, cups_dest_t *dest,
+			                        cups_dinfo_t *dinfo, int n,
+			                        unsigned flags,
+			                        cups_size_t *size)
+			                        _CUPS_API_1_7;
+extern  int		cupsGetDestMediaCount(http_t *http, cups_dest_t *dest,
+			                      cups_dinfo_t *dinfo,
+			                      unsigned flags) _CUPS_API_1_7;
+extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
+			                        cups_dinfo_t *dinfo,
+			                        unsigned flags,
+			                        cups_size_t *size)
+			                        _CUPS_API_1_7;
 extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
 extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 

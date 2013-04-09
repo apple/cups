@@ -113,6 +113,7 @@ HEADERS	=	\
 		ipp.h \
 		language.h \
 		ppd.h \
+		pwg.h \
 		raster.h \
 		sidechannel.h \
 		transcode.h \
@@ -198,6 +199,14 @@ clean:
 
 depend:
 	$(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
+
+
+#
+# Run oclint to check code coverage...
+#
+
+oclint:
+	oclint -o=oclint.html -html $(LIBOBJS:.o=.c) -- $(ALL_CFLAGS)
 
 
 #
@@ -527,8 +536,8 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
 		api-cups.xml \
-		cups.h adminutil.c dest*.c language.c notify.c \
-		options.c tempfile.c usersys.c \
+		cups.h pwg.h adminutil.c dest*.c language.c notify.c \
+		options.c pwg-media.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --tokens help/api-cups.html api-cups.xml >../doc/help/api-cups.tokens
 	$(RM) api-cups.xml

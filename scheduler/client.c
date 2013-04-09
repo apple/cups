@@ -436,7 +436,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   {
     if (httpAddrLocalhost(&temp))
       strlcpy(con->servername, "localhost", sizeof(con->servername));
-    else if (HostNameLookups || RemotePort)
+    else if (HostNameLookups)
       httpAddrLookup(&temp, con->servername, sizeof(con->servername));
     else
       httpAddrString(&temp, con->servername, sizeof(con->servername));
@@ -1302,7 +1302,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       {
 	case HTTP_STATE_GET_SEND :
             if ((!strncmp(con->uri, "/ppd/", 5) ||
-		 !strncmp(con->uri, "/printers/", 10)) &&
+		 !strncmp(con->uri, "/printers/", 10) ||
+		 !strncmp(con->uri, "/classes/", 9)) &&
 		!strcmp(con->uri + strlen(con->uri) - 4, ".ppd"))
 	    {
 	     /*
@@ -1314,8 +1315,36 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      if (!strncmp(con->uri, "/ppd/", 5))
 		p = cupsdFindPrinter(con->uri + 5);
-	      else
+	      else if (!strncmp(con->uri, "/printers/", 10))
 		p = cupsdFindPrinter(con->uri + 10);
+	      else
+	      {
+		p = cupsdFindClass(con->uri + 9);
+
+		if (p)
+		{
+		  int i;		/* Looping var */
+
+		  for (i = 0; i < p->num_printers; i ++)
+		  {
+		    if (!(p->printers[i]->type & CUPS_PRINTER_CLASS))
+		    {
+		      char ppdname[1024];/* PPD filename */
+
+		      snprintf(ppdname, sizeof(ppdname), "%s/ppd/%s.ppd",
+		               ServerRoot, p->printers[i]->name);
+		      if (!access(ppdname, 0))
+		      {
+		        p = p->printers[i];
+		        break;
+		      }
+		    }
+		  }
+
+                  if (i >= p->num_printers)
+                    p = NULL;
+		}
+	      }
 
 	      if (p)
 	      {
@@ -1349,7 +1378,33 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               else if (!strncmp(con->uri, "/printers/", 10))
                 p = cupsdFindPrinter(con->uri + 10);
               else
-                p = cupsdFindClass(con->uri + 9);
+              {
+		p = cupsdFindClass(con->uri + 9);
+
+		if (p)
+		{
+		  int i;		/* Looping var */
+
+		  for (i = 0; i < p->num_printers; i ++)
+		  {
+		    if (!(p->printers[i]->type & CUPS_PRINTER_CLASS))
+		    {
+		      char ppdname[1024];/* PPD filename */
+
+		      snprintf(ppdname, sizeof(ppdname), "%s/ppd/%s.ppd",
+		               ServerRoot, p->printers[i]->name);
+		      if (!access(ppdname, 0))
+		      {
+		        p = p->printers[i];
+		        break;
+		      }
+		    }
+		  }
+
+                  if (i >= p->num_printers)
+                    p = NULL;
+		}
+	      }
 
               if (p)
 		snprintf(con->uri, sizeof(con->uri), "/icons/%s.png", p->name);
@@ -2128,6 +2183,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 
+	      if (data_ready(con))
+	        continue;
 	      break;
             }
 	    else
@@ -2619,7 +2676,14 @@ cupsdSendHeader(
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
+    {
+#  ifdef AF_LOCAL
+      if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
+        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
+      else
+#  endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
+    }
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&

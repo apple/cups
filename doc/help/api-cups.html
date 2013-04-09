@@ -415,6 +415,9 @@ destination.">cupsCopyDestInfo</a></li>
 	<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
 	<li><a href="#cupsEnumDests" title="Enumerate available destinations with a callback function.">cupsEnumDests</a></li>
 	<li><a href="#cupsEnumDestsBlock" title="Enumerate available destinations with a block.">cupsEnumDestsBlock</a></li>
+	<li><a href="#cupsFindDestDefault" title="Find the default value(s) for the given option.">cupsFindDestDefault</a></li>
+	<li><a href="#cupsFindDestReady" title="Find the default value(s) for the given option.">cupsFindDestReady</a></li>
+	<li><a href="#cupsFindDestSupported" title="Find the default value(s) for the given option.">cupsFindDestSupported</a></li>
 	<li><a href="#cupsFinishDestDocument" title="Finish the current document.">cupsFinishDestDocument</a></li>
 	<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
 	<li><a href="#cupsFreeDestInfo" title="Free destination information obtained using
@@ -426,8 +429,13 @@ cupsCopyDestInfo.">cupsFreeDestInfo</a></li>
 	<li><a href="#cupsGetDefault" title="Get the default printer or class for the default server.">cupsGetDefault</a></li>
 	<li><a href="#cupsGetDefault2" title="Get the default printer or class for the specified server.">cupsGetDefault2</a></li>
 	<li><a href="#cupsGetDest" title="Get the named destination from the list.">cupsGetDest</a></li>
+	<li><a href="#cupsGetDestMediaByIndex" title="Get a media name, dimension, and margins for a
+specific size.">cupsGetDestMediaByIndex</a></li>
 	<li><a href="#cupsGetDestMediaByName" title="Get media names, dimensions, and margins.">cupsGetDestMediaByName</a></li>
 	<li><a href="#cupsGetDestMediaBySize" title="Get media names, dimensions, and margins.">cupsGetDestMediaBySize</a></li>
+	<li><a href="#cupsGetDestMediaCount" title="Get the number of sizes supported by a
+destination.">cupsGetDestMediaCount</a></li>
+	<li><a href="#cupsGetDestMediaDefault" title="Get the default size for a destination.">cupsGetDestMediaDefault</a></li>
 	<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
 	<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
 	<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
@@ -486,6 +494,13 @@ connections.">cupsSetCredentials</a></li>
 	<li><a href="#cupsTempFile2" title="Creates a temporary CUPS file.">cupsTempFile2</a></li>
 	<li><a href="#cupsUser" title="Return the current user's name.">cupsUser</a></li>
 	<li><a href="#cupsUserAgent" title="Return the default HTTP User-Agent string.">cupsUserAgent</a></li>
+	<li><a href="#pwgFormatSizeName" title="Generate a PWG self-describing media size name.">pwgFormatSizeName</a></li>
+	<li><a href="#pwgInitSize" title="Initialize a pwg_size_t structure using IPP Job Template
+attributes.">pwgInitSize</a></li>
+	<li><a href="#pwgMediaForLegacy" title="Find a PWG media size by ISO/IPP legacy name.">pwgMediaForLegacy</a></li>
+	<li><a href="#pwgMediaForPPD" title="Find a PWG media size by Adobe PPD name.">pwgMediaForPPD</a></li>
+	<li><a href="#pwgMediaForPWG" title="Find a PWG media size by 5101.1 self-describing name.">pwgMediaForPWG</a></li>
+	<li><a href="#pwgMediaForSize" title="Get the PWG media size for the given dimensions.">pwgMediaForSize</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_client_cert_cb_t" title="Client credentials callback
@@ -508,6 +523,9 @@ information ">cups_dinfo_t</a></li>
 	<li><a href="#cups_server_cert_cb_t" title="Server credentials callback
 ">cups_server_cert_cb_t</a></li>
 	<li><a href="#cups_size_t" title="Media Size ">cups_size_t</a></li>
+	<li><a href="#pwg_map_t" title="Map element - PPD to/from PWG">pwg_map_t</a></li>
+	<li><a href="#pwg_media_t" title="Common media size data">pwg_media_t</a></li>
+	<li><a href="#pwg_size_t" title="Size element - PPD to/from PWG">pwg_size_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#cups_dest_s" title="Destination">cups_dest_s</a></li>
@@ -515,6 +533,9 @@ information ">cups_dinfo_t</a></li>
 	<li><a href="#cups_option_s" title="Printer Options">cups_option_s</a></li>
 	<li><a href="#cups_size_s" title="Media Size ">cups_size_s</a></li>
 	<li><a href="#pollfd" title="User data (unused)">pollfd</a></li>
+	<li><a href="#pwg_map_s" title="Map element - PPD to/from PWG">pwg_map_s</a></li>
+	<li><a href="#pwg_media_s" title="Common media size data">pwg_media_s</a></li>
+	<li><a href="#pwg_size_s" title="Size element - PPD to/from PWG">pwg_size_s</a></li>
 </ul></li>
 <li><a href="#VARIABLES">Variables</a><ul class="code">
 	<li><a href="#CF_RETURNS_RETAINED" title="Get the Apple language identifier associated with a
@@ -1141,7 +1162,7 @@ ipp_status_t cupsCancelDestJob (<br>
 <p class="description">Cancel a job on a destination.</p>
 <p class="discussion">The &quot;job_id&quot; is the number returned by cupsCreateDestJob.<br>
 <br>
-Returns IPP_OK on success and IPP_NOT_AUTHORIZED or IPP_FORBIDDEN on
+Returns IPP_STATUS_OK on success and IPP_NOT_AUTHORIZED or IPP_FORBIDDEN on
 failure.
 
 </p>
@@ -1254,7 +1275,7 @@ ipp_status_t cupsCloseDestJob (<br>
 <p class="description">IPP status code</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use when the last call to cupsStartDocument passed 0 for &quot;last_document&quot;.
-&quot;job_id&quot; is the job ID returned by cupsCreateDestJob. Returns <code>IPP_OK</code>
+&quot;job_id&quot; is the job ID returned by cupsCreateDestJob. Returns <code>IPP_STATUS_OK</code>
 on success.
 
 </p>
@@ -1475,7 +1496,7 @@ ipp_status_t cupsCreateDestJob (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">IPP status code</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Returns <code>IPP_OK</code> or <code>IPP_OK_SUBST</code> on success, saving the job ID
+<p class="discussion">Returns <code>IPP_STATUS_OK</code> or <code>IPP_STATUS_OK_SUBST</code> on success, saving the job ID
 in the variable pointed to by &quot;job_id&quot;.
 
 </p>
@@ -1522,7 +1543,7 @@ http_encryption_t cupsEncryption (void);</p>
 <p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
 environment variable, then the ~/.cups/client.conf file, and finally the
 /etc/cups/client.conf file. If not set, the default is
-<code>HTTP_ENCRYPT_IF_REQUESTED</code>.<br>
+<code>HTTP_ENCRYPTION_IF_REQUESTED</code>.<br>
 <br>
 Note: The current encryption setting is tracked separately for each thread
 in a program. Multi-threaded programs that override the setting via the
@@ -1608,6 +1629,96 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the block returns 0.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestDefault (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestReady (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
+<p class="description">Find the default value(s) for the given option.</p>
+<p class="code">
+ipp_attribute_t *cupsFindDestSupported (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>option</dt>
+<dd class="description">Option/attribute name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default attribute or <code>NULL</code> for none</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned value is an IPP attribute. Use the <code>ippGetBoolean</code>,
+<code>ippGetCollection</code>, <code>ippGetCount</code>, <code>ippGetDate</code>,
+<code>ippGetInteger</code>, <code>ippGetOctetString</code>, <code>ippGetRange</code>,
+<code>ippGetResolution</code>, <code>ippGetString</code>, and <code>ippGetValueTag</code>
+functions to inspect the default value(s) as needed.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsFinishDestDocument">cupsFinishDestDocument</a></h3>
 <p class="description">Finish the current document.</p>
 <p class="code">
@@ -1628,7 +1739,7 @@ ipp_status_t cupsFinishDestDocument (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of document submission</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Returns <code>IPP_OK</code> or <code>IPP_OK_SUBST</code> on success.
+<p class="discussion">Returns <code>IPP_STATUS_OK</code> or <code>IPP_STATUS_OK_SUBST</code> on success.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
@@ -1782,6 +1893,41 @@ not support the lpoptions-defined default printer.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> or <a href="#cupsGetDests2"><code>cupsGetDests2</code></a> functions to get a
 list of supported destinations for the current user.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
+<p class="description">Get a media name, dimension, and margins for a
+specific size.</p>
+<p class="code">
+int cupsGetDestMediaByIndex (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int n,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>n</dt>
+<dd class="description">Media size number (0-based)</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines which set of media are indexed.  For
+example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will get the Nth
+borderless size supported by the printer.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsGetDestMediaByName">cupsGetDestMediaByName</a></h3>
 <p class="description">Get media names, dimensions, and margins.</p>
 <p class="code">
@@ -1873,6 +2019,66 @@ size amongst the &quot;ready&quot; media.<br>
 The matching result (if any) is returned in the &quot;cups_size_t&quot; structure.<br>
 <br>
 Returns 1 when there is a match and 0 if there is not a match.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
+<p class="description">Get the number of sizes supported by a
+destination.</p>
+<p class="code">
+int cupsGetDestMediaCount (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of sizes</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines the set of media sizes that are
+counted.  For example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return
+the number of borderless sizes.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
+<p class="description">Get the default size for a destination.</p>
+<p class="code">
+int cupsGetDestMediaDefault (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+<dt>size</dt>
+<dd class="description">Media size information</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>flags</code> parameter determines which default size is returned.  For
+example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return the default
+borderless size, typically US Letter or A4, but sometimes 4x6 photo media.
 
 </p>
 <h3 class="function"><a name="cupsGetDests">cupsGetDests</a></h3>
@@ -2123,8 +2329,8 @@ the empty string, a new temporary file is created, otherwise the existing
 file will be overwritten as needed.  The caller &quot;owns&quot; the file that is
 created and must <code>unlink</code> the returned filename.<br>
 <br>
-On success, <code>HTTP_OK</code> is returned for a new PPD file and
-<code>HTTP_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other
+On success, <code>HTTP_STATUS_OK</code> is returned for a new PPD file and
+<code>HTTP_STATUS_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other
 status is an error.<br>
 <br>
 For classes, <code>cupsGetPPD3</code> returns the PPD file for the first printer
@@ -2703,7 +2909,7 @@ void cupsSetEncryption (<br>
 <p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
 environment variable, then the ~/.cups/client.conf file, and finally the
 /etc/cups/client.conf file. If not set, the default is
-<code>HTTP_ENCRYPT_IF_REQUESTED</code>.<br>
+<code>HTTP_ENCRYPTION_IF_REQUESTED</code>.<br>
 <br>
 Note: The current encryption setting is tracked separately for each thread
 in a program. Multi-threaded programs that override the setting need to do
@@ -2992,6 +3198,173 @@ name to be used.</p>
 const char *cupsUserAgent (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">User-Agent string</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgFormatSizeName">pwgFormatSizeName</a></h3>
+<p class="description">Generate a PWG self-describing media size name.</p>
+<p class="code">
+int pwgFormatSizeName (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *keyword,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t keysize,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *prefix,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int length,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *units<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>keyword</dt>
+<dd class="description">Keyword buffer</dd>
+<dt>keysize</dt>
+<dd class="description">Size of keyword buffer</dd>
+<dt>prefix</dt>
+<dd class="description">Prefix for PWG size or <code>NULL</code> for automatic</dd>
+<dt>name</dt>
+<dd class="description">Size name or <code>NULL</code></dd>
+<dt>width</dt>
+<dd class="description">Width of page in 2540ths</dd>
+<dt>length</dt>
+<dd class="description">Length of page in 2540ths</dd>
+<dt>units</dt>
+<dd class="description">Units - &quot;in&quot;, &quot;mm&quot;, or <code>NULL</code> for automatic</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function generates a PWG self-describing media size name of the form
+&quot;prefix_name_WIDTHxLENGTHunits&quot;.  The prefix is typically &quot;custom&quot; or &quot;roll&quot;
+for user-supplied sizes but can also be &quot;disc&quot;, &quot;iso&quot;, &quot;jis&quot;, &quot;jpn&quot;, &quot;na&quot;,
+&quot;oe&quot;, &quot;om&quot;, &quot;prc&quot;, or &quot;roc&quot;.  A value of <code>NULL</code> automatically chooses
+&quot;oe&quot; or &quot;om&quot; depending on the units.<br>
+<br>
+The size name may only contain lowercase letters, numbers, &quot;-&quot;, and &quot;.&quot;.  If
+<code>NULL</code> is passed, the size name will contain the formatted dimensions.<br>
+<br>
+The width and length are specified in hundredths of millimeters, equivalent
+to 1/100000th of a meter or 1/2540th of an inch.  The width, length, and
+units used for the generated size name are calculated automatically if the
+units string is <code>NULL</code>, otherwise inches (&quot;in&quot;) or millimeters (&quot;mm&quot;)
+are used.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgInitSize">pwgInitSize</a></h3>
+<p class="description">Initialize a pwg_size_t structure using IPP Job Template
+attributes.</p>
+<p class="code">
+int pwgInitSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#pwg_size_t">pwg_size_t</a> *size,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_t *job,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *margins_set<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>size</dt>
+<dd class="description">Size to initialize</dd>
+<dt>job</dt>
+<dd class="description">Job template attributes</dd>
+<dt>margins_set</dt>
+<dd class="description">1 if margins were set, 0 otherwise</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if size was initialized, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function initializes a pwg_size_t structure from an IPP &quot;media&quot; or
+&quot;media-col&quot; attribute in the specified IPP message.  0 is returned if neither
+attribute is found in the message or the values are not valid.<br>
+<br>
+The &quot;margins_set&quot; variable is initialized to 1 if any &quot;media-xxx-margin&quot;
+member attribute was specified in the &quot;media-col&quot; Job Template attribute,
+otherwise it is initialized to 0.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForLegacy">pwgMediaForLegacy</a></h3>
+<p class="description">Find a PWG media size by ISO/IPP legacy name.</p>
+<p class="code">
+<a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForLegacy (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *legacy<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>legacy</dt>
+<dd class="description">Legacy size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Matching size or NULL</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;name&quot; argument specifies the legacy ISO media size name, for example
+&quot;iso-a4&quot; or &quot;na-letter&quot;.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForPPD">pwgMediaForPPD</a></h3>
+<p class="description">Find a PWG media size by Adobe PPD name.</p>
+<p class="code">
+<a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPPD (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Matching size or NULL</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;ppd&quot; argument specifies an Adobe page size name as defined in Table B.1
+of the Adobe PostScript Printer Description File Format Specification Version
+4.3.<br>
+<br>
+If the name is non-standard, the returned PWG media size is stored in
+thread-local storage and is overwritten by each call to the function in the
+thread.  Custom names can be of the form &quot;Custom.WIDTHxLENGTH[units]&quot; or
+&quot;WIDTHxLENGTH[units]&quot;.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForPWG">pwgMediaForPWG</a></h3>
+<p class="description">Find a PWG media size by 5101.1 self-describing name.</p>
+<p class="code">
+<a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPWG (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *pwg<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>pwg</dt>
+<dd class="description">PWG size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Matching size or NULL</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;pwg&quot; argument specifies a self-describing media size name of the form
+&quot;prefix_name_WIDTHxLENGTHunits&quot; as defined in PWG 5101.1.<br>
+<br>
+If the name is non-standard, the returned PWG media size is stored in
+thread-local storage and is overwritten by each call to the function in the
+thread.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForSize">pwgMediaForSize</a></h3>
+<p class="description">Get the PWG media size for the given dimensions.</p>
+<p class="code">
+<a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int length<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>width</dt>
+<dd class="description">Width in hundredths of millimeters</dd>
+<dt>length</dt>
+<dd class="description">Length in hundredths of millimeters</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PWG media name</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The &quot;width&quot; and &quot;length&quot; are in hundredths of millimeters, equivalent to
+1/100000th of a meter or 1/2540th of an inch.<br>
+<br>
+If the dimensions are non-standard, the returned PWG media size is stored in
+thread-local storage and is overwritten by each call to the function in the
+thread.
+
+</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span><a name="cups_client_cert_cb_t">cups_client_cert_cb_t</a></h3>
 <p class="description">Client credentials callback
@@ -3064,6 +3437,21 @@ typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls, cups_array_t *cert
 <p class="description">Media Size </p>
 <p class="code">
 typedef struct <a href="#cups_size_s">cups_size_s</a> cups_size_t;
+</p>
+<h3 class="typedef"><a name="pwg_map_t">pwg_map_t</a></h3>
+<p class="description">Map element - PPD to/from PWG</p>
+<p class="code">
+typedef struct <a href="#pwg_map_s">pwg_map_s</a> pwg_map_t;
+</p>
+<h3 class="typedef"><a name="pwg_media_t">pwg_media_t</a></h3>
+<p class="description">Common media size data</p>
+<p class="code">
+typedef struct <a href="#pwg_media_s">pwg_media_s</a> pwg_media_t;
+</p>
+<h3 class="typedef"><a name="pwg_size_t">pwg_size_t</a></h3>
+<p class="description">Size element - PPD to/from PWG</p>
+<p class="code">
+typedef struct <a href="#pwg_size_s">pwg_size_s</a> pwg_size_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
 <h3 class="struct"><a name="cups_dest_s">cups_dest_s</a></h3>
@@ -3168,6 +3556,42 @@ millimeters</dd>
 <dt>timeout </dt>
 <dt>val </dt>
 <dd class="description">Return value</dd>
+</dl>
+<h3 class="struct"><a name="pwg_map_s">pwg_map_s</a></h3>
+<p class="description">Map element - PPD to/from PWG</p>
+<p class="code">struct pwg_map_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *pwg, *ppd;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>ppd </dt>
+<dd class="description">PPD option keyword</dd>
+</dl>
+<h3 class="struct"><a name="pwg_media_s">pwg_media_s</a></h3>
+<p class="description">Common media size data</p>
+<p class="code">struct pwg_media_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width, length;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *pwg, *legacy, *ppd;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>length </dt>
+<dd class="description">Length in 2540ths</dd>
+<dt>ppd </dt>
+<dd class="description">Standard Adobe PPD name</dd>
+</dl>
+<h3 class="struct"><a name="pwg_size_s">pwg_size_s</a></h3>
+<p class="description">Size element - PPD to/from PWG</p>
+<p class="code">struct pwg_size_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#pwg_map_t">pwg_map_t</a> map;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width, length, left, bottom, right, top;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>map </dt>
+<dd class="description">Map element</dd>
+<dt>top </dt>
+<dd class="description">Top margin in 2540ths</dd>
 </dl>
 <h2 class="title"><a name="VARIABLES">Variables</a></h2>
 <h3 class="variable"><a name="CF_RETURNS_RETAINED">CF_RETURNS_RETAINED</a></h3>

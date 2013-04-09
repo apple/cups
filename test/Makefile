@@ -49,7 +49,8 @@ TESTFILES	=	\
 			ipp-everywhere.test \
 			print-job.test \
 			print-job-deflate.test \
-			print-job-gzip.test
+			print-job-gzip.test \
+			validate-job.test
 OBJS		=	\
 			ippserver.o \
 			ipptool.o \

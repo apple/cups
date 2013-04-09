@@ -1,9 +1,24 @@
-CHANGES.txt - 1.7b1 - 2013-01-30
+CHANGES.txt - 1.7b1 - 2013-04-09
 --------------------------------
 
 CHANGES IN CUPS V1.7b1
 
+	- The configure script now supports a --with-rundir option to change
+	  the transient run-time state directory from the default to other
+	  locations like /run/cups (STR #4306)
+	- The scheduler now supports PPD lookups for classes (STR #4296)
+	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
+	  environment variable for filters.
 	- Added a new "-x" option to the cancel command (STR #4103)
+	- Made the PWG media handling APIs public (STR #4267)
+	- Implemented ready media support for the cupsGetDestMediaXxx APIs
+	  (STR #4289)
+	- Added new cupsFindDestDefault, cupsFindDestReady, and
+	  cupsFindDestSupported APIs (STR #4289)
+	- Added new cupsGetDestMediaByIndex, cupsGetDestMediaCount, and
+	  cupsGetDestMediaDefault APIs (STR #4289)
+	- Added new ippGet/SetOctetString APIs for getting and setting an
+	  octetString value (STR #4289)
 	- Added new ippCreateRequestedArray API for generating a array of
 	  attributes from the requested-attributes attribute.
 	- The ipptool utility now supports compression, conditional tests based

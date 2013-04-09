@@ -112,6 +112,8 @@ cupsCloseDestJob(
     return (IPP_STATUS_ERROR_INTERNAL);
   }
 
+  ippSetVersion(request, info->version / 10, info->version % 10);
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, info->uri);
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
@@ -188,6 +190,8 @@ cupsCreateDestJob(
     DEBUG_puts("1cupsCreateDestJob: Unable to create Create-Job request.");
     return (IPP_STATUS_ERROR_INTERNAL);
   }
+
+  ippSetVersion(request, info->version / 10, info->version % 10);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, info->uri);
@@ -326,6 +330,8 @@ cupsStartDestDocument(
                "request.");
     return (HTTP_STATUS_ERROR);
   }
+
+  ippSetVersion(request, info->version / 10, info->version % 10);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, info->uri);

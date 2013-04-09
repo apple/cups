@@ -47,11 +47,11 @@
  *   _httpFreeCredentials()	  - Free internal credentials.
  *   httpFreeCredentials()	  - Free an array of credentials.
  *   httpGet()			  - Send a GET request to the server.
- *   httpGetContentEncoding()	  - Get a common content encoding, if any,
- *				    between the client and server.
  *   httpGetAuthString()	  - Get the current authorization string.
  *   httpGetBlocking()		  - Get the blocking/non-block state of a
  *				    connection.
+ *   httpGetContentEncoding()	  - Get a common content encoding, if any,
+ *				    between the client and server.
  *   httpGetCookie()		  - Get any cookie data from the response.
  *   httpGetExpect()		  - Get the value of the Expect header, if any.
  *   httpGetFd()		  - Get the file descriptor associated with a
@@ -1044,6 +1044,40 @@ httpGet(http_t     *http,		/* I - Connection to server */
 
 
 /*
+ * 'httpGetAuthString()' - Get the current authorization string.
+ *
+ * The authorization string is set by cupsDoAuthentication() and
+ * httpSetAuthString().  Use httpGetAuthString() to retrieve the
+ * string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
+ * value.
+ *
+ * @since CUPS 1.3/OS X 10.5@
+ */
+
+char *					/* O - Authorization string */
+httpGetAuthString(http_t *http)		/* I - Connection to server */
+{
+  if (http)
+    return (http->authstring);
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'httpGetBlocking()' - Get the blocking/non-block state of a connection.
+ *
+ * @since CUPS 1.2/OS X 10.5@
+ */
+
+int					/* O - 1 if blocking, 0 if non-blocking */
+httpGetBlocking(http_t *http)		/* I - Connection to server */
+{
+  return (http ? http->blocking : 0);
+}
+
+
+/*
  * 'httpGetContentEncoding()' - Get a common content encoding, if any, between
  *                              the client and server.
  *
@@ -1128,40 +1162,6 @@ httpGetContentEncoding(http_t *http)	/* I - Connection to client/server */
 #endif /* HAVE_LIBZ */
 
   return (NULL);
-}
-
-
-/*
- * 'httpGetAuthString()' - Get the current authorization string.
- *
- * The authorization string is set by cupsDoAuthentication() and
- * httpSetAuthString().  Use httpGetAuthString() to retrieve the
- * string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
- * value.
- *
- * @since CUPS 1.3/OS X 10.5@
- */
-
-char *					/* O - Authorization string */
-httpGetAuthString(http_t *http)		/* I - Connection to server */
-{
-  if (http)
-    return (http->authstring);
-  else
-    return (NULL);
-}
-
-
-/*
- * 'httpGetBlocking()' - Get the blocking/non-block state of a connection.
- *
- * @since CUPS 1.2/OS X 10.5@
- */
-
-int					/* O - 1 if blocking, 0 if non-blocking */
-httpGetBlocking(http_t *http)		/* I - Connection to server */
-{
-  return (http ? http->blocking : 0);
 }
 
 
@@ -2358,6 +2358,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
+    else if (http->state == HTTP_STATE_GET_SEND ||
+             http->state == HTTP_STATE_POST_SEND)
+      http->state = HTTP_STATE_WAITING;
     else
       http->state = HTTP_STATE_STATUS;
 
@@ -2898,8 +2901,8 @@ httpSetCookie(http_t     *http,		/* I - Connection */
 /*
  * 'httpSetDefaultField()' - Set the default value of an HTTP header.
  *
- * Currently only HTTP_FIELD_ACCEPT_ENCODING, HTTP_FIELD_SERVER, and
- * HTTP_FIELD_USER_AGENT can be set.
+ * Currently only @code HTTP_FIELD_ACCEPT_ENCODING@, @code HTTP_FIELD_SERVER@,
+ * and @code HTTP_FIELD_USER_AGENT@ can be set.
  *
  * @since CUPS 1.7@
  */
@@ -4602,7 +4605,7 @@ http_read(http_t *http,			/* I - Connection to server */
 		CUPS_LLCAST bytes));
 #ifdef DEBUG
   if (bytes > 0)
-    http_debug_hex("http_read", http->buffer, (int)bytes);
+    http_debug_hex("http_read", buffer, (int)bytes);
 #endif /* DEBUG */
 
   if (bytes < 0)
@@ -5293,7 +5296,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       http->error  = EIO;
       http->status = HTTP_STATUS_ERROR;
 
-      _cupsSetError(IPP_PKI_ERROR, gnutls_strerror(status), 0);
+      _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, gnutls_strerror(status), 0);
 
       gnutls_deinit(http->tls);
       gnutls_certificate_free_credentials(*credentials);

@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-03-08 13:23-0500\n"
+"POT-Creation-Date: 2013-03-20 15:42-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -3165,6 +3165,9 @@ msgstr "Correo por Internet Parte-3"
 msgid "Internet Printing Protocol"
 msgstr "Protocolo de Impresión de Internet IPP"
 
+msgid "Invalid media name arguments."
+msgstr ""
+
 msgid "Invalid media size."
 msgstr "Tamaño del papel no válido"
 
@@ -3769,6 +3772,9 @@ msgstr "Configuración de la impresora"
 
 msgid "Printer cannot print supplied content."
 msgstr "La impresora no puede imprimir el contenido suministrado."
+
+msgid "Printer cannot print with supplied options."
+msgstr ""
 
 msgid "Printer:"
 msgstr "Impresora:"

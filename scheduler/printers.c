@@ -2128,7 +2128,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     for (i = 0, name = (char *)cupsArrayFirst(p->users);
          name;
 	 i ++, name = (char *)cupsArrayNext(p->users))
-      attr->values[i].string.text = _cupsStrRetain(name);
+      attr->values[i].string.text = _cupsStrAlloc(name);
   }
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -2195,7 +2195,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       for (i = 0; i < p->num_printers; i ++)
       {
 	if (attr != NULL)
-	  attr->values[i].string.text = _cupsStrRetain(p->printers[i]->name);
+	  attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
 
 	p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
       }
@@ -2295,7 +2295,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrRetain(oldattr->values[i].string.text);
+	      _cupsStrAlloc(oldattr->values[i].string.text);
       }
     }
 
@@ -2349,7 +2349,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrRetain(oldattr->values[i].string.text);
+	      _cupsStrAlloc(oldattr->values[i].string.text);
       }
     }
 
@@ -2362,7 +2362,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrRetain(oldattr->values[i].string.text);
+	      _cupsStrAlloc(oldattr->values[i].string.text);
       }
     }
 
@@ -3935,13 +3935,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         for (i = p->pc->num_sizes, pwgsize = p->pc->sizes;
 	     i > 0;
 	     i --, pwgsize ++, val ++)
-	  val->string.text = _cupsStrRetain(pwgsize->map.pwg);
+	  val->string.text = _cupsStrAlloc(pwgsize->map.pwg);
 
         if (p->pc->custom_min_keyword)
 	{
-	  val->string.text = _cupsStrRetain(p->pc->custom_min_keyword);
+	  val->string.text = _cupsStrAlloc(p->pc->custom_min_keyword);
 	  val ++;
-	  val->string.text = _cupsStrRetain(p->pc->custom_max_keyword);
+	  val->string.text = _cupsStrAlloc(p->pc->custom_max_keyword);
         }
       }
 
@@ -3993,7 +3993,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	         val = attr->values;
 	     i > 0;
 	     i --, pwgsource ++, val ++)
-	  val->string.text = _cupsStrRetain(pwgsource->pwg);
+	  val->string.text = _cupsStrAlloc(pwgsource->pwg);
       }
 
      /*
@@ -4009,7 +4009,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	         val = attr->values;
 	     i > 0;
 	     i --, pwgtype ++, val ++)
-	  val->string.text = _cupsStrRetain(pwgtype->pwg);
+	  val->string.text = _cupsStrAlloc(pwgtype->pwg);
       }
 
      /*
@@ -4295,7 +4295,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                mandatory = (char *)cupsArrayFirst(p->pc->mandatory);
            mandatory;
            val ++, mandatory = (char *)cupsArrayNext(p->pc->mandatory))
-        val->string.text = _cupsStrRetain(mandatory);
+        val->string.text = _cupsStrAlloc(mandatory);
     }
 
    /*

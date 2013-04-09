@@ -552,6 +552,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippGetGroupTag" title="Get the group associated with an attribute.">ippGetGroupTag</a></li>
 	<li><a href="#ippGetInteger" title="Get the integer/enum value for an attribute.">ippGetInteger</a></li>
 	<li><a href="#ippGetName" title="Get the attribute name.">ippGetName</a></li>
+	<li><a href="#ippGetOctetString" title="Get an octetString value from an IPP attribute.">ippGetOctetString</a></li>
 	<li><a href="#ippGetOperation" title="Get the operation ID in an IPP message.">ippGetOperation</a></li>
 	<li><a href="#ippGetRange" title="Get a rangeOfInteger value from an attribute.">ippGetRange</a></li>
 	<li><a href="#ippGetRequestId" title="Get the request ID from an IPP message.">ippGetRequestId</a></li>
@@ -578,6 +579,7 @@ in seconds.">ippDateToTime</a></li>
 	<li><a href="#ippSetGroupTag" title="Set the group tag of an attribute.">ippSetGroupTag</a></li>
 	<li><a href="#ippSetInteger" title="Set an integer or enum value in an attribute.">ippSetInteger</a></li>
 	<li><a href="#ippSetName" title="Set the name of an attribute.">ippSetName</a></li>
+	<li><a href="#ippSetOctetString" title="Set an octetString value in an IPP attribute.">ippSetOctetString</a></li>
 	<li><a href="#ippSetOperation" title="Set the operation ID in an IPP request message.">ippSetOperation</a></li>
 	<li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
 	<li><a href="#ippSetRange" title="Set a rangeOfInteger value in an attribute.">ippSetRange</a></li>
@@ -1011,7 +1013,7 @@ int cupsDoAuthentication (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function should be called in response to a <code>HTTP_UNAUTHORIZED</code>
+<p class="discussion">This function should be called in response to a <code>HTTP_STATUS_UNAUTHORIZED</code>
 status, prior to resubmitting your request.
 
 </p>
@@ -1203,7 +1205,7 @@ http_status_t cupsGetFd (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+<p class="discussion">This function returns <code>HTTP_STATUS_OK</code> when the file is successfully retrieved.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/OS X 10.4&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
@@ -1226,7 +1228,7 @@ http_status_t cupsGetFile (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+<p class="discussion">This function returns <code>HTTP_STATUS_OK</code> when the file is successfully retrieved.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
@@ -1286,7 +1288,7 @@ http_status_t cupsPutFd (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns <code>HTTP_CREATED</code> when the file is stored
+<p class="discussion">This function returns <code>HTTP_STATUS_CREATED</code> when the file is stored
 successfully.
 
 </p>
@@ -1368,7 +1370,7 @@ and <a href="#cupsReadResponseData"><code>cupsReadResponseData</code></a> to rea
 response. Only one request can be sent/queued at a time per <code>http_t</code>
 connection.<br>
 <br>
-Returns the initial HTTP status code, which will be <code>HTTP_CONTINUE</code>
+Returns the initial HTTP status code, which will be <code>HTTP_STATUS_CONTINUE</code>
 on a successful send of the request.<br>
 <br>
 Note: Unlike <a href="#cupsDoFileRequest"><code>cupsDoFileRequest</code></a>, <a href="#cupsDoIORequest"><code>cupsDoIORequest</code></a>, and
@@ -1393,7 +1395,7 @@ http_status_t cupsWriteRequestData (<br>
 <dd class="description">Number of bytes to write</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description"><code>HTTP_CONTINUE</code> if OK or HTTP status on error</p>
+<p class="description"><code>HTTP_STATUS_CONTINUE</code> if OK or HTTP status on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function is used after <a href="#cupsSendRequest"><code>cupsSendRequest</code></a> to provide a PPD and
 after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
@@ -1651,7 +1653,7 @@ this function in place of traditional string functions whenever
 you need to create a URI string.
 
 </p>
-<h3 class="function"><a name="httpAssembleUUID">httpAssembleUUID</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="httpAssembleUUID">httpAssembleUUID</a></h3>
 <p class="description">Assemble a name-based UUID URN conforming to RFC 4122.</p>
 <p class="code">
 char *httpAssembleUUID (<br>
@@ -1684,7 +1686,9 @@ char *httpAssembleUUID (<br>
 name, port number, random data, and optionally an object name and/or object
 number.  The result is formatted as a UUID URN as defined in RFC 4122.<br>
 <br>
-The buffer needs to be at least 46 bytes in size.</p>
+The buffer needs to be at least 46 bytes in size.
+
+</p>
 <h3 class="function"><a name="httpBlocking">httpBlocking</a></h3>
 <p class="description">Set blocking/non-blocking behavior on a connection.</p>
 <p class="code">
@@ -2813,8 +2817,8 @@ void httpSetDefaultField (<br>
 <dd class="description">Value</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Currently only HTTP_FIELD_ACCEPT_ENCODING, HTTP_FIELD_SERVER, and
-HTTP_FIELD_USER_AGENT can be set.
+<p class="discussion">Currently only <code>HTTP_FIELD_ACCEPT_ENCODING</code>, <code>HTTP_FIELD_SERVER</code>,
+and <code>HTTP_FIELD_USER_AGENT</code> can be set.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
@@ -2830,7 +2834,7 @@ void httpSetExpect (<br>
 <dd class="description">Connection to server</dd>
 <dt>expect</dt>
 <dd class="description">HTTP status to expect
-(<code>HTTP_CONTINUE</code>)</dd>
+(<code>HTTP_STATUS_CONTINUE</code>)</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Currently only <code>HTTP_STATUS_CONTINUE</code> is supported for the &quot;expect&quot;
@@ -4176,6 +4180,30 @@ const char *ippGetName (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Attribute name or <code>NULL</code> for separators</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippGetOctetString">ippGetOctetString</a></h3>
+<p class="description">Get an octetString value from an IPP attribute.</p>
+<p class="code">
+void *ippGetOctetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *datalen<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>datalen</dt>
+<dd class="description">Length of octetString data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Pointer to octetString data</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetOperation">ippGetOperation</a></h3>
 <p class="description">Get the operation ID in an IPP message.</p>
 <p class="code">
@@ -4677,6 +4705,41 @@ int ippSetName (<br>
 the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ippNewRequest</code></a>, or  <a href="#ippNewResponse"><code>ippNewResponse</code></a> functions.<br>
 <br>
 The <code>attr</code> parameter may be modified as a result of setting the value.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="ippSetOctetString">ippSetOctetString</a></h3>
+<p class="description">Set an octetString value in an IPP attribute.</p>
+<p class="code">
+int ippSetOctetString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> **attr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int element,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const void *data,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int datalen<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipp</dt>
+<dd class="description">IPP message</dd>
+<dt>attr</dt>
+<dd class="description">IPP attribute</dd>
+<dt>element</dt>
+<dd class="description">Value number (0-based)</dd>
+<dt>data</dt>
+<dd class="description">Pointer to octetString data</dd>
+<dt>datalen</dt>
+<dd class="description">Length of octetString data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The <code>ipp</code> parameter refers to an IPP message previously created using
+the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ippNewRequest</code></a>, or  <a href="#ippNewResponse"><code>ippNewResponse</code></a> functions.<br>
+<br>
+The <code>attr</code> parameter may be modified as a result of setting the value.<br>
+<br>
+The <code>element</code> parameter specifies which value to set from 0 to
+<a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a>.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippSetOperation">ippSetOperation</a></h3>
@@ -5538,10 +5601,6 @@ are server-oriented...</p>
 <p class="description">HTTP status codes</p>
 <h4 class="constants">Constants</h4>
 <dl>
-<dt>CUPS_STATUS_AUTHORIZATION_CANCELED <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
-<dd class="description">User canceled authorization </dd>
-<dt>CUPS_STATUS_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
-<dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_STATUS_ACCEPTED </dt>
 <dd class="description">DELETE command was successful</dd>
 <dt>HTTP_STATUS_BAD_GATEWAY </dt>
@@ -5554,6 +5613,10 @@ are server-oriented...</p>
 <dd class="description">Everything OK, keep going...</dd>
 <dt>HTTP_STATUS_CREATED </dt>
 <dd class="description">PUT command was successful</dd>
+<dt>HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dd class="description">User canceled authorization </dd>
+<dt>HTTP_STATUS_CUPS_PKI_ERROR <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
+<dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_STATUS_ERROR </dt>
 <dd class="description">An error response from httpXxxx()</dd>
 <dt>HTTP_STATUS_EXPECTATION_FAILED </dt>
@@ -5721,6 +5784,28 @@ are server-oriented...</p>
 <dd class="description">Fold to make booklet</dd>
 <dt>IPP_FINISHINGS_COVER </dt>
 <dd class="description">Add cover</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN </dt>
+<dd class="description">Accordian-fold the paper vertically into four sections</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE </dt>
+<dd class="description">Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_GATE </dt>
+<dd class="description">Fold the top and bottom quarters of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_HALF </dt>
+<dd class="description">Fold the paper in half vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_HALF_Z </dt>
+<dd class="description">Fold the paper in half horizontally, then Z-fold the paper vertically</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE </dt>
+<dd class="description">Fold the top quarter of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_LETTER </dt>
+<dd class="description">Fold the paper into three sections vertically; sometimes also known as a C fold</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_PARALLEL </dt>
+<dd class="description">Fold the paper in half vertically two times, yielding four sections</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_POSTER </dt>
+<dd class="description">Fold the paper in half horizontally and vertically; sometimes also called a cross fold</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE </dt>
+<dd class="description">Fold the bottom quarter of the paper towards the midline</dd>
+<dt>IPP_FINISHINGS_CUPS_FOLD_Z </dt>
+<dd class="description">Fold the paper vertically into three sections, forming a Z</dd>
 <dt>IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_LEFT </dt>
 <dd class="description">Punch 1 hole bottom left</dd>
 <dt>IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_RIGHT </dt>
@@ -5765,7 +5850,7 @@ are server-oriented...</p>
 <dd class="description">Stitch along top edge</dd>
 <dt>IPP_FINISHINGS_FOLD </dt>
 <dd class="description">Fold (any type)</dd>
-<dt>IPP_FINISHINGS_JOB_OFFSET </dt>
+<dt>IPP_FINISHINGS_JOG_OFFSET </dt>
 <dd class="description">Offset for binding (any type)</dd>
 <dt>IPP_FINISHINGS_NONE </dt>
 <dd class="description">No finishing</dd>

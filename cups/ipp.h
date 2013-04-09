@@ -102,7 +102,7 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_TRIM,			/* Trim (any type) */
   IPP_FINISHINGS_BALE,			/* Bale (any type) */
   IPP_FINISHINGS_BOOKLET_MAKER,		/* Fold to make booklet */
-  IPP_FINISHINGS_JOB_OFFSET,		/* Offset for binding (any type) */
+  IPP_FINISHINGS_JOG_OFFSET,		/* Offset for binding (any type) */
   IPP_FINISHINGS_STAPLE_TOP_LEFT = 20,	/* Staple top left corner */
   IPP_FINISHINGS_STAPLE_BOTTOM_LEFT,	/* Staple bottom left corner */
   IPP_FINISHINGS_STAPLE_TOP_RIGHT,	/* Staple top right corner */
@@ -144,9 +144,24 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side */
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
   IPP_FINISHINGS_CUPS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
-  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM	/* Punch 4 holes bottom edge */
+  IPP_FINISHINGS_CUPS_PUNCH_QUAD_BOTTOM,/* Punch 4 holes bottom edge */
+
+  IPP_FINISHINGS_CUPS_FOLD_ACCORDIAN = 0x4000005A,
+					/* Accordian-fold the paper vertically into four sections */
+  IPP_FINISHINGS_CUPS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
+  IPP_FINISHINGS_CUPS_FOLD_GATE,	/* Fold the top and bottom quarters of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_HALF,	/* Fold the paper in half vertically */
+  IPP_FINISHINGS_CUPS_FOLD_HALF_Z,	/* Fold the paper in half horizontally, then Z-fold the paper vertically */
+  IPP_FINISHINGS_CUPS_FOLD_LEFT_GATE,	/* Fold the top quarter of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_LETTER,	/* Fold the paper into three sections vertically; sometimes also known as a C fold*/
+  IPP_FINISHINGS_CUPS_FOLD_PARALLEL,	/* Fold the paper in half vertically two times, yielding four sections */
+  IPP_FINISHINGS_CUPS_FOLD_POSTER,	/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold */
+  IPP_FINISHINGS_CUPS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline */
+  IPP_FINISHINGS_CUPS_FOLD_Z		/* Fold the paper vertically into three sections, forming a Z */
 } ipp_finishings_t;
 #  ifndef _CUPS_NO_DEPRECATED
+#    define IPP_FINISHINGS_JOB_OFFSET	IPP_FINISHINGS_JOG_OFFSET
+					/* Long-time misspelling... */
 typedef enum ipp_finishings_e ipp_finish_t;
 #  endif /* !_CUPS_NO_DEPRECATED */
 
@@ -921,7 +936,12 @@ extern int		ippContainsInteger(ipp_attribute_t *attr, int value)
 extern int		ippContainsString(ipp_attribute_t *attr,
 			                  const char *value) _CUPS_API_1_7;
 extern cups_array_t	*ippCreateRequestedArray(ipp_t *request) _CUPS_API_1_7;
+extern void		*ippGetOctetString(ipp_attribute_t *attr, int element,
+			                   int *datalen) _CUPS_API_1_7;
 extern ipp_t		*ippNewResponse(ipp_t *request) _CUPS_API_1_7;
+extern int		ippSetOctetString(ipp_t *ipp, ipp_attribute_t **attr,
+			                  int element, const void *data,
+					  int datalen) _CUPS_API_1_7;
 extern int		ippSetStringf(ipp_t *ipp, ipp_attribute_t **attr,
 			              int element, const char *format,
 				      ...) _CUPS_API_1_7;

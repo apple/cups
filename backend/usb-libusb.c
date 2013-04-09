@@ -122,7 +122,7 @@ struct quirk_printer_struct {
 #define USBLP_QUIRK_USB_INIT	0x2	/* needs vendor USB init string */
 #define USBLP_QUIRK_BAD_CLASS	0x4	/* descriptor uses vendor-specific
 					   Class or SubClass */
-#define USBLP_QUICK_BLACKLIST	0x8	/* these printers do not conform to the USB print spec */
+#define USBLP_QUIRK_BLACKLIST	0x8	/* these printers do not conform to the USB print spec */
 #define USBLP_QUIRK_RESET	0x4000	/* After printing do a reset
 					   for clean-up */
 #define USBLP_QUIRK_NO_REATTACH	0x8000	/* After printing we cannot re-attach

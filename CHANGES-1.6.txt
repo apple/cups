@@ -1,6 +1,24 @@
 CHANGES-1.6.txt
 ---------------
 
+CHANGES IN CUPS V1.6.3
+
+	- The configure script now prefers Clang over GCC.
+	- Fixed a compile problem on AIX (STR #4307)
+	- The Russian web interface templates were broken (STR #4310)
+	- The scheduler no longer tries to do Kerberos authentication over the
+	  loopback interface.
+	- The IPP backend could fail to pause a job for authentication
+	  (STR #4298)
+	- Fixed a regression on the handling of auth keys on OS X if the
+	  cups-files.conf was not present or did not contain a SystemAuthKey
+	  value.
+	- The scheduler incorrectly did a reverse lookup of the server address
+	  when HostNameLookups was turned off (STR #4302)
+	- The scheduler incorrectly computed the final content type value when
+	  null filters were present.
+
+
 CHANGES IN CUPS V1.6.2
 
 	- Documentation fixes (STR #4229, STR #4239, STR #4234, STR #4248,
@@ -12,6 +30,9 @@ CHANGES IN CUPS V1.6.2
 	- Added a French localization (STR #4247)
 	- Added a Russian localization (STR #4228, STR #4285)
 	- Updated the Catalan localization (STR #4202)
+	- Local certificate authentication did not guard against an empty
+	  certification file (STR #4293)
+	- The scheduler did not reject device URIs with spaces.
 	- Added USB quirk rule for Epson Stylus Photo 750 (STR #4286)
 	- The IPP backend could crash if the printer disconnects early
 	  (STR #4284)
@@ -47,7 +68,7 @@ CHANGES IN CUPS V1.6.2
 	- The scheduler incorrectly advertised auth-info-required for local
 	  queues needing local authentication (STR #4205)
 	- CUPS 1.6 clients using the ServerName directive in client.conf did not
-	  work with CUPS 1.3.x or older servers (STR #4231)
+	  work with CUPS 1.3.x or older servers (STR #4231, STR #4291)
 	- The SNMP backend now tries to work around broken printers that use a
 	  newline to separate key/value pairs.
 	- The IPP backend did not send a cancel request to printers when a job

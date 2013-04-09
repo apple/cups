@@ -560,7 +560,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* CONTENT_TYPE env variable */
 			device_uri[1024],
 					/* DEVICE_URI env variable */
-			final_content_type[1024],
+			final_content_type[1024] = "",
 					/* FINAL_CONTENT_TYPE env variable */
 			lang[255],	/* LANG env variable */
 #ifdef __APPLE__
@@ -598,7 +598,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   memset(job->filters, 0, sizeof(job->filters));
 
-
   if (job->printer->raw)
   {
    /*
@@ -634,6 +633,44 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
       ippSetString(job->attrs, &job->reasons, 0, "document-unprintable-error");
       goto abort_job;
+    }
+
+   /*
+    * Figure out the final content type...
+    */
+
+    cupsdLogJob(job, CUPSD_LOG_DEBUG, "%d filters for job:",
+                cupsArrayCount(filters));
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+         filter = (mime_filter_t *)cupsArrayNext(filters))
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "%s (%s/%s to %s/%s, cost %d)",
+		  filter->filter,
+		  filter->src ? filter->src->super : "???",
+		  filter->src ? filter->src->type : "???",
+		  filter->dst ? filter->dst->super : "???",
+		  filter->dst ? filter->dst->type : "???",
+		  filter->cost);
+
+    if (!job->printer->remote)
+    {
+      for (filter = (mime_filter_t *)cupsArrayLast(filters);
+           filter && filter->dst;
+           filter = (mime_filter_t *)cupsArrayPrev(filters))
+        if (strcmp(filter->dst->super, "printer") ||
+            strcmp(filter->dst->type, job->printer->name))
+          break;
+
+      if (filter && filter->dst)
+      {
+	if ((ptr = strchr(filter->dst->type, '/')) != NULL)
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s", ptr + 1);
+	else
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
+		   filter->dst->type);
+      }
     }
 
    /*
@@ -1034,25 +1071,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
                                 "CUPS_FILETYPE=document";
 
-  if (!job->printer->remote && !job->printer->raw)
-  {
-    filter = (mime_filter_t *)cupsArrayLast(filters);
-
-    if (job->printer->port_monitor)
-      filter = (mime_filter_t *)cupsArrayPrev(filters);
-
-    if (filter && filter->dst)
-    {
-      if ((ptr = strchr(filter->dst->type, '/')) != NULL)
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s", ptr + 1);
-      else
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
-		 filter->dst->type);
-      envp[envc ++] = final_content_type;
-    }
-  }
+  if (final_content_type[0])
+    envp[envc ++] = final_content_type;
 
   if (Classification && !banner_page)
   {
@@ -3040,8 +3060,9 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	job_state = IPP_JOB_COMPLETED;
 	message   = "Job completed.";
 
-	ippSetString(job->attrs, &job->reasons, 0,
-	             "job-completed-successfully");
+        if (!job->status)
+	  ippSetString(job->attrs, &job->reasons, 0,
+		       "job-completed-successfully");
         break;
 
     case IPP_JOB_STOPPED :
@@ -3227,13 +3248,48 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 	    * Hold the job...
 	    */
 
-	    cupsdSetJobHoldUntil(job, "indefinite", 1);
-	    ippSetString(job->attrs, &job->reasons, 0,
-	                 "job-hold-until-specified");
+	    const char *reason = ippGetString(job->reasons, 0, NULL);
+
+	    cupsdLogJob(job, CUPSD_LOG_DEBUG, "job-state-reasons=\"%s\"",
+	                reason);
+
+	    if (!reason || strncmp(reason, "account-", 8))
+	    {
+	      cupsdSetJobHoldUntil(job, "indefinite", 1);
+
+	      ippSetString(job->attrs, &job->reasons, 0,
+			   "job-hold-until-specified");
+	      message = "Job held indefinitely due to backend errors; please "
+			"consult the error_log file for details.";
+            }
+            else if (!strcmp(reason, "account-info-needed"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account information is "
+	                "required.";
+            }
+            else if (!strcmp(reason, "account-closed"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account has been closed.";
+	    }
+            else if (!strcmp(reason, "account-limit-reached"))
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account limit has been "
+	                "reached.";
+	    }
+            else
+            {
+	      cupsdSetJobHoldUntil(job, "indefinite", 0);
+
+	      message = "Job held indefinitely - account authorization failed.";
+	    }
 
 	    job_state = IPP_JOB_HELD;
-	    message   = "Job held indefinitely due to backend errors; please "
-			"consult the error_log file for details.";
           }
           break;
 

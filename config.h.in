@@ -32,6 +32,7 @@
 #define CUPS_DEFAULT_GROUP	"sys"
 #define CUPS_DEFAULT_SYSTEM_GROUPS	"sys root system"
 #define CUPS_DEFAULT_PRINTOPERATOR_AUTH	"@SYSTEM"
+#define CUPS_DEFAULT_SYSTEM_AUTHKEY	"system.print.admin"
 
 
 /*

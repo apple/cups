@@ -57,6 +57,7 @@
  *   ippGetGroupTag()	     - Get the group associated with an attribute.
  *   ippGetInteger()	     - Get the integer/enum value for an attribute.
  *   ippGetName()	     - Get the attribute name.
+ *   ippGetOctetString()     - Get an octetString value from an IPP attribute.
  *   ippGetOperation()	     - Get the operation ID in an IPP message.
  *   ippGetRange()	     - Get a rangeOfInteger value from an attribute.
  *   ippGetRequestId()	     - Get the request ID from an IPP message.
@@ -84,6 +85,7 @@
  *   ippSetGroupTag()	     - Set the group tag of an attribute.
  *   ippSetInteger()	     - Set an integer or enum value in an attribute.
  *   ippSetName()	     - Set the name of an attribute.
+ *   ippSetOctetString()     - Set an octetString value in an IPP attribute.
  *   ippSetOperation()	     - Set the operation ID in an IPP request message.
  *   ippSetRange()	     - Set a rangeOfInteger value in an attribute.
  *   ippSetRequestId()	     - Set the request ID in an IPP message.
@@ -2383,6 +2385,45 @@ ippGetName(ipp_attribute_t *attr)	/* I - IPP attribute */
 
 
 /*
+ * 'ippGetOctetString()' - Get an octetString value from an IPP attribute.
+ *
+ * The @code element@ parameter specifies which value to get from 0 to
+ * @link ippGetCount(attr)@ - 1.
+ *
+ * @since CUPS 1.7@
+ */
+
+void *					/* O - Pointer to octetString data */
+ippGetOctetString(
+    ipp_attribute_t *attr,		/* I - IPP attribute */
+    int             element,		/* I - Value number (0-based) */
+    int             *datalen)		/* O - Length of octetString data */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!attr || attr->value_tag != IPP_TAG_STRING ||
+      element < 0 || element >= attr->num_values)
+  {
+    if (datalen)
+      *datalen = 0;
+
+    return (NULL);
+  }
+
+ /*
+  * Return the values...
+  */
+
+  if (datalen)
+    *datalen = attr->values[element].unknown.length;
+
+  return (attr->values[element].unknown.data);
+}
+
+
+/*
  * 'ippGetOperation()' - Get the operation ID in an IPP message.
  *
  * @since CUPS 1.6/OS X 10.8@
@@ -3712,7 +3753,7 @@ ippReadIO(void       *src,		/* I - Data source */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetBoolean(ipp_t           *ipp,	/* IO - IPP message */
+ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element,	/* I  - Value number (0-based) */
               int             boolvalue)/* I  - Boolean value */
@@ -3755,7 +3796,7 @@ ippSetBoolean(ipp_t           *ipp,	/* IO - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetCollection(
-    ipp_t           *ipp,		/* IO - IPP message */
+    ipp_t           *ipp,		/* I  - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     int             element,		/* I  - Value number (0-based) */
     ipp_t           *colvalue)		/* I  - Collection value */
@@ -3803,7 +3844,7 @@ ippSetCollection(
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetDate(ipp_t             *ipp,	/* IO - IPP message */
+ippSetDate(ipp_t             *ipp,	/* I  - IPP message */
            ipp_attribute_t   **attr,	/* IO - IPP attribute */
            int               element,	/* I  - Value number (0-based) */
            const ipp_uchar_t *datevalue)/* I  - Date value */
@@ -3849,7 +3890,7 @@ ippSetDate(ipp_t             *ipp,	/* IO - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetGroupTag(
-    ipp_t           *ipp,		/* IO - IPP message */
+    ipp_t           *ipp,		/* I  - IPP message */
     ipp_attribute_t **attr,		/* IO - Attribute */
     ipp_tag_t       group_tag)		/* I  - Group tag */
 {
@@ -3887,7 +3928,7 @@ ippSetGroupTag(
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetInteger(ipp_t           *ipp,	/* IO - IPP message */
+ippSetInteger(ipp_t           *ipp,	/* I  - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element,	/* I  - Value number (0-based) */
               int             intvalue)	/* I  - Integer/enum value */
@@ -3927,7 +3968,7 @@ ippSetInteger(ipp_t           *ipp,	/* IO - IPP message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetName(ipp_t           *ipp,	/* IO - IPP message */
+ippSetName(ipp_t           *ipp,	/* I  - IPP message */
 	   ipp_attribute_t **attr,	/* IO - IPP attribute */
 	   const char      *name)	/* I  - Attribute name */
 {
@@ -3954,6 +3995,94 @@ ippSetName(ipp_t           *ipp,	/* IO - IPP message */
   }
 
   return (temp != NULL);
+}
+
+
+/*
+ * 'ippSetOctetString()' - Set an octetString value in an IPP attribute.
+ *
+ * The @code ipp@ parameter refers to an IPP message previously created using
+ * the @link ippNew@, @link ippNewRequest@, or  @link ippNewResponse@ functions.
+ *
+ * The @code attr@ parameter may be modified as a result of setting the value.
+ *
+ * The @code element@ parameter specifies which value to set from 0 to
+ * @link ippGetCount(attr)@.
+ *
+ * @since CUPS 1.7@
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+ippSetOctetString(
+    ipp_t           *ipp,		/* I  - IPP message */
+    ipp_attribute_t **attr,		/* IO - IPP attribute */
+    int             element,		/* I  - Value number (0-based) */
+    const void      *data,		/* I  - Pointer to octetString data */
+    int             datalen)		/* I  - Length of octetString data */
+{
+  _ipp_value_t	*value;			/* Current value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ipp || !attr || !*attr || (*attr)->value_tag != IPP_TAG_STRING ||
+      element < 0 || element > (*attr)->num_values ||
+      datalen < 0 || datalen > IPP_MAX_LENGTH)
+    return (0);
+
+ /*
+  * Set the value and return...
+  */
+
+  if ((value = ipp_set_value(ipp, attr, element)) != NULL)
+  {
+    if ((int)((*attr)->value_tag) & IPP_TAG_CUPS_CONST)
+    {
+     /*
+      * Just copy the pointer...
+      */
+
+      value->unknown.data   = (void *)data;
+      value->unknown.length = datalen;
+    }
+    else
+    {
+     /*
+      * Copy the data...
+      */
+
+      if (value->unknown.data)
+      {
+       /*
+	* Free previous data...
+	*/
+
+	free(value->unknown.data);
+
+	value->unknown.data   = NULL;
+        value->unknown.length = 0;
+      }
+
+      if (datalen > 0)
+      {
+	void	*temp;			/* Temporary data pointer */
+
+	if ((temp = malloc(datalen)) != NULL)
+	{
+	  memcpy(temp, data, datalen);
+
+	  value->unknown.data   = temp;
+	  value->unknown.length = datalen;
+	}
+	else
+	  return (0);
+      }
+    }
+  }
+
+  return (value != NULL);
 }
 
 
@@ -4002,7 +4131,7 @@ ippSetOperation(ipp_t    *ipp,		/* I - IPP request message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetRange(ipp_t           *ipp,	/* IO - IPP message */
+ippSetRange(ipp_t           *ipp,	/* I  - IPP message */
             ipp_attribute_t **attr,	/* IO - IPP attribute */
             int             element,	/* I  - Value number (0-based) */
 	    int             lowervalue,	/* I  - Lower bound for range */
@@ -4083,7 +4212,7 @@ ippSetRequestId(ipp_t *ipp,		/* I - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetResolution(
-    ipp_t           *ipp,		/* IO - IPP message */
+    ipp_t           *ipp,		/* I  - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     int             element,		/* I  - Value number (0-based) */
     ipp_res_t       unitsvalue,		/* I  - Resolution units */
@@ -4190,7 +4319,7 @@ ippSetStatusCode(ipp_t        *ipp,	/* I - IPP response or event message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetString(ipp_t           *ipp,	/* IO - IPP message */
+ippSetString(ipp_t           *ipp,	/* I  - IPP message */
              ipp_attribute_t **attr,	/* IO - IPP attribute */
              int             element,	/* I  - Value number (0-based) */
 	     const char      *strvalue)	/* I  - String value */
@@ -4257,7 +4386,7 @@ ippSetString(ipp_t           *ipp,	/* IO - IPP message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetStringf(ipp_t           *ipp,	/* IO - IPP message */
+ippSetStringf(ipp_t           *ipp,	/* I  - IPP message */
               ipp_attribute_t **attr,	/* IO - IPP attribute */
               int             element,	/* I  - Value number (0-based) */
 	      const char      *format,	/* I  - Printf-style format string */
@@ -4295,7 +4424,7 @@ ippSetStringf(ipp_t           *ipp,	/* IO - IPP message */
  */
 
 int					/* O  - 1 on success, 0 on failure */
-ippSetStringfv(ipp_t           *ipp,	/* IO - IPP message */
+ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
                ipp_attribute_t **attr,	/* IO - IPP attribute */
                int             element,	/* I  - Value number (0-based) */
 	       const char      *format,	/* I  - Printf-style format string */
@@ -4448,7 +4577,7 @@ ippSetStringfv(ipp_t           *ipp,	/* IO - IPP message */
 
 int					/* O  - 1 on success, 0 on failure */
 ippSetValueTag(
-    ipp_t          *ipp,		/* IO - IPP message */
+    ipp_t          *ipp,		/* I  - IPP message */
     ipp_attribute_t **attr,		/* IO - IPP attribute */
     ipp_tag_t       value_tag)		/* I  - Value tag */
 {

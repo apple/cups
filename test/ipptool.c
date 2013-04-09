@@ -2474,6 +2474,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  else if (status != HTTP_OK)
 	  {
 	    httpFlush(http);
+
+	    if (status == HTTP_STATUS_UNAUTHORIZED)
+	      continue;
+
 	    break;
 	  }
 	}

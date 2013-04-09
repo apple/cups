@@ -3,7 +3,7 @@
  *
  *   PPD test program for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -3210,11 +3210,11 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
     {
       is_ok          = 1;
       width_2540ths  = (size->length > size->width) ?
-                           _PWG_FROMPTS(size->width) :
-			   _PWG_FROMPTS(size->length);
+                           PWG_FROM_POINTS(size->width) :
+			   PWG_FROM_POINTS(size->length);
       length_2540ths = (size->length > size->width) ?
-                           _PWG_FROMPTS(size->length) :
-			   _PWG_FROMPTS(size->width);
+                           PWG_FROM_POINTS(size->length) :
+			   PWG_FROM_POINTS(size->width);
       pwg_media      = _pwgMediaForSize(width_2540ths, length_2540ths);
 
       if (pwg_media &&

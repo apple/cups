@@ -489,13 +489,29 @@ static const char * const ipp_document_states[] =
 		  "punch-dual-bottom",
 		  "punch-triple-left",
 		  "punch-triple-top",
-		  /* 0x40000050 - 0x40000055 */
+		  /* 0x40000050 - 0x4000005F */
 		  "punch-triple-right",
 		  "punch-triple-bottom",
 		  "punch-quad-left",
 		  "punch-quad-top",
 		  "punch-quad-right",
 		  "punch-quad-bottom",
+		  "0x40000056",
+		  "0x40000057",
+		  "0x40000058",
+		  "0x40000059",
+		  "fold-accordian",
+		  "fold-double-gate",
+		  "fold-gate",
+		  "fold-half",
+		  "fold-half-z",
+		  "fold-left-gate",
+		  /* 0x40000060 - 0x40000064 */
+		  "fold-letter",
+		  "fold-parallel",
+		  "fold-poster",
+		  "fold-right-gate",
+		  "fold-z"
 		},
 		* const ipp_job_collation_types[] =
 		{			/* job-collation-type enums */
@@ -863,6 +879,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-content-optimize-actual",
     "print-quality-actual",
     "print-rendering-intent-actual",
+    "print-scaling-actual",		/* IPP Paid Printing */
     "printer-resolution-actual",
     "printer-up-time",
     "separator-sheets-actual",
@@ -955,6 +972,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "orientation-requested",
     "orientation-requested-default",
     "orientation-requested-supported",
+    "output-mode",			/* CUPS extension */
+    "output-mode-default",		/* CUPS extension */
+    "output-mode-supported",		/* CUPS extension */
     "overrides",
     "overrides-supported",
     "page-delivery",
@@ -989,6 +1009,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-rendering-intent",
     "print-rendering-intent-default",
     "print-rendering-intent-supported",
+    "print-scaling",			/* IPP Paid Printing */
+    "print-scaling-default",		/* IPP Paid Printing */
+    "print-scaling-supported",		/* IPP Paid Printing */
     "printer-resolution",
     "printer-resolution-default",
     "printer-resolution-supported",
@@ -1123,6 +1146,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-content-optimize-actual",
     "print-quality-actual",
     "print-rendering-intent-actual",
+    "print-scaling-actual",		/* IPP Paid Printing */
     "printer-resolution-actual",
     "separator-sheets-actual",
     "sheet-collate-actual",
@@ -1299,6 +1323,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "output-device",
     "output-device-default",
     "output-device-supported",
+    "output-mode",			/* CUPS extension */
+    "output-mode-default",		/* CUPS extension */
+    "output-mode-supported",		/* CUPS extension */
     "overrides",
     "overrides-supported",
     "page-delivery",
@@ -1333,6 +1360,9 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "print-rendering-intent",
     "print-rendering-intent-default",
     "print-rendering-intent-supported",
+    "print-scaling",			/* IPP Paid Printing */
+    "print-scaling-default",		/* IPP Paid Printing */
+    "print-scaling-supported",		/* IPP Paid Printing */
     "printer-resolution",
     "printer-resolution-default",
     "printer-resolution-supported",
@@ -1488,6 +1518,8 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-icons",
     "printer-info",
     "printer-is-accepting-jobs",
+    "printer-is-shared",		/* CUPS extension */
+    "printer-kind",			/* IPP Paid Printing */
     "printer-location",
     "printer-make-and-model",
     "printer-mandatory-job-attributes",
@@ -1497,6 +1529,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-more-info",
     "printer-more-info-manufacturer",
     "printer-name",
+    "printer-native-formats",
     "printer-organization",
     "printer-organizational-unit",
     "printer-settable-attributes-supported",
@@ -1523,6 +1556,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "requesting-user-name-denied",	/* CUPS extension */
     "requesting-user-uri-supported",
     "subordinate-printers-supported",
+    "urf-supported",			/* CUPS extension */
     "uri-authentication-supported",
     "uri-security-supported",
     "user-defined-value-supported",
@@ -1714,7 +1748,10 @@ ippEnumString(const char *attrname,	/* I - Attribute name */
 	   !strcmp(attrname, "finishings-actual") ||
 	   !strcmp(attrname, "finishings-default") ||
 	   !strcmp(attrname, "finishings-ready") ||
-	   !strcmp(attrname, "finishings-supported"))
+	   !strcmp(attrname, "finishings-supported") ||
+	   !strcmp(attrname, "job-finishings") ||
+	   !strcmp(attrname, "job-finishings-default") ||
+	   !strcmp(attrname, "job-finishings-supported"))
   {
     if (enumvalue >= 3 &&
         enumvalue < (3 + (int)(sizeof(ipp_finishings) /

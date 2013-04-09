@@ -838,6 +838,7 @@
 "Internet Postage 2-Part" = "Internet Postage 2-Part";
 "Internet Postage 3-Part" = "Internet Postage 3-Part";
 "Internet Printing Protocol" = "Internet Printing Protocol";
+"Invalid media name arguments." = "Invalid media name arguments.";
 "Invalid media size." = "Invalid media size.";
 "Invalid printer command \"%s\"." = "Invalid printer command \"%s\".";
 "JCL" = "JCL";
@@ -1027,6 +1028,7 @@
 "Printer Paused" = "Printer Paused";
 "Printer Settings" = "Printer Settings";
 "Printer cannot print supplied content." = "Printer cannot print supplied content.";
+"Printer cannot print with supplied options." = "Printer cannot print with supplied options.";
 "Printer:" = "Printer:";
 "Printers" = "Printers";
 "Printing page %d, %d%% complete." = "Printing page %d, %d%% complete.";

@@ -1967,7 +1967,10 @@
 				273BF6B81333B4A90022CAAB /* tests */,
 				72220EAF1333047D00FCA411 /* Products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 8;
+			wrapsLines = 0;
 		};
 		72F75A681336FA42004BB496 /* libcupsimage */ = {
 			isa = PBXGroup;
