@@ -2128,6 +2128,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 
+	      if (data_ready(con))
+	        continue;
 	      break;
             }
 	    else

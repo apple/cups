@@ -2358,6 +2358,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
+    else if (http->state == HTTP_STATE_GET_SEND ||
+             http->state == HTTP_STATE_POST_SEND)
+      http->state = HTTP_STATE_WAITING;
     else
       http->state = HTTP_STATE_STATUS;
 
@@ -4602,7 +4605,7 @@ http_read(http_t *http,			/* I - Connection to server */
 		CUPS_LLCAST bytes));
 #ifdef DEBUG
   if (bytes > 0)
-    http_debug_hex("http_read", http->buffer, (int)bytes);
+    http_debug_hex("http_read", buffer, (int)bytes);
 #endif /* DEBUG */
 
   if (bytes < 0)
