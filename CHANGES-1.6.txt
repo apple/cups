@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- The scheduler no longer tries to do Kerberos authentication over the
+	  loopback interface.
 	- The IPP backend could fail to pause a job for authentication
 	  (STR #4298)
 	- Fixed a regression on the handling of auth keys on OS X if the
