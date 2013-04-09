@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.7b1 - 2013-01-11
+INSTALL - CUPS v1.7b1 - 2013-04-09
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
@@ -29,18 +29,16 @@ BEFORE YOU BEGIN
     Compaq, HP, SGI, and Sun.  BSD users should use GNU make (gmake) since BSD
     make does not support "include".
 
-    Besides these tools you'll want the JPEG, PNG, TIFF, and ZLIB libraries for
-    image support, the CDSA, GNU TLS, or OpenSSL libraries for encryption
-    support, the OpenLDAP and OpenSLP libraries for directory services support,
-    and either MIT (1.6.3 or higher) or Heimdal Kerberos for Kerberos support.
-    CUPS will compile and run without these, however you'll miss out on many of
-    the features provided by CUPS.
+    Besides these tools you'll want ZLIB library for compression support, the
+    CDSA, GNU TLS, or OpenSSL libraries for encryption support, and either MIT
+    (1.6.3 or higher) or Heimdal Kerberos for Kerberos support.  CUPS will
+    compile and run without these, however you'll miss out on many of the
+    features provided by CUPS.
 
-    Also, please note that CUPS does not include the Ghostscript-based
-    PostScript filter needed by non-PostScript printers.  You *must* download
-    GPL Ghostscript separately from the CUPS web site if you want to print
-    PostScript files to non-PostScript printers on operating systems other than
-    OS X.
+    Also, please note that CUPS does not include print filters to support PDF
+    or raster printing.  You *must* download GPL Ghostscript and/or the Open
+    Printing CUPS filters package separately to print on operating systems
+    other than OS X.
 
 
 COMPILING THE SUBVERSION REPOSITORY CODE
