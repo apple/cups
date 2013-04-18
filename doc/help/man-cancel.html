@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cancel(1)</title>
+</head>
+<body>
+<h1 class="title">cancel(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cancel - cancel jobs
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cancel
+</b>[ -E ] [ -U
+<i>username
+</i>] [ -a ] [ -h
+<i>hostname[:port]
+</i>] [ -u
+<i>username
+</i>] [ -x ] [
+<i>id
+</i>] [
+<i>destination
+</i>] [
+<i>destination-id
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>cancel</i> cancels existing print jobs. The <i>-a</i> option will remove
+all jobs from the specified destination.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized by <i>cancel</i>:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-U username
+</dt>
+<dd></dd>
+<dd>Specifies the username to use when connecting to the server.
+</dd>
+<dt>-a
+</dt>
+<dd></dd>
+<dd>Cancel all jobs on the named destination, or all jobs on all
+destinations if none is provided.
+</dd>
+<dt>-h hostname[:port]
+</dt>
+<dd></dd>
+<dd>Chooses an alternate server.
+</dd>
+<dt>-u username
+</dt>
+<dd></dd>
+<dd>Cancels jobs owned by <i>username</i>.
+</dd>
+<dt>-x
+</dt>
+<dd></dd>
+<dd>Deletes job data files in addition to canceling.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+Unlike the System V printing system, CUPS allows printer names to
+contain any printable character except SPACE, TAB, "/", or "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+Administrators wishing to prevent unauthorized cancellation of
+jobs via the <i>-u</i> option should require authentication for
+Cancel-Jobs operations in <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpmove.html?TOPIC=Man+Pages'>lpmove(8)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

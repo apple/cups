@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupstestppd(1)</title>
+</head>
+<body>
+<h1 class="title">cupstestppd(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupstestppd - test conformance of ppd files
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupstestppd
+</b>[ -I
+<i>category
+</i>] [ -R
+<i>rootdir
+</i>] [ -W
+<i>category
+</i>] [ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
+<br>
+<b>cupstestppd
+</b>[ -R
+<i>rootdir
+</i>] [ -W
+<i>category
+</i>] [ -q ] [-r] [ -v[v] ] -
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>cupstestppd</i> tests the conformance of PPD files to the
+Adobe PostScript Printer Description file format specification
+version 4.3. It can also be used to list the supported options
+and available fonts in a PPD file. The results of testing and
+any other output are sent to the standard output.
+<p>The first form of <i>cupstestppd</i> tests one or more PPD files
+on the command-line. The second form tests the PPD file provided
+on the standard input.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<i>cupstestppd</i> supports the following options:
+<dl>
+<dt>-I filename
+</dt>
+<dd></dd>
+<dd>Ignores all PCFileName warnings.
+</dd>
+<dt>-I filters
+</dt>
+<dd></dd>
+<dd>Ignores all filter errors.
+</dd>
+<dt>-I profiles
+</dt>
+<dd></dd>
+<dd>Ignores all profile errors.
+</dd>
+<dt>-R rootdir
+</dt>
+<dd></dd>
+<dd>Specifies an alternate root directory for the filter, pre-filter,
+and other support file checks.
+</dd>
+<dt>-W constraints
+</dt>
+<dd></dd>
+<dd>Report all UIConstraint errors as warnings.
+</dd>
+<dt>-W defaults
+</dt>
+<dd></dd>
+<dd>Except for size-related options, report all default option errors as warnings.
+</dd>
+<dt>-W filters
+</dt>
+<dd></dd>
+<dd>Report all filter errors as warnings.
+</dd>
+<dt>-W profiles
+</dt>
+<dd></dd>
+<dd>Report all profile errors as warnings.
+</dd>
+<dt>-W sizes
+</dt>
+<dd></dd>
+<dd>Report all media size errors as warnings.
+</dd>
+<dt>-W translations
+</dt>
+<dd></dd>
+<dd>Report all translation errors as warnings.
+</dd>
+<dt>-W all
+</dt>
+<dd></dd>
+<dd>Report all of the previous errors as warnings.
+</dd>
+<dt>-W none
+</dt>
+<dd></dd>
+<dd>Report all of the previous errors as errors.
+</dd>
+<dt>-q
+</dt>
+<dd></dd>
+<dd>Specifies that no information should be displayed.
+</dd>
+<dt>-r
+</dt>
+<dd></dd>
+<dd>Relaxes the PPD conformance requirements so that common
+whitespace, control character, and formatting problems are not
+treated as hard errors.
+</dd>
+<dt>-v
+</dt>
+<dd></dd>
+<dd>Specifies that detailed conformance testing results should be
+displayed rather than the concise PASS/FAIL/ERROR status.
+</dd>
+<dt>-vv
+</dt>
+<dd></dd>
+<dd>Specifies that all information in the PPD file should be
+displayed in addition to the detailed conformance testing
+results.
+</dd>
+</dl>
+<p>The <i>-q</i>, <i>-v</i>, and <i>-vv</i> options are mutually exclusive.
+<h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
+<i>cupstestppd</i> returns zero on success and non-zero on error. The
+error codes are as follows:
+<dl>
+<dt>1
+</dt>
+<dd></dd>
+<dd>Bad command-line arguments or missing PPD filename.
+</dd>
+<dt>2
+</dt>
+<dd></dd>
+<dd>Unable to open or read PPD file.
+</dd>
+<dt>3
+</dt>
+<dd></dd>
+<dd>The PPD file contains format errors that cannot be skipped.
+</dd>
+<dt>4
+</dt>
+<dd></dd>
+<dd>The PPD file does not conform to the Adobe PPD specification.
+</dd>
+</dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+The following command will test all PPD files under the current
+directory and print the names of each file that does not
+conform:
+<pre>
+
+    find . -name \*.ppd \! -exec cupstestppd -q '{}' \; -print
+
+</pre>
+The next command tests all PPD files under the current directory
+and print detailed conformance testing results for the files
+that do not conform:
+<pre>
+
+    find . -name \*.ppd \! -exec cupstestppd -q '{}' \; \
+        -exec cupstestppd -v '{}' \;
+
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<br>
+Adobe PostScript Printer Description File Format Specification, Version 4.3.
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

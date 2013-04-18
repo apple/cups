@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>filter(7)</title>
+</head>
+<body>
+<h1 class="title">filter(7)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+filter - cups file conversion filter interface
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>filter
+</b>job user title num-copies options [
+<i>filename
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The CUPS filter interface provides a standard method for adding support for
+new document types to CUPS. Each filter is capable of converting from one
+or more input formats to another format that can either be printed directly
+or piped into another filter to get it to a printable format.
+<p>Filters <b>must</b> be capable of reading from a filename on the command-line
+or from the standard input, copying the standard input to a temporary
+file as required by the file format. All output <b>must</b> be sent to the
+standard output.
+<p>The command name (argv[0]) is set to the name of the destination printer but is
+also available in the PRINTER environment variable.
+<h2 class="title"><a name="WARNING">Warning</a></h2>
+CUPS filters are not meant to be run directly by the user. Aside from the legacy
+System V interface issues (argv[0] is the printer name), CUPS filters also
+expect specific environment variables and file descriptors, and typically run in
+a user session that (on OS X) has additional restrictions that affect how it
+runs. Unless you are a developer and know what you are doing, please do not run
+filters directly. Instead, use the <a href='man-cupsfilter.html?TOPIC=Man+Pages'>cupsfilter(8)</a> program to use the
+appropriate filters to do the conversions you need.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+Options passed on the command-line typically do not include the default choices
+the printer's PPD file. In addition, some options may be specified in multiple
+ways - "landscape" is a synonym for "orientation-requested=4", "media" is a
+synonym for "PageSize", "PageRegion", "InputSlot", and "MediaType", and "sides"
+is a synonym for the various "Duplex" options. Non-raster filters <b>must</b>
+support both explicit and implicit specification of PPD options - use the
+ppdMarkDefaults and cupsMarkOptions functions in the CUPS library to use the
+correct mapping, and ppdFindMarkedChoice to get the user-selected choice.
+<p>Raster filters should use option choices set through the raster page header, as
+those reflect the options in effect for a given page. Options specified on the
+command-line determine the default values for the entire job, which can be
+overridden on a per-page basis.
+<h2 class="title"><a name="LOG_MESSAGES">Log Messages</a></h2>
+Messages sent to stderr are generally logged to
+printer-state-message attribute and the current <i>ErrorLog</i>.
+Each line begins with a standard prefix:
+<dl>
+<dt>ALERT: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "alert" log level.
+</dd>
+<dt>ATTR: attribute=value [attribute=value]
+</dt>
+<dd></dd>
+<dd>Sets the named job or printer attribute(s). The following job attributes can be
+set: "job-media-progress". The following printer attributes can be set:
+"auth-info-required", "marker-colors", "marker-high-levels", "marker-levels",
+"marker-low-levels", "marker-message", "marker-names", "marker-types",
+"printer-alert", and "printer-alert-description".
+</dd>
+<dt>CRIT: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "critical" log level.
+</dd>
+<dt>DEBUG: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "debug" log level.
+</dd>
+<dt>DEBUG2: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "debug2" log level.
+</dd>
+<dt>EMERG: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "emergency" log level.
+</dd>
+<dt>ERROR: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "error" log level.
+</dd>
+<dt>INFO: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute. If the current <i>LogLevel</i>
+is set to "debug2", also adds the specified message to the
+current <i>ErrorLog</i> using the "info" log level.
+</dd>
+<dt>NOTICE: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "notice" log level.
+</dd>
+<dt>PAGE: page-number #-copies
+</dt>
+<dd></dd>
+<dt>PAGE: total #-pages
+</dt>
+<dd></dd>
+<dd>Adds an entry to the current <i>PageLog</i>. The first form adds
+#-copies to the job-media-sheets-completed attribute. The second
+form sets the job-media-sheets-completed attribute to #-pages.
+</dd>
+<dt>PPD: Keyword=Value ... KeywordN=Value
+</dt>
+<dd></dd>
+<dd>Sets the named keywords in the printer's PPD file. This is typically
+used to update default option keywords such as DefaultPageSize and
+the various installable options in the PPD file.
+</dd>
+<dt>STATE: printer-state-reason [printer-state-reason ...]
+</dt>
+<dd></dd>
+<dt>STATE: + printer-state-reason [printer-state-reason ...]
+</dt>
+<dd></dd>
+<dt>STATE: - printer-state-reason [printer-state-reason ...]
+</dt>
+<dd></dd>
+<dd>Sets, adds, or removes printer-state-reason keywords to the
+current queue. Typically this is used to indicate media, ink, and
+toner conditions on a printer.
+</dd>
+<dt>WARNING: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "warning" log level.
+</dd>
+</dl>
+<h2 class="title"><a name="ENVIRONMENT_VARIABLES">Environment Variables</a></h2>
+The following environment variables are defined by the CUPS
+server when executing the filter:
+<dl>
+<dt>CHARSET
+</dt>
+<dd></dd>
+<dd>The default text character set, typically utf-8.
+</dd>
+<dt>CLASS
+</dt>
+<dd></dd>
+<dd>When a job is submitted to a printer class, contains the name of
+the destination printer class. Otherwise this environment
+variable will not be set.
+</dd>
+<dt>CONTENT_TYPE
+</dt>
+<dd></dd>
+<dd>The MIME type associated with the file (e.g.
+application/postscript).
+</dd>
+<dt>CUPS_CACHEDIR
+</dt>
+<dd></dd>
+<dd>The directory for semi-persistent cache files can be found.
+</dd>
+<dt>CUPS_DATADIR
+</dt>
+<dd></dd>
+<dd>The directory where data files can be found.
+</dd>
+<dt>CUPS_FILETYPE
+</dt>
+<dd></dd>
+<dd>The type of file being printed: "job-sheet" for a banner page and "document"
+for a regular print file.
+</dd>
+<dt>CUPS_MAX_MESSAGE
+</dt>
+<dd></dd>
+<dd>The maximum size of a message sent to stderr, including any leading prefix and
+the trailing newline.
+</dd>
+<dt>CUPS_SERVERROOT
+</dt>
+<dd></dd>
+<dd>The root directory of the server.
+</dd>
+<dt>DEVICE_URI
+</dt>
+<dd></dd>
+<dd>The device-uri associated with the printer.
+</dd>
+<dt>FINAL_CONTENT_TYPE
+</dt>
+<dd></dd>
+<dd>The MIME type associated with the printer (e.g.
+application/vnd.cups-postscript).
+</dd>
+<dt>LANG
+</dt>
+<dd></dd>
+<dd>The default language locale (typically C or en).
+</dd>
+<dt>PATH
+</dt>
+<dd></dd>
+<dd>The standard execution path for external programs that may be run by
+the filter.
+</dd>
+<dt>PPD
+</dt>
+<dd></dd>
+<dd>The full pathname of the PostScript Printer Description (PPD)
+file for this printer.
+</dd>
+<dt>PRINTER
+</dt>
+<dd></dd>
+<dd>The name of the printer.
+</dd>
+<dt>RIP_CACHE
+</dt>
+<dd></dd>
+<dd>The recommended amount of memory to use for Raster Image
+Processors (RIPs).
+</dd>
+<dt>SOFTWARE
+</dt>
+<dd></dd>
+<dd>The name and version number of the server (typically CUPS/1.2).
+</dd>
+<dt>TZ
+</dt>
+<dd></dd>
+<dd>The timezone of the server.
+</dd>
+<dt>USER
+</dt>
+<dd></dd>
+<dd>The user executing the filter, typically "lp" or "root"; consult the
+<a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a> file for the current setting.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+While the filter interface is compatible with System V interface
+scripts, it will only work with the System V interface script as the
+only filter.  Typically the interface script will be provided via the
+<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a> command using the <i>-i</i> option.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-backend.html?TOPIC=Man+Pages'>backend(7)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsfilter.html?TOPIC=Man+Pages'>cupsfilter(8)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

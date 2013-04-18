@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>notifier(7)</title>
+</head>
+<body>
+<h1 class="title">notifier(7)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+notifier - cups notification interface
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>notifier
+</b><i>recipient
+</i>[
+<i>user-data
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The CUPS notifier interface provides a standard method for adding support for
+new event notification methods to CUPS. Each notifier delivers one or more IPP
+events from the standard input to the specified recipient.
+<p>Notifiers <b>must</b> read IPP messages from the standard input using the
+ippNew and ippReadFile functions and exit on error. Notifiers are encouraged to
+exit after a suitable period of inactivity, however they may exit after reading
+the first message or stay running until an error is seen.
+<h2 class="title"><a name="LOG_MESSAGES">Log Messages</a></h2>
+Messages sent to stderr are generally logged to the current <i>ErrorLog</i>.
+Each line begins with a standard prefix:
+
+<dl>
+<dt>ALERT: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "alert" log level.
+
+</dd>
+<dt>CRIT: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "critical" log level.
+
+</dd>
+<dt>DEBUG: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "debug" log level.
+
+</dd>
+<dt>DEBUG2: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "debug2" log level.
+
+</dd>
+<dt>EMERG: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "emergency" log level.
+
+</dd>
+<dt>ERROR: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "error" log level.
+
+</dd>
+<dt>INFO: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute. If the current <i>LogLevel</i>
+is set to "debug2", also adds the specified message to the
+current <i>ErrorLog</i> using the "info" log level.
+
+</dd>
+<dt>NOTICE: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "notice" log level.
+
+</dd>
+<dt>WARNING: message
+</dt>
+<dd></dd>
+<dd>Sets the printer-state-message attribute and adds the specified
+message to the current <i>ErrorLog</i> using the "warning" log level.
+
+</dd>
+</dl>
+<h2 class="title"><a name="ENVIRONMENT_VARIABLES">Environment Variables</a></h2>
+The following environment variables are defined by the CUPS server when
+executing the notifier:
+
+<dl>
+<dt>CHARSET
+</dt>
+<dd></dd>
+<dd>The default text character set, typically utf-8.
+
+</dd>
+<dt>CUPS_CACHEDIR
+</dt>
+<dd></dd>
+<dd>The directory for semi-persistent cache files can be found.
+
+</dd>
+<dt>CUPS_DATADIR
+</dt>
+<dd></dd>
+<dd>The directory where data files can be found.
+
+</dd>
+<dt>CUPS_FILETYPE
+</dt>
+<dd></dd>
+<dd>The type of file being printed: "job-sheet" for a banner page and "document"
+for a regular print file.
+
+</dd>
+<dt>CUPS_SERVERROOT
+</dt>
+<dd></dd>
+<dd>The root directory of the server.
+
+</dd>
+<dt>LANG
+</dt>
+<dd></dd>
+<dd>The default language locale (typically C or en).
+
+</dd>
+<dt>PATH
+</dt>
+<dd></dd>
+<dd>The standard execution path for external programs that may be run by
+the filter.
+
+</dd>
+<dt>SOFTWARE
+</dt>
+<dd></dd>
+<dd>The name and version number of the server (typically CUPS/1.2).
+
+</dd>
+<dt>TZ
+</dt>
+<dd></dd>
+<dd>The timezone of the server.
+
+</dd>
+<dt>USER
+</dt>
+<dd></dd>
+<dd>The user executing the filter, typically "lp"; consult the <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>
+file for the current setting.
+
+</dd>
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-backend.html?TOPIC=Man+Pages'>backend(7)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-filter.html?TOPIC=Man+Pages'>filter(7)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>
