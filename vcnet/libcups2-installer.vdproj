@@ -45,14 +45,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1AF767BD52F94DC08C2CBE11DA41E95A"
+        "MsmKey" = "8:_1859B81745C54E228CDCA94F130C8150"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_1DFD9AECD1AD4B2291DD52028E866569"
-        "OwnerKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
+        "MsmKey" = "8:_1AF767BD52F94DC08C2CBE11DA41E95A"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -69,7 +69,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_232E0EB837A04A5B90312D947F1A7905"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_24E7DBA1F5964574A8251258BCDC935D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_253C714B01974C9BB1A698DD449F588D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -117,13 +129,37 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3A7FB149E6D64E78A9792E52A6D905FD"
+        "OwnerKey" = "8:_FC564AE377AF4166919D500C98F403DA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3CFC5A9B09ED4916A350B88FEF4662CC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_3CFD2A1A9D824E2491CC2BAC1334BA13"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4879AF80C19D4ED9A3758DCC412190FB"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4A46F690254944ECBF1539E2C2F86A59"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_51381771E03E40DEA842E785C9B7A31B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -137,36 +173,6 @@
         {
         "MsmKey" = "8:_5ED87BAE980C4992A4C74AEAEC4A57CF"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
-        "OwnerKey" = "8:_0299839A2CCC4F908C5D3A8F465F3FFE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
-        "OwnerKey" = "8:_B20638175CCB42398417E0683A12469C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
-        "OwnerKey" = "8:_364DCCAFF25145BCBE75FFEEDCC75B3A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_62CA00B1E5E4460CA93EE7E2B8FE878B"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -201,6 +207,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7A478A9B37C44B22BD4F926913C9A5B7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7FC58520B0F44E3E95A207905CABFED4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -219,20 +231,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9967519E7058965D4C7DEF47EB39CC50"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmKey" = "8:_933D37C7FEBF4B8AAF9E6CE01A605039"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_9D69B0FC2413407BA24D88B73EF456AA"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9FBF78D7B89EEA843380D5F10E1954D7"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -256,6 +262,12 @@
         "Entry"
         {
         "MsmKey" = "8:_B20638175CCB42398417E0683A12469C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B38E399C93724A9BB5F429DABBA6301F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -286,6 +298,12 @@
         "Entry"
         {
         "MsmKey" = "8:_CDBB327B06484A60AD16B999D88A10F5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CE2A836CE5AF4404B8672B100A9FC9ED"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -351,8 +369,38 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F7FBD6E1C73B45EA813FB1D5E6050650"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FA604C5C4FDD4D7B8110AFC6B603FBAF"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FC564AE377AF4166919D500C98F403DA"
+        "OwnerKey" = "8:_0299839A2CCC4F908C5D3A8F465F3FFE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FC564AE377AF4166919D500C98F403DA"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FC564AE377AF4166919D500C98F403DA"
+        "OwnerKey" = "8:_B20638175CCB42398417E0683A12469C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FC564AE377AF4166919D500C98F403DA"
+        "OwnerKey" = "8:_364DCCAFF25145BCBE75FFEEDCC75B3A"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -532,6 +580,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1859B81745C54E228CDCA94F130C8150"
+            {
+            "SourcePath" = "8:..\\test\\get-notifications.test"
+            "TargetName" = "8:get-notifications.test"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1AF767BD52F94DC08C2CBE11DA41E95A"
             {
             "SourcePath" = "8:..\\doc\\images\\raster.png"
@@ -577,7 +645,27 @@
             "SourcePath" = "8:..\\cups\\adminutil.h"
             "TargetName" = "8:adminutil.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_232E0EB837A04A5B90312D947F1A7905"
+            {
+            "SourcePath" = "8:..\\doc\\help\\man-ipptool.html"
+            "TargetName" = "8:man-ipptool.html"
+            "Tag" = "8:"
+            "Folder" = "8:_24DE31CE70694FD2977B5FB38F24D77F"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -597,7 +685,27 @@
             "SourcePath" = "8:..\\cups\\http.h"
             "TargetName" = "8:http.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_253C714B01974C9BB1A698DD449F588D"
+            {
+            "SourcePath" = "8:..\\test\\validate-job.test"
+            "TargetName" = "8:validate-job.test"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -657,7 +765,7 @@
             "SourcePath" = "8:..\\cups\\ipp.h"
             "TargetName" = "8:ipp.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -737,7 +845,27 @@
             "SourcePath" = "8:..\\cups\\transcode.h"
             "TargetName" = "8:transcode.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CFD2A1A9D824E2491CC2BAC1334BA13"
+            {
+            "SourcePath" = "8:..\\test\\get-subscriptions.test"
+            "TargetName" = "8:get-subscriptions.test"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -757,7 +885,47 @@
             "SourcePath" = "8:..\\cups\\raster.h"
             "TargetName" = "8:raster.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4A46F690254944ECBF1539E2C2F86A59"
+            {
+            "SourcePath" = "8:..\\doc\\help\\man-ipptoolfile.html"
+            "TargetName" = "8:man-ipptoolfile.html"
+            "Tag" = "8:"
+            "Folder" = "8:_24DE31CE70694FD2977B5FB38F24D77F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51381771E03E40DEA842E785C9B7A31B"
+            {
+            "SourcePath" = "8:..\\test\\print-job-gzip.test"
+            "TargetName" = "8:print-job-gzip.test"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -777,7 +945,7 @@
             "SourcePath" = "8:..\\cups\\array.h"
             "TargetName" = "8:array.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -797,7 +965,7 @@
             "SourcePath" = "8:..\\cups\\ppd.h"
             "TargetName" = "8:ppd.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -817,7 +985,7 @@
             "SourcePath" = "8:..\\cups\\language.h"
             "TargetName" = "8:language.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -877,7 +1045,7 @@
             "SourcePath" = "8:..\\cups\\versioning.h"
             "TargetName" = "8:versioning.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -897,7 +1065,27 @@
             "SourcePath" = "8:..\\cups\\dir.h"
             "TargetName" = "8:dir.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7A478A9B37C44B22BD4F926913C9A5B7"
+            {
+            "SourcePath" = "8:..\\test\\get-jobs.test"
+            "TargetName" = "8:get-jobs.test"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -972,12 +1160,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9967519E7058965D4C7DEF47EB39CC50"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_933D37C7FEBF4B8AAF9E6CE01A605039"
             {
-            "SourcePath" = "8:CRYPT32.dll"
-            "TargetName" = "8:CRYPT32.dll"
+            "SourcePath" = "8:..\\test\\ipp-everywhere.test"
+            "TargetName" = "8:ipp-everywhere.test"
             "Tag" = "8:"
-            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -988,8 +1176,8 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9D69B0FC2413407BA24D88B73EF456AA"
@@ -1010,26 +1198,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9FBF78D7B89EEA843380D5F10E1954D7"
-            {
-            "SourcePath" = "8:Secur32.dll"
-            "TargetName" = "8:Secur32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A271CCE042C14DDF8F0F1A1B16584F17"
@@ -1076,6 +1244,26 @@
             {
             "SourcePath" = "8:..\\test\\document-letter.pdf"
             "TargetName" = "8:document-letter.pdf"
+            "Tag" = "8:"
+            "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B38E399C93724A9BB5F429DABBA6301F"
+            {
+            "SourcePath" = "8:..\\test\\print-job-deflate.test"
+            "TargetName" = "8:print-job-deflate.test"
             "Tag" = "8:"
             "Folder" = "8:_9DFBB4777E594B0F8884792467931241"
             "Condition" = "8:"
@@ -1192,6 +1380,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CE2A836CE5AF4404B8672B100A9FC9ED"
+            {
+            "SourcePath" = "8:..\\IPPTOOL.txt"
+            "TargetName" = "8:IPPTOOL.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D3B3B266E0FC45DD9B7EEBCC3AC52965"
             {
             "SourcePath" = "8:..\\test\\get-printer-attributes.test"
@@ -1277,7 +1485,7 @@
             "SourcePath" = "8:..\\cups\\cups.h"
             "TargetName" = "8:cups.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1317,7 +1525,7 @@
             "SourcePath" = "8:..\\cups\\file.h"
             "TargetName" = "8:file.h"
             "Tag" = "8:"
-            "Folder" = "8:_121A70CA434045EDB010E7480AFCEF18"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1338,6 +1546,26 @@
             "TargetName" = "8:api-ppd.html"
             "Tag" = "8:"
             "Folder" = "8:_24DE31CE70694FD2977B5FB38F24D77F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F7FBD6E1C73B45EA813FB1D5E6050650"
+            {
+            "SourcePath" = "8:..\\cups\\pwg.h"
+            "TargetName" = "8:pwg.h"
+            "Tag" = "8:"
+            "Folder" = "8:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1430,6 +1658,17 @@
                     "Property" = "8:_23D8BBBA9DEE4C8E88C9D1624DEAFB81"
                         "Folders"
                         {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_8EF6B1AA25034DB9BCC44F5A3CCFF9F0"
+                            {
+                            "Name" = "8:cups"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_61254DF68D8F4039997C263F7B45ABB8"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_24DE31CE70694FD2977B5FB38F24D77F"
@@ -1495,7 +1734,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CUPS SDK for Windows"
         "ProductCode" = "8:{4E0D1662-B032-4CAD-8DBD-5302ADCE1C6F}"
-        "PackageCode" = "8:{00298F12-01DD-4785-9402-7A1E694F9577}"
+        "PackageCode" = "8:{EB6A403A-100A-4EDB-A727-C18FAC8E39E1}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -2018,11 +2257,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_1DFD9AECD1AD4B2291DD52028E866569"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_3A7FB149E6D64E78A9792E52A6D905FD"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -2032,11 +2271,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_62CA00B1E5E4460CA93EE7E2B8FE878B"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_FC564AE377AF4166919D500C98F403DA"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -2051,7 +2290,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0299839A2CCC4F908C5D3A8F465F3FFE"
             {
-            "SourcePath" = "8:Win32\\Release\\libcupsimage2.dll"
+            "SourcePath" = "8:Win32\\Debug\\libcupsimage2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C8D931ADC425446B916E9711B929659F"
@@ -2079,7 +2318,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_364DCCAFF25145BCBE75FFEEDCC75B3A"
             {
-            "SourcePath" = "8:Win32\\Release\\cupstestppd.exe"
+            "SourcePath" = "8:Win32\\Debug\\cupstestppd.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -2107,7 +2346,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B20638175CCB42398417E0683A12469C"
             {
-            "SourcePath" = "8:Win32\\Release\\ipptool.exe"
+            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -2135,7 +2374,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Win32\\Release\\regex.dll"
+            "SourcePath" = "8:Win32\\Debug\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C8D931ADC425446B916E9711B929659F"
@@ -2163,7 +2402,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Win32\\Release\\libcups2.dll"
+            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_C8D931ADC425446B916E9711B929659F"

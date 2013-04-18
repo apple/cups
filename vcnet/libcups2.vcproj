@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="libcups2"
 	ProjectGUID="{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}"
+	RootNamespace="libcups2"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -481,6 +482,18 @@
 			</File>
 			<File
 				RelativePath="..\cups\debug.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\dest-job.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\dest-localization.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\dest-options.c"
 				>
 			</File>
 			<File

@@ -61,14 +61,6 @@ _ppdNormalizeMakeAndModel
 _ppdOpen
 _ppdOpenFile
 _ppdParseOptions
-_pwgGenerateSize
-_pwgInitSize
-_pwgMediaForLegacy
-_pwgMediaForPPD
-_pwgMediaForPWG
-_pwgMediaForSize
-_pwgMediaTypeForType
-_pwgPageSizeForMedia
 cupsAddDest
 cupsAddOption
 cupsAdminCreateWindowsPPD
@@ -134,6 +126,9 @@ cupsFileStdout
 cupsFileTell
 cupsFileUnlock
 cupsFileWrite
+cupsFindDestDefault
+cupsFindDestReady
+cupsFindDestSupported
 cupsFreeDests
 cupsFreeJobs
 cupsFreeOptions
@@ -141,6 +136,9 @@ cupsGetClasses
 cupsGetDefault
 cupsGetDefault2
 cupsGetDest
+cupsGetDestMediaByIndex
+cupsGetDestMediaCount
+cupsGetDestMediaDefault
 cupsGetDests
 cupsGetDests2
 cupsGetFd
@@ -301,6 +299,7 @@ ippContainsInteger
 ippContainsString
 ippCopyAttribute
 ippCopyAttributes
+ippCreateRequestedArray
 ippDateToTime
 ippDelete
 ippDeleteAttribute
@@ -319,6 +318,7 @@ ippGetDate
 ippGetGroupTag
 ippGetInteger
 ippGetName
+ippGetOctetString
 ippGetOperation
 ippGetRange
 ippGetRequestId
@@ -346,6 +346,7 @@ ippSetDate
 ippSetGroupTag
 ippSetInteger
 ippSetName
+ippSetOctetString
 ippSetOperation
 ippSetRange
 ippSetRequestId
@@ -400,3 +401,9 @@ ppdPageLength
 ppdPageSize
 ppdPageWidth
 ppdSetConformance
+pwgFormatSizeName
+pwgInitSize
+pwgMediaForLegacy
+pwgMediaForPPD
+pwgMediaForPWG
+pwgMediaForSize

@@ -3215,7 +3215,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       length_2540ths = (size->length > size->width) ?
                            PWG_FROM_POINTS(size->length) :
 			   PWG_FROM_POINTS(size->width);
-      pwg_media      = _pwgMediaForSize(width_2540ths, length_2540ths);
+      pwg_media      = pwgMediaForSize(width_2540ths, length_2540ths);
 
       if (pwg_media &&
           (fabs(pwg_media->width - width_2540ths) > 34 ||
