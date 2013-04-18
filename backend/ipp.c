@@ -431,7 +431,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (!port)
     port = IPP_PORT;			/* Default to port 631 */
 
-  if (!strcmp(scheme, "https"))
+  if (!strcmp(scheme, "https") || !strcmp(scheme, "ipps"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
   else
     cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
