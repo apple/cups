@@ -60,6 +60,7 @@ cp test/document-*.ps $pkgdir
 cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
 cp test/get-notifications.test $pkgdir
 cp test/get-printer-attributes.test $pkgdir
+cp test/get-subscriptions.test $pkgdir
 cp test/gray.jpg $pkgdir
 cp test/ipp-[12].*.test $pkgdir
 cp test/ipp-everywhere.test $pkgdir
