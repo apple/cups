@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- Kerberos credentials could get truncated when printing to a shared
+	  printer.
 	- Printing using "ipps" URIs was not encrypted.
 	- Insecure ICC profiles prevented installation of user profiles for a
 	  printer on OS X.

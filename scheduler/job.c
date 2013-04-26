@@ -1956,7 +1956,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
 
       if (cupsFileGets(fp, line, sizeof(line)) &&
-          !strcmp(line, "CUPSD-AUTH-V2"))
+          !strcmp(line, "CUPSD-AUTH-V3"))
       {
         i = 0;
         while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
@@ -1965,8 +1965,11 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
           * Decode value...
           */
 
-	  bytes = sizeof(data);
-	  httpDecode64_2(data, &bytes, value);
+          if (strcmp(line, "negotiate") && strcmp(line, "uid"))
+          {
+	    bytes = sizeof(data);
+	    httpDecode64_2(data, &bytes, value);
+	  }
 
          /*
           * Assign environment variables...
@@ -1987,7 +1990,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  else if (!strcmp(line, "password"))
 	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
 	  else if (!strcmp(line, "negotiate"))
-	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", data);
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", value);
 	  else
 	    continue;
 
