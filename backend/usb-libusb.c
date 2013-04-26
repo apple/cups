@@ -230,6 +230,7 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x04a9, 0x3256, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP810 */
 	{ 0x04a9, 0x30F5, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP500 */
 	{ 0x04a9, 0x31AF, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES3 */
+	{ 0x04a9, 0x31DD, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP780 */
 	 /* MISSING PIDs: CP520, CP530, CP790 */
 	{ 0, 0 }
 };
