@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-04-18
+IPPTOOL.txt - 2013-05-02
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
@@ -57,7 +57,7 @@ STANDARD TEST FILES
         get-notifications.test              Shows events for an ippget
 	                                    subscription.
         get-printer-attributes.test         Shows printer attributes
-        get-subscription.test               Shows a list of subscriptions
+        get-subscriptions.test              Shows a list of subscriptions
         ipp-1.1.test                        IPP/1.1 conformance test suite
         ipp-2.0.test                        IPP/2.0 conformance test suite
         ipp-2.1.test                        IPP/2.1 conformance test suite

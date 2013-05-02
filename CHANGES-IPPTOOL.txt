@@ -1,8 +1,12 @@
-CHANGES-IPPTOOL.txt - 2013-04-18
+CHANGES-IPPTOOL.txt - 2013-05-02
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+2013-05-02
+
+	- Fixed several ipptool test files that used old STATUS names.
 
 
 2013-04-18

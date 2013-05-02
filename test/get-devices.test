@@ -16,6 +16,6 @@
 	ATTR uri printer-uri $uri
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 }
