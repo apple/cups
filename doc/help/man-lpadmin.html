@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpadmin(8)</title>
+</head>
+<body>
+<h1 class="title">lpadmin(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lpadmin - configure cups printers and classes
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lpadmin
+</b>[ -E ] [-U
+<i>username
+</i>] [ -h
+<i>server[:port]
+</i>] -d
+<i>destination
+</i><br>
+<b>lpadmin
+</b>[ -E ] [-U
+<i>username
+</i>] [ -h
+<i>server[:port]
+</i>] -p
+<i>destination
+</i>[ -R
+<i>name-default
+</i>]
+<i>option(s)
+</i><br>
+<b>lpadmin
+</b>[ -E ] [-U
+<i>username
+</i>] [ -h
+<i>server[:port]
+</i>] -x
+<i>destination
+</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>lpadmin</i> configures printer and class queues provided by
+CUPS. It can also be used to set the server default printer or
+class.
+<p>When specified before the <i>-d</i>, <i>-p</i>, or <i>-x</i>
+options, the <i>-E</i> option forces encryption when connecting to
+the server.
+<p>The first form of the command (<i>-d</i>) sets the default printer
+or class to <i>destination</i>.  Subsequent print jobs submitted
+via the <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a> or <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a> commands will use this
+destination unless the user specifies otherwise with the
+<a href='man-lpoptions.html?TOPIC=Man+Pages'>lpoptions(1)</a> command.
+<p>The second form of the command (<i>-p</i>) configures the named
+printer or class.  The additional options are described below.
+<p>The third form of the command (<i>-x</i>) deletes the printer or
+class <i>destination</i>. Any jobs that are pending for the
+destination will be removed and any job that is currently printed
+will be aborted.
+<h2 class="title"><a name="CONFIGURATION_OPTIONS">Configuration Options</a></h2>
+The following options are recognized when configuring a printer
+queue:
+<dl>
+<dt>-c class
+</dt>
+<dd></dd>
+<dd>Adds the named <i>printer</i> to <i>class</i>.  If <i>class</i> does
+not exist it is created automatically.
+</dd>
+<dt>-i interface
+</dt>
+<dd></dd>
+<dd>Sets a System V style interface script for the printer. This
+option cannot be specified with the <i>-P</i> option (PPD file)
+and is intended for providing support for legacy printer drivers.
+</dd>
+<dt>-m model
+</dt>
+<dd></dd>
+<dd>Sets a standard System V interface script or PPD file for the printer from the
+<i>model</i> directory or using one of the driver interfaces. Use the <i>-m</i>
+option with the <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a> command to get a list of supported models.
+</dd>
+<dt>-o cupsIPPSupplies=true
+</dt>
+<dd></dd>
+<dt>-o cupsIPPSupplies=false
+</dt>
+<dd></dd>
+<dd>Specifies whether IPP supply level values should be reported.
+</dd>
+<dt>-o cupsSNMPSupplies=true
+</dt>
+<dd></dd>
+<dt>-o cupsSNMPSupplies=false
+</dt>
+<dd></dd>
+<dd>Specifies whether SNMP supply level (RFC 3805) values should be reported.
+</dd>
+<dt>-o job-k-limit=value
+</dt>
+<dd></dd>
+<dd>Sets the kilobyte limit for per-user quotas. The value is an
+integer number of kilobytes; one kilobyte is 1024 bytes.
+</dd>
+<dt>-o job-page-limit=value
+</dt>
+<dd></dd>
+<dd>Sets the page limit for per-user quotas. The value is the integer
+number of pages that can be printed; double-sided pages are
+counted as two pages.
+</dd>
+<dt>-o job-quota-period=value
+</dt>
+<dd></dd>
+<dd>Sets the accounting period for per-user quotas. The value is an
+integer number of seconds; 86,400 seconds are in one day.
+</dd>
+<dt>-o job-sheets-default=banner
+</dt>
+<dd></dd>
+<dt>-o job-sheets-default=banner,banner
+</dt>
+<dd></dd>
+<dd>Sets the default banner page(s) to use for print jobs.
+</dd>
+<dt>-o name=value
+</dt>
+<dd></dd>
+<dd>Sets a PPD option for the printer. PPD options can be listed using the <i>-l</i>
+option with the <a href='man-lpoptions.html?TOPIC=Man+Pages'>lpoptions(1)</a> command.
+</dd>
+<dt>-o name-default=value
+</dt>
+<dd></dd>
+<dd>Sets a default server-side option for the destination. Any print-time
+option can be defaulted, e.g. "-o cpi-default=17" to set the default
+"cpi" option value to 17.
+</dd>
+<dt>-o port-monitor=name
+</dt>
+<dd></dd>
+<dd>Sets the binary communications program to use when printing,
+"none", "bcp", or "tbcp". The default program is "none". The
+specified port monitor must be listed in the printer's PPD file.
+</dd>
+<dt>-o printer-error-policy=name
+</dt>
+<dd></dd>
+<dd>Sets the error policy to be used when the printer backend is
+unable to send the job to the printer. The name must be one of
+"abort-job", "retry-job", "retry-current-job", or "stop-printer". The default
+error policy is "stop-printer" for printers and "retry-current-job" for
+classes.
+</dd>
+<dt>-o printer-is-shared=true/false
+</dt>
+<dd></dd>
+<dd>Sets the destination to shared/published or unshared/unpublished.
+Shared/published destinations are publicly announced by the server
+on the LAN based on the browsing configuration in
+<b>cupsd.conf</b>, while unshared/unpublished destinations are not
+announced. The default value is "true".
+</dd>
+<dt>-o printer-op-policy=name
+</dt>
+<dd></dd>
+<dd>Sets the IPP operation policy associated with the destination. The
+name must be defined in the <b>cupsd.conf</b> in a Policy section.
+The default operation policy is "default".
+</dd>
+<dt>-R name-default
+</dt>
+<dd></dd>
+<dd>Deletes the named option from <i>printer</i>.
+</dd>
+<dt>-r class
+</dt>
+<dd></dd>
+<dd>Removes the named <i>printer</i> from <i>class</i>.  If the
+resulting class becomes empty it is removed.
+</dd>
+<dt>-u allow:user,user,@group
+</dt>
+<dd></dd>
+<dt>-u deny:user,user,@group
+</dt>
+<dd></dd>
+<dt>-u allow:all
+</dt>
+<dd></dd>
+<dt>-u deny:none
+</dt>
+<dd></dd>
+<dd>Sets user-level access control on a destination. Names starting with
+"@" are interpreted as UNIX groups. The latter two forms turn
+user-level access control off.
+</dd>
+<dt>-v "device-uri"
+</dt>
+<dd></dd>
+<dd>Sets the <i>device-uri</i> attribute of the printer queue. Use the <i>-v</i>
+option with the <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a> command to get a list of supported device URIs
+and schemes.
+</dd>
+<dt>-D "info"
+</dt>
+<dd></dd>
+<dd>Provides a textual description of the destination.
+</dd>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Enables the destination and accepts jobs; this is the same as running the
+<a href='man-cupsaccept.html?TOPIC=Man+Pages'>cupsaccept(8)</a> and <a href='man-cupsenable.html?TOPIC=Man+Pages'>cupsenable(8)</a> programs on the destination.
+</dd>
+<dt>-L "location"
+</dt>
+<dd></dd>
+<dd>Provides a textual location of the destination.
+</dd>
+<dt>-P ppd-file
+</dt>
+<dd></dd>
+<dd>Specifies a PostScript Printer Description file to use with the
+printer. If specified, this option overrides the <i>-i</i> option
+(interface script).
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+Unlike the System V printing system, CUPS allows printer names to
+contain any printable character except SPACE, TAB, "/", or "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+Finally, the CUPS version of <i>lpadmin</i> may ask the user for
+an access password depending on the printing system
+configuration. This differs from the System V version which
+requires the root user to execute this command.
+<h2 class="title"><a name="LIMITATIONS">Limitations</a></h2>
+The CUPS version of <i>lpadmin</i> does not support all of the
+System V or Solaris printing system configuration options.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cupsaccept.html?TOPIC=Man+Pages'>cupsaccept(8)</a>, <a href='man-cupsenable.html?TOPIC=Man+Pages'>cupsenable(8)</a>, <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a>,
+<a href='man-lpoptions.html?TOPIC=Man+Pages'>lpoptions(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

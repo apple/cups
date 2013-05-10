@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsfilter(8)</title>
+</head>
+<body>
+<h1 class="title">cupsfilter(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsfilter - convert a file to another format using cups filters
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsfilter
+</b>[ -D ] [ -U
+<i>user
+</i>] [ -c
+<i>config-file
+</i>] [ -d
+<i>printer
+</i>] [ -e ] [ -i
+<i>mime/type
+</i>] [ -j
+<i>job-id[,N]
+</i>] [ -m
+<i>mime/type
+</i>] [ -n
+<i>copies
+</i>] [ -o
+<i>name=value
+</i>] [ -p
+<i>filename.ppd
+</i>] [ -t
+<i>title
+</i>] [ -u ]
+<i>filename
+</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>cupsfilter</i> is a front-end to the CUPS filter subsystem which allows you
+to convert a file to a specific format, just as if you had printed the file
+through CUPS. By default, <i>cupsfilter</i> generates a PDF file.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<dl>
+<dt>-D
+</dt>
+<dd></dd>
+<dd>Delete the input file after conversion.
+</dd>
+<dt>-U user
+</dt>
+<dd></dd>
+<dd>Specifies the username passed to the filters. The default is the name of the current user.
+</dd>
+<dt>-c config-file
+</dt>
+<dd></dd>
+<dd>Uses the named cupsd.conf configuration file.
+</dd>
+<dt>-d printer
+</dt>
+<dd>Uses information from the named printer.
+</dd>
+<dt>-e
+</dt>
+<dd></dd>
+<dd>Use every filter from the PPD file.
+</dd>
+<dt>-i mime/type
+</dt>
+<dd></dd>
+<dd>Specifies the source file type. The default file type is guessed using the
+filename and contents of the file.
+</dd>
+<dt>-j job-id[,N]
+</dt>
+<dd></dd>
+<dd>Converts document N from the specified job. If N is omitted, document 1 is
+converted.
+</dd>
+<dt>-m mime/type
+</dt>
+<dd></dd>
+<dd>Specifies the destination file type. The default file type is application/pdf.
+Use printer/foo to convert to the printer format defined by the filters in the
+PPD file.
+</dd>
+<dt>-n copies
+</dt>
+<dd></dd>
+<dd>Specifies the number of copies to generate.
+</dd>
+<dt>-o name=value
+</dt>
+<dd></dd>
+<dd>Specifies options to pass to the CUPS filters.
+</dd>
+<dt>-p filename.ppd
+</dt>
+<dd></dd>
+<dd>Specifies the PPD file to use.
+</dd>
+<dt>-t title
+</dt>
+<dd></dd>
+<dd>Specifies the document title.
+</dd>
+<dt>-u
+</dt>
+<dd></dd>
+<dd>Delete the PPD file after conversion.
+</dd>
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

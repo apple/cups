@@ -1,0 +1,43 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?Изменение {printer_name}:Добавление принтера}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Подключение:</TH>
+<TD><INPUT TYPE="URL" SIZE="60" MAXLENGTH="1023" NAME="DEVICE_URI" VALUE="{current_device_uri?{current_device_uri}:{device_uri}}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>Примеры:
+<PRE>
+    http://hostname:631/ipp/
+    http://hostname:631/ipp/port1
+
+    ipp://hostname/ipp/
+    ipp://hostname/ipp/port1
+
+    lpd://hostname/queue
+
+    socket://hostname
+    socket://hostname:9100
+</PRE>
+
+<P>Смотрите раздел <A HREF="/help/network.html" TARGET="_blank">"Сетевые принтеры"</A> для выяснения правильного адреса вашего принтера.</P>
+
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Продолжить"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

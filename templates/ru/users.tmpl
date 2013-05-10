@@ -1,0 +1,30 @@
+<DIV CLASS="indent">
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{OP}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+{IS_CLASS?<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="{IS_CLASS}">:}
+
+<H2 CLASS="title">Доступ пользователей на {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Пользователи:</TH>
+<TD>
+<INPUT TYPE='TEXT' NAME='users' SIZE='60' VALUE='{?requesting_user_name_allowed}{?requesting_user_name_denied}'>
+<BR>
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-allowed' {requesting_user_name_allowed?checked:}>Разрешить этим пользователям печатать
+<INPUT TYPE='RADIO' NAME='type' VALUE='requesting-user-name-denied' {requesting_user_name_denied?checked:}>Запретить этим пользователям печатать
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>
+<INPUT TYPE="SUBMIT" VALUE="Сохранить">
+</TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

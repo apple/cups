@@ -1,0 +1,37 @@
+CHANGES.txt - 1.7b1 - 2013-04-18
+--------------------------------
+
+CHANGES IN CUPS V1.7b1
+
+	- The configure script now supports a --with-rundir option to change
+	  the transient run-time state directory from the default to other
+	  locations like /run/cups (STR #4306)
+	- The scheduler now supports PPD lookups for classes (STR #4296)
+	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
+	  environment variable for filters.
+	- Added a new "-x" option to the cancel command (STR #4103)
+	- Made the PWG media handling APIs public (STR #4267)
+	- Implemented ready media support for the cupsGetDestMediaXxx APIs
+	  (STR #4289)
+	- Added new cupsFindDestDefault, cupsFindDestReady, and
+	  cupsFindDestSupported APIs (STR #4289)
+	- Added new cupsGetDestMediaByIndex, cupsGetDestMediaCount, and
+	  cupsGetDestMediaDefault APIs (STR #4289)
+	- Added new ippGet/SetOctetString APIs for getting and setting an
+	  octetString value (STR #4289)
+	- Added new ippCreateRequestedArray API for generating a array of
+	  attributes from the requested-attributes attribute.
+	- The ipptool utility now supports compression, conditional tests based
+	  on the presence of files, and new DEFINE predicates for STATUS.
+	- Added new IPP APIs for checking values (STR #4167)
+	- Added new IPP APis for adding and setting formatted strings.
+	- Added new HTTP APIs to support basic server functionality via libcups.
+	- The dnssd backend now generates a 1284 device ID as needed (STR #3702)
+	- CUPS now supports compressing and decompressing streamed data
+	  (STR #4168)
+	- CUPS now supports higher-level PIN printing, external accounting
+	  systems, and "print here" printing environments (STR #4169)
+	- IRIX is no longer a supported operating system (STR #4092)
+	- The PPD compiler now supports JCL options properly (STR #4115)
+	- The web interface now checks whether the web browser has cookies
+	  enabled and displays a suitable error message (STR #4141)

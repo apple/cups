@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpr(1)</title>
+</head>
+<body>
+<h1 class="title">lpr(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lpr - print files
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lpr
+</b>[ -E ] [ -H
+<i>server[:port]
+</i>] [ -U
+<i>username
+</i>] [ -P
+<i>destination[/instance]
+</i>] [ -#
+<i>num-copies
+</i>[ -h ] [ -l ] [ -m ] [ -o
+<i>option[=value]
+</i>] [ -p] [ -q ] [ -r ] [ -C/J/T
+<i>title
+</i>] [
+<i>file(s)
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>lpr</i> submits files for printing. Files named on the command
+line are sent to the named printer (or the default destination if no
+destination is specified). If no files are listed on the command-line,
+<i>lpr</i> reads the print file from the standard input.
+<h2 class="title"><a name="THE_DEFAULT_DESTINATION">The Default Destination</a></h2>
+CUPS provides many ways to set the default destination. The "LPDEST" and
+"PRINTER" environment variables are consulted first. If neither are set,
+the current default set using the <a href='man-lpoptions.html?TOPIC=Man+Pages'>lpoptions(1)</a> command is used,
+followed by the default set using the <a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a> command.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized by <i>lpr</i>:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-H server[:port]
+</dt>
+<dd></dd>
+<dd>Specifies an alternate server.
+</dd>
+<dt>-C "name"
+</dt>
+<dd></dd>
+<dt>-J "name"
+</dt>
+<dd></dd>
+<dt>-T "name"
+</dt>
+<dd></dd>
+<dd>Sets the job name.
+</dd>
+<dt>-P destination[/instance]
+</dt>
+<dd></dd>
+<dd>Prints files to the named printer.
+</dd>
+<dt>-U username
+</dt>
+<dd></dd>
+<dd>Specifies an alternate username.
+</dd>
+<dt>-# <i>copies</i>
+</dt>
+<dd></dd>
+<dd>Sets the number of copies to print from 1 to 100.
+</dd>
+<dt>-h
+</dt>
+<dd></dd>
+<dd>Disables banner printing. This option is equivalent to "-o
+job-sheets=none".
+</dd>
+<dt>-l
+</dt>
+<dd></dd>
+<dd>Specifies that the print file is already formatted for the
+destination and should be sent without filtering. This option is
+equivalent to "-o raw".
+</dd>
+<dt>-m
+</dt>
+<dd></dd>
+<dd>Send an email on job completion.
+</dd>
+<dt>-o option[=value]
+</dt>
+<dd></dd>
+<dd>Sets a job option.
+</dd>
+<dt>-p
+</dt>
+<dd></dd>
+<dd>Specifies that the print file should be formatted with a shaded
+header with the date, time, job name, and page number. This
+option is equivalent to "-o prettyprint" and is only useful when
+printing text files.
+</dd>
+<dt>-q
+</dt>
+<dd></dd>
+<dd>Hold job for printing.
+</dd>
+<dt>-r
+</dt>
+<dd></dd>
+<dd>Specifies that the named print files should be deleted after
+printing them.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+The "c", "d", "f", "g", "i", "n", "t", "v", and "w" options
+are not supported by CUPS and produce a warning message if used.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>, <a href='man-lpoptions.html?TOPIC=Man+Pages'>lpoptions(1)</a>,
+<a href='man-lpq.html?TOPIC=Man+Pages'>lpq(1)</a>, <a href='man-lprm.html?TOPIC=Man+Pages'>lprm(1)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

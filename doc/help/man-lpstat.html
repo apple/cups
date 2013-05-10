@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpstat(1)</title>
+</head>
+<body>
+<h1 class="title">lpstat(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lpstat - print cups status information
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lpstat
+</b>[ -E ] [ -H ] [ -U
+<i>username
+</i>] [ -h
+<i>hostname[:port]
+</i>] [ -l ] [ -W
+<i>which-jobs
+</i>] [ -a [
+<i>destination(s)
+</i>] ] [ -c [
+<i>class(es)
+</i>] ] [ -d ] [ -o [
+<i>destination(s)
+</i>] ] [ -p [
+<i>printer(s)
+</i>] ] [ -r ] [ -R ] [ -s ] [ -t ] [ -u [
+<i>user(s)
+</i>] ] [ -v [
+<i>printer(s)
+</i>] ]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>lpstat</i> displays status information about the current
+classes, jobs, and printers. When run with no arguments,
+<i>lpstat</i> will list jobs queued by the current user.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The <i>lpstat</i> command supports the following options:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-H
+</dt>
+<dd></dd>
+<dd>Shows the server hostname and port.
+</dd>
+<dt>-R
+</dt>
+<dd></dd>
+<dd>Shows the ranking of print jobs.
+</dd>
+<dt>-U username
+</dt>
+<dd></dd>
+<dd>Specifies an alternate username.
+</dd>
+<dt>-W which-jobs
+</dt>
+<dd></dd>
+<dd>Specifies which jobs to show, <i>completed</i> or
+<i>not-completed</i> (the default). This option <i>must</i> appear
+before the <i>-o</i> option and/or any printer names, otherwise
+the default (not-completed) value will be used in the request to
+the scheduler.
+</dd>
+<dt>-a [printer(s)]
+</dt>
+<dd></dd>
+<dd>Shows the accepting state of printer queues. If no printers are
+specified then all printers are listed.
+</dd>
+<dt>-c [class(es)]
+</dt>
+<dd></dd>
+<dd>Shows the printer classes and the printers that belong to them.
+If no classes are specified then all classes are listed.
+</dd>
+<dt>-d
+</dt>
+<dd></dd>
+<dd>Shows the current default destination.
+</dd>
+<dt>-h server[:port]
+</dt>
+<dd></dd>
+<dd>Specifies an alternate server.
+</dd>
+<dt>-l
+</dt>
+<dd></dd>
+<dd>Shows a long listing of printers, classes, or jobs.
+</dd>
+<dt>-o [destination(s)]
+</dt>
+<dd></dd>
+<dd>Shows the jobs queue on the specified destinations. If no destinations are
+specified all jobs are shown.
+</dd>
+<dt>-p [printer(s)]
+</dt>
+<dd></dd>
+<dd>Shows the printers and whether or not they are enabled for printing. If
+no printers are specified then all printers are listed.
+</dd>
+<dt>-r
+</dt>
+<dd></dd>
+<dd>Shows whether the CUPS server is running.
+</dd>
+<dt>-s
+</dt>
+<dd></dd>
+<dd>Shows a status summary, including the default destination, a
+list of classes and their member printers, and a list of printers and
+their associated devices. This is equivalent to using the "-d", "-c",
+and "-v" options.
+</dd>
+<dt>-t
+</dt>
+<dd></dd>
+<dd>Shows all status information. This is equivalent to using the "-r",
+"-d", "-c", "-v", "-a", "-p", and "-o" options.
+</dd>
+<dt>-u [user(s)]
+</dt>
+<dd></dd>
+<dd>Shows a list of print jobs queued by the specified users. If no users
+are specified, lists the jobs queued by the current user.
+</dd>
+<dt>-v [printer(s)]
+</dt>
+<dd></dd>
+<dd>Shows the printers and what device they are attached to. If no printers
+are specified then all printers are listed.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+Unlike the System V printing system, CUPS allows printer names to
+contain any printable character except SPACE, TAB, "/", and "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+<p>The "-h", "-E", "-U", and "-W" options are unique to CUPS.
+<p>The Solaris "-f", "-P", and "-S" options are silently ignored.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>
