@@ -1,0 +1,124 @@
+.\"
+.\" "$Id: printers.conf.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   printers.conf man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH printers.conf 5 "CUPS" "29 April 2009" "Apple Inc."
+.SH NAME
+printers.conf \- printer configuration file for cups
+.SH DESCRIPTION
+The \fIprinters.conf\fR file defines the local printers that are
+available. It is normally located in the \fI/etc/cups\fR directory and
+is generated automatically by the \fIcupsd(8)\fR program when printers
+are added or deleted.
+.LP
+Each line in the file can be a configuration directive, a blank line,
+or a comment. Comment lines start with the # character.
+.SH DIRECTIVES
+.TP 5
+<Printer name> ... </Printer>
+.br
+Defines a specific printer.
+.TP 5
+<DefaultPrinter name> ... </Printer>
+.br
+Defines a default printer.
+.TP 5
+Accepting Yes
+.TP 5
+Accepting No
+.br
+Specifies whether the printer is accepting new jobs.
+.TP 5
+AllowUser [ user @group ... ]
+.br
+Allows specific users and groups to print to the printer.
+.TP 5
+DenyUser [ user @group ... ]
+.br
+Prevents specific users and groups from printing to the printer.
+.TP 5
+DeviceURI uri
+.br
+Specifies the device URI for a printer.
+.TP 5
+ErrorPolicy abort-job
+.TP 5
+ErrorPolicy retry-current-job
+.TP 5
+ErrorPolicy retry-job
+.TP 5
+ErrorPolicy stop-printer
+.br
+Specifies the error policy for the printer.
+.TP 5
+Info text
+.br
+Specifies human-readable text describing the printer.
+.TP 5
+JobSheets banner banner
+.br
+Specifies the banner pages to use for the printer.
+.TP 5
+KLimit number
+.br
+Specifies the job-k-limit value for the printer.
+.TP 5
+Location text
+.br
+Specifies human-readable text describing the location of the printer.
+.TP 5
+OpPolicy name
+.br
+Specifies the operation policy for the printer.
+.TP 5
+PageLimit number
+.br
+Specifies the job-page-limit value for the printer.
+.TP 5
+PortMonitor monitor
+.br
+Specifies the port monitor for a printer.
+.TP 5
+QuotaPeriod seconds
+.br
+Specifies the job-quota-period value for the printer.
+.TP 5
+Shared Yes
+.TP 5
+Shared No
+.br
+Specifies whether the printer is shared.
+.TP 5
+State idle
+.TP 5
+State stopped
+.br
+Specifies the initial state of the printer (Idle or Stopped)
+.TP 5
+StateMessage text
+.br
+Specifies the message associated with the state.
+.TP 5
+StateTime seconds
+.br
+Specifies the date/time associated with the state.
+.SH SEE ALSO
+\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
+\fImime.convs(5)\fR, \fImime.types(5)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: printers.conf.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

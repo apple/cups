@@ -1,0 +1,462 @@
+BODY {
+  background: white;
+  color: black;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  color: #006600;
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  background: #f0f0f0;
+  border: dotted thin #7f7f7f;
+  color: #7f0000;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+PRE.example {
+  background: white;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+PRE.command EM, PRE.example EM {
+  color: #3f0000;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  color: #7f0000;
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #f0f0f0;
+  border: inset 1px #eeeeee;
+  padding: 10px;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+  color: #000099;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+  color: #990099;
+}
+
+TABLE.page {
+  border: none;
+  border-collapse: collapse;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+TD.body {
+  height: 100%;
+  vertical-align: top;
+}
+
+TD.sel, TD.unsel {
+  border-left: thin solid #cccccc;
+  padding: 0px 5px;
+  text-align: center;
+  vertical-align: middle;
+  width: 14%;
+}
+
+TD.sel {
+  background: url(images/sel.gif);
+}
+
+TD.unsel {
+  background: url(images/unsel.gif);
+}
+
+TD.sel A, TD.sel A:hover, TD.unsel A:link:hover, TD.unsel A:visited:hover,
+TD.unsel A:active, TD.unsel A, TD.unsel A:visited {
+  color: #666666;
+  display: block;
+  font-weight: normal;
+  padding: 8px;
+  text-decoration: none;
+}
+
+TD.trailer {
+  background: #f0f0f0;
+  border: solid thin #e0e0e0;
+  color: #666666;
+  font-size: 80%;
+  padding: 5px;
+}
+
+TD.trailer A {
+  color: #666699;
+}
+
+FORM {
+  display: inline;
+}
+
+INPUT[TYPE="TEXT"], TEXTAREA {
+  font-family: monaco, courier, monospace;
+}
+
+INPUT[TYPE="IMAGE"] {
+  border: none;
+  padding: 2pt;
+  vertical-align: bottom;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  background: white;
+  border: solid thin #bbbbbb;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #f0f0f0;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+.conflict {
+  background: red;
+  color: white;
+}
+
+TH.conflict {
+  text-align: right;
+}
+
+H1.title {
+  display: none;
+}
+
+H2.title, H3.title {
+  border-bottom: solid 1pt #999999;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DIV.sidebar {
+  float: right;
+  min-width: 25%;
+  margin-left: 10px;
+  max-width: 33%;
+}
+
+DIV.sidebar P.l0 {
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 12pt;
+}
+
+DIV.sidebar P.l1 {
+  margin-bottom: 0;
+  margin-left: 36pt;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -18pt;
+}
+
+DIV.sidebar P.l2 {
+  font-style: italic;
+  margin-bottom: 0;
+  margin-left: 54pt;
+  margin-right: 0;
+  margin-top: 0;
+  text-indent: -18pt;
+}
+
+TABLE.inset {
+  background: #f0f0f0;
+  border: thin solid #e0e0e0;
+  margin-top: 1em;
+  padding: 0;
+  width: 100%;
+  /* These are not implemented by all browsers, but that's OK */
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+TABLE.inset CAPTION {
+  caption-side: top;
+  color: #666666;
+  font-size: 80%;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  text-align: left;
+}
+
+TABLE.inset TD {
+  padding: 2px;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  background: white;
+  border: solid thin #999999;
+  border-spacing: 0;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #f0f0f0;
+}
+
+DIV.tabs {
+  height: 480px;
+  overflow: hidden;
+}
+
+DIV.tab {
+  float: left;
+  height: 100%;
+  overflow-y: auto;
+  width: 100%;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}

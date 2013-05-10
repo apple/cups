@@ -1,0 +1,68 @@
+.\"
+.\" "$Id: lppasswd.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpadmin man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lppasswd 1 "CUPS" "22 February 2008" "Apple Inc."
+.SH NAME
+lppasswd \- add, change, or delete digest passwords.
+.SH SYNOPSIS
+.B lppasswd
+[
+.I username
+]
+.br
+.B lppasswd
+-a [ -g
+.I groupname
+]
+.I username
+.br
+.B lppasswd
+-x
+.I username
+.SH DESCRIPTION
+\fIlppasswd\fR adds, changes, or deletes passwords in the CUPS
+digest password file, \fIpasswd.md5\fR. When run by a normal
+user, \fIlppasswd\fR will prompt for the old and new passwords.
+When run by the super-user, \fIlppasswd\fR can add new accounts
+(\fI-a username\fR), change existing accounts (\fIusername\fR),
+or delete accounts (\fI-x username\fR) in the digest password
+file. Digest usernames do not have to match local UNIX usernames.
+.SH OPTIONS
+\fIlppasswd\fR supports the following options:
+.TP 5
+-g groupname
+.br
+Specifies a group other than the default system group.
+.SH SECURITY ISSUES
+By default, the \fIlppasswd\fR program is not installed to allow ordinary
+users to change their passwords. To enable this, the \fIlppasswd\fR command
+must be made setuid to root with the command:
+.br
+.nf
+chmod u+s lppasswd
+.fi
+.PP
+While every attempt has been made to make \fIlppasswd\fR secure against
+exploits that could grant super-user privileges to unprivileged users,
+paranoid system administrators may wish to use Basic authentication with
+accounts managed by PAM instead.
+.SH SEE ALSO
+\fIlp(1)\fR, \fIlpr(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lppasswd.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

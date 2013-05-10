@@ -1,0 +1,72 @@
+.\"
+.\" "$Id: lpq.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpq man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpq 1 "CUPS" "16 June 2008" "Apple Inc."
+.SH NAME
+lpq \- show printer queue status
+.SH SYNOPSIS
+.B lpq
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -P
+.I destination[/instance]
+] [ -a ] [ -l ] [
+.I +interval
+]
+.SH DESCRIPTION
+\fIlpq\fR shows the current print queue status on the named
+printer. Jobs queued on the default destination will be shown if
+no printer or class is specified on the command-line.
+.LP
+The \fI+interval\fR option allows you to continuously report the
+jobs in the queue until the queue is empty; the list of jobs is
+shown once every \fIinterval\fR seconds.
+.SH OPTIONS
+\fIlpq\fR supports the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-P destination[/instance]
+.br
+Specifies an alternate printer or class name.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-a
+.br
+Reports jobs on all printers.
+.TP 5
+-h server[:port]
+.br
+Specifies an alternate server.
+.TP 5
+-l
+.br
+Requests a more verbose (long) reporting format.
+.SH SEE ALSO
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpr(1)\fR, \fIlprm(1)\fR,
+\fIlpstat(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lpq.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

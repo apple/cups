@@ -1,0 +1,66 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>What's New in CUPS 1.6</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">What's New in CUPS 1.6</H1>
+
+<P>CUPS 1.6 provides many changes and new features to CUPS 1.5.x. This page provides a high-level outline of these changes. If you have never used CUPS before, read the <A HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
+
+<H2 CLASS="title"><A NAME="COMMANDS">General</A></H2>
+
+<OL START="1">
+
+	<LI><EM>Bonjour Support;</EM> Bonjour printer sharing and discovery is now also supported using Avahi.</LI>
+
+	<LI><EM>Color Management;</EM> ICC profiles referenced by PPD files are now registered on systems with D-BUS and colord installed.</LI>
+
+	<LI><EM>Default Username;</EM> CUPS now supports the <CODE>CUPS_USER</CODE> environment variable and <CODE>User</CODE> directive in the <VAR>client.conf</VAR> file to override the default username.</LI>
+
+	<LI><EM>Open Printing Filters;</EM> The parallel and serial backends, php_cups scripting module, and bannertops, commandtoescpx, commandtopclx, imagetops, imagetoraster, pdftops, rastertoescpx, rastertopclx, and texttops filters are now provided as part of a separate cups-filters project hosted by the Linux Foundation.</LI>
+
+	<LI><EM>Passwords;</EM> Passwords up to 127 characters are now supported.</LI>
+
+	<LI><EM>Printer Options;</EM> The "brightness", "columns", "fitplot", "gamma", "hue", "natural-scaling", "penwidth", "position", "ppi", "saturation", and "scaling" options are not longer supported by CUPS directly, while the "page-bottom", "page-left", "page-right", "page-top", "prettyprint", and "wrap" options have been deprecated.</LI>
+
+</OL>
+
+
+<H2 CLASS="title"><A NAME="SCHEDULER">Scheduler</A></H2>
+
+<OL START="7">
+
+	<LI><EM>Authentication;</EM> The scheduler now supports a <CODE>DefaultAuthType</CODE> value of <CODE>auto</CODE> which automatically chooses between Basic (username/password) and Negotiate (Kerberos) authentication.</LI>
+
+	<LI><EM>IPP Conformance;</EM> The scheduler now correctly reports the "number-of-documents" attribute for jobs and fully conforms to the latest IPP/2.1 test suite.</LI>
+
+	<LI><EM>Permissions;</EM> Filters and backends may no longer have group write permissions enabled.</LI>
+
+	<LI><EM>PPD Files;</EM> PPD files can now be packaged and installed as compressed tar files to reduce the amount of disk space required. Dynamic PPD updates are now also consolidated so that a printer's PPD file is updated once at the end of a job.</LI>
+
+	<LI><EM>Sharing Protocols;</EM> The scheduler no longer supports the CUPS, LDAP, or SLP protocols for printer sharing.</LI>
+
+	<LI><EM>Time-Based Job Limits;</EM> New <CODE>MaxHoldTime</CODE> and <CODE>MaxJobTime</CODE> directives, combined with support for time values in the <CODE>PreserveJobFiles</CODE> and <CODE>PreserveJobHistory</CODE> directives, allow administrators to define time-based job limits and behaviors.</LI>
+
+</OL>
+
+
+<H2 CLASS="title"><A NAME="CUPSAPI">CUPS API</A></H2>
+
+<OL START="13">
+
+	<LI><EM>Destination-Based Printing;</EM> Inspired by IPP Everywhere, new dynamic destination-based APIs allow applications to discover, query, and use both shared and network printers directly and display localized user interfaces with full conflict resolution without static configuration files. These APIs provide equivalent functionality offered by PPD-based printer drivers without the disadvantages of static configuration files.</LI>
+
+	<LI><EM>IPP;</EM> IPP requests now default to protocol version 2.0, and the <CODE>ipp_t</CODE> and <CODE>ipp_value_t</CODE> structures are now private by default. New software should be developed using the corresponding accessor functions instead of directly accessing these structures.</LI>
+
+	<LI><EM>PPD;</EM> The PPD functions are now officially deprecated in favor of the new destination-based printing APIs.</LI>
+
+	<LI><EM>SNMP Support;</EM> The <CODE>cupsSideChannelSNMPGet</CODE> and <CODE>cupsSideChannelSNMPWalk</CODE> functions now support OIDs and values up to 64k in length.</LI>
+
+</OL>
+
+</BODY>
+</HTML>

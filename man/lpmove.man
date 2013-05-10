@@ -1,0 +1,66 @@
+.\"
+.\" "$Id: lpmove.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpmove man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpmove 8 "CUPS" "12 February 2006" "Apple Inc."
+.SH NAME
+lpmove \- move a job or all jobs to a new destination
+.SH SYNOPSIS
+.B lpmove
+[ -E ] [ -h
+.I server[:port]
+] [ -U
+.I username
+]
+.I job destination
+.br
+.B lpmove
+[ -E ] [ -h
+.I server[:port]
+] [ -U
+.I username
+]
+.I source destination
+.SH DESCRIPTION
+\fBlpmove\fR moves the specified \fIjob\fR or all jobs from
+\fIsource\fR to \fIdestination\fR. \fIjob\fR can be the job ID
+number or the old destination and job ID:
+.br
+.nf
+
+     lpmove 123 newprinter
+     lpmove oldprinter-123 newprinter
+.fi
+.SH OPTIONS
+The \fIlpmove\fR command supports the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-h server[:port]
+.br
+Specifies an alternate server.
+.SH SEE ALSO
+\fIcancel(1)\fR, \fIlp(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lpmove.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

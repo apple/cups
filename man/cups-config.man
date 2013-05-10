@@ -1,0 +1,117 @@
+.\"
+.\" "$Id: cups-config.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   cups-config man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cups-config 1 "CUPS" "23 October 2008" "Apple Inc."
+.SH NAME
+cups-config \- get cups api, compiler, directory, and link information.
+.SH SYNOPSIS
+.B cups-config
+--api-version
+.br
+.B cups-config
+--build
+.br
+.B cups-config
+--cflags
+.br
+.B cups-config
+--datadir
+.br
+.B cups-config
+--help
+.br
+.B cups-config
+--ldflags
+.br
+.B cups-config
+[
+.I --image
+] [
+.I --static
+] --libs
+.br
+.B cups-config
+--serverbin
+.br
+.B cups-config
+--serverroot
+.br
+.B cups-config
+--version
+.br
+.SH DESCRIPTION
+\fBcups-config\fR is the CUPS program configuration utility. It should be
+used by application developers to determine the necessary command-line
+options for the compiler and linker, as well as determining installation
+directories for filters, configuration files, and drivers.
+.SH OPTIONS
+.TP 5
+--api-version
+.br
+Displays the current API version (major.minor).
+.TP 5
+--build
+.br
+Displays a system-specific build number.
+.TP 5
+--cflags
+.br
+Displays the necessary compiler options.
+.TP 5
+--datadir
+.br
+Displays the default CUPS data directory.
+.TP 5
+--help
+.br
+Displays the program usage message.
+.TP 5
+--image
+.br
+When used with \fI--libs\fR, adds the CUPS imaging library to the
+list of displayed libraries.
+.TP 5
+--ldflags
+.br
+Displays the necessary linker options.
+.TP 5
+--libs
+.br
+Displays the necessary librarys to link to.
+.TP 5
+--serverbin
+.br
+Displays the default CUPS binary directory,
+where filters and backends are stored.
+.TP 5
+--serverroot
+.br
+Displays the default CUPS configuration file directory.
+.TP 5
+--static
+.br
+When used with \fI--libs\fR, shows the static libraries instead
+of the default (shared) libraries.
+.TP 5
+--version
+.br
+Displays the full version number of the CUPS installation
+(major.minor.patch).
+.SH SEE ALSO
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: cups-config.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

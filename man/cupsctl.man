@@ -1,0 +1,107 @@
+.\"
+.\" "$Id: cupsctl.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   cupsctl man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cupsctl 8 "CUPS" "10 January 2011" "Apple Inc."
+.SH NAME
+cupsctl \- configure cupsd.conf options
+.SH SYNOPSIS
+.B cupsctl
+[ -E ] [-U
+.I username
+] [ -h
+.I server[:port]
+] [ --[no-]debug-logging ] [ --[no-]remote-admin ] [ --[no-]remote-any ]
+[ --[no-]remote-printers ] [ --[no-]share-printers ] [ --[no-]user-cancel-any ]
+[
+.I name=value
+]
+.SH DESCRIPTION
+\fIcupsctl\fR updates or queries the \fBcupsd.conf\fR file for a server. When
+no changes are requested, the current configuration values are written to the
+standard output in the format "name=value", one per line.
+.SH OPTIONS
+The following options are recognized:
+.TP 5
+-E
+.br
+Enables encryption on the connection to the scheduler.
+.TP 5
+-U \fIusername\fR
+.br
+Specifies an alternate username to use when authenticating with the scheduler.
+.TP 5
+-h \fIserver[:port]\fR
+.br
+Specifies the server address.
+.TP 5
+--[no-]debug-logging
+.br
+Enables or disables debug logging in the \fBerror_log\fR file.
+.TP 5
+--[no-]remote-admin
+.br
+Enables or disables remote administration.
+.TP 5
+--[no-]remote-any
+.br
+Enables or disables printing from any address, e.g. the Internet.
+.TP 5
+--[no-]remote-printers
+.br
+Enables or disables the display of remote printers shared via the CUPS, LDAP,
+or SLP protocols.
+.TP 5
+--[no-]share-printers
+.br
+Enables or disables sharing of local printers with other computers.
+.TP 5
+--[no-]user-cancel-any
+.br
+Allows or prevents users from canceling jobs owned by others.
+.SH EXAMPLES
+Display the current settings:
+.nf
+    cupsctl
+.fi
+.LP
+Enable debug logging:
+.nf
+    cupsctl --debug-logging
+.fi
+.LP
+Get the current debug logging state:
+.nf
+    cupsctl | grep '^_debug_logging' | awk -F= '{print $2}'
+.fi
+.LP
+Disable printer sharing:
+.nf
+    cupsctl --no-shared-printers
+.fi
+.LP
+Enable printing using the file: pseudo-device:
+.nf
+    cupsctl FileDevice=Yes
+.fi
+.SH KNOWN ISSUES
+You cannot set the Listen or Port directives using \fIcupsctl\fR.
+.SH SEE ALSO
+\fIcupsd.conf(5)\fR, \fIcupsd(8)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: cupsctl.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

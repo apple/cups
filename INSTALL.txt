@@ -1,0 +1,207 @@
+INSTALL - CUPS v1.6b1 - 2012-05-24
+----------------------------------
+
+This file describes how to compile and install CUPS from source code. For more
+information on CUPS see the file called "README.txt".  A complete change log can
+be found in "CHANGES.txt".
+
+**** IF YOU HAVE A NON-POSTSCRIPT PRINTER AND ARE NOT       ****
+**** RUNNING OS X, YOU WILL ALSO NEED TO INSTALL GPL        ****
+**** GHOSTSCRIPT WITH THE "cups" DRIVER AFTER YOU INSTALL   ****
+**** CUPS.                                                  ****
+
+
+BEFORE YOU BEGIN
+
+    You'll need ANSI-compliant C and C++ compilers, plus a make program and
+    POSIX-compliant shell (/bin/sh).  The GNU compiler tools and Bash work well
+    and we have tested the current CUPS code against several versions of GCC
+    with excellent results.
+
+    The makefiles used by the project should work with most versions of make.
+    We've tested them with GNU make as well as the make programs shipped by
+    Compaq, HP, SGI, and Sun.  BSD users should use GNU make (gmake) since BSD
+    make does not support "include".
+
+    Besides these tools you'll want the JPEG, PNG, TIFF, and ZLIB libraries for
+    image support, the CDSA, GNU TLS, or OpenSSL libraries for encryption
+    support, the OpenLDAP and OpenSLP libraries for directory services support,
+    and either MIT (1.6.3 or higher) or Heimdal Kerberos for Kerberos support.
+    CUPS will compile and run without these, however you'll miss out on many of
+    the features provided by CUPS.
+
+    Also, please note that CUPS does not include the Ghostscript-based
+    PostScript filter needed by non-PostScript printers.  You *must* download
+    GPL Ghostscript separately from the CUPS web site if you want to print
+    PostScript files to non-PostScript printers on operating systems other than
+    OS X.
+
+
+COMPILING THE SUBVERSION REPOSITORY CODE
+
+    The CUPS Subversion repository doesn't hold a copy of the pre-built
+    configure script.  You'll need to run the GNU autoconf software (2.60 or
+    higher) to create it:
+
+	autoconf
+
+
+CONFIGURATION
+
+    CUPS uses GNU autoconf, so you should find the usual "configure" script in
+    the main CUPS source directory.  To configure CUPS for your system, type:
+
+	./configure
+
+    The default installation will put the CUPS software in the "/etc", "/usr",
+    and "/var" directories on your system, which will overwrite any existing
+    printing commands on your system.  Use the "--prefix" option to install the
+    CUPS software in another location:
+
+	./configure --prefix=/some/directory
+
+    To see a complete list of configuration options, use the --help option:
+
+        ./configure --help
+
+    If any of the dependent libraries are not installed in a system default
+    location (typically "/usr/include" and "/usr/lib") you'll need to set the
+    CFLAGS, CPPFLAGS, CXXFLAGS, DSOFLAGS, and LDFLAGS environment variables
+    prior to running configure:
+
+	setenv CFLAGS "-I/some/directory"
+	setenv CPPFLAGS "-I/some/directory"
+	setenv CXXFLAGS "-I/some/directory"
+	setenv DSOFLAGS "-L/some/directory"
+	setenv LDFLAGS "-L/some/directory"
+	./configure ...
+
+    or:
+
+	CFLAGS="-I/some/directory" \
+	CPPFLAGS="-I/some/directory" \
+	CXXFLAGS="-I/some/directory" \
+	DSOFLAGS="-L/some/directory" \
+	LDFLAGS="-L/some/directory" \
+	./configure ...
+
+    The "--enable-debug" option compiles CUPS with debugging information
+    enabled.  Additional debug logging support can be enabled using the
+    "--enable-debug-printfs" option - these debug messages are enabled using the
+    CUPS_DEBUG_LOG environment variable at run-time.
+
+    CUPS also includes an extensive set of unit tests that can be used to find
+    and diagnose a variety of common problems - use the "--enable-unit-tests"
+    configure option to run them at build time.
+
+    Once you have configured things, just type:
+
+	make ENTER
+
+    or if you have FreeBSD, NetBSD, or OpenBSD type:
+
+	gmake ENTER
+
+    to build the software.
+
+
+TESTING THE SOFTWARE
+
+    Aside from the built-in unit tests, CUPS includes an automated test
+    framework for testing the entire printing system.  To run the tests, just
+    type:
+
+	make check ENTER
+
+    or if you have FreeBSD, NetBSD, or OpenBSD type:
+
+	gmake check ENTER
+
+    The test framework runs a copy of the CUPS scheduler (cupsd) on port 8631
+    in /tmp/cups-$USER and produces a nice HTML report of the results.
+
+
+INSTALLING THE SOFTWARE
+
+    Once you have built the software you need to install it.  The "install"
+    target provides a quick way to install the software on your local system:
+
+	make install ENTER
+
+    or for FreeBSD, NetBSD, or OpenBSD:
+
+	gmake install ENTER
+
+    You can also build binary packages that can be installed on other machines
+    using the RPM spec file ("packaging/cups.spec") or EPM list file
+    ("packaging/cups.list").  The latter also supports building of binary RPMs,
+    so it may be more convenient to use.
+
+    You can find the RPM software at:
+
+	http://www.rpm.org/
+
+    The EPM software is available at:
+
+	http://www.epmhome.org/
+
+
+CREATING BINARY DISTRIBUTIONS WITH EPM
+
+    The top level makefile supports generation of many types of binary
+    distributions using EPM.  To build a binary distribution type:
+
+	make <format> ENTER
+
+    or
+
+	gmake <format> ENTER
+
+    for FreeBSD, NetBSD, and OpenBSD.  The <format> target is one of the
+    following:
+
+	epm       - Builds a script + tarfile package
+	aix       - Builds an AIX package
+	bsd       - Builds a *BSD package
+	deb       - Builds a Debian package
+	depot     - Builds a HP-UX package (also swinstall)
+	inst      - Builds an IRIX package (also tardist)
+	pkg       - Builds a Solaris package
+	rpm       - Builds a RPM package
+	setld     - Build a Tru64 UNIX package
+	slackware - Build a Slackware package
+	swinstall - Build a HP-UX package (also depot)
+	tardist   - Builds an IRIX package (also inst)
+
+
+GETTING DEBUG LOGGING FROM CUPS
+
+    When configured with the "--enable-debug-printfs" option, CUPS compiles in
+    additional debug logging support in the scheduler, CUPS API, and CUPS
+    Imaging API.  The following environment variables are used to enable and
+    control debug logging:
+
+        CUPS_DEBUG_FILTER  Specifies a POSIX regular expression to control
+	                   which messages are logged.
+	CUPS_DEBUG_LEVEL   Specifies a number from 0 to 9 to control the
+	                   verbosity of the logging. The default level is 1.
+        CUPS_DEBUG_LOG     Specifies a log file to use.  Specify the name "-"
+	                   to send the messages to stderr.  Prefix a filename
+			   with "+" to append to an existing file.
+
+
+REPORTING PROBLEMS
+
+    If you have problems, READ THE DOCUMENTATION FIRST!  If the documentation
+    does not solve your problems, please post a message on the "cups.general"
+    forum at:
+
+        http://www.cups.org/newsgroups.php
+
+    Include your operating system and version, compiler and version, and any
+    errors or problems you've run into.  The "config.log" file and the output
+    from the configure script and make should also be sent, as it often helps to
+    determine the cause of your problem.
+
+    If you are running a version of Linux, be sure to provide the Linux
+    distribution you have, too.

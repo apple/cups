@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS Browse Protocol</title>
+	<meta name='keywords' content='Programming'>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</head>
+<body>
+<!--
+  "$Id: spec-browsing.html 9727 2011-04-28 21:20:12Z mike $"
+
+  CUPS Browse Protocol specification for CUPS.
+
+  Copyright 2008-2011 by Apple Inc.
+  Copyright 1997-2005 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The CUPS Browse Protocol is deprecated and will no longer be used in a future release of CUPS.</P>
+
+</BLOCKQUOTE>
+
+<H1 CLASS="title">CUPS Browse Protocol</H1>
+
+<h2><a name='INTRO'>Introduction</a></h2>
+
+<p>This specification describes the CUPS browsing protocol which is used for
+printer sharing. The protocol is a UDP/IP-based broadcast service that
+operates on IP service port 631 by default. Each broadcast packet describes
+a single printer or class being shared.</p>
+
+<p>For simple networks with a single subnet, a CUPS system sharing a printer
+(the <em>server</em>) will periodically broadcast that printer's availability
+and status information to the subnet. Every other CUPS system on the subnet
+(the <em>clients</em>) will receive the broadcast and make that printer
+available to local users. If a client stops receiving broadcasts from the
+server, or if the server sends a special "deleted" broadcast message, the
+client will remove its copy of the printer.</p>
+
+<p>For larger networks with multiple subnets, a relay configuration can be used
+where one or more client systems poll the server and then broadcast the
+availability and status information for the server's shared printers to the
+clients' local subnets.</p>
+
+<p>A key feature of CUPS printer sharing is support for <em>implicit
+classes</em>, which are automatically-created classes for printers that are
+shared by multiple servers. These implicit classes provide automatic load
+balancing and fail-safe printing functionality transparently to the user.</p>
+
+
+<h2><a name='SECURITY'>Security Considerations</a></h2>
+
+<p>Like most discovery protocols, CUPS browse packets are not encrypted or
+signed, so it is possible for malicious systems on a network to advertise
+or remove printers on that network to cause denial of service or information
+disclosure. In order to combat this, CUPS logs incoming browse packets and
+provides access controls to limit browse packet reception to known hosts.</p>
+
+
+<h2><a name='FORMAT'>Browse Packet Format</a></h2>
+
+<p>Each broadcast packet is an ASCII text string of up to 1450 bytes ending
+with a line feed (0x0a). The general format is:</p>
+
+<p class='summary'>
+printer-type printer-state printer-uri "printer-location" "printer-info"
+"printer-make-and-model" name=value name2=value2 ...
+</p>
+
+<p>Each of the fields contains the value of the corresponding IPP attribute.
+The trailing "name=value" information is used to convey default job template
+attribute values (job-sheets-default, media-default, etc.), authentication
+requirements (auth-info-required), and additional IPP URI options that are
+requested by the server (ipp-options).</p>
+
+<h3>ABNF Definition</h3>
+
+<p>The following ABNF definition [RFC4234, RFC3986] defines the format of each
+browse packet:</p>
+
+<pre class='command'>
+PACKET         = TYPE WSP STATE WSP URI WSP LOCATION WSP INFO WSP
+                 MAKE-AND-MODEL WSP *[ WSP ATTR-NAME "=" ATTR-VALUE ] LF
+
+TYPE           = 1*HEXDIG
+
+STATE          = "3" / "4" / "5"
+
+URI            = "ipp://" ( 1*NAMECHAR / IP-literal / IPv4address )
+                 [ ":" 1*DIGIT ] ( "/printers/" / "/classes/" ) 1*NAMECHAR
+NAMECHAR       = %x21.22.24.26-2E.30-7E / %x25 HEXDIG HEXDIG
+IP-literal     = See RFC 3986
+IPv4address    = See RFC 3986
+
+LOCATION       = QUOTED-STRING
+INFO           = QUOTED-STRING
+MAKE-AND-MODEL = QUOTED-STRING
+
+ATTR-NAME      = 1*( ALPHA / DIGIT / "-" / "." )
+ATTR-VALUE     = QUOTED-STRING / 1*UNQUOTE-CHAR
+
+QUOTED-STRING  = DQUOTE *QUOTED-CHAR DQUOTE
+QUOTED-CHAR    = %x20.21.23-5B.5D-7E / UTF8-CHAR / %x5C %x5C / %x5C %x22
+UNQUOTE-CHAR   = %x21.23-26.28-5B.5D-7E / UTF8-CHAR
+UTF8-CHAR      = %xC0.DF %x80.BF / %xE0.EF %x80.BF %x80.BF /
+                 %xF0.F7 %x80.BF %x80.BF %x80.BF
+</pre>
+
+</body>
+</html>

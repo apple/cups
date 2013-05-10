@@ -1,0 +1,55 @@
+<SCRIPT TYPE="text/javascript"><!--
+function select_printers() {
+  var list = document.export_samba.EXPORT_NAME;
+  var sel = document.export_samba.EXPORT_ALL.checked;
+
+  for (i = 0; i < list.length; i ++) {
+    list.options[i].selected = sel;
+  }
+}
+--></SCRIPT>
+
+<FORM METHOD="POST" ACTION="/admin/" NAME="export_samba">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba">
+
+<H2 CLASS="title">Export Printers to Samba</H2>
+
+{error?<P>Unable to export printers to Samba\:</P>
+<BLOCKQUOTE>{error}</BLOCKQUOTE>
+<P>Consult the <A HREF="/admin/log/error_log"
+TARGET="_blank">error_log</A> file for more information.</P>:
+<P>This page allows you to export printers to Samba so that
+Windows clients can access them through the <VAR>Network
+Neighborhood</VAR> or <VAR>Network Places</VAR> icons on their
+desktop. You must previously install the Windows PostScript
+printer drivers as described in the <A
+HREF="/help/man-cupsaddsmb.html"
+TARGET="_blank">cupsaddsmb(8)</A> man page.</P>}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Printers:</TH>
+<TD>
+<SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
+{[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
+</SELECT><BR>
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"> Export All Printers
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Samba Username:</TH>
+<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (required)</TD>
+</TR>
+<TR>
+<TH CLASS="label">Samba Password:</TH>
+<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (required)</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Export Printers to Samba"></TD>
+</TR>
+</TABLE>
+
+</FORM>

@@ -1,0 +1,165 @@
+.\"
+.\" "$Id: cupstestppd.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   cupstestppd man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH cupstestppd 1 "CUPS" "19 November 2009" "Apple Inc."
+.SH NAME
+cupstestppd \- test conformance of ppd files
+.SH SYNOPSIS
+.B cupstestppd
+[ -I
+.I category
+] [ -R
+.I rootdir
+] [ -W
+.I category
+] [ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
+.br
+.B cupstestppd
+[ -R
+.I rootdir
+] [ -W
+.I category
+] [ -q ] [-r] [ -v[v] ] -
+.SH DESCRIPTION
+\fIcupstestppd\fR tests the conformance of PPD files to the
+Adobe PostScript Printer Description file format specification
+version 4.3. It can also be used to list the supported options
+and available fonts in a PPD file. The results of testing and
+any other output are sent to the standard output.
+.LP
+The first form of \fIcupstestppd\fR tests one or more PPD files
+on the command-line. The second form tests the PPD file provided
+on the standard input.
+.SH OPTIONS
+\fIcupstestppd\fR supports the following options:
+.TP 5
+-I filename
+.br
+Ignores all PCFileName warnings.
+.TP 5
+-I filters
+.br
+Ignores all filter errors.
+.TP 5
+-I profiles
+.br
+Ignores all profile errors.
+.TP 5
+-R rootdir
+.br
+Specifies an alternate root directory for the filter, pre-filter,
+and other support file checks.
+.TP 5
+-W constraints
+.br
+Report all UIConstraint errors as warnings.
+.TP 5
+-W defaults
+.br
+Except for size-related options, report all default option errors as warnings.
+.TP 5
+-W filters
+.br
+Report all filter errors as warnings.
+.TP 5
+-W profiles
+.br
+Report all profile errors as warnings.
+.TP 5
+-W sizes
+.br
+Report all media size errors as warnings.
+.TP 5
+-W translations
+.br
+Report all translation errors as warnings.
+.TP 5
+-W all
+.br
+Report all of the previous errors as warnings.
+.TP 5
+-W none
+.br
+Report all of the previous errors as errors.
+.TP 5
+-q
+.br
+Specifies that no information should be displayed.
+.TP 5
+-r
+.br
+Relaxes the PPD conformance requirements so that common
+whitespace, control character, and formatting problems are not
+treated as hard errors.
+.TP 5
+-v
+.br
+Specifies that detailed conformance testing results should be
+displayed rather than the concise PASS/FAIL/ERROR status.
+.TP 5
+-vv
+.br
+Specifies that all information in the PPD file should be
+displayed in addition to the detailed conformance testing
+results.
+.LP
+The \fI-q\fR, \fI-v\fR, and \fI-vv\fR options are mutually exclusive.
+.SH EXIT STATUS
+\fIcupstestppd\fR returns zero on success and non-zero on error. The
+error codes are as follows:
+.TP 5
+1
+.br
+Bad command-line arguments or missing PPD filename.
+.TP 5
+2
+.br
+Unable to open or read PPD file.
+.TP 5
+3
+.br
+The PPD file contains format errors that cannot be skipped.
+.TP 5
+4
+.br
+The PPD file does not conform to the Adobe PPD specification.
+.SH EXAMPLES
+The following command will test all PPD files under the current
+directory and print the names of each file that does not
+conform:
+.nf
+
+    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; -print
+
+.fi
+The next command tests all PPD files under the current directory
+and print detailed conformance testing results for the files
+that do not conform:
+.nf
+
+    find . -name \\*.ppd \\! -exec cupstestppd -q '{}' \\; \\
+        -exec cupstestppd -v '{}' \\;
+
+.fi
+.SH SEE ALSO
+\fIlpadmin(8)\fR,
+.br
+http://localhost:631/help
+.br
+Adobe PostScript Printer Description File Format Specification, Version 4.3.
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: cupstestppd.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

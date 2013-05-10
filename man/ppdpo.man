@@ -1,0 +1,52 @@
+.\"
+.\" "$Id: ppdpo.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   ppdpo man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdpo 1 "CUPS" "23 April 2012" "Apple Inc."
+.SH NAME
+ppdpo \- ppd message catalog generator
+.SH SYNOPSIS
+.B ppdpo
+[ -D
+.I name[=value]
+] [ -I
+.I include-directory
+] [ -o
+.I output-file
+]
+.I source-file
+.SH DESCRIPTION
+\fIppdpo\fR extracts UI strings from PPDC source files and updates either
+a GNU gettext or OS X strings format message catalog source file for
+translation.
+.PP
+The \fI-D\fR option sets the named variable for use in the
+source file. It is equivalent to using the #define directive
+in the source file.
+.PP
+The \fI-I\fR option specifies an alternate include directory;
+multiple \fI-I\fR options can be supplied to add additional
+directories.
+.PP
+The \fI-o\fR option specifies the output file. The supported extensions are
+".po" or ".po.gz" for GNU gettext format message catalogs and ".strings" for
+OS X strings files.
+.SH SEE ALSO
+ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5)
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: ppdpo.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

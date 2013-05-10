@@ -1,0 +1,77 @@
+<HTML>
+<!-- SECTION: References -->
+<HEAD>
+	<TITLE>page_log</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">page_log</H1>
+
+<P>The <VAR>page_log</VAR> file lists each page that is sent to a
+printer. By default, each line contains the following information:</P>
+
+<P CLASS="command">
+
+printer user job-id date-time page-number num-copies job-billing job-originating-host-name job-name media sides<BR>
+
+<BR>
+
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 1 1 acme-123 localhost myjob letter one-sided<BR>
+
+DeskJet root 2 [20/May/1999:19:21:05 +0000] 2 1 acme-123 localhost myjob letter one-sided<BR>
+
+</P>
+
+<p>The <a href="ref-cupsd-conf.html#PageLogFormat"><code>PageLogFormat</code></a>
+directive can be used to change this information.</p>
+
+<P>The <I>printer</I> field contains the name of the printer that
+printed the page. If you send a job to a printer class, this
+field will contain the name of the printer that was assigned the
+job.</P>
+
+<P>The <I>user</I> field contains the name of the user (the IPP
+<CODE>requesting-user-name</CODE> attribute) that submitted this
+file for printing.</P>
+
+<P>The <I>job-id</I> field contains the job number of the page
+being printed. Job numbers are reset to 1 whenever the spool
+directory (<VAR>/var/spool/cups</VAR>) is cleared, so don't
+depend on this number being unique!</P>
+
+<P>The <I>date-time</I> field contains the date and time of when
+the page started printing. The format of this field is identical
+to the <I>data-time</I> field in the <VAR>access_log</VAR>
+file.</P>
+
+<P>The <I>page-number</I> and <I>num-copies</I> fields contain the
+page number and number of copies being printed of that page. For
+printers that cannot produce copies on their own, the
+<I>num-copies</I> field will always be 1.</P>
+
+<P>The <I>job-billing</I> field contains a copy of the
+<CODE>job-billing</CODE> attribute provided with the IPP
+<CODE>Create-Job</CODE> or <CODE>Print-Job</CODE> requests or "-"
+if none was provided.
+
+<P>The <I>job-originating-host-name</I> field contains the hostname or IP
+address of the client that printed the job.</P>
+
+<P>The <I>job-name</I> field contains a copy of the
+<CODE>job-name</CODE> attribute provided with the IPP
+<CODE>Create-Job</CODE> or <CODE>Print-Job</CODE> requests or "-"
+if none was provided.
+
+<P>The <I>media</I> field contains a copy of the
+<CODE>media</CODE> attribute provided with the IPP
+<CODE>Create-Job</CODE> or <CODE>Print-Job</CODE> requests or "-"
+if none was provided.
+
+<P>The <I>sides</I> field contains a copy of the
+<CODE>sides</CODE> attribute provided with the IPP
+<CODE>Create-Job</CODE> or <CODE>Print-Job</CODE> requests or "-"
+if none was provided.
+
+</BODY>
+</HTML>
