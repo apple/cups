@@ -1,0 +1,41 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Mencari dalam
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:Semua Dokumen}}:</B> <INPUT
+TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
+TYPE="IMAGE" SRC="/images/button-search.gif" ALT="Cari">
+<A HREF="/help/{?HELPFILE}{QUERY?{TOPIC??TOPIC={TOPIC}:}:}"><IMG
+SRC="/images/button-clear.gif" ALT="Bersihkan" CLASS="button"></A></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar">
+<H3 CLASS="title">Dokumen Bantuan <I>On-Line</I></H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Semua Dokumen</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</DIV>
+
+{QUERY?<P>Hasil Pencarian dalam {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Semua Dokumen}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (dalam <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Tidak ada kesamaan yang ditemukan.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}
+<A HREF="/help/{HELPFILE}?PRINTABLE=YES" TARGET="_blank"><IMG
+SRC="/images/button-view-printable-version.gif" ALT="Lihat Versi yang Bisa Dicetak"
+CLASS="button"></A></H1>:<H1>Halaman Bantuan CUPS</H1>
+
+<P>Ini adalah antarmuka bantuan <I>on-line</I> CUPS. Masukkan kata kunci yang hendak dicari pada kotak isian di atas, atau kliklah pada taut atau <I>link</I> dokumentasi yang telah disediakan untuk melihat informasi bantuan <I>on-line</I>.</P>
+
+<P>Jika Anda adalah pengguna yang baru menggunakan CUPS, bacalah halaman "<a
+href="overview.html">Ikhtisar CUPS</a>". Sementara pengguna veteran, bisa merujuk pada halaman "<a href="whatsnew.html">Apa yang Baru di CUPS
+1.3</a>".</P>
+
+<P><A HREF="http://www.cups.org/">Halaman Beranda CUPS</A> juga menyediakan cukup banyak informasi, termasuk forum diskusi bagi pengguna, tanya jawab untuk pertanyaan yang sering diajukan, dan formulir untuk mengajukan laporan hama kode (<I>bug</I>) dan permintaan fitur baru.<P>}

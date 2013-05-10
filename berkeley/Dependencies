@@ -1,0 +1,14 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+lpc.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+lpc.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+lpc.o: ../cups/transcode.h ../cups/debug.h ../cups/string.h ../config.h
+lpq.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+lpq.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+lpq.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+lpr.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+lpr.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+lpr.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+lprm.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
+lprm.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+lprm.o: ../cups/transcode.h ../cups/string.h ../config.h
