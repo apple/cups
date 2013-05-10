@@ -1,0 +1,284 @@
+//========================================================================
+//
+// Catalog.cc
+//
+// Copyright 1996 Derek B. Noonburg
+//
+//========================================================================
+
+#ifdef __GNUC__
+#pragma implementation
+#endif
+
+#include <stddef.h>
+#include "gmem.h"
+#include "Object.h"
+#include "Array.h"
+#include "Dict.h"
+#include "Page.h"
+#include "Error.h"
+#include "Link.h"
+#include "Catalog.h"
+
+//------------------------------------------------------------------------
+// Catalog
+//------------------------------------------------------------------------
+
+Catalog::Catalog(Object *catDict) {
+  Object pagesDict;
+  Object obj, obj2;
+  int i;
+
+  ok = gTrue;
+  pages = NULL;
+  pageRefs = NULL;
+  numPages = 0;
+
+  if (!catDict->isDict("Catalog")) {
+    error(-1, "Catalog object is wrong type (%s)", catDict->getTypeName());
+    goto err1;
+  }
+
+  // read page tree
+  catDict->dictLookup("Pages", &pagesDict);
+  if (!pagesDict.isDict("Pages")) {
+    error(-1, "Top-level pages object is wrong type (%s)",
+	  pagesDict.getTypeName());
+    goto err2;
+  }
+  pagesDict.dictLookup("Count", &obj);
+  if (!obj.isInt()) {
+    error(-1, "Page count in top-level pages object is wrong type (%s)",
+	  obj.getTypeName());
+    goto err3;
+  }
+  numPages = obj.getInt();
+  obj.free();
+  pages = (Page **)gmalloc(numPages * sizeof(Page *));
+  pageRefs = (Ref *)gmalloc(numPages * sizeof(Ref));
+  for (i = 0; i < numPages; ++i) {
+    pages[i] = NULL;
+    pageRefs[i].num = -1;
+    pageRefs[i].gen = -1;
+  }
+  readPageTree(pagesDict.getDict(), NULL, 0);
+  pagesDict.free();
+
+  // read named destination dictionary
+  catDict->dictLookup("Dests", &dests);
+
+  // read root of named destination tree
+  if (catDict->dictLookup("Names", &obj)->isDict())
+    obj.dictLookup("Dests", &nameTree);
+  else
+    nameTree.initNull();
+  obj.free();
+
+  // read base URI
+  baseURI = NULL;
+  if (catDict->dictLookup("URI", &obj)->isDict()) {
+    if (obj.dictLookup("Base", &obj2)->isString()) {
+      baseURI = obj2.getString()->copy();
+    }
+    obj2.free();
+  }
+  obj.free();
+
+  return;
+
+ err3:
+  obj.free();
+ err2:
+  pagesDict.free();
+ err1:
+  dests.initNull();
+  nameTree.initNull();
+  ok = gFalse;
+}
+
+Catalog::~Catalog() {
+  int i;
+
+  if (pages) {
+    for (i = 0; i < numPages; ++i) {
+      if (pages[i])
+	delete pages[i];
+    }
+    gfree(pages);
+    gfree(pageRefs);
+  }
+  dests.free();
+  nameTree.free();
+  if (baseURI) {
+    delete baseURI;
+  }
+}
+
+int Catalog::readPageTree(Dict *pagesDict, PageAttrs *attrs, int start) {
+  Object kids;
+  Object kid;
+  Object kidRef;
+  PageAttrs *attrs1, *attrs2;
+  Page *page;
+  int i;
+
+  attrs1 = new PageAttrs(attrs, pagesDict);
+  pagesDict->lookup("Kids", &kids);
+  if (!kids.isArray()) {
+    error(-1, "Kids object (page %d) is wrong type (%s)",
+	  start+1, kids.getTypeName());
+    goto err1;
+  }
+  for (i = 0; i < kids.arrayGetLength(); ++i) {
+    kids.arrayGet(i, &kid);
+    if (kid.isDict("Page")) {
+      attrs2 = new PageAttrs(attrs1, kid.getDict());
+      page = new Page(start+1, kid.getDict(), attrs2);
+      if (!page->isOk()) {
+	++start;
+	goto err3;
+      }
+      pages[start] = page;
+      kids.arrayGetNF(i, &kidRef);
+      if (kidRef.isRef()) {
+	pageRefs[start].num = kidRef.getRefNum();
+	pageRefs[start].gen = kidRef.getRefGen();
+      }
+      kidRef.free();
+      ++start;
+    //~ found one PDF file where a Pages object is missing the /Type entry
+    // } else if (kid.isDict("Pages")) {
+    } else if (kid.isDict()) {
+      if ((start = readPageTree(kid.getDict(), attrs1, start)) < 0)
+	goto err2;
+    } else {
+      error(-1, "Kid object (page %d) is wrong type (%s)",
+	    start+1, kid.getTypeName());
+      goto err2;
+    }
+    kid.free();
+  }
+  delete attrs1;
+  kids.free();
+  return start;
+
+ err3:
+  delete page;
+ err2:
+  kid.free();
+ err1:
+  kids.free();
+  delete attrs1;
+  ok = gFalse;
+  return -1;
+}
+
+int Catalog::findPage(int num, int gen) {
+  int i;
+
+  for (i = 0; i < numPages; ++i) {
+    if (pageRefs[i].num == num && pageRefs[i].gen == gen)
+      return i + 1;
+  }
+  return 0;
+}
+
+LinkDest *Catalog::findDest(GString *name) {
+  LinkDest *dest;
+  Object obj1, obj2;
+  GBool found;
+
+  // try named destination dictionary then name tree
+  found = gFalse;
+  if (dests.isDict()) {
+    if (!dests.dictLookup(name->getCString(), &obj1)->isNull())
+      found = gTrue;
+    else
+      obj1.free();
+  }
+  if (!found && nameTree.isDict()) {
+    if (!findDestInTree(&nameTree, name, &obj1)->isNull())
+      found = gTrue;
+    else
+      obj1.free();
+  }
+  if (!found)
+    return NULL;
+
+  // construct LinkDest
+  dest = NULL;
+  if (obj1.isArray()) {
+    dest = new LinkDest(obj1.getArray(), gTrue);
+  } else if (obj1.isDict()) {
+    if (obj1.dictLookup("D", &obj2)->isArray())
+      dest = new LinkDest(obj2.getArray(), gTrue);
+    else
+      error(-1, "Bad named destination value");
+    obj2.free();
+  } else {
+    error(-1, "Bad named destination value");
+  }
+  obj1.free();
+
+  return dest;
+}
+
+Object *Catalog::findDestInTree(Object *tree, GString *name, Object *obj) {
+  Object names, name1;
+  Object kids, kid, limits, low, high;
+  GBool done, found;
+  int cmp, i;
+
+  // leaf node
+  if (tree->dictLookup("Names", &names)->isArray()) {
+    done = found = gFalse;
+    for (i = 0; !done && i < names.arrayGetLength(); i += 2) {
+      if (names.arrayGet(i, &name1)->isString()) {
+	cmp = name->cmp(name1.getString());
+	if (cmp == 0) {
+	  names.arrayGet(i+1, obj);
+	  found = gTrue;
+	  done = gTrue;
+	} else if (cmp < 0) {
+	  done = gTrue;
+	}
+	name1.free();
+      }
+    }
+    names.free();
+    if (!found)
+      obj->initNull();
+    return obj;
+  }
+  names.free();
+
+  // root or intermediate node
+  done = gFalse;
+  if (tree->dictLookup("Kids", &kids)->isArray()) {
+    for (i = 0; !done && i < kids.arrayGetLength(); ++i) {
+      if (kids.arrayGet(i, &kid)->isDict()) {
+	if (kid.dictLookup("Limits", &limits)->isArray()) {
+	  if (limits.arrayGet(0, &low)->isString() &&
+	      name->cmp(low.getString()) >= 0) {
+	    if (limits.arrayGet(1, &high)->isString() &&
+		name->cmp(high.getString()) <= 0) {
+	      findDestInTree(&kid, name, obj);
+	      done = gTrue;
+	    }
+	    high.free();
+	  }
+	  low.free();
+	}
+	limits.free();
+      }
+      kid.free();
+    }
+  }
+  kids.free();
+
+  // name was outside of ranges of all kids
+  if (!done)
+    obj->initNull();
+
+  return obj;
+}

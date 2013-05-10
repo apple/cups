@@ -1,0 +1,201 @@
+/*
+ * "$Id$"
+ *
+ *   User, system, and password routines for the Common UNIX Printing
+ *   System (CUPS).
+ *
+ *   Copyright 1997-2000 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE.txt" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
+ *   cupsUser()        - Return the current users name.
+ *   cupsGetPassword() - Get a password from the user...
+ *   cupsServer()      - Return the hostname of the default server...
+ */
+
+/*
+ * Include necessary headers...
+ */
+
+#include "cups.h"
+#include <config.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+
+#if defined(WIN32) || defined(__EMX__)
+/*
+ * WIN32 and OS/2 username and password stuff...
+ */
+
+/*
+ * 'cupsUser()' - Return the current user's name.
+ */
+
+const char *				/* O - User name */
+cupsUser(void)
+{
+  return ("WindowsUser");
+}
+
+
+/*
+ * 'cupsGetPassword()' - Get a password from the user...
+ */
+
+const char *				/* O - Password */
+cupsGetPassword(const char *prompt)	/* I - Prompt string */
+{
+  return (NULL);
+}
+#else
+/*
+ * UNIX username and password stuff...
+ */
+
+#  include <pwd.h>
+
+/*
+ * 'cupsUser()' - Return the current user's name.
+ */
+
+const char *				/* O - User name */
+cupsUser(void)
+{
+  struct passwd	*pwd;			/* User/password entry */
+
+
+ /*
+  * Rewind the password file...
+  */
+
+  setpwent();
+
+ /*
+  * Lookup the password entry for the current user.
+  */
+
+  if ((pwd = getpwuid(getuid())) == NULL)
+    return ("unknown");			/* Unknown user! */
+
+ /*
+  * Rewind the password file again and return the username...
+  */
+
+  setpwent();
+
+  return (pwd->pw_name);
+}
+
+
+/*
+ * 'cupsGetPassword()' - Get a password from the user...
+ */
+
+const char *				/* O - Password */
+cupsGetPassword(const char *prompt)	/* I - Prompt string */
+{
+  return (getpass(prompt));
+}
+#endif /* WIN32 || __EMX__ */
+
+
+/*
+ * 'cupsServer()' - Return the hostname of the default server...
+ */
+
+const char *				/* O - Server name */
+cupsServer(void)
+{
+  FILE		*fp;			/* client.conf file */
+  char		*server;		/* Pointer to server name */
+  const char	*home;			/* Home directory of user */
+  static char	line[1024];		/* Line from file */
+
+
+ /*
+  * First see if the CUPS_SERVER environment variable is set...
+  */
+
+  if ((server = getenv("CUPS_SERVER")) != NULL)
+    return (server);
+
+ /*
+  * Next check to see if we have a $HOME/.cupsrc or client.conf file...
+  */
+
+  if ((home = getenv("HOME")) != NULL)
+  {
+    snprintf(line, sizeof(line), "%s/.cupsrc", home);
+    fp = fopen(line, "r");
+  }
+  else
+    fp = NULL;
+
+  if (fp == NULL)
+  {
+    if ((home = getenv("CUPS_SERVERROOT")) != NULL)
+    {
+      snprintf(line, sizeof(line), "%s/client.conf", home);
+      fp = fopen(line, "r");
+    }
+    else
+      fp = fopen(CUPS_SERVERROOT "/client.conf", "r");
+  }
+
+  if (fp == NULL)
+    return ("localhost");
+
+ /*
+  * Read the config file and look for a ServerName line...
+  */
+
+  while (fgets(line, sizeof(line), fp) != NULL)
+    if (strncmp(line, "ServerName ", 11) == 0)
+    {
+     /*
+      * Got it!  Drop any trailing newline and find the name...
+      */
+
+      server = line + strlen(line) - 1;
+      if (*server == '\n')
+        *server = '\0';
+
+      for (server = line + 11; isspace(*server); server ++);
+
+      if (*server)
+      {
+        fclose(fp);
+        return (server);
+      }
+    }
+
+ /*
+  * Didn't see a ServerName line, so return "localhost"...
+  */
+
+  fclose(fp);
+
+  return ("localhost");
+}
+
+
+/*
+ * End of "$Id$".
+ */
