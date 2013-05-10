@@ -1,0 +1,27 @@
+<DIV CLASS="indent">
+
+<FORM METHOD="POST" ACTION="/{SECTION}/{job_id?:{printer_name}}">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{job_id?<INPUT TYPE="HIDDEN" NAME="JOB_ID" VALUE="{job_id}">:}
+
+<H2 CLASS="title">{job_id?ジョブ {job_id} の移動:すべてのジョブの移動}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">新しい宛先:</TH>
+<TD>
+<SELECT NAME="JOB_PRINTER_URI" SIZE="10">
+{[job_printer_uri]<OPTION VALUE="{job_printer_uri}">{job_printer_name}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="{job_id?ジョブの移動:ジョブの移動}"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+
+</DIV>

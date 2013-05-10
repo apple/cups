@@ -1,0 +1,157 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   notifier man page for CUPS.
+.\"
+.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH notifier 7 "CUPS" "12 May 2009" "Apple Inc."
+.SH NAME
+notifier \- cups notification interface
+.SH SYNOPSIS
+.B notifier
+.I recipient
+[
+.I user-data
+]
+.SH DESCRIPTION
+The CUPS notifier interface provides a standard method for adding support for
+new event notification methods to CUPS. Each notifier delivers one or more IPP
+events from the standard input to the specified recipient.
+.LP
+Notifiers \fBmust\fR read IPP messages from the standard input using the
+ippNew and ippReadFile functions and exit on error. Notifiers are encouraged to
+exit after a suitable period of inactivity, however they may exit after reading
+the first message or stay running until an error is seen.
+.SH LOG MESSAGES
+Messages sent to stderr are generally logged to the current \fIErrorLog\fR.
+Each line begins with a standard prefix:
+
+.TP 5
+ALERT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "alert" log level.
+
+.TP 5
+CRIT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "critical" log level.
+
+.TP 5
+DEBUG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "debug" log level.
+
+.TP 5
+DEBUG2: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "debug2" log level.
+
+.TP 5
+EMERG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "emergency" log level.
+
+.TP 5
+ERROR: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "error" log level.
+
+.TP 5
+INFO: message
+.br
+Sets the printer-state-message attribute. If the current \fILogLevel\fR
+is set to "debug2", also adds the specified message to the
+current \fIErrorLog\fR using the "info" log level.
+
+.TP 5
+NOTICE: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "notice" log level.
+
+.TP 5
+WARNING: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "warning" log level.
+
+.SH ENVIRONMENT VARIABLES
+The following environment variables are defined by the CUPS server when
+executing the notifier:
+
+.TP 5
+CHARSET
+.br
+The default text character set, typically utf-8.
+
+.TP 5
+CUPS_CACHEDIR
+.br
+The directory for semi-persistent cache files can be found.
+
+.TP 5
+CUPS_DATADIR
+.br
+The directory where data files can be found.
+
+.TP 5
+CUPS_FILETYPE
+.br
+The type of file being printed: "job-sheet" for a banner page and "document"
+for a regular print file.
+
+.TP 5
+CUPS_SERVERROOT
+.br
+The root directory of the server.
+
+.TP 5
+LANG
+.br
+The default language locale (typically C or en).
+
+.TP 5
+PATH
+.br
+The standard execution path for external programs that may be run by
+the filter.
+
+.TP 5
+SOFTWARE
+.br
+The name and version number of the server (typically CUPS/1.2).
+
+.TP 5
+TZ
+.br
+The timezone of the server.
+
+.TP 5
+USER
+.br
+The user executing the filter, typically "lp"; consult the \fIcupsd.conf(5)\fR
+file for the current setting.
+
+.SH SEE ALSO
+\fIbackend(7)\fR, \fIcupsd(8)\fR, \fIfilter(7)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2009 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"
