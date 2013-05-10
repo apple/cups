@@ -1,0 +1,928 @@
+
+
+
+
+
+
+INTERNET DRAFT                                             Roger K deBry
+<draft-ietf-ipp-not-05.txt>                    Utah Valley State College
+[Target Category: Informational]                             Harry Lewis
+                                                         IBM Corporation
+                                                   Tom Hastings (editor)
+                                                       Xerox Corporation
+                                                        January 23, 2001
+
+   Internet Printing Protocol (IPP): Requirements for IPP Notifications
+      Copyright (C) The Internet Society (2001). All Rights Reserved.
+
+
+STATUS OF THIS MEMO
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of [RFC2026].  Internet-Drafts are
+   working documents of the Internet Engineering Task Force (IETF), its
+   areas, and its working groups.  Note that other groups may also
+   distribute working documents as Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as  ''work in progress.''
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow Directories can be accessed as
+   http://www.ietf.org/shadow.html.
+
+ABSTRACT
+
+   This document is one of a set of documents which together describe
+   all aspects of a new Internet Printing Protocol (IPP). IPP is an
+   application level protocol that can be used for distributed printing
+   on the Internet. There are multiple parts to IPP, but the primary
+   architectural components are the Model, the Protocol and an interface
+   to Directory Services. This document provides a statement of the
+   requirements for notifications as part of an IPP Service.
+
+
+
+
+
+
+
+
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 1]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+   The full set of IPP documents include:
+
+     Design Goals for an Internet Printing Protocol [RFC2567]
+     Rationale for the Structure and Model and Protocol for the Internet
+     Printing Protocol [RFC2568]
+     Internet Printing Protocol/1.0: Model and Semantics [RFC2566]
+     Internet Printing Protocol/1.0: Encoding and Transport [RFC2565]
+     Internet Printing Protocol/1.0: Implementer's Guide [RFC 2639]
+     Mapping between LPD and IPP Protocols [RFC2569]
+
+   The 'Design Goals for an Internet Printing Protocol' document takes a
+   broad look at distributed printing functionality, and it enumerates
+   real-life scenarios that help to clarify the features that need to be
+   included in a printing protocol for the Internet.  It identifies
+   requirements for three types of users: end users, operators, and
+   administrators.  It calls out a subset of end user requirements that
+   are satisfied in IPP/1.0.  Operator and administrator requirements
+   are out of scope for version 1.0.
+
+   The 'Rationale for the Structure and Model and Protocol for the
+   Internet Printing Protocol' document describes IPP from a high level
+   view, defines a roadmap for the various documents that form the suite
+   of IPP specifications, and gives background and rationale for the
+   IETF working group's major decisions.
+
+   The 'Internet Printing Protocol/1.0: Encoding and Transport' document
+   is a formal mapping of the abstract operations and attributes defined
+   in the model document onto HTTP/1.1.  It defines the encoding rules
+   for a new Internet media type called 'application/ipp'.
+
+   The 'Internet Printing Protocol/1.0: Implementer's Guide' document
+   gives insight and advice to implementers of IPP clients and IPP
+   objects.  It is intended to help them understand IPP/1.0 and some of
+   the considerations that may assist them in the design of their client
+   and/or IPP object implementations.  For example, a typical order of
+   processing requests is given, including error checking.  Motivation
+   for some of the specification decisions is also included.
+
+   The 'Mapping between LPD and IPP Protocols' document gives some
+   advice to implementers of gateways between IPP and LPD (Line Printer
+   Daemon) implementations.
+
+                             Table of Contents
+
+
+   1 Scope ...........................................................4
+
+   2 Terminology .....................................................4
+
+   3 Scenarios .......................................................8
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 2]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+   4 Requirements ...................................................11
+
+   5 Security considerations for IPP Notifications requirements .....13
+
+   6 Internationalization Considerations ............................14
+
+   7 IANA Considerations ............................................14
+
+   8 References .....................................................14
+
+   9 Author's Address ...............................................15
+
+   10 Appendix A: Full Copyright Statement...........................16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 3]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+1  Scope
+
+   The scope of this requirements document covers functionality used by
+   the following kinds of IPP Users: End Users, Print Administrators and
+   Operators.
+
+2  Terminology
+
+   It is necessary to define a set of terms in order to be able to
+   clearly express the requirements for notification services in an IPP
+   System.
+
+2.1 Job Submitting End User
+
+   A human end user who submits a print job to an IPP Printer. This
+   person may or may not be within the same security domain as the
+   Printer. This person may or may not be geographically near the
+   printer.
+
+2.2 Administrator
+
+   A human user who established policy for and configures the print
+   system.
+
+2.3 Operator
+
+   A human user who carries out the policy established by the
+   Administrator and controls the day to day running of the print
+   system.
+
+2.4 Job Submitting Application
+
+   An application (for example, a batch application), acting on behalf
+   of a Job Submitting End User, which submits a print job to an IPP
+   Printer. The application may or may not be within the same security
+   domain as the Printer. This application may or may not be
+   geographically near the printer.
+
+2.5 Security Domain
+
+   For the purposes of this discussion, the set of network components
+   which can communicate without going through a proxy or firewall. A
+   security domain may be geographically very large, for example -
+   anyplace within IBM.COM.
+
+2.6 IPP Client
+
+   The software component that sends IPP requests to an IPP Printer
+   object and accepts IPP responses from an IPP Printer.
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 4]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+2.7 Job Recipient
+
+   A human who is the ultimate consumer of the print job. In many cases
+   this will be the same person as the Job Submitting End User, but this
+   need not always be the case. For example, if I use IPP to print a
+   document on a printer in a business partner's office, I am the Job
+   Submitting End User, while the person I intend the document for in my
+   business partner's office is the Job Recipient.  Since one of the
+   goals of IPP is to be able to print near the Job Recipient of the
+   printed output, we would normally expect that person to be in the
+   same security domain as, and geographically near, the Printer.
+   However, this may not always be the case. For example, I submit a
+   print job across the Internet to a Kinko's print shop. I am both the
+   Submitting end User and the Job Recipient, but I am neither near nor
+   in the same security domain as the Printer.
+
+2.8 Job Recipient Proxy
+
+   A person acting on behalf of the Job Recipient.  In particular, the
+   Job Recipient Proxy physically picks up the printed document from the
+   Printer, if the Job Recipient cannot perform that function. The Proxy
+   is by definition geographically near and in the same security domain
+   as the printer. For example, I submit a print job from home to be
+   printed on a printer at work. I'd like my secretary to pick up the
+   print job and put it on my desk. In this case,  I am acting as both
+   Job Submitting End User and Job Recipient. My secretary is acting as
+   a Job Recipient Proxy.
+
+2.9 Notification Subscriber
+
+   A client that requests the IPP Printer to send Event Notifications to
+   one or more Notification Recipients.  A Notification Subscriber may
+   be a Job Submitting End User or an End User, an Operator, or an
+   Administrator that is not submitting a job.
+
+2.10 Notification Source
+
+   The entity that sends Event Notifications.
+
+2.11 Notification Recipient
+
+   The entity that receives IPP Notifications about Job and/or Printer
+   events.  A Notification Recipient may be a: Job Submitting End User,
+   Job Submitting Application, Job Recipient, Job Recipient Proxy,
+   Operator, or Administrator, etc., and their representatives or log
+   file or usage statistics gathering application or other active or
+   passive entities.
+
+2.12 Notification Recipient Agent
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 5]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+   A program which receives Event Notifications on behalf of the
+   Notification Recipient. The agent may take some action on behalf of
+   the recipient, forward the notification to the recipient via some
+   alternative means (for example, page the recipient), or queue the
+   notification for later retrieval by the recipient.
+
+2.13 Event
+
+   A Event is some occurrence (either expected or unexpected) within the
+   printing system of a change of state, condition, or configuration of
+   a Job or Printer object.
+
+2.14 Event Notification
+
+   When an event occurs, an Event Notification is generated that fully
+   describes the event (what the event was, where it occurred, when it
+   occurred, etc.).  Event Notifications are delivered to all the
+   Notification Recipients that are subscribed to that Event, if any.
+   The Event Notification is delivered to the address of the
+   Notification Recipient using the notification delivery method defined
+   in the subscription.  However, an Event Notification is sent ONLY if
+   there is a corresponding subscription.
+
+2.15 Notification Subscription
+
+   A Notification Subscription is a request by a Notification Subscriber
+   to the IPP Printer to send Event Notifications to specified
+   Notification Recipient(s) when the event occur.
+
+2.16 Notification Attributes
+
+   IPP Objects (for example, a print job) from which notification are
+   being sent may have attributes associated with them. A user may want
+   to have one or more of these associated attributes returned along
+   with a particular notification. In general, these may include any
+   attribute associated with the object emitting the notification.
+   Examples include:
+
+     number-of-intervening jobs
+     job-k-octets
+     job-k-octets processed
+     job impressions
+     job-impressions-interpreted
+     job-impressions-completed
+     impressionsCompletedCurrentCopy (job MIB)
+        sheetCompletedCopyNumber (job MIB)
+        sheetsCompletedDocumentNumber (job MIB)
+        Copies-requested
+        Copy-type
+        Output-destination
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 6]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+        Job-state-reasons
+        Job ID
+        Printer URI
+        Subscription ID (for job independent subscription)
+
+2.17 Notification Delivery Method (or Delivery Method for short)
+
+   Event Notifications are delivered using a method, such as email,
+   TCP/IP, etc.
+
+2.18 Immediate Notification
+
+   Notifications sent to the Notification Recipient or the Notification
+   Recipient's agent in such a way that the notification arrives
+   immediately , within the limits of common addressing, routing,
+   network congestion and quality of service.
+
+2.19 Store and Forward Notification
+
+   Notifications which are not necessarily delivered to Notification
+   Recipients immediately, but are queued for delivery by some
+   intermediate network application, for later retrieval. Email is an
+   example of a store and forward notification delivery method.
+
+2.20 Reliable Delivery of Notifications
+
+   Notifications which are delivered by a reliable delivery of packets
+   or character stream, with acknowledgment and retry, such that
+   delivery of the notification is guaranteed within some determinate
+   time limits. For example, if the Notification Recipient has logged
+   off and gone home for the day, an immediate notification cannot be
+   guaranteed to be delivered, even when sent over a reliable transport,
+   because there is nothing there to catch it. Guaranteed delivery
+   requires both store and forward notification and a reliable
+   transport.
+
+2.21 Notification over Unreliable Transport
+
+   Notifications are delivered via the fundamental transport address and
+   routing framework, but no acknowledgment or retry is required.
+   Process to process communications, if involved, are unconstrained.
+
+
+2.22 Human Consumable Notification
+
+   Notifications which are intended to be consumed by human end users
+   only.  Email would be an example of a Human consumable notification,
+   though it could also contain Machine Consumable Notification.
+
+2.23 Machine Consumable Notification
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 7]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+
+   Notifications which are intended for consumption by a program only,
+   such as an IPP Client. Machine Consumable notifications may not
+   contain human readable information. Do we need both human and
+   machine? Machine readable is intended for application to application
+   only.  The Notification Recipient could process the machine readable
+   Event Notification into human readable format.
+
+2.24 Mixed Notification
+
+   A mixed notification contains both Human Consumable and Machine
+   Consumable information.
+
+3  Scenarios
+
+   1.I am sitting in my office and submit a print job to the printer
+     down the hall. I am in the same security domain as the printer and
+     of course, geographically near.  I want to know immediately when
+     my print job will be completed (or if there is a problem) because
+     the document I am working on is urgent. I submit the print job
+     with the following attributes:
+
+     .  Notification Recipient - me
+     .  Notification Events - all
+     .  Notification Attributes - job-state-reason
+     .  Notification Type - immediate
+         
+   2.I am working from home and submit a print job to the same printer
+     as in the previous example. However, since I am not at work, I
+     cannot physically get the print file or do anything with it. It
+     can wait until I get to work this afternoon. However, I'd like my
+     secretary to pick up the output and put it on my desk so it
+     doesn't get lost or miss-filed. I'd also like a store and forward
+     notification sent to my email so that when I get to work I can
+     tell if there was a problem with the print job. I submit a print
+     job with the following attributes:
+
+     .  Notification Recipient - my secretary
+     .  Notification Events - print complete
+     .  Notification Type - immediate
+      
+     .  Notification Recipient - me
+     .  Notification Events - print complete
+     .  Notification Attributes - impressions completed
+     .  Notification Type - store and forward
+
+   3.I am sitting in my office and submit a print job to a client at an
+     engineering firm we work with on a daily basis. The engineering
+     firm is in Belgium. I would like my client to know when the print
+     job is complete, so that she can pick it up from the printer in
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 8]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+     her building.  It is important that she review it right away and
+     get her comments back to me. I submit the print job with the
+     following attributes:
+
+
+     .  Notification Recipient - client at engineering firm
+     .  Notification Events - print complete
+     .  Notification Type - immediate
+     .  Notification Language - French
+
+   4.I am in a hotel room and send a print job to a Kinko's store in
+     the town I am working in, in order to get a printed report for the
+     meeting I am attending in the morning.  Since I'm going out to
+     dinner after I get this job submitted, an immediate notification
+     won't do me much good. However, I'd like to check in the morning
+     before I drive to the Kinko's store to see if the file has been
+     printed. An email notification is sufficient for this purpose. I
+     submit the print job with the following attributes:
+
+     .  Notification Recipient - me
+     .  Notification Events - print complete
+     .  Notification Type - store and forward
+
+   5.I am printing a large, complex print file. I want to have some
+     immediate feedback on the progress of the print job as it prints.
+     I submit the print job with the following attributes:
+
+     .  Notification Recipient - me
+     .  Notification Type - immediate
+     .  Notification Events - all state transitions
+     .  Notification Attributes - impression completed
+
+   6.I am an operator and my duties is to keep the printer running.  I
+     subscribe independently from a job submission so that my
+     subscription outlasts any particular job.  I subscribe with the
+     following attributes:
+
+     .  Notification Recipient - me
+     .  Notification Type - immediate
+     .  Notification Events - all Printer state transitions
+     .  Notification Attributes - Printer state, printer state reasons,
+        device powering up, device powering down.
+
+   7.I am a usage statistics gathering application. I subscribe
+     independently from a job submission so that my subscription
+     outlasts any particular job.  My subscription may persists across
+     power cycles.  I subscribe with the following attributes:
+
+     .  Notification Recipient - me
+     .  Notification Type - immediate
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001             [Page 9]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+     .  Notification Events - job completion
+     .  Notification Attributes - impression completed, sheets
+        completed, time submitted, time started, time completed, job
+        owner, job size in octets, etc.
+
+   8.I am a client application program that displays a list of jobs
+     currently queued for printing on a printer.  I display the "job-
+     name", "job-state", "job-state-reasons", "page-count", and
+     "intervening-jobs" either for the user's jobs or for all jobs.
+     The window displaying the job list remains open for an independent
+     amount of time, and it is desired that it represent the current
+     state of the queue.  It is desired that the application only need
+     to perform a slow poll in order to recover from any missed
+     notifications.  So the event delivery mechanism provides the means
+     to update the screen on all needed changes, including querying for
+     some attributes that may not be delivered in the Notification.
+
+   9.I am a client application program that displays a list of
+     printers.  For each Printer I display the current state and
+     configuration.  The window displaying the printer list remains
+     open for an independent amount of time, and it is desired that it
+     represent the current state of each printer.  It is desired that
+     the application only need to perform a slow poll in order to
+     recover from any missed notifications.  So the event delivery
+     mechanism provides the means to update the screen on all needed
+     changes, including querying for some attributes that may not be
+     delivered in the Notification.
+
+   10.    I am an IPP Server that controls one or more devices and
+     implements an IPP Printer object to represent each device.  I want
+     to support IPP Notification for each of the IPP Printer objects
+     that I implement.  Many of these devices do not support
+     notification (or IPP).  So I need to support the IPP Notification
+     semantics specified for each IPP Printer object myself on behalf
+     of each of the devices that each of the IPP Printer objects
+     represent.  When I accept IPP job creation requests, I convert the
+     request to what the device will accept.  In some cases, I must
+     poll the devices in order to be informed of their job and device
+     state and state changes in order to be able to send IPP
+     Notifications to subscribed Notification Recipients.
+
+   11.    I am an IPP Server that controls one or more devices and
+     implements an IPP Printer object to represent each device.  I want
+     to support IPP Notification for each of the IPP Printer objects
+     that I implement.  These devices all support IPP, including IPP
+     Notification.  I would like the design choice for supporting IPP
+     Notification for these IPP Printer objects that I implement either
+     (1) by forwarding the notification to the IPP Printers that I
+     alone control and have them send the notifications to the intended
+     Notification Recipients without my involvement or (2) replace the
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 10]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+     notification submitted with the Job to indicate me as the
+     Notification Recipient and I will in turn forward Notifications to
+     the Notification Recipients requested by my clients.  Most of the
+     rest of the contents of the IPP Job that I send to the IPP
+     Printers that I control will be the same as the IPP Job that I
+     receive from my IPP clients.
+
+   12.    I am an IPP Server that controls one or more devices and
+     implements an IPP Printer object to represent each device.  I want
+     to support IPP Notification for each of the IPP Printer objects
+     that I implement.  These devices all support IPP, including IPP
+     Notification.  Because these IPP Printers MAY also be being
+     controlled by other servers (using IPP or other protocols), I only
+     want job events for the jobs that I send, but do want Printer
+     events all the time, so that I can show proper Printer state to my
+     clients.  So I subscribe to these IPP Printers for Printer events
+     with a long standing subscription with myself to as the
+     Notification Recipient.  When I get a Job Creation request, I
+     decide to which IPP Printer to send the job.  When I do so, I also
+     add a job subscription for Job events with me as the Notification
+     Recipient to the job's job subscriptions supplied by my clients
+     (this usage is called "piggy-backing").  These IPP Printers
+     automatically remove their job subscriptions when the job
+     completes as for all job subscriptions so that I no longer get Job
+     events when my jobs are completed.
+
+4  Requirements
+
+   The following requirements are intended to be met by the IPP
+   Notification specification (not the implementation).  The resulting
+   IPP Notification Specification document:
+
+   1.must indicate which of these requirements are REQUIRED and which
+     are OPTIONAL for a conforming implementation to support.  See
+     [RFC2911] section 12.1 for the definition of these important
+     conformance terms.
+
+   2.must be designed to that an IPP Printer can transparently  support
+     the IPP Notification semantics using third party notification
+     services that exist today or that may be standardized in the
+     future.
+
+   3.must define means for a Job Submitting End User to specify zero or
+     more Notification Recipients when submitting a print job. A
+     Submitter will not be able to prevent out of band subscriptions
+     from authorized persons, such as Operators.
+
+   4.must define means when specifying a Notification Recipient, for a
+     Notification Subscriber to be able to specify one or more
+     notification events for that Notification Recipient, subject to
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 11]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+     administrative and security policy restrictions.  Any of the
+     following constitute Job or Printer Events that a Job Submitting
+     End User can specify notifications be sent for:
+        . Any standard Printer MIB alert (i.e. device alerts) (critical
+          and warning?) (state change notifications)?
+        . Job Received (transition from Unknown to Pending)
+        . Job Started (Transition from Pending to Processing)
+        . Page Complete (Page is stacked)
+        . Collated Copy Complete (last sheet of collated copy is
+          stacked)
+        . Job Complete (transition from Processing or  Processing-
+          stopped to Completed)
+        . Job aborted (transition from Pending, Pending-held,
+          Processing, or Processing-stopped to Aborted)
+        . Job canceled (transition from Pending, Pending-held,
+          Processing, or Processing-held to Canceled)
+        . Other job state changes like 'paused', purged?
+        . Device problems for which the job is destined
+        . Job (interpreter) issues
+
+
+   5.must define how an End User or Operator subscribes for:
+        . Any set of Job Events for a specific job.
+        . Any set of Printer Events while a specific job is not
+          complete.
+
+   6.must define how an End User or Operator subscribes for the
+     following without having to submit a Job:
+        . Any set of Printer Events for a defined period.
+        . Any set of Job Events for all jobs with no control over which
+          jobs.
+
+   7.must define how the Notification Subscriber is able to specify
+     either immediate or store and forward notification independently
+     for each Notification Recipient.  The means may be explicit, or
+     implied by the method of delivery chosen by the Job Submitting End
+     User.
+    
+   8.must define common delivery methods, e.g. email, must be defined.
+
+   9.must define how an IPP Printer validates its ability to deliver an
+     Event using the specified delivery scheme.  If it does not support
+     the specified scheme, or the specified scheme is invalid for some
+     reason, then the IPP Printer accepts and performs the request
+     anyway and responds indicating the unsupported attribute values.
+     There is no requirement for the IPP Printer receiving the print
+     request to validate the identity of an Notification Recipient, nor
+     the ability of the system to deliver an event to that recipient as
+     requested (for example, if the Notification Recipient is not at
+     work today).
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 12]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+
+   10.    must define a class of IPP event notification delivery methods
+     which can flow through corporate firewalls. However, an IPP
+     printer need not test to guarantee delivery of the notification
+     through a firewall before accepting a print job.
+   11.    may define means for delivering a notification to the
+     submitting client when the delivery of an event notification to a
+     specified Notification Recipient fails. Fall back means of
+     subscribers determining if notifications have failed, i.e.
+     polling, may be provided.
+
+   12.    must define a mechanism for localizing Human Consumable
+     notifications by the Notification Source.
+
+   13.    may define a way to specify whether or not event delivery
+     requires acknowledgement back to the Notification Source.
+
+   14.    There must be a mechanism defined so that job independent
+     subscriptions do not become stale and do not require human
+     intervention to remove stale subscriptions.  However, stale must
+     not be the inability to deliver an Event Notification , since
+     temporary Notification delivery problems must be tolerated.
+
+   15.    A mechanism must be defined so that an Event Subscriber is
+     able to add an Event Subscription to a Job after the Job has been
+     submitted.
+
+   16.    A mechanism must be defined so that a client is able to cancel
+     an Event Subscription on a job or printer after the job has been
+     submitted.
+
+   17.    A mechanism must be defined so that a client can obtain the
+     set of current Subscriptions.
+
+5  Security considerations for IPP Notifications requirements
+
+   By far the biggest security concern is the abuse of notification:
+   sending unwanted notifications to third parties (i.e., spam).  The
+   problem is made worse by notification addresses that may be
+   redistributed to multiple parties (e.g. mailing lists).  There exist
+   scenarios where third party notification is required (see Scenario #2
+   and #3).  The fully secure solution would require active agreement of
+   all recipients before sending out anything.  However, requirement #9
+   ("There is no requirement for IPP Printer receiving the print request
+   to validate the identity of an event recipient") argues against this.
+   Certain systems may decide to disallow third party notifications (a
+   traditional fax model).
+
+   Clients submitting notification requests to the IPP Printer has the
+   same security issues as submitting an IPP/1.1 print job request.  The
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 13]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+   same mechanisms used by IPP/1.1 can therefore be used by the client
+   notification submission.  Operations that require authentication can
+   use the HTTP authentication.  Operations that require privacy can use
+   the HTTP/TLS privacy.
+
+   The notification access control model should be similar to the IPP
+   access control model.  Creating a notification subscription is
+   associated with a user.  Only the creator or an operator can cancel
+   the subscription.  The system may limit the listing of items to only
+   those items owned by the user.  Some subscriptions (e.g. those that
+   have a lifetime longer than a job) can be done only by privileged
+   users (operators and/or administrators), if that is the authorization
+   policy.
+
+   The standard security concerns (delivery to the right user, privacy
+   of content, tamper proof content) apply to the notification delivery.
+   IPP should use the security mechanism of the delivery method used.
+   Some delivery mechanisms are more secure than others.  Therefore,
+   sensitive notifications should use the delivery method that has the
+   strongest security.
+
+6  Internationalization Considerations
+
+   The Human Consumable notification must be localized to the natural
+   language and charset that Notification Subscriber specifies within
+   the choice of natural languages and charsets that the IPP Printer
+   supports.
+
+   The Machine Consumable notification data uses the 'application/ipp'
+   MIME media type.  It contains some attributes whose text values are
+   required to be in the natural language and charset that the
+   Notification Subscriber specifies within the choice of natural
+   languages and charsets that the IPP Printer supports.  See [RFC2566].
+
+7  IANA Considerations
+
+   There will be some notification delivery methods registered with IANA
+   for use in URLs.  These will be defined in other documents.
+
+8  References
+
+   [RFC2565]
+     Herriot, R., Butler, S., Moore, P., Tuner, R., "Internet Printing
+     Protocol/1.0: Encoding and Transport", RFC 2565, April 1999.
+
+   [RFC2566]
+     R. deBry, T. Hastings, R. Herriot, S. Isaacson, P. Powell,
+     "Internet Printing Protocol/1.0: Model and Semantics", RFC 2566,
+     April 1999.
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 14]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+   [RFC2567]
+     Wright, D., "Design Goals for an Internet Printing Protocol",
+     draft-ietf-ipp-req-03.txt, November, 1998.
+
+   [RFC2568]
+     Zilles, S., "Rationale for the Structure and Model and Protocol for
+     the Internet Printing Protocol", draft-ietf-ipp-rat-04.txt,
+     November, 1998.
+
+   [RFC2569]
+     Herriot, R., Hastings, T., Jacobs, N., Martin, J., "Mapping between
+     LPD and IPP Protocols", draft-ietf-ipp-lpd-ipp-map-05.txt, November
+     1998.
+
+   [RFC2639]
+      T. Hastings, C. Manros. "Internet Printing Protocol/1.0:
+     Implementer's Guide", RFC 2639, July 1999.
+
+   [RFC2911]
+     deBry, R., , Hastings, T., Herriot, R., Isaacson, S., Powell, P.,
+     "Internet Printing Protocol/1.1: Model and Semantics", RFC 2911,
+     September 2000.
+
+9  Author's Address
+
+     Harry Lewis
+     HUC/003G
+     IBM Corporation
+     P.O. Box 1900
+     Boulder, CO 80301-9191
+
+     Phone: (303) 924-5337
+     Fax: (303) 924-9889
+     e-mail: harryl@us.ibm.com
+
+     Roger deBry
+     Utah Valley State College
+     Orem, UT 84058
+
+     Phone: (801) 222-8000
+     e-mail: debryro@uvsc.edu
+
+     Tom Hastings (editor)
+     Xerox Corporation
+     737 Hawaii St.  ESAE 231
+     El Segundo, CA   90245
+
+     Phone: 310-333-6413
+     Fax:   310-333-5514
+     e-mail: hastings@cp10.es.xerox.com
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 15]
+
+
+INTERNET DRAFT    IPP/1.1: Notification Requirements   January 23, 2001
+
+
+
+     IPP Mailing List:  ipp@pwg.org
+     IPP Mailing List Subscription: ipp-request@pwg.org
+     IPP Web Page:  http://www.pwg.org/ipp/
+
+10 Appendix A: Full Copyright Statement
+
+   Copyright (C) The Internet Society (1998,1999,2000,2001). All Rights
+   Reserved
+
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+deBry, Lewis, Hastings       Expires July 23, 2001            [Page 16]
