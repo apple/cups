@@ -1,0 +1,29 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{?device_uri=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_DEVICE_URI" VALUE="{device_uri}">}
+{?printer_make_and_model=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{printer_make_and_model}">}
+
+<H2 CLASS="title">שנה מדפסת {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">שם:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>
+<TR>
+<TH CLASS="label">מיקום:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(מיקום במלל חופשי כגון "חדר 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">תיאור:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(תיאור במלל חופשי כגון "HP LaserJet עם יחידת הדפסה דו-צידית")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="המשך"></TD>
+</TR>
+</TABLE>
+
+</FORM>

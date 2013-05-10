@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>Generating PostScript for CUPS</title>
+	<meta name='keywords' content='Programming, PostScript, Document Structuring Conventions'>
+	<link rel='stylesheet' type='text/css' href='../cups.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS PostScript file specification for the Common UNIX Printing System (CUPS).
+
+  Copyright 2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+        WWW: http://www.cups.org
+-->
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This document describes how to generate PostScript output for
+CUPS and is largely based on the <a
+href="http://partners.adobe.com/public/developer/en/ps/5001.DSC_Spec.pdf">
+Adobe TechNote #5001: PostScript Language Document Structuring
+Conventions Specification Version 3.0</a>. While CUPS can
+generally print any PostScript file, following the rules in the
+Adobe TechNote and this document will ensure that your PostScript
+output will work reliably.</p>
+
+<blockquote><b>Note:</b> While PostScript is currently the
+defacto-standard print job file format/language for UNIX-based
+applications, it is slowly being phased out in favor of Adobe's
+Portable Document Format ("PDF") which offers many advantages
+over PostScript. MacOS X uses PDF as the primary print job file
+format, and we expect Linux to soon follow. Both PostScript and
+PDF are complex formats, and we highly recommend using high-level
+toolkits whenever possible.</blockquote>
+
+<h3>Anatomy of a PostScript File</h3>
+
+<p>PostScript files are ASCII text files starting with a header
+line (<tt>%!PS-Adobe-3.0</tt>) followed by a combination of
+comment lines starting with two percent signs (<tt>%%</tt>) and
+PostScript code lines. The lines themselves should not exceed 255
+characters to conform to the DSC. The following short PostScript
+file produces a box with a smiley face in it:</p>
+
+<pre class="command">
+%!PS-Adobe-3.0
+%%BoundingBox: 36 36 576 756
+%%Pages: 1
+%%LanguageLevel: 2
+%%EndComments
+%%Page: (1) 1
+% Draw a black box around the page
+0 setgray
+1 setlinewidth
+36 36 540 720 rectstroke
+
+% Draw a two inch blue circle in the middle of the page
+0 0 1 setrgbcolor
+306 396 144 0 360 arc closepath fill
+
+% Draw two half inch yellow circles for eyes
+1 1 0 setrgbcolor
+252 432 36 0 360 arc closepath fill
+360 432 36 0 360 arc closepath fill
+
+% Draw the smile
+1 setlinecap
+18 setlinewidth
+306 396 99 200 340 arc stroke
+
+% Print it!
+showpage
+%%EOF
+</pre>
+
+<div class="figure"><table summary="Sample PostScript File Output">
+<caption>Figure 1: <a name="FIGURE_1">Sample PostScript File Output</a></caption>
+<tr><td align="center"><img src="../images/smiley.jpg"
+width="445" height="570" alt="Sample PostScript File Output"></td></tr>
+</table></div>
+
+
+<h2>Embedding Printer Options</h2>
+
+
+<h2>Embedding Fonts and Text</h2>
+
+
+<h2>Embedding Images</h2>
+
+
+<blockquote><b>Note:</b> While some printers support arbitrary
+binary data in PostScript files, we do not recommend this
+practice because it does not work with all printers or
+interfaces. In most cases, the Base-85 encoding and compression
+filters can be used to embed images with very little, if any,
+increase in data size.</blockquote>
+
+
+
+</body>
+</html>
