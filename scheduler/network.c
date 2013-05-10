@@ -1,0 +1,474 @@
+/*
+ * "$Id$"
+ *
+ *   Network interface functions for the Common UNIX Printing System
+ *   (CUPS) scheduler.
+ *
+ *   Copyright 1997-2002 by Easy Software Products, all rights reserved.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44141 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ */
+
+/*
+ * Include necessary headers.
+ */
+
+#include "cupsd.h"
+
+#include <net/if.h>
+
+#ifdef HAVE_GETIFADDRS
+/*
+ * Use native getifaddrs() function...
+ */
+#  include <ifaddrs.h>
+#else
+/*
+ * Use getifaddrs() emulation...
+ */
+
+#  include <sys/ioctl.h>
+#  ifdef HAVE_SYS_SOCKIO_H
+#    include <sys/sockio.h>
+#  endif
+
+#  ifdef ifa_dstaddr
+#    undef ifa_dstaddr
+#  endif /* ifa_dstaddr */
+#  ifndef ifr_netmask
+#    define ifr_netmask ifr_addr
+#  endif /* !ifr_netmask */
+
+struct ifaddrs			/**** Interface Structure ****/
+{
+  struct ifaddrs	*ifa_next;	/* Next interface in list */
+  char			*ifa_name;	/* Name of interface */
+  unsigned int		ifa_flags;	/* Flags (up, point-to-point, etc.) */
+  struct sockaddr	*ifa_addr,	/* Network address */
+			*ifa_netmask,	/* Address mask */
+			*ifa_dstaddr;	/* Broadcast or destination address */
+  void			*ifa_data;	/* Interface statistics */
+};
+
+int	getifaddrs(struct ifaddrs **addrs);
+void	freeifaddrs(struct ifaddrs *addrs);
+#endif /* HAVE_GETIFADDRS */
+
+
+/*
+ * 'NetIFFind()' - Find a network interface.
+ */
+
+cups_netif_t *			/* O - Network interface data */
+NetIFFind(const char *name)	/* I - Name of interface */
+{
+  cups_netif_t	*temp;		/* Current network interface */
+
+
+ /*
+  * Update the interface list as needed...
+  */
+
+  NetIFUpdate();
+
+ /*
+  * Search for the named interface...
+  */
+
+  for (temp = NetIFList; temp != NULL; temp = temp->next)
+    if (strcasecmp(name, temp->name) == 0)
+      return (temp);
+
+  return (NULL);
+}
+
+
+/*
+ * 'NetIFFree()' - Free the current network interface list.
+ */
+
+void
+NetIFFree(void)
+{
+  cups_netif_t	*next;		/* Next interface in list */
+
+
+ /*
+  * Loop through the interface list and free all the records...
+  */
+
+  while (NetIFList != NULL)
+  {
+    next = NetIFList->next;
+
+    free(NetIFList);
+
+    NetIFList = next;
+  }
+}
+
+
+/*
+ * 'NetIFUpdate()' - Update the network interface list as needed...
+ */
+
+void
+NetIFUpdate(void)
+{
+  cups_netif_t	*temp;		/* Current interface */
+  struct ifaddrs *addrs,	/* Interface address list */
+		*addr;		/* Current interface address */
+  struct hostent *host;		/* Host lookup info */
+
+
+ /*
+  * Update the network interface list no more often than once a
+  * minute...
+  */
+
+  if ((time(NULL) - NetIFTime) < 60)
+    return;
+
+ /*
+  * Free the old interfaces...
+  */
+
+  NetIFFree();
+
+ /*
+  * Grab a new list of interfaces...
+  */
+
+  if (getifaddrs(&addrs) < 0)
+    return;
+
+  for (addr = addrs; addr != NULL; addr = addr->ifa_next)
+  {
+   /*
+    * See if this interface address is IPv4...
+    */
+
+    if (addr->ifa_addr == NULL || addr->ifa_addr->sa_family != AF_INET ||
+        addr->ifa_netmask == NULL || addr->ifa_name == NULL)
+      continue;
+
+   /*
+    * OK, we have an IPv4 address, so create a new list node...
+    */
+
+    if ((temp = calloc(1, sizeof(cups_netif_t))) == NULL)
+      break;
+
+    temp->next = NetIFList;
+    NetIFList  = temp;
+
+   /*
+    * Then copy all of the information...
+    */
+
+    strlcpy(temp->name, addr->ifa_name, sizeof(temp->name));
+    memcpy(&(temp->address), addr->ifa_addr, sizeof(temp->address));
+    memcpy(&(temp->mask), addr->ifa_netmask, sizeof(temp->mask));
+
+    if (addr->ifa_dstaddr)
+      memcpy(&(temp->broadcast), addr->ifa_dstaddr, sizeof(temp->broadcast));
+
+    if (!(addr->ifa_flags & IFF_POINTOPOINT) &&
+        ntohl(temp->address.sin_addr.s_addr) != 0x7f000001)
+      temp->is_local = 1;
+
+   /*
+    * Finally, try looking up the hostname for the address as needed...
+    */
+
+    if (HostNameLookups)
+    {
+#ifndef __sgi
+      host = gethostbyaddr((char *)&(temp->address.sin_addr),
+                           sizeof(struct in_addr), AF_INET);
+#else
+      host = gethostbyaddr(&(temp->address.sin_addr),
+                           sizeof(struct in_addr), AF_INET);
+#endif /* !__sgi */
+    }
+    else
+      host = NULL;
+
+   /*
+    * Map the default server address and localhost to the server name
+    * and localhost, respectively; for all other addresses, use the
+    * dotted notation...
+    */
+
+    if (host != NULL)
+      strlcpy(temp->hostname, host->h_name, sizeof(temp->hostname));
+    else if (ntohl(temp->address.sin_addr.s_addr) == 0x7f000001)
+      strcpy(temp->hostname, "localhost");
+    else if (temp->address.sin_addr.s_addr == ServerAddr.sin_addr.s_addr)
+      strlcpy(temp->hostname, ServerName, sizeof(temp->hostname));
+    else
+    {
+      unsigned ip = ntohl(temp->address.sin_addr.s_addr);
+
+      snprintf(temp->hostname, sizeof(temp->hostname), "%d.%d.%d.%d",
+	       (ip >> 24) & 255, (ip >> 16) & 255, (ip >> 8) & 255, ip & 255);
+    }
+  }
+
+  freeifaddrs(addrs);
+}
+
+
+#ifndef HAVE_GETIFADDRS
+/*
+ * 'getifaddrs()' - Get a list of network interfaces on the system.
+ */
+
+int					/* O - 0 on success, -1 on error */
+getifaddrs(struct ifaddrs **addrs)	/* O - List of interfaces */
+{
+  int			sock;		/* Socket */
+  char			buffer[65536],	/* Buffer for address info */
+			*bufptr,	/* Pointer into buffer */
+			*bufend;	/* End of buffer */
+  struct ifconf		conf;		/* Interface configurations */
+  struct sockaddr	addr;		/* Address data */
+  struct ifreq		*ifp;		/* Interface data */
+  int			ifpsize;	/* Size of interface data */
+  struct ifaddrs	*temp;		/* Pointer to current interface */
+  struct ifreq		request;	/* Interface request */
+
+
+ /*
+  * Start with an empty list...
+  */
+
+  if (addrs == NULL)
+    return (-1);
+
+  *addrs = NULL;
+
+ /*
+  * Create a UDP socket to get the interface data...
+  */
+
+  memset (&addr, 0, sizeof(addr));
+  if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    return (-1);
+
+ /*
+  * Try to get the list of interfaces...
+  */
+
+  conf.ifc_len = sizeof(buffer);
+  conf.ifc_buf = buffer;
+
+  if (ioctl(sock, SIOCGIFCONF, &conf) < 0)
+  {
+   /*
+    * Couldn't get the list of interfaces...
+    */
+
+    close(sock);
+    return (-1);
+  }
+
+ /*
+  * OK, got the list of interfaces, now lets step through the
+  * buffer to pull them out...
+  */
+
+#  ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
+#    define sockaddr_len(a)	((a)->sa_len)
+#  else
+#    define sockaddr_len(a)	(sizeof(struct sockaddr))
+#  endif /* HAVE_STRUCT_SOCKADDR_SA_LEN */
+
+  for (bufptr = buffer, bufend = buffer + conf.ifc_len;
+       bufptr < bufend;
+       bufptr += ifpsize)
+  {
+   /*
+    * Get the current interface information...
+    */
+
+    ifp     = (struct ifreq *)bufptr;
+    ifpsize = sizeof(ifp->ifr_name) + sockaddr_len(&(ifp->ifr_addr));
+
+    if (ifpsize < sizeof(struct ifreq))
+      ifpsize = sizeof(struct ifreq);
+
+    memset(&request, 0, sizeof(request));
+    memcpy(request.ifr_name, ifp->ifr_name, sizeof(ifp->ifr_name));
+
+   /*
+    * Check the status of the interface...
+    */
+
+    if (ioctl(sock, SIOCGIFFLAGS, &request) < 0)
+      continue;
+
+   /*
+    * Allocate memory for a single interface record...
+    */
+
+    if ((temp = calloc(1, sizeof(struct ifaddrs))) == NULL)
+    {
+     /*
+      * Unable to allocate memory...
+      */
+
+      close(sock);
+      return (-1);
+    }
+
+   /*
+    * Add this record to the front of the list and copy the name, flags,
+    * and network address...
+    */
+
+    temp->ifa_next  = *addrs;
+    *addrs          = temp;
+    temp->ifa_name  = strdup(ifp->ifr_name);
+    temp->ifa_flags = request.ifr_flags;
+    if ((temp->ifa_addr = calloc(1, sockaddr_len(&(ifp->ifr_addr)))) != NULL)
+      memcpy(temp->ifa_addr, &(ifp->ifr_addr), sockaddr_len(&(ifp->ifr_addr)));
+
+   /*
+    * Try to get the netmask for the interface...
+    */
+
+    if (!ioctl(sock, SIOCGIFNETMASK, &request))
+    {
+     /*
+      * Got it, make a copy...
+      */
+
+      if ((temp->ifa_netmask = calloc(1, sizeof(request.ifr_netmask))) != NULL)
+	memcpy(temp->ifa_netmask, &(request.ifr_netmask),
+	       sizeof(request.ifr_netmask));
+    }
+
+   /*
+    * Then get the broadcast or point-to-point (destination) address,
+    * if applicable...
+    */
+
+    if (temp->ifa_flags & IFF_BROADCAST)
+    {
+     /*
+      * Have a broadcast address, so get it!
+      */
+
+      if (!ioctl(sock, SIOCGIFBRDADDR, &request))
+      {
+       /*
+	* Got it, make a copy...
+	*/
+
+	if ((temp->ifa_dstaddr = calloc(1, sizeof(request.ifr_broadaddr))) != NULL)
+	  memcpy(temp->ifa_dstaddr, &(request.ifr_broadaddr),
+		 sizeof(request.ifr_broadaddr));
+      }
+    }
+    else if (temp->ifa_flags & IFF_POINTOPOINT)
+    {
+     /*
+      * Point-to-point interface; grab the remote address...
+      */
+
+      if (!ioctl(sock, SIOCGIFDSTADDR, &request))
+      {
+	temp->ifa_dstaddr = malloc(sizeof(request.ifr_dstaddr));
+	memcpy(temp->ifa_dstaddr, &(request.ifr_dstaddr),
+	       sizeof(request.ifr_dstaddr));
+      }
+    }
+  }
+
+ /*
+  * OK, we're done with the socket, close it and return 0...
+  */
+
+  close(sock);
+
+  return (0);
+}
+
+
+/*
+ * 'freeifaddrs()' - Free an interface list...
+ */
+
+void
+freeifaddrs(struct ifaddrs *addrs)	/* I - Interface list to free */
+{
+  struct ifaddrs	*next;		/* Next interface in list */
+
+
+  while (addrs != NULL)
+  {
+   /*
+    * Make a copy of the next interface pointer...
+    */
+
+    next = addrs->ifa_next;
+
+   /*
+    * Free data values as needed...
+    */
+
+    if (addrs->ifa_name)
+    {
+      free(addrs->ifa_name);
+      addrs->ifa_name = NULL;
+    }
+
+    if (addrs->ifa_addr)
+    {
+      free(addrs->ifa_addr);
+      addrs->ifa_addr = NULL;
+    }
+
+    if (addrs->ifa_netmask)
+    {
+      free(addrs->ifa_netmask);
+      addrs->ifa_netmask = NULL;
+    }
+
+    if (addrs->ifa_dstaddr)
+    {
+      free(addrs->ifa_dstaddr);
+      addrs->ifa_dstaddr = NULL;
+    }
+
+   /*
+    * Free this node and continue to the next...
+    */
+
+    free(addrs);
+
+    addrs = next;
+  }
+}
+
+#endif /* !HAVE_GETIFADDRS */
+
+
+/*
+ * End of "$Id$".
+ */
