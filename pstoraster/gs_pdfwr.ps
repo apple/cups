@@ -1,0 +1,288 @@
+%    Copyright (C) 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% gs_pdfwr.ps
+% PDF writer additions to systemdict.
+
+% This file should be included iff the pdfwrite "device" is included
+% in the executable.
+
+% Redefine pdfmark to pass the data to the driver.
+/.pdf===dict mark
+  /arraytype
+   { dup xcheck { ({) (}) } { ([) (]) } ifelse
+		% Stack: file obj left right
+      4 1 roll 2 index exch writestring () exch
+       { exch 2 index exch writestring
+	 1 index exch pdfmark===only ( )
+       }
+      forall pop exch writestring
+   } bind
+  /packedarraytype 1 index
+  /dicttype
+   { 1 index (<<\n) writestring
+      { 2 index 3 -1 roll pdfmark===only 1 index ( ) writestring
+	1 index exch pdfmark===only dup (\n) writestring
+      }
+     forall (>>) writestring
+   } bind
+.dicttomark readonly def
+/pdfmark===only		% <file> <obj> pdfmark===only -
+ { .pdf===dict 1 index type .knownget { exec } { write==only } ifelse
+ } bind def
+/.pdfcvs		% <obj> .pdfcvs <string>
+ {		% We can't handle long values yet.
+   =string /NullEncode filter dup 2 index pdfmark===only
+   dup (\n\000) writestring closefile pop
+   =string (\n\000) search
+    { dup length string copy exch pop exch pop }
+    {		% The converted representation didn't fit.  Punt.
+      pop (???)
+    }
+   ifelse
+ } bind def
+/.pdfputparams		% <paramarray> <paramname> .pdfputparams <result...>
+ { currentdevice null false mark 6 -2 roll exch
+		% Don't allow the page device to get cleared....
+     {.putdeviceparams} 0 get .currentpagedevice pop {.setpagedevice} 0 get
+   3 array astore cvx exec
+ } bind def
+/pdfmark
+ { ] 1 2 2 index length 1 sub { 2 copy 2 copy get .pdfcvs put pop } for
+   /pdfmark .pdfputparams
+   type /booleantype ne { cleartomark pop pop } if pop
+ } odef
+userdict /pdfmark .undef
+
+% Define setdistillerparams / currentdistillerparams.
+% Distiller parameters are currently treated as device parameters.
+/.distillerparamkeys mark
+		% General parameters
+  /CoreDistVersion { }
+  /DoThumbnails { }
+  /LZWEncodePages { }
+  /ASCII85EncodePages { }
+		% Color sampled image parameters
+  /DownsampleColorImages { }
+  /ColorImageResolution { }
+  /EncodeColorImages { }
+  /ColorImageFilter { }
+  /ColorImageDict { }
+  /ColorImageDepth { }
+  /AntiAliasColorImages { }
+  /ConvertCMYKImagesToRGB { }
+		% Grayscale sampled image parameters
+  /DownsampleGrayImages { }
+  /GrayImageResolution { }
+  /EncodeGrayImages { }
+  /GrayImageFilter { }
+  /GrayImageDict { }
+  /GrayImageDepth { }
+  /AntiAliasGrayImages { }
+		% Monochrome sampled image parameters
+  /DownsampleMonoImages { }
+  /MonoImageResolution { }
+  /EncodeMonoImages { }
+  /MonoImageFilter { }
+  /MonoImageDict { }
+  /MonoImageDepth { }
+  /AntiAliasMonoImages { }
+		% Font embedding parameters
+  /AlwaysEmbed
+   { dup length 0 gt
+      { dup 0 get false eq
+         { dup length 1 sub 1 exch getinterval exch pop /~AlwaysEmbed exch
+         } if
+      } if
+   }
+  /NeverEmbed
+   { dup length 0 gt
+      { dup 0 get false eq
+         { dup length 1 sub 1 exch getinterval exch pop /~NeverEmbed exch
+         } if
+      } if
+   }
+  /EmbedAllFonts { }
+  /SubsetFonts { }
+  /MaxSubsetPct { }
+.dicttomark readonly def
+/.distillerdevice
+ { currentdevice .devicename /pdfwrite eq
+    { currentdevice }
+    { /pdfwrite finddevice }
+   ifelse
+ } bind def
+/setdistillerparams		% <dict> setdistillerparams -
+ { .distillerdevice null false mark 5 -1 roll
+    { //.distillerparamkeys 2 index .knownget { exec } { pop pop } ifelse }
+   forall .putdeviceparams
+   type /booleantype eq { pop } { cleartomark pop pop pop } ifelse
+ } odef
+/currentdistillerparams		% - currentdistillerparams <dict>
+ { .distillerdevice //.distillerparamkeys .getdeviceparams .dicttomark
+ } odef
+
+% Patch the 'show' operators to pass the data to the device.
+% We use a pseudo-parameter named /show whose value is a dictionary:
+%	/String (str)
+%	/Values [cx cy char ax ay px py]
+%	/Matrix [xx xy yx yy tx ty]
+%	/FontName /fontname
+%	/Color [r g b]
+%	/Encoding [e0 .. e255]
+%	/BaseEncoding [e0 ... e255]
+% THIS IS A BIG HACK.
+/.findorigfont		% <font> .findorigfont <origfont>
+ {			% Check for a known font with this name and
+			% the same UniqueID.
+   dup /UniqueID .knownget
+    { 1 index /FontName .knownget
+       {		% Stack: font uniqueid fontname
+	 FontDirectory exch .knownget
+	  { dup /UniqueID .knownget
+	     {		% Stack: font uniqueid knownfont knownid
+	       3 -1 roll eq { true } { pop false } ifelse
+	     }
+	     { pop pop false
+	     }
+	    ifelse
+	  }
+	  { pop false
+	  }
+	 ifelse
+       }
+       { pop false
+       }
+      ifelse
+    }
+    { false
+    }
+   ifelse
+			% Stack: font knownfont -true- | font -false-
+    { exch pop
+    }
+    {  { dup /OrigFont .knownget not { exit } if exch pop } loop
+    }
+   ifelse
+ } .bind def
+/.pdfdoshow		% <string> <cxd> <cyd> <char> <axd> <ayd> .pdfdoshow
+			%   <bool>
+ { mark /String 8 2 roll
+   currentpoint transform 7 array astore /Values exch
+		% Concatenate the "quotient" of the current FontMatrix
+		% and the FontMatrix of the original font.
+		% Be sure to include any translation.
+   /Matrix
+     currentfont .findorigfont /FontMatrix get matrix invertmatrix
+     currentfont /FontMatrix get 1 index concatmatrix
+     matrix currentmatrix dup 4 0 put dup 5 0 put dup concatmatrix
+   /FontName currentfont /FontName get
+   /Color [ currentrgbcolor ]
+   /Encoding currentfont /Encoding .knownget not { [] } if
+	% Make a reasonable guess at the base encoding.
+   /BaseEncoding StandardEncoding
+   .dicttomark /show .pdfputparams
+   dup type /booleantype eq
+    { pop pop true }
+    { dup /undefined eq
+       { cleartomark pop pop pop false }
+       { dup mark eq { /unknown /rangecheck } if
+	 counttomark 4 add 1 roll cleartomark pop pop pop
+	 /.pdfshow cvx exch signalerror
+       }
+      ifelse
+    }
+   ifelse
+ } .bind def
+/.pdfexecshow		% <proc> .pdfexecshow -
+ { matrix currentmatrix gsave nulldevice setmatrix
+   exec currentpoint grestore moveto
+ } .bind def
+% Create a 1-element cache for currentdevice .devicename /pdfwrite eq.
+userdict begin
+  /.pdfwritedevice null def
+  /.pdfwriteenabled false def		% place-holder
+end
+/.pdfwrite?		% - .pdfwrite? <bool>
+ { currentdevice .pdfwritedevice eq
+    { .pdfwriteenabled
+    }
+    { currentdevice .devicename /pdfwrite eq
+      userdict /.pdfwriteenabled 2 index put
+      userdict /.pdfwritedevice currentdevice put
+    }
+   ifelse currentfont /FontType get 1 eq and
+ } .bind def
+/.pdfshow		% <string> <cxd> <cyd> <char> <axd> <ayd> <showproc>
+			%   .pdfdoshow -
+ { 7 1 roll .pdfwrite?
+    { .pdfdoshow }
+    { 6 { pop } repeat false }
+   ifelse
+    { .pdfexecshow }
+    { exec }
+   ifelse
+ } .bind def
+/show
+ { dup 0 0 32 0 0 { show } .pdfshow
+ } .bind odef
+/ashow
+ { dup 0 0 32 6 index 6 index dtransform { ashow } .pdfshow
+ } .bind odef
+/widthshow
+ { 4 copy 4 -2 roll dtransform 4 -1 roll 0 0 { widthshow } .pdfshow
+ } .bind odef
+/awidthshow
+ { 6 copy 6 -2 roll dtransform 6 -3 roll dtransform { awidthshow } .pdfshow
+ } .bind odef
+/glyphshow
+ { .pdfwrite?
+    { currentfont /Encoding .knownget not { {} } if
+      0 1 2 index length 1 sub
+       {		% Stack: glyph encoding index
+	 2 copy get 3 index eq { exch pop exch pop null exit } if pop
+       }
+      for null eq
+       { (X) dup 0 4 -1 roll put show }
+       { glyphshow }
+      ifelse
+    }
+    { glyphshow
+    }
+   ifelse
+ } .bind odef
+% The remaining operators aren't implemented correctly.
+/kshow
+ { .pdfwrite?
+    {  { (X) dup 0 4 -1 roll put show dup exec } forall pop }
+    { kshow }
+   ifelse
+ } .bind odef
+/xshow
+ { .pdfwrite? { pop show } { xshow } ifelse
+ } .bind odef
+/yshow
+ { .pdfwrite? { pop show } { yshow } ifelse
+ } .bind odef
+/xyshow
+ { .pdfwrite? { pop show } { xyshow } ifelse
+ } .bind odef
