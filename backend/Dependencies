@@ -1,0 +1,50 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+betest.o: betest.c ../cups/string.h ../config.h
+ipp.o: ipp.c ../cups/http-private.h ../config.h ../cups/http.h \
+  ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/backend.h \
+  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/language.h ../cups/i18n.h \
+  ../cups/transcode.h ../cups/string.h
+lpd.o: lpd.c ../cups/backend.h ../cups/http-private.h ../config.h \
+  ../cups/http.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h \
+  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/i18n.h ../cups/transcode.h ../cups/string.h
+pap.o: pap.c ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/backend.h ../cups/sidechannel.h ../cups/i18n.h \
+  ../cups/transcode.h
+parallel.o: parallel.c backend-private.h ../cups/backend.h \
+  ../cups/sidechannel.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/debug.h ../cups/i18n.h ../cups/transcode.h ../cups/string.h \
+  ../config.h
+scsi.o: scsi.c ../cups/backend.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/i18n.h ../cups/transcode.h ../cups/string.h \
+  ../config.h scsi-linux.c
+serial.o: serial.c backend-private.h ../cups/backend.h \
+  ../cups/sidechannel.h ../cups/cups.h ../cups/ipp.h ../cups/http.h \
+  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h \
+  ../cups/debug.h ../cups/i18n.h ../cups/transcode.h ../cups/string.h \
+  ../config.h
+snmp.o: snmp.c ../cups/http-private.h ../config.h ../cups/http.h \
+  ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h backend-private.h \
+  ../cups/backend.h ../cups/sidechannel.h ../cups/cups.h ../cups/ppd.h \
+  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../cups/array.h \
+  ../cups/file.h
+socket.o: socket.c ../cups/http-private.h ../config.h ../cups/http.h \
+  ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h backend-private.h \
+  ../cups/backend.h ../cups/sidechannel.h ../cups/cups.h ../cups/ppd.h \
+  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h ../cups/string.h
+test1284.o: test1284.c ../cups/string.h ../config.h ieee1284.c \
+  backend-private.h ../cups/backend.h ../cups/sidechannel.h \
+  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h \
+  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h \
+  ../cups/i18n.h ../cups/transcode.h
+usb.o: usb.c ../cups/backend.h ../cups/cups.h ../cups/ipp.h \
+  ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h \
+  ../cups/language.h ../cups/string.h ../config.h ../cups/i18n.h \
+  ../cups/transcode.h usb-unix.c ieee1284.c backend-private.h \
+  ../cups/sidechannel.h ../cups/debug.h
