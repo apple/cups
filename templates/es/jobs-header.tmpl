@@ -1,0 +1,15 @@
+<P>{?which_jobs=?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Mostrar trabajos completados"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Mostrar todos los trabajos">:{which_jobs=all?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Mostrar trabajos completados"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Mostrar trabajos activos">:<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Mostrar trabajos activos"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Mostrar todos los trabajos">}}</A></P>
+
+<P ALIGN="CENTER">{total=0?No hay trabajos:Mostrando {#job_id} de {total} trabajo{total=1?:s}{?which_jobs=? activo{total=1?:s}:{which_jobs=all?: completado{total=1?:s}}}}.</P>

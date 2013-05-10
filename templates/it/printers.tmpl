@@ -1,0 +1,64 @@
+{printer_type?:}{#printer_name=0?:
+{[printer_name]
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}
+{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
+
+<TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
+<TR>
+<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+<IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" CLASS="button" ALT=""></A>
+</TD>
+<TD VALIGN="TOP"><B>Descrizione:</B> {printer_info}<BR>
+<B>Posizione:</B> {printer_location}<BR>
+<B>Marca e modello:</B> {printer_make_and_model}<BR>
+<B>Stato della stampante:</B> {printer_state=3?in attesa:{printer_state=4?elaborazione in corso:fermata}},
+{printer_is_accepting_jobs=0?scarta operazioni:accetta operazioni}, {printer_is_shared=0?non:} pubblicata.
+{?device_uri=?:<BR><B>URI del dispositivo:</B> {device_uri}}
+
+<P>
+<A HREF="{printer_uri_supported}?op=print-test-page">
+<IMG SRC="/images/button-print-test-page.gif" ALT="Stampa pagina di prova" CLASS="button"></A>
+{?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
+<IMG SRC="/images/button-clean-print-heads.gif" ALT="Pulizia delle testine" CLASS="button"></A>
+<A HREF="{printer_uri_supported}?op=print-self-test-page">
+<IMG SRC="/images/button-print-self-test-page.gif" ALT="Stampa pagina di prova predefinita" CLASS="button"></A>:}
+{printer_state=5?
+<A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-start-printer.gif" ALT="Avvia stampante" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=stop-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-stop-printer.gif" ALT="Ferma stampante" CLASS="button"></A>
+}
+{printer_is_accepting_jobs=0?
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-accept-jobs.gif" ALT="Accetta operazioni" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-reject-jobs.gif" ALT="Scarta operazioni" CLASS="button"></A>
+}
+<A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-move-jobs.gif" ALT="Sposta tutte le operazioni" CLASS="button"></A>
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Annulla tutte le operazioni" CLASS="button"></A>
+{printer_is_shared=0?
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
+<IMG SRC="/images/button-publish-printer.gif" ALT="Pubblica stampante" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0">
+<IMG SRC="/images/button-unpublish-printer.gif" ALT="Non pubblicare stampante" CLASS="button"></A>
+}
+<A HREF="{admin_uri}?op=modify-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-modify-printer.gif" ALT="Modifica stampante" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-printer-options&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-printer-options.gif" ALT="Imposta opzioni stampante" CLASS="button"></A>
+<A HREF="{admin_uri}?op=delete-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-delete-printer.gif" ALT="Elimina stampante" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-as-default.gif" ALT="Imposta come predefinita" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="Imposta utenti autorizzati" CLASS="button"></A>
+</P>
+</TD>
+</TR>
+</TABLE>
+}}
