@@ -1,0 +1,59 @@
+# DO NOT DELETE
+
+pdftops.o: parseargs.h gtypes.h GString.h gmem.h Object.h Array.h Dict.h
+pdftops.o: Stream.h XRef.h Catalog.h Page.h PDFDoc.h Link.h PSOutputDev.h
+pdftops.o: config.h ../config.h OutputDev.h Params.h Error.h ../cups/cups.h
+pdftops.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
+Decrypt.o: gmem.h Decrypt.h gtypes.h GString.h
+GString.o: gtypes.h GString.h
+gfile.o: GString.h gfile.h config.h ../config.h gtypes.h ../cups/cups.h
+gfile.o: ../cups/ipp.h ../cups/http.h ../cups/md5.h ../cups/ppd.h
+gmempp.o: gmem.h
+Array.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
+Catalog.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h XRef.h
+Catalog.o: Page.h Error.h config.h ../config.h Link.h Catalog.h
+Dict.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h XRef.h
+Error.o: gtypes.h Params.h Error.h config.h ../config.h
+FontEncoding.o: gmem.h FontEncoding.h gtypes.h
+FontFile.o: gmem.h Error.h config.h ../config.h FontFile.h gtypes.h GString.h
+FontFile.o: FontEncoding.h StdFontInfo.h CompactFontInfo.h
+FormWidget.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
+FormWidget.o: Gfx.h FormWidget.h
+Function.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h
+Function.o: Error.h config.h ../config.h Function.h
+Gfx.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h Lexer.h
+Gfx.o: Parser.h GfxFont.h FontEncoding.h GfxState.h Function.h OutputDev.h
+Gfx.o: Params.h Page.h Error.h config.h ../config.h Gfx.h
+GfxFont.o: GString.h gmem.h gfile.h config.h ../config.h gtypes.h Object.h
+GfxFont.o: Array.h Dict.h Stream.h Error.h Params.h FontFile.h FontEncoding.h
+GfxFont.o: GfxFont.h FontInfo.h Japan12CMapInfo.h GB12CMapInfo.h
+GfxFont.o: CNS13CMapInfo.h
+GfxState.o: gmem.h Error.h config.h ../config.h Object.h gtypes.h GString.h
+GfxState.o: Array.h Dict.h Stream.h Page.h GfxState.h Function.h
+Lexer.o: Lexer.h Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h
+Lexer.o: Error.h config.h ../config.h
+Link.o: gmem.h GString.h Error.h config.h ../config.h Object.h gtypes.h
+Link.o: Array.h Dict.h Stream.h Link.h
+Object.o: Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h Error.h
+Object.o: config.h ../config.h XRef.h
+OutputDev.o: Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h
+OutputDev.o: GfxState.h Function.h OutputDev.h
+Page.o: Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h XRef.h
+Page.o: Link.h OutputDev.h Gfx.h FormWidget.h Error.h config.h ../config.h
+Page.o: Params.h Page.h
+Params.o: gtypes.h gmem.h GString.h gfile.h config.h ../config.h Params.h
+Parser.o: Object.h gtypes.h gmem.h GString.h Array.h Dict.h Stream.h Parser.h
+Parser.o: Lexer.h XRef.h Error.h config.h ../config.h Decrypt.h
+PDFDoc.o: GString.h config.h ../config.h Page.h Object.h gtypes.h gmem.h
+PDFDoc.o: Array.h Dict.h Stream.h Catalog.h XRef.h Link.h OutputDev.h
+PDFDoc.o: Params.h Error.h Lexer.h Parser.h PDFDoc.h
+PSOutputDev.o: GString.h config.h ../config.h Object.h gtypes.h gmem.h
+PSOutputDev.o: Array.h Dict.h Stream.h Error.h Function.h GfxState.h
+PSOutputDev.o: GfxFont.h FontEncoding.h FontFile.h Catalog.h Page.h
+PSOutputDev.o: FormWidget.h PSOutputDev.h OutputDev.h Japan12ToRKSJ.h
+Stream.o: gmem.h gfile.h config.h ../config.h gtypes.h Error.h Object.h
+Stream.o: GString.h Array.h Dict.h Stream.h Decrypt.h Stream-CCITT.h
+XRef.o: gmem.h Object.h gtypes.h GString.h Array.h Dict.h Stream.h Lexer.h
+XRef.o: Parser.h Decrypt.h Error.h config.h ../config.h XRef.h
+gmem.o: gmem.h
+parseargs.o: parseargs.h gtypes.h
