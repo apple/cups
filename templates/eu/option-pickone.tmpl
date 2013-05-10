@@ -1,0 +1,18 @@
+<TR>
+<TH {conflicted=1?CLASS="conflict":CLASS="label"} WIDTH="50%"><A NAME="{keyword}">{keytext}</A>:</TH>
+<TD><SELECT NAME="{keyword}" ID="select-{keyword}" ONCHANGE="update_paramtable('{keyword}')">
+{[choices]<OPTION {choices={defchoice}?SELECTED:} VALUE="{choices}">{text}}
+</SELECT>
+{iscustom=1?<TABLE NAME="paramtable" id="{keyword}-params">{[params]
+<TR><TH CLASS="sublabel">{paramtext}:</TH>
+<TD>{params=Units?<SELECT NAME="{keyword}.{params}">
+<OPTION VALUE="pt"{paramvalue=pt? SELECTED:}>Puntuak</OPTION>
+<OPTION VALUE="mm"{paramvalue=mm? SELECTED:}>Milimetroak</OPTION>
+<OPTION VALUE="cm"{paramvalue=cm? SELECTED:}>Zentimetroak</OPTION>
+<OPTION VALUE="in"{paramvalue=in? SELECTED:}>Hatzak</OPTION>
+<OPTION VALUE="ft"{paramvalue=ft? SELECTED:}>Oinak</OPTION>
+<OPTION VALUE="m"{paramvalue=m? SELECTED:}>Metroak</OPTION>
+</SELECT>:<INPUT TYPE="{inputtype}" NAME="{keyword}.{params}" VALUE="{paramvalue}">}</TD></TR>
+}</TABLE>
+</TD>:}
+</TR>

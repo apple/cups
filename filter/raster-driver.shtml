@@ -1,0 +1,194 @@
+<h2 class='title'><a name='BASICS'>Printer Driver Basics</a></h2>
+
+<p>A CUPS raster printer driver consists of a PostScript Printer Description (PPD) file that describes the features and capabilities of the device, one or more <em>filter</em> programs that prepare print data for the device, and zero or more support files for color management, online help, and so forth. The PPD file includes references to all of the filters and support files used by the driver.</p>
+
+<p>Every time a user prints something the scheduler program, <a href='man-cupsd.html'>cupsd(8)</a>, determines the format of the print job and the programs required to convert that job into something the printer understands. CUPS includes filter programs for many common formats, for example to convert Portable Document Format (PDF) files into CUPS raster data. <a href='#FIGURE_1'>Figure 1</a> shows the data flow of a typical print job.</p>
+
+<div class='figure'><table summary='Raster Filter Chain'>
+<caption>Figure 1: <a name='FIGURE_1'>Raster Filter Chain</a></caption>
+<tr><td><img src='../images/cups-raster-chain.png' width='700' height='150' alt='Raster Filter Chain'></td></tr>
+</table></div>
+
+<p>The raster filter converts CUPS raster data into a format the printer understands, for example HP-PCL. CUPS includes several sample raster filters supporting standard page description languages (PDLs). <a href='#TABLE_1'>Table 1</a> shows the raster filters that are bundled with CUPS and the languages they support.</p>
+
+<div class='table'><table summary='Standard CUPS Raster Filters'>
+<caption>Table 1: <a name='TABLE_1'>Standard CUPS Raster Filters</a></caption>
+<thead>
+<tr><th>Filter</th><th>PDLs</th><th>ppdc DriverType</th><th>ppdc #include file</th></tr>
+</thead>
+<tbody>
+<tr><td>rastertoepson</td><td>ESC/P, ESC/P2</td><td>epson</td><td>epson.h</td></tr>
+<tr><td>rastertoescpx</td><td>ESC/P, ESC/P2, EPSON Remote Mode</td><td>escp</td><td>escp.h</td></tr>
+<tr><td>rastertohp</td><td>HP-PCL3, HP-PCL5</td><td>hp</td><td>hp.h</td></tr>
+<tr><td>rastertolabel</td><td>CPCL, Dymo, EPL1, EPL2, Intellitech PCL, ZPL</td><td>label</td><td>label.h</td></tr>
+<tr><td>rastertopclx</td><td>HP-RTL, HP-PCL3, HP-PCL3GUI, HP-PCL5, HP-PCL5c, HP-PCL5e</td><td>pcl</td><td>pcl.h</td></tr>
+</tbody>
+</table></div>
+
+<p>The optional port monitor handles interface-specific protocol or encoding issues. For example, some raster printers use the 1284.4 communications protocol.</p>
+
+<p>The backend handles communications with the printer, sending print data from the last filter to the printer and relaying back-channel data from the printer to the upstream filters. CUPS includes backend programs for common direct-connect interfaces and network protocols, and you can provide your own backend to support custom interfaces and protocols.</p>
+
+<p>The scheduler also supports a special "command" file format for sending maintenance commands and status queries to a printer or printer driver. Command print jobs typically use a single command filter program defined in the PPD file to generate the appropriate printer commands and handle any responses from the printer. <a href='#FIGURE_2'>Figure 2</a> shows the data flow of a typical command job.</p>
+
+<div class='figure'><table summary='Command Filter Chain'>
+<caption>Figure 2: <a name='FIGURE_2'>Command Filter Chain</a></caption>
+<tr><td><img src='../images/cups-command-chain.png' width='575' height='150' alt='Command Filter Chain'></td></tr>
+</table></div>
+
+<p>Raster printer drivers must provide their own command filter.</p>
+
+
+<h2 class='title'><a name='CREATING'>Creating New PPD Files</a></h2>
+
+<p>We recommend using the CUPS PPD compiler, <a href='man-ppdc.html'>ppdc(1)</a>, to create new PPD files since it manages many of the tedious (and error-prone!) details of paper sizes and localization for you. It also allows you to easily support multiple devices from a single source file. For more information see the "<a href='ppd-compiler.html'>Introduction to the PPD Compiler</a>" document. <a href='#LISTING_1'>Listing 1</a> shows a driver information file for several similar black-and-white HP-PCL5 laser printers.</p>
+
+<p class='example'>Listing 1: <a name='LISTING_1'>"examples/laserjet-basic.drv"</a></p>
+
+<pre class='example'>
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// Include HP-PCL driver definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;pcl.h&gt;
+
+<I>// Specify that this driver uses the HP-PCL driver...</I>
+<a href='ref-ppdcfile.html#DriverType'>DriverType</a> pcl
+
+<I>// Specify the driver options via the model number...</I>
+<a href='ref-ppdcfile.html#ModelNumber'>ModelNumber</a> ($PCL_PAPER_SIZE $PCL_PJL $PCL_PJL_RESOLUTION)
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer and driver version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "HP"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Supported page sizes and their margins</I>
+<a href='ref-ppdcfile.html#HWMargins'>HWMargins</a> 18 12 18 12
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Legal
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Executive
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Monarch
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Statement
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> FanFoldGermanLegal
+
+<a href='ref-ppdcfile.html#HWMargins'>HWMargins</a> 18 12.72 18 12.72
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Env10
+
+<a href='ref-ppdcfile.html#HWMargins'>HWMargins</a> 9.72 12 9.72 12
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A5
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> B5
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> EnvC5
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> EnvDL
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> EnvISOB5
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Postcard
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> DoublePostcard
+
+<I>// Only black-and-white output with mode 3 compression...</I>
+<a href='ref-ppdcfile.html#ColorModel'>ColorModel</a> Gray k chunky 3
+
+<I>// Supported resolutions</I>
+<a href='ref-ppdcfile.html#Resolution'>Resolution</a> - 1 0 0 0 "300dpi/300 DPI"
+*<a href='ref-ppdcfile.html#Resolution'>Resolution</a> - 8 0 0 0 "600dpi/600 DPI"
+
+<I>// Supported input slots</I>
+*<a href='ref-ppdcfile.html#InputSlot'>InputSlot</a> 7 "Auto/Automatic Selection"
+<a href='ref-ppdcfile.html#InputSlot'>InputSlot</a> 2 "Manual/Tray 1 - Manual Feed"
+<a href='ref-ppdcfile.html#InputSlot'>InputSlot</a> 4 "Upper/Tray 1"
+<a href='ref-ppdcfile.html#InputSlot'>InputSlot</a> 1 "Lower/Tray 2"
+<a href='ref-ppdcfile.html#InputSlot'>InputSlot</a> 5 "LargeCapacity/Tray 3"
+
+<I>// Tray 3 is an option...</I>
+<a href='ref-ppdcfile.html#Installable'>Installable</a> "OptionLargeCapacity/Tray 3 Installed"
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*OptionLargeCapacity False *InputSlot LargeCapacity"
+
+{
+  <I>// HP LaserJet 2100 Series</I>
+  <a href='ref-ppdcfile.html#Throughput'>Throughput</a> 10
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "LaserJet 2100 Series"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "hpljt211.ppd"
+}
+
+{
+  <I>// LaserJet 2200 and 2300 series have duplexer option...</I>
+  <a href='ref-ppdcfile.html#Duplex'>Duplex</a> normal
+  <a href='ref-ppdcfile.html#Installable'>Installable</a> "OptionDuplex/Duplexer Installed"
+  <a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*OptionDuplex False *Duplex"
+
+  {
+    <I>// HP LaserJet 2200 Series</I>
+    <a href='ref-ppdcfile.html#Throughput'>Throughput</a> 19
+    <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "LaserJet 2200 Series"
+    <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "hpljt221.ppd"
+  }
+
+  {
+    <I>// HP LaserJet 2300 Series</I>
+    <a href='ref-ppdcfile.html#Throughput'>Throughput</a> 25
+    <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "LaserJet 2300 Series"
+    <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "hpljt231.ppd"
+  }
+}
+</pre>
+
+
+<h2 class='title'><a name='FILTERS'>Using Filters</a></h2>
+
+<p>The standard CUPS raster filters can be specified using the
+<a href='ref-ppdcfile.html#DriverType'><tt>DriverType</tt></a> directive, for example:</p>
+
+<pre class='example'>
+<I>// Specify that this driver uses the HP-PCL driver...</I>
+<a href='ref-ppdcfile.html#DriverType'>DriverType</a> pcl
+</pre>
+
+<p><a href='#TABLE_1'>Table 1</a> shows the driver types for each of the standard CUPS raster filters. For drivers that do not use the standard raster filters, the "custom" type is used with <a href='ref-ppdcfile.html#Filter'><tt>Filter</tt></a> directives:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#DriverType'>DriverType</a> custom
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 /path/to/raster/filter
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-command 100 /path/to/command/filter
+</pre>
+
+
+<h2 class='title'><a name='COLOR'>Implementing Color Management</a></h2>
+
+<p>CUPS uses ICC color profiles to provide more accurate color reproduction. The <a href='spec-ppd.html#cupsICCProfile'><tt>cupsICCProfile</tt></a> attribute defines the color profiles that are available for a given printer, for example:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "ColorModel.MediaType.Resolution/Description" /path/to/ICC/profile
+</pre>
+
+<p>where "ColorModel.MediaType.Resolution" defines a selector based on the corresponding option selections. A simple driver might only define profiles for the color models that are supported, for example a printer supporting Gray and RGB might use:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "Gray../Grayscale Profile" /path/to/ICC/gray-profile
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "RGB../Full Color Profile" /path/to/ICC/rgb-profile
+</pre>
+
+<p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
+
+<h3><span class='info'>Since Mac OS X 10.5</span>Custom Color Matching Support</h3>
+
+<p>Mac OS X printer drivers that are based on an existing standard RGB colorspace can tell the system to use the corresponding colorspace instead of an arbitrary ICC color profile when doing color management. The <a href='#APCustom'><tt>APSupportsCustomColorMatching</tt></a> and <tt>APDefaultCustomColorMatchingProfile</tt> attributes can be used to enable this mode:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APSupportsCustomColorMatching "" true
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDefaultCustomColorMatchingProfile "" sRGB
+</pre>
+
+
+<h2 class='title'><a name='MACOSX'>Adding Mac OS X Features</a></h2>
+
+<p>Mac OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APHelpBook "" /Library/Printers/Vendor/filename.bundle
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterIconPath "" /Library/Printers/Vendor/filename.icns
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterPreset "name/text" "*option choice ..."
+</pre>

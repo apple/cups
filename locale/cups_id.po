@@ -1,0 +1,7095 @@
+# translation of cups_id.po to Bahasa Indonesia
+#
+# "$Id$"
+#
+#   Message catalog template for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 2007 by Apple Inc.
+#   Copyright 2005-2007 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Citra Paska <dirgitadevina@yahoo.co.id>, 2008, 2009.
+
+#
+# Notes for Translators:
+#
+# The following prefixes MUST NOT be translated: "ALERT:", "CRIT:", "INFO:",
+# "NOTICE:", and "WARNING:".
+#
+# The "checkpo" program located in the "locale" source directory can be used
+# to verify that your translations do not introduce formatting errors or other
+# problems.  Run with:
+#
+#    cd locale
+#    ./checkpo cups_LL.po
+#
+# where "LL" is your locale.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cups_id\n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
+"PO-Revision-Date: 2009-09-29 05:17+0700\n"
+"Last-Translator: Citra Paska <dirgitadevina@yahoo.co.id>\n"
+"Language-Team: Bahasa Indonesia\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: systemv/lpstat.c:1848 systemv/lpstat.c:1961
+msgid "\t\t(all)\n"
+msgstr "\t\t(semua)\n"
+
+#: systemv/lpstat.c:1851 systemv/lpstat.c:1854 systemv/lpstat.c:1964
+#: systemv/lpstat.c:1967
+msgid "\t\t(none)\n"
+msgstr "\t\t(nihil)\n"
+
+#: berkeley/lpc.c:438
+#, c-format
+msgid "\t%d entries\n"
+msgstr "\t%d entri\n"
+
+#: systemv/lpstat.c:1829 systemv/lpstat.c:1942
+msgid "\tAfter fault: continue\n"
+msgstr "\tUsai kesalahan: lanjut\n"
+
+#: systemv/lpstat.c:1461 systemv/lpstat.c:1795 systemv/lpstat.c:1908
+msgid "\tAlerts:"
+msgstr "\tPeringatan:"
+
+#: systemv/lpstat.c:1852 systemv/lpstat.c:1965
+msgid "\tBanner required\n"
+msgstr "\tBanner diperlukan\n"
+
+#: systemv/lpstat.c:1853 systemv/lpstat.c:1966
+msgid "\tCharset sets:\n"
+msgstr "\tSet karakter:\n"
+
+#: systemv/lpstat.c:1818 systemv/lpstat.c:1931
+msgid "\tConnection: direct\n"
+msgstr "\tKoneksi: langsung\n"
+
+#: systemv/lpstat.c:1809 systemv/lpstat.c:1922
+msgid "\tConnection: remote\n"
+msgstr "\tKoneksi: jarak jauh\n"
+
+#: systemv/lpstat.c:1856 systemv/lpstat.c:1969
+msgid "\tDefault page size:\n"
+msgstr "\tUkuran halaman utama:\n"
+
+#: systemv/lpstat.c:1855 systemv/lpstat.c:1968
+msgid "\tDefault pitch:\n"
+msgstr "\tTiti utama:\n"
+
+#: systemv/lpstat.c:1857 systemv/lpstat.c:1970
+msgid "\tDefault port settings:\n"
+msgstr "\tPengaturan port utama:\n"
+
+#: systemv/lpstat.c:1790 systemv/lpstat.c:1903
+#, c-format
+msgid "\tDescription: %s\n"
+msgstr "\tDeskripsi: %s\n"
+
+#: systemv/lpstat.c:1784 systemv/lpstat.c:1897
+msgid ""
+"\tForm mounted:\n"
+"\tContent types: any\n"
+"\tPrinter types: unknown\n"
+msgstr ""
+"\tFormulir yang diakuisisi:\n"
+"\tJenis isi: apa saja\n"
+"\tJenis pencetak: tak dikenal\n"
+
+#: systemv/lpstat.c:1850 systemv/lpstat.c:1963
+msgid "\tForms allowed:\n"
+msgstr "\tFormulir yang diperbolehkan:\n"
+
+#: systemv/lpstat.c:1813 systemv/lpstat.c:1926
+#, c-format
+msgid "\tInterface: %s.ppd\n"
+msgstr "\tAntarmuka: %s.ppd\n"
+
+#: systemv/lpstat.c:1822 systemv/lpstat.c:1935
+#, c-format
+msgid "\tInterface: %s/interfaces/%s\n"
+msgstr "\tAntarmuka: %s/interfaces/%s\n"
+
+#: systemv/lpstat.c:1826 systemv/lpstat.c:1939
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd\n"
+msgstr "\tAntarmuka: %s/ppd/%s.ppd\n"
+
+#: systemv/lpstat.c:1804 systemv/lpstat.c:1917
+#, c-format
+msgid "\tLocation: %s\n"
+msgstr "\tLokasi: %s\n"
+
+#: systemv/lpstat.c:1828 systemv/lpstat.c:1941
+msgid "\tOn fault: no alert\n"
+msgstr "\tSaat gagal: tanpa peringatan\n"
+
+#: systemv/lpstat.c:1833 systemv/lpstat.c:1847 systemv/lpstat.c:1946
+#: systemv/lpstat.c:1960
+msgid "\tUsers allowed:\n"
+msgstr "\tPengguna yang diperbolehkan:\n"
+
+#: systemv/lpstat.c:1840 systemv/lpstat.c:1953
+msgid "\tUsers denied:\n"
+msgstr "\tPengguna yang dilarang:\n"
+
+#: berkeley/lpc.c:440
+msgid "\tdaemon present\n"
+msgstr "\tjurik hadir\n"
+
+#: berkeley/lpc.c:436
+msgid "\tno entries\n"
+msgstr "\ttidak ada entri\n"
+
+#: berkeley/lpc.c:408 berkeley/lpc.c:420
+#, c-format
+msgid "\tprinter is on device '%s' speed -1\n"
+msgstr "\tpencetak pada perangkat '%s' kecepatan -1\n"
+
+#: berkeley/lpc.c:433
+msgid "\tprinting is disabled\n"
+msgstr "\tproses cetak dinonaktifkan\n"
+
+#: berkeley/lpc.c:431
+msgid "\tprinting is enabled\n"
+msgstr "\tproses cetak diaktifkan\n"
+
+#: systemv/lpstat.c:1467
+#, c-format
+msgid "\tqueued for %s\n"
+msgstr "\tantrian untuk %s\n"
+
+#: berkeley/lpc.c:428
+msgid "\tqueuing is disabled\n"
+msgstr "\tantrian dinonaktifkan\n"
+
+#: berkeley/lpc.c:426
+msgid "\tqueuing is enabled\n"
+msgstr "\tantrian diaktifkan\n"
+
+#: systemv/lpstat.c:1777 systemv/lpstat.c:1890
+msgid "\treason unknown\n"
+msgstr "\talasan tak dikenal\n"
+
+#: systemv/cupstestppd.c:551
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS\n"
+msgstr ""
+"\n"
+"    DETIL HASIL KECOCOKAN TES\n"
+
+#: systemv/cupstestppd.c:512 systemv/cupstestppd.c:516
+msgid "                REF: Page 15, section 3.1.\n"
+msgstr "                REF: Halaman 15, seksi 3.1.\n"
+
+#: systemv/cupstestppd.c:508
+msgid "                REF: Page 15, section 3.2.\n"
+msgstr "                REF: Halaman 15, seksi 3.2.\n"
+
+#: systemv/cupstestppd.c:524
+msgid "                REF: Page 19, section 3.3.\n"
+msgstr "                REF: Halaman 19, seksi 3.3.\n"
+
+#: systemv/cupstestppd.c:486
+msgid "                REF: Page 20, section 3.4.\n"
+msgstr "                REF: Halaman 20, seksi 3.4.\n"
+
+#: systemv/cupstestppd.c:528
+msgid "                REF: Page 27, section 3.5.\n"
+msgstr "                REF: Halaman 27, seksi 3.5.\n"
+
+#: systemv/cupstestppd.c:482
+msgid "                REF: Page 42, section 5.2.\n"
+msgstr "                REF: Halaman 42, seksi 5.2.\n"
+
+#: systemv/cupstestppd.c:520
+msgid "                REF: Pages 16-17, section 3.2.\n"
+msgstr "                REF: Halaman 16-17, seksi 3.2.\n"
+
+#: systemv/cupstestppd.c:496
+msgid "                REF: Pages 42-45, section 5.2.\n"
+msgstr "                REF: Halaman 42-45, seksi 5.2.\n"
+
+#: systemv/cupstestppd.c:491
+msgid "                REF: Pages 45-46, section 5.2.\n"
+msgstr "                REF: Halaman 45-46, seksi 5.2.\n"
+
+#: systemv/cupstestppd.c:500
+msgid "                REF: Pages 48-49, section 5.2.\n"
+msgstr "                REF: Halaman 48-49, seksi 5.2.\n"
+
+#: systemv/cupstestppd.c:504
+msgid "                REF: Pages 52-54, section 5.2.\n"
+msgstr "                REF: Halaman 52-54, seksi 5.2.\n"
+
+#: berkeley/lpq.c:546
+#, c-format
+msgid "        %-39.39s %.0f bytes\n"
+msgstr "        %-39.39s %.0f bita\n"
+
+#: systemv/cupstestppd.c:668
+#, c-format
+msgid "        PASS    Default%s\n"
+msgstr "        PASS    Default%s\n"
+
+#: systemv/cupstestppd.c:605
+msgid "        PASS    DefaultImageableArea\n"
+msgstr "        PASS    DefaultImageableArea\n"
+
+#: systemv/cupstestppd.c:639
+msgid "        PASS    DefaultPaperDimension\n"
+msgstr "        PASS    DefaultPaperDimension\n"
+
+#: systemv/cupstestppd.c:710
+msgid "        PASS    FileVersion\n"
+msgstr "        PASS    FileVersion\n"
+
+#: systemv/cupstestppd.c:754
+msgid "        PASS    FormatVersion\n"
+msgstr "        PASS    FormatVersion\n"
+
+#: systemv/cupstestppd.c:774
+msgid "        PASS    LanguageEncoding\n"
+msgstr "        PASS    LanguageEncoding\n"
+
+#: systemv/cupstestppd.c:794
+msgid "        PASS    LanguageVersion\n"
+msgstr "        PASS    LanguageVersion\n"
+
+#: systemv/cupstestppd.c:846
+msgid "        PASS    Manufacturer\n"
+msgstr "        PASS    Manufacturer\n"
+
+#: systemv/cupstestppd.c:886
+msgid "        PASS    ModelName\n"
+msgstr "        PASS    ModelName\n"
+
+#: systemv/cupstestppd.c:906
+msgid "        PASS    NickName\n"
+msgstr "        PASS    NickName\n"
+
+#: systemv/cupstestppd.c:966
+msgid "        PASS    PCFileName\n"
+msgstr "        PASS    PCFileName\n"
+
+#: systemv/cupstestppd.c:1041
+msgid "        PASS    PSVersion\n"
+msgstr "        PASS    PSVersion\n"
+
+#: systemv/cupstestppd.c:946
+msgid "        PASS    PageRegion\n"
+msgstr "        PASS    PageRegion\n"
+
+#: systemv/cupstestppd.c:926
+msgid "        PASS    PageSize\n"
+msgstr "        PASS    PageSize\n"
+
+#: systemv/cupstestppd.c:1001
+msgid "        PASS    Product\n"
+msgstr "        PASS    Product\n"
+
+#: systemv/cupstestppd.c:1076
+msgid "        PASS    ShortNickName\n"
+msgstr "        PASS    ShortNickName\n"
+
+#: systemv/cupstestppd.c:3416
+#, c-format
+msgid ""
+"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
+msgstr ""
+"        WARN    \"%s %s\" konflik dengan \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
+
+#: systemv/cupstestppd.c:1449
+#, c-format
+msgid "        WARN    %s has no corresponding options!\n"
+msgstr "        WARN    %s tidak memiliki opsi yang berkorespondensi!\n"
+
+#: systemv/cupstestppd.c:1557
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2.\n"
+msgstr ""
+"        WARN    %s berbagi prefiks umum dengan %s\n"
+"                REF: Halaman 15, seksi 3.2.\n"
+
+#: systemv/cupstestppd.c:1458
+msgid "        WARN    Default choices conflicting!\n"
+msgstr "        WARN    Pilihan utama mengalam konflik!\n"
+
+#: systemv/cupstestppd.c:1420
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s may not work as expected and should "
+"be named Duplex!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"        WARN    Opsi kata kunci Duplex %s mungkin tidak bekerja seperti yang diharapkan dan seharusnya dinamai Duplex!\n"
+"                REF: Halaman 122, seksi 5.17\n"
+
+#: systemv/cupstestppd.c:1819
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr "        WARN    Berkas memiliki campuran CR, LF, dan CR LF pada akhir baris!\n"
+
+#: systemv/cupstestppd.c:1474
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+"        WARN    LanguageEncoding diperlukan oleh spesifikasi PPD 4.3.\n"
+"                REF: Halaman 56-57, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1801
+#, c-format
+msgid "        WARN    Line %d only contains whitespace!\n"
+msgstr "        WARN    Baris %d hanya mengandung spasi!\n"
+
+#: systemv/cupstestppd.c:1482
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"        WARN    Manufacturer diperlukan oleh spesifikasi PPD 4.3.\n"
+"                REF: Halaman 58-59, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1824
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF!\n"
+msgstr "        WARN    Berkas PPD non-Windows seharusnya hanya berakhir baris LF, bukan CR LF!\n"
+
+#: systemv/cupstestppd.c:1466
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f!\n"
+"                REF: Page 42, section 5.2.\n"
+msgstr ""
+"        WARN    PPD versi %.1f telah usang!\n"
+"                REF: Halaman 42, seksi 5.2.\n"
+
+#: systemv/cupstestppd.c:1495
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"        WARN    PCFileName lebih panjang dari 8.3 melanggar spesifikasi PPD.\n"
+"                REF: Halaman 61-62, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1529
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        WARN    Protocols mengandung PJL tetapi atribut JCL tidak diset.\n"
+"                REF: Halaman 78-79, seksi 5.7.\n"
+
+#: systemv/cupstestppd.c:1520
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        WARN    Protocols mengandung PJL dan BCP; diharapkan TBCP.\n"
+"                REF: Halaman 78-79, seksi 5.7.\n"
+
+#: systemv/cupstestppd.c:1503
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"        WARN    ShortNickName diperlukan oleh spesifikasi PPD 4.3.\n"
+"                REF: Halaman 64-65, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:2307
+#, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      %s  %s %s tidak ada!\n"
+
+#: systemv/cupstestppd.c:3571
+#, c-format
+msgid "      %s  %s file \"%s\" has the wrong capitalization!\n"
+msgstr "      %s  %s berkas \"%s\" memiliki kapitalisasi yang salah!\n"
+
+#: systemv/cupstestppd.c:2377
+#, c-format
+msgid ""
+"      %s  Bad %s choice %s!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:3131
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr "      %s  UTF-8 jelek \"%s\" string translasi untuk opsi %s!\n"
+
+#: systemv/cupstestppd.c:3177 systemv/cupstestppd.c:3226
+#: systemv/cupstestppd.c:3265
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      %s  UTF-8 jelek \"%s\" string translasi untuk opsi %s, pilihan %s!\n"
+
+#: systemv/cupstestppd.c:2429
+#, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      %s  Nilai cupsFilter jelek \"%s\"!\n"
+
+#: systemv/cupstestppd.c:2794
+#, c-format
+msgid "      %s  Bad cupsICCProfile %s!\n"
+msgstr "      %s  cupsICCProfile jelek \"%s\"!\n"
+
+#: systemv/cupstestppd.c:2500
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      %s  Nilai cupsPreFilter jelek \"%s\"!\n"
+
+#: systemv/cupstestppd.c:1897
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  cupsUIConstraints jelek %s: \"%s\"!\n"
+
+#: systemv/cupstestppd.c:3081
+#, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      %s  Bahasa jelek \"%s\"!\n"
+
+#: systemv/cupstestppd.c:2484 systemv/cupstestppd.c:2556
+#: systemv/cupstestppd.c:2594 systemv/cupstestppd.c:2632
+#: systemv/cupstestppd.c:2670 systemv/cupstestppd.c:2708
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s!\n"
+msgstr "      %s  Ejaan dari %s jelek - seharusnya %s!\n"
+
+#: systemv/cupstestppd.c:2738
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
+msgstr "      %s  Tidak dapat menyediakan APScanAppPath dan APScanAppBundleID!\n"
+
+#: systemv/cupstestppd.c:1878
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s!\n"
+msgstr "      %s  cupsUIConstraints %s kosong!\n"
+
+#: systemv/cupstestppd.c:3117
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr "      %s  Kehilangan \"%s\" string translasi untuk opsi %s!\n"
+
+#: systemv/cupstestppd.c:3209 systemv/cupstestppd.c:3249
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      %s  Kehilangan \"%s\" string translasi untuk opsi %s, pilihan %s!\n"
+
+#: systemv/cupstestppd.c:2569
+#, c-format
+msgid "      %s  Missing APDialogExtension file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas APDialogExtension \"%s\"\n"
+
+#: systemv/cupstestppd.c:2607
+#, c-format
+msgid "      %s  Missing APPrinterIconPath file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas APPrinterIconPath \"%s\"\n"
+
+#: systemv/cupstestppd.c:2645
+#, c-format
+msgid "      %s  Missing APPrinterLowInkTool file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas APPrinterLowInkTool \"%s\"\n"
+
+#: systemv/cupstestppd.c:2683
+#, c-format
+msgid "      %s  Missing APPrinterUtilityPath file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas APPrinterUtilityPath \"%s\"\n"
+
+#: systemv/cupstestppd.c:2721
+#, c-format
+msgid "      %s  Missing APScanAppPath file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas APScanAppPath \"%s\"\n"
+
+#: systemv/cupstestppd.c:2926
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageRegion option!\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+"      %s  Kehilangan opsi PageRegion yang DIPERLUKAN!\n"
+"                REF: Halaman 100, seksi 5.14.\n"
+
+#: systemv/cupstestppd.c:2911
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageSize option!\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
+"      %s  Kehilangan opsi PageSize yang DIPERLUKAN!\n"
+"                REF: Halaman 99, seksi 5.14.\n"
+
+#: systemv/cupstestppd.c:2088 systemv/cupstestppd.c:2129
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgstr "      %s  Kehilangan pilihan *%s %s dalam UIConstraints \"*%s %s *%s %s\"!\n"
+
+#: systemv/cupstestppd.c:1983
+#, c-format
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  Kehilangan pilihan *%s %s dalam cupsUIConstraints %s: \"%s\"!\n"
+
+#: systemv/cupstestppd.c:2458
+#, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas cupsFilter \"%s\"\n"
+
+#: systemv/cupstestppd.c:2828
+#, c-format
+msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
+msgstr "      %s  Kehilangan berkas cupsICCProfile \"%s\"!\n"
+
+#: systemv/cupstestppd.c:2529
+#, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      %s  Kehilangan berkas cupsPreFilter \"%s\"\n"
+
+#: systemv/cupstestppd.c:1915
+#, c-format
+msgid "      %s  Missing cupsUIResolver %s!\n"
+msgstr "      %s  Kehilangan cupsUIResolver %s!\n"
+
+#: systemv/cupstestppd.c:2074 systemv/cupstestppd.c:2115
+#, c-format
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgstr "      %s  Kehilangan opsi %s dalam UIConstraints \"*%s %s *%s %s\"!\n"
+
+#: systemv/cupstestppd.c:1967
+#, c-format
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  Kehilangan opsi %s dalam cupsUIConstraints %s: \"%s\"!\n"
+
+#: systemv/cupstestppd.c:3303
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr "      %s  Tidak ada basis translasi \"%s\" yang disertakan pada berkas!\n"
+
+#: systemv/cupstestppd.c:2989
+#, c-format
+msgid ""
+"      %s  Non-standard size name \"%s\"!\n"
+"                REF: Page 187, section B.2.\n"
+msgstr ""
+"      %s  Nama ukuran nonstandar \"%s\"!\n"
+"                REF: Halaman 187, seksi B.2.\n"
+
+#: systemv/cupstestppd.c:2353
+#, c-format
+msgid ""
+"      %s  REQUIRED %s does not define choice None!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:3006 systemv/cupstestppd.c:3020
+#, c-format
+msgid "      %s  Size \"%s\" defined for %s but not for %s!\n"
+msgstr "      %s  Ukuran \"%s\" ditentukan untuk %s bukan untuk %s!\n"
+
+#: systemv/cupstestppd.c:2964
+#, c-format
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)!\n"
+msgstr "      %s  Ukuran \"%s\" memiliki dimensi yang tak diharapkan (%gx%g)!\n"
+
+#: systemv/cupstestppd.c:2856
+#, c-format
+msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:2038
+#, c-format
+msgid "      %s  cupsUIResolver %s causes a loop!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:2020
+#, c-format
+msgid "      %s  cupsUIResolver %s does not list at least two different options!\n"
+msgstr "      %s  cupsUIResolver %s tidak menyediakan setidaknya dua opsi berbeda!\n"
+
+#: systemv/cupstestppd.c:2238
+#, c-format
+msgid "      **FAIL**  %s choice names %s and %s differ only by case!\n"
+msgstr "      **FAIL**  %s nama yang dipilih %s dan %s berbeda hanya pada besar/kecilnya huruf!\n"
+
+#: systemv/cupstestppd.c:1243
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"               REF: Page 72, section 5.5\n"
+msgstr ""
+"      **FAIL**  %s seharusnya 1284DeviceID!\n"
+"                REF: Halaman 72, seksi 5.5\n"
+
+#: systemv/cupstestppd.c:659
+#, c-format
+msgid ""
+"      **FAIL**  BAD Default%s %s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **FAIL**  Default%s %s JELEK\n"
+"                REF: Halaman 40, seksi 4.5.\n"
+
+#: systemv/cupstestppd.c:595
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultImageableArea %s!\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DefaultImageableArea %s JELEK!\n"
+"                REF: Halaman 102, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:631
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultPaperDimension %s!\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DefaultPaperDimension %s JELEK!\n"
+"                REF: Halaman 103, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:1102
+msgid ""
+"      **FAIL**  BAD JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4.\n"
+msgstr ""
+"      **FAIL**  Atribut JobPatchFile JELEK dalam berkas\n"
+"                REF: Halaman 24, seksi 3.4.\n"
+
+#: systemv/cupstestppd.c:822
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **FAIL**  Manufacturer JELEK (seharusnya \"HP\")\n"
+"                REF: Halaman 211, tabel D.1.\n"
+
+#: systemv/cupstestppd.c:838
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **FAIL**  Manufacturer JELEK (seharusnya \"Oki\")\n"
+"                REF: Halaman 211, tabel D.1.\n"
+
+#: systemv/cupstestppd.c:877
+#, c-format
+msgid ""
+"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **FAIL**  ModelName JELEK - \"%c\" tidak diperbolehkan dalam string.\n"
+"                REF: Halaman 59-60, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1033
+msgid ""
+"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **FAIL**  PSVersion JELEK - bukan \"(string) int\".\n"
+"                REF: Halaman 62-64, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:994
+msgid ""
+"      **FAIL**  BAD Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **FAIL**  Product JELEK - bukan \"(string)\".\n"
+"                REF: Halaman 62, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1068
+msgid ""
+"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"      **FAIL**  ShortNickName JELEK - lebih dari 31 karakter.\n"
+"                REF: Halaman 64-65, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1224
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 84, section 5.9\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:702
+#, c-format
+msgid ""
+"      **FAIL**  Bad FileVersion \"%s\"\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FAIL**  FileVersion \"%s\" jelek\n"
+"                REF: Halaman 56, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:746
+#, c-format
+msgid ""
+"      **FAIL**  Bad FormatVersion \"%s\"\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FAIL**  FormatVersion \"%s\" jelek\n"
+"                REF: Halaman 56, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1288
+#, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **FAIL**  LanguageEncoding %s jelek - seharusnya ISOLatin1!\n"
+
+#: systemv/cupstestppd.c:1302
+#, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **FAIL**  LanguageVersion %s jelek - seharusnya English!\n"
+
+#: systemv/cupstestppd.c:3443 systemv/cupstestppd.c:3465
+#, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr "      **FAIL**  Kode opsi utama tidak bisa diinterpretasikan: %s\n"
+
+#: systemv/cupstestppd.c:1361
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters!\n"
+msgstr "      **FAIL**  String translasi utama untuk opsi %s pilihan %s mengandung karakter 8-bit!\n"
+
+#: systemv/cupstestppd.c:1334
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters!\n"
+msgstr ""
+"      **FAIL**  String translasi utama untuk opsi %s mengandung karakter 8-"
+"bit!\n"
+
+#: systemv/cupstestppd.c:2176
+#, c-format
+msgid "      **FAIL**  Group names %s and %s differ only by case!\n"
+msgstr "      **FAIL**  Nama kelompok %s dan %s berbeda hanya besar/kecilnya huruf!\n"
+
+#: systemv/cupstestppd.c:2221
+#, c-format
+msgid "      **FAIL**  Multiple occurrences of %s choice name %s!\n"
+msgstr "      **FAIL**  Terjadi ganda dari %s nama yang dipilih %s!\n"
+
+#: systemv/cupstestppd.c:2198
+#, c-format
+msgid "      **FAIL**  Option names %s and %s differ only by case!\n"
+msgstr "      **FAIL**  Nama opsi %s dan %s berbeda hanya besar/kecilnya huruf!\n"
+
+#: systemv/cupstestppd.c:679
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN Default%s\n"
+"                REF: Halaman 40, seksi 4.5.\n"
+
+#: systemv/cupstestppd.c:580
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN DefaultImageableArea\n"
+"                REF: Halaman 102, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:616
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN DefaultPaperDimension\n"
+"                REF: Halaman 103, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:720
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN FileVersion\n"
+"                REF: Halaman 56, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:764
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN FormatVersion\n"
+"                REF: Halaman 56, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1153
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN ImageableArea untuk PageSize %s\n"
+"                REF: Halaman 41, seksi 5.\n"
+"                REF: Halaman 102, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:784
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN LanguageEncoding\n"
+"                REF: Halaman 56-57, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:804
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN LanguageVersion\n"
+"                REF: Halaman 57-58, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:856
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN Manufacturer\n"
+"                REF: Halaman 58-59, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:896
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN ModelName\n"
+"                REF: Halaman 59-60, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:916
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN NickName\n"
+"                REF: Halaman 60, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:976
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PCFileName\n"
+"                REF: Halaman 61-62, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1051
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PSVersion\n"
+"                REF: Halaman 62-64, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:956
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PageRegion\n"
+"                REF: Halaman 100, seksi 5.14.\n"
+
+#: systemv/cupstestppd.c:1122
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PageSize\n"
+"                REF: Halaman 41, seksi 5.\n"
+"                REF: Halaman 99, seksi 5.14.\n"
+
+#: systemv/cupstestppd.c:936
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PageSize\n"
+"                REF: Halaman 99-100, seksi 5.14.\n"
+
+#: systemv/cupstestppd.c:1175
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN PaperDimension untuk PageSize %s\n"
+"                REF: Halaman 41, seksi 5.\n"
+"                REF: Halaman 103, seksi 5.15.\n"
+
+#: systemv/cupstestppd.c:1011
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN Product\n"
+"                REF: Halaman 62, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1086
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3.\n"
+msgstr ""
+"      **FAIL**  DIPERLUKAN ShortNickName\n"
+"                REF: Halaman 64-65, seksi 5.3.\n"
+
+#: systemv/cupstestppd.c:1569
+#, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d KESALAHAN DITEMUKAN\n"
+
+#: systemv/cupstestdsc.c:238 systemv/cupstestdsc.c:280
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d!\n"
+"        REF: Page 39, %%%%BoundingBox:\n"
+msgstr ""
+"    %%%%BoundingBox jelek: pada baris %d!\n"
+"        REF: Halaman 39, %%%%BoundingBox:\n"
+
+#: systemv/cupstestdsc.c:309
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d!\n"
+"        REF: Page 53, %%%%Page:\n"
+msgstr ""
+
+#: systemv/cupstestdsc.c:222 systemv/cupstestdsc.c:262
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d!\n"
+"        REF: Page 43, %%%%Pages:\n"
+msgstr ""
+
+#: systemv/cupstestdsc.c:180
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d)!\n"
+"        REF: Page 25, Line Length\n"
+msgstr ""
+"    Baris %d lebih dari 255 karakter (%d)!\n"
+"        REF: Halaman 25, Line Length (Panjang Baris)\n"
+
+#: systemv/cupstestdsc.c:196
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line!\n"
+"        REF: Page 17, 3.1 Conforming Documents\n"
+msgstr ""
+"    Kehilangan %!PS-Adobe-3.0 pada baris pertama!\n"
+"        REF: Halaman 17, 3.1 Conforming Documents (Menyesuaikan Dokumen)\n"
+
+#: systemv/cupstestdsc.c:366
+#, c-format
+msgid ""
+"    Missing %%EndComments comment!\n"
+"        REF: Page 41, %%EndComments\n"
+msgstr ""
+"    Kehilangan komentar %%EndComments!\n"
+"        REF: Halaman 41, %%EndComments\n"
+
+#: systemv/cupstestdsc.c:346
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment!\n"
+"        REF: Page 39, %%BoundingBox:\n"
+msgstr ""
+"    Kehilangan atau %%BoundingBox jelek: komentar!\n"
+"        REF: Halaman 39, %%BoundingBox:\n"
+
+#: systemv/cupstestdsc.c:376
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments!\n"
+"        REF: Page 53, %%Page:\n"
+msgstr ""
+"    Kehilangan atau %%Page jelek: komentar!\n"
+"        REF: Halaman 53, %%Page:\n"
+
+#: systemv/cupstestdsc.c:356
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment!\n"
+"        REF: Page 43, %%Pages:\n"
+msgstr ""
+"    Kehilangan atau %%Pages jelek: komentar!\n"
+"        REF: Halaman 43, %%Pages:\n"
+
+#: systemv/cupstestppd.c:1571
+msgid "    NO ERRORS FOUND\n"
+msgstr "    TIDAK ADA KESALAHAN\n"
+
+#: systemv/cupstestdsc.c:399
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters!\n"
+msgstr "    Menemukan %d baris yang melebihi 255 karakter!\n"
+
+#: systemv/cupstestdsc.c:394
+#, c-format
+msgid "    Too many %%BeginDocument comments!\n"
+msgstr "    Terlalu banyak komentar %%BeginDocument!\n"
+
+#: systemv/cupstestdsc.c:386
+#, c-format
+msgid "    Too many %%EndDocument comments!\n"
+msgstr "    Terlalu banyak komentar %%EndDocument!\n"
+
+#: systemv/cupstestdsc.c:406
+msgid "    Warning: file contains binary data!\n"
+msgstr "    Peringatan: berkas mengandung data biner!\n"
+
+#: systemv/cupstestdsc.c:414
+#, c-format
+msgid "    Warning: no %%EndComments comment in file!\n"
+msgstr "    Peringatan: tidak ada komentar %%EndComments dalam berkas!\n"
+
+#: systemv/cupstestdsc.c:410
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file!\n"
+msgstr "    Peringatan: DSC usang versi %.1f dalam berkas!\n"
+
+#: systemv/cupstestppd.c:577 systemv/cupstestppd.c:592
+#: systemv/cupstestppd.c:613 systemv/cupstestppd.c:628
+#: systemv/cupstestppd.c:656 systemv/cupstestppd.c:676
+#: systemv/cupstestppd.c:699 systemv/cupstestppd.c:717
+#: systemv/cupstestppd.c:743 systemv/cupstestppd.c:761
+#: systemv/cupstestppd.c:781 systemv/cupstestppd.c:801
+#: systemv/cupstestppd.c:819 systemv/cupstestppd.c:835
+#: systemv/cupstestppd.c:853 systemv/cupstestppd.c:874
+#: systemv/cupstestppd.c:893 systemv/cupstestppd.c:913
+#: systemv/cupstestppd.c:933 systemv/cupstestppd.c:953
+#: systemv/cupstestppd.c:973 systemv/cupstestppd.c:991
+#: systemv/cupstestppd.c:1008 systemv/cupstestppd.c:1030
+#: systemv/cupstestppd.c:1048 systemv/cupstestppd.c:1065
+#: systemv/cupstestppd.c:1083 systemv/cupstestppd.c:1099
+#: systemv/cupstestppd.c:1119 systemv/cupstestppd.c:1150
+#: systemv/cupstestppd.c:1172 systemv/cupstestppd.c:1221
+#: systemv/cupstestppd.c:1240 systemv/cupstestppd.c:1284
+#: systemv/cupstestppd.c:1298 systemv/cupstestppd.c:1330
+#: systemv/cupstestppd.c:1357 systemv/cupstestppd.c:1875
+#: systemv/cupstestppd.c:1894 systemv/cupstestppd.c:1912
+#: systemv/cupstestppd.c:1964 systemv/cupstestppd.c:1980
+#: systemv/cupstestppd.c:2017 systemv/cupstestppd.c:2035
+#: systemv/cupstestppd.c:2071 systemv/cupstestppd.c:2085
+#: systemv/cupstestppd.c:2112 systemv/cupstestppd.c:2126
+#: systemv/cupstestppd.c:2172 systemv/cupstestppd.c:2194
+#: systemv/cupstestppd.c:2217 systemv/cupstestppd.c:2234
+#: systemv/cupstestppd.c:2303 systemv/cupstestppd.c:2350
+#: systemv/cupstestppd.c:2374 systemv/cupstestppd.c:2425
+#: systemv/cupstestppd.c:2455 systemv/cupstestppd.c:2480
+#: systemv/cupstestppd.c:2496 systemv/cupstestppd.c:2526
+#: systemv/cupstestppd.c:2552 systemv/cupstestppd.c:2566
+#: systemv/cupstestppd.c:2590 systemv/cupstestppd.c:2604
+#: systemv/cupstestppd.c:2628 systemv/cupstestppd.c:2642
+#: systemv/cupstestppd.c:2666 systemv/cupstestppd.c:2680
+#: systemv/cupstestppd.c:2704 systemv/cupstestppd.c:2718
+#: systemv/cupstestppd.c:2735 systemv/cupstestppd.c:2790
+#: systemv/cupstestppd.c:2825 systemv/cupstestppd.c:2852
+#: systemv/cupstestppd.c:2907 systemv/cupstestppd.c:2922
+#: systemv/cupstestppd.c:2960 systemv/cupstestppd.c:3002
+#: systemv/cupstestppd.c:3016 systemv/cupstestppd.c:3077
+#: systemv/cupstestppd.c:3113 systemv/cupstestppd.c:3127
+#: systemv/cupstestppd.c:3173 systemv/cupstestppd.c:3205
+#: systemv/cupstestppd.c:3222 systemv/cupstestppd.c:3245
+#: systemv/cupstestppd.c:3261 systemv/cupstestppd.c:3299
+#: systemv/cupstestppd.c:3439 systemv/cupstestppd.c:3461
+#: systemv/cupstestppd.c:3567
+msgid " FAIL\n"
+msgstr " GAGAL\n"
+
+#: systemv/cupstestppd.c:462
+#, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s\n"
+msgstr ""
+" GAGAL\n"
+"      **FAIL**  Tidak bisa membuka berkas PPD - %s\n"
+
+#: systemv/cupstestppd.c:473
+#, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s on line %d.\n"
+msgstr ""
+" GAGAL\n"
+"      **FAIL**  Tidak bisa membuka berkas PPD - %s pada baris %d.\n"
+
+#: systemv/cupstestppd.c:1381
+msgid " PASS\n"
+msgstr " LEWAT\n"
+
+#: ppdc/sample.c:51
+msgid "#10 Envelope"
+msgstr "#10 Amplop"
+
+#: ppdc/sample.c:52
+msgid "#11 Envelope"
+msgstr "#11 Amplop"
+
+#: ppdc/sample.c:53
+msgid "#12 Envelope"
+msgstr "#12 Amplop"
+
+#: ppdc/sample.c:54
+msgid "#14 Envelope"
+msgstr "#14 Amplop"
+
+#: ppdc/sample.c:55
+msgid "#9 Envelope"
+msgstr "#9 Amplop"
+
+#: berkeley/lpq.c:552
+#, c-format
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bita\n"
+
+#: berkeley/lpq.c:557
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bita\n"
+
+#: filter/bannertops.c:784
+#, c-format
+msgid "%.0f x %.0f millimeters"
+msgstr "%.0f x %.0f milimeter"
+
+#: filter/bannertops.c:805
+#, c-format
+msgid "%.0f x %.0f to %.0f x %.0f millimeters"
+msgstr "%.0f x %.0f hingga %.0f x %.0f milimeter"
+
+#: filter/bannertops.c:775
+#, c-format
+msgid "%.2f x %.2f inches"
+msgstr "%.2f x %.2f inci"
+
+#: filter/bannertops.c:794
+#, c-format
+msgid "%.2f x %.2f to %.2f x %.2f inches"
+msgstr "%.2f x %.2f hingga %.2f x %.2f inci"
+
+#: systemv/lpstat.c:754
+#, c-format
+msgid "%s accepting requests since %s\n"
+msgstr "%s menerima permintaan sejak %s\n"
+
+#: scheduler/ipp.c:10415
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s tidak bisa diubah."
+
+#: berkeley/lpc.c:194
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc.\n"
+msgstr "%s tidak diimplementasikan oleh versi lpc CUPS.\n"
+
+#: berkeley/lpq.c:643
+#, c-format
+msgid "%s is not ready\n"
+msgstr "%s tidak siap\n"
+
+#: berkeley/lpq.c:636
+#, c-format
+msgid "%s is ready\n"
+msgstr "%s siap\n"
+
+#: berkeley/lpq.c:639
+#, c-format
+msgid "%s is ready and printing\n"
+msgstr "%s siap dan sedang mencetak\n"
+
+#: systemv/lpstat.c:757
+#, c-format
+msgid ""
+"%s not accepting requests since %s -\n"
+"\t%s\n"
+msgstr ""
+"%s tidak menerima permintaan sejak %s -\n"
+"\t%s\n"
+
+#: scheduler/ipp.c:701
+#, c-format
+msgid "%s not supported!"
+msgstr "%s tidak didukung!"
+
+#: systemv/lpstat.c:767
+#, c-format
+msgid "%s/%s accepting requests since %s\n"
+msgstr "%s/%s menerima permintaan sejak %s\n"
+
+#: systemv/lpstat.c:770
+#, c-format
+msgid ""
+"%s/%s not accepting requests since %s -\n"
+"\t%s\n"
+msgstr ""
+"%s/%s tidak menerima permintaan sejak %s -\n"
+"\t%s\n"
+
+#: berkeley/lpq.c:544
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]\n"
+msgstr "%s: %-33.33s [tugas %d localhost]\n"
+
+#: systemv/cancel.c:303 systemv/cancel.c:367
+#, c-format
+msgid "%s: %s failed: %s\n"
+msgstr "%s: %s gagal: %s\n"
+
+#: systemv/cupsaccept.c:73
+#, c-format
+msgid "%s: Don't know what to do!\n"
+msgstr "%s: Tidak tahu apa yang hendak dikerjakan!\n"
+
+#: berkeley/lpr.c:356 systemv/lp.c:603
+#, c-format
+msgid "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: Kesalahan - Nama variabel lingkungan %s sebenarnya tidak ada \"%s\"!\n"
+
+#: systemv/lp.c:240
+#, c-format
+msgid "%s: Error - bad job ID!\n"
+msgstr "%s: Kesalahan - ID tugas jelek!\n"
+
+#: systemv/lp.c:227
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
+msgstr "%s: Kesalahan - tidak bisa mencetak dan mengubah tugas secara bersamaan!\n"
+
+#: systemv/lp.c:523
+#, c-format
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr ""
+"%s: Kesalahan - tidak bisa mencetak dari stdin apabila berkas atau ID tugas "
+"disediakan!\n"
+
+#: systemv/lp.c:477
+#, c-format
+msgid "%s: Error - expected character set after '-S' option!\n"
+msgstr "%s: Kesalahan - diharapkan set karakter usai opsi '-S'!\n"
+
+#: systemv/lp.c:497
+#, c-format
+msgid "%s: Error - expected content type after '-T' option!\n"
+msgstr "%s: Kesalahan - diharapkan jenis konten usai opsi '-T'!\n"
+
+#: systemv/lp.c:273
+#, c-format
+msgid "%s: Error - expected copies after '-n' option!\n"
+msgstr "%s: Kesalahan - diharapkan banyaknya rangkap usai opsi '-n'!\n"
+
+#: berkeley/lpr.c:251
+#, c-format
+msgid "%s: Error - expected copy count after '-#' option!\n"
+msgstr "%s: Kesalahan - diharapkan banyak hitungan rangkap usai opsi '-#'!\n"
+
+#: berkeley/lpr.c:219
+#, c-format
+msgid "%s: Error - expected destination after '-P' option!\n"
+msgstr "%s: Kesalahan - diharapkan target usai opsi '-P'!\n"
+
+#: systemv/lpstat.c:238
+#, c-format
+msgid "%s: Error - expected destination after '-b' option!\n"
+msgstr "%s: Kesalahan - diharapkan target usai opsi '-b'!\n"
+
+#: systemv/lp.c:145
+#, c-format
+msgid "%s: Error - expected destination after '-d' option!\n"
+msgstr "%s: Kesalahan - diharapkan target usai opsi '-d'!\n"
+
+#: systemv/lp.c:175
+#, c-format
+msgid "%s: Error - expected form after '-f' option!\n"
+msgstr "%s: Kesalahan - diharapkan formulir usai opsi '-f'!\n"
+
+#: systemv/lp.c:404
+#, c-format
+msgid "%s: Error - expected hold name after '-H' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama yang ditahan usai opsi '-H'!\n"
+
+#: berkeley/lpr.c:111
+#, c-format
+msgid "%s: Error - expected hostname after '-H' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama host usai opsi '-H'!\n"
+
+#: berkeley/lpq.c:188 berkeley/lprm.c:130 systemv/cancel.c:130
+#: systemv/cupsaccept.c:131 systemv/lp.c:196 systemv/lpstat.c:298
+#, c-format
+msgid "%s: Error - expected hostname after '-h' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama host usai opsi '-h'!\n"
+
+#: systemv/lp.c:382
+#, c-format
+msgid "%s: Error - expected mode list after '-y' option!\n"
+msgstr "%s: Kesalahan - diharapkan daftar modus usai opsi '-y'!\n"
+
+#: berkeley/lpr.c:275
+#, c-format
+msgid "%s: Error - expected name after '-%c' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama usai opsi '-%c'!\n"
+
+#: systemv/lp.c:296
+#, c-format
+msgid "%s: Error - expected option string after '-o' option!\n"
+msgstr "%s: Kesalahan - diharapkan opsi string usai opsi '-o'!\n"
+
+#: systemv/lp.c:456
+#, c-format
+msgid "%s: Error - expected page list after '-P' option!\n"
+msgstr "%s: Kesalahan - diharapkan daftar halaman usai opsi '-P'!\n"
+
+#: systemv/lp.c:317
+#, c-format
+msgid "%s: Error - expected priority after '-%c' option!\n"
+msgstr "%s: Kesalahan - diharapkan prioritas usai opsi '-%c'!\n"
+
+#: systemv/cupsaccept.c:150
+#, c-format
+msgid "%s: Error - expected reason text after '-r' option!\n"
+msgstr "%s: Kesalahan - diharapkan teks alasan usai opsi '-r'!\n"
+
+#: systemv/lp.c:364
+#, c-format
+msgid "%s: Error - expected title after '-t' option!\n"
+msgstr "%s: Kesalahan - diharapkan judul usai opsi '-t'!\n"
+
+#: berkeley/lpq.c:117 berkeley/lpr.c:91 berkeley/lprm.c:110
+#: systemv/cancel.c:99 systemv/cupsaccept.c:108 systemv/lp.c:122
+#: systemv/lpadmin.c:471 systemv/lpstat.c:144
+#, c-format
+msgid "%s: Error - expected username after '-U' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama pengguna usai opsi '-U'!\n"
+
+#: systemv/cancel.c:152
+#, c-format
+msgid "%s: Error - expected username after '-u' option!\n"
+msgstr "%s: Kesalahan - diharapkan nama pengguna usai opsi '-u'!\n"
+
+#: berkeley/lpr.c:134
+#, c-format
+msgid "%s: Error - expected value after '-%c' option!\n"
+msgstr "%s: Kesalahan - diharapkan nilai usai opsi '-%c'!\n"
+
+#: systemv/lpstat.c:164 systemv/lpstat.c:178
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+"option!\n"
+msgstr ""
+"%s: Kesalahan - diperlukan \"completed\", \"not-completed\", atau \"all\" "
+"usai opsi '-W'!\n"
+
+#: berkeley/lpr.c:361 systemv/lp.c:608
+#, c-format
+msgid "%s: Error - no default destination available.\n"
+msgstr "%s: Kesalahan - tidak tersedia tujuan utama.\n"
+
+#: systemv/lp.c:340
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100.\n"
+msgstr "%s: Kesalahan - prioritas harus antara 1 dan 100.\n"
+
+#: berkeley/lpr.c:365 systemv/lp.c:612
+#, c-format
+msgid "%s: Error - scheduler not responding!\n"
+msgstr "%s: Kesalahan - penjadwal tidak merespon!\n"
+
+#: berkeley/lpr.c:317 systemv/lp.c:556
+#, c-format
+msgid "%s: Error - too many files - \"%s\"\n"
+msgstr "%s: Kesalahan - terlalu banyak berkas - \"%s\"\n"
+
+#: berkeley/lpr.c:299 systemv/lp.c:539
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s\n"
+msgstr "%s: Kesalahan - tidak bisa mengakses \"%s\" - %s\n"
+
+#: berkeley/lpr.c:410 systemv/lp.c:645
+#, c-format
+msgid "%s: Error - unable to queue from stdin - %s\n"
+msgstr ""
+
+#: berkeley/lprm.c:93 berkeley/lprm.c:182 systemv/cancel.c:222
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"!\n"
+msgstr "%s: Kesalahan - tujuan tak dikenal \"%s\"!\n"
+
+#: berkeley/lpq.c:157
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"!\n"
+msgstr "%s: Kesalahan - tujuan tak dikenal \"%s/%s\"!\n"
+
+#: berkeley/lpr.c:286 berkeley/lprm.c:148 systemv/cancel.c:164
+#: systemv/cupsaccept.c:174 systemv/lp.c:514 systemv/lpstat.c:459
+#, c-format
+msgid "%s: Error - unknown option '%c'!\n"
+msgstr "%s: Kesalahan - opsi tak dikenal '%c'!\n"
+
+#: systemv/cupsaccept.c:167
+#, c-format
+msgid "%s: Error - unknown option '%s'!\n"
+msgstr "%s: Kesalahan - opsi '%s' tak dikenal!\n"
+
+#: systemv/lp.c:216
+#, c-format
+msgid "%s: Expected job ID after '-i' option!\n"
+msgstr "%s: Diharapkan ID tugas usai opsi '-i'!\n"
+
+#: scheduler/cupsfilter.c:558
+#, c-format
+msgid "%s: Filter \"%s\" not available: %s\n"
+msgstr "%s: Penyaring \"%s\" tak tersedia: %s\n"
+
+#: systemv/lpstat.c:511 systemv/lpstat.c:550
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"!\n"
+msgstr "%s: Nama tujuan tidak sah pada daftar \"%s\"!\n"
+
+#: scheduler/cupsfilter.c:539
+#, c-format
+msgid "%s: Invalid filter string \"%s\"\n"
+msgstr "%s: String penyaring \"%s\" tidak sah\n"
+
+#: systemv/lp.c:432
+#, c-format
+msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
+msgstr "%s: Memerlukan ID tugas ('-i jobid') sebelum '-H restart'!\n"
+
+#: scheduler/cupsfilter.c:453
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr "%s: Tidak ada penyaring untuk konversi dari %s/%s ke %s/%s!\n"
+
+#: systemv/cupsaccept.c:208
+#, c-format
+msgid "%s: Operation failed: %s\n"
+msgstr "%s: Operasi gagal: %s\n"
+
+#: berkeley/lpq.c:103 berkeley/lpr.c:77 berkeley/lprm.c:72 systemv/cancel.c:85
+#: systemv/cupsaccept.c:94 systemv/cupsaddsmb.c:91 systemv/lp.c:108
+#: systemv/lpadmin.c:277 systemv/lpinfo.c:94 systemv/lpmove.c:79
+#: systemv/lpstat.c:109
+#, c-format
+msgid "%s: Sorry, no encryption support compiled in!\n"
+msgstr "%s: Maaf, tidak ada dukungan enkripsi yang dikompilasi serta!\n"
+
+#: berkeley/lpq.c:304 scheduler/cupsfilter.c:1106 systemv/cupsaddsmb.c:149
+#: systemv/cupsaddsmb.c:175
+#, c-format
+msgid "%s: Unable to connect to server\n"
+msgstr "%s: Tidak bisa terhubung ke server\n"
+
+#: systemv/cancel.c:245 systemv/cancel.c:326
+#, c-format
+msgid "%s: Unable to contact server!\n"
+msgstr "%s: Tidak bisa mengontak server!\n"
+
+#: scheduler/cupsfilter.c:419
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr "%s: Tidak bisa menentukan jenis MIME dari \"%s\"!\n"
+
+#: ppdc/ppdc-file.cxx:50 ppdc/ppdmerge.cxx:99
+#, c-format
+msgid "%s: Unable to open %s: %s\n"
+msgstr "%s: Tidak bisa membuka %s: %s\n"
+
+#: scheduler/cupsfilter.c:603
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d\n"
+msgstr "%s: Tidak bisa membuka berkas PPD: %s pada baris %d\n"
+
+#: ppdc/ppdmerge.cxx:113
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d.\n"
+msgstr "%s: Tidak bisa membuka berkas PPD: %s pada baris %d.\n"
+
+#: scheduler/cupsfilter.c:384
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"!\n"
+msgstr "%s: Tak dapat membaca basis data MIME dari \"%s\" atau \"%s\"!\n"
+
+#: berkeley/lpq.c:161 systemv/lpstat.c:565
+#, c-format
+msgid "%s: Unknown destination \"%s\"!\n"
+msgstr "%s: Tujuan tak dikenal \"%s\"!\n"
+
+#: scheduler/cupsfilter.c:430
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr "%s: Jenis MIME yang dituju tak dikenal %s/%s!\n"
+
+#: scheduler/cupsfilter.c:1312
+#, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: Opsi tak dikenal '%c'!\n"
+
+#: scheduler/cupsfilter.c:411
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
+msgstr "%s: Sumber jenis MIME tak dikenal %s/%s!\n"
+
+#: berkeley/lpr.c:148
+#, c-format
+msgid ""
+"%s: Warning - '%c' format modifier not supported - output may not be "
+"correct!\n"
+msgstr ""
+"%s: Peringatan - format peubah '%c' tidak didukung - keluaran yang "
+"dihasilkan mungkin tak tepat!\n"
+
+#: systemv/lp.c:485
+#, c-format
+msgid "%s: Warning - character set option ignored!\n"
+msgstr "%s: Peringatan - opsi set karakter diabaikan!\n"
+
+#: systemv/lp.c:505
+#, c-format
+msgid "%s: Warning - content type option ignored!\n"
+msgstr "%s: Peringatan - opsi jenis konten diabaikan!\n"
+
+#: systemv/lp.c:182
+#, c-format
+msgid "%s: Warning - form option ignored!\n"
+msgstr "%s: Peringatan - opsi formulir diabaikan!\n"
+
+#: systemv/lp.c:390
+#, c-format
+msgid "%s: Warning - mode option ignored!\n"
+msgstr "%s: Peringatan - opsi modus diabaikan!\n"
+
+#: berkeley/lpq.c:245
+#, c-format
+msgid "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr ""
+"%s: kesalahan - nama variabel lingkungan %s merupakan tujuan yang tidak ada "
+"\"%s\"!\n"
+
+#: berkeley/lpr.c:162
+#, c-format
+msgid "%s: error - expected option=value after '-o' option!\n"
+msgstr "%s: kesalahan - diharapkan opsi=nilai usai opsi '-o'!\n"
+
+#: berkeley/lpq.c:250
+#, c-format
+msgid "%s: error - no default destination available.\n"
+msgstr "%s: kesalahan - tidak ada tujuan utama.\n"
+
+#: ppdc/sample.c:281
+msgid "-1"
+msgstr "-1"
+
+#: ppdc/sample.c:272
+msgid "-10"
+msgstr "-10"
+
+#: ppdc/sample.c:364
+msgid "-100"
+msgstr "-100"
+
+#: ppdc/sample.c:363
+msgid "-105"
+msgstr "-105"
+
+#: ppdc/sample.c:271
+msgid "-11"
+msgstr "-11"
+
+#: ppdc/sample.c:362
+msgid "-110"
+msgstr "-110"
+
+#: ppdc/sample.c:361
+msgid "-115"
+msgstr "-115"
+
+#: ppdc/sample.c:270
+msgid "-12"
+msgstr "-12"
+
+#: ppdc/sample.c:360
+msgid "-120"
+msgstr "-120"
+
+#: ppdc/sample.c:269
+msgid "-13"
+msgstr "-13"
+
+#: ppdc/sample.c:268
+msgid "-14"
+msgstr "-14"
+
+#: ppdc/sample.c:267
+msgid "-15"
+msgstr "-15"
+
+#: ppdc/sample.c:280
+msgid "-2"
+msgstr "-2"
+
+#: ppdc/sample.c:380
+msgid "-20"
+msgstr "-20"
+
+#: ppdc/sample.c:379
+msgid "-25"
+msgstr "-25"
+
+#: ppdc/sample.c:279
+msgid "-3"
+msgstr "-3"
+
+#: ppdc/sample.c:378
+msgid "-30"
+msgstr "-30"
+
+#: ppdc/sample.c:377
+msgid "-35"
+msgstr "-35"
+
+#: ppdc/sample.c:278
+msgid "-4"
+msgstr "-4"
+
+#: ppdc/sample.c:376
+msgid "-40"
+msgstr "-40"
+
+#: ppdc/sample.c:375
+msgid "-45"
+msgstr "-45"
+
+#: ppdc/sample.c:277
+msgid "-5"
+msgstr "-5"
+
+#: ppdc/sample.c:374
+msgid "-50"
+msgstr "-50"
+
+#: ppdc/sample.c:373
+msgid "-55"
+msgstr "-55"
+
+#: ppdc/sample.c:276
+msgid "-6"
+msgstr "-6"
+
+#: ppdc/sample.c:372
+msgid "-60"
+msgstr "-60"
+
+#: ppdc/sample.c:371
+msgid "-65"
+msgstr "-65"
+
+#: ppdc/sample.c:275
+msgid "-7"
+msgstr "-7"
+
+#: ppdc/sample.c:370
+msgid "-70"
+msgstr "-70"
+
+#: ppdc/sample.c:369
+msgid "-75"
+msgstr "-75"
+
+#: ppdc/sample.c:274
+msgid "-8"
+msgstr "-8"
+
+#: ppdc/sample.c:368
+msgid "-80"
+msgstr "-80"
+
+#: ppdc/sample.c:367
+msgid "-85"
+msgstr "-85"
+
+#: ppdc/sample.c:273
+msgid "-9"
+msgstr "-9"
+
+#: ppdc/sample.c:366
+msgid "-90"
+msgstr "-90"
+
+#: ppdc/sample.c:365
+msgid "-95"
+msgstr "-95"
+
+#: ppdc/sample.c:282
+msgid "0"
+msgstr "0"
+
+#: ppdc/sample.c:283
+msgid "1"
+msgstr "1"
+
+#: ppdc/sample.c:355
+msgid "1 inch/sec."
+msgstr "1 inci/det."
+
+#: ppdc/sample.c:144
+msgid "1.25x0.25\""
+msgstr "1,25x0,25\""
+
+#: ppdc/sample.c:145
+msgid "1.25x2.25\""
+msgstr "1,25x2,25\""
+
+#: ppdc/sample.c:403
+msgid "1.5 inch/sec."
+msgstr "1,5 inci/det."
+
+#: ppdc/sample.c:146
+msgid "1.50x0.25\""
+msgstr "1,50x0,25\""
+
+#: ppdc/sample.c:147
+msgid "1.50x0.50\""
+msgstr "1,50x0,50\""
+
+#: ppdc/sample.c:148
+msgid "1.50x1.00\""
+msgstr "1,50x1,00\""
+
+#: ppdc/sample.c:149
+msgid "1.50x2.00\""
+msgstr "1,50x2,00\""
+
+#: ppdc/sample.c:292
+msgid "10"
+msgstr "10"
+
+#: ppdc/sample.c:414
+msgid "10 inches/sec."
+msgstr "10 inci/det."
+
+#: ppdc/sample.c:1
+msgid "10 x 11\""
+msgstr "10 x 11\""
+
+#: ppdc/sample.c:2
+msgid "10 x 13\""
+msgstr "10 x 13\""
+
+#: ppdc/sample.c:3
+msgid "10 x 14\""
+msgstr "10 x 14\""
+
+#: ppdc/sample.c:394
+msgid "100"
+msgstr "100"
+
+#: ppdc/sample.c:305
+msgid "100 mm/sec."
+msgstr "100 mm/det."
+
+#: ppdc/sample.c:395
+msgid "105"
+msgstr "105"
+
+#: ppdc/sample.c:293
+msgid "11"
+msgstr "11"
+
+#: ppdc/sample.c:415
+msgid "11 inches/sec."
+msgstr "11 inci/det."
+
+#: ppdc/sample.c:396
+msgid "110"
+msgstr "110"
+
+#: ppdc/sample.c:397
+msgid "115"
+msgstr "115"
+
+#: ppdc/sample.c:294
+msgid "12"
+msgstr "12"
+
+#: ppdc/sample.c:416
+msgid "12 inches/sec."
+msgstr "12 inci/det."
+
+#: ppdc/sample.c:4
+msgid "12 x 11\""
+msgstr "12 x 11\""
+
+#: ppdc/sample.c:398
+msgid "120"
+msgstr "120"
+
+#: ppdc/sample.c:306
+msgid "120 mm/sec."
+msgstr "120 mm/det."
+
+#: ppdc/sample.c:215
+msgid "120x60dpi"
+msgstr "120x60dpi"
+
+#: ppdc/sample.c:221
+msgid "120x72dpi"
+msgstr "120x72dpi"
+
+#: ppdc/sample.c:295
+msgid "13"
+msgstr "13"
+
+#: ppdc/sample.c:204
+msgid "136dpi"
+msgstr "136dpi"
+
+#: ppdc/sample.c:296
+msgid "14"
+msgstr "14"
+
+#: ppdc/sample.c:297
+msgid "15"
+msgstr "15"
+
+#: ppdc/sample.c:299
+msgid "15 mm/sec."
+msgstr "15 mm/det."
+
+#: ppdc/sample.c:5
+msgid "15 x 11\""
+msgstr "15 x 11\""
+
+#: ppdc/sample.c:307
+msgid "150 mm/sec."
+msgstr "150 mm/det."
+
+#: ppdc/sample.c:254
+msgid "150dpi"
+msgstr "150dpi"
+
+#: ppdc/sample.c:339
+msgid "16"
+msgstr "16"
+
+#: ppdc/sample.c:340
+msgid "17"
+msgstr "17"
+
+#: ppdc/sample.c:341
+msgid "18"
+msgstr "18"
+
+#: ppdc/sample.c:216
+msgid "180dpi"
+msgstr "180dpi"
+
+#: ppdc/sample.c:342
+msgid "19"
+msgstr "19"
+
+#: ppdc/sample.c:284
+msgid "2"
+msgstr "2"
+
+#: ppdc/sample.c:356
+msgid "2 inches/sec."
+msgstr "2 inci/det."
+
+#: ppdc/sample.c:242
+msgid "2-Sided Printing"
+msgstr "2-Sisi Pencetakan"
+
+#: ppdc/sample.c:150
+msgid "2.00x0.37\""
+msgstr "2,00x0,37\""
+
+#: ppdc/sample.c:151
+msgid "2.00x0.50\""
+msgstr "2,00x0,50\""
+
+#: ppdc/sample.c:152
+msgid "2.00x1.00\""
+msgstr "2,00x1.00\""
+
+#: ppdc/sample.c:153
+msgid "2.00x1.25\""
+msgstr "2,00x1,25\""
+
+#: ppdc/sample.c:154
+msgid "2.00x2.00\""
+msgstr "2,00x2,00\""
+
+#: ppdc/sample.c:155
+msgid "2.00x3.00\""
+msgstr "2,00x3,00\""
+
+#: ppdc/sample.c:156
+msgid "2.00x4.00\""
+msgstr "2,00x4,00\""
+
+#: ppdc/sample.c:157
+msgid "2.00x5.50\""
+msgstr "2,00x5,50\""
+
+#: ppdc/sample.c:158
+msgid "2.25x0.50\""
+msgstr "2,25x0,50\""
+
+#: ppdc/sample.c:159
+msgid "2.25x1.25\""
+msgstr "2,25x1,25\""
+
+#: ppdc/sample.c:160
+msgid "2.25x4.00\""
+msgstr "2,25x4,00\""
+
+#: ppdc/sample.c:161
+msgid "2.25x5.50\""
+msgstr "2,25x5,50\""
+
+#: ppdc/sample.c:162
+msgid "2.38x5.50\""
+msgstr "2,38x5,50\""
+
+#: ppdc/sample.c:404
+msgid "2.5 inches/sec."
+msgstr "2,5 inci/det."
+
+#: ppdc/sample.c:163
+msgid "2.50x1.00\""
+msgstr "2,50x1,00\""
+
+#: ppdc/sample.c:164
+msgid "2.50x2.00\""
+msgstr "2,50x2,00\""
+
+#: ppdc/sample.c:165
+msgid "2.75x1.25\""
+msgstr "2,75x1,25\""
+
+#: ppdc/sample.c:166
+msgid "2.9 x 1\""
+msgstr "2,9 x 1\""
+
+#: ppdc/sample.c:343
+msgid "20"
+msgstr "20"
+
+#: ppdc/sample.c:300
+msgid "20 mm/sec."
+msgstr "20 mm/det."
+
+#: ppdc/sample.c:308
+msgid "200 mm/sec."
+msgstr "200 mm/det."
+
+#: ppdc/sample.c:205
+msgid "203dpi"
+msgstr "203dpi"
+
+#: ppdc/sample.c:344
+msgid "21"
+msgstr "21"
+
+#: ppdc/sample.c:345
+msgid "22"
+msgstr "22"
+
+#: ppdc/sample.c:346
+msgid "23"
+msgstr "23"
+
+#: ppdc/sample.c:347
+msgid "24"
+msgstr "24"
+
+#: ppdc/sample.c:213
+msgid "24-Pin Series"
+msgstr "Seri 24-Pin"
+
+#: ppdc/sample.c:222
+msgid "240x72dpi"
+msgstr "240x72dpi"
+
+#: ppdc/sample.c:348
+msgid "25"
+msgstr "25"
+
+#: ppdc/sample.c:309
+msgid "250 mm/sec."
+msgstr "250 mm/det."
+
+#: ppdc/sample.c:349
+msgid "26"
+msgstr "26"
+
+#: ppdc/sample.c:350
+msgid "27"
+msgstr "27"
+
+#: ppdc/sample.c:351
+msgid "28"
+msgstr "28"
+
+#: ppdc/sample.c:352
+msgid "29"
+msgstr "29"
+
+#: ppdc/sample.c:285
+msgid "3"
+msgstr "3"
+
+#: ppdc/sample.c:357
+msgid "3 inches/sec."
+msgstr "3 inci/det."
+
+#: ppdc/sample.c:167
+msgid "3.00x1.00\""
+msgstr "3,00x1,00\""
+
+#: ppdc/sample.c:168
+msgid "3.00x1.25\""
+msgstr "3,00x1,25\""
+
+#: ppdc/sample.c:169
+msgid "3.00x2.00\""
+msgstr "3,00x2,00\""
+
+#: ppdc/sample.c:170
+msgid "3.00x3.00\""
+msgstr "3,00x3,00\""
+
+#: ppdc/sample.c:171
+msgid "3.00x5.00\""
+msgstr "3,00x5,00\""
+
+#: ppdc/sample.c:172
+msgid "3.25x2.00\""
+msgstr "3,25x2,00\""
+
+#: ppdc/sample.c:173
+msgid "3.25x5.00\""
+msgstr "3,25x5,00\""
+
+#: ppdc/sample.c:174
+msgid "3.25x5.50\""
+msgstr "3,25x5,50\""
+
+#: ppdc/sample.c:175
+msgid "3.25x5.83\""
+msgstr "3,25x5,83\""
+
+#: ppdc/sample.c:176
+msgid "3.25x7.83\""
+msgstr "3,25x7,83\""
+
+#: ppdc/sample.c:134
+msgid "3.5\" Disk"
+msgstr "Diska 3,5\""
+
+#: ppdc/sample.c:143
+msgid "3.5\" Disk - 2 1/8 x 2 3/4\""
+msgstr "Diska 3.5\" - 2 1/8 x 2 3/4\""
+
+#: ppdc/sample.c:177
+msgid "3.50x1.00\""
+msgstr "3,50x1,00\""
+
+#: ppdc/sample.c:353
+msgid "30"
+msgstr "30"
+
+#: ppdc/sample.c:301
+msgid "30 mm/sec."
+msgstr "30 mm/det."
+
+#: ppdc/sample.c:310
+msgid "300 mm/sec."
+msgstr "300 mm/det."
+
+#: ppdc/sample.c:206
+msgid "300dpi"
+msgstr "300dpi"
+
+#: ppdc/sample.c:381
+msgid "35"
+msgstr "35"
+
+#: ppdc/sample.c:218
+msgid "360dpi"
+msgstr "360dpi"
+
+#: ppdc/sample.c:217
+msgid "360x180dpi"
+msgstr "360x180dpi"
+
+#: ppdc/sample.c:286
+msgid "4"
+msgstr "4"
+
+#: ppdc/sample.c:358
+msgid "4 inches/sec."
+msgstr "4 inci/det."
+
+#: ppdc/sample.c:178
+msgid "4.00x1.00\""
+msgstr "4,00x1,00\""
+
+#: ppdc/sample.c:186
+msgid "4.00x13.00\""
+msgstr "4,00x13,00\""
+
+#: ppdc/sample.c:179
+msgid "4.00x2.00\""
+msgstr "4,00x2,00\""
+
+#: ppdc/sample.c:180
+msgid "4.00x2.50\""
+msgstr "4,00x2,50\""
+
+#: ppdc/sample.c:181
+msgid "4.00x3.00\""
+msgstr "4,00x3,00\""
+
+#: ppdc/sample.c:182
+msgid "4.00x4.00\""
+msgstr "4,00x4,00\""
+
+#: ppdc/sample.c:183
+msgid "4.00x5.00\""
+msgstr "4,00x5,00\""
+
+#: ppdc/sample.c:184
+msgid "4.00x6.00\""
+msgstr "4,00x6,00\""
+
+#: ppdc/sample.c:185
+msgid "4.00x6.50\""
+msgstr "4,00x6,50\""
+
+#: ppdc/sample.c:382
+msgid "40"
+msgstr "40"
+
+#: ppdc/sample.c:302
+msgid "40 mm/sec."
+msgstr "40 mm/det."
+
+#: ppdc/sample.c:383
+msgid "45"
+msgstr "45"
+
+#: ppdc/sample.c:287
+msgid "5"
+msgstr "5"
+
+#: ppdc/sample.c:408
+msgid "5 inches/sec."
+msgstr "5 inci/det."
+
+#: ppdc/sample.c:384
+msgid "50"
+msgstr "50"
+
+#: ppdc/sample.c:385
+msgid "55"
+msgstr "55"
+
+#: ppdc/sample.c:288
+msgid "6"
+msgstr "6"
+
+#: ppdc/sample.c:409
+msgid "6 inches/sec."
+msgstr "6 inci/det."
+
+#: ppdc/sample.c:187
+msgid "6.00x1.00\""
+msgstr "6,00x1,00\""
+
+#: ppdc/sample.c:188
+msgid "6.00x2.00\""
+msgstr "6,00x2,00\""
+
+#: ppdc/sample.c:189
+msgid "6.00x3.00\""
+msgstr "6,00x3,00\""
+
+#: ppdc/sample.c:190
+msgid "6.00x4.00\""
+msgstr "6,00x4,00\""
+
+#: ppdc/sample.c:191
+msgid "6.00x5.00\""
+msgstr "6,00x5,00\""
+
+#: ppdc/sample.c:192
+msgid "6.00x6.00\""
+msgstr "6,00x6,00\""
+
+#: ppdc/sample.c:193
+msgid "6.00x6.50\""
+msgstr "6,00x6,50\""
+
+#: ppdc/sample.c:386
+msgid "60"
+msgstr "60"
+
+#: ppdc/sample.c:303
+msgid "60 mm/sec."
+msgstr "60 mm/det."
+
+#: ppdc/sample.c:233
+msgid "600dpi"
+msgstr "600dpi"
+
+#: ppdc/sample.c:214
+msgid "60dpi"
+msgstr "60dpi"
+
+#: ppdc/sample.c:220
+msgid "60x720dpi"
+msgstr "60x720dpi"
+
+#: ppdc/sample.c:387
+msgid "65"
+msgstr "65"
+
+#: ppdc/sample.c:289
+msgid "7"
+msgstr "7"
+
+#: ppdc/sample.c:411
+msgid "7 inches/sec."
+msgstr "7 inci/det."
+
+#: ppdc/sample.c:6
+msgid "7 x 9\""
+msgstr "7 x 9\""
+
+#: ppdc/sample.c:388
+msgid "70"
+msgstr "70"
+
+#: ppdc/sample.c:224
+msgid "720dpi"
+msgstr "720dpi"
+
+#: ppdc/sample.c:389
+msgid "75"
+msgstr "75"
+
+#: ppdc/sample.c:290
+msgid "8"
+msgstr "8"
+
+#: ppdc/sample.c:412
+msgid "8 inches/sec."
+msgstr "8 inci/det."
+
+#: ppdc/sample.c:7
+msgid "8 x 10\""
+msgstr "8 x 10\""
+
+#: ppdc/sample.c:194
+msgid "8.00x1.00\""
+msgstr "8,00x1,00\""
+
+#: ppdc/sample.c:195
+msgid "8.00x2.00\""
+msgstr "8,00x2,00\""
+
+#: ppdc/sample.c:196
+msgid "8.00x3.00\""
+msgstr "8,00x3,00\""
+
+#: ppdc/sample.c:197
+msgid "8.00x4.00\""
+msgstr "8,00x4,00\""
+
+#: ppdc/sample.c:198
+msgid "8.00x5.00\""
+msgstr "8,00x5,00\""
+
+#: ppdc/sample.c:199
+msgid "8.00x6.00\""
+msgstr "8,00x6,00\""
+
+#: ppdc/sample.c:200
+msgid "8.00x6.50\""
+msgstr "8,00x6,50\""
+
+#: ppdc/sample.c:390
+msgid "80"
+msgstr "80"
+
+#: ppdc/sample.c:304
+msgid "80 mm/sec."
+msgstr "80 mm/det."
+
+#: ppdc/sample.c:391
+msgid "85"
+msgstr "85"
+
+#: ppdc/sample.c:291
+msgid "9"
+msgstr "9"
+
+#: ppdc/sample.c:413
+msgid "9 inches/sec."
+msgstr "9 inci/det."
+
+#: ppdc/sample.c:8
+msgid "9 x 11\""
+msgstr "9 x 11\""
+
+#: ppdc/sample.c:9
+msgid "9 x 12\""
+msgstr "9 x 12\""
+
+#: ppdc/sample.c:219
+msgid "9-Pin Series"
+msgstr "Seri 9-Pin"
+
+#: ppdc/sample.c:392
+msgid "90"
+msgstr "90"
+
+#: ppdc/sample.c:393
+msgid "95"
+msgstr "95"
+
+#: berkeley/lpc.c:218
+msgid "?Invalid help command unknown\n"
+msgstr ""
+
+#: cgi-bin/admin.c:2343
+msgid "A Samba password is required to export printer drivers!"
+msgstr "Diperlukan sandi Samba untuk mengekspor penggerak pencetak!"
+
+#: cgi-bin/admin.c:2339
+msgid "A Samba username is required to export printer drivers!"
+msgstr "Diperlukan nama pengguna Samba untuk mengekspor penggerak pencetak!"
+
+#: scheduler/ipp.c:2390
+#, c-format
+msgid "A class named \"%s\" already exists!"
+msgstr "Kelas bernama \"%s\" sudah ada!"
+
+#: scheduler/ipp.c:1013
+#, c-format
+msgid "A printer named \"%s\" already exists!"
+msgstr "Pencetak bernama \"%s\" sudah ada!"
+
+#: ppdc/sample.c:10
+msgid "A0"
+msgstr "A0"
+
+#: ppdc/sample.c:11
+msgid "A1"
+msgstr "A1"
+
+#: ppdc/sample.c:24
+msgid "A10"
+msgstr "A10"
+
+#: ppdc/sample.c:12
+msgid "A2"
+msgstr "A2"
+
+#: ppdc/sample.c:13
+msgid "A3"
+msgstr "A3"
+
+#: ppdc/sample.c:14
+msgid "A3 (Oversize)"
+msgstr "A3 (Besar)"
+
+#: ppdc/sample.c:15
+msgid "A4"
+msgstr "A4"
+
+#: ppdc/sample.c:16
+msgid "A4 (Oversize)"
+msgstr "A4 (Besar)"
+
+#: ppdc/sample.c:17
+msgid "A4 (Small)"
+msgstr "A4 (Kecil)"
+
+#: ppdc/sample.c:18
+msgid "A5"
+msgstr "A5"
+
+#: ppdc/sample.c:19
+msgid "A5 (Oversize)"
+msgstr "A5 (Besar)"
+
+#: ppdc/sample.c:20
+msgid "A6"
+msgstr "A6"
+
+#: ppdc/sample.c:21
+msgid "A7"
+msgstr "A7"
+
+#: ppdc/sample.c:22
+msgid "A8"
+msgstr "A8"
+
+#: ppdc/sample.c:23
+msgid "A9"
+msgstr "A9"
+
+#: ppdc/sample.c:25
+msgid "ANSI A"
+msgstr "ANSI A"
+
+#: ppdc/sample.c:26
+msgid "ANSI B"
+msgstr "ANSI B"
+
+#: ppdc/sample.c:27
+msgid "ANSI C"
+msgstr "ANSI C"
+
+#: ppdc/sample.c:28
+msgid "ANSI D"
+msgstr "ANSI D"
+
+#: ppdc/sample.c:29
+msgid "ANSI E"
+msgstr "ANSI E"
+
+#: ppdc/sample.c:30
+msgid "ARCH A"
+msgstr "ARCH A"
+
+#: ppdc/sample.c:31
+msgid "ARCH B"
+msgstr "ARCH B"
+
+#: ppdc/sample.c:32
+msgid "ARCH C"
+msgstr "ARCH C"
+
+#: ppdc/sample.c:33
+msgid "ARCH D"
+msgstr "ARCH D"
+
+#: ppdc/sample.c:34
+msgid "ARCH E"
+msgstr "ARCH E"
+
+#: cgi-bin/classes.c:154 cgi-bin/printers.c:157
+msgid "Accept Jobs"
+msgstr "Terima Tugas"
+
+#: cups/http-support.c:1196
+msgid "Accepted"
+msgstr "Diterima"
+
+#: cgi-bin/admin.c:480
+msgid "Add Class"
+msgstr "Tambah Kelas"
+
+#: cgi-bin/admin.c:778
+msgid "Add Printer"
+msgstr "Tambah Pencetak"
+
+#: cgi-bin/admin.c:355 cgi-bin/admin.c:388 cgi-bin/admin.c:436
+#: cgi-bin/admin.c:446
+msgid "Add RSS Subscription"
+msgstr "Tambah Subskripsi RSS"
+
+#: ppdc/sample.c:126
+msgid "Address"
+msgstr "Alamat"
+
+#: ppdc/sample.c:135
+msgid "Address - 1 1/8 x 3 1/2\""
+msgstr "Alamat - 1 1/8 x 3 1/2\""
+
+#: cgi-bin/admin.c:187 cgi-bin/admin.c:218 cgi-bin/admin.c:2761
+msgid "Administration"
+msgstr "Administrasi"
+
+#: ppdc/sample.c:400
+msgid "Always"
+msgstr "Selalu"
+
+#: backend/socket.c:126
+msgid "AppSocket/HP JetDirect"
+msgstr "AppSocket/HP JetDirect"
+
+#: ppdc/sample.c:421
+msgid "Applicator"
+msgstr "Aplikator"
+
+#: scheduler/ipp.c:1135
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d!"
+msgstr ""
+
+#: scheduler/ipp.c:341
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)!"
+msgstr "Kelompok atribut di luar jangkauan (%x < %x)!"
+
+#: ppdc/sample.c:35
+msgid "B0"
+msgstr "B0"
+
+#: ppdc/sample.c:37
+msgid "B1"
+msgstr "B1"
+
+#: ppdc/sample.c:36
+msgid "B10"
+msgstr "B10"
+
+#: ppdc/sample.c:38
+msgid "B2"
+msgstr "B2"
+
+#: ppdc/sample.c:39
+msgid "B3"
+msgstr "B3"
+
+#: ppdc/sample.c:40
+msgid "B4"
+msgstr "B4"
+
+#: ppdc/sample.c:41
+msgid "B5"
+msgstr "B5"
+
+#: ppdc/sample.c:42
+msgid "B6"
+msgstr "B6"
+
+#: ppdc/sample.c:43
+msgid "B7"
+msgstr "B7"
+
+#: ppdc/sample.c:44
+msgid "B8"
+msgstr "B8"
+
+#: ppdc/sample.c:45
+msgid "B9"
+msgstr "B9"
+
+#: cups/dest.c:317
+msgid "Bad NULL dests pointer"
+msgstr ""
+
+#: cups/ppd.c:342
+msgid "Bad OpenGroup"
+msgstr "OpenGroup Jelek"
+
+#: cups/ppd.c:344
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "OpenUI/JCLOpenUI Jelek"
+
+#: cups/ppd.c:346
+msgid "Bad OrderDependency"
+msgstr "OrderDependency Jelek"
+
+#: cups/http-support.c:1211
+msgid "Bad Request"
+msgstr "Permintaan Jelek"
+
+#: cups/snmp.c:1003
+msgid "Bad SNMP version number"
+msgstr "Nomor versi SNMP jelek"
+
+#: cups/ppd.c:347
+msgid "Bad UIConstraints"
+msgstr "UIConstraints Jelek"
+
+#: scheduler/ipp.c:1433
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Nilai rangkap %d jelek."
+
+#: cups/ppd.c:355
+msgid "Bad custom parameter"
+msgstr "Parameter ubahan jelek"
+
+#: cups/http-support.c:1339
+#, c-format
+msgid "Bad device URI \"%s\"!\n"
+msgstr "URI perangkat \"%s\" jelek!\n"
+
+#: scheduler/ipp.c:2508
+#, c-format
+msgid "Bad device-uri \"%s\"!"
+msgstr "device-uri \"%s\" jelek!"
+
+#: scheduler/ipp.c:2548
+#, c-format
+msgid "Bad device-uri scheme \"%s\"!"
+msgstr "Skema device-uri \"%s\" jelek!"
+
+#: scheduler/ipp.c:9835 scheduler/ipp.c:11314
+#, c-format
+msgid "Bad document-format \"%s\"!"
+msgstr "document-format \"%s\" jelek!"
+
+#: cups/util.c:930
+msgid "Bad filename buffer!"
+msgstr "Nama berkas penyangga jelek!"
+
+#: ppdc/ppdc-import.cxx:265
+#, c-format
+msgid "Bad font attribute: %s\n"
+msgstr "Atribut huruf jelek: %s\n"
+
+#: scheduler/ipp.c:10431
+msgid "Bad job-priority value!"
+msgstr "Nilai job-priority jelek!"
+
+#: scheduler/ipp.c:1463
+#, c-format
+msgid "Bad job-sheets value \"%s\"!"
+msgstr "Nilai job-sheets \"%s\" jelek!"
+
+#: scheduler/ipp.c:1447
+msgid "Bad job-sheets value type!"
+msgstr "Jenis nilai job-sheets jelek!"
+
+#: scheduler/ipp.c:10461
+msgid "Bad job-state value!"
+msgstr "Nilai job-state jelek!"
+
+#: scheduler/ipp.c:3663 scheduler/ipp.c:4022 scheduler/ipp.c:6650
+#: scheduler/ipp.c:6792 scheduler/ipp.c:8067 scheduler/ipp.c:8322
+#: scheduler/ipp.c:9166 scheduler/ipp.c:9392 scheduler/ipp.c:9747
+#: scheduler/ipp.c:10323
+#, c-format
+msgid "Bad job-uri attribute \"%s\"!"
+msgstr "Atribut job-uri \"%s\" jelek!"
+
+#: scheduler/ipp.c:2129 scheduler/ipp.c:6197
+#, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "notify-pull-method \"%s\" jelek!"
+
+#: scheduler/ipp.c:2093 scheduler/ipp.c:6161
+#, c-format
+msgid "Bad notify-recipient-uri URI \"%s\"!"
+msgstr "URI notify-recipient-uri \"%s\" jelek!"
+
+#: scheduler/ipp.c:1479
+#, c-format
+msgid "Bad number-up value %d."
+msgstr "Nilai number-up %d jelek."
+
+#: cups/adminutil.c:303
+#, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Opsi + yang dipilih pada baris %d jelek!"
+
+#: scheduler/ipp.c:1496
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Nilai page-ranges %d-%d jelek."
+
+#: scheduler/ipp.c:2592
+#, c-format
+msgid "Bad port-monitor \"%s\"!"
+msgstr "port-monitor \"%s\" jelek!"
+
+#: scheduler/ipp.c:2640
+#, c-format
+msgid "Bad printer-state value %d!"
+msgstr "Nilai printer-state %d jelek!"
+
+#: scheduler/ipp.c:309
+#, c-format
+msgid "Bad request ID %d!"
+msgstr "ID permintaan %d jelek!"
+
+#: scheduler/ipp.c:294
+#, c-format
+msgid "Bad request version number %d.%d!"
+msgstr ""
+
+#: cgi-bin/admin.c:1385
+msgid "Bad subscription ID!"
+msgstr "ID subskripsi jelek!"
+
+#: cgi-bin/admin.c:3301 cgi-bin/admin.c:3524
+msgid "Banners"
+msgstr "Pataka"
+
+#: filter/bannertops.c:666
+msgid "Billing Information: "
+msgstr "Informasi Tagihan: "
+
+#: ppdc/sample.c:258
+msgid "Bond Paper"
+msgstr "Kertas Surat"
+
+#: ppdc/sample.c:56
+msgid "C0 Envelope"
+msgstr "C0 Amplop"
+
+#: ppdc/sample.c:57
+msgid "C1 Envelope"
+msgstr "C1 Amplop"
+
+#: ppdc/sample.c:58
+msgid "C2 Envelope"
+msgstr "C2 Amplop"
+
+#: ppdc/sample.c:59
+msgid "C3 Envelope"
+msgstr "C3 Amplop"
+
+#: ppdc/sample.c:46
+msgid "C4"
+msgstr "C4"
+
+#: ppdc/sample.c:60
+msgid "C4 Envelope"
+msgstr "C4 Amplop"
+
+#: ppdc/sample.c:47
+msgid "C5"
+msgstr "C5"
+
+#: ppdc/sample.c:61
+msgid "C5 Envelope"
+msgstr "C5 Amplop"
+
+#: ppdc/sample.c:48
+msgid "C6"
+msgstr "C6"
+
+#: ppdc/sample.c:63
+msgid "C6 Envelope"
+msgstr "C6 Amplop"
+
+#: ppdc/sample.c:62
+msgid "C65 Envelope"
+msgstr "C65 Amplop"
+
+#: ppdc/sample.c:64
+msgid "C7 Envelope"
+msgstr "C7 Amplop"
+
+#: ppdc/sample.c:226
+msgid "CMYK"
+msgstr "CMYK"
+
+#: ppdc/sample.c:334
+msgid "CPCL Label Printer"
+msgstr ""
+
+#: cgi-bin/admin.c:1386 cgi-bin/admin.c:1425 cgi-bin/admin.c:1435
+msgid "Cancel RSS Subscription"
+msgstr "Batal Subskripsi RSS"
+
+#: cgi-bin/admin.c:1608 cgi-bin/admin.c:1772 cgi-bin/admin.c:1784
+#: cgi-bin/admin.c:1795
+msgid "Change Settings"
+msgstr "Ubah Pengaturan"
+
+#: scheduler/ipp.c:2141 scheduler/ipp.c:6209
+#, c-format
+msgid "Character set \"%s\" not supported!"
+msgstr "Set karakter \"%s\" tidak didukung!"
+
+#: ppdc/sample.c:65
+msgid "Chou3 Envelope"
+msgstr "Chou3 Amplop"
+
+#: ppdc/sample.c:66
+msgid "Chou4 Envelope"
+msgstr "Chou4 Amplop"
+
+#: cgi-bin/classes.c:180 cgi-bin/classes.c:307
+msgid "Classes"
+msgstr "Kelas"
+
+#: cgi-bin/printers.c:167
+msgid "Clean Print Heads"
+msgstr "Bersihkan Kepala Pencetak"
+
+#: ppdc/sample.c:253
+msgid "Color"
+msgstr "Warna"
+
+#: ppdc/sample.c:225
+msgid "Color Mode"
+msgstr "Modus Warna"
+
+#: berkeley/lpc.c:209
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?\n"
+msgstr ""
+"Perintah bisa saja singkat.  Perintahnya:\n"
+"\n"
+"exit    help    quit    status  ?\n"
+
+#: cups/snmp.c:1007
+msgid "Community name uses indefinite length"
+msgstr "Nama komunitas memiliki panjang tak terdefinisi"
+
+#: cups/http-support.c:1184
+msgid "Continue"
+msgstr "Lanjut"
+
+#: ppdc/sample.c:336
+msgid "Continuous"
+msgstr "Terus-menerus"
+
+#: scheduler/ipp.c:8616 scheduler/ipp.c:8632 scheduler/ipp.c:9851
+#, c-format
+msgid "Could not scan type \"%s\"!"
+msgstr "Tidak akan memindai jenis \"%s\"!"
+
+#: cups/localize.c:319
+msgid "Cover open."
+msgstr "Penutup terbuka."
+
+#: cups/http-support.c:1193
+msgid "Created"
+msgstr "Dibuat"
+
+#: filter/bannertops.c:854
+msgid "Created On: "
+msgstr "Dibuat Pada: "
+
+#: cups/ppd.c:1072 cups/ppd.c:1112 cups/ppd.c:1326 cups/ppd.c:1429
+msgid "Custom"
+msgstr "Ubahan"
+
+#: ppdc/sample.c:330
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+#: ppdc/sample.c:328
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+#: ppdc/sample.c:314
+msgid "Cut"
+msgstr "Potong"
+
+#: ppdc/sample.c:422
+msgid "Cutter"
+msgstr "Pemotong"
+
+#: ppdc/sample.c:49
+msgid "DL"
+msgstr "DL"
+
+#: ppdc/sample.c:67
+msgid "DL Envelope"
+msgstr "DL Amplop"
+
+#: ppdc/sample.c:211
+msgid "Dark"
+msgstr "Gelap"
+
+#: ppdc/sample.c:207
+msgid "Darkness"
+msgstr "Gelap"
+
+#: cgi-bin/admin.c:2068 cgi-bin/admin.c:2079 cgi-bin/admin.c:2124
+msgid "Delete Class"
+msgstr "Hapus Kelas"
+
+#: cgi-bin/admin.c:2153 cgi-bin/admin.c:2164 cgi-bin/admin.c:2209
+msgid "Delete Printer"
+msgstr "Hapus Pencetak"
+
+#: filter/bannertops.c:735
+msgid "Description: "
+msgstr "Deskripsi: "
+
+#: ppdc/sample.c:252
+msgid "DeskJet Series"
+msgstr "Seri Deskjet"
+
+#: scheduler/ipp.c:1399
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "Tujuan \"%s\" bukanlah tugas yang diterima."
+
+#: cups/localize.c:353
+msgid "Developer almost empty."
+msgstr "Developer hampir kosong."
+
+#: cups/localize.c:355
+msgid "Developer empty!"
+msgstr "Developer kosong!"
+
+#: systemv/lpinfo.c:305
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s\n"
+msgstr ""
+"Perangkat: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s\n"
+
+#: ppdc/sample.c:407
+msgid "Direct Thermal Media"
+msgstr "Media Termal Langsung"
+
+#: ppdc/sample.c:316
+msgid "Disabled"
+msgstr "Dinonaktifkan"
+
+#: scheduler/ipp.c:6697
+#, c-format
+msgid "Document %d not found in job %d."
+msgstr "Dokumen %d tidak ditemukan di tugas %d."
+
+#: cups/localize.c:323
+msgid "Door open."
+msgstr "Pintu terbuka."
+
+#: ppdc/sample.c:50
+msgid "Double Postcard"
+msgstr "Kartu Pos Ganda"
+
+#: filter/bannertops.c:820
+msgid "Driver Name: "
+msgstr "Nama Penggerak: "
+
+#: filter/bannertops.c:831
+msgid "Driver Version: "
+msgstr "Versi Penggerak: "
+
+#: ppdc/sample.c:247
+msgid "Duplexer"
+msgstr "Pendupleks"
+
+#: ppdc/sample.c:201
+msgid "Dymo"
+msgstr "Dymo"
+
+#: filter/pstops.c:446
+#, c-format
+msgid "EMERG: Unable to allocate memory for page info: %s\n"
+msgstr "EMERG: Tidak bisa mengalokasikan memori untuk halaman info: %s\n"
+
+#: filter/pstops.c:438
+#, c-format
+msgid "EMERG: Unable to allocate memory for pages array: %s\n"
+msgstr "EMERG: Tidak bisa mengalokasikan memori untuk larik halaman: %s\n"
+
+#: ppdc/sample.c:402
+msgid "EPL1 Label Printer"
+msgstr "EPL1 Pencetak Label"
+
+#: ppdc/sample.c:405
+msgid "EPL2 Label Printer"
+msgstr "EPL2 Pencetak Label"
+
+#: driver/rastertoescpx.c:1776 driver/rastertopclx.c:1801
+#, c-format
+msgid "ERROR: %s job-id user title copies options [file]\n"
+msgstr ""
+
+#: filter/pstops.c:707
+#, c-format
+msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
+msgstr ""
+
+#: filter/pstops.c:2220
+#, c-format
+msgid "ERROR: Bad %%IncludeFeature: comment!\n"
+msgstr ""
+
+#: filter/pstops.c:1286 filter/pstops.c:1292
+#, c-format
+msgid "ERROR: Bad %%Page: comment in file!\n"
+msgstr ""
+
+#: filter/pstops.c:1363
+#, c-format
+msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
+msgstr ""
+
+#: backend/scsi-irix.c:100 backend/scsi-linux.c:114
+#, c-format
+msgid "ERROR: Bad SCSI device file \"%s\"!\n"
+msgstr "ERROR: Berkas perangkat SCSI \"%s\" jelek!\n"
+
+#: filter/pstext.c:276 filter/texttops.c:284 filter/texttops.c:295
+#, c-format
+msgid "ERROR: Bad charset file %s\n"
+msgstr "ERROR: Berkas set karakter %s jelek\n"
+
+#: filter/texttops.c:453
+#, c-format
+msgid "ERROR: Bad charset type %s\n"
+msgstr "ERROR: Jenis set karakter %s jelek\n"
+
+#: filter/textcommon.c:613
+#, c-format
+msgid "ERROR: Bad columns value %d!\n"
+msgstr "ERROR: Nilai kolom %d jelek!\n"
+
+#: filter/textcommon.c:624
+#, c-format
+msgid "ERROR: Bad cpi value %f!\n"
+msgstr "ERROR: Nilai cpi %f jelek!\n"
+
+#: filter/pstext.c:320 filter/pstext.c:357 filter/texttops.c:348
+#: filter/texttops.c:384
+#, c-format
+msgid "ERROR: Bad font description line: %s\n"
+msgstr "ERROR: Baris deskripsi huruf: %s jelek\n"
+
+#: filter/textcommon.c:635
+#, c-format
+msgid "ERROR: Bad lpi value %f!\n"
+msgstr "ERROR: Nilai lpi %f jelek!\n"
+
+#: filter/imagetoraster.c:458
+msgid "ERROR: Bad page setup!\n"
+msgstr "ERROR: Pengaturan halaman jelek!\n"
+
+#: filter/pstext.c:334 filter/texttops.c:361
+#, c-format
+msgid "ERROR: Bad text direction %s\n"
+msgstr "ERROR: Arah teks %s jelek\n"
+
+#: filter/pstext.c:371 filter/texttops.c:397
+#, c-format
+msgid "ERROR: Bad text width %s\n"
+msgstr "ERROR: Lebar teks %s jelek\n"
+
+#: backend/ipp.c:749
+msgid "ERROR: Destination printer does not exist!\n"
+msgstr "ERROR: Pencetak yang dituju tidak ada!\n"
+
+#: filter/pstops.c:696
+#, c-format
+msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
+msgstr ""
+
+#: filter/pstops.c:648
+#, c-format
+msgid "ERROR: Duplicate %%Pages: comment seen!\n"
+msgstr ""
+
+#: backend/ipp.c:468 filter/pstops.c:303
+msgid "ERROR: Empty print file!\n"
+msgstr "ERROR: Mencetak berkas kosong!\n"
+
+#: backend/pap.c:838
+#, c-format
+msgid "ERROR: Error %d sending PAPSendData request: %s\n"
+msgstr "ERROR: Kesalahan %d mengirim permintaan PAPSendData: %s\n"
+
+#: ppdc/ppdc-catalog.cxx:338 ppdc/ppdc-catalog.cxx:350
+#, c-format
+msgid "ERROR: Expected quoted string on line %d of %s!\n"
+msgstr ""
+
+#: backend/usb-darwin.c:377 backend/usb-darwin.c:435 backend/usb-darwin.c:500
+#: backend/usb-darwin.c:518
+msgid "ERROR: Fatal USB error!\n"
+msgstr "ERROR: Kesalahan fatal USB!\n"
+
+#: filter/hpgl-input.c:139
+msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
+msgstr "ERROR: Ketidaksahan HP-GL/2 komentar terlihat, tak bisa mencetak berkas!\n"
+
+#: filter/pstops.c:1771
+#, c-format
+msgid "ERROR: Missing %%EndProlog!\n"
+msgstr ""
+
+#: filter/pstops.c:1842
+#, c-format
+msgid "ERROR: Missing %%EndSetup!\n"
+msgstr ""
+
+#: filter/bannertops.c:222
+#, c-format
+msgid "ERROR: Missing value on line %d of banner file!\n"
+msgstr "ERROR: Kehilangan nilai pada baris %d dari berkas pataka (banner)!\n"
+
+#: ppdc/ppdc-catalog.cxx:415
+#, c-format
+msgid "ERROR: Need a msgid line before any translation strings on line %d of %s!\n"
+msgstr "ERROR: Memerlukan baris msgid sebelum string translasi pada baris %d dari %s!\n"
+
+#: filter/pstops.c:759
+#, c-format
+msgid "ERROR: No %%BoundingBox: comment in header!\n"
+msgstr ""
+
+#: filter/pstops.c:762
+#, c-format
+msgid "ERROR: No %%Pages: comment in header!\n"
+msgstr ""
+
+#: backend/usb.c:200
+msgid ""
+"ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
+"variable!\n"
+msgstr ""
+"ERROR: Tak ditemukan URI perangkat pada argv[0] atau dalam variabel "
+"lingkungan DEVICE_URI!\n"
+
+#: filter/pstext.c:433
+#, c-format
+msgid "ERROR: No fonts in charset file %s\n"
+msgstr "ERROR: Tidak ada huruf pada berkas set karakter %s\n"
+
+#: driver/rastertoescpx.c:1906 driver/rastertopclx.c:1931
+#: filter/rastertoepson.c:1129 filter/rastertohp.c:857
+#: filter/rastertolabel.c:1283
+msgid "ERROR: No pages found!\n"
+msgstr "ERROR: Tidak ketemu halaman!\n"
+
+#: backend/runloop.c:348
+msgid "ERROR: Out of paper!\n"
+msgstr "ERROR: Kehabisan kertas!\n"
+
+#: backend/ipp.c:1754
+msgid "ERROR: PRINTER environment variable not defined!\n"
+msgstr "ERROR: Variabel lingkungan PRINTER belum ditentukan!\n"
+
+#: backend/ipp.c:1066
+#, c-format
+msgid "ERROR: Print file was not accepted (%s)!\n"
+msgstr "ERROR: Berkas cetak tidak diterima (%s)!\n"
+
+#: backend/pap.c:521
+msgid "ERROR: Printer not responding\n"
+msgstr "ERROR: Pencetak tidak merespon\n"
+
+#: backend/ipp.c:581 backend/ipp.c:716 backend/lpd.c:848 backend/socket.c:310
+msgid "ERROR: Printer not responding!\n"
+msgstr "ERROR: Pencetak tidak merespon!\n"
+
+#: backend/pap.c:858
+msgid "ERROR: Printer sent unexpected EOF\n"
+msgstr "ERROR: Pencetak mengirim EOF yang tak diharapkan\n"
+
+#: backend/lpd.c:1052 backend/lpd.c:1199
+#, c-format
+msgid "ERROR: Remote host did not accept control file (%d)\n"
+msgstr "ERROR: Host jarak jauh tidak menerima berkas kontrol (%d)\n"
+
+#: backend/lpd.c:1147
+#, c-format
+msgid "ERROR: Remote host did not accept data file (%d)\n"
+msgstr "ERROR: Host jarak jauh tidak menerima data berkas (%d)\n"
+
+#: backend/pap.c:1694
+msgid "ERROR: There was a timeout error while sending data to the printer\n"
+msgstr "ERROR: Kehabisan waktu saat mengirim data ke pencetak\n"
+
+#: backend/ipp.c:1145
+#, c-format
+msgid "ERROR: Unable to add file %d to job: %s\n"
+msgstr "ERROR: Tidak bisa menambah berkas %d untuk tugas: %s\n"
+
+#: backend/ipp.c:1383
+#, c-format
+msgid "ERROR: Unable to cancel job %d: %s\n"
+msgstr "ERROR: Tidak bisa membatalkan tugas %d: %s\n"
+
+#: filter/pdftops.c:136
+msgid "ERROR: Unable to copy PDF file"
+msgstr "ERROR: Tidak bisa menyalin berkas PPD"
+
+#: filter/pdftops.c:412
+msgid "ERROR: Unable to create pipe"
+msgstr "ERROR: Tidak bisa membuat pipa"
+
+#: backend/lpd.c:772
+msgid "ERROR: Unable to create socket"
+msgstr "ERROR: Tidak bisa membuat soket"
+
+#: backend/ipp.c:1476
+#, c-format
+msgid "ERROR: Unable to create temporary compressed print file: %s\n"
+msgstr "ERROR: Tidak bisa membuat berkas cetak berkompresi temporer: %s\n"
+
+#: backend/ipp.c:431 backend/ipp.c:1776 backend/lpd.c:446 filter/pstops.c:2719
+#: scheduler/cupsfilter.c:1121 systemv/lpadmin.c:1453 systemv/lpadmin.c:1842
+msgid "ERROR: Unable to create temporary file"
+msgstr "ERROR: Tidak bisa membuat berkas temporer"
+
+#: backend/ipp.c:1831
+#, c-format
+msgid "ERROR: Unable to exec pictwpstops: %s\n"
+msgstr "ERROR: Tidak bisa mengeksekusi pictwpstops: %s\n"
+
+#: filter/pdftops.c:433 filter/pdftops.c:447
+msgid "ERROR: Unable to execute gs program"
+msgstr "ERROR: Tidak bisa mengeksekusi program gs"
+
+#: filter/pdftops.c:430 filter/pdftops.c:445
+msgid "ERROR: Unable to execute pdftops program"
+msgstr "ERROR: Tidak bisa mengeksekusi program pdftops"
+
+#: filter/pdftops.c:467 filter/pdftops.c:477
+msgid "ERROR: Unable to execute pstops program"
+msgstr "ERROR: Tidak bisa mengeksekusi program pstops"
+
+#: backend/ipp.c:1844
+#, c-format
+msgid "ERROR: Unable to fork pictwpstops: %s\n"
+msgstr ""
+
+#: backend/pap.c:712
+msgid "ERROR: Unable to get PAP request"
+msgstr "ERROR: Tidak bisa memperoleh permintaan PAP"
+
+#: backend/pap.c:701
+msgid "ERROR: Unable to get PAP response"
+msgstr "ERROR: Tidak bisa memperoleh respon PAP"
+
+#: backend/ipp.c:1761
+#, c-format
+msgid "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"
+msgstr "ERROR: Tidak bisa memperoleh berkas PPD untuk pencetak \"%s\" - %s.\n"
+
+#: backend/pap.c:302
+msgid "ERROR: Unable to get default AppleTalk zone"
+msgstr "ERROR: Tidak bisa memperoleh zona baku AppleTalk"
+
+#: backend/ipp.c:1232
+#, c-format
+msgid "ERROR: Unable to get job %d attributes (%s)!\n"
+msgstr "ERROR: Tidak bisa memperoleh atribut tugas %d (%s)!\n"
+
+#: backend/ipp.c:759
+#, c-format
+msgid "ERROR: Unable to get printer status (%s)!\n"
+msgstr "ERROR: Tidak bisa memperoleh status pencetak (%s)!\n"
+
+#: backend/ipp.c:422 backend/ipp.c:599 backend/lpd.c:437 backend/lpd.c:705
+#: backend/socket.c:268
+#, c-format
+msgid "ERROR: Unable to locate printer '%s'!\n"
+msgstr "ERROR: Tidak bisa menentukan lokasi pencetak '%s'!\n"
+
+#: backend/pap.c:688
+msgid "ERROR: Unable to look for PAP response"
+msgstr ""
+
+#: backend/pap.c:322
+msgid "ERROR: Unable to lookup AppleTalk printers"
+msgstr ""
+
+#: backend/pap.c:451
+msgid "ERROR: Unable to make AppleTalk address"
+msgstr "ERROR: Tidak bisa membuat alamat AppleTalk"
+
+#: filter/pstext.c:247 filter/texttops.c:248
+#, c-format
+msgid "ERROR: Unable to open \"%s\" - %s\n"
+msgstr "ERROR: Tidak bisa membuka \"%s\" - %s\n"
+
+#: filter/pstext.c:264 filter/texttops.c:268
+#, c-format
+msgid "ERROR: Unable to open %s: %s\n"
+msgstr "ERROR: Tidak bisa membuka %s: %s\n"
+
+#: driver/rastertoescpx.c:1791 driver/rastertopclx.c:1816
+msgid "ERROR: Unable to open PPD file!\n"
+msgstr "ERROR: Tidak bisa membuka berkas PPD!\n"
+
+#: filter/bannertops.c:184
+#, c-format
+msgid "ERROR: Unable to open banner file \"%s\" - %s\n"
+msgstr ""
+
+#: backend/parallel.c:249 backend/scsi-irix.c:140 backend/scsi-linux.c:154
+#: backend/serial.c:262 backend/usb-unix.c:146
+#, c-format
+msgid "ERROR: Unable to open device file \"%s\": %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas perangkat \"%s\": %s\n"
+
+#: filter/pstops.c:291
+#, c-format
+msgid "ERROR: Unable to open file \"%s\" - %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas \"%s\" - %s\n"
+
+#: filter/gziptoany.c:74
+#, c-format
+msgid "ERROR: Unable to open file \"%s\": %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas \"%s\": %s\n"
+
+#: filter/imagetops.c:313 filter/imagetoraster.c:635
+msgid "ERROR: Unable to open image file for printing!\n"
+msgstr "ERROR: Tidak bisa membuka berkas gambar untuk mencetak!\n"
+
+#: backend/ipp.c:1492 backend/pap.c:249 backend/parallel.c:151
+#: backend/scsi.c:181 backend/serial.c:189 backend/socket.c:156
+#, c-format
+msgid "ERROR: Unable to open print file \"%s\": %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas cetak \"%s\": %s\n"
+
+#: backend/usb.c:237
+#, c-format
+msgid "ERROR: Unable to open print file %s - %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas cetak %s - %s\n"
+
+#: backend/lpd.c:487
+#, c-format
+msgid "ERROR: Unable to open print file %s: %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas cetak %s: %s\n"
+
+#: driver/rastertoescpx.c:1806 driver/rastertopclx.c:1831
+#: filter/rastertoepson.c:1001 filter/rastertohp.c:726
+#: filter/rastertolabel.c:1148
+#, c-format
+msgid "ERROR: Unable to open raster file - %s\n"
+msgstr ""
+
+#: backend/ipp.c:1484
+#, c-format
+msgid "ERROR: Unable to open temporary compressed print file: %s\n"
+msgstr "ERROR: Tidak bisa membuka berkas cetak temporer berkompresi: %s\n"
+
+#: filter/texttops.c:200
+#, c-format
+msgid "ERROR: Unable to print %d text columns!\n"
+msgstr ""
+
+#: filter/texttops.c:179
+#, c-format
+msgid "ERROR: Unable to print %dx%d text page!\n"
+msgstr ""
+
+#: backend/serial.c:615
+msgid "ERROR: Unable to read print data"
+msgstr "ERROR: Tidak bisa membaca data yang hendak dicetak"
+
+#: backend/usb-darwin.c:602 backend/usb-darwin.c:644
+msgid "ERROR: Unable to read print data!\n"
+msgstr "ERROR: Tidak bisa membaca data yang hendak dicetak!\n"
+
+#: backend/lpd.c:789
+msgid "ERROR: Unable to reserve port"
+msgstr ""
+
+#: filter/pstops.c:563
+#, c-format
+msgid "ERROR: Unable to seek to offset %ld in file - %s\n"
+msgstr "ERROR: Tidak bisa mencari letak %ld dalam berkas - %s\n"
+
+#: filter/pstops.c:561
+#, c-format
+msgid "ERROR: Unable to seek to offset %lld in file - %s\n"
+msgstr "ERROR: Tidak bisa mencari letak %lld dalam berkas - %s\n"
+
+#: backend/lpd.c:603
+msgid "ERROR: Unable to send LPD command"
+msgstr "ERROR: Tidak bisa mengirim perintah LPD"
+
+#: backend/pap.c:571
+msgid "ERROR: Unable to send PAP tickle request"
+msgstr ""
+
+#: backend/pap.c:580
+msgid "ERROR: Unable to send initial PAP send data request"
+msgstr ""
+
+#: backend/scsi-irix.c:219 backend/scsi-linux.c:237
+#, c-format
+msgid "ERROR: Unable to send print data (%d)\n"
+msgstr "ERROR: Tidak bisa mengirim data yang hendak dicetak (%d)\n"
+
+#: backend/usb-darwin.c:720
+msgid "ERROR: Unable to send print data!\n"
+msgstr "ERROR: Tidak bisa mengirim data yang hendak dicetak!\n"
+
+#: backend/lpd.c:1103
+msgid "ERROR: Unable to send print file to printer"
+msgstr "ERROR: Tidak bisa mengirim data ke pencetak"
+
+#: backend/lpd.c:1117
+msgid "ERROR: Unable to send trailing nul to printer"
+msgstr ""
+
+#: backend/ipp.c:1857
+#, c-format
+msgid "ERROR: Unable to wait for pictwpstops: %s\n"
+msgstr "ERROR: Tidak bisa menunggu pictwpstops: %s\n"
+
+#: backend/ipp.c:1503
+#, c-format
+msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
+msgstr "ERROR: Tidak bisa menulis %d bita ke \"%s\": %s\n"
+
+#: backend/usb-libusb.c:169 backend/usb-libusb.c:765
+#, c-format
+msgid "ERROR: Unable to write %d bytes to printer!\n"
+msgstr "ERROR: Tidak bisa menulis %d bita ke pencetak!\n"
+
+#: backend/lpd.c:1033 backend/lpd.c:1180
+msgid "ERROR: Unable to write control file"
+msgstr "ERROR: Tidak bisa menulis berkas kontrol"
+
+#: backend/serial.c:691
+msgid "ERROR: Unable to write print data"
+msgstr "ERROR: Tidak bisa menulis data yang hendak dicetak"
+
+#: backend/runloop.c:122 backend/runloop.c:363
+#, c-format
+msgid "ERROR: Unable to write print data: %s\n"
+msgstr "ERROR: Tidak bisa menulis data yang hendak dicetak: %s\n"
+
+#: filter/imagetoraster.c:1197 filter/imagetoraster.c:1293
+#: filter/imagetoraster.c:1333
+msgid "ERROR: Unable to write raster data to driver!\n"
+msgstr ""
+
+#: backend/ipp.c:443 backend/lpd.c:456
+msgid "ERROR: Unable to write to temporary file"
+msgstr "ERROR: Tidak bisa menulis di berkas temporer"
+
+#: filter/gziptoany.c:96
+#, c-format
+msgid "ERROR: Unable to write uncompressed document data: %s\n"
+msgstr ""
+
+#: ppdc/ppdc-catalog.cxx:432
+#, c-format
+msgid "ERROR: Unexpected text on line %d of %s!\n"
+msgstr "ERROR: Teks tak diharapkan pada baris %d dari %s!\n"
+
+#: backend/ipp.c:346
+#, c-format
+msgid "ERROR: Unknown encryption option value \"%s\"!\n"
+msgstr "ERROR: Nilai opsi enkripsi \"%s\" tak dikenal!\n"
+
+#: backend/lpd.c:354
+#, c-format
+msgid "ERROR: Unknown file order \"%s\"\n"
+msgstr "ERROR: Urutan berkas \"%s\" tak dikenal\n"
+
+#: backend/lpd.c:326
+#, c-format
+msgid "ERROR: Unknown format character \"%c\"\n"
+msgstr "ERROR: Format karakter \"%c\" tak dikenal\n"
+
+#: ppdc/ppdc-catalog.cxx:460
+#, c-format
+msgid "ERROR: Unknown message catalog format for \"%s\"!\n"
+msgstr "ERROR: Format katalog pesan \"%s\" tak dikenal!\n"
+
+#: backend/ipp.c:392
+#, c-format
+msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
+msgstr "ERROR: Opsi \"%s\" dengan nilai \"%s\" tak dikenal!\n"
+
+#: backend/lpd.c:340
+#, c-format
+msgid "ERROR: Unknown print mode \"%s\"\n"
+msgstr "ERROR: Modus cetak \"%s\" tak dikenal\n"
+
+#: backend/ipp.c:363
+#, c-format
+msgid "ERROR: Unknown version option value \"%s\"!\n"
+msgstr "ERROR: Nilai opsi versi \"%s\" tak dikenal!\n"
+
+#: filter/pstops.c:2418
+#, c-format
+msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
+msgstr "ERROR: Nilai kecerahan %s tak didukung, gunakanlah brightness=100!\n"
+
+#: filter/pstops.c:2487
+#, c-format
+msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
+msgstr "ERROR: Nilai gama %s tak didukung, gunakanlah gamma=1000!\n"
+
+#: filter/pstops.c:2541
+#, c-format
+msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
+msgstr "ERROR: Nilai number-up %d tak didukung, gunakanlah number-up=1!\n"
+
+#: filter/pstops.c:2574
+#, c-format
+msgid "ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
+msgstr ""
+"ERROR: Nilai number-up-layout %s tak didukung, gunakanlah number-up-"
+"layout=lrtb!\n"
+
+#: filter/pstops.c:2624
+#, c-format
+msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
+msgstr "ERROR: Nilai page-border %s tak didukung, gunakanlah page-border=none!\n"
+
+#: filter/pstops.c:2090
+#, c-format
+msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
+msgstr "ERROR: Kelebihan doc_printf (%d bita) terdeteksi, dibatalkan!\n"
+
+#: backend/ipp.c:1876
+#, c-format
+msgid "ERROR: pictwpstops exited on signal %d!\n"
+msgstr "ERROR: pictwpstops tertutup pada sinyal %d!\n"
+
+#: backend/ipp.c:1873
+#, c-format
+msgid "ERROR: pictwpstops exited with status %d!\n"
+msgstr "ERROR: pictwpstops tertutup dengan status %d!\n"
+
+#: backend/ipp.c:609 backend/lpd.c:877 backend/socket.c:333
+msgid ""
+"ERROR: recoverable: Unable to connect to printer; will retry in 30 "
+"seconds...\n"
+msgstr ""
+"ERROR: pemulihan: Tidak bisa menghubungi pencetak; akan mencoba ulang dalam 30 "
+"detik...\n"
+
+#: backend/pap.c:629
+msgid "ERROR: select() failed"
+msgstr "ERROR: select() gagal"
+
+#: backend/lpd.c:940
+msgid "ERROR: unable to stat print file"
+msgstr "ERROR: tak dapat memulai berkas yang hendak dicetak"
+
+#: cgi-bin/admin.c:1823 cgi-bin/admin.c:1835 cgi-bin/admin.c:1889
+#: cgi-bin/admin.c:1896 cgi-bin/admin.c:1931 cgi-bin/admin.c:1944
+#: cgi-bin/admin.c:1968 cgi-bin/admin.c:2041
+msgid "Edit Configuration File"
+msgstr "Sunting Berkas Konfigurasi"
+
+#: cups/adminutil.c:348
+msgid "Empty PPD file!"
+msgstr "Berkas PPD kosong!"
+
+#: cgi-bin/admin.c:3545
+msgid "Ending Banner"
+msgstr "Akhir Pataka"
+
+#: systemv/lppasswd.c:205
+msgid "Enter old password:"
+msgstr "Masukkan sandi lama:"
+
+#: systemv/lppasswd.c:234
+msgid "Enter password again:"
+msgstr "Masukkan lagi sandinya:"
+
+#: systemv/lppasswd.c:223
+msgid "Enter password:"
+msgstr "Masukkan sandi:"
+
+#: scheduler/client.c:2392
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Masukkan nama pengguna dan sandi Anda atau nama pengguna dan sandi root "
+"untuk mengakses halaman ini. Apabila Anda menggunakan otentikasi Kerberos, "
+"pastikan bahwa Anda memiliki tiket Kerberos yang sah."
+
+#: ppdc/sample.c:241
+msgid "Envelope Feed"
+msgstr "Amplop Feed"
+
+#: ppdc/sample.c:212
+msgid "Epson"
+msgstr "Epson"
+
+#: cgi-bin/admin.c:3588
+msgid "Error Policy"
+msgstr "Polis Kesalahan"
+
+#: systemv/lpinfo.c:109 systemv/lpmove.c:94
+msgid "Error: need hostname after '-h' option!\n"
+msgstr "Kesalahan: perlu nama host usai opsi '-h'!\n"
+
+#: ppdc/sample.c:326
+msgid "Every 10 Labels"
+msgstr "Tiap 10 Label"
+
+#: ppdc/sample.c:318
+msgid "Every 2 Labels"
+msgstr "Tiap 2 Label"
+
+#: ppdc/sample.c:319
+msgid "Every 3 Labels"
+msgstr "Tiap 3 Label"
+
+#: ppdc/sample.c:320
+msgid "Every 4 Labels"
+msgstr "Tiap 4 Label"
+
+#: ppdc/sample.c:321
+msgid "Every 5 Labels"
+msgstr "Tiap 5 Label"
+
+#: ppdc/sample.c:322
+msgid "Every 6 Labels"
+msgstr "Tiap 6 Label"
+
+#: ppdc/sample.c:323
+msgid "Every 7 Labels"
+msgstr "Tiap 7 Label"
+
+#: ppdc/sample.c:324
+msgid "Every 8 Labels"
+msgstr "Tiap 8 Label"
+
+#: ppdc/sample.c:325
+msgid "Every 9 Labels"
+msgstr "Tiap 9 Label"
+
+#: ppdc/sample.c:317
+msgid "Every Label"
+msgstr "Tiap Label"
+
+#: cups/http-support.c:1239
+msgid "Expectation Failed"
+msgstr ""
+
+#: cgi-bin/admin.c:2331 cgi-bin/admin.c:2350
+msgid "Export Printers to Samba"
+msgstr "Ekspor Pencetak melalui Samba"
+
+#: systemv/cupstestdsc.c:176 systemv/cupstestdsc.c:193
+#: systemv/cupstestdsc.c:218 systemv/cupstestdsc.c:235
+#: systemv/cupstestdsc.c:259 systemv/cupstestdsc.c:277
+#: systemv/cupstestdsc.c:306 systemv/cupstestdsc.c:343
+#: systemv/cupstestdsc.c:353 systemv/cupstestdsc.c:363
+#: systemv/cupstestdsc.c:373 systemv/cupstestdsc.c:383
+#: systemv/cupstestdsc.c:391
+msgid "FAIL\n"
+msgstr "GAGAL\n"
+
+#: ppdc/sample.c:132
+msgid "File Folder"
+msgstr "Map"
+
+#: ppdc/sample.c:141
+msgid "File Folder - 9/16 x 3 7/16\""
+msgstr "Map - 9/16 x 3 7/16\""
+
+#: scheduler/ipp.c:2528
+#, c-format
+msgid ""
+"File device URIs have been disabled! To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"Berkas URI perangkat telah dinonaktifkan! Untuk mengaktifkannya, lihatlah "
+"petunjuk FileDevice dalam \"%s/cupsd.conf\"."
+
+#: ppdc/sample.c:92
+msgid "Folio"
+msgstr "Folio"
+
+#: cups/http-support.c:1218
+msgid "Forbidden"
+msgstr "Terlarang"
+
+#: cups/localize.c:345
+msgid "Fuser temperature high!"
+msgstr "Suhu fusi tinggi!"
+
+#: cups/localize.c:347
+msgid "Fuser temperature low!"
+msgstr "Suhu fusi rendah!"
+
+#: cups/ppd.c:700 cups/ppd.c:1230
+msgid "General"
+msgstr "Umum"
+
+#: ppdc/sample.c:231
+msgid "Generic"
+msgstr "Umum"
+
+#: ppdc/sample.c:89
+msgid "German FanFold"
+msgstr "FanFold Jerman"
+
+#: ppdc/sample.c:90
+msgid "German FanFold Legal"
+msgstr "FanFold Legal Jerman"
+
+#: cups/snmp.c:1017
+msgid "Get-Response-PDU uses indefinite length"
+msgstr "Get-Response-PDU memiliki panjang tak terdefinisi"
+
+#: ppdc/sample.c:261
+msgid "Glossy Paper"
+msgstr "Kertas Glosi"
+
+#: scheduler/ipp.c:3641 scheduler/ipp.c:3947 scheduler/ipp.c:6627
+#: scheduler/ipp.c:6769 scheduler/ipp.c:8044 scheduler/ipp.c:9143
+#: scheduler/ipp.c:9369 scheduler/ipp.c:9724 scheduler/ipp.c:10300
+msgid "Got a printer-uri attribute but no job-id!"
+msgstr "Memperoleh atribut printer-uri tetapi bukan job-id!"
+
+#: ppdc/sample.c:227
+msgid "Grayscale"
+msgstr "Skala Abu-abu"
+
+#: ppdc/sample.c:251
+msgid "HP"
+msgstr "HP"
+
+#: ppdc/sample.c:133
+msgid "Hanging Folder"
+msgstr "Map Gantung"
+
+#: ppdc/sample.c:142
+msgid "Hanging Folder - 9/16 x 2\""
+msgstr "Map Gantung - 9/16 x 2\""
+
+#: backend/pap.c:296
+msgid "INFO: AppleTalk disabled in System Preferences\n"
+msgstr "INFO: AppleTalk ditiadakan pada Preferensi Sistem\n"
+
+#: backend/pap.c:511
+msgid "INFO: AppleTalk disabled in System Preferences.\n"
+msgstr "INFO: AppleTalk ditiadakan pada Preferensi Sistem.\n"
+
+#: backend/ipp.c:1359
+msgid "INFO: Canceling print job...\n"
+msgstr "INFO: Membatalkan tugas mencetak...\n"
+
+#: backend/ipp.c:629 backend/lpd.c:896 backend/socket.c:354
+msgid "INFO: Connected to printer...\n"
+msgstr "INFO: Terhubung ke pencetak...\n"
+
+#: backend/ipp.c:544 backend/lpd.c:729 backend/socket.c:274
+msgid "INFO: Connecting to printer...\n"
+msgstr "INFO: Menghubungi pencetak...\n"
+
+#: backend/lpd.c:1055 backend/lpd.c:1202
+msgid "INFO: Control file sent successfully\n"
+msgstr "INFO: Berkas kontrol berhasil dikirim\n"
+
+#: backend/ipp.c:435 backend/lpd.c:450
+msgid "INFO: Copying print data...\n"
+msgstr "INFO: Menyalin data yang hendak dicetak...\n"
+
+#: backend/lpd.c:1150
+msgid "INFO: Data file sent successfully\n"
+msgstr "INFO: Berkas data berhasil dikirim\n"
+
+#: driver/rastertoescpx.c:1887 driver/rastertopclx.c:1912
+#, c-format
+msgid "INFO: Finished page %d...\n"
+msgstr "INFO: Halaman selesai %d...\n"
+
+#: filter/imagetoraster.c:1140
+#, c-format
+msgid "INFO: Formatting page %d...\n"
+msgstr "INFO: Memformat halaman %d...\n"
+
+#: filter/imagetoraster.c:621
+msgid "INFO: Loading image file...\n"
+msgstr "INFO: Memuat berkas gambar...\n"
+
+#: cups/http-support.c:1428
+msgid "INFO: Looking for printer...\n"
+msgstr "INFO: Mencari pencetak...\n"
+
+#: backend/pap.c:928
+msgid "INFO: Opening connection\n"
+msgstr "INFO: Membuka hubungan\n"
+
+#: backend/socket.c:425
+msgid "INFO: Print file sent, waiting for printer to finish...\n"
+msgstr "INFO: Berkas cetak dikirim, menunggu pencetak selesai mengerjakannya...\n"
+
+#: backend/ipp.c:1044 backend/usb-unix.c:132
+msgid "INFO: Printer busy; will retry in 10 seconds...\n"
+msgstr "INFO: Pencetak sibuk; dicoba ulang 10 detik lagi...\n"
+
+#: backend/parallel.c:236 backend/scsi-irix.c:147 backend/scsi-linux.c:161
+#: backend/serial.c:256
+msgid "INFO: Printer busy; will retry in 30 seconds...\n"
+msgstr "INFO: Pencetak sibuk; dicoba ulang 30 detik lagi...\n"
+
+#: backend/usb-unix.c:437
+msgid "INFO: Printer busy; will retry in 5 seconds...\n"
+msgstr "INFO: Pencetak sibuk; dicoba ulang 5 detik lagi...\n"
+
+#: backend/ipp.c:742 backend/ipp.c:1055
+#, c-format
+msgid "INFO: Printer does not support IPP/%d.%d, trying IPP/1.0...\n"
+msgstr "INFO: Pencetak tidak mendukung IPP/%d.%d, mencoba IPP/1.0...\n"
+
+#: backend/usb-unix.c:521
+msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
+msgstr "INFO: Pencetak sibuk; dicoba ulang 5 detik lagi...\n"
+
+#: backend/runloop.c:357
+msgid "INFO: Printer is currently off-line.\n"
+msgstr "INFO: Pencetak saat ini tak terhubung.\n"
+
+#: backend/runloop.c:243
+msgid "INFO: Printer is currently offline.\n"
+msgstr "INFO: Pencetak saat ini tak terhubung.\n"
+
+#: backend/runloop.c:379 backend/usb-darwin.c:1254
+msgid "INFO: Printer is now online.\n"
+msgstr "INFO: Pencetak saat ini terhubung.\n"
+
+#: backend/usb-darwin.c:1272
+msgid "INFO: Printer is offline.\n"
+msgstr "INFO: Pencetak saat ini tak terhubung.\n"
+
+#: backend/parallel.c:242 backend/usb-unix.c:139
+msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
+msgstr "INFO: Pencetak tak terhubung; dicoba ulang 30 detik lagi...\n"
+
+#: driver/rastertoescpx.c:1873 driver/rastertopclx.c:1895
+#: filter/rastertoepson.c:1080 filter/rastertohp.c:803
+#: filter/rastertolabel.c:1235
+#, c-format
+msgid "INFO: Printing page %d, %d%% complete...\n"
+msgstr "INFO: Mencetak halaman %d, %d%% selesai...\n"
+
+#: filter/imagetops.c:808
+#, c-format
+msgid "INFO: Printing page %d...\n"
+msgstr "INFO: Mencetak halaman %d...\n"
+
+#: backend/socket.c:457 driver/rastertoescpx.c:1911 driver/rastertopclx.c:1936
+#: filter/rastertoepson.c:1134 filter/rastertohp.c:862
+#: filter/rastertolabel.c:1288
+msgid "INFO: Ready to print.\n"
+msgstr "INFO: Siap mencetak.\n"
+
+#: backend/lpd.c:1174
+#, c-format
+msgid "INFO: Sending control file (%lu bytes)\n"
+msgstr "INFO: Mengirim berkas kontrol (%lu bita)\n"
+
+#: backend/lpd.c:1027
+#, c-format
+msgid "INFO: Sending control file (%u bytes)\n"
+msgstr "INFO: Mengirim berkas kontrol (%u bita)\n"
+
+#: backend/pap.c:564
+msgid "INFO: Sending data\n"
+msgstr "INFO: Mengirim data\n"
+
+#: backend/lpd.c:1086
+#, c-format
+msgid "INFO: Sending data file (%ld bytes)\n"
+msgstr "INFO: Mengirim berkas data (%ld bita)\n"
+
+#: backend/lpd.c:1084
+#, c-format
+msgid "INFO: Sending data file (%lld bytes)\n"
+msgstr "INFO: Mengirim berkas data (%lld bita)\n"
+
+#: backend/usb-darwin.c:534
+msgid "INFO: Sending print data...\n"
+msgstr "INFO: Mengirim data yang hendak dicetak...\n"
+
+#: backend/parallel.c:294 backend/socket.c:404 backend/usb-unix.c:201
+#, c-format
+msgid "INFO: Sent print file, %ld bytes...\n"
+msgstr "INFO: Mengirim berkas yang hendak dicetak, %ld bita...\n"
+
+#: backend/parallel.c:292 backend/socket.c:402 backend/usb-unix.c:199
+#, c-format
+msgid "INFO: Sent print file, %lld bytes...\n"
+msgstr "INFO: Mengirim berkas yang hendak dicetak, %lld bita...\n"
+
+#: backend/lpd.c:1098
+#, c-format
+msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
+msgstr ""
+
+#: driver/rastertoescpx.c:1859 driver/rastertopclx.c:1880
+#, c-format
+msgid "INFO: Starting page %d...\n"
+msgstr "INFO: Memulai halaman %d...\n"
+
+#: backend/ipp.c:561 backend/ipp.c:823 backend/lpd.c:829
+#: backend/parallel.c:221 backend/scsi-irix.c:125 backend/scsi-linux.c:139
+#: backend/serial.c:241 backend/socket.c:293 backend/usb-unix.c:117
+msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
+msgstr ""
+"INFO: Tidak bisa menghubungi pencetak, diantrikan ke pencetak selanjutnya pada "
+"kelas...\n"
+
+#: backend/pap.c:309
+#, c-format
+msgid "INFO: Using default AppleTalk zone \"%s\"\n"
+msgstr "INFO: Menggunakan zona baku AppleTalk \"%s\"\n"
+
+#: backend/ipp.c:1170
+msgid "INFO: Waiting for job to complete...\n"
+msgstr "INFO: Menunggu tugas diselesaikan...\n"
+
+#: backend/usb-darwin.c:454 backend/usb-libusb.c:117
+msgid "INFO: Waiting for printer to become available...\n"
+msgstr "INFO: Menunggu pencetak tersedia...\n"
+
+#: ppdc/sample.c:93
+msgid "ISO B0"
+msgstr "ISO B0"
+
+#: ppdc/sample.c:94
+msgid "ISO B1"
+msgstr "ISO B1"
+
+#: ppdc/sample.c:104
+msgid "ISO B10"
+msgstr "ISO B10"
+
+#: ppdc/sample.c:95
+msgid "ISO B2"
+msgstr "ISO B2"
+
+#: ppdc/sample.c:96
+msgid "ISO B3"
+msgstr "ISO B3"
+
+#: ppdc/sample.c:97
+msgid "ISO B4"
+msgstr "ISO B4"
+
+#: ppdc/sample.c:69
+msgid "ISO B4 Envelope"
+msgstr "ISO B4 Amplop"
+
+#: ppdc/sample.c:98
+msgid "ISO B5"
+msgstr "ISO B5"
+
+#: ppdc/sample.c:99
+msgid "ISO B5 (Oversize)"
+msgstr "ISO B5 (Besar)"
+
+#: ppdc/sample.c:70
+msgid "ISO B5 Envelope"
+msgstr "ISO B5 Amplop"
+
+#: ppdc/sample.c:100
+msgid "ISO B6"
+msgstr "ISO B6"
+
+#: ppdc/sample.c:71
+msgid "ISO B6 Envelope"
+msgstr "ISO B6 Amplop"
+
+#: ppdc/sample.c:101
+msgid "ISO B7"
+msgstr "ISO B7"
+
+#: ppdc/sample.c:102
+msgid "ISO B8"
+msgstr "ISO B8"
+
+#: ppdc/sample.c:103
+msgid "ISO B9"
+msgstr "ISO B9"
+
+#: cups/ppd.c:350
+msgid "Illegal control character"
+msgstr "Karakter kontrol ilegal"
+
+#: cups/ppd.c:351
+msgid "Illegal main keyword string"
+msgstr "String kata kunci utama ilegal"
+
+#: cups/ppd.c:352
+msgid "Illegal option keyword string"
+msgstr "String opsi kata kunci ilegal"
+
+#: cups/ppd.c:353
+msgid "Illegal translation string"
+msgstr "String translasi ilegal"
+
+#: cups/ppd.c:354
+msgid "Illegal whitespace character"
+msgstr ""
+
+#: cups/localize.c:337
+msgid "Ink/toner almost empty."
+msgstr "Tinta/toner hampir kosong."
+
+#: cups/localize.c:339
+msgid "Ink/toner empty!"
+msgstr "Tinta/toner kosong!"
+
+#: cups/localize.c:341
+msgid "Ink/toner waste bin almost full."
+msgstr "Baki buangan tinta/toner hampir penuh."
+
+#: cups/localize.c:343
+msgid "Ink/toner waste bin full!"
+msgstr "Baki buangan tinta/toner sudah penuh!"
+
+#: ppdc/sample.c:246
+msgid "Installable Options"
+msgstr ""
+
+#: ppdc/sample.c:249
+msgid "Installed"
+msgstr ""
+
+#: ppdc/sample.c:264
+msgid "IntelliBar Label Printer"
+msgstr "Pencetak Label IntelliBar"
+
+#: ppdc/sample.c:263
+msgid "Intellitech"
+msgstr "Intellitech"
+
+#: cups/localize.c:321
+msgid "Interlock open."
+msgstr ""
+
+#: cups/http-support.c:1245
+msgid "Internal Server Error"
+msgstr "Kesalahan Internal Server"
+
+#: cups/ppd.c:341
+msgid "Internal error"
+msgstr "Kesalahan internal"
+
+#: ppdc/sample.c:130
+msgid "Internet Postage 2-Part"
+msgstr "Perangko Internet 2-Bagian"
+
+#: ppdc/sample.c:139
+msgid "Internet Postage 2-Part - 2 1/4 x 7 1/2\""
+msgstr "Perangko Internet 2-Bagian - 2 1/4 x 7 1/2\""
+
+#: ppdc/sample.c:131
+msgid "Internet Postage 3-Part"
+msgstr "Perangko Internet 3-Bagian"
+
+#: ppdc/sample.c:140
+msgid "Internet Postage 3-Part - 2 1/4 x 7\""
+msgstr "Perangko Internet 3-Bagian - 2 1/4 x 7\""
+
+#: backend/ipp.c:206
+msgid "Internet Printing Protocol"
+msgstr "Protokol Cetak Internet"
+
+#: ppdc/sample.c:68
+msgid "Invite Envelope"
+msgstr "Amplop Undangan"
+
+#: ppdc/sample.c:72
+msgid "Italian Envelope"
+msgstr "Amplop Italia"
+
+#: cups/ppd.c:1348
+msgid "JCL"
+msgstr "JCL"
+
+#: scheduler/ipp.c:9442
+#, c-format
+msgid "Job #%d cannot be restarted - no files!"
+msgstr "Tugas #%d tidak bisa dicetak ulang - tidak ada berkas!"
+
+#: scheduler/ipp.c:3682 scheduler/ipp.c:4050 scheduler/ipp.c:6668
+#: scheduler/ipp.c:6810 scheduler/ipp.c:7921 scheduler/ipp.c:8085
+#: scheduler/ipp.c:8295 scheduler/ipp.c:8340 scheduler/ipp.c:9184
+#: scheduler/ipp.c:9410 scheduler/ipp.c:9765 scheduler/ipp.c:10341
+#, c-format
+msgid "Job #%d does not exist!"
+msgstr "Tugas #%d tidak ada!"
+
+#: scheduler/ipp.c:4082
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "Tugas #%d telah dibatalkan - tidak bisa dibatalkan lagi."
+
+#: scheduler/ipp.c:4076
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "Tugas #%d sudah dibatalkan - tidak bisa dibatalkan lagi."
+
+#: scheduler/ipp.c:4088
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "Tugas #%d sudah diselesaikan - tidak bisa dibatalkan."
+
+#: scheduler/ipp.c:8382 scheduler/ipp.c:10356
+#, c-format
+msgid "Job #%d is finished and cannot be altered!"
+msgstr "Tugas #%d sudah diselesaikan dan tidak dapat diubah!"
+
+#: scheduler/ipp.c:9424
+#, c-format
+msgid "Job #%d is not complete!"
+msgstr "Tugas #%d tidak selesai!"
+
+#: scheduler/ipp.c:3697
+#, c-format
+msgid "Job #%d is not held for authentication!"
+msgstr "Tugas #%d tidak ditahan untuk otentikasi!"
+
+#: scheduler/ipp.c:9198
+#, c-format
+msgid "Job #%d is not held!"
+msgstr "Tugas #%d tidak ditahan!"
+
+#: scheduler/ipp.c:7899
+#, c-format
+msgid "Job #%s does not exist!"
+msgstr "Tugas #%s tidak ada!"
+
+#: scheduler/ipp.c:6295
+#, c-format
+msgid "Job %d not found!"
+msgstr "Tugas %d tidak ketemu!"
+
+#: cgi-bin/ipp-var.c:1050
+msgid "Job Completed"
+msgstr "Tugas Diselesaikan"
+
+#: cgi-bin/ipp-var.c:1048
+msgid "Job Created"
+msgstr "Tugas Dibuat"
+
+#: filter/bannertops.c:623
+msgid "Job ID: "
+msgstr "ID Tugas: "
+
+#: cgi-bin/ipp-var.c:1054
+msgid "Job Options Changed"
+msgstr "Perubahan Opsi Tugas"
+
+#: cgi-bin/ipp-var.c:1052
+msgid "Job Stopped"
+msgstr "Tugas Dihentikan"
+
+#: filter/bannertops.c:631
+msgid "Job UUID: "
+msgstr "UUID Tugas: "
+
+#: scheduler/ipp.c:10439
+msgid "Job is completed and cannot be changed."
+msgstr "Tugas sudah diselesaikan dan tidak bisa diubah."
+
+#: cgi-bin/jobs.c:197
+msgid "Job operation failed:"
+msgstr "Operasi tugas gagal:"
+
+#: scheduler/ipp.c:10475 scheduler/ipp.c:10494 scheduler/ipp.c:10505
+msgid "Job state cannot be changed."
+msgstr "Status tugas tidak bisa diubah."
+
+#: scheduler/ipp.c:9289
+msgid "Job subscriptions cannot be renewed!"
+msgstr "Subkripsi tugas tidak bisa diperbaharui!"
+
+#: cgi-bin/jobs.c:102 cgi-bin/jobs.c:113 cgi-bin/jobs.c:194
+msgid "Jobs"
+msgstr "Tugas"
+
+#: ppdc/sample.c:73
+msgid "Kaku2 Envelope"
+msgstr "Kaku2 Amplop"
+
+#: ppdc/sample.c:74
+msgid "Kaku3 Envelope"
+msgstr "Kaku3 Amplop"
+
+#: backend/lpd.c:178
+msgid "LPD/LPR Host or Printer"
+msgstr "Host atau Pencetak LPD/LPR"
+
+#: ppdc/sample.c:202
+msgid "Label Printer"
+msgstr "Pencetak Label"
+
+#: ppdc/sample.c:417
+msgid "Label Top"
+msgstr "Label Atas"
+
+#: scheduler/ipp.c:2150 scheduler/ipp.c:6218
+#, c-format
+msgid "Language \"%s\" not supported!"
+msgstr "Bahasa \"%s\" tidak didukung!"
+
+#: ppdc/sample.c:127
+msgid "Large Address"
+msgstr "Alamat Besar"
+
+#: ppdc/sample.c:136
+msgid "Large Address - 1 4/10 x 3 1/2\""
+msgstr "Alamat Besar - 1 4/10 x 3 1/2\""
+
+#: ppdc/sample.c:262
+msgid "LaserJet Series PCL 4/5"
+msgstr "Seri LaserJet PCL 4/5"
+
+#: ppdc/sample.c:208
+msgid "Light"
+msgstr "Cahaya"
+
+#: cups/ppd.c:349
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "Baris melebihi panjang yang diperbolehkan (255 karakter)"
+
+#: cgi-bin/admin.c:2368
+msgid "List Available Printers"
+msgstr "Daftar Pencetak yang Tersedia"
+
+#: filter/bannertops.c:744
+msgid "Location: "
+msgstr "Lokasi: "
+
+#: ppdc/sample.c:244
+msgid "Long-Edge (Portrait)"
+msgstr "Sisi Panjang (Tegak)"
+
+#: filter/bannertops.c:753
+msgid "Make and Model: "
+msgstr "Pembuat dan Model: "
+
+#: ppdc/sample.c:240
+msgid "Manual Feed"
+msgstr ""
+
+#: filter/bannertops.c:780
+msgid "Media Dimensions: "
+msgstr "Dimensi Media: "
+
+#: filter/bannertops.c:800
+msgid "Media Limits: "
+msgstr "Batas Media: "
+
+#: filter/bannertops.c:769
+msgid "Media Name: "
+msgstr "Nama Media: "
+
+#: cups/ppd.c:747 cups/ppd.c:1285
+msgid "Media Size"
+msgstr "Ukuran Media"
+
+#: cups/ppd.c:751 cups/ppd.c:1289 ppdc/sample.c:234
+msgid "Media Source"
+msgstr "Sumber Media"
+
+#: ppdc/sample.c:335
+msgid "Media Tracking"
+msgstr ""
+
+#: cups/ppd.c:749 cups/ppd.c:1287 ppdc/sample.c:256
+msgid "Media Type"
+msgstr "Jenis Media"
+
+#: cups/localize.c:310
+msgid "Media jam!"
+msgstr "Media tersangkut!"
+
+#: cups/localize.c:327
+msgid "Media tray almost empty."
+msgstr "Baki media hampir kosong."
+
+#: cups/localize.c:329
+msgid "Media tray empty!"
+msgstr "Baki media kosong!"
+
+#: cups/localize.c:325
+msgid "Media tray missing!"
+msgstr "Baki media hilang!"
+
+#: cups/localize.c:308
+msgid "Media tray needs to be filled."
+msgstr "Baki media perlu diisi."
+
+#: ppdc/sample.c:209
+msgid "Medium"
+msgstr ""
+
+#: cups/ppd.c:338
+msgid "Memory allocation error"
+msgstr "Kesalahan alokasi memori"
+
+#: cups/ppd.c:339
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Kehilangan tajuk PPD-Adobe-4.x"
+
+#: cups/ppd.c:348
+msgid "Missing asterisk in column 1"
+msgstr "Kehilangan asterik pada kolom 1"
+
+#: scheduler/ipp.c:6690
+msgid "Missing document-number attribute!"
+msgstr "Kehilangan atribut document-number!"
+
+#: cups/adminutil.c:284
+#, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Kehilangan tanda kutip pada baris %d!"
+
+#: cgi-bin/admin.c:2080 cgi-bin/admin.c:2165 cgi-bin/admin.c:2801
+#: cgi-bin/admin.c:3055 cgi-bin/admin.c:3166 cgi-bin/admin.c:3844
+msgid "Missing form variable!"
+msgstr "Kehilangan variabel formulir!"
+
+#: scheduler/ipp.c:7090
+msgid "Missing notify-subscription-ids attribute!"
+msgstr "Kehilangan atribut notify-subscription-ids!"
+
+#: scheduler/ipp.c:3820
+msgid "Missing requesting-user-name attribute!"
+msgstr "Kehilangan atribut requesting-user-name!"
+
+#: scheduler/ipp.c:477
+msgid "Missing required attributes!"
+msgstr "Kehilangan atribut yang diperlukan!"
+
+#: cups/adminutil.c:265
+#, c-format
+msgid "Missing value on line %d!"
+msgstr "Kehilangan nilai pada baris %d!"
+
+#: cups/ppd.c:340
+msgid "Missing value string"
+msgstr "Kehilangan string nilai"
+
+#: systemv/lpinfo.c:475
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+msgstr ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+
+#: cgi-bin/admin.c:480
+msgid "Modify Class"
+msgstr "Ubah Kelas"
+
+#: cgi-bin/admin.c:778
+msgid "Modify Printer"
+msgstr "Ubah Pencetak"
+
+#: ppdc/sample.c:111
+msgid "Monarch"
+msgstr "Monarki"
+
+#: ppdc/sample.c:75
+msgid "Monarch Envelope"
+msgstr "Amplop Monarki"
+
+#: cgi-bin/ipp-var.c:421 cgi-bin/ipp-var.c:512
+msgid "Move All Jobs"
+msgstr "Pindah Semua Tugas"
+
+#: cgi-bin/ipp-var.c:360 cgi-bin/ipp-var.c:419 cgi-bin/ipp-var.c:510
+msgid "Move Job"
+msgstr "Pindah Tugas"
+
+#: cups/http-support.c:1202
+msgid "Moved Permanently"
+msgstr "Dipindahkan Permanen"
+
+#: backend/ipp.c:1092
+#, c-format
+msgid "NOTICE: Print file accepted - job ID %d.\n"
+msgstr "NOTICE: Berkas yang hendak dicetak diterima - ID tugas %d.\n"
+
+#: backend/ipp.c:1086
+msgid "NOTICE: Print file accepted - job ID unknown.\n"
+msgstr "NOTICE: Berkas yang hendak dicetak diterima - ID tugas tak dikenal.\n"
+
+#: cups/ppd.c:337
+msgid "NULL PPD file pointer"
+msgstr ""
+
+#: cups/snmp.c:1054
+msgid "Name OID uses indefinite length"
+msgstr "Nama OID memiliki panjang tak terdefinisi"
+
+#: scheduler/ipp.c:1196
+msgid "Nested classes are not allowed!"
+msgstr "Kelas bersarang tidak diperbolehkan!"
+
+#: ppdc/sample.c:401
+msgid "Never"
+msgstr "Tidak Pernah"
+
+#: ppdc/sample.c:228
+msgid "New Stylus Color Series"
+msgstr "Seri Stylus Color Baru"
+
+#: ppdc/sample.c:230
+msgid "New Stylus Photo Series"
+msgstr "Seri Stylus Photo Baru"
+
+#: cups/ppd.c:1877
+msgid "No"
+msgstr "Tidak"
+
+#: cups/http-support.c:1199
+msgid "No Content"
+msgstr "Tak Ada Isi"
+
+#: cups/util.c:1289
+msgid "No PPD name!"
+msgstr "Tidak ada nama PPD!"
+
+#: cups/snmp.c:1048
+msgid "No VarBind SEQUENCE"
+msgstr "Tidak ada VarBind SEQUENCE"
+
+#: cups/adminutil.c:799
+msgid "No Windows printer drivers are installed!"
+msgstr "Tidak ada penggerak pencetak Windows yang terpasang!"
+
+#: cups/request.c:509 cups/request.c:775
+msgid "No active connection"
+msgstr "Tidak ada koneksi yang aktif"
+
+#: scheduler/ipp.c:3998
+#, c-format
+msgid "No active jobs on %s!"
+msgstr "Tidak ada tugas yang aktif pada %s!"
+
+#: scheduler/ipp.c:318
+msgid "No attributes in request!"
+msgstr "Tidak ada atribut dalam permintaan!"
+
+#: scheduler/ipp.c:3725
+msgid "No authentication information provided!"
+msgstr "Tidak ada informasi otentikasi yang tersedia!"
+
+#: cups/snmp.c:1005
+msgid "No community name"
+msgstr "Tidak ada nama komunitas"
+
+#: scheduler/ipp.c:6490
+msgid "No default printer"
+msgstr "Tidak ada pencetak utama"
+
+#: cgi-bin/ipp-var.c:432 scheduler/ipp.c:7666
+msgid "No destinations added."
+msgstr "Tidak ada tujuan yang ditambah."
+
+#: cups/snmp.c:1035
+msgid "No error-index"
+msgstr "Tidak ada error-index"
+
+#: cups/snmp.c:1027
+msgid "No error-status"
+msgstr "Tidak ada error-status"
+
+#: scheduler/ipp.c:8582 scheduler/ipp.c:9817
+msgid "No file!?!"
+msgstr "Tidak ada berkas!?!"
+
+#: cups/util.c:924
+msgid "No modification time!"
+msgstr "Tidak ada waktu modifikasi!"
+
+#: cups/snmp.c:1052
+msgid "No name OID"
+msgstr "Tidak ada nama OID"
+
+#: cups/util.c:918
+msgid "No printer name!"
+msgstr "Tidak ada nama pencetak!"
+
+#: cups/util.c:1840
+msgid "No printer-uri found for class!"
+msgstr "Tidak ditemukan printer-uri untuk kelas!"
+
+#: cups/util.c:1855
+msgid "No printer-uri found!"
+msgstr "Tidak ditemukan printer-uri!"
+
+#: scheduler/ipp.c:6875
+msgid "No printer-uri in request!"
+msgstr "Tidak ada printer-uri dalam permintaan!"
+
+#: cups/snmp.c:1019
+msgid "No request-id"
+msgstr "Tidak ada request-id"
+
+#: scheduler/ipp.c:6103
+msgid "No subscription attributes in request!"
+msgstr "Tidak ada atribut subskripsi dalam permintaan!"
+
+#: scheduler/ipp.c:7984
+msgid "No subscriptions found."
+msgstr "Tidak ada subskripsi yang ditemukan."
+
+#: cups/snmp.c:1043
+msgid "No variable-bindings SEQUENCE"
+msgstr "Tidak ada variable-bindings SEQUENCE"
+
+#: cups/snmp.c:998
+msgid "No version number"
+msgstr "Tidak ada nomor versi"
+
+#: ppdc/sample.c:338
+msgid "Non-continuous (Mark sensing)"
+msgstr "Tak bersambungan (Penanda)"
+
+#: ppdc/sample.c:337
+msgid "Non-continuous (Web sensing)"
+msgstr "Tak bersambungan (Web)"
+
+#: ppdc/sample.c:210
+msgid "Normal"
+msgstr "Normal"
+
+#: cups/http-support.c:1221
+msgid "Not Found"
+msgstr "Tidak Ketemu"
+
+#: cups/http-support.c:1233
+msgid "Not Implemented"
+msgstr "Tidak Diimplementasikan"
+
+#: ppdc/sample.c:248
+msgid "Not Installed"
+msgstr "Tidak Terpasang"
+
+#: cups/http-support.c:1208
+msgid "Not Modified"
+msgstr "Tidak Diubah"
+
+#: cups/http-support.c:1236
+msgid "Not Supported"
+msgstr "Tidak Didukung"
+
+#: scheduler/ipp.c:1527
+msgid "Not allowed to print."
+msgstr "Tidak diperbolehkan mencetak."
+
+#: ppdc/sample.c:112
+msgid "Note"
+msgstr "Catatan"
+
+#: cups/http-support.c:1190 cups/ppd.c:335
+msgid "OK"
+msgstr "Oke"
+
+#: cups/localize.c:349
+msgid "OPC almost at end-of-life."
+msgstr "OPC nyaris di ujung hayat."
+
+#: cups/localize.c:351
+msgid "OPC at end-of-life!"
+msgstr "OPC sudah di ujung hayat!"
+
+#: ppdc/sample.c:243
+msgid "Off (1-Sided)"
+msgstr "Mati (1-Sisi)"
+
+#: ppdc/sample.c:332
+msgid "Oki"
+msgstr "Oki"
+
+#: cgi-bin/help.c:89 cgi-bin/help.c:130 cgi-bin/help.c:140 cgi-bin/help.c:171
+msgid "Online Help"
+msgstr "Bantuan Langsung"
+
+#: cups/adminutil.c:985
+#, c-format
+msgid "Open of %s failed: %s"
+msgstr "Gagal membuka %s: %s"
+
+#: cups/ppd.c:343
+msgid "OpenGroup without a CloseGroup first"
+msgstr "OpenGroup tanpa CloseGroup lebih dulu"
+
+#: cups/ppd.c:345
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "OpenUI/JCLOpenUI tanpa CloseUI/JCLCloseUI lebih dulu"
+
+#: cgi-bin/admin.c:3615
+msgid "Operation Policy"
+msgstr "Polis Operasi"
+
+#: cgi-bin/admin.c:3292 cgi-bin/admin.c:3352
+msgid "Options Installed"
+msgstr "Opsi yang Terpasang"
+
+#: filter/bannertops.c:674
+msgid "Options: "
+msgstr "Opsi: "
+
+#: cups/localize.c:317
+msgid "Out of toner!"
+msgstr "Kehabisan toner!"
+
+#: cups/ppd.c:753 cups/ppd.c:1291
+msgid "Output Mode"
+msgstr "Modus Keluaran"
+
+#: cups/localize.c:333
+msgid "Output bin almost full."
+msgstr "Baki keluaran hampir penuh."
+
+#: cups/localize.c:335
+msgid "Output bin full!"
+msgstr "Baki keluaran penuh!"
+
+#: systemv/lpstat.c:1191 systemv/lpstat.c:1195
+#, c-format
+msgid "Output for printer %s is sent to %s\n"
+msgstr "Keluaran untuk pencetak %s dikirim ke %s\n"
+
+#: systemv/lpstat.c:1185
+#, c-format
+msgid "Output for printer %s is sent to remote printer %s on %s\n"
+msgstr "Keluaran untuk pencetak %s dikirim ke pencetak jarak jauh %s pada %s\n"
+
+#: systemv/lpstat.c:1209 systemv/lpstat.c:1213
+#, c-format
+msgid "Output for printer %s/%s is sent to %s\n"
+msgstr "Keluaran untuk pencetak %s/%s dikirim ke %s\n"
+
+#: systemv/lpstat.c:1203
+#, c-format
+msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
+msgstr "Keluaran untuk pencetak %s/%s dikirim ke pencetak jarak jauh %s pada %s\n"
+
+#: cups/localize.c:331
+msgid "Output tray missing!"
+msgstr "Baki keluaran hilang!"
+
+#: systemv/cupstestdsc.c:403
+msgid "PASS\n"
+msgstr "LEWAT\n"
+
+#: ppdc/sample.c:232
+msgid "PCL Laser Printer"
+msgstr "Pencetak Laser PCL"
+
+#: ppdc/sample.c:77
+msgid "PRC1 Envelope"
+msgstr "PRC1 Amplop"
+
+#: ppdc/sample.c:86
+msgid "PRC10 Envelope"
+msgstr "PRC10 Amplop"
+
+#: ppdc/sample.c:114
+msgid "PRC16K"
+msgstr "PRC16K"
+
+#: ppdc/sample.c:78
+msgid "PRC2 Envelope"
+msgstr "PRC2 Amplop"
+
+#: ppdc/sample.c:79
+msgid "PRC3 Envelope"
+msgstr "PRC3 Amplop"
+
+#: ppdc/sample.c:115
+msgid "PRC32K"
+msgstr "PRC32K"
+
+#: ppdc/sample.c:116
+msgid "PRC32K (Oversize)"
+msgstr "PRC32K (Besar)"
+
+#: ppdc/sample.c:80
+msgid "PRC4 Envelope"
+msgstr "PRC4 Amplop"
+
+#: ppdc/sample.c:81
+msgid "PRC5 Envelope"
+msgstr "PRC5 Amplop"
+
+#: ppdc/sample.c:82
+msgid "PRC6 Envelope"
+msgstr "PRC6 Amplop"
+
+#: ppdc/sample.c:83
+msgid "PRC7 Envelope"
+msgstr "PRC7 Amplop"
+
+#: ppdc/sample.c:84
+msgid "PRC8 Envelope"
+msgstr "PRC8 Amplop"
+
+#: ppdc/sample.c:85
+msgid "PRC9 Envelope"
+msgstr "PRC9 Amplop"
+
+#: cups/snmp.c:1015
+msgid "Packet does not contain a Get-Response-PDU"
+msgstr "Paket tidak mengandung Get-Response-PDU"
+
+#: cups/snmp.c:994
+msgid "Packet does not start with SEQUENCE"
+msgstr "Paket tidak dimulai dengan SEQUENCE"
+
+#: ppdc/sample.c:331
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+#: ppdc/sample.c:329
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
+#: cups/auth.c:158
+#, c-format
+msgid "Password for %s on %s? "
+msgstr "Sandi untuk %s pada %s? "
+
+#: systemv/cupsaddsmb.c:256
+#, c-format
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "Sandi untuk %s diperlukan untuk mengakses %s via SAMBA: "
+
+#: cgi-bin/classes.c:152
+msgid "Pause Class"
+msgstr "Tahan Kelas"
+
+#: cgi-bin/printers.c:155
+msgid "Pause Printer"
+msgstr "Tahan Pencetak"
+
+#: ppdc/sample.c:419
+msgid "Peel-Off"
+msgstr ""
+
+#: ppdc/sample.c:76
+msgid "Personal Envelope"
+msgstr "Amplop Pribadi"
+
+#: ppdc/sample.c:123
+msgid "Photo"
+msgstr "Foto"
+
+#: ppdc/sample.c:124
+msgid "Photo Labels"
+msgstr "Label Foto"
+
+#: ppdc/sample.c:257
+msgid "Plain Paper"
+msgstr "Kertas Biasa"
+
+#: cgi-bin/admin.c:3310 cgi-bin/admin.c:3564
+msgid "Policies"
+msgstr "Kebijakan"
+
+#: cgi-bin/admin.c:3317 cgi-bin/admin.c:3633 cgi-bin/admin.c:3646
+msgid "Port Monitor"
+msgstr "Port Monitor"
+
+#: ppdc/sample.c:250
+msgid "PostScript Printer"
+msgstr "Pencetak PostScript"
+
+#: ppdc/sample.c:113
+msgid "Postcard"
+msgstr "Kartu Pos"
+
+#: ppdc/sample.c:266
+msgid "Print Density"
+msgstr "Densitas Cetak"
+
+#: cups/notify.c:82
+msgid "Print Job:"
+msgstr "Tugas Cetak:"
+
+#: ppdc/sample.c:311
+msgid "Print Mode"
+msgstr "Modus Cetak"
+
+#: ppdc/sample.c:354
+msgid "Print Rate"
+msgstr ""
+
+#: cgi-bin/printers.c:164
+msgid "Print Self-Test Page"
+msgstr "Cetak Halaman Uji-Mandiri"
+
+#: ppdc/sample.c:298
+msgid "Print Speed"
+msgstr "Kecepatan Cetak"
+
+#: cgi-bin/ipp-var.c:787
+msgid "Print Test Page"
+msgstr "Cetak Halaman Uji"
+
+#: ppdc/sample.c:327
+msgid "Print and Cut"
+msgstr "Cetak dan Potong"
+
+#: ppdc/sample.c:315
+msgid "Print and Tear"
+msgstr ""
+
+#: filter/bannertops.c:648
+msgid "Printed For: "
+msgstr "Dicetak Untuk: "
+
+#: filter/bannertops.c:656
+msgid "Printed From: "
+msgstr "Dicetak Dari: "
+
+#: filter/bannertops.c:876
+msgid "Printed On: "
+msgstr "Dicetak Pada: "
+
+#: cgi-bin/ipp-var.c:1042
+msgid "Printer Added"
+msgstr "Pencetak Ditambah"
+
+#: ppdc/sample.c:235
+msgid "Printer Default"
+msgstr "Pencetak Utama"
+
+#: cgi-bin/ipp-var.c:1046
+msgid "Printer Deleted"
+msgstr "Pencetak Dihapus"
+
+#: cgi-bin/ipp-var.c:1044
+msgid "Printer Modified"
+msgstr "Pencetak Diubah"
+
+#: filter/bannertops.c:614
+msgid "Printer Name: "
+msgstr "Nama Pencetak: "
+
+#: cgi-bin/ipp-var.c:1040
+msgid "Printer Paused"
+msgstr "Pencetak Ditahan"
+
+#: ppdc/sample.c:265
+msgid "Printer Settings"
+msgstr "Pengaturan Pencetak"
+
+#: cups/localize.c:313
+msgid "Printer offline."
+msgstr "Pencetak tak terhubung."
+
+#: cups/notify.c:126
+msgid "Printer:"
+msgstr "Pencetak:"
+
+#: cgi-bin/printers.c:189 cgi-bin/printers.c:317
+msgid "Printers"
+msgstr "Pencetak"
+
+#: cgi-bin/classes.c:158 cgi-bin/printers.c:161
+msgid "Purge Jobs"
+msgstr "Membersihkan Tugas"
+
+#: ppdc/sample.c:117
+msgid "Quarto"
+msgstr "Kuarto"
+
+#: scheduler/ipp.c:1522
+msgid "Quota limit reached."
+msgstr "Batas kuota telah dicapai."
+
+#: berkeley/lpq.c:507
+msgid "Rank    Owner   Job     File(s)                         Total Size\n"
+msgstr "Urut    Tuan    Tgs     Berkas                          Ukur Total\n"
+
+#: berkeley/lpq.c:503
+msgid "Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgstr "Urut   Tuan       Pri  Tugas      Berkas                      Ukuran Total\n"
+
+#: cgi-bin/classes.c:156 cgi-bin/printers.c:159
+msgid "Reject Jobs"
+msgstr "Tolak Tugas"
+
+#: ppdc/sample.c:399
+msgid "Reprint After Error"
+msgstr "Cetak Ulang Usai Kesalahan"
+
+#: cups/http-support.c:1224
+msgid "Request Entity Too Large"
+msgstr "Entitas Pesanan Terlalu Besar"
+
+#: cups/ppd.c:755 cups/ppd.c:1293 ppdc/sample.c:203
+msgid "Resolution"
+msgstr "Resolusi"
+
+#: cgi-bin/classes.c:150
+msgid "Resume Class"
+msgstr ""
+
+#: cgi-bin/printers.c:152
+msgid "Resume Printer"
+msgstr ""
+
+#: ppdc/sample.c:128
+msgid "Return Address"
+msgstr "Alamat Pengembalian"
+
+#: ppdc/sample.c:137
+msgid "Return Address - 3/4 x 2\""
+msgstr "Alamat Pengembalian - 3/4 x 2\""
+
+#: ppdc/sample.c:420
+msgid "Rewind"
+msgstr "Ulang"
+
+#: cups/adminutil.c:2167
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'\n"
+msgstr "Menjalankan perintah: %s %s -N -A %s -c '%s'\n"
+
+#: backend/scsi-irix.c:70 backend/scsi-linux.c:83
+msgid "SCSI Printer"
+msgstr "Pencetak SCSI"
+
+#: cups/snmp.c:996
+msgid "SEQUENCE uses indefinite length"
+msgstr "SEQUENCE memiliki panjang tak terdefinisi"
+
+#: cups/http-support.c:1205
+msgid "See Other"
+msgstr "Lihat Lainnya"
+
+#: backend/serial.c:784 backend/serial.c:943 backend/serial.c:1065
+#: backend/serial.c:1159
+#, c-format
+msgid "Serial Port #%d"
+msgstr "Port Serial #%d"
+
+#: cgi-bin/ipp-var.c:1056
+msgid "Server Restarted"
+msgstr "Server Dijalankan Ulang"
+
+#: cgi-bin/ipp-var.c:1062
+msgid "Server Security Auditing"
+msgstr "Audit Sekuritas Server"
+
+#: cgi-bin/ipp-var.c:1058
+msgid "Server Started"
+msgstr "Server Dijalankan"
+
+#: cgi-bin/ipp-var.c:1060
+msgid "Server Stopped"
+msgstr "Server Dihentikan"
+
+#: cups/http-support.c:1242
+msgid "Service Unavailable"
+msgstr "Layanan Tak Tersedia"
+
+#: cgi-bin/admin.c:2802 cgi-bin/admin.c:2848 cgi-bin/admin.c:3005
+#: cgi-bin/admin.c:3024
+msgid "Set Allowed Users"
+msgstr "Atur Pengguna yang Boleh"
+
+#: cgi-bin/admin.c:3051
+msgid "Set As Server Default"
+msgstr "Atur Sebagai Baku Server"
+
+#: cgi-bin/admin.c:3151
+msgid "Set Class Options"
+msgstr "Atur Opsi Kelas"
+
+#: cgi-bin/admin.c:3151 cgi-bin/admin.c:3320 cgi-bin/admin.c:3675
+msgid "Set Printer Options"
+msgstr "Atur Opsi Pencetak"
+
+#: cgi-bin/admin.c:3845 cgi-bin/admin.c:3889 cgi-bin/admin.c:3907
+msgid "Set Publishing"
+msgstr "Atur Penerbitan"
+
+#: ppdc/sample.c:129
+msgid "Shipping Address"
+msgstr "Alamat Pengiriman"
+
+#: ppdc/sample.c:138
+msgid "Shipping Address - 2 5/16 x 4\""
+msgstr "Alamat Pengiriman - 2 5/16 x 4\""
+
+#: ppdc/sample.c:245
+msgid "Short-Edge (Landscape)"
+msgstr "Sisi-Pendek (Mendatar)"
+
+#: ppdc/sample.c:259
+msgid "Special Paper"
+msgstr "Kertas Khusus"
+
+#: ppdc/sample.c:312
+msgid "Standard"
+msgstr "Standar"
+
+#: cgi-bin/admin.c:3538
+msgid "Starting Banner"
+msgstr "Menjalankan Pataka"
+
+#: ppdc/sample.c:118
+msgid "Statement"
+msgstr "Pernyataan"
+
+#: ppdc/sample.c:223
+msgid "Stylus Color Series"
+msgstr "Seri Stylus Color"
+
+#: ppdc/sample.c:229
+msgid "Stylus Photo Series"
+msgstr "Seri Stylus Photo"
+
+#: ppdc/sample.c:119
+msgid "Super A"
+msgstr "Super A"
+
+#: ppdc/sample.c:120
+msgid "Super B"
+msgstr "Super B"
+
+#: ppdc/sample.c:125
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
+#: cups/http-support.c:1187
+msgid "Switching Protocols"
+msgstr "Berpindah Protokol"
+
+#: ppdc/sample.c:121
+msgid "Tabloid"
+msgstr "Tabloid"
+
+#: ppdc/sample.c:122
+msgid "Tabloid (Oversize)"
+msgstr "Tabloid (Besar)"
+
+#: ppdc/sample.c:313
+msgid "Tear"
+msgstr ""
+
+#: ppdc/sample.c:418
+msgid "Tear-Off"
+msgstr ""
+
+#: ppdc/sample.c:359
+msgid "Tear-Off Adjust Position"
+msgstr ""
+
+#: scheduler/ipp.c:7337
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr "Berkas PPD \"%s\" tak bisa ditemukan."
+
+#: scheduler/ipp.c:7324
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr "Berkas PPD \"%s\" tak bisa dibuka: %s"
+
+#: cgi-bin/admin.c:644
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Nama kelas paling banyak 127 karakter cetak dan tidak mengandung spasi, "
+"garis miring (/), atau pun tanda pagar (#)."
+
+#: scheduler/ipp.c:2177
+msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr "Atribut notify-lease-duration tak bisa digunakan bersama subskripsi tugas."
+
+#: scheduler/ipp.c:2160 scheduler/ipp.c:6228
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)!"
+msgstr "Nilai notify-user-data terlalu besar (%d > 63 oktet)!"
+
+#: cgi-bin/admin.c:827
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Nama pencetak paling banyak 127 karakter cetak dan tidak mengandung spasi, "
+"garis miring (/), atau tanda pagar (#)."
+
+#: scheduler/ipp.c:1357
+msgid "The printer or class is not shared!"
+msgstr "Pencetak atau kelas tidak dikongsikan!"
+
+#: scheduler/ipp.c:884 scheduler/ipp.c:1190 scheduler/ipp.c:3856
+#: scheduler/ipp.c:3964 scheduler/ipp.c:5759 scheduler/ipp.c:6062
+#: scheduler/ipp.c:6375 scheduler/ipp.c:6912 scheduler/ipp.c:7542
+#: scheduler/ipp.c:7598 scheduler/ipp.c:7911 scheduler/ipp.c:8153
+#: scheduler/ipp.c:8243 scheduler/ipp.c:8276 scheduler/ipp.c:8597
+#: scheduler/ipp.c:8988 scheduler/ipp.c:9068 scheduler/ipp.c:10209
+#: scheduler/ipp.c:10665 scheduler/ipp.c:10994 scheduler/ipp.c:11061
+#: scheduler/ipp.c:11344
+msgid "The printer or class was not found."
+msgstr "Pencetak atau kelas tidak ditemukan."
+
+#: scheduler/ipp.c:990 scheduler/ipp.c:2367
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "Terdapat karakter tidak sah pada printer-uri \"%s\"."
+
+#: scheduler/ipp.c:3801
+msgid "The printer-uri attribute is required!"
+msgstr "Atribut printer-uri diperlukan!"
+
+#: scheduler/ipp.c:974
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"Bentuk printer-uri seharusnya menuruti format \"ipp://HOSTNAME/classes/"
+"CLASSNAME\"."
+
+#: scheduler/ipp.c:2351
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"Bentuk printer-uri seharusnya menuruti format \"ipp://HOSTNAME/printers/"
+"PRINTERNAME\"."
+
+#: cgi-bin/admin.c:385
+msgid ""
+"The subscription name may not contain spaces, slashes (/), question marks "
+"(?), or the pound sign (#)."
+msgstr ""
+"Nama subskripsi tidak bisa mengandung spasi, garis miring (/), tanda tanya "
+"(?), atau tanda pagar (#)."
+
+#: scheduler/ipp.c:6305
+msgid "There are too many subscriptions."
+msgstr "Terlalu banyak subskripsi."
+
+#: ppdc/sample.c:406
+msgid "Thermal Transfer Media"
+msgstr ""
+
+#: filter/bannertops.c:640
+msgid "Title: "
+msgstr "Judul: "
+
+#: cups/localize.c:315
+msgid "Toner low."
+msgstr "Toner lemah."
+
+#: scheduler/ipp.c:1516
+msgid "Too many active jobs."
+msgstr "Terlalu banyak tugas yang aktif."
+
+#: scheduler/ipp.c:1454
+#, c-format
+msgid "Too many job-sheets values (%d > 2)!"
+msgstr "Terlalu banyak nilai job-sheets (%d > 2)!"
+
+#: scheduler/ipp.c:2672
+#, c-format
+msgid "Too many printer-state-reasons values (%d > %d)!"
+msgstr "Terlalu banyak nilai printer-state-reasons (%d > %d)!"
+
+#: ppdc/sample.c:260
+msgid "Transparency"
+msgstr "Transparansi"
+
+#: ppdc/sample.c:255
+msgid "Tray"
+msgstr "Baki"
+
+#: ppdc/sample.c:236
+msgid "Tray 1"
+msgstr "Baki 1"
+
+#: ppdc/sample.c:237
+msgid "Tray 2"
+msgstr "Baki 2"
+
+#: ppdc/sample.c:238
+msgid "Tray 3"
+msgstr "Baki 3"
+
+#: ppdc/sample.c:239
+msgid "Tray 4"
+msgstr "Baki 4"
+
+#: cups/http-support.c:1227
+msgid "URI Too Long"
+msgstr "URI Terlalu Panjang"
+
+#: ppdc/sample.c:88
+msgid "US Executive"
+msgstr "Eksekutif AS"
+
+#: ppdc/sample.c:91
+msgid "US Fanfold"
+msgstr "Fanfold AS"
+
+#: ppdc/sample.c:105
+msgid "US Ledger"
+msgstr "Ledger AS"
+
+#: ppdc/sample.c:106
+msgid "US Legal"
+msgstr "Legal AS"
+
+#: ppdc/sample.c:107
+msgid "US Legal (Oversize)"
+msgstr "Legal AS (Besar)"
+
+#: ppdc/sample.c:108
+msgid "US Letter"
+msgstr "Kuarto AS"
+
+#: ppdc/sample.c:109
+msgid "US Letter (Oversize)"
+msgstr "Kuarto AS (Besar)"
+
+#: ppdc/sample.c:110
+msgid "US Letter (Small)"
+msgstr "Kuarto AS (Kecil)"
+
+#: backend/serial.c:797
+#, c-format
+msgid "USB Serial Port #%d"
+msgstr "Port Serial USB #%d"
+
+#: cgi-bin/admin.c:1933 cgi-bin/admin.c:1946 cgi-bin/admin.c:1970
+msgid "Unable to access cupsd.conf file:"
+msgstr "Tidak bisa mengakses berkas cupsd.conf:"
+
+#: cgi-bin/admin.c:437
+msgid "Unable to add RSS subscription:"
+msgstr "Tidak bisa menambah subskripsi RSS:"
+
+#: cgi-bin/admin.c:710
+msgid "Unable to add class:"
+msgstr "Tidak bisa menambah kelas:"
+
+#: scheduler/ipp.c:1560
+#, c-format
+msgid "Unable to add job for destination \"%s\"!"
+msgstr "Tidak bisa menambah tugas untuk tujuan \"%s\"!"
+
+#: cgi-bin/admin.c:959 cgi-bin/admin.c:1320
+msgid "Unable to add printer:"
+msgstr "Tidak bisa menambah pencetak:"
+
+#: scheduler/ipp.c:1302
+msgid "Unable to allocate memory for file types!"
+msgstr "Tidak bisa mengalokasikan memori untuk jenis berkas!"
+
+#: cgi-bin/admin.c:1426
+msgid "Unable to cancel RSS subscription:"
+msgstr "Tidak bisa membatalkan subskripsi RSS:"
+
+#: cgi-bin/admin.c:3890
+msgid "Unable to change printer-is-shared attribute:"
+msgstr "Tidak bisa mengubah atribut printer-is-shared:"
+
+#: cgi-bin/admin.c:3006
+msgid "Unable to change printer:"
+msgstr "Tidak bisa mengubah pencetak:"
+
+#: cgi-bin/admin.c:1610 cgi-bin/admin.c:1774
+msgid "Unable to change server settings:"
+msgstr "Tidak bisa mengubah pengaturan server:"
+
+#: cups/adminutil.c:941 cups/util.c:1652
+msgid "Unable to connect to host."
+msgstr "Tidak bisa terhubung ke host."
+
+#: cups/adminutil.c:737
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr "Tidak bisa menyalin berkas penggerak pencetak CUPS 64-bit (%d)!"
+
+#: cups/adminutil.c:702
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr "Tidak bisa menyalin berkas penggerak pencetak Windows 64-bit (%d)!"
+
+#: cups/adminutil.c:533
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)!"
+msgstr "Tidak bisa menyalin berkas penggerak pencetak CUPS (%d)!"
+
+#: scheduler/ipp.c:2788
+#, c-format
+msgid "Unable to copy PPD file - %s!"
+msgstr "Tidak bisa menyalin berkas PPD - %s!"
+
+#: scheduler/ipp.c:2854
+msgid "Unable to copy PPD file!"
+msgstr "Tidak bisa menyalin berkas PPD!"
+
+#: cups/adminutil.c:498
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)!"
+msgstr "Tidak bisa menyalin berkas penggerak pencetak Windows 2000 (%d)!"
+
+#: cups/adminutil.c:621
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)!"
+msgstr "Tidak bisa menyalin berkas penggerak pencetak Windows 9x (%d)!"
+
+#: scheduler/ipp.c:2765
+#, c-format
+msgid "Unable to copy interface script - %s!"
+msgstr "Tidak bisa menyalin skrip antarmuka - %s!"
+
+#: cups/util.c:607 cups/util.c:1711
+msgid "Unable to create printer-uri!"
+msgstr "Tidak bisa membuat printer-uri!"
+
+#: cgi-bin/admin.c:1824 cgi-bin/admin.c:1836
+msgid "Unable to create temporary file:"
+msgstr "Tidak bisa membuat berkas temporer:"
+
+#: cgi-bin/admin.c:2127
+msgid "Unable to delete class:"
+msgstr "Tidak bisa menghapus kelas:"
+
+#: cgi-bin/admin.c:2212
+msgid "Unable to delete printer:"
+msgstr "Tidak bisa menghapus pencetak:"
+
+#: cgi-bin/classes.c:245 cgi-bin/printers.c:254
+msgid "Unable to do maintenance command:"
+msgstr ""
+
+#: cgi-bin/admin.c:1948
+msgid "Unable to edit cupsd.conf files larger than 1MB!"
+msgstr "Tidak bisa menyunting berkas cupsd.conf lebih dari 1MB!"
+
+#: cgi-bin/ipp-var.c:361
+msgid "Unable to find destination for job!"
+msgstr "Tidak bisa menemukan tujuan untuk tugas!"
+
+#: cups/http-support.c:1509
+msgid "Unable to find printer!\n"
+msgstr "Tidak bisa menemukan pencetak!\n"
+
+#: cgi-bin/classes.c:435
+msgid "Unable to get class list:"
+msgstr "Tidak bisa memperoleh daftar kelas:"
+
+#: cgi-bin/classes.c:534
+msgid "Unable to get class status:"
+msgstr "Tidak bisa memperoleh status kelas:"
+
+#: cgi-bin/admin.c:1221
+msgid "Unable to get list of printer drivers:"
+msgstr "Tidak bisa memperoleh daftar penggerak pencetak:"
+
+#: cgi-bin/admin.c:2856
+msgid "Unable to get printer attributes:"
+msgstr "Tidak bisa memperoleh atribut pencetak:"
+
+#: cgi-bin/printers.c:452
+msgid "Unable to get printer list:"
+msgstr "Tidak bisa memperoleh daftar pencetak:"
+
+#: cgi-bin/printers.c:554
+msgid "Unable to get printer status:"
+msgstr "Tidak bisa memperoleh status pencetak:"
+
+#: cups/adminutil.c:576 cups/adminutil.c:780
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)!"
+msgstr "Tidak bisa memasang berkas penggerak pencetak Windows 2000 (%d)!"
+
+#: cups/adminutil.c:650
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)!"
+msgstr "Tidak bisa memasang berkas penggerak pencetak Windows 9x (%d)!"
+
+#: cgi-bin/admin.c:709
+msgid "Unable to modify class:"
+msgstr "Tidak bisa mengubah kelas:"
+
+#: cgi-bin/admin.c:958 cgi-bin/admin.c:1319
+msgid "Unable to modify printer:"
+msgstr "Tidak bisa mengubah pencetak"
+
+#: cgi-bin/ipp-var.c:428 cgi-bin/ipp-var.c:517
+msgid "Unable to move job"
+msgstr "Tidak bisa memindahkan tugas"
+
+#: cgi-bin/ipp-var.c:430 cgi-bin/ipp-var.c:519
+msgid "Unable to move jobs"
+msgstr "Tidak bisa memindahkan tugas"
+
+#: cups/ppd.c:336
+msgid "Unable to open PPD file"
+msgstr "Tidak bisa membuka berkas PPD"
+
+#: cgi-bin/admin.c:3202
+msgid "Unable to open PPD file:"
+msgstr "Tidak bisa membuka berkas PPD:"
+
+#: cgi-bin/admin.c:2582
+msgid "Unable to open cupsd.conf file:"
+msgstr "Tidak bisa membuka berkas cupsd.conf:"
+
+#: scheduler/ipp.c:6710
+#, c-format
+msgid "Unable to open document %d in job %d!"
+msgstr "Tidak bisa membuka dokumen %d pada tugas %d!"
+
+#: cgi-bin/ipp-var.c:790
+msgid "Unable to print test page:"
+msgstr "Tidak bisa mencetak halaman uji:"
+
+#: cups/adminutil.c:2203
+#, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "Tidak bisa menjalankan \"%s\": %s\n"
+
+#: cgi-bin/ipp-var.c:594 cgi-bin/ipp-var.c:614
+msgid "Unable to send command to printer driver!"
+msgstr ""
+
+#: cups/adminutil.c:832
+#, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "Tidak bisa mengeset penggerak pencetak Windows (%d)!"
+
+#: cgi-bin/admin.c:3791
+msgid "Unable to set options:"
+msgstr "Tidak bisa mengeset opsi:"
+
+#: cgi-bin/admin.c:3093
+msgid "Unable to set server default:"
+msgstr ""
+
+#: cgi-bin/admin.c:1886
+msgid "Unable to upload cupsd.conf file:"
+msgstr "Tidak bisa mengunggah berkas cupsd.conf:"
+
+#: backend/usb-darwin.c:1953 backend/usb-darwin.c:1975
+msgid "Unable to use legacy USB class driver!\n"
+msgstr ""
+
+#: cups/http-support.c:1215
+msgid "Unauthorized"
+msgstr "Terlarang"
+
+#: cgi-bin/admin.c:3491
+msgid "Units"
+msgstr "Unit"
+
+#: cups/http-support.c:1249 cups/ppd.c:360
+msgid "Unknown"
+msgstr "Tak Dikenal"
+
+#: scheduler/ipp.c:10867
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "printer-error-policy \"%s\" tak dikenal."
+
+#: scheduler/ipp.c:10850
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "printer-op-policy \"%s\" tak dikenal."
+
+#: scheduler/ipp.c:418
+#, c-format
+msgid "Unsupported character set \"%s\"!"
+msgstr "Set karakter \"%s\" tak didukung!"
+
+#: scheduler/ipp.c:8563 scheduler/ipp.c:9798
+#, c-format
+msgid "Unsupported compression \"%s\"!"
+msgstr "Kompresi \"%s\" tak didukung!"
+
+#: scheduler/ipp.c:11297
+#, c-format
+msgid "Unsupported compression attribute %s!"
+msgstr "Atribut kompresi %s tak didukung!"
+
+#: scheduler/ipp.c:11325
+#, c-format
+msgid "Unsupported format \"%s\"!"
+msgstr "Format \"%s\" tak didukung!"
+
+#: scheduler/ipp.c:1420 scheduler/ipp.c:9932
+#, c-format
+msgid "Unsupported format '%s'!"
+msgstr "Format '%s' tak didukung!"
+
+#: scheduler/ipp.c:8697 scheduler/ipp.c:9915
+#, c-format
+msgid "Unsupported format '%s/%s'!"
+msgstr "Format '%s/%s' tak didukung!"
+
+#: cups/snmp.c:1113
+msgid "Unsupported value type"
+msgstr "Jenis nilai tak didukung"
+
+#: cups/http-support.c:1230
+msgid "Upgrade Required"
+msgstr "Diperlukan Naik-Tingkat"
+
+#: systemv/lpadmin.c:805
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]\n"
+"\n"
+msgstr ""
+"Penggunaan:\n"
+"\n"
+"    lpadmin [-h server] -d tujuan\n"
+"    lpadmin [-h server] -x tujuan\n"
+"    lpadmin [-h server] -p pencetak [-c tambah-kelas] [-i antarmuka] [-m "
+"model]\n"
+"                       [-r buang-kelas] [-v perangkat] [-D deskripsi]\n"
+"                       [-P berkas-ppd] [-o nama=nilai]\n"
+"                       [-u allow:pengguna,pengguna] [-u deny:pengguna,"
+"pengguna]\n"
+"\n"
+
+#: filter/pdftops.c:103
+#, c-format
+msgid "Usage: %s job user title copies options [filename]\n"
+msgstr "Penggunaan: %s tugas pengguna judul salinan opsi [berkas]\n"
+
+#: backend/ipp.c:212 backend/lpd.c:184 backend/pap.c:228
+#: backend/parallel.c:127 backend/scsi.c:157 backend/serial.c:165
+#: backend/socket.c:132 backend/usb.c:183 filter/bannertops.c:118
+#: filter/hpgl-main.c:148 filter/imagetops.c:115 filter/imagetoraster.c:207
+#: filter/pstops.c:255 filter/rastertoepson.c:988 filter/rastertohp.c:713
+#: filter/rastertolabel.c:1135 filter/textcommon.c:518
+#, c-format
+msgid "Usage: %s job-id user title copies options [file]\n"
+msgstr "Penggunaan: %s id-tugas pengguna judul rangkap opsi [berkas]\n"
+
+#: filter/gziptoany.c:53
+#, c-format
+msgid "Usage: %s job-id user title copies options file\n"
+msgstr "Penggunaan: %s id-tugas pengguna judul rangkap opsi berkas\n"
+
+#: scheduler/cupsfilter.c:1329
+msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -e                   Use every filter from the PPD file\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
+msgstr ""
+
+#: systemv/cupsaddsmb.c:286
+msgid ""
+"Usage: cupsaddsmb [options] printer1 ... printerN\n"
+"       cupsaddsmb [options] -a\n"
+"\n"
+"Options:\n"
+"  -E               Encrypt the connection to the server\n"
+"  -H samba-server  Use the named SAMBA server\n"
+"  -U samba-user    Authenticate using the named SAMBA user\n"
+"  -a               Export all printers\n"
+"  -h cups-server   Use the named CUPS server\n"
+"  -v               Be verbose (show commands)\n"
+msgstr ""
+"Penggunaan: cupsaddsmb [opsi] pencetak1 ... pencetakN\n"
+"            cupsaddsmb [opsi] -a\n"
+"\n"
+"Opsi:\n"
+"  -E               Mengenkripsi koneksi ke server\n"
+"  -H samba-server  Menggunakan server SAMBA yang diberikan\n"
+"  -U samba-user    Otentikasi menggunakan nama pengguna SAMBA yang "
+"diberikan\n"
+"  -a               Mengekspor semua pencetak\n"
+"  -h cups-server   Menggunakan server CUPS yang ditentukan\n"
+"  -v               Menjadi riuh (menampilkan perintah)\n"
+
+#: systemv/cupsctl.c:202
+msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+"Penggunaan: cupsctl [opsi] [param=nilai ... paramN=nilaiN]\n"
+"\n"
+"Opsi:\n"
+"\n"
+"    -E                      Mengaktifkan enkripsi\n"
+"    -U namapengguna         Menentukan nama pengguna\n"
+"    -h server[:portal       Menentukan alamat server\n"
+"\n"
+"    --[no-]debug-logging    Mengaktifkan/tidak pencatat debug\n"
+"    --[no-]remote-admin     Mengaktifkan/tidak administrasi jarak jauh\n"
+"    --[no-]remote-any       Biarkan/cegah akses dari Internet\n"
+"    --[no-]remote-printers  Tampilkan/sembunyikan pencetak jarak jauh\n"
+"    --[no-]share-printers   Mengaktifkan/tidak pencetak yang dikongsi\n"
+"    --[no-]user-cancel-any  Biarkan/cegah pengguna biasa membatalkan tugas\n"
+
+#: scheduler/main.c:2128
+msgid ""
+"Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c config-file      Load alternate configuration file\n"
+"-f                  Run in the foreground\n"
+"-F                  Run in the foreground but detach\n"
+"-h                  Show this usage message\n"
+"-l                  Run cupsd from launchd(8)\n"
+msgstr ""
+"Penggunaan: cupsd [-c berkas-konfigurasi] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c berkas-konfigurasi  Memuat berkas konfigurasi alternatif\n"
+"-f                     Berjalan pada latar depan\n"
+"-F                     Berjalan pada latar depan tapi terpisah\n"
+"-h                     Tampilkan pesan ini\n"
+"-l                     Menjalankan cupsd dari launchd(8)\n"
+
+#: scheduler/cupsfilter.c:1316
+msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -e               Use every filter from the PPD file\n"
+"  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
+msgstr ""
+"Penggunaan: cupsfilter -m mime/jenis [ opsi ] berkas\n"
+"\n"
+"Opsi:\n"
+"\n"
+"  -c cupsd.conf    Mengeset berkas cupsd.conf untuk digunakan\n"
+"  -e               Menggunakan tiap penyaring dari berkas PPD\n"
+"  -j job-id[,N]    Menyaring berkas N dari tugas yang diberikan (baku adalah berkas 1)\n"
+"  -n copies        Mengeset banyaknya salinan\n"
+"  -o name=value    Mengeset opsi\n"
+"  -p filename.ppd  Mengeset berkas PPD\n"
+"  -t title         Mengeset judul\n"
+
+#: systemv/cupstestdsc.c:430
+msgid ""
+"Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
+"       cupstestdsc [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -h       Show program usage\n"
+"\n"
+"    Note: this program only validates the DSC comments, not the PostScript "
+"itself.\n"
+msgstr ""
+"Penggunaan: cupstestdsc [opsi] berkas.ps [... berkas.ps]\n"
+"            cupstestdsc [opsi] -\n"
+"\n"
+"Opsi:\n"
+"\n"
+"    -h       Menampilkan cara guna program\n"
+"\n"
+"    Catatan: program ini hanya memvalidasi komentar DSC, bukan PostScript "
+"itu sendiri.\n"
+
+#: systemv/cupstestppd.c:3483
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+"Penggunaan: cupstestppd [opsi] berkas1.ppd[.gz] [... berkasN.ppd[.gz]]\n"
+"       program | cupstestppd [opsi] -\n"
+"\n"
+"Opsi:\n"
+"\n"
+"    -R direktori-root    Mengeset root alternatif\n"
+"    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}\n"
+"                         Menampilkan peringatan ketimbang kesalahan\n"
+"    -q                   Berjalan senyap\n"
+"    -r                   Menggunakan modus 'relaxed' terbuka\n"
+"    -v                   Menjadi riuh\n"
+"    -vv                  Menjadi sangat riuh\n"
+
+#: systemv/lpmove.c:132
+msgid "Usage: lpmove job/src dest\n"
+msgstr "Penggunaan: lpmove tugas/sumber tujuan\n"
+
+#: systemv/lpoptions.c:540
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer\n"
+msgstr ""
+"Penggunaan: lpoptions [-h server] [-E] -d pencetak\n"
+"            lpoptions [-h server] [-E] [-p pencetak] -l\n"
+"            lpoptions [-h server] [-E] -p pencetak -o opsi[=nilai] ...\n"
+"            lpoptions [-h server] [-E] -x pencetak\n"
+
+#: systemv/lppasswd.c:493
+msgid "Usage: lppasswd [-g groupname]\n"
+msgstr "Penggunaan: lppasswd [-g namakelompok]\n"
+
+#: systemv/lppasswd.c:496
+msgid ""
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]\n"
+msgstr ""
+"Penggunaan: lppasswd [-g namakelompok] [namapengguna]\n"
+"            lppasswd [-g namakelompok] -a [namapengguna]\n"
+"            lppasswd [-g namakelompok] -x [namapengguna]\n"
+
+#: berkeley/lpq.c:662
+msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr ""
+"Penggunaan: lpq [-P tujuan] [-U namapengguna] [-h namahost[:portal]] [-l] "
+"[+interval]\n"
+
+#: ppdc/ppdc.cxx:408
+msgid ""
+"Usage: ppdc [options] filename.drv [ ... filenameN.drv ]\n"
+"Options:\n"
+"  -D name=value        Set named variable to value.\n"
+"  -I include-dir       Add include directory to search path.\n"
+"  -c catalog.po        Load the specified message catalog.\n"
+"  -d output-dir        Specify the output directory.\n"
+"  -l lang[,lang,...]   Specify the output language(s) (locale).\n"
+"  -m                   Use the ModelName value as the filename.\n"
+"  -t                   Test PPDs instead of generating them.\n"
+"  -v                   Be verbose (more v's for more verbosity).\n"
+"  -z                   Compress PPD files using GNU zip.\n"
+"  --cr                 End lines with CR (Mac OS 9).\n"
+"  --crlf               End lines with CR + LF (Windows).\n"
+"  --lf                 End lines with LF (UNIX/Linux/Mac OS X).\n"
+msgstr ""
+"Penggunaan: ppdc [opsi] berkas.drv [ ... berkasN.drv ]\n"
+"Opsi:\n"
+"  -D nama=nilai        Atur nilai variabel bernama.\n"
+"  -I dir-inklusi       Tambah direktori dalam jalur pencarian.\n"
+"  -c katalog.po        Memuat katalog pesan yang diinginkan.\n"
+"  -d dir-keluaran      Menentukan direktori keluaran.\n"
+"  -l bhsa[,bhsa,...]   Menentukan bahasa keluaran (lokal).\n"
+"  -m                   Menggunakan nilai ModelName sebagai nama berkas.\n"
+"  -t                   Menguji PPD ketimbang membuatnya.\n"
+"  -v                   Menjadi riuh (tambahkan v lagi untuk lebih riuh).\n"
+"  -z                   Kompres berkas PPD dengan GNU zip.\n"
+"  --cr                 Akhiri baris dengan CR (Mac OS 9).\n"
+"  --crlf               Akhiri baris dengan CR + LF (Windows).\n"
+"  --lf                 Akhiri baris dengan LF (UNIX/Linux/Mac OS X).\n"
+
+#: ppdc/ppdhtml.cxx:173
+msgid ""
+"Usage: ppdhtml [options] filename.drv >filename.html\n"
+"  -D name=value        Set named variable to value.\n"
+"Options:\n"
+"  -I include-dir       Add include directory to search path.\n"
+msgstr ""
+"Penggunaan: ppdhtml [opsi] berkas.drv >berkas.html\n"
+"  -D nama=nilai        Atur nilai variabel bernama.\n"
+"Opsi:\n"
+"  -I dir-inklusi       Tambah direktori dalam jalur pencarian.\n"
+
+#: ppdc/ppdi.cxx:129
+msgid ""
+"Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]\n"
+"Options:\n"
+"  -I include-dir\n"
+"  -o filename.drv\n"
+msgstr ""
+"Penggunaan: ppdi [opsi] berkas.ppd [ ... berkasN.ppd ]\n"
+"Opsi:\n"
+"  -I direktori\n"
+"  -o berkas.drv\n"
+
+#: ppdc/ppdmerge.cxx:370
+msgid ""
+"Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]\n"
+"Options:\n"
+"  -o filename.ppd[.gz]\n"
+msgstr ""
+"Penggunaan: ppdmerge [opsi] berkas.ppd [ ... berkasN.ppd ]\n"
+"Opsi:\n"
+"  -o berkas.ppd[.gz]\n"
+
+#: ppdc/ppdpo.cxx:254
+msgid ""
+"Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]\n"
+"Options:\n"
+"  -D name=value        Set named variable to value.\n"
+"  -I include-dir       Add include directory to search path.\n"
+"  -v                   Be verbose (more v's for more verbosity).\n"
+msgstr ""
+"Penggunaan: ppdpo [opsi] -o berkas.po berkas.drv [ ... berkasN.drv ]\n"
+"Opsi:\n"
+"  -D nama=nilai        Mengeset nilai variabel bernama.\n"
+"  -I dir-inklusi       Tambah direktori dalam jalur pencarian.\n"
+"  -v                   Menjadi riuh (tambahkan v lagi untuk lebih riuh).\n"
+
+#: backend/snmp.c:224
+msgid "Usage: snmp [host-or-ip-address]\n"
+msgstr "Penggunaan: snmp [host-atau-alamat-ip]\n"
+
+#: cups/snmp.c:1065
+msgid "Value uses indefinite length"
+msgstr "Value memiliki panjang tak terdefinisi"
+
+#: cups/snmp.c:1050
+msgid "VarBind uses indefinite length"
+msgstr "VarBind memiliki panjang tak terdefinisi"
+
+#: cups/snmp.c:1000
+msgid "Version uses indefinite length"
+msgstr "Version memiliki panjang tak terdefinisi"
+
+#: backend/pap.c:328
+#, c-format
+msgid "WARNING: Adding only the first %d printers found"
+msgstr "WARNING: Hanya menambah %d pencetak pertama yang ditemukan"
+
+#: backend/pap.c:1460 backend/usb-darwin.c:1816
+#, c-format
+msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
+msgstr "WARNING: Diharapkan boolean untuk opsi waiteof \"%s\"\n"
+
+#: backend/network.c:83 backend/pap.c:1293 backend/parallel.c:638
+#: backend/serial.c:1297 backend/usb-libusb.c:747 backend/usb-unix.c:583
+msgid "WARNING: Failed to read side-channel request!\n"
+msgstr "WARNING: Gagal membaca permintaan kanal sisi!\n"
+
+#: filter/pstops.c:2237
+#, c-format
+msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
+msgstr "WARNING: Opsi \"%s\" tidak akan disertakan via IncludeFeature!\n"
+
+#: backend/pap.c:503
+msgid "WARNING: Printer not responding\n"
+msgstr "WARNING: Pencetak tidak merespon!\n"
+
+#: backend/pap.c:831 backend/pap.c:854
+msgid "WARNING: Printer sent unexpected EOF\n"
+msgstr "WARNING: Pencetak mengirim EOF yang tak diharapkan\n"
+
+#: backend/lpd.c:618
+#, c-format
+msgid ""
+"WARNING: Remote host did not respond with command status byte after %d "
+"seconds!\n"
+msgstr ""
+"WARNING: Host jarak jauh tidak merespon pada bita status perintah usai %d "
+"detik!\n"
+
+#: backend/lpd.c:1042 backend/lpd.c:1189
+#, c-format
+msgid ""
+"WARNING: Remote host did not respond with control status byte after %d "
+"seconds!\n"
+msgstr ""
+"WARNING: Host jarak jauh tidak merespon pada bita kontrol status usai %d "
+"detik!\n"
+
+#: backend/lpd.c:1134
+#, c-format
+msgid ""
+"WARNING: Remote host did not respond with data status byte after %d "
+"seconds!\n"
+msgstr ""
+"WARNING: Host jarak jauh tidak merespon pada bita status data usai %d "
+"detik!\n"
+
+#: backend/scsi-irix.c:210 backend/scsi-linux.c:228
+#, c-format
+msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+msgstr "WARNING: Perintah SCSI kehabisan waktu (%d); mencoba ulang...\n"
+
+#: filter/pstops.c:1096
+msgid ""
+"WARNING: This document does not conform to the Adobe Document Structuring "
+"Conventions and may not print correctly!\n"
+msgstr ""
+"WARNING: Dokumen ini tidak sesuai dengan Adobe Document Structuring "
+"Conventions dan mungkin tidak tercetak dengan benar!\n"
+
+#: backend/pap.c:492
+#, c-format
+msgid "WARNING: Unable to open \"%s:%s\": %s\n"
+msgstr "WARNING: Tidak bisa membuka \"%s:%s\": %s\n"
+
+#: backend/pap.c:637
+msgid "WARNING: Unable to send PAP status request"
+msgstr "WARNING: Tidak bisa mengirim permintaan status PAP"
+
+#: backend/pap.c:867
+#, c-format
+msgid "WARNING: Unexpected PAP packet of type %d\n"
+msgstr ""
+
+#: backend/pap.c:872
+#, c-format
+msgid "WARNING: Unknown PAP packet of type %d\n"
+msgstr "WARNING: Paket PAP berjenis %d tak dikenal\n"
+
+#: filter/pstops.c:2245
+#, c-format
+msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
+msgstr "WARNING: Pilihan \"%s\" tak dikenal untuk opsi \"%s\"!\n"
+
+#: filter/pstops.c:2230
+#, c-format
+msgid "WARNING: Unknown option \"%s\"!\n"
+msgstr "WARNING: Opsi \"%s\" tak dikenal!\n"
+
+#: backend/serial.c:380
+#, c-format
+msgid "WARNING: Unsupported baud rate %s!\n"
+msgstr ""
+
+#: backend/pap.c:1474
+#, c-format
+msgid "WARNING: number expected for status option \"%s\"\n"
+msgstr "WARNING: angka diharapkan untuk opsi status \"%s\"\n"
+
+#: backend/ipp.c:588 backend/ipp.c:723 backend/lpd.c:855 backend/socket.c:317
+#, c-format
+msgid ""
+"WARNING: recoverable: Network host '%s' is busy; will retry in %d "
+"seconds...\n"
+msgstr ""
+
+#: cups/adminutil.c:804
+msgid "Warning, no Windows 2000 printer drivers are installed!"
+msgstr "Peringatan, tak ada penggerak pencetak Windows 2000 yang terpasang!"
+
+#: cups/ppd.c:1875
+msgid "Yes"
+msgstr "Ya"
+
+#: scheduler/client.c:2402
+#, c-format
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
+msgstr ""
+"Anda harus mengakses halaman ini melalui URL <A HREF=\"https://%s:%d%s"
+"\">https://%s:%d%s</A>."
+
+#: ppdc/sample.c:87
+msgid "You4 Envelope"
+msgstr "You4 Amplop"
+
+#: ppdc/sample.c:410
+msgid "ZPL Label Printer"
+msgstr "Pencetak Label ZPL"
+
+#: ppdc/sample.c:333
+msgid "Zebra"
+msgstr "Zebra"
+
+#: cups/notify.c:102
+msgid "aborted"
+msgstr "digagalkan"
+
+#: cups/notify.c:99
+msgid "canceled"
+msgstr "dibatalkan"
+
+#: cups/notify.c:105
+msgid "completed"
+msgstr "diselesaikan"
+
+#: scheduler/cupsfilter.c:342
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr "konversi: Gunakan opsi -f untuk menentukan berkas yang hendak dikonversi.\n"
+
+#: scheduler/ipp.c:6583
+msgid "cups-deviced failed to execute."
+msgstr "cups-deviced gagal dieksekusi."
+
+#: scheduler/ipp.c:7259 scheduler/ipp.c:7509
+msgid "cups-driverd failed to execute."
+msgstr "cups-driverd gagal dieksekusi."
+
+#: systemv/cupsaddsmb.c:236
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
+msgstr "cupsaddsmb: Tidak ada berkas PPD untuk pencetak \"%s\" - %s\n"
+
+#: systemv/cupsctl.c:153
+#, c-format
+msgid "cupsctl: Unable to connect to server: %s\n"
+msgstr "cupsctl: Tidak bisa menghubungi server: %s\n"
+
+#: systemv/cupsctl.c:196
+#, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cupsctl: Opsi tak dikenal \"%s\"!\n"
+
+#: systemv/cupsctl.c:198
+#, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cupsctl: Opsi tak dikenal \"-%c\"!\n"
+
+#: scheduler/main.c:200
+msgid "cupsd: Expected config filename after \"-c\" option!\n"
+msgstr "cupsd: Diharapkan nama berkas konfigurasi usai opsi \"-c\"!\n"
+
+#: scheduler/main.c:232 scheduler/main.c:239
+msgid "cupsd: Unable to get current directory!\n"
+msgstr "cupsd: Tidak bisa memperoleh direktori sekarang!\n"
+
+#: scheduler/main.c:303
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
+msgstr "cupsd: Argumen \"%s\" tak dikenal - digagalkan!\n"
+
+#: scheduler/main.c:296
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting!\n"
+msgstr "cupsd: Opsi \"%c\" tak dikenal - digagalkan!\n"
+
+#: scheduler/main.c:266
+msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
+msgstr ""
+"cupsd: dukungan launchd(8) tidak dikompilasi serta, menjalankan dalam modus "
+"normal.\n"
+
+#: scheduler/cupsfilter.c:1094
+#, c-format
+msgid "cupsfilter: Invalid document number %d!\n"
+msgstr "cupsfilter: Jumlah dokumen %d tidak sah!\n"
+
+#: scheduler/cupsfilter.c:1088
+#, c-format
+msgid "cupsfilter: Invalid job ID %d!\n"
+msgstr "cupsfilter: ID tugas %d tak sah!\n"
+
+#: scheduler/cupsfilter.c:350
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr "cupsfilter: Hanya satu nama berkas yang bisa ditentukan!\n"
+
+#: scheduler/cupsfilter.c:1136
+#, c-format
+msgid "cupsfilter: Unable to get job file - %s\n"
+msgstr "cupsfilter: Tidak bisa memperoleh berkas tugas - %s\n"
+
+#: systemv/cupstestppd.c:389
+msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
+msgstr "cupstestppd: Opsi -q tidak cocok dengan opsi -v.\n"
+
+#: systemv/cupstestppd.c:405
+msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
+msgstr "cupstestppd: Opsi -v tidak cocok dengan opsi -q.\n"
+
+#: systemv/lpstat.c:1231 systemv/lpstat.c:1234 systemv/lpstat.c:1237
+#, c-format
+msgid "device for %s/%s: %s\n"
+msgstr "perangkat untuk %s/%s: %s\n"
+
+#: systemv/lpstat.c:1218 systemv/lpstat.c:1221 systemv/lpstat.c:1224
+#, c-format
+msgid "device for %s: %s\n"
+msgstr "perangkat untuk %s: %s\n"
+
+#: cups/snmp.c:1037
+msgid "error-index uses indefinite length"
+msgstr "error-index memiliki panjang tak terdefinisi"
+
+#: cups/snmp.c:1029
+msgid "error-status uses indefinite length"
+msgstr "error-status memiliki panjang tak terdefinisi"
+
+#: cups/notify.c:90
+msgid "held"
+msgstr "ditahan"
+
+#: berkeley/lpc.c:214
+msgid "help\t\tget help on commands\n"
+msgstr "bantuan\t\tmemperoleh bantuan dari baris perintah\n"
+
+#: cups/notify.c:131
+msgid "idle"
+msgstr "menganggur"
+
+#: scheduler/ipp.c:8232
+msgid "job-printer-uri attribute missing!"
+msgstr "Atribut job-printer-uri hilang!"
+
+#: systemv/lpadmin.c:141 systemv/lpadmin.c:453
+msgid "lpadmin: Class name can only contain printable characters!\n"
+msgstr "lpadmin: Nama kelas hanya boleh diisi karakter cetak!\n"
+
+#: systemv/lpadmin.c:750
+msgid "lpadmin: Expected PPD after '-P' option!\n"
+msgstr "lpadmin: Diharapkan PPD usai opsi '-P'!\n"
+
+#: systemv/lpadmin.c:491
+msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
+msgstr "lpadmin: Diharapkan allow/deny:daftarpengguna usai opsi '-u'!\n"
+
+#: systemv/lpadmin.c:442
+msgid "lpadmin: Expected class after '-r' option!\n"
+msgstr "lpadmin: Diharapkan kelas usai opsi '-r'!\n"
+
+#: systemv/lpadmin.c:130
+msgid "lpadmin: Expected class name after '-c' option!\n"
+msgstr "lpadmin: Diharapkan nama kelas usai opsi '-c'!\n"
+
+#: systemv/lpadmin.c:643
+msgid "lpadmin: Expected description after '-D' option!\n"
+msgstr "lpadmin: Diharapkan deskripsi usai opsi '-D'!\n"
+
+#: systemv/lpadmin.c:550
+msgid "lpadmin: Expected device URI after '-v' option!\n"
+msgstr "lpadmin: Diharapkan URI perangkat usai opsi '-v'!\n"
+
+#: systemv/lpadmin.c:659
+msgid "lpadmin: Expected file type(s) after '-I' option!\n"
+msgstr "lpadmin: Diharapkan jenis berkas usai opsi '-I'!\n"
+
+#: systemv/lpadmin.c:212
+msgid "lpadmin: Expected hostname after '-h' option!\n"
+msgstr "lpadmin: Diharapkan nama host usai opsi '-h'!\n"
+
+#: systemv/lpadmin.c:257
+msgid "lpadmin: Expected interface after '-i' option!\n"
+msgstr "lpadmin: Diharapkan antarmuka usai opsi '-i'!\n"
+
+#: systemv/lpadmin.c:704
+msgid "lpadmin: Expected location after '-L' option!\n"
+msgstr "lpadmin: Diharapkan lokasi usai opsi '-L'!\n"
+
+#: systemv/lpadmin.c:338
+msgid "lpadmin: Expected model after '-m' option!\n"
+msgstr "lpadmin: Diharapkan model usai opsi '-m'!\n"
+
+#: systemv/lpadmin.c:358
+msgid "lpadmin: Expected name=value after '-o' option!\n"
+msgstr "lpadmin: Diharapkan nama=nilai usai opsi '-o'!\n"
+
+#: systemv/lpadmin.c:391
+msgid "lpadmin: Expected printer after '-p' option!\n"
+msgstr "lpadmin: Diharapkan pencetak usai opsi '-p'!\n"
+
+#: systemv/lpadmin.c:174
+msgid "lpadmin: Expected printer name after '-d' option!\n"
+msgstr "lpadmin: Diharapkan nama pencetak usai opsi '-d'!\n"
+
+#: systemv/lpadmin.c:584
+msgid "lpadmin: Expected printer or class after '-x' option!\n"
+msgstr "lpadmin: Diharapkan pencetak atau kelas usai opsi '-x'!\n"
+
+#: systemv/lpadmin.c:1128
+msgid "lpadmin: No member names were seen!\n"
+msgstr "lpadmin: Tidak ada nama anggota yang terlihat!\n"
+
+#: systemv/lpadmin.c:893
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s.\n"
+msgstr "lpadmin: Pencetak %s sudah menjadi anggota kelas %s.\n"
+
+#: systemv/lpadmin.c:1142
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s.\n"
+msgstr "lpadmin: Pencetak %s bukanlah anggota kelas %s.\n"
+
+#: systemv/lpadmin.c:185 systemv/lpadmin.c:402 systemv/lpadmin.c:595
+msgid "lpadmin: Printer name can only contain printable characters!\n"
+msgstr "lpadmin: Nama pencetak hanya bisa mengandung karakter cetak!\n"
+
+#: systemv/lpadmin.c:115
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa menambah pencetak ke kelas:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:106 systemv/lpadmin.c:159 systemv/lpadmin.c:230
+#: systemv/lpadmin.c:291 systemv/lpadmin.c:310 systemv/lpadmin.c:376
+#: systemv/lpadmin.c:417 systemv/lpadmin.c:523 systemv/lpadmin.c:569
+#: systemv/lpadmin.c:615 systemv/lpadmin.c:677 systemv/lpadmin.c:723
+#: systemv/lpadmin.c:784
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s\n"
+msgstr "lpadmin: Tidak bisa terkoneksi ke server: %s\n"
+
+#: systemv/lpadmin.c:1851
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
+msgstr "lpadmin: Tidak bisa membuka berkas PPD \"%s\" - %s\n"
+
+#: systemv/lpadmin.c:1460
+#, c-format
+msgid "lpadmin: Unable to open file \"%s\": %s\n"
+msgstr "lpadmin: Tidak bisa membuka berkas \"%s\": %s\n"
+
+#: systemv/lpadmin.c:426
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa membuang pencetak dari kelas:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:732
+msgid ""
+"lpadmin: Unable to set the PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset berkas PPD:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:532
+msgid ""
+"lpadmin: Unable to set the device URI:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset URI perangkat:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:319
+msgid ""
+"lpadmin: Unable to set the interface script or PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset skrip antarmuka atau berkas PPD:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:239
+msgid ""
+"lpadmin: Unable to set the interface script:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset skrip antarmuka:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:624
+msgid ""
+"lpadmin: Unable to set the printer description:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset deskripsi pencetak:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:686
+msgid ""
+"lpadmin: Unable to set the printer location:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset lokasi pencetak:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:793
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: Tidak bisa mengeset opsi pencetak:\n"
+"         Anda harus menentukan nama pencetak lebih dulu!\n"
+
+#: systemv/lpadmin.c:508
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
+msgstr "lpadmin: Opsi boleh/larang tak dikenal \"%s\"!\n"
+
+#: systemv/lpadmin.c:766
+#, c-format
+msgid "lpadmin: Unknown argument '%s'!\n"
+msgstr "lpadmin: Argumen tak dikenal '%s'!\n"
+
+#: systemv/lpadmin.c:761
+#, c-format
+msgid "lpadmin: Unknown option '%c'!\n"
+msgstr "lpadmin: Opsi tak dikenal '%c'!\n"
+
+#: systemv/lpadmin.c:665
+msgid "lpadmin: Warning - content type list ignored!\n"
+msgstr "lpadmin: Peringatan - jenis isi diabaikan!\n"
+
+#: berkeley/lpc.c:81 berkeley/lpc.c:109 berkeley/lpc.c:145
+msgid "lpc> "
+msgstr "lpc> "
+
+#: systemv/lpinfo.c:143
+msgid "lpinfo: Expected 1284 device ID string after --device-id!\n"
+msgstr ""
+
+#: systemv/lpinfo.c:196
+msgid "lpinfo: Expected language after --language!\n"
+msgstr "lpinfo: Diharapkan bahasa usai --language!\n"
+
+#: systemv/lpinfo.c:213
+msgid "lpinfo: Expected make and model after --make-and-model!\n"
+msgstr "lpinfo: Diharapkan pembuat dan model usai --make-and-model!\n"
+
+#: systemv/lpinfo.c:230
+msgid "lpinfo: Expected product string after --product!\n"
+msgstr "lpinfo: Diharapkan string produk usai --product!\n"
+
+#: systemv/lpinfo.c:161
+msgid "lpinfo: Expected scheme list after --exclude-schemes!\n"
+msgstr "lpinfo: Diharapkan daftar skema usai --exclude-scemes!\n"
+
+#: systemv/lpinfo.c:179
+msgid "lpinfo: Expected scheme list after --include-schemes!\n"
+msgstr "lpinfo: Diharapkan daftar skema usai --include-schemes!\n"
+
+#: systemv/lpinfo.c:247
+msgid "lpinfo: Expected timeout after --timeout!\n"
+msgstr "lpinfo: Diharapkan waktu habis usai --timeout!\n"
+
+#: systemv/lpinfo.c:270
+#, c-format
+msgid "lpinfo: Unknown argument '%s'!\n"
+msgstr "lpinfo: Argumen tak dikenal '%s'!\n"
+
+#: systemv/lpinfo.c:264
+#, c-format
+msgid "lpinfo: Unknown option '%c'!\n"
+msgstr "lpinfo: Opsi tak dikenal '%c'!\n"
+
+#: systemv/lpinfo.c:257
+#, c-format
+msgid "lpinfo: Unknown option '%s'!\n"
+msgstr "lpinfo: Opsi tak dikenal '%s'!\n"
+
+#: systemv/lpmove.c:141
+#, c-format
+msgid "lpmove: Unable to connect to server: %s\n"
+msgstr "lpmove: Tidak bisa terkoneksi ke server: %s\n"
+
+#: systemv/lpmove.c:125
+#, c-format
+msgid "lpmove: Unknown argument '%s'!\n"
+msgstr "lpmove: Argumen tak dikenal '%s'!\n"
+
+#: systemv/lpmove.c:103
+#, c-format
+msgid "lpmove: Unknown option '%c'!\n"
+msgstr "lpmove: Opsi tak dikenal '%c'!\n"
+
+#: systemv/lpoptions.c:154 systemv/lpoptions.c:172 systemv/lpoptions.c:248
+msgid "lpoptions: No printers!?!\n"
+msgstr "lpoptions: Tidak ada pencetak!?!\n"
+
+#: systemv/lpoptions.c:223
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s\n"
+msgstr "lpoptions: Tidak bisa menambah pencetak: %s\n"
+
+#: systemv/lpoptions.c:507
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: Tidak bisa mendapatkan berkas PPD untuk %s: %s\n"
+
+#: systemv/lpoptions.c:516
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s!\n"
+msgstr "lpoptions: Tidak bisa membuka berkas PPD untuk %s!\n"
+
+#: systemv/lpoptions.c:104
+msgid "lpoptions: Unknown printer or class!\n"
+msgstr "lpoptions: Pencetak atau kelas tak dikenal!\n"
+
+#: systemv/lppasswd.c:185
+msgid "lppasswd: Only root can add or delete passwords!\n"
+msgstr "lppasswd: Hanya root yang bisa menambah atau menghapus sandi!\n"
+
+#: systemv/lppasswd.c:314
+msgid "lppasswd: Password file busy!\n"
+msgstr "lppasswd: Berkas sandi sedang sibuk!\n"
+
+#: systemv/lppasswd.c:447
+msgid "lppasswd: Password file not updated!\n"
+msgstr "lppasswd: Berkas sandi tidak diperbaharui!\n"
+
+#: systemv/lppasswd.c:414
+msgid "lppasswd: Sorry, password doesn't match!\n"
+msgstr "lppasswd: Maaf, sandi tidak cocok!\n"
+
+#: systemv/lppasswd.c:264
+msgid ""
+"lppasswd: Sorry, password rejected.\n"
+"Your password must be at least 6 characters long, cannot contain\n"
+"your username, and must contain at least one letter and number.\n"
+msgstr ""
+"lppasswd: Maaf, sandi ditolak.\n"
+"Sandi Anda harus setidaknya 6 karakter, tidak memuat\n"
+"nama pengguna Anda, dan setidaknya memiliki satu huruf serta angka.\n"
+
+#: systemv/lppasswd.c:240
+msgid "lppasswd: Sorry, passwords don't match!\n"
+msgstr "lppasswd: Maaf, sandi tidak cocok!\n"
+
+#: systemv/lppasswd.c:211 systemv/lppasswd.c:229
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s\n"
+msgstr "lppasswd: Tidak bisa menyalin string sandi: %s\n"
+
+#: systemv/lppasswd.c:317 systemv/lppasswd.c:326 systemv/lppasswd.c:344
+#, c-format
+msgid "lppasswd: Unable to open password file: %s\n"
+msgstr "lppasswd: Tidak bisa membuka berkas sandi: %s\n"
+
+#: systemv/lppasswd.c:379 systemv/lppasswd.c:392 systemv/lppasswd.c:424
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s\n"
+msgstr "lppasswd: Tidak bisa menulis ke berkas sandi: %s\n"
+
+#: systemv/lppasswd.c:462
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s\n"
+msgstr "lppasswd: gagal mencadangkan berkas sandi yang lama: %s\n"
+
+#: systemv/lppasswd.c:475
+#, c-format
+msgid "lppasswd: failed to rename password file: %s\n"
+msgstr "lppasswd: gagal mengubah nama berkas sandi: %s\n"
+
+#: systemv/lppasswd.c:404
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
+msgstr "lppasswd: pengguna \"%s\" dan kelompok \"%s\" tidak ada.\n"
+
+#: systemv/lpstat.c:1039
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"!\n"
+msgstr ""
+"lpstat: kesalahan - nama variabel lingkungan %s bukanlah tujuan yang ada \"%s"
+"\"!\n"
+
+#: systemv/lpstat.c:969
+#, c-format
+msgid "members of class %s:\n"
+msgstr "anggota kelas %s:\n"
+
+#: berkeley/lpq.c:574
+msgid "no entries\n"
+msgstr "tak ada entri\n"
+
+#: systemv/lpstat.c:1043
+msgid "no system default destination\n"
+msgstr "tak ada tujuan sistem utama\n"
+
+#: scheduler/ipp.c:6277
+msgid "notify-events not specified!"
+msgstr "notify-events tidak dispesifikasikan!"
+
+#: scheduler/ipp.c:2114 scheduler/ipp.c:6182
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" is already used!"
+msgstr "URI notify-recipient-uri \"%s\" sudah dipakai!"
+
+#: scheduler/ipp.c:2104 scheduler/ipp.c:6172
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
+msgstr "URI notify-recipient-uri \"%s\" memakai skema tak dikenal!"
+
+#: scheduler/ipp.c:4145 scheduler/ipp.c:7107 scheduler/ipp.c:7813
+#: scheduler/ipp.c:9278
+#, c-format
+msgid "notify-subscription-id %d no good!"
+msgstr "notify-subscription-id %d tidak baik!"
+
+#: cups/notify.c:87
+msgid "pending"
+msgstr "tunda"
+
+#: ppdc/ppdc.cxx:107 ppdc/ppdpo.cxx:93
+#, c-format
+msgid "ppdc: Adding include directory \"%s\"...\n"
+msgstr "ppdc: Menambahkan direktori \"%s\"...\n"
+
+#: ppdc/ppdpo.cxx:135
+#, c-format
+msgid "ppdc: Adding/updating UI text from %s...\n"
+msgstr "ppdf: Menambah/memperbaharui teks UI dari %s...\n"
+
+#: ppdc/ppdc-source.cxx:413
+#, c-format
+msgid "ppdc: Bad boolean value (%s) on line %d of %s.\n"
+msgstr "ppdc: Nilai boolean jelek (%s) pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:1798
+#, c-format
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Nama resolusi jelek \"%s\" pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1116
+#, c-format
+msgid "ppdc: Bad status keyword %s on line %d of %s!\n"
+msgstr "ppdc: Kata kunci status jelek %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:2035
+#, c-format
+msgid "ppdc: Bad variable substitution ($%c) on line %d of %s.\n"
+msgstr "ppdc: Subtitusi variabel jelek ($%c) pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:2711
+#, c-format
+msgid "ppdc: Choice found on line %d of %s with no Option!\n"
+msgstr "ppdc: Ditemukan pilihan pada baris %d dari %s tanpa Option!\n"
+
+#: ppdc/ppdc-source.cxx:1700
+#, c-format
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s!\n"
+msgstr "ppdc: Duplikat #po untuk lokal %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:935
+#, c-format
+msgid "ppdc: Expected a filter definition on line %d of %s!\n"
+msgstr "ppdc: Diharapkan definisi penyaring pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:958
+#, c-format
+msgid "ppdc: Expected a program name on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama program pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:397
+#, c-format
+msgid "ppdc: Expected boolean value on line %d of %s.\n"
+msgstr "ppdc: Diharapkan nilai boolean pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:1096
+#, c-format
+msgid "ppdc: Expected charset after Font on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:450
+#, c-format
+msgid "ppdc: Expected choice code on line %d of %s.\n"
+msgstr "ppdc: Diharapkan kode pilihan pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:438
+#, c-format
+msgid "ppdc: Expected choice name/text on line %d of %s.\n"
+msgstr "ppdc: Diharapkan nama/teks pilihan pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:506
+#, c-format
+msgid "ppdc: Expected color order for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Diharapkan urutan warna untuk ColorModel pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:495
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Diharapkan ruang warna untuk ColorModel pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:517
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Diharapkan kompresi untuk ColorModel pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:698
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s!\n"
+msgstr "ppdc: Diharapkan string konstrain untuk UIConstraints pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:2897
+#, c-format
+msgid "ppdc: Expected driver type keyword following DriverType on line %d of %s!\n"
+msgstr "ppdc: Diharapkan kata kunci jenis penggerak diikuti DriverType pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:829
+#, c-format
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s!\n"
+msgstr "ppdc: Diharapkan jenis dupleks usai Duplex pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1080
+#, c-format
+msgid "ppdc: Expected encoding after Font on line %d of %s!\n"
+msgstr "ppdc: Diharapkan enkode usai Font pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1691
+#, c-format
+msgid "ppdc: Expected filename after #po %s on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama berkas usai #po %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1208
+#, c-format
+msgid "ppdc: Expected group name/text on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama/teks kelompok pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:2611
+#, c-format
+msgid "ppdc: Expected include filename on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama berkas yang disertakan pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1504
+#, c-format
+msgid "ppdc: Expected integer on line %d of %s!\n"
+msgstr "ppdc: Diharapkan integer pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1683
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s!\n"
+msgstr "ppdc: Diharapkan lokal usai #po pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:356
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3269
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai FileName pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1061
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai Font pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3100
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai Manufacturer pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3133
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai MediaSize pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3223
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai ModelName pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3286
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama usai PCFileName pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1159
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama/teks usai %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1248
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama/teks usai Installable pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1784
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama/teks usai Resolution pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:482
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nama/teks kombinasi untuk ColorModel pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1576
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s!\n"
+msgstr "ppdc: Diharapkan opsi nama/teks pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1610
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s!\n"
+msgstr "ppdc: Diharapkan opsi seksi pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1588
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s!\n"
+msgstr "ppdc: Diharapkan opsi jenis pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1767
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:1007
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s!\n"
+msgstr "ppdc: Diharapkan bilangan real pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:575
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %"
+"s!\n"
+msgstr "ppdc: Diharapkan resolusi/jenis media diikuti ColorProfile pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1865
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
+"of %s!\n"
+msgstr "ppdc: Diharapkan resolusi/jenis media diikuti SimpleColorProfile pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:364
+#, c-format
+msgid "ppdc: Expected selector after %s on line %d of %s!\n"
+msgstr "ppdc: Diharapan selektor usai %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1104
+#, c-format
+msgid "ppdc: Expected status after Font on line %d of %s!\n"
+msgstr "ppdc: Diharapkan status usai Font pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:2786
+#, c-format
+msgid "ppdc: Expected string after Copyright on line %d of %s!\n"
+msgstr "ppdc: Diharapkan string usai Copyright pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3389
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s!\n"
+msgstr "ppdc: Diharapkan string usai Version pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:731
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s!\n"
+msgstr "ppdc: Diharapkan dua opsi nama pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:375
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s!\n"
+msgstr "ppdc: Diharapkan nilai usai %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1088
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s!\n"
+msgstr "ppdc: Diharapkan versi usai Font pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:230
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"!\n"
+msgstr "ppdc: Nama berkas #include/#po \"%s\" tak sah!\n"
+
+#: ppdc/ppdc-source.cxx:975
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s!\n"
+msgstr "ppdc: Nilai tak sah bagi penyaring pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:967
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s!\n"
+msgstr "ppdc: Jenis MIME kosong tak sah untuk penyaring pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:983
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s!\n"
+msgstr "ppdc: Nama program korong tak sah untuk penyaring pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1630
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Seksi opsi \"%s\" tak sah pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:1602
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Jenis opsi \"%s\" tak sah pada baris %d dari %s!\n"
+
+#: ppdc/ppdc.cxx:243 ppdc/ppdpo.cxx:123
+#, c-format
+msgid "ppdc: Loading driver information file \"%s\"...\n"
+msgstr "ppdc: Memuat berkas informasi penggerak \"%s\"...\n"
+
+#: ppdc/ppdc.cxx:179
+#, c-format
+msgid "ppdc: Loading messages for locale \"%s\"...\n"
+msgstr "ppdc: Memuat pesan untuk loakl \"%s\"...\n"
+
+#: ppdc/ppdc.cxx:120
+#, c-format
+msgid "ppdc: Loading messages from \"%s\"...\n"
+msgstr "ppdc: Memuat pesan dari \"%s\"...\n"
+
+#: ppdc/ppdc-source.cxx:2404 ppdc/ppdc-source.cxx:2636
+#, c-format
+msgid "ppdc: Missing #endif at end of \"%s\"!\n"
+msgstr "ppdc: Kehilangan #endif di akhir \"%s\"!\n"
+
+#: ppdc/ppdc-source.cxx:2505 ppdc/ppdc-source.cxx:2540
+#: ppdc/ppdc-source.cxx:2570
+#, c-format
+msgid "ppdc: Missing #if on line %d of %s!\n"
+msgstr "ppdc: Kehilangan #if pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-driver.cxx:722
+#, c-format
+msgid "ppdc: No message catalog provided for locale %s!\n"
+msgstr "ppdc: Tak tersedia katalog pesan untuk lokal %s!\n"
+
+#: ppdc/ppdc-source.cxx:1653 ppdc/ppdc-source.cxx:2874
+#: ppdc/ppdc-source.cxx:2960 ppdc/ppdc-source.cxx:3053
+#: ppdc/ppdc-source.cxx:3186 ppdc/ppdc-source.cxx:3319
+#, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:1646
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:708
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:2487
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s!\n"
+msgstr "ppdc: Terlalu banyak #if bersarang pada baris %d dari %s!\n"
+
+#: ppdc/ppdc.cxx:346
+#, c-format
+msgid "ppdc: Unable to create PPD file \"%s\" - %s.\n"
+msgstr "ppdc: Tidak bisa membuat berkas PPD \"%s\" - %s.\n"
+
+#: ppdc/ppdc.cxx:258
+#, c-format
+msgid "ppdc: Unable to create output directory %s: %s\n"
+msgstr "ppdc: Tidak bisa membuat direktori keluaran %s: %s\n"
+
+#: ppdc/ppdc.cxx:279
+#, c-format
+msgid "ppdc: Unable to create output pipes: %s\n"
+msgstr "ppdc: Tidak bisa membuat pipa keluaran: %s\n"
+
+#: ppdc/ppdc.cxx:295 ppdc/ppdc.cxx:302
+#, c-format
+msgid "ppdc: Unable to execute cupstestppd: %s\n"
+msgstr "ppdc: Tidak bisa mengeksekusi cupstestppd: %s\n"
+
+#: ppdc/ppdc-source.cxx:1732
+#, c-format
+msgid "ppdc: Unable to find #po file %s on line %d of %s!\n"
+msgstr "ppdc: Tidak bisa menemukan berkas #po %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:2643
+#, c-format
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Tidak bisa menemukan berkas yang disertakan \"%s\" pada baris %d dari %s!\n"
+
+#: ppdc/ppdc.cxx:190
+#, c-format
+msgid "ppdc: Unable to find localization for \"%s\" - %s\n"
+msgstr "ppdc: Tidak bisa menemukan lokalisasi bagi \"%s\" - %s\n"
+
+#: ppdc/ppdc.cxx:129
+#, c-format
+msgid "ppdc: Unable to load localization file \"%s\" - %s\n"
+msgstr "ppdc: Tidak bisa memuat berkas lokalisasi \"%s\" - %s\n"
+
+#: ppdc/ppdc-source.cxx:2056
+#, c-format
+msgid "ppdc: Undefined variable (%s) on line %d of %s.\n"
+msgstr "ppdc: Variabel tak berdefinisi (%s) pada baris %d dari %s.\n"
+
+#: ppdc/ppdc-source.cxx:2916
+#, c-format
+msgid "ppdc: Unknown driver type %s on line %d of %s!\n"
+msgstr "ppdc: Jenis penggerak tak dikenal %s pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:909
+#, c-format
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Jenis dupleks tak dikenal \"%s\" pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3146
+#, c-format
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Ukuran media tak dikenal \"%s\" pada baris %d dari %s!\n"
+
+#: ppdc/ppdc-source.cxx:3400
+#, c-format
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:1017
+#, c-format
+msgid "ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc-source.cxx:2166
+#, c-format
+msgid "ppdc: Unterminated string starting with %c on line %d of %s!\n"
+msgstr ""
+
+#: ppdc/ppdc.cxx:352
+#, c-format
+msgid "ppdc: Writing %s...\n"
+msgstr "ppdc: Menulis %s...\n"
+
+#: ppdc/ppdc.cxx:142
+#, c-format
+msgid "ppdc: Writing PPD files to directory \"%s\"...\n"
+msgstr "ppdc: Menulis berkas PPD ke direktori \"%s\"...\n"
+
+#: ppdc/ppdmerge.cxx:138
+#, c-format
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"
+msgstr "ppdmerge: LanguageVersion \"%s\" jelek pada %s!\n"
+
+#: ppdc/ppdmerge.cxx:178
+#, c-format
+msgid "ppdmerge: Ignoring PPD file %s...\n"
+msgstr "ppdmerge: Mengabaikan berkas PPD %s...\n"
+
+#: ppdc/ppdmerge.cxx:162
+#, c-format
+msgid "ppdmerge: Unable to backup %s to %s- %s\n"
+msgstr "ppdmerge: Tidak bisa mencadangkan %s ke %s- %s\n"
+
+#: systemv/lpstat.c:1769
+#, c-format
+msgid "printer %s disabled since %s -\n"
+msgstr "pencetak %s ditiadakan sejak %s -\n"
+
+#: systemv/lpstat.c:1758
+#, c-format
+msgid "printer %s is idle.  enabled since %s\n"
+msgstr "pencetak %s sedang menganggur.  diaktifkan sejak %s\n"
+
+#: systemv/lpstat.c:1763
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s\n"
+msgstr "pencetak %s saat ini tengah mencetak %s-%d.  diaktifkan sejak %s\n"
+
+#: systemv/lpstat.c:1881
+#, c-format
+msgid "printer %s/%s disabled since %s -\n"
+msgstr "pencetak %s/%s dinonaktifkan sejak %s -\n"
+
+#: systemv/lpstat.c:1867
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s\n"
+msgstr "pencetak %s/%s sedang menganggur.  diaktifkan sejak %s\n"
+
+#: systemv/lpstat.c:1874
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
+msgstr "pencetak %s/%s saat ini tengah mencetak %s-%d.  diaktifkan sejak %s\n"
+
+#: cups/notify.c:93 cups/notify.c:134
+msgid "processing"
+msgstr "memproses"
+
+#: systemv/lp.c:660
+#, c-format
+msgid "request id is %s-%d (%d file(s))\n"
+msgstr "identitas permintaan adalah %s-%d (%d berkas)\n"
+
+#: cups/snmp.c:1021
+msgid "request-id uses indefinite length"
+msgstr "request-id memiliki panjang tak terdefinisi"
+
+#: systemv/lpstat.c:2008
+msgid "scheduler is not running\n"
+msgstr "penjadwal tidak berjalan\n"
+
+#: systemv/lpstat.c:2004
+msgid "scheduler is running\n"
+msgstr "penjadwal tengah berjalan\n"
+
+#: cups/adminutil.c:2274
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "status dari %s gagal: %s"
+
+#: berkeley/lpc.c:216
+msgid "status\t\tshow status of daemon and queue\n"
+msgstr "status\t\tmenampilkan status daemon dan antrian\n"
+
+#: cups/notify.c:96 cups/notify.c:137
+msgid "stopped"
+msgstr "dihentikan"
+
+#: systemv/lpstat.c:1017
+#, c-format
+msgid "system default destination: %s\n"
+msgstr "tujuan utama sistem: %s\n"
+
+#: systemv/lpstat.c:1014
+#, c-format
+msgid "system default destination: %s/%s\n"
+msgstr "tujuan utama sistem: %s/%s\n"
+
+#: cups/notify.c:108 cups/notify.c:140
+msgid "unknown"
+msgstr "tak dikenal"
+
+#: cups/notify.c:117
+msgid "untitled"
+msgstr "tak berjudul"
+
+#: cups/snmp.c:1046
+msgid "variable-bindings uses indefinite length"
+msgstr "variable-bindings memiliki panjang tak terdefinisi"
+
+
+#
+# End of "$Id$".
+#
