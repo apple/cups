@@ -1,0 +1,883 @@
+<h2 class='title'><a name='BASICS'>The Basics</a></h2>
+
+<P>The PPD compiler, <a href='man-ppdc.html'><code>ppdc(1)</code></a>, is a
+simple command-line tool that takes a single <I>driver information file</I>,
+which by convention uses the extension <VAR>.drv</VAR>, and produces one or more
+PPD files that may be distributed with your printer drivers for use with CUPS.
+For example, you would run the following command to create the English language
+PPD files defined by the driver information file <VAR>mydrivers.drv</VAR>:</P>
+
+<pre class='command'>
+ppdc mydrivers.drv
+</pre>
+
+<P>The PPD files are placed in a subdirectory called
+<VAR>ppd</VAR>. The <TT>-d</TT> option is used to put the PPD
+files in a different location, for example:</p>
+
+<pre class='command'>
+ppdc -d myppds mydrivers.drv
+</pre>
+
+<P>places the PPD files in a subdirectory named
+<VAR>myppds</VAR>. Finally, use the <TT>-l</TT> option to
+specify the language localization for the PPD files that are
+created, for example:</P>
+
+<pre class='command'>
+ppdc -d myppds/de -l de mydrivers.drv
+ppdc -d myppds/en -l en mydrivers.drv
+ppdc -d myppds/es -l es mydrivers.drv
+ppdc -d myppds/fr -l fr mydrivers.drv
+ppdc -d myppds/it -l it mydrivers.drv
+</pre>
+
+<P>creates PPD files in German (de), English (en), Spanish (es),
+French (fr), and Italian (it) in the corresponding
+subdirectories. Specify multiple languages (separated by commas) to produce
+"globalized" PPD files:</p>
+
+<pre class='command'>
+ppdc -d myppds -l de,en,es,fr,it mydrivers.drv
+</pre>
+
+
+<h2 class='title'><a name='DRV'>Driver Information Files</a></h2>
+
+<P>The driver information files accepted by the PPD compiler are
+plain text files that define the various attributes and options
+that are included in the PPD files that are generated. A driver
+information file can define the information for one or more printers and
+their corresponding PPD files.</P>
+
+<p class='example'><a name="LISTING1">Listing 1: "examples/minimum.drv"</a></p>
+
+<pre class='example'>
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer, model name, and version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Each filter provided by the driver...</I>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+
+<I>// Supported page sizes</I>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+<I>// Supported resolutions</I>
+*<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+<I>// Specify the name of the PPD file we want to generate...</I>
+<a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+</pre>
+
+
+<h3><a name='SIMPLE'>A Simple Example</a></h3>
+
+<P>The example in <A HREF="#LISTING1">Listing 1</A> shows a driver information
+file which defines the minimum required attributes to provide a valid PPD file.
+The first part of the file includes standard definition files for fonts and
+media sizes:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+</pre>
+
+<P>The <TT>#include</TT> directive works just like the C/C++ include directive;
+files included using the angle brackets (<TT>&lt;filename&gt;</TT>) are found
+in any of the standard include directories and files included using quotes
+(<TT>"filename"</TT>) are found in the same directory as the source or include
+file. The <TT>&lt;font.defs&gt;</TT> include file defines the standard fonts
+which are included with GPL Ghostscript and the Apple PDF RIP, while the
+<TT>&lt;media.defs&gt;</TT> include file defines the standard media sizes
+listed in Appendix B of the Adobe PostScript Printer Description File Format
+Specification.</P>
+
+<P>CUPS provides several other standard include files:</P>
+
+<UL>
+
+	<LI><TT>&lt;epson.h&gt;</TT> - Defines all of the rastertoepson driver
+	constants.</LI>
+
+	<LI><TT>&lt;escp.h&gt;</TT> - Defines all of the rastertoescpx driver
+	constants.</LI>
+
+	<LI><TT>&lt;hp.h&gt;</TT> - Defines all of the rastertohp driver
+	constants.</LI>
+
+	<LI><TT>&lt;label.h&gt;</TT> - Defines all of the rastertolabel driver
+	constants.</LI>
+
+	<LI><TT>&lt;pcl.h&gt;</TT> - Defines all of the rastertopclx driver
+	constants.</LI>
+
+	<LI><TT>&lt;raster.defs&gt;</TT> - Defines all of the CUPS raster format
+	constants.</LI>
+
+</UL>
+
+<P>Next we list all of the fonts that are available in the driver; for CUPS
+raster drivers, the following line is all that is usually supplied:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+</pre>
+
+<P>The <TT>Font</TT> directive specifies the name of a single font or the
+asterisk to specify all fonts. For example, you would use the following line to
+define an additional bar code font that you are supplying with your printer
+driver:</P>
+
+<pre class='example'>
+<I>//   name         encoding  version  charset  status</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> Barcode-Foo  Special   "(1.0)"  Special  ROM
+</pre>
+
+<P>The name of the font is <TT>Barcode-Foo</TT>. Since it is not a standard
+text font, the encoding and charset name <TT>Special</TT> is used. The version
+number is <TT>1.0</TT> and the status (where the font is located) is
+<TT>ROM</TT> to indicate that the font does not need to be embedded in
+documents that use the font for this printer.</P>
+
+<P>Third comes the manufacturer, model name, and version number information
+strings:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+</pre>
+
+<P>These strings are used when the user (or auto-configuration program) selects
+the printer driver for a newly connected device.</p>
+
+<P>The list of filters comes after the information strings; for the example in
+<A HREF="#LISTING1">Listing 1</A>, we have a single filter that takes CUPS
+raster data:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+</pre>
+
+<P>Each filter specified in the driver information file is the equivalent of a
+printer driver for that format; if a user submits a print job in a different
+format, CUPS figures out the sequence of commands that will produce a supported
+format for the least relative cost.</P>
+
+<P>Once we have defined the driver information we specify the supported options.
+For the example driver we support a single resolution of 600 dots per inch and
+two media sizes, A4 and Letter:</P>
+
+<pre class='example'>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+*<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+</pre>
+
+<P>The asterisk in front of the <TT>MediaSize</TT> and <TT>Resolution</TT>
+directives specify that those option choices are the default. The
+<TT>MediaSize</TT> directive is followed by a media size name which is normally
+defined in the <TT>&lt;media.defs&gt;</TT> file and corresponds to a standard
+Adobe media size name. If the default media size is <TT>Letter</TT>, the PPD
+compiler will override it to be <TT>A4</TT> for non-English localizations for
+you automatically.</P>
+
+<P>The <TT>Resolution</TT> directive accepts several values after it as
+follows:</P>
+
+<OL>
+
+	<LI>Colorspace for this resolution, if any. In the example file, the
+	colorspace <TT>k</TT> is used which corresponds to black. For printer
+	drivers that support color printing, this field is usually specified as
+	"-" for "no change".</LI>
+
+	<LI>Bits per color. In the example file, we define 8 bits per color, for
+	a continuous-tone grayscale output. All versions of CUPS support 1 and
+	8 bits per color.  CUPS 1.2 and higher (Mac OS X 10.5 and higher) also
+	supports 16 bits per color.</LI>
+
+	<LI>Rows per band. In the example file, we define 0 rows per band to
+	indicate that our printer driver does not process the page in
+	bands.</LI>
+
+	<LI>Row feed. In the example, we define the feed value to be 0 to
+	indicate that our printer driver does not interleave the output.</LI>
+
+	<LI>Row step. In the example, we define the step value to be 0 to
+	indicate that our printer driver does not interleave the output. This
+	value normally indicates the spacing between the nozzles of an inkjet
+	printer - when combined with the previous two values, it informs the
+	driver how to stagger the output on the page to produce interleaved
+	lines on the page for higher-resolution output.</LI>
+
+	<LI>Choice name and text. In the example, we define the choice name and
+	text to be <TT>"600dpi/600 DPI"</TT>. The name and text are separated by
+	slash (<TT>/</TT>) character; if no text is specified, then the name is
+	used as the text. The PPD compiler parses the name to determine the
+	actual resolution; the name can be of the form
+	<TT><I>RESOLUTION</I>dpi</TT> for resolutions that are equal
+	horizontally and vertically or <TT><I>HRES</I>x<I>VRES</I>dpi</TT> for
+	isometric resolutions. Only integer resolution values are supported, so
+	a resolution name of <TT>300dpi</TT> is valid while <TT>300.1dpi</TT> is
+	not.</LI>
+
+</OL>
+
+<P>Finally, the <TT>PCFileName</TT> directive specifies that the named PPD file
+should be written for the current driver definitions:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+</pre>
+
+<P>The filename follows the directive and <I>must</I> conform to the Adobe
+filename requirements in the Adobe Postscript Printer Description File Format
+Specification. Specifically, the filename may not exceed 8 characters followed
+by the extension <VAR>.ppd</VAR>. The <TT>FileName</TT> directive can be used to
+specify longer filenames:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#FileName'>FileName</a> "FooJet 2000"
+</pre>
+
+
+<h3><a name='GROUPING'>Grouping and Inheritance</a></h3>
+
+<P>The previous example created a single PPD file. Driver information files can
+also define multiple printers by using the PPD compiler grouping functionality.
+Directives are grouped using the curly braces (<TT>{</TT> and <TT>}</TT>) and
+every group that uses the <TT>PCFileName</TT> or <TT>FileName</TT> directives
+produces a PPD file with that name. <A HREF="#LISTING2">Listing 2</A> shows a
+variation of the original example that uses two groups to define two printers
+that share the same printer driver filter but provide two different resolution
+options.</P>
+
+<p class='example'><a name="LISTING2">Listing 2: "examples/grouping.drv"</a></p>
+
+<pre class='example'>
+
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer and version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Each filter provided by the driver...</I>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+
+<I>// Supported page sizes</I>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+{
+  <I>// Supported resolutions</I>
+  *<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+  <I>// Specify the model name and filename...</I>
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+}
+
+{
+  <I>// Supported resolutions</I>
+  *<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "1200dpi/1200 DPI"
+
+  <I>// Specify the model name and filename...</I>
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2001"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojt2k1.ppd"
+}
+</pre>
+
+<P>The second example is essentially the same as the first, except that each
+printer model is defined inside of a pair of curly braces. For example, the
+first printer is defined using:</P>
+
+<pre class='example'>
+{
+  // Supported resolutions
+  *<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+  // Specify the model name and filename...
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+}
+</pre>
+
+<P>The printer <I>inherits</I> all of the definitions from the parent group (the
+top part of the file) and adds the additional definitions inside the curly
+braces for that printer driver. When we define the second group, it also
+inherits the same definitions from the parent group but <I>none</I> of the
+definitions from the first driver. Groups can be nested to any number of levels
+to support variations of similar models without duplication of information.</P>
+
+
+<h3><a name='COLOR'>Color Support</a></h3>
+
+<P>For printer drivers that support color printing, the
+<TT>ColorDevice</TT> and <TT>ColorModel</TT> directives should be
+used to tell the printing system that color output is desired
+and in what formats. <A HREF="#LISTING3">Listing 3</A> shows a
+variation of the previous example which includes a color printer
+that supports printing at 300 and 600 DPI.</P>
+
+<P>The key changes are the addition of the <TT>ColorDevice</TT>
+directive:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#ColorDevice'>ColorDevice</a> true
+</pre>
+
+<P>which tells the printing system that the printer supports
+color printing, and the <TT>ColorModel</TT> directives:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#ColorModel'>ColorModel</a> Gray/Grayscale w chunky 0
+*<a href='ref-ppdcfile.html#ColorModel'>ColorModel</a> RGB/Color rgb chunky 0
+</pre>
+
+<P>which tell the printing system which colorspaces are supported by the printer
+driver for color printing. Each of the <TT>ColorModel</TT> directives is
+followed by the option name and text (<TT>Gray/Grayscale</TT> and
+<TT>RGB/Color</TT>), the colorspace name (<TT>w</TT> and <TT>rgb</TT>), the
+color organization (<TT>chunky</TT>), and the compression mode number
+(<TT>0</TT>) to be passed to the driver. The option name can be any of the
+standard Adobe <TT>ColorModel</TT> names:</P>
+
+<UL>
+
+	<LI><TT>Gray</TT> - Grayscale output.
+
+	<LI><TT>RGB</TT> - Color output, typically using the RGB
+	colorspace, but without a separate black channel.
+
+	<LI><TT>CMYK</TT> - Color output with a separate black
+	channel.
+
+</UL>
+
+<P>Custom names can be used, however it is recommended that you use your vendor
+prefix for any custom names, for example "fooName".</P>
+
+<P>The colorspace name can be any of the following universally supported
+colorspaces:</P>
+
+<UL>
+	<LI><TT>w</TT> - Luminance</LI>
+
+	<LI><TT>rgb</TT> - Red, green, blue</LI>
+
+	<LI><TT>k</TT> - Black</LI>
+
+	<LI><TT>cmy</TT> - Cyan, magenta, yellow</LI>
+
+	<LI><TT>cmyk</TT> - Cyan, magenta, yellow, black</LI>
+
+</UL>
+
+<P>The color organization can be any of the following values:</P>
+
+<UL>
+
+	<LI><TT>chunky</TT> - Color values are passed together on a line
+	as RGB RGB RGB RGB</LI>
+
+	<LI><TT>banded</TT> - Color values are passed separately
+	on a line as RRRR GGGG BBBB; not supported by the Apple
+	RIP filters</LI>
+
+	<LI><TT>planar</TT> - Color values are passed separately
+	on a page as RRRR RRRR RRRR ... GGGG GGGG GGGG ... BBBB
+	BBBB BBBB; not supported by the Apple RIP filters</LI>
+
+</UL>
+
+<P>The compression mode value is passed to the driver in the
+<TT>cupsCompression</TT> attribute. It is traditionally used to select an
+appropriate compression mode for the color model but can be used for any
+purpose, such as specifying a photo mode vs. standard mode.</P>
+
+<p class='example'><a name="LISTING3">Listing 3: "examples/color.drv"</a></p>
+
+<pre class='example'>
+
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer and version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Each filter provided by the driver...</I>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+
+<I>// Supported page sizes</I>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+{
+  <I>// Supported resolutions</I>
+  *<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+  <I>// Specify the model name and filename...</I>
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+}
+
+{
+  <I>// Supports color printing</I>
+  <a href='ref-ppdcfile.html#ColorDevice'>ColorDevice</a> true
+
+  <I>// Supported colorspaces</I>
+  <a href='ref-ppdcfile.html#ColorModel'>ColorModel</a> Gray/Grayscale w chunky 0
+  *<a href='ref-ppdcfile.html#ColorModel'>ColorModel</a> RGB/Color rgb chunky 0
+
+  <I>// Supported resolutions</I>
+  *<a href='ref-ppdcfile.html#Resolution'>Resolution</a> - 8 0 0 0 "300dpi/300 DPI"
+  <a href='ref-ppdcfile.html#Resolution'>Resolution</a> - 8 0 0 0 "600dpi/600 DPI"
+
+  <I>// Specify the model name and filename...</I>
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet Color"
+  <a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojetco.ppd"
+}
+</pre>
+
+
+<h3><a name='OPTIONS'>Defining Custom Options and Option Groups</a></h3>
+
+<P>The <TT>Group</TT>, <TT>Option</TT>, and <TT>Choice</TT>
+directives are used to define or select a group, option, or
+choice. <A HREF="#LISTING4">Listing 4</A> shows a variation of
+the first example that provides two custom options in a group
+named "Footasm".</P>
+
+<p class='example'><a name="LISTING4">Listing 4: "examples/custom.drv"</a></p>
+
+<pre class='example'>
+
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer, model name, and version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Each filter provided by the driver...</I>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+
+<I>// Supported page sizes</I>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+<I>// Supported resolutions</I>
+*<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+<I>// Option Group</I>
+<a href='ref-ppdcfile.html#Group'>Group</a> "Footasm"
+
+  <I>// Boolean option</I>
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooEnhance/Resolution Enhancement" Boolean AnySetup 10
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> True/Yes "&lt;&lt;/cupsCompression 1&gt;&gt;setpagedevice"
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> False/No "&lt;&lt;/cupsCompression 0&gt;&gt;setpagedevice"
+
+  <I>// Multiple choice option</I>
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooOutputType/Output Quality" PickOne AnySetup 10
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "Auto/Automatic Selection"
+            "&lt;&lt;/OutputType(Auto)&gt;&gt;setpagedevice""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "Text/Optimize for Text"
+            "&lt;&lt;/OutputType(Text)&gt;&gt;setpagedevice""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "Graph/Optimize for Graphics"
+            "&lt;&lt;/OutputType(Graph)&gt;&gt;setpagedevice""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "Photo/Optimize for Photos"
+            "&lt;&lt;/OutputType(Photo)&gt;&gt;setpagedevice""
+
+<I>// Specify the name of the PPD file we want to generate...</I>
+<a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+</pre>
+
+<P>The custom group is introduced by the <TT>Group</TT>
+directive which is followed by the name and optionally text for
+the user:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Group'>Group</a> "Footasm/Footastic Options"
+</pre>
+
+<P>The group name must conform to the PPD specification and
+cannot exceed 40 characters in length. If you specify user text,
+it cannot exceed 80 characters in length. The groups
+<TT>General</TT>, <TT>Extra</TT>, and
+<TT>InstallableOptions</TT> are predefined by CUPS; the general
+and extra groups are filled by the UI options defined by the PPD
+specification. The <TT>InstallableOptions</TT> group is reserved
+for options that define whether accessories for the printer
+(duplexer unit, finisher, stapler, etc.) are installed.</P>
+
+<P>Once the group is specified, the <TT>Option</TT> directive is
+used to introduce a new option:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Option'>Option</a> "fooEnhance/Resolution Enhancement" Boolean AnySetup 10
+</pre>
+
+<P>The directive is followed by the name of the option and any
+optional user text, the option type, the PostScript document group, and
+the sort order number. The option name must conform to the PPD specification
+and cannot exceed 40 characters in length. If you specify user text, it
+cannot exceed 80 characters in length.</P>
+
+<P>The option type can be <TT>Boolean</TT> for true/false
+selections, <TT>PickOne</TT> for picking one of many choices, or
+<TT>PickMany</TT> for picking zero or more choices. Boolean
+options can have at most two choices with the names
+<TT>False</TT> and <TT>True</TT>. Pick options can have any
+number of choices, although for Windows compatibility reasons
+the number of choices should not exceed 255.</P>
+
+<P>The PostScript document group is typically <TT>AnySetup</TT>,
+meaning that the option can be introduced at any point in the
+PostScript document. Other values include <TT>PageSetup</TT> to
+include the option before each page and <TT>DocumentSetup</TT>
+to include the option once at the beginning of the document.</P>
+
+<P>The sort order number is used to sort the printer commands
+associated with each option choice within the PostScript
+document. This allows you to setup certain options before others
+as required by the printer. For most CUPS raster printer
+drivers, the value <TT>10</TT> can be used for all options.</P>
+
+<P>Once the option is specified, each option choice can be
+listed using the <TT>Choice</TT> directive:</P>
+
+<pre class='example'>
+*<a href='ref-ppdcfile.html#Choice'>Choice</a> True/Yes "&lt;&lt;/cupsCompression 1&gt;&gt;setpagedevice"
+<a href='ref-ppdcfile.html#Choice'>Choice</a> False/No "&lt;&lt;/cupsCompression 0&gt;&gt;setpagedevice"
+</pre>
+
+<P>The directive is followed by the choice name and optionally
+user text, and the PostScript commands that should be inserted
+when printing a file to this printer. The option name must
+conform to the PPD specification and cannot exceed 40 characters
+in length. If you specify user text, it cannot exceed 80
+characters in length.</P>
+
+<P>The PostScript commands are also interpreted by any RIP
+filters, so these commands typically must be present for all
+option choices. Most commands take the form:</P>
+
+<pre class='example'>
+&lt;&lt;/name value&gt;&gt;setpagedevice
+</pre>
+
+<P>where <TT>name</TT> is the name of the PostScript page device
+attribute and <TT>value</TT> is the numeric or string value for
+that attribute.</P>
+
+
+<h3><a name='DEFINE'>Defining Constants</a></h3>
+
+<P>Sometimes you will want to define constants for your drivers
+so that you can share values in different groups within the same
+driver information file, or to share values between different
+driver information files using the <TT>#include</TT> directive.
+The <TT>#define</TT> directive is used to define constants for
+use in your printer definitions:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_define'>#define</a> NAME value
+</pre>
+
+<P>The <TT>NAME</TT> is any sequence of letters, numbers, and
+the underscore. The <TT>value</TT> is a number or string; if the
+value contains spaces you must put double quotes around it, for
+example:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_define'>#define</a> FOO "My String Value"
+</pre>
+
+<P>Constants can also be defined on the command-line using the <tt>-D</tt>
+option:</P>
+
+<pre class='command'>
+ppdc -DNAME="value" filename.drv
+</pre>
+
+<P>Once defined, you use the notation <TT>$NAME</TT> to substitute the value of
+the constant in the file, for example:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_define'>#define</a> MANUFACTURER "Foo"
+<a href='ref-ppdcfile.html#_define'>#define</a> FOO_600      0
+<a href='ref-ppdcfile.html#_define'>#define</a> FOO_1200     1
+
+{
+  <a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "$MANUFACTURER"
+  <a href='ref-ppdcfile.html#ModelNumber'>ModelNumber</a> $FOO_600
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+  ...
+}
+
+{
+  <a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "$MANUFACTURER"
+  <a href='ref-ppdcfile.html#ModelNumber'>ModelNumber</a> $FOO_1200
+  <a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2001"
+  ...
+}
+</pre>
+
+<P>Numeric constants can be bitwise OR'd together by placing the constants
+inside parenthesis, for example:</P>
+
+<pre class='example'>
+<I>// ModelNumber capability bits</I>
+<a href='ref-ppdcfile.html#_define'>#define</a> DUPLEX 1
+<a href='ref-ppdcfile.html#_define'>#define</a> COLOR  2
+
+...
+
+{
+  <I>// Define a model number specifying the capabilities of the printer...</I>
+  <a href='ref-ppdcfile.html#ModelNumber'>ModelNumber</a> ($DUPLEX $COLOR)
+  ...
+}
+</pre>
+
+
+<h3><a name='CONDITIONAL'>Conditional Statements</a></h3>
+
+<p>The PPD compiler supports conditional compilation using the <tt>#if</tt>,
+<tt>#elif</tt>, <tt>#else</tt>, and <tt>#endif</tt> directives. The <tt>#if</tt>
+and <tt>#elif</tt> directives are followed by a constant name or an expression.
+For example, to include a group of options when "ADVANCED" is defined:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_if'>#if</a> ADVANCED
+<a href='ref-ppdcfile.html#Group'>Group</a> "Advanced/Advanced Options"
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooCyanAdjust/Cyan Adjustment"
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus10/+10%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus5/+5%" ""
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "none/No Adjustment" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus5/-5%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus10/-10%" ""
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooMagentaAdjust/Magenta Adjustment"
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus10/+10%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus5/+5%" ""
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "none/No Adjustment" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus5/-5%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus10/-10%" ""
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooYellowAdjust/Yellow Adjustment"
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus10/+10%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus5/+5%" ""
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "none/No Adjustment" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus5/-5%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus10/-10%" ""
+  <a href='ref-ppdcfile.html#Option'>Option</a> "fooBlackAdjust/Black Adjustment"
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus10/+10%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "plus5/+5%" ""
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "none/No Adjustment" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus5/-5%" ""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "minus10/-10%" ""
+<a href='ref-ppdcfile.html#_endif'>#endif</a>
+</pre>
+
+
+<h3><a name='CONSTRAINTS'>Defining Constraints</a></h3>
+
+<P>Constraints are strings that are used to specify that one or more option
+choices are incompatible, for example two-sided printing on transparency media.
+Constraints are also used to prevent the use of uninstalled features such as the
+duplexer unit, additional media trays, and so forth.</P>
+
+<P>The <TT>UIConstraints</TT> directive is used to specify a constraint that is
+placed in the PPD file. The directive is followed by a string using one of the
+following formats:</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Option1 *Option2"
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Option1 Choice1 *Option2"
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Option1 *Option2 Choice2"
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Option1 Choice1 *Option2 Choice2"
+</pre>
+
+<P>Each option name is preceded by the asterisk (<TT>*</TT>). If no choice is
+given for an option, then all choices <I>except</I> <TT>False</TT> and
+<TT>None</TT> will conflict with the other option and choice(s). Since the PPD
+compiler automatically adds reciprocal constraints (option A conflicts with
+option B, so therefore option B conflicts with option A), you need only specify
+the constraint once.</P>
+
+<p class='example'><a name="LISTING5">Listing 5: "examples/constraint.drv"</a></p>
+
+<pre class='example'>
+
+<I>// Include standard font and media definitions</I>
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;font.defs&gt;
+<a href='ref-ppdcfile.html#_include'>#include</a> &lt;media.defs&gt;
+
+<I>// List the fonts that are supported, in this case all standard fonts...</I>
+<a href='ref-ppdcfile.html#Font'>Font</a> *
+
+<I>// Manufacturer, model name, and version</I>
+<a href='ref-ppdcfile.html#Manufacturer'>Manufacturer</a> "Foo"
+<a href='ref-ppdcfile.html#ModelName'>ModelName</a> "FooJet 2000"
+<a href='ref-ppdcfile.html#Version'>Version</a> 1.0
+
+<I>// Each filter provided by the driver...</I>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-raster 100 rastertofoo
+
+<I>// Supported page sizes</I>
+*<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> Letter
+<a href='ref-ppdcfile.html#MediaSize'>MediaSize</a> A4
+
+<I>// Supported resolutions</I>
+*<a href='ref-ppdcfile.html#Resolution'>Resolution</a> k 8 0 0 0 "600dpi/600 DPI"
+
+<I>// Installable Option Group</I>
+<a href='ref-ppdcfile.html#Group'>Group</a> "InstallableOptions/Options Installed"
+
+  <I>// Duplexing unit option</I>
+  <a href='ref-ppdcfile.html#Option'>Option</a> "OptionDuplexer/Duplexing Unit" Boolean AnySetup 10
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> True/Installed ""
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "False/Not Installed" ""
+
+<I>// General Option Group</I>
+<a href='ref-ppdcfile.html#Group'>Group</a> General
+
+  <I>// Duplexing option</I>
+  <a href='ref-ppdcfile.html#Option'>Option</a> "Duplex/Two-Sided Printing" PickOne AnySetup 10
+    *<a href='ref-ppdcfile.html#Choice'>Choice</a> "None/No" "&lt;&lt;/Duplex false&gt;&gt;setpagedevice""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "DuplexNoTumble/Long Edge Binding"
+           "&lt;&lt;/Duplex true/Tumble false&gt;&gt;setpagedevice""
+    <a href='ref-ppdcfile.html#Choice'>Choice</a> "DuplexTumble/Short Edge Binding"
+           "&lt;&lt;/Duplex true/Tumble true&gt;&gt;setpagedevice""
+
+<I>// Only allow duplexing if the duplexer is installed</I>
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Duplex *OptionDuplexer False"
+
+<I>// Specify the name of the PPD file we want to generate...</I>
+<a href='ref-ppdcfile.html#PCFileName'>PCFileName</a> "foojet2k.ppd"
+</pre>
+
+<P><A HREF="#LISTING5">Listing 5</A> shows a variation of the first example with
+an added <TT>Duplex</TT> option and installable option for the duplexer,
+<TT>OptionDuplex</TT>. A constraint is added at the end to specify that any
+choice of the <TT>Duplex</TT> option that is not <TT>None</TT> is incompatible
+with the "Duplexer Installed" option set to "Not Installed"
+(<TT>False</TT>):</P>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#UIConstraints'>UIConstraints</a> "*Duplex *OptionDuplexer False"
+</pre>
+
+<h4>Enhanced Constraints</h4>
+
+<p>CUPS 1.4 supports constraints between 2 or more options using the
+<TT>Attribute</TT> directive. <TT>cupsUIConstraints</TT> attributes define
+the constraints, while <TT>cupsUIResolver</TT> attributes define option changes
+to resolve constraints. For example, we can specify the previous duplex
+constraint with a resolver that turns off duplexing with the following two
+lines:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsUIConstraints DuplexOff "*Duplex *OptionDuplexer False"
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsUIResolver DuplexOff "*Duplex None"
+</pre>
+
+<h2 class='title'><a name='LOCALIZATION'>Localization</a></h2>
+
+<p>The PPD compiler provides localization of PPD files in different languages
+through <i>message catalog</i> files in the GNU gettext or Apple .strings
+formats. Each user text string and several key PPD attribute values such as
+<tt>LanguageVersion</tt> and <tt>LanguageEncoding</tt> are looked up in the
+corresponding message catalog and the translated text is substituted in the
+generated PPD files. One message catalog file can be used by multiple driver
+information files, and each file contains a single language translation.</p>
+
+<h3><a name='PPDPO'>The ppdpo Utility</a></h3>
+
+<p>While CUPS includes localizations of all standard media sizes and options in
+several languages, your driver information files may provide their own media
+sizes and options that need to be localized. CUPS provides a utility program to
+aid in the localization of drivers called <a
+href='man-ppdpo.html'><tt>ppdpo(1)</tt></a>. The <tt>ppdpo</tt> program creates
+or updates a message catalog file based upon one or more driver information
+files. New messages are added with the word "TRANSLATE" added to the front of
+the translation string to make locating new strings for translation easier. The
+program accepts the message catalog filename and one or more driver information
+files.</p>
+
+<p>For example, run the following command to create a new German message catalog
+called <var>de.po</var> for all of the driver information files in the current
+directory:</p>
+
+<pre class='command'>
+ppdpo -o de.po *.drv
+</pre>
+
+<p>If the file <var>de.po</var> already exists, <tt>ppdpo</tt> will update the
+contents of the file with any new messages that need to be translated. To create
+an Apple .strings file instead, specify the output filename with a .strings
+extension, for example:</p>
+
+<pre class='command'>
+ppdpo -o de.strings *.drv
+</pre>
+
+<h3><a name='PPDC_CATALOG'>Using Message Catalogs with the PPD Compiler</a></h3>
+
+<p>Once you have created a message catalog, use the <a
+href='ref-ppdcfile.html#_po'><tt>#po</tt></a> directive to declare it in each
+driver information file. For example, to declare the German message catalog for
+a driver use:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_po'>#po</a> de "de.po"  // German
+</pre>
+
+<p>In fact, you can use the <tt>#po</tt> directive as many times as needed:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_po'>#po</a> de "de.po"  // German
+<a href='ref-ppdcfile.html#_po'>#po</a> es "es.po"  // Spanish
+<a href='ref-ppdcfile.html#_po'>#po</a> fr "fr.po"  // French
+<a href='ref-ppdcfile.html#_po'>#po</a> it "it.po"  // Italian
+<a href='ref-ppdcfile.html#_po'>#po</a> ja "ja.po"  // Japanese
+</pre>
+
+<p>The filename ("de.po", etc.) can be relative to the location of the driver
+information file or an absolute path. Once defined, the PPD compiler will
+automatically generate a globalized PPD for every language declared in your
+driver information file. To generate a single-language PPD file, simply use the
+<tt>-l</tt> option to list the corresponding locale, for example:</p>
+
+<pre class='command'>
+ppdc -l de -d ppd/de mydrivers.drv
+</pre>
+
+<p>to generate German PPD files.</p>
