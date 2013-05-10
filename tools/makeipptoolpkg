@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# "$Id: makeipptoolpkg 9543 2011-02-17 23:43:53Z mike $"
+#
+#   Make an ipptool package for CUPS.
+#
+#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+# Make sure we are running in the right directory...
+if test ! -f tools/makeipptoolpkg; then
+        echo "Run this script from the top-level CUPS source directory, e.g.:"
+        echo ""
+        echo "    tools/makeipptoolpkg $*"
+        echo ""
+        exit 1
+fi
+
+if test $# = 0; then
+	echo Updating to get snapshot version...
+	svn up
+	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
+	fileversion="1.5svn-r$rev"
+	version=snapshots
+else
+	fileversion=$1
+	version=$1
+fi
+
+if (svn st | grep -qv '^\?'); then
+	echo Local changes remain:
+	svn st | grep -v '^\?'
+	exit 1
+fi
+
+echo Creating package directory...
+pkgdir="ipptool-$fileversion"
+
+test -d $pkgdir && rm -r $pkgdir
+mkdir $pkgdir || exit 1
+
+echo Copying package files
+cp IPPTOOL.txt LICENSE.txt $pkgdir
+cp doc/help/man-ipptool*.html $pkgdir
+cp test/create-printer-subscription.test $pkgdir
+cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
+cp test/get-printer-attributes.test $pkgdir
+cp test/ipp-[12].*.test $pkgdir
+cp test/ipptool-static $pkgdir/ipptool
+cp test/testfile.* $pkgdir
+
+if test `uname` = Darwin; then
+	echo Creating disk image...
+	pkgfile="$pkgdir-macosx-universal.dmg"
+	test -f $pkgfile && rm $pkgfile
+	hdiutil create -srcfolder $pkgdir $pkgfile
+	#sudo chown `whoami` $pkgfile
+else
+	echo Creating archive...
+	pkgfile="$pkgdir-`uname`-`uname -m`.tar.gz"
+	tar czf $pkgfile $pkgdir || exit 1
+fi
+
+if test -x /usr/bin/md5sum; then
+        (md5sum $pkgfile | awk '{print $1, "'$fileversion' cups/'$version'/" $2}')
+elif test -x /sbin/md5; then
+        (md5 $pkgfile | awk '{print $4, "'$fileversion' cups/'$version'/" substr($2, 2, length($2) - 2)}')
+fi
+
+echo Removing temporary files...
+rm -r $pkgdir
+
+echo "Done!"
+
+#
+# End of "$Id: makeipptoolpkg 9543 2011-02-17 23:43:53Z mike $".
+#
