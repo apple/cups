@@ -1,0 +1,41 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?待機中:{printer_state=4?処理中:停止}},
+{printer_is_accepting_jobs=0?ジョブを拒否中:ジョブを受け付け中},
+{server_is_sharing_printers=0?非:{printer_is_shared=0?非:}}共有{default_name={printer_name}?, デフォルトプリンター:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">メンテナンス</OPTION>
+<OPTION VALUE="print-test-page">テストページの印刷</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">クラスの開始</OPTION>:<OPTION VALUE="stop-class">クラスの停止</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">ジョブを受け付け</OPTION>:<OPTION VALUE="reject-jobs">ジョブを拒否</OPTION>}
+<OPTION VALUE="move-jobs">すべてのジョブの移動</OPTION>
+<OPTION VALUE="purge-jobs">すべてのジョブをキャンセル</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">管理</OPTION>
+<OPTION VALUE="modify-class">クラスの変更</OPTION>
+<OPTION VALUE="delete-class">クラスの削除</OPTION>
+<OPTION VALUE="set-class-options">デフォルトオプションの設定</OPTION>
+<OPTION VALUE="set-as-default">デフォルトプリンターの設定</OPTION>
+<OPTION VALUE="set-allowed-users">許可するユーザーの設定</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">説明:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">場所:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">メンバー:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">デフォルト:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unknown}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>
