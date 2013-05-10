@@ -1,0 +1,115 @@
+.\"
+.\" "$Id: lpinfo.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpinfo man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpinfo 8 "CUPS" "5 December 2008" "Apple Inc."
+.SH NAME
+lpinfo \- show available devices or drivers
+.SH SYNOPSIS
+.B lpinfo
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -l ] [ --device-id
+.I device-id-string
+] [ --exclude-schemes
+.I scheme-list
+] [ --include-schemes
+.I scheme-list
+] [ --language
+.I locale
+] [ --make-and-model
+.I name
+] [ --product
+.I name
+] -m
+.br
+.B lpinfo
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -l ] [ --exclude-schemes
+.I scheme-list
+] [ --include-schemes
+.I scheme-list
+] [ --timeout
+.I seconds
+] -v
+.SH DESCRIPTION
+\fIlpinfo\fR lists the available devices or drivers known to the
+CUPS server. The first form (\fI-m\fR) lists the available
+drivers, while the second form (\fI-v\fR) lists the available
+devices.
+.SH OPTIONS
+\fIlpinfo\fR accepts the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-U username
+.br
+Sets the username to use when connecting to the server.
+.TP 5
+-h server[:port]
+.br
+Selects an alternate server.
+.TP 5
+-l
+.br
+Shows a "long" listing of devices or drivers.
+.TP 5
+--device-id device-id-string
+.br
+Specifies the IEEE-1284 device ID to match when listing drivers with the
+\fI-m\fR option.
+.TP 5
+--exclude-schemes scheme-list
+.br
+Specifies a comma-separated list of device or PPD schemes that should be
+excluded from the results. Static PPD files use the "file" scheme.
+.TP 5
+--include-schemes scheme-list
+.br
+Specifies a comma-separated list of device or PPD schemes that should be
+included in the results. Static PPD files use the "file" scheme.
+.TP 5
+--language locale
+.br
+Specifies the language to match when listing drivers with the \fI-m\fR option.
+.TP 5
+--make-and-model name
+.br
+Specifies the make and model to match when listing drivers with the \fI-m\fR
+option.
+.TP 5
+--product name
+.br
+Specifies the product to match when listing drivers with the \fI-m\fR option.
+.TP 5
+--timeout seconds
+.br
+Specifies the timeout when listing devices with the \fI-v\fR option.
+.SH COMPATIBILITY
+The \fIlpinfo\fR command is unique to CUPS.
+.SH SEE ALSO
+\fIlpadmin(8)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lpinfo.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

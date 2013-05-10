@@ -1,0 +1,12 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{printer_name} の {title}</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Busy Indicator"> }プリンターコマンドジョブ
+{job_state=3?ペンディング中:{job_state=4?ホールド中:
+{job_state=5?処理中:{job_state=6?停止中:
+{job_state=7?キャンセル:{job_state=8?破棄:完了}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}</P>
+
+</DIV>

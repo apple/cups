@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Inici - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Inici&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administració&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Ajuda&nbsp;en&nbsp;línia&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Tasques&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Impressores&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>CUPS és el sistema d'impressió de codi obert i basat en estandards desenvolupat per
+<A HREF="http://www.apple.com/">Apple Inc.</A> per OS<SUP>&reg;</SUP> X and
+altres sistemes operatius basats en UNIX<SUP>&reg;</SUP></P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS per usuaris</H2>
+
+<P><A HREF="help/overview.html">Descripció general del CUPS</A></P>
+
+<P><A HREF="help/options.html">Impresió i opcions en linia de comandes</A></P>
+
+<P><A HREF="help/whatsnew.html">Novetats del CUPS 1.4</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Fòrum d'usuaris</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS per Administradors</H2>
+
+<P><A HREF="admin">Afegir impressores i classes</A></P>
+
+<P><A HREF="help/policies.html">Gestió de les polítiques de treball</A></P>
+
+<P><A HREF="help/accounting.html">Bàsic de comptes d'impressió</A></P>
+
+<P><A HREF="help/security.html">Seguritat del servidor</A></P>
+
+<P><A HREF="help/kerberos.html">Ús d'autenticació amb el Kerberos</A></P>
+
+<P><A HREF="help/network.html">Ús d'impressores en xarxa</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">Referència del cupsd.conf</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Cerca de controladors d'impressora</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS per desenvolupadors</H2>
+
+<P><A HREF="help/api-overview.html">Introducció a la programació amb CUPS</A></P>
+
+<P><A HREF="help/api-cups.html">La API de CUPS</A></P>
+
+<P><A HREF="help/api-filter.html">Programació de filtres i rerefons</A></P>
+
+<P><A HREF="help/api-httpipp.html">APIs per HTTP i IPP</A></P>
+
+<P><A HREF="help/api-ppd.html">API per PPD</A></P>
+
+<P><A HREF="help/api-raster.html">API per Raster</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">Referència del fitxer d'inf. del compilador del controlador per PPD</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Fòrum de desenvolupadors</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">CUPS i el seu logotip són marques registrades de
+<A HREF="http://www.apple.com">Apple Inc.</A> CUPS té copyright 2007-2012 d'Apple
+Inc. Tots els drets reservats.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>
