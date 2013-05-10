@@ -1,0 +1,95 @@
+<!--
+  "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
+
+  Introduction to CUPS programming content for the Common UNIX Printing System
+  (CUPS).
+
+  Copyright 2008 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class="title"><a name="OVERVIEW">Overview</a></h2>
+
+<p>CUPS provides two libraries that interface with the different parts of the
+printing system. The "cups" library provides all of the common application and
+filter functions while the "cupsimage" library provides all of the imaging
+functions used in raster printer drivers. The "cups" library functions are
+accessed by including the <var>&lt;cups/cups.h&gt;</var> header, while
+"cupsimage" functions are found in the <var>&lt;cups/raster.h&gt;</var>
+header.</p>
+
+<h2 class="title"><a name="COMPILING">Compiling Programs</a></h2>
+
+<p>The CUPS libraries can be used from any C, C++, or Objective C program.
+The method of compiling against the libraries varies depending on the
+operating system and installation of CUPS. The following sections show how
+to compile a simple program (shown below) in two common environments.</p>
+
+<p>The following simple program lists the available printers on the system:</p>
+
+<pre class="example">
+#include &lt;stdio.h&gt;
+#include &lt;cups/cups.h&gt;
+
+int main(void)
+{
+  int i;
+  cups_dest_t *dests, *dest;
+  int num_dests = cupsGetDests(&amp;dests);
+
+  for (i = num_dests, dest = dests; i &gt; 0; i --, dest ++)
+  {
+    if (dest->instance)
+      printf("%s/%s\n", dest->name, dest->instance);
+    else
+      puts(dest->name);
+  }
+
+  return (0);
+}
+</pre>
+
+<h3><a name="XCODE">Compiling with Xcode</a></h3>
+
+<p>In Xcode, choose <var>New Project...</var> from the <var>File</var> menu,
+then select the <var>Standard Tool</var> project type under <var>Command Line
+Utility</var>. Click <var>Next</var> and choose a project directory. Click
+<var>Next</var> to create the project.</p>
+
+<p>In the project window, double-click on the <var>Targets</var> group and
+control-click on the simple target to show the context menu. Choose
+<var>Existing Framework...</var> from the <var>Add</var> submenu. When the file
+chooser sheet appears, press the <kbd>/</kbd> key and enter "/usr/lib". Scroll
+down the file list and select the <var>libcups.dylib</var> file. Click the
+<var>Add</var> button in the file chooser and attributes sheets.</p>
+
+<p>In the project window, double-click on the <var>main.c</var> source file.
+Replace the template source code with the listing above and save it. Click the
+<var>Build and Go</var> button to build the sample program and run it.</p>
+
+<h3><a name="COMMANDLINE">Compiling with GCC</a></h3>
+
+<p>From the command-line, create a file called <var>sample.c</var> using your
+favorite editor and then run the following command to compile it with GCC and
+run it:</p>
+
+<pre class="command">
+gcc -o simple `cups-config --cflags` simple.c `cups-config --libs`
+./simple
+</pre>
+
+<p>The <code>cups-config</code> command provides the compiler flags
+("cups-config --cflags") and libraries ("cups-config --libs") needed for the
+local system.</p>
+
+<h2 class="title"><a name="WHERETOGO">Where to Go Next</a></h2>
+
+<p>If you are developing a print filter, driver, or backend, see the
+<a href="api-filter.html" target="_top">Filter and Backend Programming</a>
+guide. Raster printer driver developers should also read the
+<a href="api-raster.html" target="_top">Raster API</a> reference.</p>

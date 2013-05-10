@@ -1,0 +1,78 @@
+# DO NOT DELETE
+
+ppdc-array.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-array.o: ../cups/versioning.h
+ppdc-attr.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-attr.o: ../cups/versioning.h
+ppdc-catalog.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-catalog.o: ../cups/versioning.h ../cups/globals.h ../cups/string.h
+ppdc-catalog.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-catalog.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-catalog.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-catalog.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-choice.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-choice.o: ../cups/versioning.h
+ppdc-constraint.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-constraint.o: ../cups/versioning.h
+ppdc-driver.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-driver.o: ../cups/versioning.h ../cups/globals.h ../cups/string.h
+ppdc-driver.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-driver.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-driver.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-driver.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-file.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-file.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
+ppdc-file.o: ../cups/language.h ../cups/array.h
+ppdc-filter.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-filter.o: ../cups/versioning.h
+ppdc-font.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-font.o: ../cups/versioning.h
+ppdc-group.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-group.o: ../cups/versioning.h
+ppdc-import.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-import.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+ppdc-import.o: ../cups/file.h ../cups/i18n.h ../cups/transcode.h
+ppdc-import.o: ../cups/language.h
+ppdc-mediasize.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-mediasize.o: ../cups/versioning.h
+ppdc-message.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-message.o: ../cups/versioning.h
+ppdc-option.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-option.o: ../cups/versioning.h
+ppdc-profile.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-profile.o: ../cups/versioning.h
+ppdc-shared.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-shared.o: ../cups/versioning.h
+ppdc-source.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-source.o: ../cups/versioning.h ../cups/globals.h ../cups/string.h
+ppdc-source.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-source.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-source.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-source.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-source.o: ../cups/raster.h ../cups/cups.h ../data/epson.h ../data/escp.h
+ppdc-source.o: ../data/hp.h ../data/label.h ../data/pcl.h
+ppdc-string.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-string.o: ../cups/versioning.h
+ppdc-variable.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc-variable.o: ../cups/versioning.h
+genstrings.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+genstrings.o: ../cups/versioning.h
+ppdc.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
+ppdc.o: ../cups/language.h ../cups/array.h
+ppdhtml.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdhtml.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
+ppdhtml.o: ../cups/language.h ../cups/array.h
+ppdi.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdi.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
+ppdi.o: ../cups/language.h ../cups/array.h
+ppdmerge.o: ../cups/ppd-private.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+ppdmerge.o: ../cups/versioning.h ../cups/string.h ../cups/ppd.h
+ppdmerge.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/cups.h
+ppdmerge.o: ../cups/array.h ../cups/string.h ../config.h ../cups/i18n.h
+ppdmerge.o: ../cups/transcode.h
+ppdpo.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdpo.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
+ppdpo.o: ../cups/language.h ../cups/array.h
+testcatalog.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+testcatalog.o: ../cups/versioning.h
