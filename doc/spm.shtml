@@ -1,0 +1,4555 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SPM-1.0b1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>DRAFT - CUPS Software Programmers Manual</TITLE>
+</HEAD>
+<BODY>
+
+<H1 ALIGN="RIGHT">Preface</H1>
+
+This software programmers manual provides software programming
+information for the Common UNIX Printing System ("CUPS") Version 1.0.
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
+
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
+<H2>Document Overview</H2>
+
+<P>This software administrators manual is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Printing System Overview</LI>
+	<LI>2 - The CUPS API</LI>
+	<LI>3 - Writing Filters</LI>
+	<LI>4 - Writing Printer Drivers</LI>
+	<LI>5 - Writing Backends</LI>
+	<LI>A - Constants</LI>
+	<LI>B - Structures</LI>
+	<LI>C - Functions</LI>
+</UL>
+
+<H1 ALIGN="RIGHT">1 - Printing System Overview</H1>
+
+<P>This chapter provides an overview of how the Common UNIX Printing System
+works.
+
+<H2>The Printing Problem</H2>
+
+<P>For years <I>the printing problem</I> has plagued UNIX&reg;. Unlike
+Microsoft&reg; Windows&reg; or MacOS, UNIX has no standard interface or
+system in place for supporting printers. Among the solutions previously
+available, the Berkeley and System V printing systems are the most
+prevalent.
+
+<P>These printing systems support line printers (text only) or
+PostScript printers (text and graphics), and with some coaxing they can
+be made to support a full range of printers and file formats. However,
+because each varient of the UNIX operating system uses a different
+printing system than the next, developing printer drivers for a wide
+range of printers is extremely difficult. That combined with the
+limited volume of customers for each UNIX varient has forced most
+printer vendors to give up supporting UNIX entirely.
+
+<P>The Common UNIX Printing System, or CUPS, is designed to eliminate
+<I>the printing problem</I>. One common printing system can be used by
+all UNIX varients to support the printing needs of users. Printer
+vendors can use its modular filter interface to develop a single driver
+program that supports a wide range of file formats with little or no
+effort.  Since CUPS provides both the System V and Berkeley printing
+commands, users (and applications) can reap the benefits of this new
+technology with no changes.
+
+<H2>The Technology</H2>
+
+<P>CUPS is based upon an emerging Internet standard called the Internet
+Printing Protocol, or IPP. IPP has been embraced by dozens of printer
+and printer server manufacturers, and will be supported by the next
+Microsoft Windows operating system.
+
+<P>IPP defines a standard protocol for printing as well as managing print
+jobs and printer options like media size, resolution, and so forth. Like all
+IP-based protocols, IPP can be used locally or over the Internet to printers
+hundreds or thousands of miles away. Unlike other protocols, however, IPP
+also supports access control, authentication, and encryption, making it a
+much more secure printing solution than older ones.
+
+<P>IPP is layered on top of the Hyper-Text Transport Protocol, or HTTP,
+which is the basis of web servers on the Internet. This allows the user to
+view documentation and status information on a printer or server using their
+web browser.
+
+<P>CUPS provides a complete IPP/1.0-based printing system that provides Basic
+authentication and domain or IP-based access control. Digest authentication
+and TLS encryption will be available in future versions of CUPS.
+
+<H2>Jobs</H2>
+
+<P>Each file that is submitted for printing is called a <I>job</I>. 
+Jobs are identified by a unique number starting at 1 and are assigned
+to a particular destination (usually a printer). Jobs can also have
+options associated with them such as media size, number of copies, and
+priority.
+
+<H2>Classes</H2>
+
+<P>CUPS supports collections of printers known as <I>classes</I>. Jobs sent
+to a class are forwarded to the first available printer in the class.
+
+<H2>Filters</H2>
+
+<P>Filters allow a user or application to print many types of files
+without extra effort. Print jobs sent to a CUPS server are filtered
+before sending them to a printer. Some filters convert job files to
+different formats that the printer can understand. Others perform page
+selection and ordering tasks. <I>Backend</I> filters perform the most
+important task of all - they send the filtered print data to the
+printer.
+
+<P>CUPS provides filters for printing many types of image files,
+HP-GL/2 files, PDF files, and text files. CUPS also supplies
+PostScript and image file Raster Image Processors, or RIPs, that
+convert PostScript or image files into bitmaps that can be sent to a
+raster printer.
+
+<P>CUPS provides backends for printing over parallel and serial ports,
+and over the network via the JetDirect (AppSocket), Server Message
+Block, and Line Printer Daemon protocols.
+
+<H2>Printer Drivers</H2>
+
+<P>Printer drivers in CUPS consist of one of more filters specific to a
+printer. CUPS includes a sample printer driver for Hewlett-Packard
+LaserJet and DeskJet printers. While this driver does not generate
+optimal output for different printer models, it does demonstrate how
+you can write your own printer drivers and incorporate them into CUPS.
+
+<H2>Networking</H2>
+
+<P>Printers and classes on the local system are automatically shared with
+other systems on the network. This allows you to setup one system to print
+to a printer and use this system as a printer server or spool host for all
+of the others.  If there is only one occurrence of a printer on a network,
+then that printer can be accessed using its name alone. If more than one
+printer exists with the same name, users must select the printer by specifying
+which server to use (e.g. "printer@host1" or "printer@host2".)
+
+<P>CUPS also provides <I>implicit classes</I>, which are collections of
+printers and/or classes with the same name. This allows you to setup multiple
+servers pointing to the same physical network printer, for example, so that
+you aren't relying on a single system for printing. Because this also works
+with printer classes, you can setup multiple servers and printers and never
+worry about a "single point of failure" unless all of the printers and servers
+goes down!
+
+<H1 ALIGN="RIGHT">2 - The CUPS API</H1>
+
+<P>This chapter describes the CUPS Application Programmers Interface ("API").
+
+<H2>The CUPS Library</H2>
+
+<H3>Detecting the CUPS Library in Autoconf</H3>
+
+
+<H2>Basic Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Getting the Available Printers and Classes</H3>
+
+<H3>Printing Files</H3>
+
+<H3>Setting Printer Options</H3>
+
+<H3>Cancelling Jobs</H3>
+
+
+<H2>HTTP Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Connecting to a Server</H3>
+
+<H3>Setting Request Fields</H3>
+
+<H3>Issuing a Request</H3>
+
+<H3>Getting the Request Status</H3>
+
+<H3>Sending Request Data</H3>
+
+<H3>Reading Request Data</H3>
+
+
+<H2>IPP Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Creating an IPP Request</H3>
+
+<H3>Adding Attributes</H3>
+
+<H3>Sending an IPP Request</H3>
+
+<H3>Reading an IPP Response</H3>
+
+<H3>Finding Attributes</H3>
+
+<H3>Looping Through Attributes</H3>
+
+<H3>IPP Standard Operations</H3>
+
+<H3>IPP Extension Operations</H3>
+
+<H3>CUPS Extension Operations</H3>
+
+
+<H2>Language Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Getting the Default Language</H3>
+
+<H3>Getting the Language Encoding</H3>
+
+<H3>Getting a Language String</H3>
+
+
+<H2>MIME Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Loading a MIME Database</H3>
+
+<H3>Finding a Specific MIME Type</H3>
+
+<H3>Finding the MIME Type of a File</H3>
+
+<H3>Filters</H3>
+
+
+<H2>PPD Services</H2>
+
+<H3>Include Files</H3>
+
+<H3>Loading a PPD File</H3>
+
+<H3>Options and Groups</H3>
+
+<H3>Finding an Option</H3>
+
+<H3>Finding a Page Size</H3>
+
+<H3>Marking Options</H3>
+
+<H3>Checking for Conflicts</H3>
+
+<H3>Sending Options</H3>
+
+
+<H1 ALIGN="RIGHT">3 - Writing Filters</H1>
+
+<P>This chapter describes how to write a file filter for CUPS.
+
+<H2>Overview</H2>
+
+<H3>Security Considerations</H3>
+
+Users and Groups
+
+<H3>Temporary Files</H3>
+
+<H3>Page Accounting</H3>
+
+
+<H2>Command-Line Arguments</H2>
+
+<H3>Copy Generation</H3>
+
+
+<H2>Environment Variables</H2>
+
+
+<H2>Writing a HTML Filter</H2>
+
+
+<H1 ALIGN="RIGHT">4 - Writing Printer Drivers</H1>
+
+<P>This chapter discusses how to write a printer driver, which is a
+special filter program that converts CUPS raster data into the
+appropriate commands and data required for a printer.
+
+<H2>Overview</H2>
+
+<H3>Page Accounting</H3>
+
+<H3>Color Management</H3>
+
+
+<H2>Raster Functions</H2>
+
+<H3>cupsRasterOpen()</H3>
+
+<H3>cupsRasterReadHeader()</H3>
+
+<H3>cupsRasterReadPixels()</H3>
+
+<H3>cupsRasterClose()</H3>
+
+
+<H2>Writing a HP-PCL Driver</H2>
+
+
+<H1 ALIGN="RIGHT">5 - Writing Backends</H1>
+
+<P>This chapter describes how to write a backend for CUPS.  Backends
+communicate directly with printers and allow printer drivers and
+filters to send data using any type of connection transparently.
+
+<H2>Overview</H2>
+
+<H3>Security Considerations</H3>
+
+Users and Groups
+
+<H3>Temporary Files</H3>
+
+<H3>Page Accounting</H3>
+
+<H3>Retries</H3>
+
+
+<H2>Command-Line Arguments</H2>
+
+<H3>Copy Generation</H3>
+
+
+<H2>Environment Variables</H2>
+
+
+<H2>Writing a Serial Port Backend</H2>
+
+
+<H1 ALIGN="RIGHT">A - Constants</H1>
+
+<P>This appendix lists all of the constants that are defined by the CUPS
+API.
+
+<H2>CUPS Constants</H2>
+
+<H2>HTTP Constants</H2>
+
+<H2>IPP Constants</H2>
+
+<H2>Language Constants</H2>
+
+<H2>MIME Constants</H2>
+
+<H2>PPD Constants</H2>
+
+<H2>Raster Constants</H2>
+
+
+<H1 ALIGN="RIGHT">B - Structures</H1>
+
+<P>This appendix describes all of the structures that are defined by the CUPS
+API.
+
+<H2></H2>
+
+
+<H1 ALIGN="RIGHT">C - Functions</H1>
+
+<P>This appendix provides a reference for all of the CUPS API functions.
+
+<!-- NEW PAGE --><H2><A NAME="cupsAddOption">cupsAddOption()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsAddOption(const char *name,
+              const char *value,
+              int num_options,
+	      cups_option_t **options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the option.</TD>
+</TR>
+<TR>
+	<TD>value</TD>
+	<TD>The value of the option.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>Number of options currently in the array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>Pointer to the options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The new number of options.
+
+<H3>Description</H3>
+
+<P><CODE>cupsAddOption()</CODE> adds an option to the specified array.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+...
+
+/* Declare the options array */
+int           num_options;
+<A HREF="#cups_option_t">cups_option_t</A> *options;
+
+/* Initialize the options array */
+num_options = 0;
+options     = (cups_option_t *)0;
+
+/* Add options using cupsAddOption() */
+num_options = cupsAddOption("media", "letter", num_options, &amp;options);
+num_options = cupsAddOption("resolution", "300dpi", num_options, &amp;options);
+</PRE>
+
+<H3>See Also</H3>
+
+<A HREF="#cupsFreeOptions"><CODE>cupsFreeOptions()</CODE></A>,
+<A HREF="#cupsGetOption"><CODE>cupsGetOption()</CODE></A>,
+<A HREF="#cupsParseOptions"><CODE>cupsParseOptions()</CODE></A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsCancelJob">cupsCancelJob()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsCancelJob(const char *dest,
+              int job);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>dest</TD>
+	<TD>Printer or class name</TD>
+</TR>
+<TR>
+	<TD>job</TD>
+	<TD>Job ID</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>1 on success, 0 on failure. On failure the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
+
+<H3>Description</H3>
+
+<P><CODE>cupsCancelJob()</CODE> cancels the specifies job.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+cupsCancelJob("LaserJet", 1);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>,
+<A HREF="#cupsPrintFile"><CODE>cupsPrintFile()</CODE></A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsDoFileRequest">cupsDoFileRequest()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ipp_t *
+cupsDoFileRequest(http_t *http,
+                  ipp_t *request,
+                  const char *resource,
+		  const char *filename);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>HTTP connection to server.</TD>
+</TR>
+<TR>
+	<TD>request</TD>
+	<TD>IPP request data.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>HTTP resource name for POST.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>File to send with POST request (<CODE>NULL</CODE> pointer if none.)</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>IPP response data or <CODE>NULL</CODE> if the request fails. On failure
+the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
+
+<H3>Description</H3>
+
+<P><CODE>cupsDoFileRequest()</CODE> does a HTTP POST request and provides the
+IPP request and optionally the contents of a file to the IPP server. It also
+handles resubmitting the request and performing password authentication as
+needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+<A HREF="#http_t">http_t</A>      *http;
+<A HREF="#cups_lang_t">cups_lang_t</A> *language;
+<A HREF="#ipp_t">ipp_t</A>       *request;
+ipp_t       *response;
+
+...
+
+/* Get the default language */
+language = <A HREF="#cupsLangDefault">cupsLangDefault()</A>;
+
+/* Create a new IPP request */
+request  = <A HREF="#ippNew">ippNew()</A>;
+
+request-&gt;request.op.operation_id = IPP_PRINT_FILE;
+request-&gt;request.op.request_id   = 1;
+
+/* Add required attributes */
+<A HREF="#ippAddString">ippAddString</A>(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+             "attributes-charset", NULL, <A HREF="#cupsLangEncoding">cupsLangEncoding</A>(language));
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+             "attributes-natural-language", NULL,
+             language != NULL ? language-&gt;language : "C");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+             NULL, "ipp://hostname/resource");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+             NULL, <A HREF="#cupsUser">cupsUser()</A>);
+
+/* Do the request... */
+response = cupsDoFileRequest(http, request, "/resource", "filename.txt");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault"><CODE>cupsLangDefault()</CODE></A>,
+<A HREF="#cupsLangEncoding"><CODE>cupsLangEncoding()</CODE></A>,
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsDoRequest">cupsDoRequest()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ipp_t *
+cupsDoRequest(http_t *http,
+              ipp_t *request,
+              const char *resource);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>http</TD>
+	<TD>HTTP connection to server.</TD>
+</TR>
+<TR>
+	<TD>request</TD>
+	<TD>IPP request data.</TD>
+</TR>
+<TR>
+	<TD>resource</TD>
+	<TD>HTTP resource name for POST.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>IPP response data or <CODE>NULL</CODE> if the request fails. On failure
+the error can be found by calling
+<A HREF="#cupsLastError"><CODE>cupsLastError()</CODE></A>.
+
+<H3>Description</H3>
+
+<P><CODE>cupsDoRequest()</CODE> does a HTTP POST request and provides
+the IPP request to the IPP server. It also handles resubmitting the
+request and performing password authentication as needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups.h&gt;
+
+<A HREF="#http_t">http_t</A>      *http;
+<A HREF="#cups_lang_t">cups_lang_t</A> *language;
+<A HREF="#ipp_t">ipp_t</A>       *request;
+ipp_t       *response;
+
+...
+
+/* Get the default language */
+language = <A HREF="#cupsLangDefault">cupsLangDefault()</A>;
+
+/* Create a new IPP request */
+request  = <A HREF="#ippNew">ippNew()</A>;
+
+request-&gt;request.op.operation_id = IPP_GET_PRINTER_ATTRIBUTES;
+request-&gt;request.op.request_id   = 1;
+
+/* Add required attributes */
+<A HREF="#ippAddString">ippAddString</A>(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+             "attributes-charset", NULL, <A HREF="#cupsLangEncoding">cupsLangEncoding</A>(language));
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+             "attributes-natural-language", NULL,
+             language != NULL ? language-&gt;language : "C");
+
+ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+             NULL, "ipp://hostname/resource");
+
+/* Do the request... */
+response = cupsDoRequest(http, request, "/resource");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault"><CODE>cupsLangDefault()</CODE></A>,
+<A HREF="#cupsLangEncoding"><CODE>cupsLangEncoding()</CODE></A>,
+<A HREF="#cupsUser"><CODE>cupsUser()</CODE></A>,
+<A HREF="#httpConnect"><CODE>httpConnect()</CODE></A>,
+<A HREF="#ippAddString"><CODE>ippAddString()</CODE></A>,
+<A HREF="#ippNew"><CODE>ippNew()</CODE></A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsFreeOptions">cupsFreeOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsFreeOptions(int num_options,
+                cups_option_t *options);
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>Number of options in array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>Pointer to options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsFreeOptions()</CODE> frees all memory associated with the
+option array specified.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+cupsFreeOptions(num_options, options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetClasses">cupsGetClasses()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsGetClasses(char ***classes);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>classes</TD>
+	<TD>Pointer to character pointer array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The number of printer classes available.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetClasses()</CODE> gets a list of the available printer classes.
+The returned array should be freed using the <CODE>free()</CODE> when it is
+no longer needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int  i;
+int  num_classes;
+char **classes;
+
+...
+
+num_classes = cupsGetClasses(&classes);
+
+...
+
+if (num_classes > 0)
+{
+  for (i = 0; i < num_classes; i ++)
+    free(classes[i]);
+
+  free(classes);
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetDefault">cupsGetDefault()</CODE>,
+<A HREF="#cupsGetPrinters">cupsGetPrinters()</CODE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetDefault">cupsGetDefault()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsGetDefault(void);
+</PRE>
+
+<H3>Returns</H3>
+
+<P>A pointer to the default destination.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetDefault()</CODE> gets the default destination printer or class.
+The default destination is stored in a static string and will be overwritten
+(usually with the same value) after each call.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+printf("The default destination is %s\n", cupsGetDefault());
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetClasses">cupsGetClasses()</CODE>,
+<A HREF="#cupsGetPrinters">cupsGetPrinters()</CODE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetOption">cupsGetOption()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsGetOption(const char *name,
+              int num_options,
+              cups_option_t *options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the option.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>The options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the option values or <CODE>NULL</CODE> if the option is
+not defined.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetOption()</CODE> returns the first occurrence of the
+named option. If the option is not included in the options array then a
+<CODE>NULL</CODE> pointer is returned.
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+const char    *media;
+
+...
+
+media = cupsGetOption("media", num_options, options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetPassword">cupsGetPassword()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsGetPassword(const char *prompt);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>prompt</TD>
+	<TD>The prompt to display to the user.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the password that was entered or <CODE>NULL</CODE> if no
+password was entered.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetPassword()</CODE> displays the prompt string and asks the user
+for a password. The password text is not echoed to the user.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+char *password;
+
+...
+
+password = cupsGetPassword("Please enter a password:");
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsServer">cupsServer()</A>,
+<A HREF="#cupsUser()">cupsUser()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetPPD">cupsGetPPD()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsGetPPD(const char *printer);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>printer</TD>
+	<TD>The name of the printer.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The name of a temporary file containing the PPD file or <CODE>NULL</CODE>
+if the printer cannot be located or does not have a PPD file.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetPPD()</CODE> gets a copy of the PPD file for the named printer.
+The printer name can be of the form "printer" or "printer@hostname".
+
+<P>You should remove (unlink) the PPD file after you are done using it. The
+filename is stored in a static buffer and will be overwritten with each call
+to <CODE>cupsGetPPD()</CODE>.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+char *ppd;
+
+...
+
+ppd = cupsGetPPD("printer@hostname");
+
+...
+
+unlink(ppd);
+</PRE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsGetPrinters">cupsGetPrinters()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsGetPrinters(char ***printers);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>printers</TD>
+	<TD>Pointer to character pointer array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The number of printer printers available.
+
+<H3>Description</H3>
+
+<P><CODE>cupsGetPrinters()</CODE> gets a list of the available printers.
+The returned array should be freed using the <CODE>free()</CODE> when it is
+no longer needed.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int  i;
+int  num_printers;
+char **printers;
+
+...
+
+num_printers = cupsGetPrinters(&printers);
+
+...
+
+if (num_printers > 0)
+{
+  for (i = 0; i < num_printers; i ++)
+    free(printers[i]);
+
+  free(printers);
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetClasses">cupsGetClasses()</CODE>,
+<A HREF="#cupsGetDefault">cupsGetDefault()</CODE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangDefault">cupsLangDefault()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsLangDefault(void);
+</PRE>
+
+<H3>Returns</H3>
+
+<P>A pointer to the default language structure.
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangDefault()</CODE> returns a language structure for the default
+language. The default language is defined by the <CODE>LANG</CODE> environment
+variable. If the specified language cannot be located then the POSIX (English)
+locale is used.
+
+<P>Call <CODE>cupsLangFree()</CODE> to free any memory associated with the
+language structure when you are done.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+...
+
+language = cupsLangDefault();
+
+...
+
+cupsLangFree(language);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangEncoding">cupsLangEncoding()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+char *
+cupsLangEncoding(cups_lang_t *language);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>language</TD>
+	<TD>The language structure.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the encoding string.
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangEncoding()</CODE> returns the language encoding used for the
+specified language, e.g. "iso-8859-1", "utf-8", etc.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+char        *encoding;
+...
+
+language = cupsLangDefault();
+encoding = cupsLangEncoding(language);
+...
+
+cupsLangFree(language);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangFlush">cupsLangFlush()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsLangFlush(void);
+</PRE>
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangFlush()</CODE> frees all language structures that have been
+allocated.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+...
+
+cupsLangFlush();
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangFree">cupsLangFree()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsLangFree(cups_lang_t *language);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>language</TD>
+	<TD>The language structure to free.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangFree()</CODE> frees the specified language structure.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+...
+
+cupsLangFree(language);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangGet">cupsLangGet()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+cups_lang_t *
+cupsLangGet(const char *name);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>name</TD>
+	<TD>The name of the locale.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to a language structure.
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangGet()</CODE> returns a language structure for the specified
+locale. If the locale is not defined then the POSIX (English) locale is
+substituted.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+
+...
+
+language = cupsLangGet("fr");
+
+...
+
+cupsLangFree(language);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangString">cupsLangString()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLangString">cupsLangString()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+char *
+cupsLangString(cups_lang_t *language,
+               int         message);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>language</TD>
+	<TD>The language to query.</TD>
+</TR>
+<TR>
+	<TD>message</TD>
+	<TD>The message number.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to the message string or <CODE>NULL</CODE> if the message is
+not defined.
+
+<H3>Description</H3>
+
+<P><CODE>cupsLangString()</CODE> returns a pointer to the specified message
+string in the specified language.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/language.h&gt;
+
+cups_lang_t *language;
+char        *s;
+...
+
+language = cupsLangGet("fr");
+
+s = cupsLangString(language, CUPS_MSG_YES);
+
+...
+
+cupsLangFree(language);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsLangDefault">cupsLangDefault()</A>,
+<A HREF="#cupsLangEncoding">cupsLangEncoding()</A>,
+<A HREF="#cupsLangFlush">cupsLangFlush()</A>,
+<A HREF="#cupsLangFree">cupsLangFree()</A>,
+<A HREF="#cupsLangGet">cupsLangGet()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsLastError">cupsLastError()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+ipp_status_t
+cupsLastError(void);
+</PRE>
+
+<H3>Returns</H3>
+
+<P>An enumeration containing the last IPP error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsLastError()</CODE> returns the last IPP error that occurred.
+If no error occurred then it will return <CODE>IPP_OK</CODE> or
+<CODE>IPP_OK_CONFLICT</CODE>.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+ipp_status_t status;
+
+...
+
+status = cupsLastError();
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsCancelJob">cupsCancelJob()</A>,
+<A HREF="#cupsPrintFile">cupsPrintFile()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsMarkOptions">cupsMarkOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsMarkOptions(ppd_file_t *ppd,
+                int num_options,
+                cups_option_t *options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ppd</TD>
+	<TD>The PPD file to mark.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The number of conflicts found.
+
+<H3>Description</H3>
+
+<P><CODE>cupsMarkOptions()</CODE> marks options in the PPD file. It also
+handles mapping of IPP option names and values to PPD option names.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+ppd_file_t    *ppd;
+
+...
+
+cupsMarkOptions(ppd, num_options, options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsParseOptions">cupsParseOptions()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsParseOptions">cupsParseOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsParseOptions(const char *arg,
+                 int num_options,
+                 cups_option_t **options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>arg</TD>
+	<TD>The string containing one or more options.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array pointer.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The new number of options in the array.
+
+<H3>Description</H3>
+
+<P><CODE>cupsParseOptions()</CODE> parses the specifies string for one
+or more options of the form "name=value", "name", or "noname". It can
+be called multiple times to combine the options from several strings.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+num_options = 0;
+options     = (cups_option_t *)0;
+num_options = cupsParseOptions(argv[5], num_options, &amp;options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsAddOption">cupsAddOption()</A>,
+<A HREF="#cupsFreeOptions">cupsFreeOptions()</A>,
+<A HREF="#cupsGetOption">cupsGetOption()</A>,
+<A HREF="#cupsMarkOptions">cupsMarkOptions()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsPrintFile">cupsPrintFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+int
+cupsPrintFile(const char *printer,
+              const char *filename,
+              const char *title,
+	      int num_options,
+	      cups_option_t *options);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>printer</TD>
+	<TD>The printer or class to print to.</TD>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The file to print.</TD>
+</TR>
+<TR>
+	<TD>title</TD>
+	<TD>The job title.</TD>
+</TR>
+<TR>
+	<TD>num_options</TD>
+	<TD>The number of options in the options array.</TD>
+</TR>
+<TR>
+	<TD>options</TD>
+	<TD>A pointer to the options array.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The new job ID number or 0 on error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsPrintFile()</CODE> sends a file to the specified printer or
+class for printing. If the job cannot be printed the error code can be
+found by calling <CODE>cupsLastError()</CODE>.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+int           num_options;
+cups_option_t *options;
+
+...
+
+cupsPrintFile("printer@hostname", "filename.ps", "Job Title", num_options,
+              options);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsCancelJob">cupsCancelJob()</A>,
+<A HREF="#cupsLastError">cupsLastError()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterClose">cupsRasterClose()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+void
+cupsRasterClose(cups_raster_t *ras);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ras</TD>
+	<TD>The raster stream to close.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterClose()</CODE> closes the specified raster stream.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+cups_raster_t *ras;
+
+...
+
+cupsRasterClose(ras);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
+
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterOpen">cupsRasterOpen()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+cups_raster_t *
+cupsRasterOpen(int fd,
+               cups_mode_t mode);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>fd</TD>
+	<TD>The file descriptor to use.</TD>
+</TR>
+<TR>
+	<TD>mode</TD>
+	<TD>The mode to use; <CODE>CUPS_RASTER_READ</CODE> or
+	<CODE>CUPS_RASTER_WRITE</CODE>.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to a raster stream or <CODE>NULL</CODE> if there was an error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterOpen()</CODE> opens a raster stream for reading or writing.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+cups_raster_t *ras;
+
+...
+
+ras = cupsRasterOpen(0, CUPS_RASTER_READ);
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterReadHeader">cupsRasterReadHeader()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterReadHeader(cups_raster_t *ras,
+                     cups_page_header_t *header);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ras</TD>
+	<TD>The raster stream to read from.</TD>
+</TR>
+<TR>
+	<TD>header</TD>
+	<TD>A pointer to a page header structure to read into.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>1 on success, 0 on EOF or error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterReadHeader()</CODE> reads a page header from the specified
+raster stream.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+while (cupsRasterReadHeader(ras, &amp;header))
+{
+  ...
+
+  for (line = 0; line &lt; header.cupsHeight; line ++)
+  {
+    cupsRasterReadPixels(ras, pixels, header.cupsBytesPerLine);
+
+    ...
+  }
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterReadPixels">cupsRasterReadPixels()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterReadPixels(cups_raster_t *ras,
+                     unsigned char *pixels,
+		     unsigned length);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ras</TD>
+	<TD>The raster stream to read from.</TD>
+</TR>
+<TR>
+	<TD>pixels</TD>
+	<TD>The pointer to a pixel buffer.</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes of pixel data to read.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The number of bytes read or 0 on EOF or error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterReadPixels()</CODE> reads pixel data from the specified
+raster stream.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+while (cupsRasterReadHeader(ras, &amp;header))
+{
+  ...
+
+  for (line = 0; line &lt; header.cupsHeight; line ++)
+  {
+    cupsRasterReadPixels(ras, pixels, header.cupsBytesPerLine);
+
+    ...
+  }
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterWriteHeader">cupsRasterWriteHeader()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterWriteHeader(cups_raster_t *ras,
+                      cups_page_header_t *header);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ras</TD>
+	<TD>The raster stream to write to.</TD>
+</TR>
+<TR>
+	<TD>header</TD>
+	<TD>A pointer to the page header to write.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>1 on success, 0 on error.
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterWriteHeader()</CODE> writes the specified page header to
+a raster stream.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+cupsRasterWriteHeader(ras, &amp;header);
+
+for (line = 0; line &lt; header.cupsHeight; line ++)
+{
+  ...
+
+  cupsRasterWritePixels(ras, pixels, header.cupsBytesPerLine);
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWritePixels">cupsRasterWritePixels()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsRasterWritePixels">cupsRasterWritePixels()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+unsigned
+cupsRasterWritePixels(cups_raster_t *ras,
+                      unsigned char *pixels,
+		      unsigned length);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>ras</TD>
+	<TD>The raster stream to write to.</TD>
+</TR>
+<TR>
+	<TD>pixels</TD>
+	<TD>The pixel data to write.</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The number of bytes to write.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>The number of bytes written.
+
+<H3>Description</H3>
+
+<P><CODE>cupsRasterWritePixels()</CODE> writes the specified pixel data to a
+raster stream.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/raster.h&gt;
+
+int                  line;
+cups_raster_t        *ras;
+cups_raster_header_t header;
+unsigned char        pixels[8192];
+...
+
+cupsRasterWriteHeader(ras, &amp;header);
+
+for (line = 0; line &lt; header.cupsHeight; line ++)
+{
+  ...
+
+  cupsRasterWritePixels(ras, pixels, header.cupsBytesPerLine);
+}
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsRasterClose">cupsRasterClose()</A>,
+<A HREF="#cupsRasterOpen">cupsRasterOpen()</A>,
+<A HREF="#cupsRasterReadHeader">cupsRasterReadHeader()</A>,
+<A HREF="#cupsRasterReadPixels">cupsRasterReadPixels()</A>,
+<A HREF="#cupsRasterWriteHeader">cupsRasterWriteHeader()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsServer">cupsServer()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsServer(void);
+</PRE>
+
+<H3>Returns</H3>
+
+<P>A pointer to the default server name.
+
+<H3>Description</H3>
+
+<P><CODE>cupsServer()</CODE> returns a pointer to the default server name.
+The server name is stored in a static location and will be overwritten with
+every call to <CODE>cupsServer()</CODE>
+
+<P>The default server is determined from the following locations:
+
+<OL>
+
+	<LI>The <CODE>CUPS_SERVER</CODE> environment variable,
+
+	<LI>The <CODE>ServerName</CODE> directive in the
+	<VAR>cupsd.conf</VAR> file,
+
+	<LI>The default host, "localhost".
+
+</OL>
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *server;
+
+server = cupsServer();
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetPassword">cupsGetPassword()</A>,
+<A HREF="#cupsUser">cupsUser()</A>
+
+<!-- NEW PAGE --><H2><A NAME="cupsTempFile">cupsTempFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+char *
+cupsTempFile(char *filename,
+             int length);
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>filename</TD>
+	<TD>The character string to hold the temporary filename.</TD>
+</TR>
+<TR>
+	<TD>length</TD>
+	<TD>The size of the filename string in bytes.</TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<P>A pointer to <CODE>filename</CODE>.
+
+<H3>Description</H3>
+
+<P><CODE>cupsTempFile()</CODE> generates a temporary filename for the
+<VAR>/var/tmp</VAR> directory or the directory specified by the
+<CODE>TMPDIR</CODE> environment variable.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+char filename[256];
+
+cupsTempFile(filename, sizeof(filename));
+</PRE>
+
+<!-- NEW PAGE --><H2><A NAME="cupsUser">cupsUser()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+const char *
+cupsUser(void);
+</PRE>
+
+<H3>Returns</H3>
+
+<P>A pointer to the current username or <CODE>NULL</CODE> if the user ID is
+undefined.
+
+<H3>Description</H3>
+
+<P><CODE>cupsUser()</CODE> returns the name associated with the current
+user ID as reported by the <CODE>getuid()</CODE> system call.
+
+<H3>Example</H3>
+
+<PRE>
+#include &lt;cups/cups.h&gt;
+
+const char *user;
+
+user = cupsUser();
+</PRE>
+
+<H3>See Also</H3>
+
+<P>
+<A HREF="#cupsGetPassword">cupsGetPassword()</A>,
+<A HREF="#cupsServer">cupsServer()</A>
+
+<!-- NEW PAGE --><H2><A NAME="httpBlocking">httpBlocking()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpCheck">httpCheck()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpClearFields">httpClearFields()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpClose">httpClose()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpConnect">httpConnect()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpDecode64">httpDecode64()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpDelete">httpDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpEncode64">httpEncode64()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpError">httpError()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpFlush">httpFlush()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGet">httpGet()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGets">httpGets()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGetDateString">httpGetDateString()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGetDateTime">httpGetDateTime()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGetField">httpGetField()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpGetLength">httpGetLength()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpHead">httpHead()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpInitialize">httpInitialize()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpOptions">httpOptions()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpPost">httpPost()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpPrintf">httpPrintf()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpPut">httpPut()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpRead">httpRead()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpReconnect">httpReconnect()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpSeparate">httpSeparate()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpSetField">httpSetField()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpTrace">httpTrace()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpUpdate">httpUpdate()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="httpWrite">httpWrite()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddBoolean">ippAddBoolean()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddBooleans">ippAddBooleans()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddDate">ippAddDate()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddInteger">ippAddInteger()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddIntegers">ippAddIntegers()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddRange">ippAddRange()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddRanges">ippAddRanges()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddResolution">ippAddResolution()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddResolutions">ippAddResolutions()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddSeparator">ippAddSeparator()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddString">ippAddString()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippAddStrings">ippAddStrings()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippDateToTime">ippDateToTime()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippDelete">ippDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippFindAttribute">ippFindAttribute()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippLength">ippLength()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippNew">ippNew()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippPort">ippPort()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippRead">ippRead()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippTimeToDate">ippTimeToDate()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ippWrite">ippWrite()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeAddFilter">mimeAddFilter()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeAddType">mimeAddType()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeAddTypeRule">mimeAddTypeRule()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeDelete">mimeDelete()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeFileType">mimeFileType()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeFilter">mimeFilter()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeLoad">mimeLoad()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeMerge">mimeMerge()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeNew">mimeNew()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="mimeType">mimeType()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdClose">ppdClose()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdConflicts">ppdConflicts()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="pddEmitFd">pddEmitFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdEmit">ppdEmit()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdFindChoice">ppdFindChoice()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdFindMarkedChoice">ppdFindMarkedChoice()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdFindOption">ppdFindOption()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdIsMarked">ppdIsMarked()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdMarkDefaults">ppdMarkDefaults()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdMarkOption">ppdMarkOption()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFd">ppdOpenFd()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdOpenFile">ppdOpenFile()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdOpen">ppdOpen()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdPageLength">ppdPageLength()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdPageSize">ppdPageSize()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+<!-- NEW PAGE --><H2><A NAME="ppdPageWidth">ppdPageWidth()</A></H2>
+
+<H3>Usage</H3>
+
+<PRE>
+</PRE>
+
+<H3>Arguments</H3>
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<TR>
+	<TH>Argument</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD></TD>
+	<TD></TD>
+</TR>
+</TABLE></CENTER>
+
+<H3>Returns</H3>
+
+<H3>Description</H3>
+
+<H3>Example</H3>
+
+<PRE>
+</PRE>
+
+<H3>See Also</H3>
+
+
+</BODY>
+</HTML>
