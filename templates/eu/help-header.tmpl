@@ -1,0 +1,49 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Bilatu 
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:dokumentu guztietan}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Bilatu">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Garbitu"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Edukia">
+<TR><TD>
+
+<H3 CLASS="title">Lineako laguntzaren dokumentuak</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Dokumentu guztiak</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Bilaketaren emaitzak {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:dokumentu guztietan}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Ez da bat datorrenik aurkitu.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Ikusi bertsio inprimagarria"></FORM>:
+
+<H1>Lineako laguntza</H1>
+
+<P>Hau CUPSen lineako laguntzaren interfazea da. Sartu bilatzeko hitzak gainean
+edo klik egin dokumentazioaren edozein esteketan lineako laguntzaren informazioa bistaratzeko.</P>
+
+<P>CUPSekin hasiberria bazara, irakurri "<a
+href="/help/overview.html">CUPSen gainbegiraketa</a>" orrialdea. Erabiltzaile adituek
+ "<a href="/help/whatsnew.html">CUPS 1.4 bertsioko berrikuntzak</a>" orrialdea irakurri beharko lukete.</P>
+
+<P><A HREF="http://www.cups.org/">CUPSen webgune nagusia</A>k
+hainbat baliabide eskaintzen ditu: erabiltzaileek eztabaidatzeko foruak, maiz egindako
+galderei (MEG edo FAQ) erantzunak, eta akatsei buruz berri emateko edo eginbideak eskatzeko
+inprimakia.</P>}

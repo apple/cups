@@ -1,0 +1,44 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription">
+
+<H2 CLASS="title">S'abonner &agrave; un flux RSS</H2>
+
+<TABLE SUMMARY="S'abonner &agrave; un flux RSS">
+<TR>
+<TH CLASS="label">Nom:</TH>
+<TD COLSPAN="5"><INPUT TYPE="TEXT" NAME="SUBSCRIPTION_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?SUBSCRIPTION_NAME}"><BR>
+<SMALL>(Peux contenir n'importe quel caract&egrave;re sauf "/", "#", et espace)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">File:</TH>
+<TD COLSPAN="5"><SELECT NAME="PRINTER_URI" SIZE="10"><OPTION VALUE="#ALL#"{?PRINTER_URI=#ALL#? SELECTED:}>Toutes les files</OPTION>{[printer_name]<OPTION VALUE="{printer_uri_supported}"{?PRINTER_URI={printer_uri_supported}? SELECTED:}>{printer_name}</OPTION>}</SELECT></TD>
+</TR>
+<TR VALIGN="TOP">
+<TH CLASS="label">Ev&eacute;nements:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CREATED" {?EVENT_JOB_CREATED}>T&acirc;ches cr&eacute;es<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_COMPLETED" {?EVENT_JOB_COMPLETED}>T&acirc;ches finies<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_STOPPED" {?EVENT_JOB_STOPPED}>T&acirc;ches stopp&eacute;es<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CONFIG_CHANGED" {?EVENT_JOB_CONFIG_CHANGED}>Options de t&acirc;che modifi&eacute;es</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_STOPPED" {?EVENT_PRINTER_STOPPED}>Files arr&ecirc;t&eacute;es<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_ADDED" {?EVENT_PRINTER_ADDED}>File ajout&eacute;e<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_MODIFIED" {?EVENT_PRINTER_MODIFIED}>File modifi&eacute;e<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_DELETED" {?EVENT_PRINTER_DELETED}>File supprim&eacute;e</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STARTED" {?EVENT_SERVER_STARTED}>Serveur d&eacute;marr&eacute;<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STOPPED" {?EVENT_SERVER_STOPPED}>Serveur arr&ecirc;t&eacute;<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_RESTARTED" {?EVENT_SERVER_RESTARTED}>Serveur red&eacute;marr&eacute;<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_AUDIT" {?EVENT_SERVER_AUDIT}>Audit de s&eacute;curit&eacute; du serveur</TD>
+</TR>
+<TR>
+<TH CLASS="label">Nombre maximum d'&eacute;v&eacute;nements:</TH>
+<TD COLSPAN="5"><INPUT TYPE="TEXT" NAME="MAX_EVENTS" SIZE="4" MAXLENGTH="4" VALUE="{MAX_EVENTS?{MAX_EVENTS}:20}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN="5"><INPUT TYPE="SUBMIT" VALUE="S'abonner &agrave; un flux RSS"></TD>
+</TR>
+</TABLE>
+
+</FORM>

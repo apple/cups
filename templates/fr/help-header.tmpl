@@ -1,0 +1,51 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Rechercher dans
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:tous les documents}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Rechercher">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Vider"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contenus">
+<TR><TD>
+
+<H3 CLASS="title">Documents d'aide en ligne</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Tous les documents</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>R&eacute;sultats de la recherche dans {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:tous les documents}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Aucun r&eacute;sultat trouv&eacute;.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Voir la version imprimable"></FORM>:
+
+<H1>Aide en ligne</H1>
+
+<P>Voici l'interface d'aide en ligne de CUPS. Entrez ci-dessus les mots &agrave; rechercher
+ou cliquez sur un lien ci-contre pour afficher l'aide en ligne du document.</P>
+
+
+<P>Si vous &ecirc;tes un nouvel utilisateur de CUPS, lisez la page "<a
+href="/help/overview.html">Pr&eacute;sentation de CUPS</a>". Il est conseill&eacute; aux utilisateurs
+habitu&eacute;s de lire la page  "<a href="/help/whatsnew.html">Quoi de neuf dans CUPS
+1.5</a>" page.</P>
+
+<P>La <A HREF="http://www.cups.org/">page d'accueil de CUPS</A> donne aussi
+acc&egrave;s &agrave; de nombreuses ressources, comme des forums de discussion pour les
+utilisateurs, des r&eacute;ponses aux questions fr&eacute;quentes, et un formulaire pour
+soumettre des rapports de bug ou des demandes pour de nouvelles fonctionnalit&eacute;s.</P>}

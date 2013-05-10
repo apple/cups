@@ -1,0 +1,53 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?{printer_name} módosítása:Nyomtató
+hozzáadása}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Kapcsolat:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Adatátviteli sebesség:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Paritás:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>Nincs
+<OPTION VALUE="even" {?parity=even?SELECTED:}>Páros
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Páratlan
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Adatbitek:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Folyamvezérlés:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>Nincs
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (szoftveres)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (hardveres)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (hardveres)
+</SELECT></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Folytatás"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>
