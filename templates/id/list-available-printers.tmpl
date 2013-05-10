@@ -1,0 +1,10 @@
+<H2 CLASS="title">Pencetak yang Tersedia</H2>
+
+{#device_uri=0?<P>Tidak ada pencetak yang ditemukan.</P>
+:<UL>{[device_uri]
+<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/button-add-this-printer.gif" ALT="Tambahkan Pencetak Ini" CLASS="button"
+ALIGN="MIDDLE"></A>
+{device_make_and_model} ({device_info})</LI>
+}</UL>}
+

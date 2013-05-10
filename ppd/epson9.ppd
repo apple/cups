@@ -1,0 +1,377 @@
+*PPD-Adobe: "4.3"
+*% PPD file for 9-Pin Series with CUPS.
+*% Created by the CUPS PPD Compiler CUPS v1.4b1.
+*% Copyright 2007 by Apple Inc.
+*% Copyright 1997-2007 by Easy Software Products.
+*% 
+*% These coded instructions, statements, and computer programs are the
+*% property of Apple Inc. and are protected by Federal copyright
+*% law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+*% which should have been included with this file.  If this file is
+*% file is missing or damaged, see the license at "http://www.cups.org/".
+*FormatVersion: "4.3"
+*FileVersion: "1.3"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "EPSON9.PPD"
+*Product: "(ESP Ghostscript)"
+*Product: "(GPL Ghostscript)"
+*Manufacturer: "Epson"
+*ModelName: "Epson 9-Pin Series"
+*ShortNickName: "Epson 9-Pin Series"
+*NickName: "Epson 9-Pin Series, 1.3"
+*PSVersion: "(3010.000) 81504"
+*PSVersion: "(3010.000) 860"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: Gray
+*FileSystem: False
+*Throughput: "1"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*cupsVersion: 1.3
+*cupsModelNumber: 0
+*cupsManualCopies: True
+*cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
+*cupsLanguages: "en da de es et fi fr he id it ja ko nl no pl pt pt_BR ru sv zh zh_TW"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize FanFoldUS/US Fanfold: "<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion FanFoldUS/US Fanfold: "<</PageSize[1071 792]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: Letter
+*ImageableArea Letter/US Letter: "18.00 18.00 594.00 774.00"
+*ImageableArea Legal/US Legal: "18.00 18.00 594.00 990.00"
+*ImageableArea A4/A4: "18.00 18.00 577.00 824.00"
+*ImageableArea FanFoldUS/US Fanfold: "18.00 18.00 1053.00 774.00"
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/US Letter: "612.00 792.00"
+*PaperDimension Legal/US Legal: "612.00 1008.00"
+*PaperDimension A4/A4: "595.00 842.00"
+*PaperDimension FanFoldUS/US Fanfold: "1071.00 792.00"
+*MaxMediaWidth: "1080.00"
+*MaxMediaHeight: "86400.00"
+*HWMargins: 18.00 18.00 18.00 18.00
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 36.00 1080.00
+*ParamCustomPageSize Height: 2 points 36.00 86400.00
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+*RequiresPageRegion All: True
+*OpenUI *Resolution: PickOne
+*OrderDependency: 10.0 AnySetup *Resolution
+*DefaultResolution: 120x72dpi
+*Resolution 60x720dpi: "<</HWResolution[60 720]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*Resolution 120x72dpi: "<</HWResolution[120 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*Resolution 240x72dpi: "<</HWResolution[240 72]/cupsBitsPerColor 1/cupsRowCount 8/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*CloseUI: *Resolution
+*da.Translation Manufacturer/Epson: ""
+*da.Translation ModelName/Epson 9-Pin Series: ""
+*da.Translation ShortNickName/Epson 9-Pin Series: ""
+*da.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*da.Translation PageSize/: ""
+*da.PageSize Letter/US Letter: ""
+*da.PageSize Legal/US Legal: ""
+*da.PageSize A4/A4: ""
+*da.PageSize FanFoldUS/US Fanfold: ""
+*da.Translation Resolution/: ""
+*da.Resolution 60x720dpi/60x720dpi: ""
+*da.Resolution 120x72dpi/120x72dpi: ""
+*da.Resolution 240x72dpi/240x72dpi: ""
+*de.Translation Manufacturer/Epson: ""
+*de.Translation ModelName/Epson 9-Pin Series: ""
+*de.Translation ShortNickName/Epson 9-Pin Series: ""
+*de.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*de.Translation PageSize/: ""
+*de.PageSize Letter/US Letter: ""
+*de.PageSize Legal/US Legal: ""
+*de.PageSize A4/A4: ""
+*de.PageSize FanFoldUS/US Fanfold: ""
+*de.Translation Resolution/: ""
+*de.Resolution 60x720dpi/60x720dpi: ""
+*de.Resolution 120x72dpi/120x72dpi: ""
+*de.Resolution 240x72dpi/240x72dpi: ""
+*es.Translation Manufacturer/Epson: ""
+*es.Translation ModelName/Epson 9-Pin Series: ""
+*es.Translation ShortNickName/Epson 9-Pin Series: ""
+*es.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*es.Translation PageSize/: ""
+*es.PageSize Letter/US Letter: ""
+*es.PageSize Legal/US Legal: ""
+*es.PageSize A4/A4: ""
+*es.PageSize FanFoldUS/US Fanfold: ""
+*es.Translation Resolution/: ""
+*es.Resolution 60x720dpi/60x720dpi: ""
+*es.Resolution 120x72dpi/120x72dpi: ""
+*es.Resolution 240x72dpi/240x72dpi: ""
+*et.Translation Manufacturer/Epson: ""
+*et.Translation ModelName/Epson 9-Pin Series: ""
+*et.Translation ShortNickName/Epson 9-Pin Series: ""
+*et.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*et.Translation PageSize/: ""
+*et.PageSize Letter/US Letter: ""
+*et.PageSize Legal/US Legal: ""
+*et.PageSize A4/A4: ""
+*et.PageSize FanFoldUS/US Fanfold: ""
+*et.Translation Resolution/: ""
+*et.Resolution 60x720dpi/60x720dpi: ""
+*et.Resolution 120x72dpi/120x72dpi: ""
+*et.Resolution 240x72dpi/240x72dpi: ""
+*fi.Translation Manufacturer/Epson: ""
+*fi.Translation ModelName/Epson 9-Pin Series: ""
+*fi.Translation ShortNickName/Epson 9-Pin Series: ""
+*fi.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*fi.Translation PageSize/: ""
+*fi.PageSize Letter/US Letter: ""
+*fi.PageSize Legal/US Legal: ""
+*fi.PageSize A4/A4: ""
+*fi.PageSize FanFoldUS/US Fanfold: ""
+*fi.Translation Resolution/: ""
+*fi.Resolution 60x720dpi/60x720dpi: ""
+*fi.Resolution 120x72dpi/120x72dpi: ""
+*fi.Resolution 240x72dpi/240x72dpi: ""
+*fr.Translation Manufacturer/Epson: ""
+*fr.Translation ModelName/Epson 9-Pin Series: ""
+*fr.Translation ShortNickName/Epson 9-Pin Series: ""
+*fr.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*fr.Translation PageSize/: ""
+*fr.PageSize Letter/US Letter: ""
+*fr.PageSize Legal/US Legal: ""
+*fr.PageSize A4/A4: ""
+*fr.PageSize FanFoldUS/US Fanfold: ""
+*fr.Translation Resolution/: ""
+*fr.Resolution 60x720dpi/60x720dpi: ""
+*fr.Resolution 120x72dpi/120x72dpi: ""
+*fr.Resolution 240x72dpi/240x72dpi: ""
+*he.Translation Manufacturer/Epson: ""
+*he.Translation ModelName/Epson 9-Pin Series: ""
+*he.Translation ShortNickName/Epson 9-Pin Series: ""
+*he.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*he.Translation PageSize/: ""
+*he.PageSize Letter/US Letter: ""
+*he.PageSize Legal/US Legal: ""
+*he.PageSize A4/A4: ""
+*he.PageSize FanFoldUS/US Fanfold: ""
+*he.Translation Resolution/: ""
+*he.Resolution 60x720dpi/60x720dpi: ""
+*he.Resolution 120x72dpi/120x72dpi: ""
+*he.Resolution 240x72dpi/240x72dpi: ""
+*id.Translation Manufacturer/Epson: ""
+*id.Translation ModelName/Epson 9-Pin Series: ""
+*id.Translation ShortNickName/Epson 9-Pin Series: ""
+*id.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*id.Translation PageSize/: ""
+*id.PageSize Letter/US Letter: ""
+*id.PageSize Legal/US Legal: ""
+*id.PageSize A4/A4: ""
+*id.PageSize FanFoldUS/US Fanfold: ""
+*id.Translation Resolution/: ""
+*id.Resolution 60x720dpi/60x720dpi: ""
+*id.Resolution 120x72dpi/120x72dpi: ""
+*id.Resolution 240x72dpi/240x72dpi: ""
+*it.Translation Manufacturer/Epson: ""
+*it.Translation ModelName/Epson 9-Pin Series: ""
+*it.Translation ShortNickName/Epson 9-Pin Series: ""
+*it.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*it.Translation PageSize/: ""
+*it.PageSize Letter/US Letter: ""
+*it.PageSize Legal/US Legal: ""
+*it.PageSize A4/A4: ""
+*it.PageSize FanFoldUS/US Fanfold: ""
+*it.Translation Resolution/: ""
+*it.Resolution 60x720dpi/60x720dpi: ""
+*it.Resolution 120x72dpi/120x72dpi: ""
+*it.Resolution 240x72dpi/240x72dpi: ""
+*ja.Translation Manufacturer/Epson: ""
+*ja.Translation ModelName/Epson 9-Pin Series: ""
+*ja.Translation ShortNickName/Epson 9-Pin Series: ""
+*ja.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*ja.Translation PageSize/: ""
+*ja.PageSize Letter/US Letter: ""
+*ja.PageSize Legal/US Legal: ""
+*ja.PageSize A4/A4: ""
+*ja.PageSize FanFoldUS/US Fanfold: ""
+*ja.Translation Resolution/: ""
+*ja.Resolution 60x720dpi/60x720dpi: ""
+*ja.Resolution 120x72dpi/120x72dpi: ""
+*ja.Resolution 240x72dpi/240x72dpi: ""
+*ko.Translation Manufacturer/Epson: ""
+*ko.Translation ModelName/Epson 9-Pin Series: ""
+*ko.Translation ShortNickName/Epson 9-Pin Series: ""
+*ko.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*ko.Translation PageSize/: ""
+*ko.PageSize Letter/US Letter: ""
+*ko.PageSize Legal/US Legal: ""
+*ko.PageSize A4/A4: ""
+*ko.PageSize FanFoldUS/US Fanfold: ""
+*ko.Translation Resolution/: ""
+*ko.Resolution 60x720dpi/60x720dpi: ""
+*ko.Resolution 120x72dpi/120x72dpi: ""
+*ko.Resolution 240x72dpi/240x72dpi: ""
+*nl.Translation Manufacturer/Epson: ""
+*nl.Translation ModelName/Epson 9-Pin Series: ""
+*nl.Translation ShortNickName/Epson 9-Pin Series: ""
+*nl.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*nl.Translation PageSize/: ""
+*nl.PageSize Letter/US Letter: ""
+*nl.PageSize Legal/US Legal: ""
+*nl.PageSize A4/A4: ""
+*nl.PageSize FanFoldUS/US Fanfold: ""
+*nl.Translation Resolution/: ""
+*nl.Resolution 60x720dpi/60x720dpi: ""
+*nl.Resolution 120x72dpi/120x72dpi: ""
+*nl.Resolution 240x72dpi/240x72dpi: ""
+*no.Translation Manufacturer/Epson: ""
+*no.Translation ModelName/Epson 9-Pin Series: ""
+*no.Translation ShortNickName/Epson 9-Pin Series: ""
+*no.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*no.Translation PageSize/: ""
+*no.PageSize Letter/US Letter: ""
+*no.PageSize Legal/US Legal: ""
+*no.PageSize A4/A4: ""
+*no.PageSize FanFoldUS/US Fanfold: ""
+*no.Translation Resolution/: ""
+*no.Resolution 60x720dpi/60x720dpi: ""
+*no.Resolution 120x72dpi/120x72dpi: ""
+*no.Resolution 240x72dpi/240x72dpi: ""
+*pl.Translation Manufacturer/Epson: ""
+*pl.Translation ModelName/Epson 9-Pin Series: ""
+*pl.Translation ShortNickName/Epson 9-Pin Series: ""
+*pl.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*pl.Translation PageSize/: ""
+*pl.PageSize Letter/US Letter: ""
+*pl.PageSize Legal/US Legal: ""
+*pl.PageSize A4/A4: ""
+*pl.PageSize FanFoldUS/US Fanfold: ""
+*pl.Translation Resolution/: ""
+*pl.Resolution 60x720dpi/60x720dpi: ""
+*pl.Resolution 120x72dpi/120x72dpi: ""
+*pl.Resolution 240x72dpi/240x72dpi: ""
+*pt.Translation Manufacturer/Epson: ""
+*pt.Translation ModelName/Epson 9-Pin Series: ""
+*pt.Translation ShortNickName/Epson 9-Pin Series: ""
+*pt.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*pt.Translation PageSize/: ""
+*pt.PageSize Letter/US Letter: ""
+*pt.PageSize Legal/US Legal: ""
+*pt.PageSize A4/A4: ""
+*pt.PageSize FanFoldUS/US Fanfold: ""
+*pt.Translation Resolution/: ""
+*pt.Resolution 60x720dpi/60x720dpi: ""
+*pt.Resolution 120x72dpi/120x72dpi: ""
+*pt.Resolution 240x72dpi/240x72dpi: ""
+*pt_BR.Translation Manufacturer/Epson: ""
+*pt_BR.Translation ModelName/Epson 9-Pin Series: ""
+*pt_BR.Translation ShortNickName/Epson 9-Pin Series: ""
+*pt_BR.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*pt_BR.Translation PageSize/: ""
+*pt_BR.PageSize Letter/US Letter: ""
+*pt_BR.PageSize Legal/US Legal: ""
+*pt_BR.PageSize A4/A4: ""
+*pt_BR.PageSize FanFoldUS/US Fanfold: ""
+*pt_BR.Translation Resolution/: ""
+*pt_BR.Resolution 60x720dpi/60x720dpi: ""
+*pt_BR.Resolution 120x72dpi/120x72dpi: ""
+*pt_BR.Resolution 240x72dpi/240x72dpi: ""
+*ru.Translation Manufacturer/Epson: ""
+*ru.Translation ModelName/Epson 9-Pin Series: ""
+*ru.Translation ShortNickName/Epson 9-Pin Series: ""
+*ru.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*ru.Translation PageSize/: ""
+*ru.PageSize Letter/US Letter: ""
+*ru.PageSize Legal/US Legal: ""
+*ru.PageSize A4/A4: ""
+*ru.PageSize FanFoldUS/US Fanfold: ""
+*ru.Translation Resolution/: ""
+*ru.Resolution 60x720dpi/60x720dpi: ""
+*ru.Resolution 120x72dpi/120x72dpi: ""
+*ru.Resolution 240x72dpi/240x72dpi: ""
+*sv.Translation Manufacturer/Epson: ""
+*sv.Translation ModelName/Epson 9-Pin Series: ""
+*sv.Translation ShortNickName/Epson 9-Pin Series: ""
+*sv.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*sv.Translation PageSize/: ""
+*sv.PageSize Letter/US Letter: ""
+*sv.PageSize Legal/US Legal: ""
+*sv.PageSize A4/A4: ""
+*sv.PageSize FanFoldUS/US Fanfold: ""
+*sv.Translation Resolution/: ""
+*sv.Resolution 60x720dpi/60x720dpi: ""
+*sv.Resolution 120x72dpi/120x72dpi: ""
+*sv.Resolution 240x72dpi/240x72dpi: ""
+*zh.Translation Manufacturer/Epson: ""
+*zh.Translation ModelName/Epson 9-Pin Series: ""
+*zh.Translation ShortNickName/Epson 9-Pin Series: ""
+*zh.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*zh.Translation PageSize/: ""
+*zh.PageSize Letter/US Letter: ""
+*zh.PageSize Legal/US Legal: ""
+*zh.PageSize A4/A4: ""
+*zh.PageSize FanFoldUS/US Fanfold: ""
+*zh.Translation Resolution/: ""
+*zh.Resolution 60x720dpi/60x720dpi: ""
+*zh.Resolution 120x72dpi/120x72dpi: ""
+*zh.Resolution 240x72dpi/240x72dpi: ""
+*zh_TW.Translation Manufacturer/Epson: ""
+*zh_TW.Translation ModelName/Epson 9-Pin Series: ""
+*zh_TW.Translation ShortNickName/Epson 9-Pin Series: ""
+*zh_TW.Translation NickName/Epson 9-Pin Series, 1.3: ""
+*zh_TW.Translation PageSize/: ""
+*zh_TW.PageSize Letter/US Letter: ""
+*zh_TW.PageSize Legal/US Legal: ""
+*zh_TW.PageSize A4/A4: ""
+*zh_TW.PageSize FanFoldUS/US Fanfold: ""
+*zh_TW.Translation Resolution/: ""
+*zh_TW.Resolution 60x720dpi/60x720dpi: ""
+*zh_TW.Resolution 120x72dpi/120x72dpi: ""
+*zh_TW.Resolution 240x72dpi/240x72dpi: ""
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*% End of EPSON9.PPD, 15811 bytes.

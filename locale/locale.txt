@@ -1,0 +1,32 @@
+This directory contains the message strings used by CUPS for various
+languages.  Each subdirectory corresponds to a different locale, and
+the cups_xx and cups_xx_YY files contain the messages for the locales
+named "xx" or "xx_YY".
+
+Each message file starts with a character set identifier, which can be
+one of the following:
+
+    us-ascii
+    iso-8859-1
+    iso-8859-2
+    iso-8859-3
+    iso-8859-4
+    iso-8859-5
+    iso-8859-6
+    iso-8859-7
+    iso-8859-8
+    iso-8859-9
+    utf-8
+
+After that, all non-blank lines are treated as messages, with any
+leading whitespace removed.  If a line starts with a number then the
+message index is updated to the number.  Otherwise, the next message
+number is used.
+
+The message indices are defined in the include file <cups/language.h>.
+The HTTP status messages use the status codes defined in <cups/http.h>.
+
+If you would like to contribute a new message file for your locale, or
+have corrections to the current ones, please send them to:
+
+    cups-support@cups.org

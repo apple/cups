@@ -1,0 +1,756 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>File and Directory APIs</title>
+	<meta name='keywords' content='Programming'>
+	<meta name='creator' content='Mini-XML v2.3'>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { background: #000000; border: solid thin #000000; color: #ffffff; font-size: 80%; font-style: italic; font-weight: bold; white-space: nowrap; }
+	h3 span.info { float: right; font-size: 100%; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+</head>
+<body>
+<!--
+  "$Id: api-filedir.shtml 6649 2007-07-11 21:46:42Z mike $"
+
+  File and directory API introduction for the Common UNIX Printing System (CUPS).
+
+  Copyright 2007 by Apple Inc.
+  Copyright 1997-2005 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'>Introduction</h2>
+
+<p>The CUPS file and directory APIs provide portable interfaces
+for manipulating files and listing files and directories. Unlike
+stdio <tt>FILE</tt> streams, the <tt>cupsFile</tt> functions
+allow you to open more than 256 files at any given time. They
+also manage the platform-specific details of locking, large file
+support, line endings (CR, LF, or CR LF), and reading and writing
+files using Flate ("gzip") compression. Finally, you can also
+connect, read from, and write to network connections using the
+<tt>cupsFile</tt> functions.</p>
+
+<p>The <tt>cupsDir</tt> functions manage the platform-specific
+details of directory access/listing and provide a convenient way
+to get both a list of files and the information (permissions,
+size, timestamp, etc.) for each of those files.</p>
+
+<p>The CUPS scheduler (<tt>cupsd</tt>), <tt>mailto</tt> notifier,
+and many of the CUPS API functions use these functions for
+everything except console (stdin, stdout, stderr) I/O.</p>
+
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/dir.h&gt;</var> and
+<var>&lt;cups/file.h&gt;</var> header files must be included to
+use the <tt>cupsDir</tt> and <tt>cupsFile</tt> functions,
+respectively.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+library: <var>libcups.a</var>, <var>libcups.so.2</var>,
+<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
+<var>libcups2.lib</var> depending on the platform. The following
+command compiles <var>myprogram.c</var> using GCC and the CUPS
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>All of these functions require CUPS 1.2 or higher.</p>
+<h2 class='title'>Contents</h2>
+<ul>
+	<li><a href='#FUNCTIONS'>Functions</a></li>
+	<li><a href='#STRUCTURES'>Structures</a></li>
+	<li><a href='#TYPES'>Types</a></li>
+</ul>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
+<ul>
+	<li><a href='#cupsDirClose'><tt>cupsDirClose()</tt></a> </li>
+	<li><a href='#cupsDirOpen'><tt>cupsDirOpen()</tt></a> </li>
+	<li><a href='#cupsDirRead'><tt>cupsDirRead()</tt></a> </li>
+	<li><a href='#cupsDirRewind'><tt>cupsDirRewind()</tt></a> </li>
+	<li><a href='#cupsFileClose'><tt>cupsFileClose()</tt></a> </li>
+	<li><a href='#cupsFileCompression'><tt>cupsFileCompression()</tt></a> </li>
+	<li><a href='#cupsFileEOF'><tt>cupsFileEOF()</tt></a> </li>
+	<li><a href='#cupsFileFind'><tt>cupsFileFind()</tt></a> </li>
+	<li><a href='#cupsFileFlush'><tt>cupsFileFlush()</tt></a> </li>
+	<li><a href='#cupsFileGetChar'><tt>cupsFileGetChar()</tt></a> </li>
+	<li><a href='#cupsFileGetConf'><tt>cupsFileGetConf()</tt></a> </li>
+	<li><a href='#cupsFileGetLine'><tt>cupsFileGetLine()</tt></a> </li>
+	<li><a href='#cupsFileGets'><tt>cupsFileGets()</tt></a> </li>
+	<li><a href='#cupsFileLock'><tt>cupsFileLock()</tt></a> </li>
+	<li><a href='#cupsFileNumber'><tt>cupsFileNumber()</tt></a> </li>
+	<li><a href='#cupsFileOpen'><tt>cupsFileOpen()</tt></a> </li>
+	<li><a href='#cupsFileOpenFd'><tt>cupsFileOpenFd()</tt></a> </li>
+	<li><a href='#cupsFilePeekChar'><tt>cupsFilePeekChar()</tt></a> </li>
+	<li><a href='#cupsFilePrintf'><tt>cupsFilePrintf()</tt></a> </li>
+	<li><a href='#cupsFilePutChar'><tt>cupsFilePutChar()</tt></a> </li>
+	<li><a href='#cupsFilePuts'><tt>cupsFilePuts()</tt></a> </li>
+	<li><a href='#cupsFileRead'><tt>cupsFileRead()</tt></a> </li>
+	<li><a href='#cupsFileRewind'><tt>cupsFileRewind()</tt></a> </li>
+	<li><a href='#cupsFileSeek'><tt>cupsFileSeek()</tt></a> </li>
+	<li><a href='#cupsFileStderr'><tt>cupsFileStderr()</tt></a> </li>
+	<li><a href='#cupsFileStdin'><tt>cupsFileStdin()</tt></a> </li>
+	<li><a href='#cupsFileStdout'><tt>cupsFileStdout()</tt></a> </li>
+	<li><a href='#cupsFileTell'><tt>cupsFileTell()</tt></a> </li>
+	<li><a href='#cupsFileUnlock'><tt>cupsFileUnlock()</tt></a> </li>
+	<li><a href='#cupsFileWrite'><tt>cupsFileWrite()</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsDirClose'>cupsDirClose()</a></h3>
+<h4>Description</h4>
+<p>Close a directory.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsDirClose(
+    <a href='#cups_dir_t'>cups_dir_t</a> * dp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>dp</tt></td><td>Directory</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsDirOpen'>cupsDirOpen()</a></h3>
+<h4>Description</h4>
+<p>Open a directory.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_dir_t'>cups_dir_t</a> *<br>
+cupsDirOpen(
+    const char * directory);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>directory</tt></td><td>Directory name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Directory</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsDirRead'>cupsDirRead()</a></h3>
+<h4>Description</h4>
+<p>Read the next directory entry.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_dentry_t'>cups_dentry_t</a> *<br>
+cupsDirRead(
+    <a href='#cups_dir_t'>cups_dir_t</a> * dp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>dp</tt></td><td>Directory</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Directory entry</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsDirRewind'>cupsDirRewind()</a></h3>
+<h4>Description</h4>
+<p>Rewind to the start of the directory.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsDirRewind(
+    <a href='#cups_dir_t'>cups_dir_t</a> * dp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>dp</tt></td><td>Directory</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileClose'>cupsFileClose()</a></h3>
+<h4>Description</h4>
+<p>Close a CUPS file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileClose(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileCompression'>cupsFileCompression()</a></h3>
+<h4>Description</h4>
+<p>Return whether a file is compressed.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileCompression(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>CUPS_FILE_NONE or CUPS_FILE_GZIP</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileEOF'>cupsFileEOF()</a></h3>
+<h4>Description</h4>
+<p>Return the end-of-file status.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileEOF(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on EOF, 0 otherwise</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileFind'>cupsFileFind()</a></h3>
+<h4>Description</h4>
+<p>Find a file using the specified path.
+<p>This function allows the paths in the path string to be separated by
+colons (UNIX standard) or semicolons (Windows standard) and stores the
+result in the buffer supplied.  If the file cannot be found in any of
+the supplied paths, NULL is returned. A NULL path only matches the
+current directory.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsFileFind(
+    const char * filename,
+    const char * path,
+    int executable,
+    char * buffer,
+    int bufsize);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>File to find</td></tr>
+<tr><td><tt>path</tt></td><td>Colon/semicolon-separated path</td></tr>
+<tr><td><tt>executable</tt></td><td>1 = executable files, 0 = any file/dir</td></tr>
+<tr><td><tt>buffer</tt></td><td>Filename buffer</td></tr>
+<tr><td><tt>bufsize</tt></td><td>Size of filename buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Full path to file or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileFlush'>cupsFileFlush()</a></h3>
+<h4>Description</h4>
+<p>Flush pending output.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileFlush(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileGetChar'>cupsFileGetChar()</a></h3>
+<h4>Description</h4>
+<p>Get a single character from a file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileGetChar(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Character or -1 on EOF</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileGetConf'>cupsFileGetConf()</a></h3>
+<h4>Description</h4>
+<p>Get a line from a configuration file...
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsFileGetConf(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    char * buf,
+    size_t buflen,
+    char ** value,
+    int * linenum);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>buf</tt></td><td>String buffer</td></tr>
+<tr><td><tt>buflen</tt></td><td>Size of string buffer</td></tr>
+<tr><td><tt>value</tt></td><td>Pointer to value</td></tr>
+<tr><td><tt>linenum</tt></td><td>Current line number</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Line read or NULL on eof/error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileGetLine'>cupsFileGetLine()</a></h3>
+<h4>Description</h4>
+<p>Get a CR and/or LF-terminated line that may
+contain binary data.
+<p>This function differs from cupsFileGets() in that the trailing CR and LF
+are preserved, as is any binary data on the line. The buffer is nul-
+terminated, however you should use the returned length to determine
+the number of bytes on the line.
+<h4>Syntax</h4>
+<p><tt>
+size_t<br>
+cupsFileGetLine(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    char * buf,
+    size_t buflen);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>File to read from</td></tr>
+<tr><td><tt>buf</tt></td><td>Buffer</td></tr>
+<tr><td><tt>buflen</tt></td><td>Size of buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes on line or 0 on EOF</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileGets'>cupsFileGets()</a></h3>
+<h4>Description</h4>
+<p>Get a CR and/or LF-terminated line.
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsFileGets(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    char * buf,
+    size_t buflen);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>buf</tt></td><td>String buffer</td></tr>
+<tr><td><tt>buflen</tt></td><td>Size of string buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Line read or NULL on eof/error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileLock'>cupsFileLock()</a></h3>
+<h4>Description</h4>
+<p>Temporarily lock access to a file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileLock(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    int block);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>File to lock</td></tr>
+<tr><td><tt>block</tt></td><td>1 to wait for the lock, 0 to fail right away</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileNumber'>cupsFileNumber()</a></h3>
+<h4>Description</h4>
+<p>Return the file descriptor associated with a CUPS file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileNumber(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>File descriptor</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileOpen'>cupsFileOpen()</a></h3>
+<h4>Description</h4>
+<p>Open a CUPS file.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_file_t'>cups_file_t</a> *<br>
+cupsFileOpen(
+    const char * filename,
+    const char * mode);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>Name of file</td></tr>
+<tr><td><tt>mode</tt></td><td>Open mode</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>CUPS file or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileOpenFd'>cupsFileOpenFd()</a></h3>
+<h4>Description</h4>
+<p>Open a CUPS file using a file descriptor.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_file_t'>cups_file_t</a> *<br>
+cupsFileOpenFd(
+    int fd,
+    const char * mode);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+<tr><td><tt>mode</tt></td><td>Open mode</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>CUPS file or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFilePeekChar'>cupsFilePeekChar()</a></h3>
+<h4>Description</h4>
+<p>Peek at the next character from a file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFilePeekChar(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Character or -1 on EOF</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFilePrintf'>cupsFilePrintf()</a></h3>
+<h4>Description</h4>
+<p>Write a formatted string.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFilePrintf(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    const char * format,
+    ...);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>format</tt></td><td>Printf-style format string</td></tr>
+<tr><td><tt>...</tt></td><td>Additional args as necessary</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes written or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFilePutChar'>cupsFilePutChar()</a></h3>
+<h4>Description</h4>
+<p>Write a character.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFilePutChar(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    int c);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>c</tt></td><td>Character to write</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFilePuts'>cupsFilePuts()</a></h3>
+<h4>Description</h4>
+<p>Write a string.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFilePuts(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    const char * s);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>s</tt></td><td>String to write</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes written or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileRead'>cupsFileRead()</a></h3>
+<h4>Description</h4>
+<p>Read from a file.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#ssize_t'>ssize_t</a><br>
+cupsFileRead(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    char * buf,
+    size_t bytes);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>buf</tt></td><td>Buffer</td></tr>
+<tr><td><tt>bytes</tt></td><td>Number of bytes to read</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes read or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileRewind'>cupsFileRewind()</a></h3>
+<h4>Description</h4>
+<p>Rewind a file.
+<h4>Syntax</h4>
+<p><tt>
+off_t<br>
+cupsFileRewind(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New file position or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileSeek'>cupsFileSeek()</a></h3>
+<h4>Description</h4>
+<p>Seek in a file.
+<h4>Syntax</h4>
+<p><tt>
+off_t<br>
+cupsFileSeek(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    off_t pos);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>pos</tt></td><td>Position in file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New file position or -1</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStderr'>cupsFileStderr()</a></h3>
+<h4>Description</h4>
+<p>Just reposition the current pointer, since we have the right
+range...
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_file_t'>cups_file_t</a> *<br>
+cupsFileStderr(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stderr.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStdin'>cupsFileStdin()</a></h3>
+<h4>Description</h4>
+<p>Open file descriptor 2...
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_file_t'>cups_file_t</a> *<br>
+cupsFileStdin(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stdin.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileStdout'>cupsFileStdout()</a></h3>
+<h4>Description</h4>
+<p>Open file descriptor 0...
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_file_t'>cups_file_t</a> *<br>
+cupsFileStdout(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Return a CUPS file associated with stdout.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileTell'>cupsFileTell()</a></h3>
+<h4>Description</h4>
+<p>Return the current file position.
+<h4>Syntax</h4>
+<p><tt>
+off_t<br>
+cupsFileTell(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>File position</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileUnlock'>cupsFileUnlock()</a></h3>
+<h4>Description</h4>
+<p>Unlock access to a file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsFileUnlock(
+    <a href='#cups_file_t'>cups_file_t</a> * fp);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>File to lock</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFileWrite'>cupsFileWrite()</a></h3>
+<h4>Description</h4>
+<p>Write to a file.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#ssize_t'>ssize_t</a><br>
+cupsFileWrite(
+    <a href='#cups_file_t'>cups_file_t</a> * fp,
+    const char * buf,
+    size_t bytes);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fp</tt></td><td>CUPS file</td></tr>
+<tr><td><tt>buf</tt></td><td>Buffer</td></tr>
+<tr><td><tt>bytes</tt></td><td>Number of bytes to write</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes written</p>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='STRUCTURES'>Structures</a></h2>
+<ul>
+	<li><a href='#cups_dentry_s'><tt>cups_dentry_s</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_dentry_s'>cups_dentry_s</a></h3>
+<h4>Description</h4>
+<p>Directory entry type
+<h4>Definition</h4>
+<p><tt>
+struct cups_dentry_s<br>
+{<br>
+&nbsp;&nbsp;struct stat fileinfo;<br>
+&nbsp;&nbsp;char filename[260];<br>
+};</tt></p>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%' summary='Members'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fileinfo</tt> </td><td>File information
+</td></tr>
+<tr><td><tt>filename[260]</tt> </td><td>File name
+</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='TYPES'>Types</a></h2>
+<ul>
+	<li><a href='#cups_dentry_t'><tt>cups_dentry_t</tt></a> </li>
+	<li><a href='#cups_dir_t'><tt>cups_dir_t</tt></a> </li>
+	<li><a href='#cups_file_t'><tt>cups_file_t</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_dentry_t'>cups_dentry_t</a></h3>
+<h4>Description</h4>
+<p>Directory entry type
+<h4>Definition</h4>
+<p><tt>
+typedef struct <a href='#cups_dentry_s'>cups_dentry_s</a> cups_dentry_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_dir_t'>cups_dir_t</a></h3>
+<h4>Description</h4>
+<p>Directory type
+<h4>Definition</h4>
+<p><tt>
+typedef struct _cups_dir_s cups_dir_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_file_t'>cups_file_t</a></h3>
+<h4>Description</h4>
+<p>CUPS file type
+<h4>Definition</h4>
+<p><tt>
+typedef struct _cups_file_s cups_file_t;
+</tt></p>
+</body>
+</html>
