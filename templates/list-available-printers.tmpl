@@ -1,0 +1,10 @@
+<H2 CLASS="title">Available Printers</H2>
+
+{#device_uri=0?<P>No printers found.</P>
+:<UL>{[device_uri]
+<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/button-add-this-printer.gif" ALT="Add This Printer" CLASS="button"
+ALIGN="MIDDLE"></A>
+{device_make_and_model} ({device_info})</LI>
+}</UL>}
+
