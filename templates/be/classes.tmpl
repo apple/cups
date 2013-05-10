@@ -1,0 +1,51 @@
+{#printer_name=0?Клясы адсутнічаюць:
+<P><B>Дапомная друкарка:</B> <A HREF="{default_uri}">{default_name}</A>
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+{[printer_name]
+<TR>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
+	<TH BGCOLOR="#999966">Кляса друкарак</TH>
+	<TH><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD VALIGN=TOP><A HREF="{printer_uri_supported}">
+	<IMG SRC="../images/classes.gif" BORDER="0" ALT=""></A></TD>
+	<TD VALIGN=TOP>Апісаньне: {printer_info}<BR>
+	Знаходжаньне: {printer_location}<BR>
+	Стан клясы: {printer_state=3?бязьдзейнічае:{printer_state=4?друкуе:спыненая}},
+	{printer_is_accepting_jobs=0?не прыймае заданьні:прыймае заданьні}.
+	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
+	{?member_names=?:<BR>Удзельнікі: {member_names}}
+	<P>
+	<A HREF="{printer_uri_supported}?op=print-test-page">
+	<IMG SRC="/images/print-test-page.gif" ALT="Надрукаваць тэставую старонку" BORDER="0"></A>
+	{printer_state=5?
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
+	<IMG SRC="/images/start-class.gif" ALT="Запусьціць клясу" BORDER="0"></A>
+	:
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
+	<IMG SRC="/images/stop-class.gif" ALT="Спыніць клясу" BORDER="0"></A>
+	}
+	{printer_is_accepting_jobs=0?
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/accept-jobs.gif" ALT="Дазволіць заданьні" BORDER="0"></A>
+	:
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/reject-jobs.gif" ALT="Забараніць заданьні" BORDER="0"></A>
+	}
+	<A HREF="{admin_uri}?op=modify-class&printer_name={printer_name}">
+	<IMG SRC="/images/modify-class.gif" ALT="Зьмяніць клясу" BORDER="0"></A>
+	<A HREF="{admin_uri}?op=delete-class&printer_name={printer_name}">
+	<IMG SRC="/images/delete-class.gif" ALT="Выдаліць клясу" BORDER="0"></A>
+	</TD>
+</TR>
+}
+</TABLE>
+}
+<P><A HREF="/admin/?op=add-class">
+<IMG SRC="/images/add-class.gif" ALT="Дадаць клясу" BORDER="0"></A>
