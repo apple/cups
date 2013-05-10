@@ -1,0 +1,66 @@
+
+
+
+enable(8)             Easy Software Products            enable(8)
+
+
+NNAAMMEE
+       disable, enable - stop/start printers and classes
+
+SSYYNNOOPPSSIISS
+       ddiissaabbllee  [  -c  ] [ -h _s_e_r_v_e_r ] [ -r [ _r_e_a_s_o_n ] ] destina-
+       tion(s)
+       eennaabbllee destination(s)
+
+DDEESSCCRRIIPPTTIIOONN
+       _e_n_a_b_l_e starts the named printers or classes.
+
+       _d_i_s_a_b_l_e stops the named printers or classes.  The  follow-
+       ing options may be used:
+
+       -c
+            Cancels all jobs on the named destination.
+
+       -r [ _r_e_a_s_o_n ]
+            Sets  the  message associated with the stopped state.
+            If no reason is specified then the message is set  to
+            "Reason Unknown".
+
+CCOOMMPPAATTIIBBIILLIITTYY
+       The  CUPS  versions of _d_i_s_a_b_l_e and _e_n_a_b_l_e may ask the user
+       for an access password depending on  the  printing  system
+       configuration.   This  differs  from the System V versions
+       which require the root user to execute these commands.
+
+SSEEEE AALLSSOO
+       accept(8),  cancel(1),   lp(1),   lpadmin(8),   lpstat(1),
+       reject(8), CUPS Software Administrators Manual
+
+CCOOPPYYRRIIGGHHTT
+       Copyright  1993-2000 by Easy Software Products, All Rights
+       Reserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22 September 1999  Common UNIX Printing System                  1
+
+
