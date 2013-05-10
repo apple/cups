@@ -1,0 +1,54 @@
+<P>{#job_id=0?Pas de travaux {?which_jobs=completed?complétés:actifs}:
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR BGCOLOR="#999966">
+	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH>N°&nbsp;</TH>
+	<TH>Nom&nbsp;</TH>
+	<TH>Utilisateur&nbsp;</TH>
+	<TH>Taille&nbsp;</TH>
+	<TH>Etat&nbsp;</TH>
+	<TH>Contrôle&nbsp;</TH>
+	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+{[job_id]
+<TR VALIGN="TOP">
+	<TD HEIGHT="28"></TD>
+	<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+	<TD>{?job_name=?Inconnu:{job_name}}&nbsp;</TD>
+	<TD>{job_originating_user_name}&nbsp;</TD>
+	<TD>{job_k_octets}k&nbsp;</TD>
+	<TD>{job_state=3?En attente depuis<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
+	{job_state=5?En cours de traitement depuis<BR>{time_at_processing}:{job_state=6?stopped at<BR>{time_at_completed}:
+	{job_state=7?Annulé depuis<BR>{time_at_completed}:{job_state=8?Abandonné à:Complété à<BR>{time_at_completed}}}}}}}&nbsp;</TD>
+	<TD>
+	{job_state>5?
+	{job_k_octets>0?
+	<A HREF="/jobs/?op=restart-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+	<IMG SRC="/images/restart-job.gif" ALT="Restart Job" BORDER="0"></A>
+	:}:}
+	{job_state>6?:
+	{job_state=4?
+	<A HREF="/jobs/?op=release-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+	<IMG SRC="/images/release-job.gif" ALT="Release Job" BORDER="0"></A>
+	:
+	<A HREF="/jobs/?op=hold-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+	<IMG SRC="/images/hold-job.gif" ALT="Hold Job" BORDER="0"></A>
+	}
+	<A HREF="/jobs/?op=cancel-job&job_id={job_id}&job_printer_uri={job_printer_uri}">
+	<IMG SRC="/images/cancel-job.gif" ALT="Cancel Job" BORDER="0"></A>
+	}
+	&nbsp;</TD>
+</TR>
+}
+</TABLE>
+}
+<P>{?which_jobs=?
+<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}?which_jobs=completed">
+<IMG SRC="/images/show-completed.gif" BORDER="0" ALT="Show Completed Jobs"></A>
+:
+<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}">
+<IMG SRC="/images/show-active.gif" BORDER="0" ALT="Show Active Jobs"></A>
+}
