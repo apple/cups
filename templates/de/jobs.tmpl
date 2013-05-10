@@ -1,0 +1,58 @@
+<P>{#job_id=0?No {?which_jobs=completed?Completed:Active} Druckauftr&auml;ge:
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+<TR BGCOLOR="#999966">
+	<TH WIDTH="16"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH>ID&nbsp;</TH>
+	<TH>Name&nbsp;</TH>
+	<TH>Benutzer&nbsp;</TH>
+	<TH>Gr&ouml;sse&nbsp;</TH>
+	<TH>Status&nbsp;</TH>
+	<TH>Steuerung&nbsp;</TH>
+	<TH BGCOLOR="#cccc99" WIDTH="16"><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+{[job_id]
+<TR VALIGN="TOP">
+	<TD HEIGHT="28"></TD>
+	<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+	<TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
+	<TD>{job_originating_user_name}&nbsp;</TD>
+	<TD>{job_k_octets}k&nbsp;</TD>
+	<TD>{job_state=3?in Auftrag seit<BR>
+	{time_at_creation}:{job_state=4?angehalten seit<BR>
+	{time_at_creation}:{job_state=5?in Verarbeitung seit<BR>
+	{time_at_processing}:{job_state=6?angehalten am<BR>
+	{time_at_completed}:{job_state=7?gel&ouml;scht am<BR>
+	{time_at_completed}:{job_state=8?abgebrochen:fertig am<BR>
+	{time_at_completed}}}}}}}&nbsp;</TD>
+	<TD>
+	{job_state>5?
+	{job_k_octets>0?
+	<A HREF="/jobs/?op=restart-job&job_id={job_id}">
+	<IMG SRC="/images/restart-job.gif" ALT="Auftrag wieder starten" BORDER="0"></A>
+	:}:}
+	{job_state>6?:
+	{job_state=4?
+	<A HREF="/jobs/?op=release-job&job_id={job_id}">
+	<IMG SRC="/images/release-job.gif" ALT="Auftrag freigeben" BORDER="0"></A>
+	:
+	<A HREF="/jobs/?op=hold-job&job_id={job_id}">
+	<IMG SRC="/images/hold-job.gif" ALT="Auftrag anhalten" BORDER="0"></A>
+	}
+	<A HREF="/jobs/?op=cancel-job&job_id={job_id}">
+	<IMG SRC="/images/cancel-job.gif" ALT="Auftrag l&ouml;schen" BORDER="0"></A>
+	}
+	&nbsp;</TD>
+</TR>
+}
+</TABLE>
+}
+<P>{?which_jobs=?
+<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}?which_jobs=completed">
+<IMG SRC="/images/show-completed.gif" BORDER="0" ALT="Fertige Auftr&auml;ge anzeigen"></A>
+:
+<A HREF="{?printer_name=?/jobs:/printers/{printer_name}}">
+<IMG SRC="/images/show-active.gif" BORDER="0" ALT="Aktive Auftr&auml;ge anzeigen"></A>
+}
