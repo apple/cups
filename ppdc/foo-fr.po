@@ -1,0 +1,11 @@
+msgid "A Serious Error"
+msgstr "La Error Serious"
+
+msgid "http://foo.com/serious.html"
+msgstr "http://foo.com/fr/serious.html"
+
+msgid "Foo Letter"
+msgstr "La Foo Letter"
+
+msgid "Foo Photo"
+msgstr "La Foo Photo"

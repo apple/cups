@@ -1,0 +1,65 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?{printer_name} módosítása:Nyomtató
+hozzáadása}</H2>
+
+<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+
+<TABLE>
+{op=modify-printer?:<TR>
+<TH CLASS="label">Név:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>}
+<TR>
+<TH CLASS="label">Leírás:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Hely:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Kapcsolat:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Megosztás:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
+{?printer_is_shared=?Nincs megosztva:{?printer_is_shared=0?:Nyomtató megosztása}}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Gyártó:</TH>
+<TD>
+<SELECT NAME="PPD_MAKE" SIZE="10">
+{[ppd_make]<OPTION VALUE="{ppd_make}" {?current_make={ppd_make}?SELECTED:}>{ppd_make}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Folytatás"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>&nbsp;</TD>
+</TR>
+<TR>
+<TH CLASS="label">Vagy adjon meg egy PPD-fájlt:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
+TYPE="FILE" NAME="PPD_FILE"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?Nyomtató hozzáadása:Nyomtató módosítása}"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

@@ -1,0 +1,34 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+lpc.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+lpc.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+lpc.o: ../cups/language.h ../cups/string-private.h ../config.h
+lpc.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+lpc.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+lpc.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+lpc.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+lpc.o: ../cups/transcode.h ../cups/thread-private.h
+lpq.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+lpq.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+lpq.o: ../cups/language.h ../cups/string-private.h ../config.h
+lpq.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+lpq.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+lpq.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+lpq.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+lpq.o: ../cups/transcode.h ../cups/thread-private.h
+lpr.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+lpr.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+lpr.o: ../cups/language.h ../cups/string-private.h ../config.h
+lpr.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+lpr.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+lpr.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+lpr.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+lpr.o: ../cups/transcode.h ../cups/thread-private.h
+lprm.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+lprm.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+lprm.o: ../cups/language.h ../cups/string-private.h ../config.h
+lprm.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+lprm.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+lprm.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+lprm.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+lprm.o: ../cups/transcode.h ../cups/thread-private.h

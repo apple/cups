@@ -1,0 +1,531 @@
+# DO NOT DELETE
+
+image-bmp.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-bmp.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-bmp.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-bmp.o: ../cups/debug-private.h ../cups/versioning.h
+image-bmp.o: ../cups/string-private.h ../config.h
+image-colorspace.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-colorspace.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-colorspace.o: ../cups/http.h ../cups/array.h ../cups/language.h
+image-colorspace.o: ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-colorspace.o: ../cups/versioning.h ../cups/string-private.h ../config.h
+image-gif.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-gif.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-gif.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-gif.o: ../cups/debug-private.h ../cups/versioning.h
+image-gif.o: ../cups/string-private.h ../config.h
+image-jpeg.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-jpeg.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-jpeg.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-jpeg.o: ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-jpeg.o: ../cups/string-private.h ../config.h
+image-photocd.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-photocd.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-photocd.o: ../cups/http.h ../cups/array.h ../cups/language.h
+image-photocd.o: ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-photocd.o: ../cups/versioning.h ../cups/string-private.h ../config.h
+image-pix.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pix.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pix.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pix.o: ../cups/debug-private.h ../cups/versioning.h
+image-pix.o: ../cups/string-private.h ../config.h
+image-png.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-png.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-png.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-png.o: ../cups/debug-private.h ../cups/versioning.h
+image-png.o: ../cups/string-private.h ../config.h
+image-pnm.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pnm.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pnm.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pnm.o: ../cups/debug-private.h ../cups/versioning.h
+image-pnm.o: ../cups/string-private.h ../config.h
+image-sgi.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sgi.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sgi.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sgi.o: ../cups/debug-private.h ../cups/versioning.h
+image-sgi.o: ../cups/string-private.h ../config.h image-sgi.h
+image-sgilib.o: image-sgi.h
+image-sun.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sun.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sun.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sun.o: ../cups/debug-private.h ../cups/versioning.h
+image-sun.o: ../cups/string-private.h ../config.h
+image-tiff.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-tiff.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-tiff.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-tiff.o: ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-tiff.o: ../cups/string-private.h ../config.h
+image-zoom.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-zoom.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-zoom.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-zoom.o: ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-zoom.o: ../cups/string-private.h ../config.h
+image.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+image.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image.o: ../cups/debug-private.h ../cups/versioning.h
+image.o: ../cups/string-private.h ../config.h
+error.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+error.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+error.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+error.o: ../cups/debug-private.h ../cups/versioning.h
+error.o: ../cups/string-private.h ../config.h
+interpret.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+interpret.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+interpret.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+interpret.o: ../cups/debug-private.h ../cups/versioning.h
+interpret.o: ../cups/string-private.h ../config.h
+raster.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+raster.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+raster.o: ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+raster.o: ../cups/debug-private.h ../cups/versioning.h
+raster.o: ../cups/string-private.h ../config.h
+bannertops.o: pstext.h common.h ../cups/string-private.h ../config.h
+bannertops.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+bannertops.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+bannertops.o: ../cups/array.h ../cups/language.h ../cups/transcode.h image.h
+bannertops.o: ../cups/raster.h ../cups/ppd.h ../cups/language-private.h
+commandtops.o: ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+commandtops.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.o: ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.o: ../cups/language-private.h ../cups/transcode.h
+commandtops.o: ../cups/thread-private.h ../cups/sidechannel.h
+gziptoany.o: ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+gziptoany.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.o: ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.o: ../cups/transcode.h ../cups/thread-private.h
+imagetops.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetops.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+imagetops.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+imagetops.o: image.h ../cups/raster.h ../cups/ppd.h
+imagetops.o: ../cups/language-private.h ../cups/transcode.h
+imagetoraster.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetoraster.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h
+imagetoraster.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+imagetoraster.o: ../cups/array.h ../cups/language.h image-private.h image.h
+imagetoraster.o: ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.o: ../cups/versioning.h ../cups/language-private.h
+imagetoraster.o: ../cups/transcode.h
+common.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
+common.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+common.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pdftops.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pdftops.o: ../cups/language.h ../cups/string-private.h ../config.h
+pdftops.o: ../cups/language-private.h ../cups/transcode.h
+pstext.o: pstext.h common.h ../cups/string-private.h ../config.h
+pstext.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pstext.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pstext.o: ../cups/language.h ../cups/transcode.h ../cups/language-private.h
+pstops.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
+pstops.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+pstops.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pstops.o: ../cups/file.h ../cups/array.h ../cups/language-private.h
+pstops.o: ../cups/transcode.h
+rasterbench.o: ../config.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+rasterbench.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rasterbench.o: ../cups/array.h ../cups/language.h ../cups/ppd.h
+rastertoepson.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertoepson.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertoepson.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertoepson.o: ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertoepson.o: ../cups/raster.h ../cups/ppd.h
+rastertohp.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertohp.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertohp.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertohp.o: ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertohp.o: ../cups/raster.h ../cups/ppd.h
+rastertolabel.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertolabel.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertolabel.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertolabel.o: ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertolabel.o: ../cups/raster.h ../cups/ppd.h
+rastertopwg.o: ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+rastertopwg.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+rastertopwg.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+rastertopwg.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+rastertopwg.o: ../cups/http.h ../cups/array.h ../cups/language.h
+rastertopwg.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+rastertopwg.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+rastertopwg.o: ../cups/language-private.h ../cups/transcode.h
+rastertopwg.o: ../cups/thread-private.h ../cups/raster.h ../cups/ppd.h
+testimage.o: image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+testimage.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+testimage.o: ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
+testraster.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+testraster.o: ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.o: ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.o: ../cups/string-private.h ../config.h
+textcommon.o: textcommon.h common.h ../cups/string-private.h ../config.h
+textcommon.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+textcommon.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+textcommon.o: ../cups/array.h ../cups/language.h ../cups/language-private.h
+textcommon.o: ../cups/transcode.h
+texttops.o: textcommon.h common.h ../cups/string-private.h ../config.h
+texttops.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+texttops.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+texttops.o: ../cups/language.h ../cups/language-private.h ../cups/transcode.h
+# DO NOT DELETE
+
+image-bmp.32.o: image-bmp.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-bmp.32.o: image-bmp.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-bmp.32.o: image-bmp.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-bmp.32.o: image-bmp.c  ../cups/debug-private.h ../cups/versioning.h
+image-bmp.32.o: image-bmp.c  ../cups/string-private.h ../config.h
+image-colorspace.32.o: image-colorspace.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-colorspace.32.o: image-colorspace.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-colorspace.32.o: image-colorspace.c  ../cups/http.h ../cups/array.h ../cups/language.h
+image-colorspace.32.o: image-colorspace.c  ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-colorspace.32.o: image-colorspace.c  ../cups/versioning.h ../cups/string-private.h ../config.h
+image-gif.32.o: image-gif.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-gif.32.o: image-gif.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-gif.32.o: image-gif.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-gif.32.o: image-gif.c  ../cups/debug-private.h ../cups/versioning.h
+image-gif.32.o: image-gif.c  ../cups/string-private.h ../config.h
+image-jpeg.32.o: image-jpeg.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-jpeg.32.o: image-jpeg.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-jpeg.32.o: image-jpeg.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-jpeg.32.o: image-jpeg.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-jpeg.32.o: image-jpeg.c  ../cups/string-private.h ../config.h
+image-photocd.32.o: image-photocd.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-photocd.32.o: image-photocd.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-photocd.32.o: image-photocd.c  ../cups/http.h ../cups/array.h ../cups/language.h
+image-photocd.32.o: image-photocd.c  ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-photocd.32.o: image-photocd.c  ../cups/versioning.h ../cups/string-private.h ../config.h
+image-pix.32.o: image-pix.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pix.32.o: image-pix.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pix.32.o: image-pix.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pix.32.o: image-pix.c  ../cups/debug-private.h ../cups/versioning.h
+image-pix.32.o: image-pix.c  ../cups/string-private.h ../config.h
+image-png.32.o: image-png.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-png.32.o: image-png.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-png.32.o: image-png.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-png.32.o: image-png.c  ../cups/debug-private.h ../cups/versioning.h
+image-png.32.o: image-png.c  ../cups/string-private.h ../config.h
+image-pnm.32.o: image-pnm.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pnm.32.o: image-pnm.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pnm.32.o: image-pnm.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pnm.32.o: image-pnm.c  ../cups/debug-private.h ../cups/versioning.h
+image-pnm.32.o: image-pnm.c  ../cups/string-private.h ../config.h
+image-sgi.32.o: image-sgi.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sgi.32.o: image-sgi.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sgi.32.o: image-sgi.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sgi.32.o: image-sgi.c  ../cups/debug-private.h ../cups/versioning.h
+image-sgi.32.o: image-sgi.c  ../cups/string-private.h ../config.h image-sgi.h
+image-sgilib.32.o: image-sgilib.c  image-sgi.h
+image-sun.32.o: image-sun.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sun.32.o: image-sun.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sun.32.o: image-sun.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sun.32.o: image-sun.c  ../cups/debug-private.h ../cups/versioning.h
+image-sun.32.o: image-sun.c  ../cups/string-private.h ../config.h
+image-tiff.32.o: image-tiff.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-tiff.32.o: image-tiff.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-tiff.32.o: image-tiff.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-tiff.32.o: image-tiff.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-tiff.32.o: image-tiff.c  ../cups/string-private.h ../config.h
+image-zoom.32.o: image-zoom.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-zoom.32.o: image-zoom.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-zoom.32.o: image-zoom.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-zoom.32.o: image-zoom.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-zoom.32.o: image-zoom.c  ../cups/string-private.h ../config.h
+image.32.o: image.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image.32.o: image.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image.32.o: image.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image.32.o: image.c  ../cups/debug-private.h ../cups/versioning.h
+image.32.o: image.c  ../cups/string-private.h ../config.h
+error.32.o: error.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+error.32.o: error.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+error.32.o: error.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+error.32.o: error.c  ../cups/debug-private.h ../cups/versioning.h
+error.32.o: error.c  ../cups/string-private.h ../config.h
+interpret.32.o: interpret.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+interpret.32.o: interpret.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+interpret.32.o: interpret.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+interpret.32.o: interpret.c  ../cups/debug-private.h ../cups/versioning.h
+interpret.32.o: interpret.c  ../cups/string-private.h ../config.h
+raster.32.o: raster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+raster.32.o: raster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+raster.32.o: raster.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+raster.32.o: raster.c  ../cups/debug-private.h ../cups/versioning.h
+raster.32.o: raster.c  ../cups/string-private.h ../config.h
+bannertops.32.o: bannertops.c  pstext.h common.h ../cups/string-private.h ../config.h
+bannertops.32.o: bannertops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+bannertops.32.o: bannertops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+bannertops.32.o: bannertops.c  ../cups/array.h ../cups/language.h ../cups/transcode.h image.h
+bannertops.32.o: bannertops.c  ../cups/raster.h ../cups/ppd.h ../cups/language-private.h
+commandtops.32.o: commandtops.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+commandtops.32.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.32.o: commandtops.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.32.o: commandtops.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.32.o: commandtops.c  ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.32.o: commandtops.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.32.o: commandtops.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.32.o: commandtops.c  ../cups/language-private.h ../cups/transcode.h
+commandtops.32.o: commandtops.c  ../cups/thread-private.h ../cups/sidechannel.h
+gziptoany.32.o: gziptoany.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+gziptoany.32.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.32.o: gziptoany.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.32.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.32.o: gziptoany.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.32.o: gziptoany.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.32.o: gziptoany.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.32.o: gziptoany.c  ../cups/transcode.h ../cups/thread-private.h
+imagetops.32.o: imagetops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetops.32.o: imagetops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+imagetops.32.o: imagetops.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+imagetops.32.o: imagetops.c  image.h ../cups/raster.h ../cups/ppd.h
+imagetops.32.o: imagetops.c  ../cups/language-private.h ../cups/transcode.h
+imagetoraster.32.o: imagetoraster.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetoraster.32.o: imagetoraster.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
+imagetoraster.32.o: imagetoraster.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+imagetoraster.32.o: imagetoraster.c  ../cups/array.h ../cups/language.h image-private.h image.h
+imagetoraster.32.o: imagetoraster.c  ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.32.o: imagetoraster.c  ../cups/versioning.h ../cups/language-private.h
+imagetoraster.32.o: imagetoraster.c  ../cups/transcode.h
+common.32.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+common.32.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+common.32.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pdftops.32.o: pdftops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.32.o: pdftops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pdftops.32.o: pdftops.c  ../cups/language.h ../cups/string-private.h ../config.h
+pdftops.32.o: pdftops.c  ../cups/language-private.h ../cups/transcode.h
+pstext.32.o: pstext.c  pstext.h common.h ../cups/string-private.h ../config.h
+pstext.32.o: pstext.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pstext.32.o: pstext.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pstext.32.o: pstext.c  ../cups/language.h ../cups/transcode.h ../cups/language-private.h
+pstops.32.o: pstops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+pstops.32.o: pstops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+pstops.32.o: pstops.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pstops.32.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/language-private.h
+pstops.32.o: pstops.c  ../cups/transcode.h
+rasterbench.32.o: rasterbench.c  ../config.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+rasterbench.32.o: rasterbench.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rasterbench.32.o: rasterbench.c  ../cups/array.h ../cups/language.h ../cups/ppd.h
+rastertoepson.32.o: rastertoepson.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertoepson.32.o: rastertoepson.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertoepson.32.o: rastertoepson.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertoepson.32.o: rastertoepson.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertoepson.32.o: rastertoepson.c  ../cups/raster.h ../cups/ppd.h
+rastertohp.32.o: rastertohp.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertohp.32.o: rastertohp.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertohp.32.o: rastertohp.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertohp.32.o: rastertohp.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertohp.32.o: rastertohp.c  ../cups/raster.h ../cups/ppd.h
+rastertolabel.32.o: rastertolabel.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertolabel.32.o: rastertolabel.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertolabel.32.o: rastertolabel.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertolabel.32.o: rastertolabel.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertolabel.32.o: rastertolabel.c  ../cups/raster.h ../cups/ppd.h
+rastertopwg.32.o: rastertopwg.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+rastertopwg.32.o: rastertopwg.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+rastertopwg.32.o: rastertopwg.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+rastertopwg.32.o: rastertopwg.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+rastertopwg.32.o: rastertopwg.c  ../cups/http.h ../cups/array.h ../cups/language.h
+rastertopwg.32.o: rastertopwg.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+rastertopwg.32.o: rastertopwg.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+rastertopwg.32.o: rastertopwg.c  ../cups/language-private.h ../cups/transcode.h
+rastertopwg.32.o: rastertopwg.c  ../cups/thread-private.h ../cups/raster.h ../cups/ppd.h
+testimage.32.o: testimage.c  image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+testimage.32.o: testimage.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+testimage.32.o: testimage.c  ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.32.o: testraster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+testraster.32.o: testraster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+testraster.32.o: testraster.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.32.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.32.o: testraster.c  ../cups/string-private.h ../config.h
+textcommon.32.o: textcommon.c  textcommon.h common.h ../cups/string-private.h ../config.h
+textcommon.32.o: textcommon.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+textcommon.32.o: textcommon.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+textcommon.32.o: textcommon.c  ../cups/array.h ../cups/language.h ../cups/language-private.h
+textcommon.32.o: textcommon.c  ../cups/transcode.h
+texttops.32.o: texttops.c  textcommon.h common.h ../cups/string-private.h ../config.h
+texttops.32.o: texttops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+texttops.32.o: texttops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+texttops.32.o: texttops.c  ../cups/language.h ../cups/language-private.h ../cups/transcode.h
+# DO NOT DELETE
+
+image-bmp.64.o: image-bmp.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-bmp.64.o: image-bmp.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-bmp.64.o: image-bmp.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-bmp.64.o: image-bmp.c  ../cups/debug-private.h ../cups/versioning.h
+image-bmp.64.o: image-bmp.c  ../cups/string-private.h ../config.h
+image-colorspace.64.o: image-colorspace.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-colorspace.64.o: image-colorspace.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-colorspace.64.o: image-colorspace.c  ../cups/http.h ../cups/array.h ../cups/language.h
+image-colorspace.64.o: image-colorspace.c  ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-colorspace.64.o: image-colorspace.c  ../cups/versioning.h ../cups/string-private.h ../config.h
+image-gif.64.o: image-gif.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-gif.64.o: image-gif.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-gif.64.o: image-gif.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-gif.64.o: image-gif.c  ../cups/debug-private.h ../cups/versioning.h
+image-gif.64.o: image-gif.c  ../cups/string-private.h ../config.h
+image-jpeg.64.o: image-jpeg.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-jpeg.64.o: image-jpeg.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-jpeg.64.o: image-jpeg.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-jpeg.64.o: image-jpeg.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-jpeg.64.o: image-jpeg.c  ../cups/string-private.h ../config.h
+image-photocd.64.o: image-photocd.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-photocd.64.o: image-photocd.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-photocd.64.o: image-photocd.c  ../cups/http.h ../cups/array.h ../cups/language.h
+image-photocd.64.o: image-photocd.c  ../cups/ppd.h ../cups/cups.h ../cups/debug-private.h
+image-photocd.64.o: image-photocd.c  ../cups/versioning.h ../cups/string-private.h ../config.h
+image-pix.64.o: image-pix.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pix.64.o: image-pix.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pix.64.o: image-pix.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pix.64.o: image-pix.c  ../cups/debug-private.h ../cups/versioning.h
+image-pix.64.o: image-pix.c  ../cups/string-private.h ../config.h
+image-png.64.o: image-png.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-png.64.o: image-png.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-png.64.o: image-png.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-png.64.o: image-png.c  ../cups/debug-private.h ../cups/versioning.h
+image-png.64.o: image-png.c  ../cups/string-private.h ../config.h
+image-pnm.64.o: image-pnm.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-pnm.64.o: image-pnm.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-pnm.64.o: image-pnm.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-pnm.64.o: image-pnm.c  ../cups/debug-private.h ../cups/versioning.h
+image-pnm.64.o: image-pnm.c  ../cups/string-private.h ../config.h
+image-sgi.64.o: image-sgi.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sgi.64.o: image-sgi.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sgi.64.o: image-sgi.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sgi.64.o: image-sgi.c  ../cups/debug-private.h ../cups/versioning.h
+image-sgi.64.o: image-sgi.c  ../cups/string-private.h ../config.h image-sgi.h
+image-sgilib.64.o: image-sgilib.c  image-sgi.h
+image-sun.64.o: image-sun.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-sun.64.o: image-sun.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image-sun.64.o: image-sun.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image-sun.64.o: image-sun.c  ../cups/debug-private.h ../cups/versioning.h
+image-sun.64.o: image-sun.c  ../cups/string-private.h ../config.h
+image-tiff.64.o: image-tiff.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-tiff.64.o: image-tiff.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-tiff.64.o: image-tiff.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-tiff.64.o: image-tiff.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-tiff.64.o: image-tiff.c  ../cups/string-private.h ../config.h
+image-zoom.64.o: image-zoom.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image-zoom.64.o: image-zoom.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+image-zoom.64.o: image-zoom.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+image-zoom.64.o: image-zoom.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+image-zoom.64.o: image-zoom.c  ../cups/string-private.h ../config.h
+image.64.o: image.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+image.64.o: image.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+image.64.o: image.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+image.64.o: image.c  ../cups/debug-private.h ../cups/versioning.h
+image.64.o: image.c  ../cups/string-private.h ../config.h
+error.64.o: error.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+error.64.o: error.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+error.64.o: error.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+error.64.o: error.c  ../cups/debug-private.h ../cups/versioning.h
+error.64.o: error.c  ../cups/string-private.h ../config.h
+interpret.64.o: interpret.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+interpret.64.o: interpret.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+interpret.64.o: interpret.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+interpret.64.o: interpret.c  ../cups/debug-private.h ../cups/versioning.h
+interpret.64.o: interpret.c  ../cups/string-private.h ../config.h
+raster.64.o: raster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+raster.64.o: raster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+raster.64.o: raster.c  ../cups/array.h ../cups/language.h ../cups/ppd.h ../cups/cups.h
+raster.64.o: raster.c  ../cups/debug-private.h ../cups/versioning.h
+raster.64.o: raster.c  ../cups/string-private.h ../config.h
+bannertops.64.o: bannertops.c  pstext.h common.h ../cups/string-private.h ../config.h
+bannertops.64.o: bannertops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+bannertops.64.o: bannertops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+bannertops.64.o: bannertops.c  ../cups/array.h ../cups/language.h ../cups/transcode.h image.h
+bannertops.64.o: bannertops.c  ../cups/raster.h ../cups/ppd.h ../cups/language-private.h
+commandtops.64.o: commandtops.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+commandtops.64.o: commandtops.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+commandtops.64.o: commandtops.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+commandtops.64.o: commandtops.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+commandtops.64.o: commandtops.c  ../cups/http.h ../cups/array.h ../cups/language.h
+commandtops.64.o: commandtops.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+commandtops.64.o: commandtops.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+commandtops.64.o: commandtops.c  ../cups/language-private.h ../cups/transcode.h
+commandtops.64.o: commandtops.c  ../cups/thread-private.h ../cups/sidechannel.h
+gziptoany.64.o: gziptoany.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+gziptoany.64.o: gziptoany.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+gziptoany.64.o: gziptoany.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+gziptoany.64.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+gziptoany.64.o: gziptoany.c  ../cups/array.h ../cups/language.h ../cups/pwg-private.h
+gziptoany.64.o: gziptoany.c  ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+gziptoany.64.o: gziptoany.c  ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+gziptoany.64.o: gziptoany.c  ../cups/transcode.h ../cups/thread-private.h
+imagetops.64.o: imagetops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetops.64.o: imagetops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+imagetops.64.o: imagetops.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+imagetops.64.o: imagetops.c  image.h ../cups/raster.h ../cups/ppd.h
+imagetops.64.o: imagetops.c  ../cups/language-private.h ../cups/transcode.h
+imagetoraster.64.o: imagetoraster.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+imagetoraster.64.o: imagetoraster.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
+imagetoraster.64.o: imagetoraster.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+imagetoraster.64.o: imagetoraster.c  ../cups/array.h ../cups/language.h image-private.h image.h
+imagetoraster.64.o: imagetoraster.c  ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.64.o: imagetoraster.c  ../cups/versioning.h ../cups/language-private.h
+imagetoraster.64.o: imagetoraster.c  ../cups/transcode.h
+common.64.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+common.64.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+common.64.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pdftops.64.o: pdftops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.64.o: pdftops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pdftops.64.o: pdftops.c  ../cups/language.h ../cups/string-private.h ../config.h
+pdftops.64.o: pdftops.c  ../cups/language-private.h ../cups/transcode.h
+pstext.64.o: pstext.c  pstext.h common.h ../cups/string-private.h ../config.h
+pstext.64.o: pstext.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pstext.64.o: pstext.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+pstext.64.o: pstext.c  ../cups/language.h ../cups/transcode.h ../cups/language-private.h
+pstops.64.o: pstops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
+pstops.64.o: pstops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
+pstops.64.o: pstops.c  ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
+pstops.64.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/language-private.h
+pstops.64.o: pstops.c  ../cups/transcode.h
+rasterbench.64.o: rasterbench.c  ../config.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+rasterbench.64.o: rasterbench.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rasterbench.64.o: rasterbench.c  ../cups/array.h ../cups/language.h ../cups/ppd.h
+rastertoepson.64.o: rastertoepson.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertoepson.64.o: rastertoepson.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertoepson.64.o: rastertoepson.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertoepson.64.o: rastertoepson.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertoepson.64.o: rastertoepson.c  ../cups/raster.h ../cups/ppd.h
+rastertohp.64.o: rastertohp.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertohp.64.o: rastertohp.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertohp.64.o: rastertohp.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertohp.64.o: rastertohp.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertohp.64.o: rastertohp.c  ../cups/raster.h ../cups/ppd.h
+rastertolabel.64.o: rastertolabel.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+rastertolabel.64.o: rastertolabel.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+rastertolabel.64.o: rastertolabel.c  ../cups/array.h ../cups/language.h ../cups/string-private.h
+rastertolabel.64.o: rastertolabel.c  ../config.h ../cups/language-private.h ../cups/transcode.h
+rastertolabel.64.o: rastertolabel.c  ../cups/raster.h ../cups/ppd.h
+rastertopwg.64.o: rastertopwg.c  ../cups/cups-private.h ../cups/cups.h ../cups/string-private.h
+rastertopwg.64.o: rastertopwg.c  ../config.h ../cups/debug-private.h ../cups/versioning.h
+rastertopwg.64.o: rastertopwg.c  ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+rastertopwg.64.o: rastertopwg.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+rastertopwg.64.o: rastertopwg.c  ../cups/http.h ../cups/array.h ../cups/language.h
+rastertopwg.64.o: rastertopwg.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+rastertopwg.64.o: rastertopwg.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+rastertopwg.64.o: rastertopwg.c  ../cups/language-private.h ../cups/transcode.h
+rastertopwg.64.o: rastertopwg.c  ../cups/thread-private.h ../cups/raster.h ../cups/ppd.h
+testimage.64.o: testimage.c  image.h ../cups/raster.h ../cups/cups.h ../cups/file.h
+testimage.64.o: testimage.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+testimage.64.o: testimage.c  ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.64.o: testraster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
+testraster.64.o: testraster.c  ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+testraster.64.o: testraster.c  ../cups/http.h ../cups/array.h ../cups/language.h ../cups/ppd.h
+testraster.64.o: testraster.c  ../cups/cups.h ../cups/debug-private.h ../cups/versioning.h
+testraster.64.o: testraster.c  ../cups/string-private.h ../config.h
+textcommon.64.o: textcommon.c  textcommon.h common.h ../cups/string-private.h ../config.h
+textcommon.64.o: textcommon.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+textcommon.64.o: textcommon.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+textcommon.64.o: textcommon.c  ../cups/array.h ../cups/language.h ../cups/language-private.h
+textcommon.64.o: textcommon.c  ../cups/transcode.h
+texttops.64.o: texttops.c  textcommon.h common.h ../cups/string-private.h ../config.h
+texttops.64.o: texttops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+texttops.64.o: texttops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+texttops.64.o: texttops.c  ../cups/language.h ../cups/language-private.h ../cups/transcode.h

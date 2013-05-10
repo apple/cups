@@ -1,0 +1,6 @@
+#CUPS-BANNER
+Show job-id job-name job-originating-user-name job-originating-host-name job-billing
+Header Classified
+Footer Classified
+Image images/cups.png
+

@@ -1,0 +1,5835 @@
+# Gabor Kelemen <kelemeng at gnome dot hu>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2012-03-07 13:38-0800\n"
+"PO-Revision-Date: 2011-12-02 01:55+0100\n"
+"Last-Translator: Gabor Kelemen <kelemeng at gnome dot hu>\n"
+"Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+msgid "\t\t(all)"
+msgstr "\t\t(mind)"
+
+msgid "\t\t(none)"
+msgstr "\t\t(egyik sem)"
+
+#, c-format
+msgid "\t%d entries"
+msgstr "\t%d bejegyzés"
+
+#, c-format
+msgid "\t%s"
+msgstr "\t%s"
+
+msgid "\tAfter fault: continue"
+msgstr "\tHiba után: folytatás"
+
+#, c-format
+msgid "\tAlerts: %s"
+msgstr "\tRiasztások: %s"
+
+msgid "\tBanner required"
+msgstr "\tKísérőoldal szükséges"
+
+msgid "\tCharset sets:"
+msgstr "\tKarakterkódolások:"
+
+msgid "\tConnection: direct"
+msgstr "\tKapcsolat: közvetlen"
+
+msgid "\tConnection: remote"
+msgstr "\tKapcsolat: távoli"
+
+msgid "\tContent types: any"
+msgstr "\tTartalomtípusok: bármely"
+
+msgid "\tDefault page size:"
+msgstr "\tAlapértelmezett oldalméret:"
+
+msgid "\tDefault pitch:"
+msgstr "\tAlapértelmezett térköz:"
+
+msgid "\tDefault port settings:"
+msgstr "\tAlapértelmezett portbeállítások:"
+
+#, c-format
+msgid "\tDescription: %s"
+msgstr "\tLeírás: %s"
+
+msgid "\tForm mounted:"
+msgstr "\tFelszerelt típus:"
+
+msgid "\tForms allowed:"
+msgstr "\tEngedélyezett típusok:"
+
+#, c-format
+msgid "\tInterface: %s.ppd"
+msgstr "\tFelület: %s.ppd"
+
+#, c-format
+msgid "\tInterface: %s/interfaces/%s"
+msgstr "\tFelület: %s/interfaces/%s"
+
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd"
+msgstr "\tFelület: %s/ppd/%s.ppd"
+
+#, c-format
+msgid "\tLocation: %s"
+msgstr "\tHely: %s"
+
+msgid "\tOn fault: no alert"
+msgstr "\tHiba esetén: nincs riasztás"
+
+msgid "\tPrinter types: unknown"
+msgstr "\tNyomtatótípusok: ismeretlen"
+
+#, c-format
+msgid "\tStatus: %s"
+msgstr "\tÁllapot: %s"
+
+msgid "\tUsers allowed:"
+msgstr "\tEngedélyezett felhasználók:"
+
+msgid "\tUsers denied:"
+msgstr "\tLetiltott felhasználók:"
+
+msgid "\tdaemon present"
+msgstr "\ta démon jelen van"
+
+msgid "\tno entries"
+msgstr "\tnincsenek bejegyzések"
+
+#, c-format
+msgid "\tprinter is on device '%s' speed -1"
+msgstr "\ta nyomtató a(z) „%s” eszközön, sebesség -1"
+
+msgid "\tprinting is disabled"
+msgstr "\ta nyomtatás letiltva"
+
+msgid "\tprinting is enabled"
+msgstr "\ta nyomtatás engedélyezve"
+
+#, c-format
+msgid "\tqueued for %s"
+msgstr "\tsorba állítva ehhez: %s"
+
+msgid "\tqueuing is disabled"
+msgstr "\ta sorba állítás letiltva"
+
+msgid "\tqueuing is enabled"
+msgstr "\ta sorba állítás engedélyezve"
+
+msgid "\treason unknown"
+msgstr "\tismeretlen ok"
+
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS"
+msgstr ""
+"\n"
+"    MEGFELELŐSÉGI TESZT RÉSZLETES EREDMÉNYEI"
+
+msgid "                          Ignore specific warnings."
+msgstr "                          Adott figyelmeztetések mellőzése."
+
+msgid "                          Issue warnings instead of errors."
+msgstr "                          Figyelmeztetések kiadása hibák helyett."
+
+msgid "                REF: Page 15, section 3.1."
+msgstr "                REF: 15. oldal, 3.1-es szakasz."
+
+msgid "                REF: Page 15, section 3.2."
+msgstr "                REF: 15. oldal, 3.2-es szakasz."
+
+msgid "                REF: Page 19, section 3.3."
+msgstr "                REF: 19. oldal, 3.3-as szakasz."
+
+msgid "                REF: Page 20, section 3.4."
+msgstr "                REF: 20. oldal, 3.4-es szakasz."
+
+msgid "                REF: Page 27, section 3.5."
+msgstr "                REF: 27. oldal, 3.5-ös szakasz."
+
+msgid "                REF: Page 42, section 5.2."
+msgstr "                REF: 42. oldal, 5.2-es szakasz."
+
+msgid "                REF: Pages 16-17, section 3.2."
+msgstr "                REF: 16-17. oldalak, 3.2-es szakasz."
+
+msgid "                REF: Pages 42-45, section 5.2."
+msgstr "                REF: 42-45. oldalak, 5.2-es szakasz."
+
+msgid "                REF: Pages 45-46, section 5.2."
+msgstr "                REF: 45-46. oldalak, 5.2-es szakasz."
+
+msgid "                REF: Pages 48-49, section 5.2."
+msgstr "                REF: 48-49. oldalak, 5.2-es szakasz."
+
+msgid "                REF: Pages 52-54, section 5.2."
+msgstr "                REF: 52-54. oldalak, 5.2-es szakasz."
+
+#, c-format
+msgid "        %-39.39s %.0f bytes"
+msgstr "        %-39.39s %.0f bájt"
+
+#, c-format
+msgid "        PASS    Default%s"
+msgstr "        SIKER    Default%s"
+
+msgid "        PASS    DefaultImageableArea"
+msgstr "        SIKER    DefaultImageableArea"
+
+msgid "        PASS    DefaultPaperDimension"
+msgstr "        SIKER    DefaultPaperDimension"
+
+msgid "        PASS    FileVersion"
+msgstr "        SIKER    FileVersion"
+
+msgid "        PASS    FormatVersion"
+msgstr "        SIKER    FormatVersion"
+
+msgid "        PASS    LanguageEncoding"
+msgstr "        SIKER    LanguageEncoding"
+
+msgid "        PASS    LanguageVersion"
+msgstr "        SIKER    LanguageVersion"
+
+msgid "        PASS    Manufacturer"
+msgstr "        SIKER    Manufacturer"
+
+msgid "        PASS    ModelName"
+msgstr "        SIKER    ModelName"
+
+msgid "        PASS    NickName"
+msgstr "        SIKER    NickName"
+
+msgid "        PASS    PCFileName"
+msgstr "        SIKER    PCFileName"
+
+msgid "        PASS    PSVersion"
+msgstr "        SIKER    PSVersion"
+
+msgid "        PASS    PageRegion"
+msgstr "        SIKER    PageRegion"
+
+msgid "        PASS    PageSize"
+msgstr "        SIKER    PageSize"
+
+msgid "        PASS    Product"
+msgstr "        SIKER    Product"
+
+msgid "        PASS    ShortNickName"
+msgstr "        SIKER    ShortNickName"
+
+#, c-format
+msgid "        WARN    %s has no corresponding options."
+msgstr "        FIGY    nem tartoznak beállítások ehhez: %s."
+
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2."
+msgstr ""
+"        FIGY    %s közös előtagot használ ezzel: %s\n"
+"                REF: 15. oldal, 3.2-es szakasz."
+
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s may not work as expected and should "
+"be named Duplex.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"        FIGY    A duplex beállítás %s kulcsszava lehet, hogy nem várt módon "
+"működik, és Duplexnek kell nevezni.\n"
+"                REF: 122. oldal, 5.17-es szakasz"
+
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings."
+msgstr "        FIGY    A fájl CR, LF és CR LF sorvégek keverékét tartalmazza."
+
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"        FIGY    A PPD 4.3 specifikáció megköveteli a LanguageEncoding "
+"jelenlétét.\n"
+"                REF: 56-57. oldalak, 5.3-as szakasz."
+
+#, c-format
+msgid "        WARN    Line %d only contains whitespace."
+msgstr "        FIGY    A(z) %d. sor csak üres helyet tartalmaz."
+
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"        FIGY    A PPD 4.3 specifikáció megköveteli a Manufacturer "
+"jelenlétét.\n"
+"                REF: 58-59. oldalak, 5.3-as szakasz."
+
+msgid ""
+"        WARN    Non-Windows PPD files should use lines ending with only LF, "
+"not CR LF."
+msgstr ""
+"        FIGY    A nem windowsos PPD fájlok csak LF, és nem CR LF végű "
+"sorokat használhatnak."
+
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f.\n"
+"                REF: Page 42, section 5.2."
+msgstr ""
+"        FIGY    Elavult PPD-verzió: %.1f.\n"
+"                REF: 42. oldal, 5.2-es szakasz."
+
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        FIGY    A 8.3-nál hosszabb PCFileName megsérti a PPD-specifikációt.\n"
+"                REF: 61-62. oldalak, 5.3-as szakasz."
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"        FIGY    A PCFileName egyedi fájlnevet kell tartalmazzon.\n"
+"                REF: 61-62. oldalak, 5.3-as szakasz."
+
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        FIGY    A Protocols PJL-t tartalmaz, de a JCL attribútumok nincsenek "
+"beállítva.\n"
+"                REF: 78-79. oldal, 5.7-es szakasz."
+
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7."
+msgstr ""
+"        FIGY    A Protocols PJL-t és BCP-t is tartalmaz; a várt a TBCP.\n"
+"                REF: 78-79. oldalak, 5.7-es szakasz."
+
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"        FIGY    A PPD 4.3 specifikáció megköveteli a ShortNickName "
+"jelenlétét.\n"
+"                REF: 64-65. oldalak, 5.3-as szakasz."
+
+msgid "       cupsaddsmb [options] -a"
+msgstr "       cupsaddsmb [kapcsolók] -a"
+
+msgid "       cupstestdsc [options] -"
+msgstr "       cupstestdsc [kapcsolók] -"
+
+msgid "       program | cupstestppd [options] -"
+msgstr "       program | cupstestppd [kapcsolók] -"
+
+#, c-format
+msgid ""
+"      %s  \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")."
+msgstr ""
+"       %s  „%s %s” ütközik ezzel: „%s %s”\n"
+"                 (megszorítás=„%s %s %s %s”)."
+
+#, c-format
+msgid "      %s  %s %s does not exist."
+msgstr "       %s  %s %s nem létezik."
+
+#, c-format
+msgid "      %s  %s file \"%s\" has the wrong capitalization."
+msgstr "       %s  %s fájl „%s” kis- és nagybetűi hibásak."
+
+#, c-format
+msgid ""
+"      %s  Bad %s choice %s.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"       %s  Hibás %s lehetőség: %s.\n"
+"                REF: 122. oldal, 5.17-es szakasz."
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s."
+msgstr ""
+"       %s  Hibás UTF-8 „%s” fordítás a(z) %s beállítás %s lehetőségéhez."
+
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s."
+msgstr "       %s  Hibás UTF-8 „%s” fordítás a(z) %s beállításhoz."
+
+#, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"."
+msgstr "       %s  Hibás cupsFilter érték: „%s”."
+
+#, c-format
+msgid "      %s  Bad cupsFilter2 value \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad cupsICCProfile %s."
+msgstr "       %s  Hibás cupsICCProfile: %s."
+
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"."
+msgstr "       %s  Hibás cupsPreFilter érték: „%s”."
+
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\""
+msgstr "       %s  Hibás cupsUIConstraints: %s: „%s”"
+
+#, c-format
+msgid "      %s  Bad language \"%s\"."
+msgstr "       %s  Hibás nyelv: „%s”."
+
+#, c-format
+msgid "      %s  Bad permissions on %s file \"%s\"."
+msgstr "       %s  Hibás jogosultságok a(z) %s fájlok: „%s”."
+
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s."
+msgstr "       %s  %s el van írva - %s kellene legyen."
+
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID."
+msgstr ""
+"       %s  Nem biztosítható egyszerre az APScanAppPath és APScanAppBundleID."
+
+#, c-format
+msgid "      %s  Default choices conflicting."
+msgstr "       %s  Az alapértelmezett választások ütköznek."
+
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s"
+msgstr "       %s  Üres cupsUIConstraints: %s"
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s."
+msgstr "       %s  Hiányzó „%s” fordítás a(z) %s beállítás %s lehetőségéhez."
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s."
+msgstr "       %s  Hiányzó „%s” fordítás a(z) %s beállításhoz."
+
+#, c-format
+msgid "      %s  Missing %s file \"%s\"."
+msgstr "       %s  Hiányzó %s fájl: „%s”."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageRegion option.\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"       %s  Hiányzó KÖTELEZŐ PageRegion beállítás.\n"
+"                 REF: 100. oldal, 5.14-es szakasz."
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageSize option.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"       %s Hiányzó KÖTELEZŐ PageSize beállítás.\n"
+"                 REF: 99. oldal, 5.14-es szakasz."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr ""
+"       %s  Hiányzó lehetőség (*%s %s) az UIConstraints elemben: „*%s %s *%s %"
+"s”."
+
+#, c-format
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\""
+msgstr ""
+"       %s  Hiányzó lehetőség (*%s %s) a cupsUIConstraints %s elemben: „%s”"
+
+#, c-format
+msgid "      %s  Missing cupsUIResolver %s"
+msgstr "       %s  Hiányzó cupsUIResolver %s"
+
+#, c-format
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"."
+msgstr ""
+"       %s  Hiányzó %s beállítás az UIConstraints elemben: „*%s %s *%s %s”."
+
+#, c-format
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\""
+msgstr "       %s  Hiányzó %s beállítás a cupsUIConstraints %s elemben: „%s”"
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file."
+msgstr "       %s  A fájl nem tartalmaz alap „%s” fordítást."
+
+#, c-format
+msgid ""
+"      %s  REQUIRED %s does not define choice None.\n"
+"                REF: Page 122, section 5.17"
+msgstr ""
+"       %s  A KÖTELEZŐ %s nem definiálja a None lehetőséget.\n"
+"                 REF: 122. oldal, 5.17-es szakasz."
+
+#, c-format
+msgid "      %s  Size \"%s\" defined for %s but not for %s."
+msgstr ""
+"       %s  A(z) „%s” méret definiálva van ehhez: %s de ehhez már nem: %s."
+
+#, c-format
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)."
+msgstr "       %s  A(z) „%s” méret váratlan kiterjedéssel rendelkezik (%gx%g)."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be \"%s\"."
+msgstr "       %s  „%s” méret el van írva - „%s” kellene legyen."
+
+#, c-format
+msgid "      %s  Size \"%s\" should be the Adobe standard name \"%s\"."
+msgstr ""
+"      %s  A(z) „%s” méretnek ennek a szabványos Adobe névnek kellene lennie: "
+"„%s”."
+
+#, c-format
+msgid "      %s  cupsICCProfile %s hash value collides with %s."
+msgstr "       %s  A cupsICCProfile (%s) hash értéke ütközik ezzel: %s."
+
+#, c-format
+msgid "      %s  cupsUIResolver %s causes a loop."
+msgstr "       %s  A cupsUIResolver (%s) ismétlődést okoz."
+
+#, c-format
+msgid ""
+"      %s  cupsUIResolver %s does not list at least two different options."
+msgstr ""
+"       %s  A cupsUIResolver (%s) nem sorol fel legalább két eltérő "
+"beállítást."
+
+#, c-format
+msgid "      **FAIL**  %s choice names %s and %s differ only by case."
+msgstr ""
+"       **HIBA** A(z) %s lehetőségnevek: %s és %s csak a kis- és nagybetűkben "
+"különböznek."
+
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID\n"
+"                REF: Page 72, section 5.5"
+msgstr ""
+"       **HIBA**  %s csak 1284DeviceID lehet\n"
+"                 REF: 72. oldal, 5.5-ös szakasz"
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD Default%s %s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"       **HIBA**  HIBÁS Default%s %s\n"
+"\n"
+"                 REF: 40. oldal, 4.5-ös szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultImageableArea %s\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"       **HIBA**  HIBÁS DefaultImageableArea %s\n"
+"                 REF: 102. oldal, 5.15-ös szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultPaperDimension %s\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"       **HIBA**  HIBÁS DefaultPaperDimension %s\n"
+"                 REF: 103. oldal, 5.15-ös szakasz."
+
+msgid ""
+"      **FAIL**  BAD JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4."
+msgstr ""
+"       **HIBA**  HIBÁS JobPatchFile attribútum a fájlban\n"
+"                 REF: 24. oldal, 3.4-es szakasz."
+
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1."
+msgstr ""
+"       **HIBA**  HIBÁS Manufacturer („HP” kellene)\n"
+"                 REF: 211. oldal, D.1 táblázat."
+
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+"                REF: Page 211, table D.1."
+msgstr ""
+"       **HIBA**  HIBÁS Manufacturer („Oki” kellene)\n"
+"                 REF: 211. oldal, D.1 táblázat."
+
+#, c-format
+msgid ""
+"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"       **HIBA**  HIBÁS ModelName - „%c” nem engedélyezett a "
+"karakterláncban.\n"
+"                 REF: 59-60. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"       **HIBA**  HIBÁS PSVersion - nem „(string) int”.\n"
+"                 REF: 62-64. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  BAD Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"       **HIBA**  HIBÁS Product - nem „(string)”.\n"
+" REF: 62. oldal, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3."
+msgstr ""
+"       **HIBA**  HIBÁS ShortNickName - 31 karakternél hosszabb.\n"
+"                 REF: 64-65. oldalak, 5.3-as szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s\n"
+"                REF: Page 84, section 5.9"
+msgstr ""
+"       **HIBA**  Hibás %s választás: %s\n"
+"                 REF: 84. oldal, 5.9-es szakasz"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FileVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"       **HIBA**  Hibás FileVersion: „%s”\n"
+"                 REF: 56. oldal, 5.3-as szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FormatVersion \"%s\"\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"       **HIBA**  Hibás FormatVersion: „%s”\n"
+"                 REF: 56. oldal, 5.3-as szakasz."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1."
+msgstr ""
+"       **HIBA**  Bad LanguageEncoding %s - ISOLatin1 kellene hogy legyen."
+
+#, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English."
+msgstr "       **HIBA**  Bad LanguageVersion %s - English kellene hogy legyen."
+
+#, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s"
+msgstr "       **HIBA**  Az alapértelmezett beállításkód nem értelmezhető: %s"
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s choice %s contains "
+"8-bit characters."
+msgstr ""
+"       **HIBA**  Az alapértelmezett fordítás %s beállítás %s lehetőségéhez 8 "
+"bites karaktereket tartalmaz."
+
+#, c-format
+msgid ""
+"      **FAIL**  Default translation string for option %s contains 8-bit "
+"characters."
+msgstr ""
+"       **HIBA**  Az alapértelmezett fordítás a(z) %s beállításhoz 8 bites "
+"karaktereket tartalmaz."
+
+#, c-format
+msgid "      **FAIL**  Group names %s and %s differ only by case."
+msgstr ""
+"       **HIBA**  A(z) %s és %s csoportnevek csak a kis- és nagybetűkben "
+"különböznek."
+
+#, c-format
+msgid "      **FAIL**  Multiple occurrences of %s choice name %s."
+msgstr "       **HIBA**  A(z) %s választásnév (%s) többször is előfordul."
+
+#, c-format
+msgid "      **FAIL**  Option names %s and %s differ only by case."
+msgstr ""
+"       **HIBA**  A(z) %s és %s beállításnevek csak a kis- és nagybetűkben "
+"különböznek."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a Default%s\n"
+"                 REF: 40. oldal, 4.5-ös szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a DefaultImageableArea\n"
+"                 REF: 102. oldal, 5.15-ös szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a DefaultPaperDimension\n"
+"                 REF: 103. oldal, 5.15-ös szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a FileVersion\n"
+"                 REF: 56. oldal, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a FormatVersion\n"
+"                 REF: 56. oldal, 5.3-as szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ az ImageableArea ehhez: PageSize %s\n"
+"                 REF: 41. oldal, 5. szakasz.\n"
+"                 REF: 102. oldal, 5.15-ös szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a LanguageEncoding\n"
+"                 REF: 56-57. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a LanguageVersion\n"
+"                 REF: 57-58. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a Manufacturer\n"
+"                 REF: 58-59. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a ModelName\n"
+"                 REF: 59-60. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a NickName\n"
+"                 REF: 60. oldal, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PCFileName\n"
+"                 REF: 61-62. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PSVersion\n"
+"                 REF: 62-64. oldalak, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PageRegion\n"
+"                 REF: 100. oldal, 5.14-es szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PageSize\n"
+"                 REF: 41. oldal, 5. szakasz.\n"
+"                 REF: 99. oldal, 5.14-es szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PageSize\n"
+"                 REF: 99-100. oldalak, 5.14-es szakasz."
+
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a PaperDimension ehhez: PageSize %s\n"
+"                 REF: 41. oldal, 5. szakasz.\n"
+"                 REF: 103. oldal, 5.15-ös szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a Product\n"
+"                 REF: 62. oldal, 5.3-as szakasz."
+
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3."
+msgstr ""
+"       **HIBA**  KÖTELEZŐ a ShortNickName\n"
+"                 REF: 64-65. oldalak, 5.3-as szakasz."
+
+#, c-format
+msgid "      **FAIL**  Unable to open PPD file - %s"
+msgstr "       **HIBA**  Nem nyitható meg a PPD-fájl - %s"
+
+#, c-format
+msgid "      **FAIL**  Unable to open PPD file - %s on line %d."
+msgstr "       **HIBA**  Nem nyitható meg a PPD-fájl - %s a(z) %d. sorban."
+
+#, c-format
+msgid "    %d ERRORS FOUND"
+msgstr "    %d HIBA TALÁLHATÓ"
+
+msgid "    -h       Show program usage"
+msgstr "    -h       Használati utasítás megjelenítése"
+
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d.\n"
+"        REF: Page 39, %%%%BoundingBox:"
+msgstr ""
+"    Hibás %%%%BoundingBox: a(z) %d. sorban.\n"
+"        REF: 39. oldal, %%%%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d.\n"
+"        REF: Page 53, %%%%Page:"
+msgstr ""
+"    Hibás %%%%Page: a(z) %d. sorban.\n"
+"        REF: 53. oldal, %%%%Page:"
+
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d.\n"
+"        REF: Page 43, %%%%Pages:"
+msgstr ""
+"    Hibás %%%%Pages: a(z) %d. sorban.\n"
+"        REF: 43. oldal, %%%%Pages:"
+
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d).\n"
+"        REF: Page 25, Line Length"
+msgstr ""
+"    A(z) %d. sor hosszabb 255 karakternél (%d).\n"
+"        REF: Page 25. oldal, sorhossz"
+
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line.\n"
+"        REF: Page 17, 3.1 Conforming Documents"
+msgstr ""
+"    Hiányzó %!PS-Adobe-3.0 az első sorban.\n"
+"        REF: 17. oldal, 3.1 Megfelelő dokumentumok"
+
+#, c-format
+msgid "    Missing %%EndComments comment.        REF: Page 41, %%EndComments"
+msgstr ""
+"    Hiányzó %%EndComments megjegyzés.\n"
+"        REF: 41. oldal, %%EndComments"
+
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment.\n"
+"        REF: Page 39, %%BoundingBox:"
+msgstr ""
+"    Hiányzó vagy hibás %%BoundingBox: megjegyzés.\n"
+"        REF: 39. oldal, %%BoundingBox:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments.\n"
+"        REF: Page 53, %%Page:"
+msgstr ""
+"    Hiányzó vagy hibás %%Page: megjegyzések.\n"
+"        REF: 53. oldal, %%Page:"
+
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment.\n"
+"        REF: Page 43, %%Pages:"
+msgstr ""
+"    Hiányzó vagy hibás %%Pages: megjegyzés.\n"
+"        REF: 43. oldal, %%Pages:"
+
+msgid "    NO ERRORS FOUND"
+msgstr "    NEM TALÁLHATÓ HIBA"
+
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters."
+msgstr "    %d sor meghaladta a 255 karaktert."
+
+#, c-format
+msgid "    Too many %%BeginDocument comments."
+msgstr "    Túl sok %%BeginDocument megjegyzés."
+
+#, c-format
+msgid "    Too many %%EndDocument comments."
+msgstr "    Túl sok %%EndDocument megjegyzés."
+
+msgid "    Warning: file contains binary data."
+msgstr "    Figyelmeztetés: a fájl bináris adatokat tartalmaz."
+
+#, c-format
+msgid "    Warning: no %%EndComments comment in file."
+msgstr "    Figyelmeztetés: nincs %%EndComments megjegyzés a fájlban."
+
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file."
+msgstr "    Figyelmeztetés: elavult DSC verzió (%.1f) a fájlban."
+
+msgid "  --[no-]debug-logging    Turn debug logging on/off."
+msgstr "  --[no-]debug-logging    Hibakeresési naplózás be/ki."
+
+msgid "  --[no-]remote-admin     Turn remote administration on/off."
+msgstr "  --[no-]remote-admin     Távoli adminisztráció be/ki."
+
+msgid "  --[no-]remote-any       Allow/prevent access from the Internet."
+msgstr "  --[no-]remote-any       Internetről való elérés be/ki."
+
+msgid "  --[no-]remote-printers  Show/hide remote printers."
+msgstr "  --[no-]remote-printers  Távoli nyomtatók megjelenítése/elrejtése."
+
+msgid "  --[no-]share-printers   Turn printer sharing on/off."
+msgstr "  --[no-]share-printers   Nyomtatómegosztás be/ki."
+
+msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
+msgstr "  --[no-]user-cancel-any  Felhasználói feladatmegszakítás be/ki."
+
+msgid "  --cr                    End lines with CR (Mac OS 9)."
+msgstr "  --cr                    Sorok zárása CR-rel (Mac OS 9)."
+
+msgid "  --crlf                  End lines with CR + LF (Windows)."
+msgstr "  --crlf                  Sorok zárása CR + LF-fel (Windows)."
+
+msgid "  --lf                    End lines with LF (UNIX/Linux/Mac OS X)."
+msgstr "  --lf                    Sorok zárása LF-fel (UNIX/Linux/Mac OS X)."
+
+msgid "  -4                      Connect using IPv4."
+msgstr "  -4                      Csatlakozás IPv4 használatával."
+
+msgid "  -6                      Connect using IPv6."
+msgstr "  -6                      Csatlakozás IPv6 használatával."
+
+msgid "  -C                      Send requests using chunking (default)."
+msgstr ""
+"  -C                      Kérések küldése darabolás használatával (alap)."
+
+msgid "  -D                      Remove the input file when finished."
+msgstr ""
+"  -D                      A bemeneti fájl eltávolítása a befejezés után."
+
+msgid "  -D name=value           Set named variable to value."
+msgstr "  -D név=érték            A megnevezett változó beállítása az értékre."
+
+msgid "  -E                      Enable encryption."
+msgstr "  -E                      Titkosítás engedélyezése."
+
+msgid "  -E                      Encrypt the connection to the server."
+msgstr "  -E                      A kapcsolat titkosítása a kiszolgálóhoz."
+
+msgid "  -E                      Test with TLS encryption."
+msgstr "  -E                      Tesztelés TLS titkosítással."
+
+msgid ""
+"  -F                      Run in the foreground but detach from console."
+msgstr ""
+"  -F                      Futtatás az előtérben, de leválasztás a konzolról."
+
+msgid "  -H samba-server         Use the named SAMBA server."
+msgstr "  -H samba-kiszolgáló     A megnevezett SAMBA kiszolgáló használata."
+
+msgid "  -I                      Ignore errors."
+msgstr "  -I                      Hibák figyelmen kívül hagyása."
+
+msgid "  -I include-dir          Add include directory to search path."
+msgstr ""
+"  -I include-kvt          Az include könyvtár keresési útvonalhoz adása."
+
+msgid "  -I {filename,filters,none,profiles}"
+msgstr "  -I {filename,filters,none,profiles}"
+
+msgid "  -J title                Set title."
+msgstr "  -J cím                  Cím beállítása."
+
+msgid "  -L                      Send requests using content-length."
+msgstr ""
+"  -L                      Kérések küldése a content-length használatával."
+
+msgid "  -P filename.ppd         Set PPD file."
+msgstr "  -P fájlnév.ppd          PPD-fájl megadása."
+
+msgid "  -R root-directory       Set alternate root."
+msgstr "  -R root-könyvtár        Alternatív root beállítása."
+
+msgid "  -S                      Test with SSL encryption."
+msgstr "  -S                      Tesztelés SSL titkosítással."
+
+msgid "  -T                      Set the receive/send timeout in seconds."
+msgstr ""
+"  -T                      A fogadási/küldési időkorlát beállítása "
+"másodpercben."
+
+msgid "  -U samba-user           Authenticate using the named SAMBA user."
+msgstr ""
+"  -U samba-felh           Hitelesítés a megnevezett SAMBA felhasználóként."
+
+msgid "  -U username             Set username for job."
+msgstr "  -U felhasználónév       Felhasználónév beállítása a feladathoz."
+
+msgid "  -U username             Specify username."
+msgstr "  -U felhasználónév       Felhasználónév megadása."
+
+msgid "  -V version              Set default IPP version."
+msgstr "  -V verzió               Alapértelmezett IPP verzió beállítása."
+
+msgid ""
+"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}"
+msgstr ""
+"  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}"
+
+msgid "  -X                      Produce XML plist instead of plain text."
+msgstr ""
+"  -X                      XML plist előállítása egyszerű szöveg helyett."
+
+msgid "  -a                      Export all printers."
+msgstr "  -a                      Minden nyomtató exportálása."
+
+msgid "  -a 'name=value ...'     Set option(s)."
+msgstr "  -a 'név=érték ...'      Beállítások megadása."
+
+msgid "  -c catalog.po           Load the specified message catalog."
+msgstr "  -c katalógus.po         A megadott üzenetkatalógus betöltése."
+
+msgid "  -c config-file          Load alternate configuration file."
+msgstr "  -c konfig-fájl          Másik konfigurációs fájl betöltése."
+
+msgid "  -c copies               Set number of copies."
+msgstr "  -c másolatok            Másolatok számának megadása."
+
+msgid "  -c cupsd.conf           Set cupsd.conf file to use."
+msgstr "  -c cupsd.conf           Használandó cupsd.conf fájl megadása."
+
+msgid "  -d name=value           Set named variable to value."
+msgstr "  -d név=érték            A megnevezett változó beállítása az értékre."
+
+msgid "  -d output-dir           Specify the output directory."
+msgstr "  -d kimeneti-kvt         A kimeneti könyvtár megadása."
+
+msgid "  -d printer              Use the named printer."
+msgstr "  -d nyomtató             A megnevezett nyomtató használata."
+
+msgid "  -e                      Use every filter from the PPD file."
+msgstr "  -e                      Minden szűrő használata a PPD fájlból."
+
+msgid "  -f                      Run in the foreground."
+msgstr "  -f                      Futtatás az előtérben."
+
+msgid "  -f filename             Set default request filename."
+msgstr "  -f fájlnév              Alapértelmezett kérésfájlnév beállítása."
+
+msgid "  -f filename             Set file to be converted (otherwise stdin)."
+msgstr ""
+"  -f fájlnév              Átalakítandó fájl megadása (egyébként stdin)."
+
+msgid "  -h                      Show this usage message."
+msgstr "  -h                      Ezen súgó megjelenítése."
+
+msgid "  -h cups-server          Use the named CUPS server."
+msgstr "  -h cups-kiszolgáló      A megnevezett CUPS kiszolgáló használata."
+
+msgid "  -h server[:port]        Specify server address."
+msgstr "  -h kiszolgáló[:port]    Kiszolgáló címének megadása."
+
+msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
+msgstr ""
+"  -i mime/type            Bemeneti MIME-típus beállítása (egyébként "
+"automatikus)."
+
+msgid ""
+"  -i seconds              Repeat the last file with the given time interval."
+msgstr ""
+"  -i másodperc            Az utolsó fájl megismétlése a megadott időközzel."
+
+msgid ""
+"  -j job-id[,N]           Filter file N from the specified job (default is "
+"file 1)."
+msgstr ""
+"  -j job-id[,N]           Az N. fájl kiszűrése a megadott feladatból "
+"(alapértelmezett az 1.)."
+
+msgid ""
+"  -j mime/type            Set output MIME type (otherwise application/pdf)."
+msgstr ""
+"  -j mime/type            Kimeneti MIME-típus beállítása (egyébként "
+"application/pdf)."
+
+msgid "  -l                      Run cupsd from launchd(8)."
+msgstr ""
+"  -l                      A cupsd futtatása a launchd(8) használatával."
+
+msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
+msgstr "  -l nyelv[,nyelv,...]    A kimeneti nyelvek (locale) megadása."
+
+msgid "  -m                      Use the ModelName value as the filename."
+msgstr "  -m                      A ModelName érték használata fájlnévként."
+
+msgid ""
+"  -m mime/type            Set output MIME type (otherwise application/pdf)."
+msgstr ""
+"  -m mime/type            Kimeneti MIME-típus beállítása (egyébként "
+"application/pdf)."
+
+msgid "  -n copies               Set number of copies."
+msgstr "  -n másolatok            Másolatok számának megadása."
+
+msgid ""
+"  -n count                Repeat the last file the given number of times."
+msgstr ""
+"  -n szám                 Az utolsó fájl ismétlése a megadott alkalommal."
+
+msgid "  -o filename             Set file to be generated (otherwise stdout)."
+msgstr ""
+"  -o fájlnév              Az előállítandó fájl beállítása (egyébként stdout)."
+
+msgid ""
+"  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
+msgstr ""
+"  -o fájlnév.drv          Illesztőprogram-információs fájl beállítása "
+"(egyébként ppdi.drv)."
+
+msgid "  -o filename.ppd[.gz]    Set output file (otherwise stdout)."
+msgstr "  -o fájlnév.ppd[.gz]     Kimeneti fájl beállítása (egyébként stdout)."
+
+msgid "  -o name=value           Set option(s)."
+msgstr "  -o név=érték            Beállítások megadása."
+
+msgid "  -p filename.ppd         Set PPD file."
+msgstr "  -p fájlnév.ppd          PPD-fájl megadása."
+
+msgid "  -q                      Be quiet - no output except errors."
+msgstr "  -q                      Csendes mód - nincs kimenet a hibákon kívül."
+
+msgid "  -q                      Run silently."
+msgstr "  -q                      Csendes futás."
+
+msgid "  -r                      Use 'relaxed' open mode."
+msgstr "  -r                      A „lazított” megnyitási mód használata."
+
+msgid "  -t                      Produce a test report."
+msgstr "  -t                      Tesztjelentés előállítása."
+
+msgid "  -t                      Test PPDs instead of generating them."
+msgstr "  -t                      PPD-k tesztelése az előállításuk helyett."
+
+msgid "  -t                      Test the configuration file."
+msgstr "  -t                      A konfigurációs fájl tesztelése."
+
+msgid "  -t title                Set title."
+msgstr "  -t cím                  Cím beállítása."
+
+msgid "  -u                      Remove the PPD file when finished."
+msgstr "  -u                      A PPD fájl eltávolítása befejezéskor."
+
+msgid "  -v                      Be slightly verbose."
+msgstr "  -v                      Valamivel részletesebb kimenet."
+
+msgid "  -v                      Be verbose (more v's for more verbosity)."
+msgstr ""
+"  -v                      Részletes mód (nagyobb részletesség = több v)."
+
+msgid "  -v                      Be verbose (show commands)."
+msgstr "  -v                      Részletes mód (parancsok megjelenítése)."
+
+msgid "  -v                      Show all attributes sent and received."
+msgstr ""
+"  -v                      Minden elküldött és fogadott attribútum "
+"megjelenítése."
+
+msgid "  -vv                     Be very verbose."
+msgstr "  -vv                   Nagyon részletes mód."
+
+msgid "  -z                      Compress PPD files using GNU zip."
+msgstr ""
+"  -z                      PPD-fájlok tömörítése a GNU zip használatával."
+
+msgid " FAIL"
+msgstr " HIBA"
+
+msgid " PASS"
+msgstr " SIKER"
+
+#, c-format
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bájt"
+
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bájt"
+
+#, c-format
+msgid "%.0f x %.0f millimeters"
+msgstr "%.0f x %.0f milliméter"
+
+#, c-format
+msgid "%.0f x %.0f to %.0f x %.0f millimeters"
+msgstr "%.0f x %.0f to %.0f x %.0f milliméter"
+
+#, c-format
+msgid "%.2f x %.2f inches"
+msgstr "%.2f x %.2f hüvelyk"
+
+#, c-format
+msgid "%.2f x %.2f to %.2f x %.2f inches"
+msgstr "%.2f x %.2f to %.2f x %.2f hüvelyk"
+
+#, c-format
+msgid "%s accepting requests since %s"
+msgstr "%s elfogadja a kéréseket ez óta: %s"
+
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s nem módosítható."
+
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc."
+msgstr "%s nincs megvalósítva az lpc CUPS verziója által."
+
+#, c-format
+msgid "%s is not ready"
+msgstr "%s nem áll készen"
+
+#, c-format
+msgid "%s is ready"
+msgstr "%s készen áll"
+
+#, c-format
+msgid "%s is ready and printing"
+msgstr "%s készen áll és nyomtat"
+
+#, c-format
+msgid "%s job-id user title copies options [file]"
+msgstr "%s feladatazonosító felhasználó cím példányok beállítások [fájl]"
+
+#, c-format
+msgid "%s not accepting requests since %s -"
+msgstr "%s nem fogad el kéréseket ez óta: %s -"
+
+#, c-format
+msgid "%s not supported."
+msgstr "%s nem támogatott."
+
+#, c-format
+msgid "%s/%s accepting requests since %s"
+msgstr "%s/%s elfogadja a kéréseket ez óta: %s"
+
+#, c-format
+msgid "%s/%s not accepting requests since %s -"
+msgstr "%s/%s nem fogadja el a kéréseket ez óta: %s -"
+
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]"
+msgstr "%s: %-33.33s [%d. feladat localhost]"
+
+#. TRANSLATORS: Message is "subject: error"
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#, c-format
+msgid "%s: %s failed: %s"
+msgstr "%s: %s sikertelen: %s"
+
+#, c-format
+msgid "%s: Don't know what to do."
+msgstr "%s: Nem dönthető el, mi a teendő."
+
+#, c-format
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"."
+msgstr "%s: Hiba - a(z) %s környezeti változó nem létező célt nevez meg: „%s”."
+
+#, c-format
+msgid "%s: Error - bad job ID."
+msgstr "%s: Hiba - hibás feladatazonosító."
+
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously."
+msgstr ""
+"%s: Hiba - nem lehet egyszerre fájlokat nyomtatni és feladatokat "
+"megváltoztatni."
+
+#, c-format
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided."
+msgstr ""
+"%s: Hiba - nem lehet az stdin-ről nyomtatni, ha fájlok vagy feladatazonosító "
+"van megadva."
+
+#, c-format
+msgid "%s: Error - expected character set after \"-S\" option."
+msgstr "%s: Hiba - a „-S” kapcsoló után karakterkészletnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected content type after \"-T\" option."
+msgstr "%s: Hiba - a „-T” kapcsoló után tartalomtípusnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-#\" option."
+msgstr "%s: Hiba - a „-#” kapcsoló után példányszámnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected copies after \"-n\" option."
+msgstr "%s: Hiba - a „-n” kapcsoló után példányszámnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-P\" option."
+msgstr "%s: Hiba - a „-P” kapcsoló után célnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-b\" option."
+msgstr "%s: Hiba - a „-b” kapcsoló után célnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected destination after \"-d\" option."
+msgstr "%s: Hiba - a „-d” kapcsoló után célnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected form after \"-f\" option."
+msgstr "%s: Hiba - a „-f” kapcsoló után típusnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected hold name after \"-H\" option."
+msgstr "%s: Hiba - a „-H” kapcsoló után tárolónévnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-H\" option."
+msgstr "%s: Hiba - a „-H” kapcsoló után gépnévnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected hostname after \"-h\" option."
+msgstr "%s: Hiba - a „-h” kapcsoló után gépnévnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected mode list after \"-y\" option."
+msgstr "%s: Hiba - a „-y” kapcsoló után módlistának kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected name after \"-%c\" option."
+msgstr "%s: Hiba - a „-%c” kapcsoló után névnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected option=value after \"-o\" option."
+msgstr ""
+"%s: Hiba - a „-o” kapcsoló után egy beállítás=érték párnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected page list after \"-P\" option."
+msgstr "%s: Hiba - a „-P” kapcsoló után oldallistának kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected priority after \"-%c\" option."
+msgstr "%s: Hiba - a „-%c” kapcsoló után prioritásnak kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected reason text after \"-r\" option."
+msgstr ""
+"%s: Hiba - a „-r” kapcsoló után az okot megadó szövegnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected title after \"-t\" option."
+msgstr "%s: Hiba - a „-t” kapcsoló után címnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected username after \"-U\" option."
+msgstr "%s: Hiba - a „-U” kapcsoló után felhasználónévnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected username after \"-u\" option."
+msgstr "%s: Hiba - a „-U” kapcsoló után felhasználónévnek kellene állnia."
+
+#, c-format
+msgid "%s: Error - expected value after \"-%c\" option."
+msgstr "%s: Hiba - a „-%c” kapcsoló után értéknek kellene állnia."
+
+#, c-format
+msgid ""
+"%s: Error - need \"completed\", \"not-completed\", or \"all\" after \"-W\" "
+"option."
+msgstr ""
+"%s: Hiba - a „-W” kapcsoló után a „completed”, „not-completed” vagy „all” "
+"egyikének kellene állnia."
+
+#, c-format
+msgid "%s: Error - no default destination available."
+msgstr "%s: Hiba - nem érhető el alapértelmezett cél."
+
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100."
+msgstr "%s: Hiba - a prioritásnak 1 és 100 között kell lennie."
+
+#, c-format
+msgid "%s: Error - scheduler not responding."
+msgstr "%s: Hiba - az ütemező nem válaszol."
+
+#, c-format
+msgid "%s: Error - too many files - \"%s\"."
+msgstr "%s: Hiba - túl sok fájl - „%s”."
+
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s"
+msgstr "%s: Hiba - „%s” nem érhető el - %s"
+
+#, c-format
+msgid "%s: Error - unable to queue from stdin - %s."
+msgstr "%s: Hiba - nem lehet sorba állítani az stdin-ről - %s."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"."
+msgstr "%s: Hiba - ismeretlen cél: - „%s”."
+
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"."
+msgstr "%s: Hiba - ismeretlen cél: „%s/%s”."
+
+#, c-format
+msgid "%s: Error - unknown option \"%c\"."
+msgstr "%s: Hiba - ismeretlen kapcsoló: „%c”."
+
+#, c-format
+msgid "%s: Error - unknown option \"%s\"."
+msgstr "%s: Hiba - ismeretlen kapcsoló: „%s”."
+
+#, c-format
+msgid "%s: Expected job ID after \"-i\" option."
+msgstr "%s: Feladatazonosítónak kellene állnia a „-i” kapcsoló után."
+
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"."
+msgstr "%s: Érvénytelen célnév a listában: „%s”."
+
+#, c-format
+msgid "%s: Invalid filter string \"%s\"."
+msgstr "%s: Érvénytelen szűrőkarakterlánc: „%s”."
+
+#, c-format
+msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
+msgstr "%s: Feladatazonosító („-i jobid”) szükséges a „-H restart” előtt."
+
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s."
+msgstr "%s: Nincs szűrő %s/%s átalakításához erre: %s/%s."
+
+#, c-format
+msgid "%s: Operation failed: %s"
+msgstr "%s: A művelet sikertelen: %s"
+
+#, c-format
+msgid "%s: Sorry, no encryption support."
+msgstr "%s: Elnézést, a titkosítás nem támogatott."
+
+#, c-format
+msgid "%s: Unable to connect to server."
+msgstr "%s: Nem lehet a kiszolgálóhoz kapcsolódni."
+
+#, c-format
+msgid "%s: Unable to contact server."
+msgstr "%s: Nem lehet elérni a kiszolgálót."
+
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"."
+msgstr "%s: Nem határozható meg a(z) „%s” MIME-típusa."
+
+#, c-format
+msgid "%s: Unable to open %s: %s"
+msgstr "%s: A(z) %s nem nyitható meg: %s"
+
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d."
+msgstr "%s: Nem nyitható meg a(z) %s PPD-fájl a(z) %d. sorban."
+
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
+msgstr "%s: Nem olvasható a MIME-adatbázis innen: „%s” vagy innen: „%s”."
+
+#, c-format
+msgid "%s: Unknown destination \"%s\"."
+msgstr "%s: Ismeretlen cél: „%s”."
+
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s."
+msgstr "%s: Ismeretlen cél MIME-típus: %s/%s."
+
+#, c-format
+msgid "%s: Unknown option \"%c\"."
+msgstr "%s: Ismeretlen kapcsoló: „%c”."
+
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s."
+msgstr "%s: Ismeretlen forrás MIME-típus: %s/%s."
+
+#, c-format
+msgid ""
+"%s: Warning - \"%c\" format modifier not supported - output may not be "
+"correct."
+msgstr ""
+"%s: Figyelmeztetés - a(z) „%c” formátummódosító nem támogatott - a kimenet "
+"nem feltétlenül lesz helyes."
+
+#, c-format
+msgid "%s: Warning - character set option ignored."
+msgstr "%s: Figyelmeztetés - a karakterkészlet kapcsoló mellőzve."
+
+#, c-format
+msgid "%s: Warning - content type option ignored."
+msgstr "%s: Figyelmeztetés - a tartalomtípus kapcsoló mellőzve."
+
+#, c-format
+msgid "%s: Warning - form option ignored."
+msgstr "%s: Figyelmeztetés - a típus kapcsoló mellőzve."
+
+#, c-format
+msgid "%s: Warning - mode option ignored."
+msgstr "%s: Figyelmeztetés - a mód kapcsoló mellőzve."
+
+msgid "-1"
+msgstr "-1"
+
+msgid "-10"
+msgstr "-10"
+
+msgid "-100"
+msgstr "-100"
+
+msgid "-105"
+msgstr "-105"
+
+msgid "-11"
+msgstr "-11"
+
+msgid "-110"
+msgstr "-110"
+
+msgid "-115"
+msgstr "-115"
+
+msgid "-12"
+msgstr "-12"
+
+msgid "-120"
+msgstr "-120"
+
+msgid "-13"
+msgstr "-13"
+
+msgid "-14"
+msgstr "-14"
+
+msgid "-15"
+msgstr "-15"
+
+msgid "-2"
+msgstr "-2"
+
+msgid "-20"
+msgstr "-20"
+
+msgid "-25"
+msgstr "-25"
+
+msgid "-3"
+msgstr "-3"
+
+msgid "-30"
+msgstr "-30"
+
+msgid "-35"
+msgstr "-35"
+
+msgid "-4"
+msgstr "-4"
+
+msgid "-40"
+msgstr "-40"
+
+msgid "-45"
+msgstr "-45"
+
+msgid "-5"
+msgstr "-5"
+
+msgid "-50"
+msgstr "-50"
+
+msgid "-55"
+msgstr "-55"
+
+msgid "-6"
+msgstr "-6"
+
+msgid "-60"
+msgstr "-60"
+
+msgid "-65"
+msgstr "-65"
+
+msgid "-7"
+msgstr "-7"
+
+msgid "-70"
+msgstr "-70"
+
+msgid "-75"
+msgstr "-75"
+
+msgid "-8"
+msgstr "-8"
+
+msgid "-80"
+msgstr "-80"
+
+msgid "-85"
+msgstr "-85"
+
+msgid "-9"
+msgstr "-9"
+
+msgid "-90"
+msgstr "-90"
+
+msgid "-95"
+msgstr "-95"
+
+msgid "0"
+msgstr "0"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 inch/sec."
+msgstr "1 hüvelyk/mp."
+
+msgid "1.25x0.25\""
+msgstr "1,25x0,25\""
+
+msgid "1.25x2.25\""
+msgstr "1,25x2,25\""
+
+msgid "1.5 inch/sec."
+msgstr "1,5 hüvelyk/mp."
+
+msgid "1.50x0.25\""
+msgstr "1,50x0,25\""
+
+msgid "1.50x0.50\""
+msgstr "1,50x0,50\""
+
+msgid "1.50x1.00\""
+msgstr "1,50x1,00\""
+
+msgid "1.50x2.00\""
+msgstr "1,50x2,00\""
+
+msgid "10"
+msgstr "10"
+
+msgid "10 inches/sec."
+msgstr "10 hüvelyk/mp."
+
+msgid "10 x 11"
+msgstr "10 x 11"
+
+msgid "10 x 13"
+msgstr "10 x 13"
+
+msgid "10 x 14"
+msgstr "10 x 14"
+
+msgid "100"
+msgstr "100"
+
+msgid "100 mm/sec."
+msgstr "100 mm/mp."
+
+msgid "105"
+msgstr "105"
+
+msgid "11"
+msgstr "11"
+
+msgid "11 inches/sec."
+msgstr "11 hüvelyk/mp."
+
+msgid "110"
+msgstr "110"
+
+msgid "115"
+msgstr "115"
+
+msgid "12"
+msgstr "12"
+
+msgid "12 inches/sec."
+msgstr "12 hüvelyk/mp."
+
+msgid "12 x 11"
+msgstr "12 x 11"
+
+msgid "120"
+msgstr "120"
+
+msgid "120 mm/sec."
+msgstr "120 mm/mp."
+
+msgid "120x60dpi"
+msgstr "120x60dpi"
+
+msgid "120x72dpi"
+msgstr "120x72dpi"
+
+msgid "13"
+msgstr "13"
+
+msgid "136dpi"
+msgstr "136dpi"
+
+msgid "14"
+msgstr "14"
+
+msgid "15"
+msgstr "15"
+
+msgid "15 mm/sec."
+msgstr "15 mm/mp."
+
+msgid "15 x 11"
+msgstr "15 x 11"
+
+msgid "150 mm/sec."
+msgstr "150 mm/mp."
+
+msgid "150dpi"
+msgstr "150dpi"
+
+msgid "16"
+msgstr "16"
+
+msgid "17"
+msgstr "17"
+
+msgid "18"
+msgstr "18"
+
+msgid "180dpi"
+msgstr "180dpi"
+
+msgid "19"
+msgstr "19"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 inches/sec."
+msgstr "2 hüvelyk/mp."
+
+msgid "2-Sided Printing"
+msgstr "2 oldalas nyomtatás"
+
+msgid "2.00x0.37\""
+msgstr "2,00x0,37\""
+
+msgid "2.00x0.50\""
+msgstr "2,00x0,50\""
+
+msgid "2.00x1.00\""
+msgstr "2,00x1,00\""
+
+msgid "2.00x1.25\""
+msgstr "2,00x1,25\""
+
+msgid "2.00x2.00\""
+msgstr "2,00x2,00\""
+
+msgid "2.00x3.00\""
+msgstr "2,00x3,00\""
+
+msgid "2.00x4.00\""
+msgstr "2,00x4,00\""
+
+msgid "2.00x5.50\""
+msgstr "2,00x5,50\""
+
+msgid "2.25x0.50\""
+msgstr "2,25x0,50\""
+
+msgid "2.25x1.25\""
+msgstr "2,25x1,25\""
+
+msgid "2.25x4.00\""
+msgstr "2,25x4,00\""
+
+msgid "2.25x5.50\""
+msgstr "2,25x5,50\""
+
+msgid "2.38x5.50\""
+msgstr "2,38x5,50\""
+
+msgid "2.5 inches/sec."
+msgstr "2,5 hüvelyk/mp."
+
+msgid "2.50x1.00\""
+msgstr "2,50x1,00\""
+
+msgid "2.50x2.00\""
+msgstr "2,50x2,00\""
+
+msgid "2.75x1.25\""
+msgstr "2,75x1,25\""
+
+msgid "2.9 x 1\""
+msgstr "2,9 x 1\""
+
+msgid "20"
+msgstr "20"
+
+msgid "20 mm/sec."
+msgstr "20 mm/mp."
+
+msgid "200 mm/sec."
+msgstr "200 mm/mp."
+
+msgid "203dpi"
+msgstr "203dpi"
+
+msgid "21"
+msgstr "21"
+
+msgid "22"
+msgstr "22"
+
+msgid "23"
+msgstr "23"
+
+msgid "24"
+msgstr "24"
+
+msgid "24-Pin Series"
+msgstr "24 tűs sorozat"
+
+msgid "240x72dpi"
+msgstr "240x72dpi"
+
+msgid "25"
+msgstr "25"
+
+msgid "250 mm/sec."
+msgstr "250 mm/mp."
+
+msgid "26"
+msgstr "26"
+
+msgid "27"
+msgstr "27"
+
+msgid "28"
+msgstr "28"
+
+msgid "29"
+msgstr "29"
+
+msgid "3"
+msgstr "3"
+
+msgid "3 inches/sec."
+msgstr "3 hüvelyk/mp."
+
+msgid "3 x 5"
+msgstr "3 x 5"
+
+msgid "3.00x1.00\""
+msgstr "3,00x1,00\""
+
+msgid "3.00x1.25\""
+msgstr "3,00x1,25\""
+
+msgid "3.00x2.00\""
+msgstr "3,00x2,00\""
+
+msgid "3.00x3.00\""
+msgstr "3,00x3,00\""
+
+msgid "3.00x5.00\""
+msgstr "3,00x5,00\""
+
+msgid "3.25x2.00\""
+msgstr "3,25x2,00\""
+
+msgid "3.25x5.00\""
+msgstr "3,25x5,00\""
+
+msgid "3.25x5.50\""
+msgstr "3,25x5,50\""
+
+msgid "3.25x5.83\""
+msgstr "3,25x5,83\""
+
+msgid "3.25x7.83\""
+msgstr "3,25x7,83\""
+
+msgid "3.5 x 5"
+msgstr "3,5 x 5"
+
+msgid "3.5\" Disk"
+msgstr "3,5\"-es lemez"
+
+msgid "3.5\" Disk - 2 1/8 x 2 3/4\""
+msgstr "3,5\"-es lemez - 2 1/8 x 2 3/4\""
+
+msgid "3.50x1.00\""
+msgstr "3,50x1,00\""
+
+msgid "30"
+msgstr "30"
+
+msgid "30 mm/sec."
+msgstr "30 mm/mp."
+
+msgid "300 mm/sec."
+msgstr "300 mm/mp."
+
+msgid "300dpi"
+msgstr "300dpi"
+
+msgid "35"
+msgstr "35"
+
+msgid "360dpi"
+msgstr "360dpi"
+
+msgid "360x180dpi"
+msgstr "360x180dpi"
+
+msgid "4"
+msgstr "4"
+
+msgid "4 inches/sec."
+msgstr "4 hüvelyk/mp."
+
+msgid "4.00x1.00\""
+msgstr "4,00x1,00\""
+
+msgid "4.00x13.00\""
+msgstr "4,00x13,00\""
+
+msgid "4.00x2.00\""
+msgstr "4,00x2,00\""
+
+msgid "4.00x2.50\""
+msgstr "4,00x2,50\""
+
+msgid "4.00x3.00\""
+msgstr "4,00x3,00\""
+
+msgid "4.00x4.00\""
+msgstr "4,00x4,00\""
+
+msgid "4.00x5.00\""
+msgstr "4,00x5,00\""
+
+msgid "4.00x6.00\""
+msgstr "4,00x6,00\""
+
+msgid "4.00x6.50\""
+msgstr "4,00x6,50\""
+
+msgid "40"
+msgstr "40"
+
+msgid "40 mm/sec."
+msgstr "40 mm/mp."
+
+msgid "45"
+msgstr "45"
+
+msgid "5"
+msgstr "5"
+
+msgid "5 inches/sec."
+msgstr "5 hüvelyk/mp."
+
+msgid "5 x 7"
+msgstr "5 x 7"
+
+msgid "50"
+msgstr "50"
+
+msgid "55"
+msgstr "55"
+
+msgid "6"
+msgstr "6"
+
+msgid "6 inches/sec."
+msgstr "6 hüvelyk/mp."
+
+msgid "6.00x1.00\""
+msgstr "6,00x1,00\""
+
+msgid "6.00x2.00\""
+msgstr "6,00x2,00\""
+
+msgid "6.00x3.00\""
+msgstr "6,00x3,00\""
+
+msgid "6.00x4.00\""
+msgstr "6,00x4,00\""
+
+msgid "6.00x5.00\""
+msgstr "6,00x5,00\""
+
+msgid "6.00x6.00\""
+msgstr "6,00x6,00\""
+
+msgid "6.00x6.50\""
+msgstr "6,00x6,50\""
+
+msgid "60"
+msgstr "60"
+
+msgid "60 mm/sec."
+msgstr "60 mm/mp."
+
+msgid "600dpi"
+msgstr "600dpi"
+
+msgid "60dpi"
+msgstr "60dpi"
+
+msgid "60x72dpi"
+msgstr "60x72dpi"
+
+msgid "65"
+msgstr "65"
+
+msgid "7"
+msgstr "7"
+
+msgid "7 inches/sec."
+msgstr "7 hüvelyk/mp."
+
+msgid "7 x 9"
+msgstr "7 x 9"
+
+msgid "70"
+msgstr "70"
+
+msgid "720dpi"
+msgstr "720dpi"
+
+msgid "75"
+msgstr "75"
+
+msgid "8"
+msgstr "8"
+
+msgid "8 inches/sec."
+msgstr "8 hüvelyk/mp."
+
+msgid "8 x 10"
+msgstr "8 x 10"
+
+msgid "8.00x1.00\""
+msgstr "8,00x1,00\""
+
+msgid "8.00x2.00\""
+msgstr "8,00x2,00\""
+
+msgid "8.00x3.00\""
+msgstr "8,00x3,00\""
+
+msgid "8.00x4.00\""
+msgstr "8,00x4,00\""
+
+msgid "8.00x5.00\""
+msgstr "8,00x5,00\""
+
+msgid "8.00x6.00\""
+msgstr "8,00x6,00\""
+
+msgid "8.00x6.50\""
+msgstr "8,00x6,50\""
+
+msgid "80"
+msgstr "80"
+
+msgid "80 mm/sec."
+msgstr "80 mm/mp."
+
+msgid "85"
+msgstr "85"
+
+msgid "9"
+msgstr "9"
+
+msgid "9 inches/sec."
+msgstr "9 hüvelyk/mp."
+
+msgid "9 x 11"
+msgstr "9 x 11"
+
+msgid "9 x 12"
+msgstr "9 x 12"
+
+msgid "9-Pin Series"
+msgstr "9 tűs sorozatok"
+
+msgid "90"
+msgstr "90"
+
+msgid "95"
+msgstr "95"
+
+msgid "?Invalid help command unknown."
+msgstr "?Az érvénytelen súgóparancs ismeretlen."
+
+msgid "A Samba password is required to export printer drivers"
+msgstr "A nyomtató-illesztőprogramok exportálásához Samba jelszó szükséges"
+
+msgid "A Samba username is required to export printer drivers"
+msgstr ""
+"A nyomtató-illesztőprogramok exportálásához Samba felhasználónév szükséges"
+
+#, c-format
+msgid "A class named \"%s\" already exists."
+msgstr "Már létezik „%s” nevű osztály."
+
+#, c-format
+msgid "A printer named \"%s\" already exists."
+msgstr "Már létezik „%s” nevű nyomtató."
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A0 Long Edge"
+msgstr "A0 hosszú élű"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A1 Long Edge"
+msgstr "A1 hosszú élű"
+
+msgid "A10"
+msgstr "A10"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A2 Long Edge"
+msgstr "A2 hosszú élű"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A3 Long Edge"
+msgstr "A3 hosszú élű"
+
+msgid "A3 Oversize"
+msgstr "A3 túlméretes"
+
+msgid "A3 Oversize Long Edge"
+msgstr "A3 túlméretes hosszú élű"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A4 Long Edge"
+msgstr "A4 hosszú élű"
+
+msgid "A4 Oversize"
+msgstr "A4 túlméretes"
+
+msgid "A4 Small"
+msgstr "A4 kicsi"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "A5 Long Edge"
+msgstr "A5 hosszú élű"
+
+msgid "A5 Oversize"
+msgstr "A5 túlméretes"
+
+msgid "A6"
+msgstr "A6"
+
+msgid "A6 Long Edge"
+msgstr "A6 hosszú élű"
+
+msgid "A7"
+msgstr "A7"
+
+msgid "A8"
+msgstr "A8"
+
+msgid "A9"
+msgstr "A9"
+
+msgid "ANSI A"
+msgstr "ANSI A"
+
+msgid "ANSI B"
+msgstr "ANSI B"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH C Long Edge"
+msgstr "ARCH C hosszú élű"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH D Long Edge"
+msgstr "ARCH D hosszú élű"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "ARCH E Long Edge"
+msgstr "ARCH E hosszú élű"
+
+msgid "Accept Jobs"
+msgstr "Feladatok elfogadása"
+
+msgid "Accepted"
+msgstr "Elfogadva"
+
+msgid "Add Class"
+msgstr "Osztály hozzáadása"
+
+msgid "Add Printer"
+msgstr "Nyomtató hozzáadása"
+
+msgid "Add RSS Subscription"
+msgstr "RSS-feliratkozás hozzáadása"
+
+msgid "Address"
+msgstr "Cím"
+
+msgid "Address - 1 1/8 x 3 1/2\""
+msgstr "Cím - 1 1/8 x 3 1/2\""
+
+msgid "Administration"
+msgstr "Adminisztráció"
+
+msgid "Always"
+msgstr "Mindig"
+
+msgid "AppSocket/HP JetDirect"
+msgstr "AppSocket/HP JetDirect"
+
+msgid "Applicator"
+msgstr "Felhordó"
+
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d."
+msgstr "Kísérlet %s nyomtatóállapot hibás értékre (%d) állítására."
+
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)."
+msgstr "Az attribútumcsoportok nincsenek sorrendben (%x < %x)."
+
+msgid "B0"
+msgstr "B0"
+
+msgid "B1"
+msgstr "B1"
+
+msgid "B10"
+msgstr "B10"
+
+msgid "B2"
+msgstr "B2"
+
+msgid "B3"
+msgstr "B3"
+
+msgid "B4"
+msgstr "B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B5 Oversize"
+msgstr "B5 túlméretes"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "B7"
+msgstr "B7"
+
+msgid "B8"
+msgstr "B8"
+
+msgid "B9"
+msgstr "B9"
+
+msgid "Bad NULL dests pointer"
+msgstr "Hibás NULL célmutató"
+
+msgid "Bad OpenGroup"
+msgstr "Hibás OpenGroup"
+
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "Hibás OpenUI/JCLOpenUI"
+
+msgid "Bad OrderDependency"
+msgstr "Hibás OrderDependency"
+
+msgid "Bad PPD cache file."
+msgstr "Hibás PPD-gyorsítótárfájl."
+
+msgid "Bad Request"
+msgstr "Hibás kérés"
+
+msgid "Bad SNMP version number"
+msgstr "Hibás SNMP verziószám"
+
+msgid "Bad UIConstraints"
+msgstr "Hibás UIConstraints"
+
+#, c-format
+msgid "Bad charset file \"%s\"."
+msgstr "Hibás karakterkészletfájl: „%s”."
+
+#, c-format
+msgid "Bad charset type: %s"
+msgstr "Hibás karakterkészlet-típus: %s"
+
+#, c-format
+msgid "Bad columns value %d."
+msgstr "Hibás oszlopérték: %d."
+
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Hibás példányérték: %d."
+
+#, c-format
+msgid "Bad cpi value %f."
+msgstr "Hibás cpi érték: %f."
+
+msgid "Bad custom parameter"
+msgstr "Hibás egyéni paraméter"
+
+#, c-format
+msgid "Bad device-uri \"%s\"."
+msgstr "Hibás device-uri: „%s”."
+
+#, c-format
+msgid "Bad device-uri scheme \"%s\"."
+msgstr "Hibás device-uri séma: „%s”."
+
+#, c-format
+msgid "Bad document-format \"%s\"."
+msgstr "Hibás document-format érték: „%s”."
+
+#, c-format
+msgid "Bad document-format-default \"%s\"."
+msgstr "Hibás document-format-default érték: „%s”."
+
+msgid "Bad filename buffer"
+msgstr "Hibás fájlnévpuffer"
+
+#, c-format
+msgid "Bad font description line \"%s\"."
+msgstr "Hibás betűkészletleíró sor: „%s”."
+
+#, c-format
+msgid "Bad font description line: %s"
+msgstr "Hibás betűkészlet-leíró sor: %s."
+
+msgid "Bad job-priority value."
+msgstr "Hibás job-priority érték."
+
+#, c-format
+msgid "Bad job-sheets value \"%s\"."
+msgstr "Hibás job-sheets érték: „%s”."
+
+msgid "Bad job-sheets value type."
+msgstr "Hibás job-sheets értéktípus."
+
+msgid "Bad job-state value."
+msgstr "Hibás job-state érték."
+
+#, c-format
+msgid "Bad job-uri \"%s\"."
+msgstr "Hibás job-uri érték: „%s”."
+
+#, c-format
+msgid "Bad lpi value %f."
+msgstr "Hibás lpi érték: %f."
+
+#, c-format
+msgid "Bad notify-pull-method \"%s\"."
+msgstr "Hibás notify-pull-method érték: „%s”."
+
+#, c-format
+msgid "Bad notify-recipient-uri \"%s\"."
+msgstr "Hibás notify-recipient-uri érték: „%s”."
+
+#, c-format
+msgid "Bad number-up value %d."
+msgstr "Bad number-up érték: „%d”"
+
+#, c-format
+msgid "Bad option + choice on line %d."
+msgstr "Hibás beállítás + érték a(z) %d. sorban."
+
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Hibás page-ranges értékek: %d-%d."
+
+#, c-format
+msgid "Bad port-monitor \"%s\"."
+msgstr "Hibás port-monitor: „%s”."
+
+#, c-format
+msgid "Bad printer-state value %d."
+msgstr "Hibás printer-state érték: %d."
+
+#, c-format
+msgid "Bad request ID %d."
+msgstr "Hibás kérésazonosító: %d."
+
+#, c-format
+msgid "Bad request version number %d.%d."
+msgstr "Hibás kérésverziószám: %d.%d."
+
+msgid "Bad subscription ID"
+msgstr "Hibás feliratkozásazonosító"
+
+#, c-format
+msgid "Bad text direction \"%s\"."
+msgstr "Hibás szövegirány: „%s”."
+
+#, c-format
+msgid "Bad text direction: %s"
+msgstr "Hibás szövegirány: %s."
+
+#, c-format
+msgid "Bad text width \"%s\"."
+msgstr "Hibás szövegszélesség: „%s”."
+
+#, c-format
+msgid "Bad text width: %s"
+msgstr "Hibás szövegszélesség: %s."
+
+msgid "Bad value string"
+msgstr "Hibás értékkarakterlánc"
+
+msgid "Banners"
+msgstr "Kísérőoldalak"
+
+msgid "Billing Information: "
+msgstr "Számlázási adatok: "
+
+msgid "Bond Paper"
+msgstr "Kötött papír"
+
+#, c-format
+msgid "Boolean expected for waiteof option \"%s\"."
+msgstr "A várt érték logikai a waiteof „%s” beállításához."
+
+msgid "Buffer overflow detected, aborting."
+msgstr "Puffertúlcsordulás észlelve, megszakítás."
+
+msgid "CMYK"
+msgstr "CMYK"
+
+msgid "CPCL Label Printer"
+msgstr "CPCL címkenyomtató"
+
+msgid "Cancel RSS Subscription"
+msgstr "RSS-feliratkozás törlése"
+
+msgid "Canceling print job."
+msgstr "Nyomtatási feladat megszakítása."
+
+msgid "Cannot share a remote Kerberized printer."
+msgstr "Nem osztható meg távoli Kerberos-nyomtató."
+
+msgid "Cassette"
+msgstr "Kazetta"
+
+msgid "Change Settings"
+msgstr "Beállítások módosítása"
+
+#, c-format
+msgid "Character set \"%s\" not supported."
+msgstr "A(z) „%s” karakterkészlet nem támogatott."
+
+msgid "Classes"
+msgstr "Osztályok"
+
+msgid "Clean Print Heads"
+msgstr "Nyomtatófejek tisztítása"
+
+msgid "Close-Job doesn't support the job-uri attribute."
+msgstr "A Close-Job nem támogatja a job-uri attribútumot."
+
+msgid "Color"
+msgstr "Szín"
+
+msgid "Color Mode"
+msgstr "Színmód"
+
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?"
+msgstr ""
+"A parancsok rövidíthetők. A parancsok:\n"
+"\n"
+"exit    help    quit    status  ?"
+
+msgid "Community name uses indefinite length"
+msgstr "A közösségnév végtelen hosszat használ"
+
+msgid "Connected to printer."
+msgstr "Kapcsolódva a nyomtatóhoz."
+
+msgid "Connecting to printer."
+msgstr "Kapcsolódás a nyomtatóhoz."
+
+msgid "Continue"
+msgstr "Folytatás"
+
+msgid "Continuous"
+msgstr "Folyamatos"
+
+msgid "Control file sent successfully."
+msgstr "Vezérlőfájl sikeresen elküldve."
+
+msgid "Copying print data."
+msgstr "Nyomtatási adatok másolása."
+
+msgid "Created"
+msgstr "Létrehozva"
+
+msgid "Created On: "
+msgstr "Létrehozva: "
+
+msgid "Custom"
+msgstr "Egyéni"
+
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+msgid "Cut"
+msgstr "Kivágás"
+
+msgid "Cutter"
+msgstr "Vágó"
+
+msgid "Dark"
+msgstr "Sötét"
+
+msgid "Darkness"
+msgstr "Sötétség"
+
+msgid "Data file sent successfully."
+msgstr "Az adatfájl sikeresen elküldve."
+
+msgid "Delete Class"
+msgstr "Osztály törlése"
+
+msgid "Delete Printer"
+msgstr "Nyomtató törlése"
+
+msgid "Description: "
+msgstr "Leírás: "
+
+msgid "DeskJet Series"
+msgstr "DeskJet sorozat"
+
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "A(z) „%s” cél nem fogad el feladatokat."
+
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s"
+msgstr ""
+"Eszköz: uri = %s\n"
+"        osztály = %s\n"
+"        info = %s\n"
+"        gyártó és modell = %s\n"
+"        eszközazonosító = %s\n"
+"        hely = %s"
+
+msgid "Direct Thermal Media"
+msgstr "Direkt termál címke"
+
+#, c-format
+msgid "Directory \"%s\" contains a relative path."
+msgstr "A(z) „%s” könyvtár relatív útvonalat tartalmaz."
+
+#, c-format
+msgid "Directory \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr ""
+"A(z) „%s” könyvtár jogosultságai nem biztonságosak (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "Directory \"%s\" is a file."
+msgstr "A(z) „%s” könyvtár nem fájl."
+
+#, c-format
+msgid "Directory \"%s\" not available: %s"
+msgstr "A(z) „%s” könyvtár nem érhető el: %s"
+
+#, c-format
+msgid "Directory \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "A(z) „%s” könyvtár jogosultságai megfelelők (0%o/uid=%d/gid=%d)."
+
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+#, c-format
+msgid "Document #%d does not exist in job #%d."
+msgstr "A(z) %d. dokumentum nem létezik a(z) %d. feladatban."
+
+msgid "Driver Name: "
+msgstr "Illesztőprogram neve: "
+
+msgid "Driver Version: "
+msgstr "Illesztőprogram verziója: "
+
+msgid "Duplexer"
+msgstr "Duplexáló"
+
+msgid "Dymo"
+msgstr "Dymo"
+
+msgid "EPL1 Label Printer"
+msgstr "EPL1 címkenyomtató"
+
+msgid "EPL2 Label Printer"
+msgstr "EPL2 címkenyomtató"
+
+msgid "Edit Configuration File"
+msgstr "Konfigurációs fájl szerkesztése"
+
+msgid "Empty PPD file."
+msgstr "Üres PPD-fájl."
+
+#. TRANSLATORS: Banner/cover sheet after the print job.
+msgid "Ending Banner"
+msgstr "Záró kísérőoldal"
+
+msgid "English"
+msgstr "Angol"
+
+msgid "Enter old password:"
+msgstr "Adja meg a régi jelszót:"
+
+msgid "Enter password again:"
+msgstr "Adja meg újra a jelszót:"
+
+msgid "Enter password:"
+msgstr "Adja meg a jelszót:"
+
+msgid ""
+"Enter your username and password or the root username and password to access "
+"this page. If you are using Kerberos authentication, make sure you have a "
+"valid Kerberos ticket."
+msgstr ""
+"Adja meg felhasználónevét és jelszavát, vagy a root felhasználó nevét és "
+"jelszavát az oldal eléréséhez. Ha Kerberos hitelesítést használ, akkor "
+"győződjön meg róla, hogy rendelkezik érvényes Kerberos jeggyel."
+
+msgid "Envelope #10 "
+msgstr "Boríték #10 "
+
+msgid "Envelope #11"
+msgstr "Boríték #11"
+
+msgid "Envelope #12"
+msgstr "Boríték #12"
+
+msgid "Envelope #14"
+msgstr "Boríték #14"
+
+msgid "Envelope #9"
+msgstr "Boríték #9"
+
+msgid "Envelope B4"
+msgstr "B4 boríték"
+
+msgid "Envelope B5"
+msgstr "B5 boríték"
+
+msgid "Envelope B6"
+msgstr "B6 boríték"
+
+msgid "Envelope C0"
+msgstr "C0 boríték"
+
+msgid "Envelope C1"
+msgstr "C1 boríték"
+
+msgid "Envelope C2"
+msgstr "C2 boríték"
+
+msgid "Envelope C3"
+msgstr "C3 boríték"
+
+msgid "Envelope C4"
+msgstr "C4 boríték"
+
+msgid "Envelope C5"
+msgstr "C5 boríték"
+
+msgid "Envelope C6"
+msgstr "C6 boríték"
+
+msgid "Envelope C65"
+msgstr "C65 boríték"
+
+msgid "Envelope C7"
+msgstr "C7 boríték"
+
+msgid "Envelope Choukei 3"
+msgstr "Choukei boríték 3"
+
+msgid "Envelope Choukei 3 Long Edge"
+msgstr "Choukei boríték 3, hosszú élű"
+
+msgid "Envelope Choukei 4"
+msgstr "Choukei boríték 4"
+
+msgid "Envelope Choukei 4 Long Edge"
+msgstr "Choukei boríték 4, hosszú élű"
+
+msgid "Envelope DL"
+msgstr "DL boríték"
+
+msgid "Envelope Feed"
+msgstr "Borítékadagoló"
+
+msgid "Envelope Invite"
+msgstr "Meghívóboríték"
+
+msgid "Envelope Italian"
+msgstr "Olasz boríték"
+
+msgid "Envelope Kaku2"
+msgstr "Kaku2 boríték"
+
+msgid "Envelope Kaku2 Long Edge"
+msgstr "Kaku2 hosszú élű boríték"
+
+msgid "Envelope Kaku3"
+msgstr "Kaku3 boríték"
+
+msgid "Envelope Kaku3 Long Edge"
+msgstr "Kaku3 hosszú élű boríték"
+
+msgid "Envelope Monarch"
+msgstr "Monarch boríték"
+
+msgid "Envelope PRC1 "
+msgstr "PRC1 boríték"
+
+msgid "Envelope PRC1 Long Edge"
+msgstr "PRC1 hosszú élű boríték"
+
+msgid "Envelope PRC10"
+msgstr "PRC10 boríték"
+
+msgid "Envelope PRC10 Long Edge"
+msgstr "PRC10 hosszú élű boríték"
+
+msgid "Envelope PRC2"
+msgstr "PRC2 boríték"
+
+msgid "Envelope PRC2 Long Edge"
+msgstr "PRC2 hosszú élű boríték"
+
+msgid "Envelope PRC3"
+msgstr "PRC3 boríték"
+
+msgid "Envelope PRC3 Long Edge"
+msgstr "PRC3 hosszú élű boríték"
+
+msgid "Envelope PRC4"
+msgstr "PRC4 boríték"
+
+msgid "Envelope PRC4 Long Edge"
+msgstr "PRC4 hosszú élű boríték"
+
+msgid "Envelope PRC5 Long Edge"
+msgstr "PRC5 hosszú élű boríték"
+
+msgid "Envelope PRC5PRC5"
+msgstr "PRC5PRC5 boríték"
+
+msgid "Envelope PRC6"
+msgstr "PRC6 boríték"
+
+msgid "Envelope PRC6 Long Edge"
+msgstr "PRC6 hosszú élű boríték"
+
+msgid "Envelope PRC7"
+msgstr "PRC7 boríték"
+
+msgid "Envelope PRC7 Long Edge"
+msgstr "PRC7 hosszú élű boríték"
+
+msgid "Envelope PRC8"
+msgstr "PRC8 boríték"
+
+msgid "Envelope PRC8 Long Edge"
+msgstr "PRC8 hosszú élű boríték"
+
+msgid "Envelope PRC9"
+msgstr "PRC9 boríték"
+
+msgid "Envelope PRC9 Long Edge"
+msgstr "PRC9 hosszú élű boríték"
+
+msgid "Envelope Personal"
+msgstr "Személyes boríték"
+
+msgid "Envelope You4"
+msgstr "You4 boríték"
+
+msgid "Envelope You4 Long Edge"
+msgstr "You4 hosszú élű boríték"
+
+msgid "Epson"
+msgstr "Epson"
+
+msgid "Error Policy"
+msgstr "Hibaházirend"
+
+msgid "Error sending raster data."
+msgstr "Hiba a raszteradatok küldésekor."
+
+msgid "Error: need hostname after \"-h\" option."
+msgstr "Hiba: a „-h” kapcsoló után gépnév szükséges."
+
+msgid "Every 10 Labels"
+msgstr "10 címkénként"
+
+msgid "Every 2 Labels"
+msgstr "2 címkénként"
+
+msgid "Every 3 Labels"
+msgstr "3 címkénként"
+
+msgid "Every 4 Labels"
+msgstr "4 címkénként"
+
+msgid "Every 5 Labels"
+msgstr "5 címkénként"
+
+msgid "Every 6 Labels"
+msgstr "6 címkénként"
+
+msgid "Every 7 Labels"
+msgstr "7 címkénként"
+
+msgid "Every 8 Labels"
+msgstr "8 címkénként"
+
+msgid "Every 9 Labels"
+msgstr "9 címkénként"
+
+msgid "Every Label"
+msgstr "Címkénként"
+
+msgid "Executive"
+msgstr "Exekutív"
+
+msgid "Expectation Failed"
+msgstr "A várakozás meghiúsult"
+
+msgid "Export Printers to Samba"
+msgstr "Nyomtatók exportálása Samba rendszerbe"
+
+msgid "FAIL"
+msgstr "HIBA"
+
+msgid "FanFold German"
+msgstr "Német leporelló"
+
+msgid "FanFold Legal German"
+msgstr "Legal német leporelló"
+
+msgid "Fanfold US"
+msgstr "US leporelló"
+
+#, c-format
+msgid "File \"%s\" contains a relative path."
+msgstr "A(z) „%s” fájl relatív útvonalat tartalmaz."
+
+#, c-format
+msgid "File \"%s\" has insecure permissions (0%o/uid=%d/gid=%d)."
+msgstr "A(z) „%s” fájl jogosultságai nem biztonságosak (0%o/uid=%d/gid=%d)."
+
+#, c-format
+msgid "File \"%s\" is a directory."
+msgstr "A(z) „%s” fájl egy könyvtár."
+
+#, c-format
+msgid "File \"%s\" not available: %s"
+msgstr "A(z) „%s” fájl nem érhető el: %s"
+
+#, c-format
+msgid "File \"%s\" permissions OK (0%o/uid=%d/gid=%d)."
+msgstr "A(z) „%s” fájl jogosultságai megfelelők (0%o/uid=%d/gid=%d)."
+
+msgid "File Folder"
+msgstr "Iratmappa"
+
+msgid "File Folder - 9/16 x 3 7/16\""
+msgstr "Fájlmappa - 9/16 x 3 7/16\""
+
+#, c-format
+msgid ""
+"File device URIs have been disabled. To enable, see the FileDevice directive "
+"in \"%s/cupsd.conf\"."
+msgstr ""
+"A fájl eszközök URI-címei le lettek tiltva. Az engedélyezéshez lásd a "
+"FileDevice direktívát a(z) „%s/cupsd.conf” fájlban."
+
+#, c-format
+msgid "Finished page %d."
+msgstr "%d. oldal befejezve."
+
+msgid "Folio"
+msgstr "Ívlap"
+
+msgid "Forbidden"
+msgstr "Tiltott"
+
+#, c-format
+msgid "Formatting page %d."
+msgstr "%d. oldal formázása"
+
+msgid "General"
+msgstr "Általános"
+
+msgid "Generic"
+msgstr "Általános"
+
+msgid "Get-Response-PDU uses indefinite length"
+msgstr "A Get-Response-PDU végtelen hosszot használ"
+
+msgid "Glossy Paper"
+msgstr "Fényes papír"
+
+msgid "Got a printer-uri attribute but no job-id."
+msgstr "A kapott printer-uri attribútumhoz nincs job-id."
+
+msgid "Grayscale"
+msgstr "Szürkeárnyalat"
+
+msgid "HP"
+msgstr "HP"
+
+msgid "Hanging Folder"
+msgstr "Lógó mappa"
+
+msgid "Hanging Folder - 9/16 x 2\""
+msgstr "Lógó mappa - 9/16 x 2\""
+
+msgid "IPP 1setOf attribute with incompatible value tags."
+msgstr ""
+
+msgid "IPP attribute has no name."
+msgstr ""
+
+msgid "IPP begCollection value not 0 bytes."
+msgstr ""
+
+msgid "IPP boolean value not 1 byte."
+msgstr ""
+
+msgid "IPP date value not 11 bytes."
+msgstr ""
+
+msgid "IPP endCollection value not 0 bytes."
+msgstr ""
+
+msgid "IPP enum value not 4 bytes."
+msgstr ""
+
+msgid "IPP integer value not 4 bytes."
+msgstr ""
+
+msgid "IPP language length overflows value."
+msgstr ""
+
+msgid "IPP member name is not empty."
+msgstr ""
+
+msgid "IPP name larger than 32767 bytes."
+msgstr ""
+
+msgid "IPP nameWithLanguage value less than minimum 4 bytes."
+msgstr ""
+
+msgid "IPP rangeOfInteger value not 8 bytes."
+msgstr ""
+
+msgid "IPP resolution value not 9 bytes."
+msgstr ""
+
+msgid "IPP string length overflows value."
+msgstr ""
+
+msgid "IPP textWithLanguage value less than minimum 4 bytes."
+msgstr ""
+
+msgid "IPP value larger than 32767 bytes."
+msgstr ""
+
+msgid "ISOLatin1"
+msgstr "ISOLatin1"
+
+msgid "Illegal control character"
+msgstr "Érvénytelen vezérlőkarakter"
+
+msgid "Illegal main keyword string"
+msgstr "Érvénytelen főkulcsszó-karakterlánc"
+
+msgid "Illegal option keyword string"
+msgstr "Érvénytelen kapcsolókulcsszó-karakterlánc"
+
+msgid "Illegal translation string"
+msgstr "Érvénytelen fordítás"
+
+msgid "Illegal whitespace character"
+msgstr "Érvénytelen üres hely karakter"
+
+msgid "Installable Options"
+msgstr "Telepíthető beállítások"
+
+msgid "Installed"
+msgstr "Telepítve"
+
+msgid "IntelliBar Label Printer"
+msgstr "IntelliBar címkenyomtató"
+
+msgid "Intellitech"
+msgstr "Intellitech"
+
+msgid "Internal Server Error"
+msgstr "Belső kiszolgálóhiba"
+
+msgid "Internal error"
+msgstr "Belső hiba"
+
+msgid "Internet Postage 2-Part"
+msgstr "Kétrészes internetes postai"
+
+msgid "Internet Postage 2-Part - 2 1/4 x 7 1/2\""
+msgstr "Kétrészes internetes postai - 2 1/4 x 7 1/2\""
+
+msgid "Internet Postage 3-Part"
+msgstr "Háromrészes internetes postai"
+
+msgid "Internet Postage 3-Part - 2 1/4 x 7\""
+msgstr "Háromrészes internetes postai - 2 1/4 x 7\""
+
+msgid "Internet Printing Protocol"
+msgstr "Internet nyomtatási protokoll"
+
+#, c-format
+msgid "Invalid printer command \"%s\"."
+msgstr ""
+
+msgid "JCL"
+msgstr "JCL"
+
+msgid "JIS B0"
+msgstr "JIS B0"
+
+msgid "JIS B1"
+msgstr "JIS B1"
+
+msgid "JIS B10"
+msgstr "JIS B10"
+
+msgid "JIS B2"
+msgstr "JIS B2"
+
+msgid "JIS B3"
+msgstr "JIS B3"
+
+msgid "JIS B4"
+msgstr "JIS B4"
+
+msgid "JIS B4 Long Edge"
+msgstr "JIS B4 hosszú élű"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "JIS B5 Long Edge"
+msgstr "JIS B5 hosszú élű"
+
+msgid "JIS B6"
+msgstr "JIS B6"
+
+msgid "JIS B6 Long Edge"
+msgstr "JIS B6 hosszú élű"
+
+msgid "JIS B7"
+msgstr "JIS B7"
+
+msgid "JIS B8"
+msgstr "JIS B8"
+
+msgid "JIS B9"
+msgstr "JIS B9"
+
+#, c-format
+msgid "Job #%d cannot be restarted - no files."
+msgstr "A(z) %d. feladat nem indítható újra - nincsenek fájlok."
+
+#, c-format
+msgid "Job #%d does not exist."
+msgstr "A(z) %d. feladat nem létezik."
+
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "A(z) %d. feladat már félbe van szakítva - nem szakítható meg."
+
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "A(z) %d. feladat már meg van szakítva - nem szakítható meg."
+
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "A(z) %d. feladat már kész van - nem szakítható meg."
+
+#, c-format
+msgid "Job #%d is finished and cannot be altered."
+msgstr "A(z) %d. feladat befejeződött, és nem módosítható."
+
+#, c-format
+msgid "Job #%d is not complete."
+msgstr "A(z) %d. feladat nincs kész."
+
+#, c-format
+msgid "Job #%d is not held for authentication."
+msgstr "A(z) %d. feladat nincs hitelesítésre visszatartva."
+
+#, c-format
+msgid "Job #%d is not held."
+msgstr "A(z) %d. feladat nincs visszatartva."
+
+msgid "Job Completed"
+msgstr "Feladat befejeződött"
+
+msgid "Job Created"
+msgstr "Feladat létrehozva"
+
+msgid "Job ID: "
+msgstr "Feladatazonosító: "
+
+msgid "Job Options Changed"
+msgstr "Feladat beállításai módosítva"
+
+msgid "Job Stopped"
+msgstr "Feladat leállítva"
+
+msgid "Job UUID: "
+msgstr "Feladat UUID: "
+
+msgid "Job is completed and cannot be changed."
+msgstr "A feladat befejeződött, és nem módosítható."
+
+msgid "Job operation failed:"
+msgstr "A feladatművelet sikertelen:"
+
+msgid "Job state cannot be changed."
+msgstr "A feladat állapota nem módosítható."
+
+msgid "Job subscriptions cannot be renewed."
+msgstr "A feladatfeliratkozások nem újíthatók meg."
+
+msgid "Jobs"
+msgstr "Feladatok"
+
+msgid "LPD/LPR Host or Printer"
+msgstr "LPD/LPR kiszolgáló vagy nyomtató"
+
+msgid "Label Printer"
+msgstr "Címkenyomtató"
+
+msgid "Label Top"
+msgstr "Címke teteje"
+
+#, c-format
+msgid "Language \"%s\" not supported."
+msgstr "A(z) „%s” nyelv nem támogatott."
+
+msgid "Large Address"
+msgstr "Nagy cím"
+
+msgid "Large Address - 1 4/10 x 3 1/2\""
+msgstr "Nagy cím - 1 4/10 x 3 1/2\""
+
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet sorozat PCL 4/5"
+
+msgid "Letter Oversize"
+msgstr "Letter túlméretes"
+
+msgid "Letter Oversize Long Edge"
+msgstr "Letter túlméretes hosszú élű"
+
+msgid "Light"
+msgstr "Gyenge"
+
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "A sor hosszabb a maximálisan engedélyezettnél (255 karakter)"
+
+msgid "List Available Printers"
+msgstr "Elérhető nyomtatók felsorolása"
+
+msgid "Loading print file."
+msgstr "Nyomtatandó fájl betöltése."
+
+msgid "Location: "
+msgstr "Hely: "
+
+msgid "Long-Edge (Portrait)"
+msgstr "Hosszú élű (álló)"
+
+msgid "Looking for printer."
+msgstr "Nyomtató keresése."
+
+msgid "Make and Model: "
+msgstr "Gyártó és modell: "
+
+msgid "Manual Feed"
+msgstr "Kézi adagolás"
+
+msgid "Media Dimensions: "
+msgstr "Média méretei: "
+
+msgid "Media Limits: "
+msgstr "Média korlátai: "
+
+msgid "Media Name: "
+msgstr "Média neve: "
+
+msgid "Media Size"
+msgstr "Média mérete"
+
+msgid "Media Source"
+msgstr "Média forrása"
+
+msgid "Media Tracking"
+msgstr "Média követése"
+
+msgid "Media Type"
+msgstr "Média típusa"
+
+msgid "Medium"
+msgstr "Médium"
+
+msgid "Memory allocation error"
+msgstr "Memóriafoglalási hiba"
+
+msgid "Missing CloseGroup"
+msgstr "Hiányzó CloseGroup"
+
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Hiányzó PPD-Adobe-4.x fejléc"
+
+msgid "Missing asterisk in column 1"
+msgstr "Hiányzó csillag az 1. oszlopban"
+
+msgid "Missing document-number attribute."
+msgstr "Hiányzó document-number attribútum."
+
+#, c-format
+msgid "Missing double quote on line %d."
+msgstr "Hiányzó dupla idézőjel a(z) %d. sorban."
+
+msgid "Missing form variable"
+msgstr "Hiányzó típusváltozó"
+
+msgid "Missing last-document attribute in request."
+msgstr ""
+
+msgid "Missing media or media-col."
+msgstr "Hiányzó média vagy media-col."
+
+msgid "Missing media-size in media-col."
+msgstr "Hiányzó media-size a media-col elemben."
+
+msgid "Missing notify-subscription-ids attribute."
+msgstr "Hiányzó notify-subscription-ids attribútum."
+
+msgid "Missing option keyword"
+msgstr "Hiányzó kapcsolókulcsszó"
+
+msgid "Missing requesting-user-name attribute."
+msgstr "Hiányzó requesting-user-name attribútum."
+
+msgid "Missing required attributes."
+msgstr "Hiányzó kötelező attribútumok."
+
+#, c-format
+msgid "Missing value on line %d of banner file."
+msgstr "Hiányzó érték a kísérőoldalfájl %d. sorában."
+
+#, c-format
+msgid "Missing value on line %d."
+msgstr "Hiányzó érték a(z) %d. sorban."
+
+msgid "Missing value string"
+msgstr "Hiányzó értékkarakterlánc"
+
+msgid "Missing x-dimension in media-size."
+msgstr "Hiányzó x-dimension a media-size elemben."
+
+msgid "Missing y-dimension in media-size."
+msgstr "Hiányzó y-dimension a media-size elemben."
+
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s"
+msgstr ""
+"Modell:  név = %s\n"
+"         természetes nyelv = %s\n"
+"         gyártó és típus = %s\n"
+"         eszközazonosító = %s"
+
+msgid "Modify Class"
+msgstr "Osztály módosítása"
+
+msgid "Modify Printer"
+msgstr "Nyomtató módosítása"
+
+msgid "Move All Jobs"
+msgstr "Minden feladat áthelyezése"
+
+msgid "Move Job"
+msgstr "Feladat áthelyezése"
+
+msgid "Moved Permanently"
+msgstr "Tartósan áthelyezve"
+
+msgid "NULL PPD file pointer"
+msgstr "NULL PPD-fájl mutató"
+
+msgid "Name OID uses indefinite length"
+msgstr "Név OID végtelen hosszt használ"
+
+msgid "Nested classes are not allowed."
+msgstr "A beágyazott osztályok nem engedélyezettek."
+
+msgid "Never"
+msgstr "Soha"
+
+msgid "New Stylus Color Series"
+msgstr "New Stylus Color sorozat"
+
+msgid "New Stylus Photo Series"
+msgstr "New Stylus Photo sorozat"
+
+msgid "No"
+msgstr "Nem"
+
+msgid "No Content"
+msgstr "Nincs tartalom"
+
+msgid "No PPD name"
+msgstr "Nincs PPD-név"
+
+msgid "No VarBind SEQUENCE"
+msgstr "Nincs VarBind SEQUENCE"
+
+msgid "No Windows printer drivers are installed."
+msgstr "Nincsenek telepítve windowsos nyomtató-illesztőprogramok."
+
+msgid "No active connection"
+msgstr "Nincs aktív kapcsolat"
+
+#, c-format
+msgid "No active jobs on %s."
+msgstr "Nincsenek aktív feladatok ezen: %s."
+
+msgid "No attributes in request."
+msgstr "Nincsenek attribútumok a kérésben."
+
+msgid "No authentication information provided."
+msgstr "Nem adott meg hitelesítési információkat."
+
+msgid "No community name"
+msgstr "Nincs közösségnév"
+
+msgid "No default printer."
+msgstr "Nincs alapértelmezett nyomtató."
+
+msgid "No destinations added."
+msgstr "Nem lett cél hozzáadva."
+
+msgid "No device URI found in argv[0] or in DEVICE_URI environment variable."
+msgstr ""
+"Nem található az eszköz URI azonosítója az argv[0] változóban vagy a "
+"DEVICE_URI környezeti változóban."
+
+msgid "No error-index"
+msgstr "Nincs error-index"
+
+msgid "No error-status"
+msgstr "Nincs error-status"
+
+msgid "No file in print request."
+msgstr "Nincs fájl a nyomtatási kérésben."
+
+msgid "No fonts in charset file."
+msgstr "Nincsenek betűk a karakterkészlet-fájlban."
+
+msgid "No modification time"
+msgstr "Nincs módosítási idő"
+
+msgid "No name OID"
+msgstr "Nincs név OID"
+
+msgid "No pages were found."
+msgstr "Nem találhatók oldalak."
+
+msgid "No printer name"
+msgstr "Nincs nyomtatónév"
+
+msgid "No printer-uri found"
+msgstr "Nem található printer-uri"
+
+msgid "No printer-uri found for class"
+msgstr "Nem található printer-uri az osztályhoz"
+
+msgid "No printer-uri in request."
+msgstr "Nincs printer-uri a kérésben."
+
+msgid "No request-id"
+msgstr "Nincs request-id"
+
+msgid "No subscription attributes in request."
+msgstr "Nincsenek feliratkozási attribútumok a kérésben."
+
+msgid "No subscriptions found."
+msgstr "Nem található feliratkozás."
+
+msgid "No variable-bindings SEQUENCE"
+msgstr "Nincs variable-bindings SEQUENCE"
+
+msgid "No version number"
+msgstr "Nincs verziószám"
+
+msgid "Non-continuous (Mark sensing)"
+msgstr "Nem végtelenített (jelölésérzékelés)"
+
+msgid "Non-continuous (Web sensing)"
+msgstr "Nem végtelenített (webérzékelés)"
+
+msgid "Normal"
+msgstr "Normál"
+
+msgid "Not Found"
+msgstr "Nem található"
+
+msgid "Not Implemented"
+msgstr "Nincs megvalósítva"
+
+msgid "Not Installed"
+msgstr "Nincs telepítve"
+
+msgid "Not Modified"
+msgstr "Nincs módosítva"
+
+msgid "Not Supported"
+msgstr "Nem támogatott"
+
+msgid "Not allowed to print."
+msgstr "Nem engedélyezett a nyomtatás."
+
+msgid "Note"
+msgstr "Megjegyzés"
+
+msgid ""
+"Note: this program only validates the DSC comments, not the PostScript "
+"itself."
+msgstr ""
+"Megjegyzés: ez a program csak a DSC-megjegyzéseket ellenőrzi, nem magát a "
+"PostScriptet."
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Off (1-Sided)"
+msgstr "Ki (egyoldalas)"
+
+msgid "Oki"
+msgstr "Oki"
+
+msgid "Online Help"
+msgstr "Online súgó"
+
+#, c-format
+msgid "Open of %s failed: %s"
+msgstr "%s megnyitása sikertelen: %s"
+
+msgid "OpenGroup without a CloseGroup first"
+msgstr "Az OpenGroup előtt nincs CloseGroup"
+
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "Az OpenUI/JCLOpenUI előtt nincs CloseUI/JCLCloseUI"
+
+msgid "Operation Policy"
+msgstr "Működtetési házirend"
+
+#, c-format
+msgid "Option \"%s\" cannot be included via %%%%IncludeFeature."
+msgstr "A(z) „%s” beállítás nem vehető fel a %%%%IncludeFeature használatával."
+
+msgid "Options Installed"
+msgstr "Telepített beállítások"
+
+msgid "Options:"
+msgstr "Beállítások:"
+
+msgid "Options: "
+msgstr "Beállítások: "
+
+msgid "Out of date PPD cache file."
+msgstr "Elavult PPD-gyorsítótárfájl."
+
+msgid "Out of memory."
+msgstr "Elfogyott a memória."
+
+msgid "Output Mode"
+msgstr "Kimeneti mód"
+
+#, c-format
+msgid "Output for printer %s is sent to %s"
+msgstr "A(z) %s nyomtató kimenete erre van elküldve: %s"
+
+#, c-format
+msgid "Output for printer %s is sent to remote printer %s on %s"
+msgstr ""
+"A(z) %s nyomtató kimenete a(z) %s távoli nyomtatóra van elküldve ezen: %s"
+
+#, c-format
+msgid "Output for printer %s/%s is sent to %s"
+msgstr "A(z) %s/%s nyomtató kimenete erre van elküldve: %s"
+
+#, c-format
+msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgstr ""
+"A(z) %s/%s nyomtató kimenete a(z) %s távoli nyomtatóra van elküldve ezen: %s"
+
+msgid "PASS"
+msgstr "SIKER"
+
+msgid "PCL Laser Printer"
+msgstr "PCL lézernyomtató"
+
+msgid "PRC16K"
+msgstr "PRC16K"
+
+msgid "PRC16K Long Edge"
+msgstr "PRC16K hosszú élű"
+
+msgid "PRC32K"
+msgstr "PRC32K"
+
+msgid "PRC32K Long Edge"
+msgstr "PRC32K hosszú élű"
+
+msgid "PRC32K Oversize"
+msgstr "PRC32K túlméretes"
+
+msgid "PRC32K Oversize Long Edge"
+msgstr "PRC32K túlméretes hosszú élű"
+
+msgid "Packet does not contain a Get-Response-PDU"
+msgstr "A csomag nem tartalmaz Get-Response-PDU elemet"
+
+msgid "Packet does not start with SEQUENCE"
+msgstr "A csomag nem a SEQUENCE elemmel kezdődik"
+
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
+#, c-format
+msgid "Password for %s on %s? "
+msgstr "%s jelszava ezen: %s? "
+
+#, c-format
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "%s jelszava szükséges %s eléréséhez SAMBA használatával: "
+
+msgid "Pause Class"
+msgstr "Osztály szüneteltetése"
+
+msgid "Pause Printer"
+msgstr "Nyomtató szüneteltetése"
+
+msgid "Peel-Off"
+msgstr "Leválasztás"
+
+msgid "Photo"
+msgstr "Fotó"
+
+msgid "Photo Labels"
+msgstr "Fotócímkék"
+
+msgid "Plain Paper"
+msgstr "Sima papír"
+
+# msgid "Postcard Double"
+# msgstr "Dupla képeslap"
+msgid "Policies"
+msgstr "Házirendek"
+
+msgid "Port Monitor"
+msgstr "Portfigyelő"
+
+msgid "PostScript Printer"
+msgstr "PostScript nyomtató"
+
+msgid "Postcard"
+msgstr "Képeslap"
+
+msgid "Postcard Double "
+msgstr "Dupla képeslap "
+
+msgid "Postcard Double Long Edge"
+msgstr "Hosszú élű dupla képeslap"
+
+msgid "Postcard Long Edge"
+msgstr "Hosszú élű képeslap"
+
+msgid "Print Density"
+msgstr "Nyomtatás sűrűsége"
+
+msgid "Print Job:"
+msgstr "Nyomtatási feladat:"
+
+msgid "Print Mode"
+msgstr "Nyomtatási mód"
+
+msgid "Print Rate"
+msgstr "Nyomtatási sebesség"
+
+msgid "Print Self-Test Page"
+msgstr "Öntesztelő oldal nyomtatása"
+
+msgid "Print Speed"
+msgstr "Nyomtatási sebesség"
+
+msgid "Print Test Page"
+msgstr "Tesztoldal nyomtatása"
+
+msgid "Print and Cut"
+msgstr "Nyomtatás és kivágás"
+
+msgid "Print and Tear"
+msgstr "Nyomtatás és szakítás"
+
+#, c-format
+msgid "Print file accepted - job ID %d."
+msgstr "Nyomtatási fájl elfogadva - feladatazonosító: %d"
+
+msgid "Print file accepted - job ID unknown."
+msgstr "Nyomtatási fájl elfogadva - feladatazonosító ismeretlen."
+
+msgid "Print file sent."
+msgstr "Nyomtatási fájl elküldve."
+
+msgid "Print file was not accepted."
+msgstr "A nyomtatási fájl nem lett elfogadva."
+
+msgid "Print job too large."
+msgstr ""
+
+msgid "Printed For: "
+msgstr "Nyomtatva ehhez: "
+
+msgid "Printed From: "
+msgstr "Nyomtatva ebből: "
+
+msgid "Printed On: "
+msgstr "Nyomtatva ekkor: "
+
+msgid "Printer Added"
+msgstr "Nyomtató hozzáadva"
+
+msgid "Printer Default"
+msgstr "Nyomtató alapértelmezése"
+
+msgid "Printer Deleted"
+msgstr "Nyomtató törölve"
+
+msgid "Printer Modified"
+msgstr "Nyomtató módosítva"
+
+msgid "Printer Name: "
+msgstr "Nyomtatónév: "
+
+msgid "Printer Paused"
+msgstr "Nyomtató szüneteltetve"
+
+msgid "Printer Settings"
+msgstr "Nyomtató beállításai"
+
+msgid "Printer busy, will retry in 10 seconds."
+msgstr "Nyomtató elfoglalt, 10 másodperc múlva újrapróbálkozom."
+
+msgid "Printer busy; will retry in 30 seconds."
+msgstr "Nyomtató elfoglalt; 30 másodperc múlva újrapróbálkozom."
+
+msgid "Printer did not respond."
+msgstr ""
+
+#, c-format
+msgid "Printer does not support IPP/%d.%d, trying IPP/%s."
+msgstr ""
+"A nyomtató nem támogatja az IPP/%d.%d módot, próbálkozás az IPP/%s móddal…"
+
+msgid "Printer is busy, will retry in 5 seconds."
+msgstr "Nyomtató elfoglalt, 5 másodperc múlva újrapróbálkozom."
+
+msgid "Printer is not currently connected."
+msgstr "A nyomtató jelenleg nincs csatlakoztatva."
+
+msgid "Printer is now connected."
+msgstr "A nyomtató jelenleg csatlakoztatva van."
+
+msgid "Printer is now online."
+msgstr "A nyomtató jelenleg elérhető."
+
+msgid "Printer is offline."
+msgstr "A nyomtató offline állapotban van."
+
+msgid "Printer not connected, will retry in 30 seconds."
+msgstr "A nyomtató nem csatlakozik, 30 másodperc múlva újrapróbálkozom."
+
+msgid "Printer not connected; will retry in 30 seconds."
+msgstr "A nyomtató nem csatlakozik; 30 másodperc múlva újrapróbálkozom."
+
+msgid "Printer:"
+msgstr "Nyomtató:"
+
+msgid "Printers"
+msgstr "Nyomtatók"
+
+#, c-format
+msgid "Printing page %d, %d%% complete."
+msgstr "%d. oldal nyomtatása, %d%% kész."
+
+#, c-format
+msgid "Printing page %d."
+msgstr "%d. oldal nyomtatása."
+
+msgid "Purge Jobs"
+msgstr "Feladatok eltávolítása"
+
+msgid "Quarto"
+msgstr "Quarto"
+
+msgid "Quota limit reached."
+msgstr "Kvótakorlát elérve."
+
+msgid "Rank    Owner   Job     File(s)                         Total Size"
+msgstr "Sorr    Tulaj   Felad   Fájlok                          Teljes méret"
+
+#. TRANSLATORS: Pri is job priority.
+msgid ""
+"Rank   Owner      Pri  Job        Files                       Total Size"
+msgstr ""
+"Sorr   Tulaj      Pri  Felad      Fájlok                      Teljes méret"
+
+msgid "Ready to print."
+msgstr "Nyomtatásra kész."
+
+msgid "Reject Jobs"
+msgstr "Feladatok visszautasítása"
+
+#, c-format
+msgid "Remote host did not accept control file (%d)."
+msgstr "A távoli gép nem fogadta el a vezérlőfájlt (%d)."
+
+#, c-format
+msgid "Remote host did not accept data file (%d)."
+msgstr "A távoli gép nem fogadta el az adatfájlt (%d)."
+
+msgid "Reprint After Error"
+msgstr "Újranyomtatás hiba után"
+
+msgid "Request Entity Too Large"
+msgstr "A kérésegyed túl nagy"
+
+msgid "Resolution"
+msgstr "Felbontás"
+
+msgid "Resume Class"
+msgstr "Osztály folytatása"
+
+msgid "Resume Printer"
+msgstr "Nyomtató folytatása"
+
+msgid "Return Address"
+msgstr "Visszaküldési cím"
+
+msgid "Return Address - 3/4 x 2\""
+msgstr "Visszaküldési cím - 3/4 x 2\""
+
+msgid "Rewind"
+msgstr "Visszatekerés"
+
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'"
+msgstr "Parancs futtatása: %s %s -N -A %s -c '%s'"
+
+msgid "SEQUENCE uses indefinite length"
+msgstr "A SEQUENCE végtelen hosszt használ"
+
+msgid "SSL/TLS Negotiation Error"
+msgstr "SSL/TLS egyeztetési hiba"
+
+msgid "See Other"
+msgstr "A többi megjelenítése"
+
+msgid "Sending data to printer."
+msgstr "Adatok küldése a nyomtatónak."
+
+#, c-format
+msgid "Serial Port #%d"
+msgstr "%d. soros port"
+
+msgid "Server Restarted"
+msgstr "Kiszolgáló újraindítva"
+
+msgid "Server Security Auditing"
+msgstr "Kiszolgáló biztonsági megfigyelése"
+
+msgid "Server Started"
+msgstr "Kiszolgáló elindítva"
+
+msgid "Server Stopped"
+msgstr "Kiszolgáló leállítva"
+
+msgid "Service Unavailable"
+msgstr "A szolgáltatás nem érhető el"
+
+msgid "Set Allowed Users"
+msgstr "Engedélyezett felhasználók beállítása"
+
+msgid "Set As Server Default"
+msgstr "Beállítás kiszolgáló alapértelmezéseként"
+
+msgid "Set Class Options"
+msgstr "Osztály beállításainak megadása"
+
+msgid "Set Printer Options"
+msgstr "Nyomtató beállításainak megadása"
+
+msgid "Set Publishing"
+msgstr "Közzététel beállítása"
+
+msgid "Shipping Address"
+msgstr "Szállítási cím"
+
+msgid "Shipping Address - 2 5/16 x 4\""
+msgstr "Szállítási cím - 2 5/16 x 4\""
+
+msgid "Short-Edge (Landscape)"
+msgstr "Rövid élű (fekvő)"
+
+msgid "Special Paper"
+msgstr "Speciális papír"
+
+#, c-format
+msgid "Spooling job, %.0f%% complete."
+msgstr "Feladat sorba állítása, %.0f%% kész."
+
+msgid "Standard"
+msgstr "Szabványos"
+
+#. TRANSLATORS: Banner/cover sheet before the print job.
+msgid "Starting Banner"
+msgstr "Kezdő kísérőoldal"
+
+#, c-format
+msgid "Starting page %d."
+msgstr "%d. oldal kezdése."
+
+msgid "Statement"
+msgstr "Statement"
+
+msgid "Stylus Color Series"
+msgstr "Stylus Color sorozat"
+
+msgid "Stylus Photo Series"
+msgstr "Stylus Photo sorozat"
+
+#, c-format
+msgid "Subscription #%d does not exist."
+msgstr "A(z) %d. feliratkozás nem létezik."
+
+msgid "Super A"
+msgstr "Super A"
+
+msgid "Super B"
+msgstr "Super B"
+
+msgid "Super B/A3"
+msgstr "Szuper B/A3"
+
+msgid "Switching Protocols"
+msgstr "Protokollváltás"
+
+msgid "Tabloid"
+msgstr "Tabloid"
+
+msgid "Tabloid Oversize"
+msgstr "Tabloid túlméretes"
+
+msgid "Tabloid Oversize Long Edge"
+msgstr "Hosszú élű túlméretes tabloid"
+
+msgid "Tear"
+msgstr "Letépés"
+
+msgid "Tear-Off"
+msgstr "Perforáció"
+
+msgid "Tear-Off Adjust Position"
+msgstr "Perforáció igazítási pozíciója"
+
+#, c-format
+msgid "The %s attribute cannot be provided with job-ids."
+msgstr "A(z) %s attribútum nem adható meg job-id értékekkel."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr "A(z) „%s” PPD-fájl nem található."
+
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr "A(z) „%s” PPD-fájl nem nyitható meg: %s"
+
+msgid "The PPD file could not be opened."
+msgstr "A PPD-fájl nem nyitható meg."
+
+msgid ""
+"The class name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"Az osztálynév legfeljebb 127 nyomtatható karaktert tartalmazhat, kivéve a "
+"„/”, „#” és szóköz karaktereket."
+
+msgid "The developer unit needs to be replaced."
+msgstr "Az előhívó egységet ki kell cserélni."
+
+msgid "The developer unit will need to be replaced soon."
+msgstr "Az előhívó egységet hamarosan ki kell majd cserélni."
+
+msgid "The fuser's temperature is high."
+msgstr "A beégetőmű hőmérséklete túl magas."
+
+msgid "The fuser's temperature is low."
+msgstr "A beégetőmű hőmérséklete túl alacsony."
+
+msgid ""
+"The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr ""
+"A notify-lease-duration attribútum nem használható feladatfeliratkozásokkal."
+
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)."
+msgstr "A notify-user-data érték túl magas (%d > 63 oktet)."
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr "Az optikai fotovezetőt ki kell cserélni."
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr "Az optikai fotovezetőt hamarosan ki kell majd cserélni."
+
+msgid "The output bin is almost full."
+msgstr "A kimeneti tartó majdnem megtelt."
+
+msgid "The output bin is full."
+msgstr "A kimeneti tartó megtelt."
+
+msgid "The output bin is missing."
+msgstr "A kimeneti tartó hiányzik."
+
+msgid "The page setup information was not valid."
+msgstr "Az oldalbeállítási információk érvénytelenek."
+
+msgid "The paper tray is almost empty."
+msgstr "Majdnem üres a papírtálca."
+
+msgid "The paper tray is empty."
+msgstr "Üres a papírtálca."
+
+msgid "The paper tray is missing."
+msgstr "Hiányzik a papírtálca."
+
+msgid "The paper tray needs to be filled."
+msgstr "Fel kell tölteni a papírtálcát."
+
+msgid "The print file could not be opened."
+msgstr "A nyomtatási fájl nem nyitható meg."
+
+msgid "The printer URI is incorrect or no longer exists."
+msgstr "A nyomtató URI-címe helytelen, vagy nem létezik."
+
+msgid "The printer is busy."
+msgstr "A nyomtató elfoglalt."
+
+msgid "The printer is not connected."
+msgstr "A nyomtató nincs csatlakoztatva."
+
+msgid "The printer is not responding."
+msgstr "A nyomtató nem válaszol."
+
+msgid "The printer is out of ink."
+msgstr "A nyomtatóból kifogyott a tinta."
+
+msgid "The printer is running low on ink."
+msgstr ""
+
+msgid "The printer is running low on toner."
+msgstr ""
+
+msgid "The printer is unreachable at this time."
+msgstr "A nyomtató jelenleg elérhetetlen."
+
+msgid "The printer may be out of toner."
+msgstr ""
+
+msgid "The printer may not exist or is unavailable at this time."
+msgstr "A nyomtató nem létezik, vagy jelenleg elérhetetlen."
+
+msgid ""
+"The printer name may only contain up to 127 printable characters and may not "
+"contain spaces, slashes (/), or the pound sign (#)."
+msgstr ""
+"A nyomtatónév legfeljebb 127 nyomtatható karaktert tartalmazhat, kivéve a "
+"„/”, „#” és szóköz karaktereket."
+
+msgid "The printer or class does not exist."
+msgstr "A nyomtató vagy osztály nem létezik."
+
+msgid "The printer or class is not shared."
+msgstr "A nyomtató vagy osztály nincs megosztva."
+
+msgid "The printer's cover is open."
+msgstr "A nyomtató fedele nyitva van."
+
+msgid "The printer's door is open."
+msgstr "A nyomtató ajtaja nyitva van."
+
+msgid "The printer's interlock is open."
+msgstr "A nyomtató retesze nyitva van."
+
+msgid "The printer's waste bin is almost full."
+msgstr "A nyomtató hulladéktárolója majdnem megtelt."
+
+msgid "The printer's waste bin is full."
+msgstr "A nyomtató hulladéktárolója megtelt."
+
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "A(z) „%s” printer-uri érvénytelen karaktereket tartalmaz."
+
+msgid "The printer-uri attribute is required."
+msgstr "A printer-uri attribútum szükséges."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr ""
+"A printer-uri a következő alakú kell legyen: „ipp://GÉPNÉV/classes/"
+"OSZTÁLYNÉV”."
+
+msgid ""
+"The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr ""
+"A printer-uri a következő alakú kell legyen: „ipp://GÉPNÉV/printers/"
+"NYOMTATÓNÉV”."
+
+msgid ""
+"The subscription name may not contain spaces, slashes (/), question marks "
+"(?), or the pound sign (#)."
+msgstr ""
+"A feliratkozás neve nem tartalmazhatja a „/”, „?”, „#” és szóköz "
+"karaktereket."
+
+msgid ""
+"The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to "
+"enable it."
+msgstr ""
+"A webes felület jelenleg le van tiltva. Futtassa a „cupsctl "
+"WebInterface=yes” parancsot az engedélyezéséhez."
+
+#, c-format
+msgid "The which-jobs value \"%s\" is not supported."
+msgstr "A(z) „%s” which-jobs érték nem támogatott."
+
+msgid "There are too many subscriptions."
+msgstr "Túl sok feliratkozás van."
+
+msgid "There is a paper jam."
+msgstr "Begyűrődött a papír."
+
+msgid "There was an unrecoverable USB error."
+msgstr "Helyrehozhatatlan USB-hiba történt."
+
+msgid "Thermal Transfer Media"
+msgstr "Termáltranszfer címke"
+
+msgid "Title: "
+msgstr "Cím: "
+
+msgid "Too many active jobs."
+msgstr "Túl sok aktív feladat."
+
+#, c-format
+msgid "Too many job-sheets values (%d > 2)."
+msgstr "Túl sok job-sheets érték (%d > 2)."
+
+#, c-format
+msgid "Too many printer-state-reasons values (%d > %d)."
+msgstr "Túl sok printer-state-reasons érték (%d > %d)."
+
+msgid "Transparency"
+msgstr "Átlátszóság"
+
+msgid "Tray"
+msgstr "Tálca"
+
+msgid "Tray 1"
+msgstr "1. tálca"
+
+msgid "Tray 2"
+msgstr "2. tálca"
+
+msgid "Tray 3"
+msgstr "3. tálca"
+
+msgid "Tray 4"
+msgstr "4. tálca"
+
+msgid "URI Too Long"
+msgstr "Az URI túl hosszú"
+
+msgid "US Ledger"
+msgstr "US Ledger"
+
+msgid "US Legal"
+msgstr "US Legal"
+
+msgid "US Legal Oversize"
+msgstr "US Legal túlméretes"
+
+msgid "US Letter"
+msgstr "US levél"
+
+msgid "US Letter Long Edge"
+msgstr "Hosszú élű US levél"
+
+msgid "US Letter Oversize"
+msgstr "Túlméretes US levél"
+
+msgid "US Letter Oversize Long Edge"
+msgstr "Hosszú élű túlméretes US levél"
+
+msgid "US Letter Small"
+msgstr "US Letter kicsi"
+
+#, c-format
+msgid "USB Serial Port #%d"
+msgstr "%d. USB soros port"
+
+msgid "Unable to access cupsd.conf file:"
+msgstr "A cupsd.conf fájl nem érhető el:"
+
+msgid "Unable to add RSS subscription:"
+msgstr "Nem vehető fel az RSS-feliratkozás:"
+
+msgid "Unable to add class:"
+msgstr "Nem vehető fel osztály:"
+
+msgid "Unable to add document to print job."
+msgstr "A dokumentum nem adható hozzá a nyomtatási feladathoz."
+
+#, c-format
+msgid "Unable to add job for destination \"%s\"."
+msgstr "Nem vehető fel feladat a(z) „%s” célhoz."
+
+msgid "Unable to add printer:"
+msgstr "Nem vehető fel nyomtató:"
+
+msgid "Unable to allocate memory for file types."
+msgstr "A memória lefoglalása nem lehetséges a fájltípusoknak."
+
+msgid "Unable to allocate memory for page info"
+msgstr "A memória lefoglalása nem lehetséges az oldalinformációknak."
+
+msgid "Unable to allocate memory for pages array"
+msgstr "A memória lefoglalása nem lehetséges az oldalak tömbjének."
+
+msgid "Unable to cancel RSS subscription:"
+msgstr "Nem távolítható el az RSS-feliratkozás:"
+
+msgid "Unable to cancel print job."
+msgstr "Nem szakítható meg a nyomtatási feladat."
+
+msgid "Unable to change printer-is-shared attribute:"
+msgstr "A printer-is-shared attribútum nem módosítható:"
+
+msgid "Unable to change printer:"
+msgstr "Nem módosítható a nyomtató:"
+
+msgid "Unable to change server settings:"
+msgstr "Nem módosíthatók a kiszolgáló beállításai:"
+
+msgid "Unable to configure printer options."
+msgstr ""
+
+msgid "Unable to connect to host."
+msgstr "A géphez nem lehet kapcsolódni."
+
+msgid "Unable to contact printer, queuing on next printer in class."
+msgstr ""
+"A nyomtatóval nem vehető fel a kapcsolat, sorba állítás az osztály következő "
+"nyomtatójára."
+
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)."
+msgstr "A 64 bites CUPS illesztőprogram-fájlok nem másolhatók (%d)."
+
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)."
+msgstr "A 64 bites Windows illesztőprogram-fájlok nem másolhatók (%d)."
+
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)."
+msgstr "A CUPS illesztőprogram-fájlok nem másolhatók (%d)."
+
+#, c-format
+msgid "Unable to copy PPD file - %s"
+msgstr "A PPD-fájl nem másolható - %s"
+
+msgid "Unable to copy PPD file."
+msgstr "A PPD-fájl nem másolható."
+
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)."
+msgstr "A Windows 2000 illesztőprogram-fájlok nem másolhatók (%d)."
+
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)."
+msgstr "A Windows 9x illesztőprogram-fájlok nem másolhatók (%d)."
+
+#, c-format
+msgid "Unable to copy interface script - %s"
+msgstr "A felület parancsfájl nem másolható - %s"
+
+msgid "Unable to copy print file"
+msgstr "A nyomtatási fájl nem másolható"
+
+msgid "Unable to create compressed print file"
+msgstr "Nem hozható létre tömörített nyomtatási fájl"
+
+msgid "Unable to create pipes for filters"
+msgstr "Nem hozhatók létre csövek a szűrőkhöz"
+
+msgid "Unable to create printer-uri"
+msgstr "Nem hozható létre printer-uri"
+
+msgid "Unable to create temporary file"
+msgstr "Az átmeneti fájl létrehozása nem lehetséges"
+
+msgid "Unable to create temporary file:"
+msgstr "Az átmeneti fájl létrehozása nem lehetséges:"
+
+msgid "Unable to delete class:"
+msgstr "Nem törölhető az osztály:"
+
+msgid "Unable to delete printer:"
+msgstr "Nem törölhető a nyomtató:"
+
+msgid "Unable to do maintenance command:"
+msgstr "Nem hajtható végre a karbantartási parancs:"
+
+msgid "Unable to edit cupsd.conf files larger than 1MB"
+msgstr "Nem szerkeszthetők 1 MB-nál nagyobb cupsd.conf fájlok"
+
+msgid ""
+"Unable to establish a secure connection to host (certificate chain invalid)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (érvénytelen "
+"tanúsítványlánc)."
+
+msgid ""
+"Unable to establish a secure connection to host (certificate not yet valid)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (a tanúsítvány még nem "
+"érvényes)."
+
+msgid "Unable to establish a secure connection to host (expired certificate)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (a tanúsítvány lejárt)."
+
+msgid "Unable to establish a secure connection to host (host name mismatch)."
+msgstr "Nem hozható létre biztonságos kapcsolat a géphez (a gépnév eltér)."
+
+msgid ""
+"Unable to establish a secure connection to host (peer dropped connection "
+"before responding)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (a partner eldobta a "
+"kapcsolatot a válasz előtt)."
+
+msgid ""
+"Unable to establish a secure connection to host (self-signed certificate)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (önaláírt tanúsítvány)."
+
+msgid ""
+"Unable to establish a secure connection to host (untrusted certificate)."
+msgstr ""
+"Nem hozható létre biztonságos kapcsolat a géphez (a tanúsítványban nem lehet "
+"megbízni)."
+
+msgid "Unable to establish a secure connection to host."
+msgstr "Nem hozható létre biztonságos kapcsolat a géphez."
+
+msgid "Unable to find destination for job"
+msgstr "Nem található a feladat célja"
+
+msgid "Unable to find printer."
+msgstr "Nem található a nyomtató."
+
+msgid "Unable to fork filter"
+msgstr "A szűrő nem indítható el"
+
+msgid "Unable to generate compressed print file"
+msgstr "Nem állítható elő tömörített nyomtatási fájl"
+
+msgid "Unable to get backend exit status."
+msgstr "Nem kérhető le a háttérprogram kilépési állapota."
+
+msgid "Unable to get class list:"
+msgstr "Nem kérhető le az osztályok listája:"
+
+msgid "Unable to get class status:"
+msgstr "Nem kérhető le az osztály állapota:"
+
+msgid "Unable to get list of printer drivers:"
+msgstr "Nem kérhető le a nyomtató-illesztőprogramok listája:"
+
+msgid "Unable to get printer attributes:"
+msgstr "Nem kérhetők le a nyomtató attribútumai:"
+
+msgid "Unable to get printer list:"
+msgstr "Nem kérhető le a nyomtatók listája:"
+
+msgid "Unable to get printer status."
+msgstr "Nem kérhető le a nyomtató állapota."
+
+msgid "Unable to get printer status:"
+msgstr "Nem kérhető le a nyomtató állapota:"
+
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)."
+msgstr "A Windows 2000 illesztőprogram-fájlok nem telepíthetők (%d)."
+
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)."
+msgstr "A Windows 9x illesztőprogram-fájlok nem telepíthetők (%d)."
+
+#, c-format
+msgid "Unable to locate printer \"%s\"."
+msgstr "Nem található a(z) „%s” nyomtató."
+
+msgid "Unable to locate printer."
+msgstr "Nem található a nyomtató."
+
+msgid "Unable to modify class:"
+msgstr "Nem módosítható az osztály:"
+
+msgid "Unable to modify printer:"
+msgstr "Nem módosítható a nyomtató:"
+
+msgid "Unable to move job"
+msgstr "Nem helyezhető át a feladat"
+
+msgid "Unable to move jobs"
+msgstr "Nem helyezhetők át a feladatok"
+
+msgid "Unable to open PPD file"
+msgstr "Nem nyitható meg a PPD-fájl"
+
+msgid "Unable to open PPD file:"
+msgstr "Nem nyitható meg a PPD-fájl:"
+
+msgid "Unable to open charset file"
+msgstr "A karakterkészletfájl nem nyitható meg"
+
+msgid "Unable to open compressed print file"
+msgstr "Nem nyitható meg tömörített nyomtatási fájl"
+
+msgid "Unable to open cupsd.conf file:"
+msgstr "A cupsd.conf fájl nem nyitható meg:"
+
+msgid "Unable to open device file"
+msgstr "Az eszközfájl nem nyitható meg"
+
+#, c-format
+msgid "Unable to open document #%d in job #%d."
+msgstr "Nem nyitható meg a(z) %d. dokumentum a(z) %d. feladatban."
+
+msgid "Unable to open print file"
+msgstr "A nyomtatási fájl nem nyitható meg"
+
+msgid "Unable to open psglyphs"
+msgstr "A psglyphs nem nyitható meg"
+
+msgid "Unable to open raster file"
+msgstr "Raszterfájl megnyitása nem lehetséges"
+
+#, c-format
+msgid "Unable to print %d text columns."
+msgstr "Nem nyomtatható ki %d szövegoszlop."
+
+#, c-format
+msgid "Unable to print %dx%d text page."
+msgstr "Nem nyomtatható ki %dx%d szövegoldal."
+
+msgid "Unable to print test page:"
+msgstr "Nem nyomtatható tesztoldal:"
+
+msgid "Unable to read print data"
+msgstr "Nem olvashatók a nyomtatási adatok"
+
+msgid "Unable to read print data."
+msgstr "Nem olvashatók a nyomtatási adatok."
+
+#, c-format
+msgid "Unable to run \"%s\": %s"
+msgstr "A(z) „%s” nem futtatható: %s"
+
+msgid "Unable to see in file"
+msgstr "A fájl nem olvasható"
+
+msgid "Unable to send command to printer driver"
+msgstr "Nem küldhető parancs a nyomtató-illesztőprogramnak"
+
+msgid "Unable to send data to printer."
+msgstr "Az adatok nem küldhetők el a nyomtatóra."
+
+msgid "Unable to send raster data to the driver."
+msgstr "A raszteradatok nem küldhetők el az illesztőprogramnak."
+
+#, c-format
+msgid "Unable to set Windows printer driver (%d)."
+msgstr "A Windows illesztőprogram nem állítható be (%d)."
+
+msgid "Unable to set options:"
+msgstr "Nem adhatók meg a beállítások:"
+
+msgid "Unable to set server default:"
+msgstr "Nem állítható be a kiszolgáló alapértelmezése:"
+
+msgid "Unable to start backend process."
+msgstr "Nem indítható a háttérfolyamat."
+
+msgid "Unable to upload cupsd.conf file:"
+msgstr "A cupsd.conf fájl nem tölthető fel:"
+
+msgid "Unable to use legacy USB class driver."
+msgstr "Nem használható az örökölt USB osztály-illesztőprogram."
+
+msgid "Unable to write print data"
+msgstr "Nem írhatók a nyomtatási adatok"
+
+#, c-format
+msgid "Unable to write uncompressed print data: %s"
+msgstr "Nem írhatók a tömörítetlen nyomtatási adatok: %s"
+
+msgid "Unauthorized"
+msgstr "Nem jogosult"
+
+msgid "Units"
+msgstr "Mértékegységek"
+
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#, c-format
+msgid "Unknown choice \"%s\" for option \"%s\"."
+msgstr "Ismeretlen lehetőség („%s”) a(z) „%s” beállításhoz."
+
+#, c-format
+msgid "Unknown encryption option value: \"%s\"."
+msgstr "Ismeretlen titkosításibeállítás-érték: „%s”."
+
+#, c-format
+msgid "Unknown file order: \"%s\"."
+msgstr "Ismeretlen fájlsorrend: „%s”."
+
+#, c-format
+msgid "Unknown format character: \"%c\"."
+msgstr "Ismeretlen formázókarakter: „%c”."
+
+#, c-format
+msgid "Unknown option \"%s\" with value \"%s\"."
+msgstr "Ismeretlen kapcsoló („%s”) „%s” értékkel."
+
+#, c-format
+msgid "Unknown option \"%s\"."
+msgstr "Ismeretlen kapcsoló: „%s”."
+
+#, c-format
+msgid "Unknown print mode: \"%s\"."
+msgstr "Ismeretlen nyomtatási mód: „%s”."
+
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "Ismeretlen printer-error-policy: „%s”."
+
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "Ismeretlen printer-op-policy: „%s”."
+
+#, c-format
+msgid "Unknown version option value: \"%s\"."
+msgstr "Ismeretlen verzióbeállítás-érték: „%s”."
+
+#, c-format
+msgid "Unsupported baud rate: %s"
+msgstr "Nem támogatott átviteli sebesség: %s"
+
+#, c-format
+msgid "Unsupported brightness value %s, using brightness=100."
+msgstr "Nem támogatott fényerőérték (%s), fényerő=100 használata."
+
+#, c-format
+msgid "Unsupported character set \"%s\"."
+msgstr "Nem támogatott karakterkészlet: „%s”."
+
+#, c-format
+msgid "Unsupported compression \"%s\"."
+msgstr "Nem támogatott tömörítés: „%s”."
+
+#, c-format
+msgid "Unsupported document-format \"%s\"."
+msgstr "Nem támogatott document-format: „%s”."
+
+#, c-format
+msgid "Unsupported document-format \"%s/%s\"."
+msgstr "Nem támogatott document-format: „%s/%s”."
+
+#, c-format
+msgid "Unsupported format \"%s\"."
+msgstr "Nem támogatott formátum: „%s”."
+
+#, c-format
+msgid "Unsupported gamma value %s, using gamma=1000."
+msgstr "Nem támogatott gamma érték (%s), gamma=1000 használata."
+
+msgid "Unsupported margins."
+msgstr "Nem támogatott margók."
+
+msgid "Unsupported media value."
+msgstr "Nem támogatott médiaérték."
+
+#, c-format
+msgid "Unsupported number-up value %d, using number-up=1."
+msgstr "Nem támogatott number-up érték (%d), number-up=1 használata."
+
+#, c-format
+msgid "Unsupported number-up-layout value %s, using number-up-layout=lrtb."
+msgstr ""
+"Nem támogatott number-up-layout érték (%s), number-up-layout=lrtb használata."
+
+#, c-format
+msgid "Unsupported page-border value %s, using page-border=none."
+msgstr "Nem támogatott page-border érték (%s), page-border=none használata."
+
+msgid "Unsupported raster data."
+msgstr "Nem támogatott raszteradatok."
+
+msgid "Unsupported value type"
+msgstr "Nem támogatott értéktípus"
+
+msgid "Upgrade Required"
+msgstr "Frissítés szükséges"
+
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]"
+msgstr ""
+"Használat:\n"
+"\n"
+"    lpadmin [-h kiszolgáló] -d cél\n"
+"    lpadmin [-h kiszolgáló] -x cél\n"
+"    lpadmin [-h kiszolgáló] -p nyomtató [-c hozzáadandó-osztály] [-i "
+"csatoló]\n"
+"                           [-m modell] [-r eltávolítandó-osztály] [-v "
+"eszköz]\n"
+"                           [-D leírás] [-P ppd-fájl] [-o név=érték]\n"
+"                           [-u allow:felhasználó,felhasználó] [-u deny:"
+"felhasználó,felhasználó]"
+
+#, c-format
+msgid "Usage: %s job user title copies options [filename]"
+msgstr "Használat: %s feladat felhasználó cím példányok kapcsolók [fájlnév]"
+
+#, c-format
+msgid "Usage: %s job-id user title copies options [file]"
+msgstr ""
+"Használat: %s feladatazonosító felhasználó cím példányok kapcsolók [fájl]"
+
+#, c-format
+msgid "Usage: %s job-id user title copies options file"
+msgstr ""
+"Használat: %s feladatazonosító felhasználó cím példányok kapcsolók fájl"
+
+msgid "Usage: convert [ options ]"
+msgstr "Használat: convert [ kapcsolók ]"
+
+msgid "Usage: cupsaddsmb [options] printer1 ... printerN"
+msgstr "Használat: cupsaddsmb [kapcsolók] nyomtató1 ... nyomtatóN"
+
+msgid "Usage: cupsctl [options] [param=value ... paramN=valueN]"
+msgstr "Használat: cupsctl [kapcsolók] [param=érték ... paramN=értékN]"
+
+msgid "Usage: cupsd [options]"
+msgstr "Használat: cupsd [kapcsolók]"
+
+msgid "Usage: cupsfilter [ options ] filename"
+msgstr "Használat: cupsfilter [ kapcsolók ] fájlnév"
+
+msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
+msgstr "Használat: cupstestdsc [kapcsolók] fájlnév.ps [... fájlnév.ps]"
+
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
+msgstr ""
+"Használat: cupstestppd [kapcsolók] fájlnév1.ppd[.gz] [... fájlnévN.ppd[.gz]]"
+
+msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
+msgstr "Használat: ipptool [kapcsolók] URI fájlnév [ ... fájlnévN ]"
+
+msgid "Usage: lpmove job/src dest"
+msgstr "Használat: lpmove feladat/forrás cél"
+
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer"
+msgstr ""
+"Használat: lpoptions [-h kiszolgáló] [-E] -d nyomtató\n"
+"           lpoptions [-h kiszolgáló] [-E] [-p nyomtató] -l\n"
+"           lpoptions [-h kiszolgáló] [-E] -p nyomtató -o kapcsoló[=érték] …\n"
+"           lpoptions [-h kiszolgáló] [-E] -x nyomtató"
+
+msgid "Usage: lppasswd [-g groupname]"
+msgstr "Használat: lppasswd [-g csoportnév]"
+
+msgid ""
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]"
+msgstr ""
+"Használat: lppasswd [-g csoportnév] [felhasználónév]\n"
+"           lppasswd [-g csoportnév] -a [felhasználónév]\n"
+"           lppasswd [-g csoportnév] -x [felhasználónév]"
+
+msgid ""
+"Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
+msgstr ""
+"Használat: lpq [-P cél] [-U felhasználónév] [-h gépnév[:port]] [-l] [+időköz]"
+
+msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
+msgstr "Használat: ppdc [kapcsolók] fájlnév.drv [ ... fájlnévN.drv ]"
+
+msgid "Usage: ppdhtml [options] filename.drv >filename.html"
+msgstr "Használat: ppdhtml [kapcsolók] fájlnév.drv > fájlnév.html"
+
+msgid "Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Használat: ppdi [kapcsolók] fájlnév.ppd [ ... fájlnévN.ppd ]"
+
+msgid "Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]"
+msgstr "Használat: ppdmerge [kapcsolók] fájlnév.ppd [ ... fájlnévN.ppd ]"
+
+msgid ""
+"Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]"
+msgstr ""
+"Használat: ppdpo [kapcsolók] -o fájlnév.po fájlnév.drv [ ... fájlnévN.drv ]"
+
+msgid "Usage: snmp [host-or-ip-address]"
+msgstr "Használat: snmp [gép-vagy-ip-cím]"
+
+msgid "Value uses indefinite length"
+msgstr "Az érték végtelen hosszt használ"
+
+msgid "VarBind uses indefinite length"
+msgstr "A VarBind végtelen hosszt használ"
+
+msgid "Version uses indefinite length"
+msgstr "A verzió végtelen hosszt használ"
+
+msgid "Waiting for job to complete."
+msgstr "Várakozás a feladat befejeződésére."
+
+msgid "Waiting for printer to become available."
+msgstr "Várakozás a nyomtató elérhetővé válására."
+
+msgid "Waiting for printer to finish."
+msgstr "Várakozás a nyomtatás befejezésére."
+
+msgid "Warning, no Windows 2000 printer drivers are installed."
+msgstr ""
+"Figyelmeztetés, nincsenek telepítve Windows 2000 nyomtató-illesztőprogramok."
+
+msgid "Web Interface is Disabled"
+msgstr "A webes felület letiltva"
+
+msgid "Yes"
+msgstr "Igen"
+
+#, c-format
+msgid ""
+"You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%"
+"s:%d%s</A>."
+msgstr ""
+"Ezt az oldalt a következő URL használatával érje el: <A HREF=\"https://%s:%d%"
+"s\">https://%s:%d%s</A>."
+
+msgid ""
+"Your password must be at least 6 characters long, cannot contain your "
+"username, and must contain at least one letter and number."
+msgstr ""
+"Jelszavának legalább 6 karakter hosszúságúnak kell lennie, nem "
+"tartalmazhatja ą felhasználónevét, és legalább egy betűt és számot kell "
+"tartalmaznia."
+
+msgid "ZPL Label Printer"
+msgstr "ZPL címkenyomtató"
+
+msgid "Zebra"
+msgstr "Zebra"
+
+msgid "aborted"
+msgstr "megszakítva"
+
+msgid "canceled"
+msgstr "megszakítva"
+
+msgid "completed"
+msgstr "végrehajtva"
+
+msgid "convert: Use the -f option to specify a file to convert."
+msgstr "convert: Használja a -f kapcsolót az átalakítandó fájl megadásához."
+
+msgid "cups-deviced failed to execute."
+msgstr "A cups-deviced végrehajtása sikertelen."
+
+msgid "cups-driverd failed to execute."
+msgstr "A cups-driverd végrehajtása sikertelen."
+
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s"
+msgstr "cupsaddsmb: Nincs PPD-fájl a(z) „%s” nyomtatóhoz - %s"
+
+msgid "cupsctl: Cannot set Listen or Port directly."
+msgstr "cupsctl: A Listen vagy Port nem állítható be közvetlenül."
+
+#, c-format
+msgid "cupsctl: Unable to connect to server: %s"
+msgstr "cupsctl: Nem lehet a kiszolgálóhoz csatlakozni: %s"
+
+#, c-format
+msgid "cupsctl: Unknown option \"%s\""
+msgstr "cupsctl: Ismeretlen kapcsoló: „%s”"
+
+#, c-format
+msgid "cupsctl: Unknown option \"-%c\""
+msgstr "cupsctl: Ismeretlen kapcsoló: „-%c”"
+
+msgid "cupsd: Expected config filename after \"-c\" option."
+msgstr "cupsd: A „-c” kapcsoló után konfigurációs fájl nevének kellene állnia."
+
+msgid "cupsd: Unable to get current directory."
+msgstr "cupsd: Az aktuális könyvtár nem kérhető le."
+
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting."
+msgstr "cupsd: Ismeretlen argumentum: „%s” - megszakítás."
+
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting."
+msgstr "cupsd: Ismeretlen kapcsoló: „%c” - megszakítás."
+
+msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+msgstr ""
+"cupsd: A launchd(8) támogatása nincs befordítva, futtatás normál módban."
+
+#, c-format
+msgid "cupsfilter: Invalid document number %d."
+msgstr "cupsfilter: Érvénytelen dokumentumszám: %d."
+
+#, c-format
+msgid "cupsfilter: Invalid job ID %d."
+msgstr "cupsfilter: Érvénytelen feladatazonosító: %d."
+
+msgid "cupsfilter: Only one filename can be specified."
+msgstr "cupsfilter: Csak egy fájlnév adható meg."
+
+#, c-format
+msgid "cupsfilter: Unable to get job file - %s"
+msgstr "cupsfilter: A feladatfájl nem kérhető le - %s"
+
+msgid "cupstestppd: The -q option is incompatible with the -v option."
+msgstr "cupstestppd: A -q kapcsoló nem kompatibilis a -v kapcsolóval."
+
+msgid "cupstestppd: The -v option is incompatible with the -q option."
+msgstr "cupstestppd: A -v kapcsoló nem kompatibilis a -q kapcsolóval."
+
+#, c-format
+msgid "device for %s/%s: %s"
+msgstr "eszköz ehhez: %s/%s: %s"
+
+#, c-format
+msgid "device for %s: %s"
+msgstr "eszköz ehhez: %s: %s"
+
+msgid "error-index uses indefinite length"
+msgstr "az error-index végtelen hosszot használ"
+
+msgid "error-status uses indefinite length"
+msgstr "az error-status végtelen hosszot használ"
+
+msgid "held"
+msgstr "felfüggesztve"
+
+msgid "help\t\tGet help on commands."
+msgstr "help\t\tSúgó a parancsokhoz."
+
+msgid "idle"
+msgstr "tétlenség"
+
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+msgstr "ipptool: a „-i” és „-n” nem kompatibilisek a „-X” kapcsolóval."
+
+msgid "ipptool: \"-i\" is incompatible with \"-X\"."
+msgstr "ipptool: a „-i” nem kompatibilis a „-X” kapcsolóval."
+
+msgid "ipptool: \"-n\" is incompatible with \"-X\"."
+msgstr "ipptool: a „-n” nem kompatibilis a „-X” kapcsolóval."
+
+#, c-format
+msgid "ipptool: Bad URI - %s."
+msgstr "ipptool: Hibás URI - %s."
+
+#, c-format
+msgid "ipptool: Bad version %s for \"-V\"."
+msgstr "ipptool: Hibás verzió (%s) a „-V” kapcsolóhoz."
+
+msgid "ipptool: Invalid seconds for \"-i\"."
+msgstr "ipptool: Érvénytelen másodpercek a „-i” kapcsolóhoz."
+
+msgid "ipptool: May only specify a single URI."
+msgstr "ipptool: Csak egy URI adható meg."
+
+msgid "ipptool: Missing count for \"-n\"."
+msgstr "ipptool: Hiányzó szám a „-n” kapcsolóhoz."
+
+msgid "ipptool: Missing filename for \"-f\"."
+msgstr "ipptool: Hiányzó fájlnév a „-f” kapcsolóhoz."
+
+msgid "ipptool: Missing name=value for \"-d\"."
+msgstr "ipptool: Hiányzó név=érték pár a „-d” kapcsolóhoz."
+
+msgid "ipptool: Missing seconds for \"-i\"."
+msgstr "ipptool: Hiányzó másodpercek a „-i” kapcsolóhoz."
+
+msgid "ipptool: Missing timeout for \"-T\"."
+msgstr "ipptool: Hiányzó időkorlát a „-T” kapcsolóhoz."
+
+msgid "ipptool: Missing version for \"-V\"."
+msgstr "ipptool: Hiányzó verzió a „-V” kapcsolóhoz."
+
+msgid "ipptool: URI required before test file."
+msgstr "ipptool: URI szükséges a tesztfájl előtt."
+
+#, c-format
+msgid "ipptool: Unknown option \"-%c\"."
+msgstr "ipptool: Ismeretlen kapcsoló: „-%c”."
+
+msgid "job-printer-uri attribute missing."
+msgstr "A job-printer-uri attribútum hiányzik."
+
+msgid "lpadmin: Class name can only contain printable characters."
+msgstr "lpadmin: Az osztálynév csak nyomtatható karaktereket tartalmazhat."
+
+msgid "lpadmin: Expected PPD after \"-P\" option."
+msgstr "lpadmin: A „-P” kapcsoló után PPD-nek kellene állnia."
+
+msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
+msgstr ""
+"lpadmin: A „-u” kapcsoló után allow/deny:felhasználólistának kellene állnia."
+
+msgid "lpadmin: Expected class after \"-r\" option."
+msgstr "lpadmin: A „-r” kapcsoló után osztálynak kellene állnia."
+
+msgid "lpadmin: Expected class name after \"-c\" option."
+msgstr "lpadmin: A „-c” kapcsoló után osztálynévnek kellene állnia."
+
+msgid "lpadmin: Expected description after \"-D\" option."
+msgstr "lpadmin: A „-D” kapcsoló után leírásnak kellene állnia."
+
+msgid "lpadmin: Expected device URI after \"-v\" option."
+msgstr "lpadmin: A „-v” kapcsoló után eszköz URI-címnek kellene állnia."
+
+msgid "lpadmin: Expected file type(s) after \"-I\" option."
+msgstr "lpadmin: A „-I” kapcsoló után fájltípusnak kellene állnia."
+
+msgid "lpadmin: Expected hostname after \"-h\" option."
+msgstr "lpadmin: A „-h” kapcsoló után gépnévnek kellene állnia."
+
+msgid "lpadmin: Expected interface after \"-i\" option."
+msgstr "lpadmin: A „-i” kapcsoló után felületnek kellene állnia."
+
+msgid "lpadmin: Expected location after \"-L\" option."
+msgstr "lpadmin: A „-L” kapcsoló után helynek kellene állnia."
+
+msgid "lpadmin: Expected model after \"-m\" option."
+msgstr "lpadmin: A „-m” kapcsoló után modellnek kellene állnia."
+
+msgid "lpadmin: Expected name after \"-R\" option."
+msgstr "lpadmin: A „-h” kapcsoló után gépnévnek kellene állnia."
+
+msgid "lpadmin: Expected name=value after \"-o\" option."
+msgstr "lpadmin: A „-o” kapcsoló után név=érték párnak kellene állnia."
+
+msgid "lpadmin: Expected printer after \"-p\" option."
+msgstr "lpadmin: A „-p” kapcsoló után nyomtatónak kellene állnia."
+
+msgid "lpadmin: Expected printer name after \"-d\" option."
+msgstr "lpadmin: A „-d” kapcsoló után nyomtatónévnek kellene állnia."
+
+msgid "lpadmin: Expected printer or class after \"-x\" option."
+msgstr ""
+"lpadmin: A „-x” kapcsoló után nyomtatónak vagy osztálynak kellene állnia."
+
+msgid "lpadmin: No member names were seen."
+msgstr "lpadmin: Nem voltak megadva tagnevek."
+
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s."
+msgstr "lpadmin: A(z) %s nyomtató már tagja a(z) %s osztálynak."
+
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s."
+msgstr "lpadmin: A(z) %s nyomtató nem tagja a(z) %s osztálynak."
+
+msgid "lpadmin: Printer name can only contain printable characters."
+msgstr "lpadmin: A nyomtatónév csak nyomtatható karaktereket tartalmazhat."
+
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Nem adható a nyomtató az osztályhoz:\n"
+"         Előbb meg kell adnia egy nyomtatónevet."
+
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s"
+msgstr "lpadmin: Nem lehet a kiszolgálóhoz csatlakozni: %s"
+
+msgid "lpadmin: Unable to create temporary file"
+msgstr "lpadmin: Az átmeneti fájl létrehozása nem lehetséges"
+
+msgid ""
+"lpadmin: Unable to delete option:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Nem törölhető a beállítás:\n"
+"         Előbb meg kell adnia egy nyomtatónevet."
+
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
+msgstr "lpadmin: A(z) „%s” PPD-fájl nem nyitható meg - %s"
+
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Nem távolítható el a nyomtató az osztályból:\n"
+"         Előbb meg kell adnia egy nyomtatónevet."
+
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first."
+msgstr ""
+"lpadmin: Nem adhatók meg a nyomtatóbeállítások:\n"
+"         Előbb meg kell adnia egy nyomtatónevet."
+
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"."
+msgstr "lpadmin: Ismeretlen allow/deny kapcsoló: „%s”."
+
+#, c-format
+msgid "lpadmin: Unknown argument \"%s\"."
+msgstr "lpadmin: Ismeretlen argumentum: „%s”."
+
+#, c-format
+msgid "lpadmin: Unknown option \"%c\"."
+msgstr "lpadmin: Ismeretlen kapcsoló: „%c”."
+
+msgid "lpadmin: Warning - content type list ignored."
+msgstr "lpadmin: Figyelmeztetés - a tartalomtípus-lista mellőzve."
+
+msgid "lpc> "
+msgstr "lpc> "
+
+msgid "lpinfo: Expected 1284 device ID string after \"--device-id\"."
+msgstr ""
+"lpinfo: A „--device-id” kapcsoló után 1284-es eszközazonosítónak kellene "
+"állnia."
+
+msgid "lpinfo: Expected language after \"--language\"."
+msgstr "lpinfo: A „--language” kapcsoló után nyelvnek kellene állnia."
+
+msgid "lpinfo: Expected make and model after \"--make-and-model\"."
+msgstr ""
+"lpinfo: A „--make-and-model” kapcsoló után gyártónak és modellnek kellene "
+"állnia."
+
+msgid "lpinfo: Expected product string after \"--product\"."
+msgstr ""
+"lpinfo: A „--product” kapcsoló után termék karakterláncnak kellene állnia."
+
+msgid "lpinfo: Expected scheme list after \"--exclude-schemes\"."
+msgstr ""
+"lpinfo: A „--exclude-schemes” kapcsoló után sémalistának kellene állnia."
+
+msgid "lpinfo: Expected scheme list after \"--include-schemes\"."
+msgstr ""
+"lpinfo: A „--include-schemes” kapcsoló után sémalistának kellene állnia."
+
+msgid "lpinfo: Expected timeout after \"--timeout\"."
+msgstr "lpinfo: A „--timeout” kapcsoló után időkorlátnak kellene állnia."
+
+#, c-format
+msgid "lpinfo: Unknown argument \"%s\"."
+msgstr "lpinfo: Ismeretlen argumentum: „%s”."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%c\"."
+msgstr "lpinfo: Ismeretlen kapcsoló: „%c”."
+
+#, c-format
+msgid "lpinfo: Unknown option \"%s\"."
+msgstr "lpinfo: Ismeretlen kapcsoló: „%s”."
+
+#, c-format
+msgid "lpmove: Unable to connect to server: %s"
+msgstr "lpmove: Nem lehet a kiszolgálóhoz csatlakozni: %s"
+
+#, c-format
+msgid "lpmove: Unknown argument \"%s\"."
+msgstr "lpmove: Ismeretlen argumentum: „%s”."
+
+#, c-format
+msgid "lpmove: Unknown option \"%c\"."
+msgstr "lpmove: Ismeretlen kapcsoló: „%c”."
+
+msgid "lpoptions: No printers."
+msgstr "lpoptions: Nincsenek nyomtatók."
+
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s"
+msgstr "lpoptions: Nem vehető fel a nyomtató vagy példány: %s"
+
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s"
+msgstr "lpoptions: Nem kérhető le PPD-fájl ehhez: %s: %s"
+
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s."
+msgstr "lpoptions: Nem nyitható meg PPD-fájl ehhez: %s."
+
+msgid "lpoptions: Unknown printer or class."
+msgstr "lpoptions: Ismeretlen nyomtató vagy osztály."
+
+msgid "lppasswd: Only root can add or delete passwords."
+msgstr "lppasswd: Csak a root vehet fel vagy törölhet jelszavakat."
+
+msgid "lppasswd: Password file busy."
+msgstr "lppasswd: A jelszófájl foglalt."
+
+msgid "lppasswd: Password file not updated."
+msgstr "lppasswd: A jelszófájl nem lett frissítve."
+
+msgid "lppasswd: Sorry, password doesn't match."
+msgstr "lppasswd: Elnézést, a jelszó nem egyezik."
+
+msgid "lppasswd: Sorry, password rejected."
+msgstr "lppasswd: Elnézést, a jelszó visszautasítva."
+
+msgid "lppasswd: Sorry, passwords don't match."
+msgstr "lppasswd: Elnézést, a jelszavak nem egyeznek."
+
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s"
+msgstr "lppasswd: A jelszókarakterlánc nem másolható: %s"
+
+#, c-format
+msgid "lppasswd: Unable to open password file: %s"
+msgstr "lppasswd: A jelszófájl nem nyitható meg: %s"
+
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s"
+msgstr "lppasswd: A jelszófájlba nem lehet írni: %s"
+
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s"
+msgstr "lppasswd: a régi jelszófájl mentése sikertelen: %s"
+
+#, c-format
+msgid "lppasswd: failed to rename password file: %s"
+msgstr "lppasswd: a jelszófájl átnevezése sikertelen: %s"
+
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+msgstr "lppasswd: a(z) „%s” felhasználó és „%s” csoport nem létezik."
+
+#, c-format
+msgid ""
+"lpstat: error - %s environment variable names non-existent destination \"%s"
+"\"."
+msgstr ""
+"lpstat: hiba - a(z) %s környezeti változó nem létező célt („%s”) nevez meg."
+
+#, c-format
+msgid "members of class %s:"
+msgstr "%s osztály tagjai:"
+
+msgid "no entries"
+msgstr "nincsenek bejegyzések"
+
+msgid "no system default destination"
+msgstr "nincs rendszerszintű alapértelmezett cél"
+
+msgid "notify-events not specified."
+msgstr "A notify-events nincs megadva."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" is already used."
+msgstr "A(z) „%s” notify-recipient-uri URI már használatban van."
+
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme."
+msgstr "A(z) „%s” notify-recipient-uri URI ismeretlen sémát használ."
+
+msgid "pending"
+msgstr "függőben"
+
+#, c-format
+msgid "ppdc: Adding include directory \"%s\"."
+msgstr "ppdc: „%s” include-könyvtár hozzáadása."
+
+#, c-format
+msgid "ppdc: Adding/updating UI text from %s."
+msgstr "ppdc: Felületszöveg hozzáadása/frissítése innen: %s."
+
+#, c-format
+msgid "ppdc: Bad boolean value (%s) on line %d of %s."
+msgstr "ppdc: Hibás logikai érték (%s) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Bad font attribute: %s"
+msgstr "ppdc: Hibás betűkészlet attribútum: %s"
+
+#, c-format
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s."
+msgstr "ppdc: Hibás felbontásnév („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Bad status keyword %s on line %d of %s."
+msgstr "ppdc: Hibás állapotkulcsszó (%s) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Bad variable substitution ($%c) on line %d of %s."
+msgstr "ppdc: Hibás változóhelyettesítés ($%c) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Choice found on line %d of %s with no Option."
+msgstr "ppdc: A(z) %d. sorban található lehetőséghez nincs Option ebben: %s."
+
+#, c-format
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s."
+msgstr ""
+"ppdc: Többszörös #po a(z) %s területi beállításhoz a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected a filter definition on line %d of %s."
+msgstr "ppdc: Szűrődefiníciónak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected a program name on line %d of %s."
+msgstr "ppdc: Programnévnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected boolean value on line %d of %s."
+msgstr "ppdc: Logikai értéknek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected charset after Font on line %d of %s."
+msgstr ""
+"ppdc: Karakterkészletnek kellene a Font után állnia a(z) %d. sorban ebben: %"
+"s."
+
+#, c-format
+msgid "ppdc: Expected choice code on line %d of %s."
+msgstr "ppdc: Lehetőségkódnak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected choice name/text on line %d of %s."
+msgstr ""
+"ppdc: Lehetőségnévnek/szövegnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected color order for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: Színsorrendnek kellene a(z) %d. sorban állnia a ColorModelhez ebben: %"
+"s."
+
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: Színtérnek kellene a(z) %d. sorban állnia a ColorModelhez ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: Tömörítésnek kellene a(z) %d. sorban állnia a ColorModelhez ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s."
+msgstr ""
+"ppdc: Megszorítás-karakterláncnak kellene a(z) %d. sorban állnia a "
+"UIConstraintshoz ebben: %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected driver type keyword following DriverType on line %d of %s."
+msgstr ""
+"ppdc: Illesztőprogram-típusnak kellene a(z) %d. sorban állnia a DriverType "
+"után ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s."
+msgstr ""
+"ppdc: Duplex típusnak kellene a Duplex után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected encoding after Font on line %d of %s."
+msgstr "ppdc: Kódolásnak kellene a Font után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected filename after #po %s on line %d of %s."
+msgstr ""
+"ppdc: Fájlnévnek kellene a #po %s után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected group name/text on line %d of %s."
+msgstr ""
+"ppdc: Csoportnévnek/szövegnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected include filename on line %d of %s."
+msgstr "ppdc: include fájlnévnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected integer on line %d of %s."
+msgstr "ppdc: Egésznek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s."
+msgstr ""
+"ppdc: Területi beállításnak kellene a #po után állnia a(z) %d. sorban ebben: "
+"%s."
+
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s."
+msgstr "ppdc: Névnek kellene a(z) %s után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s."
+msgstr "ppdc: Névnek kellene a FileName után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s."
+msgstr "ppdc: Névnek kellene a Font után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s."
+msgstr ""
+"ppdc: Névnek kellene a Manufacturer után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s."
+msgstr ""
+"ppdc: Névnek kellene a MediaSize után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s."
+msgstr ""
+"ppdc: Névnek kellene a ModelName után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s."
+msgstr ""
+"ppdc: Névnek kellene a PCFileName után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s."
+msgstr ""
+"ppdc: Névnek/szövegnek kellene a(z) %s után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s."
+msgstr ""
+"ppdc: Névnek/szövegnek kellene az Installable után állnia a(z) %d. sorban "
+"ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s."
+msgstr ""
+"ppdc: Névnek/szövegnek kellene a Resolution után állnia a(z) %d. sorban "
+"ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s."
+msgstr ""
+"ppdc: Név/szöveg kombinációnak kellene a(z) %d. sorban állnia a "
+"ColorModelhez ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s."
+msgstr ""
+"ppdc: Beállításnévnek/szövegnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s."
+msgstr "ppdc: Beállításszakasznak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s."
+msgstr "ppdc: Beállítástípusnak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s."
+msgstr ""
+"ppdc: Felülbírálási mezőnek kellene a Resolution után állnia a(z) %d. sorban "
+"ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected quoted string on line %d of %s."
+msgstr ""
+"ppdc: Idézett karakterláncnak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s."
+msgstr "ppdc: Valós számnak kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s."
+msgstr ""
+"ppdc: Felbontásnak/médiatípusnak kellene a(z) %d. sorban állnia a "
+"ColorProfile után ebben: %s."
+
+#, c-format
+msgid ""
+"ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
+"of %s."
+msgstr ""
+"ppdc: Felbontásnak/médiatípusnak kellene a(z) %d. sorban állnia a "
+"SimpleColorProfile után ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected selector after %s on line %d of %s."
+msgstr ""
+"ppdc: Választónak kellene a(z) %s után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected status after Font on line %d of %s."
+msgstr "ppdc: Állapotnak kellene a Font után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected string after Copyright on line %d of %s."
+msgstr ""
+"ppdc: Karakterláncnak kellene a Copyright után állnia a(z) %d. sorban ebben: "
+"%s."
+
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s."
+msgstr ""
+"ppdc: Karakterláncnak kellene a Version után állnia a(z) %d. sorban ebben: %"
+"s."
+
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s."
+msgstr "ppdc: Két beállításnévnek kellene a(z) %d. sorban állnia ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s."
+msgstr "ppdc: Értéknek kellene a(z) %s után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s."
+msgstr "ppdc: Verziónak kellene a Font után állnia a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"."
+msgstr "ppdc: Érvénytelen #include/#po fájlnév: „%s”."
+
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s."
+msgstr "ppdc: Érvénytelen költség a szűrőhöz a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s."
+msgstr ""
+"ppdc: Érvénytelen üres MIME-típus a szűrőhöz a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s."
+msgstr ""
+"ppdc: Érvénytelen üres programnév a szűrőhöz a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s."
+msgstr "ppdc: Érvénytelen beállításszakasz („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s."
+msgstr "ppdc: Érvénytelen beállítástípus („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Loading driver information file \"%s\"."
+msgstr "ppdc: Illesztőprogram-információs fájl betöltése: „%s”."
+
+#, c-format
+msgid "ppdc: Loading messages for locale \"%s\"."
+msgstr "ppdc: Üzenetek betöltése a területi beállításhoz: „%s”."
+
+#, c-format
+msgid "ppdc: Loading messages from \"%s\"."
+msgstr "ppdc: Üzenetek betöltése ebből: „%s”."
+
+#, c-format
+msgid "ppdc: Missing #endif at end of \"%s\"."
+msgstr "ppdc: Hiányzó #endif a(z) „%s” végén."
+
+#, c-format
+msgid "ppdc: Missing #if on line %d of %s."
+msgstr "ppdc: Hiányzó #if a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid ""
+"ppdc: Need a msgid line before any translation strings on line %d of %s."
+msgstr ""
+"ppdc: Egy msgid sor szükséges a fordítások előtt a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: No message catalog provided for locale %s."
+msgstr "ppdc: Nincs üzenetkatalógus a(z) %s területi beállításhoz."
+
+#, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s."
+msgstr ""
+"ppdc: A(z) %s beállítás két különböző csoportban van definiálva a(z) %d. "
+"sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s."
+msgstr ""
+"ppdc: A(z) %s beállítás másik típussal újra van definiálva a(z) %d. sorban "
+"ebben: %s."
+
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s."
+msgstr ""
+"ppdc: A megszorítás beállításnak *name elemet kell használnia a(z) %d. "
+"sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s."
+msgstr "ppdc: Túl sok beágyazott #if a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unable to create PPD file \"%s\" - %s."
+msgstr "ppdc: A(z) „%s” PPD-fájl nem hozható létre - %s."
+
+#, c-format
+msgid "ppdc: Unable to create output directory %s: %s"
+msgstr "ppdc: Nem hozható létre a kimeneti %s könyvtár: %s"
+
+#, c-format
+msgid "ppdc: Unable to create output pipes: %s"
+msgstr "ppdc: Nem hozhatók létre a kimeneti csövek: %s"
+
+#, c-format
+msgid "ppdc: Unable to execute cupstestppd: %s"
+msgstr "ppdc: Nem hajtható végre a cupstestppd: %s"
+
+#, c-format
+msgid "ppdc: Unable to find #po file %s on line %d of %s."
+msgstr "ppdc: Nem található a(z) %s #po fájl a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s."
+msgstr "ppdc: Nem található a(z) „%s” include fájl a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unable to find localization for \"%s\" - %s"
+msgstr "ppdc: Nem található lokalizáció ehhez: „%s” - %s"
+
+#, c-format
+msgid "ppdc: Unable to load localization file \"%s\" - %s"
+msgstr "ppdc: Nem tölthető be a(z) „%s” lokalizációs fájl - %s"
+
+#, c-format
+msgid "ppdc: Unable to open %s: %s"
+msgstr "ppdc: A(z) %s nem nyitható meg: %s"
+
+#, c-format
+msgid "ppdc: Undefined variable (%s) on line %d of %s."
+msgstr "ppdc: Nem definiált változó (%s) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unexpected text on line %d of %s."
+msgstr "ppdc: Váratlan szöveg a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unknown driver type %s on line %d of %s."
+msgstr "ppdc: Ismeretlen illesztőprogram-típus (%s) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s."
+msgstr "ppdc: Ismeretlen duplex típus („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
+msgstr "ppdc: Ismeretlen médiaméret („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Unknown message catalog format for \"%s\"."
+msgstr "ppdc: Ismeretlen üzenetkatalógus-formátum ehhez: „%s”."
+
+#, c-format
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s."
+msgstr "ppdc: Ismeretlen jelsor („%s”) a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid ""
+"ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s."
+msgstr ""
+"ppdc: Ismeretlen záró karakterek a(z) „%s” valós számban a(z) %d. sorban "
+"ebben: %s."
+
+#, c-format
+msgid "ppdc: Unterminated string starting with %c on line %d of %s."
+msgstr ""
+"ppdc: Befejezetlen karakterlánc %c kezdettel a(z) %d. sorban ebben: %s."
+
+#, c-format
+msgid "ppdc: Warning - overlapping filename \"%s\"."
+msgstr "ppdc: Figyelmeztetés - átfedő fájlnév: „%s”."
+
+#, c-format
+msgid "ppdc: Writing %s."
+msgstr "ppdc: %s írása."
+
+#, c-format
+msgid "ppdc: Writing PPD files to directory \"%s\"."
+msgstr "ppdc: PPD-fájlok írása ebbe a könyvtárba: „%s”."
+
+#, c-format
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s."
+msgstr "ppdmerge: Hibás LanguageVersion („%s”) ebben: %s."
+
+#, c-format
+msgid "ppdmerge: Ignoring PPD file %s."
+msgstr "ppdmerge: A(z) %s PPD-fájl mellőzése."
+
+#, c-format
+msgid "ppdmerge: Unable to backup %s to %s - %s"
+msgstr "ppdmerge: %s nem menthető ide: %s - %s"
+
+#, c-format
+msgid "printer %s disabled since %s -"
+msgstr "a(z) %s nyomtató letiltva ez óta: %s -"
+
+#, c-format
+msgid "printer %s is idle.  enabled since %s"
+msgstr "a(z) %s nyomtató tétlen. engedélyezve ez óta: %s"
+
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s"
+msgstr "a(z) %s nyomtató nyomtat: %s-%d. engedélyezve ez óta: %s"
+
+#, c-format
+msgid "printer %s/%s disabled since %s -"
+msgstr "a(z) %s/%s nyomtató letiltva ez óta: %s -"
+
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s"
+msgstr "a(z) %s/%s nyomtató tétlen. engedélyezve ez óta: %s"
+
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s"
+msgstr "a(z) %s/%s nyomtató nyomtat: %s-%d. engedélyezve ez óta: %s"
+
+msgid "processing"
+msgstr "feldolgozás"
+
+#, c-format
+msgid "request id is %s-%d (%d file(s))"
+msgstr "kérésazonosító: %s-%d (%d fájl)"
+
+msgid "request-id uses indefinite length"
+msgstr "A request-id végtelen hosszt használ"
+
+msgid "scheduler is not running"
+msgstr "az ütemező nem fut"
+
+msgid "scheduler is running"
+msgstr "az ütemező fut"
+
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "%s elérése sikertelen: %s"
+
+msgid "status\t\tShow status of daemon and queue."
+msgstr "status\t\tA démon és a sor állapotának megjelenítése."
+
+msgid "stopped"
+msgstr "megállítva"
+
+#, c-format
+msgid "system default destination: %s"
+msgstr "rendszer alapértelmezett célja: %s"
+
+#, c-format
+msgid "system default destination: %s/%s"
+msgstr "rendszer alapértelmezett célja: %s/%s"
+
+msgid "unknown"
+msgstr "ismeretlen"
+
+msgid "untitled"
+msgstr "névtelen"
+
+msgid "variable-bindings uses indefinite length"
+msgstr "A variable-bindings végtelen hosszt használ"
+
+#~ msgid "-I Ignore errors."
+#~ msgstr "-I Hibák figyelmen kívül hagyása."
+
+#~ msgid "-q Run silently."
+#~ msgstr "-q Csendes futás."
+
+#~ msgid "B5 JIS"
+#~ msgstr "B5 JIS"
+
+#~ msgid "JB0"
+#~ msgstr "JB0"
+
+#~ msgid "JB1"
+#~ msgstr "JB1"
+
+#~ msgid "JB10"
+#~ msgstr "JB10"
+
+#~ msgid "JB2"
+#~ msgstr "JB2"
+
+#~ msgid "JB3"
+#~ msgstr "JB3"
+
+#~ msgid "JB4"
+#~ msgstr "JB4"
+
+#~ msgid "JB6"
+#~ msgstr "JB6"
+
+#~ msgid "JB7"
+#~ msgstr "JB7"
+
+#~ msgid "JB8"
+#~ msgstr "JB8"
+
+#~ msgid "JB9"
+#~ msgstr "JB9"
+
+#~ msgid "Monarch"
+#~ msgstr "Monarch"
+
+#~ msgid "Network host \\\"%s\\\" is busy; will retry in %d seconds."
+#~ msgstr ""
+#~ "A(z) „%s” hálózati kiszolgáló elfoglalt, %d másodperc múlva "
+#~ "újrapróbálkozom."
+
+#~ msgid "Network printer \\\"%s\\\" is busy."
+#~ msgstr "A(z) „%s” hálózati nyomtató elfoglalt."
+
+#~ msgid "Network printer \\\"%s\\\" is not responding."
+#~ msgstr "A(z) „%s” hálózati nyomtató nem válaszol."
+
+#~ msgid "Printer busy; will retry in 10 seconds."
+#~ msgstr "Nyomtató elfoglalt; 10 másodperc múlva újrapróbálkozom."
+
+#~ msgid "Printer did not respond after %d seconds."
+#~ msgstr "A nyomtató nem válaszolt %d másodperc után."
+
+#~ msgid "The printer is almost out of ink."
+#~ msgstr "A nyomtatóból majdnem kifogyott a tinta."
+
+#~ msgid "The printer is low on toner."
+#~ msgstr "A nyomtatóban kifogyóban van a festékkazetta."
+
+#~ msgid "The printer is out of toner."
+#~ msgstr "A nyomtató festékkazettája kifogyott."
+
+#~ msgid "This printer does not conform to the IPP standard and may not work."
+#~ msgstr ""
+#~ "Ez a nyomtató nem felel meg az IPP szabványnak, és lehet, hogy nem fog "
+#~ "működni."
+
+#~ msgid ""
+#~ "This printer does not conform to the IPP standard. Please contact the "
+#~ "manufacturer of your printer for assistance."
+#~ msgstr ""
+#~ "Ez a nyomtató nem felel meg az IPP szabványnak. Segítségért keresse meg a "
+#~ "nyomtató gyártóját."
+
+#~ msgid "Unable to add file to job: %s"
+#~ msgstr "Nem vehető fel a fájl a feladatba: %s"
+
+#~ msgid "Unable to connect to server"
+#~ msgstr "A kiszolgálóhoz nem lehet kapcsolódni."
+
+#~ msgid "Unable to get job attributes: %s"
+#~ msgstr "Nem kérhetők le a feladat attribútumai: %s"
+
+#~ msgid "Unable to get print job status."
+#~ msgstr "Nem kérhető le a nyomtatási feladat állapota."
+
+#~ msgid "Unable to get printer status: %s"
+#~ msgstr "Nem kérhető le a nyomtató állapota: %s"
+
+#~ msgid "\\t%s"
+#~ msgstr "\\t%s"
+
+#~ msgid "\\tno entries"
+#~ msgstr "\\tnincs bejegyzés"

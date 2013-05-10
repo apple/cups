@@ -1,0 +1,7 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+phpcups.o: ../../cups/string-private.h ../../config.h phpcups.h
+phpcups.o: ../../cups/cups.h ../../cups/file.h ../../cups/versioning.h
+phpcups.o: ../../cups/ipp.h ../../cups/http.h ../../cups/array.h
+phpcups.o: ../../cups/language.h ../../cups/language.h
+phpcups.o: ../../cups/debug-private.h ../../cups/versioning.h

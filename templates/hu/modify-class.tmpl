@@ -1,0 +1,34 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{printer_name} osztály módosítása</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Leírás:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+<TH CLASS="label">Hely:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+<TH CLASS="label">Tagok:</TH>
+<TD>
+<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
+{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Osztály módosítása"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>
