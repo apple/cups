@@ -1851,6 +1851,11 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 	  return (NULL);
 	}
       }
+      else if ((*src & 255) <= 0x20 || (*src & 255) >= 0x7f)
+      {
+        *ptr = '\0';
+        return (NULL);
+      }
       else
 	*ptr++ = *src;
     }

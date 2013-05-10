@@ -560,7 +560,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* CONTENT_TYPE env variable */
 			device_uri[1024],
 					/* DEVICE_URI env variable */
-			final_content_type[1024],
+			final_content_type[1024] = "",
 					/* FINAL_CONTENT_TYPE env variable */
 			lang[255],	/* LANG env variable */
 #ifdef __APPLE__
@@ -634,6 +634,44 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
       ippSetString(job->attrs, &job->reasons, 0, "document-unprintable-error");
       goto abort_job;
+    }
+
+   /*
+    * Figure out the final content type...
+    */
+
+    cupsdLogJob(job, CUPSD_LOG_DEBUG, "%d filters for job:",
+                cupsArrayCount(filters));
+    for (filter = (mime_filter_t *)cupsArrayFirst(filters);
+         filter;
+         filter = (mime_filter_t *)cupsArrayNext(filters))
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "%s (%s/%s to %s/%s, cost %d)",
+		  filter->filter,
+		  filter->src ? filter->src->super : "???",
+		  filter->src ? filter->src->type : "???",
+		  filter->dst ? filter->dst->super : "???",
+		  filter->dst ? filter->dst->type : "???",
+		  filter->cost);
+
+    if (!job->printer->remote)
+    {
+      for (filter = (mime_filter_t *)cupsArrayLast(filters);
+           filter && filter->dst;
+           filter = (mime_filter_t *)cupsArrayPrev(filters))
+        if (strcmp(filter->dst->super, "printer") ||
+            strcmp(filter->dst->type, job->printer->name))
+          break;
+
+      if (filter && filter->dst)
+      {
+	if ((ptr = strchr(filter->dst->type, '/')) != NULL)
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s", ptr + 1);
+	else
+	  snprintf(final_content_type, sizeof(final_content_type),
+		   "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
+		   filter->dst->type);
+      }
     }
 
    /*
@@ -1033,25 +1071,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
                                 "CUPS_FILETYPE=document";
 
-  if (!job->printer->remote && !job->printer->raw)
-  {
-    filter = (mime_filter_t *)cupsArrayLast(filters);
-
-    if (job->printer->port_monitor)
-      filter = (mime_filter_t *)cupsArrayPrev(filters);
-
-    if (filter && filter->dst)
-    {
-      if ((ptr = strchr(filter->dst->type, '/')) != NULL)
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s", ptr + 1);
-      else
-	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
-		 filter->dst->type);
-      envp[envc ++] = final_content_type;
-    }
-  }
+  if (final_content_type[0])
+    envp[envc ++] = final_content_type;
 
   if (Classification && !banner_page)
   {
@@ -1940,7 +1961,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
 
       if (cupsFileGets(fp, line, sizeof(line)) &&
-          !strcmp(line, "CUPSD-AUTH-V2"))
+          !strcmp(line, "CUPSD-AUTH-V3"))
       {
         i = 0;
         while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
@@ -1949,8 +1970,11 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
           * Decode value...
           */
 
-	  bytes = sizeof(data);
-	  httpDecode64_2(data, &bytes, value);
+          if (strcmp(line, "negotiate") && strcmp(line, "uid"))
+          {
+	    bytes = sizeof(data);
+	    httpDecode64_2(data, &bytes, value);
+	  }
 
          /*
           * Assign environment variables...
@@ -1971,7 +1995,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	  else if (!strcmp(line, "password"))
 	    cupsdSetStringf(job->auth_env + i, "AUTH_PASSWORD=%s", data);
 	  else if (!strcmp(line, "negotiate"))
-	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", data);
+	    cupsdSetStringf(job->auth_env + i, "AUTH_NEGOTIATE=%s", value);
 	  else
 	    continue;
 

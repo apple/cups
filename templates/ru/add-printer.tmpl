@@ -1,6 +1,6 @@
 <DIV CLASS="indent">
 
-<H2 CLASS="title">Add Printer</H2>
+<H2 CLASS="title">Добавление принтера</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -16,12 +16,12 @@
 <TR>
 <TH CLASS="label">Название:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
-<SMALL>(может содержать любые символы кроме "/","#" и пробела)</SMALL></TD>
+<SMALL>(может содержать любые символы, кроме "/","#" и пробела)</SMALL></TD>
 </TR>
 <TR>
 <TH CLASS="label">Описание:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_INFO}"><BR>
-<SMALL>(расширенное описание, например "HP LaserJet с дуплексной печатью")</SMALL></TD>
+<SMALL>(расширенное описание, например, "HP LaserJet с дуплексной печатью")</SMALL></TD>
 </TR>
 <TR>
 <TH CLASS="label">Расположение:</TH>

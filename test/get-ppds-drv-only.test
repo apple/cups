@@ -17,8 +17,8 @@
 	ATTR name include-schemes drv
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	EXPECT ppd-name
 }

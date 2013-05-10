@@ -127,6 +127,14 @@ depend:
 
 
 #
+# Run oclint to check code coverage...
+#
+
+oclint:
+	oclint -o=oclint.html -html $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) -- $(ALL_CFLAGS)
+
+
+#
 # Install all targets...
 #
 

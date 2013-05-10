@@ -3,7 +3,7 @@
  *
  *   SNMP supplies functions for CUPS.
  *
- *   Copyright 2008-2012 by Apple Inc.
+ *   Copyright 2008-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -163,7 +163,7 @@ static const int	prtMarkerSuppliesSupplyUnit[] =
 			 sizeof(prtMarkerSuppliesSupplyUnit[0]));
 					/* Offset to supply index */
 
-static const backend_state_t const printer_states[] =
+static const backend_state_t printer_states[] =
 			{
 			  /* { CUPS_TC_lowPaper, "media-low-report" }, */
 			  { CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty, "media-empty-warning" },
@@ -180,7 +180,7 @@ static const backend_state_t const printer_states[] =
 			  { CUPS_TC_outputFull, "output-area-full-warning" }
 			};
 
-static const backend_state_t const supply_states[] =
+static const backend_state_t supply_states[] =
 			{
 			  { CUPS_DEVELOPER_LOW, "developer-low-report" },
 			  { CUPS_DEVELOPER_EMPTY, "developer-empty-warning" },

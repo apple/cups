@@ -33,7 +33,7 @@
 #  include <poll.h>
 #endif /* HAVE_POLL */
 #ifndef WIN32
-#  include <sys/fcntl.h>
+#  include <fcntl.h>
 #endif /* WIN32 */
 
 

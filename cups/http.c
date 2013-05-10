@@ -3,7 +3,7 @@
  *
  *   HTTP routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -2992,8 +2992,11 @@ _httpWait(http_t *http,			/* I - Connection to server */
   pfd.fd     = http->fd;
   pfd.events = POLLIN;
 
-  while ((nfds = poll(&pfd, 1, msec)) < 0 &&
-         (errno == EINTR || errno == EAGAIN));
+  do
+  {
+    nfds = poll(&pfd, 1, msec);
+  }
+  while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
 
 #else
   do
@@ -3895,7 +3898,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   int			any_root;	/* Allow any root */
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
-
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
 #  ifdef HAVE_LIBSSL
   SSL_CTX		*context;	/* Context for encryption */
   BIO			*bio;		/* BIO data */
@@ -3905,8 +3909,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Pointer to library globals */
   OSStatus		error;		/* Error code */
   const char		*message = NULL;/* Error message */
 #    ifdef HAVE_SECCERTIFICATECOPYDATA

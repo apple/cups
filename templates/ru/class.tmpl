@@ -2,7 +2,7 @@
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
 ({printer_state=3?Idle:{printer_state=4?печать:приостановлен}},
 {printer_is_accepting_jobs=0?Не принимает задания:Принимает задания},
-{server_is_sharing_printers=0?нет совместного доступа:{printer_is_shared=0?нет совместного доступа:}} Разрешен совместный доступ{default_name={printer_name}?, Сервер по умолчанию:})</H2>
+{server_is_sharing_printers=0?нет совместного доступа:{printer_is_shared=0?нет совместного доступа:разрешен совместный доступ}} {default_name={printer_name}?, Сервер по умолчанию:})</H2>
 
 <FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
@@ -17,7 +17,7 @@
 <INPUT TYPE="SUBMIT" VALUE="Сохранить" STYLE="display: none;">
 </FORM>
 
-<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="Администрирование">
 <INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">

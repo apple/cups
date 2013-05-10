@@ -40,6 +40,25 @@
  *
  * Contents:
  *
+ *   cupsdRegisterColor()	   - Register vendor color profiles in a PPD
+ *				     file.
+ *   cupsdStartColor()		   - Initialize color management.
+ *   cupsdStopColor()		   - Shutdown color management.
+ *   cupsdUnregisterColor()	   - Unregister vendor color profiles in a PPD
+ *				     file.
+ *   apple_init_profile()	   - Initialize a color profile.
+ *   apple_register_profiles()	   - Register color profiles for a printer.
+ *   apple_unregister_profiles()   - Remove color profiles for the specified
+ *				     printer.
+ *   colord_create_device()	   - Create a device and register profiles.
+ *   colord_create_profile()	   - Create a color profile for a printer.
+ *   colord_delete_device()	   - Delete a device
+ *   colord_device_add_profile()   - Assign a profile to a device.
+ *   colord_dict_add_strings()	   - Add two strings to a dictionary.
+ *   colord_find_device()	   - Finds a device
+ *   colord_get_qualifier_format() - Get the qualifier format.
+ *   colord_register_printer()	   - Register profiles for a printer.
+ *   colord_unregister_printer()   - Unregister profiles for a printer.
  */
 
 /*
@@ -307,7 +326,7 @@ apple_init_profile(
   * Fill in the profile data...
   */
 
- if (iccfile)
+ if (iccfile && *iccfile)
  {
     url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
 						  (const UInt8 *)iccfile,
@@ -497,7 +516,7 @@ apple_register_profiles(
 
         if (_cupsFileCheck(iccfile, _CUPS_FILE_CHECK_FILE, !RunUser,
 	                   cupsdLogFCMessage, p))
-	  continue;
+	  iccfile[0] = '\0';
 
 	cupsArraySave(ppd->sorted_attrs);
 

@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -135,7 +135,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /etc/cups
 %config(noreplace) /etc/cups/*.conf
-/etc/cups/cups-files.conf.default
 /etc/cups/cupsd.conf.default
 %dir /etc/cups/interfaces
 %dir /etc/cups/ppd
@@ -246,17 +245,29 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/doc/cups/ca
 /usr/share/doc/cups/ca/*
+%dir /usr/share/doc/cups/cs
+/usr/share/doc/cups/cs/*
 %dir /usr/share/doc/cups/es
 /usr/share/doc/cups/es/*
+%dir /usr/share/doc/cups/fr
+/usr/share/doc/cups/fr/*
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/*
+%dir /usr/share/doc/cups/ru
+/usr/share/doc/cups/ru/*
 
 %dir /usr/share/locale/ca
 /usr/share/locale/ca/cups_ca.po
+%dir /usr/share/locale/cs
+/usr/share/locale/cs/cups_cs.po
 %dir /usr/share/locale/es
 /usr/share/locale/es/cups_es.po
+%dir /usr/share/locale/fr
+/usr/share/locale/fr/cups_fr.po
 %dir /usr/share/locale/ja
 /usr/share/locale/ja/cups_ja.po
+%dir /usr/share/locale/ru
+/usr/share/locale/ru/cups_ru.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz

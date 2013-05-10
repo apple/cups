@@ -3,7 +3,7 @@
  *
  *   IPP backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -100,8 +100,6 @@ static char		username[256] = "",
 					/* Username for device URI */
 			*password = NULL;
 					/* Password for device URI */
-static int		password_tries = 0;
-					/* Password tries */
 static const char * const pattrs[] =	/* Printer attributes we want */
 {
   "copies-supported",
@@ -166,7 +164,9 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     const char *format, _ppd_cache_t *pc,
 				     ipp_attribute_t *media_col_sup,
 				     ipp_attribute_t *doc_handling_sup);
-static const char	*password_cb(const char *);
+static const char	*password_cb(const char *prompt, http_t *http,
+			             const char *method, const char *resource,
+			             int *user_data);
 static void		report_attr(ipp_attribute_t *attr);
 static void		report_printer_state(ipp_t *ipp);
 #if defined(HAVE_GSSAPI) && defined(HAVE_XPC)
@@ -203,6 +203,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*name,			/* Name of option */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
+  int		password_tries = 0;	/* Password tries */
   http_addrlist_t *addrlist;		/* Address of printer */
   int		snmp_enabled = 1;	/* Is SNMP enabled? */
   int		snmp_fd,		/* SNMP socket */
@@ -406,7 +407,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (!port)
     port = IPP_PORT;			/* Default to port 631 */
 
-  if (!strcmp(scheme, "https"))
+  if (!strcmp(scheme, "https") || !strcmp(scheme, "ipps"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
   else
     cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
@@ -607,7 +608,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Set the authentication info, if any...
   */
 
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2((cups_password_cb2_t)password_cb, &password_tries);
 
   if (username[0])
   {
@@ -1896,6 +1897,9 @@ main(int  argc,				/* I - Number of command-line args */
 
       ippDelete(response);
 
+      if (cupsLastError() <= IPP_OK_CONFLICT)
+        password_tries = 0;
+
      /*
       * Wait before polling again...
       */
@@ -1919,12 +1923,16 @@ main(int  argc,				/* I - Number of command-line args */
 
   check_printer_state(http, uri, resource, argv[2], version);
 
+  if (cupsLastError() <= IPP_OK_CONFLICT)
+    password_tries = 0;
+
  /*
   * Collect the final page count as needed...
   */
 
   if (have_supplies &&
-      !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
+      !backendSNMPSupplies(snmp_fd, &(http->addrlist->addr), &page_count,
+                           NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 
@@ -2093,9 +2101,6 @@ check_printer_state(
   fprintf(stderr, "DEBUG: Get-Printer-Attributes: %s (%s)\n",
 	  ippErrorString(cupsLastError()), cupsLastErrorString());
 
-  if (cupsLastError() <= IPP_OK_CONFLICT)
-    password_tries = 0;
-
  /*
   * Return the printer-state value...
   */
@@ -2194,6 +2199,7 @@ monitor_printer(
   const char	*job_name;		/* Job name */
   ipp_jstate_t	job_state;		/* Job state */
   const char	*job_user;		/* Job originating user name */
+  int		password_tries = 0;	/* Password tries */
 
 
  /*
@@ -2205,7 +2211,7 @@ monitor_printer(
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
   if (username[0])
     cupsSetUser(username);
-  cupsSetPasswordCB(password_cb);
+  cupsSetPasswordCB2((cups_password_cb2_t)password_cb, &password_tries);
 
  /*
   * Loop until the job is canceled, aborted, or completed.
@@ -2229,6 +2235,8 @@ monitor_printer(
                                                    monitor->resource,
 						   monitor->user,
 						   monitor->version);
+      if (cupsLastError() <= IPP_OK_CONFLICT)
+        password_tries = 0;
 
      /*
       * Check the status of the job itself...
@@ -2697,12 +2705,20 @@ new_request(
  */
 
 static const char *			/* O - Password  */
-password_cb(const char *prompt)		/* I - Prompt (not used) */
+password_cb(const char *prompt,		/* I - Prompt (not used) */
+            http_t     *http,		/* I - Connection */
+            const char *method,		/* I - Request method (not used) */
+            const char *resource,	/* I - Resource path (not used) */
+            int        *password_tries)	/* I - Password tries */
 {
-  fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\"), password=%p, "
-          "password_tries=%d\n", prompt, password, password_tries);
+  fprintf(stderr, "DEBUG: password_cb(prompt=\"%s\", http=%p, method=\"%s\", "
+                  "resource=\"%s\", password_tries=%p(%d)), password=%p\n",
+          prompt, http, method, resource, password_tries, *password_tries,
+          password);
 
   (void)prompt;
+  (void)method;
+  (void)resource;
 
  /*
   * Remember that we need to authenticate...
@@ -2710,9 +2726,9 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 
   auth_info_required = "username,password";
 
-  if (password && *password && password_tries < 3)
+  if (password && *password && *password_tries < 3)
   {
-    password_tries ++;
+    (*password_tries) ++;
 
     return (password);
   }

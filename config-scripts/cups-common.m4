@@ -3,7 +3,7 @@ dnl "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $"
 dnl
 dnl   Common configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
+dnl   Copyright 2007-2013 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="1.6.2"
+CUPS_VERSION="1.6.3"
 CUPS_REVISION=""
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -44,9 +44,9 @@ LDFLAGS="${LDFLAGS:=}"
 
 dnl Checks for programs...
 AC_PROG_AWK
-AC_PROG_CC
+AC_PROG_CC(clang cc gcc)
 AC_PROG_CPP
-AC_PROG_CXX
+AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
@@ -337,6 +337,7 @@ AC_SUBST(DBUS_NOTIFIERLIBS)
 
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
+CUPS_DEFAULT_SYSTEM_AUTHKEY=""
 CUPS_SYSTEM_AUTHKEY=""
 INSTALLXPC=""
 
@@ -384,10 +385,13 @@ case $uname in
 
 			if test "x$default_adminkey" != xdefault; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey $default_adminkey"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="$default_adminkey"
 			elif grep -q system.print.operator /etc/authorization; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.print.admin"
 			else
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
+				CUPS_DEFAULT_SYSTEM_AUTHKEY="system.preferences"
 			fi
 
 			if test "x$default_operkey" != xdefault; then
@@ -425,6 +429,7 @@ esac
 
 AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SYSTEM_AUTHKEY, "$CUPS_DEFAULT_SYSTEM_AUTHKEY")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(INSTALLXPC)
 

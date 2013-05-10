@@ -3,7 +3,7 @@
  *
  *   IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -2432,6 +2432,21 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     http_uri_status_t	uri_status;	/* URI separation status */
     char		old_device_uri[1024];
 					/* Old device URI */
+    static const char * const uri_status_strings[] =
+    {
+      "URI too large.",
+      "Bad arguments to function.",
+      "Bad resource path.",
+      "Bad port number.",
+      "Bad hostname/address.",
+      "Bad username/password.",
+      "Bad URI scheme.",
+      "Bad URI.",
+      "OK",
+      "Missing URI scheme.",
+      "Unknown URI scheme",
+      "Missing resource path."
+    };
 
 
     need_restart_job = 1;
@@ -2443,12 +2458,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 				 host, sizeof(host), &port,
 				 resource, sizeof(resource));
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "%s device-uri: %s", printer->name,
+		    uri_status_strings[uri_status - HTTP_URI_OVERFLOW]);
+
     if (uri_status < HTTP_URI_OK)
     {
       send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"."),
 		      attr->values[0].string.text);
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "add_printer: httpSeparateURI returned %d", uri_status);
       return;
     }
 
@@ -9262,7 +9279,7 @@ save_auth_info(
   fchown(cupsFileNumber(fp), 0, 0);
   fchmod(cupsFileNumber(fp), 0400);
 
-  cupsFilePuts(fp, "CUPSD-AUTH-V2\n");
+  cupsFilePuts(fp, "CUPSD-AUTH-V3\n");
 
   for (i = 0;
        i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
@@ -9280,9 +9297,15 @@ save_auth_info(
 	     i < (int)(sizeof(job->auth_env) / sizeof(job->auth_env[0]));
 	 i ++)
     {
-      httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
-                     strlen(auth_info->values[i].string.text));
-      cupsFilePutConf(fp, dest->auth_info_required[i], line);
+      if (strcmp(dest->auth_info_required[i], "negotiate"))
+      {
+	httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
+		       strlen(auth_info->values[i].string.text));
+	cupsFilePutConf(fp, dest->auth_info_required[i], line);
+      }
+      else
+	cupsFilePutConf(fp, dest->auth_info_required[i],
+	                auth_info->values[i].string.text);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
         cupsdSetStringf(job->auth_env + i, "AUTH_USERNAME=%s",

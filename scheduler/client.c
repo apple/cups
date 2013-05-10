@@ -406,7 +406,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   {
     if (httpAddrLocalhost(&temp))
       strlcpy(con->servername, "localhost", sizeof(con->servername));
-    else if (HostNameLookups || RemotePort)
+    else if (HostNameLookups)
       httpAddrLookup(&temp, con->servername, sizeof(con->servername));
     else
       httpAddrString(&temp, con->servername, sizeof(con->servername));
@@ -2581,7 +2581,14 @@ cupsdSendHeader(
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
+    {
+#  ifdef AF_LOCAL
+      if (_httpAddrFamily(con->http.hostaddr) == AF_LOCAL)
+        strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
+      else
+#  endif /* AF_LOCAL */
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
+    }
 #endif /* HAVE_GSSAPI */
 
     if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&

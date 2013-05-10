@@ -11,9 +11,9 @@
 <OPTION VALUE="">Обслуживание</OPTION>
 <OPTION VALUE="print-test-page">Печать пробной страницы</OPTION>
 {printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Очистить головки</OPTION>:}
-{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">печать пробной страницы принтера</OPTION>:}
-{printer_state=5?<OPTION VALUE="start-printer">Resume Printer</OPTION>:<OPTION VALUE="stop-printer">Приостановить принтер</OPTION>}
-{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Возобновить печать</OPTION>:<OPTION VALUE="reject-jobs">Приостановить печать</OPTION>}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Печать пробной страницы принтера</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Восстановить печать</OPTION>:<OPTION VALUE="stop-printer">Приостановить принтер</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Принимать задания</OPTION>:<OPTION VALUE="reject-jobs">Не принимать задания</OPTION>}
 <OPTION VALUE="move-jobs">Переместить все задания</OPTION>
 <OPTION VALUE="purge-jobs">Закрыть все задания</OPTION>
 </SELECT>
