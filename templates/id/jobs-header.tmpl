@@ -1,0 +1,5 @@
+<DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Lihat Tugas yang Aktif"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Lihat Tugas yang Diselesaikan"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Lihat Semua Tugas"></FORM>}</DIV>
+
+<P ALIGN="CENTER">{total=0?Tidak ada tugas:Menampilkan {#job_id} dari {total} tugas {?which_jobs=?yang aktif:{which_jobs=all?:yang diselesaikan}} {total=1?:}}.</P>

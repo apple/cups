@@ -1,0 +1,86 @@
+IPPTOOL.txt - 2011-05-20
+------------------------
+
+
+INTRODUCTION
+
+    Starting with CUPS 1.5, CUPS now installs a user program called ipptool that
+    can be used to send arbitrary IPP requests to a CUPS server or IPP printer.
+    This tool started life as part of the CUPS automated test suite and has
+    grown to support complex conformance tests and a simple way to query
+    printer, job, and subscription attributes.
+
+
+BASIC USAGE
+
+    The ipptool command requires a printer URI and one or more "test" files that
+    describe the operations, attributes to display, and expected status and
+    attribute values. Several standard files are included with CUPS, for example
+    to show a list of pending print jobs on a CUPS printer called "myprinter"
+    you'd run:
+
+        ipptool ipp://localhost/printers/myprinter get-jobs.test
+
+    which would produce something like this:
+
+	job-id job-state    job-name     job-originating-user-name
+	------ ------------ ------------ -------------------------
+	72     pending      testfile.pdf msweet
+	73     pending      testfile.ps  msweet
+	74     pending-held testfile.jpg msweet
+	75     pending-held testfile.txt msweet
+
+    To get output suitable for import into a spreadsheet, use the "-c" (CSV)
+    option:
+
+        ipptool -c ipp://localhost/printers/myprinter get-jobs.test
+
+    which would produce something like this:
+
+	job-id,job-state,job-name,job-originating-user-name
+	72,pending,testfile.pdf,msweet
+	73,pending,testfile.ps,msweet
+	74,pending-held,testfile.jpg,msweet
+	75,pending-held,testfile.txt,msweet
+
+
+CONFORMANCE TESTS
+
+    We provide basic IPP conformance tests for IPP/1.1, IPP/2.0, and IPP/2.1.
+    For a given printer URI, the following commands perform tests at each level:
+
+        ipptool -t printer-uri ipp-1.1.test
+        ipptool -t -V 2.0 printer-uri ipp-2.0.test
+        ipptool -t -V 2.1 printer-uri ipp-2.1.test
+
+
+READING THE DOCUMENTATION
+
+    The command usage is described in the ipptest(1) man page, while the file
+    format is described in the ipptestfile(5) man page.
+
+
+GETTING SUPPORT AND OTHER RESOURCES
+
+    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide many
+    discussion forums which are available at:
+
+	http://www.cups.org/newsgroups.php
+
+    See the CUPS web site at "http://www.cups.org/" for other resources.
+
+
+LEGAL STUFF
+
+    CUPS is Copyright 2007-2011 by Apple Inc.  CUPS and the CUPS logo are
+    trademarks of Apple Inc.
+
+    The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
+
+    This software is based in part on the work of the Independent JPEG Group.
+
+    CUPS is provided under the terms of version 2 of the GNU General Public
+    License and GNU Library General Public License. This program is distributed
+    in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the "doc/help/license.html" or "LICENSE.txt" files for more information.

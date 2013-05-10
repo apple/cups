@@ -1,0 +1,47 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Mencari di
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:Semua Dokumen}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Cari">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Bersihkan"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contents">
+<TR><TD>
+
+<H3 CLASS="title">Dokumen Bantuan Langsung</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Semua Dokumen</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Hasil Pencarian di {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Semua Dokumen}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (di <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Tidak ada yang cocok.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Lihat Versi Cetak"></FORM>:
+
+<H1>Bantuan Langsung</H1>
+
+<P>Ini adalah antarmuka bantuan langsung milik CUPS. Masukkan kata yang hendak dicari pada kotak
+di atas atau klik salah satu taut dokumen untuk melihat informasi bantuan langsung tersebut.</P>
+
+<P>Apabila Anda adalah pengguna baru CUPS, bacalah halaman "<a
+href="/help/overview.html">Ikhtisar CUPS</a>". Bagi yang sudah berpengalaman, dapat
+membaca halaman "<a href="/help/whatsnew.html">Apa yang Baru di CUPS
+1.4</a>".</P>
+
+<P><A HREF="http://www.cups.org/">Laman CUPS</A> juga menyediakan berbagai sumber termasuk forum, jawaban untuk pertanyaan-pertanyaan yang sering diajukan, serta formulir untuk mengirim laporan kode hama dan permintaan fitur baru.</P>}
