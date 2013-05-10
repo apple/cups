@@ -1,0 +1,307 @@
+%    Copyright (C) 1990, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Initialization file for analogs of Display PostScript functions
+% that are also included in Level 2.
+% When this is run, systemdict is still writable,
+% but (almost) everything defined here goes into level2dict.
+
+level2dict begin
+
+% ------ Virtual memory ------ %
+
+/currentshared /.currentglobal load def
+/scheck /.gcheck load def
+%****** FOLLOWING IS WRONG ******
+/shareddict currentdict /globaldict .knownget not { 20 dict } if def
+
+% Global and LocalFontDirectory must remain in systemdict
+% even if we temporarily exit Level 2 mode.
+
+end				% level2dict
+systemdict begin
+
+/SharedFontDirectory FontDirectory .gcheck
+ { .currentglobal false .setglobal
+   /LocalFontDirectory FontDirectory dup maxlength dict copy def
+   .setglobal FontDirectory
+ }
+ { /LocalFontDirectory FontDirectory def
+   50 dict
+ }
+ifelse def
+
+end				% systemdict
+level2dict begin
+
+% setshared must rebind FontDirectory to the appropriate one of
+% Local or SharedFontDirectory.
+
+/.setglobal
+ { .setglobal
+   //systemdict /FontDirectory .currentglobal
+    { //SharedFontDirectory }
+    { //systemdict /LocalFontDirectory get }	% can't embed ref to local VM
+   ifelse .forceput
+ } .bind odef		% must bind .forceput and .setglobal
+			% even if NOBIND in effect
+/setshared /.setglobal load def
+.currentglobal setshared
+
+% ------ Fonts ------ %
+
+/selectfont
+ { exch findfont exch
+   dup type /arraytype eq { makefont } { scalefont } ifelse
+   setfont
+ } odef
+% Undefinefont has to take local/global VM into account.
+/undefinefont
+ { FontDirectory 1 index .undef
+   .currentglobal
+    {		% Current mode is global; delete from local directory too.
+      //systemdict /LocalFontDirectory .knownget
+       { exch .undef }
+       { pop }
+      ifelse
+    }
+    {		% Current mode is local; if there was a shadowed global
+		% definition, copy it into the local directory.
+      //systemdict /SharedFontDirectory .knownget
+       { 1 index .knownget
+	  { FontDirectory 3 1 roll put }
+	  { pop }
+	 ifelse
+       }
+      if
+    }
+   ifelse
+ } odef
+
+% If we load a font into global VM within an inner save, the restore
+% will delete it from FontDirectory but not from SharedFontDirectory.
+% We have to handle this by making restore copy missing entries from
+% SharedFontDirectory to FontDirectory.  Since this could slow down restore
+% considerably, we define a new operator .dictcopynew for this purpose.
+% Furthermore, if FAKEFONTS is in effect, we want global real fonts to
+% override fake local ones.  We handle this by brute force.
+/restore
+ { //restore
+   //systemdict /LocalFontDirectory get
+   FAKEFONTS
+    { mark
+		% We want to delete a fake font from the local directory
+		% iff the global directory now has no definition for it,
+		% or a non-fake definition.
+      1 index dup
+       {		% Stack: lfd mark lfd key ... lfd key value
+	 length 1 gt
+	  {		% This is a real local definition; don't do anything.
+	    pop
+	  }
+	  {		% This is a fake local definition, check for global.
+	    //SharedFontDirectory 1 index .knownget
+	     {		% A global definition exists, check for fake.
+	       length 1 eq { pop } { 1 index } ifelse
+	     }
+	     {		% No global definition, delete the local one.
+	       1 index
+	     }
+	    ifelse
+	  }
+	 ifelse
+       } forall
+      pop counttomark 2 idiv { .undef } repeat pop
+    }
+   if
+   //SharedFontDirectory exch .dictcopynew pop
+ } bind odef
+
+% ------ Halftones ------ %
+
+/.makestackdict
+	{ { counttomark -1 roll } forall .dicttomark
+	} bind def
+/currenthalftone
+	{ mark .currenthalftone
+	   { { exch pop }		% halftone
+	     { /HalftoneType 1		% screen
+		{ /Frequency /Angle /SpotFunction }
+	       .makestackdict
+	     }
+	     { /HalftoneType 2		% colorscreen
+		{ /RedFrequency /RedAngle /RedSpotFunction
+		  /GreenFrequency /GreenAngle /GreenSpotFunction
+		  /BlueFrequency /BlueAngle /BlueSpotFunction
+		  /GrayFrequency /GrayAngle /GraySpotFunction
+		}
+	       .makestackdict
+	     }
+	   }
+	  exch get exec
+	} odef
+% Define sethalftone so it converts all other types to type 5.
+/.sethalftoneRGBV	% <dict> <type> <keys> <keysRGBV>
+	{ 4 -1 roll exch { 1 index exch get exch } forall 15 1 roll
+	  14 -2 roll mark 15 1 roll { /Gray /Blue /Green /Red }
+	   {		% stack: v0 v1 v2 type keys comp
+	     mark
+	     2 index 0 get 8 -1 roll
+	     4 index 1 get 9 -1 roll
+	     6 index 2 get 10 -1 roll
+			% stack: type keys comp mark k0 v0 k1 v1 k2 v2
+	     /HalftoneType 10 index .dicttomark
+	     counttomark 2 roll
+	   }
+	  forall pop pop
+	  /Default 1 index .dicttomark .sethalftone5
+	} bind def
+/sethalftone
+	{ dup /HalftoneType get 1 sub
+	   {  { mark /Default 2 index .dicttomark .sethalftone5 }
+	      { 1 { /Frequency /Angle /SpotFunction }
+		{ /RedFrequency /RedAngle /RedSpotFunction
+		  /GreenFrequency /GreenAngle /GreenSpotFunction
+		  /BlueFrequency /BlueAngle /BlueSpotFunction
+		  /GrayFrequency /GrayAngle /GraySpotFunction
+		} .sethalftoneRGBV
+	      }
+	      { mark /Default 2 index .dicttomark .sethalftone5 }
+	      { 3 { /Width /Height /Thresholds }
+		{ /RedWidth /RedHeight /RedThresholds
+		  /GreenWidth /GreenHeight /GreenThresholds
+		  /BlueWidth /BlueHeight /BlueThresholds
+		  /GrayWidth /GrayHeight /GrayThresholds
+		} .sethalftoneRGBV
+	      }
+	      { dup .sethalftone5 }
+	   } exch get exec
+	} odef
+% Redefine setscreen and setcolorscreen to recognize halftone dictionaries,
+% and to insert the Frequency and Angle into Type 1 halftones, per
+% Adobe TN 5085.
+/.fixsethalftonescreen
+ { dup /HalftoneType get 1 eq
+    { dup wcheck not { dup length .copydict } if
+      dup /Frequency 4 index put
+      dup /Angle 3 index put
+    }
+   if
+ } bind def
+/setscreen
+	{ dup type /dicttype eq
+	   { .fixsethalftonescreen sethalftone pop pop }
+	   { //setscreen }
+	  ifelse
+	} odef
+/setcolorscreen
+	{ dup type /dicttype eq
+	   { .fixsethalftonescreen sethalftone 11 { pop } repeat }
+	   { //setcolorscreen }
+	  ifelse
+	} odef
+% Redefine currentscreen and currentcolorscreen to extract the Frequency
+% and Angle from Type 1 halftones, per Adobe TN 5085.
+/.fixcurrenthalftonescreen	% <dict> .fix... <freq> <angle> <proc>
+ { dup /HalftoneType get 1 eq
+    { dup /Frequency get 1 index /Angle get }
+    { 60 0 }
+   ifelse 3 2 roll
+ } bind def
+/currentscreen
+	{ .currenthalftone
+	   { { .fixcurrenthalftonescreen }	% halftone
+	     { }				% screen
+	     { 12 3 roll 9 { pop } repeat	% colorscreen
+	       dup type /dicttype eq { .fixcurrenthalftonescreen } if
+	     }
+	   }
+	  exch get exec
+	} odef
+/currentcolorscreen
+	{ .currenthalftone
+	   { { .fixcurrenthalftonescreen 3 copy 6 copy }	% halftone
+	     { 3 copy 6 copy }			% screen
+	     { }				% colorscreen
+	   }
+	  exch get exec
+	} odef
+
+% ------ User objects ------ %
+
+/.localarray where
+ { pop }
+ { /.localarray
+	{ currentglobal false setglobal
+	  exch array exch setglobal
+	} bind def
+ }
+ifelse
+/defineuserobject
+	{ userdict /.UserObjects known
+	   { 1 index userdict /.UserObjects get length ge
+	      { 1 index 1 add .localarray userdict /.UserObjects get
+		1 index copy pop
+		userdict /.UserObjects 3 -1 roll put
+	      }
+	     if
+	   }
+	   { userdict /.UserObjects 3 index 1 add .localarray put
+	   }
+	  ifelse
+	  userdict /.UserObjects get 3 1 roll put
+	} odef
+/execuserobject
+	{ userdict /.UserObjects get exch get exec
+	} odef
+/undefineuserobject
+	{ userdict /.UserObjects get exch null put
+	} odef
+
+% ------ User paths ------ %
+
+% We define upath carefully so it won't leave garbage on the stack
+% if an error occurs.
+/upath
+	{ [
+	   { 1 index {/ucache cvx} if true .pathbbox /setbbox cvx
+	     {/moveto cvx} {/lineto cvx} {/curveto cvx} {/closepath cvx}
+	     pathforall ]
+	   }
+	  .internalstopped
+	   { cleartomark /upath load $error /errorname get signalerror
+	   }
+	  if cvx exch pop
+	} odef
+
+% Dummy definitions for cache control operators
+
+/ucachestatus
+	{ mark 0 0 0 0 0 } odef
+/setucacheparams
+	{ cleartomark } odef
+
+% ------ Miscellaneous ------ %
+
+/undef /.undef load def
+
+end				% level2dict
