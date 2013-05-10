@@ -1,0 +1,47 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Cerca in
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:Tutti i documenti}}:</B> <INPUT
+TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
+TYPE="IMAGE" SRC="/images/button-search.gif" ALT="Cerca">
+<A HREF="/help/{?HELPFILE}{QUERY?{TOPIC??TOPIC={TOPIC}:}:}"><IMG
+SRC="/images/button-clear.gif" ALT="Pulisci" CLASS="button"></A></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar">
+<H3 CLASS="title">Guida in linea</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Tutti i documenti</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</DIV>
+
+{QUERY?<P>Cerca risultati in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:Tutti i documenti}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Nessuna corrispondenza trovata.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}
+<A HREF="/help/{HELPFILE}?PRINTABLE=YES" TARGET="_blank"><IMG
+SRC="/images/button-view-printable-version.gif" ALT="Mostra versione stampabile"
+CLASS="button"></A></H1>:<H1>Pagine della guida di CUPS</H1>
+
+<P>Questa &egrave; l'interfaccia di guida in linea di CUPS. Inserisci sopra i termini di
+ricerca o fai clic su ognuno dei collegamenti alla documentazione per visualizzare
+le informazioni.</P>
+
+<P>Se sei nuovo di CUPS, leggi la pagina "<a
+href="overview.html">Sommario di CUPS</a>". Gli utenti di vecchia data
+dovrebbero leggere la pagina "<a href="whatsnew.html">Cosa c'&egrave; di nuovo in CUPS
+1.2</a>".</P>
+
+<P>La <A HREF="http://www.cups.org/">pagina principale di CUPS</A> fornisce
+inoltre molte risorse tra cui forum di discussione per utenti, risposte
+alla domande frequenti, e un modulo per la segnalazione di bug
+e richieste di nuove funzionalit&agrave;.</P>}
