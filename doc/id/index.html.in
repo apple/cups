@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Beranda - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Beranda&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administrasi&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Kelas&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Bantuan&nbsp;Langsung&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Tugas&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Pencetak&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>CUPS adalah sistem pencetakan berstandar dan berkode sumber terbuka, dikembangkan oleh
+<A HREF="http://www.apple.com/">Apple Inc.</A> untuk Mac OS<SUP>&reg;</SUP> X dan sistem
+operasi serupa UNIX<SUP>&reg;</SUP> lainnya.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS bagi Pengguna</H2>
+
+<P><A HREF="help/overview.html">Ikhtisar CUPS</A></P>
+
+<P><A HREF="help/options.html">Opsi dan Pencetakan dari Baris Perintah</A></P>
+
+<P><A HREF="help/whatsnew.html">Apa yang Baru di CUPS 1.4</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Forum Pengguna</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS bagi Administrator</H2>
+
+<P><A HREF="admin">Menambah Pencetak dan Kelas</A></P>
+
+<P><A HREF="help/policies.html">Mengatur Kebijakan Operasi</A></P>
+
+<P><A HREF="help/accounting.html">Dasar Akunting Pencetak</A></P>
+
+<P><A HREF="help/security.html">Keamanan Server</A></P>
+
+<P><A HREF="help/kerberos.html">Menggunakan Otentikasi Kerberos</A></P>
+
+<P><A HREF="help/network.html">Menggunakan Pencetak di Jaringan</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">Referensi cupsd.conf</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Mencari Penggerak Pencetak</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS bagi Pengembang</H2>
+
+<P><A HREF="help/api-overview.html">Pengenalan untuk Pemrograman CUPS</A></P>
+
+<P><A HREF="help/api-cups.html">API di CUPS</A></P>
+
+<P><A HREF="help/api-filter.html">Penyaring dan Pemrograman Balik (<I>Backend Programming</I>)</A></P>
+
+<P><A HREF="help/api-httpipp.html">API di HTTP dan IPP</A></P>
+
+<P><A HREF="help/api-ppd.html">API di PPD</A></P>
+
+<P><A HREF="help/api-raster.html">API di Raster</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">Referensi Kompiler Berkas Penggerak PPD</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Forum Pengembang</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">CUPS dan logo CUPS logo adalah merek dagang dari
+<A HREF="http://www.apple.com">Apple Inc.</A> Hak cipta CUPS pada 2007-2009 Apple
+Inc. Semua hak terpelihara.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

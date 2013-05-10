@@ -1,0 +1,37 @@
+{#job_id=0?:
+<TABLE CLASS="list" SUMMARY="Job List">
+<THEAD>
+<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> ID <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> ID <SMALL>&#x25bc;</SMALL>}</A></TH><TH>Nama</TH><TH>Pengguna</TH><TH>Ukuran</TH><TH>Halaman</TH><TH>Status</TH><TH>Kontrol</TH></TR>
+</THEAD>
+<TBODY>
+{[job_id]
+<TR VALIGN="TOP">
+<TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
+<TD>{?job_name=?Tak Dikenal:{job_name}}&nbsp;</TD>
+<TD>{job_originating_user_name}&nbsp;</TD>
+<TD>{job_k_octets}k&nbsp;</TD>
+<TD>{job_media_sheets_completed=0?Tak Dikenal:{?job_media_sheets_completed}}&nbsp;</TD>
+<TD>{job_state=3?ditunda sejak<BR>{time_at_creation}:{job_state=4?ditahan sejak<BR>{time_at_creation}:
+{job_state=5?diproses sejak<BR>{time_at_processing}:{job_state=6?dihentikan:
+{job_state=7?dibatalkan pada<BR>{time_at_completed}:{job_state=8?dibatalkan:diselesaikan pada<BR>{time_at_completed}}}}}}}&nbsp;{job_printer_state_message?<BR>
+<EM>"{job_printer_state_message}"</EM>:}</TD>
+<TD>
+{job_preserved>0?{job_state>5?
+<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
+<INPUT TYPE="SUBMIT" VALUE="Reprint Job"></FORM>:}:}
+{job_state=4?
+<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="release-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
+<INPUT TYPE="SUBMIT" VALUE="Release Job"></FORM>:}
+{job_state=3?
+<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="hold-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
+<INPUT TYPE="SUBMIT" VALUE="Hold Job"></FORM>:}
+{job_state<7?
+<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
+<INPUT TYPE="SUBMIT" VALUE="Cancel Job"></FORM>
+<FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="move-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="SUBMIT" VALUE="Move Job"></FORM>:}
+&nbsp;</TD>
+</TR>
+}
+</TBODY>
+</TABLE>
+}

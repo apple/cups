@@ -1,0 +1,59 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Tambah Pencetak}</H2>
+
+<FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+<TABLE>
+{op=modify-printer?:<TR>
+<TH CLASS="label">Nama:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>}
+<TR>
+<TH CLASS="label">Deskripsi:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Lokasi:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Koneksi:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Berbagi:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
+{?printer_is_shared=?Jangan:{?printer_is_shared=0?Jangan:}} Berbagi Pencetak Ini</TD>
+</TR>
+<TR>
+<TH CLASS="label">Pembuat:</TH>
+<TD>{PPD_MAKE} <INPUT TYPE="SUBMIT" NAME="SELECT_MAKE" VALUE="Pilih Manufaktur/Pembuat Lainnya"></TD>
+</TR>
+<TR>
+<TH CLASS="label">Model:</TH>
+<TD>
+<SELECT NAME="PPD_NAME" SIZE="10">
+{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Penggerak Saat Ini - {current_make_and_model}</OPTION>:}
+{[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
+}</SELECT>
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Atau Sediakan Berkas PPD:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
+TYPE="FILE" NAME="PPD_FILE"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="{op=add-printer?Tambah Pencetak:Ubah Pencetak}"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

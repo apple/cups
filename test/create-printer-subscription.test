@@ -1,0 +1,36 @@
+#
+# "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
+#
+#   Verify that the CUPS subscription operations work.
+#
+{
+	# The name of the test...
+	NAME "Add Printer Subscription w/Lease"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+        GROUP subscription
+	ATTR uri notify-recipient testnotify://nowait
+	ATTR keyword notify-events printer-state-changed
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT notify-subscription-id
+	DISPLAY notify-subscription-id
+}
+
+#
+# End of "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
+#

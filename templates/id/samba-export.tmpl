@@ -1,0 +1,54 @@
+<SCRIPT TYPE="text/javascript"><!--
+function select_printers() {
+  var list = document.export_samba.EXPORT_NAME;
+  var sel = document.export_samba.EXPORT_ALL.checked;
+
+  for (i = 0; i < list.length; i ++) {
+    list.options[i].selected = sel;
+  }
+}
+--></SCRIPT>
+
+<FORM METHOD="POST" ACTION="/admin/" NAME="export_samba">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba">
+
+<H2 CLASS="title">Ekspor Pencetak ke Samba</H2>
+
+{error?<P>Tak dapat mengekspor pencetak ke Samba\:</P>
+<BLOCKQUOTE>{error}</BLOCKQUOTE>
+<P>Rujuklah berkas <A HREF="/admin/log/error_log"
+TARGET="_blank">error_log</A> untuk informasi lebih lanjut.</P>:
+<P>Di halaman ini, Anda dapat mengekspor pencetak untuk Samba, sehingga
+klien Windows dapat mengakses pencetak-pencetak tersebut melalui ikon
+<VAR>Network Neighborhood</VAR> atau <VAR>Network Places</VAR> yang ada
+di desktop mereka. Namun, sebelumnya Anda harus memasang penggerak
+pencetak PostScript Windows seperti yang dijelaskan pada halaman
+manual <A HREF="/help/man-cupsaddsmb.html"
+TARGET="_blank">cupsaddsmb(8)</A>.</P>}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Pencetak:</TH>
+<TD>
+<SELECT NAME="EXPORT_NAME" SIZE="10" MULTIPLE>
+{[printer_name]<OPTION VALUE="{printer_name}"{export_all? SELECTED:{printer_export? SELECTED:}}>{printer_name}}
+</SELECT><BR>
+<INPUT TYPE="CHECKBOX" NAME="EXPORT_ALL"{export_all? CHECKED:}
+onChange="select_printers()"> Ekspor Semua Pencetak
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Nama Pengguna Samba:</TH>
+<TD><INPUT TYPE="TEXT" NAME="USERNAME" VALUE="{?USERNAME}"> (diperlukan)</TD>
+</TR>
+<TR>
+<TH CLASS="label">Sandi Samba:</TH>
+<TD><INPUT TYPE="PASSWORD" NAME="PASSWORD" VALUE=""> (diperlukan)</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Ekspor Pencetak ke Samba"></TD>
+</TR>
+</TABLE>
+
+</FORM>

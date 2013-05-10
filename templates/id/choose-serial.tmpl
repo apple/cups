@@ -1,0 +1,51 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Tambah Pencetak}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Koneksi:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Kecepatan Data:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Paritas:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>Nihil
+<OPTION VALUE="even" {?parity=even?SELECTED:}>Genap
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Ganjil
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Bit Data:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kendali Aliran Data:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>Nihil
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Peranti Lunak)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Peranti Keras)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Peranti Keras)
+</SELECT></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Lanjut"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

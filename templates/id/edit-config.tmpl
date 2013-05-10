@@ -1,0 +1,24 @@
+<SCRIPT TYPE="text/javascript">
+function reset_config()
+{
+  document.cups.CUPSDCONF.value = "{?cupsdconf_default}";
+}
+</SCRIPT>
+
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Sunting Berkas Konfigurasi</H2>
+
+<FORM NAME="cups" METHOD="POST" ACTION="/admin/">
+
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+
+<TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25">{CUPSDCONF}</TEXTAREA>
+
+<P><INPUT TYPE="SUBMIT" NAME="SAVECHANGES" VALUE="Simpan Perubahan">
+<INPUT TYPE="BUTTON" VALUE="Gunakan Konfigurasi Baku"
+onClick="reset_config();"></P>
+
+</FORM>
+
+</DIV>

@@ -1,0 +1,41 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Idle:{printer_state=4?Processing:Paused}},
+{printer_is_accepting_jobs=0?Rejecting Jobs:Accepting Jobs},
+{server_is_sharing_printers=0?Not:{printer_is_shared=0?Not:}} Shared{default_name={printer_name}?, Server Default:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Manutenzione</OPTION>
+<OPTION VALUE="print-test-page">Stampa pagina di prova</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Ripristina classe</OPTION>:<OPTION VALUE="stop-class">Sospendi classe</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accetta stampe</OPTION>:<OPTION VALUE="reject-jobs">Rifiuta stampe</OPTION>}
+<OPTION VALUE="move-jobs">Sposta tutte le stampe</OPTION>
+<OPTION VALUE="purge-jobs">Annulla tuttte le stampe</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Vai" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Amministrazione</OPTION>
+<OPTION VALUE="modify-class">Modifica classe</OPTION>
+<OPTION VALUE="delete-class">Elimina classe</OPTION>
+<OPTION VALUE="set-class-options">Imposta opzioni predefinite</OPTION>
+<OPTION VALUE="set-as-default">Imposta come predefiniti del server</OPTION>
+<OPTION VALUE="set-allowed-users">Imposta utenti autorizzati</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Vai" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Descrizione:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Posizione:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Membri:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Predefiniti:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unknown}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>
