@@ -1,0 +1,62 @@
+#
+# "$Id: mime.convs 530 1999-07-13 14:11:17Z mike $"
+#
+#   MIME converts file for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 1997-1999 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Easy Software Products and are protected by Federal
+#   copyright law.  Distribution and use rights are outlined in the file
+#   "LICENSE.txt" which should have been included with this file.  If this
+#   file is missing or damaged please contact Easy Software Products
+#   at:
+#
+#       Attn: CUPS Licensing Information
+#       Easy Software Products
+#       44141 Airport View Drive, Suite 204
+#       Hollywood, Maryland 20636-3111 USA
+#
+#       Voice: (301) 373-9603
+#       EMail: cups-info@cups.org
+#         WWW: http://www.cups.org
+#
+
+########################################################################
+#
+# Format of Lines:
+#
+#   source/type destination/type cost filter
+#
+# General Notes:
+#
+#   Currently the "cost" field is not used (all filters are assumed to
+#   be equally costly in terms of speed/memory).  Also, a filter program
+#   *must* accept the standard command-line arguments (job-id, user, title,
+#   copies,options,[filename or stdin]) or this won't work.
+#
+
+########################################################################
+#
+# PostScript filters
+#
+
+#application/msword	application/postscript	50	mswordtops
+#application/pdf		application/postscript	50	pdftops
+application/postscript	application/vnd.cups-postscript	50	pstops
+application/vnd.hp-HPGL	application/postscript	50	hpgltops
+image/*			application/vnd.cups-postscript	50	imagetops
+#text/html		application/postscript	50	htmltops
+text/plain		application/postscript	50	texttops
+
+########################################################################
+#
+# Raster filters...
+#
+
+image/*			application/vnd.cups-raster	50	imagetoraster
+application/vnd.cups-postscript	application/vnd.cups-raster	50	pstoraster
+
+#
+# End of "$Id: mime.convs 530 1999-07-13 14:11:17Z mike $".
+#
