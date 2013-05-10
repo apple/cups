@@ -1,0 +1,160 @@
+# DO NOT DELETE
+
+ppdc-array.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-array.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-array.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-array.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-array.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+ppdc-array.o: ../cups/i18n.h ../cups/transcode.h
+ppdc-attr.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-attr.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-attr.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-attr.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdc-attr.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdc-attr.o: ../cups/transcode.h
+ppdc-catalog.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-catalog.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-catalog.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-catalog.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-catalog.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-catalog.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-choice.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-choice.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-choice.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-choice.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-choice.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-choice.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-constraint.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-constraint.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-constraint.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-constraint.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-constraint.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h
+ppdc-constraint.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdc-constraint.o: ../cups/transcode.h
+ppdc-driver.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-driver.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-driver.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-driver.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-driver.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-driver.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-file.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-file.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-file.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-file.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdc-file.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdc-file.o: ../cups/transcode.h ../cups/i18n.h
+ppdc-filter.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-filter.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-filter.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-filter.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-filter.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-filter.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-font.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-font.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-font.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-font.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdc-font.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdc-font.o: ../cups/transcode.h
+ppdc-group.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-group.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-group.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-group.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-group.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+ppdc-group.o: ../cups/i18n.h ../cups/transcode.h
+ppdc-import.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-import.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-import.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-import.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-import.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-import.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-import.o: ../cups/ppd.h ../cups/i18n.h
+ppdc-mediasize.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-mediasize.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-mediasize.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-mediasize.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-mediasize.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-mediasize.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-message.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-message.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-message.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-message.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-message.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-message.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-option.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-option.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-option.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-option.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-option.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-option.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-profile.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-profile.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-profile.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-profile.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-profile.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-profile.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-shared.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-shared.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-shared.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-shared.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-shared.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-shared.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-source.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-source.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-source.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-source.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-source.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-source.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-source.o: ../cups/raster.h ../cups/cups.h ../data/epson.h ../data/escp.h
+ppdc-source.o: ../data/hp.h ../data/label.h ../data/pcl.h
+ppdc-string.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-string.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc-string.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc-string.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+ppdc-string.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-string.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+ppdc-variable.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc-variable.o: ../cups/debug.h ../cups/globals.h ../cups/string.h
+ppdc-variable.o: ../config.h ../cups/http-private.h ../cups/http.h
+ppdc-variable.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ppdc-variable.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+ppdc-variable.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
+genstrings.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+genstrings.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+genstrings.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+genstrings.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+genstrings.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+genstrings.o: ../cups/i18n.h ../cups/transcode.h
+ppdc.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdc.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdc.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdc.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdc.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdc.o: ../cups/transcode.h
+ppdhtml.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdhtml.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdhtml.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdhtml.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdhtml.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdhtml.o: ../cups/transcode.h
+ppdi.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdi.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdi.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdi.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdi.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdi.o: ../cups/transcode.h
+ppdmerge.o: ../cups/ppd-private.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+ppdmerge.o: ../cups/versioning.h ../cups/string.h ../config.h ../cups/ppd.h
+ppdmerge.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/cups.h
+ppdmerge.o: ../cups/array.h ../cups/string.h ../cups/i18n.h
+ppdpo.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+ppdpo.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+ppdpo.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+ppdpo.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h ../cups/ppd.h
+ppdpo.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
+ppdpo.o: ../cups/transcode.h
+testcatalog.o: ppdc-private.h ppdc.h ../cups/file.h ../cups/versioning.h
+testcatalog.o: ../cups/debug.h ../cups/globals.h ../cups/string.h ../config.h
+testcatalog.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
+testcatalog.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+testcatalog.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
+testcatalog.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
