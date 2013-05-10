@@ -1,0 +1,13 @@
+libcups.a
+libcups.la
+libcups.sl
+libcups.sl.2
+libcups.so
+libcups.so.2
+libcups_s.a
+libcups.2.dylib
+libcups.dylib
+testhttp
+testipp
+testlang
+testppd
