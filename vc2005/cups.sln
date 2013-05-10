@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual C++ Express 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcups2", "libcups2.vcproj", "{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testfile", "testfile.vcproj", "{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testhttp", "testhttp.vcproj", "{90B0058C-8393-411F-BD3B-E2C831D4E883}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Debug|Win32.Build.0 = Debug|Win32
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|Win32.ActiveCfg = Release|Win32
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|Win32.Build.0 = Release|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Debug|Win32.Build.0 = Debug|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release|Win32.ActiveCfg = Release|Win32
+		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release|Win32.Build.0 = Release|Win32
+		{90B0058C-8393-411F-BD3B-E2C831D4E883}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90B0058C-8393-411F-BD3B-E2C831D4E883}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,56 @@
+<HTML>
+<!-- SECTION: References -->
+<HEAD>
+	<TITLE>client.conf</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">client.conf</H1>
+
+<P>The <VAR>/etc/cups/client.conf</VAR> and
+<VAR>~/.cups/client.conf</VAR> files contain up to two directives
+that determine how the client behaves. Each directive is listed
+on a line by itself followed by its value. Comments are
+introduced using the number sign ("#") character at the beginning
+of a line.</P>
+
+<H2 CLASS="title"><A NAME="Encryption">Encryption</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Encryption Never
+Encryption IfRequested
+Encryption Required
+Encryption Always
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Encryption</CODE> directive specifies the default
+encryption settings for the client.</P>
+
+<P>The default setting is <VAR>IfRequested</VAR>.</P>
+
+
+<H2 CLASS="title"><A NAME="ServerName">ServerName</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+ServerName foo.bar.com
+ServerName 11.22.33.44
+ServerName foo.bar.com:8631
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>ServerName</CODE> directive specifies sets the remote server that is to be used for all client operations. That is, it redirects all client requests to the remote server.</P>
+
+<P>The default port number is 631 but can be overridden by adding a colon followed by the desired port number to the value.</P>
+
+<P>The default is to use the local server ("<VAR>localhost</VAR>") or domain socket, if so configured.</P>
+
+</BODY>
+</HTML>

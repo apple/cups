@@ -1,0 +1,19 @@
+<h1 class='title'>Introduction to the PPD Compiler</h1>
+
+<P>This document describes how to use the CUPS PostScript Printer Description
+(PPD) file compiler. The PPD compiler generates PPD files from simple text files
+that describe the features and capabilities of one or more printers.</P>
+
+<div class='summary'><table summary='General Information'>
+<tbody>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='raster-driver.html'>Developing Raster Printer Drivers</a><br>
+	Programming: <a href='postscript-driver.html'>Developing PostScript Printer Drivers</a><br>
+	Programming: <a href='api-filter.html'>Filter and Backend Programming</a><br>
+	Programming: <a href='api-raster.html'>Raster API</a><br>
+	References: <a href='ref-ppdcfile.html'>PPD Compiler Driver Information File Reference</a><br>
+	Specifications: <a href='spec-ppd.html'>CUPS PPD Extensions</a></td>
+</tr>
+</tbody>
+</table></div>
