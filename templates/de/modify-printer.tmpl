@@ -1,0 +1,29 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{?device_uri=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_DEVICE_URI" VALUE="{device_uri}">}
+{?printer_make_and_model=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{printer_make_and_model}">}
+
+<H2 CLASS="title">Drucker {printer_name} &auml;ndern</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Name:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Ort:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(F&uuml;r Menschen lesbarer Ort wie "Labor 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Beschreibung:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(F&uuml;r Menschen lesbare Beschreibung wie "HP LaserJet mit Duplexeinheit")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Fortsetzen"></TD>
+</TR>
+</TABLE>
+
+</FORM>
