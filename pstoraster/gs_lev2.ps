@@ -1,0 +1,332 @@
+%    Copyright (C) 1990, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Initialization file for Level 2 functions.
+% When this is run, systemdict is still writable,
+% but (almost) everything defined here goes into level2dict.
+
+level2dict begin
+
+% ------ Miscellaneous ------ %
+
+(<<) cvn /mark load def
+(>>) cvn /.dicttomark load def
+/currentsystemparams { mark .currentsystemparams .dicttomark } odef
+/currentuserparams { mark .currentuserparams .dicttomark } odef
+/deviceinfo { currentdevice getdeviceprops .dicttomark readonly } odef
+/languagelevel 2 def
+% When running in Level 2 mode, this interpreter is supposed to be
+% compatible with PostScript version 2017 (I think).
+/version (2017) def
+
+% If binary tokens are supported by this interpreter,
+% set an appropriate default binary object format.
+/setobjectformat where
+ { pop
+   currentsystemparams dup
+   /RealFormat get (IEEE) eq { 1 } { 3 } ifelse
+   exch /ByteOrder get { 1 add } if
+   setobjectformat
+ } if
+
+% ------ Virtual memory ------ %
+
+/currentglobal /currentshared load def
+/gcheck /scheck load def
+/setglobal /setshared load def
+% We can make the global dictionaries very small, because they auto-expand.
+/globaldict currentdict /shareddict .knownget not { 4 dict } if def
+/GlobalFontDirectory SharedFontDirectory def
+
+% ------ IODevices ------ %
+
+/.getdevparams where
+ { pop /currentdevparams { .getdevparams .dicttomark } odef
+ } if
+/.putdevparams where
+ { pop /setdevparams { mark exch { } forall counttomark 2 add -1 roll .putdevparams } odef
+ } if
+
+% ------ Job control ------ %
+
+serverdict begin
+
+% We could protect the job information better, but we aren't attempting
+% (currently) to protect ourselves against maliciousness.
+
+/.jobsave null def		% top-level save object
+/.jobsavelevel 0 def		% save depth of job (0 if .jobsave is null,
+				% 1 otherwise)
+/.adminjob true def		% status of current unencapsulated job
+
+/exitserver
+ { true exch startjob not { /exitserver /invalidaccess signalerror } if
+ } bind def
+
+end		% serverdict
+
+%**************** The definition of startjob is not complete yet, since
+% it doesn't clear the exec stack, doesn't reset stdin/stdout,
+% doesn't run the job under its own control, and doesn't reset
+% other aspects of the interpreter.
+/startjob
+ { vmstatus pop pop serverdict /.jobsavelevel get eq
+   1 index .checkpassword 0 gt and
+    { .checkpassword count 2 roll count 2 sub { pop } repeat
+      cleardictstack
+      serverdict /.jobsave get dup null eq { pop } { restore } ifelse
+      exch
+       {	% unencapsulated job
+	 serverdict /.jobsave null put
+	 serverdict /.jobsavelevel 0 put
+	 serverdict /.adminjob 3 -1 roll 1 gt put
+       }
+       {	% encapsulated job
+	 serverdict /.jobsave save put
+	 serverdict /.jobsavelevel 1 put
+	 userdict /quit /stop load put
+	 pop
+       }
+      ifelse true
+    }
+    { pop pop false
+    }
+   ifelse
+ } odef
+
+systemdict begin
+/quit
+ { //systemdict /serverdict get /.jobsave get null eq
+    { //quit }
+    { //systemdict /quit get /invalidaccess signalerror }
+   ifelse
+ } bind odef
+end
+
+% ------ Compatibility ------ %
+
+% In Level 2 mode, the following replace the definitions that gs_statd.ps
+% installs in statusdict and serverdict.
+% Note that statusdict must be allocated in local VM.
+% We don't bother with many of these yet, and the ones defined in terms
+% of currentsystemparams are cavalier about allocating a dictionary
+% in order to retrieve a single element from it....
+
+/.dict1 { exch mark 3 1 roll .dicttomark } bind def
+
+currentglobal false setglobal 25 dict exch setglobal begin
+currentsystemparams
+
+/buildtime 1 index /BuildTime get def
+/byteorder 1 index /ByteOrder get def
+/checkpassword { .checkpassword 0 gt } bind def
+/defaulttimeouts
+ { currentsystemparams dup
+   /JobTimeout .knownget not { 0 } if
+   exch /WaitTimeout .knownget not { 0 } if
+   currentpagedevice /ManualFeedTimeout .knownget not { 0 } if
+ } bind def
+dup /DoStartPage known
+ { /dostartpage { currentsystemparams /DoStartPage get } bind def
+   /setdostartpage { /DoStartPage .dict1 setsystemparams } bind def
+ } if
+dup /StartupMode known
+ { /dosysstart { currentsystemparams /StartupMode get 0 ne } bind def
+   /setdosysstart { { 1 } { 0 } ifelse /StartupMode .dict1 setsystemparams } bind def
+ } if
+%****** Setting jobname is supposed to set userparams.JobName, too.
+/jobname { currentuserparams /JobName get } bind def
+/jobtimeout { currentuserparams /JobTimeout get } bind def
+%manualfeed
+%manualfeedtimeout
+/margins
+ { currentpagedevice /Margins .knownget { exch } { [0 0] } ifelse
+ } bind def
+%pagecount
+%pagestackorder
+/printername
+ { currentsystemparams /PrinterName .knownget not { () } if exch copy
+ } bind def
+%/ramsize { currentsystemparams /RamSize get } bind def
+/realformat 1 index /RealFormat get def
+
+/.setpagedevice where
+ { pop
+   /setdefaulttimeouts
+    { exch mark /ManualFeedTimeout 3 -1 roll
+      /Policies mark /ManualFeedTimeout 1 .dicttomark
+      .dicttomark setpagedevice
+      /WaitTimeout exch mark /JobTimeout 5 2 roll .dicttomark setsystemparams
+    } bind def
+   /setmargins
+    { exch 2 array astore /Margins .dict1 setpagedevice
+    } bind def
+ }
+if
+%setpagestackorder
+dup /PrinterName known
+ { /setprintername { /PrinterName .dict1 setsystemparams } bind def
+ } if
+currentuserparams /WaitTimeout known
+ { /waittimeout { currentuserparams /WaitTimeout get } bind def
+ } if
+
+/.setpagedevice where
+ { pop 
+   /pagemargin
+    { currentpagedevice /PageOffset .knownget { 0 get } { 0 } ifelse
+    } bind def
+   /pageparams
+    { currentpagedevice
+      dup /Orientation .knownget { 1 and ORIENT1 { 1 xor } if } { 0 } ifelse exch
+      dup /PageSize get aload pop 3 index 0 ne { exch } if 3 2 roll
+      /PageOffset .knownget { 0 get } { 0 } ifelse 4 -1 roll
+    } bind def
+   /.setpagesize { 2 array astore /PageSize .dict1 setpagedevice } bind def
+   /setduplexmode { /Duplex .dict1 setpagedevice } bind def
+   /setpagemargin { 0 2 array astore /PageOffset .dict1 setpagedevice } bind def
+   /setpageparams
+    { mark /PageSize 6 -2 roll
+      4 index 1 and ORIENT1 { 1 } { 0 } ifelse ne { exch } if 2 array astore
+      /Orientation 5 -1 roll ORIENT1 { 1 xor } if
+      /PageOffset counttomark 2 add -1 roll 0 2 array astore
+      .dicttomark setpagedevice
+    } bind def
+   /setresolution
+    { dup 2 array astore /HWResolution .dict1 setpagedevice
+    } bind def
+ }
+if
+
+pop		% currentsystemparams
+
+% Flag the current dictionary so it will be swapped when we
+% change language levels.  (See zmisc2.c for more information.)
+/statusdict currentdict def
+
+currentdict end
+/statusdict exch def
+
+% ------ Color spaces ------ %
+
+% Define the setcolorspace procedures.
+/colorspacedict mark
+  /DeviceGray { pop 0 setgray } bind
+  /DeviceRGB { pop 0 0 0 setrgbcolor } bind
+  /setcmykcolor where
+   { pop /DeviceCMYK { pop 0 0 0 1 setcmykcolor } bind
+   } if
+  /.setcieaspace where
+   { pop /CIEBasedA { NOCIE { pop 0 setgray } { 1 get .setcieaspace } ifelse } bind
+   } if
+  /.setcieabcspace where
+   { pop /CIEBasedABC { NOCIE { pop 0 0 0 setrgbcolor } { 1 get .setcieabcspace } ifelse } bind
+   } if
+  /.setciedefspace where
+   { pop /CIEBasedDEF { NOCIE { pop 0 0 0 setrgbcolor } { 1 get .setciedefspace } ifelse } bind
+   } if
+  /.setciedefgspace where
+   { pop /CIEBasedDEFG { NOCIE { pop 0 0 0 1 setcmykcolor } { 1 get .setciedefgspace } ifelse } bind
+   } if
+  /.setseparationspace where
+   { pop /Separation { dup 2 get setcolorspace .setseparationspace } bind
+   } if
+  /.setindexedspace where
+   { pop /Indexed { dup 1 get setcolorspace .setindexedspace } bind
+   } if
+  /.setpatternspace where
+   { pop /Pattern
+      { dup length 1 gt { dup 1 get setcolorspace } if
+        .setpatternspace
+      } bind
+   } if
+.dicttomark def
+
+/.devcs [/DeviceGray /DeviceRGB /DeviceCMYK] readonly def
+/currentcolorspace
+ { .currentcolorspace dup type /integertype eq
+    { //.devcs exch 1 getinterval
+    } if
+ } odef
+currentdict /.devcs .undef
+
+/setcolorspace
+ { dup type /nametype eq { 1 array astore } if
+   dup //colorspacedict 1 index 0 get get exec
+   .setcolorspace
+ } odef
+
+% Initialize the CIE rendering dictionary if necessary.
+% The most common CIE files seem to assume the "calibrated RGB color space"
+% described on p. 189 of the PostScript Language Reference Manual,
+% 2nd Edition; we simply invert this transformation back to RGB.
+/setcolorrendering where
+ { pop mark
+   /ColorRenderingType 1
+% We must make RangePQR and RangeLMN large enough so that values computed by
+% the assumed encoding MatrixLMN don't get clamped.
+   /RangePQR [0 0.9505 0 1 0 1.0890]
+   /TransformPQR [ { } dup dup ]
+   /RangeLMN [0 0.9505 0 1 0 1.0890]
+   /MatrixABC
+    [ 3.24063 -0.96893  0.05571
+     -1.53721  1.87576 -0.20402
+     -0.49863  0.04152  1.05700
+    ]
+   /EncodeABC [{0 max 0.45 exp} bind dup dup]
+   /WhitePoint [0.9505 1 1.0890]
+   .dicttomark setcolorrendering
+ } if
+
+% ------ Painting ------ %
+
+% A straightforward definition of execform that doesn't actually
+% do any caching.
+/execform
+ { dup /Implementation known not
+    { dup /FormType get 1 ne { /rangecheck signalerror } if
+      dup /Implementation null put readonly
+    } if
+   gsave dup /Matrix get concat
+   dup /BBox get aload pop
+   exch 3 index sub exch 2 index sub rectclip
+   dup /PaintProc get exec
+   grestore
+ } odef
+
+/makepattern
+ { currentglobal
+    { false setglobal .buildpattern true setglobal }
+    { .buildpattern }
+   ifelse
+   exch dup length 1 add dict .copydict
+   dup /Implementation 4 -1 roll put
+   readonly
+ } odef
+
+/setpattern
+ { currentcolorspace 0 get /Pattern ne
+    { [ /Pattern currentcolorspace ] setcolorspace } if
+   setcolor
+ } odef
+
+end				% level2dict
