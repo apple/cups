@@ -1,0 +1,45 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Idle:{printer_state=4?Processing:Paused}},
+{printer_is_accepting_jobs=0?Rejecting Jobs:Accepting Jobs},
+{server_is_sharing_printers=0?Not:{printer_is_shared=0?Not:}} Shared{default_name={printer_name}?, Server Default:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Maintenance</OPTION>
+<OPTION VALUE="print-test-page">Print Test Page</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Clean Print Heads</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Print Self Test Page</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Resume Printer</OPTION>:<OPTION VALUE="stop-printer">Pause Printer</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accept Jobs</OPTION>:<OPTION VALUE="reject-jobs">Reject Jobs</OPTION>}
+<OPTION VALUE="move-jobs">Move All Jobs</OPTION>
+<OPTION VALUE="purge-jobs">Cancel All Jobs</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administration</OPTION>
+<OPTION VALUE="modify-printer">Modify Printer</OPTION>
+<OPTION VALUE="delete-printer">Delete Printer</OPTION>
+<OPTION VALUE="set-printer-options">Set Default Options</OPTION>
+<OPTION VALUE="set-as-default">Set As Server Default</OPTION>
+<OPTION VALUE="set-allowed-users">Set Allowed Users</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Description:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Location:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Driver:</TH><TD>{printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported?, 2-sided printing:})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Connection:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Defaults:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unknown}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>
