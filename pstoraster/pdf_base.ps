@@ -1,0 +1,392 @@
+%    Copyright (C) 1994, 1996 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% pdf_base.ps
+% Basic parser for PDF reader.
+
+% This handles basic parsing of the file (including the trailer
+% and cross-reference table), as well as objects, object references,
+% and streams; it doesn't include any facilities for making marks on
+% the page.
+
+/.setlanguagelevel where { pop 2 .setlanguagelevel } if
+.currentglobal true .setglobal
+/pdfdict where { pop } { /pdfdict 100 dict def } ifelse
+pdfdict begin
+
+% Since PDF files can include extremely large dictionaries,
+% we increase the operand stack size here.
+/setuserparams where
+ { pop mark /MaxOpStack 10000 .dicttomark setuserparams
+ } if
+
+% We rebind #, #?, #dsc, and #dscfile later if we're writing out PostScript.
+/#			% <arg1> ... <argN> <opname> <N> # -
+ { pop cvx exec
+ } bind def
+/#?
+ { false
+ } bind def
+/#dsc			% mark <obj1> ... #dsc -
+ { cleartomark
+ } bind def
+/#dscfile		% <filename> #dscfile -
+ { pop
+ } bind def
+
+% Define the name interpretation dictionary for reading values.
+/valueopdict mark
+  (<<) cvn { mark } bind	% don't push an actual mark!
+  (>>) cvn /.dicttomark load
+  ([) cvn { mark } bind		% ditto
+  (]) cvn dup load
+  /true true
+  /false false
+  /null null
+  /F dup cvx		% see Objects section below
+  /R dup cvx		% see Objects section below
+  /stream dup cvx	% see Streams section below
+.dicttomark readonly def
+
+% ------ Utilities ------ %
+
+% Define a scratch string.  The PDF language definition says that
+% no line in a PDF file can exceed 255 characters.
+/pdfstring 255 string def
+
+% Read the previous line of a file.  If we aren't at a line boundary,
+% read the line containing the current position.
+% Skip any blank lines.
+/prevline		% - prevline <startpos> <substring>
+ { PDFfile fileposition dup () pdfstring
+   2 index 257 sub 0 .max PDFfile exch setfileposition
+    {		% Stack: initpos linepos line string
+      PDFfile fileposition
+      PDFfile 2 index readline pop
+      dup length 0 gt
+       { 3 2 roll 5 -2 roll pop pop 2 index }
+       { pop }
+      ifelse
+		% Stack: initpos linepos line string startpos
+      PDFfile fileposition 5 index ge { exit } if
+      pop
+    }
+   loop pop pop 3 -1 roll pop
+ } bind def
+
+% Execute a file, interpreting its executable names in a given
+% dictionary.  The name procedures may do whatever they want
+% to the operand stack.
+/.pdfrun			% <file> <opdict> .pdfrun -
+ {	% Construct a procedure with the file and opdict bound into it.
+   1 index cvlit mark mark 4 2 roll
+    { token not { (%%EOF) cvn cvx } if
+      dup xcheck
+       { DEBUG { dup == flush } if
+	 2 copy .knownget
+	  { exch pop exch pop exec }
+	  { (%stderr) (w) file
+	    dup (****************Unknown operator: ) writestring
+	    dup 3 -1 roll .writecvs dup (\n) writestring flushfile
+	    pop
+	  }
+	 ifelse
+       }
+       { exch pop DEBUG { dup ==only ( ) print flush } if
+       }
+      ifelse
+    }
+   aload pop .packtomark cvx
+   /loop cvx 2 packedarray cvx
+    { stopped /PDFsource } aload pop
+   PDFsource
+    { store { stop } if } aload pop .packtomark cvx
+   /PDFsource 3 -1 roll store exec
+ } bind def
+
+% ------ File reading ------ %
+
+% Read the cross-reference entry for an (unresolved) object.
+% The caller must save and restore the PDFfile position if desired.
+% For invalid (free) objects, we return 0.
+/readxrefentry		% <object#> readxrefentry <objpos>
+ { dup Objects exch get
+   PDFfile exch setfileposition
+   PDFfile token pop		% object position
+   PDFfile token pop		% generation #
+   PDFfile token pop		% n or f
+   dup /n eq
+    { pop 1 add dup 255 gt
+       { Generations type /stringtype eq
+	  {		% Convert Generations from a string to an array.
+	    Generations length array dup
+	    0 1 2 index length 1 sub
+	     { Generations 1 index get put dup
+	     }
+	    for pop /Generations exch store
+	  }
+	 if
+       }
+      if
+    }
+    { /f eq
+       { pop 0 }
+       { /readxrefentry cvx /syntaxerror signalerror }
+      ifelse
+    }
+   ifelse
+		% Stack: obj# objpos 1+gen#
+   Generations 4 -1 roll 3 -1 roll put
+ } bind def
+
+% ================================ Objects ================================ %
+
+% We represent an unresolved object reference by a procedure of the form
+% {obj# gen# resolveR}.  This is not a possible PDF object, because PDF has
+% no way to represent procedures.  Since PDF in fact has no way to represent
+% any PostScript object that doesn't evaluate to itself, we can 'force'
+% a possibly indirect object painlessly with 'exec'.
+% Note that since we represent streams by executable dictionaries
+% (see below), we need both an xcheck and a type check to determine
+% whether an object has been resolved.
+/unresolved?		% <object#> unresolved? <bool>
+ { Objects exch get dup xcheck exch type /integertype eq and
+ } bind def
+/oforce /exec load def
+/oget		% <array> <index> oget <object>
+		% <dict> <key> oget <object>
+ { 2 copy get dup xcheck
+    { exec dup 4 1 roll put }
+    { exch pop exch pop }
+   ifelse
+ } bind def
+% A null value in a dictionary is equivalent to an omitted key;
+% we must check for this specially.
+/knownoget
+ { 2 copy known
+    { oget dup null eq { pop false } { true } ifelse }
+    { pop pop false }
+   ifelse
+ } bind def
+
+% PDF 1.1 defines a 'foreign file reference', but not its meaning.
+% Per the specification, we convert these to nulls.
+/F		% <file#> <object#> <generation#> F <object>
+ {		% Some PDF 1.1 files use F as a synonym for f!
+   count 3 lt { setfillcolor /fill fsexec } { pop pop pop null } ifelse
+ } bind def
+
+% We keep track of objects in a pair of arrays, Objects and Generations.
+% Generations[N] is 1+ the current generation number for object number N.
+% (As far as we can tell, this is needed only for error checking.)
+% If object N is loaded, Objects[N] is the actual object;
+% otherwise, Objects[N] is an executable integer giving the file offset
+% of the object's entry in the cross-reference table.
+% For free objects, Generations[N] is 0.
+/checkgeneration  % <object#> <generation#> checkgeneration <object#> <OK>
+ { Generations 2 index get 1 sub 1 index eq
+    { pop true
+    }
+    { (Warning: wrong generation: ) print 1 index =only ( ) print = false
+    }
+   ifelse
+ } bind def
+/R		% <object#> <generation#> R <object>
+ { 1 index unresolved?
+    { /resolveR cvx 3 packedarray cvx }
+    { checkgeneration { Objects exch get } { pop null } ifelse }
+   ifelse
+ } bind def
+
+% If we encounter an object definition while reading sequentially,
+% we just store it away and keep going.
+/objopdict mark
+  valueopdict { } forall
+  /endobj dup cvx
+.dicttomark readonly def
+/obj			% <object#> <generation#> obj <object>
+ { PDFfile objopdict .pdfrun
+ } bind def
+/endobj			% <object#> <generation#> <object> endobj <object>
+ { 3 1 roll
+		% Read the xref entry if we haven't yet done so.
+		% This is only needed for generation # checking.
+   1 index unresolved?
+    { PDFfile fileposition
+      2 index readxrefentry pop
+      PDFoffset add PDFfile exch setfileposition
+    } if
+   checkgeneration { Objects exch 2 index put } { pop pop null } ifelse
+ } bind def
+
+% When resolving an object reference, we stop at the endobj.
+/resolveopdict mark
+  valueopdict { } forall
+  /endobj { endobj exit } bind
+.dicttomark readonly def
+/resolveR		% <object#> <generation#> resolveR <object>
+ { DEBUG { (%Resolving: ) print 2 copy 2 array astore == } if
+   1 index unresolved?
+    { PDFfile fileposition 3 1 roll
+      1 index readxrefentry
+      3 1 roll checkgeneration
+       {		% Stack: savepos objpos obj#
+	 exch PDFoffset add PDFfile exch setfileposition
+	 PDFfile token pop 2 copy ne
+	  { (xref error!\n) print /resolveR cvx /rangecheck signalerror
+	  }
+	 if pop PDFfile token pop
+	 PDFfile token pop /obj ne
+	  { (xref error!\n) print /resolveR cvx /rangecheck signalerror
+	  }
+	 if
+	 pdf_run_resolve	% PDFfile resolveopdict .pdfrun
+       }
+       { Objects exch null put pop null
+       }
+      ifelse exch PDFfile exch setfileposition
+    }
+    { pop Objects exch get
+    }
+   ifelse
+ } bind def      
+
+%================================ Streams ================================ %
+
+% We represent a stream by an executable dictionary that contains,
+% in addition to the contents of the original stream dictionary:
+%	/File - the file or string where the stream contents are stored;
+%	/FilePosition - iff File is a file, the position in the file
+%	  where the contents start.
+%	/StreamKey - the key used to decrypt this stream if any
+% We do the real work of constructing the data stream only when the
+% contents are needed.
+
+% Construct a stream.  The length is not reliable in the face of
+% different end-of-line conventions, but it's all we've got.
+%
+% PDF files are inconsistent about what may fall between the 'stream' keyword
+% and the actual stream data, and it appears that no one algorithm can
+% detect this reliably.  Furthermore, if we are already reading from a stream,
+% we can't back it up to determine what terminated the keyword.
+% We think the following is the best we can do:
+%	If we are already reading from a stream, skip the next character
+%	after the keyword terminator iff it is a \n.
+% This is chancy if the data are in binary form, but such files are
+% questionable to begin with.
+/streamskipeols
+ {		% We used to use the following algorithm:
+%    { PDFsource read not { /stream cvx /syntaxerror signalerror } if
+%      dup 10 eq 1 index 13 eq or not { PDFsource exch unread exit } if pop
+%    }
+%   loop
+		% But the one described above seems to work more often:
+    PDFsource read not { /stream cvx /syntaxerror signalerror } if
+    dup 10 ne { PDFsource exch unread } { pop } ifelse
+ } bind def
+/stream
+ { PDFsource PDFfile eq
+    { dup /File PDFfile put
+		% We used to do the following:
+%      prevline pop pop
+      streamskipeols
+      dup /FilePosition PDFfile fileposition put
+      DEBUG { (%FilePosition: ) print dup /FilePosition get == } if
+      PDFfile fileposition 1 index /Length oget add
+        PDFfile exch setfileposition
+    }
+    {	% We're already reading from a stream, which we can't reposition.
+	% Capture the sub-stream contents in a string.
+      streamskipeols
+      dup /Length oget string PDFsource exch readstring
+      not
+       { (Unexpected EOF in stream!\n) print
+	 /stream cvx /rangecheck signalerror
+       }
+      if
+      1 index exch /File exch put
+    }
+   ifelse
+   PDFsource token pop
+     /endstream ne { /stream cvx /syntaxerror signalerror } if
+   cvx
+ } bind def
+
+% Resolve a stream dictionary to a PostScript stream.
+% Streams with no filters require special handling:
+%	- If we are going to interpret their contents, we let endstream
+%	  terminate the interpretation loop;
+%	- If we are just going to read data from them, we impose
+%	  a SubFileDecode filter that reads just the requisite amount of data.
+% Note that, in general, resolving a stream repositions PDFfile.
+% Clients must save and restore the position of PDFfile themselves.
+/resolvestream		% <streamdict> <readdata?> resolvestream <stream>
+ { exch dup /FilePosition .knownget
+    { 1 index /File get exch setfileposition }
+   if
+		% Stack: readdata? dict
+   dup /DecodeParms .knownget not { null } if
+   1 index /Filter .knownget not { {} } if
+   dup type /nametype eq
+    { 1 array astore
+      1 index null ne { exch 1 array astore exch } if
+    }
+   if
+		% Stack: readdata? dict parms filternames
+   2 index /File get exch
+		% Stack: readdata? dict parms file/string filternames
+   pdf_decrypt_stream		% add decryption if needed
+   dup length 0 eq
+    {		% All the PDF filters have EOD markers, but in this case
+		% there is no specified filter.
+      pop exch pop
+		% Stack: readdata? dict file/string
+      2 index
+       {	% We're going to read data; use a SubFileDecode filter.
+	 1 index /Length oget () /SubFileDecode filter
+       }
+       { dup type /filetype ne
+	  {	% Use a SubFileDecode filter to read from a string.
+	    0 () SubFileDecode filter
+	  }
+	 if
+       }
+      ifelse
+    }
+    { 2 index null eq
+       { { filter }
+       }
+       {	% Stack: readdata? dict parms file/string filtername
+         { 2 index 0 get dup null eq { pop } { exch } ifelse filter
+	   exch dup length 1 sub 1 exch getinterval exch
+	 }
+       }
+      ifelse forall exch pop
+    }
+   ifelse
+		% Stack: readdata? dict file
+   exch pop exch pop
+ } bind def
+/endstream { exit } def
+
+end			% pdfdict
+.setglobal
