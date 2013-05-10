@@ -1,0 +1,503 @@
+<HTML>
+<HEAD>
+	<META NAME="Author" CONTENT="Michael Sweet">
+        <META NAME="Translator" CONTENT="Marian REYT-LLABRES">
+	<TITLE>Un aperçu de CUPS (Common UNIX Printing System)</TITLE>
+	<LINK REL=STYLESHEET TYPE="text/css" HREF="cupsdoc.css">
+</HEAD>
+<BODY>
+<TABLE WIDTH="100%">
+<TR VALIGN=TOP>
+	<TD><IMG SRC="images/cups-large.gif" WIDTH="103" HEIGHT="120"></TD>
+	<TD><H1 ALIGN="RIGHT">Un aperçu de CUPS <BR>
+	(Common UNIX Printing System),<BR>
+	Version 1.1</H1>
+
+	<P ALIGN="RIGHT">July 10, 2000<BR>
+	Michael Sweet, Easy Software Products<BR>
+	Copyright 1998-2005, All Rights Reserved.</P>
+	<P ALIGN="RIGHT">Traduction française - 27/06/2002 : Marian REYT-LLABRES (mrl21_pub <i>at</i> netcourrier.com).</P>
+	</TD>
+</TR>
+</TABLE>
+
+<P>Ce document décrit le logiciel CUPS<SUP>TM</SUP> (Common UNIX Printing
+System<SUP>TM</SUP>), un système d'impression portable et extensible pour UNIX<SUP>&reg;</SUP>.
+CUPS est développé par
+<A HREF="http://www.easysw.com">Easy Software Products</A>, un éditeur logiciel
+implanté à Hollywood, Maryland qui vend des logiciels commerciaux pour UNIX depuis 1993
+par le biais de plus de 40 distributeurs répartis dans plus de 80 pays de par le monde.
+
+<P>Des informations supplémentaires sur CUPS sont disponibles sur le Web à l'adresse "<A HREF="http://www.cups.org">http://www.cups.org</A>".
+
+<H2>Avant-propos</H2>
+
+<P><hr width="50%" size="1px" color="#000000"><I><b>Note du traducteur : </b>Amies lectrices, amis lecteurs, j'ai fait le choix de <b>ne pas traduire</b> l'expression anglaise <b>"default"</b> par la 
+version française
+habituellent utilisée <b>"par défaut"</b> que l'on doit, entre autres, à la documentation d'un célèbre système d'exploitation "ouvert à tous vents".
+<br /><br />
+En effet, l'expression "par défaut" est normalement utilisée en mathématiques (arrondi "par défaut" ou "par excès", 
+personnellement je cherche encore mon "imprimante par excès" !)
+mais elle est abusivement employée en informatique pour signifier "donnée/comportement qui s'applique si l'on n'en 
+précise pas <b>explicitement</b> la valeur/nature/teneur".
+<br /><br />
+Or la langue française possède justement un mot pout exprimer ce concept 
+: "implicite" (Larousse 1998 : "Qui est contenu dans une proposition sans être exprimé en termes précis formels; qui est la 
+conséquence nécessaire."). Dans la mesure du possible, j'utiliserai
+cet adjectif sauf dans les cas où son emploi n'est pas suffisamment <b>explicite</b> (sic !). Je lui
+préfèrerai alors l'expression "... de base ..." ou l'adjectif "standard".
+<br /><br />
+Ce choix est totalement personnel et le fait que j'ai fait l'effort (non négligeable) de traduire ces lignes pour vos yeux délicats suffit à le justifier! Si, par malheur, ma prose vous est insupportable,
+je ne vous empêche aucunement de vous reporter à la version originale où vous retrouverez "default" entouré de tout le
+reste... en anglais, bien sûr. Enfin, si vous avez une meilleure traduction, je suis preneur !
+<br /><br />
+Malgré les très nombreuses relectures et corrections, certaines fautes de frappe, d'orthographe ou de grammaire ont pu échapper à ma vigilance (ou à celles de mes relecteurs/correcteurs). Merci de me les signaler afin de contribuer à
+l'amélioration constante de la qualité du présent manuel.
+<br /><br />
+Bonne lecture !
+</I><hr width="50%" size="1px" color="#000000"></P>
+
+
+<P>
+Historiquement, l'impression sous UNIX a toujours été réalisée en utilisant
+un des deux systèmes d'impression - le Berkeley Line Printer Daemon ("LPD") [RFC1179]
+et l'AT&amp;T Line Printer. Ces systèmes d'impression ont été conçus dans les années 70 pour
+imprimer du texte sur des imprimantes matricielles à aiguilles; les constructeurs ont
+depuis ajouté divers systèmes de pilotage sur bien d'autres types d'imprimantes.
+
+<P>
+Des remplaçants pour ces systèmes d'impression ont émergé [LPRng,
+Palladin, PLP], cependant aucun d'eux n'a fondamentalement changé les capacités de ces systèmes historiques.
+
+<P>
+Au cours des dernières années, plusieurs tentatives de développement
+d'une interface d'impression standard ont été faites, celles-ci incluant le projet
+de standard d'impression POSIX développé par l'IEEE (Institute of Electrical and Electronics
+Engineers, Inc.) [IEEE-1387.4] ainsi que le protocole IPP (Internet Printing
+Protocol) développé par l'IETF (Internet Engineering Task Force) par le biais du PWG
+(Printer Working Group) [IETF-IPP]. Le standard d'impression POSIX définit un ensemble commun
+d'outils en ligne de commande ainsi qu'une interface C pour l'administration des
+imprimantes et des travaux d'impression, mais il a été abandonné par l'IEEE.
+
+<P>Le protocole IPP définit des extensions au protocole HTTP 1.1 (Hypertext Transport Protocol)
+[RFC2616] afin de fournir le support pour un service d'impression à distance.
+IPP/1.0 a été accepté par l'IETF comme une RFC (Request For Comments - Requête pour commentaires )
+expérimentale en octobre 1999. Depuis lors, le PWG (Printing Working Group) a développé un jeu
+de spécifications mises à jour pour IPP/1.1 qui a été accepté par l'IETF et attendent leur publication
+en tant que proposition de standard. Contrairement au système d'impression POSIX, IPP enthousiasme les
+acteurs de l'industrie et est en passe de devenir la solution standard d'impression via réseau pour tous
+les systèmes d'exploitation.
+
+<P>CUPS utilise le protocole IPP/1.1 pour fournir un système d'impression complet et moderne
+pour UNIX qui peut être étendu pour prendre en charge d'autres imprimantes, périphériques et protocoles tout
+en fournissant une compatibilité avec les applications UNIX existantes. CUPS est un logiciel libre distribué
+conformément aux termes de la licence GPL (General Public License).
+
+<H2>Historique</H2>
+
+
+<P>La première version de production de CUPS (basée sur le protocole IPP/1.0) a été réalisée
+en octobre 1999. Depuis ce jour, nous avons réalisé diverses mises à jour du produit original CUPS 1.0 qui
+concernaient la sécurité, la portabilité et des corrections de bogues, mais aucune nouvelle fonctionnalité n'a été
+ajoutée, ceci afin de garantir la stabilité du code de CUPS
+
+<P>CUPS 1.1 est basé sur IPP/1.1 et ajoute nombre des améliorations fonctionnelles qui ont été demandées
+par les utilsateurs. Comme pour la version 1.0, CUPS 1.1 sera suivie de mises à jour qui résoudront tout
+problème découvert sur le logiciel, mais elles n'ajouteront aucune nouvelle fonctionnalité.
+
+<H2>Aperçu de l'architecture</H2>
+
+<P>Comme la plupart des systèmes d'impression, CUPS est conçu autour d'un processus d'ordonnancement central qui
+répartit les travaux d'impression, exécute des tâches d'administration, fournit des informations sur l'état des imprimantes
+aux programmes locaux et distants, et informe les utilisateurs si nécessaire. La Figure 1 montre la base de l'organisation de CUPS.
+
+<CENTER><IMG SRC="images/cups-block-diagram.gif" WIDTH="470" HEIGHT="170"></CENTER>
+<P ALIGN="CENTER">Figure 1 - Diagramme de l'architecture globale de CUPS</P>
+
+<H3>L'ordonnanceur (Scheduler)</H3>
+
+<P>L'ordonnanceur est une application serveur HTTP 1.1 qui traite les requêtes HTTP. En plus de
+traiter les demandes reçues par le biais de requêtes IPP POST, l'ordonnanceur agit également comme un serveur
+"web" totalement fonctionnel qui ouvre l'accès à la documentation, à la surveillance de l'état du système et
+ à son administration.
+
+
+<P>L'ordonnanceur maintient également une liste des imprimantes disponibles sur le réseau local (LAN) et répartit
+les travaux d'impression si nécessaire en employant les filtres ou les programmes appropriés.
+
+<H3>Fichiers de configuration</H3>
+
+Les fichiers se répartissent de la manière suivante :
+
+<UL>
+
+	<LI>Le fichier de configuration du serveur HTTP.
+
+	<LI>Les fichiers de définition des imprimantes et des classes d'imprimantes.
+
+	<LI>Les fichiers décrivant les règles de conversion des types MIME.
+
+	<LI>Les fichiers PPD (PostScript Printer Description).
+
+</UL>
+
+<P>Le fichier de configuration du serveur HTTP est conçu dans la même optique que celle du fichier de configuration du serveur Apache et
+définit toutes les règles de contrôle d'accès pour le serveur.
+
+<P>Les fichiers de définition des imprimantes et des classes d'imprimantes listent les classes d'imprimantes et les
+files d'impression disponibles. Les classes d'imprimantes sont des collections d'imprimantes. Les travaux
+d'impression envoyés à une classe sont transmis à la première imprimante disponible de la classe selon un méthode de type "round-robin".
+
+<P>Les fichiers de définition des types MIME listent les différents types MIME pris en charge (texte simple, postscript, etc...)
+et des règles "magiques" pour détecter automatiquement le format d'un fichier. Ils sont utilisés par le serveur
+HTTP pour renseigner le champ <I>Content-Type</I> des requêtes <I>GET</I> et <I>HEAD</I>, et par le
+gestionnaire de requêtes IPP pour déterminer le type de fichier lorsqu'une requête <I>Print-Job</I> ou <I>Send-File</I>
+est reçue avec un champ <I>document-format</I> contenant la valeur <I>application/octet-stream</I>.
+
+<P>Les fichiers de règles de conversion MIME listent les filtres disponibles. Les filtres sont utilisés
+quand un travail d'impression est soumis, de sorte qu'une application puisse envoyer un format de fichier
+adapté au système d'impression qui convertit alors le document dans un format imprimable. Chaque filtre a un
+coût relatif associé, et l'algorithme de filtrage choisit le jeu de filtres qui permettra de convertir le
+fichier avec un coût minimal.
+
+<P>Les fichiers PPD décrivent les capacités de toutes les imprimantes, pas seulement celles de type PostScript.
+Il y a un fichier PPD pour chaque imprimante. Les fichier PPD pour les imprimantes non-PostScript définissent des
+filtres additionnels au moyen des attributs <I>cupsFilter</I> afin de prendre en charge les pilotes d'imprimantes.
+
+<H3>L'API CUPS</H3>
+
+<P>L'API CUPS contient des fonctions spécifiques à CUPS pour mettre en file d'attente les travaux
+d'impression, récupérer de l'information sur les imprimantes, accéder aux ressources via les
+protocoles HTTP et IPP, manipuler les fichiers PPD. Contrairement au reste de CUPS, l'API CUPS
+est distribuée conformément aux termes de la licence LGPL ainsi elle peut être utilisée par des
+applications non-GPL.
+
+<H3>Commandes de type Berkeley et System V</H3>
+
+<P>CUPS fournit une interface en ligne de commande de type System V et Berkeley pour soumettre des travaux
+d'impression et vérifier l'état des imprimantes. Les commandes <CODE>lpstat</CODE> et <CODE>lpc status</CODE>
+affichent aussi les imprimantes réseau ("imprimante@serveur") lorsque l'exploration réseau des imprimantes ("printer browsing") est activée.
+
+<P>Les commandes d'administration de type System V sont fournies pour administrer les imprimantes et les classes
+d'imprimantes. L'outil d'administration d'imrpimante Berkeley <CODE>lpc</CODE> est uniquement pris en charge en mode
+"lecture seule" pour vérifier l'état actuel des files d'impression et de l'ordonnanceur.
+
+<H3>Filtres</H3>
+
+<P>Un programme de filtrage lit les données depuis l'entrée standard ou depuis un fichier si un nom de fichier est indiqué.
+Tous les filtres doivent prendre en charge un jeu commun d'options incluant le nom d'imprimante, ne n°
+d'identification du travail d'impression (ID), le nom de l'utilisateur, le nombre de copies,
+et des options pour le travail d'impression. Toute sortie est envoyée vers la sortie standard.
+
+<P>Des filtres sont fournis pour de nombreux formats de fichiers y compris les fichiers image et des filtres
+PostScript "matriciels" <i>(NdT : "raster" = au sens où le document imprimé est en fait une image générée par une trame de points,
+par exemple une imprimante à jet d'encre est de type "matriciel" même si l'impression ne se fait pas au moyen
+d'aiguilles venant frapper un ruban et déposer de l'encre sur le papier, souvenirs, souvenirs...)</i> qui prennent
+en charge les
+imprimantes non-PostScript <i>(NdT : par opposition, le langage PostScript est un langage de description de
+page de type vectoriel)</i>. Plusieurs filtres sont exécutés
+en parallèle pour produire le format de sortie désiré.
+
+<P>Le filtre PostScript "matriciel" est basé sur le coeur du logiciel GNU Ghostscript 5.50. Au lieu
+d'utiliser l'application d'arrière-plan et les pilotes d'imprimantes Ghostscript, le filtre CUPS utilise un
+pilote "matriciel" d'imprimante générique et une application d'arrière-plan compatible CUPS pour prendre en
+compte toute imprimante de type "matriciel". Ceci permet d'employer le même filtre de pilote d'impression
+pour imprimer des données de type "matriciel" provenant de n'importe quel filtre. <i>(NdT : je suis preneur de toute information ou tout éclaircissement qui pourrait me permettre de produire une
+meilleure traduction pour les trois paragraphes précédents.)</i>
+
+<H3>Rendu d'image dans CUPS</H3>
+
+<P>La librairie de rendu d'image de CUPS fournit des fonctions pour manipuler
+des images de grande taille, faire des conversions de palettes et des manipulations
+sur les couleurs, dimensionner les images en vue de l'impression et administrer les flux de données
+pour les pages de type "matriciel". Elle est utilisée par les filtres de fichiers image de CUPS,
+et tous les pilotes d'imprimantes de type "matriciel".
+
+<H3>Programmes d'arrière-plan (Backends)</H3>
+
+<P>Un programme d'arrière-plan est programme qui envoie des données d'impression à un périphérique ou
+à une connexion réseau. Des programmes d'arrière-plan pour port parallèle, port série, USB, LPD, IPP,
+et les connexions AppSocket (JetDirect)  sont fournis dans CUPS 1.1.
+
+<P>Les versions de SAMBA commençant à partir de la version 2.0.6. incluent un programme d'arrière-plan SMB
+(<CODE>smbspool(1)</CODE>) qui peut être employé avec CUPS 1.0 ou 1.1 pour imprimer vers des
+machines Windows.
+
+<H2>Impression réseau</H2>
+
+<P>Traditionnellement, l'impression réseau a toujour été l'une des choses les plus difficiles à faire
+fonctionner sous UNIX. Une des raisons est que chaque fabricant ou vendeur a ajouté ses propres extensions
+au protocol LPD (le standard précédent pour l'impression réseau), rendant l'impression inter-plateformes difficile
+voire impossible.
+
+<P>Une autre raison est que vous devez administrer chaque imprimante réseau sur chaque machine cliente.
+Dans certains cas, vous pouvez clôner la configuration à partir d'un original pour tous les autres postes, mais
+même cette méthode peut être une perte de temps et une source d'erreur. Quelque chose de mieux est nécessaire.
+
+<P>CUPS fournit l'exploration des imprimantes réseau ("printer browsing") qui autorise les clients à
+voir et utiliser automatiquement les imprimantes de tout serveur sur le réseau local (LAN). Cela signifie que
+vous devez seulement configurer le serveur et les clients verront automatiquement les imprimantes et les classes
+d'imprimantes définies sur celui-ci.
+
+<P>En plus de cela, CUPS peut automatiquement fusionner plusieurs imprimantes réseau identiques en des
+classes implicites <i>(NdT : le terme "implicite" est ici la traduction littérale du même mot anglais "implicit" et non celle de l'expression "default". Cf. ma note en tête du présent manuel.)</i>. Cela permet aux clients de soumettre des travaux d'impression à une classe implicite et que
+ceux-ci soient imprimés sur la première imprimante ou le premier serveur disponible. En plus de cela, des fonctions de
+répartition de charge et de tolérance de panne sont activées en définissant simplement la même imprimante sur plusieurs serveurs!
+
+<H2>Nouvelles fonctionnalités dans CUPS 1.1</H2>
+
+<P>CUPS 1.1 inclut de nombreuses nouvelles fonctionnalités et caractéristiques:
+
+<OL>
+
+	<LI><A HREF="#BACKENDS">Programmes d'arrière-plan (Backends)</A>
+
+	<LI><A HREF="#BANNERS">Support des pages de garde (Banner Page)</A>
+
+	<LI><A HREF="#DIGEST">Authentication "Digest"</A>
+
+	<LI><A HREF="#DIRSVC">Services d'annuaires</A>
+
+	<LI><A HREF="#FHS2">Changement de stucture des répertoires</A>
+
+	<LI><A HREF="#DOCOS">Documentation</A>
+
+	<LI><A HREF="#DRIVERS">Pilotes</A>
+
+	<LI><A HREF="#FILTERS">Filtres</A>
+
+	<LI><A HREF="#IPP">Prise en charge IPP</A>
+
+	<LI><A HREF="#PERSISTENCE">Persistance des travaux d'impression</A>
+
+	<LI><A HREF="#LPD">Prise en charge des clients LPD</A>
+
+	<LI><A HREF="#USEROPTS">Imprimantes et options définies par l'utilisateur</A>
+
+	<LI><A HREF="#WEB">Interface d'administration "web"</A>
+
+</OL>
+
+<H3><A NAME="BACKENDS">1. Programmes d'arrière-plan (Backends)</A></H3>
+
+<P>CUPS 1.1 implémente une nouvelle interface pour les programmes d'arrière-plan afin de récupérer
+la liste des périphériques disponibles pour les clients CUPS. Ceci permet aux interfaces d'administration
+d'interroger l'ordonnanceur CUPS pour obtenir une liste des périphériques disponibles, configurer automatiquement
+les imprimante si les informations d'identification du périphérique sont disponibles, et présenter une liste à
+l'utilisateur plutôt que compter sur celui-ci pour savoir quels périphériques sont réellement disponibles sur son système.
+
+
+<P>La nouvelle version  inclut un programme d'arrière-plan pour les imprimantes USB sous
+*BSD et GNU/Linux. La prise en charge USB sous Solaris 8 sera fournie dans une prochaine mise à
+jour du produit.
+
+<H3><A NAME="BANNERS">2. Pages de garde (Banner Page)</A></H3>
+
+<P>CUPS 1.1 inclut la prise en charge des page de garde au début et à la fin d'un travail d'impression. Les
+pages de garde peuvent être dans n'importe quel format de fichier et prennent en charge la substitution de
+variable pour le titre des travaux d'impression, les noms d'utilisateurs, etc. Des pages de garde implicites
+("par défaut") peuvent être associées à chaque imprimante et peuvent être outrepassées par l'utilisateur
+au moyen des options sur la ligne de commande.
+
+<H3><A NAME="DIGEST">3. Authentification "Digest"</A></H3>
+
+<P>L'authentification "Digest" fournit une méthode plus sécurisée pour
+accéder au système d'impression. Contrairement à l'authentification "Basic", l'authentification "Digest"
+n'envoie pas de mots de passe en clair sur le réseau ainsi il est plus difficile d'avoir un accès non
+autorisé à votre système.
+
+<P>CUPS 1.1 implémente l'authentification "Digest" en utilisant un fichier de mot de passe MD5 spécial
+au lieu du fichier de mots de passe UNIX. Ce fichier est administré au moyen de la commande <CODE>lppasswd</CODE>.
+
+<H3><A NAME="DIRSVC">4. Services d'annuaires</A></H3>
+
+<P>CUPS 1.1 ajoute une nouvelle fonctionnalité de service d'annuaire ("printer browsing" = exploration des
+imprimantes) pour permettre d'employer plus facilement CUPS sur de grands réseaux locaux (LAN) ou des réseaux WAN.
+Vous pouvez maintenant surveiller un serveur distant pour obtenir des informations d'impression et les relayer
+sur le LAN, ainsi que limiter les informations d'impression qui sont traitées (par exemple, cacher des serveurs,
+des domaines ou des réseaux que vous ne voulez pas voir).
+
+<H3><A NAME="FHS2">5. Changement de structure de répertoires</A></H3>
+
+<P>CUPS 1.1 utilise désormais une structure de répertoire conforme à la version 2.0 des recommandations FHS ("Filesystem Hierarchy Standard")
+Ceci devrait rendre son intégration dans des distributions *BSD ou GNU/Linux plus facile.
+
+<H3><A NAME="DOCOS">6. Documentation</A></H3>
+
+<P>La documentation de CUPS 1.1 a subi de nombreuses révisions incluant une réécriture complète du guide de
+l'administrateur, un nouveau guide du programmeur et un manuel de référence de l'implémentation du protocole IPP.
+<i>(NdT : ...et maintenant, une traduction française d'une partie celle-ci... ;o)</i>
+
+<H3><A NAME="DRIVERS">7. Pilotes</A></H3>
+
+<P>CUPS 1.1 inclut des pilotes pour imprimantes matricielles à aiguilles et jet d'encre EPSON.
+Comme pour les pilots HP PCL, les pilotes EPSON ne fournissent pas forcément la meilleure sortie possible pour
+chaque imprimante mais devrait produire une qualité suffisante pour les impressions de la vie courante.
+
+<H3><A NAME="FILTERS">8. Filtres</A></H3>
+
+<P>CUPS 1.1 inclut de nouveaux filtres image, PostScript, PDF et texte. Les filtres image ont
+été mis à jour pour prendre en charge les fichiers Windows BMP et Alias PIX.
+
+<P>Le filtre PostScript est maintenant basé sur GNU/Ghostscript 5.50. Le nouveau filtre fournit des performances
+bien meilleures avec les imprimantes haute résolution et prend en charge la plupart des caractéristiques du
+langage PostScript 3.
+
+<P>Le nouveau filtre PDF est basé sur l'excellent programme Xpdf de Derek Noonburg et prend en charge la mise
+à l'échelle automatique de page. Le nouveau filtre est plus rapide, plus petit, un remplaçant plus avantageux
+pour le filtre PDF GNU/Ghostscript qui était utilisé dans CUPS 1.0.
+
+<P>Le nouveau filtre texte prend à présent en charge le texte bidirectionnel et peut encapsuler les polices
+de caractères si nécessaire.
+
+<H3><A NAME="IPP">9. Support IPP</A></H3>
+
+<P>La partie la moins visible de CUPS est probablement le support IPP. CUPS 1.1 implémente toutes les opérations
+et attributs requis dans le protocole IPP/1.1 et la plupart de ceux qui sont facultatifs.Les opérations optionnelles
+Create-Job et Send-File sont maintenant implémentées, permettant une meilleur compatibilité avec les systèmes
+d'impression de type System V (un n° de travail d'impression par commande <CODE>lp</CODE>) et le support des pages
+de garde.
+
+<H3><A NAME="PERSISTENCE">10. Persistance des travaux d'impression</A></H3>
+
+<P>CUPS 1.1 supporte la persistance des travaux d'impression. Cela signifie que les travaux d'impression sont
+préservés même après un redémarrage du système, une fonctionnalité qui était malheureusement absente de CUPS 1.0.
+
+<P>En plus de cela, CUPS 1.1 vous permet de conserver des informations sur un travail d'impression après que le
+travail ait été imprimé. Le mode de base de persistance de travaux d'impression fournit un historique des travaux
+(nombre de pages imprimées, heure de soumission du travail, etc...) mais ne conserve pas les fichiers réels du
+travail d'impression. Cela peut être changé pour supprimer toute information sur les travaux d'impression après
+qu'ils aient été imprimés ou pour conserver les fichiers réels des travaux d'impression de manière à pouvoir
+les resoumettre ultérieurement.
+
+<H3><A NAME="LPD">11. Support de clients LPD</A></H3>
+
+<P>A la demande générale, CUPS 1.1 prend en charge les client basés sur LPD au moyen d'un nouveu mini démon qui
+traite les requêtes LPD et les transmet au serveur principal.
+
+<H3><A NAME="USEROPTS">12. Imprimantes et options définies par l'utilisateur</A></H3>
+
+<P>CUPS 1.1 inclut la prise en charge d'imprimantes et d'options définies par l'utilisateur via une nouvelle
+commande <CODE>lpoptions</CODE>. Les imprimantes définies par l'utilisateur sont des instances spéciales
+d'imprimantes disponibles (par exemple "imprimante/instance" ou "imprimante@serveur/instance") qui peuvent avoir
+leur propre options de base telles la taille du papier, la résolution, et ainsi de suite.
+La commande <CODE>lpoptions</CODE> peut également être utilisée pour définir une autre file d'impression implicite.
+
+<H3><A NAME="WEB">13. Interface d'administration "web"</A></H3>
+
+<P>CUPS 1.0 fournissait une interface très limitée pour la surveillance des classes d'imprimantes, des travaux
+d'impression et des imprimantes au moyen des navigateurs web. CUPS 1.1 remplace cette interface par une interface
+d'administration améliorée qui vous permet d'ajouter, modifier, supprimer, configurer et contrôler les classes
+d'imprimantes, les travaux d'impression et les imprimantes.
+
+<H2>Logiciels utilisant CUPS</H2>
+
+<P>Il s'est passé beaucoup de choses depuis que CUPS 1.0 est sorti, et beaucoup de produits logiciels prennent en
+charge CUPS. Nous avons contribué au code de l'équipe SAMBA pour prendre en charge CUPS, et une partie de cela
+est déjà disponible dans SAMBA 2.0.6 et 2.0.7. Avec un peu de chance, les pièces finales qui fournissent une
+complète intégration dans SAMBA seront disponibles dans la prochaine version de SAMBA.
+
+<P>Deux interfaces graphiques utilisant CUPS ont également vu le jour. Le projet KUPS fournit une interface
+pour CUPS basée sur KDE et peut être trouvée à l'adresse :
+
+<UL><PRE>
+<A HREF="http://kups.sourceforge.net">http://kups.sourceforge.net</A>
+</PRE></UL>
+
+<P>Le projet XPP ("X Printing Panel") fournit une interface graphique de panneau d'impression pour CUPS et
+peut être trouvé à l'adresse:
+
+<UL><PRE>r
+<A HREF="http://www.phy.uni-bayreuth.de/till/xpp">http://www.phy.uni-bayreuth.de/till/xpp/</A>
+</PRE></UL>
+
+<P>De nombreux autres filtres, pilotes et tutoriels, etc ont été rendus disponibles dans le "bazaar" CUPS à
+l'adresse:
+
+<UL><PRE>
+<A HREF="http://www.cups.org/bazaar.cgi">http://www.cups.org/bazaar.cgi</A>
+</PRE></UL>
+
+<P>Finalement, notre propre logiciel ESP Print Pro utilise CUPS pour fournir des pilotes pour des milliers
+d'imprimantes et peut être trouvé à l'adresse:
+
+<UL><PRE>
+<A HREF="http://www.easysw.com/printpro">http://www.easysw.com/printpro</A>
+</PRE></UL>
+
+<H2>Systèmes d'exploitation utilisant CUPS</H2>
+
+<P>Un de nos buts a toujours été d'amener autant de distributions UNIX et GNU/Linux que possible à utiliser CUPS.
+Debian fournit actuellement CUPS dans sa distribution stable, et beaucoup d'autres distributions projettent
+d'en faire autant dans leurs prochaines versions.
+
+<H2>Résumé</H2>
+
+<P>Le système CUPS fournit une interface d'impression moderne pour les applications UNIX qui est à la fois
+flexible et ergonomique. Le logiciel fournit des interfaces sur ligne de commande compatibles avec System V et Berkeley pour
+assurer la compatibilité avec les applications existantes. CUPS 1.1 ajoute de nombreuses nouvelles fonctionnalités
+qui en font encore plus un excellent choix pour imprimer sous UNIX.
+
+<H2>Qui contacter ?</H2>
+
+<P>Pour de plus amples informations, contactez-nous à:
+
+<UL><PRE>
+Attn: CUPS Information
+Easy Software Products
+44141 Airport View Drive Suite 204
+Hollywood, Maryland 20636 USA
+
++1.301.373.9600
+
+<A HREF="mailto:cups-info@cups.org">cups-info@cups.org</A>
+</PRE></UL>
+
+<H2>Références</H2>
+
+<DL>
+
+	<DT>IEEE-1387.4</DT>
+
+	<DD>System Administration - Part 4: Printing Interfaces (draft)</DD>
+
+	<DT><A HREF="http://www.pwg.org/ipp/index.html">IETF-IPP</A></DT>
+
+	<DD>Internet Printing Protocol/1.1</DD>
+
+	<DT><A HREF="http://www.astart.com/lprng.html">LPRng</A></DT>
+
+	<DD>An enhanced, extended, and portable implementation of the
+	Berkeley LPR print spooler functionality</DD>
+
+	<DT>Palladin</DT>
+
+	<DD>A printing system developed at the Massachussetts Institute
+	of Technology</DD>
+
+	<DT><A HREF="http://www-usa.iona.com//hyplan/jmason/plp.html">PLP</A></DT>
+
+	<DD>The Portable Line Printer spooler system</DD>
+
+	<DT><A HREF="http://www.ietf.org/rfc/rfc1179.txt">RFC1179</A></DT>
+
+	<DD>Line Printer Daemon Protocol</DD>
+
+	<DT><A HREF="http://www.ietf.org/rfc/rfc2046.txt">RFC2046</A></DT>
+
+	<DD>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</DD>
+
+	<DT><A HREF="http://www.ietf.org/rfc/rfc2616.txt">RFC2616</A></DT>
+
+	<DD>Hypertext Transfer Protocol -- HTTP/1.1</DD>
+
+</DL>
+
+<H2>Trademarks</H2>
+
+<P>The Common UNIX Printing System, CUPS, and the CUPS logo are the
+trademark property of Easy Software Products. All other trademarks are
+the property of their respective owners.
+
+</BODY>
+</HTML>

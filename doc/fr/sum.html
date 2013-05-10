@@ -1,0 +1,1785 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<TITLE>CUPS - Manuel de l'utilisateur</TITLE>
+<META NAME="author" CONTENT="Easy Software Products">
+<META NAME="copyright" CONTENT="Copyright 1997-2003, All Rights Reserved">
+<META NAME="docnumber" CONTENT="CUPS-SUM-1.1.14">
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+--></STYLE>
+</HEAD>
+<BODY BGCOLOR="white">
+<CENTER><A HREF="#CONTENTS"><IMG SRC="images/cups-large.gif" BORDER="0" WIDTH="431" HEIGHT="511" ALT="CUPS - Manuel de l'utilisateur"><BR>
+<H1>CUPS - Manuel de l'utilisateur</H1></A><BR>
+CUPS-SUM-1.1.14<BR>
+Easy Software Products<BR>
+Copyright 1997-2003, All Rights Reserved<BR>
+</CENTER>
+<HR NOSHADE>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">Table des mati&egrave;res</A></H1>
+<BR>
+<BR><B><A HREF="#1">Pr&eacute;face</A></B>
+<UL>
+<LI><A HREF="#1_1">Aper&ccedil;u du syst&egrave;me</A></LI>
+<LI><A HREF="#1_2">Aper&ccedil;u du document</A></LI>
+<LI><A HREF="#1_3">Conventions d'&eacute;critures</A></LI>
+<LI><A HREF="#1_4">Abr&eacute;viations</A></LI>
+<LI><A HREF="#1_5">Autres r&eacute;f&eacute;rences</A></LI>
+</UL>
+<B><A HREF="#OVERVIEW">1 - Aper&ccedil;u du syst&egrave;me d'impression</A></B>
+<UL>
+<LI><A HREF="#2_1">Le probl&egrave;me d'impression</A></LI>
+<LI><A HREF="#2_2">La technologie</A></LI>
+<LI><A HREF="#2_3">Travaux d'impression</A></LI>
+<LI><A HREF="#2_4">Classes d'imprimantes</A></LI>
+<LI><A HREF="#2_5">Filtres</A></LI>
+<LI><A HREF="#2_6">Programmes d'arri&egrave;re-plan (Backends)</A></LI>
+<LI><A HREF="#2_7">Pilotes d'imprimantes</A></LI>
+<LI><A HREF="#2_8">R&eacute;seau</A></LI>
+</UL>
+<B><A HREF="#USING_SYSTEM">2 - Utilisation du syst&egrave;me d'impression</A></B>
+<UL>
+<LI><A HREF="#3_1">Soumission de travaux &agrave; l'impression</A></LI>
+<LI><A HREF="#3_2">Choix d'une imprimante</A></LI>
+<LI><A HREF="#3_3">R&eacute;glage des options d'imprimante</A></LI>
+<LI><A HREF="#3_4">Impression de plusieurs copies</A></LI>
+<LI><A HREF="#3_5">V&eacute;rification de l'&eacute;tat d'une imprimante depuis la
+ ligne de commande</A></LI>
+<LI><A HREF="#3_6">V&eacute;rification de l'&eacute;tat d'un imprimante depuis
+ l'interface &quot;web&quot;</A></LI>
+<LI><A HREF="#3_7">Suppression d'un travail d'impression</A></LI>
+</UL>
+<B><A HREF="#STANDARD_OPTIONS">3 - Options standards d'imrimante</A></B>
+<UL>
+<LI><A HREF="#4_1">Options g&eacute;n&eacute;rales</A>
+<UL>
+<LI><A HREF="#4_1_1">R&eacute;glage de l'orientation</A></LI>
+<LI><A HREF="#4_1_2">Choix du type, de la taille et de la source du
+ support d'impression</A></LI>
+<LI><A HREF="#4_1_3">Impression en recto/verso</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#4_2">Options de pages de garde</A>
+<UL>
+<LI><A HREF="#4_2_1">S&eacute;lection des pages de garde</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#4_3">Options de document</A>
+<UL>
+<LI><A HREF="#4_3_1">S&eacute;lection d'une s&eacute;rie de pages</A></LI>
+<LI><A HREF="#4_3_2">S&eacute;lection des pages paires et impaires</A></LI>
+<LI><A HREF="#4_3_3">Impression de plusieurs pages par face du support
+ (&quot;N-Up Printing&quot;)</A></LI>
+<LI><A HREF="#4_3_4">R&eacute;glage de la luminosit&eacute;</A></LI>
+<LI><A HREF="#4_3_5">R&eacute;glage de la correction Gamma</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#4_4">Options de texte</A>
+<UL>
+<LI><A HREF="#4_4_1">R&eacute;glage du nombre de caract&egrave;res par pouce</A></LI>
+<LI><A HREF="#4_4_2">R&eacute;glage du nombre de lignes par pouce</A></LI>
+<LI><A HREF="#4_4_3">R&eacute;glage du nombre de colonnes</A></LI>
+<LI><A HREF="#4_4_4">R&eacute;glage des marges de la page</A></LI>
+<LI><A HREF="#4_4_5">Impression am&eacute;lior&eacute;e</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#4_5">Options d'image</A>
+<UL>
+<LI><A HREF="#4_5_1">Positionnement de l'image</A></LI>
+<LI><A HREF="#4_5_2">Mise &agrave; l'&eacute;chelle de l'image</A></LI>
+<LI><A HREF="#4_5_3">Ajustement de la teinte (&quot;Hue&quot;, &quot;Tint&quot;) de l'image</A>
+</LI>
+<LI><A HREF="#4_5_4">Ajustement de la saturation de couleur de l'image</A>
+</LI>
+</UL>
+</LI>
+<LI><A HREF="#4_6">Options HP-GL/2</A>
+<UL>
+<LI><A HREF="#4_6_1">Impression en noir</A></LI>
+<LI><A HREF="#4_6_2">Ajuster le trac&eacute; &agrave; la page</A></LI>
+<LI><A HREF="#4_6_3">R&eacute;glage de la largeur implicite de trac&eacute;</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#4_7">Sortie brute ou non filtr&eacute;e</A></LI>
+</UL>
+<B><A HREF="#SAVING_OPTIONS">4 - Sauvegarder les options et valeurs
+ implicites des r&eacute;glages d'imprimante</A></B>
+<UL>
+<LI><A HREF="#5_1">Options d'imprimante</A></LI>
+<LI><A HREF="#5_2">R&eacute;glage des options pour une imprimante sp&eacute;cifique</A>
+</LI>
+<LI><A HREF="#5_3">Visualisation des r&eacute;glages implicites actuels</A></LI>
+<LI><A HREF="#5_4">Choix de l'imprimante implicite</A></LI>
+<LI><A HREF="#5_5">Instances d'imprimantes</A></LI>
+<LI><A HREF="#5_6">Retirer des instances d'imprimantes</A></LI>
+</UL>
+<B><A HREF="#LICENSE">A - Licence d'utilisation du logiciel (NdT : en
+ anglais)</A></B>
+<UL>
+<LI><A HREF="#6_1">Common UNIX Printing System License Agreement</A>
+<UL>
+<LI><A HREF="#6_1_1">Introduction</A></LI>
+<LI><A HREF="#6_1_2">Trademarks</A></LI>
+<LI><A HREF="#6_1_3">Binary Distribution Rights</A></LI>
+<LI><A HREF="#6_1_4">Support</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#6_2">GNU GENERAL PUBLIC LICENSE</A>
+<UL>
+<LI><A HREF="#6_2_1">Preamble</A></LI>
+</UL>
+</LI>
+<LI><A HREF="#6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A>
+<UL>
+<LI><A HREF="#6_3_1">Preamble</A></LI>
+</UL>
+</LI>
+</UL>
+<HR NOSHADE>
+<H1 ALIGN="RIGHT"><A NAME="1">Pr&eacute;face</A></H1>
+<P>Ce manuel de l'utilisateur d&eacute;crit comment utiliser le logiciel CUPS<SUP>
+TM</SUP> (&quot;Common Unix Printing System<SUP>TM</SUP>&quot;) Version 1.1.14.</P>
+<P></P>
+<HR color="#000000" size="1px" width="50%"><I><B>Note du traducteur :</B>
+ Amies lectrices, amis lecteurs, j'ai fait le choix de<B> ne pas
+ traduire</B> l'expression anglaise<B> &quot;default&quot;</B> par la version
+ fran&ccedil;aise habituellent utilis&eacute;e<B> &quot;par d&eacute;faut&quot;</B> que l'on doit,
+ entre autres, &agrave; la documentation d'un c&eacute;l&egrave;bre syst&egrave;me d'exploitation
+ &quot;ouvert &agrave; tous vents&quot;.
+<BR>
+<BR> En effet, l'expression &quot;par d&eacute;faut&quot; est normalement utilis&eacute;e en
+ math&eacute;matiques (arrondi &quot;par d&eacute;faut&quot; ou &quot;par exc&egrave;s&quot;, personnellement je
+ cherche encore mon &quot;imprimante par exc&egrave;s&quot; !) mais elle est abusivement
+ employ&eacute;e en informatique pour signifier &quot;donn&eacute;e/comportement qui
+ s'applique si l'on n'en pr&eacute;cise pas<B> explicitement</B> la
+ valeur/nature/teneur&quot;.
+<BR>
+<BR> Or la langue fran&ccedil;aise poss&egrave;de justement un mot pout exprimer ce
+ concept : &quot;implicite&quot; (Larousse 1998 : &quot;Qui est contenu dans une
+ proposition sans &ecirc;tre exprim&eacute; en termes pr&eacute;cis formels; qui est la
+ cons&eacute;quence n&eacute;cessaire.&quot;). Dans la mesure du possible, j'utiliserai cet
+ adjectif sauf dans les cas o&ugrave; son emploi n'est pas suffisamment<B>
+ explicite</B> (sic !). Je lui pr&eacute;f&egrave;rerai alors l'expression &quot;... de
+ base ...&quot; ou l'adjectif &quot;standard&quot;.
+<BR>
+<BR> Ce choix est totalement personnel et le fait que j'ai fait l'effort
+ (non n&eacute;gligeable) de traduire ces lignes pour vos yeux d&eacute;licats suffit
+ &agrave; le justifier! Si, par malheur, ma prose vous est insupportable, je ne
+ vous emp&ecirc;che aucunement de vous reporter &agrave; la version originale o&ugrave; vous
+ retrouverez &quot;default&quot; entour&eacute; de tout le reste... en anglais, bien s&ucirc;r.
+ Enfin, si vous avez une meilleure traduction, je suis preneur !
+<BR>
+<BR> Malgr&eacute; les tr&egrave;s nombreuses relectures et corrections, certaines
+ fautes de frappe, d'orthographe ou de grammaire ont pu &eacute;chapper &agrave; ma
+ vigilance (ou &agrave; celles de mes relecteurs/correcteurs). Merci de me les
+ signaler afin de contribuer &agrave; l'am&eacute;lioration constante de la qualit&eacute; du
+ pr&eacute;sent manuel.
+<BR>
+<BR> Bonne lecture !</I>
+<HR color="#000000" size="1px" width="50%">
+<H2><A NAME="1_1">Aper&ccedil;u du syst&egrave;me</A></H2>
+<P>CUPS fournit une couche d'impression portable pour les syst&egrave;mes
+ d'exploitation de type UNIX&reg;. Il a &eacute;t&eacute; d&eacute;velopp&eacute; par <A HREF="http://www.easysw.com">
+Easy Software Products</A> pour promouvoir une solution d'impression
+ standard pour tous les vendeurs et utilisateurs d'UNIX. CUPS fournit
+ des interfaces en ligne de commande de type System V et Berkeley.</P>
+<P>CUPS utilise le protocol IPP (Internet Printing Protocol) comme base
+ de l'administration des travaux et files d'impression. Les protocoles
+ LPD (&quot;Line Printer Daemon&quot;), SMB (&quot;Server Message Block&quot;), et AppSocket
+ (JetDirect) sont &eacute;galement pris en charge avec des fontionnalit&eacute;s
+ r&eacute;duites. CUPS ajoute l'exploration r&eacute;seau des imprimantes (&quot;network
+ printer browsing&quot;) et des options d'impression bas&eacute;es sur PPD
+ (&quot;PostScript Printer Definition&quot;) pour prendre en charge l'impression
+ &quot;dans le monde r&eacute;el&quot; sous UNIX.</P>
+<P>CUPS inclut &eacute;galement une version adapt&eacute;e de GNU/Ghostscript
+ (actuellement bas&eacute;e sur la version 5.50) et un module de rendu (RIP -
+ Raster Image Processor) pour fichier image qui sont utilis&eacute;s pour
+ prendre en charge les imprimantes non-PostScript. Des pilotes d'exemple
+ (incluant ces filtres) pour imprimantes HP et EPSON sont &eacute;galement
+ inclus.</P>
+
+<!-- NEED 2in -->
+<H2><A NAME="1_2">Aper&ccedil;u du document</A></H2>
+<P>Le pr&eacute;sent manuel de l'utilisateur s'articule autour sections
+ suivantes:</P>
+<UL>
+<LI><A HREF="#OVERVIEW">1 - Aper&ccedil;u du syst&egrave;me d'impression</A></LI>
+<LI><A HREF="#USING_SYSTEM">2 - Utilisation du syst&egrave;me d'impression</A></LI>
+<LI><A HREF="#STANDARD_OPTIONS">3 - Options standards pour imprimante</A>
+</LI>
+<LI><A HREF="#SAVING_OPTIONS">4 - Sauvegarde des options et valeurs
+ implicites des r&eacute;glages d'imprimante</A></LI>
+<LI><A HREF="#LICENSE">A - Licence d'utilisation du logiciel<I> (NdT :
+ en anglais)</I></A></LI>
+</UL>
+<H2><A NAME="1_3">Conventions d'&eacute;critures</A></H2>
+ Diverses conventions de polices de caract&egrave;res et de syntaxe sont
+ utilis&eacute;es dans ce guide. Des exemples et leur signification sont donn&eacute;s
+ ci-dessous:
+<CENTER>
+<TABLE WIDTH="80%">
+<TR><TH>Exemple</TH><TD>&nbsp;&nbsp;&nbsp;</TD><TH>Description</TH></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP"><TD><CODE>lpstat</CODE>
+<BR> <CODE>lpstat(1)</CODE></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD> Les noms des commandes;
+ La premi&egrave;re r&eacute;f&eacute;rence faite &agrave; une commande ou une fonction dans un
+ chapitre est suivie par un num&eacute;ro de section de page de manuel.</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP"><TD><VAR>/var</VAR>
+<BR><VAR> /usr/share/cups/data/testprint.ps</VAR></TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD>
+ Noms de fichiers et de r&eacute;pertoires.</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP"><TD NOWRAP><TT>Request ID is Printer-123</TT></TD><TD>
+ &nbsp;&nbsp;&nbsp;</TD><TD>Affichage &eacute;cran.</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP"><TD NOWRAP><KBD>lp -d imprimante nom_fichier ENTREE</KBD>
+</TD><TD> &nbsp;&nbsp;&nbsp;</TD><TD>Frappe litt&eacute;rale de l'utilisateur; les touches
+ sp&eacute;ciales telles que <KBD>ENTREE</KBD> sont repr&eacute;sent&eacute;es en lettres
+ capitales.</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR VALIGN="TOP"><TD>12.3</TD><TD>&nbsp;&nbsp;&nbsp;</TD><TD> Les nombres dans le texte
+ sont &eacute;crits avec un point symbolisant le s&eacute;parateur d&eacute;cimal.</TD></TR>
+</TABLE>
+</CENTER>
+
+<!-- NEED 3in -->
+<H2><A NAME="1_4">Abr&eacute;viations</A></H2>
+ Les abr&eacute;viations suivantes sont utilis&eacute;es au cours de ce manuel:
+<UL>
+<DL>
+<DT>ko</DT>
+<DD>Kilo-octets, ou 1024 octets
+<BR> &nbsp;</DD>
+<DT>Mo</DT>
+<DD>M&eacute;ga-octets, ou 1048576 octets
+<BR> &nbsp;</DD>
+<DT>Go</DT>
+<DD>Giga-octets, ou 1073741824 octets
+<BR> &nbsp;</DD>
+</DL>
+</UL>
+<H2><A NAME="1_5">Autres r&eacute;f&eacute;rences</A></H2>
+<UL>
+<DL>
+<DT>CUPS - Manuel de l'administrateur</DT>
+<DD>Un guide d'administration du logiciel CUPS.
+<BR> &nbsp;</DD>
+<DT>CUPS - Manuel du programmeur<I> (NdT : en anglais)</I></DT>
+<DD>Un guide du programmeur pour cr&eacute;er des programmes qui s'interfacent
+ avec et/ou &eacute;tendent le logiciels CUPS.
+<BR> &nbsp;</DD>
+</DL>
+</UL>
+<H1 ALIGN="RIGHT"><A NAME="OVERVIEW">1 - Aper&ccedil;u du syst&egrave;me d'impression</A>
+</H1>
+<P>Ce chapitre fournit un aper&ccedil;u du fonctionnement de CUPS.</P>
+<H2><A NAME="2_1">Le probl&egrave;me d'impression</A></H2>
+<P>Depuis des ann&eacute;es<I> le probl&egrave;me d'impression</I> a empoisonn&eacute; le
+ monde UNIX. Contrairement &agrave; Microsoft&reg; Windows&reg; ou Mac OS, UNIX n'a pas
+ d'interface standard ou de syst&egrave;me en place pour prendre en charge les
+ imprimantes. Parmi les solutions actuellement disponibles, les syst&egrave;mes
+ Berkeley et System V sont pr&eacute;dominants.</P>
+<P> Ces syst&egrave;mes d'impressions prennent en charge les imprimantes de
+ type matriciel texte ou les imprimantes PostScript (texte et
+ graphique), et avec quelques ajustements il peuvent prendre en charge
+ un grand nombre d'imprimantes et de formats de fichiers. Cependant,
+ puisque chaque version de syst&egrave;me d'exploitation UNIX utilise un
+ syst&egrave;me d'impression diff&eacute;rent de celui de son voisin, il est
+ extr&ecirc;mement difficile de d&eacute;velopper des pilotes d'imprimantes pour une
+ vaste gamme d'imprimantes et de syst&egrave;mes d'exploitation. Ceci, combin&eacute;
+ au faible nombre de clients pour chaque variante d'UNIX, a pouss&eacute; les
+ fabricants d'imprimantes &agrave; abandonner la prise en charge globale de
+ tous les UNIX.</P>
+<P> CUPS est con&ccedil;u pour &eacute;liminer<I> le probl&egrave;me d'impression</I>. Un
+ syst&egrave;me d'impression commun peut &ecirc;tre utilis&eacute; par toutes les variantes
+ d'UNIX pour prendre en charge les capacit&eacute;s d'impression dont les
+ utilisateurs ont besoin. Les fabricants d'imprimantes peuvent utiliser
+ l'interface modulaire des filtres pour d&eacute;velopper un unique pilote qui
+ prend en charge une large gamme de formats de fichiers et ce, sans
+ presque aucun effort. Etant donn&eacute; que CUPS fournit une interface
+ compatible avec les commandes Berkeley et System V, les utilisateurs
+ (et les applications) peuvent tirer b&eacute;n&eacute;fice de cette nouvelle
+ technologie sans avoir &agrave; faire de changements.</P>
+<H2><A NAME="2_2">La technologie</A></H2>
+<P> CUPS est bas&eacute; sur un standard &eacute;mergeant d'Internet appel&eacute; IPP
+ (Internet Printing Protocol). IPP a &eacute;t&eacute; adopt&eacute; par des douzaines de
+ fabricants d'imprimantes et de serveurs d'impression et est pris en
+ charge par Microsoft Windows 2000.</P>
+<P> IPP d&eacute;finit un protocole standard pour imprimer ainsi qu'administrer
+ les travaux d'impression et les options des imprimantes telles que la
+ taille du support d'impression, la r&eacute;solution, etc. Comme tout
+ protocole de la pile TCP/IP, IPP peut &ecirc;tre utilis&eacute; localement ou &agrave;
+ travers Internet pour atteindre des imprimantes &eacute;loign&eacute;es de centaines
+ ou de milliers de kilom&egrave;tres. Contrairement &agrave; d'autres protocoles de la
+ pile TCP/IP, IPP prend en charge le contr&ocirc;le d'acc&egrave;s,
+ l'authentification et l'encryptage, ce qui fait de lui une solution
+ d'impression bien plus efficace et s&eacute;curis&eacute;e que ses anc&ecirc;tres.</P>
+<P> IPP est une surcouche ajout&eacute;e au-dessus du protocole HTTP (HyperText
+ Transport Protocol) qui est &agrave; la base des serveurs &quot;web&quot; sur
+ l'Internet. Ceci permet aux utilisateurs de lire la documentation,
+ v&eacute;rifier les informations sur l'&eacute;tat des imprimantes ou du serveur,
+ administrer les imprimantes, les classes d'imprimantes et les travaux
+ d'impression en utilisant leur navigateur &quot;web&quot;.</P>
+<P> CUPS fournit un syst&egrave;me d'impression complet bas&eacute; sur IPP/1.1
+ prenant en charge l'authentification &quot;Basic&quot;, &quot;Digest&quot; et par
+ certificats locaux ainsi qu'un contr&ocirc;le d'acc&egrave;s bas&eacute; sur l'utilisateur,
+ le domaine ou l'adresse IP. L'encryptage TLS sera disponible dans une
+ future version de CUPS.</P>
+<H2><A NAME="2_3">Travaux d'impression</A></H2>
+<P> Tout fichier ou groupe de fichiers soumis &agrave; l'impression est appel&eacute;
+ un<I> travail d'impression</I>. Les travaux d'impression sont
+ identifi&eacute;s par un nombre unique en commen&ccedil;ant &agrave; 1 et sont affect&eacute;s &agrave;
+ une destination particuli&egrave;re, g&eacute;n&eacute;ralement une imprimante. Les travaux
+ d'impression peuvent &eacute;galement inclure des options associ&eacute;es telles que
+ la taille du support d'impression, le nombre de copies et la priorit&eacute;
+ dans la file d'impression.</P>
+<H2><A NAME="2_4">Classes d'imprimantes</A></H2>
+<P> CUPS prend en charge des collections d'imprimantes connues sous le
+ nom de<I> classes</I>. Les travaux d'impression transmis &agrave; une classe
+ d'imprimantes sont envoy&eacute;s &agrave; la premi&egrave;re imprimante disponible dans la
+ classe.</P>
+<H2><A NAME="2_5">Filtres</A></H2>
+<P>Les filtres permettent &agrave; un utilisateur ou une application d'imprimer
+ de nombreux types de documents sans effort suppl&eacute;mentaire. Les travaux
+ d'impressions envoy&eacute;s au serveur CUPS sont filtr&eacute;s avant d'&ecirc;tre envoy&eacute;s
+ &agrave; l'imprimante. Certains filtres convertissent les fichiers de travaux
+ d'impression dans diff&eacute;rents formats que l'imprimante peut comprendre.
+ D'autres ne font que des s&eacute;lections de page et des tris.</P>
+<P>CUPS fournit des filtres pour imprimer de nombreux types de fichiers
+ image, des fichier HP-GL/2, fichiers PDF et texte. CUPS fournit
+ &eacute;galement des filtres PostScript et RIP (Raster Image Processor) qui
+ convertissent les fichiers PostScript ou image en format &quot;bitmap&quot; qui
+ peut &ecirc;tre envoy&eacute; &agrave; une imprimante de type &quot;matriciel&quot; (NdT : il s'agit
+ ici, des imprimantes dont l'impression est g&eacute;n&eacute;r&eacute;e au moyen d'une
+ grille de points comme l'&eacute;taient les v&eacute;n&eacute;rables imprimantes &agrave; aiguilles
+ de notre enfance, mais pas seulement elles puisque les imprimantes &agrave;
+ jet d'encre actuelles sont &eacute;galement de type matriciel... par
+ opposition aux imprimantes laser dont la m&eacute;thode de g&eacute;n&eacute;ration
+ d'impression est diff&eacute;rente.)</P>
+<H2><A NAME="2_6">Programmes d'arri&egrave;re-plan (Backends)</A></H2>
+<P>Les programmes d'arri&egrave;re-plan effectuent le travail le plus important
+ : ils envoient les donn&eacute;es d'impression &agrave; l'imprimante.</P>
+<P>CUPS fournit des programmes d'arri&egrave;re-plan pour imprimer via des
+ ports de type parall&egrave;le, s&eacute;rie, USB et &agrave; travers un r&eacute;seau au moyen des
+ protocoles IPP, JetDirect (AppSocket) et LPD (Line Printer Daemon). Des
+ programmes d'arri&egrave;re-plan additionnels sont disponibles sous forme de
+ paquetage de service r&eacute;seau comme le programme d'arri&egrave;re_plan SMB
+ inclus dans le c&eacute;l&egrave;bre logiciel SAMBA.</P>
+<P>Les programmes d'arri&egrave;re-plan sont &eacute;galement utilis&eacute;s pour d&eacute;terminer
+ les p&eacute;riph&eacute;riques disponibles. Au d&eacute;marrage, chaque programme
+ d'arri&egrave;re-plan est interrog&eacute; afin de d&eacute;terminer la liste des
+ p&eacute;riph&eacute;riques qu'il prend en charge, ainsi que toute information
+ disponible. Cela permet au programme d'arri&egrave;re-plan de gestion du port
+ parall&egrave;re d'indiquer &agrave; CUPS qu'une imprimante EPSON Stylus Color 600
+ est branch&eacute;e sur le port parall&egrave;le 1, par exemple.</P>
+<H2><A NAME="2_7">Pilotes d'imprimantes</A></H2>
+<P>Les pilotes d'imprimantes de CUPS consistent en un ou plusieurs
+ filtres sp&eacute;cifiques &agrave; une imprimante. CUPS inclut des pilotes
+ d'imprimantes d'exemple pour les imprimantes Deskjet et LaserJet
+ Hewlett-Packard et les imprimantes EPSON jet d'encre couleur Stylus
+ Color, Stylus Photo et les mod&egrave;les 9 et 24 aiguilles matricielles. Bien
+ que ces pilotes ne produisent pas des impressions de qualit&eacute; optimale
+ pour les diff&eacute;rents mod&egrave;les d'imprimantes, ils fournissent une
+ impression de base et d&eacute;montrent comment vous pouvez &eacute;crire vos propres
+ pilotes d'imprimantes et les incorporer dans CUPS.</P>
+<H2><A NAME="2_8">R&eacute;seau</A></H2>
+<P>Les imprimantes et classes d'imprimantes sur le syst&egrave;me local sont
+ automatiquement partag&eacute;es avec les autres syst&egrave;mes sur le r&eacute;seau. Cela
+ vous permet de configurer un syst&egrave;me h&ocirc;te pour tous les autres. Les
+ utilisateurs pourront s&eacute;lectionner une imprimante locale par son nom ou
+ une imprimante &agrave; distance en utilisant la syntaxe
+ &quot;nom_imprimante@serveur&quot;.</P>
+<P>CUPS fournit &eacute;galement des<I> classes d'imprimantes implicites</I>
+ (NdT : le terme &quot;implicite&quot; est ici la traduction lit&eacute;rale du m&ecirc;me mot
+ anglais &quot;implicit&quot; et non celle de l'expression &quot;default&quot;. cf. ma
+ remarque dans la pr&eacute;face du pr&eacute;sent manuel. De toute fa&ccedil;on, CUPS ne
+ pr&eacute;voit pas de &quot;default class&quot; c'est-&agrave;-dire de &quot;classe de base&quot;, donc
+ aucune ambigu&iuml;t&eacute; possible ici.), qui sont des collections d'imprimantes
+ ou de classes d'imprimantes qui portent le m&ecirc;me nom. Cela vous permet
+ de configurer de multiples serveurs pointant vers la m&ecirc;me imprimante
+ r&eacute;seau physique, par exemple, de sorte que vous ne d&eacute;pendez pas d'un
+ seul serveur pour pouvoir imprimer. Etant donn&eacute; que cette m&eacute;thode vous
+ permet de travailler avec des classes d'imprimantes, vous pouvez
+ configurer de multiples serveurs et imprimantes sans jamais vous
+ soucier d'un simple point en panne tant que tous les autres serveurs ne
+ tombent pas en panne en m&ecirc;me temps.</P>
+<H1 ALIGN="RIGHT"><A NAME="USING_SYSTEM">2 - Utilisation du syst&egrave;me
+ d'impression</A></H1>
+<P>Ce chapitre expose comment soumettre, lister et annuler les travaux
+ d'impression sur diff&eacute;rentes imprimantes.</P>
+<H2><A NAME="3_1">Soumission de travaux &agrave; l'impression</A></H2>
+<P>CUPS fournit les deux commandes d'impression System V (<CODE>lp(1)</CODE>
+) et Berkeley ( <CODE>lpr(1)</CODE>). Tapez la commande suivante pour
+ imprimer un fichier sur l'imprimante implicite du syst&egrave;me:</P>
+<UL>
+<PRE>
+<B>lp nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>ou:</P>
+<UL>
+<PRE>
+<B>lpr nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>CUPS sait directement interpr&eacute;ter diff&eacute;rents types de fichier, y
+ compris les fichiers PostScript et image. Cela vous permet d'imprimer
+ depuis vos applications ou depuis la ligne de commande, selon votre
+ pr&eacute;f&eacute;rence!</P>
+<H2><A NAME="3_2">Choix d'une imprimante</A></H2>
+<P>Beaucoup de syst&egrave;mes disposeront de plusieurs imprimantes &agrave; offrir &agrave;
+ l'utilisateur. Ces imprimantes peuvent &ecirc;tre reli&eacute;es au syst&egrave;me local
+ par un port parall&egrave;le, s&eacute;rie ou USB, ou accessibles &agrave; travers le
+ r&eacute;seau.</P>
+<P>Utilisez la commande <CODE>lpstat(1)</CODE> pour voir une liste des
+ imprimantes disponibles:</P>
+<UL>
+<PRE>
+<B>lpstat -p -d ENTREE</B>
+</PRE>
+</UL>
+<P>L'option <CODE>-p</CODE> indique que vous voulez voir la liste des
+ imprimantes et l'option <CODE>-d</CODE> provoque l'affichage de
+ l'imprimante ou classe d'imprimantes standard (implicite) du syst&egrave;me.</P>
+<P>Utilisez l'option <CODE>-d</CODE> avec la comamnde <CODE>lp</CODE>
+ pour imprimer vers une imprimante sp&eacute;cifique:</P>
+<UL>
+<PRE>
+<B>lp -d imprimante nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>ou l'option <CODE>-P</CODE> avec la commande <CODE>lpr</CODE>:</P>
+<UL>
+<PRE>
+<B>lpr -P imprimante nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<H2><A NAME="3_3">R&eacute;glage des options d'imprimante</A></H2>
+<P>Pour de nombreux types de fichiers, les options d'imprimante
+ implicites devraient satisfaire vos besoins. Cependant, il peut arriver
+ que vous ayez besoin de changer les options pour un fichier sp&eacute;cifique
+ que vous imprimez.</P>
+<P>Les commandes <CODE>lp</CODE> et <CODE>lpr</CODE> vous permettent de
+ passer des options d'imprimante en utilisant l'option <CODE>-o</CODE>:</P>
+<UL>
+<PRE>
+<B>lp -o landscape -o scaling=75 -o media=A4 nom_fichier.jpg
+<B>lpr -o landscape -o scaling=75 -o media=A4 nom_fichier.jpg
+</B></B></PRE>
+</UL>
+<P>Les options d'imprimante disponibles varient en fonction de
+ l'imprimante. Les options standards sont d&eacute;crites dans le <A HREF="#STANDARD_OPTIONS">
+ Chapitre 3, &quot;Options standards d'imprimante&quot;</A>.</P>
+<H2><A NAME="3_4">Impression de plusieurs copies</A></H2>
+<P>Les deux commandes <CODE>lp</CODE> et <CODE>lpr</CODE> poss&egrave;dent des
+ options pour l'impression de plus d'une copie d'un fichier:</P>
+<UL>
+<PRE>
+<B>lp -n <I>nombre_copies</I> nom_fichier ENTREE</B>
+<B>lpr -#<I>nombre_copies</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Les copies ne sont g&eacute;n&eacute;ralement<I> pas</I> assembl&eacute;es. Utilisez
+ l'option <CODE>-o Collate=True</CODE> pour obtenir des copies
+ assembl&eacute;es:</P>
+<UL>
+<PRE>
+<B>lp -n <I>nombre_copies</I> -o Collate=True nom_fichier ENTREE</B>
+<B>lpr -#<I>nombre_copies</I> -o Collate=True nom_fichier ENTREE</B>
+</PRE>
+</UL>
+
+<!-- NEED 3in -->
+<H2><A NAME="3_5">V&eacute;rification de l'&eacute;tat d'une imprimante depuis la
+ ligne de commande</A></H2>
+<P>La commande <CODE>lpstat</CODE> peut &ecirc;tre utilis&eacute;e pour v&eacute;rifier les
+ travaux que vous avez soumis &agrave; l'impression:</P>
+<UL>
+<PRE>
+<B>lpstat ENTREE</B>
+Printer-1 johndoe 4427776
+Printer-2 johndoe 15786
+Printer-3 johndoe 372842
+</PRE>
+</UL>
+<P>Les travaux sont list&eacute;s dans l'ordre dans lequel ils seront imprim&eacute;s.
+ Utilisez l'option <CODE>-p</CODE> pour voir les travaux actifs sur
+ l'imprimante:</P>
+<UL>
+<PRE>
+<B>lpstat -p ENTREE</B>
+printer DeskJet now printing DeskJet-1.
+</PRE>
+</UL>
+
+<!-- NEED 2in -->
+<P>Utilisez les options <CODE>-o</CODE> et <CODE>-p</CODE> ensemble pout
+ voir les &agrave; la fois les travaux et les imprimantes:</P>
+<UL>
+<PRE>
+<B>lpstat -o -p ENTREE</B>
+Printer-1 johndoe 4427776
+Printer-2 johndoe 15786
+Printer-3 johndoe 372842
+printer DeskJet now printing DeskJet-1.
+</PRE>
+</UL>
+<H2><A NAME="3_6">V&eacute;rification de l'&eacute;tat d'un imprimante depuis
+ l'interface &quot;web&quot;</A></H2>
+<P>CUPS utilise le protocole IPP (Internet Printing Protocol), mais
+ c'est &eacute;galement un serveur &quot;web&quot; compl&egrave;tement fonctionnel. Pour
+ utiliser votre navigateur &quot;web&quot; pour surveiller les imprimantes sur
+ votre syst&egrave;me, ouvrez l'adresse:</P>
+<UL>
+<PRE>
+<A HREF="http://localhost:631">http://localhost:631</A>
+</PRE>
+</UL>
+<P>A partir de l&agrave;, vous pouvez voir l'&eacute;tat des classes, travaux, et
+ imprimantes par un simple clic de bouton!</P>
+<H2><A NAME="3_7">Suppression d'un travail d'impression</A></H2>
+<P>Les commandes <CODE>cancel(1)</CODE> et <CODE>lprm(1)</CODE>
+ suppriment un travail d'impression:</P>
+<UL>
+<PRE>
+<B>cancel <I>num&eacute;ro_travail</I> ENTREE</B>
+<B>lprm <I>num&eacute;ro_travail</I> ENTREE</B>
+</PRE>
+</UL>
+<P>Le <CODE>num&eacute;ro_travail</CODE> est le nombre qui vous est fourni par
+ les commandes <CODE>lp</CODE> ou <CODE>lpstat</CODE>.</P>
+<H1 ALIGN="RIGHT"><A NAME="STANDARD_OPTIONS">3 - Options standards
+ d'imrimante</A></H1>
+<P>Ce chapitre d&eacute;crit les options standards d'imprimante qui sont
+ disponibles lors de l'impression au moyen des commandes <CODE>lp</CODE>
+ et <CODE>lpr</CODE>.</P>
+<H2><A NAME="4_1">Options g&eacute;n&eacute;rales</A></H2>
+<P>Les options suivantes s'appliquent lors de l'impression de tous les
+ types de fichiers.</P>
+<H3><A NAME="4_1_1">R&eacute;glage de l'orientation</A></H3>
+<P>L'option <CODE>-o landscape</CODE> tournera la sortie imprim&eacute;e de 90&deg;
+ pour imprimer en mode paysage:</P>
+<UL>
+<PRE>
+<B>lp -o landscape nom_fichier ENTREE</B>
+<B>lpr -o landscape nom_fichier ENTREE</B>
+</PRE>
+</UL>
+
+<!-- NEED 2in -->
+<H3><A NAME="4_1_2">Choix du type, de la taille et de la source du
+ support d'impression</A></H3>
+<P>L'option <CODE>-o media=xyz</CODE> d&eacute;finit la taille, le type et la
+ source du support d'impression:</P>
+<UL>
+<PRE>
+<B>lp -o media=Letter nom_fichier ENTREE</B>
+<B>lp -o media=Letter,MultiPurpose nom_fichier ENTREE</B>
+<B>lpr -o media=Letter,Transparency nom_fichier ENTREE</B>
+<B>lpr -o media=Letter,MultiPurpose,Transparency nom_fichier ENTREE</B>
+</PRE>
+</UL>
+
+<!-- NEED 3in -->
+<P>Les tailles, types et sources de support d'impression disponibles
+ d&eacute;pendent de l'imprimante mais la plupart des mat&eacute;riels prennent en
+ charge les options suivantes (les plus courantes):</P>
+<UL>
+<LI><CODE>Letter</CODE> - US Letter (8.5x11 pouces, ou 216x279mm)</LI>
+<LI><CODE>Legal</CODE> - US Legal (8.5x14 pouces, ou 216x356mm)</LI>
+<LI><CODE>A4</CODE> - ISO A4 (8.27x11.69 pouces, ou 210x297mm)</LI>
+<LI><CODE>COM10</CODE> - US #10 Enveloppe (9.5x4.125 pouces, ou
+ 241x105mm)</LI>
+<LI><CODE>DL</CODE> - ISO DL Enveloppe (8.66x4.33 pouces, ou 220x110mm)</LI>
+<LI><CODE>Transparency</CODE> - Type de support transparent ou source de
+ support transparent</LI>
+<LI><CODE>Upper</CODE> - Bac d'alimentation sup&eacute;rieur</LI>
+<LI><CODE>Lower</CODE> - Bac d'alimentation inf&eacute;rieur</LI>
+<LI><CODE>MultiPurpose</CODE> - Bac papier multi-usage</LI>
+<LI><CODE>LargeCapacity</CODE> - Bac d'alimentation de grande capacit&eacute;</LI>
+</UL>
+<P>Les options r&eacute;ellement prises en charge sont d&eacute;finies dans le fichier
+ PPD de l'imprimante au moyen des options <CODE>PageSize</CODE>, <CODE>
+InputSlot</CODE>, et <CODE>MediaType</CODE>.</P>
+<H3><A NAME="4_1_3">Impression en recto/verso</A></H3>
+<P>Les options <CODE>-o sides=two-sided-short-edge</CODE> et <CODE>-o
+ sides=two-sided-long-edge</CODE> activeront l'impression recto/verso si
+ l'imprimante la prend en charge. L'option <CODE>-o
+ sides=two-sided-short-edge</CODE> convient pour les pages orient&eacute;es en
+ paysage, tandis que l'option <CODE>-o sides=two-sided-long-edge</CODE>
+ convient pour celles orient&eacute;es en portrait:</P>
+<UL>
+<PRE>
+<B>lp -o sides=two-sided-short-edge nom_fichier ENTREE</B>
+<B>lp -o sides=two-sided-long-edge nom_fichier ENTREE</B>
+<B>lpr -o sides=two-sided-long-edge nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>La valeur implicite est d'imprimer en mode simple face
+ (&quot;single-sided&quot;):</P>
+<UL>
+<PRE>
+<B>lp -o sides=one-sided nom_fichier ENTREE</B>
+<B>lpr -o sides=one-sided nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<H2><A NAME="4_2">Options de pages de garde</A></H2>
+<P>Les options suivantes s'appliquent &agrave; l'impression de tous les types
+ de fichiers.</P>
+<H3><A NAME="4_2_1">S&eacute;lection des pages de garde</A></H3>
+<P>L'option <CODE>-o jobsheets=start,end</CODE> d&eacute;finit les pages de
+ garde pour un travail d'impression:</P>
+<UL>
+<PRE>
+<B>lp -o job-sheets=none nom_fichier ENTREE</B>
+<B>lp -o job-sheets=standard nom_fichier ENTREE</B>
+<B>lpr -o job-sheets=classified,classified nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Si seulement un fichier de page de garde est indiqu&eacute; il sera imprim&eacute;
+ avant le travail d'impression. Si un second fichier de page de garde
+ est indiqu&eacute;, il sera imprim&eacute; apr&egrave;s le travail d'impression..</P>
+<P>Les pages de garde disponibles d&eacute;pendent de la configuration du
+ syst&egrave;me local; CUPS inclut les fichiers de pages de garde suivants:</P>
+<UL>
+<LI><CODE>none</CODE> - Ne pas produire de page de garde.</LI>
+<LI><CODE>classified</CODE> - Une page de garde avec une inscription
+ &quot;classified&quot; en haut et en bas de page.</LI>
+<LI><CODE>confidential</CODE> - Une page de garde avec une inscription
+ &quot;confidential&quot; en haut et en bas de page.</LI>
+<LI><CODE>secret</CODE> - Une page de garde avec une inscription
+ &quot;secret&quot; en haut et en bas de page.</LI>
+<LI><CODE>standard</CODE> - Une page de garde sans inscription en haut
+ et en bas de page.</LI>
+<LI><CODE>topsecret</CODE> - Une page de garde avec une inscription
+ &quot;top-secret&quot; en haut et en bas de page.</LI>
+<LI><CODE>unclassified</CODE> - Une page de garde avec une inscription
+ &quot;unclassified&quot; en haut et en bas de page.</LI>
+</UL>
+<H2><A NAME="4_3">Options de document</A></H2>
+<P>Les options suivantes s'appliquent &agrave; l'impression de tous les types
+ de fichiers.</P>
+<H3><A NAME="4_3_1">S&eacute;lection d'une s&eacute;rie de pages</A></H3>
+<P>L'option <CODE>-o page-ranges=pages</CODE> s&eacute;lectionne une s&eacute;rie de
+ pages &agrave; imprimer:</P>
+<UL>
+<PRE>
+<B>lp -o page-ranges=1 nom_fichier ENTREE</B>
+<B>lp -o page-ranges=1-4 nom_fichier ENTREE</B>
+<B>lp -o page-ranges=1-4,7,9-12 nom_fichier ENTREE</B>
+<B>lpr -o page-ranges=1-4,7,9-12 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Comme indiqu&eacute; ci-dessus, la valeur <CODE>pages</CODE> peut &ecirc;tre une
+ page unique, un intervalle de num&eacute;ros de pages ou une collections de
+ num&eacute;ros de pages et d'intervalles s&eacute;par&eacute;s par des virgules. Les pages
+ seront imprim&eacute;es dans l'ordre croissant de leurs num&eacute;ros, sans tenir
+ compte de l'ordre dans lequel les valeurs ont &eacute;t&eacute; tap&eacute;es dans l'option <CODE>
+page-ranges</CODE>.</P>
+<P>Le comportement implicite est d'imprimer toutes les pages.</P>
+<H3><A NAME="4_3_2">S&eacute;lection des pages paires et impaires</A></H3>
+<P>Utilisez l'option <CODE>-o page-set=set</CODE> pour s&eacute;lectionner les
+ pages paires ou impaires:</P>
+<UL>
+<PRE>
+<B>lp -o page-set=odd nom_fichier ENTREE</B>
+<B>lp -o page-set=even nom_fichier ENTREE</B>
+<B>lpr -o page-set=even nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Le comportement implicite est d'imprimer toutes les pages.</P>
+<H3><A NAME="4_3_3">Impression de plusieurs pages par face du support
+ (&quot;N-Up Printing&quot;)</A></H3>
+<P>L'option <CODE>-o number-up=value</CODE> s&eacute;lectionne l'impression de
+ plusieurs pages par face du support. Cela permet d'imprimer 1, 2 ou 4
+ pages du document d'origine sur une seule page physique en sortie:</P>
+<UL>
+<PRE>
+<B>lp -o number-up=1 nom_fichier ENTREE</B>
+<B>lp -o number-up=2 nom_fichier ENTREE</B>
+<B>lp -o number-up=4 nom_fichier ENTREE</B>
+<B>lpr -o number-up=4 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>La valeur implicite est 1.</P>
+<H3><A NAME="4_3_4">R&eacute;glage de la luminosit&eacute;</A></H3>
+<P>Vous pouvez contr&ocirc;ler la luminosit&eacute; globale de la sortie imprim&eacute;e en
+ utilisant l'option <CODE>-o brightness=percent</CODE>:</P>
+<UL>
+<PRE>
+<B>lp -o brightness=120 nom_fichier ENTREE</B>
+<B>lpr -o brightness=120 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Les valeurs sup&eacute;rieures &agrave; 100 &eacute;claircissent l'impression, tandis que
+ les valeurs inf&eacute;rieures &agrave; 100 l'assombrissent.</P>
+<H3><A NAME="4_3_5">R&eacute;glage de la correction Gamma</A></H3>
+<P>Vous pouvez contr&ocirc;ler la correction gamma goblale de la sortie
+ imprim&eacute;e en utilsiant l'option <CODE>-o gamma=value</CODE>:</P>
+<UL>
+<PRE>
+<B>lp -o gamma=1700 nom_fichier ENTREE</B>
+<B>lpr -o gamma=1700 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Les valeurs sup&eacute;rieures &agrave; 1000 &eacute;claircissent l'impression, tandis que
+ les valeurs inf&eacute;rieures &agrave; 1000 l'assombrissent. La valeur implicite est
+ 1000.</P>
+<H2><A NAME="4_4">Options de texte</A></H2>
+<P>Les options suivantes s'appliquent &agrave; l'impression de fichier texte.</P>
+<H3><A NAME="4_4_1">R&eacute;glage du nombre de caract&egrave;res par pouce</A></H3>
+<P>L'option <CODE>-o cpi=value</CODE> d&eacute;finit le nombre de caract&egrave;res
+ par pouce<I> (NdT : 1 pouce = 2,54 cm)</I>:</P>
+<UL>
+<PRE>
+<B>lp -o cpi=10 nom_fichier ENTREE</B>
+<B>lp -o cpi=12 nom_fichier ENTREE</B>
+<B>lpr -o cpi=17 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Le nombre implicite de caract&egrave;res par pouce est 10.</P>
+<H3><A NAME="4_4_2">R&eacute;glage du nombre de lignes par pouce</A></H3>
+<P>L'option <CODE>-o lpi=value</CODE> d&eacute;finit le nombre de lignes par
+ pouce:</P>
+<UL>
+<PRE>
+<B>lp -o lpi=6 nom_fichier ENTREE</B>
+<B>lpr -o lpi=8 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Le nombre implicite de lignes par pouces est 6.</P>
+<H3><A NAME="4_4_3">R&eacute;glage du nombre de colonnes</A></H3>
+<P>L'option <CODE>-o columns=value</CODE> d&eacute;finit le nombre de colonnes
+ de texte:</P>
+<UL>
+<PRE>
+<B>lp -o columns=2 nom_fichier ENTREE</B>
+<B>lpr -o columns=3 nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Le nombre de colonnes implicite est 1.</P>
+<H3><A NAME="4_4_4">R&eacute;glage des marges de la page</A></H3>
+<P>Normalement, les marges de la page sont fix&eacute;es par les limites
+ physiques de l'imprimante. Utilisez les options <CODE>-o
+ page-left=value</CODE>, <CODE>-o page-right=value</CODE> , <CODE>-o
+ page-top=value</CODE>, et <CODE>-o page-bottom=value</CODE> pour
+ ajuster les marges:</P>
+<UL>
+<PRE>
+<B>lp -o page-left=<I>valeur</I> nom_fichier ENTREE</B>
+<B>lp -o page-right=<I>valeur</I> nom_fichier ENTREE</B>
+<B>lp -o page-top=<I>valeur</I> nom_fichier ENTREE</B>
+<B>lp -o page-bottom=<I>valeur</I> nom_fichier ENTREE</B>
+<B>lpr -o page-bottom=<I>valeur</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>L'argument <CODE>valeur</CODE> est la marge en points; 1 point =
+ 1/72&egrave;me de pouce = 0.35mm.</P>
+<H3><A NAME="4_4_5">Impression am&eacute;lior&eacute;e</A></H3>
+<P>L'option <CODE>-o prettyprint</CODE> ajoute un en-t&ecirc;te en haut de
+ chaque page. Celui-ci comporte le num&eacute;ro de page, le titre du travail
+ d'impression (habituellement le nom du fichier), et la date. Les mots
+ clefs C, C++ et les lignes de commentaires sont &eacute;galement repr&eacute;sent&eacute;es
+ en italique:</P>
+<UL>
+<PRE>
+<B>lp -o prettyprint nom_fichier ENTREE</B>
+<B>lpr -o prettyprint nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<H2><A NAME="4_5">Options d'image</A></H2>
+<P>Les options suivantes s'appliquent lors de l'impression de fichiers
+ image.</P>
+<H3><A NAME="4_5_1">Positionnement de l'image</A></H3>
+<P>L'option <CODE>-o position=name</CODE> indique la position de l'image
+ dans la page:</P>
+<UL>
+<LI><CODE>center</CODE> - Centre l'image dans la page (valeur implicite)</LI>
+<LI><CODE>top</CODE> - Imprime l'image cal&eacute;e en haut de la page et
+ centr&eacute;e en largeur</LI>
+<LI><CODE>left</CODE> - Imprime l'image cal&eacute;e &agrave; gauche de la page et
+ centr&eacute;e en hauteur</LI>
+<LI><CODE>right</CODE> - Imprime l'image cal&eacute;e &agrave; droite de la page et
+ centr&eacute;e en hauteur</LI>
+<LI><CODE>top-left</CODE> - Imprime l'image cal&eacute;e dans le coin sup&eacute;rieur
+ gauche</LI>
+<LI><CODE>top-right</CODE> - Imprime l'image cal&eacute;e dans le coin
+ sup&eacute;rieur droit</LI>
+<LI><CODE>bottom</CODE> - Imprime l'image cal&eacute;e en bas de la page et
+ centr&eacute;e en largeur</LI>
+<LI><CODE>bottom-left</CODE> - Imprime l'image cal&eacute;e dans le coin
+ inf&eacute;rieur gauche</LI>
+<LI><CODE>bottom-right</CODE> - Imprime l'image cal&eacute;e dans le coin
+ inf&eacute;rieur droit</LI>
+</UL>
+<H3><A NAME="4_5_2">Mise &agrave; l'&eacute;chelle de l'image</A></H3>
+<P>Les options <CODE>-o scaling=percent</CODE>, <CODE>-o ppi=value</CODE>
+, et <CODE>-o natural-scaling=percent</CODE> changent la taille de
+ l'image imprim&eacute;e:</P>
+<UL>
+<PRE>
+<B>lp -o scaling=<I>percent</I> nom_fichier ENTREE</B>
+<B>lp -o ppi=<I>value</I> nom_fichier ENTREE</B>
+<B>lpr -o natural-scaling=<I>percent</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>La valeur <CODE>scaling=percent</CODE> est un nombre compris entre 1
+ et 800 indiquant la taille par rapport celle de la page (<I>pas celle
+ de l'image</I>). Un valeur de 100% va adapter l'image &agrave; la taille
+ maximale que permet la page (en fonction des contraintes impos&eacute;es par
+ le rapport hauteur/largeur de l'image). Une valeur de 200% imprimera
+ l'image r&eacute;partie sur 4 pages.</P>
+<P>La valeur <CODE>ppi=value</CODE> est un nombre compris entre 1 et
+ 1200 indiquant la r&eacute;solution de l'image en pixels par pouce. Une image
+ qui mesure 3000x2400 pixels s'imprimera sur le papier en 10x8 pouces &agrave;
+ une r&eacute;solution de 300 pixels par pouce (ppp ou, en anglais, dpi). Si la
+ r&eacute;solution indiqu&eacute;e donne une image plus grande que la page, plusieurs
+ pages sont imprim&eacute;es pour satisfaire la requ&ecirc;te.</P>
+<P>La valeur <CODE>natural-scaling=percent</CODE> est un nombre compris
+ entre 1 et 800 indiquant la taille d'impression de l'image relativement
+ &agrave; sa taille d'origine. Une valeur de 100% imprimera l'image dans sa
+ taille normale, tandis qu'une valeur de 50% donnera une taille moiti&eacute;
+ moins grande. Si la valeur indiqu&eacute;e donne une image plus grande que la
+ page, plusieurs pages sont imprim&eacute;es pour satisfaire la requ&ecirc;te.</P>
+<H3><A NAME="4_5_3">Ajustement de la teinte (&quot;Hue&quot;, &quot;Tint&quot;) de l'image</A>
+</H3>
+<P>La valeur <CODE>-o hue=value</CODE> ajustera la teinte (&quot;hue&quot;) de
+ l'image imprim&eacute;e, comme le r&eacute;glage de teinte de votre t&eacute;l&eacute;vision:</P>
+<UL>
+<PRE>
+<B>lp -o hue=<I>value</I> nom_fichier ENTREE</B>
+<B>lpr -o hue=<I>value</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+
+<!-- NEED 3in -->
+<P>L'argument <CODE>value</CODE> est un nombre compris entre -360 et 360
+ repr&eacute;sentant une rotation de teinte. Le tableau suivant, r&eacute;sume les
+ changements que vous verrez avec diff&eacute;rentes couleurs:
+<CENTER>
+<TABLE BORDER="1" WIDTH="50%">
+<TR><TH>Original</TH><TH>hue=-45</TH><TH>hue=45</TH></TR>
+<TR><TD>Rouge</TD><TD>Pourpre</TD><TD>Jaune-orange</TD></TR>
+<TR><TD>Vert</TD><TD>Jaune-vert</TD><TD>Bleu-vert</TD></TR>
+<TR><TD>Jaune</TD><TD>Orange</TD><TD>Vert-Jaune</TD></TR>
+<TR><TD>Bleu</TD><TD>Bleu ciel</TD><TD>Pourpre</TD></TR>
+<TR><TD>Magenta</TD><TD>Indigo</TD><TD>Rouge cramoisi</TD></TR>
+<TR><TD>Cyan</TD><TD>Bleu-vert</TD><TD>Blue marine clair</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<P>La valeur implicite de ce param&egrave;tre est 0.</P>
+<H3><A NAME="4_5_4">Ajustement de la saturation de couleur de l'image</A>
+</H3>
+<P>L'option <CODE>-o saturation=percent</CODE> ajuste la saturation des
+ couleurs de l'image, comme le bouton &quot;couleur&quot; de votre t&eacute;l&eacute;vision:</P>
+<UL>
+<PRE>
+<B>lp -o saturation=<I>percent</I> nom_fichier ENTREE</B>
+<B>lpr -o saturation=<I>percent</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>L'argument <CODE>percent</CODE> indique la saturation de couleur de 0
+ &agrave; 200. Une saturation de 0 produit une image en noir et blanc, tandis
+ qu'une valeur de 200 rend les couleurs extr&ecirc;mement intenses.</P>
+<P>La saturation implicite est de 100.
+<!-- NEED 4in -->
+</P>
+<H2><A NAME="4_6">Options HP-GL/2</A></H2>
+<P>Les options suivantes s'appliquent aux fichiers HP-GL/2.</P>
+<H3><A NAME="4_6_1">Impression en noir</A></H3>
+<P>L'option <CODE>-o blackplot</CODE> indique que tous les &quot;stylos&quot;
+ doivent &eacute;crire en noir:</P>
+<UL>
+<PRE>
+<B>lp -o blackplot nom_fichier ENTREE</B>
+<B>lpr -o blackplot nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>La valeur implicite est d'utiliser les couleurs d&eacute;finies dans le
+ fichier ou les couleurs standards de &quot;stylos&quot; d&eacute;finies dans le manuel
+ de r&eacute;f&eacute;rence HP-GL/2.</P>
+<H3><A NAME="4_6_2">Ajuster le trac&eacute; &agrave; la page</A></H3>
+<P>L'option <CODE>-o fitplot</CODE> indique que le trac&eacute; doit &ecirc;tre mis &agrave;
+ l'&eacute;chelle pour tenir sur la page:</P>
+<UL>
+<PRE>
+<B>lp -o fitplot nom_fichier ENTREE</B>
+<B>lpr -o fitplot nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>Le comportement implicite est d'utiliser les distances absolues
+ d&eacute;finies dans le fichier.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Cette fonctionnalit&eacute; d&eacute;pend d'une d&eacute;finition pr&eacute;cise de la commande
+ de taille de trac&eacute; (<CODE>PS</CODE>) dans le fichier HP-GL/2. Si aucune
+ taille de trac&eacute; n'est donn&eacute;e dans le fichier, alors le filtre HP-GL/2
+ consid&egrave;re que le trac&eacute; a une taille ANSI E.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<H3><A NAME="4_6_3">R&eacute;glage de la largeur implicite de trac&eacute;</A></H3>
+<P>L'option <CODE>-o penwidth=valeur</CODE> indique la valeur implicite
+ de largeur de trac&eacute; pour les fichiers HP-GL/2:</P>
+<UL>
+<PRE>
+<B>lp -o penwidth=<I>valeur</I> nom_fichier ENTREE</B>
+<B>lpr -o penwidth=<I>valeur</I> nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>La <CODE>valeur</CODE> de largeur de trac&eacute; d&eacute;finit la largeur de
+ &quot;stylo&quot; en microm&egrave;tres. La valeur implicite de 1000 produit des lignes
+ de 1 millim&egrave;tre de large. Indiquer une largeur de &quot;stylo&quot; de 0 produit
+ un trac&eacute; d'un pixel de large.
+<CENTER>
+<TABLE BGCOLOR="#cccccc" BORDER="1" CELLPADDING="5" WIDTH="80%">
+<TR><TD><B> NOTE:</B>
+<P>Cette option est ignor&eacute;e si les largeurs de trac&eacute; sont d&eacute;finies dans
+ le fichier.</P>
+</TD></TR>
+</TABLE>
+</CENTER>
+</P>
+<H2><A NAME="4_7">Sortie brute ou non filtr&eacute;e</A></H2>
+<P>L'option <CODE>-o raw</CODE> vous permet d'envoyer directement des
+ fichiers &agrave; l'imprimante sans faire de filtrage. Cela est parfois
+ n&eacute;cessaire lors que vous imprimez depuis des applications qui
+ fournissent leur propres &quot;pilotes d'imprimantes&quot; pour votre imprimante:</P>
+<UL>
+<PRE>
+<B>lp -o raw nom_fichier ENTREE</B>
+<B>lpr -o raw nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<P>L'option <CODE>-l</CODE> peut &eacute;galement &ecirc;tre utilis&eacute;e avec la
+ commande <CODE>lpr</CODE> pour envoyer directement des fichiers &agrave; une
+ imprimante:</P>
+<UL>
+<PRE>
+<B>lpr -l nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<H1 ALIGN="RIGHT"><A NAME="SAVING_OPTIONS">4 - Sauvegarder les options
+ et valeurs implicites des r&eacute;glages d'imprimante</A></H1>
+<P>Ce chapitre d&eacute;crit comment sauvegarder les options pour votre
+ imprimante et d&eacute;finir votre propre imprimante implicite.</P>
+<H2><A NAME="5_1">Options d'imprimante</A></H2>
+<P>Chaque imprimante prend en charge un grand nombre d'options, que vous
+ avez d&eacute;couvertes dans le <A HREF="#STANDARD_OPTIONS"> Chapitre 3,
+ &quot;Options standards d'imprimante&quot;</A>. Plut&ocirc;t qu'indiquer ces options &agrave;
+ chaque fois que vous imprimez un fichier, CUPS vous permet de
+ sauvegarder comme &quot;implicites&quot; les options pour votre imprimante.</P>
+<P>La commande <CODE>lpoptions(1)</CODE> sauvegarde les options de vos
+ imprimantes. Comme les commandes <CODE>lp</CODE> et <CODE>lpr</CODE>,
+ elle accepte les options d'imprimantes en utilisant l'argument <CODE>-o</CODE>
+:</P>
+<UL>
+<PRE>
+<B>lpoptions -o media=A4 -o sides=two-sided-long-edge ENTREE</B>
+<B>lpoptions -o media=Legal -o scaling=100 ENTREE</B>
+</PRE>
+</UL>
+<P>Une fois sauvegard&eacute;es, toute commande <CODE>lp</CODE> ou <CODE>lpr</CODE>
+ les utilisera lorsque vous imprimerez.</P>
+<H2><A NAME="5_2">R&eacute;glage des options pour une imprimante sp&eacute;cifique</A></H2>
+<P>L'exemple pr&eacute;c&eacute;dent montre comment r&eacute;gler les options pour
+ l'imprimante implicite. L'option <CODE>-p imprimante</CODE> indique que
+ les options sont pour une autre imprimante:</P>
+<UL>
+<PRE>
+<B>lpoptions -p laserjet -o media=A4 -o sides=two-sided-long-edge ENTREE</B>
+<B>lpoptions -p deskjet -o media=Legal -o scaling=100 ENTREE</B>
+</PRE>
+</UL>
+<H2><A NAME="5_3">Visualisation des r&eacute;glages implicites actuels</A></H2>
+<P>La commande <CODE>lpoptions</CODE> peut &eacute;galement &ecirc;tre utilis&eacute;e pour
+ afficher les options actuelles en n'indiquant aucune option sur la
+ ligne de commande:</P>
+<UL>
+<PRE>
+<B>lpoptions ENTREE</B>
+media=A4 sides=two-sided-long-edge
+<B>lpoptions -p deskjet ENTREE</B>
+media=Legal scaling=100
+</PRE>
+</UL>
+<H2><A NAME="5_4">Choix de l'imprimante implicite</A></H2>
+<P>L'administrateur d&eacute;finira g&eacute;n&eacute;ralement une imprimante implicite
+ valable pour tout le syst&egrave;me et qui sera utilis&eacute;e par tous. Utilisez
+ l'option <CODE>-d imprimante</CODE> pour d&eacute;finir votre propre
+ imprimante implicite:</P>
+<UL>
+<PRE>
+<B>lpoptions -d deskjet ENTREE</B>
+</PRE>
+</UL>
+<P>L'imprimante peut &ecirc;tre locale (<CODE>deskjet</CODE>) ou &agrave; distance (<CODE>
+deskjet@serveur</CODE>).</P>
+<H2><A NAME="5_5">Instances d'imprimantes</A></H2>
+<P>En plus de d&eacute;finir des r&eacute;glages pour chaque file d'impression, CUPS
+ prend en charge les<I> instances d'imprimantes</I> qui vous permettent
+ de d&eacute;finir diff&eacute;rents jeux d'options pour chaque imprimante. Vous
+ indiquez chaque instante en utilisant le caract&egrave;re &quot;slash&quot; (<CODE>/</CODE>
+):</P>
+<UL>
+<PRE>
+<B>lpoptions -p laserjet/duplex -o sides=two-sided-long-edge ENTREE</B>
+<B>lpoptions -p laserjet/legal -o media=Legal ENTREE</B>
+</PRE>
+</UL>
+<P>Les commandes <CODE>lp</CODE> et <CODE>lpr</CODE> comprennent
+ &eacute;galement la notation:</P>
+<UL>
+<PRE>
+<B>lp -d laserjet/duplex nom_fichier ENTREE</B>
+<B>lpr -P laserjet/legal nom_fichier ENTREE</B>
+</PRE>
+</UL>
+<H2><A NAME="5_6">Retirer des instances d'imprimantes</A></H2>
+<P>Utilisez l'option <CODE>-x imprimante/instance</CODE> pour retirer
+ une instance d'imprimante dont vous n'avez plus besoin:</P>
+<UL>
+<PRE>
+<B>lpoptions -x laserjet ENTREE</B>
+<B>lpoptions -x laserjet/duplex ENTREE</B>
+<B>lpoptions -x laserjet/legal ENTREE</B>
+</PRE>
+</UL>
+<P>L'option <CODE>-x</CODE> ne retire que les options implicites pour
+ cette instance d'imprimante. la file d'impression d'origine demeurera
+ jusqu'&agrave; suppression au moyen de la commande <CODE>lpadmin(8)</CODE> par
+ l'administrateur.</P>
+<H1 ALIGN="RIGHT"><A NAME="LICENSE">A - Licence d'utilisation du
+ logiciel<I> (NdT : en anglais)</I></A></H1>
+<H2 ALIGN="CENTER"><A NAME="6_1">Common UNIX Printing System License
+ Agreement</A></H2>
+<P ALIGN="CENTER">Copyright 1997-2003 by Easy Software Products
+<BR> 44141 AIRPORT VIEW DR STE 204
+<BR> HOLLYWOOD, MARYLAND 20636-3111 USA
+<BR>
+<BR> Voice: +1.301.373.9600
+<BR> Email:<A HREF="mailto:cups-info@cups.org"> cups-info@cups.org</A>
+<BR> WWW:<A HREF="http://www.cups.org"> http://www.cups.org</A></P>
+<H3><A NAME="6_1_1">Introduction</A></H3>
+<P>The Common UNIX Printing System<SUP>TM</SUP>, (&quot;CUPS<SUP>TM</SUP>&quot;),
+ is provided under the GNU General Public License (&quot;GPL&quot;) and GNU
+ Library General Public License (&quot;LGPL&quot;), Version 2. A copy of these
+ licenses follow this introduction.</P>
+<P>The GNU LGPL applies to the CUPS API library, located in the &quot;cups&quot;
+ subdirectory of the CUPS source distribution and in the
+ &quot;/usr/include/cups&quot; directory and &quot;libcups.a&quot;, &quot;libcups_s.a&quot;,
+ &quot;libcups.sl&quot;, or &quot;libcups.so&quot; files in the binary distributions.</P>
+<P>The GNU GPL applies to the remainder of the CUPS distribution,
+ including the &quot;pstoraster&quot; filter which is based upon GNU Ghostscript
+ 5.50 and the &quot;pdftops&quot; filter which is based upon Xpdf 0.93a.</P>
+<P>For those not familiar with the GNU GPL, the license basically allows
+ you to:</P>
+<UL>
+<LI>Use the CUPS software at no charge.</LI>
+<LI>Distribute verbatim copies of the software in source or binary form.</LI>
+<LI>Sell verbatim copies of the software for a media fee, or sell
+ support for the software.</LI>
+<LI>Distribute or sell printer drivers and filters that use CUPS so long
+ as source code is made available under the GPL.</LI>
+</UL>
+<P>What this license<B> does not</B> allow you to do is make changes or
+ add features to CUPS and then sell a binary distribution without source
+ code. You must provide source for any new drivers, changes, or
+ additions to the software, and all code must be provided under the GPL
+ or LGPL as appropriate.</P>
+<P>The GNU LGPL relaxes the &quot;link-to&quot; restriction, allowing you to
+ develop applications that use the CUPS API library under other licenses
+ and/or conditions as appropriate for your application.</P>
+<H3><A NAME="6_1_2">Trademarks</A></H3>
+<P>Easy Software Products has trademarked the Common UNIX Printing
+ System, CUPS, and CUPS logo. These names and logos may be used freely
+ in any direct port or binary distribution of CUPS. To use them in
+ derivative products, please contract Easy Software Products for written
+ permission. Our intention is to protect the value of these trademarks
+ and ensure that any derivative product meets the same high-quality
+ standards as the original.</P>
+<H3><A NAME="6_1_3">Binary Distribution Rights</A></H3>
+<P>Easy Software Products also sells rights to the CUPS source code
+ under a binary distribution license for vendors that are unable to
+ release source code for their drivers, additions, and modifications to
+ CUPS under the GNU GPL and LGPL. For information please contact us at
+ the address shown above.</P>
+<P>The Common UNIX Printing System provides a &quot;pstoraster&quot; filter that
+ utilizes the GNU GhostScript 5.50 core to convert PostScript files into
+ a stream of raster images. For binary distribution licensing of this
+ software, please contact:<BLOCKQUOTE> Miles Jones
+<BR> Director of Marketing
+<BR> Artifex Software Inc.
+<BR> 454 Las Gallinas Ave., Suite 108
+<BR> San Rafael, CA 94903 USA
+<BR> Voice: +1.415.492.9861
+<BR> Fax: +1.415.492.9862
+<BR> EMail:<A HREF="mailto:info@arsoft.com"> info@arsoft.com</A></BLOCKQUOTE>
+</P>
+<P>The &quot;pdftops&quot; filter is based on the Xpdf 0.93a software. For binary
+ distribution licensing of this software, please contact:<BLOCKQUOTE>
+ Derek B. Noonburg
+<BR> Email:<A HREF="mailto:derekn@foolabs.com"> derekn@foolabs.com</A>
+<BR> WWW:<A HREF="http://www.foolabs.com/xpdf/">
+ http://www.foolabs.com/xpdf/</A></BLOCKQUOTE></P>
+<H3><A NAME="6_1_4">Support</A></H3>
+<P>Easy Software Products sells software support for CUPS as well as a
+ commercial printing product based on CUPS called ESP Print Pro. You can
+ find out more at our web site:</P>
+<UL>
+<PRE>
+<A HREF="http://www.easysw.com">http://www.easysw.com</A>
+</PRE>
+</UL>
+
+<!-- NEW PAGE -->
+<H2><A NAME="6_2">GNU GENERAL PUBLIC LICENSE</A></H2>
+<P>Version 2, June 1991</P>
+<PRE>
+Copyright 1989, 1991 Free Software Foundation, Inc.
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+Everyone is permitted to copy and distribute verbatim
+copies of this license document, but changing it is not allowed.
+</PRE>
+<PRE>
+
+</PRE>
+<H3><A NAME="6_2_1">Preamble</A></H3>
+<P>The licenses for most software are designed to take away your freedom
+ to share and change it. By contrast, the GNU General Public License is
+ intended to guarantee your freedom to share and change free
+ software--to make sure the software is free for all its users. This
+ General Public License applies to most of the Free Software
+ Foundation's software and to any other program whose authors commit to
+ using it. (Some other Free Software Foundation software is covered by
+ the GNU Library General Public License instead.) You can apply it to
+ your programs, too.</P>
+<P>When we speak of free software, we are referring to freedom, not
+ price. Our General Public Licenses are designed to make sure that you
+ have the freedom to distribute copies of free software (and charge for
+ this service if you wish), that you receive source code or can get it
+ if you want it, that you can change the software or use pieces of it in
+ new free programs; and that you know you can do these things.</P>
+<P>To protect your rights, we need to make restrictions that forbid
+ anyone to deny you these rights or to ask you to surrender the rights.
+ These restrictions translate to certain responsibilities for you if you
+ distribute copies of the software, or if you modify it.</P>
+<P>For example, if you distribute copies of such a program, whether
+ gratis or for a fee, you must give the recipients all the rights that
+ you have. You must make sure that they, too, receive or can get the
+ source code. And you must show them these terms so they know their
+ rights.</P>
+<P>We protect your rights with two steps: (1) copyright the software,
+ and (2) offer you this license which gives you legal permission to
+ copy, distribute and/or modify the software.</P>
+<P>Also, for each author's protection and ours, we want to make certain
+ that everyone understands that there is no warranty for this free
+ software. If the software is modified by someone else and passed on, we
+ want its recipients to know that what they have is not the original, so
+ that any problems introduced by others will not reflect on the original
+ authors' reputations.</P>
+<P>Finally, any free program is threatened constantly by software
+ patents. We wish to avoid the danger that redistributors of a free
+ program will individually obtain patent licenses, in effect making the
+ program proprietary. To prevent this, we have made it clear that any
+ patent must be licensed for everyone's free use or not licensed at all.</P>
+<P>The precise terms and conditions for copying, distribution and
+ modification follow.</P>
+<H4>GNU GENERAL PUBLIC LICENSE
+<BR> TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
+<OL START="0">
+<LI>This License applies to any program or other work which contains a
+ notice placed by the copyright holder saying it may be distributed
+ under the terms of this General Public License. The &quot;Program&quot;, below,
+ refers to any such program or work, and a &quot;work based on the Program&quot;
+ means either the Program or any derivative work under copyright law:
+ that is to say, a work containing the Program or a portion of it,
+ either verbatim or with modifications and/or translated into another
+ language. (Hereinafter, translation is included without limitation in
+ the term &quot;modification&quot;.) Each licensee is addressed as &quot;you&quot;.</LI>
+<P>Activities other than copying, distribution and modification are not
+ covered by this License; they are outside its scope. The act of running
+ the Program is not restricted, and the output from the Program is
+ covered only if its contents constitute a work based on the Program
+ (independent of having been made by running the Program). Whether that
+ is true depends on what the Program does.</P>
+<LI>You may copy and distribute verbatim copies of the Program's source
+ code as you receive it, in any medium, provided that you conspicuously
+ and appropriately publish on each copy an appropriate copyright notice
+ and disclaimer of warranty; keep intact all the notices that refer to
+ this License and to the absence of any warranty; and give any other
+ recipients of the Program a copy of this License along with the
+ Program.</LI>
+<P>You may charge a fee for the physical act of transferring a copy, and
+ you may at your option offer warranty protection in exchange for a fee.</P>
+<LI>You may modify your copy or copies of the Program or any portion of
+ it, thus forming a work based on the Program, and copy and distribute
+ such modifications or work under the terms of Section 1 above, provided
+ that you also meet all of these conditions:
+<OL TYPE="a">
+<LI>You must cause the modified files to carry prominent notices stating
+ that you changed the files and the date of any change.</LI>
+<LI>You must cause any work that you distribute or publish, that in
+ whole or in part contains or is derived from the Program or any part
+ thereof, to be licensed as a whole at no charge to all third parties
+ under the terms of this License.</LI>
+<LI>if the modified program normally reads commands interactively when
+ run, you must cause it, when started running for such interactive use
+ in the most ordinary way, to print or display an announcement including
+ an appropriate copyright notice and a notice that there is no warranty
+ (or else, saying that you provide a warranty) and that users may
+ redistribute the program under these conditions, and telling the user
+ how to view a copy of this License. (Exception: if the Program itself
+ is interactive but does not normally print such an announcement, your
+ work based on the Program is not required to print an announcement.)</LI>
+</OL>
+</LI>
+<P>These requirements apply to the modified work as a whole. If
+ identifiable sections of that work are not derived from the Program,
+ and can be reasonably considered independent and separate works in
+ themselves, then this License, and its terms, do not apply to those
+ sections when you distribute them as separate works. But when you
+ distribute the same sections as part of a whole which is a work based
+ on the Program, the distribution of the whole must be on the terms of
+ this License, whose permissions for other licensees extend to the
+ entire whole, and thus to each and every part regardless of who wrote
+ it.</P>
+<P>Thus, it is not the intent of this section to claim rights or contest
+ your rights to work written entirely by you; rather, the intent is to
+ exercise the right to control the distribution of derivative or
+ collective works based on the Program.</P>
+<P>In addition, mere aggregation of another work not based on the
+ Program with the Program (or with a work based on the Program) on a
+ volume of a storage or distribution medium does not bring the other
+ work under the scope of this License.</P>
+<LI>You may copy and distribute the Program (or a work based on it,
+ under Section 2) in object code or executable form under the terms of
+ Sections 1 and 2 above provided that you also do one of the following:
+<OL TYPE="a">
+<LI>Accompany it with the complete corresponding machine-readable source
+ code, which must be distributed under the terms of Sections 1 and 2
+ above on a medium customarily used for software interchange; or,</LI>
+<LI>Accompany it with a written offer, valid for at least three years,
+ to give any third party, for a charge no more than your cost of
+ physically performing source distribution, a complete machine-readable
+ copy of the corresponding source code, to be distributed under the
+ terms of Sections 1 and 2 above on a medium customarily used for
+ software interchange; or,</LI>
+<LI>Accompany it with the information you received as to the offer to
+ distribute corresponding source code. (This alternative is allowed only
+ for noncommercial distribution and only if you received the program in
+ object code or executable form with such an offer, in accord with
+ Subsection b above.)</LI>
+</OL>
+</LI>
+<P>The source code for a work means the preferred form of the work for
+ making modifications to it. For an executable work, complete source
+ code means all the source code for all modules it contains, plus any
+ associated interface definition files, plus the scripts used to control
+ compilation and installation of the executable. However, as a special
+ exception, the source code distributed need not include anything that
+ is normally distributed (in either source or binary form) with the
+ major components (compiler, kernel, and so on) of the operating system
+ on which the executable runs, unless that component itself accompanies
+ the executable.</P>
+<P>If distribution of executable or object code is made by offering
+ access to copy from a designated place, then offering equivalent access
+ to copy the source code from the same place counts as distribution of
+ the source code, even though third parties are not compelled to copy
+ the source along with the object code.</P>
+<LI>You may not copy, modify, sublicense, or distribute the Program
+ except as expressly provided under this License. Any attempt otherwise
+ to copy, modify, sublicense or distribute the Program is void, and will
+ automatically terminate your rights under this License. However,
+ parties who have received copies, or rights, from you under this
+ License will not have their licenses terminated so long as such parties
+ remain in full compliance.</LI>
+<LI>You are not required to accept this License, since you have not
+ signed it. However, nothing else grants you permission to modify or
+ distribute the Program or its derivative works. These actions are
+ prohibited by law if you do not accept this License. Therefore, by
+ modifying or distributing the Program (or any work based on the
+ Program), you indicate your acceptance of this License to do so, and
+ all its terms and conditions for copying, distributing or modifying the
+ Program or works based on it.</LI>
+<LI>Each time you redistribute the Program (or any work based on the
+ Program), the recipient automatically receives a license from the
+ original licensor to copy, distribute or modify the Program subject to
+ these terms and conditions. You may not impose any further restrictions
+ on the recipients' exercise of the rights granted herein. You are not
+ responsible for enforcing compliance by third parties to this License.</LI>
+<LI>If, as a consequence of a court judgment or allegation of patent
+ infringement or for any other reason (not limited to patent issues),
+ conditions are imposed on you (whether by court order, agreement or
+ otherwise) that contradict the conditions of this License, they do not
+ excuse you from the conditions of this License. If you cannot
+ distribute so as to satisfy simultaneously your obligations under this
+ License and any other pertinent obligations, then as a consequence you
+ may not distribute the Program at all. For example, if a patent license
+ would not permit royalty-free redistribution of the Program by all
+ those who receive copies directly or indirectly through you, then the
+ only way you could satisfy both it and this License would be to refrain
+ entirely from distribution of the Program.</LI>
+<P>If any portion of this section is held invalid or unenforceable under
+ any particular circumstance, the balance of the section is intended to
+ apply and the section as a whole is intended to apply in other
+ circumstances.</P>
+<P>It is not the purpose of this section to induce you to infringe any
+ patents or other property right claims or to contest validity of any
+ such claims; this section has the sole purpose of protecting the
+ integrity of the free software distribution system, which is
+ implemented by public license practices. Many people have made generous
+ contributions to the wide range of software distributed through that
+ system in reliance on consistent application of that system; it is up
+ to the author/donor to decide if he or she is willing to distribute
+ software through any other system and a licensee cannot impose that
+ choice.</P>
+<P>This section is intended to make thoroughly clear what is believed to
+ be a consequence of the rest of this License.</P>
+<LI>If the distribution and/or use of the Program is restricted in
+ certain countries either by patents or by copyrighted interfaces, the
+ original copyright holder who places the Program under this License may
+ add an explicit geographical distribution limitation excluding those
+ countries, so that distribution is permitted only in or among countries
+ not thus excluded. In such case, this License incorporates the
+ limitation as if written in the body of this License.</LI>
+<LI>The Free Software Foundation may publish revised and/or new versions
+ of the General Public License from time to time. Such new versions will
+ be similar in spirit to the present version, but may differ in detail
+ to address new problems or concerns.</LI>
+<P>Each version is given a distinguishing version number. If the Program
+ specifies a version number of this License which applies to it and &quot;any
+ later version&quot;, you have the option of following the terms and
+ conditions either of that version or of any later version published by
+ the Free Software Foundation. If the Program does not specify a version
+ number of this License, you may choose any version ever published by
+ the Free Software Foundation.</P>
+<LI>If you wish to incorporate parts of the Program into other free
+ programs whose distribution conditions are different, write to the
+ author to ask for permission. For software which is copyrighted by the
+ Free Software Foundation, write to the Free Software Foundation; we
+ sometimes make exceptions for this. Our decision will be guided by the
+ two goals of preserving the free status of all derivatives of our free
+ software and of promoting the sharing and reuse of software generally.</LI>
+</OL>
+<H4>NO WARRANTY</H4>
+<OL START="11">
+<LI>BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+ FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+ OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+ PROVIDE THE PROGRAM &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER
+ EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH
+ YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+ NECESSARY SERVICING, REPAIR OR CORRECTION.</LI>
+<LI>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
+ WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+ AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU
+ FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+ CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+ PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+ FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF
+ SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGES.</LI>
+</OL>
+<H4>END OF TERMS AND CONDITIONS</H4>
+
+<!-- NEW PAGE -->
+<H2><A NAME="6_3">GNU LIBRARY GENERAL PUBLIC LICENSE</A></H2>
+<P>Version 2, June 1991</P>
+<PRE>
+Copyright (C) 1991 Free Software Foundation, Inc.
+59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+[This is the first released version of the library GPL.  It is
+ numbered 2 because it goes with version 2 of the ordinary GPL.]
+</PRE>
+<H3><A NAME="6_3_1">Preamble</A></H3>
+<P>The licenses for most software are designed to take away your freedom
+ to share and change it. By contrast, the GNU General Public Licenses
+ are intended to guarantee your freedom to share and change free
+ software--to make sure the software is free for all its users.</P>
+<P>This license, the Library General Public License, applies to some
+ specially designated Free Software Foundation software, and to any
+ other libraries whose authors decide to use it. You can use it for your
+ libraries, too.</P>
+<P>When we speak of free software, we are referring to freedom, not
+ price. Our General Public Licenses are designed to make sure that you
+ have the freedom to distribute copies of free software (and charge for
+ this service if you wish), that you receive source code or can get it
+ if you want it, that you can change the software or use pieces of it in
+ new free programs; and that you know you can do these things.</P>
+<P>To protect your rights, we need to make restrictions that forbid
+ anyone to deny you these rights or to ask you to surrender the rights.
+ These restrictions translate to certain responsibilities for you if you
+ distribute copies of the library, or if you modify it.</P>
+<P>For example, if you distribute copies of the library, whether gratis
+ or for a fee, you must give the recipients all the rights that we gave
+ you. You must make sure that they, too, receive or can get the source
+ code. If you link a program with the library, you must provide complete
+ object files to the recipients so that they can relink them with the
+ library, after making changes to the library and recompiling it. And
+ you must show them these terms so they know their rights.</P>
+<P>Our method of protecting your rights has two steps: (1) copyright the
+ library, and (2) offer you this license which gives you legal
+ permission to copy, distribute and/or modify the library.</P>
+<P>Also, for each distributor's protection, we want to make certain that
+ everyone understands that there is no warranty for this free library.
+ If the library is modified by someone else and passed on, we want its
+ recipients to know that what they have is not the original version, so
+ that any problems introduced by others will not reflect on the original
+ authors' reputations.</P>
+<P>Finally, any free program is threatened constantly by software
+ patents. We wish to avoid the danger that companies distributing free
+ software will individually obtain patent licenses, thus in effect
+ transforming the program into proprietary software. To prevent this, we
+ have made it clear that any patent must be licensed for everyone's free
+ use or not licensed at all.</P>
+<P>Most GNU software, including some libraries, is covered by the
+ ordinary GNU General Public License, which was designed for utility
+ programs. This license, the GNU Library General Public License, applies
+ to certain designated libraries. This license is quite different from
+ the ordinary one; be sure to read it in full, and don't assume that
+ anything in it is the same as in the ordinary license.</P>
+<P>The reason we have a separate public license for some libraries is
+ that they blur the distinction we usually make between modifying or
+ adding to a program and simply using it. Linking a program with a
+ library, without changing the library, is in some sense simply using
+ the library, and is analogous to running a utility program or
+ application program. However, in a textual and legal sense, the linked
+ executable is a combined work, a derivative of the original library,
+ and the ordinary General Public License treats it as such.</P>
+<P>Because of this blurred distinction, using the ordinary General
+ Public License for libraries did not effectively promote software
+ sharing, because most developers did not use the libraries. We
+ concluded that weaker conditions might promote sharing better.</P>
+<P>However, unrestricted linking of non-free programs would deprive the
+ users of those programs of all benefit from the free status of the
+ libraries themselves. This Library General Public License is intended
+ to permit developers of non-free programs to use free libraries, while
+ preserving your freedom as a user of such programs to change the free
+ libraries that are incorporated in them. (We have not seen how to
+ achieve this as regards changes in header files, but we have achieved
+ it as regards changes in the actual functions of the Library.) The hope
+ is that this will lead to faster development of free libraries.</P>
+<P>The precise terms and conditions for copying, distribution and
+ modification follow. Pay close attention to the difference between a
+ &quot;work based on the library&quot; and a &quot;work that uses the library&quot;. The
+ former contains code derived from the library, while the latter only
+ works together with the library.</P>
+<P>Note that it is possible for a library to be covered by the ordinary
+ General Public License rather than by this special one.</P>
+<H4>TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</H4>
+<P><STRONG>0.</STRONG> This License Agreement applies to any software
+ library which contains a notice placed by the copyright holder or other
+ authorized party saying it may be distributed under the terms of this
+ Library General Public License (also called &quot;this License&quot;). Each
+ licensee is addressed as &quot;you&quot;.</P>
+<P>A &quot;library&quot; means a collection of software functions and/or data
+ prepared so as to be conveniently linked with application programs
+ (which use some of those functions and data) to form executables.</P>
+<P>The &quot;Library&quot;, below, refers to any such software library or work
+ which has been distributed under these terms. A &quot;work based on the
+ Library&quot; means either the Library or any derivative work under
+ copyright law: that is to say, a work containing the Library or a
+ portion of it, either verbatim or with modifications and/or translated
+ straightforwardly into another language. (Hereinafter, translation is
+ included without limitation in the term &quot;modification&quot;.)</P>
+<P>&quot;Source code&quot; for a work means the preferred form of the work for
+ making modifications to it. For a library, complete source code means
+ all the source code for all modules it contains, plus any associated
+ interface definition files, plus the scripts used to control
+ compilation and installation of the library.</P>
+<P>Activities other than copying, distribution and modification are not
+ covered by this License; they are outside its scope. The act of running
+ a program using the Library is not restricted, and output from such a
+ program is covered only if its contents constitute a work based on the
+ Library (independent of the use of the Library in a tool for writing
+ it). Whether that is true depends on what the Library does and what the
+ program that uses the Library does.</P>
+<P><STRONG>1.</STRONG> You may copy and distribute verbatim copies of
+ the Library's complete source code as you receive it, in any medium,
+ provided that you conspicuously and appropriately publish on each copy
+ an appropriate copyright notice and disclaimer of warranty; keep intact
+ all the notices that refer to this License and to the absence of any
+ warranty; and distribute a copy of this License along with the Library.</P>
+<P>You may charge a fee for the physical act of transferring a copy, and
+ you may at your option offer warranty protection in exchange for a fee.</P>
+<P><STRONG>2.</STRONG> You may modify your copy or copies of the Library
+ or any portion of it, thus forming a work based on the Library, and
+ copy and distribute such modifications or work under the terms of
+ Section 1 above, provided that you also meet all of these conditions:</P>
+<OL TYPE="a">
+<LI>The modified work must itself be a software library.</LI>
+<P></P>
+<LI>You must cause the files modified to carry prominent notices stating
+ that you changed the files and the date of any change.</LI>
+<P></P>
+<LI>You must cause the whole of the work to be licensed at no charge to
+ all third parties under the terms of this License.</LI>
+<P></P>
+<LI>If a facility in the modified Library refers to a function or a
+ table of data to be supplied by an application program that uses the
+ facility, other than as an argument passed when the facility is
+ invoked, then you must make a good faith effort to ensure that, in the
+ event an application does not supply such function or table, the
+ facility still operates, and performs whatever part of its purpose
+ remains meaningful.</LI>
+<P>(For example, a function in a library to compute square roots has a
+ purpose that is entirely well-defined independent of the application.
+ Therefore, Subsection 2d requires that any application-supplied
+ function or table used by this function must be optional: if the
+ application does not supply it, the square root function must still
+ compute square roots.)</P>
+</OL>
+<P>These requirements apply to the modified work as a whole. If
+ identifiable sections of that work are not derived from the Library,
+ and can be reasonably considered independent and separate works in
+ themselves, then this License, and its terms, do not apply to those
+ sections when you distribute them as separate works. But when you
+ distribute the same sections as part of a whole which is a work based
+ on the Library, the distribution of the whole must be on the terms of
+ this License, whose permissions for other licensees extend to the
+ entire whole, and thus to each and every part regardless of who wrote
+ it.</P>
+<P>Thus, it is not the intent of this section to claim rights or contest
+ your rights to work written entirely by you; rather, the intent is to
+ exercise the right to control the distribution of derivative or
+ collective works based on the Library.</P>
+<P>In addition, mere aggregation of another work not based on the
+ Library with the Library (or with a work based on the Library) on a
+ volume of a storage or distribution medium does not bring the other
+ work under the scope of this License.</P>
+<P><STRONG>3.</STRONG> You may opt to apply the terms of the ordinary
+ GNU General Public License instead of this License to a given copy of
+ the Library. To do this, you must alter all the notices that refer to
+ this License, so that they refer to the ordinary GNU General Public
+ License, version 2, instead of to this License. (If a newer version
+ than version 2 of the ordinary GNU General Public License has appeared,
+ then you can specify that version instead if you wish.) Do not make any
+ other change in these notices.</P>
+<P>Once this change is made in a given copy, it is irreversible for that
+ copy, so the ordinary GNU General Public License applies to all
+ subsequent copies and derivative works made from that copy.</P>
+<P>This option is useful when you wish to copy part of the code of the
+ Library into a program that is not a library.</P>
+<P><STRONG>4.</STRONG> You may copy and distribute the Library (or a
+ portion or derivative of it, under Section 2) in object code or
+ executable form under the terms of Sections 1 and 2 above provided that
+ you accompany it with the complete corresponding machine-readable
+ source code, which must be distributed under the terms of Sections 1
+ and 2 above on a medium customarily used for software interchange.</P>
+<P>If distribution of object code is made by offering access to copy
+ from a designated place, then offering equivalent access to copy the
+ source code from the same place satisfies the requirement to distribute
+ the source code, even though third parties are not compelled to copy
+ the source along with the object code.</P>
+<P><STRONG>5.</STRONG> A program that contains no derivative of any
+ portion of the Library, but is designed to work with the Library by
+ being compiled or linked with it, is called a &quot;work that uses the
+ Library&quot;. Such a work, in isolation, is not a derivative work of the
+ Library, and therefore falls outside the scope of this License.</P>
+<P>However, linking a &quot;work that uses the Library&quot; with the Library
+ creates an executable that is a derivative of the Library (because it
+ contains portions of the Library), rather than a &quot;work that uses the
+ library&quot;. The executable is therefore covered by this License. Section
+ 6 states terms for distribution of such executables.</P>
+<P>When a &quot;work that uses the Library&quot; uses material from a header file
+ that is part of the Library, the object code for the work may be a
+ derivative work of the Library even though the source code is not.
+ Whether this is true is especially significant if the work can be
+ linked without the Library, or if the work is itself a library. The
+ threshold for this to be true is not precisely defined by law.</P>
+<P>If such an object file uses only numerical parameters, data structure
+ layouts and accessors, and small macros and small inline functions (ten
+ lines or less in length), then the use of the object file is
+ unrestricted, regardless of whether it is legally a derivative work.
+ (Executables containing this object code plus portions of the Library
+ will still fall under Section 6.)</P>
+<P>Otherwise, if the work is a derivative of the Library, you may
+ distribute the object code for the work under the terms of Section 6.
+ Any executables containing that work also fall under Section 6, whether
+ or not they are linked directly with the Library itself.</P>
+<P><STRONG>6.</STRONG> As an exception to the Sections above, you may
+ also compile or link a &quot;work that uses the Library&quot; with the Library to
+ produce a work containing portions of the Library, and distribute that
+ work under terms of your choice, provided that the terms permit
+ modification of the work for the customer's own use and reverse
+ engineering for debugging such modifications.</P>
+<P>You must give prominent notice with each copy of the work that the
+ Library is used in it and that the Library and its use are covered by
+ this License. You must supply a copy of this License. If the work
+ during execution displays copyright notices, you must include the
+ copyright notice for the Library among them, as well as a reference
+ directing the user to the copy of this License. Also, you must do one
+ of these things:</P>
+<OL TYPE="a">
+<LI>Accompany the work with the complete corresponding machine-readable
+ source code for the Library including whatever changes were used in the
+ work (which must be distributed under Sections 1 and 2 above); and, if
+ the work is an executable linked with the Library, with the complete
+ machine-readable &quot;work that uses the Library&quot;, as object code and/or
+ source code, so that the user can modify the Library and then relink to
+ produce a modified executable containing the modified Library. (It is
+ understood that the user who changes the contents of definitions files
+ in the Library will not necessarily be able to recompile the
+ application to use the modified definitions.)</LI>
+<P></P>
+<LI>Accompany the work with a written offer, valid for at least three
+ years, to give the same user the materials specified in Subsection 6a,
+ above, for a charge no more than the cost of performing this
+ distribution.</LI>
+<P></P>
+<LI>If distribution of the work is made by offering access to copy from
+ a designated place, offer equivalent access to copy the above specified
+ materials from the same place.</LI>
+<P></P>
+<LI>Verify that the user has already received a copy of these materials
+ or that you have already sent this user a copy.</LI>
+</OL>
+<P>For an executable, the required form of the &quot;work that uses the
+ Library&quot; must include any data and utility programs needed for
+ reproducing the executable from it. However, as a special exception,
+ the source code distributed need not include anything that is normally
+ distributed (in either source or binary form) with the major components
+ (compiler, kernel, and so on) of the operating system on which the
+ executable runs, unless that component itself accompanies the
+ executable.</P>
+<P>It may happen that this requirement contradicts the license
+ restrictions of other proprietary libraries that do not normally
+ accompany the operating system. Such a contradiction means you cannot
+ use both them and the Library together in an executable that you
+ distribute.</P>
+<P><STRONG>7.</STRONG> You may place library facilities that are a work
+ based on the Library side-by-side in a single library together with
+ other library facilities not covered by this License, and distribute
+ such a combined library, provided that the separate distribution of the
+ work based on the Library and of the other library facilities is
+ otherwise permitted, and provided that you do these two things:</P>
+<OL TYPE="a">
+<LI>Accompany the combined library with a copy of the same work based on
+ the Library, uncombined with any other library facilities. This must be
+ distributed under the terms of the Sections above.</LI>
+<P></P>
+<LI>Give prominent notice with the combined library of the fact that
+ part of it is a work based on the Library, and explaining where to find
+ the accompanying uncombined form of the same work.</LI>
+</OL>
+<P><STRONG>8.</STRONG> You may not copy, modify, sublicense, link with,
+ or distribute the Library except as expressly provided under this
+ License. Any attempt otherwise to copy, modify, sublicense, link with,
+ or distribute the Library is void, and will automatically terminate
+ your rights under this License. However, parties who have received
+ copies, or rights, from you under this License will not have their
+ licenses terminated so long as such parties remain in full compliance.</P>
+<P><STRONG>9.</STRONG> You are not required to accept this License,
+ since you have not signed it. However, nothing else grants you
+ permission to modify or distribute the Library or its derivative works.
+ These actions are prohibited by law if you do not accept this License.
+ Therefore, by modifying or distributing the Library (or any work based
+ on the Library), you indicate your acceptance of this License to do so,
+ and all its terms and conditions for copying, distributing or modifying
+ the Library or works based on it.</P>
+<P><STRONG>10.</STRONG> Each time you redistribute the Library (or any
+ work based on the Library), the recipient automatically receives a
+ license from the original licensor to copy, distribute, link with or
+ modify the Library subject to these terms and conditions. You may not
+ impose any further restrictions on the recipients' exercise of the
+ rights granted herein. You are not responsible for enforcing compliance
+ by third parties to this License.</P>
+<P><STRONG>11.</STRONG> If, as a consequence of a court judgment or
+ allegation of patent infringement or for any other reason (not limited
+ to patent issues), conditions are imposed on you (whether by court
+ order, agreement or otherwise) that contradict the conditions of this
+ License, they do not excuse you from the conditions of this License. If
+ you cannot distribute so as to satisfy simultaneously your obligations
+ under this License and any other pertinent obligations, then as a
+ consequence you may not distribute the Library at all. For example, if
+ a patent license would not permit royalty-free redistribution of the
+ Library by all those who receive copies directly or indirectly through
+ you, then the only way you could satisfy both it and this License would
+ be to refrain entirely from distribution of the Library.</P>
+<P>If any portion of this section is held invalid or unenforceable under
+ any particular circumstance, the balance of the section is intended to
+ apply, and the section as a whole is intended to apply in other
+ circumstances.</P>
+<P>It is not the purpose of this section to induce you to infringe any
+ patents or other property right claims or to contest validity of any
+ such claims; this section has the sole purpose of protecting the
+ integrity of the free software distribution system which is implemented
+ by public license practices. Many people have made generous
+ contributions to the wide range of software distributed through that
+ system in reliance on consistent application of that system; it is up
+ to the author/donor to decide if he or she is willing to distribute
+ software through any other system and a licensee cannot impose that
+ choice.</P>
+<P>This section is intended to make thoroughly clear what is believed to
+ be a consequence of the rest of this License.</P>
+<P><STRONG>12.</STRONG> If the distribution and/or use of the Library is
+ restricted in certain countries either by patents or by copyrighted
+ interfaces, the original copyright holder who places the Library under
+ this License may add an explicit geographical distribution limitation
+ excluding those countries, so that distribution is permitted only in or
+ among countries not thus excluded. In such case, this License
+ incorporates the limitation as if written in the body of this License.</P>
+<P><STRONG>13.</STRONG> The Free Software Foundation may publish revised
+ and/or new versions of the Library General Public License from time to
+ time. Such new versions will be similar in spirit to the present
+ version, but may differ in detail to address new problems or concerns.</P>
+<P>Each version is given a distinguishing version number. If the Library
+ specifies a version number of this License which applies to it and &quot;any
+ later version&quot;, you have the option of following the terms and
+ conditions either of that version or of any later version published by
+ the Free Software Foundation. If the Library does not specify a license
+ version number, you may choose any version ever published by the Free
+ Software Foundation.</P>
+<P><STRONG>14.</STRONG> If you wish to incorporate parts of the Library
+ into other free programs whose distribution conditions are incompatible
+ with these, write to the author to ask for permission. For software
+ which is copyrighted by the Free Software Foundation, write to the Free
+ Software Foundation; we sometimes make exceptions for this. Our
+ decision will be guided by the two goals of preserving the free status
+ of all derivatives of our free software and of promoting the sharing
+ and reuse of software generally.</P>
+<P><STRONG>NO WARRANTY</STRONG></P>
+<P><STRONG>15.</STRONG> BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE,
+ THERE IS NO WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY
+ APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+ HOLDERS AND/OR OTHER PARTIES PROVIDE THE LIBRARY &quot;AS IS&quot; WITHOUT
+ WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+ OF THE LIBRARY IS WITH YOU. SHOULD THE LIBRARY PROVE DEFECTIVE, YOU
+ ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</P>
+<P><STRONG>16.</STRONG> IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR
+ AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO
+ MAY MODIFY AND/OR REDISTRIBUTE THE LIBRARY AS PERMITTED ABOVE, BE
+ LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL
+ OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+ LIBRARY (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+ FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+ SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGES.</P>
+<H4>END OF TERMS AND CONDITIONS</H4>
+</BODY>
+</HTML>
