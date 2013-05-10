@@ -1,0 +1,45 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?в ожидании:{printer_state=4?печать:приостановлен}},
+{printer_is_accepting_jobs=0?не принимает задания:принимает задания},
+{server_is_sharing_printers=0?нет совместного доступа:{printer_is_shared=0?нет совместного доступа:разрешен совместный доступ}})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Обслуживание</OPTION>
+<OPTION VALUE="print-test-page">Печать пробной страницы</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Очистить головки</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Печать пробной страницы принтера</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Возобновить печать</OPTION>:<OPTION VALUE="stop-printer">Приостановить принтер</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Принимать задания</OPTION>:<OPTION VALUE="reject-jobs">Не принимать задания</OPTION>}
+<OPTION VALUE="move-jobs">Переместить все задания</OPTION>
+<OPTION VALUE="purge-jobs">Закрыть все задания</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Администрирование</OPTION>
+<OPTION VALUE="modify-printer">Изменить принтер</OPTION>
+<OPTION VALUE="delete-printer">Удалить принтер</OPTION>
+<OPTION VALUE="set-printer-options">Установить параметры по умолчанию</OPTION>
+<OPTION VALUE="set-as-default">Установить как принтер по умолчанию</OPTION>
+<OPTION VALUE="set-allowed-users">Список разрешенных пользователей</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Описание:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Расположение:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Драйвер:</TH><TD>{printer_make_and_model} ({color_supported=1?цветной:черно-белый}{sides_supported?, дуплексная печать:})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Подключение:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">По умолчанию:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:неизвестный}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>
