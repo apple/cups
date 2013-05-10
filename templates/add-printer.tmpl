@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">Add New Printer</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Name:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(May contain any printable characters except "/", "#", and space)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Location:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Human-readable location such as "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Description:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Human-readable description such as "HP LaserJet with Duplexer")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Continue"></TD>
+</TR>
+</TABLE>
+
+</FORM>

@@ -1,0 +1,573 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>Raster API</title>
+	<meta name='keywords' content='Programming'>
+	<meta name='creator' content='Mini-XML v2.3'>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { background: #000000; border: solid thin #000000; color: #ffffff; font-size: 80%; font-style: italic; font-weight: bold; white-space: nowrap; }
+	h3 span.info { float: right; font-size: 100%; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  Raster API introduction for the Common UNIX Printing System (CUPS).
+
+  Copyright 1997-2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Easy Software Products and are protected by Federal
+  copyright law.  Distribution and use rights are outlined in the file
+  "LICENSE.txt" which should have been included with this file.  If this
+  file is missing or damaged please contact Easy Software Products
+  at:
+
+      Attn: CUPS Licensing Information
+      Easy Software Products
+      44141 Airport View Drive, Suite 204
+      Hollywood, Maryland 20636 USA
+
+      Voice: (301) 373-9600
+      EMail: cups-info@cups.org
+	WWW: http://www.cups.org
+-->
+
+<h2 class='title'>Introduction</h2>
+
+<p>The CUPS raster API provides a standard interface for reading
+and writing CUPS raster streams which are used for printing to
+raster printers. Because the raster format is updated from time
+to time, it is important to use this API to avoid
+incompatibilities with newer versions of CUPS.</p>
+
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/raster.h&gt;</var> header file must be
+included to use the <tt>cupsRaster</tt> functions.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+imaging library: <var>libcupsimage.a</var>,
+<var>libcupsimage.so.2</var>, <var>libcupsimage.2.dylib</var>,
+<var>libcupsimage_s.a</var>, or <var>libcupsimage2.lib</var>
+depending on the platform. The following command compiles
+<var>myprogram.c</var> using GCC and the CUPS imaging
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcupsimage</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>Unless otherwise specified, the raster API functions require
+CUPS 1.1 or higher.</p>
+
+<h2 class='title'>Licensing</h2>
+
+<p>The CUPS raster API is provided under the terms of the GNU
+General Public License, with exceptions for MacOS X-based
+programs. Please see the CUPS license agreement for more
+information.</p>
+<h2 class='title'>Contents</h2>
+<ul>
+	<li><a href='#ENUMERATIONS'>Enumerations</a></li>
+	<li><a href='#FUNCTIONS'>Functions</a></li>
+	<li><a href='#STRUCTURES'>Structures</a></li>
+	<li><a href='#TYPES'>Types</a></li>
+</ul>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='ENUMERATIONS'>Enumerations</a></h2>
+<ul>
+	<li><a href='#cups_bool_e'><tt>cups_bool_e</tt></a> </li>
+	<li><a href='#cups_mode_e'><tt>cups_mode_e</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_bool_e'>cups_bool_e</a></h3>
+<h4>Description</h4>
+<p>Types...</p>
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>CUPS_FALSE</tt> </td><td>Logical false</td></tr>
+<tr><td><tt>CUPS_TRUE</tt> </td><td>Logical true</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_mode_e'>cups_mode_e</a></h3>
+<h4>Description</h4>
+<p>Raster modes</p>
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>CUPS_RASTER_READ</tt> </td><td>Open stream for reading</td></tr>
+<tr><td><tt>CUPS_RASTER_WRITE</tt> </td><td>Open stream for writing</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
+<ul>
+	<li><a href='#cupsRasterClose'><tt>cupsRasterClose()</tt></a> </li>
+	<li><a href='#cupsRasterInterpretPPD'><tt>cupsRasterInterpretPPD()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsRasterOpen'><tt>cupsRasterOpen()</tt></a> </li>
+	<li><a href='#cupsRasterReadHeader'><tt>cupsRasterReadHeader()</tt></a> </li>
+	<li><a href='#cupsRasterReadHeader2'><tt>cupsRasterReadHeader2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsRasterReadPixels'><tt>cupsRasterReadPixels()</tt></a> </li>
+	<li><a href='#cupsRasterWriteHeader'><tt>cupsRasterWriteHeader()</tt></a> </li>
+	<li><a href='#cupsRasterWriteHeader2'><tt>cupsRasterWriteHeader2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsRasterWritePixels'><tt>cupsRasterWritePixels()</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterClose'>cupsRasterClose()</a></h3>
+<h4>Description</h4>
+<p>Close a raster stream.</p>
+<h4>Syntax</h4>
+<pre>
+void
+cupsRasterClose(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Stream to close</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRasterInterpretPPD'>cupsRasterInterpretPPD()</a></h3>
+<h4>Description</h4>
+<p>Interpret PPD commands to create a page header.
+
+This function does not mark the options in the PPD using the &quot;num_options&quot;
+and &quot;options&quot; arguments.  Instead, mark the options prior to calling
+cupsRasterInterpretPPD() - this allows you to do per-page options
+without manipulating the options array.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+int
+cupsRasterInterpretPPD(
+    <a href='#cups_page_header2_t'>cups_page_header2_t</a> * h,
+    ppd_file_t * ppd,
+    int num_options,
+    cups_option_t * options);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>h</tt></td><td>Page header</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterOpen'>cupsRasterOpen()</a></h3>
+<h4>Description</h4>
+<p>Open a raster stream.</p>
+<h4>Syntax</h4>
+<pre>
+<a href='#cups_raster_t'>cups_raster_t</a> *
+cupsRasterOpen(
+    int fd,
+    cups_mode_t mode);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+<tr><td><tt>mode</tt></td><td>Mode</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New stream</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterReadHeader'>cupsRasterReadHeader()</a></h3>
+<h4>Description</h4>
+<p>Read a raster page header and store it in a
+V1 page header structure.</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterReadHeader(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    <a href='#cups_page_header_t'>cups_page_header_t</a> * h);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>h</tt></td><td>Pointer to header data</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on success, 0 on fail</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRasterReadHeader2'>cupsRasterReadHeader2()</a></h3>
+<h4>Description</h4>
+<p>Read a raster page header and store it in a
+V2 page header structure.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterReadHeader2(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    <a href='#cups_page_header2_t'>cups_page_header2_t</a> * h);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>h</tt></td><td>Pointer to header data</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on success, 0 on fail</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterReadPixels'>cupsRasterReadPixels()</a></h3>
+<h4>Description</h4>
+<p>Read raster pixels.</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterReadPixels(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    unsigned char * p,
+    unsigned len);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>p</tt></td><td>Pointer to pixel buffer</td></tr>
+<tr><td><tt>len</tt></td><td>Number of bytes to read</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes read</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterWriteHeader'>cupsRasterWriteHeader()</a></h3>
+<h4>Description</h4>
+<p>Write a raster page header from a V1 page
+header structure.</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterWriteHeader(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    <a href='#cups_page_header_t'>cups_page_header_t</a> * h);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>h</tt></td><td>Raster page header</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on success, 0 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRasterWriteHeader2'>cupsRasterWriteHeader2()</a></h3>
+<h4>Description</h4>
+<p>Write a raster page header from a V2 page
+header structure.
+
+</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterWriteHeader2(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    <a href='#cups_page_header2_t'>cups_page_header2_t</a> * h);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>h</tt></td><td>Raster page header</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on success, 0 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsRasterWritePixels'>cupsRasterWritePixels()</a></h3>
+<h4>Description</h4>
+<p>Write raster pixels.</p>
+<h4>Syntax</h4>
+<pre>
+unsigned
+cupsRasterWritePixels(
+    <a href='#cups_raster_t'>cups_raster_t</a> * r,
+    unsigned char * p,
+    unsigned len);
+</pre>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>r</tt></td><td>Raster stream</td></tr>
+<tr><td><tt>p</tt></td><td>Bytes to write</td></tr>
+<tr><td><tt>len</tt></td><td>Number of bytes to write</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of bytes written</p>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='STRUCTURES'>Structures</a></h2>
+<ul>
+	<li><a href='#cups_page_header2_s'><tt>cups_page_header2_s</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cups_page_header_s'><tt>cups_page_header_s</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cups_page_header2_s'>cups_page_header2_s</a></h3>
+<h4>Description</h4>
+<p>Version 2 Page Header </p>
+<h4>Definition</h4>
+<pre>
+struct cups_page_header2_s
+{
+  unsigned AdvanceDistance;
+  cups_adv_t AdvanceMedia;
+  cups_bool_t Collate;
+  cups_cut_t CutMedia;
+  cups_bool_t Duplex;
+  unsigned HWResolution[2];
+  unsigned ImagingBoundingBox[4];
+  cups_bool_t InsertSheet;
+  cups_jog_t Jog;
+  cups_edge_t LeadingEdge;
+  cups_bool_t ManualFeed;
+  unsigned Margins[2];
+  char MediaClass[64];
+  char MediaColor[64];
+  unsigned MediaPosition;
+  char MediaType[64];
+  unsigned MediaWeight;
+  cups_bool_t MirrorPrint;
+  cups_bool_t NegativePrint;
+  unsigned NumCopies;
+  cups_orient_t Orientation;
+  cups_bool_t OutputFaceUp;
+  char OutputType[64];
+  unsigned PageSize[2];
+  cups_bool_t Separations;
+  cups_bool_t TraySwitch;
+  cups_bool_t Tumble;
+  unsigned cupsBitsPerColor;
+  unsigned cupsBitsPerPixel;
+  float cupsBorderlessScalingFactor;
+  unsigned cupsBytesPerLine;
+  cups_order_t cupsColorOrder;
+  cups_cspace_t cupsColorSpace;
+  unsigned cupsCompression;
+  unsigned cupsHeight;
+  float cupsImagingBBox[4];
+  unsigned cupsInteger[16];
+  char cupsMarkerType[64];
+  unsigned cupsMediaType;
+  unsigned cupsNumColors;
+  char cupsPageSizeName[64];
+  float cupsPageSize[2];
+  float cupsReal[16];
+  char cupsRenderingIntent[64];
+  unsigned cupsRowCount;
+  unsigned cupsRowFeed;
+  unsigned cupsRowStep;
+  char cupsString[16][64];
+  unsigned cupsWidth;
+};
+</pre>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>AdvanceDistance</tt> </td><td>AdvanceDistance value in points</td></tr>
+<tr><td><tt>AdvanceMedia</tt> </td><td>AdvanceMedia value (see above)</td></tr>
+<tr><td><tt>Collate</tt> </td><td>Collated copies value</td></tr>
+<tr><td><tt>CutMedia</tt> </td><td>CutMedia value (see above)</td></tr>
+<tr><td><tt>Duplex</tt> </td><td>Duplexed (double-sided) value</td></tr>
+<tr><td><tt>HWResolution[2]</tt> </td><td>Resolution in dots-per-inch</td></tr>
+<tr><td><tt>ImagingBoundingBox[4]</tt> </td><td>Pixel region that is painted (points)</td></tr>
+<tr><td><tt>InsertSheet</tt> </td><td>InsertSheet value</td></tr>
+<tr><td><tt>Jog</tt> </td><td>Jog value (see above)</td></tr>
+<tr><td><tt>LeadingEdge</tt> </td><td>LeadingEdge value (see above)</td></tr>
+<tr><td><tt>ManualFeed</tt> </td><td>ManualFeed value</td></tr>
+<tr><td><tt>Margins[2]</tt> </td><td>Lower-lefthand margins in points</td></tr>
+<tr><td><tt>MediaClass[64]</tt> </td><td>MediaClass string</td></tr>
+<tr><td><tt>MediaColor[64]</tt> </td><td>MediaColor string</td></tr>
+<tr><td><tt>MediaPosition</tt> </td><td>MediaPosition value</td></tr>
+<tr><td><tt>MediaType[64]</tt> </td><td>MediaType string</td></tr>
+<tr><td><tt>MediaWeight</tt> </td><td>MediaWeight value in grams/m^2</td></tr>
+<tr><td><tt>MirrorPrint</tt> </td><td>MirrorPrint value</td></tr>
+<tr><td><tt>NegativePrint</tt> </td><td>NegativePrint value</td></tr>
+<tr><td><tt>NumCopies</tt> </td><td>Number of copies to produce</td></tr>
+<tr><td><tt>Orientation</tt> </td><td>Orientation value (see above)</td></tr>
+<tr><td><tt>OutputFaceUp</tt> </td><td>OutputFaceUp value</td></tr>
+<tr><td><tt>OutputType[64]</tt> </td><td>OutputType string</td></tr>
+<tr><td><tt>PageSize[2]</tt> </td><td>Width and length of page in points</td></tr>
+<tr><td><tt>Separations</tt> </td><td>Separations value</td></tr>
+<tr><td><tt>TraySwitch</tt> </td><td>TraySwitch value</td></tr>
+<tr><td><tt>Tumble</tt> </td><td>Tumble value</td></tr>
+<tr><td><tt>cupsBitsPerColor</tt> </td><td>Number of bits for each color</td></tr>
+<tr><td><tt>cupsBitsPerPixel</tt> </td><td>Number of bits for each pixel</td></tr>
+<tr><td><tt>cupsBorderlessScalingFactor</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Scaling that was applied to page data </td></tr>
+<tr><td><tt>cupsBytesPerLine</tt> </td><td>Number of bytes per line</td></tr>
+<tr><td><tt>cupsColorOrder</tt> </td><td>Order of colors</td></tr>
+<tr><td><tt>cupsColorSpace</tt> </td><td>True colorspace</td></tr>
+<tr><td><tt>cupsCompression</tt> </td><td>Device compression to use</td></tr>
+<tr><td><tt>cupsHeight</tt> </td><td>Height of page image in pixels</td></tr>
+<tr><td><tt>cupsImagingBBox[4]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Floating point ImagingBoundingBox *
+(scaling factor not applied) </td></tr>
+<tr><td><tt>cupsInteger[16]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>User-defined integer values </td></tr>
+<tr><td><tt>cupsMarkerType[64]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Ink/toner type </td></tr>
+<tr><td><tt>cupsMediaType</tt> </td><td>Media type code</td></tr>
+<tr><td><tt>cupsNumColors</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Number of colors </td></tr>
+<tr><td><tt>cupsPageSizeName[64]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>PageSize name </td></tr>
+<tr><td><tt>cupsPageSize[2]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Floating point PageSize (scaling *
+factor not applied) </td></tr>
+<tr><td><tt>cupsReal[16]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>User-defined floating-point values </td></tr>
+<tr><td><tt>cupsRenderingIntent[64]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Color rendering intent </td></tr>
+<tr><td><tt>cupsRowCount</tt> </td><td>Rows per band</td></tr>
+<tr><td><tt>cupsRowFeed</tt> </td><td>Feed between bands</td></tr>
+<tr><td><tt>cupsRowStep</tt> </td><td>Spacing between lines</td></tr>
+<tr><td><tt>cupsString[16][64]</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>User-defined string values </td></tr>
+<tr><td><tt>cupsWidth</tt> </td><td>Width of page image in pixels</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_page_header_s'>cups_page_header_s</a></h3>
+<h4>Description</h4>
+<p>Version 1 Page Header</p>
+<h4>Definition</h4>
+<pre>
+struct cups_page_header_s
+{
+  unsigned AdvanceDistance;
+  cups_adv_t AdvanceMedia;
+  cups_bool_t Collate;
+  cups_cut_t CutMedia;
+  cups_bool_t Duplex;
+  unsigned HWResolution[2];
+  unsigned ImagingBoundingBox[4];
+  cups_bool_t InsertSheet;
+  cups_jog_t Jog;
+  cups_edge_t LeadingEdge;
+  cups_bool_t ManualFeed;
+  unsigned Margins[2];
+  char MediaClass[64];
+  char MediaColor[64];
+  unsigned MediaPosition;
+  char MediaType[64];
+  unsigned MediaWeight;
+  cups_bool_t MirrorPrint;
+  cups_bool_t NegativePrint;
+  unsigned NumCopies;
+  cups_orient_t Orientation;
+  cups_bool_t OutputFaceUp;
+  char OutputType[64];
+  unsigned PageSize[2];
+  cups_bool_t Separations;
+  cups_bool_t TraySwitch;
+  cups_bool_t Tumble;
+  unsigned cupsBitsPerColor;
+  unsigned cupsBitsPerPixel;
+  unsigned cupsBytesPerLine;
+  cups_order_t cupsColorOrder;
+  cups_cspace_t cupsColorSpace;
+  unsigned cupsCompression;
+  unsigned cupsHeight;
+  unsigned cupsMediaType;
+  unsigned cupsRowCount;
+  unsigned cupsRowFeed;
+  unsigned cupsRowStep;
+  unsigned cupsWidth;
+};
+</pre>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>AdvanceDistance</tt> </td><td>AdvanceDistance value in points</td></tr>
+<tr><td><tt>AdvanceMedia</tt> </td><td>AdvanceMedia value (see above)</td></tr>
+<tr><td><tt>Collate</tt> </td><td>Collated copies value</td></tr>
+<tr><td><tt>CutMedia</tt> </td><td>CutMedia value (see above)</td></tr>
+<tr><td><tt>Duplex</tt> </td><td>Duplexed (double-sided) value</td></tr>
+<tr><td><tt>HWResolution[2]</tt> </td><td>Resolution in dots-per-inch</td></tr>
+<tr><td><tt>ImagingBoundingBox[4]</tt> </td><td>Pixel region that is painted (points)</td></tr>
+<tr><td><tt>InsertSheet</tt> </td><td>InsertSheet value</td></tr>
+<tr><td><tt>Jog</tt> </td><td>Jog value (see above)</td></tr>
+<tr><td><tt>LeadingEdge</tt> </td><td>LeadingEdge value (see above)</td></tr>
+<tr><td><tt>ManualFeed</tt> </td><td>ManualFeed value</td></tr>
+<tr><td><tt>Margins[2]</tt> </td><td>Lower-lefthand margins in points</td></tr>
+<tr><td><tt>MediaClass[64]</tt> </td><td>MediaClass string</td></tr>
+<tr><td><tt>MediaColor[64]</tt> </td><td>MediaColor string</td></tr>
+<tr><td><tt>MediaPosition</tt> </td><td>MediaPosition value</td></tr>
+<tr><td><tt>MediaType[64]</tt> </td><td>MediaType string</td></tr>
+<tr><td><tt>MediaWeight</tt> </td><td>MediaWeight value in grams/m^2</td></tr>
+<tr><td><tt>MirrorPrint</tt> </td><td>MirrorPrint value</td></tr>
+<tr><td><tt>NegativePrint</tt> </td><td>NegativePrint value</td></tr>
+<tr><td><tt>NumCopies</tt> </td><td>Number of copies to produce</td></tr>
+<tr><td><tt>Orientation</tt> </td><td>Orientation value (see above)</td></tr>
+<tr><td><tt>OutputFaceUp</tt> </td><td>OutputFaceUp value</td></tr>
+<tr><td><tt>OutputType[64]</tt> </td><td>OutputType string</td></tr>
+<tr><td><tt>PageSize[2]</tt> </td><td>Width and length of page in points</td></tr>
+<tr><td><tt>Separations</tt> </td><td>Separations value</td></tr>
+<tr><td><tt>TraySwitch</tt> </td><td>TraySwitch value</td></tr>
+<tr><td><tt>Tumble</tt> </td><td>Tumble value</td></tr>
+<tr><td><tt>cupsBitsPerColor</tt> </td><td>Number of bits for each color</td></tr>
+<tr><td><tt>cupsBitsPerPixel</tt> </td><td>Number of bits for each pixel</td></tr>
+<tr><td><tt>cupsBytesPerLine</tt> </td><td>Number of bytes per line</td></tr>
+<tr><td><tt>cupsColorOrder</tt> </td><td>Order of colors</td></tr>
+<tr><td><tt>cupsColorSpace</tt> </td><td>True colorspace</td></tr>
+<tr><td><tt>cupsCompression</tt> </td><td>Device compression to use</td></tr>
+<tr><td><tt>cupsHeight</tt> </td><td>Height of page image in pixels</td></tr>
+<tr><td><tt>cupsMediaType</tt> </td><td>Media type code</td></tr>
+<tr><td><tt>cupsRowCount</tt> </td><td>Rows per band</td></tr>
+<tr><td><tt>cupsRowFeed</tt> </td><td>Feed between bands</td></tr>
+<tr><td><tt>cupsRowStep</tt> </td><td>Spacing between lines</td></tr>
+<tr><td><tt>cupsWidth</tt> </td><td>Width of page image in pixels</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='TYPES'>Types</a></h2>
+<ul>
+	<li><a href='#cups_page_header2_t'><tt>cups_page_header2_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cups_page_header_t'><tt>cups_page_header_t</tt></a> </li>
+	<li><a href='#cups_raster_t'><tt>cups_raster_t</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cups_page_header2_t'>cups_page_header2_t</a></h3>
+<h4>Description</h4>
+<p>Version 2 Page Header </p>
+<h4>Definition</h4>
+<pre>
+typedef struct <a href='#cups_page_header2_s'>cups_page_header2_s</a> cups_page_header2_t;
+</pre>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_page_header_t'>cups_page_header_t</a></h3>
+<h4>Description</h4>
+<p>Version 1 Page Header</p>
+<h4>Definition</h4>
+<pre>
+typedef struct <a href='#cups_page_header_s'>cups_page_header_s</a> cups_page_header_t;
+</pre>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_raster_t'>cups_raster_t</a></h3>
+<h4>Description</h4>
+<p>Raster stream data</p>
+<h4>Definition</h4>
+<pre>
+typedef struct _cups_raster_s cups_raster_t;
+</pre>
+</body>
+</html>
