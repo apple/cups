@@ -1,0 +1,39 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Gehitu klasea</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Izena:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Inprimatu daitekeen edozein karaktere eduki dezake, "/", "#" eta zuriunea izan ezik)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Deskripzioa:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Gizakiek irakurtzeko deskripzioa, adibidez "HP LaserJet Duplexatzailearekin")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kokalekua:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Gizakiek irakurtzeko kokalekua, adibidez "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kideak:</TH>
+<TD>
+<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
+{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Gehitu klasea"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

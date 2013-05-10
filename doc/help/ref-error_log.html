@@ -1,0 +1,55 @@
+<HTML>
+<!-- SECTION: References -->
+<HEAD>
+	<TITLE>error_log</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">error_log</H1>
+
+<P>The <VAR>error_log</VAR> file lists messages from the
+scheduler - errors, warnings, etc. The <A
+HREF="ref-cupsd-conf.html#LogLevel"><CODE>LogLevel</CODE></A>
+directive controls which messages are logged:</P>
+
+<P CLASS="command">
+
+level date-time message<BR>
+
+<BR>
+
+I [20/May/1999:19:18:28 +0000] Job 1 queued on 'DeskJet' by 'mike'.<BR>
+
+I [20/May/1999:19:21:02 +0000] Job 2 queued on 'DeskJet' by 'mike'.<BR>
+
+I [20/May/1999:19:22:24 +0000] Job 2 was cancelled by 'mike'.<BR>
+
+</P>
+
+<P>The <I>level</I> field contains the type of message:</P>
+
+<UL>
+
+	<LI><CODE>A</CODE> - Alert message (LogLevel alert)
+	<LI><CODE>C</CODE> - Critical error message (LogLevel crit)
+	<LI><CODE>D</CODE> - Debugging message (LogLevel debug)
+	<LI><CODE>d</CODE> - Detailed debugging message (LogLevel debug2)
+	<LI><CODE>E</CODE> - Normal error message (LogLevel error)
+	<LI><CODE>I</CODE> - Informational message (LogLevel info)
+	<LI><CODE>N</CODE> - Notice message (LogLevel notice)
+	<LI><CODE>W</CODE> - Warning message (LogLevel warn)
+	<LI><CODE>X</CODE> - Emergency error message (LogLevel emerg)
+
+</UL>
+
+<P>The <I>date-time</I> field contains the date and time of when
+the page started printing. The format of this field is identical
+to the <I>data-time</I> field in the <VAR>access_log</VAR> file.</P>
+
+<P>The <I>message</I> fields contains a free-form textual
+message. Messages from job filters are prefixed with "<CODE>[Job
+NNN]</CODE>".</P>
+
+</BODY>
+</HTML>
