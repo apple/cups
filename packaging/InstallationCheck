@@ -1,0 +1,11 @@
+#!/bin/sh
+case `uname -r` in
+	# Mac OS X 10.4.x
+	8.*) exit 0;;
+
+	# Mac OS X 10.5.x
+	9.*) exit 0;;
+
+	# Older Mac OS X...
+	*) exit 97;;
+esac
