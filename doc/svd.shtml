@@ -1,0 +1,156 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SVD-1.1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>CUPS Software Version Description</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This software version description document provides release information for the
+Common UNIX Printing System ("CUPS") Version 1.1.
+
+<EMBED SRC="system-overview.shtml">
+
+<H2>Document Overview</H2>
+
+<P>This software version description document is organized into the following
+sections:</P>
+
+<UL>
+	<LI><A HREF="#1">1 - Scope</A></LI>
+	<LI><A HREF="#2">2 - References</A></LI>
+	<LI><A HREF="#3">3 - Additions</A></LI>
+	<LI><A HREF="#4">4 - Changes</A></LI>
+	<LI><A HREF="#5">A - Glossary</A></LI>
+</UL>
+
+<EMBED SRC="references.shtml">
+
+<H1>Additions</H1>
+
+CUPS 1.1 includes many new features from the 1.0.x releases.
+
+<H2>Filters</H2>
+
+<H3><CODE>imagetoraster</CODE>, <CODE>imagetops</CODE></H3>
+
+The image file filters have been upgraded to support conversion of Microsoft
+Bitmap ("BMP") files.
+
+<H3>pstoraster</H3>
+
+<P>The <CODE>pstoraster</CODE> filter has been integrated with GNU GhostScript 5.50. The
+new RIP supports most Level 3 PostScript language features and much better
+color management for the sample printer drivers.
+
+<H2>User-Defined Printers and Options</H2>
+
+<P>The new <CODE>lpoptions</CODE> command allows users to configure default
+document options and create additional "instances" of existing printers,
+each with unique options.
+
+<P>The <CODE>lp</CODE>, <CODE>lpr</CODE>, and <CODE>lpstat</CODE> commands
+have been upgraded to use this option and printer instance information
+automatically.
+
+
+
+<H1>Changes</H1>
+
+CUPS 1.1 includes many changes from the 1.0.x releases.
+
+<H2>Directory Structure</H2>
+
+The directory structure in CUPS 1.1 has been modified to conform to the
+Filesystem Hierarchy Standard, 2.0. The following table describes the
+new file locations.
+
+<CENTER><TABLE WIDTH="80%" BORDER>
+<CAPTION>Table N: Directory structure changes from CUPS 1.0.x to 1.1.x.</CAPTION>
+<TR>
+	<TH>Description</TH>
+	<TH>CUPS 1.0.x</TH>
+	<TH>CUPS 1.1.x</TH>
+</TR>
+<TR>
+	<TD>Backends</TD>
+	<TD>/var/cups/backend</TD>
+	<TD>/usr/lib/cups/backend</TD>
+</TR>
+<TR>
+	<TD>CGI programs</TD>
+	<TD>/var/cups/cgi-bin</TD>
+	<TD>/usr/lib/cups/cgi-bin</TD>
+</TR>
+<TR>
+	<TD>Configuration files</TD>
+	<TD>/var/cups/conf</TD>
+	<TD>/etc/cups</TD>
+</TR>
+<TR>
+	<TD>Documentation</TD>
+	<TD>/usr/share/cups/doc</TD>
+	<TD>/usr/share/doc/cups</TD>
+</TR>
+<TR>
+	<TD>Filter programs</TD>
+	<TD>/var/cups/filter</TD>
+	<TD>/usr/lib/cups/filter</TD>
+</TR>
+<TR>
+	<TD>Interface scripts</TD>
+	<TD>/var/cups/interfaces</TD>
+	<TD>/etc/cups/interfaces</TD>
+</TR>
+<TR>
+	<TD>Locale data</TD>
+	<TD>/usr/lib/locale</TD>
+	<TD>/usr/share/locale</TD>
+</TR>
+<TR>
+	<TD>Log files</TD>
+	<TD>/var/cups/logs</TD>
+	<TD>/var/log/cups</TD>
+</TR>
+<TR>
+	<TD>PPD files</TD>
+	<TD>/var/cups/ppd</TD>
+	<TD>/etc/cups/ppd</TD>
+</TR>
+<TR>
+	<TD>Request files</TD>
+	<TD>/var/cups/requests</TD>
+	<TD>/var/spool/cups</TD>
+</TR>
+</TABLE></CENTER>
+
+<H2>IPP Implementation</H2>
+
+<P>CUPS 1.1 is based on version 1.1 of the Internet Printing Protocol,
+and implements the <CODE>set-job-attributes</CODE> extension operation.
+
+<P>Two new CUPS-specific extension operations are provided to determine
+which devices and printer drivers are available on the system.
+
+<P>The <CODE>CUPS-get-printers</CODE> and <CODE>CUPS-get-classes</CODE>
+operations have been upgraded to support limited filtering based upon
+the <CODE>printer-type</CODE>, <CODE>printer-location</CODE>,
+<CODE>printer-info</CODE>, and <CODE>printer-make-and-model</CODE>
+attributes.
+
+<P>The <CODE>CUPS-add-printer</CODE> operation now supports the
+<CODE>ppd-name</CODE> attribute to specify a locally-available PPD
+file rather than sending the PPD file from the client with the request.
+
+<P>Further information on the CUPS implementation of IPP can be found
+in CUPS-IPP-1.1.
+
+<EMBED SRC="glossary.shtml">
+
+</BODY>
+</HTML>
