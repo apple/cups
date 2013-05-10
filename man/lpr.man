@@ -1,0 +1,122 @@
+.\"
+.\" "$Id: lpr.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpr man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpr 1 "CUPS" "29 August 2008" "Apple Inc."
+.SH NAME
+lpr \- print files
+.SH SYNOPSIS
+.B lpr
+[ -E ] [ -H
+.I server[:port]
+] [ -U
+.I username
+] [ -P
+.I destination[/instance]
+] [ -#
+.I num-copies
+[ -h ] [ -l ] [ -m ] [ -o
+.I option[=value]
+] [ -p] [ -q ] [ -r ] [ -C/J/T
+.I title
+] [
+.I file(s)
+]
+.SH DESCRIPTION
+\fIlpr\fR submits files for printing. Files named on the command
+line are sent to the named printer (or the default destination if no
+destination is specified). If no files are listed on the command-line,
+\fIlpr\fR reads the print file from the standard input.
+.SH THE DEFAULT DESTINATION
+CUPS provides many ways to set the default destination. The "LPDEST" and
+"PRINTER" environment variables are consulted first. If neither are set,
+the current default set using the \fIlpoptions(1)\fR command is used,
+followed by the default set using the \fIlpadmin(8)\fR command.
+.SH OPTIONS
+The following options are recognized by \fIlpr\fR:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-H server[:port]
+.br
+Specifies an alternate server.
+.TP 5
+-C "name"
+.TP 5
+-J "name"
+.TP 5
+-T "name"
+.br
+Sets the job name.
+.TP 5
+-P destination[/instance]
+.br
+Prints files to the named printer.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-# \fIcopies\fR
+.br
+Sets the number of copies to print from 1 to 100.
+.TP 5
+-h
+.br
+Disables banner printing. This option is equivalent to "-o
+job-sheets=none".
+.TP 5
+-l
+.br
+Specifies that the print file is already formatted for the
+destination and should be sent without filtering. This option is
+equivalent to "-o raw".
+.TP 5
+-m
+.br
+Send an email on job completion.
+.TP 5
+-o option[=value]
+.br
+Sets a job option.
+.TP 5
+-p
+.br
+Specifies that the print file should be formatted with a shaded
+header with the date, time, job name, and page number. This
+option is equivalent to "-o prettyprint" and is only useful when
+printing text files.
+.TP 5
+-q
+.br
+Hold job for printing.
+.TP 5
+-r
+.br
+Specifies that the named print files should be deleted after
+printing them.
+.SH COMPATIBILITY
+The "c", "d", "f", "g", "i", "n", "t", "v", and "w" options
+are not supported by CUPS and produce a warning message if used.
+.SH SEE ALSO
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpadmin(8)\fR, \fIlpoptions(1)\fR,
+\fIlpq(1)\fR, \fIlprm(1)\fR, \fIlpstat(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lpr.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

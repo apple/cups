@@ -1,0 +1,172 @@
+.\"
+.\" "$Id: backend.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   Backend man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH backend 7 "CUPS" "23 April 2012" "Apple Inc."
+
+.SH NAME
+backend \- cups backend transmission interfaces
+.SH SYNOPSIS
+.B backend
+.br
+.B backend
+job user title num-copies options [
+.I filename
+]
+.SH DESCRIPTION
+Backends are a special type of \fIfilter(7)\fR which is used to send print data
+to and discover different devices on the system.
+.LP
+Like filters, backends must be capable of reading from a filename on the
+command-line or from the standard input, copying the standard input to a
+temporary file as required by the physical interface.
+.LP
+The command name (argv[0]) is set to the device URI of the destination printer.
+Starting with CUPS 1.1.22, any authentication information in argv[0] is removed,
+so backend developers are urged to use the DEVICE_URI environment variable
+whenever authentication information is required. The CUPS API includes a
+\fIcupsBackendDeviceURI\fR function for retrieving the correct device URI.
+.LP
+Back-channel data from the device should be relayed to the job
+filters by writing to file descriptor 3. The CUPS API includes
+the \fIcupsBackChannelWrite\fR function for this purpose.
+.SH WARNING
+CUPS backends are not generally design to be run directly by the user. Aside
+from the device URI issue (argv[0] and DEVICE_URI environment variable contain
+the device URI), CUPS backends also expect specific environment variables and
+file descriptors, and typically run in a user session that (on OS X) has
+additional restrictions that affect how it runs. Backends can also be installed
+with restricted permissions (0500 or 0700) that tell the scheduler to run them
+as the "root" user instead of an unprivileged user (typically "lp") on the
+system.
+.LP
+Unless you are a developer and know what you are doing, please do not run
+backends directly. Instead, use the \fIlp(1)\fR or \fIlpr(1)\fR programs to send
+a print job or \fIlpinfo(8)\fR program to query for available printers using the
+backend. The one exception is the SNMP backend - see \fIsnmpbackend(8)\fR for
+more information.
+.SH DEVICE DISCOVERY
+When run with no arguments, the backend should list the devices and schemes it
+supports or is advertising to stdout. The output consists of zero or more lines
+consisting of any of the following forms:
+
+.nf
+    device-class scheme "Unknown" "device-info"
+    device-class device-uri "device-make-and-model" "device-info"
+    device-class device-uri "device-make-and-model" "device-info" "device-id"
+    device-class device-uri "device-make-and-model" "device-info" "device-id" "device-location"
+.fi
+.LP
+The \fIdevice-class\fR field is one of the following values:
+.TP 5
+direct
+.br
+The device-uri refers to a specific direct-access device with no options, such
+as a parallel, USB, or SCSI device.
+.TP 5
+file
+.br
+The device-uri refers to a file on disk.
+.TP 5
+network
+.br
+The device-uri refers to a networked device and conforms to the general form for
+network URIs.
+.TP 5
+serial
+.br
+The device-uri refers to a serial device with configurable baud rate and other
+options. If the device-uri contains a baud value, it represents the maximum baud
+rate supported by the device.
+.LP
+The \fIscheme\fR field provides the URI scheme that is supported by the backend.
+Backends should use this form only when the backend supports any URI using that
+scheme. The \fIdevice-uri\fR field specifies the full URI to use when
+communicating with the device.
+.LP
+The \fIdevice-make-and-model\fR field specifies the make and model of the
+device, e.g. "Example Foojet 2000". If the make and model is not known, you must
+report "Unknown".
+.LP
+The \fIdevice-info\fR field specifies additional information about the device.
+Typically this includes the make and model along with the port number or network
+address, e.g. "Example Foojet 2000 USB #1".
+.LP
+The optional \fIdevice-id\fR field specifies the IEEE-1284 device ID string for
+the device, which is used to select a matching driver.
+.LP
+The optional \fIdevice-location\fR field specifies the physical location of
+the device, which is often used to pre-populate the printer-location attribute
+when adding a printer.
+.SH PERMISSIONS
+Backends without world execute permissions are run as the root user. Otherwise,
+the backend is run using an unprivileged user account, typically "lp".
+.SH EXIT CODES
+The following exit codes are defined for backends; C API constants defined in
+the <cups/backend.h> header file are defined in parenthesis:
+.TP 5
+0 (CUPS_BACKEND_OK)
+.br
+The print file was successfully transmitted to the device or remote server.
+.TP 5
+1 (CUPS_BACKEND_FAILED)
+.br
+The print file was not successfully transmitted to the device or remote server.
+The scheduler will respond to this by canceling the job, retrying the job, or
+stopping the queue depending on the state of the error-policy attribute.
+.TP 5
+2 (CUPS_BACKEND_AUTH_REQUIRED)
+.br
+The print file was not successfully transmitted because valid authentication
+information is required. The scheduler will respond to this by holding the job
+and adding the "cups-held-for-authentication" keyword to the "job-reasons"
+attribute.
+.TP 5
+3 (CUPS_BACKEND_HOLD)
+.br
+The print file was not successfully transmitted because it cannot be printed at
+this time. The scheduler will respond to this by holding the job.
+.TP 5
+4 (CUPS_BACKEND_STOP)
+.br
+The print file was not successfully transmitted because it cannot be printed at
+this time. The scheduler will respond to this by stopping the queue.
+.TP 5
+5 (CUPS_BACKEND_CANCEL)
+.br
+The print file was not successfully transmitted because one or more attributes
+are not supported or the job was canceled at the printer. The scheduler will
+respond to this by canceling the job.
+.TP 5
+6 (CUPS_BACKEND_RETRY)
+.br
+The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job at a future time - other jobs may print before
+this one.
+.TP 5
+7 (CUPS_BACKEND_RETRY_CURRENT)
+.br
+The print file was not successfully transmitted because of a temporary issue.
+The scheduler will retry the job immediately without allowing intervening jobs.
+.PP
+All other exit code values are reserved.
+.SH SEE ALSO
+\fIcups-snmp(8)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR,
+\fIlpinfo(8)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: backend.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

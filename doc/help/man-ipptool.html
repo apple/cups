@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ipptool(1)</title>
+</head>
+<body>
+<h1 class="title">ipptool(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ipptool - perform internet printing protocol requests
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ipptool
+</b>[ -4 ] [ -6 ] [ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -T
+<i>seconds
+</i>] [ -V
+<i>version
+</i>] [ -X ] [ -c ] [ -d
+<i>name=value
+</i>] [ -f
+<i>filename
+</i>] [ -i
+<i>seconds
+</i>] [ -n
+<i>repeat-count
+</i>] [ -q ] [ -t ] [ -v ]
+<i>URI
+</i><i>filename
+</i>[
+<i>... filenameN
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>ipptool</i> sends IPP requests to the specified URI and tests and/or displays the results. Each named file defines one or more requests, including the expected response status, attributes, and values. Output is either a plain text, formatted text, CSV, or XML report on the standard output, with a non-zero exit status indicating that one or more tests have failed. The file format is described in <a href='man-ipptoolfile.html?TOPIC=Man+Pages'>ipptoolfile(5)</a>.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized by <i>ipptool</i>:
+<dl>
+<dt>-4
+</dt>
+<dd>Specifies that <i>ipptool</i> must connect to the printer or server using IPv4.
+</dd>
+<dt>-6
+</dt>
+<dd>Specifies that <i>ipptool</i> must connect to the printer or server using IPv6.
+</dd>
+<dt>-C
+</dt>
+<dd>Specifies that requests should be sent using the HTTP/1.1 "Transfer-Encoding: chunked" header, which is required for conformance by all versions of IPP. The default is to use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
+</dd>
+<dt>-E
+</dt>
+<dd>Forces TLS encryption when connecting to the server using the HTTP "Upgrade" header.
+</dd>
+<dt>-I
+</dt>
+<dd>Specifies that <i>ipptool</i> will continue past errors.
+</dd>
+<dt>-L
+</dt>
+<dd>Specifies that requests should be sent using the HTTP/1.0 "Content-Length:" header, which is required for conformance by all versions of IPP. The default is to use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
+</dd>
+<dt>-S
+</dt>
+<dd>Forces (dedicated) SSL encryption when connecting to the server.
+</dd>
+<dt>-T seconds
+</dt>
+<dd>Specifies a timeout for IPP requests in seconds.
+</dd>
+<dt>-V version
+</dt>
+<dd>Specifies the default IPP version to use: 1.0, 1.1, 2.0, 2.1, or 2.2. If not specified, version 1.1 is used.
+</dd>
+<dt>-X
+</dt>
+<dd>Specifies that XML (Apple plist) output is desired instead of the plain text report. This option is incompatible with the <i>-i</i> (interval) and <i>-n</i> (repeat-count) options.
+</dd>
+<dt>-c
+</dt>
+<dd>Specifies that CSV (comma-separated values) output is desired instead of the plain text output.
+</dd>
+<dt>-d name=value
+</dt>
+<dd>Defines the named variable.
+</dd>
+<dt>-f filename
+</dt>
+<dd>Defines the default request filename for tests.
+</dd>
+<dt>-i seconds
+</dt>
+<dd>Specifies that the (last) file should be repeated at the specified interval. This option is incompatible with the <i>-X</i> (XML plist output) option.
+</dd>
+<dt>-l
+</dt>
+<dd>Specifies that plain text output is desired.
+</dd>
+<dt>-n repeat-count
+</dt>
+<dd>Specifies that the (last) file should be repeated the specified number of times. This option is incompatible with the <i>-X</i> (XML plist output) option.
+</dd>
+<dt>-t
+</dt>
+<dd>Specifies that CUPS test report output is desired instead of the plain text output.
+</dd>
+<dt>-v
+</dt>
+<dd>Specifies that all request and response attributes should be output in CUPS test mode (<i>-t</i>). This is the default for XML output.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+The <i>ipptool</i> program is unique to CUPS.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Get a list of completed jobs for "myprinter":
+<pre>
+    ipptool ipp://localhost/printers/myprinter get-completed-jobs.test
+</pre>
+<p>Send email notifications to "user@example.com" when "myprinter" changes:
+<pre>
+    ipptool -d recipient=mailto:user@example.com 
+        ipp://localhost/printers/myprinter create-printer-subscription.test
+</pre>
+<h2 class="title"><a name="STANDARD_FILES">Standard Files</a></h2>
+The following standard files are available:
+<pre>
+    color.jpg
+    create-printer-subscription.test
+    document-a4.pdf
+    document-a4.ps
+    document-letter.pdf
+    document-letter.ps
+    get-completed-jobs.test
+    get-jobs.test
+    get-printer-attributes.test
+    gray.jpg
+    ipp-1.1.test
+    ipp-2.0.test
+    ipp-2.1.test
+    ipp-2.2.test
+    onepage-a4.pdf
+    onepage-a4.ps
+    onepage-letter.pdf
+    onepage-letter.ps
+    print-job.test
+    testfile.jpg
+    testfile.pdf
+    testfile.ps
+    testfile.txt
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-ipptoolfile.html?TOPIC=Man+Pages'>ipptoolfile(5)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2012 by Apple Inc.
+
+</body>
+</html>

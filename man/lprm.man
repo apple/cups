@@ -1,0 +1,65 @@
+.\"
+.\" "$Id: lprm.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lprm man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lprm 1 "CUPS" "28 August 2009" "Apple Inc."
+.SH NAME
+lprm \- cancel print jobs
+.SH SYNOPSIS
+.B lprm
+[ -E ] [ -U
+.I username
+] [ -h
+.I server[:port]
+] [ -P
+.I destination[/instance]
+] [ - ] [
+.I job ID(s)
+]
+.SH DESCRIPTION
+\fIlprm\fR cancels print jobs that have been queued for printing.
+If no arguments are supplied, the current job on the default
+destination is cancelled. You can specify one or more job ID
+numbers to cancel those jobs or use the \fI-\fR option to cancel
+all jobs.
+.SH OPTIONS
+The \fIlprm\fR command supports the following options:
+.TP 5
+-E
+.br
+Forces encryption when connecting to the server.
+.TP 5
+-P destination[/instance]
+.br
+Specifies the destination printer or class.
+.TP 5
+-U username
+.br
+Specifies an alternate username.
+.TP 5
+-h server[:port]
+.br
+Specifies an alternate server.
+.SH COMPATIBILITY
+The CUPS version of \fIlprm\fR is compatible with the standard
+Berkeley \fIlprm\fR command.
+.SH SEE ALSO
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpq(1)\fR, \fIlpr(1)\fR,
+\fIlpstat(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lprm.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

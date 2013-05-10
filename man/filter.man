@@ -1,0 +1,238 @@
+.\"
+.\" "$Id: filter.man 10485 2012-05-18 20:17:41Z mike $"
+.\"
+.\"   filter man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH filter 7 "CUPS" "18 May 2012" "Apple Inc."
+.SH NAME
+filter \- cups file conversion filter interface
+.SH SYNOPSIS
+.B filter
+job user title num-copies options [
+.I filename
+]
+.SH DESCRIPTION
+The CUPS filter interface provides a standard method for adding support for
+new document types to CUPS. Each filter is capable of converting from one
+or more input formats to another format that can either be printed directly
+or piped into another filter to get it to a printable format.
+.LP
+Filters \fBmust\fR be capable of reading from a filename on the command-line
+or from the standard input, copying the standard input to a temporary
+file as required by the file format. All output \fBmust\fR be sent to the
+standard output.
+.LP
+The command name (argv[0]) is set to the name of the destination printer but is
+also available in the PRINTER environment variable.
+.SH WARNING
+CUPS filters are not meant to be run directly by the user. Aside from the legacy
+System V interface issues (argv[0] is the printer name), CUPS filters also
+expect specific environment variables and file descriptors, and typically run in
+a user session that (on OS X) has additional restrictions that affect how it
+runs. Unless you are a developer and know what you are doing, please do not run
+filters directly. Instead, use the \fIcupsfilter(8)\fR program to use the
+appropriate filters to do the conversions you need.
+.SH OPTIONS
+Options passed on the command-line typically do not include the default choices
+the printer's PPD file. In addition, some options may be specified in multiple
+ways - "landscape" is a synonym for "orientation-requested=4", "media" is a
+synonym for "PageSize", "PageRegion", "InputSlot", and "MediaType", and "sides"
+is a synonym for the various "Duplex" options. Non-raster filters \fBmust\fR
+support both explicit and implicit specification of PPD options - use the
+ppdMarkDefaults and cupsMarkOptions functions in the CUPS library to use the
+correct mapping, and ppdFindMarkedChoice to get the user-selected choice.
+.LP
+Raster filters should use option choices set through the raster page header, as
+those reflect the options in effect for a given page. Options specified on the
+command-line determine the default values for the entire job, which can be
+overridden on a per-page basis.
+.SH LOG MESSAGES
+Messages sent to stderr are generally logged to
+printer-state-message attribute and the current \fIErrorLog\fR.
+Each line begins with a standard prefix:
+.TP 5
+ALERT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "alert" log level.
+.TP 5
+ATTR: attribute=value [attribute=value]
+.br
+Sets the named job or printer attribute(s). The following job attributes can be
+set: "job-media-progress". The following printer attributes can be set:
+"auth-info-required", "marker-colors", "marker-high-levels", "marker-levels",
+"marker-low-levels", "marker-message", "marker-names", "marker-types",
+"printer-alert", and "printer-alert-description".
+.TP 5
+CRIT: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "critical" log level.
+.TP 5
+DEBUG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "debug" log level.
+.TP 5
+DEBUG2: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "debug2" log level.
+.TP 5
+EMERG: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "emergency" log level.
+.TP 5
+ERROR: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "error" log level.
+.TP 5
+INFO: message
+.br
+Sets the printer-state-message attribute. If the current \fILogLevel\fR
+is set to "debug2", also adds the specified message to the
+current \fIErrorLog\fR using the "info" log level.
+.TP 5
+NOTICE: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "notice" log level.
+.TP 5
+PAGE: page-number #-copies
+.TP 5
+PAGE: total #-pages
+.br
+Adds an entry to the current \fIPageLog\fR. The first form adds
+#-copies to the job-media-sheets-completed attribute. The second
+form sets the job-media-sheets-completed attribute to #-pages.
+.TP 5
+PPD: Keyword=Value ... KeywordN=Value
+.br
+Sets the named keywords in the printer's PPD file. This is typically
+used to update default option keywords such as DefaultPageSize and
+the various installable options in the PPD file.
+.TP 5
+STATE: printer-state-reason [printer-state-reason ...]
+.TP 5
+STATE: + printer-state-reason [printer-state-reason ...]
+.TP 5
+STATE: - printer-state-reason [printer-state-reason ...]
+.br
+Sets, adds, or removes printer-state-reason keywords to the
+current queue. Typically this is used to indicate media, ink, and
+toner conditions on a printer.
+.TP 5
+WARNING: message
+.br
+Sets the printer-state-message attribute and adds the specified
+message to the current \fIErrorLog\fR using the "warning" log level.
+.SH ENVIRONMENT VARIABLES
+The following environment variables are defined by the CUPS
+server when executing the filter:
+.TP 5
+CHARSET
+.br
+The default text character set, typically utf-8.
+.TP 5
+CLASS
+.br
+When a job is submitted to a printer class, contains the name of
+the destination printer class. Otherwise this environment
+variable will not be set.
+.TP 5
+CONTENT_TYPE
+.br
+The MIME type associated with the file (e.g.
+application/postscript).
+.TP 5
+CUPS_CACHEDIR
+.br
+The directory for semi-persistent cache files can be found.
+.TP 5
+CUPS_DATADIR
+.br
+The directory where data files can be found.
+.TP 5
+CUPS_FILETYPE
+.br
+The type of file being printed: "job-sheet" for a banner page and "document"
+for a regular print file.
+.TP 5
+CUPS_MAX_MESSAGE
+.br
+The maximum size of a message sent to stderr, including any leading prefix and
+the trailing newline.
+.TP 5
+CUPS_SERVERROOT
+.br
+The root directory of the server.
+.TP 5
+DEVICE_URI
+.br
+The device-uri associated with the printer.
+.TP 5
+FINAL_CONTENT_TYPE
+.br
+The MIME type associated with the printer (e.g.
+application/vnd.cups-postscript).
+.TP 5
+LANG
+.br
+The default language locale (typically C or en).
+.TP 5
+PATH
+.br
+The standard execution path for external programs that may be run by
+the filter.
+.TP 5
+PPD
+.br
+The full pathname of the PostScript Printer Description (PPD)
+file for this printer.
+.TP 5
+PRINTER
+.br
+The name of the printer.
+.TP 5
+RIP_CACHE
+.br
+The recommended amount of memory to use for Raster Image
+Processors (RIPs).
+.TP 5
+SOFTWARE
+.br
+The name and version number of the server (typically CUPS/1.2).
+.TP 5
+TZ
+.br
+The timezone of the server.
+.TP 5
+USER
+.br
+The user executing the filter, typically "lp" or "root"; consult the
+\fIcupsd.conf(5)\fR file for the current setting.
+.SH COMPATIBILITY
+While the filter interface is compatible with System V interface
+scripts, it will only work with the System V interface script as the
+only filter.  Typically the interface script will be provided via the
+\fIlpadmin(8)\fR command using the \fI-i\fR option.
+.SH SEE ALSO
+\fIbackend(7)\fR, \fIcupsd(8)\fR, \fIcupsfilter(8)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: filter.man 10485 2012-05-18 20:17:41Z mike $".
+.\"

@@ -1,0 +1,71 @@
+.\"
+.\" "$Id: lpc.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   lpc man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH lpc 8 "CUPS" "3 November 2008" "Apple Inc."
+.SH NAME
+lpc \- line printer control program
+.SH SYNOPSIS
+.B lpc
+[
+.I command
+[
+.I parameter(s)
+] ]
+.SH DESCRIPTION
+\fIlpc\fR provides limited control over printer and class queues
+provided by CUPS. It can also be used to query the state of
+queues.
+.LP
+If no command is specified on the command-line, \fRlpc\fR will
+display a prompt and accept commands from the standard input.
+.SH COMMANDS
+The \fIlpc\fR program accepts a subset of commands accepted by
+the Berkeley \fIlpc\fR program of the same name:
+.TP 5
+exit
+.br
+Exits the command interpreter.
+.TP 5
+help [command]
+.TP 5
+? [command]
+.br
+Displays a short help message.
+.TP 5
+quit
+.br
+Exits the command interpreter.
+.TP 5
+status [queue]
+.br
+Displays the status of one or more printer or class queues.
+.SH LIMITATIONS
+Since \fIlpc\fR is geared towards the Berkeley printing system,
+it is impossible to use \fIlpc\fR to configure printer or class
+queues provided by CUPS.  To configure printer or class queues
+you must use the \fIlpadmin(8)\fR command or another
+CUPS-compatible client with that functionality.
+.SH COMPATIBILITY
+The CUPS version of \fIlpc\fR does not implement all of the
+standard Berkeley or LPRng commands.
+.SH SEE ALSO
+\fIcancel(1)\fR, \fIcupsaccept(8)\fR, \fIcupsenable(8)\fR,
+\fIlp(1)\fR, \fIlpr(1)\fR, \fIlprm(1)\fR, \fIlpstat(1)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: lpc.man 10424 2012-04-23 17:26:57Z mike $".
+.\"
