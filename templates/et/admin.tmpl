@@ -1,0 +1,77 @@
+<TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Administration Tasks">
+<TR><TD VALIGN="TOP" NOWRAP>
+
+<H2 CLASS="title">Printerid</H2>
+
+<P>
+<A HREF="/admin?op=add-printer"><IMG
+SRC="/images/button-add-printer.gif" ALT="Lisa printer" CLASS="button"></A>
+<A HREF="/printers/"><IMG SRC="/images/button-manage-printers.gif"
+ALT="Halda printereid" CLASS="button"></A>
+{have_samba?<A HREF="/admin/?op=export-samba"><IMG
+SRC="/images/button-export-samba.gif" ALT="Ekspordi printerid Sambasse"
+CLASS="button"></A>:}
+</P>
+
+{#device_uri=0?:<P><B>Leitud uued printerid:</B></P><UL>{[device_uri]
+<LI><A HREF="/admin?op=add-printer&amp;{device_options}"><IMG
+SRC="/images/button-add-this-printer.gif" ALT="Lisa see printer" CLASS="button"
+ALIGN="MIDDLE"></A>
+{device_make_and_model} ({device_info})</LI>
+}</UL>}
+
+<H2 CLASS="title">Klassid</H2>
+
+<P>
+<A HREF="/admin?op=add-class"><IMG SRC="/images/button-add-class.gif"
+ALT="Lisa klass" CLASS="button"></A>
+<A HREF="/classes/"><IMG SRC="/images/button-manage-classes.gif"
+ALT="Halda klasse" CLASS="button"></A>
+</P>
+
+<H2 CLASS="title">Tööd</H2>
+
+<P>
+<A HREF="/jobs/"><IMG SRC="/images/button-manage-jobs.gif" ALT="Halda
+töid" CLASS="button"></A>
+</P>
+
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+
+<H2 CLASS="title">Server</H2>
+
+<P>
+<A HREF="/admin?op=config-server"><IMG
+SRC="/images/button-edit-configuration-file.gif" ALT="Muuda
+seadistustefaili" CLASS="button"></A>
+<A HREF="/admin/log/access_log" TARGET="_blank"><IMG
+SRC="/images/button-view-access-log.gif" ALT="Vaata kasutamislogi"
+CLASS="button"></A>
+<A HREF="/admin/log/error_log" TARGET="_blank"><IMG
+SRC="/images/button-view-error-log.gif" ALT="Vaata vealogi"
+CLASS="button"></A>
+<A HREF="/admin/log/page_log" TARGET="_blank"><IMG
+SRC="/images/button-view-page-log.gif" ALT="Vaata lehelogi"
+CLASS="button"></A>
+</P>
+
+{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
+<FORM METHOD="POST" ACTION="/admin">
+
+<P><B>Serveri põhiseadistused:</B></P>
+
+<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Teiste süsteemide jagatud printerite näitamine<BR>
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Aktiivse süsteemiga ühendatud avaldatud printerite jagamine<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Võrguhalduse lubamine<BR>
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Kasutajatel lubatakse katkestada kõiki töid (mitte ainult enda omi)<BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Silumisinfo salvestamine probleemide tuvastamiseks</P>
+
+<P><INPUT TYPE="IMAGE" SRC="/images/button-change-settings.gif" ALT="Muuda seadistusi"></P>
+
+</FORM>}
+
+</TD></TR>
+</TABLE>

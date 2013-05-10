@@ -1,0 +1,69 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   mailto.conf man page for the Common UNIX Printing System (CUPS).
+.\"
+.\"   Copyright 1997-2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636 USA
+.\"
+.\"       Voice: (301) 373-9600
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH mailto.conf 5 "Common UNIX Printing System" "12 July 2006" "Easy Software Products"
+.SH NAME
+mailto.conf \- configuration file for cups email notifier
+.SH DESCRIPTION
+The \fImailto.conf\fR file defines the local mail server and
+email notification preferences for CUPS.
+.LP
+Each line in the file can be a configuration directive, a blank line,
+or a comment. Comment lines start with the # character.
+.SH DIRECTIVES
+.TP 5
+Cc \fIcc-address@domain.com\fR
+.br
+Specifies an additional recipient for all email notifications.
+.TP 5
+From \fIfrom-address@domain.com\fR
+.br
+Specifies the sender of email notifications.
+.TP 5
+Sendmail \fIsendmail command and options\fR
+.br
+Specifies the sendmail command to use when sending email
+notifications. Only one \fISendmail\fR or \fISMTPServer\fR line
+may be present in the \fImailto.conf\fR file. If multiple lines
+are present, only the last one is used.
+.TP 5
+SMTPServer \fIservername\fR
+.br
+Specifies a SMTP server to send email notifications to. Only one
+\fISendmail\fR or \fISMTPServer\fR line may be present in the
+\fImailto.conf\fR file. If multiple lines are present, only the
+last one is used.
+.TP 5
+Subject \fIsubject-prefix\fR
+.br
+Specifies a prefix string for the subject line of an email notification.
+.SH SEE ALSO
+\fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
+\fImime.convs(5)\fR, \fImime.types(5)\fR, \fIprinters.conf(5)\fR,
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 1997-2006 by Easy Software Products, All Rights Reserved.
+.\"
+.\" End of "$Id$".
+.\"
