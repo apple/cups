@@ -1,0 +1,66 @@
+{printer_type?:}{#printer_name=0?:
+{[printer_name]
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Pencetak Utama):}
+{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
+
+<TABLE WIDTH="100%" CLASS="button" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
+<TR>
+<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+<IMG SRC="/images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" CLASS="button" ALT=""></A>
+</TD>
+<TD VALIGN="TOP"><B>Deskripsi:</B> {printer_info}<BR>
+<B>Lokasi:</B> {printer_location}<BR>
+<B><I>Driver</I> Pencetak:</B> {printer_make_and_model}<BR>
+<B>Status Pencetak:</B> {printer_state=3?menganggur:{printer_state=4?memproses:dihentikan}},
+{printer_is_accepting_jobs=0?menolak tugas:menerima tugas}, {printer_is_shared=0?not:} dipublikasikan.
+{?device_uri=?:<BR><B>URI Perangkat:</B> {device_uri}}
+
+<P><TABLE WIDTH="100%" CELLPADDING="5" SUMMARY="Actions">
+<TR VALIGN="TOP"><TD>
+<A HREF="{printer_uri_supported}?op=print-test-page">
+<IMG SRC="/images/button-print-test-page.gif" ALT="Cetak Halaman Tes" CLASS="button"></A>
+{?cupscommand=1?<A HREF="{printer_uri_supported}?op=clean-print-heads">
+<IMG SRC="/images/button-clean-print-heads.gif" ALT="Bersihkan Mata-Cetak" CLASS="button"></A>
+<A HREF="{printer_uri_supported}?op=print-self-test-page">
+<IMG SRC="/images/button-print-self-test-page.gif" ALT="Cetak Halaman Tes Sendiri" CLASS="button"></A>:}</TD>
+<TD>{printer_state=5?
+<A HREF="{admin_uri}?op=start-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-start-printer.gif" ALT="Memulaikan Pencetak" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=stop-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-stop-printer.gif" ALT="Menghentikan Pencetak" CLASS="button"></A>
+}
+{printer_is_accepting_jobs=0?
+<A HREF="{admin_uri}?op=accept-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-accept-jobs.gif" ALT="Menerima Tugas" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=reject-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-reject-jobs.gif" ALT="Menolak Tugas" CLASS="button"></A>
+}
+<A HREF="{printer_uri_supported}?op=move-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-move-jobs.gif" ALT="Pindahkan Semua Tugas" CLASS="button"></A>
+<A HREF="{admin_uri}?op=purge-jobs&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-cancel-all-jobs.gif" ALT="Batalkan Semua Tugas" CLASS="button"></A></TD>
+<TD>{printer_is_shared=0?
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=1">
+<IMG SRC="/images/button-publish-printer.gif" ALT="Publikasikan Pencetak" CLASS="button"></A>
+:
+<A HREF="{admin_uri}?op=set-sharing&amp;printer_name={%printer_name}&amp;shared=0">
+<IMG SRC="/images/button-unpublish-printer.gif" ALT="Jangan Publikasikan Pencetak" CLASS="button"></A>
+}
+<A HREF="{admin_uri}?op=modify-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-modify-printer.gif" ALT="Ubah Pencetak" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-printer-options&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-printer-options.gif" ALT="Atur Pilihan Pencetak" CLASS="button"></A>
+<A HREF="{admin_uri}?op=delete-printer&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-delete-printer.gif" ALT="Hapus Pencetak" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-as-default&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-as-default.gif" ALT="Atur Sebagai Utama" CLASS="button"></A>
+<A HREF="{admin_uri}?op=set-allowed-users&amp;printer_name={%printer_name}">
+<IMG SRC="/images/button-set-allowed-users.gif" ALT="Atur Pengguna yang Boleh" CLASS="button"></A></TD>
+</TR>
+</TABLE></P>
+</TD>
+</TR>
+</TABLE>
+}}

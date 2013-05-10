@@ -1,0 +1,22 @@
+<SCRIPT TYPE="text/javascript">
+function reset_config()
+{
+  document.cups.CUPSDCONF.value = "{?cupsdconf_default}";
+}
+</SCRIPT>
+
+<H2 CLASS="title">Berkas Konfigurasi <i>Server</i></H2>
+
+<FORM NAME="cups" METHOD="POST" ACTION="/admin/">
+
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+
+<TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25">{CUPSDCONF}</TEXTAREA>
+
+<P><INPUT TYPE="IMAGE" SRC="/images/button-save-changes.gif"
+ALT="Save Changes"> <A
+HREF="javascript:reset_config();"><IMG
+SRC="/images/button-use-default-config.gif" CLASS="button"
+ALT="Use Default Configuration File"></A></P>
+
+</FORM>

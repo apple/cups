@@ -1,0 +1,15 @@
+<P>{?which_jobs=?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Lihat Tugas yang Telah Diselesaikan"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Lihat Semua Tugas">:{which_jobs=all?<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
+SRC="/images/button-show-completed.gif" CLASS="button" ALT="Lihat Tugas yang Telah Diselesaikan"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Lihat Tugas yang Aktif">:<A
+HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
+SRC="/images/button-show-active.gif" CLASS="button" ALT="Lihat Tugas yang Aktif"></A>
+<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
+SRC="/images/button-show-all.gif" CLASS="button" ALT="Lihat Semua Tugas">}}</A></P>
+
+<P ALIGN="CENTER">{total=0?Tidak ada tugas:Menampilkan {#job_id} dari {total} {?which_jobs=?aktif:{which_jobs=all?:diselesaikan}} tugas{total=1?:s}}.</P>
