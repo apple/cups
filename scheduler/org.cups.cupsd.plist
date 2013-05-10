@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>org.cups.cupsd</string>
+	<key>EnableTransactions</key>
+	<true/>
+	<key>ExitTimeOut</key>
+	<integer>60</integer>
+	<key>KeepAlive</key>
+	<dict>
+		<key>PathState</key>
+		<dict>
+			<key>/private/var/spool/cups/cache/org.cups.cupsd</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/sbin/cupsd</string>
+		<string>-l</string>
+	</array>
+	<!-- These environment variables are only used when CUPS is compiled
+	     with --enable-debug-printfs -->
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>CUPS_DEBUG_LOG</key>
+		<string>/var/log/cups/debug_log</string>
+		<key>CUPS_DEBUG_LEVEL</key>
+		<string>3</string>
+		<key>CUPS_DEBUG_FILTER</key>
+		<string>^(http|_http|ipp|_ipp|mime).*</string>
+	</dict>
+	<key>ServiceIPC</key>
+	<true/>
+	<key>Sockets</key>
+	<dict>
+		<key>Listeners</key>
+		<array>
+			<dict>
+				<key>SockNodeName</key>
+				<string>::1</string>
+				<key>SockServiceName</key>
+				<string>ipp</string>
+			</dict>
+			<dict>
+				<key>SockNodeName</key>
+				<string>127.0.0.1</string>
+				<key>SockServiceName</key>
+				<string>ipp</string>
+			</dict>
+			<dict>
+				<key>SockPathMode</key>
+				<integer>49663</integer>
+				<key>SockPathName</key>
+				<string>/private/var/run/cupsd</string>
+			</dict>
+		</array>
+	</dict>
+</dict>
+</plist>
