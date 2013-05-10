@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">Uue printeri lisamine</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Nimi:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Võib sisaldada kõiki trükitavaid märke, välja arvatud "/", "#" ja tühik)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Asukoht:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Arusaadava sisuga asukoht, näiteks "Laud 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kirjeldus:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Arusaadava sisuga kirjeldus, näiteks "HP LaserJet duplekseriga")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Edasi"></TD>
+</TR>
+</TABLE>
+
+</FORM>
