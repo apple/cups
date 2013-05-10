@@ -1,0 +1,59 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Printer Accounting Basics</TITLE>
+</HEAD>
+<BODY>
+
+<P>CUPS supports a variety of printer accounting schemes. Aside from the
+built-in <A HREF="#QUOTAS">quota</A> and <A HREF="#PAGELOG">page logging</A>
+support, there are several third-party solutions that can be found on
+<A HREF="http://www.cups.org/">www.cups.org</A>.</P>
+
+
+<H2 CLASS="title"><A NAME="QUOTAS">Quota Support</A></H2>
+
+<P>CUPS supports page and size-based quotas for each printer.
+The quotas are tracked individually for each user, but a single set of
+limits applies to all users for a partiuclar printer. For example, you
+can limit every user to 5 pages per day on an expensive printer, but
+you cannot limit every user except Johnny.</P>
+
+<P>The <CODE>job-k-limit</CODE>, <CODE>job-page-limit</CODE>, and <CODE>job-quota-peiod</CODE>
+options determine whether and how quotas are enforced for a printer.
+The <CODE>job-quota-period</CODE> option determines the time interval for
+quota tracking. The interval is expressed in seconds, so a day is
+86,400, a week is 604,800 and a month is 2,592,000 seconds. The
+<CODE>job-k-limit</CODE> option specifies the job size limit in killobytes. The 
+<CODE>job-page-limit</CODE> option specifies the number of pages limit.</P>
+
+<P>For quotas to be enforced, the period and at least one of the limits
+must be set to a non-zero value. The following options will enable
+weekly quotas with the given size and page count limits:</P>
+
+<PRE CLASS="command">
+<KBD>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 \
+    -o job-k-limit=1024 ENTER</KBD>
+<KBD>/usr/sbin/lpadmin -p <I>printer</I> -o job-quota-period=604800 \
+    -o job-page-limit=100 ENTER</KBD>
+</PRE>
+
+<P>Or, you can combine all three options on the same line.</P>
+
+<P>While there is no way to query the current quota state for a particular
+user, any application can request a list of jobs for a user and printer that
+can be used to easily determine that information.</P>
+
+
+<H2 CLASS="title"><A NAME="PAGELOG">Page Logging</A></H2>
+
+<P>CUPS logs every page that is printed on a system to the
+<VAR><A HREF="ref-page_log.html">page_log</A></VAR> file. Page logging
+is only available for drivers that provide page accounting information,
+typically all PostScript and CUPS raster devices. Raw queues and queues
+using third-party solutions such as Foomatic generally do not have
+useful page accounting information available.</P>
+ 
+
+</BODY>
+</HTML>

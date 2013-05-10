@@ -1,0 +1,47 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
+<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
+
+<H2 CLASS="title">Serieportsinställningar för {printer_name}</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">Baudhastighet:</TH>
+<TD><SELECT NAME="BAUDRATE">
+{[baudrates]<OPTION {?baudrate={baudrates}?SELECTED:}>{baudrates}}
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Paritet:</TH>
+<TD><SELECT NAME="PARITY">
+<OPTION VALUE="none" {?parity=none?SELECTED:}>Ingen
+<OPTION VALUE="even" {?parity=even?SELECTED:}>Jämn
+<OPTION VALUE="odd" {?parity=odd?SELECTED:}>Udda
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Databitar:</TH>
+<TD><SELECT NAME="BITS">
+<OPTION {?bits=8?SELECTED:}>8
+<OPTION {?bits=7?SELECTED:}>7
+</SELECT></TD>
+</TR>
+<TR>
+<TH CLASS="label">Flödeskontroll:</TH>
+<TD><SELECT NAME="FLOW">
+<OPTION VALUE="none" {?flow=none?SELECTED:}>Ingen
+<OPTION VALUE="soft" {?flow=soft?SELECTED:}>XON/XOFF (Programvara)
+<OPTION VALUE="hard" {?flow=hard?SELECTED:}>RTS/CTS (Maskinvara)
+<OPTION VALUE="dtrdsr" {?flow=dtrdsr?SELECTED:}>DTR/DSR (Maskinvara)
+</SELECT></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="Fortsätt"></TD>
+</TR>
+</TABLE>
+
+</FORM>
