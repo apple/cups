@@ -1,0 +1,13 @@
+#
+# "$Id$"
+#
+#   Sample SNMP configuration file for CUPS.  See "man smnp.conf" for a
+#   complete description of this file.
+#
+
+@CUPS_SNMP_ADDRESS@
+@CUPS_SNMP_COMMUNITY@
+
+#
+# End of "$Id$".
+#
