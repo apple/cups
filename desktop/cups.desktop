@@ -1,0 +1,19 @@
+[Desktop Entry]
+Categories=Application;System;X-Red-Hat-Base;
+Comment=CUPS Web Interface
+Comment[en_US]=CUPS Web Interface
+Encoding=UTF-8
+Exec=htmlview http://localhost:631/
+GenericName=
+GenericName[en_US]=
+Icon=cups
+MimeType=
+Name=Manage Printing
+Path=
+StartupNotify=false
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DCOP-ServiceType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
