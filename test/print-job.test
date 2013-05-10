@@ -1,0 +1,32 @@
+# Print a test page using print-job
+{
+	# The name of the test...
+	NAME "Print test page using print-job"
+
+	# The resource to use for the POST
+	# RESOURCE /admin
+
+	# The operation to use
+	OPERATION print-job
+
+	# Attributes, starting in the operation group...
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimetype document-format application/postscript
+
+	GROUP job
+	ATTR integer copies 1
+
+	FILE testfile.ps
+
+	# What statuses are OK?
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
+
+	# What attributes do we expect?
+	EXPECT job-id
+	EXPECT job-uri
+}

@@ -1,0 +1,206 @@
+/*
+ * "$Id: media.defs 343 2007-07-13 19:52:48Z mike $"
+ *
+ *   Adobe standard media size definitions for the CUPS PPD file compiler.
+ *
+ *   Copyright 2007 by Apple Inc.
+ *   Copyright 1997-2005 by Easy Software Products.
+ *
+ *   These codedinstructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   copyright law.  Distribution and use rights are outlinedin the file
+ *   "LICENSE.txt" which should have beenincluded with this file.  If this
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
+ */
+
+#media "10x11/10 x 11\"" 720 792
+#media "10x13/10 x 13\"" 720 936
+#media "10x14/10 x 14\"" 720 1008
+#media "12x11/12 x 11\"" 864 792
+#media "15x11/15 x 11\"" 1080 792
+#media "7x9/7 x 9\"" 504 648
+#media "8x10/8 x 10\"" 576 720
+#media "9x11/9 x 11\"" 648 792
+#media "9x12/9 x 12\"" 648 864
+#media "A0/A0" 2384 3370
+#media "A0.Transverse/A0" 3370 2384
+#media "A1/A1" 1684 2384
+#media "A1.Transverse/A1" 2384 1684
+#media "A2/A2" 1191 1684
+#media "A2.Transverse/A2" 1684 1191
+#media "A3/A3" 842 1191
+#media "A3.Transverse/A3" 1191 842
+#media "A3Extra/A3 (Oversize)" 913 1262
+#media "A3Extra.Transverse/A3 (Oversize)" 913 1262
+#media "A3Rotated/A3" 1191 842
+#media "A4/A4" 595 842
+#media "A4Extra/A4 (Oversize)" 667 914
+#media "A4Plus/A4 (Oversize)" 595 936
+#media "A4Rotated/A4" 842 595
+#media "A4Small/A4 (Small)" 595 842
+#media "A4.Transverse/A4" 842 595
+#media "A5/A5" 420 595
+#media "A5Extra/A5 (Oversize)" 492 668
+#media "A5Rotated/A5" 595 420
+#media "A5.Transverse/A5" 595 420
+#media "A6/A6" 297 420
+#media "A6Rotated/A6" 420 297
+#media "A7/A7" 210 297
+#media "A8/A8" 148 210
+#media "A9/A9" 105 148
+#media "A10/A10" 73 105
+#media "AnsiA/ANSI A" 612 792
+#media "AnsiB/ANSI B" 792 1224
+#media "AnsiC/ANSI C" 1224 1584
+#media "AnsiD/ANSI D" 1584 2448
+#media "AnsiE/ANSI E" 2448 3168
+#media "ARCHA/ARCH A" 648 864
+#media "ARCHA.Transverse/ARCH A" 864 648
+#media "ARCHB/ARCH B" 864 1296
+#media "ARCHB.Transverse/ARCH B" 1296 864
+#media "ARCHC/ARCH C" 1296 1728
+#media "ARCHC.Transverse/ARCH C" 1728 1296
+#media "ARCHD/ARCH D" 1728 2592
+#media "ARCHD.Transverse/ARCH D" 2592 1728
+#media "ARCHE/ARCH E" 2592 3456
+#media "ARCHE.Transverse/ARCH E" 3456 2592
+#media "B0/B0" 2920 4127
+#media "B10/B10" 91 127
+#media "B1/B1" 2064 2918
+#media "B1/B1" 2064 2920
+#media "B2/B2" 1460 2064
+#media "B3/B3" 1032 1460
+#media "B4/B4" 729 1032
+#media "B4Rotated/B4" 1032 729
+#media "B5/B5" 516 729
+#media "B5Rotated/B5" 729 516
+#media "B5.Transverse/B5" 516 729
+#media "B6/B6" 363 516
+#media "B6Rotated/B6" 516 363
+#media "B7/B7" 258 363
+#media "B8/B8" 181 258
+#media "B9/B9" 127 181
+#media "C4/C4" 649 918
+#media "C5/C5" 459 649
+#media "C6/C6" 323 459
+#media "DL/DL" 312 624
+#media "DoublePostcard/Double Postcard" 567 420
+#media "DoublePostcardRotated/Double Postcard" 420 567
+#media "Env10/#10 Envelope" 297 684
+#media "Env11/#11 Envelope" 324 747
+#media "Env12/#12 Envelope" 342 792
+#media "Env14/#14 Envelope" 360 828
+#media "Env9/#9 Envelope" 279 639
+#media "EnvC0/C0 Envelope" 2599 3676
+#media "EnvC1/C1 Envelope" 1837 2599
+#media "EnvC2/C2 Envelope" 1298 1837
+#media "EnvC3/C3 Envelope" 918 1296
+#media "EnvC4/C4 Envelope" 649 918
+#media "EnvC5/C5 Envelope" 459 649
+#media "EnvC65/C65 Envelope" 324 648
+#media "EnvC6/C6 Envelope" 323 459
+#media "EnvC7/C7 Envelope" 230 323
+#media "EnvChou3/Chou3 Envelope" 340 666
+#media "EnvChou3Rotated/Chou3 Envelope" 666 340
+#media "EnvChou4/Chou4 Envelope" 255 581
+#media "EnvChou4Rotated/Chou4 Envelope" 581 255
+#media "EnvDL/DL Envelope" 312 624
+#media "EnvInvite/Invite Envelope" 624 624
+#media "EnvISOB4/ISO B4 Envelope" 708 1001
+#media "EnvISOB5/ISO B5 Envelope" 499 709
+#media "EnvISOB6/ISO B6 Envelope" 499 354
+#media "EnvItalian/Italian Envelope" 312 652
+#media "EnvKaku2/Kaku2 Envelope" 680 941
+#media "EnvKaku2Rotated/Kaku2 Envelope" 941 680
+#media "EnvKaku3/Kaku3 Envelope" 612 785
+#media "EnvKaku3Rotated/Kaku3 Envelope" 785 612
+#media "EnvMonarch/Monarch Envelope" 279 540
+#media "EnvPersonal/Personal Envelope" 261 468
+#media "EnvPRC1/PRC1 Envelope" 289 468
+#media "EnvPRC1Rotated/PRC1 Envelope" 468 289
+#media "EnvPRC2/PRC2 Envelope" 289 499
+#media "EnvPRC2Rotated/PRC2 Envelope" 499 289
+#media "EnvPRC3/PRC3 Envelope" 354 499
+#media "EnvPRC3Rotated/PRC3 Envelope" 499 354
+#media "EnvPRC4/PRC4 Envelope" 312 590
+#media "EnvPRC4Rotated/PRC4 Envelope" 590 312
+#media "EnvPRC5/PRC5 Envelope" 312 624
+#media "EnvPRC5Rotated/PRC5 Envelope" 624 312
+#media "EnvPRC6/PRC6 Envelope" 340 652
+#media "EnvPRC6Rotated/PRC6 Envelope" 652 340
+#media "EnvPRC7/PRC7 Envelope" 454 652
+#media "EnvPRC7Rotated/PRC7 Envelope" 652 454
+#media "EnvPRC8/PRC8 Envelope" 340 876
+#media "EnvPRC8Rotated/PRC8 Envelope" 876 340
+#media "EnvPRC9/PRC9 Envelope" 649 918
+#media "EnvPRC9Rotated/PRC9 Envelope" 918 649
+#media "EnvPRC10/PRC10 Envelope" 918 1298
+#media "EnvPRC10Rotated/PRC10 Envelope" 1298 918
+#media "EnvYou4/You4 Envelope" 298 666
+#media "EnvYou4Rotated/You4 Envelope" 666 298
+#media "Executive/US Executive" 522 756
+#media "FanFoldGerman/German FanFold" 612 864
+#media "FanFoldGermanLegal/German FanFold Legal" 612 936
+#media "FanFoldUS/US Fanfold" 1071 792
+#media "Folio/Folio" 595 935
+#media "ISOB0/ISO B0" 2835 4008
+#media "ISOB1/ISO B1" 2004 2835
+#media "ISOB2/ISO B2" 1417 2004
+#media "ISOB3/ISO B3" 1001 1417
+#media "ISOB4/ISO B4" 709 1001
+#media "ISOB5/ISO B5" 499 709
+#media "ISOB5Extra/ISO B5 (Oversize)" 570 782
+#media "ISOB6/ISO B6" 354 499
+#media "ISOB7/ISO B7" 249 354
+#media "ISOB8/ISO B8" 176 249
+#media "ISOB9/ISO B9" 125 176
+#media "ISOB10/ISO B10" 88 125
+#media "Ledger/US Ledger" 1224 792
+#media "Legal/US Legal" 612 1008
+#media "LegalExtra/US Legal (Oversize)" 684 1080
+#media "Letter/US Letter" 612 792
+#media "Letter.Transverse/US Letter" 792 612
+#media "LetterExtra/US Letter (Oversize)" 684 864
+#media "LetterExtra.Transverse/US Letter (Oversize)" 864 684
+#media "LetterPlus/US Letter (Oversize)" 612 914
+#media "LetterRotated/US Letter" 792 612
+#media "LetterSmall/US Letter (Small)" 612 792
+#media "Monarch/Monarch" 279 540
+#media "Note/Note" 612 792
+#media "Postcard/Postcard" 284 419
+#media "PostcardRotated/Postcard" 419 284
+#media "PRC16K/PRC16K" 414 610
+#media "PRC16KRotated/PRC16K" 610 414
+#media "PRC32K/PRC32K" 275 428
+#media "PRC32KBig/PRC32K (Oversize)" 275 428
+#media "PRC32KBigRotated/PRC32K (Oversize)" 428 275
+#media "PRC32KRotated/PRC32K" 428 275
+#media "Quarto/Quarto" 610 780
+#media "Statement/Statement" 396 612
+#media "SuperA/Super A" 643 1009
+#media "SuperB/Super B" 864 1380
+#media "Tabloid/Tabloid" 792 1224
+#media "TabloidExtra/Tabloid (Oversize)" 864 1296
+
+/*
+ * Non-standard sizes...
+ */
+
+#media "Photo4x6/Photo" 288 432
+#media "PhotoLabel/Photo Labels" 288 468
+#media "w288h418/Photo" 288 418
+#media "w936h1368/Super B/A3" 936 1368
+#media "w81h252/Address" 81 252
+#media "w101h252/Large Address" 101 252
+#media "w54h144/Return Address" 54 144
+#media "w167h288/Shipping Address" 167 288
+#media "w162h540/Internet Postage 2-Part" 162 540
+#media "w162h504/Internet Postage 3-Part" 162 504
+#media "w41h248/File Folder" 41 248
+#media "w41h144/Hanging Folder" 41 144
+#media "w153h198/3.5\" Disk" 153 198
+
+
+/*
+ * End of "$Id: media.defs 343 2007-07-13 19:52:48Z mike $".
+ */
