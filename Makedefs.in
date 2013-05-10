@@ -1,0 +1,276 @@
+#
+# "$Id$"
+#
+#   Common makefile definitions for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 2007 by Apple Inc.
+#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+#
+# Programs...
+#
+
+AR		=	@AR@
+AWK		=	@AWK@
+CC		=	@LIBTOOL@ @CC@
+CXX		=	@LIBTOOL@ @CXX@
+DSO		=	@DSO@
+HTMLDOC		=	@HTMLDOC@
+INSTALL		=	@INSTALL@
+LD		=	@LD@
+LIBTOOL		=	@LIBTOOL@
+LN		=	@LN@ -sf
+MV		=	@MV@
+PHPCONFIG	=	@PHPCONFIG@
+RANLIB		=	@RANLIB@
+RM		=	@RM@ -f
+RMDIR		=	@RMDIR@
+SED		=	@SED@
+SHELL		=	/bin/sh
+STRIP		=	@STRIP@
+
+#
+# Installation programs...
+#
+
+INSTALL_BIN	=	$(LIBTOOL) $(INSTALL) -m 755
+INSTALL_CONFIG	=	$(INSTALL) -m @CUPS_CONFIG_FILE_PERM@
+INSTALL_DATA	=	$(INSTALL) -m 644
+INSTALL_DIR	=	$(INSTALL) -d
+INSTALL_LIB	=	$(LIBTOOL) $(INSTALL) -m 755
+INSTALL_MAN	=	$(INSTALL) -m 644
+INSTALL_SCRIPT	=	$(INSTALL) -m 755
+
+#
+# Default user, group, and system groups for the scheduler...
+#
+
+CUPS_USER	=	@CUPS_USER@
+CUPS_GROUP	=	@CUPS_GROUP@
+CUPS_SYSTEM_GROUPS =	@CUPS_SYSTEM_GROUPS@
+CUPS_PRIMARY_SYSTEM_GROUP =	@CUPS_PRIMARY_SYSTEM_GROUP@
+
+#
+# Default permissions...
+#
+
+CUPS_CONFIG_FILE_PERM = @CUPS_CONFIG_FILE_PERM@
+CUPS_LOG_FILE_PERM = @CUPS_LOG_FILE_PERM@
+
+#
+# Languages to install...
+#
+
+LANGUAGES	=	@LANGUAGES@
+INSTALL_LANGUAGES =	@INSTALL_LANGUAGES@
+UNINSTALL_LANGUAGES =	@UNINSTALL_LANGUAGES@
+
+#
+# Libraries...
+#
+
+LIBCUPS		=	@LIBCUPS@
+LIBCUPSIMAGE	=	@LIBCUPSIMAGE@
+LIBJPEG		=	@LIBJPEG@
+LIBLDAP		=	@LIBLDAP@
+LIBMALLOC	=	@LIBMALLOC@
+LIBPAPER	=	@LIBPAPER@
+LIBPNG		=	@LIBPNG@
+LIBSLP		=	@LIBSLP@
+LIBGSSAPI	=	@LIBGSSAPI@
+LIBTIFF		=	@LIBTIFF@
+LIBZ		=	@LIBZ@
+
+#
+# Install static libraries?
+#
+
+INSTALLSTATIC	=	@INSTALLSTATIC@
+
+#
+# Program options...
+#
+# ARCHFLAGS     Defines the default architecture build options.
+# ARCH32FLAGS   Defines the 32-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# ARCH64FLAGS   Defines the 64-bit architecture build options, used
+#               when compiling separate 32/64-bit libraries.
+# OPTIM         Defines the common compiler optimization/debugging options
+#               for all architectures.
+# OPTIONS       Defines other compile-time options (currently only -DDEBUG
+#               for extra debug info)
+#
+
+ALL_CFLAGS	=	$(CFLAGS) $(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
+			$(OPTIONS)
+ARCHFLAGS	=	@ARCHFLAGS@
+ARFLAGS		=	@ARFLAGS@
+BACKLIBS	=	@BACKLIBS@
+CFLAGS		=	-I.. @CPPFLAGS@ @CFLAGS@ \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
+COMMONLIBS	=	@LIBS@
+CUPSDLIBS	=	@CUPSDLIBS@
+CXXFLAGS	=	-I.. $(SSLFLAGS) @CPPFLAGS@ @CXXFLAGS@ \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
+CXXLIBS		=	@CXXLIBS@
+DSOFLAGS	=	@DSOFLAGS@
+DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
+DNSSDLIBS	=	@DNSSDLIBS@
+FONTS		=	@FONTS@
+IMGLIBS		=	@IMGLIBS@
+IMGFILTERS	=	@IMGFILTERS@
+LAUNCHDLIBS	=	@LAUNCHDLIBS@
+LDFLAGS		=	-L../cups -L../filter @LDARCHFLAGS@ \
+			@LDFLAGS@ @RELROFLAGS@ @PIEFLAGS@ $(OPTIM)
+LEGACY_BACKENDS	=	@LEGACY_BACKENDS@
+LIBCUPSORDER	=	@LIBCUPSORDER@
+LIBCUPSIMAGEORDER =	@LIBCUPSIMAGEORDER@
+LINKCUPS	=	@LINKCUPS@ $(SSLLIBS)
+LINKCUPSIMAGE	=	@LINKCUPSIMAGE@
+LIBS		=	$(LINKCUPS) $(COMMONLIBS)
+OPTIM		=	@OPTIM@
+OPTIONS		=
+PAMLIBS		=	@PAMLIBS@
+PAP		=	@PAP@
+PDFTOPS		=	@PDFTOPS@
+PHPDIR		=	@PHPDIR@
+SSLFLAGS	=	@SSLFLAGS@
+SSLLIBS		=	@SSLLIBS@
+
+#
+# Separate 32/64-bit library support...
+#
+
+ARCH32FLAGS	=	@ARCH32FLAGS@
+DSO32FLAGS	=	@DSO32FLAGS@
+INSTALL32	=	@INSTALL32@
+LIB32CUPS	=	@LIB32CUPS@
+LIB32CUPSIMAGE	=	@LIB32CUPSIMAGE@
+LIB32DIR	=	$(BUILDROOT)@LIB32DIR@
+UNINSTALL32	=	@UNINSTALL32@
+
+ARCH64FLAGS	=	@ARCH64FLAGS@
+DSO64FLAGS	=	@DSO64FLAGS@
+INSTALL64	=	@INSTALL64@
+LIB64CUPS	=	@LIB64CUPS@
+LIB64CUPSIMAGE	=	@LIB64CUPSIMAGE@
+LIB64DIR	=	$(BUILDROOT)@LIB64DIR@
+UNINSTALL64	=	@UNINSTALL64@
+
+#
+# Directories...
+#
+# The first section uses the GNU names (which are *extremely*
+# difficult to find in a makefile because they are lowercase...)
+# We have to define these first because autoconf uses ${prefix}
+# and ${exec_prefix} for most of the other directories...
+#
+# The "datarootdir" variable may not get defined if you are using
+# a version of autoconf prior to 2.60.
+#
+# This is immediately followed by definition in ALL CAPS for the
+# needed directories...
+#
+
+bindir		=	@bindir@
+datadir		=	@datadir@
+datarootdir	=	@datarootdir@
+exec_prefix	=	@exec_prefix@
+includedir	=	@includedir@
+infodir		=	@infodir@
+libdir		=	@libdir@
+libexecdir	=	@libexecdir@
+localstatedir	=	@localstatedir@
+mandir		=	@mandir@
+oldincludedir	=	@oldincludedir@
+prefix		=	@prefix@
+sbindir		=	@sbindir@
+sharedstatedir	=	@sharedstatedir@
+srcdir		=	@srcdir@
+sysconfdir	=	@sysconfdir@
+top_srcdir	=	@top_srcdir@
+
+BUILDROOT	=	$(DSTROOT)
+
+AMANDIR		=	$(BUILDROOT)@AMANDIR@
+BINDIR		=	$(BUILDROOT)@bindir@
+CACHEDIR	=	$(BUILDROOT)@CUPS_CACHEDIR@
+DATADIR		=	$(BUILDROOT)@CUPS_DATADIR@
+DOCDIR		=	$(BUILDROOT)@CUPS_DOCROOT@
+ICONDIR		=	@ICONDIR@
+INCLUDEDIR	=	$(BUILDROOT)$(includedir)
+INITDIR		=	@INITDIR@
+INITDDIR	=	@INITDDIR@
+LIBDIR		=	$(BUILDROOT)$(libdir)
+LOCALEDIR	= 	$(BUILDROOT)@CUPS_LOCALEDIR@
+LOGDIR		= 	$(BUILDROOT)@CUPS_LOGDIR@
+MANDIR		=	$(BUILDROOT)@mandir@
+MENUDIR		=	@MENUDIR@
+PMANDIR		=	$(BUILDROOT)@PMANDIR@
+RCLEVELS	=	@RCLEVELS@
+RCSTART		=	@RCSTART@
+RCSTOP		=	@RCSTOP@
+REQUESTS	= 	$(BUILDROOT)@CUPS_REQUESTS@
+SBINDIR		=	$(BUILDROOT)@sbindir@
+SERVERBIN	= 	$(BUILDROOT)@CUPS_SERVERBIN@
+SERVERROOT	= 	$(BUILDROOT)@CUPS_SERVERROOT@
+STATEDIR	=	$(BUILDROOT)@CUPS_STATEDIR@
+XINETD		=	@XINETD@
+
+MAN1EXT		=	@MAN1EXT@
+MAN5EXT		=	@MAN5EXT@
+MAN7EXT		=	@MAN7EXT@
+MAN8EXT		=	@MAN8EXT@
+MAN8DIR		=	@MAN8DIR@
+
+PAMDIR		=	@PAMDIR@
+PAMFILE		=	@PAMFILE@
+
+DEFAULT_LAUNCHD_CONF =	@DEFAULT_LAUNCHD_CONF@
+DBUSDIR		=	@DBUSDIR@
+
+
+#
+# Rules...
+#
+
+.SILENT:
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .32.o .64.o .gz
+
+.c.o:
+	echo Compiling $<...
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c $<
+
+.c.32.o:
+	echo Compiling 32-bit $<...
+	$(CC) $(ARCH32FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
+
+.c.64.o:
+	echo Compiling 64-bit $<...
+	$(CC) $(ARCH64FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
+
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(CXXFLAGS) -c $<
+
+.man.1 .man.1m .man.5 .man.7 .man.8:
+	echo Linking $<...
+	$(RM) $@
+	$(LN) $< $@
+
+.man.1.gz .man.1m.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
+	echo -n Compressing $<...
+	$(RM) $@
+	gzip -v9 <$< >$@
+
+
+#
+# End of "$Id$"
+#
