@@ -1,0 +1,1426 @@
+
+
+
+
+
+
+INTERNET-DRAFT
+<draft-ietf-ipp-install-02.txt>
+[Target category:  standards track]                           Hugo Parra
+                                                            Novell, Inc.
+                                                             Ted Tronson
+                                                            Novell, Inc.
+                                                            Tom Hastings
+                                                             Xerox Corp.
+                                                       February 28, 2001
+                     Internet Printing Protocol (IPP):
+                      Printer Installation Extension
+
+      Copyright (C) The Internet Society (2001). All Rights Reserved.
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of [RFC2026].  Internet-Drafts are
+   working documents of the Internet Engineering Task Force (IETF), its
+   areas, and its working groups.  Note that other groups may also
+   distribute working documents as Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress".
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow Directories can be accessed as
+   http://www.ietf.org/shadow.html.
+
+Abstract
+
+   Various client platforms require that some setting up take place at
+   the workstation before the client can properly submit jobs to a
+   specific printer.   This setup process is sometimes referred to as
+   printer installation.  Most clients need some information about the
+   printer being installed as well as support files to complete the
+   printer installation.  The nature of the support files varies
+   depending on the specific client platform, from simple configuration
+   files to highly sophisticated printer drivers.  This document refers
+   to these support files as "Client Print Support Files".
+   Traditionally, the selection and installation of the correct Client
+   Print Support Files has been error prone.  The selection and
+   installation process can be simplified and even automated if the
+   workstation can learn some key information about the printer and
+   which sets of Client Print Support Files are available.  Such key
+   information includes: operating system type, CPU type, document-
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 1]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   format (PDL), natural language, compression mechanism, file type,
+   client file name, policy for automatic loading, file size, file
+   version, file date and time, file information description, and
+   digital signature. This document describes the IPP extensions that
+   enable workstations to obtain the information needed to perform a
+   proper printer driver installation using IPP, including security for
+   downloading executable code and data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 2]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   The full set of IPP documents includes:
+
+      Design Goals for an Internet Printing Protocol [RFC2567]
+      Rationale for the Structure and Model and Protocol for the
+        Internet Printing Protocol [RFC2568]
+      Internet Printing Protocol/1.1: Model and Semantics [RFC2911]
+      Internet Printing Protocol/1.1: Encoding and Transport [RFC2910]
+      Internet Printing Protocol/1.1: Implementer's Guide [ipp-iig]
+      Mapping between LPD and IPP Protocols [RFC2569]
+
+   The "Design Goals for an Internet Printing Protocol" document takes a
+   broad look at distributed printing functionality, and it enumerates
+   real-life scenarios that help to clarify the features that need to be
+   included in a printing protocol for the Internet.  It identifies
+   requirements for three types of users: end users, operators, and
+   administrators.  It calls out a subset of end user requirements that
+   are satisfied in IPP/1.0.  A few OPTIONAL operator operations have
+   been added to IPP/1.1.
+
+   The "Rationale for the Structure and Model and Protocol for the
+   Internet Printing Protocol" document describes IPP from a high level
+   view, defines a roadmap for the various documents that form the suite
+   of IPP specification documents, and gives background and rationale
+   for the IETF working group's major decisions.
+
+   The "Internet Printing Protocol/1.1: Encoding and Transport" document
+   is a formal mapping of the abstract operations and attributes defined
+   in the model document onto HTTP/1.1 [RFC2616].  It defines the
+   encoding rules for a new Internet MIME media type called
+   "application/ipp".  This document also defines the rules for
+   transporting a message body over HTTP whose Content-Type is
+   "application/ipp".  This document defines a new scheme named 'ipp'
+   for identifying IPP printers and jobs.
+
+   The "Internet Printing Protocol/1.1: Implementer's Guide" document
+   gives insight and advice to implementers of IPP clients and IPP
+   objects.  It is intended to help them understand IPP/1.1 and some of
+   the considerations that may assist them in the design of their client
+   and/or IPP object implementations.  For example, a typical order of
+   processing requests is given, including error checking.  Motivation
+   for some of the specification decisions is also included.
+
+   The "Mapping between LPD and IPP Protocols" document gives some
+   advice to implementers of gateways between IPP and LPD (Line Printer
+   Daemon) implementations.
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 3]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+
+Table of Contents
+
+   1  Introduction....................................................6
+
+
+   2  Terminology.....................................................6
+
+
+   3  Model Extensions................................................7
+
+   3.1   client-print-support-files-supported (1setOf octetString(MAX))
+
+            ..........................................................7
+   3.1.1 Use of Keyword Values in fields.............................12
+
+   3.1.2 Use of the Special Keyword Value: 'unknown'.................12
+
+   3.1.3 Examples of "client-print-support-files-supported" attribute
+
+              values.................................................12
+
+   3.2   Get-Printer-Attributes Operation Extension..................13
+
+   3.2.1 Get-Printer-Attributes Request..............................13
+
+   3.2.1.1  client-print-support-files-filter (octetString(MAX))
+
+                operation attribute..................................13
+
+   3.2.1.1.1   Filter matching rules.................................15
+
+   3.2.2 Get-Printer-Attributes Response.............................16
+
+   3.3   Get-Client-Print-Support-Files..............................17
+
+   3.3.1 Get-Client-Print-Support-Files Request......................17
+
+   3.3.2 Get-Client-Print-Support-Files Response.....................18
+
+
+   4  Conformance....................................................19
+
+
+   5  Encoding of the Operation Layer................................20
+
+
+   6  Encoding of Transport Layer....................................20
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 4]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   7  IANA Considerations............................................20
+
+   7.1   Attribute Registrations.....................................21
+
+   7.2   Operation Registrations.....................................22
+
+
+   8  Internationalization Considerations............................22
+
+
+   9  Security Considerations........................................22
+
+
+   10 References.....................................................23
+
+
+   11 Author's Addresses.............................................24
+
+
+   12 Full Copyright Statement.......................................25
+
+
+
+Tables
+
+   Table 1 - "client-print-support-files-supported" attribute fields..9
+
+   Table 2 - "client-print-support-files-filter" attribute fields....14
+
+   Table 3 - REQUIRED "client-print-support-files-filter" fields.....14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 5]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+1  Introduction
+
+   A common configuration for printing from a workstation requires that
+   some Client Print Support Files (e.g., PPD, printer driver files)
+   specific to the target printer be installed on that workstation.
+   Selection and configuration of the appropriate Client Print Support
+   Files can be simplified and even automated if the workstation can
+   obtain some key information about the printer and which sets of
+   Client Print Support Files are available.  Such key information
+   includes: operating system type, CPU type, document-format (PDL),
+   natural language, compression mechanism, file type, client file name,
+   policy for automatic loading, file size, file version, file date and
+   time, file information description, and digital signature.  With a
+   few extensions, IPP provides a simple and reliable vehicle for
+   printers to convey this information to interested workstations.  The
+   IPP extensions described in this document enable a flexible solution
+   for installing Client Print Support Files on workstations running
+   different operating systems and for printers of all makes and models.
+   It allows Client Print Support Files to be downloaded from
+   repositories of different sorts.  A possible repository for the files
+   is the printer itself.  The extensions necessary for getting Client
+   Print Support Files from the printer are included in this document,
+   including security for downloading executable code and data.
+
+
+2  Terminology
+
+   Client Print Support Files - a set of files, such as a printer
+   driver, font metric file, printer configuration file (PPD, GPD, etc.)
+   that support a client printing to a particular Printer.  A Printer
+   MAY have multiple sets of Client Print Support Files that work for
+   different operating systems, document formats, natural languages,
+   CPUs, etc.
+
+   This document uses terms such as "attributes", "keywords", and
+   "support".  These terms have special meaning and are defined in the
+   model terminology [RFC2911] section 12.2.  This document also uses
+   the terms "IPP Printer", "Printer" and "Printer object"
+   interchangeably as in [RFC2911] to mean the software entity that
+   accepts IPP operation requests and returns IPP operation responses
+   (see [RFC2911] section 2).
+
+   Capitalized terms, such as MUST, MUST NOT, REQUIRED, SHOULD, SHOULD
+   NOT, MAY, NEED NOT, and OPTIONAL, have special meaning relating to
+   conformance.  These terms are defined in [RFC2911] section 12.1 on
+   conformance terminology, most of which is taken from RFC 2119
+   [RFC2119].
+
+   This section defines the following additional terms that are used
+   throughout this document:
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 6]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+      REQUIRED: if an implementation supports the extensions described
+        in this document, it MUST support a REQUIRED feature.
+      OPTIONAL: if an implementation supports the extensions described
+        in this document, it MAY support an OPTIONAL feature.
+
+3  Model Extensions
+
+   To assist workstations in the printer installation process, an IPP
+   printer needs to provide the workstation with information about the
+   Client Print Support Files, such as the their name and location/s.
+   This information needs to match the workstation's specific
+   environment, such as its operating system, preferred natural
+   language, and preferred document format.
+
+   The following extensions to the IPP model enable assisted or
+   automated printer installation.  This section describes each
+   extension in detail.
+
+
+     - A new REQUIRED Printer Description attribute: "client-print-
+       support-files-supported" (1setOf octetString(MAX)).
+     - A new REQUIRED Get-Printer-Attributes operation attribute:
+       "client-print-support-files-filter" (octetString(MAX)).
+     - A new RECOMMENDED printer operation: Get-Client-Print-Support-
+       Files.
+
+
+3.1 client-print-support-files-supported (1setOf octetString(MAX))
+
+   An IPP Printer uses the REQUIRED Printer Description attribute
+   "client-print-support-files-supported" to represent relevant
+   information about all of the Client Print Support Files it supports.
+   Each value is a composite UTF-8 string with well-defined fields (see
+   Table 1).  Each value string MUST be formatted as follows:
+
+   "uri=val1< field-name2=val21,_,val2p< _ < field-namen=valn1,_,valnq<"
+
+   The first field MUST be the "uri" field.  The remaining fields MAY be
+   in any order.
+
+   The string MUST NOT include any control characters (hex 00 to 1F),
+   even the so-called white space control characters (TAB, CR, and LF)
+   anywhere.  Only zero or more UTF-8 SPACE characters (hex 20) can be
+   included and they can be included only IMMEDIATELY AFTER the
+   delimiter character: "<", but NOT anywhere else, including after "="
+   and ",".  However, if the UTF-8 SPACE character is needed in a
+   client-file-name value, then each occurrence is included directly,
+   without escaping (see example).  On the other hand, if the UTF-8
+   SPACE character is needed in a URL value, then each occurrence is
+   escaped as: "%20" (URI conventions - see [RFC2396]).
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 7]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   Table 1 lists the REQUIRED fields that a Printer MUST support and the
+   OPTIONAL fields that a Printer MAY support in the "client-print-
+   support-files-supported" (1setOf octetString(MAX)) Printer
+   Description attribute.  A Printer implementation MAY support
+   additional fields using the same syntax.  Values are defined to be
+   either CASE-SENSITIVE or ALL-LOWER-CASE according to the definitions
+   for the attribute syntaxes from [RFC2911] (set off by single quotes
+   in the table).  The CASE-SENSITIVE values MAY have upper and lower
+   case letters as for the corresponding attribute syntaxes in
+   [RFC2911].  The LOWER-CASE values MUST have all lower case alphabetic
+   letters.  Additional characters, such as digits, hyphen-minus (-),
+   period (.), and slash (/) are according to the corresponding
+   attribute syntaxes in [RFC2911].
+
+   Clients SHOULD ignore fields they don't recognize in a given value.
+   This allows for future extensions to the format of the string without
+   breaking compatibility with earlier clients.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 8]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+     Table 1 - "client-print-support-files-supported" attribute fields
+
+
+   Field      Field value
+   name
+
+
+   "uri"      One REQUIRED CASE-SENSITIVE 'uri' string identifying the
+              uri where to obtain the support files for each OS
+              platform, document format, and natural language the
+              printer supports.  This MUST be the first field in each
+              value.  Examples of uri schemes that MAY be found here
+              are 'ftp', 'http', and 'ipp'.  The 'ftp' and 'http'
+              schemed URIs identify the archive file that contains all
+              the necessary client support files.
+
+              The 'ipp' schemed URIs identify the archive file that
+              clients MAY obtain from the Printer using the Get-
+              Client-Print-Support-Files operation (see section 3.3).
+              The URI MUST be a valid URI to the same Printer object,
+              i.e., one of the values of the Printer's "printer-uri-
+              supported" attribute.  The 'ipp' URI is used to
+              distinguish between multiple Client Print Support Files
+              in an implementation dependent manner using the URL
+              query syntax (e.g.,  "?drv-id=xxx") [RFC2396].  The
+              query part MUST NOT exceed 127 octets, not counting the
+              "?" character that begins the query part.  A Printer
+              SHOULD support the 'ipp' scheme.
+
+   "os-type"  One or more REQUIRED comma-separated LOWER-CASE
+              'keyword' strings identifying the operating system types
+              supported by this set of Client Print Support Files.
+              Valid values are the operating system names defined in
+              the IANA document [os-names] and the special keyword
+              value: 'unknown'. Although the IANA registry requires
+              that the names be all upper-case, the values MUST be all
+              lower case in this field (plus hyphen-minus (-), period
+              (.), and slash (/)).   Examples: 'linux', 'linux-2.2',
+              'os/2', 'sun-os-4.0', 'unix', 'unix-bsd', 'win32',
+              'windows-95', 'windows-98', 'windows-ce', 'windows-nt',
+              'windows-nt-4', 'windows-nt-5', 'unknown'.
+
+   "cpu-      One or more REQUIRED comma-separated LOWER-CASE
+   type"      'keyword' strings identifying the CPU types supported by
+              this set of Client Print Support Files.  The values
+              indicate the CPU family independent of the CPU
+              manufacturer.  Valid keyword values are:  'x86-16',
+              'x86-32', 'x86-64', 'dec-vax', 'alpha', 'power-pc', 'm-
+              68000, 'sparc', 'itantium', 'mips', 'arm' and will be
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001            [page 9]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+
+   Field      Field value
+   name
+
+
+              used as the initial value for the "cpu-type" IANA
+              registry.  In addition, the special keyword value:
+              'unknown' is valid.
+
+   "document  One or more REQUIRED comma-separated CASE-SENSITIVE
+   -format"   'mimeMediaType' strings identifying the document formats
+              supported by this set of Client Print Support Files.
+              Valid values are the string representation of the IPP
+              mimeMediaType attribute syntax (see [RFC2911] section
+              4.1.9), for example 'application/postscript'.  In
+              addition, the special keyword value: 'unknown' is valid.
+
+   "natural-  One or more REQUIRED comma-separated LOWER-CASE
+   language"  'naturalLanguage' strings identifying the natural
+              language used by this set of Client Print Support Files.
+              Valid values are the string representation of the IPP
+              'naturalLanguage' attribute syntax (see [RFC2911]
+              section 4.1.8), for example 'en' and 'en-us'.  In
+              addition, the special keyword value: 'unknown' is valid.
+
+   "compress  One REQUIRED LOWER-CASE 'keyword' string identifying the
+   ion"       mechanism used to compress this set of Client Print
+              Support Files.  All files needed for the installation of
+              a printer driver MUST be compressed into a single file.
+              Valid keyword values are the keywords defined by
+              [RFC2911] or registered with IANA for use in the IPP
+              "compression" and "compression-supported" attributes.
+              See [RFC2911] section 4.4.32), for example 'gzip'.  The
+              'none' value limits the uncompressed Client Print
+              Support File to a single file.  The values for the
+              "compression" field that a Printer supports NEED NOT be
+              the same values that the Printer is configured to
+              support in Job Creation operations as indicated in the
+              Printer's "compressions-supported" attribute.
+
+   "file-     One or more REQUIRED comma-separated LOWER-CASE
+   type"      'keyword' strings identifying the type of the Client
+              Print Support Files.  Valid keyword values are:
+              'printer-driver', 'ppd', 'updf', 'gpd'.
+
+   "client-   One REQUIRED CASE-SENSITIVE string identifying the name
+   file-      by which the Client Print Support Files will be
+   name"      installed on the workstation.  For Client Print Support
+              Files of type 'printer-driver', this is also the name
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 10]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+
+   Field      Field value
+   name
+
+
+              that identifies this printer driver in an .inf file.
+
+   "policy"   One OPTIONAL LOWER-CASE 'keyword' string indicating the
+              policy for automatic loading.  Valid keyword values are:
+              'manufacturer-recommended', 'administrator-recommended',
+              'manufacturer-experimental,  'administrator-
+              experimental'.  The experimental values are for beta
+              test.
+
+   "file-     One OPTIONAL file size in octets represented as ASCII
+   size"      decimal digits.
+
+   "file-     One OPTIONAL LOWER-CASE version number.  Recommended to
+   version"   be of the form "Major.minor[.revision]" where "Major" is
+              the major version number, "minor" is the minor version
+              number and "revision" is an optional revision number.
+
+   "file-     One OPTIONAL File CASE-SENSITIVE creation date and time
+   date-      according to ISO 8601 where all fields are fixed length
+   time"      with leading zeroes (see [RFC2518] Appendix 2).
+              Examples:  2000-01-01T23:09:05Z and 2000-01-01T02:59:59-
+              04.00
+
+   "file-     One OPTIONAL CASE-SENSITIVE human readable 'text' string
+   info"      describing this set of Client Print Support Files.  The
+              natural language for this value MUST be the natural
+              language indicated by the Printer's "natural-language-
+              configured" attribute.  To avoid exceeding the maximum
+              limit imposed on IPP attributes and to increase
+              interoperability with other systems, the length of this
+              field value MUST not exceed 127 characters.
+
+   "digital-  One REQUIRED LOWER-CASE 'keyword' string identifying the
+   signature  mechanism used to ensure the integrity and authenticity
+   "          of this set of Client Print Support Files.  Valid values
+              are: 'smime', 'pgp', 'dss', and 'xmldsig' which are
+              defined in [RFC2634], [RFC1991], [dss], and [xmldsig],
+              respectively.  In addition, the special keyword value:
+              'none' is valid.
+
+
+   Each value MUST refer to one and only one set of Client Print Support
+   Files, even if the files are downloadable from various repositories
+   (i.e., even if they are associated with multiple URIs).
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 11]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+3.1.1 Use of Keyword Values in fields
+
+   A number of the fields in Table 1 use keyword strings as values.  The
+   syntax of these keywords is the same as in [RFC2911], including the
+   use of private keywords.  See [RFC2911] sections 4.1.3 and 6.1.
+   Printer implementers are strongly RECOMMENDED to submit additional
+   keyword values for registration with IANA according to the procedures
+   for registering attributes.  See section 7 and [RFC2911] section 6.1.
+
+
+3.1.2 Use of the Special Keyword Value: 'unknown'
+
+   A number of REQUIRED 'keyword' value fields have a special keyword
+   value: 'unknown' defined. This value is intended for use when the
+   actual value is not known, such as by an administrator automatic
+   software configuring the IPP Printer object.  However, it is strongly
+   RECOMMENDED that other more meaningful values be used, instead of the
+   'unknown' value whenever possible.
+
+
+3.1.3 Examples of "client-print-support-files-supported" attribute
+      values
+
+   The following illustrates what two valid values of the "client-print-
+   support-files-supported" (1setOf octetString(MAX)) Printer
+   Description attribute might look like:
+
+      uri=ipp://mycompany.com/myprinter?drv-id=ModelY.gz<
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application/postscript<
+      natural-language=en< compression=gzip<
+      file-type=printer-driver<
+      client-file-name=CompanyX-ModelY-driver.gz<
+      policy=manufacturer-recommended<
+
+      uri=ftp://mycompany.com/root/drivers/win95/CompanyX/ModelY.gz<
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application/postscript,application/vnd.hp-PCL<
+      natural-language=en,fr< compression=gzip<
+      file-type=printer-driver<
+      client-file-name=Company T Model Z driver.gz<
+      policy=manufacturer-recommended<
+
+   The above examples have been broken onto separate lines for
+   readability in this document.  However, there MUST NOT be any line
+   breaks in the actual values.
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 12]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   The "client-print-support-files-supported" Printer Description
+   attribute MAY be preset at manufacturing time or through
+   administrative means outside the scope of this document.
+
+
+3.2 Get-Printer-Attributes Operation Extension
+
+   The "client-print-support-files-supported" Printer Description
+   attribute defined in section 3.1 contains information, such as
+   operating system, natural language, and document format, about all of
+   the sets of Client Print Support Files.  This section defines an
+   extension to the Get-Printer-Attributes operation that allows a
+   workstation to filter out all but the Client Print Support Files of
+   interest.
+
+
+3.2.1 Get-Printer-Attributes Request
+
+   A Printer MAY contain information about multiple sets of Client Print
+   Support Files to match the different operating systems, natural
+   languages and document formats it supports.  A workstation MAY query
+   this information by including the 'client-print-support-files-
+   supported' keyword as a value of the "requested-attributes" operation
+   attribute of the Get-Printer-Attributes operation.
+
+
+3.2.1.1 client-print-support-files-filter (octetString(MAX)) operation
+        attribute
+
+   The client can request a subset of the values of the "client-print-
+   support-files-supported" Printer attribute by supplying the "client-
+   print-support-files-filter" (octetString(MAX)) operation attribute in
+   the request as a filter.  The filter value indicates in which Client
+   Print Support Files the client is interested. The client MAY supply
+   this attribute.  The Printer MUST support this attribute.
+
+   The filter value of the "client-print-support-files-filter" attribute
+   is a composite string with the same format as that of "client-print-
+   support-files-supported" (see Table 1 - "client-print-support-files-
+   supported" attribute fields in section 3.1) with the following
+   exceptions:
+
+
+
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 13]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+      Table 2 - "client-print-support-files-filter" attribute fields
+
+
+     Field     Field Value in the "client-print-support-files-filter"
+     Name      attribute
+
+
+     uri-      One or more comma-separated LOWER-CASE 'uriScheme'
+     scheme    string values identifying the uri scheme to be
+               filtered on.  Valid values are the string
+               representation of the IPP 'uriScheme' attribute syntax
+               (see [RFC2911] section 4.1.6).  Example URI schemes
+               are: 'ftp', 'http', and 'ipp'.  The Printer SHOULD
+               support the 'ipp' scheme.  If supplied by the client,
+               this field NEED NOT be first.  If this field is
+               omitted by the client, the Printer returns all
+               schemes.
+
+     xxx       One or more comma-separated values for any of the
+               fields defined in Table 1, with the single exception
+               of the "uri" field which a client MUST NOT supply and
+               a Printer MUST NOT support.
+               The Printer MUST support any filter field having more
+               than one value separated by a COMMA (,), including the
+               fields that Table 1 indicates MUST BE single valued.
+
+
+   Printer implementations MUST support the "client-print-support-files-
+   filter" operation attribute in a Get-Printer-Attributes request with
+   the member fields listed Table 3.  Printers MAY support any
+   additional filter fields listed in Table 2.
+
+   Client implementations MAY supply any filter fields listed in Table 2
+   in the "client-print-support-files-filter" operation attribute of a
+   Get-Printer-Attributes request.
+
+       Table 3 - REQUIRED "client-print-support-files-filter" fields
+
+
+      uri-scheme
+
+      os-type
+
+      cpu-type
+
+      document-format
+
+      natural-language
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 14]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+3.2.1.1.1  Filter matching rules
+
+   The Printer returns only the values of the "client-print-support-
+   files-supported" Printer Description attribute that match the filter
+   in the "client-print-support-files-filter" operation attribute. The
+   following filter matching rules are defined:
+
+     1. A match occurs if at least one value of each field supplied by
+        the client in the filter matches a Client Print Support File
+        value.  Printers MUST ignore a filter field supplied by a client
+        that the Printer does not support and return a match if all
+        supported fields do match, no matter what value the client
+        supplied for that unsupported field.  Similarly, Printers MUST
+        ignore a filter field supplied by a client that the Printer does
+        support, but which the field has not been populated for a Client
+        Print Support Files and return a match if all supported and
+        populated fields do match, no matter what value the client
+        supplied for that unpopulated field.
+
+     2. A match for a CASE-INSENSITIVE field occurs independent of the
+        case of the letters supplied by the client and those stored by
+        the Printer, while a match for a LOWER-CASE field is a strict
+        character for character match.
+
+     3. A match for a 'keyword' Printer field that is populated with the
+        'unknown' special keyword value occurs for any value supplied by
+        the client for that field.
+
+     4. If the "client-print-support-files-filter" operation attribute
+        filter is not supplied by the client, the printer SHOULD behave
+        as if the attribute had been provided with all fields left empty
+        (i.e., return an unfiltered list).
+
+   The following are two examples of a "client-print-support-files-
+   filter" filter value:
+
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application-postscript< natural-language=en,de<
+
+      uri-scheme=ipp< os-type=windows-95< cpu-type=x86-32<
+      document-format=application-postscript< natural-language=en,de<
+
+   See section 3.2.2 for example matching responses.
+
+   It is RECOMMENDED that workstations first use the Get-Printer-
+   Attributes operation in combination with "client-print-support-files-
+   filter" operation attribute filter to get a list of the potential
+   Client Print Support Files that meet the workstation's requirements.
+   The workstation can then choose from the returned list which Client
+   Print Support Files to use and where to get them.  If one of the URIs
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 15]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   returned is an IPP uri, the workstation can retrieve the Client Print
+   Support Files from an IPP printer via the Get-Client-Print-Support-
+   Files operation (see section 3.3).
+
+
+3.2.2 Get-Printer-Attributes Response
+
+
+   A Printer MUST return the "client-print-support-files-supported"
+   (1setOf octetString(MAX)) attribute in the Printer Object Attributes
+   group (group 3) when requested by a client.  Each returned attribute
+   value MUST satisfy the criteria specified by the client in the
+   request.
+
+
+   For example, if the request contains the following "client-print-
+   support-files-filter" filter:
+
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application-postscript<
+      natural-language=en,de<
+
+   A conforming response is the following two octet String values:
+
+      uri=ipp://mycompany.com/myprinter?drv-id=ModelY.gz<
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application/postscript<
+      natural-language=en< compression=gzip<
+      file-type=printer-driver<
+      client-file-name=CompanyX-ModelY-driver.gz<
+      policy=manufacturer-recommended<
+      digital-signature=smime<
+
+      uri=ftp://mycompany.com/root/drivers/win95/CompanyX/ModelY.gz<
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application/postscript,application/vnd.hp-PCL<
+      natural-language=en,fr< compression=gzip<
+      file-type=printer-driver<
+      client-file-name=CompanyX-ModelY-driver.gz<
+      policy=manufacturer-recommended<
+      digital-signature=smime<
+
+
+   These examples have been broken onto separate lines for readability
+   in this document.  However, there MUST NOT be any line breaks in the
+   actual values.
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 16]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   As another example, if the above request had also contained the "uri-
+   scheme" field in the following "client-print-support-files-filter"
+   filter:
+
+      uri-scheme=ipp< os-type=windows-95< cpu-type=x86-32<
+      document-format=application-postscript<
+      natural-language=en,de<
+
+   Then only the first value would have been returned as a single
+   octetString value:
+
+      uri=ipp://mycompany.com/myprinter?drv-id=ModelY.gz<
+      os-type=windows-95< cpu-type=x86-32<
+      document-format=application/postscript<
+      natural-language=en< compression=gzip<
+      file-type=printer-driver<
+      client-file-name=CompanyX-ModelY-driver.gz<
+      policy=manufacturer-recommended<
+      digital-signature=smime<
+
+3.3 Get-Client-Print-Support-Files
+
+   This RECOMMENDED operation allows a client to download Client Print
+   Support Files from an IPP Printer.
+
+
+3.3.1 Get-Client-Print-Support-Files Request
+
+
+   The following sets of attributes are part of the Get-Client-Print-
+   Support-Files request:
+
+
+   Group 1: Operation Attributes
+
+     Natural Language and Character Set:
+        The "attributes-charset" and "attributes-natural-language"
+        attributes as described in [RFC2911], section 3.1.4.1.
+
+     Target:
+        The "printer-uri" (uri) operation attribute which is the target
+        for this operation as described in [RFC2911], section 3.1.5.
+        The client MUST use the URI value as the target of this
+        operation that the Printer returns in the "uri" field (see Table
+        1) in the Get-Printer-Attributes response.  Furthermore, the
+        client MUST use the appropriate authorization and security
+        regime for this URI as indicated by the Printer's "printer-uri-
+        supported", "uri-authentication-supported" and "uri-security-
+        supported" attributes (see [RFC2911] sections 4.4.1, 4.4.2, and
+        4.4.3).  Only if the URI returned in the "uri" field matches the
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 17]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+        URI that the client used for the Get-Printer-Attributes request
+        MAY the client use the same HTTP connection.  The 'ipp' URL
+        matching rules are defined in [ipp-url] and do not include the
+        query part.
+
+     Requesting User Name:
+        The "requesting-user-name" (name(MAX)) attribute SHOULD be
+        supplied by the client as described in [RFC2911], section 8.3.
+
+     "client-print-support-files-query" (text(127)):
+        The client MUST supply this attribute specifying the query part
+        [RFC2396] of the ipp uri for the desired Client Print Support
+        Files not including the "?" character that starts the query
+        part, i.e., the value of the "uri" field following the "?"
+        character returned by the Get-Printer-Attributes in one of the
+        values of the "client-print-support-files-supported" (1setOf
+        octetString(MAX)) Printer attribute (see Table 1) that had an
+        'ipp' scheme.
+
+
+3.3.2 Get-Client-Print-Support-Files Response
+
+
+   The Printer object returns the following sets of attributes as part
+   of the Get-Client-Print-Support-Files Response:
+
+
+   Group 1: Operation Attributes
+
+     Status Message:
+        In addition to the REQUIRED status code returned in every
+        response, the response OPTIONALLY includes a "status-message"
+        (text(255)) operation attribute as described in [RFC2911],
+        sections 13 and 3.1.6.
+
+        Natural Language and Character Set:
+        The "attributes-charset" and "attributes-natural-language"
+        attributes as described in [RFC2911], section 3.1.4.2.
+
+   Group 2: Unsupported Attributes
+     See [RFC2911], section 3.1.7 for details on returning Unsupported
+     Attributes.
+
+
+   Group 3: Printer Object Attributes
+     "client-print-support-files-supported" (octetString(MAX)).
+        This attribute identifies the properties of the returned Client
+        Print Support Files.  The Printer object MUST return this
+        attribute if the response includes Group 4 (i.e., if a set of
+        Client Print Support Files identified by the supplied "client-
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 18]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+        print-support-files-query" operation attribute was found).  The
+        Printer MUST return all configured fields for the selected
+        Client Print Support Files in the format shown in section 3.1.
+
+
+   Group 4: Client Print Support Files
+     The printer MUST supply the Client Print Support Files that match
+     the client's criteria following the "end-of-attributes" tag.  All
+     necessary files MUST be compressed into a single transferred file.
+
+
+4  Conformance
+
+   A Printer conforming to this specification:
+
+     1.MUST support the "client-print-support-files-supported" Printer
+       Description attribute as defined in section 3.1, including all
+       of the REQUIRED fields defined in Table 1 and MAY support the
+       OPTIONAL fields defined in Table 1.
+
+     2.MUST support the "client-print-support-files-filter" operation
+       attribute in the Get-Printer-Attributes request as defined in
+       section 3.2, including all of the fields listed in Table 3 and
+       ignoring any fields not recognized.
+
+     3.MUST support at least one of the following URI schemes that
+       identify the support files:  'ftp', 'http', or 'ipp', of which
+       the 'ipp' scheme is the RECOMMENDED one.
+
+     4.SHOULD support the Get-Client-Print-Support-Files operation as
+       described in section 3.3.  If this operation is supported, then
+       one of the supported schemes MUST be 'ipp'.
+
+     5.SHOULD support TLS as described in section 9.
+
+     6.SHOULD support the downloading of Client Print Support Files
+       that have been digitally signed as described in section 9.
+
+   A client conforming to this specification:
+
+     1.MUST ignore any fields returned by the Printer in the "client-
+       print-support-files-supported" Printer Description attribute
+       that the client does not recognize or support.
+
+     2.SHOULD be able to retrieve Client Print Support Files by either
+       FTP Get or HTTP Get operations.
+
+     3.MUST be able to retrieve Client Print Support Files using the
+       Get-Client-Print-Support-Files operation, i.e., support the
+       'ipp' scheme.
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 19]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+     4.MUST supply the proper URI value for the "printer-uri" operation
+       attribute as specified in section 3.3.1 under Target:.
+
+     5.MUST validate that files that are supposed to be digitally
+       signed are done with the indicated mechanism as described in
+       section 9.
+
+     6.SHOULD support TLS as described in section 9.
+
+
+5  Encoding of the Operation Layer
+
+   This extension uses the operation layer encoding described in
+   [RFC2910].
+
+
+6  Encoding of Transport Layer
+
+   This specification uses the transport layer encoding described in
+   [RFC2910] with the following extensions.
+
+   New Error codes:
+
+     0x0417    client-error-client-print-support-file-not-found
+
+   New Operation code
+
+     0x0021    Get-Client-Print-Support-Files
+
+
+7  IANA Considerations
+
+   The IANA-registered operating system names that IANA has registered
+   [os-names] are required by this spec for use in the "os-type" field
+   (see Table 1).
+
+   Table 1 of this document defines possible 'keyword' values for the
+   "cpu-type" field.  However, the existing IANA machine registration
+   [cpu-names] is inadequate for two reasons: a) it is really a machine
+   model number, not a CPU type,  and b) it doesn't express whether a
+   CPU is 16-bit, 32-bit, or 64-bit which needs to be indicated in the
+   keyword value. Therefore, the "os-type" field will be a new
+   registration with initial values assigned.
+
+   The rest of this section contains the exact information for IANA to
+   add to the IPP Registries according to the procedures defined in RFC
+   2911 [RFC2911] section 6.
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 20]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+     Note to RFC Editors:  Replace RFC NNNN below with the RFC number
+     for this document, so that it accurately reflects the content of
+     the information for the IANA Registry.
+
+
+7.1 Attribute Registrations
+
+   The attributes and fields defined in this document will be published
+   by IANA according to the procedures in RFC 2911 [RFC2911] section 6.2
+   with the following path:
+
+     ftp.isi.edu/iana/assignments/ipp/attributes/
+
+   The registry entry will contain the following information:
+
+   Printer Description Attributes:                     Ref:  Section:
+   client-print-support-files-supported (1setOf octetString(MAX))
+                                                       RFC NNNN   3.1
+
+   For purposes of IANA attribute registration, the following fields of
+   the "client-print-support-files-supported" and the "client-print-
+   support-files-filter" attributes are registered following the
+   procedures for IPP attribute registration:
+                                                       Ref:  Section:
+   uri (uri)                                           RFC NNNN   3.1
+   os-type (type2 keyword)                             RFC NNNN   3.1
+   cpu-type (type2 keyword)                            RFC NNNN   3.1
+   document-format (mimeMediaType)                     RFC NNNN   3.1
+   natural-language (naturalLanguage)                  RFC NNNN   3.1
+   compression (type2 keyword)                         RFC NNNN   3.1
+   file-type (type2 keyword)                           RFC NNNN   3.1
+   client-file-name (name(MAX))                        RFC NNNN   3.1
+   policy (type2 keyword)                              RFC NNNN   3.1
+   file-size (integer(0:MAX))                          RFC NNNN   3.1
+   file-version (name(MAX))                            RFC NNNN   3.1
+   file-date-time (text(25))                           RFC NNNN   3.1
+   file-info (text(127))                               RFC NNNN   3.1
+   digital-signature (type2 keyword)                   RFC NNNN   3.1
+
+   uri-scheme (uriScheme)                              RFC NNNN   3.2
+
+   Operation Attributes:                               Ref:  Section:
+   client-print-support-files-filter (octetString(MAX))RFC NNNN   3.2
+
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 21]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+7.2 Operation Registrations
+
+   The operations defined in this document will be published by IANA
+   according to the procedures in RFC 2911 [RFC2911] section 6.4 with
+   the following path:
+
+       ftp.isi.edu/iana/assignments/ipp/operations/
+
+   The registry entry will contain the following information:
+
+   Operations:                                         Ref.  Section:
+   Get-Client-Print-Support-Files                      RFC NNNN   3.3
+
+
+8  Internationalization Considerations
+
+   All text representations introduced by this specification adhere to
+   the internationalization-friendly representation supported by IPP.
+   This work is also accommodates the use of Client Print Support Files
+   of different languages.
+
+
+9  Security Considerations
+
+   The IPP Model and Semantics document [RFC2911] discusses high-level
+   security requirements (Client Authentication, Server Authentication
+   and Operation Privacy). Client Authentication is the mechanism by
+   which the client proves its identity to the server in a secure
+   manner. Server Authentication is the mechanism by which the server
+   proves its identity to the client in a secure manner. Operation
+   Privacy is defined as a mechanism for protecting operations from
+   eavesdropping.
+
+   Only operators of a printer SHOULD be allowed to set the "client-
+   print-support-files-supported" attribute and only users of the
+   printer SHOULD be allowed to query that information.
+
+   The IPP extension described in this document introduces the potential
+   for a security threat previously not encountered by IPP.  As Client
+   Print Support Files might exist in the form of executable objects (as
+   is the case with printer drivers, for example), additional provisions
+   are needed to prevent the distribution of malicious code through this
+   mechanism.  Digital signatures provide the message level security
+   commonly used to help consumers of network resources verify the
+   authenticity and integrity of those resources.  Specifically, digital
+   signatures help defend against security threats such as message
+   insertion, message deletion, and message modification, and their
+   combined use into man-in-the-middle attacks.
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 22]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   This document identifies some commonly used signing mechanisms (SMIME
+   [RFC2634], PGP [RFC1991], DSS [dss], and XML Digital Signatures
+   [xmldsig]), though any others MAY be used. Of course, it is assumed
+   that once end-users know the identity of the provider of Client Print
+   Support Files, they can make the correct determination as to whether
+   it is safe to use those files.
+
+   Printers that support the Get-Client-Print-Support-Files operation
+   SHOULD support the downloading of Client Print Support Files that
+   have been digitally signed.  Clients that invoke the Get-Client-
+   Print-Support-Files operation MUST make sure that Client Print
+   Support Files that are supposed to be signed (i.e., whose client-
+   print-support-files-supported attribute value includes the "digital-
+   signature" field) are indeed signed via the specified mechanism when
+   downloaded from the printer.
+
+   Furthermore, printers that support the Get-Client-Print-Support-Files
+   operation SHOULD implement TLS to provide application level channel
+   security and enable users to reliably authenticate the source of the
+   Client Print Support Files.
+
+
+10 References
+
+
+   [cpu-names]
+     IANA Registry of CPU Names at ftp://ftp.isi.edu/in-
+     notes/iana/assignments/XXX.
+
+   [dss]
+     U.S. Department of Commerce, "Digital Signature Standard (DDS)",
+     Federal Information Processing Standards Publication 186-1 (FIPS
+     PUB 186-1), December 15, 1998.
+
+   [ipp-url]
+     Herriot, R., McDonald, I., "Internet Printing Protocol (IPP): IPP
+     URL Scheme."  <draft-ietf-ipp-url-scheme-02.txt>, February 14,
+     2001.
+
+   [os-names]
+     IANA Registry of Operating System Names at ftp://ftp.isi.edu/in-
+     notes/iana/assignments/operating-system-names.
+
+   [RFC1991]
+     D. Atkins, W. Stallings, P. Zimmermann, "PGP Message Exchange
+     Formats", RFC 1991, August, 1996.
+
+   [RFC2026]
+     S. Bradner, "The Internet Standards Process -- Revision 3", RFC
+     2026, October 1996.
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 23]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+   [RFC2396]
+     Berners-Lee, T., Fielding, R., Masinter, L., "Uniform Resource
+     Identifiers (URI): Generic Syntax", RFC 2396, August 1998.
+
+   [RFC2518]
+     Goland, Y., et al, "HTTP Extensions for Distributed Authoring --
+     WEBDAV", RFC 2518, February 1999.
+
+   [RFC2616]
+     R. Fielding, J. Gettys, J. Mogul, H. Frystyk, L. Masinter, P.
+     Leach, T. Berners-Lee, "Hypertext Transfer Protocol - HTTP/1.1",
+     RFC 2616, June 1999.
+
+   [RFC2634]
+     P. Hoffman, "Enhanced Security Services for S/MIME", RFC 2634, June
+     1999.
+
+   [RFC2910]
+     Herriot, R., Butler, S., Moore, P., Tuner, R., "Internet Printing
+     Protocol/1.1: Encoding and Transport", RFC 2910, September 2000.
+
+   [RFC2911]
+     R. deBry, T. Hastings, R. Herriot, S. Isaacson, P. Powell,
+     "Internet Printing Protocol/1.0: Model and Semantics", RFC 2911,
+     September 2000.
+
+   [xmldsig]
+     D. Eastlake, J. Reagle, D. Solo "XML-Signature Syntax and
+     Processing", <draft-ietf-xmldsig-core-11.txt>, October 31, 2000.
+
+
+11 Author's Addresses
+
+   Hugo Parra
+   Novell, Inc.
+   1800 South Novell Place
+   Provo, UT   84606
+
+   Phone: 801-861-3307
+   Fax:   801-861-4025
+   e-mail: hparra@novell.com
+
+   Ted Tronson
+   Novell, Inc.
+   1800 South Novell Place
+   Provo, UT   84606
+
+   Phone: 801-861-3338
+   Fax:   801-861-4025
+   e-mail: ttronson@novell.com
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 24]
+
+
+INTERNET-DRAFT   IPP: Printer Installation Extension  February 28, 2001
+
+
+
+   Thomas N. Hastings
+   Xerox Corp.
+   737 Hawaii St.  ESAE 231
+   El Segundo, CA   90245
+
+   Phone: 310-333-6413
+   Fax:   310-333-5514
+   e-mail: hastings@cp10.es.xerox.com
+
+
+
+12 Full Copyright Statement
+
+   Copyright (C) The Internet Society (2001). All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+Parra, Tronson, Hastings    Expires August 28, 2001           [page 25]
