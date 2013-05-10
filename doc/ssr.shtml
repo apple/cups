@@ -1,0 +1,272 @@
+<HTML>
+<HEAD>
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-SSR-1.0">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>DRAFT - CUPS Software Security Report</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+This software security report provides an analysis of possible security
+concerns for the Common UNIX Printing System ("CUPS") Version 1.0.</P>
+
+<H2>System Overview</H2>
+
+The Common UNIX Printing System provides a portable printing layer for 
+UNIX&reg; operating systems. It has been developed by Easy Software 
+Products to promote a standard printing solution for all UNIX vendors 
+and users. CUPS provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol (IETF-IPP) as the basis
+for managing print jobs and queues. The Line Printer Daemon (LPD,
+RFC1179), Server Message Block (SMB), and AppSocket protocols are also
+supported with reduced functionality.
+
+<P>CUPS adds network printer browsing and PostScript Printer
+Description (&quot;PPD&quot;)-based printing options to support real
+world applications under UNIX.
+
+<P>CUPS also includes a customized version of GNU GhostScript
+(currently based off GNU GhostScript 4.03) and an image file RIP that
+can be used to support non-PostScript printers.
+
+<H2>Document Overview</H2>
+
+<P>This software security report is organized into the following sections:</P>
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Local Access Risks</LI>
+	<LI>4 - Remote Access Risks</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<H1>References</H1>
+
+<H2>CUPS Documentation</H2>
+
+The following CUPS documentation is referenced by this document:
+
+<UL>
+	<LI>CUPS-CMP-1.0: CUPS Configuration Management Plan 
+	<LI>CUPS-IDD-1.0: CUPS System Interface Design Description 
+	<LI>CUPS-SAM-1.0.x: CUPS Software Administrators Manual 
+	<LI>CUPS-SDD-1.0: CUPS Software Design Description 
+	<LI>CUPS-SPM-1.0: CUPS Software Programming Manual
+	<LI>CUPS-SSR-1.0: CUPS Software Security Report 
+	<LI>CUPS-STP-1.0: CUPS Software Test Plan 
+	<LI>CUPS-SUM-1.0.x: CUPS Software Users Manual 
+	<LI>CUPS-SVD-1.0.x: CUPS Software Version Description 
+</UL>
+
+<H2>Other Documents</H2>
+
+The following non-CUPS documents are referenced by this document:
+
+<UL>
+	<LI>IEEE 1387.4, System Administration: Printing (draft) 
+	<LI>IPP/1.0: Additional Optional Operations - Set 1
+	<LI>RFC 1179, Line Printer Daemon Protocol 
+	<LI>RFC 2565, IPP/1.0: Encoding and Transport 
+	<LI>RFC 2566, IPP/1.0: Model and Semantics
+	<LI>RFC 2639, IPP/1.0: Implementers Guide
+</UL>
+
+<H1>Local Access Risks</H1>
+
+<P>Local access risks are those that can be exploited only with a local user
+account. This section does not address issues related to dissemination of the
+root password or other security issues associated with the UNIX operating
+system.
+
+<H2>Security Breaches</H2>
+
+<P>There are two known security vulnerabilities with local access:
+
+<OL>
+
+	<LI>Since the default installation creates a world-readable
+	request directory, it is possible for local users to read the
+	contents of print files before they are printed.
+
+	<P>This problem can be alleviated by making the request
+	directory readable only by the user specified in the CUPS
+	configuration file.
+
+	<LI>Device URIs are passed to backend filters in argv[0] and in
+	an environment variable. Since device URIs can contain
+	usernames and passwords it may be possible for a local user to
+	gain access to a remote resource.
+
+	<P>We recommend that any password-protected accounts used for
+	remote printing have limited access priviledges so that the
+	possible damages can be minimized.
+
+	<P>The device URI is "sanitized" (the username and password are
+	removed) when sent to an IPP client so that a remote user
+	cannot exploit this vulnerability.
+
+</OL>
+
+<H1>Remote Access Risks</H1>
+
+<P>Remote access risks are those that can be exploited without a local user
+account and/or from a remote system. This section does not address issues
+related to network or firewall security.
+
+<H2>Denial of Service Attacks</H2>
+
+<P>Like all Internet services, the CUPS server is vulnerable to denial of
+service attacks, including:
+
+<OL>
+
+	<LI>Establishing multiple connections to the server until the server
+	will accept no more.
+
+	<P>This cannot be protected against by the current software. It
+	is possible that future versions of the CUPS software could be
+	configured to limit the number of connections allowed from a
+	single host, however that still would not prevent a determined
+	attack.
+
+	<LI>Repeatedly opening and closing connections to the server as fast
+	as possible.
+
+	<P>There is no easy way of protecting against this in the CUPS
+	software. If the attack is coming from outside the local
+	network it might be possible to filter such an attack, however
+	once the connection request has been received by the server it
+	must at least accept the connection to find out who is
+	connecting.
+
+	<LI>Flooding the network with broadcast packets on port 631.
+
+	<P>It might be possible to disable browsing if this condition
+	is detected by the CUPS software, however if there are large
+	numbers of printers available on the network such an algorithm
+	might think that an attack was occurring when instead a valid
+	update was being received.
+
+	<LI>Sending partial IPP requests; specifically, sending part of an
+	attribute value and then stopping transmission.
+
+	<P>The current code is structured to read and write the IPP
+	request data on-the-fly, so there is no easy way to protect
+	against this for large attribute values.
+
+	<LI>Sending large/long print jobs to printers, preventing other users
+	from printing.
+
+	<P>There are limited facilities for protecting against large print
+	jobs (the <CODE>MaxRequestSize</CODE> attribute), however this will
+	not protect printers from malicious users and print files that
+	generate hundreds or thousands of pages. In general, we recommend
+	restricting printer access to known hosts or networks, and adding
+	user-level access control as needed for expensive printers.
+
+</OL>
+
+<H2>Security Breaches</H2>
+
+<P>The current CUPS server only supports Basic authentication with
+usernames and passwords. This essentially places the clear text of the
+username and password on the network. Since CUPS uses the UNIX username
+and password account information, the authentication information could
+be used to gain access to accounts (possibly priviledged accounts) on
+the server.
+
+<P>The default CUPS configuration disables remote administration. We do
+not recommend that remote administration be enabled for all hosts,
+however if you have a trusted network or subnet access can be
+restricted accordingly.
+
+<P>The next minor release of CUPS will support Digest authentication of
+the entire message body using separate MD5-based username and password
+files. This will protect password information and prevent unauthorized
+access due to compromised account passwords.
+
+<H1 TYPE=A VALUE=1>Glossary</H1>
+
+<H2>Terms</H2>
+
+<DL>
+
+	<DT>C
+	<DD>A computer language.
+
+	<DT>parallel
+	<DD>Sending or receiving data more than 1 bit at a time.
+
+	<DT>pipe
+	<DD>A one-way communications channel between two programs.
+
+	<DT>serial
+	<DD>Sending or receiving data 1 bit at a time.
+
+	<DT>socket
+	<DD>A two-way network communications channel.
+
+</DL>
+
+<H2>Acronyms</H2>
+
+<DL>
+
+	<DT>ASCII
+	<DD>American Standard Code for Information Interchange
+
+	<DT>CUPS
+	<DD>Common UNIX Printing System
+
+	<DT>ESC/P
+	<DD>EPSON Standard Code for Printers
+
+	<DT>FTP
+	<DD>File Transfer Protocol
+
+	<DT>HP-GL
+	<DD>Hewlett-Packard Graphics Language
+
+	<DT>HP-PCL
+	<DD>Hewlett-Packard Printer Control Language
+
+	<DT>HP-PJL
+	<DD>Hewlett-Packard Printer Job Language
+
+	<DT>IETF
+	<DD>Internet Engineering Task Force
+
+	<DT>IPP
+	<DD>Internet Printing Protocol
+
+	<DT>ISO
+	<DD>International Standards Organization
+
+	<DT>LPD
+	<DD>Line Printer Daemon
+
+	<DT>MIME
+	<DD>Multimedia Internet Mail Exchange
+
+	<DT>PCL
+	<DD>Page Control Language
+
+	<DT>PPD
+	<DD>PostScript Printer Description
+
+	<DT>SMB
+	<DD>Server Message Block
+
+	<DT>TFTP
+	<DD>Trivial File Transfer Protocol
+
+</DL>
+
+</BODY>
+</HTML>
