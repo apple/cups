@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+	<META NAME="Description" CONTENT="Common UNIX Printing System Software Test Plan">
+	<META NAME="COPYRIGHT" CONTENT="Copyright 1997-2000, All Rights Reserved">
+	<META NAME="DOCNUMBER" CONTENT="CUPS-STP-1.1">
+	<META NAME="Author" CONTENT="Easy Software Products">
+	<TITLE>DRAFT - CUPS Software Test Plan</TITLE>
+</HEAD>
+<BODY>
+
+<H1>Scope</H1>
+
+<H2>Identification</H2>
+
+<P>This software test plan provides detailed tests that are used to evaluate
+the stability of the Common UNIX Printing System ("CUPS") Version 1.1.
+
+<EMBED SRC="system-overview.shtml">
+
+<H2>Document Overview</H2>
+
+<P>This software test plan is organized into the following sections:
+
+<UL>
+	<LI>1 - Scope</LI>
+	<LI>2 - References</LI>
+	<LI>3 - Local Tests</LI>
+	<LI>4 - Remote Tests</LI>
+	<LI>A - Glossary</LI>
+</UL>
+
+<EMBED SRC="references.shtml">
+
+<H1>Local Tests</H1>
+
+
+
+
+<H1>Remote Tests</H1>
+
+
+
+
+<EMBED SRC="glossary.shtml">
+
+</BODY>
+</HTML>
