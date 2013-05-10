@@ -1,0 +1,9 @@
+README - 04/11/2003
+-------------------
+
+This directory contains the Java API for CUPS, which requires JDK 1.4
+or higher.
+
+The CUPS Java API code and examples are provided under the terms of the
+GNU Library General Public License, just as for the CUPS C API.
+
