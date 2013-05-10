@@ -1,0 +1,34 @@
+<H2>System Overview</H2>
+
+<P>CUPS provides a portable printing layer for UNIX&reg;-based
+operating systems. It has been developed by
+<A HREF="http://www.easysw.com">Easy Software Products</A> to promote a
+standard printing solution for all UNIX vendors and users. CUPS
+provides the System V and Berkeley command-line interfaces.
+
+<P>CUPS uses the Internet Printing Protocol ("IPP") as the basis for
+managing print jobs and queues. The Line Printer Daemon ("LPD") Server
+Message Block ("SMB"), and AppSocket (a.k.a. JetDirect) protocols are
+also supported with reduced functionality. CUPS adds network printer
+browsing and PostScript Printer Description ("PPD") based
+printing options to support real-world printing under UNIX.
+
+<P>CUPS includes an image file RIP that supports printing of
+image files to non-PostScript printers.  A customized version of
+GNU Ghostscript 7.05 for CUPS called ESP Ghostscript is
+available separately to support printing of PostScript files
+within the CUPS driver framework.  Sample drivers for Dymo,
+EPSON, HP, and OKIDATA printers are included that use these
+filters.
+
+<P>Drivers for thousands of printers are provided with our ESP
+Print Pro software, available at:
+
+<PRE>
+    <A HREF="http://www.easysw.com/printpro/">http://www.easysw.com/printpro/</A>
+</PRE>
+
+<P>CUPS is licensed under the GNU General Public License and GNU
+Library General Public License.  Please contact Easy Software
+Products for commercial support and "binary distribution"
+rights.
