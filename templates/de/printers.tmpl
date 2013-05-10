@@ -1,0 +1,61 @@
+{#printer_name=0?No printers:
+<P><B>Systemvoreingestelltes Druckziel: </B> {default_name?<A HREF="{default_uri}">{default_name}</A>:none}
+<P><TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+{[printer_name]
+<TR>
+	<TH BGCOLOR="#999966"><IMG SRC="/images/left.gif" ALT=""></TH>
+	<TH BGCOLOR="#999966"><A HREF="{printer_uri_supported}">{printer_name}</A></TH>
+	<TH BGCOLOR="#999966">{printer_make_and_model}</TH>
+	<TH><IMG SRC="/images/right.gif" ALT=""></TH>
+</TR>
+<TR>
+	<TD HEIGHT="4"></TD>
+</TR>
+<TR>
+	<TD></TD>
+	<TD VALIGN="TOP"><A HREF="{printer_uri_supported}">
+	<IMG SRC="../images/printer-{printer_state=3?idle:{printer_state=4?processing:stopped}}.gif" BORDER="0" ALT=""></A>
+	</TD>
+	<TD VALIGN="TOP">Beschreibung: {printer_info}<BR>
+	Standort: {printer_location}<BR>
+	Ger&auml;testatus: {printer_state=3?gelangweilt:{printer_state=4?arbeitend:angehalten}},
+	{printer_is_accepting_jobs=0?weist Auftr&auml;ge ab:Nimmt Auftr&auml;ge entgegen}.
+	{?printer_state_message=?:<BR><I>"{printer_state_message}"</I>}
+	{?printer_state_history2.printer_state_message=?:<BR><I>"{printer_state_history2.printer_state_message}"</I>}
+	{?printer_state_history3.printer_state_message=?:<BR><I>"{printer_state_history3.printer_state_message}"</I>}
+	{?printer_state_history4.printer_state_message=?:<BR><I>"{printer_state_history4.printer_state_message}"</I>}
+	{?printer_state_history5.printer_state_message=?:<BR><I>"{printer_state_history5.printer_state_message}"</I>}
+	{?device_uri=?:<BR>Ger&auml;te URI: {device_uri}}
+	<P>
+	<A HREF="{printer_uri_supported}?op=print-test-page">
+	<IMG SRC="/images/print-test-page.gif" ALT="Drucker Testseite" BORDER="0"></A>
+	{printer_state=5?
+	<A HREF="{admin_uri}?op=start-printer&printer_name={printer_name}">
+	<IMG SRC="/images/start-printer.gif" ALT="Drucker starten" BORDER="0"></A>
+	:
+	<A HREF="{admin_uri}?op=stop-printer&printer_name={printer_name}">
+	<IMG SRC="/images/stop-printer.gif" ALT="Drucker anhalten" BORDER="0"></A>
+	}
+	{printer_is_accepting_jobs=0?
+	<A HREF="{admin_uri}?op=accept-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/accept-jobs.gif" ALT="Auftr&auml;ge annehmen" BORDER="0"></A>
+	:
+	<A HREF="{admin_uri}?op=reject-jobs&printer_name={printer_name}">
+	<IMG SRC="/images/reject-jobs.gif" ALT="Auftr&auml;ge ablehnen" BORDER="0"></A>
+	}
+	<A HREF="{admin_uri}?op=modify-printer&printer_name={printer_name}">
+	<IMG SRC="/images/modify-printer.gif" ALT="Drucker modifizieren" BORDER="0"></A>
+	<A HREF="{admin_uri}?op=config-printer&printer_name={printer_name}">
+	<IMG SRC="/images/config-printer.gif" ALT="Drucker konfigurieren" BORDER="0"></A>
+	<A HREF="{admin_uri}?op=delete-printer&printer_name={printer_name}">
+	<IMG SRC="/images/delete-printer.gif" ALT="Drucker l&ouml;schen" BORDER="0"></A>
+	</TD>
+</TR>
+<TR>
+	<TD>&nbsp;</TD>
+</TR>
+}
+</TABLE>
+}
+<P><A HREF="/admin/?op=add-printer">
+<IMG SRC="/images/add-printer.gif" ALT="Drucker hinzuf&uuml;gen" BORDER="0"></A>
