@@ -1,0 +1,78 @@
+.\"
+.\" "$Id: cups-snmp.conf.man 10424 2012-04-23 17:26:57Z mike $"
+.\"
+.\"   snmp.conf man page for CUPS.
+.\"
+.\"   Copyright 2007-2012 by Apple Inc.
+.\"   Copyright 2006 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH snmp.conf 5 "CUPS" "23 April 2012" "Apple Inc."
+
+.SH NAME
+snmp.conf \- snmp configuration file for cups
+.SH DESCRIPTION
+The \fIsnmp.conf\fR file configures how the standard CUPS network backends
+(http, https, ipp, ipps, lpd, snmp, and socket) access printer information using
+SNMPv1 and is normally located in the \fI/etc/cups\fR directory. Each line in
+the file can be a configuration directive, a blank line, or a comment. Comment
+lines start with the # character.
+.LP
+The Community and DebugLevel directives are used by all backends. The remainder
+apply only to the SNMP backend (\fIcups-snmp(8)\fR).
+.SH DIRECTIVES
+The following directives are understood by the CUPS network backends. Consult
+the on-line help for detailed descriptions:
+.TP 5
+Address @IF(\fIname\fR)
+.TP 5
+Address @LOCAL
+.TP 5
+Address \fIaddress\fR
+.br
+Sends SNMP broadcast queries to the specified address(es). There is no default
+for the broadcast address.
+.TP 5
+Community \fIname\fR
+.br
+Specifies the community name to use. Only a single community name may be
+specified. The default community name is "public".
+.TP 5
+DebugLevel number
+.br
+Specifies the logging level from 0 (none) to 3 (everything). Typically only used
+for debugging (thus the name). The default debug level is 0.
+.TP 5
+DeviceURI "regular expression" device-uri [... device-uri]
+.br
+Specifies one or more device URIs that should be used for a given make and model
+string. The regular expression is used to match the detected make and model, and
+the device URI strings must be of the form "scheme://%s[:port]/[path]", where
+"%s" represents the detected address or hostname. There are no default device
+URI matching rules.
+.TP 5
+HostNameLookups on
+.TP 5
+HostNameLookups off
+.br
+Specifies whether the addresses of printers should be converted to hostnames or
+left as numeric IP addresses. The default is "off".
+.TP 5
+MaxRunTime \fIseconds\fR
+.br
+Specifies the maximum number of seconds that the SNMP backend will scan the
+network for printers. The default is 120 seconds (2 minutes).
+.SH SEE ALSO
+cups-snmp(8),
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2007-2012 by Apple Inc.
+.\"
+.\" End of "$Id: cups-snmp.conf.man 10424 2012-04-23 17:26:57Z mike $".
+.\"

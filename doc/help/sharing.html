@@ -1,0 +1,111 @@
+<html>
+<!-- SECTION: Getting Started -->
+<head>
+	<title>Printer Sharing</title>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">Printer Sharing</H1>
+
+<p>This document discusses several ways to configure printer sharing.</p>
+
+<h2><a name="BASICS">The Basics</h2>
+
+<p>A "server" is any machine that communicates directly to a printer. A "client" is any machine that sends print jobs to a server for final printing. Clients can also be servers if they communicate directly with any printers of their own.</p>
+
+<p>By default, CUPS uses the Internet Printing Protocol (IPP) to send jobs from a client to a server. When printing to legacy print servers you may also use the Line Printer Daemon (LPD) protocol when printing to older UNIX-based servers or Server Message Block (SMB) when printing to Windows<sup>&reg;</sup> servers.</p>
+
+<p>Clients can automatically discover and access shared printers via DNS Service Discovery (DNS-SD a.k.a. Bonjour<sup>&reg;</sup>). SMB browsing can also be used to manually discover and access shared printers when <a href="http://www.samba.org/">Samba</a> is installed.</p>
+
+
+<h2><a name="SERVER_CONFIG">Configuring the Server</a></h2>
+
+<p>You must enable printer sharing on the server before clients can print through it. The simplest way to do this is to use the <a href="man-cupsctl.html">cupsctl(8)</a> command on the server:</p>
+
+<pre class="command">
+cupsctl --share-printers
+</pre>
+
+<p>By default, the above command will allow printing from other clients on the same subnet as your server. To allow printing from any subnet, use the following command instead:</p>
+
+<pre class="command">
+cupsctl --share-printers --remote-any
+</pre>
+
+<p>Next, tag each printer that you want to share using the <a href="man-lpadmin.html">lpadmin(8)</a> command on the server, for example:</p>
+
+<pre class="command">
+lpadmin -p printer -o printer-is-shared=true
+</pre>
+
+<p>You can require authentication for shared printing by setting the policy on each printer, for example:</p>
+
+<pre class="command">
+lpadmin -p printer -o printer-op-policy=authenticated
+</pre>
+
+
+<h2><a name="AUTO_IPP">Automatic Configuration using IPP</a></h2>
+
+<blockquote><b>Note:</b>
+<p>This method of configuration does not work on OS X 10.7 or later because sandboxed applications do not always have direct network access.</p>
+</blockquote>
+
+<p>CUPS can be configured to run without a local spooler and send all jobs to a
+single server. However, if that server goes down then all printing will be
+disabled. Use this configuration only as absolutely necessary.</p>
+
+<p>The default server is normally the local system ("localhost"). To override
+the default server create a file named <var>/etc/cups/client.conf</var> with a
+line as follows:</p>
+
+<pre class='example'>
+ServerName <em>server</em>
+</pre>
+
+<p>The <var>server</var> name can be the hostname or IP address of the default
+server. If the server is not using the default IPP port (631), you can add the
+port number at the end like this:</p>
+
+<pre class='example'>
+ServerName <em>server:port</em>
+</pre>
+
+<p>The default server can also be customized on a per-user basis. To set a
+user-specific server create a file named <var>~/.cups/client.conf</var> instead.
+The user <var>client.conf</var> file takes precedence over the system one.</p>
+
+<p>Finally, you can set the <code>CUPS_SERVER</code> environment variable to
+override the default server for a single process, for example:</p>
+
+<pre class='command'>
+CUPS_SERVER=server:port firefox http://www.cups.org
+</pre>
+
+<p>will run the Firefox web browser pointed to the specified server and
+port. The environment variable overrides both the user and system
+<var>client.conf</var> files, if any.</p>
+
+
+<h2><a name="MANUAL">Manual Configuration of Print Queues</a></h2>
+
+<blockquote><b>Note:</b>
+<p>This method of configuration does not work on OS X 10.7 or later because sandboxed applications do not always have direct network access.</p>
+</blockquote>
+
+<p>The most tedious method of configuring client machines is to configure
+each remote queue by hand using the <a href="man-lpadmin.html">lpadmin(8)</a>
+command:</p>
+
+<pre class='command'>
+lpadmin -p <em>printer</em> -E -v ipp://<em>server</em>/printers/<em>printer</em>
+</pre>
+
+<p>The <var>printer</var> name is the name of the printer on the server machine.
+The <var>server</var> name is the hostname or IP address of the server machine.
+Repeat the <b>lpadmin</b> command for each remote printer you wish to use.</p>
+
+
+</body>
+</html>
