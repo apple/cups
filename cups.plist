@@ -1,0 +1,11 @@
+{
+  Description     = "Printing Services";
+  Provides        = ("Printing");
+  Requires        = ("Resolver");
+  OrderPreference = "None";
+  Messages =
+  {
+    start = "Starting CUPS";
+    stop  = "Stopping CUPS";
+  };
+}

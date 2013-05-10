@@ -1,0 +1,133 @@
+iso-8859-1
+OK
+Avbryt
+Hjälp
+Sluta
+Stäng
+Ja
+Nej
+Till
+Från
+Spara
+Släng
+Default
+Alternativ
+Mera info
+Svart
+Färg
+Cyan
+Magenta
+Gul
+Copyright 1993-2002 by Easy Software Products, All Rights Reserved.
+Generellt
+Skrivare
+Bild
+HP-GL/2
+Extra
+Dokument
+Andra
+Skriv sidorna: 
+Hela dokumentet
+Inkl. sidorna:
+Omvänd sidordning: 
+Sidformat: 
+ 1 sida/sida
+ 2 sidor/sida
+ 4 sidor/sida
+Bildskalning: 
+Naturlig bildstorlek
+Procentuell zoom
+PPI-zoom
+Spegelvänd bild: 
+Färgmättnad: 
+Färgnyans: 
+Fit to Page: 
+Skuggning: 
+Linjebredd: 
+Gammakorrektion: 
+Ljushet: 
+Lägg till
+Ta bort
+Modifiera
+Skrivarens URI
+Skrivarens Namn
+Skrivarens Placering
+Skrivarens Info
+Skrivarens Fabrikat och Modell
+Enhetens URI
+Formaterar sida
+Skriver sida
+Initialiserar Skrivare
+Skrivarens tillstånd
+Accepterar jobb
+Accepterar inte jobb
+Utskriftsjobb
+Klass
+Lokalt
+Fjärr
+Dubbelsidigt
+Häftning
+Snabbkopior
+Hopsorterade kopior
+Hålslagning
+Omslag
+Inbindning
+Sortering
+Små (upp till 9.5x14")
+Medium (9.5x14" till 13x19")
+Stora (13x19" och större)
+Specificerad storlek
+Tomgång
+Arbetar...
+Avbruten
+Alla
+Udda
+Jämna
+Mörkare                    Ljusare
+Mediastorlek
+Mediatyp
+Mediakälla
+Orientering: 
+Stående
+Liggande
+Jobbtillstånd
+Jobbnam
+Användarnamn
+Prioritet
+Kopior
+Filstorlek
+Pågående
+Utskriftsmod
+Upplösning
+Text
+Skönutskrift
+Marginaler
+Vänster
+Höger
+Nertill
+Upptill
+Filnamn
+Print
+400 Din bläddrare skickade en begäran som den här tjänstehanteraren inte förstår.
+Den här tjänstehanteraren kan inte verifiera att du har tillstånd att använda tjänsten.
+Du måste betala för att använda denna tjänst.
+Du har inte tillstånd att använda denna resurs.
+Kan inte hitta den efterfrågade resursen.
+Du tillåts inte använda den efterfrågade metoden med den här resursen.
+An appropriate representation for the resource was not found on this server.
+Du tillåts inte använda den här tjänstehanteraren som en proxy-värd.
+Din förfrågan har tagit för lång tid att hantera och har därför avbrutits.
+Den efterfrågade resursen har mer än ett värde.
+Den efterfrågade resursen är borta och har inte ersatts.
+Den efterfrågade metoden behöver ett giltigt "Content-Length".
+Förvillkoren till förfrågan evaluerades till FALSKT.
+Förfrågan var för stor för att hanteras av denna tjänstehanterare.
+URI i förfrågan var för stor för att hanteras av denna tjänstehanterare.
+Tjänstehanteraren förstod inte formatet på förfrågan.
+426 Det är nödvändigt att byta till en säker förbindelse. Ser du detta meddelande i en nätbläddrare så understödjer den inte byte till krypterad HTTP-förbindelse.
+500 Tjänstehanteraren har upptäckt ett allvarligt fel och kan inte hantera din begäran.
+Den efterfrågade metoden är inte implementerad av denna tjänstehanterare.
+Proxy-servern mottog ett otillåtet svar från en tjänstehanterare.
+Den efterfrågade resursen är inte tillgänglig på denna tjänstehanterare.
+Proxy-servern har inte svarat fort nog till denna tjänstehanterare.
+Denna tjänstehanterare tillhandahåller inte den version av HTTP som din bläddrare kräver.
