@@ -1,0 +1,16 @@
+_cupsImagePutCol
+_cupsImagePutRow
+_cupsImageReadBMP
+_cupsImageReadGIF
+_cupsImageReadJPEG
+_cupsImageReadPIX
+_cupsImageReadPNG
+_cupsImageReadPNM
+_cupsImageReadPhotoCD
+_cupsImageReadSGI
+_cupsImageReadSunRaster
+_cupsImageReadTIFF
+_cupsImageZoomDelete
+_cupsImageZoomFill
+_cupsImageZoomNew
+_cupsRasterExecPS
