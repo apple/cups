@@ -1285,7 +1285,7 @@ cupsdSetStringf(char       **s,		/* O - New string */
                 const char *f,		/* I - Printf-style format string */
 	        ...)			/* I - Additional args as needed */
 {
-  char		v[4096];		/* Formatting string value */
+  char		v[65536 + 64];		/* Formatting string value */
   va_list	ap;			/* Argument pointer */
   char		*olds;			/* Old string */
 

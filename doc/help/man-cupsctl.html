@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsctl(8)</title>
+</head>
+<body>
+<h1 class="title">cupsctl(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsctl - configure cupsd.conf options
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsctl
+</b>[ -E ] [-U
+<i>username
+</i>] [ -h
+<i>server[:port]
+</i>] [ --[no-]debug-logging ] [ --[no-]remote-admin ] [ --[no-]remote-any ]
+[ --[no-]share-printers ] [ --[no-]user-cancel-any ]
+[
+<i>name=value
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>cupsctl</i> updates or queries the <b>cupsd.conf</b> file for a server. When
+no changes are requested, the current configuration values are written to the
+standard output in the format "name=value", one per line.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Enables encryption on the connection to the scheduler.
+</dd>
+<dt>-U <i>username</i>
+</dt>
+<dd></dd>
+<dd>Specifies an alternate username to use when authenticating with the scheduler.
+</dd>
+<dt>-h <i>server[:port]</i>
+</dt>
+<dd></dd>
+<dd>Specifies the server address.
+</dd>
+<dt>--[no-]debug-logging
+</dt>
+<dd></dd>
+<dd>Enables or disables debug logging in the <b>error_log</b> file.
+</dd>
+<dt>--[no-]remote-admin
+</dt>
+<dd></dd>
+<dd>Enables or disables remote administration.
+</dd>
+<dt>--[no-]remote-any
+</dt>
+<dd></dd>
+<dd>Enables or disables printing from any address, e.g. the Internet.
+</dd>
+<dt>--[no-]share-printers
+</dt>
+<dd></dd>
+<dd>Enables or disables sharing of local printers with other computers.
+</dd>
+<dt>--[no-]user-cancel-any
+</dt>
+<dd></dd>
+<dd>Allows or prevents users from canceling jobs owned by others.
+</dd>
+</dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Display the current settings:
+<pre>
+    cupsctl
+</pre>
+<p>Enable debug logging:
+<pre>
+    cupsctl --debug-logging
+</pre>
+<p>Get the current debug logging state:
+<pre>
+    cupsctl | grep '^_debug_logging' | awk -F= '{print $2}'
+</pre>
+<p>Disable printer sharing:
+<pre>
+    cupsctl --no-share-printers
+</pre>
+<h2 class="title"><a name="KNOWN_ISSUES">Known Issues</a></h2>
+You cannot set the Listen or Port directives using <i>cupsctl</i>.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

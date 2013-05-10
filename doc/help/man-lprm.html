@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lprm(1)</title>
+</head>
+<body>
+<h1 class="title">lprm(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lprm - cancel print jobs
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lprm
+</b>[ -E ] [ -U
+<i>username
+</i>] [ -h
+<i>server[:port]
+</i>] [ -P
+<i>destination[/instance]
+</i>] [ - ] [
+<i>job ID(s)
+</i>]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>lprm</i> cancels print jobs that have been queued for printing.
+If no arguments are supplied, the current job on the default
+destination is cancelled. You can specify one or more job ID
+numbers to cancel those jobs or use the <i>-</i> option to cancel
+all jobs.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The <i>lprm</i> command supports the following options:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-P destination[/instance]
+</dt>
+<dd></dd>
+<dd>Specifies the destination printer or class.
+</dd>
+<dt>-U username
+</dt>
+<dd></dd>
+<dd>Specifies an alternate username.
+</dd>
+<dt>-h server[:port]
+</dt>
+<dd></dd>
+<dd>Specifies an alternate server.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+The CUPS version of <i>lprm</i> is compatible with the standard
+Berkeley <i>lprm</i> command.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpq.html?TOPIC=Man+Pages'>lpq(1)</a>, <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a>,
+<a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

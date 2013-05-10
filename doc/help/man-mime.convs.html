@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>mime.convs(5)</title>
+</head>
+<body>
+<h1 class="title">mime.convs(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+mime.convs - mime type conversion file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <i>mime.convs</i> file defines the filters that are available
+for converting files from one format to another. The standard
+filters support text, PDF, PostScript, HP-GL/2, and many types of
+image files.
+<p>Additional filters can be added to the <i>mime.convs</i> file or
+(preferably) to other files in the CUPS configuration directory.
+<p>Each line in the <i>mime.convs</i> file is a comment, blank, or filter
+line. Comment lines start with the # character. Filter lines specify
+the source and destination MIME types along with a relative cost
+associated with the filter and the filter to run:
+<br>
+<pre>
+
+super/type super/type cost filter
+application/postscript application/vnd.cups-raster 50 pstoraster
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-classes.conf.html?TOPIC=Man+Pages'>classes.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>,
+<a href='man-mime.types.html?TOPIC=Man+Pages'>mime.types(5)</a>, <a href='man-printers.conf.html?TOPIC=Man+Pages'>printers.conf(5)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

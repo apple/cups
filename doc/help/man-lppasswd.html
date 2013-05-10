@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lppasswd(1)</title>
+</head>
+<body>
+<h1 class="title">lppasswd(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lppasswd - add, change, or delete digest passwords.
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lppasswd
+</b>[
+<i>username
+</i>]
+<br>
+<b>lppasswd
+</b>-a [ -g
+<i>groupname
+</i>]
+<i>username
+</i><br>
+<b>lppasswd
+</b>-x
+<i>username
+</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>lppasswd</i> adds, changes, or deletes passwords in the CUPS
+digest password file, <i>passwd.md5</i>. When run by a normal
+user, <i>lppasswd</i> will prompt for the old and new passwords.
+When run by the super-user, <i>lppasswd</i> can add new accounts
+(<i>-a username</i>), change existing accounts (<i>username</i>),
+or delete accounts (<i>-x username</i>) in the digest password
+file. Digest usernames do not have to match local UNIX usernames.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<i>lppasswd</i> supports the following options:
+<dl>
+<dt>-g groupname
+</dt>
+<dd></dd>
+<dd>Specifies a group other than the default system group.
+</dd>
+</dl>
+<h2 class="title"><a name="SECURITY_ISSUES">Security Issues</a></h2>
+By default, the <i>lppasswd</i> program is not installed to allow ordinary
+users to change their passwords. To enable this, the <i>lppasswd</i> command
+must be made setuid to root with the command:
+<br>
+<pre>
+chmod u+s lppasswd
+</pre>
+<p>While every attempt has been made to make <i>lppasswd</i> secure against
+exploits that could grant super-user privileges to unprivileged users,
+paranoid system administrators may wish to use Basic authentication with
+accounts managed by PAM instead.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>, <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

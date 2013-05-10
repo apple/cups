@@ -27,12 +27,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1DBDCFABB8DF28E5F75E41EDAE4BF6BE"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_1E4B2A9BD6A44926B719E0D7E8FC0952"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -81,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_604E80B396974DD68D1F4A11BB022F79"
+        "OwnerKey" = "8:_8B9B4769224046F5B6D692BA9E6FFBDD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_65CBD149C9DA448FBACE2B02766A6537"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -111,6 +111,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8B9B4769224046F5B6D692BA9E6FFBDD"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8CC3562BCDED4676A672115D19D898B5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -135,8 +141,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_AB0BD66B57BF4C41BE53BCE573C254BC"
-        "OwnerKey" = "8:_F208E348BAE54EDEA200755E5C149F13"
+        "MsmKey" = "8:_A63C5C4108AB4B588878482B26876DC5"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A9CCE21DCF004D869F157B0065B32AA7"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -173,6 +185,12 @@
         {
         "MsmKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D20F7E9FAB8B4CF38D740C5E5655CC3E"
+        "OwnerKey" = "8:_A9CCE21DCF004D869F157B0065B32AA7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -251,24 +269,6 @@
         {
         "MsmKey" = "8:_F16FA7F9826E461E955A95B2EEABA975"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F208E348BAE54EDEA200755E5C149F13"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F208E348BAE54EDEA200755E5C149F13"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F208E348BAE54EDEA200755E5C149F13"
-        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -412,26 +412,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1DBDCFABB8DF28E5F75E41EDAE4BF6BE"
-            {
-            "SourcePath" = "8:zlibwapi.dll"
-            "TargetName" = "8:zlibwapi.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E4B2A9BD6A44926B719E0D7E8FC0952"
@@ -750,7 +730,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -770,8 +750,28 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A63C5C4108AB4B588878482B26876DC5"
+            {
+            "SourcePath" = "8:..\\test\\validate-job.test"
+            "TargetName" = "8:validate-job.test"
+            "Tag" = "8:"
+            "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AF057921D20E4520A3C6420F0729A744"
@@ -1192,14 +1192,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ipptool for Windows"
-        "ProductCode" = "8:{BADD3454-4180-4519-B1CA-5C255DAB0047}"
-        "PackageCode" = "8:{3C801C7B-F294-47ED-9146-D35C6B48C3B9}"
+        "ProductCode" = "8:{75CFE2B5-5105-4D7A-87CA-5D919126F3DA}"
+        "PackageCode" = "8:{85757D89-5057-4EE1-9852-763E1EEF2FC8}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:13.01.3100"
+        "ProductVersion" = "8:13.04.1800"
         "Manufacturer" = "8:Apple Inc."
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.cups.org/str.php"
@@ -1758,11 +1758,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_AB0BD66B57BF4C41BE53BCE573C254BC"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_604E80B396974DD68D1F4A11BB022F79"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86_x64.msm"
                 "Properties"
                 {
                 }
@@ -1772,11 +1772,39 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_F208E348BAE54EDEA200755E5C149F13"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_8B9B4769224046F5B6D692BA9E6FFBDD"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A9CCE21DCF004D869F157B0065B32AA7"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D20F7E9FAB8B4CF38D740C5E5655CC3E"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:microsoft_vc90_crt_x86_x64.msm"
                 "Properties"
                 {
                 }
@@ -1791,7 +1819,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Win32\\Debug\\regex.dll"
+            "SourcePath" = "8:x64\\Release\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1819,7 +1847,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
+            "SourcePath" = "8:x64\\Debug\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1847,7 +1875,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
+            "SourcePath" = "8:x64\\Debug\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"

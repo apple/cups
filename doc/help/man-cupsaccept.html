@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsaccept(8)</title>
+</head>
+<body>
+<h1 class="title">cupsaccept(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsaccept/cupsreject - accept/reject jobs sent to a destination
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsaccept
+</b>[ -E ] [ -U
+<i>username
+</i>] [ -h
+<i>hostname[:port]
+</i>] destination(s)
+<br>
+<b>cupsreject
+</b>[ -E ] [ -U
+<i>username
+</i>] [ -h
+<i>hostname[:port]
+</i>] [ -r
+<i>reason
+</i>] destination(s)
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>cupsaccept</i> instructs the printing system to accept print jobs to the
+specified destinations.
+<p><i>cupsreject</i> instructs the printing system to reject print jobs to the
+specified destinations. The <i>-r</i> option sets the reason for rejecting
+print jobs. If not specified the reason defaults to "Reason Unknown".
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are supported by both <i>cupsaccept</i> and
+<i>cupsreject</i>:
+<dl>
+<dt>-E
+</dt>
+<dd></dd>
+<dd>Forces encryption when connecting to the server.
+</dd>
+<dt>-U username
+</dt>
+<dd></dd>
+<dd>Sets the username that is sent when connecting to the server.
+</dd>
+<dt>-h hostname[:port]
+</dt>
+<dd></dd>
+<dd>Chooses an alternate server.
+</dd>
+<dt>-r "reason"
+</dt>
+<dd></dd>
+<dd>Sets the reason string that is shown for a printer that is
+rejecting jobs.
+</dd>
+</dl>
+<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+Unlike the System V printing system, CUPS allows printer names to
+contain any printable character except SPACE, TAB, "/", or "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+<p>The CUPS versions of <i>accept</i> and <i>reject</i> may ask the
+user for an access password depending on the printing system
+configuration. This differs from the System V versions which
+require the root user to execute these commands.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-cupsenable.html?TOPIC=Man+Pages'>cupsenable(8)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>,
+<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

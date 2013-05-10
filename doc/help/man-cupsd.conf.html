@@ -1,0 +1,674 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd.conf(5)</title>
+</head>
+<body>
+<h1 class="title">cupsd.conf(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsd.conf - server configuration file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <i>cupsd.conf</i> file configures the CUPS scheduler, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>.  It
+is normally located in the <i>/private/etc/cups</i> directory. <b>Note:</b>
+File, directory, and user configuration directives that used to be allowed in
+the <i>cupsd.conf</i> file are now stored in the <a href='man-cups-files.conf.html?TOPIC=Man+Pages'>cups-files.conf(5)</a> instead
+in order to prevent certain types of privilege escalation attacks.
+<p>Each line in the file can be a configuration directive, a blank line,
+or a comment. Comment lines start with the # character. The
+configuration directives are intentionally similar to those used by the
+popular Apache web server software and are described below.
+<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
+The following directives are understood by <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>. Consult the
+on-line help for detailed descriptions:
+<dl>
+<dt>AccessLogLevel config
+</dt>
+<dd></dd>
+<dt>AccessLogLevel actions
+</dt>
+<dd></dd>
+<dt>AccessLogLevel all
+</dt>
+<dd></dd>
+<dd>Specifies the logging level for the AccessLog file.
+</dd>
+<dt>Allow all
+</dt>
+<dd></dd>
+<dt>Allow none
+</dt>
+<dd></dd>
+<dt>Allow host.domain.com
+</dt>
+<dd></dd>
+<dt>Allow *.domain.com
+</dt>
+<dd></dd>
+<dt>Allow ip-address
+</dt>
+<dd></dd>
+<dt>Allow ip-address/netmask
+</dt>
+<dd></dd>
+<dt>Allow ip-address/mm
+</dt>
+<dd></dd>
+<dt>Allow @IF(name)
+</dt>
+<dd></dd>
+<dt>Allow @LOCAL
+</dt>
+<dd></dd>
+<dd>Allows access from the named hosts or addresses.
+</dd>
+<dt>AuthType None
+</dt>
+<dd></dd>
+<dt>AuthType Basic
+</dt>
+<dd></dd>
+<dt>AuthType BasicDigest
+</dt>
+<dd></dd>
+<dt>AuthType Digest
+</dt>
+<dd></dd>
+<dt>AuthType Negotiate
+</dt>
+<dd></dd>
+<dd>Specifies the authentication type (None, Basic, BasicDigest, Digest, Negotiate)
+</dd>
+<dt>AutoPurgeJobs Yes
+</dt>
+<dd></dd>
+<dt>AutoPurgeJobs No
+</dt>
+<dd></dd>
+<dd>Specifies whether to purge job history data automatically when
+it is no longer required for quotas.
+</dd>
+<dt>BrowseLocalProtocols [All] [DNSSD]
+</dt>
+<dd></dd>
+<dd>Specifies the protocols to use for local printer sharing.
+</dd>
+<dt>BrowseWebIF Yes
+</dt>
+<dd></dd>
+<dt>BrowseWebIF No
+</dt>
+<dd></dd>
+<dd>Specifies whether the CUPS web interface is advertised via DNS-SD.
+</dd>
+<dt>Browsing Yes
+</dt>
+<dd></dd>
+<dt>Browsing No
+</dt>
+<dd></dd>
+<dd>Specifies whether or not shared printers should be advertised.
+</dd>
+<dt>Classification banner
+</dt>
+<dd></dd>
+<dd>Specifies the security classification of the server.
+</dd>
+<dt>ClassifyOverride Yes
+</dt>
+<dd></dd>
+<dt>ClassifyOverride No
+</dt>
+<dd></dd>
+<dd>Specifies whether to allow users to override the classification
+of individual print jobs.
+</dd>
+<dt>DefaultAuthType Basic
+</dt>
+<dd></dd>
+<dt>DefaultAuthType BasicDigest
+</dt>
+<dd></dd>
+<dt>DefaultAuthType Digest
+</dt>
+<dd></dd>
+<dt>DefaultAuthType Negotiate
+</dt>
+<dd></dd>
+<dd>Specifies the default type of authentication to use.
+</dd>
+<dt>DefaultEncryption Never
+</dt>
+<dd></dd>
+<dt>DefaultEncryption IfRequested
+</dt>
+<dd></dd>
+<dt>DefaultEncryption Required
+</dt>
+<dd></dd>
+<dd>Specifies the type of encryption to use for authenticated requests.
+</dd>
+<dt>DefaultLanguage locale
+</dt>
+<dd></dd>
+<dd>Specifies the default language to use for text and web content.
+</dd>
+<dt>DefaultPaperSize Auto
+</dt>
+<dd></dd>
+<dt>DefaultPaperSize None
+</dt>
+<dd></dd>
+<dt>DefaultPaperSize sizename
+</dt>
+<dd></dd>
+<dd>Specifies the default paper size for new print queues. "Auto" uses a locale-
+specific default, while "None" specifies there is no default paper size.
+</dd>
+<dt>DefaultPolicy policy-name
+</dt>
+<dd></dd>
+<dd>Specifies the default access policy to use.
+</dd>
+<dt>DefaultShared Yes
+</dt>
+<dd></dd>
+<dt>DefaultShared No
+</dt>
+<dd></dd>
+<dd>Specifies whether local printers are shared by default.
+</dd>
+<dt>Deny all
+</dt>
+<dd></dd>
+<dt>Deny none
+</dt>
+<dd></dd>
+<dt>Deny host.domain.com
+</dt>
+<dd></dd>
+<dt>Deny *.domain.com
+</dt>
+<dd></dd>
+<dt>Deny ip-address
+</dt>
+<dd></dd>
+<dt>Deny ip-address/netmask
+</dt>
+<dd></dd>
+<dt>Deny ip-address/mm
+</dt>
+<dd></dd>
+<dt>Deny @IF(name)
+</dt>
+<dd></dd>
+<dt>Deny @LOCAL
+</dt>
+<dd></dd>
+<dd>Denies access to the named host or address.
+</dd>
+<dt>DirtyCleanInterval seconds
+</dt>
+<dd></dd>
+<dd>Specifies the delay for updating of configuration and state files. A value of 0
+causes the update to happen as soon as possible, typically within a few
+milliseconds.
+</dd>
+<dt>Encryption IfRequested
+</dt>
+<dd></dd>
+<dt>Encryption Never
+</dt>
+<dd></dd>
+<dt>Encryption Required
+</dt>
+<dd></dd>
+<dd>Specifies the level of encryption that is required for a particular
+location.
+</dd>
+<dt>FilterLimit limit
+</dt>
+<dd></dd>
+<dd>Specifies the maximum cost of filters that are run concurrently.
+</dd>
+<dt>FilterNice nice-value
+</dt>
+<dd></dd>
+<dd>Specifies the scheduling priority ("nice" value) of filters that
+are run to print a job.
+</dd>
+<dt>GSSServiceName name
+</dt>
+<dd></dd>
+<dd>Specifies the service name when using Kerberos authentication. The default
+service name is "host".
+</dd>
+<dt>HostNameLookups On
+</dt>
+<dd></dd>
+<dt>HostNameLookups Off
+</dt>
+<dd></dd>
+<dt>HostNameLookups Double
+</dt>
+<dd></dd>
+<dd>Specifies whether or not to do reverse lookups on client addresses.
+</dd>
+<dt>Include filename
+</dt>
+<dd></dd>
+<dd>Includes the named file.
+</dd>
+<dt>JobKillDelay seconds
+</dt>
+<dd></dd>
+<dd>Specifies the number of seconds to wait before killing the filters and backend
+associated with a canceled or held job.
+</dd>
+<dt>JobPrivateAccess all
+</dt>
+<dd></dd>
+<dt>JobPrivateAccess default
+</dt>
+<dd></dd>
+<dt>JobPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+</dt>
+<dd></dd>
+<dd>Specifies an access list for a job's private values. The "default" access list
+is "@OWNER @SYSTEM". "@ACL" maps to the printer's requesting-user-name-allowed
+or requesting-user-name-denied values.
+</dd>
+<dt>JobPrivateValues all
+</dt>
+<dd></dd>
+<dt>JobPrivateValues default
+</dt>
+<dd></dd>
+<dt>JobPrivateValues none
+</dt>
+<dd></dd>
+<dt>JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
+</dt>
+<dd>Specifies the list of job values to make private. The "default" values are
+"job-name", "job-originating-host-name", and "job-originating-user-name".
+</dd>
+<dt>JobRetryInterval seconds
+</dt>
+<dd></dd>
+<dd>Specifies the interval between retries of jobs in seconds.
+</dd>
+<dt>JobRetryLimit count
+</dt>
+<dd></dd>
+<dd>Specifies the number of retries that are done for jobs.
+</dd>
+<dt>KeepAlive Yes
+</dt>
+<dd></dd>
+<dt>KeepAlive No
+</dt>
+<dd></dd>
+<dd>Specifies whether to support HTTP keep-alive connections.
+</dd>
+<dt>KeepAliveTimeout seconds
+</dt>
+<dd></dd>
+<dd>Specifies the amount of time that connections are kept alive.
+</dd>
+<dt>&lt;Limit operations> ... &lt;/Limit>
+</dt>
+<dd></dd>
+<dd>Specifies the IPP operations that are being limited inside a policy.
+</dd>
+<dt>&lt;Limit methods> ... &lt;/Limit>
+</dt>
+<dd></dd>
+<dt>&lt;LimitExcept methods> ... &lt;/LimitExcept>
+</dt>
+<dd></dd>
+<dd>Specifies the HTTP methods that are being limited inside a location.
+</dd>
+<dt>LimitRequestBody
+</dt>
+<dd></dd>
+<dd>Specifies the maximum size of any print job request.
+</dd>
+<dt>Listen ip-address:port
+</dt>
+<dd></dd>
+<dt>Listen *:port
+</dt>
+<dd></dd>
+<dt>Listen /path/to/domain/socket
+</dt>
+<dd></dd>
+<dd>Listens to the specified address and port or domain socket path.
+</dd>
+<dt>&lt;Location /path> ... &lt;/Location>
+</dt>
+<dd></dd>
+<dd>Specifies access control for the named location.
+</dd>
+<dt>LogDebugHistory #-messages
+</dt>
+<dd></dd>
+<dd>Specifies the number of debugging messages that are logged when an error
+occurs in a print job.
+</dd>
+<dt>LogLevel alert
+</dt>
+<dd></dd>
+<dt>LogLevel crit
+</dt>
+<dd></dd>
+<dt>LogLevel debug2
+</dt>
+<dd></dd>
+<dt>LogLevel debug
+</dt>
+<dd></dd>
+<dt>LogLevel emerg
+</dt>
+<dd></dd>
+<dt>LogLevel error
+</dt>
+<dd></dd>
+<dt>LogLevel info
+</dt>
+<dd></dd>
+<dt>LogLevel none
+</dt>
+<dd></dd>
+<dt>LogLevel notice
+</dt>
+<dd></dd>
+<dt>LogLevel warn
+</dt>
+<dd></dd>
+<dd>Specifies the logging level for the ErrorLog file.
+</dd>
+<dt>LogTimeFormat standard
+</dt>
+<dd></dd>
+<dt>LogTimeFormat usecs
+</dt>
+<dd></dd>
+<dd>Specifies the format of the date and time in the log files.
+</dd>
+<dt>MaxClients number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of simultaneous clients to support.
+</dd>
+<dt>MaxClientsPerHost number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of simultaneous clients to support from a
+single address.
+</dd>
+<dt>MaxCopies number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of copies that a user can print of each job.
+</dd>
+<dt>MaxHoldTime seconds
+</dt>
+<dd></dd>
+<dd>Specifies the maximum time a job may remain in the "indefinite" hold state
+before it is canceled. Set to 0 to disable cancellation of held jobs.
+</dd>
+<dt>MaxJobs number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of simultaneous jobs to support.
+</dd>
+<dt>MaxJobsPerPrinter number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of simultaneous jobs per printer to support.
+</dd>
+<dt>MaxJobsPerUser number
+</dt>
+<dd></dd>
+<dd>Specifies the maximum number of simultaneous jobs per user to support.
+</dd>
+<dt>MaxJobTime seconds
+</dt>
+<dd></dd>
+<dd>Specifies the maximum time a job may take to print before it is canceled. The
+default is 10800 seconds (3 hours). Set to 0 to disable cancellation of "stuck"
+jobs.
+</dd>
+<dt>MaxLogSize number-bytes
+</dt>
+<dd></dd>
+<dd>Specifies the maximum size of the log files before they are
+rotated (0 to disable rotation)
+</dd>
+<dt>MaxRequestSize number-bytes
+</dt>
+<dd></dd>
+<dd>Specifies the maximum request/file size in bytes (0 for no limit)
+</dd>
+<dt>MultipleOperationTimeout seconds
+</dt>
+<dd></dd>
+<dd>Specifies the maximum amount of time to allow between files in a multiple file
+print job.
+</dd>
+<dt>Order allow,deny
+</dt>
+<dd></dd>
+<dt>Order deny,allow
+</dt>
+<dd></dd>
+<dd>Specifies the order of HTTP access control (allow,deny or deny,allow)
+</dd>
+<dt>PageLogFormat format string
+</dt>
+<dd></dd>
+<dd>Specifies the format of page log lines.
+</dd>
+<dt>PassEnv variable [... variable]
+</dt>
+<dd></dd>
+<dd>Passes the specified environment variable(s) to child processes.
+</dd>
+<dt>&lt;Policy name> ... &lt;/Policy>
+</dt>
+<dd></dd>
+<dd>Specifies access control for the named policy.
+</dd>
+<dt>Port number
+</dt>
+<dd></dd>
+<dd>Specifies a port number to listen to for HTTP requests.
+</dd>
+<dt>PreserveJobFiles Yes
+</dt>
+<dd></dd>
+<dt>PreserveJobFiles No
+</dt>
+<dd></dd>
+<dd>Specifies whether or not to preserve job files after they are printed.
+</dd>
+<dt>PreserveJobHistory Yes
+</dt>
+<dd></dd>
+<dt>PreserveJobHistory No
+</dt>
+<dd></dd>
+<dd>Specifies whether or not to preserve the job history after they are
+printed.
+</dd>
+<dt>PrintcapFormat bsd
+</dt>
+<dd></dd>
+<dt>PrintcapFormat plist
+</dt>
+<dd></dd>
+<dt>PrintcapFormat solaris
+</dt>
+<dd></dd>
+<dd>Specifies the format of the printcap file.
+</dd>
+<dt>ReloadTimeout seconds
+</dt>
+<dd></dd>
+<dd>Specifies the amount of time to wait for job completion before
+restarting the scheduler.
+</dd>
+<dt>Require group group-name-list
+</dt>
+<dd></dd>
+<dt>Require user user-name-list
+</dt>
+<dd></dd>
+<dt>Require valid-user
+</dt>
+<dd></dd>
+<dd>Specifies that user or group authentication is required.
+</dd>
+<dt>RIPCache bytes
+</dt>
+<dd></dd>
+<dd>Specifies the maximum amount of memory to use when converting images
+and PostScript files to bitmaps for a printer.
+</dd>
+<dt>Satisfy all
+</dt>
+<dd></dd>
+<dt>Satisfy any
+</dt>
+<dd></dd>
+<dd>Specifies whether all or any limits set for a Location must be
+satisfied to allow access.
+</dd>
+<dt>ServerAdmin user@domain.com
+</dt>
+<dd></dd>
+<dd>Specifies the email address of the server administrator.
+</dd>
+<dt>ServerAlias hostname [... hostname]
+</dt>
+<dd></dd>
+<dt>ServerAlias *
+</dt>
+<dd></dd>
+<dd>Specifies an alternate name that the server is known by. The special name "*"
+allows any name to be used.
+</dd>
+<dt>ServerName hostname-or-ip-address
+</dt>
+<dd></dd>
+<dd>Specifies the fully-qualified hostname of the server.
+</dd>
+<dt>ServerTokens Full
+</dt>
+<dd></dd>
+<dt>ServerTokens Major
+</dt>
+<dd></dd>
+<dt>ServerTokens Minimal
+</dt>
+<dd></dd>
+<dt>ServerTokens Minor
+</dt>
+<dd></dd>
+<dt>ServerTokens None
+</dt>
+<dd></dd>
+<dt>ServerTokens OS
+</dt>
+<dd></dd>
+<dt>ServerTokens ProductOnly
+</dt>
+<dd></dd>
+<dd>Specifies what information is included in the Server header of HTTP
+responses.
+</dd>
+<dt>SetEnv variable value
+</dt>
+<dd></dd>
+<dd>Set the specified environment variable to be passed to child processes.
+</dd>
+<dt>SSLListen
+</dt>
+<dd></dd>
+<dd>Listens on the specified address and port for encrypted connections.
+</dd>
+<dt>SSLOptions None
+</dt>
+<dd></dd>
+<dt>SSLOptions NoEmptyFragments
+</dt>
+<dd></dd>
+<dd>Sets SSL/TLS protocol options for encrypted connections.
+</dd>
+<dt>SSLPort
+</dt>
+<dd></dd>
+<dd>Listens on the specified port for encrypted connections.
+</dd>
+<dt>StrictConformance Yes
+</dt>
+<dd></dd>
+<dt>StrictConformance No
+</dt>
+<dd></dd>
+<dd>Specifies whether the scheduler requires clients to strictly adhere to the IPP
+specifications. The default is No.
+</dd>
+<dt>SubscriptionPrivateAccess all
+</dt>
+<dd></dd>
+<dt>SubscriptionPrivateAccess default
+</dt>
+<dd></dd>
+<dt>SubscriptionPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+</dt>
+<dd></dd>
+<dd>Specifies an access list for a subscription's private values. The "default"
+access list is "@OWNER @SYSTEM". "@ACL" maps to the printer's
+requesting-user-name-allowed or requesting-user-name-denied values.
+</dd>
+<dt>SubscriptionPrivateValues all
+</dt>
+<dd></dd>
+<dt>SubscriptionPrivateValues default
+</dt>
+<dd></dd>
+<dt>SubscriptionPrivateValues none
+</dt>
+<dd></dd>
+<dt>SubscriptionPrivateValues attribute-name-1 [ ... attribute-name-N ]
+</dt>
+<dd>Specifies the list of job values to make private. The "default" values are
+"notify-events", "notify-pull-method", "notify-recipient-uri",
+"notify-subscriber-user-name", and "notify-user-data".
+</dd>
+<dt>Timeout seconds
+</dt>
+<dd></dd>
+<dd>Specifies the HTTP request timeout in seconds.
+</dd>
+<dt>WebInterface yes
+</dt>
+<dd></dd>
+<dt>WebInterface no
+</dt>
+<dd>Specifies whether the web interface is enabled.
+</dd>
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-classes.conf.html?TOPIC=Man+Pages'>classes.conf(5)</a>, <a href='man-cups-files.conf.html?TOPIC=Man+Pages'>cups-files.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>,
+<a href='man-mime.convs.html?TOPIC=Man+Pages'>mime.convs(5)</a>, <a href='man-mime.types.html?TOPIC=Man+Pages'>mime.types(5)</a>, <a href='man-printers.conf.html?TOPIC=Man+Pages'>printers.conf(5)</a>,
+<a href='man-subscriptions.conf.html?TOPIC=Man+Pages'>subscriptions.conf(5)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

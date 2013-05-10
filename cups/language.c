@@ -1184,24 +1184,40 @@ appleLangDefault(void)
   {
     if (getenv("SOFTWARE") != NULL && (lang = getenv("LANG")) != NULL)
     {
+      DEBUG_printf(("3appleLangDefault: Using LANG=%s", lang));
       strlcpy(cg->language, lang, sizeof(cg->language));
       return (cg->language);
     }
     else if ((bundle = CFBundleGetMainBundle()) != NULL &&
              (bundleList = CFBundleCopyBundleLocalizations(bundle)) != NULL)
     {
+      DEBUG_puts("3appleLangDefault: Getting localizationList from bundle.");
+
       localizationList =
 	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
 
       CFRelease(bundleList);
     }
     else
+    {
+      DEBUG_puts("3appleLangDefault: Getting localizationList from preferences.");
+
       localizationList =
 	  CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
 				    kCFPreferencesCurrentApplication);
+    }
 
     if (localizationList)
     {
+
+#ifdef DEBUG
+      if (CFGetTypeID(localizationList) == CFArrayGetTypeID())
+        DEBUG_printf(("3appleLangDefault: Got localizationList, %d entries.",
+                      (int)CFArrayGetCount(localizationList)));
+      else
+        DEBUG_puts("3appleLangDefault: Got localizationList but not an array.");
+#endif /* DEBUG */
+
       if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
 	  CFArrayGetCount(localizationList) > 0)
       {
@@ -1219,7 +1235,7 @@ appleLangDefault(void)
 			       kCFStringEncodingASCII);
 	    CFRelease(localeName);
 
-	    DEBUG_printf(("9appleLangDefault: cg->language=\"%s\"",
+	    DEBUG_printf(("3appleLangDefault: cg->language=\"%s\"",
 			  cg->language));
 
 	   /*
@@ -1233,7 +1249,7 @@ appleLangDefault(void)
 	    {
 	      if (!strcmp(cg->language, apple_language_locale[i].language))
 	      {
-		DEBUG_printf(("9appleLangDefault: mapping \"%s\" to \"%s\"...",
+		DEBUG_printf(("3appleLangDefault: mapping \"%s\" to \"%s\"...",
 			      cg->language, apple_language_locale[i].locale));
 		strlcpy(cg->language, apple_language_locale[i].locale,
 			sizeof(cg->language));
@@ -1251,6 +1267,8 @@ appleLangDefault(void)
 	    if (!strchr(cg->language, '.'))
 	      strlcat(cg->language, ".UTF-8", sizeof(cg->language));
 	  }
+	  else
+	    DEBUG_puts("3appleLangDefault: Unable to get localeName.");
 	}
       }
 
@@ -1262,7 +1280,10 @@ appleLangDefault(void)
     */
 
     if (!cg->language[0])
+    {
+      DEBUG_puts("3appleLangDefault: Defaulting to en_US.");
       strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
+    }
   }
 
  /*

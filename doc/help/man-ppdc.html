@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ppdc(1)</title>
+</head>
+<body>
+<h1 class="title">ppdc(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ppdc - cups ppd compiler
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ppdc
+</b>[ -D
+<i>name[=value]
+</i>] [ -I
+<i>include-directory
+</i>] [ -c
+<i>message-catalog
+</i>] [ -d
+<i>output-directory
+</i>] [ -l
+<i>language(s)
+</i>] [-m] [-t] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
+<i>source-file
+</i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<i>ppdc</i> compiles PPDC source files into one or more PPD
+files. <b>This program is deprecated and will be removed in a future release of
+CUPS.</b>
+<p>The <i>-D</i> option sets the named variable for use in the
+source file. It is equivalent to using the #define directive
+in the source file.
+<p>The <i>-I</i> option specifies an alternate include directory;
+multiple <i>-I</i> options can be supplied to add additional
+directories.
+<p>The <i>-c</i> option specifies a single message catalog file in GNU
+gettext source format (filename.po) to be used for localization.
+<p>The <i>-d</i> option specifies the output directory for PPD
+files. The default output directory is "ppd".
+<p>The <i>-l</i> option specifies one or more languages to use when
+localizing the PPD file(s). The default language is "en"
+(English). Separate multiple languages with commas, for example
+"de_DE,en_UK,es_ES,es_MX,es_US,fr_CA,fr_FR,it_IT" will create PPD
+files with German, UK English, Spanish (Spain, Mexico, and US),
+French (France and Canada), and Italian languages in each file.
+<p>The <i>-m</i> option specifies that the output filename should be
+based on the ModelName value instead of FileName or PCFilenName.
+<p>The <i>-t</i> option specifies that PPD files should be tested instead
+of generated.
+<p>The <i>-v</i> option provides more verbose output, basically a
+running status of which files are being loaded or written.
+<p>The <i>-z</i> option generates compressed PPD files (filename.ppd.gz).
+The default is to generate uncompressed PPD files.
+<p>The <i>--cr</i>, <i>--crlf</i>, and <i>--lf</i> options specify the
+line ending to use - carriage return, carriage return and line feed,
+or line feed. The default is to use the line feed character alone.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

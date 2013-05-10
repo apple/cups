@@ -142,8 +142,12 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x0409, 0xbef4, USBLP_QUIRK_BIDIR }, /* NEC Picty760 (HP OEM) */
 	{ 0x0409, 0xf0be, USBLP_QUIRK_BIDIR }, /* NEC Picty920 (HP OEM) */
 	{ 0x0409, 0xf1be, USBLP_QUIRK_BIDIR }, /* NEC Picty800 (HP OEM) */
+	{ 0x043d, 0x00f3, USBLP_QUIRK_NO_REATTACH }, /* Lexmark International,
+		       Inc. (e250d), https://bugs.launchpad.net/bugs/1084164 */
 	{ 0x0482, 0x0010, USBLP_QUIRK_BIDIR }, /* Kyocera Mita FS 820,
 						  by zut <kernel@zut.de> */
+	{ 0x04a9, 0x1095, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP6000D
+			    Printer, https://bugs.launchpad.net/bugs/1160638 */
 	{ 0x04a9, 0x10a2, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4200
 			    Printer, http://www.cups.org/str.php?L4155 */
 	{ 0x04a9, 0x10b6, USBLP_QUIRK_BIDIR }, /* Canon, Inc. PIXMA iP4300
@@ -158,6 +162,8 @@ static const struct quirk_printer_struct quirk_printers[] = {
 			    Printer, http://www.cups.org/str.php?L4155 */
 	{ 0x04a9, 0x173e, USBLP_QUIRK_BIDIR }, /* Canon, Inc. MP560
 			    Printer, http://www.cups.org/str.php?L4155 */
+	{ 0x04a9, 0x26a3, USBLP_QUIRK_NO_REATTACH }, /* Canon, Inc. MF4150
+		            Printer, https://bugs.launchpad.net/bugs/1160638 */
 	{ 0x04f9, 0x001a, USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
 						  HL-1430 Laser Printer,
 				     https://bugs.launchpad.net/bugs/1038695 */
@@ -165,24 +171,33 @@ static const struct quirk_printer_struct quirk_printers[] = {
 			  USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
 						  HL-1440 Laser Printer,
 				     https://bugs.launchpad.net/bugs/1000253 */
+	{ 0x04f9, 0x000e, USBLP_QUIRK_BIDIR |
+			  USBLP_QUIRK_NO_REATTACH }, /* Brother Industries, Ltd
+						  HL-1450 Laser Printer,
+				     https://bugs.launchpad.net/bugs/1000253 */
 	{ 0x06bc, 0x000b, USBLP_QUIRK_NO_REATTACH }, /* Oki Data Corp.
 						  Okipage 14ex Printer,
 				     https://bugs.launchpad.net/bugs/872483 */
 	{ 0x06bc, 0x01c7, USBLP_QUIRK_NO_REATTACH }, /* Oki Data Corp. B410d,
 				     https://bugs.launchpad.net/bugs/872483 */
-	{ 0x04b8, 0x0001, USBLP_QUIRK_BIDIR }, /* Seiko Epson Corp. Stylus Color 740 / Photo 750,
+	{ 0x04b8, 0x0001, USBLP_QUIRK_BIDIR |
+			  USBLP_QUIRK_NO_REATTACH }, /* Seiko Epson Corp. Stylus Color 740 / Photo 750,
 				     http://bugs.debian.org/697970 */
+	{ 0x04b8, 0x0005, USBLP_QUIRK_NO_REATTACH }, /* Seiko Epson Corp. Stylus Color 670,
+				     https://bugs.launchpad.net/bugs/872483 */
 	{ 0x04b8, 0x0202, USBLP_QUIRK_BAD_CLASS }, /* Seiko Epson Receipt
 						      Printer M129C */
 	{ 0x067b, 0x2305, USBLP_QUIRK_BIDIR |
 			  USBLP_QUIRK_NO_REATTACH |
 	                  USBLP_QUIRK_RESET },
+	/* Prolific Technology, Inc. PL2305 Parallel Port
+	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
 	{ 0x0924, 0x3ce9, USBLP_QUIRK_NO_REATTACH }, /* Xerox Phaser 3124
 			  https://bugzilla.redhat.com/show_bug.cgi?id=867392 */
 	{ 0x0924, 0x4293, USBLP_QUIRK_NO_REATTACH }, /* Xerox WorkCentre 3210
 				     https://bugs.launchpad.net/bugs/1102470 */
-	/* Prolific Technology, Inc. PL2305 Parallel Port
-	   (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/987485 */
+	{ 0x1a86, 0x7584, USBLP_QUIRK_NO_REATTACH }, /* QinHeng Electronics
+   CH340S (USB -> Parallel adapter), https://bugs.launchpad.net/bugs/1000253 */
 	{ 0x04e8, 0x0000, USBLP_QUIRK_RESET }, /* All Samsung devices,
 				     https://bugs.launchpad.net/bugs/1032456 */
 	{ 0x0a5f, 0x0000, USBLP_QUIRK_BIDIR }, /* All Zebra devices,
@@ -215,6 +230,7 @@ static const struct quirk_printer_struct quirk_printers[] = {
 	{ 0x04a9, 0x3256, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP810 */
 	{ 0x04a9, 0x30F5, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP500 */
 	{ 0x04a9, 0x31AF, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY ES3 */
+	{ 0x04a9, 0x31DD, USBLP_QUIRK_BLACKLIST }, /* Canon SELPHY CP780 */
 	 /* MISSING PIDs: CP520, CP530, CP790 */
 	{ 0, 0 }
 };

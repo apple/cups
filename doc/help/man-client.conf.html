@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>client.conf(5)</title>
+</head>
+<body>
+<h1 class="title">client.conf(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+client.conf - client configuration file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <i>client.conf</i> file configures the CUPS client and is
+normally located in the <i>/private/etc/cups</i> or <i>~/.cups</i>
+directory. Each line in the file can be a configuration
+directive, a blank line, or a comment. Comment lines start with
+the # character.
+<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
+The following directives are understood by the client. Consult the
+on-line help for detailed descriptions:
+<dl>
+<dt>Encryption IfRequested
+</dt>
+<dd></dd>
+<dt>Encryption Never
+</dt>
+<dd></dd>
+<dt>Encryption Required
+</dt>
+<dd></dd>
+<dd>Specifies the level of encryption that is required for a particular
+location.
+</dd>
+<dt>GSSServiceName name
+</dt>
+<dd>Specifies the Kerberos service name that is used for authentication, typically
+"host", "http", or "ipp". CUPS adds the remote hostname
+("name@server.example.com") for you. The default name is
+"host".
+</dd>
+<dt>ServerName hostname-or-ip-address[:port]
+</dt>
+<dd></dd>
+<dt>ServerName /domain/socket
+</dt>
+<dd></dd>
+<dd>Specifies the address and optionally the port to use when connecting to the
+server. <b>Note: Not supported on OS X 10.7 or later.</b>
+</dd>
+<dt>User name
+</dt>
+<dd></dd>
+<dd>Specifies the default user name to use for requests.
+</dd>
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

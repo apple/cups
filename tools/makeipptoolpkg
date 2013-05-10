@@ -58,7 +58,9 @@ cp test/create-printer-subscription.test $pkgdir
 cp test/document-*.pdf $pkgdir
 cp test/document-*.ps $pkgdir
 cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
+cp test/get-notifications.test $pkgdir
 cp test/get-printer-attributes.test $pkgdir
+cp test/get-subscriptions.test $pkgdir
 cp test/gray.jpg $pkgdir
 cp test/ipp-[12].*.test $pkgdir
 cp test/ipp-everywhere.test $pkgdir
@@ -69,6 +71,7 @@ cp test/print-job.test $pkgdir
 cp test/print-job-deflate.test $pkgdir
 cp test/print-job-gzip.test $pkgdir
 cp test/testfile.* $pkgdir
+cp test/validate-job.test $pkgdir
 
 if test `uname` = Darwin; then
 	pkgfile="$pkgdir-macosx-universal.dmg"

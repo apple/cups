@@ -3,7 +3,7 @@
 #
 #   IPP test makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -42,6 +42,7 @@ TESTFILES	=	\
 			get-jobs.test \
 			get-notifications.test \
 			get-printer-attributes.test \
+			get-subscriptions.test \
 			ipp-1.1.test \
 			ipp-2.0.test \
 			ipp-2.1.test \

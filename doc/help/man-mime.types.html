@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>mime.types(5)</title>
+</head>
+<body>
+<h1 class="title">mime.types(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+mime.types - mime type description file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <i>mime.types</i> file defines the recognized file types.
+<p>Additional file types can be added to <i>mime.types</i> or
+(preferably) in additional files in the CUPS configuration
+directory with the extension ".types".
+<p>Each line in the <i>mime.types</i> file is a comment, blank, or
+rule line. Comment lines start with the # character. Rule lines
+start with the MIME type name and are optionally followed by a
+series of file recognition rules that are used to automatically
+identify print and web files:
+<br>
+<pre>
+
+    super/type rule [ ... ruleN]
+</pre>
+MIME type names are case-insensitive and are sorted in ascending alphanumeric
+order for the purposes of matching. See the "TYPE MATCHING AND PRIORITY"
+section for more information.
+<p>The rules may be grouped using parenthesis, joined using "+" for a
+logical AND and "," or whitespace for a logical OR, and negated using
+"!".
+<h2 class="title"><a name="RULES">Rules</a></h2>
+Rules take two forms - a filename extension by itself and functions with test
+values inside parenthesis. The following functions are available:
+<dl>
+<dt>match("pattern")
+</dt>
+<dd></dd>
+<dd>Pattern match on filename
+</dd>
+<dt>ascii(offset,length)
+</dt>
+<dd></dd>
+<dd>True if bytes are valid printable ASCII (CR, NL, TAB, BS, 32-126)
+</dd>
+<dt>printable(offset,length)
+</dt>
+<dd></dd>
+<dd>True if bytes are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254)
+</dd>
+<dt>priority(number)
+</dt>
+<dd></dd>
+<dd>Specifies the relative priority of this MIME type. The default priority is 100.
+Larger values have higher priority while smaller values have lower priority.
+</dd>
+<dt>string(offset,"string")
+</dt>
+<dd></dd>
+<dd>True if bytes are identical to string
+</dd>
+<dt>istring(offset,"string")
+</dt>
+<dd></dd>
+<dd>True if a case-insensitive comparison of the bytes is identical
+</dd>
+<dt>char(offset,value)
+</dt>
+<dd></dd>
+<dd>True if byte is identical
+</dd>
+<dt>short(offset,value)
+</dt>
+<dd></dd>
+<dd>True if 16-bit integer is identical
+</dd>
+<dt>int(offset,value)
+</dt>
+<dd></dd>
+<dd>True if 32-bit integer is identical
+</dd>
+<dt>locale("string")
+</dt>
+<dd></dd>
+<dd>True if current locale matches string
+</dd>
+<dt>contains(offset,range,"string")
+</dt>
+<dd></dd>
+<dd>True if the range contains the string
+</dd>
+</dl>
+<h2 class="title"><a name="STRING_CONSTANTS">String Constants</a></h2>
+String constants can be specified inside quotes ("") for strings
+containing whitespace and angle brackets (&lt;>) for hexadecimal
+strings.
+<h2 class="title"><a name="TYPE_MATCHING_AND_PRIORITY">Type Matching And Priority</a></h2>
+When CUPS needs to determine the MIME type of a given file, it checks every
+MIME type defined in the .types files. When two types have the same matching
+rules, the type chosen will depend on the type name and priority, with higher-
+priority types being used over lower-priority ones. If the types have the same
+priority, the type names are sorted alphanumerically in ascending order and the
+first type is chosen.
+<p>For example, if two types "text/bar" and "text/foo" are defined as matching the
+extension "doc", normally the type "text/bar" will be chosen since its name is
+alphanumerically smaller than "text/foo". However, if "text/foo" also defines a
+higher priority than "text/bar", "text/foo" will be chosen instead.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href='man-classes.conf.html?TOPIC=Man+Pages'>classes.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>,
+<a href='man-mime.convs.html?TOPIC=Man+Pages'>mime.convs(5)</a>, <a href='man-printers.conf.html?TOPIC=Man+Pages'>printers.conf(5)</a>,
+<br>
+<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright 2007-2013 by Apple Inc.
+
+</body>
+</html>

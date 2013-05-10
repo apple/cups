@@ -2874,9 +2874,30 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
   if (con->response && con->response->state != IPP_DATA)
   {
-    ipp_state = ippWrite(HTTP(con), con->response);
-    bytes     = ipp_state != IPP_ERROR &&
-                (con->file >= 0 || ipp_state != IPP_DATA);
+    int wused = con->http.wused;	/* Previous write buffer use */
+
+    do
+    {
+     /*
+      * Write a single attribute or the IPP message header...
+      */
+
+      ipp_state = ippWrite(HTTP(con), con->response);
+
+     /*
+      * If the write buffer has been flushed, stop buffering up attributes...
+      */
+
+      if (con->http.wused <= wused)
+        break;
+    }
+    while (ipp_state != IPP_STATE_DATA && ipp_state != IPP_STATE_ERROR);
+
+    if (con->http.wused > 0)
+      httpFlushWrite(HTTP(con));
+
+    bytes = ipp_state != IPP_STATE_ERROR &&
+	    (con->file >= 0 || ipp_state != IPP_STATE_DATA);
   }
   else if ((bytes = read(con->file, con->header + con->header_used,
 			 sizeof(con->header) - con->header_used)) > 0)

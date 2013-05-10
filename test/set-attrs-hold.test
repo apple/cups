@@ -17,8 +17,8 @@
 	ATTR name requesting-user-name $user
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 }
 
 {
@@ -45,8 +45,8 @@
 	FILE ../data/testprint.ps
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	# What attributes do we expect?
 	EXPECT job-id
@@ -71,8 +71,8 @@
 	ATTR integer job-id $job-id
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	# What attributes do we expect?
 	EXPECT job-state
@@ -101,8 +101,8 @@
 	ATTR name job-hold-until 00:30:00
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 }
 
 {
@@ -123,8 +123,8 @@
 	ATTR integer job-id $job-id
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	# What attributes do we expect?
 	EXPECT job-state
@@ -149,8 +149,8 @@
 	ATTR name requesting-user-name $user
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 }
 
 {
@@ -171,8 +171,8 @@
 	ATTR integer job-id $job-id
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	# What attributes do we expect?
 	EXPECT job-state

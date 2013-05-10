@@ -1,12 +1,17 @@
-CHANGES-IPPTOOL.txt - 2013-02-20
+CHANGES-IPPTOOL.txt - 2013-05-02
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
+2013-05-02
 
-2013-02-nn
+	- Fixed several ipptool test files that used old STATUS names.
 
+
+2013-04-18
+
+	- Fixed some HTTP issues with authentication and compression.
 	- The IPP/1.1 test file did not allow for sufficient retries when
 	  printing.
 	- The IPP/1.1 test file did not allow for empty printer-name values.
