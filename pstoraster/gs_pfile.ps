@@ -1,0 +1,184 @@
+%    Copyright (C) 1994, 1995 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% Runtime support for minimum-space fonts and packed files.
+
+% ****** NOTE: This file must be kept consistent with
+% ****** packfile.ps and wrfont.ps.
+
+% ---------------- Packed file support ---------------- %
+
+% A packed file is the concatenation of several file groups, each of which
+% is the result of compressing several files concatenated together.
+% The packed file begins with a procedure that creates an appropriate
+% decoding filter for each file group, as follows:
+%	<group-subfile-filter> -proc- <group-decode-filter>
+% Thus, accessing an individual file requires 4 parameters:
+% the starting address and length of the outer compressed file,
+% and the starting address and length of the inner file.
+/.packedfilefilter	% <file> <ostart> <olength> <istart> <ilength>
+			%   .packedfilefilter <filter>
+ { 4 index systemdict begin token pop end 6 1 roll
+	% Stack: fproc file ostart olength istart ilength
+   4 index 5 -1 roll setfileposition
+	% Stack: fproc file olength istart ilength
+   4 -2 roll () /SubFileDecode filter
+	% Stack: fproc istart ilength ofilter
+   4 -1 roll exec
+	% Filters don't support setfileposition, so we must skip data
+	% by reading it into a buffer.  We rely on the fact that
+	% save/restore don't affect file positions.
+	% Stack: istart ilength dfilter
+   save exch 1000 string
+	% Stack: istart ilength save dfilter scratch
+   4 index 1 index length idiv { 2 copy readstring pop pop } repeat
+   2 copy 0 8 -1 roll 2 index length mod getinterval readstring pop pop pop
+	% Stack: ilength save dfilter
+   exch restore exch () /SubFileDecode filter
+ } bind def
+
+% Run a packed library file.
+/.runpackedlibfile	% <filename> <ostart> <olength> <istart> <ilength>
+			%   .runpackedlibfile
+ { 5 -1 roll findlibfile
+    { exch pop dup 6 2 roll .packedfilefilter
+      currentobjectformat exch 1 setobjectformat run
+      setobjectformat closefile
+    }
+    { 5 1 roll /findlibfile load /undefinedfilename signalerror
+    }
+   ifelse
+ } bind def
+
+% ---------------- Compacted font support ---------------- %
+
+% Compacted fonts written by wrfont.ps depend on the existence and
+% specifications of the procedures and data in this section.
+
+/.compactfontdefault mark
+	/PaintType 0
+	/FontMatrix [0.001 0 0 0.001 0 0] readonly
+	/FontType 1
+	/Encoding StandardEncoding
+.dicttomark readonly def
+
+/.checkexistingfont	% <fontname> <uid> <privatesize> <fontsize>
+			%   .checkexistingfont
+			%   {} (<font> on d-stack)
+			% <fontname> <uid> <privatesize> <fontsize>
+			%   .checkexistingfont
+			%   -save- --restore-- (<font> on d-stack)
+ { FontDirectory 4 index .knownget
+    { dup /UniqueID .knownget
+       { 4 index eq exch /FontType get 1 eq and }
+       { pop false }
+      ifelse
+    }
+    { false
+    }
+   ifelse
+    { save /restore load 6 2 roll }
+    { {} 5 1 roll }
+   ifelse
+   dict //.compactfontdefault exch .copydict begin
+   dict /Private exch def
+   Private begin
+     /MinFeature {16 16} def
+     /Password 5839 def
+     /UniqueID 1 index def
+   end
+   /UniqueID exch def
+   /FontName exch def
+ } bind def
+
+/.knownEncodings [
+   ISOLatin1Encoding
+   StandardEncoding
+   SymbolEncoding
+] readonly def
+
+/.readCharStrings	% <count> <encrypt> .readCharStrings <dict>
+ { exch dup dict dup 3 -1 roll
+    { currentfile token pop dup type /integertype eq
+       { dup -8 bitshift //.knownEncodings exch get exch 255 and get } if
+      currentfile token pop dup type /nametype eq
+       { 2 index exch get
+       }
+       {	% Stack: encrypt dict dict key value
+	 4 index { 4330 exch dup .type1encrypt exch pop } if
+	 readonly
+       }
+      ifelse put dup
+    }
+   repeat pop exch pop
+ } bind def
+
+% ---------------- Synthetic font support ---------------- %
+
+% Create a new font by modifying an existing one.  paramdict contains
+% entries with the same keys as the ones found in a Type 1 font;
+% it should also contain enough empty entries to allow adding the
+% corresponding non-overridden entries from the original font dictionary,
+% including FID.  If paramdict includes a FontInfo entry, this will
+% also override the original font's FontInfo, entry by entry;
+% again, it must contain enough empty entries.
+
+% Note that this procedure does not perform a definefont.
+
+/.makemodifiedfont	% <fontdict> <paramdict> .makemodifiedfont <fontdict'>
+ { exch
+    {			% Stack: destdict key value
+      1 index /FID ne
+       { 2 index 2 index known
+	  {		% Skip fontdict entry supplied in paramdict, but
+			% handle FontInfo specially.
+	    1 index /FontInfo eq
+	     { 2 index 2 index get		% new FontInfo
+	       1 index				% old FontInfo
+		{	% Stack: destdict key value destinfo key value
+		  2 index 2 index known
+		   { pop pop }
+		   { 2 index 3 1 roll put }
+		  ifelse
+		}
+	       forall pop
+	     }
+	    if
+	  }
+	  {		% No override, copy the fontdict entry.
+	    2 index 3 1 roll put
+	    dup dup	% to match pop pop below
+	  }
+	 ifelse
+       }
+      if
+      pop pop
+    } forall
+ } bind def
+
+% Make a modified font and define it.  Note that unlike definefont,
+% this does not leave the font on the operand stack.
+
+/.definemodifiedfont	% <fontdict> <paramdict> .definemodifiedfont -
+ { .makemodifiedfont
+   dup /FontName get exch definefont pop
+ } bind def
