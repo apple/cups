@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Kezdőlap - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Kezdőoldal&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A
+HREF="/admin">&nbsp;&nbsp;Adminisztráció&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Osztályok&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A
+HREF="/help/">&nbsp;&nbsp;Online&nbsp;súgó&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Feladatok&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A
+HREF="/printers/">&nbsp;&nbsp;Nyomtatók&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Keresés a súgóban"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>A CUPS az <A HREF="http://www.apple.com/">Apple Inc.</A> által a Mac
+OS<SUP>&reg;</SUP> X és más UNIX<SUP>&reg;</SUP>-szerű operációs
+rendszerekhez kifejlesztett, szabványokra épülő, nyílt forrású
+nyomtatórendszer.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS felhasználóknak</H2>
+
+<P><A HREF="help/overview.html">A CUPS bemutatása</A></P>
+
+<P><A HREF="help/options.html">Parancssori nyomtatás és kapcsolók</A></P>
+
+<P><A HREF="help/whatsnew.html">A CUPS 1.5 újdonságai</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Felhasználói fórum</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS rendszergazdáknak</H2>
+
+<P><A HREF="admin">Nyomtatók és osztályok hozzáadása</A></P>
+
+<P><A HREF="help/policies.html">Műveletházirendek kezelése</A></P>
+
+<P><A HREF="help/accounting.html">Nyomtatási számlázás alapjai</A></P>
+
+<P><A HREF="help/security.html">Kiszolgáló biztonsága</A></P>
+
+<P><A HREF="help/kerberos.html">Kerberos hitelesítés használata</A></P>
+
+<P><A HREF="help/network.html">Hálózati nyomtatók használata</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">cupsd.conf referencia</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Nyomtató-illesztőprogramok
+keresése</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>A CUPS fejlesztőknek</H2>
+
+<P><A HREF="help/api-overview.html">A CUPS programozásának bemutatása</A></P>
+
+<P><A HREF="help/api-cups.html">CUPS API</A></P>
+
+<P><A HREF="help/api-filter.html">Szűrők és háttérprogramok
+programozása</A></P>
+
+<P><A HREF="help/api-httpipp.html">HTTP és IPP API-k</A></P>
+
+<P><A HREF="help/api-ppd.html">PPD API</A></P>
+
+<P><A HREF="help/api-raster.html">Raszter API</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">PPD fordító illesztőprogram-információs fájljának referenciája</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Fejlesztői fórum</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">A CUPS és a CUPS logó az <A
+HREF="http://www.apple.com">Apple Inc.</A> védjegyei. CUPS copyright
+2007-2012 Apple Inc. Minden jog fenntartva.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

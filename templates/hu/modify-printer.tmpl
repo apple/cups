@@ -1,0 +1,42 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{printer_name} módosítása</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Leírás:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Közérthető leírás, mint például „HP LaserJet duplexerrel”)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Hely:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Közérthető hely, mint például „1-es labor”)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kapcsolat:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Megosztás:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" 
+{PRINTER_IS_SHARED=1?CHECKED:}> Nyomtató megosztása</TD>
+</TR>
+<TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Folytatás"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

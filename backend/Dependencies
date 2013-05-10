@@ -1,0 +1,107 @@
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+ipp.o: backend-private.h ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+ipp.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+ipp.o: ../cups/language.h ../cups/string-private.h ../config.h
+ipp.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+ipp.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+ipp.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+ipp.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+ipp.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
+ipp.o: ../cups/backend.h ../cups/sidechannel.h ../cups/array-private.h
+ipp.o: ../cups/array.h
+lpd.o: ../cups/http-private.h ../config.h ../cups/http.h
+lpd.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+lpd.o: backend-private.h ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+lpd.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+lpd.o: ../cups/language.h ../cups/string-private.h ../cups/debug-private.h
+lpd.o: ../cups/versioning.h ../cups/ppd-private.h ../cups/ppd.h
+lpd.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
+lpd.o: ../cups/language-private.h ../cups/transcode.h
+lpd.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+lpd.o: ../cups/sidechannel.h
+dnssd.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+dnssd.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+dnssd.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+dnssd.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+dnssd.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+dnssd.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+dnssd.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+dnssd.o: ../cups/language-private.h ../cups/transcode.h
+dnssd.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+dnssd.o: ../cups/sidechannel.h ../cups/array.h
+parallel.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+parallel.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+parallel.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+parallel.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+parallel.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+parallel.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+parallel.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+parallel.o: ../cups/language-private.h ../cups/transcode.h
+parallel.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+parallel.o: ../cups/sidechannel.h
+serial.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+serial.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+serial.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+serial.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+serial.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+serial.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+serial.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+serial.o: ../cups/language-private.h ../cups/transcode.h
+serial.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+serial.o: ../cups/sidechannel.h
+snmp.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+snmp.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+snmp.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+snmp.o: ../config.h ../cups/debug-private.h ../cups/versioning.h
+snmp.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+snmp.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+snmp.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+snmp.o: ../cups/language-private.h ../cups/transcode.h
+snmp.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+snmp.o: ../cups/sidechannel.h ../cups/array.h ../cups/file.h
+snmp.o: ../cups/http-private.h
+socket.o: ../cups/http-private.h ../config.h ../cups/http.h
+socket.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+socket.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+socket.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+socket.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+socket.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+socket.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+socket.o: ../cups/http-private.h ../cups/language-private.h
+socket.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
+socket.o: ../cups/backend.h ../cups/sidechannel.h
+test1284.o: ../cups/string-private.h ../config.h ieee1284.c backend-private.h
+test1284.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+test1284.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+test1284.o: ../cups/language.h ../cups/string-private.h
+test1284.o: ../cups/debug-private.h ../cups/versioning.h
+test1284.o: ../cups/ppd-private.h ../cups/ppd.h ../cups/cups.h
+test1284.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
+test1284.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
+test1284.o: ../cups/language-private.h ../cups/transcode.h
+test1284.o: ../cups/thread-private.h ../cups/snmp-private.h ../cups/backend.h
+test1284.o: ../cups/sidechannel.h
+testbackend.o: ../cups/string-private.h ../config.h ../cups/cups.h
+testbackend.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+testbackend.o: ../cups/http.h ../cups/array.h ../cups/language.h
+testbackend.o: ../cups/sidechannel.h
+testsupplies.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
+testsupplies.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h
+testsupplies.o: ../cups/http.h ../cups/array.h ../cups/language.h
+testsupplies.o: ../cups/string-private.h ../config.h ../cups/debug-private.h
+testsupplies.o: ../cups/versioning.h ../cups/ppd-private.h ../cups/ppd.h
+testsupplies.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
+testsupplies.o: ../cups/http.h ../cups/md5-private.h ../cups/ipp-private.h
+testsupplies.o: ../cups/ipp.h ../cups/language-private.h ../cups/transcode.h
+testsupplies.o: ../cups/thread-private.h ../cups/snmp-private.h
+testsupplies.o: ../cups/backend.h ../cups/sidechannel.h
+usb.o: backend-private.h ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+usb.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
+usb.o: ../cups/language.h ../cups/string-private.h ../config.h
+usb.o: ../cups/debug-private.h ../cups/versioning.h ../cups/ppd-private.h
+usb.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+usb.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+usb.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+usb.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
+usb.o: ../cups/backend.h ../cups/sidechannel.h

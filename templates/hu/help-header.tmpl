@@ -1,0 +1,52 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Keresés itt\:
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:minden dokumentáció}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Keresés">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Törlés"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Tartalom">
+<TR><TD>
+
+<H3 CLASS="title">Online súgódokumentumok</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Minden dokumentáció</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Találatok itt\: {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:minden
+dokumentáció}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (itt\: <I><A
+HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Nincs találat.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Nyomtatható változat megjelenítése"></FORM>:
+
+<H1>Online súgó</H1>
+
+<P>Ez a CUPS online súgófelülete. Adja meg fentebb a keresőkifejezéseket,
+vagy kattintson a dokumentációs linkekre az online súgóinformációk
+megjelenítéséhez.</P>
+
+<P>Ha új CUPS felhasználó, olvassa el a „<a href="/help/overview.html">CUPS bemutatása</a>” oldalt. A tapasztalt
+felhasználóknak „<a href="/help/whatsnew.html">A CUPS 1.5 újdonságai</a>”
+oldal elolvasását ajánljuk.</P>
+
+<P>A <A HREF="http://www.cups.org/">CUPS honlapja</A> is számos (angol
+nyelvű) információforrást biztosít, beleértve a felhasználói fórumokat,
+válaszokat a gyakran feltett kérdésekre és egy űrlapot hibajelentések és
+szolgáltatáskérések beküldéséhez.</P>}

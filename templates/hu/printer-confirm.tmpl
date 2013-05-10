@@ -1,0 +1,9 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{printer_name} törlése</H2>
+
+<P><B>Figyelmeztetés:</B> Biztosan törli a következő nyomtatót: {printer_name}?</P>
+
+<P ALIGN="CENTER"><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="delete-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}"><INPUT TYPE="SUBMIT" NAME="confirm" VALUE="Nyomtató törlése"></FORM></P>
+
+</DIV>

@@ -1,0 +1,58 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription">
+
+<H2 CLASS="title">RSS-hírforrás hozzáadása</H2>
+
+<TABLE SUMMARY="RSS-feliratkozás hozzáadása űrlap">
+<TR>
+<TH CLASS="label">Név:</TH>
+<TD COLSPAN="5"><INPUT TYPE="TEXT" NAME="SUBSCRIPTION_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?SUBSCRIPTION_NAME}"><BR>
+<SMALL>(Tetszőleges nyomtatható karaktert tartalmazhat, kivéve a szóközt,
+a „/”, „?”, és „#” karaktereket)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Sor:</TH>
+<TD COLSPAN="5"><SELECT NAME="PRINTER_URI" SIZE="10"><OPTION VALUE="#ALL#"{?PRINTER_URI=#ALL#? SELECTED:}>Minden
+sor</OPTION>{[printer_name]<OPTION VALUE="{printer_uri_supported}"{?PRINTER_URI={printer_uri_supported}? SELECTED:}>{printer_name}</OPTION>}</SELECT></TD>
+</TR>
+<TR VALIGN="TOP">
+<TH CLASS="label">Események:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CREATED" 
+{?EVENT_JOB_CREATED}>Feladat létrehozva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_COMPLETED" 
+{?EVENT_JOB_COMPLETED}>Feladat befejeződött<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_STOPPED" 
+{?EVENT_JOB_STOPPED}>Feladat leállítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_JOB_CONFIG_CHANGED" 
+{?EVENT_JOB_CONFIG_CHANGED}>Feladat beállításai módosítva</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_STOPPED" 
+{?EVENT_PRINTER_STOPPED}>Sor leállítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_ADDED" 
+{?EVENT_PRINTER_ADDED}>Sor hozzáadva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_MODIFIED" 
+{?EVENT_PRINTER_MODIFIED}>Sor módosítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_PRINTER_DELETED" 
+{?EVENT_PRINTER_DELETED}>Sor törölve</TD>
+<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+<TD><INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STARTED" 
+{?EVENT_SERVER_STARTED}>Kiszolgáló elindítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_STOPPED" 
+{?EVENT_SERVER_STOPPED}>Kiszolgáló leállítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_RESTARTED" 
+{?EVENT_SERVER_RESTARTED}>Kiszolgáló újraindítva<BR>
+<INPUT TYPE="CHECKBOX" NAME="EVENT_SERVER_AUDIT" 
+{?EVENT_SERVER_AUDIT}>Kiszolgáló biztonsági megfigyelése</TD>
+</TR>
+<TR>
+<TH CLASS="label">Események maximális száma a hírforrásban:</TH>
+<TD COLSPAN="5"><INPUT TYPE="NUMBER" NAME="MAX_EVENTS" SIZE="4" MAXLENGTH="4" VALUE="{MAX_EVENTS?{MAX_EVENTS}:20}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD COLSPAN="5"><INPUT TYPE="SUBMIT" VALUE="RSS-hírforrás hozzáadása"></TD>
+</TR>
+</TABLE>
+
+</FORM>
