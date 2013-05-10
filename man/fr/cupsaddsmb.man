@@ -1,0 +1,151 @@
+.\"
+.\" "$Id: cupsaddsmb.man 3456 2003-03-12 20:41:43Z mike $"
+.\"
+.\"   cupsaddsmb man page for the Common UNIX Printing System (CUPS).
+.\"   Based on cvs revision 1.6
+.\"
+.\"   Copyright 1997-2003 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Easy Software Products and are protected by Federal
+.\"   copyright law.  Distribution and use rights are outlined in the file
+.\"   "LICENSE.txt" which should have been included with this file.  If this
+.\"   file is missing or damaged please contact Easy Software Products
+.\"   at:
+.\"
+.\"       Attn: CUPS Licensing Information
+.\"       Easy Software Products
+.\"       44141 Airport View Drive, Suite 204
+.\"       Hollywood, Maryland 20636-3111 USA
+.\"
+.\"       Voice: (301) 373-9603
+.\"       EMail: cups-info@cups.org
+.\"         WWW: http://www.cups.org
+.\"
+.TH cupsaddsmb 8 "Common UNIX Printing System" "27 septembre 2002" "Easy Software Products"
+.SH NOM
+cupsaddsmb \- Export d'imprimante vers Samba pour les clients Windows
+.SH SYNOPSIS
+.B cupsaddsmb
+[ -a ] [ -U
+.I utilisateur
+] [ -v ]
+.br
+.B cupsaddsmb
+[ -u
+.I utilisateur
+] [ -v ] [ imprimante1 ... imprimanteN ]
+.SH DESCRIPTION
+\fIcupsaddsmb\fR permet l'export d'imprimantes vers SAMBA (version 2.2.0
+ou supérieure) pour l'utilisation par des clients Windows. Suivant
+la configuration de SAMBA, il est possible qu'un mot de passe soit
+demandé pour l'export. Ce programme requiert les fichiers du driver
+d'imprimante Adobe PostScript ou CUPS, comme indiqué plus bas.
+.LP
+L'option \fI-a\fR exporte toutes les imprimantes connues. Sinon,
+seules les imprimantes fournies dans la ligne de commande sont
+exportées.
+.LP
+L'option \fI-U\fR spécifie le nom d'utilisateur de l'administrateur
+d'impression. C'est par défaut votre nom d'utilisateur.
+.LP
+L'option \fI-v\fR spécifie que des informations détaillées doivent
+être affichées. Ceci peut être utile pour le débogage des configurations
+de SAMBA.
+.SH CONFIGURATION DE SAMBA
+\fIcupsaddsmb\fR utilise le nouveau mode d'impression RPC de
+SAMBA pour fournir aux clients Windows les drivers d'impression et les
+fichiers PPD. Pour utiliser cette fonctionnalité, vous devez configurer
+SAMBA (via le fichier smb.conf) pour qu'il utilise l'impression via CUPS, et
+fournir un driver à télécharger. Ceci est fait de la manière suivante\ :
+.nf
+
+    [global]
+	load printers = yes
+	printing = cups
+	printcap name = cups
+
+    [printers]
+	comment = All Printers
+	path = /var/spool/samba
+	browseable = no
+	public = yes
+	guest ok = yes
+	writable = no
+	printable = yes
+	printer admin = root
+
+    [print$]
+	comment = Printer Drivers
+	path = /etc/samba/drivers
+	browseable = yes
+	guest ok = no
+	read only = yes
+	write list = root
+.fi
+.LP
+Cette configuration suppose une installation de SAMBA conforme au
+standard FHS. Modifiez les chemins dans [printers] et [print$] suivant
+votre installation.
+.SH PILOTES POSTSCRIPT CUPS POUR WINDOWS
+\fIcupsaddsmb\fR peut utiliser les pilotes d'impression CUPS PostScript pour
+Windows, disponibles sur le site Internet de CUPS.
+.LP
+Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
+du nombre de pages, les pages de garde et les labels sur tous les types
+d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
+plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+il est nécessaire d'utiliser les pilotes Adobe.
+.LP
+Après décompression des fichiers, créer un répertoire «\ drivers\ » dans le
+répertoire de données de CUPS (habituellement /usr/share/cups) et copiez
+les fichiers CUPS en utilisant des noms de fichiers en MINUSCULES, comme
+ci-dessous\ :
+.nf
+    [Windows NT, 2000, and XP]
+    cups.hlp
+    cupsdrvr.dll
+    cupsui.dll
+.fi
+
+.SH LES PILOTES ADOBE POSTSCRIPT POUR WINDOWS
+\fIcupsaddsmb\fR peut utiliser les pilotes Adobe PostScript pour Windows,
+disponibles en téléchargement sur le site web d'Adobe (http://www.adobe.com).
+.LP
+Il est recommandé d'utiliser ces pilotes CUPS car ils permettent le comptage
+du nombre de pages, les pages de garde et les labels sur tous les types
+d'imprimantes. Ces pilotes ne sont cependant disponibles que pour les
+plateformes Windows NT, 2000 et XP. Pour des plateformes Windows 95, 98 et Me,
+il est nécessaire d'utiliser les pilotes Adobe.
+.LP
+Une fois les fichiers décompressés, créez un répertoire «\ drivers\ » dans
+le répertoire de données de CUPS (habituellement /usr/share/cups) et
+copiez les fichiers Adobe en utilisant des noms de fichiers en MAJUSCULES,
+comme ci-dessous\ :
+.nf
+
+    [Windows 95, 98, and Me]
+    ADFONTS.MFM
+    ADOBEPS4.DRV
+    ADOBEPS4.HLP
+    DEFPRTR2.PPD
+    ICONLIB.DLL
+    PSMON.DLL
+    
+    [Windows NT, 2000, and XP]
+    cups.hlp
+    cupsdrvr.dll
+    cupsui.dll
+.fi
+.LP
+Les deux jeux de pilotes sont utilisables indépendemment.
+.SH VOIR AUSSI
+CUPS Software Administrators Manual,
+http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright 1993-2003 Easy Software Products, Tous droits réservés.
+.SH TRADUCTION
+Gilles QUERRET <gilles.querret@nerim.net>
+.\"
+.\" End of "$Id: cupsaddsmb.man 3456 2003-03-12 20:41:43Z mike $".
+.\"

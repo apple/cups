@@ -1,0 +1,81 @@
+CGI - CUPS v1.1.19 - 03/14/2003
+-------------------------------
+
+This file describes the experimental scripting/CGI support
+provided by CUPS starting with CUPS 1.1.19.
+
+WARNING: CGI support is not complete; you may run into problems
+and limitations in the implementation of CGI in CUPS that are
+not present in full-featured web servers like Apache.
+
+
+OVERVIEW OF CGI SUPPORT IN CUPS
+
+CUPS has traditionally provided a dynamic web interface through
+four CGI programs that are executed when users open special
+directories on the CUPS server.  Each CGI performs
+administration, class, job, and printer functions as directed by
+the user, but the actual programs that are run and functions
+that are available are limited to those that were originally
+designed into the scheduler.
+
+Starting with CUPS 1.1.19, support is now available for CGI
+programs and specific scripting languages, currently Java, Perl,
+PHP, and Python.  The interpreters for these languages are
+currently configured at compile time.  Future versions may
+expand the interface to allow for generic support of scripting
+languages similar to the Apache "AddHandler" directive, but with
+external programs instead of modules.
+
+The following MIME types are reserved for the CGI support in
+CUPS (the names have been chosen to mirror those used by
+Apache):
+
+    application/x-http-cgi      CGI script/program
+    application/x-http-java     Java program
+    application/x-http-perl     Perl script
+    application/x-http-php      PHP script
+    application/x-http-python   Python script
+
+In order to enable the corresponding type, you must create a new
+/etc/cups/cgi.types file which maps the filename extensions to
+the appropriate MIME type, for example:
+
+    application/x-http-cgi cgi
+    application/x-http-php php
+
+CGI scripts/programs (application/x-http-cgi) also must have
+execution permissions to be treated as a CGI script or program.
+
+
+LIMITATIONS
+
+CUPS implements most of the CGI/1.1 specification, with the
+following limitations:
+
+    - No Location: redirection support.
+    - No PATH_INFO or PATH_TRANSLATED support.
+    - Limited HTTP field support; only the Content-Length
+      (CONTENT_LENGTH), Cookie (HTTP_COOKIE), and User-Agent
+      (HTTP_USER_AGENT) fields are placed in environment
+      variables at this time.
+
+
+REPORTING PROBLEMS
+
+If you have problems, READ THE DOCUMENTATION FIRST!  If the
+documentation does not solve your problems please send an email
+to "cups-support@cups.org".  Include your operating system and
+version, compiler and version, and any errors or problems you've
+run into. The "/var/log/cups/error_log" file should also be sent,
+as it often helps to determine the cause of your problem.
+
+If you are running a version of Linux, be sure to provide the
+Linux distribution you have, too.
+
+Please note that the "cups-support@cups.org" email address goes
+to the CUPS developers; they are busy people, so your email may
+go unanswered for days or weeks.  In general, only general build
+or distribution problems will actually get answered - for
+end-user support see the "README.txt" for a summary of the
+resources available.
