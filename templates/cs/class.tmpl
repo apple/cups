@@ -1,0 +1,44 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?čeká:{printer_state=4?tiskne:pauza}},
+{printer_is_accepting_jobs=0?ne:}přijímá úlohy,
+{server_is_sharing_printers=0?není:{printer_is_shared=0?není:}} sdílení{default_name={printer_name}?, výchozí server:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Údržba</OPTION>
+<OPTION VALUE="print-test-page">Tisk zkušební stránky</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Obnovení třídy</OPTION>:<OPTION VALUE="stop-class">Pozastavení třídy</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Příjem úloh</OPTION>:<OPTION VALUE="reject-jobs">Odmítnutí úloh</OPTION>}
+<OPTION VALUE="move-jobs">Přesun všech úloh</OPTION>
+<OPTION VALUE="purge-jobs">Výmaz všech úloh</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<INPUT TYPE="HIDDEN" NAME="IS_CLASS" VALUE="1">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administrace</OPTION>
+<OPTION VALUE="modify-class">Úprava třídy</OPTION>
+<OPTION VALUE="delete-class">Výmaz třídy</OPTION>
+<OPTION VALUE="set-class-options">Nastavení parametrů</OPTION>
+<OPTION VALUE="set-as-default">Nastavení jako výchozí na serveru</OPTION>
+<OPTION VALUE="set-allowed-users">Nastavení přístupu uživatelů</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Popis:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Umístění:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Členové:</TH><TD>{?member_uris=?None:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Nastavení:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:unknown}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

@@ -1,0 +1,12 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{title} u {printer_name}</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Busy Indicator"> }Stav úlohy
+{job_state=3?čeká:{job_state=4?pozastaveno:
+{job_state=5?zpracováváno:{job_state=6?zastaveno:
+{job_state=7?zrušeno:{job_state=8?zrušeno:dokončeno}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}.</P>
+
+</DIV>
