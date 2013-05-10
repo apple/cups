@@ -1,0 +1,319 @@
+%    Copyright (C) 1994, 1995 Aladdin Enterprises.  All rights reserved.
+% 
+% This file is part of GNU Ghostscript.
+% 
+% GNU Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility to
+% anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer to
+% the GNU General Public License for full details.
+% 
+% Everyone is granted permission to copy, modify and redistribute GNU
+% Ghostscript, but only under the conditions described in the GNU General
+% Public License.  A copy of this license is supposed to have been given to
+% you along with GNU Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+% 
+% Aladdin Enterprises is not affiliated with the Free Software Foundation or
+% the GNU Project.  GNU Ghostscript, as distributed by Aladdin Enterprises,
+% does not depend on any other GNU software.
+
+% pdf_draw.ps
+% PDF drawing operations (graphics, text, and images).
+
+% We don't handle the following PDF elements yet (identified by
+% page number in the reference manual):
+%	style strings (63-64), except in a few known fonts
+%	font descriptor resources (71-75), except for MissingWidth
+%	text clipping modes (104)
+%		What do these mean??
+
+/.setlanguagelevel where { pop 2 .setlanguagelevel } if
+.currentglobal true .setglobal
+/pdfdict where { pop } { /pdfdict 100 dict def } ifelse
+GS_PDF_ProcSet begin
+pdfdict begin
+
+% For simplicity, we use a single interpretation dictionary for all
+% PDF graphics operations, even though this is too liberal.
+/drawopdict 100 dict def
+
+% ================================ Graphics ================================ %
+
+% ---------------- Graphics state management ---------------- %
+
+drawopdict begin
+			% Graphics state stack
+  /q { q } def
+  /Q { Q } def
+			% Graphics state setting
+  /cm { cm } def
+  /i { i } def
+  /J { J } def
+  /d { d } def
+  /j { j } def
+  /w { w } def
+  /M { M } def
+end
+
+% ---------------- Color setting ---------------- %
+
+/csgray			% <op> <csop> csgray -
+ { Page /Resources pget
+    { /ColorSpace knownoget
+       { /DefaultGray knownoget { 3 -1 roll exch 3 1 roll } if }
+      if
+    }
+   if pop cvx exec
+ } bdef
+/csrgb			% <op> <csop> csrgb -
+ { Page /Resources pget
+    { /ColorSpace knownoget
+       { /DefaultRGB knownoget { 3 -1 roll exch 3 1 roll } if }
+      if
+    }
+   if pop cvx exec
+ } bdef
+/cscmyk			% <op> <csop> cscmyk -
+ { pop cvx exec
+ } bdef
+/csresolve		% <csresource> csresolve <colorspace>
+ { Page /Resources pget not { 0 dict } if
+   /ColorSpace oget exch oget resolvecolorspace
+   dup type /nametype ne { dup length 1 eq { 0 get } if } if
+ } bdef
+/cset		% <c0> ... [- <sc1> - <sc3> <sc4>] <colorspace> cset -
+ { gsave setcolorspace mark currentcolor counttomark
+   grestore dup 2 add 1 roll cleartomark get exec
+ } bdef
+
+%**************** sc and SC don't work, because the color space information
+%**************** isn't available at conversion time.
+drawopdict begin
+  /g { /g { cs sc1 } csgray } bdef
+  /rg { /rg { cs sc3 } csrgb } bdef
+  /k { /k { cs sc4 } cscmyk } bdef
+  /cs { csresolve cs } bdef
+  /sc { { null sc1 null sc3 sc4 } FillColorSpace cset } bdef
+  /G { /G { CS SC1 } csgray } bdef
+  /RG { /RG { CS SC3 } csrgb } bdef
+  /K { /K { CS SC4 } cscmyk } bdef
+  /CS { csresolve CS } bdef
+  /SC { { null SC1 null SC3 SC4 } StrokeColorSpace cset } bdef
+end
+
+% ---------------- Paths ---------------- %
+
+drawopdict begin
+			% Path construction
+  /m { m } def
+  /l { l } def
+  /c { c } def
+  /v { v } def
+  /y { y } def
+  /re { re } def
+  /h { h } def
+			% Path painting and clipping
+  /n { n } def
+  /S { S } def
+  /s { s } def
+  /f { f } def
+  /f* { f* } def
+  /B { B } def
+  /b { b } def
+  /B* { B* } def
+  /b* { b* } def
+  /W { W } def
+  /W* { W* } def
+end
+
+% ---------------- XObjects ---------------- %
+
+/xobjectprocs mark		% <dict> -proc- -
+  /Image { DoImage }
+  /Form { DoForm }
+.dicttomark readonly def
+
+/ncompdict mark
+  /DeviceGray 1
+  /CalGray 1
+  /DeviceRGB 3
+  /CalRGB 3
+  /Lab 3
+  /DeviceCMYK 4
+  /CalCMYK 4
+.dicttomark readonly def
+/defaultdecodedict mark
+  /DeviceGray [0 1] readonly
+  /CalGray 1 index
+  /DeviceRGB [0 1 0 1 0 1] readonly
+  /CalRGB 1 index
+  /Lab
+   { 0 100 2 index 1 get /Range .knownget not { {-100 100 -100 100} } if
+     aload pop 6 array astore readonly
+   } bind
+  /DeviceCMYK [0 1 0 1 0 1 0 1] readonly
+  /CalCMYK 1 index
+.dicttomark readonly def
+/resolvecolorspace	% <cspace> resolvecolorspace <cspace>
+ { dup type /arraytype eq
+    { dup 0 get /Indexed eq
+       { dup 3 oget dup type /stringtype eq
+	  { pop
+	  }
+	  {	% The color lookup table is a stream.
+		% Get its contents.
+	    true resolvestream
+	    1 index 2 get 1 add
+	    ncompdict 3 index 1 get get mul
+	    string readstring pop
+	    1 index 3 3 -1 roll put
+	  }
+	 ifelse
+       }
+      if
+    }
+   if
+ } bdef
+/DoImage
+ { dup length dict
+   1 index /ColorSpace knownoget
+    { resolvecolorspace
+      dup type /arraytype eq { dup length 1 eq { 0 get } if } if
+      exch begin /ColorSpace exch def
+    }
+    { begin
+    }
+   ifelse
+   /ImageType 1 def
+		% Always define ImageMask appropriately.
+   dup /ImageMask knownoget dup { and } if
+     /ImageMask exch def
+   /Width 2 copy oget def
+   /Height 2 copy oget def
+   /BitsPerComponent 2 copy oget def
+   /Decode 2 copy knownoget not
+    {		% Decode is required for the PostScript image operators.
+      ImageMask
+       { [0 1]
+       }
+       { ColorSpace dup type /arraytype eq { 0 get } if dup /Indexed eq
+	  { pop [ 0 1 BitsPerComponent bitshift 1 sub ] }
+	  { defaultdecodedict exch get exec }
+	 ifelse
+       }
+      ifelse
+    }
+   if def
+   /Interpolate 2 copy knownoget { def } { pop } ifelse
+   /ImageMatrix Width 0 0 Height neg 0 Height 6 array astore def
+		% Define DataSource as the width of the row buffer,
+		% which is what is needed if we're writing PostScript.
+   /DataSource 
+     Width BitsPerComponent mul
+     ImageMask not { Decode length 2 idiv mul } if
+     7 add 8 idiv
+   def
+		% Even though we're going to read data,
+		% pass false to resolvestream so that
+		% it doesn't try to use Length (which may not be present).
+   false resolvestream /Is_stream exch store
+   currentdict end ID
+ } bdef
+% Redefine Is, which constructs the data source for the image,
+% to retrieve the stream.  (pdf_2ps.ps redefines Is to copy the data too.)
+userdict /Is_stream null put
+/Is		% <imagedict> Is <imagedict> <datasource>
+ { Is_stream
+ } bdef
+
+/DoForm
+ { dup [ /pop load 2 index
+    { false resolvestream pdfopdict .pdfrun }
+   aload pop ] cvx /PaintProc exch put
+   execform
+ } bdef
+
+drawopdict begin
+  /Do
+    { PDFfile fileposition exch
+      Page /Resources pget not { 0 dict } if
+      /XObject oget exch oget
+      dup /Subtype get xobjectprocs exch get exec
+      PDFfile exch setfileposition
+    } bdef
+end
+
+% ---------------- In-line images ---------------- %
+
+% Undo the abbreviations in an in-line image dictionary.
+% Note that these can appear as keys, values, or members of array values.
+% /I is ambiguous; we check specially for it below.
+/unabbrevdict mark
+	% Top-level dictionary keys
+  /BPC /BitsPerComponent  /CS /ColorSpace  /D /Decode  /DP /DecodeParms
+  /F /Filter  /H /Height  /IM /ImageMask  /W /Width
+	% Values
+  /AHx /ASCIIHexDecode  /A85 /ASCII85Decode  /CC /CalCMYK
+  /CCF /CCITTFaxDecode  /CG /CalGray  /CR /CalRGB
+  /DCT /DCTDecode  /CMYK /DeviceCMYK  /G /DeviceGray  /RGB /DeviceRGB
+  /I /Indexed  /LZW /LZWDecode  /RL /RunLengthDecode
+.dicttomark readonly def
+/unabbrev		% <obj> unabbrev <obj'>
+ { dup type /nametype eq
+    { unabbrevdict 1 index .knownget { exch pop } if
+    }
+    { dup type /arraytype eq
+       { dup 0 1 2 index length 1 sub
+	  { 2 copy get unabbrev put dup
+	  }
+	 for pop
+       }
+      if
+    }
+   ifelse
+ } bdef
+
+drawopdict begin
+  /BI { mark } bdef
+  /ID
+    { counttomark
+       { counttomark 1 roll
+	 dup /I eq { pop /Interpolate } { unabbrev } ifelse
+       }
+      repeat
+      /File PDFsource
+      .dicttomark DoImage
+      PDFsource token pop /EI ne { /ID cvx /syntaxerror signalerror } if
+    } bdef
+end
+
+% ================================ Text ================================ %
+
+drawopdict begin
+			% Text control
+  /BT { BT } def
+  /ET { ET } def
+  /Tc { Tc } def
+  /TL { TL } def
+  /Tr { Tr } def
+  /Ts { Ts } def
+  /Tw { Tw } def
+  /Tz { Tz } def
+			% Text positioning
+  /Td { Td } def
+  /TD { TD } def
+  /Tm { Tm } def
+  /T* { T* } def
+			% Text painting
+  /Tj { Tj } def
+  /' { ' } def
+  /" { " } def
+  /TJ { mark exch aload pop TJ } def
+end
+
+end			% pdfdict
+end			% GS_PDF_ProcSet
+.setglobal

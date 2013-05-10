@@ -1,0 +1,179 @@
+/*
+ * "$Id$"
+ *
+ *   Parallel port backend for the Common UNIX Printing System (CUPS).
+ *
+ *   Copyright 1997-1999 by Easy Software Products, all rights reserved.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Easy Software Products and are protected by Federal
+ *   copyright law.  Distribution and use rights are outlined in the file
+ *   "LICENSE" which should have been included with this file.  If this
+ *   file is missing or damaged please contact Easy Software Products
+ *   at:
+ *
+ *       Attn: CUPS Licensing Information
+ *       Easy Software Products
+ *       44145 Airport View Drive, Suite 204
+ *       Hollywood, Maryland 20636-3111 USA
+ *
+ *       Voice: (301) 373-9603
+ *       EMail: cups-info@cups.org
+ *         WWW: http://www.cups.org
+ *
+ * Contents:
+ *
+ *   main() - Send a file to the specified parallel port.
+ */
+
+/*
+ * Include necessary headers.
+ */
+
+#include <cups/cups.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cups/string.h>
+
+#if defined(WIN32) || defined(__EMX__)
+#  include <io.h>
+#else
+#  include <unistd.h>
+#  include <fcntl.h>
+#  include <termios.h>
+#endif /* WIN32 || __EMX__ */
+
+
+/*
+ * 'main()' - Send a file to the specified parallel port.
+ *
+ * Usage:
+ *
+ *    printer-uri job-id user title copies options [file]
+ */
+
+int			/* O - Exit status */
+main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
+     char *argv[])	/* I - Command-line arguments */
+{
+  char		method[255],	/* Method in URI */
+		hostname[1024],	/* Hostname */
+		username[255],	/* Username info (not used) */
+		resource[1024],	/* Resource info (device and options) */
+		*options;	/* Pointer to options */
+  int		port;		/* Port number (not used) */
+  FILE		*fp;		/* Print file */
+  int		fd;		/* Parallel device */
+  int		error;		/* Error code (if any) */
+  size_t	nbytes,		/* Number of bytes written */
+		tbytes;		/* Total number of bytes written */
+  char		buffer[8192];	/* Output buffer */
+  struct termios opts;		/* Parallel port options */
+
+
+  if (argc < 6 || argc > 7)
+  {
+    fputs("Usage: parallel job-id user title copies options [file]\n", stderr);
+    return (1);
+  }
+
+ /*
+  * If we have 7 arguments, print the file named on the command-line.
+  * Otherwise, send stdin instead...
+  */
+
+  if (argc == 6)
+    fp = stdin;
+  else
+  {
+   /*
+    * Try to open the print file...
+    */
+
+    if ((fp = fopen(argv[6], "rb")) == NULL)
+    {
+      perror("ERROR: unable to open print file");
+      return (1);
+    }
+  }
+
+ /*
+  * Extract the device name and options from the URI...
+  */
+
+  httpSeparate(argv[0], method, username, hostname, &port, resource);
+
+ /*
+  * See if there are any options...
+  */
+
+  if ((options = strchr(resource, '?')) != NULL)
+  {
+   /*
+    * Yup, terminate the device name string and move to the first
+    * character of the options...
+    */
+
+    *options++ = '\0';
+  }
+
+ /*
+  * Open the parallel port device...
+  */
+
+  if ((fd = open(resource, O_WRONLY)) == -1)
+  {
+    perror("ERROR: Unable to open parallel port device file");
+    return (1);
+  }
+
+ /*
+  * Set any options provided...
+  */
+
+  tcgetattr(fd, &opts);
+
+  opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+
+  /**** No options supported yet ****/
+
+  tcsetattr(fd, TCSANOW, &opts);
+
+ /*
+  * Finally, send the print file...
+  */
+
+  tbytes = 0;
+  while ((nbytes = fread(buffer, 1, sizeof(buffer), fp)) > 0)
+  {
+   /*
+    * Write the print data to the printer...
+    */
+
+    if (write(fd, buffer, nbytes) < nbytes)
+    {
+      perror("ERROR: Unable to send print file to printer");
+      break;
+    }
+    else
+      tbytes += nbytes;
+
+    if (argc > 6)
+      fprintf(stderr, "INFO: Sending print file, %u bytes...\n", tbytes);
+  }
+
+ /*
+  * Close the socket connection and input file and return...
+  */
+
+  close(fd);
+  if (fp != stdin)
+    fclose(fp);
+
+  return (0);
+}
+
+
+/*
+ * End of "$Id$".
+ */
