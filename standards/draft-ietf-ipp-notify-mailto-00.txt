@@ -1,0 +1,1043 @@
+
+
+
+
+
+
+
+INTERNET-DRAFT
+<draft-ietf-ipp-notify-mailto-00.txt>                       Henrik Holst
+                                                i-data international a/s
+                                                            Tom Hastings
+                                                             Xerox Corp.
+                                                           March 9, 2000
+
+                   Internet Printing Protocol (IPP):
+               The 'mailto:' Notification Delivery Method
+
+    Copyright (C) The Internet Society (2000). All Rights Reserved.
+
+Status of this Memo
+
+This document is an Internet-Draft and is in full conformance with all
+provisions of Section 10 of [rfc2026].  Internet-Drafts are working
+documents of the Internet Engineering Task Force (IETF), its areas, and
+its working groups.  Note that other groups may also distribute working
+documents as Internet-Drafts.
+
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any
+time.  It is inappropriate to use Internet-Drafts as reference material
+or to cite them other than as "work in progress".
+
+The list of current Internet-Drafts can be accessed at
+http://www.ietf.org/ietf/1id-abstracts.txt
+
+The list of Internet-Draft Shadow Directories can be accessed as
+http://www.ietf.org/shadow.html.
+
+
+Abstract
+
+The IPP notification specification [ipp-ntfy] is an OPTIONAL extension
+to IPP/1.0 and IPP/1.1 that requires the definition of one or more
+delivery methods for dispatching event notification reports to
+Notification Recipients.  This document describes the semantics and
+syntax of the 'mailto:' event notification delivery method.  For this
+delivery method, the IPP Printer uses the SMTP mail protocol to send
+(push) Human Consumable and/or Machine Consumable Notifications to
+Notification Recipients.  The Subscriber specifies the mail address
+using the mailto: URL.  This mail address can be any user or can be any
+of the mail services defined to perform such notification using
+parameters in the URL, such as paging.  The Subscriber can specify the
+MIME media type of both the Human Consumable and Machine Consumable
+Notifications.  The Subscriber can also specify a mail address in the
+"subscriber-user-data" Subscription attribute to which the Notification
+Recipient can reply and to which the mail system delivers undeliverable
+mail messages.  That mail address is usually the Subscribers mail
+address, but can be any mail address.
+
+The mail messages appear to come from the Printer, so that mail agents
+can sort and filter on the From: field.  Also the beginning of the
+
+
+
+Holst, Hastings                                                [page 1]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+Subject line starts with the localized "Printer message: " prefix, so
+that mail agents can filter from any Printer.
+
+        There are 7 ISSUES called out in the text.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Holst, Hastings                                                [page 2]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+The full set of IPP documents includes:
+
+  Design Goals for an Internet Printing Protocol [RFC2567]
+  Rationale for the Structure and Model and Protocol for the Internet
+     Printing Protocol [RFC2568]
+  Internet Printing Protocol/1.1: Model and Semantics [ipp-mod]
+  Internet Printing Protocol/1.1: Encoding and Transport [ipp-pro]
+  Internet Printing Protocol/1.1: Implementer's Guide [ipp-iig]
+  Mapping between LPD and IPP Protocols [RFC2569]
+  Internet Printing Protocol (IPP):  Event Notification Specification
+     [ipp-ntfy]
+
+The "Design Goals for an Internet Printing Protocol" document takes a
+broad look at distributed printing functionality, and it enumerates
+real-life scenarios that help to clarify the features that need to be
+included in a printing protocol for the Internet.  It identifies
+requirements for three types of users: end users, operators, and
+administrators.  It calls out a subset of end user requirements that are
+satisfied in IPP/1.0.  A few OPTIONAL operator operations have been
+added to IPP/1.1.
+
+The "Rationale for the Structure and Model and Protocol for the Internet
+Printing Protocol" document describes IPP from a high level view,
+defines a roadmap for the various documents that form the suite of IPP
+specification documents, and gives background and rationale for the IETF
+working group's major decisions.
+
+The "Internet Printing Protocol/1.1: Model and Semantics" document
+describes a simplified model with abstract objects, their attributes,
+and their operations that are independent of encoding and transport.  It
+introduces a Printer and a Job object.  The Job object optionally
+supports multiple documents per Job.  It also addresses security,
+internationalization, and directory issues.
+
+The "Internet Printing Protocol/1.1: Encoding and Transport" document is
+a formal mapping of the abstract operations and attributes defined in
+the model document onto HTTP/1.1 [RFC2616].  It defines the encoding
+rules for a new Internet MIME media type called "application/ipp".  This
+document also defines the rules for transporting over HTTP a message
+body whose Content-Type is "application/ipp".  This document defines a
+new scheme named 'ipp' for identifying IPP printers and jobs.
+
+The "Internet Printing Protocol/1.1: Implementer's Guide" document gives
+insight and advice to implementers of IPP clients and IPP objects.  It
+is intended to help them understand IPP/1.1 and some of the
+considerations that may assist them in the design of their client and/or
+IPP object implementations.  For example, a typical order of processing
+requests is given, including error checking.  Motivation for some of the
+specification decisions is also included.
+
+The "Mapping between LPD and IPP Protocols" document gives some advice
+to implementers of gateways between IPP and LPD (Line Printer Daemon)
+implementations.
+
+
+
+
+Holst, Hastings                                                [page 3]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+The "Event Notification Specification" document extends the Job Creation
+operations and defines additional operations that allow a client to
+subscribe to printing related events.  Subscriptions are modeled as
+Subscription objects which can be Per-Job or Per-Printer Subscriptions.
+Additional operations are defined to query, renew, and cancel
+Subscription objects.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Holst, Hastings                                                [page 4]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+                           Table of Contents
+
+1  Introduction......................................................6
+
+2  Terminology.......................................................6
+ 2.1Conformance Terminology..........................................6
+ 2.2Other terminology................................................7
+
+3  Model and Operation...............................................7
+
+4  Sending Notifications.............................................8
+ 4.1notify-recipient (uri)...........................................8
+ 4.2notify-events (1setOf type2 keyword).............................8
+ 4.3notify-format (mimeMediaType)....................................9
+ 4.4subscriber-user-data (octetString(63))...........................9
+ 4.5notify-charset (charset)........................................10
+ 4.6notify-natural-language (naturalLanguage).......................10
+ 4.7request-id......................................................10
+ 4.8subscription-id (integer (1:MAX))...............................10
+ 4.9notify-lease-expiration-time (integer(0:MAX))...................10
+ 4.10 printer-uri (uri).............................................10
+ 4.11 subscriber-user-name (name(MAX))..............................11
+ 4.12 notify-printer-up-time (integer(1:MAX)).......................11
+ 4.13 notify-persistence-granted (boolean)..........................11
+
+5  Mail Notification Content........................................11
+ 5.1Human Consumable Form...........................................13
+ 5.2Machine Consumable Form.........................................13
+
+6  Printer Description attributes specific to the 'mailto:' delivery
+method...............................................................13
+ 6.1"printer-smtp-mail-service-address" (1setOf text(MAX))..........13
+
+7  Conformance Requirements.........................................13
+
+8  IANA Considerations..............................................14
+
+9  Internationalization Considerations..............................14
+
+10 Security Considerations..........................................14
+
+11 References.......................................................15
+
+12 Author's Addresses...............................................16
+
+13 Full Copyright Statement.........................................16
+
+                            Table of Tables
+
+Table 1 - SMTP Fields to be filled in................................12
+
+
+
+
+
+Holst, Hastings                                                [page 5]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+
+
+1  Introduction
+
+An IPP Printer that supports the OPTIONAL IPP notification extension
+[ipp-ntfy] is called a Notification Source which sends event
+Notifications to Notification Recipients.  As such, a Printer either a)
+accepts, stores, and uses notification Subscription objects to generate
+event Notification reports and implement one or more delivery methods
+for notifying interested parties, or b) supports a subset of these tasks
+and farms out the remaining tasks to a Notification Delivery Service.
+This document describes the semantics and syntax of the 'mailto:' event
+notification delivery method.  Such a Notification Delivery Service then
+delivers the event Notification to the Ultimate Notification Recipient.
+
+For this delivery method, the IPP Printer uses the SMTP mail protocol to
+send (push) Human Consumable and/or Machine Consumable Notifications to
+Notification Recipients.  The Subscriber specifies the mail address
+using the mailto: URL.  This mail address can be any user or can be any
+of the mail services defined to perform such notification using
+parameters in the URL, such as paging.  The Subscriber can specify the
+MIME media type of both the Human Consumable and Machine Consumable
+Notifications.  The Subscriber can also specify a mail address in the
+"subscriber-user-data" Subscription attribute to which the Notification
+Recipient can reply and to which the mail system delivers undeliverable
+mail messages.  That mail address is usually the Subscribers mail
+address, but can be any mail address.
+
+The mail messages appear to come from the Printer, so that mail agents
+can sort and filter on the From: field.  Also the beginning of the
+Subject line starts with the localized "Printer message: " prefix, so
+that mail agents can filter from any Printer.
+
+
+2  Terminology
+
+This section defines terminology used throughout this document:
+
+
+2.1 Conformance Terminology
+
+  Capitalized terms, such as MUST, MUST NOT, REQUIRED, SHOULD, SHOULD
+     NOT, MAY, NEED NOT, and OPTIONAL, have special meaning relating to
+     conformance to this specification.  These terms are defined in
+     [ipp-mod section 13.1 on conformance terminology, most of which is
+     taken from RFC 2119 [RFC2119].
+  REQUIRED - an adjective used to indicate that a conforming IPP
+     Printer implementation MUST support the indicated operation,
+     object, attribute, attribute value, status code, or out-of-band
+     value in requests and responses.  See [ipp-mod] "Appendix A -
+     Terminology for a definition of "support".  Since support of this
+     entire notification specification is OPTIONAL for conformance to
+     IPP/1.0 or IPP/1.1, the use of the term REQUIRED in this document
+
+
+Holst, Hastings                                                [page 6]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+     means "REQUIRED if this OPTIONAL notification specification is
+     implemented".
+  OPTIONAL - an adjective used to indicate that a conforming IPP
+     Printer implementation MAY, but is NOT REQUIRED to, support the
+     indicated operation, object, attribute, attribute value, status
+     code, or out-of-band value in requests and responses.
+
+2.2 Other terminology
+
+  Event Notification (Notification for short) - See [ipp-ntfy]
+  Notification Source - See [ipp-ntfy]
+  Notification Recipient - See [ipp-ntfy]
+  Subscription object - See [ipp-ntfy]
+  Ultimate Notification Recipient - See [ipp-ntfy]
+
+3  Model and Operation
+
+In the IPP Notification Model [ipp-ntfy], a client is able to:
+
+  1. supply one or more Per-Job Subscriptions in the Job Creation
+     operation
+
+  2. OPTIONALLY supply Per-Job Subscriptions as subsequent Create-Job-
+     Subscription operations
+
+  3. supply one Per-Printer Subscription in the Create-Printer-
+     Subscription operation.  The client that creates these Subscription
+     objects becomes the owner of the Subscription object.
+
+The client that creates these Subscription objects becomes the owner of
+the Subscription object.
+
+When creating each Subscription object, the client supplies the "notify-
+recipient" (uri) attribute.  The "notify-recipient" attribute specifies
+both a single Notification Recipient that is to receive the
+Notifications when subsequent events occur and the method for
+Notification delivery that the IPP Printer is to use.  For the 'mailto:'
+Notification delivery method defined in this document, the "notify-
+recipient" consists of the 'mailto:' scheme followed by an SMPT mail
+address [RFC822].
+
+Notification Sources that implement the 'mailto:' event notification
+delivery method will need to include an SMTP mail agent while
+Notification Recipients that implement this delivery method will need to
+support an SMTP server.   ISSUE 01:  Is this SMTP terminology correct?
+
+The IPP Printer can be the Notification Source or could use some other
+Notification Delivery Service that actually delivers the mail message.
+In this latter case, the protocol between the IPP Printer and the
+Notification Delivery Service is implementation defined and could be the
+INDP protocol (see [indp]).
+
+
+
+
+Holst, Hastings                                                [page 7]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+Also the Notification Recipient specified by the "notify-recipient"
+Subscription attribute can be either (1) the Ultimate Notification
+Recipient or can be a Notification Delivery Service, such as a paging
+system that accept 'mailto:' parameters to indicate the Ultimate
+Notification Recipient, such as a phone number or paging subscriber's
+id.
+
+
+4  Sending Notifications
+
+This section defines the processing that the IPP Printer MUST perform
+when sending an event Notification using the 'mailto:' delivery method.
+The usage of each of the Subscription object attributes defined in [ipp-
+ntfy] is described here as it applies to the 'mailto:' delivery method.
+The description of each Subscription attribute in this document is not
+the complete description, but is just the application of the attribute
+to this 'mailto:' delivery method.  See the complete definition of each
+Subscription object attribute in [ipp-ntfy].  ISSUE 02:  Is it a good
+idea to list each Subscription object attribute in this spec with the
+applicability to this delivery method?  If yes, should all delivery
+method specs also do it this way?  Section 5 defines how the IPP Printer
+populates the SMTP fields in the mail message.
+
+
+4.1 notify-recipient (uri)
+
+
+This REQUIRED READ-ONLY Subscription object attribute contain the
+'mailto:' URI delivery method followed by the SMTP mail address [RFC821]
+of the Notification Recipient.  As required by the [ipp-ntfy] document,
+the following information is given for this notification delivery
+method:
+
+ISSUE 03 - What should we say about any mailto parameters, if any?  For
+example, if you want to send over secure mail, etc.
+
+ISSUE 04 - Do we want to define any IPP-specific mailto parameters to
+this document?
+
+
+4.2 notify-events (1setOf type2 keyword)
+
+
+This REQUIRED READ-ONLY Subscription object attribute identifies the job
+and/or printer events that are to be delivered to the Notification
+Recipient as Notifications as defined in [ipp-ntfy] section 7.
+
+Note:  Some rapidly recurring events, such as page events, are not
+appropriate to use with this delivery method, especially if the
+recipient mail address is a mailing list.  Implementations MAY choose
+either not to support page events with the 'mailto:' delivery method
+and/or not permit a mailing list to be supplied, if they can detect that
+a mail address is a mailing list.
+
+
+
+
+Holst, Hastings                                                [page 8]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+4.3 notify-format (mimeMediaType)
+
+
+This REQUIRED READ-ONLY Subscription object attribute indicates the type
+of Human Consumable and/or Machine Consumable format content that is to
+be sent in the Notifications as a mail message attachment.  For the
+'mailto:' delivery method, any registered 'mimeMediaType' value is
+allowed, including types that allow pictures to be represented, e.g.,
+'application/postscript' or 'image/tiff', and/or sounds to be
+represented, e.g., 'audio/32kadpcm'.  The body of the mail message MUST
+always be 'text/plain; charset=us-ascii, since that is the default for
+'mailto:'.
+
+There is no "notify-default" Printer attribute to configure.  If the
+client did not supply the "notify-format" attribute in the Subscription
+Creation operation, the Printer MUST populate this attribute with an
+implementation-defined default value.  Such a default value MAY include
+multi-part mixed media, so that the Printer can send multi-part mixed
+MIME type attachments by default (though there is no way for the client
+to explicitly request such).  If the out-of-band 'none' value [ipp-col]
+was supplied in the Subscription Creation operation, the Printer MUST
+NOT send any attachment in the Notification.
+
+If the MIME media type registration definition permits a charset
+parameter, than the client MUST use such a specification (instead of the
+"notify-charset" attribute) in order to indicate the charset to be used
+in the Notification content.
+
+
+4.4 subscriber-user-data (octetString(63))
+
+
+This REQUIRED READ-ONLY Subscription object attribute holds an SMTP mail
+address value that the Printer copies to the "From:" inside <> (see RFC
+822 [rfc822] section 4.4.1) and the "Sender:" SMTP fields (see section
+5).  For the 'mailto:' notification delivery method, the client MUST
+supply the "subscriber-user-data" attribute.  If the client omits this
+attribute, the Printer MUST either (1) reject the operation with the
+'client-error-bad-request' or (2) ignore this Subscription, since the
+Printer will not have a mail address to put in the "From:" and in the
+"Sender:" SMTP fields, depending on implementation.
+
+When the subscribing user selects the 'mailto:' delivery scheme, the
+client SHOULD obtain the user's mail address automatically from the
+client system (in an implementation-dependent manner) and supply it as
+the value of the "subscriber-user-data" attribute by default, rather
+than require the user to explicitly supply it.  Allowing users to supply
+the mail address explicitly would allow the malicious user to hide
+his/her identity when sending notifications by email.
+
+
+
+
+
+
+
+Holst, Hastings                                                [page 9]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+4.5 notify-charset (charset)
+
+
+This OPTIONAL READ-ONLY Subscription object attribute specifies the
+charset to be used in the Notification content sent to the Notification
+Recipient, whether the notification content is Machine Consumable or
+Human Consumable.  The client MUST NOT supply and the Printer MUST NOT
+use this attribute when the MIME media type registration definition
+supplied in the "notify-format" attribute value allows the charset
+parameter in its MIME media type value, e.g., 'text/plain; charset=utf-
+8'.
+
+
+4.6 notify-natural-language (naturalLanguage)
+
+
+This OPTIONAL READ-ONLY Subscription object attribute specifies the
+natural language for the IPP object to use in the localized Notification
+content that is sent to the Notification Recipient, whether the
+notification content is Machine Consumable or Human Consumable.
+
+
+4.7 request-id
+
+
+This REQUIRED READ-ONLY Subscription object attribute holds the most
+recent request-id sequence number delivered in a Notification content to
+the Notification Recipient.  A value of 0 indicates that no
+Notifications have been sent for this subscription.  The first request-
+id sent for a subscription MUST be 1.  Each Notification Recipient has
+its own monotonically increasing series of request-ids, i.e., no gaps,
+in order to be able to detect a missing notification.
+
+
+4.8 subscription-id (integer (1:MAX))
+
+
+This REQUIRED READ-ONLY Subscription object attribute uniquely
+identifies this Subscription object instance on this Printer object or
+this Job object..
+
+
+4.9 notify-lease-expiration-time (integer(0:MAX))
+
+
+This REQUIRED READ-ONLY Subscription object attribute specifies the time
+in the future when the subscription lease will expire, i.e., the
+"printer-up-time" value at which the lease will expire.
+
+
+4.10printer-uri (uri)
+
+This REQUIRED READ-ONLY Subscription object attribute identifies the
+Printer object that created this Subscription object.
+
+
+
+
+
+Holst, Hastings                                               [page 10]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+4.11subscriber-user-name (name(MAX))
+
+This REQUIRED READ-ONLY Subscription object attribute contains the name
+of the user that created the Subscription object.  The Printer includes
+the value of this attribute as the value of the SMTP "FROM" field
+outside the <> (see RFC 822 [rfc822] section 4.4.1).  For the 'mailto:'
+notification delivery method, the client MUST supply the "requesting-
+user-name" operation attribute so that the Printer can populate the
+"subscriber-user-name" Subscription attribute, in case the Printer does
+not have a more authenticated printable name (see [ipp-ntfy]).  If the
+client omits "requesting-user-name" attribute and the Printer doesn't
+have a more authenticated printable name, the Printer MUST either (1)
+reject the operation with the 'client-error-bad-request' or (2) ignore
+this Subscription, since the Printer will not have a User Display Name
+to put in the "From:" field outside the <>, depending on implementation.
+
+ISSUE 05:  Ok that we made "subscriber-user-name" be REQUIRED for the
+Printer to support and indicate that the client MUST supply the
+"requester-user-name" operation attribute when the delivery method is
+'mailto:', in case the Printer does not have a more authenticated
+printable name?
+
+
+4.12notify-printer-up-time (integer(1:MAX))
+
+
+This REQUIRED READ-ONLY Subscription object attribute indicates the
+amount of time (in seconds) that the Printer implementation has been up
+and running.   The Printer includes the value of this attribute in both
+the Human Consumable and Machine Consumable forms.
+
+
+4.13notify-persistence-granted (boolean)
+
+
+This REQUIRED Subscription object attribute whether or not the Per-Job
+or Per-Printer Subscription is persistent, i.e., saved across power
+cycles in an implementation-define manner.
+
+
+5  Mail Notification Content
+
+The intent of the mail message is that the Notification Recipient is
+receiving a Human Consumable and/or Machine Consumable mail message from
+the Printer with the subject line indicating that it is a printer
+notification message and some implementation-defined salient
+information, such as the Job name and submitting user name.  The body of
+the message duplicates this information and includes other information
+as REQUIRED by [ipp-ntfy].
+
+Table 1 shows the SMPT fields that the IPP Printer MUST fill in from the
+indicated sources of the data.
+
+
+
+
+
+Holst, Hastings                                               [page 11]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+                 Table 1 - SMTP Fields to be filled in
+
+SMTP RFC SMTP      Subscription object attribute source for SNMP field
+822      Field
+section  Name
+
+4.4.1    From:     "printer-name"  <"subscriber-user-data">
+
+                   For example, if Bob Jones submits a print job to the
+                   Printer "George Washington" and his email address is
+                   jones@acme.com, the From: line will be displayed as:
+
+                   From:  George Washington <jones@acme.com>
+
+                   Mail messages appear to the Notification Recipient
+                   to come from the Printer, so that mail agents can
+                   sort and filter on the From: field.
+
+                   Note:  The "printer-name" is the Mail Display name.
+                   And the "subscriber-user-data" inside <> is assumed
+                   to be an SMTP mail address so that the Notification
+                   Recipient can reply to the subscriber.  For example,
+                   to say "I picked up your document, thanks."   
+
+4.4.2    Sender:   "subscriber-user-name" <"subscriber-user-data">
+
+                   For example, if Bob Jones submits a print job to the
+                   Printer "George Washington" and his email address is
+                   jones@acme.com, the Sender: line will be displayed
+                   as:
+
+                   Sender:  Bob Jones <jones@acme.com>
+
+                   Note:  The "subscriber-user-name" is the Mail
+                   Display name (Bob Jones).  And the "subscriber-user-
+                   data" inside <> is assumed to be an SMTP mail
+                   address so that the mail system will send failure to
+                   deliver mail messages to the mail address specified
+                   by the "subscriber-user-data", not the Printer.
+
+4.5.1    To:       The rest of the URI following the 'mailto:' scheme
+                   in the value of the "notify-recipient" attribute.
+
+4.7.1    Subject:  Implementation-dependent, but SHOULD start with
+                   "Printer message: " (localized) followed by the job
+                   or printer event name, job name, etc.  The beginning
+                   of the Subject line is a standardized prefix, so
+                   that mail agents can filter from any Printer.
+
+The Printer MUST repeat any of this information in these fields in the
+body of the message, plus additional information REQUIRED by the
+Notification Specification [ipp-ntfy].
+
+
+Holst, Hastings                                               [page 12]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+5.1 Human Consumable Form
+
+
+If the format specified by the "notify-format" (mimeMediaType) is a
+Human Consumable form, then it MUST be sent as a MIME according to
+[rfc1341] and [rfc2046] if the MIME type is anything but 'text/plain'.
+Even 'text/plain; charset=utf-8' MUST be represented as a MIME type in
+the body of the message.
+
+ISSUE 06: What if "notify-format" is 'text/plain; charset=utf-8', does
+that have to be sent as a mail attachment, since it isn't 'text/plain'
+which assumes charset=us-ascii, or can it be sent as the body of the
+mail message properly identified as 'text/plain; charset=us-ascii'?
+
+
+5.2 Machine Consumable Form
+
+
+If the format specified by the "notify-format" (mimeMediaType) is a
+Machine Consumable form, then it MUST be sent as a MIME attachment
+according to [rfc1341] and [rfc2046], including the 'application/ipp'.
+
+
+6  Printer Description attributes specific to the 'mailto:' delivery
+   method
+
+This section defines Printer Description attributes that are REQUIRED
+when supporting the 'mailto:' delivery method.
+
+
+6.1 "printer-smtp-mail-service-address" (1setOf text(MAX))
+
+
+This REQUIRED Printer Description attribute contains the DNS or IP
+address of the SMTP relaying mail server (see [rfc822]) that the Printer
+is to use to send mail messages when supporting the 'mailto:' delivery
+method.  The System Administrator is expected to configure this
+attribute with one or more values.
+
+
+7  Conformance Requirements
+
+If the IPP Printer supports the 'mailto:' notification delivery scheme,
+the Printer MUST meet these conformance requirements:
+
+1.MUST meet the conformance requirements defined in [ipp-ntfy].
+
+2.MUST support at least the 'text/plain' Notification Content format.
+  Being able to support any other MIME media types (MUST be sent as
+  mail attachments) is OPTIONAL..
+
+3.MUST support the Subscription attribute semantics specified in
+  section 4 when sending Notifications.
+
+4.MUST fill in the SMTP fields in the mail message as specified in
+  section 5.
+
+
+Holst, Hastings                                               [page 13]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+5.MUST support the "printer-smtp-mail-service-address" (1setOf
+  text(MAX)) Printer Description attribute defined in section 6.
+
+
+8  IANA Considerations
+
+Since the 'mailto:' URL scheme is already defined in a standards track
+document and registered with IANA, this document does not require
+anything further of IANA.
+
+
+9  Internationalization Considerations
+
+This notification delivery method presents no additional
+internationalization considerations already covered in the [ipp-ntfy]
+document.  The IPP Printer MUST localize the Human Consumable format and
+the 'text' attributes in the Machine Consumable form.  The Notification
+Recipient is expected to localize the attributes in the Machine
+Consumable that have the 'keyword' attribute syntax according to the
+charset and natural language supplied in the Notification Content which
+is derived from the Subscription object as supplied by the Subscriber.
+
+
+10 Security Considerations
+
+By far the biggest security concern is the abuse of notification:
+sending unwanted notifications to third parties (i.e., spam).  The
+problem is made worse by notification addresses that may be
+redistributed to multiple parties (e.g. mailing lists).  There exist
+scenarios where third party notification is required (see Scenario #2
+and #3 in [ipp-not-req]).  The fully secure solution would require
+active agreement of all recipients before sending out anything.
+However, requirement #9 in [ipp-req] ("There is no requirement for IPP
+Printer receiving the print request to validate the identity of an event
+recipient") argues against this.  Certain systems may decide to disallow
+third party notifications (a traditional facsimile model).
+
+Sometimes the Notification Recipient is not the same person as the
+person who created the Subscription.  It is possible for the
+Notification Recipient to find out who created the Subscription, since
+the subscriber MUST supply the "subscriber-user-name" Subscription
+attribute in the Subscription Creation operation.
+
+The [ipp-ntfy] document discusses general security considerations for
+notifications.  Some delivery methods, such as the 'ipp:' delivery
+method, avoid the spam problem because the Notification Recipient pulls
+the Notifications when desired.  The 'indp:' [indp-method] delivery
+method allows the Notification Recipient to return a special status code
+reply to the IPP Printer Send-Notifications operation to cancel the
+subscription.  The 'mailto:' delivery method does not permit either of
+these remedies.
+
+ISSUE 07 - Is there any way that a Notification Recipient could reply to
+the message in such a way as to cancel the subscription and thereby
+solve the spam problem?
+
+
+Holst, Hastings                                               [page 14]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+Some firewall administrators are preventing mail attachments from being
+accepted into their organizations because of the problem of the
+attachments containing computer viruses.  The 'mailto:' delivery method
+allows the subscriber to suppress sending any attachments, by specifying
+only the 'text/plain' MIME media type.
+
+
+11 References
+
+[ipp-coll]
+     deBry, R., , Hastings, T., Herriot, R., "Internet Printing
+     Protocol/1.0 & 1.1: collection attribute syntax", <draft-ietf-ipp-
+     collection-00.doc>, work in progress, September 9, 1999.
+
+[ipp-mod]
+     R. deBry, T. Hastings, R. Herriot, S. Isaacson, P. Powell,
+     "Internet Printing Protocol/1.0: Model and Semantics", <draft-ietf-
+     ipp-model-v11-04.txt>, June, 1999.
+
+[ipp-ntfy]
+     Isaacson, S., Martin, J., deBry, R., Hastings, T., Shepherd, M.,
+     Bergman, R., "Internet Printing Protocol/1.1: IPP Event
+     Notification Specification", <draft-ietf-ipp-not-spec-01.txt>,
+     October 14, 1999.
+
+[ipp-pro]
+     Herriot, R., Butler, S., Moore, P., Tuner, R., "Internet Printing
+     Protocol/1.1: Encoding and Transport", draft-ietf-ipp-protocol-v11-
+     03.txt, June, 1999.
+
+[rfc821]
+     Jonathan B. Postel, "Simple Mail Transfer Protocol", August, 1982.
+
+[rfc822]
+     David H. Crocker, "Standard For The Format Of ARPA Internet Text
+     Messages", August 13, 1982.
+
+[rfc1341]
+     N. Borenstein, N. Freed, "MIME (Multipurpose Internet Mail
+     Extensions): Mechanisms for Specifying and Describing the Format of
+     Internet Message Bodies", June, 1992.
+
+[rfc2026]
+     S. Bradner, "The Internet Standards Process -- Revision 3", RFC
+     2026, October 1996.
+
+[rfc2046]
+     Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types.
+     N. Freed & N. Borenstein. November 1996. (Obsoletes RFC1521,
+     RFC1522, RFC1590), RFC 2046.
+
+
+
+
+
+
+Holst, Hastings                                               [page 15]
+
+                      Expires: September 9, 2000
+
+
+
+INTERNET-DRAFT   IPP: The 'mailto:' Notification Delivery Method 3/9/00
+
+
+[rfc2616]
+     R. Fielding, J. Gettys, J. Mogul, H. Frystyk, L. Masinter, P.
+     Leach, T. Berners-Lee, "Hypertext Transfer Protocol - HTTP/1.1",
+     RFC 2616, June 1999.
+
+
+12 Author's Addresses
+
+   Henrik Holst
+   i-data international a/s
+   Vadstrupvej 35-43
+   2880 Bagsvaerd, Denmark
+
+   Phone: +45 4436-6000
+   Fax: +45 4436-6111
+   e-mail: hh@i-data.com
+
+   Tom Hastings
+   Xerox Corporation
+   737 Hawaii St.  ESAE 231
+   El Segundo, CA  90245
+
+   Phone: 310-333-6413
+   Fax: 310-333-5514
+   e-mail: hastings@cp10.es.xerox.com
+
+
+
+13 Full Copyright Statement
+
+Copyright (C) The Internet Society (2000). All Rights Reserved.
+
+This document and translations of it may be copied and furnished to
+others, and derivative works that comment on or otherwise explain it or
+assist in its implementation may be prepared, copied, published and
+distributed, in whole or in part, without restriction of any kind,
+provided that the above copyright notice and this paragraph are included
+on all such copies and derivative works.  However, this document itself
+may not be modified in any way, such as by removing the copyright notice
+or references to the Internet Society or other Internet organizations,
+except as needed for the  purpose of developing Internet standards in
+which case the procedures for copyrights defined in the Internet
+Standards process must be followed, or as required to translate it into
+languages other than English.
+
+The limited permissions granted above are perpetual and will not be
+revoked by the Internet Society or its successors or assigns.
+
+This document and the information contained herein is provided on an "AS
+IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING TASK
+FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+Holst, Hastings                                               [page 16]
+
+                      Expires: September 9, 2000
