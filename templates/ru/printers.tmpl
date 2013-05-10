@@ -1,0 +1,11 @@
+{#printer_name=0?:
+<TABLE CLASS="list" SUMMARY="Список принтеров">
+<THEAD>
+<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> Очередь <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> Очередь <SMALL>&#x25bc;</SMALL>}</A></TH><TH>Описание</TH><TH>Расположение</TH><TH>Драйвер</TH><TH>Статус</TH></TR>
+</THEAD>
+<TBODY>
+{[printer_name]
+<TR><TD><A HREF="{printer_uri_supported}">{printer_name}</A></TD><TD>{printer_info}</TD><TD>{printer_location}</TD><TD>{printer_make_and_model}</TD><TD>{printer_state=3?В ожидании:{printer_state=4?Печатает:Приостановлен}}{printer_state_message?: {printer_state_message}:}</TD></TR>
+}
+</TBODY>
+</TABLE></DIV>}
