@@ -1,0 +1,45 @@
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:すべてのドキュメント}} 内を検索:</B> <INPUT
+TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
+TYPE="IMAGE" SRC="/images/button-search.gif" ALT="検索"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar">
+<H3 CLASS="title">オンラインヘルプドキュメント</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">すべてのドキュメント</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</DIV>
+
+{QUERY?<P>{HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:すべてのドキュメント}} の検索結果\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (<I><A HREF="{QPLINK}">{QPTEXT}</A></I>内):}</LI>}
+{QTEXT?</UL>:}
+:<P>マッチするものはありませんでした。</P>}
+{HELPTITLE?<HR NOSHADE>:}:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>:}
+<A HREF="/help/{HELPFILE}?PRINTABLE=YES" TARGET="_blank"><IMG
+SRC="/images/button-view-printable-version.gif" ALT="印刷可能バージョンの表示"
+CLASS="button"></A></H1>:<H1>CUPS ヘルプページ</H1>
+
+<P>これは、CUPS のオンラインヘルプインターフェイスです。
+オンラインヘルプ情報を表示するには、検索語句を上に入力するか、
+ドキュメントリンクのいずれかをクリックしてください。</P>
+
+<P>あなたが CUPS について初心者なら、"<a
+href="overview.html">Overview of CUPS</a>" ページを読んでください。
+上級ユーザは、"<a href="whatsnew.html">What's New in CUPS
+1.3</a>" ページを読むべきです。</P>
+
+<P><A HREF="http://www.cups.org/">CUPS ホームページ</A>でも、ユーザ
+ディスカッションフォーラム、FAQ、バグ報告や機能リクエストを申請する
+フォームといった、多くのリソースを提供しています。
+</P>}

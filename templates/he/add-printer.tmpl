@@ -1,0 +1,28 @@
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<H2 CLASS="title">הוסף מדפסת חדשה</H2>
+
+<TABLE>
+<TR>
+<TH CLASS="label">שם:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(יכול להכיל כל תו דפיס למעט "/", "#", ורווח)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">מיקום:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(מיקום במלל חופשי כגון "חדר 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">תיאור:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(תיאור במלל חופשי כגון "HP LaserJet עם יחידת הדפסה דו-צידית")</SMALL></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="IMAGE" SRC="/images/button-continue.gif" ALT="המשך"></TD>
+</TR>
+</TABLE>
+
+</FORM>

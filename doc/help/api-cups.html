@@ -1,0 +1,1566 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>CUPS API</title>
+	<meta name='keywords' content='Programming'>
+	<meta name='creator' content='Mini-XML v2.3'>
+	<style type='text/css'><!--
+	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
+	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
+	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
+	span.info { background: #000000; border: solid thin #000000; color: #ffffff; font-size: 80%; font-style: italic; font-weight: bold; white-space: nowrap; }
+	h3 span.info { float: right; font-size: 100%; }
+	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
+	--></style>
+</head>
+<body>
+<!--
+  "$Id: api-cups.shtml 6649 2007-07-11 21:46:42Z mike $"
+
+  CUPS API introduction for the Common UNIX Printing System (CUPS).
+
+  Copyright 2007 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'>Introduction</h2>
+
+<p>The CUPS library provides a whole collection of interfaces
+needed to support the internal needs of the CUPS software as well
+as the needs of applications, filters, printer drivers, and
+backends.</p>
+
+<p>Unlike the rest of CUPS, the CUPS API library is provided
+under the GNU Library General Public License. This means that you
+can use the CUPS API library in both proprietary and open-source
+programs.</p>
+
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/cups.h&gt;</var> header file must be included to
+use the CUPS functions.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+library: <var>libcups.a</var>, <var>libcups.so.2</var>,
+<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
+<var>libcups2.lib</var> depending on the platform. The following
+command compiles <var>myprogram.c</var> using GCC and the CUPS
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>Unless otherwise specified, the CUPS API functions require
+CUPS 1.1 or higher.</p>
+<h2 class='title'>Contents</h2>
+<ul>
+	<li><a href='#ENUMERATIONS'>Enumerations</a></li>
+	<li><a href='#FUNCTIONS'>Functions</a></li>
+	<li><a href='#STRUCTURES'>Structures</a></li>
+	<li><a href='#TYPES'>Types</a></li>
+</ul>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='ENUMERATIONS'>Enumerations</a></h2>
+<ul>
+	<li><a href='#cups_ptype_e'><tt>cups_ptype_e</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_ptype_e'>cups_ptype_e</a></h3>
+<h4>Description</h4>
+<p>Not a typedef'd enum so we can OR
+<h4>Values</h4>
+<div class='table'><table align='center' border='1' width='80%' summary='Values'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>CUPS_PRINTER_AUTHENTICATED</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer requires authentication 
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_BIND</tt> </td><td>Can bind output
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_BW</tt> </td><td>Can do B&amp;W printing
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_CLASS</tt> </td><td>Printer class
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_COLLATE</tt> </td><td>Can collage copies
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_COLOR</tt> </td><td>Can do color printing
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_COMMANDS</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer supports maintenance commands 
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_COPIES</tt> </td><td>Can do copies
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_COVER</tt> </td><td>Can cover output
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_DEFAULT</tt> </td><td>Default printer on network
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_DELETE</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Delete printer 
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_DISCOVERED</tt> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></td><td>Printer was automatically discovered and added 
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_DUPLEX</tt> </td><td>Can do duplexing
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_FAX</tt> </td><td>Fax queue
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_IMPLICIT</tt> </td><td>Implicit class
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_LARGE</tt> </td><td>Can do D/E/A1/A0
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_LOCAL</tt> </td><td>Local printer or class
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_MEDIUM</tt> </td><td>Can do Tabloid/B/C/A3/A2
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_NOT_SHARED</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Printer is not shared 
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_OPTIONS</tt> </td><td>~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED)
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_PUNCH</tt> </td><td>Can punch output
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_REJECTING</tt> </td><td>Printer is rejecting jobs
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_REMOTE</tt> </td><td>Remote printer or class
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_SMALL</tt> </td><td>Can do Letter/Legal/A4
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_SORT</tt> </td><td>Can sort output
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_STAPLE</tt> </td><td>Can staple output
+</td></tr>
+<tr><td><tt>CUPS_PRINTER_VARIABLE</tt> </td><td>Can do variable sizes
+</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
+<ul>
+	<li><a href='#cupsAddDest'><tt>cupsAddDest()</tt></a> </li>
+	<li><a href='#cupsAddOption'><tt>cupsAddOption()</tt></a> </li>
+	<li><a href='#cupsCancelJob'><tt>cupsCancelJob()</tt></a> </li>
+	<li><a href='#cupsEncryption'><tt>cupsEncryption()</tt></a> </li>
+	<li><a href='#cupsFreeDests'><tt>cupsFreeDests()</tt></a> </li>
+	<li><a href='#cupsFreeJobs'><tt>cupsFreeJobs()</tt></a> </li>
+	<li><a href='#cupsFreeOptions'><tt>cupsFreeOptions()</tt></a> </li>
+	<li><a href='#cupsGetClasses'><tt>cupsGetClasses()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#cupsGetDefault'><tt>cupsGetDefault()</tt></a> </li>
+	<li><a href='#cupsGetDefault2'><tt>cupsGetDefault2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetDest'><tt>cupsGetDest()</tt></a> </li>
+	<li><a href='#cupsGetDests'><tt>cupsGetDests()</tt></a> </li>
+	<li><a href='#cupsGetDests2'><tt>cupsGetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetFd'><tt>cupsGetFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsGetFile'><tt>cupsGetFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsGetJobs'><tt>cupsGetJobs()</tt></a> </li>
+	<li><a href='#cupsGetJobs2'><tt>cupsGetJobs2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetOption'><tt>cupsGetOption()</tt></a> </li>
+	<li><a href='#cupsGetPPD'><tt>cupsGetPPD()</tt></a> </li>
+	<li><a href='#cupsGetPPD2'><tt>cupsGetPPD2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetPassword'><tt>cupsGetPassword()</tt></a> </li>
+	<li><a href='#cupsGetPrinters'><tt>cupsGetPrinters()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#cupsGetServerPPD'><tt>cupsGetServerPPD()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
+	<li><a href='#cupsLangDefault'><tt>cupsLangDefault()</tt></a> </li>
+	<li><a href='#cupsLangEncoding'><tt>cupsLangEncoding()</tt></a> </li>
+	<li><a href='#cupsLangFlush'><tt>cupsLangFlush()</tt></a> </li>
+	<li><a href='#cupsLangFree'><tt>cupsLangFree()</tt></a> </li>
+	<li><a href='#cupsLangGet'><tt>cupsLangGet()</tt></a> </li>
+	<li><a href='#cupsLastError'><tt>cupsLastError()</tt></a> </li>
+	<li><a href='#cupsLastErrorString'><tt>cupsLastErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsMarkOptions'><tt>cupsMarkOptions()</tt></a> </li>
+	<li><a href='#cupsNotifySubject'><tt>cupsNotifySubject()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsNotifyText'><tt>cupsNotifyText()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsParseOptions'><tt>cupsParseOptions()</tt></a> </li>
+	<li><a href='#cupsPrintFile'><tt>cupsPrintFile()</tt></a> </li>
+	<li><a href='#cupsPrintFile2'><tt>cupsPrintFile2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsPrintFiles'><tt>cupsPrintFiles()</tt></a> </li>
+	<li><a href='#cupsPrintFiles2'><tt>cupsPrintFiles2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsPutFd'><tt>cupsPutFd()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsPutFile'><tt>cupsPutFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
+	<li><a href='#cupsRemoveDest'><tt>cupsRemoveDest()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
+	<li><a href='#cupsRemoveOption'><tt>cupsRemoveOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsServer'><tt>cupsServer()</tt></a> </li>
+	<li><a href='#cupsSetDefaultDest'><tt>cupsSetDefaultDest()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
+	<li><a href='#cupsSetDests'><tt>cupsSetDests()</tt></a> </li>
+	<li><a href='#cupsSetDests2'><tt>cupsSetDests2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsSetEncryption'><tt>cupsSetEncryption()</tt></a> </li>
+	<li><a href='#cupsSetPasswordCB'><tt>cupsSetPasswordCB()</tt></a> </li>
+	<li><a href='#cupsSetServer'><tt>cupsSetServer()</tt></a> </li>
+	<li><a href='#cupsSetUser'><tt>cupsSetUser()</tt></a> </li>
+	<li><a href='#cupsTempFd'><tt>cupsTempFd()</tt></a> </li>
+	<li><a href='#cupsTempFile'><tt>cupsTempFile()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
+	<li><a href='#cupsTempFile2'><tt>cupsTempFile2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
+	<li><a href='#cupsUser'><tt>cupsUser()</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsAddDest'>cupsAddDest()</a></h3>
+<h4>Description</h4>
+<p>Add a destination to the list of destinations.
+<p>This function cannot be used to add a new class or printer queue,
+it only adds a new container of saved options for the named
+destination or instance.
+<p>If the named destination already exists, the destination list is
+returned unchanged.  Adding a new instance of a destination creates
+a copy of that destination's options.
+<p>Use the cupsSaveDests() function to save the updated list of
+destinations to the user's lpoptions file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsAddDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL for none/primary</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New number of destinations</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsAddOption'>cupsAddOption()</a></h3>
+<h4>Description</h4>
+<p>Add an option to an option array.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsAddOption(
+    const char * name,
+    const char * value,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> ** options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Name of option</td></tr>
+<tr><td><tt>value</tt></td><td>Value of option</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of options</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsCancelJob'>cupsCancelJob()</a></h3>
+<h4>Description</h4>
+<p>Cancel a print job on the default server.
+<p>Use the cupsLastError() and cupsLastErrorString() functions to get
+the cause of any failure.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsCancelJob(
+    const char * name,
+    int job);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Name of printer or class</td></tr>
+<tr><td><tt>job</tt></td><td>Job ID</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 on success, 0 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsEncryption'>cupsEncryption()</a></h3>
+<h4>Description</h4>
+<p>Get the default encryption settings.
+<p>The default encryption setting comes from the CUPS_ENCRYPTION
+environment variable, then the ~/.cupsrc file, and finally the
+/etc/cups/client.conf file. If not set, the default is
+HTTP_ENCRYPT_IF_REQUESTED.
+<h4>Syntax</h4>
+<p><tt>
+http_encryption_t<br>
+cupsEncryption(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Encryption settings</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFreeDests'>cupsFreeDests()</a></h3>
+<h4>Description</h4>
+<p>Free the memory used by the list of destinations.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsFreeDests(
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFreeJobs'>cupsFreeJobs()</a></h3>
+<h4>Description</h4>
+<p>Free memory used by job data.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsFreeJobs(
+    int num_jobs,
+    <a href='#cups_job_t'>cups_job_t</a> * jobs);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>num_jobs</tt></td><td>Number of jobs</td></tr>
+<tr><td><tt>jobs</tt></td><td>Jobs</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsFreeOptions'>cupsFreeOptions()</a></h3>
+<h4>Description</h4>
+<p>Free all memory used by options.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsFreeOptions(
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetClasses'>cupsGetClasses()</a></h3>
+<h4>Description</h4>
+<p>Get a list of printer classes from the default server.
+<p>This function is deprecated - use cupsGetDests() instead.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetClasses(
+    char *** classes);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>classes</tt></td><td>Classes</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of classes</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetDefault'>cupsGetDefault()</a></h3>
+<h4>Description</h4>
+<p>Get the default printer or class for the default server.
+<p>This function returns the default printer or class as defined by
+the LPDEST or PRINTER environment variables. If these environment
+variables are not set, the server default destination is returned.
+Applications should use the cupsGetDests() and cupsGetDest() functions
+to get the user-defined default printer, as this function does not
+support the lpoptions-defined default printer.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetDefault(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Default printer or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDefault2'>cupsGetDefault2()</a></h3>
+<h4>Description</h4>
+<p>Get the default printer or class for the specified server.
+<p>This function returns the default printer or class as defined by
+the LPDEST or PRINTER environment variables. If these environment
+variables are not set, the server default destination is returned.
+Applications should use the cupsGetDests() and cupsGetDest() functions
+to get the user-defined default printer, as this function does not
+support the lpoptions-defined default printer.
+
+
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetDefault2(
+    http_t * http);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Default printer or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetDest'>cupsGetDest()</a></h3>
+<h4>Description</h4>
+<p>Get the named destination from the list.
+<p>Use the cupsGetDests() or cupsGetDests2() functions to get a
+list of supported destinations for the current user.
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_dest_t'>cups_dest_t</a> *<br>
+cupsGetDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name or NULL for the default destination</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Destination pointer or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetDests'>cupsGetDests()</a></h3>
+<h4>Description</h4>
+<p>Get the list of destinations from the default server.
+<p>Starting with CUPS 1.2, the returned list of destinations include the
+printer-info, printer-is-accepting-jobs, printer-is-shared,
+printer-make-and-model, printer-state, printer-state-change-time,
+printer-state-reasons, and printer-type attributes as options.
+<p>Use the cupsFreeDests() function to free the destination list and
+the cupsGetDest() function to find a particular destination.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetDests(
+    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of destinations</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetDests2'>cupsGetDests2()</a></h3>
+<h4>Description</h4>
+<p>Get the list of destinations from the specified server.
+<p>Starting with CUPS 1.2, the returned list of destinations include the
+printer-info, printer-is-accepting-jobs, printer-is-shared,
+printer-make-and-model, printer-state, printer-state-change-time,
+printer-state-reasons, and printer-type attributes as options.
+<p>Use the cupsFreeDests() function to free the destination list and
+the cupsGetDest() function to find a particular destination.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetDests2(
+    http_t * http,
+    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of destinations</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsGetFd'>cupsGetFd()</a></h3>
+<h4>Description</h4>
+<p>Get a file from the server.
+<p>This function returns HTTP_OK when the file is successfully retrieved.
+
+
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsGetFd(
+    http_t * http,
+    const char * resource,
+    int fd);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
+<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsGetFile'>cupsGetFile()</a></h3>
+<h4>Description</h4>
+<p>Get a file from the server.
+<p>This function returns HTTP_OK when the file is successfully retrieved.
+
+
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsGetFile(
+    http_t * http,
+    const char * resource,
+    const char * filename);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
+<tr><td><tt>filename</tt></td><td>Filename</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetJobs'>cupsGetJobs()</a></h3>
+<h4>Description</h4>
+<p>Get the jobs from the default server.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetJobs(
+    <a href='#cups_job_t'>cups_job_t</a> ** jobs,
+    const char * mydest,
+    int myjobs,
+    int completed);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
+<tr><td><tt>mydest</tt></td><td>NULL = all destinations,       *
+otherwise show jobs for mydest</td></tr>
+<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine</td></tr>
+<tr><td><tt>completed</tt></td><td>-1 = show all, 0 = active, *
+1 = completed jobs</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of jobs</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetJobs2'>cupsGetJobs2()</a></h3>
+<h4>Description</h4>
+<p>Get the jobs from the specified server.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetJobs2(
+    http_t * http,
+    <a href='#cups_job_t'>cups_job_t</a> ** jobs,
+    const char * mydest,
+    int myjobs,
+    int completed);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
+<tr><td><tt>mydest</tt></td><td>NULL = all destinations,       *
+otherwise show jobs for mydest</td></tr>
+<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine</td></tr>
+<tr><td><tt>completed</tt></td><td>-1 = show all, 0 = active, *
+1 = completed jobs</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of jobs</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetOption'>cupsGetOption()</a></h3>
+<h4>Description</h4>
+<p>Get an option value.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetOption(
+    const char * name,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Name of option</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Option value or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetPPD'>cupsGetPPD()</a></h3>
+<h4>Description</h4>
+<p>Get the PPD file for a printer on the default server.
+<p>For classes, cupsGetPPD() returns the PPD file for the first printer
+in the class.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetPPD(
+    const char * name);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Printer name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Filename for PPD file</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsGetPPD2'>cupsGetPPD2()</a></h3>
+<h4>Description</h4>
+<p>Get the PPD file for a printer from the specified server.
+<p>For classes, cupsGetPPD2() returns the PPD file for the first printer
+in the class.
+
+
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetPPD2(
+    http_t * http,
+    const char * name);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>name</tt></td><td>Printer name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Filename for PPD file</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetPassword'>cupsGetPassword()</a></h3>
+<h4>Description</h4>
+<p>Get a password from the user.
+<p>Uses the current password callback function. Returns NULL if the
+user does not provide a password.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsGetPassword(
+    const char * prompt);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>prompt</tt></td><td>Prompt string</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Password</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsGetPrinters'>cupsGetPrinters()</a></h3>
+<h4>Description</h4>
+<p>Get a list of printers from the default server.
+<p>This function is deprecated - use cupsGetDests() instead.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsGetPrinters(
+    char *** printers);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>printers</tt></td><td>Printers</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of printers</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsGetServerPPD'>cupsGetServerPPD()</a></h3>
+<h4>Description</h4>
+<p>Get an available PPD file from the server.
+<p>This function returns the named PPD file from the server.  The
+list of available PPDs is provided by the IPP CUPS_GET_PPDS
+operation.
+<p>You must remove (unlink) the PPD file when you are finished with
+it. The PPD filename is stored in a static location that will be
+overwritten on the next call to cupsGetPPD(), cupsGetPPD2(), or
+cupsGetServerPPD().
+
+
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsGetServerPPD(
+    http_t * http,
+    const char * name);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>name</tt></td><td>Name of PPD file (&quot;ppd-name&quot;)</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Name of PPD file or NULL on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLangDefault'>cupsLangDefault()</a></h3>
+<h4>Description</h4>
+<p>Return the default language.
+<h4>Syntax</h4>
+<p><tt>
+cups_lang_t *<br>
+cupsLangDefault(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Language data</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLangEncoding'>cupsLangEncoding()</a></h3>
+<h4>Description</h4>
+<p>Return the character encoding (us-ascii, etc.)
+for the given language.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsLangEncoding(
+    cups_lang_t * lang);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>lang</tt></td><td>Language data</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Character encoding</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLangFlush'>cupsLangFlush()</a></h3>
+<h4>Description</h4>
+<p>Flush all language data out of the cache.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsLangFlush(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLangFree'>cupsLangFree()</a></h3>
+<h4>Description</h4>
+<p>Free language data.
+<p>This does not actually free anything; use cupsLangFlush() for that.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsLangFree(
+    cups_lang_t * lang);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>lang</tt></td><td>Language to free</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLangGet'>cupsLangGet()</a></h3>
+<h4>Description</h4>
+<p>Get a language.
+<h4>Syntax</h4>
+<p><tt>
+cups_lang_t *<br>
+cupsLangGet(
+    const char * language);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>language</tt></td><td>Language or locale</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Language data</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsLastError'>cupsLastError()</a></h3>
+<h4>Description</h4>
+<p>Return the last IPP status code.
+<h4>Syntax</h4>
+<p><tt>
+ipp_status_t<br>
+cupsLastError(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>IPP status code from last request</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsLastErrorString'>cupsLastErrorString()</a></h3>
+<h4>Description</h4>
+<p>Return the last IPP status-message.
+
+
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsLastErrorString(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>status-message text from last request</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsMarkOptions'>cupsMarkOptions()</a></h3>
+<h4>Description</h4>
+<p>Mark command-line options in a PPD file.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsMarkOptions(
+    ppd_file_t * ppd,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>1 if conflicting</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsNotifySubject'>cupsNotifySubject()</a></h3>
+<h4>Description</h4>
+<p>Return the subject for the given notification message.
+<p>The returned string must be freed by the caller using free().
+
+
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsNotifySubject(
+    cups_lang_t * lang,
+    ipp_t * event);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>lang</tt></td><td>Language data</td></tr>
+<tr><td><tt>event</tt></td><td>Event data</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Subject string or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsNotifyText'>cupsNotifyText()</a></h3>
+<h4>Description</h4>
+<p>Return the text for the given notification message.
+<p>The returned string must be freed by the caller using free().
+
+
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsNotifyText(
+    cups_lang_t * lang,
+    ipp_t * event);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>lang</tt></td><td>Language data</td></tr>
+<tr><td><tt>event</tt></td><td>Event data</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Message text or NULL</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsParseOptions'>cupsParseOptions()</a></h3>
+<h4>Description</h4>
+<p>Parse options from a command-line argument.
+<p>This function converts space-delimited name/value pairs according
+to the PAPI text option ABNF specification. Collection values
+(&quot;name={a=... b=... c=...}&quot;) are stored with the curley brackets
+intact - use cupsParseOptions() on the value to extract the collection
+attributes.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsParseOptions(
+    const char * arg,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> ** options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>arg</tt></td><td>Argument to parse</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options found</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Number of options found</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsPrintFile'>cupsPrintFile()</a></h3>
+<h4>Description</h4>
+<p>Print a file to a printer or class on the default server.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsPrintFile(
+    const char * name,
+    const char * filename,
+    const char * title,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
+<tr><td><tt>filename</tt></td><td>File to print</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Job ID</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFile2'>cupsPrintFile2()</a></h3>
+<h4>Description</h4>
+<p>Print a file to a printer or class on the specified server.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsPrintFile2(
+    http_t * http,
+    const char * name,
+    const char * filename,
+    const char * title,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
+<tr><td><tt>filename</tt></td><td>File to print</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Job ID</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsPrintFiles'>cupsPrintFiles()</a></h3>
+<h4>Description</h4>
+<p>Print one or more files to a printer or class on the
+default server.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsPrintFiles(
+    const char * name,
+    int num_files,
+    const char ** files,
+    const char * title,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
+<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
+<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Job ID</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsPrintFiles2'>cupsPrintFiles2()</a></h3>
+<h4>Description</h4>
+<p>Print one or more files to a printer or class on the
+specified server.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsPrintFiles2(
+    http_t * http,
+    const char * name,
+    int num_files,
+    const char ** files,
+    const char * title,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
+<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
+<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Job ID</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsPutFd'>cupsPutFd()</a></h3>
+<h4>Description</h4>
+<p>Put a file on the server.
+<p>This function returns HTTP_CREATED when the file is stored successfully.
+
+
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsPutFd(
+    http_t * http,
+    const char * resource,
+    int fd);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
+<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='cupsPutFile'>cupsPutFile()</a></h3>
+<h4>Description</h4>
+<p>Put a file on the server.
+<p>This function returns HTTP_CREATED when the file is stored successfully.
+
+
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsPutFile(
+    http_t * http,
+    const char * resource,
+    const char * filename);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
+<tr><td><tt>filename</tt></td><td>Filename</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsRemoveDest'>cupsRemoveDest()</a></h3>
+<h4>Description</h4>
+<p>Remove a destination from the destination list.
+<p>Removing a destination/instance does not delete the class or printer
+queue, merely the lpoptions for that destination/instance.  Use the
+cupsSetDests() or cupsSetDests2() functions to save the new options
+for the user.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsRemoveDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> ** dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New number of destinations</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsRemoveOption'>cupsRemoveOption()</a></h3>
+<h4>Description</h4>
+<p>Remove an option from an option array.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsRemoveOption(
+    const char * name,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> ** options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Option name</td></tr>
+<tr><td><tt>num_options</tt></td><td>Current number of options</td></tr>
+<tr><td><tt>options</tt></td><td>Options</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New number of options</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsServer'>cupsServer()</a></h3>
+<h4>Description</h4>
+<p>Return the hostname/address of the default server.
+<p>The returned value can be a fully-qualified hostname, a numeric
+IPv4 or IPv6 address, or a domain socket pathname.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsServer(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>Server name</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='cupsSetDefaultDest'>cupsSetDefaultDest()</a></h3>
+<h4>Description</h4>
+<p>Set the default destination.
+
+
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetDefaultDest(
+    const char * name,
+    const char * instance,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt></td><td>Destination name</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsSetDests'>cupsSetDests()</a></h3>
+<h4>Description</h4>
+<p>Save the list of destinations for the default server.
+<p>This function saves the destinations to /etc/cups/lpoptions when run
+as root and ~/.cups/lpoptions when run as a normal user.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetDests(
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span><a name='cupsSetDests2'>cupsSetDests2()</a></h3>
+<h4>Description</h4>
+<p>Save the list of destinations for the specified server.
+<p>This function saves the destinations to /etc/cups/lpoptions when run
+as root and ~/.cups/lpoptions when run as a normal user.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsSetDests2(
+    http_t * http,
+    int num_dests,
+    <a href='#cups_dest_t'>cups_dest_t</a> * dests);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>0 on success, -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsSetEncryption'>cupsSetEncryption()</a></h3>
+<h4>Description</h4>
+<p>Set the encryption preference.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetEncryption(
+    http_encryption_t e);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>e</tt></td><td>New encryption preference</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsSetPasswordCB'>cupsSetPasswordCB()</a></h3>
+<h4>Description</h4>
+<p>Set the password callback for CUPS.
+<p>Pass NULL to restore the default (console) password callback.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetPasswordCB(
+    <a href='#cups_password_cb_t'>cups_password_cb_t</a> cb);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>cb</tt></td><td>Callback function</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsSetServer'>cupsSetServer()</a></h3>
+<h4>Description</h4>
+<p>Set the default server name.
+<p>The &quot;server&quot; string can be a fully-qualified hostname, a numeric
+IPv4 or IPv6 address, or a domain socket pathname. Pass NULL to
+restore the default server name.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetServer(
+    const char * server);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>server</tt></td><td>Server name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsSetUser'>cupsSetUser()</a></h3>
+<h4>Description</h4>
+<p>Set the default user name.
+<p>Pass NULL to restore the default user name.
+<h4>Syntax</h4>
+<p><tt>
+void<br>
+cupsSetUser(
+    const char * user);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>user</tt></td><td>User name</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsTempFd'>cupsTempFd()</a></h3>
+<h4>Description</h4>
+<p>Creates a temporary file.
+<p>The temporary filename is returned in the filename buffer.
+The temporary file is opened for reading and writing.
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsTempFd(
+    char * filename,
+    int len);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>New file descriptor or -1 on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;DEPRECATED&nbsp;</span><a name='cupsTempFile'>cupsTempFile()</a></h3>
+<h4>Description</h4>
+<p>Generates a temporary filename.
+<p>The temporary filename is returned in the filename buffer.
+This function is deprecated - use cupsTempFd() or cupsTempFile2()
+instead.
+
+
+<h4>Syntax</h4>
+<p><tt>
+char *<br>
+cupsTempFile(
+    char * filename,
+    int len);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Filename or NULL on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='cupsTempFile2'>cupsTempFile2()</a></h3>
+<h4>Description</h4>
+<p>Creates a temporary CUPS file.
+<p>The temporary filename is returned in the filename buffer.
+The temporary file is opened for writing.
+
+
+<h4>Syntax</h4>
+<p><tt>
+cups_file_t *<br>
+cupsTempFile2(
+    char * filename,
+    int len);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>CUPS file or NULL on error</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsUser'>cupsUser()</a></h3>
+<h4>Description</h4>
+<p>Return the current user's name.
+<h4>Syntax</h4>
+<p><tt>
+const char *<br>
+cupsUser(void);
+</tt></p>
+<h4>Arguments</h4>
+<p>None.</p>
+<h4>Returns</h4>
+<p>User name</p>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='STRUCTURES'>Structures</a></h2>
+<ul>
+	<li><a href='#cups_dest_s'><tt>cups_dest_s</tt></a> </li>
+	<li><a href='#cups_job_s'><tt>cups_job_s</tt></a> </li>
+	<li><a href='#cups_option_s'><tt>cups_option_s</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_dest_s'>cups_dest_s</a></h3>
+<h4>Description</h4>
+<p>Destination
+<h4>Definition</h4>
+<p><tt>
+struct cups_dest_s<br>
+{<br>
+&nbsp;&nbsp;char *name, * instance;<br>
+&nbsp;&nbsp;int is_default;<br>
+&nbsp;&nbsp;int num_options;<br>
+&nbsp;&nbsp;<a href='#cups_option_t'>cups_option_t</a> * options;<br>
+};</tt></p>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%' summary='Members'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>instance</tt> </td><td>Local instance name or NULL
+</td></tr>
+<tr><td><tt>is_default</tt> </td><td>Is this printer the default?
+</td></tr>
+<tr><td><tt>num_options</tt> </td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt> </td><td>Options
+</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_job_s'>cups_job_s</a></h3>
+<h4>Description</h4>
+<p>Job
+<h4>Definition</h4>
+<p><tt>
+struct cups_job_s<br>
+{<br>
+&nbsp;&nbsp;time_t completed_time;<br>
+&nbsp;&nbsp;time_t creation_time;<br>
+&nbsp;&nbsp;char * dest;<br>
+&nbsp;&nbsp;char * format;<br>
+&nbsp;&nbsp;int id;<br>
+&nbsp;&nbsp;int priority;<br>
+&nbsp;&nbsp;time_t processing_time;<br>
+&nbsp;&nbsp;int size;<br>
+&nbsp;&nbsp;ipp_jstate_t state;<br>
+&nbsp;&nbsp;char * title;<br>
+&nbsp;&nbsp;char * user;<br>
+};</tt></p>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%' summary='Members'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>completed_time</tt> </td><td>Time the job was completed
+</td></tr>
+<tr><td><tt>creation_time</tt> </td><td>Time the job was created
+</td></tr>
+<tr><td><tt>dest</tt> </td><td>Printer or class name
+</td></tr>
+<tr><td><tt>format</tt> </td><td>Document format
+</td></tr>
+<tr><td><tt>id</tt> </td><td>The job ID
+</td></tr>
+<tr><td><tt>priority</tt> </td><td>Priority (1-100)
+</td></tr>
+<tr><td><tt>processing_time</tt> </td><td>Time the job was processed
+</td></tr>
+<tr><td><tt>size</tt> </td><td>Size in kilobytes
+</td></tr>
+<tr><td><tt>state</tt> </td><td>Job state
+</td></tr>
+<tr><td><tt>title</tt> </td><td>Title/job name
+</td></tr>
+<tr><td><tt>user</tt> </td><td>User the submitted the job
+</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_option_s'>cups_option_s</a></h3>
+<h4>Description</h4>
+<p>Printer Options
+<h4>Definition</h4>
+<p><tt>
+struct cups_option_s<br>
+{<br>
+&nbsp;&nbsp;char * name;<br>
+&nbsp;&nbsp;char * value;<br>
+};</tt></p>
+<h4>Members</h4>
+<div class='table'><table align='center' border='1' width='80%' summary='Members'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>name</tt> </td><td>Name of option
+</td></tr>
+<tr><td><tt>value</tt> </td><td>Value of option
+</td></tr>
+</tbody></table></div>
+<!-- NEW PAGE -->
+<h2 class='title'><a name='TYPES'>Types</a></h2>
+<ul>
+	<li><a href='#cups_dest_t'><tt>cups_dest_t</tt></a> </li>
+	<li><a href='#cups_job_t'><tt>cups_job_t</tt></a> </li>
+	<li><a href='#cups_option_t'><tt>cups_option_t</tt></a> </li>
+	<li><a href='#cups_password_cb_t'><tt>cups_password_cb_t</tt></a> </li>
+	<li><a href='#cups_ptype_t'><tt>cups_ptype_t</tt></a> </li>
+</ul>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_dest_t'>cups_dest_t</a></h3>
+<h4>Description</h4>
+<p>Destination
+<h4>Definition</h4>
+<p><tt>
+typedef struct <a href='#cups_dest_s'>cups_dest_s</a> cups_dest_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_job_t'>cups_job_t</a></h3>
+<h4>Description</h4>
+<p>Job
+<h4>Definition</h4>
+<p><tt>
+typedef struct <a href='#cups_job_s'>cups_job_s</a> cups_job_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_option_t'>cups_option_t</a></h3>
+<h4>Description</h4>
+<p>Printer Options
+<h4>Definition</h4>
+<p><tt>
+typedef struct <a href='#cups_option_s'>cups_option_s</a> cups_option_t;
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_password_cb_t'>cups_password_cb_t</a></h3>
+<h4>Description</h4>
+<p>Password callback
+<h4>Definition</h4>
+<p><tt>
+typedef const char * (*cups_password_cb_t)(const char *);
+</tt></p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cups_ptype_t'>cups_ptype_t</a></h3>
+<h4>Description</h4>
+<p>Printer Type/Capability Bits
+<h4>Definition</h4>
+<p><tt>
+typedef unsigned cups_ptype_t;
+</tt></p>
+</body>
+</html>
