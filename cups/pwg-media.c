@@ -868,13 +868,13 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
 
 	if (!strcmp(ptr, "mm"))
 	{
-	  size->width  = (int)(w * 100);
-	  size->length = (int)(l * 100);
+	  size->width  = (int)(w * 100 + 0.5);
+	  size->length = (int)(l * 100 + 0.5);
 	}
 	else
 	{
-	  size->width  = (int)(w * 2540);
-	  size->length = (int)(l * 2540);
+	  size->width  = (int)(w * 2540 + 0.5);
+	  size->length = (int)(l * 2540 + 0.5);
 	}
 
         strlcpy(cg->pwg_name, pwg, sizeof(cg->pwg_name));
