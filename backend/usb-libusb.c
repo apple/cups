@@ -899,7 +899,8 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 					/* Pointer to current alternate setting */
   const struct libusb_endpoint_descriptor *endpptr = NULL;
 					/* Pointer to current endpoint */
-  ssize_t               numdevs,        /* number of connected devices */
+  ssize_t               err = 0,	/* Error code */
+                        numdevs,        /* number of connected devices */
                         i = 0;
   uint8_t		conf,		/* Current configuration */
 			iface,		/* Current interface */
@@ -918,7 +919,14 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
   * Initialize libusb...
   */
 
-  libusb_init(NULL);
+  err = libusb_init(NULL);
+  if (err)
+  {
+    fprintf(stderr, "DEBUG: Unable to initialize USB access via libusb, "
+                    "libusb error %i\n", err);
+    return (NULL);
+  }
+
   numdevs = libusb_get_device_list(NULL, &list);
   fprintf(stderr, "DEBUG: libusb_get_device_list=%d\n", (int)numdevs);
 
@@ -1088,7 +1096,8 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
   * Clean up ....
   */
 
-  libusb_free_device_list(list, 1);
+  if (numdevs >= 0)
+    libusb_free_device_list(list, 1);
   libusb_exit(NULL);
 
   return (NULL);
