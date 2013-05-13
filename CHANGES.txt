@@ -7,6 +7,9 @@ CHANGES IN CUPS V1.7b2
 	  default (<rdar://problem/13875803>)
 	- The ipptool program now supports FILE-ID and TEST-ID directives and
 	  includes their values in its XML output (<rdar://problem/13876038>)
+	- The ipptool program now supports WITH-HOSTNAME, WITH-RESOURCE, and
+	  WITH-SCHEME expect predicates to compare the corresponding URI
+	  components (<rdar://problem/13876091>)
 
 
 CHANGES IN CUPS V1.7b1

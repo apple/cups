@@ -368,6 +368,27 @@ matches or does not match.
 <dd>Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
 </dd>
+<dt>WITH-ALL-HOSTNAMES "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-ALL-HOSTNAMES "/regular expression/"
+</dt>
+<dd>Requires that all URI values contain a matching hostname.
+</dd>
+<dt>WITH-ALL-RESOURCES "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-ALL-RESOURCES "/regular expression/"
+</dt>
+<dd>Requires that all URI values contain a matching resource (including leading /).
+</dd>
+<dt>WITH-ALL-SCHEMES "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-ALL-SCHEMES "/regular expression/"
+</dt>
+<dd>Requires that all URI values contain a matching scheme.
+</dd>
 <dt>WITH-ALL-VALUES "literal string"
 </dt>
 <dd>Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
@@ -395,6 +416,27 @@ parallel attribute.
 <dt>WITH-ALL-VALUES "/regular expression/"
 </dt>
 <dd>Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+</dd>
+<dt>WITH-HOSTNAME "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-HOSTNAME "/regular expression/"
+</dt>
+<dd>Requires that at least one URI value contains a matching hostname.
+</dd>
+<dt>WITH-RESOURCE "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-RESOURCE "/regular expression/"
+</dt>
+<dd>Requires that at least one URI value contains a matching resource (including leading /).
+</dd>
+<dt>WITH-SCHEME "literal string"
+</dt>
+<dd></dd>
+<dt>WITH-SCHEME "/regular expression/"
+</dt>
+<dd>Requires that at least one URI value contains a matching scheme.
 </dd>
 <dt>WITH-VALUE "literal string"
 </dt>

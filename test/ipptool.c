@@ -87,7 +87,10 @@ typedef enum _cups_with_e		/**** WITH flags ****/
 {
   _CUPS_WITH_LITERAL = 0,		/* Match string is a literal value */
   _CUPS_WITH_ALL = 1,			/* Must match all values */
-  _CUPS_WITH_REGEX = 2			/* Match string is a regular expression */
+  _CUPS_WITH_REGEX = 2,			/* Match string is a regular expression */
+  _CUPS_WITH_HOSTNAME = 4,		/* Match string is a URI hostname */
+  _CUPS_WITH_RESOURCE = 8,		/* Match string is a URI resource */
+  _CUPS_WITH_SCHEME = 16		/* Match string is a URI scheme */
 } _cups_with_t;
 
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
@@ -197,6 +200,8 @@ static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(_cups_vars_t *vars, FILE *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src,
 		              size_t dstsize);
+static char	*get_string(ipp_attribute_t *attr, int element, int flags,
+		            char *buffer, size_t bufsize);
 static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
@@ -1254,6 +1259,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           _cups_strcasecmp(token, "REPEAT-NO-MATCH") &&
           _cups_strcasecmp(token, "SAME-COUNT-AS") &&
           _cups_strcasecmp(token, "WITH-ALL-VALUES") &&
+          _cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") &&
+          _cups_strcasecmp(token, "WITH-ALL-RESOURCES") &&
+          _cups_strcasecmp(token, "WITH-ALL-SCHEMES") &&
+          _cups_strcasecmp(token, "WITH-HOSTNAME") &&
+          _cups_strcasecmp(token, "WITH-RESOURCE") &&
+          _cups_strcasecmp(token, "WITH-SCHEME") &&
           _cups_strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
@@ -2276,10 +2287,29 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
       }
       else if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") ||
+               !_cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") ||
+               !_cups_strcasecmp(token, "WITH-ALL-RESOURCES") ||
+               !_cups_strcasecmp(token, "WITH-ALL-SCHEMES") ||
+               !_cups_strcasecmp(token, "WITH-HOSTNAME") ||
+               !_cups_strcasecmp(token, "WITH-RESOURCE") ||
+               !_cups_strcasecmp(token, "WITH-SCHEME") ||
                !_cups_strcasecmp(token, "WITH-VALUE"))
       {
-	if (!_cups_strcasecmp(token, "WITH-ALL-VALUES") && last_expect)
-	  last_expect->with_flags = _CUPS_WITH_ALL;
+	if (last_expect)
+	{
+	  if (!_cups_strcasecmp(token, "WITH-ALL-HOSTNAMES") ||
+	      !_cups_strcasecmp(token, "WITH-HOSTNAME"))
+	    last_expect->with_flags = _CUPS_WITH_HOSTNAME;
+	  else if (!_cups_strcasecmp(token, "WITH-ALL-RESOURCES") ||
+	      !_cups_strcasecmp(token, "WITH-RESOURCE"))
+	    last_expect->with_flags = _CUPS_WITH_RESOURCE;
+	  else if (!_cups_strcasecmp(token, "WITH-ALL-SCHEMES") ||
+	      !_cups_strcasecmp(token, "WITH-SCHEME"))
+	    last_expect->with_flags = _CUPS_WITH_SCHEME;
+
+	  if (!_cups_strncasecmp(token, "WITH-ALL-", 9))
+	    last_expect->with_flags |= _CUPS_WITH_ALL;
+        }
 
       	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
@@ -3772,6 +3802,59 @@ get_filename(const char *testfile,	/* I - Current test file */
   }
 
   return (dst);
+}
+
+
+/*
+ * 'get_string()' - Get a pointer to a string value or the portion of interest.
+ */
+
+static char *				/* O - Pointer to string */
+get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
+           int             element,	/* I - Element to fetch */
+           int             flags,	/* I - Value ("with") flags */
+           char            *buffer,	/* I - Temporary buffer */
+	   size_t          bufsize)	/* I - Size of temporary buffer */
+{
+  char	*ptr,				/* Value */
+	scheme[256],			/* URI scheme */
+	userpass[256],			/* Username/password */
+	hostname[256],			/* Hostname */
+	resource[1024];			/* Resource */
+  int	port;				/* Port number */
+
+
+  ptr = attr->values[element].string.text;
+
+  if (flags & _CUPS_WITH_HOSTNAME)
+  {
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme),
+                        userpass, sizeof(userpass), buffer, bufsize, &port,
+                        resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+      return ("");
+    else
+      return (buffer);
+  }
+  else if (flags & _CUPS_WITH_RESOURCE)
+  {
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme),
+                        userpass, sizeof(userpass), hostname, sizeof(hostname),
+                        &port, buffer, bufsize) < HTTP_URI_STATUS_OK)
+      return ("");
+    else
+      return (buffer);
+  }
+  else if (flags & _CUPS_WITH_SCHEME)
+  {
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, buffer, bufsize,
+                        userpass, sizeof(userpass), hostname, sizeof(hostname),
+                        &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+      return ("");
+    else
+      return (buffer);
+  }
+  else
+    return (ptr);
 }
 
 
@@ -5390,7 +5473,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 {
   int	i,				/* Looping var */
 	match;				/* Match? */
-  char	temp[256],			/* Temporary value string */
+  char	temp[1024],			/* Temporary value string */
 	*valptr;			/* Pointer into value */
 
 
@@ -5669,10 +5752,13 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    if (!regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	    if (!regexec(&re, get_string(attr, i, flags, temp, sizeof(temp)),
+	                 0, NULL, 0))
 	    {
 	      if (!matchbuf[0])
-		strlcpy(matchbuf, attr->values[i].string.text, matchlen);
+		strlcpy(matchbuf,
+		        get_string(attr, i, flags, temp, sizeof(temp)),
+		        matchlen);
 
 	      if (!(flags & _CUPS_WITH_ALL))
 	      {
@@ -5697,10 +5783,12 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
-	    if (!strcmp(value, attr->values[i].string.text))
+	    if (!strcmp(value, get_string(attr, i, flags, temp, sizeof(temp))))
 	    {
 	      if (!matchbuf[0])
-		strlcpy(matchbuf, attr->values[i].string.text, matchlen);
+		strlcpy(matchbuf,
+		        get_string(attr, i, flags, temp, sizeof(temp)),
+		        matchlen);
 
 	      if (!(flags & _CUPS_WITH_ALL))
 	      {
@@ -5720,7 +5808,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
         {
 	  for (i = 0; i < attr->num_values; i ++)
 	    add_stringf(errors, "GOT: %s=\"%s\"", attr->name,
-			     attr->values[i].string.text);
+			attr->values[i].string.text);
         }
 	break;
 

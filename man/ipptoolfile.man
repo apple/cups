@@ -300,6 +300,21 @@ SAME-COUNT-AS attribute-name
 Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
 .TP 5
+WITH-ALL-HOSTNAMES "literal string"
+.TP 5
+WITH-ALL-HOSTNAMES "/regular expression/"
+Requires that all URI values contain a matching hostname.
+.TP 5
+WITH-ALL-RESOURCES "literal string"
+.TP 5
+WITH-ALL-RESOURCES "/regular expression/"
+Requires that all URI values contain a matching resource (including leading /).
+.TP 5
+WITH-ALL-SCHEMES "literal string"
+.TP 5
+WITH-ALL-SCHEMES "/regular expression/"
+Requires that all URI values contain a matching scheme.
+.TP 5
 WITH-ALL-VALUES "literal string"
 Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
 .TP 5
@@ -319,6 +334,21 @@ Requires that all values of the EXPECT attribute match the boolean value given.
 .TP 5
 WITH-ALL-VALUES "/regular expression/"
 Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+.TP 5
+WITH-HOSTNAME "literal string"
+.TP 5
+WITH-HOSTNAME "/regular expression/"
+Requires that at least one URI value contains a matching hostname.
+.TP 5
+WITH-RESOURCE "literal string"
+.TP 5
+WITH-RESOURCE "/regular expression/"
+Requires that at least one URI value contains a matching resource (including leading /).
+.TP 5
+WITH-SCHEME "literal string"
+.TP 5
+WITH-SCHEME "/regular expression/"
+Requires that at least one URI value contains a matching scheme.
 .TP 5
 WITH-VALUE "literal string"
 Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
