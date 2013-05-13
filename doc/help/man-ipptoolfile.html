@@ -119,6 +119,13 @@ includes a file from the <i>ipptool</i> include directory.
 <dd>Specifies that the remainder of the test file should be skipped when the
 variable is or is not defined.
 </dd>
+<dt>STOP-AFTER-INCLUDE-ERROR no
+</dt>
+<dd></dd>
+<dt>STOP-AFTER-INCLUDE-ERROR yes
+</dt>
+<dd>Specifies whether tests will be stopped after an error in an included file.
+</dd>
 <dt>TRANSFER auto
 </dt>
 <dd>Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
@@ -506,6 +513,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Resume-Printer
     Schedule-Job-After
     Send-Document
+    Send-Hardcopy-Document
     Send-Notifications
     Send-URI
     Set-Job-Attributes

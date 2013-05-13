@@ -11,7 +11,8 @@
 ipptool - perform internet printing protocol requests
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>ipptool
-</b>[ -4 ] [ -6 ] [ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -T
+</b>[ --help ] [ --stop-after-include-error ] [ --version ]
+[ -4 ] [ -6 ] [ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -T
 <i>seconds
 </i>] [ -V
 <i>version
@@ -34,6 +35,14 @@ ipptool - perform internet printing protocol requests
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The following options are recognized by <i>ipptool</i>:
 <dl>
+<dt>--help
+</dt>
+<dd>Shows program help.
+--stop-after-include-error
+Tells <i>ipptool</i> to stop if an error occurs in an included file. Normally <i>ipptool</i> will continue with subsequent tests after the INCLUDE directive.
+--version
+Shows the version of <i>ipptool</i> being used.
+</dd>
 <dt>-4
 </dt>
 <dd>Specifies that <i>ipptool</i> must connect to the printer or server using IPv4.
@@ -107,6 +116,8 @@ The following options are recognized by <i>ipptool</i>:
 <dd>Specifies that all request and response attributes should be output in CUPS test mode (<i>-t</i>). This is the default for XML output.
 </dd>
 </dl>
+<h2 class="title"><a name="EXIT_CODE">Exit Code</a></h2>
+The <i>ipptool</i> program returns 0 if all tests were sucessful and 1 otherwise.
 <h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
 The <i>ipptool</i> program is unique to CUPS.
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>
@@ -130,21 +141,28 @@ The following standard files are available:
     document-letter.ps
     get-completed-jobs.test
     get-jobs.test
+    get-notifications.test
     get-printer-attributes.test
+    get-subscriptions.test
     gray.jpg
     ipp-1.1.test
     ipp-2.0.test
     ipp-2.1.test
     ipp-2.2.test
+    ipp-everywhere.test
     onepage-a4.pdf
     onepage-a4.ps
     onepage-letter.pdf
     onepage-letter.ps
     print-job.test
+    print-job-deflate.test
+    print-job-gzip.test
     testfile.jpg
+    testfile.pcl
     testfile.pdf
     testfile.ps
     testfile.txt
+    validate-job.test
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href='man-ipptoolfile.html?TOPIC=Man+Pages'>ipptoolfile(5)</a>,

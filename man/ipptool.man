@@ -11,11 +11,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "9 November 2010" "Apple Inc."
+.TH ipptool 1 "CUPS" "13 May 2013" "Apple Inc."
 .SH NAME
 ipptool - perform internet printing protocol requests
 .SH SYNOPSIS
 .B ipptool
+[ --help ] [ --stop-after-include-error ] [ --version ]
 [ -4 ] [ -6 ] [ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -T
 .I seconds
 ] [ -V
@@ -38,6 +39,13 @@ ipptool - perform internet printing protocol requests
 \fIipptool\fR sends IPP requests to the specified URI and tests and/or displays the results. Each named file defines one or more requests, including the expected response status, attributes, and values. Output is either a plain text, formatted text, CSV, or XML report on the standard output, with a non-zero exit status indicating that one or more tests have failed. The file format is described in \fIipptoolfile(5)\fR.
 .SH OPTIONS
 The following options are recognized by \fIipptool\fR:
+.TP 5
+--help
+Shows program help.
+--stop-after-include-error
+Tells \fIipptool\fR to stop if an error occurs in an included file. Normally \fIipptool\fR will continue with subsequent tests after the INCLUDE directive.
+--version
+Shows the version of \fIipptool\fR being used.
 .TP 5
 -4
 Specifies that \fIipptool\fR must connect to the printer or server using IPv4.
@@ -92,6 +100,8 @@ Specifies that CUPS test report output is desired instead of the plain text outp
 .TP 5
 -v
 Specifies that all request and response attributes should be output in CUPS test mode (\fI-t\fR). This is the default for XML output.
+.SH EXIT CODE
+The \fIipptool\fR program returns 0 if all tests were sucessful and 1 otherwise.
 .SH COMPATIBILITY
 The \fIipptool\fR program is unique to CUPS.
 .SH EXAMPLES
@@ -116,21 +126,28 @@ The following standard files are available:
     document-letter.ps
     get-completed-jobs.test
     get-jobs.test
+    get-notifications.test
     get-printer-attributes.test
+    get-subscriptions.test
     gray.jpg
     ipp-1.1.test
     ipp-2.0.test
     ipp-2.1.test
     ipp-2.2.test
+    ipp-everywhere.test
     onepage-a4.pdf
     onepage-a4.ps
     onepage-letter.pdf
     onepage-letter.ps
     print-job.test
+    print-job-deflate.test
+    print-job-gzip.test
     testfile.jpg
+    testfile.pcl
     testfile.pdf
     testfile.ps
     testfile.txt
+    validate-job.test
 .fi
 .SH SEE ALSO
 \fIipptoolfile(5)\fR,

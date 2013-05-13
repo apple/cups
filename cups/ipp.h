@@ -123,8 +123,35 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_TRIM_AFTER_DOCUMENTS,	/* Trim output after each document */
   IPP_FINISHINGS_TRIM_AFTER_COPIES,	/* Trim output after each copy */
   IPP_FINISHINGS_TRIM_AFTER_JOB,	/* Trim output after job */
+  IPP_FINISHINGS_PUNCH_TOP_LEFT = 70,	/* Punch 1 hole top left */
+  IPP_FINISHINGS_PUNCH_BOTTOM_LEFT,	/* Punch 1 hole bottom left */
+  IPP_FINISHINGS_PUNCH_TOP_RIGHT,	/* Punch 1 hole top right */
+  IPP_FINISHINGS_PUNCH_BOTTOM_RIGHT,	/* Punch 1 hole bottom right */
+  IPP_FINISHINGS_PUNCH_DUAL_LEFT,	/* Punch 2 holes left side */
+  IPP_FINISHINGS_PUNCH_DUAL_TOP,	/* Punch 2 holes top edge */
+  IPP_FINISHINGS_PUNCH_DUAL_RIGHT,	/* Punch 2 holes right side */
+  IPP_FINISHINGS_PUNCH_DUAL_BOTTOM,	/* Punch 2 holes bottom edge */
+  IPP_FINISHINGS_PUNCH_TRIPLE_LEFT,	/* Punch 3 holes left side */
+  IPP_FINISHINGS_PUNCH_TRIPLE_TOP,	/* Punch 3 holes top edge */
+  IPP_FINISHINGS_PUNCH_TRIPLE_RIGHT,	/* Punch 3 holes right side */
+  IPP_FINISHINGS_PUNCH_TRIPLE_BOTTOM,	/* Punch 3 holes bottom edge */
+  IPP_FINISHINGS_PUNCH_QUAD_LEFT,	/* Punch 4 holes left side */
+  IPP_FINISHINGS_PUNCH_QUAD_TOP,	/* Punch 4 holes top edge */
+  IPP_FINISHINGS_PUNCH_QUAD_RIGHT,	/* Punch 4 holes right side */
+  IPP_FINISHINGS_PUNCH_QUAD_BOTTOM,	/* Punch 4 holes bottom edge */
+  IPP_FINISHINGS_FOLD_ACCORDIAN = 90,	/* Accordian-fold the paper vertically into four sections */
+  IPP_FINISHINGS_FOLD_DOUBLE_GATE,	/* Fold the top and bottom quarters of the paper towards the midline, then fold in half vertically */
+  IPP_FINISHINGS_FOLD_GATE,		/* Fold the top and bottom quarters of the paper towards the midline */
+  IPP_FINISHINGS_FOLD_HALF,		/* Fold the paper in half vertically */
+  IPP_FINISHINGS_FOLD_HALF_Z,		/* Fold the paper in half horizontally, then Z-fold the paper vertically */
+  IPP_FINISHINGS_FOLD_LEFT_GATE,	/* Fold the top quarter of the paper towards the midline */
+  IPP_FINISHINGS_FOLD_LETTER,		/* Fold the paper into three sections vertically; sometimes also known as a C fold*/
+  IPP_FINISHINGS_FOLD_PARALLEL,		/* Fold the paper in half vertically two times, yielding four sections */
+  IPP_FINISHINGS_FOLD_POSTER,		/* Fold the paper in half horizontally and vertically; sometimes also called a cross fold */
+  IPP_FINISHINGS_FOLD_RIGHT_GATE,	/* Fold the bottom quarter of the paper towards the midline */
+  IPP_FINISHINGS_FOLD_Z,		/* Fold the paper vertically into three sections, forming a Z */
 
-  /* Proposed extensions for finishings */
+  /* CUPS extensions for finishings (pre-standard versions of values above) */
   IPP_FINISHINGS_CUPS_PUNCH_TOP_LEFT = 0x40000046,
 					/* Punch 1 hole top left */
   IPP_FINISHINGS_CUPS_PUNCH_BOTTOM_LEFT,/* Punch 1 hole bottom left */
@@ -262,8 +289,10 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_OP_CANCEL_MY_JOBS,		/* Cancel-My-Jobs */
   IPP_OP_RESUBMIT_JOB,			/* Resubmit-Job */
   IPP_OP_CLOSE_JOB,			/* Close-Job */
-  IPP_OP_IDENTIFY_PRINTER,		/* Identify-Printer (proposed IPP JPS3) */
-  IPP_OP_VALIDATE_DOCUMENT,		/* Validate-Document (proposed IPP JPS3) */
+  IPP_OP_IDENTIFY_PRINTER,		/* Identify-Printer @private@ */
+  IPP_OP_VALIDATE_DOCUMENT,		/* Validate-Document @private@ */
+  IPP_OP_SEND_HARDCOPY_DOCUMENT,	/* Send-Hardcopy-Document @private@ */
+
   IPP_OP_PRIVATE = 0x4000,		/* Reserved @private@ */
   IPP_OP_CUPS_GET_DEFAULT,		/* Get the default printer */
   IPP_OP_CUPS_GET_PRINTERS,		/* Get a list of printers and/or classes */

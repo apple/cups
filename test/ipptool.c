@@ -156,6 +156,8 @@ _cups_output_t	Output = _CUPS_OUTPUT_LIST;
 					/* Output mode */
 int		Cancel = 0,		/* Cancel test? */
 		IgnoreErrors = 0,	/* Ignore errors? */
+		StopAfterIncludeError = 0,
+					/* Stop after include errors? */
 		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0,		/* 1 if header is written */
@@ -282,7 +284,20 @@ main(int  argc,				/* I - Number of command-line args */
 
   for (i = 1; i < argc; i ++)
   {
-    if (argv[i][0] == '-')
+    if (!strcmp(argv[i], "--help"))
+    {
+      usage();
+    }
+    else if (!strcmp(argv[i], "--stop-after-include-error"))
+    {
+      StopAfterIncludeError = 1;
+    }
+    else if (!strcmp(argv[i], "--version"))
+    {
+      puts(CUPS_SVERSION);
+      return (0);
+    }
+    else if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
       {
@@ -949,7 +964,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  pass = 0;
 
-	  if (!IgnoreErrors)
+	  if (StopAfterIncludeError)
 	    goto test_exit;
 	}
       }
@@ -983,7 +998,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  pass = 0;
 
-	  if (!IgnoreErrors)
+	  if (StopAfterIncludeError)
 	    goto test_exit;
 	}
       }
@@ -1018,7 +1033,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  pass = 0;
 
-	  if (!IgnoreErrors)
+	  if (StopAfterIncludeError)
 	    goto test_exit;
 	}
       }
@@ -1070,6 +1085,28 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	pass = 0;
 	goto test_exit;
       }
+    }
+    else if (!strcmp(token, "STOP-AFTER-INCLUDE-ERROR"))
+    {
+     /*
+      * STOP-AFTER-INCLUDE-ERROR yes
+      * STOP-AFTER-INCLUDE-ERROR no
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum) &&
+          (!_cups_strcasecmp(temp, "yes") || !_cups_strcasecmp(temp, "no")))
+      {
+        StopAfterIncludeError = !_cups_strcasecmp(temp, "yes");
+      }
+      else
+      {
+        print_fatal_error("Missing STOP-AFTER-INCLUDE-ERROR value on line %d.",
+                          linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      continue;
     }
     else if (!strcmp(token, "TRANSFER"))
     {

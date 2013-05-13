@@ -1,5 +1,11 @@
-CHANGES.txt - 1.7b1 - 2013-04-18
+CHANGES.txt - 1.7b1 - 2013-05-13
 --------------------------------
+
+CHANGES IN CUPS V1.7b2
+
+	- The ipptool program did not continue past include file errors by
+	  default (<rdar://problem/13875803>)
+
 
 CHANGES IN CUPS V1.7b1
 

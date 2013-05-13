@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "10 January 2013" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "13 May 2013" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -110,6 +110,11 @@ SKIP-IF-DEFINED variable-name
 SKIP-IF-NOT-DEFINED variable-name
 Specifies that the remainder of the test file should be skipped when the
 variable is or is not defined.
+.TP 5
+STOP-AFTER-INCLUDE-ERROR no
+.TP 5
+STOP-AFTER-INCLUDE-ERROR yes
+Specifies whether tests will be stopped after an error in an included file.
 .TP 5
 TRANSFER auto
 Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
@@ -415,6 +420,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Resume-Printer
     Schedule-Job-After
     Send-Document
+    Send-Hardcopy-Document
     Send-Notifications
     Send-URI
     Set-Job-Attributes
