@@ -78,6 +78,9 @@ DEFINE-DEFAULT variable-name value
 Defines the named variable to the given value if it does not already have a
 value.
 .TP 5
+FILE-ID "identifier"
+Specifies an identifier string for the current file.
+.TP 5
 IGNORE-ERRORS yes
 .TP 5
 IGNORE-ERRORS no
@@ -226,6 +229,9 @@ STATUS status-code [ predicate ]
 Specifies an expected response status-code value. Additional requirements can be
 added as predicates - see the "STATUS PREDICATES" section for more information
 on predicates.
+.TP 5
+TEST-ID "identifier"
+Specifies an identifier string for the current test.
 .TP 5
 TRANSFER auto
 Specifies that this test will use "Transfer-Encoding: chunked" if it has an

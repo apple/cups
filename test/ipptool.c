@@ -807,7 +807,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   ipp_attribute_t *attrptr,		/* Attribute pointer */
 		*found,			/* Found attribute */
 		*lastcol = NULL;	/* Last collection attribute */
-  char		name[1024];		/* Name of test */
+  char		name[1024],		/* Name of test */
+		file_id[1024],		/* File identifier */
+		test_id[1024];		/* Test identifier */
   char		filename[1024];		/* Filename */
   _cups_transfer_t transfer;		/* To chunk or not to chunk */
   int		version,		/* IPP version number to use */
@@ -870,6 +872,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
   errors     = cupsArrayNew3(NULL, NULL, NULL, 0, (cups_acopy_func_t)strdup,
                              (cups_afree_func_t)free);
+  file_id[0] = '\0';
   pass       = 1;
   linenum    = 1;
   request_id = (CUPS_RAND() % 1000) * 137 + 1;
@@ -919,6 +922,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
         print_fatal_error("Missing DEFINE-DEFAULT name and/or value on line "
 	                  "%d.", linenum);
+	pass = 0;
+	goto test_exit;
+      }
+
+      continue;
+    }
+    else if (!strcmp(token, "FILE-ID"))
+    {
+     /*
+      * FILE-ID "string"
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        expand_variables(vars, file_id, temp, sizeof(file_id));
+      }
+      else
+      {
+        print_fatal_error("Missing FILE-ID value on line %d.", linenum);
 	pass = 0;
 	goto test_exit;
       }
@@ -1204,6 +1226,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     filename[0]    = '\0';
     skip_previous  = 0;
     skip_test      = 0;
+    test_id[0]     = '\0';
     version        = Version;
     transfer       = Transfer;
     compression[0] = '\0';
@@ -1481,6 +1504,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  print_fatal_error("Missing SKIP-PREVIOUS-ERROR value on line %d.", linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+	continue;
+      }
+      else if (!strcmp(token, "TEST-ID"))
+      {
+       /*
+	* TEST-ID "string"
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  expand_variables(vars, test_id, temp, sizeof(test_id));
+	}
+	else
+	{
+	  print_fatal_error("Missing TEST-ID value on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -2348,8 +2390,22 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<dict>");
       puts("<key>Name</key>");
       print_xml_string("string", name);
+      if (file_id[0])
+      {
+	puts("<key>FileId</key>");
+	print_xml_string("string", file_id);
+      }
+      if (test_id[0])
+      {
+        puts("<key>TestId</key>");
+        print_xml_string("string", test_id);
+      }
+      puts("<key>Version</key>");
+      printf("<string>%d.%d</string>\n", version / 10, version % 10);
       puts("<key>Operation</key>");
       print_xml_string("string", ippOpString(op));
+      puts("<key>RequestId</key>");
+      printf("<integer>%d</integer>\n", request_id);
       puts("<key>RequestAttributes</key>");
       puts("<array>");
       if (request->attrs)
@@ -4406,6 +4462,8 @@ print_xml_header(void)
          "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
     puts("<plist version=\"1.0\">");
     puts("<dict>");
+    puts("<key>ipptoolVersion</key>");
+    puts("<string>" CUPS_SVERSION "</string>");
     puts("<key>Transfer</key>");
     printf("<string>%s</string>\n",
            Transfer == _CUPS_TRANSFER_AUTO ? "auto" :
