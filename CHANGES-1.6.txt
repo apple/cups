@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- The USB backend could crash on libusb-based systems if USB was
+	  disabled in the BIOS (<rdar://problem/13875729>)
 	- Fixed a rounding error in the PWG media size mapping code
 	  (<rdar://problem/13493241>)
 	- Fixed several ipptool test files that used old STATUS names.
