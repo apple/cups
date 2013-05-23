@@ -29,6 +29,7 @@
  *   pwg_compare_pwg()	      - Compare two sizes using the PWG names.
  *   pwg_format_inches()      - Convert and format PWG units as inches.
  *   pwg_format_millimeters() - Convert and format PWG units as millimeters.
+ *   pwg_scan_measurement()   - Scan a measurement in inches or millimeters.
  */
 
 /*
@@ -56,6 +57,8 @@ static int	pwg_compare_pwg(pwg_media_t *a, pwg_media_t *b);
 static int	pwg_compare_ppd(pwg_media_t *a, pwg_media_t *b);
 static char	*pwg_format_inches(char *buf, size_t bufsize, int val);
 static char	*pwg_format_millimeters(char *buf, size_t bufsize, int val);
+static int	pwg_scan_measurement(const char *buf, char **bufptr, int numer,
+		                     int denom);
 
 
 /*
@@ -706,72 +709,96 @@ pwgMediaForPPD(const char *ppd)		/* I - PPD size name */
     *   [Custom.]WIDTHxLENGTHpt[.FullBleed]  - Size in points [borderless]
     */
 
-    double		w, l,		/* Width and length of page */
-			factor;		/* Unit scaling factor */
+    int			w, l,		/* Width and length of page */
+			numer,		/* Unit scaling factor */
+			denom;		/* ... */
     char		*ptr;		/* Pointer into name */
-    struct lconv	*loc;		/* Locale data */
+    const char		*units;		/* Pointer to units */
     int			custom;		/* Custom page size? */
+
 
     if (!_cups_strncasecmp(ppd, "Custom.", 7))
     {
       custom = 1;
-      factor = 2540.0 / 72.0;
+      numer  = 2540;
+      denom  = 72;
       ptr    = (char *)ppd + 7;
     }
     else
     {
       custom = 0;
-      factor = 2540.0;
+      numer  = 2540;
+      denom  = 1;
       ptr    = (char *)ppd;
     }
 
-    loc = localeconv();
-    w   = _cupsStrScand(ptr, &ptr, loc);
+   /*
+    * Find any units in the size...
+    */
+
+    units = strchr(ptr, '.');
+    while (units && isdigit(units[1] & 255))
+      units = strchr(units + 1, '.');
+
+    if (units)
+      units -= 2;
+    else
+      units = ptr + strlen(ptr) - 2;
+
+    if (units > ptr)
+    {
+      if (isdigit(*units & 255) || *units == '.')
+        units ++;
+
+      if (!_cups_strncasecmp(units, "cm", 2))
+      {
+        numer = 1000;
+        denom = 1;
+      }
+      else if (!_cups_strncasecmp(units, "ft", 2))
+      {
+        numer = 2540 * 12;
+        denom = 1;
+      }
+      else if (!_cups_strncasecmp(units, "in", 2))
+      {
+	numer = 2540;
+        denom = 1;
+      }
+      else if (!_cups_strncasecmp(units, "mm", 2))
+      {
+        numer = 100;
+        denom = 1;
+      }
+      else if (*units == 'm' || *units == 'M')
+      {
+	numer = 100000;
+        denom = 1;
+      }
+      else if (!_cups_strncasecmp(units, "pt", 2))
+      {
+	numer = 2540;
+	denom = 72;
+      }
+    }
+
+    w = pwg_scan_measurement(ptr, &ptr, numer, denom);
 
     if (ptr && ptr > ppd && *ptr == 'x')
     {
-      l = _cupsStrScand(ptr + 1, &ptr, loc);
+      l = pwg_scan_measurement(ptr + 1, &ptr, numer, denom);
 
-      if (ptr &&
-	  (!*ptr ||
-	   !_cups_strcasecmp(ptr, "FullBleed") ||
-	   !_cups_strcasecmp(ptr, ".FullBleed") ||
-	   !_cups_strcasecmp(ptr, "cm") ||
-	   !_cups_strcasecmp(ptr, "cm.FullBleed") ||
-	   !_cups_strcasecmp(ptr, "ft") ||
-	   !_cups_strcasecmp(ptr, "ft.FullBleed") ||
-	   !_cups_strcasecmp(ptr, "in") ||
-	   !_cups_strcasecmp(ptr, "in.FullBleed") ||
-	   !_cups_strcasecmp(ptr, "m") ||
-	   !_cups_strcasecmp(ptr, "m.FullBleed") ||
-	   !_cups_strcasecmp(ptr, "mm") ||
-	   !_cups_strcasecmp(ptr, "mm.FullBleed") ||
-	   !_cups_strcasecmp(ptr, "pt") ||
-	   !_cups_strcasecmp(ptr, "pt.FullBleed")))
+      if (ptr)
       {
-	size = &(cg->pwg_media);
-
-	if (!_cups_strncasecmp(ptr, "cm", 2))
-	  factor = 1000.0;
-	else if (!_cups_strncasecmp(ptr, "ft", 2))
-	  factor = 2540.0 * 12.0;
-	else if (!_cups_strncasecmp(ptr, "in", 2))
-	  factor = 2540.0;
-	else if (!_cups_strncasecmp(ptr, "mm", 2))
-	  factor = 100.0;
-	else if (*ptr == 'm' || *ptr == 'M')
-	  factor = 100000.0;
-	else if (!_cups_strncasecmp(ptr, "pt", 2))
-	  factor = 2540.0 / 72.0;
-
        /*
 	* Not a standard size; convert it to a PWG custom name of the form:
 	*
 	*     [oe|om]_WIDTHxHEIGHTuu_WIDTHxHEIGHTuu
 	*/
 
-	size->width  = (int)(w * factor);
-	size->length = (int)(l * factor);
+	size         = &(cg->pwg_media);
+	size->width  = w;
+	size->length = l;
 	size->pwg    = cg->pwg_name;
 
 	pwgFormatSizeName(cg->pwg_name, sizeof(cg->pwg_name),
@@ -851,31 +878,29 @@ pwgMediaForPWG(const char *pwg)		/* I - PWG size name */
     * class_name_WWWxHHHmm
     */
 
-    double		w, l;		/* Width and length of page */
-    struct lconv	*loc;		/* Locale data */
+    int		w, l;			/* Width and length of page */
+    int		numer;			/* Scale factor for units */
+    const char	*units = ptr + strlen(ptr) - 2;
+					/* Units from size */
 
     ptr ++;
-    loc = localeconv();
-    w   = _cupsStrScand(ptr, &ptr, loc);
+
+    if (units >= ptr && !strcmp(units, "in"))
+      numer = 2540;
+    else
+      numer = 100;
+
+    w = pwg_scan_measurement(ptr, &ptr, numer, 1);
 
     if (ptr && *ptr == 'x')
     {
-      l = _cupsStrScand(ptr + 1, &ptr, loc);
+      l = pwg_scan_measurement(ptr + 1, &ptr, numer, 1);
 
-      if (ptr && (!strcmp(ptr, "in") || !strcmp(ptr, "mm")))
+      if (ptr)
       {
-	size = &(cg->pwg_media);
-
-	if (!strcmp(ptr, "mm"))
-	{
-	  size->width  = (int)(w * 100 + 0.5);
-	  size->length = (int)(l * 100 + 0.5);
-	}
-	else
-	{
-	  size->width  = (int)(w * 2540 + 0.5);
-	  size->length = (int)(l * 2540 + 0.5);
-	}
+        size         = &(cg->pwg_media);
+        size->width  = w;
+        size->length = l;
 
         strlcpy(cg->pwg_name, pwg, sizeof(cg->pwg_name));
 	size->pwg = cg->pwg_name;
@@ -1088,6 +1113,62 @@ pwg_format_millimeters(char   *buf,	/* I - Buffer */
     snprintf(buf, bufsize, "%d.%01d", integer, fraction / 10);
 
   return (buf);
+}
+
+
+/*
+ * 'pwg_scan_measurement()' - Scan a measurement in inches or millimeters.
+ *
+ * The "factor" argument specifies the scale factor for the units to convert to
+ * hundredths of millimeters.  The returned value is NOT rounded but is an
+ * exact conversion of the fraction value (no floating point is used).
+ */
+
+static int				/* O - Hundredths of millimeters */
+pwg_scan_measurement(
+    const char *buf,			/* I - Number string */
+    char       **bufptr,		/* O - First byte after the number */
+    int        numer,			/* I - Numerator from units */
+    int        denom)			/* I - Denominator from units */
+{
+  int	value = 0,			/* Measurement value */
+	divisor = 1,			/* Fractional divisor */
+	digits = 10 * numer * denom;	/* Maximum fractional value to read */
+
+
+ /*
+  * Scan integer portion...
+  */
+
+  while (*buf >= '0' && *buf <= '9')
+    value = value * 10 + (*buf++) - '0';
+
+  if (*buf == '.')
+  {
+   /*
+    * Scan fractional portion...
+    */
+
+    buf ++;
+
+    while (divisor < digits && *buf >= '0' && *buf <= '9')
+    {
+      value = value * 10 + (*buf++) - '0';
+      divisor *= 10;
+    }
+
+   /*
+    * Skip trailing digits that won't contribute...
+    */
+
+    while (*buf >= '0' && *buf <= '9')
+      buf ++;
+  }
+
+  if (bufptr)
+    *bufptr = (char *)buf;
+
+  return (value * numer / denom / divisor);
 }
 
 
