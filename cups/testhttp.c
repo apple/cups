@@ -40,7 +40,8 @@ typedef struct uri_test_s		/**** URI test cases ****/
 			*hostname,	/* Hostname string */
 			*resource;	/* Resource string */
   int			port,		/* Port number */
-			assemble_port;	/* Port number for httpAssembleURI() */
+			assemble_port,	/* Port number for httpAssembleURI() */
+			assemble_coding;/* Coding for httpAssembleURI() */
 } uri_test_t;
 
 
@@ -52,97 +53,137 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			{
 			  /* Start with valid URIs */
 			  { HTTP_URI_STATUS_OK, "file:/filename",
-			    "file", "", "", "/filename", 0, 0 },
+			    "file", "", "", "/filename", 0, 0,
+			    HTTP_URI_CODING_MOST },
 			  { HTTP_URI_STATUS_OK, "file:/filename%20with%20spaces",
-			    "file", "", "", "/filename with spaces", 0, 0 },
+			    "file", "", "", "/filename with spaces", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "file:///filename",
-			    "file", "", "", "/filename", 0, 0 },
+			    "file", "", "", "/filename", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "file:///filename%20with%20spaces",
-			    "file", "", "", "/filename with spaces", 0, 0 },
+			    "file", "", "", "/filename with spaces", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "file://localhost/filename",
-			    "file", "", "localhost", "/filename", 0, 0 },
+			    "file", "", "localhost", "/filename", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "file://localhost/filename%20with%20spaces",
-			    "file", "", "localhost", "/filename with spaces", 0, 0 },
+			    "file", "", "localhost", "/filename with spaces", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://server/",
-			    "http", "", "server", "/", 80, 0 },
+			    "http", "", "server", "/", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://username@server/",
-			    "http", "username", "server", "/", 80, 0 },
+			    "http", "username", "server", "/", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server/",
-			    "http", "username:password", "server", "/", 80, 0 },
+			    "http", "username:password", "server", "/", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server:8080/",
-			    "http", "username:password", "server", "/", 8080, 8080 },
+			    "http", "username:password", "server", "/", 8080, 8080,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://username:passwor%64@server:8080/directory/filename",
-			    "http", "username:password", "server", "/directory/filename", 8080, 8080 },
+			    "http", "username:password", "server", "/directory/filename", 8080, 8080,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "http://[2000::10:100]:631/ipp",
-			    "http", "", "2000::10:100", "/ipp", 631, 631 },
+			    "http", "", "2000::10:100", "/ipp", 631, 631,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "https://username:passwor%64@server/directory/filename",
-			    "https", "username:password", "server", "/directory/filename", 443, 0 },
+			    "https", "username:password", "server", "/directory/filename", 443, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://username:passwor%64@[::1]/ipp",
-			    "ipp", "username:password", "::1", "/ipp", 631, 0 },
+			    "ipp", "username:password", "::1", "/ipp", 631, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "lpd://server/queue?reserve=yes",
-			    "lpd", "", "server", "/queue?reserve=yes", 515, 0 },
+			    "lpd", "", "server", "/queue?reserve=yes", 515, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "mailto:user@domain.com",
-			    "mailto", "", "", "user@domain.com", 0, 0 },
+			    "mailto", "", "", "user@domain.com", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "socket://server/",
-			    "socket", "", "server", "/", 9100, 0 },
+			    "socket", "", "server", "/", 9100, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "socket://192.168.1.1:9101/",
-			    "socket", "", "192.168.1.1", "/", 9101, 9101 },
+			    "socket", "", "192.168.1.1", "/", 9101, 9101,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://username:password@[v1.fe80::200:1234:5678:9abc+eth0]:999/ipp",
-			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
+			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999,
+			    HTTP_URI_CODING_MOST  },
+			  { HTTP_URI_STATUS_OK, "ipp://username:password@[fe80::200:1234:5678:9abc%25eth0]:999/ipp",
+			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999,
+			    HTTP_URI_CODING_MOST | HTTP_URI_CODING_RFC6874 },
 			  { HTTP_URI_STATUS_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
-			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0 },
+			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "lpd://Acme%20Laser%20(01%3A23%3A45).local._tcp._printer/",
-			    "lpd", "", "Acme Laser (01:23:45).local._tcp._printer", "/", 515, 0 },
+			    "lpd", "", "Acme Laser (01:23:45).local._tcp._printer", "/", 515, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://HP%20Officejet%204500%20G510n-z%20%40%20Will's%20MacBook%20Pro%2015%22._ipp._tcp.local./",
-			    "ipp", "", "HP Officejet 4500 G510n-z @ Will's MacBook Pro 15\"._ipp._tcp.local.", "/", 631, 0 },
+			    "ipp", "", "HP Officejet 4500 G510n-z @ Will's MacBook Pro 15\"._ipp._tcp.local.", "/", 631, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Missing scheme */
 			  { HTTP_URI_STATUS_MISSING_SCHEME, "/path/to/file/index.html",
-			    "file", "", "", "/path/to/file/index.html", 0, 0 },
+			    "file", "", "", "/path/to/file/index.html", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_MISSING_SCHEME, "//server/ipp",
-			    "ipp", "", "server", "/ipp", 631, 0 },
+			    "ipp", "", "server", "/ipp", 631, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Unknown scheme */
 			  { HTTP_URI_STATUS_UNKNOWN_SCHEME, "vendor://server/resource",
-			    "vendor", "", "server", "/resource", 0, 0 },
+			    "vendor", "", "server", "/resource", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Missing resource */
 			  { HTTP_URI_STATUS_MISSING_RESOURCE, "socket://[::192.168.2.1]",
-			    "socket", "", "::192.168.2.1", "/", 9100, 0 },
+			    "socket", "", "::192.168.2.1", "/", 9100, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_MISSING_RESOURCE, "socket://192.168.1.1:9101",
-			    "socket", "", "192.168.1.1", "/", 9101 },
+			    "socket", "", "192.168.1.1", "/", 9101, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad URI */
 			  { HTTP_URI_STATUS_BAD_URI, "",
-			    "", "", "", "", 0, 0 },
+			    "", "", "", "", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad scheme */
 			  { HTTP_URI_STATUS_BAD_SCHEME, "bad_scheme://server/resource",
-			    "", "", "", "", 0, 0 },
+			    "", "", "", "", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad username */
 			  { HTTP_URI_STATUS_BAD_USERNAME, "http://username:passwor%6@server/resource",
-			    "http", "", "", "", 80, 0 },
+			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad hostname */
 			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://[/::1]/index.html",
-			    "http", "", "", "", 80, 0 },
+			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://[",
-			    "http", "", "", "", 80, 0 },
+			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://serve%7/index.html",
-			    "http", "", "", "", 80, 0 },
+			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://server with spaces/index.html",
-			    "http", "", "", "", 80, 0 },
+			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad port number */
 			  { HTTP_URI_STATUS_BAD_PORT, "http://127.0.0.1:9999a/index.html",
-			    "http", "", "127.0.0.1", "", 0, 0 },
+			    "http", "", "127.0.0.1", "", 0, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad resource */
 			  { HTTP_URI_STATUS_BAD_RESOURCE, "http://server/index.html%",
-			    "http", "", "server", "", 80, 0 },
+			    "http", "", "server", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_RESOURCE, "http://server/index with spaces.html",
-			    "http", "", "server", "", 80, 0 }
+			    "http", "", "server", "", 80, 0,
+			    HTTP_URI_CODING_MOST  }
 			};
 static const char * const base64_tests[][2] =
 			{
@@ -412,7 +453,7 @@ main(int  argc,				/* I - Number of command-line arguments */
           strstr(uri_tests[i].uri, "//"))
       {
         k ++;
-	uri_status = httpAssembleURI(HTTP_URI_CODING_MOST,
+	uri_status = httpAssembleURI(uri_tests[i].assemble_coding,
 				     buffer, sizeof(buffer),
 	                             uri_tests[i].scheme,
 				     uri_tests[i].username,

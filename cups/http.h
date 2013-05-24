@@ -383,7 +383,8 @@ typedef enum http_uri_coding_e		/**** URI en/decode flags ****/
   HTTP_URI_CODING_RESOURCE = 4,		/* En/decode the resource portion */
   HTTP_URI_CODING_MOST = 7,		/* En/decode all but the query */
   HTTP_URI_CODING_QUERY = 8,		/* En/decode the query portion */
-  HTTP_URI_CODING_ALL = 15		/* En/decode everything */
+  HTTP_URI_CODING_ALL = 15,		/* En/decode everything */
+  HTTP_URI_CODING_RFC6874 = 16		/* Use RFC 6874 address format */
 } http_uri_coding_t;
 
 typedef enum http_version_e		/**** HTTP version numbers ****/

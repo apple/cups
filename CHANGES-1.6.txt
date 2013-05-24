@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- Added support for RFC 6874's IPv6 link local address format in URIs
+	  (<rdar://problem/13979453>)
 	- The USB backend could crash on libusb-based systems if USB was
 	  disabled in the BIOS (<rdar://problem/13875729>)
 	- Fixed a rounding error in the PWG media size mapping code

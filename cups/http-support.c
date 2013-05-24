@@ -272,7 +272,7 @@ httpAssembleURI(
       * We have a raw IPv6 address...
       */
 
-      if (strchr(host, '%'))
+      if (strchr(host, '%') && !(encoding & HTTP_URI_CODING_RFC6874))
       {
        /*
         * We have a link-local address, add "[v1." prefix...
@@ -307,8 +307,23 @@ httpAssembleURI(
       while (ptr < end && *host)
       {
         if (*host == '%')
-	{
-          *ptr++ = '+';			/* Convert zone separator */
+        {
+         /*
+          * Convert/encode zone separator
+          */
+
+          if (encoding & HTTP_URI_CODING_RFC6874)
+          {
+            if (ptr >= (end - 2))
+              goto assemble_overflow;
+
+            *ptr++ = '%';
+            *ptr++ = '2';
+            *ptr++ = '5';
+          }
+          else
+	    *ptr++ = '+';
+
 	  host ++;
 	}
 	else
@@ -1097,8 +1112,25 @@ httpSeparateURI(
       */
 
       uri ++;
-      if (!strncmp(uri, "v1.", 3))
-        uri += 3;			/* Skip IPvN leader... */
+      if (*uri == 'v')
+      {
+       /*
+        * Skip IPvFuture ("vXXXX.") prefix...
+        */
+
+        uri ++;
+
+        while (isxdigit(*uri & 255))
+          uri ++;
+
+        if (*uri != '.')
+        {
+	  *host = '\0';
+	  return (HTTP_URI_STATUS_BAD_HOSTNAME);
+        }
+
+        uri ++;
+      }
 
       uri = http_copy_decode(host, uri, hostlen, "]",
                              decoding & HTTP_URI_CODING_HOSTNAME);
@@ -1129,6 +1161,14 @@ httpSeparateURI(
 	  */
 
 	  *ptr = '%';
+	  break;
+	}
+	else if (*ptr == '%')
+	{
+	 /*
+	  * Stop at zone separator (RFC 6874)
+	  */
+
 	  break;
 	}
 	else if (*ptr != ':' && *ptr != '.' && !isxdigit(*ptr & 255))
