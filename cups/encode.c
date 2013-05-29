@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 7696 2008-06-26 00:54:42Z mike $"
+ * "$Id$"
  *
  *   Option encoding routines for CUPS.
  *
@@ -872,5 +872,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 7696 2008-06-26 00:54:42Z mike $".
+ * End of "$Id$".
  */

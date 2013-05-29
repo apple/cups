@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Configuration file for CUPS on Windows.
  *
@@ -771,5 +771,5 @@ static __inline int _cups_abs(int i) { return (i < 0 ? -i : i); }
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

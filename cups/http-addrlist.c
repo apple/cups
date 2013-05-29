@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addrlist.c 7910 2008-09-06 00:25:17Z mike $"
+ * "$Id$"
  *
  *   HTTP address list routines for CUPS.
  *
@@ -882,5 +882,5 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
 
 /*
- * End of "$Id: http-addrlist.c 7910 2008-09-06 00:25:17Z mike $".
+ * End of "$Id$".
  */

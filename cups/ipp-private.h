@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-private.h 7259 2008-01-28 22:26:04Z mike $"
+ * "$Id$"
  *
  *   Private IPP definitions for CUPS.
  *
@@ -77,5 +77,5 @@ extern _ipp_option_t	*_ippFindOption(const char *name);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp-private.h 7259 2008-01-28 22:26:04Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 7881 2008-08-28 20:21:56Z mike $"
+ * "$Id$"
  *
  *   AppSocket backend for CUPS.
  *
@@ -520,5 +520,5 @@ wait_bc(int device_fd,			/* I - Socket */
 
 
 /*
- * End of "$Id: socket.c 7881 2008-08-28 20:21:56Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Printer class definitions for the CUPS scheduler.
  *
@@ -31,5 +31,5 @@ extern void		cupsdSaveAllClasses(void);
 
 
 /*
- * End of "$Id: classes.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

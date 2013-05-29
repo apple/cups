@@ -1,5 +1,5 @@
 /*
- * "$Id: lp.c 7170 2008-01-04 02:21:30Z mike $"
+ * "$Id$"
  *
  *   "lp" command for CUPS.
  *
@@ -731,5 +731,5 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
 
 /*
- * End of "$Id: lp.c 7170 2008-01-04 02:21:30Z mike $".
+ * End of "$Id$".
  */

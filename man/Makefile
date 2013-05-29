@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7930 2008-09-10 22:25:54Z mike $"
+# "$Id$"
 #
 #   Man page makefile for CUPS.
 #
@@ -237,5 +237,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 7930 2008-09-10 22:25:54Z mike $".
+# End of "$Id$".
 #

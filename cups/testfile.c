@@ -1,5 +1,5 @@
 /*
- * "$Id: testfile.c 7720 2008-07-11 22:46:21Z mike $"
+ * "$Id$"
  *
  *   File test program for CUPS.
  *
@@ -817,5 +817,5 @@ read_write_tests(int compression)	/* I - Use compression? */
 
 
 /*
- * End of "$Id: testfile.c 7720 2008-07-11 22:46:21Z mike $".
+ * End of "$Id$".
  */

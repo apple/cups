@@ -1,5 +1,5 @@
 /*
- * "$Id: lprm.c 7261 2008-01-28 23:09:31Z mike $"
+ * "$Id$"
  *
  *   "lprm" command for CUPS.
  *
@@ -213,5 +213,5 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lprm.c 7261 2008-01-28 23:09:31Z mike $".
+ * End of "$Id$".
  */

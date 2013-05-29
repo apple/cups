@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi-private.h 7940 2008-09-16 00:45:16Z mike $"
+ * "$Id$"
  *
  *   Private CGI definitions for CUPS.
  *
@@ -32,5 +32,5 @@
 
 
 /*
- * End of "$Id: cgi-private.h 7940 2008-09-16 00:45:16Z mike $".
+ * End of "$Id$".
  */

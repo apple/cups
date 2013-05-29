@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# "$Id: cups-config.in 9926 2011-08-27 09:23:01Z mike $"
+# "$Id$"
 #
 #   CUPS configuration utility.
 #
@@ -142,5 +142,5 @@ while test $# -gt 0; do
 done
 
 #
-# End of "$Id: cups-config.in 9926 2011-08-27 09:23:01Z mike $".
+# End of "$Id$".
 #

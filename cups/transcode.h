@@ -1,5 +1,5 @@
 /*
- * "$Id: transcode.h 7026 2007-10-19 00:57:45Z mike $"
+ * "$Id$"
  *
  *   Transcoding definitions for CUPS.
  *
@@ -77,5 +77,5 @@ extern int	cupsUTF32ToUTF8(cups_utf8_t *dest,
 
 
 /*
- * End of "$Id: transcode.h 7026 2007-10-19 00:57:45Z mike $"
+ * End of "$Id$"
  */

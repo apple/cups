@@ -1,5 +1,5 @@
 /*
- * "$Id: testtemplate.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   CGI template test program for CUPS.
  *
@@ -99,5 +99,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testtemplate.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.h 7824 2008-08-01 21:11:55Z mike $"
+ * "$Id$"
  *
  *   Subscription definitions for the CUPS scheduler.
  *
@@ -162,5 +162,5 @@ extern void	cupsdStopAllNotifiers(void);
 
 
 /*
- * End of "$Id: subscriptions.h 7824 2008-08-01 21:11:55Z mike $".
+ * End of "$Id$".
  */

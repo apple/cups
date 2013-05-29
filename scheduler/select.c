@@ -1,5 +1,5 @@
 /*
- * "$Id: select.c 7720 2008-07-11 22:46:21Z mike $"
+ * "$Id$"
  *
  *   Select abstraction functions for the CUPS scheduler.
  *
@@ -30,6 +30,7 @@
  */
 
 #include "cupsd.h"
+#undef HAVE_KQUEUE
 
 #ifdef HAVE_EPOLL
 #  include <sys/epoll.h>
@@ -267,7 +268,7 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
   * Range check input...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdAddSelect(fd=%d, read_cb=%p, write_cb=%p, data=%p)",
 		  fd, read_cb, write_cb, data);
 
@@ -722,7 +723,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   * Range check input...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdRemoveSelect(fd=%d)", fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdRemoveSelect(fd=%d)", fd);
 
   if (fd < 0)
     return;
@@ -812,7 +813,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
 void
 cupsdStartSelect(void)
 {
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartSelect()");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStartSelect()");
 
   cupsd_fds = cupsArrayNew((cups_array_func_t)compare_fds, NULL);
 
@@ -850,7 +851,7 @@ cupsdStopSelect(void)
   _cupsd_fd_t	*fdptr;			/* Current file descriptor */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStopSelect()");
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdStopSelect()");
 
   for (fdptr = (_cupsd_fd_t *)cupsArrayFirst(cupsd_fds);
        fdptr;
@@ -946,5 +947,5 @@ find_fd(int fd)				/* I - File descriptor */
 
 
 /*
- * End of "$Id: select.c 7720 2008-07-11 22:46:21Z mike $".
+ * End of "$Id$".
  */

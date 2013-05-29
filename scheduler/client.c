@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 10886 2013-03-08 17:56:02Z mike $"
+ * "$Id$"
  *
  *   Client routines for the CUPS scheduler.
  *
@@ -2817,7 +2817,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   ipp_state_t	ipp_state;		/* IPP state value */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
 		  "[Client %d] cupsdWriteClient "
 		  "error=%d, "
 		  "used=%d, "
@@ -2882,7 +2882,9 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       * Write a single attribute or the IPP message header...
       */
 
-      ipp_state = ippWrite(HTTP(con), con->response);
+//      ipp_state = ippWrite(HTTP(con), con->response);
+      ipp_state = ippWriteIO(HTTP(con), (ipp_iocb_t)httpWrite2, 1, NULL,
+                             con->response);
 
      /*
       * If the write buffer has been flushed, stop buffering up attributes...
@@ -2892,6 +2894,11 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
         break;
     }
     while (ipp_state != IPP_STATE_DATA && ipp_state != IPP_STATE_ERROR);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "[Client %d] Writing IPP response, ipp_state=%d, old "
+                    "wused=%d, new wused=%d", con->http.fd, ipp_state, wused,
+                    con->http.wused);
 
     if (con->http.wused > 0)
       httpFlushWrite(HTTP(con));
@@ -4341,5 +4348,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 10886 2013-03-08 17:56:02Z mike $".
+ * End of "$Id$".
  */

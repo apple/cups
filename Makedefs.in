@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 7900 2008-09-03 13:47:57Z mike $"
+# "$Id$"
 #
 #   Common makefile definitions for CUPS.
 #
@@ -258,5 +258,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 7900 2008-09-03 13:47:57Z mike $"
+# End of "$Id$"
 #

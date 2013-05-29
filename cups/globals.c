@@ -1,5 +1,5 @@
 /*
- * "$Id: globals.c 7870 2008-08-27 18:14:10Z mike $"
+ * "$Id$"
  *
  *   Global variable access routines for CUPS.
  *
@@ -393,5 +393,5 @@ cups_globals_init(void)
 
 
 /*
- * End of "$Id: globals.c 7870 2008-08-27 18:14:10Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 9759 2011-05-11 03:24:33Z mike $"
+ * "$Id$"
  *
  *   IPP backend for CUPS.
  *
@@ -3669,5 +3669,5 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
 }
 
 /*
- * End of "$Id: ipp.c 9759 2011-05-11 03:24:33Z mike $".
+ * End of "$Id$".
  */

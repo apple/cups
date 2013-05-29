@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 9371 2010-11-17 06:21:32Z mike $"
+ * "$Id$"
  *
  *   Internet Printing Protocol support functions for CUPS.
  *
@@ -2248,5 +2248,5 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
 
 
 /*
- * End of "$Id: ipp-support.c 9371 2010-11-17 06:21:32Z mike $".
+ * End of "$Id$".
  */
