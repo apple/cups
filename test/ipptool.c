@@ -4744,14 +4744,34 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
  */
 
 static int				/* O - 1 to continue, 0 to cancel */
-timeout_cb(http_t *http,		/* I - Connection to server (unused) */
+timeout_cb(http_t *http,		/* I - Connection to server */
            void   *user_data)		/* I - User data (unused) */
 {
+  int		buffered = 0;		/* Bytes buffered but not yet sent */
+
+
+ /*
+  * If the socket still have data waiting to be sent to the printer (as can
+  * happen if the printer runs out of paper), continue to wait until the output
+  * buffer is empty...
+  */
+
+#ifdef SO_NWRITE			/* OS X and some versions of Linux */
+  socklen_t len = sizeof(buffered);	/* Size of return value */
+
+  if (getsockopt(httpGetFd(http), SOL_SOCKET, SO_NWRITE, &buffered, &len))
+    buffered = 0;
+
+#elif defined(SIOCOUTQ)			/* Others except Windows */
+  if (ioctl(httpGetFd(http), SIOCOUTQ, &buffered))
+    buffered = 0;
+
+#else					/* Windows (not possible) */
   (void)http;
   (void)user_data;
+#endif /* SO_NWRITE */
 
- /* Always cancel on timeout */
-  return (0);
+  return (buffered > 0);
 }
 
 
