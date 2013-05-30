@@ -268,7 +268,7 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
   * Range check input...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdAddSelect(fd=%d, read_cb=%p, write_cb=%p, data=%p)",
 		  fd, read_cb, write_cb, data);
 
@@ -723,7 +723,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   * Range check input...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdRemoveSelect(fd=%d)", fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdRemoveSelect(fd=%d)", fd);
 
   if (fd < 0)
     return;

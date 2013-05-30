@@ -471,6 +471,9 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
   cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Waiting for request.",
+		  con->http.fd);
+
  /*
   * Temporarily suspend accept()'s until we lose a client...
   */
@@ -594,6 +597,9 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
       shutdown(con->http.fd, 0);
       cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Waiting for socket close.",
+		      con->http.fd);
     }
     else
     {
@@ -2431,6 +2437,9 @@ cupsdSendCommand(
 
   cupsdAddSelect(con->file, (cupsd_selfunc_t)write_pipe, NULL, con);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Waiting for CGI data.",
+		  con->http.fd);
+
   con->sent_header = 0;
   con->file_ready  = 0;
   con->got_fields  = 0;
@@ -2859,6 +2868,9 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     cupsdAddSelect(con->file, (cupsd_selfunc_t)write_pipe, NULL, con);
 
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Waiting for CGI data.",
+		    con->http.fd);
+
     if (!con->file_ready)
     {
      /*
@@ -3086,6 +3098,9 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     con->http.state = HTTP_STATE_WAITING;
 
     cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient, NULL, con);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Waiting for request.",
+                    con->http.fd);
 
     if (con->file >= 0)
     {
@@ -4335,6 +4350,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
                  (cupsd_selfunc_t)cupsdWriteClient, con);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Sending file.", con->http.fd);
+
   return (1);
 }
 
@@ -4354,6 +4371,9 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
   cupsdRemoveSelect(con->file);
   cupsdAddSelect(con->http.fd, NULL, (cupsd_selfunc_t)cupsdWriteClient, con);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] CGI data ready to be sent.",
+		  con->http.fd);
 }
 
 
