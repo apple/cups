@@ -2882,9 +2882,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       * Write a single attribute or the IPP message header...
       */
 
-//      ipp_state = ippWrite(HTTP(con), con->response);
-      ipp_state = ippWriteIO(HTTP(con), (ipp_iocb_t)httpWrite2, 1, NULL,
-                             con->response);
+      ipp_state = ippWrite(HTTP(con), con->response);
 
      /*
       * If the write buffer has been flushed, stop buffering up attributes...
@@ -2896,15 +2894,25 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     while (ipp_state != IPP_STATE_DATA && ipp_state != IPP_STATE_ERROR);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "[Client %d] Writing IPP response, ipp_state=%d, old "
-                    "wused=%d, new wused=%d", con->http.fd, ipp_state, wused,
-                    con->http.wused);
+                    "[Client %d] Writing IPP response, ipp_state=%s, old "
+                    "wused=%d, new wused=%d", con->http.fd,
+                    ipp_state == IPP_STATE_ERROR ? "ERROR" :
+			ipp_state == IPP_STATE_IDLE ? "IDLE" :
+			ipp_state == IPP_STATE_HEADER ? "HEADER" :
+			ipp_state == IPP_STATE_ATTRIBUTE ? "ATTRIBUTE" : "DATA",
+		    wused, con->http.wused);
 
     if (con->http.wused > 0)
       httpFlushWrite(HTTP(con));
 
     bytes = ipp_state != IPP_STATE_ERROR &&
 	    (con->file >= 0 || ipp_state != IPP_STATE_DATA);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "[Client %d] bytes=%d, http_state=%d, "
+                    "data_remaining=" CUPS_LLFMT,
+                    con->http.fd, (int)bytes, con->http.state,
+                    CUPS_LLCAST con->http.data_remaining);
   }
   else if ((bytes = read(con->file, con->header + con->header_used,
 			 sizeof(con->header) - con->header_used)) > 0)
@@ -3049,7 +3057,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   }
 
   if (bytes <= 0 ||
-      (con->http.state != HTTP_STATE_GET_SEND && con->http.state != HTTP_STATE_POST_SEND))
+      (con->http.state != HTTP_STATE_GET_SEND &&
+       con->http.state != HTTP_STATE_POST_SEND))
   {
     if (!con->sent_header && con->pipe_pid)
       cupsdSendError(con, HTTP_SERVER_ERROR, CUPSD_AUTH_NONE);
@@ -3059,7 +3068,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
       httpFlushWrite(HTTP(con));
 
-      if (con->http.data_encoding == HTTP_ENCODING_CHUNKED && con->sent_header == 1)
+      if (con->http.data_encoding == HTTP_ENCODING_CHUNKED &&
+          con->sent_header == 1)
       {
 	if (httpWrite2(HTTP(con), "", 0) < 0)
 	{

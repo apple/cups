@@ -707,16 +707,12 @@ cupsdProcessIPPRequest(
                         >= IPP_BAD_REQUEST &&
                     con->response->request.status.status_code
 		        != IPP_NOT_FOUND ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
-                    "Returning IPP %s for %s (%s) from %s",
+                    "[Client %d] Returning IPP %s for %s (%s) from %s",
+	            con->http.fd,
 	            ippErrorString(con->response->request.status.status_code),
 		    ippOpString(con->request->request.op.operation_id),
 		    uri ? uri->values[0].string.text : "no URI",
 		    con->http.hostname);
-
-    if (LogLevel == CUPSD_LOG_DEBUG2)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		      "cupsdProcessIPPRequest: ippLength(response)=%ld",
-		      (long)ippLength(con->response));
 
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
@@ -731,6 +727,10 @@ cupsdProcessIPPRequest(
 
       if (con->http.version == HTTP_1_1)
       {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "[Client %d] Transfer-Encoding: chunked",
+                        con->http.fd);
+
 	if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n") < 0)
 	  return (0);
 
@@ -755,6 +755,9 @@ cupsdProcessIPPRequest(
 	    length += fileinfo.st_size;
 	}
 
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "[Client %d] Content-Length: " CUPS_LLFMT,
+                        con->http.fd, CUPS_LLCAST length);
 	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
         	       CUPS_LLCAST length) < 0)
 	  return (0);
@@ -9582,8 +9585,8 @@ send_http_error(
     uri = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI);
 
   cupsdLogMessage(status == HTTP_FORBIDDEN ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
-                  "Returning HTTP %s for %s (%s) from %s",
-                  httpStatus(status),
+                  "[Client %d] Returning HTTP %s for %s (%s) from %s",
+                  con->http.fd, httpStatus(status),
 		  con->request ?
 		      ippOpString(con->request->request.op.operation_id) :
 		      "no operation-id",

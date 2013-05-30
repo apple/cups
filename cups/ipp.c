@@ -6348,10 +6348,11 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	  }
 
 	 /*
-          * If blocking is disabled, stop here...
+          * If blocking is disabled and we aren't at the end of the attribute
+          * list, stop here...
 	  */
 
-          if (!blocking)
+          if (!blocking && ipp->current)
 	    break;
 	}
 
