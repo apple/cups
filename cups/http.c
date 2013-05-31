@@ -959,18 +959,7 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   if (http->data_encoding == HTTP_ENCODING_CHUNKED)
     bytes = http_write_chunk(http, http->wbuffer, http->wused);
   else
-  {
     bytes = http_write(http, http->wbuffer, http->wused);
-
-    if (bytes > 0 && http->data_encoding == HTTP_ENCODING_LENGTH)
-    {
-      http->data_remaining -= bytes;
-
-      if (http->data_remaining <= 0)
-      {
-      }
-    }
-  }
 
   http->wused = 0;
 
