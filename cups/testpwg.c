@@ -170,6 +170,20 @@ main(int  argc,				/* I - Number of command-line args */
   else
     puts("PASS");
 
+  fputs("pwgMediaForPWG(\"roll_max_36.1025x3622.0472in\"): ", stdout);
+  if ((pwgmedia = pwgMediaForPWG("roll_max_36.1025x3622.0472in")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (pwgmedia->width != 91700 || pwgmedia->length != 9199999)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    printf("PASS (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+
   fputs("pwgMediaForLegacy(\"na-letter\"): ", stdout);
   if ((pwgmedia = pwgMediaForLegacy("na-letter")) == NULL)
   {
