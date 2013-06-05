@@ -113,10 +113,8 @@
  *   --true                          - Always true
  *
  *   expression expression
- *   expression --and expression
- *   expression -a expression        - Logical AND.
+ *   expression --and expression     - Logical AND.
  *
- *   expression -o expression
  *   expression --or expression      - Logical OR.
  *
  * The substitutions for {} are:
@@ -171,10 +169,11 @@
 
 typedef enum ippfind_exit_e		/* Exit codes */
 {
-  IPPFIND_EXIT_OK = 0,			/* OK and result is true */
+  IPPFIND_EXIT_TRUE = 0,		/* OK and result is true */
   IPPFIND_EXIT_FALSE,			/* OK but result is false*/
   IPPFIND_EXIT_BONJOUR,			/* Browse/resolve failure */
-  IPPFIND_EXIT_SYNTAX			/* Bad option or syntax error */
+  IPPFIND_EXIT_SYNTAX,			/* Bad option or syntax error */
+  IPPFIND_EXIT_MEMORY			/* Out of memory */
 } ippfind_exit_t;
 
 typedef enum ippfind_op_e		/* Operations for expressions */
@@ -184,6 +183,8 @@ typedef enum ippfind_op_e		/* Operations for expressions */
   IPPFIND_OP_OR,			/* Logical OR of all children */
   IPPFIND_OP_TRUE,			/* Always true */
   IPPFIND_OP_FALSE,			/* Always false */
+  IPPFIND_OP_IS_LOCAL,			/* Is a local service */
+  IPPFIND_OP_IS_REMOTE,			/* Is a remote service */
   IPPFIND_OP_DOMAIN_REGEX,		/* Domain matches regular expression */
   IPPFIND_OP_NAME_REGEX,		/* Name matches regular expression */
   IPPFIND_OP_PATH_REGEX,		/* Path matches regular expression */
@@ -210,6 +211,8 @@ typedef struct ippfind_expr_s		/* Expression */
   int		invert;			/* Invert the result */
   char		*key;			/* TXT record key */
   regex_t	re;			/* Regular expression for matching */
+  int		num_args;		/* Number of arguments for exec */
+  char		**args;			/* Arguments for exec */
 } ippfind_expr_t;
 
 typedef struct ippfind_srv_s		/* Service information */
@@ -231,7 +234,6 @@ typedef struct ippfind_srv_s		/* Service information */
 		is_local,		/* Is a local service? */
 		is_processed,		/* Did we process the service? */
 		is_resolved;		/* Got the resolve data? */
-  time_t	resolve_time;		/* Time we started the resolve */
 } ippfind_srv_t;
 
 
@@ -251,8 +253,8 @@ static AvahiSimplePoll *avahi_poll = NULL;
 static int	address_family = AF_UNSPEC;
 					/* Address family for LIST */
 static int	bonjour_error = 0;	/* Error browsing/resolving? */
+static double	bonjour_timeout = 1.0;	/* Timeout in seconds */
 static int	ipp_version = 20;	/* IPP version for LIST */
-static double	timeout = 10;		/* Timeout in seconds */
 
 
 /*
@@ -293,11 +295,17 @@ static void		client_callback(AvahiClient *client,
 #endif /* HAVE_AVAHI */
 
 static int		compare_services(ippfind_srv_t *a, ippfind_srv_t *b);
+static const char	*dnssd_error_string(int error);
+static int		eval_expr(ippfind_srv_t *service,
+			          ippfind_expr_t *expressions);
 static ippfind_srv_t	*get_service(cups_array_t *services,
 				     const char *serviceName,
 				     const char *regtype,
 				     const char *replyDomain)
 				     __attribute__((nonnull(1,2,3,4)));
+static double		get_time(void);
+static ippfind_expr_t	*new_expr(ippfind_op_t op, int invert, const char *key,
+			          const char *regex, char **args);
 #ifdef HAVE_DNSSD
 static void		resolve_callback(DNSServiceRef sdRef,
 			                 DNSServiceFlags flags,
@@ -307,7 +315,7 @@ static void		resolve_callback(DNSServiceRef sdRef,
 				         const char *hostTarget, uint16_t port,
 				         uint16_t txtLen,
 				         const unsigned char *txtRecord,
-				         void *context);
+				         void *context)
 				         __attribute__((nonnull(1,5,6,9, 10)));
 #elif defined(HAVE_AVAHI)
 static int		poll_callback(struct pollfd *pollfds,
@@ -329,8 +337,6 @@ static void		resolve_callback(AvahiServiceResolver *res,
 static void		set_service_uri(ippfind_srv_t *service);
 static void		show_usage(void) __attribute__((noreturn));
 static void		show_version(void) __attribute__((noreturn));
-static void		unquote(char *dst, const char *src, size_t dstsize)
-			    __attribute__((nonnull(1,2)));
 
 
 /*
@@ -341,9 +347,29 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		fd;			/* File descriptor for Bonjour */
-  cups_array_t	*services;		/* Service array */
-  ippfind_srv_t	*service;		/* Current service */
+  int			i,		/* Looping var */
+			have_output = 0,/* Have output expression */
+			status = IPPFIND_EXIT_TRUE;
+					/* Exit status */
+  const char		*opt,		/* Option character */
+			*search;	/* Current browse/resolve string */
+  cups_array_t		*searches;	/* Things to browse/resolve */
+  cups_array_t		*services;	/* Service array */
+  ippfind_srv_t		*service;	/* Current service */
+  ippfind_expr_t	*expressions = NULL,
+					/* Expression tree */
+			*temp = NULL,	/* New expression */
+			*parent = NULL,	/* Parent expression */
+			*current = NULL;/* Current expression */
+  ippfind_op_t		logic = IPPFIND_OP_AND;
+					/* Logic for next expression */
+  int			invert = 0;	/* Invert expression? */
+  int			err;		/* DNS-SD error */
+#ifdef HAVE_DNSSD
+  fd_set		sinput;		/* Input set for select() */
+  struct timeval	stimeout;	/* Timeout for select() */
+#endif /* HAVE_DNSSD */
+  double		endtime;	/* End time */
 
 
  /*
@@ -353,409 +379,868 @@ main(int  argc,				/* I - Number of command-line args */
   _cupsSetLocale(argv);
 
  /*
-  * Create an array to track services...
+  * Create arrays to track services and things we want to browse/resolve...
   */
 
+  searches = cupsArrayNew(NULL, NULL);
   services = cupsArrayNew((cups_array_func_t)compare_services, NULL);
 
  /*
-  * Start up masters for browsing/resolving...
+  * Parse command-line...
+  */
+
+  for (i = 1; i < argc; i ++)
+  {
+    if (argv[i][0] == '-')
+    {
+      if (argv[i][1] == '-')
+      {
+       /*
+        * Parse --option options...
+        */
+
+        if (!strcmp(argv[i], "--and"))
+        {
+	  if (logic != IPPFIND_OP_AND && current && current->prev)
+	  {
+	   /*
+	    * OK, we have more than 1 rule in the current tree level.
+	    * Make a new group tree and move the previous rule to it...
+	    */
+
+	    if ((temp = new_expr(IPPFIND_OP_AND, 0, NULL, NULL, NULL)) == NULL)
+	      return (IPPFIND_EXIT_MEMORY);
+
+	    temp->child         = current;
+	    temp->parent        = current->parent;
+	    current->prev->next = temp;
+	    temp->prev          = current->prev;
+
+	    current->prev   = NULL;
+	    current->parent = temp;
+	    parent          = temp;
+	  }
+	  else if (parent)
+	    parent->op = IPPFIND_OP_AND;
+
+	  logic = IPPFIND_OP_AND;
+	  temp  = NULL;
+        }
+        else if (!strcmp(argv[i], "--domain"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_DOMAIN_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--exec"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_EXEC, invert, NULL, NULL,
+                               argv + i)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+
+          while (i < argc)
+            if (!strcmp(argv[i], ";"))
+              break;
+            else
+              i ++;
+
+          if (i >= argc)
+            show_usage();
+
+          have_output = 1;
+        }
+        else if (!strcmp(argv[i], "--false"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_FALSE, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--help"))
+        {
+          show_usage();
+        }
+        else if (!strcmp(argv[i], "--ls"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_LIST, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+
+          have_output = 1;
+        }
+        else if (!strcmp(argv[i], "--local"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_IS_LOCAL, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--name"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_NAME_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--not"))
+        {
+          invert = 1;
+        }
+        else if (!strcmp(argv[i], "--or"))
+        {
+	  if (logic != IPPFIND_OP_OR && current)
+	  {
+	   /*
+	    * OK, we have two possibilities; either this is the top-level
+	    * rule or we have a bunch of AND rules at this level.
+	    */
+
+	    if (!parent)
+	    {
+	     /*
+	      * This is the top-level rule; we have to group *all* of the AND
+	      * rules down a level, as AND has precedence over OR.
+	      */
+
+	      if ((temp = new_expr(IPPFIND_OP_AND, 0, NULL, NULL,
+	                           NULL)) == NULL)
+		return (IPPFIND_EXIT_MEMORY);
+
+	      while (current->prev)
+	      {
+		current->parent = temp;
+		current         = current->prev;
+	      }
+
+	      current->parent = temp;
+	      temp->child     = current;
+
+	      expressions = current = temp;
+	    }
+	    else
+	    {
+	     /*
+	      * This isn't the top rule, so go up one level...
+	      */
+
+	      current = parent;
+	      parent  = current->parent;
+	    }
+	  }
+
+	  logic = IPPFIND_OP_OR;
+	  temp  = NULL;
+        }
+        else if (!strcmp(argv[i], "--path"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_PATH_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--print"))
+        {
+          if ((temp = new_expr(IPPFIND_OP_PRINT_URI, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+
+          have_output = 1;
+        }
+        else if (!strcmp(argv[i], "--print-name"))
+        {
+          if ((temp = new_expr(IPPFIND_OP_PRINT_NAME, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+
+          have_output = 1;
+        }
+        else if (!strcmp(argv[i], "--quiet"))
+        {
+          if ((temp = new_expr(IPPFIND_OP_QUIET, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+
+          have_output = 1;
+        }
+        else if (!strcmp(argv[i], "--remote"))
+        {
+          if ((temp = new_expr(IPPFIND_OP_IS_REMOTE, invert, NULL, NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--true"))
+        {
+          if ((temp = new_expr(IPPFIND_OP_TRUE, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--txt"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_TXT_EXISTS, invert, argv[i], NULL,
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strncmp(argv[i], "--txt-", 5))
+        {
+          const char *key = argv[i] + 5;/* TXT key */
+
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_TXT_REGEX, invert, key, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--uri"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_URI_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--version"))
+        {
+          show_version();
+        }
+        else
+        {
+	  _cupsLangPrintf(stderr, _("%s: Unknown option \"%s\"."),
+			  "ippfind", argv[i]);
+	  show_usage();
+	}
+
+        if (temp)
+        {
+         /*
+          * Add new expression...
+          */
+
+	  if (current)
+	  {
+	    temp->parent  = parent;
+	    current->next = temp;
+	  }
+	  else if (parent)
+	    parent->child = temp;
+	  else
+	    expressions = temp;
+
+	  temp->prev = current;
+	  current    = temp;
+          invert     = 0;
+          temp       = NULL;
+        }
+      }
+      else
+      {
+       /*
+        * Parse -o options
+        */
+
+        for (opt = argv[i] + 1; *opt; opt ++)
+        {
+          switch (*opt)
+          {
+            case '4' :
+                address_family = AF_INET;
+                break;
+
+            case '6' :
+                address_family = AF_INET6;
+                break;
+
+            case 'T' :
+                i ++;
+                if (i >= argc)
+                  show_usage();
+
+                bonjour_timeout = atof(argv[i]);
+                break;
+
+            case 'V' :
+                i ++;
+                if (i >= argc)
+                  show_usage();
+
+                if (!strcmp(argv[i], "1.1"))
+                  ipp_version = 11;
+                else if (!strcmp(argv[i], "2.0"))
+                  ipp_version = 20;
+                else if (!strcmp(argv[i], "2.1"))
+                  ipp_version = 21;
+                else if (!strcmp(argv[i], "2.2"))
+                  ipp_version = 22;
+                else
+                  show_usage();
+                break;
+
+            case 'd' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_DOMAIN_REGEX, invert, NULL,
+		                     argv[i], NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            case 'e' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_EXEC, invert, NULL, NULL,
+				     argv + i)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		while (i < argc)
+		  if (!strcmp(argv[i], ";"))
+		    break;
+		  else
+		    i ++;
+
+		if (i >= argc)
+		  show_usage();
+
+		have_output = 1;
+                break;
+
+            case 'l' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_LIST, invert, NULL, NULL,
+				     NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		have_output = 1;
+                break;
+
+            case 'n' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_NAME_REGEX, invert, NULL,
+		                     argv[i], NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            case 'p' :
+		if ((temp = new_expr(IPPFIND_OP_PRINT_URI, invert, NULL, NULL,
+				     NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		have_output = 1;
+                break;
+
+            case 'q' :
+		if ((temp = new_expr(IPPFIND_OP_QUIET, invert, NULL, NULL,
+				     NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		have_output = 1;
+                break;
+
+            case 'r' :
+		if ((temp = new_expr(IPPFIND_OP_IS_REMOTE, invert, NULL, NULL,
+				     NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            case 's' :
+		if ((temp = new_expr(IPPFIND_OP_PRINT_NAME, invert, NULL, NULL,
+				     NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		have_output = 1;
+                break;
+
+            case 't' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_TXT_EXISTS, invert, argv[i],
+		                     NULL, NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            case 'u' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_URI_REGEX, invert, NULL,
+		                     argv[i], NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            default :
+                _cupsLangPrintf(stderr, _("%s: Unknown option \"-%c\"."),
+                                "ippfind", *opt);
+                show_usage();
+                break;
+          }
+
+	  if (temp)
+	  {
+	   /*
+	    * Add new expression...
+	    */
+
+	    if (current)
+	    {
+	      temp->parent  = parent;
+	      current->next = temp;
+	    }
+	    else if (parent)
+	      parent->child = temp;
+	    else
+	      expressions = temp;
+
+	    temp->prev = current;
+	    current    = temp;
+	    invert     = 0;
+	    temp       = NULL;
+	  }
+        }
+      }
+    }
+    else if (!strcmp(argv[i], "("))
+    {
+      if ((temp = new_expr(IPPFIND_OP_AND, invert, NULL, NULL, NULL)) == NULL)
+	return (IPPFIND_EXIT_MEMORY);
+
+      if (current)
+      {
+	temp->parent  = current->parent;
+	current->next = temp;
+      }
+      else
+	expressions = temp;
+
+      temp->prev = current;
+      parent     = temp;
+      current    = NULL;
+      invert     = 0;
+      logic      = IPPFIND_OP_AND;
+    }
+    else if (!strcmp(argv[i], ")"))
+    {
+      if (!parent)
+      {
+        _cupsLangPuts(stderr, _("ippfind: Missing open parenthesis."));
+        show_usage();
+      }
+
+      current = parent;
+      parent  = current->parent;
+
+      if (!parent)
+        logic = IPPFIND_OP_AND;
+      else
+        logic = parent->op;
+    }
+    else if (!strcmp(argv[i], "!"))
+    {
+      invert = 1;
+    }
+    else
+    {
+     /*
+      * _regtype._tcp[,subtype][.domain]
+      *
+      *   OR
+      *
+      * service-name[._regtype._tcp[.domain]]
+      */
+
+      cupsArrayAdd(searches, argv[i]);
+    }
+  }
+
+  if (parent)
+  {
+    _cupsLangPuts(stderr, _("ippfind: Missing close parenthesis."));
+    show_usage();
+  }
+
+  if (cupsArrayCount(searches) == 0)
+  {
+   /*
+    * Add an implicit browse for IPP printers ("_ipp._tcp")...
+    */
+
+    cupsArrayAdd(searches, "_ipp._tcp");
+  }
+
+  if (!have_output)
+  {
+   /*
+    * Add an implicit --print-uri to the end...
+    */
+
+    if ((temp = new_expr(IPPFIND_OP_PRINT_URI, 0, NULL, NULL, NULL)) == NULL)
+      return (IPPFIND_EXIT_MEMORY);
+
+    if (current)
+    {
+      temp->parent  = parent;
+      current->next = temp;
+    }
+    else
+      expressions = temp;
+
+    temp->prev = current;
+  }
+
+ /*
+  * Start up browsing/resolving...
   */
 
 #ifdef HAVE_DNSSD
-  if (DNSServiceCreateConnection(&dnssd_ref) != kDNSServiceErr_NoError)
+  if ((err = DNSServiceCreateConnection(&dnssd_ref)) != kDNSServiceErr_NoError)
   {
-    perror("ERROR: Unable to create service connection");
+    _cupsLangPrintf(stderr, _("ippfind: Unable to use Bonjour: %s"),
+                    dnssd_error_string(err));
     return (IPPFIND_EXIT_BONJOUR);
   }
 
-  fd = DNSServiceRefSockFD(dnssd_ref);
-
 #elif defined(HAVE_AVAHI)
+  if ((avahi_poll = avahi_simple_poll_new()) == NULL)
+  {
+    _cupsLangPrintError(stderr, _("ippfind: Unable to use Bonjour: %s"),
+                        strerror(errno));
+    return (IPPFIND_EXIT_BONJOUR);
+  }
+
+  avahi_simple_poll_set_func(avahi_poll, poll_callback, NULL);
+
+  avahi_client = avahi_client_new(avahi_simple_poll_get(avahi_poll),
+			          0, client_callback, avahi_poll, &err);
+  if (!client)
+  {
+    _cupsLangPrintError(stderr, _("ippfind: Unable to use Bonjour: %s"),
+                        dnssd_error_string(err));
+    return (IPPFIND_EXIT_BONJOUR);
+  }
 #endif /* HAVE_DNSSD */
 
-#if 0
-  int		i;			/* Looping var */
-  DNSServiceRef	main_ref,		/* Main service reference */
-		ipp_ref;		/* IPP service reference */
-  int		fd;			/* Main file descriptor */
-  fd_set	input;			/* Input set for select() */
-  struct timeval timeout;		/* Timeout for select() */
-  cups_array_t	*devices;		/* Device array */
-  ippfind_srv_t	*device;		/* Current device */
-  http_t	*http;			/* Connection to printer */
-  ipp_t		*request,		/* Get-Printer-Attributes request */
-		*response;		/* Get-Printer-Attributes response */
-  ipp_attribute_t *attr;		/* IPP attribute in response */
-  const char	*version,		/* Version supported */
-		*testfile;		/* Test file to use */
-  int		ipponly = 0,		/* Do IPP tests only? */
-		snmponly = 0;		/* Do SNMP walk only? */
+  for (search = (const char *)cupsArrayFirst(searches);
+       search;
+       search = (const char *)cupsArrayNext(searches))
+  {
+    char		buf[1024],	/* Full name string */
+			*name = NULL,	/* Service instance name */
+			*regtype,	/* Registration type */
+			*domain;	/* Domain, if any */
 
-
-  for (i = 1; i < argc; i ++)
-    if (!strcmp(argv[i], "snmp"))
-      snmponly = 1;
-    else if (!strcmp(argv[i], "ipp"))
-      ipponly = 1;
+    strlcpy(buf, search, sizeof(buf));
+    if (buf[0] == '_')
+    {
+      regtype = buf;
+    }
+    else if ((regtype = strstr(buf, "._")) != NULL)
+    {
+      name = buf;
+      *regtype++ = '\0';
+    }
     else
     {
-      puts("Usage: ./ipp-printers [{ipp | snmp}]");
-      return (1);
+      name    = buf;
+      regtype = "_ipp._tcp";
     }
 
- /*
-  * Create an array to track devices...
-  */
+    for (domain = regtype; *domain; domain ++)
+      if (*domain == '.' && domain[1] != '_')
+      {
+        *domain++ = '\0';
+        break;
+      }
 
-  devices = cupsArrayNew((cups_array_func_t)compare_services, NULL);
+    if (!*domain)
+      domain = NULL;
 
- /*
-  * Browse for different kinds of printers...
-  */
+    if (name)
+    {
+     /*
+      * Resolve the given service instance name, regtype, and domain...
+      */
 
-  if (DNSServiceCreateConnection(&main_ref) != kDNSServiceErr_NoError)
-  {
-    perror("ERROR: Unable to create service connection");
-    return (1);
+      if (!domain)
+        domain = "local.";
+
+      service = get_service(services, name, regtype, domain);
+
+#ifdef HAVE_DNSSD
+      service->ref = dnssd_ref;
+      err          = DNSServiceResolve(&(service->ref),
+                                       kDNSServiceFlagsShareConnection, 0, name,
+				       regtype, domain, resolve_callback,
+				       service);
+
+#elif defined(HAVE_AVAHI)
+      service->ref = avahi_service_resolver_new(avahi_client, AVAHI_IF_UNSPEC,
+                                                AVAHI_PROTO_UNSPEC, name,
+                                                regtype, domain,
+                                                AVAHI_PROTO_UNSPEC, 0,
+                                                resolve_callback, service);
+      if (service->ref)
+        err = 0;
+      else
+        err = avahi_client_get_errno(avahi_client);
+#endif /* HAVE_DNSSD */
+    }
+    else
+    {
+     /*
+      * Browse for services of the given type...
+      */
+
+#ifdef HAVE_DNSSD
+      DNSServiceRef	ref;		/* Browse reference */
+
+      ref = dnssd_ref;
+      err = DNSServiceBrowse(&ref, kDNSServiceFlagsShareConnection, 0, regtype,
+                             domain, browse_callback, services);
+
+      if (!err)
+      {
+	ref = dnssd_ref;
+	err = DNSServiceBrowse(&ref, kDNSServiceFlagsShareConnection,
+			       kDNSServiceInterfaceIndexLocalOnly, regtype,
+			       domain, browse_local_callback, services);
+      }
+
+#elif defined(HAVE_AVAHI)
+      if (avahi_service_browser_new(avahi_client, AVAHI_IF_UNSPEC,
+                                    AVAHI_PROTO_UNSPEC, regtype, domain, 0,
+                                    browse_callback, services))
+        err = 0;
+      else
+        err = avahi_client_get_errno(avahi_client);
+#endif /* HAVE_DNSSD */
+    }
+
+    if (err)
+    {
+      _cupsLangPrintf(stderr, _("ippfind: Unable to browse or resolve: %s"),
+                      dnssd_error_string(err));
+
+      if (name)
+        printf("name=\"%s\"\n", name);
+
+      printf("regtype=\"%s\"\n", regtype);
+
+      if (domain)
+        printf("domain=\"%s\"\n", domain);
+
+      return (IPPFIND_EXIT_BONJOUR);
+    }
   }
 
-  fd = DNSServiceRefSockFD(main_ref);
-
-  ipp_ref = main_ref;
-  DNSServiceBrowse(&ipp_ref, kDNSServiceFlagsShareConnection, 0,
-                   "_ipp._tcp", NULL, browse_callback, devices);
-
  /*
-  * Loop until we are killed...
+  * Process browse/resolve requests...
   */
 
-  progress();
+  if (bonjour_timeout > 1.0)
+    endtime = get_time() + bonjour_timeout;
+  else
+    endtime = get_time() + 300.0;
 
-  for (;;)
+  while (get_time() < endtime)
   {
-    FD_ZERO(&input);
-    FD_SET(fd, &input);
+    int		process = 0;		/* Process services? */
 
-    timeout.tv_sec  = 2;
-    timeout.tv_usec = 500000;
+#ifdef HAVE_DNSSD
+    int fd = DNSServiceRefSockFD(dnssd_ref);
+					/* File descriptor for DNS-SD */
 
-    if (select(fd + 1, &input, NULL, NULL, &timeout) <= 0)
+    FD_ZERO(&sinput);
+    FD_SET(fd, &sinput);
+
+    stimeout.tv_sec  = 0;
+    stimeout.tv_usec = 500000;
+
+    if (select(fd + 1, &sinput, NULL, NULL, &stimeout) < 0)
+      continue;
+
+    if (FD_ISSET(fd, &sinput))
     {
-      time_t curtime = time(NULL);
+     /*
+      * Process responses...
+      */
 
-      for (device = (ippfind_srv_t *)cupsArrayFirst(devices);
-           device;
-	   device = (ippfind_srv_t *)cupsArrayNext(devices))
-        if (!device->got_resolve)
+      DNSServiceProcessResult(dnssd_ref);
+    }
+    else
+    {
+     /*
+      * Time to process services...
+      */
+
+      process = 1;
+    }
+
+#elif defined(HAVE_AVAHI)
+    avahi_got_data = 0;
+
+    if (avahi_simple_poll_iterate(avahi_poll, 500) > 0)
+    {
+     /*
+      * We've been told to exit the loop.  Perhaps the connection to
+      * Avahi failed.
+      */
+
+      return (IPPFIND_EXIT_BONJOUR);
+    }
+
+    if (!avahi_got_data)
+    {
+     /*
+      * Time to process services...
+      */
+
+      process = 1;
+    }
+#endif /* HAVE_DNSSD */
+
+    if (process)
+    {
+     /*
+      * Process any services that we have found...
+      */
+
+      int	active = 0,		/* Number of active resolves */
+		resolved = 0,		/* Number of resolved services */
+		processed = 0;		/* Number of processed services */
+
+      for (service = (ippfind_srv_t *)cupsArrayFirst(services);
+           service;
+           service = (ippfind_srv_t *)cupsArrayNext(services))
+      {
+        if (service->is_processed)
+          processed ++;
+
+        if (service->is_resolved)
+          resolved ++;
+
+        if (!service->ref && !service->is_resolved)
         {
-          if (!device->ref)
-            break;
+         /*
+          * Found a service, now resolve it (but limit to 50 active resolves...)
+          */
 
-          if ((curtime - device->resolve_time) > 10)
+          if (active < 50)
           {
-            device->got_resolve = -1;
-	    fprintf(stderr, "\rUnable to resolve \"%s\": timeout\n",
-		    device->name);
-	    progress();
-	  }
-          else
-            break;
-        }
+#ifdef HAVE_DNSSD
+	    service->ref = dnssd_ref;
+	    err          = DNSServiceResolve(&(service->ref),
+					     kDNSServiceFlagsShareConnection, 0,
+					     service->name, service->regtype,
+					     service->domain, resolve_callback,
+					     service);
 
-      if (!device)
+#elif defined(HAVE_AVAHI)
+	    service->ref = avahi_service_resolver_new(avahi_client,
+						      AVAHI_IF_UNSPEC,
+						      AVAHI_PROTO_UNSPEC,
+						      service->name,
+						      service->regtype,
+						      service->domain,
+						      AVAHI_PROTO_UNSPEC, 0,
+						      resolve_callback,
+						      service);
+	    if (service->ref)
+	      err = 0;
+	    else
+	      err = avahi_client_get_errno(avahi_client);
+#endif /* HAVE_DNSSD */
+
+	    if (err)
+	    {
+	      _cupsLangPrintf(stderr,
+	                      _("ippfind: Unable to browse or resolve: %s"),
+			      dnssd_error_string(err));
+	      return (IPPFIND_EXIT_BONJOUR);
+	    }
+
+	    active ++;
+          }
+        }
+        else if (service->is_resolved && !service->is_processed)
+        {
+	 /*
+	  * Resolved, not process this service against the expressions...
+	  */
+
+          if (service->ref)
+          {
+#ifdef HAVE_DNSSD
+	    DNSServiceRefDeallocate(service->ref);
+#else
+            avahi_record_browser_free(service->ref);
+#endif /* HAVE_DNSSD */
+
+	    service->ref = NULL;
+	  }
+
+          if (!eval_expr(service, expressions))
+            status = IPPFIND_EXIT_FALSE;
+
+          service->is_processed = 1;
+        }
+        else if (service->ref)
+          active ++;
+      }
+
+     /*
+      * If we have processed all services we have discovered, then we are done.
+      */
+
+      if (processed == cupsArrayCount(services) && bonjour_timeout <= 1.0)
         break;
     }
-
-    if (FD_ISSET(fd, &input))
-    {
-     /*
-      * Process results of our browsing...
-      */
-
-      progress();
-      DNSServiceProcessResult(main_ref);
-    }
-    else
-    {
-     /*
-      * Query any devices we've found...
-      */
-
-      DNSServiceErrorType	status;	/* DNS query status */
-      int			count;	/* Number of queries */
-
-
-      for (device = (ippfind_srv_t *)cupsArrayFirst(devices), count = 0;
-           device;
-	   device = (ippfind_srv_t *)cupsArrayNext(devices))
-      {
-        if (!device->ref && !device->sent)
-	{
-	 /*
-	  * Found the device, now get the TXT record(s) for it...
-	  */
-
-          if (count < 50)
-	  {
-	    device->resolve_time = time(NULL);
-	    device->ref          = main_ref;
-
-	    status = DNSServiceResolve(&(device->ref),
-				       kDNSServiceFlagsShareConnection,
-				       0, device->name, device->regtype,
-				       device->domain, resolve_callback,
-				       device);
-            if (status != kDNSServiceErr_NoError)
-            {
-	      fprintf(stderr, "\rUnable to resolve \"%s\": %d\n",
-	              device->name, status);
-	      progress();
-	    }
-	    else
-	      count ++;
-          }
-	}
-	else if (!device->sent && device->got_resolve)
-	{
-	 /*
-	  * Got the TXT records, now report the device...
-	  */
-
-	  DNSServiceRefDeallocate(device->ref);
-	  device->ref  = 0;
-	  device->sent = 1;
-        }
-      }
-    }
   }
 
-#ifndef DEBUG
-  fprintf(stderr, "\rFound %d printers. Now querying for capabilities...\n",
-          cupsArrayCount(devices));
-#endif /* !DEBUG */
-
-  puts("#!/bin/sh -x");
-  puts("test -d results && rm -rf results");
-  puts("mkdir results");
-  puts("CUPS_DEBUG_LEVEL=6; export CUPS_DEBUG_LEVEL");
-  puts("CUPS_DEBUG_FILTER='^(ipp|http|_ipp|_http|cupsGetResponse|cupsSend|"
-       "cupsWrite|cupsDo).*'; export CUPS_DEBUG_FILTER");
-
-  for (device = (ippfind_srv_t *)cupsArrayFirst(devices);
-       device;
-       device = (ippfind_srv_t *)cupsArrayNext(devices))
-  {
-    if (device->got_resolve <= 0 || device->cups_shared)
-      continue;
-
-#ifdef DEBUG
-    fprintf(stderr, "Checking \"%s\" (got_resolve=%d, cups_shared=%d, uri=%s)\n",
-            device->name, device->got_resolve, device->cups_shared, device->uri);
-#else
-    fprintf(stderr, "Checking \"%s\"...\n", device->name);
-#endif /* DEBUG */
-
-    if ((http = httpConnect(device->host, device->port)) == NULL)
-    {
-      fprintf(stderr, "Failed to connect to \"%s\": %s\n", device->name,
-              cupsLastErrorString());
-      continue;
-    }
-
-    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
-                 device->uri);
-
-    response = cupsDoRequest(http, request, device->rp);
-
-    if (cupsLastError() > IPP_OK_SUBST)
-      fprintf(stderr, "Failed to query \"%s\": %s\n", device->name,
-              cupsLastErrorString());
-    else
-    {
-      if ((attr = ippFindAttribute(response, "ipp-versions-supported",
-				   IPP_TAG_KEYWORD)) != NULL)
-      {
-	version = attr->values[0].string.text;
-
-	for (i = 1; i < attr->num_values; i ++)
-	  if (strcmp(attr->values[i].string.text, version) > 0)
-	    version = attr->values[i].string.text;
-      }
-      else
-	version = "1.0";
-
-      testfile = NULL;
-
-      if ((attr = ippFindAttribute(response, "document-format-supported",
-                                   IPP_TAG_MIMETYPE)) != NULL)
-      {
-       /*
-        * Figure out the test file for printing, preferring PDF and PostScript
-        * over JPEG and plain text...
-        */
-
-        for (i = 0; i < attr->num_values; i ++)
-        {
-          if (!strcasecmp(attr->values[i].string.text, "application/pdf"))
-          {
-            testfile = "testfile.pdf";
-            break;
-          }
-          else if (!strcasecmp(attr->values[i].string.text,
-                               "application/postscript"))
-            testfile = "testfile.ps";
-          else if (!strcasecmp(attr->values[i].string.text, "image/jpeg") &&
-                   !testfile)
-            testfile = "testfile.jpg";
-          else if (!strcasecmp(attr->values[i].string.text, "text/plain") &&
-                   !testfile)
-            testfile = "testfile.txt";
-          else if (!strcasecmp(attr->values[i].string.text,
-                               "application/vnd.hp-PCL") && !testfile)
-            testfile = "testfile.pcl";
-        }
-
-        if (!testfile)
-        {
-          fprintf(stderr,
-                  "Printer \"%s\" reports the following IPP file formats:\n",
-                  device->name);
-          for (i = 0; i < attr->num_values; i ++)
-            fprintf(stderr, "    \"%s\"\n", attr->values[i].string.text);
-        }
-      }
-
-      if (!testfile && device->pdl)
-      {
-	char	*pdl,			/* Copy of pdl string */
-		*start, *end;		/* Pointers into pdl string */
-
-
-        pdl = strdup(device->pdl);
-	for (start = device->pdl; start && *start; start = end)
-	{
-	  if ((end = strchr(start, ',')) != NULL)
-	    *end++ = '\0';
-
-	  if (!strcasecmp(start, "application/pdf"))
-	  {
-	    testfile = "testfile.pdf";
-	    break;
-	  }
-	  else if (!strcasecmp(start, "application/postscript"))
-	    testfile = "testfile.ps";
-	  else if (!strcasecmp(start, "image/jpeg") && !testfile)
-	    testfile = "testfile.jpg";
-	  else if (!strcasecmp(start, "text/plain") && !testfile)
-	    testfile = "testfile.txt";
-	  else if (!strcasecmp(start, "application/vnd.hp-PCL") && !testfile)
-	    testfile = "testfile.pcl";
-	}
-	free(pdl);
-
-        if (testfile)
-        {
-	  fprintf(stderr,
-		  "Using \"%s\" for printer \"%s\" based on TXT record pdl "
-		  "info.\n", testfile, device->name);
-        }
-        else
-        {
-	  fprintf(stderr,
-		  "Printer \"%s\" reports the following TXT file formats:\n",
-		  device->name);
-	  fprintf(stderr, "    \"%s\"\n", device->pdl);
-	}
-      }
-
-      if (!device->ty &&
-	  (attr = ippFindAttribute(response, "printer-make-and-model",
-				   IPP_TAG_TEXT)) != NULL)
-	device->ty = strdup(attr->values[0].string.text);
-
-      if (strcmp(version, "1.0") && testfile && device->ty)
-      {
-	char		filename[1024],	/* Filename */
-			*fileptr;	/* Pointer into filename */
-	const char	*typtr;		/* Pointer into ty */
-
-        if (!strncasecmp(device->ty, "DeskJet", 7) ||
-            !strncasecmp(device->ty, "DesignJet", 9) ||
-            !strncasecmp(device->ty, "OfficeJet", 9) ||
-            !strncasecmp(device->ty, "Photosmart", 10))
-          strlcpy(filename, "HP_", sizeof(filename));
-        else
-          filename[0] = '\0';
-
-	fileptr = filename + strlen(filename);
-
-        if (!strncasecmp(device->ty, "Lexmark International Lexmark", 29))
-          typtr = device->ty + 22;
-        else
-          typtr = device->ty;
-
-	while (*typtr && fileptr < (filename + sizeof(filename) - 1))
-	{
-	  if (isalnum(*typtr & 255) || *typtr == '-')
-	    *fileptr++ = *typtr++;
-	  else
-	  {
-	    *fileptr++ = '_';
-	    typtr++;
-	  }
-	}
-
-	*fileptr = '\0';
-
-        printf("# %s\n", device->name);
-        printf("echo \"Testing %s...\"\n", device->name);
-
-        if (!ipponly)
-        {
-	  printf("echo \"snmpwalk -c public -v 1 -Cc %s 1.3.6.1.2.1.25 "
-	         "1.3.6.1.2.1.43 1.3.6.1.4.1.2699.1\" > results/%s.snmpwalk\n",
-	         device->host, filename);
-	  printf("snmpwalk -c public -v 1 -Cc %s 1.3.6.1.2.1.25 "
-	         "1.3.6.1.2.1.43 1.3.6.1.4.1.2699.1 | "
-	         "tee -a results/%s.snmpwalk\n",
-	         device->host, filename);
-        }
-
-        if (!snmponly)
-        {
-	  printf("echo \"./ipptool-static -tIf %s -T 30 -d NOPRINT=1 -V %s %s "
-	         "ipp-%s.test\" > results/%s.log\n", testfile, version,
-	         device->uri, version, filename);
-	  printf("CUPS_DEBUG_LOG=results/%s.debug_log "
-	         "./ipptool-static -tIf %s -T 30 -d NOPRINT=1 -V %s %s "
-	         "ipp-%s.test | tee -a results/%s.log\n", filename,
-	         testfile, version, device->uri,
-	         version, filename);
-        }
-
-	puts("");
-      }
-      else if (!device->ty)
-	fprintf(stderr,
-		"Ignoring \"%s\" since it doesn't provide a make and model.\n",
-		device->name);
-      else if (!testfile)
-	fprintf(stderr,
-	        "Ignoring \"%s\" since it does not support a common format.\n",
-		device->name);
-      else
-	fprintf(stderr, "Ignoring \"%s\" since it only supports IPP/1.0.\n",
-		device->name);
-    }
-
-    ippDelete(response);
-    httpClose(http);
-  }
-
-  return (0);
-#endif /* 0 */
+  if (bonjour_error)
+    return (IPPFIND_EXIT_BONJOUR);
+  else
+    return (status);
 }
 
 
@@ -921,6 +1406,137 @@ compare_services(ippfind_srv_t *a,	/* I - First device */
 
 
 /*
+ * 'dnssd_error_string()' - Return an error string for an error code.
+ */
+
+static const char *			/* O - Error message */
+dnssd_error_string(int error)		/* I - Error number */
+{
+#  ifdef HAVE_DNSSD
+  switch (error)
+  {
+    case kDNSServiceErr_NoError :
+        return ("OK.");
+
+    default :
+    case kDNSServiceErr_Unknown :
+        return ("Unknown error.");
+
+    case kDNSServiceErr_NoSuchName :
+        return ("Service not found.");
+
+    case kDNSServiceErr_NoMemory :
+        return ("Out of memory.");
+
+    case kDNSServiceErr_BadParam :
+        return ("Bad parameter.");
+
+    case kDNSServiceErr_BadReference :
+        return ("Bad service reference.");
+
+    case kDNSServiceErr_BadState :
+        return ("Bad state.");
+
+    case kDNSServiceErr_BadFlags :
+        return ("Bad flags.");
+
+    case kDNSServiceErr_Unsupported :
+        return ("Unsupported.");
+
+    case kDNSServiceErr_NotInitialized :
+        return ("Not initialized.");
+
+    case kDNSServiceErr_AlreadyRegistered :
+        return ("Already registered.");
+
+    case kDNSServiceErr_NameConflict :
+        return ("Name conflict.");
+
+    case kDNSServiceErr_Invalid :
+        return ("Invalid name.");
+
+    case kDNSServiceErr_Firewall :
+        return ("Firewall prevents registration.");
+
+    case kDNSServiceErr_Incompatible :
+        return ("Client library incompatible.");
+
+    case kDNSServiceErr_BadInterfaceIndex :
+        return ("Bad interface index.");
+
+    case kDNSServiceErr_Refused :
+        return ("Server prevents registration.");
+
+    case kDNSServiceErr_NoSuchRecord :
+        return ("Record not found.");
+
+    case kDNSServiceErr_NoAuth :
+        return ("Authentication required.");
+
+    case kDNSServiceErr_NoSuchKey :
+        return ("Encryption key not found.");
+
+    case kDNSServiceErr_NATTraversal :
+        return ("Unable to traverse NAT boundary.");
+
+    case kDNSServiceErr_DoubleNAT :
+        return ("Unable to traverse double-NAT boundary.");
+
+    case kDNSServiceErr_BadTime :
+        return ("Bad system time.");
+
+    case kDNSServiceErr_BadSig :
+        return ("Bad signature.");
+
+    case kDNSServiceErr_BadKey :
+        return ("Bad encryption key.");
+
+    case kDNSServiceErr_Transient :
+        return ("Transient error occurred - please try again.");
+
+    case kDNSServiceErr_ServiceNotRunning :
+        return ("Server not running.");
+
+    case kDNSServiceErr_NATPortMappingUnsupported :
+        return ("NAT doesn't support NAT-PMP or UPnP.");
+
+    case kDNSServiceErr_NATPortMappingDisabled :
+        return ("NAT supports NAT-PNP or UPnP but it is disabled.");
+
+    case kDNSServiceErr_NoRouter :
+        return ("No Internet/default router configured.");
+
+    case kDNSServiceErr_PollingMode :
+        return ("Service polling mode error.");
+
+    case kDNSServiceErr_Timeout :
+        return ("Service timeout.");
+  }
+
+#  elif defined(HAVE_AVAHI)
+  return (avahi_strerror(error));
+#  endif /* HAVE_DNSSD */
+}
+
+
+/*
+ * 'eval_expr()' - Evaluate the expressions against the specified service.
+ *
+ * Returns 1 for true and 0 for false.
+ */
+
+static int				/* O - Result of evaluation */
+eval_expr(ippfind_srv_t  *service,	/* I - Service */
+	  ippfind_expr_t *expressions)	/* I - Expressions */
+{
+  (void)expressions;
+
+  puts(service->uri);
+  return (1);
+}
+
+
+/*
  * 'get_service()' - Create or update a device.
  */
 
@@ -977,6 +1593,83 @@ get_service(cups_array_t *services,	/* I - Service array */
   service->fullName = strdup(fullName);
 
   return (service);
+}
+
+
+/*
+ * 'get_time()' - Get the current time-of-day in seconds.
+ */
+
+static double
+get_time(void)
+{
+#ifdef WIN32
+  struct _timeb curtime;		/* Current Windows time */
+
+  _ftime(&curtime);
+
+  return (curtime.time + 0.001 * curtime.millitm);
+
+#else
+  struct timeval	curtime;	/* Current UNIX time */
+
+  if (gettimeofday(&curtime, NULL))
+    return (0.0);
+  else
+    return (curtime.tv_sec + 0.000001 * curtime.tv_usec);
+#endif /* WIN32 */
+}
+
+
+/*
+ * 'new_expr()' - Create a new expression.
+ */
+
+static ippfind_expr_t *			/* O - New expression */
+new_expr(ippfind_op_t op,		/* I - Operation */
+         int          invert,		/* I - Invert result? */
+         const char   *key,		/* I - TXT key */
+	 const char   *regex,		/* I - Regular expression */
+	 char         **args)		/* I - Pointer to argument strings */
+{
+  ippfind_expr_t	*temp;		/* New expression */
+
+
+  if ((temp = calloc(1, sizeof(ippfind_expr_t))) == NULL)
+    return (NULL);
+
+  temp->op = op;
+  temp->invert = invert;
+  temp->key    = (char *)key;
+
+  if (regex)
+  {
+    int err = regcomp(&(temp->re), regex, REG_NOSUB | REG_EXTENDED);
+
+    if (err)
+    {
+      char	message[256];		/* Error message */
+
+      regerror(err, &(temp->re), message, sizeof(message));
+      _cupsLangPrintf(stderr, _("ippfind: Bad regular expression: %s"),
+                      message);
+      exit(IPPFIND_EXIT_SYNTAX);
+    }
+  }
+
+  if (args)
+  {
+    int	num_args;			/* Number of arguments */
+
+    for (num_args = 1; args[num_args]; num_args ++)
+      if (!strcmp(args[num_args], ";"))
+        break;
+
+     temp->args = malloc(num_args * sizeof(char *));
+     memcpy(temp->args, args, num_args * sizeof(char *));
+  }
+
+  return (temp);
 }
 
 
@@ -1045,7 +1738,12 @@ resolve_callback(
   */
 
   if (errorCode != kDNSServiceErr_NoError)
+  {
+    _cupsLangPrintf(stderr, _("ippfind: Unable to browse or resolve: %s"),
+		    dnssd_error_string(errorCode));
+    bonjour_error = 1;
     return;
+  }
 
   service->is_resolved = 1;
   service->host        = strdup(hostTarget);
@@ -1198,10 +1896,10 @@ set_service_uri(ippfind_srv_t *service)	/* I - Service */
     path = "/";
 
   if (*path == '/')
-    httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(URI), scheme, NULL,
+    httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
                     service->host, service->port, path);
   else
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(URI), scheme, NULL,
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
                      service->host, service->port, "/%s", path);
 
   service->uri = strdup(uri);
@@ -1209,11 +1907,11 @@ set_service_uri(ippfind_srv_t *service)	/* I - Service */
 
 
 /*
- * 'usage()' - Show program usage.
+ * 'show_usage()' - Show program usage.
  */
 
 static void
-usage(void)
+show_usage(void)
 {
   _cupsLangPuts(stderr, _("Usage: ippfind [options] regtype[,subtype]"
                           "[.domain.] ... [expression]\n"
@@ -1237,33 +1935,63 @@ usage(void)
   _cupsLangPuts(stderr, _("  -e utility [argument ...] ;\n"
                           "                          Execute program if true."));
   _cupsLangPuts(stderr, _("  -l                      List attributes."));
-  _cupsLangPuts(stderr, _("  --local                 True if service is local."));
   _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  --path regex            Match resource path to regular expression."));
   _cupsLangPuts(stderr, _("  -p                      Print URI if true."));
   _cupsLangPuts(stderr, _("  -q                      Quietly report match via exit code."));
   _cupsLangPuts(stderr, _("  -r                      True if service is remote."));
+  _cupsLangPuts(stderr, _("  -s                      Print service name if true."));
+  _cupsLangPuts(stderr, _("  -t key                  True if the TXT record contains the key."));
+  _cupsLangPuts(stderr, _("  -u regex                Match URI to regular expression."));
+  _cupsLangPuts(stderr, _("  --domain regex          Match domain to regular expression."));
+  _cupsLangPuts(stderr, _("  --exec utility [argument ...] ;\n"
+                          "                          Execute program if true."));
+  _cupsLangPuts(stderr, _("  --ls                    List attributes."));
+  _cupsLangPuts(stderr, _("  --local                 True if service is local."));
+  _cupsLangPuts(stderr, _("  --name regex            Match service name to regular expression."));
+  _cupsLangPuts(stderr, _("  --path regex            Match resource path to regular expression."));
+  _cupsLangPuts(stderr, _("  --print                 Print URI if true."));
+  _cupsLangPuts(stderr, _("  --print-name            Print service name if true."));
+  _cupsLangPuts(stderr, _("  --quiet                 Quietly report match via exit code."));
+  _cupsLangPuts(stderr, _("  --remote                True if service is remote."));
+  _cupsLangPuts(stderr, _("  --txt key               True if the TXT record contains the key."));
+  _cupsLangPuts(stderr, _("  --txt-* regex           Match TXT record key to regular expression."));
+  _cupsLangPuts(stderr, _("  --uri regex             Match URI to regular expression."));
+  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("Modifiers:"));
+  _cupsLangPuts(stderr, _("  ( expressions )         Group expressions."));
+  _cupsLangPuts(stderr, _("  ! expression            Unary NOT of expression."));
+  _cupsLangPuts(stderr, _("  --not expression        Unary NOT of expression."));
+  _cupsLangPuts(stderr, _("  --false                 Always false."));
+  _cupsLangPuts(stderr, _("  --true                  Always true."));
+  _cupsLangPuts(stderr, _("  expression expression   Logical AND."));
+  _cupsLangPuts(stderr, _("  expression --and expression\n"
+                          "                          Logical AND."));
+  _cupsLangPuts(stderr, _("  expression --or expression\n"
+                          "                          Logical OR."));
+  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("Substitutions:"));
+  _cupsLangPuts(stderr, _("  {}                      URI"));
+  _cupsLangPuts(stderr, _("  {service_domain}        Domain name"));
+  _cupsLangPuts(stderr, _("  {service_hostname}      Fully-qualified domain name"));
+  _cupsLangPuts(stderr, _("  {service_name}          Service instance name"));
+  _cupsLangPuts(stderr, _("  {service_port}          Port number"));
+  _cupsLangPuts(stderr, _("  {service_regtype}       DNS-SD registration type"));
+  _cupsLangPuts(stderr, _("  {service_scheme}        URI scheme"));
+  _cupsLangPuts(stderr, _("  {service_uri}           URI"));
+  _cupsLangPuts(stderr, _("  {txt_*}                 Value of TXT record key"));
+  _cupsLangPuts(stderr, "");
+  _cupsLangPuts(stderr, _("Environment Variables:"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_DOMAIN  Domain name"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_HOSTNAME\n"
+                          "                          Fully-qualified domain name"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_NAME    Service instance name"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_PORT    Port number"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_SCHEME  URI scheme"));
+  _cupsLangPuts(stderr, _("  IPPFIND_SERVICE_URI     URI"));
+  _cupsLangPuts(stderr, _("  IPPFIND_TXT_*           Value of TXT record key"));
 
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
-  _cupsLangPuts(stderr, _("  -d name=value           Set named variable to "
-                          "value."));
-  _cupsLangPuts(stderr, _("  -f filename             Set default request "
-                          "filename."));
-  _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with "
-                          "the given time interval."));
-  _cupsLangPuts(stderr, _("  -n count                Repeat the last file the "
-                          "given number of times."));
-  _cupsLangPuts(stderr, _("  -q                      Run silently."));
-  _cupsLangPuts(stderr, _("  -t                      Produce a test report."));
-  _cupsLangPuts(stderr, _("  -v                      Be verbose."));
-
-  exit(IPPFIND_EXIT_OK);
+  exit(IPPFIND_EXIT_TRUE);
 }
 
 
@@ -1276,41 +2004,7 @@ show_version(void)
 {
   _cupsLangPuts(stderr, CUPS_SVERSION);
 
-  exit(IPPFIND_EXIT_OK);
-}
-
-
-/*
- * 'unquote()' - Unquote a name string.
- */
-
-static void
-unquote(char       *dst,		/* I - Destination buffer */
-        const char *src,		/* I - Source string */
-	size_t     dstsize)		/* I - Size of destination buffer */
-{
-  char	*dstend = dst + dstsize - 1;	/* End of destination buffer */
-
-
-  while (*src && dst < dstend)
-  {
-    if (*src == '\\')
-    {
-      src ++;
-      if (isdigit(src[0] & 255) && isdigit(src[1] & 255) &&
-          isdigit(src[2] & 255))
-      {
-        *dst++ = ((((src[0] - '0') * 10) + src[1] - '0') * 10) + src[2] - '0';
-	src += 3;
-      }
-      else
-        *dst++ = *src++;
-    }
-    else
-      *dst++ = *src ++;
-  }
-
-  *dst = '\0';
+  exit(IPPFIND_EXIT_TRUE);
 }
 
 

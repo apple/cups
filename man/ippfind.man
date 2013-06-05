@@ -1,0 +1,229 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   ippfind man page for CUPS.
+.\"
+.\"   Copyright 2013 by Apple Inc.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ippfind 1 "CUPS" "5 June 2013" "Apple Inc."
+.SH NAME
+ippfind - find internet printing protocol printers
+.SH SYNOPSIS
+.B ippfind
+[
+.I options
+] regtype[,subtype][.domain.] ... [
+.I expression ...
+]
+.B ippfind
+[
+.I options
+] name[.regtype[.domain.]] ... [
+.I expression ...
+]
+.B ippfind
+--help
+.B ippfind
+--version
+.SH SUPPORTED REGISTRATION TYPES
+\fIippfind\fR supports the following registration types:
+.TP 5
+_http._tcp
+HyperText Transport Protocol (HTTP, RFC 2616)
+.TP 5
+_https._tcp
+Secure HyperText Transport Protocol (HTTPS, RFC 2818)
+.TP 5
+_ipp._tcp
+Internet Printing Protocol (IPP, RFC 2911)
+.TP 5
+_ipps._tcp
+Secure Internet Printing Protocol (IPPS, draft)
+.TP 5
+_printer._tcp
+Line Printer Daemon (LPD, RFC 1179)
+
+.SH OPTIONS
+.TP 5
+--help
+Show program help
+.TP 5
+--version
+Show program version
+.TP 5
+-4
+Use IPv4 when listing
+.TP 5
+-6
+Use IPv6 when listing
+.TP 5
+-T seconds
+Specify find timeout in seconds. If 1 or less, \fIippfind\fR stops as soon as it thinks it has found everything. The default is 1 second.
+.TP 5
+-V version
+Specifies the IPP version when listing. Supported values are 1.1, 2.0, 2.1, and 2.2.
+
+.SH DESCRIPTION
+\fIippfind\fR finds printer services registered with the local DNS infrastructure or available through the local links.
+
+.SH EXPRESSIONS
+\fIippfind\fR supports expressions much like the \fIfind(1)\fR utility. However, unlike \fIfind\fR, \fIippfind\fR uses POSIX regular expressions instead of shell filename matching patterns. If -e, --exec, -l, --ls, -p, --print, --print-name, -q, --quiet, or -s is not specified, \fIippfind\fR adds --print to print the service URI of anything it finds. The following expressions are supported:
+.TP 5
+-d regex
+.TP 5
+--domain regex
+True if the domain matches the given regular expression.
+.TP 5
+-e utility [argument ...] ;
+.TP 5
+--exec utility [argument ...] ;
+Executes the specified program if the current result is true. "{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
+.TP 5
+--false
+Always false.
+.TP 5
+-l
+.TP 5
+--ls
+Lists attributes returned by Get-Printer-Attributes for IPP printers and traditional \fIfind\fR "-ls" output for HTTP URLs. The result is true if the URI is accessible, false otherwise.
+.TP 5
+--local
+True if the service is local to this computer.
+.TP 5
+-n regex
+.TP 5
+--name regex
+True if the service instance name matches the given regular expression.
+.TP 5
+--path regex
+True if the URI resource path matches the given regular expression.
+.TP 5
+-p
+.TP 5
+--print
+Prints the URI if the result of previous expressions is true. The result is always true.
+.TP 5
+-q
+.TP 5
+--quiet
+Quiet mode - just returns the exit codes below.
+.TP 5
+-r
+.TP 5
+--remote
+True if the service is not local to this computer.
+.TP 5
+-s
+.TP 5
+--print-name
+Prints the service instance name if the result of previous expressions is true. The result is always true.
+.TP 5
+--true
+Always true.
+.TP 5
+-t key
+.TP 5
+--txt key
+True if the TXT record contains the named key.
+.TP 5
+--txt-\fIkey\fR regex
+True if the TXT record contains the named key and matches the given regular
+expression.
+.TP 5
+-u regex
+.TP 5
+--uri regex
+True if the URI matches the given regular expression.
+.PP
+Expressions may also contain modifiers:
+.TP 5
+( expression )
+Group the result of expressions.
+.TP 5
+! expression
+.TP 5
+--not expression
+Unary NOT of the expression.
+.TP 5
+expression expression
+.TP 5
+expression --and expression
+Logical AND of expressions.
+.TP 5
+expression --or expression
+Logical OR of expressions.
+
+.SH SUBSTITUTIONS
+The substitutions for "{foo}" in -e and --exec are:
+.TP 5
+{}
+URI
+.TP 5
+{service_domain}
+Domain name, e.g., "example.com.", "local.", etc.
+.TP 5
+{service_hostname}
+Fully-qualified domain name, e.g., "printer.example.com.", "printer.local.", etc.
+.TP 5
+{service_name}
+Service instance name, e.g., "My Fine Printer".
+.TP 5
+{service_port}
+Port number for server, typically 631 for IPP and 80 for HTTP.
+.TP 5
+{service_regtype}
+DNS-SD registration type, e.g., "_ipp._tcp", "_http._tcp", etc.
+.TP 5
+{service_scheme}
+URI scheme for DNS-SD registration type, e.g., "ipp", "http", etc.
+.TP 5
+{service_uri}
+URI for service, e.g., "ipp://printer.local./ipp/print", "http://printer.local./", etc.
+.TP 5
+{txt_\fIkey\fR}
+Value of TXT record \fIkey\fR (lowercase).
+
+.SH ENVIRONMENT VARIABLES
+When executing a program, \fIippfind\fR sets the following environment variables for the matching service registration:
+.TP 5
+IPPFIND_SERVICE_DOMAIN
+Domain name, e.g., "example.com.", "local.", etc.
+.TP 5
+IPPFIND_SERVICE_HOSTNAME
+Fully-qualified domain name, e.g., "printer.example.com.", "printer.local.", etc.
+.TP 5
+IPPFIND_SERVICE_NAME
+Service instance name, e.g., "My Fine Printer".
+.TP 5
+IPPFIND_SERVICE_PORT
+Port number for server, typically 631 for IPP and 80 for HTTP.
+.TP 5
+IPPFIND_SERVICE_REGTYPE
+DNS-SD registration type, e.g., "_ipp._tcp", "_http._tcp", etc.
+.TP 5
+IPPFIND_SERVICE_SCHEME
+URI scheme for DNS-SD registration type, e.g., "ipp", "http", etc.
+.TP 5
+IPPFIND_SERVICE_URI
+URI for service, e.g., "ipp://printer.local./ipp/print", "http://printer.local./", etc.
+.TP 5
+IPPFIND_TXT_\fIKEY\fR
+Values of TXT record \fIKEY\fR (uppercase).
+
+.SH EXIT CODES
+\fIippfind\fR returns 0 if the result for all processed expressions is true, 1 if the result of any processed expression is false, 2 if browsing or any query or resolution failed, 3 if an undefined option or invalid expression was specified, and 4 if it ran out of memory.
+
+.SH SEE ALSO
+\fIipptool(1)\fR
+
+.SH COPYRIGHT
+Copyright 2013 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

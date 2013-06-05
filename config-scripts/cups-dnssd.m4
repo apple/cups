@@ -23,6 +23,8 @@ AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes   set directory for DNS Ser
 
 DNSSDLIBS=""
 DNSSD_BACKEND=""
+IPPFIND_BIN=""
+IPPFIND_MAN=""
 
 if test "x$PKGCONFIG" != x -a x$enable_avahi != xno; then
 	AC_MSG_CHECKING(for Avahi)
@@ -31,6 +33,8 @@ if test "x$PKGCONFIG" != x -a x$enable_avahi != xno; then
 		CFLAGS="$CFLAGS `$PKGCONFIG --cflags avahi-client`"
 		DNSSDLIBS="`$PKGCONFIG --libs avahi-client`"
 		DNSSD_BACKEND="dnssd"
+		IPPFIND_BIN="ippfind"
+		IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 		AC_DEFINE(HAVE_AVAHI)
 	else
 		AC_MSG_RESULT(no)
@@ -45,6 +49,8 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 				AC_DEFINE(HAVE_DNSSD)
 				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				DNSSD_BACKEND="dnssd"
+				IPPFIND_BIN="ippfind"
+				IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 				;;
 			*)
 				# All others...
@@ -61,6 +67,8 @@ if test "x$DNSSD_BACKEND" = x -a x$enable_dnssd != xno; then
 					AC_DEFINE(HAVE_DNSSD)
 					DNSSDLIBS="-ldns_sd"
 					DNSSD_BACKEND="dnssd",
+					IPPFIND_BIN="ippfind"
+					IPPFIND_MAN="ippfind.\$(MAN1EXT)"
 					AC_MSG_RESULT(no))
 				LIBS="$SAVELIBS"
 				;;
@@ -70,6 +78,8 @@ fi
 
 AC_SUBST(DNSSDLIBS)
 AC_SUBST(DNSSD_BACKEND)
+AC_SUBST(IPPFIND_BIN)
+AC_SUBST(IPPFIND_MAN)
 
 dnl
 dnl End of "$Id: cups-dnssd.m4 7890 2008-08-29 22:19:39Z mike $".

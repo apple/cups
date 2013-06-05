@@ -53,10 +53,12 @@ TESTFILES	=	\
 			print-job-gzip.test \
 			validate-job.test
 OBJS		=	\
+			ippfind.o \
 			ippserver.o \
 			ipptool.o \
 			xmltotest.o
 TARGETS		=	\
+			$(IPPFIND_BIN) \
 			ippserver \
 			ipptool \
 			ipptool-static
@@ -163,6 +165,18 @@ uninstall:
 		$(RM) $(DATADIR)/ipptool/$$file; \
 	done
 	-$(RMDIR) $(DATADIR)/ipptool
+
+
+#
+# ippfind
+#
+
+ippfind:	ippfind.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippfind.o $(LIBS)
+	echo Linking $@-static...
+	$(CC) $(LDFLAGS) -o $@-static ippfind.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

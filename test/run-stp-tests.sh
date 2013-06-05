@@ -100,6 +100,7 @@ case "$testtype" in
 		nprinters2=0
 		pjobs=0
 		pprinters=0
+		loglevel="debug2"
 		;;
 	2)
 		echo "Running the medium tests (2)"
@@ -107,6 +108,7 @@ case "$testtype" in
 		nprinters2=20
 		pjobs=20
 		pprinters=10
+		loglevel="debug"
 		;;
 	3)
 		echo "Running the extreme tests (3)"
@@ -114,6 +116,7 @@ case "$testtype" in
 		nprinters2=1000
 		pjobs=100
 		pprinters=50
+		loglevel="debug"
 		;;
 	4)
 		echo "Running the torture tests (4)"
@@ -121,6 +124,7 @@ case "$testtype" in
 		nprinters2=20000
 		pjobs=200
 		pprinters=100
+		loglevel="debug"
 		;;
 	*)
 		echo "Running the timid tests (1)"
@@ -128,6 +132,7 @@ case "$testtype" in
 		nprinters2=0
 		pjobs=10
 		pprinters=0
+		loglevel="debug2"
 		;;
 esac
 
@@ -397,7 +402,7 @@ PassEnv DYLD_INSERT_LIBRARIES
 MaxSubscriptions 3
 MaxLogSize 0
 AccessLogLevel actions
-LogLevel debug2
+LogLevel $loglevel
 LogTimeFormat usecs
 PreserveJobHistory Yes
 PreserveJobFiles No
