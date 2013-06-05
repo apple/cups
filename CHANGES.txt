@@ -1,8 +1,12 @@
-CHANGES.txt - 1.7b1 - 2013-05-13
---------------------------------
+CHANGES.txt - 1.7rc1 - 2013-06-05
+---------------------------------
 
-CHANGES IN CUPS V1.7b2
+CHANGES IN CUPS V1.7rc1
 
+	- Fixed some issues with conversion of PWG media size names to
+	  hundredths of millimeters (<rdar://problem/14065748>)
+	- The IPP backend could crash on OS X when printing to a Kerberized
+	  printer (<rdar://problem/14040186>)
 	- The ipptool program now automatically extends timeouts when the
 	  output buffer is filled (<rdar://problem/14016099>)
 	- The ipptool program now supports the --help and --version options.

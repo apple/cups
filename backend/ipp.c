@@ -366,7 +366,8 @@ main(int  argc,				/* I - Number of command-line args */
   * that way.
   */
 
-  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
+  if (!getuid() && (value = getenv("AUTH_UID")) != NULL &&
+      !getenv("AUTH_PASSWORD"))
   {
     uid_t	uid = (uid_t)atoi(value);
 					/* User ID */
@@ -3403,7 +3404,6 @@ run_as_user(char       *argv[],		/* I - Command-line arguments */
 
   if (conn)
   {
-    xpc_connection_suspend(conn);
     xpc_connection_cancel(conn);
     xpc_release(conn);
   }
