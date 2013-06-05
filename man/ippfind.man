@@ -88,6 +88,11 @@ Executes the specified program if the current result is true. "{foo}" arguments 
 --false
 Always false.
 .TP 5
+-h regex
+.TP 5
+--host regex
+True is the hostname matches the given regular expression.
+.TP 5
 -l
 .TP 5
 --ls
@@ -103,6 +108,11 @@ True if the service instance name matches the given regular expression.
 .TP 5
 --path regex
 True if the URI resource path matches the given regular expression.
+.TP 5
+-P number[-number]
+.TP 5
+--port number[-number]
+True if the port matches the given number or range.
 .TP 5
 -p
 .TP 5

@@ -15,131 +15,6 @@
  *
  *   This file is subject to the Apple OS-Developed Software exception.
  *
- * Usage:
- *
- *   ./ippfind [options] regtype[,subtype][.domain.] ... [expression]
- *   ./ippfind [options] name[.regtype[.domain.]] ... [expression]
- *   ./ippfind --help
- *   ./ippfind --version
- *
- *  Supported regtypes are:
- *
- *    _http._tcp                      - HTTP (RFC 2616)
- *    _https._tcp                     - HTTPS (RFC 2818)
- *    _ipp._tcp                       - IPP (RFC 2911)
- *    _ipps._tcp                      - IPPS (pending)
- *    _printer._tcp                   - LPD (RFC 1179)
- *
- *  Exit Codes:
- *
- *    0 if result for all processed expressions is true
- *    1 if result of any processed expression is false
- *    2 if browsing or any query or resolution failed
- *    3 if an undefined option or invalid expression was specified
- *
- *  Options:
- *
- *    --help                          - Show program help
- *    --version                       - Show program version
- *    -4                              - Use IPv4 when listing
- *    -6                              - Use IPv6 when listing
- *    -T seconds                      - Specify browse timeout (default 10
- *                                      seconds)
- *    -V version                      - Specify IPP version (1.1, 2.0, 2.1, 2.2)
- *
- *  "expression" is any of the following:
- *
- *   -d regex
- *   --domain regex                   - True if the domain matches the given
- *                                      regular expression.
- *
- *   -e utility [argument ...] ;
- *   --exec utility [argument ...] ;  - Executes the specified program; "{}"
- *                                      does a substitution (see below)
- *
- *   -l
- *   --ls                             - Lists attributes returned by
- *                                      Get-Printer-Attributes for IPP printers,
- *                                      ???? of HEAD request for HTTP URLs)
- *                                      True if resource is accessible, false
- *                                      otherwise.
- *
- *   --local                          - True if the service is local to this
- *                                      computer.
- *
- *   -n regex
- *   --name regex                     - True if the name matches the given
- *                                      regular expression.
- *
- *   --path regex                     - True if the URI resource path matches
- *                                      the given regular expression.
- *
- *   -p
- *   --print                          - Prints the URI of found printers (always
- *                                      true, default if -e, -l, -p, -q, or -s
- *                                      is not specified.
- *
- *   -q
- *   --quiet                          - Quiet mode (just return exit code)
- *
- *   -r
- *   --remote                         - True if the service is not local to this
- *                                      computer.
- *
- *   -s
- *   --print-name                     - Prints the service name of found
- *                                      printers.
- *
- *   -t key
- *   --txt key                        - True if the TXT record contains the
- *                                      named key
- *
- *   --txt-* regex                    - True if the TXT record contains the
- *                                      named key and matches the given regular
- *                                      expression.
- *
- *   -u regex
- *   --uri regex                      - True if the URI matches the given
- *                                      regular expression.
- *
- * Expressions may also contain modifiers:
- *
- *   ( expression )                  - Group the result of expressions.
- *
- *   ! expression
- *   --not expression                - Unary NOT
- *
- *   --false                         - Always false
- *   --true                          - Always true
- *
- *   expression expression
- *   expression --and expression     - Logical AND.
- *
- *   expression --or expression      - Logical OR.
- *
- * The substitutions for {} are:
- *
- *   {}                              - URI
- *   {service_domain}                - Domain name
- *   {service_hostname}              - FQDN
- *   {service_name}                  - Service name
- *   {service_port}                  - Port number
- *   {service_regtype}               - DNS-SD registration type
- *   {service_scheme}                - URI scheme for DNS-SD registration type
- *   {service_uri}                   - URI
- *   {txt_*}                         - Value of TXT record key
- *
- * These variables are also set in the environment for executed programs:
- *
- *   IPPFIND_SERVICE_DOMAIN          - Domain name
- *   IPPFIND_SERVICE_HOSTNAME        - FQDN
- *   IPPFIND_SERVICE_NAME            - Service name
- *   IPPFIND_SERVICE_PORT            - Port number
- *   IPPFIND_SERVICE_REGTYPE         - DNS-SD registration type
- *   IPPFIND_SERVICE_SCHEME          - URI scheme for DNS-SD registration type
- *   IPPFIND_SERVICE_URI             - URI
- *   IPPFIND_TXT_*                   - Values of TXT record key (uppercase)
- *
  * Contents:
  *
  */
@@ -178,6 +53,7 @@ typedef enum ippfind_exit_e		/* Exit codes */
 
 typedef enum ippfind_op_e		/* Operations for expressions */
 {
+  /* "Evaluation" operations */
   IPPFIND_OP_NONE,			/* No operation */
   IPPFIND_OP_AND,			/* Logical AND of all children */
   IPPFIND_OP_OR,			/* Logical OR of all children */
@@ -187,12 +63,14 @@ typedef enum ippfind_op_e		/* Operations for expressions */
   IPPFIND_OP_IS_REMOTE,			/* Is a remote service */
   IPPFIND_OP_DOMAIN_REGEX,		/* Domain matches regular expression */
   IPPFIND_OP_NAME_REGEX,		/* Name matches regular expression */
+  IPPFIND_OP_HOST_REGEX,		/* Hostname matches regular expression */
+  IPPFIND_OP_PORT_RANGE,		/* Port matches range */
   IPPFIND_OP_PATH_REGEX,		/* Path matches regular expression */
   IPPFIND_OP_TXT_EXISTS,		/* TXT record key exists */
   IPPFIND_OP_TXT_REGEX,			/* TXT record key matches regular expression */
   IPPFIND_OP_URI_REGEX,			/* URI matches regular expression */
 
-  IPPFIND_OP_OUTPUT = 100,		/* Output operations */
+  /* "Output" operations */
   IPPFIND_OP_EXEC,			/* Execute when true */
   IPPFIND_OP_LIST,			/* List when true */
   IPPFIND_OP_PRINT_NAME,		/* Print URI when true */
@@ -211,6 +89,7 @@ typedef struct ippfind_expr_s		/* Expression */
   int		invert;			/* Invert the result */
   char		*key;			/* TXT record key */
   regex_t	re;			/* Regular expression for matching */
+  int		range[2];		/* Port number range */
   int		num_args;		/* Number of arguments for exec */
   char		**args;			/* Arguments for exec */
 } ippfind_expr_t;
@@ -227,6 +106,7 @@ typedef struct ippfind_srv_s		/* Service information */
 		*regtype,		/* Registration type */
 		*fullName,		/* Full name */
 		*host,			/* Hostname */
+		*resource,		/* Resource path */
 		*uri;			/* URI */
   int		num_txt;		/* Number of TXT record keys */
   cups_option_t	*txt;			/* TXT record keys */
@@ -298,14 +178,18 @@ static int		compare_services(ippfind_srv_t *a, ippfind_srv_t *b);
 static const char	*dnssd_error_string(int error);
 static int		eval_expr(ippfind_srv_t *service,
 			          ippfind_expr_t *expressions);
+static int		exec_program(ippfind_srv_t *service, int num_args,
+			             char **args);
 static ippfind_srv_t	*get_service(cups_array_t *services,
 				     const char *serviceName,
 				     const char *regtype,
 				     const char *replyDomain)
 				     __attribute__((nonnull(1,2,3,4)));
 static double		get_time(void);
-static ippfind_expr_t	*new_expr(ippfind_op_t op, int invert, const char *key,
-			          const char *regex, char **args);
+static int		list_service(ippfind_srv_t *service);
+static ippfind_expr_t	*new_expr(ippfind_op_t op, int invert,
+			          const char *value, const char *regex,
+			          char **args);
 #ifdef HAVE_DNSSD
 static void		resolve_callback(DNSServiceRef sdRef,
 			                 DNSServiceFlags flags,
@@ -471,6 +355,16 @@ main(int  argc,				/* I - Number of command-line args */
         {
           show_usage();
         }
+        else if (!strcmp(argv[i], "--host"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_HOST_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
         else if (!strcmp(argv[i], "--ls"))
         {
           i ++;
@@ -559,6 +453,16 @@ main(int  argc,				/* I - Number of command-line args */
             show_usage();
 
           if ((temp = new_expr(IPPFIND_OP_PATH_REGEX, invert, NULL, argv[i],
+                               NULL)) == NULL)
+            return (IPPFIND_EXIT_MEMORY);
+        }
+        else if (!strcmp(argv[i], "--port"))
+        {
+          i ++;
+          if (i >= argc)
+            show_usage();
+
+          if ((temp = new_expr(IPPFIND_OP_PORT_RANGE, invert, argv[i], NULL,
                                NULL)) == NULL)
             return (IPPFIND_EXIT_MEMORY);
         }
@@ -681,6 +585,16 @@ main(int  argc,				/* I - Number of command-line args */
                 address_family = AF_INET6;
                 break;
 
+            case 'P' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_PORT_RANGE, invert, argv[i],
+		                     NULL, NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+		break;
+
             case 'T' :
                 i ++;
                 if (i >= argc)
@@ -735,6 +649,16 @@ main(int  argc,				/* I - Number of command-line args */
 		  show_usage();
 
 		have_output = 1;
+                break;
+
+            case 'h' :
+		i ++;
+		if (i >= argc)
+		  show_usage();
+
+		if ((temp = new_expr(IPPFIND_OP_HOST_REGEX, invert, NULL,
+		                     argv[i], NULL)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
                 break;
 
             case 'l' :
@@ -1529,9 +1453,122 @@ static int				/* O - Result of evaluation */
 eval_expr(ippfind_srv_t  *service,	/* I - Service */
 	  ippfind_expr_t *expressions)	/* I - Expressions */
 {
-  (void)expressions;
+  int			logic,		/* Logical operation */
+			result;		/* Result of current expression */
+  ippfind_expr_t	*expression;	/* Current expression */
+  const char		*val;		/* TXT value */
 
-  puts(service->uri);
+ /*
+  * Loop through the expressions...
+  */
+
+  if (expressions && expressions->parent)
+    logic = expressions->parent->op;
+  else
+    logic = IPPFIND_OP_AND;
+
+  for (expression = expressions; expression; expression = expression->next)
+  {
+    switch (expression->op)
+    {
+      default :
+      case IPPFIND_OP_AND :
+      case IPPFIND_OP_OR :
+          if (expression->child)
+            result = eval_expr(service, expression->child);
+          else
+            result = expression->op == IPPFIND_OP_AND;
+          break;
+      case IPPFIND_OP_TRUE :
+          result = 1;
+          break;
+      case IPPFIND_OP_FALSE :
+          result = 0;
+          break;
+      case IPPFIND_OP_IS_LOCAL :
+          result = service->is_local;
+          break;
+      case IPPFIND_OP_IS_REMOTE :
+          result = !service->is_local;
+          break;
+      case IPPFIND_OP_DOMAIN_REGEX :
+          result = !regexec(&(expression->re), service->domain, 0, NULL, 0);
+          break;
+      case IPPFIND_OP_NAME_REGEX :
+          result = !regexec(&(expression->re), service->name, 0, NULL, 0);
+          break;
+      case IPPFIND_OP_HOST_REGEX :
+          result = !regexec(&(expression->re), service->host, 0, NULL, 0);
+          break;
+      case IPPFIND_OP_PORT_RANGE :
+          result = service->port >= expression->range[0] &&
+                   service->port <= expression->range[1];
+          break;
+      case IPPFIND_OP_PATH_REGEX :
+          result = !regexec(&(expression->re), service->resource, 0, NULL, 0);
+          break;
+      case IPPFIND_OP_TXT_EXISTS :
+          result = cupsGetOption(expression->key, service->num_txt,
+				 service->txt) != NULL;
+          break;
+      case IPPFIND_OP_TXT_REGEX :
+          val = cupsGetOption(expression->key, service->num_txt,
+			      service->txt);
+	  if (val)
+	    result = !regexec(&(expression->re), val, 0, NULL, 0);
+	  else
+	    result = 0;
+          break;
+      case IPPFIND_OP_URI_REGEX :
+          result = !regexec(&(expression->re), service->uri, 0, NULL, 0);
+          break;
+      case IPPFIND_OP_EXEC :
+          result = exec_program(service, expression->num_args,
+				 expression->args);
+          break;
+      case IPPFIND_OP_LIST :
+          result = list_service(service);
+          break;
+      case IPPFIND_OP_PRINT_NAME :
+          _cupsLangPuts(stdout, service->name);
+          result = 1;
+          break;
+      case IPPFIND_OP_PRINT_URI :
+          _cupsLangPuts(stdout, service->uri);
+          result = 1;
+          break;
+      case IPPFIND_OP_QUIET :
+          result = 1;
+          break;
+    }
+
+    if (expression->invert)
+      result = !result;
+
+    if (logic == IPPFIND_OP_AND && !result)
+      return (0);
+    else if (logic == IPPFIND_OP_OR && result)
+      return (1);
+  }
+
+  return (logic == IPPFIND_OP_AND);
+}
+
+
+/*
+ * 'exec_program()' - Execute a program for a service.
+ */
+
+static int				/* O - 1 if program terminated
+					       successfully, 0 otherwise. */
+exec_program(ippfind_srv_t *service,	/* I - Service */
+             int           num_args,	/* I - Number of command-line args */
+             char          **args)	/* I - Command-line arguments */
+{
+  (void)service;
+  (void)num_args;
+  (void)args;
+
   return (1);
 }
 
@@ -1622,13 +1659,26 @@ get_time(void)
 
 
 /*
+ * 'list_service()' - List the contents of a service.
+ */
+
+static int				/* O - 1 if successful, 0 otherwise */
+list_service(ippfind_srv_t *service)	/* I - Service */
+{
+  (void)service;
+
+  return (1);
+}
+
+
+/*
  * 'new_expr()' - Create a new expression.
  */
 
 static ippfind_expr_t *			/* O - New expression */
 new_expr(ippfind_op_t op,		/* I - Operation */
          int          invert,		/* I - Invert result? */
-         const char   *key,		/* I - TXT key */
+         const char   *value,		/* I - TXT key or port range */
 	 const char   *regex,		/* I - Regular expression */
 	 char         **args)		/* I - Pointer to argument strings */
 {
@@ -1640,11 +1690,34 @@ new_expr(ippfind_op_t op,		/* I - Operation */
 
   temp->op = op;
   temp->invert = invert;
-  temp->key    = (char *)key;
+
+  if (op == IPPFIND_OP_TXT_EXISTS || op == IPPFIND_OP_TXT_REGEX)
+    temp->key = (char *)value;
+  else if (op == IPPFIND_OP_PORT_RANGE)
+  {
+   /*
+    * Pull port number range of the form "number", "-number" (0-number),
+    * "number-" (number-65535), and "number-number".
+    */
+
+    if (*value == '-')
+    {
+      temp->range[1] = atoi(value + 1);
+    }
+    else if (strchr(value, '-'))
+    {
+      if (sscanf(value, "%d-%d", temp->range, temp->range + 1) == 1)
+        temp->range[1] = 65535;
+    }
+    else
+    {
+      temp->range[0] = temp->range[1] = atoi(value);
+    }
+  }
 
   if (regex)
   {
-    int err = regcomp(&(temp->re), regex, REG_NOSUB | REG_EXTENDED);
+    int err = regcomp(&(temp->re), regex, REG_NOSUB | REG_ICASE | REG_EXTENDED);
 
     if (err)
     {
@@ -1896,12 +1969,17 @@ set_service_uri(ippfind_srv_t *service)	/* I - Service */
     path = "/";
 
   if (*path == '/')
-    httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
-                    service->host, service->port, path);
+  {
+    service->resource = strdup(path);
+  }
   else
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
-                     service->host, service->port, "/%s", path);
+  {
+    snprintf(uri, sizeof(uri), "/%s", path);
+    service->resource = strdup(uri);
+  }
 
+  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL,
+		  service->host, service->port, service->resource);
   service->uri = strdup(uri);
 }
 
@@ -1931,9 +2009,11 @@ show_usage(void)
   _cupsLangPuts(stderr, _("  --version               Show program version."));
   _cupsLangPuts(stderr, "");
   _cupsLangPuts(stderr, _("Expressions:"));
+  _cupsLangPuts(stderr, _("  -P number[-number]      Match port to number or range."));
   _cupsLangPuts(stderr, _("  -d regex                Match domain to regular expression."));
   _cupsLangPuts(stderr, _("  -e utility [argument ...] ;\n"
                           "                          Execute program if true."));
+  _cupsLangPuts(stderr, _("  -h regex                Match hostname to regular expression."));
   _cupsLangPuts(stderr, _("  -l                      List attributes."));
   _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
   _cupsLangPuts(stderr, _("  -p                      Print URI if true."));
@@ -1945,10 +2025,12 @@ show_usage(void)
   _cupsLangPuts(stderr, _("  --domain regex          Match domain to regular expression."));
   _cupsLangPuts(stderr, _("  --exec utility [argument ...] ;\n"
                           "                          Execute program if true."));
+  _cupsLangPuts(stderr, _("  --host regex            Match hostname to regular expression."));
   _cupsLangPuts(stderr, _("  --ls                    List attributes."));
   _cupsLangPuts(stderr, _("  --local                 True if service is local."));
   _cupsLangPuts(stderr, _("  --name regex            Match service name to regular expression."));
   _cupsLangPuts(stderr, _("  --path regex            Match resource path to regular expression."));
+  _cupsLangPuts(stderr, _("  --port number[-number]  Match port to number or range."));
   _cupsLangPuts(stderr, _("  --print                 Print URI if true."));
   _cupsLangPuts(stderr, _("  --print-name            Print service name if true."));
   _cupsLangPuts(stderr, _("  --quiet                 Quietly report match via exit code."));
