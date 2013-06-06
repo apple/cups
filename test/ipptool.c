@@ -353,8 +353,9 @@ main(int  argc,				/* I - Number of command-line args */
 
 	      if (i >= argc)
 	      {
-		_cupsLangPuts(stderr,
-		              _("ipptool: Missing timeout for \"-T\"."));
+		_cupsLangPrintf(stderr,
+		                _("%s: Missing timeout for \"-T\"."),
+		                "ipptool");
 		usage();
               }
 
@@ -366,8 +367,9 @@ main(int  argc,				/* I - Number of command-line args */
 
 	      if (i >= argc)
 	      {
-		_cupsLangPuts(stderr,
-		              _("ipptool: Missing version for \"-V\"."));
+		_cupsLangPrintf(stderr,
+		                _("%s: Missing version for \"-V\"."),
+		                "ipptool");
 		usage();
               }
 
@@ -384,8 +386,8 @@ main(int  argc,				/* I - Number of command-line args */
 	      else
 	      {
 		_cupsLangPrintf(stderr,
-		                _("ipptool: Bad version %s for \"-V\"."),
-				argv[i]);
+		                _("%s: Bad version %s for \"-V\"."),
+				"ipptool", argv[i]);
 		usage();
 	      }
 	      break;
