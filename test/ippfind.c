@@ -58,6 +58,8 @@
 #  define kDNSServiceMaxDomainName AVAHI_DOMAIN_NAME_MAX
 #endif /* HAVE_DNSSD */
 
+extern char **environ;			/* Process environment variables */
+
 
 /*
  * Structures...
@@ -1815,7 +1817,7 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
           break;
       case IPPFIND_OP_EXEC :
           result = exec_program(service, expression->num_args,
-				 expression->args);
+				expression->args);
           break;
       case IPPFIND_OP_LIST :
           result = list_service(service);
@@ -1856,11 +1858,224 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
              int           num_args,	/* I - Number of command-line args */
              char          **args)	/* I - Command-line arguments */
 {
-  (void)service;
-  (void)num_args;
-  (void)args;
+  char		**myargv,		/* Command-line arguments */
+		**myenvp,		/* Environment variables */
+		*ptr,			/* Pointer into variable */
+		domain[1024],		/* IPPFIND_SERVICE_DOMAIN */
+		hostname[1024],		/* IPPFIND_SERVICE_HOSTNAME */
+		name[256],		/* IPPFIND_SERVICE_NAME */
+		port[32],		/* IPPFIND_SERVICE_PORT */
+		regtype[256],		/* IPPFIND_SERVICE_REGTYPE */
+		scheme[128],		/* IPPFIND_SERVICE_SCHEME */
+		uri[1024],		/* IPPFIND_SERVICE_URI */
+		txt[100][256];		/* IPPFIND_TXT_foo */
+  int		i,			/* Looping var */
+		myenvc,			/* Number of environment variables */
+		status;			/* Exit status of program */
+#ifndef WIN32
+  char		program[1024];		/* Program to execute */
+  int		pid;			/* Process ID */
+#endif /* !WIN32 */
 
-  return (1);
+
+ /*
+  * Environment variables...
+  */
+
+  snprintf(domain, sizeof(domain), "IPPFIND_SERVICE_DOMAIN=%s",
+           service->domain);
+  snprintf(hostname, sizeof(hostname), "IPPFIND_SERVICE_HOSTNAME=%s",
+           service->host);
+  snprintf(name, sizeof(name), "IPPFIND_SERVICE_NAME=%s", service->name);
+  snprintf(port, sizeof(port), "IPPFIND_SERVICE_PORT=%d", service->port);
+  snprintf(regtype, sizeof(regtype), "IPPFIND_SERVICE_REGTYPE=%s",
+           service->regtype);
+  snprintf(scheme, sizeof(scheme), "IPPFIND_SERVICE_SCHEME=%s",
+           !strncmp(service->regtype, "_http._tcp", 10) ? "http" :
+               !strncmp(service->regtype, "_https._tcp", 11) ? "https" :
+               !strncmp(service->regtype, "_ipp._tcp", 9) ? "ipp" :
+               !strncmp(service->regtype, "_ipps._tcp", 10) ? "ipps" : "lpd");
+  snprintf(uri, sizeof(uri), "IPPFIND_SERVICE_URI=%s", service->uri);
+  for (i = 0; i < service->num_txt && i < 100; i ++)
+  {
+    snprintf(txt[i], sizeof(txt[i]), "IPPFIND_TXT_%s=%s", service->txt[i].name,
+             service->txt[i].value);
+    for (ptr = txt[i] + 12; *ptr && *ptr != '='; ptr ++)
+      *ptr = _cups_toupper(*ptr);
+  }
+
+  for (i = 0, myenvc = 7 + service->num_txt; environ[i]; i ++)
+    if (strncmp(environ[i], "IPPFIND_", 8))
+      myenvc ++;
+
+  if ((myenvp = calloc(sizeof(char *), myenvc + 1)) == NULL)
+  {
+    _cupsLangPuts(stderr, _("ippfind: Out of memory."));
+    exit(IPPFIND_EXIT_MEMORY);
+  }
+
+  for (i = 0, myenvc = 0; environ[i]; i ++)
+    if (strncmp(environ[i], "IPPFIND_", 8))
+      myenvp[myenvc++] = environ[i];
+
+  myenvp[myenvc++] = domain;
+  myenvp[myenvc++] = hostname;
+  myenvp[myenvc++] = name;
+  myenvp[myenvc++] = port;
+  myenvp[myenvc++] = regtype;
+  myenvp[myenvc++] = scheme;
+  myenvp[myenvc++] = uri;
+
+  for (i = 0; i < service->num_txt && i < 100; i ++)
+    myenvp[myenvc++] = txt[i];
+
+ /*
+  * Allocate and copy command-line arguments...
+  */
+
+  if ((myargv = calloc(sizeof(char *), num_args + 1)) == NULL)
+  {
+    _cupsLangPuts(stderr, _("ippfind: Out of memory."));
+    exit(IPPFIND_EXIT_MEMORY);
+  }
+
+  for (i = 0; i < num_args; i ++)
+  {
+    if (strchr(args[i], '{'))
+    {
+      char	temp[2048],		/* Temporary string */
+		*tptr,			/* Pointer into temporary string */
+		keyword[256],		/* {keyword} */
+		*kptr;			/* Pointer into keyword */
+
+      for (ptr = args[i], tptr = temp; *ptr; ptr ++)
+      {
+        if (*ptr == '{')
+        {
+         /*
+          * Do a {var} substitution...
+          */
+
+          for (kptr = keyword, ptr ++; *ptr && *ptr != '}'; ptr ++)
+            if (kptr < (keyword + sizeof(keyword) - 1))
+              *kptr++ = *ptr;
+
+          if (*ptr != '}')
+          {
+            _cupsLangPuts(stderr,
+                          _("ippfind: Missing close brace in substitution."));
+            exit(IPPFIND_EXIT_SYNTAX);
+          }
+
+          *kptr = '\0';
+          if (!keyword[0] || !strcmp(keyword, "service_uri"))
+	    strlcpy(tptr, service->uri, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_domain"))
+	    strlcpy(tptr, service->domain, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_hostname"))
+	    strlcpy(tptr, service->host, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_name"))
+	    strlcpy(tptr, service->name, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_path"))
+	    strlcpy(tptr, service->resource, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_port"))
+	    strlcpy(tptr, port + 20, sizeof(temp) - (tptr - temp));
+	  else if (!strcmp(keyword, "service_scheme"))
+	    strlcpy(tptr, scheme + 22, sizeof(temp) - (tptr - temp));
+	  else if (!strncmp(keyword, "txt_", 4))
+	  {
+	    if ((ptr = (char *)cupsGetOption(keyword + 4, service->num_txt,
+					     service->txt)) != NULL)
+	      strlcpy(tptr, strdup(ptr), sizeof(temp) - (tptr - temp));
+	    else
+	      *tptr = '\0';
+	  }
+	  else
+	  {
+	    _cupsLangPrintf(stderr, _("ippfind: Unknown variable \"{%s}\"."),
+	                    keyword);
+	    exit(IPPFIND_EXIT_SYNTAX);
+	  }
+
+	  tptr += strlen(tptr);
+	}
+	else if (tptr < (temp + sizeof(temp) - 1))
+	  *tptr++ = *ptr;
+      }
+
+      *tptr = '\0';
+      myargv[i] = strdup(temp);
+    }
+    else
+      myargv[i] = strdup(args[i]);
+  }
+
+#ifdef WIN32
+  status = _spawnvpe(_P_WAIT, args[0], myargv, myenvp);
+
+#else
+ /*
+  * Execute the program...
+  */
+
+  if (strchr(args[0], '/') && !access(args[0], X_OK))
+    strlcpy(program, args[0], sizeof(program));
+  else if (!cupsFileFind(args[0], getenv("PATH"), 1, program, sizeof(program)))
+  {
+    _cupsLangPrintf(stderr, _("ippfind: Unable to execute \"%s\": %s"),
+                    args[0], strerror(ENOENT));
+    exit(IPPFIND_EXIT_SYNTAX);
+  }
+
+  if (getenv("IPPFIND_DEBUG"))
+  {
+    printf("\nProgram:\n    %s\n", program);
+    puts("\nArguments:");
+    for (i = 0; i < num_args; i ++)
+      printf("    %s\n", myargv[i]);
+    puts("\nEnvironment:");
+    for (i = 0; i < myenvc; i ++)
+      printf("    %s\n", myenvp[i]);
+  }
+
+  if ((pid = fork()) == 0)
+  {
+   /*
+    * Child comes here...
+    */
+
+    execve(program, myargv, myenvp);
+    exit(1);
+  }
+  else if (pid < 0)
+  {
+    _cupsLangPrintf(stderr, _("ippfind: Unable to execute \"%s\": %s"),
+                    args[0], strerror(errno));
+    exit(IPPFIND_EXIT_SYNTAX);
+  }
+  else
+  {
+   /*
+    * Wait for it to complete...
+    */
+
+    while (wait(&status) != pid)
+      ;
+  }
+#endif /* WIN32 */
+
+ /*
+  * Free memory...
+  */
+
+  for (i = 0; i < num_args; i ++)
+    free(myargv[i]);
+
+ /*
+  * Return whether the program succeeded or crashed...
+  */
+
+  return (status == 0);
 }
 
 
@@ -1957,7 +2172,7 @@ static int				/* O - 1 if successful, 0 otherwise */
 list_service(ippfind_srv_t *service)	/* I - Service */
 {
   http_addrlist_t	*addrlist;	/* Address(es) of service */
-  char			port[32];	/* Port number of service */
+  char			port[10];	/* Port number of service */
 
 
   snprintf(port, sizeof(port), "%d", service->port);
@@ -2240,7 +2455,8 @@ new_expr(ippfind_op_t op,		/* I - Operation */
       if (!strcmp(args[num_args], ";"))
         break;
 
-     temp->args = malloc(num_args * sizeof(char *));
+     temp->num_args = num_args;
+     temp->args     = malloc(num_args * sizeof(char *));
      memcpy(temp->args, args, num_args * sizeof(char *));
   }
 

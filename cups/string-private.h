@@ -3,7 +3,7 @@
  *
  *   Private string definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -102,6 +102,12 @@ _cups_isalpha(int ch)			/* I - Character to test */
 }
 
 _CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
+_cups_islower(int ch)			/* I - Character to test */
+{
+  return (ch >= 'a' && ch <= 'z');
+}
+
+_CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
 _cups_isspace(int ch)			/* I - Character to test */
 {
   return (ch == ' ' || ch == '\f' || ch == '\n' || ch == '\r' || ch == '\t' ||
@@ -119,12 +125,20 @@ _cups_tolower(int ch)			/* I - Character to convert */
 {
   return (_cups_isupper(ch) ? ch - 'A' + 'a' : ch);
 }
+
+_CUPS_INLINE int			/* O - Converted character */
+_cups_toupper(int ch)			/* I - Character to convert */
+{
+  return (_cups_islower(ch) ? ch - 'a' + 'A' : ch);
+}
 #  else
 extern int _cups_isalnum(int ch);
 extern int _cups_isalpha(int ch);
+extern int _cups_islower(int ch);
 extern int _cups_isspace(int ch);
 extern int _cups_isupper(int ch);
 extern int _cups_tolower(int ch);
+extern int _cups_toupper(int ch);
 #  endif /* _CUPS_INLINE */
 
 
