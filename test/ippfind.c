@@ -75,7 +75,7 @@ typedef enum ippfind_op_e		/* Operations for expressions */
   IPPFIND_OP_LIST,			/* List when true */
   IPPFIND_OP_PRINT_NAME,		/* Print URI when true */
   IPPFIND_OP_PRINT_URI,			/* Print name when true */
-  IPPFIND_OP_QUIET,			/* No output when true */
+  IPPFIND_OP_QUIET			/* No output when true */
 } ippfind_op_t;
 
 typedef struct ippfind_expr_s		/* Expression */
@@ -244,7 +244,9 @@ main(int  argc,				/* I - Number of command-line args */
 					/* Expression tree */
 			*temp = NULL,	/* New expression */
 			*parent = NULL,	/* Parent expression */
-			*current = NULL;/* Current expression */
+			*current = NULL,/* Current expression */
+			*parens[100];	/* Markers for parenthesis */
+  int			num_parens = 0;	/* Number of parenthesis */
   ippfind_op_t		logic = IPPFIND_OP_AND;
 					/* Logic for next expression */
   int			invert = 0;	/* Invert expression? */
@@ -285,30 +287,20 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (!strcmp(argv[i], "--and"))
         {
-	  if (logic != IPPFIND_OP_AND && current && current->prev)
-	  {
-	   /*
-	    * OK, we have more than 1 rule in the current tree level.
-	    * Make a new group tree and move the previous rule to it...
-	    */
+          if (logic == IPPFIND_OP_OR)
+          {
+            _cupsLangPuts(stderr, _("ippfind: Cannot use --and after --or."));
+            show_usage();
+          }
 
-	    if ((temp = new_expr(IPPFIND_OP_AND, 0, NULL, NULL, NULL)) == NULL)
-	      return (IPPFIND_EXIT_MEMORY);
+          if (!current)
+          {
+            _cupsLangPuts(stderr,
+                          _("ippfind: Missing expression before \"--and\"."));
+            show_usage();
+          }
 
-	    temp->child         = current;
-	    temp->parent        = current->parent;
-	    current->prev->next = temp;
-	    temp->prev          = current->prev;
-
-	    current->prev   = NULL;
-	    current->parent = temp;
-	    parent          = temp;
-	  }
-	  else if (parent)
-	    parent->op = IPPFIND_OP_AND;
-
-	  logic = IPPFIND_OP_AND;
-	  temp  = NULL;
+	  temp = NULL;
         }
         else if (!strcmp(argv[i], "--domain"))
         {
@@ -403,48 +395,90 @@ main(int  argc,				/* I - Number of command-line args */
         }
         else if (!strcmp(argv[i], "--or"))
         {
-	  if (logic != IPPFIND_OP_OR && current)
+          if (!current)
+          {
+            _cupsLangPuts(stderr,
+                          _("ippfind: Missing expression before \"--or\"."));
+            show_usage();
+          }
+
+          logic = IPPFIND_OP_OR;
+
+          if (parent && parent->op == IPPFIND_OP_OR)
+          {
+           /*
+            * Already setup to do "foo --or bar --or baz"...
+            */
+
+            temp = NULL;
+          }
+          else if (!current->prev && parent)
+          {
+           /*
+            * Change parent node into an OR node...
+            */
+
+            parent->op = IPPFIND_OP_OR;
+            temp       = NULL;
+          }
+          else if (!current->prev)
+          {
+           /*
+            * Need to group "current" in a new OR node...
+            */
+
+	    if ((temp = new_expr(IPPFIND_OP_OR, 0, NULL, NULL,
+				 NULL)) == NULL)
+	      return (IPPFIND_EXIT_MEMORY);
+
+            temp->parent    = parent;
+            temp->child     = current;
+            current->parent = temp;
+
+            if (parent)
+              parent->child = temp;
+            else
+              expressions = temp;
+
+	    parent = temp;
+	    temp   = NULL;
+	  }
+	  else
 	  {
 	   /*
-	    * OK, we have two possibilities; either this is the top-level
-	    * rule or we have a bunch of AND rules at this level.
+	    * Need to group previous expressions in an AND node, and then
+	    * put that in an OR node...
 	    */
 
-	    if (!parent)
+	    if ((temp = new_expr(IPPFIND_OP_AND, 0, NULL, NULL,
+				 NULL)) == NULL)
+	      return (IPPFIND_EXIT_MEMORY);
+
+	    while (current->prev)
 	    {
-	     /*
-	      * This is the top-level rule; we have to group *all* of the AND
-	      * rules down a level, as AND has precedence over OR.
-	      */
-
-	      if ((temp = new_expr(IPPFIND_OP_AND, 0, NULL, NULL,
-	                           NULL)) == NULL)
-		return (IPPFIND_EXIT_MEMORY);
-
-	      while (current->prev)
-	      {
-		current->parent = temp;
-		current         = current->prev;
-	      }
-
 	      current->parent = temp;
-	      temp->child     = current;
-
-	      expressions = current = temp;
+	      current         = current->prev;
 	    }
-	    else
-	    {
-	     /*
-	      * This isn't the top rule, so go up one level...
-	      */
 
-	      current = parent;
-	      parent  = current->parent;
-	    }
+	    current->parent = temp;
+	    temp->child     = current;
+	    current         = temp;
+
+	    if ((temp = new_expr(IPPFIND_OP_OR, 0, NULL, NULL,
+				 NULL)) == NULL)
+	      return (IPPFIND_EXIT_MEMORY);
+
+            temp->parent    = parent;
+            current->parent = temp;
+
+            if (parent)
+              parent->child = temp;
+            else
+              expressions = temp;
+
+	    parent = temp;
+	    temp   = NULL;
 	  }
-
-	  logic = IPPFIND_OP_OR;
-	  temp  = NULL;
         }
         else if (!strcmp(argv[i], "--path"))
         {
@@ -551,6 +585,42 @@ main(int  argc,				/* I - Number of command-line args */
           * Add new expression...
           */
 
+	  if (logic == IPPFIND_OP_AND &&
+	      current && current->prev &&
+	      parent && parent->op != IPPFIND_OP_AND)
+          {
+           /*
+            * Need to re-group "current" in a new AND node...
+            */
+
+            ippfind_expr_t *tempand;	/* Temporary AND node */
+
+	    if ((tempand = new_expr(IPPFIND_OP_AND, 0, NULL, NULL,
+				    NULL)) == NULL)
+	      return (IPPFIND_EXIT_MEMORY);
+
+           /*
+            * Replace "current" with new AND node at the end of this list...
+            */
+
+            current->prev->next = tempand;
+            tempand->prev       = current->prev;
+            tempand->parent     = parent;
+
+           /*
+            * Add "current to the new AND node...
+            */
+
+            tempand->child  = current;
+            current->parent = tempand;
+            current->prev   = NULL;
+	    parent          = tempand;
+	  }
+
+         /*
+          * Add the new node at current level...
+          */
+
 	  if (current)
 	  {
 	    temp->parent  = parent;
@@ -564,6 +634,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  temp->prev = current;
 	  current    = temp;
           invert     = 0;
+          logic      = IPPFIND_OP_AND;
           temp       = NULL;
         }
       }
@@ -746,6 +817,42 @@ main(int  argc,				/* I - Number of command-line args */
 	    * Add new expression...
 	    */
 
+	    if (logic == IPPFIND_OP_AND &&
+	        current && current->prev &&
+	        parent && parent->op != IPPFIND_OP_AND)
+	    {
+	     /*
+	      * Need to re-group "current" in a new AND node...
+	      */
+
+	      ippfind_expr_t *tempand;	/* Temporary AND node */
+
+	      if ((tempand = new_expr(IPPFIND_OP_AND, 0, NULL, NULL,
+				      NULL)) == NULL)
+		return (IPPFIND_EXIT_MEMORY);
+
+	     /*
+	      * Replace "current" with new AND node at the end of this list...
+	      */
+
+	      current->prev->next = tempand;
+	      tempand->prev       = current->prev;
+	      tempand->parent     = parent;
+
+	     /*
+	      * Add "current to the new AND node...
+	      */
+
+	      tempand->child  = current;
+	      current->parent = tempand;
+	      current->prev   = NULL;
+	      parent          = tempand;
+	    }
+
+	   /*
+	    * Add the new node at current level...
+	    */
+
 	    if (current)
 	    {
 	      temp->parent  = parent;
@@ -759,6 +866,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    temp->prev = current;
 	    current    = temp;
 	    invert     = 0;
+	    logic      = IPPFIND_OP_AND;
 	    temp       = NULL;
 	  }
         }
@@ -766,38 +874,43 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else if (!strcmp(argv[i], "("))
     {
+      if (num_parens >= 100)
+      {
+        _cupsLangPuts(stderr, _("ippfind: Too many parenthesis."));
+        show_usage();
+      }
+
       if ((temp = new_expr(IPPFIND_OP_AND, invert, NULL, NULL, NULL)) == NULL)
 	return (IPPFIND_EXIT_MEMORY);
+
+      parens[num_parens++] = temp;
 
       if (current)
       {
 	temp->parent  = current->parent;
 	current->next = temp;
+	temp->prev    = current;
       }
       else
 	expressions = temp;
 
-      temp->prev = current;
-      parent     = temp;
-      current    = NULL;
-      invert     = 0;
-      logic      = IPPFIND_OP_AND;
+      parent  = temp;
+      current = NULL;
+      invert  = 0;
+      logic   = IPPFIND_OP_AND;
     }
     else if (!strcmp(argv[i], ")"))
     {
-      if (!parent)
+      if (num_parens <= 0)
       {
         _cupsLangPuts(stderr, _("ippfind: Missing open parenthesis."));
         show_usage();
       }
 
-      current = parent;
+      current = parens[--num_parens];
       parent  = current->parent;
-
-      if (!parent)
-        logic = IPPFIND_OP_AND;
-      else
-        logic = parent->op;
+      invert  = 0;
+      logic   = IPPFIND_OP_AND;
     }
     else if (!strcmp(argv[i], "!"))
     {
@@ -817,19 +930,10 @@ main(int  argc,				/* I - Number of command-line args */
     }
   }
 
-  if (parent)
+  if (num_parens > 0)
   {
     _cupsLangPuts(stderr, _("ippfind: Missing close parenthesis."));
     show_usage();
-  }
-
-  if (cupsArrayCount(searches) == 0)
-  {
-   /*
-    * Add an implicit browse for IPP printers ("_ipp._tcp")...
-    */
-
-    cupsArrayAdd(searches, "_ipp._tcp");
   }
 
   if (!have_output)
@@ -843,13 +947,88 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (current)
     {
-      temp->parent  = parent;
+      while (current->parent)
+	current = current->parent;
+
       current->next = temp;
+      temp->prev    = current;
     }
     else
       expressions = temp;
+  }
 
-    temp->prev = current;
+  if (cupsArrayCount(searches) == 0)
+  {
+   /*
+    * Add an implicit browse for IPP printers ("_ipp._tcp")...
+    */
+
+    cupsArrayAdd(searches, "_ipp._tcp");
+  }
+
+  if (getenv("IPPFIND_DEBUG"))
+  {
+    int			indent = 4;	/* Indentation */
+    static const char * const ops[] =
+    {
+      "NONE",
+      "AND",
+      "OR",
+      "TRUE",
+      "FALSE",
+      "IS_LOCAL",
+      "IS_REMOTE",
+      "DOMAIN_REGEX",
+      "NAME_REGEX",
+      "HOST_REGEX",
+      "PORT_RANGE",
+      "PATH_REGEX",
+      "TXT_EXISTS",
+      "TXT_REGEX",
+      "URI_REGEX",
+      "EXEC",
+      "LIST",
+      "PRINT_NAME",
+      "PRINT_URI",
+      "QUIET"
+    };
+
+    puts("Expression tree:");
+    current = expressions;
+    while (current)
+    {
+     /*
+      * Print the current node...
+      */
+
+      printf("%*s%s%s\n", indent, "", current->invert ? "!" : "",
+             ops[current->op]);
+
+     /*
+      * Advance to the next node...
+      */
+
+      if (current->child)
+      {
+        current = current->child;
+        indent += 4;
+      }
+      else if (current->next)
+        current = current->next;
+      else if (current->parent)
+      {
+        current = current->parent->next;
+        indent -= 4;
+      }
+      else
+        current = NULL;
+    }
+
+    puts("\nSearch items:");
+    for (search = (const char *)cupsArrayFirst(searches);
+	 search;
+	 search = (const char *)cupsArrayNext(searches))
+      printf("    %s\n", search);
   }
 
  /*
