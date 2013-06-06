@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man 7889 2008-08-29 22:03:35Z mike $"
+.\" "$Id$"
 .\"
 .\"   lp man page for CUPS.
 .\"
@@ -248,5 +248,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: lp.man 7889 2008-08-29 22:03:35Z mike $".
+.\" End of "$Id$".
 .\"

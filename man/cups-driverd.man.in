@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cups-driverd.man.in 7662 2008-06-17 14:34:20Z mike $"
+.\" "$Id$"
 .\"
 .\"   cups-driverd man page for CUPS.
 .\"
@@ -118,5 +118,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: cups-driverd.man.in 7662 2008-06-17 14:34:20Z mike $".
+.\" End of "$Id$".
 .\"

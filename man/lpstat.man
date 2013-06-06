@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpstat.man 7921 2008-09-10 15:42:24Z mike $"
+.\" "$Id$"
 .\"
 .\"   lpstat man page for CUPS.
 .\"
@@ -139,5 +139,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: lpstat.man 7921 2008-09-10 15:42:24Z mike $".
+.\" End of "$Id$".
 .\"

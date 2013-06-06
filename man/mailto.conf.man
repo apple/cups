@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mailto.conf.man 7600 2008-05-20 21:06:23Z mike $"
+.\" "$Id$"
 .\"
 .\"   mailto.conf man page for CUPS.
 .\"
@@ -56,5 +56,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: mailto.conf.man 7600 2008-05-20 21:06:23Z mike $".
+.\" End of "$Id$".
 .\"

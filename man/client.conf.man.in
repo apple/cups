@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: client.conf.man.in 6649 2007-07-11 21:46:42Z mike $"
+.\" "$Id$"
 .\"
 .\"   client.conf man page for CUPS.
 .\"
@@ -55,5 +55,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: client.conf.man.in 6649 2007-07-11 21:46:42Z mike $".
+.\" End of "$Id$".
 .\"

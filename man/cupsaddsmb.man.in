@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsaddsmb.man.in 7600 2008-05-20 21:06:23Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupsaddsmb man page for CUPS.
 .\"
@@ -210,5 +210,5 @@ http://www.cups.org/windows/
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: cupsaddsmb.man.in 7600 2008-05-20 21:06:23Z mike $".
+.\" End of "$Id$".
 .\"

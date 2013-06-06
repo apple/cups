@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: classes.conf.man 7600 2008-05-20 21:06:23Z mike $"
+.\" "$Id$"
 .\"
 .\"   classes.conf man page for CUPS.
 .\"
@@ -106,5 +106,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: classes.conf.man 7600 2008-05-20 21:06:23Z mike $".
+.\" End of "$Id$".
 .\"

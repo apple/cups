@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $"
+.\" "$Id$"
 .\"
 .\"   mime.types man page for CUPS.
 .\"
@@ -111,5 +111,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $".
+.\" End of "$Id$".
 .\"
