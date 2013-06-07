@@ -45,6 +45,7 @@
 
 #define _CUPS_NO_DEPRECATED
 #include <cups/cups-private.h>
+#include <sys/wait.h>
 #include <regex.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -1160,8 +1161,8 @@ main(int  argc,				/* I - Number of command-line args */
 #elif defined(HAVE_AVAHI)
   if ((avahi_poll = avahi_simple_poll_new()) == NULL)
   {
-    _cupsLangPrintError(stderr, _("ippfind: Unable to use Bonjour: %s"),
-                        strerror(errno));
+    _cupsLangPrintf(stderr, _("ippfind: Unable to use Bonjour: %s"),
+                    strerror(errno));
     return (IPPFIND_EXIT_BONJOUR);
   }
 
@@ -1171,8 +1172,8 @@ main(int  argc,				/* I - Number of command-line args */
 			          0, client_callback, avahi_poll, &err);
   if (!client)
   {
-    _cupsLangPrintError(stderr, _("ippfind: Unable to use Bonjour: %s"),
-                        dnssd_error_string(err));
+    _cupsLangPrintf(stderr, _("ippfind: Unable to use Bonjour: %s"),
+                    dnssd_error_string(err));
     return (IPPFIND_EXIT_BONJOUR);
   }
 #endif /* HAVE_DNSSD */
@@ -1239,7 +1240,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (service->ref)
         err = 0;
       else
-        err = avahi_client_get_errno(avahi_client);
+        err = avahi_client_get_error(avahi_client);
 #endif /* HAVE_DNSSD */
     }
     else
@@ -1560,7 +1561,7 @@ browse_callback(
 	fprintf(stderr, "DEBUG: browse_callback: %s\n",
 		avahi_strerror(avahi_client_errno(client)));
 	bonjour_error = 1;
-	avahi_simple_poll_quit(simple_poll);
+	avahi_simple_poll_quit(avahi_poll);
 	break;
 
     case AVAHI_BROWSER_NEW:
@@ -2488,10 +2489,8 @@ poll_callback(
 
   val = poll(pollfds, num_pollfds, 500);
 
-  if (val < 0)
-    fprintf(stderr, "DEBUG: poll_callback: %s\n", strerror(errno));
-  else if (val > 0)
-    got_data = 1;
+  if (val > 0)
+    avahi_got_data = 1;
 
   return (val);
 }
