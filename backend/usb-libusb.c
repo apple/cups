@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: usb-libusb.c 10979 2013-05-13 17:39:19Z msweet $"
  *
  *   LIBUSB interface code for CUPS.
  *
@@ -1982,6 +1982,6 @@ static void soft_reset(void)
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: usb-libusb.c 10979 2013-05-13 17:39:19Z msweet $".
  */
 

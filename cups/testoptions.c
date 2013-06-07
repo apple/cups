@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testoptions.c 1992 2010-03-24 14:32:08Z msweet $"
  *
  *   Option test program for CUPS.
  *
@@ -112,5 +112,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testoptions.c 1992 2010-03-24 14:32:08Z msweet $".
  */

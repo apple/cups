@@ -3,7 +3,7 @@
 #
 #   Top-level Makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -99,8 +99,10 @@ clean:
 distclean:	clean
 	$(RM) Makedefs config.h config.log config.status
 	$(RM) cups-config
-	$(RM) conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf
-	$(RM) doc/help/ref-cupsd-conf.html doc/help/standard.html doc/index.html
+	$(RM) conf/cups-files.conf conf/cupsd.conf
+	$(RM) conf/mime.convs conf/pam.std conf/snmp.conf
+	$(RM) doc/help/ref-cups-files-conf.html doc/help/ref-cupsd-conf.html
+	$(RM) doc/help/standard.html doc/index.html
 	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man

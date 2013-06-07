@@ -1,5 +1,5 @@
 #
-# "$Id$"
+# "$Id: Makefile 1725 2009-10-15 18:50:47Z msweet $"
 #
 #   Desktop makefile for CUPS.
 #
@@ -131,5 +131,5 @@ uninstall:
 
 
 #
-# End of "$Id$".
+# End of "$Id: Makefile 1725 2009-10-15 18:50:47Z msweet $".
 #

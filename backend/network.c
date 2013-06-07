@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: network.c 3755 2012-03-30 05:59:14Z msweet $"
  *
  *   Common backend network APIs for CUPS.
  *
@@ -322,5 +322,5 @@ backendNetworkSideCB(
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: network.c 3755 2012-03-30 05:59:14Z msweet $".
  */

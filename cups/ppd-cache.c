@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: ppd-cache.c 4185 2013-02-20 02:19:13Z msweet $"
  *
  *   PPD cache implementation for CUPS.
  *
@@ -2631,5 +2631,5 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: ppd-cache.c 4185 2013-02-20 02:19:13Z msweet $".
  */

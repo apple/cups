@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-variable.cxx 1378 2009-04-08 03:17:45Z msweet $"
 //
 //   Variable class for the CUPS PPD Compiler.
 //
@@ -67,5 +67,5 @@ ppdcVariable::set_value(const char *v)
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-variable.cxx 1378 2009-04-08 03:17:45Z msweet $".
 //

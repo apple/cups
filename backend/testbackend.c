@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: testbackend.c 3755 2012-03-30 05:59:14Z msweet $"
  *
  *   Backend test program for CUPS.
  *
@@ -672,5 +672,5 @@ walk_cb(const char *oid,		/* I - OID */
 
 
 /*
- * End of "$Id$".
+ * End of "$Id: testbackend.c 3755 2012-03-30 05:59:14Z msweet $".
  */

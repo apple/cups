@@ -1,5 +1,5 @@
 //
-// "$Id$"
+// "$Id: ppdc-profile.cxx 1378 2009-04-08 03:17:45Z msweet $"
 //
 //   Color profile class for the CUPS PPD Compiler.
 //
@@ -61,5 +61,5 @@ ppdcProfile::~ppdcProfile()
 
 
 //
-// End of "$Id$".
+// End of "$Id: ppdc-profile.cxx 1378 2009-04-08 03:17:45Z msweet $".
 //
