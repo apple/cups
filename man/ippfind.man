@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ippfind 1 "CUPS" "5 June 2013" "Apple Inc."
+.TH ippfind 1 "CUPS" "6 June 2013" "Apple Inc."
 .SH NAME
 ippfind - find internet printing protocol printers
 .SH SYNOPSIS
@@ -31,24 +31,6 @@ ippfind - find internet printing protocol printers
 --help
 .B ippfind
 --version
-.SH SUPPORTED REGISTRATION TYPES
-\fIippfind\fR supports the following registration types:
-.TP 5
-_http._tcp
-HyperText Transport Protocol (HTTP, RFC 2616)
-.TP 5
-_https._tcp
-Secure HyperText Transport Protocol (HTTPS, RFC 2818)
-.TP 5
-_ipp._tcp
-Internet Printing Protocol (IPP, RFC 2911)
-.TP 5
-_ipps._tcp
-Secure Internet Printing Protocol (IPPS, draft)
-.TP 5
-_printer._tcp
-Line Printer Daemon (LPD, RFC 1179)
-
 .SH OPTIONS
 .TP 5
 --help
@@ -70,20 +52,41 @@ Specify find timeout in seconds. If 1 or less, \fIippfind\fR stops as soon as it
 Specifies the IPP version when listing. Supported values are 1.1, 2.0, 2.1, and 2.2.
 
 .SH DESCRIPTION
-\fIippfind\fR finds printer services registered with the local DNS infrastructure or available through the local links.
+\fIippfind\fR finds services registered with a DNS server or available through local devices. Its primary purpose is to find IPP printers and show their URIs, show their current status, or run commands. For example, to show the status of all registered IPP printers on your network, run:
+.nf
+    ippfind --ls
+.fi
+Similarly, to send a PostScript test page to every PostScript printer, run:
+.nf
+    ippfind --txt-pdl application/postscript --exec ipptool \\
+        -f onepage-letter.ps '{}' print-job.test \\;
+.fi
+
+.SH REGISTRATION TYPES
+\fIippfind\fR supports the following registration types:
+.TP 5
+_http._tcp
+HyperText Transport Protocol (HTTP, RFC 2616)
+.TP 5
+_https._tcp
+Secure HyperText Transport Protocol (HTTPS, RFC 2818)
+.TP 5
+_ipp._tcp
+Internet Printing Protocol (IPP, RFC 2911)
+.TP 5
+_ipps._tcp
+Secure Internet Printing Protocol (IPPS, draft)
+.TP 5
+_printer._tcp
+Line Printer Daemon (LPD, RFC 1179)
 
 .SH EXPRESSIONS
-\fIippfind\fR supports expressions much like the \fIfind(1)\fR utility. However, unlike \fIfind\fR, \fIippfind\fR uses POSIX regular expressions instead of shell filename matching patterns. If -e, --exec, -l, --ls, -p, --print, --print-name, -q, --quiet, or -s is not specified, \fIippfind\fR adds --print to print the service URI of anything it finds. The following expressions are supported:
+\fIippfind\fR supports expressions much like the \fIfind(1)\fR utility. However, unlike \fIfind\fR, \fIippfind\fR uses POSIX regular expressions instead of shell filename matching patterns. If --exec, -l, --ls, -p, --print, --print-name, -q, --quiet, -s, or -x is not specified, \fIippfind\fR adds --print to print the service URI of anything it finds. The following expressions are supported:
 .TP 5
 -d regex
 .TP 5
 --domain regex
 True if the domain matches the given regular expression.
-.TP 5
--e utility [argument ...] ;
-.TP 5
---exec utility [argument ...] ;
-Executes the specified program if the current result is true. "{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
 .TP 5
 --false
 Always false.
@@ -150,6 +153,11 @@ expression.
 .TP 5
 --uri regex
 True if the URI matches the given regular expression.
+.TP 5
+-x utility [argument ...] ;
+.TP 5
+--exec utility [argument ...] ;
+Executes the specified program if the current result is true. "{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
 .PP
 Expressions may also contain modifiers:
 .TP 5

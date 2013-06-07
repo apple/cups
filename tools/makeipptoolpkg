@@ -52,7 +52,7 @@ mkdir $pkgdir || exit 1
 
 echo Copying package files
 cp CHANGES-IPPTOOL.txt IPPTOOL.txt LICENSE.txt $pkgdir
-cp doc/help/man-ipptool*.html $pkgdir
+cp doc/help/man-ipp*.html $pkgdir
 cp test/color.jpg $pkgdir
 cp test/create-printer-subscription.test $pkgdir
 cp test/document-*.pdf $pkgdir
@@ -64,6 +64,7 @@ cp test/get-subscriptions.test $pkgdir
 cp test/gray.jpg $pkgdir
 cp test/ipp-[12].*.test $pkgdir
 cp test/ipp-everywhere.test $pkgdir
+cp test/ippfind-static $pkgdir/ippfind
 cp test/ipptool-static $pkgdir/ipptool
 cp test/onepage-*.pdf $pkgdir
 cp test/onepage-*.ps $pkgdir

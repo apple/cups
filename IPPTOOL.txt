@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-05-02
+IPPTOOL.txt - 2013-06-06
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
@@ -12,8 +12,30 @@ INTRODUCTION
     complex conformance tests and a simple way to query printer, job, and
     subscription attributes.
 
+    CUPS also includes a user program called ippfind that can be used to find
+    IPP printers that have registered themselves using Bonjour (DNS-SD, mDNS,
+    and Zeroconf) and run commands such as ipptool.
 
-BASIC USAGE
+
+IPPFIND BASIC USAGE
+
+    The ippfind command can be used to discover IPP printers on your network.
+    For example, the following command prints the printer URI of registered IPP
+    printers:
+
+        ippfind
+
+    To find all color IPP printers, run:
+
+        ippfind --txt-color T
+
+    To run the IPP Everywhere conformance test file on every registered IPP
+    printer, run the following command instead:
+
+        ippfind --exec ipptool -t '{}' ipp-everywhere.test \;
+
+
+IPPTOOL BASIC USAGE
 
     The ipptool command requires a printer URI and one or more "test" files that
     describe the operations, attributes to display, and expected status and

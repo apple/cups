@@ -1,11 +1,12 @@
-CHANGES-IPPTOOL.txt - 2013-05-29
+CHANGES-IPPTOOL.txt - 2013-06-06
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
 
-2013-05-29
+2013-06-06
 
+	- New ippfind tool now included with ipptool.
 	- Added support for automatically extending the timeout when all of the
 	  request data has not yet been written (all platforms but Windows
 	  which does not support it...)

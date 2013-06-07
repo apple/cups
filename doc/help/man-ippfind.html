@@ -26,31 +26,6 @@ ippfind - find internet printing protocol printers
 </b>--help
 <b>ippfind
 </b>--version
-<h2 class="title"><a name="SUPPORTED_REGISTRATION_TYPES">Supported Registration Types</a></h2>
-<i>ippfind</i> supports the following registration types:
-<dl>
-<dt>_http._tcp
-</dt>
-<dd>HyperText Transport Protocol (HTTP, RFC 2616)
-</dd>
-<dt>_https._tcp
-</dt>
-<dd>Secure HyperText Transport Protocol (HTTPS, RFC 2818)
-</dd>
-<dt>_ipp._tcp
-</dt>
-<dd>Internet Printing Protocol (IPP, RFC 2911)
-</dd>
-<dt>_ipps._tcp
-</dt>
-<dd>Secure Internet Printing Protocol (IPPS, draft)
-</dd>
-<dt>_printer._tcp
-</dt>
-<dd>Line Printer Daemon (LPD, RFC 1179)
-
-</dd>
-</dl>
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <dl>
 <dt>--help
@@ -80,10 +55,43 @@ ippfind - find internet printing protocol printers
 </dd>
 </dl>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>ippfind</i> finds printer services registered with the local DNS infrastructure or available through the local links.
+<i>ippfind</i> finds services registered with a DNS server or available through local devices. Its primary purpose is to find IPP printers and show their URIs, show their current status, or run commands. For example, to show the status of all registered IPP printers on your network, run:
+<pre>
+    ippfind --ls
+</pre>
+Similarly, to send a PostScript test page to every PostScript printer, run:
+<pre>
+    ippfind --txt-pdl application/postscript --exec ipptool \
+        -f onepage-letter.ps '{}' print-job.test \;
+</pre>
 
+<h2 class="title"><a name="REGISTRATION_TYPES">Registration Types</a></h2>
+<i>ippfind</i> supports the following registration types:
+<dl>
+<dt>_http._tcp
+</dt>
+<dd>HyperText Transport Protocol (HTTP, RFC 2616)
+</dd>
+<dt>_https._tcp
+</dt>
+<dd>Secure HyperText Transport Protocol (HTTPS, RFC 2818)
+</dd>
+<dt>_ipp._tcp
+</dt>
+<dd>Internet Printing Protocol (IPP, RFC 2911)
+</dd>
+<dt>_ipps._tcp
+</dt>
+<dd>Secure Internet Printing Protocol (IPPS, draft)
+</dd>
+<dt>_printer._tcp
+</dt>
+<dd>Line Printer Daemon (LPD, RFC 1179)
+
+</dd>
+</dl>
 <h2 class="title"><a name="EXPRESSIONS">Expressions</a></h2>
-<i>ippfind</i> supports expressions much like the <i>find(1)</i> utility. However, unlike <i>find</i>, <i>ippfind</i> uses POSIX regular expressions instead of shell filename matching patterns. If -e, --exec, -l, --ls, -p, --print, --print-name, -q, --quiet, or -s is not specified, <i>ippfind</i> adds --print to print the service URI of anything it finds. The following expressions are supported:
+<i>ippfind</i> supports expressions much like the <i>find(1)</i> utility. However, unlike <i>find</i>, <i>ippfind</i> uses POSIX regular expressions instead of shell filename matching patterns. If --exec, -l, --ls, -p, --print, --print-name, -q, --quiet, -s, or -x is not specified, <i>ippfind</i> adds --print to print the service URI of anything it finds. The following expressions are supported:
 <dl>
 <dt>-d regex
 </dt>
@@ -92,16 +100,16 @@ ippfind - find internet printing protocol printers
 </dt>
 <dd>True if the domain matches the given regular expression.
 </dd>
-<dt>-e utility [argument ...] ;
-</dt>
-<dd></dd>
-<dt>--exec utility [argument ...] ;
-</dt>
-<dd>Executes the specified program if the current result is true. "{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
-</dd>
 <dt>--false
 </dt>
 <dd>Always false.
+</dd>
+<dt>-h regex
+</dt>
+<dd></dd>
+<dt>--host regex
+</dt>
+<dd>True is the hostname matches the given regular expression.
 </dd>
 <dt>-l
 </dt>
@@ -124,6 +132,13 @@ ippfind - find internet printing protocol printers
 <dt>--path regex
 </dt>
 <dd>True if the URI resource path matches the given regular expression.
+</dd>
+<dt>-P number[-number]
+</dt>
+<dd></dd>
+<dt>--port number[-number]
+</dt>
+<dd>True if the port matches the given number or range.
 </dd>
 <dt>-p
 </dt>
@@ -175,6 +190,13 @@ expression.
 <dt>--uri regex
 </dt>
 <dd>True if the URI matches the given regular expression.
+</dd>
+<dt>-x utility [argument ...] ;
+</dt>
+<dd></dd>
+<dt>--exec utility [argument ...] ;
+</dt>
+<dd>Executes the specified program if the current result is true. "{foo}" arguments are replaced with the corresponding value - see SUBSTITUTIONS below.
 </dd>
 </dl>
 <p>Expressions may also contain modifiers:

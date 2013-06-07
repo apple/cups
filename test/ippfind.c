@@ -806,37 +806,6 @@ main(int  argc,				/* I - Number of command-line args */
 		  return (IPPFIND_EXIT_MEMORY);
                 break;
 
-            case 'e' :
-		i ++;
-		if (i >= argc)
-		{
-		  _cupsLangPrintf(stderr,
-				  _("ippfind: Missing program after %s."),
-				  "-e");
-		  show_usage();
-		}
-
-		if ((temp = new_expr(IPPFIND_OP_EXEC, invert, NULL, NULL,
-				     argv + i)) == NULL)
-		  return (IPPFIND_EXIT_MEMORY);
-
-		while (i < argc)
-		  if (!strcmp(argv[i], ";"))
-		    break;
-		  else
-		    i ++;
-
-		if (i >= argc)
-		{
-		  _cupsLangPrintf(stderr,
-				  _("ippfind: Missing semi-colon after %s."),
-				  "-e");
-		  show_usage();
-		}
-
-		have_output = 1;
-                break;
-
             case 'h' :
 		i ++;
 		if (i >= argc)
@@ -933,6 +902,37 @@ main(int  argc,				/* I - Number of command-line args */
 		if ((temp = new_expr(IPPFIND_OP_URI_REGEX, invert, NULL,
 		                     argv[i], NULL)) == NULL)
 		  return (IPPFIND_EXIT_MEMORY);
+                break;
+
+            case 'x' :
+		i ++;
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr,
+				  _("ippfind: Missing program after %s."),
+				  "-x");
+		  show_usage();
+		}
+
+		if ((temp = new_expr(IPPFIND_OP_EXEC, invert, NULL, NULL,
+				     argv + i)) == NULL)
+		  return (IPPFIND_EXIT_MEMORY);
+
+		while (i < argc)
+		  if (!strcmp(argv[i], ";"))
+		    break;
+		  else
+		    i ++;
+
+		if (i >= argc)
+		{
+		  _cupsLangPrintf(stderr,
+				  _("ippfind: Missing semi-colon after %s."),
+				  "-x");
+		  show_usage();
+		}
+
+		have_output = 1;
                 break;
 
             default :
@@ -2729,8 +2729,6 @@ show_usage(void)
   _cupsLangPuts(stderr, _("Expressions:"));
   _cupsLangPuts(stderr, _("  -P number[-number]      Match port to number or range."));
   _cupsLangPuts(stderr, _("  -d regex                Match domain to regular expression."));
-  _cupsLangPuts(stderr, _("  -e utility [argument ...] ;\n"
-                          "                          Execute program if true."));
   _cupsLangPuts(stderr, _("  -h regex                Match hostname to regular expression."));
   _cupsLangPuts(stderr, _("  -l                      List attributes."));
   _cupsLangPuts(stderr, _("  -n regex                Match service name to regular expression."));
@@ -2740,6 +2738,8 @@ show_usage(void)
   _cupsLangPuts(stderr, _("  -s                      Print service name if true."));
   _cupsLangPuts(stderr, _("  -t key                  True if the TXT record contains the key."));
   _cupsLangPuts(stderr, _("  -u regex                Match URI to regular expression."));
+  _cupsLangPuts(stderr, _("  -x utility [argument ...] ;\n"
+                          "                          Execute program if true."));
   _cupsLangPuts(stderr, _("  --domain regex          Match domain to regular expression."));
   _cupsLangPuts(stderr, _("  --exec utility [argument ...] ;\n"
                           "                          Execute program if true."));
