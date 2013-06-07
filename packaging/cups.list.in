@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 7930 2008-09-10 22:25:54Z mike $"
+# "$Id$"
 #
 #   ESP Package Manager (EPM) file list for CUPS.
 #
@@ -736,5 +736,5 @@ f 0444 root sys $XINETD/cups-lpd scheduler/cups-lpd.xinetd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 7930 2008-09-10 22:25:54Z mike $".
+# End of "$Id$".
 #
