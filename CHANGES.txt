@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7rc1 - 2013-06-06
+CHANGES.txt - 1.7rc1 - 2013-06-12
 ---------------------------------
 
 CHANGES IN CUPS V1.7rc1
 
+	- Fixed a build issue on ARM-based Linux systems - unable to validate
+	  va_list arguments.
 	- Added a new ippfind tool for finding IPP printers and other Bonjour
 	  services (<rdar://problem/13876199>)
 	- Fixed some issues with conversion of PWG media size names to

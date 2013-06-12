@@ -1210,7 +1210,7 @@ ippAddStringfv(ipp_t      *ipp,		/* I - IPP message */
       group == IPP_TAG_END || group >= IPP_TAG_UNSUPPORTED_VALUE ||
       (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
        value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
-      !format || !ap)
+      !format)
     return (NULL);
 
   if ((value_tag == IPP_TAG_TEXTLANG || value_tag == IPP_TAG_NAMELANG)
@@ -4449,7 +4449,7 @@ ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
   if (!ipp || !attr || !*attr ||
       (value_tag < IPP_TAG_TEXT && value_tag != IPP_TAG_TEXTLANG &&
        value_tag != IPP_TAG_NAMELANG) || value_tag > IPP_TAG_MIMETYPE ||
-      !format || !ap)
+      !format)
     return (0);
 
  /*
