@@ -24,6 +24,7 @@
  * Include necessary headers...
  */
 
+#undef _CUPS_NO_DEPRECATED
 #include "string-private.h"
 #include "cups.h"
 #include "ppd.h"

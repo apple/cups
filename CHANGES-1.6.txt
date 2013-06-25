@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.6.3
 	- Fixed a compile problem on AIX (STR #4307)
 	- Added documentation about the /version=1.1 option to ServerName in
 	  client.conf (<rdar://problem/14216262>)
+	- The lp and lpr commands incorrectly ignored the default printer set
+	  in the lpoptions file (<rdar://problem/14216472>)
 	- Fixed a URI encoding issue for hostnames containing the ` (backquote)
 	  character (<rdar://problem/14243133>)
 	- Added support for RFC 6874's IPv6 link local address format in URIs
