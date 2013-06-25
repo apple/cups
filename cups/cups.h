@@ -358,7 +358,8 @@ extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsGetDes
 extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
 			            int myjobs, int whichjobs);
-extern const char	*cupsGetPPD(const char *name);
+extern const char	*cupsGetPPD(const char *name)
+			            _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo instead.");
 extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
 extern ipp_status_t	cupsLastError(void);
 extern int		cupsPrintFile(const char *name, const char *filename,
@@ -417,7 +418,7 @@ extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
 			             const char *name, int myjobs,
 				     int whichjobs) _CUPS_API_1_1_21;
 extern const char	*cupsGetPPD2(http_t *http, const char *name)
-			             _CUPS_API_1_1_21;
+			             _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo instead.");
 extern int		cupsPrintFile2(http_t *http, const char *name,
 			               const char *filename,
 				       const char *title, int num_options,
