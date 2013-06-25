@@ -121,6 +121,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			  { HTTP_URI_STATUS_OK, "ipp://HP%20Officejet%204500%20G510n-z%20%40%20Will's%20MacBook%20Pro%2015%22._ipp._tcp.local./",
 			    "ipp", "", "HP Officejet 4500 G510n-z @ Will's MacBook Pro 15\"._ipp._tcp.local.", "/", 631, 0,
 			    HTTP_URI_CODING_MOST  },
+			  { HTTP_URI_STATUS_OK, "ipp://%22%23%2F%3A%3C%3E%3F%40%5B%5C%5D%5E%60%7B%7C%7D/",
+			    "ipp", "", "\"#/:<>?@[\\]^`{|}", "/", 631, 0,
+			    HTTP_URI_CODING_MOST  },
 
 			  /* Missing scheme */
 			  { HTTP_URI_STATUS_MISSING_SCHEME, "/path/to/file/index.html",
@@ -170,6 +173,9 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_BAD_HOSTNAME, "http://server with spaces/index.html",
 			    "http", "", "", "", 80, 0,
+			    HTTP_URI_CODING_MOST  },
+			  { HTTP_URI_STATUS_BAD_HOSTNAME, "ipp://\"#/:<>?@[\\]^`{|}/",
+			    "ipp", "", "", "", 631, 0,
 			    HTTP_URI_CODING_MOST  },
 
 			  /* Bad port number */

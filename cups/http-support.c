@@ -239,6 +239,9 @@ httpAssembleURI(
 
   if (host)
   {
+    const char	*hostptr;		/* Pointer into hostname */
+    int		have_ipv6;		/* Do we have an IPv6 address? */
+
     if (username && *username)
     {
      /*
@@ -266,7 +269,17 @@ httpAssembleURI(
     * too...
     */
 
-    if (host[0] != '[' && strchr(host, ':') && !strstr(host, "._tcp"))
+    for (hostptr = host,
+             have_ipv6 = strchr(host, ':') && !strstr(host, "._tcp");
+         *hostptr && have_ipv6;
+         hostptr ++)
+      if (*hostptr != ':' && !isxdigit(*hostptr & 255))
+      {
+        have_ipv6 = *hostptr == '%';
+        break;
+      }
+
+    if (have_ipv6)
     {
      /*
       * We have a raw IPv6 address...
@@ -291,7 +304,7 @@ httpAssembleURI(
       else
       {
        /*
-        * We have a normal address, add "[" prefix...
+        * We have a normal (or RFC 6874 link-local) address, add "[" prefix...
 	*/
 
 	if (ptr < end)
@@ -341,9 +354,12 @@ httpAssembleURI(
     else
     {
      /*
-      * Otherwise, just copy the host string...
+      * Otherwise, just copy the host string (the extra chars are not in the
+      * "reg-name" ABNF rule; anything <= SP or >= DEL plus % gets automatically
+      * percent-encoded.
       */
-      ptr = http_copy_encode(ptr, host, end, "<>{}|^:/?#[]@\\\"", NULL,
+
+      ptr = http_copy_encode(ptr, host, end, "\"#/:<>?@[\\]^`{|}", NULL,
                              encoding & HTTP_URI_CODING_HOSTNAME);
 
       if (!ptr)
@@ -1186,12 +1202,13 @@ httpSeparateURI(
       for (ptr = (char *)uri; *ptr; ptr ++)
         if (strchr(":?/", *ptr))
 	  break;
-        else if (!strchr("abcdefghijklmnopqrstuvwxyz"
-			 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-			 "0123456789"
-	        	 "-._~"
-			 "%"
-			 "!$&'()*+,;=\\", *ptr))
+        else if (!strchr("abcdefghijklmnopqrstuvwxyz"	/* unreserved */
+			 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"	/* unreserved */
+			 "0123456789"			/* unreserved */
+	        	 "-._~"				/* unreserved */
+			 "%"				/* pct-encoded */
+			 "!$&'()*+,;="			/* sub-delims */
+			 "\\", *ptr))			/* SMB domain */
 	{
 	  *host = '\0';
 	  return (HTTP_URI_STATUS_BAD_HOSTNAME);
@@ -1284,8 +1301,9 @@ httpSeparateURI(
 
       char *resptr = resource + strlen(resource);
 
-      uri = http_copy_decode(resptr, uri, resourcelen - (int)(resptr - resource),
-                             NULL, decoding & HTTP_URI_CODING_QUERY);
+      uri = http_copy_decode(resptr, uri,
+                             resourcelen - (int)(resptr - resource), NULL,
+                             decoding & HTTP_URI_CODING_QUERY);
     }
   }
 
