@@ -3,7 +3,7 @@
  *
  *   HTTP support routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1326,6 +1326,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 
   switch (status)
   {
+    case HTTP_ERROR :
+        s = strerror(errno);
+        break;
     case HTTP_CONTINUE :
         s = _("Continue");
 	break;
