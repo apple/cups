@@ -493,6 +493,21 @@ main(int  argc,				/* I - Number of command-line arguments */
       printf("PASS (%d URIs tested)\n", k);
 
    /*
+    * httpAssembleUUID
+    */
+
+    fputs("httpAssembleUUID: ", stdout);
+    httpAssembleUUID("hostname.example.com", 631, "printer", 12345, buffer,
+                     sizeof(buffer));
+    if (strncmp(buffer, "urn:uuid:", 9))
+    {
+      printf("FAIL (%s)\n", buffer);
+      failures ++;
+    }
+    else
+      printf("PASS (%s)\n", buffer);
+
+   /*
     * Show a summary and return...
     */
 
