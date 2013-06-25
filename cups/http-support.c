@@ -1340,6 +1340,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 
   switch (status)
   {
+    case HTTP_STATUS_ERROR :
+        s = strerror(errno);
+        break;
     case HTTP_STATUS_CONTINUE :
         s = _("Continue");
 	break;
