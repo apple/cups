@@ -3,7 +3,7 @@
  *
  *   User-defined destination (and option) support for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1657,7 +1657,6 @@ int					/* O - Number of destinations */
 cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
               cups_dest_t **dests)	/* O - Destinations */
 {
-  int		i;			/* Looping var */
   int		num_dests;		/* Number of destinations */
   cups_dest_t	*dest;			/* Destination pointer */
   const char	*home;			/* HOME environment variable */
@@ -1780,21 +1779,16 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
       * Have a default; see if it is real...
       */
 
-      dest = cupsGetDest(dest->name, NULL, num_reals, reals);
-    }
+      if (!cupsGetDest(dest->name, NULL, num_reals, reals))
+      {
+       /*
+        * Remove the non-real printer from the list, since we don't want jobs
+        * going to an unexpected printer... (<rdar://problem/14216472>)
+        */
 
-   /*
-    * If dest is NULL, then no default (that exists) is set, so we
-    * need to set a default if one exists...
-    */
-
-    if (!dest && *dests && defprinter)
-    {
-      for (i = 0; i < num_dests; i ++)
-        (*dests)[i].is_default = 0;
-
-      if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
-	dest->is_default = 1;
+        num_dests = cupsRemoveDest(dest->name, dest->instance, num_dests,
+                                   dests);
+      }
     }
 
    /*

@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- The lp and lpr commands incorrectly ignored the default printer set
+	  in the lpoptions file (<rdar://problem/14216472>)
 	- Added documentation about the /version=1.1 option to ServerName in
 	  client.conf (<rdar://problem/14216262>)
 	- Fixed a URI encoding issue for hostnames containing the ` (backquote)
