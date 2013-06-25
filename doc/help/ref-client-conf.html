@@ -56,6 +56,8 @@ GSSServiceName ipp
 ServerName foo.bar.com
 ServerName 11.22.33.44
 ServerName foo.bar.com:8631
+<SPAN CLASS="info">CUPS 1.6</SPAN>ServerName foo.bar.com/version=1.1
+<SPAN CLASS="info">CUPS 1.6</SPAN>ServerName foo.bar.com:8631/version=1.1
 </PRE>
 
 <H3>Description</H3>
@@ -63,6 +65,8 @@ ServerName foo.bar.com:8631
 <P>The <CODE>ServerName</CODE> directive specifies sets the remote server that is to be used for all client operations. That is, it redirects all client requests to the remote server.</P>
 
 <P>The default port number is 631 but can be overridden by adding a colon followed by the desired port number to the value.</P>
+
+<P>By default, CUPS 1.6 and later use IPP/2.0 to communicate with the server. Add "/version=1.1" to force IPP/1.1 which is required for CUPS 1.3.12 and earlier.</P>
 
 <P>The default is to use the local server ("<VAR>localhost</VAR>") or domain socket, if so configured.</P>
 
