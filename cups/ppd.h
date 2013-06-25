@@ -7,7 +7,7 @@
  *   -D_PPD_DEPRECATED="" TO YOUR COMPILE OPTIONS.  THIS HEADER AND THESE
  *   FUNCTIONS WILL BE REMOVED IN A FUTURE RELEASE OF CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -56,19 +56,7 @@ extern "C" {
  */
 
 #  ifndef _PPD_DEPRECATED
-#    if defined(__APPLE__)
-#      if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
-         /* Building for OS X 10.7 and earlier */
-#        define _PPD_DEPRECATED
-#      elif !defined(MAC_OS_X_VERSION_10_8)
-	 /* Building for OS X 10.7 and earlier */
-#        define _PPD_DEPRECATED
-#      else
-#        define _PPD_DEPRECATED _CUPS_DEPRECATED
-#      endif /* MAC_OS_X_VERSION_10_8 && MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8 */
-#    else
-#      define _PPD_DEPRECATED _CUPS_DEPRECATED
-#    endif /* __APPLE__ */
+#    define _PPD_DEPRECATED _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo and friends instead.")
 #  endif /* !_PPD_DEPRECATED */
 
 
@@ -375,32 +363,39 @@ typedef struct ppd_file_s		/**** PPD File ****/
  */
 
 extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
-			                cups_option_t *options);
-extern void		ppdClose(ppd_file_t *ppd);
+			                cups_option_t *options) _PPD_DEPRECATED;
+extern void		ppdClose(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern int		ppdCollect(ppd_file_t *ppd, ppd_section_t section,
-			           ppd_choice_t  ***choices);
-extern int		ppdConflicts(ppd_file_t *ppd);
+			           ppd_choice_t  ***choices) _PPD_DEPRECATED;
+extern int		ppdConflicts(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern int		ppdEmit(ppd_file_t *ppd, FILE *fp,
-			        ppd_section_t section);
+			        ppd_section_t section) _PPD_DEPRECATED;
 extern int		ppdEmitFd(ppd_file_t *ppd, int fd,
-			          ppd_section_t section);
+			          ppd_section_t section) _PPD_DEPRECATED;
 extern int		ppdEmitJCL(ppd_file_t *ppd, FILE *fp, int job_id,
-			           const char *user, const char *title);
-extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option);
+			           const char *user, const char *title)
+			           _PPD_DEPRECATED;
+extern ppd_choice_t	*ppdFindChoice(ppd_option_t *o, const char *option)
+			               _PPD_DEPRECATED;
 extern ppd_choice_t	*ppdFindMarkedChoice(ppd_file_t *ppd,
-			                     const char *keyword);
-extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword);
+			                     const char *keyword)
+			                     _PPD_DEPRECATED;
+extern ppd_option_t	*ppdFindOption(ppd_file_t *ppd, const char *keyword)
+			               _PPD_DEPRECATED;
 extern int		ppdIsMarked(ppd_file_t *ppd, const char *keyword,
-			            const char *option);
-extern void		ppdMarkDefaults(ppd_file_t *ppd);
+			            const char *option) _PPD_DEPRECATED;
+extern void		ppdMarkDefaults(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern int		ppdMarkOption(ppd_file_t *ppd, const char *keyword,
-			              const char *option);
-extern ppd_file_t	*ppdOpen(FILE *fp);
-extern ppd_file_t	*ppdOpenFd(int fd);
-extern ppd_file_t	*ppdOpenFile(const char *filename);
-extern float		ppdPageLength(ppd_file_t *ppd, const char *name);
-extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
-extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
+			              const char *option) _PPD_DEPRECATED;
+extern ppd_file_t	*ppdOpen(FILE *fp) _PPD_DEPRECATED;
+extern ppd_file_t	*ppdOpenFd(int fd) _PPD_DEPRECATED;
+extern ppd_file_t	*ppdOpenFile(const char *filename) _PPD_DEPRECATED;
+extern float		ppdPageLength(ppd_file_t *ppd, const char *name)
+			              _PPD_DEPRECATED;
+extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name)
+			             _PPD_DEPRECATED;
+extern float		ppdPageWidth(ppd_file_t *ppd, const char *name)
+			             _PPD_DEPRECATED;
 
 /**** New in CUPS 1.1.19 ****/
 extern const char	*ppdErrorString(ppd_status_t status) _PPD_DEPRECATED;
@@ -420,14 +415,17 @@ extern int		ppdCollect2(ppd_file_t *ppd, ppd_section_t section,
 extern int		ppdEmitAfterOrder(ppd_file_t *ppd, FILE *fp,
 			                  ppd_section_t section, int limit,
 					  float min_order) _PPD_DEPRECATED;
-extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp) _PPD_DEPRECATED;
+extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp)
+			              _PPD_DEPRECATED;
 extern char		*ppdEmitString(ppd_file_t *ppd, ppd_section_t section,
 			               float min_order) _PPD_DEPRECATED;
 extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
-			                     const char *keyword) _PPD_DEPRECATED;
+			                     const char *keyword)
+			                     _PPD_DEPRECATED;
 extern ppd_cparam_t	*ppdFindCustomParam(ppd_coption_t *opt,
 			                    const char *name) _PPD_DEPRECATED;
-extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt) _PPD_DEPRECATED;
+extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt)
+			                     _PPD_DEPRECATED;
 extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt) _PPD_DEPRECATED;
 extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _PPD_DEPRECATED;
@@ -445,7 +443,7 @@ extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
 					 const char *choice,
 					 cups_option_t **options)
-					     _PPD_DEPRECATED;
+					 _PPD_DEPRECATED;
 extern int		cupsResolveConflicts(ppd_file_t *ppd,
 			                     const char *option,
 			                     const char *choice,
@@ -455,7 +453,7 @@ extern int		cupsResolveConflicts(ppd_file_t *ppd,
 extern int		ppdInstallableConflict(ppd_file_t *ppd,
 			                       const char *option,
 					       const char *choice)
-					           _PPD_DEPRECATED;
+					       _PPD_DEPRECATED;
 extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
 			                 const char *spec) _PPD_DEPRECATED;
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,

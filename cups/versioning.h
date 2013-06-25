@@ -106,14 +106,18 @@
      */
 #    define _CUPS_DEPRECATED
 #    define _CUPS_DEPRECATED_MSG(m)
+#    define _CUPS_DEPRECATED_1_6_MSG(m)
+#    define _CUPS_DEPRECATED_1_7_MSG(m)
 #    define _CUPS_INTERNAL_MSG(m)
 #  elif defined(_CUPS_HAS_UNAVAILABLE_WITH_MESSAGE) && defined(_CUPS_NO_DEPRECATED)
     /*
-     * Compiler supports the unsupported attribute, so use it when the code
+     * Compiler supports the unavailable attribute, so use it when the code
      * wants to exclude the use of deprecated API.
      */
 #    define _CUPS_DEPRECATED __attribute__ ((unavailable))
 #    define _CUPS_DEPRECATED_MSG(m) __attribute__ ((unavailable(m)))
+#    define _CUPS_DEPRECATED_1_6_MSG(m) __attribute__ ((unavailable(m)))
+#    define _CUPS_DEPRECATED_1_7_MSG(m) __attribute__ ((unavailable(m)))
 #    define _CUPS_INTERNAL_MSG(m) __attribute__ ((unavailable(m)))
 #  else
     /*
@@ -125,6 +129,16 @@
 #    else
 #      define _CUPS_DEPRECATED_MSG(m) __attribute__ ((deprecated))
 #    endif /* _CUPS_HAS_DEPRECATED_WITH_MESSAGE */
+#    if defined(MAC_OS_X_VERSION_10_8) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8
+#      define _CUPS_DEPRECATED_1_6_MSG(m) _CUPS_DEPRECATED_MSG(m)
+#    else
+#      define _CUPS_DEPRECATED_1_6_MSG(m)
+#    endif /* MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_8 */
+#    if defined(MAC_OS_X_VERSION_10_9) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9
+#      define _CUPS_DEPRECATED_1_7_MSG(m) _CUPS_DEPRECATED_MSG(m)
+#    else
+#      define _CUPS_DEPRECATED_1_7_MSG(m)
+#    endif /* MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_9 */
 #    ifdef _CUPS_SOURCE
 #      define _CUPS_INTERNAL_MSG(m)
 #    elif defined(_CUPS_HAS_UNAVAILABLE_WITH_MESSAGE)

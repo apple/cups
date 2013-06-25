@@ -449,10 +449,10 @@ extern int		httpCheck(http_t *http);
 extern void		httpClearFields(http_t *http);
 extern void		httpClose(http_t *http);
 extern http_t		*httpConnect(const char *host, int port)
-			             _CUPS_DEPRECATED_MSG("Use httpConnect2 instead.");
+			             _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
 extern http_t		*httpConnectEncrypt(const char *host, int port,
 			                    http_encryption_t encryption)
-			                    _CUPS_DEPRECATED_MSG("Use httpConnect2 instead.");
+			                    _CUPS_DEPRECATED_1_7_MSG("Use httpConnect2 instead.");
 extern int		httpDelete(http_t *http, const char *uri);
 extern int		httpEncryption(http_t *http, http_encryption_t e);
 extern int		httpError(http_t *http);
@@ -473,7 +473,7 @@ extern int		httpPrintf(http_t *http, const char *format, ...)
 			__attribute__ ((__format__ (__printf__, 2, 3)));
 extern int		httpPut(http_t *http, const char *uri);
 extern int		httpRead(http_t *http, char *buffer, int length) _CUPS_DEPRECATED_MSG("Use httpRead2 instead.");
-extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED_MSG("Use httpReconnect2 instead.");
+extern int		httpReconnect(http_t *http) _CUPS_DEPRECATED_1_6_MSG("Use httpReconnect2 instead.");
 extern void		httpSeparate(const char *uri, char *method,
 			             char *username, char *host, int *port,
 				     char *resource) _CUPS_DEPRECATED_MSG("Use httpSeparateURI instead.");

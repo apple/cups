@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7rc1 - 2013-06-12
+CHANGES.txt - 1.7rc1 - 2013-06-25
 ---------------------------------
 
 CHANGES IN CUPS V1.7rc1
 
+	- Fixed deprecation warnings for many functions on OS X so they are tied
+	  to the deployment version when building (<rdar://problem/14210079>)
 	- Fixed a build issue on ARM-based Linux systems - unable to validate
 	  va_list arguments.
 	- Added a new ippfind tool for finding IPP printers and other Bonjour
