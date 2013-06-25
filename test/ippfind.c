@@ -232,11 +232,12 @@ static int		poll_callback(struct pollfd *pollfds,
 static void		resolve_callback(AvahiServiceResolver *res,
 					 AvahiIfIndex interface,
 					 AvahiProtocol protocol,
-					 AvahiBrowserEvent event,
+					 AvahiResolverEvent event,
 					 const char *serviceName,
 					 const char *regtype,
 					 const char *replyDomain,
 					 const char *host_name,
+					 const AvahiAddress *address,
 					 uint16_t port,
 					 AvahiStringList *txt,
 					 AvahiLookupResultFlags flags,
@@ -1170,7 +1171,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   avahi_client = avahi_client_new(avahi_simple_poll_get(avahi_poll),
 			          0, client_callback, avahi_poll, &err);
-  if (!client)
+  if (!avahi_client)
   {
     _cupsLangPrintf(stderr, _("ippfind: Unable to use Bonjour: %s"),
                     dnssd_error_string(err));
@@ -1240,7 +1241,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (service->ref)
         err = 0;
       else
-        err = avahi_client_get_error(avahi_client);
+        err = avahi_client_errno(avahi_client);
 #endif /* HAVE_DNSSD */
     }
     else
@@ -1270,7 +1271,7 @@ main(int  argc,				/* I - Number of command-line args */
                                     browse_callback, services))
         err = 0;
       else
-        err = avahi_client_get_errno(avahi_client);
+        err = avahi_client_errno(avahi_client);
 #endif /* HAVE_DNSSD */
     }
 
@@ -1406,7 +1407,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    if (service->ref)
 	      err = 0;
 	    else
-	      err = avahi_client_get_errno(avahi_client);
+	      err = avahi_client_errno(avahi_client);
 #endif /* HAVE_DNSSD */
 
 	    if (err)
@@ -1431,7 +1432,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_DNSSD
 	    DNSServiceRefDeallocate(service->ref);
 #else
-            avahi_record_browser_free(service->ref);
+            avahi_service_resolver_free(service->ref);
 #endif /* HAVE_DNSSD */
 
 	    service->ref = NULL;
@@ -2577,30 +2578,32 @@ resolve_callback(
     AvahiServiceResolver   *resolver,	/* I - Resolver */
     AvahiIfIndex           interface,	/* I - Interface */
     AvahiProtocol          protocol,	/* I - Address protocol */
-    AvahiBrowserEvent      event,	/* I - Event */
+    AvahiResolverEvent     event,	/* I - Event */
     const char             *serviceName,/* I - Service name */
     const char             *regtype,	/* I - Registration type */
     const char             *replyDomain,/* I - Domain name */
     const char             *hostTarget,	/* I - FQDN */
+    const AvahiAddress     *address,	/* I - Address */
     uint16_t               port,	/* I - Port number */
     AvahiStringList        *txt,	/* I - TXT records */
     AvahiLookupResultFlags flags,	/* I - Lookup flags */
     void                   *context)	/* I - Service */
 {
-  char		uri[1024];		/* URI */
-		key[256],		/* TXT key */
+  char		key[256],		/* TXT key */
 		*value;			/* TXT value */
   ippfind_srv_t	*service = (ippfind_srv_t *)context;
 					/* Service */
   AvahiStringList *current;		/* Current TXT key/value pair */
 
 
+  (void)address;
+
   if (event != AVAHI_RESOLVER_FOUND)
   {
     bonjour_error = 1;
 
     avahi_service_resolver_free(resolver);
-    avahi_simple_poll_quit(uribuf->poll);
+    avahi_simple_poll_quit(avahi_poll);
     return;
   }
 
