@@ -3730,6 +3730,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
+    else if (http->state == HTTP_STATE_POST_SEND)
+      http->state = HTTP_STATE_WAITING;
     else
       http->state = HTTP_STATE_STATUS;
 

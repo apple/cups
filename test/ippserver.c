@@ -5166,29 +5166,26 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "sides",
                                IPP_TAG_ZERO)) != NULL)
   {
+    const char *sides = NULL;		/* "sides" value... */
+
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD)
     {
       respond_unsupported(client, attr);
       valid = 0;
     }
 
-    if ((supported = ippFindAttribute(client->printer->attrs, "sides",
+    sides = ippGetString(attr, 0, NULL);
+
+    if ((supported = ippFindAttribute(client->printer->attrs, "sides-supported",
                                       IPP_TAG_KEYWORD)) != NULL)
     {
-      int count = ippGetCount(supported);
-      const char *sides = ippGetString(attr, 0, NULL);
-
-      for (i = 0; i < count; i ++)
-        if (!strcmp(sides, ippGetString(supported, i, NULL)))
-	  break;
-
-      if (i >= count)
+      if (!ippContainsString(supported, sides))
       {
 	respond_unsupported(client, attr);
 	valid = 0;
       }
     }
-    else
+    else if (strcmp(sides, "one-sided"))
     {
       respond_unsupported(client, attr);
       valid = 0;
