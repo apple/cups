@@ -2602,17 +2602,27 @@ new_request(
                      "job-password-encryption", NULL, keyword);
       }
 
-      if (pc->account_id &&
-          (keyword = cupsGetOption("job-account-id", num_options,
-                                   options)) != NULL)
-        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
-                     NULL, keyword);
+      if (pc->account_id)
+      {
+        if ((keyword = cupsGetOption("job-account-id", num_options,
+				     options)) == NULL)
+	  keyword = cupsGetOption("job-billing", num_options, options);
 
-      if (pc->accounting_user_id &&
-          (keyword = cupsGetOption("job-accounting-user-id", num_options,
-                                   options)) != NULL)
-        ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,
-                     "job-accounting-user-id", NULL, keyword);
+        if (keyword)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME, "job-account-id",
+		       NULL, keyword);
+      }
+
+      if (pc->accounting_user_id)
+      {
+        if ((keyword = cupsGetOption("job-accounting-user-id", num_options,
+				     options)) == NULL)
+	  keyword = user;
+
+        if (keyword)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_NAME,
+		       "job-accounting-user-id", NULL, keyword);
+      }
 
       for (mandatory = (char *)cupsArrayFirst(pc->mandatory);
            mandatory;
