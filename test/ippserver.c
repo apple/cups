@@ -4810,7 +4810,7 @@ usage(int status)			/* O - Exit status */
 {
   if (!status)
   {
-    puts(CUPS_SVERSION " - Copyright 2010-2012 by Apple Inc. All rights "
+    puts(CUPS_SVERSION " - Copyright 2010-2013 by Apple Inc. All rights "
          "reserved.");
     puts("");
   }
@@ -4820,17 +4820,22 @@ usage(int status)			/* O - Exit status */
   puts("Options:");
   puts("-2                      Supports 2-sided printing (default=1-sided)");
   puts("-M manufacturer         Manufacturer name (default=Test)");
+  puts("-P                      PIN printing mode");
+  puts("-c command              Run command for every print job"
   printf("-d spool-directory      Spool directory "
          "(default=/tmp/ippserver.%d)\n", (int)getpid());
   puts("-f type/subtype[,...]   List of supported types "
        "(default=application/pdf,image/jpeg)");
   puts("-h                      Show program help");
   puts("-i iconfile.png         PNG icon file (default=printer.png)");
+  puts("-k                      Keep job spool files");
   puts("-l location             Location of printer (default=empty string)");
   puts("-m model                Model name (default=Printer)");
   puts("-n hostname             Hostname for printer");
   puts("-p port                 Port number (default=auto)");
+#ifdef HAVE_DNSSD
   puts("-r subtype              Bonjour service subtype (default=_print)");
+#endif /* HAVE_DNSSD */
   puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
   puts("-v[vvv]                 Be (very) verbose");
 
