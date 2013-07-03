@@ -137,7 +137,7 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
  * 'httpAddrListen()' - Create a listening socket bound to the specified
  *                      address and port.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - Socket or -1 on error */
@@ -364,7 +364,7 @@ httpAddrLookup(
 /*
  * 'httpAddrPort()' - Get the port number associated with an address.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - Port number */

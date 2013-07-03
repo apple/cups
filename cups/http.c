@@ -278,7 +278,7 @@ static BIO_METHOD	http_bio_methods =
  * 'httpAcceptConnection()' - Accept a new HTTP client connection from the
  *                            specified listening socket.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 http_t *				/* O - HTTP connection or @code NULL@ */
@@ -582,7 +582,7 @@ httpConnect(const char *host,		/* I - Host to connect to */
 /*
  * 'httpConnect2()' - Connect to a HTTP server.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 http_t *				/* O - New HTTP connection */
@@ -1075,7 +1075,7 @@ httpGetBlocking(http_t *http)		/* I - Connection to server */
  * client.  The value returned can be use in subsequent requests (for clients)
  * or in the response (for servers) in order to compress the content stream.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 const char *				/* O - Content-Coding value or
@@ -1173,7 +1173,7 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
  * Returns @code HTTP_STATUS_NONE@ if there is no Expect header, otherwise
  * returns the expected HTTP status code, typically @code HTTP_STATUS_CONTINUE@.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 http_status_t				/* O - Expect: status, if any */
@@ -1807,7 +1807,7 @@ httpOptions(http_t     *http,		/* I - Connection to server */
  *
  * For non-blocking connections the usual timeouts apply.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ssize_t					/* O - Number of bytes copied */
@@ -2472,7 +2472,7 @@ _httpReadGNUTLS(
 /*
  * 'httpReadRequest()' - Read a HTTP request from a connection.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 http_state_t				/* O - New state of connection */
@@ -2893,7 +2893,7 @@ httpSetCookie(http_t     *http,		/* I - Connection */
  * Currently only @code HTTP_FIELD_ACCEPT_ENCODING@, @code HTTP_FIELD_SERVER@,
  * and @code HTTP_FIELD_USER_AGENT@ can be set.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 void
@@ -3824,7 +3824,7 @@ _httpWriteGNUTLS(
 /*
  * 'httpWriteResponse()' - Write a HTTP response to a client connection.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 0 on success, -1 on error */

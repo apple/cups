@@ -713,7 +713,7 @@ cupsCopyDestInfo(
  * @code ippGetResolution@, @code ippGetString@, and @code ippGetValueTag@
  * functions to inspect the default value(s) as needed.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_attribute_t	*			/* O - Default attribute or @code NULL@ for none */
@@ -753,7 +753,7 @@ cupsFindDestDefault(
  * @code ippGetResolution@, @code ippGetString@, and @code ippGetValueTag@
  * functions to inspect the default value(s) as needed.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_attribute_t	*			/* O - Default attribute or @code NULL@ for none */
@@ -795,7 +795,7 @@ cupsFindDestReady(
  * @code ippGetResolution@, @code ippGetString@, and @code ippGetValueTag@
  * functions to inspect the default value(s) as needed.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_attribute_t	*			/* O - Default attribute or @code NULL@ for none */
@@ -874,7 +874,7 @@ cupsFreeDestInfo(cups_dinfo_t *dinfo)	/* I - Destination information */
  * example, passing @code CUPS_MEDIA_FLAGS_BORDERLESS@ will get the Nth
  * borderless size supported by the printer.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -1069,7 +1069,7 @@ cupsGetDestMediaBySize(
  * counted.  For example, passing @code CUPS_MEDIA_FLAGS_BORDERLESS@ will return
  * the number of borderless sizes.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - Number of sizes */
@@ -1110,7 +1110,7 @@ cupsGetDestMediaCount(
  * example, passing @code CUPS_MEDIA_FLAGS_BORDERLESS@ will return the default
  * borderless size, typically US Letter or A4, but sometimes 4x6 photo media.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 on success, 0 on failure */

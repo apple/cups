@@ -504,12 +504,12 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
 
   /* Proposed extensions for paid printing */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED = 0x049C,
-					/* cups-error-account-info-needed @since CUPS 1.7@ */
-  IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED,	/* cups-error-account-closed @since CUPS 1.7@ */
+					/* cups-error-account-info-needed @since CUPS 1.7/OS X 10.9@ */
+  IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED,	/* cups-error-account-closed @since CUPS 1.7/OS X 10.9@ */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED,
-					/* cups-error-account-limit-reached @since CUPS 1.7@ */
+					/* cups-error-account-limit-reached @since CUPS 1.7/OS X 10.9@ */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED,
-					/* cups-error-account-authorization-failed @since CUPS 1.7@ */
+					/* cups-error-account-authorization-failed @since CUPS 1.7/OS X 10.9@ */
 
   IPP_STATUS_ERROR_INTERNAL = 0x0500,	/* server-error-internal-error */
   IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED,

@@ -453,7 +453,7 @@ cupsSetUser(const char *user)		/* I - User name */
  * Setting the string to NULL forces the default value containing the CUPS
  * version, IPP version, and operating system version and architecture.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 void
@@ -528,7 +528,7 @@ cupsUser(void)
 /*
  * 'cupsUserAgent()' - Return the default HTTP User-Agent string.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 const char *				/* O - User-Agent string */

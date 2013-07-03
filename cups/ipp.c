@@ -1131,7 +1131,7 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -1184,7 +1184,7 @@ ippAddStringf(ipp_t      *ipp,		/* I - IPP message */
  * stdarg pointer @code ap@.  The formatted string is truncated as needed to the
  * maximum length of the corresponding value type.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -1466,7 +1466,7 @@ ippAddStrings(
  * enum value, or the value falls within one of the rangeOfInteger values for
  * the attribute.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 on a match, 0 on no match */
@@ -1517,7 +1517,7 @@ ippContainsInteger(
  * Returns non-zero when the attribute contains a matching charset, keyword,
  * language, mimeMediaType, name, text, URI, or URI scheme value.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 on a match, 0 on no match */
@@ -2390,7 +2390,7 @@ ippGetName(ipp_attribute_t *attr)	/* I - IPP attribute */
  * The @code element@ parameter specifies which value to get from 0 to
  * @link ippGetCount(attr)@ - 1.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 void *					/* O - Pointer to octetString data */
@@ -2826,7 +2826,7 @@ ippNewRequest(ipp_op_t op)		/* I - Operation code */
  * "utf-8" and a value derived from the current locale are substituted,
  * respectively.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 ipp_t *					/* O - IPP response message */
@@ -4009,7 +4009,7 @@ ippSetName(ipp_t           *ipp,	/* I  - IPP message */
  * The @code element@ parameter specifies which value to set from 0 to
  * @link ippGetCount(attr)@.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4382,7 +4382,7 @@ ippSetString(ipp_t           *ipp,	/* I  - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4420,7 +4420,7 @@ ippSetStringf(ipp_t           *ipp,	/* I  - IPP message */
  * needed.  The formatted string is truncated as needed to the maximum length of
  * the corresponding value type.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O  - 1 on success, 0 on failure */
@@ -4810,7 +4810,7 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
  * value tag.  1 is returned if the attribute is valid, 0 otherwise.  On
  * failure, cupsLastErrorString() is set to a human-readable message.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -5449,7 +5449,7 @@ ippValidateAttribute(
  * attribute.  Like @link ippValidateAttribute@, cupsLastErrorString() is set
  * to a human-readable message on failure.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 if valid, 0 otherwise */

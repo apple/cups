@@ -838,7 +838,7 @@ ippAttributeString(
  * "attribute-name")@ will return a non-NULL pointer.  The array must be freed
  * using the @code cupsArrayDelete@ function.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 cups_array_t *				/* O - CUPS array or @code NULL@ if all */

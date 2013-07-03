@@ -341,7 +341,7 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id$"
+  "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
 
   CUPS API header for CUPS.
 
@@ -547,7 +547,7 @@ constants">cups_ptype_e</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id$"
+  "$Id: api-cups.shtml 7337 2008-02-22 04:44:04Z mike $"
 
   API introduction for CUPS.
 
@@ -1629,7 +1629,7 @@ Enumeration happens on the current thread and does not return until all
 destinations have been enumerated or the block returns 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestDefault">cupsFindDestDefault</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestDefault (<br>
@@ -1659,7 +1659,7 @@ ipp_attribute_t *cupsFindDestDefault (<br>
 functions to inspect the default value(s) as needed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestReady">cupsFindDestReady</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestReady (<br>
@@ -1689,7 +1689,7 @@ ipp_attribute_t *cupsFindDestReady (<br>
 functions to inspect the default value(s) as needed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsFindDestSupported">cupsFindDestSupported</a></h3>
 <p class="description">Find the default value(s) for the given option.</p>
 <p class="code">
 ipp_attribute_t *cupsFindDestSupported (<br>
@@ -1893,7 +1893,7 @@ not support the lpoptions-defined default printer.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use the <a href="#cupsGetDests"><code>cupsGetDests</code></a> or <a href="#cupsGetDests2"><code>cupsGetDests2</code></a> functions to get a
 list of supported destinations for the current user.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaByIndex">cupsGetDestMediaByIndex</a></h3>
 <p class="description">Get a media name, dimension, and margins for a
 specific size.</p>
 <p class="code">
@@ -2021,7 +2021,7 @@ The matching result (if any) is returned in the &quot;cups_size_t&quot; structur
 Returns 1 when there is a match and 0 if there is not a match.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaCount">cupsGetDestMediaCount</a></h3>
 <p class="description">Get the number of sizes supported by a
 destination.</p>
 <p class="code">
@@ -2050,7 +2050,7 @@ counted.  For example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will ret
 the number of borderless sizes.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsGetDestMediaDefault">cupsGetDestMediaDefault</a></h3>
 <p class="description">Get the default size for a destination.</p>
 <p class="code">
 int cupsGetDestMediaDefault (<br>
@@ -3019,7 +3019,7 @@ void cupsSetUser (<br>
 Note: The current user name is tracked separately for each thread in a
 program. Multi-threaded programs that override the user name need to do so
 in each thread for the same user name to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsSetUserAgent">cupsSetUserAgent</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsSetUserAgent">cupsSetUserAgent</a></h3>
 <p class="description">Set the default HTTP User-Agent string.</p>
 <p class="code">
 void cupsSetUserAgent (<br>
@@ -3192,13 +3192,13 @@ const char *cupsUser (void);</p>
 program. Multi-threaded programs that override the user name with the
 <a href="#cupsSetUser"><code>cupsSetUser</code></a> function need to do so in each thread for the same user
 name to be used.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="cupsUserAgent">cupsUserAgent</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="cupsUserAgent">cupsUserAgent</a></h3>
 <p class="description">Return the default HTTP User-Agent string.</p>
 <p class="code">
 const char *cupsUserAgent (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">User-Agent string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgFormatSizeName">pwgFormatSizeName</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgFormatSizeName">pwgFormatSizeName</a></h3>
 <p class="description">Generate a PWG self-describing media size name.</p>
 <p class="code">
 int pwgFormatSizeName (<br>
@@ -3246,7 +3246,7 @@ units string is <code>NULL</code>, otherwise inches (&quot;in&quot;) or millimet
 are used.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgInitSize">pwgInitSize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgInitSize">pwgInitSize</a></h3>
 <p class="description">Initialize a pwg_size_t structure using IPP Job Template
 attributes.</p>
 <p class="code">
@@ -3276,7 +3276,7 @@ member attribute was specified in the &quot;media-col&quot; Job Template attribu
 otherwise it is initialized to 0.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForLegacy">pwgMediaForLegacy</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForLegacy">pwgMediaForLegacy</a></h3>
 <p class="description">Find a PWG media size by ISO/IPP legacy name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForLegacy (<br>
@@ -3294,7 +3294,7 @@ otherwise it is initialized to 0.
 &quot;iso-a4&quot; or &quot;na-letter&quot;.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForPPD">pwgMediaForPPD</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForPPD">pwgMediaForPPD</a></h3>
 <p class="description">Find a PWG media size by Adobe PPD name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPPD (<br>
@@ -3318,7 +3318,7 @@ thread.  Custom names can be of the form &quot;Custom.WIDTHxLENGTH[units]&quot; 
 &quot;WIDTHxLENGTH[units]&quot;.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForPWG">pwgMediaForPWG</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForPWG">pwgMediaForPWG</a></h3>
 <p class="description">Find a PWG media size by 5101.1 self-describing name.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForPWG (<br>
@@ -3340,7 +3340,7 @@ thread-local storage and is overwritten by each call to the function in the
 thread.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.7&nbsp;</span><a name="pwgMediaForSize">pwgMediaForSize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span><a name="pwgMediaForSize">pwgMediaForSize</a></h3>
 <p class="description">Get the PWG media size for the given dimensions.</p>
 <p class="code">
 <a href="#pwg_media_t">pwg_media_t</a> *pwgMediaForSize (<br>

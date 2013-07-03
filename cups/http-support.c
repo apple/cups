@@ -506,7 +506,7 @@ httpAssembleURIf(
  *
  * The buffer needs to be at least 46 bytes in size.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 char *					/* I - UUID string */

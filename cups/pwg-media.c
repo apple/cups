@@ -278,7 +278,7 @@ static pwg_media_t const cups_pwg_media[] =
  * units string is @code NULL@, otherwise inches ("in") or millimeters ("mm")
  * are used.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -417,7 +417,7 @@ void _pwgGenerateSize(char *keyword, size_t keysize, const char *prefix,
  * member attribute was specified in the "media-col" Job Template attribute,
  * otherwise it is initialized to 0.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 int					/* O - 1 if size was initialized, 0 otherwise */
@@ -592,7 +592,7 @@ int _pwgInitSize(pwg_size_t *size, ipp_t *job, int *margins_set)
  * The "name" argument specifies the legacy ISO media size name, for example
  * "iso-a4" or "na-letter".
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -654,7 +654,7 @@ pwg_media_t *_pwgMediaForLegacy(const char *legacy)
  * thread.  Custom names can be of the form "Custom.WIDTHxLENGTH[units]" or
  * "WIDTHxLENGTH[units]".
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -826,7 +826,7 @@ pwg_media_t *_pwgMediaForPPD(const char *ppd)
  * thread-local storage and is overwritten by each call to the function in the
  * thread.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 pwg_media_t *				/* O - Matching size or NULL */
@@ -926,7 +926,7 @@ pwg_media_t *_pwgMediaForPWG(const char *pwg)
  * thread-local storage and is overwritten by each call to the function in the
  * thread.
  *
- * @since CUPS 1.7@
+ * @since CUPS 1.7/OS X 10.9@
  */
 
 pwg_media_t *				/* O - PWG media name */
