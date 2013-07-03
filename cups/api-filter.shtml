@@ -3,7 +3,7 @@
 
   Filter and backend programming introduction for CUPS.
 
-  Copyright 2007-2012 by Apple Inc.
+  Copyright 2007-2013 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -488,7 +488,7 @@ from localizing the vendor-prefixed keyword in the PPD file - otherwise both
 the generic and vendor-specific keyword will be shown in the user
 interface.</p>
 
-</blockquote></dd>
+</blockquote>
 
 <h4><a name="REPORTING_SUPPLIES">Reporting Supply Levels</a></h4>
 
@@ -613,7 +613,7 @@ datalen = sizeof(data) - 1;
 status = <a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a>(CUPS_SC_CMD_GET_DEVICE_ID, data, &amp;datalen, 1.0);
 
 /* Use the returned value if OK was returned and the length is non-zero */
-if (status == CUPS_SC_STATUS_OK && datalen > 0)
+if (status == CUPS_SC_STATUS_OK &amp;&amp; datalen > 0)
   data[datalen] = '\0';
 else
   data[0] = '\0';

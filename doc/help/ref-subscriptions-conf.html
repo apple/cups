@@ -196,7 +196,7 @@ HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
 <PRE CLASS="command">
 &lt;Subscription NNN&gt;
   ...
-  LeaseDuration 
+  LeaseDuration
 &lt;/Subscription&gt;
 </PRE>
 
@@ -335,17 +335,17 @@ unique (to the server) number starting at 1.</P>
 <PRE CLASS="command">
 &lt;Subscription NNN&gt;
   ...
-  UserData mailto:bar<40>domain.com
+  UserData mailto:bar&lt;40&gt;example.com
 &lt;/Subscription&gt;
 </PRE>
 
 <H3>Description</H3>
 
 <P>The <CODE>UserData</CODE> directive specifies the
-<CODE>notify-user-data</CODE> value, which is normally the "from"
+<CODE>notify-user-data</CODE> value, which is normally the "to"
 address used in <CODE>mailto</CODE> notifications. Binary values
 are introduced by encoding the bytes as hexadecimal values inside
-angle brackets, e.g. "<1234>".</P>
+angle brackets, e.g. "&lt;1234&gt;".</P>
 
 <P>The <CODE>UserData</CODE> directive must appear inside a <A
 HREF="#Subscription"><CODE>Subscription</CODE></A> section.</P>
