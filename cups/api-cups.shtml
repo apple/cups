@@ -3,7 +3,7 @@
 
   API introduction for CUPS.
 
-  Copyright 2007-2011 by Apple Inc.
+  Copyright 2007-2013 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -183,7 +183,7 @@ int num_options = 0;
 <a href='#cups_option_t'>cups_option_t</a> *options = NULL;
 <a href='#cups_dest_t'>cups_dest_t</a> *dest;
 
-for (i = 0; i < dest->num_options; i ++)
+for (i = 0; i &lt; dest->num_options; i ++)
   num_options = <a href='#cupsAddOption'>cupsAddOption</a>(dest->options[i].name, dest->options[i].value,
                               num_options, &amp;options);
 </pre>
@@ -235,7 +235,7 @@ job_id = <a href='#cupsPrintFiles'>cupsPrintFiles</a>(dest->name, 3, files, "Tes
 
 <p>Finally, the <a href='#cupsCreateJob'><code>cupsCreateJob</code></a>
 function creates a new job with no files in it. Files are added using the
-<a href='#cupsStartDocument'><code>cupsStartDocument</code></a>, 
+<a href='#cupsStartDocument'><code>cupsStartDocument</code></a>,
 <a href='api-httpipp.html#cupsWriteRequestData'><code>cupsWriteRequestData</code></a>,
 and <a href='#cupsFinishDocument'><code>cupsFinishDocument</code></a> functions.
 The following example creates a job with 10 text files for printing:</p>
@@ -299,7 +299,7 @@ int num_jobs;
 <a href='#cups_job_t'>cups_job_t</a> *jobs;
 int i;
 ipp_jstate_t job_state = IPP_JOB_PENDING;
- 
+
 while (job_state &lt; IPP_JOB_STOPPED)
 {
   /* Get my jobs (1) with any state (-1) */

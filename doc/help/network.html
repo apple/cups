@@ -88,10 +88,10 @@ page on the device.</P>
 <PRE>
 socket://<i>ip-address-or-hostname</i>
 socket://<i>ip-address-or-hostname</i>/?option=value
-socket://<i>ip-address-or-hostname</i>/?option=value&option=value
+socket://<i>ip-address-or-hostname</i>/?option=value&amp;option=value
 socket://<i>ip-address-or-hostname</i>:<i>port-number</i>
 socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value
-socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value&option=value
+socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value&amp;option=value
 </PRE>
 
 <P>The "contimeout" option controls the number of seconds that the backend will wait to obtain a connection to the printer. The default is 1 week.</P>
@@ -107,19 +107,19 @@ socket://<i>ip-address-or-hostname</i>:<i>port-number</i>/?option=value&option=v
 <PRE>
 http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
 http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
-http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&amp;option=value</i>
 ipp://<i>ip-address-or-hostname</i>/<i>resource</i>
 ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value</i>
-ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipp://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&amp;option=value</i>
 ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
 ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
-ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipp://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&amp;option=value</i>
 ipps://<i>ip-address-or-hostname</i>/<i>resource</i>
 ipps://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value</i>
-ipps://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipps://<i>ip-address-or-hostname</i>/<i>resource</i>?<i>option=value&amp;option=value</i>
 ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
 ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value</i>
-ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&option=value</i>
+ipps://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>?<i>option=value&amp;option=value</i>
 </PRE>
 
 <P>The <tt>ipp</tt> backend supports many options, which are summarized in <A HREF="#TABLE2">Table 2</A>.</P>
@@ -189,8 +189,8 @@ lpd://<i>ip-address-or-hostname</i>/<i>queue</i>
 lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>
 lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value</i>
 lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>?<i>option=value</i>
-lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option=value</i>
-lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option=value</i>
+lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&amp;option=value</i>
+lpd://<i>username@ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&amp;option=value</i>
 </PRE>
 
 <P><A HREF="#TABLE3">Table 3</A> summarizes the options supported by the <tt>lpd</tt> backend.</P>
@@ -436,7 +436,7 @@ CUPS_DEBUG_LEVEL=2 /usr/lib/cups/backend/snmp 2>&amp;1 | tee snmp.log
 <P>For C shell (/bin/csh) and TCsh (/bin/tcsh), use the following command instead:</P>
 
 <PRE CLASS="command">
-(setenv CUPS_DEBUG_LEVEL 2; /usr/lib/cups/backend/snmp) |& tee snmp.log
+(setenv CUPS_DEBUG_LEVEL 2; /usr/lib/cups/backend/snmp) |&amp; tee snmp.log
 </PRE>
 
 <P>On MacOS X you'll find the SNMP backend in /usr/libexec/cups/backend instead:</P>
