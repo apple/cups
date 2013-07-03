@@ -4821,7 +4821,7 @@ usage(int status)			/* O - Exit status */
   puts("-2                      Supports 2-sided printing (default=1-sided)");
   puts("-M manufacturer         Manufacturer name (default=Test)");
   puts("-P                      PIN printing mode");
-  puts("-c command              Run command for every print job"
+  puts("-c command              Run command for every print job");
   printf("-d spool-directory      Spool directory "
          "(default=/tmp/ippserver.%d)\n", (int)getpid());
   puts("-f type/subtype[,...]   List of supported types "
