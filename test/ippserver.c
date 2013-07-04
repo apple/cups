@@ -4200,77 +4200,82 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST,
 	            "Missing required attributes.");
       }
-      else if (strcmp(ippGetString(uri, 0, NULL), client->printer->uri) &&
-               strncmp(ippGetString(uri, 0, NULL), client->printer->uri,
-	               client->printer->urilen))
-      {
-        respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "%s %s not found.",
-                    ippGetName(uri), ippGetString(uri, 0, NULL));
-      }
       else
       {
-       /*
-        * Try processing the operation...
-	*/
+        char		scheme[32],	/* URI scheme */
+			userpass[32],	/* Username/password in URI */
+			host[256],	/* Host name in URI */
+			resource[256];	/* Resource path in URI */
+	int		port;		/* Port number in URI */
 
-#if 0 /* Already doing this in process_http()... */
-        if (httpGetExpect(client->http) == HTTP_STATUS_CONTINUE)
+        name = ippGetName(uri);
+
+        if (httpSeparateURI(HTTP_URI_CODING_ALL, ippGetString(uri, 0, NULL),
+                            scheme, sizeof(scheme),
+                            userpass, sizeof(userpass),
+                            host, sizeof(host), &port,
+                            resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+	  respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES,
+	              "Bad %s value '%s'.", name, ippGetString(uri, 0, NULL));
+        else if ((!strcmp(name, "job-uri") &&
+                  strncmp(resource, "/ipp/print/", 11)) ||
+                 (!strcmp(name, "printer-uri") &&
+                  strcmp(resource, "/ipp/print")))
+	  respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "%s %s not found.",
+		      name, ippGetString(uri, 0, NULL));
+	else
 	{
 	 /*
-	  * Send 100-continue header...
+	  * Try processing the operation...
 	  */
 
-	  if (!respond_http(client, HTTP_STATUS_CONTINUE, NULL, NULL, 0))
-	    return (0);
-	}
-#endif /* 0 */
+	  switch (ippGetOperation(client->request))
+	  {
+	    case IPP_OP_PRINT_JOB :
+		ipp_print_job(client);
+		break;
 
-	switch (ippGetOperation(client->request))
-	{
-	  case IPP_OP_PRINT_JOB :
-              ipp_print_job(client);
-              break;
+	    case IPP_OP_PRINT_URI :
+		ipp_print_uri(client);
+		break;
 
-	  case IPP_OP_PRINT_URI :
-              ipp_print_uri(client);
-              break;
+	    case IPP_OP_VALIDATE_JOB :
+		ipp_validate_job(client);
+		break;
 
-	  case IPP_OP_VALIDATE_JOB :
-              ipp_validate_job(client);
-              break;
+	    case IPP_OP_CREATE_JOB :
+		ipp_create_job(client);
+		break;
 
-          case IPP_OP_CREATE_JOB :
-              ipp_create_job(client);
-              break;
+	    case IPP_OP_SEND_DOCUMENT :
+		ipp_send_document(client);
+		break;
 
-          case IPP_OP_SEND_DOCUMENT :
-              ipp_send_document(client);
-              break;
+	    case IPP_OP_SEND_URI :
+		ipp_send_uri(client);
+		break;
 
-          case IPP_OP_SEND_URI :
-              ipp_send_uri(client);
-              break;
+	    case IPP_OP_CANCEL_JOB :
+		ipp_cancel_job(client);
+		break;
 
-	  case IPP_OP_CANCEL_JOB :
-              ipp_cancel_job(client);
-              break;
+	    case IPP_OP_GET_JOB_ATTRIBUTES :
+		ipp_get_job_attributes(client);
+		break;
 
-	  case IPP_OP_GET_JOB_ATTRIBUTES :
-              ipp_get_job_attributes(client);
-              break;
+	    case IPP_OP_GET_JOBS :
+		ipp_get_jobs(client);
+		break;
 
-	  case IPP_OP_GET_JOBS :
-              ipp_get_jobs(client);
-              break;
+	    case IPP_OP_GET_PRINTER_ATTRIBUTES :
+		ipp_get_printer_attributes(client);
+		break;
 
-	  case IPP_OP_GET_PRINTER_ATTRIBUTES :
-              ipp_get_printer_attributes(client);
-              break;
-
-	  default :
-	      respond_ipp(client, IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED,
-	                  "Operation not supported.");
-	      break;
+	    default :
+		respond_ipp(client, IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED,
+			    "Operation not supported.");
+		break;
+	  }
 	}
       }
     }
@@ -4418,7 +4423,7 @@ register_printer(
   snprintf(product, sizeof(product), "(%s)", model);
 
   TXTRecordCreate(&(printer->ipp_txt), 1024, NULL);
-  TXTRecordSetValue(&(printer->ipp_txt), "rp", 3, "ipp");
+  TXTRecordSetValue(&(printer->ipp_txt), "rp", 9, "ipp/print");
   TXTRecordSetValue(&(printer->ipp_txt), "ty", (uint8_t)strlen(make_model),
                     make_model);
   TXTRecordSetValue(&(printer->ipp_txt), "adminurl", (uint8_t)strlen(adminurl),
@@ -4496,7 +4501,7 @@ register_printer(
     return (0);
   }
 
-#  ifdef HAVE_SSL
+#  if 0 /* ifdef HAVE_SSL */
  /*
   * Then register the _ipps._tcp (IPP) service type with the real port number to
   * advertise our IPP printer...
@@ -4925,9 +4930,14 @@ valid_doc_attributes(
   }
   else
   {
-    format = "application/octet-stream";
-    attr   = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
-			  "document-format", NULL, format);
+    format = ippGetString(ippFindAttribute(client->printer->attrs,
+                                           "document-format-default",
+                                           IPP_TAG_MIMETYPE), 0, NULL);
+    if (!format)
+      format = "application/octet-stream"; /* Should never happen */
+
+    attr = ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+			"document-format", NULL, format);
   }
 
   if (!strcmp(format, "application/octet-stream") &&
