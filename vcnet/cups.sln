@@ -33,10 +33,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipptool", "ipptool.vcproj",
 	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ipptool-installer", "ipptool-installer.vdproj", "{6AEA263B-92C0-426F-B5FF-F7F5917B704A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85} = {B484DA0C-62C8-4C32-83B6-CCEB58968B85}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex.vcproj", "{18950A1B-D37A-40C7-B2DF-C12986C0526E}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "libcups2-installer", "libcups2-installer.vdproj", "{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85} = {B484DA0C-62C8-4C32-83B6-CCEB58968B85}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ippfind", "ippfind.vcproj", "{B484DA0C-62C8-4C32-83B6-CCEB58968B85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{18950A1B-D37A-40C7-B2DF-C12986C0526E} = {18950A1B-D37A-40C7-B2DF-C12986C0526E}
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3} = {CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,8 +64,8 @@ Global
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Debug|x64.Build.0 = Debug|x64
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|Win32.ActiveCfg = Release|Win32
 		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|Win32.Build.0 = Release|Win32
-		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|x64.ActiveCfg = Debug|x64
-		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|x64.Build.0 = Debug|x64
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|x64.ActiveCfg = Release|x64
+		{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}.Release|x64.Build.0 = Release|x64
 		{CB4AA6F2-3E84-45BE-B505-95CD375E1234}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CB4AA6F2-3E84-45BE-B505-95CD375E1234}.Debug|Win32.Build.0 = Debug|Win32
 		{CB4AA6F2-3E84-45BE-B505-95CD375E1234}.Debug|x64.ActiveCfg = Debug|x64
@@ -104,11 +116,11 @@ Global
 		{6AEA263B-92C0-426F-B5FF-F7F5917B704A}.Release|x64.Build.0 = Release
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|Win32.ActiveCfg = Debug|Win32
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|Win32.Build.0 = Debug|Win32
-		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|x64.ActiveCfg = Release|x64
-		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|x64.Build.0 = Release|x64
+		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|x64.ActiveCfg = Debug|x64
+		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Debug|x64.Build.0 = Debug|x64
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|Win32.ActiveCfg = Release|Win32
 		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|Win32.Build.0 = Release|Win32
-		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|x64.ActiveCfg = Release|Win32
+		{18950A1B-D37A-40C7-B2DF-C12986C0526E}.Release|x64.ActiveCfg = Release|x64
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|Win32.ActiveCfg = Debug
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|Win32.Build.0 = Debug
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Debug|x64.ActiveCfg = Debug
@@ -117,6 +129,14 @@ Global
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|Win32.Build.0 = Release
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|x64.ActiveCfg = Release
 		{03CF67C2-3FF5-44EA-B3AF-FB62D3BED961}.Release|x64.Build.0 = Release
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Debug|Win32.Build.0 = Debug|Win32
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Debug|x64.ActiveCfg = Debug|x64
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Debug|x64.Build.0 = Debug|x64
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Release|Win32.ActiveCfg = Release|Win32
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Release|Win32.Build.0 = Release|Win32
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Release|x64.ActiveCfg = Release|x64
+		{B484DA0C-62C8-4C32-83B6-CCEB58968B85}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

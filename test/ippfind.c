@@ -45,7 +45,12 @@
 
 #define _CUPS_NO_DEPRECATED
 #include <cups/cups-private.h>
-#include <sys/wait.h>
+#ifdef WIN32
+#  include <process.h>
+#  include <sys/timeb.h>
+#else
+#  include <sys/wait.h>
+#endif /* WIN32 */
 #include <regex.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
@@ -59,7 +64,9 @@
 #  define kDNSServiceMaxDomainName AVAHI_DOMAIN_NAME_MAX
 #endif /* HAVE_DNSSD */
 
+#ifndef WIN32
 extern char **environ;			/* Process environment variables */
+#endif /* !WIN32 */
 
 
 /*
@@ -166,7 +173,7 @@ static int	ipp_version = 20;	/* IPP version for LIST */
  */
 
 #ifdef HAVE_DNSSD
-static void		browse_callback(DNSServiceRef sdRef,
+static void DNSSD_API	browse_callback(DNSServiceRef sdRef,
 			                DNSServiceFlags flags,
 				        uint32_t interfaceIndex,
 				        DNSServiceErrorType errorCode,
@@ -174,7 +181,7 @@ static void		browse_callback(DNSServiceRef sdRef,
 				        const char *regtype,
 				        const char *replyDomain, void *context)
 					__attribute__((nonnull(1,5,6,7,8)));
-static void		browse_local_callback(DNSServiceRef sdRef,
+static void DNSSD_API	browse_local_callback(DNSServiceRef sdRef,
 					      DNSServiceFlags flags,
 					      uint32_t interfaceIndex,
 					      DNSServiceErrorType errorCode,
@@ -215,7 +222,7 @@ static ippfind_expr_t	*new_expr(ippfind_op_t op, int invert,
 			          const char *value, const char *regex,
 			          char **args);
 #ifdef HAVE_DNSSD
-static void		resolve_callback(DNSServiceRef sdRef,
+static void DNSSD_API	resolve_callback(DNSServiceRef sdRef,
 			                 DNSServiceFlags flags,
 				         uint32_t interfaceIndex,
 				         DNSServiceErrorType errorCode,
@@ -1468,7 +1475,7 @@ main(int  argc,				/* I - Number of command-line args */
  * 'browse_callback()' - Browse devices.
  */
 
-static void
+static void DNSSD_API
 browse_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Option flags */
@@ -1498,7 +1505,7 @@ browse_callback(
  * 'browse_local_callback()' - Browse local devices.
  */
 
-static void
+static void DNSSD_API
 browse_local_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Option flags */
@@ -1728,8 +1735,10 @@ dnssd_error_string(int error)		/* I - Error number */
     case kDNSServiceErr_PollingMode :
         return ("Service polling mode error.");
 
+#ifndef WIN32
     case kDNSServiceErr_Timeout :
         return ("Service timeout.");
+#endif /* !WIN32 */
   }
 
 #  elif defined(HAVE_AVAHI)
@@ -2503,7 +2512,7 @@ poll_callback(
  */
 
 #ifdef HAVE_DNSSD
-static void
+static void DNSSD_API
 resolve_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Data flags */

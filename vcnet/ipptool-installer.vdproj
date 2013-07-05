@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1DBDCFABB8DF28E5F75E41EDAE4BF6BE"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1E4B2A9BD6A44926B719E0D7E8FC0952"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -35,6 +41,30 @@
         {
         "MsmKey" = "8:_290B9B52C4784AED94FA6B87CAB18D10"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
+        "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
+        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -75,8 +105,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_604E80B396974DD68D1F4A11BB022F79"
-        "OwnerKey" = "8:_8B9B4769224046F5B6D692BA9E6FFBDD"
+        "MsmKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_592FC984DBFD494D9FB7DFFEA35AD7A5"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -111,12 +147,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8B9B4769224046F5B6D692BA9E6FFBDD"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_8CC3562BCDED4676A672115D19D898B5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -143,12 +173,6 @@
         {
         "MsmKey" = "8:_A63C5C4108AB4B588878482B26876DC5"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A9CCE21DCF004D869F157B0065B32AA7"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -189,12 +213,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D20F7E9FAB8B4CF38D740C5E5655CC3E"
-        "OwnerKey" = "8:_A9CCE21DCF004D869F157B0065B32AA7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_D4BEA026ABFB46DD960AD8EFCAE45E31"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -203,6 +221,12 @@
         {
         "MsmKey" = "8:_D5CD9D9AB1644688A1D54B1589BDF724"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D9C1920DC8F14B9EB89DDF4B6C1F474A"
+        "OwnerKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -414,6 +438,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1DBDCFABB8DF28E5F75E41EDAE4BF6BE"
+            {
+            "SourcePath" = "8:zlibwapi.dll"
+            "TargetName" = "8:zlibwapi.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E4B2A9BD6A44926B719E0D7E8FC0952"
             {
             "SourcePath" = "8:..\\test\\get-printer-attributes.test"
@@ -560,6 +604,26 @@
             "TargetName" = "8:get-notifications.test"
             "Tag" = "8:"
             "Folder" = "8:_EB00D0298C7E441EBD0257AC04FB3560"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_592FC984DBFD494D9FB7DFFEA35AD7A5"
+            {
+            "SourcePath" = "8:..\\doc\\help\\man-ippfind.html"
+            "TargetName" = "8:man-ippfind.html"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1192,14 +1256,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ipptool for Windows"
-        "ProductCode" = "8:{75CFE2B5-5105-4D7A-87CA-5D919126F3DA}"
-        "PackageCode" = "8:{85757D89-5057-4EE1-9852-763E1EEF2FC8}"
+        "ProductCode" = "8:{820B4978-328C-46E6-938B-02ECE3846FFA}"
+        "PackageCode" = "8:{FF5FD1DE-7162-41BD-B4E4-E9E32BD8CA80}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:13.04.1800"
+        "ProductVersion" = "8:13.07.0500"
         "Manufacturer" = "8:Apple Inc."
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.cups.org/str.php"
@@ -1758,11 +1822,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_604E80B396974DD68D1F4A11BB022F79"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_3CE1523FBE134534AC61A75E96CB0E1A"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_debugcrt_x86_x64.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1772,39 +1836,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_8B9B4769224046F5B6D692BA9E6FFBDD"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D9C1920DC8F14B9EB89DDF4B6C1F474A"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86_x64.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A9CCE21DCF004D869F157B0065B32AA7"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_CRT_x86_x64.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D20F7E9FAB8B4CF38D740C5E5655CC3E"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_crt_x86_x64.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -1817,9 +1853,37 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_58DC0E72F0944BEFB927AED718CD1660"
+            {
+            "SourcePath" = "8:Win32\\Debug\\ippfind.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{B484DA0C-62C8-4C32-83B6-CCEB58968B85}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:x64\\Release\\regex.dll"
+            "SourcePath" = "8:Win32\\Debug\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1847,7 +1911,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:x64\\Debug\\ipptool.exe"
+            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1875,7 +1939,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:x64\\Debug\\libcups2.dll"
+            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
