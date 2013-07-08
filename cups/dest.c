@@ -1907,18 +1907,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   if (!_cupsGetDests(http, op, name, &dest, 0, 0))
-  {
-    if (op == IPP_OP_CUPS_GET_DEFAULT || (name && !set_as_default))
-      return (NULL);
-
-   /*
-    * The default printer from environment variables or from a
-    * configuration file does not exist.  Find out the real default.
-    */
-
-    if (!_cupsGetDests(http, IPP_OP_CUPS_GET_DEFAULT, NULL, &dest, 0, 0))
-      return (NULL);
-  }
+    return (NULL);
 
   if (instance)
     dest->instance = _cupsStrAlloc(instance);

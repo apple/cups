@@ -146,7 +146,8 @@ main(int  argc,				/* I - Number of command-line arguments */
             if ((instance = strrchr(printer, '/')) != NULL)
 	      *instance++ = '\0';
 
-            if ((dest = cupsGetNamedDest(NULL, printer, instance)) != NULL)
+            if ((dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer,
+                                         instance)) != NULL)
 	    {
 	      for (j = 0; j < dest->num_options; j ++)
 	        if (cupsGetOption(dest->options[j].name, num_options,
@@ -154,6 +155,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	          num_options = cupsAddOption(dest->options[j].name,
 		                              dest->options[j].value,
 					      num_options, &options);
+	    }
+	    else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+		     cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+	    {
+	      _cupsLangPrintf(stderr,
+			      _("%s: Error - add '/version=1.1' to server "
+				"name."), argv[0]);
+	      return (1);
 	    }
 	    break;
 
@@ -567,6 +576,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 		                      dest->options[j].value,
 				      num_options, &options);
     }
+    else if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+	     cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+    {
+      _cupsLangPrintf(stderr,
+		      _("%s: Error - add '/version=1.1' to server "
+			"name."), argv[0]);
+      return (1);
+    }
   }
 
   if (printer == NULL)
@@ -679,7 +696,15 @@ restart_job(const char *command,	/* I - Command name */
 
   ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/jobs"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+      cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+  {
+    _cupsLangPrintf(stderr,
+		    _("%s: Error - add '/version=1.1' to server "
+		      "name."), command);
+    return (1);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
     return (1);
@@ -720,7 +745,15 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
   ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/jobs"));
 
-  if (cupsLastError() > IPP_OK_CONFLICT)
+  if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+      cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+  {
+    _cupsLangPrintf(stderr,
+		    _("%s: Error - add '/version=1.1' to server "
+		      "name."), command);
+    return (1);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
   {
     _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
     return (1);

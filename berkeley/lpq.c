@@ -3,7 +3,7 @@
  *
  *   "lpq" command for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -60,8 +60,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		all,			/* All printers */
 		interval,		/* Reporting interval */
 		longstatus;		/* Show file details */
-  int		num_dests;		/* Number of destinations */
-  cups_dest_t	*dests;			/* Destinations */
+  cups_dest_t	*named_dest;		/* Named destination */
 
 
   _cupsSetLocale(argv);
@@ -77,8 +76,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   interval   = 0;
   longstatus = 0;
   all        = 0;
-  num_dests  = 0;
-  dests      = NULL;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '+')
@@ -127,7 +124,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 		httpClose(http);
-		cupsFreeDests(num_dests, dests);
 
 	        usage();
 	      }
@@ -140,12 +136,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
             http = connect_server(argv[0], http);
 
-            if (num_dests == 0)
-              num_dests = cupsGetDests2(http, &dests);
-
-            if (cupsGetDest(dest, instance, num_dests, dests) == NULL)
+            if ((named_dest = cupsGetNamedDest(http, dest, instance)) == NULL)
 	    {
-	      if (instance)
+	      if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+		  cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+		_cupsLangPrintf(stderr,
+				_("%s: Error - add '/version=1.1' to server "
+				  "name."), argv[0]);
+	      else if (instance)
 		_cupsLangPrintf(stderr,
 		                _("%s: Error - unknown destination \"%s/%s\"."),
 		        	argv[0], dest, instance);
@@ -155,6 +153,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      return (1);
 	    }
+
+	    cupsFreeDests(1, named_dest);
 	    break;
 
 	case 'a' : /* All printers */
@@ -192,7 +192,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	default :
 	    httpClose(http);
-	    cupsFreeDests(num_dests, dests);
 
 	    usage();
 	    break;
@@ -207,15 +206,17 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (dest == NULL && !all)
   {
-    if (num_dests == 0)
-      num_dests = cupsGetDests2(http, &dests);
-
-    for (i = 0; i < num_dests; i ++)
-      if (dests[i].is_default)
-	dest = dests[i].name;
-
-    if (dest == NULL)
+    if ((named_dest = cupsGetNamedDest(http, NULL, NULL)) == NULL)
     {
+      if (cupsLastError() == IPP_STATUS_ERROR_BAD_REQUEST ||
+          cupsLastError() == IPP_STATUS_ERROR_VERSION_NOT_SUPPORTED)
+      {
+	_cupsLangPrintf(stderr,
+	                _("%s: Error - add '/version=1.1' to server name."),
+			argv[0]);
+        return (1);
+      }
+
       val = NULL;
 
       if ((dest = getenv("LPDEST")) == NULL)
@@ -231,7 +232,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       else
 	val = "LPDEST";
 
-      if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
+      if (dest && val)
 	_cupsLangPrintf(stderr,
 	                _("%s: Error - %s environment variable names "
 			  "non-existent destination \"%s\"."), argv[0], val,
@@ -241,9 +242,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                _("%s: Error - no default destination available."),
 			argv[0]);
       httpClose(http);
-      cupsFreeDests(num_dests, dests);
       return (1);
     }
+
+    dest = named_dest->name;
   }
 
  /*
@@ -270,7 +272,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Close the connection to the server and return...
   */
 
-  cupsFreeDests(num_dests, dests);
   httpClose(http);
 
   return (0);
