@@ -44,6 +44,8 @@
 #  include <IOKit/pwr_mgt/IOPMLib.h>
 #  ifdef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H
 #    include <IOKit/pwr_mgt/IOPMLibPrivate.h>
+#  else
+#    define kIOPMAssertionTypeDenySystemSleep CFSTR("DenySystemSleep")
 #  endif /* HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
 #endif /* __APPLE__ */
 
@@ -69,9 +71,9 @@
  * Local globals...
  */
 
-#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertRemoteAccess)
+#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertNetworkClientActive)
 static IOPMAssertionID	keep_awake = 0;	/* Keep the system awake while printing */
-#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertRemoteAccess */
+#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertNetworkClientActive */
 
 
 /*
@@ -215,13 +217,13 @@ cupsdSetBusyState(void)
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
   }
 
-#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertRemoteAccess)
+#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertNetworkClientActive)
   if (cupsArrayCount(PrintingJobs) > 0 && !keep_awake)
   {
-#  ifdef kIOPMAssertionTypeRemoteAccess
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting RemoteAccess.");
+#  ifdef kIOPMAssertNetworkClientActive
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting NetworkClientActive.");
 
-    IOPMAssertionCreateWithName(kIOPMAssertionTypeRemoteAccess,
+    IOPMAssertionCreateWithName(kIOPMAssertNetworkClientActive,
 				kIOPMAssertionLevelOn,
 				CFSTR("org.cups.cupsd"), &keep_awake);
 
@@ -232,7 +234,7 @@ cupsdSetBusyState(void)
 				kIOPMAssertionLevelOn,
 				CFSTR("org.cups.cupsd"), &keep_awake);
 
-#  endif /* kIOPMAssertionTypeRemoteAccess */
+#  endif /* kIOPMAssertNetworkClientActive */
   }
   else if (cupsArrayCount(PrintingJobs) == 0 && keep_awake)
   {
@@ -240,7 +242,7 @@ cupsdSetBusyState(void)
     IOPMAssertionRelease(keep_awake);
     keep_awake = 0;
   }
-#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertionTypeRemoteAccess */
+#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertNetworkClientActive */
 }
 
 
