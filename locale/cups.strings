@@ -261,6 +261,7 @@
 "%s: %s failed: %s" = "%s: %s failed: %s";
 "%s: Don't know what to do." = "%s: Don't know what to do.";
 "%s: Error - %s environment variable names non-existent destination \"%s\"." = "%s: Error - %s environment variable names non-existent destination \"%s\".";
+"%s: Error - add '/version=1.1' to server name." = "%s: Error - add '/version=1.1' to server name.";
 "%s: Error - bad job ID." = "%s: Error - bad job ID.";
 "%s: Error - cannot print files and alter jobs simultaneously." = "%s: Error - cannot print files and alter jobs simultaneously.";
 "%s: Error - cannot print from stdin if files or a job ID are provided." = "%s: Error - cannot print from stdin if files or a job ID are provided.";
