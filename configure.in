@@ -70,7 +70,6 @@ AC_OUTPUT(Makedefs
 	  desktop/cups.desktop
 	  doc/help/ref-cups-files-conf.html
 	  doc/help/ref-cupsd-conf.html
-	  doc/help/standard.html
 	  doc/index.html
 	  man/client.conf.man
 	  man/cups-deviced.man

@@ -12,13 +12,13 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "19 November 2012" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 cups-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
 The \fIcups-files.conf\fR file configures the files and directories used by the
 CUPS scheduler, \fIcupsd(8)\fR.  It is normally located in the
-\fI@CUPS_SERVERROOT@\fR directory.
+\fI/etc/cups\fR directory.
 .LP
 Each line in the file can be a configuration directive, a blank line,
 or a comment. Comment lines start with the # character.

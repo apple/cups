@@ -114,10 +114,7 @@ Windows 2000 or higher in the
 drivers and
 %WINDIR%\SYSTEM32\SPOOL\DRIVERS\X64\3 folder for 64-bit
 drivers.
-<p>The CUPS printer driver is preferred over the Microsoft driver
-since it supports the page-label, job-billing, and
-job-hold-until options fully on all printers. However, currently
-only Windows 2000 and higher is supported by the Microsoft
+<p>However, currently only Windows 2000 and higher is supported by the Microsoft
 driver, so you will also need to get the Adobe driver to support
 Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
 for Windows 2000 are identical.
@@ -132,36 +129,6 @@ as named below:
     pscript.hlp
     pscript.ntf
     pscript5.dll
-</pre>
-<p><b>Note:</b> Unlike Windows, case is significant - make sure that
-you use the lowercase filenames shown above, otherwise
-<i>cupsaddsmb</i> will fail to export the drivers.
-
-<h2 class="title"><a name="CUPS_POSTSCRIPT_DRIVERS_FOR_WINDOWS">Cups Postscript Drivers For Windows</a></h2>
-<i>cupsaddsmb</i> can use the CUPS v6 PostScript printer driver
-for Windows, which is available for download from the CUPS web
-site.
-<p>The CUPS printer driver is preferred over the Adobe and
-Microsoft drivers since it supports the page-label, job-billing,
-and job-hold-until options fully on all printers. However,
-currently only Windows 2000 and higher is supported by the CUPS
-driver, so you will also need to get the Adobe driver to support
-Windows 95, 98, and Me clients.
-<p>Once you have extracted the driver files, copy the 32-bit drivers
-to the <i>/usr/share/cups/drivers</i> directory and the 64-bit
-drivers to the <i>/usr/share/cups/drivers/x64</i> directory exactly
-as named below:
-<pre>
-
-    [Windows 2000 and higher]
-    cups6.inf (from www.cups.org)
-    cups6.ini (from www.cups.org)
-    cupsps6.dll (from www.cups.org)
-    cupsui6.dll (from www.cups.org)
-    ps5ui.dll (from your Windows system)
-    pscript.hlp (from your Windows system)
-    pscript.ntf (from your Windows system)
-    pscript5.dll (from your Windows system)
 </pre>
 <p><b>Note:</b> Unlike Windows, case is significant - make sure that
 you use the lowercase filenames shown above, otherwise

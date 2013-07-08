@@ -12,12 +12,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "19 November 2012" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
 The \fIcupsd.conf\fR file configures the CUPS scheduler, \fIcupsd(8)\fR.  It
-is normally located in the \fI@CUPS_SERVERROOT@\fR directory. \fBNote:\fR
+is normally located in the \fI/etc/cups\fR directory. \fBNote:\fR
 File, directory, and user configuration directives that used to be allowed in
 the \fIcupsd.conf\fR file are now stored in the \fIcups-files.conf(5)\fR instead
 in order to prevent certain types of privilege escalation attacks.
@@ -192,7 +192,7 @@ are run to print a job.
 GSSServiceName name
 .br
 Specifies the service name when using Kerberos authentication. The default
-service name is "@CUPS_DEFAULT_GSSSERVICENAME@".
+service name is "http".
 .TP 5
 HostNameLookups On
 .TP 5

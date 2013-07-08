@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd 8 "CUPS" "9 March 2009" "Apple Inc."
+.TH cupsd 8 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 cupsd \- cups scheduler
 .SH SYNOPSIS
@@ -24,7 +24,7 @@ cupsd \- cups scheduler
 \fIcupsd\fR is the scheduler for CUPS. It implements a printing system based
 upon the Internet Printing Protocol, version 2.1.  If no options are specified
 on the command-line then the default configuration file
-\fI@CUPS_SERVERROOT@/cupsd.conf\fR will be used.
+\fI/etc/cups/cupsd.conf\fR will be used.
 .SH OPTIONS
 .TP 5
 -c config-file

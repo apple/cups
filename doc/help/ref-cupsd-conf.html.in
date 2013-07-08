@@ -247,10 +247,7 @@ BrowseLocalProtocols dnssd
 
 <H3>Description</H3>
 
-<P>The <CODE>BrowseLocalProtocols</CODE> directive specifies the
-protocols to use when advertising local shared printers on the
-network. Multiple protocols can be specified by separating them
-with spaces. The default is "<CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE>".</P>
+<P>The <CODE>BrowseLocalProtocols</CODE> directive specifies the protocols to use when advertising local shared printers on the network. Multiple protocols can be specified by separating them with spaces. The default is "<CODE>dnssd</CODE>" on systems that support Bonjour and "<CODE>none</CODE>" on all others.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseWebIF">BrowseWebIF</A></H2>
@@ -280,9 +277,7 @@ Browsing Off
 
 <H3>Description</H3>
 
-<P>The <CODE>Browsing</CODE> directive controls whether or not
-printer sharing is enabled. The default setting is
-<CODE>@CUPS_BROWSING@</CODE>.</P>
+<P>The <CODE>Browsing</CODE> directive controls whether or not printer sharing is enabled. The default setting is <CODE>On</CODE>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.7</SPAN><A NAME="Classification">Classification</A></H2>
@@ -430,15 +425,13 @@ and other job operations.</P>
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-DefaultShared yes
-DefaultShared no
+DefaultShared Yes
+DefaultShared No
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>DefaultShared</CODE> directive specifies whether
-printers are shared (published) by default. The default is
-<CODE>@CUPS_DEFAULT_SHARED@</CODE>.</P>
+<P>The <CODE>DefaultShared</CODE> directive specifies whether printers are shared (published) by default. The default is <CODE>Yes</CODE>.</P>
 
 
 <H2 CLASS="title"><A NAME="Deny">Deny</A></H2>
@@ -628,7 +621,7 @@ GSSServiceName ipp
 
 <H3>Description</H3>
 
-<P>The <CODE>GSSServiceName</CODE> directive sets the Kerberos service name to use. The default is <CODE>@CUPS_DEFAULT_GSSSERVICE_NAME@</CODE> for compatibility with Microsoft Windows.</P>
+<P>The <CODE>GSSServiceName</CODE> directive sets the Kerberos service name to use. The default is <CODE>http</CODE> for compatibility with Microsoft Windows.</P>
 
 
 <H2 CLASS="title"><A NAME="HostNameLookups">HostNameLookups</A></H2>
@@ -2150,13 +2143,13 @@ to wait before an active HTTP or IPP request times out in seconds (no suffix), m
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-WebInterface yes
-WebInterface no
+WebInterface Yes
+WebInterface No
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>WebInterface</CODE> directive specifies whether the web interface is enabled. The default value is <CODE>@CUPS_WEBIF@</CODE>.</P>
+<P>The <CODE>WebInterface</CODE> directive specifies whether the web interface is enabled. The default value is <CODE>No</CODE> on OS X and <CODE>Yes</CODE> on all other operating systems.</P>
 
 </BODY>
 </HTML>

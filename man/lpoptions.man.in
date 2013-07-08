@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpoptions 1 "CUPS" "29 August 2008" "Apple Inc."
+.TH lpoptions 1 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
@@ -115,14 +115,14 @@ Options set with the \fIlpoptions\fR command are used by the
 .SH ROOT ACCOUNT OPTIONS
 When run by the root user, \fIlpoptions\fR gets and sets default
 options and instances for \fIall users\fR in the
-@CUPS_SERVERROOT@/lpoptions file.
+/etc/cups/lpoptions file.
 .SH COMPATIBILITY
 The \fIlpoptions\fR command is unique to CUPS.
 .SH FILES
 ~/.cups/lpoptions - user defaults and instances created by non-root
 users.
 .br
-@CUPS_SERVERROOT@/lpoptions - system-wide defaults and instances
+/etc/cups/lpoptions - system-wide defaults and instances
 created by the root user.
 .SH SEE ALSO
 \fIcancel(1)\fR, \fIlp(1)\fR, \fIlpadmin(8)\fR, \fIlpr(1)\fR,

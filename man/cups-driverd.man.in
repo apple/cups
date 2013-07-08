@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-driverd 8 "CUPS" "6 January 2011" "Apple Inc."
+.TH cups-driverd 8 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 cups-driverd \- cups driver daemon
 .SH SYNOPSIS
@@ -42,10 +42,10 @@ is a space-delimited list of attributes ("name=value name=value
 accordingly.
 .SH DRIVERS
 Drivers can be static PPD files under the
-\fI@CUPS_DATADIR@/model\fR directory or programs under the
-\fI@CUPS_SERVERBIN@/driver\fR directory. Static PPD files must
-conform to the Adobe PPD File Format Specification version 4.3
-and may be compressed using the \fIgzip(1)\fR program. Driver
+\fI/usr/share/cups/model\fR directory or programs under the
+\fI/usr/lib/cups/driver\fR or \fI/usr/libexec/cups/driver\fR (OS X) directories.
+Static PPD files must conform to the Adobe PPD File Format Specification version
+4.3 and may be compressed using the \fIgzip(1)\fR program. Driver
 programs must implement the command-line interface shown in the
 next section.
 .SS DRIVER PROGRAMS

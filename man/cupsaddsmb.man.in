@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsaddsmb 8 "CUPS" "25 July 2007" "Apple Inc."
+.TH cupsaddsmb 8 "CUPS" "8 July 2013" "Apple Inc."
 .SH NAME
 cupsaddsmb \- export printers to samba for windows clients
 
@@ -115,17 +115,14 @@ drivers and
 %WINDIR%\\SYSTEM32\\SPOOL\\DRIVERS\\X64\\3 folder for 64-bit
 drivers.
 .LP
-The CUPS printer driver is preferred over the Microsoft driver
-since it supports the page-label, job-billing, and
-job-hold-until options fully on all printers. However, currently
-only Windows 2000 and higher is supported by the Microsoft
+However, currently only Windows 2000 and higher is supported by the Microsoft
 driver, so you will also need to get the Adobe driver to support
 Windows 95, 98, and Me clients. The Adobe and Microsoft drivers
 for Windows 2000 are identical.
 .LP
 Once you have extracted the driver files, copy the 32-bit drivers
-to the \fI@CUPS_DATADIR@/drivers\fR directory and the 64-bit
-drivers to the \fI@CUPS_DATADIR@/drivers/x64\fR directory exactly
+to the \fI/usr/share/cups/drivers\fR directory and the 64-bit
+drivers to the \fI/usr/share/cups/drivers/x64\fR directory exactly
 as named below:
 .nf
 
@@ -134,39 +131,6 @@ as named below:
     pscript.hlp
     pscript.ntf
     pscript5.dll
-.fi
-.LP
-\fBNote:\fR Unlike Windows, case is significant - make sure that
-you use the lowercase filenames shown above, otherwise
-\fIcupsaddsmb\fR will fail to export the drivers.
-
-.SH CUPS POSTSCRIPT DRIVERS FOR WINDOWS
-\fIcupsaddsmb\fR can use the CUPS v6 PostScript printer driver
-for Windows, which is available for download from the CUPS web
-site.
-.LP
-The CUPS printer driver is preferred over the Adobe and
-Microsoft drivers since it supports the page-label, job-billing,
-and job-hold-until options fully on all printers. However,
-currently only Windows 2000 and higher is supported by the CUPS
-driver, so you will also need to get the Adobe driver to support
-Windows 95, 98, and Me clients.
-.LP
-Once you have extracted the driver files, copy the 32-bit drivers
-to the \fI@CUPS_DATADIR@/drivers\fR directory and the 64-bit
-drivers to the \fI@CUPS_DATADIR@/drivers/x64\fR directory exactly
-as named below:
-.nf
-
-    [Windows 2000 and higher]
-    cups6.inf (from www.cups.org)
-    cups6.ini (from www.cups.org)
-    cupsps6.dll (from www.cups.org)
-    cupsui6.dll (from www.cups.org)
-    ps5ui.dll (from your Windows system)
-    pscript.hlp (from your Windows system)
-    pscript.ntf (from your Windows system)
-    pscript5.dll (from your Windows system)
 .fi
 .LP
 \fBNote:\fR Unlike Windows, case is significant - make sure that

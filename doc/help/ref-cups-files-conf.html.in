@@ -37,7 +37,7 @@ server activity.</P>
 information to the system log instead of a plain file.</P>
 
 <P>The default access log file is
-<VAR>@CUPS_LOGDIR@/access_log</VAR>.</P>
+<VAR>/var/log/access_log</VAR>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.15</SPAN><A NAME="ConfigFilePerm">ConfigFilePerm</A></H2>
@@ -51,7 +51,7 @@ ConfigFilePerm 0640
 
 <H3>Description</H3>
 
-<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions to use when the scheduler writes configuration and cache files, typically in response to IPP or HTTP requests. The default is @CUPS_CONFIG_FILE_PERM@.</P>
+<P>The <CODE>ConfigFilePerm</CODE> directive specifies the permissions to use when the scheduler writes configuration and cache files, typically in response to IPP or HTTP requests. The default is 644 on OS X and 640 on all other operating systems.</P>
 
 <BLOCKQUOTE><B>Note:</B>
 
@@ -89,13 +89,13 @@ DocumentRoot /foo/bar/doc/cups
 of web content for the HTTP server in CUPS. If an absolute path
 is not specified then it is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default directory is <VAR>@CUPS_DOCROOT@</VAR>.</P>
+default directory is <VAR>/usr/share/doc/cups</VAR>.</P>
 
 <P>Documents are first looked up in a sub-directory for the
 primary language requested by the client (e.g.
-<VAR>@CUPS_DOCROOT@/fr/...</VAR>) and then directly under
+<VAR>/usr/share/doc/cups/fr/...</VAR>) and then directly under
 the <CODE>DocumentRoot</CODE> directory (e.g.
-<VAR>@CUPS_DOCROOT@/...</VAR>), so it is possible to
+<VAR>/usr/share/doc/cups/...</VAR>), so it is possible to
 localize the web content by providing subdirectories for each
 language needed.</P>
 
@@ -116,7 +116,7 @@ ErrorLog syslog
 log file. If the filename is not absolute then it is assumed to
 be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default error log file is <VAR>@CUPS_LOGDIR@/error_log</VAR>.</P>
+default error log file is <VAR>/var/log/cups/error_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.</P>
@@ -172,7 +172,7 @@ errors are fatal. The following kinds of errors are currently recognized:</P>
 
 <P>Multiple errors can be listed, and the form "-kind" can be used with
 <CODE>all</CODE> to remove specific kinds of errors. The default setting is
-<CODE>@CUPS_FATAL_ERRORS@</CODE>.</P>
+<CODE>config</CODE>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.18</SPAN><A NAME="FileDevice">FileDevice</A></H2>
@@ -255,7 +255,7 @@ LogFilePerm 0600
 
 <P>The <CODE>LogFilePerm</CODE> directive specifies the
 permissions to use when writing log files. The default
-is @CUPS_LOG_FILE_PERM@.</P>
+is 644.</P>
 
 
 <H2 CLASS="title"><A NAME="PageLog">PageLog</A></H2>
@@ -274,7 +274,7 @@ PageLog syslog
 log file. If the filename is not absolute then it is assumed to
 be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default page log file is <VAR>@CUPS_LOGDIR@/page_log</VAR>.</P>
+default page log file is <VAR>/var/log/cups/page_log</VAR>.</P>
 
 <P>The server name can be included in the filename by using
 <CODE>%s</CODE> in the name.</P>
@@ -296,17 +296,9 @@ Printcap /Library/Preferences/org.cups.printers.plist
 
 <H3>Description</H3>
 
-<P>The <CODE>Printcap</CODE> directive controls whether or not a
-printcap file is automatically generated and updated with a list
-of available printers. If specified with no value, then no
-printcap file will be generated. The default is to generate a
-file named <VAR>@CUPS_DEFAULT_PRINTCAP@</VAR>.</P>
+<P>The <CODE>Printcap</CODE> directive controls whether or not a printcap file is automatically generated and updated with a list of available printers. If specified with no value, then no printcap file will be generated. The default is to generate a file named <VAR>/Library/Preferences.org.cups.printers.plist</VAR> on OS X and <VAR>/etc/printcap</VAR> on all other operating systems.</P>
 
-<P>When a filename is specified (e.g. <VAR>@CUPS_DEFAULT_PRINTCAP@</VAR>),
-the printcap file is written whenever a printer is added or
-removed. The printcap file can then be used by applications that
-are hardcoded to look at the printcap file for the available
-printers.</P>
+<P>When a filename is specified (e.g. <VAR>/etc/printcap</VAR>), the printcap file is written whenever a printer is added or removed. The printcap file can then be used by applications that are hardcoded to look at the printcap file for the available printers.</P>
 
 
 <H2 CLASS="title"><A NAME="PrintcapFormat">PrintcapFormat</A></H2>
@@ -359,7 +351,7 @@ RequestRoot /foo/bar/spool/cups
 incoming IPP requests and HTML forms. If an absolute path is not
 provided then it is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
-default request directory is <VAR>@CUPS_REQUESTS@</VAR>.</P>
+default request directory is <VAR>/var/spool/cups</VAR>.</P>
 
 
 <H2 CLASS="title"><A NAME="ServerBin">ServerBin</A></H2>
@@ -451,10 +443,7 @@ SystemGroup root lpadmin
 
 <H3>Description</H3>
 
-<P>The <CODE>SystemGroup</CODE> directive specifies the system
-administration group for <CODE>System</CODE> authentication.
-Multiple groups can be listed, separated with spaces. The default
-group list is <CODE>@CUPS_SYSTEM_GROUPS@</CODE>.</P>
+<P>The <CODE>SystemGroup</CODE> directive specifies the system administration group for <CODE>System</CODE> authentication. Multiple groups can be listed, separated with spaces. The default group list is <CODE>admin</CODE> on OS X and <CODE>lpadmin</CODE>, <CODE>root</CODE>, <CODE>sys</CODE>, and/or <CODE>system</CODE> on other operating systems.</P>
 
 
 <H2 CLASS="title"><A NAME="TempDir">TempDir</A></H2>
@@ -470,7 +459,7 @@ TempDir /foo/bar/tmp
 
 <P>The <CODE>TempDir</CODE> directive specifies an absolute path
 for the directory to use for temporary files. The default
-directory is <VAR>@CUPS_REQUESTS@/tmp</VAR>.</P>
+directory is <VAR>/var/spool/cups/tmp</VAR>.</P>
 
 <P>Temporary directories must be world-writable and should have
 the "sticky" permission bit enabled so that other users cannot
@@ -482,6 +471,10 @@ an appropriate temporary directory called
 <KBD>mkdir /foo/bar/tmp</KBD>
 <KBD>chmod a+rwxt /foo/bar/tmp</KBD>
 </PRE>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The <CODE>TempDir</CODE> cannot be pointed at a standard system temporary directory such as <VAR>/tmp</VAR> or <VAR>/var/tmp</VAR> for security reasons.</P></BLOCKQUOTE>
 
 
 <H2 CLASS="title"><A NAME="User">User</A></H2>
@@ -495,9 +488,7 @@ User guest
 
 <H3>Description</H3>
 
-<P>The <CODE>User</CODE> directive specifies the UNIX user that
-filter and CGI programs run as. The default user is
-<CODE>@CUPS_USER@</CODE>.</P>
+<P>The <CODE>User</CODE> directive specifies the UNIX user that filter and CGI programs run as. The default user is <CODE>_lp</CODE>, <CODE>lp</CODE>, or <CODE>nobody</CODE> (whichever is found first).</P>
 
 <BLOCKQUOTE><B>Note:</B>
 
