@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-06-06
+IPPTOOL.txt - 2013-07-08
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
@@ -6,15 +6,25 @@ See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
 
 INTRODUCTION
 
-    CUPS includes a user program called ipptool that can be used to send
-    arbitrary IPP requests to a CUPS server or IPP printer.  This tool started
-    life as part of the CUPS automated test suite and has grown to support
-    complex conformance tests and a simple way to query printer, job, and
-    subscription attributes.
+    CUPS includes two user programs for IPP printers.  The first is called
+    ipptool and can be used to send arbitrary IPP requests to a CUPS server or
+    IPP printer.  This tool started life as part of the CUPS automated test
+    suite and has grown to support complex conformance tests and a simple way
+    to query printer, job, and subscription attributes.
 
-    CUPS also includes a user program called ippfind that can be used to find
-    IPP printers that have registered themselves using Bonjour (DNS-SD, mDNS,
-    and Zeroconf) and run commands such as ipptool.
+    The second program called ippfind that can be used to find IPP printers
+    that have registered themselves using Bonjour (DNS-SD, mDNS, and Zeroconf)
+    and run commands such as ipptool.
+
+
+READING THE DOCUMENTATION
+
+    Full documentation on the ipptool command can be found in the
+    "man-ipptool.html" and "man-ipptoolfile.html" files; the latter describes
+    the test file format supported by ipptool.
+
+    Full documentation on the ippfind command can be found in the
+    "man-ippfind.html" file.
 
 
 IPPFIND BASIC USAGE
@@ -29,10 +39,10 @@ IPPFIND BASIC USAGE
 
         ippfind --txt-color T
 
-    To run the IPP Everywhere conformance test file on every registered IPP
-    printer, run the following command instead:
+    And to run the IPP Everywhere conformance test file on every registered IPP
+    printer, run the following command:
 
-        ippfind --exec ipptool -t '{}' ipp-everywhere.test \;
+        ippfind _ipp._tcp,_print --exec ipptool -t '{}' ipp-everywhere.test \;
 
 
 IPPTOOL BASIC USAGE
@@ -173,37 +183,28 @@ IPP EVERYWHERE TESTING
     372 pages including the 90 pages produced by the regular IPP test suite.
 
 
-READING THE DOCUMENTATION
-
-    The command usage is described in the ipptest(1) man page, while the file
-    format is described in the ipptestfile(5) man page.  Both are provided in
-    HTML format with the standalone releases of ipptool.
-
-
 GETTING SUPPORT AND OTHER RESOURCES
 
-    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide many
+    If you have problems, READ THE DOCUMENTATION FIRST!  We also provide
     discussion forums which are available at:
 
-	http://www.cups.org/newsgroups.php
-
-    See the CUPS web site at "http://www.cups.org/" for other resources.
+	http://www.cups.org/
 
 
 REPORTING BUGS
 
-    If you believe you have discovered a bug in ipptool, please fill out the
-    bug form at:
+    If you believe you have discovered a bug in ippfind or ipptool, please fill
+    out the bug form at:
 
 	http://www.cups.org/str.php
 
-    Be sure to identify the version of CUPS and ipptool (if you downloaded the
-    standalone version) you are using, the printer (if any) and firmware
-    version, and include any files that apply.
+    Be sure to identify the version of CUPS and ippfind/ipptool (if you
+    downloaded the standalone version) you are using, the printer (if any) and
+    firmware version, and include any files that apply.
 
-    If you downloaded the standalone version of ipptool, please also re-run the
-    test with debug logging enabled.  Run the following commands on Windows to
-    enable debug logging:
+    If you downloaded the standalone version of ippfind/ipptool, please also
+    re-run the command with debug logging enabled.  Run the following commands
+    on Windows to enable debug logging:
 
         setdebug.bat
 
@@ -212,9 +213,9 @@ REPORTING BUGS
 	CUPS_DEBUG_LOG=ipptool.log; export CUPS_DEBUG_LOG
 	CUPS_DEBUG_LEVEL=6; export CUPS_DEBUG_LEVEL
 
-    Then when you run the ipptool command a new "ipptool.log" file will be
-    created with detailed information - attach this file to the bug you file
-    as well.
+    Then when you run the ippfind or ipptool command a new "ipptool.log" file
+    will be created with detailed information - attach this file to the bug you
+    file as well.
 
 
 LEGAL STUFF

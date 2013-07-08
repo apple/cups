@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7rc1 - 2013-07-03
+CHANGES.txt - 1.7rc1 - 2013-07-08
 ---------------------------------
 
 CHANGES IN CUPS V1.7rc1

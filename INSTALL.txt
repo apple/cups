@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.7b1 - 2013-04-18
-----------------------------------
+INSTALL - CUPS v1.7rc1 - 2013-07-08
+-----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
@@ -147,7 +147,7 @@ INSTALLING THE SOFTWARE
 
     The EPM software is available at:
 
-	http://www.epmhome.org/
+	http://www.msweet.org/
 
 
 CREATING BINARY DISTRIBUTIONS WITH EPM
@@ -197,10 +197,9 @@ GETTING DEBUG LOGGING FROM CUPS
 REPORTING PROBLEMS
 
     If you have problems, READ THE DOCUMENTATION FIRST!  If the documentation
-    does not solve your problems, please post a message on the "cups.general"
-    forum at:
+    does not solve your problems, please post a message on the users forum at:
 
-        http://www.cups.org/newsgroups.php
+        http://www.cups.org/
 
     Include your operating system and version, compiler and version, and any
     errors or problems you've run into.  The "config.log" file and the output

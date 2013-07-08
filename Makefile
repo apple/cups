@@ -3,7 +3,7 @@
 #
 #   Top-level Makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -242,7 +242,7 @@ debugcheck:	all unittests
 
 
 #
-# Create HTML documentation...
+# Create HTML documentation using Mini-XML's mxmldoc (http://www.msweet.org/)...
 #
 
 apihelp:
@@ -259,7 +259,7 @@ framedhelp:
 
 
 #
-# Create an Xcode docset...
+# Create an Xcode docset using Mini-XML's mxmldoc (http://www.msweet.org/)...
 #
 
 docset:	apihelp
@@ -295,7 +295,7 @@ sloc:
 
 
 #
-# Make software distributions using EPM (http://www.epmhome.org/)...
+# Make software distributions using EPM (http://www.msweet.org/)...
 #
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
