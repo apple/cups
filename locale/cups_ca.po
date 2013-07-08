@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-03-20 15:42-0400\n"
+"POT-Creation-Date: 2013-07-08 07:21-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -932,6 +932,12 @@ msgstr "     Avís: no hi ha cap %%EndComments al fitxer."
 msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr "     Avís: versió del DSC %.1f obsoleta al fitxer."
 
+msgid "  ! expression            Unary NOT of expression."
+msgstr ""
+
+msgid "  ( expressions )         Group expressions."
+msgstr ""
+
 msgid "  --[no-]debug-logging    Turn debug logging on/off."
 msgstr "  --[no-]debug-logging    Activa o desactiva el registre de depuració."
 
@@ -956,8 +962,70 @@ msgstr "  --cr                    Final de línia amb CR (Mac OS 9)."
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  Final de línia amb CR + LF (Windows)."
 
+msgid "  --domain regex          Match domain to regular expression."
+msgstr ""
+
+msgid ""
+"  --exec utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
+msgid "  --false                 Always false."
+msgstr ""
+
+msgid "  --help                  Show this help."
+msgstr ""
+
+msgid "  --host regex            Match hostname to regular expression."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
+
+msgid "  --local                 True if service is local."
+msgstr ""
+
+msgid "  --ls                    List attributes."
+msgstr ""
+
+msgid "  --name regex            Match service name to regular expression."
+msgstr ""
+
+msgid "  --not expression        Unary NOT of expression."
+msgstr ""
+
+msgid "  --path regex            Match resource path to regular expression."
+msgstr ""
+
+msgid "  --port number[-number]  Match port to number or range."
+msgstr ""
+
+msgid "  --print                 Print URI if true."
+msgstr ""
+
+msgid "  --print-name            Print service name if true."
+msgstr ""
+
+msgid "  --quiet                 Quietly report match via exit code."
+msgstr ""
+
+msgid "  --remote                True if service is remote."
+msgstr ""
+
+msgid "  --true                  Always true."
+msgstr ""
+
+msgid "  --txt key               True if the TXT record contains the key."
+msgstr ""
+
+msgid "  --txt-* regex           Match TXT record key to regular expression."
+msgstr ""
+
+msgid "  --uri regex             Match URI to regular expression."
+msgstr ""
+
+msgid "  --version               Show program version."
+msgstr ""
 
 msgid "  -4                      Connect using IPv4."
 msgstr "  -4                      Connecta fent servir IPv4."
@@ -1007,11 +1075,17 @@ msgstr ""
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P nomfitxer.ppd         Estableix el fitxer PPD."
 
+msgid "  -P number[-number]      Match port to number or range."
+msgstr ""
+
 msgid "  -R root-directory       Set alternate root."
 msgstr "  -R directori-arrel       Estableix una arrel alternativa."
 
 msgid "  -S                      Test with SSL encryption."
 msgstr "  -S                      Fa una prova amb xifrat SSL."
+
+msgid "  -T seconds              Set the browse timeout in seconds."
+msgstr ""
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
 msgstr ""
@@ -1035,6 +1109,9 @@ msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 "  -X                      Retorna els plist en XML en comptes de text pla."
 
+msgid "  -a                      Browse for all services."
+msgstr ""
+
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Exporta totes les impressores."
 
@@ -1045,6 +1122,9 @@ msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 "  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer servir."
 
+msgid "  -d domain               Browse/resolve in specified domain."
+msgstr ""
+
 msgid "  -d name=value           Set named variable to value."
 msgstr "  -d nom=valor           Estableix la variable indicada al valor."
 
@@ -1053,6 +1133,9 @@ msgstr "  -d dir-sortida           Especifica el directori de sortida."
 
 msgid "  -d printer              Use the named printer."
 msgstr "  -d impressora              Fa servir la impressora indicada."
+
+msgid "  -d regex                Match domain to regular expression."
+msgstr ""
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr "  -e                      Fa servir tots els filtres del fitxer PPD."
@@ -1067,6 +1150,9 @@ msgstr ""
 
 msgid "  -h                      Show this usage message."
 msgstr "  -h                      Mostra aquest missatge de sintaxi."
+
+msgid "  -h regex                Match hostname to regular expression."
+msgstr ""
 
 msgid "  -h server[:port]        Specify server address."
 msgstr "  -h servidor[:port]        Especifica l'adreça del servidor."
@@ -1087,6 +1173,9 @@ msgid ""
 msgstr ""
 "  -j id-feina[,N]           Filtra el fitxer N a la feina especificada (el "
 "fitxer per defecte és 1)."
+
+msgid "  -l                      List attributes."
+msgstr ""
 
 msgid "  -l                      Run cupsd from launchd(8)."
 msgstr "  -l                      Executa cupsd des de launchd(8)."
@@ -1115,6 +1204,9 @@ msgstr ""
 "  -n comptador                Repeteix l'últim fitxer el nombre indicat de "
 "vegades."
 
+msgid "  -n regex                Match service name to regular expression."
+msgstr ""
+
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
@@ -1129,14 +1221,29 @@ msgstr ""
 msgid "  -o name=value           Set option(s)."
 msgstr "  -o nom=valor           Estableix les opcions."
 
+msgid "  -p                      Print URI if true."
+msgstr ""
+
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p nomfitxer.ppd         Estableix el fitxer PPD."
+
+msgid "  -p program              Run specified program for each service."
+msgstr ""
+
+msgid "  -q                      Quietly report match via exit code."
+msgstr ""
 
 msgid "  -q                      Run silently."
 msgstr "  -q                      S'executa en mode silenciós."
 
+msgid "  -r                      True if service is remote."
+msgstr ""
+
 msgid "  -r                      Use 'relaxed' open mode."
 msgstr "  -r                      Fa servir el mode obert «relaxat»."
+
+msgid "  -s                      Print service name if true."
+msgstr ""
 
 msgid "  -t                      Produce a test report."
 msgstr "  -t                      Genera un informe de prova."
@@ -1147,11 +1254,20 @@ msgstr "  -t                      Prova els  PPDs en comptes de generar-los."
 msgid "  -t                      Test the configuration file."
 msgstr "  -t                      Prova el fitxer de configuració."
 
+msgid "  -t key                  True if the TXT record contains the key."
+msgstr ""
+
 msgid "  -t title                Set title."
 msgstr "  -t títol                Estableix el títol."
 
+msgid "  -t type                 Browse/resolve with specified type."
+msgstr ""
+
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      Elimina el fitxer PPD quan ha acabat."
+
+msgid "  -u regex                Match URI to regular expression."
+msgstr ""
 
 msgid "  -v                      Be verbose."
 msgstr "  -v                      Mode detallat."
@@ -1159,10 +1275,81 @@ msgstr "  -v                      Mode detallat."
 msgid "  -vv                     Be very verbose."
 msgstr "  -vv                     Mode molt detallat."
 
+msgid ""
+"  -x utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr ""
 "  -z                      Comprimeix els fitxers PPD fent servir el zip de "
 "GNU."
+
+msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Fully-qualified domain name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "  IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
+
+msgid ""
+"  expression --and expression\n"
+"                          Logical AND."
+msgstr ""
+
+msgid ""
+"  expression --or expression\n"
+"                          Logical OR."
+msgstr ""
+
+msgid "  expression expression   Logical AND."
+msgstr ""
+
+msgid "  {service_domain}        Domain name"
+msgstr ""
+
+msgid "  {service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "  {service_name}          Service instance name"
+msgstr ""
+
+msgid "  {service_port}          Port number"
+msgstr ""
+
+msgid "  {service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "  {service_scheme}        URI scheme"
+msgstr ""
+
+msgid "  {service_uri}           URI"
+msgstr ""
+
+msgid "  {txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "  {}                      URI"
+msgstr ""
 
 msgid " FAIL"
 msgstr " ERROR"
@@ -1399,6 +1586,10 @@ msgid "%s: %s failed: %s"
 msgstr "%s: %s ha fallat: %s"
 
 #, c-format
+msgid "%s: Bad version %s for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Don't know what to do."
 msgstr "%s: no sé que fer."
 
@@ -1408,6 +1599,10 @@ msgid ""
 msgstr ""
 "%s: error - els noms de les variables d'entorn %s tenen un destí inexistent "
 "«%s»."
+
+#, c-format
+msgid "%s: Error - add '/version=1.1' to server name."
+msgstr ""
 
 #, c-format
 msgid "%s: Error - bad job ID."
@@ -1566,6 +1761,14 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr "%s: la cadena del filtre «%s» no és vàlida."
 
 #, c-format
+msgid "%s: Missing timeout for \"-T\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Missing version for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
 msgstr "%s: es necessita l'ID de la feina («-i jobid») abans de «-H restart»."
 
@@ -1616,6 +1819,14 @@ msgstr "%s: es destí de tipus MIME %s/%s és desconegut."
 #, c-format
 msgid "%s: Unknown option \"%c\"."
 msgstr "%s: l'opció «%c» és desconeguda."
+
+#, c-format
+msgid "%s: Unknown option \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown option \"-%c\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown source MIME type %s/%s."
@@ -2932,6 +3143,9 @@ msgstr "Sobre You4"
 msgid "Envelope You4 Long Edge"
 msgstr "Sobre You4 costat llarg"
 
+msgid "Environment Variables:"
+msgstr ""
+
 msgid "Epson"
 msgstr "Epson"
 
@@ -2982,6 +3196,9 @@ msgstr "Ha fallat la condició del valor que s'esperava"
 
 msgid "Export Printers to Samba"
 msgstr "Exportar les impressores al Samba"
+
+msgid "Expressions:"
+msgstr ""
 
 msgid "FAIL"
 msgstr "ERROR"
@@ -3421,6 +3638,9 @@ msgstr ""
 "        idioma_natural = %s\n"
 "        fabricant i model = %s\n"
 "        id del dispositiu = %s"
+
+msgid "Modifiers:"
+msgstr ""
 
 msgid "Modify Class"
 msgstr "Modifica la classe"
@@ -3932,6 +4152,9 @@ msgstr "Sèrie Stylus Photo"
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr "La subscripció #%d no existeix."
+
+msgid "Substitutions:"
+msgstr ""
 
 msgid "Super A"
 msgstr "Super A"
@@ -4685,6 +4908,20 @@ msgid ""
 msgstr ""
 "Sintaxi: cupstestppd [opcions] nomfitxer1.ppd[.gz] [... nomfitxerN.ppd[.gz]]"
 
+msgid ""
+"Usage: ippdiscover [options] -a\n"
+"       ippdiscover [options] \"service name\"\n"
+"\n"
+"Options:"
+msgstr ""
+
+msgid ""
+"Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
+"       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
+"       ippfind --help\n"
+"       ippfind --version"
+msgstr ""
+
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr "Sintaxi: ipptool [opcions] URI nomfitxer[ ... nomfitxerN]"
 
@@ -4895,16 +5132,88 @@ msgstr "help\t\tproporciona ajuda sobre les comandes."
 msgid "idle"
 msgstr "inactiva"
 
+#, c-format
+msgid "ippfind: Bad regular expression: %s"
+msgstr ""
+
+msgid "ippfind: Cannot use --and after --or."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected key name after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected port range after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Missing close brace in substitution."
+msgstr ""
+
+msgid "ippfind: Missing close parenthesis."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--and\"."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--or\"."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing key name after %s."
+msgstr ""
+
+msgid "ippfind: Missing open parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing regular expression after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Out of memory."
+msgstr ""
+
+msgid "ippfind: Too many parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to browse or resolve: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to execute \"%s\": %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to use Bonjour: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unknown variable \"{%s}\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 msgstr "ipptool: «-i» i «-n» no són compatibles amb «-X»."
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
 msgstr "ipptool: l'URI no es correcte - %s."
-
-#, c-format
-msgid "ipptool: Bad version %s for \"-V\"."
-msgstr "ipptool: la versió %s de «-V» no és correcta."
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool: els segons de «-i» no són correctes."
@@ -4923,12 +5232,6 @@ msgstr "ipptool: falta nom=valor a «-d»."
 
 msgid "ipptool: Missing seconds for \"-i\"."
 msgstr "ipptool: falten els segons a «-i»."
-
-msgid "ipptool: Missing timeout for \"-T\"."
-msgstr "ipptool: falta el temps màxim d'espera a «-T»."
-
-msgid "ipptool: Missing version for \"-V\"."
-msgstr "ipptool: falta la versió a «-V»."
 
 msgid "ipptool: URI required before test file."
 msgstr "ipptool: falta l'URI abans del fitxer de prova."
@@ -5883,3 +6186,12 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "ipptool: \"-n\" is incompatible with \"-X\"."
 #~ msgstr "ipptool: «-n» no és compatible amb «-X»."
+
+#~ msgid "ipptool: Bad version %s for \"-V\"."
+#~ msgstr "ipptool: la versió %s de «-V» no és correcta."
+
+#~ msgid "ipptool: Missing timeout for \"-T\"."
+#~ msgstr "ipptool: falta el temps màxim d'espera a «-T»."
+
+#~ msgid "ipptool: Missing version for \"-V\"."
+#~ msgstr "ipptool: falta la versió a «-V»."

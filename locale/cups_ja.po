@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-03-20 15:42-0400\n"
+"POT-Creation-Date: 2013-07-08 07:21-0400\n"
 "PO-Revision-Date: 2012-06-13 01:20+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -930,6 +930,12 @@ msgstr "    警告: ファイルに %%EndComments コメントがありません
 msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr "    警告: ファイルは時代遅れの DSC バージョン %.1f です。"
 
+msgid "  ! expression            Unary NOT of expression."
+msgstr ""
+
+msgid "  ( expressions )         Group expressions."
+msgstr ""
+
 msgid "  --[no-]debug-logging    Turn debug logging on/off."
 msgstr "  --[no-]debug-logging    デバッグログの有効/無効を切り替える。"
 
@@ -953,8 +959,70 @@ msgstr "  --cr                    行末を CR とする (Mac OS 9)。"
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr "  --crlf                  行末を CR + LF とする (Windows)。"
 
+msgid "  --domain regex          Match domain to regular expression."
+msgstr ""
+
+msgid ""
+"  --exec utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
+msgid "  --false                 Always false."
+msgstr ""
+
+msgid "  --help                  Show this help."
+msgstr ""
+
+msgid "  --host regex            Match hostname to regular expression."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    行末を LF とする (UNIX/Linux/OS X)。"
+
+msgid "  --local                 True if service is local."
+msgstr ""
+
+msgid "  --ls                    List attributes."
+msgstr ""
+
+msgid "  --name regex            Match service name to regular expression."
+msgstr ""
+
+msgid "  --not expression        Unary NOT of expression."
+msgstr ""
+
+msgid "  --path regex            Match resource path to regular expression."
+msgstr ""
+
+msgid "  --port number[-number]  Match port to number or range."
+msgstr ""
+
+msgid "  --print                 Print URI if true."
+msgstr ""
+
+msgid "  --print-name            Print service name if true."
+msgstr ""
+
+msgid "  --quiet                 Quietly report match via exit code."
+msgstr ""
+
+msgid "  --remote                True if service is remote."
+msgstr ""
+
+msgid "  --true                  Always true."
+msgstr ""
+
+msgid "  --txt key               True if the TXT record contains the key."
+msgstr ""
+
+msgid "  --txt-* regex           Match TXT record key to regular expression."
+msgstr ""
+
+msgid "  --uri regex             Match URI to regular expression."
+msgstr ""
+
+msgid "  --version               Show program version."
+msgstr ""
 
 msgid "  -4                      Connect using IPv4."
 msgstr "  -4                      IPv4 で接続する。"
@@ -1005,11 +1073,17 @@ msgstr "  -L                      content-length を用いてリクエストを�
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P filename.ppd         PPD ファイルを指定する。"
 
+msgid "  -P number[-number]      Match port to number or range."
+msgstr ""
+
 msgid "  -R root-directory       Set alternate root."
 msgstr "  -R root-directory       別のルートディレクトリーを指定する。"
 
 msgid "  -S                      Test with SSL encryption."
 msgstr "  -S                      SSL 暗号化でテストする。"
+
+msgid "  -T seconds              Set the browse timeout in seconds."
+msgstr ""
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
 msgstr "  -T seconds              受信／送信タイムアウトを秒で指定する。"
@@ -1030,6 +1104,9 @@ msgstr ""
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr "  -X                      プレーンテキストの代わりに XML を用いる。"
 
+msgid "  -a                      Browse for all services."
+msgstr ""
+
 msgid "  -a                      Export all printers."
 msgstr "  -a                      すべてのプリンターをエクスポートする。"
 
@@ -1038,6 +1115,9 @@ msgstr "  -c catalog.po           指定したメッセージカタログをロ�
 
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           使用する cupsd.conf ファイルを指定する。"
+
+msgid "  -d domain               Browse/resolve in specified domain."
+msgstr ""
 
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
@@ -1048,6 +1128,9 @@ msgstr "  -d output-dir           出力先ディレクトリーを指定する�
 
 msgid "  -d printer              Use the named printer."
 msgstr "  -d printer              指定されたプリンターを利用する。"
+
+msgid "  -d regex                Match domain to regular expression."
+msgstr ""
 
 msgid "  -e                      Use every filter from the PPD file."
 msgstr ""
@@ -1061,6 +1144,9 @@ msgstr "  -f filename             デフォルトのリクエストファイル�
 
 msgid "  -h                      Show this usage message."
 msgstr "  -h                      このヘルプメッセージを表示する。"
+
+msgid "  -h regex                Match hostname to regular expression."
+msgstr ""
 
 msgid "  -h server[:port]        Specify server address."
 msgstr "  -h server[:port]        サーバーアドレスを指定する。"
@@ -1081,6 +1167,9 @@ msgid ""
 msgstr ""
 "  -j job-id[,N]           フィルターファイル N を指定されたジョブから使用す"
 "る (デフォルトは ファイル 1)。"
+
+msgid "  -l                      List attributes."
+msgstr ""
 
 msgid "  -l                      Run cupsd from launchd(8)."
 msgstr "  -l                      launchd(8) から cupsd を実行する。"
@@ -1104,6 +1193,9 @@ msgid ""
 "  -n count                Repeat the last file the given number of times."
 msgstr "  -n count                最後のファイルを与えられた回数だけ繰り返す。"
 
+msgid "  -n regex                Match service name to regular expression."
+msgstr ""
+
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
@@ -1117,14 +1209,29 @@ msgstr ""
 msgid "  -o name=value           Set option(s)."
 msgstr "  -o name=value           オプションを指定する。"
 
+msgid "  -p                      Print URI if true."
+msgstr ""
+
 msgid "  -p filename.ppd         Set PPD file."
 msgstr "  -p filename.ppd         PPD ファイルを指定する。"
+
+msgid "  -p program              Run specified program for each service."
+msgstr ""
+
+msgid "  -q                      Quietly report match via exit code."
+msgstr ""
 
 msgid "  -q                      Run silently."
 msgstr "  -q                      詳細は表示しない。"
 
+msgid "  -r                      True if service is remote."
+msgstr ""
+
 msgid "  -r                      Use 'relaxed' open mode."
 msgstr "  -r                      寛容モードを用いる。"
+
+msgid "  -s                      Print service name if true."
+msgstr ""
 
 msgid "  -t                      Produce a test report."
 msgstr "  -t                      テストリポートを出力する。"
@@ -1135,11 +1242,20 @@ msgstr "  -t                      PPD を出力しないでテストする。"
 msgid "  -t                      Test the configuration file."
 msgstr "  -t                      設定ファイルをテストする。"
 
+msgid "  -t key                  True if the TXT record contains the key."
+msgstr ""
+
 msgid "  -t title                Set title."
 msgstr "  -t title                タイトルを指定する。"
 
+msgid "  -t type                 Browse/resolve with specified type."
+msgstr ""
+
 msgid "  -u                      Remove the PPD file when finished."
 msgstr "  -u                      終了したときに PPD ファイルを削除する。"
+
+msgid "  -u regex                Match URI to regular expression."
+msgstr ""
 
 msgid "  -v                      Be verbose."
 msgstr "  -v                      冗長出力を行う。"
@@ -1147,8 +1263,79 @@ msgstr "  -v                      冗長出力を行う。"
 msgid "  -vv                     Be very verbose."
 msgstr "  -vv                     より冗長な出力を行う。"
 
+msgid ""
+"  -x utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr "  -z                      PPD ファイルを GNU zip を使って圧縮する。"
+
+msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Fully-qualified domain name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "  IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
+
+msgid ""
+"  expression --and expression\n"
+"                          Logical AND."
+msgstr ""
+
+msgid ""
+"  expression --or expression\n"
+"                          Logical OR."
+msgstr ""
+
+msgid "  expression expression   Logical AND."
+msgstr ""
+
+msgid "  {service_domain}        Domain name"
+msgstr ""
+
+msgid "  {service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "  {service_name}          Service instance name"
+msgstr ""
+
+msgid "  {service_port}          Port number"
+msgstr ""
+
+msgid "  {service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "  {service_scheme}        URI scheme"
+msgstr ""
+
+msgid "  {service_uri}           URI"
+msgstr ""
+
+msgid "  {txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "  {}                      URI"
+msgstr ""
 
 msgid " FAIL"
 msgstr " 失敗"
@@ -1385,6 +1572,10 @@ msgid "%s: %s failed: %s"
 msgstr "%s: %s に失敗しました: %s"
 
 #, c-format
+msgid "%s: Bad version %s for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Don't know what to do."
 msgstr "%s: 何が起きているか不明です。"
 
@@ -1392,6 +1583,10 @@ msgstr "%s: 何が起きているか不明です。"
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
 msgstr "%s: エラー - 環境変数 %s が存在しない宛先 \"%s\" を指しています。"
+
+#, c-format
+msgid "%s: Error - add '/version=1.1' to server name."
+msgstr ""
 
 #, c-format
 msgid "%s: Error - bad job ID."
@@ -1549,6 +1744,14 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr "%s: 無効なフィルター文字列です \"%s\""
 
 #, c-format
+msgid "%s: Missing timeout for \"-T\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Missing version for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
 msgstr "%s: '-H restart' の前にはジョブ ID ('-i ジョブID') が必要です。"
 
@@ -1600,6 +1803,14 @@ msgstr "%s: %s/%s は未知の宛先 MIME タイプです。"
 #, c-format
 msgid "%s: Unknown option \"%c\"."
 msgstr "%s: '%c' は未知のオプションです。"
+
+#, c-format
+msgid "%s: Unknown option \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown option \"-%c\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown source MIME type %s/%s."
@@ -2915,6 +3126,9 @@ msgstr "封筒 洋形4号"
 msgid "Envelope You4 Long Edge"
 msgstr "封筒 洋形4号 長辺送り"
 
+msgid "Environment Variables:"
+msgstr ""
+
 msgid "Epson"
 msgstr "Epson"
 
@@ -2965,6 +3179,9 @@ msgstr "予測に失敗しました"
 
 msgid "Export Printers to Samba"
 msgstr "Samba へプリンターをエクスポート"
+
+msgid "Expressions:"
+msgstr ""
 
 msgid "FAIL"
 msgstr "失敗"
@@ -3405,6 +3622,9 @@ msgstr ""
 "        言語 = %s\n"
 "        プリンタードライバー = %s\n"
 "        デバイス ID = %s"
+
+msgid "Modifiers:"
+msgstr ""
 
 msgid "Modify Class"
 msgstr "クラスの変更"
@@ -3913,6 +4133,9 @@ msgstr "Stylus Photo シリーズ"
 #, c-format
 msgid "Subscription #%d does not exist."
 msgstr "サブスクリプション番号 %d は存在しません。"
+
+msgid "Substitutions:"
+msgstr ""
 
 msgid "Super A"
 msgstr "スーパー A"
@@ -4645,6 +4868,20 @@ msgstr ""
 "使い方: cupstestppd [オプション] ファイル名1.ppd[.gz] [... ファイル名N.ppd[."
 "gz]]"
 
+msgid ""
+"Usage: ippdiscover [options] -a\n"
+"       ippdiscover [options] \"service name\"\n"
+"\n"
+"Options:"
+msgstr ""
+
+msgid ""
+"Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
+"       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
+"       ippfind --help\n"
+"       ippfind --version"
+msgstr ""
+
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr "使い方: ipptool [オプション] URI ファイル名 [ ... ファイル名N ]"
 
@@ -4854,16 +5091,88 @@ msgstr "help\t\tコマンドのヘルプを取得。"
 msgid "idle"
 msgstr "待機中"
 
+#, c-format
+msgid "ippfind: Bad regular expression: %s"
+msgstr ""
+
+msgid "ippfind: Cannot use --and after --or."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected key name after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected port range after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Missing close brace in substitution."
+msgstr ""
+
+msgid "ippfind: Missing close parenthesis."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--and\"."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--or\"."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing key name after %s."
+msgstr ""
+
+msgid "ippfind: Missing open parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing regular expression after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Out of memory."
+msgstr ""
+
+msgid "ippfind: Too many parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to browse or resolve: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to execute \"%s\": %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to use Bonjour: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unknown variable \"{%s}\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 msgstr "ipptool: \"-i\" と \"-n\" は \"-X\" と組み合わせられません。"
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
 msgstr "ipptool: 不正な URI です - %s。"
-
-#, c-format
-msgid "ipptool: Bad version %s for \"-V\"."
-msgstr "ipptool: \"-V\" オプションに不正なバージョン %s が指定されました。"
 
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr "ipptool: \"-i\" に不正な秒数が指定されました。"
@@ -4882,12 +5191,6 @@ msgstr "ipptool: \"-d\" に 名前=値 の指定がありません。"
 
 msgid "ipptool: Missing seconds for \"-i\"."
 msgstr "ipptool: \"-i\" に秒数の指定がありません。"
-
-msgid "ipptool: Missing timeout for \"-T\"."
-msgstr "ipptool: \"-T\" にタイムアウトの指定がありません。"
-
-msgid "ipptool: Missing version for \"-V\"."
-msgstr "ipptool: \"-V\" にバージョンの指定がありません。"
 
 msgid "ipptool: URI required before test file."
 msgstr "ipptool: テストファイルの前に URI の指定が必要です。"
@@ -5696,3 +5999,12 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "Unable to open compressed print file"
 #~ msgstr "圧縮プリントファイルを開けません"
+
+#~ msgid "ipptool: Bad version %s for \"-V\"."
+#~ msgstr "ipptool: \"-V\" オプションに不正なバージョン %s が指定されました。"
+
+#~ msgid "ipptool: Missing timeout for \"-T\"."
+#~ msgstr "ipptool: \"-T\" にタイムアウトの指定がありません。"
+
+#~ msgid "ipptool: Missing version for \"-V\"."
+#~ msgstr "ipptool: \"-V\" にバージョンの指定がありません。"

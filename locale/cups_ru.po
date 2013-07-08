@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-03-20 15:42-0400\n"
+"POT-Creation-Date: 2013-07-08 07:21-0400\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -761,6 +761,12 @@ msgstr ""
 msgid "    Warning: obsolete DSC version %.1f in file."
 msgstr ""
 
+msgid "  ! expression            Unary NOT of expression."
+msgstr ""
+
+msgid "  ( expressions )         Group expressions."
+msgstr ""
+
 msgid "  --[no-]debug-logging    Turn debug logging on/off."
 msgstr ""
 
@@ -782,7 +788,69 @@ msgstr ""
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr ""
 
+msgid "  --domain regex          Match domain to regular expression."
+msgstr ""
+
+msgid ""
+"  --exec utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
+msgid "  --false                 Always false."
+msgstr ""
+
+msgid "  --help                  Show this help."
+msgstr ""
+
+msgid "  --host regex            Match hostname to regular expression."
+msgstr ""
+
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
+msgstr ""
+
+msgid "  --local                 True if service is local."
+msgstr ""
+
+msgid "  --ls                    List attributes."
+msgstr ""
+
+msgid "  --name regex            Match service name to regular expression."
+msgstr ""
+
+msgid "  --not expression        Unary NOT of expression."
+msgstr ""
+
+msgid "  --path regex            Match resource path to regular expression."
+msgstr ""
+
+msgid "  --port number[-number]  Match port to number or range."
+msgstr ""
+
+msgid "  --print                 Print URI if true."
+msgstr ""
+
+msgid "  --print-name            Print service name if true."
+msgstr ""
+
+msgid "  --quiet                 Quietly report match via exit code."
+msgstr ""
+
+msgid "  --remote                True if service is remote."
+msgstr ""
+
+msgid "  --true                  Always true."
+msgstr ""
+
+msgid "  --txt key               True if the TXT record contains the key."
+msgstr ""
+
+msgid "  --txt-* regex           Match TXT record key to regular expression."
+msgstr ""
+
+msgid "  --uri regex             Match URI to regular expression."
+msgstr ""
+
+msgid "  --version               Show program version."
 msgstr ""
 
 msgid "  -4                      Connect using IPv4."
@@ -828,10 +896,16 @@ msgstr ""
 msgid "  -P filename.ppd         Set PPD file."
 msgstr ""
 
+msgid "  -P number[-number]      Match port to number or range."
+msgstr ""
+
 msgid "  -R root-directory       Set alternate root."
 msgstr ""
 
 msgid "  -S                      Test with SSL encryption."
+msgstr ""
+
+msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr ""
 
 msgid "  -T seconds              Set the receive/send timeout in seconds."
@@ -851,6 +925,9 @@ msgstr ""
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 
+msgid "  -a                      Browse for all services."
+msgstr ""
+
 msgid "  -a                      Export all printers."
 msgstr ""
 
@@ -860,6 +937,9 @@ msgstr ""
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
+msgid "  -d domain               Browse/resolve in specified domain."
+msgstr ""
+
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
 
@@ -867,6 +947,9 @@ msgid "  -d output-dir           Specify the output directory."
 msgstr ""
 
 msgid "  -d printer              Use the named printer."
+msgstr ""
+
+msgid "  -d regex                Match domain to regular expression."
 msgstr ""
 
 msgid "  -e                      Use every filter from the PPD file."
@@ -879,6 +962,9 @@ msgid "  -f filename             Set default request filename."
 msgstr ""
 
 msgid "  -h                      Show this usage message."
+msgstr ""
+
+msgid "  -h regex                Match hostname to regular expression."
 msgstr ""
 
 msgid "  -h server[:port]        Specify server address."
@@ -894,6 +980,9 @@ msgstr ""
 msgid ""
 "  -j job-id[,N]           Filter file N from the specified job (default is "
 "file 1)."
+msgstr ""
+
+msgid "  -l                      List attributes."
 msgstr ""
 
 msgid "  -l                      Run cupsd from launchd(8)."
@@ -916,6 +1005,9 @@ msgid ""
 "  -n count                Repeat the last file the given number of times."
 msgstr ""
 
+msgid "  -n regex                Match service name to regular expression."
+msgstr ""
+
 msgid ""
 "  -o filename.drv         Set driver information file (otherwise ppdi.drv)."
 msgstr ""
@@ -926,13 +1018,28 @@ msgstr ""
 msgid "  -o name=value           Set option(s)."
 msgstr ""
 
+msgid "  -p                      Print URI if true."
+msgstr ""
+
 msgid "  -p filename.ppd         Set PPD file."
+msgstr ""
+
+msgid "  -p program              Run specified program for each service."
+msgstr ""
+
+msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 
 msgid "  -q                      Run silently."
 msgstr ""
 
+msgid "  -r                      True if service is remote."
+msgstr ""
+
 msgid "  -r                      Use 'relaxed' open mode."
+msgstr ""
+
+msgid "  -s                      Print service name if true."
 msgstr ""
 
 msgid "  -t                      Produce a test report."
@@ -944,10 +1051,19 @@ msgstr ""
 msgid "  -t                      Test the configuration file."
 msgstr ""
 
+msgid "  -t key                  True if the TXT record contains the key."
+msgstr ""
+
 msgid "  -t title                Set title."
 msgstr ""
 
+msgid "  -t type                 Browse/resolve with specified type."
+msgstr ""
+
 msgid "  -u                      Remove the PPD file when finished."
+msgstr ""
+
+msgid "  -u regex                Match URI to regular expression."
 msgstr ""
 
 msgid "  -v                      Be verbose."
@@ -956,7 +1072,78 @@ msgstr ""
 msgid "  -vv                     Be very verbose."
 msgstr ""
 
+msgid ""
+"  -x utility [argument ...] ;\n"
+"                          Execute program if true."
+msgstr ""
+
 msgid "  -z                      Compress PPD files using GNU zip."
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_DOMAIN  Domain name"
+msgstr ""
+
+msgid ""
+"  IPPFIND_SERVICE_HOSTNAME\n"
+"                          Fully-qualified domain name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_NAME    Service instance name"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_PORT    Port number"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_REGTYPE DNS-SD registration type"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_SCHEME  URI scheme"
+msgstr ""
+
+msgid "  IPPFIND_SERVICE_URI     URI"
+msgstr ""
+
+msgid "  IPPFIND_TXT_*           Value of TXT record key"
+msgstr ""
+
+msgid ""
+"  expression --and expression\n"
+"                          Logical AND."
+msgstr ""
+
+msgid ""
+"  expression --or expression\n"
+"                          Logical OR."
+msgstr ""
+
+msgid "  expression expression   Logical AND."
+msgstr ""
+
+msgid "  {service_domain}        Domain name"
+msgstr ""
+
+msgid "  {service_hostname}      Fully-qualified domain name"
+msgstr ""
+
+msgid "  {service_name}          Service instance name"
+msgstr ""
+
+msgid "  {service_port}          Port number"
+msgstr ""
+
+msgid "  {service_regtype}       DNS-SD registration type"
+msgstr ""
+
+msgid "  {service_scheme}        URI scheme"
+msgstr ""
+
+msgid "  {service_uri}           URI"
+msgstr ""
+
+msgid "  {txt_*}                 Value of TXT record key"
+msgstr ""
+
+msgid "  {}                      URI"
 msgstr ""
 
 msgid " FAIL"
@@ -1194,12 +1381,20 @@ msgid "%s: %s failed: %s"
 msgstr ""
 
 #, c-format
+msgid "%s: Bad version %s for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Don't know what to do."
 msgstr ""
 
 #, c-format
 msgid ""
 "%s: Error - %s environment variable names non-existent destination \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Error - add '/version=1.1' to server name."
 msgstr ""
 
 #, c-format
@@ -1353,6 +1548,14 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr ""
 
 #, c-format
+msgid "%s: Missing timeout for \"-T\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Missing version for \"-V\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Need job ID (\"-i jobid\") before \"-H restart\"."
 msgstr ""
 
@@ -1402,6 +1605,14 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unknown option \"%c\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown option \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unknown option \"-%c\"."
 msgstr ""
 
 #, c-format
@@ -2702,6 +2913,9 @@ msgstr ""
 msgid "Envelope You4 Long Edge"
 msgstr ""
 
+msgid "Environment Variables:"
+msgstr ""
+
 msgid "Epson"
 msgstr "Epson"
 
@@ -2752,6 +2966,9 @@ msgstr "Сбой ожидания"
 
 msgid "Export Printers to Samba"
 msgstr "Экспортировать принтеры в Samba"
+
+msgid "Expressions:"
+msgstr ""
 
 msgid "FAIL"
 msgstr ""
@@ -3183,6 +3400,9 @@ msgid ""
 "        natural_language = %s\n"
 "        make-and-model = %s\n"
 "        device-id = %s"
+msgstr ""
+
+msgid "Modifiers:"
 msgstr ""
 
 msgid "Modify Class"
@@ -3687,6 +3907,9 @@ msgstr "Серия Stylus Photo"
 
 #, c-format
 msgid "Subscription #%d does not exist."
+msgstr ""
+
+msgid "Substitutions:"
 msgstr ""
 
 msgid "Super A"
@@ -4393,6 +4616,20 @@ msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]"
 msgstr ""
 
+msgid ""
+"Usage: ippdiscover [options] -a\n"
+"       ippdiscover [options] \"service name\"\n"
+"\n"
+"Options:"
+msgstr ""
+
+msgid ""
+"Usage: ippfind [options] regtype[,subtype][.domain.] ... [expression]\n"
+"       ippfind [options] name[.regtype[.domain.]] ... [expression]\n"
+"       ippfind --help\n"
+"       ippfind --version"
+msgstr ""
+
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr ""
 
@@ -4588,15 +4825,87 @@ msgstr ""
 msgid "idle"
 msgstr "свободен"
 
+#, c-format
+msgid "ippfind: Bad regular expression: %s"
+msgstr ""
+
+msgid "ippfind: Cannot use --and after --or."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected key name after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected port range after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Expected semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Missing close brace in substitution."
+msgstr ""
+
+msgid "ippfind: Missing close parenthesis."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--and\"."
+msgstr ""
+
+msgid "ippfind: Missing expression before \"--or\"."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing key name after %s."
+msgstr ""
+
+msgid "ippfind: Missing open parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing program after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing regular expression after %s."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Missing semi-colon after %s."
+msgstr ""
+
+msgid "ippfind: Out of memory."
+msgstr ""
+
+msgid "ippfind: Too many parenthesis."
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to browse or resolve: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to execute \"%s\": %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unable to use Bonjour: %s"
+msgstr ""
+
+#, c-format
+msgid "ippfind: Unknown variable \"{%s}\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 msgstr ""
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
-msgstr ""
-
-#, c-format
-msgid "ipptool: Bad version %s for \"-V\"."
 msgstr ""
 
 msgid "ipptool: Invalid seconds for \"-i\"."
@@ -4615,12 +4924,6 @@ msgid "ipptool: Missing name=value for \"-d\"."
 msgstr ""
 
 msgid "ipptool: Missing seconds for \"-i\"."
-msgstr ""
-
-msgid "ipptool: Missing timeout for \"-T\"."
-msgstr ""
-
-msgid "ipptool: Missing version for \"-V\"."
 msgstr ""
 
 msgid "ipptool: URI required before test file."
