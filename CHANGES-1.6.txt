@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- Printer xxx-default values were not reported by Get-Printer-Attributes
+	  or lpoptions (<rdar://problem/14401795>)
 	- The default IPP version did not always get set before creating a new
 	  IPP request message (<rdar://problem/14401718>)
 	- The lp, lpq, lpr, and lpstat now display an error message advising the

@@ -534,7 +534,7 @@ cupsEncodeOptions2(
       else
         ops ++;
 
-    if (*ops == IPP_OP_CUPS_NONE)
+    if (*ops == IPP_OP_CUPS_NONE && op != IPP_OP_CUPS_NONE)
     {
       DEBUG_printf(("2cupsEncodeOptions2: Skipping \"%s\".", option->name));
       continue;
