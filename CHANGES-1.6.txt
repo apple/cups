@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
 	- Fixed a compile problem on AIX (STR #4307)
+	- The default IPP version did not always get set before creating a new
+	  IPP request message (<rdar://problem/14401718>)
 	- The lp, lpq, lpr, and lpstat now display an error message advising the
 	  use of the /version=1.1 ServerName option (<rdar://problem/14290628>)
 	- Added documentation about the /version=1.1 option to ServerName in

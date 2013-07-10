@@ -370,6 +370,8 @@ cupsSetServer(const char *server)	/* I - Server name */
       else if (!strcmp(options, "version=2.2"))
         cg->server_version = 22;
     }
+    else
+      cg->server_version = 20;
 
     if (cg->server[0] != '/' && (port = strrchr(cg->server, ':')) != NULL &&
         !strchr(port, ']') && isdigit(port[1] & 255))

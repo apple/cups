@@ -2741,6 +2741,9 @@ ippNew(void)
     * Set default version - usually 2.0...
     */
 
+    if (cg->server_version == 0)
+      _cupsSetDefaults();
+
     temp->request.any.version[0] = cg->server_version / 10;
     temp->request.any.version[1] = cg->server_version % 10;
     temp->use                    = 1;

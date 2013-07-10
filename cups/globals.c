@@ -219,7 +219,6 @@ cups_globals_alloc(void)
   cg->any_root       = 1;
   cg->expired_certs  = 1;
   cg->expired_root   = 1;
-  cg->server_version = 20;
 
 #ifdef DEBUG
  /*
