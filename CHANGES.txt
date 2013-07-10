@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7rc1 - 2013-07-08
+CHANGES.txt - 1.7rc1 - 2013-07-10
 ---------------------------------
 
 CHANGES IN CUPS V1.7rc1
 
+	- Printer xxx-default values were not reported by Get-Printer-Attributes
+	  or lpoptions (<rdar://problem/14401795>)
 	- Fixed deprecation warnings for many functions on OS X so they are tied
 	  to the deployment version when building (<rdar://problem/14210079>)
 	- Fixed a build issue on ARM-based Linux systems - unable to validate
