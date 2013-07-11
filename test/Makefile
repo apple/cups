@@ -131,8 +131,13 @@ install-exec:
 	echo Installing ipptool in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) ipptool $(BINDIR)
+	if test -x ippfind; then
+		$(INSTALL_BIN) ippfind $(BINDIR); \
+	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
+		cp ippfind $(SYMROOT); \
+		dsymutil $(SYMROOT)/ippfind; \
 		cp ipptool $(SYMROOT); \
 		dsymutil $(SYMROOT)/ipptool; \
 	fi
