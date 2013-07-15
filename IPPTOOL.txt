@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-07-08
+IPPTOOL.txt - 2013-07-15
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
