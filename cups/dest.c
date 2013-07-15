@@ -1427,6 +1427,7 @@ _cupsGetDests(http_t       *http,	/* I  - Connection to server or
   */
 
   appleGetPaperSize(media_default, sizeof(media_default));
+  fprintf(stderr, "Apple default media = %s\n", media_default);
 #endif /* __APPLE__ */
 
  /*

@@ -23,11 +23,13 @@ if test ! -f tools/makeipptoolpkg; then
         exit 1
 fi
 
-uname="`uname | awk '{print tolower($1)}'`"
-if test "x$1" = xlsb; then
-	shift
-	uname="linux-lsb"
-fi
+platform="`uname | awk '{print tolower($1)}'`"
+case "x$1" in
+	xfedora* | xlsb | xrhel* | xubuntu*)
+		platform="linux-$1"
+		shift
+		;;
+esac
 
 if test $# = 0; then
 	echo Updating to get snapshot version...
@@ -74,13 +76,13 @@ cp test/print-job-gzip.test $pkgdir
 cp test/testfile.* $pkgdir
 cp test/validate-job.test $pkgdir
 
-if test `uname` = Darwin; then
-	pkgfile="$pkgdir-macosx-universal.dmg"
+if test x$platform = xdarwin; then
+	pkgfile="$pkgdir-osx-universal.dmg"
 	echo Creating disk image $pkgfile...
 	test -f $pkgfile && rm $pkgfile
 	hdiutil create -srcfolder $pkgdir $pkgfile
 else
-	pkgfile="$pkgdir-$uname-`uname -m`.tar.gz"
+	pkgfile="$pkgdir-$platform-`uname -m`.tar.gz"
 	echo Creating archive $pkgfile...
 	tar czf $pkgfile $pkgdir || exit 1
 fi
