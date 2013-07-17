@@ -1,6 +1,12 @@
 CHANGES-1.6.txt
 ---------------
 
+CHANGES IN CUPS V1.6.4
+
+	- The scheduler did not properly register ICC color profiles with
+	  colord (<rdar://problem/14455625>)
+
+
 CHANGES IN CUPS V1.6.3
 
 	- The configure script now prefers Clang over GCC.
