@@ -23,8 +23,7 @@
  * Include necessary headers...
  */
 
-#include "string-private.h"
-#include "http-private.h"
+#include "cups-private.h"
 
 
 /*
@@ -623,10 +622,87 @@ main(int  argc,				/* I - Number of command-line arguments */
       continue;
     }
     printf("Checking file \"%s\"...\n", resource);
-    httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
-    httpHead(http, resource);
-    while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
+
+    do
+    {
+      if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_CONNECTION), "close"))
+      {
+	httpClearFields(http);
+	if (httpReconnect2(http, 30000, NULL))
+	{
+          status = HTTP_STATUS_ERROR;
+          break;
+	}
+      }
+
+      httpClearFields(http);
+      httpSetField(http, HTTP_FIELD_AUTHORIZATION, httpGetAuthString(http));
+      httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
+      if (httpHead(http, resource))
+      {
+        if (httpReconnect2(http, 30000, NULL))
+        {
+          status = HTTP_STATUS_ERROR;
+          break;
+        }
+        else
+        {
+          status = HTTP_STATUS_UNAUTHORIZED;
+          continue;
+        }
+      }
+
+      while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
+
+      if (status == HTTP_STATUS_UNAUTHORIZED)
+      {
+       /*
+	* Flush any error message...
+	*/
+
+	httpFlush(http);
+
+       /*
+	* See if we can do authentication...
+	*/
+
+	if (cupsDoAuthentication(http, "GET", resource))
+	{
+	  status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
+	  break;
+	}
+
+	if (httpReconnect2(http, 30000, NULL))
+	{
+	  status = HTTP_STATUS_ERROR;
+	  break;
+	}
+
+	continue;
+      }
+#ifdef HAVE_SSL
+      else if (status == HTTP_STATUS_UPGRADE_REQUIRED)
+      {
+	/* Flush any error message... */
+	httpFlush(http);
+
+	/* Reconnect... */
+	if (httpReconnect2(http, 30000, NULL))
+	{
+	  status = HTTP_STATUS_ERROR;
+	  break;
+	}
+
+	/* Upgrade with encryption... */
+	httpEncryption(http, HTTP_ENCRYPTION_REQUIRED);
+
+	/* Try again, this time with encryption enabled... */
+	continue;
+      }
+#endif /* HAVE_SSL */
+    }
+    while (status == HTTP_STATUS_UNAUTHORIZED ||
+           status == HTTP_STATUS_UPGRADE_REQUIRED);
 
     if (status == HTTP_STATUS_OK)
       puts("HEAD OK:");
@@ -637,11 +713,88 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     printf("Requesting file \"%s\" (Accept-Encoding: %s)...\n", resource,
            encoding ? encoding : "identity");
-    httpClearFields(http);
-    httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
-    httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, encoding);
-    httpGet(http, resource);
-    while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
+
+    do
+    {
+      if (!_cups_strcasecmp(httpGetField(http, HTTP_FIELD_CONNECTION), "close"))
+      {
+	httpClearFields(http);
+	if (httpReconnect2(http, 30000, NULL))
+	{
+          status = HTTP_STATUS_ERROR;
+          break;
+	}
+      }
+
+      httpClearFields(http);
+      httpSetField(http, HTTP_FIELD_AUTHORIZATION, httpGetAuthString(http));
+      httpSetField(http, HTTP_FIELD_ACCEPT_LANGUAGE, "en");
+      httpSetField(http, HTTP_FIELD_ACCEPT_ENCODING, encoding);
+
+      if (httpGet(http, resource))
+      {
+        if (httpReconnect2(http, 30000, NULL))
+        {
+          status = HTTP_STATUS_ERROR;
+          break;
+        }
+        else
+        {
+          status = HTTP_STATUS_UNAUTHORIZED;
+          continue;
+        }
+      }
+
+      while ((status = httpUpdate(http)) == HTTP_STATUS_CONTINUE);
+
+      if (status == HTTP_STATUS_UNAUTHORIZED)
+      {
+       /*
+	* Flush any error message...
+	*/
+
+	httpFlush(http);
+
+       /*
+	* See if we can do authentication...
+	*/
+
+	if (cupsDoAuthentication(http, "GET", resource))
+	{
+	  status = HTTP_STATUS_CUPS_AUTHORIZATION_CANCELED;
+	  break;
+	}
+
+	if (httpReconnect2(http, 30000, NULL))
+	{
+	  status = HTTP_STATUS_ERROR;
+	  break;
+	}
+
+	continue;
+      }
+#ifdef HAVE_SSL
+      else if (status == HTTP_STATUS_UPGRADE_REQUIRED)
+      {
+	/* Flush any error message... */
+	httpFlush(http);
+
+	/* Reconnect... */
+	if (httpReconnect2(http, 30000, NULL))
+	{
+	  status = HTTP_STATUS_ERROR;
+	  break;
+	}
+
+	/* Upgrade with encryption... */
+	httpEncryption(http, HTTP_ENCRYPTION_REQUIRED);
+
+	/* Try again, this time with encryption enabled... */
+	continue;
+      }
+#endif /* HAVE_SSL */
+    }
+    while (status == HTTP_STATUS_UNAUTHORIZED || status == HTTP_STATUS_UPGRADE_REQUIRED);
 
     if (status == HTTP_STATUS_OK)
       puts("GET OK:");
