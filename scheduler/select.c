@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -30,7 +30,6 @@
  */
 
 #include "cupsd.h"
-#undef HAVE_KQUEUE
 
 #ifdef HAVE_EPOLL
 #  include <sys/epoll.h>

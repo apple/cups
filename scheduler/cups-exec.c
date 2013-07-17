@@ -3,7 +3,7 @@
  *
  *   Sandbox helper for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -74,20 +74,6 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 #endif /* HAVE_SANDBOX_H */
-
- /*
-  * Close file descriptors we don't need (insurance):
-  *
-  * 0   = stdin
-  * 1   = stdout
-  * 2   = stderr
-  * 3   = back-channel
-  * 4   = side-channel
-  * 5-N = unused
-  */
-
-  for (i = 5; i < 1024; i ++)
-    close(i);
 
  /*
   * Execute the program...

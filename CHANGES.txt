@@ -1,5 +1,13 @@
-CHANGES.txt - 1.7rc1 - 2013-07-10
----------------------------------
+CHANGES.txt - 1.7.0 - 2013-07-16
+--------------------------------
+
+CHANGES IN CUPS V1.7.0
+
+	- The cups-exec helper program could fail randomly on OS X due to
+	  sandbox violations when closing excess file descriptors
+	  (<rdar://problem/14421943>)
+	- The scheduler incorrectly did not use the kqueue interface on OS X.
+
 
 CHANGES IN CUPS V1.7rc1
 
