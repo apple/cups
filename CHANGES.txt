@@ -3,6 +3,7 @@ CHANGES.txt - 1.7.0 - 2013-07-16
 
 CHANGES IN CUPS V1.7.0
 
+	- Fix a compile error in libcups (<rdar://problem/14467141>)
 	- The scheduler incorrectly did not pass a FINAL_CONTENT_TYPE
 	  environment variable to the filters or backend
 	  (<rdar://problem/14355011>)

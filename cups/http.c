@@ -5247,7 +5247,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     if (!message)
       message = _("Unable to establish a secure connection to host.");
 
-    _cupsSetError(IPP_PKI_ERROR, message, 1);
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, message, 1);
 
     return (-1);
   }
@@ -5533,7 +5533,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
 
-    _cupsSetError(IPP_PKI_ERROR,
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI,
                   _("Unable to establish a secure connection to host."), 1);
 
     return (-1);
@@ -5550,7 +5550,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
 
-    _cupsSetError(IPP_PKI_ERROR,
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI,
                   _("Unable to establish a secure connection to host."), 1);
 
     return (-1);
