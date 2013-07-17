@@ -3,6 +3,9 @@ CHANGES.txt - 1.7.0 - 2013-07-16
 
 CHANGES IN CUPS V1.7.0
 
+	- The scheduler incorrectly did not pass a FINAL_CONTENT_TYPE
+	  environment variable to the filters or backend
+	  (<rdar://problem/14355011>)
 	- The cups-exec helper program could fail randomly on OS X due to
 	  sandbox violations when closing excess file descriptors
 	  (<rdar://problem/14421943>)

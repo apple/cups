@@ -671,6 +671,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		   "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
 		   filter->dst->type);
       }
+      else
+        snprintf(final_content_type, sizeof(final_content_type),
+                 "FINAL_CONTENT_TYPE=printer/%s", job->printer->name);
     }
 
    /*
