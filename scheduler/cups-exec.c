@@ -43,7 +43,6 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int	i;				/* Looping var */
 #ifdef HAVE_SANDBOX_H
   char	*sandbox_error = NULL;		/* Sandbox error, if any */
 #endif /* HAVE_SANDBOX_H */
