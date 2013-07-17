@@ -3,7 +3,7 @@
  *
  *   Color management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -103,11 +103,10 @@ extern CFUUIDRef ColorSyncCreateUUIDFromUInt32(unsigned id);
 #  define COLORD_KIND_PRINTER	"printer"
 					/* printing output device */
 
-#  define COLORD_DBUS_MSG(p,m)	dbus_message_new_method_call(\
-					"org.freedesktop.ColorManager", (p),\
-                                        "org.freedesktop.ColorManager", (m))
-                                        /* Macro to make new colord messages */
-#  define COLORD_DBUS_PATH	"/org/freedesktop/ColorManager"
+#  define COLORD_DBUS_SERVICE		"org.freedesktop.ColorManager"
+#  define COLORD_DBUS_INTERFACE 	"org.freedesktop.ColorManager"
+#  define COLORD_DBUS_INTERFACE_DEVICE	"org.freedesktop.ColorManager.Device"
+#  define COLORD_DBUS_PATH		"/org/freedesktop/ColorManager"
 					/* Path for color management system */
 #  define COLORD_DBUS_TIMEOUT	5000	/* Timeout for connecting to colord in ms */
 #endif /* __APPLE__ */
@@ -939,7 +938,10 @@ colord_create_device(
   snprintf(device_id, sizeof(device_id), "cups-%s", p->name);
   device_path = device_id;
 
-  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "CreateDevice");
+  message = dbus_message_new_method_call(COLORD_DBUS_SERVICE,
+                                         COLORD_DBUS_PATH,
+                                         COLORD_DBUS_INTERFACE,
+                                         "CreateDevice");
 
   dbus_message_iter_init_append(message, &args);
   dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_path);
@@ -1048,7 +1050,10 @@ colord_create_profile(
   * Create the profile...
   */
 
-  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "CreateProfile");
+  message = dbus_message_new_method_call(COLORD_DBUS_SERVICE,
+                                         COLORD_DBUS_PATH,
+                                         COLORD_DBUS_INTERFACE,
+                                         "CreateProfile");
 
   idstrlen = strlen(printer_name) + 1 + strlen(qualifier) + 1;
   if ((idstr = malloc(idstrlen)) == NULL)
@@ -1144,7 +1149,10 @@ colord_delete_device(
   * Delete the device...
   */
 
-  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "DeleteDevice");
+  message = dbus_message_new_method_call(COLORD_DBUS_SERVICE,
+                                         COLORD_DBUS_PATH,
+                                         COLORD_DBUS_INTERFACE,
+                                         "DeleteDevice");
 
   dbus_message_iter_init_append(message, &args);
   dbus_message_iter_append_basic(&args, DBUS_TYPE_OBJECT_PATH, &device_path);
@@ -1196,7 +1204,10 @@ colord_device_add_profile(
   DBusError	error;			/* D-Bus error */
 
 
-  message = COLORD_DBUS_MSG(device_path, "AddProfile");
+  message = dbus_message_new_method_call(COLORD_DBUS_SERVICE,
+                                         device_path,
+                                         COLORD_DBUS_INTERFACE_DEVICE,
+                                         "AddProfile");
 
   dbus_message_iter_init_append(message, &args);
   dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &relation);
@@ -1266,7 +1277,10 @@ colord_find_device(
   char		*device_path = NULL;	/* Device object path */
 
 
-  message = COLORD_DBUS_MSG(COLORD_DBUS_PATH, "FindDeviceById");
+  message = dbus_message_new_method_call(COLORD_DBUS_SERVICE,
+                                         COLORD_DBUS_PATH,
+                                         COLORD_DBUS_INTERFACE,
+                                         "FindDeviceById");
 
   dbus_message_iter_init_append(message, &args);
   dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &device_id);

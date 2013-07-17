@@ -1,5 +1,11 @@
-CHANGES.txt - 1.6.3 - 2013-07-11
+CHANGES.txt - 1.6.4 - 2013-07-17
 --------------------------------
+
+CHANGES IN CUPS V1.6.4
+
+	- The scheduler did not properly register ICC color profiles with
+	  colord (<rdar://problem/14455625>)
+
 
 CHANGES IN CUPS V1.6.3
 
