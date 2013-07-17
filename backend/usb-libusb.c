@@ -38,6 +38,7 @@
 
 #include <libusb.h>
 #include <cups/cups-private.h>
+#include <cups/dir.h>
 #include <pthread.h>
 #include <sys/select.h>
 #include <sys/types.h>
@@ -141,7 +142,7 @@ typedef struct usb_quirk_s		/* USB "quirk" information */
 
 cups_array_t		*all_quirks;	/* Array of printer quirks */
 usb_globals_t		g = { 0 };	/* Globals */
-libusb_device           **list;         /* List of connected USB devices */
+libusb_device		**all_list;	/* List of connected USB devices */
 
 
 /*
@@ -176,6 +177,8 @@ static int		soft_reset_printer(usb_printer_t *printer);
 void
 list_devices(void)
 {
+  load_quirks();
+
   fputs("DEBUG: list_devices\n", stderr);
   find_device(list_cb, NULL);
 }
@@ -217,6 +220,8 @@ print_device(const char *uri,		/* I - Device URI */
   cups_option_t	*opts;			/* Options */
   const char	*val;			/* Option value */
 
+
+  load_quirks();
 
  /*
   * See if the side-channel descriptor is valid...
@@ -662,7 +667,7 @@ print_device(const char *uri,		/* I - Device URI */
   * Clean up ....
   */
 
-  libusb_free_device_list(list, 1);
+  libusb_free_device_list(all_list, 1);
   libusb_exit(NULL);
 
   return (status);
@@ -842,7 +847,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
   if (err)
   {
     fprintf(stderr, "DEBUG: Unable to initialize USB access via libusb, "
-                    "libusb error %i\n", err);
+                    "libusb error %i\n", (int)err);
     return (NULL);
   }
 
@@ -1187,7 +1192,7 @@ load_quirks(void)
 
   fprintf(stderr, "DEBUG: Loading USB quirks from \"%s\".\n", filename);
 
-  while (dent = cupsDirRead(dir))
+  while ((dent = cupsDirRead(dir)) != NULL)
   {
     if (!S_ISREG(dent->fileinfo.st_mode))
       continue;
