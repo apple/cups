@@ -225,7 +225,9 @@ dnl See if we have libusb...
 AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing])
 
 LIBUSB=""
+USBQUIRKS=""
 AC_SUBST(LIBUSB)
+AC_SUBST(USBQUIRKS)
 
 if test "x$PKGCONFIG" != x; then
 	if test x$enable_libusb = xyes -o $uname != Darwin; then
@@ -235,6 +237,7 @@ if test "x$PKGCONFIG" != x; then
 			AC_DEFINE(HAVE_LIBUSB)
 			CFLAGS="$CFLAGS `$PKGCONFIG --cflags libusb-1.0`"
 			LIBUSB="`$PKGCONFIG --libs libusb-1.0`"
+			USBQUIRKS="\$(DATADIR)/usb"
 		else
 			AC_MSG_RESULT(no)
 		fi

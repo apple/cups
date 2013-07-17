@@ -3,7 +3,7 @@
 #
 #   Backend makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -109,6 +109,11 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
+	if test "x$(USBQUIRKS)" != x; then \
+		echo Installing USB quirks in $(USBQUIRKS); \
+		$(INSTALL_DIR) -m 755 $(USBQUIRKS); \
+		$(INSTALL_DATA) org.cups.usb-quirks $(USBQUIRKS); \
+	fi
 
 
 #
