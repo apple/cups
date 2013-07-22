@@ -3,6 +3,8 @@ CHANGES.txt - 1.7.0 - 2013-07-22
 
 CHANGES IN CUPS V1.7.0
 
+	- Fixed a compile issue on 64-bit Linux with Clang - need to use the
+	  -pie option instead of -Wl,-pie now (<rdar://problem/14480938>)
 	- The ippfind utility reported the wrong port numbers when compiled
 	  against Avahi (<rdar://problem/14508324>)
 	- httpGetFd, httpGetFile, httpPutFd, and httpPutFile did not

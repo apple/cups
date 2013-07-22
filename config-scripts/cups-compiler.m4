@@ -132,17 +132,10 @@ if test -n "$GCC"; then
 		# Not available to LSB binaries...
 		AC_MSG_CHECKING(if GCC supports -fPIE)
 		OLDCFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS -fPIE"
-		AC_TRY_COMPILE(,,
-			[case "$CC" in
-				*clang)
-					PIEFLAGS="-fPIE -Wl,-pie"
-					;;
-				*)
-					PIEFLAGS="-fPIE -pie"
-					;;
-			esac
-			AC_MSG_RESULT(yes)],
+		CFLAGS="$CFLAGS -fPIE -pie"
+		AC_TRY_COMPILE(,,[
+		        PIEFLAGS="-fPIE -pie"
+		        AC_MSG_RESULT(yes)],
 			AC_MSG_RESULT(no))
 		CFLAGS="$OLDCFLAGS"
 	fi
