@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7.0 - 2013-07-16
+CHANGES.txt - 1.7.0 - 2013-07-22
 --------------------------------
 
 CHANGES IN CUPS V1.7.0
 
+	- The ippfind utility reported the wrong port numbers when compiled
+	  against Avahi (<rdar://problem/14508324>)
 	- httpGetFd, httpGetFile, httpPutFd, and httpPutFile did not
 	  automatically reconnect if the server closed the connecion after the
 	  previous response.

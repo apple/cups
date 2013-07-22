@@ -2618,7 +2618,7 @@ resolve_callback(
 
   service->is_resolved = 1;
   service->host        = strdup(hostTarget);
-  service->port        = ntohs(port);
+  service->port        = port;
 
  /*
   * Loop through the TXT key/value pairs and add them to an array...
