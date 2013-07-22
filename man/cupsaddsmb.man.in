@@ -168,8 +168,6 @@ Getting the full set of Windows driver files should be easier.
 .SH SEE ALSO
 \fIsmbd(8)\fR, \fIsmb.conf(5)\fR,
 http://localhost:631/help
-.br
-http://www.cups.org/windows/
 
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
