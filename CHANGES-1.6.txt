@@ -3,6 +3,7 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.4
 
+	- Added USB quirk rule for Lexmark E238 (<rdar://problem/14493054>)
 	- Closed server connections were still not always detected
 	  (<rdar://problem/14484313>)
 	- The libusb-based USB backend now loads its list of quirks from files

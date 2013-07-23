@@ -210,3 +210,5 @@
 # Canon SELPHY CP780
 0x04a9 0x31dd blacklist
 
+# Lexmark E238 (<rdar://problem/14493054>)
+0x043d 0x00d7 no-reattach
