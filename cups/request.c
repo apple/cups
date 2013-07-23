@@ -3,7 +3,7 @@
  *
  *   IPP utilities for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1010,10 +1010,16 @@ _cupsConnect(void)
       * Same server, see if the connection is still established...
       */
 
-      char ch;				/* Connection check byte */
+      char	ch;			/* Connection check byte */
+      ssize_t	n;			/* Number of bytes */
 
-      if (recv(cg->http->fd, &ch, 1, MSG_PEEK | MSG_DONTWAIT) < 0 &&
-          errno != EWOULDBLOCK)
+#ifdef WIN32
+      if ((n = recv(cg->http->fd, &ch, 1, MSG_PEEK)) == 0 ||
+          (n < 0 && WSAGetLastError() != WSAEWOULDBLOCK))
+#else
+      if ((n = recv(cg->http->fd, &ch, 1, MSG_PEEK | MSG_DONTWAIT)) == 0 ||
+          (n < 0 && errno != EWOULDBLOCK))
+#endif /* WIN32 */
       {
        /*
         * Nope, close the connection...
