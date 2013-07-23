@@ -1,5 +1,5 @@
 /*
- * "$Id: raster-private.h 3794 2012-04-23 22:44:16Z msweet $"
+ * "$Id$"
  *
  *   Private image library definitions for CUPS.
  *
@@ -62,5 +62,5 @@ extern void		_cupsRasterClearError(void);
 #endif /* !_CUPS_RASTER_PRIVATE_H_ */
 
 /*
- * End of "$Id: raster-private.h 3794 2012-04-23 22:44:16Z msweet $".
+ * End of "$Id$".
  */

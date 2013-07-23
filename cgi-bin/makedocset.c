@@ -1,5 +1,5 @@
 /*
- * "$Id: makedocset.c 3833 2012-05-23 22:51:18Z msweet $"
+ * "$Id$"
  *
  *   Xcode documentation set generator.
  *
@@ -482,5 +482,5 @@ write_nodes(const char   *path,		/* I - File to write */
 
 
 /*
- * End of "$Id: makedocset.c 3833 2012-05-23 22:51:18Z msweet $".
+ * End of "$Id$".
  */

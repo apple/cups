@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 7672 2008-06-18 22:03:02Z mike $"
+ * "$Id$"
  *
  *   File functions for CUPS.
  *
@@ -2710,5 +2710,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 7672 2008-06-18 22:03:02Z mike $".
+ * End of "$Id$".
  */

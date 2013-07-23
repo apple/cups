@@ -1,5 +1,5 @@
 /*
- * "$Id: http.h 7026 2007-10-19 00:57:45Z mike $"
+ * "$Id$"
  *
  *   Hyper-Text Transport Protocol definitions for CUPS.
  *
@@ -483,5 +483,5 @@ extern int		httpReconnect2(http_t *http, int msec, int *cancel)
 #endif /* !_CUPS_HTTP_H_ */
 
 /*
- * End of "$Id: http.h 7026 2007-10-19 00:57:45Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: network.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Network interface definitions for the CUPS scheduler.
  *
@@ -48,5 +48,5 @@ extern void		cupsdNetIFUpdate(void);
 
 
 /*
- * End of "$Id: network.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

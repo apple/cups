@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 7918 2008-09-08 22:03:01Z mike $"
+ * "$Id$"
  *
  *   Log file routines for the CUPS scheduler.
  *
@@ -1103,5 +1103,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 7918 2008-09-08 22:03:01Z mike $".
+ * End of "$Id$".
  */

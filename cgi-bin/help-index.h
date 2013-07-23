@@ -1,5 +1,5 @@
 /*
- * "$Id: help-index.h 7615 2008-05-25 07:17:07Z mike $"
+ * "$Id$"
  *
  *   Online help index definitions for CUPS.
  *
@@ -83,5 +83,5 @@ extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
 #endif /* !_CUPS_HELP_INDEX_H_ */
 
 /*
- * End of "$Id: help-index.h 7615 2008-05-25 07:17:07Z mike $".
+ * End of "$Id$".
  */

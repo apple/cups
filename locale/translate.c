@@ -1,5 +1,5 @@
 /*
- * "$Id: translate.c 7922 2008-09-10 15:56:47Z mike $"
+ * "$Id$"
  *
  *   HTTP-based translation program for CUPS.
  *
@@ -435,5 +435,5 @@ write_string(cups_file_t *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: translate.c 7922 2008-09-10 15:56:47Z mike $".
+ * End of "$Id$".
  */

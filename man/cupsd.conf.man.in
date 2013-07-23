@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupsd.conf man page for CUPS.
 .\"
@@ -521,5 +521,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2013 by Apple Inc.
 .\"
-.\" End of "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $".
+.\" End of "$Id$".
 .\"

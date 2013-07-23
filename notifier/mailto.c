@@ -1,5 +1,5 @@
 /*
- * "$Id: mailto.c 7460 2008-04-16 02:19:54Z mike $"
+ * "$Id$"
  *
  *   "mailto" notifier for CUPS.
  *
@@ -642,5 +642,5 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
 
 /*
- * End of "$Id: mailto.c 7460 2008-04-16 02:19:54Z mike $".
+ * End of "$Id$".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: tls.c 3755 2012-03-30 05:59:14Z msweet $"
+ * "$Id$"
  *
  *   TLS support code for the CUPS scheduler.
  *
@@ -26,5 +26,5 @@
 
 
 /*
- * End of "$Id: tls.c 3755 2012-03-30 05:59:14Z msweet $".
+ * End of "$Id$".
  */

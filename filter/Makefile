@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
+# "$Id$"
 #
 #   Filter makefile for CUPS.
 #
@@ -396,5 +396,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $".
+# End of "$Id$".
 #

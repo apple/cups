@@ -1,5 +1,5 @@
 /*
- * "$Id: tls-darwin.c 3833 2012-05-23 22:51:18Z msweet $"
+ * "$Id$"
  *
  *   TLS support code for the CUPS scheduler on OS X.
  *
@@ -566,5 +566,5 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
- * End of "$Id: tls-darwin.c 3833 2012-05-23 22:51:18Z msweet $".
+ * End of "$Id$".
  */

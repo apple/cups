@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7938 2008-09-11 23:53:59Z mike $"
+# "$Id$"
 #
 #   Configuration file makefile for CUPS.
 #
@@ -139,5 +139,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 7938 2008-09-11 23:53:59Z mike $".
+# End of "$Id$".
 #

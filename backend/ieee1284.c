@@ -1,5 +1,5 @@
 /*
- * "$Id: ieee1284.c 7687 2008-06-24 01:28:36Z mike $"
+ * "$Id$"
  *
  *   IEEE-1284 support functions for CUPS.
  *
@@ -487,5 +487,5 @@ backendGetMakeModel(
 
 
 /*
- * End of "$Id: ieee1284.c 7687 2008-06-24 01:28:36Z mike $".
+ * End of "$Id$".
  */

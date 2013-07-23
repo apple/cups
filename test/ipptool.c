@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptool.c 4185 2013-02-20 02:19:13Z msweet $"
+ * "$Id$"
  *
  *   ipptool command for CUPS.
  *
@@ -5477,5 +5477,5 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
 
 
 /*
- * End of "$Id: ipptool.c 4185 2013-02-20 02:19:13Z msweet $".
+ * End of "$Id$".
  */

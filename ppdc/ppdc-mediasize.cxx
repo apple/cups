@@ -1,5 +1,5 @@
 //
-// "$Id: ppdc-mediasize.cxx 1378 2009-04-08 03:17:45Z msweet $"
+// "$Id$"
 //
 //   Shared media size class for the CUPS PPD Compiler.
 //
@@ -81,5 +81,5 @@ ppdcMediaSize::~ppdcMediaSize()
 
 
 //
-// End of "$Id: ppdc-mediasize.cxx 1378 2009-04-08 03:17:45Z msweet $".
+// End of "$Id$".
 //

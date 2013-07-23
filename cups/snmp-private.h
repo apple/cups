@@ -1,5 +1,5 @@
 /*
- * "$Id: snmp-private.h 3794 2012-04-23 22:44:16Z msweet $"
+ * "$Id$"
  *
  *   Private SNMP definitions for CUPS.
  *
@@ -142,5 +142,5 @@ extern int		_cupsSNMPWrite(int fd, http_addr_t *address, int version,
 
 
 /*
- * End of "$Id: snmp-private.h 3794 2012-04-23 22:44:16Z msweet $".
+ * End of "$Id$".
  */

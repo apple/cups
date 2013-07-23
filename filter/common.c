@@ -1,5 +1,5 @@
 /*
- * "$Id: common.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Common filter routines for CUPS.
  *
@@ -531,5 +531,5 @@ WriteTextComment(const char *name,	/* I - Comment name ("Title", etc.) */
 
 
 /*
- * End of "$Id: common.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

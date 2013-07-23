@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 8781 2009-08-28 17:34:54Z mike $"
+ * "$Id$"
  *
  *   API definitions for CUPS.
  *
@@ -597,5 +597,5 @@ extern http_status_t	cupsStartDestDocument(http_t *http, cups_dest_t *dest,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 8781 2009-08-28 17:34:54Z mike $".
+ * End of "$Id$".
  */

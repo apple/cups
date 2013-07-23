@@ -1,5 +1,5 @@
 //
-// "$Id: ppdpo.cxx 3794 2012-04-23 22:44:16Z msweet $"
+// "$Id$"
 //
 //   PPD file message catalog program for the CUPS PPD Compiler.
 //
@@ -263,5 +263,5 @@ usage(void)
 
 
 //
-// End of "$Id: ppdpo.cxx 3794 2012-04-23 22:44:16Z msweet $".
+// End of "$Id$".
 //
