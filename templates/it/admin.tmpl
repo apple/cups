@@ -1,0 +1,102 @@
+<TABLE CLASS="indent" SUMMARY="Operazioni di amministrazione">
+<TR><TD VALIGN="TOP">
+
+<H2 CLASS="title">Stampanti</H2>
+
+<P>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Aggiungi una stampante"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Trova nuove stampanti"></FORM>
+<FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gestisci le stampanti"></FORM>
+{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Esporta le stampanti a Samba"></FORM>:}
+</P>
+
+<H2 CLASS="title">Classi</H2>
+
+<P>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Aggiungi una classe"></FORM>
+<FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gestisci le classi"></FORM>
+</P>
+
+<H2 CLASS="title">Stampe</H2>
+
+<P>
+<FORM ACTION="/jobs/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Gestisci le stampe"></FORM>
+</P>
+
+</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD VALIGN="TOP">
+
+<H2 CLASS="title">Server</H2>
+
+<P>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Edita il file di configurazione"></FORM>
+<FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Visualizza il log degli accessi"></FORM>
+<FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Visualizza il log degli errori"></FORM>
+<FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Visualizza la pagina dei log"></FORM>
+</P>
+
+{SETTINGS_ERROR?<P>{SETTINGS_MESSAGE}</P>
+<BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+
+{ADVANCEDSETTINGS?<P><B>Impostazioni del server\:</B></P>
+
+<P><A HREF="/admin/">Avanzate <SMALL>&#x25bc;</SMALL></A><BR>
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Condividi le stampanti connesse a questo sistema<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Numero massimo di client\:
+<INPUT TYPE="TEXT" NAME="MAX_CLIENTS" VALUE="{?max_clients}" SIZE="6"><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Consenti la stampa da internet<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Pubblicizza l'interfaccia web<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Consenti l'amministrazione remota<BR>
+{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Utilizza l'autenticazione Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Consenti agli utenti di eliminare qualsiasi stampa (non solo le proprie)<BR>
+<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOBS" {?preserve_jobs}> Conserva la cronologia delle stampe<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Numero massimo di stampe (0 per nessun limite)\:
+<INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conserva i metadata\:
+<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_HISTORY" VALUE="{?preserve_job_history}" SIZE="6"><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conserva i documenti\:
+<INPUT TYPE="TEXT" NAME="PRESERVE_JOB_FILES" VALUE="{?preserve_job_files}" SIZE="6"><BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salva le informazioni di debug per la risoluzione dei problemi<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dimensione massima del file di log\:
+<INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
+
+:<P><B>Impostazioni del server:</B></P>
+
+<P><A HREF="/admin/?ADVANCEDSETTINGS=YES">Avanzate <SMALL>&#x25b6;</SMALL></A><BR>
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Condividi le stampanti connesse a questo sistema<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Consenti la stampa da internet<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Consenti l'amministrazione remota<BR>
+{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Utilizza l'autenticazione Kerberos (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Consenti agli utenti di eliminare qualsiasi stampa (non solo le proprie)<BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Salva le informazioni di debug per la risoluzione dei problemi</P>
+
+}
+<P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Modifica le impostazioni"></P>
+
+</FORM>}
+
+</TD></TR>
+</TABLE>
+
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Abbonamenti RSS</H2>
+
+<P>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Aggiungi un abbonamento RSS"></FORM>
+</P>
+
+</DIV>
+
+{notify_subscription_id?<TABLE CLASS="list" SUMMARY="Abbonamenti RSS">
+<THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Nome della coda</TH></TR></THEAD>
+<TBODY>{[notify_subscription_id]
+<TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Elimina l'abbonamento RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Tutti i file}</TD></TR>}
+</TBODY>
+</TABLE>:}

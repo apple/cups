@@ -1,0 +1,51 @@
+<DIV CLASS="indent">
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
+{TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
+
+<P ALIGN="CENTER"><B>Cerca in
+{HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:tutti i documenti}}:</B> <INPUT
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="40" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Cerca">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Cancella"></P>
+
+</FORM>
+
+<!-- Bookmarks -->
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contenuti">
+<TR><TD>
+
+<H3 CLASS="title">Documenti della guida in linea</H3>
+
+<P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">Tutti i documenti</A></P>
+<HR>
+
+{[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
+}
+</TD></TR>
+</TABLE></DIV>
+
+{QUERY?<P>Cerca risultati in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:tutti i documenti}}\:</P>
+{QTEXT?<UL>
+{[QTEXT]<LI><A HREF="{QLINK}">{QTEXT}</A>{QPTEXT? (in <I><A HREF="{QPLINK}">{QPTEXT}</A></I>):}</LI>}
+{QTEXT?</UL>:}
+:<P>Nessuna corrispondenza trovata.</P>}
+<HR NOSHADE>:}
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="Visualizza la versione stampabile"></FORM>:
+
+<H1>Guida in linea</H1>
+
+<P>Questa è l'interfaccia della guida in linea di CUPS. Digita in alto
+le parole da ricercare oppure fai clic su uno dei collegamenti della documentazione,
+per visualizzare le informazioni della guida in linea.</P>
+
+<P>Se sei un nuovo utente di CUPS, leggi la pagina "<a
+href="/help/overview.html">Overview of CUPS</a>". Gli utenti esperti
+dovrebbero leggere la pagina "<a href="/help/whatsnew.html">What's New in CUPS
+1.7</a>".</P>
+
+<P>Inoltre, la <A HREF="http://www.cups.org/">pagina principale di CUPS</A>
+fornisce molte risorse, tra le quali: forum di discussione per gli utenti,
+risposte alle domande più frequenti ed un modulo per segnalare bug
+e richiedere nuove funzionalità.</P>}

@@ -1,0 +1,5 @@
+<DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Mostra stampe attive"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Mostra le stampe completate"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Mostra tutte le stampe"></FORM>}</DIV>
+
+<P ALIGN="CENTER">{total=0?Nessuna stampa:Sto visualizzando {#job_id} di {total} {?which_jobs=?active: stamp{total=1?a:e} {which_jobs=all?:completat{total=1?a:e}}}}.</P>

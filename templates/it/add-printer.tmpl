@@ -1,0 +1,47 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Aggiungi una stampante</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+<INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
+<INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
+<INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
+<INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
+{?current_make!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE" VALUE="{current_make}">:}
+{?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}
+
+<TABLE>
+<TR>
+<TH CLASS="label">Nome:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
+<SMALL>(Può contenere qualsiasi carattere stampabile ad eccezione di "/", "#" e spazio)</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Descrizione:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_INFO}"><BR>
+<SMALL>(Una descrizione esplicativa, ad esempio "HP LaserJet con Duplexer")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Posizione:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" SIZE="40" MAXLENGTH="127" VALUE="{?PRINTER_LOCATION}"><BR>
+<SMALL>(Una posizione esplicativa, ad esempio "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Connessione:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Condivisione:</TH>
+<TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}>
+Condividi questa stampante</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Continua"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Amministrazione&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Classi&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Guida&nbsp;in&nbsp;linea&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Stampe&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Stampanti&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Cerca aiuto"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>CUPS è il sistema di stampa open source, basato su degli standard, sviluppato da
+<A HREF="http://www.apple.com/">Apple Inc.</A> per OS<SUP>&reg;</SUP> X e
+per gli altri sistemi operativi UNIX<SUP>&reg;</SUP>-like.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS per gli utenti</H2>
+
+<P><A HREF="help/overview.html">Presentazione di CUPS</A></P>
+
+<P><A HREF="help/options.html">Stampare da riga di comando ed opzioni</A></P>
+
+<P><A HREF="help/whatsnew.html">Le novità introdotte da CUPS 1.7</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Forum dell'utente</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS per gli amministratori</H2>
+
+<P><A HREF="admin">Aggiungere stampanti e classi</A></P>
+
+<P><A HREF="help/policies.html">Gestire le policy</A></P>
+
+<P><A HREF="help/accounting.html">Nozioni di base sulla gestione delle stampanti</A></P>
+
+<P><A HREF="help/security.html">Sicurezza del server</A></P>
+
+<P><A HREF="help/kerberos.html">Usare l'autenticazione Kerberos</A></P>
+
+<P><A HREF="help/network.html">Usare le stampanti di rete</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">Riferimenti a cupsd.conf</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Trovare i driver delle stampanti</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS per gli sviluppatori</H2>
+
+<P><A HREF="help/api-overview.html">Introduzione alla programmazione di CUPS</A></P>
+
+<P><A HREF="help/api-cups.html">Le API di CUPS</A></P>
+
+<P><A HREF="help/api-filter.html">Programmazione dei filtri e dei backend</A></P>
+
+<P><A HREF="help/api-httpipp.html">Le API HTTP e IPP</A></P>
+
+<P><A HREF="help/api-ppd.html">Le API PPD</A></P>
+
+<P><A HREF="help/api-raster.html">Le API Raster</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">File di riferimento del compilatore di driver PPD</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Forum dello sviluppatore</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">CUPS e il logo di CUPS sono marchi registrati da
+<A HREF="http://www.apple.com">Apple Inc.</A> Copyright 2007-2013 Apple
+Inc. Tutti i diritti sono riservati.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>
