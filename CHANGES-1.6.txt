@@ -3,6 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.4
 
+	- Closed server connections were still not always detected
+	  (<rdar://problem/14484313>)
 	- The libusb-based USB backend now loads its list of quirks from files
 	  in /usr/share/cups/usb instead of using a hardcoded table
 	  (<rdar://problem/14442769>)
