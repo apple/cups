@@ -2082,6 +2082,9 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
   for (i = 0; i < num_args; i ++)
     free(myargv[i]);
 
+  free(myargv);
+  free(myenvp);
+
  /*
   * Return whether the program succeeded or crashed...
   */
