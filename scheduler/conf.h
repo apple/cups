@@ -172,7 +172,7 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Which errors are fatal? */
 			StrictConformance	VALUE(FALSE),
 					/* Require strict IPP conformance? */
-			SyncOnClosee		VALUE(FALSE),
+			SyncOnClose		VALUE(FALSE),
 					/* Call fsync() when closing files? */
 			LogFilePerm		VALUE(0644);
 					/* Permissions for log files */
