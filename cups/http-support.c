@@ -2056,7 +2056,8 @@ http_resolve_cb(
   */
 
   if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
-      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
+      !TXTRecordGetValuePtr(txtLen, txtRecord, "printer-type", &valueLen))
   {
     reskey     = "rfo";
     resdefault = "/ipp/faxout";
