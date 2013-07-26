@@ -353,7 +353,20 @@ cupsdProcessIPPRequest(
       if (attr && attr->name &&
           !strcmp(attr->name, "attributes-natural-language") &&
 	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
+      {
 	language = attr;
+
+       /*
+        * Reset language for this request if different from Accept-Language.
+        */
+
+	if (!con->language ||
+	    strcmp(attr->values[0].string.text, con->language->language))
+	{
+	  cupsLangFree(con->language);
+	  con->language = cupsLangGet(attr->values[0].string.text);
+	}
+      }
       else
 	language = NULL;
 

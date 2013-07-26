@@ -1,10 +1,13 @@
-CHANGES.txt - 1.7.0 - 2013-07-25
+CHANGES.txt - 1.7.0 - 2013-07-26
 --------------------------------
 
 CHANGES IN CUPS V1.7.0
 
 	- Fax queues did not work when shared via Bonjour
 	  (<rdar://problem/14498310>)
+	- Error messages from the scheduler were not localized using the
+	  language specified in the client's IPP request
+	  (<rdar://problem/14128011>)
 	- Added an Italian localization (<rdar://problem/14481578>)
 	- Fixed a couple memory leaks in ippfind that were reported by Clang.
 	- Fixed a compile issue on 64-bit Linux with Clang - need to use the
