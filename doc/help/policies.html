@@ -39,7 +39,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
  7
  8      # All administration operations require an administrator
       to authenticate...
- 9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
+ 9      &lt;Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class
       CUPS-Delete-Class CUPS-Set-Default>
 10        AuthType Default
 11        Require user @SYSTEM
@@ -100,7 +100,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 <P>The access control rules are listed after the <TT>Limit</TT> line and are the same as those used for <A HREF="ref-cupsd-conf.html#Location"><TT>Location</TT></A> sections. In this case, we require the owner of the job ("@OWNER") or a member of the <A HREF="ref-cupsd-conf.html#SystemGroup"><TT>SystemGroup</TT></A> ("@SYSTEM") to do the operation. Because we do not include an <A HREF="ref-cupsd-conf.html#AuthType"><TT>AuthType</TT></A> directive here, the user information can come from the IPP request itself or the authenticated username from the HTTP request. The administrative operations starting on line 9, however, <em>do</em> use the <TT>AuthType</TT> directive, and so administrative operations need to be authenticated:</P>
 
 <PRE CLASS="example">
- 9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
+ 9      &lt;Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class
       CUPS-Delete-Class CUPS-Set-Default>
 10        AuthType Default
 11        Require user @SYSTEM
