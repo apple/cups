@@ -8,6 +8,9 @@
 # List of events that are considered fatal errors for the scheduler...
 #FatalErrors @CUPS_FATAL_ERRORS@
 
+# Do we call fsync() after writing configuration or status files?
+#SyncOnClose No
+
 # Default user and group for filters/backends/helper programs; this cannot be
 # any user or group that resolves to ID 0 for security reasons...
 #User @CUPS_USER@

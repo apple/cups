@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -174,6 +174,7 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
+  { "SyncOnClose",		&SyncOnClose,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_AUTHORIZATION_H */
@@ -734,6 +735,7 @@ cupsdReadConfiguration(void)
   ReloadTimeout	           = DEFAULT_KEEPALIVE;
   RootCertDuration         = 300;
   StrictConformance        = FALSE;
+  SyncOnClose              = FALSE;
   Timeout                  = DEFAULT_TIMEOUT;
   WebInterface             = CUPS_DEFAULT_WEBIF;
 

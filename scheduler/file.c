@@ -109,6 +109,29 @@ cupsdCloseCreatedConfFile(
 
 
  /*
+  * Synchronize changes to disk if SyncOnClose is enabled.
+  */
+
+  if (SyncOnClose)
+  {
+    if (cupsFileFlush(fp))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to write changes to \"%s\": %s",
+		      filename, strerror(errno));
+      cupsFileClose(fp);
+      return (-1);
+    }
+
+    if (fsync(cupsFileNumber(fp)))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to sync changes to \"%s\": %s",
+		      filename, strerror(errno));
+      cupsFileClose(fp);
+      return (-1);
+    }
+  }
+
+ /*
   * First close the file...
   */
 

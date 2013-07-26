@@ -429,6 +429,31 @@ to resolve relative paths in the <VAR>cupsd.conf</VAR> file. The
 default server directory is <VAR>/etc/cups</VAR>.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.6.4</SPAN><A NAME="SyncOnClose">SyncOnClose</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+SyncOnClose No
+SyncOnClose Yes
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>SyncOnClose</CODE> directive determines whether the scheduler
+flushes changes to configuration and state files to disk. The default is
+<CODE>No</CODE> which relies on the operating system to schedule a suitable
+time to write changes to disk.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>Setting <CODE>SyncOnClose</CODE> to <CODE>Yes</CODE> makes the scheduler use the <CODE>fsync(2)</CODE> system call to write all changes to disk, however the drive or network file system server may still delay writing data to disk. Do not depend on this functionality to prevent data loss in the event of unexpected hardware failure.</P>
+
+<P>Enabling <CODE>SyncOnClose</CODE> may also cause the scheduler to periodically become unresponsive while it waits for changes to be written.</P>
+
+</BLOCKQUOTE>
+
+
 <H2 CLASS="title"><A NAME="SystemGroup">SystemGroup</A></H2>
 
 <H3>Examples</H3>

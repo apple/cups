@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "8 July 2013" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "26 July 2013" "Apple Inc."
 .SH NAME
 cups-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -121,6 +121,12 @@ Specifies the encryption key to use.
 ServerRoot directory
 .br
 Specifies the directory where the server configuration files can be found.
+.TP 5
+SyncOnClose Yes
+.TP 5
+SyncOnClose No
+Specifies whether the scheduler calls \fIfsync(2)\fR after writing configuration
+or state files. The default is No.
 .TP 5
 SystemGroup group-name [group-name ...]
 .br

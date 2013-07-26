@@ -3,7 +3,7 @@
  *
  *   Configuration file definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -172,6 +172,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Which errors are fatal? */
 			StrictConformance	VALUE(FALSE),
 					/* Require strict IPP conformance? */
+			SyncOnClosee		VALUE(FALSE),
+					/* Call fsync() when closing files? */
 			LogFilePerm		VALUE(0644);
 					/* Permissions for log files */
 VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
