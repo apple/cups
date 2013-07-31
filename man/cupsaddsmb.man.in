@@ -146,7 +146,7 @@ The Adobe driver does not support the page-label, job-billing, or
 job-hold-until options.
 .LP
 Once you have installed the driver on a Windows system, copy the
-following files to the \fI@CUPS_DATADIR@/drivers\fR directory
+following files to the \fI/usr/share/cups/drivers\fR directory
 exactly as named below:
 .nf
 
