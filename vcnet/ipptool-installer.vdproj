@@ -45,30 +45,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
-        "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
-        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_40C483299484486C9416B704F0EF4A6C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -83,6 +59,12 @@
         {
         "MsmKey" = "8:_425F2537D86148B9A4233AD27D426738"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4273A45FE6E54897AC9A4F66D9AA59EC"
+        "OwnerKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -137,6 +119,30 @@
         {
         "MsmKey" = "8:_842C04D73EBC4F5DBC2FD58D5B98D5D1"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
+        "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
+        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -221,12 +227,6 @@
         {
         "MsmKey" = "8:_D5CD9D9AB1644688A1D54B1589BDF724"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D9C1920DC8F14B9EB89DDF4B6C1F474A"
-        "OwnerKey" = "8:_3CE1523FBE134534AC61A75E96CB0E1A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1256,14 +1256,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ipptool for Windows"
-        "ProductCode" = "8:{820B4978-328C-46E6-938B-02ECE3846FFA}"
-        "PackageCode" = "8:{FF5FD1DE-7162-41BD-B4E4-E9E32BD8CA80}"
+        "ProductCode" = "8:{5B0420A3-BD82-4698-B8A1-9D9EC51A7836}"
+        "PackageCode" = "8:{ECECE842-1E95-48BD-962D-A4E62FBB5F89}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:13.07.0500"
+        "ProductVersion" = "8:13.07.3100"
         "Manufacturer" = "8:Apple Inc."
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.cups.org/str.php"
@@ -1822,11 +1822,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_3CE1523FBE134534AC61A75E96CB0E1A"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_4273A45FE6E54897AC9A4F66D9AA59EC"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
+            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
                 "Properties"
                 {
                 }
@@ -1836,11 +1836,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_D9C1920DC8F14B9EB89DDF4B6C1F474A"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:microsoft_vc90_debugcrt_x86.msm"
+            "SourcePath" = "8:policy_9_0_Microsoft_VC90_DebugCRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1855,7 +1855,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_58DC0E72F0944BEFB927AED718CD1660"
             {
-            "SourcePath" = "8:Win32\\Debug\\ippfind.exe"
+            "SourcePath" = "8:Win32\\Release\\ippfind.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1883,7 +1883,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Win32\\Debug\\regex.dll"
+            "SourcePath" = "8:Win32\\Release\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1911,7 +1911,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
+            "SourcePath" = "8:Win32\\Release\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1939,7 +1939,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
+            "SourcePath" = "8:Win32\\Release\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
