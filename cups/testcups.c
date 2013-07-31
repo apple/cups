@@ -171,10 +171,27 @@ main(int  argc,				/* I - Number of command-line arguments */
       else
 	puts("No password entered.");
     }
+    else if (!strcmp(argv[1], "ppd") && argc == 3)
+    {
+     /*
+      * ./testcups ppd printer
+      */
+
+      http_status_t	http_status;	/* Status */
+      char		buffer[1024];	/* PPD filename */
+      time_t		modtime = 0;	/* Last modified */
+
+      if ((http_status = cupsGetPPD3(CUPS_HTTP_DEFAULT, argv[2], &modtime,
+                                     buffer, sizeof(buffer))) != HTTP_STATUS_OK)
+        printf("Unable to get PPD: %d (%s)\n", (int)http_status,
+               cupsLastErrorString());
+      else
+        puts(buffer);
+    }
     else if (!strcmp(argv[1], "print") && argc == 5)
     {
      /*
-      * ./testcups printer file interval
+      * ./testcups print printer file interval
       */
 
       int		interval,	/* Interval between writes */
@@ -245,6 +262,10 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("Ask for a password:");
       puts("");
       puts("    ./testcups password");
+      puts("");
+      puts("Get the PPD file:");
+      puts("");
+      puts("    ./testcups ppd printer");
       puts("");
       puts("Print a file (interval controls delay between buffers in seconds):");
       puts("");
