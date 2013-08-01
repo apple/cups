@@ -4139,11 +4139,27 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
 {
   cupsd_alias_t	*a;			/* Current alias */
   cupsd_netif_t	*netif;			/* Current network interface */
-  const char	*host,			/* Host field */
-		*end;			/* End character */
+  const char	*end;			/* End character */
+  char		*ptr;			/* Pointer into host value */
 
 
-  host = con->http.fields[HTTP_FIELD_HOST];
+ /*
+  * Copy the Host: header for later use...
+  */
+
+  strlcpy(con->clientname, con->http.fields[HTTP_FIELD_HOST],
+          sizeof(con->clientname));
+  if ((ptr = strrchr(con->clientname, ':')) != NULL && !strchr(ptr, ']'))
+  {
+    *ptr++ = '\0';
+    con->clientport = atoi(ptr);
+  }
+  else
+    con->clientport = con->serverport;
+
+ /*
+  * Then validate...
+  */
 
   if (httpAddrLocalhost(con->http.hostaddr))
   {
@@ -4152,18 +4168,13 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     * addresses when accessing CUPS via the loopback interface...
     */
 
-    return (!_cups_strcasecmp(host, "localhost") ||
-            !_cups_strncasecmp(host, "localhost:", 10) ||
-	    !_cups_strcasecmp(host, "localhost.") ||
-            !_cups_strncasecmp(host, "localhost.:", 11) ||
+    return (!_cups_strcasecmp(con->clientname, "localhost") ||
+	    !_cups_strcasecmp(con->clientname, "localhost.") ||
 #ifdef __linux
-	    !_cups_strcasecmp(host, "localhost.localdomain") ||
-            !_cups_strncasecmp(host, "localhost.localdomain:", 22) ||
+	    !_cups_strcasecmp(con->clientname, "localhost.localdomain") ||
 #endif /* __linux */
-            !strcmp(host, "127.0.0.1") ||
-	    !strncmp(host, "127.0.0.1:", 10) ||
-	    !strcmp(host, "[::1]") ||
-	    !strncmp(host, "[::1]:", 6));
+            !strcmp(con->clientname, "127.0.0.1") ||
+	    !strcmp(con->clientname, "[::1]"));
   }
 
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
@@ -4171,19 +4182,18 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   * Check if the hostname is something.local (Bonjour); if so, allow it.
   */
 
-  if ((end = strrchr(host, '.')) != NULL && end > host &&
-      (!end[1] || end[1] == ':'))
+  if ((end = strrchr(con->clientname, '.')) != NULL && end > con->clientname &&
+      !end[1])
   {
    /*
     * "." on end, work back to second-to-last "."...
     */
-    for (end --; end > host && *end != '.'; end --);
+
+    for (end --; end > con->clientname && *end != '.'; end --);
   }
 
   if (end && (!_cups_strcasecmp(end, ".local") ||
-	      !_cups_strncasecmp(end, ".local:", 7) ||
-	      !_cups_strcasecmp(end, ".local.") ||
-	      !_cups_strncasecmp(end, ".local.:", 8)))
+	      !_cups_strcasecmp(end, ".local.")))
     return (1);
 #endif /* HAVE_DNSSD || HAVE_AVAHI */
 
@@ -4191,22 +4201,16 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
   * Check if the hostname is an IP address...
   */
 
-  if (isdigit(*host & 255) || *host == '[')
+  if (isdigit(con->clientname[0] & 255) || con->clientname[0] == '[')
   {
    /*
     * Possible IPv4/IPv6 address...
     */
 
-    char	temp[1024],		/* Temporary string */
-		*ptr;			/* Pointer into temporary string */
     http_addrlist_t *addrlist;		/* List of addresses */
 
 
-    strlcpy(temp, host, sizeof(temp));
-    if ((ptr = strrchr(temp, ':')) != NULL && !strchr(ptr, ']'))
-      *ptr = '\0';			/* Strip :port from host value */
-
-    if ((addrlist = httpAddrGetList(temp, AF_UNSPEC, NULL)) != NULL)
+    if ((addrlist = httpAddrGetList(con->clientname, AF_UNSPEC, NULL)) != NULL)
     {
      /*
       * Good IPv4/IPv6 address...
@@ -4232,16 +4236,15 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     if (!strcmp(a->name, "*"))
       return (1);
 
-    if (!_cups_strncasecmp(host, a->name, a->namelen))
+    if (!_cups_strncasecmp(con->clientname, a->name, a->namelen))
     {
      /*
-      * Prefix matches; check the character at the end - it must be ":", ".",
-      * ".:", or nul...
+      * Prefix matches; check the character at the end - it must be "." or nul.
       */
 
-      end = host + a->namelen;
+      end = con->clientname + a->namelen;
 
-      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+      if (!*end || (*end == '.' && !end[1]))
         return (1);
     }
   }
@@ -4258,16 +4261,15 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
     if (!strcmp(a->name, "*"))
       return (1);
 
-    if (!_cups_strncasecmp(host, a->name, a->namelen))
+    if (!_cups_strncasecmp(con->clientname, a->name, a->namelen))
     {
      /*
-      * Prefix matches; check the character at the end - it must be ":", ".",
-      * ".:", or nul...
+      * Prefix matches; check the character at the end - it must be "." or nul.
       */
 
-      end = host + a->namelen;
+      end = con->clientname + a->namelen;
 
-      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+      if (!*end || (*end == '.' && !end[1]))
         return (1);
     }
   }
@@ -4281,16 +4283,15 @@ valid_host(cupsd_client_t *con)		/* I - Client connection */
        netif;
        netif = (cupsd_netif_t *)cupsArrayNext(NetIFList))
   {
-    if (!_cups_strncasecmp(host, netif->hostname, netif->hostlen))
+    if (!_cups_strncasecmp(con->clientname, netif->hostname, netif->hostlen))
     {
      /*
-      * Prefix matches; check the character at the end - it must be ":", ".",
-      * ".:", or nul...
+      * Prefix matches; check the character at the end - it must be "." or nul.
       */
 
-      end = host + netif->hostlen;
+      end = con->clientname + netif->hostlen;
 
-      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+      if (!*end || (*end == '.' && !end[1]))
         return (1);
     }
   }

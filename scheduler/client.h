@@ -54,6 +54,8 @@ struct cupsd_client_s
   int			auto_ssl;	/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
   http_addr_t		clientaddr;	/* Client address */
+  char			clientname[256];/* Client's server name for connection */
+  int			clientport;	/* Client's server port for connection */
   char			servername[256];/* Server name for connection */
   int			serverport;	/* Server port for connection */
 #ifdef HAVE_GSSAPI

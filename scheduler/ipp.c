@@ -1992,7 +1992,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-                   con->servername, con->serverport, "/jobs/%d", job->id);
+                   con->clientname, con->clientport, "/jobs/%d", job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -4064,7 +4064,7 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-                   con->servername, con->serverport, "/jobs/%d", job->id);
+                   con->clientname, con->clientport, "/jobs/%d", job->id);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
@@ -4816,7 +4816,7 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
         (!ra || cupsArrayFind(ra, "job-more-info")))
     {
       httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "http",
-                       NULL, con->servername, con->serverport, "/jobs/%d",
+                       NULL, con->clientname, con->clientport, "/jobs/%d",
 		       job->id);
       ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
 		   "job-more-info", NULL, job_uri);
@@ -4837,7 +4837,7 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
   if (!ra || cupsArrayFind(ra, "job-printer-uri"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-		     con->servername, con->serverport,
+		     con->clientname, con->clientport,
 		     (job->dtype & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 		                                         "/printers/%s",
 		     job->dest);
@@ -4848,7 +4848,7 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
   if (!ra || cupsArrayFind(ra, "job-uri"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-		     con->servername, con->serverport, "/jobs/%d",
+		     con->clientname, con->clientport, "/jobs/%d",
 		     job->id);
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-uri", NULL, job_uri);
@@ -4911,8 +4911,8 @@ copy_printer_attrs(
         else
 	{
 	  httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri,
-	                   sizeof(printer_uri), "ipp", NULL, con->servername,
-			   con->serverport,
+	                   sizeof(printer_uri), "ipp", NULL, con->clientname,
+			   con->clientport,
 			   (p2->type & CUPS_PRINTER_CLASS) ?
 			       "/classes/%s" : "/printers/%s", p2->name);
 	  member_uris->values[i].string.text = _cupsStrAlloc(printer_uri);
@@ -4973,7 +4973,7 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-icons"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_icons, sizeof(printer_icons),
-                     "http", NULL, con->servername, con->serverport,
+                     "http", NULL, con->clientname, con->clientport,
 		     "/icons/%s.png", printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-icons",
                  NULL, printer_icons);
@@ -4991,7 +4991,7 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-more-info"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
-                     "http", NULL, con->servername, con->serverport,
+                     "http", NULL, con->clientname, con->clientport,
 		     (printer->type & CUPS_PRINTER_CLASS) ?
 		         "/classes/%s" : "/printers/%s", printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
@@ -5047,7 +5047,7 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-uri-supported"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
-                     "ipp", NULL, con->servername, con->serverport,
+                     "ipp", NULL, con->clientname, con->clientport,
 		     (printer->type & CUPS_PRINTER_CLASS) ?
 		         "/classes/%s" : "/printers/%s", printer->name);
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
@@ -5174,7 +5174,7 @@ copy_subscription_attrs(
   if (sub->dest && (!ra || cupsArrayFind(ra, "notify-printer-uri")))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
-                     "ipp", NULL, con->servername, con->serverport,
+                     "ipp", NULL, con->clientname, con->clientport,
 		     "/printers/%s", sub->dest->name);
     ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
         	 "notify-printer-uri", NULL, printer_uri);
@@ -9558,7 +9558,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, job_uri, sizeof(job_uri), "ipp", NULL,
-                   con->servername, con->serverport, "/jobs/%d", jobid);
+                   con->clientname, con->clientport, "/jobs/%d", jobid);
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
                job_uri);
 
