@@ -263,7 +263,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   cups_file_t	*fp;		/* File pointer */
   int		i;		/* Looping var */
   int		status;		/* Status of tests (0 = success, 1 = fail) */
+#ifdef DEBUG
   const char	*name;		/* Option name */
+#endif /* DEBUG */
 
 
   status = 0;
