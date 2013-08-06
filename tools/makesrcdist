@@ -75,7 +75,7 @@ else
 	fi
 
 	echo Creating tag for release...
-	svn copy svn+ssh://src.apple.com/svn/cups/cups.org/trunk "$url" \
+	svn copy svn+ssh://src.apple.com/svn/cups/cups.org/branches/branch-1.7 "$url" \
 		-m "Tag $version" || exit 1
 fi
 
