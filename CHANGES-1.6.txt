@@ -3,6 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.4
 
+	- The IPP backend did not add the "last-document" attribute
+	  (<rdar://problem/114660379>)
 	- Added a SyncOnClose directive to cups-files.conf to force cupsd to
 	  call fsync before closing any configuration/state files it writes
 	  (<rdar://problem/14523043>)

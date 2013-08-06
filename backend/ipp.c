@@ -1699,8 +1699,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                        "requesting-user-name", NULL, argv[2]);
 
-        if ((i + 1) >= num_files)
-	  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", 1);
+	ippAddBoolean(request, IPP_TAG_OPERATION, "last-document",
+        	      (i + 1) >= num_files);
 
 	if (document_format)
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
