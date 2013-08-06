@@ -26,9 +26,9 @@ if test $# = 0; then
 
 	# Compute version for snapshot
 	rev=`svn info . | grep Revision: | awk '{print $2}'`
-	version="1.7svn"
+	version="2.0svn"
 	revision="-r$rev"
-	fileversion="1.7svn-r$rev"
+	fileversion="2.0svn-r$rev"
 	fileurl="http://www.cups.org/software/test/cups-$fileversion-source.tar."
 	url="."
 else
