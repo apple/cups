@@ -1,0 +1,91 @@
+CHANGES.txt - 1.7.0 - 2013-08-01
+--------------------------------
+
+CHANGES IN CUPS V1.7.0
+
+	- The scheduler did not respond using the hostname specified by the
+	  client (<rdar://problem/14583574>)
+	- Fax queues did not work when shared via Bonjour
+	  (<rdar://problem/14498310>)
+	- Error messages from the scheduler were not localized using the
+	  language specified in the client's IPP request
+	  (<rdar://problem/14128011>)
+	- Added an Italian localization (<rdar://problem/14481578>)
+	- Fixed a couple memory leaks in ippfind that were reported by Clang.
+	- Fixed a compile issue on 64-bit Linux with Clang - need to use the
+	  -pie option instead of -Wl,-pie now (<rdar://problem/14480938>)
+	- The ippfind utility reported the wrong port numbers when compiled
+	  against Avahi (<rdar://problem/14508324>)
+	- httpGetFd, httpGetFile, httpPutFd, and httpPutFile did not
+	  automatically reconnect if the server closed the connecion after the
+	  previous response.
+	- Fixed a compile error in libcups (<rdar://problem/14467141>)
+	- The scheduler incorrectly did not pass a FINAL_CONTENT_TYPE
+	  environment variable to the filters or backend
+	  (<rdar://problem/14355011>)
+	- The cups-exec helper program could fail randomly on OS X due to
+	  sandbox violations when closing excess file descriptors
+	  (<rdar://problem/14421943>)
+	- The scheduler incorrectly did not use the kqueue interface on OS X.
+
+
+CHANGES IN CUPS V1.7rc1
+
+	- Printer xxx-default values were not reported by Get-Printer-Attributes
+	  or lpoptions (<rdar://problem/14401795>)
+	- Fixed deprecation warnings for many functions on OS X so they are tied
+	  to the deployment version when building (<rdar://problem/14210079>)
+	- Fixed a build issue on ARM-based Linux systems - unable to validate
+	  va_list arguments.
+	- Added a new ippfind tool for finding IPP printers and other Bonjour
+	  services (<rdar://problem/13876199>)
+	- Fixed some issues with conversion of PWG media size names to
+	  hundredths of millimeters (<rdar://problem/14065748>)
+	- The IPP backend could crash on OS X when printing to a Kerberized
+	  printer (<rdar://problem/14040186>)
+	- The ipptool program now automatically extends timeouts when the
+	  output buffer is filled (<rdar://problem/14016099>)
+	- The ipptool program now supports the --help and --version options.
+	- The ipptool program did not continue past include file errors by
+	  default (<rdar://problem/13875803>)
+	- The ipptool program now supports FILE-ID and TEST-ID directives and
+	  includes their values in its XML output (<rdar://problem/13876038>)
+	- The ipptool program now supports WITH-HOSTNAME, WITH-RESOURCE, and
+	  WITH-SCHEME expect predicates to compare the corresponding URI
+	  components (<rdar://problem/13876091>)
+
+
+CHANGES IN CUPS V1.7b1
+
+	- The configure script now supports a --with-rundir option to change
+	  the transient run-time state directory from the default to other
+	  locations like /run/cups (STR #4306)
+	- The scheduler now supports PPD lookups for classes (STR #4296)
+	- The cupsfilter program did not set the FINAL_CONTENT_TYPE
+	  environment variable for filters.
+	- Added a new "-x" option to the cancel command (STR #4103)
+	- Made the PWG media handling APIs public (STR #4267)
+	- Implemented ready media support for the cupsGetDestMediaXxx APIs
+	  (STR #4289)
+	- Added new cupsFindDestDefault, cupsFindDestReady, and
+	  cupsFindDestSupported APIs (STR #4289)
+	- Added new cupsGetDestMediaByIndex, cupsGetDestMediaCount, and
+	  cupsGetDestMediaDefault APIs (STR #4289)
+	- Added new ippGet/SetOctetString APIs for getting and setting an
+	  octetString value (STR #4289)
+	- Added new ippCreateRequestedArray API for generating a array of
+	  attributes from the requested-attributes attribute.
+	- The ipptool utility now supports compression, conditional tests based
+	  on the presence of files, and new DEFINE predicates for STATUS.
+	- Added new IPP APIs for checking values (STR #4167)
+	- Added new IPP APis for adding and setting formatted strings.
+	- Added new HTTP APIs to support basic server functionality via libcups.
+	- The dnssd backend now generates a 1284 device ID as needed (STR #3702)
+	- CUPS now supports compressing and decompressing streamed data
+	  (STR #4168)
+	- CUPS now supports higher-level PIN printing, external accounting
+	  systems, and "print here" printing environments (STR #4169)
+	- IRIX is no longer a supported operating system (STR #4092)
+	- The PPD compiler now supports JCL options properly (STR #4115)
+	- The web interface now checks whether the web browser has cookies
+	  enabled and displays a suitable error message (STR #4141)
