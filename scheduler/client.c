@@ -2579,7 +2579,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     "<P>%s</P>\n"
 	     "</BODY>\n"
 	     "</HTML>\n",
-	     httpStatus(code), redirect, httpStatus(code), text);
+	     _httpStatus(con->language, code), redirect,
+	     _httpStatus(con->language, code), text);
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);

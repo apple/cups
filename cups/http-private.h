@@ -23,6 +23,7 @@
  */
 
 #  include "config.h"
+#  include <cups/language.h>
 #  include <stddef.h>
 #  include <stdlib.h>
 
@@ -422,6 +423,7 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),
 					 void *context);
+extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
 extern int		_httpUpdate(http_t *http, http_status_t *status);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 

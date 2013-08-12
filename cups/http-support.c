@@ -35,6 +35,8 @@
  *			    components.
  *   httpSeparateURI()	  - Separate a Universal Resource Identifier into its
  *			    components.
+ *   _httpStatus()        - Return the localized string describing a HTTP
+ *                          status code.
  *   httpStatus()	  - Return a short string describing a HTTP status
  *			    code.
  *   _cups_hstrerror()	  - hstrerror() emulation function for Solaris and
@@ -1322,21 +1324,17 @@ httpSeparateURI(
 
 
 /*
- * 'httpStatus()' - Return a short string describing a HTTP status code.
+ * '_httpStatus()' - Return the localized string describing a HTTP status code.
  *
- * The returned string is localized to the current POSIX locale and is based
- * on the status strings defined in RFC 2616.
+ * The returned string is localized using the passed message catalog.
  */
 
 const char *				/* O - Localized status string */
-httpStatus(http_status_t status)	/* I - HTTP status code */
+_httpStatus(cups_lang_t   *lang,	/* I - Language */
+            http_status_t status)	/* I - HTTP status code */
 {
   const char	*s;			/* Status string */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
-
-  if (!cg->lang_default)
-    cg->lang_default = cupsLangDefault();
 
   switch (status)
   {
@@ -1419,7 +1417,27 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 	break;
   }
 
-  return (_cupsLangString(cg->lang_default, s));
+  return (_cupsLangString(lang, s));
+}
+
+
+/*
+ * 'httpStatus()' - Return a short string describing a HTTP status code.
+ *
+ * The returned string is localized to the current POSIX locale and is based
+ * on the status strings defined in RFC 2616.
+ */
+
+const char *				/* O - Localized status string */
+httpStatus(http_status_t status)	/* I - HTTP status code */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+  return (_httpStatus(cg->lang_default, status));
 }
 
 
