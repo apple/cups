@@ -3,7 +3,7 @@
  *
  *   PWG media name API implementation for CUPS.
  *
- *   Copyright 2009-2012 by Apple Inc.
+ *   Copyright 2009-2013 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -15,6 +15,19 @@
  *
  * Contents:
  *
+ *   _pwgFormatInches()      - Convert and format PWG units as inches.
+ *   _pwgFormatMillimeters() - Convert and format PWG units as millimeters.
+ *   _pwgGenerateSize()      - Generate a PWG size keyword.
+ *   _pwgInitSize()	     - Initialize a PWG size using IPP job template
+ *			       attributes.
+ *   _pwgMediaForLegacy()    - Find a PWG media size by ISO/IPP legacy name.
+ *   _pwgMediaForPPD()	     - Find a PWG media size by Adobe PPD name.
+ *   _pwgMediaForPWG()	     - Find a PWG media size by 5101.1 self-describing
+ *			       name.
+ *   _pwgMediaForSize()      - Get the PWG media name for a given size.
+ *   pwg_compare_legacy()    - Compare two sizes using the legacy names.
+ *   pwg_compare_ppd()	     - Compare two sizes using the PPD names.
+ *   pwg_compare_pwg()	     - Compare two sizes using the PWG names.
  */
 
 /*
@@ -208,13 +221,11 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("prc_5_110x220mm", NULL, "EnvPRC5", 110, 220),
   _PWG_MEDIA_MM("prc_8_120x309mm", NULL, "EnvPRC8", 120, 309),
   _PWG_MEDIA_MM("prc_6_120x320mm", NULL, NULL, 120, 320),
-  _PWG_MEDIA_MM("prc_3_125x176mm", NULL, "EnvPRC3", 125, 176),
   _PWG_MEDIA_MM("prc_16k_146x215mm", NULL, "PRC16K", 146, 215),
   _PWG_MEDIA_MM("prc_7_160x230mm", NULL, "EnvPRC7", 160, 230),
   _PWG_MEDIA_MM("om_juuro-ku-kai_198x275mm", NULL, NULL, 198, 275),
   _PWG_MEDIA_MM("om_pa-kai_267x389mm", NULL, NULL, 267, 389),
   _PWG_MEDIA_MM("om_dai-pa-kai_275x395mm", NULL, NULL, 275, 395),
-  _PWG_MEDIA_MM("prc_10_324x458mm", NULL, "EnvPRC10", 324, 458),
 
   /* Other English Standard Sheet Media Sizes */
   _PWG_MEDIA_IN("oe_photo-l_3.5x5in", NULL, "3.5x5", 3.5, 5),
@@ -222,7 +233,6 @@ static _pwg_media_t const cups_pwg_media[] =
   /* Other Metric Standard Sheet Media Sizes */
   _PWG_MEDIA_MM("om_small-photo_100x150mm", NULL, "om_small-photo", 100, 150),
   _PWG_MEDIA_MM("om_italian_110x230mm", NULL, "EnvItalian", 110, 230),
-  _PWG_MEDIA_MM("om_postfix_114x229mm", NULL, NULL, 114, 229),
   _PWG_MEDIA_MM("om_large-photo_200x300", NULL, "om_large-photo", 200, 300),
   _PWG_MEDIA_MM("om_folio_210x330mm", "folio", "Folio", 210, 330),
   _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, "FolioSP", 215, 315),
