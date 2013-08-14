@@ -61,6 +61,7 @@ _ppdNormalizeMakeAndModel
 _ppdOpen
 _ppdOpenFile
 _ppdParseOptions
+_pwgMediaTable
 cupsAddDest
 cupsAddOption
 cupsAdminCreateWindowsPPD

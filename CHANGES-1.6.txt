@@ -3,6 +3,8 @@ CHANGES-1.6.txt
 
 CHANGES IN CUPS V1.6.4
 
+	- Removed some duplicate size definitions for some ISO sizes that were
+	  causing problems (<rdar://problem/14722721>)
 	- The IPP backend did not add the "last-document" attribute
 	  (<rdar://problem/114660379>)
 	- Added a SyncOnClose directive to cups-files.conf to force cupsd to

@@ -45,11 +45,15 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		status;			/* Status of tests (0 = success, 1 = fail) */
-  const char	*ppdfile;		/* PPD filename */
-  ppd_file_t	*ppd;			/* PPD file */
-  _ppd_cache_t	*pc;			/* PPD cache and PWG mapping data */
-  pwg_media_t	*pwgmedia;		/* PWG media size */
+  int			status;		/* Status of tests (0 = success, 1 = fail) */
+  const char		*ppdfile;	/* PPD filename */
+  ppd_file_t		*ppd;		/* PPD file */
+  _ppd_cache_t		*pc;		/* PPD cache and PWG mapping data */
+  const pwg_media_t	*pwgmedia;	/* PWG media size */
+  size_t		i,		/* Looping var */
+			num_media;	/* Number of media sizes */
+  const pwg_media_t	*mediatable;	/* Media size table */
+  int			dupmedia = 0;	/* Duplicate media sizes? */
 
 
   status = 0;
@@ -301,6 +305,33 @@ main(int  argc,				/* I - Number of command-line args */
   }
   else
     printf("PASS (%s)\n", pwgmedia->pwg);
+
+  fputs("Duplicate size test: ", stdout);
+  for (mediatable = _pwgMediaTable(&num_media);
+       num_media > 1;
+       num_media --, mediatable ++)
+  {
+    for (i = num_media - 1, pwgmedia = mediatable + 1; i > 0; i --, pwgmedia ++)
+    {
+      if (pwgmedia->width == mediatable->width &&
+          pwgmedia->length == mediatable->length)
+      {
+        if (!dupmedia)
+        {
+          dupmedia = 1;
+          status ++;
+          puts("FAIL");
+        }
+
+        printf("    %s and %s have the same dimensions (%dx%d)\n",
+               pwgmedia->pwg, mediatable->pwg, pwgmedia->width,
+               pwgmedia->length);
+      }
+    }
+  }
+  if (!dupmedia)
+    puts("PASS");
+
 
   return (status);
 }
