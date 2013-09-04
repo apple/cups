@@ -2273,7 +2273,8 @@ http_resolve_cb(
   */
 
   if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
-      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
+      !avahi_string_list_find(txt, "printer-type"))
   {
     reskey     = "rfo";
     resdefault = "/ipp/faxout";
