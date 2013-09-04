@@ -86,6 +86,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
   size_t		bufsize;	/* Size of buffer */
   int			options;	/* Options passed to _httpResolveURI */
   const char		*resource;	/* Resource from URI */
+  const char		*uuid;		/* UUID from URI */
 } _http_uribuf_t;
 
 
@@ -1556,7 +1557,9 @@ _httpResolveURI(
   {
 #if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
     char		*regtype,	/* Pointer to type in hostname */
-			*domain;	/* Pointer to domain in hostname */
+			*domain,	/* Pointer to domain in hostname */
+			*uuid,		/* Pointer to UUID in URI */
+			*uuidend;	/* Pointer to end of UUID in URI */
     _http_uribuf_t	uribuf;		/* URI buffer */
     int			offline = 0;	/* offline-report state set? */
 #  ifdef HAVE_DNSSD
@@ -1613,12 +1616,21 @@ _httpResolveURI(
     if (domain)
       *domain++ = '\0';
 
+    if ((uuid = strstr(resource, "?uuid=")) != NULL)
+    {
+      *uuid = '\0';
+      uuid  += 6;
+      if ((uuidend = strchr(uuid, '&')) != NULL)
+        *uuidend = '\0';
+    }
+
+    resolved_uri[0] = '\0';
+
     uribuf.buffer   = resolved_uri;
     uribuf.bufsize  = resolved_size;
     uribuf.options  = options;
     uribuf.resource = resource;
-
-    resolved_uri[0] = '\0';
+    uribuf.uuid     = uuid;
 
     DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
@@ -1737,7 +1749,8 @@ _httpResolveURI(
 	  }
 	  else
 	  {
-	    if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError)
+	    if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError &&
+	        resolved_uri[0])
 	    {
 	      uri = resolved_uri;
 	      break;
@@ -2051,6 +2064,34 @@ http_resolve_cb(
 	        txtRecord, context));
 
  /*
+  * If we have a UUID, compare it...
+  */
+
+  if (uribuf->uuid &&
+      (value = TXTRecordGetValuePtr(txtLen, txtRecord, "UUID",
+                                    &valueLen)) != NULL)
+  {
+    char	uuid[256];		/* UUID value */
+
+    memcpy(uuid, value, valueLen);
+    uuid[valueLen] = '\0';
+
+    if (_cups_strcasecmp(uuid, uribuf->uuid))
+    {
+      if (uribuf->options & _HTTP_RESOLVE_STDERR)
+      {
+	_cupsLangPrintFilter(stderr, "INFO", _("Still looking for printer."));
+	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
+		uribuf->uuid);
+      }
+
+      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+                    uribuf->uuid));
+      return;
+    }
+  }
+
+ /*
   * Figure out the scheme from the full name...
   */
 
@@ -2255,6 +2296,34 @@ http_resolve_cb(
   }
 
  /*
+  * If we have a UUID, compare it...
+  */
+
+  if (uribuf->uuid && (pair = avahi_string_list_find(txt, "UUID")) != NULL)
+  {
+    char	uuid[256];		/* UUID value */
+
+    avahi_string_list_get_pair(pair, NULL, &value, &valueLen);
+
+    memcpy(uuid, value, valueLen);
+    uuid[valueLen] = '\0';
+
+    if (_cups_strcasecmp(uuid, uribuf->uuid))
+    {
+      if (uribuf->options & _HTTP_RESOLVE_STDERR)
+      {
+	_cupsLangPrintFilter(stderr, "INFO", _("Still looking for printer."));
+	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
+		uribuf->uuid);
+      }
+
+      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+                    uribuf->uuid));
+      return;
+    }
+  }
+
+ /*
   * Figure out the scheme from the full name...
   */
 
@@ -2291,7 +2360,8 @@ http_resolve_cb(
   */
 
   if ((uribuf->options & _HTTP_RESOLVE_FAXOUT) &&
-      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")))
+      (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
+      !avahi_string_list_find(txt, "printer-type"))
   {
     reskey     = "rfo";
     resdefault = "/ipp/faxout";

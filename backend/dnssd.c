@@ -77,7 +77,8 @@ typedef struct
 		*domain,		/* Domain name */
 		*fullName,		/* Full name */
 		*make_and_model,	/* Make and model from TXT record */
-		*device_id;		/* 1284 device ID from TXT record */
+		*device_id,		/* 1284 device ID from TXT record */
+		*uuid;			/* UUID from TXT record */
   cups_devtype_t type;			/* Device registration type */
   int		priority,		/* Priority associated with type */
 		cups_shared,		/* CUPS shared printer? */
@@ -513,9 +514,15 @@ main(int  argc,				/* I - Number of command-line args */
           {
 	    unquote(uriName, best->fullName, sizeof(uriName));
 
-	    httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			    "dnssd", NULL, uriName, 0,
-			    best->cups_shared ? "/cups" : "/");
+            if (best->uuid)
+	      httpAssembleURIf(HTTP_URI_CODING_ALL, device_uri,
+	                       sizeof(device_uri), "dnssd", NULL, uriName, 0,
+			       best->cups_shared ? "/cups?uuid=%s" : "/?uuid=%s",
+			       best->uuid);
+	    else
+	      httpAssembleURI(HTTP_URI_CODING_ALL, device_uri,
+	                      sizeof(device_uri), "dnssd", NULL, uriName, 0,
+			      best->cups_shared ? "/cups" : "/");
 
 	    cupsBackendReport("network", device_uri, best->make_and_model,
 	                      best->name, best->device_id, NULL);
@@ -546,9 +553,15 @@ main(int  argc,				/* I - Number of command-line args */
       {
 	unquote(uriName, best->fullName, sizeof(uriName));
 
-	httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			"dnssd", NULL, uriName, 0,
-			best->cups_shared ? "/cups" : "/");
+	if (best->uuid)
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, device_uri,
+			   sizeof(device_uri), "dnssd", NULL, uriName, 0,
+			   best->cups_shared ? "/cups?uuid=%s" : "/?uuid=%s",
+			   best->uuid);
+	else
+	  httpAssembleURI(HTTP_URI_CODING_ALL, device_uri,
+			  sizeof(device_uri), "dnssd", NULL, uriName, 0,
+			  best->cups_shared ? "/cups" : "/");
 
 	cupsBackendReport("network", device_uri, best->make_and_model,
 			  best->name, best->device_id, NULL);
@@ -1180,6 +1193,8 @@ query_callback(
       if (device->type == CUPS_DEVICE_PRINTER)
 	device->sent = 1;
     }
+    else if (!_cups_strcasecmp(key, "UUID"))
+      device->uuid = strdup(value);
   }
 
   if (device->device_id)
