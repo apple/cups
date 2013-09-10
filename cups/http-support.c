@@ -2079,11 +2079,8 @@ http_resolve_cb(
     if (_cups_strcasecmp(uuid, uribuf->uuid))
     {
       if (uribuf->options & _HTTP_RESOLVE_STDERR)
-      {
-	_cupsLangPrintFilter(stderr, "INFO", _("Still looking for printer."));
 	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
 		uribuf->uuid);
-      }
 
       DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
                     uribuf->uuid));
@@ -2311,11 +2308,8 @@ http_resolve_cb(
     if (_cups_strcasecmp(uuid, uribuf->uuid))
     {
       if (uribuf->options & _HTTP_RESOLVE_STDERR)
-      {
-	_cupsLangPrintFilter(stderr, "INFO", _("Still looking for printer."));
 	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
 		uribuf->uuid);
-      }
 
       DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
                     uribuf->uuid));
