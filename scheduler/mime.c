@@ -659,6 +659,9 @@ mime_delete_rules(mime_magic_t *rules)	/* I - Rules to free */
     if (rules->child != NULL)
       mime_delete_rules(rules->child);
 
+    if (rules->op == MIME_MAGIC_REGEX && rules->value.rev)
+      regfree(&(rules.value.rev));
+
     free(rules);
     rules = next;
   }
