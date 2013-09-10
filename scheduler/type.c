@@ -891,6 +891,7 @@ mime_check_rules(
 	  * short then don't compare - it can't match...
 	  */
 
+          if (fb->length > 0)
           {
             char temp[MIME_MAX_BUFFER + 1];
 					/* Temporary buffer */
