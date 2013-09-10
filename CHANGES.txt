@@ -1,5 +1,7 @@
-CHANGES.txt - 2.0b1 - 2013-08-06
+CHANGES.txt - 2.0b1 - 2013-09-10
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
 
+	- Added support for regular expression matching in the MIME type rules
+	  (<rdar://problem/11131245>)

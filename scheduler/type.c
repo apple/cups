@@ -3,7 +3,7 @@
  *
  *   MIME typing routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -425,6 +425,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  op = MIME_MAGIC_ASCII;
 	else if (!strcmp(name, "printable"))
 	  op = MIME_MAGIC_PRINTABLE;
+	else if (!strcmp(name, "regex"))
+	  op = MIME_MAGIC_REGEX;
 	else if (!strcmp(name, "string"))
 	  op = MIME_MAGIC_STRING;
 	else if (!strcmp(name, "istring"))
@@ -523,6 +525,12 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    temp->length = strtol(value[1], NULL, 0);
 	    if (temp->length > MIME_MAX_BUFFER)
 	      temp->length = MIME_MAX_BUFFER;
+	    break;
+	case MIME_MAGIC_REGEX :
+	    temp->offset = strtol(value[0], NULL, 0);
+	    temp->length = MIME_MAX_BUFFER;
+	    if (regcomp(&(temp->value.rev), value[1], REG_NOSUB | REG_EXTENDED))
+	      return (-1);
 	    break;
 	case MIME_MAGIC_STRING :
 	case MIME_MAGIC_ISTRING :
@@ -850,6 +858,49 @@ mime_check_rules(
 	      break;
 
 	  result = (n == 0);
+	  break;
+
+      case MIME_MAGIC_REGEX :
+          DEBUG_printf(("5mime_check_rules: regex(%d, \"%s\")", rules->offset,
+	                rules->value.stringv));
+
+         /*
+	  * Load the buffer if necessary...
+	  */
+
+          if (fb->offset < 0 || rules->offset < fb->offset ||
+	      (rules->offset + rules->length) > (fb->offset + fb->length))
+	  {
+	   /*
+	    * Reload file buffer...
+	    */
+
+            cupsFileSeek(fb->fp, rules->offset);
+	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
+	                              sizeof(fb->buffer));
+	    fb->offset = rules->offset;
+
+            DEBUG_printf(("5mime_check_rules: loaded %d byte fb->buffer at %d, starts "
+	                  "with \"%c%c%c%c\".",
+	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
+			  fb->buffer[2], fb->buffer[3]));
+	  }
+
+         /*
+	  * Compare the buffer against the string.  If the file is too
+	  * short then don't compare - it can't match...
+	  */
+
+          {
+            char temp[MIME_MAX_BUFFER + 1];
+					/* Temporary buffer */
+
+            memcpy(temp, fb->buffer, fb->length);
+            temp[fb->length] = '\0';
+            result = !regexec(&(rules->value.rev), temp, 0, NULL, 0);
+          }
+
+          DEBUG_printf(("5mime_check_rules: result=%d", result));
 	  break;
 
       case MIME_MAGIC_STRING :

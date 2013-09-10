@@ -3,7 +3,7 @@
  *
  *   MIME type/conversion database definitions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -19,6 +19,7 @@
 #  include <cups/array.h>
 #  include <cups/ipp.h>
 #  include <cups/file.h>
+#  include <regex.h>
 
 
 /*
@@ -58,7 +59,8 @@ typedef enum
   MIME_MAGIC_INT,			/* Integer/32-bit word matches */
   MIME_MAGIC_LOCALE,			/* Current locale matches string */
   MIME_MAGIC_CONTAINS,			/* File contains a string */
-  MIME_MAGIC_ISTRING			/* Case-insensitive string matches */
+  MIME_MAGIC_ISTRING,			/* Case-insensitive string matches */
+  MIME_MAGIC_REGEX			/* Regular expression matches */
 } mime_op_t;
 
 typedef struct _mime_magic_s		/**** MIME Magic Data ****/
@@ -80,6 +82,7 @@ typedef struct _mime_magic_s		/**** MIME Magic Data ****/
     unsigned char charv;		/* Byte value */
     unsigned short shortv;		/* Short value */
     unsigned	intv;			/* Integer value */
+    regex_t	rev;			/* Regular expression value */
   }		value;
 } mime_magic_t;
 

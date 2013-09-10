@@ -7,7 +7,7 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.types" file that
 #   reflects your local configuration changes.
 #
-#   Copyright 2007-2011 by Apple Inc.
+#   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -37,6 +37,7 @@
 #                                       100=default, 200=highest)
 #   printable(offset,length)		True if bytes are printable 8-bit chars
 #					(CR, NL, TAB, BS, 32-126, 128-254)
+#   regex(offset,"regex")		True if bytes match regular expression
 #   string(offset,"string")		True if bytes are identical to string
 #   istring(offset,"string")		True if bytes are identical to
 #                                       case-insensitive string
@@ -70,7 +71,7 @@
 #
 
 #application/msword		doc string(0,<D0CF11E0A1B11AE1>)
-application/pdf			pdf string(0,%PDF)
+application/pdf			pdf regex(0,^[\\n\\r]*%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
 				(contains(0,4096,"LANGUAGE=POSTSCRIPT") \
