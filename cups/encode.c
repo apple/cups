@@ -176,6 +176,8 @@ static const _ipp_option_t ipp_options[] =
   { 0, "job-accounting-user-id", IPP_TAG_NAME,          IPP_TAG_JOB },
   { 0, "job-accounting-user-id-default", IPP_TAG_NAME,  IPP_TAG_PRINTER },
   { 0, "job-authorization-uri",	IPP_TAG_URI,		IPP_TAG_OPERATION },
+  { 0, "job-cancel-after",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-cancel-after-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "job-hold-until",	IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "job-id",		IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */
   { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_ZERO }, /* never send as option */

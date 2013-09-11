@@ -3,7 +3,7 @@
  *
  *   Printer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
+ *   Copyright 2007-2013 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -469,6 +469,10 @@ cupsdCreateCommonData(void)
   /* ippget-event-life */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "ippget-event-life", 15);
+
+  /* job-cancel-after-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "job-cancel-after-supported",
+              0, INT_MAX);
 
   /* job-creation-attributes-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
@@ -3162,6 +3166,7 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-account-id-default"));
     cupsArrayAdd(CommonDefaults,
                  _cupsStrAlloc("job-accounting-user-id-default"));
+    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-cancel-after-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-hold-until-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-priority-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-sheets-default"));
@@ -3209,6 +3214,10 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   if (!cupsGetOption("document-format", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
         	 "document-format-default", NULL, "application/octet-stream");
+
+  if (!cupsGetOption("job-cancel-after", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+		  "job-cancel-after-default", MaxJobTime);
 
   if (!cupsGetOption("job-hold-until", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
