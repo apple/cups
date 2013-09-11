@@ -957,6 +957,33 @@ sysUpdate(void)
       }
 #endif /* kIOPMAssertionTypeDenySystemSleep */
 
+     /*
+      * Make sure jobs that were queued prior to the system going to sleep don't
+      * get canceled right away...
+      */
+
+      if (MaxJobTime > 0)
+      {
+        cupsd_job_t	*job;		/* Current job */
+
+        for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+             job;
+             job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+        {
+          if (job->cancel_time)
+          {
+            ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
+                                                             "job-cancel-after",
+                                                             IPP_TAG_INTEGER);
+
+            if (cancel_after)
+              job->cancel_time = time(NULL) + ippGetInteger(cancel_after, 0);
+            else
+              job->cancel_time = time(NULL) + MaxJobTime;
+          }
+        }
+      }
+
       cupsdCheckJobs();
     }
 

@@ -4480,6 +4480,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
           cupsd_printer_t *printer)	/* I - Printer to print job */
 {
   const char	*filename;		/* Support filename */
+  ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
+						   "job-cancel-after",
+						   IPP_TAG_INTEGER);
+					/* job-cancel-after attribute */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job(job=%p(%d), printer=%p(%s))",
@@ -4530,7 +4534,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->printer      = printer;
   printer->job      = job;
 
-  if (MaxJobTime > 0)
+  if (cancel_after)
+    job->cancel_time = time(NULL) + ippGetInteger(cancel_after, 0);
+  else if (MaxJobTime > 0)
     job->cancel_time = time(NULL) + MaxJobTime;
   else
     job->cancel_time = 0;
@@ -4826,18 +4832,28 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
 	event |= CUPSD_EVENT_PRINTER_STATE;
 
-        if (MaxJobTime > 0 && strstr(message, "connecting-to-device") != NULL)
+        if (MaxJobTime > 0)
         {
          /*
           * Reset cancel time after connecting to the device...
           */
+
+	  ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
+							   "job-cancel-after",
+							   IPP_TAG_INTEGER);
+					/* job-cancel-after attribute */
 
           for (i = 0; i < job->printer->num_reasons; i ++)
             if (!strcmp(job->printer->reasons[i], "connecting-to-device"))
               break;
 
           if (i >= job->printer->num_reasons)
-	    job->cancel_time = time(NULL) + MaxJobTime;
+          {
+            if (cancel_after)
+	      job->cancel_time = time(NULL) + ippGetInteger(cancel_after, 0);
+	    else
+	      job->cancel_time = time(NULL) + MaxJobTime;
+	  }
         }
       }
 
