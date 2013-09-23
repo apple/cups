@@ -349,6 +349,7 @@ cupsdAllowSleep(void)
 {
   cupsdCleanDirty();
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "Allowing system sleep.");
   IOAllowPowerChange(LastSysEvent.powerKernelPort,
 		     LastSysEvent.powerNotificationID);
 }
@@ -671,18 +672,18 @@ sysEventPowerNotifier(
 
   switch (messageType)
   {
-    case kIOMessageCanSystemPowerOff:
-    case kIOMessageCanSystemSleep:
+    case kIOMessageCanSystemPowerOff :
+    case kIOMessageCanSystemSleep :
 	threadData->sysevent.event |= SYSEVENT_CANSLEEP;
 	break;
 
-    case kIOMessageSystemWillRestart:
-    case kIOMessageSystemWillPowerOff:
-    case kIOMessageSystemWillSleep:
+    case kIOMessageSystemWillRestart :
+    case kIOMessageSystemWillPowerOff :
+    case kIOMessageSystemWillSleep :
 	threadData->sysevent.event |= SYSEVENT_WILLSLEEP;
 	break;
 
-    case kIOMessageSystemHasPoweredOn:
+    case kIOMessageSystemHasPoweredOn :
        /*
 	* Because powered on is followed by a net-changed event, delay
 	* before sending it.
@@ -692,10 +693,10 @@ sysEventPowerNotifier(
 	threadData->sysevent.event |= SYSEVENT_WOKE;
 	break;
 
-    case kIOMessageSystemWillNotPowerOff:
-    case kIOMessageSystemWillNotSleep:
+    case kIOMessageSystemWillNotPowerOff :
+    case kIOMessageSystemWillNotSleep :
 #  ifdef kIOMessageSystemWillPowerOn
-    case kIOMessageSystemWillPowerOn:
+    case kIOMessageSystemWillPowerOn :
 #  endif /* kIOMessageSystemWillPowerOn */
     default:
 	sendit = 0;
@@ -902,8 +903,11 @@ sysUpdate(void)
       */
 
       if (cupsArrayCount(PrintingJobs) == 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "Allowing system sleep.");
 	IOAllowPowerChange(sysevent.powerKernelPort,
 			   sysevent.powerNotificationID);
+      }
       else
       {
        /*
@@ -934,6 +938,7 @@ sysUpdate(void)
 	}
 	else
 	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "Allowing system sleep.");
 	  IOAllowPowerChange(sysevent.powerKernelPort,
 			     sysevent.powerNotificationID);
 	}
