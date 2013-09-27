@@ -1905,7 +1905,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    }
 	    else if (!WebInterface)
 	    {
-              if (!cupsdSendHeader(con, HTTP_OK, line, CUPSD_AUTH_NONE))
+              if (!cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
