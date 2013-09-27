@@ -703,6 +703,52 @@ sysEventPowerNotifier(
 	break;
   }
 
+  switch (messageType)
+  {
+    case kIOMessageCanSystemPowerOff :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageCanSystemPowerOff message.");
+	break;
+    case kIOMessageCanSystemSleep :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageCannSystemSleep message.");
+	break;
+    case kIOMessageSystemWillRestart :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillRestart message.");
+	break;
+    case kIOMessageSystemWillPowerOff :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillPowerOff message.");
+	break;
+    case kIOMessageSystemWillSleep :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillSleep message.");
+	break;
+    case kIOMessageSystemHasPoweredOn :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemHasPoweredOn message.");
+	break;
+    case kIOMessageSystemWillNotPowerOff :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillNotPowerOff message.");
+	break;
+    case kIOMessageSystemWillNotSleep :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillNotSleep message.");
+	break;
+#  ifdef kIOMessageSystemWillPowerOn
+    case kIOMessageSystemWillPowerOn :
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+                        "Got kIOMessageSystemWillPowerOn message.");
+	break;
+#  endif /* kIOMessageSystemWillPowerOn */
+    default:
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Got unknown power message %d.",
+                        (int)messageType);
+	break;
+  }
+
   if (sendit == 0)
     IOAllowPowerChange(threadData->sysevent.powerKernelPort,
                        (long)messageArgument);

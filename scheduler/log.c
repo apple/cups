@@ -38,6 +38,8 @@
  * Local globals...
  */
 
+static _cups_mutex_t log_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for logging */
 static int	log_linesize = 0;	/* Size of line for output file */
 static char	*log_line = NULL;	/* Line for output file */
 
@@ -991,6 +993,7 @@ int					/* O - 1 on success, 0 on failure */
 cupsdWriteErrorLog(int        level,	/* I - Log level */
                    const char *message)	/* I - Message string */
 {
+  int		ret = 1;		/* Return value */
   static const char	levels[] =	/* Log levels... */
 		{
 		  ' ',
@@ -1022,18 +1025,26 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   * Not using syslog; check the log file...
   */
 
+  _cupsMutexLock(&log_mutex);
+
   if (!cupsdCheckLogFile(&ErrorFile, ErrorLog))
-    return (0);
+  {
+    ret = 0;
+  }
+  else
+  {
+   /*
+    * Write the log message...
+    */
 
- /*
-  * Write the log message...
-  */
+    cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
+                   cupsdGetDateTime(NULL, LogTimeFormat), message);
+    cupsFileFlush(ErrorFile);
+  }
 
-  cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
-                 cupsdGetDateTime(NULL, LogTimeFormat), message);
-  cupsFileFlush(ErrorFile);
+  _cupsMutexUnlock(&log_mutex);
 
-  return (1);
+  return (ret);
 }
 
 
