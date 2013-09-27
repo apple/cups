@@ -407,34 +407,28 @@ make test
 
 <P>The ".cxx" extension is used because it is the only common C++ extension between Linux, OS X, UNIX, and Windows.</P></BLOCKQUOTE>
 
-<P>The top of each source file contains a header giving the name of the file, the purpose or nature of the source file, the copyright and licensing notice, and the functions contained in the file.  The file name and revision information is provided by the Subversion "&#36;Id$" tag:</P>
+<P>The top of each source file contains a header giving the name of the file, the purpose or nature of the source file, and the copyright and licensing notice.  The file name and revision information is provided by the Subversion "&#36;Id$" tag:</P>
 
 <PRE CLASS="command">
 /*
  * "&#36;Id$"
  *
- *   Description of file contents.
+ * Description of file contents.
  *
- *   Copyright 2012 by Apple Inc.
+ * Copyright 2013 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   function1() - Description 1.
- *   function2() - Description 2.
- *   function3() - Description 3.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 </PRE>
 
 <P>For source files that are subject to the Apple OS-Developed Software exception, the following additional comment appears after the contact information:</P>
 
 <PRE CLASS="command">
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
 </PRE>
 
 <P>The bottom of each source file contains a trailer giving the name of the file using the Subversion "&#36;Id$" tag. The primary purpose of this is to mark the end of a source file; if the trailer is missing it is possible that code has been lost near the end of the file:</P>
@@ -637,15 +631,15 @@ enum
 #
 # "&#36;Id$"
 #
-#   Makefile for ...
+# Makefile for ...
 #
-#   Copyright 2012 by Apple Inc.
+# Copyright 2013 by Apple Inc.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 </PRE>
 
