@@ -1,9 +1,13 @@
-CHANGES.txt - 1.7.0 - 2013-08-29
---------------------------------
+CHANGES-1.7.txt
+---------------
 
 CHANGES IN CUPS V1.7.0
 
 	- Updated the Japanese localization.
+	- The scheduler did not remove backup PPD files when a printer was
+	  deleted (<rdar://problem/15065555>)
+	- The scheduler incorrectly responded to HEAD requests when the web
+	  interface was disabled (<rdar://problem/15090332>)
 	- The scheduler did not respond using the hostname specified by the
 	  client (<rdar://problem/14583574>)
 	- Fax queues did not work when shared via Bonjour

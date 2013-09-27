@@ -5741,8 +5741,14 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot,
            printer->name);
   unlink(filename);
+  snprintf(filename, sizeof(filename), "%s/interfaces/%s.O", ServerRoot,
+           printer->name);
+  unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+           printer->name);
+  unlink(filename);
+  snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd.O", ServerRoot,
            printer->name);
   unlink(filename);
 
