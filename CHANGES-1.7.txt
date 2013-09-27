@@ -4,6 +4,9 @@ CHANGES-1.7.txt
 CHANGES IN CUPS V1.7.0
 
 	- Updated the Japanese localization.
+	- Network backends now use the prtMarkerSuppliesClass property to
+	  determine the direction of supply level values
+	  (<rdar://problem/14302628>)
 	- The scheduler did not remove backup PPD files when a printer was
 	  deleted (<rdar://problem/15065555>)
 	- The scheduler incorrectly responded to HEAD requests when the web
