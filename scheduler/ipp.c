@@ -242,7 +242,7 @@ cupsdProcessIPPRequest(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdProcessIPPRequest(%p[%d]): operation_id = %04x",
-                  con, con->http.fd, con->request->request.op.operation_id);
+                  con, con->number, con->request->request.op.operation_id);
 
  /*
   * First build an empty response message for this request...
@@ -270,7 +270,7 @@ cupsdProcessIPPRequest(
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                   "%04X %s Bad request version number %d.%d",
-		  IPP_VERSION_NOT_SUPPORTED, con->http.hostname,
+		  IPP_VERSION_NOT_SUPPORTED, con->http->hostname,
                   con->request->request.any.version[0],
 	          con->request->request.any.version[1]);
 
@@ -287,7 +287,7 @@ cupsdProcessIPPRequest(
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                   "%04X %s Bad request ID %d",
-		  IPP_BAD_REQUEST, con->http.hostname,
+		  IPP_BAD_REQUEST, con->http->hostname,
                   con->request->request.any.request_id);
 
     send_ipp_status(con, IPP_BAD_REQUEST, _("Bad request ID %d."),
@@ -297,7 +297,7 @@ cupsdProcessIPPRequest(
   {
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                   "%04X %s No attributes in request",
-		  IPP_BAD_REQUEST, con->http.hostname);
+		  IPP_BAD_REQUEST, con->http->hostname);
 
     send_ipp_status(con, IPP_BAD_REQUEST, _("No attributes in request."));
   }
@@ -319,7 +319,7 @@ cupsdProcessIPPRequest(
 
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                       "%04X %s Attribute groups are out of order",
-		      IPP_BAD_REQUEST, con->http.hostname);
+		      IPP_BAD_REQUEST, con->http->hostname);
 
 	send_ipp_status(con, IPP_BAD_REQUEST,
 	                _("Attribute groups are out of order (%x < %x)."),
@@ -409,7 +409,7 @@ cupsdProcessIPPRequest(
 	                charset->values[0].string.text);
 	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
 		      "%04X %s Unsupported attributes-charset value \"%s\"",
-		      IPP_CHARSET, con->http.hostname,
+		      IPP_CHARSET, con->http->hostname,
 		      charset->values[0].string.text);
 	send_ipp_status(con, IPP_BAD_REQUEST,
 	                _("Unsupported character set \"%s\"."),
@@ -436,7 +436,7 @@ cupsdProcessIPPRequest(
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing attributes-charset attribute",
-			IPP_BAD_REQUEST, con->http.hostname);
+			IPP_BAD_REQUEST, con->http->hostname);
         }
 
         if (!language)
@@ -446,7 +446,7 @@ cupsdProcessIPPRequest(
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing attributes-natural-language attribute",
-			IPP_BAD_REQUEST, con->http.hostname);
+			IPP_BAD_REQUEST, con->http->hostname);
         }
 
         if (!uri)
@@ -457,7 +457,7 @@ cupsdProcessIPPRequest(
 
 	  cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	"%04X %s Missing printer-uri, job-uri, or ppd-name "
-			"attribute", IPP_BAD_REQUEST, con->http.hostname);
+			"attribute", IPP_BAD_REQUEST, con->http->hostname);
         }
 
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "Request attributes follow...");
@@ -488,7 +488,7 @@ cupsdProcessIPPRequest(
 	  */
 
 	  if (!strcmp(username->values[0].string.text, "root") &&
-	      _cups_strcasecmp(con->http.hostname, "localhost") &&
+	      _cups_strcasecmp(con->http->hostname, "localhost") &&
 	      strcmp(con->username, "root"))
 	  {
 	   /*
@@ -696,7 +696,7 @@ cupsdProcessIPPRequest(
 	  default :
 	      cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	    "%04X %s Operation %04X (%s) not supported",
-			    IPP_OPERATION_NOT_SUPPORTED, con->http.hostname,
+			    IPP_OPERATION_NOT_SUPPORTED, con->http->hostname,
 			    con->request->request.op.operation_id,
 			    ippOpString(con->request->request.op.operation_id));
 
@@ -721,11 +721,11 @@ cupsdProcessIPPRequest(
                     con->response->request.status.status_code
 		        != IPP_NOT_FOUND ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                     "[Client %d] Returning IPP %s for %s (%s) from %s",
-	            con->http.fd,
+	            con->number,
 	            ippErrorString(con->response->request.status.status_code),
 		    ippOpString(con->request->request.op.operation_id),
 		    uri ? uri->values[0].string.text : "no URI",
-		    con->http.hostname);
+		    con->http->hostname);
 
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
@@ -738,11 +738,11 @@ cupsdProcessIPPRequest(
       * it.
       */
 
-      if (con->http.version == HTTP_1_1)
+      if (con->http->version == HTTP_1_1)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
                         "[Client %d] Transfer-Encoding: chunked",
-                        con->http.fd);
+                        con->number);
 
 	if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n") < 0)
 	  return (0);
@@ -750,7 +750,7 @@ cupsdProcessIPPRequest(
 	if (cupsdFlushHeader(con) < 0)
 	  return (0);
 
-	con->http.data_encoding = HTTP_ENCODE_CHUNKED;
+	con->http->data_encoding = HTTP_ENCODE_CHUNKED;
       }
       else
 #endif /* CUPSD_USE_CHUNKING */
@@ -770,7 +770,7 @@ cupsdProcessIPPRequest(
 
         cupsdLogMessage(CUPSD_LOG_DEBUG,
                         "[Client %d] Content-Length: " CUPS_LLFMT,
-                        con->http.fd, CUPS_LLCAST length);
+                        con->number, CUPS_LLCAST length);
 	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
         	       CUPS_LLCAST length) < 0)
 	  return (0);
@@ -778,16 +778,16 @@ cupsdProcessIPPRequest(
 	if (cupsdFlushHeader(con) < 0)
 	  return (0);
 
-	con->http.data_encoding  = HTTP_ENCODE_LENGTH;
-	con->http.data_remaining = length;
+	con->http->data_encoding  = HTTP_ENCODE_LENGTH;
+	con->http->data_remaining = length;
 
-	if (con->http.data_remaining <= INT_MAX)
-	  con->http._data_remaining = con->http.data_remaining;
+	if (con->http->data_remaining <= INT_MAX)
+	  con->http->_data_remaining = con->http->data_remaining;
 	else
-	  con->http._data_remaining = INT_MAX;
+	  con->http->_data_remaining = INT_MAX;
       }
 
-      cupsdAddSelect(con->http.fd, (cupsd_selfunc_t)cupsdReadClient,
+      cupsdAddSelect(con->number, (cupsd_selfunc_t)cupsdReadClient,
                      (cupsd_selfunc_t)cupsdWriteClient, con);
 
      /*
@@ -875,7 +875,7 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "accept_jobs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -960,7 +960,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_class(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Do we have a valid URI?
@@ -1230,7 +1230,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
         	  "add_file(con=%p[%d], job=%d, filetype=%s/%s, "
-		  "compression=%d)", con, con ? con->http.fd : -1, job->id,
+		  "compression=%d)", con, con ? con->number : -1, job->id,
 		  filetype->super, filetype->type, compression);
 
  /*
@@ -1321,7 +1321,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
-                  con, con->http.fd, printer, printer->name,
+                  con, con->number, printer, printer->name,
 		  filetype, filetype ? filetype->super : "none",
 		  filetype ? filetype->type : "none");
 
@@ -1330,8 +1330,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (!printer->shared &&
-      _cups_strcasecmp(con->http.hostname, "localhost") &&
-      _cups_strcasecmp(con->http.hostname, ServerName))
+      _cups_strcasecmp(con->http->hostname, "localhost") &&
+      _cups_strcasecmp(con->http->hostname, ServerName))
   {
     send_ipp_status(con, IPP_NOT_AUTHORIZED,
                     _("The printer or class is not shared."));
@@ -1357,8 +1357,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     return (NULL);
   }
 #ifdef HAVE_SSL
-  else if (auth_info && !con->http.tls &&
-           !httpAddrLocalhost(con->http.hostaddr))
+  else if (auth_info && !con->http->tls &&
+           !httpAddrLocalhost(con->http->hostaddr))
   {
    /*
     * Require encryption of auth-info over non-local connections...
@@ -1704,7 +1704,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (attr->value_tag != IPP_TAG_NAME ||
         attr->num_values != 1 ||
-        strcmp(con->http.hostname, "localhost"))
+        strcmp(con->http->hostname, "localhost"))
     {
      /*
       * Can't override the value if we aren't connected via localhost.
@@ -1749,7 +1749,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr->value_tag             = IPP_TAG_NAME;
       attr->num_values            = 1;
-      attr->values[0].string.text = _cupsStrAlloc(con->http.hostname);
+      attr->values[0].string.text = _cupsStrAlloc(con->http->hostname);
     }
 
     attr->group_tag = IPP_TAG_JOB;
@@ -1762,7 +1762,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME,
-        	 "job-originating-host-name", NULL, con->http.hostname);
+        	 "job-originating-host-name", NULL, con->http->hostname);
   }
 
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
@@ -2318,7 +2318,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_printer(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Do we have a valid URI?
@@ -2939,7 +2939,7 @@ add_printer_state_reasons(
 {
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "add_printer_state_reasons(%p[%d], %p[%s])",
-                  con, con->http.fd, p, p->name);
+                  con, con->number, p, p->name);
 
   if (p->num_reasons == 0)
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -2965,7 +2965,7 @@ add_queued_job_count(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_queued_job_count(%p[%d], %p[%s])",
-                  con, con->http.fd, p, p->name);
+                  con, con->number, p, p->name);
 
   count = cupsdGetPrinterJobCount(p->name);
 
@@ -3037,7 +3037,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "authenticate_job(%p[%d], %s)",
-                  con, con->http.fd, uri->values[0].string.text);
+                  con, con->number, uri->values[0].string.text);
 
  /*
   * Start with "everything is OK" status...
@@ -3216,7 +3216,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_all_jobs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Get the jobs to cancel/purge...
@@ -3451,7 +3451,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -3651,7 +3651,7 @@ cancel_subscription(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cancel_subscription(con=%p[%d], sub_id=%d)",
-                  con, con->http.fd, sub_id);
+                  con, con->number, sub_id);
 
  /*
   * Is the subscription ID valid?
@@ -3757,7 +3757,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "check_quotas(%p[%d], %p[%s])",
-                  con, con->http.fd, p, p->name);
+                  con, con->number, p, p->name);
 
  /*
   * Figure out who is printing...
@@ -3980,7 +3980,7 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "close_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -4184,7 +4184,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "copy_banner(con=%p[%d], job=%p[%d], name=\"%s\")",
-                  con, con ? con->http.fd : -1, job, job->id,
+                  con, con ? con->number : -1, job, job->id,
 		  name ? name : "(null)");
 
  /*
@@ -4543,7 +4543,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
   snprintf(buffer, sizeof(buffer), "%s/daemon/cups-driverd", ServerBin);
-  snprintf(tempfile, sizeof(tempfile), "%s/%d.ppd", TempDir, con->http.fd);
+  snprintf(tempfile, sizeof(tempfile), "%s/%d.ppd", TempDir, con->number);
   tempfd = open(tempfile, O_WRONLY | O_CREAT | O_TRUNC, 0600);
   if (tempfd < 0 || cupsdOpenPipe(temppipe))
     return (-1);
@@ -5207,7 +5207,7 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "create_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -5361,7 +5361,7 @@ create_subscription(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdCreateSubscription(con=%p(%d), uri=\"%s\")",
-                  con, con->http.fd, uri->values[0].string.text);
+                  con, con->number, uri->values[0].string.text);
 
   httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
                   sizeof(scheme), userpass, sizeof(userpass), host,
@@ -5690,7 +5690,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "delete_printer(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Do we have a valid URI?
@@ -5804,7 +5804,7 @@ get_default(cupsd_client_t *con)	/* I - Client connection */
   cups_array_t	*ra;			/* Requested attributes array */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_default(%p[%d])", con, con->http.fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_default(%p[%d])", con, con->number);
 
  /*
   * Check policy...
@@ -5854,7 +5854,7 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
 					/* String for included schemes */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_devices(%p[%d])", con, con->http.fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_devices(%p[%d])", con, con->number);
 
  /*
   * Check policy...
@@ -5948,7 +5948,7 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_document(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -6095,7 +6095,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_job_attrs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -6221,7 +6221,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_policy_t *policy;		/* Current policy */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs(%p[%d], %s)", con, con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs(%p[%d], %s)", con, con->number,
                   uri->values[0].string.text);
 
  /*
@@ -6556,7 +6556,7 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_notifications(con=%p[%d])",
-                  con, con->http.fd);
+                  con, con->number);
 
  /*
   * Get subscription attributes...
@@ -6690,7 +6690,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppd(%p[%d], %p[%s=%s])", con,
-                  con->http.fd, uri, uri->name, uri->values[0].string.text);
+                  con->number, uri, uri->name, uri->values[0].string.text);
 
   if (!strcmp(uri->name, "ppd-name"))
   {
@@ -6863,7 +6863,7 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 					/* String for included schemes */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->http.fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->number);
 
  /*
   * Check policy...
@@ -7008,7 +7008,7 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printer_attrs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -7064,7 +7064,7 @@ get_printer_supported(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printer_supported(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -7127,7 +7127,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printers(%p[%d], %x)", con,
-                  con->http.fd, type);
+                  con->number, type);
 
  /*
   * Check policy...
@@ -7273,7 +7273,7 @@ get_subscription_attrs(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "get_subscription_attrs(con=%p[%d], sub_id=%d)",
-                  con, con->http.fd, sub_id);
+                  con, con->number, sub_id);
 
  /*
   * Is the subscription ID valid?
@@ -7354,7 +7354,7 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "get_subscriptions(con=%p[%d], uri=%s)",
-                  con, con->http.fd, uri->values[0].string.text);
+                  con, con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -7515,7 +7515,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_job_t	*job;			/* Job information */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "hold_job(%p[%d], %s)", con, con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "hold_job(%p[%d], %s)", con, con->number,
                   uri->values[0].string.text);
 
  /*
@@ -7644,7 +7644,7 @@ hold_new_jobs(cupsd_client_t  *con,	/* I - Connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "hold_new_jobs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -7720,7 +7720,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 		*dprinter;		/* Destination printer */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "move_job(%p[%d], %s)", con, con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "move_job(%p[%d], %s)", con, con->number,
                   uri->values[0].string.text);
 
  /*
@@ -8048,7 +8048,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   int		compression;		/* Document compression */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "print_job(%p[%d], %s)", con, con->http.fd,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "print_job(%p[%d], %s)", con, con->number,
                   uri->values[0].string.text);
 
  /*
@@ -8482,7 +8482,7 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "reject_jobs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -8564,7 +8564,7 @@ release_held_new_jobs(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "release_held_new_jobs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -8635,7 +8635,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "release_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -8773,7 +8773,7 @@ renew_subscription(
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "renew_subscription(con=%p[%d], sub_id=%d)",
-                  con, con->http.fd, sub_id);
+                  con, con->number, sub_id);
 
  /*
   * Is the subscription ID valid?
@@ -8861,7 +8861,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "restart_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -9216,7 +9216,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_document(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * See if we have a job URI or a printer URI...
@@ -9605,12 +9605,12 @@ send_http_error(
 
   cupsdLogMessage(status == HTTP_FORBIDDEN ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                   "[Client %d] Returning HTTP %s for %s (%s) from %s",
-                  con->http.fd, httpStatus(status),
+                  con->number, httpStatus(status),
 		  con->request ?
 		      ippOpString(con->request->request.op.operation_id) :
 		      "no operation-id",
 		  uri ? uri->values[0].string.text : "no URI",
-		  con->http.hostname);
+		  con->http->hostname);
 
   if (printer)
   {
@@ -9731,7 +9731,7 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_default(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -9813,7 +9813,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_job_attrs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Start with "everything is OK" status...
@@ -10185,7 +10185,7 @@ set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_printer_attrs(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -10516,7 +10516,7 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_printer(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -10598,7 +10598,7 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "stop_printer(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * Is the destination valid?
@@ -10839,7 +10839,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "validate_job(%p[%d], %s)", con,
-                  con->http.fd, uri->values[0].string.text);
+                  con->number, uri->values[0].string.text);
 
  /*
   * OK, see if the client is sending the document compressed - CUPS
@@ -11008,8 +11008,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     return;
   }
 #ifdef HAVE_SSL
-  else if (auth_info && !con->http.tls &&
-           !httpAddrLocalhost(con->http.hostaddr))
+  else if (auth_info && !con->http->tls &&
+           !httpAddrLocalhost(con->http->hostaddr))
   {
    /*
     * Require encryption of auth-info over non-local connections...
@@ -11071,7 +11071,7 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, "
 		  "userlen=%d)",
-        	  job->id, con ? con->http.fd : 0,
+        	  job->id, con ? con->number : 0,
 		  owner ? owner : "(null)", username, userlen);
 
  /*

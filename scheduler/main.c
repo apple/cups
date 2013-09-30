@@ -703,10 +703,10 @@ main(int  argc,				/* I - Number of command-line args */
 	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
 	     con;
 	     con = (cupsd_client_t *)cupsArrayNext(Clients))
-	  if (con->http.state == HTTP_WAITING)
+	  if (httpGetState(con->http) == HTTP_WAITING)
 	    cupsdCloseClient(con);
 	  else
-	    con->http.keep_alive = HTTP_KEEPALIVE_OFF;
+	    con->http->keep_alive = HTTP_KEEPALIVE_OFF;
 
         cupsdPauseListening();
       }
@@ -825,7 +825,7 @@ main(int  argc,				/* I - Number of command-line args */
 	   i ++, con = (cupsd_client_t *)cupsArrayNext(Clients))
         cupsdLogMessage(CUPSD_LOG_EMERG,
 	                "Clients[%d] = %d, file = %d, state = %d",
-	                i, con->http.fd, con->file, con->http.state);
+	                i, con->number, con->file, httpGetState(con->http));
 
       for (i = 0, lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
            lis;
@@ -962,7 +962,8 @@ main(int  argc,				/* I - Number of command-line args */
       * Process pending data in the input buffer...
       */
 
-      if (con->http.used)
+      // TODO: Use httpGetReady()
+      if (con->http->used)
       {
         cupsdReadClient(con);
 	continue;
@@ -972,12 +973,13 @@ main(int  argc,				/* I - Number of command-line args */
       * Check the activity and close old clients...
       */
 
+      // TODO: Use httpGetActivity()
       activity = current_time - Timeout;
-      if (con->http.activity < activity && !con->pipe_pid)
+      if (con->http->activity < activity && !con->pipe_pid)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "Closing client %d after %d seconds of inactivity...",
-	                con->http.fd, Timeout);
+	                con->number, Timeout);
 
         cupsdCloseClient(con);
         continue;
@@ -1776,10 +1778,11 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * processed; if so, the timeout should be 0...
   */
 
+  // TODO: Use httpGetReady()
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
        con = (cupsd_client_t *)cupsArrayNext(Clients))
-    if (con->http.used > 0)
+    if (con->http->used > 0)
       return (0);
 
  /*
@@ -1830,12 +1833,13 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * Check the activity and close old clients...
   */
 
+  // TODO: Use httpGetActivity()
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
        con = (cupsd_client_t *)cupsArrayNext(Clients))
-    if ((con->http.activity + Timeout) < timeout)
+    if ((con->http->activity + Timeout) < timeout)
     {
-      timeout = con->http.activity + Timeout;
+      timeout = con->http->activity + Timeout;
       why     = "timeout a client connection";
     }
 

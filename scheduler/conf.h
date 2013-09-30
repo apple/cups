@@ -279,6 +279,9 @@ extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
 extern int	cupsdDefaultAuthType(void);
 extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
+extern int	cupsdLogClient(cupsd_client_t *con, int level,
+                               const char *message, ...)
+                               __attribute__((__format__(__printf__, 3, 4)));
 extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result,
 		                  const char *message);
 #ifdef HAVE_GSSAPI

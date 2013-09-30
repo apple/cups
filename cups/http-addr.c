@@ -1,32 +1,16 @@
 /*
  * "$Id$"
  *
- *   HTTP address routines for CUPS.
+ * HTTP address routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   httpAddrAny()	 - Check for the "any" address.
- *   httpAddrEqual()	 - Compare two addresses.
- *   httpAddrLength()	 - Return the length of the address in bytes.
- *   httpAddrListen()	 - Create a listening socket bound to the specified
- *			   address and port.
- *   httpAddrLocalhost() - Check for the local loopback address.
- *   httpAddrLookup()	 - Lookup the hostname associated with the address.
- *   httpAddrPort()	 - Get the port number associated with an address.
- *   _httpAddrSetPort()  - Set the port number associated with an address.
- *   httpAddrString()	 - Convert an address to a numeric string.
- *   httpGetHostByName() - Lookup a hostname or IPv4 address, and return
- *			   address records for the specified name.
- *   httpGetHostname()	 - Get the FQDN for the connection or local system.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -565,6 +549,24 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
   DEBUG_printf(("1httpAddrString: returning \"%s\"...", s));
 
   return (s);
+}
+
+
+/*
+ * 'httpGetAddress()' - Get the address of the connected peer of a connection.
+ *
+ * Returns @code NULL@ if the socket is currently unconnected.
+ *
+ * @since CUPS 2.0@
+ */
+
+http_addr_t *				/* O - Connected address or @code NULL@ */
+httpGetAddress(http_t *http)		/* I - HTTP connection */
+{
+  if (http)
+    return (http->hostaddr);
+  else
+    return (NULL);
 }
 
 

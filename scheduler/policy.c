@@ -293,7 +293,7 @@ cupsdGetPrivateAttrs(
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdGetPrivateAttrs(policy=%p(%s), con=%p(%d), "
 		  "printer=%p(%s), owner=\"%s\")", policy, policy->name, con,
-		  con->http.fd, printer, printer ? printer->name : "", owner);
+		  con->number, printer, printer ? printer->name : "", owner);
 #endif /* DEBUG */
 
  /*

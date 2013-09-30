@@ -1,17 +1,16 @@
-/* config.h.  Generated from config.h.in by configure.  */
 /*
  * "$Id$"
  *
- *   Configuration file for CUPS.
+ * Configuration file for CUPS and Xcode.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -21,8 +20,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.7.0"
-#define CUPS_MINIMAL "CUPS/1.7.0"
+#define CUPS_SVERSION "CUPS v2.0.0"
+#define CUPS_MINIMAL "CUPS/2.0.0"
 
 
 /*
@@ -33,6 +32,7 @@
 #define CUPS_DEFAULT_GROUP "_lp"
 #define CUPS_DEFAULT_SYSTEM_GROUPS "admin"
 #define CUPS_DEFAULT_PRINTOPERATOR_AUTH "@AUTHKEY(system.print.operator) @admin @lpadmin"
+#define CUPS_DEFAULT_SYSTEM_AUTHKEY "system.print.admin"
 
 
 /*

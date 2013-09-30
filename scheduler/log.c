@@ -1,28 +1,16 @@
 /*
  * "$Id$"
  *
- *   Log file routines for the CUPS scheduler.
+ * Log file routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCheckLogFile()     - Open/rotate a log file if it needs it.
- *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
- *   cupsdLogGSSMessage() - Log a GSSAPI error...
- *   cupsdLogJob()        - Log a job message.
- *   cupsdLogMessage()    - Log a message to the error log file.
- *   cupsdLogPage()       - Log a page to the page log file.
- *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
- *   cupsdWriteErrorLog() - Write a line to the ErrorLog.
- *   format_log_line()    - Format a line for a log file.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -439,6 +427,61 @@ cupsdLogGSSMessage(
 
 
 /*
+ * 'cupsdLogClient()' - Log a client message.
+ */
+
+int					/* O - 1 on success, 0 on error */
+cupsdLogClient(cupsd_client_t *con,	/* I - Client connection */
+               int            level,	/* I - Log level */
+               const char     *message,	/* I - Printf-style message string */
+               ...)			/* I - Additional arguments as needed */
+{
+  va_list		ap, ap2;	/* Argument pointers */
+  char			clientmsg[1024];/* Format string for client message */
+  int			status;		/* Formatting status */
+
+
+ /*
+  * See if we want to log this message...
+  */
+
+  if (TestConfigFile || !ErrorLog)
+    return (1);
+
+  if (level > LogLevel)
+    return (1);
+
+ /*
+  * Format and write the log message...
+  */
+
+  if (con)
+    snprintf(clientmsg, sizeof(clientmsg), "[Client %d] %s", con->number,
+             message);
+  else
+    strlcpy(clientmsg, message, sizeof(clientmsg));
+
+  va_start(ap, message);
+
+  do
+  {
+    va_copy(ap2, ap);
+    status = format_log_line(clientmsg, ap2);
+    va_end(ap2);
+  }
+  while (status == 0);
+
+  va_end(ap);
+
+  if (status > 0)
+    return (cupsdWriteErrorLog(level, log_line));
+  else
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line."));
+}
+
+
+/*
  * 'cupsdLogJob()' - Log a job message.
  */
 
@@ -537,7 +580,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   }
   else
     return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
-                               "Unable to allocate memory for log line!"));
+                               "Unable to allocate memory for log line."));
 }
 
 
@@ -940,9 +983,9 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   {
     syslog(LOG_INFO,
            "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
-           con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+           con->http->hostname, con->username[0] != '\0' ? con->username : "-",
 	   states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)),
-	   con->http.version / 100, con->http.version % 100,
+	   con->http->version / 100, con->http->version % 100,
 	   code, CUPS_LLCAST con->bytes,
 	   con->request ?
 	       ippOpString(con->request->request.op.operation_id) : "-",
@@ -966,12 +1009,12 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   cupsFilePrintf(AccessFile,
                  "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
-        	 con->http.hostname,
+        	 con->http->hostname,
 		 con->username[0] != '\0' ? con->username : "-",
 		 cupsdGetDateTime(&(con->start), LogTimeFormat),
 		 states[con->operation],
 		 _httpEncodeURI(temp, con->uri, sizeof(temp)),
-		 con->http.version / 100, con->http.version % 100,
+		 con->http->version / 100, con->http->version % 100,
 		 code, CUPS_LLCAST con->bytes,
 		 con->request ?
 		     ippOpString(con->request->request.op.operation_id) : "-",

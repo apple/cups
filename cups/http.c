@@ -1,144 +1,21 @@
 /*
  * "$Id$"
  *
- *   HTTP routines for CUPS.
+ * HTTP routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   This file contains Kerberos support code, copyright 2006 by
- *   Jelmer Vernooij.
+ * This file contains Kerberos support code, copyright 2006 by
+ * Jelmer Vernooij.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   httpAcceptConnection()	  - Accept a new HTTP client connection from
- *				    the specified listening socket.
- *   httpAddCredential()	  - Allocates and adds a single credential to
- *				    an array.
- *   _httpBIOMethods()		  - Get the OpenSSL BIO methods for HTTP
- *				    connections.
- *   httpBlocking()		  - Set blocking/non-blocking behavior on a
- *				    connection.
- *   httpCheck()		  - Check to see if there is a pending response
- *				    from the server.
- *   httpClearCookie()		  - Clear the cookie value(s).
- *   httpClearFields()		  - Clear HTTP request fields.
- *   httpClose()		  - Close an HTTP connection.
- *   httpConnect()		  - Connect to a HTTP server.
- *   httpConnect2()		  - Connect to a HTTP server.
- *   httpConnectEncrypt()	  - Connect to a HTTP server using encryption.
- *   httpCopyCredentials()	  - Copy the credentials associated with an
- *				    encrypted connection.
- *   _httpCreateCredentials()	  - Create credentials in the internal format.
- *   httpDelete()		  - Send a DELETE request to the server.
- *   _httpDisconnect()		  - Disconnect a HTTP connection.
- *   httpEncryption()		  - Set the required encryption on the link.
- *   httpError()		  - Get the last error on a connection.
- *   httpFlush()		  - Flush data from a HTTP connection.
- *   httpFlushWrite()		  - Flush data in write buffer.
- *   _httpFreeCredentials()	  - Free internal credentials.
- *   httpFreeCredentials()	  - Free an array of credentials.
- *   httpGet()			  - Send a GET request to the server.
- *   httpGetAuthString()	  - Get the current authorization string.
- *   httpGetBlocking()		  - Get the blocking/non-block state of a
- *				    connection.
- *   httpGetContentEncoding()	  - Get a common content encoding, if any,
- *				    between the client and server.
- *   httpGetCookie()		  - Get any cookie data from the response.
- *   httpGetExpect()		  - Get the value of the Expect header, if any.
- *   httpGetFd()		  - Get the file descriptor associated with a
- *				    connection.
- *   httpGetField()		  - Get a field value from a request/response.
- *   httpGetLength()		  - Get the amount of data remaining from the
- *				    content-length or transfer-encoding fields.
- *   httpGetLength2()		  - Get the amount of data remaining from the
- *				    content-length or transfer-encoding fields.
- *   httpGets() 		  - Get a line of text from a HTTP connection.
- *   httpGetState()		  - Get the current state of the HTTP request.
- *   httpGetStatus()		  - Get the status of the last HTTP request.
- *   httpGetSubField()		  - Get a sub-field value.
- *   httpGetSubField2() 	  - Get a sub-field value.
- *   httpGetVersion()		  - Get the HTTP version at the other end.
- *   httpHead() 		  - Send a HEAD request to the server.
- *   httpInitialize()		  - Initialize the HTTP interface library and
- *				    set the default HTTP proxy (if any).
- *   httpOptions()		  - Send an OPTIONS request to the server.
- *   httpPeek() 		  - Peek at data from a HTTP connection.
- *   httpPost() 		  - Send a POST request to the server.
- *   httpPrintf()		  - Print a formatted string to a HTTP
- *				    connection.
- *   httpPut()			  - Send a PUT request to the server.
- *   httpRead() 		  - Read data from a HTTP connection.
- *   httpRead2()		  - Read data from a HTTP connection.
- *   _httpReadCDSA()		  - Read function for the CDSA library.
- *   _httpReadGNUTLS()		  - Read function for the GNU TLS library.
- *   httpReadRequest()		  - Read a HTTP request from a connection.
- *   httpReconnect()		  - Reconnect to a HTTP server.
- *   httpReconnect2()		  - Reconnect to a HTTP server with timeout and
- *				    optional cancel.
- *   httpSetAuthString()	  - Set the current authorization string.
- *   httpSetCredentials()	  - Set the credentials associated with an
- *				    encrypted connection.
- *   httpSetCookie()		  - Set the cookie value(s).
- *   httpSetDefaultField()	  - Set the default value of an HTTP header.
- *   httpSetExpect()		  - Set the Expect: header in a request.
- *   httpSetField()		  - Set the value of an HTTP header.
- *   httpSetLength()		  - Set the content-length and
- *				    content-encoding.
- *   httpSetTimeout()		  - Set read/write timeouts and an optional
- *				    callback.
- *   httpTrace()		  - Send an TRACE request to the server.
- *   _httpUpdate()		  - Update the current HTTP status for incoming
- *				    data.
- *   httpUpdate()		  - Update the current HTTP state for incoming
- *				    data.
- *   _httpWait()		  - Wait for data available on a connection (no
- *				    flush).
- *   httpWait() 		  - Wait for data available on a connection.
- *   httpWrite()		  - Write data to a HTTP connection.
- *   httpWrite2()		  - Write data to a HTTP connection.
- *   _httpWriteCDSA()		  - Write function for the CDSA library.
- *   _httpWriteGNUTLS() 	  - Write function for the GNU TLS library.
- *   httpWriteResponse()	  - Write a HTTP response to a client
- *				    connection.
- *   http_bio_ctrl()		  - Control the HTTP connection.
- *   http_bio_free()		  - Free OpenSSL data.
- *   http_bio_new()		  - Initialize an OpenSSL BIO structure.
- *   http_bio_puts()		  - Send a string for OpenSSL.
- *   http_bio_read()		  - Read data for OpenSSL.
- *   http_bio_write()		  - Write data for OpenSSL.
- *   http_content_coding_finish() - Finish doing any content encoding.
- *   http_content_coding_start()  - Start doing content encoding.
- *   http_create()		  - Create an unconnected HTTP connection.
- *   http_debug_hex()		  - Do a hex dump of a buffer.
- *   http_field()		  - Return the field index for a field name.
- *   http_read()		  - Read a buffer from a HTTP connection.
- *   http_read_buffered()	  - Do a buffered read from a HTTP connection.
- *   http_read_chunk()		  - Read a chunk from a HTTP connection.
- *   http_read_ssl()		  - Read from a SSL/TLS connection.
- *   http_send()		  - Send a request with all fields and the
- *				    trailing blank line.
- *   http_set_credentials()	  - Set the SSL/TLS credentials.
- *   http_set_length()		  - Set the data_encoding and data_remaining
- *				    values.
- *   http_set_timeout() 	  - Set the socket timeout values.
- *   http_set_wait()		  - Set the default wait value for reads.
- *   http_setup_ssl()		  - Set up SSL/TLS support on a connection.
- *   http_shutdown_ssl()	  - Shut down SSL/TLS on a connection.
- *   http_state_string()          - Return the string associated with a given
- *                                  HTTP state.
- *   http_upgrade()		  - Force upgrade to TLS encryption.
- *   http_write()		  - Write a buffer to a HTTP connection.
- *   http_write_chunk() 	  - Write a chunked buffer.
- *   http_write_ssl()		  - Write to a SSL/TLS connection.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*

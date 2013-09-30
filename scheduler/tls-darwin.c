@@ -37,14 +37,14 @@ static int		make_certificate(cupsd_client_t *con);
 int					/* O - 1 on success, 0 on error */
 cupsdEndTLS(cupsd_client_t *con)	/* I - Client connection */
 {
-  while (SSLClose(con->http.tls) == errSSLWouldBlock)
+  while (SSLClose(con->http->tls) == errSSLWouldBlock)
     usleep(1000);
 
-  CFRelease(con->http.tls);
-  con->http.tls = NULL;
+  CFRelease(con->http->tls);
+  con->http->tls = NULL;
 
-  if (con->http.tls_credentials)
-    CFRelease(con->http.tls_credentials);
+  if (con->http->tls_credentials)
+    CFRelease(con->http->tls_credentials);
 
   return (1);
 }
@@ -62,21 +62,21 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
-                  con->http.fd);
+                  con->number);
 
-  con->http.tls_credentials = copy_cdsa_certificate(con);
+  con->http->tls_credentials = copy_cdsa_certificate(con);
 
-  if (!con->http.tls_credentials)
+  if (!con->http->tls_credentials)
   {
    /*
     * No keychain (yet), make a self-signed certificate...
     */
 
     if (make_certificate(con))
-      con->http.tls_credentials = copy_cdsa_certificate(con);
+      con->http->tls_credentials = copy_cdsa_certificate(con);
   }
 
-  if (!con->http.tls_credentials)
+  if (!con->http->tls_credentials)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
         	    "Could not find signing key in keychain \"%s\"",
@@ -85,17 +85,17 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   }
 
   if (!error)
-    con->http.tls = SSLCreateContext(kCFAllocatorDefault, kSSLServerSide,
+    con->http->tls = SSLCreateContext(kCFAllocatorDefault, kSSLServerSide,
                                      kSSLStreamType);
 
   if (!error)
-    error = SSLSetIOFuncs(con->http.tls, _httpReadCDSA, _httpWriteCDSA);
+    error = SSLSetIOFuncs(con->http->tls, _httpReadCDSA, _httpWriteCDSA);
 
   if (!error)
-    error = SSLSetConnection(con->http.tls, HTTP(con));
+    error = SSLSetConnection(con->http->tls, HTTP(con));
 
   if (!error)
-    error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
+    error = SSLSetCertificate(con->http->tls, con->http->tls_credentials);
 
   if (!error)
   {
@@ -103,7 +103,7 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
     * Perform SSL/TLS handshake
     */
 
-    while ((error = SSLHandshake(con->http.tls)) == errSSLWouldBlock)
+    while ((error = SSLHandshake(con->http->tls)) == errSSLWouldBlock)
       usleep(1000);
   }
 
@@ -111,30 +111,30 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to encrypt connection from %s - %s (%d)",
-                    con->http.hostname, cssmErrorString(error), (int)error);
+                    con->http->hostname, cssmErrorString(error), (int)error);
 
-    con->http.error  = error;
-    con->http.status = HTTP_ERROR;
+    con->http->error  = error;
+    con->http->status = HTTP_ERROR;
 
-    if (con->http.tls)
+    if (con->http->tls)
     {
-      CFRelease(con->http.tls);
-      con->http.tls = NULL;
+      CFRelease(con->http->tls);
+      con->http->tls = NULL;
     }
 
-    if (con->http.tls_credentials)
+    if (con->http->tls_credentials)
     {
-      CFRelease(con->http.tls_credentials);
-      con->http.tls_credentials = NULL;
+      CFRelease(con->http->tls_credentials);
+      con->http->tls_credentials = NULL;
     }
 
     return (0);
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
+                  con->http->hostname);
 
-  if (!SSLCopyPeerTrust(con->http.tls, &peerTrust) && peerTrust)
+  if (!SSLCopyPeerTrust(con->http->tls, &peerTrust) && peerTrust)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates.",
 		    (int)SecTrustGetCertificateCount(peerTrust));

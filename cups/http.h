@@ -1,18 +1,18 @@
 /*
  * "$Id$"
  *
- *   Hyper-Text Transport Protocol definitions for CUPS.
+ * Hyper-Text Transport Protocol definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_HTTP_H_
@@ -585,7 +585,7 @@ extern int		httpReconnect2(http_t *http, int msec, int *cancel)
 			               _CUPS_API_1_6;
 
 
-/**** New in CUPS 1.7 ****/
+/**** New in CUPS 1.7/OS X 10.9 ****/
 extern http_t		*httpAcceptConnection(int fd, int blocking)
 			                      _CUPS_API_1_7;
 extern http_addrlist_t	*httpAddrCopyList(http_addrlist_t *src) _CUPS_API_1_7;
@@ -612,6 +612,13 @@ extern void		httpSetDefaultField(http_t *http, http_field_t field,
 extern http_state_t	httpWriteResponse(http_t *http,
 			                  http_status_t status) _CUPS_API_1_7;
 
+
+/**** New in CUPS 2.0 ****/
+extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;
+extern http_addr_t	*httpGetAddress(http_t *http) _CUPS_API_2_0;
+extern http_keepalive_t	httpGetKeepAlive(http_t *http) _CUPS_API_2_0;
+extern size_t		httpGetReady(http_t *http) _CUPS_API_2_0;
+extern void		httpSetKeepAlive(http_t *http) _CUPS_API_2_0;
 
 /*
  * C++ magic...

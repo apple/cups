@@ -24,7 +24,8 @@
 
 struct cupsd_client_s
 {
-  http_t		http;		/* HTTP client connection */
+  int			number;		/* Connection number */
+  http_t		*http;		/* HTTP client connection */
   ipp_t			*request,	/* IPP request information */
 			*response;	/* IPP response information */
   cupsd_location_t	*best;		/* Best match for AAA */
@@ -53,7 +54,7 @@ struct cupsd_client_s
 #ifdef HAVE_SSL
   int			auto_ssl;	/* Automatic test for SSL/TLS */
 #endif /* HAVE_SSL */
-  http_addr_t		clientaddr;	/* Client address */
+  http_addr_t		clientaddr;	/* Client's server address */
   char			clientname[256];/* Client's server name for connection */
   int			clientport;	/* Client's server port for connection */
   char			servername[256];/* Server name for connection */
@@ -67,7 +68,7 @@ struct cupsd_client_s
 #endif /* HAVE_AUTHORIZATION_H */
 };
 
-#define HTTP(con) &((con)->http)
+#define HTTP(con) ((con)->http)
 
 
 /*
@@ -86,7 +87,9 @@ typedef struct
  * Globals...
  */
 
-VAR int			ListenBackLog	VALUE(SOMAXCONN),
+VAR int			LastClientNumber VALUE(0),
+					/* Last client connection number */
+			ListenBackLog	VALUE(SOMAXCONN),
 					/* Max backlog of pending connections */
 			LocalPort	VALUE(631),
 					/* Local port to use */
