@@ -4752,7 +4752,9 @@ timeout_cb(http_t *http,		/* I - Connection to server */
   int		buffered = 0;		/* Bytes buffered but not yet sent */
 
 
- /*
+  (void)user_data;
+
+  /*
   * If the socket still have data waiting to be sent to the printer (as can
   * happen if the printer runs out of paper), continue to wait until the output
   * buffer is empty...
@@ -4770,7 +4772,6 @@ timeout_cb(http_t *http,		/* I - Connection to server */
 
 #else					/* Windows (not possible) */
   (void)http;
-  (void)user_data;
 #endif /* SO_NWRITE */
 
   return (buffered > 0);

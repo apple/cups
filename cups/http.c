@@ -289,7 +289,7 @@ _httpBIOMethods(void)
  */
 
 void
-httpBlocking(http_t *http,		/* I - Connection to server */
+httpBlocking(http_t *http,		/* I - HTTP connection */
              int    b)			/* I - 1 = blocking, 0 = non-blocking */
 {
   if (http)
@@ -305,7 +305,7 @@ httpBlocking(http_t *http,		/* I - Connection to server */
  */
 
 int					/* O - 0 = no data, 1 = data available */
-httpCheck(http_t *http)			/* I - Connection to server */
+httpCheck(http_t *http)			/* I - HTTP connection */
 {
   return (httpWait(http, 0));
 }
@@ -318,7 +318,7 @@ httpCheck(http_t *http)			/* I - Connection to server */
  */
 
 void
-httpClearCookie(http_t *http)		/* I - Connection to server */
+httpClearCookie(http_t *http)		/* I - HTTP connection */
 {
   if (!http)
     return;
@@ -336,7 +336,7 @@ httpClearCookie(http_t *http)		/* I - Connection to server */
  */
 
 void
-httpClearFields(http_t *http)		/* I - Connection to server */
+httpClearFields(http_t *http)		/* I - HTTP connection */
 {
   DEBUG_printf(("httpClearFields(http=%p)", http));
 
@@ -386,7 +386,7 @@ httpClearFields(http_t *http)		/* I - Connection to server */
  */
 
 void
-httpClose(http_t *http)			/* I - Connection to server */
+httpClose(http_t *http)			/* I - HTTP connection */
 {
 #ifdef HAVE_GSSAPI
   OM_uint32	minor_status;		/* Minor status code */
@@ -537,7 +537,7 @@ httpConnectEncrypt(
 
 int					/* O - Status of call (0 = success) */
 httpCopyCredentials(
-    http_t	 *http,			/* I - Connection to server */
+    http_t	 *http,			/* I - HTTP connection */
     cups_array_t **credentials)		/* O - Array of credentials */
 {
 #  ifdef HAVE_LIBSSL
@@ -661,7 +661,7 @@ _httpCreateCredentials(
  */
 
 int					/* O - Status of call (0 = success) */
-httpDelete(http_t     *http,		/* I - Connection to server */
+httpDelete(http_t     *http,		/* I - HTTP connection */
            const char *uri)		/* I - URI to delete */
 {
   return (http_send(http, HTTP_STATE_DELETE, uri));
@@ -673,7 +673,7 @@ httpDelete(http_t     *http,		/* I - Connection to server */
  */
 
 void
-_httpDisconnect(http_t *http)		/* I - Connection to server */
+_httpDisconnect(http_t *http)		/* I - HTTP connection */
 {
 #ifdef HAVE_SSL
   if (http->tls)
@@ -695,7 +695,7 @@ _httpDisconnect(http_t *http)		/* I - Connection to server */
  */
 
 int					/* O - -1 on error, 0 on success */
-httpEncryption(http_t            *http,	/* I - Connection to server */
+httpEncryption(http_t            *http,	/* I - HTTP connection */
                http_encryption_t e)	/* I - New encryption preference */
 {
   DEBUG_printf(("httpEncryption(http=%p, e=%d)", http, e));
@@ -727,7 +727,7 @@ httpEncryption(http_t            *http,	/* I - Connection to server */
  */
 
 int					/* O - Error code (errno) value */
-httpError(http_t *http)			/* I - Connection to server */
+httpError(http_t *http)			/* I - HTTP connection */
 {
   if (http)
     return (http->error);
@@ -741,7 +741,7 @@ httpError(http_t *http)			/* I - Connection to server */
  */
 
 void
-httpFlush(http_t *http)			/* I - Connection to server */
+httpFlush(http_t *http)			/* I - HTTP connection */
 {
   char		buffer[8192];		/* Junk buffer */
   int		blocking;		/* To block or not to block */
@@ -818,7 +818,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
  */
 
 int					/* O - Bytes written or -1 on error */
-httpFlushWrite(http_t *http)		/* I - Connection to server */
+httpFlushWrite(http_t *http)		/* I - HTTP connection */
 {
   int	bytes;				/* Bytes written */
 
@@ -902,10 +902,25 @@ httpFreeCredentials(
  */
 
 int					/* O - Status of call (0 = success) */
-httpGet(http_t     *http,		/* I - Connection to server */
+httpGet(http_t     *http,		/* I - HTTP connection */
         const char *uri)		/* I - URI to get */
 {
   return (http_send(http, HTTP_STATE_GET, uri));
+}
+
+
+/*
+ * 'httpGetActivity()' - Get the most recent activity for a connection.
+ *
+ * The return value is the UNIX time of the last read or write.
+ *
+ * @since CUPS 2.0@
+ */
+
+time_t					/* O - Time of last read or write */
+httpGetActivity(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->activity : 0);
 }
 
 
@@ -921,7 +936,7 @@ httpGet(http_t     *http,		/* I - Connection to server */
  */
 
 char *					/* O - Authorization string */
-httpGetAuthString(http_t *http)		/* I - Connection to server */
+httpGetAuthString(http_t *http)		/* I - HTTP connection */
 {
   if (http)
     return (http->authstring);
@@ -937,7 +952,7 @@ httpGetAuthString(http_t *http)		/* I - Connection to server */
  */
 
 int					/* O - 1 if blocking, 0 if non-blocking */
-httpGetBlocking(http_t *http)		/* I - Connection to server */
+httpGetBlocking(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->blocking : 0);
 }
@@ -1070,7 +1085,7 @@ httpGetExpect(http_t *http)		/* I - Connection to client */
  */
 
 int					/* O - File descriptor or -1 if none */
-httpGetFd(http_t *http)			/* I - Connection to server */
+httpGetFd(http_t *http)			/* I - HTTP connection */
 {
   return (http ? http->fd : -1);
 }
@@ -1081,7 +1096,7 @@ httpGetFd(http_t *http)			/* I - Connection to server */
  */
 
 const char *				/* O - Field value */
-httpGetField(http_t       *http,	/* I - Connection to server */
+httpGetField(http_t       *http,	/* I - HTTP connection */
              http_field_t field)	/* I - Field to get */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
@@ -1116,6 +1131,19 @@ httpGetField(http_t       *http,	/* I - Connection to server */
 
 
 /*
+ * 'httpGetKeepAlive()' - Get the current Keep-Alive state of the connection.
+ *
+ * @since CUPS 2.0@
+ */
+
+http_keepalive_t			/* O - Keep-Alive state */
+httpGetKeepAlive(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->keep_alive : HTTP_KEEPALIVE_OFF);
+}
+
+
+/*
  * 'httpGetLength()' - Get the amount of data remaining from the
  *                     content-length or transfer-encoding fields.
  *
@@ -1126,7 +1154,7 @@ httpGetField(http_t       *http,	/* I - Connection to server */
  */
 
 int					/* O - Content length */
-httpGetLength(http_t *http)		/* I - Connection to server */
+httpGetLength(http_t *http)		/* I - HTTP connection */
 {
  /*
   * Get the read content length and return the 32-bit value.
@@ -1154,7 +1182,7 @@ httpGetLength(http_t *http)		/* I - Connection to server */
  */
 
 off_t					/* O - Content length */
-httpGetLength2(http_t *http)		/* I - Connection to server */
+httpGetLength2(http_t *http)		/* I - HTTP connection */
 {
   off_t			remaining;	/* Remaining length */
 
@@ -1212,13 +1240,48 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
 
 
 /*
+ * 'httpGetReady()' - Get the number of bytes that can be read without blocking.
+ *
+ * @since CUPS 2.0@
+ */
+
+size_t					/* O - Number of bytes available */
+httpGetReady(http_t *http)		/* I - HTTP connection */
+{
+  if (!http)
+    return (0);
+  else if (http->used > 0)
+    return (http->used);
+#ifdef HAVE_SSL
+  else if (http->tls)
+  {
+    size_t	ready;			/* Ready bytes */
+
+#  ifdef HAVE_LIBSSL
+    if ((ready = SSL_pending((SSL *)(http->tls))) > 0)
+      return (ready);
+#  elif defined(HAVE_GNUTLS)
+    if ((ready = gnutls_record_check_pending(http->tls)) > 0)
+      return (ready);
+#  elif defined(HAVE_CDSASSL)
+    if (!SSLGetBufferedReadSize(http->tls, &ready) && ready > 0)
+      return (ready);
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
+
+  return (0);
+}
+
+
+/*
  * 'httpGets()' - Get a line of text from a HTTP connection.
  */
 
 char *					/* O - Line or NULL */
 httpGets(char   *line,			/* I - Line to read into */
          int    length,			/* I - Max length of buffer */
-	 http_t *http)			/* I - Connection to server */
+	 http_t *http)			/* I - HTTP connection */
 {
   char	*lineptr,			/* Pointer into line */
 	*lineend,			/* End of line */
@@ -1390,7 +1453,7 @@ httpGets(char   *line,			/* I - Line to read into */
  */
 
 http_state_t				/* O - HTTP state */
-httpGetState(http_t *http)		/* I - Connection to server */
+httpGetState(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->state : HTTP_STATE_ERROR);
 }
@@ -1403,7 +1466,7 @@ httpGetState(http_t *http)		/* I - Connection to server */
  */
 
 http_status_t				/* O - HTTP status */
-httpGetStatus(http_t *http)		/* I - Connection to server */
+httpGetStatus(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->status : HTTP_STATUS_ERROR);
 }
@@ -1416,7 +1479,7 @@ httpGetStatus(http_t *http)		/* I - Connection to server */
  */
 
 char *					/* O - Value or NULL */
-httpGetSubField(http_t       *http,	/* I - Connection to server */
+httpGetSubField(http_t       *http,	/* I - HTTP connection */
                 http_field_t field,	/* I - Field index */
                 const char   *name,	/* I - Name of sub-field */
 		char         *value)	/* O - Value string */
@@ -1432,7 +1495,7 @@ httpGetSubField(http_t       *http,	/* I - Connection to server */
  */
 
 char *					/* O - Value or NULL */
-httpGetSubField2(http_t       *http,	/* I - Connection to server */
+httpGetSubField2(http_t       *http,	/* I - HTTP connection */
                  http_field_t field,	/* I - Field index */
                  const char   *name,	/* I - Name of sub-field */
 		 char         *value,	/* O - Value string */
@@ -1562,7 +1625,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
  */
 
 http_version_t				/* O - Version number */
-httpGetVersion(http_t *http)		/* I - Connection to server */
+httpGetVersion(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->version : HTTP_VERSION_1_0);
 }
@@ -1573,7 +1636,7 @@ httpGetVersion(http_t *http)		/* I - Connection to server */
  */
 
 int					/* O - Status of call (0 = success) */
-httpHead(http_t     *http,		/* I - Connection to server */
+httpHead(http_t     *http,		/* I - HTTP connection */
          const char *uri)		/* I - URI for head */
 {
   DEBUG_printf(("httpHead(http=%p, uri=\"%s\")", http, uri));
@@ -1668,7 +1731,7 @@ httpInitialize(void)
  */
 
 int					/* O - Status of call (0 = success) */
-httpOptions(http_t     *http,		/* I - Connection to server */
+httpOptions(http_t     *http,		/* I - HTTP connection */
             const char *uri)		/* I - URI for options */
 {
   return (http_send(http, HTTP_STATE_OPTIONS, uri));
@@ -1688,7 +1751,7 @@ httpOptions(http_t     *http,		/* I - Connection to server */
  */
 
 ssize_t					/* O - Number of bytes copied */
-httpPeek(http_t *http,			/* I - Connection to server */
+httpPeek(http_t *http,			/* I - HTTP connection */
          char   *buffer,		/* I - Buffer for data */
 	 size_t length)			/* I - Maximum number of bytes */
 {
@@ -1941,7 +2004,7 @@ ssize_t _httpPeek(http_t *http, char *buffer, size_t length)
  */
 
 int					/* O - Status of call (0 = success) */
-httpPost(http_t     *http,		/* I - Connection to server */
+httpPost(http_t     *http,		/* I - HTTP connection */
          const char *uri)		/* I - URI for post */
 {
   return (http_send(http, HTTP_STATE_POST, uri));
@@ -1955,7 +2018,7 @@ httpPost(http_t     *http,		/* I - Connection to server */
  */
 
 int					/* O - Number of bytes written */
-httpPrintf(http_t     *http,		/* I - Connection to server */
+httpPrintf(http_t     *http,		/* I - HTTP connection */
            const char *format,		/* I - printf-style format string */
 	   ...)				/* I - Additional args as needed */
 {
@@ -1994,7 +2057,7 @@ httpPrintf(http_t     *http,		/* I - Connection to server */
  */
 
 int					/* O - Status of call (0 = success) */
-httpPut(http_t     *http,		/* I - Connection to server */
+httpPut(http_t     *http,		/* I - HTTP connection */
         const char *uri)		/* I - URI to put */
 {
   DEBUG_printf(("httpPut(http=%p, uri=\"%s\")", http, uri));
@@ -2012,7 +2075,7 @@ httpPut(http_t     *http,		/* I - Connection to server */
  */
 
 int					/* O - Number of bytes read */
-httpRead(http_t *http,			/* I - Connection to server */
+httpRead(http_t *http,			/* I - HTTP connection */
          char   *buffer,		/* I - Buffer for data */
 	 int    length)			/* I - Maximum number of bytes */
 {
@@ -2027,7 +2090,7 @@ httpRead(http_t *http,			/* I - Connection to server */
  */
 
 ssize_t					/* O - Number of bytes read */
-httpRead2(http_t *http,			/* I - Connection to server */
+httpRead2(http_t *http,			/* I - HTTP connection */
           char   *buffer,		/* I - Buffer for data */
 	  size_t length)		/* I - Maximum number of bytes */
 {
@@ -2311,7 +2374,7 @@ _httpReadCDSA(
 
 ssize_t					/* O - Number of bytes read or -1 on error */
 _httpReadGNUTLS(
-    gnutls_transport_ptr ptr,		/* I - Connection to server */
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
     void                 *data,		/* I - Buffer */
     size_t               length)	/* I - Number of bytes to read */
 {
@@ -2515,7 +2578,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
  */
 
 int					/* O - 0 on success, non-zero on failure */
-httpReconnect(http_t *http)		/* I - Connection to server */
+httpReconnect(http_t *http)		/* I - HTTP connection */
 {
   DEBUG_printf(("httpReconnect(http=%p)", http));
 
@@ -2529,7 +2592,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
  */
 
 int					/* O - 0 on success, non-zero on failure */
-httpReconnect2(http_t *http,		/* I - Connection to server */
+httpReconnect2(http_t *http,		/* I - HTTP connection */
 	       int    msec,		/* I - Timeout in milliseconds */
 	       int    *cancel)		/* I - Pointer to "cancel" variable */
 {
@@ -2670,7 +2733,7 @@ httpReconnect2(http_t *http,		/* I - Connection to server */
  */
 
 void
-httpSetAuthString(http_t     *http,	/* I - Connection to server */
+httpSetAuthString(http_t     *http,	/* I - HTTP connection */
                   const char *scheme,	/* I - Auth scheme (NULL to clear it) */
 		  const char *data)	/* I - Auth data (NULL for none) */
 {
@@ -2727,7 +2790,7 @@ httpSetAuthString(http_t     *http,	/* I - Connection to server */
  */
 
 int						/* O - Status of call (0 = success) */
-httpSetCredentials(http_t	*http,		/* I - Connection to server */
+httpSetCredentials(http_t	*http,		/* I - HTTP connection */
 		   cups_array_t *credentials)	/* I - Array of credentials */
 {
   if (!http || cupsArrayCount(credentials) < 1)
@@ -2774,7 +2837,7 @@ httpSetCookie(http_t     *http,		/* I - Connection */
  */
 
 void
-httpSetDefaultField(http_t       *http,	/* I - Connection to server */
+httpSetDefaultField(http_t       *http,	/* I - HTTP connection */
                     http_field_t field,	/* I - Field index */
 	            const char   *value)/* I - Value */
 {
@@ -2824,7 +2887,7 @@ httpSetDefaultField(http_t       *http,	/* I - Connection to server */
  */
 
 void
-httpSetExpect(http_t        *http,	/* I - Connection to server */
+httpSetExpect(http_t        *http,	/* I - HTTP connection */
               http_status_t expect)	/* I - HTTP status to expect
               				       (@code HTTP_STATUS_CONTINUE@) */
 {
@@ -2840,7 +2903,7 @@ httpSetExpect(http_t        *http,	/* I - Connection to server */
  */
 
 void
-httpSetField(http_t       *http,	/* I - Connection to server */
+httpSetField(http_t       *http,	/* I - HTTP connection */
              http_field_t field,	/* I - Field index */
 	     const char   *value)	/* I - Value */
 {
@@ -2943,13 +3006,29 @@ httpSetField(http_t       *http,	/* I - Connection to server */
 
 
 /*
+ * 'httpSetKeepAlive()' - Set the current Keep-Alive state of a connection.
+ *
+ * @since CUPS 2.0@
+ */
+
+void
+httpSetKeepAlive(
+    http_t           *http,		/* I - HTTP connection */
+    http_keepalive_t keep_alive)	/* I - New Keep-Alive value */
+{
+  if (http)
+    http->keep_alive = keep_alive;
+}
+
+
+/*
  * 'httpSetLength()' - Set the content-length and content-encoding.
  *
  * @since CUPS 1.2/OS X 10.5@
  */
 
 void
-httpSetLength(http_t *http,		/* I - Connection to server */
+httpSetLength(http_t *http,		/* I - HTTP connection */
               size_t length)		/* I - Length (0 for chunked) */
 {
   DEBUG_printf(("httpSetLength(http=%p, length=" CUPS_LLFMT ")", http,
@@ -2984,7 +3063,7 @@ httpSetLength(http_t *http,		/* I - Connection to server */
 
 void
 httpSetTimeout(
-    http_t            *http,		/* I - Connection to server */
+    http_t            *http,		/* I - HTTP connection */
     double            timeout,		/* I - Number of seconds for timeout,
                                                must be greater than 0 */
     http_timeout_cb_t cb,		/* I - Callback function or NULL */
@@ -3009,7 +3088,7 @@ httpSetTimeout(
  */
 
 int					/* O - Status of call (0 = success) */
-httpTrace(http_t     *http,		/* I - Connection to server */
+httpTrace(http_t     *http,		/* I - HTTP connection */
           const char *uri)		/* I - URI for trace */
 {
   return (http_send(http, HTTP_STATE_TRACE, uri));
@@ -3024,7 +3103,7 @@ httpTrace(http_t     *http,		/* I - Connection to server */
  */
 
 int					/* O - 1 to continue, 0 to stop */
-_httpUpdate(http_t        *http,	/* I - Connection to server */
+_httpUpdate(http_t        *http,	/* I - HTTP connection */
             http_status_t *status)	/* O - Current HTTP status */
 {
   char		line[32768],		/* Line from connection... */
@@ -3202,7 +3281,7 @@ _httpUpdate(http_t        *http,	/* I - Connection to server */
  */
 
 http_status_t				/* O - HTTP status */
-httpUpdate(http_t *http)		/* I - Connection to server */
+httpUpdate(http_t *http)		/* I - HTTP connection */
 {
   http_status_t	status;			/* Request status */
 
@@ -3266,7 +3345,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
  */
 
 int					/* O - 1 if data is available, 0 otherwise */
-_httpWait(http_t *http,			/* I - Connection to server */
+_httpWait(http_t *http,			/* I - HTTP connection */
           int    msec,			/* I - Milliseconds to wait */
 	  int    usessl)		/* I - Use SSL context? */
 {
@@ -3377,7 +3456,7 @@ _httpWait(http_t *http,			/* I - Connection to server */
  */
 
 int					/* O - 1 if data is available, 0 otherwise */
-httpWait(http_t *http,			/* I - Connection to server */
+httpWait(http_t *http,			/* I - HTTP connection */
          int    msec)			/* I - Milliseconds to wait */
 {
  /*
@@ -3433,7 +3512,7 @@ httpWait(http_t *http,			/* I - Connection to server */
  */
 
 int					/* O - Number of bytes written */
-httpWrite(http_t     *http,		/* I - Connection to server */
+httpWrite(http_t     *http,		/* I - HTTP connection */
           const char *buffer,		/* I - Buffer for data */
 	  int        length)		/* I - Number of bytes to write */
 {
@@ -3448,7 +3527,7 @@ httpWrite(http_t     *http,		/* I - Connection to server */
  */
 
 ssize_t					/* O - Number of bytes written */
-httpWrite2(http_t     *http,		/* I - Connection to server */
+httpWrite2(http_t     *http,		/* I - HTTP connection */
            const char *buffer,		/* I - Buffer for data */
 	   size_t     length)		/* I - Number of bytes to write */
 {
@@ -3677,7 +3756,7 @@ _httpWriteCDSA(
 
 ssize_t					/* O - Number of bytes written or -1 on error */
 _httpWriteGNUTLS(
-    gnutls_transport_ptr ptr,		/* I - Connection to server */
+    gnutls_transport_ptr ptr,		/* I - HTTP connection */
     const void           *data,		/* I - Data buffer */
     size_t               length)	/* I - Number of bytes to write */
 {
@@ -4393,7 +4472,7 @@ http_field(const char *name)		/* I - String name */
  */
 
 static ssize_t				/* O - Number of bytes read or -1 on error */
-http_read(http_t *http,			/* I - Connection to server */
+http_read(http_t *http,			/* I - HTTP connection */
           char   *buffer,		/* I - Buffer */
           size_t length)		/* I - Maximum bytes to read */
 {
@@ -4507,7 +4586,7 @@ http_read(http_t *http,			/* I - Connection to server */
  */
 
 static ssize_t				/* O - Number of bytes read or -1 on error */
-http_read_buffered(http_t *http,	/* I - Connection to server */
+http_read_buffered(http_t *http,	/* I - HTTP connection */
                    char   *buffer,	/* I - Buffer */
                    size_t length)	/* I - Maximum bytes to read */
 {
@@ -4549,7 +4628,7 @@ http_read_buffered(http_t *http,	/* I - Connection to server */
  */
 
 static ssize_t				/* O - Number of bytes read or -1 on error */
-http_read_chunk(http_t *http,		/* I - Connection to server */
+http_read_chunk(http_t *http,		/* I - HTTP connection */
 		char   *buffer,		/* I - Buffer */
 		size_t length)		/* I - Maximum bytes to read */
 {
@@ -4616,7 +4695,7 @@ http_read_chunk(http_t *http,		/* I - Connection to server */
  */
 
 static int				/* O - Bytes read */
-http_read_ssl(http_t *http,		/* I - Connection to server */
+http_read_ssl(http_t *http,		/* I - HTTP connection */
 	      char   *buf,		/* I - Buffer to store data */
 	      int    len)		/* I - Length of buffer */
 {
@@ -4706,7 +4785,7 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
  */
 
 static int				/* O - 0 on success, non-zero on error */
-http_send(http_t       *http,		/* I - Connection to server */
+http_send(http_t       *http,		/* I - HTTP connection */
           http_state_t request,		/* I - Request code */
 	  const char   *uri)		/* I - URI */
 {
@@ -4895,7 +4974,7 @@ http_send(http_t       *http,		/* I - Connection to server */
  */
 
 static int				/* O - Status of connection */
-http_set_credentials(http_t *http)	/* I - Connection to server */
+http_set_credentials(http_t *http)	/* I - HTTP connection */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   OSStatus		error = 0;	/* Error code */
@@ -5011,7 +5090,7 @@ http_set_timeout(int    fd,		/* I - File descriptor */
  */
 
 static void
-http_set_wait(http_t *http)		/* I - Connection to server */
+http_set_wait(http_t *http)		/* I - HTTP connection */
 {
   if (http->blocking)
   {
@@ -5031,7 +5110,7 @@ http_set_wait(http_t *http)		/* I - Connection to server */
  */
 
 static int				/* O - 0 on success, -1 on failure */
-http_setup_ssl(http_t *http)		/* I - Connection to server */
+http_setup_ssl(http_t *http)		/* I - HTTP connection */
 {
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
@@ -5443,7 +5522,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
  */
 
 static void
-http_shutdown_ssl(http_t *http)		/* I - Connection to server */
+http_shutdown_ssl(http_t *http)		/* I - HTTP connection */
 {
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
@@ -5529,7 +5608,7 @@ http_state_string(http_state_t state)	/* I - HTTP state */
  */
 
 static int				/* O - Status of connection */
-http_upgrade(http_t *http)		/* I - Connection to server */
+http_upgrade(http_t *http)		/* I - HTTP connection */
 {
   int		ret;			/* Return value */
   http_t	myhttp;			/* Local copy of HTTP data */
@@ -5618,7 +5697,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
  */
 
 static ssize_t				/* O - Number of bytes written */
-http_write(http_t     *http,		/* I - Connection to server */
+http_write(http_t     *http,		/* I - HTTP connection */
            const char *buffer,		/* I - Buffer for data */
 	   size_t     length)		/* I - Number of bytes to write */
 {
@@ -5766,7 +5845,7 @@ http_write(http_t     *http,		/* I - Connection to server */
  */
 
 static ssize_t				/* O - Number bytes written */
-http_write_chunk(http_t     *http,	/* I - Connection to server */
+http_write_chunk(http_t     *http,	/* I - HTTP connection */
                  const char *buffer,	/* I - Buffer to write */
 		 size_t        length)	/* I - Length of buffer */
 {
@@ -5810,7 +5889,7 @@ http_write_chunk(http_t     *http,	/* I - Connection to server */
  */
 
 static int				/* O - Bytes written */
-http_write_ssl(http_t     *http,	/* I - Connection to server */
+http_write_ssl(http_t     *http,	/* I - HTTP connection */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
