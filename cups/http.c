@@ -202,8 +202,12 @@ httpAcceptConnection(int fd,		/* I - Listen socket file descriptor */
     return (NULL);
   }
 
-  httpAddrString(&(http->addrlist->addr), http->hostname,
-		 sizeof(http->hostname));
+  http->hostaddr = &(http->addrlist->addr);
+
+  if (httpAddrLocalhost(http->hostaddr))
+    strlcpy(http->hostname, "localhost", sizeof(http->hostname));
+  else
+    httpAddrString(http->hostaddr, http->hostname, sizeof(http->hostname));
 
 #ifdef SO_NOSIGPIPE
  /*
@@ -1060,6 +1064,23 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
 
 
 /*
+ * 'httpGetEncryption()' - Get the current encryption mode of a connection.
+ *
+ * This function returns the encryption mode for the connection. Use the
+ * @link httpIsEncrypted@ function to determine whether a TLS session has
+ * been established.
+ *
+ * @since CUPS 2.0@
+ */
+
+http_encryption_t			/* O - Current encryption mode */
+httpGetEncryption(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->encryption : HTTP_ENCRYPTION_IF_REQUESTED);
+}
+
+
+/*
  * 'httpGetExpect()' - Get the value of the Expect header, if any.
  *
  * Returns @code HTTP_STATUS_NONE@ if there is no Expect header, otherwise
@@ -1271,6 +1292,23 @@ httpGetReady(http_t *http)		/* I - HTTP connection */
 #endif /* HAVE_SSL */
 
   return (0);
+}
+
+
+/*
+ * 'httpGetRemaining()' - Get the number of remaining bytes in the message
+ *                        body or current chunk.
+ *
+ * The @link httpIsChunked@ function can be used to determine whether the
+ * message body is chunked or fixed-length.
+ *
+ * @since CUPS 2.0@
+ */
+
+size_t					/* O - Remaining bytes */
+httpGetRemaining(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->data_remaining : 0);
 }
 
 
@@ -1723,6 +1761,37 @@ httpInitialize(void)
 
   initialized = 1;
   _cupsGlobalUnlock();
+}
+
+
+/*
+ * 'httpIsChunked()' - Report whether a message body is chunked.
+ *
+ * This function returns non-zero if the message body is composed of
+ * variable-length chunks.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 if chunked, 0 if not */
+httpIsChunked(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->data_encoding == HTTP_ENCODING_CHUNKED : 0);
+}
+
+
+/*
+ * 'httpIsEncrypted()' - Report whether a connection is encrypted.
+ *
+ * This function returns non-zero if the connection is currently encrypted.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 if encrypted, 0 if not */
+httpIsEncrypted(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->tls != NULL : 0);
 }
 
 
@@ -3084,6 +3153,25 @@ httpSetTimeout(
 
 
 /*
+ * 'httpShutdown()' - Shutdown one side of an HTTP connection.
+ *
+ * @since CUPS 2.0@
+ */
+
+void
+httpShutdown(http_t *http)		/* I - HTTP connection */
+{
+  if (!http || http->fd < 0)
+    return;
+
+  if (http->tls)
+    http_shutdown_ssl(http);
+
+  shutdown(http->fd, SHUT_RD);
+}
+
+
+/*
  * 'httpTrace()' - Send an TRACE request to the server.
  */
 
@@ -3812,7 +3900,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
   if (status >= HTTP_STATUS_BAD_REQUEST && http->keep_alive)
   {
-    http->keep_alive = 0;
+    http->keep_alive = HTTP_KEEPALIVE_OFF;
     httpSetField(http, HTTP_FIELD_KEEP_ALIVE, "");
   }
 

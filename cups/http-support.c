@@ -1,55 +1,18 @@
 /*
  * "$Id$"
  *
- *   HTTP support routines for CUPS.
+ * HTTP support routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   httpAssembleURI()	  - Assemble a uniform resource identifier from its
- *			    components.
- *   httpAssembleURIf()   - Assemble a uniform resource identifier from its
- *			    components with a formatted resource.
- *   httpAssembleUUID()   - Assemble a name-based UUID URN conforming to RFC
- *                          4122.
- *   httpDecode64()	  - Base64-decode a string.
- *   httpDecode64_2()	  - Base64-decode a string.
- *   httpEncode64()	  - Base64-encode a string.
- *   httpEncode64_2()	  - Base64-encode a string.
- *   httpGetDateString()  - Get a formatted date/time string from a time value.
- *   httpGetDateString2() - Get a formatted date/time string from a time value.
- *   httpGetDateTime()	  - Get a time value from a formatted date/time string.
- *   httpSeparate()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   httpSeparate2()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   httpSeparateURI()	  - Separate a Universal Resource Identifier into its
- *			    components.
- *   _httpStatus()        - Return the localized string describing a HTTP
- *                          status code.
- *   httpStatus()	  - Return a short string describing a HTTP status
- *			    code.
- *   _cups_hstrerror()	  - hstrerror() emulation function for Solaris and
- *			    others.
- *   _httpDecodeURI()	  - Percent-decode a HTTP request URI.
- *   _httpEncodeURI()	  - Percent-encode a HTTP request URI.
- *   _httpResolveURI()	  - Resolve a DNS-SD URI.
- *   http_client_cb()	  - Client callback for resolving URI.
- *   http_copy_decode()   - Copy and decode a URI.
- *   http_copy_encode()   - Copy and encode a URI.
- *   http_poll_cb()       - Wait for input on the specified file descriptors.
- *   http_resolve_cb()	  - Build a device URI for the given service name.
- *   http_resolve_cb()	  - Build a device URI for the given service name.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -94,7 +57,7 @@ typedef struct _http_uribuf_s		/* URI buffer */
  * Local globals...
  */
 
-static const char * const http_days[7] =
+static const char * const http_days[7] =/* Days of the week */
 			{
 			  "Sun",
 			  "Mon",
@@ -105,7 +68,7 @@ static const char * const http_days[7] =
 			  "Sat"
 			};
 static const char * const http_months[12] =
-			{
+			{		/* Months of the year */
 			  "Jan",
 			  "Feb",
 			  "Mar",
@@ -118,6 +81,26 @@ static const char * const http_months[12] =
 			  "Oct",
 			  "Nov",
 			  "Dec"
+			};
+static const char * const http_states[] =
+			{		/* HTTP state strings */
+			  "HTTP_STATE_ERROR",
+			  "HTTP_STATE_WAITING",
+			  "HTTP_STATE_OPTIONS",
+			  "HTTP_STATE_GET",
+			  "HTTP_STATE_GET_SEND",
+			  "HTTP_STATE_HEAD",
+			  "HTTP_STATE_POST",
+			  "HTTP_STATE_POST_RECV",
+			  "HTTP_STATE_POST_SEND",
+			  "HTTP_STATE_PUT",
+			  "HTTP_STATE_PUT_RECV",
+			  "HTTP_STATE_DELETE",
+			  "HTTP_STATE_TRACE",
+			  "HTTP_STATE_CONNECT",
+			  "HTTP_STATE_STATUS",
+			  "HTTP_STATE_UNKNOWN_METHOD",
+			  "HTTP_STATE_UNKNOWN_VERSION"
 			};
 
 
@@ -1321,6 +1304,22 @@ httpSeparateURI(
   */
 
   return (status);
+}
+
+
+/*
+ * 'httpStateString()' - Return the string describing a HTTP state value.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - State string */
+httpStateString(http_state_t state)	/* I - HTTP state value */
+{
+  if (state < HTTP_STATE_ERROR || state > HTTP_STATE_UNKNOWN_VERSION)
+    return ("HTTP_STATE_???");
+  else
+    return (http_states[state - HTTP_STATE_ERROR]);
 }
 
 

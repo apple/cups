@@ -346,6 +346,20 @@ httpAddrLookup(
 
 
 /*
+ * 'httpAddrFamily()' - Get the address family of an address.
+ */
+
+int					/* O - Address family */
+httpAddrFamily(http_addr_t *addr)	/* I - Address */
+{
+  if (addr)
+    return (addr->addr.sa_family);
+  else
+    return (0);
+}
+
+
+/*
  * 'httpAddrPort()' - Get the port number associated with an address.
  *
  * @since CUPS 1.7/OS X 10.9@
@@ -355,7 +369,7 @@ int					/* O - Port number */
 httpAddrPort(http_addr_t *addr)		/* I - Address */
 {
   if (!addr)
-    return (ippPort());
+    return (-1);
 #ifdef AF_INET6
   else if (addr->addr.sa_family == AF_INET6)
     return (ntohs(addr->ipv6.sin6_port));
@@ -363,7 +377,7 @@ httpAddrPort(http_addr_t *addr)		/* I - Address */
   else if (addr->addr.sa_family == AF_INET)
     return (ntohs(addr->ipv4.sin_port));
   else
-    return (ippPort());
+    return (0);
 }
 
 /* For OS X 10.8 and earlier */
@@ -694,12 +708,16 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
                 char   *s,		/* I - String buffer for name */
                 int    slen)		/* I - Size of buffer */
 {
-  if (!s || slen <= 1)
-    return (NULL);
-
   if (http)
   {
-    if (http->hostname[0] == '/')
+    if (!s || slen <= 1)
+    {
+      if (http->hostname[0] == '/')
+	return ("localhost");
+      else
+	return (http->hostname);
+    }
+    else if (http->hostname[0] == '/')
       strlcpy(s, "localhost", slen);
     else
       strlcpy(s, http->hostname, slen);
@@ -710,6 +728,9 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
     * Get the hostname...
     */
 
+    if (!s || slen <= 1)
+      return (NULL);
+    
     if (gethostname(s, slen) < 0)
       strlcpy(s, "localhost", slen);
 

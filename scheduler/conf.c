@@ -3035,7 +3035,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 #endif /* AF_LOCAL */
 	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv%d)", temp,
                         httpAddrPort(&(lis->address)),
-			_httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
+			httpAddrFamily(&(lis->address)) == AF_INET ? 4 : 6);
 
         if (!httpAddrLocalhost(&(lis->address)))
 	  RemotePort = httpAddrPort(&(lis->address));

@@ -1,51 +1,19 @@
 /*
  * "$Id$"
  *
- *   Authorization routines for the CUPS scheduler.
+ * Authorization routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   This file contains Kerberos support code, copyright 2006 by
- *   Jelmer Vernooij.
+ * This file contains Kerberos support code, copyright 2006 by
+ * Jelmer Vernooij.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddIPMask()          - Add an IP address authorization mask.
- *   cupsdAddLocation()        - Add a location for authorization.
- *   cupsdAddName()            - Add a name to a location...
- *   cupsdAddNameMask()        - Add a host or interface name authorization
- *                               mask.
- *   cupsdAuthorize()          - Validate any authorization credentials.
- *   cupsdCheckAccess()        - Check whether the given address is allowed to
- *                               access a location.
- *   cupsdCheckAuth()          - Check authorization masks.
- *   cupsdCheckGroup()         - Check for a user's group membership.
- *   cupsdCopyLocation()       - Make a copy of a location...
- *   cupsdDeleteAllLocations() - Free all memory used for location
- *                               authorization.
- *   cupsdFindBest()           - Find the location entry that best matches the
- *                               resource.
- *   cupsdFindLocation()       - Find the named location.
- *   cupsdFreeLocation()       - Free all memory used by a location.
- *   cupsdIsAuthorized()       - Check to see if the user is authorized...
- *   cupsdNewLocation()        - Create a new location for authorization.
- *   check_authref()           - Check if an authorization services reference
- *                               has the supplied right.
- *   compare_locations()       - Compare two locations.
- *   copy_authmask()           - Copy function for auth masks.
- *   cups_crypt()              - Encrypt the password using the DES or MD5
- *                               algorithms, as needed.
- *   free_authmask()           - Free function for auth masks.
- *   get_md5_password()        - Get an MD5 password.
- *   pam_func()                - PAM conversation function.
- *   to64()                    - Base64-encode an integer value...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -408,7 +376,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   }
 #ifdef HAVE_AUTHORIZATION_H
   else if (!strncmp(authorization, "AuthRef ", 8) &&
-           !_cups_strcasecmp(con->http->hostname, "localhost"))
+           httpAddrLocalhost(httpGetAddress(con->http)))
   {
     OSStatus		status;		/* Status */
     int			authlen;	/* Auth string length */
@@ -601,7 +569,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   }
 #endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
-           !_cups_strcasecmp(con->http->hostname, "localhost"))
+	   httpAddrLocalhost(httpGetAddress(con->http)))
   {
    /*
     * Get Local certificate authentication data...
@@ -1148,7 +1116,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * to run as the correct user to get Kerberos credentials of its own.
     */
 
-    if (_httpAddrFamily(con->http->hostaddr) == AF_LOCAL)
+    if (httpAddrFamily(con->http->hostaddr) == AF_LOCAL)
     {
       cupsd_ucred_t	peercred;	/* Peer credentials */
       socklen_t		peersize;	/* Size of peer credentials */
@@ -1210,7 +1178,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 int					/* O - 1 if allowed, 0 otherwise */
 cupsdCheckAccess(
     unsigned         ip[4],		/* I - Client address */
-    char             *name,		/* I - Client hostname */
+    const char       *name,		/* I - Client hostname */
     int              namelen,		/* I - Length of hostname */
     cupsd_location_t *loc)		/* I - Location to check */
 {
@@ -1269,7 +1237,7 @@ cupsdCheckAccess(
 
 int					/* O - 1 if mask matches, 0 otherwise */
 cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
-	       char         *name,	/* I - Client hostname */
+	       const char   *name,	/* I - Client hostname */
 	       int          name_len,	/* I - Length of hostname */
 	       cups_array_t *masks)	/* I - Masks */
 {
@@ -1817,6 +1785,10 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   int			i,		/* Looping vars */
 			auth,		/* Authorization status */
 			type;		/* Type of authentication */
+  http_addr_t		*hostaddr = httpGetAddress(con->http);
+					/* Client address */
+  const char		*hostname = httpGetHostname(con->http, NULL, 0);
+					/* Client hostname */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
@@ -1857,8 +1829,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   if (!con->best)
   {
-    if (!strcmp(con->http->hostname, "localhost") ||
-        !strcmp(con->http->hostname, ServerName))
+    if (httpAddrLocalhost(httpGetAddress(con->http)) ||
+        !strcmp(hostname, ServerName) ||
+	cupsArrayFind(ServerAlias, (void *)hostname))
       return (HTTP_OK);
     else
       return (HTTP_FORBIDDEN);
@@ -1884,16 +1857,16 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
 #ifdef AF_INET6
-  if (con->http->hostaddr->addr.sa_family == AF_INET6)
+  if (httpAddrFamily(hostaddr) == AF_INET6)
   {
    /*
     * Copy IPv6 address...
     */
 
-    address[0] = ntohl(con->http->hostaddr->ipv6.sin6_addr.s6_addr32[0]);
-    address[1] = ntohl(con->http->hostaddr->ipv6.sin6_addr.s6_addr32[1]);
-    address[2] = ntohl(con->http->hostaddr->ipv6.sin6_addr.s6_addr32[2]);
-    address[3] = ntohl(con->http->hostaddr->ipv6.sin6_addr.s6_addr32[3]);
+    address[0] = ntohl(hostaddr->ipv6.sin6_addr.s6_addr32[0]);
+    address[1] = ntohl(hostaddr->ipv6.sin6_addr.s6_addr32[1]);
+    address[2] = ntohl(hostaddr->ipv6.sin6_addr.s6_addr32[2]);
+    address[3] = ntohl(hostaddr->ipv6.sin6_addr.s6_addr32[3]);
   }
   else
 #endif /* AF_INET6 */
@@ -1906,14 +1879,14 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     address[0] = 0;
     address[1] = 0;
     address[2] = 0;
-    address[3] = ntohl(con->http->hostaddr->ipv4.sin_addr.s_addr);
+    address[3] = ntohl(hostaddr->ipv4.sin_addr.s_addr);
   }
   else
     memset(address, 0, sizeof(address));
 
-  hostlen = strlen(con->http->hostname);
+  hostlen = strlen(hostname);
 
-  auth = cupsdCheckAccess(address, con->http->hostname, hostlen, best)
+  auth = cupsdCheckAccess(address, hostname, hostlen, best)
              ? CUPSD_AUTH_ALLOW : CUPSD_AUTH_DENY;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: auth=CUPSD_AUTH_%s...",
@@ -1928,7 +1901,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http->tls &&
-      _cups_strcasecmp(con->http->hostname, "localhost") &&
+      _cups_strcasecmp(hostname, "localhost") &&
+      !httpAddrLocalhost(hostaddr) &&
       best->satisfy == CUPSD_AUTH_SATISFY_ALL) &&
       !(type == CUPSD_AUTH_NEGOTIATE ||
         (type == CUPSD_AUTH_NONE &&

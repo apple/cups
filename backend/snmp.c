@@ -1233,7 +1233,7 @@ scan_devices(int ipv4,			/* I - SNMP IPv4 socket */
       for (addr = addrs; addr; addr = addr->next)
       {
 #ifdef AF_INET6
-        if (_httpAddrFamily(&(addr->addr)) == AF_INET6)
+        if (httpAddrFamily(&(addr->addr)) == AF_INET6)
 	  fd = ipv6;
 	else
 #endif /* AF_INET6 */
@@ -1335,7 +1335,7 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
   debug_printf("DEBUG: %.3f Trying %s://%s:%d...\n", run_time(),
                port == 515 ? "lpd" : "socket", addrname, port);
 
-  if ((fd = socket(_httpAddrFamily(addr), SOCK_STREAM, 0)) < 0)
+  if ((fd = socket(httpAddrFamily(addr), SOCK_STREAM, 0)) < 0)
   {
     fprintf(stderr, "ERROR: Unable to create socket: %s\n",
             strerror(errno));

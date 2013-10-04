@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Authorization definitions for the CUPS scheduler.
+ * Authorization definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -130,9 +130,9 @@ extern void		cupsdAddLocation(cupsd_location_t *loc);
 extern void		cupsdAddName(cupsd_location_t *loc, char *name);
 extern int		cupsdAddNameMask(cups_array_t **masks, char *name);
 extern void		cupsdAuthorize(cupsd_client_t *con);
-extern int		cupsdCheckAccess(unsigned ip[4], char *name,
+extern int		cupsdCheckAccess(unsigned ip[4], const char *name,
 			                 int namelen, cupsd_location_t *loc);
-extern int		cupsdCheckAuth(unsigned ip[4], char *name, int namelen,
+extern int		cupsdCheckAuth(unsigned ip[4], const char *name, int namelen,
 				       cups_array_t *masks);
 extern int		cupsdCheckGroup(const char *username,
 			                struct passwd *user,

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $"
+dnl "$Id$"
 dnl
 dnl   Default cupsd configuration settings for CUPS.
 dnl
@@ -400,5 +400,5 @@ AC_SUBST(CUPS_WEBIF)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_WEBIF, $CUPS_DEFAULT_WEBIF)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $".
+dnl End of "$Id$".
 dnl

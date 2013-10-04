@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $"
+dnl "$Id$"
 dnl
 dnl   Common configuration stuff for CUPS.
 dnl
@@ -462,5 +462,5 @@ esac
 AC_SUBST(BUILDDIRS)
 
 dnl
-dnl End of "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $".
+dnl End of "$Id$".
 dnl

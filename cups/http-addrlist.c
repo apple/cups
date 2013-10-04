@@ -122,7 +122,7 @@ httpAddrConnect2(
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		  httpAddrPort(&(addrlist->addr))));
 
-    if ((*sock = (int)socket(_httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
+    if ((*sock = (int)socket(httpAddrFamily(&(addrlist->addr)), SOCK_STREAM,
                              0)) < 0)
     {
      /*

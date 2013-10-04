@@ -1,102 +1,19 @@
 /*
  * "$Id$"
  *
- *   IPP routines for the CUPS scheduler.
+ * IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   This file contains Kerberos support code, copyright 2006 by
- *   Jelmer Vernooij.
+ * This file contains Kerberos support code, copyright 2006 by
+ * Jelmer Vernooij.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdProcessIPPRequest()    - Process an incoming IPP request.
- *   cupsdTimeoutJob()           - Timeout a job waiting on job files.
- *   accept_jobs()               - Accept print jobs to a printer.
- *   add_class()                 - Add a class to the system.
- *   add_file()                  - Add a file to a job.
- *   add_job()                   - Add a job to a print queue.
- *   add_job_subscriptions()     - Add any subscriptions for a job.
- *   add_job_uuid()              - Add job-uuid attribute to a job.
- *   add_printer()               - Add a printer to the system.
- *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
- *                                 based upon the printer state...
- *   add_queued_job_count()      - Add the "queued-job-count" attribute for the
- *                                 specified printer or class.
- *   apply_printer_defaults()    - Apply printer default options to a job.
- *   authenticate_job()          - Set job authentication info.
- *   cancel_all_jobs()           - Cancel all or selected print jobs.
- *   cancel_job()                - Cancel a print job.
- *   cancel_subscription()       - Cancel a subscription.
- *   check_rss_recipient()       - Check that we do not have a duplicate RSS
- *                                 feed URI.
- *   check_quotas()              - Check quotas for a printer and user.
- *   close_job()                 - Close a multi-file job.
- *   copy_attrs()                - Copy attributes from one request to another.
- *   copy_banner()               - Copy a banner file to the requests directory
- *                                 for the specified job.
- *   copy_file()                 - Copy a PPD file or interface script...
- *   copy_model()                - Copy a PPD model file, substituting default
- *                                 values as needed...
- *   copy_job_attrs()            - Copy job attributes.
- *   copy_printer_attrs()        - Copy printer attributes.
- *   copy_subscription_attrs()   - Copy subscription attributes.
- *   create_job()                - Print a file to a printer or class.
- *   create_requested_array()    - Create an array for the requested-attributes.
- *   create_subscription()       - Create a notification subscription.
- *   delete_printer()            - Remove a printer or class from the system.
- *   get_default()               - Get the default destination.
- *   get_devices()               - Get the list of available devices on the
- *                                 local system.
- *   get_document()              - Get a copy of a job file.
- *   get_job_attrs()             - Get job attributes.
- *   get_jobs()                  - Get a list of jobs for the specified printer.
- *   get_notifications()         - Get events for a subscription.
- *   get_ppd()                   - Get a named PPD from the local system.
- *   get_ppds()                  - Get the list of PPD files on the local
- *                                 system.
- *   get_printer_attrs()         - Get printer attributes.
- *   get_printer_supported()     - Get printer supported values.
- *   get_printers()              - Get a list of printers or classes.
- *   get_subscription_attrs()    - Get subscription attributes.
- *   get_subscriptions()         - Get subscriptions.
- *   get_username()              - Get the username associated with a request.
- *   hold_job()                  - Hold a print job.
- *   hold_new_jobs()             - Hold pending/new jobs on a printer or class.
- *   move_job()                  - Move a job to a new destination.
- *   ppd_parse_line()            - Parse a PPD default line.
- *   print_job()                 - Print a file to a printer or class.
- *   read_job_ticket()           - Read a job ticket embedded in a print file.
- *   reject_jobs()               - Reject print jobs to a printer.
- *   release_held_new_jobs()     - Release pending/new jobs on a printer or
- *                                 class.
- *   release_job()               - Release a held print job.
- *   renew_subscription()        - Renew an existing subscription...
- *   restart_job()               - Restart an old print job.
- *   save_auth_info()            - Save authentication information for a job.
- *   send_document()             - Send a file to a printer or class.
- *   send_http_error()           - Send a HTTP error back to the IPP client.
- *   send_ipp_status()           - Send a status back to the IPP client.
- *   set_default()               - Set the default destination...
- *   set_job_attrs()             - Set job attributes.
- *   set_printer_attrs()         - Set printer attributes.
- *   set_printer_defaults()      - Set printer default options from a request.
- *   start_printer()             - Start a printer.
- *   stop_printer()              - Stop a printer.
- *   url_encode_attr()           - URL-encode a string attribute.
- *   url_encode_string()         - URL-encode a string.
- *   user_allowed()              - See if a user is allowed to print to a queue.
- *   validate_job()              - Validate printer options and destination.
- *   validate_name()             - Make sure the printer name only contains
- *                                 valid chars.
- *   validate_user()             - Validate the user for the request.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -787,7 +704,7 @@ cupsdProcessIPPRequest(
 	  con->http->_data_remaining = INT_MAX;
       }
 
-      cupsdAddSelect(con->number, (cupsd_selfunc_t)cupsdReadClient,
+      cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient,
                      (cupsd_selfunc_t)cupsdWriteClient, con);
 
      /*

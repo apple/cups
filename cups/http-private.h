@@ -243,6 +243,7 @@ typedef enum _http_mode_e		/**** HTTP mode enumeration ****/
   _HTTP_MODE_SERVER			/* Server connected (accepted) from client */
 } _http_mode_t;
 
+#  ifndef _HTTP_NO_PRIVATE
 struct _http_s				/**** HTTP connection structure ****/
 {
   int			fd;		/* File descriptor for this socket */
@@ -264,7 +265,7 @@ struct _http_s				/**** HTTP connection structure ****/
   int			used;		/* Number of bytes used in buffer */
   char			buffer[HTTP_MAX_BUFFER];
 					/* Buffer for incoming data */
-  int			auth_type;	/* Authentication in use */
+  int			_auth_type;	/* Authentication in use (deprecated) */
   _cups_md5_state_t	md5_state;	/* MD5 state */
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
@@ -333,6 +334,7 @@ struct _http_s				/**** HTTP connection structure ****/
   Bytef			*dbuffer;	/* Decompression buffer */
 #  endif /* HAVE_LIBZ */
 };
+#  endif /* !_HTTP_NO_PRIVATE */
 
 
 /*
@@ -396,7 +398,6 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
-#define			_httpAddrFamily(addrp) (addrp)->addr.sa_family
 extern int		_httpAddrPort(http_addr_t *addr)
 			              _CUPS_INTERNAL_MSG("Use httpAddrPort instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);

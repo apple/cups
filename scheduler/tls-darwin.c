@@ -64,6 +64,8 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
                   con->number);
 
+  con->http->encryption = HTTP_ENCRYPTION_ALWAYS;
+
   con->http->tls_credentials = copy_cdsa_certificate(con);
 
   if (!con->http->tls_credentials)

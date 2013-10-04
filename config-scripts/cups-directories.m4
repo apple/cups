@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 7799 2008-07-25 20:06:08Z mike $"
+dnl "$Id$"
 dnl
 dnl   Directory stuff for CUPS.
 dnl
@@ -427,5 +427,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$CUPS_STATEDIR")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 7799 2008-07-25 20:06:08Z mike $".
+dnl End of "$Id$".
 dnl
