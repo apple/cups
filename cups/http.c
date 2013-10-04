@@ -54,7 +54,6 @@ static http_t		*http_create(const char *host, int port,
 static void		http_debug_hex(const char *prefix, const char *buffer,
 			               int bytes);
 #endif /* DEBUG */
-static http_field_t	http_field(const char *name);
 static ssize_t		http_read(http_t *http, char *buffer, size_t length);
 static ssize_t		http_read_buffered(http_t *http, char *buffer, size_t length);
 static ssize_t		http_read_chunk(http_t *http, char *buffer, size_t length);
@@ -66,16 +65,11 @@ static ssize_t		http_write_chunk(http_t *http, const char *buffer,
 			                 size_t length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
-#  ifdef HAVE_CDSASSL
 static int		http_set_credentials(http_t *http);
-#  endif /* HAVE_CDSASSL */
 #endif /* HAVE_SSL */
 static off_t		http_set_length(http_t *http);
 static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
-#ifdef DEBUG
-static const char	*http_state_string(http_state_t state);
-#endif /* DEBUG */
 #ifdef HAVE_SSL
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
@@ -741,6 +735,25 @@ httpError(http_t *http)			/* I - HTTP connection */
 
 
 /*
+ * 'httpFieldValue()' - Return the HTTP field enumeration value for a field
+ *                      name.
+ */
+
+http_field_t				/* O - Field index */
+httpFieldValue(const char *name)	/* I - String name */
+{
+  int	i;				/* Looping var */
+
+
+  for (i = 0; i < HTTP_FIELD_MAX; i ++)
+    if (!_cups_strcasecmp(name, http_fields[i]))
+      return ((http_field_t)i);
+
+  return (HTTP_FIELD_UNKNOWN);
+}
+
+
+/*
  * 'httpFlush()' - Flush data from a HTTP connection.
  */
 
@@ -753,7 +766,7 @@ httpFlush(http_t *http)			/* I - HTTP connection */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%s", http,
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
  /*
   * Nothing to do if we are in the "waiting" state...
@@ -1209,7 +1222,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
 
 
   DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
   if (!http)
     return (-1);
@@ -1894,7 +1907,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpPeek: 0-length chunk, set state to %s.",
-                  http_state_string(http->state)));
+                  httpStateString(http->state)));
 
    /*
     * Prevent future reads for this request...
@@ -2363,7 +2376,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("1httpRead2: End of content, set state to %s.",
-		  http_state_string(http->state)));
+		  httpStateString(http->state)));
   }
 
   return (bytes);
@@ -2513,7 +2526,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else if (http->state != HTTP_STATE_WAITING)
   {
     DEBUG_printf(("1httpReadRequest: Bad state %s, returning HTTP_STATE_ERROR.",
-                  http_state_string(http->state)));
+                  httpStateString(http->state)));
     return (HTTP_STATE_ERROR);
   }
 
@@ -2612,7 +2625,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   }
 
   DEBUG_printf(("1httpReadRequest: Set state to %s.",
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
   if (!strcmp(req_version, "HTTP/1.0"))
   {
@@ -3201,7 +3214,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
 
 
   DEBUG_printf(("_httpUpdate(http=%p, status=%p), state=%s", http, status,
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
  /*
   * Grab a single line from the connection...
@@ -3272,7 +3285,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
 	  http->state ++;
 
 	  DEBUG_printf(("1_httpUpdate: Set state to %s.",
-	                http_state_string(http->state)));
+	                httpStateString(http->state)));
 
       case HTTP_STATE_POST_SEND :
       case HTTP_STATE_HEAD :
@@ -3345,7 +3358,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
 
       httpSetCookie(http, value);
     }
-    else if ((field = http_field(line)) != HTTP_FIELD_UNKNOWN)
+    else if ((field = httpFieldValue(line)) != HTTP_FIELD_UNKNOWN)
       httpSetField(http, field, value);
 #ifdef DEBUG
     else
@@ -3375,7 +3388,7 @@ httpUpdate(http_t *http)		/* I - HTTP connection */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
  /*
   * Flush pending data, if any...
@@ -3780,7 +3793,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
       http->state = HTTP_STATE_STATUS;
 
     DEBUG_printf(("2httpWrite2: Changed state to %s.",
-		  http_state_string(http->state)));
+		  httpStateString(http->state)));
   }
 
   DEBUG_printf(("1httpWrite2: Returning " CUPS_LLFMT ".", CUPS_LLCAST bytes));
@@ -4027,7 +4040,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
            http->state == HTTP_STATE_STATUS)
   {
     DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
-                  "was %s.", http_state_string(http->state)));
+                  "was %s.", httpStateString(http->state)));
     http->state = HTTP_STATE_WAITING;
   }
   else
@@ -4532,24 +4545,6 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
   }
 }
 #endif /* DEBUG */
-
-
-/*
- * 'http_field()' - Return the field index for a field name.
- */
-
-static http_field_t			/* O - Field index */
-http_field(const char *name)		/* I - String name */
-{
-  int	i;				/* Looping var */
-
-
-  for (i = 0; i < HTTP_FIELD_MAX; i ++)
-    if (_cups_strcasecmp(name, http_fields[i]) == 0)
-      return ((http_field_t)i);
-
-  return (HTTP_FIELD_UNKNOWN);
-}
 
 
 /*
@@ -5105,7 +5100,7 @@ http_set_length(http_t *http)		/* I - Connection */
 
 
   DEBUG_printf(("http_set_length(http=%p) mode=%d state=%s", http, http->mode,
-                http_state_string(http->state)));
+                httpStateString(http->state)));
 
   if ((remaining = httpGetLength2(http)) >= 0)
   {
@@ -5649,45 +5644,6 @@ http_shutdown_ssl(http_t *http)		/* I - HTTP connection */
   http->tls_credentials = NULL;
 }
 #endif /* HAVE_SSL */
-
-
-#ifdef DEBUG
-/*
- * 'http_state_string()' - Return the string associated with a given HTTP state.
- */
-
-static const char *			/* O - State string */
-http_state_string(http_state_t state)	/* I - HTTP state */
-{
-  static char buffer[255];		/* Unknown value buffer */
-  static const char * const states[] =	/* State strings */
-  {
-    "HTTP_STATE_ERROR",
-    "HTTP_STATE_WAITING",
-    "HTTP_STATE_OPTIONS",
-    "HTTP_STATE_GET",
-    "HTTP_STATE_GET_SEND",
-    "HTTP_STATE_HEAD",
-    "HTTP_STATE_POST",
-    "HTTP_STATE_POST_RECV",
-    "HTTP_STATE_POST_SEND",
-    "HTTP_STATE_PUT",
-    "HTTP_STATE_PUT_RECV",
-    "HTTP_STATE_DELETE",
-    "HTTP_STATE_TRACE",
-    "HTTP_STATE_CONNECT",
-    "HTTP_STATE_STATUS",
-    "HTTP_STATE_UNKNOWN_METHOD",
-    "HTTP_STATE_UNKNOWN_VERSION"
-  };
-
-  if (state >= HTTP_STATE_ERROR && state <= HTTP_STATE_UNKNOWN_VERSION)
-    return (states[state - HTTP_STATE_ERROR]);
-
-  snprintf(buffer, sizeof(buffer), "??? %d ???", (int)state);
-  return (buffer);
-}
-#endif /* DEBUG */
 
 
 #ifdef HAVE_SSL

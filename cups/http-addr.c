@@ -696,7 +696,8 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
  * 'httpGetHostname()' - Get the FQDN for the connection or local system.
  *
  * When "http" points to a connected socket, return the hostname or
- * address that was used in the call to httpConnect() or httpConnectEncrypt().
+ * address that was used in the call to httpConnect() or httpConnectEncrypt(),
+ * or the address of the client for the connection from httpAcceptConnection().
  * Otherwise, return the FQDN for the local system using both gethostname()
  * and gethostbyname() to get the local hostname with domain.
  *
@@ -788,6 +789,47 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
   */
 
   return (s);
+}
+
+
+/*
+ * 'httpResolveHostname()' - Resolve the hostname of the HTTP connection
+ *                           address.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - Resolved hostname or @code NULL@ */
+httpResolveHostname(http_t *http,	/* I - HTTP connection */
+                    char   *buffer,	/* I - Hostname buffer */
+                    size_t bufsize)	/* I - Size of buffer */
+{
+  if (!http)
+    return (NULL);
+
+  if (isdigit(http->hostname[0] & 255) || http->hostname[0] == '[')
+  {
+    char	temp[1024];		/* Temporary string */
+
+    if (httpAddrLookup(http->hostaddr, temp, sizeof(temp)))
+      strlcpy(http->hostname, temp, sizeof(http->hostname));
+    else
+      return (NULL);
+  }
+
+  if (buffer)
+  {
+    if (http->hostname[0] == '/')
+      strlcpy(buffer, "localhost", bufsize);
+    else
+      strlcpy(buffer, http->hostname, bufsize);
+
+    return (buffer);
+  }
+  else if (http->hostname[0] == '/')
+    return ("localhost");
+  else
+    return (http->hostname);
 }
 
 

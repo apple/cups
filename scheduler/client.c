@@ -75,15 +75,12 @@ static void		write_pipe(cupsd_client_t *con);
 void
 cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 {
+  const char		*hostname;	/* Hostname of client */
   char			name[256];	/* Hostname of client */
   int			count;		/* Count of connections on a host */
-//  int			val;		/* Parameter value */
   cupsd_client_t	*con,		/* New client pointer */
 			*tempcon;	/* Temporary client pointer */
-//  http_addrlist_t	*addrlist,	/* List of adddresses for host */
-//			*addr;		/* Current address */
   socklen_t		addrlen;	/* Length of address */
-//  char			*hostname;	/* Hostname for address */
   http_addr_t		temp;		/* Temporary address variable */
   static time_t		last_dos = 0;	/* Time of last DoS attack */
 #ifdef HAVE_TCPD_H
@@ -141,10 +138,6 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
   con->number = ++ LastClientNumber;
   con->file   = -1;
-//  con->http->activity   = time(NULL);
-//  httpGetAddress(con->http)   = &(con->clientaddr);
-//  con->http->wait_value = 10000;
-//  con->http->mode       = _HTTP_MODE_SERVER;
 
   if ((con->http = httpAcceptConnection(lis->fd, 0)) == NULL)
   {
@@ -211,36 +204,14 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     return;
   }
 
-#if 0 /* Decide if we keep this, and where to store the name */
  /*
   * Get the hostname or format the IP address as needed...
   */
 
-  if (httpAddrLocalhost(httpGetAddress(con->http)))
-  {
-   /*
-    * Map accesses from the loopback interface to "localhost"...
-    */
-
-    strlcpy(httpGetHostname(con->http, NULL, 0), "localhost", sizeof(httpGetHostname(con->http, NULL, 0)));
-    hostname = httpGetHostname(con->http, NULL, 0);
-  }
+  if (HostNameLookups)
+    hostname = httpResolveHostname(con->http, NULL, 0);
   else
-  {
-   /*
-    * Map accesses from the same host to the server name.
-    */
-
-    if (HostNameLookups)
-      hostname = httpAddrLookup(httpGetAddress(con->http), httpGetHostname(con->http, NULL, 0),
-                                sizeof(httpGetHostname(con->http, NULL, 0)));
-    else
-    {
-      hostname = NULL;
-      httpAddrString(httpGetAddress(con->http), httpGetHostname(con->http, NULL, 0),
-                     sizeof(httpGetHostname(con->http, NULL, 0)));
-    }
-  }
+    hostname = httpGetHostname(con->http, NULL, 0);
 
   if (hostname == NULL && HostNameLookups == 2)
   {
@@ -264,8 +235,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((addrlist = httpAddrGetList(httpGetHostname(con->http, NULL, 0), AF_UNSPEC, NULL))
-            != NULL)
+    http_addrlist_t	*addrlist,	/* List of addresses */
+			*addr;		/* Current address */
+
+    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, NULL)) != NULL)
     {
      /*
       * See if the hostname maps to the same IP address...
@@ -296,7 +269,6 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
       return;
     }
   }
-#endif /* 0 */
 
 #ifdef HAVE_TCPD_H
  /*
