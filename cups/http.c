@@ -1274,6 +1274,19 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
 
 
 /*
+ * 'httpGetPending()' - Get the number of bytes that are buffered for writing.
+ *
+ * @since CUPS 2.0@
+ */
+
+size_t					/* O - Number of bytes buffered */
+httpGetPending(http_t *http)		/* I - HTTP connection */
+{
+  return (http ? http->wused : 0);
+}
+
+
+/*
  * 'httpGetReady()' - Get the number of bytes that can be read without blocking.
  *
  * @since CUPS 2.0@
@@ -2574,6 +2587,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   if (!*req_uri)
   {
     DEBUG_puts("1httpReadRequest: No request URI.");
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No request URI."), 1);
     return (HTTP_STATE_ERROR);
   }
 
@@ -2590,6 +2604,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   if (!*req_version)
   {
     DEBUG_puts("1httpReadRequest: No request protocol version.");
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No request protocol version."), 1);
     return (HTTP_STATE_ERROR);
   }
 
@@ -2621,6 +2636,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else
   {
     DEBUG_printf(("1httpReadRequest: Unknown method \"%s\".", req_method));
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unknown request method."), 1);
     return (HTTP_STATE_UNKNOWN_METHOD);
   }
 
@@ -2640,6 +2656,7 @@ httpReadRequest(http_t *http,		/* I - HTTP connection */
   else
   {
     DEBUG_printf(("1httpReadRequest: Unknown version \"%s\".", req_version));
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unknown request version."), 1);
     return (HTTP_STATE_UNKNOWN_VERSION);
   }
 

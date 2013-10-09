@@ -620,6 +620,7 @@ extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;
 extern http_addr_t	*httpGetAddress(http_t *http) _CUPS_API_2_0;
 extern http_encryption_t httpGetEncryption(http_t *http) _CUPS_API_2_0;
 extern http_keepalive_t	httpGetKeepAlive(http_t *http) _CUPS_API_2_0;
+extern size_t		httpGetPending(http_t *http) _CUPS_API_2_0;
 extern size_t		httpGetReady(http_t *http) _CUPS_API_2_0;
 extern size_t		httpGetRemaining(http_t *http) _CUPS_API_2_0;
 extern int		httpIsChunked(http_t *http) _CUPS_API_2_0;

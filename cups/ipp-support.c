@@ -1,39 +1,18 @@
 /*
  * "$Id$"
  *
- *   Internet Printing Protocol support functions for CUPS.
+ * Internet Printing Protocol support functions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ippAttributeString()      - Convert the attribute's value to a string.
- *   ippCreateRequestedArray() - Create a CUPS array of attribute names from
- *				 the given requested-attributes attribute.
- *   ippEnumString()	       - Return a string corresponding to the enum
- *				 value.
- *   ippEnumValue()	       - Return the value associated with a given enum
- *				 string.
- *   ippErrorString()	       - Return a name for the given status code.
- *   ippErrorValue()	       - Return a status code for the given name.
- *   ippOpString()	       - Return a name for the given operation id.
- *   ippOpValue()	       - Return an operation id for the given name.
- *   ippPort()		       - Return the default IPP port number.
- *   ippSetPort()	       - Set the default port number.
- *   ippTagString()	       - Return the tag name corresponding to a tag
- *				 value.
- *   ippTagValue()	       - Return the tag value corresponding to a tag
- *				 name.
- *   ipp_col_string()	       - Convert a collection to a string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -47,6 +26,14 @@
  * Local globals...
  */
 
+static const char * const ipp_states[] =
+		{
+		  "IPP_STATE_ERROR",
+		  "IPP_STATE_IDLE",
+		  "IPP_STATE_HEADER",
+		  "IPP_STATE_ATTRIBUTE",
+		  "IPP_STATE_DATA"
+		};
 static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		{				/* (name) = abandoned standard value */
 		  "successful-ok",
@@ -2124,6 +2111,22 @@ ippSetPort(int p)			/* I - Port number to use */
   DEBUG_printf(("ippSetPort(p=%d)", p));
 
   _cupsGlobals()->ipp_port = p;
+}
+
+
+/*
+ * 'ippStateString()' - Return the name corresponding to a state value.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - State name */
+ippStateString(ipp_state_t state)	/* I - State value */
+{
+  if (state >= IPP_STATE_ERROR && state <= IPP_STATE_DATA)
+    return (ipp_states[state - IPP_STATE_ERROR]);
+  else
+    return ("UNKNOWN");
 }
 
 

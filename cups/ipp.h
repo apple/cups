@@ -1,18 +1,18 @@
 /*
  * "$Id$"
  *
- *   Internet Printing Protocol definitions for CUPS.
+ * Internet Printing Protocol definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_IPP_H_
@@ -980,6 +980,10 @@ extern int		ippSetStringfv(ipp_t *ipp, ipp_attribute_t **attr,
 extern int		ippValidateAttribute(ipp_attribute_t *attr)
 			                     _CUPS_API_1_7;
 extern int		ippValidateAttributes(ipp_t *ipp) _CUPS_API_1_7;
+
+
+/**** New in CUPS 2.0 ****/
+extern const char	*ippStateString(ipp_state_t state) _CUPS_API_2_0;
 
 
 /*
