@@ -109,6 +109,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      _cupsLangPuts(stdout, cupsServer());
 	    else
 	      _cupsLangPrintf(stdout, "%s:%d", cupsServer(), ippPort());
+	    op = 'H';
             break;
 
         case 'P' : /* Show paper types */

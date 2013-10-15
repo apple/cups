@@ -46,6 +46,7 @@ struct cupsd_client_s
   int			file;		/* Input/output file */
   int			file_ready;	/* Input ready on file/pipe? */
   int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
+  http_status_t		pipe_status;	/* HTTP status from pipe process */
   int			sent_header,	/* Non-zero if sent HTTP header */
 			got_fields,	/* Non-zero if all fields seen */
 			header_used;	/* Number of header bytes used */
@@ -121,7 +122,6 @@ extern void	cupsdAcceptClient(cupsd_listener_t *lis);
 extern void	cupsdCloseAllClients(void);
 extern int	cupsdCloseClient(cupsd_client_t *con);
 extern void	cupsdDeleteAllListeners(void);
-extern int	cupsdFlushHeader(cupsd_client_t *con);
 extern void	cupsdPauseListening(void);
 extern int	cupsdProcessIPPRequest(cupsd_client_t *con);
 extern void	cupsdReadClient(cupsd_client_t *con);

@@ -644,73 +644,54 @@ cupsdProcessIPPRequest(
 		    uri ? uri->values[0].string.text : "no URI",
 		    con->http->hostname);
 
+#ifdef CUPSD_USE_CHUNKING
+   /*
+    * Because older versions of CUPS (1.1.17 and older) and some IPP
+    * clients do not implement chunking properly, we cannot use
+    * chunking by default.  This may become the default in future
+    * CUPS releases, or we might add a configuration directive for
+    * it.
+    */
+
+    if (con->http->version == HTTP_1_1)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "[Client %d] Transfer-Encoding: chunked",
+		      con->number);
+
+      cupsdSetLength(con->http, 0);
+    }
+    else
+#endif /* CUPSD_USE_CHUNKING */
+    {
+      size_t	length;			/* Length of response */
+
+
+      length = ippLength(con->response);
+
+      if (con->file >= 0 && !con->pipe_pid)
+      {
+	struct stat	fileinfo;	/* File information */
+
+	if (!fstat(con->file, &fileinfo))
+	  length += fileinfo.st_size;
+      }
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "[Client %d] Content-Length: " CUPS_LLFMT,
+		      con->number, CUPS_LLCAST length);
+      httpSetLength(con->http, length);
+    }
+
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
-#ifdef CUPSD_USE_CHUNKING
-     /*
-      * Because older versions of CUPS (1.1.17 and older) and some IPP
-      * clients do not implement chunking properly, we cannot use
-      * chunking by default.  This may become the default in future
-      * CUPS releases, or we might add a configuration directive for
-      * it.
-      */
-
-      if (con->http->version == HTTP_1_1)
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-                        "[Client %d] Transfer-Encoding: chunked",
-                        con->number);
-
-	if (httpPrintf(HTTP(con), "Transfer-Encoding: chunked\r\n\r\n") < 0)
-	  return (0);
-
-	if (cupsdFlushHeader(con) < 0)
-	  return (0);
-
-	con->http->data_encoding = HTTP_ENCODE_CHUNKED;
-      }
-      else
-#endif /* CUPSD_USE_CHUNKING */
-      {
-        size_t	length;			/* Length of response */
-
-
-	length = ippLength(con->response);
-
-	if (con->file >= 0 && !con->pipe_pid)
-	{
-	  struct stat	fileinfo;	/* File information */
-
-          if (!fstat(con->file, &fileinfo))
-	    length += fileinfo.st_size;
-	}
-
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-                        "[Client %d] Content-Length: " CUPS_LLFMT,
-                        con->number, CUPS_LLCAST length);
-	if (httpPrintf(HTTP(con), "Content-Length: " CUPS_LLFMT "\r\n\r\n",
-        	       CUPS_LLCAST length) < 0)
-	  return (0);
-
-	if (cupsdFlushHeader(con) < 0)
-	  return (0);
-
-	con->http->data_encoding  = HTTP_ENCODE_LENGTH;
-	con->http->data_remaining = length;
-
-	if (con->http->data_remaining <= INT_MAX)
-	  con->http->_data_remaining = con->http->data_remaining;
-	else
-	  con->http->_data_remaining = INT_MAX;
-      }
-
-      cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient,
-                     (cupsd_selfunc_t)cupsdWriteClient, con);
-
      /*
       * Tell the caller the response header was sent successfully...
       */
 
+      cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient,
+		     (cupsd_selfunc_t)cupsdWriteClient, con);
+    
       return (1);
     }
     else

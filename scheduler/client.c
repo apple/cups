@@ -951,6 +951,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
+#  if 0
 	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
@@ -968,6 +969,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
+#else
+	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
+#  endif /* 0 */
+
         if (!cupsdStartTLS(con))
         {
 	  cupsdCloseClient(con);
@@ -982,6 +991,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
+#if 0
       if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
       {
 	cupsdCloseClient(con);
@@ -997,6 +1007,17 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	cupsdCloseClient(con);
 	return;
       }
+#else
+      httpSetField(con->http, HTTP_FIELD_ALLOW,
+		   "GET, HEAD, OPTIONS, POST, PUT");
+      httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
+
+      if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
+      {
+	cupsdCloseClient(con);
+	return;
+      }
+#endif /* 0 */
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1023,6 +1044,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
+#  if 0
 	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL,
 	                     CUPSD_AUTH_NONE))
 	{
@@ -1040,6 +1062,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  cupsdCloseClient(con);
 	  return;
 	}
+#  else
+	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL,
+	                     CUPSD_AUTH_NONE))
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
+#  endif /* 0 */
 
         if (!cupsdStartTLS(con))
         {
@@ -1083,18 +1113,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Send 417-expectation-failed header...
 	  */
 
+	  httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
+
 	  if (!cupsdSendHeader(con, HTTP_STATUS_EXPECTATION_FAILED, NULL,
 	                       CUPSD_AUTH_NONE))
 	  {
-	    cupsdCloseClient(con);
-	    return;
-	  }
-
-	  httpPrintf(con->http, "Content-Length: 0\r\n");
-	  httpPrintf(con->http, "\r\n");
-
-	  if (cupsdFlushHeader(con) < 0)
-          {
 	    cupsdCloseClient(con);
 	    return;
 	  }
@@ -1670,6 +1693,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		  return;
 		}
 
+		cupsdLogRequest(con, HTTP_STATUS_NOT_FOUND);
 		break;
 	      }
 	    }
@@ -1693,6 +1717,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		  return;
 		}
 
+		cupsdLogRequest(con, HTTP_STATUS_NOT_FOUND);
 		break;
 	      }
 	    }
@@ -1704,21 +1729,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 
-	      if (httpPrintf(con->http, "\r\n") < 0)
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      if (cupsdFlushHeader(con) < 0)
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-//	      con->http->state = HTTP_STATE_WAITING;
-	      DEBUG_puts("cupsdReadClient: Set state to HTTP_STATE_WAITING "
-	                 "after HEAD.");
+              cupsdLogRequest(con, HTTP_STATUS_OK);
 	      break;
 	    }
 
@@ -1735,18 +1746,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      */
 
               if (!cupsdSendHeader(con, HTTP_STATUS_OK, "text/html", CUPSD_AUTH_NONE))
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      if (httpPrintf(con->http, "\r\n") < 0)
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      if (cupsdFlushHeader(con) < 0)
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1775,6 +1774,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 
+              cupsdLogRequest(con, HTTP_STATUS_FORBIDDEN);
 	      break;
 	    }
 	    else if ((filename = get_file(con, &filestats, buf,
@@ -1811,21 +1811,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
+	      httpSetField(con->http, HTTP_FIELD_LAST_MODIFIED,
+			   httpGetDateString(filestats.st_mtime));
+	      httpSetLength(con->http, filestats.st_size);
+
               if (!cupsdSendHeader(con, HTTP_STATUS_OK, line, CUPSD_AUTH_NONE))
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      if (httpPrintf(con->http, "Last-Modified: %s\r\n",
-	                     httpGetDateString(filestats.st_mtime)) < 0)
-	      {
-		cupsdCloseClient(con);
-		return;
-	      }
-
-	      if (httpPrintf(con->http, "Content-Length: %lu\r\n",
-	                     (unsigned long)filestats.st_size) < 0)
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1833,22 +1823,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
               cupsdLogRequest(con, HTTP_STATUS_OK);
 	    }
-
-            if (httpPrintf(con->http, "\r\n") < 0)
-	    {
-	      cupsdCloseClient(con);
-	      return;
-	    }
-
-	    if (cupsdFlushHeader(con) < 0)
-            {
-	      cupsdCloseClient(con);
-	      return;
-	    }
-
-//            con->http->state = HTTP_STATE_WAITING;
-	    DEBUG_puts("cupsdReadClient: Set state to HTTP_STATE_WAITING "
-		       "after HEAD.");
             break;
 
 	default :
@@ -2202,7 +2176,8 @@ cupsdSendCommand(
   else
     fd = -1;
 
-  con->pipe_pid = pipe_command(con, fd, &(con->file), command, options, root);
+  con->pipe_pid    = pipe_command(con, fd, &(con->file), command, options, root);
+  con->pipe_status = HTTP_STATUS_OK;
 
   if (fd >= 0)
     close(fd);
@@ -2272,29 +2247,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   if (code >= HTTP_STATUS_BAD_REQUEST && con->type != CUPSD_AUTH_NEGOTIATE)
     httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
 
- /*
-  * Send an error message back to the client.  If the error code is a
-  * 400 or 500 series, make sure the message contains some text, too!
-  */
-
-  if (!cupsdSendHeader(con, code, NULL, auth_type))
-    return (0);
-
-#ifdef HAVE_SSL
-  if (code == HTTP_STATUS_UPGRADE_REQUIRED)
-    if (httpPrintf(con->http, "Connection: Upgrade\r\n") < 0)
-      return (0);
-
-  if (httpPrintf(con->http, "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n") < 0)
-    return (0);
-#endif /* HAVE_SSL */
-
   if (httpGetVersion(con->http) >= HTTP_VERSION_1_1 &&
       httpGetKeepAlive(con->http) == HTTP_KEEPALIVE_OFF)
-  {
-    if (httpPrintf(con->http, "Connection: close\r\n") < 0)
-      return (0);
-  }
+    httpSetField(con->http, HTTP_FIELD_CONNECTION, "close");
 
   if (code >= HTTP_STATUS_BAD_REQUEST)
   {
@@ -2360,25 +2315,26 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     _httpStatus(con->language, code), redirect,
 	     _httpStatus(con->language, code), text);
 
-    if (httpPrintf(con->http, "Content-Type: text/html; charset=utf-8\r\n") < 0)
+    /*
+     * Send an error message back to the client.  If the error code is a
+     * 400 or 500 series, make sure the message contains some text, too!
+     */
+
+    httpSetLength(con->http, strlen(message));
+
+    if (!cupsdSendHeader(con, code, "text/html", auth_type))
       return (0);
-    if (httpPrintf(con->http, "Content-Length: %d\r\n",
-                   (int)strlen(message)) < 0)
-      return (0);
-    if (httpPrintf(con->http, "\r\n") < 0)
-      return (0);
+    
     if (httpPrintf(con->http, "%s", message) < 0)
       return (0);
   }
-  else if (httpPrintf(con->http, "\r\n") < 0)
-    return (0);
+  else
+  {
+    httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
 
-  if (cupsdFlushHeader(con) < 0)
-    return (0);
-
-//  con->http->state = HTTP_STATE_WAITING;
-
-  DEBUG_puts("cupsdSendError: Set state to HTTP_STATE_WAITING.");
+    if (!cupsdSendHeader(con, code, NULL, auth_type))
+      return (0);
+  }
 
   return (1);
 }
@@ -2408,9 +2364,7 @@ cupsdSendHeader(
     * 100-continue doesn't send any headers...
     */
 
-    return (httpPrintf(con->http, "HTTP/%d.%d 100 Continue\r\n\r\n",
-		       httpGetVersion(con->http) / 100,
-		       httpGetVersion(con->http) % 100) > 0);
+    return (!httpWriteResponse(con->http, HTTP_STATUS_CONTINUE));
   }
   else if (code == HTTP_STATUS_CUPS_WEBIF_DISABLED)
   {
@@ -2422,32 +2376,11 @@ cupsdSendHeader(
     code = HTTP_STATUS_OK;
   }
 
-  httpFlushWrite(con->http);
-
-//  con->http->data_encoding = HTTP_ENCODING_FIELDS;
-
-  if (httpPrintf(con->http, "HTTP/%d.%d %d %s\r\n", httpGetVersion(con->http) / 100,
-                 httpGetVersion(con->http) % 100, code, httpStatus(code)) < 0)
-    return (0);
-  if (httpPrintf(con->http, "Date: %s\r\n", httpGetDateString(time(NULL))) < 0)
-    return (0);
   if (ServerHeader)
-    if (httpPrintf(con->http, "Server: %s\r\n", ServerHeader) < 0)
-      return (0);
-  if (httpGetKeepAlive(con->http) && httpGetVersion(con->http) >= HTTP_VERSION_1_0)
-  {
-    if (httpPrintf(con->http, "Connection: Keep-Alive\r\n") < 0)
-      return (0);
-    if (httpPrintf(con->http, "Keep-Alive: timeout=%d\r\n",
-                   KeepAliveTimeout) < 0)
-      return (0);
-  }
-  else if (httpPrintf(con->http, "Connection: close\r\n") < 0)
-    return (0);
+    httpSetField(con->http, HTTP_FIELD_SERVER, ServerHeader);
 
   if (code == HTTP_STATUS_METHOD_NOT_ALLOWED)
-    if (httpPrintf(con->http, "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n") < 0)
-      return (0);
+    httpSetField(con->http, HTTP_FIELD_ALLOW, "GET, HEAD, OPTIONS, POST, PUT");
 
   if (code == HTTP_STATUS_UNAUTHORIZED)
   {
@@ -2530,31 +2463,22 @@ cupsdSendHeader(
     {
       cupsdLogClient(con, CUPSD_LOG_DEBUG, "WWW-Authenticate: %s", auth_str);
 
-      if (httpPrintf(con->http, "WWW-Authenticate: %s\r\n", auth_str) < 0)
-        return (0);
+      httpSetField(con->http, HTTP_FIELD_WWW_AUTHENTICATE, auth_str);
     }
   }
 
   if (con->language && strcmp(con->language->language, "C"))
-  {
-    if (httpPrintf(con->http, "Content-Language: %s\r\n",
-                   con->language->language) < 0)
-      return (0);
-  }
+    httpSetField(con->http, HTTP_FIELD_CONTENT_LANGUAGE, con->language->language);
 
   if (type)
   {
     if (!strcmp(type, "text/html"))
-    {
-      if (httpPrintf(con->http,
-                     "Content-Type: text/html; charset=utf-8\r\n") < 0)
-        return (0);
-    }
-    else if (httpPrintf(con->http, "Content-Type: %s\r\n", type) < 0)
-      return (0);
+      httpSetField(con->http, HTTP_FIELD_CONTENT_TYPE, "text/html; charset=utf-8");
+    else
+      httpSetField(con->http, HTTP_FIELD_CONTENT_TYPE, type);
   }
 
-  return (1);
+  return (!httpWriteResponse(con->http, code));
 }
 
 
@@ -2735,45 +2659,48 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    * Handle redirection and CGI status codes...
 	    */
 
-            if (!_cups_strncasecmp(con->header, "Location:", 9))
+	    http_field_t field;		/* HTTP field */
+	    char	*value = strchr(con->header, ':');
+					/* Value of field */
+
+	    if (value)
 	    {
-  	      if (!cupsdSendHeader(con, HTTP_STATUS_SEE_OTHER, NULL, CUPSD_AUTH_NONE))
-	      {
-	        cupsdCloseClient(con);
-		return;
-	      }
-
-	      con->sent_header = 2;
-
-	      if (httpPrintf(con->http, "Content-Length: 0\r\n") < 0)
-		return;
+	      *value++ = '\0';
+	      while (isspace(*value & 255))
+		value ++;
 	    }
-	    else if (!_cups_strncasecmp(con->header, "Status:", 7))
+
+	    field = httpFieldValue(con->header);
+
+	    if (field != HTTP_FIELD_UNKNOWN && value)
 	    {
-  	      cupsdSendError(con, (http_status_t)atoi(con->header + 7),
-	                     CUPSD_AUTH_NONE);
+	      httpSetField(con->http, field, value);
+
+	      if (field == HTTP_FIELD_LOCATION)
+	      {
+		con->pipe_status = HTTP_STATUS_SEE_OTHER;
+		con->sent_header = 2;
+	      }
+	      else
+	        con->sent_header = 1;
+	    }
+	    else if (!_cups_strcasecmp(con->header, "Status") && value)
+	    {
+  	      con->pipe_status = (http_status_t)atoi(value);
 	      con->sent_header = 2;
 	    }
-	    else
+	    else if (!_cups_strcasecmp(con->header, "Set-Cookie") && value)
 	    {
-  	      if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
-	      {
-	        cupsdCloseClient(con);
-		return;
-	      }
+	      char *sep = strchr(value, ';');
+					/* Separator between name=value and the rest */
 
+	      if (sep)
+		*sep = '\0';
+
+	      httpSetCookie(con->http, value);
 	      con->sent_header = 1;
-
-	      if (httpGetVersion(con->http) == HTTP_VERSION_1_1)
-	      {
-		if (httpPrintf(con->http, "Transfer-Encoding: chunked\r\n") < 0)
-		  return;
-	      }
-            }
+	    }
 	  }
-
-	  if (_cups_strncasecmp(con->header, "Status:", 7))
-	    httpPrintf(con->http, "%s\r\n", con->header);
 
          /*
 	  * Update buffer...
@@ -2794,15 +2721,15 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  {
 	    con->got_fields = 1;
 
-            if (cupsdFlushHeader(con) < 0)
+	    if (httpGetVersion(con->http) == HTTP_VERSION_1_1 &&
+		!httpGetField(con->http, HTTP_FIELD_CONTENT_LENGTH)[0])
+	      httpSetLength(con->http, 0);
+
+            if (!cupsdSendHeader(con, con->pipe_status, NULL, CUPSD_AUTH_NONE))
 	    {
 	      cupsdCloseClient(con);
 	      return;
 	    }
-
-	    if (httpGetVersion(con->http) == HTTP_VERSION_1_1)
-	      httpSetLength(con->http, 0);
-//	      con->http->data_encoding = HTTP_ENCODING_CHUNKED;
           }
 	  else
 	    field_col = 0;
@@ -2812,10 +2739,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       }
 
       if (!con->got_fields)
-      {
-//        con->http->activity = time(NULL);
         return;
-      }
     }
 
     if (con->header_used > 0)
@@ -2865,8 +2789,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	}
       }
     }
-
-//    con->http->state = HTTP_STATE_WAITING;
 
     cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient, NULL, con);
 
@@ -2919,8 +2841,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       cupsdSetBusyState();
     }
   }
-
-//  con->http->activity = time(NULL);
 }
 
 
@@ -4063,22 +3983,13 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
   con->pipe_pid = 0;
 
+  httpSetLength(con->http, filestats->st_size);
+
+  httpSetField(con->http, HTTP_FIELD_LAST_MODIFIED,
+	       httpGetDateString(filestats->st_mtime));
+
   if (!cupsdSendHeader(con, code, type, CUPSD_AUTH_NONE))
     return (0);
-
-  if (httpPrintf(con->http, "Last-Modified: %s\r\n",
-                 httpGetDateString(filestats->st_mtime)) < 0)
-    return (0);
-  if (httpPrintf(con->http, "Content-Length: " CUPS_LLFMT "\r\n",
-                 CUPS_LLCAST filestats->st_size) < 0)
-    return (0);
-  if (httpPrintf(con->http, "\r\n") < 0)
-    return (0);
-
-  if (cupsdFlushHeader(con) < 0)
-    return (0);
-
-  httpSetLength(con->http, filestats->st_size);
 
   cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient,
                  (cupsd_selfunc_t)cupsdWriteClient, con);

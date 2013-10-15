@@ -3949,13 +3949,17 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
   }
 
 #ifdef HAVE_SSL
-  if (status == HTTP_STATUS_UPGRADE_REQUIRED)
+  if (status == HTTP_STATUS_UPGRADE_REQUIRED ||
+      status == HTTP_STATUS_SWITCHING_PROTOCOLS)
   {
     if (!http->fields[HTTP_FIELD_CONNECTION][0])
       httpSetField(http, HTTP_FIELD_CONNECTION, "Upgrade");
 
     if (!http->fields[HTTP_FIELD_UPGRADE][0])
       httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2,TLS/1.1,TLS/1.0");
+
+    if (!http->fields[HTTP_FIELD_CONTENT_LENGTH][0])
+      httpSetField(http, HTTP_FIELD_CONTENT_LENGTH, "0");
   }
 #endif /* HAVE_SSL */
 
@@ -4014,8 +4018,8 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
     if (http->cookie)
     {
-      if (httpPrintf(http, "Set-Cookie: %s path=/%s\r\n", http->cookie,
-                     http->tls ? " secure" : "") < 1)
+      if (httpPrintf(http, "Set-Cookie: %s path=/ httponly%s\r\n",
+		     http->cookie, http->tls ? " secure" : "") < 1)
       {
 	http->status = HTTP_STATUS_ERROR;
 	return (-1);
@@ -4035,7 +4039,8 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     return (-1);
   }
 
-  if (status == HTTP_STATUS_CONTINUE)
+  if (status == HTTP_STATUS_CONTINUE ||
+      status == HTTP_STATUS_SWITCHING_PROTOCOLS)
   {
    /*
     * Restore the old data_encoding and data_length values...
