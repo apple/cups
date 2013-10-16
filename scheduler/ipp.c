@@ -644,6 +644,8 @@ cupsdProcessIPPRequest(
 		    uri ? uri->values[0].string.text : "no URI",
 		    con->http->hostname);
 
+    httpClearFields(con->http);
+
 #ifdef CUPSD_USE_CHUNKING
    /*
     * Because older versions of CUPS (1.1.17 and older) and some IPP

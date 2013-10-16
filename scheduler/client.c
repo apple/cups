@@ -33,19 +33,6 @@
 
 
 /*
- * Local globals...
- */
-
-static const char 	* const ipp_states[] =
-			{		/* IPP state strings */
-			  "IPP_IDLE",
-			  "IPP_HEADER",
-			  "IPP_ATTRIBUTE",
-			  "IPP_STATE_DATA"
-			};
-
-
-/*
  * Local functions...
  */
 
@@ -592,7 +579,6 @@ void
 cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 {
   char			line[32768],	/* Line from client... */
-			operation[64],	/* Operation code from socket */
 			locale[64],	/* Locale */
 			*ptr;		/* Pointer into strings */
   http_status_t		status;		/* Transfer status */
@@ -622,7 +608,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		 httpIsChunked(con->http) ? "CHUNKED" : "LENGTH",
 		 CUPS_LLCAST httpGetRemaining(con->http),
 		 con->request,
-		 con->request ? ipp_states[con->request->state] : "",
+		 con->request ? ippStateString(ippGetState(con->request)) : "",
 		 con->file);
 
 #ifdef HAVE_SSL
@@ -789,7 +775,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         gettimeofday(&(con->start), NULL);
 
         cupsdLogClient(con, CUPSD_LOG_DEBUG, "%s %s HTTP/%d.%d",
-	               operation, con->uri,
+	               httpStateString(con->operation) + 11, con->uri,
 		       httpGetVersion(con->http) / 100,
                        httpGetVersion(con->http) % 100);
 
@@ -936,6 +922,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
       if (con->best && con->best->type != CUPSD_AUTH_NONE)
       {
+        httpClearFields(con->http);
+
 	if (!cupsdSendHeader(con, HTTP_STATUS_UNAUTHORIZED, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
@@ -951,31 +939,13 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
-#  if 0
+        httpClearFields(con->http);
+
 	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
 	}
-
-	httpPrintf(con->http, "Connection: Upgrade\r\n");
-	httpPrintf(con->http, "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
-	httpPrintf(con->http, "Content-Length: 0\r\n");
-	httpPrintf(con->http, "\r\n");
-
-	if (cupsdFlushHeader(con) < 0)
-        {
-	  cupsdCloseClient(con);
-	  return;
-	}
-
-#else
-	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
-	{
-	  cupsdCloseClient(con);
-	  return;
-	}
-#  endif /* 0 */
 
         if (!cupsdStartTLS(con))
         {
@@ -991,23 +961,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
-#if 0
-      if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
-      {
-	cupsdCloseClient(con);
-	return;
-      }
-
-      httpPrintf(con->http, "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n");
-      httpPrintf(con->http, "Content-Length: 0\r\n");
-      httpPrintf(con->http, "\r\n");
-
-      if (cupsdFlushHeader(con) < 0)
-      {
-	cupsdCloseClient(con);
-	return;
-      }
-#else
+      httpClearFields(con->http);
       httpSetField(con->http, HTTP_FIELD_ALLOW,
 		   "GET, HEAD, OPTIONS, POST, PUT");
       httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
@@ -1017,7 +971,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	cupsdCloseClient(con);
 	return;
       }
-#endif /* 0 */
     }
     else if (!is_path_absolute(con->uri))
     {
@@ -1044,32 +997,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
-#  if 0
+        httpClearFields(con->http);
+
 	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL,
 	                     CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
 	}
-
-	httpPrintf(con->http, "Connection: Upgrade\r\n");
-	httpPrintf(con->http, "Upgrade: TLS/1.2,TLS/1.1,TLS/1.0\r\n");
-	httpPrintf(con->http, "Content-Length: 0\r\n");
-	httpPrintf(con->http, "\r\n");
-
-	if (cupsdFlushHeader(con) < 0)
-        {
-	  cupsdCloseClient(con);
-	  return;
-	}
-#  else
-	if (!cupsdSendHeader(con, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL,
-	                     CUPSD_AUTH_NONE))
-	{
-	  cupsdCloseClient(con);
-	  return;
-	}
-#  endif /* 0 */
 
         if (!cupsdStartTLS(con))
         {
@@ -1101,7 +1036,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Send 100-continue header...
 	  */
 
-	  if (!cupsdSendHeader(con, HTTP_STATUS_CONTINUE, NULL, CUPSD_AUTH_NONE))
+          if (httpWriteResponse(con->http, HTTP_STATUS_CONTINUE))
 	  {
 	    cupsdCloseClient(con);
 	    return;
@@ -1113,14 +1048,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Send 417-expectation-failed header...
 	  */
 
+          httpClearFields(con->http);
 	  httpSetField(con->http, HTTP_FIELD_CONTENT_LENGTH, "0");
 
-	  if (!cupsdSendHeader(con, HTTP_STATUS_EXPECTATION_FAILED, NULL,
-	                       CUPSD_AUTH_NONE))
-	  {
-	    cupsdCloseClient(con);
-	    return;
-	  }
+	  cupsdSendError(con, HTTP_STATUS_EXPECTATION_FAILED, CUPSD_AUTH_NONE);
+          cupsdCloseClient(con);
+          return;
 	}
       }
 
@@ -1723,6 +1656,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    }
 	    else if (!WebInterface)
 	    {
+              httpClearFields(con->http);
+
               if (!cupsdSendHeader(con, HTTP_STATUS_OK, NULL, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
@@ -1744,6 +1679,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	     /*
 	      * CGI output...
 	      */
+
+              httpClearFields(con->http);
 
               if (!cupsdSendHeader(con, HTTP_STATUS_OK, "text/html", CUPSD_AUTH_NONE))
 	      {
@@ -1780,6 +1717,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    else if ((filename = get_file(con, &filestats, buf,
 	                                  sizeof(buf))) == NULL)
 	    {
+              httpClearFields(con->http);
+
 	      if (!cupsdSendHeader(con, HTTP_STATUS_NOT_FOUND, "text/html",
 	                           CUPSD_AUTH_NONE))
 	      {
@@ -1810,6 +1749,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		strlcpy(line, "text/plain", sizeof(line));
 	      else
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
+
+              httpClearFields(con->http);
 
 	      httpSetField(con->http, HTTP_FIELD_LAST_MODIFIED,
 			   httpGetDateString(filestats.st_mtime));
@@ -2179,6 +2120,8 @@ cupsdSendCommand(
   con->pipe_pid    = pipe_command(con, fd, &(con->file), command, options, root);
   con->pipe_status = HTTP_STATUS_OK;
 
+  httpClearFields(con->http);
+
   if (fd >= 0)
     close(fd);
 
@@ -2243,6 +2186,8 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   * Kerberos authentication doesn't work without Keep-Alive, so
   * never disable it in that case.
   */
+
+  httpClearFields(con->http);
 
   if (code >= HTTP_STATUS_BAD_REQUEST && con->type != CUPSD_AUTH_NEGOTIATE)
     httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
@@ -2358,15 +2303,7 @@ cupsdSendHeader(
   * Send the HTTP status header...
   */
 
-  if (code == HTTP_STATUS_CONTINUE)
-  {
-   /*
-    * 100-continue doesn't send any headers...
-    */
-
-    return (!httpWriteResponse(con->http, HTTP_STATUS_CONTINUE));
-  }
-  else if (code == HTTP_STATUS_CUPS_WEBIF_DISABLED)
+  if (code == HTTP_STATUS_CUPS_WEBIF_DISABLED)
   {
    /*
     * Treat our special "web interface is disabled" status as "200 OK" for web
@@ -2547,7 +2484,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		 httpIsChunked(con->http) ? "CHUNKED" : "LENGTH",
 		 CUPS_LLCAST httpGetLength2(con->http),
 		 con->response,
-		 con->response ? ipp_states[con->response->state] : "",
+		 con->response ? ippStateString(ippGetState(con->request)) : "",
 		 con->pipe_pid, con->file);
 
   if (httpGetState(con->http) != HTTP_STATE_GET_SEND &&
@@ -3982,6 +3919,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
   con->pipe_pid = 0;
+
+  httpClearFields(con->http);
 
   httpSetLength(con->http, filestats->st_size);
 
