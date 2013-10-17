@@ -40,8 +40,7 @@ CUPSDOBJS =	\
 		server.o \
 		statbuf.o \
 		subscriptions.o \
-		sysman.o \
-		tls.o
+		sysman.o
 LIBOBJS =	\
 		filter.o \
 		mime.o \
@@ -390,8 +389,6 @@ cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(SERVERLIBS) $(DNSSDLIBS) $(LIBGSSAPI) \
 		$(LIBWRAP)
-
-tls.o:	tls-darwin.c tls-gnutls.c tls-openssl.c
 
 
 #

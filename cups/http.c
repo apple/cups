@@ -538,15 +538,29 @@ httpEncryption(http_t            *http,	/* I - HTTP connection */
   if (!http)
     return (0);
 
-  http->encryption = e;
+  if (http->mode == _HTTP_MODE_CLIENT)
+  {
+    http->encryption = e;
 
-  if ((http->encryption == HTTP_ENCRYPTION_ALWAYS && !http->tls) ||
-      (http->encryption == HTTP_ENCRYPTION_NEVER && http->tls))
-    return (httpReconnect2(http, 30000, NULL));
-  else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
-    return (http_tls_upgrade(http));
+    if ((http->encryption == HTTP_ENCRYPTION_ALWAYS && !http->tls) ||
+        (http->encryption == HTTP_ENCRYPTION_NEVER && http->tls))
+      return (httpReconnect2(http, 30000, NULL));
+    else if (http->encryption == HTTP_ENCRYPTION_REQUIRED && !http->tls)
+      return (http_tls_upgrade(http));
+    else
+      return (0);
+  }
   else
-    return (0);
+  {
+    if (e == HTTP_ENCRYPTION_NEVER && http->tls)
+      return (-1);
+
+    http->encryption = e;
+    if (e != HTTP_ENCRYPTION_IF_REQUESTED && !http->tls)
+      return (http_tls_start(http));
+    else
+      return (0);
+  }
 #else
   if (e == HTTP_ENCRYPTION_ALWAYS || e == HTTP_ENCRYPTION_REQUIRED)
     return (-1);
@@ -2860,7 +2874,7 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
     return;
 
   if (http->tls)
-    http_shutdown_ssl(http);
+    http_tls_stop(http);
 
   shutdown(http->fd, SHUT_RD);
 }

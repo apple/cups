@@ -329,7 +329,6 @@
 		7258EAF513459B6D009286F1 /* libcupsimage.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A611336F9A3004BB496 /* libcupsimage.dylib */; };
 		726AD702135E8A90002C930D /* ippserver.c in Sources */ = {isa = PBXBuildFile; fileRef = 726AD701135E8A90002C930D /* ippserver.c */; };
 		7271883D1374AB14001A2036 /* mime-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 7271883C1374AB14001A2036 /* mime-private.h */; };
-		728FB7E8153600FA005426E1 /* tls.c in Sources */ = {isa = PBXBuildFile; fileRef = 728FB7E3153600FA005426E1 /* tls.c */; };
 		728FB7E91536161C005426E1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E5136B64AF00836530 /* CoreFoundation.framework */; };
 		728FB7EA1536161C005426E1 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
 		728FB7EB1536161C005426E1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
@@ -1314,7 +1313,6 @@
 		728FB7E0153600FA005426E1 /* tls-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../scheduler/tls-darwin.c"; sourceTree = "<group>"; };
 		728FB7E1153600FA005426E1 /* tls-gnutls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../scheduler/tls-gnutls.c"; sourceTree = "<group>"; };
 		728FB7E2153600FA005426E1 /* tls-openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-openssl.c"; path = "../scheduler/tls-openssl.c"; sourceTree = "<group>"; };
-		728FB7E3153600FA005426E1 /* tls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tls.c; path = ../scheduler/tls.c; sourceTree = "<group>"; };
 		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
@@ -1882,7 +1880,6 @@
 				72220F8D13330B0C00FCA411 /* subscriptions.h */,
 				72220F8E13330B0C00FCA411 /* sysman.c */,
 				72220F8F13330B0C00FCA411 /* sysman.h */,
-				728FB7E3153600FA005426E1 /* tls.c */,
 				728FB7E0153600FA005426E1 /* tls-darwin.c */,
 				728FB7E1153600FA005426E1 /* tls-gnutls.c */,
 				728FB7E2153600FA005426E1 /* tls-openssl.c */,
@@ -3015,7 +3012,6 @@
 				72220FA613330B0C00FCA411 /* subscriptions.c in Sources */,
 				72220FA713330B0C00FCA411 /* sysman.c in Sources */,
 				72C16CB9137B195D007E4BF4 /* file.c in Sources */,
-				728FB7E8153600FA005426E1 /* tls.c in Sources */,
 				72D53A3815B4929D003F877F /* colorman.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

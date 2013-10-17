@@ -447,8 +447,8 @@ http_tls_start(http_t *http)		/* I - Connection to server */
     }
     else
     {
-      error = http_set_credentials(http);
-      DEBUG_printf(("4http_tls_start: http_set_credentials, error=%d",
+      error = http_tls_set_credentials(http);
+      DEBUG_printf(("4http_tls_start: http_tls_set_credentials, error=%d",
                     (int)error));
     }
   }
@@ -696,6 +696,7 @@ http_tls_write(http_t     *http,	/* I - Connection to server */
 }
 
 
+#if 0
 /*
  * 'cupsdEndTLS()' - Shutdown a secure session with the client.
  */
@@ -1227,6 +1228,7 @@ cleanup:
   return (!status);
 #    endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
 }
+#endif /* 0 */
 
 
 /*

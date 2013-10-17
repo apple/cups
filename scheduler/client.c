@@ -40,6 +40,9 @@ static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 			                void *data);
+#ifdef HAVE_SSL
+static int		cupsd_start_tls(cupsd_client_t *con, http_encryption_t e);
+#endif /* HAVE_SSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
 			          char *filename, int len);
 static http_status_t	install_cupsd_conf(cupsd_client_t *con);
@@ -377,7 +380,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     * https connection; go secure...
     */
 
-    if (!cupsdStartTLS(con))
+    if (cupsd_start_tls(con, HTTP_ENCRYPTION_ALWAYS))
       cupsdCloseClient(con);
   }
   else
@@ -631,7 +634,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
                      "Saw first byte %02X, auto-negotiating "
 		     "SSL/TLS session.", buf[0] & 255);
 
-      if (!cupsdStartTLS(con))
+      if (cupsd_start_tls(con, HTTP_ENCRYPTION_ALWAYS))
         cupsdCloseClient(con);
 
       return;
@@ -947,7 +950,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
-        if (!cupsdStartTLS(con))
+        if (cupsd_start_tls(con, HTTP_ENCRYPTION_REQUIRED))
         {
 	  cupsdCloseClient(con);
 	  return;
@@ -1006,7 +1009,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
-        if (!cupsdStartTLS(con))
+        if (cupsd_start_tls(con, HTTP_ENCRYPTION_REQUIRED))
         {
 	  cupsdCloseClient(con);
 	  return;
@@ -2855,6 +2858,29 @@ compare_clients(cupsd_client_t *a,	/* I - First client */
   else
     return (1);
 }
+
+
+#ifdef HAVE_SSL
+/*
+ * 'cupsd_start_tls()' - Start encryption on a connection.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+cupsd_start_tls(cupsd_client_t    *con,	/* I - Client connection */
+                http_encryption_t e)	/* I - Encryption mode */
+{
+  /* TODO: Lookup/load cert + key and set */
+  if (httpEncryption(con->http, e))
+  {
+    cupsdLogClient(con, CUPSD_LOG_ERROR, "Unable to encrypt connection: %s",
+                   cupsLastErrorString());
+    return (-1);
+  }
+
+  cupsdLogClient(con, CUPSD_LOG_INFO, "Connection now encrypted.");
+  return (0);
+}
+#endif /* HAVE_SSL */
 
 
 /*

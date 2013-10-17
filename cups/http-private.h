@@ -162,7 +162,7 @@ extern "C" {
 typedef SSL  *http_tls_t;
 typedef void *http_tls_credentials_t;
 
-extern BIO_METHOD *_httpBIOMethods(void);
+//extern BIO_METHOD *_httpBIOMethods(void);
 
 #  elif defined HAVE_GNUTLS
 /*
@@ -172,10 +172,10 @@ extern BIO_METHOD *_httpBIOMethods(void);
 typedef gnutls_session http_tls_t;
 typedef void *http_tls_credentials_t;
 
-extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
-		                size_t length);
-extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
-		                 size_t length);
+//extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
+//		                size_t length);
+//extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
+//		                 size_t length);
 
 #  elif defined(HAVE_CDSASSL)
 /*
@@ -392,14 +392,14 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
-extern int		_httpAddrPort(http_addr_t *addr)
+/* XXX */extern int		_httpAddrPort(http_addr_t *addr)
 			              _CUPS_INTERNAL_MSG("Use httpAddrPort instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
-extern char		*_httpAssembleUUID(const char *server, int port,
+/* XXX */extern char		*_httpAssembleUUID(const char *server, int port,
 					   const char *name, int number,
 					   char *buffer, size_t bufsize)
 					   _CUPS_INTERNAL_MSG("Use httpAssembleUUID instead.");
-extern http_t		*_httpCreate(const char *host, int port,
+/* XXX */extern http_t		*_httpCreate(const char *host, int port,
 			             http_addrlist_t *addrlist,
 				     http_encryption_t encryption,
 				     int family)
@@ -412,7 +412,7 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
-extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
+/* XXX */extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
 			          _CUPS_INTERNAL_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
