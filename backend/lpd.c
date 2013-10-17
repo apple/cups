@@ -1285,11 +1285,7 @@ rresvport_af(int *port,			/* IO - Port number to bind to */
 
     if (errno != EADDRINUSE)
     {
-#  ifdef WIN32
-      closesocket(fd);
-#  else
-      close(fd);
-#  endif /* WIN32 */
+      httpAddrClose(NULL, fd);
 
       return (-1);
     }

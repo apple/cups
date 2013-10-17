@@ -2385,11 +2385,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
     _cupsLangPrintf(stdout, "%s available", service->uri);
     httpAddrFreeList(addrlist);
 
-#ifdef WIN32
-    closesocket(sock);
-#else
-    close(sock);
-#endif /* WIN32 */
+    httpAddrClose(NULL, sock);
   }
   else
   {

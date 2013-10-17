@@ -614,6 +614,7 @@ extern http_state_t	httpWriteResponse(http_t *http,
 
 
 /**** New in CUPS 2.0 ****/
+extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
 extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern http_field_t	httpFieldValue(const char *name) _CUPS_API_2_0;
 extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;

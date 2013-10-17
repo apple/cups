@@ -18,6 +18,7 @@
  */
 
 #include "cups-private.h"
+#include <sys/stat.h>
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>
 #endif /* HAVE_RESOLV_H */
@@ -48,6 +49,37 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
   if (addr->addr.sa_family == AF_INET &&
       ntohl(addr->ipv4.sin_addr.s_addr) == 0x00000000)
     return (1);
+
+  return (0);
+}
+
+
+/*
+ * 'httpAddrClose()' - Close a socket created by @link httpAddrConnect@ or
+ *                     @link httpAddrListen@.
+ *
+ * Pass @code NULL@ for sockets created with @link httpAddrConnect@ and the
+ * listen address for sockets created with @link httpAddrListen@. This will
+ * ensure that domain sockets are removed when closed.
+ *
+ * @since CUPS 2.0@
+ */
+
+int						/* O - 0 on success, -1 on failure */
+httpAddrClose(http_addr_t *addr,		/* I - Listen address or @code NULL@ */
+              int         fd)			/* I - Socket file descriptor */
+{
+#ifdef WIN32
+  if (closesocket(fd))
+#else
+  if (close(fd))
+#endif /* WIN32 */
+    return (-1);
+
+#ifdef AF_LOCAL
+  if (addr && addr->addr.sa_family == AF_LOCAL)
+    return (unlink(addr->un.sun_path));
+#endif /* AF_LOCAL */
 
   return (0);
 }
@@ -129,15 +161,20 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
                int         port)	/* I - Port number to bind to */
 {
   int		fd = -1,		/* Socket */
-		val;			/* Socket value */
+		val,			/* Socket value */
+                status;			/* Bind status */
 
 
  /*
   * Range check input...
   */
 
-  if (!addr || port <= 0)
+  if (!addr || port < 0)
     return (-1);
+
+ /*
+  * Create the socket and set options...
+  */
 
   if ((fd = socket(addr->addr.sa_family, SOCK_STREAM, 0)) < 0)
   {
@@ -153,9 +190,50 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
     setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, CUPS_SOCAST &val, sizeof(val));
 #endif /* IPV6_V6ONLY */
 
-  _httpAddrSetPort(addr, port);
+ /*
+  * Bind the socket...
+  */
 
-  if (bind(fd, (struct sockaddr *)addr, httpAddrLength(addr)))
+#ifdef AF_LOCAL
+  if (addr->addr.sa_family == AF_LOCAL)
+  {
+    mode_t	mask;			/* Umask setting */
+
+   /*
+    * Remove any existing domain socket file...
+    */
+
+    unlink(addr->un.sun_path);
+
+   /*
+    * Save the current umask and set it to 0 so that all users can access
+    * the domain socket...
+    */
+
+    mask = umask(0);
+
+   /*
+    * Bind the domain socket...
+    */
+
+    status = bind(fd, (struct sockaddr *)addr, httpAddrLength(addr));
+
+   /*
+    * Restore the umask and fix permissions...
+    */
+
+    umask(mask);
+    chmod(addr->un.sun_path, 0140777);
+  }
+  else
+#endif /* AF_LOCAL */
+  {
+    _httpAddrSetPort(addr, port);
+
+    status = bind(fd, (struct sockaddr *)addr, httpAddrLength(addr));
+  }
+
+  if (status)
   {
     _cupsSetHTTPError(HTTP_STATUS_ERROR);
 
@@ -163,6 +241,10 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
 
     return (-1);
   }
+
+ /*
+  * Listen...
+  */
 
   if (listen(fd, 5))
   {
@@ -172,6 +254,14 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
 
     return (-1);
   }
+
+ /*
+  * Close on exec...
+  */
+
+#ifndef WIN32
+  fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+#endif /* !WIN32 */
 
 #ifdef SO_NOSIGPIPE
  /*

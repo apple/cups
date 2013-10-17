@@ -1,57 +1,18 @@
 /*
  * "$Id$"
  *
- *   SNMP functions for CUPS.
+ * SNMP functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsSNMPClose()            - Close a SNMP socket.
- *   _cupsSNMPCopyOID()          - Copy an OID.
- *   _cupsSNMPDefaultCommunity() - Get the default SNMP community name.
- *   _cupsSNMPIsOID()            - Test whether a SNMP response contains the
- *                                 specified OID.
- *   _cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
- *                                 specified OID prefix.
- *   _cupsSNMPOIDToString()      - Convert an OID to a string.
- *   _cupsSNMPOpen()             - Open a SNMP socket.
- *   _cupsSNMPRead()             - Read and parse a SNMP response.
- *   _cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
- *   _cupsSNMPStringToOID()      - Convert a numeric OID string to an OID array.
- *   _cupsSNMPWalk()             - Enumerate a group of OIDs.
- *   _cupsSNMPWrite()            - Send an SNMP query packet.
- *   asn1_debug()                - Decode an ASN1-encoded message.
- *   asn1_decode_snmp()          - Decode a SNMP packet.
- *   asn1_encode_snmp()          - Encode a SNMP packet.
- *   asn1_get_integer()          - Get an integer value.
- *   asn1_get_length()           - Get a value length.
- *   asn1_get_oid()              - Get an OID value.
- *   asn1_get_packed()           - Get a packed integer value.
- *   asn1_get_string()           - Get a string value.
- *   asn1_get_type()             - Get a value type.
- *   asn1_set_integer()          - Set an integer value.
- *   asn1_set_length()           - Set a value length.
- *   asn1_set_oid()              - Set an OID value.
- *   asn1_set_packed()           - Set a packed integer value.
- *   asn1_size_integer()         - Figure out the number of bytes needed for an
- *                                 integer value.
- *   asn1_size_length()          - Figure out the number of bytes needed for a
- *                                 length value.
- *   asn1_size_oid()             - Figure out the numebr of bytes needed for an
- *                                 OID value.
- *   asn1_size_packed()          - Figure out the number of bytes needed for a
- *                                 packed integer value.
- *   snmp_set_error()            - Set the localized error for a packet.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -116,11 +77,7 @@ _cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 {
   DEBUG_printf(("4_cupsSNMPClose(fd=%d)", fd));
 
-#ifdef WIN32
-  closesocket(fd);
-#else
-  close(fd);
-#endif /* WIN32 */
+  httpAddrClose(NULL, fd);
 }
 
 

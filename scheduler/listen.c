@@ -1,24 +1,16 @@
 /*
  * "$Id$"
  *
- *   Server listening routines for the CUPS scheduler.
+ * Server listening routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdDeleteAllListeners() - Delete all listeners.
- *   cupsdPauseListening()     - Clear input polling on all listening sockets...
- *   cupsdResumeListening()    - Set input polling on all listening sockets...
- *   cupsdStartListening()     - Create all listening sockets...
- *   cupsdStopListening()      - Close all listening sockets...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -123,9 +115,7 @@ cupsdResumeListening(void)
 void
 cupsdStartListening(void)
 {
-  int			status;		/* Bind result */
-  int			p,		/* Port number */
-			val;		/* Parameter value */
+  int			p;		/* Port number */
   cupsd_listener_t	*lis;		/* Current listening socket */
   char			s[256];		/* String addresss */
   const char		*have_domain;	/* Have a domain socket? */
@@ -163,7 +153,7 @@ cupsdStartListening(void)
       * Create a socket for listening...
       */
 
-      lis->fd = socket(lis->address.addr.sa_family, SOCK_STREAM, 0);
+      lis->fd = httpAddrListen(&(lis->address), p);
 
       if (lis->fd == -1)
       {
@@ -186,131 +176,14 @@ cupsdStartListening(void)
 
 	continue;
       }
-
-     /*
-      * Set things up to reuse the local address for this port.
-      */
-
-      val = 1;
-#ifdef __sun
-      setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, (char *)&val, sizeof(val));
-#else
-      setsockopt(lis->fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-#endif /* __sun */
-
-     /*
-      * Bind to the port we found...
-      */
-
-#ifdef AF_INET6
-      if (lis->address.addr.sa_family == AF_INET6)
-      {
-#  ifdef IPV6_V6ONLY
-       /*
-	* Accept only IPv6 connections on this socket, to avoid
-	* potential security issues and to make all platforms behave
-	* the same.
-	*/
-
-	val = 1;
-#    ifdef __sun
-	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, (char *)&val, sizeof(val));
-#    else
-	setsockopt(lis->fd, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
-#    endif /* __sun */
-#  endif /* IPV6_V6ONLY */
-
-	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-		      httpAddrLength(&(lis->address)));
-      }
-      else
-#endif /* AF_INET6 */
-#ifdef AF_LOCAL
-      if (lis->address.addr.sa_family == AF_LOCAL)
-      {
-	mode_t	mask;			/* Umask setting */
-
-
-       /*
-	* Remove any existing domain socket file...
-	*/
-
-	unlink(lis->address.un.sun_path);
-
-       /*
-	* Save the current umask and set it to 0 so that all users can access
-	* the domain socket...
-	*/
-
-	mask = umask(0);
-
-       /*
-	* Bind the domain socket...
-	*/
-
-	status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-		      httpAddrLength(&(lis->address)));
-
-       /*
-	* Restore the umask...
-	*/
-
-	umask(mask);
-      }
-      else
-#endif /* AF_LOCAL */
-      status = bind(lis->fd, (struct sockaddr *)&(lis->address),
-		    sizeof(lis->address.ipv4));
-
-      if (status < 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to bind socket for address %s:%d - %s.",
-			s, p, strerror(errno));
-	close(lis->fd);
-	lis->fd = -1;
-
-	if (FatalErrors & CUPSD_FATAL_LISTEN)
-	  cupsdEndProcess(getpid(), 0);
-
-	continue;
-      }
-
-     /*
-      * Listen for new clients.
-      */
-
-      if (listen(lis->fd, ListenBackLog) < 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to listen for clients on address %s:%d - %s.",
-			s, p, strerror(errno));
-
-	close(lis->fd);
-	lis->fd = -1;
-
-	if (FatalErrors & CUPSD_FATAL_LISTEN)
-	  cupsdEndProcess(getpid(), 0);
-
-        continue;
-      }
     }
-
-    fcntl(lis->fd, F_SETFD, fcntl(lis->fd, F_GETFD) | FD_CLOEXEC);
 
     if (p)
       cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d on fd %d...",
         	      s, p, lis->fd);
     else
-    {
       cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s on fd %d...",
         	      s, lis->fd);
-
-      if (chmod(s, 0140777))
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to change permisssions on domain socket "
-			"\"%s\" - %s", s, strerror(errno));
-    }
 
    /*
     * Save the first port that is bound to the local loopback or
@@ -339,7 +212,7 @@ cupsdStartListening(void)
   {
     cupsdLogMessage(CUPSD_LOG_EMERG,
                     "No Listen or Port lines were found to allow access via "
-		    "localhost!");
+		    "localhost.");
 
     if (FatalErrors & (CUPSD_FATAL_CONFIG | CUPSD_FATAL_LISTEN))
       cupsdEndProcess(getpid(), 0);
@@ -403,24 +276,13 @@ cupsdStopListening(void)
   {
     if (lis->fd != -1)
     {
-#ifdef WIN32
-      closesocket(lis->fd);
+#ifdef HAVE_LAUNCH_H
+      httpAddrClose(NULL, lis->fd);
 #else
-      close(lis->fd);
-#endif /* WIN32 */
+      httpAddrClose(&(lis->address), lis->fd);
+#endif /* HAVE_LAUNCH */
 
-#ifdef AF_LOCAL
-     /*
-      * Remove domain sockets...
-      */
-
-#  ifdef HAVE_LAUNCH_H
-      if (lis->address.addr.sa_family == AF_LOCAL && !Launchd)
-#  else
-      if (lis->address.addr.sa_family == AF_LOCAL)
-#  endif /* HAVE_LAUNCH_H */
-	unlink(lis->address.un.sun_path);
-#endif /* AF_LOCAL */
+      lis->fd = -1;
     }
   }
 }

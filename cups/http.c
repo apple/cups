@@ -678,11 +678,7 @@ _httpDisconnect(http_t *http)		/* I - HTTP connection */
     http_shutdown_ssl(http);
 #endif /* HAVE_SSL */
 
-#ifdef WIN32
-  closesocket(http->fd);
-#else
-  close(http->fd);
-#endif /* WIN32 */
+  httpAddrClose(NULL, http->fd);
 
   http->fd = -1;
 }
@@ -817,11 +813,7 @@ httpFlush(http_t *http)			/* I - HTTP connection */
       http_shutdown_ssl(http);
 #endif /* HAVE_SSL */
 
-#ifdef WIN32
-    closesocket(http->fd);
-#else
-    close(http->fd);
-#endif /* WIN32 */
+    httpAddrClose(NULL, http->fd);
 
     http->fd = -1;
   }
@@ -2727,11 +2719,7 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
   {
     DEBUG_printf(("2httpReconnect2: Closing socket %d...", http->fd));
 
-#ifdef WIN32
-    closesocket(http->fd);
-#else
-    close(http->fd);
-#endif /* WIN32 */
+    httpAddrClose(NULL, http->fd);
 
     http->fd = -1;
   }
@@ -2799,11 +2787,7 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
 
     if (http_setup_ssl(http) != 0)
     {
-#  ifdef WIN32
-      closesocket(http->fd);
-#  else
-      close(http->fd);
-#  endif /* WIN32 */
+      httpAddrClose(NULL, http->fd);
 
       return (-1);
     }
@@ -3270,11 +3254,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
     {
       if (http_setup_ssl(http) != 0)
       {
-#  ifdef WIN32
-	closesocket(http->fd);
-#  else
-	close(http->fd);
-#  endif /* WIN32 */
+        httpAddrClose(NULL, http->fd);
 
 	*status = http->status = HTTP_STATUS_ERROR;
 	return (0);
@@ -5742,11 +5722,7 @@ http_upgrade(http_t *http)		/* I - HTTP connection */
 
     DEBUG_puts("8http_upgrade: Server does not support HTTP upgrade!");
 
-#  ifdef WIN32
-    closesocket(http->fd);
-#  else
-    close(http->fd);
-#  endif
+    httpAddrClose(NULL, http->fd);
 
     http->fd = -1;
 

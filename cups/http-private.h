@@ -40,7 +40,6 @@
 #    include <unistd.h>
 #    include <fcntl.h>
 #    include <sys/socket.h>
-#    define closesocket(f) close(f)
 #    define CUPS_SOCAST
 #  endif /* WIN32 */
 

@@ -225,11 +225,7 @@ httpAddrConnect2(
 
             DEBUG_puts("1httpAddrConnect2: Canceled connect()");
 
-#    ifdef WIN32
-	    closesocket(*sock);
-#    else
-	    close(*sock);
-#    endif /* WIN32 */
+            httpAddrClose(NULL, *sock);
 
 	    *sock = -1;
 
@@ -297,11 +293,7 @@ httpAddrConnect2(
     * Close this socket and move to the next address...
     */
 
-#ifdef WIN32
-    closesocket(*sock);
-#else
-    close(*sock);
-#endif /* WIN32 */
+    httpAddrClose(NULL, *sock);
 
     *sock    = -1;
     addrlist = addrlist->next;

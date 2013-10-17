@@ -468,7 +468,7 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 
   if (mode == 's')
   {
-    if (closesocket(fd) < 0)
+    if (httpAddrClose(NULL, fd) < 0)
       status = -1;
   }
   else if (!is_stdio)
@@ -1170,7 +1170,7 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   if ((fp = cupsFileOpenFd(fd, mode)) == NULL)
   {
     if (*mode == 's')
-      closesocket(fd);
+      httpAddrClose(NULL, fd);
     else
       close(fd);
   }
