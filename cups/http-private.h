@@ -1,18 +1,18 @@
 /*
  * "$Id$"
  *
- *   Private HTTP definitions for CUPS.
+ * Private HTTP definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_HTTP_PRIVATE_H_
@@ -204,11 +204,6 @@ extern OSStatus SecPolicySetValue(SecPolicyRef policyRef,
 
 typedef SSLContextRef	http_tls_t;
 typedef CFArrayRef	http_tls_credentials_t;
-
-extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
-		              size_t *dataLength);
-extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
-		               size_t *dataLength);
 
 #  elif defined(HAVE_SSPISSL)
 /*

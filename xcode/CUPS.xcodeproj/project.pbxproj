@@ -1083,6 +1083,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		270B267D17F5C06700C8A3A9 /* tls-darwin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../cups/tls-darwin.c"; sourceTree = "<group>"; };
+		270B267E17F5C06700C8A3A9 /* tls-gnutls.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../cups/tls-gnutls.c"; sourceTree = "<group>"; };
+		270B267F17F5C06700C8A3A9 /* tls-openssl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-openssl.c"; path = "../cups/tls-openssl.c"; sourceTree = "<group>"; };
+		270B268017F5C5D600C8A3A9 /* sspi-private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "sspi-private.h"; path = "../cups/sspi-private.h"; sourceTree = "<group>"; };
+		270B268117F5C5D600C8A3A9 /* tls-sspi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-sspi.c"; path = "../cups/tls-sspi.c"; sourceTree = "<group>"; };
 		270CCDA7135E3C9E00007BE2 /* testmime */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testmime; sourceTree = BUILT_PRODUCTS_DIR; };
 		270CCDBB135E3D3E00007BE2 /* testmime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testmime.c; path = ../scheduler/testmime.c; sourceTree = "<group>"; };
 		2732E089137A3F5200FAFEF6 /* cancel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cancel.c; path = ../systemv/cancel.c; sourceTree = "<group>"; };
@@ -1310,17 +1315,17 @@
 		728FB7E1153600FA005426E1 /* tls-gnutls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../scheduler/tls-gnutls.c"; sourceTree = "<group>"; };
 		728FB7E2153600FA005426E1 /* tls-openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-openssl.c"; path = "../scheduler/tls-openssl.c"; sourceTree = "<group>"; };
 		728FB7E3153600FA005426E1 /* tls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tls.c; path = ../scheduler/tls.c; sourceTree = "<group>"; };
-		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = ../../../../../usr/lib/libz.dylib; sourceTree = "<group>"; };
-		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = ../../../../../usr/lib/libiconv.dylib; sourceTree = "<group>"; };
-		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = ../../../../../usr/lib/libresolv.dylib; sourceTree = "<group>"; };
+		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
+		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
 		72A4332F155844CF002E172D /* libcups_static.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		72C16CB8137B195D007E4BF4 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = ../scheduler/file.c; sourceTree = SOURCE_ROOT; };
-		72D53A2915B49110003F877F /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = ../../../../../System/Library/Frameworks/GSS.framework; sourceTree = "<group>"; };
-		72D53A2C15B4913D003F877F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
-		72D53A3315B4925B003F877F /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = ../../../../../System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<group>"; };
+		72D53A2915B49110003F877F /* GSS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GSS.framework; path = /System/Library/Frameworks/GSS.framework; sourceTree = "<absolute>"; };
+		72D53A2C15B4913D003F877F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		72D53A3315B4925B003F877F /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		72D53A3615B4929D003F877F /* colorman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = colorman.c; path = ../scheduler/colorman.c; sourceTree = "<group>"; };
 		72D53A3715B4929D003F877F /* colorman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colorman.h; path = ../scheduler/colorman.h; sourceTree = "<group>"; };
-		72D53A3915B492FA003F877F /* libpam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpam.dylib; path = ../../../../../usr/lib/libpam.dylib; sourceTree = "<group>"; };
+		72D53A3915B492FA003F877F /* libpam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpam.dylib; path = /usr/lib/libpam.dylib; sourceTree = "<absolute>"; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
 		72F75A611336F9A3004BB496 /* libcupsimage.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcupsimage.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1777,6 +1782,11 @@
 				72220F02133305BB00FCA411 /* string.c */,
 				72220F03133305BB00FCA411 /* tempfile.c */,
 				72220F05133305BB00FCA411 /* thread.c */,
+				270B267D17F5C06700C8A3A9 /* tls-darwin.c */,
+				270B267E17F5C06700C8A3A9 /* tls-gnutls.c */,
+				270B267F17F5C06700C8A3A9 /* tls-openssl.c */,
+				270B268117F5C5D600C8A3A9 /* tls-sspi.c */,
+				270B268017F5C5D600C8A3A9 /* sspi-private.h */,
 				72220F06133305BB00FCA411 /* transcode.c */,
 				72220F08133305BB00FCA411 /* usersys.c */,
 				72220F09133305BB00FCA411 /* util.c */,
@@ -1894,6 +1904,13 @@
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72D53A3915B492FA003F877F /* libpam.dylib */,
+				72D53A3315B4925B003F877F /* ApplicationServices.framework */,
+				72D53A2C15B4913D003F877F /* IOKit.framework */,
+				72D53A2915B49110003F877F /* GSS.framework */,
+				728FB7EF1536167A005426E1 /* libiconv.dylib */,
+				728FB7F01536167A005426E1 /* libresolv.dylib */,
+				728FB7EC1536161C005426E1 /* libz.dylib */,
 				278C58E5136B64AF00836530 /* CoreFoundation.framework */,
 				278C58E6136B64B000836530 /* Kerberos.framework */,
 				278C58E7136B64B000836530 /* Security.framework */,
@@ -1944,13 +1961,6 @@
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
-				72D53A3915B492FA003F877F /* libpam.dylib */,
-				72D53A3315B4925B003F877F /* ApplicationServices.framework */,
-				72D53A2C15B4913D003F877F /* IOKit.framework */,
-				72D53A2915B49110003F877F /* GSS.framework */,
-				728FB7EF1536167A005426E1 /* libiconv.dylib */,
-				728FB7F01536167A005426E1 /* libresolv.dylib */,
-				728FB7EC1536161C005426E1 /* libz.dylib */,
 				72220FB113330B4A00FCA411 /* Frameworks */,
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
@@ -3517,6 +3527,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -3524,6 +3535,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};

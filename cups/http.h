@@ -612,8 +612,17 @@ extern void		httpSetDefaultField(http_t *http, http_field_t field,
 extern http_state_t	httpWriteResponse(http_t *http,
 			                  http_status_t status) _CUPS_API_1_7;
 
-
-/**** New in CUPS 2.0 ****/
+/* New in CUPS 2.0 */
+extern int		httpCompareCredentials(cups_array_t *cred1,
+			                       cups_array_t *cred2)
+			                       _CUPS_API_2_0;
+extern int		httpCreateCredentials(const char *path,
+			                      cups_array_t **credentials,
+			                      const char *common_name)
+					      _CUPS_API_2_0;
+extern size_t		httpCredentialsString(cups_array_t *credentials,
+			                      char *buffer, size_t bufsize)
+					      _CUPS_API_2_0;
 extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
 extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern http_field_t	httpFieldValue(const char *name) _CUPS_API_2_0;
@@ -626,7 +635,15 @@ extern size_t		httpGetReady(http_t *http) _CUPS_API_2_0;
 extern size_t		httpGetRemaining(http_t *http) _CUPS_API_2_0;
 extern int		httpIsChunked(http_t *http) _CUPS_API_2_0;
 extern int		httpIsEncrypted(http_t *http) _CUPS_API_2_0;
+extern int		httpLoadCredentials(const char *path,
+			                    cups_array_t **credentials,
+					    const char *common_name)
+					    _CUPS_API_2_0;
 extern const char	*httpResolveHostname(http_t *http, char *buffer, size_t bufsize) _CUPS_API_2_0;
+extern int		httpSaveCredentials(const char *path,
+			                    cups_array_t *credentials,
+			                    const char *common_name)
+					    _CUPS_API_2_0;
 extern void		httpSetKeepAlive(http_t *http, http_keepalive_t keep_alive) _CUPS_API_2_0;
 extern void		httpShutdown(http_t *http) _CUPS_API_2_0;
 extern const char	*httpStateString(http_state_t state);
