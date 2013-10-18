@@ -613,6 +613,8 @@ extern http_state_t	httpWriteResponse(http_t *http,
 			                  http_status_t status) _CUPS_API_1_7;
 
 /* New in CUPS 2.0 */
+extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
+extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern int		httpCompareCredentials(cups_array_t *cred1,
 			                       cups_array_t *cred2)
 			                       _CUPS_API_2_0;
@@ -623,8 +625,6 @@ extern int		httpCreateCredentials(const char *path,
 extern size_t		httpCredentialsString(cups_array_t *credentials,
 			                      char *buffer, size_t bufsize)
 					      _CUPS_API_2_0;
-extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
-extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern http_field_t	httpFieldValue(const char *name) _CUPS_API_2_0;
 extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;
 extern http_addr_t	*httpGetAddress(http_t *http) _CUPS_API_2_0;

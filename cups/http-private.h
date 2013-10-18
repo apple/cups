@@ -392,18 +392,7 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Prototypes...
  */
 
-/* XXX */extern int		_httpAddrPort(http_addr_t *addr)
-			              _CUPS_INTERNAL_MSG("Use httpAddrPort instead.");
 extern void		_httpAddrSetPort(http_addr_t *addr, int port);
-/* XXX */extern char		*_httpAssembleUUID(const char *server, int port,
-					   const char *name, int number,
-					   char *buffer, size_t bufsize)
-					   _CUPS_INTERNAL_MSG("Use httpAssembleUUID instead.");
-/* XXX */extern http_t		*_httpCreate(const char *host, int port,
-			             http_addrlist_t *addrlist,
-				     http_encryption_t encryption,
-				     int family)
-				     _CUPS_INTERNAL_MSG("Use httpConnect2 or httpAccept instead.");
 extern http_tls_credentials_t
 			_httpCreateCredentials(cups_array_t *credentials);
 extern char		*_httpDecodeURI(char *dst, const char *src,
@@ -412,8 +401,6 @@ extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
-/* XXX */extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length)
-			          _CUPS_INTERNAL_MSG("Use httpPeek instead.");
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int options,
 					 int (*cb)(void *context),

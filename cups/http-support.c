@@ -538,13 +538,6 @@ httpAssembleUUID(const char *server,	/* I - Server name */
   return (buffer);
 }
 
-/* For OS X 10.8 and earlier */
-char *_httpAssembleUUID(const char *server, int port, const char *name,
-			int number, char *buffer, size_t bufsize)
-{
-  return (httpAssembleUUID(server, port, name, number, buffer, bufsize));
-}
-
 
 /*
  * 'httpDecode64()' - Base64-decode a string.

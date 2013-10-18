@@ -1884,10 +1884,6 @@ httpPeek(http_t *http,			/* I - HTTP connection */
   return (bytes);
 }
 
-/* For OS X 10.8 and earlier */
-ssize_t _httpPeek(http_t *http, char *buffer, size_t length)
-{ return (httpPeek(http, buffer, length)); }
-
 
 /*
  * 'httpPost()' - Send a POST request to the server.
@@ -3932,12 +3928,6 @@ http_create(
 
   return (http);
 }
-
-/* For OS X 10.8 and earlier */
-http_t *_httpCreate(const char *host, int port, http_addrlist_t *addrlist,
-		    http_encryption_t encryption, int family)
-{ return (http_create(host, port, addrlist, family, encryption, 1,
-                      _HTTP_MODE_CLIENT)); }
 
 
 #ifdef DEBUG

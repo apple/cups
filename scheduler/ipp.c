@@ -2184,8 +2184,8 @@ add_job_uuid(cupsd_job_t *job)		/* I - Job */
 
   if (!ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL,
-		 _httpAssembleUUID(ServerName, RemotePort, job->dest, job->id,
-		                   uuid, sizeof(uuid)));
+		 httpAssembleUUID(ServerName, RemotePort, job->dest, job->id,
+		                  uuid, sizeof(uuid)));
 }
 
 

@@ -470,9 +470,6 @@ httpAddrPort(http_addr_t *addr)		/* I - Address */
     return (0);
 }
 
-/* For OS X 10.8 and earlier */
-int _httpAddrPort(http_addr_t *addr) { return (httpAddrPort(addr)); }
-
 
 /*
  * '_httpAddrSetPort()' - Set the port number associated with an address.
