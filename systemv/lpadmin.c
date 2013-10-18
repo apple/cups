@@ -1295,6 +1295,7 @@ set_printer_options(
   * Add the options...
   */
 
+  cupsEncodeOptions2(request, num_options, options, IPP_TAG_OPERATION);
   cupsEncodeOptions2(request, num_options, options, IPP_TAG_PRINTER);
 
   if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
