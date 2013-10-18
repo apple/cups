@@ -645,7 +645,7 @@ cat_tar(const char *name,		/* I - PPD name */
   */
 
   if ((fp = get_file(name, request_id, "model", filename, sizeof(filename),
-                     &ppdname)) == NULL)
+                     &ppdname)) == NULL || !ppdname)
     return (1);
 
  /*

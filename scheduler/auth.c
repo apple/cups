@@ -458,7 +458,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 #endif /* HAVE_AUTHORIZATION_H */
 #if defined(SO_PEERCRED) && defined(AF_LOCAL)
   else if (!strncmp(authorization, "PeerCred ", 9) &&
-           con->http->hostaddr->addr.sa_family == AF_LOCAL)
+           con->http->hostaddr->addr.sa_family == AF_LOCAL && con->best)
   {
    /*
     * Use peer credentials from domain socket connection...
