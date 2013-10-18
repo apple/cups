@@ -4,6 +4,8 @@ CHANGES-1.7.txt
 CHANGES IN CUPS V1.7.0
 
 	- Updated the Japanese localization.
+	- The lpadmin command did not send the PPD name from the "-m" option
+	  (<rdar://problem/15264697>)
 	- Network backends now use the prtMarkerSuppliesClass property to
 	  determine the direction of supply level values
 	  (<rdar://problem/14302628>)
