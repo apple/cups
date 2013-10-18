@@ -1,16 +1,16 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Directory stuff for CUPS.
+dnl Directory stuff for CUPS.
 dnl
-dnl   Copyright 2007-2013 by Apple Inc.
-dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_PREFIX_DEFAULT(/)
@@ -107,11 +107,6 @@ if test "$libdir" = "\${exec_prefix}/lib"; then
 				libdir="$exec_prefix/lib64"
 			fi
 			;;
-		HP-UX*)
-			if test -d /usr/lib/hpux32; then
-				libdir="$exec_prefix/lib/hpux32"
-			fi
-			;;
 	esac
 fi
 
@@ -142,10 +137,6 @@ SMFMANIFESTDIR=""
 
 if test x$rcdir = x; then
 	case "$uname" in
-		AIX*)
-			INITDIR="/etc/rc.d"
-			;;
-
 		Darwin*)
 			# Darwin and MacOS X...
 			if test -x /sbin/launchd; then
@@ -157,13 +148,6 @@ if test x$rcdir = x; then
 
 		FreeBSD* | OpenBSD* | MirBSD* | ekkoBSD*)
 			# FreeBSD and OpenBSD
-			;;
-
-		HP-UX*)
-			INITDIR="/sbin"
-			RCLEVELS="2"
-			RCSTART="380"
-			RCSTOP="620"
 			;;
 
 		Linux | GNU | GNU/k*BSD*)
@@ -187,10 +171,6 @@ if test x$rcdir = x; then
 		NetBSD*)
 			# NetBSD
 			INITDDIR="/etc/rc.d"
-			;;
-
-		OSF1*)
-			INITDIR="/sbin"
 			;;
 
 		SunOS*)
@@ -353,10 +333,6 @@ if test "$localedir" = "\${datarootdir}/locale"; then
 	case "$uname" in
 		Linux | GNU | *BSD* | Darwin*)
 			CUPS_LOCALEDIR="$datarootdir/locale"
-			;;
-
-		OSF1* | AIX*)
-			CUPS_LOCALEDIR="$exec_prefix/lib/nls/msg"
 			;;
 
 		*)

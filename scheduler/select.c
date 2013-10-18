@@ -1,28 +1,16 @@
 /*
  * "$Id$"
  *
- *   Select abstraction functions for the CUPS scheduler.
+ * Select abstraction functions for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddSelect()    - Add a file descriptor to the list.
- *   cupsdDoSelect()     - Do a select-like operation.
- *   cupsdIsSelecting()  - Determine whether we are monitoring a file
- *                         descriptor.
- *   cupsdRemoveSelect() - Remove a file descriptor from the list.
- *   cupsdStartSelect()  - Initialize the file polling engine.
- *   cupsdStopSelect()   - Shutdown the file polling engine.
- *   compare_fds()       - Compare file descriptors.
- *   find_fd()           - Find an existing file descriptor record.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -39,8 +27,6 @@
 #  include <sys/time.h>
 #elif defined(HAVE_POLL)
 #  include <poll.h>
-#elif defined(__hpux)
-#  include <sys/time.h>
 #else
 #  include <sys/select.h>
 #endif /* HAVE_EPOLL */

@@ -3,23 +3,18 @@ dnl "$Id$"
 dnl
 dnl   PAM stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(pam, [  --disable-pam           disable PAM support])
 AC_ARG_WITH(pam_module, [  --with-pam-module       specify the PAM module to use])
-
-dnl Don't use PAM with AIX...
-if test $uname = AIX; then
-	enable_pam=no
-fi
 
 PAMDIR=""
 PAMFILE="pam.std"

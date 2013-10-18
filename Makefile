@@ -1,16 +1,16 @@
 #
 # "$Id$"
 #
-#   Top-level Makefile for CUPS.
+# Top-level Makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include Makedefs
@@ -300,7 +300,7 @@ sloc:
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-aix bsd deb depot inst pkg setld slackware swinstall tardist:
+bsd deb pkg slackware tardist:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:

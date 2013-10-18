@@ -1,18 +1,18 @@
 #
 # "$Id$"
 #
-#   API library Makefile for CUPS.
+# API library Makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
-#   This file is subject to the Apple OS-Developed Software exception.
+# This file is subject to the Apple OS-Developed Software exception.
 #
 
 include ../Makedefs
@@ -190,7 +190,7 @@ unittests:	$(UNITTARGETS)
 
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
-	$(RM) libcups.so libcups.sl libcups.dylib
+	$(RM) libcups.so libcups.dylib
 
 
 #
@@ -257,7 +257,7 @@ install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
-	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
+	if test $(LIBCUPS) = "libcups.so.2"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 	fi
@@ -286,9 +286,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcups.2.dylib
 	$(RM) $(LIBDIR)/$(LIBCUPSSTATIC)
 	$(RM) $(LIBDIR)/libcups.dylib
-	$(RM) $(LIBDIR)/libcups_s.a
-	$(RM) $(LIBDIR)/libcups.sl
-	$(RM) $(LIBDIR)/libcups.sl.2
 	$(RM) $(LIBDIR)/libcups.so
 	$(RM) $(LIBDIR)/libcups.so.2
 	-$(RMDIR) $(LIBDIR)
@@ -299,10 +296,10 @@ uninstall:
 
 
 #
-# libcups.so.2, libcups.sl.2
+# libcups.so.2
 #
 
-libcups.so.2 libcups.sl.2:	$(LIBOBJS)
+libcups.so.2:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
@@ -329,19 +326,6 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 		$(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib t.exp
 	$(LN) $@ libcups.dylib
-
-
-#
-# libcups_s.a
-#
-
-libcups_s.a:	$(LIBOBJS) libcups_s.exp
-	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o \
-		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
-		$(COMMONLIBS) $(LIBZ)
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ libcups_s.o
 
 
 #

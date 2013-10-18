@@ -1,23 +1,18 @@
 /*
  * "$Id$"
  *
- *   Common backend network APIs for CUPS.
+ * Common backend network APIs for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2011 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendCheckSideChannel() - Check the side-channel for pending requests.
- *   backendNetworkSideCB()    - Handle common network side-channel commands.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -26,11 +21,7 @@
 
 #include "backend-private.h"
 #include <limits.h>
-#ifdef __hpux
-#  include <sys/time.h>
-#else
-#  include <sys/select.h>
-#endif /* __hpux */
+#include <sys/select.h>
 
 
 /*

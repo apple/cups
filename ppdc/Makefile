@@ -1,16 +1,16 @@
 #
 # "$Id$"
 #
-#   Makefile for the CUPS PPD Compiler.
+# Makefile for the CUPS PPD Compiler.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 2002-2006 by Easy Software Products.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 2002-2006 by Easy Software Products.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 #
@@ -104,7 +104,7 @@ clean:
 	$(RM) $(TARGETS) $(UNITTARGETS)
 	$(RM) -r ppd ppd2
 	$(RM) sample-import.drv sample.c test.drv
-	$(RM) libcupsppdc.so libcupsppdc.sl libcupsppdc.dylib
+	$(RM) libcupsppdc.so libcupsppdc.dylib
 
 
 #
@@ -168,7 +168,7 @@ install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSPPDC) $(LIBDIR)
-	if test $(LIBCUPSPPDC) = "libcupsppdc.so.1" -o $(LIBCUPSPPDC) = "libcupsppdc.sl.1"; then \
+	if test $(LIBCUPSPPDC) = "libcupsppdc.so.1"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSPPDC) .1`; \
 		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/`basename $(LIBCUPSPPDC) .1`; \
 	fi
@@ -202,9 +202,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsppdc.1.dylib
 	$(RM) $(LIBDIR)/libcupsppdc.a
 	$(RM) $(LIBDIR)/libcupsppdc.dylib
-	$(RM) $(LIBDIR)/libcupsppdc_s.a
-	$(RM) $(LIBDIR)/libcupsppdc.sl
-	$(RM) $(LIBDIR)/libcupsppdc.sl.1
 	$(RM) $(LIBDIR)/libcupsppdc.so
 	$(RM) $(LIBDIR)/libcupsppdc.so.1
 	-$(RMDIR) $(LIBDIR)
@@ -334,10 +331,10 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 
 
 #
-# libcupsppdc.so.1, libcupsppdc.sl.1
+# libcupsppdc.so.1
 #
 
-libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
+libcupsppdc.so.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
 	$(RM) `basename $@ .1`
@@ -360,17 +357,6 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 		$(LIBOBJS) $(LINKCUPS)
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
-
-
-#
-# libcupsppdc_s.a
-#
-
-libcupsppdc_s.a:	$(LIBOBJS) ../cups/$(LIBCUPS)
-	echo Creating $@...
-	$(DSOXX) $(DSOFLAGS) -o libcupsppdc_s.o $(LIBOBJS) $(LINKCUPS)
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ libcupsppdc_s.o
 
 
 #

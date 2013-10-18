@@ -338,11 +338,6 @@ struct _http_s				/**** HTTP connection structure ****/
 #  ifndef HAVE_HSTRERROR
 extern const char *_cups_hstrerror(int error);
 #    define hstrerror _cups_hstrerror
-#  elif defined(_AIX) || defined(__osf__)
-/*
- * AIX and Tru64 UNIX don't provide a prototype but do provide the function...
- */
-extern const char *hstrerror(int error);
 #  endif /* !HAVE_HSTRERROR */
 
 

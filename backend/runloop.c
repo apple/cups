@@ -1,25 +1,18 @@
 /*
  * "$Id$"
  *
- *   Common run loop APIs for CUPS backends.
+ * Common run loop APIs for CUPS backends.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendDrainOutput() - Drain pending print data to the device.
- *   backendRunLoop()     - Read and write print and back-channel data.
- *   backendWaitLoop()    - Wait for input from stdin while handling
- *                          side-channel queries.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -28,11 +21,7 @@
 
 #include "backend-private.h"
 #include <limits.h>
-#ifdef __hpux
-#  include <sys/time.h>
-#else
-#  include <sys/select.h>
-#endif /* __hpux */
+#include <sys/select.h>
 
 
 /*

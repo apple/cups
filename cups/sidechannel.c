@@ -1,27 +1,18 @@
 /*
  * "$Id$"
  *
- *   Side-channel API code for CUPS.
+ * Side-channel API code for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsSideChannelDoRequest() - Send a side-channel command to a backend and
- *                                wait for a response.
- *   cupsSideChannelRead()      - Read a side-channel message.
- *   cupsSideChannelSNMPGet()   - Query a SNMP OID's value.
- *   cupsSideChannelSNMPWalk()  - Query multiple SNMP OID values.
- *   cupsSideChannelWrite()     - Write a side-channel message.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -35,12 +26,8 @@
 #else
 #  include <unistd.h>
 #endif /* WIN32 */
-#ifdef __hpux
-#  include <sys/time.h>
-#elif !defined(WIN32)
-#  include <sys/select.h>
-#endif /* __hpux */
 #ifndef WIN32
+#  include <sys/select.h>
 #  include <sys/time.h>
 #endif /* !WIN32 */
 #ifdef HAVE_POLL

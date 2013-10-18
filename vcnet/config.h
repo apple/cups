@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Configuration file for CUPS on Windows.
+ * Configuration file for CUPS on Windows.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifndef _CUPS_CONFIG_H_
@@ -86,8 +86,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.7.0"
-#define CUPS_MINIMAL "CUPS/1.7.0"
+#define CUPS_SVERSION "CUPS v2.0.0"
+#define CUPS_MINIMAL "CUPS/2.0.0"
 
 
 /*
@@ -492,13 +492,6 @@
  */
 
 /* #undef HAVE_STRUCT_SOCKADDR_SA_LEN */
-
-
-/*
- * Do we have the AIX usersec.h header file?
- */
-
-/* #undef HAVE_USERSEC_H */
 
 
 /*

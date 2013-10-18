@@ -21,17 +21,12 @@ process using the startup script for your operating system:</P>
 
 <UL>
 
-	<LI>AIX, Linux, Solaris:
+	<LI>Linux, Solaris:
 	<PRE CLASS="command">
 /etc/init.d/cups restart
 	</PRE></LI>
 
-	<LI>HP-UX:
-	<PRE CLASS="command">
-/sbin/init.d/cups restart
-	</PRE></LI>
-
-	<LI>MacOS X:
+	<LI>Mac OS X:
 	<PRE CLASS="command">
 sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist
 sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist

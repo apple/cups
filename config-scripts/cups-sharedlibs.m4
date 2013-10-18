@@ -1,16 +1,16 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Shared library support for CUPS.
+dnl Shared library support for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 PICFLAG=1
@@ -34,51 +34,7 @@ if test x$enable_shared != xno; then
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
-		UNIX_S*)
-			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-h,\`basename \$@\` -G \$(OPTIM)"
-			;;
-		HP-UX*)
-			case "$uarch" in
-				ia64)
-					LIBCUPS="lib$cupsbase.so.2"
-					LIBCUPSCGI="libcupscgi.so.1"
-					LIBCUPSIMAGE="libcupsimage.so.2"
-					LIBCUPSMIME="libcupsmime.so.1"
-					LIBCUPSPPDC="libcupsppdc.so.1"
-					DSO="\$(CC)"
-					DSOXX="\$(CXX)"
-					DSOFLAGS="$DSOFLAGS -Wl,-b,-z,+h,\`basename \$@\`"
-					;;
-				*)
-					LIBCUPS="lib$cupsbase.sl.2"
-					LIBCUPSCGI="libcupscgi.sl.1"
-					LIBCUPSIMAGE="libcupsimage.sl.2"
-					LIBCUPSMIME="libcupsmime.sl.1"
-					LIBCUPSPPDC="libcupsppdc.sl.1"
-					DSO="\$(LD)"
-					DSOXX="\$(LD)"
-					DSOFLAGS="$DSOFLAGS -b -z +h \`basename \$@\`"
-					;;
-			esac
-			;;
-		IRIX)
-			LIBCUPS="lib$cupsbase.so.2"
-			LIBCUPSCGI="libcupscgi.so.1"
-			LIBCUPSIMAGE="libcupsimage.so.2"
-			LIBCUPSMIME="libcupsmime.so.1"
-			LIBCUPSPPDC="libcupsppdc.so.1"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
-			;;
-		OSF1* | Linux | GNU | *BSD*)
+		Linux | GNU | *BSD*)
 			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -97,17 +53,6 @@ if test x$enable_shared != xno; then
 			DSO="\$(CC)"
 			DSOXX="\$(CXX)"
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
-			;;
-		AIX*)
-			LIBCUPS="lib${cupsbase}_s.a"
-			LIBCUPSBASE="${cupsbase}_s"
-			LIBCUPSCGI="libcupscgi_s.a"
-			LIBCUPSIMAGE="libcupsimage_s.a"
-			LIBCUPSMIME="libcupsmime_s.a"
-			LIBCUPSPPDC="libcupsppdc_s.a"
-			DSO="\$(CC)"
-			DSOXX="\$(CXX)"
-			DSOFLAGS="$DSOFLAGS -Wl,-bexpall,-bM:SRE,-bnoentry,-blibpath:\$(libdir)"
 			;;
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
@@ -151,19 +96,11 @@ if test x$enable_shared = xno; then
 	EXTLINKCUPS="-lcups"
 	EXTLINKCUPSIMAGE="-lcupsimage"
 else
-	if test $uname = AIX; then
-		LINKCUPS="-l${cupsbase}_s"
-		LINKCUPSIMAGE="-lcupsimage_s"
+	LINKCUPS="-l${cupsbase}"
+	LINKCUPSIMAGE="-lcupsimage"
 
-		EXTLINKCUPS="-lcups_s"
-		EXTLINKCUPSIMAGE="-lcupsimage_s"
-	else
-		LINKCUPS="-l${cupsbase}"
-		LINKCUPSIMAGE="-lcupsimage"
-
-		EXTLINKCUPS="-lcups"
-		EXTLINKCUPSIMAGE="-lcupsimage"
-	fi
+	EXTLINKCUPS="-lcups"
+	EXTLINKCUPSIMAGE="-lcupsimage"
 fi
 
 AC_SUBST(EXTLINKCUPS)
@@ -186,19 +123,6 @@ if test "$DSO" != ":"; then
 	# need this option, even when the library is installed in a
 	# standard location...
 	case $uname in
-                HP-UX*)
-			# HP-UX needs the path, even for /usr/lib...
-			case "$uarch" in
-				ia64)
-					DSOFLAGS="-Wl,+s,+b,$libdir $DSOFLAGS"
-					;;
-				*)
-                			DSOFLAGS="+s +b $libdir $DSOFLAGS"
-					;;
-			esac
-                	LDFLAGS="$LDFLAGS -Wl,+s,+b,$libdir"
-                	EXPORT_LDFLAGS="-Wl,+s,+b,$libdir"
-			;;
                 SunOS*)
                 	# Solaris...
 			if test $exec_prefix != /usr; then

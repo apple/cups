@@ -1,27 +1,20 @@
 /*
  * "$Id$"
  *
- *   USB port backend for CUPS.
+ * USB port backend for CUPS.
  *
- *   This file is included from "usb.c" when compiled on UNIX/Linux.
+ * This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   print_device() - Print a file to a USB device.
- *   list_devices() - List all USB devices.
- *   open_device()  - Open a USB device...
- *   side_cb()      - Handle side-channel requests...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -285,8 +278,6 @@ list_devices(void)
       close(fd);
     }
   }
-#elif defined(__hpux)
-#elif defined(__osf)
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
   int   i;                      /* Looping var */
   char  device[255];            /* Device filename */

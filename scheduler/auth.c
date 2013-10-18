@@ -35,9 +35,6 @@
 #    include <security/pam_appl.h>
 #  endif /* HAVE_PAM_PAM_APPL_H */
 #endif /* HAVE_LIBPAM */
-#ifdef HAVE_USERSEC_H
-#  include <usersec.h>
-#endif /* HAVE_USERSEC_H */
 #ifdef HAVE_MEMBERSHIP_H
 #  include <membership.h>
 #endif /* HAVE_MEMBERSHIP_H */
@@ -76,16 +73,16 @@ static int		check_authref(cupsd_client_t *con, const char *right);
 static int		compare_locations(cupsd_location_t *a,
 			                  cupsd_location_t *b);
 static cupsd_authmask_t	*copy_authmask(cupsd_authmask_t *am, void *data);
-#if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
+#if !HAVE_LIBPAM
 static char		*cups_crypt(const char *pw, const char *salt);
-#endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+#endif /* !HAVE_LIBPAM */
 static void		free_authmask(cupsd_authmask_t *am, void *data);
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
-#elif !defined(HAVE_USERSEC_H)
+#else
 static void		to64(char *s, unsigned long v, int n);
 #endif /* HAVE_LIBPAM */
 
@@ -101,15 +98,6 @@ typedef struct cupsd_authdata_s		/**** Authentication data ****/
 	password[HTTP_MAX_VALUE];	/* Password string */
 } cupsd_authdata_t;
 #endif /* HAVE_LIBPAM */
-
-
-/*
- * Local globals...
- */
-
-#if defined(__hpux) && HAVE_LIBPAM
-static cupsd_authdata_t	*auth_data;	/* Current client being authenticated */
-#endif /* __hpux && HAVE_LIBPAM */
 
 
 /*
@@ -671,23 +659,14 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
             strlcpy(data.username, username, sizeof(data.username));
 	    strlcpy(data.password, password, sizeof(data.password));
 
-#  if defined(__sun) || defined(__hpux)
+#  ifdef __sun
 	    pamdata.conv        = (int (*)(int, struct pam_message **,
 	                                   struct pam_response **,
 					   void *))pam_func;
 #  else
 	    pamdata.conv        = pam_func;
-#  endif /* __sun || __hpux */
+#  endif /* __sun */
 	    pamdata.appdata_ptr = &data;
-
-#  ifdef __hpux
-	   /*
-	    * Workaround for HP-UX bug in pam_unix; see pam_func() below for
-	    * more info...
-	    */
-
-	    auth_data = &data;
-#  endif /* __hpux */
 
 	    pamerr = pam_start("cups", username, &pamdata, &pamh);
 	    if (pamerr != PAM_SUCCESS)
@@ -748,29 +727,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    }
 
 	    pam_end(pamh, PAM_SUCCESS);
-
-#elif defined(HAVE_USERSEC_H)
-	   /*
-	    * Use AIX authentication interface...
-	    */
-
-	    char	*authmsg;	/* Authentication message */
-	    int		reenter;	/* ??? */
-
-
-	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                    "[Client %d] AIX authenticate of username \"%s\"",
-	                    con->number, username);
-
-	    reenter = 1;
-	    if (authenticate(username, password, &reenter, &authmsg) != 0)
-	    {
-	      cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                      "[Client %d] Unable to authenticate username "
-			      "\"%s\": %s", con->number, username,
-			      strerror(errno));
-	      return;
-	    }
 
 #else
            /*
@@ -2264,7 +2220,7 @@ copy_authmask(cupsd_authmask_t *mask,	/* I - Existing auth mask */
 }
 
 
-#if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
+#if !HAVE_LIBPAM
 /*
  * 'cups_crypt()' - Encrypt the password using the DES or MD5 algorithms,
  *                  as needed.
@@ -2384,7 +2340,7 @@ cups_crypt(const char *pw,		/* I - Password string */
     return (crypt(pw, salt));
   }
 }
-#endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+#endif /* !HAVE_LIBPAM */
 
 
 /*
@@ -2497,17 +2453,7 @@ pam_func(
 
   DEBUG_printf(("pam_func: appdata_ptr = %p\n", appdata_ptr));
 
-#ifdef __hpux
- /*
-  * Apparently some versions of HP-UX 11 have a broken pam_unix security
-  * module.  This is a workaround...
-  */
-
-  data = auth_data;
-  (void)appdata_ptr;
-#else
   data = (cupsd_authdata_t *)appdata_ptr;
-#endif /* __hpux */
 
   for (i = 0; i < num_msg; i ++)
   {
@@ -2557,7 +2503,7 @@ pam_func(
 
   return (PAM_SUCCESS);
 }
-#elif !defined(HAVE_USERSEC_H)
+#else
 
 
 /*

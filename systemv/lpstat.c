@@ -1,30 +1,16 @@
 /*
  * "$Id$"
  *
- *   "lpstat" command for CUPS.
+ * "lpstat" command for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()           - Parse options and show status information.
- *   check_dest()     - Verify that the named destination(s) exists.
- *   match_list()     - Match a name from a list of comma or space-separated
- *                      names.
- *   show_accepting() - Show acceptance status.
- *   show_classes()   - Show printer classes.
- *   show_default()   - Show default destination.
- *   show_devices()   - Show printer devices.
- *   show_jobs()      - Show active print jobs.
- *   show_printers()  - Show printers.
- *   show_scheduler() - Show scheduler status.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -1230,52 +1216,6 @@ show_devices(const char  *printers,	/* I - Destinations */
 
       if (match_list(printers, printer))
       {
-#ifdef __osf__ /* Compaq/Digital like to do it their own way... */
-        char	scheme[HTTP_MAX_URI],	/* Components of printer URI */
-		username[HTTP_MAX_URI],
-		hostname[HTTP_MAX_URI],
-		resource[HTTP_MAX_URI];
-	int	port;
-
-
-        if (device == NULL)
-	{
-	  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-	                  username, sizeof(username), hostname,
-			  sizeof(hostname), &port, resource, sizeof(resource));
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to remote "
-			    "printer %s on %s"),
-	        	  printer, strrchr(resource, '/') + 1, hostname);
-        }
-        else if (!strncmp(device, "file:", 5))
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to %s"),
-			  printer, device + 5);
-        else
-          _cupsLangPrintf(stdout,
-	                  _("Output for printer %s is sent to %s"),
-			  printer, device);
-
-        for (i = 0; i < num_dests; i ++)
-	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
-	  {
-            if (device == NULL)
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to "
-			        "remote printer %s on %s"),
-	        	      printer, dests[i].instance,
-			      strrchr(resource, '/') + 1, hostname);
-            else if (!strncmp(device, "file:", 5))
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to %s"),
-			      printer, dests[i].instance, device + 5);
-            else
-              _cupsLangPrintf(stdout,
-	                      _("Output for printer %s/%s is sent to %s"),
-			      printer, dests[i].instance, device);
-	  }
-#else
         if (device == NULL)
           _cupsLangPrintf(stdout, _("device for %s: %s"),
 	                  printer, uri);
@@ -1287,6 +1227,7 @@ show_devices(const char  *printers,	/* I - Destinations */
 	                  printer, device);
 
         for (i = 0; i < num_dests; i ++)
+        {
 	  if (!_cups_strcasecmp(printer, dests[i].name) && dests[i].instance)
 	  {
             if (device == NULL)
@@ -1299,7 +1240,7 @@ show_devices(const char  *printers,	/* I - Destinations */
               _cupsLangPrintf(stdout, _("device for %s/%s: %s"),
 	                      printer, dests[i].instance, device);
 	  }
-#endif /* __osf__ */
+	}
       }
 
       if (attr == NULL)

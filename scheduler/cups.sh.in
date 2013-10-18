@@ -2,16 +2,16 @@
 #
 # "$Id$"
 #
-#   Startup/shutdown script for CUPS.
+# Startup/shutdown script for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 #### OS-Dependent Information
@@ -115,8 +115,7 @@ unset TMPDIR
 
 #
 # Make sure we have the standard program directories in the path
-# since some operating systems (this means YOU HP-UX!) don't
-# provide a standard path on boot-up...
+# since some operating systems don't provide a standard path on boot-up...
 #
 
 if test "x$PATH" = x; then
@@ -132,18 +131,8 @@ export PATH
 #
 
 case "`uname`" in
-	HP-UX* | AIX* | SINIX*)
-		pid=`ps -e | awk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
-		;;
 	SunOS*)
 		pid=`ps -e | nawk '{if (match($4, ".*/cupsd$") || $4 == "cupsd") print $1}'`
-		;;
-	UnixWare*)
-		pid=`ps -e | awk '{if (match($6, ".*/cupsd$") || $6 == "cupsd") print $1}'`
-		. /etc/TIMEZONE
-		;;
-	OSF1*)
-		pid=`ps -e | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
 		;;
 	Linux* | *BSD* | Darwin*)
 		pid=`ps ax | awk '{if (match($5, ".*/cupsd$") || $5 == "cupsd") print $1}'`
@@ -195,16 +184,6 @@ case $1 in
 		else
 			echo "cups: scheduler is not running."
 		fi
-		;;
-
-	start_msg)
-		# HP-UX non-standard...
-		echo "Starting CUPS Server"
-		;;
-
-	stop_msg)
-		# HP-UX non-standard...
-		echo "Starting CUPS Server"
 		;;
 
 	*)

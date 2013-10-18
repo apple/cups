@@ -429,13 +429,6 @@
 
 
 /*
- * Do we have the AIX usersec.h header file?
- */
-
-/* #undef HAVE_USERSEC_H */
-
-
-/*
  * Do we have pthread support?
  */
 

@@ -1,16 +1,16 @@
 #
 # "$Id$"
 #
-#   Scheduler Makefile for CUPS.
+# Scheduler Makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -113,7 +113,7 @@ unittests:	$(UNITTARGETS)
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGETS) $(UNITTARGETS) convert
-	$(RM) libcupsmime.so libcupsmime.sl libcupsmime.dylib
+	$(RM) libcupsmime.so libcupsmime.dylib
 
 
 #
@@ -179,10 +179,6 @@ install-data:
 		for level in $(RCLEVELS); do \
 			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
 			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/S$(RCSTART)cups; \
-			if test `uname` = HP-UX; then \
-				level=`expr $$level - 1`; \
-				$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
-			fi; \
 			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/K$(RCSTOP)cups; \
 		done; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
@@ -254,7 +250,7 @@ install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR)
-	if test $(LIBCUPSMIME) = "libcupsmime.so.1" -o $(LIBCUPSMIME) = "libcupsmime.sl.1"; then \
+	if test $(LIBCUPSMIME) = "libcupsmime.so.1"; then \
 		$(RM) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
 		$(LN) $(LIBCUPSMIME) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
 	fi
@@ -303,9 +299,6 @@ uninstall:
 	$(RM) $(LIBDIR)/libcupsmime.1.dylib
 	$(RM) $(LIBDIR)/libcupsmime.a
 	$(RM) $(LIBDIR)/libcupsmime.dylib
-	$(RM) $(LIBDIR)/libcupsmime_s.a
-	$(RM) $(LIBDIR)/libcupsmime.sl
-	$(RM) $(LIBDIR)/libcupsmime.sl.1
 	$(RM) $(LIBDIR)/libcupsmime.so
 	$(RM) $(LIBDIR)/libcupsmime.so.1
 	-$(RMDIR) $(LIBDIR)
@@ -440,10 +433,10 @@ cups-lpd:	cups-lpd.o ../cups/$(LIBCUPS)
 
 
 #
-# libcupsmime.so.1, libcupsmime.sl.1
+# libcupsmime.so.1
 #
 
-libcupsmime.so.1 libcupsmime.sl.1:	$(LIBOBJS)
+libcupsmime.so.1:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .1`
@@ -464,17 +457,6 @@ libcupsmime.1.dylib:	$(LIBOBJS) libcupsmime.exp
 		$(LIBOBJS) $(LIBS)
 	$(RM) libcupsmime.dylib
 	$(LN) $@ libcupsmime.dylib
-
-
-#
-# libcupsmime_s.a
-#
-
-libcupsmime_s.a:	$(LIBOBJS)
-	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -o libcupsmime_s.o $(LIBOBJS) $(LIBS)
-	$(RM) $@
-	$(AR) $(ARFLAGS) $@ libcupsmime_s.o
 
 
 #
