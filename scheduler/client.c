@@ -556,24 +556,6 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 }
 
 
-#if 0
-/*
- * 'cupsdFlushHeader()' - Flush the header fields to the client.
- */
-
-int					/* I - Bytes written or -1 on error */
-cupsdFlushHeader(cupsd_client_t *con)	/* I - Client to flush to */
-{
-  int bytes = httpFlushWrite(con->http);
-
-  // TODO: Need to use httpSendResponse
-  con->http->data_encoding = HTTP_ENCODING_LENGTH;
-
-  return (bytes);
-}
-#endif /* 0 */
-
-
 /*
  * 'cupsdReadClient()' - Read data from a client.
  */
@@ -613,6 +595,22 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		 con->request,
 		 con->request ? ippStateString(ippGetState(con->request)) : "",
 		 con->file);
+
+  if (httpGetState(con->http) == HTTP_STATE_GET_SEND ||
+      httpGetState(con->http) == HTTP_STATE_POST_SEND ||
+      httpGetState(con->http) == HTTP_STATE_STATUS)
+  {
+   /*
+    * If we get called in the wrong state, then something went wrong with the
+    * connection and we need to shut it down...
+    */
+
+    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.",
+		   httpStateString(httpGetState(con->http)));
+    cupsdCloseClient(con);
+    return;
+  }
+
 
 #ifdef HAVE_SSL
   if (con->auto_ssl)
@@ -2263,17 +2261,22 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     _httpStatus(con->language, code), redirect,
 	     _httpStatus(con->language, code), text);
 
-    /*
-     * Send an error message back to the client.  If the error code is a
-     * 400 or 500 series, make sure the message contains some text, too!
-     */
+   /*
+    * Send an error message back to the client.  If the error code is a
+    * 400 or 500 series, make sure the message contains some text, too!
+    */
 
-    httpSetLength(con->http, strlen(message));
+    size_t length = strlen(message);	/* Length of message */
+
+    httpSetLength(con->http, length);
 
     if (!cupsdSendHeader(con, code, "text/html", auth_type))
       return (0);
     
-    if (httpPrintf(con->http, "%s", message) < 0)
+    if (httpWrite2(con->http, message, length) < 0)
+      return (0);
+
+    if (httpFlushWrite(con->http) < 0)
       return (0);
   }
   else
@@ -2498,7 +2501,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     * connection and we need to shut it down...
     */
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP state %s.",
+    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP write state %s.",
 		   httpStateString(httpGetState(con->http)));
     cupsdCloseClient(con);
     return;
@@ -2718,7 +2721,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
       httpFlushWrite(con->http);
 
-      if (httpIsChunked(con->http) && con->sent_header == 1)
+      if (httpIsChunked(con->http) && (!con->pipe_pid || con->sent_header == 1))
       {
 	if (httpWrite2(con->http, "", 0) < 0)
 	{
@@ -3956,8 +3959,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
   if (!cupsdSendHeader(con, code, type, CUPSD_AUTH_NONE))
     return (0);
 
-  cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient,
-                 (cupsd_selfunc_t)cupsdWriteClient, con);
+  cupsdAddSelect(httpGetFd(con->http), NULL, (cupsd_selfunc_t)cupsdWriteClient, con);
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG, "Sending file.");
 
