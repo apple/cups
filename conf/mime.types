@@ -124,7 +124,7 @@ application/x-shell		sh printable(0,1024) + string(0,#!) +\
 				(contains(2,80,/bash) contains(2,80,/ksh)\
 				 contains(2,80,/sh) contains(2,80,/zsh))
 application/x-csource		c cxx cpp cc C h hpp \
-				printable(0,1024) + \
+				printable(0,1024) + ! css + \
 				(string(0,/*) string(0,//)
 				 string(0,#include) contains(0,1024,<0a>#include) \
 				 string(0,#define) contains(0,1024,<0a>#define))

@@ -20,6 +20,7 @@ include ../Makedefs
 #
 
 WEBPAGES	=	\
+			apple-touch-icon.png \
 			cups.css \
 			cups-printable.css \
 			index.html \

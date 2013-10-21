@@ -835,6 +835,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   * Handle new transfers...
   */
 
+  cupsdLogClient(con, CUPSD_LOG_DEBUG, "Read: status=%d", status);
+
   if (status == HTTP_STATUS_OK)
   {
     if (httpGetField(con->http, HTTP_FIELD_ACCEPT_LANGUAGE)[0])
@@ -1061,6 +1063,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       switch (httpGetState(con->http))
       {
 	case HTTP_STATE_GET_SEND :
+            cupsdLogClient(con, CUPSD_LOG_DEBUG, "Processing GET %s", con->uri);
+
             if ((!strncmp(con->uri, "/ppd/", 5) ||
 		 !strncmp(con->uri, "/printers/", 10) ||
 		 !strncmp(con->uri, "/classes/", 9)) &&
@@ -1310,6 +1314,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      }
 
 	      type = mimeFileType(MimeDatabase, filename, NULL, NULL);
+
+              cupsdLogClient(con, CUPSD_LOG_DEBUG, "filename=\"%s\", type=%s/%s", filename, type ? type->super : "", type ? type->type : "");
 
               if (is_cgi(con, filename, &filestats, type))
 	      {
@@ -2719,10 +2725,10 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     {
       cupsdLogRequest(con, HTTP_STATUS_OK);
 
-      httpFlushWrite(con->http);
-
       if (httpIsChunked(con->http) && (!con->pipe_pid || con->sent_header == 1))
       {
+        cupsdLogClient(con, CUPSD_LOG_DEBUG, "Sending 0-length chunk.");
+
 	if (httpWrite2(con->http, "", 0) < 0)
 	{
 	  cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing for error %d (%s)",
@@ -2731,6 +2737,10 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  return;
 	}
       }
+
+      cupsdLogClient(con, CUPSD_LOG_DEBUG, "Flushing write buffer.");
+      httpFlushWrite(con->http);
+      cupsdLogClient(con, CUPSD_LOG_DEBUG, "New state is %s", httpStateString(httpGetState(con->http)));
     }
 
     cupsdAddSelect(httpGetFd(con->http), (cupsd_selfunc_t)cupsdReadClient, NULL, con);
@@ -3947,7 +3957,8 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
   fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
 
-  con->pipe_pid = 0;
+  con->pipe_pid    = 0;
+  con->sent_header = 1;
 
   httpClearFields(con->http);
 

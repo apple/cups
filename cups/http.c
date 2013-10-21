@@ -3453,7 +3453,8 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 
     if (http->state == HTTP_STATE_POST_RECV)
       http->state ++;
-    else if (http->state == HTTP_STATE_POST_SEND)
+    else if (http->state == HTTP_STATE_POST_SEND ||
+             http->state == HTTP_STATE_GET_SEND)
       http->state = HTTP_STATE_WAITING;
     else
       http->state = HTTP_STATE_STATUS;
@@ -3647,6 +3648,14 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
     http_set_length(http);
 
+    if (http->data_encoding == HTTP_ENCODING_LENGTH && http->data_remaining == 0)
+    {
+      DEBUG_printf(("1httpWriteResponse: Resetting state to HTTP_STATE_WAITING, "
+                    "was %s.", httpStateString(http->state)));
+      http->state = HTTP_STATE_WAITING;
+      return (0);
+    }
+
 #ifdef HAVE_LIBZ
    /*
     * Then start any content encoding...
@@ -3656,6 +3665,7 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
     http_content_coding_start(http,
 			      httpGetField(http, HTTP_FIELD_CONTENT_ENCODING));
 #endif /* HAVE_LIBZ */
+
   }
 
   return (0);
