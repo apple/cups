@@ -1,5 +1,0 @@
-<DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Mostra les tasques actives"></FORM>}
-{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Mostra les tasques completades"></FORM>}
-{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Mostra totes les tasques"></FORM>}</DIV>
-
-<P ALIGN="CENTER">{total=0?No hi ha cap tasca:Es mostren {#job_id} tas{total=1?ca:ques} de {total} {?which_jobs=?active:{which_jobs=all?:completed}}}.</P>
