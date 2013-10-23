@@ -1,36 +1,18 @@
 /*
  * "$Id$"
  *
- *   IPP backend for CUPS.
+ * IPP backend for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()		    - Send a file to the printer or server.
- *   cancel_job()	    - Cancel a print job.
- *   check_printer_state()  - Check the printer state.
- *   monitor_printer()	    - Monitor the printer state.
- *   new_request()	    - Create a new print creation or validation
- *			      request.
- *   password_cb()	    - Disable the password prompt for
- *			      cupsDoFileRequest().
- *   quote_string()	    - Quote a string value.
- *   report_attr()	    - Report an IPP attribute value.
- *   report_printer_state() - Report the printer state.
- *   run_as_user()	    - Run the IPP backend as the printing user.
- *   sigterm_handler()	    - Handle 'terminate' signals that stop the backend.
- *   timeout_cb()	    - Handle HTTP timeouts.
- *   update_reasons()	    - Update the printer-state-reasons values.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -133,6 +115,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "media-col-supported",
   "multiple-document-handling-supported",
   "operations-supported",
+  "print-color-mode-supported",
   "printer-alert",
   "printer-alert-description",
   "printer-is-accepting-jobs",
