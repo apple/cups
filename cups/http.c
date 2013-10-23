@@ -3682,12 +3682,16 @@ http_content_coding_finish(
     http_t *http)			/* I - HTTP connection */
 {
   int	zerr;				/* Compression status */
+  Byte	dummy[1];			/* Dummy read buffer */
 
 
   switch (http->coding)
   {
     case _HTTP_CODING_DEFLATE :
     case _HTTP_CODING_GZIP :
+        http->stream.next_in  = dummy;
+        http->stream.avail_in = 0;
+
         do
         {
           http->stream.next_out  = (Bytef *)http->wbuffer + http->wused;
