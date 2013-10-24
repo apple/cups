@@ -254,6 +254,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/es/*
 %dir /usr/share/doc/cups/fr
 /usr/share/doc/cups/fr/*
+%dir /usr/share/doc/cups/it
+/usr/share/doc/cups/it/*
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/*
 %dir /usr/share/doc/cups/ru
@@ -267,6 +269,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/es/cups_es.po
 %dir /usr/share/locale/fr
 /usr/share/locale/fr/cups_fr.po
+%dir /usr/share/locale/it
+/usr/share/locale/it/cups_it.po
 %dir /usr/share/locale/ja
 /usr/share/locale/ja/cups_ja.po
 %dir /usr/share/locale/ru
