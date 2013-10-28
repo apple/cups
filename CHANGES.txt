@@ -1,5 +1,10 @@
-CHANGES.txt - 1.7.0 - 2013-10-18
+CHANGES.txt - 1.7.1 - 2013-10-28
 --------------------------------
+
+CHANGES IN CUPS V1.7.1
+
+	- Auto debug logging was broken in 1.7.0 (<rdar://problem/15331639>)
+
 
 CHANGES IN CUPS V1.7.0
 
