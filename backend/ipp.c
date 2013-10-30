@@ -3009,7 +3009,7 @@ quote_string(const char *s,		/* I - String */
   {
     if (*s == '\\' || *s == '\"' || *s == '\'')
     {
-      if (q < (qend - 3))
+      if (q < (qend - 4))
       {
 	*qptr++ = '\\';
 	*qptr++ = '\\';

@@ -1,48 +1,18 @@
 /*
  * "$Id$"
  *
- *   ipptool command for CUPS.
+ * ipptool command for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()              - Parse options and do tests.
- *   add_stringf()       - Add a formatted string to an array.
- *   compare_vars()      - Compare two variables.
- *   do_tests()          - Do tests as specified in the test file.
- *   expand_variables()  - Expand variables in a string.
- *   expect_matches()    - Return true if the tag matches the specification.
- *   get_collection()    - Get a collection value from the current test file.
- *   get_filename()      - Get a filename based on the current test file.
- *   get_token()         - Get a token from a file.
- *   get_variable()      - Get the value of a variable.
- *   iso_date()          - Return an ISO 8601 date/time string for the given IPP
- *                         dateTime value.
- *   password_cb()       - Password callback for authenticated tests.
- *   print_attr()        - Print an attribute on the screen.
- *   print_col()         - Print a collection attribute on the screen.
- *   print_csv()         - Print a line of CSV text.
- *   print_fatal_error() - Print a fatal error message.
- *   print_line()        - Print a line of formatted or CSV text.
- *   print_xml_header()  - Print a standard XML plist header.
- *   print_xml_string()  - Print an XML string with escaping.
- *   print_xml_trailer() - Print the XML trailer with success/fail value.
- *   set_variable()      - Set a variable value.
- *   sigterm_handler()   - Handle SIGINT and SIGTERM.
- *   timeout_cb()        - Handle HTTP timeouts.
- *   usage()             - Show program usage.
- *   validate_attr()     - Determine whether an attribute is valid.
- *   with_value()        - Test a WITH-VALUE predicate.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -1292,39 +1262,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (col)
 	{
-	  ipp_attribute_t *tempcol;	/* Pointer to new buffer */
-
-
-	 /*
-	  * Reallocate memory...
-	  */
-
-	  if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
-				          (lastcol->num_values + 1) *
-				          sizeof(_ipp_value_t))) == NULL)
-	  {
-	    print_fatal_error("Unable to allocate memory on line %d.", linenum);
-	    pass = 0;
-	    goto test_exit;
-	  }
-
-	  if (tempcol != lastcol)
-	  {
-	   /*
-	    * Reset pointers in the list...
-	    */
-
-	    if (request->prev)
-	      request->prev->next = tempcol;
-	    else
-	      request->attrs = tempcol;
-
-	    lastcol = request->current = request->last = tempcol;
-	  }
-
-	  lastcol->values[lastcol->num_values].collection = col;
-	  lastcol->num_values ++;
-	}
+          ippSetCollection(request, &lastcol, ippGetCount(lastcol), col);
+        }
 	else
 	{
 	  pass = 0;
@@ -3540,39 +3479,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 					/* Collection value */
 
       if (subcol)
-      {
-	ipp_attribute_t	*tempcol;	/* Pointer to new buffer */
-
-
-       /*
-	* Reallocate memory...
-	*/
-
-	if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
-				        (lastcol->num_values + 1) *
-					sizeof(_ipp_value_t))) == NULL)
-	{
-	  print_fatal_error("Unable to allocate memory on line %d.", *linenum);
-	  goto col_error;
-	}
-
-	if (tempcol != lastcol)
-	{
-	 /*
-	  * Reset pointers in the list...
-	  */
-
-	  if (col->prev)
-	    col->prev->next = tempcol;
-	  else
-	    col->attrs = tempcol;
-
-	  lastcol = col->current = col->last = tempcol;
-	}
-
-	lastcol->values[lastcol->num_values].collection = subcol;
-	lastcol->num_values ++;
-      }
+        ippSetCollection(col, &lastcol, ippGetCount(lastcol), subcol);
       else
 	goto col_error;
     }

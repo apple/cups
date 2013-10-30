@@ -128,8 +128,11 @@ depend:
 
 
 #
-# Run the clang.llvm.org static code analysis tool on the C sources.
-# (at least checker-231 is required for scan-build to work this way)
+# Run the Clang static code analysis tool on the sources, available here:
+#
+#    http://clang-analyzer.llvm.org
+#
+# At least checker-231 is required.
 #
 
 .PHONY: clang clang-changes
@@ -138,6 +141,26 @@ clang:
 	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) clean all
 clang-changes:
 	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) all
+
+
+#
+# Run the STACK tool on the sources, available here:
+#
+#    http://css.csail.mit.edu/stack/
+#
+# Do the following to pass options to configure:
+#
+#    make CONFIGFLAGS="--foo --bar" stack
+#
+
+.PHONY: stack
+stack:
+	stack-build ./configure $(CONFIGFLAGS)
+	stack-build $(MAKE) $(MFLAGS) clean all
+	poptck
+	$(MAKE) $(MFLAGS) distclean
+	$(RM) */*.ll
+	$(RM) */*.ll.out
 
 
 #
