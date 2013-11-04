@@ -1,39 +1,16 @@
 /*
  * "$Id$"
  *
- *   Configuration routines for the CUPS scheduler.
+ * Configuration routines for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddAlias()	      - Add a host alias.
- *   cupsdCheckPermissions()  - Fix the mode and ownership of a file or
- *				directory.
- *   cupsdDefaultAuthType()   - Get the default AuthType.
- *   cupsdFreeAliases()       - Free all of the alias entries.
- *   cupsdReadConfiguration() - Read the cupsd.conf file.
- *   get_address()	      - Get an address + port number from a line.
- *   get_addr_and_mask()      - Get an IP address and netmask.
- *   mime_error_cb()	      - Log a MIME error.
- *   parse_aaa()	      - Parse authentication, authorization, and access
- *				control lines.
- *   parse_fatal_errors()     - Parse FatalErrors values in a string.
- *   parse_groups()	      - Parse system group names in a string.
- *   parse_protocols()	      - Parse browse protocols in a string.
- *   parse_variable()	      - Parse a variable line.
- *   read_cupsd_conf()	      - Read the cupsd.conf configuration file.
- *   read_cups_files_conf()   - Read the cups-files.conf configuration file.
- *   read_location()	      - Read a <Location path> definition.
- *   read_policy()	      - Read a <Policy name> definition.
- *   set_policy_defaults()    - Set default policy values as needed.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -1815,7 +1792,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
 	* Merge everything into a 32-bit IPv4 address in ip[3]...
 	*/
 
-	ip[3] = (((((val[0] << 8) | val[1]) << 8) | val[2]) << 8) | val[3];
+	ip[3] = ((((((unsigned)val[0] << 8) | (unsigned)val[1]) << 8) |
+	         (unsigned)val[2]) << 8) | (unsigned)val[3];
 
 	if (ipcount < 4)
 	  mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
@@ -1883,7 +1861,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
     * Merge everything into a 32-bit IPv4 address in ip[3]...
     */
 
-    ip[3] = (((((val[0] << 8) | val[1]) << 8) | val[2]) << 8) | val[3];
+    ip[3] = ((((((unsigned)val[0] << 8) | (unsigned)val[1]) << 8) |
+             (unsigned)val[2]) << 8) | (unsigned)val[3];
 
     if (ipcount < 4)
       mask[3] = (0xffffffff << (32 - 8 * ipcount)) & 0xffffffff;
@@ -1910,7 +1889,8 @@ get_addr_and_mask(const char *value,	/* I - String from config file */
                  mask + 3) != 4)
         return (0);
 
-      mask[3] |= ((((mask[0] << 8) | mask[1]) << 8) | mask[2]) << 8;
+      mask[3] |= (((((unsigned)mask[0] << 8) | (unsigned)mask[1]) << 8) |
+                  (unsigned)mask[2]) << 8;
       mask[0] = mask[1] = mask[2] = 0;
     }
     else

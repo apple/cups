@@ -1,32 +1,16 @@
 /*
  * "$Id$"
  *
- *   HTTP address routines for CUPS.
+ * HTTP address routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   httpAddrAny()	 - Check for the "any" address.
- *   httpAddrEqual()	 - Compare two addresses.
- *   httpAddrLength()	 - Return the length of the address in bytes.
- *   httpAddrListen()	 - Create a listening socket bound to the specified
- *			   address and port.
- *   httpAddrLocalhost() - Check for the local loopback address.
- *   httpAddrLookup()	 - Lookup the hostname associated with the address.
- *   httpAddrPort()	 - Get the port number associated with an address.
- *   _httpAddrSetPort()  - Set the port number associated with an address.
- *   httpAddrString()	 - Convert an address to a numeric string.
- *   httpGetHostByName() - Lookup a hostname or IPv4 address, and return
- *			   address records for the specified name.
- *   httpGetHostname()	 - Get the FQDN for the connection or local system.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -643,8 +627,9 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     if (ip[0] > 255 || ip[1] > 255 || ip[2] > 255 || ip[3] > 255)
       return (NULL);			/* Invalid byte ranges! */
 
-    cg->ip_addr = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
-                         ip[3]));
+    cg->ip_addr = htonl((((((((unsigned)ip[0] << 8) | (unsigned)ip[1]) << 8) |
+                           (unsigned)ip[2]) << 8) |
+                         (unsigned)ip[3]));
 
    /*
     * Fill in the host entry and return it...
