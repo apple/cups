@@ -1,25 +1,16 @@
 /*
  * "$Id$"
  *
- *   HTTP address list routines for CUPS.
+ * HTTP address list routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   httpAddrConnect()	- Connect to any of the addresses in the list.
- *   httpAddrConnect2() - Connect to any of the addresses in the list with a
- *			  timeout and optional cancel.
- *   httpAddrCopyList() - Copy an address list.
- *   httpAddrFreeList() - Free an address list.
- *   httpAddrGetList()	- Get a list of addresses for a hostname.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -639,9 +630,10 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	    return (NULL);
 
           first->addr.ipv4.sin_family = AF_INET;
-          first->addr.ipv4.sin_addr.s_addr = htonl(((((((ip[0] << 8) |
-	                                               ip[1]) << 8) |
-						     ip[2]) << 8) | ip[3]));
+          first->addr.ipv4.sin_addr.s_addr = htonl((((((((unsigned)ip[0] << 8) |
+	                                               (unsigned)ip[1]) << 8) |
+						     (unsigned)ip[2]) << 8) |
+						   (unsigned)ip[3]));
           first->addr.ipv4.sin_port = htons(portnum);
 	}
       }

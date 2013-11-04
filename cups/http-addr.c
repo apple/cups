@@ -746,8 +746,9 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     if (ip[0] > 255 || ip[1] > 255 || ip[2] > 255 || ip[3] > 255)
       return (NULL);			/* Invalid byte ranges! */
 
-    cg->ip_addr = htonl(((((((ip[0] << 8) | ip[1]) << 8) | ip[2]) << 8) |
-                         ip[3]));
+    cg->ip_addr = htonl((((((((unsigned)ip[0] << 8) | (unsigned)ip[1]) << 8) |
+                           (unsigned)ip[2]) << 8) |
+                         (unsigned)ip[3]));
 
    /*
     * Fill in the host entry and return it...
@@ -818,7 +819,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
     if (!s || slen <= 1)
       return (NULL);
-    
+
     if (gethostname(s, slen) < 0)
       strlcpy(s, "localhost", slen);
 

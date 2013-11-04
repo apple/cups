@@ -1,61 +1,21 @@
 /*
  * "$Id$"
  *
- *   File functions for CUPS.
+ * File functions for CUPS.
  *
- *   Since stdio files max out at 256 files on many systems, we have to
- *   write similar functions without this limit.  At the same time, using
- *   our own file functions allows us to provide transparent support of
- *   gzip'd print files, PPD files, etc.
+ * Since stdio files max out at 256 files on many systems, we have to
+ * write similar functions without this limit.  At the same time, using
+ * our own file functions allows us to provide transparent support of
+ * gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   _cupsFileCheck()       - Check the permissions of the given filename.
- *   _cupsFileCheckFilter() - Report file check results as CUPS filter messages.
- *   cupsFileClose()        - Close a CUPS file.
- *   cupsFileCompression()  - Return whether a file is compressed.
- *   cupsFileEOF()          - Return the end-of-file status.
- *   cupsFileFind()         - Find a file using the specified path.
- *   cupsFileFlush()        - Flush pending output.
- *   cupsFileGetChar()      - Get a single character from a file.
- *   cupsFileGetConf()      - Get a line from a configuration file.
- *   cupsFileGetLine()      - Get a CR and/or LF-terminated line that may
- *                            contain binary data.
- *   cupsFileGets()         - Get a CR and/or LF-terminated line.
- *   cupsFileLock()         - Temporarily lock access to a file.
- *   cupsFileNumber()       - Return the file descriptor associated with a CUPS
- *                            file.
- *   cupsFileOpen()         - Open a CUPS file.
- *   cupsFileOpenFd()       - Open a CUPS file using a file descriptor.
- *   cupsFilePeekChar()     - Peek at the next character from a file.
- *   cupsFilePrintf()       - Write a formatted string.
- *   cupsFilePutChar()      - Write a character.
- *   cupsFilePutConf()      - Write a configuration line.
- *   cupsFilePuts()         - Write a string.
- *   cupsFileRead()         - Read from a file.
- *   cupsFileRewind()       - Set the current file position to the beginning of
- *                            the file.
- *   cupsFileSeek()         - Seek in a file.
- *   cupsFileStderr()       - Return a CUPS file associated with stderr.
- *   cupsFileStdin()        - Return a CUPS file associated with stdin.
- *   cupsFileStdout()       - Return a CUPS file associated with stdout.
- *   cupsFileTell()         - Return the current file position.
- *   cupsFileUnlock()       - Unlock access to a file.
- *   cupsFileWrite()        - Write to a file.
- *   cups_compress()        - Compress a buffer of data.
- *   cups_fill()            - Fill the input buffer.
- *   cups_open()            - Safely open a file for writing.
- *   cups_read()            - Read from a file descriptor.
- *   cups_write()           - Write to a file descriptor.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -2429,8 +2389,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	}
 	else
 	{
-	  tcrc = (((((trailer[3] << 8) | trailer[2]) << 8) | trailer[1]) << 8) |
-        	 trailer[0];
+	  tcrc = ((((((uLong)trailer[3] << 8) | (uLong)trailer[2]) << 8) |
+	          (uLong)trailer[1]) << 8) | (uLong)trailer[0];
 
 	  if (tcrc != fp->crc)
 	  {
@@ -2438,7 +2398,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
             * Bad CRC, mark end-of-file...
 	    */
 
-            DEBUG_printf(("9cups_fill: tcrc=%08x, fp->crc=%08x",
+            DEBUG_printf(("9cups_fill: tcrc=%08x != fp->crc=%08x",
 	                  (unsigned int)tcrc, (unsigned int)fp->crc));
 
 	    fp->eof = 1;
