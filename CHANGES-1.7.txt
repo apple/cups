@@ -12,6 +12,8 @@ CHANGES IN CUPS V1.7.1
 	- The RPM spec file did not list the build requirements; this was on
 	  purpose, but now we are listing the Red Hat package names
 	  (<rdar://problem/15375760>)
+	- Printing to a raw queue could result in corrupt output due to
+	  opportunistic compression (<rdar://problem/15008524>)
 
 
 CHANGES IN CUPS V1.7.0
