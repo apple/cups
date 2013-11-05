@@ -51,6 +51,8 @@ Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
 
 # Package names are as defined for Red Hat (and clone) distributions
+BuildRequires: gnutls-devel, pam-devel
+
 %if %{?_with_dbus:1}%{!?_with_dbus:0}
 BuildRequires: dbus-devel
 %endif
