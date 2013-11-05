@@ -1,55 +1,16 @@
 /*
  * "$Id$"
  *
- *   Printer routines for the CUPS scheduler.
+ * Printer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdAddPrinter()          - Add a printer to the system.
- *   cupsdCreateCommonData()    - Create the common printer data.
- *   cupsdDeleteAllPrinters()   - Delete all printers from the system.
- *   cupsdDeletePrinter()       - Delete a printer from the system.
- *   cupsdFindDest()            - Find a destination in the list.
- *   cupsdFindPrinter()         - Find a printer in the list.
- *   cupsdLoadAllPrinters()     - Load printers from the printers.conf file.
- *   cupsdRenamePrinter()       - Rename a printer.
- *   cupsdSaveAllPrinters()     - Save all printer definitions to the
- *                                printers.conf file.
- *   cupsdSetAuthInfoRequired() - Set the required authentication info.
- *   cupsdSetDeviceURI()        - Set the device URI for a printer.
- *   cupsdSetPrinterAttr()      - Set a printer attribute.
- *   cupsdSetPrinterAttrs()     - Set printer attributes based upon the PPD
- *                                file.
- *   cupsdSetPrinterReasons()   - Set/update the reasons strings.
- *   cupsdSetPrinterState()     - Update the current state of a printer.
- *   cupsdStopPrinter()         - Stop a printer from printing any jobs...
- *   cupsdUpdatePrinterPPD()    - Update keywords in a printer's PPD file.
- *   cupsdUpdatePrinters()      - Update printers after a partial reload.
- *   cupsdValidateDest()        - Validate a printer/class destination.
- *   cupsdWritePrintcap()       - Write a pseudo-printcap file for older
- *                                applications that need it...
- *   add_printer_defaults()     - Add name-default attributes to the printer
- *                                attributes.
- *   add_printer_filter()       - Add a MIME filter for a printer.
- *   add_printer_formats()      - Add document-format-supported values for a
- *                                printer.
- *   compare_printers()         - Compare two printers.
- *   delete_printer_filters()   - Delete all MIME filters for a printer.
- *   dirty_printer()            - Mark config and state files dirty for the
- *                                specified printer.
- *   load_ppd()                 - Load a cached PPD file, updating the cache as
- *                                needed.
- *   new_media_col()            - Create a media-col collection value.
- *   write_xml_string()         - Write a string with XML escaping.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -1870,12 +1831,13 @@ void
 cupsdSetPrinterAttr(
     cupsd_printer_t *p,			/* I - Printer */
     const char      *name,		/* I - Attribute name */
-    char            *value)		/* I - Attribute value string */
+    const char      *value)		/* I - Attribute value string */
 {
   ipp_attribute_t	*attr;		/* Attribute */
   int			i,		/* Looping var */
 			count;		/* Number of values */
-  char			*ptr,		/* Pointer into value */
+  char			*temp,		/* Temporary copy of value string */
+			*ptr,		/* Pointer into value */
 			*start,		/* Start of value */
 			quote;		/* Quote character */
   ipp_tag_t		value_tag;	/* Value tag for this attribute */
@@ -1892,10 +1854,21 @@ cupsdSetPrinterAttr(
   }
 
  /*
+  * Copy the value string so we can do what we want with it...
+  */
+
+  if ((temp = strdup(value)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to duplicate value for \"%s\" attribute.", name);
+    return;
+  }
+
+ /*
   * Count the number of values...
   */
 
-  for (count = 1, quote = '\0', ptr = value;
+  for (count = 1, quote = '\0', ptr = temp;
        *ptr;
        ptr ++)
   {
@@ -1943,15 +1916,15 @@ cupsdSetPrinterAttr(
       return;
     }
 
-    for (i = 0; i < count; i ++)
+    for (i = 0, start = temp; i < count; i ++)
     {
-      if ((ptr = strchr(value, ',')) != NULL)
+      if ((ptr = strchr(start, ',')) != NULL)
         *ptr++ = '\0';
 
-      attr->values[i].integer = strtol(value, NULL, 10);
+      attr->values[i].integer = strtol(start, NULL, 10);
 
       if (ptr)
-        value = ptr;
+        start = ptr;
     }
   }
   else
@@ -1993,7 +1966,7 @@ cupsdSetPrinterAttr(
       return;
     }
 
-    for (i = 0, quote = '\0', ptr = value; i < count; i ++)
+    for (i = 0, quote = '\0', ptr = temp; i < count; i ++)
     {
       for (start = ptr; *ptr; ptr ++)
       {
@@ -2022,6 +1995,8 @@ cupsdSetPrinterAttr(
       attr->values[i].string.text = _cupsStrAlloc(start);
     }
   }
+
+  free(temp);
 }
 
 

@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Printer definitions for the CUPS scheduler.
+ * Printer definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 #ifdef HAVE_DNSSD
@@ -166,7 +166,8 @@ extern int		cupsdSetAuthInfoRequired(cupsd_printer_t *p,
 						 ipp_attribute_t *attr);
 extern void		cupsdSetDeviceURI(cupsd_printer_t *p, const char *uri);
 extern void		cupsdSetPrinterAttr(cupsd_printer_t *p,
-			                    const char *name, char *value);
+			                    const char *name,
+			                    const char *value);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
 extern int		cupsdSetPrinterReasons(cupsd_printer_t *p,
 			                       const char *s);
