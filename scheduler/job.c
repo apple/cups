@@ -312,8 +312,7 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job.",
-		      job->id);
+      cupsdLogJob(job, CUPSD_LOG_ERROR, "Stopping unresponsive job.");
 
       stop_job(job, CUPSD_JOB_FORCE);
       continue;
@@ -1640,7 +1639,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   * Load job attributes...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] Loading attributes...", job->id);
+  cupsdLogJob(job, CUPSD_LOG_DEBUG, "Loading attributes...");
 
   snprintf(jobfile, sizeof(jobfile), "%s/c%05d", RequestRoot, job->id);
   if ((fp = cupsdOpenConfFile(jobfile)) == NULL)
@@ -1648,9 +1647,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL, job->attrs) != IPP_DATA)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to read job control file \"%s\".", job->id,
-		    jobfile);
+    cupsdLogJob(job, CUPSD_LOG_ERROR,
+		"Unable to read job control file \"%s\".", jobfile);
     cupsFileClose(fp);
     goto error;
   }
@@ -1663,18 +1661,16 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   if (!ippFindAttribute(job->attrs, "time-at-creation", IPP_TAG_INTEGER))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Missing or bad time-at-creation attribute in "
-		    "control file.", job->id);
+    cupsdLogJob(job, CUPSD_LOG_ERROR,
+		"Missing or bad time-at-creation attribute in control file.");
     goto error;
   }
 
   if ((job->state = ippFindAttribute(job->attrs, "job-state",
                                      IPP_TAG_ENUM)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Missing or bad job-state attribute in control "
-		    "file.", job->id);
+    cupsdLogJob(job, CUPSD_LOG_ERROR,
+		"Missing or bad job-state attribute in control file.");
     goto error;
   }
 
@@ -1714,18 +1710,17 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if ((attr = ippFindAttribute(job->attrs, "job-printer-uri",
                                  IPP_TAG_URI)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] No job-printer-uri attribute in control file.",
-		      job->id);
+      cupsdLogJob(job, CUPSD_LOG_ERROR,
+		  "No job-printer-uri attribute in control file.");
       goto error;
     }
 
     if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
                                   &destptr)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] Unable to queue job for destination \"%s\".",
-		      job->id, attr->values[0].string.text);
+      cupsdLogJob(job, CUPSD_LOG_ERROR,
+		  "Unable to queue job for destination \"%s\".",
+		  attr->values[0].string.text);
       goto error;
     }
 
@@ -1733,9 +1728,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   }
   else if ((destptr = cupsdFindDest(job->dest)) == NULL)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "[Job %d] Unable to queue job for destination \"%s\".",
-		    job->id, job->dest);
+    cupsdLogJob(job, CUPSD_LOG_ERROR,
+		"Unable to queue job for destination \"%s\".",
+		job->dest);
     goto error;
   }
 
@@ -1744,9 +1739,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   {
     const char	*reason;		/* job-state-reason keyword */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "[Job %d] Adding missing job-state-reasons attribute to "
-		    " control file.", job->id);
+    cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		"Adding missing job-state-reasons attribute to  control file.");
 
     switch (job->state_value)
     {
@@ -1811,9 +1805,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if ((attr = ippFindAttribute(job->attrs, "job-priority",
                         	 IPP_TAG_INTEGER)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] Missing or bad job-priority attribute in "
-		      "control file.", job->id);
+      cupsdLogJob(job, CUPSD_LOG_ERROR,
+		  "Missing or bad job-priority attribute in control file.");
       goto error;
     }
 
@@ -1825,9 +1818,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if ((attr = ippFindAttribute(job->attrs, "job-originating-user-name",
                         	 IPP_TAG_NAME)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "[Job %d] Missing or bad job-originating-user-name "
-		      "attribute in control file.", job->id);
+      cupsdLogJob(job, CUPSD_LOG_ERROR,
+		  "Missing or bad job-originating-user-name "
+		  "attribute in control file.");
       goto error;
     }
 
@@ -1872,9 +1865,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       if (access(jobfile, 0))
         break;
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "[Job %d] Auto-typing document file \"%s\"...", job->id,
-		      jobfile);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		  "Auto-typing document file \"%s\"...", jobfile);
 
       if (fileid > job->num_files)
       {
@@ -1900,9 +1892,8 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
         if (!compressions || !filetypes)
 	{
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "[Job %d] Ran out of memory for job file types.",
-			  job->id);
+          cupsdLogJob(job, CUPSD_LOG_ERROR,
+		      "Ran out of memory for job file types.");
 
 	  ippDelete(job->attrs);
 	  job->attrs = NULL;
@@ -2210,8 +2201,7 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
   if (ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL,
                  job->attrs) != IPP_DATA)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "[Job %d] Unable to write job control file.", job->id);
+    cupsdLogJob(job, CUPSD_LOG_ERROR, "Unable to write job control file.");
     cupsFileClose(fp);
     return;
   }
@@ -4076,8 +4066,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       job->status_pipes[0] = -1;
       job->status_pipes[1] = -1;
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] Loading from cache...",
-                      job->id);
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "Loading from cache...");
     }
     else if (!job)
     {
@@ -4146,8 +4135,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	         job->id);
         if (access(jobfile, 0))
 	{
-	  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Data files have gone away.",
-	                  job->id);
+	  cupsdLogJob(job, CUPSD_LOG_INFO, "Data files have gone away.");
           job->num_files = 0;
 	  continue;
 	}
@@ -4157,9 +4145,9 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
         if (!job->filetypes || !job->compressions)
 	{
-	  cupsdLogMessage(CUPSD_LOG_EMERG,
-		          "[Job %d] Unable to allocate memory for %d files.",
-		          job->id, job->num_files);
+	  cupsdLogJob(job, CUPSD_LOG_EMERG,
+		      "Unable to allocate memory for %d files.",
+		      job->num_files);
           break;
 	}
       }
@@ -4197,9 +4185,9 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
         * If the original MIME type is unknown, auto-type it!
 	*/
 
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-		        "[Job %d] Unknown MIME type %s/%s for file %d.",
-		        job->id, super, type, number + 1);
+        cupsdLogJob(job, CUPSD_LOG_ERROR,
+		    "Unknown MIME type %s/%s for file %d.",
+		    super, type, number + 1);
 
         snprintf(jobfile, sizeof(jobfile), "%s/d%05d-%03d", RequestRoot,
 	         job->id, number + 1);
@@ -4717,7 +4705,7 @@ unload_job(cupsd_job_t *job)		/* I - Job */
   if (!job->attrs)
     return;
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] Unloading...", job->id);
+  cupsdLogJob(job, CUPSD_LOG_DEBUG, "Unloading...");
 
   ippDelete(job->attrs);
 
