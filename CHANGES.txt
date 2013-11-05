@@ -1,9 +1,14 @@
-CHANGES.txt - 1.7.1 - 2013-10-28
+CHANGES.txt - 1.7.1 - 2013-11-04
 --------------------------------
 
 CHANGES IN CUPS V1.7.1
 
 	- Auto debug logging was broken in 1.7.0 (<rdar://problem/15331639>)
+	- Some gzip'd PPD files could not be used (<rdar://problem/15386424>)
+	- Cleaned up some job logging in the scheduler
+	  (<rdar://problem/15332672>)
+	- ATTR messages could cause string pool memory corruption in the
+	  scheduler (<rdar://problem/15382819>)
 
 
 CHANGES IN CUPS V1.7.0
