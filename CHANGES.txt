@@ -9,6 +9,9 @@ CHANGES IN CUPS V1.7.1
 	  (<rdar://problem/15332672>)
 	- ATTR messages could cause string pool memory corruption in the
 	  scheduler (<rdar://problem/15382819>)
+	- The RPM spec file did not list the build requirements; this was on
+	  purpose, but now we are listing the Red Hat package names
+	  (<rdar://problem/15375760>)
 
 
 CHANGES IN CUPS V1.7.0
