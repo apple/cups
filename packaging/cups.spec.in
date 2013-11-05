@@ -1,24 +1,25 @@
 #
 # "$Id$"
 #
-#   RPM "spec" file for CUPS.
+# RPM "spec" file for CUPS.
 #
-#   Original version by Jason McMullan <jmcc@ontv.com>.
+# Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 1999-2007 by Easy Software Products, all rights reserved.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 # Conditional build options (--with name/--without name):
 #
 #   dbus     - Enable/disable DBUS support (default = enable)
 #   dnssd    - Enable/disable DNS-SD support (default = enable)
+#   libusb1  - Enable/disable LIBUSB 1.0 support (default = enable)
 #   static   - Enable/disable static libraries (default = enable)
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
@@ -28,6 +29,10 @@
 %{!?_with_dnssd: %{!?_without_dnssd: %define _with_dnssd --with-dnssd}}
 %{?_with_dnssd: %define _dnssd --enable-dnssd}
 %{!?_with_dnssd: %define _dnssd --disable-dnssd}
+
+%{!?_with_libusb1: %{!?_without_libusb1: %define _with_libusb1 --with-libusb1}}
+%{?_with_libusb1: %define _libusb1 --enable-libusb}
+%{!?_with_libusb1: %define _libusb1 --disable-libusb}
 
 %{!?_with_static: %{!?_without_static: %define _without_static --without-static}}
 %{?_with_static: %define _static --enable-static}
@@ -44,6 +49,19 @@ Source: http://ftp.cups.org/pub/cups/%{version}/cups-%{version}-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
+
+# Package names are as defined for Red Hat (and clone) distributions
+%if %{?_with_dbus:1}%{!?_with_dbus:0}
+BuildRequires: dbus-devel
+%endif
+
+%if %{?_with_dnssd:1}%{!?_with_dnssd:0}
+BuildRequires: avahi-devel
+%endif
+
+%if %{?_with_libusb1:1}%{!?_with_libusb1:0}
+BuildRequires: libusbx-devel
+%endif
 
 # Use buildroot so as not to disturb the version already installed
 BuildRoot: /tmp/%{name}-root
@@ -89,7 +107,7 @@ This package provides LPD client support.
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
-    ./configure %{_dbus} %{_dnssd} %{_static}
+    ./configure %{_dbus} %{_dnssd} %{_libusb1} %{_static}
 # If we got this far, all prerequisite libraries must be here.
 make
 
@@ -222,8 +240,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/ppdc/*
 %dir /usr/share/cups/templates
 /usr/share/cups/templates/*
+%if %{?_with_libusb:1}%{!?_with_libusb:0}
+# LIBUSB quirks files
 %dir /usr/share/cups/usb
 /usr/share/cups/usb/*
+%endif
 
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
