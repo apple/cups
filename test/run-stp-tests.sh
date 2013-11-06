@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 9034 2010-03-09 07:03:06Z mike $"
+# "$Id$"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -346,38 +346,97 @@ ln -s $root/templates /tmp/cups-$user/share
 # Local filters and configuration files...
 #
 
+instfilter() {
+	# instfilter src dst format
+	#
+	# See if the filter exists in a standard location; if so, make a
+	# symlink, otherwise create a dummy script for the specified format.
+	#
+	src="$1"
+	dst="$2"
+	format="$3"
+
+	for dir in /usr/libexec/cups/filter /usr/lib/cups/filter; do
+		if test -x "$dir/$src"; then
+			ln -s "$dir/$src" "/tmp/cups-$user/bin/filter/$dst"
+			return
+		fi
+	done
+
+	# Source filter not present, create a dummy filter
+	case $format in
+		passthru)
+			ln -s gziptoany "/tmp/cups-$user/bin/filter/$dst"
+			;;
+		pdf)
+			cat >"/tmp/cups-$user/bin/filter/$dst" <<EOF
+#!/bin/sh
+case "\$5" in
+	*media=a4* | *media=iso_a4* | *PageSize=A4*)
+		cat "$root/test/onepage-a4.pdf"
+		;;
+	*)
+		cat "$root/test/onepage-letter.pdf"
+		;;
+esac
+EOF
+			chmod +x "/tmp/cups-$user/bin/filter/$dst"
+			;;
+		ps)
+			cat >"/tmp/cups-$user/bin/filter/$dst" <<EOF
+#!/bin/sh
+case "\$5" in
+	*media=a4* | *media=iso_a4* | *PageSize=A4*)
+		cat "$root/test/onepage-a4.ps"
+		;;
+	*)
+		cat "$root/test/onepage-letter.ps"
+		;;
+esac
+EOF
+			chmod +x "/tmp/cups-$user/bin/filter/$dst"
+			;;
+		raster)
+			cat >"/tmp/cups-$user/bin/filter/$dst" <<EOF
+#!/bin/sh
+case "\$5" in
+	*media=a4* | *media=iso_a4* | *PageSize=A4*)
+		gunzip -c "$root/test/onepage-a4-300-black-1.pwg.gz"
+		;;
+	*)
+		gunzip -c "$root/test/onepage-letter-300-black-1.pwg.gz"
+		;;
+esac
+EOF
+			chmod +x "/tmp/cups-$user/bin/filter/$dst"
+			;;
+	esac
+}
+ 
+ln -s $root/test/test.convs /tmp/cups-$user/share/mime
+
 if test `uname` = Darwin; then
-	ln -s /usr/libexec/cups/filter/cgpdfto* /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/cgbannertopdf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/cgimagetopdf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/cgtexttopdf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/nsimagetopdf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/nstexttopdf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/pictwpstops /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/pstoappleps /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/rastertourf /tmp/cups-$user/bin/filter
-	ln -s /usr/libexec/cups/filter/xhtmltopdf /tmp/cups-$user/bin/filter
-
-	if test -f /private/etc/cups/apple.types; then
-		ln -s /private/etc/cups/apple.* /tmp/cups-$user/share/mime
-	elif test -f /usr/share/cups/mime/apple.types; then
-		ln -s /usr/share/cups/mime/apple.* /tmp/cups-$user/share/mime
-	fi
+	instfilter cgbannertopdf bannertopdf pdf
+	instfilter cgimagetopdf imagetopdf pdf
+	instfilter cgpdftopdf pdftopdf passthru
+	instfilter cgpdftops pdftops ps
+	instfilter cgpdftoraster pdftoraster raster
+	instfilter cgtexttopdf texttopdf pdf
+	instfilter pstocupsraster pstoraster raster
+	instfilter pstopdffilter pstopdf pdf
 else
-	ln -s /usr/lib/cups/filter/bannertops /tmp/cups-$user/bin/filter
-	ln -s /usr/lib/cups/filter/imagetops /tmp/cups-$user/bin/filter
-	ln -s /usr/lib/cups/filter/imagetoraster /tmp/cups-$user/bin/filter
-	ln -s /usr/lib/cups/filter/pdftops /tmp/cups-$user/bin/filter
-	ln -s /usr/lib/cups/filter/texttops /tmp/cups-$user/bin/filter
+	instfilter bannertopdf bannertopdf pdf
+	instfilter bannertops bannertops ps
+	instfilter imagetopdf imagetopdf pdf
+	instfilter pdftopdf pdftopdf passthru
+	instfilter pdftops pdftops ps
+	instfilter pdftoraster pdftoraster raster
+	instfilter pstoraster pstoraster raster
+	instfilter texttopdf texttopdf pdf
 
-	ln -s /usr/share/cups/mime/legacy.convs /tmp/cups-$user/share/mime
-	ln -s /usr/share/cups/charsets /tmp/cups-$user/share
-	if test -f $root/data/psglyphs; then
-		ln -s /usr/share/cups/data/psglyphs $root/data
+	if test -d /usr/share/cups/charsets; then
+		ln -s /usr/share/cups/charsets /tmp/cups-$user/share
 	fi
-	ln -s /usr/share/cups/fonts /tmp/cups-$user/share
 fi
 
 #
@@ -853,7 +912,7 @@ else
 fi
 
 # Warning log messages
-count=`$GREP '^W ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^W ' /tmp/cups-$user/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
 if test $count != 9; then
 	echo "FAIL: $count warning messages, expected 9."
 	$GREP '^W ' /tmp/cups-$user/log/error_log
@@ -960,5 +1019,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 9034 2010-03-09 07:03:06Z mike $"
+# End of "$Id$"
 #
