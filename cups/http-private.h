@@ -169,13 +169,8 @@ typedef void *http_tls_credentials_t;
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
 
-typedef gnutls_session http_tls_t;
+typedef gnutls_session_t http_tls_t;
 typedef void *http_tls_credentials_t;
-
-//extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
-//		                size_t length);
-//extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
-//		                 size_t length);
 
 #  elif defined(HAVE_CDSASSL)
 /*
