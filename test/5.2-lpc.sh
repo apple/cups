@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.2-lpc.sh 6649 2007-07-11 21:46:42Z mike $"
+# "$Id$"
 #
 #   Test the lpc command.
 #
@@ -27,5 +27,5 @@ fi
 echo ""
 
 #
-# End of "$Id: 5.2-lpc.sh 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id$".
 #
