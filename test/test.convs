@@ -1,0 +1,9 @@
+# Test file listing potential filters for conversions
+application/pdf application/vnd.cups-pdf 100 pdftopdf
+application/pdf application/postscript 100 pdftops
+application/pdf application/vnd.cups-raster 100 pdftoraster
+application/postscript application/vnd.cups-raster 100 pstoraster
+application/vnd.cups-banner application/pdf 100 bannertopdf
+image/jpeg application/pdf 100 imagetopdf
+text/plain application/pdf 100 texttopdf
+

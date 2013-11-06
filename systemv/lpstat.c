@@ -1,30 +1,16 @@
 /*
  * "$Id$"
  *
- *   "lpstat" command for CUPS.
+ * "lpstat" command for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()           - Parse options and show status information.
- *   check_dest()     - Verify that the named destination(s) exists.
- *   match_list()     - Match a name from a list of comma or space-separated
- *                      names.
- *   show_accepting() - Show acceptance status.
- *   show_classes()   - Show printer classes.
- *   show_default()   - Show default destination.
- *   show_devices()   - Show printer devices.
- *   show_jobs()      - Show active print jobs.
- *   show_printers()  - Show printers.
- *   show_scheduler() - Show scheduler status.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -109,6 +95,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      _cupsLangPuts(stdout, cupsServer());
 	    else
 	      _cupsLangPrintf(stdout, "%s:%d", cupsServer(), ippPort());
+	    op = 'H';
             break;
 
         case 'P' : /* Show paper types */
