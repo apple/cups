@@ -14,6 +14,10 @@ CHANGES IN CUPS V1.7.1
 	  (<rdar://problem/15375760>)
 	- Printing to a raw queue could result in corrupt output due to
 	  opportunistic compression (<rdar://problem/15008524>)
+	- The GNU TLS support code triggered many compiler warnings due to the
+	  use of old GNU TLS compatibility type names.
+	- The "make check" test suite did not work on Linux without the
+	  cups-filters package installed (<rdar://problem/14292998>)
 
 
 CHANGES IN CUPS V1.7.0
