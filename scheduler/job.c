@@ -270,9 +270,10 @@ cupsdCheckJobs(void)
 
     if (job->cancel_time && job->cancel_time <= curtime)
     {
-      ipp_attribute_t *attr = ippFindAttribute(job->attrs, "job-cancel-after", IPP_TAG_INTEGER);
-      int cancel_after = attr ? ippGetInteger(attr, 0) : MaxJobTime;
-					/* job-cancel-after value */
+      int cancel_after;			/* job-cancel-after value */
+
+      attr         = ippFindAttribute(job->attrs, "job-cancel-after", IPP_TAG_INTEGER);
+      cancel_after = attr ? ippGetInteger(attr, 0) : MaxJobTime;
 
       if (job->completed)
 	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_FORCE, "Marking stuck job as completed after %d seconds.", cancel_after);
