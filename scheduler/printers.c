@@ -2471,7 +2471,7 @@ cupsdSetPrinterReasons(
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
-          if (!strcmp(reason, "cups-waiting-for-completed") && p->job)
+          if (!strcmp(reason, "cups-waiting-for-job-completed") && p->job)
             p->job->completed = 0;
 
           if (strcmp(reason, "connecting-to-device"))
@@ -2511,7 +2511,7 @@ cupsdSetPrinterReasons(
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
 
-	if (!strcmp(reason, "cups-waiting-for-completed") && p->job)
+	if (!strcmp(reason, "cups-waiting-for-job-completed") && p->job)
 	  p->job->completed = 1;
 
 	if (strcmp(reason, "connecting-to-device"))

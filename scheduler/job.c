@@ -2933,13 +2933,13 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "finalize_job(job=%p(%d))", job, job->id);
 
  /*
-  * Clear the "connecting-to-device" and "cups-waiting-for-completed" reasons,
-  * which are only valid when a printer is processing, along with any remote
-  * printing job state...
+  * Clear the "connecting-to-device" and "cups-waiting-for-job-completed"
+  * reasons, which are only valid when a printer is processing, along with any
+  * remote printing job state...
   */
 
   cupsdSetPrinterReasons(job->printer, "-connecting-to-device,"
-                                       "cups-waiting-for-completed,"
+                                       "cups-waiting-for-job-completed,"
 				       "cups-remote-pending,"
 				       "cups-remote-pending-held,"
 				       "cups-remote-processing,"

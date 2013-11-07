@@ -1160,7 +1160,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	                     _("Control file sent successfully."));
     }
 
-    fputs("STATE: +cups-waiting-for-completed\n", stderr);
+    fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
    /*
     * Collect the final supply levels as needed...

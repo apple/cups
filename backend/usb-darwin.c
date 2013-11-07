@@ -761,7 +761,7 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
   fprintf(stderr, "DEBUG: Sent %lld bytes...\n", (off_t)total_bytes);
-  fputs("STATE: +cups-waiting-for-completed\n", stderr);
+  fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
  /*
   * Signal the side channel thread to exit...

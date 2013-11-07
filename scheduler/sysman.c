@@ -820,9 +820,9 @@ sysUpdate(void)
     {
      /*
       * If there are active printers that don't have the connecting-to-device
-      * or cups-waiting-for-completed printer-state-reason then cancel the sleep
-      * request, i.e., these reasons indicate a job that is not actively doing
-      * anything...
+      * or cups-waiting-for-job-completed printer-state-reason then cancel the
+      * sleep request, i.e., these reasons indicate a job that is not actively
+      * doing anything...
       */
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -833,7 +833,7 @@ sysUpdate(void)
         {
 	  for (i = 0; i < p->num_reasons; i ++)
 	    if (!strcmp(p->reasons[i], "connecting-to-device") ||
-	        !strcmp(p->reasons[i], "cups-waiting-for-completed"))
+	        !strcmp(p->reasons[i], "cups-waiting-for-job-completed"))
 	      break;
 
 	  if (!p->num_reasons || i >= p->num_reasons)
@@ -881,7 +881,7 @@ sysUpdate(void)
       {
        /*
 	* If there are active printers that don't have the connecting-to-device
-	* or cups-waiting-for-completed printer-state-reasons then delay the
+	* or cups-waiting-for-job-completed printer-state-reasons then delay the
 	* sleep request, i.e., these reasons indicate a job is active...
 	*/
 
@@ -893,7 +893,7 @@ sysUpdate(void)
 	  {
 	    for (i = 0; i < p->num_reasons; i ++)
 	      if (!strcmp(p->reasons[i], "connecting-to-device") ||
-	          !strcmp(p->reasons[i], "cups-waiting-for-completed"))
+	          !strcmp(p->reasons[i], "cups-waiting-for-job-completed"))
 		break;
 
 	    if (!p->num_reasons || i >= p->num_reasons)

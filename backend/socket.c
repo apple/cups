@@ -429,7 +429,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
 
-  fputs("STATE: +cups-waiting-for-completed\n", stderr);
+  fputs("STATE: +cups-waiting-for-job-completed\n", stderr);
 
   if (waiteof)
   {
