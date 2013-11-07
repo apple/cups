@@ -1,23 +1,18 @@
 /*
  * "$Id$"
  *
- *   AppSocket backend for CUPS.
+ * AppSocket backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()    - Send a file to the printer or server.
- *   wait_bc() - Wait for back-channel data...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -433,6 +428,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
+
+  fputs("STATE: +cups-waiting-for-completed\n", stderr);
 
   if (waiteof)
   {

@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Print job definitions for the CUPS scheduler.
+ * Print job definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -74,6 +74,7 @@ struct cupsd_job_s			/**** Job request ****/
   int			backend;	/* Backend process ID */
   int			status;		/* Status code from filters */
   int			tries;		/* Number of tries for this job */
+  int			completed;	/* cups-waiting-for-completed seen */
   char			*auth_env[3],	/* AUTH_xxx environment variables,
                                          * if any */
 			*auth_uid;	/* AUTH_UID environment variable */

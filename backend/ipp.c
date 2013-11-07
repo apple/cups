@@ -1855,6 +1855,8 @@ main(int  argc,				/* I - Number of command-line args */
     if (!job_id || !waitjob || !get_job_attrs)
       continue;
 
+    fputs("STATE: +cups-waiting-for-completed\n", stderr);
+
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for job to complete."));
 
     for (delay = _cupsNextDelay(0, &prev_delay); !job_canceled;)

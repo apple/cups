@@ -257,7 +257,8 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogJob(job, CUPSD_LOG_ERROR, "Stopping unresponsive job.");
+      if (!job->completed)
+        cupsdLogJob(job, CUPSD_LOG_ERROR, "Stopping unresponsive job.");
 
       stop_job(job, CUPSD_JOB_FORCE);
       continue;
@@ -269,8 +270,12 @@ cupsdCheckJobs(void)
 
     if (job->cancel_time && job->cancel_time <= curtime)
     {
-      cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
-                       "Canceling stuck job after %d seconds.", MaxJobTime);
+      if (job->completed)
+	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_FORCE,
+			 "Marking stuck job as completed after %d seconds.", MaxJobTime);
+      else
+	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
+			 "Canceling stuck job after %d seconds.", MaxJobTime);
       continue;
     }
 
@@ -323,10 +328,7 @@ cupsdCheckJobs(void)
     */
 
     if (job->state_value == IPP_JOB_PENDING && !NeedReload &&
-#ifndef kIOPMAssertionTypeDenySystemSleep
-        !Sleeping &&
-#endif /* !kIOPMAssertionTypeDenySystemSleep */
-        !DoingShutdown && !job->printer)
+        !Sleeping && !DoingShutdown && !job->printer)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;
@@ -2645,10 +2647,17 @@ cupsdStopAllJobs(
        job;
        job = (cupsd_job_t *)cupsArrayNext(PrintingJobs))
   {
-    if (kill_delay)
-      job->kill_time = time(NULL) + kill_delay;
+    if (job->completed)
+    {
+      cupsdSetJobState(job, IPP_JOB_COMPLETED, CUPSD_JOB_FORCE, NULL);
+    }
+    else
+    {
+      if (kill_delay)
+        job->kill_time = time(NULL) + kill_delay;
 
-    cupsdSetJobState(job, IPP_JOB_PENDING, action, NULL);
+      cupsdSetJobState(job, IPP_JOB_PENDING, action, NULL);
+    }
   }
 }
 
@@ -2924,11 +2933,13 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "finalize_job(job=%p(%d))", job, job->id);
 
  /*
-  * Clear the "connecting-to-device" reason, which is only valid when a printer
-  * is processing, along with any remote printing job state...
+  * Clear the "connecting-to-device" and "cups-waiting-for-completed" reasons,
+  * which are only valid when a printer is processing, along with any remote
+  * printing job state...
   */
 
   cupsdSetPrinterReasons(job->printer, "-connecting-to-device,"
+                                       "cups-waiting-for-completed,"
 				       "cups-remote-pending,"
 				       "cups-remote-pending-held,"
 				       "cups-remote-processing,"
@@ -4768,17 +4779,17 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
           * Reset cancel time after connecting to the device...
           */
 
-	  ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
-							   "job-cancel-after",
-							   IPP_TAG_INTEGER);
-					/* job-cancel-after attribute */
-
           for (i = 0; i < job->printer->num_reasons; i ++)
             if (!strcmp(job->printer->reasons[i], "connecting-to-device"))
               break;
 
           if (i >= job->printer->num_reasons)
           {
+	    ipp_attribute_t *cancel_after = ippFindAttribute(job->attrs,
+							     "job-cancel-after",
+							     IPP_TAG_INTEGER);
+					/* job-cancel-after attribute */
+
             if (cancel_after)
 	      job->cancel_time = time(NULL) + ippGetInteger(cancel_after, 0);
 	    else

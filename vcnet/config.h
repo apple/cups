@@ -581,13 +581,6 @@
 
 
 /*
- * Do we have Darwin's IOKit private headers?
- */
-
-/* #undef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
-
-
-/*
  * Do we have DBUS?
  */
 

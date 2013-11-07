@@ -1,27 +1,18 @@
 /*
  * "$Id$"
  *
- *   Line Printer Daemon backend for CUPS.
+ * Line Printer Daemon backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()            - Send a file to the printer or server.
- *   lpd_command()     - Send an LPR command sequence and wait for a reply.
- *   lpd_queue()       - Queue a file using the Line Printer Daemon protocol.
- *   lpd_write()       - Write a buffer of data to an LPD server.
- *   rresvport_af()    - A simple implementation of rresvport_af().
- *   sigterm_handler() - Handle 'terminate' signals that stop the backend.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -1168,6 +1159,8 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	_cupsLangPrintFilter(stderr, "INFO",
 	                     _("Control file sent successfully."));
     }
+
+    fputs("STATE: +cups-waiting-for-completed\n", stderr);
 
    /*
     * Collect the final supply levels as needed...

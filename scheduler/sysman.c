@@ -1,34 +1,16 @@
 /*
  * "$Id$"
  *
- *   System management functions for the CUPS scheduler.
+ * System management functions for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCleanDirty()               - Write dirty config and state files.
- *   cupsdMarkDirty()                - Mark config or state files as needing a
- *                                     write.
- *   cupsdSetBusyState()             - Let the system know when we are busy
- *                                     doing something.
- *   cupsdAllowSleep()               - Tell the OS it is now OK to sleep.
- *   cupsdStartSystemMonitor()       - Start monitoring for system change.
- *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
- *   sysEventThreadEntry()           - A thread to receive power and computer
- *                                     name change notifications.
- *   sysEventPowerNotifier()         - Handle power notification events.
- *   sysEventConfigurationNotifier() - Computer name changed notification
- *                                     callback.
- *   sysEventTimerNotifier()         - Handle delayed event notifications.
- *   sysUpdate()                     - Update the current system state.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -42,11 +24,6 @@
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 #ifdef __APPLE__
 #  include <IOKit/pwr_mgt/IOPMLib.h>
-#  ifdef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H
-#    include <IOKit/pwr_mgt/IOPMLibPrivate.h>
-#  else
-#    define kIOPMAssertionTypeDenySystemSleep CFSTR("DenySystemSleep")
-#  endif /* HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
 #endif /* __APPLE__ */
 
 
@@ -58,7 +35,7 @@
  * and state files to minimize the number of times the disk has to spin
  * up.
  *
- * Power management support is currently only implemented on MacOS X, but
+ * Power management support is currently only implemented on OS X, but
  * essentially we use four functions to let the OS know when it is OK to
  * put the system to sleep, typically when we are not in the middle of
  * printing a job.
@@ -66,15 +43,6 @@
  * Once put to sleep, we invalidate all remote printers since it is common
  * to wake up in a new location/on a new wireless network.
  */
-
-/*
- * Local globals...
- */
-
-#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertNetworkClientActive)
-static IOPMAssertionID	keep_awake = 0;	/* Keep the system awake while printing */
-#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertNetworkClientActive */
-
 
 /*
  * 'cupsdCleanDirty()' - Write dirty config and state files.
@@ -216,33 +184,6 @@ cupsdSetBusyState(void)
     }
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
   }
-
-#if defined(kIOPMAssertionTypeDenySystemSleep) || defined(kIOPMAssertNetworkClientActive)
-  if (cupsArrayCount(PrintingJobs) > 0 && !keep_awake)
-  {
-#  ifdef kIOPMAssertNetworkClientActive
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting NetworkClientActive.");
-
-    IOPMAssertionCreateWithName(kIOPMAssertNetworkClientActive,
-				kIOPMAssertionLevelOn,
-				CFSTR("org.cups.cupsd"), &keep_awake);
-
-#  else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting DenySystemSleep.");
-
-    IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
-				kIOPMAssertionLevelOn,
-				CFSTR("org.cups.cupsd"), &keep_awake);
-
-#  endif /* kIOPMAssertNetworkClientActive */
-  }
-  else if (cupsArrayCount(PrintingJobs) == 0 && keep_awake)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Releasing power assertion.");
-    IOPMAssertionRelease(keep_awake);
-    keep_awake = 0;
-  }
-#endif /* kIOPMAssertionTypeDenySystemSleep || kIOPMAssertNetworkClientActive */
 }
 
 
@@ -323,6 +264,7 @@ static CFStringRef	ComputerNameKey = NULL,
 			NetworkInterfaceKeyIPv6 = NULL;
 					/* Netowrk interface key */
 static cupsd_sysevent_t	LastSysEvent;	/* Last system event (for delayed sleep) */
+static int		NameChanged = 0;/* Did we get a 'name changed' event during sleep? */
 
 
 /*
@@ -338,6 +280,7 @@ static void	sysEventConfigurationNotifier(SCDynamicStoreRef store,
 					      void *context);
 static void	sysEventTimerNotifier(CFRunLoopTimerRef timer, void *context);
 static void	sysUpdate(void);
+static void	sysUpdateNames(void);
 
 
 /*
@@ -681,6 +624,7 @@ sysEventPowerNotifier(
     case kIOMessageSystemWillPowerOff :
     case kIOMessageSystemWillSleep :
 	threadData->sysevent.event |= SYSEVENT_WILLSLEEP;
+	threadData->sysevent.event &= ~SYSEVENT_WOKE;
 	break;
 
     case kIOMessageSystemHasPoweredOn :
@@ -876,8 +820,9 @@ sysUpdate(void)
     {
      /*
       * If there are active printers that don't have the connecting-to-device
-      * printer-state-reason then cancel the sleep request (i.e. this reason
-      * indicates a job that is not yet connected to the printer)...
+      * or cups-waiting-for-completed printer-state-reason then cancel the sleep
+      * request, i.e., these reasons indicate a job that is not actively doing
+      * anything...
       */
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -887,7 +832,8 @@ sysUpdate(void)
         if (p->job)
         {
 	  for (i = 0; i < p->num_reasons; i ++)
-	    if (!strcmp(p->reasons[i], "connecting-to-device"))
+	    if (!strcmp(p->reasons[i], "connecting-to-device") ||
+	        !strcmp(p->reasons[i], "cups-waiting-for-completed"))
 	      break;
 
 	  if (!p->num_reasons || i >= p->num_reasons)
@@ -898,14 +844,14 @@ sysUpdate(void)
       if (p)
       {
         cupsdLogMessage(CUPSD_LOG_INFO,
-	                "System sleep canceled because printer %s is active",
+	                "System sleep canceled because printer %s is active.",
 	                p->name);
         IOCancelPowerChange(sysevent.powerKernelPort,
 	                    sysevent.powerNotificationID);
       }
       else
       {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, "System wants to sleep");
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "System wants to sleep.");
         IOAllowPowerChange(sysevent.powerKernelPort,
 	                   sysevent.powerNotificationID);
       }
@@ -913,38 +859,15 @@ sysUpdate(void)
 
     if (sysevent.event & SYSEVENT_WILLSLEEP)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep");
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep.");
 
       Sleeping = 1;
 
-      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-           p;
-	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG,
-			"Deregistering local printer \"%s\"", p->name);
-	cupsdDeregisterPrinter(p, 0);
-      }
-
       cupsdCleanDirty();
-
-#ifdef kIOPMAssertionTypeDenySystemSleep
-     /*
-      * Remove our assertion as needed since the user wants the system to
-      * sleep (different than idle sleep)...
-      */
-
-      if (keep_awake)
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, "Releasing dark wake assertion.");
-	IOPMAssertionRelease(keep_awake);
-	keep_awake = 0;
-      }
-#endif /* kIOPMAssertionTypeDenySystemSleep */
 
      /*
       * If we have no printing jobs, allow the power change immediately.
-      * Otherwise set the SleepJobs time to 15 seconds in the future when
+      * Otherwise set the SleepJobs time to 10 seconds in the future when
       * we'll take more drastic measures...
       */
 
@@ -958,8 +881,8 @@ sysUpdate(void)
       {
        /*
 	* If there are active printers that don't have the connecting-to-device
-	* printer-state-reason then delay the sleep request (i.e. this reason
-	* indicates a job that is not yet connected to the printer)...
+	* or cups-waiting-for-completed printer-state-reasons then delay the
+	* sleep request, i.e., these reasons indicate a job is active...
 	*/
 
 	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
@@ -969,7 +892,8 @@ sysUpdate(void)
 	  if (p->job)
 	  {
 	    for (i = 0; i < p->num_reasons; i ++)
-	      if (!strcmp(p->reasons[i], "connecting-to-device"))
+	      if (!strcmp(p->reasons[i], "connecting-to-device") ||
+	          !strcmp(p->reasons[i], "cups-waiting-for-completed"))
 		break;
 
 	    if (!p->num_reasons || i >= p->num_reasons)
@@ -979,6 +903,10 @@ sysUpdate(void)
 
 	if (p)
 	{
+	  cupsdLogMessage(CUPSD_LOG_INFO,
+			  "System sleep delayed because printer %s is active.",
+			  p->name);
+
 	  LastSysEvent = sysevent;
 	  SleepJobs    = time(NULL) + 10;
 	}
@@ -993,20 +921,10 @@ sysUpdate(void)
 
     if (sysevent.event & SYSEVENT_WOKE)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "System woke from sleep");
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "System woke from sleep.");
       IOAllowPowerChange(sysevent.powerKernelPort,
                          sysevent.powerNotificationID);
       Sleeping = 0;
-
-#ifdef kIOPMAssertionTypeDenySystemSleep
-      if (cupsArrayCount(PrintingJobs) > 0 && !keep_awake)
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting dark wake.");
-	IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
-				    kIOPMAssertionLevelOn,
-				    CFSTR("org.cups.cupsd"), &keep_awake);
-      }
-#endif /* kIOPMAssertionTypeDenySystemSleep */
 
      /*
       * Make sure jobs that were queued prior to the system going to sleep don't
@@ -1035,59 +953,82 @@ sysUpdate(void)
         }
       }
 
+      if (NameChanged)
+        sysUpdateNames();
+
       cupsdCheckJobs();
     }
 
     if (sysevent.event & SYSEVENT_NETCHANGED)
     {
-      if (!Sleeping)
+      if (Sleeping)
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "System network configuration changed");
+	                "System network configuration changed - "
+			"ignored while sleeping.");
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "System network configuration changed; "
-			"ignored while sleeping");
+	                "System network configuration changed.");
     }
 
     if (sysevent.event & SYSEVENT_NAMECHANGED)
     {
-      if (!Sleeping)
+      if (Sleeping)
       {
+        NameChanged = 1;
+
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Computer name or BTMM domains changed");
-
-       /*
-	* De-register the individual printers...
-	*/
-
-	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	     p;
-	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  cupsdDeregisterPrinter(p, 1);
-
-#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-       /*
-        * Update the computer name and BTMM domain list...
-	*/
-
-	cupsdUpdateDNSSDName();
-#  endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-       /*
-	* Now re-register them...
-	*/
-
-	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	     p;
-	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  cupsdRegisterPrinter(p);
+	                "Computer name or BTMM domains changed - ignored while "
+			"sleeping.");
       }
       else
+      {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Computer name or BTMM domains changed; ignored while "
-			"sleeping");
+	                "Computer name or BTMM domains changed.");
+
+        sysUpdateNames();
+      }
     }
   }
+}
+
+
+/*
+ * 'sysUpdateNames()' - Update computer and/or BTMM domains.
+ */
+
+static void
+sysUpdateNames(void)
+{
+  cupsd_printer_t	*p;		/* Current printer */
+
+
+  NameChanged = 0;
+
+ /*
+  * De-register the individual printers...
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    cupsdDeregisterPrinter(p, 1);
+
+#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
+ /*
+  * Update the computer name and BTMM domain list...
+  */
+
+  cupsdUpdateDNSSDName();
+#  endif /* HAVE_DNSSD || HAVE_AVAHI */
+
+ /*
+  * Now re-register them...
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    cupsdRegisterPrinter(p);
 }
 #endif	/* __APPLE__ */
 
