@@ -486,6 +486,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
   struct stat		fileinfo;	/* Job file information */
+  int			argc;		/* Number of arguments */
   char			**argv = NULL,	/* Filter command-line arguments */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
@@ -836,11 +837,11 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   */
 
   if (job->printer->remote)
-    argv = calloc(7 + job->num_files, sizeof(char *));
+    argc = 6 + job->num_files;
   else
-    argv = calloc(8, sizeof(char *));
+    argc = 7;
 
-  if (!argv)
+  if ((argv = calloc(argc + 1, sizeof(char *))) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Unable to allocate argument array - %s",
                     strerror(errno));
@@ -1172,8 +1173,13 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     cupsdLogJob(job, CUPSD_LOG_INFO, "Started filter %s (PID %d)", command,
                 pid);
 
-    argv[6] = NULL;
-    slot    = !slot;
+    if (argv[6])
+    {
+      free(argv[6]);
+      argv[6] = NULL;
+    }
+
+    slot = !slot;
   }
 
   cupsArrayDelete(filters);
@@ -1257,8 +1263,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   cupsdClosePipe(filterfds[slot]);
 
-  for (i = 0; i < job->num_files; i ++)
-    free(argv[i + 6]);
+  for (i = 6; i < argc; i ++)
+    if (argv[i])
+      free(argv[i]);
 
   free(argv);
 
@@ -1291,13 +1298,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   if (argv)
   {
-    if (job->printer->remote && job->num_files > 1)
-    {
-      for (i = 0; i < job->num_files; i ++)
-	free(argv[i + 6]);
-    }
-
-    free(argv);
+    for (i = 6; i < argc; i ++)
+      if (argv[i])
+	free(argv[i]);
   }
 
   if (printer_state_reasons)
