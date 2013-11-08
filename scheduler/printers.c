@@ -1910,6 +1910,7 @@ cupsdSetPrinterAttr(
 
     if (!attr)
     {
+      free(temp);
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate memory for printer attribute "
 		      "(%d values)", count);
@@ -1960,6 +1961,7 @@ cupsdSetPrinterAttr(
 
     if (!attr)
     {
+      free(temp);
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate memory for printer attribute "
 		      "(%d values)", count);
