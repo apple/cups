@@ -134,7 +134,7 @@ static const char * const lang_encodings[] =
 			  "unknown",		"unknown",
 			  "euc-cn",		"euc-jp",
 			  "euc-kr",		"euc-tw",
-			  "shiftjis_x0213"
+			  "shift_jisx0213"
 			};
 
 #ifdef __APPLE__
