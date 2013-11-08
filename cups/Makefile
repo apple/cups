@@ -620,6 +620,7 @@ sloc:
 #
 
 include Dependencies
+http.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #

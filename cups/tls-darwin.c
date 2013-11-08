@@ -126,6 +126,27 @@ _httpCreateCredentials(
 
 
 /*
+ * 'httpCredentialsString()' - Return a string representing the credentials.
+ *
+ * @since CUPS 2.0@
+ */
+
+size_t					/* O - Total size of credentials string */
+httpCredentialsString(
+    cups_array_t *credentials,		/* I - Credentials */
+    char         *buffer,		/* I - Buffer or @code NULL@ */
+    size_t       bufsize)		/* I - Size of buffer */
+{
+  (void)credentials;
+
+  if (buffer && bufsize > 0)
+    *buffer = '\0';
+
+  return (1);
+}
+
+
+/*
  * '_httpFreeCredentials()' - Free internal credentials.
  */
 
@@ -137,6 +158,67 @@ _httpFreeCredentials(
     return;
 
   CFRelease(credentials);
+}
+
+
+/*
+ * 'httpLoadCredentials()' - Load X.509 credentials from a keychain file.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O  - -1 on error, 0 on success */
+httpLoadCredentials(
+    const char   *path,			/* I  - Keychain/PKCS#12 path */
+    cups_array_t **credentials,		/* IO - Credentials */
+    const char   *common_name)		/* I  - Common name for credentials */
+{
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+
+  return (-1);
+}
+
+
+/*
+ * 'httpMakeCredentials()' - Create self-signed credentials for the given
+ *                           name.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 0 on success, -1 on failure */
+httpMakeCredentials(
+    cups_array_t **credentials,		/* O - Credentials */
+    const char   *common_name)		/* I - Common name for X.509 cert */
+{
+  (void)common_name;
+
+  if (credentials)
+    *credentials = NULL;
+
+  return (-1);
+}
+
+
+/*
+ * 'httpSaveCredentials()' - Save X.509 credentials to a keychain file.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - -1 on error, 0 on success */
+httpSaveCredentials(
+    const char   *path,			/* I - Keychain/PKCS#12 path */
+    cups_array_t *credentials,		/* I - Credentials */
+    const char   *common_name)		/* I - Common name for credentials */
+{
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+
+  return (-1);
 }
 
 
@@ -408,8 +490,7 @@ http_tls_start(http_t *http)		/* I - Connection to server */
       *hostptr = '\0';
   }
 
-  if ((http->tls = SSLCreateContext(kCFAllocatorDefault, kSSLClientSide,
-                                    kSSLStreamType)) == NULL)
+  if ((http->tls = SSLCreateContext(kCFAllocatorDefault, http->mode == _HTTP_MODE_CLIENT ? kSSLClientSide : kSSLServerSide, kSSLStreamType)) == NULL)
   {
     DEBUG_puts("4http_tls_start: SSLCreateContext failed.");
     http->error  = errno = ENOMEM;

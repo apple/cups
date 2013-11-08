@@ -1193,7 +1193,7 @@
 		72220EE0133305BB00FCA411 /* http-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "http-private.h"; path = "../cups/http-private.h"; sourceTree = "<group>"; };
 		72220EE1133305BB00FCA411 /* http-support.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "http-support.c"; path = "../cups/http-support.c"; sourceTree = "<group>"; };
 		72220EE2133305BB00FCA411 /* http.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = http.c; path = ../cups/http.c; sourceTree = "<group>"; };
-		72220EE3133305BB00FCA411 /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http.h; path = ../cups/http.h; sourceTree = "<group>"; };
+		72220EE3133305BB00FCA411 /* http.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http.h; path = ../cups/http.h; sourceTree = "<group>"; wrapsLines = 1; };
 		72220EE4133305BB00FCA411 /* ipp-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ipp-private.h"; path = "../cups/ipp-private.h"; sourceTree = "<group>"; };
 		72220EE5133305BB00FCA411 /* ipp-support.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ipp-support.c"; path = "../cups/ipp-support.c"; sourceTree = "<group>"; };
 		72220EE6133305BB00FCA411 /* ipp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ipp.c; path = ../cups/ipp.c; sourceTree = "<group>"; };
@@ -1310,7 +1310,6 @@
 		7271883C1374AB14001A2036 /* mime-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mime-private.h"; path = "../scheduler/mime-private.h"; sourceTree = "<group>"; };
 		728FB7E0153600FA005426E1 /* tls-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../scheduler/tls-darwin.c"; sourceTree = "<group>"; };
 		728FB7E1153600FA005426E1 /* tls-gnutls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../scheduler/tls-gnutls.c"; sourceTree = "<group>"; };
-		728FB7E2153600FA005426E1 /* tls-openssl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-openssl.c"; path = "../scheduler/tls-openssl.c"; sourceTree = "<group>"; };
 		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
@@ -1618,6 +1617,7 @@
 			);
 			name = tests;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		274FF5D513332C2C00317ECB /* daemon */ = {
 			isa = PBXGroup;
@@ -1631,6 +1631,7 @@
 			);
 			name = daemon;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		274FF5F41333310400317ECB /* libcupsppdc */ = {
 			isa = PBXGroup;
@@ -1658,6 +1659,7 @@
 			);
 			name = libcupsppdc;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		274FF67313333B0A00317ECB /* commands */ = {
 			isa = PBXGroup;
@@ -1681,6 +1683,7 @@
 			);
 			name = commands;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		276683CB1337B1CC000D33D0 /* ppdc tools */ = {
 			isa = PBXGroup;
@@ -1693,6 +1696,7 @@
 			);
 			name = "ppdc tools";
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220EAF1333047D00FCA411 /* Products */ = {
 			isa = PBXGroup;
@@ -1787,6 +1791,7 @@
 			);
 			name = libcups;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220F45133305D000FCA411 /* Public Headers */ = {
 			isa = PBXGroup;
@@ -1809,6 +1814,7 @@
 			);
 			name = "Public Headers";
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220F461333060C00FCA411 /* Private Headers */ = {
 			isa = PBXGroup;
@@ -1831,6 +1837,7 @@
 			);
 			name = "Private Headers";
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220F5D13330A5A00FCA411 /* cupsd */ = {
 			isa = PBXGroup;
@@ -1878,11 +1885,11 @@
 				72220F8F13330B0C00FCA411 /* sysman.h */,
 				728FB7E0153600FA005426E1 /* tls-darwin.c */,
 				728FB7E1153600FA005426E1 /* tls-gnutls.c */,
-				728FB7E2153600FA005426E1 /* tls-openssl.c */,
 			);
 			name = cupsd;
 			path = .;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220FB013330B3400FCA411 /* libcupsmime */ = {
 			isa = PBXGroup;
@@ -1893,6 +1900,7 @@
 			);
 			name = libcupsmime;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
@@ -1934,6 +1942,7 @@
 			);
 			name = backends;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		7258EADC134594A8009286F1 /* filters */ = {
 			isa = PBXGroup;
@@ -1950,6 +1959,7 @@
 			);
 			name = filters;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
@@ -1984,6 +1994,7 @@
 			);
 			name = libcupsimage;
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 /* End PBXGroup section */
 

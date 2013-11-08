@@ -404,6 +404,30 @@ httpClose(http_t *http)			/* I - HTTP connection */
 
 
 /*
+ * 'httpCompareCredentials()' - Compare two sets of X.509 credentials.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 if they match, 0 if they do not */
+httpCompareCredentials(
+    cups_array_t *cred1,		/* I - First set of X.509 credentials */
+    cups_array_t *cred2)		/* I - Second set of X.509 credentials */
+{
+  http_credential_t	*temp1, *temp2;	/* Temporary credentials */
+
+
+  for (temp1 = (http_credential_t *)cupsArrayFirst(cred1), temp2 = (http_credential_t *)cupsArrayFirst(cred2); temp1 && temp2; temp1 = (http_credential_t *)cupsArrayNext(cred1), temp2 = (http_credential_t *)cupsArrayNext(cred2))
+    if (temp1->datalen != temp2->datalen)
+      return (0);
+    else if (memcmp(temp1->data, temp2->data, temp1->datalen))
+      return (0);
+
+  return (temp1 == temp2);
+}
+
+
+/*
  * 'httpConnect()' - Connect to a HTTP server.
  *
  * This function is deprecated - use @link httpConnect2@ instead.

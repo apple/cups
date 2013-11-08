@@ -412,7 +412,7 @@ EOF
 			;;
 	esac
 }
- 
+
 ln -s $root/test/test.convs /tmp/cups-$user/share/mime
 
 if test `uname` = Darwin; then
@@ -473,6 +473,10 @@ $encryption
 </Policy>
 EOF
 
+if test $testtype = 0; then
+	echo WebInterface yes >>/tmp/cups-$user/cupsd.conf
+fi
+
 cat >/tmp/cups-$user/cups-files.conf <<EOF
 FileDevice yes
 Printcap
@@ -492,7 +496,7 @@ PageLog /tmp/cups-$user/log/page_log
 EOF
 
 if test $ssltype != 0 -a `uname` = Darwin; then
-	echo "ServerCertificate $HOME/Library/Keychains/login.keychain" >> /tmp/cups-$user/cups-files.conf
+	echo "ServerKeychain $HOME/Library/Keychains/login.keychain" >> /tmp/cups-$user/cups-files.conf
 fi
 
 #

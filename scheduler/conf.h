@@ -74,14 +74,6 @@ typedef enum
 
 
 /*
- * SSL options (bits)...
- */
-
-#define CUPSD_SSL_NONE		0	/* No special options */
-#define CUPSD_SSL_NOEMPTY	1	/* Do not insert empty fragments */
-
-
-/*
  * ServerAlias data...
  */
 
@@ -236,14 +228,14 @@ VAR const char		**MimeTypes		VALUE(NULL);
 					/* Array of MIME types */
 
 #ifdef HAVE_SSL
-VAR char		*ServerCertificate	VALUE(NULL);
-					/* Server certificate file */
 #  ifdef HAVE_GNUTLS
-VAR char		*ServerKey		VALUE(NULL);
+VAR char		*ServerCertificate	VALUE(NULL),
+					/* Server certificate file */
+			*ServerKey		VALUE(NULL);
 					/* Server key file */
 #  endif /* HAVE_GNUTLS */
-VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
-					/* SSL/TLS options */
+VAR char		*ServerKeychain		VALUE(NULL);
+					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */
 
 #ifdef HAVE_LAUNCHD

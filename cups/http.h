@@ -616,10 +616,6 @@ extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern int		httpCompareCredentials(cups_array_t *cred1,
 			                       cups_array_t *cred2)
 			                       _CUPS_API_2_0;
-extern int		httpCreateCredentials(const char *path,
-			                      cups_array_t **credentials,
-			                      const char *common_name)
-					      _CUPS_API_2_0;
 extern size_t		httpCredentialsString(cups_array_t *credentials,
 			                      char *buffer, size_t bufsize)
 					      _CUPS_API_2_0;
@@ -637,6 +633,7 @@ extern int		httpLoadCredentials(const char *path,
 			                    cups_array_t **credentials,
 					    const char *common_name)
 					    _CUPS_API_2_0;
+extern int		httpMakeCredentials(cups_array_t **credentials, const char *common_name) _CUPS_API_2_0;
 extern const char	*httpResolveHostname(http_t *http, char *buffer, size_t bufsize) _CUPS_API_2_0;
 extern int		httpSaveCredentials(const char *path,
 			                    cups_array_t *credentials,

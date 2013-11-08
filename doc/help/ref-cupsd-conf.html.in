@@ -26,7 +26,7 @@ process using the startup script for your operating system:</P>
 /etc/init.d/cups restart
 	</PRE></LI>
 
-	<LI>Mac OS X:
+	<LI>OS X:
 	<PRE CLASS="command">
 sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist
 sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
@@ -2018,24 +2018,6 @@ multiple addresses.</P>
 <P>The <CODE>SSLListen</CODE> directive is similar to the <A
 HREF="#SSLPort"><CODE>SSLPort</CODE></A> directive but allows you
 to restrict access to specific interfaces or networks.</P>
-
-
-<H2 CLASS="title"><A NAME="SSLOptions">SSLOptions</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-SSLOptions None
-SSLOptions NoEmptyFragments
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>SSLOptions</CODE> directive specifies additional SSL/TLS
-protocol options to use for encrypted connected. Currently only two
-options are supported - <code>None</code> (the default) for the most
-secure mode and <code>NoEmptyFragments</code> to allow CUPS to work with
-Microsoft Windows with the FIPS conformance mode enabled.</p>
 
 
 <H2 CLASS="title"><A NAME="SSLPort">SSLPort</A></H2>

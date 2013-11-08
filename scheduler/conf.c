@@ -143,10 +143,11 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
-  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
 #  ifdef HAVE_GNUTLS
+  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
   { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_PATHNAME },
 #  endif /* HAVE_GNUTLS */
+  { "ServerKeychain",		&ServerKeychain,	CUPSD_VARTYPE_PATHNAME },
 #endif /* HAVE_SSL */
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
@@ -590,12 +591,13 @@ cupsdReadConfiguration(void)
   ClassifyOverride  = 0;
 
 #ifdef HAVE_SSL
-#  ifdef HAVE_CDSASSL
-  cupsdSetString(&ServerCertificate, "/Library/Keychains/System.keychain");
-#  else
+#  ifdef HAVE_GNUTLS
+  cupsdClearString(&ServerKeychain);
   cupsdSetString(&ServerCertificate, "ssl/server.crt");
   cupsdSetString(&ServerKey, "ssl/server.key");
-#  endif /* HAVE_CDSASSL */
+#  else
+  cupsdSetString(&ServerKeychain, "/Library/Keychains/System.keychain");
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
   language = cupsLangDefault();
@@ -685,7 +687,6 @@ cupsdReadConfiguration(void)
   default_auth_type        = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption        = HTTP_ENCRYPT_REQUIRED;
-  SSLOptions               = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
   DirtyCleanInterval       = DEFAULT_KEEPALIVE;
   JobKillDelay             = DEFAULT_TIMEOUT;
@@ -1060,6 +1061,7 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&CacheDir, "%s/%s", ServerRoot, CacheDir);
 
 #ifdef HAVE_SSL
+#  ifdef HAVE_GNUTLS
   if (ServerCertificate[0] != '/')
     cupsdSetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
@@ -1069,7 +1071,6 @@ cupsdReadConfiguration(void)
       (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 
-#  ifdef HAVE_GNUTLS
   if (ServerKey[0] != '/')
     cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
@@ -1078,6 +1079,9 @@ cupsdReadConfiguration(void)
       (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 #  endif /* HAVE_GNUTLS */
+
+  if (ServerKeychain[0] != '/')
+    cupsdSetStringf(&ServerKeychain, "%s/%s", ServerRoot, ServerKeychain);
 #endif /* HAVE_SSL */
 
  /*
@@ -3286,23 +3290,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	                "Missing value for SetEnv directive on line %d.",
 	                linenum);
     }
-#ifdef HAVE_SSL
-    else if (!_cups_strcasecmp(line, "SSLOptions"))
-    {
-     /*
-      * SSLOptions options
-      */
-
-      if (!value || !_cups_strcasecmp(value, "none"))
-        SSLOptions = CUPSD_SSL_NONE;
-      else if (!_cups_strcasecmp(value, "noemptyfragments"))
-        SSLOptions = CUPSD_SSL_NOEMPTY;
-      else
-        cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown value \"%s\" for SSLOptions directive on "
-			"line %d.", value, linenum);
-    }
-#endif /* HAVE_SSL */
     else if (!_cups_strcasecmp(line, "AccessLog") ||
              !_cups_strcasecmp(line, "CacheDir") ||
              !_cups_strcasecmp(line, "ConfigFilePerm") ||
