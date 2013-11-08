@@ -144,9 +144,9 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
   { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
+#  ifdef HAVE_GNUTLS
   { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_PATHNAME },
-#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
   { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
@@ -1069,7 +1069,7 @@ cupsdReadConfiguration(void)
       (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
+#  ifdef HAVE_GNUTLS
   if (ServerKey[0] != '/')
     cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
@@ -1077,7 +1077,7 @@ cupsdReadConfiguration(void)
       cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0 &&
       (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
-#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
  /*

@@ -1,6 +1,6 @@
                           CUPS License Agreement
 
-		      Copyright 2007-2012 by Apple Inc.
+		      Copyright 2007-2013 by Apple Inc.
 			     1 Infinite Loop
 			  Cupertino, CA 95014 USA
 
@@ -10,9 +10,9 @@
 INTRODUCTION
 
 CUPS(tm) is provided under the GNU General Public License ("GPL")
-and GNU Library General Public License ("LGPL"), Version 2, with
-exceptions for Apple operating systems and the OpenSSL toolkit. A
-copy of the exceptions and licenses follow this introduction.
+and GNU Library General Public License ("LGPL"), Version 2, with an
+exception for Apple operating systems. A copy of the exception and
+licenses follow this introduction.
 
 The GNU LGPL applies to the CUPS and CUPS Imaging libraries
 located in the "cups" and "filter" subdirectories of the CUPS
@@ -45,7 +45,7 @@ application, driver, or filter.
 LICENSE EXCEPTIONS
 
 In addition, as the copyright holder of CUPS, Apple Inc. grants
-the following special exceptions:
+the following special exception:
 
      1. Apple Operating System Development License Exception;
 
@@ -86,14 +86,8 @@ the following special exceptions:
 	     This file is subject to the Apple OS-Developed
 	     Software exception.
 
-     2. OpenSSL Toolkit License Exception;
-
-	a. Apple Inc. explicitly allows the compilation and
-	   distribution of the CUPS software with the OpenSSL
-	   Toolkit.
-
-No developer is required to provide these exceptions in a
-derived work.
+No developer is required to provide this exception in a derived
+work.
 
 
 KERBEROS SUPPORT CODE

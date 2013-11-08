@@ -75,15 +75,13 @@ static int		http_tls_start(http_t *http);
 static void		http_tls_stop(http_t *http);
 static int		http_tls_upgrade(http_t *http);
 static int		http_tls_write(http_t *http, const char *buf, int len);
-#  ifdef HAVE_LIBSSL
-#    include "tls-openssl.c"
-#  elif defined(HAVE_GNUTLS)
+#  ifdef HAVE_GNUTLS
 #    include "tls-gnutls.c"
 #  elif defined(HAVE_CDSASSL)
 #    include "tls-darwin.c"
 #  else
 #    include "tls-sspi.c"
-#  endif /* HAVE_LIBSSL */
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
 
@@ -1120,20 +1118,7 @@ httpGetReady(http_t *http)		/* I - HTTP connection */
     return (http->used);
 #ifdef HAVE_SSL
   else if (http->tls)
-  {
-    size_t	ready;			/* Ready bytes */
-
-#  ifdef HAVE_LIBSSL
-    if ((ready = SSL_pending((SSL *)(http->tls))) > 0)
-      return (ready);
-#  elif defined(HAVE_GNUTLS)
-    if ((ready = gnutls_record_check_pending(http->tls)) > 0)
-      return (ready);
-#  elif defined(HAVE_CDSASSL)
-    if (!SSLGetBufferedReadSize(http->tls, &ready) && ready > 0)
-      return (ready);
-#  endif /* HAVE_LIBSSL */
-  }
+    return (http_tls_pending(http));
 #endif /* HAVE_SSL */
 
   return (0);
@@ -1539,10 +1524,6 @@ httpInitialize(void)
 #ifdef WIN32
   WSADATA	winsockdata;		/* WinSock data */
 #endif /* WIN32 */
-#ifdef HAVE_LIBSSL
-  int		i;			/* Looping var */
-  unsigned char	data[1024];		/* Seed data */
-#endif /* HAVE_LIBSSL */
 
 
   _cupsGlobalLock();

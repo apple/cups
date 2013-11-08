@@ -418,10 +418,6 @@ int					/* O - 1 if partial close, 0 if fully closed */
 cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 {
   int		partial;		/* Do partial close for SSL? */
-#ifdef HAVE_LIBSSL
-#elif defined(HAVE_GNUTLS)
-#  elif defined(HAVE_CDSASSL)
-#endif /* HAVE_LIBSSL */
 
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing connection.");

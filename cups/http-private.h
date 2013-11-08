@@ -73,11 +73,7 @@ typedef int socklen_t;
 #  include "md5-private.h"
 #  include "ipp-private.h"
 
-#  if defined HAVE_LIBSSL
-#    include <openssl/err.h>
-#    include <openssl/rand.h>
-#    include <openssl/ssl.h>
-#  elif defined HAVE_GNUTLS
+#  ifdef HAVE_GNUTLS
 #    include <gnutls/gnutls.h>
 #    include <gnutls/x509.h>
 #    include <gcrypt.h>
@@ -109,7 +105,7 @@ typedef int socklen_t;
 #    endif /* HAVE_SECPOLICYPRIV_H */
 #  elif defined(HAVE_SSPISSL)
 #    include "sspi-private.h"
-#  endif /* HAVE_LIBSSL */
+#  endif /* HAVE_GNUTLS */
 
 #  ifndef WIN32
 #    include <net/if.h>
@@ -152,19 +148,7 @@ extern "C" {
  * Types and functions for SSL support...
  */
 
-#  if defined HAVE_LIBSSL
-/*
- * The OpenSSL library provides its own SSL/TLS context structure for its
- * IO and protocol management.  However, we need to provide our own BIO
- * (basic IO) implementation to do timeouts...
- */
-
-typedef SSL  *http_tls_t;
-typedef void *http_tls_credentials_t;
-
-//extern BIO_METHOD *_httpBIOMethods(void);
-
-#  elif defined HAVE_GNUTLS
+#  ifdef HAVE_GNUTLS
 /*
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
@@ -215,7 +199,7 @@ typedef void *http_tls_credentials_t;
 
 typedef void *http_tls_t;
 typedef void *http_tls_credentials_t;
-#  endif /* HAVE_LIBSSL */
+#  endif /* HAVE_GNUTLS */
 
 typedef enum _http_coding_e		/**** HTTP content coding enumeration ****/
 {

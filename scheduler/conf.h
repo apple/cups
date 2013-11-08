@@ -238,10 +238,10 @@ VAR const char		**MimeTypes		VALUE(NULL);
 #ifdef HAVE_SSL
 VAR char		*ServerCertificate	VALUE(NULL);
 					/* Server certificate file */
-#  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
+#  ifdef HAVE_GNUTLS
 VAR char		*ServerKey		VALUE(NULL);
 					/* Server key file */
-#  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+#  endif /* HAVE_GNUTLS */
 VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
 					/* SSL/TLS options */
 #endif /* HAVE_SSL */

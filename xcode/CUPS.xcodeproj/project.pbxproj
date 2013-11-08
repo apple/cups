@@ -1084,7 +1084,6 @@
 /* Begin PBXFileReference section */
 		270B267D17F5C06700C8A3A9 /* tls-darwin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../cups/tls-darwin.c"; sourceTree = "<group>"; };
 		270B267E17F5C06700C8A3A9 /* tls-gnutls.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../cups/tls-gnutls.c"; sourceTree = "<group>"; };
-		270B267F17F5C06700C8A3A9 /* tls-openssl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-openssl.c"; path = "../cups/tls-openssl.c"; sourceTree = "<group>"; };
 		270B268017F5C5D600C8A3A9 /* sspi-private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "sspi-private.h"; path = "../cups/sspi-private.h"; sourceTree = "<group>"; };
 		270B268117F5C5D600C8A3A9 /* tls-sspi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "tls-sspi.c"; path = "../cups/tls-sspi.c"; sourceTree = "<group>"; };
 		270CCDA7135E3C9E00007BE2 /* testmime */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testmime; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1780,7 +1779,6 @@
 				72220F05133305BB00FCA411 /* thread.c */,
 				270B267D17F5C06700C8A3A9 /* tls-darwin.c */,
 				270B267E17F5C06700C8A3A9 /* tls-gnutls.c */,
-				270B267F17F5C06700C8A3A9 /* tls-openssl.c */,
 				270B268117F5C5D600C8A3A9 /* tls-sspi.c */,
 				270B268017F5C5D600C8A3A9 /* sspi-private.h */,
 				72220F06133305BB00FCA411 /* transcode.c */,

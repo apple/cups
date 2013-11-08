@@ -1,28 +1,21 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   OpenSSL/GNUTLS stuff for CUPS.
+dnl TLS stuff for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
-dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(ssl, [  --disable-ssl           disable SSL/TLS support])
 AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=first])
 AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=second])
-AC_ARG_ENABLE(openssl, [  --enable-openssl        use OpenSSL for SSL/TLS support, default=third])
-AC_ARG_WITH(openssl-libs, [  --with-openssl-libs     set directory for OpenSSL library],
-    LDFLAGS="-L$withval $LDFLAGS"
-    DSOFLAGS="-L$withval $DSOFLAGS",)
-AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenSSL includes],
-    CFLAGS="-I$withval $CFLAGS"
-    CPPFLAGS="-I$withval $CPPFLAGS",)
 
 SSLFLAGS=""
 SSLLIBS=""
@@ -94,48 +87,6 @@ if test x$enable_ssl != xno; then
 	    fi
 	fi
     fi
-
-    dnl Check for the OpenSSL library last...
-    if test $have_ssl = 0 -a "x$enable_openssl" != "xno"; then
-	AC_CHECK_HEADER(openssl/ssl.h,[
-	    dnl Save the current libraries so the crypto stuff isn't always
-	    dnl included...
-	    SAVELIBS="$LIBS"
-
-	    dnl Some ELF systems can't resolve all the symbols in libcrypto
-	    dnl if libcrypto was linked against RSAREF, and fail to link the
-	    dnl test program correctly, even though a correct installation
-	    dnl of OpenSSL exists.  So we test the linking three times in
-	    dnl case the RSAREF libraries are needed.
-
-	    for libcrypto in \
-		"-lcrypto" \
-		"-lcrypto -lrsaref" \
-		"-lcrypto -lRSAglue -lrsaref"
-	    do
-		AC_CHECK_LIB(ssl,SSL_new,
-		    [have_ssl=1
-		     SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
-		     SSLLIBS="-lssl $libcrypto"
-		     AC_DEFINE(HAVE_SSL)
-		     AC_DEFINE(HAVE_LIBSSL)],,
-		    $libcrypto)
-
-		if test "x${SSLLIBS}" != "x"; then
-		    break
-		fi
-	    done
-
-	    if test "x${SSLLIBS}" != "x"; then
-		CUPS_SERVERCERT="ssl/server.crt"
-		CUPS_SERVERKEY="ssl/server.key"
-
-		LIBS="$SAVELIBS $SSLLIBS"
-		AC_CHECK_FUNCS(SSL_set_tlsext_host_name)
-	    fi
-
-	    LIBS="$SAVELIBS"])
-    fi
 fi
 
 IPPALIASES="http"
@@ -143,7 +94,7 @@ if test $have_ssl = 1; then
     AC_MSG_RESULT([    Using SSLLIBS="$SSLLIBS"])
     AC_MSG_RESULT([    Using SSLFLAGS="$SSLFLAGS"])
     IPPALIASES="http https ipps"
-elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes -o x$enable_openssl = xyes; then
+elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes; then
     AC_MSG_ERROR([Unable to enable SSL support.])
 fi
 
