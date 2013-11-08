@@ -3141,7 +3141,7 @@ _httpWait(http_t *http,			/* I - HTTP connection */
   */
 
 #ifdef HAVE_SSL
-  if (http_tls_pending(http))
+  if (http->tls && http_tls_pending(http))
   {
     DEBUG_puts("5_httpWait: Return 1 since there is pending TLS data.");
     return (1);
