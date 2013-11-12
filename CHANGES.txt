@@ -19,6 +19,8 @@ CHANGES IN CUPS V1.7.1
 	  (<rdar://problem/15392966>)
 	- The "make check" test suite did not work on Linux without the
 	  cups-filters package installed (<rdar://problem/14292998>)
+	- Japanese PPDs using with the Shift-JIS encoding did not work
+	  (<rdar://problem/15427759>)
 
 
 CHANGES IN CUPS V1.7.0
