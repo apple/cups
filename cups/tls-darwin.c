@@ -15,13 +15,20 @@
  * This file is subject to the Apple OS-Developed Software exception.
  */
 
+/**** This file is included from http.c ****/
+
+/*
+ * Include necessary headers...
+ */
+
+#include <spawn.h>
+
+extern char **environ;
+
 
 /*
  * Local functions...
  */
-
-//static CFArrayRef	copy_cdsa_certificate(cupsd_client_t *con);
-//static int		make_certificate(cupsd_client_t *con);
 
 static OSStatus	http_cdsa_read(SSLConnectionRef connection, void *data,
 		               size_t *dataLength);
@@ -167,15 +174,100 @@ _httpFreeCredentials(
  * @since CUPS 2.0@
  */
 
-int					/* O  - -1 on error, 0 on success */
+int					/* O - 0 on success, -1 on error */
 httpLoadCredentials(
     const char   *path,			/* I  - Keychain/PKCS#12 path */
     cups_array_t **credentials,		/* IO - Credentials */
     const char   *common_name)		/* I  - Common name for credentials */
 {
-  (void)path;
-  (void)credentials;
-  (void)common_name;
+  OSStatus		err;		/* Error info */
+  SecKeychainRef	keychain = NULL;/* Keychain reference */
+  SecIdentitySearchRef	search = NULL;	/* Search reference */
+  SecIdentityRef	identity = NULL;/* Identity */
+  CFArrayRef		certificates = NULL;
+					/* Certificate array */
+  SecPolicyRef		policy = NULL;	/* Policy ref */
+  CFStringRef		cfcommon_name = NULL;
+					/* Server name */
+  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
+  CFArrayRef		list = NULL;	/* Keychain list */
+
+
+  if ((err = SecKeychainOpen(path, &keychain)))
+    goto cleanup;
+
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
+
+  policy = SecPolicyCreateSSL(1, cfcommon_name);
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+
+  if (!policy)
+    goto cleanup;
+
+  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
+    goto cleanup;
+
+  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1,
+                       &kCFTypeArrayCallBacks);
+
+  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
+  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
+  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
+  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
+  CFDictionaryAddValue(query, kSecMatchSearchList, list);
+
+  CFRelease(list);
+
+  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+
+  if (err)
+    goto cleanup;
+
+  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+    goto cleanup;
+
+  if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks)) == NULL)
+    goto cleanup;
+
+  cleanup :
+
+  if (keychain)
+    CFRelease(keychain);
+  if (search)
+    CFRelease(search);
+  if (identity)
+    CFRelease(identity);
+
+  if (policy)
+    CFRelease(policy);
+  if (query)
+    CFRelease(query);
+
+  return (certificates);
+
+}
+
+
+/*
+ * 'httpLoadPEM()' - Load PEM-encoded credentials from separate files.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 0 on success, -1 on error */
+httpLoadPEM(const char *certificate,	/* I - Certificate file */
+	    const char *private_key,	/* I - Private key file */
+            const char *chain,		/* I - Certificate chain file or @code NULL@ */
+	    cups_array_t **credentials)	/* O - Credentials */
+{
+  (void)certificate;
+  (void)private_key;
+  (void)chain;
+
+  if (credentials)
+    *credentials = NULL;
 
   return (-1);
 }
@@ -188,17 +280,192 @@ httpLoadCredentials(
  * @since CUPS 2.0@
  */
 
-int					/* O - 0 on success, -1 on failure */
+int					/* O - 0 on success, -1 on error */
 httpMakeCredentials(
+    const char   *path,			/* I - Keychain/PKCS#12 path */
     cups_array_t **credentials,		/* O - Credentials */
     const char   *common_name)		/* I - Common name for X.509 cert */
 {
-  (void)common_name;
+#    ifdef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
+  int			status = -1;	/* Return status */
+  OSStatus		err;		/* Error code (if any) */
+  CFStringRef		cfcommon_name = NULL;
+					/* CF string for server name */
+  SecIdentityRef	ident = NULL;	/* Identity */
+  SecKeyRef		publicKey = NULL,
+					/* Public key */
+			privateKey = NULL;
+					/* Private key */
+  CFMutableDictionaryRef keyParams = NULL;
+					/* Key generation parameters */
+
 
   if (credentials)
     *credentials = NULL;
 
-  return (-1);
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, servername,
+                                           kCFStringEncodingUTF8);
+  if (!cfcommon_name)
+    goto cleanup;
+
+ /*
+  * Create a public/private key pair...
+  */
+
+  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+					&kCFTypeDictionaryKeyCallBacks,
+					&kCFTypeDictionaryValueCallBacks);
+  if (!keyParams)
+    goto cleanup;
+
+  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
+  CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
+  CFDictionaryAddValue(keyParams, kSecAttrLabel,
+                       CFSTR("CUPS Self-Signed Certificate"));
+
+  err = SecKeyGeneratePair(keyParams, &publicKey, &privateKey);
+  if (err != noErr)
+    goto cleanup;
+
+ /*
+  * Create a self-signed certificate using the public/private key pair...
+  */
+
+  CFIndex	usageInt = kSecKeyUsageAll;
+  CFNumberRef	usage = CFNumberCreate(alloc, kCFNumberCFIndexType, &usageInt);
+  CFDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault,
+kSecCSRBasicContraintsPathLen, CFINT(0), kSecSubjectAltName, cfcommon_name, kSecCertificateKeyUsage, usage, NULL, NULL);
+  CFRelease(usage);
+
+  const void	*ca_o[] = { kSecOidOrganization, CFSTR("") };
+  const void	*ca_cn[] = { kSecOidCommonName, cfcommon_name };
+  CFArrayRef	ca_o_dn = CFArrayCreate(kCFAllocatorDefault, ca_o, 2, NULL);
+  CFArrayRef	ca_cn_dn = CFArrayCreate(kCFAllocatorDefault, ca_cn, 2, NULL);
+  const void	*ca_dn_array[2];
+
+  ca_dn_array[0] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_o_dn, 1, NULL);
+  ca_dn_array[1] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_cn_dn, 1, NULL);
+
+  CFArrayRef	subject = CFArrayCreate(kCFAllocatorDefault, ca_dn_array, 2, NULL);
+  SecCertificateRef cert = SecGenerateSelfSignedCertificate(subject, certParams, publicKey, privateKey);
+  CFRelease(subject);
+  CFRelease(certParams);
+
+  if (!cert)
+    goto cleanup;
+
+  ident = SecIdentityCreate(kCFAllocatorDefault, cert, privateKey);
+
+  if (ident)
+    status = 0;
+
+  /*
+   * Cleanup and return...
+   */
+
+cleanup:
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+
+  if (keyParams)
+    CFRelease(keyParams);
+
+  if (ident)
+    CFRelease(ident);
+
+  if (cert)
+    CFRelease(cert);
+
+  if (publicKey)
+    CFRelease(publicKey);
+
+  if (privateKey)
+    CFRelease(publicKey);
+
+  return (status);
+
+#    else /* !HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+  int		pid,			/* Process ID of command */
+		status;			/* Status of command */
+  char		command[1024],		/* Command */
+		*argv[4],		/* Command-line arguments */
+		keychain[1024],		/* Keychain argument */
+		infofile[1024];		/* Type-in information for cert */
+  cups_file_t	*fp;			/* Seed/info file */
+
+
+ /*
+  * Run the "certtool" command to generate a self-signed certificate...
+  */
+
+  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
+    return (-1);
+
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the certtool
+  * command...
+  */
+
+ if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+    return (-1);
+
+  cupsFilePrintf(fp,
+                 "%s\n"			/* Enter key and certificate label */
+                 "r\n"			/* Generate RSA key pair */
+                 "2048\n"		/* Key size in bits */
+                 "y\n"			/* OK (y = yes) */
+                 "b\n"			/* Usage (b=signing/encryption) */
+                 "s\n"			/* Sign with SHA1 */
+                 "y\n"			/* OK (y = yes) */
+                 "%s\n"			/* Common name */
+                 "\n"			/* Country (default) */
+                 "\n"			/* Organization (default) */
+                 "\n"			/* Organizational unit (default) */
+                 "\n"			/* State/Province (default) */
+                 "%s\n"			/* Email address */
+                 "y\n",			/* OK (y = yes) */
+        	 common_name, common_name, "");
+  cupsFileClose(fp);
+
+  snprintf(keychain, sizeof(keychain), "k=%s", path);
+
+  argv[0] = "certtool";
+  argv[1] = "c";
+  argv[2] = keychain;
+  argv[3] = NULL;
+
+  posix_spawn_file_actions_t actions;	/* File actions */
+
+  posix_spawn_file_actions_init(&actions);
+  posix_spawn_file_actions_addclose(&actions, 0);
+  posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
+
+  if (posix_spawn(&pid, command, &actions, NULL, argv, environ))
+  {
+    unlink(infofile);
+    return (-1);
+  }
+
+  posix_spawn_file_actions_destroy(&actions);
+
+  unlink(infofile);
+
+  while (waitpid(pid, &status, 0) < 0)
+    if (errno != EINTR)
+    {
+      status = -1;
+      break;
+    }
+
+  if (status)
+    return (-1);
+
+#    endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+
+  return (httpLoadCredentials(path, credentials, common_name));
 }
 
 
@@ -892,422 +1159,6 @@ cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates.");
 
   return (1);
-}
-
-
-/*
- * 'copy_cdsa_certificate()' - Copy a SSL/TLS certificate from the System
- *                             keychain.
- */
-
-static CFArrayRef				/* O - Array of certificates */
-copy_cdsa_certificate(
-    cupsd_client_t *con)			/* I - Client connection */
-{
-  OSStatus		err;		/* Error info */
-  SecKeychainRef	keychain = NULL;/* Keychain reference */
-  SecIdentitySearchRef	search = NULL;	/* Search reference */
-  SecIdentityRef	identity = NULL;/* Identity */
-  CFArrayRef		certificates = NULL;
-					/* Certificate array */
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  CFStringRef		servername = NULL;
-					/* Server name */
-  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
-  CFArrayRef		list = NULL;	/* Keychain list */
-#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  char			localname[1024];/* Local hostname */
-#    endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "copy_cdsa_certificate: Looking for certs for \"%s\".",
-		  con->servername);
-
-  if ((err = SecKeychainOpen(ServerCertificate, &keychain)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot open keychain \"%s\" - %s (%d)",
-	            ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-  servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
-					 kCFStringEncodingUTF8);
-
-  policy = SecPolicyCreateSSL(1, servername);
-
-  if (servername)
-    CFRelease(servername);
-
-  if (!policy)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-    goto cleanup;
-  }
-
-  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					  &kCFTypeDictionaryKeyCallBacks,
-					  &kCFTypeDictionaryValueCallBacks)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create query dictionary");
-    goto cleanup;
-  }
-
-  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1,
-                       &kCFTypeArrayCallBacks);
-
-  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
-  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
-  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
-  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
-  CFDictionaryAddValue(query, kSecMatchSearchList, list);
-
-  CFRelease(list);
-
-  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-
-#    if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  if (err && DNSSDHostName)
-  {
-   /*
-    * Search for the connection server name failed; try the DNS-SD .local
-    * hostname instead...
-    */
-
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "copy_cdsa_certificate: Looking for certs for \"%s\".",
-		    localname);
-
-    servername = CFStringCreateWithCString(kCFAllocatorDefault, localname,
-					   kCFStringEncodingUTF8);
-
-    CFRelease(policy);
-
-    policy = SecPolicyCreateSSL(1, servername);
-
-    if (servername)
-      CFRelease(servername);
-
-    if (!policy)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
-      goto cleanup;
-    }
-
-    CFDictionarySetValue(query, kSecMatchPolicy, policy);
-
-    err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-  }
-#    endif /* HAVE_DNSSD || HAVE_AVAHI */
-
-  if (err)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "Cannot find signing key in keychain \"%s\": %s (%d)",
-		    ServerCertificate, cssmErrorString(err), (int)err);
-    goto cleanup;
-  }
-
-  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "SecIdentity CFTypeID failure.");
-    goto cleanup;
-  }
-
-  if ((certificates = CFArrayCreate(NULL, (const void **)&identity,
-				  1, &kCFTypeArrayCallBacks)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create certificate array");
-    goto cleanup;
-  }
-
-  cleanup :
-
-  if (keychain)
-    CFRelease(keychain);
-  if (search)
-    CFRelease(search);
-  if (identity)
-    CFRelease(identity);
-
-  if (policy)
-    CFRelease(policy);
-  if (query)
-    CFRelease(query);
-
-  return (certificates);
-}
-
-
-/*
- * 'make_certificate()' - Make a self-signed SSL/TLS certificate.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-make_certificate(cupsd_client_t *con)	/* I - Client connection */
-{
-#    ifdef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
-  int			status = 0;	/* Return status */
-  OSStatus		err;		/* Error code (if any) */
-#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  char			localname[1024];/* Local hostname */
-#  endif /* HAVE_DNSSD || HAVE_AVAHI */
-  const char		*servername;	/* Name of server in cert */
-  CFStringRef		cfservername = NULL;
-					/* CF string for server name */
-  SecIdentityRef	ident = NULL;	/* Identity */
-  SecKeyRef		publicKey = NULL,
-					/* Public key */
-			privateKey = NULL;
-					/* Private key */
-  CFMutableDictionaryRef keyParams = NULL;
-					/* Key generation parameters */
-
-
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Generating SSL server key and certificate.");
-
-#  if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
-  {
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-    servername = localname;
-  }
-  else
-#  endif /* HAVE_DNSSD || HAVE_AVAHI */
-  servername = con->servername;
-
-  cfservername = CFStringCreateWithCString(kCFAllocatorDefault, servername,
-                                           kCFStringEncodingUTF8);
-  if (!cfservername)
-    goto cleanup;
-
- /*
-  * Create a public/private key pair...
-  */
-
-  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					&kCFTypeDictionaryKeyCallBacks,
-					&kCFTypeDictionaryValueCallBacks);
-  if (!keyParams)
-    goto cleanup;
-
-  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
-  CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
-  CFDictionaryAddValue(keyParams, kSecAttrLabel,
-                       CFSTR("CUPS Self-Signed Certificate"));
-
-  err = SecKeyGeneratePair(keyParams, &publicKey, &privateKey);
-  if (err != noErr)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "SecKeyGeneratePair returned %ld.",
-                    (long)err);
-    goto cleanup;
-  }
-
- /*
-  * Create a self-signed certificate using the public/private key pair...
-  */
-
-  CFIndex	usageInt = kSecKeyUsageAll;
-  CFNumberRef	usage = CFNumberCreate(alloc, kCFNumberCFIndexType, &usageInt);
-  CFDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault,
-                                   kSecCSRBasicContraintsPathLen, CFINT(0),
-                                   kSecSubjectAltName, cfservername,
-                                   kSecCertificateKeyUsage, usage,
-                                   NULL, NULL);
-  CFRelease(usage);
-        
-  const void	*ca_o[] = { kSecOidOrganization, CFSTR("") };
-  const void	*ca_cn[] = { kSecOidCommonName, cfservername };
-  CFArrayRef	ca_o_dn = CFArrayCreate(kCFAllocatorDefault, ca_o, 2, NULL);
-  CFArrayRef	ca_cn_dn = CFArrayCreate(kCFAllocatorDefault, ca_cn, 2, NULL);
-  const void	*ca_dn_array[2];
-
-  ca_dn_array[0] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_o_dn,
-                                 1, NULL);
-  ca_dn_array[1] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_cn_dn,
-                                 1, NULL);
-
-  CFArrayRef	subject = CFArrayCreate(kCFAllocatorDefault, ca_dn_array, 2,
-                                        NULL);
-  SecCertificateRef cert = SecGenerateSelfSignedCertificate(subject, certParams,
-                                                            publicKey,
-                                                            privateKey);
-  CFRelease(subject);
-  CFRelease(certParams);
-
-  if (!cert)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "SecGenerateSelfSignedCertificate failed.");
-    goto cleanup;
-  }
-
-  ident = SecIdentityCreate(kCFAllocatorDefault, cert, privateKey);
-
-  if (ident)
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created SSL server certificate file \"%s\".",
-		    ServerCertificate);
-
- /*
-  * Cleanup and return...
-  */
-
-cleanup:
-
-  if (cfservername)
-    CFRelease(cfservername);
-
-  if (keyParams)
-    CFRelease(keyParams);
-
-  if (ident)
-    CFRelease(ident);
-
-  if (cert)
-    CFRelease(cert);
-
-  if (publicKey)
-    CFRelease(publicKey);
-
-  if (privateKey)
-    CFRelease(publicKey);
-
-  if (!status)
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create SSL server key and certificate.");
-
-  return (status);
-
-#    else /* !HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
-  int		pid,			/* Process ID of command */
-		status;			/* Status of command */
-  char		command[1024],		/* Command */
-		*argv[4],		/* Command-line arguments */
-		*envp[MAX_ENV + 1],	/* Environment variables */
-		keychain[1024],		/* Keychain argument */
-		infofile[1024],		/* Type-in information for cert */
-#      if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-		localname[1024],	/* Local hostname */
-#      endif /* HAVE_DNSSD || HAVE_AVAHI */
-		*servername;		/* Name of server in cert */
-  cups_file_t	*fp;			/* Seed/info file */
-  int		infofd;			/* Info file descriptor */
-
-
-#      if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
-  if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
-  {
-    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
-    servername = localname;
-  }
-  else
-#      endif /* HAVE_DNSSD || HAVE_AVAHI */
-    servername = con->servername;
-
- /*
-  * Run the "certtool" command to generate a self-signed certificate...
-  */
-
-  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "No SSL certificate and certtool command not found.");
-    return (0);
-  }
-
- /*
-  * Create a file with the certificate information fields...
-  *
-  * Note: This assumes that the default questions are asked by the certtool
-  * command...
-  */
-
-  if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create certificate information file %s - %s",
-                    infofile, strerror(errno));
-    return (0);
-  }
-
-  cupsFilePrintf(fp,
-                 "%s\n"			/* Enter key and certificate label */
-                 "r\n"			/* Generate RSA key pair */
-                 "2048\n"		/* Key size in bits */
-                 "y\n"			/* OK (y = yes) */
-                 "b\n"			/* Usage (b=signing/encryption) */
-                 "s\n"			/* Sign with SHA1 */
-                 "y\n"			/* OK (y = yes) */
-                 "%s\n"			/* Common name */
-                 "\n"			/* Country (default) */
-                 "\n"			/* Organization (default) */
-                 "\n"			/* Organizational unit (default) */
-                 "\n"			/* State/Province (default) */
-                 "%s\n"			/* Email address */
-                 "y\n",			/* OK (y = yes) */
-        	 servername, servername, ServerAdmin);
-  cupsFileClose(fp);
-
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Generating SSL server key and certificate.");
-
-  snprintf(keychain, sizeof(keychain), "k=%s", ServerCertificate);
-
-  argv[0] = "certtool";
-  argv[1] = "c";
-  argv[2] = keychain;
-  argv[3] = NULL;
-
-  cupsdLoadEnv(envp, MAX_ENV);
-
-  infofd = open(infofile, O_RDONLY);
-
-  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         NULL, &pid))
-  {
-    close(infofd);
-    unlink(infofile);
-    return (0);
-  }
-
-  close(infofd);
-  unlink(infofile);
-
-  while (waitpid(pid, &status, 0) < 0)
-    if (errno != EINTR)
-    {
-      status = 1;
-      break;
-    }
-
-  cupsdFinishProcess(pid, command, sizeof(command), NULL);
-
-  if (status)
-  {
-    if (WIFEXITED(status))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the certtool command stopped with status %d.",
-	              WEXITSTATUS(status));
-    else
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to create SSL server key and certificate - "
-		      "the certtool command crashed on signal %d.",
-	              WTERMSIG(status));
-  }
-  else
-  {
-    cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Created SSL server certificate file \"%s\".",
-		    ServerCertificate);
-  }
-
-  return (!status);
-#    endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
 }
 #endif /* 0 */
 

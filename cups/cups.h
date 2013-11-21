@@ -619,6 +619,8 @@ extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,
 extern void		cupsSetUserAgent(const char *user_agent) _CUPS_API_1_7;
 extern const char	*cupsUserAgent(void) _CUPS_API_1_7;
 
+/* New in CUPS 2.0 */
+extern int		cupsSetServerCredentials(const char *path, const char *common_name) _CUPS_API_2_0;
 
 #  ifdef __cplusplus
 }
