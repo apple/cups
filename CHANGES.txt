@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.1 - 2013-11-06
+CHANGES.txt - 1.7.1 - 2013-12-05
 --------------------------------
 
 CHANGES IN CUPS V1.7.1
@@ -21,6 +21,7 @@ CHANGES IN CUPS V1.7.1
 	  cups-filters package installed (<rdar://problem/14292998>)
 	- Japanese PPDs using with the Shift-JIS encoding did not work
 	  (<rdar://problem/15427759>)
+	- "tel:" URIs incorrectly had slashes (<rdar://problem/15418463>)
 
 
 CHANGES IN CUPS V1.7.0

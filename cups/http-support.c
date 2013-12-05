@@ -206,10 +206,10 @@ httpAssembleURI(
   if (!ptr)
     goto assemble_overflow;
 
-  if (!strcmp(scheme, "mailto"))
+  if (!strcmp(scheme, "mailto") || !strcmp(scheme, "tel"))
   {
    /*
-    * mailto: only has :, no //...
+    * mailto: and tel: only have :, no //...
     */
 
     if (ptr < end)
@@ -220,7 +220,7 @@ httpAssembleURI(
   else
   {
    /*
-    * Schemes other than mailto: all have //...
+    * Schemes other than mailto: and tel: all have //...
     */
 
     if ((ptr + 2) < end)
@@ -1080,7 +1080,7 @@ httpSeparateURI(
     *port = 515;
   else if (!strcmp(scheme, "socket"))	/* Not yet registered with IANA... */
     *port = 9100;
-  else if (strcmp(scheme, "file") && strcmp(scheme, "mailto"))
+  else if (strcmp(scheme, "file") && strcmp(scheme, "mailto") && strcmp(scheme, "tel"))
     status = HTTP_URI_STATUS_UNKNOWN_SCHEME;
 
  /*
