@@ -180,6 +180,13 @@ httpLoadCredentials(
     cups_array_t **credentials,		/* IO - Credentials */
     const char   *common_name)		/* I  - Common name for credentials */
 {
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+
+  return (-1);
+
+#if 0
   OSStatus		err;		/* Error info */
   SecKeychainRef	keychain = NULL;/* Keychain reference */
   SecIdentitySearchRef	search = NULL;	/* Search reference */
@@ -246,33 +253,11 @@ httpLoadCredentials(
     CFRelease(query);
 
   return (certificates);
-
+#endif /* 0 */
 }
 
 
-/*
- * 'httpLoadPEM()' - Load PEM-encoded credentials from separate files.
- *
- * @since CUPS 2.0@
- */
-
-int					/* O - 0 on success, -1 on error */
-httpLoadPEM(const char *certificate,	/* I - Certificate file */
-	    const char *private_key,	/* I - Private key file */
-            const char *chain,		/* I - Certificate chain file or @code NULL@ */
-	    cups_array_t **credentials)	/* O - Credentials */
-{
-  (void)certificate;
-  (void)private_key;
-  (void)chain;
-
-  if (credentials)
-    *credentials = NULL;
-
-  return (-1);
-}
-
-
+#if 0
 /*
  * 'httpMakeCredentials()' - Create self-signed credentials for the given
  *                           name.
@@ -467,6 +452,7 @@ cleanup:
 
   return (httpLoadCredentials(path, credentials, common_name));
 }
+#endif /* 0 */
 
 
 /*
