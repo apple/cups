@@ -321,7 +321,7 @@ static const char * const ipp_document_states[] =
 		  "pending",
 		  "4",
 		  "processing",
-		  "6",
+		  "processing-stopped",	/* IPPSIX */
 		  "canceled",
 		  "aborted",
 		  "completed"
@@ -340,8 +340,8 @@ static const char * const ipp_document_states[] =
 		  "bale",
 		  "booklet-maker",
 		  "jog-offset",
-		  "15",
-		  "16",
+		  "coat",		/* Finishings 2.0 */
+		  "laminate",		/* Finishings 2.0 */
 		  "17",
 		  "18",
 		  "19",
@@ -357,10 +357,10 @@ static const char * const ipp_document_states[] =
 		  "staple-dual-top",
 		  "staple-dual-right",
 		  "staple-dual-bottom",
-		  "32",
-		  "33",
-		  "34",
-		  "35",
+		  "staple-triple-left",	/* Finishings 2.0 */
+		  "staple-triple-top",	/* Finishings 2.0 */
+		  "staple-triple-right",/* Finishings 2.0 */
+		  "staple-triple-bottom",/* Finishings 2.0 */
 		  "36",
 		  "37",
 		  "38",
@@ -395,37 +395,37 @@ static const char * const ipp_document_states[] =
 		  "67",
 		  "68",
 		  "69",
-		  "punch-top-left",
-		  "punch-bottom-left",
-		  "punch-top-right",
-		  "punch-bottom-right",
-		  "punch-dual-left",
-		  "punch-dual-top",
-		  "punch-dual-right",
-		  "punch-dual-bottom",
-		  "punch-triple-left",
-		  "punch-triple-top",
-		  "punch-triple-right",
-		  "punch-triple-bottom",
-		  "punch-quad-left",
-		  "punch-quad-top",
-		  "punch-quad-right",
-		  "punch-quad-bottom",
+		  "punch-top-left",	/* Finishings 2.0 */
+		  "punch-bottom-left",	/* Finishings 2.0 */
+		  "punch-top-right",	/* Finishings 2.0 */
+		  "punch-bottom-right",	/* Finishings 2.0 */
+		  "punch-dual-left",	/* Finishings 2.0 */
+		  "punch-dual-top",	/* Finishings 2.0 */
+		  "punch-dual-right",	/* Finishings 2.0 */
+		  "punch-dual-bottom",	/* Finishings 2.0 */
+		  "punch-triple-left",	/* Finishings 2.0 */
+		  "punch-triple-top",	/* Finishings 2.0 */
+		  "punch-triple-right",	/* Finishings 2.0 */
+		  "punch-triple-bottom",/* Finishings 2.0 */
+		  "punch-quad-left",	/* Finishings 2.0 */
+		  "punch-quad-top",	/* Finishings 2.0 */
+		  "punch-quad-right",	/* Finishings 2.0 */
+		  "punch-quad-bottom",	/* Finishings 2.0 */
 		  "86",
 		  "87",
 		  "88",
 		  "89",
-		  "fold-accordian",
-		  "fold-double-gate",
-		  "fold-gate",
-		  "fold-half",
-		  "fold-half-z",
-		  "fold-left-gate",
-		  "fold-letter",
-		  "fold-parallel",
-		  "fold-poster",
-		  "fold-right-gate",
-		  "fold-z"
+		  "fold-accordian",	/* Finishings 2.0 */
+		  "fold-double-gate",	/* Finishings 2.0 */
+		  "fold-gate",		/* Finishings 2.0 */
+		  "fold-half",		/* Finishings 2.0 */
+		  "fold-half-z",	/* Finishings 2.0 */
+		  "fold-left-gate",	/* Finishings 2.0 */
+		  "fold-letter",	/* Finishings 2.0 */
+		  "fold-parallel",	/* Finishings 2.0 */
+		  "fold-poster",	/* Finishings 2.0 */
+		  "fold-right-gate",	/* Finishings 2.0 */
+		  "fold-z"		/* Finishings 2.0 */
 		},
 		* const ipp_finishings_vendor[] =
 		{

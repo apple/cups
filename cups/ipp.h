@@ -103,6 +103,8 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_BALE,			/* Bale (any type) */
   IPP_FINISHINGS_BOOKLET_MAKER,		/* Fold to make booklet */
   IPP_FINISHINGS_JOG_OFFSET,		/* Offset for binding (any type) */
+  IPP_FINISHINGS_COAT,			/* Apply protective liquid or powder coating */
+  IPP_FINISHINGS_LAMINATE,		/* Apply protective (solid) material */
   IPP_FINISHINGS_STAPLE_TOP_LEFT = 20,	/* Staple top left corner */
   IPP_FINISHINGS_STAPLE_BOTTOM_LEFT,	/* Staple bottom left corner */
   IPP_FINISHINGS_STAPLE_TOP_RIGHT,	/* Staple top right corner */
@@ -115,6 +117,10 @@ typedef enum ipp_finishings_e		/**** Finishings ****/
   IPP_FINISHINGS_STAPLE_DUAL_TOP,	/* Two staples on top */
   IPP_FINISHINGS_STAPLE_DUAL_RIGHT,	/* Two staples on right */
   IPP_FINISHINGS_STAPLE_DUAL_BOTTOM,	/* Two staples on bottom */
+  IPP_FINISHINGS_STAPLE_TRIPLE_LEFT,	/* Three staples on left */
+  IPP_FINISHINGS_STAPLE_TRIPLE_TOP,	/* Three staples on top */
+  IPP_FINISHINGS_STAPLE_TRIPLE_RIGHT,	/* Three staples on right */
+  IPP_FINISHINGS_STAPLE_TRIPLE_BOTTOM,	/* Three staples on bottom */
   IPP_FINISHINGS_BIND_LEFT = 50,	/* Bind on left */
   IPP_FINISHINGS_BIND_TOP,		/* Bind on top */
   IPP_FINISHINGS_BIND_RIGHT,		/* Bind on right */
