@@ -36,6 +36,52 @@ static OSStatus	http_cdsa_write(SSLConnectionRef connection, const void *data,
 		                size_t *dataLength);
 
 
+/*
+ * 'cupsMakeServerCredentials()' - Make a self-signed certificate and private key pair.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsMakeServerCredentials(
+    const char *path,			/* I - Path to keychain/directory */
+    const char *common_name,		/* I - Common name */
+    int        num_alt_names,		/* I - Number of subject alternate names */
+    const char **alt_names,		/* I - Subject Alternate Names */
+    time_t     expiration_date)		/* I - Expiration date */
+{
+  (void)path;
+  (void)common_name;
+  (void)num_alt_names;
+  (void)alt_names;
+  (void)expiration_date;
+
+  return (0);
+}
+
+
+/*
+ * 'cupsSetServerCredentials()' - Set the default server credentials.
+ *
+ * Note: The server credentials are used by all threads in the running process.
+ * This function is threadsafe.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsSetServerCredentials(
+    const char *path,			/* I - Path to keychain/directory */
+    const char *common_name,		/* I - Default common name for server */
+    int        auto_create)		/* I - 1 = automatically create self-signed certificates */
+{
+  (void)path;
+  (void)common_name;
+  (void)auto_create;
+
+  return (0);
+}
+
 
 /*
  * 'httpCopyCredentials()' - Copy the credentials associated with the peer in
@@ -129,6 +175,56 @@ _httpCreateCredentials(
   }
 
   return (peerCerts);
+}
+
+
+/*
+ * 'httpCredentialsAreTrusted()' - Return whether the credentials are trusted.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 if trusted, 0 if not/unknown */
+httpCredentialsAreTrusted(
+    cups_array_t *credentials)		/* I - Credentials */
+{
+  (void)credentials;
+
+  return (0);
+}
+
+
+/*
+ * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
+ *
+ * @since CUPS 2.0@
+ */
+
+time_t					/* O - Expiration date of credentials */
+httpCredentialsGetExpiration(
+    cups_array_t *credentials)		/* I - Credentials */
+{
+  (void)credentials;
+
+  return (0);
+}
+
+
+/*
+ * 'httpCredentialsIsValidName()' - Return whether the credentials are valid for the given name.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 if valid, 0 otherwise */
+httpCredentialsIsValidName(
+    cups_array_t *credentials,		/* I - Credentials */
+    const char   *common_name)		/* I - Name to check */
+{
+  (void)credentials;
+  (void)common_name;
+
+  return (0);
 }
 
 
@@ -259,14 +355,14 @@ httpLoadCredentials(
 
 #if 0
 /*
- * 'httpMakeCredentials()' - Create self-signed credentials for the given
+ * 'cupsMakeCredentials()' - Create self-signed credentials for the given
  *                           name.
  *
  * @since CUPS 2.0@
  */
 
 int					/* O - 0 on success, -1 on error */
-httpMakeCredentials(
+cupsMakeCredentials(
     const char   *path,			/* I - Keychain/PKCS#12 path */
     cups_array_t **credentials,		/* O - Credentials */
     const char   *common_name)		/* I - Common name for X.509 cert */

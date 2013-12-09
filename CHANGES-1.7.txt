@@ -22,6 +22,8 @@ CHANGES IN CUPS V1.7.1
 	- Japanese PPDs using with the Shift-JIS encoding did not work
 	  (<rdar://problem/15427759>)
 	- "tel:" URIs incorrectly had slashes (<rdar://problem/15418463>)
+	- The libusb-based USB backend incorrectly used write timeouts
+	  (<rdar://problem/15564888>)
 
 
 CHANGES IN CUPS V1.7.0
