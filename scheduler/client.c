@@ -2878,7 +2878,6 @@ static int				/* O - 0 on success, -1 on error */
 cupsd_start_tls(cupsd_client_t    *con,	/* I - Client connection */
                 http_encryption_t e)	/* I - Encryption mode */
 {
-  /* TODO: Lookup/load cert + key and set */
   if (httpEncryption(con->http, e))
   {
     cupsdLogClient(con, CUPSD_LOG_ERROR, "Unable to encrypt connection: %s",

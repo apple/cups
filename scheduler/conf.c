@@ -143,10 +143,6 @@ static const cupsd_var_t	cupsfiles_vars[] =
   { "RequestRoot",		&RequestRoot,		CUPSD_VARTYPE_STRING },
   { "ServerBin",		&ServerBin,		CUPSD_VARTYPE_PATHNAME },
 #ifdef HAVE_SSL
-#  ifdef HAVE_GNUTLS
-  { "ServerCertificate",	&ServerCertificate,	CUPSD_VARTYPE_PATHNAME },
-  { "ServerKey",		&ServerKey,		CUPSD_VARTYPE_PATHNAME },
-#  endif /* HAVE_GNUTLS */
   { "ServerKeychain",		&ServerKeychain,	CUPSD_VARTYPE_PATHNAME },
 #endif /* HAVE_SSL */
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
@@ -592,9 +588,7 @@ cupsdReadConfiguration(void)
 
 #ifdef HAVE_SSL
 #  ifdef HAVE_GNUTLS
-  cupsdClearString(&ServerKeychain);
-  cupsdSetString(&ServerCertificate, "ssl/server.crt");
-  cupsdSetString(&ServerKey, "ssl/server.key");
+  cupsdSetString(&ServerKeychain, "ssl");
 #  else
   cupsdSetString(&ServerKeychain, "/Library/Keychains/System.keychain");
 #  endif /* HAVE_GNUTLS */
@@ -1061,27 +1055,10 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&CacheDir, "%s/%s", ServerRoot, CacheDir);
 
 #ifdef HAVE_SSL
-#  ifdef HAVE_GNUTLS
-  if (ServerCertificate[0] != '/')
-    cupsdSetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
-
-  if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)) &&
-      cupsdCheckPermissions(ServerCertificate, NULL, 0600, RunUser, Group,
-                            0, 0) < 0 &&
-      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
-    return (0);
-
-  if (ServerKey[0] != '/')
-    cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
-
-  if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)) &&
-      cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0 &&
-      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
-    return (0);
-#  endif /* HAVE_GNUTLS */
-
   if (ServerKeychain[0] != '/')
     cupsdSetStringf(&ServerKeychain, "%s/%s", ServerRoot, ServerKeychain);
+
+  cupsSetServerCredentials(ServerKeychain, ServerName, 1);
 #endif /* HAVE_SSL */
 
  /*
@@ -3310,6 +3287,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
              !_cups_strcasecmp(line, "ServerBin") ||
              !_cups_strcasecmp(line, "ServerCertificate") ||
              !_cups_strcasecmp(line, "ServerKey") ||
+             !_cups_strcasecmp(line, "ServerKeychain") ||
              !_cups_strcasecmp(line, "ServerRoot") ||
              !_cups_strcasecmp(line, "SMBConfigFile") ||
              !_cups_strcasecmp(line, "StateDir") ||
@@ -3471,6 +3449,15 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
             return (0);
         }
       }
+    }
+    else if (!_cups_strcasecmp(line, "ServerCertificate") ||
+             !_cups_strcasecmp(line, "ServerKey"))
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+		      "The \"%s\" directive on line %d of %s is no longer "
+		      "supported; this will become an error in a future "
+		      "release.",
+		      line, linenum, CupsFilesFile);
     }
     else if (!parse_variable(CupsFilesFile, linenum, line, value,
 			     sizeof(cupsfiles_vars) / sizeof(cupsfiles_vars[0]),

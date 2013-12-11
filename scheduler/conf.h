@@ -228,12 +228,6 @@ VAR const char		**MimeTypes		VALUE(NULL);
 					/* Array of MIME types */
 
 #ifdef HAVE_SSL
-#  ifdef HAVE_GNUTLS
-VAR char		*ServerCertificate	VALUE(NULL),
-					/* Server certificate file */
-			*ServerKey		VALUE(NULL);
-					/* Server key file */
-#  endif /* HAVE_GNUTLS */
 VAR char		*ServerKeychain		VALUE(NULL);
 					/* Keychain holding cert + key */
 #endif /* HAVE_SSL */
