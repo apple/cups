@@ -27,6 +27,20 @@ extern char **environ;
 
 
 /*
+ * Local globals...
+ */
+
+static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for keychain/certs */
+static SecKeychainRef	tls_keychain = NULL;
+					/* Server cert keychain */
+static int		tls_auto_create = 0;
+					/* Auto-create self-signed certs? */
+static char		*tls_common_name = NULL;
+					/* Default common name */
+
+
+/*
  * Local functions...
  */
 
@@ -75,11 +89,38 @@ cupsSetServerCredentials(
     const char *common_name,		/* I - Default common name for server */
     int        auto_create)		/* I - 1 = automatically create self-signed certificates */
 {
-  (void)path;
-  (void)common_name;
-  (void)auto_create;
+  SecKeychainRef	keychain = NULL;/* Temporary keychain */
 
-  return (0);
+
+  if (SecKeychainOpen(path, &keychain) != noErr)
+  {
+    /* TODO: Set cups last error string */
+    return (0);
+  }
+
+  _cupsMutexLock(&tls_mutex);
+
+ /*
+  * Close any keychain that is currently open...
+  */
+
+  if (tls_keychain)
+    CFRelease(tls_keychain);
+
+  if (tls_common_name)
+    _cupsStrFree(tls_common_name);
+
+ /*
+  * Save the new keychain...
+  */
+
+  tls_keychain    = keychain;
+  tls_auto_create = auto_create;
+  tls_common_name = _cupsStrAlloc(common_name);
+
+  _cupsMutexUnlock(&tls_mutex);
+
+  return (1);
 }
 
 
