@@ -21,7 +21,7 @@
   <body onload="check_cookies();">
     <div class="header">
       <ul>
-	<li><a href="http://www.cups.org/" target="_blank">cups.org</a></li>
+	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a href="/">Home</a></li>
 	<li><a {SECTION=admin?class="active" :}href="/admin">Administration</a></li>
 	<li><a {SECTION=classes?class="active" :}href="/classes/">Classes</a></li>

@@ -12,7 +12,7 @@
   <body>
     <div class="header">
       <ul>
-	<li><a href="http://www.cups.org/" target="_blank">cups.org</a></li>
+	<li><a href="http://www.cups.org/" target="_blank">CUPS.org</a></li>
 	<li><a class="active" href="/">Home</a></li>
 	<li><a href="/admin">Administration</a></li>
 	<li><a href="/classes/">Classes</a></li>
