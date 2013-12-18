@@ -30,24 +30,25 @@ extern char **environ;
  * Local globals...
  */
 
-static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
-					/* Mutex for keychain/certs */
-static SecKeychainRef	tls_keychain = NULL;
-					/* Server cert keychain */
 static int		tls_auto_create = 0;
 					/* Auto-create self-signed certs? */
 static char		*tls_common_name = NULL;
 					/* Default common name */
+static SecKeychainRef	tls_keychain = NULL;
+					/* Server cert keychain */
+static char		*tls_keypath = NULL;
+					/* Server cert keychain path */
+static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for keychain/certs */
 
 
 /*
  * Local functions...
  */
 
-static OSStatus	http_cdsa_read(SSLConnectionRef connection, void *data,
-		               size_t *dataLength);
-static OSStatus	http_cdsa_write(SSLConnectionRef connection, const void *data,
-		                size_t *dataLength);
+static CFArrayRef	http_cdsa_copy_server(const char *common_name);
+static OSStatus		http_cdsa_read(SSLConnectionRef connection, void *data, size_t *dataLength);
+static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, size_t *dataLength);
 
 
 /*
@@ -64,13 +65,188 @@ cupsMakeServerCredentials(
     const char **alt_names,		/* I - Subject Alternate Names */
     time_t     expiration_date)		/* I - Expiration date */
 {
-  (void)path;
-  (void)common_name;
+#ifdef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
+  int			status = 0;	/* Return status */
+  OSStatus		err;		/* Error code (if any) */
+  CFStringRef		cfcommon_name = NULL;
+					/* CF string for server name */
+  SecIdentityRef	ident = NULL;	/* Identity */
+  SecKeyRef		publicKey = NULL,
+					/* Public key */
+			privateKey = NULL;
+					/* Private key */
+  CFMutableDictionaryRef keyParams = NULL;
+					/* Key generation parameters */
+
+
   (void)num_alt_names;
   (void)alt_names;
   (void)expiration_date;
 
-  return (0);
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name,
+                                           kCFStringEncodingUTF8);
+  if (!cfcommon_name)
+    goto cleanup;
+
+ /*
+  * Create a public/private key pair...
+  */
+
+  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+					&kCFTypeDictionaryKeyCallBacks,
+					&kCFTypeDictionaryValueCallBacks);
+  if (!keyParams)
+    goto cleanup;
+
+  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
+  CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
+  CFDictionaryAddValue(keyParams, kSecAttrLabel,
+                       CFSTR("CUPS Self-Signed Certificate"));
+
+  err = SecKeyGeneratePair(keyParams, &publicKey, &privateKey);
+  if (err != noErr)
+    goto cleanup;
+
+ /*
+  * Create a self-signed certificate using the public/private key pair...
+  */
+
+  CFIndex	usageInt = kSecKeyUsageAll;
+  CFNumberRef	usage = CFNumberCreate(alloc, kCFNumberCFIndexType, &usageInt);
+  CFDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault,
+kSecCSRBasicContraintsPathLen, CFINT(0), kSecSubjectAltName, cfcommon_name, kSecCertificateKeyUsage, usage, NULL, NULL);
+  CFRelease(usage);
+
+  const void	*ca_o[] = { kSecOidOrganization, CFSTR("") };
+  const void	*ca_cn[] = { kSecOidCommonName, cfcommon_name };
+  CFArrayRef	ca_o_dn = CFArrayCreate(kCFAllocatorDefault, ca_o, 2, NULL);
+  CFArrayRef	ca_cn_dn = CFArrayCreate(kCFAllocatorDefault, ca_cn, 2, NULL);
+  const void	*ca_dn_array[2];
+
+  ca_dn_array[0] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_o_dn, 1, NULL);
+  ca_dn_array[1] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_cn_dn, 1, NULL);
+
+  CFArrayRef	subject = CFArrayCreate(kCFAllocatorDefault, ca_dn_array, 2, NULL);
+  SecCertificateRef cert = SecGenerateSelfSignedCertificate(subject, certParams, publicKey, privateKey);
+  CFRelease(subject);
+  CFRelease(certParams);
+
+  if (!cert)
+    goto cleanup;
+
+  ident = SecIdentityCreate(kCFAllocatorDefault, cert, privateKey);
+
+  if (ident)
+    status = 1;
+
+  /*
+   * Cleanup and return...
+   */
+
+cleanup:
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+
+  if (keyParams)
+    CFRelease(keyParams);
+
+  if (ident)
+    CFRelease(ident);
+
+  if (cert)
+    CFRelease(cert);
+
+  if (publicKey)
+    CFRelease(publicKey);
+
+  if (privateKey)
+    CFRelease(publicKey);
+
+  return (status);
+
+#else /* !HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+  int		pid,			/* Process ID of command */
+		status;			/* Status of command */
+  char		command[1024],		/* Command */
+		*argv[4],		/* Command-line arguments */
+		keychain[1024],		/* Keychain argument */
+		infofile[1024];		/* Type-in information for cert */
+  cups_file_t	*fp;			/* Seed/info file */
+
+
+  (void)num_alt_names;
+  (void)alt_names;
+  (void)expiration_date;
+
+ /*
+  * Run the "certtool" command to generate a self-signed certificate...
+  */
+
+  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
+    return (-1);
+
+ /*
+  * Create a file with the certificate information fields...
+  *
+  * Note: This assumes that the default questions are asked by the certtool
+  * command...
+  */
+
+ if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
+    return (-1);
+
+  cupsFilePrintf(fp,
+                 "CUPS Self-Signed Certificate\n"
+		 			/* Enter key and certificate label */
+                 "r\n"			/* Generate RSA key pair */
+                 "2048\n"		/* Key size in bits */
+                 "y\n"			/* OK (y = yes) */
+                 "b\n"			/* Usage (b=signing/encryption) */
+                 "s\n"			/* Sign with SHA1 */
+                 "y\n"			/* OK (y = yes) */
+                 "%s\n"			/* Common name */
+                 "\n"			/* Country (default) */
+                 "\n"			/* Organization (default) */
+                 "\n"			/* Organizational unit (default) */
+                 "\n"			/* State/Province (default) */
+                 "\n"			/* Email address */
+                 "y\n",			/* OK (y = yes) */
+        	 common_name);
+  cupsFileClose(fp);
+
+  snprintf(keychain, sizeof(keychain), "k=%s", path);
+
+  argv[0] = "certtool";
+  argv[1] = "c";
+  argv[2] = keychain;
+  argv[3] = NULL;
+
+  posix_spawn_file_actions_t actions;	/* File actions */
+
+  posix_spawn_file_actions_init(&actions);
+  posix_spawn_file_actions_addclose(&actions, 0);
+  posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
+
+  if (posix_spawn(&pid, command, &actions, NULL, argv, environ))
+  {
+    unlink(infofile);
+    return (-1);
+  }
+
+  posix_spawn_file_actions_destroy(&actions);
+
+  unlink(infofile);
+
+  while (waitpid(pid, &status, 0) < 0)
+    if (errno != EINTR)
+    {
+      status = -1;
+      break;
+    }
+
+  return (!status);
+#endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
 }
 
 
@@ -107,6 +283,9 @@ cupsSetServerCredentials(
   if (tls_keychain)
     CFRelease(tls_keychain);
 
+  if (tls_keypath)
+    _cupsStrFree(tls_keypath);
+
   if (tls_common_name)
     _cupsStrFree(tls_common_name);
 
@@ -115,6 +294,7 @@ cupsSetServerCredentials(
   */
 
   tls_keychain    = keychain;
+  tls_keypath     = _cupsStrAlloc(path);
   tls_auto_create = auto_create;
   tls_common_name = _cupsStrAlloc(common_name);
 
@@ -613,6 +793,76 @@ httpSaveCredentials(
 
 
 /*
+ * 'http_cdsa_copy_server()' - Find and copy server credentials from the keychain.
+ */
+
+static CFArrayRef			/* O - Array of certificates or NULL */
+http_cdsa_copy_server(
+    const char *common_name)		/* I - Server's hostname */
+{
+  OSStatus		err;		/* Error info */
+  SecIdentitySearchRef	search = NULL;	/* Search reference */
+  SecIdentityRef	identity = NULL;/* Identity */
+  CFArrayRef		certificates = NULL;
+					/* Certificate array */
+  SecPolicyRef		policy = NULL;	/* Policy ref */
+  CFStringRef		cfcommon_name = NULL;
+					/* Server name */
+  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
+  CFArrayRef		list = NULL;	/* Keychain list */
+
+
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
+
+  policy = SecPolicyCreateSSL(1, cfcommon_name);
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+
+  if (!policy)
+    goto cleanup;
+
+  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
+    goto cleanup;
+
+  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&tls_keychain, 1, &kCFTypeArrayCallBacks);
+
+  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
+  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
+  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
+  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
+  CFDictionaryAddValue(query, kSecMatchSearchList, list);
+
+  CFRelease(list);
+
+  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+
+  if (err)
+    goto cleanup;
+
+  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+    goto cleanup;
+
+  if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks)) == NULL)
+    goto cleanup;
+
+  cleanup :
+
+  if (search)
+    CFRelease(search);
+  if (identity)
+    CFRelease(identity);
+
+  if (policy)
+    CFRelease(policy);
+  if (query)
+    CFRelease(query);
+
+  return (certificates);
+}
+
+
+/*
  * 'http_cdsa_read()' - Read function for the CDSA library.
  */
 
@@ -757,7 +1007,7 @@ http_tls_pending(http_t *http)		/* I - HTTP connection */
  */
 
 static int				/* O - Bytes read */
-http_tls_read(http_t *http,		/* I - Connection to server */
+http_tls_read(http_t *http,		/* I - HTTP connection */
 	      char   *buf,		/* I - Buffer to store data */
 	      int    len)		/* I - Length of buffer */
 {
@@ -806,7 +1056,7 @@ http_tls_read(http_t *http,		/* I - Connection to server */
  */
 
 static int				/* O - Status of connection */
-http_tls_set_credentials(http_t *http)	/* I - Connection to server */
+http_tls_set_credentials(http_t *http)	/* I - HTTP connection */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   OSStatus		error = 0;	/* Error code */
@@ -841,7 +1091,7 @@ http_tls_set_credentials(http_t *http)	/* I - Connection to server */
  */
 
 static int				/* O - 0 on success, -1 on failure */
-http_tls_start(http_t *http)		/* I - Connection to server */
+http_tls_start(http_t *http)		/* I - HTTP connection */
 {
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
@@ -860,24 +1110,14 @@ http_tls_start(http_t *http)		/* I - Connection to server */
 
   DEBUG_printf(("7http_tls_start(http=%p)", http));
 
- /*
-  * Get the hostname to use for SSL...
-  */
-
-  if (httpAddrLocalhost(http->hostaddr))
+  if (http->mode == _HTTP_MODE_SERVER && !tls_keychain)
   {
-    strlcpy(hostname, "localhost", sizeof(hostname));
-  }
-  else
-  {
-   /*
-    * Otherwise make sure the hostname we have does not end in a trailing dot.
-    */
+    DEBUG_puts("4http_tls_start: cupsSetServerCredentials not called.");
+    http->error  = errno = EINVAL;
+    http->status = HTTP_STATUS_ERROR;
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Server credentials not set."), 1);
 
-    strlcpy(hostname, http->hostname, sizeof(hostname));
-    if ((hostptr = hostname + strlen(hostname) - 1) >= hostname &&
-        *hostptr == '.')
-      *hostptr = '\0';
+    return (-1);
   }
 
   if ((http->tls = SSLCreateContext(kCFAllocatorDefault, http->mode == _HTTP_MODE_CLIENT ? kSSLClientSide : kSSLServerSide, kSSLStreamType)) == NULL)
@@ -907,8 +1147,12 @@ http_tls_start(http_t *http)		/* I - Connection to server */
                   (int)error));
   }
 
-  if (!error)
+  if (!error && http->mode == _HTTP_MODE_CLIENT)
   {
+   /*
+    * Client: set client-side credentials, if any...
+    */
+
     if (cg->client_cert_cb)
     {
       error = SSLSetSessionOption(http->tls,
@@ -923,18 +1167,110 @@ http_tls_start(http_t *http)		/* I - Connection to server */
                     (int)error));
     }
   }
+  else if (!error)
+  {
+   /*
+    * Server: find/create a certificate for TLS...
+    */
+
+    if (http->fields[HTTP_FIELD_HOST][0])
+    {
+     /*
+      * Use hostname for TLS upgrade...
+      */
+
+      strlcpy(hostname, http->fields[HTTP_FIELD_HOST], sizeof(hostname));
+    }
+    else
+    {
+     /*
+      * Resolve hostname from connection address...
+      */
+
+      http_addr_t	addr;		/* Connection address */
+      socklen_t		addrlen;	/* Length of address */
+
+      addrlen = sizeof(addr);
+      if (getsockname(http->fd, (struct sockaddr *)&addr, &addrlen))
+      {
+	DEBUG_printf(("4http_tls_start: Unable to get socket address: %s", strerror(errno)));
+	hostname[0] = '\0';
+      }
+      else if (httpAddrLocalhost(&addr))
+	hostname[0] = '\0';
+      else
+	httpAddrString(&addr, hostname, sizeof(hostname));
+    }
+
+    if (hostname[0])
+      http->tls_credentials = http_cdsa_copy_server(hostname);
+    else if (tls_common_name)
+      http->tls_credentials = http_cdsa_copy_server(tls_common_name);
+
+    if (!http->tls_credentials && tls_auto_create && (hostname[0] || tls_common_name))
+    {
+      DEBUG_printf(("4http_tls_start: Auto-create credentials for \"%s\".", hostname[0] ? hostname : tls_common_name));
+
+      if (!cupsMakeServerCredentials(tls_keypath, hostname[0] ? hostname : tls_common_name, 0, NULL, time(NULL) + 365 * 86400))
+      {
+	DEBUG_puts("4http_tls_start: cupsMakeServerCredentials failed.");
+	http->error  = errno = EINVAL;
+	http->status = HTTP_STATUS_ERROR;
+	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create server credentials."), 1);
+
+	return (-1);
+      }
+
+      http->tls_credentials = http_cdsa_copy_server(hostname[0] ? hostname : tls_common_name);
+    }
+
+    if (!http->tls_credentials)
+    {
+      DEBUG_puts("4http_tls_start: Unable to find server credentials.");
+      http->error  = errno = EINVAL;
+      http->status = HTTP_STATUS_ERROR;
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to find server credentials."), 1);
+
+      return (-1);
+    }
+
+    error = SSLSetCertificate(http->tls, http->tls_credentials);
+
+    DEBUG_printf(("4http_tls_start: SSLSetCertificate, error=%d", (int)error));
+  }
+
+  DEBUG_printf(("4http_tls_start: tls_credentials=%p", http->tls_credentials));
 
  /*
   * Let the server know which hostname/domain we are trying to connect to
   * in case it wants to serve up a certificate with a matching common name.
   */
 
-  if (!error)
+  if (!error && http->mode == _HTTP_MODE_CLIENT)
   {
+   /*
+    * Client: get the hostname to use for TLS...
+    */
+
+    if (httpAddrLocalhost(http->hostaddr))
+    {
+      strlcpy(hostname, "localhost", sizeof(hostname));
+    }
+    else
+    {
+     /*
+      * Otherwise make sure the hostname we have does not end in a trailing dot.
+      */
+
+      strlcpy(hostname, http->hostname, sizeof(hostname));
+      if ((hostptr = hostname + strlen(hostname) - 1) >= hostname &&
+	  *hostptr == '.')
+	*hostptr = '\0';
+    }
+
     error = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
 
-    DEBUG_printf(("4http_tls_start: SSLSetPeerDomainName, error=%d",
-                  (int)error));
+    DEBUG_printf(("4http_tls_start: SSLSetPeerDomainName, error=%d", (int)error));
   }
 
   if (!error)
@@ -1096,7 +1432,7 @@ http_tls_start(http_t *http)		/* I - Connection to server */
  */
 
 static void
-http_tls_stop(http_t *http)		/* I - Connection to server */
+http_tls_stop(http_t *http)		/* I - HTTP connection */
 {
   while (SSLClose(http->tls) == errSSLWouldBlock)
     usleep(1000);
@@ -1116,7 +1452,7 @@ http_tls_stop(http_t *http)		/* I - Connection to server */
  */
 
 static int				/* O - Bytes written */
-http_tls_write(http_t     *http,	/* I - Connection to server */
+http_tls_write(http_t     *http,	/* I - HTTP connection */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
