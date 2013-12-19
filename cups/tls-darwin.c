@@ -1121,7 +1121,11 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
   DEBUG_printf(("7http_tls_start(http=%p)", http));
 
+#ifdef HAVE_SECKEYCHAINOPEN
   if (http->mode == _HTTP_MODE_SERVER && !tls_keychain)
+#else
+  if (http->mode == _HTTP_MODE_SERVER)
+#endif /* HAVE_SECKEYCHAINOPEN */
   {
     DEBUG_puts("4http_tls_start: cupsSetServerCredentials not called.");
     http->error  = errno = EINVAL;
