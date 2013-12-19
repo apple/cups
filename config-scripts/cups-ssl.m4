@@ -52,7 +52,8 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_HEADER(Security/SecIdentitySearchPriv.h,
 		    AC_DEFINE(HAVE_SECIDENTITYSEARCHPRIV_H))
 
-		AC_DEFINE(HAVE_CSSMERRORSTRING)])
+		AC_DEFINE(HAVE_CSSMERRORSTRING)
+		AC_DEFINE(HAVE_SECKEYCHAINOPEN)])
 	fi
     fi
 

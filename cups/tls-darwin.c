@@ -30,6 +30,7 @@ extern char **environ;
  * Local globals...
  */
 
+#ifdef HAVE_SECKEYCHAINOPEN
 static int		tls_auto_create = 0;
 					/* Auto-create self-signed certs? */
 static char		*tls_common_name = NULL;
@@ -40,13 +41,16 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
+#endif /* HAVE_SECKEYCHAINOPEN */
 
 
 /*
  * Local functions...
  */
 
+#ifdef HAVE_SECKEYCHAINOPEN
 static CFArrayRef	http_cdsa_copy_server(const char *common_name);
+#endif /* HAVE_SECKEYCHAINOPEN */
 static OSStatus		http_cdsa_read(SSLConnectionRef connection, void *data, size_t *dataLength);
 static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, size_t *dataLength);
 
@@ -65,7 +69,7 @@ cupsMakeServerCredentials(
     const char **alt_names,		/* I - Subject Alternate Names */
     time_t     expiration_date)		/* I - Expiration date */
 {
-#ifdef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
+#if defined(HAVE_SECGENERATESELFSIGNEDCERTIFICATE) && defined(HAVE_SECKEYCHAINOPEN)
   int			status = 0;	/* Return status */
   OSStatus		err;		/* Error code (if any) */
   CFStringRef		cfcommon_name = NULL;
@@ -165,7 +169,7 @@ cleanup:
 
   return (status);
 
-#else /* !HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+#else /* !(HAVE_SECGENERATESELFSIGNEDCERTIFICATE && HAVE_SECKEYCHAINOPEN) */
   int		pid,			/* Process ID of command */
 		status;			/* Status of command */
   char		command[1024],		/* Command */
@@ -246,7 +250,7 @@ cleanup:
     }
 
   return (!status);
-#endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+#endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE && HAVE_SECKEYCHAINOPEN */
 }
 
 
@@ -265,6 +269,7 @@ cupsSetServerCredentials(
     const char *common_name,		/* I - Default common name for server */
     int        auto_create)		/* I - 1 = automatically create self-signed certificates */
 {
+#ifdef HAVE_SECKEYCHAINOPEN
   SecKeychainRef	keychain = NULL;/* Temporary keychain */
 
 
@@ -301,6 +306,10 @@ cupsSetServerCredentials(
   _cupsMutexUnlock(&tls_mutex);
 
   return (1);
+
+#else
+  return (0);
+#endif /* HAVE_SECKEYCHAINOPEN */
 }
 
 
@@ -792,6 +801,7 @@ httpSaveCredentials(
 }
 
 
+#ifdef HAVE_SECKEYCHAINOPEN
 /*
  * 'http_cdsa_copy_server()' - Find and copy server credentials from the keychain.
  */
@@ -860,6 +870,7 @@ http_cdsa_copy_server(
 
   return (certificates);
 }
+#endif /* HAVE_SECKEYCHAINOPEN */
 
 
 /*
@@ -1202,6 +1213,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 	httpAddrString(&addr, hostname, sizeof(hostname));
     }
 
+#ifdef HAVE_SECKEYCHAINOPEN
     if (hostname[0])
       http->tls_credentials = http_cdsa_copy_server(hostname);
     else if (tls_common_name)
@@ -1223,6 +1235,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
       http->tls_credentials = http_cdsa_copy_server(hostname[0] ? hostname : tls_common_name);
     }
+#endif /* HAVE_SECKEYCHAINOPEN */
 
     if (!http->tls_credentials)
     {
