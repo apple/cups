@@ -591,7 +591,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     return;
   }
 
-
 #ifdef HAVE_SSL
   if (con->auto_ssl)
   {
@@ -914,8 +913,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
       }
 
-      if (!_cups_strcasecmp(httpGetField(con->http, HTTP_FIELD_CONNECTION), "Upgrade") &&
-	  !httpIsEncrypted(con->http))
+      if (!_cups_strcasecmp(httpGetField(con->http, HTTP_FIELD_CONNECTION), "Upgrade") && strstr(httpGetField(con->http, HTTP_FIELD_UPGRADE), "TLS/") != NULL && !httpIsEncrypted(con->http))
       {
 #ifdef HAVE_SSL
        /*
