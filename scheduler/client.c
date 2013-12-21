@@ -147,22 +147,6 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 
   con->clientaddr = lis->address;
 
-#if 0 /* ifdef AF_INET6 */
- /* FIXME: I don't believe this is recommended any longer, and we specifically
-  *        disable IPv4-over-IPv6 when we listen...
-  */
- /*
-  * Convert IPv4 over IPv6 addresses (::ffff:n.n.n.n) to IPv4 forms we
-  * can more easily use...
-  */
-
-  if (lis->address.addr.sa_family == AF_INET6 &&
-      httpGetAddress(con->http)->ipv6.sin6_addr.s6_addr32[0] == 0 &&
-      httpGetAddress(con->http)->ipv6.sin6_addr.s6_addr32[1] == 0 &&
-      ntohl(httpGetAddress(con->http)->ipv6.sin6_addr.s6_addr32[2]) == 0xffff)
-    httpGetAddress(con->http)->ipv6.sin6_addr.s6_addr32[2] = 0;
-#endif /* AF_INET6 */
-
  /*
   * Check the number of clients on the same address...
   */
@@ -2274,7 +2258,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 
     if (!cupsdSendHeader(con, code, "text/html", auth_type))
       return (0);
-    
+
     if (httpWrite2(con->http, message, length) < 0)
       return (0);
 
