@@ -26,6 +26,8 @@ CHANGES IN CUPS V1.7.1
 	- "tel:" URIs incorrectly had slashes (<rdar://problem/15418463>)
 	- The libusb-based USB backend incorrectly used write timeouts
 	  (<rdar://problem/15564888>)
+	- Shared printers could become inaccessible after a few days on OS X
+	  (<rdar://problem/15426838>)
 
 
 CHANGES IN CUPS V1.7.0

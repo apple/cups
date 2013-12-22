@@ -1165,6 +1165,8 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&TempDir, "%s/tmp", RequestRoot);
   }
 
+  setenv("TMPDIR", TempDir, 1);
+
  /*
   * Make sure the temporary directory has the right permissions...
   */
