@@ -30,6 +30,8 @@ CHANGES IN CUPS V1.7.1
 	  (<rdar://problem/15426838>)
 	- The IPP backend did not wait for a busy printer to become available
 	  before attempting to print (<rdar://problem/15465667>)
+	- CUPS did not support "auto-monochrome" or "process-monochrome" for the
+	  "print-color-mode" option (<rdar://problem/15482520>)
 
 
 CHANGES IN CUPS V1.7.0
