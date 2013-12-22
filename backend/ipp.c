@@ -1024,7 +1024,8 @@ main(int  argc,				/* I - Number of command-line args */
 	delay = _cupsNextDelay(delay, &prev_delay);
 
 	ippDelete(supported);
-	supported = NULL;
+	supported  = NULL;
+	ipp_status = IPP_STATUS_ERROR_BUSY;
 	continue;
       }
     }
