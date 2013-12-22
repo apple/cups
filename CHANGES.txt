@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7.1 - 2013-12-09
+CHANGES.txt - 1.7.1 - 2013-12-21
 --------------------------------
 
 CHANGES IN CUPS V1.7.1
 
+	- Security: the lppasswd program incorrectly used settings from
+	  ~/.cups/client.conf (STR #4319)
 	- Auto debug logging was broken in 1.7.0 (<rdar://problem/15331639>)
 	- Some gzip'd PPD files could not be used (<rdar://problem/15386424>)
 	- Cleaned up some job logging in the scheduler

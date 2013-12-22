@@ -1,43 +1,18 @@
 /*
  * "$Id$"
  *
- *   User, system, and password routines for CUPS.
+ * User, system, and password routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2013 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsEncryption()	     - Get the current encryption settings.
- *   cupsGetPassword()	     - Get a password from the user.
- *   cupsGetPassword2()      - Get a password from the user using the advanced
- *			       password callback.
- *   cupsServer()	     - Return the hostname/address of the current
- *			       server.
- *   cupsSetClientCertCB()   - Set the client certificate callback.
- *   cupsSetCredentials()    - Set the default credentials to be used for
- *			       SSL/TLS connections.
- *   cupsSetEncryption()     - Set the encryption preference.
- *   cupsSetPasswordCB()     - Set the password callback for CUPS.
- *   cupsSetPasswordCB2()    - Set the advanced password callback for CUPS.
- *   cupsSetServer()	     - Set the default server name and port.
- *   cupsSetServerCertCB()   - Set the server certificate callback.
- *   cupsSetUser()	     - Set the default user name.
- *   cupsSetUserAgent()      - Set the default HTTP User-Agent string.
- *   cupsUser() 	     - Return the current user's name.
- *   cupsUserAgent()	     - Return the default HTTP User-Agent string.
- *   _cupsGetPassword()      - Get a password from the user.
- *   _cupsGSSServiceName()   - Get the GSS (Kerberos) service name.
- *   _cupsSetDefaults()      - Set the default server, port, and encryption.
- *   cups_read_client_conf() - Read a client.conf file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -885,7 +860,13 @@ _cupsSetDefaults(void)
   if (cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
       !cg->user[0] || !cg->ipp_port)
   {
+#  ifdef HAVE_GETEUID
+    if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
+#  elif !defined(WIN32)
+    if (getuid() && (home = getenv("HOME")) != NULL)
+#  else
     if ((home = getenv("HOME")) != NULL)
+#  endif /* HAVE_GETEUID */
     {
      /*
       * Look for ~/.cups/client.conf...
