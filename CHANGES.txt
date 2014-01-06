@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.1 - 2013-12-21
+CHANGES.txt - 1.7.1 - 2014-01-06
 --------------------------------
 
 CHANGES IN CUPS V1.7.1
@@ -32,6 +32,10 @@ CHANGES IN CUPS V1.7.1
 	  before attempting to print (<rdar://problem/15465667>)
 	- CUPS did not support "auto-monochrome" or "process-monochrome" for the
 	  "print-color-mode" option (<rdar://problem/15482520>)
+	- Using "@IF(name)" in an Allow or Deny rule did not work (STR #4328)
+	- lpq and lpstat did not list jobs in the correct order when priorities
+	  were specified (STR #4326)
+	- The D-BUS notifier did not remove its lockfile (STR #4314)
 
 
 CHANGES IN CUPS V1.7.0
