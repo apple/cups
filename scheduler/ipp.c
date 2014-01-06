@@ -3,7 +3,7 @@
  *
  * IPP routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -6209,7 +6209,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   {
     job_comparison = -1;
     job_state      = IPP_JOB_STOPPED;
-    list           = Jobs;
+    list           = ActiveJobs;
   }
   else if (!strcmp(attr->values[0].string.text, "completed"))
   {
