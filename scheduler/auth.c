@@ -3,7 +3,7 @@
  *
  * Authorization routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -1226,6 +1226,8 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
           netip6[3] = htonl(ip[3]);
 #endif /* AF_INET6 */
 
+	  cupsdNetIFUpdate();
+
           if (!strcmp(mask->mask.name.name, "*"))
 	  {
 #ifdef __APPLE__
@@ -1240,8 +1242,6 @@ cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
 	   /*
 	    * Check against all local interfaces...
 	    */
-
-            cupsdNetIFUpdate();
 
 	    for (iface = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
 		 iface;

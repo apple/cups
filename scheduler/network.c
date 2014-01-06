@@ -1,23 +1,16 @@
 /*
  * "$Id$"
  *
- *   Network interface functions for the CUPS scheduler.
+ * Network interface functions for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdNetIFFind()   - Find a network interface.
- *   cupsdNetIFFree()   - Free the current network interface list.
- *   cupsdNetIFUpdate() - Update the network interface list as needed...
- *   compare_netif()    - Compare two network interfaces.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -133,7 +126,10 @@ cupsdNetIFUpdate(void)
   */
 
   if (getifaddrs(&addrs) < 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdNetIFUpdate: Unable to get interface list - %s", strerror(errno));
     return;
+  }
 
   for (addr = addrs; addr != NULL; addr = addr->ifa_next)
   {
@@ -148,7 +144,10 @@ cupsdNetIFUpdate(void)
 #endif
 	) ||
         addr->ifa_netmask == NULL || addr->ifa_name == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdNetIFUpdate: Ignoring \"%s\".", addr->ifa_name);
       continue;
+    }
 
    /*
     * Try looking up the hostname for the address as needed...
@@ -178,7 +177,10 @@ cupsdNetIFUpdate(void)
 
     hostlen = strlen(hostname);
     if ((temp = calloc(1, sizeof(cupsd_netif_t) + hostlen)) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdNetIFUpdate: Unable to allocate memory for interface.");
       break;
+    }
 
    /*
     * Copy all of the information...
