@@ -118,10 +118,14 @@ tar cjf cups-$fileversion-source.tar.bz2 cups-$version
 echo "..."
 
 if test -x /usr/bin/md5sum; then
-	(cd /tmp; md5sum cups-$fileversion-source.tar.* | awk '{print $1, "'$fileversion' '$fileversion'/" $2}')
+	(cd /tmp; md5sum cups-$fileversion-source.tar.{bz2,gz} | awk '{print $1, "'$fileversion' '$fileversion'/" $2}')
 elif test -x /sbin/md5; then
-	(cd /tmp; md5 cups-$fileversion-source.tar.* | awk '{print $4, "'$fileversion' '$fileversion'/" substr($2, 2, length($2) - 2)}')
+	(cd /tmp; md5 cups-$fileversion-source.tar.{bz2,gz} | awk '{print $4, "'$fileversion' '$fileversion'/" substr($2, 2, length($2) - 2)}')
 fi
+
+for file in /tmp/cups-$fileversion-source.tar.{bz2,gz}; do
+	gpg --detach-sign $file
+done
 
 echo Removing temporary files...
 rm -rf cups-$version
