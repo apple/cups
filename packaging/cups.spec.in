@@ -5,7 +5,7 @@
 #
 # Original version by Jason McMullan <jmcc@ontv.com>.
 #
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -242,7 +242,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/ppdc/*
 %dir /usr/share/cups/templates
 /usr/share/cups/templates/*
-%if %{?_with_libusb:1}%{!?_with_libusb:0}
+%if %{?_with_libusb1:1}%{!?_with_libusb1:0}
 # LIBUSB quirks files
 %dir /usr/share/cups/usb
 /usr/share/cups/usb/*
