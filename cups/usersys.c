@@ -850,7 +850,25 @@ _cupsSetDefaults(void)
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
 
   if ((cups_user = getenv("CUPS_USER")) == NULL)
-    cups_user = getenv("USER");
+  {
+   /*
+    * Try the USER environment variable...
+    */
+
+    if ((cups_user = getenv("USER")) != NULL)
+    {
+     /*
+      * Validate USER matches the current UID, otherwise don't allow it to
+      * override things...  This makes sure that printing after doing su or
+      * sudo records the correct username.
+      */
+
+      struct passwd	*pw;		/* Account information */
+
+      if ((pw = getpwnam(cups_user)) == NULL || pw->pw_uid != getuid())
+        cups_user = NULL;
+    }
+  }
 
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
