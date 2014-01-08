@@ -13,7 +13,7 @@ CHANGES IN CUPS V1.7.1
 	  scheduler (<rdar://problem/15382819>)
 	- The RPM spec file did not list the build requirements; this was on
 	  purpose, but now we are listing the Red Hat package names
-	  (<rdar://problem/15375760>)
+	  (<rdar://problem/15375760>, STR #4322)
 	- Printing to a raw queue could result in corrupt output due to
 	  opportunistic compression (<rdar://problem/15008524>)
 	- The GNU TLS support code triggered many compiler warnings due to the
