@@ -36,6 +36,8 @@ CHANGES IN CUPS V1.7.1
 	- lpq and lpstat did not list jobs in the correct order when priorities
 	  were specified (STR #4326)
 	- The D-BUS notifier did not remove its lockfile (STR #4314)
+	- CUPS incorrectly used the USER environment variable when the name did
+	  not match the user ID (STR #4327)
 
 
 CHANGES IN CUPS V1.7.0
