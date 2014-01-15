@@ -30,7 +30,7 @@
 		<key>CUPS_DEBUG_LEVEL</key>
 		<string>3</string>
 		<key>CUPS_DEBUG_FILTER</key>
-		<string>^(http|_http|ipp|_ipp|mime).*</string>
+		<string>^(cupsDo|cupsGet|cupsSet|http|_http|ipp|_ipp|mime).*</string>
 	</dict>
 	<key>ServiceIPC</key>
 	<true/>
