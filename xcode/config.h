@@ -3,7 +3,7 @@
  *
  * Configuration file for CUPS and Xcode.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -313,6 +313,20 @@
  */
 
 #define HAVE_CSSMERRORSTRING 1
+
+
+/*
+ * Do we have the SecGenerateSelfSignedCertificate function?
+ */
+
+/* #undef HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
+
+
+/*
+ * Do we have the SecKeychainOpen function?
+ */
+
+#define HAVE_SECKEYCHAINOPEN 1
 
 
 /*
