@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2013-11-08
+CHANGES.txt - 2.0b1 - 2014-01-21
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -8,6 +8,8 @@ CHANGES IN CUPS V2.0b1
 	  from going to sleep when there was a stuck job. We now use a variation
 	  of the CUPS 1.4 sleep support to do a cleaner sleep
 	  (<rdar://problem/14323704>)
+	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Added support for regular expression matching in the MIME type rules
 	  (<rdar://problem/11131245>)
-	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
+	- cupsRasterInterpretPPD now supports the Orientation header in order to
+	  support long-edge feed raster printers (<rdar://problem/15837926>)

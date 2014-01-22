@@ -1,39 +1,18 @@
 /*
  * "$Id$"
  *
- *   PPD command interpreter for CUPS.
+ * PPD command interpreter for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1993-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1993-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsRasterInterpretPPD() - Interpret PPD commands to create a page header.
- *   _cupsRasterExecPS()      - Execute PostScript code to initialize a page
- *                              header.
- *   cleartomark_stack()      - Clear to the last mark ([) on the stack.
- *   copy_stack()             - Copy the top N stack objects.
- *   delete_stack()           - Free memory used by a stack.
- *   error_object()           - Add an object's value to the current error
- *                              message.
- *   error_stack()            - Add a stack to the current error message.
- *   index_stack()            - Copy the Nth value on the stack.
- *   new_stack()              - Create a new stack.
- *   pop_stock()              - Pop the top object off the stack.
- *   push_stack()             - Push an object on the stack.
- *   roll_stack()             - Rotate stack objects.
- *   scan_ps()                - Scan a string for the next PS object.
- *   setpagedevice()          - Simulate the PostScript setpagedevice operator.
- *   DEBUG_object()           - Print an object value.
- *   DEBUG_stack()            - Print a stack.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -162,7 +141,8 @@ cupsRasterInterpretPPD(
   float		left,			/* Left position */
 		bottom,			/* Bottom position */
 		right,			/* Right position */
-		top;			/* Top position */
+		top,			/* Top position */
+		temp1, temp2;		/* Temporary variables for swapping */
   int		preferred_bits;		/* Preferred bits per color */
 
 
@@ -189,7 +169,7 @@ cupsRasterInterpretPPD(
   h->PageSize[1]                 = 792;
   h->HWResolution[0]             = 100;
   h->HWResolution[1]             = 100;
-  h->cupsBitsPerColor            =  1;
+  h->cupsBitsPerColor            = 1;
   h->cupsColorOrder              = CUPS_ORDER_CHUNKED;
   h->cupsColorSpace              = CUPS_CSPACE_K;
   h->cupsBorderlessScalingFactor = 1.0f;
@@ -299,6 +279,53 @@ cupsRasterInterpretPPD(
     bottom = 0.0f;
     right  = 612.0f;
     top    = 792.0f;
+  }
+
+ /*
+  * Handle orientation...
+  */
+
+  switch (h->Orientation)
+  {
+    case CUPS_ORIENT_0 :
+    default :
+        /* Do nothing */
+        break;
+
+    case CUPS_ORIENT_90 :
+        temp1              = h->cupsPageSize[0];
+        h->cupsPageSize[0] = h->cupsPageSize[1];
+        h->cupsPageSize[1] = temp1;
+
+        temp1  = left;
+        temp2  = right;
+        left   = h->cupsPageSize[0] - top;
+        right  = h->cupsPageSize[0] - bottom;
+        bottom = h->cupsPageSize[1] - temp1;
+        top    = h->cupsPageSize[1] - temp2;
+        break;
+
+    case CUPS_ORIENT_180 :
+        temp1  = left;
+        temp2  = bottom;
+        left   = h->cupsPageSize[0] - right;
+        right  = h->cupsPageSize[0] - temp1;
+        bottom = h->cupsPageSize[1] - top;
+        top    = h->cupsPageSize[1] - temp2;
+        break;
+
+    case CUPS_ORIENT_270 :
+        temp1              = h->cupsPageSize[0];
+        h->cupsPageSize[0] = h->cupsPageSize[1];
+        h->cupsPageSize[1] = temp1;
+
+        temp1  = left;
+        temp2  = right;
+        left   = bottom;
+        right  = top;
+        bottom = h->cupsPageSize[1] - temp2;
+        top    = h->cupsPageSize[1] - temp1;
+        break;
   }
 
   h->PageSize[0]           = (unsigned)(h->cupsPageSize[0] *
