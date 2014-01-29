@@ -447,6 +447,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
     if ((first = (http_addrlist_t *)calloc(1, sizeof(http_addrlist_t))) != NULL)
     {
+      addr = first;
       first->addr.un.sun_family = AF_LOCAL;
       strlcpy(first->addr.un.sun_path, hostname, sizeof(first->addr.un.sun_path));
     }

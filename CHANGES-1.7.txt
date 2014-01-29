@@ -1,6 +1,11 @@
 CHANGES-1.7.txt
 ---------------
 
+CHANGES IN CUPS V1.7.2
+
+	- Fixed some clang-reported issues (<rdar://problem/15936066>)
+
+
 CHANGES IN CUPS V1.7.1
 
 	- Security: the lppasswd program incorrectly used settings from
