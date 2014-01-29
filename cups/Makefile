@@ -3,7 +3,7 @@
 #
 # API library Makefile for CUPS.
 #
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -147,6 +147,7 @@ LIBTARGETS =	\
 UNITTARGETS =	\
 		testadmin \
 		testarray \
+		testcache \
 		testconflicts \
 		testcups \
 		testfile \
@@ -370,6 +371,16 @@ testarray:	testarray.o $(LIBCUPSSTATIC)
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running array API tests...
 	./testarray
+
+
+#
+# testcache (dependency on static CUPS library is intentional)
+#
+
+testcache:	testcache.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testcache.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
