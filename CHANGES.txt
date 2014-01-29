@@ -1,5 +1,10 @@
-CHANGES.txt - 1.7.1 - 2014-01-08
+CHANGES.txt - 1.7.1 - 2014-01-29
 --------------------------------
+
+CHANGES IN CUPS V1.7.2
+
+	- Fixed some clang-reported issues (<rdar://problem/15936066>)
+
 
 CHANGES IN CUPS V1.7.1
 

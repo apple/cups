@@ -1,18 +1,18 @@
 /*
  * "$Id$"
  *
- *   API definitions for CUPS.
+ * API definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_CUPS_H_
@@ -53,10 +53,10 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION			1.0701
+#  define CUPS_VERSION			1.0702
 #  define CUPS_VERSION_MAJOR		1
 #  define CUPS_VERSION_MINOR		7
-#  define CUPS_VERSION_PATCH		1
+#  define CUPS_VERSION_PATCH		2
 
 #  define CUPS_BC_FD			3
 					/* Back-channel file descriptor for
