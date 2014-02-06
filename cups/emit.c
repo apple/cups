@@ -1,37 +1,20 @@
 /*
  * "$Id$"
  *
- *   PPD code emission routines for CUPS.
+ * PPD code emission routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ppdCollect()          - Collect all marked options that reside in the
- *                           specified section.
- *   ppdCollect2()         - Collect all marked options that reside in the
- *                           specified section and minimum order.
- *   ppdEmit()             - Emit code for marked options to a file.
- *   ppdEmitAfterOrder()   - Emit a subset of the code for marked options to a
- *                           file.
- *   ppdEmitFd()           - Emit code for marked options to a file.
- *   ppdEmitJCL()          - Emit code for JCL options to a file.
- *   ppdEmitJCLEnd()       - Emit JCLEnd code to a file.
- *   ppdEmitString()       - Get a string containing the code for marked
- *                           options.
- *   ppd_compare_cparams() - Compare the order of two custom parameters.
- *   ppd_handle_media()    - Handle media selection...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -121,13 +104,13 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
 
   count = 0;
   if ((collect = calloc(sizeof(ppd_choice_t *),
-                        cupsArrayCount(ppd->marked))) == NULL)
+                        (size_t)cupsArrayCount(ppd->marked))) == NULL)
   {
     *choices = NULL;
     return (0);
   }
 
-  if ((orders = calloc(sizeof(float), cupsArrayCount(ppd->marked))) == NULL)
+  if ((orders = calloc(sizeof(float), (size_t)cupsArrayCount(ppd->marked))) == NULL)
   {
     *choices = NULL;
     free(collect);
@@ -358,7 +341,7 @@ ppdEmitFd(ppd_file_t    *ppd,		/* I - PPD file record */
 	break;
       }
 
-      buflength -= bytes;
+      buflength -= (size_t)bytes;
       bufptr    += bytes;
     }
 

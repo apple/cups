@@ -1,42 +1,27 @@
 /*
  * "$Id$"
  *
- *   PPD localization routines for CUPS.
+ * PPD localization routines for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   This code and any derivative of it may be used and distributed
- *   freely under the terms of the GNU General Public License when
- *   used with GNU Ghostscript or its derivatives.  Use of the code
- *   (or any derivative of it) with software other than GNU
- *   GhostScript (or its derivatives) is governed by the CUPS license
- *   agreement.
+ * This code and any derivative of it may be used and distributed
+ * freely under the terms of the GNU General Public License when
+ * used with GNU Ghostscript or its derivatives.  Use of the code
+ * (or any derivative of it) with software other than GNU
+ * GhostScript (or its derivatives) is governed by the CUPS license
+ * agreement.
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   ppdLocalize()           - Localize the PPD file to the current locale.
- *   ppdLocalizeAttr()       - Localize an attribute.
- *   ppdLocalizeIPPReason()  - Get the localized version of a cupsIPPReason
- *                             attribute.
- *   ppdLocalizeMarkerName() - Get the localized version of a marker-names
- *                             attribute value.
- *   _ppdFreeLanguages()     - Free an array of languages from _ppdGetLanguages.
- *   _ppdGetLanguages()      - Get an array of languages from a PPD file.
- *   _ppdHashName()          - Generate a hash value for a device or profile
- *                             name.
- *   _ppdLocalizedAttr()     - Find a localized attribute.
- *   ppd_ll_CC()             - Get the current locale names.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -263,8 +248,8 @@ ppdLocalizeIPPReason(
 		*bufptr,		/* Pointer into buffer */
 		*bufend,		/* Pointer to end of buffer */
 		*valptr;		/* Pointer into value */
-  int		ch,			/* Hex-encoded character */
-		schemelen;		/* Length of scheme name */
+  int		ch;			/* Hex-encoded character */
+  size_t	schemelen;		/* Length of scheme name */
 
 
  /*
@@ -405,9 +390,9 @@ ppdLocalizeIPPReason(
 	    valptr ++;
 
 	    if (isdigit(*valptr & 255))
-	      *bufptr++ = ch | (*valptr - '0');
+	      *bufptr++ = (char)(ch | (*valptr - '0'));
 	    else
-	      *bufptr++ = ch | (tolower(*valptr) - 'a' + 10);
+	      *bufptr++ = (char)(ch | (tolower(*valptr) - 'a' + 10));
 	    valptr ++;
 	  }
 	  else if (*valptr == '+')
@@ -644,8 +629,8 @@ _ppdGetLanguages(ppd_file_t *ppd)	/* I - PPD file */
 unsigned				/* O - Hash value */
 _ppdHashName(const char *name)		/* I - Name to hash */
 {
-  int		mult;			/* Multiplier */
-  unsigned	hash = 0;		/* Hash value */
+  unsigned	mult,			/* Multiplier */
+		hash = 0;		/* Hash value */
 
 
   for (mult = 1; *name && mult <= 128; mult ++, name ++)

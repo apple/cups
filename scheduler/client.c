@@ -1739,7 +1739,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      httpSetField(con->http, HTTP_FIELD_LAST_MODIFIED,
 			   httpGetDateString(filestats.st_mtime));
-	      httpSetLength(con->http, filestats.st_size);
+	      httpSetLength(con->http, (size_t)filestats.st_size);
 
               if (!cupsdSendHeader(con, HTTP_STATUS_OK, line, CUPSD_AUTH_NONE))
 	      {
@@ -1783,7 +1783,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
-            if (write(con->file, line, bytes) < bytes)
+            if (write(con->file, line, (size_t)bytes) < bytes)
 	    {
               cupsdLogClient(con, CUPSD_LOG_ERROR,
 	                     "Unable to write %d bytes to \"%s\": %s", bytes,
@@ -1941,7 +1941,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    {
 	      con->bytes += bytes;
 
-              if (write(con->file, line, bytes) < bytes)
+              if (write(con->file, line, (size_t)bytes) < bytes)
 	      {
         	cupsdLogClient(con, CUPSD_LOG_ERROR,
 	                       "Unable to write %d bytes to \"%s\": %s",
@@ -2355,7 +2355,7 @@ cupsdSendHeader(
       size_t	auth_size;		/* Size of remaining buffer */
 
       auth_key  = auth_str + strlen(auth_str);
-      auth_size = sizeof(auth_str) - (auth_key - auth_str);
+      auth_size = sizeof(auth_str) - (size_t)(auth_key - auth_str);
 
       for (name = (char *)cupsArrayFirst(con->best->names);
            name;
@@ -2553,7 +2553,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
                    CUPS_LLCAST httpGetLength2(con->http));
   }
   else if ((bytes = read(con->file, con->header + con->header_used,
-			 sizeof(con->header) - con->header_used)) > 0)
+			 sizeof(con->header) - (size_t)con->header_used)) > 0)
   {
     con->header_used += bytes;
 
@@ -2671,7 +2671,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
     if (con->header_used > 0)
     {
-      if (httpWrite2(con->http, con->header, con->header_used) < 0)
+      if (httpWrite2(con->http, con->header, (size_t)con->header_used) < 0)
       {
 	cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing for error %d (%s)",
 		       httpError(con->http), strerror(httpError(con->http)));
@@ -3110,7 +3110,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   */
 
   while ((bytes = cupsFileRead(in, buffer, sizeof(buffer))) > 0)
-    if (cupsFileWrite(out, buffer, bytes) < bytes)
+    if (cupsFileWrite(out, buffer, (size_t)bytes) < bytes)
     {
       cupsdLogClient(con, CUPSD_LOG_ERROR,
                       "Unable to copy to config file \"%s\": %s",
@@ -3482,9 +3482,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	*/
 
 	if (commptr[1] >= '0' && commptr[1] <= '9')
-          *commptr = (commptr[1] - '0') << 4;
+          *commptr = (char)((commptr[1] - '0') << 4);
 	else
-          *commptr = (tolower(commptr[1]) - 'a' + 10) << 4;
+          *commptr = (char)((tolower(commptr[1]) - 'a' + 10) << 4);
 
 	if (commptr[2] >= '0' && commptr[2] <= '9')
           *commptr |= commptr[2] - '0';
@@ -3939,7 +3939,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
   httpClearFields(con->http);
 
-  httpSetLength(con->http, filestats->st_size);
+  httpSetLength(con->http, (size_t)filestats->st_size);
 
   httpSetField(con->http, HTTP_FIELD_LAST_MODIFIED,
 	       httpGetDateString(filestats->st_mtime));

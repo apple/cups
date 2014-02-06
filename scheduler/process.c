@@ -1,26 +1,16 @@
 /*
  * "$Id$"
  *
- *   Process management routines for the CUPS scheduler.
+ * Process management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCreateProfile()  - Create an execution profile for a subprocess.
- *   cupsdDestroyProfile() - Delete an execution profile.
- *   cupsdEndProcess()     - End a process.
- *   cupsdFinishProcess()  - Finish a process and get its name.
- *   cupsdStartProcess()   - Start a process.
- *   compare_procs()       - Compare two processes.
- *   cupsd_requote()       - Make a regular-expression version of a string.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -328,7 +318,7 @@ cupsdStartProcess(
   const char	*exec_path = command;	/* Command to be exec'd */
   char		*real_argv[103],	/* Real command-line arguments */
 		cups_exec[1024];	/* Path to "cups-exec" program */
-  int		user;			/* Command UID */
+  uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
@@ -644,7 +634,7 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
     if (strchr(".?*()[]^$\\", ch))
       *dstptr++ = '\\';
 
-    *dstptr++ = ch;
+    *dstptr++ = (char)ch;
   }
 
   *dstptr = '\0';

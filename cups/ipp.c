@@ -1,124 +1,18 @@
 /*
  * "$Id$"
  *
- *   Internet Printing Protocol functions for CUPS.
+ * Internet Printing Protocol functions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsBufferGet()	     - Get a read/write buffer.
- *   _cupsBufferRelease()    - Release a read/write buffer.
- *   ippAddBoolean()	     - Add a boolean attribute to an IPP message.
- *   ippAddBooleans()	     - Add an array of boolean values.
- *   ippAddCollection()      - Add a collection value.
- *   ippAddCollections()     - Add an array of collection values.
- *   ippAddDate()	     - Add a date attribute to an IPP message.
- *   ippAddInteger()	     - Add a integer attribute to an IPP message.
- *   ippAddIntegers()	     - Add an array of integer values.
- *   ippAddOctetString()     - Add an octetString value to an IPP message.
- *   ippAddOutOfBand()	     - Add an out-of-band value to an IPP message.
- *   ippAddRange()	     - Add a range of values to an IPP message.
- *   ippAddRanges()	     - Add ranges of values to an IPP message.
- *   ippAddResolution()      - Add a resolution value to an IPP message.
- *   ippAddResolutions()     - Add resolution values to an IPP message.
- *   ippAddSeparator()	     - Add a group separator to an IPP message.
- *   ippAddString()	     - Add a language-encoded string to an IPP message.
- *   ippAddStringf()	     - Add a formatted string to an IPP message.
- *   ippAddStringfv()	     - Add a formatted string to an IPP message.
- *   ippAddStrings()	     - Add language-encoded strings to an IPP message.
- *   ippContainsInteger()    - Determine whether an attribute contains the
- *			       specified value or is within the list of ranges.
- *   ippContainsString()     - Determine whether an attribute contains the
- *			       specified string value.
- *   ippCopyAttribute()      - Copy an attribute.
- *   ippCopyAttributes()     - Copy attributes from one IPP message to another.
- *   ippDateToTime()	     - Convert from RFC 1903 Date/Time format to UNIX
- *			       time in seconds.
- *   ippDelete()	     - Delete an IPP message.
- *   ippDeleteAttribute()    - Delete a single attribute in an IPP message.
- *   ippDeleteValues()	     - Delete values in an attribute.
- *   ippFindAttribute()      - Find a named attribute in a request.
- *   ippFindNextAttribute()  - Find the next named attribute in a request.
- *   ippFirstAttribute()     - Return the first attribute in the message.
- *   ippGetBoolean()	     - Get a boolean value for an attribute.
- *   ippGetCollection()      - Get a collection value for an attribute.
- *   ippGetCount()	     - Get the number of values in an attribute.
- *   ippGetDate()	     - Get a date value for an attribute.
- *   ippGetGroupTag()	     - Get the group associated with an attribute.
- *   ippGetInteger()	     - Get the integer/enum value for an attribute.
- *   ippGetName()	     - Get the attribute name.
- *   ippGetOctetString()     - Get an octetString value from an IPP attribute.
- *   ippGetOperation()	     - Get the operation ID in an IPP message.
- *   ippGetRange()	     - Get a rangeOfInteger value from an attribute.
- *   ippGetRequestId()	     - Get the request ID from an IPP message.
- *   ippGetResolution()      - Get a resolution value for an attribute.
- *   ippGetState()	     - Get the IPP message state.
- *   ippGetStatusCode()      - Get the status code from an IPP response or
- *			       event message.
- *   ippGetString()	     - Get the string and optionally the language code
- *			       for an attribute.
- *   ippGetValueTag()	     - Get the value tag for an attribute.
- *   ippGetVersion()	     - Get the major and minor version number from an
- *			       IPP message.
- *   ippLength()	     - Compute the length of an IPP message.
- *   ippNextAttribute()      - Return the next attribute in the message.
- *   ippNew()		     - Allocate a new IPP message.
- *   ippNewRequest()	     - Allocate a new IPP request message.
- *   ippNewResponse()	     - Allocate a new IPP response message.
- *   ippRead()		     - Read data for an IPP message from a HTTP
- *			       connection.
- *   ippReadFile()	     - Read data for an IPP message from a file.
- *   ippReadIO()	     - Read data for an IPP message.
- *   ippSetBoolean()	     - Set a boolean value in an attribute.
- *   ippSetCollection()      - Set a collection value in an attribute.
- *   ippSetDate()	     - Set a date value in an attribute.
- *   ippSetGroupTag()	     - Set the group tag of an attribute.
- *   ippSetInteger()	     - Set an integer or enum value in an attribute.
- *   ippSetName()	     - Set the name of an attribute.
- *   ippSetOctetString()     - Set an octetString value in an IPP attribute.
- *   ippSetOperation()	     - Set the operation ID in an IPP request message.
- *   ippSetRange()	     - Set a rangeOfInteger value in an attribute.
- *   ippSetRequestId()	     - Set the request ID in an IPP message.
- *   ippSetResolution()      - Set a resolution value in an attribute.
- *   ippSetState()	     - Set the current state of the IPP message.
- *   ippSetStatusCode()      - Set the status code in an IPP response or event
- *			       message.
- *   ippSetString()	     - Set a string value in an attribute.
- *   ippSetStringf()	     - Set a formatted string value of an attribute.
- *   ippSetStringf()	     - Set a formatted string value of an attribute.
- *   ippSetValueTag()	     - Set the value tag of an attribute.
- *   ippSetVersion()	     - Set the version number in an IPP message.
- *   ippTimeToDate()	     - Convert from UNIX time to RFC 1903 format.
- *   ippValidateAttribute()  - Validate the contents of an attribute.
- *   ippValidateAttributes() - Validate all attributes in an IPP message.
- *   ippWrite() 	     - Write data for an IPP message to a HTTP
- *			       connection.
- *   ippWriteFile()	     - Write data for an IPP message to a file.
- *   ippWriteIO()	     - Write data for an IPP message.
- *   ipp_add_attr()	     - Add a new attribute to the message.
- *   ipp_free_values()	     - Free attribute values.
- *   ipp_get_code()	     - Convert a C locale/charset name into an IPP
- *			       language/charset code.
- *   ipp_lang_code()	     - Convert a C locale name into an IPP language
- *			       code.
- *   ipp_length()	     - Compute the length of an IPP message or
- *			       collection value.
- *   ipp_read_http()	     - Semi-blocking read on a HTTP connection...
- *   ipp_read_file()	     - Read IPP data from a file.
- *   ipp_set_error()	     - Set a formatted, localized error string.
- *   ipp_set_value()	     - Get the value element from an attribute,
- *			       expanding it as needed.
- *   ipp_write_file()	     - Write IPP data to a file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -656,7 +550,7 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
   if (data)
   {
-    if ((attr->values[0].unknown.data = malloc(datalen)) == NULL)
+    if ((attr->values[0].unknown.data = malloc((size_t)datalen)) == NULL)
     {
       ippDeleteAttribute(ipp, attr);
       return (NULL);
@@ -1232,7 +1126,7 @@ ippAddStringfv(ipp_t      *ipp,		/* I - IPP message */
     if (!s)
       s = "(null)";
 
-    bytes = strlen(s);
+    bytes = (ssize_t)strlen(s);
     strlcpy(buffer, s, sizeof(buffer));
   }
   else
@@ -1818,7 +1712,7 @@ ippCopyAttribute(
 
 	  if (dstval->unknown.length > 0)
 	  {
-	    if ((dstval->unknown.data = malloc(dstval->unknown.length)) == NULL)
+	    if ((dstval->unknown.data = malloc((size_t)dstval->unknown.length)) == NULL)
 	      dstval->unknown.length = 0;
 	    else
 	      memcpy(dstval->unknown.data, srcval->unknown.data, dstval->unknown.length);
@@ -2744,8 +2638,8 @@ ippNew(void)
     if (cg->server_version == 0)
       _cupsSetDefaults();
 
-    temp->request.any.version[0] = cg->server_version / 10;
-    temp->request.any.version[1] = cg->server_version % 10;
+    temp->request.any.version[0] = (ipp_uchar_t)(cg->server_version / 10);
+    temp->request.any.version[1] = (ipp_uchar_t)(cg->server_version % 10);
     temp->use                    = 1;
   }
 
@@ -3304,7 +3198,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    * New attribute; read the name and add it...
 	    */
 
-	    if ((*cb)(src, buffer, n) < n)
+	    if ((*cb)(src, buffer, (size_t)n) < n)
 	    {
 	      DEBUG_puts("1ippReadIO: unable to read name.");
 	      _cupsBufferRelease((char *)buffer);
@@ -3405,7 +3299,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  return (IPP_STATE_ERROR);
 		}
 
-                value->boolean = buffer[0];
+                value->boolean = (char)buffer[0];
 	        break;
 
             case IPP_TAG_NOVALUE :
@@ -3436,7 +3330,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_MIMETYPE :
 	        if (n > 0)
 	        {
-		  if ((*cb)(src, buffer, n) < n)
+		  if ((*cb)(src, buffer, (size_t)n) < n)
 		  {
 		    DEBUG_puts("1ippReadIO: unable to read string value.");
 		    _cupsBufferRelease((char *)buffer);
@@ -3537,7 +3431,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  return (IPP_STATE_ERROR);
 		}
 
-	        if ((*cb)(src, buffer, n) < n)
+	        if ((*cb)(src, buffer, (size_t)n) < n)
 		{
 	          DEBUG_puts("1ippReadIO: Unable to read string w/language "
 		             "value.");
@@ -3559,8 +3453,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 		n = (bufptr[0] << 8) | bufptr[1];
 
-		if ((bufptr + 2 + n) >= (buffer + IPP_BUF_SIZE) ||
-		    n >= sizeof(string))
+		if ((bufptr + 2 + n) >= (buffer + IPP_BUF_SIZE) || n >= (int)sizeof(string))
 		{
 		  _cupsSetError(IPP_STATUS_ERROR_INTERNAL,
 		                _("IPP language length overflows value."), 1);
@@ -3662,7 +3555,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  _cupsBufferRelease((char *)buffer);
 		  return (IPP_STATE_ERROR);
 		}
-		else if ((*cb)(src, buffer, n) < n)
+		else if ((*cb)(src, buffer, (size_t)n) < n)
 		{
 	          DEBUG_puts("1ippReadIO: Unable to read member name value.");
 		  _cupsBufferRelease((char *)buffer);
@@ -3698,7 +3591,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	        if (n > 0)
 		{
-		  if ((value->unknown.data = malloc(n)) == NULL)
+		  if ((value->unknown.data = malloc((size_t)n)) == NULL)
 		  {
 		    _cupsSetHTTPError(HTTP_STATUS_ERROR);
 		    DEBUG_puts("1ippReadIO: Unable to allocate value");
@@ -3706,7 +3599,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		    return (IPP_STATE_ERROR);
 		  }
 
-	          if ((*cb)(src, value->unknown.data, n) < n)
+	          if ((*cb)(src, value->unknown.data, (size_t)n) < n)
 		  {
 	            DEBUG_puts("1ippReadIO: Unable to read unsupported value.");
 		    _cupsBufferRelease((char *)buffer);
@@ -3777,7 +3670,7 @@ ippSetBoolean(ipp_t           *ipp,	/* I  - IPP message */
   */
 
   if ((value = ipp_set_value(ipp, attr, element)) != NULL)
-    value->boolean = boolvalue;
+    value->boolean = (char)boolvalue;
 
   return (value != NULL);
 }
@@ -4072,7 +3965,7 @@ ippSetOctetString(
       {
 	void	*temp;			/* Temporary data pointer */
 
-	if ((temp = malloc(datalen)) != NULL)
+	if ((temp = malloc((size_t)datalen)) != NULL)
 	{
 	  memcpy(temp, data, datalen);
 
@@ -4470,7 +4363,7 @@ ippSetStringfv(ipp_t           *ipp,	/* I  - IPP message */
     if (!s)
       s = "(null)";
 
-    bytes = strlen(s);
+    bytes = (ssize_t)strlen(s);
     strlcpy(buffer, s, sizeof(buffer));
   }
   else
@@ -4751,8 +4644,8 @@ ippSetVersion(ipp_t *ipp,		/* I - IPP message */
   * Set the version number...
   */
 
-  ipp->request.any.version[0] = major;
-  ipp->request.any.version[1] = minor;
+  ipp->request.any.version[0] = (ipp_uchar_t)major;
+  ipp->request.any.version[1] = (ipp_uchar_t)minor;
 
   return (1);
 }
@@ -4790,13 +4683,13 @@ ippTimeToDate(time_t t)			/* I - UNIX time value */
   unixdate = gmtime(&t);
   unixdate->tm_year += 1900;
 
-  date[0]  = unixdate->tm_year >> 8;
-  date[1]  = unixdate->tm_year;
-  date[2]  = unixdate->tm_mon + 1;
-  date[3]  = unixdate->tm_mday;
-  date[4]  = unixdate->tm_hour;
-  date[5]  = unixdate->tm_min;
-  date[6]  = unixdate->tm_sec;
+  date[0]  = (ipp_uchar_t)(unixdate->tm_year >> 8);
+  date[1]  = (ipp_uchar_t)(unixdate->tm_year);
+  date[2]  = (ipp_uchar_t)(unixdate->tm_mon + 1);
+  date[3]  = (ipp_uchar_t)unixdate->tm_mday;
+  date[4]  = (ipp_uchar_t)unixdate->tm_hour;
+  date[5]  = (ipp_uchar_t)unixdate->tm_min;
+  date[6]  = (ipp_uchar_t)unixdate->tm_sec;
   date[7]  = 0;
   date[8]  = '+';
   date[9]  = 0;
@@ -5561,12 +5454,12 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	  *bufptr++ = ipp->request.any.version[0];
 	  *bufptr++ = ipp->request.any.version[1];
-	  *bufptr++ = ipp->request.any.op_status >> 8;
-	  *bufptr++ = ipp->request.any.op_status;
-	  *bufptr++ = ipp->request.any.request_id >> 24;
-	  *bufptr++ = ipp->request.any.request_id >> 16;
-	  *bufptr++ = ipp->request.any.request_id >> 8;
-	  *bufptr++ = ipp->request.any.request_id;
+	  *bufptr++ = (ipp_uchar_t)(ipp->request.any.op_status >> 8);
+	  *bufptr++ = (ipp_uchar_t)ipp->request.any.op_status;
+	  *bufptr++ = (ipp_uchar_t)(ipp->request.any.request_id >> 24);
+	  *bufptr++ = (ipp_uchar_t)(ipp->request.any.request_id >> 16);
+	  *bufptr++ = (ipp_uchar_t)(ipp->request.any.request_id >> 8);
+	  *bufptr++ = (ipp_uchar_t)ipp->request.any.request_id;
 
 	  DEBUG_printf(("2ippWriteIO: version=%d.%d", buffer[0], buffer[1]));
 	  DEBUG_printf(("2ippWriteIO: op_status=%04x",
@@ -5574,7 +5467,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	  DEBUG_printf(("2ippWriteIO: request_id=%d",
 			ipp->request.any.request_id));
 
-          if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+          if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	  {
 	    DEBUG_puts("1ippWriteIO: Could not write IPP header...");
 	    _cupsBufferRelease((char *)buffer);
@@ -5627,7 +5520,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	      DEBUG_printf(("2ippWriteIO: wrote group tag=%x(%s)",
 			    attr->group_tag, ippTagString(attr->group_tag)));
-	      *bufptr++ = attr->group_tag;
+	      *bufptr++ = (ipp_uchar_t)attr->group_tag;
 	    }
 	    else if (attr->group_tag == IPP_TAG_ZERO)
 	      continue;
@@ -5672,16 +5565,16 @@ ippWriteIO(void       *dst,		/* I - Destination */
             if (attr->value_tag > 0xff)
             {
               *bufptr++ = IPP_TAG_EXTENSION;
-	      *bufptr++ = attr->value_tag >> 24;
-	      *bufptr++ = attr->value_tag >> 16;
-	      *bufptr++ = attr->value_tag >> 8;
-	      *bufptr++ = attr->value_tag;
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 24);
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 16);
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 8);
+	      *bufptr++ = (ipp_uchar_t)attr->value_tag;
             }
             else
-	      *bufptr++ = attr->value_tag;
+	      *bufptr++ = (ipp_uchar_t)attr->value_tag;
 
-	    *bufptr++ = n >> 8;
-	    *bufptr++ = n;
+	    *bufptr++ = (ipp_uchar_t)(n >> 8);
+	    *bufptr++ = (ipp_uchar_t)n;
 	    memcpy(bufptr, attr->name, n);
 	    bufptr += n;
           }
@@ -5715,21 +5608,21 @@ ippWriteIO(void       *dst,		/* I - Destination */
             *bufptr++ = IPP_TAG_MEMBERNAME;
 	    *bufptr++ = 0;
 	    *bufptr++ = 0;
-	    *bufptr++ = n >> 8;
-	    *bufptr++ = n;
+	    *bufptr++ = (ipp_uchar_t)(n >> 8);
+	    *bufptr++ = (ipp_uchar_t)n;
 	    memcpy(bufptr, attr->name, n);
 	    bufptr += n;
 
             if (attr->value_tag > 0xff)
             {
               *bufptr++ = IPP_TAG_EXTENSION;
-	      *bufptr++ = attr->value_tag >> 24;
-	      *bufptr++ = attr->value_tag >> 16;
-	      *bufptr++ = attr->value_tag >> 8;
-	      *bufptr++ = attr->value_tag;
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 24);
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 16);
+	      *bufptr++ = (ipp_uchar_t)(attr->value_tag >> 8);
+	      *bufptr++ = (ipp_uchar_t)attr->value_tag;
             }
             else
-	      *bufptr++ = attr->value_tag;
+	      *bufptr++ = (ipp_uchar_t)attr->value_tag;
 
             *bufptr++ = 0;
             *bufptr++ = 0;
@@ -5760,7 +5653,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		{
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 9)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -5778,7 +5671,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -5792,10 +5685,10 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 4;
-		  *bufptr++ = value->integer >> 24;
-		  *bufptr++ = value->integer >> 16;
-		  *bufptr++ = value->integer >> 8;
-		  *bufptr++ = value->integer;
+		  *bufptr++ = (ipp_uchar_t)(value->integer >> 24);
+		  *bufptr++ = (ipp_uchar_t)(value->integer >> 16);
+		  *bufptr++ = (ipp_uchar_t)(value->integer >> 8);
+		  *bufptr++ = (ipp_uchar_t)value->integer;
 		}
 		break;
 
@@ -5806,7 +5699,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		{
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 6)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -5824,7 +5717,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -5837,7 +5730,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 1;
-		  *bufptr++ = value->boolean;
+		  *bufptr++ = (ipp_uchar_t)value->boolean;
 		}
 		break;
 
@@ -5867,7 +5760,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                     if ((IPP_BUF_SIZE - (bufptr - buffer)) < 3)
 		    {
-                      if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                      if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	              {
 	        	DEBUG_puts("1ippWriteIO: Could not write IPP "
 			           "attribute...");
@@ -5878,7 +5771,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		      bufptr = buffer;
 		    }
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -5900,7 +5793,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   if ((int)(IPP_BUF_SIZE - (bufptr - buffer)) < (n + 2))
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -5921,8 +5814,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  * Put the 2-byte length and string characters in the buffer.
 		  */
 
-	          *bufptr++ = n >> 8;
-		  *bufptr++ = n;
+	          *bufptr++ = (ipp_uchar_t)(n >> 8);
+		  *bufptr++ = (ipp_uchar_t)n;
 
 		  if (n > 0)
 		  {
@@ -5939,7 +5832,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		{
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 16)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -5957,7 +5850,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -5984,7 +5877,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		{
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 14)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -6002,7 +5895,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -6018,15 +5911,15 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 9;
-		  *bufptr++ = value->resolution.xres >> 24;
-		  *bufptr++ = value->resolution.xres >> 16;
-		  *bufptr++ = value->resolution.xres >> 8;
-		  *bufptr++ = value->resolution.xres;
-		  *bufptr++ = value->resolution.yres >> 24;
-		  *bufptr++ = value->resolution.yres >> 16;
-		  *bufptr++ = value->resolution.yres >> 8;
-		  *bufptr++ = value->resolution.yres;
-		  *bufptr++ = value->resolution.units;
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.xres >> 24);
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.xres >> 16);
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.xres >> 8);
+		  *bufptr++ = (ipp_uchar_t)value->resolution.xres;
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.yres >> 24);
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.yres >> 16);
+		  *bufptr++ = (ipp_uchar_t)(value->resolution.yres >> 8);
+		  *bufptr++ = (ipp_uchar_t)value->resolution.yres;
+		  *bufptr++ = (ipp_uchar_t)value->resolution.units;
 		}
 		break;
 
@@ -6037,7 +5930,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		{
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 13)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -6055,7 +5948,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -6070,14 +5963,14 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	          *bufptr++ = 0;
 		  *bufptr++ = 8;
-		  *bufptr++ = value->range.lower >> 24;
-		  *bufptr++ = value->range.lower >> 16;
-		  *bufptr++ = value->range.lower >> 8;
-		  *bufptr++ = value->range.lower;
-		  *bufptr++ = value->range.upper >> 24;
-		  *bufptr++ = value->range.upper >> 16;
-		  *bufptr++ = value->range.upper >> 8;
-		  *bufptr++ = value->range.upper;
+		  *bufptr++ = (ipp_uchar_t)(value->range.lower >> 24);
+		  *bufptr++ = (ipp_uchar_t)(value->range.lower >> 16);
+		  *bufptr++ = (ipp_uchar_t)(value->range.lower >> 8);
+		  *bufptr++ = (ipp_uchar_t)value->range.lower;
+		  *bufptr++ = (ipp_uchar_t)(value->range.upper >> 24);
+		  *bufptr++ = (ipp_uchar_t)(value->range.upper >> 16);
+		  *bufptr++ = (ipp_uchar_t)(value->range.upper >> 8);
+		  *bufptr++ = (ipp_uchar_t)value->range.upper;
 		}
 		break;
 
@@ -6096,7 +5989,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                     if ((IPP_BUF_SIZE - (bufptr - buffer)) < 3)
 		    {
-                      if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                      if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	              {
 	        	DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                   "attribute...");
@@ -6107,7 +6000,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		      bufptr = buffer;
 		    }
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -6140,7 +6033,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   if ((int)(IPP_BUF_SIZE - (bufptr - buffer)) < (n + 2))
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -6152,8 +6045,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  }
 
                  /* Length of entire value */
-	          *bufptr++ = n >> 8;
-		  *bufptr++ = n;
+	          *bufptr++ = (ipp_uchar_t)(n >> 8);
+		  *bufptr++ = (ipp_uchar_t)n;
 
                  /* Length of language */
 		  if (value->string.language != NULL)
@@ -6161,8 +6054,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  else
 		    n = 0;
 
-	          *bufptr++ = n >> 8;
-		  *bufptr++ = n;
+	          *bufptr++ = (ipp_uchar_t)(n >> 8);
+		  *bufptr++ = (ipp_uchar_t)n;
 
                  /* Language */
 		  if (n > 0)
@@ -6177,8 +6070,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  else
 		    n = 0;
 
-	          *bufptr++ = n >> 8;
-		  *bufptr++ = n;
+	          *bufptr++ = (ipp_uchar_t)(n >> 8);
+		  *bufptr++ = (ipp_uchar_t)n;
 
                  /* Text */
 		  if (n > 0)
@@ -6203,7 +6096,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   if ((IPP_BUF_SIZE - (bufptr - buffer)) < 5)
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -6221,7 +6114,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		    * values with a zero-length name...
 		    */
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -6233,7 +6126,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	          *bufptr++ = 0;
 		  *bufptr++ = 0;
 
-                  if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                  if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	          {
 	            DEBUG_puts("1ippWriteIO: Could not write IPP "
 		               "attribute...");
@@ -6273,7 +6166,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                     if ((IPP_BUF_SIZE - (bufptr - buffer)) < 3)
 		    {
-                      if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                      if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	              {
 	        	DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                   "attribute...");
@@ -6284,7 +6177,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		      bufptr = buffer;
 		    }
 
-                    *bufptr++ = attr->value_tag;
+                    *bufptr++ = (ipp_uchar_t)attr->value_tag;
 		    *bufptr++ = 0;
 		    *bufptr++ = 0;
 		  }
@@ -6308,7 +6201,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
                   if ((int)(IPP_BUF_SIZE - (bufptr - buffer)) < (n + 2))
 		  {
-                    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+                    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	            {
 	              DEBUG_puts("1ippWriteIO: Could not write IPP "
 		                 "attribute...");
@@ -6320,8 +6213,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		  }
 
                  /* Length of unknown value */
-	          *bufptr++ = n >> 8;
-		  *bufptr++ = n;
+	          *bufptr++ = (ipp_uchar_t)(n >> 8);
+		  *bufptr++ = (ipp_uchar_t)n;
 
                  /* Value */
 		  if (n > 0)
@@ -6339,7 +6232,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	  if (bufptr > buffer)
 	  {
-	    if ((*cb)(dst, buffer, (int)(bufptr - buffer)) < 0)
+	    if ((*cb)(dst, buffer, (size_t)(bufptr - buffer)) < 0)
 	    {
 	      DEBUG_puts("1ippWriteIO: Could not write IPP attribute...");
 	      _cupsBufferRelease((char *)buffer);
@@ -6381,7 +6274,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    n         = 5;
 	  }
 
-	  if ((*cb)(dst, buffer, n) < 0)
+	  if ((*cb)(dst, buffer, (size_t)n) < 0)
 	  {
 	    DEBUG_puts("1ippWriteIO: Could not write IPP end-tag...");
 	    _cupsBufferRelease((char *)buffer);
@@ -6440,7 +6333,7 @@ ipp_add_attr(ipp_t      *ipp,		/* I - IPP message */
     alloc_values = (num_values + IPP_MAX_VALUES - 1) & ~(IPP_MAX_VALUES - 1);
 
   attr = calloc(sizeof(ipp_attribute_t) +
-                (alloc_values - 1) * sizeof(_ipp_value_t), 1);
+                (size_t)(alloc_values - 1) * sizeof(_ipp_value_t), 1);
 
   if (attr)
   {
@@ -6572,7 +6465,7 @@ ipp_free_values(ipp_attribute_t *attr,	/* I - Attribute to free values from */
 
   if ((element + count) < attr->num_values)
     memmove(attr->values + element, attr->values + element + count,
-            (attr->num_values - count - element) * sizeof(_ipp_value_t));
+            (size_t)(attr->num_values - count - element) * sizeof(_ipp_value_t));
 
   attr->num_values -= count;
 }
@@ -6604,7 +6497,7 @@ ipp_get_code(const char *value,		/* I - Locale/charset string */
     if (*value == '_')
       *bufptr++ = '-';
     else
-      *bufptr++ = _cups_tolower(*value);
+      *bufptr++ = (char)_cups_tolower(*value);
 
   *bufptr = '\0';
 
@@ -6695,12 +6588,15 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
                   "bytes=" CUPS_LLFMT, attr->name, attr->num_values, CUPS_LLCAST bytes));
 
     if (attr->value_tag < IPP_TAG_EXTENSION)
-      bytes += attr->num_values;	/* Value tag for each value */
+      bytes += (size_t)attr->num_values;/* Value tag for each value */
     else
-      bytes += 5 * attr->num_values;	/* Value tag for each value */
-    bytes += 2 * attr->num_values;	/* Name lengths */
-    bytes += (int)strlen(attr->name);	/* Name */
-    bytes += 2 * attr->num_values;	/* Value lengths */
+      bytes += (size_t)(5 * attr->num_values);
+					/* Value tag for each value */
+    bytes += (size_t)(2 * attr->num_values);
+					/* Name lengths */
+    bytes += strlen(attr->name);	/* Name */
+    bytes += (size_t)(2 * attr->num_values);
+					/* Value lengths */
 
     if (collection)
       bytes += 5;			/* Add membername overhead */
@@ -6718,11 +6614,11 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
-          bytes += 4 * attr->num_values;
+          bytes += (size_t)(4 * attr->num_values);
 	  break;
 
       case IPP_TAG_BOOLEAN :
-          bytes += attr->num_values;
+          bytes += (size_t)attr->num_values;
 	  break;
 
       case IPP_TAG_TEXT :
@@ -6741,20 +6637,21 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  break;
 
       case IPP_TAG_DATE :
-          bytes += 11 * attr->num_values;
+          bytes += (size_t)(11 * attr->num_values);
 	  break;
 
       case IPP_TAG_RESOLUTION :
-          bytes += 9 * attr->num_values;
+          bytes += (size_t)(9 * attr->num_values);
 	  break;
 
       case IPP_TAG_RANGE :
-          bytes += 8 * attr->num_values;
+          bytes += (size_t)(8 * attr->num_values);
 	  break;
 
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
-          bytes += 4 * attr->num_values;/* Charset + text length */
+          bytes += (size_t)(4 * attr->num_values);
+					/* Charset + text length */
 
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
@@ -6779,7 +6676,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
 	  for (i = 0, value = attr->values;
 	       i < attr->num_values;
 	       i ++, value ++)
-            bytes += value->unknown.length;
+            bytes += (size_t)value->unknown.length;
 	  break;
     }
   }
@@ -6809,8 +6706,8 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
               ipp_uchar_t *buffer,	/* O - Buffer for data */
 	      size_t      length)	/* I - Total length */
 {
-  int	tbytes,				/* Total bytes read */
-	bytes;				/* Bytes read this pass */
+  ssize_t	tbytes,			/* Total bytes read */
+		bytes;			/* Bytes read this pass */
 
 
   DEBUG_printf(("7ipp_read_http(http=%p, buffer=%p, length=%d)",
@@ -6824,8 +6721,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
        tbytes < (int)length;
        tbytes += bytes, buffer += bytes)
   {
-    DEBUG_printf(("9ipp_read_http: tbytes=%d, http->state=%d", tbytes,
-                  http->state));
+    DEBUG_printf(("9ipp_read_http: tbytes=" CUPS_LLFMT ", http->state=%d", CUPS_LLCAST tbytes, http->state));
 
     if (http->state == HTTP_STATE_WAITING)
       break;
@@ -6847,7 +6743,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
       }
     }
 
-    if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
+    if ((bytes = httpRead2(http, (char *)buffer, length - (size_t)tbytes)) < 0)
     {
 #ifdef WIN32
       break;
@@ -6869,7 +6765,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   if (tbytes == 0 && bytes < 0)
     tbytes = -1;
 
-  DEBUG_printf(("8ipp_read_http: Returning %d bytes", tbytes));
+  DEBUG_printf(("8ipp_read_http: Returning " CUPS_LLFMT " bytes", CUPS_LLCAST tbytes));
 
   return (tbytes);
 }
@@ -6968,8 +6864,7 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
   * Reallocate memory...
   */
 
-  if ((temp = realloc(temp, sizeof(ipp_attribute_t) +
-			    (alloc_values - 1) * sizeof(_ipp_value_t))) == NULL)
+  if ((temp = realloc(temp, sizeof(ipp_attribute_t) + (size_t)(alloc_values - 1) * sizeof(_ipp_value_t))) == NULL)
   {
     _cupsSetHTTPError(HTTP_STATUS_ERROR);
     DEBUG_puts("4ipp_set_value: Unable to resize attribute.");
@@ -6980,8 +6875,7 @@ ipp_set_value(ipp_t           *ipp,	/* IO - IPP message */
   * Zero the new memory...
   */
 
-  memset(temp->values + temp->num_values, 0,
-         (alloc_values - temp->num_values) * sizeof(_ipp_value_t));
+  memset(temp->values + temp->num_values, 0, (size_t)(alloc_values - temp->num_values) * sizeof(_ipp_value_t));
 
   if (temp != *attr)
   {

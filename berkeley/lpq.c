@@ -3,7 +3,7 @@
  *
  * "lpq" command for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -11,10 +11,6 @@
  * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
  * which should have been included with this file.  If this file is
  * file is missing or damaged, see the license at "http://www.cups.org/".
- */
-
-/*
- * Include necessary headers...
  */
 
 /*
@@ -187,7 +183,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    httpClose(http);
 
 	    usage();
-	    break;
       }
     }
     else if (isdigit(argv[i][0] & 255))
@@ -255,7 +250,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (i && interval)
     {
       fflush(stdout);
-      sleep(interval);
+      sleep((unsigned)interval);
     }
     else
       break;

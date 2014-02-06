@@ -991,11 +991,11 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Decode the authorization string to get the input token...
     */
 
-    len                = strlen(authorization);
-    input_token.value  = malloc(len);
+    len                = (int)strlen(authorization);
+    input_token.value  = malloc((size_t)len);
     input_token.value  = httpDecode64_2(input_token.value, &len,
 					authorization);
-    input_token.length = len;
+    input_token.length = (size_t)len;
 
    /*
     * Accept the input token to get the authorization info...
@@ -1135,7 +1135,7 @@ int					/* O - 1 if allowed, 0 otherwise */
 cupsdCheckAccess(
     unsigned         ip[4],		/* I - Client address */
     const char       *name,		/* I - Client hostname */
-    int              namelen,		/* I - Length of hostname */
+    size_t           namelen,		/* I - Length of hostname */
     cupsd_location_t *loc)		/* I - Location to check */
 {
   int	allow;				/* 1 if allowed, 0 otherwise */
@@ -1194,7 +1194,7 @@ cupsdCheckAccess(
 int					/* O - 1 if mask matches, 0 otherwise */
 cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
 	       const char   *name,	/* I - Client hostname */
-	       int          name_len,	/* I - Length of hostname */
+	       size_t       name_len,	/* I - Length of hostname */
 	       cups_array_t *masks)	/* I - Masks */
 {
   int			i;		/* Looping var */
@@ -1596,7 +1596,7 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
 			*uriptr;	/* Pointer into URI */
   cupsd_location_t	*loc,		/* Current location */
 			*best;		/* Best match for location so far */
-  int			bestlen;	/* Length of best match */
+  size_t		bestlen;	/* Length of best match */
   int			limit;		/* Limit field */
   static const int	limits[] =	/* Map http_status_t to CUPSD_AUTH_LIMIT_xyz */
 		{
@@ -1747,7 +1747,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 					/* Client hostname */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
-  int			hostlen;	/* Length of hostname */
+  size_t		hostlen;	/* Length of hostname */
   char			*name,		/* Current username */
 			username[256],	/* Username to authorize */
 			ownername[256],	/* Owner name to authorize */
@@ -2444,7 +2444,7 @@ pam_func(
   * Allocate memory for the responses...
   */
 
-  if ((replies = malloc(sizeof(struct pam_response) * num_msg)) == NULL)
+  if ((replies = malloc(sizeof(struct pam_response) * (size_t)num_msg)) == NULL)
     return (PAM_CONV_ERR);
 
  /*

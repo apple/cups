@@ -379,9 +379,9 @@ cupsRasterInterpretPPD(
   * Compute the bitmap parameters...
   */
 
-  h->cupsWidth  = (int)((right - left) * h->cupsBorderlessScalingFactor *
+  h->cupsWidth  = (unsigned)((right - left) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[0] / 72.0f + 0.5f);
-  h->cupsHeight = (int)((top - bottom) * h->cupsBorderlessScalingFactor *
+  h->cupsHeight = (unsigned)((top - bottom) * h->cupsBorderlessScalingFactor *
                         h->HWResolution[1] / 72.0f + 0.5f);
 
   switch (h->cupsColorSpace)
@@ -933,7 +933,7 @@ push_stack(_cups_ps_stack_t *st,	/* I - Stack */
 
     st->alloc_objs += 32;
 
-    if ((temp = realloc(st->objs, st->alloc_objs *
+    if ((temp = realloc(st->objs, (size_t)st->alloc_objs *
                                   sizeof(_cups_ps_obj_t))) == NULL)
       return (NULL);
 
@@ -994,12 +994,12 @@ roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
 
     s = -s;
 
-    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+    if ((temp = calloc((size_t)s, sizeof(_cups_ps_obj_t))) == NULL)
       return (-1);
 
-    memcpy(temp, st->objs + n, s * sizeof(_cups_ps_obj_t));
-    memmove(st->objs + n, st->objs + n + s, (c - s) * sizeof(_cups_ps_obj_t));
-    memcpy(st->objs + n + c - s, temp, s * sizeof(_cups_ps_obj_t));
+    memcpy(temp, st->objs + n, (size_t)s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n, st->objs + n + s, (size_t)(c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n + c - s, temp, (size_t)s * sizeof(_cups_ps_obj_t));
   }
   else
   {
@@ -1007,13 +1007,12 @@ roll_stack(_cups_ps_stack_t *st,	/* I - Stack */
     * Shift up...
     */
 
-    if ((temp = calloc(s, sizeof(_cups_ps_obj_t))) == NULL)
+    if ((temp = calloc((size_t)s, sizeof(_cups_ps_obj_t))) == NULL)
       return (-1);
 
-    memcpy(temp, st->objs + n + c - s, s * sizeof(_cups_ps_obj_t));
-    memmove(st->objs + n + s, st->objs + n,
-            (c - s) * sizeof(_cups_ps_obj_t));
-    memcpy(st->objs + n, temp, s * sizeof(_cups_ps_obj_t));
+    memcpy(temp, st->objs + n + c - s, (size_t)s * sizeof(_cups_ps_obj_t));
+    memmove(st->objs + n + s, st->objs + n, (size_t)(c - s) * sizeof(_cups_ps_obj_t));
+    memcpy(st->objs + n, temp, (size_t)s * sizeof(_cups_ps_obj_t));
   }
 
   free(temp);
@@ -1132,7 +1131,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 		ch = (ch << 3) + *cur - '0';
 	      }
 
-	      *valptr++ = ch;
+	      *valptr++ = (char)ch;
 	    }
 	    else if (*cur == '\r')
 	    {
@@ -1209,7 +1208,7 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
 		ch |= tolower(*cur) - 'a' + 10;
             }
 
-	    *valptr++ = ch;
+	    *valptr++ = (char)ch;
           }
 
           if (*cur != '>')

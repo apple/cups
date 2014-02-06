@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Configuration file definitions for the CUPS scheduler.
+ * Configuration file definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -148,25 +148,27 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
 					/* Classification of system */
-VAR uid_t		User			VALUE(1);
+VAR uid_t		User			VALUE(1),
 					/* User ID for server */
+			RunUser			VALUE(0);
+					/* User to run as, used for files */
 VAR gid_t		Group			VALUE(0);
 					/* Group ID for server */
 VAR cupsd_accesslog_t	AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS);
 					/* Access log level */
 VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
-			ConfigFilePerm		VALUE(0640),
-					/* Permissions for config files */
 			LogDebugHistory		VALUE(200),
 					/* Amount of automatic debug history */
 			FatalErrors		VALUE(CUPSD_FATAL_CONFIG),
 					/* Which errors are fatal? */
 			StrictConformance	VALUE(FALSE),
 					/* Require strict IPP conformance? */
-			SyncOnClose		VALUE(FALSE),
+			SyncOnClose		VALUE(FALSE);
 					/* Call fsync() when closing files? */
-			LogFilePerm		VALUE(0644);
+VAR mode_t		ConfigFilePerm		VALUE(0640U),
+					/* Permissions for config files */
+			LogFilePerm		VALUE(0644U);
 					/* Permissions for log files */
 VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
@@ -202,8 +204,6 @@ VAR int			MaxClients		VALUE(100),
 					/* Timeout before reload from SIGHUP */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
-			RunUser			VALUE(0),
-					/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
 			DefaultShared		VALUE(TRUE),
@@ -258,8 +258,8 @@ gss_cred_id_t		ServerCreds;	/* Server's GSS credentials */
 extern void	cupsdAddAlias(cups_array_t *aliases, const char *name);
 extern int	cupsdCheckLogFile(cups_file_t **lf, const char *logname);
 extern int	cupsdCheckPermissions(const char *filename,
-		                      const char *suffix, int mode,
-	 			      int user, int group, int is_dir,
+		                      const char *suffix, mode_t mode,
+	 			      uid_t user, gid_t group, int is_dir,
 				      int create_dir);
 extern int	cupsdCheckProgram(const char *filename, cupsd_printer_t *p);
 extern int	cupsdDefaultAuthType(void);
@@ -271,8 +271,8 @@ extern int	cupsdLogClient(cupsd_client_t *con, int level,
 extern void	cupsdLogFCMessage(void *context, _cups_fc_result_t result,
 		                  const char *message);
 #ifdef HAVE_GSSAPI
-extern int	cupsdLogGSSMessage(int level, int major_status,
-		                   int minor_status,
+extern int	cupsdLogGSSMessage(int level, OM_uint32 major_status,
+		                   OM_uint32 minor_status,
 		                   const char *message, ...);
 #endif /* HAVE_GSSAPI */
 extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message,

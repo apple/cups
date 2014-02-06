@@ -154,20 +154,20 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wsign-conversion -Wunused $OPTIM"
+
+		AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
+		OLDCFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
+		AC_TRY_COMPILE(,,
+			[OPTIM="$OPTIM -Wno-tautological-compare"
+			AC_MSG_RESULT(yes)],
+			AC_MSG_RESULT(no))
+		CFLAGS="$OLDCFLAGS"
 
 		# Additional warning options for development testing...
 		if test -d .svn; then
-			OPTIM="-Wshadow -Werror $OPTIM"
-		else
-			AC_MSG_CHECKING(if GCC supports -Wno-tautological-compare)
-			OLDCFLAGS="$CFLAGS"
-			CFLAGS="$CFLAGS -Werror -Wno-tautological-compare"
-			AC_TRY_COMPILE(,,
-				[OPTIM="$OPTIM -Wno-tautological-compare"
-				AC_MSG_RESULT(yes)],
-				AC_MSG_RESULT(no))
-			CFLAGS="$OLDCFLAGS"
+			OPTIM="-Werror $OPTIM"
 		fi
 	fi
 

@@ -1,49 +1,17 @@
 /*
  * "$Id$"
  *
- *   PPD cache implementation for CUPS.
+ * PPD cache implementation for CUPS.
  *
- *   Copyright 2010-2013 by Apple Inc.
+ * Copyright 2010-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _ppdCacheCreateWithFile() - Create PPD cache and mapping data from a
- *                               written file.
- *   _ppdCacheCreateWithPPD()  - Create PWG mapping data from a PPD file.
- *   _ppdCacheDestroy()        - Free all memory used for PWG mapping data.
- *   _ppdCacheGetBin()         - Get the PWG output-bin keyword associated with
- *                               a PPD OutputBin.
- *   _ppdCacheGetInputSlot()   - Get the PPD InputSlot associated with the job
- *                               attributes or a keyword string.
- *   _ppdCacheGetMediaType()   - Get the PPD MediaType associated with the job
- *                               attributes or a keyword string.
- *   _ppdCacheGetOutputBin()   - Get the PPD OutputBin associated with the
- *                               keyword string.
- *   _ppdCacheGetPageSize()    - Get the PPD PageSize associated with the job
- *                               attributes or a keyword string.
- *   _ppdCacheGetSize()        - Get the PWG size associated with a PPD
- *                               PageSize.
- *   _ppdCacheGetSource()      - Get the PWG media-source associated with a PPD
- *                               InputSlot.
- *   _ppdCacheGetType()        - Get the PWG media-type associated with a PPD
- *                               MediaType.
- *   _ppdCacheWriteFile()      - Write PWG mapping data to a file.
- *   _pwgInputSlotForSource()  - Get the InputSlot name for the given PWG
- *                               media-source.
- *   _pwgMediaTypeForType()    - Get the MediaType name for the given PWG
- *                               media-type.
- *   _pwgPageSizeForMedia()    - Get the PageSize name for the given media.
- *   pwg_ppdize_name()         - Convert an IPP keyword to a PPD keyword.
- *   pwg_unppdize_name()       - Convert a PPD keyword to a lowercase IPP
- *                               keyword.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -290,7 +258,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      if ((pc->bins = calloc(num_bins, sizeof(pwg_map_t))) == NULL)
+      if ((pc->bins = calloc((size_t)num_bins, sizeof(pwg_map_t))) == NULL)
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d bins.",
 	              num_sizes));
@@ -340,7 +308,7 @@ _ppdCacheCreateWithFile(
 
       if (num_sizes > 0)
       {
-	if ((pc->sizes = calloc(num_sizes, sizeof(pwg_size_t))) == NULL)
+	if ((pc->sizes = calloc((size_t)num_sizes, sizeof(pwg_size_t))) == NULL)
 	{
 	  DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sizes.",
 			num_sizes));
@@ -428,7 +396,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      if ((pc->sources = calloc(num_sources, sizeof(pwg_map_t))) == NULL)
+      if ((pc->sources = calloc((size_t)num_sources, sizeof(pwg_map_t))) == NULL)
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sources.",
 	              num_sources));
@@ -477,7 +445,7 @@ _ppdCacheCreateWithFile(
 	goto create_error;
       }
 
-      if ((pc->types = calloc(num_types, sizeof(pwg_map_t))) == NULL)
+      if ((pc->types = calloc((size_t)num_types, sizeof(pwg_map_t))) == NULL)
       {
         DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d types.",
 	              num_types));
@@ -553,7 +521,7 @@ _ppdCacheCreateWithFile(
       if ((finishings = calloc(1, sizeof(_pwg_finishings_t))) == NULL)
         goto create_error;
 
-      finishings->value       = strtol(value, &valueptr, 10);
+      finishings->value       = (ipp_finishings_t)strtol(value, &valueptr, 10);
       finishings->num_options = cupsParseOptions(valueptr, 0,
                                                  &(finishings->options));
 
@@ -714,7 +682,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (ppd->num_sizes > 0)
   {
-    if ((pc->sizes = calloc(ppd->num_sizes, sizeof(pwg_size_t))) == NULL)
+    if ((pc->sizes = calloc((size_t)ppd->num_sizes, sizeof(pwg_size_t))) == NULL)
     {
       DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
 		    "pwg_size_t's.", ppd->num_sizes));
@@ -891,8 +859,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   {
     pc->source_option = _cupsStrAlloc(input_slot->keyword);
 
-    if ((pc->sources = calloc(input_slot->num_choices,
-                               sizeof(pwg_map_t))) == NULL)
+    if ((pc->sources = calloc((size_t)input_slot->num_choices, sizeof(pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
                     "pwg_map_t's for InputSlot.", input_slot->num_choices));
@@ -953,8 +920,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((media_type = ppdFindOption(ppd, "MediaType")) != NULL)
   {
-    if ((pc->types = calloc(media_type->num_choices,
-                             sizeof(pwg_map_t))) == NULL)
+    if ((pc->types = calloc((size_t)media_type->num_choices, sizeof(pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
                     "pwg_map_t's for MediaType.", media_type->num_choices));
@@ -1018,8 +984,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
   {
-    if ((pc->bins = calloc(output_bin->num_choices,
-                           sizeof(pwg_map_t))) == NULL)
+    if ((pc->bins = calloc((size_t)output_bin->num_choices, sizeof(pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
                     "pwg_map_t's for OutputBin.", output_bin->num_choices));
@@ -1202,7 +1167,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
 	  num_options = pc->num_presets[_PWG_PRINT_COLOR_MODE_COLOR]
 					[pwg_print_quality];
-	  options     = calloc(sizeof(cups_option_t), num_options);
+	  options     = calloc(sizeof(cups_option_t), (size_t)num_options);
 
 	  if (options)
 	  {
@@ -1371,7 +1336,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       if ((finishings = calloc(1, sizeof(_pwg_finishings_t))) == NULL)
         goto create_error;
 
-      finishings->value       = atoi(ppd_attr->spec);
+      finishings->value       = (ipp_finishings_t)atoi(ppd_attr->spec);
       finishings->num_options = _ppdParseOptions(ppd_attr->value, 0,
                                                  &(finishings->options),
                                                  _PPD_PARSE_OPTIONS);
@@ -1611,7 +1576,7 @@ _ppdCacheGetFinishingOptions(
 
     for (i = 0; i < num_values; i ++)
     {
-      key.value = ippGetInteger(attr, i);
+      key.value = (ipp_finishings_t)ippGetInteger(attr, i);
 
       if ((f = cupsArrayFind(pc->finishings, &key)) != NULL)
       {
@@ -2694,14 +2659,14 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 	*end;				/* End of name buffer */
 
 
-  *name = toupper(*ipp++);
+  *name = (char)toupper(*ipp++);
 
   for (ptr = name + 1, end = name + namesize - 1; *ipp && ptr < end;)
   {
     if (*ipp == '-' && _cups_isalpha(ipp[1]))
     {
       ipp ++;
-      *ptr++ = toupper(*ipp++ & 255);
+      *ptr++ = (char)toupper(*ipp++ & 255);
     }
     else
       *ptr++ = *ipp++;
@@ -2728,7 +2693,7 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
   for (ptr = name, end = name + namesize - 1; *ppd && ptr < end; ppd ++)
   {
     if (_cups_isalnum(*ppd) || *ppd == '-')
-      *ptr++ = tolower(*ppd & 255);
+      *ptr++ = (char)tolower(*ppd & 255);
     else if (strchr(dashchars, *ppd))
       *ptr++ = '-';
     else

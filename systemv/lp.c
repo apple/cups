@@ -1,22 +1,16 @@
 /*
  * "$Id$"
  *
- *   "lp" command for CUPS.
+ * "lp" command for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()          - Parse options and send files for printing.
- *   restart_job()   - Restart a job.
- *   set_job_attrs() - Set job attributes.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -640,7 +634,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     while (status == HTTP_CONTINUE &&
            (bytes = read(0, buffer, sizeof(buffer))) > 0)
-      status = cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer, bytes);
+      status = cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer, (size_t)bytes);
 
     if (status != HTTP_CONTINUE)
     {

@@ -1,26 +1,18 @@
 /*
  * "$Id$"
  *
- *   Option encoding routines for CUPS.
+ * Option encoding routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsEncodeOptions()   - Encode printer options into IPP attributes.
- *   cupsEncodeOptions2()  - Encode printer options into IPP attributes for
- *                           a group.
- *   _ippFindOption()      - Find the attribute information for an option.
- *   compare_ipp_options() - Compare two IPP options.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -674,7 +666,7 @@ cupsEncodeOptions2(
 	    * Integer/enumeration value...
 	    */
 
-            attr->values[j].integer = strtol(val, &s, 10);
+            attr->values[j].integer = (int)strtol(val, &s, 10);
 
             DEBUG_printf(("2cupsEncodeOptions2: Added integer option value "
 	                  "%d...", attr->values[j].integer));
@@ -716,12 +708,12 @@ cupsEncodeOptions2(
 	      s = val;
 	    }
 	    else
-	      attr->values[j].range.lower = strtol(val, &s, 10);
+	      attr->values[j].range.lower = (int)strtol(val, &s, 10);
 
 	    if (*s == '-')
 	    {
 	      if (s[1])
-		attr->values[j].range.upper = strtol(s + 1, NULL, 10);
+		attr->values[j].range.upper = (int)strtol(s + 1, NULL, 10);
 	      else
 		attr->values[j].range.upper = 2147483647;
             }
@@ -738,10 +730,10 @@ cupsEncodeOptions2(
 	    * Resolution...
 	    */
 
-	    attr->values[j].resolution.xres = strtol(val, &s, 10);
+	    attr->values[j].resolution.xres = (int)strtol(val, &s, 10);
 
 	    if (*s == 'x')
-	      attr->values[j].resolution.yres = strtol(s + 1, &s, 10);
+	      attr->values[j].resolution.yres = (int)strtol(s + 1, &s, 10);
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 

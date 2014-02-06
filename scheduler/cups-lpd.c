@@ -1,27 +1,16 @@
 /*
  * "$Id$"
  *
- *   Line Printer Daemon interface for CUPS.
+ * Line Printer Daemon interface for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()           - Process an incoming LPD request...
- *   create_job()     - Create a new print job.
- *   get_printer()    - Get the named printer and its options.
- *   print_file()     - Add a file to the current job.
- *   recv_print_job() - Receive a print job from the client.
- *   remove_jobs()    - Cancel one or more jobs.
- *   send_state()     - Send the queue state.
- *   smart_gets()     - Get a line of text, removing the trailing CR and/or LF.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -268,21 +257,21 @@ main(int  argc,				/* I - Number of command-line arguments */
         syslog(LOG_INFO, "Receive print job for %s", dest);
         /* recv_print_job() sends initial status byte */
 
-        status = recv_print_job(dest, num_defaults, defaults);
+        status = (char)recv_print_job(dest, num_defaults, defaults);
 	break;
 
     case 0x03 : /* Send queue state (short) */
         syslog(LOG_INFO, "Send queue state (short) for %s %s", dest, list);
 	/* no status byte for this command */
 
-        status = send_state(dest, list, 0);
+        status = (char)send_state(dest, list, 0);
 	break;
 
     case 0x04 : /* Send queue state (long) */
         syslog(LOG_INFO, "Send queue state (long) for %s %s", dest, list);
 	/* no status byte for this command */
 
-        status = send_state(dest, list, 1);
+        status = (char)send_state(dest, list, 1);
 	break;
 
     case 0x05 : /* Remove jobs */
@@ -300,7 +289,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	  syslog(LOG_INFO, "Remove jobs %s on %s by %s", list, dest, agent);
 
-	  status = remove_jobs(dest, agent, list);
+	  status = (char)remove_jobs(dest, agent, list);
         }
 	else
 	  status = 1;
@@ -744,7 +733,7 @@ print_file(http_t     *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
 
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", (char)last);
 
  /*
   * Do the request...
@@ -781,7 +770,8 @@ recv_print_job(
   int		fd;			/* Temporary file */
   FILE		*fp;			/* File pointer */
   char		filename[1024];		/* Temporary filename */
-  int		bytes;			/* Bytes received */
+  ssize_t	bytes;			/* Bytes received */
+  size_t	total;			/* Total bytes */
   char		line[256],		/* Line from file/stdin */
 		command,		/* Command from line */
 		*count,			/* Number of bytes */
@@ -965,15 +955,15 @@ recv_print_job(
     * Copy the data or control file from the client...
     */
 
-    for (i = atoi(count); i > 0; i -= bytes)
+    for (total = (size_t)strtoll(count, NULL, 10); total > 0; total -= (size_t)bytes)
     {
-      if (i > sizeof(line))
-        bytes = sizeof(line);
+      if (total > sizeof(line))
+        bytes = (ssize_t)sizeof(line);
       else
-        bytes = i;
+        bytes = (ssize_t)total;
 
-      if ((bytes = fread(line, 1, bytes, stdin)) > 0)
-        bytes = write(fd, line, bytes);
+      if ((bytes = (ssize_t)fread(line, 1, (size_t)bytes, stdin)) > 0)
+        bytes = write(fd, line, (size_t)bytes);
 
       if (bytes < 1)
       {
@@ -1609,7 +1599,7 @@ smart_gets(char *s,			/* I - Pointer to line buffer */
       break;
     }
     else if (ptr < end)
-      *ptr++ = ch;
+      *ptr++ = (char)ch;
   }
 
   *ptr = '\0';

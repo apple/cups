@@ -3,7 +3,7 @@
  *
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -324,7 +324,7 @@ main(int  argc,				/* I - Number of command-line args */
       return (1);
     }
 
-    strlcpy(slash, "/cups-files.conf", len - (slash - filename));
+    strlcpy(slash, "/cups-files.conf", len - (size_t)(slash - filename));
     cupsdSetString(&CupsFilesFile, filename);
     free(filename);
   }
@@ -501,7 +501,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* RLIM_INFINITY */
     MaxFDs = limit.rlim_max;
 
-  limit.rlim_cur = MaxFDs;
+  limit.rlim_cur = (rlim_t)MaxFDs;
 
   setrlimit(RLIMIT_NOFILE, &limit);
 

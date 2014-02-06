@@ -3,7 +3,7 @@
  *
  * User, system, and password routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -678,7 +678,7 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
   }
 
   noecho = original;
-  noecho.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+  noecho.c_lflag &= (tcflag_t)~(ICANON | ECHO | ECHOE | ISIG);
 
   if (tcsetattr(tty, TCSAFLUSH, &noecho))
   {

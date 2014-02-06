@@ -3,7 +3,7 @@
  *
  * HTTP test program for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -35,8 +35,8 @@ typedef struct uri_test_s		/**** URI test cases ****/
 			*hostname,	/* Hostname string */
 			*resource;	/* Resource string */
   int			port,		/* Port number */
-			assemble_port,	/* Port number for httpAssembleURI() */
-			assemble_coding;/* Coding for httpAssembleURI() */
+			assemble_port;	/* Port number for httpAssembleURI() */
+  http_uri_coding_t	assemble_coding;/* Coding for httpAssembleURI() */
 } uri_test_t;
 
 
@@ -109,7 +109,7 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    HTTP_URI_CODING_MOST  },
 			  { HTTP_URI_STATUS_OK, "ipp://username:password@[fe80::200:1234:5678:9abc%25eth0]:999/ipp",
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999,
-			    HTTP_URI_CODING_MOST | HTTP_URI_CODING_RFC6874 },
+			    (http_uri_coding_t)(HTTP_URI_CODING_MOST | HTTP_URI_CODING_RFC6874) },
 			  { HTTP_URI_STATUS_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
 			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0,
 			    HTTP_URI_CODING_MOST  },
@@ -807,7 +807,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     while ((bytes = httpRead2(http, buffer, sizeof(buffer))) > 0)
     {
       total += bytes;
-      fwrite(buffer, bytes, 1, out);
+      fwrite(buffer, (size_t)bytes, 1, out);
       if (out != stdout)
       {
         current = time(NULL);

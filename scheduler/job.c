@@ -3,7 +3,7 @@
  *
  * Job management routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -568,9 +568,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     if (stat(filename, &fileinfo))
       fileinfo.st_size = 0;
 
-    filters = mimeFilter2(MimeDatabase, job->filetypes[job->current_file],
-                          fileinfo.st_size, job->printer->filetype,
-                          &(job->cost));
+    filters = mimeFilter2(MimeDatabase, job->filetypes[job->current_file], (size_t)fileinfo.st_size, job->printer->filetype, &(job->cost));
 
     if (!filters)
     {
@@ -846,7 +844,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   else
     argc = 7;
 
-  if ((argv = calloc(argc + 1, sizeof(char *))) == NULL)
+  if ((argv = calloc((size_t)argc + 1, sizeof(char *))) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Unable to allocate argument array - %s",
                     strerror(errno));
@@ -970,8 +968,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       {
         if (i)
 	  *psrptr++ = ',';
-	strlcpy(psrptr, job->printer->reasons[i],
-	        psrlen - (psrptr - printer_state_reasons));
+	strlcpy(psrptr, job->printer->reasons[i], psrlen - (size_t)(psrptr - printer_state_reasons));
 	psrptr += strlen(psrptr);
       }
     }
@@ -1822,16 +1819,13 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       {
         if (job->num_files == 0)
 	{
-	  compressions = (int *)calloc(fileid, sizeof(int));
-	  filetypes    = (mime_type_t **)calloc(fileid, sizeof(mime_type_t *));
+	  compressions = (int *)calloc((size_t)fileid, sizeof(int));
+	  filetypes    = (mime_type_t **)calloc((size_t)fileid, sizeof(mime_type_t *));
 	}
 	else
 	{
-	  compressions = (int *)realloc(job->compressions,
-	                                sizeof(int) * fileid);
-	  filetypes    = (mime_type_t **)realloc(job->filetypes,
-	                                         sizeof(mime_type_t *) *
-						 fileid);
+	  compressions = (int *)realloc(job->compressions, sizeof(int) * (size_t)fileid);
+	  filetypes    = (mime_type_t **)realloc(job->filetypes, sizeof(mime_type_t *) * (size_t)fileid);
         }
 
 	if (compressions)
@@ -2868,7 +2862,7 @@ dump_job_history(cupsd_job_t *job)	/* I - Job */
     snprintf(temp, sizeof(temp), "[Job %d] printer-state-reasons=", job->id);
     ptr = temp + strlen(temp);
     if (printer->num_reasons == 0)
-      strlcpy(ptr, "none", sizeof(temp) - (ptr - temp));
+      strlcpy(ptr, "none", sizeof(temp) - (size_t)(ptr - temp));
     else
     {
       for (i = 0;
@@ -2878,7 +2872,7 @@ dump_job_history(cupsd_job_t *job)	/* I - Job */
         if (i)
 	  *ptr++ = ',';
 
-	strlcpy(ptr, printer->reasons[i], sizeof(temp) - (ptr - temp));
+	strlcpy(ptr, printer->reasons[i], sizeof(temp) - (size_t)(ptr - temp));
 	ptr += strlen(ptr);
       }
     }
@@ -3708,18 +3702,18 @@ get_options(cupsd_job_t *job,		/* I - Job */
       */
 
       if (optptr > options)
-	strlcat(optptr, " ", optlength - (optptr - options));
+	strlcat(optptr, " ", optlength - (size_t)(optptr - options));
 
       if (attr->value_tag != IPP_TAG_BOOLEAN)
       {
-	strlcat(optptr, attr->name, optlength - (optptr - options));
-	strlcat(optptr, "=", optlength - (optptr - options));
+	strlcat(optptr, attr->name, optlength - (size_t)(optptr - options));
+	strlcat(optptr, "=", optlength - (size_t)(optptr - options));
       }
 
       for (i = 0; i < attr->num_values; i ++)
       {
 	if (i)
-	  strlcat(optptr, ",", optlength - (optptr - options));
+	  strlcat(optptr, ",", optlength - (size_t)(optptr - options));
 
 	optptr += strlen(optptr);
 
@@ -3727,30 +3721,29 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	{
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      snprintf(optptr, optlength - (optptr - options),
+	      snprintf(optptr, optlength - (size_t)(optptr - options),
 	               "%d", attr->values[i].integer);
 	      break;
 
 	  case IPP_TAG_BOOLEAN :
 	      if (!attr->values[i].boolean)
-		strlcat(optptr, "no", optlength - (optptr - options));
+		strlcat(optptr, "no", optlength - (size_t)(optptr - options));
 
-	      strlcat(optptr, attr->name,
-	              optlength - (optptr - options));
+	      strlcat(optptr, attr->name, optlength - (size_t)(optptr - options));
 	      break;
 
 	  case IPP_TAG_RANGE :
 	      if (attr->values[i].range.lower == attr->values[i].range.upper)
-		snprintf(optptr, optlength - (optptr - options) - 1,
+		snprintf(optptr, optlength - (size_t)(optptr - options) - 1,
 	        	 "%d", attr->values[i].range.lower);
               else
-		snprintf(optptr, optlength - (optptr - options) - 1,
+		snprintf(optptr, optlength - (size_t)(optptr - options) - 1,
 	        	 "%d-%d", attr->values[i].range.lower,
 			 attr->values[i].range.upper);
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      snprintf(optptr, optlength - (optptr - options) - 1,
+	      snprintf(optptr, optlength - (size_t)(optptr - options) - 1,
 	               "%dx%d%s", attr->values[i].resolution.xres,
 		       attr->values[i].resolution.yres,
 		       attr->values[i].resolution.units == IPP_RES_PER_INCH ?
@@ -3790,10 +3783,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
   for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
   {
     *optptr++ = ' ';
-    strlcpy(optptr, pwgppd->name, optlength - (optptr - options));
+    strlcpy(optptr, pwgppd->name, optlength - (size_t)(optptr - options));
     optptr += strlen(optptr);
     *optptr++ = '=';
-    strlcpy(optptr, pwgppd->value, optlength - (optptr - options));
+    strlcpy(optptr, pwgppd->value, optlength - (size_t)(optptr - options));
     optptr += strlen(optptr);
   }
 
@@ -3847,7 +3840,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
     */
 
     bytes ++;				/* " " separator */
-    bytes += attr->num_values;		/* "," separators */
+    bytes += (size_t)attr->num_values;	/* "," separators */
 
    /*
     * Boolean attributes appear as "foo,nofoo,foo,nofoo", while
@@ -3857,7 +3850,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
     if (attr->value_tag != IPP_TAG_BOOLEAN)
       bytes += strlen(attr->name);
     else
-      bytes += attr->num_values * strlen(attr->name);
+      bytes += (size_t)attr->num_values * strlen(attr->name);
 
    /*
     * Now add the size required for each value in the attribute...
@@ -3871,7 +3864,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
 	  * Minimum value of a signed integer is -2147483647, or 11 digits.
 	  */
 
-	  bytes += attr->num_values * 11;
+	  bytes += (size_t)attr->num_values * 11;
 	  break;
 
       case IPP_TAG_BOOLEAN :
@@ -3890,7 +3883,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
 	  * 23 characters max.
 	  */
 
-	  bytes += attr->num_values * 23;
+	  bytes += (size_t)attr->num_values * 23;
 	  break;
 
       case IPP_TAG_RESOLUTION :
@@ -3899,7 +3892,7 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
 	  * suffixed by the units, or 26 characters max.
 	  */
 
-	  bytes += attr->num_values * 26;
+	  bytes += (size_t)attr->num_values * 26;
 	  break;
 
       case IPP_TAG_STRING :
@@ -4099,8 +4092,8 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	  continue;
 	}
 
-        job->filetypes    = calloc(job->num_files, sizeof(mime_type_t *));
-	job->compressions = calloc(job->num_files, sizeof(int));
+        job->filetypes    = calloc((size_t)job->num_files, sizeof(mime_type_t *));
+	job->compressions = calloc((size_t)job->num_files, sizeof(int));
 
         if (!job->filetypes || !job->compressions)
 	{

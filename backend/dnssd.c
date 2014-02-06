@@ -1,33 +1,17 @@
 /*
  * "$Id$"
  *
- *   DNS-SD discovery backend for CUPS.
+ * DNS-SD discovery backend for CUPS.
  *
- *   Copyright 2008-2012 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()		     - Browse for printers.
- *   browse_callback()	     - Browse devices.
- *   browse_local_callback() - Browse local devices.
- *   client_callback()       - Avahi client callback function.
- *   compare_devices()	     - Compare two devices.
- *   exec_backend()	     - Execute the backend that corresponds to the
- *			       resolved service name.
- *   device_type()	     - Get DNS-SD type enumeration from string.
- *   get_device()	     - Create or update a device.
- *   query_callback()	     - Process query data.
- *   find_device()	     - Find a device from its name and domain.
- *   sigterm_handler()	     - Handle termination signals.
- *   unquote()		     - Unquote a name string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -138,7 +122,7 @@ static void		client_callback(AvahiClient *client,
 #endif /* HAVE_AVAHI */
 
 static int		compare_devices(cups_device_t *a, cups_device_t *b);
-static void		exec_backend(char **argv);
+static void		exec_backend(char **argv) __attribute__((noreturn));
 static cups_device_t	*get_device(cups_array_t *devices,
 			            const char *serviceName,
 			            const char *regtype,
@@ -837,8 +821,8 @@ exec_backend(char **argv)		/* I - Command-line arguments */
  * 'device_type()' - Get DNS-SD type enumeration from string.
  */
 
-static int
-device_type(const char *regtype)
+static cups_devtype_t			/* O - Device type */
+device_type(const char *regtype)	/* I - Service registration type */
 {
 #ifdef HAVE_AVAHI
   if (!strcmp(regtype, "_ipp._tcp"))
@@ -1115,7 +1099,7 @@ query_callback(
     datanext = data + datalen;
 
     for (ptr = key; data < datanext && *data != '='; data ++)
-      *ptr++ = *data;
+      *ptr++ = (char)*data;
     *ptr = '\0';
 
     if (data < datanext && *data == '=')
@@ -1143,8 +1127,7 @@ query_callback(
       */
 
       ptr = device_id + strlen(device_id);
-      snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s:%s;",
-	       key + 4, value);
+      snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "%s:%s;", key + 4, value);
     }
 
     if (!_cups_strcasecmp(key, "usb_MFG") || !_cups_strcasecmp(key, "usb_MANU") ||
@@ -1250,7 +1233,7 @@ query_callback(
       while (isalnum(*ptr & 255) || *ptr == '-' || *ptr == '.')
       {
         if (isalnum(*ptr & 255) && valptr < (value + sizeof(value) - 1))
-          *valptr++ = toupper(*ptr++ & 255);
+          *valptr++ = (char)toupper(*ptr++ & 255);
         else
           break;
       }
@@ -1259,8 +1242,7 @@ query_callback(
     }
 
     ptr = device_id + strlen(device_id);
-    snprintf(ptr, sizeof(device_id) - (ptr - device_id), "CMD:%s;",
-	     value + 1);
+    snprintf(ptr, sizeof(device_id) - (size_t)(ptr - device_id), "CMD:%s;", value + 1);
   }
 
   if (device_id[0])

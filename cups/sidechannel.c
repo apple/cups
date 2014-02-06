@@ -3,7 +3,7 @@
  *
  * Side-channel API code for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -107,7 +107,7 @@ cupsSideChannelRead(
     double            timeout)		/* I  - Timeout in seconds */
 {
   char		*buffer;		/* Message buffer */
-  int		bytes;			/* Bytes read */
+  ssize_t	bytes;			/* Bytes read */
   int		templen;		/* Data length from message */
   int		nfds;			/* Number of file descriptors */
 #ifdef HAVE_POLL
@@ -138,7 +138,7 @@ cupsSideChannelRead(
   pfd.events = POLLIN;
 
   while ((nfds = poll(&pfd, 1,
-		      timeout < 0.0 ? -1 : (long)(timeout * 1000))) < 0 &&
+		      timeout < 0.0 ? -1 : (int)(timeout * 1000))) < 0 &&
 	 (errno == EINTR || errno == EAGAIN))
     ;
 
@@ -201,7 +201,7 @@ cupsSideChannelRead(
 
   if (bytes < 4)
   {
-    DEBUG_printf(("1cupsSideChannelRead: Short read of %d bytes", bytes));
+    DEBUG_printf(("1cupsSideChannelRead: Short read of " CUPS_LLFMT " bytes", CUPS_LLCAST bytes));
 
     _cupsBufferRelease(buffer);
 
@@ -355,7 +355,7 @@ cupsSideChannelSNMPGet(
     * Parse the response of the form "oid\0value"...
     */
 
-    real_oidlen  = strlen(real_data) + 1;
+    real_oidlen  = (int)strlen(real_data) + 1;
     real_datalen -= real_oidlen;
 
     if ((real_datalen + 1) > *datalen)
@@ -414,8 +414,8 @@ cupsSideChannelSNMPWalk(
   cups_sc_status_t	status;		/* Status of command */
   cups_sc_command_t	rcommand;	/* Response command */
   char			*real_data;	/* Real data buffer for response */
-  int			real_datalen,	/* Real length of data buffer */
-			real_oidlen,	/* Length of returned OID string */
+  int			real_datalen;	/* Real length of data buffer */
+  size_t		real_oidlen,	/* Length of returned OID string */
 			oidlen;		/* Length of first OID */
   const char		*current_oid;	/* Current OID */
   char			last_oid[2048];	/* Last OID */
@@ -439,7 +439,7 @@ cupsSideChannelSNMPWalk(
   */
 
   current_oid = oid;
-  oidlen      = (int)strlen(oid);
+  oidlen      = strlen(oid);
   last_oid[0] = '\0';
 
   do
@@ -486,7 +486,7 @@ cupsSideChannelSNMPWalk(
         return (CUPS_SC_STATUS_OK);
       }
 
-      if (real_datalen < sizeof(real_data))
+      if ((size_t)real_datalen < sizeof(real_data))
         real_data[real_datalen] = '\0';
 
       real_oidlen  = strlen(real_data) + 1;
@@ -532,7 +532,7 @@ cupsSideChannelWrite(
     double            timeout)		/* I - Timeout in seconds */
 {
   char		*buffer;		/* Message buffer */
-  int		bytes;			/* Bytes written */
+  ssize_t	bytes;			/* Bytes written */
 #ifdef HAVE_POLL
   struct pollfd	pfd;			/* Poll structure for poll() */
 #else /* select() */
@@ -562,7 +562,7 @@ cupsSideChannelWrite(
     if (poll(&pfd, 1, -1) < 1)
       return (-1);
   }
-  else if (poll(&pfd, 1, (long)(timeout * 1000)) < 1)
+  else if (poll(&pfd, 1, (int)(timeout * 1000)) < 1)
     return (-1);
 
 #else /* select() */
@@ -595,13 +595,13 @@ cupsSideChannelWrite(
   * 4-N      Data
   */
 
-  if ((buffer = _cupsBufferGet(datalen + 4)) == NULL)
+  if ((buffer = _cupsBufferGet((size_t)datalen + 4)) == NULL)
     return (-1);
 
   buffer[0] = command;
   buffer[1] = status;
-  buffer[2] = datalen >> 8;
-  buffer[3] = datalen & 255;
+  buffer[2] = (char)(datalen >> 8);
+  buffer[3] = (char)(datalen & 255);
 
   bytes = 4;
 
@@ -611,7 +611,7 @@ cupsSideChannelWrite(
     bytes += datalen;
   }
 
-  while (write(CUPS_SC_FD, buffer, bytes) < 0)
+  while (write(CUPS_SC_FD, buffer, (size_t)bytes) < 0)
     if (errno != EINTR && errno != EAGAIN)
     {
       _cupsBufferRelease(buffer);

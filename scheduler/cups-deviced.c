@@ -1,27 +1,16 @@
 /*
  * "$Id$"
  *
- *   Device scanning mini-daemon for CUPS.
+ * Device scanning mini-daemon for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                 - Scan for devices and return an IPP response.
- *   add_device()           - Add a new device to the list.
- *   compare_devices()      - Compare device names to eliminate duplicates.
- *   get_current_time()     - Get the current time as a double value in seconds.
- *   get_device()           - Get a device from a backend.
- *   process_children()     - Process all dead children...
- *   sigchld_handler()      - Handle 'child' signals from old processes.
- *   start_backend()        - Run a backend to gather the available devices.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -82,7 +71,7 @@ static cupsd_backend_t	backends[MAX_BACKENDS];
 static struct pollfd	backend_fds[MAX_BACKENDS];
 					/* Array for poll() */
 static cups_array_t	*devices;	/* Array of devices */
-static int		normal_user;	/* Normal user ID */
+static uid_t		normal_user;	/* Normal user ID */
 static int		device_limit;	/* Maximum number of devices */
 static int		send_class,	/* Send device-class attribute? */
 			send_info,	/* Send device-info attribute? */
@@ -182,7 +171,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
-  normal_user = atoi(argv[4]);
+  normal_user = (uid_t)atoi(argv[4]);
   if (normal_user <= 0)
   {
     fprintf(stderr, "ERROR: [cups-deviced] Bad user %d!\n", normal_user);
@@ -309,7 +298,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     timeout = (int)(1000 * (end_time - current_time));
 
-    if (poll(backend_fds, num_backends, timeout) > 0)
+    if (poll(backend_fds, (nfds_t)num_backends, timeout) > 0)
     {
       for (i = 0; i < num_backends; i ++)
         if (backend_fds[i].revents && backends[i].pipe)
@@ -326,8 +315,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 	    }
 	  }
-	  while (bpipe->ptr &&
-	         memchr(bpipe->ptr, '\n', bpipe->end - bpipe->ptr));
+	  while (bpipe->ptr && memchr(bpipe->ptr, '\n', (size_t)(bpipe->end - bpipe->ptr)));
         }
     }
 

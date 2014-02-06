@@ -1,29 +1,18 @@
 /*
  * "$Id$"
  *
- *   Common filter routines for CUPS.
+ * Common filter routines for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   SetCommonOptions() - Set common filter options for media size,
- *                        etc.
- *   UpdatePageVars()   - Update the page variables for the orientation.
- *   WriteComment()     - Write a DSC comment.
- *   WriteCommon()      - Write common procedures...
- *   WriteLabelProlog() - Write the prolog with the classification
- *                        and page label.
- *   WriteLabels()      - Write the actual page labels.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -481,7 +470,7 @@ WriteTextComment(const char *name,	/* I - Comment name ("Title", etc.) */
   */
 
   printf("%%%%%s: (", name);
-  len = 5 + strlen(name);
+  len = 5 + (int)strlen(name);
 
   while (*value)
   {

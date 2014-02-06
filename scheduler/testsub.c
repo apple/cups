@@ -1,23 +1,16 @@
 /*
  * "$Id$"
  *
- *   Scheduler notification tester for CUPS.
+ * Scheduler notification tester for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()             - Subscribe to the .
- *   print_attributes() - Print the attributes in a request...
- *   sigterm_handler()  - Flag when the user hits CTRL-C...
- *   usage()            - Show program usage...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -251,7 +244,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       interval = 5;
 
     ippDelete(response);
-    sleep(interval);
+    sleep((unsigned)interval);
   }
 
  /*

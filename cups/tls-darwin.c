@@ -3,7 +3,7 @@
  *
  * TLS support code for CUPS on OS X.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -350,8 +350,7 @@ httpCopyCredentials(
 	secCert = SecTrustGetCertificateAtIndex(peerTrust, i);
 	if ((data = SecCertificateCopyData(secCert)))
 	{
-	  httpAddCredential(*credentials, CFDataGetBytePtr(data),
-	                    CFDataGetLength(data));
+	  httpAddCredential(*credentials, CFDataGetBytePtr(data), (size_t)CFDataGetLength(data));
 	  CFRelease(data);
 	}
       }
@@ -390,8 +389,7 @@ _httpCreateCredentials(
        credential;
        credential = (http_credential_t *)cupsArrayNext(credentials))
   {
-    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
-			     credential->datalen)))
+    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data, (CFIndex)credential->datalen)))
     {
       if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
               != NULL)
@@ -912,13 +910,13 @@ http_cdsa_read(
   }
   while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
 
-  if (bytes == *dataLength)
+  if ((size_t)bytes == *dataLength)
   {
     result = 0;
   }
   else if (bytes > 0)
   {
-    *dataLength = bytes;
+    *dataLength = (size_t)bytes;
     result = errSSLWouldBlock;
   }
   else
@@ -960,13 +958,13 @@ http_cdsa_write(
   }
   while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
 
-  if (bytes == *dataLength)
+  if ((size_t)bytes == *dataLength)
   {
     result = 0;
   }
   else if (bytes >= 0)
   {
-    *dataLength = bytes;
+    *dataLength = (size_t)bytes;
     result = errSSLWouldBlock;
   }
   else
@@ -1027,7 +1025,7 @@ http_tls_read(http_t *http,		/* I - HTTP connection */
   size_t	processed;		/* Number of bytes processed */
 
 
-  error = SSLRead(http->tls, buf, len, &processed);
+  error = SSLRead(http->tls, buf, (size_t)len, &processed);
   DEBUG_printf(("6http_tls_read: error=%d, processed=%d", (int)error,
                 (int)processed));
   switch (error)
@@ -1345,7 +1343,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
 		    if ((credential = malloc(sizeof(*credential))) != NULL)
 		    {
-		      credential->datalen = CFDataGetLength(data);
+		      credential->datalen = (size_t)CFDataGetLength(data);
 		      if ((credential->data = malloc(credential->datalen)))
 		      {
 			memcpy((void *)credential->data, CFDataGetBytePtr(data),
@@ -1480,7 +1478,7 @@ http_tls_write(http_t     *http,	/* I - HTTP connection */
 
   DEBUG_printf(("2http_tls_write(http=%p, buf=%p, len=%d)", http, buf, len));
 
-  error = SSLWrite(http->tls, buf, len, &processed);
+  error = SSLWrite(http->tls, buf, (size_t)len, &processed);
 
   switch (error)
   {

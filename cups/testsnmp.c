@@ -1,24 +1,17 @@
 /*
  * "$Id$"
  *
- *   SNMP test program for CUPS.
+ * SNMP test program for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ * Copyright 2008-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()     - Main entry.
- *   scan_oid() - Scan an OID value.
- *   show_oid() - Show the specified OID.
- *   usage()    - Show program usage and exit.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -132,8 +125,8 @@ static void
 print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
              void        *data)		/* I - User data pointer (not used) */
 {
-  int	i;				/* Looping var */
-  char	temp[1024];			/* Temporary OID string */
+  unsigned	i;			/* Looping var */
+  char		temp[1024];		/* Temporary OID string */
 
 
   (void)data;

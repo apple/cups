@@ -3,7 +3,7 @@
  *
  * Internet Printing Protocol support functions for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -683,7 +683,7 @@ ippAttributeString(
           {
             unsigned year;		/* Year */
 
-            year = (val->date[0] << 8) + val->date[1];
+            year = ((unsigned)val->date[0] << 8) + (unsigned)val->date[1];
 
 	    if (val->date[9] == 0 && val->date[10] == 0)
 	      snprintf(temp, sizeof(temp), "%04u-%02u-%02uT%02u:%02u:%02uZ",
@@ -752,8 +752,7 @@ ippAttributeString(
 
       case IPP_TAG_BEGIN_COLLECTION :
           if (buffer && bufptr < bufend)
-            bufptr += ipp_col_string(val->collection, bufptr,
-                                     bufend - bufptr + 1);
+            bufptr += ipp_col_string(val->collection, bufptr, (size_t)(bufend - bufptr + 1));
           else
             bufptr += ipp_col_string(val->collection, NULL, 0);
           break;
@@ -804,7 +803,7 @@ ippAttributeString(
   else if (bufend)
     *bufend = '\0';
 
-  return (bufptr - buffer);
+  return ((size_t)(bufptr - buffer));
 }
 
 
@@ -1845,7 +1844,7 @@ ippEnumValue(const char *attrname,	/* I - Attribute name */
   */
 
   if (isdigit(*enumstring & 255))
-    return (strtol(enumstring, NULL, 0));
+    return ((int)strtol(enumstring, NULL, 0));
 
  /*
   * Otherwise look up the string...
@@ -1972,7 +1971,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
 ipp_status_t				/* O - IPP status code */
 ippErrorValue(const char *name)		/* I - Name */
 {
-  int		i;
+  size_t	i;			/* Looping var */
 
 
   for (i = 0; i < (sizeof(ipp_status_oks) / sizeof(ipp_status_oks[0])); i ++)
@@ -2049,7 +2048,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
 ipp_op_t				/* O - Operation ID */
 ippOpValue(const char *name)		/* I - Textual name */
 {
-  int		i;
+  size_t	i;			/* Looping var */
 
 
   if (!strncmp(name, "0x", 2))
@@ -2161,7 +2160,7 @@ ippTagString(ipp_tag_t tag)		/* I - Tag value */
 ipp_tag_t				/* O - Tag value */
 ippTagValue(const char *name)		/* I - Tag name */
 {
-  int	i;				/* Looping var */
+  size_t	i;			/* Looping var */
 
 
   for (i = 0; i < (sizeof(ipp_tag_names) / sizeof(ipp_tag_names[0])); i ++)
@@ -2230,7 +2229,7 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
       bufptr += strlen(attr->name) + 1;
 
     if (buffer && bufptr < bufend)
-      bufptr += ippAttributeString(attr, bufptr, bufend - bufptr + 1);
+      bufptr += ippAttributeString(attr, bufptr, (size_t)(bufend - bufptr + 1));
     else
       bufptr += ippAttributeString(attr, temp, sizeof(temp));
   }
@@ -2246,7 +2245,7 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
     *bufptr = '}';
   bufptr ++;
 
-  return (bufptr - buffer);
+  return ((size_t)(bufptr - buffer));
 }
 
 

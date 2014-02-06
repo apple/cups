@@ -1,34 +1,16 @@
 /*
  * "$Id$"
  *
- *   Filtering program for CUPS.
+ * Filtering program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   main()                - Main entry for the test program.
- *   add_printer_filter()  - Add a single filters from a PPD file.
- *   add_printer_filters() - Add filters from a PPD file.
- *   check_cb()            - Callback function for _cupsFileCheck.
- *   compare_pids()        - Compare two filter PIDs...
- *   escape_options()      - Convert an options array to a string.
- *   exec_filter()         - Execute a single filter.
- *   exec_filters()        - Execute filters for the given file and options.
- *   get_job_file()        - Get the specified job file.
- *   open_pipe()           - Create a pipe which is closed on exec.
- *   read_cupsd_conf()     - Read the cupsd.conf file to get the filter
- *                           settings.
- *   set_string()          - Copy and set a string.
- *   sighandler()          - Signal catcher for when we print from stdin...
- *   usage()               - Show program usage...
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -576,7 +558,7 @@ add_printer_filter(
   {
     char	*ptr;			/* Pointer into maxsize(nnnn) program */
 
-    maxsize = strtoll(program + 8, &ptr, 10);
+    maxsize = (size_t)strtoll(program + 8, &ptr, 10);
 
     if (*ptr != ')')
     {
@@ -745,7 +727,7 @@ escape_options(
 {
   int		i;			/* Looping var */
   cups_option_t	*option;		/* Current option */
-  int		bytes;			/* Number of bytes needed */
+  size_t	bytes;			/* Number of bytes needed */
   char		*s,			/* Option string */
 		*sptr,			/* Pointer into string */
 		*vptr;			/* Pointer into value */
@@ -773,7 +755,7 @@ escape_options(
     if (sptr > s)
       *sptr++ = ' ';
 
-    strlcpy(sptr, option->name, bytes - (sptr - s));
+    strlcpy(sptr, option->name, bytes - (size_t)(sptr - s));
     sptr += strlen(sptr);
     *sptr++ = '=';
 

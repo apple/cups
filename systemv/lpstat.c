@@ -3,7 +3,7 @@
  *
  * "lpstat" command for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1478,11 +1478,9 @@ show_jobs(const char *dests,		/* I - Destinations */
 	      for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 	      {
 	        if (i)
-		  snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			   reasons->values[i].string.text);
+		  snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
                 else
-		  strlcpy(alerts, reasons->values[i].string.text,
-		          sizeof(alerts));
+		  strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 		aptr += strlen(aptr);
 	      }
@@ -1764,7 +1762,7 @@ show_printers(const char  *printers,	/* I - Destinations */
 		jobid = jobattr->values[0].integer;
               else if (!strcmp(jobattr->name, "job-state") &&
 	               jobattr->value_tag == IPP_TAG_ENUM)
-		jobstate = jobattr->values[0].integer;
+		jobstate = (ipp_jstate_t)jobattr->values[0].integer;
 	    }
 
             if (jobstate != IPP_JOB_PROCESSING)
@@ -1829,11 +1827,9 @@ show_printers(const char  *printers,	/* I - Destinations */
 	    for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 	    {
 	      if (i)
-		snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			 reasons->values[i].string.text);
+		snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
 	      else
-		strlcpy(alerts, reasons->values[i].string.text,
-			sizeof(alerts));
+		strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 	      aptr += strlen(aptr);
 	    }
@@ -1955,11 +1951,9 @@ show_printers(const char  *printers,	/* I - Destinations */
 		for (i = 0, aptr = alerts; i < reasons->num_values; i ++)
 		{
 		  if (i)
-		    snprintf(aptr, sizeof(alerts) - (aptr - alerts), " %s",
-			     reasons->values[i].string.text);
+		    snprintf(aptr, sizeof(alerts) - (size_t)(aptr - alerts), " %s", reasons->values[i].string.text);
 		  else
-		    strlcpy(alerts, reasons->values[i].string.text,
-			    sizeof(alerts));
+		    strlcpy(alerts, reasons->values[i].string.text, sizeof(alerts));
 
 		  aptr += strlen(aptr);
 		}

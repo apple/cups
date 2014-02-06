@@ -3,7 +3,7 @@
  *
  * Hyper-Text Transport Protocol definitions for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -633,8 +633,8 @@ extern const char	*httpResolveHostname(http_t *http, char *buffer, size_t bufsiz
 extern int		httpSaveCredentials(const char *path, cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
 extern void		httpSetKeepAlive(http_t *http, http_keepalive_t keep_alive) _CUPS_API_2_0;
 extern void		httpShutdown(http_t *http) _CUPS_API_2_0;
-extern const char	*httpStateString(http_state_t state);
-
+extern const char	*httpStateString(http_state_t state) _CUPS_API_2_0;
+extern const char	*httpURIStatusString(http_uri_status_t status) _CUPS_API_2_0;
 
 /*
  * C++ magic...

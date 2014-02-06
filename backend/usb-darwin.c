@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- * Copyright 2005-2013 Apple Inc. All rights reserved.
+ * Copyright 2005-2014 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
  * Inc. ("Apple") in consideration of your agreement to the following
@@ -283,10 +283,10 @@ static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
-static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
+static void run_legacy_backend(int argc, char *argv[], int fd) __attribute__((noreturn));	/* Starts child backend process running as a ppc executable */
 #endif /* __i386__ || __x86_64__ */
 static void sigterm_handler(int sig);	/* SIGTERM handler */
-static void sigquit_handler(int sig, siginfo_t *si, void *unused);
+static void sigquit_handler(int sig, siginfo_t *si, void *unused) __attribute__((noreturn));
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -680,7 +680,7 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (g.print_bytes)
       {
-	bytes    = g.print_bytes;
+	bytes    = (UInt32)g.print_bytes;
 	iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 
        /*
@@ -702,7 +702,7 @@ print_device(const char *uri,		/* I - Device URI */
 	{
 	  fputs("DEBUG: Got USB pipe stalled during write\n", stderr);
 
-	  bytes    = g.print_bytes;
+	  bytes    = (UInt32)g.print_bytes;
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 	}
 
@@ -722,7 +722,7 @@ print_device(const char *uri,		/* I - Device URI */
           sleep(5);
 #endif /* DEBUG_WRITES */
 
-	  bytes    = g.print_bytes;
+	  bytes    = (UInt32)g.print_bytes;
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
         }
 
@@ -1010,7 +1010,7 @@ sidechannel_thread(void *reference)
 	  fputs("DEBUG: CUPS_SC_CMD_GET_BIDI received from driver...\n",
 		stderr);
 
-	  data[0] = g.bidi_flag;
+	  data[0] = (char)g.bidi_flag;
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
 
 	  fprintf(stderr,
@@ -1026,7 +1026,7 @@ sidechannel_thread(void *reference)
 	  get_device_id(&status, data, &datalen);
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, datalen, 1.0);
 
-          if (datalen < sizeof(data))
+          if ((size_t)datalen < sizeof(data))
 	    data[datalen] = '\0';
 	  else
 	    data[sizeof(data) - 1] = '\0';
@@ -1229,7 +1229,7 @@ static Boolean find_device_cb(void *refcon,
   if (obj != 0x0)
   {
     CFStringRef idString = NULL;
-    UInt32 location = -1;
+    UInt32 location = ~0U;
     UInt8	interfaceNum = 0;
 
     copy_devicestring(obj, &idString, &location, &interfaceNum);
@@ -1869,7 +1869,7 @@ static void parse_options(char *options,
     else if (!_cups_strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
     else if (!_cups_strcasecmp(name, "location") && location)
-      *location = strtol(value, NULL, 16);
+      *location = (UInt32)strtoul(value, NULL, 16);
   }
 }
 
@@ -1931,6 +1931,7 @@ static void run_legacy_backend(int argc,
   pid_t	waitpid_status;
   char	*my_argv[32];
   char	*usb_legacy_status;
+
 
  /*
   * If we're running as x86_64 or i386 and couldn't load the class driver
@@ -2015,7 +2016,7 @@ static void run_legacy_backend(int argc,
       cups_serverbin = CUPS_SERVERBIN;
     snprintf(usbpath, sizeof(usbpath), "%s/backend/usb", cups_serverbin);
 
-    for (i = 0; i < argc && i < (sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
+    for (i = 0; i < argc && i < (int)(sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
       my_argv[i] = argv[i];
 
     my_argv[i] = NULL;
@@ -2303,7 +2304,7 @@ static void get_device_id(cups_sc_status_t *status,
   if (deviceIDString)
   {
     CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
-    *datalen = strlen(data);
+    *datalen = (int)strlen(data);
     CFRelease(deviceIDString);
   }
   *status  = CUPS_SC_STATUS_OK;

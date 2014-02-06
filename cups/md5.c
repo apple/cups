@@ -3,7 +3,7 @@
  *
  * Private MD5 implementation for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2005 by Easy Software Products
  * Copyright (C) 1999 Aladdin Enterprises.  All rights reserved.
  *
@@ -291,7 +291,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 	return;
 
     /* Update the message length. */
-    pms->count[1] += nbytes >> 29;
+    pms->count[1] += (unsigned)nbytes >> 29;
     pms->count[0] += nbits;
     if (pms->count[0] < nbits)
 	pms->count[1]++;

@@ -1,28 +1,17 @@
 /*
  * "$Id$"
  *
- *   Destination localization support for CUPS.
+ * Destination localization support for CUPS.
  *
- *   Copyright 2012-2013 by Apple Inc.
+ * Copyright 2012-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsLocalizeDestOption()	 - Get the localized string for a destination
- *				   option.
- *   cupsLocalizeDestValue()	 - Get the localized string for a destination
- *				   option+value pair.
- *   cups_create_localizations() - Create the localizations array for a
- *				   destination.
- *   cups_read_strings()	 - Read a pair of strings from a .strings file.
- *   cups_scan_strings()	 - Scan a quoted string.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -356,8 +345,7 @@ cups_scan_strings(char *buffer)		/* I - Start of string */
 	* Decode \nnn octal escape...
 	*/
 
-	*bufptr = ((((bufptr[1] - '0') << 3) | (bufptr[2] - '0')) << 3) |
-		  (bufptr[3] - '0');
+	*bufptr = (char)(((((bufptr[1] - '0') << 3) | (bufptr[2] - '0')) << 3) | (bufptr[3] - '0'));
 	_cups_strcpy(bufptr + 1, bufptr + 4);
       }
       else

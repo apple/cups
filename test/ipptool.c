@@ -3,7 +3,7 @@
  *
  * ipptool command for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -123,11 +123,11 @@ typedef struct _cups_vars_s		/**** Set of variables ****/
  * Globals...
  */
 
-_cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
+static _cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
 					/* How to transfer requests */
-_cups_output_t	Output = _CUPS_OUTPUT_LIST;
+static _cups_output_t	Output = _CUPS_OUTPUT_LIST;
 					/* Output mode */
-int		Cancel = 0,		/* Cancel test? */
+static int	Cancel = 0,		/* Cancel test? */
 		IgnoreErrors = 0,	/* Ignore errors? */
 		StopAfterIncludeError = 0,
 					/* Stop after include errors? */
@@ -138,22 +138,7 @@ int		Cancel = 0,		/* Cancel test? */
 		PassCount = 0,		/* Number of passing tests */
 		FailCount = 0,		/* Number of failing tests */
 		SkipCount = 0;		/* Number of skipped tests */
-char		*Password = NULL;	/* Password from URI */
-const char * const URIStatusStrings[] =	/* URI status strings */
-{
-  "URI too large",
-  "Bad arguments to function",
-  "Bad resource in URI",
-  "Bad port number in URI",
-  "Bad hostname/address in URI",
-  "Bad username in URI",
-  "Bad scheme in URI",
-  "Bad/empty URI",
-  "OK",
-  "Missing scheme in URI",
-  "Unknown scheme in URI",
-  "Missing resource in URI"
-};
+static char	*Password = NULL;	/* Password from URI */
 
 
 /*
@@ -562,7 +547,6 @@ main(int  argc,				/* I - Number of command-line args */
 	      _cupsLangPrintf(stderr, _("ipptool: Unknown option \"-%c\"."),
 	                      *opt);
 	      usage();
-	      break;
 	}
       }
     }
@@ -598,8 +582,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (uri_status != HTTP_URI_OK)
       {
-        _cupsLangPrintf(stderr, _("ipptool: Bad URI - %s."),
-	                URIStatusStrings[uri_status - HTTP_URI_OVERFLOW]);
+        _cupsLangPrintf(stderr, _("ipptool: Bad URI - %s."), httpURIStatusString(uri_status));
         return (1);
       }
 
@@ -663,7 +646,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     while (repeat > 1)
     {
-      usleep(interval);
+      usleep((useconds_t)interval);
       do_tests(&vars, testfile);
       repeat --;
     }
@@ -672,7 +655,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     for (;;)
     {
-      usleep(interval);
+      usleep((useconds_t)interval);
       do_tests(&vars, testfile);
     }
   }
@@ -1571,7 +1554,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	expand_variables(vars, token, temp, sizeof(token));
 
 	if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
-	    (op = strtol(token, NULL, 0)) == 0)
+	    (op = (ipp_op_t)strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad OPERATION code \"%s\" on line %d.", token,
 	                    linenum);
@@ -1633,7 +1616,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  if (Output == _CUPS_OUTPUT_TEST)
 	    printf("    [%g second delay]\n", delay);
 
-	  usleep((int)(1000000.0 * delay));
+	  usleep((useconds_t)(1000000.0 * delay));
 	}
       }
       else if (!_cups_strcasecmp(token, "ATTR"))
@@ -1680,20 +1663,19 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      if (!_cups_strcasecmp(token, "true"))
 		attrptr = ippAddBoolean(request, group, attr, 1);
               else
-		attrptr = ippAddBoolean(request, group, attr, atoi(token));
+		attrptr = ippAddBoolean(request, group, attr, (char)atoi(token));
 	      break;
 
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strchr(token, ','))
-		attrptr = ippAddInteger(request, group, value, attr,
-		                        strtol(token, &tokenptr, 0));
+		attrptr = ippAddInteger(request, group, value, attr, (int)strtol(token, &tokenptr, 0));
 	      else
 	      {
 	        int	values[100],	/* Values */
 			num_values = 1;	/* Number of values */
 
-		values[0] = strtol(token, &tokenptr, 10);
+		values[0] = (int)strtol(token, &tokenptr, 10);
 		while (tokenptr && *tokenptr &&
 		       num_values < (int)(sizeof(values) / sizeof(values[0])))
 		{
@@ -1702,7 +1684,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
 		    break;
 
-		  values[num_values] = strtol(tokenptr, &tokenptr, 0);
+		  values[num_values] = (int)strtol(tokenptr, &tokenptr, 0);
 		  num_values ++;
 		}
 
@@ -1724,11 +1706,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			yres;		/* Y resolution */
 	        char	*ptr;		/* Pointer into value */
 
-	        xres = yres = strtol(token, (char **)&ptr, 10);
+	        xres = yres = (int)strtol(token, (char **)&ptr, 10);
 	        if (ptr > token && xres > 0)
 	        {
 	          if (*ptr == 'x')
-	          yres = strtol(ptr + 1, (char **)&ptr, 10);
+		    yres = (int)strtol(ptr + 1, (char **)&ptr, 10);
 	        }
 
 	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
@@ -1744,15 +1726,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (!_cups_strcasecmp(ptr, "dpi"))
-	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
-	                                     xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_INCH, xres, yres);
 	        else if (!_cups_strcasecmp(ptr, "dpc") ||
 	                 !_cups_strcasecmp(ptr, "dpcm"))
-	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_CM,
-	                                     xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, IPP_RES_PER_CM, xres, yres);
 	        else
-	          attrptr = ippAddResolution(request, group, attr, (ipp_res_t)0,
-	                                     xres, yres);
+	          attrptr = ippAddResolution(request, group, attr, (ipp_res_t)0, xres, yres);
 	      }
 	      break;
 
@@ -1809,8 +1788,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      break;
 
           case IPP_TAG_STRING :
-              attrptr = ippAddOctetString(request, group, attr, token,
-                                          strlen(token));
+              attrptr = ippAddOctetString(request, group, attr, token, (int)strlen(token));
 	      break;
 
 	  default :
@@ -1918,7 +1896,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if ((statuses[num_statuses].status = ippErrorValue(token))
 	        == (ipp_status_t)-1 &&
-	    (statuses[num_statuses].status = strtol(token, NULL, 0)) == 0)
+	    (statuses[num_statuses].status = (ipp_status_t)strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
 	                    linenum);
@@ -2275,7 +2253,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    * WITH-VALUE is a POSIX extended regular expression.
 	    */
 
-	    last_expect->with_value = calloc(1, tokenptr - token);
+	    last_expect->with_value = calloc(1, (size_t)(tokenptr - token));
 	    last_expect->with_flags |= _CUPS_WITH_REGEX;
 
 	    if (last_expect->with_value)
@@ -2351,10 +2329,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     TestCount ++;
 
-    request->request.op.version[0]   = version / 10;
-    request->request.op.version[1]   = version % 10;
-    request->request.op.operation_id = op;
-    request->request.op.request_id   = request_id;
+    ippSetVersion(request, version / 10, version % 10);
+    ippSetOperation(request, op);
+    ippSetRequestId(request, request_id);
 
     if (Output == _CUPS_OUTPUT_PLIST)
     {
@@ -2461,7 +2438,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  */
 
 	  while ((bytes = cupsFileRead(reqfile, buffer, sizeof(buffer))) > 0)
-	    length += bytes;
+	    length += (size_t)bytes;
 
 	  cupsFileClose(reqfile);
 	}
@@ -2492,10 +2469,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    if ((reqfile = cupsFileOpen(filename, "r")) != NULL)
 	    {
 	      while (!Cancel &&
-	             (bytes = cupsFileRead(reqfile, buffer,
-	                                   sizeof(buffer))) > 0)
-		if ((status = cupsWriteRequestData(http, buffer,
-						   bytes)) != HTTP_CONTINUE)
+	             (bytes = cupsFileRead(reqfile, buffer, sizeof(buffer))) > 0)
+		if ((status = cupsWriteRequestData(http, buffer, (size_t)bytes)) != HTTP_CONTINUE)
 		  break;
 
 	      cupsFileClose(reqfile);
@@ -3027,7 +3002,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           fflush(stdout);
         }
 
-        sleep(repeat_interval);
+        sleep((unsigned)repeat_interval);
         repeat_interval = _cupsNextDelay(repeat_interval, &repeat_prev);
 
 	if (Output == _CUPS_OUTPUT_TEST)
@@ -3524,7 +3499,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	    if (!_cups_strcasecmp(token, "true"))
 	      ippAddBoolean(col, IPP_TAG_ZERO, attr, 1);
 	    else
-	      ippAddBoolean(col, IPP_TAG_ZERO, attr, atoi(token));
+	      ippAddBoolean(col, IPP_TAG_ZERO, attr, (char)atoi(token));
 	    break;
 
 	case IPP_TAG_INTEGER :
@@ -3550,15 +3525,12 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	      }
 
 	      if (!_cups_strcasecmp(units, "dpi"))
-		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
-		                 IPP_RES_PER_INCH);
+		ippAddResolution(col, IPP_TAG_ZERO, attr, IPP_RES_PER_INCH, xres, yres);
 	      else if (!_cups_strcasecmp(units, "dpc") ||
 	               !_cups_strcasecmp(units, "dpcm"))
-		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
-		                 IPP_RES_PER_CM);
+		ippAddResolution(col, IPP_TAG_ZERO, attr, IPP_RES_PER_CM, xres, yres);
 	      else
-		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
-		                 (ipp_res_t)0);
+		ippAddResolution(col, IPP_TAG_ZERO, attr, (ipp_res_t)0, xres, yres);
 	    }
 	    break;
 
@@ -3608,7 +3580,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	    }
 	    break;
 	case IPP_TAG_STRING :
-	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, strlen(token));
+	    ippAddOctetString(col, IPP_TAG_ZERO, attr, token, (int)strlen(token));
 	    break;
 
 	default :
@@ -3707,7 +3679,7 @@ get_filename(const char *testfile,	/* I - Current test file */
     else
       dstptr = dst; /* Should never happen */
 
-    strlcpy(dstptr, src, dstsize - (dstptr - dst));
+    strlcpy(dstptr, src, dstsize - (size_t)(dstptr - dst));
   }
 
   return (dst);
@@ -3737,30 +3709,24 @@ get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
 
   if (flags & _CUPS_WITH_HOSTNAME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme),
-                        userpass, sizeof(userpass), buffer, bufsize, &port,
-                        resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
-      return ("");
-    else
-      return (buffer);
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+      buffer[0] = '\0';
+
+    return (buffer);
   }
   else if (flags & _CUPS_WITH_RESOURCE)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme),
-                        userpass, sizeof(userpass), hostname, sizeof(hostname),
-                        &port, buffer, bufsize) < HTTP_URI_STATUS_OK)
-      return ("");
-    else
-      return (buffer);
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, buffer, (int)bufsize) < HTTP_URI_STATUS_OK)
+      buffer[0] = '\0';
+
+    return (buffer);
   }
   else if (flags & _CUPS_WITH_SCHEME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, buffer, bufsize,
-                        userpass, sizeof(userpass), hostname, sizeof(hostname),
-                        &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
-      return ("");
-    else
-      return (buffer);
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, buffer, (int)bufsize, userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+      buffer[0] = '\0';
+
+    return (buffer);
   }
   else
     return (ptr);
@@ -3820,15 +3786,15 @@ get_token(FILE *fp,			/* I  - File to read from */
 	  */
 
 	  if (bufptr < bufend)
-	    *bufptr++ = ch;
+	    *bufptr++ = (char)ch;
 
 	  if ((ch = getc(fp)) != EOF && bufptr < bufend)
-	    *bufptr++ = ch;
+	    *bufptr++ = (char)ch;
 	}
 	else if (ch == quote)
           break;
 	else if (bufptr < bufend)
-          *bufptr++ = ch;
+          *bufptr++ = (char)ch;
       }
 
       *bufptr = '\0';
@@ -3862,7 +3828,7 @@ get_token(FILE *fp,			/* I  - File to read from */
 	if (isspace(ch) || ch == '#')
           break;
 	else if (bufptr < bufend)
-          *bufptr++ = ch;
+          *bufptr++ = (char)ch;
 
       if (ch == '#')
         ungetc(ch, fp);
@@ -5187,8 +5153,7 @@ validate_attr(cups_array_t    *errors,	/* I - Errors array */
 			"\"%s\": Bad URI value \"%s\" - %s "
 			"(RFC 2911 section 4.1.5).", attr->name,
 			attr->values[i].string.text,
-			URIStatusStrings[uri_status -
-					 HTTP_URI_OVERFLOW]);
+			httpURIStatusString(uri_status));
 	  }
 
 	  if (strlen(attr->values[i].string.text) > (IPP_MAX_URI - 1))
@@ -5449,7 +5414,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
             if (!*valptr)
 	      break;
 
-	    intvalue = strtol(valptr, &nextptr, 0);
+	    intvalue = (int)strtol(valptr, &nextptr, 0);
 	    if (nextptr == valptr)
 	      break;
 	    valptr = nextptr;
@@ -5459,8 +5424,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
                 (op == '>' && attr->values[i].integer > intvalue))
 	    {
 	      if (!matchbuf[0])
-		snprintf(matchbuf, matchlen, "%d",
-			 attr->values[i].integer);
+		snprintf(matchbuf, matchlen, "%d", attr->values[i].integer);
 
 	      valmatch = 1;
 	      break;
@@ -5515,7 +5479,7 @@ with_value(cups_array_t    *errors,	/* I - Errors array */
             if (!*valptr)
 	      break;
 
-	    intvalue = strtol(valptr, &nextptr, 0);
+	    intvalue = (int)strtol(valptr, &nextptr, 0);
 	    if (nextptr == valptr)
 	      break;
 	    valptr = nextptr;

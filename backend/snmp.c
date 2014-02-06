@@ -1,44 +1,18 @@
 /*
  * "$Id$"
  *
- *   SNMP discovery backend for CUPS.
+ * SNMP discovery backend for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()                    - Discover printers via SNMP.
- *   add_array()               - Add a string to an array.
- *   add_cache()               - Add a cached device...
- *   add_device_uri()          - Add a device URI to the cache.
- *   alarm_handler()           - Handle alarm signals...
- *   compare_cache()           - Compare two cache entries.
- *   debug_printf()            - Display some debugging information.
- *   fix_make_model()          - Fix common problems in the make-and-model
- *                               string.
- *   free_array()              - Free an array of strings.
- *   free_cache()              - Free the array of cached devices.
- *   get_interface_addresses() - Get the broadcast address(es) associated with
- *                               an interface.
- *   list_device()             - List a device we found...
- *   password_cb()             - Handle authentication requests.
- *   probe_device()            - Probe a device to discover whether it is a
- *                               printer.
- *   read_snmp_conf()          - Read the snmp.conf file.
- *   read_snmp_response()      - Read and parse a SNMP response...
- *   run_time()                - Return the total running time...
- *   scan_devices()            - Scan for devices using SNMP.
- *   try_connect()             - Try connecting on a port...
- *   update_cache()            - Update a cached device...
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -753,7 +727,7 @@ probe_device(snmp_cache_t *device)	/* I - Device */
 	    * Insert hostname/address...
 	    */
 
-	    strlcpy(uriptr, device->addrname, sizeof(uri) - (uriptr - uri));
+	    strlcpy(uriptr, device->addrname, sizeof(uri) - (size_t)(uriptr - uri));
 	    uriptr += strlen(uriptr);
 	    format += 2;
 	  }
@@ -1346,7 +1320,7 @@ try_connect(http_addr_t *addr,		/* I - Socket address */
 
   alarm(1);
 
-  status = connect(fd, (void *)addr, httpAddrLength(addr));
+  status = connect(fd, (void *)addr, (socklen_t)httpAddrLength(addr));
 
   close(fd);
   alarm(0);

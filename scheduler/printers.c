@@ -3,7 +3,7 @@
  *
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1089,7 +1089,7 @@ cupsdLoadAllPrinters(void)
     else if (!_cups_strcasecmp(line, "Type"))
     {
       if (value)
-        p->type = atoi(value);
+        p->type = (cups_ptype_t)atoi(value);
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
@@ -1688,7 +1688,7 @@ cupsdSetAuthInfoRequired(
         strcmp(p->auth_info_required[0], "none"))
       p->type |= CUPS_PRINTER_AUTHENTICATED;
     else
-      p->type &= ~CUPS_PRINTER_AUTHENTICATED;
+      p->type &= (cups_ptype_t)~CUPS_PRINTER_AUTHENTICATED;
 
     return (1);
   }
@@ -2070,10 +2070,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     if (auth_type != CUPSD_AUTH_NONE)
       p->type |= CUPS_PRINTER_AUTHENTICATED;
     else
-      p->type &= ~CUPS_PRINTER_AUTHENTICATED;
+      p->type &= (cups_ptype_t)~CUPS_PRINTER_AUTHENTICATED;
   }
   else
-    p->type &= ~CUPS_PRINTER_AUTHENTICATED;
+    p->type &= (cups_ptype_t)~CUPS_PRINTER_AUTHENTICATED;
 
  /*
   * Create the required IPP attributes for a printer...
@@ -2152,7 +2152,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   if (p->type & CUPS_PRINTER_CLASS)
   {
     p->raw = 1;
-    p->type &= ~CUPS_PRINTER_OPTIONS;
+    p->type &= (cups_ptype_t)~CUPS_PRINTER_OPTIONS;
 
    /*
     * Add class-specific attributes...
@@ -2178,7 +2178,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	if (attr != NULL)
 	  attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
 
-	p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
+	p->type &= (cups_ptype_t)~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
       }
     }
   }
@@ -2467,8 +2467,7 @@ cupsdSetPrinterReasons(
 	  _cupsStrFree(p->reasons[i]);
 
 	  if (i < p->num_reasons)
-	    memmove(p->reasons + i, p->reasons + i + 1,
-	            (p->num_reasons - i) * sizeof(char *));
+	    memmove(p->reasons + i, p->reasons + i + 1, (size_t)(p->num_reasons - i) * sizeof(char *));
 
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
@@ -3306,7 +3305,7 @@ add_printer_filter(
   {
     char	*ptr;			/* Pointer into maxsize(nnnn) program */
 
-    maxsize = strtoll(program + 8, &ptr, 10);
+    maxsize = (size_t)strtoll(program + 8, &ptr, 10);
 
     if (*ptr != ')')
     {
@@ -3717,7 +3716,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
 
-  p->type &= ~CUPS_PRINTER_OPTIONS;
+  p->type &= (cups_ptype_t)~CUPS_PRINTER_OPTIONS;
   p->type |= CUPS_PRINTER_BW;
 
   finishings[0]  = IPP_FINISHINGS_NONE;
@@ -3749,8 +3748,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       if (ppd_attr->value && !_cups_strcasecmp(ppd_attr->value, "true"))
 	p->type |= CUPS_PRINTER_FAX;
 
-    ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
-		  ppd->color_device);
+    ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported", (char)ppd->color_device);
 
     if (p->pc && p->pc->charge_info_uri)
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
@@ -3769,7 +3767,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "job-password-encryption-supported", NULL, "none");
       ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                    "job-password-supported", strlen(p->pc->password));
+                    "job-password-supported", (int)strlen(p->pc->password));
     }
 
     if (ppd->throughput)
@@ -4619,22 +4617,16 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       CGContextRef	context;	/* The CG context used for resizing */
 
       snprintf(outPath, sizeof(outPath), "%s/%s.png", CacheDir, p->name);
-      outUrl      = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
-                                                            (UInt8 *)outPath,
-						            strlen(outPath),
-						            FALSE);
-      icnsFileUrl = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
-							    (UInt8 *)ppd_attr->value,
-							    strlen(ppd_attr->value),
-							    FALSE);
+      outUrl      = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (UInt8 *)outPath, (CFIndex)strlen(outPath), FALSE);
+      icnsFileUrl = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (UInt8 *)ppd_attr->value, (CFIndex)strlen(ppd_attr->value), FALSE);
       if (outUrl && icnsFileUrl)
       {
         sourceRef = CGImageSourceCreateWithURL(icnsFileUrl, NULL);
         if (sourceRef)
         {
-          for (i = 0; i < CGImageSourceGetCount(sourceRef); i ++)
+          for (i = 0; i < (int)CGImageSourceGetCount(sourceRef); i ++)
           {
-            imageRef = CGImageSourceCreateImageAtIndex(sourceRef, i, NULL);
+            imageRef = CGImageSourceCreateImageAtIndex(sourceRef, (size_t)i, NULL);
 	    if (!imageRef)
 	      continue;
 
@@ -5006,7 +4998,7 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
     if (*s == '&')
     {
       if (s > start)
-        cupsFileWrite(fp, start, s - start);
+        cupsFileWrite(fp, start, (size_t)(s - start));
 
       cupsFilePuts(fp, "&amp;");
       start = s + 1;
@@ -5014,7 +5006,7 @@ write_xml_string(cups_file_t *fp,	/* I - File to write to */
     else if (*s == '<')
     {
       if (s > start)
-        cupsFileWrite(fp, start, s - start);
+        cupsFileWrite(fp, start, (size_t)(s - start));
 
       cupsFilePuts(fp, "&lt;");
       start = s + 1;

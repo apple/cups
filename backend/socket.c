@@ -3,7 +3,7 @@
  *
  * AppSocket backend for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -41,7 +41,7 @@
  * Local functions...
  */
 
-static int	wait_bc(int device_fd, int secs);
+static ssize_t	wait_bc(int device_fd, int secs);
 
 
 /*
@@ -380,7 +380,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
         }
 
-	sleep(delay);
+	sleep((unsigned)delay);
 
 	if (delay < 30)
 	  delay += 5;
@@ -410,7 +410,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   tbytes = 0;
 
   if (bytes > 0)
-    tbytes += write(device_fd, buffer, bytes);
+    tbytes += write(device_fd, buffer, (size_t)bytes);
 
   while (copies > 0 && tbytes >= 0)
   {
@@ -476,7 +476,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
  * 'wait_bc()' - Wait for back-channel data...
  */
 
-static int				/* O - # bytes read or -1 on error */
+static ssize_t				/* O - # bytes read or -1 on error */
 wait_bc(int device_fd,			/* I - Socket */
         int secs)			/* I - Seconds to wait */
 {
@@ -506,7 +506,7 @@ wait_bc(int device_fd,			/* I - Socket */
     {
       fprintf(stderr, "DEBUG: Received %d bytes of back-channel data\n",
 	      (int)bytes);
-      cupsBackChannelWrite(buffer, bytes, 1.0);
+      cupsBackChannelWrite(buffer, (size_t)bytes, 1.0);
     }
 
     return (bytes);

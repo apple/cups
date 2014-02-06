@@ -1,28 +1,16 @@
 /*
  * "$Id$"
  *
- *   Mini-daemon utility functions for CUPS.
+ * Mini-daemon utility functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2005 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2005 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   cupsdCompareNames()       - Compare two names.
- *   cupsdCreateStringsArray() - Create a CUPS array of strings.
- *   cupsdExec()               - Run a program with the correct environment.
- *   cupsdPipeCommand()        - Read output from a command.
- *   cupsdSendIPPGroup()       - Send a group tag.
- *   cupsdSendIPPHeader()      - Send the IPP response header.
- *   cupsdSendIPPInteger()     - Send an integer attribute.
- *   cupsdSendIPPString()      - Send a string attribute.
- *   cupsdSendIPPTrailer()     - Send the end-of-message tag.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -251,7 +239,7 @@ cups_file_t *				/* O - CUPS file or NULL on error */
 cupsdPipeCommand(int        *pid,	/* O - Process ID or 0 on error */
                  const char *command,	/* I - Command to run */
                  char       **argv,	/* I - Arguments to pass to command */
-		 int        user)	/* I - User to run as or 0 for current */
+		 uid_t      user)	/* I - User to run as or 0 for current */
 {
   int	fd,				/* Temporary file descriptor */
 	fds[2];				/* Pipe file descriptors */
@@ -404,8 +392,8 @@ cupsdSendIPPInteger(
   putchar(value_tag);
 
   len = strlen(name);
-  putchar(len >> 8);
-  putchar(len);
+  putchar((int)(len >> 8));
+  putchar((int)len);
 
   fputs(name, stdout);
 
@@ -441,14 +429,14 @@ cupsdSendIPPString(
   putchar(value_tag);
 
   len = strlen(name);
-  putchar(len >> 8);
-  putchar(len);
+  putchar((int)(len >> 8));
+  putchar((int)len);
 
   fputs(name, stdout);
 
   len = strlen(value);
-  putchar(len >> 8);
-  putchar(len);
+  putchar((int)(len >> 8));
+  putchar((int)len);
 
   fputs(value, stdout);
 }

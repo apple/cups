@@ -1,24 +1,18 @@
 /*
  * "$Id$"
  *
- *   IEEE-1284 support functions for CUPS.
+ * IEEE-1284 support functions for CUPS.
  *
- *   Copyright 2007-2011 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   backendGetDeviceID()  - Get the IEEE-1284 device ID string and
- *                           corresponding URI.
- *   backendGetMakeModel() - Get the make and model string from the device ID.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -372,7 +366,7 @@ int					/* O - 0 on success, -1 on failure */
 backendGetMakeModel(
     const char *device_id,		/* O - 1284 device ID */
     char       *make_model,		/* O - Make/model */
-    int        make_model_size)		/* I - Size of buffer */
+    size_t     make_model_size)		/* I - Size of buffer */
 {
   int		num_values;		/* Number of keys and values */
   cups_option_t	*values;		/* Keys and values */
@@ -381,9 +375,7 @@ backendGetMakeModel(
 		*des;			/* Description string */
 
 
-  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", "
-                "make_model=%p, make_model_size=%d)\n", device_id,
-		make_model, make_model_size));
+  DEBUG_printf(("backendGetMakeModel(device_id=\"%s\", make_model=%p, make_model_size=" CUPS_LLFMT ")\n", device_id, make_model, CUPS_LLCAST make_model_size));
 
  /*
   * Range check input...

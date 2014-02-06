@@ -144,7 +144,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i, j, k, m, n;		/* Looping vars */
-  int		len;			/* Length of option name */
+  size_t	len;			/* Length of option name */
   char		*opt;			/* Option character */
   const char	*ptr;			/* Pointer into string */
   cups_file_t	*fp;			/* PPD file */
@@ -1470,7 +1470,7 @@ main(int  argc,				/* I - Number of command-line args */
 	       k < group->num_options;
 	       k ++, option ++)
 	  {
-	    len = (int)strlen(option->keyword);
+	    len = strlen(option->keyword);
 
 	    for (m = 0, group2 = ppd->groups;
 		 m < ppd->num_groups;
@@ -1479,7 +1479,7 @@ main(int  argc,				/* I - Number of command-line args */
 	           n < group2->num_options;
 		   n ++, option2 ++)
 		if (option != option2 &&
-	            len < (int)strlen(option2->keyword) &&
+	            len < strlen(option2->keyword) &&
 	            !strncmp(option->keyword, option2->keyword, len))
 		{
 		  _cupsLangPrintf(stdout,

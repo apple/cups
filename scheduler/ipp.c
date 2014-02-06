@@ -676,7 +676,7 @@ cupsdProcessIPPRequest(
 	struct stat	fileinfo;	/* File information */
 
 	if (!fstat(con->file, &fileinfo))
-	  length += fileinfo.st_size;
+	  length += (size_t)fileinfo.st_size;
       }
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -1145,9 +1145,9 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
   else
   {
     compressions = (int *)realloc(job->compressions,
-                                  (job->num_files + 1) * sizeof(int));
+                                  (size_t)(job->num_files + 1) * sizeof(int));
     filetypes    = (mime_type_t **)realloc(job->filetypes,
-                                           (job->num_files + 1) *
+                                           (size_t)(job->num_files + 1) *
 					   sizeof(mime_type_t *));
   }
 
@@ -4129,8 +4129,8 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
     */
 
     attrname[2] = '_';
-    attrname[3] = toupper(attrname[3] & 255);
-    attrname[4] = toupper(attrname[4] & 255);
+    attrname[3] = (char)toupper(attrname[3] & 255);
+    attrname[4] = (char)toupper(attrname[4] & 255);
   }
 
   snprintf(filename, sizeof(filename), "%s/banners/%s/%s", DataDir,
@@ -4184,7 +4184,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
         if (!isalpha(ch & 255) && ch != '-' && ch != '?')
           break;
 	else if (s < (attrname + sizeof(attrname) - 1))
-          *s++ = ch;
+          *s++ = (char)ch;
 	else
 	  break;
 
@@ -4375,7 +4375,7 @@ copy_file(const char *from,		/* I - Source file */
   */
 
   while ((bytes = cupsFileRead(src, buffer, sizeof(buffer))) > 0)
-    if (cupsFileWrite(dst, buffer, bytes) < bytes)
+    if (cupsFileWrite(dst, buffer, (size_t)bytes) < bytes)
     {
       cupsFileClose(src);
       cupsFileClose(dst);
@@ -4510,7 +4510,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
       if ((bytes = read(temppipe[0], buffer, sizeof(buffer))) > 0)
       {
-	if (write(tempfd, buffer, bytes) < bytes)
+	if (write(tempfd, buffer, (size_t)bytes) < bytes)
           break;
 
 	total += bytes;
@@ -4881,12 +4881,10 @@ copy_printer_attrs(
   }
 
   if (!ra || cupsArrayFind(ra, "printer-is-accepting-jobs"))
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                  printer->accepting);
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", (char)printer->accepting);
 
   if (!ra || cupsArrayFind(ra, "printer-is-shared"))
-    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
-                  printer->shared);
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared", (char)printer->shared);
 
   if (!ra || cupsArrayFind(ra, "printer-more-info"))
   {
@@ -4919,7 +4917,7 @@ copy_printer_attrs(
 
   if (!ra || cupsArrayFind(ra, "printer-type"))
   {
-    int type;				/* printer-type value */
+    cups_ptype_t type;			/* printer-type value */
 
    /*
     * Add the CUPS-specific printer-type attribute...
@@ -4936,8 +4934,7 @@ copy_printer_attrs(
     if (!printer->shared)
       type |= CUPS_PRINTER_NOT_SHARED;
 
-    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type",
-		  type);
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-type", (int)type);
   }
 
   if (!ra || cupsArrayFind(ra, "printer-up-time"))
@@ -7017,7 +7014,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   int		limit;			/* Max number of printers to return */
   int		count;			/* Number of printers that match */
   cupsd_printer_t *printer;		/* Current printer pointer */
-  int		printer_type,		/* printer-type attribute */
+  cups_ptype_t	printer_type,		/* printer-type attribute */
 		printer_mask;		/* printer-type-mask attribute */
   char		*location;		/* Location string */
   const char	*username;		/* Current user */
@@ -7071,15 +7068,15 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "printer-type",
                                IPP_TAG_ENUM)) != NULL)
-    printer_type = attr->values[0].integer;
+    printer_type = (cups_ptype_t)attr->values[0].integer;
   else
-    printer_type = 0;
+    printer_type = (cups_ptype_t)0;
 
   if ((attr = ippFindAttribute(con->request, "printer-type-mask",
                                IPP_TAG_ENUM)) != NULL)
-    printer_mask = attr->values[0].integer;
+    printer_mask = (cups_ptype_t)attr->values[0].integer;
   else
-    printer_mask = 0;
+    printer_mask = (cups_ptype_t)0;
 
   local = httpAddrLocalhost(&(con->clientaddr));
 
@@ -8985,8 +8982,7 @@ save_auth_info(
     {
       if (strcmp(dest->auth_info_required[i], "negotiate"))
       {
-	httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text,
-		       strlen(auth_info->values[i].string.text));
+	httpEncode64_2(line, sizeof(line), auth_info->values[i].string.text, (int)strlen(auth_info->values[i].string.text));
 	cupsFilePutConf(fp, dest->auth_info_required[i], line);
       }
       else
@@ -9017,15 +9013,13 @@ save_auth_info(
     * Allow fallback to username+password for Kerberized queues...
     */
 
-    httpEncode64_2(line, sizeof(line), auth_info->values[0].string.text,
-                   strlen(auth_info->values[0].string.text));
+    httpEncode64_2(line, sizeof(line), auth_info->values[0].string.text, (int)strlen(auth_info->values[0].string.text));
     cupsFilePutConf(fp, "username", line);
 
     cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s",
                     auth_info->values[0].string.text);
 
-    httpEncode64_2(line, sizeof(line), auth_info->values[1].string.text,
-                   strlen(auth_info->values[1].string.text));
+    httpEncode64_2(line, sizeof(line), auth_info->values[1].string.text, (int)strlen(auth_info->values[1].string.text));
     cupsFilePutConf(fp, "password", line);
 
     cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s",
@@ -9037,7 +9031,7 @@ save_auth_info(
     * Write the authenticated username...
     */
 
-    httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
+    httpEncode64_2(line, sizeof(line), con->username, (int)strlen(con->username));
     cupsFilePutConf(fp, "username", line);
 
     cupsdSetStringf(job->auth_env + 0, "AUTH_USERNAME=%s", con->username);
@@ -9046,7 +9040,7 @@ save_auth_info(
     * Write the authenticated password...
     */
 
-    httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
+    httpEncode64_2(line, sizeof(line), con->password, (int)strlen(con->password));
     cupsFilePutConf(fp, "password", line);
 
     cupsdSetStringf(job->auth_env + 1, "AUTH_PASSWORD=%s", con->password);
@@ -9915,9 +9909,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
 			    attr->values[0].integer);
-                cupsdSetJobState(job, attr->values[0].integer,
-		                 CUPSD_JOB_DEFAULT,
-				 "Job state changed by \"%s\"", username);
+                cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer, CUPSD_JOB_DEFAULT, "Job state changed by \"%s\"", username);
 		check_jobs = 1;
 	      }
 	      break;
@@ -10163,7 +10155,7 @@ set_printer_defaults(
 {
   int			i;		/* Looping var */
   ipp_attribute_t 	*attr;		/* Current attribute */
-  int			namelen;	/* Length of attribute name */
+  size_t		namelen;	/* Length of attribute name */
   char			name[256],	/* New attribute name */
 			value[256];	/* String version of integer attrs */
 

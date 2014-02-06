@@ -47,7 +47,8 @@ typedef enum
   CUPSD_VARTYPE_TIME,			/* Time interval option */
   CUPSD_VARTYPE_STRING,			/* String option */
   CUPSD_VARTYPE_BOOLEAN,		/* Boolean option */
-  CUPSD_VARTYPE_PATHNAME		/* File/directory name option */
+  CUPSD_VARTYPE_PATHNAME,		/* File/directory name option */
+  CUPSD_VARTYPE_PERM			/* File/directory permissions */
 } cupsd_vartype_t;
 
 typedef struct
@@ -129,13 +130,13 @@ static const cupsd_var_t	cupsfiles_vars[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "CacheDir",			&CacheDir,		CUPSD_VARTYPE_STRING },
-  { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_INTEGER },
+  { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_PERM },
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
   { "FileDevice",		&FileDevice,		CUPSD_VARTYPE_BOOLEAN },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-  { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
+  { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_PERM },
   { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
@@ -224,9 +225,9 @@ int					/* O - 0 on success, -1 on error, 1 on warning */
 cupsdCheckPermissions(
     const char *filename,		/* I - File/directory name */
     const char *suffix,			/* I - Additional file/directory name */
-    int        mode,			/* I - Permissions */
-    int        user,			/* I - Owner */
-    int        group,			/* I - Group */
+    mode_t     mode,			/* I - Permissions */
+    uid_t      user,			/* I - Owner */
+    gid_t      group,			/* I - Group */
     int        is_dir,			/* I - 1 = directory, 0 = file */
     int        create_dir)		/* I - 1 = create directory, -1 = create w/o logging, 0 = not */
 {
@@ -1502,7 +1503,7 @@ cupsdReadConfiguration(void)
     if (!mimeType(MimeDatabase, "application", "octet-stream"))
       NumMimeTypes ++;
 
-    if ((MimeTypes = calloc(NumMimeTypes, sizeof(const char *))) == NULL)
+    if ((MimeTypes = calloc((size_t)NumMimeTypes, sizeof(const char *))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate memory for %d MIME types.",
@@ -2677,6 +2678,41 @@ parse_variable(
 	}
 	break;
 
+    case CUPSD_VARTYPE_PERM :
+	if (!value)
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Missing permissions value for %s on line %d of %s.",
+			  line, linenum, filename);
+          return (0);
+	}
+	else if (!isdigit(*value & 255))
+	{
+	 /* TODO: Add chmod UGO syntax support */
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Bad permissions value for %s on line %d of %s.",
+			  line, linenum, filename);
+          return (0);
+	}
+	else
+	{
+	  int n = strtol(value, NULL, 8);
+					/* Permissions value */
+
+	  if (n < 0)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+			    "Bad negative permissions value for %s on line %d of "
+			    "%s.", line, linenum, filename);
+	    return (0);
+	  }
+	  else
+	  {
+	    *((mode_t *)var->ptr) = (mode_t)n;
+	  }
+	}
+	break;
+
     case CUPSD_VARTYPE_TIME :
 	if (!value)
 	{
@@ -3344,7 +3380,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       */
 
       if (isdigit(value[0]))
-        Group = atoi(value);
+        Group = (gid_t)atoi(value);
       else
       {
         endgrent();
@@ -3419,7 +3455,7 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
             return (0);
         }
         else
-	  User = atoi(value);
+	  User = (uid_t)atoi(value);
       }
       else
       {

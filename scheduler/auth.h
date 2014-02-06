@@ -3,7 +3,7 @@
  *
  * Authorization definitions for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -74,7 +74,7 @@ typedef struct
 
 typedef struct
 {
-  int		length;			/* Length of name */
+  size_t	length;			/* Length of name */
   char		*name;			/* Name string */
 } cupsd_namemask_t;
 
@@ -91,9 +91,9 @@ typedef struct
 typedef struct
 {
   char			*location;	/* Location of resource */
+  size_t		length;		/* Length of location string */
   ipp_op_t		op;		/* IPP operation */
   int			limit,		/* Limit for these types of requests */
-			length,		/* Length of location string */
 			order_type,	/* Allow or Deny */
 			type,		/* Type of authentication */
 			level,		/* Access level required */
@@ -130,10 +130,8 @@ extern void		cupsdAddLocation(cupsd_location_t *loc);
 extern void		cupsdAddName(cupsd_location_t *loc, char *name);
 extern int		cupsdAddNameMask(cups_array_t **masks, char *name);
 extern void		cupsdAuthorize(cupsd_client_t *con);
-extern int		cupsdCheckAccess(unsigned ip[4], const char *name,
-			                 int namelen, cupsd_location_t *loc);
-extern int		cupsdCheckAuth(unsigned ip[4], const char *name, int namelen,
-				       cups_array_t *masks);
+extern int		cupsdCheckAccess(unsigned ip[4], const char *name, size_t namelen, cupsd_location_t *loc);
+extern int		cupsdCheckAuth(unsigned ip[4], const char *name, size_t namelen, cups_array_t *masks);
 extern int		cupsdCheckGroup(const char *username,
 			                struct passwd *user,
 			                const char *groupname);

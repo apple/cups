@@ -3,7 +3,7 @@
  *
  * HTTP address routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -137,8 +137,7 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
 #endif /* AF_INET6 */
 #ifdef AF_LOCAL
   if (addr->addr.sa_family == AF_LOCAL)
-    return (offsetof(struct sockaddr_un, sun_path) +
-            strlen(addr->un.sun_path) + 1);
+    return ((int)(offsetof(struct sockaddr_un, sun_path) + strlen(addr->un.sun_path) + 1));
   else
 #endif /* AF_LOCAL */
   if (addr->addr.sa_family == AF_INET)
@@ -216,7 +215,7 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
     * Bind the domain socket...
     */
 
-    status = bind(fd, (struct sockaddr *)addr, httpAddrLength(addr));
+    status = bind(fd, (struct sockaddr *)addr, (socklen_t)httpAddrLength(addr));
 
    /*
     * Restore the umask and fix permissions...
@@ -230,7 +229,7 @@ httpAddrListen(http_addr_t *addr,	/* I - Address to bind to */
   {
     _httpAddrSetPort(addr, port);
 
-    status = bind(fd, (struct sockaddr *)addr, httpAddrLength(addr));
+    status = bind(fd, (struct sockaddr *)addr, (socklen_t)httpAddrLength(addr));
   }
 
   if (status)
@@ -388,8 +387,7 @@ httpAddrLookup(
     * do...
     */
 
-    int error = getnameinfo(&addr->addr, httpAddrLength(addr), name, namelen,
-		            NULL, 0, 0);
+    int error = getnameinfo(&addr->addr, (socklen_t)httpAddrLength(addr), name, (socklen_t)namelen, NULL, 0, 0);
 
     if (error)
     {
@@ -544,8 +542,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 		temps[64];		/* Temporary string for address */
 
 #  ifdef HAVE_GETNAMEINFO
-    if (getnameinfo(&addr->addr, httpAddrLength(addr), temps, sizeof(temps),
-                    NULL, 0, NI_NUMERICHOST))
+    if (getnameinfo(&addr->addr, (socklen_t)httpAddrLength(addr), temps, sizeof(temps), NULL, 0, NI_NUMERICHOST))
     {
      /*
       * If we get an error back, then the address type is not supported
@@ -720,7 +717,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     cg->hostent.h_name      = (char *)name;
     cg->hostent.h_aliases   = NULL;
     cg->hostent.h_addrtype  = AF_LOCAL;
-    cg->hostent.h_length    = strlen(name) + 1;
+    cg->hostent.h_length    = (int)strlen(name) + 1;
     cg->hostent.h_addr_list = cg->ip_ptrs;
     cg->ip_ptrs[0]          = (char *)name;
     cg->ip_ptrs[1]          = NULL;
@@ -820,7 +817,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
     if (!s || slen <= 1)
       return (NULL);
 
-    if (gethostname(s, slen) < 0)
+    if (gethostname(s, (size_t)slen) < 0)
       strlcpy(s, "localhost", slen);
 
     if (!strchr(s, '.'))

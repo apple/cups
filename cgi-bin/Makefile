@@ -3,7 +3,7 @@
 #
 # CGI makefile for CUPS.
 #
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -42,8 +42,7 @@ CGIS	=	\
 		printers.cgi
 LIBTARGETS =	\
 		libcupscgi.a \
-		$(LIBCUPSCGI) \
-		websearch
+		$(LIBCUPSCGI)
 
 UNITTARGETS =	\
 		testcgi \
@@ -345,17 +344,6 @@ testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
 		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
-
-
-#
-# websearch
-#
-
-websearch:	websearch.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
-	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ websearch.o libcupscgi.a \
-		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
-		$(LIBZ) $(LIBGSSAPI)
 
 
 #

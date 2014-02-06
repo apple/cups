@@ -84,7 +84,7 @@ static int	lpd_queue(const char *hostname, http_addrlist_t *addrlist,
 			  int copies, int banner, int format, int order,
 			  int reserve, int manual_copies, int timeout,
 			  int contimeout, const char *orighost);
-static int	lpd_write(int lpd_fd, char *buffer, int length);
+static ssize_t	lpd_write(int lpd_fd, char *buffer, size_t length);
 #ifndef HAVE_RRESVPORT_AF
 static int	rresvport_af(int *port, int family);
 #endif /* !HAVE_RRESVPORT_AF */
@@ -472,7 +472,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
 
     if (bytes > 0)
-      write(fd, buffer, bytes);
+      write(fd, buffer, (size_t)bytes);
 
     backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
 		   backendNetworkSideCB);
@@ -583,7 +583,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 {
   va_list	ap;		/* Argument pointer */
   char		buf[1024];	/* Output buffer */
-  int		bytes;		/* Number of bytes to output */
+  ssize_t	bytes;		/* Number of bytes to output */
   char		status;		/* Status from command */
 
 
@@ -608,9 +608,9 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   * Send the command...
   */
 
-  fprintf(stderr, "DEBUG: Sending command string (%d bytes)...\n", bytes);
+  fprintf(stderr, "DEBUG: Sending command string (" CUPS_LLFMT " bytes)...\n", CUPS_LLCAST bytes);
 
-  if (lpd_write(fd, buf, bytes) < bytes)
+  if (lpd_write(fd, buf, (size_t)bytes) < bytes)
   {
     perror("DEBUG: Unable to send LPD command");
     return (-1);
@@ -625,7 +625,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   if (recv(fd, &status, 1, 0) < 1)
   {
     _cupsLangPrintFilter(stderr, "WARNING", _("The printer did not respond."));
-    status = errno;
+    status = (char)errno;
   }
 
   fprintf(stderr, "DEBUG: lpd_command returning %d\n", status);
@@ -671,7 +671,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
   int			have_supplies;	/* Printer supports supply levels? */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
-  size_t		nbytes;		/* Number of bytes written */
+  ssize_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
   char			buffer[32768];	/* Output buffer */
 #ifdef WIN32
@@ -773,7 +773,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	return (CUPS_BACKEND_FAILED);
       }
 
-      if (!connect(fd, &(addr->addr.addr), httpAddrLength(&(addr->addr))))
+      if (!connect(fd, &(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr))))
 	break;
 
       error = errno;
@@ -837,7 +837,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	      break;
         }
 
-	sleep(delay);
+	sleep((unsigned)delay);
 
 	if (delay < 30)
 	  delay += 5;
@@ -958,7 +958,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 
     if (banner)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control),
+      snprintf(cptr, sizeof(control) - (size_t)(cptr - control),
                "C%.31s\n"	/* RFC 1179, Section 7.2 - class name <= 31 chars */
 	       "L%s\n",
                localhost, user);
@@ -967,13 +967,13 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 
     while (copies > 0)
     {
-      snprintf(cptr, sizeof(control) - (cptr - control), "%cdfA%03d%.15s\n",
+      snprintf(cptr, sizeof(control) - (size_t)(cptr - control), "%cdfA%03d%.15s\n",
                format, (int)getpid() % 1000, localhost);
       cptr   += strlen(cptr);
       copies --;
     }
 
-    snprintf(cptr, sizeof(control) - (cptr - control),
+    snprintf(cptr, sizeof(control) - (size_t)(cptr - control),
              "UdfA%03d%.15s\n"
 	     "N%.131s\n",	/* RFC 1179, Section 7.2 - sourcefile name <= 131 chars */
              (int)getpid() % 1000, localhost, title);
@@ -1003,9 +1003,9 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       fprintf(stderr, "DEBUG: Sending control file (%u bytes)\n",
 	      (unsigned)strlen(control));
 
-      if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+      if ((size_t)lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
-	status = errno;
+	status = (char)errno;
 	perror("DEBUG: Unable to write control file");
 
       }
@@ -1015,7 +1015,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	{
 	  _cupsLangPrintFilter(stderr, "WARNING",
 	                       _("The printer did not respond."));
-	  status = errno;
+	  status = (char)errno;
 	}
       }
 
@@ -1065,7 +1065,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 			       _("Spooling job, %.0f%% complete."),
 			       100.0 * tbytes / filestats.st_size);
 
-	  if (lpd_write(fd, buffer, nbytes) < nbytes)
+	  if (lpd_write(fd, buffer, (size_t)nbytes) < nbytes)
 	  {
 	    perror("DEBUG: Unable to send print file to printer");
             break;
@@ -1078,11 +1078,11 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       if (mode == MODE_STANDARD)
       {
 	if (tbytes < filestats.st_size)
-	  status = errno;
+	  status = (char)errno;
 	else if (lpd_write(fd, "", 1) < 1)
 	{
 	  perror("DEBUG: Unable to send trailing nul to printer");
-	  status = errno;
+	  status = (char)errno;
 	}
 	else
 	{
@@ -1136,9 +1136,9 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
       fprintf(stderr, "DEBUG: Sending control file (%lu bytes)\n",
 	      (unsigned long)strlen(control));
 
-      if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
+      if ((size_t)lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
-	status = errno;
+	status = (char)errno;
 	perror("DEBUG: Unable to write control file");
       }
       else
@@ -1147,7 +1147,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	{
 	  _cupsLangPrintFilter(stderr, "WARNING",
 			       _("The printer did not respond."));
-	  status = errno;
+	  status = (char)errno;
 	}
       }
 
@@ -1197,32 +1197,32 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
  * 'lpd_write()' - Write a buffer of data to an LPD server.
  */
 
-static int				/* O - Number of bytes written or -1 on error */
-lpd_write(int  lpd_fd,			/* I - LPD socket */
-          char *buffer,			/* I - Buffer to write */
-	  int  length)			/* I - Number of bytes to write */
+static ssize_t				/* O - Number of bytes written or -1 on error */
+lpd_write(int     lpd_fd,		/* I - LPD socket */
+          char    *buffer,		/* I - Buffer to write */
+	  size_t  length)		/* I - Number of bytes to write */
 {
-  int	bytes,				/* Number of bytes written */
-	total;				/* Total number of bytes written */
+  ssize_t	bytes,			/* Number of bytes written */
+		total;			/* Total number of bytes written */
 
 
   if (abort_job)
     return (-1);
 
   total = 0;
-  while ((bytes = send(lpd_fd, buffer, length - total, 0)) >= 0)
+  while ((bytes = send(lpd_fd, buffer, length - (size_t)total, 0)) >= 0)
   {
     total  += bytes;
     buffer += bytes;
 
-    if (total == length)
+    if ((size_t)total == length)
       break;
   }
 
   if (bytes < 0)
     return (-1);
   else
-    return (length);
+    return (total);
 }
 
 

@@ -3,7 +3,7 @@
  *
  * Common run loop APIs for CUPS backends.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -102,7 +102,7 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
     for (print_ptr = print_buffer; print_bytes > 0;)
     {
-      if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+      if ((bytes = write(device_fd, print_ptr, (size_t)print_bytes)) < 0)
       {
        /*
         * Write error - bail if we don't see an error we can retry...
@@ -282,7 +282,7 @@ backendRunLoop(
 	fprintf(stderr,
 	        "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data\n",
 	        CUPS_LLCAST bc_bytes);
-        cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
+        cupsBackChannelWrite(bc_buffer, (size_t)bc_bytes, 1.0);
       }
       else if (bc_bytes < 0 && errno != EAGAIN && errno != EINTR)
       {
@@ -339,7 +339,7 @@ backendRunLoop(
 
     if (print_bytes && FD_ISSET(device_fd, &output))
     {
-      if ((bytes = write(device_fd, print_ptr, print_bytes)) < 0)
+      if ((bytes = write(device_fd, print_ptr, (size_t)print_bytes)) < 0)
       {
        /*
         * Write error - bail if we don't see an error we can retry...

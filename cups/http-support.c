@@ -3,7 +3,7 @@
  *
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -472,7 +472,7 @@ httpAssembleURIf(
   bytes = vsnprintf(resource, sizeof(resource), resourcef, ap);
   va_end(ap);
 
-  if (bytes >= sizeof(resource))
+  if ((size_t)bytes >= sizeof(resource))
   {
     *uri = '\0';
     return (HTTP_URI_STATUS_OVERFLOW);
@@ -520,7 +520,7 @@ httpAssembleUUID(const char *server,	/* I - Server name */
 	   (unsigned)CUPS_RAND() & 0xffff, (unsigned)CUPS_RAND() & 0xffff);
 
   _cupsMD5Init(&md5state);
-  _cupsMD5Append(&md5state, (unsigned char *)data, strlen(data));
+  _cupsMD5Append(&md5state, (unsigned char *)data, (int)strlen(data));
   _cupsMD5Finish(&md5state, md5sum);
 
  /*
@@ -576,10 +576,10 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 	       int        *outlen,	/* IO - Size of output string */
                const char *in)		/* I  - String to read from */
 {
-  int	pos,				/* Bit position */
-	base64;				/* Value of this character */
-  char	*outptr,			/* Output pointer */
-	*outend;			/* End of output buffer */
+  int		pos;			/* Bit position */
+  unsigned	base64;			/* Value of this character */
+  char		*outptr,		/* Output pointer */
+		*outend;		/* End of output buffer */
 
 
  /*
@@ -608,11 +608,11 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
     */
 
     if (*in >= 'A' && *in <= 'Z')
-      base64 = *in - 'A';
+      base64 = (unsigned)(*in - 'A');
     else if (*in >= 'a' && *in <= 'z')
-      base64 = *in - 'a' + 26;
+      base64 = (unsigned)(*in - 'a' + 26);
     else if (*in >= '0' && *in <= '9')
-      base64 = *in - '0' + 52;
+      base64 = (unsigned)(*in - '0' + 52);
     else if (*in == '+')
       base64 = 62;
     else if (*in == '/')
@@ -630,21 +630,21 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
     {
       case 0 :
           if (outptr < outend)
-            *outptr = base64 << 2;
+            *outptr = (char)(base64 << 2);
 	  pos ++;
 	  break;
       case 1 :
           if (outptr < outend)
-            *outptr++ |= (base64 >> 4) & 3;
+            *outptr++ |= (char)((base64 >> 4) & 3);
           if (outptr < outend)
-	    *outptr = (base64 << 4) & 255;
+	    *outptr = (char)((base64 << 4) & 255);
 	  pos ++;
 	  break;
       case 2 :
           if (outptr < outend)
-            *outptr++ |= (base64 >> 2) & 15;
+            *outptr++ |= (char)((base64 >> 2) & 15);
           if (outptr < outend)
-	    *outptr = (base64 << 6) & 255;
+	    *outptr = (char)((base64 << 6) & 255);
 	  pos ++;
 	  break;
       case 3 :
@@ -1234,7 +1234,7 @@ httpSeparateURI(
         return (HTTP_URI_STATUS_BAD_PORT);
       }
 
-      *port = strtol(uri + 1, (char **)&uri, 10);
+      *port = (int)strtol(uri + 1, (char **)&uri, 10);
 
       if (*uri != '/' && *uri)
       {
@@ -1433,6 +1433,70 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
   return (_httpStatus(cg->lang_default, status));
 }
 
+/*
+ * 'httpURIStatusString()' - Return a string describing a URI status code.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - Localized status string */
+httpURIStatusString(
+    http_uri_status_t status)		/* I - URI status code */
+{
+  const char	*s;			/* Status string */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+  switch (status)
+  {
+    case HTTP_URI_STATUS_OVERFLOW :
+	s = _("URI too large");
+	break;
+    case HTTP_URI_STATUS_BAD_ARGUMENTS :
+	s = _("Bad arguments to function");
+	break;
+    case HTTP_URI_STATUS_BAD_RESOURCE :
+	s = _("Bad resource in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_PORT :
+	s = _("Bad port number in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_HOSTNAME :
+	s = _("Bad hostname/address in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_USERNAME :
+	s = _("Bad username in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_SCHEME :
+	s = _("Bad scheme in URI");
+	break;
+    case HTTP_URI_STATUS_BAD_URI :
+	s = _("Bad/empty URI");
+	break;
+    case HTTP_URI_STATUS_OK :
+	s = _("OK");
+	break;
+    case HTTP_URI_STATUS_MISSING_SCHEME :
+	s = _("Missing scheme in URI");
+	break;
+    case HTTP_URI_STATUS_UNKNOWN_SCHEME :
+	s = _("Unknown scheme in URI");
+	break;
+    case HTTP_URI_STATUS_MISSING_RESOURCE :
+	s = _("Missing resource in URI");
+	break;
+
+    default:
+        s = _("Unknown");
+	break;
+  }
+
+  return (_cupsLangString(cg->lang_default, s));
+}
+
 
 #ifndef HAVE_HSTRERROR
 /*
@@ -1559,7 +1623,7 @@ _httpResolveURI(
 #      pragma comment(lib, "dnssd.lib")
 #    endif /* WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
-			domainref,	/* DNS-SD service reference for domain */
+			domainref = NULL,/* DNS-SD service reference for domain */
 			localref;	/* DNS-SD service reference for .local */
     int			domainsent = 0;	/* Send the domain resolve? */
 #    ifdef HAVE_POLL
@@ -1638,7 +1702,7 @@ _httpResolveURI(
 #  ifdef HAVE_DNSSD
     if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
-      int myinterface = kDNSServiceInterfaceIndexAny;
+      uint32_t myinterface = kDNSServiceInterfaceIndexAny;
 					/* Lookup on any interface */
 
       if (!strcmp(scheme, "ippusb"))
@@ -1678,7 +1742,7 @@ _httpResolveURI(
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
-	  fds = poll(&polldata, 1, 1000 * timeout);
+	  fds = poll(&polldata, 1, (int)(1000 * timeout));
 
 #    else /* select() */
 	  FD_ZERO(&input_set);
@@ -1943,7 +2007,7 @@ http_copy_decode(char       *dst,	/* O - Destination buffer */
 	  else
 	    quoted |= *src - '0';
 
-          *ptr++ = quoted;
+          *ptr++ = (char)quoted;
 	}
 	else
 	{
@@ -2171,9 +2235,7 @@ http_resolve_cb(
     {
       for (addr = addrlist; addr; addr = addr->next)
       {
-        int error = getnameinfo(&(addr->addr.addr),
-	                        httpAddrLength(&(addr->addr)),
-			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+        int error = getnameinfo(&(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr)), fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
 
         if (!error)
 	{
@@ -2204,12 +2266,9 @@ http_resolve_cb(
 
   if ((!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps")) &&
       !strcmp(uribuf->resource, "/cups"))
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
-                     scheme, NULL, hostTarget, ntohs(port), "%s?snmp=false",
-                     resource);
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, ntohs(port), "%s?snmp=false", resource);
   else
-    httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize,
-                    scheme, NULL, hostTarget, ntohs(port), resource);
+    httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, ntohs(port), resource);
 
   DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }

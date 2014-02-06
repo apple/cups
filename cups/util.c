@@ -1,54 +1,18 @@
 /*
  * "$Id$"
  *
- *   Printing utilities for CUPS.
+ * Printing utilities for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsCancelJob()        - Cancel a print job on the default server.
- *   cupsCancelJob2()       - Cancel or purge a print job.
- *   cupsCreateJob()        - Create an empty job for streaming.
- *   cupsFinishDocument()   - Finish sending a document.
- *   cupsFreeJobs()         - Free memory used by job data.
- *   cupsGetClasses()       - Get a list of printer classes from the default
- *                            server.
- *   cupsGetDefault()       - Get the default printer or class for the default
- *                            server.
- *   cupsGetDefault2()      - Get the default printer or class for the specified
- *                            server.
- *   cupsGetJobs()          - Get the jobs from the default server.
- *   cupsGetJobs2()         - Get the jobs from the specified server.
- *   cupsGetPPD()           - Get the PPD file for a printer on the default
- *                            server.
- *   cupsGetPPD2()          - Get the PPD file for a printer from the specified
- *                            server.
- *   cupsGetPPD3()          - Get the PPD file for a printer on the specified
- *                            server if it has changed.
- *   cupsGetPrinters()      - Get a list of printers from the default server.
- *   cupsGetServerPPD()     - Get an available PPD file from the server.
- *   cupsPrintFile()        - Print a file to a printer or class on the default
- *                            server.
- *   cupsPrintFile2()       - Print a file to a printer or class on the
- *                            specified server.
- *   cupsPrintFiles()       - Print one or more files to a printer or class on
- *                            the default server.
- *   cupsPrintFiles2()      - Print one or more files to a printer or class on
- *                            the specified server.
- *   cupsStartDocument()    - Add a document to a job created with
- *                            cupsCreateJob().
- *   cups_get_printer_uri() - Get the printer-uri-supported attribute for the
- *                            first printer in a class.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -382,7 +346,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
         if (n == 0)
 	  temp = malloc(sizeof(char *));
 	else
-	  temp = realloc(*classes, sizeof(char *) * (n + 1));
+	  temp = realloc(*classes, sizeof(char *) * (size_t)(n + 1));
 
 	if (temp == NULL)
 	{
@@ -748,7 +712,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
       if (n == 0)
         temp = malloc(sizeof(cups_job_t));
       else
-	temp = realloc(*jobs, sizeof(cups_job_t) * (n + 1));
+	temp = realloc(*jobs, sizeof(cups_job_t) * (size_t)(n + 1));
 
       if (!temp)
       {
@@ -1242,7 +1206,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
         if (n == 0)
 	  temp = malloc(sizeof(char *));
 	else
-	  temp = realloc(*printers, sizeof(char *) * (n + 1));
+	  temp = realloc(*printers, sizeof(char *) * (size_t)(n + 1));
 
 	if (temp == NULL)
 	{
@@ -1510,7 +1474,7 @@ cupsPrintFiles2(
 
     while (status == HTTP_STATUS_CONTINUE &&
 	   (bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
-      status = cupsWriteRequestData(http, buffer, bytes);
+      status = cupsWriteRequestData(http, buffer, (size_t)bytes);
 
     cupsFileClose(fp);
 
@@ -1601,7 +1565,7 @@ cupsStartDocument(
   if (format)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
                  "document-format", NULL, format);
-  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", last_document);
+  ippAddBoolean(request, IPP_TAG_OPERATION, "last-document", (char)last_document);
 
  /*
   * Send and delete the request, then return the status...

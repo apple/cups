@@ -1,29 +1,18 @@
 /*
  * "$Id$"
  *
- *   Administration utility API definitions for CUPS.
+ * Administration utility API definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2001-2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2001-2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsAdminCreateWindowsPPD()  - Create the Windows PPD file for a printer.
- *   cupsAdminExportSamba()       - Export a printer to Samba.
- *   cupsAdminGetServerSettings() - Get settings from the server.
- *   cupsAdminSetServerSettings() - Set settings on the server.
- *   do_samba_command()           - Do a SAMBA command.
- *   get_cupsd_conf()             - Get the current cupsd.conf file.
- *   invalidate_cupsd_cache()     - Invalidate the cached cupsd.conf settings.
- *   write_option()               - Write a CUPS option to a PPD file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -319,7 +308,7 @@ cupsAdminCreateWindowsPPD(
 	}
       }
 
-      snprintf(ptr + 1, sizeof(line) - (ptr - line + 1),
+      snprintf(ptr + 1, sizeof(line) - (size_t)(ptr - line + 1),
                "%%cupsJobTicket: %s=%s\n\"\n*End", option, choice);
 
       cupsFilePrintf(dstfp, "*%% Changed for CUPS Windows Driver...\n%s\n",

@@ -344,7 +344,7 @@ main(int  argc,				// I - Number of command-line arguments
 	  for (j = 0;
 	       outname[j] && j < (int)(sizeof(pcfilename) - 1);
 	       j ++)
-	    pcfilename[j] = tolower(outname[j] & 255);
+	    pcfilename[j] = (char)tolower(outname[j] & 255);
 
 	  pcfilename[j] = '\0';
 	}

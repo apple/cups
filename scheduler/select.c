@@ -3,7 +3,7 @@
  *
  * Select abstraction functions for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2006-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -814,7 +814,7 @@ cupsdStartSelect(void)
 #elif defined(HAVE_KQUEUE)
   cupsd_kqueue_fd      = kqueue();
   cupsd_kqueue_changes = 0;
-  cupsd_kqueue_events  = calloc(MaxFDs, sizeof(struct kevent));
+  cupsd_kqueue_events  = calloc((size_t)MaxFDs, sizeof(struct kevent));
 
 #elif defined(HAVE_POLL)
   cupsd_update_pollfds = 0;

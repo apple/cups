@@ -3,7 +3,7 @@
  *
  * HTTP address list routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -178,8 +178,7 @@ httpAddrConnect2(
     * Then connect...
     */
 
-    if (!connect(*sock, &(addrlist->addr.addr),
-                 httpAddrLength(&(addrlist->addr))))
+    if (!connect(*sock, &(addrlist->addr.addr), (socklen_t)httpAddrLength(&(addrlist->addr))))
     {
       DEBUG_printf(("1httpAddrConnect2: Connected to %s:%d...",
 		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),

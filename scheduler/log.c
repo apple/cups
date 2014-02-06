@@ -3,7 +3,7 @@
  *
  * Log file routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -28,7 +28,7 @@
 
 static _cups_mutex_t log_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for logging */
-static int	log_linesize = 0;	/* Size of line for output file */
+static size_t	log_linesize = 0;	/* Size of line for output file */
 static char	*log_line = NULL;	/* Line for output file */
 
 #ifdef HAVE_VSYSLOG
@@ -114,7 +114,7 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 	  * Insert the server name...
 	  */
 
-	  strlcpy(ptr, ServerName, sizeof(filename) - (ptr - filename));
+	  strlcpy(ptr, ServerName, sizeof(filename) - (size_t)(ptr - filename));
 	  ptr += strlen(ptr);
 	}
         else
@@ -155,15 +155,14 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
 	* the log file permissions as a basis...
 	*/
 
-        int log_dir_perm = 0300 | LogFilePerm;
+        mode_t log_dir_perm = (mode_t)(0300 | LogFilePerm);
 					/* LogFilePerm + owner write/search */
 	if (log_dir_perm & 0040)
 	  log_dir_perm |= 0010;		/* Add group search */
 	if (log_dir_perm & 0004)
 	  log_dir_perm |= 0001;		/* Add other search */
 
-        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group,
-	                      1, -1);
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group, 1, -1);
 
         *lf = cupsFileOpen(filename, "a");
       }
@@ -372,8 +371,8 @@ cupsdLogFCMessage(
 int					/* O - 1 on success, 0 on error */
 cupsdLogGSSMessage(
     int        level,			/* I - Log level */
-    int	       major_status,		/* I - Major GSSAPI status */
-    int	       minor_status, 		/* I - Minor GSSAPI status */
+    OM_uint32  major_status,		/* I - Major GSSAPI status */
+    OM_uint32  minor_status, 		/* I - Minor GSSAPI status */
     const char *message,		/* I - printf-style message string */
     ...)				/* I - Additional args as needed */
 {
@@ -687,41 +686,37 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	    break;
 
         case 'p' :			/* Printer name */
-	    strlcpy(bufptr, job->printer->name,
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, job->printer->name, sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'j' :			/* Job ID */
-	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", job->id);
+	    snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", job->id);
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'u' :			/* Username */
-	    strlcpy(bufptr, job->username ? job->username : "-",
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, job->username ? job->username : "-", sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'T' :			/* Date and time */
-	    strlcpy(bufptr, cupsdGetDateTime(NULL, LogTimeFormat),
-	            sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, cupsdGetDateTime(NULL, LogTimeFormat), sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'P' :			/* Page number */
-	    strlcpy(bufptr, number, sizeof(buffer) - (bufptr - buffer));
+	    strlcpy(bufptr, number, sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
         case 'C' :			/* Number of copies */
-	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", copies);
+	    snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", copies);
 	    bufptr += strlen(bufptr);
 	    break;
 
         case '{' :			/* {attribute} */
-	    if ((nameend = strchr(format, '}')) != NULL &&
-	        (nameend - format - 2) < (sizeof(name) - 1))
+	    if ((nameend = strchr(format, '}')) != NULL && (size_t)(nameend - format - 2) < (sizeof(name) - 1))
 	    {
 	     /*
 	      * Pull the name from inside the brackets...
@@ -751,14 +746,12 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 		  {
 		    case IPP_TAG_INTEGER :
 		    case IPP_TAG_ENUM :
-			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
-			         "%d", attr->values[i].integer);
+			snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", attr->values[i].integer);
 			bufptr += strlen(bufptr);
 			break;
 
                     case IPP_TAG_BOOLEAN :
-			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
-			         "%d", attr->values[i].boolean);
+			snprintf(bufptr, sizeof(buffer) - (size_t)(bufptr - buffer), "%d", attr->values[i].boolean);
 			bufptr += strlen(bufptr);
 		        break;
 
@@ -772,14 +765,12 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 		    case IPP_TAG_CHARSET :
 		    case IPP_TAG_LANGUAGE :
 		    case IPP_TAG_MIMETYPE :
-		        strlcpy(bufptr, attr->values[i].string.text,
-			        sizeof(buffer) - (bufptr - buffer));
+		        strlcpy(bufptr, attr->values[i].string.text, sizeof(buffer) - (size_t)(bufptr - buffer));
 			bufptr += strlen(bufptr);
 		        break;
 
 		    default :
-			strlcpy(bufptr, "???",
-			        sizeof(buffer) - (bufptr - buffer));
+			strlcpy(bufptr, "???", sizeof(buffer) - (size_t)(bufptr - buffer));
 			bufptr += strlen(bufptr);
 		        break;
 		  }
@@ -1104,7 +1095,7 @@ static int				/* O - -1 for fatal, 0 for retry, 1 for success */
 format_log_line(const char *message,	/* I - Printf-style format string */
                 va_list    ap)		/* I - Argument list */
 {
-  int		len;			/* Length of formatted line */
+  ssize_t	len;			/* Length of formatted line */
 
 
  /*
@@ -1130,7 +1121,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   * Resize the buffer as needed...
   */
 
-  if (len >= log_linesize && log_linesize < 65536)
+  if ((size_t)len >= log_linesize && log_linesize < 65536)
   {
     char	*temp;			/* Temporary string pointer */
 
@@ -1142,12 +1133,12 @@ format_log_line(const char *message,	/* I - Printf-style format string */
     else if (len > 65536)
       len = 65536;
 
-    temp = realloc(log_line, len);
+    temp = realloc(log_line, (size_t)len);
 
     if (temp)
     {
       log_line     = temp;
-      log_linesize = len;
+      log_linesize = (size_t)len;
 
       return (0);
     }

@@ -1,23 +1,18 @@
 /*
  * "$Id$"
  *
- *   CUPS API test program for CUPS.
+ * CUPS API test program for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 2007 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()        - Main entry.
- *   dests_equal() - Determine whether two destinations are equal.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -227,15 +222,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
 	printf("Writing %d bytes...\n", (int)bytes);
 
-	if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
-				 bytes) != HTTP_STATUS_CONTINUE)
+	if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer, (size_t)bytes) != HTTP_STATUS_CONTINUE)
 	{
 	  puts("Unable to write bytes!");
 	  return (1);
 	}
 
         if (interval > 0)
-	  sleep(interval);
+	  sleep((unsigned)interval);
       }
 
       cupsFileClose(fp);
@@ -531,6 +525,8 @@ enum_cb(void        *user_data,		/* I - User data (unused) */
   int		i;			/* Looping var */
   cups_option_t	*option;		/* Current option */
 
+
+  (void)user_data;
 
   if (flags & CUPS_DEST_FLAGS_REMOVED)
     printf("Removed '%s':\n", dest->name);
