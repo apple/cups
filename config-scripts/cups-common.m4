@@ -200,6 +200,9 @@ AC_CHECK_FUNCS(sigaction)
 dnl Checks for wait functions.
 AC_CHECK_FUNCS(waitpid wait3)
 
+dnl Check for posix_spawn
+AC_CHECK_FUNCS(posix_spawn)
+
 dnl See if the tm structure has the tm_gmtoff member...
 AC_MSG_CHECKING(for tm_gmtoff member in tm structure)
 AC_TRY_COMPILE([#include <time.h>],[struct tm t;

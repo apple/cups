@@ -132,6 +132,13 @@
 
 
 /*
+ * Do we have posix_spawn?
+ */
+
+#define HAVE_POSIX_SPAWN 1
+
+
+/*
  * Do we have ZLIB?
  */
 

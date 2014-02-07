@@ -22,6 +22,10 @@
 #ifdef __APPLE__
 #  include <libgen.h>
 #endif /* __APPLE__ */
+#ifdef HAVE_POSIX_SPAWN
+#  include <spawn.h>
+extern char **environ;
+#endif /* HAVE_POSIX_SPAWN */
 
 
 /*
@@ -316,10 +320,17 @@ cupsdStartProcess(
 {
   int		i;			/* Looping var */
   const char	*exec_path = command;	/* Command to be exec'd */
-  char		*real_argv[103],	/* Real command-line arguments */
+  char		*real_argv[107],	/* Real command-line arguments */
 		cups_exec[1024];	/* Path to "cups-exec" program */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
+#ifdef HAVE_POSIX_SPAWN
+  posix_spawn_file_actions_t actions;	/* Spawn file actions */
+  posix_spawnattr_t attrs;		/* Spawn attributes */
+  char		user_str[16],		/* User string */
+		group_str[16],		/* Group string */
+		nice_str[16];		/* FilterNice string */
+#endif /* HAVE_POSIX_SPAWN */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -386,25 +397,97 @@ cupsdStartProcess(
   * Use helper program when we have a sandbox profile...
   */
 
+#ifndef HAVE_POSIX_SPAWN
   if (profile)
+#endif /* !HAVE_POSIX_SPAWN */
   {
     snprintf(cups_exec, sizeof(cups_exec), "%s/daemon/cups-exec", ServerBin);
+    snprintf(user_str, sizeof(user_str), "%d", User);
+    snprintf(group_str, sizeof(group_str), "%d", Group);
+    snprintf(nice_str, sizeof(nice_str), "%d", FilterNice);
 
     real_argv[0] = cups_exec;
     real_argv[1] = profile;
-    real_argv[2] = (char *)command;
+    real_argv[2] = user_str;
+    real_argv[3] = group_str;
+    real_argv[4] = nice_str;
+    real_argv[5] = (char *)command;
 
     for (i = 0;
-         i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 4) && argv[i];
+         i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 7) && argv[i];
 	 i ++)
-      real_argv[i + 3] = argv[i];
+      real_argv[i + 6] = argv[i];
 
-    real_argv[i + 3] = NULL;
+    real_argv[i + 6] = NULL;
 
     argv      = real_argv;
     exec_path = cups_exec;
   }
 
+  if (LogLevel == CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Preparing to start \"%s\", arguments:", command);
+
+    for (i = 0; argv[i]; i ++)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: argv[%d] = \"%s\"", i, argv[i]);
+  }
+
+#ifdef HAVE_POSIX_SPAWN
+ /*
+  * Setup attributes and file actions for the spawn...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Setting spawn attributes.");
+  posix_spawnattr_init(&attrs);
+  posix_spawnattr_setflags(&attrs, POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_SETSIGDEF);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Setting file actions.");
+  posix_spawn_file_actions_init(&actions);
+  if (infd != 0)
+  {
+    if (infd < 0)
+      posix_spawn_file_actions_addopen(&actions, 0, "/dev/null", O_WRONLY, 0);
+    else
+      posix_spawn_file_actions_adddup2(&actions, infd, 0);
+  }
+
+  if (outfd != 1)
+  {
+    if (outfd < 0)
+      posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0);
+    else
+      posix_spawn_file_actions_adddup2(&actions, outfd, 1);
+  }
+
+  if (errfd != 2)
+  {
+    if (errfd < 0)
+      posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0);
+    else
+      posix_spawn_file_actions_adddup2(&actions, errfd, 2);
+  }
+
+  if (backfd != 3 && backfd >= 0)
+    posix_spawn_file_actions_adddup2(&actions, backfd, 3);
+
+  if (sidefd != 4 && sidefd >= 0)
+    posix_spawn_file_actions_adddup2(&actions, sidefd, 4);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Calling posix_spawn.");
+
+  if (posix_spawn(pid, exec_path, &actions, &attrs, argv, envp ? envp : environ))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to fork %s - %s.", command, strerror(errno));
+
+    *pid = 0;
+  }
+  else
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: pid=%d", (int)*pid);
+
+  posix_spawn_file_actions_destroy(&actions);
+  posix_spawnattr_destroy(&attrs);
+
+#else
  /*
   * Block signals before forking...
   */
@@ -434,13 +517,13 @@ cupsdStartProcess(
     * processes it creates.
     */
 
-#ifdef HAVE_SETPGID
+#  ifdef HAVE_SETPGID
     if (!RunUser && setpgid(0, 0))
       exit(errno + 100);
-#else
+#  else
     if (!RunUser && setpgrp())
       exit(errno + 100);
-#endif /* HAVE_SETPGID */
+#  endif /* HAVE_SETPGID */
 
    /*
     * Update the remaining file descriptors as needed...
@@ -519,11 +602,11 @@ cupsdStartProcess(
     * Unblock signals before doing the exec...
     */
 
-#ifdef HAVE_SIGSET
+#  ifdef HAVE_SIGSET
     sigset(SIGTERM, SIG_DFL);
     sigset(SIGCHLD, SIG_DFL);
     sigset(SIGPIPE, SIG_DFL);
-#elif defined(HAVE_SIGACTION)
+#  elif defined(HAVE_SIGACTION)
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
@@ -532,11 +615,11 @@ cupsdStartProcess(
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGCHLD, &action, NULL);
     sigaction(SIGPIPE, &action, NULL);
-#else
+#  else
     signal(SIGTERM, SIG_DFL);
     signal(SIGCHLD, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
-#endif /* HAVE_SIGSET */
+#  endif /* HAVE_SIGSET */
 
     cupsdReleaseSignals();
 
@@ -563,7 +646,11 @@ cupsdStartProcess(
 
     *pid = 0;
   }
-  else
+
+  cupsdReleaseSignals();
+#endif /* HAVE_POSIX_SPAWN */
+
+  if (*pid)
   {
     if (!process_array)
       process_array = cupsArrayNew((cups_array_func_t)compare_procs, NULL);
@@ -580,8 +667,6 @@ cupsdStartProcess(
       }
     }
   }
-
-  cupsdReleaseSignals();
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		  "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
