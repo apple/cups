@@ -559,7 +559,8 @@ static const char * const ipp_document_states[] =
 		  "portrait",
 		  "landscape",
 		  "reverse-landscape",
-		  "reverse-portrait"
+		  "reverse-portrait",
+		  "none"
 		},
 		* const ipp_print_qualities[] =
 		{			/* print-quality enums */
@@ -1536,11 +1537,16 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-fax-modem-info",		/* IPP FaxOut */
     "printer-fax-modem-name",		/* IPP FaxOut */
     "printer-fax-modem-number",		/* IPP FaxOut */
+    "printer-firmware-name",		/* PWG 5110.1 */
+    "printer-firmware-patches",		/* PWG 5110.1 */
+    "printer-firmware-string-version",	/* PWG 5110.1 */
+    "printer-firmware-version",		/* PWG 5110.1 */
     "printer-geo-location",
     "printer-get-attributes-supported",
     "printer-icc-profiles",
     "printer-icons",
     "printer-info",
+    "printer-input-tray",		/* IPP JPS3 */
     "printer-is-accepting-jobs",
     "printer-is-shared",		/* CUPS extension */
     "printer-kind",			/* IPP Paid Printing */
@@ -1556,6 +1562,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-native-formats",
     "printer-organization",
     "printer-organizational-unit",
+    "printer-output-tray",		/* IPP JPS3 */
     "printer-settable-attributes-supported",
     "printer-state",
     "printer-state-change-date-time",

@@ -411,7 +411,8 @@ typedef enum ipp_orient_e		/**** Orientation values ****/
   IPP_ORIENT_PORTRAIT = 3,		/* No rotation */
   IPP_ORIENT_LANDSCAPE,			/* 90 degrees counter-clockwise */
   IPP_ORIENT_REVERSE_LANDSCAPE,		/* 90 degrees clockwise */
-  IPP_ORIENT_REVERSE_PORTRAIT		/* 180 degrees */
+  IPP_ORIENT_REVERSE_PORTRAIT,		/* 180 degrees */
+  IPP_ORIENT_NONE			/* No rotation */
 
 #  ifndef _CUPS_NO_DEPRECATED
 #    define IPP_PORTRAIT		IPP_ORIENT_PORTRAIT
