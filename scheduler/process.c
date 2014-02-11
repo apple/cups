@@ -259,7 +259,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
     /* Allow job filters to read the current job files... */
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"
-                   "  (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
+                   "       (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
 		   request, job_id, job_id);
   }
   else
