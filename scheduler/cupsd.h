@@ -1,16 +1,16 @@
 /*
  * "$Id$"
  *
- *   Main header file for the CUPS scheduler.
+ * Main header file for the CUPS scheduler.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   "LICENSE" which should have been included with this file.  If this
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * "LICENSE" which should have been included with this file.  If this
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 
@@ -144,10 +144,8 @@ typedef void (*cupsd_selfunc_t)(void *data);
  * Globals...
  */
 
-VAR int			TestConfigFile	VALUE(0),
+VAR int			TestConfigFile	VALUE(0);
 					/* Test the cupsd.conf file? */
-			UseProfiles	VALUE(1);
-					/* Use security profiles for child procs? */
 VAR int			MaxFDs		VALUE(0);
 					/* Maximum number of files */
 
@@ -203,7 +201,7 @@ extern void		cupsdSetStringf(char **s, const char *f, ...)
 			__attribute__ ((__format__ (__printf__, 2, 3)));
 
 /* process.c */
-extern void		*cupsdCreateProfile(int job_id);
+extern void		*cupsdCreateProfile(int job_id, int allow_networking);
 extern void		cupsdDestroyProfile(void *profile);
 extern int		cupsdEndProcess(int pid, int force);
 extern const char	*cupsdFinishProcess(int pid, char *name, int namelen,

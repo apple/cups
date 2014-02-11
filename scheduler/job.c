@@ -1218,7 +1218,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
 			      job->back_pipes[1], job->side_pipes[1],
-			      backroot, job->profile, job, &(job->backend));
+			      backroot, job->bprofile, job, &(job->backend));
 
       if (pid == 0)
       {
@@ -2963,6 +2963,8 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
   cupsdDestroyProfile(job->profile);
   job->profile = NULL;
+  cupsdDestroyProfile(job->bprofile);
+  job->bprofile = NULL;
 
  /*
   * Clear the unresponsive job watchdog timers...
@@ -4504,8 +4506,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   * Setup the last exit status and security profiles...
   */
 
-  job->status  = 0;
-  job->profile = cupsdCreateProfile(job->id);
+  job->status   = 0;
+  job->profile  = cupsdCreateProfile(job->id, 0);
+  job->bprofile = cupsdCreateProfile(job->id, 1);
 
  /*
   * Create the status pipes and buffer...
@@ -4522,6 +4525,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     cupsdDestroyProfile(job->profile);
     job->profile = NULL;
+    cupsdDestroyProfile(job->bprofile);
+    job->bprofile = NULL;
     return;
   }
 
@@ -4547,6 +4552,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     cupsdDestroyProfile(job->profile);
     job->profile = NULL;
+    cupsdDestroyProfile(job->bprofile);
+    job->bprofile = NULL;
     return;
   }
 
@@ -4576,6 +4583,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
     cupsdDestroyProfile(job->profile);
     job->profile = NULL;
+    cupsdDestroyProfile(job->bprofile);
+    job->bprofile = NULL;
     return;
   }
 

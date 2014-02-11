@@ -1,18 +1,18 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   cupsd.conf man page for CUPS.
+.\" cupsd.conf man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2006 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2006 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "26 July 2013" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "6 February 2014" "Apple Inc."
 .SH NAME
 cups-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -105,18 +105,21 @@ RequestRoot directory
 Specifies the directory to store print jobs and other HTTP request
 data.
 .TP 5
+Sandboxing off
+.TP 5
+Sandboxing relaxed
+.TP 5
+Sandboxing strict
+Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler. The default is "strict". (OS X only)
+.TP 5
 ServerBin directory
 .br
 Specifies the directory where backends, CGIs, daemons, and filters may
 be found.
 .TP 5
-ServerCertificate filename
+ServerKeychain path
 .br
-Specifies the encryption certificate to use.
-.TP 5
-ServerKey filename
-.br
-Specifies the encryption key to use.
+Specifies the location of TLS certificates and private keys.
 .TP 5
 ServerRoot directory
 .br
@@ -146,7 +149,7 @@ Specifies the user name or ID that is used when running external programs.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

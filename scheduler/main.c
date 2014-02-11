@@ -243,9 +243,8 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'P' : /* Disable security profiles */
-              fputs("cupsd: -P (disable security profiles) is for internal "
-                    "testing use only!\n", stderr);
-	      UseProfiles = 0;
+              fputs("cupsd: -P (disable sandboxing) is for internal testing use only.\n", stderr);
+	      UseSandboxing = 0;
 	      break;
 
           case 's' : /* Set cups-files.conf location */

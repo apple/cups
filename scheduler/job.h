@@ -78,7 +78,8 @@ struct cupsd_job_s			/**** Job request ****/
   char			*auth_env[3],	/* AUTH_xxx environment variables,
                                          * if any */
 			*auth_uid;	/* AUTH_UID environment variable */
-  void			*profile;	/* Security profile */
+  void			*profile,	/* Security profile for filters */
+			*bprofile;	/* Security profile for backend */
   cups_array_t		*history;	/* Debug log history */
   int			progress;	/* Printing progress */
   int			num_keywords;	/* Number of PPD keywords */

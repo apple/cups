@@ -119,21 +119,26 @@ accesses.
 <dd>Specifies the directory to store print jobs and other HTTP request
 data.
 </dd>
+<dt>Sandboxing off
+</dt>
+<dd></dd>
+<dt>Sandboxing relaxed
+</dt>
+<dd></dd>
+<dt>Sandboxing strict
+</dt>
+<dd>Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler. The default is "strict". (OS X only)
+</dd>
 <dt>ServerBin directory
 </dt>
 <dd></dd>
 <dd>Specifies the directory where backends, CGIs, daemons, and filters may
 be found.
 </dd>
-<dt>ServerCertificate filename
+<dt>ServerKeychain path
 </dt>
 <dd></dd>
-<dd>Specifies the encryption certificate to use.
-</dd>
-<dt>ServerKey filename
-</dt>
-<dd></dd>
-<dd>Specifies the encryption key to use.
+<dd>Specifies the location of TLS certificates and private keys.
 </dd>
 <dt>ServerRoot directory
 </dt>
@@ -171,7 +176,7 @@ or state files. The default is No.
 <br>
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 
 </body>
 </html>

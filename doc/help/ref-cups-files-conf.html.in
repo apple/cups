@@ -354,6 +354,21 @@ HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory. The
 default request directory is <VAR>/var/spool/cups</VAR>.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 2.0</SPAN><A NAME="Sandboxing">Sandboxing</A> (OS X Only)</H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+Sandboxing off
+Sandboxing relaxed
+Sandboxing strict
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>Sandboxing</CODE> directive sets the default level of security sandboxing that is applied to print filters, backend, and other child processes. The default value is <CODE>strict</CODE>. Sandboxing is currently only supported on OS X.</P>
+
+
 <H2 CLASS="title"><A NAME="ServerBin">ServerBin</A></H2>
 
 <H3>Examples</H3>
@@ -374,42 +389,20 @@ default executable directory is <VAR>/usr/lib/cups</VAR>,
 depending on the operating system.</P>
 
 
-<H2 CLASS="title"><A NAME="ServerCertificate">ServerCertificate</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 2.0</SPAN><A NAME="ServerKeychain">ServerKeychain</A></H2>
 
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-ServerCertificate /etc/cups/ssl/server.crt
+ServerKeychain /etc/cups/ssl
+ServerKeychain /Library/Keychains/system.keychain
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>ServerCertificate</CODE> directive specifies the
-location of the SSL certificate file used by the server when
-negotiating encrypted connections. The certificate must not be
-encrypted (password protected) since the scheduler normally runs
-in the background and will be unable to ask for a password.</P>
+<P>The <CODE>ServerKeychain</CODE> directive specifies the location of TLS certificates and private keys used when negotiating encrypted connections.</P>
 
-<P>The default certificate file is
-<VAR>/etc/cups/ssl/server.crt</VAR>.</P>
-
-
-<H2 CLASS="title"><A NAME="ServerKey">ServerKey</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-ServerKey /etc/cups/ssl/server.key
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>ServerKey</CODE> directive specifies the location of
-the SSL private key file used by the server when negotiating
-encrypted connections.</P>
-
-<P>The default key file is
-<VAR>/etc/cups/ssl/server.crt</VAR>.</P>
+<P>The default keychain is system-specific.</P>
 
 
 <H2 CLASS="title"><A NAME="ServerRoot">ServerRoot</A></H2>

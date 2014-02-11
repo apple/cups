@@ -54,7 +54,7 @@ cupsdStartServer(void)
   * Create the default security profile...
   */
 
-  DefaultProfile = cupsdCreateProfile(0);
+  DefaultProfile = cupsdCreateProfile(0, 1);
 
  /*
   * Startup all the networking stuff...

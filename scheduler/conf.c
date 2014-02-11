@@ -3,7 +3,7 @@
  *
  * Configuration routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -707,6 +707,7 @@ cupsdReadConfiguration(void)
   NumSystemGroups          = 0;
   ReloadTimeout	           = DEFAULT_KEEPALIVE;
   RootCertDuration         = 300;
+  Sandboxing               = CUPSD_SANDBOXING_STRICT;
   StrictConformance        = FALSE;
   SyncOnClose              = FALSE;
   Timeout                  = DEFAULT_TIMEOUT;
@@ -3414,6 +3415,30 @@ read_cups_files_conf(cups_file_t *fp)	/* I - File to read from */
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unknown PrintcapFormat \"%s\" on line %d of %s.",
+	                value, linenum, CupsFilesFile);
+        if (FatalErrors & CUPSD_FATAL_CONFIG)
+          return (0);
+      }
+    }
+    else if (!_cups_strcasecmp(line, "Sandboxing") && value)
+    {
+     /*
+      * Level of sandboxing?
+      */
+
+      if (!_cups_strcasecmp(value, "off"))
+      {
+        Sandboxing = CUPSD_SANDBOXING_OFF;
+        cupsdLogMessage(CUPSD_LOG_WARN, "Disabling sandboxing is not recommended (line %d of %s)", linenum, CupsFilesFile);
+      }
+      else if (!_cups_strcasecmp(value, "relaxed"))
+        Sandboxing = CUPSD_SANDBOXING_RELAXED;
+      else if (!_cups_strcasecmp(value, "strict"))
+        Sandboxing = CUPSD_SANDBOXING_STRICT;
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown Sandboxing \"%s\" on line %d of %s.",
 	                value, linenum, CupsFilesFile);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
           return (0);

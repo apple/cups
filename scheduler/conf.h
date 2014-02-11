@@ -50,6 +50,13 @@ typedef enum
   CUPSD_TIME_USECS			/* Standard format with microseconds */
 } cupsd_time_t;
 
+typedef enum
+{
+  CUPSD_SANDBOXING_OFF,			/* No sandboxing */
+  CUPSD_SANDBOXING_RELAXED,		/* Relaxed sandboxing */
+  CUPSD_SANDBOXING_STRICT		/* Strict sandboxing */
+} cupsd_sandboxing_t;
+
 
 /*
  * FatalErrors flags...
@@ -174,6 +181,10 @@ VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
 VAR cupsd_time_t	LogTimeFormat		VALUE(CUPSD_TIME_STANDARD);
 					/* Log file time format */
+VAR cupsd_sandboxing_t	Sandboxing		VALUE(CUPSD_SANDBOXING_STRICT);
+					/* Sandboxing level */
+VAR int			UseSandboxing	VALUE(1);
+					/* Use sandboxing for child procs? */
 VAR int			MaxClients		VALUE(100),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),

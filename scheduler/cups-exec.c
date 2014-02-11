@@ -21,6 +21,7 @@
  */
 
 #include <cups/string-private.h>
+#include <cups/file.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -66,21 +67,6 @@ main(int  argc,				/* I - Number of command-line args */
   fcntl(3, F_SETFL, O_NDELAY);
   fcntl(4, F_SETFL, O_NDELAY);
 
-#ifdef HAVE_SANDBOX_H
- /*
-  * Run in a separate security profile...
-  */
-
-  if (strcmp(argv[1], "none") &&
-      sandbox_init(argv[1], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
-  {
-    fprintf(stderr, "DEBUG: sandbox_init failed: %s (%s)\n", sandbox_error,
-	    strerror(errno));
-    sandbox_free_error(sandbox_error);
-    return (1);
-  }
-#endif /* HAVE_SANDBOX_H */
-
  /*
   * Change UID, GID, and nice value...
   */
@@ -106,18 +92,42 @@ main(int  argc,				/* I - Number of command-line args */
 
   umask(077);
 
+#ifdef HAVE_SANDBOX_H
  /*
-  * Execute the program...
+  * Run in a separate security profile...
   */
 
-  execv(argv[5], argv + 6);
+  if (strcmp(argv[1], "none") &&
+      sandbox_init(argv[1], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
+  {
+    cups_file_t	*fp;			/* File */
+    char	line[1024];		/* Line from file */
+    int		linenum = 0;		/* Line number in file */
+
+    fprintf(stderr, "DEBUG: sandbox_init failed: %s (%s)\n", sandbox_error,
+	    strerror(errno));
+    sandbox_free_error(sandbox_error);
+
+    if ((fp = cupsFileOpen(argv[1], "r")) != NULL)
+    {
+      while (cupsFileGets(fp, line, sizeof(line)))
+      {
+        linenum ++;
+        fprintf(stderr, "DEBUG: %4d  %s\n", linenum, line);
+      }
+      cupsFileClose(fp);
+    }
+
+    return (100 + EINVAL);
+  }
+#endif /* HAVE_SANDBOX_H */
 
  /*
   * If we get here, execv() failed...
   */
 
   fprintf(stderr, "DEBUG: execv failed: %s\n", strerror(errno));
-  return (1);
+  return (errno + 100);
 }
 
 
