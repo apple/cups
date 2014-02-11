@@ -20,7 +20,6 @@
  */
 
 #include "backend-private.h"
-#include <cups/cups-private.h>
 
 
 /*
