@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-01-21
+CHANGES.txt - 2.0b1 - 2014-02-11
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -13,3 +13,5 @@ CHANGES IN CUPS V2.0b1
 	  (<rdar://problem/11131245>)
 	- cupsRasterInterpretPPD now supports the Orientation header in order to
 	  support long-edge feed raster printers (<rdar://problem/15837926>)
+	- The filter/backend sandbox on OS X now defaults to a more strict
+	  whitelist (<rdar://problem/15939788>)

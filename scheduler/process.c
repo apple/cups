@@ -427,7 +427,7 @@ cupsdStartProcess(
 {
   int		i;			/* Looping var */
   const char	*exec_path = command;	/* Command to be exec'd */
-  char		*real_argv[107],	/* Real command-line arguments */
+  char		*real_argv[110],	/* Real command-line arguments */
 		cups_exec[1024];	/* Path to "cups-exec" program */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
@@ -514,18 +514,21 @@ cupsdStartProcess(
     snprintf(nice_str, sizeof(nice_str), "%d", FilterNice);
 
     real_argv[0] = cups_exec;
-    real_argv[1] = profile;
-    real_argv[2] = user_str;
-    real_argv[3] = group_str;
+    real_argv[1] = (char *)"-g";
+    real_argv[2] = group_str;
+    real_argv[3] = (char *)"-n";
     real_argv[4] = nice_str;
-    real_argv[5] = (char *)command;
+    real_argv[5] = (char *)"-u";
+    real_argv[6] = user_str;
+    real_argv[7] = profile;
+    real_argv[8] = (char *)command;
 
     for (i = 0;
-         i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 7) && argv[i];
+         i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 10) && argv[i];
 	 i ++)
-      real_argv[i + 6] = argv[i];
+      real_argv[i + 9] = argv[i];
 
-    real_argv[i + 6] = NULL;
+    real_argv[i + 9] = NULL;
 
     argv      = real_argv;
     exec_path = cups_exec;

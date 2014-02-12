@@ -35,6 +35,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+static void	usage(void) __attribute__((noreturn));
+
+
+/*
  * 'main()' - Apply sandbox profile and execute program.
  */
 
@@ -42,22 +49,70 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  uid_t	uid;				/* UID */
-  gid_t	gid;				/* GID */
-  int	niceval;			/* Nice value */
+  int		i;			/* Looping var */
+  const char	*opt;			/* Current option character */
+  uid_t		uid = getuid();		/* UID */
+  gid_t		gid = getgid();		/* GID */
+  int		niceval = 0;		/* Nice value */
 #ifdef HAVE_SANDBOX_H
-  char	*sandbox_error = NULL;		/* Sandbox error, if any */
+  char		*sandbox_error = NULL;	/* Sandbox error, if any */
 #endif /* HAVE_SANDBOX_H */
 
+
+ /*
+  * Parse command-line...
+  */
+
+  for (i = 1; i < argc; i ++)
+  {
+    if (argv[i][0] == '-')
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
+      {
+        switch (*opt)
+        {
+          case 'g' : /* -g gid */
+              i ++;
+              if (i >= argc)
+                usage();
+
+              gid = (gid_t)atoi(argv[i]);
+              break;
+
+          case 'n' : /* -n nice-value */
+              i ++;
+              if (i >= argc)
+                usage();
+
+              niceval = atoi(argv[i]);
+              break;
+
+          case 'u' : /* -g gid */
+              i ++;
+              if (i >= argc)
+                usage();
+
+              uid = (uid_t)atoi(argv[i]);
+              break;
+
+	  default :
+	      fprintf(stderr, "cups-exec: Unknown option '-%c'.\n", *opt);
+	      usage();
+        }
+      }
+    }
+    else
+      break;
+  }
 
  /*
   * Check that we have enough arguments...
   */
 
-  if (argc < 7)
+  if ((i + 3) > argc)
   {
-    puts("Usage: cups-exec /path/to/profile UID GID NICE /path/to/program argv0 argv1 ... argvN");
-    return (1);
+    fputs("cups-exec: Insufficient arguments.\n", stderr);
+    usage();
   }
 
  /*
@@ -70,10 +125,6 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Change UID, GID, and nice value...
   */
-
-  uid     = (uid_t)atoi(argv[2]);
-  gid     = (gid_t)atoi(argv[3]);
-  niceval = atoi(argv[4]);
 
   if (uid)
     nice(niceval);
@@ -97,8 +148,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Run in a separate security profile...
   */
 
-  if (strcmp(argv[1], "none") &&
-      sandbox_init(argv[1], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
+  if (strcmp(argv[i], "none") &&
+      sandbox_init(argv[i], SANDBOX_NAMED_EXTERNAL, &sandbox_error))
   {
     cups_file_t	*fp;			/* File */
     char	line[1024];		/* Line from file */
@@ -108,7 +159,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    strerror(errno));
     sandbox_free_error(sandbox_error);
 
-    if ((fp = cupsFileOpen(argv[1], "r")) != NULL)
+    if ((fp = cupsFileOpen(argv[i], "r")) != NULL)
     {
       while (cupsFileGets(fp, line, sizeof(line)))
       {
@@ -123,11 +174,29 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_SANDBOX_H */
 
  /*
+  * Execute the program...
+  */
+
+  execv(argv[i + 1], argv + i + 2);
+
+ /*
   * If we get here, execv() failed...
   */
 
   fprintf(stderr, "DEBUG: execv failed: %s\n", strerror(errno));
   return (errno + 100);
+}
+
+
+/*
+ * 'usage()' - Show program usage.
+ */
+
+static void
+usage(void)
+{
+  fputs("Usage: cups-exec [-g gid] [-n nice-value] [-u uid] /path/to/profile /path/to/program argv0 argv1 ... argvN\n", stderr);
+  exit(1);
 }
 
 
