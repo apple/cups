@@ -274,17 +274,17 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     char	peername[256];		/* Name of process */
 
     peersize = sizeof(peerpid);
-    if (!getsockopt(con->number, SOL_LOCAL, LOCAL_PEERPID, &peerpid,
+    if (!getsockopt(httpGetFd(con->http), SOL_LOCAL, LOCAL_PEERPID, &peerpid,
                     &peersize))
     {
-      if (!proc_name(peerpid, peername, sizeof(peername)))
+      if (!proc_name((int)peerpid, peername, sizeof(peername)))
 	cupsdLogClient(con, CUPSD_LOG_DEBUG,
 	               "Accepted from %s (Domain ???[%d])",
                        httpGetHostname(con->http, NULL, 0), (int)peerpid);
       else
 	cupsdLogClient(con, CUPSD_LOG_DEBUG,
                        "Accepted from %s (Domain %s[%d])",
-                       httpGetHostname(con->http, NULL, 0), name, (int)peerpid);
+                       httpGetHostname(con->http, NULL, 0), peername, (int)peerpid);
     }
     else
 #  endif /* __APPLE__ */

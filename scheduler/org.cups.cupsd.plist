@@ -21,8 +21,7 @@
 		<string>/usr/sbin/cupsd</string>
 		<string>-l</string>
 	</array>
-	<!-- These environment variables are only used when CUPS is compiled
-	     with --enable-debug-printfs -->
+	<!-- These environment variables are only used when CUPS is compiled with debug-printfs support -->
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>CUPS_DEBUG_LOG</key>
