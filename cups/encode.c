@@ -41,6 +41,7 @@ static const ipp_op_t ipp_job_creation[] =
 {
   IPP_OP_PRINT_JOB,
   IPP_OP_PRINT_URI,
+  IPP_OP_VALIDATE_JOB,
   IPP_OP_CREATE_JOB,
   IPP_OP_CUPS_NONE
 };
@@ -68,6 +69,7 @@ static const ipp_op_t ipp_all_print[] =
 {
   IPP_OP_PRINT_JOB,
   IPP_OP_PRINT_URI,
+  IPP_OP_VALIDATE_JOB,
   IPP_OP_CREATE_JOB,
   IPP_OP_SEND_DOCUMENT,
   IPP_OP_SEND_URI,
