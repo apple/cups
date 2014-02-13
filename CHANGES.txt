@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-02-11
+CHANGES.txt - 2.0b1 - 2014-02-13
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -15,3 +15,5 @@ CHANGES IN CUPS V2.0b1
 	  support long-edge feed raster printers (<rdar://problem/15837926>)
 	- The filter/backend sandbox on OS X now defaults to a more strict
 	  whitelist (<rdar://problem/15939788>)
+	- Increased the default idle exit timeout to 60 seconds on OS X
+	  (<rdar://problem/16041820>)

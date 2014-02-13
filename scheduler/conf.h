@@ -244,7 +244,7 @@ VAR char		*ServerKeychain		VALUE(NULL);
 #endif /* HAVE_SSL */
 
 #ifdef HAVE_LAUNCHD
-VAR int			LaunchdTimeout		VALUE(10);
+VAR int			LaunchdTimeout		VALUE(60);
 					/* Time after which an idle cupsd will exit */
 #endif /* HAVE_LAUNCHD */
 

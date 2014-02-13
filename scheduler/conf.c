@@ -753,7 +753,7 @@ cupsdReadConfiguration(void)
   MaxLeaseDuration           = 0;
 
 #ifdef HAVE_LAUNCHD
-  LaunchdTimeout = 10;
+  LaunchdTimeout = 60;
 #endif /* HAVE_LAUNCHD */
 
  /*

@@ -28,15 +28,6 @@
 #  include <libgen.h>
 #  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the launchd KeepAlive file */
-#  ifndef LAUNCH_JOBKEY_KEEPALIVE
-#    define LAUNCH_JOBKEY_KEEPALIVE "KeepAlive"
-#  endif /* !LAUNCH_JOBKEY_KEEPALIVE */
-#  ifndef LAUNCH_JOBKEY_PATHSTATE
-#    define LAUNCH_JOBKEY_PATHSTATE "PathState"
-#  endif /* !LAUNCH_JOBKEY_PATHSTATE */
-#  ifndef LAUNCH_JOBKEY_SERVICEIPC
-#    define LAUNCH_JOBKEY_SERVICEIPC "ServiceIPC"
-#  endif /* !LAUNCH_JOBKEY_SERVICEIPC */
 #endif /* HAVE_LAUNCH_H */
 
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
