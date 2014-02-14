@@ -28,6 +28,10 @@
 #  include <libgen.h>
 #  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the launchd KeepAlive file */
+#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
+/* Update when we have a public header we can include */
+extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
+#  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 #endif /* HAVE_LAUNCH_H */
 
 #if defined(HAVE_MALLOC_H) && defined(HAVE_MALLINFO)
@@ -1288,6 +1292,86 @@ cupsdSetStringf(char       **s,		/* O - New string */
 static void
 launchd_checkin(void)
 {
+#  ifdef HAVE_LAUNCH_ACTIVATE_SOCKET
+  int			error;		/* Check-in error, if any */
+  size_t		i,		/* Looping var */
+			count;		/* Number of listeners */
+  int			*ld_sockets;	/* Listener sockets */
+  cupsd_listener_t	*lis;		/* Listeners array */
+  http_addr_t		addr;		/* Address variable */
+  socklen_t		addrlen;	/* Length of address */
+  char			s[256];		/* String addresss */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: pid=%d", (int)getpid());
+
+ /*
+  * Check-in with launchd...
+  */
+
+  if ((error = launch_activate_socket("Listeners", &ld_sockets, &count)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to get listener sockets: %s", strerror(error));
+    exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
+  }
+
+ /*
+  * Try to match the launchd sockets to the cupsd listeners...
+  */
+
+  for (i = 0; i < count; i ++)
+  {
+   /*
+    * Get the launchd socket address...
+    */
+
+    addrlen = sizeof(addr);
+
+    if (getsockname(ld_sockets[i], (struct sockaddr *)&addr, &addrlen))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
+      continue;
+    }
+
+    for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	 lis;
+	 lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+      if (httpAddrEqual(&lis->address, &addr))
+	break;
+
+   /*
+    * Add a new listener if there's no match...
+    */
+
+    if (lis)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
+
+      if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to allocate listener: %s", strerror(errno));
+	exit(EXIT_FAILURE);
+      }
+
+      cupsArrayAdd(Listeners, lis);
+
+      memcpy(&lis->address, &addr, sizeof(lis->address));
+    }
+
+    lis->fd = ld_sockets[i];
+
+#    ifdef HAVE_SSL
+    if (httpAddrPort(&(lis->address)) == 443)
+      lis->encryption = HTTP_ENCRYPT_ALWAYS;
+#    endif /* HAVE_SSL */
+  }
+
+#  else
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
   launch_data_t		ld_msg,		/* Launch data message */
@@ -1420,16 +1504,17 @@ launchd_checkin(void)
 
 	lis->fd = fd;
 
-#  ifdef HAVE_SSL
+#    ifdef HAVE_SSL
 	if (httpAddrPort(&(lis->address)) == 443)
 	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
-#  endif /* HAVE_SSL */
+#    endif /* HAVE_SSL */
       }
     }
   }
 
   launch_data_free(ld_msg);
   launch_data_free(ld_resp);
+#  endif /* HAVE_LAUNCH_ACTIVATE_SOCKET */
 }
 
 

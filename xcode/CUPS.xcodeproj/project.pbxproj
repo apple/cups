@@ -1300,6 +1300,9 @@
 		72220FB313330BCE00FCA411 /* mime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mime.c; path = ../scheduler/mime.c; sourceTree = "<group>"; };
 		72220FB413330BCE00FCA411 /* mime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mime.h; path = ../scheduler/mime.h; sourceTree = "<group>"; };
 		72220FB513330BCE00FCA411 /* type.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type.c; path = ../scheduler/type.c; sourceTree = "<group>"; };
+		7226369B18AE6D19004ED309 /* org.cups.cups-lpd.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "org.cups.cups-lpd.plist"; path = "../scheduler/org.cups.cups-lpd.plist"; sourceTree = SOURCE_ROOT; };
+		7226369C18AE6D19004ED309 /* org.cups.cupsd.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = org.cups.cupsd.plist; path = ../scheduler/org.cups.cupsd.plist; sourceTree = SOURCE_ROOT; };
+		7226369D18AE73BB004ED309 /* config.h.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = config.h.in; path = ../config.h.in; sourceTree = "<group>"; };
 		7234F41F1378A16F00D3E9C9 /* array-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "array-private.h"; path = "../cups/array-private.h"; sourceTree = "<group>"; };
 		724378FD1333E43E009631B9 /* ipp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ipp; sourceTree = BUILT_PRODUCTS_DIR; };
 		724379091333E4E3009631B9 /* backend-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "backend-private.h"; path = "../backend/backend-private.h"; sourceTree = "<group>"; };
@@ -1860,6 +1863,7 @@
 		72220F461333060C00FCA411 /* Private Headers */ = {
 			isa = PBXGroup;
 			children = (
+				7226369D18AE73BB004ED309 /* config.h.in */,
 				72220F471333063D00FCA411 /* config.h */,
 				7234F41F1378A16F00D3E9C9 /* array-private.h */,
 				72220EC01333056300FCA411 /* cups-private.h */,
@@ -1883,6 +1887,8 @@
 		72220F5D13330A5A00FCA411 /* cupsd */ = {
 			isa = PBXGroup;
 			children = (
+				7226369B18AE6D19004ED309 /* org.cups.cups-lpd.plist */,
+				7226369C18AE6D19004ED309 /* org.cups.cupsd.plist */,
 				72D53A3615B4929D003F877F /* colorman.c */,
 				72D53A3715B4929D003F877F /* colorman.h */,
 				72220F6913330B0C00FCA411 /* auth.c */,
@@ -2726,7 +2732,7 @@
 		72BF96371333042100B1EAD7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Apple Inc.";
 			};
 			buildConfigurationList = 72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */;
@@ -3621,6 +3627,7 @@
 		274FF5F0133330C800317ECB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
@@ -3632,6 +3639,7 @@
 		274FF5F1133330C800317ECB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
@@ -3707,6 +3715,7 @@
 		274FF6DE1333B1C400317ECB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_EXTENSION = a;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/local/lib;
@@ -3720,6 +3729,7 @@
 		274FF6DF1333B1C400317ECB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_EXTENSION = a;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/local/lib;
@@ -3891,6 +3901,7 @@
 		72220EB01333047D00FCA411 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
@@ -3902,6 +3913,7 @@
 		72220EB11333047D00FCA411 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
@@ -3929,6 +3941,7 @@
 		72220FAE13330B2300FCA411 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3938,6 +3951,7 @@
 		72220FAF13330B2300FCA411 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4155,6 +4169,7 @@
 		72F75A631336F9A3004BB496 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4164,6 +4179,7 @@
 		72F75A641336F9A3004BB496 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				EXECUTABLE_PREFIX = "";
 				INSTALL_PATH = /usr/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";

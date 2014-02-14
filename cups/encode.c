@@ -68,34 +68,11 @@ static const ipp_op_t ipp_all_print[] =
   IPP_OP_CUPS_NONE
 };
 
-static const ipp_op_t ipp_all_limit[] =
-{
-  IPP_OP_GET_JOBS,
-  IPP_OP_GET_PRINTER_ATTRIBUTES,
-  IPP_OP_CUPS_GET_PRINTERS,
-  IPP_OP_CUPS_GET_CLASSES,
-  IPP_OP_CUPS_GET_DEVICES,
-  IPP_OP_CUPS_GET_PPDS,
-  IPP_OP_CUPS_NONE
-};
-
 static const ipp_op_t ipp_set_printer[] =
 {
   IPP_OP_SET_PRINTER_ATTRIBUTES,
   IPP_OP_CUPS_ADD_MODIFY_PRINTER,
   IPP_OP_CUPS_ADD_MODIFY_CLASS,
-  IPP_OP_CUPS_NONE
-};
-
-static const ipp_op_t cups_am_class[] =
-{
-  IPP_OP_CUPS_ADD_MODIFY_CLASS,
-  IPP_OP_CUPS_NONE
-};
-
-static const ipp_op_t cups_am_printer[] =
-{
-  IPP_OP_CUPS_ADD_MODIFY_PRINTER,
   IPP_OP_CUPS_NONE
 };
 
