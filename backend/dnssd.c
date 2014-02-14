@@ -1107,7 +1107,7 @@ query_callback(
       data ++;
 
       if (data < datanext)
-	memcpy(value, data, datanext - data);
+	memcpy(value, data, (size_t)(datanext - data));
       value[datanext - data] = '\0';
 
       fprintf(stderr, "DEBUG2: query_callback: \"%s=%s\".\n",
@@ -1198,7 +1198,7 @@ query_callback(
       * Assume the first word is the make...
       */
 
-      memcpy(make_and_model, model, ptr - model);
+      memcpy(make_and_model, model, (size_t)(ptr - model));
       make_and_model[ptr - model] = '\0';
 
       snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",

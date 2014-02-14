@@ -264,7 +264,7 @@ cupsSideChannelRead(
     *status  = (cups_sc_status_t)buffer[1];
     *datalen = templen;
 
-    memcpy(data, buffer + 4, templen);
+    memcpy(data, buffer + 4, (size_t)templen);
   }
 
   _cupsBufferRelease(buffer);
@@ -364,7 +364,7 @@ cupsSideChannelSNMPGet(
       return (CUPS_SC_STATUS_TOO_BIG);
     }
 
-    memcpy(data, real_data + real_oidlen, real_datalen);
+    memcpy(data, real_data + real_oidlen, (size_t)real_datalen);
     data[real_datalen] = '\0';
 
     *datalen = real_datalen;
@@ -607,7 +607,7 @@ cupsSideChannelWrite(
 
   if (datalen > 0)
   {
-    memcpy(buffer + 4, data, datalen);
+    memcpy(buffer + 4, data, (size_t)datalen);
     bytes += datalen;
   }
 

@@ -2612,7 +2612,7 @@ _pwgPageSizeForMedia(
     * Copy the size name from class_sizename_dimensions...
     */
 
-    memcpy(name, sizeptr + 1, dimptr - sizeptr - 1);
+    memcpy(name, sizeptr + 1, (size_t)(dimptr - sizeptr - 1));
     name[dimptr - sizeptr - 1] = '\0';
   }
 

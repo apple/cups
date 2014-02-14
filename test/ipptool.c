@@ -2257,7 +2257,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    last_expect->with_flags |= _CUPS_WITH_REGEX;
 
 	    if (last_expect->with_value)
-	      memcpy(last_expect->with_value, token + 1, tokenptr - token - 1);
+	      memcpy(last_expect->with_value, token + 1, (size_t)(tokenptr - token - 1));
 	  }
 	  else
 	  {
@@ -3348,7 +3348,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 
       if (value)
       {
-        strlcpy(dstptr, value, dstend - dstptr + 1);
+        strlcpy(dstptr, value, (size_t)(dstend - dstptr + 1));
 	dstptr += strlen(dstptr);
       }
     }

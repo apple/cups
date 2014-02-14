@@ -474,7 +474,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       */
 
       if (ptr != p)
-        memcpy(p, ptr, bytes);
+        memcpy(p, ptr, (size_t)bytes);
     }
     else
     {
@@ -485,7 +485,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       if ((unsigned)(bytes = (int)(r->pend - r->pcurrent)) > remaining)
         bytes = (ssize_t)remaining;
 
-      memcpy(p, r->pcurrent, bytes);
+      memcpy(p, r->pcurrent, (size_t)bytes);
       r->pcurrent += bytes;
 
       if (r->pcurrent >= r->pend)
@@ -868,7 +868,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
       * Copy the raster data to the buffer...
       */
 
-      memcpy(r->pcurrent, p, bytes);
+      memcpy(r->pcurrent, p, (size_t)bytes);
 
       r->pcurrent += bytes;
 
@@ -1125,7 +1125,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
       * Use memcpy() for a large read...
       */
 
-      memcpy(buf, r->bufptr, count);
+      memcpy(buf, r->bufptr, (size_t)count);
       r->bufptr += count;
       remaining -= count;
     }

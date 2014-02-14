@@ -358,7 +358,7 @@ httpAssembleURI(
 
     if (port > 0)
     {
-      snprintf(ptr, end - ptr + 1, ":%d", port);
+      snprintf(ptr, (size_t)(end - ptr + 1), ":%d", port);
       ptr += strlen(ptr);
 
       if (ptr >= end)
@@ -809,10 +809,7 @@ httpGetDateString2(time_t t,		/* I - UNIX time */
 
   tdate = gmtime(&t);
   if (tdate)
-    snprintf(s, slen, "%s, %02d %s %d %02d:%02d:%02d GMT",
-	     http_days[tdate->tm_wday], tdate->tm_mday,
-	     http_months[tdate->tm_mon], tdate->tm_year + 1900,
-	     tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
+    snprintf(s, (size_t)slen, "%s, %02d %s %d %02d:%02d:%02d GMT", http_days[tdate->tm_wday], tdate->tm_mday, http_months[tdate->tm_mon], tdate->tm_year + 1900, tdate->tm_hour, tdate->tm_min, tdate->tm_sec);
   else
     s[0] = '\0';
 
@@ -1007,7 +1004,7 @@ httpSeparateURI(
     * Workaround for HP IPP client bug...
     */
 
-    strlcpy(scheme, "ipp", schemelen);
+    strlcpy(scheme, "ipp", (size_t)schemelen);
     status = HTTP_URI_STATUS_MISSING_SCHEME;
   }
   else if (*uri == '/')
@@ -1016,7 +1013,7 @@ httpSeparateURI(
     * Filename...
     */
 
-    strlcpy(scheme, "file", schemelen);
+    strlcpy(scheme, "file", (size_t)schemelen);
     status = HTTP_URI_STATUS_MISSING_SCHEME;
   }
   else
@@ -2473,9 +2470,7 @@ http_resolve_cb(
     {
       for (addr = addrlist; addr; addr = addr->next)
       {
-        int error = getnameinfo(&(addr->addr.addr),
-	                        httpAddrLength(&(addr->addr)),
-			        fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
+        int error = getnameinfo(&(addr->addr.addr), (socklen_t)httpAddrLength(&(addr->addr)), fqdn, sizeof(fqdn), NULL, 0, NI_NAMEREQD);
 
         if (!error)
 	{

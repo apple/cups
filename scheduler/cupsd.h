@@ -204,8 +204,7 @@ extern void		cupsdSetStringf(char **s, const char *f, ...)
 extern void		*cupsdCreateProfile(int job_id, int allow_networking);
 extern void		cupsdDestroyProfile(void *profile);
 extern int		cupsdEndProcess(int pid, int force);
-extern const char	*cupsdFinishProcess(int pid, char *name, int namelen,
-					    int *job_id);
+extern const char	*cupsdFinishProcess(int pid, char *name, size_t namelen, int *job_id);
 extern int		cupsdStartProcess(const char *command, char *argv[],
 					  char *envp[], int infd, int outfd,
 					  int errfd, int backfd, int sidefd,

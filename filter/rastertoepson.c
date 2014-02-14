@@ -520,7 +520,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
 
 	    *comp_ptr++ = (unsigned char)(count - 1);
 
-	    memcpy(comp_ptr, start, count);
+	    memcpy(comp_ptr, start, (size_t)count);
 	    comp_ptr += count;
 	  }
 	}

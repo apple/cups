@@ -902,7 +902,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
       * Make URI relative to the current server...
       */
 
-      strlcpy(url, resource, urlsize);
+      strlcpy(url, resource, (size_t)urlsize);
     }
     else
     {
@@ -911,17 +911,13 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
       */
 
       if (userpass[0])
-	snprintf(url, urlsize, "%s://%s@%s:%d%s",
-		 ishttps ? "https" : "http",
-		 userpass, hostname, port, resource);
+	snprintf(url, (size_t)urlsize, "%s://%s@%s:%d%s", ishttps ? "https" : "http", userpass, hostname, port, resource);
       else
-	snprintf(url, urlsize, "%s://%s:%d%s",
-		 ishttps ? "https" : "http",
-		 hostname, port, resource);
+	snprintf(url, (size_t)urlsize, "%s://%s:%d%s", ishttps ? "https" : "http", hostname, port, resource);
     }
   }
   else
-    strlcpy(url, uri, urlsize);
+    strlcpy(url, uri, (size_t)urlsize);
 
   return (url);
 }

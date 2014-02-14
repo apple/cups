@@ -1670,7 +1670,7 @@ cups_get_printer_uri(
   * Do the request and get back a response...
   */
 
-  snprintf(resource, resourcesize, "/printers/%s", name);
+  snprintf(resource, (size_t)resourcesize, "/printers/%s", name);
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {

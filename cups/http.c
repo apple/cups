@@ -1315,7 +1315,7 @@ httpGets(char   *line,			/* I - Line to read into */
 
     http->used -= (int)(bufptr - http->buffer);
     if (http->used > 0)
-      memmove(http->buffer, bufptr, http->used);
+      memmove(http->buffer, bufptr, (size_t)http->used);
 
     if (eol)
     {
@@ -1809,7 +1809,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       http->data_remaining  -= buflen;
 
       if (http->used > 0)
-        memmove(http->buffer, http->buffer + buflen, http->used);
+        memmove(http->buffer, http->buffer + buflen, (size_t)http->used);
     }
 
     DEBUG_printf(("2httpPeek: length=%d, avail_in=%d", (int)length,
@@ -4141,11 +4141,11 @@ http_read_buffered(http_t *http,	/* I - HTTP connection */
     DEBUG_printf(("2http_read: Grabbing %d bytes from input buffer.",
                   (int)bytes));
 
-    memcpy(buffer, http->buffer, bytes);
+    memcpy(buffer, http->buffer, (size_t)bytes);
     http->used -= (int)bytes;
 
     if (http->used > 0)
-      memmove(http->buffer, http->buffer + bytes, http->used);
+      memmove(http->buffer, http->buffer + bytes, (size_t)http->used);
   }
   else
     bytes = http_read(http, buffer, length);

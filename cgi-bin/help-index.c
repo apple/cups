@@ -1163,7 +1163,7 @@ help_load_file(
 
 	wordlen = (int)(ptr - text);
 
-        memcpy(temp, text, wordlen);
+        memcpy(temp, text, (size_t)wordlen);
 	temp[wordlen] = '\0';
 
         ptr --;

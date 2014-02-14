@@ -41,7 +41,7 @@ static int		do_samba_command(const char *command,
 					 FILE *logfile);
 static http_status_t	get_cupsd_conf(http_t *http, _cups_globals_t *cg,
 			               time_t last_update, char *name,
-				       int namelen, int *remote);
+				       size_t namelen, int *remote);
 static void		invalidate_cupsd_cache(_cups_globals_t *cg);
 static void		write_option(cups_file_t *dstfp, int order,
 			             const char *name, const char *text,
@@ -2109,7 +2109,7 @@ get_cupsd_conf(
     _cups_globals_t *cg,		/* I - Global data */
     time_t          last_update,	/* I - Last update time for file */
     char            *name,		/* I - Filename buffer */
-    int             namesize,		/* I - Size of filename buffer */
+    size_t          namesize,		/* I - Size of filename buffer */
     int             *remote)		/* O - Remote file? */
 {
   int		fd;			/* Temporary file descriptor */

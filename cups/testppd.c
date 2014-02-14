@@ -28,6 +28,7 @@
 #  include <unistd.h>
 #  include <fcntl.h>
 #endif /* WIN32 */
+#include <math.h>
 
 
 /*

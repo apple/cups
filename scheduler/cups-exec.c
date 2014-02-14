@@ -24,6 +24,7 @@
 #include <cups/file.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <grp.h>
 #include <sys/stat.h>
 #ifdef HAVE_SANDBOX_H
 #  include <sandbox.h>

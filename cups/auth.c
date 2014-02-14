@@ -454,7 +454,7 @@ _cupsSetNegotiateAuthString(
       authsize         = sizeof(http->_authstring);
     }
 
-    strlcpy(http->authstring, "Negotiate ", authsize);
+    strlcpy(http->authstring, "Negotiate ", (size_t)authsize);
     httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
 		   (int)output_token.length);
 

@@ -17,12 +17,91 @@
 
 
 /*
+ * Local globals...
+ */
+
+static int		tls_auto_create = 0;
+					/* Auto-create self-signed certs? */
+static char		*tls_common_name = NULL;
+					/* Default common name */
+static char		*tls_keypath = NULL;
+					/* Server cert keychain path */
+static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Mutex for keychain/certs */
+
+
+/*
  * Local functions...
  */
 
 //static int		make_certificate(cupsd_client_t *con);
 static ssize_t	http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
 static ssize_t	http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
+
+
+/*
+ * 'cupsMakeServerCredentials()' - Make a self-signed certificate and private key pair.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsMakeServerCredentials(
+    const char *path,			/* I - Path to keychain/directory */
+    const char *common_name,		/* I - Common name */
+    int        num_alt_names,		/* I - Number of subject alternate names */
+    const char **alt_names,		/* I - Subject Alternate Names */
+    time_t     expiration_date)		/* I - Expiration date */
+{
+  (void)path;
+  (void)common_name;
+  (void)num_alt_names;
+  (void)alt_names;
+  (void)expiration_date;
+
+  return (0);
+}
+
+
+/*
+ * 'cupsSetServerCredentials()' - Set the default server credentials.
+ *
+ * Note: The server credentials are used by all threads in the running process.
+ * This function is threadsafe.
+ *
+ * @since CUPS 2.0@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsSetServerCredentials(
+    const char *path,			/* I - Path to keychain/directory */
+    const char *common_name,		/* I - Default common name for server */
+    int        auto_create)		/* I - 1 = automatically create self-signed certificates */
+{
+  _cupsMutexLock(&tls_mutex);
+
+ /*
+  * Free old values...
+  */
+
+  if (tls_keypath)
+    _cupsStrFree(tls_keypath);
+
+  if (tls_common_name)
+    _cupsStrFree(tls_common_name);
+
+ /*
+  * Save the new values...
+  */
+
+  tls_keypath     = _cupsStrAlloc(path);
+  tls_auto_create = auto_create;
+  tls_common_name = _cupsStrAlloc(common_name);
+
+  _cupsMutexUnlock(&tls_mutex);
+
+  return (1);
+}
 
 
 /*
@@ -177,7 +256,7 @@ http_tls_read(http_t *http,		/* I - Connection to server */
   ssize_t	result;			/* Return value */
 
 
-  result = gnutls_record_recv(http->tls, buf, len);
+  result = gnutls_record_recv(http->tls, buf, (size_t)len);
 
   if (result < 0 && !errno)
   {
@@ -343,7 +422,7 @@ http_tls_write(http_t     *http,	/* I - Connection to server */
 
   DEBUG_printf(("2http_write_ssl(http=%p, buf=%p, len=%d)", http, buf, len));
 
-  result = gnutls_record_send(http->tls, buf, len);
+  result = gnutls_record_send(http->tls, buf, (size_t)len);
 
   if (result < 0 && !errno)
   {

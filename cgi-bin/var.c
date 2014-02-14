@@ -821,7 +821,7 @@ cgi_initialize_multipart(
 	    */
 
 	    write(fd, line, 8192);
-	    memmove(line, line + 8192, ptr - line - 8192);
+	    memmove(line, line + 8192, (size_t)(ptr - line - 8192));
 	    ptr -= 8192;
 	  }
 	}

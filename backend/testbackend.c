@@ -671,7 +671,7 @@ walk_cb(const char *oid,		/* I - OID */
   }
   else
   {
-    memcpy(temp, data, datalen);
+    memcpy(temp, data, (size_t)datalen);
     temp[datalen] = '\0';
   }
 

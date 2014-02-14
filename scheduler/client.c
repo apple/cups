@@ -3,7 +3,7 @@
  *
  * Client routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -44,7 +44,7 @@ static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 static int		cupsd_start_tls(cupsd_client_t *con, http_encryption_t e);
 #endif /* HAVE_SSL */
 static char		*get_file(cupsd_client_t *con, struct stat *filestats,
-			          char *filename, int len);
+			          char *filename, size_t len);
 static http_status_t	install_cupsd_conf(cupsd_client_t *con);
 static int		is_cgi(cupsd_client_t *con, const char *filename,
 		               struct stat *filestats, mime_type_t *type);
@@ -2636,7 +2636,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  con->header_used -= bufptr - con->header;
 
 	  if (con->header_used > 0)
-	    memmove(con->header, bufptr, con->header_used);
+	    memmove(con->header, bufptr, (size_t)con->header_used);
 
 	  bufptr = con->header - 1;
 
@@ -2881,11 +2881,11 @@ static char *				/* O  - Real filename */
 get_file(cupsd_client_t *con,		/* I  - Client connection */
          struct stat    *filestats,	/* O  - File information */
          char           *filename,	/* IO - Filename buffer */
-         int            len)		/* I  - Buffer length */
+         size_t         len)		/* I  - Buffer length */
 {
   int		status;			/* Status of filesystem calls */
   char		*ptr;			/* Pointer info filename */
-  int		plen;			/* Remaining length after pointer */
+  size_t	plen;			/* Remaining length after pointer */
   char		language[7];		/* Language subdirectory, if any */
 
 
@@ -3008,7 +3008,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 	*ptr = '\0';
 
       ptr  = filename + strlen(filename);
-      plen = len - (ptr - filename);
+      plen = len - (size_t)(ptr - filename);
 
       strlcpy(ptr, "index.html", plen);
       status = stat(filename, filestats);
@@ -3055,10 +3055,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     while (status && language[0]);
   }
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-                 "get_file filestats=%p, filename=%p, len=%d, "
-		 "returning \"%s\".", filestats, filename, len,
-		 status ? "(null)" : filename);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "get_file filestats=%p, filename=%p, len=" CUPS_LLFMT ", returning \"%s\".", filestats, filename, CUPS_LLCAST len, status ? "(null)" : filename);
 
   if (status)
     return (NULL);

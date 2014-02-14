@@ -556,7 +556,7 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
       return (NULL);
     }
 
-    memcpy(attr->values[0].unknown.data, data, datalen);
+    memcpy(attr->values[0].unknown.data, data, (size_t)datalen);
   }
 
  /*
@@ -1715,7 +1715,7 @@ ippCopyAttribute(
 	    if ((dstval->unknown.data = malloc((size_t)dstval->unknown.length)) == NULL)
 	      dstval->unknown.length = 0;
 	    else
-	      memcpy(dstval->unknown.data, srcval->unknown.data, dstval->unknown.length);
+	      memcpy(dstval->unknown.data, srcval->unknown.data, (size_t)dstval->unknown.length);
 	  }
 	}
         break; /* anti-compiler-warning-code */
@@ -3472,7 +3472,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  return (IPP_STATE_ERROR);
 		}
 
-		memcpy(string, bufptr + 2, n);
+		memcpy(string, bufptr + 2, (size_t)n);
 		string[n] = '\0';
 
 		value->string.language = _cupsStrAlloc((char *)string);
@@ -3967,7 +3967,7 @@ ippSetOctetString(
 
 	if ((temp = malloc((size_t)datalen)) != NULL)
 	{
-	  memcpy(temp, data, datalen);
+	  memcpy(temp, data, (size_t)datalen);
 
 	  value->unknown.data   = temp;
 	  value->unknown.length = datalen;
@@ -5575,7 +5575,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 	    *bufptr++ = (ipp_uchar_t)(n >> 8);
 	    *bufptr++ = (ipp_uchar_t)n;
-	    memcpy(bufptr, attr->name, n);
+	    memcpy(bufptr, attr->name, (size_t)n);
 	    bufptr += n;
           }
 	  else
@@ -5610,7 +5610,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    *bufptr++ = 0;
 	    *bufptr++ = (ipp_uchar_t)(n >> 8);
 	    *bufptr++ = (ipp_uchar_t)n;
-	    memcpy(bufptr, attr->name, n);
+	    memcpy(bufptr, attr->name, (size_t)n);
 	    bufptr += n;
 
             if (attr->value_tag > 0xff)
@@ -5819,7 +5819,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 
 		  if (n > 0)
 		  {
-		    memcpy(bufptr, value->string.text, n);
+		    memcpy(bufptr, value->string.text, (size_t)n);
 		    bufptr += n;
 		  }
 		}
@@ -6060,7 +6060,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
                  /* Language */
 		  if (n > 0)
 		  {
-		    memcpy(bufptr, value->string.language, n);
+		    memcpy(bufptr, value->string.language, (size_t)n);
 		    bufptr += n;
 		  }
 
@@ -6076,7 +6076,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
                  /* Text */
 		  if (n > 0)
 		  {
-		    memcpy(bufptr, value->string.text, n);
+		    memcpy(bufptr, value->string.text, (size_t)n);
 		    bufptr += n;
 		  }
 		}
@@ -6219,7 +6219,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
                  /* Value */
 		  if (n > 0)
 		  {
-		    memcpy(bufptr, value->unknown.data, n);
+		    memcpy(bufptr, value->unknown.data, (size_t)n);
 		    bufptr += n;
 		  }
 		}

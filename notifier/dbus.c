@@ -417,7 +417,7 @@ main(int  argc,				/* I - Number of command-line args */
 	attr = ippFindAttribute(msg, "printer-state", IPP_TAG_ENUM);
 	if (attr)
 	{
-	  dbus_uint32_t val = ippGetInteger(attr, 0);
+	  dbus_uint32_t val = (dbus_uint32_t)ippGetInteger(attr, 0);
 	  dbus_message_iter_append_uint32(&iter, &val);
 	}
 	else
@@ -446,8 +446,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    if (i)
 	      *p++ = ',';
 
-	    strlcpy(p, ippGetString(attr, i, NULL),
-	            reasons_length - (p - printer_reasons));
+	    strlcpy(p, ippGetString(attr, i, NULL), reasons_length - (size_t)(p - printer_reasons));
 	    p += strlen(p);
 	  }
 	  if (!dbus_message_iter_append_string(&iter, &printer_reasons))
@@ -466,7 +465,7 @@ main(int  argc,				/* I - Number of command-line args */
 				IPP_TAG_BOOLEAN);
 	if (attr)
 	{
-	  dbus_bool_t val = ippGetBoolean(attr, 0);
+	  dbus_bool_t val = (dbus_bool_t)ippGetBoolean(attr, 0);
 	  dbus_message_iter_append_boolean(&iter, &val);
 	}
 	else
@@ -486,7 +485,7 @@ main(int  argc,				/* I - Number of command-line args */
       attr = ippFindAttribute(msg, "notify-job-id", IPP_TAG_INTEGER);
       if (attr)
       {
-        dbus_uint32_t val = ippGetInteger(attr, 0);
+        dbus_uint32_t val = (dbus_uint32_t)ippGetInteger(attr, 0);
         dbus_message_iter_append_uint32(&iter, &val);
       }
       else
@@ -496,7 +495,7 @@ main(int  argc,				/* I - Number of command-line args */
       attr = ippFindAttribute(msg, "job-state", IPP_TAG_ENUM);
       if (attr)
       {
-        dbus_uint32_t val = ippGetInteger(attr, 0);
+        dbus_uint32_t val = (dbus_uint32_t)ippGetInteger(attr, 0);
         dbus_message_iter_append_uint32(&iter, &val);
       }
       else
@@ -519,8 +518,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  if (i)
 	    *p++ = ',';
 
-	  strlcpy(p, ippGetString(attr, i, NULL),
-	          reasons_length - (p - job_reasons));
+	  strlcpy(p, ippGetString(attr, i, NULL), reasons_length - (size_t)(p - job_reasons));
 	  p += strlen(p);
 	}
 	if (!dbus_message_iter_append_string(&iter, &job_reasons))
@@ -545,7 +543,7 @@ main(int  argc,				/* I - Number of command-line args */
 			      IPP_TAG_INTEGER);
       if (attr)
       {
-        dbus_uint32_t val = ippGetInteger(attr, 0);
+        dbus_uint32_t val = (dbus_uint32_t)ippGetInteger(attr, 0);
         dbus_message_iter_append_uint32(&iter, &val);
       }
       else

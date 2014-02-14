@@ -408,10 +408,10 @@ cupsdInitCerts(void)
     * them as the seed...
     */
 
-    seed = cupsFileGetChar(fp);
-    seed = (seed << 8) | cupsFileGetChar(fp);
-    seed = (seed << 8) | cupsFileGetChar(fp);
-    CUPS_SRAND((seed << 8) | cupsFileGetChar(fp));
+    seed = (unsigned)cupsFileGetChar(fp);
+    seed = (seed << 8) | (unsigned)cupsFileGetChar(fp);
+    seed = (seed << 8) | (unsigned)cupsFileGetChar(fp);
+    CUPS_SRAND((seed << 8) | (unsigned)cupsFileGetChar(fp));
 
     cupsFileClose(fp);
   }

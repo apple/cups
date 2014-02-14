@@ -518,15 +518,13 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 
 
       if (cupsd_pollfds)
-	pfd = realloc(cupsd_pollfds, allocfds * sizeof(struct pollfd));
+	pfd = realloc(cupsd_pollfds, (size_t)allocfds * sizeof(struct pollfd));
       else
-	pfd = malloc(allocfds * sizeof(struct pollfd));
+	pfd = malloc((size_t)allocfds * sizeof(struct pollfd));
 
       if (!pfd)
       {
-	cupsdLogMessage(CUPSD_LOG_EMERG,
-                	"Unable to allocate %d bytes for polling!",
-                	(int)(allocfds * sizeof(struct pollfd)));
+	cupsdLogMessage(CUPSD_LOG_EMERG, "Unable to allocate %d bytes for polling.", (int)((size_t)allocfds * sizeof(struct pollfd)));
 
 	return (-1);
       }
@@ -555,9 +553,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   }
 
   if (timeout >= 0 && timeout < 86400)
-    nfds = poll(cupsd_pollfds, count, timeout * 1000);
+    nfds = poll(cupsd_pollfds, (nfds_t)count, timeout * 1000);
   else
-    nfds = poll(cupsd_pollfds, count, -1);
+    nfds = poll(cupsd_pollfds, (nfds_t)count, -1);
 
   if (nfds > 0)
   {
@@ -808,7 +806,7 @@ cupsdStartSelect(void)
 
 #ifdef HAVE_EPOLL
   cupsd_epoll_fd       = epoll_create(MaxFDs);
-  cupsd_epoll_events   = calloc(MaxFDs, sizeof(struct epoll_event));
+  cupsd_epoll_events   = calloc((size_t)MaxFDs, sizeof(struct epoll_event));
   cupsd_update_pollfds = 0;
 
 #elif defined(HAVE_KQUEUE)

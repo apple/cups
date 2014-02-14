@@ -243,7 +243,7 @@ _cupsStrFormatd(char         *buf,	/* I - String */
   }
   else
   {
-    strlcpy(buf, temp, bufend - buf + 1);
+    strlcpy(buf, temp, (size_t)(bufend - buf + 1));
     bufptr = buf + strlen(buf);
   }
 

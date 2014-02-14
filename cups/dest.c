@@ -3094,7 +3094,7 @@ cups_dnssd_query_cb(
 	txt ++;
 
 	if (txt < txtnext)
-	  memcpy(value, txt, txtnext - txt);
+	  memcpy(value, txt, (size_t)(txtnext - txt));
 	value[txtnext - txt] = '\0';
 
 	DEBUG_printf(("6cups_dnssd_query_cb: %s=%s", key, value));
@@ -3773,22 +3773,21 @@ cups_make_string(
     {
       case IPP_TAG_INTEGER :
       case IPP_TAG_ENUM :
-	  snprintf(ptr, end - ptr + 1, "%d", attr->values[i].integer);
+	  snprintf(ptr, (size_t)(end - ptr + 1), "%d", attr->values[i].integer);
 	  break;
 
       case IPP_TAG_BOOLEAN :
 	  if (attr->values[i].boolean)
-	    strlcpy(ptr, "true", end - ptr + 1);
+	    strlcpy(ptr, "true", (size_t)(end - ptr + 1));
 	  else
-	    strlcpy(ptr, "false", end - ptr + 1);
+	    strlcpy(ptr, "false", (size_t)(end - ptr + 1));
 	  break;
 
       case IPP_TAG_RANGE :
 	  if (attr->values[i].range.lower == attr->values[i].range.upper)
-	    snprintf(ptr, end - ptr + 1, "%d", attr->values[i].range.lower);
+	    snprintf(ptr, (size_t)(end - ptr + 1), "%d", attr->values[i].range.lower);
 	  else
-	    snprintf(ptr, end - ptr + 1, "%d-%d", attr->values[i].range.lower,
-		     attr->values[i].range.upper);
+	    snprintf(ptr, (size_t)(end - ptr + 1), "%d-%d", attr->values[i].range.lower, attr->values[i].range.upper);
 	  break;
 
       default :

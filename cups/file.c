@@ -508,7 +508,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
 
     if (!access(filename, 0))
     {
-      strlcpy(buffer, filename, bufsize);
+      strlcpy(buffer, filename, (size_t)bufsize);
       return (buffer);
     }
     else
@@ -533,7 +533,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
       if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
         *bufptr++ = '/';
 
-      strlcpy(bufptr, filename, bufend - bufptr);
+      strlcpy(bufptr, filename, (size_t)(bufend - bufptr));
 
 #ifdef WIN32
       if (!access(buffer, 0))
@@ -560,7 +560,7 @@ cupsFileFind(const char *filename,	/* I - File to find */
   if (bufptr > buffer && bufptr[-1] != '/' && bufptr < bufend)
     *bufptr++ = '/';
 
-  strlcpy(bufptr, filename, bufend - bufptr);
+  strlcpy(bufptr, filename, (size_t)(bufend - bufptr));
 
   if (!access(buffer, 0))
   {
@@ -1382,7 +1382,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   }
   else
   {
-    memcpy(fp->ptr, fp->printf_buffer, bytes);
+    memcpy(fp->ptr, fp->printf_buffer, (size_t)bytes);
     fp->ptr += bytes;
     return ((int)bytes);
   }
@@ -1561,7 +1561,7 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
   }
   else
   {
-    memcpy(fp->ptr, s, bytes);
+    memcpy(fp->ptr, s, (size_t)bytes);
     fp->ptr += bytes;
     return ((int)bytes);
   }
@@ -1619,7 +1619,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
     if (count > (ssize_t)bytes)
       count = (ssize_t)bytes;
 
-    memcpy(buf, fp->ptr, count);
+    memcpy(buf, fp->ptr,(size_t) count);
     fp->ptr += count;
     fp->pos += count;
 
@@ -2312,7 +2312,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       */
 
       if ((bytes = end - ptr) > 0)
-        memcpy(fp->cbuf, ptr, bytes);
+        memcpy(fp->cbuf, ptr, (size_t)bytes);
 
      /*
       * Setup the decompressor data...

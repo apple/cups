@@ -59,7 +59,7 @@ static int	create_job(http_t *http, const char *dest, const char *title,
                            const char *docname, const char *user,
 			   int num_options, cups_option_t *options);
 static int	get_printer(http_t *http, const char *name, char *dest,
-		            int destsize, cups_option_t **options,
+		            size_t destsize, cups_option_t **options,
 			    int *accepting, int *shared, ipp_pstate_t *state);
 static int	print_file(http_t *http, int id, const char *filename,
 		           const char *docname, const char *user,
@@ -398,7 +398,7 @@ static int				/* O - Number of options or -1 on error */
 get_printer(http_t        *http,	/* I - HTTP connection */
             const char    *name,	/* I - Printer name from request */
 	    char          *dest,	/* I - Destination buffer */
-            int           destsize,	/* I - Size of destination buffer */
+            size_t        destsize,	/* I - Size of destination buffer */
 	    cups_option_t **options,	/* O - Printer options */
 	    int           *accepting,	/* O - printer-is-accepting-jobs value */
 	    int           *shared,	/* O - printer-is-shared value */

@@ -638,46 +638,37 @@ ippAttributeString(
           ptr = ippEnumString(attr->name, val->integer);
 
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, ptr, bufend - bufptr + 1);
+            strlcpy(bufptr, ptr, (size_t)(bufend - bufptr + 1));
 
           bufptr += strlen(ptr);
           break;
 
       case IPP_TAG_INTEGER :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d", val->integer);
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d", val->integer);
           else
             bufptr += snprintf(temp, sizeof(temp), "%d", val->integer);
           break;
 
       case IPP_TAG_BOOLEAN :
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, val->boolean ? "true" : "false",
-                    bufend - bufptr + 1);
+            strlcpy(bufptr, val->boolean ? "true" : "false", (size_t)(bufend - bufptr + 1));
 
           bufptr += val->boolean ? 4 : 5;
           break;
 
       case IPP_TAG_RANGE :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d-%d",
-                               val->range.lower, val->range.upper);
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d-%d", val->range.lower, val->range.upper);
           else
-            bufptr += snprintf(temp, sizeof(temp), "%d-%d", val->range.lower,
-                               val->range.upper);
+            bufptr += snprintf(temp, sizeof(temp), "%d-%d", val->range.lower, val->range.upper);
           break;
 
       case IPP_TAG_RESOLUTION :
           if (buffer && bufptr < bufend)
-            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%dx%d%s",
-                               val->resolution.xres, val->resolution.yres,
-                               val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpcm");
+            bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           else
-            bufptr += snprintf(temp, sizeof(temp), "%dx%d%s",
-                               val->resolution.xres, val->resolution.yres,
-                               val->resolution.units == IPP_RES_PER_INCH ?
-                                   "dpi" : "dpcm");
+            bufptr += snprintf(temp, sizeof(temp), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           break;
 
       case IPP_TAG_DATE :
@@ -698,7 +689,7 @@ ippAttributeString(
 		       val->date[10]);
 
             if (buffer && bufptr < bufend)
-              strlcpy(bufptr, temp, bufend - bufptr + 1);
+              strlcpy(bufptr, temp, (size_t)(bufend - bufptr + 1));
 
             bufptr += strlen(temp);
           }
@@ -742,7 +733,7 @@ ippAttributeString(
             bufptr ++;
 
             if (buffer && bufptr < bufend)
-              strlcpy(bufptr, val->string.language, bufend - bufptr);
+              strlcpy(bufptr, val->string.language, (size_t)(bufend - bufptr));
             bufptr += strlen(val->string.language);
 
             if (buffer && bufptr < bufend)
@@ -775,11 +766,9 @@ ippAttributeString(
             else if (!isprint(*ptr & 255))
             {
               if (buffer && bufptr < bufend)
-                bufptr += snprintf(bufptr, bufend - bufptr + 1, "\\%03o",
-                                   *ptr & 255);
+                bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "\\%03o", *ptr & 255);
               else
-                bufptr += snprintf(temp, sizeof(temp), "\\%03o",
-                                   *ptr & 255);
+                bufptr += snprintf(temp, sizeof(temp), "\\%03o", *ptr & 255);
             }
             else
             {
@@ -793,7 +782,7 @@ ippAttributeString(
       default :
           ptr = ippTagString(attr->value_tag);
           if (buffer && bufptr < bufend)
-            strlcpy(bufptr, ptr, bufend - bufptr + 1);
+            strlcpy(bufptr, ptr, (size_t)(bufend - bufptr + 1));
           bufptr += strlen(ptr);
           break;
     }
@@ -2231,7 +2220,7 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
     prefix = ' ';
 
     if (buffer && bufptr < bufend)
-      bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
+      bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%s=", attr->name);
     else
       bufptr += strlen(attr->name) + 1;
 

@@ -36,7 +36,7 @@
  * Local functions...
  */
 
-static cups_lang_t	*ppd_ll_CC(char *ll_CC, int ll_CC_size);
+static cups_lang_t	*ppd_ll_CC(char *ll_CC, size_t ll_CC_size);
 
 
 /*
@@ -712,8 +712,8 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
  */
 
 static cups_lang_t *			/* O - Current language */
-ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
-          int  ll_CC_size)		/* I - Size of country-specific name */
+ppd_ll_CC(char   *ll_CC,		/* O - Country-specific locale name */
+          size_t ll_CC_size)		/* I - Size of country-specific name */
 {
   cups_lang_t	*lang;			/* Current language */
 

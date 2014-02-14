@@ -129,15 +129,12 @@ static void	set_printer_defaults(cupsd_client_t *con,
 		                     cupsd_printer_t *printer);
 static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	stop_printer(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	url_encode_attr(ipp_attribute_t *attr, char *buffer,
-		                int bufsize);
-static char	*url_encode_string(const char *s, char *buffer, int bufsize);
+static void	url_encode_attr(ipp_attribute_t *attr, char *buffer, size_t bufsize);
+static char	*url_encode_string(const char *s, char *buffer, size_t bufsize);
 static int	user_allowed(cupsd_printer_t *p, const char *username);
 static void	validate_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	validate_name(const char *name);
-static int	validate_user(cupsd_job_t *job, cupsd_client_t *con,
-		              const char *owner, char *username,
-		              int userlen);
+static int	validate_user(cupsd_job_t *job, cupsd_client_t *con, const char *owner, char *username, size_t userlen);
 
 
 /*
@@ -2115,7 +2112,7 @@ add_job_subscriptions(
       {
 	sub->user_data_len = user_data->values[0].unknown.length;
 	memcpy(sub->user_data, user_data->values[0].unknown.data,
-	       sub->user_data_len);
+	       (size_t)sub->user_data_len);
       }
 
       ippAddSeparator(con->response);
@@ -5555,7 +5552,7 @@ create_subscription(
     {
       sub->user_data_len = user_data->values[0].unknown.length;
       memcpy(sub->user_data, user_data->values[0].unknown.data,
-             sub->user_data_len);
+             (size_t)sub->user_data_len);
     }
 
     ippAddSeparator(con->response);
@@ -10554,7 +10551,7 @@ stop_printer(cupsd_client_t  *con,	/* I - Client connection */
 static void
 url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
                 char            *buffer,/* I - String buffer */
-		int             bufsize)/* I - Size of buffer */
+		size_t          bufsize)/* I - Size of buffer */
 {
   int	i;				/* Looping var */
   char	*bufptr,			/* Pointer into buffer */
@@ -10580,8 +10577,7 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 
     *bufptr++ = '\'';
 
-    bufptr = url_encode_string(attr->values[i].string.text,
-                               bufptr, bufend - bufptr + 1);
+    bufptr = url_encode_string(attr->values[i].string.text, bufptr, (size_t)(bufend - bufptr + 1));
 
     if (bufptr >= bufend)
       break;
@@ -10600,7 +10596,7 @@ url_encode_attr(ipp_attribute_t *attr,	/* I - Attribute */
 static char *				/* O - End of string */
 url_encode_string(const char *s,	/* I - String */
                   char       *buffer,	/* I - String buffer */
-		  int        bufsize)	/* I - Size of buffer */
+		  size_t     bufsize)	/* I - Size of buffer */
 {
   char	*bufptr,			/* Pointer into buffer */
 	*bufend;			/* End of buffer */
@@ -10955,16 +10951,12 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
               cupsd_client_t *con,	/* I - Client connection */
               const char     *owner,	/* I - Owner of job/resource */
               char           *username,	/* O - Authenticated username */
-	      int            userlen)	/* I - Length of username */
+	      size_t         userlen)	/* I - Length of username */
 {
   cupsd_printer_t	*printer;	/* Printer for job */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, "
-		  "userlen=%d)",
-        	  job->id, con ? con->number : 0,
-		  owner ? owner : "(null)", username, userlen);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, userlen=" CUPS_LLFMT ")", job->id, con ? con->number : 0, owner ? owner : "(null)", username, CUPS_LLCAST userlen);
 
  /*
   * Validate input...

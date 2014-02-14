@@ -2281,7 +2281,7 @@ list_service(ippfind_srv_t *service)	/* I - Service */
            i ++, ptr += strlen(ptr))
       {
         *ptr++ = ',';
-        strlcpy(ptr, ippGetString(attr, i, NULL), end - ptr + 1);
+        strlcpy(ptr, ippGetString(attr, i, NULL), (size_t)(end - ptr + 1));
       }
     }
     else

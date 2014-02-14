@@ -506,17 +506,16 @@ fix_make_model(
     make_model[0] = 'H';
     make_model[1] = 'P';
     make_model[2] = ' ';
-    strlcpy(make_model + 3, mmptr, make_model_size - 3);
+    strlcpy(make_model + 3, mmptr, (size_t)make_model_size - 3);
   }
   else if (!_cups_strncasecmp(old_make_model, "deskjet", 7))
-    snprintf(make_model, make_model_size, "HP DeskJet%s", old_make_model + 7);
+    snprintf(make_model, (size_t)make_model_size, "HP DeskJet%s", old_make_model + 7);
   else if (!_cups_strncasecmp(old_make_model, "officejet", 9))
-    snprintf(make_model, make_model_size, "HP OfficeJet%s", old_make_model + 9);
+    snprintf(make_model, (size_t)make_model_size, "HP OfficeJet%s", old_make_model + 9);
   else if (!_cups_strncasecmp(old_make_model, "stylus_pro_", 11))
-    snprintf(make_model, make_model_size, "EPSON Stylus Pro %s",
-             old_make_model + 11);
+    snprintf(make_model, (size_t)make_model_size, "EPSON Stylus Pro %s", old_make_model + 11);
   else
-    strlcpy(make_model, old_make_model, make_model_size);
+    strlcpy(make_model, old_make_model, (size_t)make_model_size);
 
   if ((mmptr = strstr(make_model, ", Inc.,")) != NULL)
   {

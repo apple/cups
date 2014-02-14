@@ -722,7 +722,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	      * Pull the name from inside the brackets...
 	      */
 
-	      memcpy(name, format + 1, nameend - format - 1);
+	      memcpy(name, format + 1, (size_t)(nameend - format - 1));
 	      name[nameend - format - 1] = '\0';
 
 	      format = nameend;

@@ -4076,7 +4076,7 @@ get_option_value(
       if ((val = cgiGetVariable(keyword)) == NULL)
 	return (NULL);
 
-      snprintf(bufptr, bufend - bufptr, "%s%s=", prefix, cparam->name);
+      snprintf(bufptr, (size_t)(bufend - bufptr), "%s%s=", prefix, cparam->name);
       bufptr += strlen(bufptr);
       prefix = " ";
 
@@ -4090,7 +4090,7 @@ get_option_value(
 		number > cparam->maximum.custom_real)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%g", number);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%g", number);
 	    break;
 
 	case PPD_CUSTOM_INT :
@@ -4100,7 +4100,7 @@ get_option_value(
 		integer > cparam->maximum.custom_int)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%ld", integer);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%ld", integer);
 	    break;
 
 	case PPD_CUSTOM_POINTS :
@@ -4118,7 +4118,7 @@ get_option_value(
 		number_points > cparam->maximum.custom_points)
 	      return (NULL);
 
-	    snprintf(bufptr, bufend - bufptr, "%g%s", number, uval);
+	    snprintf(bufptr, (size_t)(bufend - bufptr), "%g%s", number, uval);
 	    break;
 
 	case PPD_CUSTOM_PASSCODE :

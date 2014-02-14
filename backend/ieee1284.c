@@ -141,8 +141,7 @@ backendGetDeviceID(
 		* Read the 1284 device ID...
 		*/
 
-		if ((length = read(devparportfd, device_id,
-				   device_id_size - 1)) >= 2)
+		if ((length = read(devparportfd, device_id, (size_t)device_id_size - 1)) >= 2)
 		{
 		  device_id[length] = '\0';
 		  got_id = 1;
@@ -171,8 +170,7 @@ backendGetDeviceID(
       * bytes.  The 1284 spec says the length is stored MSB first...
       */
 
-      length = (((unsigned)device_id[0] & 255) << 8) +
-	       ((unsigned)device_id[1] & 255);
+      length = (int)((((unsigned)device_id[0] & 255) << 8) + ((unsigned)device_id[1] & 255));
 
      /*
       * Check to see if the length is larger than our buffer; first
@@ -181,8 +179,7 @@ backendGetDeviceID(
       */
 
       if (length > device_id_size || length < 14)
-	length = (((unsigned)device_id[1] & 255) << 8) +
-		 ((unsigned)device_id[0] & 255);
+	length = (int)((((unsigned)device_id[1] & 255) << 8) + ((unsigned)device_id[0] & 255));
 
       if (length > device_id_size)
 	length = device_id_size;
@@ -214,7 +211,7 @@ backendGetDeviceID(
 
 	length -= 2;
 
-	memmove(device_id, device_id + 2, length);
+	memmove(device_id, device_id + 2, (size_t)length);
 	device_id[length] = '\0';
       }
     }
@@ -280,7 +277,7 @@ backendGetDeviceID(
   */
 
   if (make_model)
-    backendGetMakeModel(device_id, make_model, make_model_size);
+    backendGetMakeModel(device_id, make_model, (size_t)make_model_size);
 
  /*
   * Then generate a device URI...

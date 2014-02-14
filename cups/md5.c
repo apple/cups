@@ -300,7 +300,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
     if (offset) {
 	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
-	memcpy(pms->buf + offset, p, copy);
+	memcpy(pms->buf + offset, p, (size_t)copy);
 	if (offset + copy < 64)
 	    return;
 	p += copy;
@@ -314,7 +314,7 @@ _cupsMD5Append(_cups_md5_state_t *pms, const unsigned char *data, int nbytes)
 
     /* Process a final partial block. */
     if (left)
-	memcpy(pms->buf, p, left);
+	memcpy(pms->buf, p, (size_t)left);
 }
 
 void

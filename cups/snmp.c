@@ -280,7 +280,7 @@ _cupsSNMPOIDToString(const int *src,	/* I - OID */
   for (dstptr = dst, dstend = dstptr + dstsize - 1;
        *src >= 0 && dstptr < dstend;
        src ++, dstptr += strlen(dstptr))
-    snprintf(dstptr, dstend - dstptr + 1, ".%d", *src);
+    snprintf(dstptr, (size_t)(dstend - dstptr + 1), ".%d", *src);
 
   if (*src >= 0)
     return (NULL);

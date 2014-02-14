@@ -369,10 +369,10 @@ cupsdEndProcess(int pid,		/* I - Process ID */
  */
 
 const char *				/* O - Process name */
-cupsdFinishProcess(int  pid,		/* I - Process ID */
-                   char *name,		/* I - Name buffer */
-		   int  namelen,	/* I - Size of name buffer */
-		   int  *job_id)	/* O - Job ID pointer or NULL */
+cupsdFinishProcess(int    pid,		/* I - Process ID */
+                   char   *name,	/* I - Name buffer */
+		   size_t namelen,	/* I - Size of name buffer */
+		   int    *job_id)	/* O - Job ID pointer or NULL */
 {
   cupsd_proc_t	key,			/* Search key */
 		*proc;			/* Matching process */
@@ -397,10 +397,7 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
     strlcpy(name, "unknown", namelen);
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		  "cupsdFinishProcess(pid=%d, name=%p, namelen=%d, "
-		  "job_id=%p(%d)) = \"%s\"", pid, name, namelen, job_id,
-		  job_id ? *job_id : 0, name);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFinishProcess(pid=%d, name=%p, namelen=" CUPS_LLFMT ", job_id=%p(%d)) = \"%s\"", pid, name, CUPS_LLCAST namelen, job_id, job_id ? *job_id : 0, name);
 
   return (name);
 }
@@ -437,10 +434,9 @@ cupsdStartProcess(
   char		user_str[16],		/* User string */
 		group_str[16],		/* Group string */
 		nice_str[16];		/* FilterNice string */
-#endif /* HAVE_POSIX_SPAWN */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+#elif defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+#endif /* HAVE_POSIX_SPAWN */
 #if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */

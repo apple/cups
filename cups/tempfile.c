@@ -1,24 +1,18 @@
 /*
  * "$Id$"
  *
- *   Temp file utilities for CUPS.
+ * Temp file utilities for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsTempFd()    - Creates a temporary file.
- *   cupsTempFile()  - Generates a temporary filename.
- *   cupsTempFile2() - Creates a temporary CUPS file.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -103,8 +97,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%05lx%08lx", tmpdir,
-             GetCurrentProcessId(), curtime);
+    snprintf(filename, (size_t)len - 1, "%s/%05lx%08lx", tmpdir, GetCurrentProcessId(), curtime);
 #else
    /*
     * Get the current time of day...
@@ -116,8 +109,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%05x%08x", tmpdir, (unsigned)getpid(),
-             (unsigned)(curtime.tv_sec + curtime.tv_usec + tries));
+    snprintf(filename, (size_t)len - 1, "%s/%05x%08x", tmpdir, (unsigned)getpid(), (unsigned)(curtime.tv_sec + curtime.tv_usec + tries));
 #endif /* WIN32 */
 
    /*

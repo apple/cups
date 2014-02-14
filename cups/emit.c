@@ -814,8 +814,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 		      break;
 
 		  case PPD_CUSTOM_INT :
-		      snprintf(bufptr, bufend - bufptr, "%d",
-		               cparam->current.custom_int);
+		      snprintf(bufptr, (size_t)(bufend - bufptr), "%d", cparam->current.custom_int);
 		      bufptr += strlen(bufptr);
 		      break;
 
@@ -824,8 +823,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 		  case PPD_CUSTOM_STRING :
 		      if (cparam->current.custom_string)
 		      {
-			strlcpy(bufptr, cparam->current.custom_string,
-				bufend - bufptr);
+			strlcpy(bufptr, cparam->current.custom_string, (size_t)(bufend - bufptr));
 			bufptr += strlen(bufptr);
 		      }
 		      break;
@@ -845,7 +843,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
         * Otherwise just copy the option code directly...
 	*/
 
-        strlcpy(bufptr, choices[i]->code, bufend - bufptr + 1);
+        strlcpy(bufptr, choices[i]->code, (size_t)(bufend - bufptr + 1));
         bufptr += strlen(bufptr);
       }
     }
@@ -856,7 +854,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       * options...
       */
 
-      strlcpy(bufptr, "[{\n", bufend - bufptr + 1);
+      strlcpy(bufptr, "[{\n", (size_t)(bufend - bufptr + 1));
       bufptr += 3;
 
      /*
@@ -881,8 +879,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	float		values[5];	/* Values for custom command */
 
 
-        strlcpy(bufptr, "%%BeginFeature: *CustomPageSize True\n",
-	        bufend - bufptr + 1);
+        strlcpy(bufptr, "%%BeginFeature: *CustomPageSize True\n", (size_t)(bufend - bufptr + 1));
         bufptr += 37;
 
         size = ppdPageSize(ppd, "Custom");
@@ -977,7 +974,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	  * Level 2 command sequence...
 	  */
 
-	  strlcpy(bufptr, ppd_custom_code, bufend - bufptr + 1);
+	  strlcpy(bufptr, ppd_custom_code, (size_t)(bufend - bufptr + 1));
           bufptr += strlen(bufptr);
 	}
       }
@@ -1000,8 +997,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	     cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
           cupsArrayAdd(params, cparam);
 
-        snprintf(bufptr, bufend - bufptr + 1,
-	         "%%%%BeginFeature: *Custom%s True\n", coption->keyword);
+        snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%%%%BeginFeature: *Custom%s True\n", coption->keyword);
         bufptr += strlen(bufptr);
 
         for (cparam = (ppd_cparam_t *)cupsArrayFirst(params);
@@ -1020,8 +1016,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	        break;
 
 	    case PPD_CUSTOM_INT :
-	        snprintf(bufptr, bufend - bufptr + 1, "%d\n",
-		         cparam->current.custom_int);
+	        snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d\n", cparam->current.custom_int);
 		bufptr += strlen(bufptr);
 	        break;
 
@@ -1036,7 +1031,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 		  {
 		    if (*s < ' ' || *s == '(' || *s == ')' || *s >= 127)
 		    {
-		      snprintf(bufptr, bufend - bufptr + 1, "\\%03o", *s & 255);
+		      snprintf(bufptr, (size_t)(bufend - bufptr + 1), "\\%03o", *s & 255);
 		      bufptr += strlen(bufptr);
 		    }
 		    else
@@ -1054,15 +1049,14 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       }
       else
       {
-        snprintf(bufptr, bufend - bufptr + 1, "%%%%BeginFeature: *%s %s\n",
-                 choices[i]->option->keyword, choices[i]->choice);
+        snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%%%%BeginFeature: *%s %s\n", choices[i]->option->keyword, choices[i]->choice);
 	bufptr += strlen(bufptr);
       }
 
       if (choices[i]->code && choices[i]->code[0])
       {
         j = (int)strlen(choices[i]->code);
-	memcpy(bufptr, choices[i]->code, j);
+	memcpy(bufptr, choices[i]->code, (size_t)j);
 	bufptr += j;
 
 	if (choices[i]->code[j - 1] != '\n')
@@ -1070,7 +1064,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       }
 
       strlcpy(bufptr, "%%EndFeature\n"
-		      "} stopped cleartomark\n", bufend - bufptr + 1);
+		      "} stopped cleartomark\n", (size_t)(bufend - bufptr + 1));
       bufptr += strlen(bufptr);
 
       DEBUG_printf(("2ppdEmitString: Offset in string is %d...",
@@ -1078,7 +1072,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
     }
     else
     {
-      strlcpy(bufptr, choices[i]->code, bufend - bufptr + 1);
+      strlcpy(bufptr, choices[i]->code, (size_t)(bufend - bufptr + 1));
       bufptr += strlen(bufptr);
     }
 

@@ -341,7 +341,7 @@ httpAddrLookup(
 #ifdef AF_LOCAL
   if (addr->addr.sa_family == AF_LOCAL)
   {
-    strlcpy(name, addr->un.sun_path, namelen);
+    strlcpy(name, addr->un.sun_path, (size_t)namelen);
     return (name);
   }
 #endif /* AF_LOCAL */
@@ -352,7 +352,7 @@ httpAddrLookup(
 
   if (httpAddrLocalhost(addr))
   {
-    strlcpy(name, "localhost", namelen);
+    strlcpy(name, "localhost", (size_t)namelen);
     return (name);
   }
 
@@ -423,7 +423,7 @@ httpAddrLookup(
       return (httpAddrString(addr, name, namelen));
     }
 
-    strlcpy(name, host->h_name, namelen);
+    strlcpy(name, host->h_name, (size_t)namelen);
   }
 #endif /* HAVE_GETNAMEINFO */
 
@@ -519,9 +519,9 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
   if (addr->addr.sa_family == AF_LOCAL)
   {
     if (addr->un.sun_path[0] == '/')
-      strlcpy(s, addr->un.sun_path, slen);
+      strlcpy(s, addr->un.sun_path, (size_t)slen);
     else
-      strlcpy(s, "localhost", slen);
+      strlcpy(s, "localhost", (size_t)slen);
   }
   else
 #endif /* AF_LOCAL */
@@ -529,10 +529,9 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
   {
     unsigned temp;			/* Temporary address */
 
-
     temp = ntohl(addr->ipv4.sin_addr.s_addr);
 
-    snprintf(s, slen, "%d.%d.%d.%d", (temp >> 24) & 255,
+    snprintf(s, (size_t)slen, "%d.%d.%d.%d", (temp >> 24) & 255,
              (temp >> 16) & 255, (temp >> 8) & 255, temp & 255);
   }
 #ifdef AF_INET6
@@ -573,8 +572,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
     {
       temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
 
-      snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
-               (temp >> 16) & 0xffff);
+      snprintf(sptr, sizeof(temps) - (size_t)(sptr - temps), "%s%x", prefix, (temp >> 16) & 0xffff);
       prefix = ":";
       sptr += strlen(sptr);
 
@@ -582,7 +580,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 
       if (temp || i == 3 || addr->ipv6.sin6_addr.s6_addr32[i + 1])
       {
-        snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix, temp);
+        snprintf(sptr, sizeof(temps) - (size_t)(sptr - temps), "%s%x", prefix, temp);
 	sptr += strlen(sptr);
       }
     }
@@ -594,7 +592,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 
       if (i < 4)
       {
-        snprintf(sptr, sizeof(temps) - (sptr - temps), "%s:", prefix);
+        snprintf(sptr, sizeof(temps) - (size_t)(sptr - temps), "%s:", prefix);
 	prefix = ":";
 	sptr += strlen(sptr);
 
@@ -605,13 +603,11 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
           if ((temp & 0xffff0000) ||
 	      (i > 0 && addr->ipv6.sin6_addr.s6_addr32[i - 1]))
 	  {
-            snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
-	             (temp >> 16) & 0xffff);
+            snprintf(sptr, sizeof(temps) - (size_t)(sptr - temps), "%s%x", prefix, (temp >> 16) & 0xffff);
 	    sptr += strlen(sptr);
           }
 
-          snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
-	           temp & 0xffff);
+          snprintf(sptr, sizeof(temps) - (size_t)(sptr - temps), "%s%x", prefix, temp & 0xffff);
 	  sptr += strlen(sptr);
 	}
       }
@@ -629,7 +625,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 	* Empty at end...
 	*/
 
-        strlcpy(sptr, "::", sizeof(temps) - (sptr - temps));
+        strlcpy(sptr, "::", sizeof(temps) - (size_t)(sptr - temps));
       }
     }
 #  endif /* HAVE_GETNAMEINFO */
@@ -638,11 +634,11 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
     * Add "[v1." and "]" around IPv6 address to convert to URI form.
     */
 
-    snprintf(s, slen, "[v1.%s]", temps);
+    snprintf(s, (size_t)slen, "[v1.%s]", temps);
   }
 #endif /* AF_INET6 */
   else
-    strlcpy(s, "UNKNOWN", slen);
+    strlcpy(s, "UNKNOWN", (size_t)slen);
 
   DEBUG_printf(("1httpAddrString: returning \"%s\"...", s));
 
@@ -804,9 +800,9 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 	return (http->hostname);
     }
     else if (http->hostname[0] == '/')
-      strlcpy(s, "localhost", slen);
+      strlcpy(s, "localhost", (size_t)slen);
     else
-      strlcpy(s, http->hostname, slen);
+      strlcpy(s, http->hostname, (size_t)slen);
   }
   else
   {
@@ -818,7 +814,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
       return (NULL);
 
     if (gethostname(s, (size_t)slen) < 0)
-      strlcpy(s, "localhost", slen);
+      strlcpy(s, "localhost", (size_t)slen);
 
     if (!strchr(s, '.'))
     {
@@ -842,7 +838,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
         * Append ".local." to the hostname we get...
 	*/
 
-        snprintf(s, slen, "%s.local.", localStr);
+        snprintf(s, (size_t)slen, "%s.local.", localStr);
       }
 
       if (local)
@@ -863,7 +859,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
         * Use the resolved hostname...
 	*/
 
-	strlcpy(s, host->h_name, slen);
+	strlcpy(s, host->h_name, (size_t)slen);
       }
 #endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
     }

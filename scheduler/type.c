@@ -528,7 +528,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    if ((size_t)length[1] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[1];
-	    memcpy(temp->value.stringv, value[1], length[1]);
+	    memcpy(temp->value.stringv, value[1], (size_t)length[1]);
 	    break;
 	case MIME_MAGIC_CHAR :
 	    temp->offset = strtol(value[0], NULL, 0);
@@ -560,7 +560,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    if ((size_t)length[2] > sizeof(temp->value.stringv))
 	      return (-1);
 	    temp->length = length[2];
-	    memcpy(temp->value.stringv, value[2], length[2]);
+	    memcpy(temp->value.stringv, value[2], (size_t)length[2]);
 	    break;
       }
     }
@@ -886,7 +886,7 @@ mime_check_rules(
             char temp[MIME_MAX_BUFFER + 1];
 					/* Temporary buffer */
 
-            memcpy(temp, fb->buffer, fb->length);
+            memcpy(temp, fb->buffer, (size_t)fb->length);
             temp[fb->length] = '\0';
             result = !regexec(&(rules->value.rev), temp, 0, NULL, 0);
           }
