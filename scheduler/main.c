@@ -1320,6 +1320,8 @@ launchd_checkin(void)
   * Try to match the launchd sockets to the cupsd listeners...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: %d listeners.", (int)count);
+
   for (i = 0; i < count; i ++)
   {
    /*
@@ -1333,6 +1335,8 @@ launchd_checkin(void)
       cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
       continue;
     }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, ld_sockets[i], httpAddrString(&addr, s, sizeof(s)));
 
     for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
 	 lis;
@@ -1419,7 +1423,7 @@ launchd_checkin(void)
           == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "launchd_checkin: No sockets found to answer requests on!");
+                    "launchd_checkin: No sockets found to answer requests on.");
     exit(EXIT_FAILURE);
     return; /* anti-compiler-warning */
   }
@@ -1431,7 +1435,7 @@ launchd_checkin(void)
   if ((ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "launchd_checkin: No sockets found to answer requests on!");
+                    "launchd_checkin: No sockets found to answer requests on.");
     exit(EXIT_FAILURE);
     return; /* anti-compiler-warning */
   }
@@ -1443,6 +1447,8 @@ launchd_checkin(void)
   if (launch_data_get_type(ld_array) == LAUNCH_DATA_ARRAY)
   {
     count = launch_data_array_get_count(ld_array);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: %d listeners.", (int)count);
 
     for (i = 0; i < count; i ++)
     {
@@ -1457,11 +1463,11 @@ launchd_checkin(void)
 
 	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "launchd_checkin: Unable to get local address - %s",
-			  strerror(errno));
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to get local address for listener #%d: %s", (int)i + 1, strerror(errno));
 	  continue;
 	}
+
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Listener #%d at fd %d, \"%s\".", (int)i + 1, fd, httpAddrString(&addr, s, sizeof(s)));
 
        /*
 	* Try to match the launchd socket address to one of the listeners...
@@ -1479,21 +1485,15 @@ launchd_checkin(void)
 
 	if (lis)
 	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-		  "launchd_checkin: Matched existing listener %s with fd %d...",
-		  httpAddrString(&(lis->address), s, sizeof(s)), fd);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Matched existing listener #%d to %s.", (int)i + 1, httpAddrString(&(lis->address), s, sizeof(s)));
 	}
 	else
 	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-		  "launchd_checkin: Adding new listener %s with fd %d...",
-		  httpAddrString(&addr, s, sizeof(s)), fd);
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "launchd_checkin: Adding new listener #%d for %s.", (int)i + 1, httpAddrString(&addr, s, sizeof(s)));
 
 	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
 	  {
-	    cupsdLogMessage(CUPSD_LOG_ERROR,
-			    "launchd_checkin: Unable to allocate listener - "
-			    "%s.", strerror(errno));
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Unable to allocate listener: %s.", strerror(errno));
 	    exit(EXIT_FAILURE);
 	  }
 
