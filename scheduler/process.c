@@ -296,7 +296,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 
     /* Also allow access to Bluetooth, USB, and SMB */
     cupsFilePuts(fp, "(allow iokit-open)\n");
-    cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata\n"
+    cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
                      "       (regex #\"^/dev/nsmb[0-9]+$\"))\n");
   }
   else
