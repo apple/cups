@@ -170,6 +170,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* TempDir/... */
 		 " #\"^%s$\""		/* CacheDir */
 		 " #\"^%s/\""		/* CacheDir/... */
+		 " #\"^/private/var/db/\""
 		 " #\"^/private/var/folders/\""
 		 " #\"^/Library/Application Support/\""
 		 " #\"^/Library/Caches/\""
@@ -182,6 +183,8 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  "(allow file-read-data file-read-metadata\n"
                  "  (literal \"/private/etc/services\")\n"
                  "  (regex"
+                 " #\"^/AppleInternal$\""
+                 " #\"^/AppleInternal/\""
                  " #\"^/bin$\""		/* /bin */
                  " #\"^/bin/\""		/* /bin/... */
                  " #\"^/usr/bin$\""	/* /usr/bin */
@@ -290,6 +293,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
     cupsFilePuts(fp, "(allow network*\n"
 		     "       (local udp \"*:*\")\n"
 		     "       (remote udp \"*:*\"))\n");
+
+    /* Also allow access to Bluetooth, USB, and SMB */
+    cupsFilePuts(fp, "(allow iokit-open)\n");
+    cupsFilePuts(fp, "(allow file-read-* file-write (literal \"/dev/nsmb0\"))\n");
   }
   else
   {
