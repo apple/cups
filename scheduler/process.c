@@ -172,6 +172,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* CacheDir/... */
 		 " #\"^/private/var/db/\""
 		 " #\"^/private/var/folders/\""
+                 " #\"^/private/var/run/\""
 		 " #\"^/Library/Application Support/\""
 		 " #\"^/Library/Caches/\""
 		 " #\"^/Library/Preferences/\""
@@ -181,12 +182,16 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   /* Read common folders */
   cupsFilePrintf(fp,
                  "(allow file-read-data file-read-metadata\n"
-                 "  (literal \"/private/etc/services\")\n"
                  "  (regex"
                  " #\"^/AppleInternal$\""
                  " #\"^/AppleInternal/\""
                  " #\"^/bin$\""		/* /bin */
                  " #\"^/bin/\""		/* /bin/... */
+                 " #\"^/private$\""
+                 " #\"^/private/etc/services$\""
+                 " #\"^/private/var$\""
+                 " #\"^/private/var/db$\""
+                 " #\"^/private/var/spool$\""
                  " #\"^/usr/bin$\""	/* /usr/bin */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
                  " #\"^/usr/libexec/cups$\""	/* /usr/libexec/cups */
@@ -196,8 +201,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^/Library/Caches$\""
 		 " #\"^/Library/Fonts$\""
 		 " #\"^/Library/Fonts/\""
+		 " #\"^/Library/Keychains$\""
+		 " #\"^/Library/Keychains/\""
 		 " #\"^/Library/Printers$\""
-		 " #\"^/Library/Printers/.*$\""
+		 " #\"^/Library/Printers/\""
 		 " #\"^%s/Library$\""	/* RequestRoot/Library */
 		 " #\"^%s/Library/\""	/* RequestRoot/Library/... */
 		 " #\"^%s$\""		/* ServerBin */
@@ -273,9 +280,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 "  (literal \"/usr/sbin/sendmail\")\n"
 		 "  (with no-sandbox))\n");
   }
-  /* Allow outbound networking to local mDNSResponder and cupsd */
+  /* Allow outbound networking to local services */
   cupsFilePuts(fp, "(allow network-outbound"
-		   "\n       (literal \"/private/var/run/mDNSResponder\")");
+		   "\n       (regex #\"^/private/var/run/\")");
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
