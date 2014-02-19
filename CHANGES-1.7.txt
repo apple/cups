@@ -3,6 +3,8 @@ CHANGES-1.7.txt
 
 CHANGES IN CUPS V1.7.2
 
+	- The LPD mini daemon did not support print jobs larger than 2GB
+	  (STR #4351)
 	- Fixed a bug in the status reading code when sending a compressed data
 	  stream to an IPP printer/server (<rdar://problem/16019623>)
 	- The IPP backend might not include all job attributes in Validate-Job
