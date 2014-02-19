@@ -269,6 +269,8 @@ cupsSetServerCredentials(
     const char *common_name,		/* I - Default common name for server */
     int        auto_create)		/* I - 1 = automatically create self-signed certificates */
 {
+  DEBUG_printf(("cupsSetServerCredentials(path=\"%s\", common_name=\"%s\", auto_create=%d)", path, common_name, auto_create));
+
 #ifdef HAVE_SECKEYCHAINOPEN
   SecKeychainRef	keychain = NULL;/* Temporary keychain */
 
@@ -276,6 +278,7 @@ cupsSetServerCredentials(
   if (SecKeychainOpen(path, &keychain) != noErr)
   {
     /* TODO: Set cups last error string */
+    DEBUG_puts("1cupsSetServerCredentials: Unable to open keychain, returning 0.");
     return (0);
   }
 
@@ -305,9 +308,11 @@ cupsSetServerCredentials(
 
   _cupsMutexUnlock(&tls_mutex);
 
+  DEBUG_puts("1cupsSetServerCredentials: Opened keychain, returning 1.");
   return (1);
 
 #else
+  DEBUG_puts("1cupsSetServerCredentials: No keychain support compiled in, returning 0.");
   return (0);
 #endif /* HAVE_SECKEYCHAINOPEN */
 }
@@ -1212,10 +1217,16 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
       else if (httpAddrLocalhost(&addr))
 	hostname[0] = '\0';
       else
-	httpAddrString(&addr, hostname, sizeof(hostname));
+      {
+	httpAddrLookup(&addr, hostname, sizeof(hostname));
+        DEBUG_printf(("4http_tls_start: Resolved socket address to \"%s\".", hostname));
+      }
     }
 
 #ifdef HAVE_SECKEYCHAINOPEN
+    if (isdigit(hostname[0] & 255) || hostname[0] == '[')
+      hostname[0] = '\0';		/* Don't allow numeric addresses */
+
     if (hostname[0])
       http->tls_credentials = http_cdsa_copy_server(hostname);
     else if (tls_common_name)
