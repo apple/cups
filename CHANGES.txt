@@ -3,6 +3,16 @@ CHANGES.txt - 1.7.2 - 2014-02-19
 
 CHANGES IN CUPS V1.7.2
 
+	- Security: The scheduler now blocks URLs containing embedded HTML
+	  (STR #4356)
+	- The dnssd backend did not always report all discovered printers using
+	  Avahi (STR #4365)
+	- The Zebra printer driver did not properly handle negative "label top"
+	  values (STR #4354)
+	- The scheduler did not always update the MakeModel value in
+	  printers.conf after updating the driver (STR #4264)
+	- The LPD mini daemon did not support print jobs larger than 2GB
+	  (STR #4351)
 	- Fixed a bug in the status reading code when sending a compressed data
 	  stream to an IPP printer/server (<rdar://problem/16019623>)
 	- The IPP backend might not include all job attributes in Validate-Job
