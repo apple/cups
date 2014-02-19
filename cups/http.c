@@ -1706,7 +1706,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     */
 
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding >= _HTTP_CODING_GUNZIP)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
@@ -1734,7 +1734,8 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
 #ifdef HAVE_LIBZ
   if (http->used == 0 &&
-      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0))
+      (http->coding == _HTTP_CODING_IDENTITY ||
+       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)))
 #else
   if (http->used == 0)
 #endif /* HAVE_LIBZ */
@@ -1777,7 +1778,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
   }
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding >= _HTTP_CODING_GUNZIP)
   {
 #  ifdef HAVE_INFLATECOPY
     int		zerr;			/* Decompressor error */
@@ -2009,7 +2010,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
     return (0);
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding >= _HTTP_CODING_GUNZIP)
   {
     do
     {
@@ -2158,14 +2159,15 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 
   if (
 #ifdef HAVE_LIBZ
-      (http->coding == _HTTP_CODING_IDENTITY || http->stream.avail_in == 0) &&
+      (http->coding == _HTTP_CODING_IDENTITY ||
+       (http->coding >= _HTTP_CODING_GUNZIP && http->stream.avail_in == 0)) &&
 #endif /* HAVE_LIBZ */
       ((http->data_remaining <= 0 &&
         http->data_encoding == HTTP_ENCODING_LENGTH) ||
        (http->data_encoding == HTTP_ENCODING_CHUNKED && bytes == 0)))
   {
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding >= _HTTP_CODING_GUNZIP)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
@@ -3323,7 +3325,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
   */
 
 #ifdef HAVE_LIBZ
-  if (http->coding)
+  if (http->coding == _HTTP_CODING_GZIP || http->coding == _HTTP_CODING_DEFLATE)
   {
     DEBUG_printf(("1httpWrite2: http->coding=%d", http->coding));
 
@@ -3422,7 +3424,7 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
     */
 
 #ifdef HAVE_LIBZ
-    if (http->coding)
+    if (http->coding == _HTTP_CODING_GZIP || http->coding == _HTTP_CODING_DEFLATE)
       http_content_coding_finish(http);
 #endif /* HAVE_LIBZ */
 
