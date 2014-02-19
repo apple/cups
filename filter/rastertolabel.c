@@ -557,7 +557,7 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	*/
 
 	if (header->cupsRowStep != 200)
-	  printf("^LT%u\n", header->cupsRowStep);
+	  printf("^LT%d\n", header->cupsRowStep);
 
        /*
         * Set media type...

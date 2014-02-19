@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
+	- The Zebra printer driver did not properly handle negative "label top"
+	  values (STR #4354)
 	- The scheduler did not always update the MakeModel value in
 	  printers.conf after updating the driver (STR #4264)
 	- The LPD mini daemon did not support print jobs larger than 2GB
