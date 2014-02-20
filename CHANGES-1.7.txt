@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
+	- The scheduler now automatically reconnects to Avahi as needed
+	  (STR #4370)
 	- The scheduler did not handle GET requests for the log files properly
 	  (STR #3265)
 	- The dnssd backend did not always report all discovered printers using
