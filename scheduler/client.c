@@ -2514,6 +2514,17 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     con->file_ready = 0;
   }
 
+  bytes = (ssize_t)(sizeof(con->header) - (size_t)con->header_used);
+
+  if (!con->pipe_pid && bytes > httpGetRemaining(con->http))
+  {
+   /*
+    * Limit GET bytes to original size of file (STR #3265)...
+    */
+
+    bytes = (ssize_t)httpGetRemaining(con->http);
+  }
+
   if (con->response && con->response->state != IPP_STATE_DATA)
   {
     size_t wused = httpGetPending(con->http);	/* Previous write buffer use */
@@ -2552,8 +2563,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
                    (int)bytes, httpGetState(con->http),
                    CUPS_LLCAST httpGetLength2(con->http));
   }
-  else if ((bytes = read(con->file, con->header + con->header_used,
-			 sizeof(con->header) - (size_t)con->header_used)) > 0)
+  else if ((bytes = read(con->file, con->header + con->header_used, (size_t)bytes)) > 0)
   {
     con->header_used += bytes;
 

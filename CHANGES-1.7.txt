@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
+	- The scheduler did not handle GET requests for the log files properly
+	  (STR #3265)
 	- The dnssd backend did not always report all discovered printers using
 	  Avahi (STR #4365)
 	- The Zebra printer driver did not properly handle negative "label top"
