@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
+	- Fixed a D-BUS threading issue that caused the scheduler to crash
+	  (STR #4347)
 	- The scheduler now automatically reconnects to Avahi as needed
 	  (STR #4370)
 	- The scheduler did not handle GET requests for the log files properly
