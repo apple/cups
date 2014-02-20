@@ -1,26 +1,17 @@
 /*
  * "$Id$"
  *
- *   Threading primitives for CUPS.
+ * Threading primitives for CUPS.
  *
- *   Copyright 2009-2012 by Apple Inc.
+ * Copyright 2009-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- * Contents:
- *
- *   _cupsMutexInit()    - Initialize a mutex.
- *   _cupsMutexLock()    - Lock a mutex.
- *   _cupsMutexUnlock()  - Unlock a mutex.
- *   _cupsRWInit()       - Initialize a reader/writer lock.
- *   _cupsRWLockRead()   - Acquire a reader/writer lock for reading.
- *   _cupsRWLockWrite()  - Acquire a reader/writer lock for writing.
- *   _cupsRWUnlock()     - Release a reader/writer lock.
- *   _cupsThreadCreate() - Create a thread.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*

@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
+	- Several libcups files did not have the Apple license exception
+	  notice (STR #4361)
 	- Fixed a D-BUS threading issue that caused the scheduler to crash
 	  (STR #4347)
 	- The scheduler now automatically reconnects to Avahi as needed
