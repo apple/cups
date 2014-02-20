@@ -703,7 +703,10 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
   while ((passbytes = read(tty, &passch, 1)) == 1)
   {
-    if (passch == noecho.c_cc[VEOL] || passch == noecho.c_cc[VEOL2] ||
+    if (passch == noecho.c_cc[VEOL] ||
+#  ifdef VEOL2
+        passch == noecho.c_cc[VEOL2] ||
+#  endif /* VEOL2 */
         passch == 0x0A || passch == 0x0D)
     {
      /*
