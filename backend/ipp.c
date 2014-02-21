@@ -2028,7 +2028,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (job_canceled > 0 && job_id > 0)
+  {
     cancel_job(http, uri, job_id, resource, argv[2], version);
+
+    if (cupsLastError() > IPP_OK_CONFLICT)
+      _cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
+  }
 
  /*
   * Check the printer state and report it if necessary...
@@ -2166,9 +2171,6 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   */
 
   ippDelete(cupsDoRequest(http, request, resource));
-
-  if (cupsLastError() > IPP_OK_CONFLICT)
-    _cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
 }
 
 
@@ -2458,9 +2460,16 @@ monitor_printer(
   */
 
   if (job_canceled > 0 && monitor->job_id > 0)
+  {
     if (!httpReconnect(http))
+    {
       cancel_job(http, monitor->uri, monitor->job_id, monitor->resource,
                  monitor->user, monitor->version);
+
+      if (cupsLastError() > IPP_OK_CONFLICT)
+	_cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
+    }
+  }
 
  /*
   * Cleanup and return...

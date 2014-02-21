@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-02-13
+CHANGES.txt - 2.0b1 - 2014-02-20
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.0b1
 	  of the CUPS 1.4 sleep support to do a cleaner sleep
 	  (<rdar://problem/14323704>)
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
+	- Added support for re-sending a job as a raster file if a higher-level
+	  format such as PDF fails (<rdar://problem/15583721>)
 	- Added support for regular expression matching in the MIME type rules
 	  (<rdar://problem/11131245>)
 	- cupsRasterInterpretPPD now supports the Orientation header in order to
