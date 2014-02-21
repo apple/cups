@@ -297,14 +297,15 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   {
     /* Allow TCP and UDP networking off the machine... */
     cupsFilePuts(fp, "\n       (remote tcp))\n");
+    cupsFilePuts(fp, "(allow network-bind)\n"); /* for LPD resvport */
     cupsFilePuts(fp, "(allow network*\n"
 		     "       (local udp \"*:*\")\n"
 		     "       (remote udp \"*:*\"))\n");
 
-    /* Also allow access to Bluetooth, USB, and SMB */
+    /* Also allow access to Bluetooth, USB, and device files */
     cupsFilePuts(fp, "(allow iokit-open)\n");
     cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
-                     "       (regex #\"^/dev/nsmb[0-9]+$\"))\n");
+                     "       (regex #\"^/dev/\"))\n");
   }
   else
   {

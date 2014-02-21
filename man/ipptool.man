@@ -109,17 +109,20 @@ The \fIipptool\fR program is unique to CUPS.
 .SH EXAMPLES
 Get a list of completed jobs for "myprinter":
 .nf
+
     ipptool ipp://localhost/printers/myprinter get-completed-jobs.test
 .fi
 .LP
 Send email notifications to "user@example.com" when "myprinter" changes:
 .nf
-    ipptool -d recipient=mailto:user@example.com \
+
+    ipptool -d recipient=mailto:user@example.com \\
         ipp://localhost/printers/myprinter create-printer-subscription.test
 .fi
 .SH STANDARD FILES
 The following standard files are available:
 .nf
+
     color.jpg
     create-printer-subscription.test
     document-a4.pdf
