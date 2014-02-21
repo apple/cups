@@ -563,12 +563,37 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     * Local jobs get filtered...
     */
 
+    mime_type_t	*dst = job->printer->filetype;
+					/* Destination file type */
+
     snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot,
              job->id, job->current_file + 1);
     if (stat(filename, &fileinfo))
       fileinfo.st_size = 0;
 
-    filters = mimeFilter2(MimeDatabase, job->filetypes[job->current_file], (size_t)fileinfo.st_size, job->printer->filetype, &(job->cost));
+    if (job->retry_as_raster)
+    {
+     /*
+      * Need to figure out whether the printer supports image/pwg-raster or
+      * image/urf, and use the corresponding type...
+      */
+
+      char	type[MIME_MAX_TYPE];	/* MIME media type for printer */
+
+      snprintf(type, sizeof(type), "%s/image/urf", job->printer->name);
+      if ((dst = mimeType(MimeDatabase, "printer", type)) == NULL)
+      {
+	snprintf(type, sizeof(type), "%s/image/pwg-raster", job->printer->name);
+	dst = mimeType(MimeDatabase, "printer", type);
+      }
+
+      if (dst)
+        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Retrying job as \"%s\".", strchr(dst->type, '/') + 1);
+      else
+        cupsdLogJob(job, CUPSD_LOG_ERROR, "Unable to retry job using a supported raster format.");
+    }
+
+    filters = mimeFilter2(MimeDatabase, job->filetypes[job->current_file], (size_t)fileinfo.st_size, dst, &(job->cost));
 
     if (!filters)
     {
@@ -4766,7 +4791,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "JOBSTATE: %s", message);
 
-      ippSetString(job->attrs, &job->reasons, 0, message);
+      if (!strcmp(message, "cups-retry-as-raster"))
+        job->retry_as_raster = 1;
+      else
+        ippSetString(job->attrs, &job->reasons, 0, message);
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {

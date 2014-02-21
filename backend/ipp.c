@@ -1769,6 +1769,20 @@ main(int  argc,				/* I - Number of command-line args */
       fprintf(stderr, "PAGE: 1 %d\n", copies_sup ? atoi(argv[4]) : 1);
       copies_remaining --;
     }
+    else if ((ipp_status == IPP_STATUS_ERROR_DOCUMENT_FORMAT_ERROR || ipp_status == IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE) &&
+             argc == 6 &&
+             document_format && strcmp(document_format, "image/pwg-raster") && strcmp(document_format, "image/urf"))
+    {
+     /*
+      * Need to reprocess the job as raster...
+      */
+
+      fputs("JOBSTATE: cups-retry-as-raster\n", stderr);
+      if (job_id > 0)
+	cancel_job(http, uri, job_id, resource, argv[2], version);
+
+      goto cleanup;
+    }
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
              ipp_status == IPP_NOT_POSSIBLE ||
 	     ipp_status == IPP_PRINTER_BUSY)

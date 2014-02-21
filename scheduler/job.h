@@ -3,7 +3,7 @@
  *
  * Print job definitions for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -75,6 +75,7 @@ struct cupsd_job_s			/**** Job request ****/
   int			status;		/* Status code from filters */
   int			tries;		/* Number of tries for this job */
   int			completed;	/* cups-waiting-for-job-completed seen */
+  int			retry_as_raster;/* Need to retry the job as raster */
   char			*auth_env[3],	/* AUTH_xxx environment variables,
                                          * if any */
 			*auth_uid;	/* AUTH_UID environment variable */
