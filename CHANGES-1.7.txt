@@ -6,6 +6,7 @@ CHANGES IN CUPS V1.7.2
 	- Security: The scheduler now blocks URLs containing embedded HTML
 	  (STR #4356)
 	- Documentation fixes (STR #3259, STR #4346)
+	- Added a German localization (STR #4363)
 	- "lp -i job-id -H hold" did not work (STR #nnn)
 	- CUPS didn't compile on older platforms (STR #4338)
 	- Several libcups files did not have the Apple license exception
