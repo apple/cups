@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>{title} - @CUPS_VERSION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
+	<SCRIPT TYPE="text/javascript"><!--
+	/* Show an error if cookies are disabled */
+	function check_cookies() {
+	  if (!navigator.cookieEnabled) {
+		document.getElementById('body').innerHTML = 'This page uses cookies to prevent common cross-site attacks. Please enable cookies in your browser.';
+	  }
+	}
+	--></SCRIPT>
+</HEAD>
+<BODY ONLOAD="check_cookies();">
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="unsel"><A HREF="/">&nbsp;&nbsp;Startseite&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=admin?:un}sel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=classes?:un}sel"><A HREF="/classes/">&nbsp;&nbsp;Klassen&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=jobs?:un}sel"><A HREF="/jobs/">&nbsp;&nbsp;Aufträge&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=printers?:un}sel"><A HREF="/printers/">&nbsp;&nbsp;Drucker&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Sucher in der Hilfe"
+VALUE="{SECTION=help?{?QUERY}:}" AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+<TR><TD COLSPAN="9">&nbsp;</TD></TR>
+</TABLE>
+<DIV ID="body">

@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Home - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Startseite&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Verwaltung&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Klassen&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online-&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Aufträge&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Drucker&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>CUPS @CUPS_VERSION@</H1>
+
+<P>CUPS ist das auf Standards basierte, Opensource-Drucksystem, welches von
+<A HREF="http://www.apple.com/">Apple Inc.</A> für Mac OS<SUP>&reg;</SUP> X und
+andere UNIX<SUP>&reg;</SUP>-ähnliche Betriebssysteme entwickelt wird.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS für Benutzer</H2>
+
+<P><A HREF="help/overview.html">CUPS Übersicht</A></P>
+
+<P><A HREF="help/options.html">Kommandozeilendruck und Einstellungen</A></P>
+
+<P><A HREF="help/whatsnew.html">Neues in CUPS 1.7</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Benutzerforum</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS für Administratoren</H2>
+
+<P><A HREF="admin">Drucker und Klassen hinzufügen</A></P>
+
+<P><A HREF="help/policies.html">Betriebsrichtlinien verwalten</A></P>
+
+<P><A HREF="help/accounting.html">Basiswissen Druckabrechnung</A></P>
+
+<P><A HREF="help/security.html">Sicherheit des Servers</A></P>
+
+<P><A HREF="help/kerberos.html">Verwenden der Kerberos Authentifizierung</A></P>
+
+<P><A HREF="help/network.html">Benutzen von Netzwerkdruckern</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">cupsd.conf Referenz</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Druckertreiber finden</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS für Entwickler</H2>
+
+<P><A HREF="help/api-overview.html">Einführung in die CUPS-Programmierung</A></P>
+
+<P><A HREF="help/api-cups.html">CUPS-API</A></P>
+
+<P><A HREF="help/api-filter.html">Filter- und Backend-Programmierung</A></P>
+
+<P><A HREF="help/api-httpipp.html">HTTP- und IPP-APIs</A></P>
+
+<P><A HREF="help/api-ppd.html">PPD-API</A></P>
+
+<P><A HREF="help/api-raster.html">Raster-API</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">PPD Compiler Treiber Dateireferenz</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Entwicklerforum</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">CUPS und das CUPS Logo sind
+eingetragene Warenzeichen der <A HREF="http://www.apple.com">Apple Inc.</A>
+CUPS ist urheberrechtlich geschützt 2007-2014 von Apple Inc, alle Rechte vorbehalten.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>
