@@ -68,7 +68,7 @@
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <libproc.h>
-
+#include <asl.h>
 #include <spawn.h>
 #include <pthread.h>
 
@@ -280,6 +280,9 @@ static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRe
 static void setup_cfLanguage(void);
 static void soft_reset(void);
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
+static void log_usb_class_driver(int is_64bit);
+#define IS_64BIT 1
+#define IS_NOT_64BIT 0
 
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
@@ -464,6 +467,10 @@ print_device(const char *uri,		/* I - Device URI */
       }
     }
   } while (status != noErr);
+
+#ifdef __x86_64__
+  log_usb_class_driver(IS_64BIT);
+#endif /* __x86_64__ */
 
   fputs("STATE: -connecting-to-device\n", stderr);
 
@@ -1949,6 +1956,8 @@ static void run_legacy_backend(int argc,
 
   if (!usb_legacy_status)
   {
+    log_usb_class_driver(IS_NOT_64BIT);
+
    /*
     * Setup a SIGTERM handler then block it before forking...
     */
@@ -2308,6 +2317,32 @@ static void get_device_id(cups_sc_status_t *status,
     CFRelease(deviceIDString);
   }
   *status  = CUPS_SC_STATUS_OK;
+}
+
+
+static void
+log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
+{
+ /*
+  * Report the usage of legacy USB class drivers to Apple if the user opts into providing
+  * feedback to Apple...
+  */
+
+  aslmsg aslm = asl_new(ASL_TYPE_MSG);
+  if (aslm)
+  {
+    ppd_file_t *ppd = ppdOpenFile(getenv("PPD"));
+    const char *make_model = ppd ? ppd->nickname : NULL;
+    ppd_attr_t *version = ppdFindAttr(ppd, "FileVersion", "");
+
+    asl_set(aslm, "com.apple.message.domain", "com.apple.printing.usb.64bit");
+    asl_set(aslm, "com.apple.message.result", is_64bit ? "yes" : "no");
+    asl_set(aslm, "com.apple.message.signature", make_model ? make_model : "Unknown");
+    asl_set(aslm, "com.apple.message.signature2", version ? version->value : "?.?");
+    asl_set(aslm, "com.apple.message.summarize", "YES");
+    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "%s (%s) is a %s printer driver.", make_model ? make_model : "Unknown", version ? version->value : "?.?", is_64bit ? "64-bit" : "32-bit");
+    asl_free(aslm);
+  }
 }
 
 
