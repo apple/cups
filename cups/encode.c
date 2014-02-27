@@ -43,6 +43,8 @@ static const ipp_op_t ipp_job_creation[] =
   IPP_OP_PRINT_URI,
   IPP_OP_VALIDATE_JOB,
   IPP_OP_CREATE_JOB,
+  IPP_OP_HOLD_JOB,
+  IPP_OP_SET_JOB_ATTRIBUTES,
   IPP_OP_CUPS_NONE
 };
 
@@ -52,6 +54,8 @@ static const ipp_op_t ipp_doc_creation[] =
   IPP_OP_PRINT_URI,
   IPP_OP_SEND_DOCUMENT,
   IPP_OP_SEND_URI,
+  IPP_OP_SET_JOB_ATTRIBUTES,
+  IPP_OP_SET_DOCUMENT_ATTRIBUTES,
   IPP_OP_CUPS_NONE
 };
 

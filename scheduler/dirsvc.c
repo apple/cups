@@ -223,8 +223,7 @@ cupsdStartBrowsing(void)
     {
       int error;			/* Error code, if any */
 
-      DNSSDClient = avahi_client_new(avahi_threaded_poll_get(DNSSDMaster), 0,
-                                     NULL, NULL, &error);
+      DNSSDClient = avahi_client_new(avahi_threaded_poll_get(DNSSDMaster), AVAHI_CLIENT_NO_FAIL, NULL, NULL, &error);
 
       if (DNSSDClient == NULL)
       {

@@ -506,6 +506,14 @@ main(int  argc,				/* I - Number of command-line args */
   setlocale(LC_TIME, "");
 #endif /* LC_TIME */
 
+#ifdef HAVE_DBUS_THREADS_INIT
+ /*
+  * Enable threading support for D-BUS...
+  */
+
+  dbus_threads_init();
+#endif /* HAVE_DBUS_THREADS_INIT */
+
  /*
   * Set the maximum number of files...
   */

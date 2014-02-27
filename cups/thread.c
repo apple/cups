@@ -11,6 +11,8 @@
  *   which should have been included with this file.  If this file is
  *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
+ *   This file is subject to the Apple OS-Developed Software exception.
+ *
  * Contents:
  *
  *   _cupsMutexInit()    - Initialize a mutex.
