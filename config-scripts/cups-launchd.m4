@@ -21,9 +21,11 @@ LAUNCHDLIBS=""
 
 if test x$enable_launchd != xno; then
 	AC_CHECK_FUNC(launch_msg, AC_DEFINE(HAVE_LAUNCHD))
-	AC_CHECK_FUNC(launch_activate_socket, [
-		AC_DEFINE(HAVE_LAUNCHD)
-		AC_DEFINE(HAVE_LAUNCH_ACTIVATE_SOCKET)])
+	if test $uversion -ge 140; then
+		AC_CHECK_FUNC(launch_activate_socket, [
+			AC_DEFINE(HAVE_LAUNCHD)
+			AC_DEFINE(HAVE_LAUNCH_ACTIVATE_SOCKET)])
+	fi
 	AC_CHECK_HEADER(launch.h, AC_DEFINE(HAVE_LAUNCH_H))
 
 	case "$uname" in
