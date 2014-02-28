@@ -451,6 +451,11 @@ print_device(const char *uri,		/* I - Device URI */
       return (CUPS_BACKEND_STOP);
     }
 
+#ifdef __x86_64__
+    if (status == noErr && driverBundlePath != NULL && CFStringCompare(driverBundlePath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo)
+      log_usb_class_driver(IS_64BIT);
+#endif /* __x86_64__ */
+
     if (driverBundlePath)
       CFRelease(driverBundlePath);
 
@@ -467,10 +472,6 @@ print_device(const char *uri,		/* I - Device URI */
       }
     }
   } while (status != noErr);
-
-#ifdef __x86_64__
-  log_usb_class_driver(IS_64BIT);
-#endif /* __x86_64__ */
 
   fputs("STATE: -connecting-to-device\n", stderr);
 
