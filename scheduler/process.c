@@ -238,6 +238,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/bin/\""		/* /bin/... */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
                  " #\"^/usr/libexec/cups/\""	/* /usr/libexec/cups/... */
+                 " #\"^/usr/libexec/fax/\""	/* /usr/libexec/fax/... */
                  " #\"^/usr/sbin/\""	/* /usr/sbin/... */
 		 " #\"^%s/\""		/* ServerBin/... */
 		 " #\"^/Library/Printers/.*/\""
