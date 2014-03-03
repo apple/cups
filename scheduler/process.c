@@ -188,9 +188,11 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/bin$\""		/* /bin */
                  " #\"^/bin/\""		/* /bin/... */
                  " #\"^/private$\""
-                 " #\"^/private/etc/services$\""
+                 " #\"^/private/etc$\""
+                 " #\"^/private/etc/\""
                  " #\"^/private/var$\""
                  " #\"^/private/var/db$\""
+                 " #\"^/private/var/folders$\""
                  " #\"^/private/var/spool$\""
                  " #\"^/usr/bin$\""	/* /usr/bin */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
