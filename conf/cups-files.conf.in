@@ -1,7 +1,5 @@
 #
-# "$Id$"
-#
-# Sample file/directory/user/group configuration file for the CUPS scheduler.
+# File/directory/user/group configuration file for the CUPS scheduler.
 # See "man cups-files.conf" for a complete description of this file.
 #
 
@@ -95,7 +93,3 @@ PageLog @CUPS_LOGDIR@/page_log
 # scheduler startup and cannot be one of the standard (public) temporary
 # directory locations for security reasons...
 #TempDir @CUPS_REQUESTS@/tmp
-
-#
-# End of "$Id$".
-#

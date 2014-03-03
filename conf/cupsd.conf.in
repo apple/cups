@@ -1,7 +1,5 @@
 #
-# "$Id$"
-#
-# Sample configuration file for the CUPS scheduler.  See "man cupsd.conf" for a
+# Configuration file for the CUPS scheduler.  See "man cupsd.conf" for a
 # complete description of this file.
 #
 
@@ -128,7 +126,3 @@ WebInterface @CUPS_WEBIF@
     Order deny,allow
   </Limit>
 </Policy>
-
-#
-# End of "$Id$".
-#
