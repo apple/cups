@@ -203,6 +203,8 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^/Library/Caches$\""
 		 " #\"^/Library/Fonts$\""
 		 " #\"^/Library/Fonts/\""
+		 " #\"^/Library/Frameworks$\""
+		 " #\"^/Library/Frameworks/\""
 		 " #\"^/Library/Keychains$\""
 		 " #\"^/Library/Keychains/\""
 		 " #\"^/Library/Printers$\""
