@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,12 +10,12 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cups-lpd - receive print jobs and report printer status to lpd clients
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cups-lpd
-</b>[ -h
-<i>hostname[:port]
-</i>] [ -n ] [ -o
-<i>option=value
-</i>]
+<b>cups-lpd</b>
+[ -h
+<i>hostname[:port]</i>
+] [ -n ] [ -o
+<i>option=value</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cups-lpd</i> is the CUPS Line Printer Daemon ("LPD")
 mini-server that supports legacy client systems that use the LPD
@@ -51,29 +51,24 @@ named <i>/etc/xinetd.d/cups</i> containing the following lines:
     }
 </pre>
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-<dl>
-<dt>-h hostname[:port]
-</dt>
-<dd></dd>
-<dd>Sets the CUPS server (and port) to use.
-</dd>
-<dt>-n
-</dt>
-<dd></dd>
-<dd>Disables reverse address lookups; normally <i>cups-lpd</i> will
+<p style="margin-left: 5.0em; text-indent: -5.0em">-h hostname[:port]
+<br>
+<br>
+Sets the CUPS server (and port) to use.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-n
+<br>
+<br>
+Disables reverse address lookups; normally <i>cups-lpd</i> will
 try to discover the hostname of the client via a reverse DNS
 lookup.
-</dd>
-<dt>-o name=value
-</dt>
-<dd></dd>
-<dd>Inserts options for all print queues. Most often this is used to
+<p style="margin-left: 5.0em; text-indent: -5.0em">-o name=value
+<br>
+<br>
+Inserts options for all print queues. Most often this is used to
 disable the "l" filter so that remote print jobs are filtered as
 needed for printing; the examples in the previous section set the
 "document-format" option to "application/octet-stream" which
 forces autodetection of the print file format.
-</dd>
-</dl>
 <h2 class="title"><a name="PERFORMANCE">Performance</a></h2>
 <i>cups-lpd</i> performs well with small numbers of clients and
 printers. However, since a new process is created for each
@@ -83,7 +78,7 @@ configurations. We highly recommend that large configurations
 use the native IPP support provided by CUPS instead.
 <h2 class="title"><a name="SECURITY">Security</a></h2>
 <i>cups-lpd</i> currently does not perform any access control
-based on the settings in <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a> or in the
+based on the settings in <i>cupsd.conf(5)</i> or in the
 <i>hosts.allow(5)</i> or <i>hosts.deny(5)</i> files used by TCP
 wrappers. Therefore, running <i>cups-lpd</i> on your server will
 allow any computer on your network (and perhaps the entire
@@ -106,10 +101,10 @@ between LPD and IPP Protocols. Since many LPD implementations
 stray from this definition, remote status reporting to LPD
 clients may be unreliable.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>cups(1)</i>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <i>inetconv(1m)</i>,
+<i>cups(1)</i>, <i>cupsd(8)</i>, <i>inetconv(1m)</i>,
 <i>inetd(8)</i>, <i>xinetd(8)</i>,
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright 2007-2013 by Apple Inc.
 

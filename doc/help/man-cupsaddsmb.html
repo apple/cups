@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -11,23 +11,23 @@
 cupsaddsmb - export printers to samba for windows clients
 
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupsaddsmb
-</b>[ -H
-<i>samba-server
-</i>] [ -U
-<i>samba-user[%samba-password]
-</i>] [ -h
-<i>cups-server[:port]
-</i>] [ -v ] -a
+<b>cupsaddsmb</b>
+[ -H
+<i>samba-server</i>
+] [ -U
+<i>samba-user[%samba-password]</i>
+] [ -h
+<i>cups-server[:port]</i>
+] [ -v ] -a
 <br>
-<b>cupsaddsmb
-</b>[ -H
-<i>samba-server
-</i>] [ -U
-<i>samba-user[%samba-password]
-</i>] [ -h
-<i>cups-server[:port]
-</i>] [ -v ] printer [ ... printer ]
+<b>cupsaddsmb</b>
+[ -H
+<i>samba-server</i>
+] [ -U
+<i>samba-user[%samba-password]</i>
+] [ -h
+<i>cups-server[:port]</i>
+] [ -v ] printer [ ... printer ]
 
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cupsaddsmb</i> exports printers to the SAMBA software (version
@@ -38,39 +38,32 @@ driver files described below.
 
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <i>cupsaddsmb</i> supports the following options:
-<dl>
-<dt>-H samba-server
-</dt>
-<dd></dd>
-<dd>Specifies the SAMBA server which defaults to the CUPS server.
-</dd>
-<dt>-U samba-user[%samba-password]
-</dt>
-<dd></dd>
-<dd>Specifies the SAMBA print admin username which defaults to your
+<p style="margin-left: 5.0em; text-indent: -5.0em">-H samba-server
+<br>
+<br>
+Specifies the SAMBA server which defaults to the CUPS server.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-U samba-user[%samba-password]
+<br>
+<br>
+Specifies the SAMBA print admin username which defaults to your
 current username. If the username contains a percent (%)
 character, then the text following the percent is treated as the
 SAMBA password to use.
-</dd>
-<dt>-a
-</dt>
-<dd></dd>
-<dd>Exports all known printers. Otherwise only the named printers are
+<p style="margin-left: 5.0em; text-indent: -5.0em">-a
+<br>
+<br>
+Exports all known printers. Otherwise only the named printers are
 exported.
-</dd>
-<dt>-h cups-server[:port]
-</dt>
-<dd></dd>
-<dd>Specifies a different CUPS server to use.
-</dd>
-<dt>-v
-</dt>
-<dd></dd>
-<dd>Specifies that verbose information should be shown. This is
+<p style="margin-left: 5.0em; text-indent: -5.0em">-h cups-server[:port]
+<br>
+<br>
+Specifies a different CUPS server to use.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-v
+<br>
+<br>
+Specifies that verbose information should be shown. This is
 useful for debugging SAMBA configuration problems.
 
-</dd>
-</dl>
 <h2 class="title"><a name="SAMBA_CONFIGURATION">Samba Configuration</a></h2>
 <i>cupsaddsmb</i> uses the new RPC-based printing support in
 SAMBA 2.2.x to provide printer drivers and PPD files to Windows
@@ -134,10 +127,10 @@ as named below:
 you use the lowercase filenames shown above, otherwise
 <i>cupsaddsmb</i> will fail to export the drivers.
 
-<h2 class="title"><a name="ADOBE_POSTSCRIPT_DRIVERS_FOR_WINDOWS_95,_98,_AND_ME">Adobe Postscript Drivers For Windows 95, 98, And Me</a></h2>
+<h2 class="title"><a name="ADOBE_POSTSCRIPT_DRIVERS_FOR_WINDOWS_95__98__AND_ME">Adobe Postscript Drivers For Windows 95, 98, And Me</a></h2>
 <i>cupsaddsmb</i> can use the Adobe PostScript printer driver for
 Windows 95, 98, and ME, which are available for download from the
-Adobe web site (<a href='http://www.adobe.com).'>http://www.adobe.com).</a>
+Adobe web site (<a href="http://www.adobe.com).">http://www.adobe.com).</a>
 <p>The Adobe driver does not support the page-label, job-billing, or
 job-hold-until options.
 <p>Once you have installed the driver on a Windows system, copy the
@@ -161,7 +154,7 @@ Getting the full set of Windows driver files should be easier.
 
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>smbd(8)</i>, <i>smb.conf(5)</i>,
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright 2007-2013 by Apple Inc.

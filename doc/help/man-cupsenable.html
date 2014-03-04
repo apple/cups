@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,65 +10,56 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupsdisable, cupsenable - stop/start printers and classes
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupsdisable
-</b>[ -E ] [-U
-<i>username
-</i>] [ -c ] [ -h
-<i>server[:port]
-</i>] [ -r
-<i>reason
-</i>] [ --hold ] destination(s)
+<b>cupsdisable</b>
+[ -E ] [-U
+<i>username</i>
+] [ -c ] [ -h
+<i>server[:port]</i>
+] [ -r
+<i>reason</i>
+] [ --hold ] destination(s)
 <br>
-<b>cupsenable
-</b>[ -E ] [-U
-<i>username
-</i>] [ -c ] [ -h
-<i>server[:port]
-</i>] [ --release ] destination(s)
+<b>cupsenable</b>
+[ -E ] [-U
+<i>username</i>
+] [ -c ] [ -h
+<i>server[:port]</i>
+] [ --release ] destination(s)
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cupsenable</i> starts the named printers or classes.
 <p><i>cupsdisable</i> stops the named printers or classes.  The
 following options may be used:
-<dl>
-<dt>-E
-</dt>
-<dd></dd>
-<dd>Forces encryption of the connection to the server.
-</dd>
-<dt>-U username
-</dt>
-<dd></dd>
-<dd>Uses the specified username when connecting to the server.
-</dd>
-<dt>-c
-</dt>
-<dd></dd>
-<dd>Cancels all jobs on the named destination.
-</dd>
-<dt>-h server[:port]
-</dt>
-<dd></dd>
-<dd>Uses the specified server and port.
-</dd>
-<dt>--hold
-</dt>
-<dd></dd>
-<dd>Holds remaining jobs on the named printer.  Useful for allowing the current
+<p style="margin-left: 5.0em; text-indent: -5.0em">-E
+<br>
+<br>
+Forces encryption of the connection to the server.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-U username
+<br>
+<br>
+Uses the specified username when connecting to the server.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-c
+<br>
+<br>
+Cancels all jobs on the named destination.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-h server[:port]
+<br>
+<br>
+Uses the specified server and port.
+<p style="margin-left: 5.0em; text-indent: -5.0em">--hold
+<br>
+<br>
+Holds remaining jobs on the named printer.  Useful for allowing the current
 job to complete before performing maintenance.
-</dd>
-<dt>-r "reason"
-</dt>
-<dd></dd>
-<dd>Sets the message associated with the stopped state. If no reason is specified
+<p style="margin-left: 5.0em; text-indent: -5.0em">-r "reason"
+<br>
+<br>
+Sets the message associated with the stopped state. If no reason is specified
 then the message is set to "Reason Unknown".
-</dd>
-<dt>--release
-</dt>
-<dd></dd>
-<dd>Releases pending jobs for printing. Use after running <i>cupsdisable</i> with
+<p style="margin-left: 5.0em; text-indent: -5.0em">--release
+<br>
+<br>
+Releases pending jobs for printing. Use after running <i>cupsdisable</i> with
 the <i>--hold</i> option to resume printing.
-</dd>
-</dl>
 <h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
 Unlike the System V printing system, CUPS allows printer names to
 contain any printable character except SPACE, TAB, "/", or "#".
@@ -81,10 +72,10 @@ user for an access password depending on the printing system
 configuration.  This differs from the System V versions which
 require the root user to execute these commands.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cupsaccept.html?TOPIC=Man+Pages'>cupsaccept(8)</a>, <i>cupsreject(8)</i>, <a href='man-cancel.html?TOPIC=Man+Pages'>cancel(1)</a>, <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a>,
-<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>, <a href='man-lpstat.html?TOPIC=Man+Pages'>lpstat(1)</a>,
+<i>cupsaccept(8)</i>, <i>cupsreject(8)</i>, <i>cancel(1)</i>, <i>lp(1)</i>,
+<i>lpadmin(8)</i>, <i>lpstat(1)</i>,
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright 2007-2013 by Apple Inc.
 

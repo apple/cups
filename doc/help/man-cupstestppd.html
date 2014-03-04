@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,21 +10,21 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 cupstestppd - test conformance of ppd files
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>cupstestppd
-</b>[ -I
-<i>category
-</i>] [ -R
-<i>rootdir
-</i>] [ -W
-<i>category
-</i>] [ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
+<b>cupstestppd</b>
+[ -I
+<i>category</i>
+] [ -R
+<i>rootdir</i>
+] [ -W
+<i>category</i>
+] [ -q ] [-r] [ -v[v] ] filename.ppd[.gz] [ ... filenameN.ppd[.gz] ]
 <br>
-<b>cupstestppd
-</b>[ -R
-<i>rootdir
-</i>] [ -W
-<i>category
-</i>] [ -q ] [-r] [ -v[v] ] -
+<b>cupstestppd</b>
+[ -R
+<i>rootdir</i>
+] [ -W
+<i>category</i>
+] [ -q ] [-r] [ -v[v] ] -
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cupstestppd</i> tests the conformance of PPD files to the
 Adobe PostScript Printer Description file format specification
@@ -36,120 +36,96 @@ on the command-line. The second form tests the PPD file provided
 on the standard input.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <i>cupstestppd</i> supports the following options:
-<dl>
-<dt>-I filename
-</dt>
-<dd></dd>
-<dd>Ignores all PCFileName warnings.
-</dd>
-<dt>-I filters
-</dt>
-<dd></dd>
-<dd>Ignores all filter errors.
-</dd>
-<dt>-I profiles
-</dt>
-<dd></dd>
-<dd>Ignores all profile errors.
-</dd>
-<dt>-R rootdir
-</dt>
-<dd></dd>
-<dd>Specifies an alternate root directory for the filter, pre-filter,
+<p style="margin-left: 5.0em; text-indent: -5.0em">-I filename
+<br>
+<br>
+Ignores all PCFileName warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-I filters
+<br>
+<br>
+Ignores all filter errors.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-I profiles
+<br>
+<br>
+Ignores all profile errors.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-R rootdir
+<br>
+<br>
+Specifies an alternate root directory for the filter, pre-filter,
 and other support file checks.
-</dd>
-<dt>-W constraints
-</dt>
-<dd></dd>
-<dd>Report all UIConstraint errors as warnings.
-</dd>
-<dt>-W defaults
-</dt>
-<dd></dd>
-<dd>Except for size-related options, report all default option errors as warnings.
-</dd>
-<dt>-W filters
-</dt>
-<dd></dd>
-<dd>Report all filter errors as warnings.
-</dd>
-<dt>-W profiles
-</dt>
-<dd></dd>
-<dd>Report all profile errors as warnings.
-</dd>
-<dt>-W sizes
-</dt>
-<dd></dd>
-<dd>Report all media size errors as warnings.
-</dd>
-<dt>-W translations
-</dt>
-<dd></dd>
-<dd>Report all translation errors as warnings.
-</dd>
-<dt>-W all
-</dt>
-<dd></dd>
-<dd>Report all of the previous errors as warnings.
-</dd>
-<dt>-W none
-</dt>
-<dd></dd>
-<dd>Report all of the previous errors as errors.
-</dd>
-<dt>-q
-</dt>
-<dd></dd>
-<dd>Specifies that no information should be displayed.
-</dd>
-<dt>-r
-</dt>
-<dd></dd>
-<dd>Relaxes the PPD conformance requirements so that common
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W constraints
+<br>
+<br>
+Report all UIConstraint errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W defaults
+<br>
+<br>
+Except for size-related options, report all default option errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W filters
+<br>
+<br>
+Report all filter errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W profiles
+<br>
+<br>
+Report all profile errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W sizes
+<br>
+<br>
+Report all media size errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W translations
+<br>
+<br>
+Report all translation errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W all
+<br>
+<br>
+Report all of the previous errors as warnings.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-W none
+<br>
+<br>
+Report all of the previous errors as errors.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-q
+<br>
+<br>
+Specifies that no information should be displayed.
+<p style="margin-left: 5.0em; text-indent: -5.0em">-r
+<br>
+<br>
+Relaxes the PPD conformance requirements so that common
 whitespace, control character, and formatting problems are not
 treated as hard errors.
-</dd>
-<dt>-v
-</dt>
-<dd></dd>
-<dd>Specifies that detailed conformance testing results should be
+<p style="margin-left: 5.0em; text-indent: -5.0em">-v
+<br>
+<br>
+Specifies that detailed conformance testing results should be
 displayed rather than the concise PASS/FAIL/ERROR status.
-</dd>
-<dt>-vv
-</dt>
-<dd></dd>
-<dd>Specifies that all information in the PPD file should be
+<p style="margin-left: 5.0em; text-indent: -5.0em">-vv
+<br>
+<br>
+Specifies that all information in the PPD file should be
 displayed in addition to the detailed conformance testing
 results.
-</dd>
-</dl>
 <p>The <i>-q</i>, <i>-v</i>, and <i>-vv</i> options are mutually exclusive.
 <h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
 <i>cupstestppd</i> returns zero on success and non-zero on error. The
 error codes are as follows:
-<dl>
-<dt>1
-</dt>
-<dd></dd>
-<dd>Bad command-line arguments or missing PPD filename.
-</dd>
-<dt>2
-</dt>
-<dd></dd>
-<dd>Unable to open or read PPD file.
-</dd>
-<dt>3
-</dt>
-<dd></dd>
-<dd>The PPD file contains format errors that cannot be skipped.
-</dd>
-<dt>4
-</dt>
-<dd></dd>
-<dd>The PPD file does not conform to the Adobe PPD specification.
-</dd>
-</dl>
+<p style="margin-left: 5.0em; text-indent: -5.0em">1
+<br>
+<br>
+Bad command-line arguments or missing PPD filename.
+<p style="margin-left: 5.0em; text-indent: -5.0em">2
+<br>
+<br>
+Unable to open or read PPD file.
+<p style="margin-left: 5.0em; text-indent: -5.0em">3
+<br>
+<br>
+The PPD file contains format errors that cannot be skipped.
+<p style="margin-left: 5.0em; text-indent: -5.0em">4
+<br>
+<br>
+The PPD file does not conform to the Adobe PPD specification.
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>
 The following command will test all PPD files under the current
 directory and print the names of each file that does not
@@ -169,9 +145,9 @@ that do not conform:
 
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-lpadmin.html?TOPIC=Man+Pages'>lpadmin(8)</a>,
+<i>lpadmin(8)</i>,
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 <br>
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>

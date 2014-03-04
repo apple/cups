@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -11,14 +11,14 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 backend - cups backend transmission interfaces
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>backend
-</b><br>
-<b>backend
-</b>job user title num-copies options [
-<i>filename
-</i>]
+<b>backend</b>
+<br>
+<b>backend</b>
+job user title num-copies options [
+<i>filename</i>
+]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-Backends are a special type of <a href='man-filter.html?TOPIC=Man+Pages'>filter(7)</a> which is used to send print data
+Backends are a special type of <i>filter(7)</i> which is used to send print data
 to and discover different devices on the system.
 <p>Like filters, backends must be capable of reading from a filename on the
 command-line or from the standard input, copying the standard input to a
@@ -41,8 +41,8 @@ with restricted permissions (0500 or 0700) that tell the scheduler to run them
 as the "root" user instead of an unprivileged user (typically "lp") on the
 system.
 <p>Unless you are a developer and know what you are doing, please do not run
-backends directly. Instead, use the <a href='man-lp.html?TOPIC=Man+Pages'>lp(1)</a> or <a href='man-lpr.html?TOPIC=Man+Pages'>lpr(1)</a> programs to send
-a print job or <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a> program to query for available printers using the
+backends directly. Instead, use the <i>lp(1)</i> or <i>lpr(1)</i> programs to send
+a print job or <i>lpinfo(8)</i> program to query for available printers using the
 backend. The one exception is the SNMP backend - see <i>snmpbackend(8)</i> for
 more information.
 <h2 class="title"><a name="DEVICE_DISCOVERY">Device Discovery</a></h2>
@@ -57,32 +57,26 @@ consisting of any of the following forms:
     device-class device-uri "device-make-and-model" "device-info" "device-id" "device-location"
 </pre>
 <p>The <i>device-class</i> field is one of the following values:
-<dl>
-<dt>direct
-</dt>
-<dd></dd>
-<dd>The device-uri refers to a specific direct-access device with no options, such
+<p style="margin-left: 5.0em; text-indent: -5.0em">direct
+<br>
+<br>
+The device-uri refers to a specific direct-access device with no options, such
 as a parallel, USB, or SCSI device.
-</dd>
-<dt>file
-</dt>
-<dd></dd>
-<dd>The device-uri refers to a file on disk.
-</dd>
-<dt>network
-</dt>
-<dd></dd>
-<dd>The device-uri refers to a networked device and conforms to the general form for
+<p style="margin-left: 5.0em; text-indent: -5.0em">file
+<br>
+<br>
+The device-uri refers to a file on disk.
+<p style="margin-left: 5.0em; text-indent: -5.0em">network
+<br>
+<br>
+The device-uri refers to a networked device and conforms to the general form for
 network URIs.
-</dd>
-<dt>serial
-</dt>
-<dd></dd>
-<dd>The device-uri refers to a serial device with configurable baud rate and other
+<p style="margin-left: 5.0em; text-indent: -5.0em">serial
+<br>
+<br>
+The device-uri refers to a serial device with configurable baud rate and other
 options. If the device-uri contains a baud value, it represents the maximum baud
 rate supported by the device.
-</dd>
-</dl>
 <p>The <i>scheme</i> field provides the URI scheme that is supported by the backend.
 Backends should use this form only when the backend supports any URI using that
 scheme. The <i>device-uri</i> field specifies the full URI to use when
@@ -104,66 +98,56 @@ the backend is run using an unprivileged user account, typically "lp".
 <h2 class="title"><a name="EXIT_CODES">Exit Codes</a></h2>
 The following exit codes are defined for backends; C API constants defined in
 the &lt;cups/backend.h> header file are defined in parenthesis:
-<dl>
-<dt>0 (CUPS_BACKEND_OK)
-</dt>
-<dd></dd>
-<dd>The print file was successfully transmitted to the device or remote server.
-</dd>
-<dt>1 (CUPS_BACKEND_FAILED)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted to the device or remote server.
+<p style="margin-left: 5.0em; text-indent: -5.0em">0 (CUPS_BACKEND_OK)
+<br>
+<br>
+The print file was successfully transmitted to the device or remote server.
+<p style="margin-left: 5.0em; text-indent: -5.0em">1 (CUPS_BACKEND_FAILED)
+<br>
+<br>
+The print file was not successfully transmitted to the device or remote server.
 The scheduler will respond to this by canceling the job, retrying the job, or
 stopping the queue depending on the state of the error-policy attribute.
-</dd>
-<dt>2 (CUPS_BACKEND_AUTH_REQUIRED)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because valid authentication
+<p style="margin-left: 5.0em; text-indent: -5.0em">2 (CUPS_BACKEND_AUTH_REQUIRED)
+<br>
+<br>
+The print file was not successfully transmitted because valid authentication
 information is required. The scheduler will respond to this by holding the job
 and adding the "cups-held-for-authentication" keyword to the "job-reasons"
 attribute.
-</dd>
-<dt>3 (CUPS_BACKEND_HOLD)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because it cannot be printed at
+<p style="margin-left: 5.0em; text-indent: -5.0em">3 (CUPS_BACKEND_HOLD)
+<br>
+<br>
+The print file was not successfully transmitted because it cannot be printed at
 this time. The scheduler will respond to this by holding the job.
-</dd>
-<dt>4 (CUPS_BACKEND_STOP)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because it cannot be printed at
+<p style="margin-left: 5.0em; text-indent: -5.0em">4 (CUPS_BACKEND_STOP)
+<br>
+<br>
+The print file was not successfully transmitted because it cannot be printed at
 this time. The scheduler will respond to this by stopping the queue.
-</dd>
-<dt>5 (CUPS_BACKEND_CANCEL)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because one or more attributes
+<p style="margin-left: 5.0em; text-indent: -5.0em">5 (CUPS_BACKEND_CANCEL)
+<br>
+<br>
+The print file was not successfully transmitted because one or more attributes
 are not supported or the job was canceled at the printer. The scheduler will
 respond to this by canceling the job.
-</dd>
-<dt>6 (CUPS_BACKEND_RETRY)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because of a temporary issue.
+<p style="margin-left: 5.0em; text-indent: -5.0em">6 (CUPS_BACKEND_RETRY)
+<br>
+<br>
+The print file was not successfully transmitted because of a temporary issue.
 The scheduler will retry the job at a future time - other jobs may print before
 this one.
-</dd>
-<dt>7 (CUPS_BACKEND_RETRY_CURRENT)
-</dt>
-<dd></dd>
-<dd>The print file was not successfully transmitted because of a temporary issue.
+<p style="margin-left: 5.0em; text-indent: -5.0em">7 (CUPS_BACKEND_RETRY_CURRENT)
+<br>
+<br>
+The print file was not successfully transmitted because of a temporary issue.
 The scheduler will retry the job immediately without allowing intervening jobs.
-</dd>
-</dl>
 <p>All other exit code values are reserved.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cups-snmp.html?TOPIC=Man+Pages'>cups-snmp(8)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>, <a href='man-filter.html?TOPIC=Man+Pages'>filter(7)</a>,
-<a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a>,
+<i>cups-snmp(8)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>, <i>filter(7)</i>,
+<i>lpinfo(8)</i>,
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright 2007-2013 by Apple Inc.
 

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <!-- SECTION: Man Pages -->
 <head>
@@ -10,14 +10,14 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 snmp - cups snmp backend
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
-<b>/usr/lib/cups/backend/snmp
-</b><i>ip-address-or-hostname
-</i><br>
-<b>/usr/libexec/cups/backend/snmp
-</b><i>ip-address-or-hostname
-</i><br>
-<b>lpinfo -v --include-schemes snmp
-</b><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>/usr/lib/cups/backend/snmp</b>
+<i>ip-address-or-hostname</i>
+<br>
+<b>/usr/libexec/cups/backend/snmp</b>
+<i>ip-address-or-hostname</i>
+<br>
+<b>lpinfo</b> <b>-v</b> <b>--include-schemes</b> <b>snmp</b>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The CUPS SNMP backend provides legacy discovery and identification of network
 printers using SNMPv1. When used for discovery through the scheduler, the
 backend will list all printers that respond to a broadcast SNMPv1 query with the
@@ -28,7 +28,7 @@ information needed for printing.
 device URI and other information when you have an IP address or hostname. This
 can be used for programs that need to configure print queues where the user has
 supplied an address but nothing else.
-<p>In the second form, the SNMP backend is run indirectly using the <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a>
+<p>In the second form, the SNMP backend is run indirectly using the <i>lpinfo(8)</i>
 command. The output provides all printers detected via SNMP on the configured
 broadcast addresses. <b>Note</b>: no broadcast addresses are configured by
 default.
@@ -39,15 +39,15 @@ determine the correct device URI and make and model for each printer.
 <h2 class="title"><a name="CONFIGURATION">Configuration</a></h2>
 The SNMP backend reads the /etc/cups/snmp.conf configuration file, if
 present, to set the default broadcast address, community name, and logging
-level. The configuration file is documented in <a href='man-cups-snmp.conf.html?TOPIC=Man+Pages'>cups-snmp.conf(5)</a>. The
+level. The configuration file is documented in <i>cups-snmp.conf(5)</i>. The
 DebugLevel value can be overridden using the CUPS_DEBUG_LEVEL environment
 variable and the MaxRunTime value can be overridden using the CUPS_MAX_RUN_TIME
 environment variable.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-backend.html?TOPIC=Man+Pages'>backend(7)</a>, <a href='man-cups-snmp.conf.html?TOPIC=Man+Pages'>cups-snmp.conf(5)</a>, <a href='man-cupsd.html?TOPIC=Man+Pages'>cupsd(8)</a>, <a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>,
-<a href='man-filter.html?TOPIC=Man+Pages'>filter(7)</a>, <a href='man-lpinfo.html?TOPIC=Man+Pages'>lpinfo(8)</a>,
+<i>backend(7)</i>, <i>cups-snmp.conf(5)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>,
+<i>filter(7)</i>, <i>lpinfo(8)</i>,
 <br>
-<a href='http://localhost:631/help'>http://localhost:631/help</a>
+<a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright 2007-2013 by Apple Inc.
 
