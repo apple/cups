@@ -2341,7 +2341,7 @@ log_usb_class_driver(int is_64bit)	/* I - Is the USB class driver 64-bit? */
     asl_set(aslm, "com.apple.message.signature", make_model ? make_model : "Unknown");
     asl_set(aslm, "com.apple.message.signature2", version ? version->value : "?.?");
     asl_set(aslm, "com.apple.message.summarize", "YES");
-    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "%s (%s) is a %s printer driver.", make_model ? make_model : "Unknown", version ? version->value : "?.?", is_64bit ? "64-bit" : "32-bit");
+    asl_log(NULL, aslm, ASL_LEVEL_NOTICE, "");
     asl_free(aslm);
   }
 }
