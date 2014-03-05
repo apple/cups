@@ -261,7 +261,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Get the server's response...
     */
 
-    if (status != HTTP_STATUS_ERROR)
+    if (status <= HTTP_STATUS_CONTINUE)
     {
       response = cupsGetResponse(http, resource);
       status   = httpGetStatus(http);
