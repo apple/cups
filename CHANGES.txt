@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.7.2
 	- Fixed the Japanese localization (STR #4385)
 	- Added a German localization (STR #4363)
 	- Updated Linux "relro" support (STR #4349)
+	- cupsEnumDests did not set the "is_default" field (STR #4332)
 	- cupsDoIORequest could miss the server status, causing failed lpadmin
 	  and other administrative commands (STR #4386)
 	- cupsEnumDests didn't always call the callback function (STR #4380)
@@ -19,7 +20,7 @@ CHANGES IN CUPS V1.7.2
 	- Fixed a D-BUS threading issue that caused the scheduler to crash
 	  (STR #4347)
 	- The scheduler now automatically reconnects to Avahi as needed
-	  (STR #4370)
+	  (STR #4370, STR #4373)
 	- The scheduler did not handle GET requests for the log files properly
 	  (STR #3265)
 	- The dnssd backend did not always report all discovered printers using

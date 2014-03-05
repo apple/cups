@@ -553,7 +553,7 @@ cgi_copy(FILE *out,			/* I - Output file */
 	      if (regcomp(&re, compare, REG_EXTENDED | REG_ICASE))
 	      {
 	        fprintf(stderr,
-		        "ERROR: Unable to compile regular expresion \"%s\"!\n",
+		        "ERROR: Unable to compile regular expression \"%s\"!\n",
 			compare);
 		result = 0;
 	      }
