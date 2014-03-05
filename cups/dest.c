@@ -953,11 +953,11 @@ cupsEnumDests(
   * Get Bonjour-shared printers...
   */
 
-  data.type    = type;
-  data.mask    = mask;
-  data.devices = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices,
-                               NULL, NULL, 0, NULL,
-                               (cups_afree_func_t)cups_dnssd_free_device);
+  data.type      = type;
+  data.mask      = mask;
+  data.cb        = cb;
+  data.user_data = user_data;
+  data.devices   = cupsArrayNew3((cups_array_func_t)cups_dnssd_compare_devices, NULL, NULL, 0, NULL, (cups_afree_func_t)cups_dnssd_free_device);
 
 #  ifdef HAVE_DNSSD
   if (DNSServiceCreateConnection(&data.main_ref) != kDNSServiceErr_NoError)
