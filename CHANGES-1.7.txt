@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.7.2
 	- Fixed the Japanese localization (STR #4385)
 	- Added a German localization (STR #4363)
 	- Updated Linux "relro" support (STR #4349)
+	- cupsEnumDests did not set the "is_default" field (STR #4332)
 	- cupsDoIORequest could miss the server status, causing failed lpadmin
 	  and other administrative commands (STR #4386)
 	- cupsEnumDests didn't always call the callback function (STR #4380)
