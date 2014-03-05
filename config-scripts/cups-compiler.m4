@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl Compiler stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2014 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -185,7 +185,7 @@ if test -n "$GCC"; then
 			# The -z relro option is provided by the Linux linker command to
 			# make relocatable data read-only.
 			if test x$enable_relro = xyes; then
-				RELROFLAGS="-Wl,-z,relro"
+				RELROFLAGS="-Wl,-z,relro,-z,now"
 			fi
 			;;
 	esac
