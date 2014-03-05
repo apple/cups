@@ -20,7 +20,7 @@ CHANGES IN CUPS V1.7.2
 	- Fixed a D-BUS threading issue that caused the scheduler to crash
 	  (STR #4347)
 	- The scheduler now automatically reconnects to Avahi as needed
-	  (STR #4370)
+	  (STR #4370, STR #4373)
 	- The scheduler did not handle GET requests for the log files properly
 	  (STR #3265)
 	- The dnssd backend did not always report all discovered printers using
