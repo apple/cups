@@ -854,6 +854,7 @@ _cupsSetDefaults(void)
 
   if ((cups_user = getenv("CUPS_USER")) == NULL)
   {
+#ifndef WIN32
    /*
     * Try the USER environment variable...
     */
@@ -871,6 +872,7 @@ _cupsSetDefaults(void)
       if ((pw = getpwnam(cups_user)) == NULL || pw->pw_uid != getuid())
         cups_user = NULL;
     }
+#endif /* !WIN32 */
   }
 
  /*
