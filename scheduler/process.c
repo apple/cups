@@ -198,6 +198,8 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
                  " #\"^/usr/libexec/cups$\""	/* /usr/libexec/cups */
                  " #\"^/usr/libexec/cups/\""	/* /usr/libexec/cups/... */
+                 " #\"^/usr/libexec/fax$\""	/* /usr/libexec/fax */
+                 " #\"^/usr/libexec/fax/\""	/* /usr/libexec/fax/... */
                  " #\"^/usr/sbin$\""	/* /usr/sbin */
                  " #\"^/usr/sbin/\""	/* /usr/sbin/... */
 		 " #\"^/Library/Application Support$\""
@@ -248,6 +250,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/usr/sbin/\""	/* /usr/sbin/... */
 		 " #\"^%s/\""		/* ServerBin/... */
 		 " #\"^/Library/Printers/.*/\""
+		 " #\"^/System/Library/Frameworks/Python.framework/\""
 		 "))\n",
 		 bin);
   if (RunUser && getenv("CUPS_TESTROOT"))
