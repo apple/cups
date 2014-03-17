@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-07-08 07:21-0400\n"
+"POT-Creation-Date: 2014-03-17 07:47-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1510,10 +1510,6 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-
-#, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 
@@ -2665,6 +2661,9 @@ msgstr "Número de versión SNMP incorrecto"
 msgid "Bad UIConstraints"
 msgstr "UIConstraints incorrecto"
 
+msgid "Bad arguments to function"
+msgstr ""
+
 #, c-format
 msgid "Bad copies value %d."
 msgstr "Valor de copias %d incorrecto."
@@ -2690,6 +2689,9 @@ msgstr "document-format-default \"%s\" incorrecto."
 
 msgid "Bad filename buffer"
 msgstr "Nombre de archivo del búfer incorrecto"
+
+msgid "Bad hostname/address in URI"
+msgstr ""
 
 #, c-format
 msgid "Bad job-name value: %s"
@@ -2735,6 +2737,9 @@ msgstr "Opción + preferencia incorrectas en línea %d."
 msgid "Bad page-ranges values %d-%d."
 msgstr "Valores de page-ranges %d-%d incorrectos."
 
+msgid "Bad port number in URI"
+msgstr ""
+
 #, c-format
 msgid "Bad port-monitor \"%s\"."
 msgstr "port-monitor \"%s\" incorrecto."
@@ -2754,11 +2759,23 @@ msgstr "Petición incorrecta de ID %d."
 msgid "Bad request version number %d.%d."
 msgstr "Petición incorrecta de número de versión %d.%d."
 
+msgid "Bad resource in URI"
+msgstr ""
+
+msgid "Bad scheme in URI"
+msgstr ""
+
 msgid "Bad subscription ID"
 msgstr "ID de subscripción incorrecto"
 
+msgid "Bad username in URI"
+msgstr ""
+
 msgid "Bad value string"
 msgstr "Cadena de valores incorrecta"
+
+msgid "Bad/empty URI"
+msgstr ""
 
 msgid "Banners"
 msgstr "Rótulos"
@@ -3534,6 +3551,9 @@ msgstr "Línea más larga que el máximo permitido (255 caracteres)"
 msgid "List Available Printers"
 msgstr "Listar impresoras disponibles"
 
+msgid "Load paper."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Lado largo (retrato)"
 
@@ -3600,6 +3620,12 @@ msgstr "Falta el atributo requesting-user-name."
 
 msgid "Missing required attributes."
 msgstr "Faltan atributos necesarios."
+
+msgid "Missing resource in URI"
+msgstr ""
+
+msgid "Missing scheme in URI"
+msgstr ""
 
 #, c-format
 msgid "Missing value on line %d."
@@ -3734,6 +3760,12 @@ msgstr "No se encontró printer-uri para la clase"
 msgid "No printer-uri in request."
 msgstr "No hay printer-uri en la petición."
 
+msgid "No request URI."
+msgstr ""
+
+msgid "No request protocol version."
+msgstr ""
+
 msgid "No request-id"
 msgstr "No hay request-id"
 
@@ -3829,23 +3861,14 @@ msgstr "Sin memoria."
 msgid "Output Mode"
 msgstr "Modo de salida"
 
-#, c-format
-msgid "Output for printer %s is sent to %s"
-msgstr "La salida de la impresora %s se ha enviado a %s"
-
-#, c-format
-msgid "Output for printer %s is sent to remote printer %s on %s"
+msgid "Output bin is almost full."
 msgstr ""
-"La salida de la impresora %s se ha enviado a la impresora remota %s en %s"
 
-#, c-format
-msgid "Output for printer %s/%s is sent to %s"
-msgstr "La salida de la impresora %s/%s se ha enviado a %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgid "Output bin is full."
 msgstr ""
-"La salida de la impresora %s/%s se ha enviado a la impresora remota %s en %s"
+
+msgid "Output bin is missing."
+msgstr ""
 
 msgid "PASS"
 msgstr "PASA"
@@ -3876,6 +3899,18 @@ msgstr "El paquete no contiene un Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "El paquete no empieza por SEQUENCE"
+
+msgid "Paper jam."
+msgstr ""
+
+msgid "Paper tray is almost empty."
+msgstr ""
+
+msgid "Paper tray is empty."
+msgstr ""
+
+msgid "Paper tray is missing."
+msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4003,8 +4038,8 @@ msgid "Printers"
 msgstr "Impresoras"
 
 #, c-format
-msgid "Printing page %d, %d%% complete."
-msgstr "Imprimiendo página %d, %d%% completado."
+msgid "Printing page %d, %u%% complete."
+msgstr ""
 
 msgid "Purge Jobs"
 msgstr "Purgar trabajos"
@@ -4017,12 +4052,6 @@ msgstr "Se ha alcanzado el límite de cuota."
 
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr "Rango  Propiet. Trabajo Archivo(s)                      Tamaño total"
-
-#. TRANSLATORS: Pri is job priority.
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size"
-msgstr ""
-"Rango  Propiet.   Pri  Trabajo    Archivos                    Tamaño total"
 
 msgid "Reject Jobs"
 msgstr "Rechazar trabajos"
@@ -4083,6 +4112,9 @@ msgstr "Servidor iniciado"
 
 msgid "Server Stopped"
 msgstr "Servidor parado"
+
+msgid "Server credentials not set."
+msgstr ""
 
 msgid "Service Unavailable"
 msgstr "Servicio no disponible"
@@ -4239,27 +4271,6 @@ msgstr "El fotoconductor óptico necesita ser cambiado."
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr "El fotoconductor óptico necesitará ser cambiado pronto."
 
-msgid "The output bin is almost full."
-msgstr "Recipiente de salida casi lleno"
-
-msgid "The output bin is full."
-msgstr "Bandeja de salida llena."
-
-msgid "The output bin is missing."
-msgstr "Falta la bandeja de salida."
-
-msgid "The paper tray is almost empty."
-msgstr "Bandeja de papel casi vacía."
-
-msgid "The paper tray is empty."
-msgstr "Bandeja de papel vacía."
-
-msgid "The paper tray is missing."
-msgstr "Falta la bandeja de papel."
-
-msgid "The paper tray needs to be filled."
-msgstr "Hay que poner papel en la bandeja."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -4268,6 +4279,12 @@ msgstr "La impresora no respondió."
 
 msgid "The printer is in use."
 msgstr "La impresora está en uso."
+
+msgid "The printer is low on ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
 
 msgid "The printer is not connected."
 msgstr "La impresora no está conectada."
@@ -4283,12 +4300,6 @@ msgstr "La impresora está ahora en línea."
 
 msgid "The printer is offline."
 msgstr "La impresora está fuera de línea."
-
-msgid "The printer is running low on ink."
-msgstr "La impresora está funcionando con poca tinta."
-
-msgid "The printer is running low on toner."
-msgstr "La impresora está funcionando con poco toner."
 
 msgid "The printer is unreachable at this time."
 msgstr "La impresora es inalcanzable en este momento."
@@ -4370,9 +4381,6 @@ msgstr "No se admite el uso del valor which-jobs \"%s\"."
 msgid "There are too many subscriptions."
 msgstr "Hay demasiadas subscripciones."
 
-msgid "There is a paper jam."
-msgstr "Hay un atasco de papel."
-
 msgid "There was an unrecoverable USB error."
 msgstr "Ha habido un error USB irrecuperable."
 
@@ -4410,6 +4418,9 @@ msgstr "Bandeja 4"
 
 msgid "URI Too Long"
 msgstr "URI demasiado largo"
+
+msgid "URI too large"
+msgstr ""
 
 msgid "US Ledger"
 msgstr "Libro Mayor, 17 x 11 pulg."
@@ -4544,6 +4555,9 @@ msgstr "No se ha podido copiar el script de interfaz - %s"
 msgid "Unable to create printer-uri"
 msgstr "No se ha podido crear printer-uri"
 
+msgid "Unable to create server credentials."
+msgstr ""
+
 msgid "Unable to create temporary file"
 msgstr "No se ha podido crear el archivo temporal"
 
@@ -4608,6 +4622,9 @@ msgstr "No se ha podido encontrar destino para el trabajo"
 
 msgid "Unable to find printer."
 msgstr "No se ha podido encontrar la impresora."
+
+msgid "Unable to find server credentials."
+msgstr ""
 
 msgid "Unable to get backend exit status."
 msgstr "No se ha podido obtener el estado de salida del programa backend"
@@ -4786,6 +4803,15 @@ msgstr "printer-error-policy \"%s\" incorrecto."
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr "printer-op-policy \"%s\" incorrecto."
+
+msgid "Unknown request method."
+msgstr ""
+
+msgid "Unknown request version."
+msgstr ""
+
+msgid "Unknown scheme in URI"
+msgstr ""
 
 msgid "Unknown service name."
 msgstr "Nombre de servicio desconocido."
@@ -5981,8 +6007,26 @@ msgstr "sin título"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
 
+#~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+#~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: Error - se esperaba un destino tras la opción \"-b\"."
+
+#~ msgid "Output for printer %s is sent to %s"
+#~ msgstr "La salida de la impresora %s se ha enviado a %s"
+
+#~ msgid "Output for printer %s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La salida de la impresora %s se ha enviado a la impresora remota %s en %s"
+
+#~ msgid "Output for printer %s/%s is sent to %s"
+#~ msgstr "La salida de la impresora %s/%s se ha enviado a %s"
+
+#~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La salida de la impresora %s/%s se ha enviado a la impresora remota %s en "
+#~ "%s"
 
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "Archivo de impresión aceptado: ID de trabajo %d."
@@ -5993,11 +6037,49 @@ msgstr "variable-bindings usa una longitud indefinida"
 #~ msgid "Print file was not accepted."
 #~ msgstr "No se ha aceptado el archivo de impresión."
 
+#~ msgid "Printing page %d, %d%% complete."
+#~ msgstr "Imprimiendo página %d, %d%% completado."
+
+#~ msgid ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+#~ msgstr ""
+#~ "Rango  Propiet.   Pri  Trabajo    Archivos                    Tamaño total"
+
+#~ msgid "The output bin is almost full."
+#~ msgstr "Recipiente de salida casi lleno"
+
+#~ msgid "The output bin is full."
+#~ msgstr "Bandeja de salida llena."
+
+#~ msgid "The output bin is missing."
+#~ msgstr "Falta la bandeja de salida."
+
+#~ msgid "The paper tray is almost empty."
+#~ msgstr "Bandeja de papel casi vacía."
+
+#~ msgid "The paper tray is empty."
+#~ msgstr "Bandeja de papel vacía."
+
+#~ msgid "The paper tray is missing."
+#~ msgstr "Falta la bandeja de papel."
+
+#~ msgid "The paper tray needs to be filled."
+#~ msgstr "Hay que poner papel en la bandeja."
+
 #~ msgid "The printer URI is incorrect or no longer exists."
 #~ msgstr "El URI de la impresora es incorrecto o ya no existe."
 
 #~ msgid "The printer does not support IPP/%d.%d, trying IPP/%s."
 #~ msgstr "La impresora no es compatible con IPP/%d.%d, probando IPP/%s."
+
+#~ msgid "The printer is running low on ink."
+#~ msgstr "La impresora está funcionando con poca tinta."
+
+#~ msgid "The printer is running low on toner."
+#~ msgstr "La impresora está funcionando con poco toner."
+
+#~ msgid "There is a paper jam."
+#~ msgstr "Hay un atasco de papel."
 
 #~ msgid "Unable to create compressed print file"
 #~ msgstr "No se ha podido crear el archivo de impresión comprimido"

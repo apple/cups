@@ -288,14 +288,14 @@ ppdLocalizeIPPReason(
       const char *message = NULL;	/* Localized message */
 
       if (!strncmp(reason, "media-needed", 12))
-	message = _("The paper tray needs to be filled.");
+	message = _("Load paper.");
       else if (!strncmp(reason, "media-jam", 9))
-	message = _("There is a paper jam.");
+	message = _("Paper jam.");
       else if (!strncmp(reason, "offline", 7) ||
 		       !strncmp(reason, "shutdown", 8))
 	message = _("The printer is not connected.");
       else if (!strncmp(reason, "toner-low", 9))
-	message = _("The printer is running low on toner.");
+	message = _("The printer is low on toner.");
       else if (!strncmp(reason, "toner-empty", 11))
 	message = _("The printer may be out of toner.");
       else if (!strncmp(reason, "cover-open", 10))
@@ -305,19 +305,19 @@ ppdLocalizeIPPReason(
       else if (!strncmp(reason, "door-open", 9))
 	message = _("The printer's door is open.");
       else if (!strncmp(reason, "input-tray-missing", 18))
-	message = _("The paper tray is missing.");
+	message = _("Paper tray is missing.");
       else if (!strncmp(reason, "media-low", 9))
-	message = _("The paper tray is almost empty.");
+	message = _("Paper tray is almost empty.");
       else if (!strncmp(reason, "media-empty", 11))
-	message = _("The paper tray is empty.");
+	message = _("Paper tray is empty.");
       else if (!strncmp(reason, "output-tray-missing", 19))
-	message = _("The output bin is missing.");
+	message = _("Output bin is missing.");
       else if (!strncmp(reason, "output-area-almost-full", 23))
-	message = _("The output bin is almost full.");
+	message = _("Output bin is almost full.");
       else if (!strncmp(reason, "output-area-full", 16))
-	message = _("The output bin is full.");
+	message = _("Output bin is full.");
       else if (!strncmp(reason, "marker-supply-low", 17))
-	message = _("The printer is running low on ink.");
+	message = _("The printer is low on ink.");
       else if (!strncmp(reason, "marker-supply-empty", 19))
 	message = _("The printer may be out of ink.");
       else if (!strncmp(reason, "marker-waste-almost-full", 24))

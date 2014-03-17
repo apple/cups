@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-07-08 07:21-0400\n"
+"POT-Creation-Date: 2014-03-17 07:47-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -1521,10 +1521,6 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
-
-#, c-format
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 
@@ -2676,6 +2672,9 @@ msgstr "El número de versió del SNMP és incorrecte"
 msgid "Bad UIConstraints"
 msgstr "La UIConstraints és incorrecta"
 
+msgid "Bad arguments to function"
+msgstr ""
+
 #, c-format
 msgid "Bad copies value %d."
 msgstr "El valor de copies %d és incorrecte"
@@ -2701,6 +2700,9 @@ msgstr "La document-format-default «%s» és incorrecta."
 
 msgid "Bad filename buffer"
 msgstr "El nom del fitxer de la memòria cau és incorrecte"
+
+msgid "Bad hostname/address in URI"
+msgstr ""
 
 #, c-format
 msgid "Bad job-name value: %s"
@@ -2746,6 +2748,9 @@ msgstr "L'opció + elecció de la línia %d és incorrecta."
 msgid "Bad page-ranges values %d-%d."
 msgstr "Els valors de page-ranges %d-%d són incorrectes."
 
+msgid "Bad port number in URI"
+msgstr ""
+
 #, c-format
 msgid "Bad port-monitor \"%s\"."
 msgstr "La port-monitor «%s» és incorrecta."
@@ -2765,11 +2770,23 @@ msgstr "L'identificador %d de la sol·licitud és incorrecte."
 msgid "Bad request version number %d.%d."
 msgstr "El número de versió %d.%d de la sol·licitud és incorrecte."
 
+msgid "Bad resource in URI"
+msgstr ""
+
+msgid "Bad scheme in URI"
+msgstr ""
+
 msgid "Bad subscription ID"
 msgstr "L'identificador de la subscripció és incorrecte."
 
+msgid "Bad username in URI"
+msgstr ""
+
 msgid "Bad value string"
 msgstr "El valor de la cadena és incorrecte"
+
+msgid "Bad/empty URI"
+msgstr ""
 
 msgid "Banners"
 msgstr "Bàners"
@@ -3547,6 +3564,9 @@ msgstr "La línia la longitud màxima permesa (255 caràcters)"
 msgid "List Available Printers"
 msgstr "Llista les impressores disponibles"
 
+msgid "Load paper."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Costat-llarg (vertical)"
 
@@ -3613,6 +3633,12 @@ msgstr "Falta l'atribut requesting-user-name."
 
 msgid "Missing required attributes."
 msgstr "Falten alguns atributs necessaris."
+
+msgid "Missing resource in URI"
+msgstr ""
+
+msgid "Missing scheme in URI"
+msgstr ""
 
 #, c-format
 msgid "Missing value on line %d."
@@ -3747,6 +3773,12 @@ msgstr "No s'ha trobat cap printer-uri per la classe"
 msgid "No printer-uri in request."
 msgstr "No hi ha cap printer-uri a la sol·licitud."
 
+msgid "No request URI."
+msgstr ""
+
+msgid "No request protocol version."
+msgstr ""
+
 msgid "No request-id"
 msgstr "No hi ha cap request-id"
 
@@ -3842,22 +3874,14 @@ msgstr "Sense memòria."
 msgid "Output Mode"
 msgstr "Mode de sortida"
 
-#, c-format
-msgid "Output for printer %s is sent to %s"
-msgstr "La sortida de la impressora %s s'envia a %s"
-
-#, c-format
-msgid "Output for printer %s is sent to remote printer %s on %s"
-msgstr "La sortida de la impressora %s s'envia a la impressora remota %s a %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to %s"
-msgstr "La sortida per la impressora %s/%s s'envia a la impressora %s"
-
-#, c-format
-msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+msgid "Output bin is almost full."
 msgstr ""
-"La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
+
+msgid "Output bin is full."
+msgstr ""
+
+msgid "Output bin is missing."
+msgstr ""
 
 msgid "PASS"
 msgstr "VÀLID"
@@ -3888,6 +3912,18 @@ msgstr "El paquet no conté cap Get-Response-PDU"
 
 msgid "Packet does not start with SEQUENCE"
 msgstr "El paquet no comença amb SEQUENCE"
+
+msgid "Paper jam."
+msgstr ""
+
+msgid "Paper tray is almost empty."
+msgstr ""
+
+msgid "Paper tray is empty."
+msgstr ""
+
+msgid "Paper tray is missing."
+msgstr ""
 
 msgid "ParamCustominCutInterval"
 msgstr "ParamCustominCutInterval"
@@ -4015,8 +4051,8 @@ msgid "Printers"
 msgstr "Impressores"
 
 #, c-format
-msgid "Printing page %d, %d%% complete."
-msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
+msgid "Printing page %d, %u%% complete."
+msgstr ""
 
 msgid "Purge Jobs"
 msgstr "Purga les feines"
@@ -4030,13 +4066,6 @@ msgstr "S'ha assolit el límit de la quota."
 msgid "Rank    Owner   Job     File(s)                         Total Size"
 msgstr ""
 "Rang    Propietari   Feina     Fitxer(s)                         Mida total"
-
-#. TRANSLATORS: Pri is job priority.
-msgid ""
-"Rank   Owner      Pri  Job        Files                       Total Size"
-msgstr ""
-"Rang   Propietari      Pri  Feina        Fitxers                       Mida "
-"total"
 
 msgid "Reject Jobs"
 msgstr "Rebutja feines"
@@ -4097,6 +4126,9 @@ msgstr "S'ha iniciat el servidor"
 
 msgid "Server Stopped"
 msgstr "S'ha aturat el servidor"
+
+msgid "Server credentials not set."
+msgstr ""
 
 msgid "Service Unavailable"
 msgstr "El servei no està disponible"
@@ -4253,27 +4285,6 @@ msgstr "S'ha de canviar el fotoconductor òptic."
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr "El fotoconductor òptic s'haurà de canviar aviat."
 
-msgid "The output bin is almost full."
-msgstr "La safata de sortida és gairebé plena."
-
-msgid "The output bin is full."
-msgstr "La safata de sortida és plena."
-
-msgid "The output bin is missing."
-msgstr "Falta la safata de sortida."
-
-msgid "The paper tray is almost empty."
-msgstr "La safata de paper és gairebé buida."
-
-msgid "The paper tray is empty."
-msgstr "La safata de paper és buida."
-
-msgid "The paper tray is missing."
-msgstr "Falta la safata de paper."
-
-msgid "The paper tray needs to be filled."
-msgstr "S'ha d'omplir la safata de paper."
-
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -4282,6 +4293,12 @@ msgstr "La impressora no ha respost."
 
 msgid "The printer is in use."
 msgstr "La impressora està ocupada."
+
+msgid "The printer is low on ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr "S'està acabant el tòner de la impressora."
 
 msgid "The printer is not connected."
 msgstr "La impressora no està connectada."
@@ -4297,12 +4314,6 @@ msgstr "Ara la impressora està en línia."
 
 msgid "The printer is offline."
 msgstr "La impressora està fora de línia."
-
-msgid "The printer is running low on ink."
-msgstr "S'està acabant la tinta de la impressora."
-
-msgid "The printer is running low on toner."
-msgstr "S'està acabant el tòner de la impressora."
 
 msgid "The printer is unreachable at this time."
 msgstr "Ara mateix no es pot accedir a la impressora."
@@ -4385,9 +4396,6 @@ msgstr "El valor «%s» de which-jobs no està implementat."
 msgid "There are too many subscriptions."
 msgstr "Hi ha massa subscripcions."
 
-msgid "There is a paper jam."
-msgstr "S'ha encallat el paper."
-
 msgid "There was an unrecoverable USB error."
 msgstr "Hi ha un error de l'USB irrecuperable."
 
@@ -4425,6 +4433,9 @@ msgstr "Safata 4"
 
 msgid "URI Too Long"
 msgstr "L'URI és massa llarg"
+
+msgid "URI too large"
+msgstr ""
 
 msgid "US Ledger"
 msgstr "Llibre major americà"
@@ -4556,6 +4567,9 @@ msgstr "No es pot copiar l'script de la interfície - %s"
 msgid "Unable to create printer-uri"
 msgstr "No es pot crear el printer-uri"
 
+msgid "Unable to create server credentials."
+msgstr ""
+
 msgid "Unable to create temporary file"
 msgstr "No es pot crear el fitxer temporal"
 
@@ -4620,6 +4634,9 @@ msgstr "No es pot trobar el destí de la feina"
 
 msgid "Unable to find printer."
 msgstr "No es pot trobar la impressora."
+
+msgid "Unable to find server credentials."
+msgstr ""
 
 msgid "Unable to get backend exit status."
 msgstr "No es pot obtenir el motiu de la sortida de l'execució en segon pla"
@@ -4796,6 +4813,15 @@ msgstr "El paràmetre printer-error-policy «%s» és desconegut."
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr "El paràmetre printer-op-policy «%s» és desconegut."
+
+msgid "Unknown request method."
+msgstr ""
+
+msgid "Unknown request version."
+msgstr ""
+
+msgid "Unknown scheme in URI"
+msgstr ""
 
 msgid "Unknown service name."
 msgstr "El nom del servei és desconegut."
@@ -6066,6 +6092,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgstr ""
 #~ "  -v                      Mostra tots els atributs enviats i rebuts."
 
+#~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+#~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
+
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: error - s'esperava un destí després de l'opció «-b»."
 
@@ -6097,6 +6126,20 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Large Address - 1 4/10 x 3 1/2\""
 #~ msgstr "Adreça gran - 1 4/10 x 3 1/2\""
 
+#~ msgid "Output for printer %s is sent to %s"
+#~ msgstr "La sortida de la impressora %s s'envia a %s"
+
+#~ msgid "Output for printer %s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida de la impressora %s s'envia a la impressora remota %s a %s"
+
+#~ msgid "Output for printer %s/%s is sent to %s"
+#~ msgstr "La sortida per la impressora %s/%s s'envia a la impressora %s"
+
+#~ msgid "Output for printer %s/%s is sent to remote printer %s on %s"
+#~ msgstr ""
+#~ "La sortida per la impressora %s/%s s'envia a la impressora remota %s a %s"
+
 #~ msgid "Print file accepted - job ID %d."
 #~ msgstr "S'ha acceptat el fitxer d'impressió - ID de la feina %d."
 
@@ -6126,6 +6169,15 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "La impressora està desconnectada. Es tornarà a intentar d'aquí a 30 "
 #~ "segons."
 
+#~ msgid "Printing page %d, %d%% complete."
+#~ msgstr "S'està imprimint la pàgina %d. S'ha completat el %d%%."
+
+#~ msgid ""
+#~ "Rank   Owner      Pri  Job        Files                       Total Size"
+#~ msgstr ""
+#~ "Rang   Propietari      Pri  Feina        Fitxers                       "
+#~ "Mida total"
+
 #~ msgid "Ready to print."
 #~ msgstr "Preparada per imprimir."
 
@@ -6135,6 +6187,27 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Shipping Address - 2 5/16 x 4\""
 #~ msgstr "Adreça de lliurament - 2 5/16 x 4\""
 
+#~ msgid "The output bin is almost full."
+#~ msgstr "La safata de sortida és gairebé plena."
+
+#~ msgid "The output bin is full."
+#~ msgstr "La safata de sortida és plena."
+
+#~ msgid "The output bin is missing."
+#~ msgstr "Falta la safata de sortida."
+
+#~ msgid "The paper tray is almost empty."
+#~ msgstr "La safata de paper és gairebé buida."
+
+#~ msgid "The paper tray is empty."
+#~ msgstr "La safata de paper és buida."
+
+#~ msgid "The paper tray is missing."
+#~ msgstr "Falta la safata de paper."
+
+#~ msgid "The paper tray needs to be filled."
+#~ msgstr "S'ha d'omplir la safata de paper."
+
 #~ msgid "The printer URI is incorrect or no longer exists."
 #~ msgstr "L'URI de la impressora no és correcte o ja no existeix."
 
@@ -6143,11 +6216,17 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "La impressora no és compatible amb el IPP/%d.%d, s'està intentant el IPP/"
 #~ "%s."
 
-#~ msgid "The printer is low on toner."
-#~ msgstr "S'està acabant el tòner de la impressora."
-
 #~ msgid "The printer is out of toner."
 #~ msgstr "S'ha acabat el tòner de la impressora"
+
+#~ msgid "The printer is running low on ink."
+#~ msgstr "S'està acabant la tinta de la impressora."
+
+#~ msgid "The printer is running low on toner."
+#~ msgstr "S'està acabant el tòner de la impressora."
+
+#~ msgid "There is a paper jam."
+#~ msgstr "S'ha encallat el paper."
 
 #~ msgid "Unable to create compressed print file"
 #~ msgstr "No es pot crear el fitxer d'impressió comprimit"
