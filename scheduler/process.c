@@ -313,7 +313,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		     "       (remote udp \"*:*\"))\n");
 
     /* Also allow access to Bluetooth, USB, device files, etc. */
-    cupsFilePuts(fp, "(allow iokit-open)\n");
+    cupsFilePuts(fp, "(allow iokit*)\n");
     cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
                      "       (regex #\"^/dev/\"))\n");
     cupsFilePuts(fp, "(allow distributed-notification-post)\n");
@@ -326,6 +326,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		     "       (remote udp \"*:161\"))\n");
     cupsFilePuts(fp, "(allow network-inbound\n"
 		     "       (local udp \"localhost:*\"))\n");
+    cupsFilePuts(fp, "(deny iokit* (with no-report))\n");
   }
   cupsFileClose(fp);
 
