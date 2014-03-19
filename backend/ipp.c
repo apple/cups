@@ -3001,6 +3001,8 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
   {
     (*password_tries) ++;
 
+    cupsSetUser(username);
+
     return (password);
   }
   else
