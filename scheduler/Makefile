@@ -289,7 +289,6 @@ uninstall:
 	$(RM) $(SERVERBIN)/daemon/cups-driverd
 	$(RM) $(SERVERBIN)/daemon/cups-exec
 	$(RM) $(SERVERBIN)/daemon/cups-lpd
-	$(RM) $(BUILDROOT)/System/Library/Printers/Libraries/convert
 	-$(RMDIR) $(STATEDIR)/certs
 	-$(RMDIR) $(STATEDIR)
 	-$(RMDIR) $(SERVERROOT)/ppd
@@ -311,8 +310,8 @@ uninstall:
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/mime.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
-	echo Uninstalling startup script...
 	if test "x$(INITDIR)" != x; then \
+		echo Uninstalling init scripts...; \
 		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
 		$(RMDIR) $(BUILDROOT)$(INITDIR)/init.d; \
 		$(RM)  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
@@ -324,23 +323,24 @@ uninstall:
 		$(RM) $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
 		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
 	fi
-	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
-		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
-			$(RM) $(BUILDROOT)$(INITDDIR)/PrintingServices; \
-			$(RM) $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
-			$(RM) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
-			$(RMDIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
-		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
-			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cupsd.plist; \
-			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cups-lpd.plist; \
-			$(RMDIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
-		else \
-			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
-		fi \
+	if test "x$(INITDDIR)" != x; then \
+		echo Uninstalling startup script...; \
+		$(RM) $(BUILDROOT)$(INITDDIR)/cups.sh; \
 		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
 	fi
+        if test "x$LAUNCHD_DIR" != x; then \
+        	echo Uninstalling launchd files...; \
+                $(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cupsd.plist; \
+                $(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cups-lpd.plist; \
+	fi
+        if test "x$SYSTEMD_DIR" != x; then \
+        	echo Uninstalling systemd files...; \
+                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.path; \
+                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.service; \
+                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.socket; \
+	fi
 	if test "x$(SMFMANIFESTDIR)" != x; then \
-		echo Uninstalling SMF manifest in $(SMFMANIFESTDIR)...;\
+		echo Uninstalling SMF manifest file...;\
 		$(RM) $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
 	fi
 	if test "x$(XINETD)" != x; then \
@@ -379,16 +379,16 @@ cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) -L. -lcupsmime \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
-		$(LIBPAPER) $(LIBMALLOC) $(SERVERLIBS) $(DNSSDLIBS) $(LIBS) \
-		$(LIBGSSAPI) $(LIBWRAP)
+		$(LIBPAPER) $(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) \
+                $(DNSSDLIBS) $(LIBS) $(LIBGSSAPI) $(LIBWRAP)
 
 cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
-		$(LIBMALLOC) $(SERVERLIBS) $(DNSSDLIBS) $(LIBGSSAPI) \
-		$(LIBWRAP)
+		$(LIBMALLOC) $(SERVERLIBS) $(ONDEMANDLIBS) $(DNSSDLIBS) \
+                $(LIBGSSAPI) $(LIBWRAP)
 
 
 #

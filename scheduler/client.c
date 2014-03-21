@@ -2516,7 +2516,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
   bytes = (ssize_t)(sizeof(con->header) - (size_t)con->header_used);
 
-  if (!con->pipe_pid && bytes > httpGetRemaining(con->http))
+  if (!con->pipe_pid && bytes > (ssize_t)httpGetRemaining(con->http))
   {
    /*
     * Limit GET bytes to original size of file (STR #3265)...

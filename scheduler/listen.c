@@ -3,7 +3,7 @@
  *
  * Server listening routines for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -274,16 +274,25 @@ cupsdStopListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
+#ifdef HAVE_SYSTEMD
+    if (lis->fd != -1 && !lis->on_demand)
+      httpAddrClose(&(lis->address), lis->fd);
+
+#elif defined(HAVE_LAUNCHD)
     if (lis->fd != -1)
     {
-#ifdef HAVE_LAUNCH_H
-      httpAddrClose(NULL, lis->fd);
-#else
-      httpAddrClose(&(lis->address), lis->fd);
-#endif /* HAVE_LAUNCH */
-
-      lis->fd = -1;
+      if (lis->on_demand)
+        httpAddrClose(NULL, lis->fd);
+      else
+        httpAddrClose(&(lis->address), lis->fd);
     }
+
+#else
+    if (lis->fd != -1)
+      httpAddrClose(&(lis->address), lis->fd);
+#endif /* HAVE_SYSTEMD */
+
+    lis->fd = -1;
   }
 }
 

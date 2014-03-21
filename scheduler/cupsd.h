@@ -158,10 +158,10 @@ VAR int			NeedReload	VALUE(RELOAD_ALL),
 VAR void		*DefaultProfile	VALUE(0);
 					/* Default security profile */
 
-#ifdef HAVE_LAUNCH_H
-VAR int			Launchd		VALUE(0);
-					/* Running from launchd */
-#endif /* HAVE_LAUNCH_H */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+VAR int			OnDemand	VALUE(0);
+					/* Launched on demand */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
 
 /*

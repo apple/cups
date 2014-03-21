@@ -85,13 +85,16 @@ static const cupsd_var_t	cupsd_vars[] =
 #ifdef HAVE_GSSAPI
   { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_GSSAPI */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  { "IdleExitTimeout",		&IdleExitTimeout,	CUPSD_VARTYPE_TIME },
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
   { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_TIME },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_TIME },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_TIME },
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
-  { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_TIME },
+  { "LaunchdTimeout",		&IdleExitTimeout,	CUPSD_VARTYPE_TIME },
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
@@ -752,9 +755,9 @@ cupsdReadConfiguration(void)
   DefaultLeaseDuration       = 86400;
   MaxLeaseDuration           = 0;
 
-#ifdef HAVE_LAUNCHD
-  LaunchdTimeout = 60;
-#endif /* HAVE_LAUNCHD */
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
+  IdleExitTimeout = 60;
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
  /*
   * Setup environment variables...

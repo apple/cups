@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-03-04
+CHANGES.txt - 2.0b1 - 2014-03-21
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -11,6 +11,7 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Adopted Linux man page conventions and updated all man pages
 	  (STR #4372)
+        - Added systemd support (STR #3282)
 	- Added support for re-sending a job as a raster file if a higher-level
 	  format such as PDF fails (<rdar://problem/15583721>)
 	- Added support for regular expression matching in the MIME type rules
