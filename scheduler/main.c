@@ -47,6 +47,10 @@ extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
 #  include <notify.h>
 #endif /* HAVE_NOTIFY_H */
 
+#ifdef HAVE_DBUS
+#  include <dbus/dbus.h>
+#endif /* HAVE_DBUS */
+
 #ifdef HAVE_SYS_PARAM_H
 #  include <sys/param.h>
 #endif /* HAVE_SYS_PARAM_H */
@@ -487,7 +491,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Enable threading support for D-BUS...
   */
 
-  dbus_threads_init();
+  dbus_threads_init_default();
 #endif /* HAVE_DBUS_THREADS_INIT */
 
  /*
