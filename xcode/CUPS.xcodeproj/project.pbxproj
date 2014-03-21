@@ -1351,6 +1351,55 @@
 		72D53A3615B4929D003F877F /* colorman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = colorman.c; path = ../scheduler/colorman.c; sourceTree = "<group>"; };
 		72D53A3715B4929D003F877F /* colorman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = colorman.h; path = ../scheduler/colorman.h; sourceTree = "<group>"; };
 		72D53A3915B492FA003F877F /* libpam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpam.dylib; path = /usr/lib/libpam.dylib; sourceTree = "<absolute>"; };
+		72E65BA318DC797E00097E89 /* configure.ac */ = {isa = PBXFileReference; lastKnownFileType = text; name = configure.ac; path = ../configure.ac; sourceTree = "<group>"; };
+		72E65BA418DC799B00097E89 /* cups-common.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-common.m4"; path = "../config-scripts/cups-common.m4"; sourceTree = "<group>"; };
+		72E65BA518DC799B00097E89 /* cups-compiler.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-compiler.m4"; path = "../config-scripts/cups-compiler.m4"; sourceTree = "<group>"; };
+		72E65BA618DC799B00097E89 /* cups-defaults.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-defaults.m4"; path = "../config-scripts/cups-defaults.m4"; sourceTree = "<group>"; };
+		72E65BA718DC799B00097E89 /* cups-directories.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-directories.m4"; path = "../config-scripts/cups-directories.m4"; sourceTree = "<group>"; };
+		72E65BA818DC799B00097E89 /* cups-dnssd.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-dnssd.m4"; path = "../config-scripts/cups-dnssd.m4"; sourceTree = "<group>"; };
+		72E65BA918DC799B00097E89 /* cups-gssapi.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-gssapi.m4"; path = "../config-scripts/cups-gssapi.m4"; sourceTree = "<group>"; };
+		72E65BAA18DC799B00097E89 /* cups-largefile.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-largefile.m4"; path = "../config-scripts/cups-largefile.m4"; sourceTree = "<group>"; };
+		72E65BAB18DC799B00097E89 /* cups-ondemand.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-ondemand.m4"; path = "../config-scripts/cups-ondemand.m4"; sourceTree = "<group>"; };
+		72E65BAC18DC799B00097E89 /* cups-libtool.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-libtool.m4"; path = "../config-scripts/cups-libtool.m4"; sourceTree = "<group>"; };
+		72E65BAD18DC799B00097E89 /* cups-manpages.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-manpages.m4"; path = "../config-scripts/cups-manpages.m4"; sourceTree = "<group>"; };
+		72E65BAE18DC799B00097E89 /* cups-network.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-network.m4"; path = "../config-scripts/cups-network.m4"; sourceTree = "<group>"; };
+		72E65BAF18DC799B00097E89 /* cups-opsys.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-opsys.m4"; path = "../config-scripts/cups-opsys.m4"; sourceTree = "<group>"; };
+		72E65BB018DC799B00097E89 /* cups-pam.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-pam.m4"; path = "../config-scripts/cups-pam.m4"; sourceTree = "<group>"; };
+		72E65BB118DC799B00097E89 /* cups-poll.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-poll.m4"; path = "../config-scripts/cups-poll.m4"; sourceTree = "<group>"; };
+		72E65BB218DC799B00097E89 /* cups-scripting.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-scripting.m4"; path = "../config-scripts/cups-scripting.m4"; sourceTree = "<group>"; };
+		72E65BB318DC799B00097E89 /* cups-sharedlibs.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-sharedlibs.m4"; path = "../config-scripts/cups-sharedlibs.m4"; sourceTree = "<group>"; };
+		72E65BB418DC799B00097E89 /* cups-ssl.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-ssl.m4"; path = "../config-scripts/cups-ssl.m4"; sourceTree = "<group>"; };
+		72E65BB518DC799B00097E89 /* cups-threads.m4 */ = {isa = PBXFileReference; lastKnownFileType = text; name = "cups-threads.m4"; path = "../config-scripts/cups-threads.m4"; sourceTree = "<group>"; };
+		72E65BB618DC79CC00097E89 /* cups-config.in */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = "cups-config.in"; path = "../cups-config.in"; sourceTree = "<group>"; };
+		72E65BB718DC79CC00097E89 /* Makedefs.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = Makedefs.in; path = ../Makedefs.in; sourceTree = "<group>"; };
+		72E65BB918DC7A3600097E89 /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = doc; path = ../doc; sourceTree = "<group>"; };
+		72E65BBA18DC7A3600097E89 /* man */ = {isa = PBXFileReference; lastKnownFileType = folder; name = man; path = ../man; sourceTree = "<group>"; };
+		72E65BBB18DC7A6B00097E89 /* api-array.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-array.header"; path = "../cups/api-array.header"; sourceTree = "<group>"; };
+		72E65BBC18DC7A6B00097E89 /* api-array.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-array.shtml"; path = "../cups/api-array.shtml"; sourceTree = "<group>"; };
+		72E65BBD18DC7A6B00097E89 /* api-cups.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-cups.header"; path = "../cups/api-cups.header"; sourceTree = "<group>"; };
+		72E65BBE18DC7A6B00097E89 /* api-cups.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-cups.shtml"; path = "../cups/api-cups.shtml"; sourceTree = "<group>"; };
+		72E65BBF18DC7A6B00097E89 /* api-filedir.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-filedir.header"; path = "../cups/api-filedir.header"; sourceTree = "<group>"; };
+		72E65BC018DC7A6B00097E89 /* api-filedir.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-filedir.shtml"; path = "../cups/api-filedir.shtml"; sourceTree = "<group>"; };
+		72E65BC118DC7A6B00097E89 /* api-filter.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-filter.header"; path = "../cups/api-filter.header"; sourceTree = "<group>"; };
+		72E65BC218DC7A6B00097E89 /* api-filter.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-filter.shtml"; path = "../cups/api-filter.shtml"; sourceTree = "<group>"; };
+		72E65BC318DC7A6B00097E89 /* api-httpipp.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-httpipp.header"; path = "../cups/api-httpipp.header"; sourceTree = "<group>"; };
+		72E65BC418DC7A6B00097E89 /* api-httpipp.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-httpipp.shtml"; path = "../cups/api-httpipp.shtml"; sourceTree = "<group>"; };
+		72E65BC518DC7A6B00097E89 /* api-overview.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-overview.header"; path = "../cups/api-overview.header"; sourceTree = "<group>"; };
+		72E65BC618DC7A6B00097E89 /* api-overview.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-overview.shtml"; path = "../cups/api-overview.shtml"; sourceTree = "<group>"; };
+		72E65BC718DC7A6B00097E89 /* api-ppd.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-ppd.header"; path = "../cups/api-ppd.header"; sourceTree = "<group>"; };
+		72E65BC818DC7A6B00097E89 /* api-ppd.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-ppd.shtml"; path = "../cups/api-ppd.shtml"; sourceTree = "<group>"; };
+		72E65BC918DC7A7E00097E89 /* api-ppdc.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-ppdc.header"; path = "../ppdc/api-ppdc.header"; sourceTree = "<group>"; };
+		72E65BCA18DC7A7E00097E89 /* api-ppdc.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-ppdc.shtml"; path = "../ppdc/api-ppdc.shtml"; sourceTree = "<group>"; };
+		72E65BCB18DC7A9800097E89 /* api-raster.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-raster.header"; path = "../filter/api-raster.header"; sourceTree = "<group>"; };
+		72E65BCC18DC7A9800097E89 /* api-raster.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-raster.shtml"; path = "../filter/api-raster.shtml"; sourceTree = "<group>"; };
+		72E65BCD18DC7A9800097E89 /* postscript-driver.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "postscript-driver.header"; path = "../filter/postscript-driver.header"; sourceTree = "<group>"; };
+		72E65BCE18DC7A9800097E89 /* postscript-driver.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "postscript-driver.shtml"; path = "../filter/postscript-driver.shtml"; sourceTree = "<group>"; };
+		72E65BCF18DC7A9800097E89 /* ppd-compiler.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "ppd-compiler.header"; path = "../filter/ppd-compiler.header"; sourceTree = "<group>"; };
+		72E65BD018DC7A9800097E89 /* ppd-compiler.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "ppd-compiler.shtml"; path = "../filter/ppd-compiler.shtml"; sourceTree = "<group>"; };
+		72E65BD118DC7A9800097E89 /* raster-driver.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "raster-driver.header"; path = "../filter/raster-driver.header"; sourceTree = "<group>"; };
+		72E65BD218DC7A9800097E89 /* raster-driver.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "raster-driver.shtml"; path = "../filter/raster-driver.shtml"; sourceTree = "<group>"; };
+		72E65BD318DC7A9800097E89 /* spec-ppd.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "spec-ppd.header"; path = "../filter/spec-ppd.header"; sourceTree = "<group>"; };
+		72E65BD418DC7A9800097E89 /* spec-ppd.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "spec-ppd.shtml"; path = "../filter/spec-ppd.shtml"; sourceTree = "<group>"; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
 		72F75A611336F9A3004BB496 /* libcupsimage.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcupsimage.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1863,7 +1912,6 @@
 		72220F461333060C00FCA411 /* Private Headers */ = {
 			isa = PBXGroup;
 			children = (
-				7226369D18AE73BB004ED309 /* config.h.in */,
 				72220F471333063D00FCA411 /* config.h */,
 				7234F41F1378A16F00D3E9C9 /* array-private.h */,
 				72220EC01333056300FCA411 /* cups-private.h */,
@@ -2011,7 +2059,8 @@
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
-				72220FB113330B4A00FCA411 /* Frameworks */,
+				72E65BA218DC796500097E89 /* Autoconf Files */,
+				72E65BB818DC79F800097E89 /* Documentation */,
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
 				72220EB41333050100FCA411 /* libcups */,
@@ -2025,12 +2074,77 @@
 				7258EADC134594A8009286F1 /* filters */,
 				276683CB1337B1CC000D33D0 /* ppdc tools */,
 				273BF6B81333B4A90022CAAB /* tests */,
+				72220FB113330B4A00FCA411 /* Frameworks */,
 				72220EAF1333047D00FCA411 /* Products */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
 			tabWidth = 8;
 			wrapsLines = 0;
+		};
+		72E65BA218DC796500097E89 /* Autoconf Files */ = {
+			isa = PBXGroup;
+			children = (
+				72E65BB718DC79CC00097E89 /* Makedefs.in */,
+				72E65BA318DC797E00097E89 /* configure.ac */,
+				7226369D18AE73BB004ED309 /* config.h.in */,
+				72E65BB618DC79CC00097E89 /* cups-config.in */,
+				72E65BA418DC799B00097E89 /* cups-common.m4 */,
+				72E65BA518DC799B00097E89 /* cups-compiler.m4 */,
+				72E65BA618DC799B00097E89 /* cups-defaults.m4 */,
+				72E65BA718DC799B00097E89 /* cups-directories.m4 */,
+				72E65BA818DC799B00097E89 /* cups-dnssd.m4 */,
+				72E65BA918DC799B00097E89 /* cups-gssapi.m4 */,
+				72E65BAA18DC799B00097E89 /* cups-largefile.m4 */,
+				72E65BAB18DC799B00097E89 /* cups-ondemand.m4 */,
+				72E65BAC18DC799B00097E89 /* cups-libtool.m4 */,
+				72E65BAD18DC799B00097E89 /* cups-manpages.m4 */,
+				72E65BAE18DC799B00097E89 /* cups-network.m4 */,
+				72E65BAF18DC799B00097E89 /* cups-opsys.m4 */,
+				72E65BB018DC799B00097E89 /* cups-pam.m4 */,
+				72E65BB118DC799B00097E89 /* cups-poll.m4 */,
+				72E65BB218DC799B00097E89 /* cups-scripting.m4 */,
+				72E65BB318DC799B00097E89 /* cups-sharedlibs.m4 */,
+				72E65BB418DC799B00097E89 /* cups-ssl.m4 */,
+				72E65BB518DC799B00097E89 /* cups-threads.m4 */,
+			);
+			name = "Autoconf Files";
+			sourceTree = "<group>";
+		};
+		72E65BB818DC79F800097E89 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				72E65BB918DC7A3600097E89 /* doc */,
+				72E65BBA18DC7A3600097E89 /* man */,
+				72E65BBB18DC7A6B00097E89 /* api-array.header */,
+				72E65BBC18DC7A6B00097E89 /* api-array.shtml */,
+				72E65BBD18DC7A6B00097E89 /* api-cups.header */,
+				72E65BBE18DC7A6B00097E89 /* api-cups.shtml */,
+				72E65BBF18DC7A6B00097E89 /* api-filedir.header */,
+				72E65BC018DC7A6B00097E89 /* api-filedir.shtml */,
+				72E65BC118DC7A6B00097E89 /* api-filter.header */,
+				72E65BC218DC7A6B00097E89 /* api-filter.shtml */,
+				72E65BC318DC7A6B00097E89 /* api-httpipp.header */,
+				72E65BC418DC7A6B00097E89 /* api-httpipp.shtml */,
+				72E65BC518DC7A6B00097E89 /* api-overview.header */,
+				72E65BC618DC7A6B00097E89 /* api-overview.shtml */,
+				72E65BC718DC7A6B00097E89 /* api-ppd.header */,
+				72E65BC818DC7A6B00097E89 /* api-ppd.shtml */,
+				72E65BC918DC7A7E00097E89 /* api-ppdc.header */,
+				72E65BCA18DC7A7E00097E89 /* api-ppdc.shtml */,
+				72E65BCB18DC7A9800097E89 /* api-raster.header */,
+				72E65BCC18DC7A9800097E89 /* api-raster.shtml */,
+				72E65BCD18DC7A9800097E89 /* postscript-driver.header */,
+				72E65BCE18DC7A9800097E89 /* postscript-driver.shtml */,
+				72E65BCF18DC7A9800097E89 /* ppd-compiler.header */,
+				72E65BD018DC7A9800097E89 /* ppd-compiler.shtml */,
+				72E65BD118DC7A9800097E89 /* raster-driver.header */,
+				72E65BD218DC7A9800097E89 /* raster-driver.shtml */,
+				72E65BD318DC7A9800097E89 /* spec-ppd.header */,
+				72E65BD418DC7A9800097E89 /* spec-ppd.shtml */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
 		};
 		72F75A681336FA42004BB496 /* libcupsimage */ = {
 			isa = PBXGroup;

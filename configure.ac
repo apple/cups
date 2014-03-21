@@ -1,16 +1,16 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Configuration script for CUPS.
+dnl Configuration script for CUPS.
 dnl
-dnl   Copyright 2007-2012 by Apple Inc.
-dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_INIT(cups/cups.h)
@@ -32,7 +32,7 @@ sinclude(config-scripts/cups-ssl.m4)
 sinclude(config-scripts/cups-pam.m4)
 sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-dnssd.m4)
-sinclude(config-scripts/cups-launchd.m4)
+sinclude(config-scripts/cups-ondemand.m4)
 sinclude(config-scripts/cups-defaults.m4)
 sinclude(config-scripts/cups-scripting.m4)
 
