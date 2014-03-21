@@ -38,6 +38,10 @@
 %{?_with_static: %define _static --enable-static}
 %{!?_with_static: %define _static --disable-static}
 
+%{!?_with_systemd: %{!?_without_systemd: %define _with_systemd --with-systemd}}
+%{?_with_systemd: %define _systemd --enable-systemd}
+%{!?_with_systemd: %define _systemd --disable-systemd}
+
 Summary: CUPS
 Name: cups
 Version: @CUPS_VERSION@
@@ -63,6 +67,10 @@ BuildRequires: avahi-devel
 
 %if %{?_with_libusb1:1}%{!?_with_libusb1:0}
 BuildRequires: libusbx-devel
+%endif
+
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+BuildRequires: systemd-devel
 %endif
 
 # Use buildroot so as not to disturb the version already installed
@@ -169,27 +177,18 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/pam.d
 /etc/pam.d/*
 
-# RC dirs are a pain under Linux...  Uncomment the appropriate ones if you
-# don't use Red Hat or Mandrake...
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+# SystemD
+/usr/lib/systemd/system/*
 
+%else
+# Legacy init support on Linux
 /etc/init.d/*
 /etc/rc0.d/*
 /etc/rc2.d/*
 /etc/rc3.d/*
 /etc/rc5.d/*
-
-# OLD RedHat/Mandrake
-#/etc/rc.d/init.d/*
-#/etc/rc.d/rc0.d/*
-#/etc/rc.d/rc2.d/*
-#/etc/rc.d/rc3.d/*
-#/etc/rc.d/rc5.d/*
-
-#/sbin/rc.d/*
-#/sbin/rc.d/rc0.d/*
-#/sbin/rc.d/rc2.d/*
-#/sbin/rc.d/rc3.d/*
-#/sbin/rc.d/rc5.d/*
+%endif
 
 /usr/bin/cancel
 /usr/bin/cupstestdsc
@@ -269,31 +268,31 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
 
-%dir /usr/share/doc/cups/ca
-/usr/share/doc/cups/ca/*
-%dir /usr/share/doc/cups/cs
-/usr/share/doc/cups/cs/*
-%dir /usr/share/doc/cups/es
-/usr/share/doc/cups/es/*
-%dir /usr/share/doc/cups/fr
-/usr/share/doc/cups/fr/*
-%dir /usr/share/doc/cups/ja
-/usr/share/doc/cups/ja/*
-%dir /usr/share/doc/cups/ru
-/usr/share/doc/cups/ru/*
+#%dir /usr/share/doc/cups/ca
+#/usr/share/doc/cups/ca/*
+#%dir /usr/share/doc/cups/cs
+#/usr/share/doc/cups/cs/*
+#%dir /usr/share/doc/cups/es
+#/usr/share/doc/cups/es/*
+#%dir /usr/share/doc/cups/fr
+#/usr/share/doc/cups/fr/*
+#%dir /usr/share/doc/cups/ja
+#/usr/share/doc/cups/ja/*
+#%dir /usr/share/doc/cups/ru
+#/usr/share/doc/cups/ru/*
 
-%dir /usr/share/locale/ca
-/usr/share/locale/ca/cups_ca.po
-%dir /usr/share/locale/cs
-/usr/share/locale/cs/cups_cs.po
-%dir /usr/share/locale/es
-/usr/share/locale/es/cups_es.po
-%dir /usr/share/locale/fr
-/usr/share/locale/fr/cups_fr.po
-%dir /usr/share/locale/ja
-/usr/share/locale/ja/cups_ja.po
-%dir /usr/share/locale/ru
-/usr/share/locale/ru/cups_ru.po
+#%dir /usr/share/locale/ca
+#/usr/share/locale/ca/cups_ca.po
+#%dir /usr/share/locale/cs
+#/usr/share/locale/cs/cups_cs.po
+#%dir /usr/share/locale/es
+#/usr/share/locale/es/cups_es.po
+#%dir /usr/share/locale/fr
+#/usr/share/locale/fr/cups_fr.po
+#%dir /usr/share/locale/ja
+#/usr/share/locale/ja/cups_ja.po
+#%dir /usr/share/locale/ru
+#/usr/share/locale/ru/cups_ru.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
