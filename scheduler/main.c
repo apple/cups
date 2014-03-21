@@ -35,6 +35,7 @@ extern int launch_activate_socket(const char *name, int **fds, size_t *cnt);
 #endif /* HAVE_LAUNCH_H */
 
 #ifdef HAVE_SYSTEMD
+#  include <systemd/sd-daemon.h>
 #  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the systemd path file */
 #endif /* HAVE_SYSTEMD */
@@ -2042,7 +2043,7 @@ service_checkin(void)
 
   if ((count = sd_listen_fds(0)) < 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get listener sockets: %s", strerror(error));
+    cupsdLogMessage(CUPSD_LOG_ERROR, "service_checkin: Unable to get listener sockets: %s", strerror(-count));
     exit(EXIT_FAILURE);
     return; /* anti-compiler-warning */
   }
