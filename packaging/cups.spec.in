@@ -126,7 +126,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 make BUILDROOT=$RPM_BUILD_ROOT install
-rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners
+rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners $RPM_BUILD_ROOT/usr/share/cups/data/testprint
 
 %post
 /sbin/chkconfig --add cups
