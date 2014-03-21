@@ -1,16 +1,16 @@
 dnl
 dnl "$Id$"
 dnl
-dnl   Networking stuff for CUPS.
+dnl Networking stuff for CUPS.
 dnl
-dnl   Copyright 2007-2011 by Apple Inc.
-dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
+dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
-dnl   These coded instructions, statements, and computer programs are the
-dnl   property of Apple Inc. and are protected by Federal copyright
-dnl   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-dnl   which should have been included with this file.  If this file is
-dnl   file is missing or damaged, see the license at "http://www.cups.org/".
+dnl These coded instructions, statements, and computer programs are the
+dnl property of Apple Inc. and are protected by Federal copyright
+dnl law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+dnl which should have been included with this file.  If this file is
+dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H))
@@ -65,9 +65,6 @@ fi
 
 AC_SUBST(CUPS_DEFAULT_DOMAINSOCKET)
 AC_SUBST(CUPS_LISTEN_DOMAINSOCKET)
-
-AC_CHECK_HEADERS(AppleTalk/at_proto.h,AC_DEFINE(HAVE_APPLETALK_AT_PROTO_H),,
-	[#include <netat/appletalk.h>])
 
 dnl
 dnl End of "$Id$".
