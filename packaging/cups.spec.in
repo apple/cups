@@ -281,18 +281,18 @@ rm -rf $RPM_BUILD_ROOT
 #%dir /usr/share/doc/cups/ru
 #/usr/share/doc/cups/ru/*
 
-#%dir /usr/share/locale/ca
-#/usr/share/locale/ca/cups_ca.po
-#%dir /usr/share/locale/cs
-#/usr/share/locale/cs/cups_cs.po
-#%dir /usr/share/locale/es
-#/usr/share/locale/es/cups_es.po
-#%dir /usr/share/locale/fr
-#/usr/share/locale/fr/cups_fr.po
-#%dir /usr/share/locale/ja
-#/usr/share/locale/ja/cups_ja.po
-#%dir /usr/share/locale/ru
-#/usr/share/locale/ru/cups_ru.po
+%dir /usr/share/locale/ca
+/usr/share/locale/ca/cups_ca.po
+%dir /usr/share/locale/cs
+/usr/share/locale/cs/cups_cs.po
+%dir /usr/share/locale/es
+/usr/share/locale/es/cups_es.po
+%dir /usr/share/locale/fr
+/usr/share/locale/fr/cups_fr.po
+%dir /usr/share/locale/ja
+/usr/share/locale/ja/cups_ja.po
+%dir /usr/share/locale/ru
+/usr/share/locale/ru/cups_ru.po
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
