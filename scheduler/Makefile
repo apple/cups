@@ -184,21 +184,28 @@ install-data:
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
 		$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc0.d/K$(RCSTOP)cups; \
 	fi
-	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
-		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
-		if test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
-			echo Installing LaunchDaemons configuration files...; \
-			$(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
-			$(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)/System/Library/LaunchDaemons; \
-		else \
-			echo Installing RC script...; \
-			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
-		fi \
+	if test "x$(INITDDIR)" != x; then \
+		echo Installing init script...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDDIR); \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR); \
+	fi
+	if test "x$(LAUNCHD_DIR)" != x; then \
+                echo Installing launchd configuration files...; \
+		$(INSTALL_DIR) $(BUILDROOT)$(LAUNCHD_DIR); \
+                $(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
+                $(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
 	fi
 	if test "x$(SMFMANIFESTDIR)" != x; then \
 		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
 		$(INSTALL_DIR) $(BUILDROOT)/$(SMFMANIFESTDIR); \
 		$(INSTALL_SCRIPT) cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+	fi
+	if test "x$(SYSTEMD_DIR)" != x; then \
+                echo Installing systemd configuration files...; \
+		$(INSTALL_DIR) $(BUILDROOT)$(SYSTEMD_DIR); \
+                $(INSTALL_DATA) org.cups.cupsd.path $(BUILDROOT)$(SYSTEMD_DIR); \
+                $(INSTALL_DATA) org.cups.cupsd.service $(BUILDROOT)$(SYSTEMD_DIR); \
+                $(INSTALL_DATA) org.cups.cupsd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
 	fi
 	if test "x$(XINETD)" != x; then \
 		echo Installing xinetd configuration file for cups-lpd...; \

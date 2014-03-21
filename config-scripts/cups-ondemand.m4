@@ -1,7 +1,7 @@
 dnl
 dnl "$Id$"
 dnl
-dnl launchd stuff for CUPS.
+dnl Launch-on-demand stuff for CUPS.
 dnl
 dnl Copyright 2007-2014 by Apple Inc.
 dnl Copyright 1997-2005 by Easy Software Products, all rights reserved.
@@ -13,11 +13,15 @@ dnl which should have been included with this file.  If this file is
 dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
+ONDEMANDFLAGS=""
+ONDEMANDLIBS=""
+AC_SUBST(ONDEMANDFLAGS)
+AC_SUBST(ONDEMANDLIBS)
 
+dnl Launchd is used on OS X/Darwin...
 AC_ARG_ENABLE(launchd, [  --disable-launchd       disable launchd support])
-
-DEFAULT_LAUNCHD_CONF=""
-LAUNCHDLIBS=""
+LAUNCHD_DIR=""
+AC_SUBST(LAUNCHD_DIR)
 
 if test x$enable_launchd != xno; then
 	AC_CHECK_FUNC(launch_msg, AC_DEFINE(HAVE_LAUNCHD))
@@ -31,7 +35,7 @@ if test x$enable_launchd != xno; then
 	case "$uname" in
 		Darwin*)
 			# Darwin, MacOS X
-			DEFAULT_LAUNCHD_CONF="/System/Library/LaunchDaemons/org.cups.cupsd.plist"
+			LAUNCHD_DIR="/System/Library/LaunchDaemons/org.cups.cupsd.plist"
 			# liblaunch is already part of libSystem
 			;;
 		*)
@@ -40,8 +44,32 @@ if test x$enable_launchd != xno; then
 	esac
 fi
 
-AC_SUBST(DEFAULT_LAUNCHD_CONF)
-AC_SUBST(LAUNCHDLIBS)
+dnl Systemd is used on Linux...
+AC_ARG_ENABLE(systemd, [  --disable-systemd       disable systemd support])
+AC_ARG_WITH(systemd, [  --with-systemd          set directory for systemd service files],
+        SYSTEMD_DIR="$withval", SYSTEMD_DIR="")
+AC_SUBST(SYSTEMD_DIR)
+
+if test x$enable_systemd != xno; then
+	if test "x$PKGCONFIG" = x; then
+        	if test x$enable_systemd = xyes; then
+	        	AC_MSG_ERROR(Need pkg-config to enable systemd support.)
+                fi
+        else
+        	AC_MSG_CHECKING(for libsystemd-daemon)
+                if $PKGCONFIG --exists libsystemd-daemon; then
+                        AC_MSG_RESULT(yes)
+                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
+                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
+                        AC_DEFINE(HAVE_SYSTEMD)
+			if test "x$SYSTEMD_DIR" = x; then
+			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
+                        fi
+                else
+                        AC_MSG_RESULT(no)
+                fi
+        fi
+fi
 
 dnl
 dnl End of "$Id$".

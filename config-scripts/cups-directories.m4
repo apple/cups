@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl Directory stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2014 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -139,9 +139,7 @@ if test x$rcdir = x; then
 	case "$uname" in
 		Darwin*)
 			# Darwin and MacOS X...
-			if test -x /sbin/launchd; then
-				INITDDIR="/System/Library/LaunchDaemons"
-			else
+			if test ! -x /sbin/launchd; then
 				INITDDIR="/System/Library/StartupItems/PrintingServices"
 			fi
 			;;

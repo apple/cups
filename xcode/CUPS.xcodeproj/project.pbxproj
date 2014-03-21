@@ -1400,6 +1400,14 @@
 		72E65BD218DC7A9800097E89 /* raster-driver.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "raster-driver.shtml"; path = "../filter/raster-driver.shtml"; sourceTree = "<group>"; };
 		72E65BD318DC7A9800097E89 /* spec-ppd.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "spec-ppd.header"; path = "../filter/spec-ppd.header"; sourceTree = "<group>"; };
 		72E65BD418DC7A9800097E89 /* spec-ppd.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "spec-ppd.shtml"; path = "../filter/spec-ppd.shtml"; sourceTree = "<group>"; };
+		72E65BD518DC818400097E89 /* org.cups.cups-lpd.plist.in */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "org.cups.cups-lpd.plist.in"; path = "../scheduler/org.cups.cups-lpd.plist.in"; sourceTree = SOURCE_ROOT; };
+		72E65BD618DC818400097E89 /* org.cups.cupsd.path.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = org.cups.cupsd.path.in; path = ../scheduler/org.cups.cupsd.path.in; sourceTree = SOURCE_ROOT; };
+		72E65BD718DC818400097E89 /* org.cups.cupsd.service.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = org.cups.cupsd.service.in; path = ../scheduler/org.cups.cupsd.service.in; sourceTree = SOURCE_ROOT; };
+		72E65BD818DC818400097E89 /* org.cups.cupsd.socket.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = org.cups.cupsd.socket.in; path = ../scheduler/org.cups.cupsd.socket.in; sourceTree = SOURCE_ROOT; };
+		72E65BD918DC850A00097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
+		72E65BDA18DC852700097E89 /* api-mime.header */ = {isa = PBXFileReference; lastKnownFileType = text; name = "api-mime.header"; path = "../scheduler/api-mime.header"; sourceTree = SOURCE_ROOT; };
+		72E65BDB18DC852700097E89 /* api-mime.shtml */ = {isa = PBXFileReference; lastKnownFileType = text.html.other; name = "api-mime.shtml"; path = "../scheduler/api-mime.shtml"; sourceTree = SOURCE_ROOT; };
+		72E65BDC18DC852700097E89 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../scheduler/Makefile; sourceTree = SOURCE_ROOT; };
 		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
 		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
 		72F75A611336F9A3004BB496 /* libcupsimage.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcupsimage.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1935,8 +1943,13 @@
 		72220F5D13330A5A00FCA411 /* cupsd */ = {
 			isa = PBXGroup;
 			children = (
+				72E65BDC18DC852700097E89 /* Makefile */,
 				7226369B18AE6D19004ED309 /* org.cups.cups-lpd.plist */,
+				72E65BD518DC818400097E89 /* org.cups.cups-lpd.plist.in */,
+				72E65BD618DC818400097E89 /* org.cups.cupsd.path.in */,
 				7226369C18AE6D19004ED309 /* org.cups.cupsd.plist */,
+				72E65BD718DC818400097E89 /* org.cups.cupsd.service.in */,
+				72E65BD818DC818400097E89 /* org.cups.cupsd.socket.in */,
 				72D53A3615B4929D003F877F /* colorman.c */,
 				72D53A3715B4929D003F877F /* colorman.h */,
 				72220F6913330B0C00FCA411 /* auth.c */,
@@ -2085,6 +2098,7 @@
 		72E65BA218DC796500097E89 /* Autoconf Files */ = {
 			isa = PBXGroup;
 			children = (
+				72E65BD918DC850A00097E89 /* Makefile */,
 				72E65BB718DC79CC00097E89 /* Makedefs.in */,
 				72E65BA318DC797E00097E89 /* configure.ac */,
 				7226369D18AE73BB004ED309 /* config.h.in */,
@@ -2126,6 +2140,8 @@
 				72E65BC218DC7A6B00097E89 /* api-filter.shtml */,
 				72E65BC318DC7A6B00097E89 /* api-httpipp.header */,
 				72E65BC418DC7A6B00097E89 /* api-httpipp.shtml */,
+				72E65BDA18DC852700097E89 /* api-mime.header */,
+				72E65BDB18DC852700097E89 /* api-mime.shtml */,
 				72E65BC518DC7A6B00097E89 /* api-overview.header */,
 				72E65BC618DC7A6B00097E89 /* api-overview.shtml */,
 				72E65BC718DC7A6B00097E89 /* api-ppd.header */,
