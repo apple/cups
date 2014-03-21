@@ -126,6 +126,7 @@ make
 rm -rf $RPM_BUILD_ROOT
 
 make BUILDROOT=$RPM_BUILD_ROOT install
+rm -rf $RPM_BUILD_ROOT/usr/share/cups/banners
 
 %post
 /sbin/chkconfig --add cups
@@ -226,8 +227,6 @@ rm -rf $RPM_BUILD_ROOT
 
 /usr/sbin/*
 %dir /usr/share/cups
-%dir /usr/share/cups/banners
-/usr/share/cups/banners/*
 %dir /usr/share/cups/data
 /usr/share/cups/data/*
 %dir /usr/share/cups/drv
