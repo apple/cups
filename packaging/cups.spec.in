@@ -289,6 +289,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/locale/es/cups_es.po
 %dir /usr/share/locale/fr
 /usr/share/locale/fr/cups_fr.po
+%dir /usr/share/locale/it
+/usr/share/locale/it/cups_it.po
 %dir /usr/share/locale/ja
 /usr/share/locale/ja/cups_ja.po
 %dir /usr/share/locale/ru
