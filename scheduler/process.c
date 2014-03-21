@@ -544,7 +544,7 @@ cupsdStartProcess(
     real_argv[4] = nice_str;
     real_argv[5] = (char *)"-u";
     real_argv[6] = user_str;
-    real_argv[7] = profile;
+    real_argv[7] = profile ? profile : "none";
     real_argv[8] = (char *)command;
 
     for (i = 0;
