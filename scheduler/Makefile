@@ -190,10 +190,10 @@ install-data:
 		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR); \
 	fi
 	if test "x$(LAUNCHD_DIR)" != x; then \
-                echo Installing launchd configuration files...; \
+		echo Installing launchd configuration files...; \
 		$(INSTALL_DIR) $(BUILDROOT)$(LAUNCHD_DIR); \
-                $(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
-                $(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
+		$(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
+		$(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)$(LAUNCHD_DIR); \
 	fi
 	if test "x$(SMFMANIFESTDIR)" != x; then \
 		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
@@ -201,11 +201,11 @@ install-data:
 		$(INSTALL_SCRIPT) cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
 	fi
 	if test "x$(SYSTEMD_DIR)" != x; then \
-                echo Installing systemd configuration files...; \
+		echo Installing systemd configuration files...; \
 		$(INSTALL_DIR) $(BUILDROOT)$(SYSTEMD_DIR); \
-                $(INSTALL_DATA) org.cups.cupsd.path $(BUILDROOT)$(SYSTEMD_DIR); \
-                $(INSTALL_DATA) org.cups.cupsd.service $(BUILDROOT)$(SYSTEMD_DIR); \
-                $(INSTALL_DATA) org.cups.cupsd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
+		$(INSTALL_DATA) org.cups.cupsd.path $(BUILDROOT)$(SYSTEMD_DIR); \
+		$(INSTALL_DATA) org.cups.cupsd.service $(BUILDROOT)$(SYSTEMD_DIR); \
+		$(INSTALL_DATA) org.cups.cupsd.socket $(BUILDROOT)$(SYSTEMD_DIR); \
 	fi
 	if test "x$(XINETD)" != x; then \
 		echo Installing xinetd configuration file for cups-lpd...; \
@@ -328,16 +328,16 @@ uninstall:
 		$(RM) $(BUILDROOT)$(INITDDIR)/cups.sh; \
 		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
 	fi
-        if test "x$LAUNCHD_DIR" != x; then \
-        	echo Uninstalling launchd files...; \
-                $(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cupsd.plist; \
-                $(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cups-lpd.plist; \
+	if test "x$LAUNCHD_DIR" != x; then \
+		echo Uninstalling launchd files...; \
+		$(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cupsd.plist; \
+		$(RM) $(BUILDROOT)$(LAUNCHD_DIR)/org.cups.cups-lpd.plist; \
 	fi
-        if test "x$SYSTEMD_DIR" != x; then \
-        	echo Uninstalling systemd files...; \
-                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.path; \
-                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.service; \
-                $(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.socket; \
+	if test "x$SYSTEMD_DIR" != x; then \
+		echo Uninstalling systemd files...; \
+		$(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.path; \
+		$(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.service; \
+		$(RM) $(BUILDROOT)$(SYSTEMD_DIR)/org.cups.cupsd.socket; \
 	fi
 	if test "x$(SMFMANIFESTDIR)" != x; then \
 		echo Uninstalling SMF manifest file...;\
