@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.2 - 2014-03-05
+CHANGES.txt - 1.7.2 - 2014-03-25
 --------------------------------
 
 CHANGES IN CUPS V1.7.2
@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.7.2
 	- Documentation fixes (STR #3259, STR #4346)
 	- Fixed the Japanese localization (STR #4385)
 	- Added a German localization (STR #4363)
+	- Fixed documentation and naming of Create-Job/Printer-Subscriptions
+	  operations (STR #4389)
 	- Updated Linux "relro" support (STR #4349)
 	- cupsEnumDests did not set the "is_default" field (STR #4332)
 	- cupsDoIORequest could miss the server status, causing failed lpadmin

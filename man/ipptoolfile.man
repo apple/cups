@@ -11,7 +11,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "20 February 2014" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "25 March 2014" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -423,8 +423,8 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
     Cancel-Subscription
     Close-Job
     Create-Job
-    Create-Job-Subscription
-    Create-Printer-Subscription
+    Create-Job-Subscriptions
+    Create-Printer-Subscriptions
     Deactivate-Printer
     Disable-Printer
     Enable-Printer
