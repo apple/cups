@@ -2877,14 +2877,51 @@ new_request(
       if ((keyword = cupsGetOption("phone", num_options, options)) != NULL)
       {
 	ipp_t	*destination;		/* destination collection */
-	char	tel_uri[1024];		/* tel: URI */
+	char	phone[1024],		/* Phone number string */
+		ch,			/* Character from phone string */
+		*ptr,			/* Pointer into string */
+		tel_uri[1024];		/* tel: URI */
+        static const char * const allowed = "0123456789#*-+.()";
+					/* Allowed characters */
 
         destination = ippNew();
 
-        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel",
-                        NULL, NULL, 0, keyword);
-        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri",
-                     NULL, tel_uri);
+       /*
+        * Unescape and filter out spaces and other characters that are not
+        * allowed in a tel: URI.
+        */
+
+        for (ptr = phone; *keyword && ptr < (phone + sizeof(phone) - 1);)
+        {
+          ch = *keyword++;
+          if (ch == '%')
+          {
+            if (*keyword >= '0' && *keyword <= '9')
+              ch = (*keyword++ - '0') << 4;
+            else if (*keyword >= 'a' && *keyword <= 'f')
+              ch = (*keyword++ - 'a' + 10) << 4;
+            else if (*keyword >= 'A' && *keyword <= 'F')
+              ch = (*keyword++ - 'A' + 10) << 4;
+            else
+              continue;
+
+            if (*keyword >= '0' && *keyword <= '9')
+              ch += *keyword++ - '0';
+            else if (*keyword >= 'a' && *keyword <= 'f')
+              ch += *keyword++ - 'a' + 10;
+            else if (*keyword >= 'A' && *keyword <= 'F')
+              ch += *keyword++ - 'A' + 10;
+            else
+              continue;
+          }
+
+          if (strchr(allowed, ch))
+            *ptr++ = ch;
+        }
+
+        *ptr = '\0';
+        httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
+        ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
 
 	if ((keyword = cupsGetOption("faxPrefix", num_options,
 	                             options)) != NULL && *keyword)
