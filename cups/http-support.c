@@ -192,10 +192,10 @@ httpAssembleURI(
   if (!ptr)
     goto assemble_overflow;
 
-  if (!strcmp(scheme, "mailto") || !strcmp(scheme, "tel"))
+  if (!strcmp(scheme, "geo") || !strcmp(scheme, "mailto") || !strcmp(scheme, "tel"))
   {
    /*
-    * mailto: and tel: only have :, no //...
+    * geo:, mailto:, and tel: only have :, no //...
     */
 
     if (ptr < end)
@@ -206,7 +206,7 @@ httpAssembleURI(
   else
   {
    /*
-    * Schemes other than mailto: and tel: all have //...
+    * Schemes other than geo:, mailto:, and tel: typically have //...
     */
 
     if ((ptr + 2) < end)
