@@ -629,13 +629,6 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 
         puts("^IDR:CUPS.GRF^FS");
 	puts("^XZ");
-
-       /*
-        * Free compression buffers...
-	*/
-
-	free(CompBuffer);
-	free(LastBuffer);
         break;
 
     case ZEBRA_CPCL :
@@ -704,6 +697,18 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
   */
 
   free(Buffer);
+
+  if (CompBuffer)
+  {
+    free(CompBuffer);
+    CompBuffer = NULL;
+  }
+
+  if (LastBuffer)
+  {
+    free(LastBuffer);
+    LastBuffer = NULL;
+  }
 }
 
 

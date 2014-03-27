@@ -13,6 +13,7 @@ CHANGES IN CUPS V1.7.2
 	- Phone numbers in fax jobs were not properly filtered for IPP FaxOut
 	  (<rdar://problem/16351701>)
 	- Updated Linux "relro" support (STR #4349)
+	- Fixed a memory leak in the label printer driver (STR #4393)
 	- cupsEnumDests did not set the "is_default" field (STR #4332)
 	- cupsDoIORequest could miss the server status, causing failed lpadmin
 	  and other administrative commands (STR #4386)
