@@ -345,7 +345,7 @@ div.contents ul.subcontents li {
 
   Filter and backend programming header for CUPS.
 
-  Copyright 2008-2011 by Apple Inc.
+  Copyright 2008-2014 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -664,7 +664,7 @@ prefix strings:</p>
 	<code>marker-types</code>, <code>printer-alert</code>, and
 	<code>printer-alert-description</code> printer attributes. Standard
 	<code>marker-types</code> values are listed in <a href='#TABLE1'>Table
-	1</a>.</dd>
+	1</a>. String values need special handling - see <a href="#ATTR_STRINGS">Reporting Attribute String Values</a> below.</dd>
 
 	<dt>CRIT: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
@@ -747,11 +747,11 @@ the "DEBUG:" prefix string.</p>
 	<td>Fuser unit</td>
 </tr>
 <tr>
-	<td>fuserCleaningPad</td>
+	<td>fuser-cleaning-pad</td>
 	<td>Fuser cleaning pad</td>
 </tr>
 <tr>
-	<td>fuserOil</td>
+	<td>fuser-oil</td>
 	<td>Fuser oil</td>
 </tr>
 <tr>
@@ -763,7 +763,7 @@ the "DEBUG:" prefix string.</p>
 	<td>Photo conductor</td>
 </tr>
 <tr>
-	<td>solidWax</td>
+	<td>solid-wax</td>
 	<td>Wax supply</td>
 </tr>
 <tr>
@@ -775,19 +775,19 @@ the "DEBUG:" prefix string.</p>
 	<td>Toner supply</td>
 </tr>
 <tr>
-	<td>transferUnit</td>
+	<td>transfer-unit</td>
 	<td>Transfer unit</td>
 </tr>
 <tr>
-	<td>wasteInk</td>
+	<td>waste-ink</td>
 	<td>Waste ink tank</td>
 </tr>
 <tr>
-	<td>wasteToner</td>
+	<td>waste-toner</td>
 	<td>Waste toner tank</td>
 </tr>
 <tr>
-	<td>wasteWax</td>
+	<td>waste-wax</td>
 	<td>Waste wax tank</td>
 </tr>
 </tbody>
@@ -866,6 +866,95 @@ the "DEBUG:" prefix string.</p>
 </tr>
 </tbody>
 </table></div>
+
+
+<h4><a name="ATTR_STRINGS">Reporting Attribute String Values</a></h4>
+
+<p>When reporting string values using "ATTR:" messages, a filter or backend must take special care to appropriately quote those values. The scheduler uses the CUPS option parsing code for attributes, so the general syntax is:</p>
+
+<pre class="example">
+name=simple
+name=simple,simple,...
+name='complex value'
+name="complex value"
+name='"complex value"','"complex value"',...
+</pre>
+
+<p>Simple values are strings that do not contain spaces, quotes, backslashes, or the comma and can be placed verbatim in the "ATTR:" message, for example:</p>
+
+<pre class="example">
+int levels[4] = { 40, 50, 60, 70 }; /* CMYK */
+
+fputs("ATTR: marker-colors=#00FFFF,#FF00FF,#FFFF00,#000000\n", stderr);
+fputs("ATTR: marker-high-levels=100,100,100,100\n", stderr);
+fprintf(stderr, "ATTR: marker-levels=%d,%d,%d,%d\n", levels[0], levels[1],
+        levels[2], levels[3], levels[4]);
+fputs("ATTR: marker-low-levels=5,5,5,5\n", stderr);
+fputs("ATTR: marker-types=toner,toner,toner,toner\n", stderr);
+</pre>
+
+<p>Complex values that contains spaces, quotes, backslashes, or the comma must be quoted. For a single value a single set of quotes is sufficient:</p>
+
+<pre class="example">
+fputs("ATTR: marker-message='Levels shown are approximate.'\n", stderr);
+</pre>
+
+<p>When multiple values are reported, each value must be enclosed by a set of single and double quotes:</p>
+
+<pre class="example">
+fputs("ATTR: marker-names='\"Cyan Toner\"','\"Magenta Toner\"',"
+      "'\"Yellow Toner\"','\"Black Toner\"'\n", stderr);
+</pre>
+
+<p>The IPP backend includes a <var>quote_string</var> function that may be used to properly quote a complex value in an "ATTR:" message:</p>
+
+<pre class="example">
+static const char *                     /* O - Quoted string */
+quote_string(const char *s,             /* I - String */
+             char       *q,             /* I - Quoted string buffer */
+             size_t     qsize)          /* I - Size of quoted string buffer */
+{
+  char  *qptr,                          /* Pointer into string buffer */
+        *qend;                          /* End of string buffer */
+
+
+  qptr = q;
+  qend = q + qsize - 5;
+
+  if (qend &lt; q)
+  {
+    *q = '\0';
+    return (q);
+  }
+
+  *qptr++ = '\'';
+  *qptr++ = '\"';
+
+  while (*s && qptr &lt; qend)
+  {
+    if (*s == '\\' || *s == '\"' || *s == '\'')
+    {
+      if (qptr &lt; (qend - 4))
+      {
+        *qptr++ = '\\';
+        *qptr++ = '\\';
+        *qptr++ = '\\';
+      }
+      else
+        break;
+    }
+
+    *qptr++ = *s++;
+  }
+
+  *qptr++ = '\"';
+  *qptr++ = '\'';
+  *qptr   = '\0';
+
+  return (q);
+}
+</pre>
+
 
 <h4><a name="MANAGING_STATE">Managing Printer State in a Filter</a></h4>
 
