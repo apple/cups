@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-03-21
+CHANGES.txt - 2.0b1 - 2014-03-27
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -22,3 +22,5 @@ CHANGES IN CUPS V2.0b1
 	  whitelist (<rdar://problem/15939788>)
 	- Increased the default idle exit timeout to 60 seconds on OS X
 	  (<rdar://problem/16041820>)
+	- Printer classes were not accessible on OS X
+	  (<rdar://problem/16385643>)

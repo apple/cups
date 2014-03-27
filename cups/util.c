@@ -1023,6 +1023,18 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   DEBUG_printf(("2cupsGetPPD3: Printer hostname=\"%s\", port=%d", hostname,
                 port));
 
+  if (cupsServer()[0] == '/' && !strcasecmp(hostname, "localhost") && port == ippPort())
+  {
+   /*
+    * Redirect localhost to domain socket...
+    */
+
+    strlcpy(hostname, cupsServer(), sizeof(hostname));
+    port = 0;
+
+    DEBUG_printf(("2cupsGetPPD3: Redirecting to \"%s\".", hostname));
+  }
+
  /*
   * Remap local hostname to localhost...
   */
@@ -1616,20 +1628,15 @@ cups_get_printer_uri(
 		};
 
 
-  DEBUG_printf(("7cups_get_printer_uri(http=%p, name=\"%s\", host=%p, "
-                "hostsize=%d, resource=%p, resourcesize=%d, depth=%d)",
-		http, name, host, hostsize, resource, resourcesize, depth));
+  DEBUG_printf(("4cups_get_printer_uri(http=%p, name=\"%s\", host=%p, hostsize=%d, resource=%p, resourcesize=%d, depth=%d)", http, name, host, hostsize, resource, resourcesize, depth));
 
  /*
   * Setup the printer URI...
   */
 
-  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                       "localhost", 0, "/printers/%s",
-                       name) < HTTP_URI_STATUS_OK)
+  if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL, "localhost", 0, "/printers/%s", name) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create printer-uri"),
-                  1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create printer-uri"), 1);
 
     *host     = '\0';
     *resource = '\0';
@@ -1637,7 +1644,7 @@ cups_get_printer_uri(
     return (0);
   }
 
-  DEBUG_printf(("9cups_get_printer_uri: printer-uri=\"%s\"", uri));
+  DEBUG_printf(("5cups_get_printer_uri: printer-uri=\"%s\"", uri));
 
  /*
   * Get the hostname and port number we are connected to...
@@ -1645,6 +1652,8 @@ cups_get_printer_uri(
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
   http_port = httpAddrPort(http->hostaddr);
+
+  DEBUG_printf(("5cups_get_printer_uri: http_hostname=\"%s\"", http_hostname));
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following
@@ -1658,13 +1667,9 @@ cups_get_printer_uri(
 
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 
-  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                "requested-attributes",
-		sizeof(requested_attrs) / sizeof(requested_attrs[0]),
-		NULL, requested_attrs);
+  ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requested-attributes", sizeof(requested_attrs) / sizeof(requested_attrs[0]), NULL, requested_attrs);
 
  /*
   * Do the request and get back a response...
@@ -1676,9 +1681,11 @@ cups_get_printer_uri(
   {
     const char *device_uri = NULL;	/* device-uri value */
 
-    if ((attr = ippFindAttribute(response, "device-uri",
-                                 IPP_TAG_URI)) != NULL)
+    if ((attr = ippFindAttribute(response, "device-uri", IPP_TAG_URI)) != NULL)
+    {
       device_uri = attr->values[0].string.text;
+      DEBUG_printf(("5cups_get_printer_uri: device-uri=\"%s\"", device_uri));
+    }
 
     if (device_uri &&
         (!strncmp(device_uri, "ipp://", 6) ||
@@ -1691,27 +1698,25 @@ cups_get_printer_uri(
       * Statically-configured shared printer.
       */
 
-      httpSeparateURI(HTTP_URI_CODING_ALL,
-                      _httpResolveURI(device_uri, uri, sizeof(uri),
-                                      _HTTP_RESOLVE_DEFAULT, NULL, NULL),
-                      scheme, sizeof(scheme), username, sizeof(username),
-		      host, hostsize, port, resource, resourcesize);
+      httpSeparateURI(HTTP_URI_CODING_ALL, _httpResolveURI(device_uri, uri, sizeof(uri), _HTTP_RESOLVE_DEFAULT, NULL, NULL), scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
       ippDelete(response);
 
+      DEBUG_printf(("5cups_get_printer_uri: Resolved to host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
       return (1);
     }
-    else if ((attr = ippFindAttribute(response, "member-uris",
-                                      IPP_TAG_URI)) != NULL)
+    else if ((attr = ippFindAttribute(response, "member-uris", IPP_TAG_URI)) != NULL)
     {
      /*
       * Get the first actual printer name in the class...
       */
 
+      DEBUG_printf(("5cups_get_printer_uri: Got member-uris with %d values.", ippGetCount(attr)));
+
       for (i = 0; i < attr->num_values; i ++)
       {
-	httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text,
-	                scheme, sizeof(scheme), username, sizeof(username),
-			host, hostsize, port, resource, resourcesize);
+        DEBUG_printf(("5cups_get_printer_uri: member-uris[%d]=\"%s\"", i, ippGetString(attr, i, NULL)));
+
+	httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[i].string.text, scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
 	if (!strncmp(resource, "/printers/", 10))
 	{
 	 /*
@@ -1720,6 +1725,7 @@ cups_get_printer_uri(
 
           ippDelete(response);
 
+	  DEBUG_printf(("5cups_get_printer_uri: Found printer member with host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
 	  return (1);
 	}
       }
@@ -1744,9 +1750,7 @@ cups_get_printer_uri(
 
 	    if (!_cups_strcasecmp(http_hostname, host) && *port == http_port)
 	      http2 = http;
-	    else if ((http2 = httpConnect2(host, *port, NULL, AF_UNSPEC,
-					   cupsEncryption(), 1, 30000,
-					   NULL)) == NULL)
+	    else if ((http2 = httpConnect2(host, *port, NULL, AF_UNSPEC, cupsEncryption(), 1, 30000, NULL)) == NULL)
 	    {
 	      DEBUG_puts("8cups_get_printer_uri: Unable to connect to server");
 
@@ -1775,25 +1779,21 @@ cups_get_printer_uri(
 	}
       }
     }
-    else if ((attr = ippFindAttribute(response, "printer-uri-supported",
-                                      IPP_TAG_URI)) != NULL)
+    else if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
     {
-      httpSeparateURI(HTTP_URI_CODING_ALL,
-                      _httpResolveURI(attr->values[0].string.text, uri,
-		                      sizeof(uri), _HTTP_RESOLVE_DEFAULT,
-				      NULL, NULL),
-                      scheme, sizeof(scheme), username, sizeof(username),
-		      host, hostsize, port, resource, resourcesize);
+      httpSeparateURI(HTTP_URI_CODING_ALL, _httpResolveURI(attr->values[0].string.text, uri, sizeof(uri), _HTTP_RESOLVE_DEFAULT, NULL, NULL), scheme, sizeof(scheme), username, sizeof(username), host, hostsize, port, resource, resourcesize);
       ippDelete(response);
+
+      DEBUG_printf(("5cups_get_printer_uri: Resolved to host=\"%s\", port=%d, resource=\"%s\"", host, *port, resource));
 
       if (!strncmp(resource, "/classes/", 9))
       {
-        _cupsSetError(IPP_STATUS_ERROR_INTERNAL,
-	              _("No printer-uri found for class"), 1);
+        _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No printer-uri found for class"), 1);
 
 	*host     = '\0';
 	*resource = '\0';
 
+        DEBUG_puts("5cups_get_printer_uri: Not returning class.");
 	return (0);
       }
 
@@ -1809,6 +1809,7 @@ cups_get_printer_uri(
   *host     = '\0';
   *resource = '\0';
 
+  DEBUG_puts("5cups_get_printer_uri: Printer URI not found.");
   return (0);
 }
 
