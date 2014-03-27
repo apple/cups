@@ -35,7 +35,7 @@ if test x$enable_launchd != xno; then
 	case "$uname" in
 		Darwin*)
 			# Darwin, MacOS X
-			LAUNCHD_DIR="/System/Library/LaunchDaemons/org.cups.cupsd.plist"
+			LAUNCHD_DIR="/System/Library/LaunchDaemons"
 			# liblaunch is already part of libSystem
 			;;
 		*)
