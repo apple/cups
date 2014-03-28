@@ -332,7 +332,7 @@ cupsdLoadAllClasses(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
     }
-    else if (!_cups_strcasecmp(line, "</Class>"))
+    else if (!_cups_strcasecmp(line, "</Class>") || !_cups_strcasecmp(line, "</DefaultClass>"))
     {
       if (p != NULL)
       {
@@ -795,7 +795,10 @@ cupsdSaveAllClasses(void)
       cupsFilePutConf(fp, "Option", value);
     }
 
-    cupsFilePuts(fp, "</Class>\n");
+    if (pclass == DefaultPrinter)
+      cupsFilePuts(fp, "</DefaultClass>\n");
+    else
+      cupsFilePuts(fp, "</Class>\n");
   }
 
   cupsdCloseCreatedConfFile(fp, filename);

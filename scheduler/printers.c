@@ -885,7 +885,7 @@ cupsdLoadAllPrinters(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!_cups_strcasecmp(line, "</Printer>"))
+    else if (!_cups_strcasecmp(line, "</Printer>") || _cups_strcasecmp(line, "</DefaultPrinter>"))
     {
       if (p != NULL)
       {
@@ -1581,7 +1581,10 @@ cupsdSaveAllPrinters(void)
       cupsFilePrintf(fp, "Attribute marker-change-time %ld\n",
                      (long)printer->marker_time);
 
-    cupsFilePuts(fp, "</Printer>\n");
+    if (printer == DefaultPrinter)
+      cupsFilePuts(fp, "</DefaultPrinter>\n");
+    else
+      cupsFilePuts(fp, "</Printer>\n");
   }
 
   cupsdCloseCreatedConfFile(fp, filename);
