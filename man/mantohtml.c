@@ -912,12 +912,20 @@ html_fputs(const char *s,		/* I  - String */
       * Embed URL...
       */
 
+      char temp[1024];			/* Temporary string */
       const char *end = s + 6;		/* End of URL */
 
       while (*end && !isspace(*end & 255))
 	end ++;
 
-      fprintf(fp, "<a href=\"%*s\">%*s</a>", (int)(end - s), s, (int)(end - s), s);
+      if (end[-1] == ',' || end[-1] == '.')
+        end --;
+
+      strlcpy(temp, s, sizeof(temp));
+      if ((size_t)(end -s) < sizeof(temp))
+        temp[end - s] = '\0';
+
+      fprintf(fp, "<a href=\"%s\">%s</a>", temp, temp);
       s = end;
     }
     else

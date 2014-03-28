@@ -1,16 +1,16 @@
 #
 # "$Id$"
 #
-#   Documentation makefile for CUPS.
+# Documentation makefile for CUPS.
 #
-#   Copyright 2007-2012 by Apple Inc.
-#   Copyright 1997-2007 by Easy Software Products.
+# Copyright 2007-2014 by Apple Inc.
+# Copyright 1997-2007 by Easy Software Products.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
 include ../Makedefs
@@ -62,12 +62,13 @@ HELPFILES	=	\
 			help/glossary.html \
 			help/kerberos.html \
 			help/license.html \
-			help/man-cupsaccept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
+			help/man-cups.html \
 			help/man-cups-config.html \
 			help/man-cups-lpd.html \
 			help/man-cups-snmp.html \
+			help/man-cupsaccept.html \
 			help/man-cupsaddsmb.html \
 			help/man-cupsd.html \
 			help/man-cupsenable.html \

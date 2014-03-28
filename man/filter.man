@@ -158,7 +158,7 @@ application/postscript).
 .TP 5
 CUPS_CACHEDIR
 .br
-The directory for semi-persistent cache files can be found.
+The directory where semi-persistent cache files can be found.
 .TP 5
 CUPS_DATADIR
 .br
