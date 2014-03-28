@@ -32,8 +32,7 @@ OBJS	=	\
 		printers.o \
 		testcgi.o \
 		testhi.o \
-		testtemplate.o \
-		websearch.o
+		testtemplate.o
 CGIS	=	\
 		admin.cgi \
 		classes.cgi \

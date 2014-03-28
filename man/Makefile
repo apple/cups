@@ -29,7 +29,6 @@ MAN1	=	cancel.$(MAN1EXT) \
 		ipptool.$(MAN1EXT) \
 		lp.$(MAN1EXT) \
 		lpoptions.$(MAN1EXT) \
-		lppasswd.$(MAN1EXT) \
 		lpq.$(MAN1EXT) \
 		lprm.$(MAN1EXT) \
 		lpr.$(MAN1EXT) \
