@@ -545,11 +545,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
                sizeof(commonName) / sizeof(TCHAR), TEXT("CN=%s"), username);
 
-  if (!_sspiGetCredentials(http->tls_credentials, L"ClientContainer",
+  if (!_sspiGetCredentials(http->tls, L"ClientContainer",
                            commonName, FALSE))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
@@ -560,13 +560,13 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
-  _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
+  _sspiSetAllowsAnyRoot(http->tls, TRUE);
+  _sspiSetAllowsExpiredCerts(http->tls, TRUE);
 
-  if (!_sspiConnect(http->tls_credentials, hostname))
+  if (!_sspiConnect(http->tls, hostname))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
@@ -619,7 +619,7 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
     CFRelease(http->tls_credentials);
 
 #  elif defined(HAVE_SSPISSL)
-  _sspiFree(http->tls_credentials);
+  _sspiFree(http->tls);
 #  endif /* HAVE_LIBSSL */
 
   http->tls             = NULL;
