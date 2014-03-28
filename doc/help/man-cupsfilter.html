@@ -36,7 +36,8 @@ cupsfilter - convert a file to another format using cups filters
 </i><h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cupsfilter</i> is a front-end to the CUPS filter subsystem which allows you
 to convert a file to a specific format, just as if you had printed the file
-through CUPS. By default, <i>cupsfilter</i> generates a PDF file.
+through CUPS. By default, <i>cupsfilter</i> generates a PDF file. The converted
+file is sent to the standard output.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <dl>
 <dt>-D
@@ -52,7 +53,7 @@ through CUPS. By default, <i>cupsfilter</i> generates a PDF file.
 <dt>-c config-file
 </dt>
 <dd></dd>
-<dd>Uses the named cupsd.conf configuration file.
+<dd>Uses the named cups-files.conf configuration file.
 </dd>
 <dt>-d printer
 </dt>
@@ -109,11 +110,11 @@ PPD file.
 </dd>
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href='man-cupsd.conf.html?TOPIC=Man+Pages'>cupsd.conf(5)</a>
+<a href='man-cups-files.conf.html?TOPIC=Man+Pages'>cups-files.conf(5)</a>
 <br>
 <a href='http://localhost:631/help'>http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright 2007-2014 by Apple Inc.
 
 </body>
 </html>

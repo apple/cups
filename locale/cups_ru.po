@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-07-08 07:21-0400\n"
+"POT-Creation-Date: 2014-03-28 11:06-0400\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -932,6 +932,9 @@ msgid "  -a                      Export all printers."
 msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
+msgstr ""
+
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."

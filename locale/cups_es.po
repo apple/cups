@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2013-07-08 07:21-0400\n"
+"POT-Creation-Date: 2014-03-28 11:06-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -1109,6 +1109,9 @@ msgstr "  -a                      Exporta todas las impresoras."
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catálogo.po           Carga el catálogo de mensajes especificado."
+
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
 
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           Establece el archivo cupsd.conf a usar."
