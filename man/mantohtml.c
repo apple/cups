@@ -918,7 +918,7 @@ html_fputs(const char *s,		/* I  - String */
       while (*end && !isspace(*end & 255))
 	end ++;
 
-      if (end[-1] == ',' || end[-1] == '.')
+      if (end[-1] == ',' || end[-1] == '.' || end[-1] == ')')
         end --;
 
       strlcpy(temp, s, sizeof(temp));
