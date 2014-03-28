@@ -5486,7 +5486,7 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
     CFRelease(http->tls_credentials);
 
 #  elif defined(HAVE_SSPISSL)
-  _sspiFree(http->tls_credentials);
+  _sspiFree(http->tls);
 #  endif /* HAVE_LIBSSL */
 
   http->tls             = NULL;
