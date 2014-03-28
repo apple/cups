@@ -2894,7 +2894,6 @@ new_request(
       {
 	ipp_t	*destination;		/* destination collection */
 	char	phone[1024],		/* Phone number string */
-		ch,			/* Character from phone string */
 		*ptr,			/* Pointer into string */
 		tel_uri[1024];		/* tel: URI */
         static const char * const allowed = "0123456789#*-+.()";
@@ -2907,42 +2906,26 @@ new_request(
         * allowed in a tel: URI.
         */
 
-        for (ptr = phone; *keyword && ptr < (phone + sizeof(phone) - 1);)
-        {
-          ch = *keyword++;
-          if (ch == '%')
-          {
-            if (*keyword >= '0' && *keyword <= '9')
-              ch = (*keyword++ - '0') << 4;
-            else if (*keyword >= 'a' && *keyword <= 'f')
-              ch = (*keyword++ - 'a' + 10) << 4;
-            else if (*keyword >= 'A' && *keyword <= 'F')
-              ch = (*keyword++ - 'A' + 10) << 4;
-            else
-              continue;
-
-            if (*keyword >= '0' && *keyword <= '9')
-              ch += *keyword++ - '0';
-            else if (*keyword >= 'a' && *keyword <= 'f')
-              ch += *keyword++ - 'a' + 10;
-            else if (*keyword >= 'A' && *keyword <= 'F')
-              ch += *keyword++ - 'A' + 10;
-            else
-              continue;
-          }
-
-          if (strchr(allowed, ch))
-            *ptr++ = ch;
+        _httpDecodeURI(phone, keyword, sizeof(phone));
+        for (ptr = phone; *ptr;)
+	{
+	  if (!strchr(allowed, *ptr))
+	    _cups_strcpy(ptr, ptr + 1);
+	  else
+	    ptr ++;
         }
 
-        *ptr = '\0';
         httpAssembleURI(HTTP_URI_CODING_ALL, tel_uri, sizeof(tel_uri), "tel", NULL, NULL, 0, phone);
         ippAddString(destination, IPP_TAG_JOB, IPP_TAG_URI, "destination-uri", NULL, tel_uri);
 
 	if ((keyword = cupsGetOption("faxPrefix", num_options,
 	                             options)) != NULL && *keyword)
-	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT,
-	               "pre-dial-string", NULL, keyword);
+        {
+	  char	predial[1024];		/* Pre-dial string */
+
+	  _httpDecodeURI(predial, keyword, sizeof(predial));
+	  ippAddString(destination, IPP_TAG_JOB, IPP_TAG_TEXT, "pre-dial-string", NULL, predial);
+	}
 
         ippAddCollection(request, IPP_TAG_JOB, "destination-uris", destination);
         ippDelete(destination);
