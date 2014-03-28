@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.7.2
 	- Documentation fixes (STR #3259, STR #4346, STR #4355)
 	- Fixed the Japanese localization (STR #4385)
 	- Added a German localization (STR #4363)
+	- Fixed OS X builds with Xcode 5.x (<rdar://problem/15914959>)
+	- Fixed SSL support on Windows (STR #4358)
 	- Fixed documentation and naming of Create-Job/Printer-Subscriptions
 	  operations (STR #4389)
 	- Phone numbers in fax jobs were not properly filtered for IPP FaxOut
