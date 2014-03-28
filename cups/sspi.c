@@ -1,35 +1,15 @@
 /*
  * "$Id$"
  *
- *   Windows SSPI SSL implementation for CUPS.
+ * Windows SSPI SSL implementation for CUPS.
  *
- *   Copyright 2010-2011 by Apple Inc.
+ * Copyright 2010-2014 by Apple Inc.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- * Contents:
- *
- *   sspi_alloc()                 - Allocate SSPI ssl object
- *   _sspiGetCredentials()        - Retrieve an SSL/TLS certificate from the
- *                                  system store If one cannot be found, one is
- *                                  created.
- *   _sspiConnect()               - Make an SSL connection. This function
- *                                  assumes a TCP/IP connection has already been
- *                                  successfully made
- *   _sspiAccept()                - Accept an SSL/TLS connection
- *   _sspiSetAllowsAnyRoot()      - Set the client cert policy for untrusted
- *                                  root certs
- *   _sspiSetAllowsExpiredCerts() - Set the client cert policy for expired root
- *                                  certs
- *   _sspiWrite()                 - Write a buffer to an ssl socket
- *   _sspiRead()                  - Read a buffer from an ssl socket
- *   _sspiPending()               - Returns the number of available bytes
- *   _sspiFree()                  - Close a connection and free resources
- *   sspi_verify_certificate()    - Verify a server certificate
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  */
 
 /*
@@ -107,6 +87,9 @@ _sspiGetCredentials(_sspi_struct_t *conn,
   CERT_EXTENSIONS	exts;		/* Array of cert extensions */
   CRYPT_KEY_PROV_INFO	ckp;		/* Handle to crypto key */
   BOOL			ok = TRUE;	/* Return value */
+
+
+  DEBUG_printf(("_sspiGetCredentials(conn=%p, container=%p, cn=\"%s\", isServer=%d)", conn, container, cn, isServer));
 
   if (!conn)
     return (FALSE);

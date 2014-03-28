@@ -63,12 +63,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4273A45FE6E54897AC9A4F66D9AA59EC"
-        "OwnerKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4454D1BB58774F95972FB94388DC5E6A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -77,6 +71,12 @@
         {
         "MsmKey" = "8:_46AB64FF360D4F309866FF5F49C65D88"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4FEB166CB8954184934B4C82D1A99107"
+        "OwnerKey" = "8:_73D53D5857124164BE3824FD94E0CB2A"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -111,6 +111,30 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_73D53D5857124164BE3824FD94E0CB2A"
+        "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_73D53D5857124164BE3824FD94E0CB2A"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_73D53D5857124164BE3824FD94E0CB2A"
+        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_73D53D5857124164BE3824FD94E0CB2A"
+        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_80DBA85C961E447CB92C95CE1F38C56B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -119,30 +143,6 @@
         {
         "MsmKey" = "8:_842C04D73EBC4F5DBC2FD58D5B98D5D1"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
-        "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
-        "OwnerKey" = "8:_E97571D3FBE048DABDC59B37762D800F"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
-        "OwnerKey" = "8:_D02EB13951314EFD9C539150EF8E53B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1256,14 +1256,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ipptool for Windows"
-        "ProductCode" = "8:{5B0420A3-BD82-4698-B8A1-9D9EC51A7836}"
-        "PackageCode" = "8:{ECECE842-1E95-48BD-962D-A4E62FBB5F89}"
+        "ProductCode" = "8:{B5950B89-CE18-455C-B176-E0B74DCDF400}"
+        "PackageCode" = "8:{0307E5A5-247E-4097-A50B-35A35B548502}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:13.07.3100"
+        "ProductVersion" = "8:14.03.2800"
         "Manufacturer" = "8:Apple Inc."
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.cups.org/str.php"
@@ -1822,7 +1822,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_4273A45FE6E54897AC9A4F66D9AA59EC"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_4FEB166CB8954184934B4C82D1A99107"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -1836,7 +1836,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_8A6033CAC27E4C1185B4FDF7D2BF8D2E"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_73D53D5857124164BE3824FD94E0CB2A"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -1855,7 +1855,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_58DC0E72F0944BEFB927AED718CD1660"
             {
-            "SourcePath" = "8:Win32\\Release\\ippfind.exe"
+            "SourcePath" = "8:Win32\\Debug\\ippfind.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1883,7 +1883,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D02EB13951314EFD9C539150EF8E53B8"
             {
-            "SourcePath" = "8:Win32\\Release\\regex.dll"
+            "SourcePath" = "8:Win32\\Debug\\regex.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1911,7 +1911,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E97571D3FBE048DABDC59B37762D800F"
             {
-            "SourcePath" = "8:Win32\\Release\\ipptool.exe"
+            "SourcePath" = "8:Win32\\Debug\\ipptool.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
@@ -1939,7 +1939,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_EA282F32A10B4ED1A81AA6133B997C6A"
             {
-            "SourcePath" = "8:Win32\\Release\\libcups2.dll"
+            "SourcePath" = "8:Win32\\Debug\\libcups2.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"

@@ -3,7 +3,7 @@
  *
  * HTTP routines for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by Jelmer Vernooij.
@@ -5396,6 +5396,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   if (!http->tls)
   {
+    DEBUG_puts("8http_setup_ssl: Unable to allocate SSPI data.");
     _cupsSetHTTPError(HTTP_STATUS_ERROR);
     return (-1);
   }
@@ -5406,11 +5407,14 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
                sizeof(commonName) / sizeof(TCHAR), TEXT("CN=%s"), username);
 
-  if (!_sspiGetCredentials(http->tls_credentials, L"ClientContainer",
-                           commonName, FALSE))
+  DEBUG_printf(("8http_setup_ssl: commonName=\"%s\"", commonName));
+
+  if (!_sspiGetCredentials(http->tls, L"ClientContainer", commonName, FALSE))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    DEBUG_puts("8http_setup_ssl: _sspiGetCredentials failed.");
+
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;
@@ -5421,13 +5425,15 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
-  _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
+  _sspiSetAllowsAnyRoot(http->tls, TRUE);
+  _sspiSetAllowsExpiredCerts(http->tls, TRUE);
 
-  if (!_sspiConnect(http->tls_credentials, hostname))
+  if (!_sspiConnect(http->tls, hostname))
   {
-    _sspiFree(http->tls_credentials);
-    http->tls_credentials = NULL;
+    DEBUG_printf(("8http_setup_ssl: _sspiConnect failed for \"%s\".", hostname));
+
+    _sspiFree(http->tls);
+    http->tls = NULL;
 
     http->error  = EIO;
     http->status = HTTP_STATUS_ERROR;

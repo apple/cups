@@ -1,4 +1,4 @@
-IPPTOOL.txt - 2013-07-15
+IPPTOOL.txt - 2014-03-28
 ------------------------
 
 See the file CHANGES-IPPTOOL.txt for a list of changes to this software.
@@ -220,7 +220,7 @@ REPORTING BUGS
 
 LEGAL STUFF
 
-    CUPS is Copyright 2007-2013 by Apple Inc.  CUPS and the CUPS logo are
+    CUPS is Copyright 2007-2014 by Apple Inc.  CUPS and the CUPS logo are
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.

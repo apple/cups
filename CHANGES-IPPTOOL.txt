@@ -1,8 +1,13 @@
-CHANGES-IPPTOOL.txt - 2013-07-15
+CHANGES-IPPTOOL.txt - 2014-03-28
 --------------------------------
 
 This file provides a list of changes to the ipptool binary distribution posted
 on cups.org.
+
+2014-03-28
+
+	- Fixed SSL support on Windows (STR #4358)
+
 
 2013-07-15
 
