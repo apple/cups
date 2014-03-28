@@ -2321,11 +2321,8 @@ cupsdSendHeader(
 
     auth_str[0] = '\0';
 
-    if (auth_type == CUPSD_AUTH_BASIC || auth_type == CUPSD_AUTH_BASICDIGEST)
+    if (auth_type == CUPSD_AUTH_BASIC)
       strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
-    else if (auth_type == CUPSD_AUTH_DIGEST)
-      snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
-	       httpGetHostname(con->http, NULL, 0));
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
     {

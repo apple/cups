@@ -77,8 +77,6 @@ static cupsd_authmask_t	*copy_authmask(cupsd_authmask_t *am, void *data);
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM */
 static void		free_authmask(cupsd_authmask_t *am, void *data);
-static char		*get_md5_password(const char *username,
-			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
 static int		pam_func(int, const struct pam_message **,
 			         struct pam_response **, void *);
@@ -282,26 +280,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		password[HTTP_MAX_VALUE];
 					/* Password string */
   cupsd_cert_t	*localuser;		/* Certificate username */
-  char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
-		md5[33],		/* MD5 password */
-		basicmd5[33];		/* MD5 of Basic password */
-  static const char * const states[] =	/* HTTP client states... */
-		{
-		  "WAITING",
-		  "OPTIONS",
-		  "GET",
-		  "GET",
-		  "HEAD",
-		  "POST",
-		  "POST",
-		  "POST",
-		  "PUT",
-		  "PUT",
-		  "DELETE",
-		  "TRACE",
-		  "CLOSE",
-		  "STATUS"
-		};
 
 
  /*
@@ -367,6 +345,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
            httpAddrLocalhost(httpGetAddress(con->http)))
   {
     OSStatus		status;		/* Status */
+    char		authdata[HTTP_MAX_VALUE];
+					/* Nonce value from client */
     int			authlen;	/* Auth string length */
     AuthorizationItemSet *authinfo;	/* Authorization item set */
 
@@ -378,8 +358,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     while (isspace(*authorization & 255))
       authorization ++;
 
-    authlen = sizeof(nonce);
-    httpDecode64_2(nonce, &authlen, authorization);
+    authlen = sizeof(authdata);
+    httpDecode64_2(authdata, &authlen, authorization);
 
     if (authlen != kAuthorizationExternalFormLength)
     {
@@ -389,8 +369,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
-    if ((status = AuthorizationCreateFromExternalForm(
-		      (AuthorizationExternalForm *)nonce, &con->authref)) != 0)
+    if ((status = AuthorizationCreateFromExternalForm((AuthorizationExternalForm *)authdata, &con->authref)) != 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Client %d] AuthorizationCreateFromExternalForm "
@@ -832,114 +811,9 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			  "[Client %d] Authorized as %s using Basic",
 			  con->number, username);
           break;
-
-      case CUPSD_AUTH_BASICDIGEST :
-         /*
-	  * Do Basic authentication with the Digest password file...
-	  */
-
-	  if (!get_md5_password(username, NULL, md5))
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "[Client %d] Unknown MD5 username \"%s\".",
-	                    con->number, username);
-            return;
-	  }
-
-	  httpMD5(username, "CUPS", password, basicmd5);
-
-	  if (strcmp(md5, basicmd5))
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "[Client %d] Authentication failed for \"%s\".",
-	                    con->number, username);
-            return;
-	  }
-
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "[Client %d] Authorized as %s using BasicDigest",
-			  con->number, username);
-	  break;
     }
 
     con->type = type;
-  }
-  else if (!strncmp(authorization, "Digest", 6))
-  {
-   /*
-    * Get the username, password, and nonce from the Digest attributes...
-    */
-
-    if (!httpGetSubField2(con->http, HTTP_FIELD_AUTHORIZATION, "username",
-                          username, sizeof(username)) || !username[0])
-    {
-     /*
-      * Username must not be empty...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "[Client %d] Empty or missing Digest username.",
-                      con->number);
-      return;
-    }
-
-    if (!httpGetSubField2(con->http, HTTP_FIELD_AUTHORIZATION, "response",
-                          password, sizeof(password)) || !password[0])
-    {
-     /*
-      * Password must not be empty...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "[Client %d] Empty or missing Digest password.",
-                      con->number);
-      return;
-    }
-
-    if (!httpGetSubField(con->http, HTTP_FIELD_AUTHORIZATION, "nonce",
-                         nonce))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "[Client %d] No nonce value for Digest authentication.",
-	              con->number);
-      return;
-    }
-
-    if (strcmp(con->http->hostname, nonce))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "[Client %d] Bad nonce value, expected \"%s\", "
-		      "got \"%s\".", con->number, con->http->hostname, nonce);
-      return;
-    }
-
-   /*
-    * Validate the username and password...
-    */
-
-    if (!get_md5_password(username, NULL, md5))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "[Client %d] Unknown MD5 username \"%s\".",
-	              con->number, username);
-      return;
-    }
-
-    httpMD5Final(nonce, states[httpGetState(con->http)], con->uri, md5);
-
-    if (strcmp(md5, password))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "[Client %d] Authentication failed for \"%s\".",
-	              con->number, username);
-      return;
-    }
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "[Client %d] Authorized as %s using Digest", con->number,
-		    username);
-
-    con->type = CUPSD_AUTH_DIGEST;
   }
 #ifdef HAVE_GSSAPI
   else if (!strncmp(authorization, "Negotiate", 9))
@@ -1380,7 +1254,6 @@ cupsdCheckGroup(
 {
   int		i;			/* Looping var */
   struct group	*group;			/* System group info */
-  char		junk[33];		/* MD5 password (not used) */
 #ifdef HAVE_MBR_UID_TO_UUID
   uuid_t	useruuid,		/* UUID for username */
 		groupuuid;		/* UUID for groupname */
@@ -1465,15 +1338,6 @@ cupsdCheckGroup(
   else if (groupname[0] == '#')
     return (0);
 #endif /* HAVE_MBR_UID_TO_UUID */
-
- /*
-  * Username not found, group not found, or user is not part of the
-  * system group...  Check for a user and group in the MD5 password
-  * file...
-  */
-
-  if (get_md5_password(username, groupname, junk) != NULL)
-    return (1);
 
  /*
   * If we get this far, then the user isn't part of the named group...
@@ -1763,8 +1627,6 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 		{
 		  "None",
 		  "Basic",
-		  "Digest",
-		  "BasicDigest",
 		  "Negotiate"
 		};
 
@@ -1923,9 +1785,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 #ifdef HAVE_GSSAPI
         (type != CUPSD_AUTH_NEGOTIATE || con->gss_uid <= 0) &&
 #endif /* HAVE_GSSAPI */
-        (con->type != CUPSD_AUTH_BASIC || type != CUPSD_AUTH_BASICDIGEST))
+        con->type != CUPSD_AUTH_BASIC)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Authorized using %s, expected %s!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Authorized using %s, expected %s.",
                       types[con->type], types[type]);
 
       return (HTTP_UNAUTHORIZED);
@@ -2357,68 +2219,6 @@ free_authmask(cupsd_authmask_t *mask,	/* I - Auth mask to free */
     _cupsStrFree(mask->mask.name.name);
 
   free(mask);
-}
-
-
-/*
- * 'get_md5_password()' - Get an MD5 password.
- */
-
-static char *				/* O - MD5 password string */
-get_md5_password(const char *username,	/* I - Username */
-                 const char *group,	/* I - Group */
-                 char       passwd[33])	/* O - MD5 password string */
-{
-  cups_file_t	*fp;			/* passwd.md5 file */
-  char		filename[1024],		/* passwd.md5 filename */
-		line[256],		/* Line from file */
-		tempuser[33],		/* User from file */
-		tempgroup[33];		/* Group from file */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "get_md5_password(username=\"%s\", group=\"%s\", passwd=%p)",
-                  username, group ? group : "(null)", passwd);
-
-  snprintf(filename, sizeof(filename), "%s/passwd.md5", ServerRoot);
-  if ((fp = cupsFileOpen(filename, "r")) == NULL)
-  {
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open %s - %s", filename,
-                      strerror(errno));
-
-    return (NULL);
-  }
-
-  while (cupsFileGets(fp, line, sizeof(line)) != NULL)
-  {
-    if (sscanf(line, "%32[^:]:%32[^:]:%32s", tempuser, tempgroup, passwd) != 3)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Bad MD5 password line: %s", line);
-      continue;
-    }
-
-    if (!strcmp(username, tempuser) &&
-        (group == NULL || !strcmp(group, tempgroup)))
-    {
-     /*
-      * Found the password entry!
-      */
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "Found MD5 user %s, group %s...",
-                      username, tempgroup);
-
-      cupsFileClose(fp);
-      return (passwd);
-    }
-  }
-
- /*
-  * Didn't find a password entry - return NULL!
-  */
-
-  cupsFileClose(fp);
-  return (NULL);
 }
 
 

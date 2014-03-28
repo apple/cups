@@ -2054,10 +2054,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
       auth_type = cupsdDefaultAuthType();
 
-    if (auth_type == CUPSD_AUTH_BASIC || auth_type == CUPSD_AUTH_BASICDIGEST)
+    if (auth_type == CUPSD_AUTH_BASIC)
       auth_supported = "basic";
-    else if (auth_type == CUPSD_AUTH_DIGEST)
-      auth_supported = "digest";
 #ifdef HAVE_GSSAPI
     else if (auth_type == CUPSD_AUTH_NEGOTIATE)
       auth_supported = "negotiate";

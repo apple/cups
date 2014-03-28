@@ -1118,7 +1118,6 @@
 		2732E08E137A3F5200FAFEF6 /* lpinfo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpinfo.c; path = ../systemv/lpinfo.c; sourceTree = "<group>"; };
 		2732E08F137A3F5200FAFEF6 /* lpmove.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpmove.c; path = ../systemv/lpmove.c; sourceTree = "<group>"; };
 		2732E090137A3F5200FAFEF6 /* lpoptions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpoptions.c; path = ../systemv/lpoptions.c; sourceTree = "<group>"; };
-		2732E091137A3F5200FAFEF6 /* lppasswd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lppasswd.c; path = ../systemv/lppasswd.c; sourceTree = "<group>"; };
 		2732E092137A3F5200FAFEF6 /* lpstat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpstat.c; path = ../systemv/lpstat.c; sourceTree = "<group>"; };
 		273BF6BD1333B5000022CAAB /* testcups */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testcups; sourceTree = BUILT_PRODUCTS_DIR; };
 		273BF6C61333B5370022CAAB /* testcups.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testcups.c; path = ../cups/testcups.c; sourceTree = "<group>"; };
@@ -1782,7 +1781,6 @@
 				2732E08E137A3F5200FAFEF6 /* lpinfo.c */,
 				2732E08F137A3F5200FAFEF6 /* lpmove.c */,
 				2732E090137A3F5200FAFEF6 /* lpoptions.c */,
-				2732E091137A3F5200FAFEF6 /* lppasswd.c */,
 				2732E092137A3F5200FAFEF6 /* lpstat.c */,
 			);
 			name = commands;

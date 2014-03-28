@@ -301,7 +301,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/ipptool.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
-/usr/share/man/man1/lppasswd.1.gz
 /usr/share/man/man1/lpq.1.gz
 /usr/share/man/man1/lpr.1.gz
 /usr/share/man/man1/lprm.1.gz

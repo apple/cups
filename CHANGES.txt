@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.0b1
 	  of the CUPS 1.4 sleep support to do a cleaner sleep
 	  (<rdar://problem/14323704>)
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
+	- Dropped lppasswd and support for Digest authentication in in the
+	  scheduler (STR #4321)
 	- Adopted Linux man page conventions and updated all man pages
 	  (STR #4372)
 	- Added a "--list-filters" option to the cupsfilter command (STR #4325)

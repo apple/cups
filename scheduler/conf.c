@@ -2169,20 +2169,6 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       if (loc->level == CUPSD_AUTH_ANON)
 	loc->level = CUPSD_AUTH_USER;
     }
-    else if (!_cups_strcasecmp(value, "digest"))
-    {
-      loc->type = CUPSD_AUTH_DIGEST;
-
-      if (loc->level == CUPSD_AUTH_ANON)
-	loc->level = CUPSD_AUTH_USER;
-    }
-    else if (!_cups_strcasecmp(value, "basicdigest"))
-    {
-      loc->type = CUPSD_AUTH_BASICDIGEST;
-
-      if (loc->level == CUPSD_AUTH_ANON)
-	loc->level = CUPSD_AUTH_USER;
-    }
     else if (!_cups_strcasecmp(value, "default"))
     {
       loc->type = CUPSD_AUTH_DEFAULT;
@@ -3081,10 +3067,6 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 	default_auth_type = CUPSD_AUTH_NONE;
       else if (!_cups_strcasecmp(value, "basic"))
 	default_auth_type = CUPSD_AUTH_BASIC;
-      else if (!_cups_strcasecmp(value, "digest"))
-	default_auth_type = CUPSD_AUTH_DIGEST;
-      else if (!_cups_strcasecmp(value, "basicdigest"))
-	default_auth_type = CUPSD_AUTH_BASICDIGEST;
 #ifdef HAVE_GSSAPI
       else if (!_cups_strcasecmp(value, "negotiate"))
         default_auth_type = CUPSD_AUTH_NEGOTIATE;

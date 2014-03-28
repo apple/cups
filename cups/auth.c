@@ -261,7 +261,6 @@ cupsDoAuthentication(
     char	encode[33],		/* MD5 buffer */
 		digest[1024];		/* Digest auth data */
 
-
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "nonce", nonce);
 

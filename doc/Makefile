@@ -83,7 +83,6 @@ HELPFILES	=	\
 			help/man-lpinfo.html \
 			help/man-lpmove.html \
 			help/man-lpoptions.html \
-			help/man-lppasswd.html \
 			help/man-lpq.html \
 			help/man-lpr.html \
 			help/man-lprm.html \

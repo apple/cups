@@ -27,10 +27,8 @@
 #define CUPSD_AUTH_DEFAULT	-1	/* Use DefaultAuthType */
 #define CUPSD_AUTH_NONE		0	/* No authentication */
 #define CUPSD_AUTH_BASIC	1	/* Basic authentication */
-#define CUPSD_AUTH_DIGEST	2	/* Digest authentication */
-#define CUPSD_AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
-#define CUPSD_AUTH_NEGOTIATE	4	/* Kerberos authentication */
-#define CUPSD_AUTH_AUTO		5	/* Kerberos or Basic, depending on configuration of server */
+#define CUPSD_AUTH_NEGOTIATE	2	/* Kerberos authentication */
+#define CUPSD_AUTH_AUTO		3	/* Kerberos or Basic, depending on configuration of server */
 
 #define CUPSD_AUTH_ANON		0	/* Anonymous access */
 #define CUPSD_AUTH_USER		1	/* Must have a valid username/password */
