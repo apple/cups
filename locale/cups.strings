@@ -192,6 +192,7 @@
 "  --help                  Show this help." = "  --help                  Show this help.";
 "  --host regex            Match hostname to regular expression." = "  --host regex            Match hostname to regular expression.";
 "  --lf                    End lines with LF (UNIX/Linux/OS X)." = "  --lf                    End lines with LF (UNIX/Linux/OS X).";
+"  --list-filters          List filters that will be used." = "  --list-filters          List filters that will be used.";
 "  --local                 True if service is local." = "  --local                 True if service is local.";
 "  --ls                    List attributes." = "  --ls                    List attributes.";
 "  --name regex            Match service name to regular expression." = "  --name regex            Match service name to regular expression.";
@@ -233,6 +234,7 @@
 "  -a                      Browse for all services." = "  -a                      Browse for all services.";
 "  -a                      Export all printers." = "  -a                      Export all printers.";
 "  -c catalog.po           Load the specified message catalog." = "  -c catalog.po           Load the specified message catalog.";
+"  -c cups-files.conf      Set cups-files.conf file to use." = "  -c cups-files.conf      Set cups-files.conf file to use.";
 "  -c cupsd.conf           Set cupsd.conf file to use." = "  -c cupsd.conf           Set cupsd.conf file to use.";
 "  -d domain               Browse/resolve in specified domain." = "  -d domain               Browse/resolve in specified domain.";
 "  -d name=value           Set named variable to value." = "  -d name=value           Set named variable to value.";
@@ -249,7 +251,7 @@
 "  -i seconds              Repeat the last file with the given time interval." = "  -i seconds              Repeat the last file with the given time interval.";
 "  -j job-id[,N]           Filter file N from the specified job (default is file 1)." = "  -j job-id[,N]           Filter file N from the specified job (default is file 1).";
 "  -l                      List attributes." = "  -l                      List attributes.";
-"  -l                      Run cupsd from launchd(8)." = "  -l                      Run cupsd from launchd(8).";
+"  -l                      Run cupsd on demand." = "  -l                      Run cupsd on demand.";
 "  -l lang[,lang,...]      Specify the output language(s) (locale)." = "  -l lang[,lang,...]      Specify the output language(s) (locale).";
 "  -m                      Use the ModelName value as the filename." = "  -m                      Use the ModelName value as the filename.";
 "  -m mime/type            Set output MIME type (otherwise application/pdf)." = "  -m mime/type            Set output MIME type (otherwise application/pdf).";
@@ -1358,7 +1360,7 @@
 "Usage: cupsaddsmb [options] printer1 ... printerN" = "Usage: cupsaddsmb [options] printer1 ... printerN";
 "Usage: cupsctl [options] [param=value ... paramN=valueN]" = "Usage: cupsctl [options] [param=value ... paramN=valueN]";
 "Usage: cupsd [options]" = "Usage: cupsd [options]";
-"Usage: cupsfilter [ options ] filename" = "Usage: cupsfilter [ options ] filename";
+"Usage: cupsfilter [ options ] [ -- ] filename" = "Usage: cupsfilter [ options ] [ -- ] filename";
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]" = "Usage: cupstestdsc [options] filename.ps [... filename.ps]";
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]" = "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]";
 "Usage: ippdiscover [options] -a\n       ippdiscover [options] \"service name\"\n\nOptions:" = "Usage: ippdiscover [options] -a\n       ippdiscover [options] \"service name\"\n\nOptions:";
@@ -1400,12 +1402,12 @@
 "cupsctl: Unknown option \"-%c\"" = "cupsctl: Unknown option \"-%c\"";
 "cupsd: Expected config filename after \"-c\" option." = "cupsd: Expected config filename after \"-c\" option.";
 "cupsd: Expected cups-files.conf filename after \"-s\" option." = "cupsd: Expected cups-files.conf filename after \"-s\" option.";
+"cupsd: On-demand support not compiled in, running in normal mode." = "cupsd: On-demand support not compiled in, running in normal mode.";
 "cupsd: Relative cups-files.conf filename not allowed." = "cupsd: Relative cups-files.conf filename not allowed.";
 "cupsd: Unable to get current directory." = "cupsd: Unable to get current directory.";
 "cupsd: Unable to get path to cups-files.conf file." = "cupsd: Unable to get path to cups-files.conf file.";
 "cupsd: Unknown argument \"%s\" - aborting." = "cupsd: Unknown argument \"%s\" - aborting.";
 "cupsd: Unknown option \"%c\" - aborting." = "cupsd: Unknown option \"%c\" - aborting.";
-"cupsd: launchd(8) support not compiled in, running in normal mode." = "cupsd: launchd(8) support not compiled in, running in normal mode.";
 "cupsfilter: Invalid document number %d." = "cupsfilter: Invalid document number %d.";
 "cupsfilter: Invalid job ID %d." = "cupsfilter: Invalid job ID %d.";
 "cupsfilter: Only one filename can be specified." = "cupsfilter: Only one filename can be specified.";

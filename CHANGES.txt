@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-03-27
+CHANGES.txt - 2.0b1 - 2014-03-28
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -11,6 +11,7 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Adopted Linux man page conventions and updated all man pages
 	  (STR #4372)
+	- Added a "--list-filters" option to the cupsfilter command (STR #4325)
         - Added systemd support (STR #3917)
 	- Added support for re-sending a job as a raster file if a higher-level
 	  format such as PDF fails (<rdar://problem/15583721>)

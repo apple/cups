@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-17 07:47-0400\n"
+"POT-Creation-Date: 2014-03-28 10:47-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -982,6 +982,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Final de línia amb LF (UNIX/Linux/OS X)."
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr ""
 
@@ -1118,6 +1121,9 @@ msgstr "  -a                      Exporta totes les impressores."
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catàleg.po           Carrega el catàleg de missatges indicat."
 
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 "  -c cupsd.conf           Estableix el fitxer cupsd.conf que cal fer servir."
@@ -1177,8 +1183,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr ""
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      Executa cupsd des de launchd(8)."
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
@@ -4923,8 +4929,8 @@ msgstr "Sintaxi: cupsctl [opcions] [param=valor ... paramN=valorN]"
 msgid "Usage: cupsd [options]"
 msgstr "Sintaxi: cupsd [opcions]"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Sintaxi: cupstestdsc [opcions] nomfitxer.ps [...nomfitxer.ps]"
@@ -5092,6 +5098,9 @@ msgstr ""
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr ""
 
@@ -5108,11 +5117,6 @@ msgstr "cupsd: l'argument «%s» és desconegut - s'interromp."
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: l'opció «%c» és desconeguda - s'interromp."
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: no s'ha compilat amb compatibilitat per launchd(8). S'executa en mode "
-"normal."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -6070,6 +6074,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ "  -j tipus/mime            Estableix el tipus MIME de sortida "
 #~ "(application/pdf si no s'especifica)."
 
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Executa cupsd des de launchd(8)."
+
 #~ msgid ""
 #~ "  -o filename             Set file to be generated (otherwise stdout)."
 #~ msgstr ""
@@ -6255,10 +6262,18 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Usage: convert [ options ]"
 #~ msgstr "Sintaxi: convert [ opcions ]"
 
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
+
 #~ msgid "convert: Use the -f option to specify a file to convert."
 #~ msgstr ""
 #~ "convert: feu servir l'opció -f per especificar el fitxer que voleu "
 #~ "convertir."
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: no s'ha compilat amb compatibilitat per launchd(8). S'executa en "
+#~ "mode normal."
 
 #~ msgid "ipptool: \"-i\" is incompatible with \"-X\"."
 #~ msgstr "ipptool: «-i» no és compatible amb «-X»."

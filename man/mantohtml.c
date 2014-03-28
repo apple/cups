@@ -764,7 +764,7 @@ html_alternate(const char *s,		/* I - String */
     while (isspace(*s & 255))
       s ++;
 
-    if (*s && *s != '(')
+    if (*s && *s != '(' && *s != '.' && *s != ',')
       putc(' ', fp);
   }
 

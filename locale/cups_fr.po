@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-17 07:47-0400\n"
+"POT-Creation-Date: 2014-03-28 10:47-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -835,6 +835,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr ""
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr ""
 
@@ -961,6 +964,9 @@ msgstr ""
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
 
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr ""
 
@@ -1012,7 +1018,7 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr ""
 
-msgid "  -l                      Run cupsd from launchd(8)."
+msgid "  -l                      Run cupsd on demand."
 msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
@@ -4663,7 +4669,7 @@ msgstr ""
 msgid "Usage: cupsd [options]"
 msgstr ""
 
-msgid "Usage: cupsfilter [ options ] filename"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
 msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
@@ -4818,6 +4824,9 @@ msgstr ""
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr ""
 
@@ -4833,9 +4842,6 @@ msgstr ""
 
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
-msgstr ""
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
 msgstr ""
 
 #, c-format

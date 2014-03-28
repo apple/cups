@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-17 07:47-0400\n"
+"POT-Creation-Date: 2014-03-28 10:47-0400\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -981,6 +981,9 @@ msgstr "  --host <正規表現>       ホスト名が正規表現にマッチす
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    行末を LF とする (UNIX/Linux/OS X)。"
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr "  --local                 サービスがローカルなら真。"
 
@@ -1119,6 +1122,9 @@ msgstr "  -a                      すべてのプリンターをエクスポー�
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           指定したメッセージカタログをロードする。"
 
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           使用する cupsd.conf ファイルを指定する。"
 
@@ -1177,8 +1183,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr "  -l                      属性の一覧を表示する。"
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      launchd(8) から cupsd を実行する。"
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr "  -l lang[,lang,...]      出力言語を指定する。(複数可能)"
@@ -4931,8 +4937,8 @@ msgstr "Usage: cupsctl [オプション] [パラメータ=値 ... パラメー�
 msgid "Usage: cupsd [options]"
 msgstr "使い方: cupsd [オプション]"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "使い方: cupsfilter [オプション] ファイル名"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "使い方: cupstestdsc [オプション] filename.ps [... filename.ps]"
@@ -5109,6 +5115,9 @@ msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 "cupsd: cups-files.conf ファイル名は \"-s\" オプションの後ろにあるべきです。"
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr "cupsd: 相対パスでの cups-files.conf の指定はできません。"
 
@@ -5125,11 +5134,6 @@ msgstr "cupsd: \"%s\" は未知の引数です - 停止します。"
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: \"%c\" は未知のオプションです - 停止します。"
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: launchd(8) サポートがコンパイルされていないので、通常モードで動作しま"
-"す。"
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -6057,6 +6061,9 @@ msgstr "タイトルなし"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings の長さが不定"
 
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      launchd(8) から cupsd を実行する。"
+
 #~ msgid ""
 #~ "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 4.1.6 節)."
 #~ msgstr ""
@@ -6143,6 +6150,14 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "Unable to open compressed print file"
 #~ msgstr "圧縮プリントファイルを開けません"
+
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "使い方: cupsfilter [オプション] ファイル名"
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: launchd(8) サポートがコンパイルされていないので、通常モードで動作し"
+#~ "ます。"
 
 #~ msgid "ipptool: Bad version %s for \"-V\"."
 #~ msgstr "ipptool: \"-V\" オプションに不正なバージョン %s が指定されました。"

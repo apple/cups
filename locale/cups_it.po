@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-17 07:47-0400\n"
+"POT-Creation-Date: 2014-03-28 10:47-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -985,6 +985,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Termina le righe con LF (UNIX/Linux/OS X)."
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr "  --local                 Vero se il servizio è locale."
 
@@ -1135,6 +1138,9 @@ msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
 "  -c catalog.po           Carica il catalogo del messaggio specificato."
 
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           Imposta il file cupsd.conf da utilizzare."
 
@@ -1196,8 +1202,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr "  -l                      Elenca gli attributi."
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      Avvia cupsd da launchd(8)."
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr "  -l lang[,lang,...]      Specifica la lingua(e) (locale) di output."
@@ -4995,8 +5001,8 @@ msgstr "Uso: cupsctl [opzioni] [param=valore ... paramN=valoreN]"
 msgid "Usage: cupsd [options]"
 msgstr "Uso: cupsd [opzioni]"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "Uso: cupsfilter [ opzioni ] file"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Uso: cupstestdsc [opzioni] file.ps [... file.ps]"
@@ -5169,6 +5175,9 @@ msgstr "cupsd: dopo l'opzione \"-c\" è previsto il file di configurazione."
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr "cupsd: dopo l'opzione \"-s\" è previsto il file cups-files.conf."
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr "cupsd: non è consentito il file relativo cups-files.conf."
 
@@ -5185,10 +5194,6 @@ msgstr "cupsd: argomento sconosciuto \"%s\" - operazione interrotta."
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: opzione sconosciuta \"%c\" - operazione interrotta."
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: launchd(8) non supporta i compilati, quando è in modalità normale."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -6083,6 +6088,9 @@ msgstr "senza titolo"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings utilizza una lunghezza indefinita"
 
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Avvia cupsd da launchd(8)."
+
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
 
@@ -6138,3 +6146,10 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "There is a paper jam."
 #~ msgstr "Vi è un inceppamento della carta."
+
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Uso: cupsfilter [ opzioni ] file"
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: launchd(8) non supporta i compilati, quando è in modalità normale."

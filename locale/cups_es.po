@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-17 07:47-0400\n"
+"POT-Creation-Date: 2014-03-28 10:47-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -974,6 +974,9 @@ msgstr ""
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr "  --lf                    Finalizar líneas con LF (UNIX/Linux/OS X)."
 
+msgid "  --list-filters          List filters that will be used."
+msgstr ""
+
 msgid "  --local                 True if service is local."
 msgstr ""
 
@@ -1110,6 +1113,9 @@ msgstr "  -a                      Exporta todas las impresoras."
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catálogo.po           Carga el catálogo de mensajes especificado."
 
+msgid "  -c cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
+
 msgid "  -c cupsd.conf           Set cupsd.conf file to use."
 msgstr "  -c cupsd.conf           Establece el archivo cupsd.conf a usar."
 
@@ -1168,8 +1174,8 @@ msgstr ""
 msgid "  -l                      List attributes."
 msgstr ""
 
-msgid "  -l                      Run cupsd from launchd(8)."
-msgstr "  -l                      Ejecuta cupsd desde launchd(8)."
+msgid "  -l                      Run cupsd on demand."
+msgstr ""
 
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
@@ -4915,8 +4921,8 @@ msgstr "Uso: cupsctl [opciones] [param=valor ... paramN=valorN]"
 msgid "Usage: cupsd [options]"
 msgstr "Uso: cupsd [opciones)"
 
-msgid "Usage: cupsfilter [ options ] filename"
-msgstr "Uso: cupsfilter ( opciones ) archivo"
+msgid "Usage: cupsfilter [ options ] [ -- ] filename"
+msgstr ""
 
 msgid "Usage: cupstestdsc [options] filename.ps [... filename.ps]"
 msgstr "Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]"
@@ -5090,6 +5096,9 @@ msgstr ""
 msgid "cupsd: Expected cups-files.conf filename after \"-s\" option."
 msgstr ""
 
+msgid "cupsd: On-demand support not compiled in, running in normal mode."
+msgstr ""
+
 msgid "cupsd: Relative cups-files.conf filename not allowed."
 msgstr ""
 
@@ -5106,11 +5115,6 @@ msgstr "cupsd: Argumento \"%s\" desconocido - cancelando."
 #, c-format
 msgid "cupsd: Unknown option \"%c\" - aborting."
 msgstr "cupsd: Opción \"%c\" desconocida - cancelando."
-
-msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
-msgstr ""
-"cupsd: el uso de launchd(8) no ha sido compilado, ejecutándose en modo "
-"normal."
 
 #, c-format
 msgid "cupsfilter: Invalid document number %d."
@@ -6007,6 +6011,9 @@ msgstr "sin título"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
 
+#~ msgid "  -l                      Run cupsd from launchd(8)."
+#~ msgstr "  -l                      Ejecuta cupsd desde launchd(8)."
+
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 
@@ -6089,6 +6096,14 @@ msgstr "variable-bindings usa una longitud indefinida"
 
 #~ msgid "Unable to open compressed print file"
 #~ msgstr "No se ha podido abrir el archivo de impresión comprimido"
+
+#~ msgid "Usage: cupsfilter [ options ] filename"
+#~ msgstr "Uso: cupsfilter ( opciones ) archivo"
+
+#~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
+#~ msgstr ""
+#~ "cupsd: el uso de launchd(8) no ha sido compilado, ejecutándose en modo "
+#~ "normal."
 
 #~ msgid "ipptool: Bad version %s for \"-V\"."
 #~ msgstr "ipptool: Versión %s para \"-V\" incorrecta."
