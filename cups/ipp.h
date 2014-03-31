@@ -804,6 +804,9 @@ struct _ipp_s				/**** IPP Request/Response/Notification ****/
 
 /**** New in CUPS 1.4.4 ****/
   int			use;		/* Use count @since CUPS 1.4.4/OS X 10.6.?@ */
+/**** New in CUPS 2.0 ****/
+  int			atend,		/* At end of list? */
+			curindex;	/* Current attribute index for hierarchical search */
 };
 #  endif /* _IPP_PRIVATE_STRUCTURES */
 

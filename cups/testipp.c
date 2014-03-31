@@ -542,6 +542,53 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
     }
 
+   /*
+    * Test hierarchical find...
+    */
+
+    fputs("ippFindAttribute(media-col/media-size/x-dimension): ", stdout);
+    if ((attr = ippFindAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      if (ippGetInteger(attr, 0) != 21590)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n", ippGetInteger(attr, 0));
+        status = 1;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (not found)");
+      status = 1;
+    }
+
+    fputs("ippFindNextAttribute(media-col/media-size/x-dimension): ", stdout);
+    if ((attr = ippFindNextAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      if (ippGetInteger(attr, 0) != 21000)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n", ippGetInteger(attr, 0));
+        status = 1;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (not found)");
+      status = 1;
+    }
+
+    fputs("ippFindNextAttribute(media-col/media-size/x-dimension) again: ", stdout);
+    if ((attr = ippFindNextAttribute(request, "media-col/media-size/x-dimension", IPP_TAG_INTEGER)) != NULL)
+    {
+      printf("FAIL (got %d, expected nothing)\n", ippGetInteger(attr, 0));
+      status = 1;
+    }
+    else
+      puts("PASS");
+
     ippDelete(request);
 
    /*

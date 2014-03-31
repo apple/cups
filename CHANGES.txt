@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-03-28
+CHANGES.txt - 2.0b1 - 2014-03-31
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -31,3 +31,5 @@ CHANGES IN CUPS V2.0b1
 	  definition in printers.conf (STR #4153)
 	- The scheduler now allows run-as-root backends to have group read and
 	  execute permissions (STR #2935)
+	- The ippFindAttribute and ippFindNextAttribute functions now support
+	  hierarchical searches (STR #4395)

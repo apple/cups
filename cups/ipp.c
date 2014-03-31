@@ -1983,6 +1983,10 @@ ippDeleteValues(
 
 /*
  * 'ippFindAttribute()' - Find a named attribute in a request.
+ *
+ * Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+ * of attribute and member names separated by slashes, for example
+ * "media-col/media-size".
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
@@ -2001,6 +2005,7 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP message */
   */
 
   ipp->current = NULL;
+  ipp->atend   = 0;
 
  /*
   * Search for the attribute...
@@ -2012,6 +2017,10 @@ ippFindAttribute(ipp_t      *ipp,	/* I - IPP message */
 
 /*
  * 'ippFindNextAttribute()' - Find the next named attribute in a request.
+ *
+ * Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+ * of attribute and member names separated by slashes, for example
+ * "media-col/media-size".
  */
 
 ipp_attribute_t	*			/* O - Matching attribute */
@@ -2019,8 +2028,11 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
                      const char *name,	/* I - Name of attribute */
 		     ipp_tag_t  type)	/* I - Type of attribute */
 {
-  ipp_attribute_t	*attr;		/* Current atttribute */
+  ipp_attribute_t	*attr,		/* Current atttribute */
+			*childattr;	/* Child attribute */
   ipp_tag_t		value_tag;	/* Value tag */
+  char			parent[1024],	/* Parent attribute name */
+			*child;		/* Child attribute name */
 
 
   DEBUG_printf(("2ippFindNextAttribute(ipp=%p, name=\"%s\", type=%02x(%s))",
@@ -2029,7 +2041,60 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
   if (!ipp || !name)
     return (NULL);
 
-  if (ipp->current)
+  DEBUG_printf(("3ippFindNextAttribute: atend=%d", ipp->atend));
+
+  if (ipp->atend)
+    return (NULL);
+
+  if (strchr(name, '/'))
+  {
+   /*
+    * Search for child attribute...
+    */
+
+    strlcpy(parent, name, sizeof(parent));
+    if ((child = strchr(parent, '/')) == NULL)
+    {
+      DEBUG_puts("3ippFindNextAttribute: Attribute name too long.");
+      return (NULL);
+    }
+
+    *child++ = '\0';
+
+    if (ipp->current && ipp->current->name && ipp->current->value_tag == IPP_TAG_BEGIN_COLLECTION && !strcmp(parent, ipp->current->name))
+    {
+      while (ipp->curindex < ipp->current->num_values)
+      {
+        if ((childattr = ippFindNextAttribute(ipp->current->values[ipp->curindex].collection, child, type)) != NULL)
+          return (childattr);
+
+        ipp->curindex ++;
+        if (ipp->curindex < ipp->current->num_values && ipp->current->values[ipp->curindex].collection)
+          ipp->current->values[ipp->curindex].collection->current = NULL;
+      }
+
+      ipp->prev     = ipp->current;
+      ipp->current  = ipp->current->next;
+      ipp->curindex = 0;
+
+      if (!ipp->current)
+      {
+        ipp->atend = 1;
+        return (NULL);
+      }
+    }
+
+    if (!ipp->current)
+    {
+      ipp->prev     = NULL;
+      ipp->current  = ipp->attrs;
+      ipp->curindex = 0;
+    }
+
+    name = parent;
+    attr = ipp->current;
+  }
+  else if (ipp->current)
   {
     ipp->prev = ipp->current;
     attr      = ipp->current->next;
@@ -2048,18 +2113,33 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
     value_tag = (ipp_tag_t)(attr->value_tag & IPP_TAG_CUPS_MASK);
 
     if (attr->name != NULL && _cups_strcasecmp(attr->name, name) == 0 &&
-        (value_tag == type || type == IPP_TAG_ZERO ||
+        (value_tag == type || type == IPP_TAG_ZERO || name == parent ||
 	 (value_tag == IPP_TAG_TEXTLANG && type == IPP_TAG_TEXT) ||
 	 (value_tag == IPP_TAG_NAMELANG && type == IPP_TAG_NAME)))
     {
       ipp->current = attr;
 
-      return (attr);
+      if (name == parent && attr->value_tag == IPP_TAG_BEGIN_COLLECTION)
+      {
+        int i;				/* Looping var */
+
+        for (i = 0; i < attr->num_values; i ++)
+        {
+	  if ((childattr = ippFindAttribute(attr->values[i].collection, child, type)) != NULL)
+	  {
+	    attr->values[0].collection->curindex = i;
+	    return (childattr);
+	  }
+        }
+      }
+      else
+        return (attr);
     }
   }
 
   ipp->current = NULL;
   ipp->prev    = NULL;
+  ipp->atend   = 1;
 
   return (NULL);
 }
