@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-03-31
+CHANGES.txt - 2.0b1 - 2014-04-02
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -13,6 +13,8 @@ CHANGES IN CUPS V2.0b1
 	  scheduler (STR #4321)
 	- Adopted Linux man page conventions and updated all man pages
 	  (STR #4372)
+	- Changed the default AccessLogLevel and PageLogFormat to disable the
+	  access_log and page_log files by default (<rdar://problem/16495000>)
 	- Added a "--list-filters" option to the cupsfilter command (STR #4325)
         - Added systemd support (STR #3917)
 	- Added support for re-sending a job as a raster file if a higher-level

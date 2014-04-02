@@ -862,7 +862,9 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   * Filter requests as needed...
   */
 
-  if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
+  if (AccessLogLevel == CUPSD_ACCESSLOG_NONE)
+    return (1);
+  else if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
   {
    /*
     * Eliminate simple GET, POST, and PUT requests...

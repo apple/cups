@@ -52,6 +52,7 @@ automatically handles restarting the scheduler.</P>
 AccessLogLevel config
 AccessLogLevel actions
 AccessLogLevel all
+AccessLogLevel none
 </PRE>
 
 <H3>Description</H3>
@@ -70,6 +71,8 @@ to the access log file. The following levels are defined:</P>
 	for <CODE>config</CODE>.</LI>
 
 	<LI><CODE>all</CODE>; Log all requests.</LI>
+
+	<LI><CODE>none</CODE>; Log no requests.</LI>
 
 </UL>
 

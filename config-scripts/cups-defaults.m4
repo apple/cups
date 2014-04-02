@@ -78,11 +78,20 @@ AC_SUBST(CUPS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_LEVEL, "$CUPS_LOG_LEVEL")
 
 dnl Default AccessLogLevel
-AC_ARG_WITH(access_log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
+AC_ARG_WITH(access_log_level, [  --with-access-log-level set default AccessLogLevel value, default=none],
 	CUPS_ACCESS_LOG_LEVEL="$withval",
-	CUPS_ACCESS_LOG_LEVEL="actions")
+	CUPS_ACCESS_LOG_LEVEL="none")
 AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
+
+dnl Default PageLogFormat
+AC_ARG_WITH(page_logging, [  --enable-page-logging   enable page_log by default])
+if test "x$enable_page_logging" = xyes; then
+	CUPS_PAGE_LOG_FORMAT=""
+else
+	CUPS_PAGE_LOG_FORMAT="PageLogFormat"
+fi
+AC_SUBST(CUPS_PAGE_LOG_FORMAT)
 
 dnl Default Browsing
 AC_ARG_ENABLE(browsing, [  --disable-browsing      disable Browsing by default])

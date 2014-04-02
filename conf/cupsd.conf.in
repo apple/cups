@@ -6,6 +6,7 @@
 # Log general information in error_log - change "@CUPS_LOG_LEVEL@" to "debug"
 # for troubleshooting...
 LogLevel @CUPS_LOG_LEVEL@
+@CUPS_PAGE_LOG_FORMAT@
 
 # Only listen for connections from the local machine.
 Listen localhost:@DEFAULT_IPP_PORT@

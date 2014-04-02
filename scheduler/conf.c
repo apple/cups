@@ -3135,6 +3135,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
         AccessLogLevel = CUPSD_ACCESSLOG_ACTIONS;
       else if (!_cups_strcasecmp(value, "config"))
         AccessLogLevel = CUPSD_ACCESSLOG_CONFIG;
+      else if (!_cups_strcasecmp(value, "none"))
+        AccessLogLevel = CUPSD_ACCESSLOG_NONE;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d.",
 	                value, linenum);

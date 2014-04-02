@@ -39,6 +39,7 @@ typedef enum
 
 typedef enum
 {
+  CUPSD_ACCESSLOG_NONE,			/* Log no requests */
   CUPSD_ACCESSLOG_CONFIG,		/* Log config requests */
   CUPSD_ACCESSLOG_ACTIONS,		/* Log config, print, and job management requests */
   CUPSD_ACCESSLOG_ALL			/* Log everything */
