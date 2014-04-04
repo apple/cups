@@ -18,38 +18,32 @@ the # character.
 <h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
 The following directives are understood by the client. Consult the
 on-line help for detailed descriptions:
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption IfRequested
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption Never
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption Required
-<br>
-<br>
+<dl class="man">
+<dt>Encryption IfRequested
+<dd style="margin-left: 5.0em"><dt>Encryption Never
+<dd style="margin-left: 5.0em"><dt>Encryption Required
+<dd style="margin-left: 5.0em"><br>
 Specifies the level of encryption that is required for a particular
 location.
-<p style="margin-left: 5.0em; text-indent: -5.0em">GSSServiceName name
-<br>
-Specifies the Kerberos service name that is used for authentication, typically
+<dt>GSSServiceName name
+<dd style="margin-left: 5.0em">Specifies the Kerberos service name that is used for authentication, typically
 "host", "http", or "ipp". CUPS adds the remote hostname
 ("name@server.example.com") for you. The default name is
 "http".
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerName hostname-or-ip-address[:port]
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerName /domain/socket
-<br>
-<br>
+<dt>ServerName hostname-or-ip-address[:port]
+<dd style="margin-left: 5.0em"><dt>ServerName /domain/socket
+<dd style="margin-left: 5.0em"><br>
 Specifies the address and optionally the port to use when connecting to the
 server. <b>Note: Not supported on OS X 10.7 or later.</b>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerName hostname-or-ip-address[:port]/version=1.1
-<br>
-<br>
+<dt>ServerName hostname-or-ip-address[:port]/version=1.1
+<dd style="margin-left: 5.0em"><br>
 Specifies the address and optionally the port to use when connecting to a
 server running CUPS 1.3.12 and earlier. <b>Note: Not supported on OS X 10.7 or
 later.</b>
-<p style="margin-left: 5.0em; text-indent: -5.0em">User name
-<br>
-<br>
+<dt>User name
+<dd style="margin-left: 5.0em"><br>
 Specifies the default user name to use for requests.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>

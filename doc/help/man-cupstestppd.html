@@ -36,101 +36,85 @@ on the command-line. The second form tests the PPD file provided
 on the standard input.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <i>cupstestppd</i> supports the following options:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-I filename
-<br>
-<br>
+<dl class="man">
+<dt>-I filename
+<dd style="margin-left: 5.0em"><br>
 Ignores all PCFileName warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-I filters
-<br>
-<br>
+<dt>-I filters
+<dd style="margin-left: 5.0em"><br>
 Ignores all filter errors.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-I profiles
-<br>
-<br>
+<dt>-I profiles
+<dd style="margin-left: 5.0em"><br>
 Ignores all profile errors.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-R rootdir
-<br>
-<br>
+<dt>-R rootdir
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate root directory for the filter, pre-filter,
 and other support file checks.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W constraints
-<br>
-<br>
+<dt>-W constraints
+<dd style="margin-left: 5.0em"><br>
 Report all UIConstraint errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W defaults
-<br>
-<br>
+<dt>-W defaults
+<dd style="margin-left: 5.0em"><br>
 Except for size-related options, report all default option errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W filters
-<br>
-<br>
+<dt>-W filters
+<dd style="margin-left: 5.0em"><br>
 Report all filter errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W profiles
-<br>
-<br>
+<dt>-W profiles
+<dd style="margin-left: 5.0em"><br>
 Report all profile errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W sizes
-<br>
-<br>
+<dt>-W sizes
+<dd style="margin-left: 5.0em"><br>
 Report all media size errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W translations
-<br>
-<br>
+<dt>-W translations
+<dd style="margin-left: 5.0em"><br>
 Report all translation errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W all
-<br>
-<br>
+<dt>-W all
+<dd style="margin-left: 5.0em"><br>
 Report all of the previous errors as warnings.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-W none
-<br>
-<br>
+<dt>-W none
+<dd style="margin-left: 5.0em"><br>
 Report all of the previous errors as errors.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-q
-<br>
-<br>
+<dt>-q
+<dd style="margin-left: 5.0em"><br>
 Specifies that no information should be displayed.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-r
-<br>
-<br>
+<dt>-r
+<dd style="margin-left: 5.0em"><br>
 Relaxes the PPD conformance requirements so that common
 whitespace, control character, and formatting problems are not
 treated as hard errors.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-v
-<br>
-<br>
+<dt>-v
+<dd style="margin-left: 5.0em"><br>
 Specifies that detailed conformance testing results should be
 displayed rather than the concise PASS/FAIL/ERROR status.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-vv
-<br>
-<br>
+<dt>-vv
+<dd style="margin-left: 5.0em"><br>
 Specifies that all information in the PPD file should be
 displayed in addition to the detailed conformance testing
 results.
+</dl>
 <p>The <i>-q</i>, <i>-v</i>, and <i>-vv</i> options are mutually exclusive.
 <h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
 <i>cupstestppd</i> returns zero on success and non-zero on error. The
 error codes are as follows:
-<p style="margin-left: 5.0em; text-indent: -5.0em">1
-<br>
-<br>
+<dl class="man">
+<dt>1
+<dd style="margin-left: 5.0em"><br>
 Bad command-line arguments or missing PPD filename.
-<p style="margin-left: 5.0em; text-indent: -5.0em">2
-<br>
-<br>
+<dt>2
+<dd style="margin-left: 5.0em"><br>
 Unable to open or read PPD file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">3
-<br>
-<br>
+<dt>3
+<dd style="margin-left: 5.0em"><br>
 The PPD file contains format errors that cannot be skipped.
-<p style="margin-left: 5.0em; text-indent: -5.0em">4
-<br>
-<br>
+<dt>4
+<dd style="margin-left: 5.0em"><br>
 The PPD file does not conform to the Adobe PPD specification.
+</dl>
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>
 The following command will test all PPD files under the current
 directory and print the names of each file that does not
 conform:
-<pre>
+<pre class="man">
 
     find . -name \*.ppd \! -exec cupstestppd -q '{}' \; -print
 
@@ -138,7 +122,7 @@ conform:
 The next command tests all PPD files under the current directory
 and print detailed conformance testing results for the files
 that do not conform:
-<pre>
+<pre class="man">
 
     find . -name \*.ppd \! -exec cupstestppd -q '{}' \; \
         -exec cupstestppd -v '{}' \;

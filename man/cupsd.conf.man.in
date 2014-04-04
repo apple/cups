@@ -20,7 +20,9 @@ The
 .I cupsd.conf
 file configures the CUPS scheduler,
 .BR cupsd (8).
-It is normally located in the \fI/etc/cups\fR directory. \fBNote:\fR File, directory, and user configuration directives that used to be allowed in the \fIcupsd.conf\fR file are now stored in the \fIcups-files.conf(5)\fR instead in order to prevent certain types of privilege escalation attacks.
+It is normally located in the
+.I /etc/cups
+directory. \fBNote:\fR File, directory, and user configuration directives that used to be allowed in the \fIcupsd.conf\fR file are now stored in the \fIcups-files.conf(5)\fR instead in order to prevent certain types of privilege escalation attacks.
 .LP
 Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character. The configuration directives are intentionally similar to those used by the popular Apache web server software and are described below.
 .SH TOP-LEVEL DIRECTIVES

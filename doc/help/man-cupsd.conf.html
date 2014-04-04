@@ -14,424 +14,284 @@ The
 <i>cupsd.conf</i>
 file configures the CUPS scheduler,
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
-It is normally located in the <i>/etc/cups</i> directory. <b>Note:</b> File, directory, and user configuration directives that used to be allowed in the <i>cupsd.conf</i> file are now stored in the <i>cups-files.conf(5)</i> instead in order to prevent certain types of privilege escalation attacks.
+It is normally located in the
+<i>/etc/cups</i>
+directory. <b>Note:</b> File, directory, and user configuration directives that used to be allowed in the <i>cupsd.conf</i> file are now stored in the <i>cups-files.conf(5)</i> instead in order to prevent certain types of privilege escalation attacks.
 <p>Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character. The configuration directives are intentionally similar to those used by the popular Apache web server software and are described below.
 <h2 class="title"><a name="TOP_LEVEL_DIRECTIVES">Top-level Directives</a></h2>
 The following directives are understood by
 <b>cupsd</b><b>(8).</b>
 Consult the online help (<a href="http://localhost:631/help">http://localhost:631/help</a>) for detailed descriptions:
-<p style="margin-left: 5.0em; text-indent: -5.0em">AccessLogLevel config
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">AccessLogLevel actions
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">AccessLogLevel all
-<br>
-Specifies the logging level for the AccessLog file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">AutoPurgeJobs Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">AutoPurgeJobs No
-<br>
-<br>
+<dl class="man">
+<dt>AccessLogLevel config
+<dd style="margin-left: 5.0em"><dt>AccessLogLevel actions
+<dd style="margin-left: 5.0em"><dt>AccessLogLevel all
+<dd style="margin-left: 5.0em">Specifies the logging level for the AccessLog file.
+<dt>AutoPurgeJobs Yes
+<dd style="margin-left: 5.0em"><dt>AutoPurgeJobs No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether to purge job history data automatically when
 it is no longer required for quotas.
-<p style="margin-left: 5.0em; text-indent: -5.0em">BrowseLocalProtocols [
-<br>
-<i>All</i>
+<dt>BrowseLocalProtocols [
+<dd style="margin-left: 5.0em"><i>All</i>
 ] [
 <i>DNSSD</i>
 ]
 Specifies the protocols to use for local printer sharing.
-<p style="margin-left: 5.0em; text-indent: -5.0em">BrowseWebIF Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">BrowseWebIF No
-<br>
-<br>
+<dt>BrowseWebIF Yes
+<dd style="margin-left: 5.0em"><dt>BrowseWebIF No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether the CUPS web interface is advertised via DNS-SD.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Browsing Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Browsing No
-<br>
-<br>
+<dt>Browsing Yes
+<dd style="margin-left: 5.0em"><dt>Browsing No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether or not shared printers should be advertised.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Classification banner
-<br>
-<br>
+<dt>Classification banner
+<dd style="margin-left: 5.0em"><br>
 Specifies the security classification of the server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ClassifyOverride Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ClassifyOverride No
-<br>
-<br>
+<dt>ClassifyOverride Yes
+<dd style="margin-left: 5.0em"><dt>ClassifyOverride No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether to allow users to override the classification
 of individual print jobs.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultAuthType Basic
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultAuthType Negotiate
-<br>
-<br>
+<dt>DefaultAuthType Basic
+<dd style="margin-left: 5.0em"><dt>DefaultAuthType Negotiate
+<dd style="margin-left: 5.0em"><br>
 Specifies the default type of authentication to use.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultEncryption Never
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultEncryption IfRequested
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultEncryption Required
-<br>
-Specifies the type of encryption to use for authenticated requests.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultLanguage locale
-<br>
-Specifies the default language to use for text and web content.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultPaperSize Auto
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultPaperSize None
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultPaperSize sizename
-<br>
-Specifies the default paper size for new print queues. "Auto" uses a locale-
+<dt>DefaultEncryption Never
+<dd style="margin-left: 5.0em"><dt>DefaultEncryption IfRequested
+<dd style="margin-left: 5.0em"><dt>DefaultEncryption Required
+<dd style="margin-left: 5.0em">Specifies the type of encryption to use for authenticated requests.
+<dt>DefaultLanguage locale
+<dd style="margin-left: 5.0em">Specifies the default language to use for text and web content.
+<dt>DefaultPaperSize Auto
+<dd style="margin-left: 5.0em"><dt>DefaultPaperSize None
+<dd style="margin-left: 5.0em"><dt>DefaultPaperSize sizename
+<dd style="margin-left: 5.0em">Specifies the default paper size for new print queues. "Auto" uses a locale-
 specific default, while "None" specifies there is no default paper size.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultPolicy policy-name
-<br>
-Specifies the default access policy to use.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultShared Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">DefaultShared No
-<br>
-Specifies whether local printers are shared by default.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DirtyCleanInterval seconds
-<br>
-Specifies the delay for updating of configuration and state files. A value of 0
+<dt>DefaultPolicy policy-name
+<dd style="margin-left: 5.0em">Specifies the default access policy to use.
+<dt>DefaultShared Yes
+<dd style="margin-left: 5.0em"><dt>DefaultShared No
+<dd style="margin-left: 5.0em">Specifies whether local printers are shared by default.
+<dt>DirtyCleanInterval seconds
+<dd style="margin-left: 5.0em">Specifies the delay for updating of configuration and state files. A value of 0
 causes the update to happen as soon as possible, typically within a few
 milliseconds.
-<p style="margin-left: 5.0em; text-indent: -5.0em">FilterLimit limit
-<br>
-Specifies the maximum cost of filters that are run concurrently.
-<p style="margin-left: 5.0em; text-indent: -5.0em">FilterNice nice-value
-<br>
-Specifies the scheduling priority ("nice" value) of filters that
+<dt>FilterLimit limit
+<dd style="margin-left: 5.0em">Specifies the maximum cost of filters that are run concurrently.
+<dt>FilterNice nice-value
+<dd style="margin-left: 5.0em">Specifies the scheduling priority ("nice" value) of filters that
 are run to print a job.
-<p style="margin-left: 5.0em; text-indent: -5.0em">GSSServiceName name
-<br>
-Specifies the service name when using Kerberos authentication. The default
+<dt>GSSServiceName name
+<dd style="margin-left: 5.0em">Specifies the service name when using Kerberos authentication. The default
 service name is "http".
-<p style="margin-left: 5.0em; text-indent: -5.0em">HostNameLookups On
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">HostNameLookups Off
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">HostNameLookups Double
-<br>
-Specifies whether or not to do reverse lookups on client addresses.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Include filename
-<br>
-Includes the named file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobKillDelay seconds
-<br>
-Specifies the number of seconds to wait before killing the filters and backend
+<dt>HostNameLookups On
+<dd style="margin-left: 5.0em"><dt>HostNameLookups Off
+<dd style="margin-left: 5.0em"><dt>HostNameLookups Double
+<dd style="margin-left: 5.0em">Specifies whether or not to do reverse lookups on client addresses.
+<dt>Include filename
+<dd style="margin-left: 5.0em">Includes the named file.
+<dt>JobKillDelay seconds
+<dd style="margin-left: 5.0em">Specifies the number of seconds to wait before killing the filters and backend
 associated with a canceled or held job.
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobRetryInterval seconds
-<br>
-Specifies the interval between retries of jobs in seconds.
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobRetryLimit count
-<br>
-Specifies the number of retries that are done for jobs.
-<p style="margin-left: 5.0em; text-indent: -5.0em">KeepAlive Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">KeepAlive No
-<br>
-Specifies whether to support HTTP keep-alive connections.
-<p style="margin-left: 5.0em; text-indent: -5.0em">KeepAliveTimeout seconds
-<br>
-Specifies the amount of time that connections are kept alive.
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;Limit operations> ... &lt;/Limit>
-<br>
-Specifies the IPP operations that are being limited inside a policy.
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;Limit methods> ... &lt;/Limit>
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;LimitExcept methods> ... &lt;/LimitExcept>
-<br>
-Specifies the HTTP methods that are being limited inside a location.
-<p style="margin-left: 5.0em; text-indent: -5.0em">LimitRequestBody
-<br>
-Specifies the maximum size of any print job request.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Listen ip-address:port
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Listen *:port
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Listen /path/to/domain/socket
-<br>
-Listens to the specified address and port or domain socket path.
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;Location /path> ... &lt;/Location>
-<br>
-Specifies access control for the named location.
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogDebugHistory #-messages
-<br>
-Specifies the number of debugging messages that are logged when an error
+<dt>JobRetryInterval seconds
+<dd style="margin-left: 5.0em">Specifies the interval between retries of jobs in seconds.
+<dt>JobRetryLimit count
+<dd style="margin-left: 5.0em">Specifies the number of retries that are done for jobs.
+<dt>KeepAlive Yes
+<dd style="margin-left: 5.0em"><dt>KeepAlive No
+<dd style="margin-left: 5.0em">Specifies whether to support HTTP keep-alive connections.
+<dt>KeepAliveTimeout seconds
+<dd style="margin-left: 5.0em">Specifies the amount of time that connections are kept alive.
+<dt>&lt;Limit operations> ... &lt;/Limit>
+<dd style="margin-left: 5.0em">Specifies the IPP operations that are being limited inside a policy.
+<dt>&lt;Limit methods> ... &lt;/Limit>
+<dd style="margin-left: 5.0em"><dt>&lt;LimitExcept methods> ... &lt;/LimitExcept>
+<dd style="margin-left: 5.0em">Specifies the HTTP methods that are being limited inside a location.
+<dt>LimitRequestBody
+<dd style="margin-left: 5.0em">Specifies the maximum size of any print job request.
+<dt>Listen ip-address:port
+<dd style="margin-left: 5.0em"><dt>Listen *:port
+<dd style="margin-left: 5.0em"><dt>Listen /path/to/domain/socket
+<dd style="margin-left: 5.0em">Listens to the specified address and port or domain socket path.
+<dt>&lt;Location /path> ... &lt;/Location>
+<dd style="margin-left: 5.0em">Specifies access control for the named location.
+<dt>LogDebugHistory #-messages
+<dd style="margin-left: 5.0em">Specifies the number of debugging messages that are logged when an error
 occurs in a print job.
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel alert
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel crit
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel debug2
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel debug
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel emerg
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel error
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel info
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel none
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel notice
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogLevel warn
-<br>
-Specifies the logging level for the ErrorLog file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogTimeFormat standard
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">LogTimeFormat usecs
-<br>
-Specifies the format of the date and time in the log files.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxClients number
-<br>
-Specifies the maximum number of simultaneous clients to support.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxClientsPerHost number
-<br>
-Specifies the maximum number of simultaneous clients to support from a
+<dt>LogLevel alert
+<dd style="margin-left: 5.0em"><dt>LogLevel crit
+<dd style="margin-left: 5.0em"><dt>LogLevel debug2
+<dd style="margin-left: 5.0em"><dt>LogLevel debug
+<dd style="margin-left: 5.0em"><dt>LogLevel emerg
+<dd style="margin-left: 5.0em"><dt>LogLevel error
+<dd style="margin-left: 5.0em"><dt>LogLevel info
+<dd style="margin-left: 5.0em"><dt>LogLevel none
+<dd style="margin-left: 5.0em"><dt>LogLevel notice
+<dd style="margin-left: 5.0em"><dt>LogLevel warn
+<dd style="margin-left: 5.0em">Specifies the logging level for the ErrorLog file.
+<dt>LogTimeFormat standard
+<dd style="margin-left: 5.0em"><dt>LogTimeFormat usecs
+<dd style="margin-left: 5.0em">Specifies the format of the date and time in the log files.
+<dt>MaxClients number
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous clients to support.
+<dt>MaxClientsPerHost number
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous clients to support from a
 single address.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxCopies number
-<br>
-Specifies the maximum number of copies that a user can print of each job.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxHoldTime seconds
-<br>
-Specifies the maximum time a job may remain in the "indefinite" hold state
+<dt>MaxCopies number
+<dd style="margin-left: 5.0em">Specifies the maximum number of copies that a user can print of each job.
+<dt>MaxHoldTime seconds
+<dd style="margin-left: 5.0em">Specifies the maximum time a job may remain in the "indefinite" hold state
 before it is canceled. Set to 0 to disable cancellation of held jobs.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxJobs number
-<br>
-Specifies the maximum number of simultaneous jobs to support.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxJobsPerPrinter number
-<br>
-Specifies the maximum number of simultaneous jobs per printer to support.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxJobsPerUser number
-<br>
-Specifies the maximum number of simultaneous jobs per user to support.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxJobTime seconds
-<br>
-Specifies the maximum time a job may take to print before it is canceled. The
+<dt>MaxJobs number
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs to support.
+<dt>MaxJobsPerPrinter number
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs per printer to support.
+<dt>MaxJobsPerUser number
+<dd style="margin-left: 5.0em">Specifies the maximum number of simultaneous jobs per user to support.
+<dt>MaxJobTime seconds
+<dd style="margin-left: 5.0em">Specifies the maximum time a job may take to print before it is canceled. The
 default is 10800 seconds (3 hours). Set to 0 to disable cancellation of "stuck"
 jobs.
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxLogSize number-bytes
-<br>
-Specifies the maximum size of the log files before they are
+<dt>MaxLogSize number-bytes
+<dd style="margin-left: 5.0em">Specifies the maximum size of the log files before they are
 rotated (0 to disable rotation)
-<p style="margin-left: 5.0em; text-indent: -5.0em">MaxRequestSize number-bytes
-<br>
-Specifies the maximum request/file size in bytes (0 for no limit)
-<p style="margin-left: 5.0em; text-indent: -5.0em">MultipleOperationTimeout seconds
-<br>
-Specifies the maximum amount of time to allow between files in a multiple file
+<dt>MaxRequestSize number-bytes
+<dd style="margin-left: 5.0em">Specifies the maximum request/file size in bytes (0 for no limit)
+<dt>MultipleOperationTimeout seconds
+<dd style="margin-left: 5.0em">Specifies the maximum amount of time to allow between files in a multiple file
 print job.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PageLogFormat format string
-<br>
-Specifies the format of page log lines.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PassEnv variable [... variable]
-<br>
-Passes the specified environment variable(s) to child processes.
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;Policy name> ... &lt;/Policy>
-<br>
-Specifies access control for the named policy.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Port number
-<br>
-Specifies a port number to listen to for HTTP requests.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PreserveJobFiles Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">PreserveJobFiles No
-<br>
-Specifies whether or not to preserve job files after they are printed.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PreserveJobHistory Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">PreserveJobHistory No
-<br>
-Specifies whether or not to preserve the job history after they are
+<dt>PageLogFormat format string
+<dd style="margin-left: 5.0em">Specifies the format of page log lines.
+<dt>PassEnv variable [... variable]
+<dd style="margin-left: 5.0em">Passes the specified environment variable(s) to child processes.
+<dt>&lt;Policy name> ... &lt;/Policy>
+<dd style="margin-left: 5.0em">Specifies access control for the named policy.
+<dt>Port number
+<dd style="margin-left: 5.0em">Specifies a port number to listen to for HTTP requests.
+<dt>PreserveJobFiles Yes
+<dd style="margin-left: 5.0em"><dt>PreserveJobFiles No
+<dd style="margin-left: 5.0em">Specifies whether or not to preserve job files after they are printed.
+<dt>PreserveJobHistory Yes
+<dd style="margin-left: 5.0em"><dt>PreserveJobHistory No
+<dd style="margin-left: 5.0em">Specifies whether or not to preserve the job history after they are
 printed.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PrintcapFormat bsd
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">PrintcapFormat plist
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">PrintcapFormat solaris
-<br>
-Specifies the format of the printcap file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ReloadTimeout seconds
-<br>
-Specifies the amount of time to wait for job completion before
+<dt>PrintcapFormat bsd
+<dd style="margin-left: 5.0em"><dt>PrintcapFormat plist
+<dd style="margin-left: 5.0em"><dt>PrintcapFormat solaris
+<dd style="margin-left: 5.0em">Specifies the format of the printcap file.
+<dt>ReloadTimeout seconds
+<dd style="margin-left: 5.0em">Specifies the amount of time to wait for job completion before
 restarting the scheduler.
-<p style="margin-left: 5.0em; text-indent: -5.0em">RIPCache bytes
-<br>
-Specifies the maximum amount of memory to use when converting images
+<dt>RIPCache bytes
+<dd style="margin-left: 5.0em">Specifies the maximum amount of memory to use when converting images
 and PostScript files to bitmaps for a printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Satisfy all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Satisfy any
-<br>
-Specifies whether all or any limits set for a Location must be
+<dt>Satisfy all
+<dd style="margin-left: 5.0em"><dt>Satisfy any
+<dd style="margin-left: 5.0em">Specifies whether all or any limits set for a Location must be
 satisfied to allow access.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerAdmin user@domain.com
-<br>
-Specifies the email address of the server administrator.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerAlias hostname [... hostname]
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerAlias *
-<br>
-Specifies an alternate name that the server is known by. The special name "*"
+<dt>ServerAdmin user@domain.com
+<dd style="margin-left: 5.0em">Specifies the email address of the server administrator.
+<dt>ServerAlias hostname [... hostname]
+<dd style="margin-left: 5.0em"><dt>ServerAlias *
+<dd style="margin-left: 5.0em">Specifies an alternate name that the server is known by. The special name "*"
 allows any name to be used.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerName hostname-or-ip-address
-<br>
-Specifies the fully-qualified hostname of the server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens Full
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens Major
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens Minimal
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens Minor
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens None
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens OS
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ServerTokens ProductOnly
-<br>
-Specifies what information is included in the Server header of HTTP
+<dt>ServerName hostname-or-ip-address
+<dd style="margin-left: 5.0em">Specifies the fully-qualified hostname of the server.
+<dt>ServerTokens Full
+<dd style="margin-left: 5.0em"><dt>ServerTokens Major
+<dd style="margin-left: 5.0em"><dt>ServerTokens Minimal
+<dd style="margin-left: 5.0em"><dt>ServerTokens Minor
+<dd style="margin-left: 5.0em"><dt>ServerTokens None
+<dd style="margin-left: 5.0em"><dt>ServerTokens OS
+<dd style="margin-left: 5.0em"><dt>ServerTokens ProductOnly
+<dd style="margin-left: 5.0em">Specifies what information is included in the Server header of HTTP
 responses.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SetEnv variable value
-<br>
-Set the specified environment variable to be passed to child processes.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SSLListen
-<br>
-Listens on the specified address and port for encrypted connections.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SSLPort
-<br>
-Listens on the specified port for encrypted connections.
-<p style="margin-left: 5.0em; text-indent: -5.0em">StrictConformance Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">StrictConformance No
-<br>
-Specifies whether the scheduler requires clients to strictly adhere to the IPP
+<dt>SetEnv variable value
+<dd style="margin-left: 5.0em">Set the specified environment variable to be passed to child processes.
+<dt>SSLListen
+<dd style="margin-left: 5.0em">Listens on the specified address and port for encrypted connections.
+<dt>SSLPort
+<dd style="margin-left: 5.0em">Listens on the specified port for encrypted connections.
+<dt>StrictConformance Yes
+<dd style="margin-left: 5.0em"><dt>StrictConformance No
+<dd style="margin-left: 5.0em">Specifies whether the scheduler requires clients to strictly adhere to the IPP
 specifications. The default is No.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Timeout seconds
-<br>
-Specifies the HTTP request timeout in seconds.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WebInterface yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WebInterface no
-<br>
-Specifies whether the web interface is enabled.
+<dt>Timeout seconds
+<dd style="margin-left: 5.0em">Specifies the HTTP request timeout in seconds.
+<dt>WebInterface yes
+<dd style="margin-left: 5.0em"><dt>WebInterface no
+<dd style="margin-left: 5.0em">Specifies whether the web interface is enabled.
+</dl>
 <h2 class="title"><a name="DIRECTIVES_VALID_WITHIN_LOCATION_AND_LIMIT_SECTIONS">Directives Valid Within Location And Limit Sections</a></h2>
 The following directives may be placed inside Location and Limit sections in the <i>cupsd.conf</i> file:
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow none
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow host.domain.com
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow *.domain.com
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow ip-address
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow ip-address/netmask
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow ip-address/mm
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow @IF(name)
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Allow @LOCAL
-<br>
-Allows access from the named hosts or addresses.
-<p style="margin-left: 5.0em; text-indent: -5.0em">AuthType None
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">AuthType Basic
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">AuthType Negotiate
-<br>
-Specifies the authentication type (None, Basic, or Negotiate)
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny none
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny host.domain.com
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny *.domain.com
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny ip-address
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny ip-address/netmask
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny ip-address/mm
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny @IF(name)
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Deny @LOCAL
-<br>
-Denies access to the named host or address.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption IfRequested
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption Never
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Encryption Required
-<br>
-Specifies the level of encryption that is required for a particular
+<dl class="man">
+<dt>Allow all
+<dd style="margin-left: 5.0em"><dt>Allow none
+<dd style="margin-left: 5.0em"><dt>Allow host.domain.com
+<dd style="margin-left: 5.0em"><dt>Allow *.domain.com
+<dd style="margin-left: 5.0em"><dt>Allow ip-address
+<dd style="margin-left: 5.0em"><dt>Allow ip-address/netmask
+<dd style="margin-left: 5.0em"><dt>Allow ip-address/mm
+<dd style="margin-left: 5.0em"><dt>Allow @IF(name)
+<dd style="margin-left: 5.0em"><dt>Allow @LOCAL
+<dd style="margin-left: 5.0em">Allows access from the named hosts or addresses.
+<dt>AuthType None
+<dd style="margin-left: 5.0em"><dt>AuthType Basic
+<dd style="margin-left: 5.0em"><dt>AuthType Negotiate
+<dd style="margin-left: 5.0em">Specifies the authentication type (None, Basic, or Negotiate)
+<dt>Deny all
+<dd style="margin-left: 5.0em"><dt>Deny none
+<dd style="margin-left: 5.0em"><dt>Deny host.domain.com
+<dd style="margin-left: 5.0em"><dt>Deny *.domain.com
+<dd style="margin-left: 5.0em"><dt>Deny ip-address
+<dd style="margin-left: 5.0em"><dt>Deny ip-address/netmask
+<dd style="margin-left: 5.0em"><dt>Deny ip-address/mm
+<dd style="margin-left: 5.0em"><dt>Deny @IF(name)
+<dd style="margin-left: 5.0em"><dt>Deny @LOCAL
+<dd style="margin-left: 5.0em">Denies access to the named host or address.
+<dt>Encryption IfRequested
+<dd style="margin-left: 5.0em"><dt>Encryption Never
+<dd style="margin-left: 5.0em"><dt>Encryption Required
+<dd style="margin-left: 5.0em">Specifies the level of encryption that is required for a particular
 location.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Order allow,deny
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Order deny,allow
-<br>
-Specifies the order of HTTP access control (allow,deny or deny,allow)
-<p style="margin-left: 5.0em; text-indent: -5.0em">Require group group-name-list
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Require user user-name-list
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Require valid-user
-<br>
-Specifies that user or group authentication is required.
+<dt>Order allow,deny
+<dd style="margin-left: 5.0em"><dt>Order deny,allow
+<dd style="margin-left: 5.0em">Specifies the order of HTTP access control (allow,deny or deny,allow)
+<dt>Require group group-name-list
+<dd style="margin-left: 5.0em"><dt>Require user user-name-list
+<dd style="margin-left: 5.0em"><dt>Require valid-user
+<dd style="margin-left: 5.0em">Specifies that user or group authentication is required.
+</dl>
 <h2 class="title"><a name="DIRECTIVES_VALID_WITHIN_POLICY_SECTIONS">Directives Valid Within Policy Sections</a></h2>
 The following directives may be placed inside Policy sections in the <i>cupsd.conf</i> file:
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateAccess all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateAccess default
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
-<br>
-Specifies an access list for a job's private values. The "default" access list is "@OWNER @SYSTEM". "@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateValues all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateValues default
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateValues none
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
-<br>
-Specifies the list of job values to make private. The "default" values are "job-name", "job-originating-host-name", and "job-originating-user-name".
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateAccess all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateAccess default
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
-<br>
-Specifies an access list for a subscription's private values. The "default"
+<dl class="man">
+<dt>JobPrivateAccess all
+<dd style="margin-left: 5.0em"><dt>JobPrivateAccess default
+<dd style="margin-left: 5.0em"><dt>JobPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+<dd style="margin-left: 5.0em">Specifies an access list for a job's private values. The "default" access list is "@OWNER @SYSTEM". "@ACL" maps to the printer's requesting-user-name-allowed or requesting-user-name-denied values.
+<dt>JobPrivateValues all
+<dd style="margin-left: 5.0em"><dt>JobPrivateValues default
+<dd style="margin-left: 5.0em"><dt>JobPrivateValues none
+<dd style="margin-left: 5.0em"><dt>JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
+<dd style="margin-left: 5.0em">Specifies the list of job values to make private. The "default" values are "job-name", "job-originating-host-name", and "job-originating-user-name".
+<dt>SubscriptionPrivateAccess all
+<dd style="margin-left: 5.0em"><dt>SubscriptionPrivateAccess default
+<dd style="margin-left: 5.0em"><dt>SubscriptionPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+<dd style="margin-left: 5.0em">Specifies an access list for a subscription's private values. The "default"
 access list is "@OWNER @SYSTEM". "@ACL" maps to the printer's
 requesting-user-name-allowed or requesting-user-name-denied values.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateValues all
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateValues default
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateValues none
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SubscriptionPrivateValues attribute-name-1 [ ... attribute-name-N ]
-<br>
-Specifies the list of job values to make private. The "default" values are
+<dt>SubscriptionPrivateValues all
+<dd style="margin-left: 5.0em"><dt>SubscriptionPrivateValues default
+<dd style="margin-left: 5.0em"><dt>SubscriptionPrivateValues none
+<dd style="margin-left: 5.0em"><dt>SubscriptionPrivateValues attribute-name-1 [ ... attribute-name-N ]
+<dd style="margin-left: 5.0em">Specifies the list of job values to make private. The "default" values are
 "notify-events", "notify-pull-method", "notify-recipient-uri",
 "notify-subscriber-user-name", and "notify-user-data".
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a> <a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a> <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a> <a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a> <a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a> <a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a> <a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a><a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a><a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a><a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a><a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a><a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a><a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
 <a href="http://localhost:631/help">http://localhost:631/help</a>
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright &copy; 2007-2014 by Apple Inc.

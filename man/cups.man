@@ -39,15 +39,11 @@ When the print job is completely printed,
 .B CUPS
 removes the job from the queue and moves on to any other jobs you have submitted. You can also be notified when the job is finished, or if there are any errors during printing, in several different ways.
 .SS WHERE DO I BEGIN?
-The easiest way to start is by using the
-.B CUPS
-web interface to configure your printer. Go to "http://localhost:631" and choose the Administration tab at the top of the page. Click/press on the Add Printer button and follow the prompts.
+The easiest way to start is by using the web interface to configure your printer. Go to "http://localhost:631" and choose the Administration tab at the top of the page. Click/press on the Add Printer button and follow the prompts.
 .LP
 When you are asked for a username and password, enter your login username and password or the "root" username and password.
 .LP
-After the printer is added,
-.B CUPS
-will ask you to set the default printer options (paper size, output mode, etc.) for the printer. Make any changes as needed and then click on the Set Default Options button to save them. Some printers also support auto-configuration - click on the Query Printer for Default Options button to update the options automatically.
+After the printer is added you will be asked to set the default printer options (paper size, output mode, etc.) for the printer. Make any changes as needed and then click/press on the Set Default Options button to save them. Some printers also support auto-configuration - click/press on the Query Printer for Default Options button to update the options automatically.
 .LP
 Once you have added the printer, you can print to it from any application. You can also choose Print Test Page from the maintenance menu to print a simple test page and verify that everything is working properly.
 .LP
@@ -62,75 +58,91 @@ Additionally, your operating system may include graphical user interfaces or aut
 The
 .B CUPS
 web site (http://www.CUPS.org) provides access to the
-.B CUPS
-user mailing list, additional documentation and resources, and a bug report database. Most vendors also provide online discussion forums to ask printing questions for your operating system of choice.
+.I cups
+and
+.I cups-devel
+mailing lists, additional documentation and resources, and a bug report database. Most vendors also provide online discussion forums to ask printing questions for your operating system of choice.
 .SH ENVIRONMENT
 .B CUPS
 commands use the following environment variables to override the default locations of files and so forth. For security reasons, these environment variables are ignored for setuid programs:
 .TP 5
-CUPS_SERVER
-The hostname/IP address and port number of the CUPS scheduler (hostname:port or ipaddress:port).
-.TP 5
-CUPS_ANYROOT
+.B CUPS_ANYROOT
 Whether to allow any X.509 certificate root (Y or N).
 .TP 5
-CUPS_CACHEDIR
+.B CUPS_CACHEDIR
 The directory where semi-persistent cache files can be found.
 .TP 5
-CUPS_DATADIR
+.B CUPS_DATADIR
 The directory where data files can be found.
 .TP 5
-CUPS_ENCRYPTION
+.B CUPS_ENCRYPTION
 The default level of encryption (Always, IfRequested, Never, Required).
 .TP 5
-CUPS_EXPIREDROOT
+.B CUPS_EXPIREDROOT
 Whether to allow expired X.509 certificate roots (Y or N).
 .TP 5
-CUPS_EXPIREDCERTS
+.B CUPS_EXPIREDCERTS
 Whether to allow expired X.509 certificates (Y or N).
 .TP 5
-CUPS_GSSSERVICENAME
+.B CUPS_GSSSERVICENAME
 The Kerberos service name used for authentication.
 .TP 5
-CUPS_SERVERBIN
+.B CUPS_SERVER
+The hostname/IP address and port number of the CUPS scheduler (hostname:port or ipaddress:port).
+.TP 5
+.B CUPS_SERVERBIN
 The directory where server helper programs, filters, backend, etc. can be found.
 .TP 5
-CUPS_SERVERROOT
+.B CUPS_SERVERROOT
 The root directory of the server.
 .TP 5
-CUPS_STATEDIR
+.B CUPS_STATEDIR
 The directory where state files can be found.
 .TP 5
-CUPS_USER
+.B CUPS_USER
 Specifies the name of the user for print requests.
 .TP 5
-HOME
+.B HOME
 Specifies the home directory of the current user.
 .TP 5
-IPP_PORT
+.B IPP_PORT
 Specifies the default port number for IPP requests.
 .TP 5
-LOCALEDIR
+.B LOCALEDIR
 Specifies the location of localization files.
 .TP 5
-LPDEST
+.B LPDEST
 Specifies the default print queue (System V standard).
 .TP 5
-PRINTER
+.B PRINTER
 Specifies the default print queue (Berkeley standard).
 .TP 5
-TMPDIR
+.B TMPDIR
 Specifies the location of temporary files.
 .SH FILES
-~/.cups/client.conf, ~/.cups/lpoptions
+.nf
+.I ~/.cups/client.conf
+.I ~/.cups/lpoptions
+.fi
 .SH CONFORMING TO
 .B CUPS
 conforms to the Internet Printing Protocol version 2.1 and implements the Berkeley and System V UNIX print commands.
 .SH SEE ALSO
-.BR cancel (1), client.conf (7), cupsctl (8), cupsd (8), lp (1), lpadmin (8), lpinfo (8), lpoptions (1), lpr (1), lprm (1), lpq (1), lpstat (1),
-http://localhost:631/help,
-http://www.CUPS.org,
-http://www.pwg.org/ipp
+.BR cancel (1),
+.BR client.conf (7),
+.BR cupsctl (8),
+.BR cupsd (8),
+.BR lp (1),
+.BR lpadmin (8),
+.BR lpinfo (8),
+.BR lpoptions (1),
+.BR lpr (1),
+.BR lprm (1),
+.BR lpq (1),
+.BR lpstat (1),
+CUPS Online Help (http://localhost:631/help),
+CUPS Web Site (http://www.CUPS.org),
+PWG Internet Printing Protocol Workgroup (http://www.pwg.org/ipp)
 .SH COPYRIGHT
 Copyright \[co] 2007-2014 by Apple Inc.
 .\"

@@ -38,32 +38,29 @@ driver files described below.
 
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <i>cupsaddsmb</i> supports the following options:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-H samba-server
-<br>
-<br>
+<dl class="man">
+<dt>-H samba-server
+<dd style="margin-left: 5.0em"><br>
 Specifies the SAMBA server which defaults to the CUPS server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-U samba-user[%samba-password]
-<br>
-<br>
+<dt>-U samba-user[%samba-password]
+<dd style="margin-left: 5.0em"><br>
 Specifies the SAMBA print admin username which defaults to your
 current username. If the username contains a percent (%)
 character, then the text following the percent is treated as the
 SAMBA password to use.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-a
-<br>
-<br>
+<dt>-a
+<dd style="margin-left: 5.0em"><br>
 Exports all known printers. Otherwise only the named printers are
 exported.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h cups-server[:port]
-<br>
-<br>
+<dt>-h cups-server[:port]
+<dd style="margin-left: 5.0em"><br>
 Specifies a different CUPS server to use.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-v
-<br>
-<br>
+<dt>-v
+<dd style="margin-left: 5.0em"><br>
 Specifies that verbose information should be shown. This is
 useful for debugging SAMBA configuration problems.
 
+</dl>
 <h2 class="title"><a name="SAMBA_CONFIGURATION">Samba Configuration</a></h2>
 <i>cupsaddsmb</i> uses the new RPC-based printing support in
 SAMBA 2.2.x to provide printer drivers and PPD files to Windows
@@ -71,7 +68,7 @@ client machines. In order to use this functionality, you must
 first configure the SAMBA <i>smb.conf(5)</i> file to support
 printing through CUPS and provide a printer driver download
 share, as follows:
-<pre>
+<pre class="man">
 
     [global]
 	load printers = yes
@@ -115,7 +112,7 @@ for Windows 2000 are identical.
 to the <i>/usr/share/cups/drivers</i> directory and the 64-bit
 drivers to the <i>/usr/share/cups/drivers/x64</i> directory exactly
 as named below:
-<pre>
+<pre class="man">
 
     [Windows 2000 and higher]
     ps5ui.dll
@@ -136,7 +133,7 @@ job-hold-until options.
 <p>Once you have installed the driver on a Windows system, copy the
 following files to the <i>/usr/share/cups/drivers</i> directory
 exactly as named below:
-<pre>
+<pre class="man">
 
     [Windows 95, 98, and Me]
     ADFONTS.MFM

@@ -15,32 +15,29 @@ email notification preferences for CUPS.
 <p>Each line in the file can be a configuration directive, a blank line,
 or a comment. Comment lines start with the # character.
 <h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Cc <i>cc-address@domain.com</i>
-<br>
-<br>
+<dl class="man">
+<dt>Cc <i>cc-address@domain.com</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies an additional recipient for all email notifications.
-<p style="margin-left: 5.0em; text-indent: -5.0em">From <i>from-address@domain.com</i>
-<br>
-<br>
+<dt>From <i>from-address@domain.com</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies the sender of email notifications.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Sendmail <i>sendmail command and options</i>
-<br>
-<br>
+<dt>Sendmail <i>sendmail command and options</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies the sendmail command to use when sending email
 notifications. Only one <i>Sendmail</i> or <i>SMTPServer</i> line
 may be present in the <i>mailto.conf</i> file. If multiple lines
 are present, only the last one is used.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SMTPServer <i>servername</i>
-<br>
-<br>
+<dt>SMTPServer <i>servername</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies a SMTP server to send email notifications to. Only one
 <i>Sendmail</i> or <i>SMTPServer</i> line may be present in the
 <i>mailto.conf</i> file. If multiple lines are present, only the
 last one is used.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Subject <i>subject-prefix</i>
-<br>
-<br>
+<dt>Subject <i>subject-prefix</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies a prefix string for the subject line of an email notification.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>classes.conf(5)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>,
 <i>mime.convs(5)</i>, <i>mime.types(5)</i>, <i>printers.conf(5)</i>,

@@ -20,7 +20,7 @@ start with the MIME type name and are optionally followed by a
 series of file recognition rules that are used to automatically
 identify print and web files:
 <br>
-<pre>
+<pre class="man">
 
     super/type rule [ ... ruleN]
 </pre>
@@ -33,51 +33,42 @@ logical AND and "," or whitespace for a logical OR, and negated using
 <h2 class="title"><a name="RULES">Rules</a></h2>
 Rules take two forms - a filename extension by itself and functions with test
 values inside parenthesis. The following functions are available:
-<p style="margin-left: 5.0em; text-indent: -5.0em">match("pattern")
-<br>
-<br>
+<dl class="man">
+<dt>match("pattern")
+<dd style="margin-left: 5.0em"><br>
 Pattern match on filename
-<p style="margin-left: 5.0em; text-indent: -5.0em">ascii(offset,length)
-<br>
-<br>
+<dt>ascii(offset,length)
+<dd style="margin-left: 5.0em"><br>
 True if bytes are valid printable ASCII (CR, NL, TAB, BS, 32-126)
-<p style="margin-left: 5.0em; text-indent: -5.0em">printable(offset,length)
-<br>
-<br>
+<dt>printable(offset,length)
+<dd style="margin-left: 5.0em"><br>
 True if bytes are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254)
-<p style="margin-left: 5.0em; text-indent: -5.0em">priority(number)
-<br>
-<br>
+<dt>priority(number)
+<dd style="margin-left: 5.0em"><br>
 Specifies the relative priority of this MIME type. The default priority is 100.
 Larger values have higher priority while smaller values have lower priority.
-<p style="margin-left: 5.0em; text-indent: -5.0em">string(offset,"string")
-<br>
-<br>
+<dt>string(offset,"string")
+<dd style="margin-left: 5.0em"><br>
 True if bytes are identical to string
-<p style="margin-left: 5.0em; text-indent: -5.0em">istring(offset,"string")
-<br>
-<br>
+<dt>istring(offset,"string")
+<dd style="margin-left: 5.0em"><br>
 True if a case-insensitive comparison of the bytes is identical
-<p style="margin-left: 5.0em; text-indent: -5.0em">char(offset,value)
-<br>
-<br>
+<dt>char(offset,value)
+<dd style="margin-left: 5.0em"><br>
 True if byte is identical
-<p style="margin-left: 5.0em; text-indent: -5.0em">short(offset,value)
-<br>
-<br>
+<dt>short(offset,value)
+<dd style="margin-left: 5.0em"><br>
 True if 16-bit integer is identical
-<p style="margin-left: 5.0em; text-indent: -5.0em">int(offset,value)
-<br>
-<br>
+<dt>int(offset,value)
+<dd style="margin-left: 5.0em"><br>
 True if 32-bit integer is identical
-<p style="margin-left: 5.0em; text-indent: -5.0em">locale("string")
-<br>
-<br>
+<dt>locale("string")
+<dd style="margin-left: 5.0em"><br>
 True if current locale matches string
-<p style="margin-left: 5.0em; text-indent: -5.0em">contains(offset,range,"string")
-<br>
-<br>
+<dt>contains(offset,range,"string")
+<dd style="margin-left: 5.0em"><br>
 True if the range contains the string
+</dl>
 <h2 class="title"><a name="STRING_CONSTANTS">String Constants</a></h2>
 String constants can be specified inside quotes ("") for strings
 containing whitespace and angle brackets (&lt;>) for hexadecimal

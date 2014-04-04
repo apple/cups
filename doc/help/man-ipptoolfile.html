@@ -12,7 +12,7 @@ ipptoolfile - ipptool file format
 
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 The <i>ipptool(1)</i> program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curly braces, for example:
-<pre>
+<pre class="man">
 
     # This is a comment
     {
@@ -61,339 +61,243 @@ The <i>ipptool(1)</i> program accepts free-form plain text files that describe o
 
 <h2 class="title"><a name="TOP_LEVEL_DIRECTIVES">Top-level Directives</a></h2>
 The following directives can be used outside of a test:
-<p style="margin-left: 5.0em; text-indent: -5.0em">{ test }
-<br>
-Defines a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE variable-name value
-<br>
-Defines the named variable to the given value. This is equivalent to specifying
+<dl class="man">
+<dt>{ test }
+<dd style="margin-left: 5.0em">Defines a test.
+<dt>DEFINE variable-name value
+<dd style="margin-left: 5.0em">Defines the named variable to the given value. This is equivalent to specifying
 "-d variable-name=value" on the <i>ipptool</i> command-line.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-DEFAULT variable-name value
-<br>
-Defines the named variable to the given value if it does not already have a
+<dt>DEFINE-DEFAULT variable-name value
+<dd style="margin-left: 5.0em">Defines the named variable to the given value if it does not already have a
 value.
-<p style="margin-left: 5.0em; text-indent: -5.0em">FILE-ID "identifier"
-<br>
-Specifies an identifier string for the current file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IGNORE-ERRORS yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">IGNORE-ERRORS no
-<br>
-Specifies whether, by default, <i>ipptool</i> will ignore errors and continue with
+<dt>FILE-ID "identifier"
+<dd style="margin-left: 5.0em">Specifies an identifier string for the current file.
+<dt>IGNORE-ERRORS yes
+<dd style="margin-left: 5.0em"><dt>IGNORE-ERRORS no
+<dd style="margin-left: 5.0em">Specifies whether, by default, <i>ipptool</i> will ignore errors and continue with
 subsequent tests.
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE "filename"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE &lt;filename>
-<br>
-Includes another test file. The first form includes a file relative to the
+<dt>INCLUDE "filename"
+<dd style="margin-left: 5.0em"><dt>INCLUDE &lt;filename>
+<dd style="margin-left: 5.0em">Includes another test file. The first form includes a file relative to the
 current test file, while the second form includes a file from the <i>ipptool</i>
 include directory.
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE-IF-DEFINED name "filename"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE-IF-DEFINED name &lt;filename>
-<br>
-Includes another test file if the named variable is defined. The first form
+<dt>INCLUDE-IF-DEFINED name "filename"
+<dd style="margin-left: 5.0em"><dt>INCLUDE-IF-DEFINED name &lt;filename>
+<dd style="margin-left: 5.0em">Includes another test file if the named variable is defined. The first form
 includes a file relative to the current test file, while the second form
 includes a file from the <i>ipptool</i> include directory.
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE-IF-NOT-DEFINED name "filename"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">INCLUDE-IF-NOT-DEFINED name &lt;filename>
-<br>
-Includes another test file if the named variable is not defined. The first form
+<dt>INCLUDE-IF-NOT-DEFINED name "filename"
+<dd style="margin-left: 5.0em"><dt>INCLUDE-IF-NOT-DEFINED name &lt;filename>
+<dd style="margin-left: 5.0em">Includes another test file if the named variable is not defined. The first form
 includes a file relative to the current test file, while the second form
 includes a file from the <i>ipptool</i> include directory.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-IF-DEFINED variable-name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-IF-NOT-DEFINED variable-name
-<br>
-Specifies that the remainder of the test file should be skipped when the
+<dt>SKIP-IF-DEFINED variable-name
+<dd style="margin-left: 5.0em"><dt>SKIP-IF-NOT-DEFINED variable-name
+<dd style="margin-left: 5.0em">Specifies that the remainder of the test file should be skipped when the
 variable is or is not defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">STOP-AFTER-INCLUDE-ERROR no
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">STOP-AFTER-INCLUDE-ERROR yes
-<br>
-Specifies whether tests will be stopped after an error in an included file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER auto
-<br>
-Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
+<dt>STOP-AFTER-INCLUDE-ERROR no
+<dd style="margin-left: 5.0em"><dt>STOP-AFTER-INCLUDE-ERROR yes
+<dd style="margin-left: 5.0em">Specifies whether tests will be stopped after an error in an included file.
+<dt>TRANSFER auto
+<dd style="margin-left: 5.0em">Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
 requests with attached files and "Content-Length:" for requests without attached
 files.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER chunked
-<br>
-Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding:
+<dt>TRANSFER chunked
+<dd style="margin-left: 5.0em">Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding:
 chunked" header. This is the default and is equivalent to specifying "-c" on the
 <i>ipptool</i> command-line. Support for chunked requests is required for
 conformance with all versions of IPP.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER length
-<br>
-Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:"
+<dt>TRANSFER length
+<dd style="margin-left: 5.0em">Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:"
 header. This is equivalent to specifying "-l" on the <i>ipptool</i> command-line.
 Support for content length requests is required for conformance with all
 versions of IPP.
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 1.0
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 1.1
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.0
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.1
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.2
-<br>
-Specifies the default IPP version number to use for the tests that follow.
+<dt>VERSION 1.0
+<dd style="margin-left: 5.0em"><dt>VERSION 1.1
+<dd style="margin-left: 5.0em"><dt>VERSION 2.0
+<dd style="margin-left: 5.0em"><dt>VERSION 2.1
+<dd style="margin-left: 5.0em"><dt>VERSION 2.2
+<dd style="margin-left: 5.0em">Specifies the default IPP version number to use for the tests that follow.
 
+</dl>
 <h2 class="title"><a name="TEST_DIRECTIVES">Test Directives</a></h2>
 The following directives are understood in a test:
-<p style="margin-left: 5.0em; text-indent: -5.0em">ATTR tag attribute-name value(s)
-<br>
-Adds an attribute to the test request. Values are separated by the comma (",")
+<dl class="man">
+<dt>ATTR tag attribute-name value(s)
+<dd style="margin-left: 5.0em">Adds an attribute to the test request. Values are separated by the comma (",")
 character - escape commas using the "" character. Common attributes and values are listed in the IANA IPP registry - see references below.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
-<br>
-Adds a collection attribute to the test request. Member attributes follow the
+<dt>ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
+<dd style="margin-left: 5.0em">Adds a collection attribute to the test request. Member attributes follow the
 same syntax as regular attributes and can themselves be nested collections.
 Multiple collection values can be supplied as needed.
-<p style="margin-left: 5.0em; text-indent: -5.0em">COMPRESSION deflate
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">COMPRESSION gzip
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">COMPRESSION none
-<br>
-<br>
+<dt>COMPRESSION deflate
+<dd style="margin-left: 5.0em"><dt>COMPRESSION gzip
+<dd style="margin-left: 5.0em"><dt>COMPRESSION none
+<dd style="margin-left: 5.0em"><br>
 Uses the specified compression on the document data following the attributes in
 a Print-Job or Send-Document request.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DELAY seconds
-<br>
-Specifies a delay before this test will be run.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DISPLAY attribute-name
-<br>
-Specifies that value of the named attribute should be output as part of the
+<dt>DELAY seconds
+<dd style="margin-left: 5.0em">Specifies a delay before this test will be run.
+<dt>DISPLAY attribute-name
+<dd style="margin-left: 5.0em">Specifies that value of the named attribute should be output as part of the
 test report.
-<p style="margin-left: 5.0em; text-indent: -5.0em">EXPECT attribute-name [ predicate(s) ]
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">EXPECT ?attribute-name predicate(s)
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">EXPECT !attribute-name
-<br>
-Specifies that the response must/may/must not include the named attribute.
+<dt>EXPECT attribute-name [ predicate(s) ]
+<dd style="margin-left: 5.0em"><dt>EXPECT ?attribute-name predicate(s)
+<dd style="margin-left: 5.0em"><dt>EXPECT !attribute-name
+<dd style="margin-left: 5.0em">Specifies that the response must/may/must not include the named attribute.
 Additional requirements can be added as predicates - see the "EXPECT PREDICATES"
 section for more information on predicates.
-<p style="margin-left: 5.0em; text-indent: -5.0em">FILE filename
-<br>
-Specifies a file to include at the end of the request. This is typically used
+<dt>FILE filename
+<dd style="margin-left: 5.0em">Specifies a file to include at the end of the request. This is typically used
 when sending a test print file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">GROUP tag
-<br>
-Specifies the group tag for subsequent attributes in the request.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IGNORE-ERRORS yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">IGNORE-ERRORS no
-<br>
-Specifies whether <i>ipptool</i> will ignore errors and continue with subsequent
+<dt>GROUP tag
+<dd style="margin-left: 5.0em">Specifies the group tag for subsequent attributes in the request.
+<dt>IGNORE-ERRORS yes
+<dd style="margin-left: 5.0em"><dt>IGNORE-ERRORS no
+<dd style="margin-left: 5.0em">Specifies whether <i>ipptool</i> will ignore errors and continue with subsequent
 tests.
-<p style="margin-left: 5.0em; text-indent: -5.0em">NAME "literal string"
-<br>
-Specifies the human-readable name of the test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">OPERATION operation-code
-<br>
-Specifies the operation to be performed.
-<p style="margin-left: 5.0em; text-indent: -5.0em">REQUEST-ID number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">REQUEST-ID random
-<br>
-Specifies the request-id value to use in the request, either an integer or the
+<dt>NAME "literal string"
+<dd style="margin-left: 5.0em">Specifies the human-readable name of the test.
+<dt>OPERATION operation-code
+<dd style="margin-left: 5.0em">Specifies the operation to be performed.
+<dt>REQUEST-ID number
+<dd style="margin-left: 5.0em"><dt>REQUEST-ID random
+<dd style="margin-left: 5.0em">Specifies the request-id value to use in the request, either an integer or the
 word "random" to use a randomly generated value (the default).
-<p style="margin-left: 5.0em; text-indent: -5.0em">RESOURCE path
-<br>
-Specifies an alternate resource path that is used for the HTTP POST request.
+<dt>RESOURCE path
+<dd style="margin-left: 5.0em">Specifies an alternate resource path that is used for the HTTP POST request.
 The default is the resource from the URI provided to the <i>ipptool</i> program.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-IF-DEFINED variable-name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-IF-NOT-DEFINED variable-name
-<br>
-Specifies that the current test should be skipped when the variable is or is not
+<dt>SKIP-IF-DEFINED variable-name
+<dd style="margin-left: 5.0em"><dt>SKIP-IF-NOT-DEFINED variable-name
+<dd style="margin-left: 5.0em">Specifies that the current test should be skipped when the variable is or is not
 defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-PREVIOUS-ERROR yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">SKIP-PREVIOUS-ERROR no
-<br>
-Specifies whether <i>ipptool</i> will skip the current test if the previous test
+<dt>SKIP-PREVIOUS-ERROR yes
+<dd style="margin-left: 5.0em"><dt>SKIP-PREVIOUS-ERROR no
+<dd style="margin-left: 5.0em">Specifies whether <i>ipptool</i> will skip the current test if the previous test
 resulted in an error/failure.
-<p style="margin-left: 5.0em; text-indent: -5.0em">STATUS status-code [ predicate ]
-<br>
-Specifies an expected response status-code value. Additional requirements can be
+<dt>STATUS status-code [ predicate ]
+<dd style="margin-left: 5.0em">Specifies an expected response status-code value. Additional requirements can be
 added as predicates - see the "STATUS PREDICATES" section for more information
 on predicates.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TEST-ID "identifier"
-<br>
-Specifies an identifier string for the current test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER auto
-<br>
-Specifies that this test will use "Transfer-Encoding: chunked" if it has an
+<dt>TEST-ID "identifier"
+<dd style="margin-left: 5.0em">Specifies an identifier string for the current test.
+<dt>TRANSFER auto
+<dd style="margin-left: 5.0em">Specifies that this test will use "Transfer-Encoding: chunked" if it has an
 attached file or "Content-Length:" otherwise.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER chunked
-<br>
-Specifies that this test will use the HTTP/1.1 "Transfer-Encoding: chunked"
+<dt>TRANSFER chunked
+<dd style="margin-left: 5.0em">Specifies that this test will use the HTTP/1.1 "Transfer-Encoding: chunked"
 header.
-<p style="margin-left: 5.0em; text-indent: -5.0em">TRANSFER length
-<br>
-Specifies that this test will use the HTTP/1.0 "Content-Length:" header.
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 1.0
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 1.1
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.0
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.1
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">VERSION 2.2
-<br>
-Specifies the IPP version number to use for this test.
+<dt>TRANSFER length
+<dd style="margin-left: 5.0em">Specifies that this test will use the HTTP/1.0 "Content-Length:" header.
+<dt>VERSION 1.0
+<dd style="margin-left: 5.0em"><dt>VERSION 1.1
+<dd style="margin-left: 5.0em"><dt>VERSION 2.0
+<dd style="margin-left: 5.0em"><dt>VERSION 2.1
+<dd style="margin-left: 5.0em"><dt>VERSION 2.2
+<dd style="margin-left: 5.0em">Specifies the IPP version number to use for this test.
 
+</dl>
 <h2 class="title"><a name="EXPECT_PREDICATES">Expect Predicates</a></h2>
 The following predicates are understood following the EXPECT test directive:
-<p style="margin-left: 5.0em; text-indent: -5.0em">COUNT number
-<br>
-Requires the EXPECT attribute to have the specified number of values.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-MATCH variable-name
-<br>
-Defines the variable to "1" when the EXPECT condition matches. A side-effect of
+<dl class="man">
+<dt>COUNT number
+<dd style="margin-left: 5.0em">Requires the EXPECT attribute to have the specified number of values.
+<dt>DEFINE-MATCH variable-name
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the EXPECT condition matches. A side-effect of
 this predicate is that this EXPECT will never fail a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-NO-MATCH variable-name
-<br>
-Defines the variable to "1" when the EXPECT condition does not match. A side-
+<dt>DEFINE-NO-MATCH variable-name
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the EXPECT condition does not match. A side-
 effect of this predicate is that this EXPECT will never fail a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-VALUE variable-name
-<br>
-Defines the variable to the value of the attribute when the EXPECT condition
+<dt>DEFINE-VALUE variable-name
+<dd style="margin-left: 5.0em">Defines the variable to the value of the attribute when the EXPECT condition
 matches. A side-effect of this predicate is that this EXPECT will never fail a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IF-DEFINED variable-name
-<br>
-Makes the EXPECT conditions apply only if the specified variable is defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IF-NOT-DEFINED variable-name
-<br>
-Makes the EXPECT conditions apply only if the specified variable is not
+<dt>IF-DEFINED variable-name
+<dd style="margin-left: 5.0em">Makes the EXPECT conditions apply only if the specified variable is defined.
+<dt>IF-NOT-DEFINED variable-name
+<dd style="margin-left: 5.0em">Makes the EXPECT conditions apply only if the specified variable is not
 defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IN-GROUP tag
-<br>
-Requires the EXPECT attribute to be in the specified group tag.
-<p style="margin-left: 5.0em; text-indent: -5.0em">OF-TYPE tag[,tag,...]
-<br>
-Requires the EXPECT attribute to use the specified value tag(s).
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-LIMIT number
-<br>
-<br>
+<dt>IN-GROUP tag
+<dd style="margin-left: 5.0em">Requires the EXPECT attribute to be in the specified group tag.
+<dt>OF-TYPE tag[,tag,...]
+<dd style="margin-left: 5.0em">Requires the EXPECT attribute to use the specified value tag(s).
+<dt>REPEAT-LIMIT number
+<dd style="margin-left: 5.0em"><br>
 Specifies the maximum number of times to repeat. The default value is 1000.
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-MATCH
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-NO-MATCH
-<br>
-Specifies that the current test should be repeated when the EXPECT condition
+<dt>REPEAT-MATCH
+<dd style="margin-left: 5.0em"><dt>REPEAT-NO-MATCH
+<dd style="margin-left: 5.0em">Specifies that the current test should be repeated when the EXPECT condition
 matches or does not match.
-<p style="margin-left: 5.0em; text-indent: -5.0em">SAME-COUNT-AS attribute-name
-<br>
-Requires the EXPECT attribute to have the same number of values as the specified
+<dt>SAME-COUNT-AS attribute-name
+<dd style="margin-left: 5.0em">Requires the EXPECT attribute to have the same number of values as the specified
 parallel attribute.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-HOSTNAMES "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-HOSTNAMES "/regular expression/"
-<br>
-Requires that all URI values contain a matching hostname.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-RESOURCES "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-RESOURCES "/regular expression/"
-<br>
-Requires that all URI values contain a matching resource (including leading /).
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-SCHEMES "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-SCHEMES "/regular expression/"
-<br>
-Requires that all URI values contain a matching scheme.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES "literal string"
-<br>
-Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES &lt;number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES =number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES >number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES number[,number,...]
-<br>
-Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES "false"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES "true"
-<br>
-Requires that all values of the EXPECT attribute match the boolean value given.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-ALL-VALUES "/regular expression/"
-<br>
-Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-HOSTNAME "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-HOSTNAME "/regular expression/"
-<br>
-Requires that at least one URI value contains a matching hostname.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-RESOURCE "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-RESOURCE "/regular expression/"
-<br>
-Requires that at least one URI value contains a matching resource (including leading /).
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-SCHEME "literal string"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-SCHEME "/regular expression/"
-<br>
-Requires that at least one URI value contains a matching scheme.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE "literal string"
-<br>
-Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE &lt;number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE =number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE >number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE number[,number,...]
-<br>
-Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE "false"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE "true"
-<br>
-Requires that at least one value of the EXPECT attribute matches the boolean value given.
-<p style="margin-left: 5.0em; text-indent: -5.0em">WITH-VALUE "/regular expression/"
-<br>
-Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dt>WITH-ALL-HOSTNAMES "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-HOSTNAMES "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that all URI values contain a matching hostname.
+<dt>WITH-ALL-RESOURCES "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-RESOURCES "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that all URI values contain a matching resource (including leading /).
+<dt>WITH-ALL-SCHEMES "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-SCHEMES "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that all URI values contain a matching scheme.
+<dt>WITH-ALL-VALUES "literal string"
+<dd style="margin-left: 5.0em">Requires that all values of the EXPECT attribute match the literal string. Comparisons are case-sensitive.
+<dt>WITH-ALL-VALUES &lt;number
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-VALUES =number
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-VALUES >number
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-VALUES number[,number,...]
+<dd style="margin-left: 5.0em">Requires that all values of the EXPECT attribute match the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+<dt>WITH-ALL-VALUES "false"
+<dd style="margin-left: 5.0em"><dt>WITH-ALL-VALUES "true"
+<dd style="margin-left: 5.0em">Requires that all values of the EXPECT attribute match the boolean value given.
+<dt>WITH-ALL-VALUES "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that all values of the EXPECT attribute match the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dt>WITH-HOSTNAME "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-HOSTNAME "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that at least one URI value contains a matching hostname.
+<dt>WITH-RESOURCE "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-RESOURCE "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that at least one URI value contains a matching resource (including leading /).
+<dt>WITH-SCHEME "literal string"
+<dd style="margin-left: 5.0em"><dt>WITH-SCHEME "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that at least one URI value contains a matching scheme.
+<dt>WITH-VALUE "literal string"
+<dd style="margin-left: 5.0em">Requires that at least one value of the EXPECT attribute matches the literal string. Comparisons are case-sensitive.
+<dt>WITH-VALUE &lt;number
+<dd style="margin-left: 5.0em"><dt>WITH-VALUE =number
+<dd style="margin-left: 5.0em"><dt>WITH-VALUE >number
+<dd style="margin-left: 5.0em"><dt>WITH-VALUE number[,number,...]
+<dd style="margin-left: 5.0em">Requires that at least one value of the EXPECT attribute matches the number(s) or numeric comparison. When comparing rangeOfInteger values, the "&lt;" and ">" operators only check the upper bound of the range.
+<dt>WITH-VALUE "false"
+<dd style="margin-left: 5.0em"><dt>WITH-VALUE "true"
+<dd style="margin-left: 5.0em">Requires that at least one value of the EXPECT attribute matches the boolean value given.
+<dt>WITH-VALUE "/regular expression/"
+<dd style="margin-left: 5.0em">Requires that at least one value of the EXPECT attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
 
+</dl>
 <h2 class="title"><a name="STATUS_PREDICATES">Status Predicates</a></h2>
 The following predicates are understood following the STATUS test directive:
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-MATCH variable-name
-<br>
-Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEFINE-NO-MATCH variable-name
-<br>
-Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IF-DEFINED variable-name
-<br>
-Makes the STATUS apply only if the specified variable is defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">IF-NOT-DEFINED variable-name
-<br>
-Makes the STATUS apply only if the specified variable is not defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-LIMIT number
-<br>
-<br>
+<dl class="man">
+<dt>DEFINE-MATCH variable-name
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the STATUS matches. A side-effect of this predicate is that this STATUS will never fail a test.
+<dt>DEFINE-NO-MATCH variable-name
+<dd style="margin-left: 5.0em">Defines the variable to "1" when the STATUS does not match. A side-effect of this predicate is that this STATUS will never fail a test.
+<dt>IF-DEFINED variable-name
+<dd style="margin-left: 5.0em">Makes the STATUS apply only if the specified variable is defined.
+<dt>IF-NOT-DEFINED variable-name
+<dd style="margin-left: 5.0em">Makes the STATUS apply only if the specified variable is not defined.
+<dt>REPEAT-LIMIT number
+<dd style="margin-left: 5.0em"><br>
 Specifies the maximum number of times to repeat. The default value is 1000.
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-MATCH
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">REPEAT-NO-MATCH
-<br>
-Specifies that the current test should be repeated when the response status-code
+<dt>REPEAT-MATCH
+<dd style="margin-left: 5.0em"><dt>REPEAT-NO-MATCH
+<dd style="margin-left: 5.0em">Specifies that the current test should be repeated when the response status-code
 matches or does not match the value specified by the STATUS directive.
 
+</dl>
 <h2 class="title"><a name="OPERATION_CODES">Operation Codes</a></h2>
 Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from
 RFC 2911 and other IPP extension specifications. Here is a complete list:
-<pre>
+<pre class="man">
     Activate-Printer
     CUPS-Accept-Jobs
     CUPS-Add-Modify-Class
@@ -466,7 +370,7 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
 <h2 class="title"><a name="STATUS_CODES">Status Codes</a></h2>
 Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
 2911 and other IPP extension specifications. Here is a complete list:
-<pre>
+<pre class="man">
     client-error-attributes-not-settable
     client-error-attributes-or-values-not-supported
     client-error-bad-request
@@ -521,7 +425,7 @@ Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
 <h2 class="title"><a name="TAGS">Tags</a></h2>
 Value and group tags correspond to the names from RFC 2911 and other IPP
 extension specifications. Here are the group tags:
-<pre>
+<pre class="man">
     event-notification-attributes-tag
     job-attributes-tag
     operation-attributes-tag
@@ -530,7 +434,7 @@ extension specifications. Here are the group tags:
     unsupported-attributes-tag
 </pre>
 <p>Here are the value tags:
-<pre>
+<pre class="man">
     admin-define
     boolean
     charset
@@ -563,50 +467,39 @@ The <i>ipptool</i> program maintains a list of variables that can be used in any
 literal string or attribute value by specifying "$variable-name". Aside from
 variables defined using the "-d" option or "DEFINE" directive, the following
 pre-defined variables are available:
-<p style="margin-left: 5.0em; text-indent: -5.0em">$$
-<br>
-Inserts a single "$" character.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$ENV[name]
-<br>
-Inserts the value of the named environment variable, or an empty string if the
+<dl class="man">
+<dt>$$
+<dd style="margin-left: 5.0em">Inserts a single "$" character.
+<dt>$ENV[name]
+<dd style="margin-left: 5.0em">Inserts the value of the named environment variable, or an empty string if the
 environment variable is not defined.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$filename
-<br>
-Inserts the filename provided to <i>ipptool</i> with the "-f" option.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$hostname
-<br>
-Inserts the hostname from the URI provided to <i>ipptool</i>.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$job-id
-<br>
-Inserts the last job-id value returned in a test response or 0 if no job-id has
+<dt>$filename
+<dd style="margin-left: 5.0em">Inserts the filename provided to <i>ipptool</i> with the "-f" option.
+<dt>$hostname
+<dd style="margin-left: 5.0em">Inserts the hostname from the URI provided to <i>ipptool</i>.
+<dt>$job-id
+<dd style="margin-left: 5.0em">Inserts the last job-id value returned in a test response or 0 if no job-id has
 been seen.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$job-uri
-<br>
-Inserts the last job-uri value returned in a test response or an empty string if
+<dt>$job-uri
+<dd style="margin-left: 5.0em">Inserts the last job-uri value returned in a test response or an empty string if
 no job-uri has been seen.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$scheme
-<br>
-Inserts the scheme from the URI provided to <i>ipptool</i>.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$notify-subscription-id
-<br>
-Inserts the last notify-subscription-id value returned in a test response or 0 if
+<dt>$scheme
+<dd style="margin-left: 5.0em">Inserts the scheme from the URI provided to <i>ipptool</i>.
+<dt>$notify-subscription-id
+<dd style="margin-left: 5.0em">Inserts the last notify-subscription-id value returned in a test response or 0 if
 no notify-subscription-id has been seen.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$port
-<br>
-Inserts the port number from the URI provided to <i>ipptool</i>.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$resource
-<br>
-Inserts the resource path from the URI provided to <i>ipptool</i>.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$uri
-<br>
-Inserts the URI provided to <i>ipptool</i>.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$user
-<br>
-Inserts the current user's login name.
-<p style="margin-left: 5.0em; text-indent: -5.0em">$username
-<br>
-Inserts the username from the URI provided to <i>ipptool</i>, if any.
+<dt>$port
+<dd style="margin-left: 5.0em">Inserts the port number from the URI provided to <i>ipptool</i>.
+<dt>$resource
+<dd style="margin-left: 5.0em">Inserts the resource path from the URI provided to <i>ipptool</i>.
+<dt>$uri
+<dd style="margin-left: 5.0em">Inserts the URI provided to <i>ipptool</i>.
+<dt>$user
+<dd style="margin-left: 5.0em">Inserts the current user's login name.
+<dt>$username
+<dd style="margin-left: 5.0em">Inserts the username from the URI provided to <i>ipptool</i>, if any.
 
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>ipptool(1)</i>, RFC 2911,
 <br>

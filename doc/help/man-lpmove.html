@@ -16,7 +16,7 @@ lpmove - move a job or all jobs to a new destination
 ] [ -U
 <i>username</i>
 ]
-<i>job</i> <i>destination</i>
+<i>job</i><i>destination</i>
 <br>
 <b>lpmove</b>
 [ -E ] [ -h
@@ -24,31 +24,30 @@ lpmove - move a job or all jobs to a new destination
 ] [ -U
 <i>username</i>
 ]
-<i>source</i> <i>destination</i>
+<i>source</i><i>destination</i>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <b>lpmove</b> moves the specified <i>job</i> or all jobs from
 <i>source</i> to <i>destination</i>. <i>job</i> can be the job ID
 number or the old destination and job ID:
 <br>
-<pre>
+<pre class="man">
 
      lpmove 123 newprinter
      lpmove oldprinter-123 newprinter
 </pre>
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The <i>lpmove</i> command supports the following options:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-E
-<br>
-<br>
+<dl class="man">
+<dt>-E
+<dd style="margin-left: 5.0em"><br>
 Forces encryption when connecting to the server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-U username
-<br>
-<br>
+<dt>-U username
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate username.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h server[:port]
-<br>
-<br>
+<dt>-h server[:port]
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate server.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>cancel(1)</i>, <i>lp(1)</i>,
 <br>

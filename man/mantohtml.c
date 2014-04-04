@@ -53,7 +53,8 @@ main(int  argc,				/* I - Number of command-line args */
 		*outfile;		/* Output file */
   char		line[1024],		/* Line from file */
 		*lineptr,		/* Pointer into line */
-		name[1024];		/* Man page name */
+		name[1024],		/* Man page name */
+		ddpost[256];		/* Tagged list post markup */
   int		section = -1,		/* Man page section */
 		pre = 0,		/* Preformatted */
 		font = 0,		/* Current font */
@@ -218,6 +219,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 3, "b", "b", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".I ", 3))
       {
@@ -229,6 +236,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 3, "i", "i", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".BI ", 4))
       {
@@ -240,6 +253,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "b", "i", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".BR ", 4))
       {
@@ -251,6 +270,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "b", NULL, outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".IB ", 4))
       {
@@ -262,6 +287,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "i", "b", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".IR ", 4))
       {
@@ -273,6 +304,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "i", NULL, outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".RB ", 4))
       {
@@ -284,6 +321,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, NULL, "b", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".RI ", 4))
       {
@@ -295,6 +338,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, NULL, "i", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".SB ", 4))
       {
@@ -306,6 +355,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "small", "b", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strncmp(line, ".SM ", 4))
       {
@@ -317,6 +372,12 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         html_alternate(line + 4, "small", "small", outfile);
+
+	if (post)
+	{
+	  fputs(post, outfile);
+	  post = NULL;
+	}
       }
       else if (!strcmp(line, ".LP") || !strcmp(line, ".PP") || !strcmp(line, ".P"))
       {
@@ -368,14 +429,12 @@ main(int  argc,				/* I - Number of command-line args */
 
         fputs("</div>\n", outfile);
       }
-      else if (!strcmp(line, ".HP") || !strncmp(line, ".HP ", 4) ||
-               !strcmp(line, ".TP") || !strncmp(line, ".TP ", 4))
+      else if (!strcmp(line, ".HP") || !strncmp(line, ".HP ", 4))
       {
        /*
-        * Hanging paragraph/tagged list...
+        * Hanging paragraph...
         *
         * .HP i
-        * .TP i
 	*/
 
 	float amount = 3.0;		/* Indentation */
@@ -396,6 +455,38 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (line[1] == 'T')
           post = "<br>\n";
+      }
+      else if (!strcmp(line, ".TP") || !strncmp(line, ".TP ", 4))
+      {
+       /*
+        * Tagged list...
+        *
+        * .TP i
+	*/
+
+	float amount = 3.0;		/* Indentation */
+
+        if (line[3])
+          amount = atof(line + 4);
+
+	fputs(end_fonts[font], outfile);
+	font = 0;
+
+        if (list && strcmp(list, "dl"))
+        {
+          fprintf(outfile, "</%s>\n", list);
+          list = NULL;
+        }
+
+        if (!list)
+        {
+          fputs("<dl class=\"man\">\n", outfile);
+          list = "dl";
+        }
+
+        fputs("<dt>", outfile);
+        snprintf(ddpost, sizeof(ddpost), "<dd style=\"margin-left: %.1fem\">", amount);
+	post = ddpost;
       }
       else if (!strncmp(line, ".IP ", 4))
       {
@@ -511,7 +602,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Ignore unused commands...
 	*/
       }
-      else if (!strncmp(line, ".Vb", 3) || !strncmp(line, ".nf", 3))
+      else if (!strncmp(line, ".Vb", 3) || !strncmp(line, ".nf", 3) || !strncmp(line, ".EX", 3))
       {
        /*
         * Start preformatted...
@@ -527,9 +618,9 @@ main(int  argc,				/* I - Number of command-line args */
 	}
 
         pre = 1;
-	fputs("<pre>\n", outfile);
+	fputs("<pre class=\"man\">\n", outfile);
       }
-      else if (!strncmp(line, ".Ve", 3) || !strncmp(line, ".fi", 3))
+      else if (!strncmp(line, ".Ve", 3) || !strncmp(line, ".fi", 3) || !strncmp(line, ".EE", 3))
       {
        /*
         * End preformatted...
@@ -763,9 +854,6 @@ html_alternate(const char *s,		/* I - String */
 
     while (isspace(*s & 255))
       s ++;
-
-    if (*s && *s != '(' && *s != '.' && *s != ',')
-      putc(' ', fp);
   }
 
   putc('\n', fp);
@@ -867,6 +955,24 @@ html_fputs(const char *s,		/* I  - String */
           default :
               fprintf(stderr, "mantohtml: Unknown macro \"\\*%c\" ignored.\n", s[-1]);
               break;
+        }
+      }
+      else if (*s == '(')
+      {
+        if (!strncmp(s, "(em", 3))
+        {
+          fputs("&mdash;", fp);
+          s += 3;
+        }
+        else if (!strncmp(s, "(en", 3))
+        {
+          fputs("&ndash;", fp);
+          s += 3;
+        }
+        else
+        {
+          putc(*s, fp);
+          s ++;
         }
       }
       else if (*s == '[')

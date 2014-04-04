@@ -17,94 +17,71 @@ are added or deleted.
 <p>Each line in the file can be a configuration directive, a blank line,
 or a comment. Comment lines start with the # character.
 <h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;Printer name> ... &lt;/Printer>
-<br>
-<br>
+<dl class="man">
+<dt>&lt;Printer name> ... &lt;/Printer>
+<dd style="margin-left: 5.0em"><br>
 Defines a specific printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">&lt;DefaultPrinter name> ... &lt;/Printer>
-<br>
-<br>
+<dt>&lt;DefaultPrinter name> ... &lt;/Printer>
+<dd style="margin-left: 5.0em"><br>
 Defines a default printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Accepting Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Accepting No
-<br>
-<br>
+<dt>Accepting Yes
+<dd style="margin-left: 5.0em"><dt>Accepting No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether the printer is accepting new jobs.
-<p style="margin-left: 5.0em; text-indent: -5.0em">AllowUser [ user @group ... ]
-<br>
-<br>
+<dt>AllowUser [ user @group ... ]
+<dd style="margin-left: 5.0em"><br>
 Allows specific users and groups to print to the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DenyUser [ user @group ... ]
-<br>
-<br>
+<dt>DenyUser [ user @group ... ]
+<dd style="margin-left: 5.0em"><br>
 Prevents specific users and groups from printing to the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">DeviceURI uri
-<br>
-<br>
+<dt>DeviceURI uri
+<dd style="margin-left: 5.0em"><br>
 Specifies the device URI for a printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">ErrorPolicy abort-job
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ErrorPolicy retry-current-job
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ErrorPolicy retry-job
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">ErrorPolicy stop-printer
-<br>
-<br>
+<dt>ErrorPolicy abort-job
+<dd style="margin-left: 5.0em"><dt>ErrorPolicy retry-current-job
+<dd style="margin-left: 5.0em"><dt>ErrorPolicy retry-job
+<dd style="margin-left: 5.0em"><dt>ErrorPolicy stop-printer
+<dd style="margin-left: 5.0em"><br>
 Specifies the error policy for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Info text
-<br>
-<br>
+<dt>Info text
+<dd style="margin-left: 5.0em"><br>
 Specifies human-readable text describing the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">JobSheets banner banner
-<br>
-<br>
+<dt>JobSheets banner banner
+<dd style="margin-left: 5.0em"><br>
 Specifies the banner pages to use for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">KLimit number
-<br>
-<br>
+<dt>KLimit number
+<dd style="margin-left: 5.0em"><br>
 Specifies the job-k-limit value for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Location text
-<br>
-<br>
+<dt>Location text
+<dd style="margin-left: 5.0em"><br>
 Specifies human-readable text describing the location of the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">OpPolicy name
-<br>
-<br>
+<dt>OpPolicy name
+<dd style="margin-left: 5.0em"><br>
 Specifies the operation policy for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PageLimit number
-<br>
-<br>
+<dt>PageLimit number
+<dd style="margin-left: 5.0em"><br>
 Specifies the job-page-limit value for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">PortMonitor monitor
-<br>
-<br>
+<dt>PortMonitor monitor
+<dd style="margin-left: 5.0em"><br>
 Specifies the port monitor for a printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">QuotaPeriod seconds
-<br>
-<br>
+<dt>QuotaPeriod seconds
+<dd style="margin-left: 5.0em"><br>
 Specifies the job-quota-period value for the printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">Shared Yes
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">Shared No
-<br>
-<br>
+<dt>Shared Yes
+<dd style="margin-left: 5.0em"><dt>Shared No
+<dd style="margin-left: 5.0em"><br>
 Specifies whether the printer is shared.
-<p style="margin-left: 5.0em; text-indent: -5.0em">State idle
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">State stopped
-<br>
-<br>
+<dt>State idle
+<dd style="margin-left: 5.0em"><dt>State stopped
+<dd style="margin-left: 5.0em"><br>
 Specifies the initial state of the printer (Idle or Stopped)
-<p style="margin-left: 5.0em; text-indent: -5.0em">StateMessage text
-<br>
-<br>
+<dt>StateMessage text
+<dd style="margin-left: 5.0em"><br>
 Specifies the message associated with the state.
-<p style="margin-left: 5.0em; text-indent: -5.0em">StateTime seconds
-<br>
-<br>
+<dt>StateTime seconds
+<dd style="margin-left: 5.0em"><br>
 Specifies the date/time associated with the state.
+</dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <i>classes.conf(5)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>,
 <i>mime.convs(5)</i>, <i>mime.types(5)</i>,

@@ -133,6 +133,18 @@ P.example {
   margin-left: 36pt;
 }
 
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
 PRE.example {
   background: white;
   border: dotted thin #999999;
@@ -612,7 +624,7 @@ div.body dd {
     margin-left: 0;
   }
 
-  PRE.command, PRE.example {
+  PRE.command, PRE.example, PRE.man {
     margin-left: 0;
     white-space: pre-wrap;
   }

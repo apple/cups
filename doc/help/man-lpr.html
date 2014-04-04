@@ -38,69 +38,56 @@ the current default set using the <i>lpoptions(1)</i> command is used,
 followed by the default set using the <i>lpadmin(8)</i> command.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The following options are recognized by <i>lpr</i>:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-E
-<br>
-<br>
+<dl class="man">
+<dt>-E
+<dd style="margin-left: 5.0em"><br>
 Forces encryption when connecting to the server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-H server[:port]
-<br>
-<br>
+<dt>-H server[:port]
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-C "name"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">-J "name"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em">-T "name"
-<br>
-<br>
+<dt>-C "name"
+<dd style="margin-left: 5.0em"><dt>-J "name"
+<dd style="margin-left: 5.0em"><dt>-T "name"
+<dd style="margin-left: 5.0em"><br>
 Sets the job name.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-P destination[/instance]
-<br>
-<br>
+<dt>-P destination[/instance]
+<dd style="margin-left: 5.0em"><br>
 Prints files to the named printer.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-U username
-<br>
-<br>
+<dt>-U username
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate username.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-# <i>copies</i>
-<br>
-<br>
+<dt>-# <i>copies</i>
+<dd style="margin-left: 5.0em"><br>
 Sets the number of copies to print from 1 to 100.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h
-<br>
-<br>
+<dt>-h
+<dd style="margin-left: 5.0em"><br>
 Disables banner printing. This option is equivalent to "-o
 job-sheets=none".
-<p style="margin-left: 5.0em; text-indent: -5.0em">-l
-<br>
-<br>
+<dt>-l
+<dd style="margin-left: 5.0em"><br>
 Specifies that the print file is already formatted for the
 destination and should be sent without filtering. This option is
 equivalent to "-o raw".
-<p style="margin-left: 5.0em; text-indent: -5.0em">-m
-<br>
-<br>
+<dt>-m
+<dd style="margin-left: 5.0em"><br>
 Send an email on job completion.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-o option[=value]
-<br>
-<br>
+<dt>-o option[=value]
+<dd style="margin-left: 5.0em"><br>
 Sets a job option.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-p
-<br>
-<br>
+<dt>-p
+<dd style="margin-left: 5.0em"><br>
 Specifies that the print file should be formatted with a shaded
 header with the date, time, job name, and page number. This
 option is equivalent to "-o prettyprint" and is only useful when
 printing text files.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-q
-<br>
-<br>
+<dt>-q
+<dd style="margin-left: 5.0em"><br>
 Hold job for printing.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-r
-<br>
-<br>
+<dt>-r
+<dd style="margin-left: 5.0em"><br>
 Specifies that the named print files should be deleted after
 printing them.
+</dl>
 <h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
 The "c", "d", "f", "g", "i", "n", "t", "v", and "w" options
 are not supported by CUPS and produce a warning message if used.

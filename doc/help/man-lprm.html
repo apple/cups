@@ -18,7 +18,7 @@ lprm - cancel print jobs
 ] [ -P
 <i>destination[/instance]</i>
 ] [ - ] [
-<i>job</i> <i>ID(s)</i>
+<i>job</i><i>ID(s)</i>
 ]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>lprm</i> cancels print jobs that have been queued for printing.
@@ -28,22 +28,20 @@ numbers to cancel those jobs or use the <i>-</i> option to cancel
 all jobs.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The <i>lprm</i> command supports the following options:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-E
-<br>
-<br>
+<dl class="man">
+<dt>-E
+<dd style="margin-left: 5.0em"><br>
 Forces encryption when connecting to the server.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-P destination[/instance]
-<br>
-<br>
+<dt>-P destination[/instance]
+<dd style="margin-left: 5.0em"><br>
 Specifies the destination printer or class.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-U username
-<br>
-<br>
+<dt>-U username
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate username.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h server[:port]
-<br>
-<br>
+<dt>-h server[:port]
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate server.
+</dl>
 <h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
 The CUPS version of <i>lprm</i> is compatible with the standard
 Berkeley <i>lprm</i> command.

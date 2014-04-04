@@ -21,7 +21,7 @@ backend - cups backend transmission interfaces
 [
 <i>filename</i>
 ]
-<pre>
+<pre class="man">
 
 <b>#include &lt;cups/cups.h></b>
 
@@ -67,7 +67,7 @@ function. The
 constant defines the file descriptor that should be monitored for incoming requests.
 <h3><a name="DEVICE_DISCOVERY">Device Discovery</a></h3>
 When run with no arguments, the backend should list the devices and schemes it supports or is advertising to the standard output. The output consists of zero or more lines consisting of any of the following forms:
-<pre>
+<pre class="man">
 
     device-class scheme "Unknown" "device-info"
     device-class device-uri "device-make-and-model" "device-info"
@@ -80,19 +80,17 @@ function can be used to generate these lines and handle any necessary escaping o
 <p>The
 <i>device-class</i>
 field is one of the following values:
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>direct</b>
-The device-uri refers to a specific direct-access device with no options, such as a parallel, USB, or SCSI device.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>file</b>
-The device-uri refers to a file on disk.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>network</b>
-The device-uri refers to a networked device and conforms to the general form for
-<br>
+<dl class="man">
+<dt><b>direct</b>
+<dd style="margin-left: 5.0em">The device-uri refers to a specific direct-access device with no options, such as a parallel, USB, or SCSI device.
+<dt><b>file</b>
+<dd style="margin-left: 5.0em">The device-uri refers to a file on disk.
+<dt><b>network</b>
+<dd style="margin-left: 5.0em">The device-uri refers to a networked device and conforms to the general form for
 network URIs.
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>serial</b>
-The device-uri refers to a serial device with configurable baud rate and other options. If the device-uri contains a baud value, it represents the maximum baud rate supported by the device.
-<br>
+<dt><b>serial</b>
+<dd style="margin-left: 5.0em">The device-uri refers to a serial device with configurable baud rate and other options. If the device-uri contains a baud value, it represents the maximum baud rate supported by the device.
+</dl>
 <p>The 
 <i>scheme</i>
 field provides the URI scheme that is supported by the backend. Backends should use this form only when the backend supports any URI using that scheme. The
@@ -114,33 +112,27 @@ field specifies the physical location of the device, which is often used to pre-
 Backends without world read and execute permissions are run as the root user. Otherwise, the backend is run using an unprivileged user account, typically "lp".
 <h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
 The following exit codes are defined for backends:
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_OK</b>
-The print file was successfully transmitted to the device or remote server.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_FAILED</b>
-<br>
+<dl class="man">
+<dt><b>CUPS_BACKEND_OK</b>
+<dd style="margin-left: 5.0em">The print file was successfully transmitted to the device or remote server.
+<dt><b>CUPS_BACKEND_FAILED</b>
+<dd style="margin-left: 5.0em"><br>
 The print file was not successfully transmitted to the device or remote server. The scheduler will respond to this by canceling the job, retrying the job, or stopping the queue depending on the state of the
-<br>
 <i>printer-error-policy</i>
 attribute.
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_AUTH_REQUIRED</b>
-The print file was not successfully transmitted because valid authentication information is required. The scheduler will respond to this by holding the job and adding the 'cups-held-for-authentication' keyword to the "job-reasons" Job Description attribute.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_HOLD</b>
-The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by holding the job.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_STOP</b>
-The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by stopping the queue.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_CANCEL</b>
-The print file was not successfully transmitted because one or more attributes are not supported or the job was canceled at the printer. The scheduler will respond to this by canceling the job.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_RETRY</b>
-The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job at a future time - other jobs may print before this one.
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CUPS_BACKEND_RETRY_CURRENT</b>
-The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job immediately without allowing intervening jobs.
-<br>
+<dt><b>CUPS_BACKEND_AUTH_REQUIRED</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because valid authentication information is required. The scheduler will respond to this by holding the job and adding the 'cups-held-for-authentication' keyword to the "job-reasons" Job Description attribute.
+<dt><b>CUPS_BACKEND_HOLD</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by holding the job.
+<dt><b>CUPS_BACKEND_STOP</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because it cannot be printed at this time. The scheduler will respond to this by stopping the queue.
+<dt><b>CUPS_BACKEND_CANCEL</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because one or more attributes are not supported or the job was canceled at the printer. The scheduler will respond to this by canceling the job.
+<dt><b>CUPS_BACKEND_RETRY</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job at a future time - other jobs may print before this one.
+<dt><b>CUPS_BACKEND_RETRY_CURRENT</b>
+<dd style="margin-left: 5.0em">The print file was not successfully transmitted because of a temporary issue. The scheduler will retry the job immediately without allowing intervening jobs.
+</dl>
 <p>All other exit code values are reserved.
 <h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
 In addition to the environment variables listed in
@@ -148,9 +140,10 @@ In addition to the environment variables listed in
 and
 <a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
 CUPS backends can expect the following environment variable:
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>DEVICE_URI</b>
-The device URI associated with the printer.
-<br>
+<dl class="man">
+<dt><b>DEVICE_URI</b>
+<dd style="margin-left: 5.0em">The device URI associated with the printer.
+</dl>
 <h2 class="title"><a name="FILES">Files</a></h2>
 <i>/etc/cups/cups-files.conf</i>
 <h2 class="title"><a name="NOTES">Notes</a></h2>

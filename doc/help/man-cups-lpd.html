@@ -25,7 +25,7 @@ daemon but instead operates using the Internet "super-server"
 add the following line to the <i>inetd.conf</i> file to enable the
 <i>cups-lpd</i> mini-server:
 <br>
-<pre>
+<pre class="man">
 
     printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
         -o document-format=application/octet-stream
@@ -36,7 +36,7 @@ inetd.conf file.
 <p>If you are using the newer <i>xinetd(8)</i> daemon, create a file
 named <i>/etc/xinetd.d/cups</i> containing the following lines:
 <br>
-<pre>
+<pre class="man">
 
     service printer
     {
@@ -51,24 +51,23 @@ named <i>/etc/xinetd.d/cups</i> containing the following lines:
     }
 </pre>
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h hostname[:port]
-<br>
-<br>
+<dl class="man">
+<dt>-h hostname[:port]
+<dd style="margin-left: 5.0em"><br>
 Sets the CUPS server (and port) to use.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-n
-<br>
-<br>
+<dt>-n
+<dd style="margin-left: 5.0em"><br>
 Disables reverse address lookups; normally <i>cups-lpd</i> will
 try to discover the hostname of the client via a reverse DNS
 lookup.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-o name=value
-<br>
-<br>
+<dt>-o name=value
+<dd style="margin-left: 5.0em"><br>
 Inserts options for all print queues. Most often this is used to
 disable the "l" filter so that remote print jobs are filtered as
 needed for printing; the examples in the previous section set the
 "document-format" option to "application/octet-stream" which
 forces autodetection of the print file format.
+</dl>
 <h2 class="title"><a name="PERFORMANCE">Performance</a></h2>
 <i>cups-lpd</i> performs well with small numbers of clients and
 printers. However, since a new process is created for each

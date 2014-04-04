@@ -26,53 +26,47 @@ no changes are requested, the current configuration values are written to the
 standard output in the format "name=value", one per line.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 The following options are recognized:
-<p style="margin-left: 5.0em; text-indent: -5.0em">-E
-<br>
-<br>
+<dl class="man">
+<dt>-E
+<dd style="margin-left: 5.0em"><br>
 Enables encryption on the connection to the scheduler.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-U <i>username</i>
-<br>
-<br>
+<dt>-U <i>username</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies an alternate username to use when authenticating with the scheduler.
-<p style="margin-left: 5.0em; text-indent: -5.0em">-h <i>server[:port]</i>
-<br>
-<br>
+<dt>-h <i>server[:port]</i>
+<dd style="margin-left: 5.0em"><br>
 Specifies the server address.
-<p style="margin-left: 5.0em; text-indent: -5.0em">--[no-]debug-logging
-<br>
-<br>
+<dt>--[no-]debug-logging
+<dd style="margin-left: 5.0em"><br>
 Enables or disables debug logging in the <b>error_log</b> file.
-<p style="margin-left: 5.0em; text-indent: -5.0em">--[no-]remote-admin
-<br>
-<br>
+<dt>--[no-]remote-admin
+<dd style="margin-left: 5.0em"><br>
 Enables or disables remote administration.
-<p style="margin-left: 5.0em; text-indent: -5.0em">--[no-]remote-any
-<br>
-<br>
+<dt>--[no-]remote-any
+<dd style="margin-left: 5.0em"><br>
 Enables or disables printing from any address, e.g. the Internet.
-<p style="margin-left: 5.0em; text-indent: -5.0em">--[no-]share-printers
-<br>
-<br>
+<dt>--[no-]share-printers
+<dd style="margin-left: 5.0em"><br>
 Enables or disables sharing of local printers with other computers.
-<p style="margin-left: 5.0em; text-indent: -5.0em">--[no-]user-cancel-any
-<br>
-<br>
+<dt>--[no-]user-cancel-any
+<dd style="margin-left: 5.0em"><br>
 Allows or prevents users from canceling jobs owned by others.
+</dl>
 <h2 class="title"><a name="EXAMPLES">Examples</a></h2>
 Display the current settings:
-<pre>
+<pre class="man">
     cupsctl
 </pre>
 <p>Enable debug logging:
-<pre>
+<pre class="man">
     cupsctl --debug-logging
 </pre>
 <p>Get the current debug logging state:
-<pre>
+<pre class="man">
     cupsctl | grep '^_debug_logging' | awk -F= '{print $2}'
 </pre>
 <p>Disable printer sharing:
-<pre>
+<pre class="man">
     cupsctl --no-share-printers
 </pre>
 <h2 class="title"><a name="KNOWN_ISSUES">Known Issues</a></h2>

@@ -24,132 +24,71 @@ defined.
 <p>Directives may be placed anywhere on a line and are followed by
 one or more values. The following is a list of the available
 directives and the values they accept:
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#define</b> name value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#elif</b> {name | value}
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#else</b>
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#endif</b>
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#font</b> name encoding "version" charset status
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#if</b> {name | value}
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#include</b> &lt;filename>
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#include</b> "filename"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#media</b> name width length
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#media</b> "name/text" width length
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>#po</b> locale "filename.po"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Attribute</b> name "" value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Attribute</b> name keyword value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Attribute</b> name "keyword/text" value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Choice</b> name "code"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Choice</b> "name/text" "code"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ColorDevice</b> boolean-value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ColorModel</b> name colorspace colororder compression
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ColorModel</b> "name/text" colorspace colororder compression
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ColorProfile</b> resolution/mediatype gamma density matrix
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Copyright</b> "text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CustomMedia</b> name width length left bottom right top "size-code" "region-code"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>CustomMedia</b> "name/text" width length left bottom right top "size-code" "region-code"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Cutter</b> boolean-value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Darkness</b> temperature name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Darkness</b> temperature "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>DriverType</b> type
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Duplex</b> type
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Filter</b> mime-type cost program
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Finishing</b> name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Finishing</b> "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Font</b> *
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Font</b> name encoding "version" charset status
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Group</b> name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Group</b> "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>HWMargins</b> left bottom right top
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>InputSlot</b> position name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>InputSlot</b> position "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Installable</b> name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Installable</b> "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>LocAttribute</b> name "keyword/text" value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ManualCopies</b> boolean-value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Manufacturer</b> "name"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>MaxSize</b> width length
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>MediaSize</b> name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>MediaType</b> type name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>MediaType</b> type "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>MinSize</b> width length
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ModelName</b> "name"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>ModelNumber</b> number
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Option</b> name type section order
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Option</b> "name/text" type section order
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>PCFileName</b> "filename.ppd"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Resolution</b> colorspace bits-per-color row-count row-feed row-step name
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Resolution</b> colorspace bits-per-color row-count row-feed row-step "name/text"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>SimpleColorProfile</b> resolution/mediatype density yellow-density red-density gamma red-adjust green-adjust blue-adjust
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Throughput</b> pages-per-minute
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>UIConstraints</b> "*Option1 *Option2"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>UIConstraints</b> "*Option1 Choice1 *Option2"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>UIConstraints</b> "*Option1 *Option2 Choice2"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>UIConstraints</b> "*Option1 Choice1 *Option2 Choice2"
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>VariablePaperSize</b> boolean-value
-<br>
-<p style="margin-left: 5.0em; text-indent: -5.0em"><b>Version</b> number
-<br>
+<dl class="man">
+<dt><b>#define</b> name value
+<dd style="margin-left: 5.0em"><dt><b>#elif</b> {name | value}
+<dd style="margin-left: 5.0em"><dt><b>#else</b>
+<dd style="margin-left: 5.0em"><dt><b>#endif</b>
+<dd style="margin-left: 5.0em"><dt><b>#font</b> name encoding "version" charset status
+<dd style="margin-left: 5.0em"><dt><b>#if</b> {name | value}
+<dd style="margin-left: 5.0em"><dt><b>#include</b> &lt;filename>
+<dd style="margin-left: 5.0em"><dt><b>#include</b> "filename"
+<dd style="margin-left: 5.0em"><dt><b>#media</b> name width length
+<dd style="margin-left: 5.0em"><dt><b>#media</b> "name/text" width length
+<dd style="margin-left: 5.0em"><dt><b>#po</b> locale "filename.po"
+<dd style="margin-left: 5.0em"><dt><b>Attribute</b> name "" value
+<dd style="margin-left: 5.0em"><dt><b>Attribute</b> name keyword value
+<dd style="margin-left: 5.0em"><dt><b>Attribute</b> name "keyword/text" value
+<dd style="margin-left: 5.0em"><dt><b>Choice</b> name "code"
+<dd style="margin-left: 5.0em"><dt><b>Choice</b> "name/text" "code"
+<dd style="margin-left: 5.0em"><dt><b>ColorDevice</b> boolean-value
+<dd style="margin-left: 5.0em"><dt><b>ColorModel</b> name colorspace colororder compression
+<dd style="margin-left: 5.0em"><dt><b>ColorModel</b> "name/text" colorspace colororder compression
+<dd style="margin-left: 5.0em"><dt><b>ColorProfile</b> resolution/mediatype gamma density matrix
+<dd style="margin-left: 5.0em"><dt><b>Copyright</b> "text"
+<dd style="margin-left: 5.0em"><dt><b>CustomMedia</b> name width length left bottom right top "size-code" "region-code"
+<dd style="margin-left: 5.0em"><dt><b>CustomMedia</b> "name/text" width length left bottom right top "size-code" "region-code"
+<dd style="margin-left: 5.0em"><dt><b>Cutter</b> boolean-value
+<dd style="margin-left: 5.0em"><dt><b>Darkness</b> temperature name
+<dd style="margin-left: 5.0em"><dt><b>Darkness</b> temperature "name/text"
+<dd style="margin-left: 5.0em"><dt><b>DriverType</b> type
+<dd style="margin-left: 5.0em"><dt><b>Duplex</b> type
+<dd style="margin-left: 5.0em"><dt><b>Filter</b> mime-type cost program
+<dd style="margin-left: 5.0em"><dt><b>Finishing</b> name
+<dd style="margin-left: 5.0em"><dt><b>Finishing</b> "name/text"
+<dd style="margin-left: 5.0em"><dt><b>Font</b> *
+<dd style="margin-left: 5.0em"><dt><b>Font</b> name encoding "version" charset status
+<dd style="margin-left: 5.0em"><dt><b>Group</b> name
+<dd style="margin-left: 5.0em"><dt><b>Group</b> "name/text"
+<dd style="margin-left: 5.0em"><dt><b>HWMargins</b> left bottom right top
+<dd style="margin-left: 5.0em"><dt><b>InputSlot</b> position name
+<dd style="margin-left: 5.0em"><dt><b>InputSlot</b> position "name/text"
+<dd style="margin-left: 5.0em"><dt><b>Installable</b> name
+<dd style="margin-left: 5.0em"><dt><b>Installable</b> "name/text"
+<dd style="margin-left: 5.0em"><dt><b>LocAttribute</b> name "keyword/text" value
+<dd style="margin-left: 5.0em"><dt><b>ManualCopies</b> boolean-value
+<dd style="margin-left: 5.0em"><dt><b>Manufacturer</b> "name"
+<dd style="margin-left: 5.0em"><dt><b>MaxSize</b> width length
+<dd style="margin-left: 5.0em"><dt><b>MediaSize</b> name
+<dd style="margin-left: 5.0em"><dt><b>MediaType</b> type name
+<dd style="margin-left: 5.0em"><dt><b>MediaType</b> type "name/text"
+<dd style="margin-left: 5.0em"><dt><b>MinSize</b> width length
+<dd style="margin-left: 5.0em"><dt><b>ModelName</b> "name"
+<dd style="margin-left: 5.0em"><dt><b>ModelNumber</b> number
+<dd style="margin-left: 5.0em"><dt><b>Option</b> name type section order
+<dd style="margin-left: 5.0em"><dt><b>Option</b> "name/text" type section order
+<dd style="margin-left: 5.0em"><dt><b>PCFileName</b> "filename.ppd"
+<dd style="margin-left: 5.0em"><dt><b>Resolution</b> colorspace bits-per-color row-count row-feed row-step name
+<dd style="margin-left: 5.0em"><dt><b>Resolution</b> colorspace bits-per-color row-count row-feed row-step "name/text"
+<dd style="margin-left: 5.0em"><dt><b>SimpleColorProfile</b> resolution/mediatype density yellow-density red-density gamma red-adjust green-adjust blue-adjust
+<dd style="margin-left: 5.0em"><dt><b>Throughput</b> pages-per-minute
+<dd style="margin-left: 5.0em"><dt><b>UIConstraints</b> "*Option1 *Option2"
+<dd style="margin-left: 5.0em"><dt><b>UIConstraints</b> "*Option1 Choice1 *Option2"
+<dd style="margin-left: 5.0em"><dt><b>UIConstraints</b> "*Option1 *Option2 Choice2"
+<dd style="margin-left: 5.0em"><dt><b>UIConstraints</b> "*Option1 Choice1 *Option2 Choice2"
+<dd style="margin-left: 5.0em"><dt><b>VariablePaperSize</b> boolean-value
+<dd style="margin-left: 5.0em"><dt><b>Version</b> number
+<dd style="margin-left: 5.0em"></dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1)
 <br>

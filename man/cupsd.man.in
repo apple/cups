@@ -12,14 +12,25 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd 8 "CUPS" "4 March 2014" "Apple Inc."
+.TH cupsd 8 "CUPS" "3 April 2014" "Apple Inc."
 .SH NAME
 cupsd \- cups scheduler
 .SH SYNOPSIS
 .B cupsd
-[ -c
+[
+.B \-c
 .I config-file
-] [ -f ] [ -F ] [ -h ] [ -l ] [ -t ]
+] [ 
+.B \-f
+] [
+.B \-F
+] [
+.B \-h
+] [
+.B -l
+] [
+.B -t
+]
 .SH DESCRIPTION
 .B cupsd
 is the scheduler for CUPS. It implements a printing system based upon the Internet Printing Protocol, version 2.1. If no options are specified on the command-line then the default configuration file
@@ -27,37 +38,87 @@ is the scheduler for CUPS. It implements a printing system based upon the Intern
 will be used.
 .SH OPTIONS
 .TP 5
--c config-file
+.BI \-c \ config-file
 Uses the named configuration file.
 .TP 5
--f
+.B \-f
 Run
 .B cupsd
 in the foreground; the default is to run in the background as a "daemon".
 .TP 5
--F
+.B \-F
 Run
 .B cupsd
 in the foreground but detach the process from the controlling terminal and current directory. This is useful for running
-.BR cupsd from init (8).
+.B cupsd
+from
+.BR init (8).
 .TP 5
--h
+.B \-h
 Shows the program usage.
 .TP 5
--l
+.B \-l
 This option is passed to
 .B cupsd
 when it is run from
-.BR launchd (8).
+.BR launchd (8)
+or
+.BR systemd (8).
 .TP 5
--t
+.B \-t
 Test the configuration file for syntax errors.
-.SH COMPATIBILITY
+.SH FILES
+.nf
+.I /etc/cups/classes.conf
+.I /etc/cups/cups-files.conf
+.I /etc/cups/cupsd.conf
+.I /usr/share/cups/mime/mime.convs
+.I /usr/share/cups/mime/mime.types
+.I /etc/cups/printers.conf
+.fi
+.SH CONFORMING TO
 .B cupsd
-implements all of the required IPP/2.1 attributes and operations. It also implements several CUPS-specific administration operations.
+implements all of the required IPP/2.1 attributes and operations. It also implements several CUPS-specific administrative operations.
+.SH EXAMPLES
+Run
+.B cupsd
+in the background with the default configuration file:
+.nf
+
+    cupsd
+
+.fi
+Test a configuration file called
+.IR test.conf :
+.nf
+
+    cupsd \-t \-c test.conf
+
+.fi
+Run
+.B cupsd
+in the foreground with a test configuration file called
+.IR test.conf :
+.nf
+
+    cupsd \-f \-c test.conf
+
+.fi
 .SH SEE ALSO
-.BR backend (7), classes.conf (5), cups-deviced (8), cups-driverd (8), cups-lpd (8), cupsd.conf (5), filter (7), launchd (8), mime.convs (5), mime.types (5), printers.conf (5),
-http://localhost:631/help
+.BR backend (7),
+.BR classes.conf (5),
+.BR cups (1),
+.BR cups-deviced (8),
+.BR cups-driverd (8),
+.BR cups-lpd (8),
+.BR cupsd.conf (5),
+.BR filter (7),
+.BR launchd (8),
+.BR mime.convs (5),
+.BR mime.types (5),
+.BR printers.conf (5),
+.BR systemd (8),
+CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
 Copyright \[co] 2007-2014 by Apple Inc.
 .\"

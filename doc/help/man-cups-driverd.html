@@ -16,7 +16,7 @@ cat
 <br>
 <b>cups-driverd</b>
 list
-<i>request_id</i> <i>limit</i> <i>options</i>
+<i>request_id</i><i>limit</i><i>options</i>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <i>cups-driverd</i> shows or lists PPD files. It is run in
 response to CUPS-Add-Modify-Printer or CUPS-Get-Devices requests.
@@ -44,14 +44,14 @@ next section.
 <h3><a name="DRIVER_PROGRAMS">Driver Programs</a></h3>
 Driver programs provide a  interface to dynamically-generated PPD
 files. The following arguments are currently defined:
-<p style="margin-left: 5.0em; text-indent: -5.0em">drivername list
-<br>
-<br>
+<dl class="man">
+<dt>drivername list
+<dd style="margin-left: 5.0em"><br>
 Lists the supported PPD files to stdout.
-<p style="margin-left: 5.0em; text-indent: -5.0em">drivername cat ppdname
-<br>
-<br>
+<dt>drivername cat ppdname
+<dd style="margin-left: 5.0em"><br>
 Writes the named PPD file to stdout.
+</dl>
 <p>Driver programs MUST NOT query hardware or make other long-term operations that
 would delay the return of a driver list. See the NOTES section below for
 specific recommendations.
@@ -59,7 +59,7 @@ specific recommendations.
 When run with the single argument "list", the program must list
 the available PPD files it can generate to stdout using the
 following format:
-<pre>
+<pre class="man">
     "drivername:ppdname" language "make" "make and model"
     "drivername:ppdname" language "make" "make and model" "1284 device id"
     "drivername:ppdname" language "make" "make and model" "1284 device id" "(PPD product)"
@@ -85,18 +85,17 @@ any output to stdout and report the error to stderr instead.
 <h3><a name="DRIVER_ERROR_MESSAGES">Driver Error Messages</a></h3>
 Error messages can be relayed back to <i>cupsd</i> by writing them
 to stderr. The following prefixes are recognized:
-<p style="margin-left: 5.0em; text-indent: -5.0em">DEBUG: [drivername]
-<br>
-<br>
+<dl class="man">
+<dt>DEBUG: [drivername]
+<dd style="margin-left: 5.0em"><br>
 Debugging messages
-<p style="margin-left: 5.0em; text-indent: -5.0em">ERROR: [drivername]
-<br>
-<br>
+<dt>ERROR: [drivername]
+<dd style="margin-left: 5.0em"><br>
 Error messages
-<p style="margin-left: 5.0em; text-indent: -5.0em">INFO: [drivername]
-<br>
-<br>
+<dt>INFO: [drivername]
+<dd style="margin-left: 5.0em"><br>
 Informational messages
+</dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 Due to performance considerations, driver programs have been officially
 deprecated and should not be used for new development. Currently only the
