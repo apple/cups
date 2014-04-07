@@ -204,6 +204,7 @@
 	ATTR uri device-uri file:/tmp/Test1
 	ATTR enum printer-state 3
 	ATTR boolean printer-is-accepting-jobs true
+	ATTR text printer-info "Test Printer 1"
 
 	FILE testps.ppd
 

@@ -885,7 +885,7 @@ cupsdLoadAllPrinters(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
     }
-    else if (!_cups_strcasecmp(line, "</Printer>") || _cups_strcasecmp(line, "</DefaultPrinter>"))
+    else if (!_cups_strcasecmp(line, "</Printer>") || !_cups_strcasecmp(line, "</DefaultPrinter>"))
     {
       if (p != NULL)
       {

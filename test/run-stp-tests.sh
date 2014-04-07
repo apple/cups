@@ -766,6 +766,35 @@ for file in 5*.sh; do
 	fi
 done
 
+#
+# Restart the server...
+#
+
+echo $ac_n "Performing restart test: $ac_c"
+echo "" >>$strfile
+echo "\"5.10-restart\":" >>$strfile
+
+kill -HUP $cupsd
+
+while true; do
+	running=`../systemv/lpstat -r 2>/dev/null`
+	if test "x$running" = "xscheduler is running"; then
+		break
+	fi
+
+	sleep 10
+done
+
+description="`lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
+if test "x$description" != "xTest Printer 1"; then
+	echo "Failed, printer-info for Test1 is '$description', expected 'Test Printer 1'." >>$strfile
+	echo "FAIL (got '$description', expected 'Test Printer 1')"
+	fail=`expr $fail + 1`
+else
+	echo "Passed." >>$strfile
+	echo PASS
+fi
+
 echo "</PRE>" >>$strfile
 
 #
@@ -924,10 +953,10 @@ fi
 
 # Warning log messages
 count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
-if test $count != 9; then
-	echo "FAIL: $count warning messages, expected 9."
+if test $count != 18; then
+	echo "FAIL: $count warning messages, expected 18."
 	$GREP '^W ' $BASE/log/error_log
-	echo "<P>FAIL: $count warning messages, expected 9.</P>" >>$strfile
+	echo "<P>FAIL: $count warning messages, expected 18.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	$GREP '^W ' $BASE/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
