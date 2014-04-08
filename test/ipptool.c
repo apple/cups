@@ -1787,6 +1787,36 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		pass = 0;
 		goto test_exit;
 	      }
+
+	      do
+	      {
+	        ipp_t	*col;			/* Collection value */
+	        long	pos = ftell(fp);	/* Save position of file */
+
+		if (!get_token(fp, token, sizeof(token), &linenum))
+		  break;
+
+		if (strcmp(token, ","))
+		{
+		  fseek(fp, pos, SEEK_SET);
+		  break;
+		}
+
+		if (!get_token(fp, token, sizeof(token), &linenum) || strcmp(token, "{"))
+		{
+		  print_fatal_error("Unexpected \"%s\" on line %d.", token, linenum);
+		  pass = 0;
+		  goto test_exit;
+		  break;
+		}
+
+	        if ((col = get_collection(vars, fp, &linenum)) == NULL)
+		  break;
+
+		ippSetCollection(request, &attrptr, ippGetCount(attrptr), col);
+		lastcol = attrptr;
+	      }
+	      while (!strcmp(token, "{"));
 	      break;
 
           case IPP_TAG_STRING :
@@ -3815,6 +3845,13 @@ get_token(FILE *fp,			/* I  - File to read from */
           break;
 
       (*linenum) ++;
+    }
+    else if (ch == '{' || ch == '}' || ch == ',')
+    {
+      buf[0] = (char)ch;
+      buf[1] = '\0';
+
+      return (buf);
     }
     else
     {

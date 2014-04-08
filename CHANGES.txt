@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Dropped lppasswd and support for Digest authentication in in the
 	  scheduler (STR #4321)
+	- The ipptool program now supports collection attributes with multiple
+	  values (<rdar://problem/15355124>)
 	- The sample drivers now include all of the installed localizations by
 	  default (<rdar://problem/14756625>)
 	- Adopted Linux man page conventions and updated all man pages
