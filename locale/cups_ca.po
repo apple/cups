@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -2988,15 +2988,6 @@ msgstr "S'està acabant el bàner"
 msgid "English"
 msgstr "Anglès"
 
-msgid "Enter old password:"
-msgstr "Introduïu la contrasenya antiga:"
-
-msgid "Enter password again:"
-msgstr "Introduïu la contrasenya un altre cop:"
-
-msgid "Enter password:"
-msgstr "Introduïu la contrasenya:"
-
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -4971,18 +4962,6 @@ msgstr ""
 "         lpoptions [-h servidor] [-E] -p impressora -o opció[=valor] ...\n"
 "         lpoptions [-h servidor] [-E] -x impressora"
 
-msgid "Usage: lppasswd [-g groupname]"
-msgstr "Sintaxi: lppasswd [-g nomgrup]"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-"Sintaxi: lppasswd [-g nomgrup] [nomusuari]\n"
-"         lppasswd [-g nomgrup] -a [nomusuari]\n"
-"         lppasswd [-g nomgrup] -x [nomusuari]"
-
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
@@ -5043,13 +5022,6 @@ msgid ""
 msgstr ""
 "Heu d'accedir a aquesta pagina a través de la URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
-
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
-"La contrasenya ha de tenir com a mínim 6 caràcters, no pot contenir el nom "
-"d'usuari, i ha de tenir com a mínim una lletra i un número."
 
 msgid "ZPL Label Printer"
 msgstr "Impressora d'etiquetes ZPL"
@@ -5464,51 +5436,6 @@ msgstr "lpoptions: no s'ha pogut obrir el fitxer PPD per %s."
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: la impressora o la classe són desconegudes."
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr ""
-"lppasswd: només l'usuari primari (root) pot afegir o esborrar contrasenyes."
-
-msgid "lppasswd: Password file busy."
-msgstr "lppaswd: el fitxer de contrasenyes està ocupat."
-
-msgid "lppasswd: Password file not updated."
-msgstr "lppaswd: el fitxer de contrasenyes no està actualitzat."
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr "lppaswwd: la contrasenya no coincideix."
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr "lppaswwd: s'ha refusat la contrasenya."
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr "lppaswwd: les contrasenyes no coincideixen."
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr "lppasswd: no s'ha pogut copiar la cadena de contrasenya: %s"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr "lppasswd: no s'ha pogut obrir el fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr "lppasswd: no s'ha pogut escriure al fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-"lppasswd: no s'ha pogut fer la còpia de seguretat del fitxer de contrasenyes "
-"antic: %s"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr "lppasswd: no s'ha pogut canviar el nom del fitxer de contrasenyes: %s"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr "lppaswd: l'usuari «%s» i el grup «%s» no existeixen."
 
 #, c-format
 msgid ""
@@ -6111,6 +6038,15 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Address - 1 1/8 x 3 1/2\""
 #~ msgstr "Adreça - 1 1/8 x 3 1/2\""
 
+#~ msgid "Enter old password:"
+#~ msgstr "Introduïu la contrasenya antiga:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Introduïu la contrasenya un altre cop:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Introduïu la contrasenya:"
+
 #~ msgid "File Folder - 9/16 x 3 7/16\""
 #~ msgstr "Carpeta d'arxivador: 9/16 x 3 7/16\""
 
@@ -6265,6 +6201,25 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "Sintaxi: cupsfilter [ opcions ] nomfitxer"
 
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "Sintaxi: lppasswd [-g nomgrup]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "Sintaxi: lppasswd [-g nomgrup] [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -a [nomusuari]\n"
+#~ "         lppasswd [-g nomgrup] -x [nomusuari]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "La contrasenya ha de tenir com a mínim 6 caràcters, no pot contenir el "
+#~ "nom d'usuari, i ha de tenir com a mínim una lletra i un número."
+
 #~ msgid "convert: Use the -f option to specify a file to convert."
 #~ msgstr ""
 #~ "convert: feu servir l'opció -f per especificar el fitxer que voleu "
@@ -6289,3 +6244,44 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: falta la versió a «-V»."
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr ""
+#~ "lppasswd: només l'usuari primari (root) pot afegir o esborrar "
+#~ "contrasenyes."
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppaswd: el fitxer de contrasenyes està ocupat."
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppaswd: el fitxer de contrasenyes no està actualitzat."
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppaswwd: la contrasenya no coincideix."
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppaswwd: s'ha refusat la contrasenya."
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppaswwd: les contrasenyes no coincideixen."
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: no s'ha pogut copiar la cadena de contrasenya: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut obrir el fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr "lppasswd: no s'ha pogut escriure al fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut fer la còpia de seguretat del fitxer de "
+#~ "contrasenyes antic: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr ""
+#~ "lppasswd: no s'ha pogut canviar el nom del fitxer de contrasenyes: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppaswd: l'usuari «%s» i el grup «%s» no existeixen."

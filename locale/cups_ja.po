@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3020,15 +3020,6 @@ msgstr "終了バナー"
 msgid "English"
 msgstr "English"
 
-msgid "Enter old password:"
-msgstr "古いパスワードを入力:"
-
-msgid "Enter password again:"
-msgstr "パスワードを再度入力:"
-
-msgid "Enter password:"
-msgstr "パスワードを入力:"
-
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -4988,18 +4979,6 @@ msgstr ""
 "        lpoptions [-h サーバー] [-E] -p プリンター -o オプション[=値] ...\n"
 "        lpoptions [-h サーバー] [-E] -x プリンター"
 
-msgid "Usage: lppasswd [-g groupname]"
-msgstr "使い方: lppasswd [-g グループ名]"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-"使い方: lppasswd [-g グループ名] [ユーザー名]\n"
-"        lppasswd [-g グループ名] -a [ユーザー名]\n"
-"        lppasswd [-g グループ名] -x [ユーザー名]"
-
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
@@ -5060,13 +5039,6 @@ msgid ""
 msgstr ""
 "このページには URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A> を使ってア"
 "クセスする必要があります。"
-
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
-"パスワードは少なくとも 6 文字以上で、あなたのユーザー名を含んではならず、少な"
-"くとも 1 つの英字および数値を含んでなければなりません。"
 
 msgid "ZPL Label Printer"
 msgstr "ZPL ラベルプリンター"
@@ -5485,48 +5457,6 @@ msgstr "lpoptions: %s の PPD ファイルを開けません。"
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: 未知のプリンターまたはクラスです。"
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr "lppasswd: root だけがパスワードの追加と削除を行えます。"
-
-msgid "lppasswd: Password file busy."
-msgstr "lppasswd: パスワードファイルがビジー状態です。"
-
-msgid "lppasswd: Password file not updated."
-msgstr "lppasswd: パスワードファイルは更新されません。"
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr "lppasswd: 残念ながら、パスワードがマッチしません。"
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr "lppasswd: 残念ながら、パスワードは拒否されました。"
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr "lppasswd: 残念ながら、パスワードがマッチしません。"
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr "lppasswd: パスワード文字列をコピーできません: %s"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr "lppasswd: パスワードファイルを開けません: %s"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr "lppasswd: パスワードファイルに書き込めません: %s"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr "lppasswd: 古いパスワードファイルのバックアップに失敗しました: %s"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr "lppasswd: パスワードファイルの名前の変更に失敗しました: %s"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr "lppasswd: ユーザー \"%s\" およびグループ \"%s\" は存在しません。"
 
 #, c-format
 msgid ""
@@ -6076,6 +6006,15 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: エラー - \"-b\" オプションのあとに宛先が必要です。"
 
+#~ msgid "Enter old password:"
+#~ msgstr "古いパスワードを入力:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "パスワードを再度入力:"
+
+#~ msgid "Enter password:"
+#~ msgstr "パスワードを入力:"
+
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "プリンター %s の出力は %s に送られます"
 
@@ -6154,6 +6093,25 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "使い方: cupsfilter [オプション] ファイル名"
 
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "使い方: lppasswd [-g グループ名]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "使い方: lppasswd [-g グループ名] [ユーザー名]\n"
+#~ "        lppasswd [-g グループ名] -a [ユーザー名]\n"
+#~ "        lppasswd [-g グループ名] -x [ユーザー名]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "パスワードは少なくとも 6 文字以上で、あなたのユーザー名を含んではならず、"
+#~ "少なくとも 1 つの英字および数値を含んでなければなりません。"
+
 #~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
 #~ msgstr ""
 #~ "cupsd: launchd(8) サポートがコンパイルされていないので、通常モードで動作し"
@@ -6167,3 +6125,39 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: \"-V\" にバージョンの指定がありません。"
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr "lppasswd: root だけがパスワードの追加と削除を行えます。"
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppasswd: パスワードファイルがビジー状態です。"
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppasswd: パスワードファイルは更新されません。"
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppasswd: 残念ながら、パスワードがマッチしません。"
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppasswd: 残念ながら、パスワードは拒否されました。"
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppasswd: 残念ながら、パスワードがマッチしません。"
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: パスワード文字列をコピーできません: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: パスワードファイルを開けません: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr "lppasswd: パスワードファイルに書き込めません: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr "lppasswd: 古いパスワードファイルのバックアップに失敗しました: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr "lppasswd: パスワードファイルの名前の変更に失敗しました: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppasswd: ユーザー \"%s\" およびグループ \"%s\" は存在しません。"

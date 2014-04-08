@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -2759,15 +2759,6 @@ msgstr "Конечный баннер"
 msgid "English"
 msgstr "Russian"
 
-msgid "Enter old password:"
-msgstr "Введите старый пароль:"
-
-msgid "Enter password again:"
-msgstr "Введите пароль снова:"
-
-msgid "Enter password:"
-msgstr "Введите пароль:"
-
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -4678,15 +4669,6 @@ msgid ""
 "       lpoptions [-h server] [-E] -x printer"
 msgstr ""
 
-msgid "Usage: lppasswd [-g groupname]"
-msgstr ""
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
@@ -4744,11 +4726,6 @@ msgid ""
 msgstr ""
 "Вы должны получить доступ к этой странице с помощью URL <A HREF=«https://%s:"
 "%d%s»>https://%s:%d%s</A>."
-
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Принтер для печати этикеток ZPL"
@@ -5146,48 +5123,6 @@ msgid "lpoptions: Unable to open PPD file for %s."
 msgstr ""
 
 msgid "lpoptions: Unknown printer or class."
-msgstr ""
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr ""
-
-msgid "lppasswd: Password file busy."
-msgstr ""
-
-msgid "lppasswd: Password file not updated."
-msgstr ""
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr ""
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr ""
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
 msgstr ""
 
 #, c-format
@@ -8156,6 +8091,15 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "Empty PPD file!"
 #~ msgstr "Пустой PPD-файл!"
+
+#~ msgid "Enter old password:"
+#~ msgstr "Введите старый пароль:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Введите пароль снова:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Введите пароль:"
 
 #~ msgid "Error: need hostname after '-h' option\n"
 #~ msgstr "ERROR: Требуется имя хоста после параметра '-h'\n"

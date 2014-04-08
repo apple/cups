@@ -776,9 +776,6 @@
 // TRANSLATORS: Banner/cover sheet after the print job.
 "Ending Banner" = "Ending Banner";
 "English" = "English";
-"Enter old password:" = "Enter old password:";
-"Enter password again:" = "Enter password again:";
-"Enter password:" = "Enter password:";
 "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket." = "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket.";
 "Envelope #10 " = "Envelope #10 ";
 "Envelope #11" = "Envelope #11";
@@ -1368,8 +1365,6 @@
 "Usage: ipptool [options] URI filename [ ... filenameN ]" = "Usage: ipptool [options] URI filename [ ... filenameN ]";
 "Usage: lpmove job/src dest" = "Usage: lpmove job/src dest";
 "Usage: lpoptions [-h server] [-E] -d printer\n       lpoptions [-h server] [-E] [-p printer] -l\n       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n       lpoptions [-h server] [-E] -x printer" = "Usage: lpoptions [-h server] [-E] -d printer\n       lpoptions [-h server] [-E] [-p printer] -l\n       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n       lpoptions [-h server] [-E] -x printer";
-"Usage: lppasswd [-g groupname]" = "Usage: lppasswd [-g groupname]";
-"Usage: lppasswd [-g groupname] [username]\n       lppasswd [-g groupname] -a [username]\n       lppasswd [-g groupname] -x [username]" = "Usage: lppasswd [-g groupname] [username]\n       lppasswd [-g groupname] -a [username]\n       lppasswd [-g groupname] -x [username]";
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]" = "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]";
 "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]" = "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]";
 "Usage: ppdhtml [options] filename.drv >filename.html" = "Usage: ppdhtml [options] filename.drv >filename.html";
@@ -1387,7 +1382,6 @@
 "Web Interface is Disabled" = "Web Interface is Disabled";
 "Yes" = "Yes";
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>." = "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>.";
-"Your password must be at least 6 characters long, cannot contain your username, and must contain at least one letter and number." = "Your password must be at least 6 characters long, cannot contain your username, and must contain at least one letter and number.";
 "ZPL Label Printer" = "ZPL Label Printer";
 "Zebra" = "Zebra";
 "aborted" = "aborted";
@@ -1504,18 +1498,6 @@
 "lpoptions: Unable to get PPD file for %s: %s" = "lpoptions: Unable to get PPD file for %s: %s";
 "lpoptions: Unable to open PPD file for %s." = "lpoptions: Unable to open PPD file for %s.";
 "lpoptions: Unknown printer or class." = "lpoptions: Unknown printer or class.";
-"lppasswd: Only root can add or delete passwords." = "lppasswd: Only root can add or delete passwords.";
-"lppasswd: Password file busy." = "lppasswd: Password file busy.";
-"lppasswd: Password file not updated." = "lppasswd: Password file not updated.";
-"lppasswd: Sorry, password doesn't match." = "lppasswd: Sorry, password doesn't match.";
-"lppasswd: Sorry, password rejected." = "lppasswd: Sorry, password rejected.";
-"lppasswd: Sorry, passwords don't match." = "lppasswd: Sorry, passwords don't match.";
-"lppasswd: Unable to copy password string: %s" = "lppasswd: Unable to copy password string: %s";
-"lppasswd: Unable to open password file: %s" = "lppasswd: Unable to open password file: %s";
-"lppasswd: Unable to write to password file: %s" = "lppasswd: Unable to write to password file: %s";
-"lppasswd: failed to backup old password file: %s" = "lppasswd: failed to backup old password file: %s";
-"lppasswd: failed to rename password file: %s" = "lppasswd: failed to rename password file: %s";
-"lppasswd: user \"%s\" and group \"%s\" do not exist." = "lppasswd: user \"%s\" and group \"%s\" do not exist.";
 "lpstat: error - %s environment variable names non-existent destination \"%s\"." = "lpstat: error - %s environment variable names non-existent destination \"%s\".";
 "members of class %s:" = "members of class %s:";
 "no entries" = "no entries";

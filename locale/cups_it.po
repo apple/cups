@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3064,15 +3064,6 @@ msgstr "Termine del banner"
 msgid "English"
 msgstr "Inglese"
 
-msgid "Enter old password:"
-msgstr "Digitare la vecchia password:"
-
-msgid "Enter password again:"
-msgstr "Digitare di nuovo la password:"
-
-msgid "Enter password:"
-msgstr "Digitare la password:"
-
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -5050,18 +5041,6 @@ msgstr ""
 "     lpoptions [-h server] [-E] -p stampante -o opzione[=valore] ...\n"
 "     lpoptions [-h server] [-E] -x stampante"
 
-msgid "Usage: lppasswd [-g groupname]"
-msgstr "Uso: lppasswd [-g groupname]"
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-"Uso: lppasswd [-g groupname] [username]\n"
-"     lppasswd [-g groupname] -a [username]\n"
-"     lppasswd [-g groupname] -x [username]"
-
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
@@ -5121,13 +5100,6 @@ msgid ""
 msgstr ""
 "Bisogna accedere a questa pagina, usando l'URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
-
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
-"La password deve contenere almeno 6 caratteri, non può contenere l'username "
-"e deve contenere almeno una lettera ed un numero."
 
 msgid "ZPL Label Printer"
 msgstr "ZPL Label Printer"
@@ -5536,51 +5508,6 @@ msgstr "lpoptions: non è possibile aprire il file PPD per %s."
 
 msgid "lpoptions: Unknown printer or class."
 msgstr "lpoptions: stampante o classe sconosciuta."
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr "lppasswd: solo root può aggiungere o eliminare le password."
-
-msgid "lppasswd: Password file busy."
-msgstr "lppasswd: il file delle password è già in uso."
-
-msgid "lppasswd: Password file not updated."
-msgstr "lppasswd: il file delle password non è aggiornato."
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr "lppasswd: spiacenti, la password non è esatta."
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr "lppasswd: spiacenti, la password è stata rifiutata."
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr "lppasswd: spiacenti, le password non sono esatte."
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr "lppasswd: non è possibile copiare la stringa della password: %s"
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr "lppasswd: non è possibile aprire il file delle password: %s"
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr ""
-"lppasswd: non è possibile scrivere all'interno del file delle password: %s"
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-"lppasswd: non è possibile eseguire il backup del vecchio file delle "
-"password: %s"
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr "lppasswd: non è possibile rinominare il file delle password: %s"
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr "lppasswd: l'utente \"%s\" ed il gruppo \"%s\" non esistono."
 
 #, c-format
 msgid ""
@@ -6094,6 +6021,15 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
 
+#~ msgid "Enter old password:"
+#~ msgstr "Digitare la vecchia password:"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Digitare di nuovo la password:"
+
+#~ msgid "Enter password:"
+#~ msgstr "Digitare la password:"
+
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "L'output della stampante %s è stato inviato a %s"
 
@@ -6150,6 +6086,64 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "Uso: cupsfilter [ opzioni ] file"
 
+#~ msgid "Usage: lppasswd [-g groupname]"
+#~ msgstr "Uso: lppasswd [-g groupname]"
+
+#~ msgid ""
+#~ "Usage: lppasswd [-g groupname] [username]\n"
+#~ "       lppasswd [-g groupname] -a [username]\n"
+#~ "       lppasswd [-g groupname] -x [username]"
+#~ msgstr ""
+#~ "Uso: lppasswd [-g groupname] [username]\n"
+#~ "     lppasswd [-g groupname] -a [username]\n"
+#~ "     lppasswd [-g groupname] -x [username]"
+
+#~ msgid ""
+#~ "Your password must be at least 6 characters long, cannot contain your "
+#~ "username, and must contain at least one letter and number."
+#~ msgstr ""
+#~ "La password deve contenere almeno 6 caratteri, non può contenere "
+#~ "l'username e deve contenere almeno una lettera ed un numero."
+
 #~ msgid "cupsd: launchd(8) support not compiled in, running in normal mode."
 #~ msgstr ""
 #~ "cupsd: launchd(8) non supporta i compilati, quando è in modalità normale."
+
+#~ msgid "lppasswd: Only root can add or delete passwords."
+#~ msgstr "lppasswd: solo root può aggiungere o eliminare le password."
+
+#~ msgid "lppasswd: Password file busy."
+#~ msgstr "lppasswd: il file delle password è già in uso."
+
+#~ msgid "lppasswd: Password file not updated."
+#~ msgstr "lppasswd: il file delle password non è aggiornato."
+
+#~ msgid "lppasswd: Sorry, password doesn't match."
+#~ msgstr "lppasswd: spiacenti, la password non è esatta."
+
+#~ msgid "lppasswd: Sorry, password rejected."
+#~ msgstr "lppasswd: spiacenti, la password è stata rifiutata."
+
+#~ msgid "lppasswd: Sorry, passwords don't match."
+#~ msgstr "lppasswd: spiacenti, le password non sono esatte."
+
+#~ msgid "lppasswd: Unable to copy password string: %s"
+#~ msgstr "lppasswd: non è possibile copiare la stringa della password: %s"
+
+#~ msgid "lppasswd: Unable to open password file: %s"
+#~ msgstr "lppasswd: non è possibile aprire il file delle password: %s"
+
+#~ msgid "lppasswd: Unable to write to password file: %s"
+#~ msgstr ""
+#~ "lppasswd: non è possibile scrivere all'interno del file delle password: %s"
+
+#~ msgid "lppasswd: failed to backup old password file: %s"
+#~ msgstr ""
+#~ "lppasswd: non è possibile eseguire il backup del vecchio file delle "
+#~ "password: %s"
+
+#~ msgid "lppasswd: failed to rename password file: %s"
+#~ msgstr "lppasswd: non è possibile rinominare il file delle password: %s"
+
+#~ msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
+#~ msgstr "lppasswd: l'utente \"%s\" ed il gruppo \"%s\" non esistono."

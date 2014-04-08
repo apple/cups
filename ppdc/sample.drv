@@ -1,16 +1,16 @@
 //
 // "$Id$"
 //
-//   Driver info file for CUPS-supplied PPDs.
+// Driver info file for CUPS-supplied PPDs.
 //
-//   Copyright 2007-2012 by Apple Inc.
-//   Copyright 1993-2006 by Easy Software Products.
+// Copyright 2007-2014 by Apple Inc.
+// Copyright 1993-2006 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 // Include necessary files...
@@ -22,26 +22,37 @@
 
 // Localizations are provided for all of the base languages supported by
 // CUPS...
-//#po da ""
-//#po de ""
-//#po es ""
-//#po et ""
-//#po fi ""
-//#po fr ""
-//#po he ""
-//#po id ""
-//#po it ""
-//#po ja ""
-//#po ko ""
-//#po nl ""
-//#po no ""
-//#po pl ""
-//#po pt ""
-//#po pt_BR ""
-//#po ru ""
-//#po sv ""
-//#po zh ""
-//#po zh_TW ""
+#po ar ""
+#po ca ""
+#po cs ""
+#po da ""
+#po de ""
+#po el ""
+#po es ""
+#po fi ""
+#po fr ""
+#po he ""
+#po hr ""
+#po hu ""
+#po id ""
+#po it ""
+#po ja ""
+#po ko ""
+#po ms ""
+#po no ""
+#po pl ""
+#po pt ""
+#po pt_PT ""
+#po ro ""
+#po ru ""
+#po sk ""
+#po sv ""
+#po th ""
+#po tr ""
+#po uk ""
+#po vi ""
+#po zh_CN ""
+#po zh_TW ""
 
 // MediaSize sizes used by label drivers...
 #media "w90h18/1.25x0.25\"" 90 18
@@ -108,7 +119,7 @@ Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright 2007-2013 by Apple Inc."
+Copyright "Copyright 2007-2014 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "These coded instructions, statements, and computer programs are the"
@@ -119,7 +130,7 @@ Copyright "file is missing or damaged, see the license at \"http://www.cups.org/
 
 Font *
 
-Version "1.5"
+Version "2.0"
 
 // Dymo Label Printer
 {

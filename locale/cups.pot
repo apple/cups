@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1003,11 +1003,11 @@ msgstr ""
 msgid "  --[no-]user-cancel-any  Allow/prevent users to cancel any job."
 msgstr ""
 
-#: ppdc/ppdc.cxx:455
+#: ppdc/ppdc.cxx:450
 msgid "  --cr                    End lines with CR (Mac OS 9)."
 msgstr ""
 
-#: ppdc/ppdc.cxx:457
+#: ppdc/ppdc.cxx:452
 msgid "  --crlf                  End lines with CR + LF (Windows)."
 msgstr ""
 
@@ -1033,7 +1033,7 @@ msgstr ""
 msgid "  --host regex            Match hostname to regular expression."
 msgstr ""
 
-#: ppdc/ppdc.cxx:459
+#: ppdc/ppdc.cxx:454
 msgid "  --lf                    End lines with LF (UNIX/Linux/OS X)."
 msgstr ""
 
@@ -1117,7 +1117,7 @@ msgstr ""
 msgid "  -D                      Remove the input file when finished."
 msgstr ""
 
-#: ppdc/ppdc.cxx:438 ppdc/ppdhtml.cxx:175 ppdc/ppdpo.cxx:255
+#: ppdc/ppdc.cxx:433 ppdc/ppdhtml.cxx:175 ppdc/ppdpo.cxx:255
 msgid "  -D name=value           Set named variable to value."
 msgstr ""
 
@@ -1141,7 +1141,7 @@ msgstr ""
 msgid "  -I                      Ignore errors."
 msgstr ""
 
-#: ppdc/ppdc.cxx:440 ppdc/ppdhtml.cxx:177 ppdc/ppdi.cxx:131 ppdc/ppdpo.cxx:257
+#: ppdc/ppdc.cxx:435 ppdc/ppdhtml.cxx:177 ppdc/ppdi.cxx:131 ppdc/ppdpo.cxx:257
 msgid "  -I include-dir          Add include directory to search path."
 msgstr ""
 
@@ -1201,7 +1201,7 @@ msgstr ""
 msgid "  -a                      Export all printers."
 msgstr ""
 
-#: ppdc/ppdc.cxx:442
+#: ppdc/ppdc.cxx:437
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
 
@@ -1221,7 +1221,7 @@ msgstr ""
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
 
-#: ppdc/ppdc.cxx:444
+#: ppdc/ppdc.cxx:439
 msgid "  -d output-dir           Specify the output directory."
 msgstr ""
 
@@ -1277,11 +1277,11 @@ msgstr ""
 msgid "  -l                      Run cupsd on demand."
 msgstr ""
 
-#: ppdc/ppdc.cxx:446
+#: ppdc/ppdc.cxx:441
 msgid "  -l lang[,lang,...]      Specify the output language(s) (locale)."
 msgstr ""
 
-#: ppdc/ppdc.cxx:448
+#: ppdc/ppdc.cxx:443
 msgid "  -m                      Use the ModelName value as the filename."
 msgstr ""
 
@@ -1349,7 +1349,7 @@ msgstr ""
 msgid "  -t                      Produce a test report."
 msgstr ""
 
-#: ppdc/ppdc.cxx:450
+#: ppdc/ppdc.cxx:445
 msgid "  -t                      Test PPDs instead of generating them."
 msgstr ""
 
@@ -1378,7 +1378,7 @@ msgid "  -u regex                Match URI to regular expression."
 msgstr ""
 
 #: systemv/cupsaddsmb.c:291 systemv/cupstestppd.c:3828 test/ipptool.c:4703
-#: ppdc/ppdc.cxx:452 ppdc/ppdpo.cxx:259
+#: ppdc/ppdc.cxx:447 ppdc/ppdpo.cxx:259
 msgid "  -v                      Be verbose."
 msgstr ""
 
@@ -1392,7 +1392,7 @@ msgid ""
 "                          Execute program if true."
 msgstr ""
 
-#: ppdc/ppdc.cxx:453
+#: ppdc/ppdc.cxx:448
 msgid "  -z                      Compress PPD files using GNU zip."
 msgstr ""
 
@@ -1543,172 +1543,172 @@ msgstr ""
 msgid " PASS"
 msgstr ""
 
-#: cups/ipp.c:5139
+#: cups/ipp.c:5219
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
 msgstr ""
 
-#: cups/ipp.c:5150
+#: cups/ipp.c:5230
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
 msgstr ""
 
-#: cups/ipp.c:4770
+#: cups/ipp.c:4850
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:4762
+#: cups/ipp.c:4842
 #, c-format
 msgid "\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:4788
+#: cups/ipp.c:4868
 #, c-format
 msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
 msgstr ""
 
-#: cups/ipp.c:5202
+#: cups/ipp.c:5282
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
 msgstr ""
 
-#: cups/ipp.c:5211
+#: cups/ipp.c:5291
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
 msgstr ""
 
-#: cups/ipp.c:4888
+#: cups/ipp.c:4968
 #, c-format
 msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4896
+#: cups/ipp.c:4976
 #, c-format
 msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4880
+#: cups/ipp.c:4960
 #, c-format
 msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4840
+#: cups/ipp.c:4920
 #, c-format
 msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4872
+#: cups/ipp.c:4952
 #, c-format
 msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4848
+#: cups/ipp.c:4928
 #, c-format
 msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4856
+#: cups/ipp.c:4936
 #, c-format
 msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4832
+#: cups/ipp.c:4912
 #, c-format
 msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4864
+#: cups/ipp.c:4944
 #, c-format
 msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4802
+#: cups/ipp.c:4882
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
 msgstr ""
 
-#: cups/ipp.c:5117
+#: cups/ipp.c:5197
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5108
+#: cups/ipp.c:5188
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5311
+#: cups/ipp.c:5391
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section 4.1.9)."
 msgstr ""
 
-#: cups/ipp.c:5321
+#: cups/ipp.c:5401
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section 4.1.9)."
 msgstr ""
 
-#: cups/ipp.c:5079
+#: cups/ipp.c:5159
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5088
+#: cups/ipp.c:5168
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5257
+#: cups/ipp.c:5337
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section 4.1.8)."
 msgstr ""
 
-#: cups/ipp.c:5267
+#: cups/ipp.c:5347
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section 4.1.8)."
 msgstr ""
 
-#: cups/ipp.c:4816
+#: cups/ipp.c:4896
 #, c-format
 msgid "\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
 msgstr ""
 
-#: cups/ipp.c:4959
+#: cups/ipp.c:5039
 #, c-format
 msgid "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 section 4.1.13)."
 msgstr ""
 
-#: cups/ipp.c:4940
+#: cups/ipp.c:5020
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4909
+#: cups/ipp.c:4989
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be positive (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:4924
+#: cups/ipp.c:5004
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:5021
+#: cups/ipp.c:5101
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
 msgstr ""
 
-#: cups/ipp.c:5030
+#: cups/ipp.c:5110
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
 msgstr ""
 
-#: cups/ipp.c:5173
+#: cups/ipp.c:5253
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
 msgstr ""
 
-#: cups/ipp.c:5182
+#: cups/ipp.c:5262
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
 msgstr ""
@@ -3617,18 +3617,6 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: systemv/lppasswd.c:193
-msgid "Enter old password:"
-msgstr ""
-
-#: systemv/lppasswd.c:224
-msgid "Enter password again:"
-msgstr ""
-
-#: systemv/lppasswd.c:212
-msgid "Enter password:"
-msgstr ""
-
 #: scheduler/client.c:2200
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
@@ -4031,95 +4019,95 @@ msgstr ""
 msgid "Help file not in index."
 msgstr ""
 
-#: cups/ipp.c:3095 cups/ipp.c:3122 cups/ipp.c:3145
+#: cups/ipp.c:3175 cups/ipp.c:3202 cups/ipp.c:3225
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr ""
 
-#: cups/ipp.c:3058
+#: cups/ipp.c:3138
 msgid "IPP attribute has no name."
 msgstr ""
 
-#: cups/ipp.c:6912
+#: cups/ipp.c:6992
 msgid "IPP attribute is not a member of the message."
 msgstr ""
 
-#: cups/ipp.c:3506
+#: cups/ipp.c:3586
 msgid "IPP begCollection value not 0 bytes."
 msgstr ""
 
-#: cups/ipp.c:3288
+#: cups/ipp.c:3368
 msgid "IPP boolean value not 1 byte."
 msgstr ""
 
-#: cups/ipp.c:3349
+#: cups/ipp.c:3429
 msgid "IPP date value not 11 bytes."
 msgstr ""
 
-#: cups/ipp.c:3527
+#: cups/ipp.c:3607
 msgid "IPP endCollection value not 0 bytes."
 msgstr ""
 
-#: cups/ipp.c:3263
+#: cups/ipp.c:3343
 msgid "IPP enum value not 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:2987
+#: cups/ipp.c:3067
 msgid "IPP extension tag larger than 0x7FFFFFFF."
 msgstr ""
 
-#: cups/ipp.c:3260
+#: cups/ipp.c:3340
 msgid "IPP integer value not 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3459
+#: cups/ipp.c:3539
 msgid "IPP language length overflows value."
 msgstr ""
 
-#: cups/ipp.c:3468
+#: cups/ipp.c:3548
 msgid "IPP language length too large."
 msgstr ""
 
-#: cups/ipp.c:3172
+#: cups/ipp.c:3252
 msgid "IPP member name is not empty."
 msgstr ""
 
-#: cups/ipp.c:3553
+#: cups/ipp.c:3633
 msgid "IPP memberName value is empty."
 msgstr ""
 
-#: cups/ipp.c:3545
+#: cups/ipp.c:3625
 msgid "IPP memberName with no attribute."
 msgstr ""
 
-#: cups/ipp.c:3041
+#: cups/ipp.c:3121
 msgid "IPP name larger than 32767 bytes."
 msgstr ""
 
-#: cups/ipp.c:3426
+#: cups/ipp.c:3506
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3583
+#: cups/ipp.c:3663
 msgid "IPP octetString length too large."
 msgstr ""
 
-#: cups/ipp.c:3394
+#: cups/ipp.c:3474
 msgid "IPP rangeOfInteger value not 8 bytes."
 msgstr ""
 
-#: cups/ipp.c:3367
+#: cups/ipp.c:3447
 msgid "IPP resolution value not 9 bytes."
 msgstr ""
 
-#: cups/ipp.c:3486
+#: cups/ipp.c:3566
 msgid "IPP string length overflows value."
 msgstr ""
 
-#: cups/ipp.c:3422
+#: cups/ipp.c:3502
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3246
+#: cups/ipp.c:3326
 msgid "IPP value larger than 32767 bytes."
 msgstr ""
 
@@ -4774,7 +4762,7 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1482 scheduler/main.c:2158 systemv/cupsaddsmb.c:284
 #: systemv/cupsctl.c:203 systemv/cupstestdsc.c:429 systemv/cupstestppd.c:3817
-#: test/ippfind.c:2715 test/ipptool.c:4675 ppdc/ppdc.cxx:437
+#: test/ippfind.c:2715 test/ipptool.c:4675 ppdc/ppdc.cxx:432
 #: ppdc/ppdhtml.cxx:174 ppdc/ppdi.cxx:130 ppdc/ppdmerge.cxx:363
 #: ppdc/ppdpo.cxx:254
 msgid "Options:"
@@ -4868,7 +4856,7 @@ msgstr ""
 msgid "ParamCustominTearInterval"
 msgstr ""
 
-#: cups/auth.c:195 cups/auth.c:363
+#: cups/auth.c:195 cups/auth.c:362
 #, c-format
 msgid "Password for %s on %s? "
 msgstr ""
@@ -5603,12 +5591,12 @@ msgstr ""
 msgid "Unable to change server settings"
 msgstr ""
 
-#: cups/ipp.c:5301
+#: cups/ipp.c:5381
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
 msgstr ""
 
-#: cups/ipp.c:5247
+#: cups/ipp.c:5327
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
 msgstr ""
@@ -5738,7 +5726,7 @@ msgstr ""
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3465
+#: backend/ipp.c:3448
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5885,7 +5873,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3324 backend/ipp.c:3401 backend/ipp.c:3409
+#: backend/ipp.c:3307 backend/ipp.c:3384 backend/ipp.c:3392
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6138,22 +6126,11 @@ msgid ""
 "       lpoptions [-h server] [-E] -x printer"
 msgstr ""
 
-#: systemv/lppasswd.c:476
-msgid "Usage: lppasswd [-g groupname]"
-msgstr ""
-
-#: systemv/lppasswd.c:479
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-
 #: berkeley/lpq.c:637
 msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
 
-#: ppdc/ppdc.cxx:435
+#: ppdc/ppdc.cxx:430
 msgid "Usage: ppdc [options] filename.drv [ ... filenameN.drv ]"
 msgstr ""
 
@@ -6216,10 +6193,6 @@ msgstr ""
 #: scheduler/client.c:2210
 #, c-format
 msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
-msgstr ""
-
-#: systemv/lppasswd.c:254
-msgid "Your password must be at least 6 characters long, cannot contain your username, and must contain at least one letter and number."
 msgstr ""
 
 #: ppdc/sample.c:439
@@ -6740,60 +6713,6 @@ msgstr ""
 msgid "lpoptions: Unknown printer or class."
 msgstr ""
 
-#: systemv/lppasswd.c:173
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr ""
-
-#: systemv/lppasswd.c:302
-msgid "lppasswd: Password file busy."
-msgstr ""
-
-#: systemv/lppasswd.c:431
-msgid "lppasswd: Password file not updated."
-msgstr ""
-
-#: systemv/lppasswd.c:398
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr ""
-
-#: systemv/lppasswd.c:253
-msgid "lppasswd: Sorry, password rejected."
-msgstr ""
-
-#: systemv/lppasswd.c:230
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr ""
-
-#: systemv/lppasswd.c:199 systemv/lppasswd.c:218
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr ""
-
-#: systemv/lppasswd.c:304 systemv/lppasswd.c:312 systemv/lppasswd.c:329
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr ""
-
-#: systemv/lppasswd.c:364 systemv/lppasswd.c:377 systemv/lppasswd.c:408
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr ""
-
-#: systemv/lppasswd.c:446
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-
-#: systemv/lppasswd.c:458
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr ""
-
-#: systemv/lppasswd.c:389
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
-msgstr ""
-
 #: systemv/lpstat.c:1076
 #, c-format
 msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"."
@@ -6830,7 +6749,7 @@ msgstr ""
 msgid "pending"
 msgstr ""
 
-#: ppdc/ppdc.cxx:113 ppdc/ppdpo.cxx:93
+#: ppdc/ppdc.cxx:108 ppdc/ppdpo.cxx:93
 #, c-format
 msgid "ppdc: Adding include directory \"%s\"."
 msgstr ""
@@ -7040,7 +6959,7 @@ msgstr ""
 msgid "ppdc: Expected override field after Resolution on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:328 ppdc/ppdc-catalog.cxx:340
+#: ppdc/ppdc-catalog.cxx:389 ppdc/ppdc-catalog.cxx:401
 #, c-format
 msgid "ppdc: Expected quoted string on line %d of %s."
 msgstr ""
@@ -7125,17 +7044,17 @@ msgstr ""
 msgid "ppdc: Invalid option type \"%s\" on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:251 ppdc/ppdpo.cxx:123
+#: ppdc/ppdc.cxx:246 ppdc/ppdpo.cxx:123
 #, c-format
 msgid "ppdc: Loading driver information file \"%s\"."
 msgstr ""
 
-#: ppdc/ppdc.cxx:187
+#: ppdc/ppdc.cxx:182
 #, c-format
 msgid "ppdc: Loading messages for locale \"%s\"."
 msgstr ""
 
-#: ppdc/ppdc.cxx:126
+#: ppdc/ppdc.cxx:121
 #, c-format
 msgid "ppdc: Loading messages from \"%s\"."
 msgstr ""
@@ -7151,7 +7070,7 @@ msgstr ""
 msgid "ppdc: Missing #if on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:405
+#: ppdc/ppdc-catalog.cxx:466
 #, c-format
 msgid "ppdc: Need a msgid line before any translation strings on line %d of %s."
 msgstr ""
@@ -7183,22 +7102,22 @@ msgstr ""
 msgid "ppdc: Too many nested #if's on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:374
+#: ppdc/ppdc.cxx:369
 #, c-format
 msgid "ppdc: Unable to create PPD file \"%s\" - %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:266
+#: ppdc/ppdc.cxx:261
 #, c-format
 msgid "ppdc: Unable to create output directory %s: %s"
 msgstr ""
 
-#: ppdc/ppdc.cxx:287
+#: ppdc/ppdc.cxx:282
 #, c-format
 msgid "ppdc: Unable to create output pipes: %s"
 msgstr ""
 
-#: ppdc/ppdc.cxx:303 ppdc/ppdc.cxx:309
+#: ppdc/ppdc.cxx:298 ppdc/ppdc.cxx:304
 #, c-format
 msgid "ppdc: Unable to execute cupstestppd: %s"
 msgstr ""
@@ -7213,12 +7132,12 @@ msgstr ""
 msgid "ppdc: Unable to find include file \"%s\" on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:198
+#: ppdc/ppdc.cxx:193
 #, c-format
 msgid "ppdc: Unable to find localization for \"%s\" - %s"
 msgstr ""
 
-#: ppdc/ppdc.cxx:135
+#: ppdc/ppdc.cxx:130
 #, c-format
 msgid "ppdc: Unable to load localization file \"%s\" - %s"
 msgstr ""
@@ -7233,7 +7152,7 @@ msgstr ""
 msgid "ppdc: Undefined variable (%s) on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:422
+#: ppdc/ppdc-catalog.cxx:483
 #, c-format
 msgid "ppdc: Unexpected text on line %d of %s."
 msgstr ""
@@ -7253,7 +7172,7 @@ msgstr ""
 msgid "ppdc: Unknown media size \"%s\" on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc-catalog.cxx:450
+#: ppdc/ppdc-catalog.cxx:511
 #, c-format
 msgid "ppdc: Unknown message catalog format for \"%s\"."
 msgstr ""
@@ -7273,17 +7192,17 @@ msgstr ""
 msgid "ppdc: Unterminated string starting with %c on line %d of %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:365
+#: ppdc/ppdc.cxx:360
 #, c-format
 msgid "ppdc: Warning - overlapping filename \"%s\"."
 msgstr ""
 
-#: ppdc/ppdc.cxx:380
+#: ppdc/ppdc.cxx:375
 #, c-format
 msgid "ppdc: Writing %s."
 msgstr ""
 
-#: ppdc/ppdc.cxx:148
+#: ppdc/ppdc.cxx:143
 #, c-format
 msgid "ppdc: Writing PPD files to directory \"%s\"."
 msgstr ""

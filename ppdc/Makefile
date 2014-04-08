@@ -3,7 +3,7 @@
 #
 # Makefile for the CUPS PPD Compiler.
 #
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 2002-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -290,9 +290,9 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
-	./ppdc-static -I ../data sample.drv
+	./ppdc-static -l en -I ../data sample.drv
 	./ppdi-static -I ../data -o sample-import.drv ppd/*
-	./ppdc-static -I ../data -d ppd2 sample-import.drv
+	./ppdc-static -l en -I ../data -d ppd2 sample-import.drv
 	if diff -r ppd ppd2 >/dev/null; then \
 		echo PPD import OK; \
 	else \

@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 10:47-0400\n"
+"POT-Creation-Date: 2014-04-08 15:48-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2786,15 +2786,6 @@ msgstr "Fin de la bannière"
 msgid "English"
 msgstr "French"
 
-msgid "Enter old password:"
-msgstr "Ancien mot de passe :"
-
-msgid "Enter password again:"
-msgstr "Confirmez le nouveau mot de passe :"
-
-msgid "Enter password:"
-msgstr "Entrez le nouveau mot de passe :"
-
 msgid ""
 "Enter your username and password or the root username and password to access "
 "this page. If you are using Kerberos authentication, make sure you have a "
@@ -4706,15 +4697,6 @@ msgid ""
 "       lpoptions [-h server] [-E] -x printer"
 msgstr ""
 
-msgid "Usage: lppasswd [-g groupname]"
-msgstr ""
-
-msgid ""
-"Usage: lppasswd [-g groupname] [username]\n"
-"       lppasswd [-g groupname] -a [username]\n"
-"       lppasswd [-g groupname] -x [username]"
-msgstr ""
-
 msgid ""
 "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]"
 msgstr ""
@@ -4772,11 +4754,6 @@ msgid ""
 msgstr ""
 "Vous devez accéder à cette page par l’URL <A HREF=\"https://%s:%d%s"
 "\">https://%s:%d%s</A>."
-
-msgid ""
-"Your password must be at least 6 characters long, cannot contain your "
-"username, and must contain at least one letter and number."
-msgstr ""
 
 msgid "ZPL Label Printer"
 msgstr "Imprimante pour étiquettes ZPL"
@@ -5174,48 +5151,6 @@ msgid "lpoptions: Unable to open PPD file for %s."
 msgstr ""
 
 msgid "lpoptions: Unknown printer or class."
-msgstr ""
-
-msgid "lppasswd: Only root can add or delete passwords."
-msgstr ""
-
-msgid "lppasswd: Password file busy."
-msgstr ""
-
-msgid "lppasswd: Password file not updated."
-msgstr ""
-
-msgid "lppasswd: Sorry, password doesn't match."
-msgstr ""
-
-msgid "lppasswd: Sorry, password rejected."
-msgstr ""
-
-msgid "lppasswd: Sorry, passwords don't match."
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to copy password string: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to open password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: Unable to write to password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: failed to backup old password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: failed to rename password file: %s"
-msgstr ""
-
-#, c-format
-msgid "lppasswd: user \"%s\" and group \"%s\" do not exist."
 msgstr ""
 
 #, c-format
@@ -5696,3 +5631,12 @@ msgstr "sans titre"
 
 msgid "variable-bindings uses indefinite length"
 msgstr ""
+
+#~ msgid "Enter old password:"
+#~ msgstr "Ancien mot de passe :"
+
+#~ msgid "Enter password again:"
+#~ msgstr "Confirmez le nouveau mot de passe :"
+
+#~ msgid "Enter password:"
+#~ msgstr "Entrez le nouveau mot de passe :"
