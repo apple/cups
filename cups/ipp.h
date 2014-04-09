@@ -517,15 +517,21 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_STATUS_ERROR_DOCUMENT_PERMISSION,	/* client-error-document-permission-error */
   IPP_STATUS_ERROR_DOCUMENT_SECURITY,	/* client-error-document-security-error */
   IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE,/* client-error-document-unprintable-error */
+  IPP_STATUS_ERROR_ACCOUNT_INFO_NEEDED,	/* client-error-account-info-needed */
+  IPP_STATUS_ERROR_ACCOUNT_CLOSED,	/* client-error-account-closed */
+  IPP_STATUS_ERROR_ACCOUNT_LIMIT_REACHED,
+					/* client-error-account-limit-reached */
+  IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED,
+					/* client-error-account-authorization-failed */
 
-  /* Proposed extensions for paid printing */
+  /* Legacy status codes for paid printing */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED = 0x049C,
-					/* cups-error-account-info-needed @since CUPS 1.7/OS X 10.9@ */
-  IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED,	/* cups-error-account-closed @since CUPS 1.7/OS X 10.9@ */
+					/* cups-error-account-info-needed @deprecated@ */
+  IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED,	/* cups-error-account-closed @deprecate@ */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED,
-					/* cups-error-account-limit-reached @since CUPS 1.7/OS X 10.9@ */
+					/* cups-error-account-limit-reached @deprecated@ */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED,
-					/* cups-error-account-authorization-failed @since CUPS 1.7/OS X 10.9@ */
+					/* cups-error-account-authorization-failed @deprecated@ */
 
   IPP_STATUS_ERROR_INTERNAL = 0x0500,	/* server-error-internal-error */
   IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED,

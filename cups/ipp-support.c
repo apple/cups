@@ -74,7 +74,11 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "client-error-document-password-error",
 		  "client-error-document-permission-error",
 		  "client-error-document-security-error",
-		  "client-error-document-unprintable-error"
+		  "client-error-document-unprintable-error",
+		  "client-error-account-info-needed",
+		  "client-error-account-closed",
+		  "client-error-account-limit-reached",
+		  "client-error-account-authorization-failed"
 		},
 		* const ipp_status_480s[] =	/* Vendor client errors */
 		{
@@ -1935,7 +1939,7 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
   else if (error == IPP_STATUS_CUPS_SEE_OTHER)
     return ("cups-see-other");
   else if (error >= IPP_STATUS_ERROR_BAD_REQUEST &&
-           error <= IPP_STATUS_ERROR_DOCUMENT_UNPRINTABLE)
+           error <= IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED)
     return (ipp_status_400s[error - IPP_STATUS_ERROR_BAD_REQUEST]);
   else if (error >= 0x480 &&
            error <= IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
