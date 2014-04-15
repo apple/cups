@@ -64,13 +64,16 @@ HELPFILES	=	\
 			help/license.html \
 			help/man-backend.html \
 			help/man-cancel.html \
+			help/man-classes.conf.html \
 			help/man-client.conf.html \
 			help/man-cups.html \
 			help/man-cups-config.html \
+			help/man-cups-files.conf.html \
 			help/man-cups-lpd.html \
 			help/man-cups-snmp.html \
 			help/man-cupsaccept.html \
 			help/man-cupsaddsmb.html \
+			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsd-helper.html \
 			help/man-cupsenable.html \
@@ -97,6 +100,8 @@ HELPFILES	=	\
 			help/man-ppdi.html \
 			help/man-ppdmerge.html \
 			help/man-ppdpo.html \
+			help/man-printers.conf.html \
+			help/man-subscriptions.conf.html \
 			help/network.html \
 			help/options.html \
 			help/overview.html \

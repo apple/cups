@@ -143,6 +143,10 @@ install-data: all
 	done
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
+	for file in cups-deviced cups-driverd cups-exec; do \
+		$(RM) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+		$(LN) cupsd-helper.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+	done
 
 
 #
