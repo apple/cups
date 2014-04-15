@@ -105,14 +105,11 @@ HELPFILES	=	\
 			help/ppd-compiler.html \
 			help/raster-driver.html \
 			help/ref-access_log.html \
-			help/ref-classes-conf.html \
 			help/ref-error_log.html \
 			help/ref-mailto-conf.html \
 			help/ref-page_log.html \
 			help/ref-ppdcfile.html \
-			help/ref-printers-conf.html \
 			help/ref-snmp-conf.html \
-			help/ref-subscriptions-conf.html \
 			help/security.html \
 			help/sharing.html \
 			help/spec-banner.html \
