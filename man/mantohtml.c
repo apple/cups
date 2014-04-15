@@ -59,7 +59,10 @@ main(int  argc,				/* I - Number of command-line args */
 		pre = 0,		/* Preformatted */
 		font = 0,		/* Current font */
 		linenum = 0;		/* Current line number */
-  const char	*list = NULL;		/* Current list, if any */
+  float		list_indent = 0.0f,	/* Current list indentation */
+		nested_indent = 0.0f;	/* Nested list indentation, if any */
+  const char	*list = NULL,		/* Current list, if any */
+		*nested = NULL;		/* Nested list, if any */
   const char 	*post = NULL;		/* Text to add after the current line */
 
 
@@ -412,11 +415,13 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (list)
         {
-          fprintf(outfile, "</%s>\n", list);
-          list = NULL;
+          nested        = list;
+          list          = NULL;
+          nested_indent = list_indent;
+          list_indent   = 0.0f;
         }
 
-        fprintf(outfile, "<div style=\"margin-left: %.1fem;\">\n", amount);
+        fprintf(outfile, "<div style=\"margin-left: %.1fem;\">\n", amount - nested_indent);
       }
       else if (!strcmp(line, ".RE"))
       {
@@ -428,6 +433,15 @@ main(int  argc,				/* I - Number of command-line args */
 	font = 0;
 
         fputs("</div>\n", outfile);
+
+        if (nested)
+        {
+          list   = nested;
+          nested = NULL;
+
+          list_indent   = nested_indent;
+          nested_indent = 0.0f;
+        }
       }
       else if (!strcmp(line, ".HP") || !strncmp(line, ".HP ", 4))
       {
@@ -481,7 +495,8 @@ main(int  argc,				/* I - Number of command-line args */
         if (!list)
         {
           fputs("<dl class=\"man\">\n", outfile);
-          list = "dl";
+          list        = "dl";
+          list_indent = amount;
         }
 
         fputs("<dt>", outfile);
@@ -611,11 +626,11 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
-        if (list)
-	{
-	  fprintf(outfile, "</%s>\n", list);
-	  list = NULL;
-	}
+//        if (list)
+//	{
+//	  fprintf(outfile, "</%s>\n", list);
+//	  list = NULL;
+//	}
 
         pre = 1;
 	fputs("<pre class=\"man\">\n", outfile);

@@ -10,85 +10,21 @@
 <h2 class="title"><a name="NAME">Name</a></h2>
 printers.conf - printer configuration file for cups
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-The <i>printers.conf</i> file defines the local printers that are
-available. It is normally located in the <i>/etc/cups</i> directory and
-is generated automatically by the <i>cupsd(8)</i> program when printers
-are added or deleted.
-<p>Each line in the file can be a configuration directive, a blank line,
-or a comment. Comment lines start with the # character.
-<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-<dl class="man">
-<dt>&lt;Printer name> ... &lt;/Printer>
-<dd style="margin-left: 5.0em"><br>
-Defines a specific printer.
-<dt>&lt;DefaultPrinter name> ... &lt;/Printer>
-<dd style="margin-left: 5.0em"><br>
-Defines a default printer.
-<dt>Accepting Yes
-<dd style="margin-left: 5.0em"><dt>Accepting No
-<dd style="margin-left: 5.0em"><br>
-Specifies whether the printer is accepting new jobs.
-<dt>AllowUser [ user @group ... ]
-<dd style="margin-left: 5.0em"><br>
-Allows specific users and groups to print to the printer.
-<dt>DenyUser [ user @group ... ]
-<dd style="margin-left: 5.0em"><br>
-Prevents specific users and groups from printing to the printer.
-<dt>DeviceURI uri
-<dd style="margin-left: 5.0em"><br>
-Specifies the device URI for a printer.
-<dt>ErrorPolicy abort-job
-<dd style="margin-left: 5.0em"><dt>ErrorPolicy retry-current-job
-<dd style="margin-left: 5.0em"><dt>ErrorPolicy retry-job
-<dd style="margin-left: 5.0em"><dt>ErrorPolicy stop-printer
-<dd style="margin-left: 5.0em"><br>
-Specifies the error policy for the printer.
-<dt>Info text
-<dd style="margin-left: 5.0em"><br>
-Specifies human-readable text describing the printer.
-<dt>JobSheets banner banner
-<dd style="margin-left: 5.0em"><br>
-Specifies the banner pages to use for the printer.
-<dt>KLimit number
-<dd style="margin-left: 5.0em"><br>
-Specifies the job-k-limit value for the printer.
-<dt>Location text
-<dd style="margin-left: 5.0em"><br>
-Specifies human-readable text describing the location of the printer.
-<dt>OpPolicy name
-<dd style="margin-left: 5.0em"><br>
-Specifies the operation policy for the printer.
-<dt>PageLimit number
-<dd style="margin-left: 5.0em"><br>
-Specifies the job-page-limit value for the printer.
-<dt>PortMonitor monitor
-<dd style="margin-left: 5.0em"><br>
-Specifies the port monitor for a printer.
-<dt>QuotaPeriod seconds
-<dd style="margin-left: 5.0em"><br>
-Specifies the job-quota-period value for the printer.
-<dt>Shared Yes
-<dd style="margin-left: 5.0em"><dt>Shared No
-<dd style="margin-left: 5.0em"><br>
-Specifies whether the printer is shared.
-<dt>State idle
-<dd style="margin-left: 5.0em"><dt>State stopped
-<dd style="margin-left: 5.0em"><br>
-Specifies the initial state of the printer (Idle or Stopped)
-<dt>StateMessage text
-<dd style="margin-left: 5.0em"><br>
-Specifies the message associated with the state.
-<dt>StateTime seconds
-<dd style="margin-left: 5.0em"><br>
-Specifies the date/time associated with the state.
-</dl>
+The <b>printers.conf</b> file defines the local printers that are available. It is normally located in the <i>/etc/cups</i> directory and is maintained by the
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8)</a>
+program. This file is not intended to be edited or managed manually.
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+The name, location, and format of this file are an implementation detail that will change in future releases of CUPS.
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>classes.conf(5)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>,
-<i>mime.convs(5)</i>, <i>mime.types(5)</i>,
-<br>
-<a href="http://localhost:631/help">http://localhost:631/help</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>
