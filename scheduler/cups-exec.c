@@ -13,7 +13,7 @@
  *
  * Usage:
  *
- *     cups-exec /path/to/profile UID GID NICE /path/to/program argv0 argv1 ... argvN
+ *     cups-exec /path/to/profile [-u UID] [-g GID] [-n NICE] /path/to/program argv0 argv1 ... argvN
  */
 
 /*

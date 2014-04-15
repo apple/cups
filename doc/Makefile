@@ -64,6 +64,7 @@ HELPFILES	=	\
 			help/license.html \
 			help/man-backend.html \
 			help/man-cancel.html \
+			help/man-client.conf.html \
 			help/man-cups.html \
 			help/man-cups-config.html \
 			help/man-cups-lpd.html \
@@ -71,6 +72,7 @@ HELPFILES	=	\
 			help/man-cupsaccept.html \
 			help/man-cupsaddsmb.html \
 			help/man-cupsd.html \
+			help/man-cupsd-helper.html \
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
@@ -104,7 +106,6 @@ HELPFILES	=	\
 			help/raster-driver.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
-			help/ref-client-conf.html \
 			help/ref-cupsd-conf.html \
 			help/ref-cups-files-conf.html \
 			help/ref-error_log.html \
