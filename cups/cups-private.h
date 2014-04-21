@@ -166,9 +166,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   void			*server_cert_data;
 					/* Server certificate user data */
   int			server_version,	/* Server IPP version */
-			any_root,	/* Allow any root */
-			expired_certs,	/* Allow expired certs */
-			expired_root;	/* Allow expired root */
+			any_root,	/* Allow any (e.g., self-signed) root */
+			expired_certs;	/* Allow expired certs */
 
   /* util.c */
   char			def_printer[256];

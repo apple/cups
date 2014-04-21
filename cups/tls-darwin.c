@@ -369,6 +369,21 @@ httpCopyCredentials(
 
 
 /*
+ * 'http_cdsa_create_credential()' - Create a single credential in the internal format.
+ */
+
+static SecCertificateRef			/* O - Certificate */
+http_cdsa_create_credential(
+    http_credential_t *credential)		/* I - Credential */
+{
+  if (!credential)
+    return (NULL);
+
+  return (SecCertificateCreateWithBytes(kCFAllocatorDefault, credential->data, (CFIndex)credential->datalen));
+}
+
+
+/*
  * '_httpCreateCredentials()' - Create credentials in the internal format.
  */
 
@@ -378,7 +393,6 @@ _httpCreateCredentials(
 {
   CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
   SecCertificateRef	secCert;	/* Certificate reference */
-  CFDataRef		data;		/* Credential data reference */
   http_credential_t	*credential;	/* Credential data */
 
 
@@ -394,16 +408,10 @@ _httpCreateCredentials(
        credential;
        credential = (http_credential_t *)cupsArrayNext(credentials))
   {
-    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data, (CFIndex)credential->datalen)))
+    if ((secCert = http_cdsa_create_credential(credential)) != NULL)
     {
-      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
-              != NULL)
-      {
-	CFArrayAppendValue(peerCerts, secCert);
-	CFRelease(secCert);
-      }
-
-      CFRelease(data);
+      CFArrayAppendValue(peerCerts, secCert);
+      CFRelease(secCert);
     }
   }
 
@@ -421,9 +429,24 @@ int					/* O - 1 if trusted, 0 if not/unknown */
 httpCredentialsAreTrusted(
     cups_array_t *credentials)		/* I - Credentials */
 {
-  (void)credentials;
+  SecCertificateRef	secCert;	/* Certificate reference */
+  int			trusted = 1;	/* Trusted? */
+  Boolean		isSelfSigned;	/* Is this certificate self-signed? */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Per-thread globals */
 
-  return (0);
+
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+    return (0);
+
+  if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
+    trusted = 0;
+  else if (!cg->any_root && (SecCertificateIsSelfSigned(secCert, &isSelfSigned) != noErr || isSelfSigned))
+    trusted = 0;
+
+  CFRelease(secCert);
+
+  return (trusted);
 }
 
 
@@ -437,9 +460,18 @@ time_t					/* O - Expiration date of credentials */
 httpCredentialsGetExpiration(
     cups_array_t *credentials)		/* I - Credentials */
 {
-  (void)credentials;
+  SecCertificateRef	secCert;	/* Certificate reference */
+  time_t		expiration;	/* Expiration date */
 
-  return (0);
+
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+    return (0);
+
+  expiration = (time_t)(SecCertificateNotValidAfter(secCert) - kCFAbsoluteTimeIntervalSince1970);
+
+  CFRelease(secCert);
+
+  return (expiration);
 }
 
 
@@ -454,10 +486,47 @@ httpCredentialsIsValidName(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Name to check */
 {
-  (void)credentials;
-  (void)common_name;
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFStringRef		cfcommon_name;	/* CF string for common name */
+  CFStringRef		cert_name = NULL;
+					/* Certificate's common name */
+  int			valid = 1;	/* Valid name? */
 
-  return (0);
+
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+    return (0);
+
+ /*
+  * Compare the common names...
+  */
+
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
+
+  if (SecCertificateCopyCommonName(secCert, &cert_name) != noErr)
+  {
+   /*
+    * Can't get common name, cannot be valid...
+    */
+
+    valid = 0;
+  }
+  else if (CFStringCompare(cfcommon_name, cert_name, kCFCompareCaseInsensitive))
+  {
+   /*
+    * Not the common name, check whether the certificate is saved in the keychain...
+    */
+
+    /* TODO: Pull certificate from the keychain using label */
+  }
+
+  CFRelease(cfcommon_name);
+
+  if (cert_name)
+    CFRelease(cert_name);
+
+  CFRelease(secCert);
+
+  return (valid);
 }
 
 
@@ -473,12 +542,29 @@ httpCredentialsString(
     char         *buffer,		/* I - Buffer or @code NULL@ */
     size_t       bufsize)		/* I - Size of buffer */
 {
-  (void)credentials;
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFStringRef		summary;	/* CF string for summary */
+
+
+  if (!buffer)
+    return (0);
 
   if (buffer && bufsize > 0)
     *buffer = '\0';
 
-  return (1);
+  /* TODO: This needs to include a hash of the credentials */
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) != NULL)
+  {
+    if ((summary = SecCertificateCopySubjectSummary(secCert)) != NULL)
+    {
+      CFStringGetCString(summary, buffer, (CFIndex)bufsize, kCFStringEncodingUTF8);
+      CFRelease(summary);
+    }
+
+    CFRelease(secCert);
+  }
+
+  return (strlen(buffer));
 }
 
 

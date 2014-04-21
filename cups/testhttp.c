@@ -620,6 +620,22 @@ main(int  argc,				/* I - Number of command-line arguments */
       perror(hostname);
       continue;
     }
+
+    if (httpIsEncrypted(http))
+    {
+      cups_array_t *creds;
+      char info[1024];
+
+      if (!httpCopyCredentials(http, &creds))
+      {
+        httpCredentialsString(creds, info, sizeof(info));
+        httpFreeCredentials(creds);
+        printf("Credentials: \"%s\"\n", info);
+      }
+      else
+        puts("Credentials: Unknown");
+    }
+
     printf("Checking file \"%s\"...\n", resource);
 
     do

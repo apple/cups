@@ -94,6 +94,20 @@ typedef int socklen_t;
 #      include <Security/SecCertificate.h>
 #      include <Security/SecIdentity.h>
 #    endif /* HAVE_SECCERTIFICATE_H */
+#    ifdef HAVE_SECCERTIFICATEPRIV_H
+#      include <Security/SecCertificatePriv.h>
+#    else
+#      ifdef __cplusplus
+extern "C" {
+#      endif /* __cplusplus */
+extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
+extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
+extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
+extern OSStatus SecCertificateIsSelfSigned(SecCertificateRef certRef, Boolean *isSelfSigned);
+#      ifdef __cplusplus
+}
+#      endif /* __cplusplus */
+#    endif /* HAVE_SECCERTIFICATEPRIV_H */
 #    ifdef HAVE_SECITEMPRIV_H
 #      include <Security/SecItemPriv.h>
 #    endif /* HAVE_SECITEMPRIV_H */

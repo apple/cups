@@ -51,7 +51,6 @@ static void	cups_read_client_conf(cups_file_t *fp,
                                       const char *cups_gssservicename,
 #endif /* HAVE_GSSAPI */
 				      const char *cups_anyroot,
-				      const char *cups_expiredroot,
 				      const char *cups_expiredcerts);
 
 
@@ -831,7 +830,6 @@ _cupsSetDefaults(void)
 		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
 		*cups_anyroot,		/* CUPS_ANYROOT env var */
-		*cups_expiredroot,	/* CUPS_EXPIREDROOT env var */
 		*cups_expiredcerts;	/* CUPS_EXPIREDCERTS env var */
   char		filename[1024];		/* Filename */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -849,7 +847,6 @@ _cupsSetDefaults(void)
   cups_gssservicename = getenv("CUPS_GSSSERVICENAME");
 #endif /* HAVE_GSSAPI */
   cups_anyroot	      = getenv("CUPS_ANYROOT");
-  cups_expiredroot    = getenv("CUPS_EXPIREDROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
 
   if ((cups_user = getenv("CUPS_USER")) == NULL)
@@ -919,8 +916,7 @@ _cupsSetDefaults(void)
 #ifdef HAVE_GSSAPI
 			  cups_gssservicename,
 #endif /* HAVE_GSSAPI */
-			  cups_anyroot, cups_expiredroot,
-			  cups_expiredcerts);
+			  cups_anyroot, cups_expiredcerts);
     cupsFileClose(fp);
   }
 }
@@ -942,7 +938,6 @@ cups_read_client_conf(
 					/* I - CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
     const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
-    const char	    *cups_expiredroot,	/* I - CUPS_EXPIREDROOT env var */
     const char	    *cups_expiredcerts)	/* I - CUPS_EXPIREDCERTS env var */
 {
   int	linenum;			/* Current line number */
@@ -954,7 +949,6 @@ cups_read_client_conf(
 #endif /* !__APPLE__ */
 	user[256],			/* User value */
 	any_root[1024],			/* AllowAnyRoot value */
-	expired_root[1024],		/* AllowExpiredRoot value */
 	expired_certs[1024];		/* AllowExpiredCerts value */
 #ifdef HAVE_GSSAPI
   char	gss_service_name[32];		/* GSSServiceName value */
@@ -995,12 +989,6 @@ cups_read_client_conf(
     {
       strlcpy(any_root, value, sizeof(any_root));
       cups_anyroot = any_root;
-    }
-    else if (!cups_expiredroot && !_cups_strcasecmp(line, "AllowExpiredRoot") &&
-             value)
-    {
-      strlcpy(expired_root, value, sizeof(expired_root));
-      cups_expiredroot = expired_root;
     }
     else if (!cups_expiredcerts && !_cups_strcasecmp(line, "AllowExpiredCerts") &&
              value)
@@ -1125,11 +1113,6 @@ cups_read_client_conf(
     cg->any_root = !_cups_strcasecmp(cups_anyroot, "yes") ||
 		   !_cups_strcasecmp(cups_anyroot, "on")  ||
 		   !_cups_strcasecmp(cups_anyroot, "true");
-
-  if (cups_expiredroot)
-    cg->expired_root  = !_cups_strcasecmp(cups_expiredroot, "yes") ||
-			!_cups_strcasecmp(cups_expiredroot, "on")  ||
-			!_cups_strcasecmp(cups_expiredroot, "true");
 
   if (cups_expiredcerts)
     cg->expired_certs = !_cups_strcasecmp(cups_expiredcerts, "yes") ||
