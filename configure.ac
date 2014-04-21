@@ -68,12 +68,8 @@ AC_OUTPUT(Makedefs
 	  cups-config
 	  data/testprint
 	  desktop/cups.desktop
-	  doc/help/ref-cups-files-conf.html
-	  doc/help/ref-cupsd-conf.html
 	  doc/index.html
 	  man/client.conf.man
-	  man/cups-deviced.man
-	  man/cups-driverd.man
 	  man/cups-files.conf.man
 	  man/cups-lpd.man
 	  man/cups-snmp.man

@@ -13,106 +13,135 @@ cups-files.conf - file and directory configuration file for cups
 The <b>cups-files.conf</b> file configures the files and directories used by the CUPS scheduler,
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
 It is normally located in the <i>/etc/cups</i> directory.
-<p>Each line in the file can be a configuration directive, a blank line,
-or a comment. Comment lines start with the # character.
-<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
-The following directives are understood by <i>cupsd(8)</i>. Consult the
-on-line help for detailed descriptions:
+<p>Each line in the file can be a configuration directive, a blank line, or a comment.
+Comment lines start with the # character.
+<h3><a name="DIRECTIVES">Directives</a></h3>
+The following directives are understood by
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
-<dt>AccessLog filename
-<dd style="margin-left: 5.0em"><dt>AccessLog syslog
-<dd style="margin-left: 5.0em"><br>
-Defines the access log filename.
-<dt>ConfigFilePerm mode
-<dd style="margin-left: 5.0em"><br>
-Specifies the permissions for all configuration files that the scheduler
-writes.
-<dt>DataDir path
-<dd style="margin-left: 5.0em"><br>
-Specified the directory where data files can be found.
-<dt>DocumentRoot directory
-<dd style="margin-left: 5.0em"><br>
-Specifies the root directory for the internal web server documents.
-<dt>ErrorLog filename
-<dd style="margin-left: 5.0em"><dt>ErrorLog syslog
-<dd style="margin-left: 5.0em"><br>
-Specifies the error log filename.
-<dt>FatalErrors none
-<dd style="margin-left: 5.0em"><dt>FatalErrors all -kind [... -kind]
-<dd style="margin-left: 5.0em"><dt>FatalErrors kind [... kind]
-<dd style="margin-left: 5.0em"><br>
-Specifies which errors are fatal, causing the scheduler to exit. "Kind" is
-"browse", "config", "listen", "log", or "permissions".
-<dt>FileDevice Yes
-<dd style="margin-left: 5.0em"><dt>FileDevice No
-<dd style="margin-left: 5.0em"><br>
-Specifies whether the file pseudo-device can be used for new
-printer queues.
-<dt>FontPath directory[:directory:...]
-<dd style="margin-left: 5.0em"><br>
-Specifies the search path for fonts.
-<dt>Group group-name-or-number
-<dd style="margin-left: 5.0em"><br>
-Specifies the group name or ID that will be used when executing
-external programs.
-<dt>LogFilePerm mode
-<dd style="margin-left: 5.0em"><br>
-Specifies the permissions for all log files that the scheduler writes.
-<dt>PageLog filename
-<dd style="margin-left: 5.0em"><dt>PageLog syslog
-<dd style="margin-left: 5.0em"><br>
-Specifies the page log filename.
-<dt>Printcap
-<dd style="margin-left: 5.0em"><dt>Printcap filename
-<dd style="margin-left: 5.0em"><br>
-Specifies the filename for a printcap file that is updated
-automatically with a list of available printers (needed for
-legacy applications); specifying Printcap with no filename
-disables printcap generation.
-<dt>RemoteRoot user-name
-<dd style="margin-left: 5.0em"><br>
-Specifies the username that is associated with unauthenticated root
-accesses.
-<dt>RequestRoot directory
-<dd style="margin-left: 5.0em"><br>
-Specifies the directory to store print jobs and other HTTP request
-data.
-<dt>Sandboxing off
-<dd style="margin-left: 5.0em"><dt>Sandboxing relaxed
-<dd style="margin-left: 5.0em"><dt>Sandboxing strict
-<dd style="margin-left: 5.0em">Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler. The default is "strict". (OS X only)
-<dt>ServerBin directory
-<dd style="margin-left: 5.0em"><br>
-Specifies the directory where backends, CGIs, daemons, and filters may
-be found.
-<dt>ServerKeychain path
-<dd style="margin-left: 5.0em"><br>
-Specifies the location of TLS certificates and private keys.
-<dt>ServerRoot directory
-<dd style="margin-left: 5.0em"><br>
-Specifies the directory where the server configuration files can be found.
-<dt>SyncOnClose Yes
-<dd style="margin-left: 5.0em"><dt>SyncOnClose No
-<dd style="margin-left: 5.0em">Specifies whether the scheduler calls <i>fsync(2)</i> after writing configuration
-or state files. The default is No.
-<dt>SystemGroup group-name [group-name ...]
-<dd style="margin-left: 5.0em"><br>
-Specifies the group(s) to use for System class authentication.
-<dt>TempDir directory
-<dd style="margin-left: 5.0em"><br>
-Specifies the directory where temporary files are stored.
-<dt>User user-name
-<dd style="margin-left: 5.0em"><br>
-Specifies the user name or ID that is used when running external programs.
+<dt><b>AccessLog </b><i>filename</i>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em"><dt><b>AccessLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the access log filename.
+The value "syslog" causes log entries to be sent to the system log daemon.
+Specifying a blank filename disables access log generation.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    AccessLog /var/log/cups/%s-access_log
+
+</pre>
+<dt><b>ConfigFilePerm </b><i>mode</i>
+<dd style="margin-left: 5.0em">Specifies the permissions for all configuration files that the scheduler writes.
+The default is 0644 on OS X and 0640 on all other operating systems.
+<b>Note:</b> The permissions for the printers.conf file are currently masked to only allow access from the scheduler user (typically root).
+This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
+There is no way to disable this security feature.
+<dt><b>DataDir </b><i>path</i>
+<dd style="margin-left: 5.0em">Specifies the directory where data files can be found. The default is usually <i>/usr/share/cups</i>.
+<dt><b>DocumentRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the root directory for the CUPS web interface content. The default is usually <i>/usr/share/doc/cups</i>.
+<dt><b>ErrorLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the error log filename.
+The value "syslog" causes log entries to be sent to the system log daemon.
+Specifying a blank filename disables error log generation.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    ErrorLog /var/log/cups/%s-error_log
+
+</pre>
+<dt><b>FatalErrors none</b>
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors all </b><i>-kind </i>[ <i>... -kind </i>]
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors </b><i>kind </i>[ <i>... kind </i>]
+<dd style="margin-left: 5.0em">Specifies which errors are fatal, causing the scheduler to exit.
+The default setting is "config".
+The <i>kind</i> strings are:
+<div style="margin-left: 0.0em;">
+<dl class="man">
+<dt><b>none</b>
+<dd style="margin-left: 5.0em">No errors are fatal.
+<dt><b>all</b>
+<dd style="margin-left: 5.0em">All of the errors below are fatal.
+<dt><b>browse</b>
+<dd style="margin-left: 5.0em">Browsing initialization errors are fatal, for example failed connections to the DNS-SD daemon.
+<dt><b>config</b>
+<dd style="margin-left: 5.0em">Configuration file syntax errors are fatal.
+<dt><b>listen</b>
+<dd style="margin-left: 5.0em">Listen or Port errors are fatal, except for IPv6 failures on the loopback or "any" addresses.
+<dt><b>log</b>
+<dd style="margin-left: 5.0em">Log file creation or write errors are fatal.
+<dt><b>permissions</b>
+<dd style="margin-left: 5.0em">Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
+</div>
+<dt><b>FileDevice Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>FileDevice No</b>
+<dd style="margin-left: 5.0em">Specifies whether the file pseudo-device can be used for new printer queues.
+The URI "file:///dev/null" is always allowed.
+<dt><b>FontPath </b><i>directory</i>[:<i>...</i>:<i>directory</i>]
+<dd style="margin-left: 5.0em">Specifies the search path for fonts.
+<b>This directive is deprecated and will no longer be supported in a future release of CUPS.</b>
+<dt><b>Group </b><i>group-name-or-number</i>
+<dd style="margin-left: 5.0em">Specifies the group name or ID that will be used when executing external programs.
+The default group is operating system specific but is usually <i>lp</i> or <i>nobody</i>.
+<dt><b>LogFilePerm </b><i>mode</i>
+<dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes. The default is 0644.
+<dt><b>PageLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em"><dt><b>PageLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the page log filename.
+The value "syslog" causes log entries to be sent to the system log daemon.
+Specifying a blank filename disables page log generation.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    PageLog /var/log/cups/%s-page_log
+
+</pre>
+<dt><b>Printcap </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em">Defines the printcap filename that the scheduler automatically updates with the current list of available printers, which is sometimes used by legacy applications.
+Specifying a blank filename disables printcap generation.
+<b>This directive is deprecated and will no longer be supported in a future release of CUPS.</b>
+<dt><b>RemoteRoot </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
+<dt><b>RequestRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory that contains print jobs and other HTTP request data.
+<dt><b>Sandboxing off</b>
+<dd style="margin-left: 5.0em"><dt><b>Sandboxing relaxed</b>
+<dd style="margin-left: 5.0em"><dt><b>Sandboxing strict</b>
+<dd style="margin-left: 5.0em">Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
+The default is "strict".
+This directive is currently only used on OS X.
+<dt><b>ServerBin </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
+<dt><b>ServerKeychain </b><i>path</i>
+<dd style="margin-left: 5.0em">Specifies the location of TLS certificates and private keys.
+<dt><b>ServerRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory containing the server configuration files.
+<dt><b>SyncOnClose Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>SyncOnClose No</b>
+<dd style="margin-left: 5.0em">Specifies whether the scheduler calls
+<b>fsync</b>(2)
+after writing configuration or state files. The default is No.
+<dt><b>SystemGroup </b><i>group-name </i>[ <i>... group-name</i> ]
+<dd style="margin-left: 5.0em">Specifies the group(s) to use for <i>@SYSTEM</i> group authentication.
+<dt><b>TempDir </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory where temporary files are stored.
+<dt><b>User </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies the user name or ID that is used when running external programs.
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>classes.conf(5)</i>, <i>cupsd(8)</i>, <i>cupsd.conf(5)</i>, <i>mime.convs(5)</i>,
-<i>mime.types(5)</i>, <i>printers.conf(5)</i>,
-<i>subscriptions.conf(5)</i>,
-<br>
-<a href="http://localhost:631/help">http://localhost:631/help</a>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
+<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2014 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>
