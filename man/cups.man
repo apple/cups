@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups 1 "CUPS" "4 March 2014" "Apple Inc."
+.TH cups 1 "CUPS" "16 April 2014" "Apple Inc."
 .SH NAME
 cups \- a standards-based, open source printing system
 .SH DESCRIPTION
@@ -77,9 +77,6 @@ The directory where data files can be found.
 .TP 5
 .B CUPS_ENCRYPTION
 The default level of encryption (Always, IfRequested, Never, Required).
-.TP 5
-.B CUPS_EXPIREDROOT
-Whether to allow expired X.509 certificate roots (Y or N).
 .TP 5
 .B CUPS_EXPIREDCERTS
 Whether to allow expired X.509 certificates (Y or N).

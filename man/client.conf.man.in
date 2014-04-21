@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "15 April 2014" "Apple Inc."
+.TH client.conf 5 "CUPS" "16 April 2014" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups (deprecated)
 .SH DESCRIPTION
@@ -23,6 +23,18 @@ Each line in the file can be a configuration directive, a blank line, or a comme
 The \fBServerName\fR directive is not supported on OS X at all.
 .SS DIRECTIVES
 The following directives are understood by the client. Consult the online help for detailed descriptions:
+.TP 5
+\fBAllowAnyRoot Y\fR
+.TP 5
+\fBAllowAnyRoot N\fR
+Specifies whether to allow TLS with certificates that have not been signed by a trusted Certificate Authority.
+The default is "Y".
+.TP 5
+\fBAllowExpiredCerts Y\fR
+.TP 5
+\fBAllowExpiredCerts N\fR
+Specifies whether to allow TLS with expired certificates.
+The default is "Y".
 .TP 5
 \fBEncryption IfRequested\fR
 .TP 5
