@@ -66,6 +66,7 @@ extern pwg_media_t	*_pwgMediaForPWG(const char *pwg)
 extern pwg_media_t	*_pwgMediaForSize(int width, int length)
 			    _CUPS_INTERNAL_MSG("Use pwgMediaForSize instead.");
 extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
+extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon);
 
 #  ifdef __cplusplus
 }

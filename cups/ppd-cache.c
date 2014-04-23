@@ -750,8 +750,9 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       * dimensions that are <= 0...
       */
 
-      if ((pwg_media = pwgMediaForSize(PWG_FROM_POINTS(ppd_size->width),
-					PWG_FROM_POINTS(ppd_size->length))) == NULL)
+      if ((pwg_media = _pwgMediaNearSize(PWG_FROM_POINTS(ppd_size->width),
+					PWG_FROM_POINTS(ppd_size->length),
+					0)) == NULL)
 	continue;
 
       new_width      = pwg_media->width;

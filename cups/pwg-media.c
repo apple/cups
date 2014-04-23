@@ -912,6 +912,18 @@ pwg_media_t *				/* O - PWG media name */
 pwgMediaForSize(int width,		/* I - Width in hundredths of millimeters */
 		int length)		/* I - Length in hundredths of millimeters */
 {
+  /*
+   * Adobe uses a size matching algorithm with an epsilon of 5 points, which
+   * is just about 176/2540ths...
+   */
+  return _pwgMediaNearSize(width, length, 176);	
+}
+
+pwg_media_t *				/* O - PWG media name */
+_pwgMediaNearSize(int width,	        /* I - Width in hundredths of millimeters */
+		int length,		/* I - Length in hundredths of millimeters */
+		int epsilon)            /* I - Match within this tolernace. PWG units */
+{
   int		i;			/* Looping var */
   pwg_media_t	*media,			/* Current media */
 		*best_media = NULL;	/* Best match */
@@ -937,17 +949,13 @@ pwgMediaForSize(int width,		/* I - Width in hundredths of millimeters */
        i > 0;
        i --, media ++)
   {
-   /*
-    * Adobe uses a size matching algorithm with an epsilon of 5 points, which
-    * is just about 176/2540ths...
-    */
 
     dw = abs(media->width - width);
     dl = abs(media->length - length);
 
     if (!dw && !dl)
       return (media);
-    else if (dw < 176 && dl < 176)
+    else if (dw <= epsilon && dl <= epsilon)
     {
       if (dw <= best_dw && dl <= best_dl)
       {
