@@ -6,6 +6,8 @@
 	<string>org.cups.cupsd</string>
 	<key>EnableTransactions</key>
 	<true/>
+	<key>EnablePressuredExit</key>
+	<true/>
 	<key>ExitTimeOut</key>
 	<integer>60</integer>
 	<key>KeepAlive</key>

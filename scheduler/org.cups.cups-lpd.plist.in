@@ -8,6 +8,8 @@
 	<string>org.cups.cups-lpd</string>
 	<key>EnableTransactions</key>
 	<false/>
+	<key>EnablePressuredExit</key>
+	<false/>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/libexec/cups/daemon/cups-lpd</string>
