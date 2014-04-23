@@ -338,6 +338,8 @@ httpCopyCredentials(
   int			i;		/* Looping var */
 
 
+  DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", http, credentials));
+
   if (credentials)
     *credentials = NULL;
 
@@ -346,6 +348,8 @@ httpCopyCredentials(
 
   if (!(error = SSLCopyPeerTrust(http->tls, &peerTrust)) && peerTrust)
   {
+    DEBUG_printf(("2httpCopyCredentials: Peer provided %d certificates.", (int)SecTrustGetCertificateCount(peerTrust)));
+
     if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
     {
       count = SecTrustGetCertificateCount(peerTrust);
@@ -353,8 +357,22 @@ httpCopyCredentials(
       for (i = 0; i < count; i ++)
       {
 	secCert = SecTrustGetCertificateAtIndex(peerTrust, i);
+
+#ifdef DEBUG
+        CFStringRef cf_name = SecCertificateCopySubjectSummary(secCert);
+	char name[1024];
+	if (cf_name)
+	  CFStringGetCString(cf_name, name, sizeof(name), kCFStringEncodingUTF8);
+	else
+	  strlcpy(name, "unknown", sizeof(name));
+
+	DEBUG_printf(("2httpCopyCredentials: Certificate %d name is \"%s\".", i, name));
+#endif /* DEBUG */
+
 	if ((data = SecCertificateCopyData(secCert)))
 	{
+	  DEBUG_printf(("2httpCopyCredentials: Adding %d byte certificate blob.", (int)CFDataGetLength(data)));
+
 	  httpAddCredential(*credentials, CFDataGetBytePtr(data), (size_t)CFDataGetLength(data));
 	  CFRelease(data);
 	}
@@ -427,22 +445,95 @@ _httpCreateCredentials(
 
 int					/* O - 1 if trusted, 0 if not/unknown */
 httpCredentialsAreTrusted(
-    cups_array_t *credentials)		/* I - Credentials */
+    cups_array_t *credentials,		/* I - Credentials */
+    const char   *common_name)		/* I - Common name for trust lookup */
 {
   SecCertificateRef	secCert;	/* Certificate reference */
   int			trusted = 1;	/* Trusted? */
+  int			save = 0;	/* Save credentials? */
+  const char		*home = getenv("HOME");
+					/* Home directory */
+  char			filename[1024];	/* Path to login keychain */
+  cups_array_t		*tcreds = NULL;	/* Trusted credentials */
   Boolean		isSelfSigned;	/* Is this certificate self-signed? */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread globals */
 
 
+  if (!common_name)
+    return (0);
+
   if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (0);
+
+ /*
+  * Look this common name up in the login and system keychains...
+  */
+
+
+  if (home)
+  {
+    snprintf(filename, sizeof(filename), "%s/Library/login.keychain", home);
+    httpLoadCredentials(filename, &tcreds, common_name);
+  }
+
+  if (!tcreds)
+    httpLoadCredentials("/Library/Keychains/System.keychain", &tcreds, common_name);
+
+  if (tcreds)
+  {
+    char	credentials_str[1024],	/* String for incoming credentials */
+		tcreds_str[1024];	/* String for saved credentials */
+
+    httpCredentialsString(credentials, credentials_str, sizeof(credentials_str));
+    httpCredentialsString(tcreds, tcreds_str, sizeof(tcreds_str));
+
+    if (strcmp(credentials_str, tcreds_str))
+    {
+     /*
+      * Credentials don't match, let's look at the expiration date of the new
+      * credentials and allow if the new ones have a later expiration...
+      */
+
+      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
+          !httpCredentialsIsValidName(credentials, common_name))
+      {
+       /*
+        * Either the new credentials are not newly issued, or the common name
+	* does not match the issued certificate...
+	*/
+
+        trusted = 0;
+      }
+      else
+      {
+       /*
+        * Flag that we should save the new credentials...
+	*/
+
+        save = 1;
+      }
+    }
+
+    httpFreeCredentials(tcreds);
+  }
+  else if (!httpCredentialsIsValidName(credentials, common_name))
+    trusted = 0;
+  else
+    save = 1;
 
   if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
     trusted = 0;
   else if (!cg->any_root && (SecCertificateIsSelfSigned(secCert, &isSelfSigned) != noErr || isSelfSigned))
     trusted = 0;
+
+  if (trusted && save)
+  {
+    if (home)
+      httpSaveCredentials(filename, credentials, common_name);
+    else if (!getuid())
+      httpSaveCredentials("/Library/Keychains/System.keychain", credentials, common_name);
+  }
 
   CFRelease(secCert);
 
@@ -467,7 +558,7 @@ httpCredentialsGetExpiration(
   if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (0);
 
-  expiration = (time_t)(SecCertificateNotValidAfter(secCert) - kCFAbsoluteTimeIntervalSince1970);
+  expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
 
   CFRelease(secCert);
 
@@ -487,9 +578,9 @@ httpCredentialsIsValidName(
     const char   *common_name)		/* I - Name to check */
 {
   SecCertificateRef	secCert;	/* Certificate reference */
-  CFStringRef		cfcommon_name;	/* CF string for common name */
-  CFStringRef		cert_name = NULL;
-					/* Certificate's common name */
+  CFStringRef		cfcert_name = NULL;
+					/* Certificate's common name (CF string) */
+  char			cert_name[256];	/* Certificate's common name (C string) */
   int			valid = 1;	/* Valid name? */
 
 
@@ -500,9 +591,7 @@ httpCredentialsIsValidName(
   * Compare the common names...
   */
 
-  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
-
-  if (SecCertificateCopyCommonName(secCert, &cert_name) != noErr)
+  if ((cfcert_name = SecCertificateCopySubjectSummary(secCert)) == NULL)
   {
    /*
     * Can't get common name, cannot be valid...
@@ -510,19 +599,29 @@ httpCredentialsIsValidName(
 
     valid = 0;
   }
-  else if (CFStringCompare(cfcommon_name, cert_name, kCFCompareCaseInsensitive))
+  else if (CFStringGetCString(cfcert_name, cert_name, sizeof(cert_name), kCFStringEncodingUTF8) &&
+           _cups_strcasecmp(common_name, cert_name))
   {
    /*
-    * Not the common name, check whether the certificate is saved in the keychain...
+    * Not an exact match for the common name, check for wildcard certs...
     */
 
-    /* TODO: Pull certificate from the keychain using label */
+    const char	*domain = strchr(common_name, '.');
+					/* Domain in common name */
+
+    if (strncmp(cert_name, "*.", 2) || !domain || _cups_strcasecmp(domain, cert_name + 1))
+    {
+     /*
+      * Not a wildcard match.
+      */
+
+      /* TODO: Check subject alternate names */
+      valid = 0;
+    }
   }
 
-  CFRelease(cfcommon_name);
-
-  if (cert_name)
-    CFRelease(cert_name);
+  if (cfcert_name)
+    CFRelease(cfcert_name);
 
   CFRelease(secCert);
 
@@ -542,9 +641,11 @@ httpCredentialsString(
     char         *buffer,		/* I - Buffer or @code NULL@ */
     size_t       bufsize)		/* I - Size of buffer */
 {
+  http_credential_t	*first;		/* First certificate */
   SecCertificateRef	secCert;	/* Certificate reference */
-  CFStringRef		summary;	/* CF string for summary */
 
+
+  DEBUG_printf(("httpCredentialsString(credentials=%p, buffer=%p, bufsize=" CUPS_LLFMT ")", credentials, buffer, CUPS_LLCAST bufsize));
 
   if (!buffer)
     return (0);
@@ -552,17 +653,35 @@ httpCredentialsString(
   if (buffer && bufsize > 0)
     *buffer = '\0';
 
-  /* TODO: This needs to include a hash of the credentials */
-  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) != NULL)
+  if ((first = (http_credential_t *)cupsArrayFirst(credentials)) != NULL &&
+      (secCert = http_cdsa_create_credential(first)) != NULL)
   {
-    if ((summary = SecCertificateCopySubjectSummary(secCert)) != NULL)
+    CFStringRef		cf_name;	/* CF common name string */
+    char		name[256];	/* Common name associated with cert */
+    time_t		expiration;	/* Expiration date of cert */
+    _cups_md5_state_t	md5_state;	/* MD5 state */
+    unsigned char	md5_digest[16];	/* MD5 result */
+
+    if ((cf_name = SecCertificateCopySubjectSummary(secCert)) != NULL)
     {
-      CFStringGetCString(summary, buffer, (CFIndex)bufsize, kCFStringEncodingUTF8);
-      CFRelease(summary);
+      CFStringGetCString(cf_name, name, (CFIndex)sizeof(name), kCFStringEncodingUTF8);
+      CFRelease(cf_name);
     }
+    else
+      strlcpy(name, "unknown", sizeof(name));
+
+    expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
+
+    _cupsMD5Init(&md5_state);
+    _cupsMD5Append(&md5_state, first->data, (int)first->datalen);
+    _cupsMD5Finish(&md5_state, md5_digest);
+
+    snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
     CFRelease(secCert);
   }
+
+  DEBUG_printf(("1httpCredentialsString: Returning \"%s\".", buffer));
 
   return (strlen(buffer));
 }

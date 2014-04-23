@@ -614,7 +614,7 @@ extern http_state_t	httpWriteResponse(http_t *http,
 extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
 extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern int		httpCompareCredentials(cups_array_t *cred1, cups_array_t *cred2) _CUPS_API_2_0;
-extern int		httpCredentialsAreTrusted(cups_array_t *credentials) _CUPS_API_2_0;
+extern int		httpCredentialsAreTrusted(cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
 extern time_t		httpCredentialsGetExpiration(cups_array_t *credentials) _CUPS_API_2_0;
 extern int		httpCredentialsIsValidName(cups_array_t *credentials, const char *common_name);
 extern size_t		httpCredentialsString(cups_array_t *credentials, char *buffer, size_t bufsize) _CUPS_API_2_0;

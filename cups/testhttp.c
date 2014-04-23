@@ -613,8 +613,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
-    http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000,
-                        NULL);
+    http = httpConnect2(hostname, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL);
     if (http == NULL)
     {
       perror(hostname);
@@ -629,11 +628,16 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (!httpCopyCredentials(http, &creds))
       {
         httpCredentialsString(creds, info, sizeof(info));
+
+        printf("AreTrusted: %d\n", httpCredentialsAreTrusted(creds, hostname));
+        printf("Expiration: %s\n", httpGetDateString(httpCredentialsGetExpiration(creds)));
+        printf("IsValidName: %d\n", httpCredentialsIsValidName(creds, hostname));
+        printf("String: \"%s\"\n", info);
+
         httpFreeCredentials(creds);
-        printf("Credentials: \"%s\"\n", info);
       }
       else
-        puts("Credentials: Unknown");
+        puts("No credentials!");
     }
 
     printf("Checking file \"%s\"...\n", resource);
@@ -827,7 +831,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (out != stdout)
       {
         current = time(NULL);
-        if (current == start) current ++;
+        if (current == start)
+          current ++;
+
         printf("\r" CUPS_LLFMT "/" CUPS_LLFMT " bytes ("
 	       CUPS_LLFMT " bytes/sec)      ", CUPS_LLCAST total,
 	       CUPS_LLCAST length, CUPS_LLCAST (total / (current - start)));
@@ -835,6 +841,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
     }
   }
+
+  if (out != stdout)
+    putchar('\n');
 
   puts("Closing connection to server...");
   httpClose(http);
