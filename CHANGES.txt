@@ -1,7 +1,10 @@
-CHANGES.txt - 1.7.3 - 2014-04-10
+CHANGES.txt - 1.7.3 - 2014-04-24
 --------------------------------
 
 CHANGES IN CUPS V1.7.3
+
+	- Fixed mapping of OutputBin values such as "Tray1"
+	  (<rdar://problem/16685606>)
 
 
 CHANGES IN CUPS V1.7.2
