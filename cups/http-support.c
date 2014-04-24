@@ -1621,8 +1621,10 @@ _httpResolveURI(
 #    endif /* WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref = NULL,/* DNS-SD service reference for domain */
+			ippref = NULL,	/* DNS-SD service reference for network IPP */
+			ippsref = NULL,	/* DNS-SD service reference for network IPPS */
 			localref;	/* DNS-SD service reference for .local */
-    int			domainsent = 0;	/* Send the domain resolve? */
+    int			extrasent = 0;	/* Send the domain/IPP/IPPS resolves? */
 #    ifdef HAVE_POLL
     struct pollfd	polldata;	/* Polling data */
 #    else /* select() */
@@ -1771,7 +1773,7 @@ _httpResolveURI(
 	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (domainsent == 0 && domain && _cups_strcasecmp(domain, "local."))
+	    if (extrasent == 0 && domain && _cups_strcasecmp(domain, "local."))
 	    {
 	      if (options & _HTTP_RESOLVE_STDERR)
 		fprintf(stderr,
@@ -1785,7 +1787,33 @@ _httpResolveURI(
 	                            myinterface, hostname, regtype, domain,
 				    http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)
-		domainsent = 1;
+		extrasent = 1;
+	    }
+	    else if (extrasent == 0 && !strcmp(scheme, "ippusb"))
+	    {
+	      if (options & _HTTP_RESOLVE_STDERR)
+		fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"_ipps._tcp\", domain=\"local.\"...\n", hostname);
+
+	      ippsref = ref;
+	      if (DNSServiceResolve(&ippsref,
+	                            kDNSServiceFlagsShareConnection,
+	                            myinterface, hostname, "_ipps._tcp", domain,
+				    http_resolve_cb,
+				    &uribuf) == kDNSServiceErr_NoError)
+		extrasent = 1;
+	    }
+	    else if (extrasent == 1 && !strcmp(scheme, "ippusb"))
+	    {
+	      if (options & _HTTP_RESOLVE_STDERR)
+		fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"_ipp._tcp\", domain=\"local.\"...\n", hostname);
+
+	      ippref = ref;
+	      if (DNSServiceResolve(&ippref,
+	                            kDNSServiceFlagsShareConnection,
+	                            myinterface, hostname, "_ipp._tcp", domain,
+				    http_resolve_cb,
+				    &uribuf) == kDNSServiceErr_NoError)
+		extrasent = 2;
 	    }
 
 	   /*
@@ -1811,8 +1839,15 @@ _httpResolveURI(
 	  }
 	}
 
-	if (domainsent)
-	  DNSServiceRefDeallocate(domainref);
+	if (extrasent)
+	{
+	  if (domainref)
+	    DNSServiceRefDeallocate(domainref);
+	  if (ippref)
+	    DNSServiceRefDeallocate(ippref);
+	  if (ippsref)
+	    DNSServiceRefDeallocate(ippsref);
+	}
 
 	DNSServiceRefDeallocate(localref);
       }
