@@ -38,7 +38,8 @@ main(int  argc,				/* I - Number of command-line args */
   _ppd_cache_t		*pc;		/* PPD cache and PWG mapping data */
   int			num_finishings,	/* Number of finishing options */
 			finishings[20];	/* Finishing options */
-
+  ppd_choice_t		*ppd_bin;	/* OutputBin value */
+  const char		*output_bin;	/* output-bin value */
 
   if (argc < 2)
   {
@@ -73,13 +74,20 @@ main(int  argc,				/* I - Number of command-line args */
 
   num_finishings = _ppdCacheGetFinishingValues(pc, num_options, options, (int)sizeof(finishings) / sizeof(finishings[0]), finishings);
 
-  fputs("finishings=", stdout);
-  for (i = 0; i < num_finishings; i ++)
-    if (i)
-      printf(",%d", finishings[i]);
-    else
-      printf("%d", finishings[i]);
-  fputs("\n", stdout);
+  if (num_finishings > 0)
+  {
+    fputs("finishings=", stdout);
+    for (i = 0; i < num_finishings; i ++)
+      if (i)
+	printf(",%d", finishings[i]);
+      else
+	printf("%d", finishings[i]);
+    fputs("\n", stdout);
+  }
+
+  if ((ppd_bin = ppdFindMarkedChoice(ppd, "OutputBin")) != NULL &&
+      (output_bin = _ppdCacheGetBin(pc, ppd_bin->choice)) != NULL)
+    printf("output-bin=\"%s\"\n", output_bin);
 
   return (0);
 }

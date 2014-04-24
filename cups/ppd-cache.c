@@ -2703,6 +2703,8 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
     if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
 	_cups_isupper(ppd[1]) && ptr < end)
       *ptr++ = '-';
+    else if (!isdigit(*ppd & 255) && isdigit(ppd[1] & 255))
+      *ptr++ = '-';
   }
 
   *ptr = '\0';

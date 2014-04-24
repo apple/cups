@@ -1,6 +1,12 @@
 CHANGES-1.7.txt
 ---------------
 
+CHANGES IN CUPS V1.7.3
+
+	- Fixed mapping of OutputBin values such as "Tray1"
+	  (<rdar://problem/16685606>)
+
+
 CHANGES IN CUPS V1.7.2
 
 	- Security: The scheduler now blocks URLs containing embedded HTML
