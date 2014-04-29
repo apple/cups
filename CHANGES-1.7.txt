@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.7.3
 
 	- Fixed mapping of OutputBin values such as "Tray1"
 	  (<rdar://problem/16685606>)
+	- Several ippGet* functions incorrectly returned -1 instead of 0 on
+	  error.
 
 
 CHANGES IN CUPS V1.7.2
