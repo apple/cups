@@ -76,6 +76,7 @@ LIBOBJS	=	\
 		string.o \
 		tempfile.o \
 		thread.o \
+		tls.o \
 		transcode.o \
 		usersys.o \
 		util.o
@@ -631,7 +632,7 @@ sloc:
 #
 
 include Dependencies
-http.o: tls-darwin.c tls-gnutls.c tls-sspi.c
+tls.o: tls-darwin.c tls-gnutls.c tls-sspi.c
 
 
 #

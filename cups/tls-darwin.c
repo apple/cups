@@ -455,7 +455,6 @@ httpCredentialsAreTrusted(
 					/* Home directory */
   char			filename[1024];	/* Path to login keychain */
   cups_array_t		*tcreds = NULL;	/* Trusted credentials */
-  Boolean		isSelfSigned;	/* Is this certificate self-signed? */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread globals */
 
@@ -524,7 +523,7 @@ httpCredentialsAreTrusted(
 
   if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
     trusted = 0;
-  else if (!cg->any_root && (SecCertificateIsSelfSigned(secCert, &isSelfSigned) != noErr || isSelfSigned))
+  else if (!cg->any_root && cupsArrayCount(credentials) == 1)
     trusted = 0;
 
   if (trusted && save)
@@ -791,204 +790,6 @@ httpLoadCredentials(
 }
 
 
-#if 0
-/*
- * 'cupsMakeCredentials()' - Create self-signed credentials for the given
- *                           name.
- *
- * @since CUPS 2.0@
- */
-
-int					/* O - 0 on success, -1 on error */
-cupsMakeCredentials(
-    const char   *path,			/* I - Keychain/PKCS#12 path */
-    cups_array_t **credentials,		/* O - Credentials */
-    const char   *common_name)		/* I - Common name for X.509 cert */
-{
-#    ifdef HAVE_SECGENERATESELFSIGNEDCERTIFICATE
-  int			status = -1;	/* Return status */
-  OSStatus		err;		/* Error code (if any) */
-  CFStringRef		cfcommon_name = NULL;
-					/* CF string for server name */
-  SecIdentityRef	ident = NULL;	/* Identity */
-  SecKeyRef		publicKey = NULL,
-					/* Public key */
-			privateKey = NULL;
-					/* Private key */
-  CFMutableDictionaryRef keyParams = NULL;
-					/* Key generation parameters */
-
-
-  if (credentials)
-    *credentials = NULL;
-
-  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, servername,
-                                           kCFStringEncodingUTF8);
-  if (!cfcommon_name)
-    goto cleanup;
-
- /*
-  * Create a public/private key pair...
-  */
-
-  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					&kCFTypeDictionaryKeyCallBacks,
-					&kCFTypeDictionaryValueCallBacks);
-  if (!keyParams)
-    goto cleanup;
-
-  CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
-  CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
-  CFDictionaryAddValue(keyParams, kSecAttrLabel,
-                       CFSTR("CUPS Self-Signed Certificate"));
-
-  err = SecKeyGeneratePair(keyParams, &publicKey, &privateKey);
-  if (err != noErr)
-    goto cleanup;
-
- /*
-  * Create a self-signed certificate using the public/private key pair...
-  */
-
-  CFIndex	usageInt = kSecKeyUsageAll;
-  CFNumberRef	usage = CFNumberCreate(alloc, kCFNumberCFIndexType, &usageInt);
-  CFDictionaryRef certParams = CFDictionaryCreateMutable(kCFAllocatorDefault,
-kSecCSRBasicContraintsPathLen, CFINT(0), kSecSubjectAltName, cfcommon_name, kSecCertificateKeyUsage, usage, NULL, NULL);
-  CFRelease(usage);
-
-  const void	*ca_o[] = { kSecOidOrganization, CFSTR("") };
-  const void	*ca_cn[] = { kSecOidCommonName, cfcommon_name };
-  CFArrayRef	ca_o_dn = CFArrayCreate(kCFAllocatorDefault, ca_o, 2, NULL);
-  CFArrayRef	ca_cn_dn = CFArrayCreate(kCFAllocatorDefault, ca_cn, 2, NULL);
-  const void	*ca_dn_array[2];
-
-  ca_dn_array[0] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_o_dn, 1, NULL);
-  ca_dn_array[1] = CFArrayCreate(kCFAllocatorDefault, (const void **)&ca_cn_dn, 1, NULL);
-
-  CFArrayRef	subject = CFArrayCreate(kCFAllocatorDefault, ca_dn_array, 2, NULL);
-  SecCertificateRef cert = SecGenerateSelfSignedCertificate(subject, certParams, publicKey, privateKey);
-  CFRelease(subject);
-  CFRelease(certParams);
-
-  if (!cert)
-    goto cleanup;
-
-  ident = SecIdentityCreate(kCFAllocatorDefault, cert, privateKey);
-
-  if (ident)
-    status = 0;
-
-  /*
-   * Cleanup and return...
-   */
-
-cleanup:
-
-  if (cfcommon_name)
-    CFRelease(cfcommon_name);
-
-  if (keyParams)
-    CFRelease(keyParams);
-
-  if (ident)
-    CFRelease(ident);
-
-  if (cert)
-    CFRelease(cert);
-
-  if (publicKey)
-    CFRelease(publicKey);
-
-  if (privateKey)
-    CFRelease(publicKey);
-
-  return (status);
-
-#    else /* !HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
-  int		pid,			/* Process ID of command */
-		status;			/* Status of command */
-  char		command[1024],		/* Command */
-		*argv[4],		/* Command-line arguments */
-		keychain[1024],		/* Keychain argument */
-		infofile[1024];		/* Type-in information for cert */
-  cups_file_t	*fp;			/* Seed/info file */
-
-
- /*
-  * Run the "certtool" command to generate a self-signed certificate...
-  */
-
-  if (!cupsFileFind("certtool", getenv("PATH"), 1, command, sizeof(command)))
-    return (-1);
-
- /*
-  * Create a file with the certificate information fields...
-  *
-  * Note: This assumes that the default questions are asked by the certtool
-  * command...
-  */
-
- if ((fp = cupsTempFile2(infofile, sizeof(infofile))) == NULL)
-    return (-1);
-
-  cupsFilePrintf(fp,
-                 "%s\n"			/* Enter key and certificate label */
-                 "r\n"			/* Generate RSA key pair */
-                 "2048\n"		/* Key size in bits */
-                 "y\n"			/* OK (y = yes) */
-                 "b\n"			/* Usage (b=signing/encryption) */
-                 "s\n"			/* Sign with SHA1 */
-                 "y\n"			/* OK (y = yes) */
-                 "%s\n"			/* Common name */
-                 "\n"			/* Country (default) */
-                 "\n"			/* Organization (default) */
-                 "\n"			/* Organizational unit (default) */
-                 "\n"			/* State/Province (default) */
-                 "%s\n"			/* Email address */
-                 "y\n",			/* OK (y = yes) */
-        	 common_name, common_name, "");
-  cupsFileClose(fp);
-
-  snprintf(keychain, sizeof(keychain), "k=%s", path);
-
-  argv[0] = "certtool";
-  argv[1] = "c";
-  argv[2] = keychain;
-  argv[3] = NULL;
-
-  posix_spawn_file_actions_t actions;	/* File actions */
-
-  posix_spawn_file_actions_init(&actions);
-  posix_spawn_file_actions_addclose(&actions, 0);
-  posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
-
-  if (posix_spawn(&pid, command, &actions, NULL, argv, environ))
-  {
-    unlink(infofile);
-    return (-1);
-  }
-
-  posix_spawn_file_actions_destroy(&actions);
-
-  unlink(infofile);
-
-  while (waitpid(pid, &status, 0) < 0)
-    if (errno != EINTR)
-    {
-      status = -1;
-      break;
-    }
-
-  if (status)
-    return (-1);
-
-#    endif /* HAVE_SECGENERATESELFSIGNEDCERTIFICATE */
-
-  return (httpLoadCredentials(path, credentials, common_name));
-}
-#endif /* 0 */
-
-
 /*
  * 'httpSaveCredentials()' - Save X.509 credentials to a keychain file.
  *
@@ -1192,11 +993,11 @@ http_cdsa_write(
 
 
 /*
- * 'http_tls_initialize()' - Initialize the TLS stack.
+ * '_httpTLSInitialize()' - Initialize the TLS stack.
  */
 
-static void
-http_tls_initialize(void)
+void
+_httpTLSInitialize(void)
 {
  /*
   * Nothing to do...
@@ -1205,11 +1006,11 @@ http_tls_initialize(void)
 
 
 /*
- * 'http_tls_pending()' - Return the number of pending TLS-encrypted bytes.
+ * '_httpTLSPending()' - Return the number of pending TLS-encrypted bytes.
  */
 
-static size_t
-http_tls_pending(http_t *http)		/* I - HTTP connection */
+size_t
+_httpTLSPending(http_t *http)		/* I - HTTP connection */
 {
   size_t bytes;				/* Bytes that are available */
 
@@ -1222,11 +1023,11 @@ http_tls_pending(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'http_tls_read()' - Read from a SSL/TLS connection.
+ * '_httpTLSRead()' - Read from a SSL/TLS connection.
  */
 
-static int				/* O - Bytes read */
-http_tls_read(http_t *http,		/* I - HTTP connection */
+int					/* O - Bytes read */
+_httpTLSRead(http_t *http,		/* I - HTTP connection */
 	      char   *buf,		/* I - Buffer to store data */
 	      int    len)		/* I - Length of buffer */
 {
@@ -1236,7 +1037,7 @@ http_tls_read(http_t *http,		/* I - HTTP connection */
 
 
   error = SSLRead(http->tls, buf, (size_t)len, &processed);
-  DEBUG_printf(("6http_tls_read: error=%d, processed=%d", (int)error,
+  DEBUG_printf(("6_httpTLSRead: error=%d, processed=%d", (int)error,
                 (int)processed));
   switch (error)
   {
@@ -1306,11 +1107,11 @@ http_tls_set_credentials(http_t *http)	/* I - HTTP connection */
 
 
 /*
- * 'http_tls_start()' - Set up SSL/TLS support on a connection.
+ * '_httpTLSStart()' - Set up SSL/TLS support on a connection.
  */
 
-static int				/* O - 0 on success, -1 on failure */
-http_tls_start(http_t *http)		/* I - HTTP connection */
+int					/* O - 0 on success, -1 on failure */
+_httpTLSStart(http_t *http)		/* I - HTTP connection */
 {
   char			hostname[256],	/* Hostname */
 			*hostptr;	/* Pointer into hostname */
@@ -1327,7 +1128,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
   http_credential_t	*credential;	/* Credential data */
 
 
-  DEBUG_printf(("7http_tls_start(http=%p)", http));
+  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
 
 #ifdef HAVE_SECKEYCHAINOPEN
   if (http->mode == _HTTP_MODE_SERVER && !tls_keychain)
@@ -1335,7 +1136,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
   if (http->mode == _HTTP_MODE_SERVER)
 #endif /* HAVE_SECKEYCHAINOPEN */
   {
-    DEBUG_puts("4http_tls_start: cupsSetServerCredentials not called.");
+    DEBUG_puts("4_httpTLSStart: cupsSetServerCredentials not called.");
     http->error  = errno = EINVAL;
     http->status = HTTP_STATUS_ERROR;
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Server credentials not set."), 1);
@@ -1345,7 +1146,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
   if ((http->tls = SSLCreateContext(kCFAllocatorDefault, http->mode == _HTTP_MODE_CLIENT ? kSSLClientSide : kSSLServerSide, kSSLStreamType)) == NULL)
   {
-    DEBUG_puts("4http_tls_start: SSLCreateContext failed.");
+    DEBUG_puts("4_httpTLSStart: SSLCreateContext failed.");
     http->error  = errno = ENOMEM;
     http->status = HTTP_STATUS_ERROR;
     _cupsSetHTTPError(HTTP_STATUS_ERROR);
@@ -1354,19 +1155,19 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
   }
 
   error = SSLSetConnection(http->tls, http);
-  DEBUG_printf(("4http_tls_start: SSLSetConnection, error=%d", (int)error));
+  DEBUG_printf(("4_httpTLSStart: SSLSetConnection, error=%d", (int)error));
 
   if (!error)
   {
     error = SSLSetIOFuncs(http->tls, http_cdsa_read, http_cdsa_write);
-    DEBUG_printf(("4http_tls_start: SSLSetIOFuncs, error=%d", (int)error));
+    DEBUG_printf(("4_httpTLSStart: SSLSetIOFuncs, error=%d", (int)error));
   }
 
   if (!error)
   {
     error = SSLSetSessionOption(http->tls, kSSLSessionOptionBreakOnServerAuth,
                                 true);
-    DEBUG_printf(("4http_tls_start: SSLSetSessionOption, error=%d",
+    DEBUG_printf(("4_httpTLSStart: SSLSetSessionOption, error=%d",
                   (int)error));
   }
 
@@ -1380,13 +1181,13 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
     {
       error = SSLSetSessionOption(http->tls,
 				  kSSLSessionOptionBreakOnCertRequested, true);
-      DEBUG_printf(("4http_tls_start: kSSLSessionOptionBreakOnCertRequested, "
+      DEBUG_printf(("4_httpTLSStart: kSSLSessionOptionBreakOnCertRequested, "
                     "error=%d", (int)error));
     }
     else
     {
       error = http_tls_set_credentials(http);
-      DEBUG_printf(("4http_tls_start: http_tls_set_credentials, error=%d",
+      DEBUG_printf(("4_httpTLSStart: http_tls_set_credentials, error=%d",
                     (int)error));
     }
   }
@@ -1416,7 +1217,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
       addrlen = sizeof(addr);
       if (getsockname(http->fd, (struct sockaddr *)&addr, &addrlen))
       {
-	DEBUG_printf(("4http_tls_start: Unable to get socket address: %s", strerror(errno)));
+	DEBUG_printf(("4_httpTLSStart: Unable to get socket address: %s", strerror(errno)));
 	hostname[0] = '\0';
       }
       else if (httpAddrLocalhost(&addr))
@@ -1424,7 +1225,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
       else
       {
 	httpAddrLookup(&addr, hostname, sizeof(hostname));
-        DEBUG_printf(("4http_tls_start: Resolved socket address to \"%s\".", hostname));
+        DEBUG_printf(("4_httpTLSStart: Resolved socket address to \"%s\".", hostname));
       }
     }
 
@@ -1439,11 +1240,11 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
     if (!http->tls_credentials && tls_auto_create && (hostname[0] || tls_common_name))
     {
-      DEBUG_printf(("4http_tls_start: Auto-create credentials for \"%s\".", hostname[0] ? hostname : tls_common_name));
+      DEBUG_printf(("4_httpTLSStart: Auto-create credentials for \"%s\".", hostname[0] ? hostname : tls_common_name));
 
       if (!cupsMakeServerCredentials(tls_keypath, hostname[0] ? hostname : tls_common_name, 0, NULL, time(NULL) + 365 * 86400))
       {
-	DEBUG_puts("4http_tls_start: cupsMakeServerCredentials failed.");
+	DEBUG_puts("4_httpTLSStart: cupsMakeServerCredentials failed.");
 	http->error  = errno = EINVAL;
 	http->status = HTTP_STATUS_ERROR;
 	_cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to create server credentials."), 1);
@@ -1457,7 +1258,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
     if (!http->tls_credentials)
     {
-      DEBUG_puts("4http_tls_start: Unable to find server credentials.");
+      DEBUG_puts("4_httpTLSStart: Unable to find server credentials.");
       http->error  = errno = EINVAL;
       http->status = HTTP_STATUS_ERROR;
       _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to find server credentials."), 1);
@@ -1467,10 +1268,10 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
     error = SSLSetCertificate(http->tls, http->tls_credentials);
 
-    DEBUG_printf(("4http_tls_start: SSLSetCertificate, error=%d", (int)error));
+    DEBUG_printf(("4_httpTLSStart: SSLSetCertificate, error=%d", (int)error));
   }
 
-  DEBUG_printf(("4http_tls_start: tls_credentials=%p", http->tls_credentials));
+  DEBUG_printf(("4_httpTLSStart: tls_credentials=%p", http->tls_credentials));
 
  /*
   * Let the server know which hostname/domain we are trying to connect to
@@ -1501,7 +1302,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
     error = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
 
-    DEBUG_printf(("4http_tls_start: SSLSetPeerDomainName, error=%d", (int)error));
+    DEBUG_printf(("4_httpTLSStart: SSLSetPeerDomainName, error=%d", (int)error));
   }
 
   if (!error)
@@ -1512,7 +1313,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
     {
       error = SSLHandshake(http->tls);
 
-      DEBUG_printf(("4http_tls_start: SSLHandshake returned %d.", (int)error));
+      DEBUG_printf(("4_httpTLSStart: SSLHandshake returned %d.", (int)error));
 
       switch (error)
       {
@@ -1537,7 +1338,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 		httpFreeCredentials(credentials);
 	      }
 
-	      DEBUG_printf(("4http_tls_start: Server certificate callback "
+	      DEBUG_printf(("4_httpTLSStart: Server certificate callback "
 	                    "returned %d.", (int)error));
 	    }
 	    break;
@@ -1580,7 +1381,7 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 		error = (cg->client_cert_cb)(http, http->tls, names,
 					     cg->client_cert_data);
 
-		DEBUG_printf(("4http_tls_start: Client certificate callback "
+		DEBUG_printf(("4_httpTLSStart: Client certificate callback "
 		              "returned %d.", (int)error));
 	      }
 
@@ -1659,11 +1460,11 @@ http_tls_start(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'http_tls_stop()' - Shut down SSL/TLS on a connection.
+ * '_httpTLSStop()' - Shut down SSL/TLS on a connection.
  */
 
-static void
-http_tls_stop(http_t *http)		/* I - HTTP connection */
+void
+_httpTLSStop(http_t *http)		/* I - HTTP connection */
 {
   while (SSLClose(http->tls) == errSSLWouldBlock)
     usleep(1000);
@@ -1679,11 +1480,11 @@ http_tls_stop(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'http_tls_write()' - Write to a SSL/TLS connection.
+ * '_httpTLSWrite()' - Write to a SSL/TLS connection.
  */
 
-static int				/* O - Bytes written */
-http_tls_write(http_t     *http,	/* I - HTTP connection */
+int					/* O - Bytes written */
+_httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
@@ -1692,7 +1493,7 @@ http_tls_write(http_t     *http,	/* I - HTTP connection */
   size_t	processed;		/* Number of bytes processed */
 
 
-  DEBUG_printf(("2http_tls_write(http=%p, buf=%p, len=%d)", http, buf, len));
+  DEBUG_printf(("2_httpTLSWrite(http=%p, buf=%p, len=%d)", http, buf, len));
 
   error = SSLWrite(http->tls, buf, (size_t)len, &processed);
 
@@ -1728,7 +1529,7 @@ http_tls_write(http_t     *http,	/* I - HTTP connection */
 	break;
   }
 
-  DEBUG_printf(("3http_tls_write: Returning %d.", (int)result));
+  DEBUG_printf(("3_httpTLSWrite: Returning %d.", (int)result));
 
   return ((int)result);
 }

@@ -68,20 +68,7 @@ static void		http_set_timeout(int fd, double timeout);
 static void		http_set_wait(http_t *http);
 
 #ifdef HAVE_SSL
-static size_t		http_tls_pending(http_t *http);
-static int		http_tls_read(http_t *http, char *buf, int len);
-static int		http_tls_set_credentials(http_t *http);
-static int		http_tls_start(http_t *http);
-static void		http_tls_stop(http_t *http);
 static int		http_tls_upgrade(http_t *http);
-static int		http_tls_write(http_t *http, const char *buf, int len);
-#  ifdef HAVE_GNUTLS
-#    include "tls-gnutls.c"
-#  elif defined(HAVE_CDSASSL)
-#    include "tls-darwin.c"
-#  else
-#    include "tls-sspi.c"
-#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
 
@@ -537,7 +524,7 @@ _httpDisconnect(http_t *http)		/* I - HTTP connection */
 {
 #ifdef HAVE_SSL
   if (http->tls)
-    http_tls_stop(http);
+    _httpTLSStop(http);
 #endif /* HAVE_SSL */
 
   httpAddrClose(NULL, http->fd);
@@ -579,7 +566,7 @@ httpEncryption(http_t            *http,	/* I - HTTP connection */
 
     http->encryption = e;
     if (e != HTTP_ENCRYPTION_IF_REQUESTED && !http->tls)
-      return (http_tls_start(http));
+      return (_httpTLSStart(http));
     else
       return (0);
   }
@@ -686,7 +673,7 @@ httpFlush(http_t *http)			/* I - HTTP connection */
 
 #ifdef HAVE_SSL
     if (http->tls)
-      http_tls_stop(http);
+      _httpTLSStop(http);
 #endif /* HAVE_SSL */
 
     httpAddrClose(NULL, http->fd);
@@ -1142,7 +1129,7 @@ httpGetReady(http_t *http)		/* I - HTTP connection */
     return ((size_t)http->used);
 #ifdef HAVE_SSL
   else if (http->tls)
-    return (http_tls_pending(http));
+    return (_httpTLSPending(http));
 #endif /* HAVE_SSL */
 
   return (0);
@@ -1581,7 +1568,7 @@ httpInitialize(void)
 #endif /* WIN32 */
 
 #  ifdef HAVE_SSL
-  http_tls_initialize();
+  _httpTLSInitialize();
 #  endif /* HAVE_SSL */
 
   initialized = 1;
@@ -2398,7 +2385,7 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
   if (http->tls)
   {
     DEBUG_puts("2httpReconnect2: Shutting down SSL/TLS...");
-    http_tls_stop(http);
+    _httpTLSStop(http);
   }
 #endif /* HAVE_SSL */
 
@@ -2476,7 +2463,7 @@ httpReconnect2(http_t *http,		/* I - HTTP connection */
     * Always do encryption via SSL.
     */
 
-    if (http_tls_start(http) != 0)
+    if (_httpTLSStart(http) != 0)
     {
       httpAddrClose(NULL, http->fd);
 
@@ -2870,7 +2857,7 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
     return;
 
   if (http->tls)
-    http_tls_stop(http);
+    _httpTLSStop(http);
 
   shutdown(http->fd, SHUT_RD);
 }
@@ -2943,7 +2930,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
 #ifdef HAVE_SSL
     if (http->status == HTTP_STATUS_SWITCHING_PROTOCOLS && !http->tls)
     {
-      if (http_tls_start(http) != 0)
+      if (_httpTLSStart(http) != 0)
       {
         httpAddrClose(NULL, http->fd);
 
@@ -3160,7 +3147,7 @@ _httpWait(http_t *http,			/* I - HTTP connection */
   */
 
 #ifdef HAVE_SSL
-  if (http->tls && http_tls_pending(http))
+  if (http->tls && _httpTLSPending(http))
   {
     DEBUG_puts("5_httpWait: Return 1 since there is pending TLS data.");
     return (1);
@@ -4036,7 +4023,7 @@ http_read(http_t *http,			/* I - HTTP connection */
   {
 #ifdef HAVE_SSL
     if (http->tls)
-      bytes = http_tls_read(http, buffer, (int)length);
+      bytes = _httpTLSRead(http, buffer, (int)length);
     else
 #endif /* HAVE_SSL */
     bytes = recv(http->fd, buffer, length, 0);
@@ -4677,7 +4664,7 @@ http_write(http_t     *http,		/* I - HTTP connection */
 
 #ifdef HAVE_SSL
     if (http->tls)
-      bytes = http_tls_write(http, buffer, (int)length);
+      bytes = _httpTLSWrite(http, buffer, (int)length);
     else
 #endif /* HAVE_SSL */
     bytes = send(http->fd, buffer, length, 0);

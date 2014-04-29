@@ -3,7 +3,7 @@
  *
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -103,7 +103,6 @@ extern "C" {
 extern SecCertificateRef SecCertificateCreateWithBytes(CFAllocatorRef allocator, const UInt8 *bytes, CFIndex length);
 extern bool SecCertificateIsValid(SecCertificateRef certificate, CFAbsoluteTime verifyTime);
 extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate);
-extern OSStatus SecCertificateIsSelfSigned(SecCertificateRef certRef, Boolean *isSelfSigned);
 #      ifdef __cplusplus
 }
 #      endif /* __cplusplus */
@@ -394,6 +393,13 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 					 int (*cb)(void *context),
 					 void *context);
 extern const char	*_httpStatus(cups_lang_t *lang, http_status_t status);
+extern void		_httpTLSInitialize(void);
+extern size_t		_httpTLSPending(http_t *http);
+extern int		_httpTLSRead(http_t *http, char *buf, int len);
+extern int		_httpTLSSetCredentials(http_t *http);
+extern int		_httpTLSStart(http_t *http);
+extern void		_httpTLSStop(http_t *http);
+extern int		_httpTLSWrite(http_t *http, const char *buf, int len);
 extern int		_httpUpdate(http_t *http, http_status_t *status);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 
