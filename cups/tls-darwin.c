@@ -52,6 +52,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 static CFArrayRef	http_cdsa_copy_server(const char *common_name);
 #endif /* HAVE_SECKEYCHAINOPEN */
 static OSStatus		http_cdsa_read(SSLConnectionRef connection, void *data, size_t *dataLength);
+static int		http_cdsa_set_credentials(http_t *http);
 static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, size_t *dataLength);
 
 
@@ -369,7 +370,7 @@ httpCopyCredentials(
 	DEBUG_printf(("2httpCopyCredentials: Certificate %d name is \"%s\".", i, name));
 #endif /* DEBUG */
 
-	if ((data = SecCertificateCopyData(secCert)))
+	if ((data = SecCertificateCopyData(secCert)) != NULL)
 	{
 	  DEBUG_printf(("2httpCopyCredentials: Adding %d byte certificate blob.", (int)CFDataGetLength(data)));
 
@@ -451,9 +452,6 @@ httpCredentialsAreTrusted(
   SecCertificateRef	secCert;	/* Certificate reference */
   int			trusted = 1;	/* Trusted? */
   int			save = 0;	/* Save credentials? */
-  const char		*home = getenv("HOME");
-					/* Home directory */
-  char			filename[1024];	/* Path to login keychain */
   cups_array_t		*tcreds = NULL;	/* Trusted credentials */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread globals */
@@ -466,18 +464,10 @@ httpCredentialsAreTrusted(
     return (0);
 
  /*
-  * Look this common name up in the login and system keychains...
+  * Look this common name up in the default keychains...
   */
 
-
-  if (home)
-  {
-    snprintf(filename, sizeof(filename), "%s/Library/login.keychain", home);
-    httpLoadCredentials(filename, &tcreds, common_name);
-  }
-
-  if (!tcreds)
-    httpLoadCredentials("/Library/Keychains/System.keychain", &tcreds, common_name);
+  httpLoadCredentials(NULL, &tcreds, common_name);
 
   if (tcreds)
   {
@@ -527,12 +517,7 @@ httpCredentialsAreTrusted(
     trusted = 0;
 
   if (trusted && save)
-  {
-    if (home)
-      httpSaveCredentials(filename, credentials, common_name);
-    else if (!getuid())
-      httpSaveCredentials("/Library/Keychains/System.keychain", credentials, common_name);
-  }
+    httpSaveCredentials(NULL, credentials, common_name);
 
   CFRelease(secCert);
 
@@ -713,19 +698,13 @@ httpLoadCredentials(
     cups_array_t **credentials,		/* IO - Credentials */
     const char   *common_name)		/* I  - Common name for credentials */
 {
-  (void)path;
-  (void)credentials;
-  (void)common_name;
-
-  return (-1);
-
-#if 0
+#ifdef HAVE_SECKEYCHAINOPEN
   OSStatus		err;		/* Error info */
+  char			filename[1024];	/* Filename for keychain */
   SecKeychainRef	keychain = NULL;/* Keychain reference */
   SecIdentitySearchRef	search = NULL;	/* Search reference */
-  SecIdentityRef	identity = NULL;/* Identity */
-  CFArrayRef		certificates = NULL;
-					/* Certificate array */
+  SecCertificateRef	cert = NULL;	/* Certificate */
+  CFDataRef		data;		/* Certificate data */
   SecPolicyRef		policy = NULL;	/* Policy ref */
   CFStringRef		cfcommon_name = NULL;
 					/* Server name */
@@ -733,7 +712,29 @@ httpLoadCredentials(
   CFArrayRef		list = NULL;	/* Keychain list */
 
 
-  if ((err = SecKeychainOpen(path, &keychain)))
+  DEBUG_printf(("httpLoadCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, credentials, common_name));
+
+  if (!credentials)
+    return (-1);
+
+  *credentials = NULL;
+
+  if (!path)
+  {
+    const char *home = getenv("HOME");	/* HOME environment variable */
+
+    if (getuid() && home)
+      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
+    else
+      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
+
+    path = filename;
+
+    DEBUG_printf(("1httpLoadCredentials: Using default path \"%s\".", path));
+  }
+
+
+  if ((err = SecKeychainOpen(path, &keychain)) != noErr)
     goto cleanup;
 
   cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
@@ -749,10 +750,9 @@ httpLoadCredentials(
   if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
     goto cleanup;
 
-  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1,
-                       &kCFTypeArrayCallBacks);
+  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1, &kCFTypeArrayCallBacks);
 
-  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
+  CFDictionaryAddValue(query, kSecClass, kSecClassCertificate);
   CFDictionaryAddValue(query, kSecMatchPolicy, policy);
   CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
   CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
@@ -760,16 +760,22 @@ httpLoadCredentials(
 
   CFRelease(list);
 
-  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+  err = SecItemCopyMatching(query, (CFTypeRef *)&cert);
 
   if (err)
     goto cleanup;
 
-  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+  if (CFGetTypeID(cert) != SecCertificateGetTypeID())
     goto cleanup;
 
-  if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks)) == NULL)
-    goto cleanup;
+  if ((data = SecCertificateCopyData(cert)) != NULL)
+  {
+    DEBUG_printf(("1httpLoadCredentials: Adding %d byte certificate blob.", (int)CFDataGetLength(data)));
+
+    *credentials = cupsArrayNew(NULL, NULL);
+    httpAddCredential(*credentials, CFDataGetBytePtr(data), (size_t)CFDataGetLength(data));
+    CFRelease(data);
+  }
 
   cleanup :
 
@@ -777,16 +783,24 @@ httpLoadCredentials(
     CFRelease(keychain);
   if (search)
     CFRelease(search);
-  if (identity)
-    CFRelease(identity);
-
+  if (cert)
+    CFRelease(cert);
   if (policy)
     CFRelease(policy);
   if (query)
     CFRelease(query);
 
-  return (certificates);
-#endif /* 0 */
+  DEBUG_printf(("1httpLoadCredentials: Returning %d.", *credentials ? 0 : -1));
+
+  return (*credentials ? 0 : -1);
+
+#else
+  (void)path;
+  (void)credentials;
+  (void)common_name;
+
+  return (-1);
+#endif /* HAVE_SECKEYCHAINOPEN */
 }
 
 
@@ -802,193 +816,103 @@ httpSaveCredentials(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Common name for credentials */
 {
+#ifdef HAVE_SECKEYCHAINOPEN
+  int			ret = -1;	/* Return value */
+  OSStatus		err;		/* Error info */
+  char			filename[1024];	/* Filename for keychain */
+  SecKeychainRef	keychain = NULL;/* Keychain reference */
+  SecIdentitySearchRef	search = NULL;	/* Search reference */
+  SecCertificateRef	cert = NULL;	/* Certificate */
+  CFStringRef		cfcommon_name = NULL;
+					/* Server name */
+  CFMutableDictionaryRef attrs = NULL;	/* Attributes for add */
+  CFArrayRef		list = NULL;	/* Keychain list */
+
+
+  DEBUG_printf(("httpSaveCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, credentials, common_name));
+  if (!credentials)
+    goto cleanup;
+
+  if ((cert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+  {
+    DEBUG_puts("1httpSaveCredentials: Unable to create certificate.");
+    goto cleanup;
+  }
+
+  if (!path)
+  {
+    const char *home = getenv("HOME");	/* HOME environment variable */
+
+    if (getuid() && home)
+      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
+    else
+      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
+
+    path = filename;
+
+    DEBUG_printf(("1httpSaveCredentials: Using default path \"%s\".", path));
+  }
+
+  if ((err = SecKeychainOpen(path, &keychain)) != noErr)
+  {
+    DEBUG_printf(("1httpSaveCredentials: SecKeychainOpen returned %d.", (int)err));
+    goto cleanup;
+  }
+
+  if ((list = CFArrayCreate(kCFAllocatorDefault, (const void **)&keychain, 1, &kCFTypeArrayCallBacks)) == NULL)
+  {
+    DEBUG_puts("1httpSaveCredentials: Unable to create list of keychains.");
+    goto cleanup;
+  }
+
+  if ((cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8)) == NULL)
+  {
+    DEBUG_puts("1httpSaveCredentials: Unable to create common name string.");
+    goto cleanup;
+  }
+
+  if ((attrs = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)) == NULL)
+  {
+    DEBUG_puts("1httpSaveCredentials: Unable to create dictionary.");
+    goto cleanup;
+  }
+
+  CFDictionaryAddValue(attrs, kSecClass, kSecClassCertificate);
+  CFDictionaryAddValue(attrs, kSecAttrLabel, cfcommon_name);
+  CFDictionaryAddValue(attrs, kSecAttrSubject, cfcommon_name);
+  CFDictionaryAddValue(attrs, kSecValueRef, cert);
+  CFDictionaryAddValue(attrs, kSecMatchSearchList, list);
+
+  /* Note: SecItemAdd consumes "attrs"... */
+  if ((err = SecItemAdd(attrs, NULL)) == noErr)
+    ret = 0;
+
+  DEBUG_printf(("1httpSaveCredentials: SecItemAdd returned %d.", (int)err));
+
+  cleanup :
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+  if (list)
+    CFRelease(list);
+  if (keychain)
+    CFRelease(keychain);
+  if (search)
+    CFRelease(search);
+  if (cert)
+    CFRelease(cert);
+
+  DEBUG_printf(("1httpSaveCredentials: Returning %d.", ret));
+
+  return (ret);
+
+#else
   (void)path;
   (void)credentials;
   (void)common_name;
 
   return (-1);
-}
-
-
-#ifdef HAVE_SECKEYCHAINOPEN
-/*
- * 'http_cdsa_copy_server()' - Find and copy server credentials from the keychain.
- */
-
-static CFArrayRef			/* O - Array of certificates or NULL */
-http_cdsa_copy_server(
-    const char *common_name)		/* I - Server's hostname */
-{
-  OSStatus		err;		/* Error info */
-  SecIdentitySearchRef	search = NULL;	/* Search reference */
-  SecIdentityRef	identity = NULL;/* Identity */
-  CFArrayRef		certificates = NULL;
-					/* Certificate array */
-  SecPolicyRef		policy = NULL;	/* Policy ref */
-  CFStringRef		cfcommon_name = NULL;
-					/* Server name */
-  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
-  CFArrayRef		list = NULL;	/* Keychain list */
-
-
-  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
-
-  policy = SecPolicyCreateSSL(1, cfcommon_name);
-
-  if (cfcommon_name)
-    CFRelease(cfcommon_name);
-
-  if (!policy)
-    goto cleanup;
-
-  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
-    goto cleanup;
-
-  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&tls_keychain, 1, &kCFTypeArrayCallBacks);
-
-  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
-  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
-  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
-  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
-  CFDictionaryAddValue(query, kSecMatchSearchList, list);
-
-  CFRelease(list);
-
-  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
-
-  if (err)
-    goto cleanup;
-
-  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
-    goto cleanup;
-
-  if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks)) == NULL)
-    goto cleanup;
-
-  cleanup :
-
-  if (search)
-    CFRelease(search);
-  if (identity)
-    CFRelease(identity);
-
-  if (policy)
-    CFRelease(policy);
-  if (query)
-    CFRelease(query);
-
-  return (certificates);
-}
 #endif /* HAVE_SECKEYCHAINOPEN */
-
-
-/*
- * 'http_cdsa_read()' - Read function for the CDSA library.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-http_cdsa_read(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    void             *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  OSStatus	result;			/* Return value */
-  ssize_t	bytes;			/* Number of bytes read */
-  http_t	*http;			/* HTTP connection */
-
-
-  http = (http_t *)connection;
-
-  if (!http->blocking)
-  {
-   /*
-    * Make sure we have data before we read...
-    */
-
-    while (!_httpWait(http, http->wait_value, 0))
-    {
-      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
-	continue;
-
-      http->error = ETIMEDOUT;
-      return (-1);
-    }
-  }
-
-  do
-  {
-    bytes = recv(http->fd, data, *dataLength, 0);
-  }
-  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
-
-  if ((size_t)bytes == *dataLength)
-  {
-    result = 0;
-  }
-  else if (bytes > 0)
-  {
-    *dataLength = (size_t)bytes;
-    result = errSSLWouldBlock;
-  }
-  else
-  {
-    *dataLength = 0;
-
-    if (bytes == 0)
-      result = errSSLClosedGraceful;
-    else if (errno == EAGAIN)
-      result = errSSLWouldBlock;
-    else
-      result = errSSLClosedAbort;
-  }
-
-  return (result);
-}
-
-
-/*
- * 'http_cdsa_write()' - Write function for the CDSA library.
- */
-
-static OSStatus				/* O  - -1 on error, 0 on success */
-http_cdsa_write(
-    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
-    const void       *data,		/* I  - Data buffer */
-    size_t           *dataLength)	/* IO - Number of bytes */
-{
-  OSStatus	result;			/* Return value */
-  ssize_t	bytes;			/* Number of bytes read */
-  http_t	*http;			/* HTTP connection */
-
-
-  http = (http_t *)connection;
-
-  do
-  {
-    bytes = write(http->fd, data, *dataLength);
-  }
-  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
-
-  if ((size_t)bytes == *dataLength)
-  {
-    result = 0;
-  }
-  else if (bytes >= 0)
-  {
-    *dataLength = (size_t)bytes;
-    result = errSSLWouldBlock;
-  }
-  else
-  {
-    *dataLength = 0;
-
-    if (errno == EAGAIN)
-      result = errSSLWouldBlock;
-    else
-      result = errSSLClosedAbort;
-  }
-
-  return (result);
 }
 
 
@@ -1072,41 +996,6 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 
 
 /*
- * 'http_tls_set_credentials()' - Set the TLS credentials.
- */
-
-static int				/* O - Status of connection */
-http_tls_set_credentials(http_t *http)	/* I - HTTP connection */
-{
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-  OSStatus		error = 0;	/* Error code */
-  http_tls_credentials_t credentials = NULL;
-					/* TLS credentials */
-
-
-  DEBUG_printf(("7http_tls_set_credentials(%p)", http));
-
- /*
-  * Prefer connection specific credentials...
-  */
-
-  if ((credentials = http->tls_credentials) == NULL)
-    credentials = cg->tls_credentials;
-
-  if (credentials)
-  {
-    error = SSLSetCertificate(http->tls, credentials);
-    DEBUG_printf(("4http_tls_set_credentials: SSLSetCertificate, error=%d",
-		  (int)error));
-  }
-  else
-    DEBUG_puts("4http_tls_set_credentials: No credentials to set.");
-
-  return (error);
-}
-
-
-/*
  * '_httpTLSStart()' - Set up SSL/TLS support on a connection.
  */
 
@@ -1186,8 +1075,8 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
     }
     else
     {
-      error = http_tls_set_credentials(http);
-      DEBUG_printf(("4_httpTLSStart: http_tls_set_credentials, error=%d",
+      error = http_cdsa_set_credentials(http);
+      DEBUG_printf(("4_httpTLSStart: http_cdsa_set_credentials, error=%d",
                     (int)error));
     }
   }
@@ -1535,123 +1424,221 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 }
 
 
-#if 0
+#ifdef HAVE_SECKEYCHAINOPEN
 /*
- * 'cupsdEndTLS()' - Shutdown a secure session with the client.
+ * 'http_cdsa_copy_server()' - Find and copy server credentials from the keychain.
  */
 
-int					/* O - 1 on success, 0 on error */
-cupsdEndTLS(cupsd_client_t *con)	/* I - Client connection */
+static CFArrayRef			/* O - Array of certificates or NULL */
+http_cdsa_copy_server(
+    const char *common_name)		/* I - Server's hostname */
 {
-  while (SSLClose(con->http.tls) == errSSLWouldBlock)
-    usleep(1000);
+  OSStatus		err;		/* Error info */
+  SecIdentitySearchRef	search = NULL;	/* Search reference */
+  SecIdentityRef	identity = NULL;/* Identity */
+  CFArrayRef		certificates = NULL;
+					/* Certificate array */
+  SecPolicyRef		policy = NULL;	/* Policy ref */
+  CFStringRef		cfcommon_name = NULL;
+					/* Server name */
+  CFMutableDictionaryRef query = NULL;	/* Query qualifiers */
+  CFArrayRef		list = NULL;	/* Keychain list */
 
-  CFRelease(con->http.tls);
-  con->http.tls = NULL;
 
-  if (con->http.tls_credentials)
-    CFRelease(con->http.tls_credentials);
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
 
-  return (1);
+  policy = SecPolicyCreateSSL(1, cfcommon_name);
+
+  if (cfcommon_name)
+    CFRelease(cfcommon_name);
+
+  if (!policy)
+    goto cleanup;
+
+  if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
+    goto cleanup;
+
+  list = CFArrayCreate(kCFAllocatorDefault, (const void **)&tls_keychain, 1, &kCFTypeArrayCallBacks);
+
+  CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
+  CFDictionaryAddValue(query, kSecMatchPolicy, policy);
+  CFDictionaryAddValue(query, kSecReturnRef, kCFBooleanTrue);
+  CFDictionaryAddValue(query, kSecMatchLimit, kSecMatchLimitOne);
+  CFDictionaryAddValue(query, kSecMatchSearchList, list);
+
+  CFRelease(list);
+
+  err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+
+  if (err)
+    goto cleanup;
+
+  if (CFGetTypeID(identity) != SecIdentityGetTypeID())
+    goto cleanup;
+
+  if ((certificates = CFArrayCreate(NULL, (const void **)&identity, 1, &kCFTypeArrayCallBacks)) == NULL)
+    goto cleanup;
+
+  cleanup :
+
+  if (search)
+    CFRelease(search);
+  if (identity)
+    CFRelease(identity);
+
+  if (policy)
+    CFRelease(policy);
+  if (query)
+    CFRelease(query);
+
+  return (certificates);
 }
+#endif /* HAVE_SECKEYCHAINOPEN */
 
 
 /*
- * 'cupsdStartTLS()' - Start a secure session with the client.
+ * 'http_cdsa_read()' - Read function for the CDSA library.
  */
 
-int					/* O - 1 on success, 0 on error */
-cupsdStartTLS(cupsd_client_t *con)	/* I - Client connection */
+static OSStatus				/* O  - -1 on error, 0 on success */
+http_cdsa_read(
+    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+    void             *data,		/* I  - Data buffer */
+    size_t           *dataLength)	/* IO - Number of bytes */
 {
-  OSStatus	error = 0;		/* Error code */
-  SecTrustRef	peerTrust;		/* Peer certificates */
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Client %d] Encrypting connection.",
-                  con->http.fd);
+  http = (http_t *)connection;
 
-  con->http.tls_credentials = copy_cdsa_certificate(con);
-
-  if (!con->http.tls_credentials)
+  if (!http->blocking)
   {
    /*
-    * No keychain (yet), make a self-signed certificate...
+    * Make sure we have data before we read...
     */
 
-    if (make_certificate(con))
-      con->http.tls_credentials = copy_cdsa_certificate(con);
-  }
-
-  if (!con->http.tls_credentials)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-        	    "Could not find signing key in keychain \"%s\"",
-		    ServerCertificate);
-    error = errSSLBadConfiguration;
-  }
-
-  if (!error)
-    con->http.tls = SSLCreateContext(kCFAllocatorDefault, kSSLServerSide,
-                                     kSSLStreamType);
-
-  if (!error)
-    error = SSLSetIOFuncs(con->http.tls, http_cdsa_read, http_cdsa_write);
-
-  if (!error)
-    error = SSLSetConnection(con->http.tls, HTTP(con));
-
-  if (!error)
-    error = SSLSetCertificate(con->http.tls, con->http.tls_credentials);
-
-  if (!error)
-  {
-   /*
-    * Perform SSL/TLS handshake
-    */
-
-    while ((error = SSLHandshake(con->http.tls)) == errSSLWouldBlock)
-      usleep(1000);
-  }
-
-  if (error)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to encrypt connection from %s - %s (%d)",
-                    con->http.hostname, cssmErrorString(error), (int)error);
-
-    con->http.error  = error;
-    con->http.status = HTTP_ERROR;
-
-    if (con->http.tls)
+    while (!_httpWait(http, http->wait_value, 0))
     {
-      CFRelease(con->http.tls);
-      con->http.tls = NULL;
-    }
+      if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	continue;
 
-    if (con->http.tls_credentials)
-    {
-      CFRelease(con->http.tls_credentials);
-      con->http.tls_credentials = NULL;
+      http->error = ETIMEDOUT;
+      return (-1);
     }
-
-    return (0);
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
-                  con->http.hostname);
-
-  if (!SSLCopyPeerTrust(con->http.tls, &peerTrust) && peerTrust)
+  do
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates.",
-		    (int)SecTrustGetCertificateCount(peerTrust));
-    CFRelease(peerTrust);
+    bytes = recv(http->fd, data, *dataLength, 0);
+  }
+  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
+
+  if ((size_t)bytes == *dataLength)
+  {
+    result = 0;
+  }
+  else if (bytes > 0)
+  {
+    *dataLength = (size_t)bytes;
+    result = errSSLWouldBlock;
   }
   else
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "Received NO peer certificates.");
+  {
+    *dataLength = 0;
 
-  return (1);
+    if (bytes == 0)
+      result = errSSLClosedGraceful;
+    else if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else
+      result = errSSLClosedAbort;
+  }
+
+  return (result);
 }
-#endif /* 0 */
+
+
+/*
+ * 'http_cdsa_set_credentials()' - Set the TLS credentials.
+ */
+
+static int				/* O - Status of connection */
+http_cdsa_set_credentials(http_t *http)	/* I - HTTP connection */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  OSStatus		error = 0;	/* Error code */
+  http_tls_credentials_t credentials = NULL;
+					/* TLS credentials */
+
+
+  DEBUG_printf(("7http_tls_set_credentials(%p)", http));
+
+ /*
+  * Prefer connection specific credentials...
+  */
+
+  if ((credentials = http->tls_credentials) == NULL)
+    credentials = cg->tls_credentials;
+
+  if (credentials)
+  {
+    error = SSLSetCertificate(http->tls, credentials);
+    DEBUG_printf(("4http_tls_set_credentials: SSLSetCertificate, error=%d",
+		  (int)error));
+  }
+  else
+    DEBUG_puts("4http_tls_set_credentials: No credentials to set.");
+
+  return (error);
+}
+
+
+/*
+ * 'http_cdsa_write()' - Write function for the CDSA library.
+ */
+
+static OSStatus				/* O  - -1 on error, 0 on success */
+http_cdsa_write(
+    SSLConnectionRef connection,	/* I  - SSL/TLS connection */
+    const void       *data,		/* I  - Data buffer */
+    size_t           *dataLength)	/* IO - Number of bytes */
+{
+  OSStatus	result;			/* Return value */
+  ssize_t	bytes;			/* Number of bytes read */
+  http_t	*http;			/* HTTP connection */
+
+
+  http = (http_t *)connection;
+
+  do
+  {
+    bytes = write(http->fd, data, *dataLength);
+  }
+  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
+
+  if ((size_t)bytes == *dataLength)
+  {
+    result = 0;
+  }
+  else if (bytes >= 0)
+  {
+    *dataLength = (size_t)bytes;
+    result = errSSLWouldBlock;
+  }
+  else
+  {
+    *dataLength = 0;
+
+    if (errno == EAGAIN)
+      result = errSSLWouldBlock;
+    else
+      result = errSSLClosedAbort;
+  }
+
+  return (result);
+}
 
 
 /*

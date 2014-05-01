@@ -627,12 +627,20 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (!httpCopyCredentials(http, &creds))
       {
+        int trusted = httpCredentialsAreTrusted(creds, hostname);
+
         httpCredentialsString(creds, info, sizeof(info));
 
-        printf("AreTrusted: %d\n", httpCredentialsAreTrusted(creds, hostname));
+        printf("AreTrusted: %d\n", trusted);
         printf("Expiration: %s\n", httpGetDateString(httpCredentialsGetExpiration(creds)));
         printf("IsValidName: %d\n", httpCredentialsIsValidName(creds, hostname));
         printf("String: \"%s\"\n", info);
+
+        if (!trusted)
+	{
+	  printf("SaveCredentials: %d\n", httpSaveCredentials(NULL, creds, hostname));
+	  printf("New AreTrusted: %d\n", httpCredentialsAreTrusted(creds, hostname));
+	}
 
         httpFreeCredentials(creds);
       }
