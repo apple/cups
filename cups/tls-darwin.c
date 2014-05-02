@@ -172,9 +172,12 @@ cleanup:
 
 #else /* !(HAVE_SECGENERATESELFSIGNEDCERTIFICATE && HAVE_SECKEYCHAINOPEN) */
   int		pid,			/* Process ID of command */
-		status;			/* Status of command */
+		status,			/* Status of command */
+		i;			/* Looping var */
   char		command[1024],		/* Command */
 		*argv[4],		/* Command-line arguments */
+		*envp[1000],		/* Environment variables */
+		days[32],		/* CERTTOOL_EXPIRATION_DAYS env var */
 		keychain[1024],		/* Keychain argument */
 		infofile[1024];		/* Type-in information for cert */
   cups_file_t	*fp;			/* Seed/info file */
@@ -182,7 +185,6 @@ cleanup:
 
   (void)num_alt_names;
   (void)alt_names;
-  (void)expiration_date;
 
  /*
   * Run the "certtool" command to generate a self-signed certificate...
@@ -227,13 +229,19 @@ cleanup:
   argv[2] = keychain;
   argv[3] = NULL;
 
+  snprintf(days, sizeof(days), "CERTTOOL_EXPIRATION_DAYS=%d", (int)((expiration_date - time(NULL) + 86399) / 86400));
+  envp[0] = days;
+  for (i = 0; i < (int)(sizeof(envp) / sizeof(envp[0]) - 2) && environ[i]; i ++)
+    envp[i + 1] = environ[i];
+  envp[i] = NULL;
+
   posix_spawn_file_actions_t actions;	/* File actions */
 
   posix_spawn_file_actions_init(&actions);
   posix_spawn_file_actions_addclose(&actions, 0);
   posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
 
-  if (posix_spawn(&pid, command, &actions, NULL, argv, environ))
+  if (posix_spawn(&pid, command, &actions, NULL, argv, envp))
   {
     unlink(infofile);
     return (-1);
