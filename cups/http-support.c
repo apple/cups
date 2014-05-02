@@ -1797,8 +1797,8 @@ _httpResolveURI(
 	      ippsref = ref;
 	      if (DNSServiceResolve(&ippsref,
 	                            kDNSServiceFlagsShareConnection,
-	                            myinterface, hostname, "_ipps._tcp", domain,
-				    http_resolve_cb,
+	                            kDNSServiceInterfaceIndexAny, hostname,
+	                            "_ipps._tcp", domain, http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)
 		extrasent = 1;
 	    }
@@ -1810,8 +1810,8 @@ _httpResolveURI(
 	      ippref = ref;
 	      if (DNSServiceResolve(&ippref,
 	                            kDNSServiceFlagsShareConnection,
-	                            myinterface, hostname, "_ipp._tcp", domain,
-				    http_resolve_cb,
+	                            kDNSServiceInterfaceIndexAny, hostname,
+	                            "_ipp._tcp", domain, http_resolve_cb,
 				    &uribuf) == kDNSServiceErr_NoError)
 		extrasent = 2;
 	    }
