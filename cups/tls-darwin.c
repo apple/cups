@@ -447,125 +447,13 @@ _httpCreateCredentials(
 
 
 /*
- * 'httpCredentialsAreTrusted()' - Return whether the credentials are trusted.
- *
- * @since CUPS 2.0@
- */
-
-int					/* O - 1 if trusted, 0 if not/unknown */
-httpCredentialsAreTrusted(
-    cups_array_t *credentials,		/* I - Credentials */
-    const char   *common_name)		/* I - Common name for trust lookup */
-{
-  SecCertificateRef	secCert;	/* Certificate reference */
-  int			trusted = 1;	/* Trusted? */
-  int			save = 0;	/* Save credentials? */
-  cups_array_t		*tcreds = NULL;	/* Trusted credentials */
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Per-thread globals */
-
-
-  if (!common_name)
-    return (0);
-
-  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
-    return (0);
-
- /*
-  * Look this common name up in the default keychains...
-  */
-
-  httpLoadCredentials(NULL, &tcreds, common_name);
-
-  if (tcreds)
-  {
-    char	credentials_str[1024],	/* String for incoming credentials */
-		tcreds_str[1024];	/* String for saved credentials */
-
-    httpCredentialsString(credentials, credentials_str, sizeof(credentials_str));
-    httpCredentialsString(tcreds, tcreds_str, sizeof(tcreds_str));
-
-    if (strcmp(credentials_str, tcreds_str))
-    {
-     /*
-      * Credentials don't match, let's look at the expiration date of the new
-      * credentials and allow if the new ones have a later expiration...
-      */
-
-      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
-          !httpCredentialsIsValidName(credentials, common_name))
-      {
-       /*
-        * Either the new credentials are not newly issued, or the common name
-	* does not match the issued certificate...
-	*/
-
-        trusted = 0;
-      }
-      else
-      {
-       /*
-        * Flag that we should save the new credentials...
-	*/
-
-        save = 1;
-      }
-    }
-
-    httpFreeCredentials(tcreds);
-  }
-  else if (!httpCredentialsIsValidName(credentials, common_name))
-    trusted = 0;
-  else
-    save = 1;
-
-  if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
-    trusted = 0;
-  else if (!cg->any_root && cupsArrayCount(credentials) == 1)
-    trusted = 0;
-
-  if (trusted && save)
-    httpSaveCredentials(NULL, credentials, common_name);
-
-  CFRelease(secCert);
-
-  return (trusted);
-}
-
-
-/*
- * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
- *
- * @since CUPS 2.0@
- */
-
-time_t					/* O - Expiration date of credentials */
-httpCredentialsGetExpiration(
-    cups_array_t *credentials)		/* I - Credentials */
-{
-  SecCertificateRef	secCert;	/* Certificate reference */
-  time_t		expiration;	/* Expiration date */
-
-
-  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
-    return (0);
-
-  expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
-
-  CFRelease(secCert);
-
-  return (expiration);
-}
-
-
-/*
- * 'httpCredentialsIsValidName()' - Return whether the credentials are valid for the given name.
+ * 'httpCredentialsAreValidForName()' - Return whether the credentials are valid for the given name.
  *
  * @since CUPS 2.0@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
-httpCredentialsIsValidName(
+httpCredentialsAreValidForName(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Name to check */
 {
@@ -618,6 +506,115 @@ httpCredentialsIsValidName(
   CFRelease(secCert);
 
   return (valid);
+}
+
+
+/*
+ * 'httpCredentialsGetTrust()' - Return the trust of credentials.
+ *
+ * @since CUPS 2.0@
+ */
+
+http_trust_t				/* O - Level of trust */
+httpCredentialsGetTrust(
+    cups_array_t *credentials,		/* I - Credentials */
+    const char   *common_name)		/* I - Common name for trust lookup */
+{
+  SecCertificateRef	secCert;	/* Certificate reference */
+  http_trust_t		trust = HTTP_TRUST_OK;
+					/* Trusted? */
+  cups_array_t		*tcreds = NULL;	/* Trusted credentials */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Per-thread globals */
+
+
+  if (!common_name)
+    return (HTTP_TRUST_UNKNOWN);
+
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+    return (HTTP_TRUST_UNKNOWN);
+
+ /*
+  * Look this common name up in the default keychains...
+  */
+
+  httpLoadCredentials(NULL, &tcreds, common_name);
+
+  if (tcreds)
+  {
+    char	credentials_str[1024],	/* String for incoming credentials */
+		tcreds_str[1024];	/* String for saved credentials */
+
+    httpCredentialsString(credentials, credentials_str, sizeof(credentials_str));
+    httpCredentialsString(tcreds, tcreds_str, sizeof(tcreds_str));
+
+    if (strcmp(credentials_str, tcreds_str))
+    {
+     /*
+      * Credentials don't match, let's look at the expiration date of the new
+      * credentials and allow if the new ones have a later expiration...
+      */
+
+      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
+          !httpCredentialsAreValidForName(credentials, common_name))
+      {
+       /*
+        * Either the new credentials are not newly issued, or the common name
+	* does not match the issued certificate...
+	*/
+
+        trust = HTTP_TRUST_INVALID;
+      }
+      else if (httpCredentialsGetExpiration(tcreds) < time(NULL))
+      {
+       /*
+        * Save the renewed credentials...
+	*/
+
+	trust = HTTP_TRUST_RENEWED;
+
+        httpSaveCredentials(NULL, credentials, common_name);
+      }
+    }
+
+    httpFreeCredentials(tcreds);
+  }
+  else if (!httpCredentialsAreValidForName(credentials, common_name))
+    trust = HTTP_TRUST_INVALID;
+
+  if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
+    trust = HTTP_TRUST_EXPIRED;
+  else if (!cg->any_root && cupsArrayCount(credentials) == 1)
+    trust = HTTP_TRUST_INVALID;
+
+  CFRelease(secCert);
+
+  return (trust);
+}
+
+
+/*
+ * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
+ *
+ * @since CUPS 2.0@
+ */
+
+time_t					/* O - Expiration date of credentials */
+httpCredentialsGetExpiration(
+    cups_array_t *credentials)		/* I - Credentials */
+{
+  SecCertificateRef	secCert;	/* Certificate reference */
+  time_t		expiration;	/* Expiration date */
+
+
+  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+    return (0);
+
+  expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
+
+  CFRelease(secCert);
+
+  return (expiration);
 }
 
 
@@ -806,6 +803,7 @@ httpLoadCredentials(
   (void)path;
   (void)credentials;
   (void)common_name;
+  (void)alt_name;
 
   return (-1);
 #endif /* HAVE_SECKEYCHAINOPEN */
@@ -831,8 +829,6 @@ httpSaveCredentials(
   SecKeychainRef	keychain = NULL;/* Keychain reference */
   SecIdentitySearchRef	search = NULL;	/* Search reference */
   SecCertificateRef	cert = NULL;	/* Certificate */
-  CFStringRef		cfcommon_name = NULL;
-					/* Server name */
   CFMutableDictionaryRef attrs = NULL;	/* Attributes for add */
   CFArrayRef		list = NULL;	/* Keychain list */
 
@@ -840,6 +836,12 @@ httpSaveCredentials(
   DEBUG_printf(("httpSaveCredentials(path=\"%s\", credentials=%p, common_name=\"%s\")", path, credentials, common_name));
   if (!credentials)
     goto cleanup;
+
+  if (!httpCredentialsAreValidForName(credentials, common_name))
+  {
+    DEBUG_puts("1httpSaveCredentials: Common name does not match.");
+    return (-1);
+  }
 
   if ((cert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
   {
@@ -873,12 +875,6 @@ httpSaveCredentials(
     goto cleanup;
   }
 
-  if ((cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8)) == NULL)
-  {
-    DEBUG_puts("1httpSaveCredentials: Unable to create common name string.");
-    goto cleanup;
-  }
-
   if ((attrs = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)) == NULL)
   {
     DEBUG_puts("1httpSaveCredentials: Unable to create dictionary.");
@@ -886,21 +882,15 @@ httpSaveCredentials(
   }
 
   CFDictionaryAddValue(attrs, kSecClass, kSecClassCertificate);
-  CFDictionaryAddValue(attrs, kSecAttrLabel, cfcommon_name);
-  CFDictionaryAddValue(attrs, kSecAttrSubject, cfcommon_name);
   CFDictionaryAddValue(attrs, kSecValueRef, cert);
   CFDictionaryAddValue(attrs, kSecMatchSearchList, list);
 
   /* Note: SecItemAdd consumes "attrs"... */
-  if ((err = SecItemAdd(attrs, NULL)) == noErr)
-    ret = 0;
-
+  err = SecItemAdd(attrs, NULL);
   DEBUG_printf(("1httpSaveCredentials: SecItemAdd returned %d.", (int)err));
 
   cleanup :
 
-  if (cfcommon_name)
-    CFRelease(cfcommon_name);
   if (list)
     CFRelease(list);
   if (keychain)

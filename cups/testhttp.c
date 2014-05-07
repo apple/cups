@@ -624,22 +624,23 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       cups_array_t *creds;
       char info[1024];
-
+      static const char *trusts[] = { "OK", "Invalid", "Changed", "Expired", "Renewed", "Unknown" };
       if (!httpCopyCredentials(http, &creds))
       {
-        int trusted = httpCredentialsAreTrusted(creds, hostname);
+        http_trust_t trust = httpCredentialsGetTrust(creds, hostname);
 
         httpCredentialsString(creds, info, sizeof(info));
 
-        printf("AreTrusted: %d\n", trusted);
+        printf("Trust: %s\n", trusts[trust]);
         printf("Expiration: %s\n", httpGetDateString(httpCredentialsGetExpiration(creds)));
-        printf("IsValidName: %d\n", httpCredentialsIsValidName(creds, hostname));
+        printf("IsValidName: %d\n", httpCredentialsAreValidForName(creds, hostname));
         printf("String: \"%s\"\n", info);
 
-        if (!trusted)
+        if (trust != HTTP_TRUST_OK)
 	{
 	  printf("SaveCredentials: %d\n", httpSaveCredentials(NULL, creds, hostname));
-	  printf("New AreTrusted: %d\n", httpCredentialsAreTrusted(creds, hostname));
+	  trust = httpCredentialsGetTrust(creds, hostname);
+	  printf("New Trust: %s\n", trusts[trust]);
 	}
 
         httpFreeCredentials(creds);

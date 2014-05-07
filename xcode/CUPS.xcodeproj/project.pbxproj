@@ -339,6 +339,21 @@
 		728FB7EE15361642005426E1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E8136B64B000836530 /* SystemConfiguration.framework */; };
 		728FB7F11536167A005426E1 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EF1536167A005426E1 /* libiconv.dylib */; };
 		728FB7F21536167A005426E1 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7F01536167A005426E1 /* libresolv.dylib */; };
+		72BFD5FB191AF0A30005DA37 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A4332F155844CF002E172D /* libcups_static.a */; };
+		72BFD5FC191AF0A30005DA37 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E5136B64AF00836530 /* CoreFoundation.framework */; };
+		72BFD5FD191AF0A30005DA37 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
+		72BFD5FE191AF0A30005DA37 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EF1536167A005426E1 /* libiconv.dylib */; };
+		72BFD5FF191AF0A30005DA37 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7F01536167A005426E1 /* libresolv.dylib */; };
+		72BFD600191AF0A30005DA37 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EC1536161C005426E1 /* libz.dylib */; };
+		72BFD601191AF0A30005DA37 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
+		72BFD602191AF1270005DA37 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E5136B64AF00836530 /* CoreFoundation.framework */; };
+		72BFD603191AF1270005DA37 /* GSS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72D53A2915B49110003F877F /* GSS.framework */; };
+		72BFD604191AF1270005DA37 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
+		72BFD605191AF1270005DA37 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EF1536167A005426E1 /* libiconv.dylib */; };
+		72BFD606191AF1270005DA37 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7F01536167A005426E1 /* libresolv.dylib */; };
+		72BFD607191AF1270005DA37 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EC1536161C005426E1 /* libz.dylib */; };
+		72BFD608191AF1270005DA37 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E7136B64B000836530 /* Security.framework */; };
+		72BFD609191AF14C0005DA37 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E8136B64B000836530 /* SystemConfiguration.framework */; };
 		72C16CB9137B195D007E4BF4 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = 72C16CB8137B195D007E4BF4 /* file.c */; };
 		72CEF95618A966E000FA9B81 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		72CF95E318A13543000FCAE4 /* dest-job.c in Sources */ = {isa = PBXBuildFile; fileRef = 72CF95E018A13543000FCAE4 /* dest-job.c */; };
@@ -1501,6 +1516,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72BFD609191AF14C0005DA37 /* SystemConfiguration.framework in Frameworks */,
+				72BFD602191AF1270005DA37 /* CoreFoundation.framework in Frameworks */,
+				72BFD603191AF1270005DA37 /* GSS.framework in Frameworks */,
+				72BFD604191AF1270005DA37 /* Kerberos.framework in Frameworks */,
+				72BFD605191AF1270005DA37 /* libiconv.dylib in Frameworks */,
+				72BFD606191AF1270005DA37 /* libresolv.dylib in Frameworks */,
+				72BFD607191AF1270005DA37 /* libz.dylib in Frameworks */,
+				72BFD608191AF1270005DA37 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1577,6 +1600,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72BFD5FB191AF0A30005DA37 /* libcups_static.a in Frameworks */,
+				72BFD5FC191AF0A30005DA37 /* CoreFoundation.framework in Frameworks */,
+				72BFD5FD191AF0A30005DA37 /* Kerberos.framework in Frameworks */,
+				72BFD5FE191AF0A30005DA37 /* libiconv.dylib in Frameworks */,
+				72BFD5FF191AF0A30005DA37 /* libresolv.dylib in Frameworks */,
+				72BFD600191AF0A30005DA37 /* libz.dylib in Frameworks */,
+				72BFD601191AF0A30005DA37 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

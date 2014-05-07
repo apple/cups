@@ -342,6 +342,16 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } http_status_t;
 
+typedef enum http_trust_e		/**** Level of trust for credentials @since CUPS 2.0@ */
+{
+  HTTP_TRUST_OK = 0,			/* Credentials are OK/trusted */
+  HTTP_TRUST_INVALID,			/* Credentials are invalid */
+  HTTP_TRUST_CHANGED,			/* Credentials have changed */
+  HTTP_TRUST_EXPIRED,			/* Credentials are expired */
+  HTTP_TRUST_RENEWED,			/* Credentials have been renewed */
+  HTTP_TRUST_UNKNOWN,			/* Credentials are unknown/new */
+} http_trust_t;
+
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ****/
 {
   HTTP_URI_STATUS_OVERFLOW = -8,	/* URI buffer for httpAssembleURI is too small */
@@ -614,9 +624,9 @@ extern http_state_t	httpWriteResponse(http_t *http,
 extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
 extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern int		httpCompareCredentials(cups_array_t *cred1, cups_array_t *cred2) _CUPS_API_2_0;
-extern int		httpCredentialsAreTrusted(cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
+extern int		httpCredentialsAreValidForName(cups_array_t *credentials, const char *common_name);
 extern time_t		httpCredentialsGetExpiration(cups_array_t *credentials) _CUPS_API_2_0;
-extern int		httpCredentialsIsValidName(cups_array_t *credentials, const char *common_name);
+extern http_trust_t	httpCredentialsGetTrust(cups_array_t *credentials, const char *common_name) _CUPS_API_2_0;
 extern size_t		httpCredentialsString(cups_array_t *credentials, char *buffer, size_t bufsize) _CUPS_API_2_0;
 extern http_field_t	httpFieldValue(const char *name) _CUPS_API_2_0;
 extern time_t		httpGetActivity(http_t *http) _CUPS_API_2_0;
