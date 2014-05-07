@@ -579,7 +579,7 @@ httpCredentialsGetTrust(
 
     httpFreeCredentials(tcreds);
   }
-  else if (!httpCredentialsAreValidForName(credentials, common_name))
+  else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
     trust = HTTP_TRUST_INVALID;
 
   if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))

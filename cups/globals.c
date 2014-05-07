@@ -218,6 +218,7 @@ cups_globals_alloc(void)
   cg->password_cb    = (cups_password_cb2_t)_cupsGetPassword;
   cg->any_root       = 1;
   cg->expired_certs  = 1;
+  cg->validate_certs = 0;
 
 #ifdef DEBUG
  /*

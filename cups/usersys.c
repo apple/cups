@@ -51,7 +51,8 @@ static void	cups_read_client_conf(cups_file_t *fp,
                                       const char *cups_gssservicename,
 #endif /* HAVE_GSSAPI */
 				      const char *cups_anyroot,
-				      const char *cups_expiredcerts);
+				      const char *cups_expiredcerts,
+				      const char *cups_validatecerts);
 
 
 /*
@@ -830,7 +831,8 @@ _cupsSetDefaults(void)
 		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
 		*cups_anyroot,		/* CUPS_ANYROOT env var */
-		*cups_expiredcerts;	/* CUPS_EXPIREDCERTS env var */
+		*cups_expiredcerts,	/* CUPS_EXPIREDCERTS env var */
+		*cups_validatecerts;	/* CUPS_VALIDATECERTS env var */
   char		filename[1024];		/* Filename */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -848,6 +850,7 @@ _cupsSetDefaults(void)
 #endif /* HAVE_GSSAPI */
   cups_anyroot	      = getenv("CUPS_ANYROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
+  cups_validatecerts  = getenv("CUPS_VALIDATECERTS");
 
   if ((cups_user = getenv("CUPS_USER")) == NULL)
   {
@@ -916,7 +919,7 @@ _cupsSetDefaults(void)
 #ifdef HAVE_GSSAPI
 			  cups_gssservicename,
 #endif /* HAVE_GSSAPI */
-			  cups_anyroot, cups_expiredcerts);
+			  cups_anyroot, cups_expiredcerts, cups_validatecerts);
     cupsFileClose(fp);
   }
 }
@@ -938,7 +941,8 @@ cups_read_client_conf(
 					/* I - CUPS_GSSSERVICENAME env var */
 #endif /* HAVE_GSSAPI */
     const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
-    const char	    *cups_expiredcerts)	/* I - CUPS_EXPIREDCERTS env var */
+    const char	    *cups_expiredcerts,	/* I - CUPS_EXPIREDCERTS env var */
+    const char      *cups_validatecerts)/* I - CUPS_VALIDATECERTS env var */
 {
   int	linenum;			/* Current line number */
   char	line[1024],			/* Line from file */
@@ -949,7 +953,8 @@ cups_read_client_conf(
 #endif /* !__APPLE__ */
 	user[256],			/* User value */
 	any_root[1024],			/* AllowAnyRoot value */
-	expired_certs[1024];		/* AllowExpiredCerts value */
+	expired_certs[1024],		/* AllowExpiredCerts value */
+	validate_certs[1024];		/* ValidateCerts value */
 #ifdef HAVE_GSSAPI
   char	gss_service_name[32];		/* GSSServiceName value */
 #endif /* HAVE_GSSAPI */
@@ -995,6 +1000,11 @@ cups_read_client_conf(
     {
       strlcpy(expired_certs, value, sizeof(expired_certs));
       cups_expiredcerts = expired_certs;
+    }
+    else if (!cups_validatecerts && !_cups_strcasecmp(line, "ValidateCerts") && value)
+    {
+      strlcpy(validate_certs, value, sizeof(validate_certs));
+      cups_validatecerts = validate_certs;
     }
 #ifdef HAVE_GSSAPI
     else if (!cups_gssservicename && !_cups_strcasecmp(line, "GSSServiceName") &&
@@ -1118,6 +1128,11 @@ cups_read_client_conf(
     cg->expired_certs = !_cups_strcasecmp(cups_expiredcerts, "yes") ||
 			!_cups_strcasecmp(cups_expiredcerts, "on")  ||
 			!_cups_strcasecmp(cups_expiredcerts, "true");
+
+  if (cups_validatecerts)
+    cg->validate_certs = !_cups_strcasecmp(cups_validatecerts, "yes") ||
+			 !_cups_strcasecmp(cups_validatecerts, "on")  ||
+			 !_cups_strcasecmp(cups_validatecerts, "true");
 }
 
 

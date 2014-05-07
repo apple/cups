@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "CUPS" "16 April 2014" "Apple Inc."
+.TH client.conf 5 "CUPS" "7 May 2014" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups (deprecated)
 .SH DESCRIPTION
@@ -24,17 +24,17 @@ The \fBServerName\fR directive is not supported on OS X at all.
 .SS DIRECTIVES
 The following directives are understood by the client. Consult the online help for detailed descriptions:
 .TP 5
-\fBAllowAnyRoot Y\fR
+\fBAllowAnyRoot Yes\fR
 .TP 5
-\fBAllowAnyRoot N\fR
+\fBAllowAnyRoot No\fR
 Specifies whether to allow TLS with certificates that have not been signed by a trusted Certificate Authority.
-The default is "Y".
+The default is "Yes".
 .TP 5
-\fBAllowExpiredCerts Y\fR
+\fBAllowExpiredCerts Yes\fR
 .TP 5
-\fBAllowExpiredCerts N\fR
+\fBAllowExpiredCerts No\fR
 Specifies whether to allow TLS with expired certificates.
-The default is "Y".
+The default is "Yes".
 .TP 5
 \fBEncryption IfRequested\fR
 .TP 5
@@ -58,6 +58,12 @@ Specifies the address and optionally the port to use when connecting to a server
 .TP 5
 \fBUser \fIname\fR
 Specifies the default user name to use for requests.
+.TP 5
+\fBValidateCerts Yes\fR
+.TP 5
+\fBValidateCerts No\fR
+Specifies whether to only allow TLS with certificates whose common name matches the hostname.
+The default is "No".
 .SH NOTES
 The \fBclient.conf\fR file is deprecated and will no longer be supported in a future version of CUPS.
 .SH SEE ALSO

@@ -679,6 +679,32 @@ main(int  argc,				/* I - Number of command-line args */
                       0, NULL);
   httpSetTimeout(http, 30.0, timeout_cb, NULL);
 
+  if (httpIsEncrypted(http))
+  {
+   /*
+    * Validate TLS credentials...
+    */
+
+    cups_array_t	*creds;		/* TLS credentials */
+    http_trust_t	trust;		/* Trust level */
+    static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
+					/* Trust keywords */
+
+    if (!httpCopyCredentials(http, &creds))
+    {
+      trust = httpCredentialsGetTrust(creds, hostname);
+
+      update_reasons(NULL, "-cups-pki-invalid,cups-pki-changed,cups-pki-expired,cups-pki-unknown");
+      if (trusts[trust])
+      {
+        update_reasons(NULL, trusts[trust]);
+        return (CUPS_BACKEND_STOP);
+      }
+
+      httpFreeCredentials(creds);
+    }
+  }
+
  /*
   * See if the printer supports SNMP...
   */
