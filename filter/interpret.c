@@ -328,6 +328,20 @@ cupsRasterInterpretPPD(
         break;
   }
 
+  if (left > right)
+  {
+    temp1 = left;
+    left  = right;
+    right = temp1;
+  }
+
+  if (bottom > top)
+  {
+    temp1  = bottom;
+    bottom = top;
+    top    = temp1;
+  }
+
   h->PageSize[0]           = (unsigned)(h->cupsPageSize[0] *
                                         h->cupsBorderlessScalingFactor);
   h->PageSize[1]           = (unsigned)(h->cupsPageSize[1] *
