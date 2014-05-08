@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.7.3
 	  (<rdar://problem/16685606>)
 	- Several ippGet* functions incorrectly returned -1 instead of 0 on
 	  error.
+	- The cupsGetResponse function did not work properly with
+	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
 
 
 CHANGES IN CUPS V1.7.2
