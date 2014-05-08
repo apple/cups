@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-04-08 15:48-0400\n"
+"POT-Creation-Date: 2014-05-08 15:57-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -3479,6 +3479,9 @@ msgstr ""
 msgid "No active connection"
 msgstr "Нет рабочего подключения"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr ""
@@ -3535,6 +3538,9 @@ msgid "No request URI."
 msgstr ""
 
 msgid "No request protocol version."
+msgstr ""
+
+msgid "No request sent."
 msgstr ""
 
 msgid "No request-id"

@@ -334,17 +334,31 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
 
   DEBUG_printf(("cupsGetResponse(http=%p, resource=\"%s\")", http, resource));
+  DEBUG_printf(("1cupsGetResponse: http->state=%d", http ? http->state : HTTP_STATE_ERROR));
 
  /*
   * Connect to the default server as needed...
   */
 
   if (!http)
-    http = _cupsConnect();
+  {
+    _cups_globals_t *cg = _cupsGlobals();
+					/* Pointer to library globals */
 
-  if (!http || (http->state != HTTP_STATE_POST_RECV &&
-                http->state != HTTP_STATE_POST_SEND))
+    if ((http = cg->http) == NULL)
+    {
+      _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No active connection."), 1);
+      DEBUG_puts("1cupsGetResponse: No active connection - returning NULL.");
+      return (NULL);
+    }
+  }
+
+  if (http->state != HTTP_STATE_POST_RECV && http->state != HTTP_STATE_POST_SEND)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("No request sent."), 1);
+    DEBUG_puts("1cupsGetResponse: Not in POST state - returning NULL.");
     return (NULL);
+  }
 
  /*
   * Check for an unfinished chunked request...

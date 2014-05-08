@@ -1005,6 +1005,7 @@
 "No VarBind SEQUENCE" = "No VarBind SEQUENCE";
 "No Windows printer drivers are installed." = "No Windows printer drivers are installed.";
 "No active connection" = "No active connection";
+"No active connection." = "No active connection.";
 "No active jobs on %s." = "No active jobs on %s.";
 "No attributes in request." = "No attributes in request.";
 "No authentication information provided." = "No authentication information provided.";
@@ -1024,6 +1025,7 @@
 "No printer-uri in request." = "No printer-uri in request.";
 "No request URI." = "No request URI.";
 "No request protocol version." = "No request protocol version.";
+"No request sent." = "No request sent.";
 "No request-id" = "No request-id";
 "No subscription attributes in request." = "No subscription attributes in request.";
 "No subscriptions found." = "No subscriptions found.";

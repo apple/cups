@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-04-08 15:48-0400\n"
+"POT-Creation-Date: 2014-05-08 15:57-0700\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -3506,6 +3506,9 @@ msgstr ""
 msgid "No active connection"
 msgstr "Není aktivní spojení"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr ""
@@ -3562,6 +3565,9 @@ msgid "No request URI."
 msgstr ""
 
 msgid "No request protocol version."
+msgstr ""
+
+msgid "No request sent."
 msgstr ""
 
 msgid "No request-id"
