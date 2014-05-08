@@ -803,7 +803,6 @@ httpLoadCredentials(
   (void)path;
   (void)credentials;
   (void)common_name;
-  (void)alt_name;
 
   return (-1);
 #endif /* HAVE_SECKEYCHAINOPEN */
