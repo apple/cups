@@ -2679,6 +2679,9 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
     snprintf(filename, sizeof(filename), "%s/%d.prn",
              client->printer->directory, job->id);
 
+  if (Verbosity)
+    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
+
   if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
   {
     job->state = IPP_JSTATE_ABORTED;
@@ -3166,8 +3169,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   _cupsRWLockWrite(&(client->printer->rwlock));
 
-  if ((attr = ippFindAttribute(job->attrs, "document-format",
-                               IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
     job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
@@ -3191,6 +3193,9 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   else
     snprintf(filename, sizeof(filename), "%s/%d.prn",
              client->printer->directory, job->id);
+
+  if (Verbosity)
+    fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
 
   job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 

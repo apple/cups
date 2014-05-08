@@ -1777,10 +1777,10 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 					/* Number of bytes to copy */
 
       if (http->stream.avail_in > 0 &&
-	  http->stream.next_in > http->dbuffer)
-        memmove(http->dbuffer, http->stream.next_in, http->stream.avail_in);
+	  http->stream.next_in > http->sbuffer)
+        memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
 
-      http->stream.next_in = http->dbuffer;
+      http->stream.next_in = http->sbuffer;
 
       if (buflen > (size_t)http->data_remaining)
         buflen = (size_t)http->data_remaining;
@@ -1791,7 +1791,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
       DEBUG_printf(("1httpPeek: Copying %d more bytes of data into "
 		    "decompression buffer.", (int)buflen));
 
-      memcpy(http->dbuffer + http->stream.avail_in, http->buffer, buflen);
+      memcpy(http->sbuffer + http->stream.avail_in, http->buffer, buflen);
       http->stream.avail_in += buflen;
       http->used            -= buflen;
       http->data_remaining  -= buflen;
@@ -1820,7 +1820,7 @@ httpPeek(http_t *http,			/* I - HTTP connection */
     {
       DEBUG_printf(("2httpPeek: zerr=%d", zerr));
 #ifdef DEBUG
-      http_debug_hex("2httpPeek", (char *)http->dbuffer, (int)http->stream.avail_in);
+      http_debug_hex("2httpPeek", (char *)http->sbuffer, (int)http->stream.avail_in);
 #endif /* DEBUG */
 
       http->error = EIO;
@@ -2015,7 +2015,7 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 	{
 	  DEBUG_printf(("2httpRead2: zerr=%d", zerr));
 #ifdef DEBUG
-          http_debug_hex("2httpRead2", (char *)http->dbuffer, (int)http->stream.avail_in);
+          http_debug_hex("2httpRead2", (char *)http->sbuffer, (int)http->stream.avail_in);
 #endif /* DEBUG */
 
 	  http->error = EIO;
@@ -2039,10 +2039,10 @@ httpRead2(http_t *http,			/* I - HTTP connection */
         if (buflen > 0)
         {
           if (http->stream.avail_in > 0 &&
-              http->stream.next_in > http->dbuffer)
-            memmove(http->dbuffer, http->stream.next_in, http->stream.avail_in);
+              http->stream.next_in > http->sbuffer)
+            memmove(http->sbuffer, http->stream.next_in, http->stream.avail_in);
 
-	  http->stream.next_in = http->dbuffer;
+	  http->stream.next_in = http->sbuffer;
 
           DEBUG_printf(("1httpRead2: Reading up to %d more bytes of data into "
                         "decompression buffer.", (int)buflen));
@@ -2052,10 +2052,10 @@ httpRead2(http_t *http,			/* I - HTTP connection */
 	    if (buflen > http->data_remaining)
 	      buflen = (ssize_t)http->data_remaining;
 
-	    bytes = http_read_buffered(http, (char *)http->dbuffer + http->stream.avail_in, (size_t)buflen);
+	    bytes = http_read_buffered(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
           }
           else if (http->data_encoding == HTTP_ENCODING_CHUNKED)
-            bytes = http_read_chunk(http, (char *)http->dbuffer + http->stream.avail_in, (size_t)buflen);
+            bytes = http_read_chunk(http, (char *)http->sbuffer + http->stream.avail_in, (size_t)buflen);
           else
             bytes = 0;
 
@@ -3323,30 +3323,51 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
     }
     else
     {
+      size_t	slen;			/* Bytes to write */
+      ssize_t	sret;			/* Bytes written */
+
       http->stream.next_in   = (Bytef *)buffer;
       http->stream.avail_in  = (uInt)length;
-      http->stream.next_out  = (Bytef *)http->wbuffer + http->wused;
-      http->stream.avail_out = (uInt)(sizeof(http->wbuffer) - (size_t)http->wused);
+      http->stream.next_out  = (Bytef *)http->sbuffer;
+      http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
 
       while (deflate(&(http->stream), Z_NO_FLUSH) == Z_OK)
       {
-	http->wused = (int)(sizeof(http->wbuffer) - (size_t)http->stream.avail_out);
+	slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
 
-        if (http->stream.avail_out == 0)
-        {
-	  if (httpFlushWrite(http) < 0)
-	  {
-	    DEBUG_puts("1httpWrite2: Unable to flush, returning -1.");
-	    return (-1);
-	  }
+	if (slen > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
+	  sret = http_write_chunk(http, (char *)http->sbuffer, slen);
+	else if (slen > 0)
+	  sret = http_write(http, (char *)http->sbuffer, slen);
+	else
+	  sret = 0;
 
-	  http->stream.next_out  = (Bytef *)http->wbuffer;
-	  http->stream.avail_out = sizeof(http->wbuffer);
+        if (sret < 0)
+	{
+	  DEBUG_puts("1httpWrite2: Unable to write, returning -1.");
+	  return (-1);
 	}
+
+	http->stream.next_out  = (Bytef *)http->sbuffer;
+	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
       }
 
-      http->wused = (int)(sizeof(http->wbuffer) - (size_t)http->stream.avail_out);
-      bytes       = (ssize_t)length;
+      slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+
+      if (slen > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
+	sret = http_write_chunk(http, (char *)http->sbuffer, slen);
+      else if (slen > 0)
+	sret = http_write(http, (char *)http->sbuffer, slen);
+      else
+	sret = 0;
+
+      if (sret < 0)
+      {
+	DEBUG_puts("1httpWrite2: Unable to write, returning -1.");
+	return (-1);
+      }
+
+      bytes = (ssize_t)length;
     }
   }
   else
@@ -3667,8 +3688,9 @@ static void
 http_content_coding_finish(
     http_t *http)			/* I - HTTP connection */
 {
-  int	zerr;				/* Compression status */
-  Byte	dummy[1];			/* Dummy read buffer */
+  int		zerr;			/* Compression status */
+  Byte		dummy[1];		/* Dummy read buffer */
+  size_t	bytes;			/* Number of bytes to write */
 
 
   switch (http->coding)
@@ -3680,18 +3702,23 @@ http_content_coding_finish(
 
         do
         {
-          http->stream.next_out  = (Bytef *)http->wbuffer + http->wused;
-          http->stream.avail_out = (uInt)(sizeof(http->wbuffer) - (size_t)http->wused);
+          http->stream.next_out  = (Bytef *)http->sbuffer;
+          http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
 
-          zerr = deflate(&(http->stream), Z_FINISH);
+          zerr  = deflate(&(http->stream), Z_FINISH);
+	  bytes = _HTTP_MAX_SBUFFER - http->stream.avail_out;
 
-          http->wused = (int)(sizeof(http->wbuffer) - (size_t)http->stream.avail_out);
-          if (http->wused == sizeof(http->wbuffer))
-            httpFlushWrite(http);
+          if (bytes > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
+	    http_write_chunk(http, (char *)http->sbuffer, bytes);
+	  else if (bytes > 0)
+	    http_write(http, (char *)http->sbuffer, bytes);
         }
         while (zerr == Z_OK);
 
         deflateEnd(&(http->stream));
+
+        free(http->sbuffer);
+        http->sbuffer = NULL;
 
         if (http->wused)
           httpFlushWrite(http);
@@ -3700,8 +3727,8 @@ http_content_coding_finish(
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
         inflateEnd(&(http->stream));
-        free(http->dbuffer);
-        http->dbuffer = NULL;
+        free(http->sbuffer);
+        http->sbuffer = NULL;
         break;
 
     default :
@@ -3781,6 +3808,13 @@ http_content_coding_start(
         if (http->wused)
           httpFlushWrite(http);
 
+        if ((http->sbuffer = malloc(_HTTP_MAX_SBUFFER)) == NULL)
+        {
+          http->status = HTTP_STATUS_ERROR;
+          http->error  = errno;
+          return;
+        }
+
        /*
         * Window size for compression is 11 bits - optimal based on PWG Raster
         * sample files on pwg.org.  -11 is raw deflate, 27 is gzip, per ZLIB
@@ -3800,7 +3834,7 @@ http_content_coding_start(
 
     case _HTTP_CODING_INFLATE :
     case _HTTP_CODING_GUNZIP :
-        if ((http->dbuffer = malloc(HTTP_MAX_BUFFER)) == NULL)
+        if ((http->sbuffer = malloc(_HTTP_MAX_SBUFFER)) == NULL)
         {
           http->status = HTTP_STATUS_ERROR;
           http->error  = errno;
@@ -3816,15 +3850,15 @@ http_content_coding_start(
                                  coding == _HTTP_CODING_INFLATE ? -15 : 31))
 		< Z_OK)
         {
-          free(http->dbuffer);
-          http->dbuffer = NULL;
+          free(http->sbuffer);
+          http->sbuffer = NULL;
           http->status  = HTTP_STATUS_ERROR;
           http->error   = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
 
         http->stream.avail_in = 0;
-        http->stream.next_in  = http->dbuffer;
+        http->stream.next_in  = http->sbuffer;
         break;
 
     default :

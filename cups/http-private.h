@@ -151,6 +151,7 @@ extern "C" {
  */
 
 
+#define _HTTP_MAX_SBUFFER	65536	/* Size of (de)compression buffer */
 #define _HTTP_RESOLVE_DEFAULT	0	/* Just resolve with default options */
 #define _HTTP_RESOLVE_STDERR	1	/* Log resolve progress to stderr */
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
@@ -317,7 +318,7 @@ struct _http_s				/**** HTTP connection structure ****/
 #  ifdef HAVE_LIBZ
   _http_coding_t	coding;		/* _HTTP_CODING_xxx */
   z_stream		stream;		/* (De)compression stream */
-  Bytef			*dbuffer;	/* Decompression buffer */
+  Bytef			*sbuffer;	/* (De)compression buffer */
 #  endif /* HAVE_LIBZ */
 };
 #  endif /* !_HTTP_NO_PRIVATE */
