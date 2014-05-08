@@ -1,10 +1,14 @@
-CHANGES.txt - 1.7.3 - 2014-04-24
+CHANGES.txt - 1.7.3 - 2014-05-08
 --------------------------------
 
 CHANGES IN CUPS V1.7.3
 
 	- Fixed mapping of OutputBin values such as "Tray1"
 	  (<rdar://problem/16685606>)
+	- Several ippGet* functions incorrectly returned -1 instead of 0 on
+	  error.
+	- The cupsGetResponse function did not work properly with
+	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
 
 
 CHANGES IN CUPS V1.7.2
