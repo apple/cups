@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-08 15:57-0700\n"
+"POT-Creation-Date: 2014-05-09 14:24-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3403,7 +3403,7 @@ msgstr ""
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:2182
+#: backend/ipp.c:2183
 msgid "Canceling print job."
 msgstr ""
 
@@ -3606,6 +3606,10 @@ msgstr ""
 
 #: cups/adminutil.c:326
 msgid "Empty PPD file."
+msgstr ""
+
+#: cups/http.c:4608
+msgid "Encryption is not supported."
 msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
@@ -4572,7 +4576,7 @@ msgstr ""
 msgid "No Windows printer drivers are installed."
 msgstr ""
 
-#: cups/request.c:570 cups/request.c:919
+#: cups/request.c:570 cups/request.c:933
 msgid "No active connection"
 msgstr ""
 
@@ -4970,15 +4974,15 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:2156
+#: backend/ipp.c:2157
 msgid "Print job canceled at printer."
 msgstr ""
 
-#: backend/ipp.c:2148
+#: backend/ipp.c:2149
 msgid "Print job too large."
 msgstr ""
 
-#: backend/ipp.c:1626
+#: backend/ipp.c:1627
 msgid "Print job was not accepted."
 msgstr ""
 
@@ -5006,11 +5010,11 @@ msgstr ""
 msgid "Printer Settings"
 msgstr ""
 
-#: backend/ipp.c:2151
+#: backend/ipp.c:2152
 msgid "Printer cannot print supplied content."
 msgstr ""
 
-#: backend/ipp.c:2154
+#: backend/ipp.c:2155
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
@@ -5328,7 +5332,7 @@ msgid "The printer did not respond."
 msgstr ""
 
 #: backend/ipp.c:810 backend/ipp.c:929 backend/ipp.c:1043 backend/ipp.c:1434
-#: backend/ipp.c:1598 backend/lpd.c:836 backend/socket.c:379
+#: backend/ipp.c:1599 backend/lpd.c:836 backend/socket.c:379
 #: backend/usb-unix.c:124 backend/usb-unix.c:414 backend/usb-unix.c:497
 msgid "The printer is in use."
 msgstr ""
@@ -5554,7 +5558,7 @@ msgstr ""
 msgid "Unable to add class"
 msgstr ""
 
-#: backend/ipp.c:1780
+#: backend/ipp.c:1781
 msgid "Unable to add document to print job."
 msgstr ""
 
@@ -5583,7 +5587,7 @@ msgstr ""
 msgid "Unable to cancel RSS subscription"
 msgstr ""
 
-#: backend/ipp.c:2061 backend/ipp.c:2496
+#: backend/ipp.c:2062 backend/ipp.c:2497
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -5613,7 +5617,7 @@ msgstr ""
 msgid "Unable to configure printer options."
 msgstr ""
 
-#: cups/adminutil.c:900 cups/request.c:1052
+#: cups/adminutil.c:900 cups/request.c:1066
 msgid "Unable to connect to host."
 msgstr ""
 
@@ -5734,7 +5738,7 @@ msgstr ""
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3474
+#: backend/ipp.c:3475
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5827,7 +5831,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:376 backend/ipp.c:1527 backend/ipp.c:1735 backend/lpd.c:496
+#: backend/ipp.c:376 backend/ipp.c:1528 backend/ipp.c:1736 backend/lpd.c:496
 #: backend/socket.c:150 backend/usb.c:237 filter/gziptoany.c:67
 #: filter/pstops.c:267
 msgid "Unable to open print file"
@@ -5881,7 +5885,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3333 backend/ipp.c:3410 backend/ipp.c:3418
+#: backend/ipp.c:3334 backend/ipp.c:3411 backend/ipp.c:3419
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6174,7 +6178,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1897
+#: backend/ipp.c:1898
 msgid "Waiting for job to complete."
 msgstr ""
 

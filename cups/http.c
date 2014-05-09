@@ -4605,6 +4605,7 @@ http_tls_upgrade(http_t *http)		/* I - HTTP connection */
 
     DEBUG_puts("8http_tls_upgrade: Server does not support HTTP upgrade!");
 
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, _("Encryption is not supported."), 1);
     httpAddrClose(NULL, http->fd);
 
     http->fd = -1;

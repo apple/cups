@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-08 15:57-0700\n"
+"POT-Creation-Date: 2014-05-09 14:24-0700\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -2980,6 +2980,9 @@ msgstr "Edita el fitxer de configuració"
 
 msgid "Empty PPD file."
 msgstr "El fitxer PPD és buit."
+
+msgid "Encryption is not supported."
+msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"

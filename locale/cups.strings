@@ -773,6 +773,7 @@
 "EPL2 Label Printer" = "EPL2 Label Printer";
 "Edit Configuration File" = "Edit Configuration File";
 "Empty PPD file." = "Empty PPD file.";
+"Encryption is not supported." = "Encryption is not supported.";
 // TRANSLATORS: Banner/cover sheet after the print job.
 "Ending Banner" = "Ending Banner";
 "English" = "English";

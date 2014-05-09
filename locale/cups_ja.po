@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-08 15:57-0700\n"
+"POT-Creation-Date: 2014-05-09 14:24-0700\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3012,6 +3012,9 @@ msgstr "設定ファイルの編集"
 
 msgid "Empty PPD file."
 msgstr "PPD ファイルが空です。"
+
+msgid "Encryption is not supported."
+msgstr ""
 
 #. TRANSLATORS: Banner/cover sheet after the print job.
 msgid "Ending Banner"
