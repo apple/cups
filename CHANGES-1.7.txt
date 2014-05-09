@@ -11,6 +11,7 @@ CHANGES IN CUPS V1.7.3
 	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
 	- The IPP backend did not abort a job when the printer did not validate
 	  the supplied options (<rdar://problem/16836752>)
+	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
 
 
 CHANGES IN CUPS V1.7.2
