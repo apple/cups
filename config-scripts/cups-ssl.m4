@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl TLS stuff for CUPS.
 dnl
-dnl Copyright 2007-2013 by Apple Inc.
+dnl Copyright 2007-2014 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -78,14 +78,6 @@ if test x$enable_ssl != xno; then
 	if test $have_ssl = 1; then
 	    CUPS_SERVERCERT="ssl/server.crt"
 	    CUPS_SERVERKEY="ssl/server.key"
-
-            if $PKGCONFIG --exists gcrypt; then
-	        SSLLIBS="$SSLLIBS `$PKGCONFIG --libs gcrypt`"
-	        SSLFLAGS="$SSLFLAGS `$PKGCONFIG --cflags gcrypt`"
-	    elif test "x$LIBGCRYPTCONFIG" != x; then
-	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
-	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
-	    fi
 	fi
     fi
 fi
