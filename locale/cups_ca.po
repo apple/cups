@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -3696,6 +3696,9 @@ msgstr "No hi ha cap controlador d'impressores de Windows instal·lat."
 msgid "No active connection"
 msgstr "No hi ha cap connexió activa"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr "No hi ha cap feina activa a %s."
@@ -3749,6 +3752,9 @@ msgstr "No s'ha trobat cap printer-uri per la classe"
 
 msgid "No printer-uri in request."
 msgstr "No hi ha cap printer-uri a la sol·licitud."
+
+msgid "No request sent."
+msgstr ""
 
 msgid "No request-id"
 msgstr "No hi ha cap request-id"

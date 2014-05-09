@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -3770,6 +3770,9 @@ msgstr "Non è stato installato nessun driver della stampante di Windows."
 msgid "No active connection"
 msgstr "Nessuna connessione attiva"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr "Nessun processo attivo su %s."
@@ -3823,6 +3826,9 @@ msgstr "Non è stato trovato printer-uri per la classe"
 
 msgid "No printer-uri in request."
 msgstr "Nessun printer-uri nella richiesta."
+
+msgid "No request sent."
+msgstr ""
 
 msgid "No request-id"
 msgstr "Nessun request-id"

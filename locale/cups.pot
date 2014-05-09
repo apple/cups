@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1539,172 +1539,172 @@ msgstr ""
 msgid " PASS"
 msgstr ""
 
-#: cups/ipp.c:5246
+#: cups/ipp.c:5254
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - %s (RFC 2911 section 4.1.5)."
 msgstr ""
 
-#: cups/ipp.c:5257
+#: cups/ipp.c:5265
 #, c-format
 msgid "\"%s\": Bad URI value \"%s\" - bad length %d (RFC 2911 section 4.1.5)."
 msgstr ""
 
-#: cups/ipp.c:4877
+#: cups/ipp.c:4885
 #, c-format
 msgid "\"%s\": Bad attribute name - bad length %d (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:4869
+#: cups/ipp.c:4877
 #, c-format
 msgid "\"%s\": Bad attribute name - invalid character (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:4895
+#: cups/ipp.c:4903
 #, c-format
 msgid "\"%s\": Bad boolen value %d (RFC 2911 section 4.1.11)."
 msgstr ""
 
-#: cups/ipp.c:5309
+#: cups/ipp.c:5317
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad characters (RFC 2911 section 4.1.7)."
 msgstr ""
 
-#: cups/ipp.c:5318
+#: cups/ipp.c:5326
 #, c-format
 msgid "\"%s\": Bad charset value \"%s\" - bad length %d (RFC 2911 section 4.1.7)."
 msgstr ""
 
-#: cups/ipp.c:4995
+#: cups/ipp.c:5003
 #, c-format
 msgid "\"%s\": Bad dateTime UTC hours %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:5003
+#: cups/ipp.c:5011
 #, c-format
 msgid "\"%s\": Bad dateTime UTC minutes %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4987
+#: cups/ipp.c:4995
 #, c-format
 msgid "\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4947
+#: cups/ipp.c:4955
 #, c-format
 msgid "\"%s\": Bad dateTime day %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4979
+#: cups/ipp.c:4987
 #, c-format
 msgid "\"%s\": Bad dateTime deciseconds %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4955
+#: cups/ipp.c:4963
 #, c-format
 msgid "\"%s\": Bad dateTime hours %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4963
+#: cups/ipp.c:4971
 #, c-format
 msgid "\"%s\": Bad dateTime minutes %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4939
+#: cups/ipp.c:4947
 #, c-format
 msgid "\"%s\": Bad dateTime month %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4971
+#: cups/ipp.c:4979
 #, c-format
 msgid "\"%s\": Bad dateTime seconds %u (RFC 2911 section 4.1.14)."
 msgstr ""
 
-#: cups/ipp.c:4909
+#: cups/ipp.c:4917
 #, c-format
 msgid "\"%s\": Bad enum value %d - out of range (RFC 2911 section 4.1.4)."
 msgstr ""
 
-#: cups/ipp.c:5224
+#: cups/ipp.c:5232
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - bad length %d (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5215
+#: cups/ipp.c:5223
 #, c-format
 msgid "\"%s\": Bad keyword value \"%s\" - invalid character (RFC 2911 section 4.1.3)."
 msgstr ""
 
-#: cups/ipp.c:5418
+#: cups/ipp.c:5426
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad characters (RFC 2911 section 4.1.9)."
 msgstr ""
 
-#: cups/ipp.c:5428
+#: cups/ipp.c:5436
 #, c-format
 msgid "\"%s\": Bad mimeMediaType value \"%s\" - bad length %d (RFC 2911 section 4.1.9)."
 msgstr ""
 
-#: cups/ipp.c:5186
+#: cups/ipp.c:5194
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5195
+#: cups/ipp.c:5203
 #, c-format
 msgid "\"%s\": Bad name value \"%s\" - bad length %d (RFC 2911 section 4.1.2)."
 msgstr ""
 
-#: cups/ipp.c:5364
+#: cups/ipp.c:5372
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad characters (RFC 2911 section 4.1.8)."
 msgstr ""
 
-#: cups/ipp.c:5374
+#: cups/ipp.c:5382
 #, c-format
 msgid "\"%s\": Bad naturalLanguage value \"%s\" - bad length %d (RFC 2911 section 4.1.8)."
 msgstr ""
 
-#: cups/ipp.c:4923
+#: cups/ipp.c:4931
 #, c-format
 msgid "\"%s\": Bad octetString value - bad length %d (RFC 2911 section 4.1.10)."
 msgstr ""
 
-#: cups/ipp.c:5066
+#: cups/ipp.c:5074
 #, c-format
 msgid "\"%s\": Bad rangeOfInteger value %d-%d - lower greater than upper (RFC 2911 section 4.1.13)."
 msgstr ""
 
-#: cups/ipp.c:5047
+#: cups/ipp.c:5055
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - bad units value (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:5016
+#: cups/ipp.c:5024
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - cross feed resolution must be positive (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:5031
+#: cups/ipp.c:5039
 #, c-format
 msgid "\"%s\": Bad resolution value %dx%d%s - feed resolution must be positive (RFC 2911 section 4.1.15)."
 msgstr ""
 
-#: cups/ipp.c:5128
+#: cups/ipp.c:5136
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad UTF-8 sequence (RFC 2911 section 4.1.1)."
 msgstr ""
 
-#: cups/ipp.c:5137
+#: cups/ipp.c:5145
 #, c-format
 msgid "\"%s\": Bad text value \"%s\" - bad length %d (RFC 2911 section 4.1.1)."
 msgstr ""
 
-#: cups/ipp.c:5280
+#: cups/ipp.c:5288
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)."
 msgstr ""
 
-#: cups/ipp.c:5289
+#: cups/ipp.c:5297
 #, c-format
 msgid "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)."
 msgstr ""
@@ -3376,7 +3376,7 @@ msgstr ""
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:2138
+#: backend/ipp.c:2139
 msgid "Canceling print job."
 msgstr ""
 
@@ -4004,95 +4004,95 @@ msgstr ""
 msgid "Help file not in index."
 msgstr ""
 
-#: cups/ipp.c:3201 cups/ipp.c:3228 cups/ipp.c:3251
+#: cups/ipp.c:3209 cups/ipp.c:3236 cups/ipp.c:3259
 msgid "IPP 1setOf attribute with incompatible value tags."
 msgstr ""
 
-#: cups/ipp.c:3164
+#: cups/ipp.c:3172
 msgid "IPP attribute has no name."
 msgstr ""
 
-#: cups/ipp.c:7018
+#: cups/ipp.c:7026
 msgid "IPP attribute is not a member of the message."
 msgstr ""
 
-#: cups/ipp.c:3613
+#: cups/ipp.c:3621
 msgid "IPP begCollection value not 0 bytes."
 msgstr ""
 
-#: cups/ipp.c:3394
+#: cups/ipp.c:3402
 msgid "IPP boolean value not 1 byte."
 msgstr ""
 
-#: cups/ipp.c:3455
+#: cups/ipp.c:3463
 msgid "IPP date value not 11 bytes."
 msgstr ""
 
-#: cups/ipp.c:3634
+#: cups/ipp.c:3642
 msgid "IPP endCollection value not 0 bytes."
 msgstr ""
 
-#: cups/ipp.c:3369
+#: cups/ipp.c:3377
 msgid "IPP enum value not 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3093
+#: cups/ipp.c:3101
 msgid "IPP extension tag larger than 0x7FFFFFFF."
 msgstr ""
 
-#: cups/ipp.c:3366
+#: cups/ipp.c:3374
 msgid "IPP integer value not 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3566
+#: cups/ipp.c:3574
 msgid "IPP language length overflows value."
 msgstr ""
 
-#: cups/ipp.c:3575
+#: cups/ipp.c:3583
 msgid "IPP language length too large."
 msgstr ""
 
-#: cups/ipp.c:3278
+#: cups/ipp.c:3286
 msgid "IPP member name is not empty."
 msgstr ""
 
-#: cups/ipp.c:3660
+#: cups/ipp.c:3668
 msgid "IPP memberName value is empty."
 msgstr ""
 
-#: cups/ipp.c:3652
+#: cups/ipp.c:3660
 msgid "IPP memberName with no attribute."
 msgstr ""
 
-#: cups/ipp.c:3147
+#: cups/ipp.c:3155
 msgid "IPP name larger than 32767 bytes."
 msgstr ""
 
-#: cups/ipp.c:3532
+#: cups/ipp.c:3540
 msgid "IPP nameWithLanguage value less than minimum 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3690
+#: cups/ipp.c:3698
 msgid "IPP octetString length too large."
 msgstr ""
 
-#: cups/ipp.c:3500
+#: cups/ipp.c:3508
 msgid "IPP rangeOfInteger value not 8 bytes."
 msgstr ""
 
-#: cups/ipp.c:3473
+#: cups/ipp.c:3481
 msgid "IPP resolution value not 9 bytes."
 msgstr ""
 
-#: cups/ipp.c:3593
+#: cups/ipp.c:3601
 msgid "IPP string length overflows value."
 msgstr ""
 
-#: cups/ipp.c:3528
+#: cups/ipp.c:3536
 msgid "IPP textWithLanguage value less than minimum 4 bytes."
 msgstr ""
 
-#: cups/ipp.c:3352
+#: cups/ipp.c:3360
 msgid "IPP value larger than 32767 bytes."
 msgstr ""
 
@@ -4545,8 +4545,12 @@ msgstr ""
 msgid "No Windows printer drivers are installed."
 msgstr ""
 
-#: cups/request.c:572 cups/request.c:921
+#: cups/request.c:586 cups/request.c:949
 msgid "No active connection"
+msgstr ""
+
+#: cups/request.c:366
+msgid "No active connection."
 msgstr ""
 
 #: scheduler/ipp.c:3438
@@ -4617,6 +4621,10 @@ msgstr ""
 
 #: scheduler/ipp.c:6148
 msgid "No printer-uri in request."
+msgstr ""
+
+#: cups/request.c:374
+msgid "No request sent."
 msgstr ""
 
 #: cups/snmp.c:1014
@@ -4919,15 +4927,15 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:2112
+#: backend/ipp.c:2113
 msgid "Print job canceled at printer."
 msgstr ""
 
-#: backend/ipp.c:2104
+#: backend/ipp.c:2105
 msgid "Print job too large."
 msgstr ""
 
-#: backend/ipp.c:1601
+#: backend/ipp.c:1602
 msgid "Print job was not accepted."
 msgstr ""
 
@@ -4955,11 +4963,11 @@ msgstr ""
 msgid "Printer Settings"
 msgstr ""
 
-#: backend/ipp.c:2107
+#: backend/ipp.c:2108
 msgid "Printer cannot print supplied content."
 msgstr ""
 
-#: backend/ipp.c:2110
+#: backend/ipp.c:2111
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
@@ -5306,7 +5314,7 @@ msgid "The printer did not respond."
 msgstr ""
 
 #: backend/ipp.c:784 backend/ipp.c:904 backend/ipp.c:1018 backend/ipp.c:1409
-#: backend/ipp.c:1573 backend/lpd.c:845 backend/socket.c:384
+#: backend/ipp.c:1574 backend/lpd.c:845 backend/socket.c:384
 #: backend/usb-unix.c:131 backend/usb-unix.c:423 backend/usb-unix.c:506
 msgid "The printer is in use."
 msgstr ""
@@ -5532,7 +5540,7 @@ msgstr ""
 msgid "Unable to add class"
 msgstr ""
 
-#: backend/ipp.c:1756
+#: backend/ipp.c:1757
 msgid "Unable to add document to print job."
 msgstr ""
 
@@ -5561,7 +5569,7 @@ msgstr ""
 msgid "Unable to cancel RSS subscription"
 msgstr ""
 
-#: backend/ipp.c:2159
+#: backend/ipp.c:2160
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -5577,12 +5585,12 @@ msgstr ""
 msgid "Unable to change server settings"
 msgstr ""
 
-#: cups/ipp.c:5408
+#: cups/ipp.c:5416
 #, c-format
 msgid "Unable to compile mimeMediaType regular expression: %s."
 msgstr ""
 
-#: cups/ipp.c:5354
+#: cups/ipp.c:5362
 #, c-format
 msgid "Unable to compile naturalLanguage regular expression: %s."
 msgstr ""
@@ -5591,7 +5599,7 @@ msgstr ""
 msgid "Unable to configure printer options."
 msgstr ""
 
-#: cups/adminutil.c:911 cups/request.c:1054
+#: cups/adminutil.c:911 cups/request.c:1082
 msgid "Unable to connect to host."
 msgstr ""
 
@@ -5703,7 +5711,7 @@ msgstr ""
 msgid "Unable to find printer."
 msgstr ""
 
-#: backend/ipp.c:3451
+#: backend/ipp.c:3435
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5796,7 +5804,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:376 backend/ipp.c:1502 backend/ipp.c:1711 backend/lpd.c:505
+#: backend/ipp.c:376 backend/ipp.c:1503 backend/ipp.c:1712 backend/lpd.c:505
 #: backend/socket.c:155 backend/usb.c:237 filter/gziptoany.c:71
 #: filter/pstops.c:300
 msgid "Unable to open print file"
@@ -5850,7 +5858,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3310 backend/ipp.c:3387 backend/ipp.c:3395
+#: backend/ipp.c:3294 backend/ipp.c:3371 backend/ipp.c:3379
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6142,7 +6150,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1857
+#: backend/ipp.c:1858
 msgid "Waiting for job to complete."
 msgstr ""
 

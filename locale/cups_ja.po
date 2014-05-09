@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-03-28 11:06-0400\n"
+"POT-Creation-Date: 2014-05-09 13:32-0700\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -3728,6 +3728,9 @@ msgstr "Windows プリンタードライバーがインストールされてい�
 msgid "No active connection"
 msgstr "アクティブな接続はありません"
 
+msgid "No active connection."
+msgstr ""
+
 #, c-format
 msgid "No active jobs on %s."
 msgstr "%s にはアクティブなジョブはありません。"
@@ -3779,6 +3782,9 @@ msgstr "クラスのプリンター URI が見つかりません。"
 
 msgid "No printer-uri in request."
 msgstr "プリンター URI のリクエストがありません。"
+
+msgid "No request sent."
+msgstr ""
 
 msgid "No request-id"
 msgstr "リクエストID がありません"

@@ -763,9 +763,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     got_status     = 0;
 
     while ((state = ippWrite(http, request)) != IPP_STATE_DATA)
-      if (state == IPP_STATE_ERROR)
-	break;
-      else if (httpCheck(http))
+    {
+      if (httpCheck(http))
       {
         got_status = 1;
 
@@ -773,15 +772,30 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	if (status >= HTTP_STATUS_MULTIPLE_CHOICES)
 	  break;
       }
+      else if (state == IPP_STATE_ERROR)
+	break;
+    }
 
     if (state == IPP_STATE_ERROR)
     {
-      DEBUG_puts("1cupsSendRequest: Unable to send IPP request.");
+     /*
+      * We weren't able to send the IPP request. But did we already get a HTTP
+      * error status?
+      */
 
-      http->status = HTTP_STATUS_ERROR;
-      http->state  = HTTP_STATE_WAITING;
+      if (!got_status || status < HTTP_STATUS_MULTIPLE_CHOICES)
+      {
+       /*
+        * No, something else went wrong.
+	*/
 
-      return (HTTP_STATUS_ERROR);
+	DEBUG_puts("1cupsSendRequest: Unable to send IPP request.");
+
+	http->status = HTTP_STATUS_ERROR;
+	http->state  = HTTP_STATE_WAITING;
+
+	return (HTTP_STATUS_ERROR);
+      }
     }
 
    /*

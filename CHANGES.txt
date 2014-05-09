@@ -1,14 +1,18 @@
-CHANGES.txt - 1.7.3 - 2014-05-08
+CHANGES.txt - 1.7.3 - 2014-05-09
 --------------------------------
 
 CHANGES IN CUPS V1.7.3
 
+	- Added Brazilian Portuguese translation (STR #4409)
 	- Fixed mapping of OutputBin values such as "Tray1"
 	  (<rdar://problem/16685606>)
 	- Several ippGet* functions incorrectly returned -1 instead of 0 on
 	  error.
 	- The cupsGetResponse function did not work properly with
 	  CUPS_HTTP_DEFAULT (<rdar://problem/16762593>)
+	- The IPP backend did not abort a job when the printer did not validate
+	  the supplied options (<rdar://problem/16836752>)
+	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
 
 
 CHANGES IN CUPS V1.7.2
