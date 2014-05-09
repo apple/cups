@@ -15,6 +15,8 @@ CHANGES IN CUPS V1.7.3
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
 	- The scheduler did not add the "job-hold-until-specified" reason when
 	  holding a job using the lp command (STR #4405)
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
 
 
 CHANGES IN CUPS V1.7.2
