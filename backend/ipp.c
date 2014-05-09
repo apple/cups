@@ -1435,6 +1435,7 @@ main(int  argc,				/* I - Number of command-line args */
       sleep(10);
     }
     else if (ipp_status == IPP_STATUS_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED ||
+             ipp_status == IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED ||
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED ||
