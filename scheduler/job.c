@@ -2238,8 +2238,9 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     }
 
-    ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
   }
+
+  ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
 
  /*
   * Update the hold time...

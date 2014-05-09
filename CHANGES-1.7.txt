@@ -3,6 +3,7 @@ CHANGES-1.7.txt
 
 CHANGES IN CUPS V1.7.3
 
+	- Added Brazilian Portuguese translation (STR #4409)
 	- Fixed mapping of OutputBin values such as "Tray1"
 	  (<rdar://problem/16685606>)
 	- Several ippGet* functions incorrectly returned -1 instead of 0 on
@@ -12,6 +13,8 @@ CHANGES IN CUPS V1.7.3
 	- The IPP backend did not abort a job when the printer did not validate
 	  the supplied options (<rdar://problem/16836752>)
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
+	- The scheduler did not add the "job-hold-until-specified" reason when
+	  holding a job using the lp command (STR #4405)
 
 
 CHANGES IN CUPS V1.7.2
