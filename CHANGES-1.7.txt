@@ -19,6 +19,8 @@ CHANGES IN CUPS V1.7.3
 	  (STR #4397)
 	- The configure script incorrectly added libgcrypt as a GNU TLS
 	  dependency (STR #4399)
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402)
 
 
 CHANGES IN CUPS V1.7.2
