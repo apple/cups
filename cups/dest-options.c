@@ -1282,6 +1282,8 @@ cups_create_cached(http_t       *http,	/* I - Connection to destination */
                mdb->top >= first->top && mdb->bottom >= first->bottom)
         first = mdb;
     }
+    else
+      cupsArrayAdd(dinfo->cached_db, mdb);
   }
 
   if (flags & CUPS_MEDIA_FLAGS_DUPLEX)

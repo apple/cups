@@ -21,6 +21,8 @@ CHANGES IN CUPS V1.7.3
 	  dependency (STR #4399)
 	- CUPS did not compile when Avahi or mDNSResponder was not present
 	  (STR #4402)
+	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
+	  (STR #4414)
 
 
 CHANGES IN CUPS V1.7.2
