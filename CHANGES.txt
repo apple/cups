@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.3 - 2014-05-09
+CHANGES.txt - 1.7.3 - 2014-05-13
 --------------------------------
 
 CHANGES IN CUPS V1.7.3
@@ -13,6 +13,8 @@ CHANGES IN CUPS V1.7.3
 	- The IPP backend did not abort a job when the printer did not validate
 	  the supplied options (<rdar://problem/16836752>)
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
+	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
+	  (STR #4414)
 
 
 CHANGES IN CUPS V1.7.2
