@@ -4285,7 +4285,7 @@ print_csv(
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-        putchar(',');
+        fputc(',', outfile);
 
       buffer[0] = '\0';
 
@@ -4303,30 +4303,30 @@ print_csv(
       if (strchr(buffer, ',') != NULL || strchr(buffer, '\"') != NULL ||
 	  strchr(buffer, '\\') != NULL)
       {
-        putchar('\"');
+        putc('\"', outfile);
         for (bufptr = buffer; *bufptr; bufptr ++)
         {
           if (*bufptr == '\\' || *bufptr == '\"')
-            putchar('\\');
-          putchar(*bufptr);
+            putc('\\', outfile);
+          putc(*bufptr, outfile);
         }
-        putchar('\"');
+        putc('\"', outfile);
       }
       else
-        fputs(buffer, stdout);
+        fputs(buffer, outfile);
     }
-    putchar('\n');
+    putc('\n', outfile);
   }
   else
   {
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-        putchar(',');
+        putc(',', outfile);
 
-      fputs(displayed[i], stdout);
+      fputs(displayed[i], outfile);
     }
-    putchar('\n');
+    putc('\n', outfile);
   }
 
   free(buffer);
@@ -4408,7 +4408,7 @@ print_line(
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-        putchar(' ');
+        putc(' ', outfile);
 
       buffer[0] = '\0';
 
@@ -4423,31 +4423,31 @@ print_line(
         }
       }
 
-      printf("%*s", (int)-widths[i], buffer);
+      fprintf(outfile, "%*s", (int)-widths[i], buffer);
     }
-    putchar('\n');
+    putc('\n', outfile);
   }
   else
   {
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-        putchar(' ');
+        putc(' ', outfile);
 
-      printf("%*s", (int)-widths[i], displayed[i]);
+      fprintf(outfile, "%*s", (int)-widths[i], displayed[i]);
     }
-    putchar('\n');
+    putc('\n', outfile);
 
     for (i = 0; i < num_displayed; i ++)
     {
       if (i)
-	putchar(' ');
+	putc(' ', outfile);
 
       memset(buffer, '-', widths[i]);
       buffer[widths[i]] = '\0';
-      fputs(buffer, stdout);
+      fputs(buffer, outfile);
     }
-    putchar('\n');
+    putc('\n', outfile);
   }
 
   free(buffer);

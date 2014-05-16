@@ -114,7 +114,7 @@ http.o: http.c cups-private.h string-private.h ../config.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
-  thread-private.h tls-darwin.c
+  thread-private.h
 http-addr.o: http-addr.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
@@ -237,6 +237,11 @@ thread.o: thread.c cups-private.h string-private.h ../config.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
   thread-private.h
+tls.o: tls.c cups-private.h string-private.h ../config.h debug-private.h \
+  ../cups/versioning.h array-private.h ../cups/array.h ipp-private.h \
+  ../cups/ipp.h http.h http-private.h ../cups/language.h md5-private.h \
+  language-private.h ../cups/transcode.h pwg-private.h ../cups/cups.h \
+  file.h pwg.h ppd-private.h ../cups/ppd.h thread-private.h tls-darwin.c
 transcode.o: transcode.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
@@ -263,6 +268,8 @@ testconflicts.o: testconflicts.c cups.h file.h versioning.h ipp.h http.h \
   array.h language.h pwg.h ppd.h string-private.h ../config.h
 testcups.o: testcups.c string-private.h ../config.h cups.h file.h \
   versioning.h ipp.h http.h array.h language.h pwg.h ppd.h
+testdest.o: testdest.c cups.h file.h versioning.h ipp.h http.h array.h \
+  language.h pwg.h
 testfile.o: testfile.c string-private.h ../config.h debug-private.h \
   ../cups/versioning.h file.h
 testhttp.o: testhttp.c cups-private.h string-private.h ../config.h \

@@ -32,6 +32,161 @@ static char	*cups_scan_strings(char *buffer);
 
 
 /*
+ * 'cupsLocalizeDestMedia()' - Get the localized string for a destination media
+ *                             size.
+ *
+ * The returned string is stored in the destination information and will become
+ * invalid if the destination information is deleted.
+ *
+ * @since CUPS 2.0@
+ */
+
+const char *				/* O - Localized string */
+cupsLocalizeDestMedia(
+    http_t       *http,			/* I - Connection to destination */
+    cups_dest_t  *dest,			/* I - Destination */
+    cups_dinfo_t *dinfo,		/* I - Destination information */
+    unsigned     flags,			/* I - Media flags */
+    cups_size_t  *size)			/* I - Media size */
+{
+  cups_lang_t		*lang;		/* Standard localizations */
+  _cups_message_t	key,		/* Search key */
+			*match;		/* Matching entry */
+  pwg_media_t		*pwg;		/* PWG media information */
+  cups_array_t		*db;		/* Media database */
+  _cups_media_db_t	*mdb;		/* Media database entry */
+  char			name[1024],	/* Size name */
+			temp[256];	/* Temporary string */
+  const char		*lsize,		/* Localized media size */
+			*lsource,	/* Localized media source */
+			*ltype;		/* Localized media type */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!http || !dest || !dinfo || !size)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (NULL);
+  }
+
+ /*
+  * See if the localization is cached...
+  */
+
+  if (!dinfo->localizations)
+    cups_create_localizations(http, dinfo);
+
+  key.id = size->media;
+  if ((match = (_cups_message_t *)cupsArrayFind(dinfo->localizations, &key)) != NULL)
+    return (match->str);
+
+ /*
+  * If not, get the localized size, source, and type strings...
+  */
+
+  lang = cupsLangDefault();
+  pwg  = pwgMediaForSize(size->width, size->length);
+
+  if (pwg->ppd)
+    lsize = _cupsLangString(lang, pwg->ppd);
+  else
+    lsize = NULL;
+
+  if (!lsize)
+  {
+    if ((size->width % 635) == 0 && (size->length % 635) == 0)
+    {
+     /*
+      * Use inches since the size is a multiple of 1/4 inch.
+      */
+
+      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%g x %g")), size->width / 2540.0, size->length / 2540.0);
+    }
+    else
+    {
+     /*
+      * Use millimeters since the size is not a multiple of 1/4 inch.
+      */
+
+      snprintf(temp, sizeof(temp), _cupsLangString(lang, _("%d x %d mm")), (size->width + 50) / 100, (size->length + 50) / 100);
+    }
+
+    lsize = temp;
+  }
+
+  if (flags & CUPS_MEDIA_FLAGS_READY)
+    db = dinfo->ready_db;
+  else
+    db = dinfo->media_db;
+
+  DEBUG_printf(("1cupsLocalizeDestMedia: size->media=\"%s\"", size->media));
+
+  for (mdb = (_cups_media_db_t *)cupsArrayFirst(db); mdb; mdb = (_cups_media_db_t *)cupsArrayNext(db))
+  {
+    if (mdb->key && !strcmp(mdb->key, size->media))
+      break;
+    else if (mdb->size_name && !strcmp(mdb->size_name, size->media))
+      break;
+    else if (mdb->width == size->width && mdb->length == size->length && mdb->bottom == size->bottom && mdb->left == size->left && mdb->right == size->right && mdb->top == size->top)
+      break;
+  }
+
+  if (mdb)
+  {
+    lsource = cupsLocalizeDestValue(http, dest, dinfo, "media-source", mdb->source);
+    ltype   = cupsLocalizeDestValue(http, dest, dinfo, "media-type", mdb->type);
+  }
+  else
+  {
+    lsource = NULL;
+    ltype   = NULL;
+  }
+
+  if (!lsource && !ltype)
+  {
+    if (size->bottom || size->left || size->right || size->top)
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless)")), lsize);
+    else
+      strlcpy(name, lsize, sizeof(name));
+  }
+  else if (!lsource)
+  {
+    if (size->bottom || size->left || size->right || size->top)
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, ltype);
+    else
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, ltype);
+  }
+  else if (!ltype)
+  {
+    if (size->bottom || size->left || size->right || size->top)
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s)")), lsize, lsource);
+    else
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s)")), lsize, lsource);
+  }
+  else
+  {
+    if (size->bottom || size->left || size->right || size->top)
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (Borderless, %s, %s)")), lsize, ltype, lsource);
+    else
+      snprintf(name, sizeof(name), _cupsLangString(lang, _("%s (%s, %s)")), lsize, ltype, lsource);
+  }
+
+  if ((match = (_cups_message_t *)calloc(1, sizeof(_cups_message_t))) == NULL)
+    return (NULL);
+
+  match->id  = strdup(size->media);
+  match->str = strdup(name);
+
+  cupsArrayAdd(dinfo->localizations, match);
+
+  return (match->str);
+}
+
+
+/*
  * 'cupsLocalizeDestOption()' - Get the localized string for a destination
  *                              option.
  *

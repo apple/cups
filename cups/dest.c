@@ -1303,6 +1303,100 @@ _cupsGetDestResource(
 
 
 /*
+ * 'cupsGetDestWithURI()' - Get a destination associated with a URI.
+ *
+ * "name" is the desired name for the printer. If @code NULL@, a name will be
+ * created using the URI.
+ *
+ * "uri" is the "ipp" or "ipps" URI for the printer.
+ *
+ * @since CUPS 2.0@
+ */
+
+cups_dest_t *				/* O - Destination or @code NULL@ */
+cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ */
+                   const char *uri)	/* I - URI for the printer */
+{
+  cups_dest_t	*dest;			/* New destination */
+  char		temp[1024],		/* Temporary string */
+		scheme[256],		/* Scheme from URI */
+		userpass[256],		/* Username:password from URI */
+		hostname[256],		/* Hostname from URI */
+		resource[1024],		/* Resource path from URI */
+		*ptr;			/* Pointer into string */
+  int		port;			/* Port number from URI */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!uri)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (NULL);
+  }
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK ||
+      (strncmp(uri, "ipp://", 6) && strncmp(uri, "ipps://", 7)))
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
+
+    return (NULL);
+  }
+
+  if (!name)
+  {
+   /*
+    * Create the name from the URI...
+    */
+
+    if (strstr(hostname, "._tcp"))
+    {
+     /*
+      * Use the service instance name...
+      */
+
+      if ((ptr = strchr(hostname, '.')) != NULL)
+        *ptr = '\0';
+
+      name = hostname;
+    }
+    else if (!strncmp(resource, "/classes/", 9))
+    {
+      snprintf(temp, sizeof(temp), "%s @ %s", resource + 9, hostname);
+      name = temp;
+    }
+    else if (!strncmp(resource, "/printers/", 10))
+    {
+      snprintf(temp, sizeof(temp), "%s @ %s", resource + 10, hostname);
+      name = temp;
+    }
+    else
+    {
+      name = hostname;
+    }
+  }
+
+ /*
+  * Create the destination...
+  */
+
+  if ((dest = calloc(1, sizeof(cups_dest_t))) == NULL)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
+    return (NULL);
+  }
+
+  dest->name        = _cupsStrAlloc(name);
+  dest->num_options = cupsAddOption("printer-uri-supported", uri, dest->num_options, &(dest->options));
+  dest->num_options = cupsAddOption("printer-info", name, dest->num_options, &(dest->options));
+
+  return (dest);
+}
+
+
+/*
  * '_cupsGetDests()' - Get destinations from a server.
  *
  * "op" is IPP_OP_CUPS_GET_PRINTERS to get a full list, IPP_OP_CUPS_GET_DEFAULT
