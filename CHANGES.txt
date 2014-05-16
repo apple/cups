@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-04-09
+CHANGES.txt - 2.0b1 - 2014-05-15
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -41,3 +41,6 @@ CHANGES IN CUPS V2.0b1
 	  execute permissions (STR #2935)
 	- The ippFindAttribute and ippFindNextAttribute functions now support
 	  hierarchical searches (STR #4395)
+	- Added support for simultaneous XML and test output from ipptool.
+	- Added support for PAUSE directive in ipptool test files.
+

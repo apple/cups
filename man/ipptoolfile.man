@@ -11,7 +11,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "9 April 2014" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "15 May 2014" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -186,6 +186,9 @@ Specifies the human-readable name of the test.
 .TP 5
 \fBOPERATION \fIoperation-code\fR
 Specifies the operation to be performed.
+.TP 5
+\fBPAUSE "\fImessage\fB"\fR
+Displays the provided message and waits for the user to press a key to continue.
 .TP 5
 \fBREQUEST\-ID \fInumber\fR\fR
 .TP 5
