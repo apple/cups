@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-05-15
+CHANGES.txt - 2.0b1 - 2014-05-21
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -43,4 +43,5 @@ CHANGES IN CUPS V2.0b1
 	  hierarchical searches (STR #4395)
 	- Added support for simultaneous XML and test output from ipptool.
 	- Added support for PAUSE directive in ipptool test files.
+	- Added support for auto-typing of TIFF files by ipptool (STR #4418)
 

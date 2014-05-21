@@ -494,12 +494,15 @@ main(int  argc,				/* I - Number of command-line args */
                          !_cups_strcasecmp(ext, ".ras") ||
                          !_cups_strcasecmp(ext, ".ras.gz"))
                   set_variable(outfile, &vars, "filetype", "image/pwg-raster");
-                else if (!_cups_strcasecmp(ext, ".urf") ||
-                         !_cups_strcasecmp(ext, ".urf.gz"))
-                  set_variable(outfile, &vars, "filetype", "image/urf");
+                else if (!_cups_strcasecmp(ext, ".tif") ||
+                         !_cups_strcasecmp(ext, ".tiff"))
+                  set_variable(outfile, &vars, "filetype", "image/tiff");
                 else if (!_cups_strcasecmp(ext, ".txt") ||
                          !_cups_strcasecmp(ext, ".txt.gz"))
                   set_variable(outfile, &vars, "filetype", "text/plain");
+                else if (!_cups_strcasecmp(ext, ".urf") ||
+                         !_cups_strcasecmp(ext, ".urf.gz"))
+                  set_variable(outfile, &vars, "filetype", "image/urf");
                 else if (!_cups_strcasecmp(ext, ".xps"))
                   set_variable(outfile, &vars, "filetype", "application/openxps");
                 else
