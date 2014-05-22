@@ -17,14 +17,14 @@ The <b>ServerName</b> directive is not supported on OS X at all.
 <h3><a name="DIRECTIVES">Directives</a></h3>
 The following directives are understood by the client. Consult the online help for detailed descriptions:
 <dl class="man">
-<dt><b>AllowAnyRoot Yes</b>
-<dd style="margin-left: 5.0em"><dt><b>AllowAnyRoot No</b>
+<dt><b>AllowAnyRoot Y</b>
+<dd style="margin-left: 5.0em"><dt><b>AllowAnyRoot N</b>
 <dd style="margin-left: 5.0em">Specifies whether to allow TLS with certificates that have not been signed by a trusted Certificate Authority.
-The default is "Yes".
-<dt><b>AllowExpiredCerts Yes</b>
-<dd style="margin-left: 5.0em"><dt><b>AllowExpiredCerts No</b>
+The default is "Y".
+<dt><b>AllowExpiredCerts Y</b>
+<dd style="margin-left: 5.0em"><dt><b>AllowExpiredCerts N</b>
 <dd style="margin-left: 5.0em">Specifies whether to allow TLS with expired certificates.
-The default is "Yes".
+The default is "Y".
 <dt><b>Encryption IfRequested</b>
 <dd style="margin-left: 5.0em"><dt><b>Encryption Never</b>
 <dd style="margin-left: 5.0em"><dt><b>Encryption Required</b>
@@ -40,10 +40,6 @@ CUPS adds the remote hostname ("name@server.example.com") for you. The default n
 <dd style="margin-left: 5.0em">Specifies the address and optionally the port to use when connecting to a server running CUPS 1.3.12 and earlier.
 <dt><b>User </b><i>name</i>
 <dd style="margin-left: 5.0em">Specifies the default user name to use for requests.
-<dt><b>ValidateCerts Yes</b>
-<dd style="margin-left: 5.0em"><dt><b>ValidateCerts No</b>
-<dd style="margin-left: 5.0em">Specifies whether to only allow TLS with certificates whose common name matches the hostname.
-The default is "No".
 </dl>
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 The <b>client.conf</b> file is deprecated and will no longer be supported in a future version of CUPS.

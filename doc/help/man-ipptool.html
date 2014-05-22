@@ -30,6 +30,9 @@ ipptool - perform internet printing protocol requests
 ] [
 <b>-L</b>
 ] [
+<b>-P</b>
+<i>filename.plist</i>
+] [
 <b>-S</b>
 ] [
 <b>-T</b>
@@ -108,6 +111,8 @@ must connect to the printer or server using IPv6.
 will continue past errors.
 <dt><b>-L</b>
 <dd style="margin-left: 5.0em">Specifies that requests should be sent using the HTTP/1.0 "Content-Length:" header, which is required for conformance by all versions of IPP. The default is to use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
+<dt><b>-P</b><i> filename.plist</i>
+<dd style="margin-left: 5.0em">Specifies that the test results should be written to the named XML (Apple plist) file in addition to the plain text report. This option is incompatible with the <b>-i</b> (interval) and <b>-n</b> (repeat-count) options.
 <dt><b>-S</b>
 <dd style="margin-left: 5.0em">Forces (dedicated) TLS encryption when connecting to the server.
 <dt><b>-T</b><i> seconds</i>
