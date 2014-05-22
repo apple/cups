@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.3 - 2014-05-13
+CHANGES.txt - 1.7.3 - 2014-05-22
 --------------------------------
 
 CHANGES IN CUPS V1.7.3
@@ -13,8 +13,20 @@ CHANGES IN CUPS V1.7.3
 	- The IPP backend did not abort a job when the printer did not validate
 	  the supplied options (<rdar://problem/16836752>)
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
+	- The scheduler did not add the "job-hold-until-specified" reason when
+	  holding a job using the lp command (STR #4405)
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
+	- The configure script incorrectly added libgcrypt as a GNU TLS
+	  dependency (STR #4399)
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402)
 	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
 	  (STR #4414)
+	- Auto-typing of PWG Raster files did not work (STR #4417)
+	- IPP queues using hardcoded credentials would ask for credentials
+	  (STR #4371)
+	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
 
 
 CHANGES IN CUPS V1.7.2

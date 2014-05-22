@@ -1,18 +1,18 @@
 /*
  * "$Id$"
  *
- *   Private string definitions for CUPS.
+ * Private string definitions for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2006 by Easy Software Products.
+ * Copyright 2007-2014 by Apple Inc.
+ * Copyright 1997-2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_STRING_PRIVATE_H_
@@ -28,6 +28,7 @@
 #  include <ctype.h>
 #  include <errno.h>
 #  include <locale.h>
+#  include <time.h>
 
 #  include "config.h"
 
@@ -197,6 +198,13 @@ extern char	*_cupsStrFormatd(char *buf, char *bufend, double number,
 		                 struct lconv *loc);
 extern double	_cupsStrScand(const char *buf, char **bufptr,
 		              struct lconv *loc);
+
+
+/*
+ * Date function...
+ */
+
+extern char	*_cupsStrDate(char *buf, size_t bufsize, time_t timeval);
 
 
 /*

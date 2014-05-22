@@ -37,10 +37,7 @@
  */
 
 #define _CUPS_STRING_C_
-#include "string-private.h"
-#include "debug-private.h"
-#include "thread-private.h"
-#include "array.h"
+#include "cups-private.h"
 #include <stddef.h>
 #include <limits.h>
 
@@ -158,6 +155,39 @@ _cupsStrAlloc(const char *s)		/* I - String */
   _cupsMutexUnlock(&sp_mutex);
 
   return (item->str);
+}
+
+
+/*
+ * '_cupsStrDate()' - Return a localized date for a given time value.
+ *
+ * This function works around the locale encoding issues of strftime...
+ */
+
+char *					/* O - Buffer */
+_cupsStrDate(char   *buf,		/* I - Buffer */
+             size_t bufsize,		/* I - Size of buffer */
+	     time_t timeval)		/* I - Time value */
+{
+  struct tm	*dateval;		/* Local date/time */
+  char		temp[1024];		/* Temporary buffer */
+  _cups_globals_t *cg = _cupsGlobals();	/* Per-thread globals */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
+  dateval = localtime(&timeval);
+
+  if (cg->lang_default->encoding != CUPS_UTF8)
+  {
+    strftime(temp, sizeof(temp), "%c", dateval);
+    cupsCharsetToUTF8((cups_utf8_t *)buf, temp, (int)bufsize, cg->lang_default->encoding);
+  }
+  else
+    strftime(buf, bufsize, "%c", dateval);
+
+  return (buf);
 }
 
 
