@@ -91,8 +91,10 @@ static const char * const jattrs[] =	/* Job attributes we want */
   "job-state",
   "job-state-reasons"
 };
-static int		job_canceled = 0;
+static int		job_canceled = 0,
 					/* Job cancelled? */
+			uri_credentials = 0;
+					/* Credentials supplied in URI? */
 static char		username[256] = "",
 					/* Username for device URI */
 			*password = NULL;
@@ -630,6 +632,7 @@ main(int  argc,				/* I - Number of command-line args */
       *password++ = '\0';
 
     cupsSetUser(username);
+    uri_credentials = 1;
   }
   else
   {
@@ -3028,20 +3031,23 @@ password_cb(const char *prompt,		/* I - Prompt (not used) */
   (void)method;
   (void)resource;
 
- /*
-  * Remember that we need to authenticate...
-  */
-
-  auth_info_required = "username,password";
-
-  if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
-                      def_username))
+  if (!uri_credentials)
   {
-    char	quoted[HTTP_MAX_VALUE * 2 + 4];
-					/* Quoted string */
+   /*
+    * Remember that we need to authenticate...
+    */
 
-    fprintf(stderr, "ATTR: auth-info-default=%s,\n",
-            quote_string(def_username, quoted, sizeof(quoted)));
+    auth_info_required = "username,password";
+
+    if (httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "username",
+			def_username))
+    {
+      char	quoted[HTTP_MAX_VALUE * 2 + 4];
+					  /* Quoted string */
+
+      fprintf(stderr, "ATTR: auth-info-default=%s,\n",
+	      quote_string(def_username, quoted, sizeof(quoted)));
+    }
   }
 
   if (password && *password && *password_tries < 3)
