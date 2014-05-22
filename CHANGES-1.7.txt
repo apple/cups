@@ -23,6 +23,7 @@ CHANGES IN CUPS V1.7.3
 	  (STR #4402)
 	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
 	  (STR #4414)
+	- Auto-typing of PWG Raster files did not work (STR #4417)
 
 
 CHANGES IN CUPS V1.7.2
