@@ -1418,6 +1418,39 @@
 		7271882313746EA8001A2036 /* rastertolabel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = rastertolabel.c; path = ../filter/rastertolabel.c; sourceTree = "<group>"; };
 		7271883C1374AB14001A2036 /* mime-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mime-private.h"; path = "../scheduler/mime-private.h"; sourceTree = "<group>"; };
 		727AD5B619100A58009F6862 /* tls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tls.c; path = ../cups/tls.c; sourceTree = "<group>"; };
+		727EF02F192E3498001EF690 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = admin.c; path = "../cgi-bin/admin.c"; sourceTree = "<group>"; };
+		727EF030192E3498001EF690 /* cgi-private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "cgi-private.h"; path = "../cgi-bin/cgi-private.h"; sourceTree = "<group>"; };
+		727EF031192E3498001EF690 /* cgi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cgi.h; path = "../cgi-bin/cgi.h"; sourceTree = "<group>"; };
+		727EF032192E3498001EF690 /* classes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = classes.c; path = "../cgi-bin/classes.c"; sourceTree = "<group>"; };
+		727EF033192E3498001EF690 /* help-index.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "help-index.c"; path = "../cgi-bin/help-index.c"; sourceTree = "<group>"; };
+		727EF034192E3498001EF690 /* help-index.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "help-index.h"; path = "../cgi-bin/help-index.h"; sourceTree = "<group>"; };
+		727EF035192E3498001EF690 /* help.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = help.c; path = "../cgi-bin/help.c"; sourceTree = "<group>"; };
+		727EF036192E3498001EF690 /* html.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = html.c; path = "../cgi-bin/html.c"; sourceTree = "<group>"; };
+		727EF037192E3498001EF690 /* ipp-var.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = "ipp-var.c"; path = "../cgi-bin/ipp-var.c"; sourceTree = "<group>"; };
+		727EF038192E3498001EF690 /* jobs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = jobs.c; path = "../cgi-bin/jobs.c"; sourceTree = "<group>"; };
+		727EF039192E3498001EF690 /* makedocset.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = makedocset.c; path = "../cgi-bin/makedocset.c"; sourceTree = "<group>"; };
+		727EF03A192E3498001EF690 /* printers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = printers.c; path = "../cgi-bin/printers.c"; sourceTree = "<group>"; };
+		727EF03B192E3498001EF690 /* search.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = search.c; path = "../cgi-bin/search.c"; sourceTree = "<group>"; };
+		727EF03C192E3498001EF690 /* template.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = template.c; path = "../cgi-bin/template.c"; sourceTree = "<group>"; };
+		727EF03D192E3498001EF690 /* testcgi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testcgi.c; path = "../cgi-bin/testcgi.c"; sourceTree = "<group>"; };
+		727EF03E192E3498001EF690 /* testhi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testhi.c; path = "../cgi-bin/testhi.c"; sourceTree = "<group>"; };
+		727EF03F192E3498001EF690 /* testtemplate.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testtemplate.c; path = "../cgi-bin/testtemplate.c"; sourceTree = "<group>"; };
+		727EF040192E3498001EF690 /* var.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = var.c; path = "../cgi-bin/var.c"; sourceTree = "<group>"; };
+		727EF041192E3544001EF690 /* testadmin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testadmin.c; path = ../cups/testadmin.c; sourceTree = "<group>"; };
+		727EF042192E3544001EF690 /* testarray.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testarray.c; path = ../cups/testarray.c; sourceTree = "<group>"; };
+		727EF043192E3544001EF690 /* testcache.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testcache.c; path = ../cups/testcache.c; sourceTree = "<group>"; };
+		727EF044192E3544001EF690 /* testconflicts.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testconflicts.c; path = ../cups/testconflicts.c; sourceTree = "<group>"; };
+		727EF045192E3544001EF690 /* testfile.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testfile.c; path = ../cups/testfile.c; sourceTree = "<group>"; };
+		727EF046192E3544001EF690 /* testi18n.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testi18n.c; path = ../cups/testi18n.c; sourceTree = "<group>"; };
+		727EF047192E3544001EF690 /* testipp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testipp.c; path = ../cups/testipp.c; sourceTree = "<group>"; };
+		727EF048192E3544001EF690 /* testlang.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testlang.c; path = ../cups/testlang.c; sourceTree = "<group>"; };
+		727EF049192E3544001EF690 /* testoptions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testoptions.c; path = ../cups/testoptions.c; sourceTree = "<group>"; };
+		727EF04A192E3544001EF690 /* testppd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testppd.c; path = ../cups/testppd.c; sourceTree = "<group>"; };
+		727EF04B192E3544001EF690 /* testpwg.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testpwg.c; path = ../cups/testpwg.c; sourceTree = "<group>"; };
+		727EF04C192E3544001EF690 /* testsnmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testsnmp.c; path = ../cups/testsnmp.c; sourceTree = "<group>"; };
+		727EF04D192E3602001EF690 /* testlpd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testlpd.c; path = ../scheduler/testlpd.c; sourceTree = "<group>"; };
+		727EF04E192E3602001EF690 /* testspeed.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testspeed.c; path = ../scheduler/testspeed.c; sourceTree = "<group>"; };
+		727EF04F192E3602001EF690 /* testsub.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testsub.c; path = ../scheduler/testsub.c; sourceTree = "<group>"; };
 		728FB7E0153600FA005426E1 /* tls-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../scheduler/tls-darwin.c"; sourceTree = "<group>"; };
 		728FB7E1153600FA005426E1 /* tls-gnutls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../scheduler/tls-gnutls.c"; sourceTree = "<group>"; };
 		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
@@ -1843,10 +1876,25 @@
 		273BF6B81333B4A90022CAAB /* tests */ = {
 			isa = PBXGroup;
 			children = (
-				2767FC5119266A36000F61D3 /* testdest.c */,
+				727EF041192E3544001EF690 /* testadmin.c */,
+				727EF042192E3544001EF690 /* testarray.c */,
+				727EF043192E3544001EF690 /* testcache.c */,
+				727EF044192E3544001EF690 /* testconflicts.c */,
 				273BF6C61333B5370022CAAB /* testcups.c */,
+				2767FC5119266A36000F61D3 /* testdest.c */,
+				727EF045192E3544001EF690 /* testfile.c */,
 				278C58E2136B647200836530 /* testhttp.c */,
+				727EF046192E3544001EF690 /* testi18n.c */,
+				727EF047192E3544001EF690 /* testipp.c */,
+				727EF048192E3544001EF690 /* testlang.c */,
+				727EF04D192E3602001EF690 /* testlpd.c */,
 				270CCDBB135E3D3E00007BE2 /* testmime.c */,
+				727EF049192E3544001EF690 /* testoptions.c */,
+				727EF04A192E3544001EF690 /* testppd.c */,
+				727EF04B192E3544001EF690 /* testpwg.c */,
+				727EF04C192E3544001EF690 /* testsnmp.c */,
+				727EF04E192E3602001EF690 /* testspeed.c */,
+				727EF04F192E3602001EF690 /* testsub.c */,
 			);
 			name = tests;
 			sourceTree = "<group>";
@@ -2215,6 +2263,31 @@
 			sourceTree = "<group>";
 			wrapsLines = 1;
 		};
+		727EF02E192E3461001EF690 /* cgi-bin */ = {
+			isa = PBXGroup;
+			children = (
+				727EF02F192E3498001EF690 /* admin.c */,
+				727EF030192E3498001EF690 /* cgi-private.h */,
+				727EF031192E3498001EF690 /* cgi.h */,
+				727EF032192E3498001EF690 /* classes.c */,
+				727EF033192E3498001EF690 /* help-index.c */,
+				727EF034192E3498001EF690 /* help-index.h */,
+				727EF035192E3498001EF690 /* help.c */,
+				727EF036192E3498001EF690 /* html.c */,
+				727EF037192E3498001EF690 /* ipp-var.c */,
+				727EF038192E3498001EF690 /* jobs.c */,
+				727EF039192E3498001EF690 /* makedocset.c */,
+				727EF03A192E3498001EF690 /* printers.c */,
+				727EF03B192E3498001EF690 /* search.c */,
+				727EF03C192E3498001EF690 /* template.c */,
+				727EF03D192E3498001EF690 /* testcgi.c */,
+				727EF03E192E3498001EF690 /* testhi.c */,
+				727EF03F192E3498001EF690 /* testtemplate.c */,
+				727EF040192E3498001EF690 /* var.c */,
+			);
+			name = "cgi-bin";
+			sourceTree = "<group>";
+		};
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
@@ -2227,6 +2300,7 @@
 				72220FB013330B3400FCA411 /* libcupsmime */,
 				274FF5F41333310400317ECB /* libcupsppdc */,
 				724378F71333E3CE009631B9 /* backends */,
+				727EF02E192E3461001EF690 /* cgi-bin */,
 				274FF67313333B0A00317ECB /* commands */,
 				72220F5D13330A5A00FCA411 /* cupsd */,
 				274FF5D513332C2C00317ECB /* daemon */,

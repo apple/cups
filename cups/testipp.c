@@ -940,17 +940,10 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
 
       case IPP_TAG_DATE :
           {
-	    time_t	vtime;		/* Date/Time value */
-	    struct tm	*vdate;		/* Date info */
 	    char	vstring[256];	/* Formatted time */
 
 	    for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    {
-	      vtime = ippDateToTime(val->date);
-	      vdate = localtime(&vtime);
-	      strftime(vstring, sizeof(vstring), "%c", vdate);
-	      printf(" (%s)", vstring);
-	    }
+	      printf(" (%s)", _cupsStrDate(vstring, sizeof(vstring), ippDateToTime(val->date)));
           }
           putchar('\n');
           break;

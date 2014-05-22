@@ -26,6 +26,7 @@ CHANGES IN CUPS V1.7.3
 	- Auto-typing of PWG Raster files did not work (STR #4417)
 	- IPP queues using hardcoded credentials would ask for credentials
 	  (STR #4371)
+	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
 
 
 CHANGES IN CUPS V1.7.2

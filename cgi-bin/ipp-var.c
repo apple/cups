@@ -939,7 +939,6 @@ cgiSetIPPObjectVars(
 			*nameptr,	/* Pointer into name */
 			value[16384],	/* Value(s) */
 			*valptr;	/* Pointer into value */
-  struct tm		*date;		/* Date information */
 
 
   fprintf(stderr, "DEBUG2: cgiSetIPPObjectVars(obj=%p, prefix=\"%s\", "
@@ -1167,17 +1166,9 @@ cgiSetIPPObjectVars(
 	case IPP_TAG_INTEGER :
 	case IPP_TAG_ENUM :
 	    if (strncmp(name, "time_at_", 8) == 0)
-	    {
-	      time_t	t;		/* Temporary time value */
-
-              t    = (time_t)attr->values[i].integer;
-	      date = localtime(&t);
-
-	      strftime(valptr, sizeof(value) - (size_t)(valptr - value), "%c", date);
-	    }
+	      _cupsStrDate(valptr, sizeof(value) - (size_t)(valptr - value), (time_t)ippGetInteger(attr, i));
 	    else
-	      snprintf(valptr, sizeof(value) - (size_t)(valptr - value),
-		       "%d", attr->values[i].integer);
+	      snprintf(valptr, sizeof(value) - (size_t)(valptr - value), "%d", ippGetInteger(attr, i));
 	    break;
 
 	case IPP_TAG_BOOLEAN :
