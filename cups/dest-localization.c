@@ -130,12 +130,21 @@ cupsLocalizeDestMedia(
       break;
     else if (mdb->size_name && !strcmp(mdb->size_name, size->media))
       break;
-    else if (mdb->width == size->width && mdb->length == size->length && mdb->bottom == size->bottom && mdb->left == size->left && mdb->right == size->right && mdb->top == size->top)
-      break;
+  }
+
+  if (!mdb)
+  {
+    for (mdb = (_cups_media_db_t *)cupsArrayFirst(db); mdb; mdb = (_cups_media_db_t *)cupsArrayNext(db))
+    {
+      if (mdb->width == size->width && mdb->length == size->length && mdb->bottom == size->bottom && mdb->left == size->left && mdb->right == size->right && mdb->top == size->top)
+	break;
+    }
   }
 
   if (mdb)
   {
+    DEBUG_printf(("1cupsLocalizeDestMedia: MATCH mdb%p [key=\"%s\" size_name=\"%s\" source=\"%s\" type=\"%s\" width=%d length=%d B%d L%d R%d T%d]", mdb, mdb->key, mdb->size_name, mdb->source, mdb->type, mdb->width, mdb->length, mdb->bottom, mdb->left, mdb->right, mdb->top));
+
     lsource = cupsLocalizeDestValue(http, dest, dinfo, "media-source", mdb->source);
     ltype   = cupsLocalizeDestValue(http, dest, dinfo, "media-type", mdb->type);
   }
