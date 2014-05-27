@@ -62,7 +62,7 @@ BuildRequires: avahi-devel
 %endif
 
 %if %{?_with_libusb1:1}%{!?_with_libusb1:0}
-BuildRequires: libusbx-devel
+BuildRequires: libusb-devel >= 1.0
 %endif
 
 # Use buildroot so as not to disturb the version already installed
