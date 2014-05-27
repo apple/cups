@@ -28,6 +28,8 @@ CHANGES IN CUPS V1.7.3
 	  (STR #4371)
 	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
 	- The RPM spec file now looks for libusb-devel 1.0 or later.
+	- Fixed the "create-printer-subscription.test" file for IPPTOOL
+	  (STR #4420)
 
 
 CHANGES IN CUPS V1.7.2
