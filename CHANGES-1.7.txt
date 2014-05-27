@@ -27,6 +27,7 @@ CHANGES IN CUPS V1.7.3
 	- IPP queues using hardcoded credentials would ask for credentials
 	  (STR #4371)
 	- Dates in non-UTF-8 locales did not display correctly (STR #4388)
+	- The RPM spec file now looks for libusb-devel 1.0 or later.
 
 
 CHANGES IN CUPS V1.7.2
