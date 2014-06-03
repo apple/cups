@@ -18,20 +18,20 @@ cancel \- cancel jobs
 .SH SYNOPSIS
 .B cancel
 [
-.I \-E
+.B \-E
 ] [
-.I \-U
+.B \-U
 .I username
 ] [
-.I \-a
+.B \-a
 ] [
-.I \-h
+.B \-h
 .I hostname[:port]
 ] [
-.I \-u
+.B \-u
 .I username
 ] [
-.I \-x
+.B \-x
 ] [
 .I id
 ] [
@@ -40,7 +40,8 @@ cancel \- cancel jobs
 .I destination\-id
 ]
 .SH DESCRIPTION
-The \fBcancel\fR command cancels print jobs. If no \fIdestination\fR or \fIid\fR is specified, the currently printing job on the default destination is canceled.
+The \fBcancel\fR command cancels print jobs.
+If no \fIdestination\fR or \fIid\fR is specified, the currently printing job on the default destination is canceled.
 .SH OPTIONS
 The following options are recognized by \fBcancel\fR:
 .TP 5
