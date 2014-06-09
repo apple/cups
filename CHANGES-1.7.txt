@@ -1,6 +1,13 @@
 CHANGES-1.7.txt
 ---------------
 
+CHANGES IN CUPS V1.7.4
+
+	- CUPS did not compile when Avahi or mDNSResponder was not present
+	  (STR #4402, STR #4424)
+	- The "snmp" option did not work with the network backends (STR #4422)
+
+
 CHANGES IN CUPS V1.7.3
 
 	- Added Brazilian Portuguese translation (STR #4409)
@@ -19,8 +26,6 @@ CHANGES IN CUPS V1.7.3
 	  (STR #4397)
 	- The configure script incorrectly added libgcrypt as a GNU TLS
 	  dependency (STR #4399)
-	- CUPS did not compile when Avahi or mDNSResponder was not present
-	  (STR #4402)
 	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
 	  (STR #4414)
 	- Auto-typing of PWG Raster files did not work (STR #4417)
