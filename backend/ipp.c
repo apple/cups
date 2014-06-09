@@ -528,8 +528,8 @@ main(int  argc,				/* I - Number of command-line args */
          */
 
          snmp_enabled = !value[0] || !_cups_strcasecmp(value, "on") ||
-                        _cups_strcasecmp(value, "yes") ||
-                        _cups_strcasecmp(value, "true");
+                        !_cups_strcasecmp(value, "yes") ||
+                        !_cups_strcasecmp(value, "true");
       }
       else if (!_cups_strcasecmp(name, "version"))
       {
