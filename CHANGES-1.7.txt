@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.7.4
 	- CUPS did not compile when Avahi or mDNSResponder was not present
 	  (STR #4402, STR #4424)
 	- The "snmp" option did not work with the network backends (STR #4422)
+	- The User directive in client.conf did not override the USER
+	  environment variable (STR #4426)
 
 
 CHANGES IN CUPS V1.7.3

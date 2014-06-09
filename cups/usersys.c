@@ -850,28 +850,8 @@ _cupsSetDefaults(void)
 #endif /* HAVE_GSSAPI */
   cups_anyroot	      = getenv("CUPS_ANYROOT");
   cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
+  cups_user           = getenv("CUPS_USER");
   cups_validatecerts  = getenv("CUPS_VALIDATECERTS");
-
-  if ((cups_user = getenv("CUPS_USER")) == NULL)
-  {
-   /*
-    * Try the USER environment variable...
-    */
-
-    if ((cups_user = getenv("USER")) != NULL)
-    {
-     /*
-      * Validate USER matches the current UID, otherwise don't allow it to
-      * override things...  This makes sure that printing after doing su or
-      * sudo records the correct username.
-      */
-
-      struct passwd	*pw;		/* Account information */
-
-      if ((pw = getpwnam(cups_user)) == NULL || pw->pw_uid != getuid())
-        cups_user = NULL;
-    }
-  }
 
  /*
   * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
@@ -1085,20 +1065,30 @@ cups_read_client_conf(
       if (!GetUserName(cg->user, &size))
 #else
      /*
-      * Get the user name corresponding to the current UID...
+      * Try the USER environment variable as the default username...
       */
 
-      struct passwd	*pwd;		/* User/password entry */
+      const char *envuser = getenv("USER");
+					/* Default username */
+      struct passwd	*pw = NULL;	/* Account information */
 
-      setpwent();
-      if ((pwd = getpwuid(getuid())) != NULL)
+      if (envuser)
       {
        /*
-	* Found a match!
+	* Validate USER matches the current UID, otherwise don't allow it to
+	* override things...  This makes sure that printing after doing su or
+	* sudo records the correct username.
 	*/
 
-	strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
+	if ((pw = getpwnam(envuser)) != NULL && pw->pw_uid != getuid())
+	  pw = NULL;
       }
+
+      if (!pw)
+        pw = getpwuid(getuid());
+
+      if (pw)
+	strlcpy(cg->user, pw->pw_name, sizeof(cg->user));
       else
 #endif /* WIN32 */
       {
