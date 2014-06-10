@@ -97,6 +97,7 @@ cd ..
 echo Configuring...
 autoconf -f
 rm -rf autom4te*.cache
+rm -rf everywhere
 rm -rf tools
 cd ..
 
