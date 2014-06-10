@@ -59,8 +59,8 @@ if test x$enable_ssl != xno; then
 
     dnl Then look for GNU TLS...
     if test $have_ssl = 0 -a "x$enable_gnutls" != "xno" -a "x$PKGCONFIG" != x; then
-    	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
-    	AC_PATH_PROG(LIBGCRYPTCONFIG,libgcrypt-config)
+    	AC_PATH_TOOL(LIBGNUTLSCONFIG,libgnutls-config)
+    	AC_PATH_TOOL(LIBGCRYPTCONFIG,libgcrypt-config)
 	if $PKGCONFIG --exists gnutls; then
 	    have_ssl=1
 	    SSLLIBS=`$PKGCONFIG --libs gnutls`

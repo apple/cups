@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-05-21
+CHANGES.txt - 2.0b1 - 2014-06-10
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Dropped lppasswd and support for Digest authentication in in the
 	  scheduler (STR #4321)
+	- The configure script now supports target-specific tools for pkg-config
+	  and others (STR #4423)
 	- The ipptool program now supports EXPECT statements for collection
 	  member attributes (<rdar://problem/15355218>)
 	- The ipptool program now supports collection attributes with multiple

@@ -22,7 +22,7 @@ LIBGSSAPI=""
 AC_SUBST(LIBGSSAPI)
 
 if test x$enable_gssapi != xno; then
-	AC_PATH_PROG(KRB5CONFIG, krb5-config)
+	AC_PATH_TOOL(KRB5CONFIG, krb5-config)
 	if test "x$KRB5CONFIG" != x; then
 		case "$uname" in
 			Darwin)

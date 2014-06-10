@@ -89,7 +89,7 @@ fi
 AC_SUBST(INSTALLSTATIC)
 
 dnl Check for pkg-config, which is used for some other tests later on...
-AC_PATH_PROG(PKGCONFIG, pkg-config)
+AC_PATH_TOOL(PKGCONFIG, pkg-config)
 
 dnl Check for libraries...
 AC_SEARCH_LIBS(abs, m, AC_DEFINE(HAVE_ABS))
