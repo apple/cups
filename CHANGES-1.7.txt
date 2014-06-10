@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.7.4
 	- The "snmp" option did not work with the network backends (STR #4422)
 	- The User directive in client.conf did not override the USER
 	  environment variable (STR #4426)
+	- The web interface now properly shows a "Go" button for all text-based
+	  browsers (STR #4425)
 
 
 CHANGES IN CUPS V1.7.3
