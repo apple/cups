@@ -1,26 +1,26 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   ippfind man page for CUPS.
+.\" ippfind man page for CUPS.
 .\"
-.\"   Copyright 2013 by Apple Inc.
+.\" Copyright 2013-2014 by Apple Inc.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ippfind 1 "CUPS" "6 June 2013" "Apple Inc."
+.TH ippfind 1 "CUPS" "11 June 2014" "Apple Inc."
 .SH NAME
-ippfind - find internet printing protocol printers
+ippfind \- find internet printing protocol printers
 .SH SYNOPSIS
 .B ippfind
 [
 .I options
-] regtype[,subtype][.domain.] ... [
-.I expression ...
-]
+] \fIregtype\fR[\fB,\fIsubtype\fR][\fB.\fIdomain\fB.\fR] ... [
+.I expression
+... ]
 .B ippfind
 [
 .I options

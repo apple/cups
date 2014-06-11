@@ -11,27 +11,45 @@
 cupsfilter - convert a file to another format using cups filters
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>cupsfilter</b>
-[ --list-filters] [ -D ] [ -U
+[
+<b>--list-filters</b>
+] [
+<b>-D</b>
+] [
+<b>-U</b>
 <i>user</i>
-] [ -c
+] [
+<b>-c</b>
 <i>config-file</i>
-] [ -d
+] [
+<b>-d</b>
 <i>printer</i>
-] [ -e ] [ -i
+] [
+<b>-e</b>
+] [
+<b>-i</b>
 <i>mime/type</i>
-] [ -j
+] [
+<b>-j</b>
 <i>job-id[,N]</i>
-] [ -m
+] [
+<b>-m</b>
 <i>mime/type</i>
-] [ -n
+] [
+<b>-n</b>
 <i>copies</i>
-] [ -o
+] [
+<b>-o</b>
 <i>name=value</i>
-] [ -p
+] [
+<b>-p</b>
 <i>filename.ppd</i>
-] [ -t
+] [
+<b>-t</b>
 <i>title</i>
-] [ -u ]
+] [
+<b>-u</b>
+]
 <i>filename</i>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <b>cupsfilter</b>
@@ -40,33 +58,33 @@ is a front-end to the CUPS filter subsystem which allows you to convert a file t
 generates a PDF file. The converted file is sent to the standard output.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <dl class="man">
-<dt>--list-filters
+<dt><b>--list-filters</b>
 <dd style="margin-left: 5.0em">Do not actually run the filters, just print the filters used to stdout.
-<dt>-D
+<dt><b>-D</b>
 <dd style="margin-left: 5.0em">Delete the input file after conversion.
-<dt>-U user
+<dt><b>-U </b><i>user</i>
 <dd style="margin-left: 5.0em">Specifies the username passed to the filters. The default is the name of the current user.
-<dt>-c config-file
+<dt><b>-c </b><i>config-file</i>
 <dd style="margin-left: 5.0em">Uses the named cups-files.conf configuration file.
-<dt>-d printer
+<dt><b>-d </b><i>printer</i>
 <dd style="margin-left: 5.0em">Uses information from the named printer.
-<dt>-e
+<dt><b>-e</b>
 <dd style="margin-left: 5.0em">Use every filter from the PPD file.
-<dt>-i mime/type
+<dt><b>-i </b><i>mime/type</i>
 <dd style="margin-left: 5.0em">Specifies the source file type. The default file type is guessed using the filename and contents of the file.
-<dt>-j job-id[,N]
+<dt><b>-j </b><i>job-id[,N]</i>
 <dd style="margin-left: 5.0em">Converts document N from the specified job. If N is omitted, document 1 is converted.
-<dt>-m mime/type
+<dt><b>-m </b><i>mime/type</i>
 <dd style="margin-left: 5.0em">Specifies the destination file type. The default file type is application/pdf. Use printer/foo to convert to the printer format defined by the filters in the PPD file.
-<dt>-n copies
+<dt><b>-n </b><i>copies</i>
 <dd style="margin-left: 5.0em">Specifies the number of copies to generate.
-<dt>-o name=value
+<dt><b>-o </b><i>name=value</i>
 <dd style="margin-left: 5.0em">Specifies options to pass to the CUPS filters.
-<dt>-p filename.ppd
+<dt><b>-p </b><i>filename.ppd</i>
 <dd style="margin-left: 5.0em">Specifies the PPD file to use.
-<dt>-t title
+<dt><b>-t </b><i>title</i>
 <dd style="margin-left: 5.0em">Specifies the document title.
-<dt>-u
+<dt><b>-u</b>
 <dd style="margin-left: 5.0em">Delete the PPD file after conversion.
 </dl>
 <h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
@@ -78,7 +96,12 @@ All of the standard
 environment variables affect the operation of
 <b>cupsfilter</b>.
 <h2 class="title"><a name="FILES">Files</a></h2>
-/etc/cups/cups-files.conf, /etc/cups/*.convs, /etc/cups/*.types, /usr/share/cups/mime/*.convs, /usr/share/cups/mime/*.types
+<pre class="man">
+/etc/cups/cups-files.conf
+/etc/cups/*.convs
+/etc/cups/*.types
+/usr/share/cups/mime/*.convs
+/usr/share/cups/mime/*.types
 <h2 class="title"><a name="NOTES">Notes</a></h2>
 Unlike when printing, filters run using the
 <b>cupsfilter</b>
@@ -86,11 +109,16 @@ command use the current user and security session. This may result in different 
 <h2 class="title"><a name="EXAMPLE">Example</a></h2>
 The following command will generate a PDF preview of job 42 for a printer named "myprinter" and save it to a file named "preview.pdf":
 <pre class="man">
+
     cupsfilter -m application/pdf -d myprinter -j 42 >preview.pdf
 </pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a><a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a><b>filter(7),</b>mime.convs<b>(7),</b>mime.types<b>(7),</b>
-<a href="http://localhost:631/help">http://localhost:631/help</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<b>filter(7),</b>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(7),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(7),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
 Copyright &copy; 2007-2014 by Apple Inc.
 

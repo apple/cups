@@ -727,8 +727,27 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 
 	      format = nameend;
 
-	      if ((attr = ippFindAttribute(job->attrs, name,
-	                                   IPP_TAG_ZERO)) != NULL)
+	      attr = ippFindAttribute(job->attrs, name, IPP_TAG_ZERO);
+	      if (!attr && !strcmp(name, "job-billing"))
+	      {
+	       /*
+	        * Handle alias "job-account-id" (which was standardized after
+		* "job-billing" was defined for CUPS...
+		*/
+
+	        attr = ippFindAttribute(job->attrs, "job-account-id", IPP_TAG_ZERO);
+	      }
+	      else if (!attr && !strcmp(name, "media"))
+	      {
+	       /*
+	        * Handle alias "media-col" which uses dimensions instead of
+		* names...
+		*/
+
+		attr = ippFindAttribute(job->attrs, "media-col/media-size", IPP_TAG_BEGIN_COLLECTION);
+	      }
+
+	      if (attr)
 	      {
 	       /*
 	        * Add the attribute value...
@@ -768,6 +787,22 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 		        strlcpy(bufptr, attr->values[i].string.text, sizeof(buffer) - (size_t)(bufptr - buffer));
 			bufptr += strlen(bufptr);
 		        break;
+
+                    case IPP_TAG_BEGIN_COLLECTION :
+		        if (!strcmp(attr->name, "media-size"))
+			{
+			  ipp_attribute_t *x_dimension = ippFindAttribute(ippGetCollection(attr, 0), "x-dimension", IPP_TAG_INTEGER);
+			  ipp_attribute_t *y_dimension = ippFindAttribute(ippGetCollection(attr, 0), "y-dimension", IPP_TAG_INTEGER);
+					/* Media dimensions */
+
+			  if (x_dimension && y_dimension)
+			  {
+			    pwg_media_t *pwg = pwgMediaForSize(ippGetInteger(x_dimension, 0), ippGetInteger(y_dimension, 0));
+			    		/* PWG media name */
+			    strlcpy(bufptr, pwg->pwg, sizeof(buffer) - (size_t)(bufptr - buffer));
+			    break;
+			  }
+			}
 
 		    default :
 			strlcpy(bufptr, "???", sizeof(buffer) - (size_t)(bufptr - buffer));
