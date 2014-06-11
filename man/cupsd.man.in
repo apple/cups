@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd 8 "CUPS" "3 April 2014" "Apple Inc."
+.TH cupsd 8 "CUPS" "10 June 2014" "Apple Inc."
 .SH NAME
 cupsd \- cups scheduler
 .SH SYNOPSIS
@@ -75,6 +75,7 @@ Test the configuration file for syntax errors.
 .I /usr/share/cups/mime/mime.convs
 .I /usr/share/cups/mime/mime.types
 .I /etc/cups/printers.conf
+.I /etc/cups/subscriptions.conf
 .fi
 .SH CONFORMING TO
 .B cupsd

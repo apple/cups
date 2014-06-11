@@ -14,49 +14,56 @@ The <b>cups-files.conf</b> file configures the files and directories used by the
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
 It is normally located in the <i>/etc/cups</i> directory.
 <p>Each line in the file can be a configuration directive, a blank line, or a comment.
+Configuration directives typically consist of a name and zero or more values separated by whitespace.
+The configuration directive name and values are case-insensitive.
 Comment lines start with the # character.
 <h3><a name="DIRECTIVES">Directives</a></h3>
 The following directives are understood by
 <a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
 <dl class="man">
-<dt><b>AccessLog </b><i>filename</i>
-<dd style="margin-left: 5.0em"><dt><b>AccessLog </b>[ <i>filename</i> ]
+<dt><b>AccessLog</b>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog </b><i>filename</i>
 <dd style="margin-left: 5.0em"><dt><b>AccessLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the access log filename.
-The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables access log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 <pre class="man">
 
     AccessLog /var/log/cups/%s-access_log
 
 </pre>
+The default is "/var/log/cups/access_log".
 <dt><b>ConfigFilePerm </b><i>mode</i>
 <dd style="margin-left: 5.0em">Specifies the permissions for all configuration files that the scheduler writes.
-The default is 0644 on OS X and 0640 on all other operating systems.
-<b>Note:</b> The permissions for the printers.conf file are currently masked to only allow access from the scheduler user (typically root).
+The default is "0644" on OS X and "0640" on all other operating systems.
+<b>Note:</b> The permissions for the <i>printers.conf</i> file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
 <dt><b>DataDir </b><i>path</i>
-<dd style="margin-left: 5.0em">Specifies the directory where data files can be found. The default is usually <i>/usr/share/cups</i>.
+<dd style="margin-left: 5.0em">Specifies the directory where data files can be found.
+The default is usually "/usr/share/cups".
 <dt><b>DocumentRoot </b><i>directory</i>
-<dd style="margin-left: 5.0em">Specifies the root directory for the CUPS web interface content. The default is usually <i>/usr/share/doc/cups</i>.
-<dt><b>ErrorLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em">Specifies the root directory for the CUPS web interface content.
+The default is usually "/usr/share/doc/cups".
+<dt><b>ErrorLog</b>
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog </b><i>filename</i>
 <dd style="margin-left: 5.0em"><dt><b>ErrorLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the error log filename.
-The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables error log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 <pre class="man">
 
     ErrorLog /var/log/cups/%s-error_log
 
 </pre>
+The default is "/var/log/cups/error_log".
 <dt><b>FatalErrors none</b>
-<dd style="margin-left: 5.0em"><dt><b>FatalErrors all </b><i>-kind </i>[ <i>... -kind </i>]
-<dd style="margin-left: 5.0em"><dt><b>FatalErrors </b><i>kind </i>[ <i>... kind </i>]
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors all </b><i>-kind </i>[ ... <i>-kind </i>]
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors </b><i>kind </i>[ ... <i>kind </i>]
 <dd style="margin-left: 5.0em">Specifies which errors are fatal, causing the scheduler to exit.
-The default setting is "config".
+The default is "config".
 The <i>kind</i> strings are:
 <div style="margin-left: 0.0em;">
 <dl class="man">
@@ -79,14 +86,12 @@ The <i>kind</i> strings are:
 <dd style="margin-left: 5.0em"><dt><b>FileDevice No</b>
 <dd style="margin-left: 5.0em">Specifies whether the file pseudo-device can be used for new printer queues.
 The URI "file:///dev/null" is always allowed.
-<dt><b>FontPath </b><i>directory</i>[:<i>...</i>:<i>directory</i>]
-<dd style="margin-left: 5.0em">Specifies the search path for fonts.
-<b>This directive is deprecated and will no longer be supported in a future release of CUPS.</b>
 <dt><b>Group </b><i>group-name-or-number</i>
 <dd style="margin-left: 5.0em">Specifies the group name or ID that will be used when executing external programs.
-The default group is operating system specific but is usually <i>lp</i> or <i>nobody</i>.
+The default group is operating system specific but is usually "lp" or "nobody".
 <dt><b>LogFilePerm </b><i>mode</i>
-<dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes. The default is 0644.
+<dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes.
+The default is "0644".
 <dt><b>PageLog </b>[ <i>filename</i> ]
 <dd style="margin-left: 5.0em"><dt><b>PageLog syslog</b>
 <dd style="margin-left: 5.0em">Defines the page log filename.
@@ -98,37 +103,43 @@ The server name may be included in filenames using the string "%s", for example:
     PageLog /var/log/cups/%s-page_log
 
 </pre>
-<dt><b>Printcap </b>[ <i>filename</i> ]
-<dd style="margin-left: 5.0em">Defines the printcap filename that the scheduler automatically updates with the current list of available printers, which is sometimes used by legacy applications.
-Specifying a blank filename disables printcap generation.
-<b>This directive is deprecated and will no longer be supported in a future release of CUPS.</b>
+The default is "/var/log/cups/page_log".
 <dt><b>RemoteRoot </b><i>username</i>
 <dd style="margin-left: 5.0em">Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
+The default is "remroot".
 <dt><b>RequestRoot </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory that contains print jobs and other HTTP request data.
+The default is "/var/spool/cups".
 <dt><b>Sandboxing off</b>
 <dd style="margin-left: 5.0em"><dt><b>Sandboxing relaxed</b>
 <dd style="margin-left: 5.0em"><dt><b>Sandboxing strict</b>
 <dd style="margin-left: 5.0em">Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
 The default is "strict".
-This directive is currently only used on OS X.
+This directive is currently only used/supported on OS X.
 <dt><b>ServerBin </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
+The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
 <dt><b>ServerKeychain </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies the location of TLS certificates and private keys.
+The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
 <dt><b>ServerRoot </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory containing the server configuration files.
+The default is "/etc/cups".
 <dt><b>SyncOnClose Yes</b>
 <dd style="margin-left: 5.0em"><dt><b>SyncOnClose No</b>
 <dd style="margin-left: 5.0em">Specifies whether the scheduler calls
 <b>fsync</b>(2)
-after writing configuration or state files. The default is No.
-<dt><b>SystemGroup </b><i>group-name </i>[ <i>... group-name</i> ]
+after writing configuration or state files.
+The default is "No".
+<dt><b>SystemGroup </b><i>group-name </i>[ ... <i>group-name</i> ]
 <dd style="margin-left: 5.0em">Specifies the group(s) to use for <i>@SYSTEM</i> group authentication.
+The default contains "admin", "lpadmin", "root", "sys", and/or "system".
 <dt><b>TempDir </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory where temporary files are stored.
+The default is "/var/spool/cups/tmp".
 <dt><b>User </b><i>username</i>
 <dd style="margin-left: 5.0em">Specifies the user name or ID that is used when running external programs.
+The default is "lp".
 </dl>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
 <a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>

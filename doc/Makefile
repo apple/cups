@@ -76,6 +76,7 @@ HELPFILES	=	\
 			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsd-helper.html \
+			help/man-cupsd-logs.html \
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
@@ -109,12 +110,7 @@ HELPFILES	=	\
 			help/postscript-driver.html \
 			help/ppd-compiler.html \
 			help/raster-driver.html \
-			help/ref-access_log.html \
-			help/ref-error_log.html \
-			help/ref-mailto-conf.html \
-			help/ref-page_log.html \
 			help/ref-ppdcfile.html \
-			help/ref-snmp-conf.html \
 			help/security.html \
 			help/sharing.html \
 			help/spec-banner.html \

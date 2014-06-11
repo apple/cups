@@ -61,6 +61,7 @@ MAN8	=	cupsaccept.$(MAN8EXT) \
 		cups-snmp.$(MAN8EXT) \
 		cupsd.$(MAN8EXT) \
 		cupsd-helper.$(MAN8EXT) \
+		cupsd-logs.$(MAN8EXT) \
 		cupsenable.$(MAN8EXT) \
 		lpadmin.$(MAN8EXT) \
 		lpinfo.$(MAN8EXT) \

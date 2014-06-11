@@ -1299,6 +1299,7 @@ cupsdReadConfiguration(void)
       cupsdAddString(&(p->job_attrs), "job-name");
       cupsdAddString(&(p->job_attrs), "job-originating-host-name");
       cupsdAddString(&(p->job_attrs), "job-originating-user-name");
+      cupsdAddString(&(p->job_attrs), "phone");
 
       cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateAccess default");
       cupsdAddString(&(p->sub_access), "@OWNER");

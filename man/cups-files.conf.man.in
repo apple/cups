@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-files.conf 5 "CUPS" "15 April 2014" "Apple Inc."
+.TH cups-files.conf 5 "CUPS" "11 June 2014" "Apple Inc."
 .SH NAME
 cups\-files.conf \- file and directory configuration file for cups
 .SH DESCRIPTION
@@ -21,59 +21,68 @@ The \fBcups\-files.conf\fR file configures the files and directories used by the
 It is normally located in the \fI/etc/cups\fR directory.
 .LP
 Each line in the file can be a configuration directive, a blank line, or a comment.
+Configuration directives typically consist of a name and zero or more values separated by whitespace.
+The configuration directive name and values are case-insensitive.
 Comment lines start with the # character.
 .SS DIRECTIVES
 The following directives are understood by
 .BR cupsd (8):
 .TP 5
-\fBAccessLog \fIfilename\fR
+\fBAccessLog\fR
 .TP 5
-\fBAccessLog \fR[ \fIfilename\fR ]
+\fBAccessLog \fIfilename\fR
 .TP 5
 \fBAccessLog syslog\fR
 Defines the access log filename.
-The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables access log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 .nf
 
     AccessLog /var/log/cups/%s-access_log
 
 .fi
+The default is "/var/log/cups/access_log".
 .TP 5
 \fBConfigFilePerm \fImode\fR
 Specifies the permissions for all configuration files that the scheduler writes.
-The default is 0644 on OS X and 0640 on all other operating systems.
-\fBNote:\fR The permissions for the printers.conf file are currently masked to only allow access from the scheduler user (typically root).
+The default is "0644" on OS X and "0640" on all other operating systems.
+.IP
+\fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
 .TP 5
 \fBDataDir \fIpath\fR
-Specifies the directory where data files can be found. The default is usually \fI/usr/share/cups\fR.
+Specifies the directory where data files can be found.
+The default is usually "/usr/share/cups".
 .TP 5
 \fBDocumentRoot \fIdirectory\fR
-Specifies the root directory for the CUPS web interface content. The default is usually \fI/usr/share/doc/cups\fR.
+Specifies the root directory for the CUPS web interface content.
+The default is usually "/usr/share/doc/cups".
 .TP 5
-\fBErrorLog \fR[ \fIfilename\fR ]
+\fBErrorLog\fR
+.TP 5
+\fBErrorLog \fIfilename\fR
 .TP 5
 \fBErrorLog syslog\fR
 Defines the error log filename.
-The value "syslog" causes log entries to be sent to the system log daemon.
 Specifying a blank filename disables error log generation.
+The value "syslog" causes log entries to be sent to the system log daemon.
 The server name may be included in filenames using the string "%s", for example:
 .nf
 
     ErrorLog /var/log/cups/%s-error_log
 
 .fi
+The default is "/var/log/cups/error_log".
 .TP 5
 \fBFatalErrors none\fR
 .TP 5
-\fBFatalErrors all \fI\-kind \fR[ \fI... \-kind \fR]
+\fBFatalErrors all \fI\-kind \fR[ ... \fI\-kind \fR]
 .TP 5
-\fBFatalErrors \fIkind \fR[ \fI... kind \fR]
+\fBFatalErrors \fIkind \fR[ ... \fIkind \fR]
 Specifies which errors are fatal, causing the scheduler to exit.
-The default setting is "config".
+The default is "config".
 The \fIkind\fR strings are:
 .RS 5
 .TP 5
@@ -105,16 +114,13 @@ Bad startup file permissions are fatal, for example shared TLS certificate and k
 Specifies whether the file pseudo-device can be used for new printer queues.
 The URI "file:///dev/null" is always allowed.
 .TP 5
-\fBFontPath \fIdirectory\fR[:\fI...\fR:\fIdirectory\fR]
-Specifies the search path for fonts.
-\fBThis directive is deprecated and will no longer be supported in a future release of CUPS.\fR
-.TP 5
 \fBGroup \fIgroup-name-or-number\fR
 Specifies the group name or ID that will be used when executing external programs.
-The default group is operating system specific but is usually \fIlp\fR or \fInobody\fR.
+The default group is operating system specific but is usually "lp" or "nobody".
 .TP 5
 \fBLogFilePerm \fImode\fR
-Specifies the permissions of all log files that the scheduler writes. The default is 0644.
+Specifies the permissions of all log files that the scheduler writes.
+The default is "0644".
 .TP 5
 \fBPageLog \fR[ \fIfilename\fR ]
 .TP 5
@@ -128,17 +134,15 @@ The server name may be included in filenames using the string "%s", for example:
     PageLog /var/log/cups/%s-page_log
 
 .fi
-.TP 5
-\fBPrintcap \fR[ \fIfilename\fR ]
-Defines the printcap filename that the scheduler automatically updates with the current list of available printers, which is sometimes used by legacy applications.
-Specifying a blank filename disables printcap generation.
-\fBThis directive is deprecated and will no longer be supported in a future release of CUPS.\fR
+The default is "/var/log/cups/page_log".
 .TP 5
 \fBRemoteRoot \fIusername\fR
 Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
+The default is "remroot".
 .TP 5
 \fBRequestRoot \fIdirectory\fR
 Specifies the directory that contains print jobs and other HTTP request data.
+The default is "/var/spool/cups".
 .TP 5
 \fBSandboxing off\fR
 .TP 5
@@ -147,32 +151,39 @@ Specifies the directory that contains print jobs and other HTTP request data.
 \fBSandboxing strict\fR
 Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
 The default is "strict".
-This directive is currently only used on OS X.
+This directive is currently only used/supported on OS X.
 .TP 5
 \fBServerBin \fIdirectory\fR
 Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
+The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
 .TP 5
 \fBServerKeychain \fIpath\fR
 Specifies the location of TLS certificates and private keys.
+The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
 .TP 5
 \fBServerRoot \fIdirectory\fR
 Specifies the directory containing the server configuration files.
+The default is "/etc/cups".
 .TP 5
 \fBSyncOnClose Yes\fR
 .TP 5
 \fBSyncOnClose No\fR
 Specifies whether the scheduler calls
 .BR fsync (2)
-after writing configuration or state files. The default is No.
+after writing configuration or state files.
+The default is "No".
 .TP 5
-\fBSystemGroup \fIgroup-name \fR[ \fI... group-name\fR ]
+\fBSystemGroup \fIgroup-name \fR[ ... \fIgroup-name\fR ]
 Specifies the group(s) to use for \fI@SYSTEM\fR group authentication.
+The default contains "admin", "lpadmin", "root", "sys", and/or "system".
 .TP 5
 \fBTempDir \fIdirectory\fR
 Specifies the directory where temporary files are stored.
+The default is "/var/spool/cups/tmp".
 .TP 5
 \fBUser \fIusername\fR
 Specifies the user name or ID that is used when running external programs.
+The default is "lp".
 .SH SEE ALSO
 .BR classes.conf (5),
 .BR cups (1),
