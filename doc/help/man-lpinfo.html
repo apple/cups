@@ -11,90 +11,113 @@
 lpinfo - show available devices or drivers
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>lpinfo</b>
-[ -E ] [ -U
+[
+<b>-E</b>
+] [
+<b>-U</b>
 <i>username</i>
-] [ -h
-<i>server[:port]</i>
-] [ -l ] [ --device-id
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-l</b>
+] [
+<b>--device-id</b>
 <i>device-id-string</i>
-] [ --exclude-schemes
+] [
+<b>--exclude-schemes</b>
 <i>scheme-list</i>
-] [ --include-schemes
+] [
+<b>--include-schemes</b>
 <i>scheme-list</i>
-] [ --language
+] [
+<b>--language</b>
 <i>locale</i>
-] [ --make-and-model
+] [
+<b>--make-and-model</b>
 <i>name</i>
-] [ --product
+] [
+<b>--product</b>
 <i>name</i>
-] -m
+]
+<b>-m</b>
 <br>
 <b>lpinfo</b>
-[ -E ] [ -U
+[
+<b>-E</b>
+] [
+<b>-U</b>
 <i>username</i>
-] [ -h
-<i>server[:port]</i>
-] [ -l ] [ --exclude-schemes
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-l</b>
+] [
+<b>--exclude-schemes</b>
 <i>scheme-list</i>
-] [ --include-schemes
+] [
+<b>--include-schemes</b>
 <i>scheme-list</i>
-] [ --timeout
+] [
+<b>--timeout</b>
 <i>seconds</i>
-] -v
+]
+<b>-v</b>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>lpinfo</i> lists the available devices or drivers known to the
-CUPS server. The first form (<i>-m</i>) lists the available
-drivers, while the second form (<i>-v</i>) lists the available
-devices.
+<b>lpinfo</b> lists the available devices or drivers known to the CUPS server.
+The first form (<i>-m</i>) lists the available drivers, while the second form (<i>-v</i>) lists the available devices.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
-<i>lpinfo</i> accepts the following options:
+<b>lpinfo</b> accepts the following options:
 <dl class="man">
-<dt>-E
-<dd style="margin-left: 5.0em"><br>
-Forces encryption when connecting to the server.
-<dt>-U username
-<dd style="margin-left: 5.0em"><br>
-Sets the username to use when connecting to the server.
-<dt>-h server[:port]
-<dd style="margin-left: 5.0em"><br>
-Selects an alternate server.
-<dt>-l
-<dd style="margin-left: 5.0em"><br>
-Shows a "long" listing of devices or drivers.
-<dt>--device-id device-id-string
-<dd style="margin-left: 5.0em"><br>
-Specifies the IEEE-1284 device ID to match when listing drivers with the
-<i>-m</i> option.
-<dt>--exclude-schemes scheme-list
-<dd style="margin-left: 5.0em"><br>
-Specifies a comma-separated list of device or PPD schemes that should be
-excluded from the results. Static PPD files use the "file" scheme.
-<dt>--include-schemes scheme-list
-<dd style="margin-left: 5.0em"><br>
-Specifies a comma-separated list of device or PPD schemes that should be
-included in the results. Static PPD files use the "file" scheme.
-<dt>--language locale
-<dd style="margin-left: 5.0em"><br>
-Specifies the language to match when listing drivers with the <i>-m</i> option.
-<dt>--make-and-model name
-<dd style="margin-left: 5.0em"><br>
-Specifies the make and model to match when listing drivers with the <i>-m</i>
-option.
-<dt>--product name
-<dd style="margin-left: 5.0em"><br>
-Specifies the product to match when listing drivers with the <i>-m</i> option.
-<dt>--timeout seconds
-<dd style="margin-left: 5.0em"><br>
-Specifies the timeout when listing devices with the <i>-v</i> option.
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Sets the username to use when connecting to the server.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Selects an alternate server.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em">Shows a "long" listing of devices or drivers.
+<dt><b>--device-id </b><i>device-id-string</i>
+<dd style="margin-left: 5.0em">Specifies the IEEE-1284 device ID to match when listing drivers with the <i>-m</i> option.
+<dt><b>--exclude-schemes </b><i>scheme-list</i>
+<dd style="margin-left: 5.0em">Specifies a comma-delimited list of device or PPD schemes that should be excluded from the results.
+Static PPD files use the "file" scheme.
+<dt><b>--include-schemes </b><i>scheme-list</i>
+<dd style="margin-left: 5.0em">Specifies a comma-delimited list of device or PPD schemes that should be included in the results.
+Static PPD files use the "file" scheme.
+<dt><b>--language </b><i>locale</i>
+<dd style="margin-left: 5.0em">Specifies the language to match when listing drivers with the <i>-m</i> option.
+<dt><b>--make-and-model </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the make and model to match when listing drivers with the <i>-m</i> option.
+<dt><b>--product </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the product to match when listing drivers with the <i>-m</i> option.
+<dt><b>--timeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the timeout when listing devices with the <i>-v</i> option.
 </dl>
-<h2 class="title"><a name="COMPATIBILITY">Compatibility</a></h2>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
 The <i>lpinfo</i> command is unique to CUPS.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+List all devices:
+<pre class="man">
+
+    lpinfo -v
+
+</pre>
+List all drivers:
+<pre class="man">
+
+    lpinfo -m
+
+</pre>
+List drivers matching "HP LaserJet":
+<pre class="man">
+
+    lpinfo --make-and-model "HP LaserJet" -m
+</pre>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>lpadmin(8)</i>,
-<br>
-<a href="http://localhost:631/help">http://localhost:631/help</a>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>
