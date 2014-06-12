@@ -1,46 +1,60 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   ppdc man page for CUPS.
+.\" ppdc man page for CUPS.
 .\"
-.\"   Copyright 2007-2013 by Apple Inc.
-.\"   Copyright 1997-2007 by Easy Software Products.
+.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 1997-2007 by Easy Software Products.
 .\"
-.\"   These coded instructions, statements, and computer programs are the
-.\"   property of Apple Inc. and are protected by Federal copyright
-.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-.\"   which should have been included with this file.  If this file is
-.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\" These coded instructions, statements, and computer programs are the
+.\" property of Apple Inc. and are protected by Federal copyright
+.\" law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\" which should have been included with this file.  If this file is
+.\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdc 1 "CUPS" "15 February 2012" "Apple Inc."
+.TH ppdc 1 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
 ppdc \- cups ppd compiler
 .SH SYNOPSIS
 .B ppdc
-[ -D
-.I name[=value]
-] [ -I
+[
+\fB\-D \fIname\fR[\fB=\fIvalue\fR]
+] [
+.B \-I
 .I include-directory
-] [ -c
+] [
+.B \-c
 .I message-catalog
-] [ -d
+] [
+.B \-d
 .I output-directory
-] [ -l
+] [
+.B \-l
 .I language(s)
-] [-m] [-t] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
+] [
+.B \-m
+] [
+.B \-t
+] [
+.B \-v
+] [
+.B \-z
+] [
+.B \-\-cr
+] [
+.B \-\-crlf
+] [
+.B \-\-lf
+]
 .I source-file
 .SH DESCRIPTION
-\fIppdc\fR compiles PPDC source files into one or more PPD
-files. \fBThis program is deprecated and will be removed in a future release of
-CUPS.\fR
+\fBppdc\fR compiles PPDC source files into one or more PPD files.
+\fBThis program is deprecated and will be removed in a future release of CUPS.\fR
 .PP
-The \fI-D\fR option sets the named variable for use in the
-source file. It is equivalent to using the #define directive
-in the source file.
+The \fI-D\fR option sets the named variable for use in the source file.
+It is equivalent to using the \fI#define\fR directive in the source file.
 .PP
-The \fI-I\fR option specifies an alternate include directory;
-multiple \fI-I\fR options can be supplied to add additional
-directories.
+The \fI-I\fR option specifies an alternate include directory; multiple \fI-I\fR options can be supplied to add additional directories.
 .PP
 The \fI-c\fR option specifies a single message catalog file in GNU
 gettext source format (filename.po) to be used for localization.

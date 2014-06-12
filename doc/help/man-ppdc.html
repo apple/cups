@@ -11,28 +11,42 @@
 ppdc - cups ppd compiler
 <h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
 <b>ppdc</b>
-[ -D
-<i>name[=value]</i>
-] [ -I
+[
+<b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+] [
+<b>-I</b>
 <i>include-directory</i>
-] [ -c
+] [
+<b>-c</b>
 <i>message-catalog</i>
-] [ -d
+] [
+<b>-d</b>
 <i>output-directory</i>
-] [ -l
+] [
+<b>-l</b>
 <i>language(s)</i>
-] [-m] [-t] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
+] [
+<b>-m</b>
+] [
+<b>-t</b>
+] [
+<b>-v</b>
+] [
+<b>-z</b>
+] [
+<b>--cr</b>
+] [
+<b>--crlf</b>
+] [
+<b>--lf</b>
+]
 <i>source-file</i>
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-<i>ppdc</i> compiles PPDC source files into one or more PPD
-files. <b>This program is deprecated and will be removed in a future release of
-CUPS.</b>
-<p>The <i>-D</i> option sets the named variable for use in the
-source file. It is equivalent to using the #define directive
-in the source file.
-<p>The <i>-I</i> option specifies an alternate include directory;
-multiple <i>-I</i> options can be supplied to add additional
-directories.
+<b>ppdc</b> compiles PPDC source files into one or more PPD files.
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<p>The <i>-D</i> option sets the named variable for use in the source file.
+It is equivalent to using the <i>#define</i> directive in the source file.
+<p>The <i>-I</i> option specifies an alternate include directory; multiple <i>-I</i> options can be supplied to add additional directories.
 <p>The <i>-c</i> option specifies a single message catalog file in GNU
 gettext source format (filename.po) to be used for localization.
 <p>The <i>-d</i> option specifies the output directory for PPD

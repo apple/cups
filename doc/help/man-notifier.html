@@ -16,120 +16,22 @@ notifier - cups notification interface
 <i>user-data</i>
 ]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
-The CUPS notifier interface provides a standard method for adding support for
-new event notification methods to CUPS. Each notifier delivers one or more IPP
-events from the standard input to the specified recipient.
-<p>Notifiers <b>must</b> read IPP messages from the standard input using the
-ippNew and ippReadFile functions and exit on error. Notifiers are encouraged to
-exit after a suitable period of inactivity, however they may exit after reading
-the first message or stay running until an error is seen.
-<h2 class="title"><a name="LOG_MESSAGES">Log Messages</a></h2>
-Messages sent to stderr are generally logged to the current <i>ErrorLog</i>.
-Each line begins with a standard prefix:
-
-<dl class="man">
-<dt>ALERT: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "alert" log level.
-
-<dt>CRIT: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "critical" log level.
-
-<dt>DEBUG: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "debug" log level.
-
-<dt>DEBUG2: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "debug2" log level.
-
-<dt>EMERG: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "emergency" log level.
-
-<dt>ERROR: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "error" log level.
-
-<dt>INFO: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute. If the current <i>LogLevel</i>
-is set to "debug2", also adds the specified message to the
-current <i>ErrorLog</i> using the "info" log level.
-
-<dt>NOTICE: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "notice" log level.
-
-<dt>WARNING: message
-<dd style="margin-left: 5.0em"><br>
-Sets the printer-state-message attribute and adds the specified
-message to the current <i>ErrorLog</i> using the "warning" log level.
-
-</dl>
-<h2 class="title"><a name="ENVIRONMENT_VARIABLES">Environment Variables</a></h2>
-The following environment variables are defined by the CUPS server when
-executing the notifier:
-
-<dl class="man">
-<dt>CHARSET
-<dd style="margin-left: 5.0em"><br>
-The default text character set, typically utf-8.
-
-<dt>CUPS_CACHEDIR
-<dd style="margin-left: 5.0em"><br>
-The directory for semi-persistent cache files can be found.
-
-<dt>CUPS_DATADIR
-<dd style="margin-left: 5.0em"><br>
-The directory where data files can be found.
-
-<dt>CUPS_FILETYPE
-<dd style="margin-left: 5.0em"><br>
-The type of file being printed: "job-sheet" for a banner page and "document"
-for a regular print file.
-
-<dt>CUPS_SERVERROOT
-<dd style="margin-left: 5.0em"><br>
-The root directory of the server.
-
-<dt>LANG
-<dd style="margin-left: 5.0em"><br>
-The default language locale (typically C or en).
-
-<dt>PATH
-<dd style="margin-left: 5.0em"><br>
-The standard execution path for external programs that may be run by
-the filter.
-
-<dt>SOFTWARE
-<dd style="margin-left: 5.0em"><br>
-The name and version number of the server (typically CUPS/1.2).
-
-<dt>TZ
-<dd style="margin-left: 5.0em"><br>
-The timezone of the server.
-
-<dt>USER
-<dd style="margin-left: 5.0em"><br>
-The user executing the filter, typically "lp"; consult the <i>cupsd.conf(5)</i>
-file for the current setting.
-
-</dl>
+The CUPS notifier interface provides a standard method for adding support for new event notification methods to CUPS.
+Each notifier delivers one or more IPP events from the standard input to the specified recipient.
+<p>Notifiers <b>MUST</b> read IPP messages from the standard input using the
+<b>ippNew</b>()
+and
+<b>ippReadFile</b>()
+functions and exit on error.
+Notifiers are encouraged to exit after a suitable period of inactivity, however they may exit after reading the first message or stay running until an error is seen.
+Notifiers inherit the environment and can use the logging mechanism documented in
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7).</a>
 <h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
-<i>backend(7)</i>, <i>cupsd(8)</i>, <i>filter(7)</i>,
-<br>
-<a href="http://localhost:631/help">http://localhost:631/help</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright 2007-2013 by Apple Inc.
+Copyright &copy; 2007-2014 by Apple Inc.
 
 </body>
 </html>
