@@ -164,8 +164,8 @@ main(void)
       do_printer_op(http, printer, CUPS_ACCEPT_JOBS, cgiText(_("Accept Jobs")));
     else if (!strcmp(op, "reject-jobs"))
       do_printer_op(http, printer, CUPS_REJECT_JOBS, cgiText(_("Reject Jobs")));
-    else if (!strcmp(op, "purge-jobs"))
-      do_printer_op(http, printer, IPP_PURGE_JOBS, cgiText(_("Purge Jobs")));
+    else if (!strcmp(op, "cancel-jobs"))
+      do_printer_op(http, printer, IPP_OP_CANCEL_JOBS, cgiText(_("Cancel Jobs")));
     else if (!_cups_strcasecmp(op, "print-self-test-page"))
       cgiPrintCommand(http, printer, "PrintSelfTestPage",
                       cgiText(_("Print Self-Test Page")));
@@ -285,8 +285,8 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
       cgiCopyTemplateLang("printer-accept.tmpl");
     else if (op == CUPS_REJECT_JOBS)
       cgiCopyTemplateLang("printer-reject.tmpl");
-    else if (op == IPP_PURGE_JOBS)
-      cgiCopyTemplateLang("printer-purge.tmpl");
+    else if (op == IPP_OP_CANCEL_JOBS)
+      cgiCopyTemplateLang("printer-cancel-jobs.tmpl");
   }
 
   cgiEndHTML();

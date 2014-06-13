@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-09 14:24-0700\n"
+"POT-Creation-Date: 2014-06-12 20:06-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,12 +39,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: systemv/lpstat.c:1887 systemv/lpstat.c:2010
+#: systemv/lpstat.c:1864 systemv/lpstat.c:1987
 msgid "\t\t(all)"
 msgstr ""
 
-#: systemv/lpstat.c:1890 systemv/lpstat.c:1893 systemv/lpstat.c:2013
-#: systemv/lpstat.c:2016
+#: systemv/lpstat.c:1867 systemv/lpstat.c:1870 systemv/lpstat.c:1990
+#: systemv/lpstat.c:1993
 msgid "\t\t(none)"
 msgstr ""
 
@@ -53,104 +53,104 @@ msgstr ""
 msgid "\t%d entries"
 msgstr ""
 
-#: systemv/lpstat.c:785 systemv/lpstat.c:801
+#: systemv/lpstat.c:783 systemv/lpstat.c:799
 #, c-format
 msgid "\t%s"
 msgstr ""
 
-#: systemv/lpstat.c:1868 systemv/lpstat.c:1991
+#: systemv/lpstat.c:1845 systemv/lpstat.c:1968
 msgid "\tAfter fault: continue"
 msgstr ""
 
-#: systemv/lpstat.c:1488 systemv/lpstat.c:1837 systemv/lpstat.c:1961
+#: systemv/lpstat.c:1468 systemv/lpstat.c:1814 systemv/lpstat.c:1938
 #, c-format
 msgid "\tAlerts: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1891 systemv/lpstat.c:2014
+#: systemv/lpstat.c:1868 systemv/lpstat.c:1991
 msgid "\tBanner required"
 msgstr ""
 
-#: systemv/lpstat.c:1892 systemv/lpstat.c:2015
+#: systemv/lpstat.c:1869 systemv/lpstat.c:1992
 msgid "\tCharset sets:"
 msgstr ""
 
-#: systemv/lpstat.c:1856 systemv/lpstat.c:1979
+#: systemv/lpstat.c:1833 systemv/lpstat.c:1956
 msgid "\tConnection: direct"
 msgstr ""
 
-#: systemv/lpstat.c:1847 systemv/lpstat.c:1971
+#: systemv/lpstat.c:1824 systemv/lpstat.c:1948
 msgid "\tConnection: remote"
 msgstr ""
 
-#: systemv/lpstat.c:1813 systemv/lpstat.c:1937
+#: systemv/lpstat.c:1790 systemv/lpstat.c:1914
 msgid "\tContent types: any"
 msgstr ""
 
-#: systemv/lpstat.c:1895 systemv/lpstat.c:2018
+#: systemv/lpstat.c:1872 systemv/lpstat.c:1995
 msgid "\tDefault page size:"
 msgstr ""
 
-#: systemv/lpstat.c:1894 systemv/lpstat.c:2017
+#: systemv/lpstat.c:1871 systemv/lpstat.c:1994
 msgid "\tDefault pitch:"
 msgstr ""
 
-#: systemv/lpstat.c:1896 systemv/lpstat.c:2019
+#: systemv/lpstat.c:1873 systemv/lpstat.c:1996
 msgid "\tDefault port settings:"
 msgstr ""
 
-#: systemv/lpstat.c:1819 systemv/lpstat.c:1943
+#: systemv/lpstat.c:1796 systemv/lpstat.c:1920
 #, c-format
 msgid "\tDescription: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1812 systemv/lpstat.c:1936
+#: systemv/lpstat.c:1789 systemv/lpstat.c:1913
 msgid "\tForm mounted:"
 msgstr ""
 
-#: systemv/lpstat.c:1889 systemv/lpstat.c:2012
+#: systemv/lpstat.c:1866 systemv/lpstat.c:1989
 msgid "\tForms allowed:"
 msgstr ""
 
-#: systemv/lpstat.c:1851 systemv/lpstat.c:1975
+#: systemv/lpstat.c:1828 systemv/lpstat.c:1952
 #, c-format
 msgid "\tInterface: %s.ppd"
 msgstr ""
 
-#: systemv/lpstat.c:1860 systemv/lpstat.c:1983
+#: systemv/lpstat.c:1837 systemv/lpstat.c:1960
 #, c-format
 msgid "\tInterface: %s/interfaces/%s"
 msgstr ""
 
-#: systemv/lpstat.c:1864 systemv/lpstat.c:1987
+#: systemv/lpstat.c:1841 systemv/lpstat.c:1964
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd"
 msgstr ""
 
-#: systemv/lpstat.c:1842 systemv/lpstat.c:1966
+#: systemv/lpstat.c:1819 systemv/lpstat.c:1943
 #, c-format
 msgid "\tLocation: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1867 systemv/lpstat.c:1990
+#: systemv/lpstat.c:1844 systemv/lpstat.c:1967
 msgid "\tOn fault: no alert"
 msgstr ""
 
-#: systemv/lpstat.c:1814 systemv/lpstat.c:1938
+#: systemv/lpstat.c:1791 systemv/lpstat.c:1915
 msgid "\tPrinter types: unknown"
 msgstr ""
 
-#: systemv/lpstat.c:1471
+#: systemv/lpstat.c:1451
 #, c-format
 msgid "\tStatus: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1872 systemv/lpstat.c:1886 systemv/lpstat.c:1995
-#: systemv/lpstat.c:2009
+#: systemv/lpstat.c:1849 systemv/lpstat.c:1863 systemv/lpstat.c:1972
+#: systemv/lpstat.c:1986
 msgid "\tUsers allowed:"
 msgstr ""
 
-#: systemv/lpstat.c:1879 systemv/lpstat.c:2002
+#: systemv/lpstat.c:1856 systemv/lpstat.c:1979
 msgid "\tUsers denied:"
 msgstr ""
 
@@ -175,7 +175,7 @@ msgstr ""
 msgid "\tprinting is enabled"
 msgstr ""
 
-#: systemv/lpstat.c:1491
+#: systemv/lpstat.c:1471
 #, c-format
 msgid "\tqueued for %s"
 msgstr ""
@@ -188,7 +188,7 @@ msgstr ""
 msgid "\tqueuing is enabled"
 msgstr ""
 
-#: systemv/lpstat.c:1805 systemv/lpstat.c:1929
+#: systemv/lpstat.c:1782 systemv/lpstat.c:1906
 msgid "\treason unknown"
 msgstr ""
 
@@ -1101,15 +1101,15 @@ msgstr ""
 msgid "  --version               Show program version."
 msgstr ""
 
-#: test/ippfind.c:2716 test/ipptool.c:4713
+#: test/ippfind.c:2716 test/ipptool.c:4718
 msgid "  -4                      Connect using IPv4."
 msgstr ""
 
-#: test/ippfind.c:2717 test/ipptool.c:4714
+#: test/ippfind.c:2717 test/ipptool.c:4719
 msgid "  -6                      Connect using IPv6."
 msgstr ""
 
-#: test/ipptool.c:4715
+#: test/ipptool.c:4720
 msgid "  -C                      Send requests using chunking (default)."
 msgstr ""
 
@@ -1125,7 +1125,7 @@ msgstr ""
 msgid "  -E                      Encrypt the connection."
 msgstr ""
 
-#: test/ipptool.c:4717
+#: test/ipptool.c:4722
 msgid "  -E                      Test with HTTP Upgrade to TLS."
 msgstr ""
 
@@ -1137,7 +1137,7 @@ msgstr ""
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr ""
 
-#: test/ipptool.c:4719
+#: test/ipptool.c:4724
 msgid "  -I                      Ignore errors."
 msgstr ""
 
@@ -1149,7 +1149,7 @@ msgstr ""
 msgid "  -I {filename,filters,none,profiles}"
 msgstr ""
 
-#: test/ipptool.c:4720
+#: test/ipptool.c:4725
 msgid "  -L                      Send requests using content-length."
 msgstr ""
 
@@ -1165,7 +1165,7 @@ msgstr ""
 msgid "  -R root-directory       Set alternate root."
 msgstr ""
 
-#: test/ipptool.c:4722
+#: test/ipptool.c:4727
 msgid "  -S                      Test with SSL encryption."
 msgstr ""
 
@@ -1173,7 +1173,7 @@ msgstr ""
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr ""
 
-#: test/ipptool.c:4724
+#: test/ipptool.c:4729
 msgid "  -T seconds              Set the receive/send timeout in seconds."
 msgstr ""
 
@@ -1181,7 +1181,7 @@ msgstr ""
 msgid "  -U username             Specify username."
 msgstr ""
 
-#: test/ippfind.c:2720 test/ipptool.c:4726
+#: test/ippfind.c:2720 test/ipptool.c:4731
 msgid "  -V version              Set default IPP version."
 msgstr ""
 
@@ -1189,7 +1189,7 @@ msgstr ""
 msgid "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,translations}"
 msgstr ""
 
-#: test/ipptool.c:4728
+#: test/ipptool.c:4733
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 
@@ -1217,7 +1217,7 @@ msgstr ""
 msgid "  -d domain               Browse/resolve in specified domain."
 msgstr ""
 
-#: test/ipptool.c:4730
+#: test/ipptool.c:4735
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
 
@@ -1241,7 +1241,7 @@ msgstr ""
 msgid "  -f                      Run in the foreground."
 msgstr ""
 
-#: test/ipptool.c:4732
+#: test/ipptool.c:4737
 msgid "  -f filename             Set default request filename."
 msgstr ""
 
@@ -1261,7 +1261,7 @@ msgstr ""
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
 
-#: test/ipptool.c:4734
+#: test/ipptool.c:4739
 msgid "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
 
@@ -1293,7 +1293,7 @@ msgstr ""
 msgid "  -n copies               Set number of copies."
 msgstr ""
 
-#: test/ipptool.c:4736
+#: test/ipptool.c:4741
 msgid "  -n count                Repeat the last file the given number of times."
 msgstr ""
 
@@ -1329,7 +1329,7 @@ msgstr ""
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 
-#: systemv/cupstestppd.c:3826 test/ipptool.c:4738
+#: systemv/cupstestppd.c:3826 test/ipptool.c:4743
 msgid "  -q                      Run silently."
 msgstr ""
 
@@ -1345,7 +1345,7 @@ msgstr ""
 msgid "  -s                      Print service name if true."
 msgstr ""
 
-#: test/ipptool.c:4739
+#: test/ipptool.c:4744
 msgid "  -t                      Produce a test report."
 msgstr ""
 
@@ -1377,7 +1377,7 @@ msgstr ""
 msgid "  -u regex                Match URI to regular expression."
 msgstr ""
 
-#: systemv/cupsaddsmb.c:291 systemv/cupstestppd.c:3828 test/ipptool.c:4740
+#: systemv/cupsaddsmb.c:291 systemv/cupstestppd.c:3828 test/ipptool.c:4745
 #: ppdc/ppdc.cxx:447 ppdc/ppdpo.cxx:259
 msgid "  -v                      Be verbose."
 msgstr ""
@@ -1718,7 +1718,42 @@ msgstr ""
 msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr ""
 
-#: systemv/lpstat.c:779
+#: cups/dest-localization.c:114
+#, c-format
+msgid "%d x %d mm"
+msgstr ""
+
+#: cups/dest-localization.c:106
+#, c-format
+msgid "%g x %g"
+msgstr ""
+
+#: cups/dest-localization.c:169 cups/dest-localization.c:176
+#, c-format
+msgid "%s (%s)"
+msgstr ""
+
+#: cups/dest-localization.c:183
+#, c-format
+msgid "%s (%s, %s)"
+msgstr ""
+
+#: cups/dest-localization.c:160
+#, c-format
+msgid "%s (Borderless)"
+msgstr ""
+
+#: cups/dest-localization.c:167 cups/dest-localization.c:174
+#, c-format
+msgid "%s (Borderless, %s)"
+msgstr ""
+
+#: cups/dest-localization.c:181
+#, c-format
+msgid "%s (Borderless, %s, %s)"
+msgstr ""
+
+#: systemv/lpstat.c:777
 #, c-format
 msgid "%s accepting requests since %s"
 msgstr ""
@@ -1754,7 +1789,7 @@ msgstr ""
 msgid "%s job-id user title copies options [file]"
 msgstr ""
 
-#: systemv/lpstat.c:783
+#: systemv/lpstat.c:781
 #, c-format
 msgid "%s not accepting requests since %s -"
 msgstr ""
@@ -1764,12 +1799,12 @@ msgstr ""
 msgid "%s not supported."
 msgstr ""
 
-#: systemv/lpstat.c:794
+#: systemv/lpstat.c:792
 #, c-format
 msgid "%s/%s accepting requests since %s"
 msgstr ""
 
-#: systemv/lpstat.c:799
+#: systemv/lpstat.c:797
 #, c-format
 msgid "%s/%s not accepting requests since %s -"
 msgstr ""
@@ -1793,7 +1828,7 @@ msgstr ""
 msgid "%s: %s failed: %s"
 msgstr ""
 
-#: test/ippfind.c:773 test/ipptool.c:346
+#: test/ippfind.c:773 test/ipptool.c:377
 #, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
@@ -1812,9 +1847,9 @@ msgstr ""
 #: systemv/lp.c:157 systemv/lp.c:577 systemv/lp.c:697 systemv/lp.c:746
 #: systemv/lpstat.c:195 systemv/lpstat.c:241 systemv/lpstat.c:332
 #: systemv/lpstat.c:361 systemv/lpstat.c:385 systemv/lpstat.c:444
-#: systemv/lpstat.c:510 systemv/lpstat.c:571 systemv/lpstat.c:697
-#: systemv/lpstat.c:882 systemv/lpstat.c:1143 systemv/lpstat.c:1341
-#: systemv/lpstat.c:1598
+#: systemv/lpstat.c:510 systemv/lpstat.c:571 systemv/lpstat.c:696
+#: systemv/lpstat.c:880 systemv/lpstat.c:1141 systemv/lpstat.c:1338
+#: systemv/lpstat.c:1576
 #, c-format
 msgid "%s: Error - add '/version=1.1' to server name."
 msgstr ""
@@ -2008,12 +2043,17 @@ msgstr ""
 msgid "%s: Invalid filter string \"%s\"."
 msgstr ""
 
-#: test/ippfind.c:745 test/ipptool.c:314
+#: test/ipptool.c:307
+#, c-format
+msgid "%s: Missing filename for \"-P\"."
+msgstr ""
+
+#: test/ippfind.c:745 test/ipptool.c:345
 #, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr ""
 
-#: test/ippfind.c:758 test/ipptool.c:328
+#: test/ippfind.c:758 test/ipptool.c:359
 #, c-format
 msgid "%s: Missing version for \"-V\"."
 msgstr ""
@@ -2036,7 +2076,7 @@ msgstr ""
 #: berkeley/lpq.c:83 berkeley/lpr.c:67 berkeley/lprm.c:67 systemv/cancel.c:82
 #: systemv/cupsaccept.c:88 systemv/cupsaddsmb.c:86 systemv/lp.c:96
 #: systemv/lpadmin.c:225 systemv/lpinfo.c:88 systemv/lpmove.c:73
-#: systemv/lpstat.c:88 test/ipptool.c:286 test/ipptool.c:303
+#: systemv/lpstat.c:88 test/ipptool.c:289 test/ipptool.c:334
 #, c-format
 msgid "%s: Sorry, no encryption support."
 msgstr ""
@@ -2055,6 +2095,11 @@ msgstr ""
 #: scheduler/cupsfilter.c:416
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
+msgstr ""
+
+#: test/ipptool.c:316
+#, c-format
+msgid "%s: Unable to open \"%s\": %s"
 msgstr ""
 
 #: ppdc/ppdmerge.cxx:90
@@ -3181,7 +3226,7 @@ msgstr ""
 msgid "Bad 'document-format' value \"%s\"."
 msgstr ""
 
-#: cups/dest.c:1642
+#: cups/dest.c:1736
 msgid "Bad NULL dests pointer"
 msgstr ""
 
@@ -3331,7 +3376,7 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr ""
 
-#: cups/dest.c:610 cups/dest.c:1296
+#: cups/dest.c:610 cups/dest.c:1296 cups/dest.c:1343
 msgid "Bad printer URI."
 msgstr ""
 
@@ -3399,11 +3444,15 @@ msgstr ""
 msgid "CPCL Label Printer"
 msgstr ""
 
+#: cgi-bin/classes.c:165 cgi-bin/printers.c:168
+msgid "Cancel Jobs"
+msgstr ""
+
 #: cgi-bin/admin.c:1465 cgi-bin/admin.c:1504 cgi-bin/admin.c:1514
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:2183
+#: backend/ipp.c:2186
 msgid "Canceling print job."
 msgstr ""
 
@@ -3456,11 +3505,11 @@ msgstr ""
 msgid "Community name uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:839 backend/lpd.c:879 backend/socket.c:400
+#: backend/ipp.c:842 backend/lpd.c:879 backend/socket.c:400
 msgid "Connected to printer."
 msgstr ""
 
-#: backend/ipp.c:744 backend/lpd.c:702 backend/socket.c:319
+#: backend/ipp.c:747 backend/lpd.c:702 backend/socket.c:319
 msgid "Connecting to printer."
 msgstr ""
 
@@ -3476,7 +3525,7 @@ msgstr ""
 msgid "Control file sent successfully."
 msgstr ""
 
-#: backend/ipp.c:1334 backend/lpd.c:472
+#: backend/ipp.c:1337 backend/lpd.c:472
 msgid "Copying print data."
 msgstr ""
 
@@ -4171,7 +4220,7 @@ msgstr ""
 msgid "Internet Postage 3-Part"
 msgstr ""
 
-#: backend/ipp.c:317
+#: backend/ipp.c:319
 msgid "Internet Printing Protocol"
 msgstr ""
 
@@ -4179,7 +4228,7 @@ msgstr ""
 msgid "Invalid media name arguments."
 msgstr ""
 
-#: cups/dest-options.c:1014
+#: cups/dest-options.c:1032
 msgid "Invalid media size."
 msgstr ""
 
@@ -4298,19 +4347,19 @@ msgstr ""
 msgid "Job #%d is not held."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1036
+#: cgi-bin/ipp-var.c:1035
 msgid "Job Completed"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1034
+#: cgi-bin/ipp-var.c:1033
 msgid "Job Created"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1040
+#: cgi-bin/ipp-var.c:1039
 msgid "Job Options Changed"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1038
+#: cgi-bin/ipp-var.c:1037
 msgid "Job Stopped"
 msgstr ""
 
@@ -4774,7 +4823,7 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1482 scheduler/main.c:2158 systemv/cupsaddsmb.c:284
 #: systemv/cupsctl.c:203 systemv/cupstestdsc.c:429 systemv/cupstestppd.c:3817
-#: test/ippfind.c:2715 test/ipptool.c:4712 ppdc/ppdc.cxx:432
+#: test/ippfind.c:2715 test/ipptool.c:4717 ppdc/ppdc.cxx:432
 #: ppdc/ppdhtml.cxx:174 ppdc/ppdi.cxx:130 ppdc/ppdmerge.cxx:363
 #: ppdc/ppdpo.cxx:254
 msgid "Options:"
@@ -4930,7 +4979,7 @@ msgstr ""
 msgid "Postcard Long Edge"
 msgstr ""
 
-#: backend/ipp.c:946 backend/ipp.c:954
+#: backend/ipp.c:949 backend/ipp.c:957
 msgid "Preparing to print."
 msgstr ""
 
@@ -4974,19 +5023,19 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:2157
+#: backend/ipp.c:2160
 msgid "Print job canceled at printer."
 msgstr ""
 
-#: backend/ipp.c:2149
+#: backend/ipp.c:2152
 msgid "Print job too large."
 msgstr ""
 
-#: backend/ipp.c:1627
+#: backend/ipp.c:1630
 msgid "Print job was not accepted."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1028
+#: cgi-bin/ipp-var.c:1027
 msgid "Printer Added"
 msgstr ""
 
@@ -4994,15 +5043,15 @@ msgstr ""
 msgid "Printer Default"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1032
+#: cgi-bin/ipp-var.c:1031
 msgid "Printer Deleted"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1030
+#: cgi-bin/ipp-var.c:1029
 msgid "Printer Modified"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1026
+#: cgi-bin/ipp-var.c:1025
 msgid "Printer Paused"
 msgstr ""
 
@@ -5010,11 +5059,11 @@ msgstr ""
 msgid "Printer Settings"
 msgstr ""
 
-#: backend/ipp.c:2152
+#: backend/ipp.c:2155
 msgid "Printer cannot print supplied content."
 msgstr ""
 
-#: backend/ipp.c:2155
+#: backend/ipp.c:2158
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
@@ -5030,10 +5079,6 @@ msgstr ""
 #: filter/rastertolabel.c:1235
 #, c-format
 msgid "Printing page %d, %u%% complete."
-msgstr ""
-
-#: cgi-bin/classes.c:165 cgi-bin/printers.c:168
-msgid "Purge Jobs"
 msgstr ""
 
 #: ppdc/sample.c:155
@@ -5111,19 +5156,19 @@ msgstr ""
 msgid "Sending data to printer."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1042
+#: cgi-bin/ipp-var.c:1041
 msgid "Server Restarted"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1048
+#: cgi-bin/ipp-var.c:1047
 msgid "Server Security Auditing"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1044
+#: cgi-bin/ipp-var.c:1043
 msgid "Server Started"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1046
+#: cgi-bin/ipp-var.c:1045
 msgid "Server Stopped"
 msgstr ""
 
@@ -5323,7 +5368,7 @@ msgstr ""
 msgid "The optical photoconductor will need to be replaced soon."
 msgstr ""
 
-#: backend/ipp.c:966
+#: backend/ipp.c:969
 msgid "The printer configuration is incorrect or the printer no longer exists."
 msgstr ""
 
@@ -5331,8 +5376,8 @@ msgstr ""
 msgid "The printer did not respond."
 msgstr ""
 
-#: backend/ipp.c:810 backend/ipp.c:929 backend/ipp.c:1043 backend/ipp.c:1434
-#: backend/ipp.c:1599 backend/lpd.c:836 backend/socket.c:379
+#: backend/ipp.c:813 backend/ipp.c:932 backend/ipp.c:1046 backend/ipp.c:1437
+#: backend/ipp.c:1602 backend/lpd.c:836 backend/socket.c:379
 #: backend/usb-unix.c:124 backend/usb-unix.c:414 backend/usb-unix.c:497
 msgid "The printer is in use."
 msgstr ""
@@ -5349,7 +5394,7 @@ msgstr ""
 msgid "The printer is not connected."
 msgstr ""
 
-#: backend/ipp.c:788 backend/ipp.c:821 backend/ipp.c:925 backend/lpd.c:815
+#: backend/ipp.c:791 backend/ipp.c:824 backend/ipp.c:928 backend/lpd.c:815
 #: backend/lpd.c:856 backend/socket.c:358 backend/socket.c:391
 msgid "The printer is not responding."
 msgstr ""
@@ -5366,7 +5411,7 @@ msgstr ""
 msgid "The printer is offline."
 msgstr ""
 
-#: backend/ipp.c:803 backend/lpd.c:829 backend/socket.c:372
+#: backend/ipp.c:806 backend/lpd.c:829 backend/socket.c:372
 msgid "The printer is unreachable at this time."
 msgstr ""
 
@@ -5378,7 +5423,7 @@ msgstr ""
 msgid "The printer may be out of toner."
 msgstr ""
 
-#: backend/ipp.c:797 backend/lpd.c:823 backend/socket.c:366
+#: backend/ipp.c:800 backend/lpd.c:823 backend/socket.c:366
 msgid "The printer may not exist or is unavailable at this time."
 msgstr ""
 
@@ -5558,7 +5603,7 @@ msgstr ""
 msgid "Unable to add class"
 msgstr ""
 
-#: backend/ipp.c:1781
+#: backend/ipp.c:1784
 msgid "Unable to add document to print job."
 msgstr ""
 
@@ -5587,7 +5632,7 @@ msgstr ""
 msgid "Unable to cancel RSS subscription"
 msgstr ""
 
-#: backend/ipp.c:2062 backend/ipp.c:2497
+#: backend/ipp.c:2065 backend/ipp.c:2500
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -5621,7 +5666,7 @@ msgstr ""
 msgid "Unable to connect to host."
 msgstr ""
 
-#: backend/ipp.c:766 backend/ipp.c:1239 backend/lpd.c:795 backend/socket.c:338
+#: backend/ipp.c:769 backend/ipp.c:1242 backend/lpd.c:795 backend/socket.c:338
 #: backend/usb-unix.c:110
 msgid "Unable to contact printer, queuing on next printer in class."
 msgstr ""
@@ -5738,7 +5783,7 @@ msgstr ""
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3475
+#: backend/ipp.c:3481
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5766,7 +5811,7 @@ msgstr ""
 msgid "Unable to get printer status"
 msgstr ""
 
-#: backend/ipp.c:990
+#: backend/ipp.c:993
 msgid "Unable to get printer status."
 msgstr ""
 
@@ -5784,12 +5829,12 @@ msgstr ""
 msgid "Unable to load help index."
 msgstr ""
 
-#: backend/ipp.c:665 backend/lpd.c:426 backend/socket.c:277
+#: backend/ipp.c:668 backend/lpd.c:426 backend/socket.c:277
 #, c-format
 msgid "Unable to locate printer \"%s\"."
 msgstr ""
 
-#: backend/dnssd.c:787 backend/ipp.c:334 backend/lpd.c:196
+#: backend/dnssd.c:787 backend/ipp.c:336 backend/lpd.c:196
 #: backend/socket.c:163
 msgid "Unable to locate printer."
 msgstr ""
@@ -5831,7 +5876,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:376 backend/ipp.c:1528 backend/ipp.c:1736 backend/lpd.c:496
+#: backend/ipp.c:378 backend/ipp.c:1531 backend/ipp.c:1739 backend/lpd.c:496
 #: backend/socket.c:150 backend/usb.c:237 filter/gziptoany.c:67
 #: filter/pstops.c:267
 msgid "Unable to open print file"
@@ -5851,7 +5896,7 @@ msgstr ""
 msgid "Unable to read print data."
 msgstr ""
 
-#: cups/dest.c:3351
+#: cups/dest.c:3445
 msgid "Unable to resolve printer URI."
 msgstr ""
 
@@ -5885,7 +5930,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3334 backend/ipp.c:3411 backend/ipp.c:3419
+#: backend/ipp.c:3340 backend/ipp.c:3417 backend/ipp.c:3425
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -5923,7 +5968,7 @@ msgstr ""
 msgid "Unknown choice \"%s\" for option \"%s\"."
 msgstr ""
 
-#: backend/ipp.c:518
+#: backend/ipp.c:520
 #, c-format
 msgid "Unknown encryption option value: \"%s\"."
 msgstr ""
@@ -5938,11 +5983,11 @@ msgstr ""
 msgid "Unknown format character: \"%c\"."
 msgstr ""
 
-#: cups/dest-options.c:946
+#: cups/dest-options.c:964
 msgid "Unknown media size name."
 msgstr ""
 
-#: backend/ipp.c:582
+#: backend/ipp.c:584
 #, c-format
 msgid "Unknown option \"%s\" with value \"%s\"."
 msgstr ""
@@ -5983,7 +6028,7 @@ msgstr ""
 msgid "Unknown service name."
 msgstr ""
 
-#: backend/ipp.c:547
+#: backend/ipp.c:549
 #, c-format
 msgid "Unknown version option value: \"%s\"."
 msgstr ""
@@ -6074,7 +6119,7 @@ msgid ""
 "                       [-u allow:user,user] [-u deny:user,user]"
 msgstr ""
 
-#: backend/dnssd.c:227 backend/ipp.c:323 backend/lpd.c:183
+#: backend/dnssd.c:227 backend/ipp.c:325 backend/lpd.c:183
 #: backend/socket.c:127 backend/usb.c:183 filter/commandtops.c:63
 #: filter/gziptoany.c:46 filter/pstops.c:231 monitor/bcp.c:56
 #: monitor/tbcp.c:55
@@ -6122,7 +6167,7 @@ msgid ""
 "       ippfind --version"
 msgstr ""
 
-#: test/ipptool.c:4710
+#: test/ipptool.c:4715
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr ""
 
@@ -6178,7 +6223,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1898
+#: backend/ipp.c:1901
 msgid "Waiting for job to complete."
 msgstr ""
 
@@ -6320,12 +6365,12 @@ msgstr ""
 msgid "cupstestppd: The -v option is incompatible with the -q option."
 msgstr ""
 
-#: systemv/lpstat.c:1234 systemv/lpstat.c:1237 systemv/lpstat.c:1240
+#: systemv/lpstat.c:1232 systemv/lpstat.c:1235 systemv/lpstat.c:1238
 #, c-format
 msgid "device for %s/%s: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1220 systemv/lpstat.c:1223 systemv/lpstat.c:1226
+#: systemv/lpstat.c:1218 systemv/lpstat.c:1221 systemv/lpstat.c:1224
 #, c-format
 msgid "device for %s: %s"
 msgstr ""
@@ -6449,44 +6494,48 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
-#: test/ipptool.c:357 test/ipptool.c:506 test/ipptool.c:530
+#: test/ipptool.c:324
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with -P\"."
+msgstr ""
+
+#: test/ipptool.c:388 test/ipptool.c:544 test/ipptool.c:568
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 msgstr ""
 
-#: test/ipptool.c:587
+#: test/ipptool.c:625
 #, c-format
 msgid "ipptool: Bad URI - %s."
 msgstr ""
 
-#: test/ipptool.c:499
+#: test/ipptool.c:537
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:568
+#: test/ipptool.c:606
 msgid "ipptool: May only specify a single URI."
 msgstr ""
 
-#: test/ipptool.c:522
+#: test/ipptool.c:560
 msgid "ipptool: Missing count for \"-n\"."
 msgstr ""
 
-#: test/ipptool.c:392
+#: test/ipptool.c:423
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr ""
 
-#: test/ipptool.c:373
+#: test/ipptool.c:404
 msgid "ipptool: Missing name=value for \"-d\"."
 msgstr ""
 
-#: test/ipptool.c:489
+#: test/ipptool.c:527
 msgid "ipptool: Missing seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:613
+#: test/ipptool.c:651
 msgid "ipptool: URI required before test file."
 msgstr ""
 
-#: test/ipptool.c:549
+#: test/ipptool.c:587
 #, c-format
 msgid "ipptool: Unknown option \"-%c\"."
 msgstr ""
@@ -6725,12 +6774,12 @@ msgstr ""
 msgid "lpoptions: Unknown printer or class."
 msgstr ""
 
-#: systemv/lpstat.c:1076
+#: systemv/lpstat.c:1074
 #, c-format
 msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"."
 msgstr ""
 
-#: systemv/lpstat.c:1012
+#: systemv/lpstat.c:1010
 #, c-format
 msgid "members of class %s:"
 msgstr ""
@@ -6739,7 +6788,7 @@ msgstr ""
 msgid "no entries"
 msgstr ""
 
-#: systemv/lpstat.c:1080
+#: systemv/lpstat.c:1078
 msgid "no system default destination"
 msgstr ""
 
@@ -7234,32 +7283,32 @@ msgstr ""
 msgid "ppdmerge: Unable to backup %s to %s - %s"
 msgstr ""
 
-#: systemv/lpstat.c:1797
+#: systemv/lpstat.c:1774
 #, c-format
 msgid "printer %s disabled since %s -"
 msgstr ""
 
-#: systemv/lpstat.c:1786
+#: systemv/lpstat.c:1763
 #, c-format
 msgid "printer %s is idle.  enabled since %s"
 msgstr ""
 
-#: systemv/lpstat.c:1791
+#: systemv/lpstat.c:1768
 #, c-format
 msgid "printer %s now printing %s-%d.  enabled since %s"
 msgstr ""
 
-#: systemv/lpstat.c:1920
+#: systemv/lpstat.c:1897
 #, c-format
 msgid "printer %s/%s disabled since %s -"
 msgstr ""
 
-#: systemv/lpstat.c:1906
+#: systemv/lpstat.c:1883
 #, c-format
 msgid "printer %s/%s is idle.  enabled since %s"
 msgstr ""
 
-#: systemv/lpstat.c:1913
+#: systemv/lpstat.c:1890
 #, c-format
 msgid "printer %s/%s now printing %s-%d.  enabled since %s"
 msgstr ""
@@ -7277,11 +7326,11 @@ msgstr ""
 msgid "request-id uses indefinite length"
 msgstr ""
 
-#: systemv/lpstat.c:2052
+#: systemv/lpstat.c:2029
 msgid "scheduler is not running"
 msgstr ""
 
-#: systemv/lpstat.c:2048
+#: systemv/lpstat.c:2025
 msgid "scheduler is running"
 msgstr ""
 
@@ -7298,12 +7347,12 @@ msgstr ""
 msgid "stopped"
 msgstr ""
 
-#: systemv/lpstat.c:1054
+#: systemv/lpstat.c:1052
 #, c-format
 msgid "system default destination: %s"
 msgstr ""
 
-#: systemv/lpstat.c:1051
+#: systemv/lpstat.c:1049
 #, c-format
 msgid "system default destination: %s/%s"
 msgstr ""

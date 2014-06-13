@@ -46,4 +46,5 @@ CHANGES IN CUPS V2.0b1
 	- Added support for simultaneous XML and test output from ipptool.
 	- Added support for PAUSE directive in ipptool test files.
 	- Added support for auto-typing of TIFF files by ipptool (STR #4418)
-
+	- Canceling all jobs in the web interface now just cancels the jobs
+	  (STR #1914)

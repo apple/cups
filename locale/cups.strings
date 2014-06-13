@@ -338,6 +338,13 @@
 "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6)." = "\"%s\": Bad uriScheme value \"%s\" - bad characters (RFC 2911 section 4.1.6).";
 "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6)." = "\"%s\": Bad uriScheme value \"%s\" - bad length %d (RFC 2911 section 4.1.6).";
 "%-7s %-7.7s %-7d %-31.31s %.0f bytes" = "%-7s %-7.7s %-7d %-31.31s %.0f bytes";
+"%d x %d mm" = "%d x %d mm";
+"%g x %g" = "%g x %g";
+"%s (%s)" = "%s (%s)";
+"%s (%s, %s)" = "%s (%s, %s)";
+"%s (Borderless)" = "%s (Borderless)";
+"%s (Borderless, %s)" = "%s (Borderless, %s)";
+"%s (Borderless, %s, %s)" = "%s (Borderless, %s, %s)";
 "%s accepting requests since %s" = "%s accepting requests since %s";
 "%s cannot be changed." = "%s cannot be changed.";
 "%s is not implemented by the CUPS version of lpc." = "%s is not implemented by the CUPS version of lpc.";
@@ -394,6 +401,7 @@
 "%s: Expected job ID after \"-i\" option." = "%s: Expected job ID after \"-i\" option.";
 "%s: Invalid destination name in list \"%s\"." = "%s: Invalid destination name in list \"%s\".";
 "%s: Invalid filter string \"%s\"." = "%s: Invalid filter string \"%s\".";
+"%s: Missing filename for \"-P\"." = "%s: Missing filename for \"-P\".";
 "%s: Missing timeout for \"-T\"." = "%s: Missing timeout for \"-T\".";
 "%s: Missing version for \"-V\"." = "%s: Missing version for \"-V\".";
 "%s: Need job ID (\"-i jobid\") before \"-H restart\"." = "%s: Need job ID (\"-i jobid\") before \"-H restart\".";
@@ -403,6 +411,7 @@
 "%s: Unable to connect to server." = "%s: Unable to connect to server.";
 "%s: Unable to contact server." = "%s: Unable to contact server.";
 "%s: Unable to determine MIME type of \"%s\"." = "%s: Unable to determine MIME type of \"%s\".";
+"%s: Unable to open \"%s\": %s" = "%s: Unable to open \"%s\": %s";
 "%s: Unable to open %s: %s" = "%s: Unable to open %s: %s";
 "%s: Unable to open PPD file: %s on line %d." = "%s: Unable to open PPD file: %s on line %d.";
 "%s: Unable to read MIME database from \"%s\" or \"%s\"." = "%s: Unable to read MIME database from \"%s\" or \"%s\".";
@@ -726,6 +735,7 @@
 "Buffer overflow detected, aborting." = "Buffer overflow detected, aborting.";
 "CMYK" = "CMYK";
 "CPCL Label Printer" = "CPCL Label Printer";
+"Cancel Jobs" = "Cancel Jobs";
 "Cancel RSS Subscription" = "Cancel RSS Subscription";
 "Canceling print job." = "Canceling print job.";
 "Cannot share a remote Kerberized printer." = "Cannot share a remote Kerberized printer.";
@@ -1116,7 +1126,6 @@
 "Printer:" = "Printer:";
 "Printers" = "Printers";
 "Printing page %d, %u%% complete." = "Printing page %d, %u%% complete.";
-"Purge Jobs" = "Purge Jobs";
 "Quarto" = "Quarto";
 "Quota limit reached." = "Quota limit reached.";
 "Rank    Owner   Job     File(s)                         Total Size" = "Rank    Owner   Job     File(s)                         Total Size";
@@ -1439,6 +1448,7 @@
 "ippfind: Unable to execute \"%s\": %s" = "ippfind: Unable to execute \"%s\": %s";
 "ippfind: Unable to use Bonjour: %s" = "ippfind: Unable to use Bonjour: %s";
 "ippfind: Unknown variable \"{%s}\"." = "ippfind: Unknown variable \"{%s}\".";
+"ipptool: \"-i\" and \"-n\" are incompatible with -P\"." = "ipptool: \"-i\" and \"-n\" are incompatible with -P\".";
 "ipptool: \"-i\" and \"-n\" are incompatible with -X\"." = "ipptool: \"-i\" and \"-n\" are incompatible with -X\".";
 "ipptool: Bad URI - %s." = "ipptool: Bad URI - %s.";
 "ipptool: Invalid seconds for \"-i\"." = "ipptool: Invalid seconds for \"-i\".";

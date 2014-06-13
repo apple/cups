@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-05-09 14:24-0700\n"
+"POT-Creation-Date: 2014-06-12 20:06-0400\n"
 "PO-Revision-Date: 2012-12-12 11:12+0100\n"
 "Last-Translator: denis meramdjougoma <dcmeram@libertysurf.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1353,6 +1353,34 @@ msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes"
 msgstr ""
 
 #, c-format
+msgid "%d x %d mm"
+msgstr ""
+
+#, c-format
+msgid "%g x %g"
+msgstr ""
+
+#, c-format
+msgid "%s (%s)"
+msgstr ""
+
+#, c-format
+msgid "%s (%s, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s)"
+msgstr ""
+
+#, c-format
+msgid "%s (Borderless, %s, %s)"
+msgstr ""
+
+#, c-format
 msgid "%s accepting requests since %s"
 msgstr ""
 
@@ -1577,6 +1605,10 @@ msgid "%s: Invalid filter string \"%s\"."
 msgstr ""
 
 #, c-format
+msgid "%s: Missing filename for \"-P\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr ""
 
@@ -1610,6 +1642,10 @@ msgstr ""
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
+msgstr ""
+
+#, c-format
+msgid "%s: Unable to open \"%s\": %s"
 msgstr ""
 
 #, c-format
@@ -2619,6 +2655,9 @@ msgstr "CMJN"
 
 msgid "CPCL Label Printer"
 msgstr "Imprimante pour étiquettes CPCL"
+
+msgid "Cancel Jobs"
+msgstr ""
 
 msgid "Cancel RSS Subscription"
 msgstr "Annuler abonnement RSS"
@@ -3844,9 +3883,6 @@ msgstr ""
 msgid "Printing page %d, %u%% complete."
 msgstr ""
 
-msgid "Purge Jobs"
-msgstr "Purger les tâches"
-
 msgid "Quarto"
 msgstr "Quarto"
 
@@ -4950,6 +4986,9 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with -P\"."
+msgstr ""
+
 msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 msgstr ""
 
@@ -5649,3 +5688,6 @@ msgstr ""
 
 #~ msgid "Enter password:"
 #~ msgstr "Entrez le nouveau mot de passe :"
+
+#~ msgid "Purge Jobs"
+#~ msgstr "Purger les tâches"
