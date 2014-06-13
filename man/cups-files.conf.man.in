@@ -47,7 +47,7 @@ The default is "/var/log/cups/access_log".
 \fBConfigFilePerm \fImode\fR
 Specifies the permissions for all configuration files that the scheduler writes.
 The default is "0644" on OS X and "0640" on all other operating systems.
-.IP
+.LP
 \fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.

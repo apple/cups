@@ -37,9 +37,11 @@ The default is "/var/log/cups/access_log".
 <dt><b>ConfigFilePerm </b><i>mode</i>
 <dd style="margin-left: 5.0em">Specifies the permissions for all configuration files that the scheduler writes.
 The default is "0644" on OS X and "0640" on all other operating systems.
-<b>Note:</b> The permissions for the <i>printers.conf</i> file are currently masked to only allow access from the scheduler user (typically root).
+</dl>
+<p><b>Note:</b> The permissions for the <i>printers.conf</i> file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
+<dl class="man">
 <dt><b>DataDir </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies the directory where data files can be found.
 The default is usually "/usr/share/cups".

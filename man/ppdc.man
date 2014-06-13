@@ -14,7 +14,7 @@
 .\"
 .TH ppdc 1 "CUPS" "12 June 2014" "Apple Inc."
 .SH NAME
-ppdc \- cups ppd compiler
+ppdc \- cups ppd compiler (deprecated)
 .SH SYNOPSIS
 .B ppdc
 [

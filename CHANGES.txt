@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-06-10
+CHANGES.txt - 2.0b1 - 2014-06-12
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -20,7 +20,7 @@ CHANGES IN CUPS V2.0b1
 	- The sample drivers now include all of the installed localizations by
 	  default (<rdar://problem/14756625>)
 	- Adopted Linux man page conventions and updated all man pages
-	  (STR #4372)
+	  (STR #4372, STR #4329)
 	- Changed the default AccessLogLevel and PageLogFormat to disable the
 	  access_log and page_log files by default (<rdar://problem/16495000>)
 	- Added a "--list-filters" option to the cupsfilter command (STR #4325)
