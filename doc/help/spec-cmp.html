@@ -215,7 +215,7 @@ rpmbuild -ta cups-<I>version</I>-source.tar.gz
 
 <PRE CLASS="command">
 tools/testrpm
-sudo rpm -U /usr/src/redhat/RPMS/i386/cups*.rpm
+sudo rpm -U /usr/src/redhat/RPMS/{arm,i386,x64_64}/cups*.rpm
 
 sudo tools/testosx
 open cups.pkg

@@ -31,7 +31,7 @@ WIDTH="768" HEIGHT="768" ALT="CUPS Block Diagram"></TD></TR>
 
 <H4>Config Files</H4>
 
-<P>The scheduler uses several configuration files to store the server settings (<A HREF="ref-cupsd-conf.html">cupsd.conf</A>), available classes (<A HREF="ref-classes-conf.html">classes.conf</A>), available printers (<A HREF="ref-printers-conf.html">printers.conf</A>), current notification subscriptions (<A HREF="ref-subscriptions-conf.html">subscriptions.conf</A>), and supported file types and filters (<A HREF="man-mime.types.html">mime.types</A>, <A HREF="man-mime.convs.html">mime.convs</A>). In addition, PostScript Printer Description ("PPD") files or interface scripts are associated with each printer, and the scheduler has cache files for remote printers, PPD files, and current jobs to optimize the scheduler's startup speed and availability.</P>
+<P>The scheduler uses several configuration files to store the server settings (<A HREF="man-cupsd.conf.html">cupsd.conf</A>), available classes (<A HREF="man-classes.conf.html">classes.conf</A>), available printers (<A HREF="man-printers.conf.html">printers.conf</A>), current notification subscriptions (<A HREF="man-subscriptions.conf.html">subscriptions.conf</A>), and supported file types and filters (<A HREF="man-mime.types.html">mime.types</A>, <A HREF="man-mime.convs.html">mime.convs</A>). In addition, PostScript Printer Description ("PPD") files or interface scripts are associated with each printer, and the scheduler has cache files for remote printers, PPD files, and current jobs to optimize the scheduler's startup speed and availability.</P>
 
 <H4>Job Files</H4>
 
@@ -41,8 +41,8 @@ WIDTH="768" HEIGHT="768" ALT="CUPS Block Diagram"></TD></TR>
 
 <H4>Log Files</H4>
 
-<P>The scheduler keeps three kinds of log files which are normally stored in the <VAR>/var/log/cups</VAR> directory. The <A HREF="ref-access_log.html">access_log</A> file lists every HTTP and IPP request that is processed by the scheduler. The <A HREF="ref-error_log.html">error_log</A> file contains messages from the scheduler and its helper applications that can be used
-to track down problems. The <A HREF="ref-page_log.html">page_log</A> file lists every page that is printed, allowing for simple print accounting.</P>
+<P>The scheduler keeps three kinds of log files which are normally stored in the <VAR>/var/log/cups</VAR> directory. The <A HREF="man-cupsd-logs.html">access_log</A> file lists every HTTP and IPP request that is processed by the scheduler. The <A HREF="man-cupsd-logs.html">error_log</A> file contains messages from the scheduler and its helper applications that can be used
+to track down problems. The <A HREF="man-cupsd-logs.html">page_log</A> file lists every page that is printed, allowing for simple print accounting.</P>
 
 <P>Log files are rotated automatically by the scheduler when they reach the configured size limit, by default 1MB. If the limit is set to 0 then no rotation is performed in the scheduler - this mode is often used by Linux distributions so they can use the <B>logrotated(8)</B> program to rotate them instead.</P>
 
