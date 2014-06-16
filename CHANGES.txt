@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.4 - 2014-06-10
+CHANGES.txt - 1.7.4 - 2014-06-16
 --------------------------------
 
 CHANGES IN CUPS V1.7.4
@@ -10,6 +10,7 @@ CHANGES IN CUPS V1.7.4
 	  environment variable (STR #4426)
 	- The web interface now properly shows a "Go" button for all text-based
 	  browsers (STR #4425)
+	- The MaxJobTime directive now properly supports time values (STR #4434)
 
 
 CHANGES IN CUPS V1.7.3
