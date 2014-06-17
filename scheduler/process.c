@@ -190,9 +190,13 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/private$\""
                  " #\"^/private/etc$\""
                  " #\"^/private/etc/\""
+                 " #\"^/private/tmp$\""
+                 " #\"^/private/tmp/\""
                  " #\"^/private/var$\""
                  " #\"^/private/var/db$\""
                  " #\"^/private/var/folders$\""
+                 " #\"^/private/var/run$\""
+                 " #\"^/private/var/run/\""
                  " #\"^/private/var/spool$\""
                  " #\"^/usr/bin$\""	/* /usr/bin */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
@@ -294,7 +298,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   }
   /* Allow outbound networking to local services */
   cupsFilePuts(fp, "(allow network-outbound"
-		   "\n       (regex #\"^/private/var/run/\")");
+		   "\n       (regex #\"^/private/var/run/\" #\"^/private/tmp/\")");
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
