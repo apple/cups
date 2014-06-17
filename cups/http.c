@@ -3328,12 +3328,17 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 
       http->stream.next_in   = (Bytef *)buffer;
       http->stream.avail_in  = (uInt)length;
-      http->stream.next_out  = (Bytef *)http->sbuffer;
-      http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
 
       while (deflate(&(http->stream), Z_NO_FLUSH) == Z_OK)
       {
+        DEBUG_printf(("1httpWrite2: avail_out=%d", http->stream.avail_out));
+
+        if (http->stream.avail_out > 0)
+	  continue;
+
 	slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
+
+        DEBUG_printf(("1httpWrite2: Writing intermediate chunk, len=%d", (int)slen));
 
 	if (slen > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
 	  sret = http_write_chunk(http, (char *)http->sbuffer, slen);
@@ -3350,21 +3355,6 @@ httpWrite2(http_t     *http,		/* I - HTTP connection */
 
 	http->stream.next_out  = (Bytef *)http->sbuffer;
 	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
-      }
-
-      slen = _HTTP_MAX_SBUFFER - http->stream.avail_out;
-
-      if (slen > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
-	sret = http_write_chunk(http, (char *)http->sbuffer, slen);
-      else if (slen > 0)
-	sret = http_write(http, (char *)http->sbuffer, slen);
-      else
-	sret = 0;
-
-      if (sret < 0)
-      {
-	DEBUG_puts("1httpWrite2: Unable to write, returning -1.");
-	return (-1);
       }
 
       bytes = (ssize_t)length;
@@ -3693,6 +3683,9 @@ http_content_coding_finish(
   size_t	bytes;			/* Number of bytes to write */
 
 
+  DEBUG_printf(("http_content_coding_finish(http=%p)", http));
+  DEBUG_printf(("1http_content_coding_finishing: http->coding=%d", http->coding));
+
   switch (http->coding)
   {
     case _HTTP_CODING_DEFLATE :
@@ -3702,17 +3695,22 @@ http_content_coding_finish(
 
         do
         {
-          http->stream.next_out  = (Bytef *)http->sbuffer;
-          http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
-
           zerr  = deflate(&(http->stream), Z_FINISH);
 	  bytes = _HTTP_MAX_SBUFFER - http->stream.avail_out;
 
-          if (bytes > 0 && http->data_encoding == HTTP_ENCODING_CHUNKED)
-	    http_write_chunk(http, (char *)http->sbuffer, bytes);
-	  else if (bytes > 0)
-	    http_write(http, (char *)http->sbuffer, bytes);
-        }
+          if (bytes > 0)
+	  {
+	    DEBUG_printf(("1http_content_coding_finish: Writing trailing chunk, len=%d", (int)bytes));
+
+	    if (http->data_encoding == HTTP_ENCODING_CHUNKED)
+	      http_write_chunk(http, (char *)http->sbuffer, bytes);
+	    else
+	      http_write(http, (char *)http->sbuffer, bytes);
+          }
+
+          http->stream.next_out  = (Bytef *)http->sbuffer;
+          http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
+	}
         while (zerr == Z_OK);
 
         deflateEnd(&(http->stream));
@@ -3830,6 +3828,9 @@ http_content_coding_start(
           http->error  = zerr == Z_MEM_ERROR ? ENOMEM : EINVAL;
           return;
         }
+
+	http->stream.next_out  = (Bytef *)http->sbuffer;
+	http->stream.avail_out = (uInt)_HTTP_MAX_SBUFFER;
         break;
 
     case _HTTP_CODING_INFLATE :
