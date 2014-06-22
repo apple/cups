@@ -189,7 +189,7 @@ URI for service, e.g., "ipp://printer.local./ipp/print", "http://printer.local./
 \fB{txt_\fIkey\fB}\fR
 Value of TXT record \fIkey\fR (lowercase).
 .SH OPTIONS
-\fBippfind\R supports the following options:
+\fBippfind\fR supports the following options:
 .TP 5
 .B \-\-help
 Show program help.
