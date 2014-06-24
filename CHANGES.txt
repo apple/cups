@@ -13,6 +13,7 @@ CHANGES IN CUPS V1.7.4
 	- The MaxJobTime directive now properly supports time values (STR #4434)
 	- The RPM spec file did not work due to the new Brazilian Portuguese
 	  localization (STR #4436)
+	- Fixed an "IPP read error" issue (STR #4440)
 
 
 CHANGES IN CUPS V1.7.3

@@ -2143,6 +2143,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    * Grab any request data from the connection...
 	    */
 
+	    if (!httpWait(HTTP(con), 0))
+	      return;
+
 	    if ((ipp_state = ippRead(&(con->http), con->request)) == IPP_ERROR)
 	    {
               cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2210,7 +2213,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  {
 	    if (!httpWait(HTTP(con), 0))
 	      return;
-            else if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
+
+            if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
 	    {
 	      if (con->http.error && con->http.error != EPIPE)
 		cupsdLogMessage(CUPSD_LOG_DEBUG,
