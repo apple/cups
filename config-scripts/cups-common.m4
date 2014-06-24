@@ -230,7 +230,7 @@ AC_SUBST(LIBUSB)
 AC_SUBST(USBQUIRKS)
 
 if test "x$PKGCONFIG" != x; then
-	if test x$enable_libusb = xyes -o $uname != Darwin; then
+	if test x$enable_libusb != xno -a $uname != Darwin; then
 		AC_MSG_CHECKING(for libusb-1.0)
 		if $PKGCONFIG --exists libusb-1.0; then
 			AC_MSG_RESULT(yes)
@@ -240,6 +240,9 @@ if test "x$PKGCONFIG" != x; then
 			USBQUIRKS="\$(DATADIR)/usb"
 		else
 			AC_MSG_RESULT(no)
+			if test x$enable_libusb = xyes; then
+				AC_MSG_ERROR(libusb required for --enable-libusb.)
+			fi
 		fi
 	fi
 elif test x$enable_libusb = xyes; then
