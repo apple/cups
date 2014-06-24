@@ -14,6 +14,7 @@ CHANGES IN CUPS V1.7.4
 	- The RPM spec file did not work due to the new Brazilian Portuguese
 	  localization (STR #4436)
 	- Fixed an "IPP read error" issue (STR #4440)
+	- Fixed the --disable-libusb configure option (STR #4439)
 
 
 CHANGES IN CUPS V1.7.3
