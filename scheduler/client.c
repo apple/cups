@@ -1859,6 +1859,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    * Grab any request data from the connection...
 	    */
 
+	    if (!httpWait(con->http, 0))
+	      return;
+
 	    if ((ipp_state = ippRead(con->http, con->request)) == IPP_STATE_ERROR)
 	    {
               cupsdLogClient(con, CUPSD_LOG_ERROR, "IPP read error: %s",
