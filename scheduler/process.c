@@ -172,10 +172,16 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* CacheDir/... */
 		 " #\"^/private/var/db/\""
 		 " #\"^/private/var/folders/\""
+                 " #\"^/private/var/lib/\""
+                 " #\"^/private/var/log/\""
+                 " #\"^/private/var/mysql/\""
                  " #\"^/private/var/run/\""
+                 " #\"^/private/var/spool/\""
 		 " #\"^/Library/Application Support/\""
 		 " #\"^/Library/Caches/\""
+		 " #\"^/Library/Logs/\""
 		 " #\"^/Library/Preferences/\""
+		 " #\"^/Library/WebServer/\""
 		 " #\"^/Users/Shared/\""
 		 "))\n",
 		 temp, temp, cache, cache);
@@ -195,8 +201,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
                  " #\"^/private/var$\""
                  " #\"^/private/var/db$\""
                  " #\"^/private/var/folders$\""
+                 " #\"^/private/var/lib$\""
+                 " #\"^/private/var/log$\""
+                 " #\"^/private/var/mysql$\""
                  " #\"^/private/var/run$\""
-                 " #\"^/private/var/run/\""
                  " #\"^/private/var/spool$\""
                  " #\"^/usr/bin$\""	/* /usr/bin */
                  " #\"^/usr/bin/\""	/* /usr/bin/... */
@@ -215,10 +223,12 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^/Library/Frameworks/\""
 		 " #\"^/Library/Keychains$\""
 		 " #\"^/Library/Keychains/\""
+		 " #\"^/Library/Logs$\""
 		 " #\"^/Library/Printers$\""
 		 " #\"^/Library/Printers/\""
 		 " #\"^/Library/Security$\""
 		 " #\"^/Library/Security/\""
+		 " #\"^/Library/WebServer$\""
 		 " #\"^%s/Library$\""	/* RequestRoot/Library */
 		 " #\"^%s/Library/\""	/* RequestRoot/Library/... */
 		 " #\"^%s$\""		/* ServerBin */
