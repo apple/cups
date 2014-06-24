@@ -290,6 +290,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		   "))\n",
 		   testroot);
   }
+  cupsFilePrintf(fp,
+		 "(deny file-write* file-read-data file-read-metadata\n"
+		 "       (regex #\"^%s$\" #\"^%s/\"))\n",
+		 request, request);
   if (job_id)
   {
     /* Allow job filters to read the current job files... */
