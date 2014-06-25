@@ -122,13 +122,6 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   cupsFilePuts(fp, "(allow ipc-posix-shm)\n");
   cupsFilePuts(fp, "(allow ipc-sysv-shm)\n");
   cupsFilePuts(fp, "(allow mach-lookup)\n");
-  cupsFilePrintf(fp,
-		 "(deny file-write* file-read-data file-read-metadata\n"
-		 "  (regex"
-		 " #\"^%s$\""		/* RequestRoot */
-		 " #\"^%s/\""		/* RequestRoot/... */
-		 ")%s)\n",
-		 request, request, nodebug);
   if (!RunUser)
     cupsFilePrintf(fp,
 		   "(deny file-write* file-read-data file-read-metadata\n"
@@ -163,6 +156,31 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 "))\n",
 		 request);
   /* Read and write TempDir, CacheDir, and other common folders */
+  cupsFilePuts(fp,
+	       "(allow file-write* file-read-data file-read-metadata\n"
+	       "  (regex"
+	       " #\"^/private/var/db/\""
+	       " #\"^/private/var/folders/\""
+	       " #\"^/private/var/lib/\""
+	       " #\"^/private/var/log/\""
+	       " #\"^/private/var/mysql/\""
+	       " #\"^/private/var/run/\""
+	       " #\"^/private/var/spool/\""
+	       " #\"^/Library/Application Support/\""
+	       " #\"^/Library/Caches/\""
+	       " #\"^/Library/Logs/\""
+	       " #\"^/Library/Preferences/\""
+	       " #\"^/Library/WebServer/\""
+	       " #\"^/Users/Shared/\""
+	       "))\n");
+  cupsFilePrintf(fp,
+		 "(deny file-write*\n"
+		 "       (regex #\"^%s$\")%s)\n",
+		 request, nodebug);
+  cupsFilePrintf(fp,
+		 "(deny file-write* file-read-data file-read-metadata\n"
+		 "       (regex #\"^%s/\")%s)\n",
+		 request, nodebug);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
                  "  (regex"
@@ -170,19 +188,6 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* TempDir/... */
 		 " #\"^%s$\""		/* CacheDir */
 		 " #\"^%s/\""		/* CacheDir/... */
-		 " #\"^/private/var/db/\""
-		 " #\"^/private/var/folders/\""
-                 " #\"^/private/var/lib/\""
-                 " #\"^/private/var/log/\""
-                 " #\"^/private/var/mysql/\""
-                 " #\"^/private/var/run/\""
-                 " #\"^/private/var/spool/\""
-		 " #\"^/Library/Application Support/\""
-		 " #\"^/Library/Caches/\""
-		 " #\"^/Library/Logs/\""
-		 " #\"^/Library/Preferences/\""
-		 " #\"^/Library/WebServer/\""
-		 " #\"^/Users/Shared/\""
 		 "))\n",
 		 temp, temp, cache, cache);
   /* Read common folders */
@@ -290,10 +295,6 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		   "))\n",
 		   testroot);
   }
-  cupsFilePrintf(fp,
-		 "(deny file-write* file-read-data file-read-metadata\n"
-		 "       (regex #\"^%s$\" #\"^%s/\"))\n",
-		 request, request);
   if (job_id)
   {
     /* Allow job filters to read the current job files... */
