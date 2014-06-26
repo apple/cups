@@ -321,8 +321,7 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (interval || repeat)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
-	                                "incompatible with -P\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
 		usage();
 	      }
               break;
@@ -385,8 +384,7 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (interval || repeat)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
-	                                "incompatible with -X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
 		usage();
 	      }
 	      break;
@@ -541,8 +539,7 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (Output == _CUPS_OUTPUT_PLIST && interval)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
-	                                "incompatible with -X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
 		usage();
 	      }
 	      break;
@@ -565,8 +562,7 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (Output == _CUPS_OUTPUT_PLIST && repeat)
 	      {
-	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
-	                                "incompatible with -X\"."));
+	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."));
 		usage();
 	      }
 	      break;

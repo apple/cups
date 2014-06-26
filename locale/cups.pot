@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-12 20:06-0400\n"
+"POT-Creation-Date: 2014-06-26 14:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1101,15 +1101,15 @@ msgstr ""
 msgid "  --version               Show program version."
 msgstr ""
 
-#: test/ippfind.c:2716 test/ipptool.c:4718
+#: test/ippfind.c:2716 test/ipptool.c:4714
 msgid "  -4                      Connect using IPv4."
 msgstr ""
 
-#: test/ippfind.c:2717 test/ipptool.c:4719
+#: test/ippfind.c:2717 test/ipptool.c:4715
 msgid "  -6                      Connect using IPv6."
 msgstr ""
 
-#: test/ipptool.c:4720
+#: test/ipptool.c:4716
 msgid "  -C                      Send requests using chunking (default)."
 msgstr ""
 
@@ -1125,7 +1125,7 @@ msgstr ""
 msgid "  -E                      Encrypt the connection."
 msgstr ""
 
-#: test/ipptool.c:4722
+#: test/ipptool.c:4718
 msgid "  -E                      Test with HTTP Upgrade to TLS."
 msgstr ""
 
@@ -1137,7 +1137,7 @@ msgstr ""
 msgid "  -H samba-server         Use the named SAMBA server."
 msgstr ""
 
-#: test/ipptool.c:4724
+#: test/ipptool.c:4720
 msgid "  -I                      Ignore errors."
 msgstr ""
 
@@ -1149,7 +1149,7 @@ msgstr ""
 msgid "  -I {filename,filters,none,profiles}"
 msgstr ""
 
-#: test/ipptool.c:4725
+#: test/ipptool.c:4721
 msgid "  -L                      Send requests using content-length."
 msgstr ""
 
@@ -1165,7 +1165,7 @@ msgstr ""
 msgid "  -R root-directory       Set alternate root."
 msgstr ""
 
-#: test/ipptool.c:4727
+#: test/ipptool.c:4723
 msgid "  -S                      Test with SSL encryption."
 msgstr ""
 
@@ -1173,7 +1173,7 @@ msgstr ""
 msgid "  -T seconds              Set the browse timeout in seconds."
 msgstr ""
 
-#: test/ipptool.c:4729
+#: test/ipptool.c:4725
 msgid "  -T seconds              Set the receive/send timeout in seconds."
 msgstr ""
 
@@ -1181,7 +1181,7 @@ msgstr ""
 msgid "  -U username             Specify username."
 msgstr ""
 
-#: test/ippfind.c:2720 test/ipptool.c:4731
+#: test/ippfind.c:2720 test/ipptool.c:4727
 msgid "  -V version              Set default IPP version."
 msgstr ""
 
@@ -1189,7 +1189,7 @@ msgstr ""
 msgid "  -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,translations}"
 msgstr ""
 
-#: test/ipptool.c:4733
+#: test/ipptool.c:4729
 msgid "  -X                      Produce XML plist instead of plain text."
 msgstr ""
 
@@ -1217,7 +1217,7 @@ msgstr ""
 msgid "  -d domain               Browse/resolve in specified domain."
 msgstr ""
 
-#: test/ipptool.c:4735
+#: test/ipptool.c:4731
 msgid "  -d name=value           Set named variable to value."
 msgstr ""
 
@@ -1241,7 +1241,7 @@ msgstr ""
 msgid "  -f                      Run in the foreground."
 msgstr ""
 
-#: test/ipptool.c:4737
+#: test/ipptool.c:4733
 msgid "  -f filename             Set default request filename."
 msgstr ""
 
@@ -1261,7 +1261,7 @@ msgstr ""
 msgid "  -i mime/type            Set input MIME type (otherwise auto-typed)."
 msgstr ""
 
-#: test/ipptool.c:4739
+#: test/ipptool.c:4735
 msgid "  -i seconds              Repeat the last file with the given time interval."
 msgstr ""
 
@@ -1293,7 +1293,7 @@ msgstr ""
 msgid "  -n copies               Set number of copies."
 msgstr ""
 
-#: test/ipptool.c:4741
+#: test/ipptool.c:4737
 msgid "  -n count                Repeat the last file the given number of times."
 msgstr ""
 
@@ -1329,7 +1329,7 @@ msgstr ""
 msgid "  -q                      Quietly report match via exit code."
 msgstr ""
 
-#: systemv/cupstestppd.c:3826 test/ipptool.c:4743
+#: systemv/cupstestppd.c:3826 test/ipptool.c:4739
 msgid "  -q                      Run silently."
 msgstr ""
 
@@ -1345,7 +1345,7 @@ msgstr ""
 msgid "  -s                      Print service name if true."
 msgstr ""
 
-#: test/ipptool.c:4744
+#: test/ipptool.c:4740
 msgid "  -t                      Produce a test report."
 msgstr ""
 
@@ -1377,7 +1377,7 @@ msgstr ""
 msgid "  -u regex                Match URI to regular expression."
 msgstr ""
 
-#: systemv/cupsaddsmb.c:291 systemv/cupstestppd.c:3828 test/ipptool.c:4745
+#: systemv/cupsaddsmb.c:291 systemv/cupstestppd.c:3828 test/ipptool.c:4741
 #: ppdc/ppdc.cxx:447 ppdc/ppdpo.cxx:259
 msgid "  -v                      Be verbose."
 msgstr ""
@@ -1828,7 +1828,7 @@ msgstr ""
 msgid "%s: %s failed: %s"
 msgstr ""
 
-#: test/ippfind.c:773 test/ipptool.c:377
+#: test/ippfind.c:773 test/ipptool.c:376
 #, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
@@ -2048,12 +2048,12 @@ msgstr ""
 msgid "%s: Missing filename for \"-P\"."
 msgstr ""
 
-#: test/ippfind.c:745 test/ipptool.c:345
+#: test/ippfind.c:745 test/ipptool.c:344
 #, c-format
 msgid "%s: Missing timeout for \"-T\"."
 msgstr ""
 
-#: test/ippfind.c:758 test/ipptool.c:359
+#: test/ippfind.c:758 test/ipptool.c:358
 #, c-format
 msgid "%s: Missing version for \"-V\"."
 msgstr ""
@@ -2076,7 +2076,7 @@ msgstr ""
 #: berkeley/lpq.c:83 berkeley/lpr.c:67 berkeley/lprm.c:67 systemv/cancel.c:82
 #: systemv/cupsaccept.c:88 systemv/cupsaddsmb.c:86 systemv/lp.c:96
 #: systemv/lpadmin.c:225 systemv/lpinfo.c:88 systemv/lpmove.c:73
-#: systemv/lpstat.c:88 test/ipptool.c:289 test/ipptool.c:334
+#: systemv/lpstat.c:88 test/ipptool.c:289 test/ipptool.c:333
 #, c-format
 msgid "%s: Sorry, no encryption support."
 msgstr ""
@@ -3657,7 +3657,7 @@ msgstr ""
 msgid "Empty PPD file."
 msgstr ""
 
-#: cups/http.c:4608
+#: cups/http.c:4609
 msgid "Encryption is not supported."
 msgstr ""
 
@@ -3670,7 +3670,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: scheduler/client.c:2200
+#: scheduler/client.c:2203
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
 
@@ -4823,7 +4823,7 @@ msgstr ""
 
 #: scheduler/cupsfilter.c:1482 scheduler/main.c:2158 systemv/cupsaddsmb.c:284
 #: systemv/cupsctl.c:203 systemv/cupstestdsc.c:429 systemv/cupstestppd.c:3817
-#: test/ippfind.c:2715 test/ipptool.c:4717 ppdc/ppdc.cxx:432
+#: test/ippfind.c:2715 test/ipptool.c:4713 ppdc/ppdc.cxx:432
 #: ppdc/ppdhtml.cxx:174 ppdc/ppdi.cxx:130 ppdc/ppdmerge.cxx:363
 #: ppdc/ppdpo.cxx:254
 msgid "Options:"
@@ -5487,7 +5487,7 @@ msgstr ""
 msgid "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)."
 msgstr ""
 
-#: scheduler/client.c:2223
+#: scheduler/client.c:2226
 msgid "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it."
 msgstr ""
 
@@ -6167,7 +6167,7 @@ msgid ""
 "       ippfind --version"
 msgstr ""
 
-#: test/ipptool.c:4715
+#: test/ipptool.c:4711
 msgid "Usage: ipptool [options] URI filename [ ... filenameN ]"
 msgstr ""
 
@@ -6247,7 +6247,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: scheduler/client.c:2210
+#: scheduler/client.c:2213
 #, c-format
 msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
 msgstr ""
@@ -6494,48 +6494,44 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
-#: test/ipptool.c:324
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -P\"."
+#: test/ipptool.c:324 test/ipptool.c:387 test/ipptool.c:542 test/ipptool.c:565
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
 
-#: test/ipptool.c:388 test/ipptool.c:544 test/ipptool.c:568
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
-msgstr ""
-
-#: test/ipptool.c:625
+#: test/ipptool.c:621
 #, c-format
 msgid "ipptool: Bad URI - %s."
 msgstr ""
 
-#: test/ipptool.c:537
+#: test/ipptool.c:535
 msgid "ipptool: Invalid seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:606
+#: test/ipptool.c:602
 msgid "ipptool: May only specify a single URI."
 msgstr ""
 
-#: test/ipptool.c:560
+#: test/ipptool.c:557
 msgid "ipptool: Missing count for \"-n\"."
 msgstr ""
 
-#: test/ipptool.c:423
+#: test/ipptool.c:421
 msgid "ipptool: Missing filename for \"-f\"."
 msgstr ""
 
-#: test/ipptool.c:404
+#: test/ipptool.c:402
 msgid "ipptool: Missing name=value for \"-d\"."
 msgstr ""
 
-#: test/ipptool.c:527
+#: test/ipptool.c:525
 msgid "ipptool: Missing seconds for \"-i\"."
 msgstr ""
 
-#: test/ipptool.c:651
+#: test/ipptool.c:647
 msgid "ipptool: URI required before test file."
 msgstr ""
 
-#: test/ipptool.c:587
+#: test/ipptool.c:583
 #, c-format
 msgid "ipptool: Unknown option \"-%c\"."
 msgstr ""

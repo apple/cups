@@ -1448,8 +1448,7 @@
 "ippfind: Unable to execute \"%s\": %s" = "ippfind: Unable to execute \"%s\": %s";
 "ippfind: Unable to use Bonjour: %s" = "ippfind: Unable to use Bonjour: %s";
 "ippfind: Unknown variable \"{%s}\"." = "ippfind: Unknown variable \"{%s}\".";
-"ipptool: \"-i\" and \"-n\" are incompatible with -P\"." = "ipptool: \"-i\" and \"-n\" are incompatible with -P\".";
-"ipptool: \"-i\" and \"-n\" are incompatible with -X\"." = "ipptool: \"-i\" and \"-n\" are incompatible with -X\".";
+"ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"." = "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\".";
 "ipptool: Bad URI - %s." = "ipptool: Bad URI - %s.";
 "ipptool: Invalid seconds for \"-i\"." = "ipptool: Invalid seconds for \"-i\".";
 "ipptool: May only specify a single URI." = "ipptool: May only specify a single URI.";

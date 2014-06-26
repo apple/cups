@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-12 20:06-0400\n"
+"POT-Creation-Date: 2014-06-26 14:24-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -5253,11 +5253,8 @@ msgstr ""
 msgid "ippfind: Unknown variable \"{%s}\"."
 msgstr ""
 
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -P\"."
+msgid "ipptool: \"-i\" and \"-n\" are incompatible with \"-P\" and \"-X\"."
 msgstr ""
-
-msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
-msgstr "ipptool: \"-i\" y \"-n\" son incompatibles with -X\"."
 
 #, c-format
 msgid "ipptool: Bad URI - %s."
@@ -6111,6 +6108,9 @@ msgstr "variable-bindings usa una longitud indefinida"
 #~ msgstr ""
 #~ "cupsd: el uso de launchd(8) no ha sido compilado, ejecutándose en modo "
 #~ "normal."
+
+#~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
+#~ msgstr "ipptool: \"-i\" y \"-n\" son incompatibles with -X\"."
 
 #~ msgid "ipptool: Bad version %s for \"-V\"."
 #~ msgstr "ipptool: Versión %s para \"-V\" incorrecta."
