@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:24-0400\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -2826,12 +2826,12 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr "\"%s\" は無効な port-monitor です。"
 
-msgid "Bad printer URI."
-msgstr "不正なプリンター URI です。"
-
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr "%d は無効な printer-state 値です。"
+
+msgid "Bad printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Bad request ID %d."
@@ -4772,8 +4772,8 @@ msgstr "テストページを印刷できません"
 msgid "Unable to read print data."
 msgstr "プリントデータを読み込めません。"
 
-msgid "Unable to resolve printer URI."
-msgstr "プリンター URI を解決できません。"
+msgid "Unable to resolve printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Unable to run \"%s\": %s"
@@ -6051,6 +6051,9 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: エラー - \"-b\" オプションのあとに宛先が必要です。"
 
+#~ msgid "Bad printer URI."
+#~ msgstr "不正なプリンター URI です。"
+
 #~ msgid "Enter old password:"
 #~ msgstr "古いパスワードを入力:"
 
@@ -6137,6 +6140,9 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "Unable to open compressed print file"
 #~ msgstr "圧縮プリントファイルを開けません"
+
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "プリンター URI を解決できません。"
 
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "使い方: cupsfilter [オプション] ファイル名"

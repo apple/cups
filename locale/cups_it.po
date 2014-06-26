@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:24-0400\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -2872,12 +2872,12 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr "Il valore di port-monitor \"%s\" non è valido."
 
-msgid "Bad printer URI."
-msgstr "L'URI della stampante non è valido."
-
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr "Il valore di printer-state %d non è valido."
+
+msgid "Bad printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Bad request ID %d."
@@ -4838,8 +4838,8 @@ msgstr "Non è possibile stampare la pagina di prova"
 msgid "Unable to read print data."
 msgstr "Non è possibile leggere i dati della stampa."
 
-msgid "Unable to resolve printer URI."
-msgstr "Non è possibile risolvere l'URI della stampante."
+msgid "Unable to resolve printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Unable to run \"%s\": %s"
@@ -6066,6 +6066,9 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
 
+#~ msgid "Bad printer URI."
+#~ msgstr "L'URI della stampante non è valido."
+
 #~ msgid "Enter old password:"
 #~ msgstr "Digitare la vecchia password:"
 
@@ -6130,6 +6133,9 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "There is a paper jam."
 #~ msgstr "Vi è un inceppamento della carta."
+
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "Non è possibile risolvere l'URI della stampante."
 
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "Uso: cupsfilter [ opzioni ] file"

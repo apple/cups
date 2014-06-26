@@ -607,7 +607,7 @@ cupsConnectDest(
                       userpass, sizeof(userpass), hostname, sizeof(hostname),
                       &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
 
     if (cb)
       (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_ERROR,
@@ -1293,7 +1293,7 @@ _cupsGetDestResource(
                       userpass, sizeof(userpass), hostname, sizeof(hostname),
                       &port, resource, (int)resourcesize) < HTTP_URI_STATUS_OK)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
 
     return (NULL);
   }
@@ -1340,7 +1340,7 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
   if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK ||
       (strncmp(uri, "ipp://", 6) && strncmp(uri, "ipps://", 7)))
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Bad printer-uri."), 1);
 
     return (NULL);
   }
@@ -3442,7 +3442,7 @@ cups_dnssd_resolve(
 			     _HTTP_RESOLVE_FQDN, cups_dnssd_resolve_cb,
 			     &resolve)) == NULL)
   {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to resolve printer URI."), 1);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to resolve printer-uri."), 1);
 
     if (cb)
       (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_ERROR,

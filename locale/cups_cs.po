@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:24-0400\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -2604,11 +2604,11 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr ""
 
-msgid "Bad printer URI."
-msgstr ""
-
 #, c-format
 msgid "Bad printer-state value %d."
+msgstr ""
+
+msgid "Bad printer-uri."
 msgstr ""
 
 #, c-format
@@ -4515,7 +4515,7 @@ msgstr "Nelze vytisknout zkušební stránku"
 msgid "Unable to read print data."
 msgstr ""
 
-msgid "Unable to resolve printer URI."
+msgid "Unable to resolve printer-uri."
 msgstr ""
 
 #, c-format

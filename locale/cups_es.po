@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:24-0400\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: 2012-07-01 20:21+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -2786,12 +2786,12 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr "port-monitor \"%s\" incorrecto."
 
-msgid "Bad printer URI."
-msgstr "URI de impresora incorrecto."
-
 #, c-format
 msgid "Bad printer-state value %d."
 msgstr "Valor printer-state %d incorrecto."
+
+msgid "Bad printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Bad request ID %d."
@@ -4754,8 +4754,8 @@ msgstr "No se ha podido imprimir la página de prueba"
 msgid "Unable to read print data."
 msgstr "No se han podido leer los datos de impresión."
 
-msgid "Unable to resolve printer URI."
-msgstr "No se ha podido resolver el URI de la impresora."
+msgid "Unable to resolve printer-uri."
+msgstr ""
 
 #, c-format
 msgid "Unable to run \"%s\": %s"
@@ -5993,6 +5993,9 @@ msgstr "variable-bindings usa una longitud indefinida"
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: Error - se esperaba un destino tras la opción \"-b\"."
 
+#~ msgid "Bad printer URI."
+#~ msgstr "URI de impresora incorrecto."
+
 #~ msgid "Enter old password:"
 #~ msgstr "Introduzca la contraseña antigua:"
 
@@ -6081,6 +6084,9 @@ msgstr "variable-bindings usa una longitud indefinida"
 
 #~ msgid "Unable to open compressed print file"
 #~ msgstr "No se ha podido abrir el archivo de impresión comprimido"
+
+#~ msgid "Unable to resolve printer URI."
+#~ msgstr "No se ha podido resolver el URI de la impresora."
 
 #~ msgid "Usage: cupsfilter [ options ] filename"
 #~ msgstr "Uso: cupsfilter ( opciones ) archivo"

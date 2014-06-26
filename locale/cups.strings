@@ -719,8 +719,8 @@
 "Bad page-ranges values %d-%d." = "Bad page-ranges values %d-%d.";
 "Bad port number in URI" = "Bad port number in URI";
 "Bad port-monitor \"%s\"." = "Bad port-monitor \"%s\".";
-"Bad printer URI." = "Bad printer URI.";
 "Bad printer-state value %d." = "Bad printer-state value %d.";
+"Bad printer-uri." = "Bad printer-uri.";
 "Bad request ID %d." = "Bad request ID %d.";
 "Bad request version number %d.%d." = "Bad request version number %d.%d.";
 "Bad resource in URI" = "Bad resource in URI";
@@ -1317,7 +1317,7 @@
 "Unable to open raster file" = "Unable to open raster file";
 "Unable to print test page" = "Unable to print test page";
 "Unable to read print data." = "Unable to read print data.";
-"Unable to resolve printer URI." = "Unable to resolve printer URI.";
+"Unable to resolve printer-uri." = "Unable to resolve printer-uri.";
 "Unable to run \"%s\": %s" = "Unable to run \"%s\": %s";
 "Unable to see in file" = "Unable to see in file";
 "Unable to send command to printer driver" = "Unable to send command to printer driver";

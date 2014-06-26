@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:24-0400\n"
+"POT-Creation-Date: 2014-06-26 14:29-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3376,13 +3376,13 @@ msgstr ""
 msgid "Bad port-monitor \"%s\"."
 msgstr ""
 
-#: cups/dest.c:610 cups/dest.c:1296 cups/dest.c:1343
-msgid "Bad printer URI."
-msgstr ""
-
 #: scheduler/ipp.c:2502
 #, c-format
 msgid "Bad printer-state value %d."
+msgstr ""
+
+#: cups/dest.c:610 cups/dest.c:1296 cups/dest.c:1343
+msgid "Bad printer-uri."
 msgstr ""
 
 #: scheduler/ipp.c:207
@@ -5897,7 +5897,7 @@ msgid "Unable to read print data."
 msgstr ""
 
 #: cups/dest.c:3445
-msgid "Unable to resolve printer URI."
+msgid "Unable to resolve printer-uri."
 msgstr ""
 
 #: cups/adminutil.c:2077
