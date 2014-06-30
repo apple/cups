@@ -15,6 +15,8 @@ CHANGES IN CUPS V1.7.4
 	  localization (STR #4436)
 	- Fixed an "IPP read error" issue (STR #4440)
 	- Fixed the --disable-libusb configure option (STR #4439)
+	- Fixed the debug output from the DNS-SD backend when using Avahi
+	  (STR #4444)
 
 
 CHANGES IN CUPS V1.7.3

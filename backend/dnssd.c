@@ -921,8 +921,12 @@ get_device(cups_array_t *devices,	/* I - Device array */
   * Yes, add the device...
   */
 
-  fprintf(stderr, "DEBUG: Found \"%s.%s%s\"...\n", serviceName, regtype,
-	  replyDomain);
+#ifdef HAVE_DNSSD
+  DNSServiceConstructFullName(fullName, serviceName, regtype, replyDomain);
+#else /* HAVE_AVAHI */
+  avahi_service_name_join(fullName, kDNSServiceMaxDomainName,
+			   serviceName, regtype, replyDomain);
+#endif /* HAVE_DNSSD */
 
   device           = calloc(sizeof(cups_device_t), 1);
   device->name     = strdup(serviceName);
