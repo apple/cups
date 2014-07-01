@@ -324,6 +324,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
       cupsFilePrintf(fp, "\n       (literal \"%s\")", domain);
     }
   }
+  /* Allow access to Bluetooth, USB, and notify_post. */
+  cupsFilePuts(fp, "(allow iokit*)\n");
+  cupsFilePuts(fp, "(allow distributed-notification-post)\n");
   if (allow_networking)
   {
     /* Allow TCP and UDP networking off the machine... */
@@ -333,21 +336,19 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		     "       (local udp \"*:*\")\n"
 		     "       (remote udp \"*:*\"))\n");
 
-    /* Also allow access to Bluetooth, USB, device files, etc. */
-    cupsFilePuts(fp, "(allow iokit*)\n");
+    /* Also allow access to device files... */
     cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
                      "       (regex #\"^/dev/\"))\n");
-    cupsFilePuts(fp, "(allow distributed-notification-post)\n");
   }
   else
   {
-    /* Only allow SNMP (UDP) off the machine... */
+    /* Only allow SNMP (UDP) and LPD (TCP) off the machine... */
     cupsFilePuts(fp, ")\n");
     cupsFilePuts(fp, "(allow network-outbound\n"
-		     "       (remote udp \"*:161\"))\n");
+		     "       (remote udp \"*:161\")"
+		     "       (remote tcp \"*:515\"))\n");
     cupsFilePuts(fp, "(allow network-inbound\n"
 		     "       (local udp \"localhost:*\"))\n");
-    cupsFilePuts(fp, "(deny iokit* (with no-report))\n");
   }
   cupsFileClose(fp);
 
