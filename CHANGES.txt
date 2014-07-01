@@ -1,4 +1,4 @@
-CHANGES.txt - 1.7.4 - 2014-06-24
+CHANGES.txt - 1.7.4 - 2014-07-01
 --------------------------------
 
 CHANGES IN CUPS V1.7.4
@@ -15,6 +15,10 @@ CHANGES IN CUPS V1.7.4
 	  localization (STR #4436)
 	- Fixed an "IPP read error" issue (STR #4440)
 	- Fixed the --disable-libusb configure option (STR #4439)
+	- Fixed the debug output from the DNS-SD backend when using Avahi
+	  (STR #4444)
+	- Fixed a bug in the CUPS_SC_GET_DEVICE_ID handling by the network
+	  backends (STR #4447)
 
 
 CHANGES IN CUPS V1.7.3
