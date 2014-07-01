@@ -396,9 +396,12 @@ httpCredentialsGetTrust(
 {
   http_trust_t		trust = HTTP_TRUST_OK;
 					/* Trusted? */
+
+#if 0
   cups_array_t		*tcreds = NULL;	/* Trusted credentials */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread globals */
+#endif /* 0 */
 
 
   if (!common_name)
@@ -480,9 +483,11 @@ httpCredentialsGetExpiration(
 {
 #if 0
   expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
-#endif /* 0 */
 
   return (expiration);
+#else
+  return (INT_MAX);
+#endif /* 0 */
 }
 
 
