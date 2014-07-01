@@ -53,9 +53,10 @@ cupsMakeServerCredentials(
     const char **alt_names,		/* I - Subject Alternate Names */
     time_t     expiration_date)		/* I - Expiration date */
 {
-  gnutls_x509_crt	crt;		/* Self-signed certificate */
-  gnutls_x509_privkey	key;		/* Encryption private key */
-  char			crtfile[1024],	/* Certificate filename */
+  gnutls_x509_crt_t	crt;		/* Self-signed certificate */
+  gnutls_x509_privkey_t	key;		/* Encryption private key */
+  char			temp[1024],	/* Temporary directory name */
+ 			crtfile[1024],	/* Certificate filename */
 			keyfile[1024];	/* Private key filename */
   cups_lang_t		*language;	/* Default language info */
   cups_file_t		*fp;		/* Key/cert file */
@@ -77,11 +78,11 @@ cupsMakeServerCredentials(
     const char *home = getenv("HOME");	/* HOME environment variable */
 
     if (getuid() && home)
-      snprintf(buffer, sizeof(buffer), "%s/.cups/ssl", home);
+      snprintf(temp, sizeof(temp), "%s/.cups/ssl", home);
     else
-      snprintf(buffer, sizeof(buffer), "%s/ssl", CUPS_SERVERROOT);
+      snprintf(temp, sizeof(temp), "%s/ssl", CUPS_SERVERROOT);
 
-    path = buffer;
+    path = temp;
 
     DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
   }
@@ -221,7 +222,7 @@ cupsSetServerCredentials(
     const char *common_name,		/* I - Default common name for server */
     int        auto_create)		/* I - 1 = automatically create self-signed certificates */
 {
-  char	buffer[1024];			/* Default path buffer */
+  char	temp[1024];			/* Default path buffer */
 
 
   DEBUG_printf(("cupsSetServerCredentials(path=\"%s\", common_name=\"%s\", auto_create=%d)", path, common_name, auto_create));
@@ -247,11 +248,11 @@ cupsSetServerCredentials(
     const char *home = getenv("HOME");	/* HOME environment variable */
 
     if (getuid() && home)
-      snprintf(buffer, sizeof(buffer), "%s/.cups/ssl", home);
+      snprintf(temp, sizeof(temp), "%s/.cups/ssl", home);
     else
-      snprintf(buffer, sizeof(buffer), "%s/ssl", CUPS_SERVERROOT);
+      snprintf(temp, sizeof(temp), "%s/ssl", CUPS_SERVERROOT);
 
-    path = buffer;
+    path = temp;
 
     DEBUG_printf(("1cupsSetServerCredentials: Using default path \"%s\".", path));
   }
@@ -373,10 +374,6 @@ http_gnutls_write(
 
   DEBUG_printf(("6http_gnutls_write(ptr=%p, data=%p, length=%d)", ptr, data,
                 (int)length));
-#ifdef DEBUG
-  http_debug_hex("http_gnutls_write", data, (int)length);
-#endif /* DEBUG */
-
   bytes = send(((http_t *)ptr)->fd, data, length, 0);
   DEBUG_printf(("http_gnutls_write: bytes=%d", (int)bytes));
 
@@ -511,7 +508,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   gnutls_transport_set_pull_function(http->tls, http_gnutls_read);
   gnutls_transport_set_push_function(http->tls, http_gnutls_write);
 
-  if (http->mode == _HTTP_CLIENT)
+  if (http->mode == _HTTP_MODE_CLIENT)
   {
    /*
     * Client: get the hostname to use for TLS...
@@ -655,9 +652,9 @@ _httpTLSStop(http_t *http)		/* I - Connection to server */
   int	error;				/* Error code */
 
 
-  error = gnutls_bye(http->tls, http->mode == _HTTP_CLIENT ? GNUTLS_SHUT_RDWR : GNUTLS_SHUT_WR);
+  error = gnutls_bye(http->tls, http->mode == _HTTP_MODE_CLIENT ? GNUTLS_SHUT_RDWR : GNUTLS_SHUT_WR);
   if (error != GNUTLS_E_SUCCESS)
-    _cupsSetError(IPP_STATUS_ERROR, gnutls_strerror(errno), 0);
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gnutls_strerror(errno), 0);
 
   gnutls_deinit(http->tls);
   http->tls = NULL;
