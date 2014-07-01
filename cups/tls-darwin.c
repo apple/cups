@@ -84,6 +84,8 @@ cupsMakeServerCredentials(
 					/* Key generation parameters */
 
 
+  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, alt_names, (int)expiration_date));
+
   (void)num_alt_names;
   (void)alt_names;
   (void)expiration_date;
@@ -182,6 +184,8 @@ cleanup:
 		infofile[1024];		/* Type-in information for cert */
   cups_file_t	*fp;			/* Seed/info file */
 
+
+  DEBUG_printf(("cupsMakeServerCredentials(path=\"%s\", common_name=\"%s\", num_alt_names=%d, alt_names=%p, expiration_date=%d)", path, common_name, num_alt_names, alt_names, (int)expiration_date));
 
   (void)num_alt_names;
   (void)alt_names;

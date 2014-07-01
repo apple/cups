@@ -168,7 +168,7 @@ extern "C" {
  */
 
 typedef gnutls_session_t http_tls_t;
-typedef void *http_tls_credentials_t;
+typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
 
 #  elif defined(HAVE_CDSASSL)
 /*
