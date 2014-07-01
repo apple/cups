@@ -17,6 +17,8 @@ CHANGES IN CUPS V1.7.4
 	- Fixed the --disable-libusb configure option (STR #4439)
 	- Fixed the debug output from the DNS-SD backend when using Avahi
 	  (STR #4444)
+	- Fixed a bug in the CUPS_SC_GET_DEVICE_ID handling by the network
+	  backends (STR #4447)
 
 
 CHANGES IN CUPS V1.7.3

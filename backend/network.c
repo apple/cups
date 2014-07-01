@@ -250,6 +250,12 @@ backendNetworkSideCB(
 	datalen = 0;
 	break;
 
+    case CUPS_SC_CMD_GET_CONNECTED :
+	status  = CUPS_SC_STATUS_OK;
+        data[0] = device_fd != -1;
+        datalen = 1;
+        break;
+
     case CUPS_SC_CMD_GET_DEVICE_ID :
         if (snmp_fd >= 0)
 	{
@@ -286,12 +292,6 @@ backendNetworkSideCB(
 	  status  = CUPS_SC_STATUS_OK;
 	  break;
 	}
-
-    case CUPS_SC_CMD_GET_CONNECTED :
-	status  = CUPS_SC_STATUS_OK;
-        data[0] = device_fd != -1;
-        datalen = 1;
-        break;
 
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
