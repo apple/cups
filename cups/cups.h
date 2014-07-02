@@ -30,10 +30,6 @@
 typedef off_t ssize_t;			/* @private@ */
 #  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
-#  ifdef __BLOCKS__
-#    include <dispatch/dispatch.h>
-#  endif /* __BLOCKS__ */
-
 #  include "file.h"
 #  include "ipp.h"
 #  include "language.h"
