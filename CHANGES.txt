@@ -1,8 +1,10 @@
-CHANGES.txt - 1.7.4 - 2014-07-01
+CHANGES.txt - 1.7.4 - 2014-07-02
 --------------------------------
 
 CHANGES IN CUPS V1.7.4
 
+	- The CUPS headers incorrectly needed libdispatch for blocks support
+	  (STR #4397)
 	- CUPS did not compile when Avahi or mDNSResponder was not present
 	  (STR #4402, STR #4424)
 	- The "snmp" option did not work with the network backends (STR #4422)
@@ -35,8 +37,6 @@ CHANGES IN CUPS V1.7.3
 	- Fixed an authentication race condition in cupsSendRequest (STR #4403)
 	- The scheduler did not add the "job-hold-until-specified" reason when
 	  holding a job using the lp command (STR #4405)
-	- The CUPS headers incorrectly needed libdispatch for blocks support
-	  (STR #4397)
 	- The configure script incorrectly added libgcrypt as a GNU TLS
 	  dependency (STR #4399)
 	- cupsGetDestMediaCount did not work for CUPS_MEDIA_FLAGS DEFAULT
