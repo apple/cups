@@ -259,21 +259,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		   " #\"^/Library/Printers/PPD Plugins/\""
 		   ")%s)\n", nodebug);
   }
-  /* Allow execution of child processes */
-  cupsFilePuts(fp, "(allow process-fork)\n");
-  cupsFilePrintf(fp,
-                 "(allow process-exec\n"
-                 "  (regex"
-                 " #\"^/bin/\""		/* /bin/... */
-                 " #\"^/usr/bin/\""	/* /usr/bin/... */
-                 " #\"^/usr/libexec/cups/\""	/* /usr/libexec/cups/... */
-                 " #\"^/usr/libexec/fax/\""	/* /usr/libexec/fax/... */
-                 " #\"^/usr/sbin/\""	/* /usr/sbin/... */
-		 " #\"^%s/\""		/* ServerBin/... */
-		 " #\"^/Library/Printers/.*/\""
-		 " #\"^/System/Library/Frameworks/Python.framework/\""
-		 "))\n",
-		 bin);
+  /* Allow execution of child processes as long as the programs are not in a user directory */
+  cupsFilePuts(fp, "(allow process*)\n");
+  cupsFilePuts(fp, "(deny process-exec (regex #\"^/Users/\"))\n");
   if (RunUser && getenv("CUPS_TESTROOT"))
   {
     /* Allow source directory access in "make test" environment */
@@ -311,6 +299,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 "  (literal \"/usr/sbin/sendmail\")\n"
 		 "  (with no-sandbox))\n");
   }
+  /* Allow access to Bluetooth, USB, and notify_post. */
+  cupsFilePuts(fp, "(allow iokit*)\n");
+  cupsFilePuts(fp, "(allow distributed-notification-post)\n");
   /* Allow outbound networking to local services */
   cupsFilePuts(fp, "(allow network-outbound"
 		   "\n       (regex #\"^/private/var/run/\" #\"^/private/tmp/\")");
@@ -324,9 +315,6 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
       cupsFilePrintf(fp, "\n       (literal \"%s\")", domain);
     }
   }
-  /* Allow access to Bluetooth, USB, and notify_post. */
-  cupsFilePuts(fp, "(allow iokit*)\n");
-  cupsFilePuts(fp, "(allow distributed-notification-post)\n");
   if (allow_networking)
   {
     /* Allow TCP and UDP networking off the machine... */
