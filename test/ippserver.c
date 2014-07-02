@@ -321,6 +321,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*icon = "printer.png",	/* Icon file */
 		*formats = "application/pdf,image/jpeg,image/pwg-raster";
 	      				/* Supported formats */
+#ifdef HAVE_SSL
+  const char	*keypath = NULL;	/* Keychain path */
+#endif /* HAVE_SSL */
 #ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
 #endif /* HAVE_DNSSD */
@@ -341,11 +344,21 @@ main(int  argc,				/* I - Number of command-line args */
     if (argv[i][0] == '-')
     {
       for (opt = argv[i] + 1; *opt; opt ++)
+      {
         switch (*opt)
 	{
 	  case '2' : /* -2 (enable 2-sided printing) */
 	      duplex = 1;
 	      break;
+
+#ifdef HAVE_SSL
+	  case 'K' : /* -K keypath */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+	      keypath = argv[i];
+	      break;
+#endif /* HAVE_SSL */
 
 	  case 'M' : /* -M manufacturer */
 	      i ++;
@@ -447,6 +460,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      fprintf(stderr, "Unknown option \"-%c\".\n", *opt);
 	      usage(1);
 	}
+      }
     }
     else if (!name)
     {
@@ -479,6 +493,10 @@ main(int  argc,				/* I - Number of command-line args */
     if (Verbosity)
       fprintf(stderr, "Using spool directory \"%s\".\n", directory);
   }
+
+#ifdef HAVE_SSL
+  cupsSetServerCredentials(keypath, servername, 1);
+#endif /* HAVE_SSL */
 
  /*
   * Create the printer...
@@ -3694,9 +3712,39 @@ process_client(_ipp_client_t *client)	/* I - Client */
   * Loop until we are out of requests or timeout (30 seconds)...
   */
 
+#ifdef HAVE_SSL
+  int first_time = 1;			/* First time request? */
+#endif /* HAVE_SSL */
+
   while (httpWait(client->http, 30000))
+  {
+#ifdef HAVE_SSL
+    if (first_time)
+    {
+     /*
+      * See if we need to negotiate a TLS connection...
+      */
+
+      char buf[1];			/* First byte from client */
+
+      if (recv(httpGetFd(client->http), buf, 1, MSG_PEEK) == 1 && (!buf[0] || !strchr("DGHOPT", buf[0])))
+      {
+        fprintf(stderr, "%s Negotiating TLS session.\n", client->hostname);
+
+	if (httpEncryption(client->http, HTTP_ENCRYPTION_ALWAYS))
+	{
+	  fprintf(stderr, "%s Unable to encrypt connection: %s\n", client->hostname, cupsLastErrorString());
+	  break;
+        }
+      }
+
+      first_time = 0;
+    }
+#endif /* HAVE_SSL */
+
     if (!process_http(client))
       break;
+  }
 
  /*
   * Close the conection to the client and return...
@@ -4448,7 +4496,7 @@ register_printer(
     return (0);
   }
 
-#  if 0 /* ifdef HAVE_SSL */
+#  ifdef HAVE_SSL
  /*
   * Then register the _ipps._tcp (IPP) service type with the real port number to
   * advertise our IPP printer...

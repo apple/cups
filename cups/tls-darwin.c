@@ -64,13 +64,14 @@ static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, 
 
 int					/* O - 1 on success, 0 on failure */
 cupsMakeServerCredentials(
-    const char *path,			/* I - Path to keychain/directory */
+    const char *path,			/* I - Keychain path or @code NULL@ for default */
     const char *common_name,		/* I - Common name */
     int        num_alt_names,		/* I - Number of subject alternate names */
     const char **alt_names,		/* I - Subject Alternate Names */
     time_t     expiration_date)		/* I - Expiration date */
 {
 #if defined(HAVE_SECGENERATESELFSIGNEDCERTIFICATE) && defined(HAVE_SECKEYCHAINOPEN)
+  char			filename[1024];	/* Default keychain path */
   int			status = 0;	/* Return status */
   OSStatus		err;		/* Error code (if any) */
   CFStringRef		cfcommon_name = NULL;
@@ -90,8 +91,21 @@ cupsMakeServerCredentials(
   (void)alt_names;
   (void)expiration_date;
 
-  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name,
-                                           kCFStringEncodingUTF8);
+  if (!path)
+  {
+    const char *home = getenv("HOME");	/* HOME environment variable */
+
+    if (getuid() && home)
+      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
+    else
+      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
+
+    path = filename;
+
+    DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
+  }
+
+  cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
   if (!cfcommon_name)
     goto cleanup;
 
@@ -99,16 +113,13 @@ cupsMakeServerCredentials(
   * Create a public/private key pair...
   */
 
-  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					&kCFTypeDictionaryKeyCallBacks,
-					&kCFTypeDictionaryValueCallBacks);
+  keyParams = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
   if (!keyParams)
     goto cleanup;
 
   CFDictionaryAddValue(keyParams, kSecAttrKeyType, kSecAttrKeyTypeRSA);
   CFDictionaryAddValue(keyParams, kSecAttrKeySizeInBits, CFSTR("2048"));
-  CFDictionaryAddValue(keyParams, kSecAttrLabel,
-                       CFSTR("CUPS Self-Signed Certificate"));
+  CFDictionaryAddValue(keyParams, kSecAttrLabel, CFSTR("CUPS Self-Signed Certificate"));
 
   err = SecKeyGeneratePair(keyParams, &publicKey, &privateKey);
   if (err != noErr)
@@ -181,7 +192,8 @@ cleanup:
 		*envp[1000],		/* Environment variables */
 		days[32],		/* CERTTOOL_EXPIRATION_DAYS env var */
 		keychain[1024],		/* Keychain argument */
-		infofile[1024];		/* Type-in information for cert */
+		infofile[1024],		/* Type-in information for cert */
+		filename[1024];		/* Default keychain path */
   cups_file_t	*fp;			/* Seed/info file */
 
 
@@ -189,6 +201,20 @@ cleanup:
 
   (void)num_alt_names;
   (void)alt_names;
+
+  if (!path)
+  {
+    const char *home = getenv("HOME");	/* HOME environment variable */
+
+    if (getuid() && home)
+      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
+    else
+      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
+
+    path = filename;
+
+    DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
+  }
 
  /*
   * Run the "certtool" command to generate a self-signed certificate...
@@ -244,6 +270,10 @@ cleanup:
   posix_spawn_file_actions_init(&actions);
   posix_spawn_file_actions_addclose(&actions, 0);
   posix_spawn_file_actions_addopen(&actions, 0, infofile, O_RDONLY, 0);
+  posix_spawn_file_actions_addclose(&actions, 1);
+  posix_spawn_file_actions_addopen(&actions, 1, "/dev/null", O_WRONLY, 0);
+  posix_spawn_file_actions_addclose(&actions, 2);
+  posix_spawn_file_actions_addopen(&actions, 2, "/dev/null", O_WRONLY, 0);
 
   if (posix_spawn(&pid, command, &actions, NULL, argv, envp))
   {
@@ -278,15 +308,30 @@ cleanup:
 
 int					/* O - 1 on success, 0 on failure */
 cupsSetServerCredentials(
-    const char *path,			/* I - Path to keychain/directory */
+    const char *path,			/* I - Keychain path or @code NULL@ for default */
     const char *common_name,		/* I - Default common name for server */
     int        auto_create)		/* I - 1 = automatically create self-signed certificates */
 {
   DEBUG_printf(("cupsSetServerCredentials(path=\"%s\", common_name=\"%s\", auto_create=%d)", path, common_name, auto_create));
 
 #ifdef HAVE_SECKEYCHAINOPEN
+  char			filename[1024];	/* Filename for keychain */
   SecKeychainRef	keychain = NULL;/* Temporary keychain */
 
+
+  if (!path)
+  {
+    const char *home = getenv("HOME");	/* HOME environment variable */
+
+    if (getuid() && home)
+      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
+    else
+      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
+
+    path = filename;
+
+    DEBUG_printf(("1cupsSetServerCredentials: Using default path \"%s\".", path));
+  }
 
   if (SecKeychainOpen(path, &keychain) != noErr)
   {
@@ -703,7 +748,7 @@ _httpFreeCredentials(
 
 int					/* O - 0 on success, -1 on error */
 httpLoadCredentials(
-    const char   *path,			/* I  - Keychain/PKCS#12 path */
+    const char   *path,			/* I  - Keychain path or @code NULL@ for default */
     cups_array_t **credentials,		/* IO - Credentials */
     const char   *common_name)		/* I  - Common name for credentials */
 {
@@ -741,7 +786,6 @@ httpLoadCredentials(
 
     DEBUG_printf(("1httpLoadCredentials: Using default path \"%s\".", path));
   }
-
 
   if ((err = SecKeychainOpen(path, &keychain)) != noErr)
     goto cleanup;
@@ -821,7 +865,7 @@ httpLoadCredentials(
 
 int					/* O - -1 on error, 0 on success */
 httpSaveCredentials(
-    const char   *path,			/* I - Keychain/PKCS#12 path */
+    const char   *path,			/* I - Keychain path or @code NULL@ for default */
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Common name for credentials */
 {
@@ -1459,6 +1503,8 @@ http_cdsa_copy_server(
   if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)))
     goto cleanup;
 
+  _cupsMutexLock(&tls_mutex);
+
   list = CFArrayCreate(kCFAllocatorDefault, (const void **)&tls_keychain, 1, &kCFTypeArrayCallBacks);
 
   CFDictionaryAddValue(query, kSecClass, kSecClassIdentity);
@@ -1470,6 +1516,8 @@ http_cdsa_copy_server(
   CFRelease(list);
 
   err = SecItemCopyMatching(query, (CFTypeRef *)&identity);
+
+  _cupsMutexUnlock(&tls_mutex);
 
   if (err)
     goto cleanup;
