@@ -2292,6 +2292,8 @@ cupsdSendHeader(
   char		auth_str[1024];		/* Authorization string */
 
 
+  cupsdLogClient(con, CUPSD_LOG_DEBUG, "cupsdSendHeader: code=%d, type=\"%s\", auth_type=%d", code, type, auth_type);
+
  /*
   * Send the HTTP status header...
   */
@@ -2662,6 +2664,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 		!httpGetField(con->http, HTTP_FIELD_CONTENT_LENGTH)[0])
 	      httpSetLength(con->http, 0);
 
+            cupsdLogClient(con, CUPSD_LOG_DEBUG, "Sending status %d for CGI.", con->pipe_status);
+
             if (!cupsdSendHeader(con, con->pipe_status, NULL, CUPSD_AUTH_NONE))
 	    {
 	      cupsdCloseClient(con);
@@ -2713,7 +2717,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     {
       cupsdLogRequest(con, HTTP_STATUS_OK);
 
-      if (httpIsChunked(con->http) && (!con->pipe_pid || con->sent_header == 1))
+      if (httpIsChunked(con->http) && (!con->pipe_pid || con->sent_header > 0))
       {
         cupsdLogClient(con, CUPSD_LOG_DEBUG, "Sending 0-length chunk.");
 
