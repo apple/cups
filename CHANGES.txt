@@ -1,8 +1,11 @@
-CHANGES.txt - 1.7.4 - 2014-07-02
+CHANGES.txt - 1.7.4 - 2014-07-03
 --------------------------------
 
 CHANGES IN CUPS V1.7.4
 
+	- Security: The web interface incorrectly served symlinked files and
+	  files that were not world-readable, potentially leading to a
+	  disclosure of information (STR #4450)
 	- The CUPS headers incorrectly needed libdispatch for blocks support
 	  (STR #4397)
 	- CUPS did not compile when Avahi or mDNSResponder was not present
