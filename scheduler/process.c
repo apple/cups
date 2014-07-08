@@ -222,6 +222,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^/Library/Application Support$\""
 		 " #\"^/Library/Application Support/\""
 		 " #\"^/Library/Caches$\""
+		 " #\"^/Library/ColorSync$\""
+		 " #\"^/Library/ColorSync/Profiles$\""
+		 " #\"^/Library/ColorSync/Profiles/\""
 		 " #\"^/Library/Fonts$\""
 		 " #\"^/Library/Fonts/\""
 		 " #\"^/Library/Frameworks$\""
@@ -234,6 +237,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^/Library/Security$\""
 		 " #\"^/Library/Security/\""
 		 " #\"^/Library/WebServer$\""
+		 " #\"^/System/Library/ColorSync$\""
+		 " #\"^/System/Library/ColorSync/Profiles$\""
+		 " #\"^/System/Library/ColorSync/Profiles/\""
 		 " #\"^%s/Library$\""	/* RequestRoot/Library */
 		 " #\"^%s/Library/\""	/* RequestRoot/Library/... */
 		 " #\"^%s$\""		/* ServerBin */
