@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd 8 "CUPS" "10 June 2014" "Apple Inc."
+.TH cupsd 8 "CUPS" "8 July 2014" "Apple Inc."
 .SH NAME
 cupsd \- cups scheduler
 .SH SYNOPSIS
@@ -109,10 +109,10 @@ in the foreground with a test configuration file called
 .BR backend (7),
 .BR classes.conf (5),
 .BR cups (1),
-.BR cups-deviced (8),
-.BR cups-driverd (8),
 .BR cups-lpd (8),
 .BR cupsd.conf (5),
+.BR cupsd-helper (8),
+.BR cupsd-logs (8),
 .BR filter (7),
 .BR launchd (8),
 .BR mime.convs (5),
