@@ -17,6 +17,13 @@
 
 
 /*
+ * Include necessary headers...
+ */
+
+#include <sys/stat.h>
+
+
+/*
  * Local globals...
  */
 
@@ -35,8 +42,9 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
  */
 
 //static int		make_certificate(cupsd_client_t *con);
-static ssize_t	http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
-static ssize_t	http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
+static const char	*http_gnutls_default_path(char *buffer, size_t bufsize);
+static ssize_t		http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
+static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
 
 
 /*
@@ -74,19 +82,14 @@ cupsMakeServerCredentials(
   */
 
   if (!path)
+    path = http_gnutls_default_path(temp, sizeof(temp));
+
+  if (!path || !common_name)
   {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(temp, sizeof(temp), "%s/.cups/ssl", home);
-    else
-      snprintf(temp, sizeof(temp), "%s/ssl", CUPS_SERVERROOT);
-
-    path = temp;
-
-    DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (0);
   }
-
+    
   snprintf(crtfile, sizeof(crtfile), "%s/%s.crt", path, common_name);
   snprintf(keyfile, sizeof(keyfile), "%s/%s.key", path, common_name);
 
@@ -94,8 +97,12 @@ cupsMakeServerCredentials(
   * Create the encryption key...
   */
 
+  DEBUG_puts("1cupsMakeServerCredentials: Creating key pair.");
+
   gnutls_x509_privkey_init(&key);
   gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 2048, 0);
+
+  DEBUG_puts("1cupsMakeServerCredentials: Key pair created.");
 
  /*
   * Save it...
@@ -103,20 +110,22 @@ cupsMakeServerCredentials(
 
   bytes = sizeof(buffer);
 
-  if ((result = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM,
-                                           buffer, &bytes)) < 0)
+  if ((result = gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer, &bytes)) < 0)
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Unable to export private key: %s", gnutls_strerror(result)));
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gnutls_strerror(result), 0);
     gnutls_x509_privkey_deinit(key);
     return (0);
   }
   else if ((fp = cupsFileOpen(keyfile, "w")) != NULL)
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Writing private key to \"%s\".", keyfile));
     cupsFileWrite(fp, (char *)buffer, bytes);
     cupsFileClose(fp);
   }
   else
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Unable to create private key file \"%s\": %s", keyfile, strerror(errno)));
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     gnutls_x509_privkey_deinit(key);
     return (0);
@@ -126,7 +135,7 @@ cupsMakeServerCredentials(
   * Create the self-signed certificate...
   */
 
-  DEBUG_puts("1cupsMakeServerCredentials: Generating self-signed SSL certificate.");
+  DEBUG_puts("1cupsMakeServerCredentials: Generating self-signed X.509 certificate.");
 
   language  = cupsLangDefault();
   curtime   = time(NULL);
@@ -178,6 +187,7 @@ cupsMakeServerCredentials(
   bytes = sizeof(buffer);
   if ((result = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buffer, &bytes)) < 0)
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Unable to export public key and X.509 certificate: %s", gnutls_strerror(result)));
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, gnutls_strerror(result), 0);
     gnutls_x509_crt_deinit(crt);
     gnutls_x509_privkey_deinit(key);
@@ -185,11 +195,13 @@ cupsMakeServerCredentials(
   }
   else if ((fp = cupsFileOpen(crtfile, "w")) != NULL)
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Writing public key and X.509 certificate to \"%s\".", crtfile));
     cupsFileWrite(fp, (char *)buffer, bytes);
     cupsFileClose(fp);
   }
   else
   {
+    DEBUG_printf(("1cupsMakeServerCredentials: Unable to create public key and X.509 certificate file \"%s\": %s", crtfile, strerror(errno)));
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(errno), 0);
     gnutls_x509_crt_deinit(crt);
     gnutls_x509_privkey_deinit(key);
@@ -202,6 +214,8 @@ cupsMakeServerCredentials(
 
   gnutls_x509_crt_deinit(crt);
   gnutls_x509_privkey_deinit(key);
+
+  DEBUG_puts("1cupsMakeServerCredentials: Successfully created credentials.");
 
   return (1);
 }
@@ -227,6 +241,23 @@ cupsSetServerCredentials(
 
   DEBUG_printf(("cupsSetServerCredentials(path=\"%s\", common_name=\"%s\", auto_create=%d)", path, common_name, auto_create));
 
+ /*
+  * Use defaults as needed...
+  */
+
+  if (!path)
+    path = http_gnutls_default_path(temp, sizeof(temp));
+
+ /*
+  * Range check input...
+  */
+
+  if (!path || !common_name)
+  {
+    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
+    return (0);
+  }
+
   _cupsMutexLock(&tls_mutex);
 
  /*
@@ -238,24 +269,6 @@ cupsSetServerCredentials(
 
   if (tls_common_name)
     _cupsStrFree(tls_common_name);
-
- /*
-  * Use defaults as needed...
-  */
-
-  if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(temp, sizeof(temp), "%s/.cups/ssl", home);
-    else
-      snprintf(temp, sizeof(temp), "%s/ssl", CUPS_SERVERROOT);
-
-    path = temp;
-
-    DEBUG_printf(("1cupsSetServerCredentials: Using default path \"%s\".", path));
-  }
 
  /*
   * Save the new values...
@@ -588,6 +601,50 @@ httpSaveCredentials(
 
 
 /*
+ * 'http_gnutls_default_path()' - Get the default credential store path.
+ */
+
+static const char *			/* O - Path or NULL on error */
+http_gnutls_default_path(char   *buffer,/* I - Path buffer */
+                         size_t bufsize)/* I - Size of path buffer */
+{
+  const char *home = getenv("HOME");	/* HOME environment variable */
+
+
+  if (getuid() && home)
+  {
+    snprintf(buffer, bufsize, "%s/.cups", home);
+    if (access(buffer, 0))
+    {
+      DEBUG_printf(("1http_gnutls_default_path: Making directory \"%s\".", buffer));
+      if (mkdir(buffer, 0700))
+      {
+        DEBUG_printf(("1http_gnutls_default_path: Failed to make directory: %s", strerror(errno)));
+        return (NULL);
+      }
+    }
+
+    snprintf(buffer, bufsize, "%s/.cups/ssl", home);
+    if (access(buffer, 0))
+    {
+      DEBUG_printf(("1http_gnutls_default_path: Making directory \"%s\".", buffer));
+      if (mkdir(buffer, 0700))
+      {
+        DEBUG_printf(("1http_gnutls_default_path: Failed to make directory: %s", strerror(errno)));
+        return (NULL);
+      }
+    }
+  }
+  else
+    strlcpy(buffer, CUPS_SERVERROOT "/ssl", bufsize);
+
+  DEBUG_printf(("1http_gnutls_default_path: Using default path \"%s\".", buffer));
+
+  return (buffer);
+}
+
+
+/*
  * 'http_gnutls_read()' - Read function for the GNU TLS library.
  */
 
@@ -770,11 +827,26 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   }
 
   gnutls_certificate_allocate_credentials(credentials);
-  gnutls_init(&http->tls, http->mode == _HTTP_MODE_CLIENT ? GNUTLS_CLIENT : GNUTLS_SERVER);
-  gnutls_set_default_priority(http->tls);
-  gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
-  gnutls_transport_set_pull_function(http->tls, http_gnutls_read);
-  gnutls_transport_set_push_function(http->tls, http_gnutls_write);
+  status = gnutls_init(&http->tls, http->mode == _HTTP_MODE_CLIENT ? GNUTLS_CLIENT : GNUTLS_SERVER);
+//  gnutls_set_default_priority(http->tls);
+  if (!status)
+    status = gnutls_priority_set_direct(http->tls, "NORMAL:%COMPAT", NULL);
+
+  if (status)
+  {
+    http->error  = EIO;
+    http->status = HTTP_STATUS_ERROR;
+
+    DEBUG_printf(("4_httpTLSStart: Unable to initialize common TLS parameters: %s", gnutls_strerror(status)));
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, gnutls_strerror(status), 0);
+
+    gnutls_deinit(http->tls);
+    gnutls_certificate_free_credentials(*credentials);
+    free(credentials);
+    http->tls = NULL;
+
+    return (-1);
+  }
 
   if (http->mode == _HTTP_MODE_CLIENT)
   {
@@ -798,8 +870,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 	*hostptr = '\0';
     }
 
-    gnutls_server_name_set(http->tls, GNUTLS_NAME_DNS, hostname, strlen(hostname));
-    gnutls_credentials_set(http->tls, GNUTLS_CRD_CERTIFICATE, *credentials);
+    status = gnutls_server_name_set(http->tls, GNUTLS_NAME_DNS, hostname, strlen(hostname));
   }
   else
   {
@@ -877,12 +948,38 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
       }
     }
 
-    gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
+    DEBUG_printf(("4_httpTLSStart: Using certificate \"%s\" and private key \"%s\".", crtfile, keyfile));
+
+    status = gnutls_certificate_set_x509_key_file(*credentials, crtfile, keyfile, GNUTLS_X509_FMT_PEM);
   }
+
+  if (!status)
+    status = gnutls_credentials_set(http->tls, GNUTLS_CRD_CERTIFICATE, *credentials);
+
+  if (status)
+  {
+    http->error  = EIO;
+    http->status = HTTP_STATUS_ERROR;
+
+    DEBUG_printf(("4_httpTLSStart: Unable to complete client/server setup: %s", gnutls_strerror(status)));
+    _cupsSetError(IPP_STATUS_ERROR_CUPS_PKI, gnutls_strerror(status), 0);
+
+    gnutls_deinit(http->tls);
+    gnutls_certificate_free_credentials(*credentials);
+    free(credentials);
+    http->tls = NULL;
+
+    return (-1);
+  }
+
+  gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
+  gnutls_transport_set_pull_function(http->tls, http_gnutls_read);
+  gnutls_transport_set_pull_timeout_function(http->tls, (gnutls_pull_timeout_func)httpWait);
+  gnutls_transport_set_push_function(http->tls, http_gnutls_write);
 
   while ((status = gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
   {
-    DEBUG_printf(("8_httpStartTLS: gnutls_handshake returned %d (%s)",
+    DEBUG_printf(("5_httpStartTLS: gnutls_handshake returned %d (%s)",
                   status, gnutls_strerror(status)));
 
     if (gnutls_error_is_fatal(status))
@@ -927,9 +1024,12 @@ _httpTLSStop(http_t *http)		/* I - Connection to server */
   gnutls_deinit(http->tls);
   http->tls = NULL;
 
-  gnutls_certificate_free_credentials(*(http->tls_credentials));
-  free(http->tls_credentials);
-  http->tls_credentials = NULL;
+  if (http->tls_credentials)
+  {
+    gnutls_certificate_free_credentials(*(http->tls_credentials));
+    free(http->tls_credentials);
+    http->tls_credentials = NULL;
+  }
 }
 
 
