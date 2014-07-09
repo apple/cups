@@ -52,7 +52,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/whatsnew.html">Quoi de neuf dans CUPS 1.6</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Forum utilisateur</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups">Forum utilisateur</A></P>
 
 </TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
@@ -72,8 +72,6 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-cupsd-conf.html">R&eacute;f&eacute;rences sur cupsd.conf</A></P>
 
-<P><A HREF="http://www.cups.org/ppd.php">Trouver des pilotes d'imprimantes</A></P>
-
 </TD><TD VALIGN="top" STYLE="padding-left: 20px;">
 
 <H2>CUPS pour les d&eacute;veloppeurs</H2>
@@ -92,7 +90,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-ppdcfile.html">PPD Compiler Driver Information File Reference</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Forum d&eacute;veloppeurs</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups-devel">Forum d&eacute;veloppeurs</A></P>
 
 </TD></TR>
 </TABLE>

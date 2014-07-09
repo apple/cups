@@ -52,7 +52,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/whatsnew.html">Co je nového v CUPS 1.6</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Uživatelské fórum</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups">Uživatelské fórum</A></P>
 
 </TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
@@ -72,8 +72,6 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-cupsd-conf.html">Konfigurační soubor cupsd.conf</A></P>
 
-<P><A HREF="http://www.cups.org/ppd.php">Hedat ovladače tiskárny</A></P>
-
 </TD><TD VALIGN="top" STYLE="padding-left: 20px;">
 
 <H2>CUPS pro vývojáře</H2>
@@ -92,7 +90,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-ppdcfile.html">PPD kompilátor Driver Information File Reference</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Vývojářské fórum</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups-devel">Vývojářské fórum</A></P>
 
 </TD></TR>
 </TABLE>

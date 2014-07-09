@@ -52,7 +52,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/whatsnew.html">CUPS 1.6 の新機能</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">ユーザーフォーラム</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups">ユーザーフォーラム</A></P>
 
 </TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
@@ -72,8 +72,6 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-cupsd-conf.html">cupsd.conf リファレンス</A></P>
 
-<P><A HREF="http://www.cups.org/ppd.php">プリンタードライバーの検索</A></P>
-
 </TD><TD VALIGN="top" STYLE="padding-left: 20px;">
 
 <H2>開発者向け</H2>
@@ -92,7 +90,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/ref-ppdcfile.html">PPD コンパイラー用ドライバー情報ファイル リファレンス</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">開発者フォーラム</A></P>
+<P><A HREF="http://www.cups.org/lists.php?LIST=cups-devel">開発者フォーラム</A></P>
 
 </TD></TR>
 </TABLE>
