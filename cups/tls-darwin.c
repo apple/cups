@@ -51,6 +51,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 #ifdef HAVE_SECKEYCHAINOPEN
 static CFArrayRef	http_cdsa_copy_server(const char *common_name);
 #endif /* HAVE_SECKEYCHAINOPEN */
+static const char	*http_cdsa_default_path(char *buffer, size_t bufsize);
 static OSStatus		http_cdsa_read(SSLConnectionRef connection, void *data, size_t *dataLength);
 static int		http_cdsa_set_credentials(http_t *http);
 static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, size_t *dataLength);
@@ -92,18 +93,7 @@ cupsMakeServerCredentials(
   (void)expiration_date;
 
   if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
-    else
-      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
-
-    path = filename;
-
-    DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
-  }
+    path = http_cdsa_default_path(filename, sizeof(filename));
 
   cfcommon_name = CFStringCreateWithCString(kCFAllocatorDefault, common_name, kCFStringEncodingUTF8);
   if (!cfcommon_name)
@@ -203,18 +193,7 @@ cleanup:
   (void)alt_names;
 
   if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
-    else
-      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
-
-    path = filename;
-
-    DEBUG_printf(("1cupsMakeServerCredentials: Using default path \"%s\".", path));
-  }
+    path = http_cdsa_default_path(filename, sizeof(filename));
 
  /*
   * Run the "certtool" command to generate a self-signed certificate...
@@ -320,18 +299,7 @@ cupsSetServerCredentials(
 
 
   if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
-    else
-      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
-
-    path = filename;
-
-    DEBUG_printf(("1cupsSetServerCredentials: Using default path \"%s\".", path));
-  }
+    path = http_cdsa_default_path(filename, sizeof(filename));
 
   if (SecKeychainOpen(path, &keychain) != noErr)
   {
@@ -774,18 +742,7 @@ httpLoadCredentials(
   *credentials = NULL;
 
   if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
-    else
-      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
-
-    path = filename;
-
-    DEBUG_printf(("1httpLoadCredentials: Using default path \"%s\".", path));
-  }
+    path = http_cdsa_default_path(filename, sizeof(filename));
 
   if ((err = SecKeychainOpen(path, &keychain)) != noErr)
     goto cleanup;
@@ -897,18 +854,7 @@ httpSaveCredentials(
   }
 
   if (!path)
-  {
-    const char *home = getenv("HOME");	/* HOME environment variable */
-
-    if (getuid() && home)
-      snprintf(filename, sizeof(filename), "%s/Library/Keychains/login.keychain", home);
-    else
-      strlcpy(filename, "/Library/Keychains/System.keychain", sizeof(filename));
-
-    path = filename;
-
-    DEBUG_printf(("1httpSaveCredentials: Using default path \"%s\".", path));
-  }
+    path = http_cdsa_default_path(filename, sizeof(filename));
 
   if ((err = SecKeychainOpen(path, &keychain)) != noErr)
   {
@@ -1543,6 +1489,28 @@ http_cdsa_copy_server(
   return (certificates);
 }
 #endif /* HAVE_SECKEYCHAINOPEN */
+
+
+/*
+ * 'http_cdsa_default_path()' - Get the default keychain path.
+ */
+
+static const char *			/* O - Keychain path */
+http_cdsa_default_path(char   *buffer,	/* I - Path buffer */
+                       size_t bufsize)	/* I - Size of buffer */
+{
+  const char *home = getenv("HOME");	/* HOME environment variable */
+
+
+  if (getuid() && home)
+    snprintf(buffer, bufsize, "%s/Library/Keychains/login.keychain", home);
+  else
+    strlcpy(buffer, "/Library/Keychains/System.keychain", bufsize);
+
+  DEBUG_printf(("1http_cdsa_default_path: Using default path \"%s\".", buffer));
+
+  return (buffer);
+}
 
 
 /*
