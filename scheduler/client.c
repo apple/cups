@@ -3349,7 +3349,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
   if (!status && S_ISLNK(filestats->st_mode))
   {
-    cupsdLogClient(con, CUPSD_LOG_INFO, "Symlinks such as \"%s\" are not allowed.", filename);
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Symlinks such as \"%s\" are not allowed.", con->http.fd, filename);
     return (NULL);
   }
 
@@ -3360,7 +3360,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
   if (!status && !(filestats->st_mode & S_IROTH))
   {
-    cupsdLogClient(con, CUPSD_LOG_INFO, "Files/directories such as \"%s\" must be world-readable.", filename);
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Client %d] Files/directories such as \"%s\" must be world-readable.", con->http.fd, filename);
     return (NULL);
   }
 
