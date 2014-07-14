@@ -41,6 +41,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
  * Local functions...
  */
 
+static gnutls_x509_crt_t http_gnutls_create_credential(http_credential_t *credential);
 static const char	*http_gnutls_default_path(char *buffer, size_t bufsize);
 static ssize_t		http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
 static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
@@ -342,56 +343,18 @@ httpCredentialsAreValidForName(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Name to check */
 {
-#if 0
-  char			cert_name[256];	/* Certificate's common name (C string) */
-  int			valid = 1;	/* Valid name? */
+  gnutls_x509_crt_t	cert;		/* Certificate */
+  int			result = 0;	/* Result */
 
 
-  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
-    return (0);
-
- /*
-  * Compare the common names...
-  */
-
-  if ((cfcert_name = SecCertificateCopySubjectSummary(secCert)) == NULL)
+  cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials));
+  if (cert)
   {
-   /*
-    * Can't get common name, cannot be valid...
-    */
-
-    valid = 0;
-  }
-  else if (CFStringGetCString(cfcert_name, cert_name, sizeof(cert_name), kCFStringEncodingUTF8) &&
-           _cups_strcasecmp(common_name, cert_name))
-  {
-   /*
-    * Not an exact match for the common name, check for wildcard certs...
-    */
-
-    const char	*domain = strchr(common_name, '.');
-					/* Domain in common name */
-
-    if (strncmp(cert_name, "*.", 2) || !domain || _cups_strcasecmp(domain, cert_name + 1))
-    {
-     /*
-      * Not a wildcard match.
-      */
-
-      /* TODO: Check subject alternate names */
-      valid = 0;
-    }
+    result = gnutls_x509_crt_check_hostname(cert, common_name) != 0;
+    gnutls_x509_crt_deinit(cert);
   }
 
-  if (cfcert_name)
-    CFRelease(cfcert_name);
-
-  CFRelease(secCert);
-
-  return (valid);
-#else
-  return (1);
-#endif /* 0 */
+  return (result);
 }
 
 
@@ -408,19 +371,16 @@ httpCredentialsGetTrust(
 {
   http_trust_t		trust = HTTP_TRUST_OK;
 					/* Trusted? */
-
-#if 0
+  gnutls_x509_crt_t	cert;		/* Certificate */
   cups_array_t		*tcreds = NULL;	/* Trusted credentials */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Per-thread globals */
-#endif /* 0 */
 
 
   if (!common_name)
     return (HTTP_TRUST_UNKNOWN);
 
-#if 0
-  if ((secCert = http_cdsa_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
+  if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (HTTP_TRUST_UNKNOWN);
 
  /*
@@ -471,13 +431,20 @@ httpCredentialsGetTrust(
   else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
     trust = HTTP_TRUST_INVALID;
 
-  if (!cg->expired_certs && !SecCertificateIsValid(secCert, CFAbsoluteTimeGetCurrent()))
-    trust = HTTP_TRUST_EXPIRED;
-  else if (!cg->any_root && cupsArrayCount(credentials) == 1)
+  if (trust == HTTP_TRUST_OK && !cg->expired_certs)
+  {
+    time_t	curtime;		/* Current date/time */
+
+    time(&curtime);
+    if (curtime < gnutls_x509_crt_get_activation_time(cert) ||
+        curtime > gnutls_x509_crt_get_expiration_time(cert))
+      trust = HTTP_TRUST_EXPIRED;
+  }
+
+  if (trust == HTTP_TRUST_OK && !cg->any_root && cupsArrayCount(credentials) == 1)
     trust = HTTP_TRUST_INVALID;
 
-  CFRelease(secCert);
-#endif /* 0 */
+  gnutls_x509_crt_deinit(cert);
 
   return (trust);
 }
@@ -493,13 +460,18 @@ time_t					/* O - Expiration date of credentials */
 httpCredentialsGetExpiration(
     cups_array_t *credentials)		/* I - Credentials */
 {
-#if 0
-  expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
+  gnutls_x509_crt_t	cert;		/* Certificate */
+  time_t		result = 0;	/* Result */
 
-  return (expiration);
-#else
-  return (INT_MAX);
-#endif /* 0 */
+
+  cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials));
+  if (cert)
+  {
+    result = gnutls_x509_crt_get_expiration_time(cert, common_name);
+    gnutls_x509_crt_deinit(cert);
+  }
+
+  return (result);
 }
 
 
@@ -515,6 +487,10 @@ httpCredentialsString(
     char         *buffer,		/* I - Buffer or @code NULL@ */
     size_t       bufsize)		/* I - Size of buffer */
 {
+  http_credential_t	*first;		/* First certificate */
+  gnutls_x509_crt_t	cert;		/* Certificate */
+
+
   DEBUG_printf(("httpCredentialsString(credentials=%p, buffer=%p, bufsize=" CUPS_LLFMT ")", credentials, buffer, CUPS_LLCAST bufsize));
 
   if (!buffer)
@@ -523,25 +499,18 @@ httpCredentialsString(
   if (buffer && bufsize > 0)
     *buffer = '\0';
 
-#if 0
   if ((first = (http_credential_t *)cupsArrayFirst(credentials)) != NULL &&
-      (secCert = http_cdsa_create_credential(first)) != NULL)
+      (cert = http_gnutls_create_credential(first)) != NULL)
   {
-    CFStringRef		cf_name;	/* CF common name string */
     char		name[256];	/* Common name associated with cert */
     time_t		expiration;	/* Expiration date of cert */
     _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
-    if ((cf_name = SecCertificateCopySubjectSummary(secCert)) != NULL)
-    {
-      CFStringGetCString(cf_name, name, (CFIndex)sizeof(name), kCFStringEncodingUTF8);
-      CFRelease(cf_name);
-    }
-    else
+    if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, name, sizeof(name)) < 0)
       strlcpy(name, "unknown", sizeof(name));
 
-    expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
+    expiration = gnutls_x509_crt_get_expiration_time(cert);
 
     _cupsMD5Init(&md5_state);
     _cupsMD5Append(&md5_state, first->data, (int)first->datalen);
@@ -549,9 +518,8 @@ httpCredentialsString(
 
     snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
-    CFRelease(secCert);
+    gnutls_x509_crt_deinit(cert);
   }
-#endif // 0
 
   DEBUG_printf(("1httpCredentialsString: Returning \"%s\".", buffer));
 
@@ -571,11 +539,117 @@ httpLoadCredentials(
     cups_array_t **credentials,		/* IO - Credentials */
     const char   *common_name)		/* I  - Common name for credentials */
 {
-  (void)path;
-  (void)credentials;
-  (void)common_name;
+  cups_file_t		*fp;		/* Certificate file */
+  char			filename[1024],	/* filename.crt */
+			temp[1024],	/* Temporary string */
+			line[256];	/* Base64-encoded line */
+  unsigned char		*data = NULL;	/* Buffer for cert data */
+  size_t		alloc_data = 0,	/* Bytes allocated */
+			num_data = 0;	/* Bytes used */
+  int			decoded;	/* Bytes decoded */
 
-  return (-1);
+
+  if (!credentials || !common_name)
+    return (-1);
+
+  if (!path)
+    path = http_gnutls_default_path(temp, sizeof(temp));
+  if (!path)
+    return (-1);
+
+  snprintf(filename, sizeof(filename), "%s/%s.crt", path, common_name);
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return (-1);
+
+  while (cupsFileGets(fp, line, sizeof(line)))
+  {
+    if (!strcmp(line, "-----BEGIN CERTIFICATE-----"))
+    {
+      if (num_data)
+      {
+       /*
+	* Missing END CERTIFICATE...
+	*/
+
+        httpFreeCredentials(*credentials);
+	*credentials = NULL;
+        break;
+      }
+    }
+    else if (!strcmp(line, "-----END CERTIFICATE-----"))
+    {
+      if (!num_data)
+      {
+       /*
+	* Missing data...
+	*/
+
+        httpFreeCredentials(*credentials);
+	*credentials = NULL;
+        break;
+      }
+
+      if (!*credentials)
+        *credentials = cupsArrayNew(NULL, NULL);
+
+      if (httpAddCredential(*credentials, data, num_data))
+      {
+        httpFreeCredentials(*credentials);
+	*credentials = NULL;
+        break;
+      }
+
+      num_data = 0;
+    }
+    else
+    {
+      if (alloc_data == 0)
+      {
+        data       = malloc(2048);
+	alloc_data = 2048;
+
+        if (!data)
+	  break;
+      }
+      else if ((num_data + strlen(line)) >= alloc_data)
+      {
+        unsigned char *tdata = realloc(data, alloc_data + 1024);
+					/* Expanded buffer */
+
+	if (!tdata)
+	{
+	  httpFreeCredentials(*credentials);
+	  *credentials = NULL;
+	  break;
+	}
+
+	data       = tdata;
+        alloc_data += 1024;
+      }
+
+      decoded = alloc_data - num_data;
+      httpDecode64_2(data, &decoded, line);
+      num_data += decoded;
+    }
+  }
+
+  cupsFileClose(fp);
+
+  if (num_data)
+  {
+   /*
+    * Missing END CERTIFICATE...
+    */
+
+    httpFreeCredentials(*credentials);
+    *credentials = NULL;
+  }
+
+  if (data)
+    free(data);
+
+  return (*credentials ? 0 : -1);
 }
 
 
@@ -591,11 +665,79 @@ httpSaveCredentials(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Common name for credentials */
 {
-  (void)path;
-  (void)credentials;
-  (void)common_name;
+  cups_file_t		*fp;		/* Certificate file */
+  char			filename[1024],	/* filename.crt */
+			nfilename[1024],/* filename.crt.N */
+			temp[1024],	/* Temporary string */
+			line[61];	/* Base64-encoded line */
+  const unsigned char	*ptr;		/* Pointer into certificate */
+  size_t		remaining;	/* Bytes left */
+  http_credential_t	*cred;		/* Current credential */
 
-  return (-1);
+
+  if (!credentials || !common_name)
+    return (-1);
+
+  if (!path)
+    path = http_gnutls_default_path(temp, sizeof(temp));
+  if (!path)
+    return (-1);
+
+  snprintf(filename, sizeof(filename), "%s/%s.crt", path, common_name);
+  snprintf(nfilename, sizeof(nfilename), "%s/%s.crt.N", path, common_name);
+
+  if ((fp = cupsFileOpen(nfilename, "w")) == NULL)
+    return (-1);
+
+  fchmod(cupsFileNumber(fp), 0600);
+
+  for (cred = (http_credential_t *)cupsArrayFirst(credentials);
+       cred;
+       cred = (http_credential_t *)cupsArrayNext(credentials))
+  {
+    cupsFilePuts(fp, "-----BEGIN CERTIFICATE-----\n");
+    for (ptr = cred->data, remaining = cred->datalen; remaining > 0; remaining -= 45, ptr += 45)
+    {
+      httpEncode64_2(line, sizeof(line), ptr, remaining > 45 ? 45 : remaining);
+      cupsFilePrintf(fp, "%s\n", line);
+    }
+    cupsFilePuts(fp, "-----END CERTIFICATE-----\n");
+  }
+
+  cupsFileClose(fp);
+
+  return (rename(nfilename, filename));
+}
+
+
+/*
+ * 'http_gnutls_create_credential()' - Create a single credential in the internal format.
+ */
+
+static gnutls_x509_crt_t			/* O - Certificate */
+http_gnutls_create_credential(
+    http_credential_t *credential)		/* I - Credential */
+{
+  gnutls_crt_t		cert;			/* Certificate */
+  gnutls_datum_t	datum;			/* Data record */
+
+
+  if (!credential)
+    return (NULL);
+
+  if (gnutls_x509_crt_init(&cert) < 0)
+    return (NULL);
+
+  datum.data = credential.data;
+  datum.size = credential.length;
+
+  if (gnutls_x509_crt_import(cert, &datum, GNUTLS_X509_FMT_PEM) < 0)
+  {
+    gnutls_x509_crt_deinit(cert);
+    return (NULL);
+  }
+
+  return (cert);
 }
 
 
