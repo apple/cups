@@ -48,8 +48,8 @@
 
 static _http_sspi_t *http_sspi_alloc(void);
 static int	http_sspi_client(http_t *http, const char *hostname);
+static BOOL	http_sspi_credentials(http_t *http, const LPWSTR containerName, const char *common_name, BOOL server);
 static void	http_sspi_free(_http_sspi_t *conn);
-static BOOL	http_sspi_get_credentials(_http_sspi_t *conn, const LPWSTR containerName, const TCHAR  *commonName, BOOL server);
 static int	http_sspi_server(http_t *http, const char *hostname);
 static void	http_sspi_set_allows_any_root(_http_sspi_t *conn, BOOL allow);
 static void	http_sspi_set_allows_expired_certs(_http_sspi_t *conn, BOOL allow);
@@ -1010,6 +1010,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
                  const char *hostname)	/* I - Server hostname */
 {
   _http_sspi_t	*conn = http->tls;	/* SSPI data */
+  DWORD		dwSize;			/* Size for buffer */
   DWORD		dwSSPIFlags;		/* SSL connection attributes we want */
   DWORD		dwSSPIOutFlags;		/* SSL connection attributes we got */
   TimeStamp	tsExpiry;		/* Time stamp */
@@ -1020,6 +1021,8 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
   SecBufferDesc	outBuffer;		/* Array of SecBuffer structs */
   SecBuffer	outBuffers[1];		/* Security package buffer */
   int		ret = 0;		/* Return value */
+  char		username[1024],		/* Current username */
+		common_name[1024];	/* CN=username */
 
 
   DEBUG_printf(("http_sspi_client(http=%p, hostname=\"%s\")", http, hostname));
@@ -1030,6 +1033,20 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
                 ISC_RET_EXTENDED_ERROR    |
                 ISC_REQ_ALLOCATE_MEMORY   |
                 ISC_REQ_STREAM;
+
+ /*
+  * Lookup the client certificate...
+  */
+
+  dwSize = sizeof(username);
+  GetUserName(username, &dwSize);
+  snprintf(common_name, sizeof(common_name), "CN=%s", username);
+
+  if (!http_sspi_credentials(http, L"ClientContainer", common_name, FALSE))
+  {
+    DEBUG_puts("http_sspi_client: Unable to get client credentials.");
+    return (-1);
+  }
 
  /*
   * Initiate a ClientHello message and generate a token.
@@ -1334,6 +1351,198 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
 
 /*
+ * 'http_sspi_credentials()' - Retrieve a TLS certificate from the system store.
+ */
+
+static BOOL				/* O - 1 on success, 0 on failure */
+http_sspi_credentials(
+    http_t       *http,			/* I - HTTP connection */
+    const LPWSTR container,		/* I - Cert container name */
+    const char   *common_name,		/* I - Common name of certificate */
+    BOOL         isServer)		/* I - Is caller a server? */
+{
+  _http_sspi_t	*conn = http->tls;	/* SSPI data */
+  HCERTSTORE	store = NULL;		/* Certificate store */
+  PCCERT_CONTEXT storedContext = NULL;	/* Context created from the store */
+  PCCERT_CONTEXT createdContext = NULL;	/* Context created by us */
+  DWORD		dwSize = 0; 		/* 32 bit size */
+  PBYTE		p = NULL;		/* Temporary storage */
+  HCRYPTPROV	hProv = (HCRYPTPROV)NULL;
+					/* Handle to a CSP */
+  CERT_NAME_BLOB sib;			/* Arbitrary array of bytes */
+  SCHANNEL_CRED	SchannelCred;		/* Schannel credential data */
+  TimeStamp	tsExpiry;		/* Time stamp */
+  SECURITY_STATUS Status;		/* Status */
+  HCRYPTKEY	hKey = (HCRYPTKEY)NULL;	/* Handle to crypto key */
+  CRYPT_KEY_PROV_INFO kpi;		/* Key container info */
+  SYSTEMTIME	et;			/* System time */
+  CERT_EXTENSIONS exts;			/* Array of cert extensions */
+  CRYPT_KEY_PROV_INFO ckp;		/* Handle to crypto key */
+  BOOL		ok = TRUE;		/* Return value */
+
+
+  if (!CryptAcquireContextW(&hProv, (LPWSTR)container, MS_DEF_PROV_W, PROV_RSA_FULL, CRYPT_NEWKEYSET | CRYPT_MACHINE_KEYSET))
+  {
+    if (GetLastError() == NTE_EXISTS)
+    {
+      if (!CryptAcquireContextW(&hProv, (LPWSTR)container, MS_DEF_PROV_W, PROV_RSA_FULL, CRYPT_MACHINE_KEYSET))
+      {
+        DEBUG_printf(("http_sspi_credentials: CryptAcquireContext failed: %x", GetLastError()));
+        ok = FALSE;
+        goto cleanup;
+      }
+    }
+  }
+
+  store = CertOpenStore(CERT_STORE_PROV_SYSTEM, X509_ASN_ENCODING|PKCS_7_ASN_ENCODING, hProv, CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_NO_CRYPT_RELEASE_FLAG | CERT_STORE_OPEN_EXISTING_FLAG, L"MY");
+
+  if (!store)
+  {
+    DEBUG_printf(("http_sspi_credentials: CertOpenSystemStore failed: %x", GetLastError()));
+    ok = FALSE;
+    goto cleanup;
+  }
+
+  dwSize = 0;
+
+  if (!CertStrToName(X509_ASN_ENCODING, common_name, CERT_OID_NAME_STR, NULL, NULL, &dwSize, NULL))
+  {
+    DEBUG_printf(("http_sspi_credentials: CertStrToName failed: %x", GetLastError()));
+    ok = FALSE;
+    goto cleanup;
+  }
+
+  p = (PBYTE)malloc(dwSize);
+
+  if (!p)
+  {
+    DEBUG_printf(("http_sspi_credentials: malloc failed for %d bytes", dwSize));
+    ok = FALSE;
+    goto cleanup;
+  }
+
+  if (!CertStrToName(X509_ASN_ENCODING, common_name, CERT_OID_NAME_STR, NULL, p, &dwSize, NULL))
+  {
+    DEBUG_printf(("_sspiGetCredentials: CertStrToName failed: %x", GetLastError()));
+    ok = FALSE;
+    goto cleanup;
+  }
+
+  sib.cbData = dwSize;
+  sib.pbData = p;
+
+  storedContext = CertFindCertificateInStore(store, X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, 0, CERT_FIND_SUBJECT_NAME, &sib, NULL);
+
+  if (!storedContext)
+  {
+   /*
+    * If we couldn't find the context, then we'll create a new one...
+    */
+
+    if (!CryptGenKey(hProv, AT_KEYEXCHANGE, CRYPT_EXPORTABLE, &hKey))
+    {
+      DEBUG_printf(("_sspiGetCredentials: CryptGenKey failed: %x", GetLastError()));
+      ok = FALSE;
+      goto cleanup;
+    }
+
+    ZeroMemory(&kpi, sizeof(kpi));
+    kpi.pwszContainerName = (LPWSTR)container;
+    kpi.pwszProvName      = MS_DEF_PROV_W;
+    kpi.dwProvType        = PROV_RSA_FULL;
+    kpi.dwFlags           = CERT_SET_KEY_CONTEXT_PROP_ID;
+    kpi.dwKeySpec         = AT_KEYEXCHANGE;
+
+    GetSystemTime(&et);
+    et.wYear += 10;
+
+    ZeroMemory(&exts, sizeof(exts));
+
+    createdContext = CertCreateSelfSignCertificate(hProv, &sib, 0, &kpi, NULL, NULL, &et, &exts);
+
+    if (!createdContext)
+    {
+      DEBUG_printf(("_sspiGetCredentials: CertCreateSelfSignCertificate failed: %x", GetLastError()));
+      ok = FALSE;
+      goto cleanup;
+    }
+
+    if (!CertAddCertificateContextToStore(store, createdContext, CERT_STORE_ADD_REPLACE_EXISTING, &storedContext))
+    {
+      DEBUG_printf(("_sspiGetCredentials: CertAddCertificateContextToStore failed: %x", GetLastError()));
+      ok = FALSE;
+      goto cleanup;
+    }
+
+    ZeroMemory(&ckp, sizeof(ckp));
+    ckp.pwszContainerName = (LPWSTR) container;
+    ckp.pwszProvName      = MS_DEF_PROV_W;
+    ckp.dwProvType        = PROV_RSA_FULL;
+    ckp.dwFlags           = CRYPT_MACHINE_KEYSET;
+    ckp.dwKeySpec         = AT_KEYEXCHANGE;
+
+    if (!CertSetCertificateContextProperty(storedContext, CERT_KEY_PROV_INFO_PROP_ID, 0, &ckp))
+    {
+      DEBUG_printf(("_sspiGetCredentials: CertSetCertificateContextProperty failed: %x", GetLastError()));
+      ok = FALSE;
+      goto cleanup;
+    }
+  }
+
+  ZeroMemory(&SchannelCred, sizeof(SchannelCred));
+
+  SchannelCred.dwVersion = SCHANNEL_CRED_VERSION;
+  SchannelCred.cCreds    = 1;
+  SchannelCred.paCred    = &storedContext;
+
+ /*
+  * SSPI doesn't seem to like it if grbitEnabledProtocols is set for a client.
+  */
+
+  if (isServer)
+    SchannelCred.grbitEnabledProtocols = SP_PROT_SSL3TLS1;
+
+ /*
+  * Create an SSPI credential.
+  */
+
+  Status = AcquireCredentialsHandle(NULL, UNISP_NAME, isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND, NULL, &SchannelCred, NULL, NULL, &conn->creds, &tsExpiry);
+  if (Status != SEC_E_OK)
+  {
+    DEBUG_printf(("_sspiGetCredentials: AcquireCredentialsHandle failed: %x", Status));
+    ok = FALSE;
+    goto cleanup;
+  }
+
+cleanup:
+
+ /*
+  * Cleanup
+  */
+
+  if (hKey)
+    CryptDestroyKey(hKey);
+
+  if (createdContext)
+    CertFreeCertificateContext(createdContext);
+
+  if (storedContext)
+    CertFreeCertificateContext(storedContext);
+
+  if (p)
+    free(p);
+
+  if (store)
+    CertCloseStore(store, 0);
+
+  if (hProv)
+    CryptReleaseContext(hProv, 0);
+
+  return (ok);
+}
+
+
+/*
  * 'http_sspi_free()' - Close a connection and free resources.
  */
 
@@ -1363,234 +1572,6 @@ http_sspi_free(_http_sspi_t *conn)	/* I  - Client connection */
 
   free(conn);
 }
-
-
-#if 0
-/*
- * '_sspiGetCredentials()' - Retrieve an SSL/TLS certificate from the system store
- *                              If one cannot be found, one is created.
- */
-BOOL					/* O - 1 on success, 0 on failure */
-_sspiGetCredentials(_http_sspi_t *conn,
-					/* I - Client connection */
-                    const LPWSTR   container,
-					/* I - Cert container name */
-                    const TCHAR    *cn,	/* I - Common name of certificate */
-                    BOOL           isServer)
-					/* I - Is caller a server? */
-{
-  HCERTSTORE		store = NULL;	/* Certificate store */
-  PCCERT_CONTEXT	storedContext = NULL;
-					/* Context created from the store */
-  PCCERT_CONTEXT	createdContext = NULL;
-					/* Context created by us */
-  DWORD			dwSize = 0;	/* 32 bit size */
-  PBYTE			p = NULL;	/* Temporary storage */
-  HCRYPTPROV		hProv = (HCRYPTPROV) NULL;
-					/* Handle to a CSP */
-  CERT_NAME_BLOB	sib;		/* Arbitrary array of bytes */
-  SCHANNEL_CRED		SchannelCred;	/* Schannel credential data */
-  TimeStamp		tsExpiry;	/* Time stamp */
-  SECURITY_STATUS	Status;		/* Status */
-  HCRYPTKEY		hKey = (HCRYPTKEY) NULL;
-					/* Handle to crypto key */
-  CRYPT_KEY_PROV_INFO	kpi;		/* Key container info */
-  SYSTEMTIME		et;		/* System time */
-  CERT_EXTENSIONS	exts;		/* Array of cert extensions */
-  CRYPT_KEY_PROV_INFO	ckp;		/* Handle to crypto key */
-  BOOL			ok = TRUE;	/* Return value */
-
-  if (!conn)
-    return (FALSE);
-  if (!cn)
-    return (FALSE);
-
-  if (!CryptAcquireContextW(&hProv, (LPWSTR) container, MS_DEF_PROV_W,
-                           PROV_RSA_FULL,
-                           CRYPT_NEWKEYSET | CRYPT_MACHINE_KEYSET))
-  {
-    if (GetLastError() == NTE_EXISTS)
-    {
-      if (!CryptAcquireContextW(&hProv, (LPWSTR) container, MS_DEF_PROV_W,
-                               PROV_RSA_FULL, CRYPT_MACHINE_KEYSET))
-      {
-        DEBUG_printf(("_sspiGetCredentials: CryptAcquireContext failed: %x\n",
-                      GetLastError()));
-        ok = FALSE;
-        goto cleanup;
-      }
-    }
-  }
-
-  store = CertOpenStore(CERT_STORE_PROV_SYSTEM,
-                        X509_ASN_ENCODING|PKCS_7_ASN_ENCODING,
-                        hProv,
-                        CERT_SYSTEM_STORE_LOCAL_MACHINE |
-                        CERT_STORE_NO_CRYPT_RELEASE_FLAG |
-                        CERT_STORE_OPEN_EXISTING_FLAG,
-                        L"MY");
-
-  if (!store)
-  {
-    DEBUG_printf(("_sspiGetCredentials: CertOpenSystemStore failed: %x\n",
-                  GetLastError()));
-    ok = FALSE;
-    goto cleanup;
-  }
-
-  dwSize = 0;
-
-  if (!CertStrToName(X509_ASN_ENCODING, cn, CERT_OID_NAME_STR,
-                     NULL, NULL, &dwSize, NULL))
-  {
-    DEBUG_printf(("_sspiGetCredentials: CertStrToName failed: %x\n",
-                   GetLastError()));
-    ok = FALSE;
-    goto cleanup;
-  }
-
-  p = (PBYTE) malloc(dwSize);
-
-  if (!p)
-  {
-    DEBUG_printf(("_sspiGetCredentials: malloc failed for %d bytes", dwSize));
-    ok = FALSE;
-    goto cleanup;
-  }
-
-  if (!CertStrToName(X509_ASN_ENCODING, cn, CERT_OID_NAME_STR, NULL,
-                     p, &dwSize, NULL))
-  {
-    DEBUG_printf(("_sspiGetCredentials: CertStrToName failed: %x",
-                 GetLastError()));
-    ok = FALSE;
-    goto cleanup;
-  }
-
-  sib.cbData = dwSize;
-  sib.pbData = p;
-
-  storedContext = CertFindCertificateInStore(store, X509_ASN_ENCODING|PKCS_7_ASN_ENCODING,
-                                             0, CERT_FIND_SUBJECT_NAME, &sib, NULL);
-
-  if (!storedContext)
-  {
-   /*
-    * If we couldn't find the context, then we'll
-    * create a new one
-    */
-    if (!CryptGenKey(hProv, AT_KEYEXCHANGE, CRYPT_EXPORTABLE, &hKey))
-    {
-      DEBUG_printf(("_sspiGetCredentials: CryptGenKey failed: %x",
-                    GetLastError()));
-      ok = FALSE;
-      goto cleanup;
-    }
-
-    ZeroMemory(&kpi, sizeof(kpi));
-    kpi.pwszContainerName = (LPWSTR) container;
-    kpi.pwszProvName = MS_DEF_PROV_W;
-    kpi.dwProvType = PROV_RSA_FULL;
-    kpi.dwFlags = CERT_SET_KEY_CONTEXT_PROP_ID;
-    kpi.dwKeySpec = AT_KEYEXCHANGE;
-
-    GetSystemTime(&et);
-    et.wYear += 10;
-
-    ZeroMemory(&exts, sizeof(exts));
-
-    createdContext = CertCreateSelfSignCertificate(hProv, &sib, 0, &kpi, NULL, NULL,
-                                                   &et, &exts);
-
-    if (!createdContext)
-    {
-      DEBUG_printf(("_sspiGetCredentials: CertCreateSelfSignCertificate failed: %x",
-                   GetLastError()));
-      ok = FALSE;
-      goto cleanup;
-    }
-
-    if (!CertAddCertificateContextToStore(store, createdContext,
-                                          CERT_STORE_ADD_REPLACE_EXISTING,
-                                          &storedContext))
-    {
-      DEBUG_printf(("_sspiGetCredentials: CertAddCertificateContextToStore failed: %x",
-                    GetLastError()));
-      ok = FALSE;
-      goto cleanup;
-    }
-
-    ZeroMemory(&ckp, sizeof(ckp));
-    ckp.pwszContainerName = (LPWSTR) container;
-    ckp.pwszProvName = MS_DEF_PROV_W;
-    ckp.dwProvType = PROV_RSA_FULL;
-    ckp.dwFlags = CRYPT_MACHINE_KEYSET;
-    ckp.dwKeySpec = AT_KEYEXCHANGE;
-
-    if (!CertSetCertificateContextProperty(storedContext,
-                                           CERT_KEY_PROV_INFO_PROP_ID,
-                                           0, &ckp))
-    {
-      DEBUG_printf(("_sspiGetCredentials: CertSetCertificateContextProperty failed: %x",
-                    GetLastError()));
-      ok = FALSE;
-      goto cleanup;
-    }
-  }
-
-  ZeroMemory(&SchannelCred, sizeof(SchannelCred));
-
-  SchannelCred.dwVersion = SCHANNEL_CRED_VERSION;
-  SchannelCred.cCreds = 1;
-  SchannelCred.paCred = &storedContext;
-
- /*
-  * SSPI doesn't seem to like it if grbitEnabledProtocols
-  * is set for a client
-  */
-  if (isServer)
-    SchannelCred.grbitEnabledProtocols = SP_PROT_SSL3TLS1;
-
- /*
-  * Create an SSPI credential.
-  */
-  Status = AcquireCredentialsHandle(NULL, UNISP_NAME,
-                                    isServer ? SECPKG_CRED_INBOUND:SECPKG_CRED_OUTBOUND,
-                                    NULL, &SchannelCred, NULL, NULL, &conn->creds,
-                                    &tsExpiry);
-  if (Status != SEC_E_OK)
-  {
-    DEBUG_printf(("_sspiGetCredentials: AcquireCredentialsHandle failed: %x", Status));
-    ok = FALSE;
-    goto cleanup;
-  }
-
-cleanup:
-
- /*
-  * Cleanup
-  */
-  if (hKey)
-    CryptDestroyKey(hKey);
-
-  if (createdContext)
-    CertFreeCertificateContext(createdContext);
-
-  if (storedContext)
-    CertFreeCertificateContext(storedContext);
-
-  if (p)
-    free(p);
-
-  if (store)
-    CertCloseStore(store, 0);
-
-  if (hProv)
-    CryptReleaseContext(hProv, 0);
-
-  return (ok);
-}
-#endif // 0
 
 
 /*
