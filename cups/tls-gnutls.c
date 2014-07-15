@@ -296,11 +296,32 @@ httpCopyCredentials(
     http_t	 *http,			/* I - Connection to server */
     cups_array_t **credentials)		/* O - Array of credentials */
 {
+  unsigned		count;		/* Number of certificates */
+  const gnutls_datum_t *certs;		/* Certificates */
+
+
+  DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", http, credentials));
+
   if (credentials)
     *credentials = NULL;
 
   if (!http || !http->tls || !credentials)
     return (-1);
+
+  *credentials = cupsArrayNew(NULL, NULL);
+  certs        = gnutls_certificate_get_peers(http->tls, &count);
+
+  DEBUG_printf(("1httpCopyCredentials: certs=%p, count=%u", certs, count));
+
+  if (certs && count)
+  {
+    while (count > 0)
+    {
+      httpAddCredential(*credentials, certs->data, certs->size);
+      certs ++;
+      count --;
+    }
+  }
 
   return (0);
 }
@@ -467,7 +488,7 @@ httpCredentialsGetExpiration(
   cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials));
   if (cert)
   {
-    result = gnutls_x509_crt_get_expiration_time(cert, common_name);
+    result = gnutls_x509_crt_get_expiration_time(cert);
     gnutls_x509_crt_deinit(cert);
   }
 
@@ -503,11 +524,15 @@ httpCredentialsString(
       (cert = http_gnutls_create_credential(first)) != NULL)
   {
     char		name[256];	/* Common name associated with cert */
+    size_t		namelen;	/* Length of name */
     time_t		expiration;	/* Expiration date of cert */
     _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
-    if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, name, sizeof(name)) < 0)
+    namelen = sizeof(name) - 1;
+    if (gnutls_x509_crt_get_dn_by_oid(cert, GNUTLS_OID_X520_COMMON_NAME, 0, 0, name, &namelen) >= 0)
+      name[namelen] = '\0';
+    else
       strlcpy(name, "unknown", sizeof(name));
 
     expiration = gnutls_x509_crt_get_expiration_time(cert);
@@ -629,8 +654,8 @@ httpLoadCredentials(
       }
 
       decoded = alloc_data - num_data;
-      httpDecode64_2(data, &decoded, line);
-      num_data += decoded;
+      httpDecode64_2((char *)data + num_data, &decoded, line);
+      num_data += (size_t)decoded;
     }
   }
 
@@ -669,9 +694,9 @@ httpSaveCredentials(
   char			filename[1024],	/* filename.crt */
 			nfilename[1024],/* filename.crt.N */
 			temp[1024],	/* Temporary string */
-			line[61];	/* Base64-encoded line */
+			line[256];	/* Base64-encoded line */
   const unsigned char	*ptr;		/* Pointer into certificate */
-  size_t		remaining;	/* Bytes left */
+  ssize_t		remaining;	/* Bytes left */
   http_credential_t	*cred;		/* Current credential */
 
 
@@ -696,9 +721,9 @@ httpSaveCredentials(
        cred = (http_credential_t *)cupsArrayNext(credentials))
   {
     cupsFilePuts(fp, "-----BEGIN CERTIFICATE-----\n");
-    for (ptr = cred->data, remaining = cred->datalen; remaining > 0; remaining -= 45, ptr += 45)
+    for (ptr = cred->data, remaining = (ssize_t)cred->datalen; remaining > 0; remaining -= 45, ptr += 45)
     {
-      httpEncode64_2(line, sizeof(line), ptr, remaining > 45 ? 45 : remaining);
+      httpEncode64_2(line, sizeof(line), (char *)ptr, remaining > 45 ? 45 : remaining);
       cupsFilePrintf(fp, "%s\n", line);
     }
     cupsFilePuts(fp, "-----END CERTIFICATE-----\n");
@@ -718,21 +743,29 @@ static gnutls_x509_crt_t			/* O - Certificate */
 http_gnutls_create_credential(
     http_credential_t *credential)		/* I - Credential */
 {
-  gnutls_crt_t		cert;			/* Certificate */
+  int			result;			/* Result from GNU TLS */
+  gnutls_x509_crt_t	cert;			/* Certificate */
   gnutls_datum_t	datum;			/* Data record */
 
+
+  DEBUG_printf(("3http_gnutls_create_credential(credential=%p)", credential));
 
   if (!credential)
     return (NULL);
 
-  if (gnutls_x509_crt_init(&cert) < 0)
-    return (NULL);
-
-  datum.data = credential.data;
-  datum.size = credential.length;
-
-  if (gnutls_x509_crt_import(cert, &datum, GNUTLS_X509_FMT_PEM) < 0)
+  if ((result = gnutls_x509_crt_init(&cert)) < 0)
   {
+    DEBUG_printf(("4http_gnutls_create_credential: init error: %s", gnutls_strerror(result)));
+    return (NULL);
+  }
+
+  datum.data = credential->data;
+  datum.size = credential->datalen;
+
+  if ((result = gnutls_x509_crt_import(cert, &datum, GNUTLS_X509_FMT_DER)) < 0)
+  {
+    DEBUG_printf(("4http_gnutls_create_credential: import error: %s", gnutls_strerror(result)));
+
     gnutls_x509_crt_deinit(cert);
     return (NULL);
   }

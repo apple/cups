@@ -627,14 +627,39 @@ main(int  argc,				/* I - Number of command-line arguments */
       static const char *trusts[] = { "OK", "Invalid", "Changed", "Expired", "Renewed", "Unknown" };
       if (!httpCopyCredentials(http, &creds))
       {
+	cups_array_t *lcreds;
         http_trust_t trust = httpCredentialsGetTrust(creds, hostname);
 
         httpCredentialsString(creds, info, sizeof(info));
 
+	printf("Count: %d\n", cupsArrayCount(creds));
         printf("Trust: %s\n", trusts[trust]);
         printf("Expiration: %s\n", httpGetDateString(httpCredentialsGetExpiration(creds)));
         printf("IsValidName: %d\n", httpCredentialsAreValidForName(creds, hostname));
         printf("String: \"%s\"\n", info);
+
+	printf("LoadCredentials: %d\n", httpLoadCredentials(NULL, &lcreds, hostname));
+	httpCredentialsString(lcreds, info, sizeof(info));
+	printf("    Count: %d\n", cupsArrayCount(lcreds));
+	printf("    String: \"%s\"\n", info);
+
+        if (lcreds && cupsArrayCount(creds) == cupsArrayCount(lcreds))
+        {
+          int			i;
+          http_credential_t	*cred, *lcred;
+
+          for (i = 1, cred = (http_credential_t *)cupsArrayFirst(creds), lcred = (http_credential_t *)cupsArrayFirst(lcreds);
+               cred && lcred;
+               i ++, cred = (http_credential_t *)cupsArrayNext(creds), lcred = (http_credential_t *)cupsArrayNext(lcreds))
+          {
+            if (cred->datalen != lcred->datalen)
+              printf("    Credential #%d: Different lengths (saved=%d, current=%d)\n", i, (int)cred->datalen, (int)lcred->datalen);
+            else if (memcmp(cred->data, lcred->data, cred->datalen))
+              printf("    Credential #%d: Different data\n", i);
+            else
+              printf("    Credential #%d: Matches\n", i);
+          }
+        }
 
         if (trust != HTTP_TRUST_OK)
 	{
