@@ -323,7 +323,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.10.0 \
+		-current_version 2.11.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -339,7 +339,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:10 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:11 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
