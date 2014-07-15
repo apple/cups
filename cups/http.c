@@ -2859,7 +2859,11 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
   if (http->tls)
     _httpTLSStop(http);
 
+#ifdef WIN32
+  shutdown(http->fd, SD_RECEIVE);	/* Microsoft-ism... */
+#else
   shutdown(http->fd, SHUT_RD);
+#endif /* WIN32 */
 }
 
 

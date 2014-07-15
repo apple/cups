@@ -1041,6 +1041,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\cups\libcups2.def"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\localize.c"
 				>
 			</File>
@@ -1317,10 +1321,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\cups\sspi.c"
-				>
-			</File>
-			<File
 				RelativePath="..\cups\string.c"
 				>
 				<FileConfiguration
@@ -1394,6 +1394,10 @@
 			</File>
 			<File
 				RelativePath="..\cups\thread.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\tls.c"
 				>
 			</File>
 			<File
@@ -1596,10 +1600,6 @@
 			</File>
 			<File
 				RelativePath="..\cups\pwg-private.h"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\sspi-private.h"
 				>
 			</File>
 			<File

@@ -25,7 +25,9 @@
 #include <sys/stat.h>
 #ifdef WIN32
 #  include <windows.h>
-#  define R_OK 0
+#  ifndef R_OK
+#    define R_OK 0
+#  endif /* !R_OK */
 #else
 #  include <signal.h>
 #  include <termios.h>

@@ -1,5 +1,5 @@
 LIBRARY libcups2
-VERSION 2.10
+VERSION 2.11
 EXPORTS
 _cupsBufferGet
 _cupsBufferRelease
@@ -88,8 +88,17 @@ cupsArrayRemove
 cupsArrayRestore
 cupsArraySave
 cupsArrayUserData
+cupsCancelDestJob
 cupsCancelJob
 cupsCharsetToUTF8
+cupsCheckDestSupported
+cupsCloseDestJob
+cupsConnectDest
+cupsCopyDest
+cupsCopyDestConflicts
+cupsCopyDestInfo
+cupsCreateDestJob
+cupsCreateJob
 cupsDirClose
 cupsDirOpen
 cupsDirRead
@@ -101,6 +110,7 @@ cupsDoRequest
 cupsEncodeOptions
 cupsEncodeOptions2
 cupsEncryption
+cupsEnumDests
 cupsFileClose
 cupsFileCompression
 cupsFileEOF
@@ -130,6 +140,9 @@ cupsFileWrite
 cupsFindDestDefault
 cupsFindDestReady
 cupsFindDestSupported
+cupsFinishDestDocument
+cupsFinishDocument
+cupsFreeDestInfo
 cupsFreeDests
 cupsFreeJobs
 cupsFreeOptions
@@ -138,8 +151,11 @@ cupsGetDefault
 cupsGetDefault2
 cupsGetDest
 cupsGetDestMediaByIndex
+cupsGetDestMediaByName
+cupsGetDestMediaBySize
 cupsGetDestMediaCount
 cupsGetDestMediaDefault
+cupsGetDestWithURI
 cupsGetDests
 cupsGetDests2
 cupsGetFd
@@ -159,6 +175,10 @@ cupsLangFree
 cupsLangGet
 cupsLastError
 cupsLastErrorString
+cupsLocalizeDestMedia
+cupsLocalizeDestOption
+cupsLocalizeDestValue
+cupsMakeServerCredentials
 cupsMarkOptions
 cupsNotifySubject
 cupsNotifyText
@@ -181,8 +201,11 @@ cupsSetEncryption
 cupsSetPasswordCB
 cupsSetServer
 cupsSetServerCertCB
+cupsSetServerCredentials
 cupsSetUser
 cupsSetUserAgent
+cupsStartDestDocument
+cupsStartDocument
 cupsTempFd
 cupsTempFile
 cupsTempFile2
@@ -221,7 +244,9 @@ httpConnect
 httpConnect2
 httpConnectEncrypt
 httpCopyCredentials
-httpCreateCredentials
+httpCredentialsAreValidForName
+httpCredentialsGetExpiration
+httpCredentialsGetTrust
 httpCredentialsString
 httpDecode64
 httpDecode64_2
@@ -237,6 +262,7 @@ httpFreeCredentials
 httpGet
 httpGetActivity
 httpGetAddress
+httpGetAuthString
 httpGetBlocking
 httpGetContentEncoding
 httpGetCookie
@@ -276,6 +302,7 @@ httpRead
 httpRead2
 httpReadRequest
 httpReconnect
+httpReconnect2
 httpResolveHostname
 httpSaveCredentials
 httpSeparate
@@ -294,6 +321,7 @@ httpStateString
 httpStatus
 httpTrace
 httpUpdate
+httpURIStatusString
 httpWait
 httpWrite
 httpWrite2

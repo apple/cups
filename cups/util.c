@@ -1023,7 +1023,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   DEBUG_printf(("2cupsGetPPD3: Printer hostname=\"%s\", port=%d", hostname,
                 port));
 
-  if (cupsServer()[0] == '/' && !strcasecmp(hostname, "localhost") && port == ippPort())
+  if (cupsServer()[0] == '/' && !_cups_strcasecmp(hostname, "localhost") && port == ippPort())
   {
    /*
     * Redirect localhost to domain socket...

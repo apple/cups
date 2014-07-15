@@ -57,6 +57,7 @@
  * Map the POSIX sleep() and usleep() functions to the Win32 Sleep() function...
  */
 
+typedef unsigned long useconds_t;
 #define sleep(X)	Sleep(1000 * (X))
 #define usleep(X)	Sleep((X)/1000)
 

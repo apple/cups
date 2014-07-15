@@ -548,7 +548,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 
   if (pDataBuffer)
   {
-    int bytesToCopy = min(pDataBuffer->cbBuffer, len);
+    int bytesToCopy = min((int)pDataBuffer->cbBuffer, len);
 				      /* Number of bytes to copy into buf */
     int bytesToSave = pDataBuffer->cbBuffer - bytesToCopy;
 				      /* Number of bytes to save in our read buffer */
@@ -587,7 +587,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
   }
   else
   {
-    DEBUG_puts("_httpTLSRead: Unable to find data buffer."));
+    DEBUG_puts("_httpTLSRead: Unable to find data buffer.");
     WSASetLastError(WSASYSCALLFAILURE);
     return (-1);
   }
@@ -816,7 +816,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 
   bufferLen = conn->streamSizes.cbMaximumMessage + conn->streamSizes.cbHeader + conn->streamSizes.cbTrailer;
 
-  if (bufferLen > conn->writeBufferLen)
+  if (bufferLen > conn->writeBufferLength)
   {
     BYTE *temp;				/* New buffer pointer */
 
@@ -827,8 +827,8 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
       return (-1);
     }
 
-    conn->writeBuffer    = temp;
-    conn->writeBufferLen = bufferLen;
+    conn->writeBuffer       = temp;
+    conn->writeBufferLength = bufferLen;
   }
 
   bytesLeft = len;
@@ -836,7 +836,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 
   while (bytesLeft)
   {
-    int chunk = min(conn->streamSizes.cbMaximumMessage, bytesLeft);
+    int chunk = min((int)conn->streamSizes.cbMaximumMessage, bytesLeft);
 					/* Size of data to write */
     SECURITY_STATUS scRet;		/* SSPI status */
 
@@ -900,7 +900,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 }
 
 
-#ifdef HAVE_SSL
+#if 0
 /*
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
@@ -938,7 +938,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       *hostptr = '\0';
   }
 
-  http->tls = _sspiAlloc();
+  http->tls = http_sspi_alloc();
 
   if (!http->tls)
   {
@@ -946,7 +946,6 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  http->tls->sock = http->fd;
   dwSize          = sizeof(username) / sizeof(TCHAR);
   GetUserName(username, &dwSize);
   _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
@@ -986,6 +985,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   return (0);
 }
+#endif // 0
 
 
 /*
@@ -1009,22 +1009,21 @@ static int				/* O - 0 on success, -1 on failure */
 http_sspi_client(http_t     *http,	/* I - Client connection */
                  const char *hostname)	/* I - Server hostname */
 {
-  _http_sspi_t		*conn;		/* SSPI data */
-  DWORD			dwSSPIFlags;	/* SSL connection attributes we want */
-  DWORD			dwSSPIOutFlags;	/* SSL connection attributes we got */
-  TimeStamp		tsExpiry;	/* Time stamp */
-  SECURITY_STATUS	scRet;		/* Status */
-  int			cbData;		/* Data count */
-  SecBufferDesc		inBuffer;	/* Array of SecBuffer structs */
-  SecBuffer		inBuffers[2];	/* Security package buffer */
-  SecBufferDesc		outBuffer;	/* Array of SecBuffer structs */
-  SecBuffer		outBuffers[1];	/* Security package buffer */
-  int			ret = 0;	/* Return value */
+  _http_sspi_t	*conn = http->tls;	/* SSPI data */
+  DWORD		dwSSPIFlags;		/* SSL connection attributes we want */
+  DWORD		dwSSPIOutFlags;		/* SSL connection attributes we got */
+  TimeStamp	tsExpiry;		/* Time stamp */
+  SECURITY_STATUS scRet;		/* Status */
+  int		cbData;			/* Data count */
+  SecBufferDesc	inBuffer;		/* Array of SecBuffer structs */
+  SecBuffer	inBuffers[2];		/* Security package buffer */
+  SecBufferDesc	outBuffer;		/* Array of SecBuffer structs */
+  SecBuffer	outBuffers[1];		/* Security package buffer */
+  int		ret = 0;		/* Return value */
 
 
   DEBUG_printf(("http_sspi_client(http=%p, hostname=\"%s\")", http, hostname));
 
-  serverCert  = NULL;
   dwSSPIFlags = ISC_REQ_SEQUENCE_DETECT   |
                 ISC_REQ_REPLAY_DETECT     |
                 ISC_REQ_CONFIDENTIALITY   |
@@ -1356,10 +1355,10 @@ http_sspi_free(_http_sspi_t *conn)	/* I  - Client connection */
   if (conn->writeBuffer)
     free(conn->writeBuffer);
 
-  if (conn->localCert.pbCertEncoded)
+  if (conn->localCert)
     CertFreeCertificateContext(conn->localCert);
 
-  if (conn->remoteCert.pbCertEncoded)
+  if (conn->remoteCert)
     CertFreeCertificateContext(conn->remoteCert);
 
   free(conn);
@@ -1669,7 +1668,7 @@ http_sspi_server(http_t     *http,	/* I - HTTP connection */
       {
         num = recv(http->fd, conn->decryptBuffer + conn->decryptBufferUsed, (int)(conn->decryptBufferLength - conn->decryptBufferUsed), 0);
 
-        if (num == -1 WSAGetLastError() == WSAEWOULDBLOCK)
+        if (num == -1 && WSAGetLastError() == WSAEWOULDBLOCK)
           Sleep(1);
         else
           break;
