@@ -1269,7 +1269,7 @@ rresvport_af(int *port,			/* IO - Port number to bind to */
     * Try binding the port to the socket; return if all is OK...
     */
 
-    if (!bind(fd, (struct sockaddr *)&addr, httpAddrSize(&addr)))
+    if (!bind(fd, (struct sockaddr *)&addr, httpAddrLength(&addr)))
       return (fd);
 
    /*
