@@ -51,6 +51,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 #ifdef HAVE_SECKEYCHAINOPEN
 static CFArrayRef	http_cdsa_copy_server(const char *common_name);
 #endif /* HAVE_SECKEYCHAINOPEN */
+static SecCertificateRef http_cdsa_create_credential(http_credential_t *credential);
 static const char	*http_cdsa_default_path(char *buffer, size_t bufsize);
 static OSStatus		http_cdsa_read(SSLConnectionRef connection, void *data, size_t *dataLength);
 static int		http_cdsa_set_credentials(http_t *http);
@@ -409,21 +410,6 @@ httpCopyCredentials(
   }
 
   return (error);
-}
-
-
-/*
- * 'http_cdsa_create_credential()' - Create a single credential in the internal format.
- */
-
-static SecCertificateRef			/* O - Certificate */
-http_cdsa_create_credential(
-    http_credential_t *credential)		/* I - Credential */
-{
-  if (!credential)
-    return (NULL);
-
-  return (SecCertificateCreateWithBytes(kCFAllocatorDefault, credential->data, (CFIndex)credential->datalen));
 }
 
 
@@ -1489,6 +1475,21 @@ http_cdsa_copy_server(
   return (certificates);
 }
 #endif /* HAVE_SECKEYCHAINOPEN */
+
+
+/*
+ * 'http_cdsa_create_credential()' - Create a single credential in the internal format.
+ */
+
+static SecCertificateRef			/* O - Certificate */
+http_cdsa_create_credential(
+    http_credential_t *credential)		/* I - Credential */
+{
+  if (!credential)
+    return (NULL);
+
+  return (SecCertificateCreateWithBytes(kCFAllocatorDefault, credential->data, (CFIndex)credential->datalen));
+}
 
 
 /*

@@ -117,7 +117,12 @@ extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate)
 #      include <Security/SecPolicyPriv.h>
 #    endif /* HAVE_SECPOLICYPRIV_H */
 #  elif defined(HAVE_SSPISSL)
-#    include "sspi-private.h"
+#    include <wincrypt.h>
+#    include <wintrust.h>
+#    include <schannel.h>
+#    define SECURITY_WIN32
+#    include <security.h>
+#    include <sspi.h>
 #  endif /* HAVE_GNUTLS */
 
 #  ifndef WIN32
@@ -203,7 +208,25 @@ typedef CFArrayRef	http_tls_credentials_t;
  * Windows' SSPI library gets a CUPS wrapper...
  */
 
-typedef _sspi_struct_t * http_tls_t;
+typedef struct _http_sspi_s		/**** SSPI/SSL data structure ****/
+{
+  CredHandle	creds;			/* Credentials */
+  CtxtHandle	context;		/* SSL context */
+  BOOL		contextInitialized;	/* Is context init'd? */
+  SecPkgContext_StreamSizes streamSizes;/* SSL data stream sizes */
+  BYTE		*decryptBuffer;		/* Data pre-decryption*/
+  size_t	decryptBufferLength;	/* Length of decrypt buffer */
+  size_t	decryptBufferUsed;	/* Bytes used in buffer */
+  BYTE		*readBuffer;		/* Data post-decryption */
+  int		readBufferLength;	/* Length of read buffer */
+  int		readBufferUsed;		/* Bytes used in buffer */
+  BYTE		*writeBuffer;		/* Data pre-encryption */
+  int		writeBufferLength;	/* Length of write buffer */
+  DWORD		certFlags;		/* Cert verification flags */
+  PCCERT_CONTEXT localCert,		/* Local certificate */
+		remoteCert;		/* Remote (peer's) certificate */
+} _http_sspi_t;
+typedef _http_sspi_t *http_tls_t;
 typedef void *http_tls_credentials_t;
 
 #  else

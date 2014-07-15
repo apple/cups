@@ -1451,8 +1451,6 @@
 		727EF04D192E3602001EF690 /* testlpd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testlpd.c; path = ../scheduler/testlpd.c; sourceTree = "<group>"; };
 		727EF04E192E3602001EF690 /* testspeed.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testspeed.c; path = ../scheduler/testspeed.c; sourceTree = "<group>"; };
 		727EF04F192E3602001EF690 /* testsub.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = testsub.c; path = ../scheduler/testsub.c; sourceTree = "<group>"; };
-		728FB7E0153600FA005426E1 /* tls-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-darwin.c"; path = "../scheduler/tls-darwin.c"; sourceTree = "<group>"; };
-		728FB7E1153600FA005426E1 /* tls-gnutls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "tls-gnutls.c"; path = "../scheduler/tls-gnutls.c"; sourceTree = "<group>"; };
 		728FB7EC1536161C005426E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		728FB7EF1536167A005426E1 /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = /usr/lib/libiconv.dylib; sourceTree = "<absolute>"; };
 		728FB7F01536167A005426E1 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = /usr/lib/libresolv.dylib; sourceTree = "<absolute>"; };
@@ -2179,8 +2177,6 @@
 				72220F8D13330B0C00FCA411 /* subscriptions.h */,
 				72220F8E13330B0C00FCA411 /* sysman.c */,
 				72220F8F13330B0C00FCA411 /* sysman.h */,
-				728FB7E0153600FA005426E1 /* tls-darwin.c */,
-				728FB7E1153600FA005426E1 /* tls-gnutls.c */,
 			);
 			name = cupsd;
 			path = .;
