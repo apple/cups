@@ -2666,10 +2666,21 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
             cupsdLogClient(con, CUPSD_LOG_DEBUG, "Sending status %d for CGI.", con->pipe_status);
 
-            if (!cupsdSendHeader(con, con->pipe_status, NULL, CUPSD_AUTH_NONE))
+            if (con->pipe_status == HTTP_STATUS_OK)
 	    {
-	      cupsdCloseClient(con);
-	      return;
+	      if (!cupsdSendHeader(con, con->pipe_status, NULL, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+	    }
+	    else
+	    {
+	      if (!cupsdSendError(con, con->pipe_status, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
 	    }
           }
 	  else
