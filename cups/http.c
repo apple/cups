@@ -3593,8 +3593,15 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 
     if (http->cookie)
     {
-      if (httpPrintf(http, "Set-Cookie: %s path=/ httponly%s\r\n",
-		     http->cookie, http->tls ? " secure" : "") < 1)
+      if (strchr(http->cookie, ';'))
+      {
+        if (httpPrintf(http, "Set-Cookie: %s\r\n", http->cookie) < 1)
+	{
+	  http->status = HTTP_STATUS_ERROR;
+	  return (-1);
+	}
+      }
+      else if (httpPrintf(http, "Set-Cookie: %s; path=/; httponly;%s\r\n", http->cookie, http->tls ? " secure;" : "") < 1)
       {
 	http->status = HTTP_STATUS_ERROR;
 	return (-1);

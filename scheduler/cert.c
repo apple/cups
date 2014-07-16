@@ -43,8 +43,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 					/* Hex constants... */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAddCert: Adding certificate for PID %d", pid);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdAddCert: Adding certificate for PID %d", pid);
 
  /*
   * Allocate memory for the certificate...

@@ -1979,6 +1979,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	if (httpGetState(con->http) == HTTP_STATE_POST_SEND)
 	{
+	 /*
+	  * Don't listen for activity until we decide to do something with this...
+	  */
+
+          cupsdAddSelect(httpGetFd(con->http), NULL, NULL, con);
+
 	  if (con->file >= 0)
 	  {
 	    fstat(con->file, &filestats);
@@ -2630,12 +2636,6 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    }
 	    else if (!_cups_strcasecmp(con->header, "Set-Cookie") && value)
 	    {
-	      char *sep = strchr(value, ';');
-					/* Separator between name=value and the rest */
-
-	      if (sep)
-		*sep = '\0';
-
 	      httpSetCookie(con->http, value);
 	      con->sent_header = 1;
 	    }

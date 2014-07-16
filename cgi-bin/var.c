@@ -437,9 +437,9 @@ cgiSetCookie(const char *name,		/* I - Name */
     printf(" expires=%s;", httpGetDateString2(expires, date, sizeof(date)));
   }
   if (secure)
-    puts(" secure;");
+    puts(" httponly; secure;");
   else
-    putchar('\n');
+    puts(" httponly;");
 }
 
 

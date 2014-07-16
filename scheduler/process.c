@@ -73,6 +73,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 			domain[1024],	/* Domain socket, if any */
 			request[1024],	/* Quoted RequestRoot */
 			root[1024],	/* Quoted ServerRoot */
+			state[1024],	/* Quoted StateDir */
 			temp[1024];	/* Quoted TempDir */
   const char		*nodebug;	/* " (with no-log)" for no debug */
   cupsd_listener_t	*lis;		/* Current listening socket */
@@ -104,6 +105,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
   cupsd_requote(cache, CacheDir, sizeof(cache));
   cupsd_requote(request, RequestRoot, sizeof(request));
   cupsd_requote(root, ServerRoot, sizeof(root));
+  cupsd_requote(state, StateDir, sizeof(state));
   cupsd_requote(temp, TempDir, sizeof(temp));
 
   nodebug = LogLevel < CUPSD_LOG_DEBUG ? " (with no-log)" : "";
@@ -188,8 +190,10 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
 		 " #\"^%s/\""		/* TempDir/... */
 		 " #\"^%s$\""		/* CacheDir */
 		 " #\"^%s/\""		/* CacheDir/... */
+		 " #\"^%s$\""		/* StateDir */
+		 " #\"^%s/\""		/* StateDir/... */
 		 "))\n",
-		 temp, temp, cache, cache);
+		 temp, temp, cache, cache, state, state);
   /* Read common folders */
   cupsFilePrintf(fp,
                  "(allow file-read-data file-read-metadata\n"
