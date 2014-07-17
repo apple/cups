@@ -53,6 +53,7 @@ static void	http_sspi_free(_http_sspi_t *conn);
 static int	http_sspi_server(http_t *http, const char *hostname);
 static void	http_sspi_set_allows_any_root(_http_sspi_t *conn, BOOL allow);
 static void	http_sspi_set_allows_expired_certs(_http_sspi_t *conn, BOOL allow);
+static const char *http_sspi_strerror(_http_sspi_t *conn, DWORD code);
 static DWORD	http_sspi_verify(PCCERT_CONTEXT cert, const char *common_name, DWORD dwCertFlags);
 
 
@@ -532,9 +533,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
   }
   else if (scRet != SEC_E_OK)
   {
-    char error[1024] = "";
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, scRet, 0, error, sizeof(error), NULL);
-    DEBUG_printf(("5_httpTLSRead: DecryptMessage failed: %lx (%s)", scRet, error));
+    DEBUG_printf(("5_httpTLSRead: DecryptMessage failed: %s", http_sspi_strerror(conn, scRet)));
     WSASetLastError(WSASYSCALLFAILURE);
     return (-1);
   }
@@ -794,12 +793,12 @@ _httpTLSStop(http_t *http)		/* I - HTTP connection */
       }
       else
       {
-        DEBUG_printf(("_httpTLSStop: AcceptSecurityContext failed: %x", status));
+        DEBUG_printf(("_httpTLSStop: AcceptSecurityContext failed: %s", http_sspi_strerror(conn, status)));
       }
     }
     else
     {
-      DEBUG_printf(("_httpTLSStop: ApplyControlToken failed: %x", status));
+      DEBUG_printf(("_httpTLSStop: ApplyControlToken failed: %s", http_sspi_strerror(conn, status)));
     }
   }
 
@@ -886,7 +885,7 @@ _httpTLSWrite(http_t     *http,		/* I - HTTP connection */
 
     if (FAILED(scRet))
     {
-      DEBUG_printf(("_httpTLSWrite: EncryptMessage failed: %x", scRet));
+      DEBUG_printf(("_httpTLSWrite: EncryptMessage failed: %s", http_sspi_strerror(conn, scRet)));
       WSASetLastError(WSASYSCALLFAILURE);
       return (-1);
     }
@@ -1077,7 +1076,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
   if (scRet != SEC_I_CONTINUE_NEEDED)
   {
-    DEBUG_printf(("http_sspi_client: InitializeSecurityContext(1) failed: %x", scRet));
+    DEBUG_printf(("http_sspi_client: InitializeSecurityContext(1) failed: %s", http_sspi_strerror(conn, scRet)));
     return (-1);
   }
 
@@ -1281,7 +1280,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
     if (FAILED(scRet))
     {
-      DEBUG_printf(("http_sspi_client: InitializeSecurityContext(2) failed: %x", scRet));
+      DEBUG_printf(("http_sspi_client: InitializeSecurityContext(2) failed: %s", http_sspi_strerror(conn, scRet)));
       ret = -1;
       break;
     }
@@ -1330,7 +1329,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
     if (scRet != SEC_E_OK)
     {
-      DEBUG_printf(("http_sspi_client: QueryContextAttributes failed(SECPKG_ATTR_REMOTE_CERT_CONTEXT): %x", scRet));
+      DEBUG_printf(("http_sspi_client: QueryContextAttributes failed(SECPKG_ATTR_REMOTE_CERT_CONTEXT): %s", http_sspi_strerror(conn, scRet)));
       return (-1);
     }
 
@@ -1340,7 +1339,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
     if (scRet != SEC_E_OK)
     {
-      DEBUG_printf(("http_sspi_client: sspi_verify_certificate failed: %x", scRet));
+      DEBUG_printf(("http_sspi_client: sspi_verify_certificate failed: %s", http_sspi_strerror(conn, scRet)));
       ret = -1;
       goto cleanup;
     }
@@ -1354,7 +1353,7 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
 
     if (scRet != SEC_E_OK)
     {
-      DEBUG_printf(("http_sspi_client: QueryContextAttributes failed(SECPKG_ATTR_STREAM_SIZES): %x", scRet));
+      DEBUG_printf(("http_sspi_client: QueryContextAttributes failed(SECPKG_ATTR_STREAM_SIZES): %s", http_sspi_strerror(conn, scRet)));
       ret = -1;
     }
   }
@@ -1400,7 +1399,7 @@ http_sspi_credentials(
     {
       if (!CryptAcquireContextW(&hProv, (LPWSTR)container, MS_DEF_PROV_W, PROV_RSA_FULL, CRYPT_MACHINE_KEYSET))
       {
-        DEBUG_printf(("http_sspi_credentials: CryptAcquireContext failed: %x", GetLastError()));
+        DEBUG_printf(("http_sspi_credentials: CryptAcquireContext failed: %s", http_sspi_strerror(conn, GetLastError())));
         ok = FALSE;
         goto cleanup;
       }
@@ -1411,7 +1410,7 @@ http_sspi_credentials(
 
   if (!store)
   {
-    DEBUG_printf(("http_sspi_credentials: CertOpenSystemStore failed: %x", GetLastError()));
+    DEBUG_printf(("http_sspi_credentials: CertOpenSystemStore failed: %s", http_sspi_strerror(conn, GetLastError())));
     ok = FALSE;
     goto cleanup;
   }
@@ -1420,7 +1419,7 @@ http_sspi_credentials(
 
   if (!CertStrToName(X509_ASN_ENCODING, common_name, CERT_OID_NAME_STR, NULL, NULL, &dwSize, NULL))
   {
-    DEBUG_printf(("http_sspi_credentials: CertStrToName failed: %x", GetLastError()));
+    DEBUG_printf(("http_sspi_credentials: CertStrToName failed: %s", http_sspi_strerror(conn, GetLastError())));
     ok = FALSE;
     goto cleanup;
   }
@@ -1436,7 +1435,7 @@ http_sspi_credentials(
 
   if (!CertStrToName(X509_ASN_ENCODING, common_name, CERT_OID_NAME_STR, NULL, p, &dwSize, NULL))
   {
-    DEBUG_printf(("_sspiGetCredentials: CertStrToName failed: %x", GetLastError()));
+    DEBUG_printf(("_sspiGetCredentials: CertStrToName failed: %s", http_sspi_strerror(conn, GetLastError())));
     ok = FALSE;
     goto cleanup;
   }
@@ -1454,7 +1453,7 @@ http_sspi_credentials(
 
     if (!CryptGenKey(hProv, AT_KEYEXCHANGE, CRYPT_EXPORTABLE, &hKey))
     {
-      DEBUG_printf(("_sspiGetCredentials: CryptGenKey failed: %x", GetLastError()));
+      DEBUG_printf(("_sspiGetCredentials: CryptGenKey failed: %s", http_sspi_strerror(conn, GetLastError())));
       ok = FALSE;
       goto cleanup;
     }
@@ -1475,14 +1474,14 @@ http_sspi_credentials(
 
     if (!createdContext)
     {
-      DEBUG_printf(("_sspiGetCredentials: CertCreateSelfSignCertificate failed: %x", GetLastError()));
+      DEBUG_printf(("_sspiGetCredentials: CertCreateSelfSignCertificate failed: %s", http_sspi_strerror(conn, GetLastError())));
       ok = FALSE;
       goto cleanup;
     }
 
     if (!CertAddCertificateContextToStore(store, createdContext, CERT_STORE_ADD_REPLACE_EXISTING, &storedContext))
     {
-      DEBUG_printf(("_sspiGetCredentials: CertAddCertificateContextToStore failed: %x", GetLastError()));
+      DEBUG_printf(("_sspiGetCredentials: CertAddCertificateContextToStore failed: %s", http_sspi_strerror(conn, GetLastError())));
       ok = FALSE;
       goto cleanup;
     }
@@ -1496,7 +1495,7 @@ http_sspi_credentials(
 
     if (!CertSetCertificateContextProperty(storedContext, CERT_KEY_PROV_INFO_PROP_ID, 0, &ckp))
     {
-      DEBUG_printf(("_sspiGetCredentials: CertSetCertificateContextProperty failed: %x", GetLastError()));
+      DEBUG_printf(("_sspiGetCredentials: CertSetCertificateContextProperty failed: %s", http_sspi_strerror(conn, GetLastError())));
       ok = FALSE;
       goto cleanup;
     }
@@ -1522,7 +1521,7 @@ http_sspi_credentials(
   Status = AcquireCredentialsHandle(NULL, UNISP_NAME, isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND, NULL, &SchannelCred, NULL, NULL, &conn->creds, &tsExpiry);
   if (Status != SEC_E_OK)
   {
-    DEBUG_printf(("_sspiGetCredentials: AcquireCredentialsHandle failed: %x", Status));
+    DEBUG_printf(("_sspiGetCredentials: AcquireCredentialsHandle failed: %s", http_sspi_strerror(conn, Status)));
     ok = FALSE;
     goto cleanup;
   }
@@ -1560,7 +1559,7 @@ cleanup:
  */
 
 static void
-http_sspi_free(_http_sspi_t *conn)	/* I  - Client connection */
+http_sspi_free(_http_sspi_t *conn)	/* I - SSPI data */
 {
   if (!conn)
     return;
@@ -1757,7 +1756,7 @@ http_sspi_server(http_t     *http,	/* I - HTTP connection */
     }
     else if (FAILED(scRet) && scRet != SEC_E_INCOMPLETE_MESSAGE)
     {
-      DEBUG_printf(("http_sspi_server: AcceptSecurityContext failed: %x", scRet));
+      DEBUG_printf(("http_sspi_server: AcceptSecurityContext failed: %s", http_sspi_strerror(conn, scRet)));
       ret = -1;
       break;
     }
@@ -1789,7 +1788,7 @@ http_sspi_server(http_t     *http,	/* I - HTTP connection */
 
     if (scRet != SEC_E_OK)
     {
-      DEBUG_printf(("http_sspi_server: QueryContextAttributes failed: %x", scRet));
+      DEBUG_printf(("http_sspi_server: QueryContextAttributes failed: %s", http_sspi_strerror(conn, scRet)));
       ret = -1;
     }
   }
@@ -1804,7 +1803,7 @@ http_sspi_server(http_t     *http,	/* I - HTTP connection */
  */
 void
 _sspiSetAllowsAnyRoot(_http_sspi_t *conn,
-					/* I  - Client connection */
+					/* I  - SSPI data */
                       BOOL           allow)
 					/* I  - Allow any root */
 {
@@ -1818,12 +1817,27 @@ _sspiSetAllowsAnyRoot(_http_sspi_t *conn,
  */
 void
 _sspiSetAllowsExpiredCerts(_http_sspi_t *conn,
-					/* I  - Client connection */
+					/* I  - SSPI data */
                            BOOL           allow)
 					/* I  - Allow expired certs */
 {
   conn->certFlags = (allow) ? conn->certFlags | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID :
                               conn->certFlags & ~SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
+}
+
+
+/*
+ * 'http_sspi_strerror()' - Return a string for the specified error code.
+ */
+
+static const char *			/* O - String for error */
+http_sspi_strerror(_http_sspi_t *conn,	/* I - SSPI data */
+                   DWORD        code)	/* I - Error code */
+{
+  if (!FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, code, 0, conn->error, sizeof(conn->error), NULL))
+    snprintf(conn->error, sizeof(conn->error), "Unknown error %x", code);
+
+  return (conn->error);
 }
 
 
@@ -1890,7 +1904,7 @@ http_sspi_verify(
   if (!CertGetCertificateChain(NULL, cert, NULL, cert->hCertStore, &chainPara, 0, NULL, &chainContext))
   {
     status = GetLastError();
-    DEBUG_printf(("CertGetCertificateChain returned 0x%x\n", status));
+    DEBUG_printf(("CertGetCertificateChain returned: %s", http_sspi_strerror(conn, status)));
 
     LocalFree(commonNameUnicode);
     return (status);
