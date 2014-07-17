@@ -424,8 +424,11 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
   SECURITY_STATUS scRet;		/* SSPI status */
 
 
+  DEBUG_printf(("4_httpTLSRead(http=%p, buf=%p, len=%d)", http, buf, len));
+
   if (!conn)
   {
+    DEBUG_puts("5_httpTLSRead: No TLS context, returning -1.");
     WSASetLastError(WSAEINVAL);
     return (-1);
   }
@@ -446,6 +449,8 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
     if (conn->readBufferUsed > 0)
       memmove(conn->readBuffer, conn->readBuffer + bytesToCopy, conn->readBufferUsed);
 
+    DEBUG_printf(("5_httpTLSRead: Returning %d bytes previously decrypted.", bytesToCopy));
+
     return (bytesToCopy);
   }
 
@@ -454,8 +459,8 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
   */
 
   message.ulVersion = SECBUFFER_VERSION;
-  message.cBuffers = 4;
-  message.pBuffers = buffers;
+  message.cBuffers  = 4;
+  message.pBuffers  = buffers;
 
   do
   {
@@ -476,21 +481,25 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 
       if ((temp = realloc(conn->decryptBuffer, conn->decryptBufferLength + 4096)) == NULL)
       {
-	DEBUG_printf(("_httpTLSRead: Unable to allocate %d byte buffer.", conn->decryptBufferLength + 4096));
+	DEBUG_printf(("_httpTLSRead: Unable to allocate %d byte decryption buffer.", conn->decryptBufferLength + 4096));
 	WSASetLastError(E_OUTOFMEMORY);
 	return (-1);
       }
 
       conn->decryptBufferLength += 4096;
       conn->decryptBuffer       = temp;
+
+      DEBUG_printf(("_httpTLSRead: Resized decryption buffer to %d bytes.", conn->decryptBufferLength));
     }
 
     buffers[0].pvBuffer	  = conn->decryptBuffer;
-    buffers[0].cbBuffer	  = (unsigned long) conn->decryptBufferUsed;
+    buffers[0].cbBuffer	  = (unsigned long)conn->decryptBufferUsed;
     buffers[0].BufferType = SECBUFFER_DATA;
     buffers[1].BufferType = SECBUFFER_EMPTY;
     buffers[2].BufferType = SECBUFFER_EMPTY;
     buffers[3].BufferType = SECBUFFER_EMPTY;
+
+    DEBUG_printf(("5_httpTLSRead: decryptBufferUsed=%d", conn->decryptBufferUsed));
 
     scRet = DecryptMessage(&conn->context, &message, 0, NULL);
 
@@ -499,14 +508,16 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
       num = recv(http->fd, conn->decryptBuffer + conn->decryptBufferUsed, (int)(conn->decryptBufferLength - conn->decryptBufferUsed), 0);
       if (num < 0)
       {
-	DEBUG_printf(("_httpTLSRead: recv failed: %d", WSAGetLastError()));
+	DEBUG_printf(("5_httpTLSRead: recv failed: %d", WSAGetLastError()));
 	return (-1);
       }
       else if (num == 0)
       {
-	DEBUG_puts("_httpTLSRead: Server disconnected.");
+	DEBUG_puts("5_httpTLSRead: Server disconnected.");
 	return (0);
       }
+
+      DEBUG_printf(("5_httpTLSRead: Read %d bytes into decryption buffer.", num));
 
       conn->decryptBufferUsed += num;
     }
@@ -515,13 +526,15 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
 
   if (scRet == SEC_I_CONTEXT_EXPIRED)
   {
-    DEBUG_puts("_httpTLSRead: Context expired.");
+    DEBUG_puts("5_httpTLSRead: Context expired.");
     WSASetLastError(WSAECONNRESET);
     return (-1);
   }
   else if (scRet != SEC_E_OK)
   {
-    DEBUG_printf(("_httpTLSRead: DecryptMessage failed: %lx", scRet));
+    char error[1024] = "";
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, scRet, 0, error, sizeof(error), NULL);
+    DEBUG_printf(("5_httpTLSRead: DecryptMessage failed: %lx (%s)", scRet, error));
     WSASetLastError(WSASYSCALLFAILURE);
     return (-1);
   }
