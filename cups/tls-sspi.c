@@ -48,6 +48,7 @@
 
 static _http_sspi_t *http_sspi_alloc(void);
 static int	http_sspi_client(http_t *http, const char *hostname);
+static PCCERT_CONTEXT http_sspi_create_credential(http_credential_t *cred);
 static BOOL	http_sspi_find_credentials(http_t *http, const LPWSTR containerName, const char *common_name);
 static void	http_sspi_free(_http_sspi_t *sspi);
 static BOOL	http_sspi_make_credentials(_http_sspi_t *sspi, const LPWSTR containerName, const char *common_name, _http_mode_t mode, int years);
@@ -147,9 +148,7 @@ http_tls_credentials_t			/* O - Internal credentials */
 _httpCreateCredentials(
     cups_array_t *credentials)		/* I - Array of credentials */
 {
-  (void)credentials;
-
-  return (NULL);
+  return (http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials)));
 }
 
 
@@ -164,10 +163,47 @@ httpCredentialsAreValidForName(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Name to check */
 {
-  (void)credentials;
-  (void)common_name;
+  int		valid = 1;		/* Valid name? */
+  PCCERT_CONTEXT cert = http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials));
+					/* Certificate */
+  char		cert_name[1024];	/* Name from certificate */
 
-  return (1);
+
+  if (cert)
+  {
+    if (!CertNameToStr(X509_ASN_ENCODING, cert->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+      strlcpy(cert_name, "unknown", sizeof(cert_name));
+
+    CertFreeCertificateContext(cert);
+  }
+  else
+    strlcpy(cert_name, "unknown", sizeof(cert_name));
+
+ /*
+  * Compare the common names...
+  */
+
+  if (_cups_strcasecmp(common_name, cert_name))
+  {
+   /*
+    * Not an exact match for the common name, check for wildcard certs...
+    */
+
+    const char	*domain = strchr(common_name, '.');
+					/* Domain in common name */
+
+    if (strncmp(cert_name, "*.", 2) || !domain || _cups_strcasecmp(domain, cert_name + 1))
+    {
+     /*
+      * Not a wildcard match.
+      */
+
+      /* TODO: Check subject alternate names */
+      valid = 0;
+    }
+  }
+
+  return (valid);
 }
 
 
@@ -182,68 +218,32 @@ httpCredentialsGetTrust(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Common name for trust lookup */
 {
-  http_trust_t		trust = HTTP_TRUST_OK;
-					/* Trusted? */
-  cups_array_t		*tcreds = NULL;	/* Trusted credentials */
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Per-thread globals */
+  http_trust_t	trust = HTTP_TRUST_OK;	/* Level of trust */
+  PCCERT_CONTEXT cert = NULL;		/* Certificate to validate */
+  DWORD		certFlags = 0;		/* Cert verification flags */
+  _cups_globals_t *cg = _cupsGlobals();	/* Per-thread global data */
 
 
   if (!common_name)
     return (HTTP_TRUST_UNKNOWN);
 
- /*
-  * Look this common name up in the default keychains...
-  */
+  cert = http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials));
+  if (!cert)
+    return (HTTP_TRUST_UNKNOWN);
 
-  httpLoadCredentials(NULL, &tcreds, common_name);
+  if (cg->any_root)
+    certFlags |= SECURITY_FLAG_IGNORE_UNKNOWN_CA;
 
-  if (tcreds)
-  {
-    char	credentials_str[1024],	/* String for incoming credentials */
-		tcreds_str[1024];	/* String for saved credentials */
+  if (cg->expired_certs)
+    certFlags |= SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
 
-    httpCredentialsString(credentials, credentials_str, sizeof(credentials_str));
-    httpCredentialsString(tcreds, tcreds_str, sizeof(tcreds_str));
+  if (!cg->validate_certs)
+    certFlags |= SECURITY_FLAG_IGNORE_CERT_CN_INVALID;
 
-    if (strcmp(credentials_str, tcreds_str))
-    {
-     /*
-      * Credentials don't match, let's look at the expiration date of the new
-      * credentials and allow if the new ones have a later expiration...
-      */
-
-      if (httpCredentialsGetExpiration(credentials) <= httpCredentialsGetExpiration(tcreds) ||
-          !httpCredentialsAreValidForName(credentials, common_name))
-      {
-       /*
-        * Either the new credentials are not newly issued, or the common name
-	* does not match the issued certificate...
-	*/
-
-        trust = HTTP_TRUST_INVALID;
-      }
-      else if (httpCredentialsGetExpiration(tcreds) < time(NULL))
-      {
-       /*
-        * Save the renewed credentials...
-	*/
-
-	trust = HTTP_TRUST_RENEWED;
-
-        httpSaveCredentials(NULL, credentials, common_name);
-      }
-    }
-
-    httpFreeCredentials(tcreds);
-  }
-  else if (cg->validate_certs && !httpCredentialsAreValidForName(credentials, common_name))
+  if (http_sspi_verify(cert, common_name, certFlags) != SEC_E_OK)
     trust = HTTP_TRUST_INVALID;
 
-  if (!cg->expired_certs && time(NULL) > httpCredentialsGetExpiration(credentials))
-    trust = HTTP_TRUST_EXPIRED;
-  else if (!cg->any_root && cupsArrayCount(credentials) == 1)
-    trust = HTTP_TRUST_INVALID;
+  CertFreeCertificateContext(cert);
 
   return (trust);
 }
@@ -259,9 +259,30 @@ time_t					/* O - Expiration date of credentials */
 httpCredentialsGetExpiration(
     cups_array_t *credentials)		/* I - Credentials */
 {
-  (void)credentials;
+  time_t	expiration_date = 0;	/* Expiration data of credentials */
+  PCCERT_CONTEXT cert = http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials));
+					/* Certificate */
 
-  return (INT_MAX);
+  if (cert)
+  {
+    SYSTEMTIME	systime;		/* System time */
+    struct tm	tm;			/* UNIX date/time */
+
+    FileTimeToSystemTime(cert->pCertInfo->NotAfter, &systime);
+
+    tm.tm_year = systime.wYear - 1900;
+    tm.tm_mon  = systime.wMonth - 1;
+    tm.tm_mday = systime.wDay;
+    tm.tm_hour = systime.wHour;
+    tm.tm_min  = systime.wMinute;
+    tm.tm_sec  = systime.wSecond;
+
+    expiration_date = mktime(&tm);
+
+    CertFreeCertificateContext(cert);
+  }
+
+  return (expiration_date);
 }
 
 
@@ -277,6 +298,11 @@ httpCredentialsString(
     char         *buffer,		/* I - Buffer or @code NULL@ */
     size_t       bufsize)		/* I - Size of buffer */
 {
+  http_credential_t	*first = (http_credential_t *)cupsArrayFirst(credentials);
+					/* First certificate */
+  PCCERT_CONTEXT 	cert;		/* Certificate */
+
+
   DEBUG_printf(("httpCredentialsString(credentials=%p, buffer=%p, bufsize=" CUPS_LLFMT ")", credentials, buffer, CUPS_LLCAST bufsize));
 
   if (!buffer)
@@ -285,39 +311,39 @@ httpCredentialsString(
   if (buffer && bufsize > 0)
     *buffer = '\0';
 
-#if 0
-  http_credential_t	*first;		/* First certificate */
-  SecCertificateRef	secCert;	/* Certificate reference */
+  cert = http_sspi_create_credential(first);
 
-
-  if ((first = (http_credential_t *)cupsArrayFirst(credentials)) != NULL &&
-      (secCert = http_cdsa_create_credential(first)) != NULL)
+  if (cert)
   {
-    CFStringRef		cf_name;	/* CF common name string */
-    char		name[256];	/* Common name associated with cert */
+    char		cert_name[256];	/* Common name */
+    SYSTEMTIME		systime;	/* System time */
+    struct tm		tm;		/* UNIX date/time */
     time_t		expiration;	/* Expiration date of cert */
     _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
-    if ((cf_name = SecCertificateCopySubjectSummary(secCert)) != NULL)
-    {
-      CFStringGetCString(cf_name, name, (CFIndex)sizeof(name), kCFStringEncodingUTF8);
-      CFRelease(cf_name);
-    }
-    else
-      strlcpy(name, "unknown", sizeof(name));
+    FileTimeToSystemTime(cert->pCertInfo->NotAfter, &systime);
 
-    expiration = (time_t)(SecCertificateNotValidAfter(secCert) + kCFAbsoluteTimeIntervalSince1970);
+    tm.tm_year = systime.wYear - 1900;
+    tm.tm_mon  = systime.wMonth - 1;
+    tm.tm_mday = systime.wDay;
+    tm.tm_hour = systime.wHour;
+    tm.tm_min  = systime.wMinute;
+    tm.tm_sec  = systime.wSecond;
+
+    expiration = mktime(&tm);
+
+    if (!CertNameToStr(X509_ASN_ENCODING, cert->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+      strlcpy(cert_name, "unknown", sizeof(cert_name));
 
     _cupsMD5Init(&md5_state);
     _cupsMD5Append(&md5_state, first->data, (int)first->datalen);
     _cupsMD5Finish(&md5_state, md5_digest);
 
-    snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
+    snprintf(buffer, bufsize, "%s / %s / %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", cert_name, httpGetDateString(expiration), md5_digest[0], md5_digest[1], md5_digest[2], md5_digest[3], md5_digest[4], md5_digest[5], md5_digest[6], md5_digest[7], md5_digest[8], md5_digest[9], md5_digest[10], md5_digest[11], md5_digest[12], md5_digest[13], md5_digest[14], md5_digest[15]);
 
-    CFRelease(secCert);
+    CertFreeCertificateContext(cert);
   }
-#endif /* 0 */
 
   DEBUG_printf(("1httpCredentialsString: Returning \"%s\".", buffer));
 
@@ -335,6 +361,8 @@ _httpFreeCredentials(
 {
   if (!credentials)
     return;
+
+  CertFreeCertificateContext(credentials);
 }
 
 
@@ -1333,18 +1361,6 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
       return (-1);
     }
 
-#if 0
-    /* TODO: Move this out for opt-in server cert validation, like other platforms. */
-    scRet = http_sspi_verify(sspi->remoteCert, hostname, sspi->certFlags);
-
-    if (scRet != SEC_E_OK)
-    {
-      DEBUG_printf(("http_sspi_client: sspi_verify_certificate failed: %s", http_sspi_strerror(sspi, scRet)));
-      ret = -1;
-      goto cleanup;
-    }
-#endif // 0
-
    /*
     * Find out how big the header/trailer will be:
     */
@@ -1359,6 +1375,21 @@ http_sspi_client(http_t     *http,	/* I - Client connection */
   }
 
   return (ret);
+}
+
+
+/*
+ * 'http_sspi_create_credential()' - Create an SSPI certificate context.
+ */
+
+static PCCERT_CONTEXT			/* O - Certificate context */
+http_sspi_create_credential(
+    http_credential_t *cred)		/* I - Credential */
+{
+  if (cred)
+    return (CertCreateCertificateContext(X509_ASN_ENCODING, cred->data, cred->datalen));
+  else
+    return (NULL);
 }
 
 
@@ -2069,36 +2100,6 @@ http_sspi_verify(
 
   return (status);
 }
-
-
-#if 0
-/*
- * '_sspiSetAllowsAnyRoot()' - Set the client cert policy for untrusted root certs
- */
-void
-_sspiSetAllowsAnyRoot(_http_sspi_t *sspi,
-					/* I  - SSPI data */
-                      BOOL           allow)
-					/* I  - Allow any root */
-{
-  sspi->certFlags = (allow) ? sspi->certFlags | SECURITY_FLAG_IGNORE_UNKNOWN_CA :
-                              sspi->certFlags & ~SECURITY_FLAG_IGNORE_UNKNOWN_CA;
-}
-
-
-/*
- * '_sspiSetAllowsExpiredCerts()' - Set the client cert policy for expired root certs
- */
-void
-_sspiSetAllowsExpiredCerts(_http_sspi_t *sspi,
-					/* I  - SSPI data */
-                           BOOL           allow)
-					/* I  - Allow expired certs */
-{
-  sspi->certFlags = (allow) ? sspi->certFlags | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID :
-                              sspi->certFlags & ~SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
-}
-#endif // 0
 
 
 /*

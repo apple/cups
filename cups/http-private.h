@@ -222,13 +222,12 @@ typedef struct _http_sspi_s		/**** SSPI/SSL data structure ****/
   int		readBufferUsed;		/* Bytes used in buffer */
   BYTE		*writeBuffer;		/* Data pre-encryption */
   int		writeBufferLength;	/* Length of write buffer */
-  DWORD		certFlags;		/* Cert verification flags */
   PCCERT_CONTEXT localCert,		/* Local certificate */
 		remoteCert;		/* Remote (peer's) certificate */
   char		error[256];		/* Most recent error message */
 } _http_sspi_t;
 typedef _http_sspi_t *http_tls_t;
-typedef void *http_tls_credentials_t;
+typedef PCCERT_CONTEXT http_tls_credentials_t;
 
 #  else
 /*
