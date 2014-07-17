@@ -595,7 +595,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
       conn->readBufferUsed += bytesToSave;
     }
 
-    return (bytesToCopy);
+    num = bytesToCopy;
   }
   else
   {
@@ -619,7 +619,7 @@ _httpTLSRead(http_t *http,		/* I - HTTP connection */
     conn->decryptBufferUsed = 0;
   }
 
-  return (0);
+  return (num);
 }
 
 
@@ -1797,6 +1797,35 @@ http_sspi_server(http_t     *http,	/* I - HTTP connection */
 }
 
 
+/*
+ * 'http_sspi_strerror()' - Return a string for the specified error code.
+ */
+
+static const char *			/* O - String for error */
+http_sspi_strerror(_http_sspi_t *conn,	/* I - SSPI data */
+                   DWORD        code)	/* I - Error code */
+{
+  if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, code, 0, conn->error, sizeof(conn->error), NULL))
+  {
+   /*
+    * Strip trailing CR + LF...
+    */
+
+    char	*ptr;			/* Pointer into error message */
+
+    for (ptr = conn->error + strlen(conn->error) - 1; ptr >= conn->error; ptr --)
+      if (*ptr == '\n' || *ptr == '\r')
+        *ptr = '\0';
+      else
+        break;
+  }
+  else
+    snprintf(conn->error, sizeof(conn->error), "Unknown error %x", code);
+
+  return (conn->error);
+}
+
+
 #if 0
 /*
  * '_sspiSetAllowsAnyRoot()' - Set the client cert policy for untrusted root certs
@@ -1823,21 +1852,6 @@ _sspiSetAllowsExpiredCerts(_http_sspi_t *conn,
 {
   conn->certFlags = (allow) ? conn->certFlags | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID :
                               conn->certFlags & ~SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
-}
-
-
-/*
- * 'http_sspi_strerror()' - Return a string for the specified error code.
- */
-
-static const char *			/* O - String for error */
-http_sspi_strerror(_http_sspi_t *conn,	/* I - SSPI data */
-                   DWORD        code)	/* I - Error code */
-{
-  if (!FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, code, 0, conn->error, sizeof(conn->error), NULL))
-    snprintf(conn->error, sizeof(conn->error), "Unknown error %x", code);
-
-  return (conn->error);
 }
 
 
