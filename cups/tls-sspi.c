@@ -38,6 +38,10 @@
 #  define SECURITY_FLAG_IGNORE_UNKNOWN_CA         0x00000100 /* Untrusted root */
 #endif /* SECURITY_FLAG_IGNORE_UNKNOWN_CA */
 
+#ifndef SECURITY_FLAG_IGNORE_CERT_CN_INVALID
+#  define SECURITY_FLAG_IGNORE_CERT_CN_INVALID	  0x00001000 /* Common name does not match */
+#endif /* !SECURITY_FLAG_IGNORE_CERT_CN_INVALID */
+
 #ifndef SECURITY_FLAG_IGNORE_CERT_DATE_INVALID
 #  define SECURITY_FLAG_IGNORE_CERT_DATE_INVALID  0x00002000 /* Expired X509 Cert. */
 #endif /* !SECURITY_FLAG_IGNORE_CERT_DATE_INVALID */
@@ -131,12 +135,18 @@ httpCopyCredentials(
 {
   DEBUG_printf(("httpCopyCredentials(http=%p, credentials=%p)", http, credentials));
 
-  (void)http;
+  if (!http || !http->tls || !http->tls->remoteCert || !credentials)
+  {
+    if (credentials)
+      *credentials = NULL;
 
-  if (credentials)
-    *credentials = NULL;
+    return (-1);
+  }
 
-  return (-1);
+  *credentials = cupsArrayNew(NULL, NULL);
+  httpAddCredential(*credentials, http->tls->remoteCert->pbCertEncoded, http->tls->remoteCert->cbCertEncoded);
+
+  return (0);
 }
 
 
@@ -171,7 +181,17 @@ httpCredentialsAreValidForName(
 
   if (cert)
   {
-    if (!CertNameToStr(X509_ASN_ENCODING, cert->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+    if (CertNameToStr(X509_ASN_ENCODING, &(cert->pCertInfo->Subject), CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+    {
+     /*
+      * Extract common name at end...
+      */
+
+      char  *ptr = strrchr(cert_name, ',');
+      if (ptr && ptr[1])
+        _cups_strcpy(cert_name, ptr + 2);
+    }
+    else
       strlcpy(cert_name, "unknown", sizeof(cert_name));
 
     CertFreeCertificateContext(cert);
@@ -268,7 +288,7 @@ httpCredentialsGetExpiration(
     SYSTEMTIME	systime;		/* System time */
     struct tm	tm;			/* UNIX date/time */
 
-    FileTimeToSystemTime(cert->pCertInfo->NotAfter, &systime);
+    FileTimeToSystemTime(&(cert->pCertInfo->NotAfter), &systime);
 
     tm.tm_year = systime.wYear - 1900;
     tm.tm_mon  = systime.wMonth - 1;
@@ -322,7 +342,7 @@ httpCredentialsString(
     _cups_md5_state_t	md5_state;	/* MD5 state */
     unsigned char	md5_digest[16];	/* MD5 result */
 
-    FileTimeToSystemTime(cert->pCertInfo->NotAfter, &systime);
+    FileTimeToSystemTime(&(cert->pCertInfo->NotAfter), &systime);
 
     tm.tm_year = systime.wYear - 1900;
     tm.tm_mon  = systime.wMonth - 1;
@@ -333,7 +353,17 @@ httpCredentialsString(
 
     expiration = mktime(&tm);
 
-    if (!CertNameToStr(X509_ASN_ENCODING, cert->pCertInfo->Subject, CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+    if (CertNameToStr(X509_ASN_ENCODING, &(cert->pCertInfo->Subject), CERT_SIMPLE_NAME_STR, cert_name, sizeof(cert_name)))
+    {
+     /*
+      * Extract common name at end...
+      */
+
+      char  *ptr = strrchr(cert_name, ',');
+      if (ptr && ptr[1])
+        _cups_strcpy(cert_name, ptr + 2);
+    }
+    else
       strlcpy(cert_name, "unknown", sizeof(cert_name));
 
     _cupsMD5Init(&md5_state);
