@@ -43,7 +43,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 
 static gnutls_x509_crt_t http_gnutls_create_credential(http_credential_t *credential);
 static const char	*http_gnutls_default_path(char *buffer, size_t bufsize);
-static const char	*http_gnuts_make_path(char *buffer, size_t bufsize, const char *dirname, const char *filename, const char *ext);
+static const char	*http_gnutls_make_path(char *buffer, size_t bufsize, const char *dirname, const char *filename, const char *ext);
 static ssize_t		http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
 static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
 
@@ -851,7 +851,7 @@ http_gnutls_make_path(
   if (bufptr < bufend)
     *bufptr++ = '.';
 
-  strlcpy(bufptr, ext, bufend - bufptr + 1);
+  strlcpy(bufptr, ext, (size_t)(bufend - bufptr + 1));
 
   return (buffer);
 }
