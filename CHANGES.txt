@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Dropped lppasswd and support for Digest authentication in in the
 	  scheduler (STR #4321)
+	- CUPS TLS support now supports certificate validation and policy
+	  enforcement (STR #1616)
 	- The configure script now supports target-specific tools for pkg-config
 	  and others (STR #4423)
 	- The ipptool program now supports EXPECT statements for collection

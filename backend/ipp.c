@@ -689,6 +689,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     cups_array_t	*creds;		/* TLS credentials */
+    cups_array_t	*lcreds = NULL;	/* Loaded credentials */
     http_trust_t	trust;		/* Trust level */
     static const char	*trusts[] = { NULL, "+cups-pki-invalid", "+cups-pki-changed", "+cups-pki-expired", NULL, "+cups-pki-unknown" };
 					/* Trust keywords */
@@ -704,6 +705,17 @@ main(int  argc,				/* I - Number of command-line args */
         return (CUPS_BACKEND_STOP);
       }
 
+      if (httpLoadCredentials(NULL, &lcreds, hostname))
+      {
+       /*
+        * Could not load the credentials, let's save the ones we have so we
+        * can detect changes...
+        */
+
+        httpSaveCredentials(NULL, creds, hostname);
+      }
+
+      httpFreeCredentials(lcreds);
       httpFreeCredentials(creds);
     }
   }
