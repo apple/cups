@@ -43,6 +43,7 @@ static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 
 static gnutls_x509_crt_t http_gnutls_create_credential(http_credential_t *credential);
 static const char	*http_gnutls_default_path(char *buffer, size_t bufsize);
+static const char	*http_gnuts_make_path(char *buffer, size_t bufsize, const char *dirname, const char *filename, const char *ext);
 static ssize_t		http_gnutls_read(gnutls_transport_ptr_t ptr, void *data, size_t length);
 static ssize_t		http_gnutls_write(gnutls_transport_ptr_t ptr, const void *data, size_t length);
 
@@ -89,9 +90,9 @@ cupsMakeServerCredentials(
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
     return (0);
   }
-    
-  snprintf(crtfile, sizeof(crtfile), "%s/%s.crt", path, common_name);
-  snprintf(keyfile, sizeof(keyfile), "%s/%s.key", path, common_name);
+
+  http_gnutls_make_path(crtfile, sizeof(crtfile), path, common_name, "crt");
+  http_gnutls_make_path(keyfile, sizeof(keyfile), path, common_name, "key");
 
  /*
   * Create the encryption key...
@@ -582,7 +583,7 @@ httpLoadCredentials(
   if (!path)
     return (-1);
 
-  snprintf(filename, sizeof(filename), "%s/%s.crt", path, common_name);
+  http_gnutls_make_path(filename, sizeof(filename), path, common_name, "crt");
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (-1);
@@ -708,8 +709,8 @@ httpSaveCredentials(
   if (!path)
     return (-1);
 
-  snprintf(filename, sizeof(filename), "%s/%s.crt", path, common_name);
-  snprintf(nfilename, sizeof(nfilename), "%s/%s.crt.N", path, common_name);
+  http_gnutls_make_path(filename, sizeof(filename), path, common_name, "crt");
+  snprintf(nfilename, sizeof(nfilename), "%s.N", filename);
 
   if ((fp = cupsFileOpen(nfilename, "w")) == NULL)
     return (-1);
@@ -813,6 +814,44 @@ http_gnutls_default_path(char   *buffer,/* I - Path buffer */
     strlcpy(buffer, CUPS_SERVERROOT "/ssl", bufsize);
 
   DEBUG_printf(("1http_gnutls_default_path: Using default path \"%s\".", buffer));
+
+  return (buffer);
+}
+
+
+/*
+ * 'http_gnutls_make_path()' - Format a filename for a certificate or key file.
+ */
+
+static const char *			/* O - Filename */
+http_gnutls_make_path(
+    char       *buffer,			/* I - Filename buffer */
+    size_t     bufsize,			/* I - Size of buffer */
+    const char *dirname,		/* I - Directory */
+    const char *filename,		/* I - Filename (usually hostname) */
+    const char *ext)			/* I - Extension */
+{
+  char	*bufptr,			/* Pointer into buffer */
+	*bufend = buffer + bufsize - 1;	/* End of buffer */
+
+
+  snprintf(buffer, bufsize, "%s/", dirname);
+  bufptr = buffer + strlen(buffer);
+
+  while (*filename && bufptr < bufend)
+  {
+    if (_cups_isalnum(*filename) || *filename == '-' || *filename == '.')
+      *bufptr++ = *filename;
+    else
+      *bufptr++ = '_';
+
+    filename ++;
+  }
+
+  if (bufptr < bufend)
+    *bufptr++ = '.';
+
+  strlcpy(bufptr, ext, bufend - bufptr + 1);
 
   return (buffer);
 }
@@ -1093,15 +1132,15 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     if (hostname[0])
     {
-      snprintf(crtfile, sizeof(crtfile), "%s/%s.crt", tls_keypath, hostname);
-      snprintf(keyfile, sizeof(keyfile), "%s/%s.key", tls_keypath, hostname);
+      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, hostname, "crt");
+      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, hostname, "key");
 
       have_creds = !access(crtfile, 0) && !access(keyfile, 0);
     }
     else if (tls_common_name)
     {
-      snprintf(crtfile, sizeof(crtfile), "%s/%s.crt", tls_keypath, tls_common_name);
-      snprintf(keyfile, sizeof(keyfile), "%s/%s.key", tls_keypath, tls_common_name);
+      http_gnutls_make_path(crtfile, sizeof(crtfile), tls_keypath, tls_common_name, "crt");
+      http_gnutls_make_path(keyfile, sizeof(keyfile), tls_keypath, tls_common_name, "key");
 
       have_creds = !access(crtfile, 0) && !access(keyfile, 0);
     }
@@ -1172,9 +1211,6 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   }
 
   http->tls_credentials = credentials;
-
-  // TODO: Put this in the right place; no-op for now, this to get things to compile
-//  http_tls_set_credentials(http);
 
   return (0);
 }
