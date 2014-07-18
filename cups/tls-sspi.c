@@ -532,7 +532,6 @@ httpSaveCredentials(
     cups_array_t *credentials,		/* I - Credentials */
     const char   *common_name)		/* I - Common name for credentials */
 {
-  _http_sspi_t	*sspi = http->tls;	/* SSPI data */
   HCERTSTORE	store = NULL;		/* Certificate store */
   PCCERT_CONTEXT storedContext = NULL;	/* Context created from the store */
   PCCERT_CONTEXT createdContext = NULL;	/* Context created by us */
@@ -540,7 +539,7 @@ httpSaveCredentials(
   PBYTE		p = NULL;		/* Temporary storage */
   HCRYPTPROV	hProv = (HCRYPTPROV)NULL;
 					/* Handle to a CSP */
-  CERT_NAME_BLOB sib;			/* Arbitrary array of bytes */
+  CRYPT_KEY_PROV_INFO ckp;		/* Handle to crypto key */
   int		ret = -1;		/* Return value */
 #ifdef DEBUG
   char		error[1024];		/* Error message buffer */
@@ -557,7 +556,7 @@ httpSaveCredentials(
     return (-1);
   }
 
-  createdContext = http_sspi_create_credential(credentials);
+  createdContext = http_sspi_create_credential((http_credential_t *)cupsArrayFirst(credentials));
   if (!createdContext)
   {
     DEBUG_puts("1httpSaveCredentials: Bad credentials, returning -1.");
@@ -2274,6 +2273,9 @@ http_sspi_verify(
 					/* Number of ites in rgszUsages */
   DWORD			count;		/* 32 bit count variable */
   DWORD			status;		/* Return value */
+#ifdef DEBUG
+  char			error[1024];	/* Error message string */
+#endif /* DEBUG */
 
 
   if (!cert)
@@ -2312,11 +2314,7 @@ http_sspi_verify(
   {
     status = GetLastError();
 
-#ifdef DEBUG
-    char error[1024];			/* Error message string */
-
     DEBUG_printf(("CertGetCertificateChain returned: %s", http_sspi_strerror(error, sizeof(error), status)));
-#endif /* DEBUG */
 
     LocalFree(commonNameUnicode);
     return (status);
@@ -2343,11 +2341,7 @@ http_sspi_verify(
   {
     status = GetLastError();
 
-#ifdef DEBUG
-    char error[1024];			/* Error message string */
-
     DEBUG_printf(("CertVerifyCertificateChainPolicy returned %s", http_sspi_strerror(error, sizeof(error), status)));
-#endif /* DEBUG */
   }
   else if (policyStatus.dwError)
     status = policyStatus.dwError;
