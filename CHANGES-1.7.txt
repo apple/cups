@@ -4,6 +4,7 @@ CHANGES-1.7.txt
 CHANGES IN CUPS V1.7.5
 
 	- The LPD backend did not work with some versions of glibc (STR #4452)
+	- CGI scripts did not work (STR #4454)
 
 
 CHANGES IN CUPS V1.7.4
