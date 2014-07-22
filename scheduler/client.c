@@ -3109,6 +3109,17 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       cupsdLogClient(con, CUPSD_LOG_INFO, "Symlinks such as \"%s\" are not allowed.", filename);
       return (NULL);
     }
+
+   /*
+    * Similarly, if the file/directory does not have world read permissions, do
+    * not allow access...
+    */
+
+    if (!status && !(filestats->st_mode & S_IROTH))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "Files/directories such as \"%s\" must be world-readable.", filename);
+      return (NULL);
+    }
   }
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "get_file filestats=%p, filename=%p, len=" CUPS_LLFMT ", returning \"%s\".", filestats, filename, CUPS_LLCAST len, status ? "(null)" : filename);
