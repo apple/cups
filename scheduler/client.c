@@ -2959,7 +2959,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   * then fallback to the default one...
   */
 
-  if ((status = stat(filename, filestats)) != 0 && language[0] &&
+  if ((status = lstat(filename, filestats)) != 0 && language[0] &&
       strncmp(con->uri, "/icons/", 7) &&
       strncmp(con->uri, "/ppd/", 5) &&
       strncmp(con->uri, "/rss/", 5) &&
@@ -3057,13 +3057,13 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       plen = len - (size_t)(ptr - filename);
 
       strlcpy(ptr, "index.html", plen);
-      status = stat(filename, filestats);
+      status = lstat(filename, filestats);
 
 #ifdef HAVE_JAVA
       if (status)
       {
 	strlcpy(ptr, "index.class", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_JAVA */
 
@@ -3071,7 +3071,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.pl", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PERL */
 
@@ -3079,7 +3079,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.php", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PHP */
 
@@ -3087,18 +3087,28 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
       if (status)
       {
 	strlcpy(ptr, "index.pyc", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 
       if (status)
       {
 	strlcpy(ptr, "index.py", plen);
-	status = stat(filename, filestats);
+	status = lstat(filename, filestats);
       }
 #endif /* HAVE_PYTHON */
 
     }
     while (status && language[0]);
+
+   /*
+    * If we've found a symlink, 404 the sucker to avoid disclosing information.
+    */
+
+    if (!status && S_ISLNK(filestats->st_mode))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "Symlinks such as \"%s\" are not allowed.", filename);
+      return (NULL);
+    }
   }
 
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "get_file filestats=%p, filename=%p, len=" CUPS_LLFMT ", returning \"%s\".", filestats, filename, CUPS_LLCAST len, status ? "(null)" : filename);

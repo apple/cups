@@ -3,6 +3,8 @@ CHANGES-1.7.txt
 
 CHANGES IN CUPS V1.7.5
 
+	- Security: Addressed some more situations where symlinked files would
+	  be served by the web interface (STR #4455)
 	- The LPD backend did not work with some versions of glibc (STR #4452)
 	- CGI scripts did not work (STR #4454)
 
