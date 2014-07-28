@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "11 June 2014" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "28 July 2014" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -130,6 +130,18 @@ The default is "Yes".
 Specifies the delay for updating of configuration and state files.
 A value of 0 causes the update to happen as soon as possible, typically within a few milliseconds.
 The default value is "30".
+.TP 5
+\fBErrorPolicy abort-job\fR
+Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
+.TP 5
+\fBErrorPolicy retry-job\fR
+Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
+.TP 5
+\fBErrorPolicy retry-this-job\fR
+Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+.TP 5
+\fBErrorPolicy stop-printer\fR
+Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
 .TP 5
 \fBFilterLimit \fIlimit\fR
 Specifies the maximum cost of filters that are run concurrently, which can be used to minimize disk, memory, and CPU resource problems.
@@ -386,7 +398,7 @@ Specifies what information is included in the Server header of HTTP responses.
 "Major" reports "CUPS 2".
 "Minor" reports "CUPS 2.0".
 "Minimal" reports "CUPS 2.0.0".
-"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the 
+"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the
 .BR uname (1)
 command.
 "Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".
