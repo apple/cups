@@ -199,6 +199,7 @@ if test -d /private/tmp; then
 else
 	BASE=/tmp/cups-$user
 fi
+export BASE
 
 #
 # Make sure that the LPDEST and PRINTER environment variables are
