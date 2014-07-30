@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.7.5
 	- CGI scripts did not work (STR #4454)
 	- The cupsd.conf man page did not list the ErrorPolicy directive
 	  (STR #4457)
+	- Updated the Brazilian Portuguese translation (STR #4456)
 
 
 CHANGES IN CUPS V1.7.4
