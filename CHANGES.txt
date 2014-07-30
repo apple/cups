@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0b1 - 2014-06-12
+CHANGES.txt - 2.0b1 - 2014-07-30
 --------------------------------
 
 CHANGES IN CUPS V2.0b1
@@ -13,6 +13,8 @@ CHANGES IN CUPS V2.0b1
 	  scheduler (STR #4321)
 	- CUPS TLS support now supports certificate validation and policy
 	  enforcement (STR #1616)
+	- The scheduler now returns completed jobs in the correct newest-to-
+	  oldest order (STR #4396)
 	- The configure script now supports target-specific tools for pkg-config
 	  and others (STR #4423)
 	- The ipptool program now supports EXPECT statements for collection

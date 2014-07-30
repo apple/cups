@@ -1271,7 +1271,8 @@ show_jobs(const char *dests,		/* I - Destinations */
   const char	*dest,			/* Pointer into job-printer-uri */
 		*username,		/* Pointer to job-originating-user-name */
 		*title,			/* Pointer to job-name */
-		*message;		/* Pointer to job-printer-state-message */
+		*message,		/* Pointer to job-printer-state-message */
+		*time_at;		/* time-at-xxx attribute name to use */
   int		rank,			/* Rank in queue */
 		jobid,			/* job-id */
 		size;			/* job-k-octets */
@@ -1287,7 +1288,8 @@ show_jobs(const char *dests,		/* I - Destinations */
 		  "job-printer-state-message",
 		  "job-printer-uri",
 		  "job-state-reasons",
-		  "time-at-creation"
+		  "time-at-creation",
+		  "time-at-completed"
 		};
 
 
@@ -1353,6 +1355,13 @@ show_jobs(const char *dests,		/* I - Destinations */
     * Loop through the job list and display them...
     */
 
+    if (!strcmp(which, "aborted") ||
+        !strcmp(which, "canceled") ||
+        !strcmp(which, "completed"))
+      time_at = "time-at-completed";
+    else
+      time_at = "time-at-creation";
+
     rank = -1;
 
     for (attr = response->attrs; attr != NULL; attr = attr->next)
@@ -1388,8 +1397,7 @@ show_jobs(const char *dests,		/* I - Destinations */
         else if (!strcmp(attr->name, "job-k-octets") &&
 		 attr->value_tag == IPP_TAG_INTEGER)
 	  size = attr->values[0].integer;
-        else if (!strcmp(attr->name, "time-at-creation") &&
-		 attr->value_tag == IPP_TAG_INTEGER)
+        else if (!strcmp(attr->name, time_at) && attr->value_tag == IPP_TAG_INTEGER)
 	  jobtime = attr->values[0].integer;
         else if (!strcmp(attr->name, "job-printer-state-message") &&
 	         attr->value_tag == IPP_TAG_TEXT)

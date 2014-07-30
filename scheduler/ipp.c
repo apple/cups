@@ -6108,6 +6108,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_job_t	*job;			/* Current job pointer */
   cupsd_printer_t *printer;		/* Printer */
   cups_array_t	*list;			/* Which job list... */
+  int		delete_list = 0;	/* Delete the list afterwards? */
   cups_array_t	*ra,			/* Requested attributes array */
 		*exclude;		/* Private attributes array */
   cupsd_policy_t *policy;		/* Current policy */
@@ -6207,13 +6208,15 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   {
     job_comparison = 1;
     job_state      = IPP_JOB_CANCELED;
-    list           = Jobs;
+    list           = cupsdGetCompletedJobs(printer);
+    delete_list    = 1;
   }
   else if (!strcmp(attr->values[0].string.text, "aborted"))
   {
     job_comparison = 0;
     job_state      = IPP_JOB_ABORTED;
-    list           = Jobs;
+    list           = cupsdGetCompletedJobs(printer);
+    delete_list    = 1;
   }
   else if (!strcmp(attr->values[0].string.text, "all"))
   {
@@ -6225,7 +6228,8 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   {
     job_comparison = 0;
     job_state      = IPP_JOB_CANCELED;
-    list           = Jobs;
+    list           = cupsdGetCompletedJobs(printer);
+    delete_list    = 1;
   }
   else if (!strcmp(attr->values[0].string.text, "pending"))
   {
@@ -6426,6 +6430,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   }
 
   cupsArrayDelete(ra);
+
+  if (delete_list)
+    cupsArrayDelete(list);
 
   con->response->request.status.status_code = IPP_OK;
 }

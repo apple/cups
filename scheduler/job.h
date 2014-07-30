@@ -47,6 +47,7 @@ struct cupsd_job_s			/**** Job request ****/
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
 			cancel_time,	/* When to cancel/send SIGTERM */
+			completed_time,	/* When job was completed (0 if not) */
 			file_time,	/* Job file retain time */
 			history_time,	/* Job history retain time */
 			hold_until,	/* Hold expiration date/time */
@@ -148,6 +149,7 @@ extern void		cupsdDeleteJob(cupsd_job_t *job,
 			               cupsd_jobaction_t action);
 extern cupsd_job_t	*cupsdFindJob(int id);
 extern void		cupsdFreeAllJobs(void);
+extern cups_array_t	*cupsdGetCompletedJobs(cupsd_printer_t *p);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
 extern void		cupsdLoadAllJobs(void);

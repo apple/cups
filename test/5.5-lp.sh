@@ -81,6 +81,19 @@ echo ""
 
 ./waitjobs.sh
 
+echo "LPSTAT Completed Jobs Order Test"
+echo ""
+echo "    lpstat -W completed -o"
+$VALGRIND ../systemv/lpstat -W completed -o | tee $BASE/lpstat-completed.txt
+if test "`uniq -d $BASE/lpstat-completed.txt`" != ""; then
+	echo "    FAILED"
+	exit 1
+else
+	echo "    PASSED"
+fi
+echo ""
+
+
 #
 # End of "$Id$".
 #
