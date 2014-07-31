@@ -39,6 +39,18 @@ P.example {
   margin-left: 36pt;
 }
 
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
 PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
@@ -436,6 +448,7 @@ specific size.">cupsGetDestMediaByIndex</a></li>
 	<li><a href="#cupsGetDestMediaCount" title="Get the number of sizes supported by a
 destination.">cupsGetDestMediaCount</a></li>
 	<li><a href="#cupsGetDestMediaDefault" title="Get the default size for a destination.">cupsGetDestMediaDefault</a></li>
+	<li><a href="#cupsGetDestWithURI" title="Get a destination associated with a URI.">cupsGetDestWithURI</a></li>
 	<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
 	<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
 	<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
@@ -457,6 +470,8 @@ for the given language.">cupsLangEncoding</a></li>
 	<li><a href="#cupsLangFlush" title="Flush all language data out of the cache.">cupsLangFlush</a></li>
 	<li><a href="#cupsLangFree" title="Free language data.">cupsLangFree</a></li>
 	<li><a href="#cupsLangGet" title="Get a language.">cupsLangGet</a></li>
+	<li><a href="#cupsLocalizeDestMedia" title="Get the localized string for a destination media
+size.">cupsLocalizeDestMedia</a></li>
 	<li><a href="#cupsLocalizeDestOption" title="Get the localized string for a destination
 option.">cupsLocalizeDestOption</a></li>
 	<li><a href="#cupsLocalizeDestValue" title="Get the localized string for a destination
@@ -1830,7 +1845,8 @@ int cupsGetClasses (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of classes</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is deprecated - use <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
+<p class="discussion">This function is deprecated and no longer returns a list of printer
+classes - use <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
 
 </p>
 <h3 class="function"><a name="cupsGetDefault">cupsGetDefault</a></h3>
@@ -2079,6 +2095,29 @@ int cupsGetDestMediaDefault (<br>
 <p class="discussion">The <code>flags</code> parameter determines which default size is returned.  For
 example, passing <code>CUPS_MEDIA_FLAGS_BORDERLESS</code> will return the default
 borderless size, typically US Letter or A4, but sometimes 4x6 photo media.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="cupsGetDestWithURI">cupsGetDestWithURI</a></h3>
+<p class="description">Get a destination associated with a URI.</p>
+<p class="code">
+<a href="#cups_dest_t">cups_dest_t</a> *cupsGetDestWithURI (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *uri<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Desired printer name or <code>NULL</code></dd>
+<dt>uri</dt>
+<dd class="description">URI for the printer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Destination or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">&quot;name&quot; is the desired name for the printer. If <code>NULL</code>, a name will be
+created using the URI.<br>
+<br>
+&quot;uri&quot; is the &quot;ipp&quot; or &quot;ipps&quot; URI for the printer.
 
 </p>
 <h3 class="function"><a name="cupsGetDests">cupsGetDests</a></h3>
@@ -2405,7 +2444,8 @@ int cupsGetPrinters (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of printers</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is deprecated - use <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
+<p class="discussion">This function is deprecated and no longer returns a list of printers - use
+<a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsGetServerPPD">cupsGetServerPPD</a></h3>
@@ -2485,6 +2525,37 @@ cups_lang_t *cupsLangGet (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Language data</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="cupsLocalizeDestMedia">cupsLocalizeDestMedia</a></h3>
+<p class="description">Get the localized string for a destination media
+size.</p>
+<p class="code">
+const char *cupsLocalizeDestMedia (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dest_t">cups_dest_t</a> *dest,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dinfo_t">cups_dinfo_t</a> *dinfo,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned flags,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_size_t">cups_size_t</a> *size<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to destination</dd>
+<dt>dest</dt>
+<dd class="description">Destination</dd>
+<dt>dinfo</dt>
+<dd class="description">Destination information</dd>
+<dt>flags</dt>
+<dd class="description">Media flags</dd>
+<dt>size</dt>
+<dd class="description">Media size</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized string</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned string is stored in the destination information and will become
+invalid if the destination information is deleted.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="cupsLocalizeDestOption">cupsLocalizeDestOption</a></h3>
 <p class="description">Get the localized string for a destination
 option.</p>
@@ -3156,8 +3227,8 @@ char *cupsTempFile (<br>
 <p class="description">Filename or <code>NULL</code> on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The temporary filename is returned in the filename buffer.
-This function is deprecated - use <a href="#cupsTempFd"><code>cupsTempFd</code></a> or
-<a href="#cupsTempFile2"><code>cupsTempFile2</code></a> instead.
+This function is deprecated and will no longer generate a temporary
+filename - use <a href="#cupsTempFd"><code>cupsTempFd</code></a> or <a href="#cupsTempFile2"><code>cupsTempFile2</code></a> instead.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsTempFile2">cupsTempFile2</a></h3>

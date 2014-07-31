@@ -96,6 +96,14 @@ The default is "Yes".
 <dd style="margin-left: 5.0em">Specifies the delay for updating of configuration and state files.
 A value of 0 causes the update to happen as soon as possible, typically within a few milliseconds.
 The default value is "30".
+<dt><b>ErrorPolicy abort-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be aborted (discarded) unless otherwise specified for the printer.
+<dt><b>ErrorPolicy retry-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried at a later time unless otherwise specified for the printer.
+<dt><b>ErrorPolicy retry-this-job</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should be retried immediately unless otherwise specified for the printer.
+<dt><b>ErrorPolicy stop-printer</b>
+<dd style="margin-left: 5.0em">Specifies that a failed print job should stop the printer unless otherwise specified for the printer. The 'stop-printer' error policy is the default.
 <dt><b>FilterLimit </b><i>limit</i>
 <dd style="margin-left: 5.0em">Specifies the maximum cost of filters that are run concurrently, which can be used to minimize disk, memory, and CPU resource problems.
 A limit of 0 disables filter limiting.
@@ -284,7 +292,7 @@ command.
 "Major" reports "CUPS 2".
 "Minor" reports "CUPS 2.0".
 "Minimal" reports "CUPS 2.0.0".
-"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the 
+"OS" reports "CUPS 2.0.0 (UNAME)" where UNAME is the output of the
 <b>uname</b>(1)
 command.
 "Full" reports "CUPS 2.0.0 (UNAME) IPP/2.0".

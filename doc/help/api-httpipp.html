@@ -39,6 +39,18 @@ P.example {
   margin-left: 36pt;
 }
 
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
 PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
@@ -642,6 +654,7 @@ with a hostname. ">http_addrlist_t</a></li>
 are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_t" title="HTTP connection type">http_t</a></li>
 	<li><a href="#http_timeout_cb_t" title="HTTP timeout callback ">http_timeout_cb_t</a></li>
+	<li><a href="#http_trust_t" title="Level of trust for credentials ">http_trust_t</a></li>
 	<li><a href="#http_uri_coding_t" title="URI en/decode flags">http_uri_coding_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
@@ -679,6 +692,7 @@ with a hostname. ">http_addrlist_s</a></li>
 	<li><a href="#http_state_e" title="HTTP state values; states
 are server-oriented...">http_state_e</a></li>
 	<li><a href="#http_status_e" title="HTTP status codes">http_status_e</a></li>
+	<li><a href="#http_trust_e" title="Level of trust for credentials ">http_trust_e</a></li>
 	<li><a href="#http_uri_coding_e" title="URI en/decode flags">http_uri_coding_e</a></li>
 	<li><a href="#http_uri_status_e" title="URI separation status ">http_uri_status_e</a></li>
 	<li><a href="#http_version_e" title="HTTP version numbers">http_version_e</a></li>
@@ -4313,6 +4327,10 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+of attribute and member names separated by slashes, for example
+&quot;media-col/media-size&quot;.</p>
 <h3 class="function"><a name="ippFindNextAttribute">ippFindNextAttribute</a></h3>
 <p class="description">Find the next named attribute in a request.</p>
 <p class="code">
@@ -4332,6 +4350,10 @@ ipp_status_t ippErrorValue (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Matching attribute</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Starting with CUPS 2.0, the attribute name can contain a hierarchical list
+of attribute and member names separated by slashes, for example
+&quot;media-col/media-size&quot;.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippFirstAttribute">ippFirstAttribute</a></h3>
 <p class="description">Return the first attribute in the message.</p>
 <p class="code">
@@ -4360,7 +4382,7 @@ int ippGetBoolean (<br>
 <dd class="description">Value number (0-based)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Boolean value or -1 on error</p>
+<p class="description">Boolean value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4399,7 +4421,7 @@ int ippGetCount (<br>
 <dd class="description">IPP attribute</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Number of values or -1 on error</p>
+<p class="description">Number of values or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetDate">ippGetDate</a></h3>
 <p class="description">Get a date value for an attribute.</p>
 <p class="code">
@@ -4449,7 +4471,7 @@ int ippGetInteger (<br>
 <dd class="description">Value number (0-based)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Value or -1 on error</p>
+<p class="description">Value or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4504,7 +4526,7 @@ ipp_op_t ippGetOperation (<br>
 <dd class="description">IPP request message</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Operation ID or -1 on error</p>
+<p class="description">Operation ID or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetRange">ippGetRange</a></h3>
 <p class="description">Get a rangeOfInteger value from an attribute.</p>
 <p class="code">
@@ -4523,7 +4545,7 @@ int ippGetRange (<br>
 <dd class="description">Upper value of range</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Lower value of range or -1</p>
+<p class="description">Lower value of range or 0</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4541,7 +4563,7 @@ int ippGetRequestId (<br>
 <dd class="description">IPP message</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Request ID or -1 on error</p>
+<p class="description">Request ID or 0 on error</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.6/OS X 10.8&nbsp;</span><a name="ippGetResolution">ippGetResolution</a></h3>
 <p class="description">Get a resolution value for an attribute.</p>
 <p class="code">
@@ -4563,7 +4585,7 @@ int ippGetResolution (<br>
 <dd class="description">Units for resolution</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Horizontal/cross feed resolution or -1</p>
+<p class="description">Horizontal/cross feed resolution or 0</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The <code>element</code> parameter specifies which value to get from 0 to
 <a href="#ippGetCount(attr)"><code>ippGetCount(attr)</code></a> - 1.
@@ -4646,7 +4668,7 @@ int ippGetVersion (<br>
 <dd class="description">Minor version number or <code>NULL</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Major version number or -1 on error</p>
+<p class="description">Major version number or 0 on error</p>
 <h3 class="function"><a name="ippLength">ippLength</a></h3>
 <p class="description">Compute the length of an IPP message.</p>
 <p class="code">
@@ -5594,6 +5616,11 @@ typedef struct _http_s http_t;
 <p class="code">
 typedef int (*http_timeout_cb_t)(<a href="#http_t">http_t</a> *http, void *user_data);
 </p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_t">http_trust_t</a></h3>
+<p class="description">Level of trust for credentials </p>
+<p class="code">
+typedef enum <a href="#http_trust_e">http_trust_e</a> http_trust_t;
+</p>
 <h3 class="typedef"><a name="http_uri_coding_t">http_uri_coding_t</a></h3>
 <p class="description">URI en/decode flags</p>
 <p class="code">
@@ -5990,6 +6017,23 @@ are server-oriented...</p>
 <dd class="description">URI too long</dd>
 <dt>HTTP_STATUS_USE_PROXY </dt>
 <dd class="description">Must use a proxy to access this URI</dd>
+</dl>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_e">http_trust_e</a></h3>
+<p class="description">Level of trust for credentials </p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>HTTP_TRUST_CHANGED </dt>
+<dd class="description">Credentials have changed</dd>
+<dt>HTTP_TRUST_EXPIRED </dt>
+<dd class="description">Credentials are expired</dd>
+<dt>HTTP_TRUST_INVALID </dt>
+<dd class="description">Credentials are invalid</dd>
+<dt>HTTP_TRUST_OK </dt>
+<dd class="description">Credentials are OK/trusted</dd>
+<dt>HTTP_TRUST_RENEWED </dt>
+<dd class="description">Credentials have been renewed</dd>
+<dt>HTTP_TRUST_UNKNOWN </dt>
+<dd class="description">Credentials are unknown/new</dd>
 </dl>
 <h3 class="enumeration"><a name="http_uri_coding_e">http_uri_coding_e</a></h3>
 <p class="description">URI en/decode flags</p>
@@ -6449,6 +6493,14 @@ are server-oriented...</p>
 <dd class="description">Invalid status name for <a href="#ippErrorValue"><code>ippErrorValue</code></a></dd>
 <dt>IPP_STATUS_CUPS_SEE_OTHER </dt>
 <dd class="description">cups-see-other</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED </dt>
+<dd class="description">client-error-account-authorization-failed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_CLOSED </dt>
+<dd class="description">client-error-account-closed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_INFO_NEEDED </dt>
+<dd class="description">client-error-account-info-needed</dd>
+<dt>IPP_STATUS_ERROR_ACCOUNT_LIMIT_REACHED </dt>
+<dd class="description">client-error-account-limit-reached</dd>
 <dt>IPP_STATUS_ERROR_ATTRIBUTES_NOT_SETTABLE </dt>
 <dd class="description">client-error-attributes-not-settable</dd>
 <dt>IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES </dt>
@@ -6465,13 +6517,13 @@ are server-oriented...</p>
 <dd class="description">client-error-compression-not-supported</dd>
 <dt>IPP_STATUS_ERROR_CONFLICTING </dt>
 <dd class="description">client-error-conflicting-attributes</dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-authorization-failed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
-<dd class="description">cups-error-account-closed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_CLOSED </dt>
+<dd class="description">cups-error-account-closed @deprecate@</dd>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-info-needed </dd>
-<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED <span class="info">&nbsp;CUPS 1.7/OS X 10.9&nbsp;</span></dt>
+<dt>IPP_STATUS_ERROR_CUPS_ACCOUNT_LIMIT_REACHED <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">cups-error-account-limit-reached </dd>
 <dt>IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
 <dd class="description">cups-authentication-canceled - Authentication canceled by user </dd>

@@ -294,6 +294,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
+/usr/share/man/man1/cups.1.gz
 /usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
 /usr/share/man/man1/ippfind.1.gz
@@ -315,11 +316,12 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsctl.8.gz
 /usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
+/usr/share/man/man8/cupsd-helper.8.gz
+/usr/share/man/man8/cupsd-logs.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
 /usr/share/man/man8/cupsreject.8.gz
-/usr/share/man/man8/cups-deviced.8.gz
-/usr/share/man/man8/cups-driverd.8.gz
+/usr/share/man/man8/cups-exec.8.gz
 /usr/share/man/man8/cups-snmp.8.gz
 /usr/share/man/man8/lpadmin.8.gz
 /usr/share/man/man8/lpc.8.gz

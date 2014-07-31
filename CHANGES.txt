@@ -44,6 +44,8 @@ CHANGES IN CUPS V2.0b1
 	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
 	- Dropped lppasswd and support for Digest authentication in in the
 	  scheduler (STR #4321)
+	- The cupsGetClasses, cupsGetPrinters, and cupsTempFile functions are no
+	  longer supported.
 	- The scheduler now caches more job history data and limits the number
 	  of completed jobs returned by Get-Jobs as needed in order to prevent a
 	  denial-of-service on busy servers (STR #2913)

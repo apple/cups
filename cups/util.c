@@ -288,7 +288,8 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 /*
  * 'cupsGetClasses()' - Get a list of printer classes from the default server.
  *
- * This function is deprecated - use @link cupsGetDests@ instead.
+ * This function is deprecated and no longer returns a list of printer
+ * classes - use @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -296,84 +297,10 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 int					/* O - Number of classes */
 cupsGetClasses(char ***classes)		/* O - Classes */
 {
-  int		n;			/* Number of classes */
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  char		**temp;			/* Temporary pointer */
-  http_t	*http;			/* Connection to server */
+  if (classes)
+    *classes = NULL;
 
-
-  if (!classes)
-  {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
-
-    return (0);
-  }
-
-  *classes = NULL;
-
-  if ((http = _cupsConnect()) == NULL)
-    return (0);
-
- /*
-  * Build a CUPS_GET_CLASSES request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    requested-attributes
-  */
-
-  request = ippNewRequest(IPP_OP_CUPS_GET_CLASSES);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-name");
-
- /*
-  * Do the request and get back a response...
-  */
-
-  n = 0;
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (attr->name != NULL &&
-          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
-          attr->value_tag == IPP_TAG_NAME)
-      {
-        if (n == 0)
-	  temp = malloc(sizeof(char *));
-	else
-	  temp = realloc(*classes, sizeof(char *) * (size_t)(n + 1));
-
-	if (temp == NULL)
-	{
-	 /*
-	  * Ran out of memory!
-	  */
-
-          while (n > 0)
-	  {
-	    n --;
-	    free((*classes)[n]);
-	  }
-
-	  free(*classes);
-	  ippDelete(response);
-	  return (0);
-	}
-
-        *classes = temp;
-        temp[n]  = strdup(attr->values[0].string.text);
-	n ++;
-      }
-
-    ippDelete(response);
-  }
-
-  return (n);
+  return (0);
 }
 
 
@@ -1146,7 +1073,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 /*
  * 'cupsGetPrinters()' - Get a list of printers from the default server.
  *
- * This function is deprecated - use @link cupsGetDests@ instead.
+ * This function is deprecated and no longer returns a list of printers - use
+ * @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -1154,98 +1082,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 int					/* O - Number of printers */
 cupsGetPrinters(char ***printers)	/* O - Printers */
 {
-  int		n;			/* Number of printers */
-  ipp_t		*request,		/* IPP Request */
-		*response;		/* IPP Response */
-  ipp_attribute_t *attr;		/* Current attribute */
-  char		**temp;			/* Temporary pointer */
-  http_t	*http;			/* Connection to server */
+  if (printers)
+    *printers = NULL;
 
-
- /*
-  * Range check input...
-  */
-
-  if (!printers)
-  {
-    _cupsSetError(IPP_STATUS_ERROR_INTERNAL, strerror(EINVAL), 0);
-
-    return (0);
-  }
-
-  *printers = NULL;
-
- /*
-  * Try to connect to the server...
-  */
-
-  if ((http = _cupsConnect()) == NULL)
-    return (0);
-
- /*
-  * Build a CUPS_GET_PRINTERS request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    requested-attributes
-  */
-
-  request = ippNewRequest(IPP_OP_CUPS_GET_PRINTERS);
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-               "requested-attributes", NULL, "printer-name");
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type", 0);
-
-  ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM,
-                "printer-type-mask", CUPS_PRINTER_CLASS);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  n = 0;
-
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
-  {
-    for (attr = response->attrs; attr != NULL; attr = attr->next)
-      if (attr->name != NULL &&
-          _cups_strcasecmp(attr->name, "printer-name") == 0 &&
-          attr->value_tag == IPP_TAG_NAME)
-      {
-        if (n == 0)
-	  temp = malloc(sizeof(char *));
-	else
-	  temp = realloc(*printers, sizeof(char *) * (size_t)(n + 1));
-
-	if (temp == NULL)
-	{
-	 /*
-	  * Ran out of memory!
-	  */
-
-	  while (n > 0)
-	  {
-	    n --;
-	    free((*printers)[n]);
-	  }
-
-	  free(*printers);
-	  ippDelete(response);
-	  return (0);
-	}
-
-        *printers = temp;
-        temp[n]   = strdup(attr->values[0].string.text);
-	n ++;
-      }
-
-    ippDelete(response);
-  }
-
-  return (n);
+  return (0);
 }
 
 
