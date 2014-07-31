@@ -1,11 +1,11 @@
-README - CUPS v2.0.0 - 2013-08-06
+README - CUPS v2.0b1 - 2014-07-30
 ---------------------------------
 
 ********************************************************************************
 ********************************************************************************
 ********                                                                ********
 ********                                                                ********
-********    THIS IS ALPHA-RELEASE SOFTWARE AND SHOULD NOT BE USED ON    ********
+********    THIS IS BETA-RELEASE SOFTWARE AND SHOULD NOT BE USED ON    ********
 ********    PRODUCTION SYSTEMS.                                         ********
 ********                                                                ********
 ********                                                                ********
@@ -162,7 +162,7 @@ PRINTING FILES
 
 LEGAL STUFF
 
-    CUPS is Copyright 2007-2013 by Apple Inc.  CUPS and the CUPS logo are
+    CUPS is Copyright 2007-2014 by Apple Inc.  CUPS and the CUPS logo are
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
