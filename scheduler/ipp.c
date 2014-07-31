@@ -1511,8 +1511,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
   if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_ZERO)) == NULL)
-    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-                 "Untitled");
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, "Untitled");
   else if ((attr->value_tag != IPP_TAG_NAME &&
             attr->value_tag != IPP_TAG_NAMELANG) ||
            attr->num_values != 1)
@@ -1591,6 +1590,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     if (auth_info)
       ippDeleteAttribute(job->attrs, auth_info);
   }
+
+  if ((attr = ippFindAttribute(con->request, "job-name", IPP_TAG_NAME)) != NULL)
+    cupsdSetString(&(job->name), attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
                                IPP_TAG_ZERO)) != NULL)
@@ -1686,8 +1688,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer->uri);
 
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets",
-                               IPP_TAG_INTEGER)) != NULL)
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer = 0;
   else
     ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-k-octets", 0);
@@ -4328,8 +4329,9 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 
   kbytes = (cupsFileTell(out) + 1023) / 1024;
 
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets",
-                               IPP_TAG_INTEGER)) != NULL)
+  job->koctets += kbytes;
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
 
   cupsFileClose(out);
@@ -4751,7 +4753,55 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
         	 "job-uri", NULL, job_uri);
   }
 
-  copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0, exclude);
+  if (job->attrs)
+  {
+    copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0, exclude);
+  }
+  else
+  {
+   /*
+    * Generate attributes from the job structure...
+    */
+
+    if (!ra || cupsArrayFind(ra, "job-id"))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+    if (!ra || cupsArrayFind(ra, "job-k-octets"))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-k-octets", job->koctets);
+
+    if (job->name && (!ra || cupsArrayFind(ra, "job-name")))
+      ippAddString(con->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_NAME), "job-name", NULL, job->name);
+
+    if (job->username && (!ra || cupsArrayFind(ra, "job-originating-user-name")))
+      ippAddString(con->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_NAME), "job-originating-user-name", NULL, job->username);
+
+    if (!ra || cupsArrayFind(ra, "job-state"))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state", (int)job->state_value);
+
+    if (!ra || cupsArrayFind(ra, "job-state-reasons"))
+    {
+      switch (job->state_value)
+      {
+        default : /* Should never get here for processing, pending, held, or stopped jobs since they don't get unloaded... */
+	    break;
+        case IPP_JSTATE_ABORTED :
+	    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-aborted-by-system");
+	    break;
+        case IPP_JSTATE_CANCELED :
+	    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-canceled-by-user");
+	    break;
+        case IPP_JSTATE_COMPLETED :
+	    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons", NULL, "job-completed-successfully");
+	    break;
+      }
+    }
+
+    if (job->completed_time && (!ra || cupsArrayFind(ra, "time-at-completed")))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-completed", (int)job->completed_time);
+
+    if (job->completed_time && (!ra || cupsArrayFind(ra, "time-at-creation")))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation", (int)job->creation_time);
+  }
 }
 
 
@@ -6101,9 +6151,13 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   int		port;			/* Port portion of URI */
   int		job_comparison;		/* Job comparison */
   ipp_jstate_t	job_state;		/* job-state value */
-  int		first_job_id;		/* First job ID */
-  int		limit;			/* Maximum number of jobs to return */
+  int		first_job_id = 1,	/* First job ID */
+		first_index = 1,	/* First index */
+		current_index = 0;	/* Current index */
+  int		limit = 0;		/* Maximum number of jobs to return */
   int		count;			/* Number of jobs that match */
+  int		need_load_job = 0;	/* Do we need to load the job? */
+  const char	*job_attr;		/* Job attribute requested */
   ipp_attribute_t *job_ids;		/* job-ids attribute */
   cupsd_job_t	*job;			/* Current job pointer */
   cupsd_printer_t *printer;		/* Printer */
@@ -6269,8 +6323,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   * See if they want to limit the number of jobs reported...
   */
 
-  if ((attr = ippFindAttribute(con->request, "limit",
-                               IPP_TAG_INTEGER)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER)) != NULL)
   {
     if (job_ids)
     {
@@ -6282,11 +6335,20 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     limit = attr->values[0].integer;
   }
-  else
-    limit = 0;
 
-  if ((attr = ippFindAttribute(con->request, "first-job-id",
-                               IPP_TAG_INTEGER)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "first-index", IPP_TAG_INTEGER)) != NULL)
+  {
+    if (job_ids)
+    {
+      send_ipp_status(con, IPP_CONFLICT,
+		      _("The %s attribute cannot be provided with job-ids."),
+		      "first-index");
+      return;
+    }
+
+    first_index = attr->values[0].integer;
+  }
+  else if ((attr = ippFindAttribute(con->request, "first-job-id", IPP_TAG_INTEGER)) != NULL)
   {
     if (job_ids)
     {
@@ -6298,15 +6360,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     first_job_id = attr->values[0].integer;
   }
-  else
-    first_job_id = 1;
 
  /*
   * See if we only want to see jobs for a specific user...
   */
 
-  if ((attr = ippFindAttribute(con->request, "my-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL && job_ids)
+  if ((attr = ippFindAttribute(con->request, "my-jobs", IPP_TAG_BOOLEAN)) != NULL && job_ids)
   {
     send_ipp_status(con, IPP_CONFLICT,
                     _("The %s attribute cannot be provided with job-ids."),
@@ -6319,6 +6378,42 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     username[0] = '\0';
 
   ra = create_requested_array(con->request);
+  for (job_attr = (char *)cupsArrayFirst(ra); job_attr; job_attr = (char *)cupsArrayNext(ra))
+    if (strcmp(job_attr, "job-id") &&
+	strcmp(job_attr, "job-k-octets") &&
+	strcmp(job_attr, "job-media-progress") &&
+	strcmp(job_attr, "job-more-info") &&
+	strcmp(job_attr, "job-name") &&
+	strcmp(job_attr, "job-originating-user-name") &&
+	strcmp(job_attr, "job-preserved") &&
+	strcmp(job_attr, "job-printer-up-time") &&
+        strcmp(job_attr, "job-printer-uri") &&
+	strcmp(job_attr, "job-state") &&
+	strcmp(job_attr, "job-state-reasons") &&
+	strcmp(job_attr, "job-uri") &&
+	strcmp(job_attr, "time-at-completed") &&
+	strcmp(job_attr, "time-at-creation") &&
+	strcmp(job_attr, "number-of-documents"))
+    {
+      need_load_job = 1;
+      break;
+    }
+
+  if (need_load_job && (limit == 0 || limit > 500) && (list == Jobs || delete_list))
+  {
+   /*
+    * Limit expensive Get-Jobs for job history to 500 jobs...
+    */
+
+    ippAddInteger(con->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "limit", 500);
+
+    if (limit)
+      ippAddInteger(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER, "limit", limit);
+
+    limit = 500;
+
+    cupsdLogClient(con, CUPSD_LOG_INFO, "Limiting Get-Jobs response to %d jobs.", limit);
+  }
 
  /*
   * OK, build a list of jobs for this printer...
@@ -6345,13 +6440,15 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     {
       job = cupsdFindJob(job_ids->values[i].integer);
 
-      cupsdLoadJob(job);
-
-      if (!job->attrs)
+      if (need_load_job && !job->attrs)
       {
-	cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d",
-			job->id);
-	continue;
+        cupsdLoadJob(job);
+
+	if (!job->attrs)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d", job->id);
+	  continue;
+	}
       }
 
       if (i > 0)
@@ -6401,13 +6498,19 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
       if (job->id < first_job_id)
 	continue;
 
-      cupsdLoadJob(job);
+      current_index ++;
+      if (current_index < first_index)
+        continue;
 
-      if (!job->attrs)
+      if (need_load_job && !job->attrs)
       {
-	cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d",
-			job->id);
-	continue;
+        cupsdLoadJob(job);
+
+	if (!job->attrs)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d", job->id);
+	  continue;
+	}
       }
 
       if (username[0] && _cups_strcasecmp(username, job->username))
@@ -8141,8 +8244,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdUpdateQuota(printer, job->username, 0, kbytes);
 
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets",
-                               IPP_TAG_INTEGER)) != NULL)
+  job->koctets += kbytes;
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
 
  /*
@@ -9375,8 +9479,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdUpdateQuota(printer, job->username, 0, kbytes);
 
-  if ((attr = ippFindAttribute(job->attrs, "job-k-octets",
-                               IPP_TAG_INTEGER)) != NULL)
+  job->koctets += kbytes;
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,

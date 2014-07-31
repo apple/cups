@@ -1675,9 +1675,10 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   job->file_time    = 0;
   job->history_time = 0;
 
-  if (job->state_value >= IPP_JOB_CANCELED &&
-      (attr = ippFindAttribute(job->attrs, "time-at-completed",
-			       IPP_TAG_INTEGER)) != NULL)
+  if ((attr = ippFindAttribute(job->attrs, "time-at-creation", IPP_TAG_INTEGER)) != NULL)
+    job->creation_time = attr->values[0].integer;
+
+  if (job->state_value >= IPP_JOB_CANCELED && (attr = ippFindAttribute(job->attrs, "time-at-completed", IPP_TAG_INTEGER)) != NULL)
   {
     job->completed_time = attr->values[0].integer;
 
@@ -1826,6 +1827,12 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdSetString(&job->username, attr->values[0].string.text);
   }
 
+  if (!job->name)
+  {
+    if ((attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME)) != NULL)
+      cupsdSetString(&job->name, attr->values[0].string.text);
+  }
+
  /*
   * Set the job hold-until time and state...
   */
@@ -1849,6 +1856,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
   }
+
+  if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
+    job->koctets = attr->values[0].integer;
 
   if (!job->num_files)
   {
@@ -2155,14 +2165,18 @@ cupsdSaveAllJobs(void)
   {
     cupsFilePrintf(fp, "<Job %d>\n", job->id);
     cupsFilePrintf(fp, "State %d\n", job->state_value);
+    cupsFilePrintf(fp, "Created %ld\n", (long)job->creation_time);
     if (job->completed_time)
       cupsFilePrintf(fp, "Completed %ld\n", (long)job->completed_time);
     cupsFilePrintf(fp, "Priority %d\n", job->priority);
     if (job->hold_until)
       cupsFilePrintf(fp, "HoldUntil %ld\n", (long)job->hold_until);
     cupsFilePrintf(fp, "Username %s\n", job->username);
+    if (job->name)
+      cupsFilePutConf(fp, "Name", job->name);
     cupsFilePrintf(fp, "Destination %s\n", job->dest);
     cupsFilePrintf(fp, "DestType %d\n", job->dtype);
+    cupsFilePrintf(fp, "KOctets %d\n", job->koctets);
     cupsFilePrintf(fp, "NumFiles %d\n", job->num_files);
     for (i = 0; i < job->num_files; i ++)
       cupsFilePrintf(fp, "File %d %s/%s %d\n", i + 1, job->filetypes[i]->super,
@@ -4114,7 +4128,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	cupsArrayAdd(ActiveJobs, job);
       else if (job->state_value > IPP_JOB_STOPPED)
       {
-        if (!job->completed_time)
+        if (!job->completed_time || !job->creation_time || !job->name || !job->koctets)
 	{
 	  cupsdLoadJob(job);
 	  unload_job(job);
@@ -4136,6 +4150,14 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
         job->state_value = IPP_JOB_PENDING;
       else if (job->state_value > IPP_JOB_COMPLETED)
         job->state_value = IPP_JOB_COMPLETED;
+    }
+    else if (!_cups_strcasecmp(line, "Name"))
+    {
+      cupsdSetString(&(job->name), value);
+    }
+    else if (!_cups_strcasecmp(line, "Created"))
+    {
+      job->creation_time = strtol(value, NULL, 10);
     }
     else if (!_cups_strcasecmp(line, "Completed"))
     {
@@ -4160,6 +4182,10 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else if (!_cups_strcasecmp(line, "DestType"))
     {
       job->dtype = (cups_ptype_t)atoi(value);
+    }
+    else if (!_cups_strcasecmp(line, "KOctets"))
+    {
+      job->koctets = atoi(value);
     }
     else if (!_cups_strcasecmp(line, "NumFiles"))
     {

@@ -39,6 +39,8 @@ struct cupsd_job_s			/**** Job request ****/
 					 * waiting on files */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
+  char			*name;		/* Job name/title */
+  int			koctets;	/* job-k-octets */
   cups_ptype_t		dtype;		/* Destination type */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			num_files;	/* Number of files in job */
@@ -47,6 +49,7 @@ struct cupsd_job_s			/**** Job request ****/
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
 			cancel_time,	/* When to cancel/send SIGTERM */
+			creation_time,	/* When job was created */
 			completed_time,	/* When job was completed (0 if not) */
 			file_time,	/* Job file retain time */
 			history_time,	/* Job history retain time */
