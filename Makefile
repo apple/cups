@@ -3,7 +3,7 @@
 #
 # Top-level Makefile for CUPS.
 #
-# Copyright 2007-2013 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -98,22 +98,18 @@ clean:
 
 distclean:	clean
 	$(RM) Makedefs config.h config.log config.status
+	$(RM) conf/cups-files.conf conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf
 	$(RM) cups-config
-	$(RM) conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf
-	$(RM) doc/help/ref-cupsd-conf.html doc/help/standard.html doc/index.html
-	$(RM) man/client.conf.man
-	$(RM) man/cups-deviced.man man/cups-driverd.man
-	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
-	$(RM) man/cupsd.conf.man man/drv.man man/lpoptions.man
-	$(RM) packaging/cups.list
-	$(RM) packaging/cups-desc.plist packaging/cups-info.plist
-	$(RM) templates/header.tmpl
+	$(RM) data/testprint
 	$(RM) desktop/cups.desktop
-	$(RM) scheduler/cups.sh scheduler/cups-lpd.xinetd
-	$(RM) scheduler/org.cups.cups-lpd.plist scheduler/cups.xml
+	$(RM) doc/index.html
+	$(RM) man/client.conf.man man/cups-files.conf.man man/cups-lpd.man man/cups-snmp.man man/cupsaddsmb.man man/cupsd.conf.man man/cupsd.man man/lpoptions.man
+	$(RM) packaging/cups.list
+	$(RM) scheduler/cups-lpd.xinetd scheduler/cups.sh scheduler/cups.xml scheduler/org.cups.cups-lpd.plist scheduler/org.cups.cupsd.path scheduler/org.cups.cupsd.service scheduler/org.cups.cupsd.socket
+	$(RM) templates/header.tmpl
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
-	-$(RM) -r autom4te*.cache clang cups/charmaps cups/locale driver/test
+	-$(RM) -r autom4te*.cache clang cups/charmaps cups/locale
 
 
 #
