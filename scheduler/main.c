@@ -1872,6 +1872,8 @@ service_checkin(void)
 #    endif /* HAVE_SSL */
   }
 
+  free(ld_sockets);
+
 #  elif defined(HAVE_LAUNCHD)
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
