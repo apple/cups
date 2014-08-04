@@ -726,19 +726,6 @@ main(int  argc,				/* I - Number of command-line args */
           break;
 	}
 
-#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
-	if (OnDemand)
-	{
-	 /*
-	  * If we were started by launchd or systemd, get the listen socket file
-	  * descriptors...
-	  */
-
-	  service_checkin();
-	  service_checkout();
-	}
-#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
-
        /*
         * Startup the server...
         */

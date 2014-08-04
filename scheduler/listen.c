@@ -274,23 +274,14 @@ cupsdStopListening(void)
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
   {
-#ifdef HAVE_SYSTEMD
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
     if (lis->fd != -1 && !lis->on_demand)
       httpAddrClose(&(lis->address), lis->fd);
-
-#elif defined(HAVE_LAUNCHD)
-    if (lis->fd != -1)
-    {
-      if (lis->on_demand)
-        httpAddrClose(NULL, lis->fd);
-      else
-        httpAddrClose(&(lis->address), lis->fd);
-    }
 
 #else
     if (lis->fd != -1)
       httpAddrClose(&(lis->address), lis->fd);
-#endif /* HAVE_SYSTEMD */
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 
     lis->fd = -1;
   }
