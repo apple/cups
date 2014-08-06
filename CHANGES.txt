@@ -1,8 +1,9 @@
-CHANGES.txt - 2.0rc1 - 2014-08-04
+CHANGES.txt - 2.0rc1 - 2014-08-06
 ---------------------------------
 
 CHANGES IN CUPS V2.0rc1
 
+	- Documentation updates (STR #4464)
 	- The scheduler incorrectly called launch_activate_socket multiple times
 	  on OS X (<rdar://problem/17523218>)
 
