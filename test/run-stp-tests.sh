@@ -623,8 +623,7 @@ echo "    $VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_l
 echo ""
 
 if test `uname` = Darwin -a "x$VALGRIND" = x; then
-	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib
-	../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
+	DYLD_INSERT_LIBRARIES=/usr/lib/libgmalloc.dylib MallocStackLogging=1 ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 else
 	$VALGRIND ../scheduler/cupsd -c $BASE/cupsd.conf -f >$BASE/log/debug_log 2>&1 &
 fi
@@ -797,6 +796,13 @@ else
 fi
 
 echo "</PRE>" >>$strfile
+
+if test `uname` = Darwin -a "x$VALGRIND" = x; then
+	#
+	# Log all allocations made by the scheduler...
+	#
+	malloc_history $cupsd -highWaterMark -callTree -showContent >$BASE/log/malloc_log
+fi
 
 #
 # Stop the server...
