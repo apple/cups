@@ -3060,7 +3060,17 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	    set_variable(outfile, vars, expect->define_match, "1");
 
 	  if (found && expect->define_value)
+	  {
+	    if (!expect->with_value)
+	    {
+	      if (ippGetValueTag(found) == IPP_TAG_ENUM)
+	        snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, 0));
+	      else
+		ippAttributeString(found, buffer, sizeof(buffer));
+	    }
+
 	    set_variable(outfile, vars, expect->define_value, buffer);
+	  }
 
 	  if (found && expect->repeat_match &&
 	      repeat_count < expect->repeat_limit)

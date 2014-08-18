@@ -149,6 +149,12 @@ static const char * const media_type_supported[] =
  * Structures...
  */
 
+typedef struct _ipp_filter_s		/**** Attribute filter ****/
+{
+  cups_array_t		*ra;		/* Requested attributes */
+  ipp_tag_t		group_tag;	/* Group to copy */
+} _ipp_filter_t;
+
 typedef struct _ipp_job_s _ipp_job_t;
 
 typedef struct _ipp_printer_s		/**** Printer data ****/
@@ -257,6 +263,7 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *domain,
 				       _ipp_printer_t *printer);
 #endif /* HAVE_DNSSD */
+static int		filter_cb(_ipp_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
 static _ipp_job_t	*find_job(_ipp_client_t *client);
 static void		html_escape(_ipp_client_t *client, const char *s,
 			            size_t slen);
@@ -586,30 +593,13 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
 	        ipp_tag_t    group_tag,	/* I - Group to copy */
 	        int          quickcopy)	/* I - Do a quick copy? */
 {
-  ipp_attribute_t	*fromattr;	/* Source attribute */
+  _ipp_filter_t	filter;			/* Filter data */
 
 
-  if (!to || !from)
-    return;
+  filter.ra        = ra;
+  filter.group_tag = group_tag;
 
-  for (fromattr = ippFirstAttribute(from);
-       fromattr;
-       fromattr = ippNextAttribute(from))
-  {
-   /*
-    * Filter attributes as needed...
-    */
-
-    ipp_tag_t fromgroup = ippGetGroupTag(fromattr);
-    const char *fromname = ippGetName(fromattr);
-
-    if ((group_tag != IPP_TAG_ZERO && fromgroup != group_tag &&
-         fromgroup != IPP_TAG_ZERO) || !fromname)
-      continue;
-
-    if (!ra || cupsArrayFind(ra, (void *)fromname))
-      ippCopyAttribute(to, fromattr, quickcopy);
-  }
+  ippCopyAttributes(to, from, quickcopy, (ipp_copycb_t)filter_cb, &filter);
 }
 
 
@@ -625,6 +615,12 @@ copy_job_attributes(
 {
   copy_attributes(client->response, job->attrs, ra, IPP_TAG_JOB, 0);
 
+  if (job->completed && (!ra || cupsArrayFind(ra, "date-time-at-completed")))
+    ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-completed", ippTimeToDate(job->completed));
+
+  if (job->processing && (!ra || cupsArrayFind(ra, "date-time-at-processing")))
+    ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-processing", ippTimeToDate(job->processing));
+
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
                   "job-printer-up-time", (int)time(NULL));
@@ -632,6 +628,48 @@ copy_job_attributes(
   if (!ra || cupsArrayFind(ra, "job-state"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_ENUM,
 		  "job-state", job->state);
+
+  if (!ra || cupsArrayFind(ra, "job-state-message"))
+  {
+    switch (job->state)
+    {
+      case IPP_JSTATE_PENDING :
+	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job pending.");
+	  break;
+
+      case IPP_JSTATE_HELD :
+          if (job->fd >= 0)
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job incoming.");
+	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job held.");
+          else
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job created.");
+	  break;
+
+      case IPP_JSTATE_PROCESSING :
+	  if (job->cancel)
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceling.");
+	  else
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job printing.");
+	  break;
+
+      case IPP_JSTATE_STOPPED :
+	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job stopped.");
+	  break;
+
+      case IPP_JSTATE_CANCELED :
+	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job canceled.");
+	  break;
+
+      case IPP_JSTATE_ABORTED :
+	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job aborted.");
+	  break;
+
+      case IPP_JSTATE_COMPLETED :
+	  ippAddString(client->response, IPP_TAG_JOB, IPP_CONST_TAG(IPP_TAG_TEXT), "job-state-message", NULL, "Job completed.");
+	  break;
+    }
+  }
 
   if (!ra || cupsArrayFind(ra, "job-state-reasons"))
   {
@@ -760,6 +798,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
   _ipp_job_t		*job;		/* Job */
   ipp_attribute_t	*attr;		/* Job attribute */
   char			uri[1024];	/* job-uri value */
+  time_t		curtime;	/* Current date/time */
 
 
   _cupsRWLockWrite(&(client->printer->rwlock));
@@ -832,12 +871,11 @@ create_job(_ipp_client_t *client)	/* I - Client */
 
   snprintf(uri, sizeof(uri), "%s/%d", client->printer->uri, job->id);
 
+  ippAddDate(job->attrs, IPP_TAG_JOB, "date-time-at-creation", ippTimeToDate(time(&curtime)));
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, uri);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
-               client->printer->uri);
-  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
-                (int)time(NULL));
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL, client->printer->uri);
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation", (int)curtime);
 
   cupsArrayAdd(client->printer->jobs, job);
   client->printer->active_job = job;
@@ -970,7 +1008,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 			icons[1024],	/* printer-icons URI */
 			adminurl[1024],	/* printer-more-info URI */
 			device_id[1024],/* printer-device-id */
-			make_model[128];/* printer-make-and-model */
+			make_model[128],/* printer-make-and-model */
+			uuid[128];	/* printer-uuid */
   int			num_formats;	/* Number of document-format-supported values */
   char			*defformat,	/* document-format-default value */
 			*formats[100],	/* document-format-supported values */
@@ -1077,6 +1116,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   {					/* multiple-document-handling-supported values */
     "separate-documents-uncollated-copies",
     "separate-documents-collated-copies"
+  };
+  static const char * const overrides[] =
+  {					/* overrides-supported */
+    "document-number",
+    "pages"
   };
   static const char * const print_color_mode_supported[] =
   {					/* print-color-mode-supported values */
@@ -1311,6 +1355,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "document-format-supported", num_formats, NULL,
 		(const char * const *)formats);
 
+  /* document-password-supported */
+  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "document-password-supported", 127);
+
   /* finishings-default */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                 "finishings-default", IPP_FINISHINGS_NONE);
@@ -1361,6 +1408,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   /* job-password-supported */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "job-password-supported", 4);
+
+  /* job-preferred-attributes-supported */
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-preferred-attributes-supported", 0);
 
   /* job-priority-default */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1533,7 +1583,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "multiple-operation-time-out", 60);
 
   /* multiple-operation-time-out-action */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "multiple-operation-time-out-action", NULL, "cancel-job");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "multiple-operation-time-out-action", NULL, "abort-job");
 
   /* natural-language-configured */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
@@ -1571,10 +1621,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                "output-bin-supported", NULL, "face-down");
 
   /* overrides-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "overrides-supported", 0);
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "overrides-supported", (int)(sizeof(overrides) / sizeof(overrides[0])), NULL, overrides);
 
   /* page-ranges-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 0);
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "page-ranges-supported", 1);
 
   /* pages-per-minute */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -1589,9 +1639,6 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
                IPP_CONST_TAG(IPP_TAG_KEYWORD),
                "pdl-override-supported", NULL, "attempted");
-
-  /* preferred-attributes-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "preferred-attributes-supported", 0);
 
   /* print-color-mode-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "print-color-mode-default", NULL, "auto");
@@ -1670,10 +1717,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                NULL, name);
 
   /* printer-organization */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "printer-organization", NULL, "Apple Inc.");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organization", NULL, "Apple Inc.");
 
   /* printer-organizational-unit */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_NAME), "printer-organizational-unit", NULL, "Printing Engineering");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_TEXT), "printer-organizational-unit", NULL, "Printing Engineering");
 
   /* printer-resolution-default */
   ippAddResolution(printer->attrs, IPP_TAG_PRINTER,
@@ -1684,8 +1731,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                    "printer-resolution-supported", IPP_RES_PER_INCH, 600, 600);
 
   /* printer-uri-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-               "printer-uri-supported", NULL, uri);
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported", NULL, uri);
+
+  /* printer-uuid */
+  httpAssembleUUID(servername, port, name, 0, uuid, sizeof(uuid));
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uuid", NULL, uuid);
 
   /* pwg-raster-document-xxx-supported */
   for (i = 0; i < num_formats; i ++)
@@ -1974,6 +2024,29 @@ dnssd_callback(
   }
 }
 #endif /* HAVE_DNSSD */
+
+
+/*
+ * 'filter_cb()' - Filter printer attributes based on the requested array.
+ */
+
+static int				/* O - 1 to copy, 0 to ignore */
+filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
+          ipp_t           *dst,		/* I - Destination (unused) */
+	  ipp_attribute_t *attr)	/* I - Source attribute */
+{
+ /*
+  * Filter attributes as needed...
+  */
+
+  ipp_tag_t group = ippGetGroupTag(attr);
+  const char *name = ippGetName(attr);
+
+  if ((filter->group_tag != IPP_TAG_ZERO && group != filter->group_tag && group != IPP_TAG_ZERO) || !name || (!strcmp(name, "media-col-database") && !cupsArrayFind(filter->ra, (void *)name)))
+    return (0);
+
+  return (!filter->ra || cupsArrayFind(filter->ra, (void *)name) != NULL);
+}
 
 
 /*
@@ -2442,6 +2515,7 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
   ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
   cupsArrayAdd(ra, "job-id");
   cupsArrayAdd(ra, "job-state");
+  cupsArrayAdd(ra, "job-state-message");
   cupsArrayAdd(ra, "job-state-reasons");
   cupsArrayAdd(ra, "job-uri");
 
@@ -2926,6 +3000,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
   cupsArrayAdd(ra, "job-id");
   cupsArrayAdd(ra, "job-state");
+  cupsArrayAdd(ra, "job-state-message");
   cupsArrayAdd(ra, "job-state-reasons");
   cupsArrayAdd(ra, "job-uri");
 
@@ -5295,8 +5370,11 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "page-ranges",
                                IPP_TAG_ZERO)) != NULL)
   {
-    respond_unsupported(client, attr);
+    if (ippGetValueTag(attr) != IPP_TAG_RANGE)
+    {
+      respond_unsupported(client, attr);
       valid = 0;
+    }
   }
 
   if ((attr = ippFindAttribute(client->request, "print-quality",
@@ -5314,8 +5392,39 @@ valid_job_attributes(
   if ((attr = ippFindAttribute(client->request, "printer-resolution",
                                IPP_TAG_ZERO)) != NULL)
   {
-    respond_unsupported(client, attr);
-    valid = 0;
+    ipp_attribute_t	*supported = ippFindAttribute(client->printer->attrs, "printer-resolution-supported", IPP_TAG_RESOLUTION);
+
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_RESOLUTION ||
+        !supported)
+    {
+      respond_unsupported(client, attr);
+      valid = 0;
+    }
+    else
+    {
+      int		i,		/* Looping var */
+			count,		/* Number of supported values */
+			xdpi,		/* Horizontal resolution for job template attribute */
+			ydpi,		/* Vertical resolution for job template attribute */
+			sydpi;		/* Vertical resolution for supported value */
+      ipp_res_t		units,		/* Units for job template attribute */
+			sunits;		/* Units for supported value */
+
+      xdpi  = ippGetResolution(attr, 0, &ydpi, &units);
+      count = ippGetCount(supported);
+
+      for (i = 0; i < count; i ++)
+      {
+        if (xdpi == ippGetResolution(supported, i, &sydpi, &sunits) && ydpi == sydpi && units == sunits)
+          break;
+      }
+
+      if (i >= count)
+      {
+	respond_unsupported(client, attr);
+	valid = 0;
+      }
+    }
   }
 
   if ((attr = ippFindAttribute(client->request, "sides",

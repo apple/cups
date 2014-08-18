@@ -1,5 +1,5 @@
 #
-# "$Id: ipp-1.1.test 11398 2013-11-06 20:11:11Z msweet $"
+# "$Id$"
 #
 #   IPP/1.1 test suite.
 #
@@ -2346,10 +2346,10 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 
 
 #
-# End of "$Id: ipp-1.1.test 11398 2013-11-06 20:11:11Z msweet $".
+# End of "$Id$".
 #
 #
-# "$Id: ipp-2.0.test 11398 2013-11-06 20:11:11Z msweet $"
+# "$Id$"
 #
 #   IPP/2.0 test suite.
 #
@@ -2461,10 +2461,10 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 
 
 #
-# End of "$Id: ipp-2.0.test 11398 2013-11-06 20:11:11Z msweet $".
+# End of "$Id$".
 #
 #
-# "$Id: ipp-everywhere.test 11398 2013-11-06 20:11:11Z msweet $"
+# "$Id$"
 #
 #   IPP Everywhere test suite.
 #
@@ -12150,5 +12150,5 @@ INCLUDE "ipp-2.0.test"
 
 
 #
-# End of "$Id: ipp-everywhere.test 11398 2013-11-06 20:11:11Z msweet $".
+# End of "$Id$".
 #
