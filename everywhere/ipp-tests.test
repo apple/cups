@@ -45,6 +45,15 @@ DEFINE UUID_URI "/^urn:uuid:[0-9A-Fa-f]{8,8}-[0-9A-Fa-f]{4,4}-[0-9A-Fa-f]{4,4}-[
 # Generated with help from: http://www.msweet.org/abnf.php
 DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)){2,}|(custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])in|(custom|iso|jis|jpn|prc|om|roll)_[a-z0-9][-a-z0-9]*_([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])x([1-9][0-9]*(\.[0-9]*[1-9])?|0\.[0-9]*[1-9])mm)$$/"
 
+# Regular expression for printer-alert attribute
+#
+# Generated with help from: http://www.msweet.org/abnf.php
+DEFINE ALERT_REGEX "/^code\=[A-Za-z]+(;(index\=[0-9]+|severity\=[A-Za-z]+|training\=[A-Za-z]+|group\=[A-Za-z]+|groupindex\=[0-9]+|location\=[0-9]+|time\=[0-9]+)){0,1}$$/"
+
+# Regular expression for printer-supply attribute
+#
+# Generated with help from: http://www.msweet.org/abnf.php
+DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([0-9]|\-){0,1})|);*((index\=[0-9]+|markerindex\=[0-9]+|class\=[A-Za-z]+|unit\=[A-Za-z]+|colorantindex\=[0-9]+|colorantrole\=[A-Za-z]+|colorantname\=[A-Za-z]+|coloranttonality\=[0-9]+);){0,1}$$/"
 
 # Test that a request-id value of 0 is not accepted.
 #
@@ -338,7 +347,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT print-quality-default DEFINE-VALUE DEFAULT_PRINT_QUALITY
 	EXPECT print-quality-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5
 
-	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
+	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$ALERT_REGEX"
 	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
 
 	EXPECT ?printer-charge-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 DEFINE-MATCH HAVE_CHARGE_INFO
@@ -395,7 +404,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply-description
+	EXPECT printer-supply OF-TYPE octetString IN-GROUP printer-attributes-tag WITH-ALL-VALUES "$SUPPLY_REGEX"
 
 	EXPECT printer-supply-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-supply
 
@@ -586,7 +595,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$user"
@@ -672,7 +681,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document-color.jpg"
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
-	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job-color.jpg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -756,7 +765,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -895,8 +904,8 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document2-color.jpg"
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
-	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB2_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job2-color.jpg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -998,7 +1007,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 {
 	SKIP-IF-NOT-DEFINED PRINT_JOB3_ID
 
-	NAME "I-27. Get-Job-Attributes Until Job Complete"
+	NAME "I-25. Get-Job-Attributes Until Job Complete"
 	OPERATION Get-Job-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1019,8 +1028,8 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 	EXPECT document-format-supplied OF-TYPE mimeMediaType|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "image/jpeg"
 	EXPECT ?document-format-version-supplied OF-TYPE text IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE ""
 	EXPECT document-name-supplied OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "document3-color.jpg"
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB_ID
-	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE $PRINT_JOB3_ID
+	EXPECT job-impressions OF-TYPE integer|no-value IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "job3-color.jpg"
 	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
@@ -1060,7 +1069,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 {
 	PAUSE "Remove media from printer."
 
-	NAME "I-30. Media Empty: Printer correctly reports 'media-empty' when at least one removable tray is empty (MUST NOT be a manual feed or bypass tray)"
+	NAME "I-26. Media Empty: Printer correctly reports 'media-empty' when at least one removable tray is empty (MUST NOT be a manual feed or bypass tray)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1080,7 +1089,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 #
 # Required by: RFC 2911 section 3.2.1
 {
-	NAME "I-29. Print-Job Operation (color.jpg)"
+	NAME "I-27. Print-Job Operation (color.jpg)"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -1124,7 +1133,7 @@ DEFINE MEDIA_REGEX "/^(choice(_((custom|na|asme|roc|oe|roll)_[a-z0-9][-a-z0-9]*_
 
 # Test 'media-needed' reason
 {
-	NAME "I-30. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
+	NAME "I-28. Media Needed: Printer correctly reports 'media-needed' when a job is queued."
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8

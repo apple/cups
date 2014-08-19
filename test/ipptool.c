@@ -3089,6 +3089,25 @@ do_tests(FILE         *outfile,		/* I - Output file */
         {
           printf("%04d]\n", repeat_count);
           fflush(stdout);
+
+	  if (num_displayed > 0)
+	  {
+	    for (attrptr = ippFirstAttribute(response); attrptr; attrptr = ippNextAttribute(response))
+	    {
+	      const char *name = ippGetName(attrptr);
+	      if (name)
+	      {
+		for (i = 0; i < num_displayed; i ++)
+		{
+		  if (!strcmp(displayed[i], name))
+		  {
+		    print_attr(stdout, _CUPS_OUTPUT_PLIST, attrptr, NULL);
+		    break;
+		  }
+		}
+	      }
+	    }
+	  }
         }
 
         sleep((unsigned)repeat_interval);
@@ -3144,7 +3163,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	printf("        status-code = %s (%s)\n", ippErrorString(cupsLastError()),
 	       cupsLastErrorString());
 
-        if (response)
+        if (Verbosity && response)
         {
 	  for (attrptr = response->attrs;
 	       attrptr != NULL;
@@ -3224,7 +3243,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
       }
     }
 
-    if (num_displayed > 0 && !Verbosity && response && Output == _CUPS_OUTPUT_TEST)
+    if (num_displayed > 0 && !Verbosity && response && (Output == _CUPS_OUTPUT_TEST || (Output == _CUPS_OUTPUT_PLIST && outfile != stdout)))
     {
       for (attrptr = response->attrs;
 	   attrptr != NULL;

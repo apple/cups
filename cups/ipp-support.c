@@ -669,7 +669,14 @@ ippAttributeString(
           break;
 
       case IPP_TAG_RESOLUTION :
-          if (buffer && bufptr < bufend)
+	  if (val->resolution.xres == val->resolution.yres)
+	  {
+	    if (buffer && bufptr < bufend)
+	      bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%d%s", val->resolution.xres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    else
+	      bufptr += snprintf(temp, sizeof(temp), "%d%s", val->resolution.xres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	  }
+	  else if (buffer && bufptr < bufend)
             bufptr += snprintf(bufptr, (size_t)(bufend - bufptr + 1), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
           else
             bufptr += snprintf(temp, sizeof(temp), "%dx%d%s", val->resolution.xres, val->resolution.yres, val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
