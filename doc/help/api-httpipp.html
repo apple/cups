@@ -1490,7 +1490,7 @@ int httpAddrAny (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if &quot;any&quot;, 0 otherwise</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpAddrClose">httpAddrClose</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpAddrClose">httpAddrClose</a></h3>
 <p class="description">Close a socket created by <a href="#httpAddrConnect"><code>httpAddrConnect</code></a> or
 <a href="#httpAddrListen"><code>httpAddrListen</code></a>.</p>
 <p class="code">
@@ -1820,7 +1820,7 @@ void httpClose (<br>
 <dt>http</dt>
 <dd class="description">HTTP connection</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpCompareCredentials">httpCompareCredentials</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpCompareCredentials">httpCompareCredentials</a></h3>
 <p class="description">Compare two sets of X.509 credentials.</p>
 <p class="code">
 int httpCompareCredentials (<br>
@@ -2107,7 +2107,7 @@ int httpGet (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetActivity">httpGetActivity</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetActivity">httpGetActivity</a></h3>
 <p class="description">Get the most recent activity for a connection.</p>
 <p class="code">
 time_t httpGetActivity (<br>
@@ -2124,7 +2124,7 @@ time_t httpGetActivity (<br>
 <p class="discussion">The return value is the UNIX time of the last read or write.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetAddress">httpGetAddress</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetAddress">httpGetAddress</a></h3>
 <p class="description">Get the address of the connected peer of a connection.</p>
 <p class="code">
 <a href="#http_addr_t">http_addr_t</a> *httpGetAddress (<br>
@@ -2255,7 +2255,7 @@ time_t httpGetDateTime (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">UNIX time</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetEncryption">httpGetEncryption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetEncryption">httpGetEncryption</a></h3>
 <p class="description">Get the current encryption mode of a connection.</p>
 <p class="code">
 <a href="#http_encryption_t">http_encryption_t</a> httpGetEncryption (<br>
@@ -2362,7 +2362,7 @@ Otherwise, return the FQDN for the local system using both gethostname()
 and gethostbyname() to get the local hostname with domain.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetKeepAlive">httpGetKeepAlive</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetKeepAlive">httpGetKeepAlive</a></h3>
 <p class="description">Get the current Keep-Alive state of the connection.</p>
 <p class="code">
 <a href="#http_keepalive_t">http_keepalive_t</a> httpGetKeepAlive (<br>
@@ -2413,7 +2413,7 @@ off_t httpGetLength2 (<br>
 content larger than 2^31 - 1.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetPending">httpGetPending</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetPending">httpGetPending</a></h3>
 <p class="description">Get the number of bytes that are buffered for writing.</p>
 <p class="code">
 size_t httpGetPending (<br>
@@ -2426,7 +2426,7 @@ size_t httpGetPending (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes buffered</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetReady">httpGetReady</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetReady">httpGetReady</a></h3>
 <p class="description">Get the number of bytes that can be read without blocking.</p>
 <p class="code">
 size_t httpGetReady (<br>
@@ -2439,7 +2439,7 @@ size_t httpGetReady (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes available</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpGetRemaining">httpGetRemaining</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpGetRemaining">httpGetRemaining</a></h3>
 <p class="description">Get the number of remaining bytes in the message
 body or current chunk.</p>
 <p class="code">
@@ -2584,7 +2584,7 @@ int httpHead (<br>
 default HTTP proxy (if any).</p>
 <p class="code">
 void httpInitialize (void);</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpIsChunked">httpIsChunked</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpIsChunked">httpIsChunked</a></h3>
 <p class="description">Report whether a message body is chunked.</p>
 <p class="code">
 int httpIsChunked (<br>
@@ -2602,7 +2602,7 @@ int httpIsChunked (<br>
 variable-length chunks.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpIsEncrypted">httpIsEncrypted</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpIsEncrypted">httpIsEncrypted</a></h3>
 <p class="description">Report whether a connection is encrypted.</p>
 <p class="code">
 int httpIsEncrypted (<br>
@@ -2856,7 +2856,7 @@ int httpReconnect2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, non-zero on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpResolveHostname">httpResolveHostname</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpResolveHostname">httpResolveHostname</a></h3>
 <p class="description">Resolve the hostname of the HTTP connection
 address.</p>
 <p class="code">
@@ -3109,7 +3109,7 @@ void httpSetField (<br>
 <dt>value</dt>
 <dd class="description">Value</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpSetKeepAlive">httpSetKeepAlive</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpSetKeepAlive">httpSetKeepAlive</a></h3>
 <p class="description">Set the current Keep-Alive state of a connection.</p>
 <p class="code">
 void httpSetKeepAlive (<br>
@@ -3163,7 +3163,7 @@ must be greater than 0</dd>
 data pointer and must return 1 to continue or 0 to error (time) out.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpShutdown">httpShutdown</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpShutdown">httpShutdown</a></h3>
 <p class="description">Shutdown one side of an HTTP connection.</p>
 <p class="code">
 void httpShutdown (<br>
@@ -3174,7 +3174,7 @@ void httpShutdown (<br>
 <dt>http</dt>
 <dd class="description">HTTP connection</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpStateString">httpStateString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpStateString">httpStateString</a></h3>
 <p class="description">Return the string describing a HTTP state value.</p>
 <p class="code">
 const char *httpStateString (<br>
@@ -3219,7 +3219,7 @@ int httpTrace (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of call (0 = success)</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="httpURIStatusString">httpURIStatusString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="httpURIStatusString">httpURIStatusString</a></h3>
 <p class="description">Return a string describing a URI status code.</p>
 <p class="code">
 const char *httpURIStatusString (<br>
@@ -5393,7 +5393,7 @@ the <a href="#ippNew"><code>ippNew</code></a>, <a href="#ippNewRequest"><code>ip
 The valid version numbers are currently 1.0, 1.1, 2.0, 2.1, and 2.2.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="ippStateString">ippStateString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="ippStateString">ippStateString</a></h3>
 <p class="description">Return the name corresponding to a state value.</p>
 <p class="code">
 const char *ippStateString (<br>
@@ -5616,7 +5616,7 @@ typedef struct _http_s http_t;
 <p class="code">
 typedef int (*http_timeout_cb_t)(<a href="#http_t">http_t</a> *http, void *user_data);
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_t">http_trust_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="http_trust_t">http_trust_t</a></h3>
 <p class="description">Level of trust for credentials </p>
 <p class="code">
 typedef enum <a href="#http_trust_e">http_trust_e</a> http_trust_t;
@@ -6018,7 +6018,7 @@ are server-oriented...</p>
 <dt>HTTP_STATUS_USE_PROXY </dt>
 <dd class="description">Must use a proxy to access this URI</dd>
 </dl>
-<h3 class="enumeration"><span class="info">&nbsp;CUPS 2.0&nbsp;</span><a name="http_trust_e">http_trust_e</a></h3>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 2.0/OS 10.10&nbsp;</span><a name="http_trust_e">http_trust_e</a></h3>
 <p class="description">Level of trust for credentials </p>
 <h4 class="constants">Constants</h4>
 <dl>

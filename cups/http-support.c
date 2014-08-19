@@ -1300,7 +1300,7 @@ httpSeparateURI(
 /*
  * 'httpStateString()' - Return the string describing a HTTP state value.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - State string */
@@ -1433,7 +1433,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 /*
  * 'httpURIStatusString()' - Return a string describing a URI status code.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - Localized status string */

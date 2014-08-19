@@ -1310,7 +1310,7 @@ _cupsGetDestResource(
  *
  * "uri" is the "ipp" or "ipps" URI for the printer.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */

@@ -61,7 +61,7 @@ static OSStatus		http_cdsa_write(SSLConnectionRef connection, const void *data, 
 /*
  * 'cupsMakeServerCredentials()' - Make a self-signed certificate and private key pair.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -283,7 +283,7 @@ cleanup:
  * Note: The server credentials are used by all threads in the running process.
  * This function is threadsafe.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -452,7 +452,7 @@ _httpCreateCredentials(
 /*
  * 'httpCredentialsAreValidForName()' - Return whether the credentials are valid for the given name.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 int					/* O - 1 if valid, 0 otherwise */
@@ -515,7 +515,7 @@ httpCredentialsAreValidForName(
 /*
  * 'httpCredentialsGetTrust()' - Return the trust of credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 http_trust_t				/* O - Level of trust */
@@ -599,7 +599,7 @@ httpCredentialsGetTrust(
 /*
  * 'httpCredentialsGetExpiration()' - Return the expiration date of the credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 time_t					/* O - Expiration date of credentials */
@@ -624,7 +624,7 @@ httpCredentialsGetExpiration(
 /*
  * 'httpCredentialsString()' - Return a string representing the credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS X 10.10@
  */
 
 size_t					/* O - Total size of credentials string */
@@ -697,7 +697,7 @@ _httpFreeCredentials(
 /*
  * 'httpLoadCredentials()' - Load X.509 credentials from a keychain file.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -803,7 +803,7 @@ httpLoadCredentials(
 /*
  * 'httpSaveCredentials()' - Save X.509 credentials to a keychain file.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - -1 on error, 0 on success */

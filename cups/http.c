@@ -393,7 +393,7 @@ httpClose(http_t *http)			/* I - HTTP connection */
 /*
  * 'httpCompareCredentials()' - Compare two sets of X.509 credentials.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if they match, 0 if they do not */
@@ -759,7 +759,7 @@ httpGet(http_t     *http,		/* I - HTTP connection */
  *
  * The return value is the UNIX time of the last read or write.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 time_t					/* O - Time of last read or write */
@@ -911,7 +911,7 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
  * @link httpIsEncrypted@ function to determine whether a TLS session has
  * been established.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_encryption_t			/* O - Current encryption mode */
@@ -995,7 +995,7 @@ httpGetField(http_t       *http,	/* I - HTTP connection */
 /*
  * 'httpGetKeepAlive()' - Get the current Keep-Alive state of the connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 http_keepalive_t			/* O - Keep-Alive state */
@@ -1104,7 +1104,7 @@ httpGetLength2(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetPending()' - Get the number of bytes that are buffered for writing.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Number of bytes buffered */
@@ -1117,7 +1117,7 @@ httpGetPending(http_t *http)		/* I - HTTP connection */
 /*
  * 'httpGetReady()' - Get the number of bytes that can be read without blocking.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Number of bytes available */
@@ -1143,7 +1143,7 @@ httpGetReady(http_t *http)		/* I - HTTP connection */
  * The @link httpIsChunked@ function can be used to determine whether the
  * message body is chunked or fixed-length.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 size_t					/* O - Remaining bytes */
@@ -1582,7 +1582,7 @@ httpInitialize(void)
  * This function returns non-zero if the message body is composed of
  * variable-length chunks.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if chunked, 0 if not */
@@ -1597,7 +1597,7 @@ httpIsChunked(http_t *http)		/* I - HTTP connection */
  *
  * This function returns non-zero if the connection is currently encrypted.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 int					/* O - 1 if encrypted, 0 if not */
@@ -2769,7 +2769,7 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
 /*
  * 'httpSetKeepAlive()' - Set the current Keep-Alive state of a connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 void
@@ -2847,7 +2847,7 @@ httpSetTimeout(
 /*
  * 'httpShutdown()' - Shutdown one side of an HTTP connection.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 void

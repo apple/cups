@@ -342,7 +342,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
 #  endif /* !_CUPS_NO_DEPRECATED */
 } http_status_t;
 
-typedef enum http_trust_e		/**** Level of trust for credentials @since CUPS 2.0@ */
+typedef enum http_trust_e		/**** Level of trust for credentials @since CUPS 2.0/OS 10.10@ */
 {
   HTTP_TRUST_OK = 0,			/* Credentials are OK/trusted */
   HTTP_TRUST_INVALID,			/* Credentials are invalid */
@@ -620,7 +620,7 @@ extern void		httpSetDefaultField(http_t *http, http_field_t field,
 extern http_state_t	httpWriteResponse(http_t *http,
 			                  http_status_t status) _CUPS_API_1_7;
 
-/* New in CUPS 2.0 */
+/* New in CUPS 2.0/OS X 10.10 */
 extern int		httpAddrClose(http_addr_t *addr, int fd) _CUPS_API_2_0;
 extern int		httpAddrFamily(http_addr_t *addr) _CUPS_API_2_0;
 extern int		httpCompareCredentials(cups_array_t *cred1, cups_array_t *cred2) _CUPS_API_2_0;

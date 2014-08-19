@@ -2122,7 +2122,7 @@ ippSetPort(int p)			/* I - Port number to use */
 /*
  * 'ippStateString()' - Return the name corresponding to a state value.
  *
- * @since CUPS 2.0@
+ * @since CUPS 2.0/OS 10.10@
  */
 
 const char *				/* O - State name */
