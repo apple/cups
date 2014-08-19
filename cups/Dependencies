@@ -4,8 +4,9 @@ adminutil.o: adminutil.c cups-private.h string-private.h ../config.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
   thread-private.h adminutil.h
-array.o: array.c string-private.h ../config.h debug-private.h \
-  ../cups/versioning.h array-private.h ../cups/array.h
+array.o: array.c ../cups/cups.h file.h versioning.h ipp.h http.h array.h \
+  language.h pwg.h string-private.h ../config.h debug-private.h \
+  array-private.h
 attr.o: attr.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
@@ -223,8 +224,12 @@ snmp.o: snmp.c cups-private.h string-private.h ../config.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
   thread-private.h snmp-private.h
 snprintf.o: snprintf.c string-private.h ../config.h
-string.o: string.c string-private.h ../config.h debug-private.h \
-  ../cups/versioning.h thread-private.h array.h
+string.o: string.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
 tempfile.o: tempfile.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \

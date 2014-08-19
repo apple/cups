@@ -944,12 +944,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
       job->format = "application/octet-stream";
 
     if ((attr = ippFindAttribute(client->request, "document-name", IPP_TAG_NAME)) != NULL)
-    {
-      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name", NULL, ippGetString(attr, 0, NULL));
       ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
-    }
-    else
-      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name", NULL, "Untitled");
   }
 
   if ((attr = ippFindAttribute(client->request, "job-name", IPP_TAG_NAME)) != NULL)
@@ -3639,12 +3634,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-supplied", NULL, ippGetString(attr, 0, NULL));
 
   if ((attr = ippFindAttribute(client->request, "document-name", IPP_TAG_NAME)) != NULL)
-  {
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name", NULL, ippGetString(attr, 0, NULL));
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
-  }
-  else
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name", NULL, "Untitled");
 
   if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
     job->format = ippGetString(attr, 0, NULL);
