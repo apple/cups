@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0rc1 - 2014-08-06
+CHANGES.txt - 2.0rc1 - 2014-08-29
 ---------------------------------
 
 CHANGES IN CUPS V2.0rc1
@@ -6,6 +6,8 @@ CHANGES IN CUPS V2.0rc1
 	- Documentation updates (STR #4464)
 	- The scheduler incorrectly called launch_activate_socket multiple times
 	  on OS X (<rdar://problem/17523218>)
+	- The ippserver test program now passes the IPP Everywhere self-
+	  certification tests (STR #4101)
 
 
 CHANGES IN CUPS V2.0b1
