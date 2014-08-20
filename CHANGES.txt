@@ -10,6 +10,9 @@ CHANGES IN CUPS V2.0rc1
 	  certification tests (STR #4101)
 	- Relaxed the new OS X filter sandbox slightly (STR #4471,
 	  <rdar://problem/17483959>)
+	- Dropped the old Epson Stylus Color/Photo sample drivers since they
+	  don't work with any current printers and there are free alternatives
+	  that produce much better output (<rdar://problem/18036889>)
 
 
 CHANGES IN CUPS V2.0b1
