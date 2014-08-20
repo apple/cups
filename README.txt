@@ -1,5 +1,5 @@
-README - CUPS v2.0b1 - 2014-07-30
----------------------------------
+README - CUPS v2.0rc1 - 2014-08-20
+----------------------------------
 
 ********************************************************************************
 ********************************************************************************
@@ -91,10 +91,6 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
 	-----------------------------  ------------------------------
 	Dymo Label Printers            drv:///sample.drv/dymo.ppd
 	Intellitech Intellibar         drv:///sample.drv/intelbar.ppd
-	EPSON Stylus Color Series      drv:///sample.drv/stcolor.ppd
-	EPSON Stylus Photo Series      drv:///sample.drv/stphoto.ppd
-	EPSON Stylus New Color Series  drv:///sample.drv/stcolor2.ppd
-	EPSON Stylus New Photo Series  drv:///sample.drv/stphoto2.ppd
 	EPSON 9-pin Series             drv:///sample.drv/epson9.ppd
 	EPSON 24-pin Series            drv:///sample.drv/epson24.ppd
 	Generic PCL Laser Printer      drv:///sample.drv/generpcl.ppd
