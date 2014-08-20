@@ -3101,7 +3101,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		{
 		  if (!strcmp(displayed[i], name))
 		  {
-		    print_attr(stdout, _CUPS_OUTPUT_PLIST, attrptr, NULL);
+		    print_attr(stdout, _CUPS_OUTPUT_TEST, attrptr, NULL);
 		    break;
 		  }
 		}
