@@ -1307,7 +1307,7 @@ void *my_data;
 
 	<li>Bluetooth and USB: backends can access Bluetooth and USB printers through IOKit. <em>Filters cannot access Bluetooth and USB printers directly.</em></li>
 
-	<li>Network: filters and backends can access UNIX domain sockets under the <var>/private/var/run</var> and <var>/private/var/tmp</var> directories. Backends can also create IPv4 and IPv6 TCP (outgoing) and UDP (incoming and outgoing) socket, and bind to local source ports. <em>Filters cannot directly create IPv4 and IPv6 TCP or UDP sockets.</em></li>
+	<li>Network: filters and backends can access UNIX domain sockets under the <var>/private/tmp</var>, <var>/private/var/run</var>, and <var>/private/var/tmp</var> directories. Backends can also create IPv4 and IPv6 TCP (outgoing) and UDP (incoming and outgoing) socket, and bind to local source ports. <em>Filters cannot directly create IPv4 and IPv6 TCP or UDP sockets.</em></li>
 
 	<li>Notifications: filters and backends can send notifications via the Darwin <code>notify_post()</code> API.</li>
 
