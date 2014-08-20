@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0rc1 - 2014-08-29
+CHANGES.txt - 2.0rc1 - 2014-08-20
 ---------------------------------
 
 CHANGES IN CUPS V2.0rc1
@@ -8,6 +8,8 @@ CHANGES IN CUPS V2.0rc1
 	  on OS X (<rdar://problem/17523218>)
 	- The ippserver test program now passes the IPP Everywhere self-
 	  certification tests (STR #4101)
+	- Relaxed the new OS X filter sandbox slightly (STR #4471,
+	  <rdar://problem/17483959>)
 
 
 CHANGES IN CUPS V2.0b1
