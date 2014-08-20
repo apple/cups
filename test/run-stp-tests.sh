@@ -767,6 +767,13 @@ for file in 5*.sh; do
 done
 
 #
+# Log all allocations made by the scheduler...
+#
+if test `uname` = Darwin -a "x$VALGRIND" = x; then
+	malloc_history $cupsd -callTree -showContent >$BASE/log/malloc_log 2>&1
+fi
+
+#
 # Restart the server...
 #
 
@@ -777,12 +784,12 @@ echo "\"5.10-restart\":" >>$strfile
 kill -HUP $cupsd
 
 while true; do
+	sleep 10
+
 	running=`../systemv/lpstat -r 2>/dev/null`
 	if test "x$running" = "xscheduler is running"; then
 		break
 	fi
-
-	sleep 10
 done
 
 description="`lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
@@ -796,13 +803,6 @@ else
 fi
 
 echo "</PRE>" >>$strfile
-
-if test `uname` = Darwin -a "x$VALGRIND" = x; then
-	#
-	# Log all allocations made by the scheduler...
-	#
-	malloc_history $cupsd -highWaterMark -callTree -showContent >$BASE/log/malloc_log
-fi
 
 #
 # Stop the server...
