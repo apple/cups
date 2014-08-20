@@ -703,11 +703,21 @@ copy_job_attributes(
 {
   copy_attributes(client->response, job->attrs, ra, IPP_TAG_JOB, 0);
 
-  if (job->completed && (!ra || cupsArrayFind(ra, "date-time-at-completed")))
-    ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-completed", ippTimeToDate(job->completed));
+  if (!ra || cupsArrayFind(ra, "date-time-at-completed"))
+  {
+    if (job->completed)
+      ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-completed", ippTimeToDate(job->completed));
+    else
+      ippAddOutOfBand(client->response, IPP_TAG_JOB, IPP_TAG_NOVALUE, "date-time-at-completed");
+  }
 
-  if (job->processing && (!ra || cupsArrayFind(ra, "date-time-at-processing")))
-    ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-processing", ippTimeToDate(job->processing));
+  if (!ra || cupsArrayFind(ra, "date-time-at-processing"))
+  {
+    if (job->processing)
+      ippAddDate(client->response, IPP_TAG_JOB, "date-time-at-processing", ippTimeToDate(job->processing));
+    else
+      ippAddOutOfBand(client->response, IPP_TAG_JOB, IPP_TAG_NOVALUE, "date-time-at-processing");
+  }
 
   if (!ra || cupsArrayFind(ra, "job-impressions"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-impressions", job->impressions);
@@ -2203,8 +2213,6 @@ find_job(_ipp_client_t *client)		/* I - Client */
   {
     const char *uri = ippGetString(attr, 0, NULL);
 
-    fprintf(stderr, "find_job: job-uri=\"%s\"\n", uri);
-
     if (!strncmp(uri, client->printer->uri, client->printer->urilen) &&
         uri[client->printer->urilen] == '/')
       key.id = atoi(uri + client->printer->urilen + 1);
@@ -2214,13 +2222,9 @@ find_job(_ipp_client_t *client)		/* I - Client */
   else if ((attr = ippFindAttribute(client->request, "job-id", IPP_TAG_INTEGER)) != NULL)
     key.id = ippGetInteger(attr, 0);
 
-  fprintf(stderr, "find_job: key.id=%d\n", key.id);
-
   _cupsRWLockRead(&(client->printer->rwlock));
   job = (_ipp_job_t *)cupsArrayFind(client->printer->jobs, &key);
   _cupsRWUnlock(&(client->printer->rwlock));
-
-  fprintf(stderr, "find_job: Got job %d (%p)\n", job ? job->id : 0, job);
 
   return (job);
 }
@@ -4674,6 +4678,14 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	  if ((num_options = parse_options(client, &options)) > 0)
 	  {
+	   /*
+	    * WARNING: A real printer/server implementation MUST NOT implement
+	    * media updates via a GET request - GET requests are supposed to be
+	    * idempotent (without side-effects) and we obviously are not
+	    * authenticating access here.  This form is provided solely to
+	    * enable testing and development!
+	    */
+
 	    const char	*val;		/* Form value */
 
 	    if ((val = cupsGetOption("main_size", num_options, options)) != NULL)
@@ -4775,6 +4787,14 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	  if ((num_options = parse_options(client, &options)) > 0)
 	  {
+	   /*
+	    * WARNING: A real printer/server implementation MUST NOT implement
+	    * supply updates via a GET request - GET requests are supposed to be
+	    * idempotent (without side-effects) and we obviously are not
+	    * authenticating access here.  This form is provided solely to
+	    * enable testing and development!
+	    */
+
 	    char	name[64];	/* Form field */
 	    const char	*val;		/* Form value */
 
