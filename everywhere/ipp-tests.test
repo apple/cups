@@ -1,17 +1,17 @@
 #
 # "$Id$"
 #
-#   IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
-#   Copyright 2014 by The Printer Working Group.
-#   Copyright 2007-2013 by Apple Inc.
-#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
+# Copyright 2014 by The Printer Working Group.
+# Copyright 2007-2013 by Apple Inc.
+# Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
-#   These coded instructions, statements, and computer programs are the
-#   property of Apple Inc. and are protected by Federal copyright
-#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-#   which should have been included with this file.  If this file is
-#   file is missing or damaged, see the license at "http://www.cups.org/".
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
 #
 # Usage:
 #
@@ -19,11 +19,11 @@
 #
 # History:
 #
-#   This test file is loosely based on the IPP/1.1, IPP/2.0 and IPP Everywhere
-#   test files from the CUPS "test" directory.  Many of those tests have been
-#   combined or removed, and all print tests are performed using a sample JPEG
-#   file.  These tests also validate support for the 'media-empty' and
-#   'media-needed' keywords in the "printer-state-reasons" Printer attribute.
+# This test file is loosely based on the IPP/1.1, IPP/2.0 and IPP Everywhere
+# test files from the CUPS "test" directory.  Many of those tests have been
+# combined or removed, and all print tests are performed using a sample JPEG
+# file.  These tests also validate support for the 'media-empty' and
+# 'media-needed' keywords in the "printer-state-reasons" Printer attribute.
 #
 
 # All tests use IPP version 2.0, unless overridden in a test...
