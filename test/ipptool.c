@@ -1371,7 +1371,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
         * Name of test...
 	*/
 
-	get_token(fp, name, sizeof(name), &linenum);
+	get_token(fp, temp, sizeof(temp), &linenum);
+	expand_variables(vars, name, temp, sizeof(name));
       }
       else if (!_cups_strcasecmp(token, "PAUSE"))
       {
@@ -3063,10 +3064,55 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  {
 	    if (!expect->with_value)
 	    {
-	      if (ippGetValueTag(found) == IPP_TAG_ENUM)
-	        snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, 0));
-	      else
-		ippAttributeString(found, buffer, sizeof(buffer));
+	      int last = ippGetCount(found) - 1;
+					/* Last element in attribute */
+
+	      switch (ippGetValueTag(found))
+	      {
+	        case IPP_TAG_ENUM :
+		case IPP_TAG_INTEGER :
+		    snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
+		    break;
+
+		case IPP_TAG_BOOLEAN :
+		    if (ippGetBoolean(found, last))
+		      strlcpy(buffer, "true", sizeof(buffer));
+		    else
+		      strlcpy(buffer, "false", sizeof(buffer));
+		    break;
+
+		case IPP_TAG_RESOLUTION :
+		    {
+		      int	xres,	/* Horizontal resolution */
+				yres;	/* Vertical resolution */
+		      ipp_res_t	units;	/* Resolution units */
+
+		      xres = ippGetResolution(found, last, &yres, &units);
+
+		      if (xres == yres)
+		        snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		      else
+		        snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		    }
+		    break;
+
+		case IPP_TAG_CHARSET :
+		case IPP_TAG_KEYWORD :
+		case IPP_TAG_LANGUAGE :
+		case IPP_TAG_MIMETYPE :
+		case IPP_TAG_NAME :
+		case IPP_TAG_NAMELANG :
+		case IPP_TAG_TEXT :
+		case IPP_TAG_TEXTLANG :
+		case IPP_TAG_URI :
+		case IPP_TAG_URISCHEME :
+		    strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
+		    break;
+
+		default :
+		    ippAttributeString(found, buffer, sizeof(buffer));
+		    break;
+	      }
 	    }
 
 	    set_variable(outfile, vars, expect->define_value, buffer);
@@ -3094,12 +3140,12 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  {
 	    for (attrptr = ippFirstAttribute(response); attrptr; attrptr = ippNextAttribute(response))
 	    {
-	      const char *name = ippGetName(attrptr);
-	      if (name)
+	      const char *attrname = ippGetName(attrptr);
+	      if (attrname)
 	      {
 		for (i = 0; i < num_displayed; i ++)
 		{
-		  if (!strcmp(displayed[i], name))
+		  if (!strcmp(displayed[i], attrname))
 		  {
 		    print_attr(stdout, _CUPS_OUTPUT_TEST, attrptr, NULL);
 		    break;
@@ -3416,14 +3462,26 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
       }
       else if (vars)
       {
-	strlcpy(temp, src + 1, sizeof(temp));
+        if (src[1] == '{')
+	{
+	  src += 2;
+	  strlcpy(temp, src, sizeof(temp));
+	  if ((tempptr = strchr(temp, '}')) != NULL)
+	    *tempptr = '\0';
+	  else
+	    tempptr = temp + strlen(temp);
+	}
+	else
+	{
+	  strlcpy(temp, src + 1, sizeof(temp));
 
-	for (tempptr = temp; *tempptr; tempptr ++)
-	  if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
-	    break;
+	  for (tempptr = temp; *tempptr; tempptr ++)
+	    if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
+	      break;
 
-        if (*tempptr)
-	  *tempptr = '\0';
+	  if (*tempptr)
+	    *tempptr = '\0';
+        }
 
 	if (!strcmp(temp, "uri"))
 	  value = vars->uri;

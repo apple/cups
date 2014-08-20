@@ -3722,6 +3722,9 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   else if (!strcasecmp(job->format, "image/png"))
     snprintf(filename, sizeof(filename), "%s/%d.png",
              client->printer->directory, job->id);
+  else if (!strcasecmp(job->format, "image/pwg-raster"))
+    snprintf(filename, sizeof(filename), "%s/%d.ras",
+             client->printer->directory, job->id);
   else if (!strcasecmp(job->format, "application/pdf"))
     snprintf(filename, sizeof(filename), "%s/%d.pdf",
              client->printer->directory, job->id);
@@ -5762,7 +5765,11 @@ valid_doc_attributes(
               client->hostname, op_name, compression);
 
       if (strcmp(compression, "none"))
+      {
+	if (Verbosity)
+	  fprintf(stderr, "Receiving job file with \"%s\" compression.\n", compression);
         httpSetField(client->http, HTTP_FIELD_CONTENT_ENCODING, compression);
+      }
     }
   }
 
