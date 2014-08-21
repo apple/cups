@@ -1017,7 +1017,7 @@ static void create_job_filename(
 
   for (nameptr = name; *job_name && nameptr < (name + sizeof(name) - 1); job_name ++)
     if (isalnum(*job_name & 255) || *job_name == '-')
-      *nameptr++ = tolower(*job_name & 255);
+      *nameptr++ = (char)tolower(*job_name & 255);
     else
       *nameptr++ = '_';
 
@@ -1338,6 +1338,17 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     "one-sided",
     "two-sided-long-edge",
     "two-sided-short-edge"
+  };
+  static const char * const urf_supported[] =
+  {					/* urf-supported values */
+    "CP1",
+    "IS1-5-7",
+    "MT1-2-3-4-5-6-8-9-10-11-12-13",
+    "RS600",
+    "SRGB24",
+    "V1.4",
+    "W8",
+    "DM1"
   };
   static const char * const which_jobs[] =
   {					/* which-jobs-supported values */
@@ -1976,6 +1987,14 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER,
                 IPP_CONST_TAG(IPP_TAG_KEYWORD),
                 "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
+
+  /* urf-supported */
+  for (i = 0; i < num_formats; i ++)
+    if (!strcasecmp(formats[i], "image/urf"))
+      break;
+
+  if (i < num_formats)
+    ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "urf-supported", (int)(sizeof(urf_supported) / sizeof(urf_supported[0])) - !duplex, NULL, urf_supported);
 
   /* uri-authentication-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER,
