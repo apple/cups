@@ -950,27 +950,19 @@ create_job(_ipp_client_t *client)	/* I - Client */
 
   if (ippGetOperation(client->request) != IPP_OP_CREATE_JOB)
   {
-    if ((attr = ippFindAttribute(client->request, "compression", IPP_TAG_KEYWORD)) != NULL)
-      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD, "compression-supplied", NULL, ippGetString(attr, 0, NULL));
-
-    if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
+    if ((attr = ippFindAttribute(job->attrs, "document-format-detected", IPP_TAG_MIMETYPE)) != NULL)
+      job->format = ippGetString(attr, 0, NULL);
+    else if ((attr = ippFindAttribute(job->attrs, "document-format-supplied", IPP_TAG_MIMETYPE)) != NULL)
       job->format = ippGetString(attr, 0, NULL);
     else
       job->format = "application/octet-stream";
-
-    if ((attr = ippFindAttribute(client->request, "document-name", IPP_TAG_NAME)) != NULL)
-      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
   }
-
-  if ((attr = ippFindAttribute(client->request, "job-name", IPP_TAG_NAME)) != NULL)
-    job->name = ippGetString(attr, 0, NULL);
-  else
-    job->name = "Untitled";
-
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, job->name);
 
   if ((attr = ippFindAttribute(client->request, "job-impressions", IPP_TAG_INTEGER)) != NULL)
     job->impressions = ippGetInteger(attr, 0);
+
+  if ((attr = ippFindAttribute(client->request, "job-name", IPP_TAG_NAME)) != NULL)
+    job->name = ippGetString(attr, 0, NULL);
 
  /*
   * Add job description attributes and add to the jobs array...
@@ -994,6 +986,67 @@ create_job(_ipp_client_t *client)	/* I - Client */
   _cupsRWUnlock(&(client->printer->rwlock));
 
   return (job);
+}
+
+
+/*
+ * 'create_job_filename()' - Create the filename for a document in a job.
+ */
+
+static void create_job_filename(
+    _ipp_printer_t *printer,		/* I - Printer */
+    _ipp_job_t     *job,		/* I - Job */
+    char           *fname,		/* I - Filename buffer */
+    size_t         fnamesize)		/* I - Size of filename buffer */
+{
+  char			name[256],	/* "Safe" filename */
+			*nameptr;	/* Pointer into filename */
+  const char		*ext,		/* Filename extension */
+			*job_name;	/* job-name value */
+  ipp_attribute_t	*job_name_attr;	/* job-name attribute */
+
+
+ /*
+  * Make a name from the job-name attribute...
+  */
+
+  if ((job_name_attr = ippFindAttribute(job->attrs, "job-name", IPP_TAG_NAME)) != NULL)
+    job_name = ippGetString(job_name_attr, 0, NULL);
+  else
+    job_name = "untitled";
+
+  for (nameptr = name; *job_name && nameptr < (name + sizeof(name) - 1); job_name ++)
+    if (isalnum(*job_name & 255) || *job_name == '-')
+      *nameptr++ = tolower(*job_name & 255);
+    else
+      *nameptr++ = '_';
+
+  *nameptr = '\0';
+
+ /*
+  * Figure out the extension...
+  */
+
+  if (!strcasecmp(job->format, "image/jpeg"))
+    ext = "jpg";
+  else if (!strcasecmp(job->format, "image/png"))
+    ext = "png";
+  else if (!strcasecmp(job->format, "image/pwg-raster"))
+    ext = "ras";
+  else if (!strcasecmp(job->format, "image/urf"))
+    ext = "urf";
+  else if (!strcasecmp(job->format, "application/pdf"))
+    ext = "pdf";
+  else if (!strcasecmp(job->format, "application/postscript"))
+    ext = "ps";
+  else
+    ext = "prn";
+
+ /*
+  * Create a filename with the job-id, job-name, and document-format (extension)...
+  */
+
+  snprintf(fname, fnamesize, "%s/%d-%s.%s", printer->directory, job->id, name, ext);
 }
 
 
@@ -3191,24 +3244,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
-    snprintf(filename, sizeof(filename), "%s/%d.jpg",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/png"))
-    snprintf(filename, sizeof(filename), "%s/%d.png",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/pwg-raster"))
-    snprintf(filename, sizeof(filename), "%s/%d.ras",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/pdf"))
-    snprintf(filename, sizeof(filename), "%s/%d.pdf",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/postscript"))
-    snprintf(filename, sizeof(filename), "%s/%d.ps",
-             client->printer->directory, job->id);
-  else
-    snprintf(filename, sizeof(filename), "%s/%d.prn",
-             client->printer->directory, job->id);
+  create_job_filename(client->printer, job, filename, sizeof(filename));
 
   if (Verbosity)
     fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
@@ -3696,44 +3732,18 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
   _cupsRWLockWrite(&(client->printer->rwlock));
 
-  if ((attr = ippFindAttribute(client->request, "compression", IPP_TAG_KEYWORD)) != NULL)
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD, "compression-supplied", NULL, ippGetString(attr, 0, NULL));
-
-  if ((attr = ippFindAttribute(client->request, "document-format-supplied", IPP_TAG_MIMETYPE)) != NULL)
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-supplied", NULL, ippGetString(attr, 0, NULL));
-
-  if ((attr = ippFindAttribute(client->request, "document-name", IPP_TAG_NAME)) != NULL)
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
-
-  if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_MIMETYPE)) != NULL)
+  if ((attr = ippFindAttribute(job->attrs, "document-format-detected", IPP_TAG_MIMETYPE)) != NULL)
+    job->format = ippGetString(attr, 0, NULL);
+  else if ((attr = ippFindAttribute(job->attrs, "document-format-supplied", IPP_TAG_MIMETYPE)) != NULL)
     job->format = ippGetString(attr, 0, NULL);
   else
     job->format = "application/octet-stream";
-
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format", NULL, job->format);
 
  /*
   * Create a file for the request data...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
-    snprintf(filename, sizeof(filename), "%s/%d.jpg",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/png"))
-    snprintf(filename, sizeof(filename), "%s/%d.png",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "image/pwg-raster"))
-    snprintf(filename, sizeof(filename), "%s/%d.ras",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/pdf"))
-    snprintf(filename, sizeof(filename), "%s/%d.pdf",
-             client->printer->directory, job->id);
-  else if (!strcasecmp(job->format, "application/postscript"))
-    snprintf(filename, sizeof(filename), "%s/%d.ps",
-             client->printer->directory, job->id);
-  else
-    snprintf(filename, sizeof(filename), "%s/%d.prn",
-             client->printer->directory, job->id);
+  create_job_filename(client->printer, job, filename, sizeof(filename));
 
   if (Verbosity)
     fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
@@ -5738,8 +5748,7 @@ valid_doc_attributes(
   * Check operation attributes...
   */
 
-  if ((attr = ippFindAttribute(client->request, "compression",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "compression", IPP_TAG_ZERO)) != NULL)
   {
    /*
     * If compression is specified, only accept a supported value in a Print-Job
@@ -5761,8 +5770,9 @@ valid_doc_attributes(
     }
     else
     {
-      fprintf(stderr, "%s %s compression=\"%s\"\n",
-              client->hostname, op_name, compression);
+      fprintf(stderr, "%s %s compression=\"%s\"\n", client->hostname, op_name, compression);
+
+      ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "compression-supplied", NULL, compression);
 
       if (strcmp(compression, "none"))
       {
@@ -5777,8 +5787,7 @@ valid_doc_attributes(
   * Is it a format we support?
   */
 
-  if ((attr = ippFindAttribute(client->request, "document-format",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "document-format", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_MIMETYPE ||
         ippGetGroupTag(attr) != IPP_TAG_OPERATION)
@@ -5798,24 +5807,20 @@ valid_doc_attributes(
   }
   else
   {
-    format = ippGetString(ippFindAttribute(client->printer->attrs,
-                                           "document-format-default",
-                                           IPP_TAG_MIMETYPE), 0, NULL);
+    format = ippGetString(ippFindAttribute(client->printer->attrs, "document-format-default", IPP_TAG_MIMETYPE), 0, NULL);
     if (!format)
       format = "application/octet-stream"; /* Should never happen */
 
     attr = ippAddString(client->request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, format);
   }
 
-  if (!strcmp(format, "application/octet-stream") &&
-      (ippGetOperation(client->request) == IPP_OP_PRINT_JOB ||
-       ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
+  if (!strcmp(format, "application/octet-stream") && (ippGetOperation(client->request) == IPP_OP_PRINT_JOB || ippGetOperation(client->request) == IPP_OP_SEND_DOCUMENT))
   {
    /*
-    * Auto-type the file using the first 4 bytes of the file...
+    * Auto-type the file using the first 8 bytes of the file...
     */
 
-    unsigned char	header[4];	/* First 4 bytes of file */
+    unsigned char	header[8];	/* First 8 bytes of file */
 
     memset(header, 0, sizeof(header));
     httpPeek(client->http, (char *)header, sizeof(header));
@@ -5824,32 +5829,38 @@ valid_doc_attributes(
       format = "application/pdf";
     else if (!memcmp(header, "%!", 2))
       format = "application/postscript";
-    else if (!memcmp(header, "\377\330\377", 3) &&
-	     header[3] >= 0xe0 && header[3] <= 0xef)
+    else if (!memcmp(header, "\377\330\377", 3) && header[3] >= 0xe0 && header[3] <= 0xef)
       format = "image/jpeg";
     else if (!memcmp(header, "\211PNG", 4))
       format = "image/png";
+    else if (!memcmp(header, "RAS2", 4))
+      format = "image/pwg-raster";
+    else if (!memcmp(header, "UNIRAST", 8))
+      format = "image/urf";
+    else
+      format = NULL;
 
     if (format)
+    {
       fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
 	      client->hostname, op_name, format);
 
-    if (!attr)
-      attr = ippAddString(client->request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-                          "document-format", NULL, format);
-    else
-      ippSetString(client->request, &attr, 0, format);
+      ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-detected", NULL, format);
+    }
   }
 
-  if (op != IPP_OP_CREATE_JOB &&
-      (supported = ippFindAttribute(client->printer->attrs,
-                                    "document-format-supported",
-			            IPP_TAG_MIMETYPE)) != NULL &&
-      !ippContainsString(supported, format))
+  if (op != IPP_OP_CREATE_JOB && (supported = ippFindAttribute(client->printer->attrs, "document-format-supported", IPP_TAG_MIMETYPE)) != NULL && !ippContainsString(supported, format))
   {
     respond_unsupported(client, attr);
     valid = 0;
   }
+
+ /*
+  * document-name
+  */
+
+  if ((attr = ippFindAttribute(client->request, "document-name", IPP_TAG_NAME)) != NULL)
+    ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
 
   return (valid);
 }
@@ -5882,8 +5893,7 @@ valid_job_attributes(
   * Check the various job template attributes...
   */
 
-  if ((attr = ippFindAttribute(client->request, "copies",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "copies", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_INTEGER ||
         ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 999)
@@ -5893,8 +5903,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "ipp-attribute-fidelity",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "ipp-attribute-fidelity", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_BOOLEAN)
     {
@@ -5903,8 +5912,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "job-hold-until",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "job-hold-until", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 ||
         (ippGetValueTag(attr) != IPP_TAG_NAME &&
@@ -5917,8 +5925,16 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "job-name",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "job-impressions", IPP_TAG_ZERO)) != NULL)
+  {
+    if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetInteger(attr, 0) < 0)
+    {
+      respond_unsupported(client, attr);
+      valid = 0;
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-name", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 ||
         (ippGetValueTag(attr) != IPP_TAG_NAME &&
@@ -5927,10 +5943,13 @@ valid_job_attributes(
       respond_unsupported(client, attr);
       valid = 0;
     }
-  }
 
-  if ((attr = ippFindAttribute(client->request, "job-priority",
-                               IPP_TAG_ZERO)) != NULL)
+    ippSetGroupTag(client->request, &attr, IPP_TAG_JOB);
+  }
+  else
+    ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL, "Untitled");
+
+  if ((attr = ippFindAttribute(client->request, "job-priority", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_INTEGER ||
         ippGetInteger(attr, 0) < 1 || ippGetInteger(attr, 0) > 100)
@@ -5940,8 +5959,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "job-sheets",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "job-sheets", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 ||
         (ippGetValueTag(attr) != IPP_TAG_NAME &&
@@ -5954,8 +5972,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "media",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "media", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 ||
         (ippGetValueTag(attr) != IPP_TAG_NAME &&
@@ -5981,8 +5998,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "media-col",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "media-col", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 ||
         ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
@@ -5993,8 +6009,7 @@ valid_job_attributes(
     /* TODO: check for valid media-col */
   }
 
-  if ((attr = ippFindAttribute(client->request, "multiple-document-handling",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "multiple-document-handling", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
         (strcmp(ippGetString(attr, 0, NULL),
@@ -6007,8 +6022,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "orientation-requested",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "orientation-requested", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_ENUM ||
         ippGetInteger(attr, 0) < IPP_ORIENT_PORTRAIT ||
@@ -6019,8 +6033,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "page-ranges",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "page-ranges", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetValueTag(attr) != IPP_TAG_RANGE)
     {
@@ -6029,8 +6042,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "print-quality",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "print-quality", IPP_TAG_ZERO)) != NULL)
   {
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_ENUM ||
         ippGetInteger(attr, 0) < IPP_QUALITY_DRAFT ||
@@ -6041,8 +6053,7 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "printer-resolution",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "printer-resolution", IPP_TAG_ZERO)) != NULL)
   {
     supported = ippFindAttribute(client->printer->attrs, "printer-resolution-supported", IPP_TAG_RESOLUTION);
 
@@ -6078,21 +6089,17 @@ valid_job_attributes(
     }
   }
 
-  if ((attr = ippFindAttribute(client->request, "sides",
-                               IPP_TAG_ZERO)) != NULL)
+  if ((attr = ippFindAttribute(client->request, "sides", IPP_TAG_ZERO)) != NULL)
   {
-    const char *sides = NULL;		/* "sides" value... */
+    const char *sides = ippGetString(attr, 0, NULL);
+					/* "sides" value... */
 
     if (ippGetCount(attr) != 1 || ippGetValueTag(attr) != IPP_TAG_KEYWORD)
     {
       respond_unsupported(client, attr);
       valid = 0;
     }
-
-    sides = ippGetString(attr, 0, NULL);
-
-    if ((supported = ippFindAttribute(client->printer->attrs, "sides-supported",
-                                      IPP_TAG_KEYWORD)) != NULL)
+    else if ((supported = ippFindAttribute(client->printer->attrs, "sides-supported", IPP_TAG_KEYWORD)) != NULL)
     {
       if (!ippContainsString(supported, sides))
       {
