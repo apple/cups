@@ -13,8 +13,10 @@ CHANGES IN CUPS V2.0rc1
 	- Dropped the old Epson Stylus Color/Photo sample drivers since they
 	  don't work with any current printers and there are free alternatives
 	  that produce much better output (<rdar://problem/18036889>)
-	- Log and configuration files that are read-only are again accessible
-	  via the web interface (STR #4461)
+	- Log and configuration files that are not world-readable are again
+	  accessible via the web interface (STR #4461)
+	- PPD files are now created using the permissions specified by the
+	  ConfigFilePerm directive.
 
 
 CHANGES IN CUPS V2.0b1
