@@ -2372,6 +2372,7 @@ html_header(_ipp_client_t *client,	/* I - Client */
 	      "<head>\n"
 	      "<title>%s</title>\n"
 	      "<link rel=\"shortcut icon\" href=\"/icon.png\" type=\"image/png\">\n"
+	      "<link rel=\"apple-touch-icon\" href=\"/icon.png\" type=\"image/png\">\n"
 	      "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=9\">\n"
 	      "<meta name=\"viewport\" content=\"width=device-width\">\n"
 	      "<style>\n"
