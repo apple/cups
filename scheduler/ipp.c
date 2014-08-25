@@ -2715,7 +2715,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "Copied PPD file successfully");
-      chmod(dstfile, 0644);
     }
   }
 
@@ -4623,7 +4622,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   * Open the destination file for a copy...
   */
 
-  if ((dst = cupsFileOpen(to, "wb")) == NULL)
+  if ((dst = cupsdCreateConfFile(to, ConfigFilePerm)) == NULL)
   {
     cupsFreeOptions(num_defaults, defaults);
     cupsFileClose(src);
@@ -4678,7 +4677,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
   unlink(tempfile);
 
-  return (cupsFileClose(dst));
+  return (cupsdCloseCreatedConfFile(dst, to));
 }
 
 
