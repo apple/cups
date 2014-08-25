@@ -21,7 +21,23 @@
 #   ./ipp-tests.sh "Printer Name"
 #
 
-ippfind "$1._ipp._tcp.local." -x ipptool -P "$1 IPP Results.plist" -I '{}' ipp-tests.test \;
+if test -x ../test/ippfind-static; then
+	IPPFIND="../test/ippfind-static"
+elif test -x ./ippfind; then
+	IPPFIND="./ippfind"
+else
+	IPPFIND="ippfind"
+fi
+
+if test -x ../test/ipptool-static; then
+	IPPTOOL="../test/ipptool-static"
+elif test -x ./ipptool; then
+	IPPTOOL="./ipptool"
+else
+	IPPTOOL="ipptool"
+fi
+
+$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 IPP Results.plist" -I '{}' ipp-tests.test \;
 
 #
 # End of "$Id$".

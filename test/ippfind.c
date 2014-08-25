@@ -242,7 +242,7 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int			i,		/* Looping var */
 			have_output = 0,/* Have output expression */
-			status = IPPFIND_EXIT_TRUE;
+			status = IPPFIND_EXIT_FALSE;
 					/* Exit status */
   const char		*opt,		/* Option character */
 			*search;	/* Current browse/resolve string */
@@ -1420,8 +1420,8 @@ main(int  argc,				/* I - Number of command-line args */
 	    service->ref = NULL;
 	  }
 
-          if (!eval_expr(service, expressions))
-            status = IPPFIND_EXIT_FALSE;
+          if (eval_expr(service, expressions))
+            status = IPPFIND_EXIT_TRUE;
 
           service->is_processed = 1;
         }

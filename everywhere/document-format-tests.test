@@ -27,8 +27,10 @@
 # data is available in the "everywhere" subdirectory of the CUPS source code.
 #
 
+FILE-ID "org.pwg.ipp-everywhere.document-format-20140825"
+
 {
-	NAME "1. PWG Raster Format Tests (mandatory)"
+	NAME "D-1. PWG Raster Format Tests (mandatory)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -54,7 +56,7 @@
 #### 1.1 NO COMPRESSION ####
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
-	NAME "1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1"
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -69,7 +71,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
-	NAME "1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8"
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -84,7 +86,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
-	NAME "1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8"
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -99,7 +101,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
-	NAME "1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	NAME "D-1.1 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -117,7 +119,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, deflate"
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -135,7 +137,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, deflate"
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -153,7 +155,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, deflate"
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -171,7 +173,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_DEFLATE
-	NAME "1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, deflate"
+	NAME "D-1.2 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, deflate"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -191,7 +193,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, gzip"
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, black-1, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -209,7 +211,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, gzip"
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, sgray-8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -227,7 +229,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, gzip"
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, srgb-8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -245,7 +247,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
 	SKIP-IF-NOT-DEFINED HAVE_GZIP
-	NAME "1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, gzip"
+	NAME "D-1.3 Print color.jpg-4x6.pwg @ $RASTER_RESOLUTION, cmyk-8, gzip"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -264,7 +266,7 @@
 #### 1.4 A4 TESTS ####
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
-	NAME "1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, black-1"
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, black-1"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -279,7 +281,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
-	NAME "1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, sgray-8"
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, sgray-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -294,7 +296,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
-	NAME "1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, srgb-8"
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, srgb-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -309,7 +311,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
-	NAME "1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	NAME "D-1.4 Print document-a4.pwg @ $RASTER_RESOLUTION, cmyk-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -326,7 +328,7 @@
 #### 1.5 US Letter TESTS ####
 {
 	SKIP-IF-NOT-DEFINED HAVE_BLACK
-	NAME "1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, black-1"
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, black-1"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -341,7 +343,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SGRAY
-	NAME "1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, sgray-8"
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, sgray-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -356,7 +358,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_SRGB
-	NAME "1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, srgb-8"
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, srgb-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -371,7 +373,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_CMYK
-	NAME "1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, cmyk-8"
+	NAME "D-1.5 Print document-letter.pwg @ $RASTER_RESOLUTION, cmyk-8"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -387,7 +389,7 @@
 
 #### JPEG Tests
 {
-	NAME "2. JPEG Tests (mandatory)"
+	NAME "D-2. JPEG Tests (mandatory)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -400,7 +402,7 @@
 	EXPECT document-format-supported OF-TYPE mimeMediaType IN-GROUP printer-attributes-tag WITH-VALUE "image/jpeg"
 }
 {
-	NAME "2.1 Print color.jpg with defaults"
+	NAME "D-2.1 Print color.jpg with defaults"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -415,7 +417,7 @@
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
-	NAME "2.2 Print color.jpg with copies=2"
+	NAME "D-2.2 Print color.jpg with copies=2"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -432,7 +434,7 @@
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
-	NAME "2.3 Print color.jpg with print-color-mode=monochrome"
+	NAME "D-2.3 Print color.jpg with print-color-mode=monochrome"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -449,7 +451,7 @@
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
-	NAME "2.4 Print color.jpg with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	NAME "D-2.4 Print color.jpg with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -467,7 +469,7 @@
 	STATUS server-error-busy REPEAT-MATCH REPEAT-LIMIT 30
 }
 {
-	NAME "2.5 Print color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	NAME "D-2.5 Print color.jpg with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -487,7 +489,7 @@
 
 #### PDF Tests
 {
-	NAME "3. PDF Tests (if PDF is supported)"
+	NAME "D-3. PDF Tests (if PDF is supported)"
 	OPERATION Get-Printer-Attributes
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -502,7 +504,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
-	NAME "3.1 Print document-letter.pdf with defaults"
+	NAME "D-3.1 Print document-letter.pdf with defaults"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -518,7 +520,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
-	NAME "3.2 Print document-letter.pdf with copies=2"
+	NAME "D-3.2 Print document-letter.pdf with copies=2"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -536,7 +538,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
-	NAME "3.3 Print document-letter.pdf with page-ranges=3-3 and print-color-mode=monochrome"
+	NAME "D-3.3 Print document-letter.pdf with page-ranges=3-3 and print-color-mode=monochrome"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -556,7 +558,7 @@
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
 	SKIP-IF-NOT-DEFINED HAVE_DUPLEX
-	NAME "3.4 Print document-letter.pdf with sides=two-sided-long-edge"
+	NAME "D-3.4 Print document-letter.pdf with sides=two-sided-long-edge"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -574,7 +576,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
-	NAME "3.5 Print document-letter.pdf with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
+	NAME "D-3.5 Print document-letter.pdf with media=iso_a4_210x297mm and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
@@ -593,7 +595,7 @@
 }
 {
 	SKIP-IF-NOT-DEFINED HAVE_PDF
-	NAME "3.6 Print document-a4.pdf with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
+	NAME "D-3.6 Print document-a4.pdf with media=na_letter_8.5x11in and ipp-attribute-fidelity=true"
 	OPERATION Print-Job
 	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
