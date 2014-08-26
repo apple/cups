@@ -15,14 +15,12 @@
 #
 # Usage:
 #
-#   ./ipptool -tI printer-uri -d ADMINURL=url -d UUID=uuid bonjour-tests.test
+#   ./ipptool -tI printer-uri -d ADMINURL=url -d UUID=uuid bonjour-value-tests.test
 #
 
 FILE-ID "org.pwg.ipp-everywhere.bonjour-20140825"
 
 {
-	SKIP-IF-DEFINED NO_VALUE_TESTS
-
 	# The name of the test...
 	NAME "Validate TXT record values using Get-Printer-Attributes"
 
@@ -41,25 +39,6 @@ FILE-ID "org.pwg.ipp-everywhere.bonjour-20140825"
 	# What attributes do we expect?
 	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$ADMINURL"
 	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "urn:uuid:$UUID"
-}
-
-{
-	SKIP-IF-NOT-DEFINED NO_VALUE_TESTS
-
-	# The name of the test...
-	NAME "Validate Get-Printer-Attributes after HTTP Upgrade"
-
-	# The operation to use
-	OPERATION Get-Printer-Attributes
-
-	# Attributes, starting in the operation group...
-	GROUP operation-attributes-tag
-	ATTR charset attributes-charset utf-8
-	ATTR language attributes-natural-language en
-	ATTR uri printer-uri $uri
-
-	# What statuses are OK?
-	STATUS successful-ok
 }
 
 #

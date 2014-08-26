@@ -374,11 +374,7 @@ static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
 static void		*process_job(_ipp_job_t *job);
 #ifdef HAVE_DNSSD
-static int		register_printer(_ipp_printer_t *printer,
-			                 const char *location, const char *make,
-					 const char *model, const char *formats,
-					 const char *adminurl, int color,
-					 int duplex, const char *regtype);
+static int		register_printer(_ipp_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
 #endif /* HAVE_DNSSD */
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
@@ -2021,8 +2017,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   * Register the printer with Bonjour...
   */
 
-  if (!register_printer(printer, location, make, model, docformats, adminurl,
-                        ppm_color > 0, duplex, subtype))
+  if (!register_printer(printer, location, make, model, docformats, adminurl, uuid + 9, ppm_color > 0, duplex, subtype))
     goto bad_printer;
 #endif /* HAVE_DNSSD */
 
@@ -4316,13 +4311,15 @@ process_client(_ipp_client_t *client)	/* I - Client */
 
       if (recv(httpGetFd(client->http), buf, 1, MSG_PEEK) == 1 && (!buf[0] || !strchr("DGHOPT", buf[0])))
       {
-        fprintf(stderr, "%s Negotiating TLS session.\n", client->hostname);
+        fprintf(stderr, "%s Starting HTTPS session.\n", client->hostname);
 
 	if (httpEncryption(client->http, HTTP_ENCRYPTION_ALWAYS))
 	{
 	  fprintf(stderr, "%s Unable to encrypt connection: %s\n", client->hostname, cupsLastErrorString());
 	  break;
         }
+
+        fprintf(stderr, "%s Connection now encrypted.\n", client->hostname);
       }
 
       first_time = 0;
@@ -4437,7 +4434,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   if (httpSeparateURI(HTTP_URI_CODING_MOST, uri, scheme, sizeof(scheme),
 		      userpass, sizeof(userpass),
 		      hostname, sizeof(hostname), &port,
-		      client->uri, sizeof(client->uri)) < HTTP_URI_STATUS_OK)
+		      client->uri, sizeof(client->uri)) < HTTP_URI_STATUS_OK &&
+      (http_state != HTTP_STATE_OPTIONS || strcmp(uri, "*")))
   {
     fprintf(stderr, "%s Bad URI \"%s\".\n", client->hostname, uri);
     respond_http(client, HTTP_STATUS_BAD_REQUEST, NULL, NULL, 0);
@@ -4484,6 +4482,25 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   if (!strcasecmp(httpGetField(client->http, HTTP_FIELD_CONNECTION),
                         "Upgrade"))
   {
+#ifdef HAVE_SSL
+    if (strstr(httpGetField(client->http, HTTP_FIELD_UPGRADE), "TLS/") != NULL && !httpIsEncrypted(client->http))
+    {
+      if (!respond_http(client, HTTP_STATUS_SWITCHING_PROTOCOLS, NULL, NULL, 0))
+        return (0);
+
+      fprintf(stderr, "%s Upgrading to encrypted connection.\n", client->hostname);
+
+      if (httpEncryption(client->http, HTTP_ENCRYPTION_REQUIRED))
+      {
+        fprintf(stderr, "%s Unable to encrypt connection: %s\n", client->hostname, cupsLastErrorString());
+	return (0);
+      }
+
+      fprintf(stderr, "%s Connection now encrypted.\n", client->hostname);
+    }
+    else
+#endif /* HAVE_SSL */
+
     if (!respond_http(client, HTTP_STATUS_NOT_IMPLEMENTED, NULL, NULL, 0))
       return (0);
   }
@@ -4526,7 +4543,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   {
     case HTTP_STATE_OPTIONS :
        /*
-	* Do HEAD/OPTIONS command...
+	* Do OPTIONS command...
 	*/
 
 	return (respond_http(client, HTTP_STATUS_OK, NULL, NULL, 0));
@@ -5280,6 +5297,7 @@ register_printer(
     const char     *model,		/* I - Model name */
     const char     *formats,		/* I - Supported formats */
     const char     *adminurl,		/* I - Web interface URL */
+    const char     *uuid,		/* I - Printer UUID */
     int            color,		/* I - 1 = color, 0 = monochrome */
     int            duplex,		/* I - 1 = duplex, 0 = simplex */
     const char     *subtype)		/* I - Service subtype */
@@ -5316,6 +5334,10 @@ register_printer(
                     make);
   TXTRecordSetValue(&(printer->ipp_txt), "usb_MDL", (uint8_t)strlen(model),
                     model);
+  TXTRecordSetValue(&(printer->ipp_txt), "UUID", (uint8_t)strlen(uuid), uuid);
+#  ifdef HAVE_SSL
+  TXTRecordSetValue(&(printer->ipp_txt), "TLS", 3, "1.2");
+#  endif /* HAVE_SSL */
 
  /*
   * Create a shared service reference for Bonjour...
@@ -5461,7 +5483,7 @@ respond_http(
   * Format an error message...
   */
 
-  if (!type && !length && code != HTTP_STATUS_OK)
+  if (!type && !length && code != HTTP_STATUS_OK && code != HTTP_STATUS_SWITCHING_PROTOCOLS)
   {
     snprintf(message, sizeof(message), "%d - %s\n", code, httpStatus(code));
 

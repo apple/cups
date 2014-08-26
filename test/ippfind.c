@@ -603,9 +603,9 @@ main(int  argc,				/* I - Number of command-line args */
                                NULL)) == NULL)
             return (IPPFIND_EXIT_MEMORY);
         }
-        else if (!strncmp(argv[i], "--txt-", 5))
+        else if (!strncmp(argv[i], "--txt-", 6))
         {
-          const char *key = argv[i] + 5;/* TXT key */
+          const char *key = argv[i] + 6;/* TXT key */
 
           i ++;
           if (i >= argc)
@@ -1803,6 +1803,9 @@ eval_expr(ippfind_srv_t  *service,	/* I - Service */
 	    result = !regexec(&(expression->re), val, 0, NULL, 0);
 	  else
 	    result = 0;
+
+	  if (getenv("IPPFIND_DEBUG"))
+	    printf("TXT_REGEX of \"%s\": %d\n", val, result);
           break;
       case IPPFIND_OP_URI_REGEX :
           result = !regexec(&(expression->re), service->uri, 0, NULL, 0);
@@ -1976,9 +1979,9 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 	    strlcpy(tptr, scheme + 22, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strncmp(keyword, "txt_", 4))
 	  {
-	    if ((ptr = (char *)cupsGetOption(keyword + 4, service->num_txt,
-					     service->txt)) != NULL)
-	      strlcpy(tptr, strdup(ptr), sizeof(temp) - (size_t)(tptr - temp));
+	    const char *txt = cupsGetOption(keyword + 4, service->num_txt, service->txt);
+	    if (txt)
+	      strlcpy(tptr, txt, sizeof(temp) - (size_t)(tptr - temp));
 	    else
 	      *tptr = '\0';
 	  }
@@ -2069,6 +2072,14 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
  /*
   * Return whether the program succeeded or crashed...
   */
+
+  if (getenv("IPPFIND_DEBUG"))
+  {
+    if (WIFEXITED(status))
+      printf("Exit Status: %d\n", WEXITSTATUS(status));
+    else
+      printf("Terminating Signal: %d\n", WTERMSIG(status));
+  }
 
   return (status == 0);
 }
