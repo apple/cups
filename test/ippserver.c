@@ -3741,6 +3741,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
     return;
   }
 
+  copy_attributes(job->attrs, client->request, NULL, IPP_TAG_JOB, 0);
+
  /*
   * Get the document format for the job...
   */
