@@ -2471,6 +2471,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
       {
 	fputs("<key>Successful</key>\n", outfile);
 	fputs("<true />\n", outfile);
+	fputs("<key>Skipped</key>\n", outfile);
+	fputs("<true />\n", outfile);
 	fputs("<key>StatusCode</key>\n", outfile);
 	print_xml_string(outfile, "string", "skip");
 	fputs("<key>ResponseAttributes</key>\n", outfile);

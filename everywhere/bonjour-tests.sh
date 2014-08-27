@@ -139,7 +139,7 @@ cat >"$PLIST" <<EOF
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-<key>FileId</key><string>org.pwg.ipp-everywhere.bonjour-20140825</string>
+<key>FileId</key><string>org.pwg.ipp-everywhere.20140826.bonjour</string>
 <key>Tests</key><array>
 EOF
 
@@ -159,6 +159,9 @@ end_test() {
 	echo $1
 	if test $1 = FAIL; then
 		echo "<key>Successful</key><false />" >>"$PLIST"
+	elif test $1 = SKIP; then
+		echo "<key>Successful</key><true />" >>"$PLIST"
+		echo "<key>Skipped</key><true />" >>"$PLIST"
 	else
 		echo "<key>Successful</key><true />" >>"$PLIST"
 	fi

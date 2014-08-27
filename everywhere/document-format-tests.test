@@ -27,7 +27,7 @@
 # data is available in the "everywhere" subdirectory of the CUPS source code.
 #
 
-FILE-ID "org.pwg.ipp-everywhere.document-format-20140825"
+FILE-ID "org.pwg.ipp-everywhere.20140826.document"
 
 {
 	NAME "D-1. PWG Raster Format Tests (mandatory)"
