@@ -139,7 +139,6 @@ cat >"$PLIST" <<EOF
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-<key>FileId</key><string>org.pwg.ipp-everywhere.20140826.bonjour</string>
 <key>Tests</key><array>
 EOF
 
@@ -153,6 +152,7 @@ start_test() {
 	total=`expr $total + 1`
 	echo $ac_n "$1: $ac_c"
 	echo "<dict><key>Name</key><string>$1</string>" >>"$PLIST"
+	echo "<key>FileId</key><string>org.pwg.ipp-everywhere.20140826.bonjour</string>" >>"$PLIST"
 }
 # end_test PASS/FAIL/SKIP
 end_test() {
