@@ -46,7 +46,7 @@
 #    include "tls-gnutls.c"
 #  elif defined(HAVE_CDSASSL)
 #    include "tls-darwin.c"
-#  else defined(HAVE_SSPI)
+#  elif defined(HAVE_SSPI)
 #    include "tls-sspi.c"
 #  endif /* HAVE_GNUTLS */
 #else

@@ -1793,8 +1793,8 @@ httpPeek(http_t *http,			/* I - HTTP connection */
 
       memcpy(http->sbuffer + http->stream.avail_in, http->buffer, buflen);
       http->stream.avail_in += buflen;
-      http->used            -= buflen;
-      http->data_remaining  -= buflen;
+      http->used            -= (int)buflen;
+      http->data_remaining  -= (off_t)buflen;
 
       if (http->used > 0)
         memmove(http->buffer, http->buffer + buflen, (size_t)http->used);
