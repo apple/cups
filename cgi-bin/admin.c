@@ -1897,7 +1897,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     }
     else
     {
-      cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
+      cgiSetVariable("refresh_page", "5;URL=/admin/");
 
       cgiStartHTML(cgiText(_("Edit Configuration File")));
       cgiCopyTemplateLang("restart.tmpl");

@@ -18,6 +18,8 @@ CHANGES IN CUPS V2.0rc1
 	- PPD files are now created using the permissions specified by the
 	  ConfigFilePerm directive.
 	- Fixed RPM build issues (STR #4459)
+	- Fixed the spinner image and restart page when reconfiguring the
+	  scheduler through the web interface (STR #4475)
 
 
 CHANGES IN CUPS V2.0b1
