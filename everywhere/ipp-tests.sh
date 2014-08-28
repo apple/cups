@@ -37,6 +37,12 @@ else
 	IPPTOOL="ipptool"
 fi
 
+for file in color.jpg; do
+	if test ! -f $file -a -f ../test/$file; then
+		ln -s ../test/$file .
+	fi
+done
+
 $IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 IPP Results.plist" -I '{}' ipp-tests.test \;
 
 #

@@ -38,6 +38,8 @@
 
 #include <sys/wait.h>
 
+extern char **environ;
+
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
@@ -318,7 +320,7 @@ static void		copy_job_attributes(_ipp_client_t *client,
 			                    _ipp_job_t *job, cups_array_t *ra);
 static _ipp_client_t	*create_client(_ipp_printer_t *printer, int sock);
 static _ipp_job_t	*create_job(_ipp_client_t *client);
-static int		create_listener(int family, int *port);
+static int		create_listener(int family, int port);
 static ipp_t		*create_media_col(const char *media, const char *source, const char *type, int width, int length, int margins);
 static ipp_t		*create_media_size(int width, int length);
 static _ipp_printer_t	*create_printer(const char *servername,
@@ -424,12 +426,13 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_DNSSD
   const char	*subtype = "_print";	/* Bonjour service subtype */
 #endif /* HAVE_DNSSD */
-  int		port = 8631,		/* Port number (0 = auto) */
+  int		port = 0,		/* Port number (0 = auto) */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
 		ppm_color = 0,		/* Pages per minute for color */
 		pin = 0;		/* PIN printing mode? */
-  char		directory[1024] = "";	/* Spool directory */
+  char		directory[1024] = "",	/* Spool directory */
+		hostname[1024];		/* Auto-detected hostname */
   _ipp_printer_t *printer;		/* Printer object */
 
 
@@ -576,6 +579,15 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Apply defaults as needed...
   */
+
+  if (!servername)
+    servername = httpGetHostname(NULL, hostname, sizeof(hostname));
+
+  if (!port)
+  {
+    port = 8000 + ((int)getuid() % 1000);
+    fprintf(stderr, "Listening on port %d.\n", port);
+  }
 
   if (!directory[0])
   {
@@ -1051,26 +1063,20 @@ static void create_job_filename(
  * 'create_listener()' - Create a listener socket.
  */
 
-static int				/* O  - Listener socket or -1 on error */
-create_listener(int family,		/* I  - Address family */
-                int *port)		/* IO - Port number */
+static int				/* O - Listener socket or -1 on error */
+create_listener(int family,		/* I - Address family */
+                int port)		/* I - Port number */
 {
   int			sock;		/* Listener socket */
   http_addrlist_t	*addrlist;	/* Listen address */
   char			service[255];	/* Service port */
 
 
-  if (!*port)
-  {
-    *port = 8000 + ((int)getuid() % 1000);
-    fprintf(stderr, "Listening on port %d.\n", *port);
-  }
-
-  snprintf(service, sizeof(service), "%d", *port);
+  snprintf(service, sizeof(service), "%d", port);
   if ((addrlist = httpAddrGetList(NULL, family, service)) == NULL)
     return (-1);
 
-  sock = httpAddrListen(&(addrlist->addr), *port);
+  sock = httpAddrListen(&(addrlist->addr), port);
 
   httpAddrFreeList(addrlist);
 
@@ -1174,8 +1180,10 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 {
   int			i, j;		/* Looping vars */
   _ipp_printer_t	*printer;	/* Printer */
-  char			hostname[256],	/* Hostname */
-			uri[1024],	/* Printer URI */
+#ifndef WIN32
+  char			path[1024];	/* Full path to command */
+#endif /* !WIN32 */
+  char			uri[1024],	/* Printer URI */
 			icons[1024],	/* printer-icons URI */
 			adminurl[1024],	/* printer-more-info URI */
 			supplyurl[1024],/* printer-supply-info-uri URI */
@@ -1361,13 +1369,41 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   };
 
 
+#ifndef WIN32
+ /*
+  * If a command was specified, make sure it exists and is executable...
+  */
+
+  if (command)
+  {
+    if (*command == '/' || !strncmp(command, "./", 2))
+    {
+      if (access(command, X_OK))
+      {
+        fprintf(stderr, "ippserver: Unable to execute command \"%s\": %s\n", command, strerror(errno));
+	return (NULL);
+      }
+    }
+    else
+    {
+      if (!cupsFileFind(command, getenv("PATH"), 1, path, sizeof(path)))
+      {
+	fprintf(stderr, "ippserver: Unable to find command \"%s\".\n", command);
+	return (NULL);
+      }
+
+      command = path;
+    }
+  }
+#endif /* !WIN32 */
+
  /*
   * Allocate memory for the printer...
   */
 
   if ((printer = calloc(1, sizeof(_ipp_printer_t))) == NULL)
   {
-    perror("Unable to allocate memory for printer");
+    perror("ippserver: Unable to allocate memory for printer");
     return (NULL);
   }
 
@@ -1379,7 +1415,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 #endif /* HAVE_DNSSD */
   printer->command       = command ? strdup(command) : NULL;
   printer->directory     = strdup(directory);
-  printer->hostname      = strdup(servername ? servername : httpGetHostname(NULL, hostname, sizeof(hostname)));
+  printer->hostname      = strdup(servername);
   printer->port          = port;
   printer->start_time    = time(NULL);
   printer->config_time   = printer->start_time;
@@ -1420,13 +1456,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   * Create the listener sockets...
   */
 
-  if ((printer->ipv4 = create_listener(AF_INET, &(printer->port))) < 0)
+  if ((printer->ipv4 = create_listener(AF_INET, printer->port)) < 0)
   {
     perror("Unable to create IPv4 listener");
     goto bad_printer;
   }
 
-  if ((printer->ipv6 = create_listener(AF_INET6, &(printer->port))) < 0)
+  if ((printer->ipv6 = create_listener(AF_INET6, printer->port)) < 0)
   {
     perror("Unable to create IPv6 listener");
     goto bad_printer;
@@ -5210,19 +5246,79 @@ process_job(_ipp_job_t *job)		/* I - Job */
 		status;			/* Exit status */
     time_t	start,			/* Start time */
 		end;			/* End time */
+    char	*myargv[3],		/* Command-line arguments */
+		*myenvp[200];		/* Environment variables */
+    int		myenvc;			/* Number of environment variables */
+    ipp_attribute_t *attr;		/* Job attribute */
+    char	val[1280],		/* IPP_NAME=value */
+		*valptr;		/* Pointer into string */
 
     fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
             job->filename);
     time(&start);
 
+   /*
+    * Setup the command-line arguments...
+    */
+
+    myargv[0] = job->printer->command;
+    myargv[1] = job->filename;
+    myargv[2] = NULL;
+
+   /*
+    * Copy the current environment, then add ENV variables for every Job
+    * attribute...
+    */
+
+    for (myenvc = 0; environ[myenvc] && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); myenvc ++)
+      myenvp[myenvc] = strdup(environ[myenvc]);
+
+    for (attr = ippFirstAttribute(job->attrs); attr && myenvc < (int)(sizeof(myenvp) / sizeof(myenvp[0]) - 1); attr = ippNextAttribute(job->attrs))
+    {
+     /*
+      * Convert "attribute-name" to "IPP_ATTRIBUTE_NAME=" and then add the
+      * value(s) from the attribute.
+      */
+
+      const char *name = ippGetName(attr);
+      if (!name)
+        continue;
+
+      valptr = val;
+      *valptr++ = 'I';
+      *valptr++ = 'P';
+      *valptr++ = 'P';
+      *valptr++ = '_';
+      while (*name && valptr < (val + sizeof(val) - 2))
+      {
+        if (*name == '-')
+	  *valptr++ = '_';
+	else
+	  *valptr++ = (char)toupper(*name & 255);
+
+	name ++;
+      }
+      *valptr++ = '=';
+      ippAttributeString(attr, valptr, sizeof(val) - (size_t)(valptr - val));
+
+      myenvp[myenvc++] = strdup(val);
+    }
+    myenvp[myenvc] = NULL;
+
+   /*
+    * Now run the program...
+    */
+
+#ifdef WIN32
+    status = _spawnvpe(_P_WAIT, job->printer->command, myargv, myenvp);
+#else
     if ((pid = fork()) == 0)
     {
      /*
       * Child comes here...
       */
 
-      execlp(job->printer->command, job->printer->command, job->filename,
-             (void *)NULL);
+      execve(job->printer->command, myargv, myenvp);
       exit(errno);
     }
     else if (pid < 0)
@@ -5232,34 +5328,48 @@ process_job(_ipp_job_t *job)		/* I - Job */
       */
 
       perror("Unable to start job processing command");
+      status = -1;
     }
     else
     {
      /*
+      * Free memory used for environment...
+      */
+
+      while (myenvc > 0)
+	free(myenvp[-- myenvc]);
+
+     /*
       * Wait for child to complete...
       */
 
-#ifdef HAVE_WAITPID
+#  ifdef HAVE_WAITPID
       while (waitpid(pid, &status, 0) < 0);
-#else
+#  else
       while (wait(&status) < 0);
-#endif /* HAVE_WAITPID */
-
-      if (status)
-      {
-        if (WIFEXITED(status))
-	  fprintf(stderr, "Command \"%s\" exited with status %d.\n",
-	          job->printer->command, WEXITSTATUS(status));
-        else
-	  fprintf(stderr, "Command \"%s\" terminated with signal %d.\n",
-	          job->printer->command, WTERMSIG(status));
-
-        job->state = IPP_JSTATE_ABORTED;
-      }
-      else
-	fprintf(stderr, "Command \"%s\" completed successfully.\n",
-		job->printer->command);
+#  endif /* HAVE_WAITPID */
     }
+#endif /* WIN32 */
+
+    if (status)
+    {
+#ifndef WIN32
+      if (WIFEXITED(status))
+#endif /* !WIN32 */
+	fprintf(stderr, "Command \"%s\" exited with status %d.\n",
+		job->printer->command, WEXITSTATUS(status));
+#ifndef WIN32
+      else
+	fprintf(stderr, "Command \"%s\" terminated with signal %d.\n",
+		job->printer->command, WTERMSIG(status));
+#endif /* !WIN32 */
+      job->state = IPP_JSTATE_ABORTED;
+    }
+    else if (status < 0)
+      job->state = IPP_JSTATE_ABORTED;
+    else
+      fprintf(stderr, "Command \"%s\" completed successfully.\n",
+	      job->printer->command);
 
    /*
     * Make sure processing takes at least 5 seconds...

@@ -865,6 +865,13 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
       }
 #endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
     }
+
+   /*
+    * Make sure .local hostnames end with a period...
+    */
+
+    if (strlen(s) > 6 && !strcmp(s + strlen(s) - 6, ".local"))
+      strlcat(s, ".", slen);
   }
 
  /*

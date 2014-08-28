@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ippserver(1)</title>
+</head>
+<body>
+<h1 class="title">ippserver(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ippserver - a simple internet printing protocol server
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ippserver</b>
+[
+<b>-2</b>
+] [
+<b>-M</b>
+<i>manufacturer</i>
+] [
+<b>-P</b>
+] [
+<b>-c</b>
+<i>command</i>
+] [
+<b>-d</b>
+<i>spool-directory</i>
+] [
+<b>-f</b>
+<i>type/subtype[,...]</i>
+] [
+<b>-h</b>
+] [
+<b>-i</b>
+<i>iconfile.png</i>
+] [
+<b>-k</b>
+] [
+<b>-l</b>
+<i>location</i>
+] [
+<b>-m</b>
+<i>model</i>
+] [
+<b>-n</b>
+<i>hostname</i>
+] [
+<b>-p</b>
+<i>port</i>
+] [
+<b>-r</b>
+<i>subtype</i>
+] [
+<b>-s</b>
+<i>speed[,color-speed]</i>
+] [
+<b>-v[vvv]</b>
+]
+<i>service-name</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ippserver</b>
+is a simple Internet Printing Protocol (IPP) server conforming to the IPP Everywhere (PWG 5100.14) specification. It can be used to test client software or act as a very basic print server that runs a command for every job that is printed.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized by
+<b>ippserver:</b>
+<dl class="man">
+<dt><b>-2</b>
+<dd style="margin-left: 5.0em">Report support for two-sided (duplex) printing.
+<dt><b>-M </b><i>manufacturer</i>
+<dd style="margin-left: 5.0em">Set the manufacturer of the printer.
+The default is "Test".
+<dt><b>-P</b>
+<dd style="margin-left: 5.0em">Report support for PIN printing.
+<dt><b>-c </b><i>command</i>
+<dd style="margin-left: 5.0em">Run the specified command for each document that is printed.
+<dt><b>-d </b><i>spool-directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory that will hold the print files.
+The default is a directory under the user's current temporary directory.
+<dt><b>-f </b><i>type/subtype[,...]</i>
+<dd style="margin-left: 5.0em">Specifies a list of MIME media types that the server will accept.
+The default is "application/pdf,image/jpeg,image/pwg-raster".
+<dt><b>-h</b>
+<dd style="margin-left: 5.0em">Shows program help.
+<dt><b>-i </b><i>iconfile.png</i>
+<dd style="margin-left: 5.0em">Specifies the printer icon file for the server.
+The default is "printer.png".
+<dt><b>-k</b>
+<dd style="margin-left: 5.0em">Keeps the print documents in the spool directory rather than deleting them.
+<dt><b>-l </b><i>location</i>
+<dd style="margin-left: 5.0em">Specifies the human-readable location string that is reported by the server.
+The default is the empty string.
+<dt><b>-m </b><i>model</i>
+<dd style="margin-left: 5.0em">Specifies the model name of the printer.
+The default is "Printer".
+<dt><b>-n </b><i>hostname</i>
+<dd style="margin-left: 5.0em">Specifies the hostname that is reported by the server.
+The default is the name returned by the
+<b>hostname</b>(1)
+command.
+<dt><b>-p </b><i>port</i>
+<dd style="margin-left: 5.0em">Specifies the port number to listen on.
+The default is a user-specific number from 8000 to 8999.
+<dt><b>-r </b><i>subtype</i>
+<dd style="margin-left: 5.0em">Specifies the Bonjour subtype(s) to advertise.
+Separate multiple subtypes with a comma.
+The default is "_print".
+<dt><b>-s </b><i>speed[,color-speed]</i>
+<dd style="margin-left: 5.0em">Specifies the printer speed in pages per minute.
+If two numbers are specified and the second number is greater than zero, the server will report support for color printing.
+The default is "10,0".
+<dt><b>-v[vvv]</b>
+<dd style="margin-left: 5.0em">Be (very) verbose when logging activity to the standard output.
+</dl>
+<h2 class="title"><a name="EXIT_STATUS">Exit Status</a></h2>
+The
+<b>ippserver</b>
+program returns 1 if it is unable to process the command-line arguments or register the IPP service.
+Otherwise
+<b>ippserver</b>
+will run continuously until terminated.
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The
+<b>ippserver</b>
+program is unique to CUPS and conforms to the IPP Everywhere (PWG 5100.14) specification.
+<h2 class="title"><a name="ENVIRONMENT">Environment</a></h2>
+<b>ippserver</b>
+adds environment variables starting with "IPP_" for all IPP Job attributes in the print request.
+For example, when executing a command for an IPP Job containing the "media" Job Template attribute, the "IPP_MEDIA" environment variable will be set to the value of that attribute.
+<p>Enumerated values are converted to their keyword equivalents.
+For example, a "print-quality" Job Template attribute with a enum value of 3 will become the "IPP_PRINT_QUALITY" environment variable with a value of "draft".
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Run
+<b>ippserver</b>
+with a service name of My Cool Printer:
+<pre class="man">
+
+    ippserver "My Cool Printer"
+</pre>
+<p>Run the
+<b>file</b>(1)
+command whenever a job is sent to the server:
+<pre class="man">
+
+    ippserver -c file "My Cool Printer"
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+PWG Internet Printing Protocol Workgroup (<a href="http://www.pwg.org/ipp">http://www.pwg.org/ipp</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2014 by Apple Inc.
+
+</body>
+</html>

@@ -18,7 +18,7 @@
 #
 # Usage:
 #
-#   ./document-format-tests.sh "Printer Name"
+#   ./document-tests.sh "Printer Name"
 #
 
 if test -x ../test/ippfind-static; then
@@ -37,7 +37,22 @@ else
 	IPPTOOL="ipptool"
 fi
 
-$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 Document Format Results.plist" -I '{}' document-format-tests.test \;
+for file in color.jpg document-a4.pdf document-letter.pdf; do
+	if test ! -f $file -a -f ../test/$file; then
+		ln -s ../test/$file .
+	fi
+done
+
+if test "`ls -d pwg-raster-samples-*dpi-20111130 2>/dev/null`" = ""; then
+	echo "You must first download and extract the PWG Raster Format sample files from:"
+	echo ""
+	echo "    http://ftp.pwg.org/pub/pwg/ipp/examples/"
+	echo ""
+	echo "Before you can run this script."
+	exit 1
+fi
+
+$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -P "$1 Document Results.plist" -I '{}' document-tests.test \;
 
 #
 # End of "$Id$".
