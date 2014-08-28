@@ -871,7 +871,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
     */
 
     if (strlen(s) > 6 && !strcmp(s + strlen(s) - 6, ".local"))
-      strlcat(s, ".", slen);
+      strlcat(s, ".", (size_t)slen);
   }
 
  /*
