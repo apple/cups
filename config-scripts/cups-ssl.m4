@@ -78,6 +78,11 @@ if test x$enable_ssl != xno; then
 	if test $have_ssl = 1; then
 	    CUPS_SERVERCERT="ssl/server.crt"
 	    CUPS_SERVERKEY="ssl/server.key"
+
+	    SAVELIBS="$LIBS"
+	    LIBS="$LIBS $SSLLIBS"
+	    AC_CHECK_FUNC(gnutls_transport_set_pull_timeout_function, AC_DEFINE(HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION))
+	    LIBS="$SAVELIBS"
 	fi
     fi
 fi

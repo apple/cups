@@ -1,4 +1,4 @@
-CHANGES.txt - 2.0rc1 - 2014-08-25
+CHANGES.txt - 2.0rc1 - 2014-08-28
 ---------------------------------
 
 CHANGES IN CUPS V2.0rc1
@@ -17,6 +17,7 @@ CHANGES IN CUPS V2.0rc1
 	  accessible via the web interface (STR #4461)
 	- PPD files are now created using the permissions specified by the
 	  ConfigFilePerm directive.
+	- Fixed RPM build issues (STR #4459)
 
 
 CHANGES IN CUPS V2.0b1
