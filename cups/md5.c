@@ -333,7 +333,7 @@ _cupsMD5Finish(_cups_md5_state_t *pms, unsigned char digest[16])
     for (i = 0; i < 8; ++i)
 	data[i] = (unsigned char)(pms->count[i >> 2] >> ((i & 3) << 3));
     /* Pad to 56 bytes mod 64. */
-    _cupsMD5Append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+    _cupsMD5Append(pms, pad, (int)((55 - (pms->count[0] >> 3)) & 63) + 1);
     /* Append the length. */
     _cupsMD5Append(pms, data, 8);
     for (i = 0; i < 16; ++i)

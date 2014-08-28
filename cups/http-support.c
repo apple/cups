@@ -649,7 +649,7 @@ httpDecode64_2(char       *out,		/* I  - String to write to */
 	  break;
       case 3 :
           if (outptr < outend)
-            *outptr++ |= base64;
+            *outptr++ |= (char)base64;
 	  pos = 0;
 	  break;
     }

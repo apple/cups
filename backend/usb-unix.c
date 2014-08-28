@@ -146,7 +146,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   tcgetattr(device_fd, &opts);
 
-  opts.c_lflag &= ~(ICANON | ECHO | ISIG);	/* Raw mode */
+  opts.c_lflag &= ~(unsigned)(ICANON | ECHO | ISIG);	/* Raw mode */
 
   /**** No options supported yet ****/
 

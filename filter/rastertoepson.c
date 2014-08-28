@@ -201,14 +201,14 @@ StartPage(
         if (Model < EPSON_ICOLOR)
 	{
 	  pwrite("\033(U\001\000", 5);		/* Resolution/units */
-	  putchar(3600 / header->HWResolution[1]);
+	  putchar((int)(3600 / header->HWResolution[1]));
         }
 	else
 	{
 	  pwrite("\033(U\005\000", 5);
-	  putchar(1440 / header->HWResolution[1]);
-	  putchar(1440 / header->HWResolution[1]);
-	  putchar(1440 / header->HWResolution[0]);
+	  putchar((int)(1440 / header->HWResolution[1]));
+	  putchar((int)(1440 / header->HWResolution[1]));
+	  putchar((int)(1440 / header->HWResolution[0]));
 	  putchar(0xa0);	/* n/1440ths... */
 	  putchar(0x05);
 	}
@@ -811,8 +811,8 @@ OutputRows(
     {
       putchar(0x1b);
       putchar('$');
-      putchar(i & 255);
-      putchar(i >> 8);
+      putchar((int)(i & 255));
+      putchar((int)(i >> 8));
     }
 
    /*
@@ -853,8 +853,8 @@ OutputRows(
     }
 
     n = dot_count / DotBytes;
-    putchar(n & 255);
-    putchar(n / 256);
+    putchar((int)(n & 255));
+    putchar((int)(n / 256));
 
    /*
     * Write the graphics data...
@@ -883,8 +883,8 @@ OutputRows(
       {
 	putchar(0x1b);
 	putchar('$');
-	putchar(i & 255);
-	putchar(i >> 8);
+	putchar((int)(i & 255));
+	putchar((int)(i >> 8));
       }
 
       if (header->HWResolution[0] == 120)
@@ -893,8 +893,8 @@ OutputRows(
       	printf("\033*\003");		/* Select bit image */
 
       n = (unsigned)dot_count / DotBytes;
-      putchar(n & 255);
-      putchar(n / 256);
+      putchar((int)(n & 255));
+      putchar((int)(n / 256));
 
       for (n = dot_count / 2, ptr = dot_ptr + 1; n > 0; n --, ptr += 2)
       {

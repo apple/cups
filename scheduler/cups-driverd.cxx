@@ -1321,7 +1321,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
       if (device_id_re &&
 	  !regexec(device_id_re, ppd->record.device_id,
-                   (int)(sizeof(re_matches) / sizeof(re_matches[0])),
+                   (size_t)(sizeof(re_matches) / sizeof(re_matches[0])),
 		   re_matches, 0))
       {
        /*
@@ -1351,7 +1351,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
       if (make_and_model_re &&
           !regexec(make_and_model_re, ppd->record.make_and_model,
-	           (int)(sizeof(re_matches) / sizeof(re_matches[0])),
+	           (size_t)(sizeof(re_matches) / sizeof(re_matches[0])),
 		   re_matches, 0))
       {
 	// See how much of the make-and-model string we matched...

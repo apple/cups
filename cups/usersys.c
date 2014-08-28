@@ -211,8 +211,10 @@ cupsSetCredentials(
   if (cupsArrayCount(credentials) < 1)
     return (-1);
 
+#ifdef HAVE_SSL
   _httpFreeCredentials(cg->tls_credentials);
   cg->tls_credentials = _httpCreateCredentials(credentials);
+#endif /* HAVE_SSL */
 
   return (cg->tls_credentials ? 0 : -1);
 }

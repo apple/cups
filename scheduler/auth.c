@@ -2171,23 +2171,23 @@ cups_crypt(const char *pw,		/* I - Password string */
     * Copy the final sum to the result string and return...
     */
 
-    memcpy(result, salt, salt_end - salt);
+    memcpy(result, salt, (size_t)(salt_end - salt));
     ptr = result + (salt_end - salt);
     *ptr++ = '$';
 
     for (i = 0; i < 5; i ++, ptr += 4)
     {
-      n = (((digest[i] << 8) | digest[i + 6]) << 8);
+      n = ((((unsigned)digest[i] << 8) | (unsigned)digest[i + 6]) << 8);
 
       if (i < 4)
-        n |= digest[i + 12];
+        n |= (unsigned)digest[i + 12];
       else
-        n |= digest[5];
+        n |= (unsigned)digest[5];
 
       to64(ptr, n, 4);
     }
 
-    to64(ptr, digest[11], 2);
+    to64(ptr, (unsigned)digest[11], 2);
     ptr += 2;
     *ptr = '\0';
 

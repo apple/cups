@@ -2557,9 +2557,11 @@ httpSetCredentials(http_t	*http,		/* I - HTTP connection */
   if (!http || cupsArrayCount(credentials) < 1)
     return (-1);
 
+#ifdef HAVE_SSL
   _httpFreeCredentials(http->tls_credentials);
 
   http->tls_credentials = _httpCreateCredentials(credentials);
+#endif /* HAVE_SSL */
 
   return (http->tls_credentials ? 0 : -1);
 }
@@ -2856,8 +2858,10 @@ httpShutdown(http_t *http)		/* I - HTTP connection */
   if (!http || http->fd < 0)
     return;
 
+#ifdef HAVE_SSL
   if (http->tls)
     _httpTLSStop(http);
+#endif /* HAVE_SSL */
 
 #ifdef WIN32
   shutdown(http->fd, SD_RECEIVE);	/* Microsoft-ism... */

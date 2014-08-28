@@ -490,7 +490,7 @@ cupsSideChannelSNMPWalk(
         real_data[real_datalen] = '\0';
 
       real_oidlen  = strlen(real_data) + 1;
-      real_datalen -= real_oidlen;
+      real_datalen -= (int)real_oidlen;
 
      /*
       * Call the callback with the OID and data...

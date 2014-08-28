@@ -378,7 +378,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       if (!cups_raster_read(r, &byte, 1))
 	return (0);
 
-      r->count = byte + 1;
+      r->count = (unsigned)byte + 1;
 
       if (r->count > 1)
 	ptr = r->pixels;
@@ -418,7 +418,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	  * Repeat the next N bytes...
 	  */
 
-          count = (byte + 1) * r->bpp;
+          count = ((unsigned)byte + 1) * r->bpp;
           if (count > (unsigned)bytes)
 	    count = (unsigned)bytes;
 

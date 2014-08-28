@@ -934,7 +934,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_STATUS_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -993,7 +993,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_STATUS_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1891,7 +1891,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 			      con->request->request.op.version[1],
 			      ippOpString(con->request->request.op.operation_id),
 			      con->request->request.op.request_id);
-	      con->bytes += ippLength(con->request);
+	      con->bytes += (off_t)ippLength(con->request);
 	    }
 	  }
 

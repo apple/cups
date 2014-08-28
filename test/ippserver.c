@@ -480,7 +480,8 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      strlcpy(directory, argv[i], sizeof(directory));
+	      strncpy(directory, argv[i], sizeof(directory) - 1);
+              directory[sizeof(directory) - 1] = '\0';
 	      break;
 
 	  case 'f' : /* -f type/subtype[,...] */
@@ -1061,7 +1062,7 @@ create_listener(int family,		/* I  - Address family */
 
   if (!*port)
   {
-    *port = 8000 + (getuid() % 1000);
+    *port = 8000 + ((int)getuid() % 1000);
     fprintf(stderr, "Listening on port %d.\n", *port);
   }
 
@@ -1482,7 +1483,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     ptr += strlen(ptr);
     prefix = ",";
   }
-  strlcat(device_id, ";", sizeof(device_id));
+  if (ptr < (device_id + sizeof(device_id) - 1))
+  {
+    *ptr++ = ';';
+    *ptr = '\0';
+  }
 
  /*
   * Get the maximum spool size based on the size of the filesystem used for
@@ -5270,7 +5275,7 @@ process_job(_ipp_job_t *job)		/* I - Job */
     * Sleep for a random amount of time to simulate job processing.
     */
 
-    sleep(5 + (rand() % 11));
+    sleep((unsigned)(5 + (rand() % 11)));
   }
 
   if (job->cancel)
@@ -5383,7 +5388,10 @@ register_printer(
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipp._tcp,%s", subtype);
   else
-    strlcpy(regtype, "_ipp._tcp", sizeof(regtype));
+  {
+    strncpy(regtype, "_ipp._tcp", sizeof(regtype) - 1);
+    regtype[sizeof(regtype) - 1] = '\0';
+  }
 
   if ((error = DNSServiceRegister(&(printer->ipp_ref),
                                   kDNSServiceFlagsShareConnection,
@@ -5411,7 +5419,10 @@ register_printer(
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipps._tcp,%s", subtype);
   else
-    strlcpy(regtype, "_ipps._tcp", sizeof(regtype));
+  {
+    strncpy(regtype, "_ipps._tcp", sizeof(regtype) - 1);
+    regtype[sizeof(regtype) - 1] = '\0';
+  }
 
   if ((error = DNSServiceRegister(&(printer->ipps_ref),
                                   kDNSServiceFlagsShareConnection,

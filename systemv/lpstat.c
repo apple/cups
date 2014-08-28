@@ -1270,7 +1270,6 @@ show_jobs(const char *dests,		/* I - Destinations */
 		*reasons;		/* Job state reasons attribute */
   const char	*dest,			/* Pointer into job-printer-uri */
 		*username,		/* Pointer to job-originating-user-name */
-		*title,			/* Pointer to job-name */
 		*message,		/* Pointer to job-printer-state-message */
 		*time_at;		/* time-at-xxx attribute name to use */
   int		rank,			/* Rank in queue */
@@ -1385,7 +1384,6 @@ show_jobs(const char *dests,		/* I - Destinations */
       username = NULL;
       dest     = NULL;
       jobtime  = 0;
-      title    = "no title";
       message  = NULL;
       reasons  = NULL;
 
@@ -1411,9 +1409,6 @@ show_jobs(const char *dests,		/* I - Destinations */
         else if (!strcmp(attr->name, "job-originating-user-name") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  username = attr->values[0].string.text;
-        else if (!strcmp(attr->name, "job-name") &&
-	         attr->value_tag == IPP_TAG_NAME)
-	  title = attr->values[0].string.text;
         else if (!strcmp(attr->name, "job-state-reasons") &&
 	         attr->value_tag == IPP_TAG_KEYWORD)
 	  reasons = attr;
