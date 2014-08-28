@@ -33,7 +33,7 @@ platform="$1"
 fileversion="$2"
 
 echo Creating package directory...
-pkgdir="ippeveselfcert-$fileversion"
+pkgdir="sw-ippeveselfcert10-$fileversion"
 
 test -d $pkgdir && rm -r $pkgdir
 mkdir $pkgdir || exit 1
