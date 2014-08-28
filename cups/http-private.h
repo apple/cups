@@ -76,7 +76,6 @@ typedef int socklen_t;
 #  ifdef HAVE_GNUTLS
 #    include <gnutls/gnutls.h>
 #    include <gnutls/x509.h>
-#    include <gcrypt.h>
 #  elif defined(HAVE_CDSASSL)
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
