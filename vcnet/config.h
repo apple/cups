@@ -54,6 +54,15 @@
 
 
 /*
+ * Map the POSIX strcasecmp() and strncasecmp() functions to the Win32 stricmp()
+ * and strnicmp() functions...
+ */
+
+#define strcasecmp	stricmp
+#define strncasecmp	strnicmp
+
+
+/*
  * Map the POSIX sleep() and usleep() functions to the Win32 Sleep() function...
  */
 
@@ -71,7 +80,7 @@ typedef unsigned long useconds_t;
 #  define R_OK		04
 #  define O_RDONLY	_O_RDONLY
 #  define O_WRONLY	_O_WRONLY
-#  define O_CREATE	_O_CREAT
+#  define O_CREAT	_O_CREAT
 #  define O_TRUNC	_O_TRUNC
 
 

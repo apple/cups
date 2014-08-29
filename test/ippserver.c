@@ -27,26 +27,37 @@
  * Include necessary headers...
  */
 
+#include <config.h>			/* CUPS configuration header */
+#include <cups/cups.h>			/* Public API */
+#include <cups/string-private.h>	/* CUPS string functions */
+#include <cups/thread-private.h>	/* For multithreading functions */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <cups/cups.h>			/* Public API */
-#include <config.h>			/* CUPS configuration header */
-#include <cups/thread-private.h>	/* For multithreading functions */
+#include <limits.h>
+#include <sys/stat.h>
 
-#include <sys/wait.h>
-
+#ifdef WIN32
+#  include <fcntl.h>
+#  include <io.h>
+#  include <process.h>
+#  define WEXITSTATUS(s) (s)
+#  include <winsock2.h>
+typedef ULONG nfds_t;
+#  define poll WSAPoll
+#else
 extern char **environ;
+
+#  include <sys/fcntl.h>
+#  include <sys/wait.h>
+#  include <poll.h>
+#endif /* WIN32 */
 
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
-#include <limits.h>
-#include <sys/stat.h>
-#include <sys/fcntl.h>
-#include <poll.h>
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
@@ -483,8 +494,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
-	      strncpy(directory, argv[i], sizeof(directory) - 1);
-              directory[sizeof(directory) - 1] = '\0';
+	      strlcpy(directory, argv[i], sizeof(directory));
 	      break;
 
 	  case 'f' : /* -f type/subtype[,...] */
@@ -585,7 +595,22 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (!port)
   {
+#ifdef WIN32
+   /*
+    * Windows is almost always used as a single user system, so use a default port
+    * number of 8631.
+    */
+
+    port = 8631;
+
+#else
+   /*
+    * Use 8000 + UID mod 1000 for the default port number...
+    */
+
     port = 8000 + ((int)getuid() % 1000);
+#endif /* WIN32 */
+
     fprintf(stderr, "Listening on port %d.\n", port);
   }
 
@@ -2293,7 +2318,7 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
   * Filter attributes as needed...
   */
 
-  (void)dst;
+//  (void)dst;
 
   ipp_tag_t group = ippGetGroupTag(attr);
   const char *name = ippGetName(attr);
@@ -5498,10 +5523,7 @@ register_printer(
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipp._tcp,%s", subtype);
   else
-  {
-    strncpy(regtype, "_ipp._tcp", sizeof(regtype) - 1);
-    regtype[sizeof(regtype) - 1] = '\0';
-  }
+    strlcpy(regtype, "_ipp._tcp", sizeof(regtype));
 
   if ((error = DNSServiceRegister(&(printer->ipp_ref),
                                   kDNSServiceFlagsShareConnection,
@@ -5529,10 +5551,7 @@ register_printer(
   if (subtype && *subtype)
     snprintf(regtype, sizeof(regtype), "_ipps._tcp,%s", subtype);
   else
-  {
-    strncpy(regtype, "_ipps._tcp", sizeof(regtype) - 1);
-    regtype[sizeof(regtype) - 1] = '\0';
-  }
+    strlcpy(regtype, "_ipps._tcp", sizeof(regtype));
 
   if ((error = DNSServiceRegister(&(printer->ipps_ref),
                                   kDNSServiceFlagsShareConnection,
