@@ -21,7 +21,7 @@
 ::   ipp-tests.bat 'Printer Name'
 ::
 
-ippfind "%1._ipp._tcp.local." -x ipptool -P "%1 IPP Results.plist" -I '{}' ipp-tests.test \;
+ippfind "%1._ipp._tcp.local." -x ipptool -P "\"%1 IPP Results.plist\"" -I "{}" ipp-tests.test "\";\""
 
 ::
 :: End of "$Id$".

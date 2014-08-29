@@ -31,7 +31,7 @@ if not "%2" == "" {
 		echo "   adminurl is not set."
 		echo "<string>adminurl is not set.</string>" >>"%PLIST%"
 	} else {
-		if test "%2" == "_value" {
+		if test "%2" == "_values" {
 			if not %IPPFIND_TXT_ADMINURL:~0,7% == "http://" {
 				if not %IPPFIND_TXT_ADMINURL:~0,8% == "https://" {
 					echo "   adminurl has bad value '%IPPFIND_TXT_ADMINURL%'."
@@ -45,7 +45,7 @@ if not "%2" == "" {
 		echo "   pdl is not set."
 		echo "<string>pdl is not set.</string>" >>"%PLIST%"
 	} else {
-		if "%2" == "_value" {
+		if "%2" == "_values" {
 			set temp=%IPPFIND_TXT_PDL:image/jpeg=%
 			if "%temp%" == "%IPPFIND_TXT_PDL%" {
 				echo "   pdl is missing image/jpeg: '%IPPFIND_TXT_PDL%'"
@@ -64,7 +64,7 @@ if not "%2" == "" {
 		echo "   rp is not set."
 		echo "<string>rp is not set.</string>" >>"%PLIST%"
 	} else {
-		if "%2" == "_value" {
+		if "%2" == "_values" {
 			if not "%IPPFIND_TXT_RP%" == "ipp/print" {
 				if not "%IPPFIND_TXT_RP:~0,10%" == "ipp/print/" {
 					echo "   rp has bad value '%IPPFIND_TXT_RP%'"
@@ -78,7 +78,7 @@ if not "%2" == "" {
 		echo "   UUID is not set."
 		echo "<string>UUID is not set.</string>" >>"%PLIST%"
 	} else {
-		if "%2" == "_value" {
+		if "%2" == "_values" {
 			:: This isn't as effective as the test in bonjour-tests.sh...
 			if "%IPPFIND_TXT_UUID:~0,9%" == "urn:uuid:" {
 				echo "   UUID has bad value '%IPPFIND_TXT_UUID%'"
@@ -87,7 +87,7 @@ if not "%2" == "" {
 		}
 	}
 
-	if "%2" == "_value" {
+	if "%2" == "_values" {
 		ipptool -t -d "ADMINURL=%IPPFIND_TXT_ADMINURL%" -d "UUID=%IPPFIND_TXT_UUID%" %IPPFIND_SERVICE_URI% bonjour-value-tests.test
 		echo "<string>" >>"%PLIST%"
 		$IPPTOOL -t -d "ADMINURL=$IPPFIND_TXT_ADMINURL" -d "UUID=$IPPFIND_TXT_UUID" $IPPFIND_SERVICE_URI bonjour-value-tests.test | findstr /r '[TD]:' >>"%PLIST%"
@@ -115,83 +115,89 @@ set fail=0
 set skip=0
 
 :: B-1. IPP Browse test: Printers appear in a search for "_ipp._tcp,_print" services?
-start_test "B-1. IPP Browse test"
-$IPPFIND _ipp._tcp,_print.local. --name "$1" --quiet
-if test $? = 0; then
-	pass=`expr $pass + 1`
-	end_test PASS
-else
-	fail=`expr $fail + 1`
-	end_test FAIL
-fi
+call :start_test "B-1. IPP Browse test"
+set result=FAIL
+ippfind _ipp._tcp,_print.local. --name "%1" --quiet && set result=PASS
+if "%result%" == "PASS" {
+	set /a pass=pass+1
+	call :end_test PASS
+} else {
+	set /a fail=fail+1
+	call :end_test FAIL
+}
 
 :: B-2. IPP TXT keys test: The IPP TXT record contains all required keys.
-start_test "B-2. IPP TXT keys test"
-$IPPFIND "$1._ipp._tcp.local." --txt adminurl --txt pdl --txt rp --txt UUID --quiet
-if test $? = 0; then
-	pass=`expr $pass + 1`
-	end_test PASS
-else
-	fail=`expr $fail + 1`
-	$IPPFIND "$1._ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail2 \;
-fi
+call :start_test "B-2. IPP TXT keys test"
+set result=FAIL
+ippfind "%1._ipp._tcp.local." --txt adminurl --txt pdl --txt rp --txt UUID --quiet && set result=PASS
+if "%result%" == "PASS" {
+	set /a pass=pass+1
+	call :end_test PASS
+} else {
+	set /a fail=fail+1
+	ippfind "$1._ipp._tcp.local." -x bonjour-tests.bat '{service_name}' _keys \;
+}
 
 :: B-3. IPP Resolve test: Printer responds to an IPP Get-Printer-Attributes request using the resolved hostname, port, and resource path.
-start_test "B-3. IPP Resolve test"
-$IPPFIND "$1._ipp._tcp.local." --ls >/dev/null
-if test $? = 0; then
-	pass=`expr $pass + 1`
-	end_test PASS
-else
-	fail=`expr $fail + 1`
-	echo "<key>Errors</key><array>" >>"%PLIST%"
-	$IPPFIND "$1._ipp._tcp.local." --ls | awk '{ print "<string>" $0 "</string>" }' >>"%PLIST%"
-	echo "</array>" >>"%PLIST%"
-	end_test FAIL
-fi
+call :start_test "B-3. IPP Resolve test"
+set result=FAIL
+ippfind "%1._ipp._tcp.local." --ls >/dev/null && set result=PASS
+if "%result%" == "PASS" {
+	set /a pass=pass+1
+	call :end_test PASS
+} else {
+	set /a fail=fail+1
+	echo "<key>Errors</key><array><string>" >>"%PLIST%"
+	ippfind "$1._ipp._tcp.local." --ls >>"%PLIST%"
+	echo "</string></array>" >>"%PLIST%"
+	call :end_test FAIL
+}
 
 :: B-4. IPP TXT values test: The IPP TXT record values match the reported IPP attribute values.
-start_test "B-4. IPP TXT values test"
-$IPPFIND "$1._ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q -d 'ADMINURL={txt_adminurl}' -d 'UUID={txt_uuid}' '{}' bonjour-value-tests.test \;
-if test $? = 0; then
-	pass=`expr $pass + 1`
-	end_test PASS
-else
-	fail=`expr $fail + 1`
-	$IPPFIND "$1._ipp._tcp.local." -x ./bonjour-tests.sh '{service_name}' _fail4 \;
+call :start_test "B-4. IPP TXT values test"
+set result=FAIL
+ippfind "%1._ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q -d 'ADMINURL={txt_adminurl}' -d 'UUID={txt_uuid}' '{}' bonjour-value-tests.test \; && set result=PASS
+if "%result%" == "PASS" {
+	set /a pass=pass+1
+	call :end_test PASS
+} else {
+	set /a fail=fail+1
+	ippfind "%1._ipp._tcp.local." -x bonjour-tests.bat '{service_name}' _values \;
 fi
 
 :: B-5. TLS tests: Performed only if TLS is supported
-start_test "B-5. TLS tests"
-$IPPFIND "$1._ipp._tcp.local." --txt tls --quiet
-if test $? = 0; then
-	pass=`expr $pass + 1`
-	HAVE_TLS=1
-	end_test PASS
-else
-	skip=`expr $skip + 1`
-	HAVE_TLS=0
-	end_test SKIP
-fi
+call :start_test "B-5. TLS tests"
+set result=FAIL
+find "$1._ipp._tcp.local." --txt tls --quiet && set result=PASS
+if "%result%" == "PASS" {
+	set /a pass=pass+1
+	set HAVE_TLS=1
+	call :end_test PASS
+} else {
+	set /a skip=skip+1
+	set HAVE_TLS=0
+	call :end_test SKIP
+}
 
 :: B-5.1 HTTP Upgrade test: Printer responds to an IPP Get-Printer-Attributes request after doing an HTTP Upgrade to TLS.
-start_test "B-5.1 HTTP Upgrade test"
-if test $HAVE_TLS = 1; then
-	error=`$IPPFIND "$1._ipp._tcp.local." -x $IPPTOOL -E -q '{}' bonjour-access-tests.test \; 2>&1`
-	if test $? = 0; then
-		pass=`expr $pass + 1`
-		end_test PASS
-	else
-		fail=`expr $fail + 1`
-		echo "<key>Errors</key><array><string>$error</string></array>" >>"%PLIST%"
-
-		end_test FAIL
-		echo "    $error"
-	fi
-else
-	skip=`expr $skip + 1`
-	end_test SKIP
-fi
+call :start_test "B-5.1 HTTP Upgrade test"
+if %HAVE_TLS% == 1 {
+	set result=FAIL
+	ippfind "%1._ipp._tcp.local." -x ipptool -E -q '{}' bonjour-access-tests.test \; && set result=PASS
+	if "%result%" == "PASS" {
+		set /a pass=pass+1
+		call :end_test PASS
+	} else {
+		set /a fail=fail+1
+		echo "<key>Errors</key><array><string>" >>"%PLIST"
+		ippfind "%1._ipp._tcp.local." -x ipptool -E -q '{}' bonjour-access-tests.test \; >>"%PLIST%"
+		echo "</string></array>" >>"%PLIST%"
+		call :end_test FAIL
+	}
+} else {
+	set /a skip=skip+1
+	call :end_test SKIP
+}
 
 :: B-5.2 IPPS Browse test: Printer appears in a search for "_ipps._tcp,_print" services.
 start_test "B-5.2 IPPS Browse test"
