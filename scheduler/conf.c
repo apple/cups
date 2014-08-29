@@ -1076,7 +1076,7 @@ cupsdReadConfiguration(void)
 
   if ((cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
 			     Group, 1, 1) < 0 ||
-       cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
+       cupsdCheckPermissions(CacheDir, NULL, 0770, RunUser,
 			     Group, 1, 1) < 0 ||
        cupsdCheckPermissions(temp, NULL, 0775, RunUser,
 			     Group, 1, 1) < 0 ||

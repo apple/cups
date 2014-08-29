@@ -171,7 +171,7 @@ install-data:
 	echo Creating $(REQUESTS)/tmp...
 	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
-	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
+	$(INSTALL_DIR) -m 770 -g $(CUPS_GROUP) $(CACHEDIR)
 	if test "x$(INITDIR)" != x; then \
 		echo Installing init scripts...; \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
