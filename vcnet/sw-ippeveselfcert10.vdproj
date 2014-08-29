@@ -106,13 +106,19 @@
         "Entry"
         {
         "MsmKey" = "8:_A1CB27EFF4094C39B58D0BE5A272DF1A"
+        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A1CB27EFF4094C39B58D0BE5A272DF1A"
         "OwnerKey" = "8:_58DC0E72F0944BEFB927AED718CD1660"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A1CB27EFF4094C39B58D0BE5A272DF1A"
-        "OwnerKey" = "8:_EA282F32A10B4ED1A81AA6133B997C6A"
+        "OwnerKey" = "8:_466C1CF41795452A8B76425F8D05D8B8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -207,7 +213,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:ipptool-windows.msi"
+        "OutputFilename" = "8:sw-ippeveselfcert10-windows.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -733,7 +739,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_E379D4EDBAD0460BB876711E9062ADB4"
                     {
-                    "Name" = "8:ipptool"
+                    "Name" = "8:IPP Everywhere Printer Self-Certification Tools"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -757,7 +763,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder]\\ipptool"
+            "DefaultLocation" = "8:[ProgramFilesFolder]\\sw-ippeveselfcert10"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -806,7 +812,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:IPP Everywhere Printer Self-Certification Tools"
         "ProductCode" = "8:{C08E3AC5-4FBF-40DD-BD19-9BE69A609DAF}"
-        "PackageCode" = "8:{B4B703D8-1B4E-44B5-AA85-F722F272BEA9}"
+        "PackageCode" = "8:{25FF31C9-52A0-4838-8F1D-02FB5D5296F4}"
         "UpgradeCode" = "8:{BAB6EBBB-515D-4155-9FEF-D98DA76814CA}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -933,6 +939,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_57BCED85BA5944009F56A11D5A9FBBEE"
+            {
+            "Name" = "8:ippfind Documentation"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_592FC984DBFD494D9FB7DFFEA35AD7A5"
+            "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
+            "WorkingFolder" = "8:_26743E387598422398CF503F7478F9E1"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_63715171338D40FFBC5B47A1418B4814"
             {
             "Name" = "8:README"
@@ -941,7 +961,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:"
+            "Target" = "8:_27AB74FFFBC7436B9EBC6AE23968CFCC"
             "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
             "WorkingFolder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
             "Icon" = "8:"
@@ -958,6 +978,20 @@
             "Target" = "8:_D5CD9D9AB1644688A1D54B1589BDF724"
             "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
             "WorkingFolder" = "8:_FFAEDEA1D38D4088A03FDD6F17E2CA5D"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_962004B0D5CA479A91EFA7F7BF7814C8"
+            {
+            "Name" = "8:ippserver Documentation"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_1BCBABF5693841AE92515645BB7765F4"
+            "Folder" = "8:_E379D4EDBAD0460BB876711E9062ADB4"
+            "WorkingFolder" = "8:_26743E387598422398CF503F7478F9E1"
             "Icon" = "8:"
             "Feature" = "8:"
             }

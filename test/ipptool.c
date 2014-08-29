@@ -647,6 +647,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (!vars.uri)
       {
         _cupsLangPuts(stderr, _("ipptool: URI required before test file."));
+        _cupsLangPuts(stderr, argv[i]);
 	usage();
       }
 
@@ -4802,6 +4803,10 @@ usage(void)
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... "
 		          "filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
+  _cupsLangPuts(stderr, _("  --help                  Show help."));
+  _cupsLangPuts(stderr, _("  --stop-after-include-error\n"
+                          "                          Stop tests after a failed INCLUDE."));
+  _cupsLangPuts(stderr, _("  --version               Show version."));
   _cupsLangPuts(stderr, _("  -4                      Connect using IPv4."));
   _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
   _cupsLangPuts(stderr, _("  -C                      Send requests using "
@@ -4811,6 +4816,7 @@ usage(void)
   _cupsLangPuts(stderr, _("  -I                      Ignore errors."));
   _cupsLangPuts(stderr, _("  -L                      Send requests using "
                           "content-length."));
+  _cupsLangPuts(stderr, _("  -P filename.plist       Produce XML plist to a file and test report to standard output."));
   _cupsLangPuts(stderr, _("  -S                      Test with SSL "
 			  "encryption."));
   _cupsLangPuts(stderr, _("  -T seconds              Set the receive/send "
@@ -4819,12 +4825,14 @@ usage(void)
                           "version."));
   _cupsLangPuts(stderr, _("  -X                      Produce XML plist instead "
                           "of plain text."));
+  _cupsLangPuts(stderr, _("  -c                      Produce CSV output."));
   _cupsLangPuts(stderr, _("  -d name=value           Set named variable to "
                           "value."));
   _cupsLangPuts(stderr, _("  -f filename             Set default request "
                           "filename."));
   _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with "
                           "the given time interval."));
+  _cupsLangPuts(stderr, _("  -l                      Produce plain text output."));
   _cupsLangPuts(stderr, _("  -n count                Repeat the last file the "
                           "given number of times."));
   _cupsLangPuts(stderr, _("  -q                      Run silently."));

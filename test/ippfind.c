@@ -307,6 +307,10 @@ main(int  argc,				/* I - Number of command-line args */
   * Parse command-line...
   */
 
+  if (getenv("IPPFIND_DEBUG"))
+    for (i = 1; i < argc; i ++)
+      fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
+
   for (i = 1; i < argc; i ++)
   {
     if (argv[i][0] == '-')
@@ -2006,6 +2010,17 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
   }
 
 #ifdef WIN32
+  if (getenv("IPPFIND_DEBUG"))
+  {
+    printf("\nProgram:\n    %s\n", args[0]);
+    puts("\nArguments:");
+    for (i = 0; i < num_args; i ++)
+      printf("    %s\n", myargv[i]);
+    puts("\nEnvironment:");
+    for (i = 0; i < myenvc; i ++)
+      printf("    %s\n", myenvp[i]);
+  }
+
   status = _spawnvpe(_P_WAIT, args[0], myargv, myenvp);
 
 #else
@@ -2075,10 +2090,14 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 
   if (getenv("IPPFIND_DEBUG"))
   {
+#ifdef WIN32
+    printf("Exit Status: %d\n", status);
+#else
     if (WIFEXITED(status))
       printf("Exit Status: %d\n", WEXITSTATUS(status));
     else
       printf("Terminating Signal: %d\n", WTERMSIG(status));
+#endif /* WIN32 */
   }
 
   return (status == 0);

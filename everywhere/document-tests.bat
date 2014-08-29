@@ -21,7 +21,7 @@
 ::   document-tests.bat 'Printer Name'
 ::
 
-ippfind "%1._ipp._tcp.local." -x ipptool -P "\"%1 Document Results.plist\"" -I "{}" document-tests.test "\";\""
+ippfind "%1._ipp._tcp.local." -x ipptool -P "\"%1 Document Results.plist\"" -I "{}" document-tests.test ";"
 
 ::
 :: End of "$Id$".
