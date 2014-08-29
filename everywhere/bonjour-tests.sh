@@ -2,7 +2,7 @@
 #
 #  "$Id$"
 #
-# IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
+# IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 #
 # Copyright 2014 by The Printer Working Group.
 #
