@@ -93,7 +93,7 @@
  * Default MaxCopies value...
  */
 
-#define CUPS_DEFAULT_MAX_COPIES	100
+#define CUPS_DEFAULT_MAX_COPIES	9999
 
 
 /*
@@ -150,10 +150,7 @@
  * Do we have PAM stuff?
  */
 
-#ifndef HAVE_LIBPAM
 #define HAVE_LIBPAM 0
-#endif /* !HAVE_LIBPAM */
-
 #undef HAVE_PAM_PAM_APPL_H
 #undef HAVE_PAM_SET_ITEM
 #undef HAVE_PAM_SETCRED
@@ -297,6 +294,7 @@
 
 #undef HAVE_CDSASSL
 #undef HAVE_GNUTLS
+#undef HAVE_SSPISSL
 #undef HAVE_SSL
 
 
