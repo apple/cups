@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:29-0400\n"
+"POT-Creation-Date: 2014-08-29 22:25-0400\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -826,6 +826,9 @@ msgstr ""
 msgid "  --false                 Always false."
 msgstr ""
 
+msgid "  --help                  Show help."
+msgstr ""
+
 msgid "  --help                  Show this help."
 msgstr ""
 
@@ -868,6 +871,11 @@ msgstr ""
 msgid "  --remote                True if service is remote."
 msgstr ""
 
+msgid ""
+"  --stop-after-include-error\n"
+"                          Stop tests after a failed INCLUDE."
+msgstr ""
+
 msgid "  --true                  Always true."
 msgstr ""
 
@@ -881,6 +889,9 @@ msgid "  --uri regex             Match URI to regular expression."
 msgstr ""
 
 msgid "  --version               Show program version."
+msgstr ""
+
+msgid "  --version               Show version."
 msgstr ""
 
 msgid "  -4                      Connect using IPv4."
@@ -923,6 +934,11 @@ msgstr ""
 msgid "  -L                      Send requests using content-length."
 msgstr ""
 
+msgid ""
+"  -P filename.plist       Produce XML plist to a file and test report to "
+"standard output."
+msgstr ""
+
 msgid "  -P filename.ppd         Set PPD file."
 msgstr ""
 
@@ -959,6 +975,9 @@ msgid "  -a                      Browse for all services."
 msgstr ""
 
 msgid "  -a                      Export all printers."
+msgstr ""
+
+msgid "  -c                      Produce CSV output."
 msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
@@ -1016,6 +1035,9 @@ msgid ""
 msgstr ""
 
 msgid "  -l                      List attributes."
+msgstr ""
+
+msgid "  -l                      Produce plain text output."
 msgstr ""
 
 msgid "  -l                      Run cupsd on demand."
@@ -2233,9 +2255,6 @@ msgstr ""
 
 msgid "70"
 msgstr "70"
-
-msgid "720dpi"
-msgstr "720 dpi"
 
 msgid "75"
 msgstr "75"
@@ -3524,12 +3543,6 @@ msgstr ""
 msgid "Never"
 msgstr "Nikdy"
 
-msgid "New Stylus Color Series"
-msgstr "New Stylus Color Series"
-
-msgid "New Stylus Photo Series"
-msgstr "New Stylus Photo Series"
-
 msgid "No"
 msgstr "Ne"
 
@@ -4002,12 +4015,6 @@ msgstr ""
 
 msgid "Statement"
 msgstr "Prohlášení"
-
-msgid "Stylus Color Series"
-msgstr "Stylus Color Series"
-
-msgid "Stylus Photo Series"
-msgstr "Stylus Photo Series"
 
 #, c-format
 msgid "Subscription #%d does not exist."
@@ -5675,6 +5682,9 @@ msgstr "nepojmenovaný"
 msgid "variable-bindings uses indefinite length"
 msgstr "\"variable-bindings\" má neomezenou délku"
 
+#~ msgid "720dpi"
+#~ msgstr "720 dpi"
+
 #~ msgid "Enter old password:"
 #~ msgstr "Zadejte původní heslo:"
 
@@ -5684,5 +5694,17 @@ msgstr "\"variable-bindings\" má neomezenou délku"
 #~ msgid "Enter password:"
 #~ msgstr "Zadejte heslo:"
 
+#~ msgid "New Stylus Color Series"
+#~ msgstr "New Stylus Color Series"
+
+#~ msgid "New Stylus Photo Series"
+#~ msgstr "New Stylus Photo Series"
+
 #~ msgid "Purge Jobs"
 #~ msgstr "Výmaz úloh"
+
+#~ msgid "Stylus Color Series"
+#~ msgstr "Stylus Color Series"
+
+#~ msgid "Stylus Photo Series"
+#~ msgstr "Stylus Photo Series"

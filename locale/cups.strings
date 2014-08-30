@@ -189,6 +189,7 @@
 "  --domain regex          Match domain to regular expression." = "  --domain regex          Match domain to regular expression.";
 "  --exec utility [argument ...] ;\n                          Execute program if true." = "  --exec utility [argument ...] ;\n                          Execute program if true.";
 "  --false                 Always false." = "  --false                 Always false.";
+"  --help                  Show help." = "  --help                  Show help.";
 "  --help                  Show this help." = "  --help                  Show this help.";
 "  --host regex            Match hostname to regular expression." = "  --host regex            Match hostname to regular expression.";
 "  --lf                    End lines with LF (UNIX/Linux/OS X)." = "  --lf                    End lines with LF (UNIX/Linux/OS X).";
@@ -203,11 +204,13 @@
 "  --print-name            Print service name if true." = "  --print-name            Print service name if true.";
 "  --quiet                 Quietly report match via exit code." = "  --quiet                 Quietly report match via exit code.";
 "  --remote                True if service is remote." = "  --remote                True if service is remote.";
+"  --stop-after-include-error\n                          Stop tests after a failed INCLUDE." = "  --stop-after-include-error\n                          Stop tests after a failed INCLUDE.";
 "  --true                  Always true." = "  --true                  Always true.";
 "  --txt key               True if the TXT record contains the key." = "  --txt key               True if the TXT record contains the key.";
 "  --txt-* regex           Match TXT record key to regular expression." = "  --txt-* regex           Match TXT record key to regular expression.";
 "  --uri regex             Match URI to regular expression." = "  --uri regex             Match URI to regular expression.";
 "  --version               Show program version." = "  --version               Show program version.";
+"  --version               Show version." = "  --version               Show version.";
 "  -4                      Connect using IPv4." = "  -4                      Connect using IPv4.";
 "  -6                      Connect using IPv6." = "  -6                      Connect using IPv6.";
 "  -C                      Send requests using chunking (default)." = "  -C                      Send requests using chunking (default).";
@@ -221,6 +224,7 @@
 "  -I include-dir          Add include directory to search path." = "  -I include-dir          Add include directory to search path.";
 "  -I {filename,filters,none,profiles}" = "  -I {filename,filters,none,profiles}";
 "  -L                      Send requests using content-length." = "  -L                      Send requests using content-length.";
+"  -P filename.plist       Produce XML plist to a file and test report to standard output." = "  -P filename.plist       Produce XML plist to a file and test report to standard output.";
 "  -P filename.ppd         Set PPD file." = "  -P filename.ppd         Set PPD file.";
 "  -P number[-number]      Match port to number or range." = "  -P number[-number]      Match port to number or range.";
 "  -R root-directory       Set alternate root." = "  -R root-directory       Set alternate root.";
@@ -233,6 +237,7 @@
 "  -X                      Produce XML plist instead of plain text." = "  -X                      Produce XML plist instead of plain text.";
 "  -a                      Browse for all services." = "  -a                      Browse for all services.";
 "  -a                      Export all printers." = "  -a                      Export all printers.";
+"  -c                      Produce CSV output." = "  -c                      Produce CSV output.";
 "  -c catalog.po           Load the specified message catalog." = "  -c catalog.po           Load the specified message catalog.";
 "  -c cups-files.conf      Set cups-files.conf file to use." = "  -c cups-files.conf      Set cups-files.conf file to use.";
 "  -c cupsd.conf           Set cupsd.conf file to use." = "  -c cupsd.conf           Set cupsd.conf file to use.";
@@ -251,6 +256,7 @@
 "  -i seconds              Repeat the last file with the given time interval." = "  -i seconds              Repeat the last file with the given time interval.";
 "  -j job-id[,N]           Filter file N from the specified job (default is file 1)." = "  -j job-id[,N]           Filter file N from the specified job (default is file 1).";
 "  -l                      List attributes." = "  -l                      List attributes.";
+"  -l                      Produce plain text output." = "  -l                      Produce plain text output.";
 "  -l                      Run cupsd on demand." = "  -l                      Run cupsd on demand.";
 "  -l lang[,lang,...]      Specify the output language(s) (locale)." = "  -l lang[,lang,...]      Specify the output language(s) (locale).";
 "  -m                      Use the ModelName value as the filename." = "  -m                      Use the ModelName value as the filename.";
@@ -602,7 +608,6 @@
 "7 inches/sec." = "7 inches/sec.";
 "7 x 9" = "7 x 9";
 "70" = "70";
-"720dpi" = "720dpi";
 "75" = "75";
 "8" = "8";
 "8 inches/sec." = "8 inches/sec.";
@@ -1008,8 +1013,6 @@
 "Name OID uses indefinite length" = "Name OID uses indefinite length";
 "Nested classes are not allowed." = "Nested classes are not allowed.";
 "Never" = "Never";
-"New Stylus Color Series" = "New Stylus Color Series";
-"New Stylus Photo Series" = "New Stylus Photo Series";
 "No" = "No";
 "No Content" = "No Content";
 "No PPD name" = "No PPD name";
@@ -1164,8 +1167,6 @@
 "Starting Banner" = "Starting Banner";
 "Starting page %d." = "Starting page %d.";
 "Statement" = "Statement";
-"Stylus Color Series" = "Stylus Color Series";
-"Stylus Photo Series" = "Stylus Photo Series";
 "Subscription #%d does not exist." = "Subscription #%d does not exist.";
 "Substitutions:" = "Substitutions:";
 "Super A" = "Super A";

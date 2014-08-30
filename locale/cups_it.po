@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:29-0400\n"
+"POT-Creation-Date: 2014-08-29 22:25-0400\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -974,6 +974,9 @@ msgstr ""
 msgid "  --false                 Always false."
 msgstr "  --false                 Sempre falso."
 
+msgid "  --help                  Show help."
+msgstr ""
+
 msgid "  --help                  Show this help."
 msgstr "  --help                  Mostra questo aiuto."
 
@@ -1026,6 +1029,11 @@ msgstr ""
 msgid "  --remote                True if service is remote."
 msgstr "  --remote                Vero se il servizio è remoto."
 
+msgid ""
+"  --stop-after-include-error\n"
+"                          Stop tests after a failed INCLUDE."
+msgstr ""
+
 msgid "  --true                  Always true."
 msgstr "  --true                  Sempre vero."
 
@@ -1043,6 +1051,9 @@ msgstr ""
 
 msgid "  --version               Show program version."
 msgstr "  --version               Mostra la versione del programma."
+
+msgid "  --version               Show version."
+msgstr ""
 
 msgid "  -4                      Connect using IPv4."
 msgstr "  -4                      Connetti utilizzando IPv4."
@@ -1089,6 +1100,11 @@ msgstr "  -I {file,filtri,nessuno,profili}"
 msgid "  -L                      Send requests using content-length."
 msgstr "  -L                      Invia richieste utilizzando content-length."
 
+msgid ""
+"  -P filename.plist       Produce XML plist to a file and test report to "
+"standard output."
+msgstr ""
+
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P filename.ppd         Imposta il file PPD."
 
@@ -1133,6 +1149,9 @@ msgstr "  -a                      Mostra tutti i servizi."
 
 msgid "  -a                      Export all printers."
 msgstr "  -a                      Esporta tutte le stampanti."
+
+msgid "  -c                      Produce CSV output."
+msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr ""
@@ -1201,6 +1220,9 @@ msgstr ""
 
 msgid "  -l                      List attributes."
 msgstr "  -l                      Elenca gli attributi."
+
+msgid "  -l                      Produce plain text output."
+msgstr ""
 
 msgid "  -l                      Run cupsd on demand."
 msgstr ""
@@ -2499,9 +2521,6 @@ msgstr "7 x 9"
 
 msgid "70"
 msgstr "70"
-
-msgid "720dpi"
-msgstr "720dpi"
 
 msgid "75"
 msgstr "75"
@@ -3808,12 +3827,6 @@ msgstr "Le classi nidificate non sono consentite."
 msgid "Never"
 msgstr "Mai"
 
-msgid "New Stylus Color Series"
-msgstr "Nuova Stylus Color Series"
-
-msgid "New Stylus Photo Series"
-msgstr "Nuova Stylus Photo Series"
-
 msgid "No"
 msgstr "No"
 
@@ -4290,12 +4303,6 @@ msgstr "Pagina iniziale %d."
 
 msgid "Statement"
 msgstr "Rapporto"
-
-msgid "Stylus Color Series"
-msgstr "Stylus Color Series"
-
-msgid "Stylus Photo Series"
-msgstr "Stylus Photo Series"
 
 #, c-format
 msgid "Subscription #%d does not exist."
@@ -6066,6 +6073,9 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"
 #~ msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f byte"
 
+#~ msgid "720dpi"
+#~ msgstr "720dpi"
+
 #~ msgid "Bad printer URI."
 #~ msgstr "L'URI della stampante non è valido."
 
@@ -6077,6 +6087,12 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "Enter password:"
 #~ msgstr "Digitare la password:"
+
+#~ msgid "New Stylus Color Series"
+#~ msgstr "Nuova Stylus Color Series"
+
+#~ msgid "New Stylus Photo Series"
+#~ msgstr "Nuova Stylus Photo Series"
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "L'output della stampante %s è stato inviato a %s"
@@ -6103,6 +6119,12 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ "Rank   Owner      Pri  Job        Files                       Total Size"
 #~ msgstr ""
 #~ "Rank   Owner      Pri  Job        Files                       Total Size"
+
+#~ msgid "Stylus Color Series"
+#~ msgstr "Stylus Color Series"
+
+#~ msgid "Stylus Photo Series"
+#~ msgstr "Stylus Photo Series"
 
 #~ msgid "The output bin is almost full."
 #~ msgstr "Il raccoglitore di uscita è quasi pieno."

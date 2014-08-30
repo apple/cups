@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.7\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-06-26 14:29-0400\n"
+"POT-Creation-Date: 2014-08-29 22:25-0400\n"
 "PO-Revision-Date: 2013-08-19 11:51+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -972,6 +972,9 @@ msgstr ""
 msgid "  --false                 Always false."
 msgstr "  --false                 常に失敗。"
 
+msgid "  --help                  Show help."
+msgstr ""
+
 msgid "  --help                  Show this help."
 msgstr "  --help                  このヘルプを表示する。"
 
@@ -1016,6 +1019,11 @@ msgstr ""
 msgid "  --remote                True if service is remote."
 msgstr "  --remote                サービスがリモートなら真。"
 
+msgid ""
+"  --stop-after-include-error\n"
+"                          Stop tests after a failed INCLUDE."
+msgstr ""
+
 msgid "  --true                  Always true."
 msgstr "  --true                  常に真。"
 
@@ -1031,6 +1039,9 @@ msgstr "  --uri <正規表現>        URI が正規表現とマッチするか�
 
 msgid "  --version               Show program version."
 msgstr "  --version               プログラムのバージョンを表示。"
+
+msgid "  --version               Show version."
+msgstr ""
 
 msgid "  -4                      Connect using IPv4."
 msgstr "  -4                      IPv4 で接続する。"
@@ -1078,6 +1089,11 @@ msgstr "  -I {filename,filters,none,profiles}"
 msgid "  -L                      Send requests using content-length."
 msgstr "  -L                      content-length を用いてリクエストを送る。"
 
+msgid ""
+"  -P filename.plist       Produce XML plist to a file and test report to "
+"standard output."
+msgstr ""
+
 msgid "  -P filename.ppd         Set PPD file."
 msgstr "  -P filename.ppd         PPD ファイルを指定する。"
 
@@ -1118,6 +1134,9 @@ msgstr "  -a                      すべてのサービスをブラウズする�
 
 msgid "  -a                      Export all printers."
 msgstr "  -a                      すべてのプリンターをエクスポートする。"
+
+msgid "  -c                      Produce CSV output."
+msgstr ""
 
 msgid "  -c catalog.po           Load the specified message catalog."
 msgstr "  -c catalog.po           指定したメッセージカタログをロードする。"
@@ -1182,6 +1201,9 @@ msgstr ""
 
 msgid "  -l                      List attributes."
 msgstr "  -l                      属性の一覧を表示する。"
+
+msgid "  -l                      Produce plain text output."
+msgstr ""
 
 msgid "  -l                      Run cupsd on demand."
 msgstr ""
@@ -2453,9 +2475,6 @@ msgstr "7 x 9 インチ"
 
 msgid "70"
 msgstr "70"
-
-msgid "720dpi"
-msgstr "720dpi"
 
 msgid "75"
 msgstr "75"
@@ -3766,12 +3785,6 @@ msgstr "入れ子になったクラスは許可されていません。"
 msgid "Never"
 msgstr "Never"
 
-msgid "New Stylus Color Series"
-msgstr "New Stylus Color シリーズ"
-
-msgid "New Stylus Photo Series"
-msgstr "New Stylus Photo シリーズ"
-
 msgid "No"
 msgstr "いいえ"
 
@@ -4246,12 +4259,6 @@ msgstr "ページ %d を開始しています。"
 
 msgid "Statement"
 msgstr "記述"
-
-msgid "Stylus Color Series"
-msgstr "Stylus Color シリーズ"
-
-msgid "Stylus Photo Series"
-msgstr "Stylus Photo シリーズ"
 
 #, c-format
 msgid "Subscription #%d does not exist."
@@ -6051,6 +6058,9 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "%s: Error - expected destination after \"-b\" option."
 #~ msgstr "%s: エラー - \"-b\" オプションのあとに宛先が必要です。"
 
+#~ msgid "720dpi"
+#~ msgstr "720dpi"
+
 #~ msgid "Bad printer URI."
 #~ msgstr "不正なプリンター URI です。"
 
@@ -6062,6 +6072,12 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "Enter password:"
 #~ msgstr "パスワードを入力:"
+
+#~ msgid "New Stylus Color Series"
+#~ msgstr "New Stylus Color シリーズ"
+
+#~ msgid "New Stylus Photo Series"
+#~ msgstr "New Stylus Photo シリーズ"
 
 #~ msgid "Output for printer %s is sent to %s"
 #~ msgstr "プリンター %s の出力は %s に送られます"
@@ -6095,6 +6111,12 @@ msgstr "variable-bindings の長さが不定"
 #~ "Rank   Owner      Pri  Job        Files                       Total Size"
 #~ msgstr ""
 #~ "ランク 所有者     優先 ジョブ     ファイル                    合計サイズ"
+
+#~ msgid "Stylus Color Series"
+#~ msgstr "Stylus Color シリーズ"
+
+#~ msgid "Stylus Photo Series"
+#~ msgstr "Stylus Photo シリーズ"
 
 #~ msgid "The output bin is almost full."
 #~ msgstr "排紙トレイがほとんど一杯です。"
