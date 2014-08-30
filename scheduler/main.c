@@ -119,8 +119,7 @@ main(int  argc,				/* I - Number of command-line args */
   int			run_as_child = 0;
 					/* Needed for background fork/exec */
 #ifdef __APPLE__
-  int			use_sysman = !getuid();
-					/* Use system management functions? */
+  int			use_sysman = 1;	/* Use system management functions? */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
@@ -137,7 +136,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (getuid() != geteuid())
   {
-    fputs("cupsd: Cannot run as a setuid program\n", stderr);
+    fputs("cupsd: Cannot run as a setuid program.\n", stderr);
     return (1);
   }
 #endif /* HAVE_GETEUID */

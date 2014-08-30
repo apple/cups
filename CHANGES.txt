@@ -1,9 +1,11 @@
-CHANGES.txt - 2.0rc1 - 2014-08-28
+CHANGES.txt - 2.0rc1 - 2014-08-29
 ---------------------------------
 
 CHANGES IN CUPS V2.0rc1
 
 	- Documentation updates (STR #4464)
+	- The scheduler now monitors the AC power status on OS X, allowing for
+	  "sleep printing" when sharing printers (<rdar://problem/17325852>)
 	- The scheduler incorrectly called launch_activate_socket multiple times
 	  on OS X (<rdar://problem/17523218>)
 	- The ippserver test program now passes the IPP Everywhere self-

@@ -3,7 +3,7 @@
  *
  * System management functions for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2014 by Apple Inc.
  * Copyright 2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -19,30 +19,28 @@
  */
 
 #include "cupsd.h"
-#ifdef HAVE_VPROC_TRANSACTION_BEGIN
-#  include <vproc.h>
-#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 #ifdef __APPLE__
+#  include <vproc.h>
 #  include <IOKit/pwr_mgt/IOPMLib.h>
 #endif /* __APPLE__ */
 
 
 /*
  * The system management functions cover disk and power management which
- * are primarily used on portable computers.
+ * are primarily used for portable computers.
  *
  * Disk management involves delaying the write of certain configuration
  * and state files to minimize the number of times the disk has to spin
- * up.
+ * up or flash to be written to.
  *
  * Power management support is currently only implemented on OS X, but
  * essentially we use four functions to let the OS know when it is OK to
  * put the system to sleep, typically when we are not in the middle of
- * printing a job.
- *
- * Once put to sleep, we invalidate all remote printers since it is common
- * to wake up in a new location/on a new wireless network.
+ * printing a job.  And on OS X we can also "sleep print" - basically the
+ * system only wakes up long enough to service network requests and process
+ * print jobs.
  */
+
 
 /*
  * 'cupsdCleanDirty()' - Write dirty config and state files.
@@ -132,9 +130,10 @@ cupsdSetBusyState(void)
     "Active clients and printing jobs",
     "Active clients, printing jobs, and dirty files"
   };
-#ifdef HAVE_VPROC_TRANSACTION_BEGIN
+#ifdef __APPLE__
   static vproc_transaction_t vtran = 0;	/* Current busy transaction */
-#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
+  static IOPMAssertionID keep_awake = 0;/* Keep the system awake while printing */
+#endif /* __APPLE__ */
 
 
  /*
@@ -174,7 +173,7 @@ cupsdSetBusyState(void)
   {
     busy = newbusy;
 
-#ifdef HAVE_VPROC_TRANSACTION_BEGIN
+#ifdef __APPLE__
     if (busy && !vtran)
       vtran = vproc_transaction_begin(NULL);
     else if (!busy && vtran)
@@ -182,8 +181,25 @@ cupsdSetBusyState(void)
       vproc_transaction_end(NULL, vtran);
       vtran = 0;
     }
-#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
+#endif /* __APPLE__ */
   }
+
+#ifdef __APPLE__
+  if (cupsArrayCount(PrintingJobs) > 0 && !keep_awake)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Asserting NetworkClientActive.");
+
+    IOPMAssertionCreateWithName(kIOPMAssertNetworkClientActive,
+				kIOPMAssertionLevelOn,
+				CFSTR("org.cups.cupsd"), &keep_awake);
+  }
+  else if (cupsArrayCount(PrintingJobs) == 0 && keep_awake)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Releasing power assertion.");
+    IOPMAssertionRelease(keep_awake);
+    keep_awake = 0;
+  }
+#endif /* __APPLE__ */
 }
 
 
@@ -198,8 +214,10 @@ cupsdSetBusyState(void)
  * Include MacOS-specific headers...
  */
 
+#  include <notify.h>
 #  include <IOKit/IOKitLib.h>
 #  include <IOKit/IOMessage.h>
+#  include <IOKit/ps/IOPowerSources.h>
 #  include <IOKit/pwr_mgt/IOPMLib.h>
 #  include <SystemConfiguration/SystemConfiguration.h>
 #  include <pthread.h>
@@ -265,6 +283,7 @@ static CFStringRef	ComputerNameKey = NULL,
 					/* Netowrk interface key */
 static cupsd_sysevent_t	LastSysEvent;	/* Last system event (for delayed sleep) */
 static int		NameChanged = 0;/* Did we get a 'name changed' event during sleep? */
+static int		PSToken = 0;	/* Power source notifications */
 
 
 /*
@@ -308,6 +327,8 @@ cupsdStartSystemMonitor(void)
   int	flags;				/* fcntl flags on pipe */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartSystemMonitor()");
+
   if (cupsdOpenPipe(SysEventPipes))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "System event monitor pipe() failed - %s!",
@@ -332,6 +353,14 @@ cupsdStartSystemMonitor(void)
   pthread_mutex_init(&SysEventThreadMutex, NULL);
   pthread_cond_init(&SysEventThreadCond, NULL);
   pthread_create(&SysEventThread, NULL, (void *(*)())sysEventThreadEntry, NULL);
+
+ /*
+  * Monitor for power source changes via dispatch queue...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartSystemMonitor: IOPSGetTimeRemainingEstimate=%f", IOPSGetTimeRemainingEstimate());
+  ACPower = IOPSGetTimeRemainingEstimate() == kIOPSTimeRemainingUnlimited;
+  notify_register_dispatch(kIOPSNotifyPowerSource, &PSToken, dispatch_get_main_queue(), ^(int t) { ACPower = IOPSGetTimeRemainingEstimate() == kIOPSTimeRemainingUnlimited; });
 }
 
 
@@ -344,6 +373,8 @@ cupsdStopSystemMonitor(void)
 {
   CFRunLoopRef	rl;			/* The event handler runloop */
 
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStopSystemMonitor()");
 
   if (SysEventThread)
   {
@@ -374,6 +405,12 @@ cupsdStopSystemMonitor(void)
   {
     cupsdRemoveSelect(SysEventPipes[0]);
     cupsdClosePipe(SysEventPipes);
+  }
+
+  if (PSToken != 0)
+  {
+    notify_cancel(PSToken);
+    PSToken = 0;
   }
 }
 
