@@ -319,7 +319,7 @@ sloc:
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)
 
-bsd deb pkg slackware tardist:
+bsd deb pkg slackware:
 	epm $(EPMFLAGS) -f $@ cups packaging/cups.list
 
 epm:

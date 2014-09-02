@@ -1,5 +1,5 @@
-INSTALL - CUPS v2.0b1 - 2014-07-30
-----------------------------------
+INSTALL - CUPS v2.0rc1 - 2014-09-02
+-----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
@@ -165,17 +165,11 @@ CREATING BINARY DISTRIBUTIONS WITH EPM
     following:
 
 	epm       - Builds a script + tarfile package
-	aix       - Builds an AIX package
 	bsd       - Builds a *BSD package
 	deb       - Builds a Debian package
-	depot     - Builds a HP-UX package (also swinstall)
-	inst      - Builds an IRIX package (also tardist)
 	pkg       - Builds a Solaris package
 	rpm       - Builds a RPM package
-	setld     - Build a Tru64 UNIX package
 	slackware - Build a Slackware package
-	swinstall - Build a HP-UX package (also depot)
-	tardist   - Builds an IRIX package (also inst)
 
 
 GETTING DEBUG LOGGING FROM CUPS
