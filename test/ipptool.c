@@ -3221,7 +3221,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	}
       }
     }
-    else if (!prev_pass)
+    else if (!prev_pass && Output != _CUPS_OUTPUT_QUIET)
       fprintf(stderr, "%s\n", cupsLastErrorString());
 
     if (prev_pass && Output >= _CUPS_OUTPUT_LIST && !Verbosity &&

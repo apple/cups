@@ -15,7 +15,8 @@
 #
 # Usage:
 #
-#   ./ipptool -tI printer-uri -d ADMINURL=url -d UUID=uuid bonjour-value-tests.test
+#   (run from within ippfind)
+#   ippfind ... -x ipptool -t "{}" bonjour-value-tests.test ";"
 #
 
 FILE-ID "org.pwg.ipp-everywhere.20140826.bonjour"
@@ -37,8 +38,8 @@ FILE-ID "org.pwg.ipp-everywhere.20140826.bonjour"
 	STATUS successful-ok
 
 	# What attributes do we expect?
-	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$ADMINURL"
-	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "urn:uuid:$UUID"
+	EXPECT printer-more-info OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "$ENV[IPPFIND_TXT_ADMINURL]"
+	EXPECT printer-uuid OF-TYPE uri IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "urn:uuid:$ENV[IPPFIND_TXT_UUID]"
 }
 
 #
