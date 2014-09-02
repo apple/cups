@@ -121,8 +121,8 @@ if test "$2" = _fail2 -o "$2" = _fail4 -o "$2" = _fail5.3 -o "$2" = _fail5.5; th
 	fi
 
 	if test "$2" = _fail4 -o "$2" = _fail5.5; then
-		$IPPTOOL -t -d "ADMINURL=$IPPFIND_TXT_ADMINURL" -d "UUID=$IPPFIND_TXT_UUID" $IPPFIND_SERVICE_URI bonjour-value-tests.test
-		$IPPTOOL -t -d "ADMINURL=$IPPFIND_TXT_ADMINURL" -d "UUID=$IPPFIND_TXT_UUID" $IPPFIND_SERVICE_URI bonjour-value-tests.test | egrep '(GOT|EXPECTED):' | sed -e '1,$s/^[ 	]*//' | awk '{print "<string>" $0 "</string>" }' >>"$PLIST"
+		$IPPTOOL -t $IPPFIND_SERVICE_URI bonjour-value-tests.test
+		$IPPTOOL -t $IPPFIND_SERVICE_URI bonjour-value-tests.test | egrep '(GOT|EXPECTED):' | sed -e '1,$s/^[ 	]*//' | awk '{print "<string>" $0 "</string>" }' >>"$PLIST"
 	fi
 
 	echo "</array>" >>"$PLIST"
@@ -206,7 +206,7 @@ fi
 
 # B-4. IPP TXT values test: The IPP TXT record values match the reported IPP attribute values.
 start_test "B-4. IPP TXT values test"
-$IPPFIND "$1._ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q -d 'ADMINURL={txt_adminurl}' -d 'UUID={txt_uuid}' '{}' bonjour-value-tests.test \;
+$IPPFIND "$1._ipp._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
 if test $? = 0; then
 	pass=`expr $pass + 1`
 	end_test PASS
@@ -301,7 +301,7 @@ fi
 # B-5.5 IPPS TXT values test: The TXT record values for IPPS match the reported IPPS attribute values.
 start_test "B-5.5 IPPS TXT values test"
 if test $HAVE_TLS = 1; then
-	$IPPFIND "$1._ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q -d 'ADMINURL={txt_adminurl}' -d 'UUID={txt_uuid}' '{}' bonjour-value-tests.test \;
+	$IPPFIND "$1._ipps._tcp.local." --txt-adminurl '^(http:|https:)//' --txt-pdl 'image/pwg-raster' --txt-pdl 'image/jpeg' --txt-rp '^ipp/(print|print/[^/]+)$' --txt-UUID '^[0-9a-fA-F]{8,8}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{4,4}-[0-9a-fA-F]{12,12}$' -x $IPPTOOL -q '{}' bonjour-value-tests.test \;
 	if test $? = 0; then
 		pass=`expr $pass + 1`
 		end_test PASS
