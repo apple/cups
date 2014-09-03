@@ -2974,9 +2974,13 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 
         if (lis)
 	{
-	  httpAddrString(&lis->address, temp, sizeof(temp));
-	  cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "Duplicate listen address \"%s\" ignored.", temp);
+	  if (!lis->on_demand)
+	  {
+	    httpAddrString(&lis->address, temp, sizeof(temp));
+	    cupsdLogMessage(CUPSD_LOG_WARN,
+			    "Duplicate listen address \"%s\" ignored.", temp);
+	  }
+
           continue;
 	}
 

@@ -1,5 +1,11 @@
-CHANGES.txt - 2.0rc1 - 2014-09-02
+CHANGES.txt - 2.0rc2 - 2014-09-03
 ---------------------------------
+
+CHANGES IN CUPS V2.0rc2
+
+	- The scheduler did not preserve listener sockets from launchd or
+	  systemd after a restart (<rdar://problem/18112848>)
+
 
 CHANGES IN CUPS V2.0rc1
 
