@@ -231,7 +231,7 @@ echo ""
 
 case "$usevalgrind" in
 	Y* | y*)
-		VALGRIND="valgrind --tool=memcheck --log-file=$BASE/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
+		VALGRIND="valgrind --tool=memcheck --log-file=$BASE/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes"
 		if test `uname` = Darwin; then
 			VALGRIND="$VALGRIND --dsymutil=yes"
 		fi
