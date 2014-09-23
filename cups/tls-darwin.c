@@ -15,7 +15,7 @@
  * This file is subject to the Apple OS-Developed Software exception.
  */
 
-/**** This file is included from http.c ****/
+/**** This file is included from tls.c ****/
 
 /*
  * Include necessary headers...
