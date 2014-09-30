@@ -63,8 +63,7 @@ application/x-httpd-php php
 application/x-httpd-python py
 </PRE>
 
-<P>CGI scripts/programs (application/x-httpd-cgi) also must have execution
-permissions to be treated as a CGI script or program.</P>
+<P>CGI scripts/programs (application/x-httpd-cgi) also must be owned by root, have execution permissions, and not have world or group write permissions to be treated as a CGI script or program.</P>
 
 <H2><A NAME="LIMITS">Limitations</A></H2>
 
@@ -75,10 +74,7 @@ following exceptions:</P>
 
 	<LI>No PATH_INFO or PATH_TRANSLATED support</LI>
 
-	<LI>Limited HTTP field support; only the Content-Length
-	(CONTENT_LENGTH), Cookie (HTTP_COOKIE), and User-Agent
-	(HTTP_USER_AGENT) fields are placed in environment
-	variables at this time</LI>
+	<LI>Limited HTTP field support; only the Content-Length (CONTENT_LENGTH), Content-Type (CONTENT_TYPE), Cookie (HTTP_COOKIE), Referrer (HTTP_REFERRER), and User-Agent (HTTP_USER_AGENT) fields are placed in environment variables at this time</LI>
 
 </UL>
 
