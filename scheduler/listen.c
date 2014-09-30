@@ -43,7 +43,9 @@ cupsdDeleteAllListeners(void)
   for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
        lis;
        lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
     if (!lis->on_demand)
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
     {
       cupsArrayRemove(Listeners, lis);
       free(lis);

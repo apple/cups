@@ -2974,7 +2974,9 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 
         if (lis)
 	{
+#if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
 	  if (!lis->on_demand)
+#endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 	  {
 	    httpAddrString(&lis->address, temp, sizeof(temp));
 	    cupsdLogMessage(CUPSD_LOG_WARN,
