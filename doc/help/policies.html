@@ -154,19 +154,39 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 </THEAD>
 <TBODY>
 <TR>
-	<TD NOWRAP><TT>Print-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Creates a print job with a single file.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Print-URI</TT></TD>
+	<TD NOWRAP><TT>Activate-Printer</TT></TD>
 	<TD>No</TD>
-	<TD>Create a print job with a single URI.</TD>
+	<TD>Activates a printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Validate-Job</TT></TD>
+	<TD NOWRAP><TT>Cancel-Current-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Cancels the current job on a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Job</TT></TD>
 	<TD>Yes</TD>
-	<TD>Validates a print request before printing.</TD>
+	<TD>Cancels a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels all print jobs.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-My-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels a user's print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Cancel-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels an event subscription.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Close-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Closes a user's print job so that it can be printed.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Create-Job</TT></TD>
@@ -174,19 +194,29 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Creates a print job with no files or URIs.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Send-Document</TT></TD>
+	<TD NOWRAP><TT>Create-Job-Subscriptions</TT></TD>
 	<TD>Yes</TD>
-	<TD>Adds a file to a print job.</TD>
+	<TD>Creates one or more event subscriptions for a job.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Send-URI</TT></TD>
+	<TD NOWRAP><TT>Create-Printer-Subscriptions</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates one or more event subscriptions for a printer or the server.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Deactivate-Printer</TT></TD>
 	<TD>No</TD>
-	<TD>Adds a URI to a print job.</TD>
+	<TD>Deactivates a printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Cancel-Job</TT></TD>
+	<TD NOWRAP><TT>Disable-Printer</TT></TD>
 	<TD>Yes</TD>
-	<TD>Cancels a print job.</TD>
+	<TD>Stops a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Enable-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Starts a printer or class.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Get-Job-Attributes</TT></TD>
@@ -199,68 +229,20 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Gets a list of jobs.</TD>
 </TR>
 <TR>
+	<TD NOWRAP><TT>Get-Notifications</TT></TD>
+	<TD>Yes</TD>
+	<TD>Gets (pending) events for an event subscription.</TD>
+</TR>
+<TR>
 	<TD NOWRAP><TT>Get-Printer-Attributes</TT></TD>
 	<TD>Yes</TD>
 	<TD>Gets information and options associated with a printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Hold-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Holds a print job for printing.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Release-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Releases a print job for printing.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Restart-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Reprints a print job.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Pause-Printer</TT></TD>
-	<TD>Yes</TD>
-	<TD>Stops a printer or class.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Resume-Printer</TT></TD>
-	<TD>Yes</TD>
-	<TD>Starts a printer or class.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Purge-Jobs</TT></TD>
-	<TD>Yes</TD>
-	<TD>Cancels all jobs on the server or a printer or class
-	and removes the job history information.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Set-Printer-Attributes</TT></TD>
-	<TD>No</TD>
-	<TD>Sets printer or class information; CUPS uses
-	CUPS-Add-Modify-Printer and CUPS-Add-Modify-Class
-	instead.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Set-Job-Attributes</TT></TD>
-	<TD>Yes</TD>
-	<TD>Changes job options.</TD>
-</TR>
-<TR>
 	<TD NOWRAP><TT>Get-Printer-Supported-Values</TT></TD>
-	<TD>No</TD>
+	<TD>Yes</TD>
 	<TD>Gets -supported attributes for a printer based on job
 	options.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Create-Printer-Subscription</TT></TD>
-	<TD>Yes</TD>
-	<TD>Creates an event subscription for a printer or the server.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Create-Job-Subscription</TT></TD>
-	<TD>Yes</TD>
-	<TD>Creates an event subscription for a job.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Get-Subscription-Attributes</TT></TD>
@@ -273,37 +255,17 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Gets a list of event subscriptions.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Renew-Subscription</TT></TD>
+	<TD NOWRAP><TT>Hold-Job</TT></TD>
 	<TD>Yes</TD>
-	<TD>Renews an event subscription that is about to expire.</TD>
+	<TD>Holds a print job for printing.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Cancel-Subscription</TT></TD>
+	<TD NOWRAP><TT>Hold-New-Jobs</TT></TD>
 	<TD>Yes</TD>
-	<TD>Cancels an event subscription.</TD>
+	<TD>Holds new jobs submitted to a printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Get-Notifications</TT></TD>
-	<TD>Yes</TD>
-	<TD>Gets (pending) events for an event subscription.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Send-Notifications</TT></TD>
-	<TD>No</TD>
-	<TD>Sends events for an event subscription.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Get-Printer-Support-Files</TT></TD>
-	<TD>No</TD>
-	<TD>Gets printer driver files for a Novell client.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Enable-Printer</TT></TD>
-	<TD>Yes</TD>
-	<TD>Starts a printer or class.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Disable-Printer</TT></TD>
+	<TD NOWRAP><TT>Pause-Printer</TT></TD>
 	<TD>Yes</TD>
 	<TD>Stops a printer or class.</TD>
 </TR>
@@ -313,30 +275,99 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Stops a printer or class after the current job is finished.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Hold-New-Jobs</TT></TD>
+	<TD NOWRAP><TT>Print-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Creates a print job with a single file.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Print-URI</TT></TD>
 	<TD>No</TD>
-	<TD>Holds new jobs submitted to a printer or class.</TD>
+	<TD>Create a print job with a single URI.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Promote-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Prints a job before others.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Purge-Jobs</TT></TD>
+	<TD>Yes</TD>
+	<TD>Cancels all jobs on the server or a printer or class
+	and removes the job history information.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Release-Held-New-Jobs</TT></TD>
-	<TD>No</TD>
+	<TD>Yes</TD>
 	<TD>Releases jobs that were held because of the
 	Hold-New-Jobs operation.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Deactivate-Printer</TT></TD>
-	<TD>No</TD>
-	<TD>Deactivates a printer or class.</TD>
+	<TD NOWRAP><TT>Release-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Releases a print job for printing.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Activate-Printer</TT></TD>
+	<TD NOWRAP><TT>Renew-Subscription</TT></TD>
+	<TD>Yes</TD>
+	<TD>Renews an event subscription that is about to expire.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Reprocess-Job</TT></TD>
 	<TD>No</TD>
-	<TD>Activates a printer or class.</TD>
+	<TD>Reprints a job on a different printer or class; CUPS has the
+	CUPS-Move-Job operation instead.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Restart-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Reprints a print job.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Restart-Printer</TT></TD>
 	<TD>No</TD>
 	<TD>Restarts a printer or class, resuming print jobs as needed.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Resubmit-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Reprints a job with new options.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Resume-Job</TT></TD>
+	<TD>No</TD>
+	<TD>Resumes printing of a stopped job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Resume-Printer</TT></TD>
+	<TD>Yes</TD>
+	<TD>Starts a printer or class.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Schedule-Job-After</TT></TD>
+	<TD>No</TD>
+	<TD>Prints a job after others.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Send-Document</TT></TD>
+	<TD>Yes</TD>
+	<TD>Adds a file to a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Send-URI</TT></TD>
+	<TD>No</TD>
+	<TD>Adds a URI to a print job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Set-Printer-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Sets printer or class information; CUPS uses
+	CUPS-Add-Modify-Printer and CUPS-Add-Modify-Class
+	for most attributes instead.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>Set-Job-Attributes</TT></TD>
+	<TD>Yes</TD>
+	<TD>Changes job options.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>Shutdown-Printer</TT></TD>
@@ -349,50 +380,45 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Powers a printer or class on.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Reprocess-Job</TT></TD>
-	<TD>No</TD>
-	<TD>Reprints a job on a different printer or class; CUPS has the
-	CUPS-Move-Job operation instead.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Cancel-Current-Job</TT></TD>
-	<TD>No</TD>
-	<TD>Cancels the current job on a printer or class.</TD>
-</TR>
-<TR>
 	<TD NOWRAP><TT>Suspend-Current-Job</TT></TD>
 	<TD>No</TD>
 	<TD>Stops the current job on a printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Resume-Job</TT></TD>
+	<TD NOWRAP><TT>Validate-Document</TT></TD>
 	<TD>No</TD>
-	<TD>Resumes printing of a stopped job.</TD>
+	<TD>Validates a document request before sending.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>Promote-Job</TT></TD>
-	<TD>No</TD>
-	<TD>Prints a job before others.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>Schedule-Job-After</TT></TD>
-	<TD>No</TD>
-	<TD>Prints a job after others.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Get-Default</TT> *</TD>
+	<TD NOWRAP><TT>Validate-Job</TT></TD>
 	<TD>Yes</TD>
-	<TD>Gets the server/network default printer or class.</TD>
+	<TD>Validates a print request before printing.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Get-Printers</TT> *</TD>
+	<TD NOWRAP><TT>CUPS-Accept-Jobs</TT></TD>
 	<TD>Yes</TD>
-	<TD>Gets a list of printers and/or classes.</TD>
+	<TD>Sets a printer's or class' printer-is-accepting-jobs
+	attribute to true.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Add-Modify-Class</TT></TD>
+	<TD>Yes</TD>
+	<TD>Adds or modifies a class.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>CUPS-Add-Modify-Printer</TT></TD>
 	<TD>Yes</TD>
 	<TD>Adds or modifies a printer.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Authenticate-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Authenticates a job for printing.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Delete-Class</TT> *</TD>
+	<TD>Yes</TD>
+	<TD>Removes a class.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>CUPS-Delete-Printer</TT> *</TD>
@@ -405,20 +431,34 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD>Gets a list of classes.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Add-Modify-Class</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Default</TT> *</TD>
 	<TD>Yes</TD>
-	<TD>Adds or modifies a class.</TD>
+	<TD>Gets the server/network default printer or class.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Delete-Class</TT> *</TD>
+	<TD NOWRAP><TT>CUPS-Get-Devices</TT> *</TD>
 	<TD>Yes</TD>
-	<TD>Removes a class.</TD>
+	<TD>Gets a list of printer devices.</TD>
 </TR>
 <TR>
-	<TD NOWRAP><TT>CUPS-Accept-Jobs</TT></TD>
+	<TD NOWRAP><TT>CUPS-Get-Document</TT></TD>
 	<TD>Yes</TD>
-	<TD>Sets a printer's or class' printer-is-accepting-jobs
-	attribute to true.</TD>
+	<TD>Retrieves a document file from a job.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-PPDs</TT> *</TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of printer drivers or manufacturers.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Get-Printers</TT> *</TD>
+	<TD>Yes</TD>
+	<TD>Gets a list of printers and/or classes.</TD>
+</TR>
+<TR>
+	<TD NOWRAP><TT>CUPS-Move-Job</TT></TD>
+	<TD>Yes</TD>
+	<TD>Moves a job to a different printer or class.</TD>
 </TR>
 <TR>
 	<TD NOWRAP><TT>CUPS-Reject-Jobs</TT></TD>
@@ -430,31 +470,6 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 	<TD NOWRAP><TT>CUPS-Set-Default</TT> *</TD>
 	<TD>Yes</TD>
 	<TD>Sets the server/network default printer or class.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Get-Devices</TT> *</TD>
-	<TD>Yes</TD>
-	<TD>Gets a list of printer devices.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Get-PPDs</TT> *</TD>
-	<TD>Yes</TD>
-	<TD>Gets a list of printer drivers or manufacturers.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Move-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Moves a job to a different printer or class.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Authenticate-Job</TT></TD>
-	<TD>Yes</TD>
-	<TD>Authenticates a job for printing.</TD>
-</TR>
-<TR>
-	<TD NOWRAP><TT>CUPS-Get-Document</TT></TD>
-	<TD>Yes</TD>
-	<TD>Retrieves a document file from a job.</TD>
 </TR>
 </TBODY>
 </TABLE></DIV>
