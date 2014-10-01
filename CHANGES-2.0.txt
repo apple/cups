@@ -1,0 +1,94 @@
+CHANGES.txt - 2.0.0 - 2014-10-01
+--------------------------------
+
+CHANGES IN CUPS V2.0.0
+
+	- The scheduler did not preserve listener sockets from launchd or
+	  systemd after a restart (<rdar://problem/18112848>)
+	- Added some USB quirk rules for the libusb-based USB backend
+	  (STR #4482)
+	- Spanish localization update (STR #4487)
+	- Updated documentation for 2.0.0 release.
+
+
+CHANGES IN CUPS V2.0rc1
+
+	- Documentation updates (STR #4464)
+	- The scheduler now monitors the AC power status on OS X, allowing for
+	  "sleep printing" when sharing printers (<rdar://problem/17325852>)
+	- The scheduler incorrectly called launch_activate_socket multiple times
+	  on OS X (<rdar://problem/17523218>)
+	- The ippserver test program now passes the IPP Everywhere self-
+	  certification tests (STR #4101)
+	- Relaxed the new OS X filter sandbox slightly (STR #4471,
+	  <rdar://problem/17483959>)
+	- Dropped the old Epson Stylus Color/Photo sample drivers since they
+	  don't work with any current printers and there are free alternatives
+	  that produce much better output (<rdar://problem/18036889>)
+	- Log and configuration files that are not world-readable are again
+	  accessible via the web interface (STR #4461)
+	- PPD files are now created using the permissions specified by the
+	  ConfigFilePerm directive.
+	- Fixed RPM build issues (STR #4459)
+	- Fixed the spinner image and restart page when reconfiguring the
+	  scheduler through the web interface (STR #4475)
+
+
+CHANGES IN CUPS V2.0b1
+
+	- Added a "--list-filters" option to the cupsfilter command (STR #4325)
+        - Added systemd support (STR #3917)
+	- Added support for re-sending a job as a raster file if a higher-level
+	  format such as PDF fails (<rdar://problem/15583721>)
+	- Added support for regular expression matching in the MIME type rules
+	  (<rdar://problem/11131245>)
+	- Added support for TLS certificate validation and policy enforcement
+	  (STR #1616)
+	- Added support for simultaneous XML and test output from ipptool.
+	- Added support for PAUSE directive in ipptool test files.
+	- Added support for auto-typing of TIFF files by ipptool (STR #4418)
+	- The scheduler now returns completed jobs in the correct newest-to-
+	  oldest order (STR #4396)
+	- The configure script now supports target-specific tools for pkg-config
+	  and others (STR #4423)
+	- The ipptool program now supports EXPECT statements for collection
+	  member attributes (<rdar://problem/15355218>)
+	- The ipptool program now supports collection attributes with multiple
+	  values (<rdar://problem/15355124>)
+	- The sample drivers now include all of the installed localizations by
+	  default (<rdar://problem/14756625>)
+	- Adopted Linux man page conventions and updated all man pages
+	  (STR #4372, STR #4329)
+	- The scheduler now supports the "first-index" operation attribute for
+	  the Get-Jobs operation (STR #2913)
+	- Changed the default AccessLogLevel and PageLogFormat to disable the
+	  access_log and page_log files by default (<rdar://problem/16495000>)
+	- cupsRasterInterpretPPD now supports the Orientation header in order to
+	  support long-edge feed raster printers (<rdar://problem/15837926>)
+	- The scheduler now allows run-as-root backends to have group read and
+	  execute permissions (STR #2935)
+	- The ippFindAttribute and ippFindNextAttribute functions now support
+	  hierarchical searches (STR #4395)
+	- Dropped OpenSSL support in favor of GNU TLS.
+	- Dropped "dark wake" support on OS X, which was preventing portables
+	  from going to sleep when there was a stuck job. We now use a variation
+	  of the CUPS 1.4 sleep support to do a cleaner sleep
+	  (<rdar://problem/14323704>)
+	- Dropped support for AIX, HP-UX, and OSF/1 (aka Digital UNIX)
+	- Dropped lppasswd and support for Digest authentication in in the
+	  scheduler (STR #4321)
+	- The cupsGetClasses, cupsGetPrinters, and cupsTempFile functions are no
+	  longer supported.
+	- The scheduler now caches more job history data and limits the number
+	  of completed jobs returned by Get-Jobs as needed in order to prevent a
+	  denial-of-service on busy servers (STR #2913)
+	- The filter/backend sandbox on OS X now defaults to a more strict
+	  whitelist (<rdar://problem/15939788>)
+	- Increased the default idle exit timeout to 60 seconds on OS X
+	  (<rdar://problem/16041820>)
+	- Printer classes were not accessible on OS X
+	  (<rdar://problem/16385643>)
+	- The scheduler now uses </DefaultPrinter> to close the default printer
+	  definition in printers.conf (STR #4153)
+	- Canceling all jobs in the web interface now just cancels the jobs
+	  (STR #1914)

@@ -694,7 +694,7 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=$BASE/cups-str-2.0-$date-$user.html
+strfile=$BASE/cups-str-2.1-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
