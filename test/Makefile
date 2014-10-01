@@ -3,7 +3,7 @@
 #
 #   IPP test makefile for CUPS.
 #
-#   Copyright 2007-2013 by Apple Inc.
+#   Copyright 2007-2014 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -54,6 +54,8 @@ TESTFILES	=	\
 			validate-job.test
 OBJS		=	\
 			ippfind.o \
+			ippinfra.o \
+			ippproxy.o \
 			ippserver.o \
 			ipptool.o \
 			xmltotest.o
@@ -90,7 +92,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(TARGETS) $(OBJS)
+	$(RM) $(TARGETS) $(OBJS) ippinfra ippinfra-shared ippproxy ippproxy-shared ippserver-shared
 
 
 #
@@ -182,6 +184,44 @@ ippfind:	ippfind.o ../cups/$(LIBCUPS) ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@-static...
 	$(CC) $(LDFLAGS) -o $@-static ippfind.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# ippinfra
+#
+
+ippinfra:	ippinfra.o ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippinfra.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# ippinfra-shared
+#
+
+ippinfra-shared:	ippinfra.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippinfra.o $(LIBS)
+
+
+#
+# ippproxy
+#
+
+ippproxy:	ippproxy.o ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippproxy.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# ippproxy-shared
+#
+
+ippproxy-shared:	ippproxy.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippproxy.o $(LIBS)
 
 
 #
