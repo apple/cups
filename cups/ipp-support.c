@@ -2223,6 +2223,14 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
   ipp_attribute_t	*attr;		/* Current member attribute */
 
 
+  if (!col)
+  {
+    if (buffer)
+      *buffer = '\0';
+
+    return (0);
+  }
+
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
