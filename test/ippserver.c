@@ -5690,11 +5690,11 @@ register_printer(
 
   ipp_txt = NULL;
   ipp_txt = avahi_string_list_add_printf(ipp_txt, "rp=ipp/print");
-  ipp_txt = avahi_string_list_add_printf(ipp_txt, "ty=%s", make_model);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "ty=%s %s", make, model);
   ipp_txt = avahi_string_list_add_printf(ipp_txt, "adminurl=%s", adminurl);
   if (*location)
     ipp_txt = avahi_string_list_add_printf(ipp_txt, "note=%s", location);
-  ipp_txt = avahi_string_list_add_printf(ipp_txt, "product=%s", product);
+  ipp_txt = avahi_string_list_add_printf(ipp_txt, "product=(%s)", model);
   ipp_txt = avahi_string_list_add_printf(ipp_txt, "pdl=%s", formats);
   ipp_txt = avahi_string_list_add_printf(ipp_txt, "Color=%s", color ? "T" : "F");
   ipp_txt = avahi_string_list_add_printf(ipp_txt, "Duplex=%s", duplex ? "T" : "F");
