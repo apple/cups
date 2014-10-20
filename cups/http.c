@@ -3611,6 +3611,17 @@ httpWriteResponse(http_t        *http,	/* I - HTTP connection */
 	return (-1);
       }
     }
+
+   /*
+    * "Click-jacking" defense (STR #4492)...
+    */
+
+    if (httpPrintf(http, "X-Frame-Options: DENY\r\n"
+                         "Content-Security-Policy: frame-ancestors 'none'\r\n") < 1)
+    {
+      http->status = HTTP_STATUS_ERROR;
+      return (-1);
+    }
   }
 
   if (httpWrite2(http, "\r\n", 2) < 2)

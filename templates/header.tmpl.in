@@ -8,7 +8,15 @@
     {refresh_page?<meta http-equiv="refresh" content="{refresh_page}">:}
     <meta http-equiv="X-UA-Compatible" content="IE=9">
     <meta name="viewport" content="width=device-width">
+    <style>html{display:none;}</style>
     <script type="text/javascript"><!--
+      /* Only display document if we are not in a frame... */
+      if (self == top) {
+        document.documentElement.style.display = 'block';
+      } else {
+        top.location = self.location;
+      }
+
       /* Show an error if cookies are disabled */
       function check_cookies() {
 	if (!navigator.cookieEnabled) {

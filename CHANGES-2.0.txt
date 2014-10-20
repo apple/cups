@@ -8,6 +8,8 @@ CHANGES IN CUPS V2.0.1
 	- Printer sharing did not work when systemd was being used (STR #4497)
 	- cupsGetPPD* would return a symlink to the PPD in /etc/cups/ppd even if
 	  it was not readable by the user (STR #4500)
+	- The web interface now protects against frame "click-jacking" attacks
+	  (STR #4492)
 	- Fixed a crash in ippAttributeString (<rdar://problem/17903871>)
 	- RPMs did not build (STR #4490)
 
