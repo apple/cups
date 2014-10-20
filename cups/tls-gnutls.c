@@ -36,6 +36,7 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
+static int		tls_options = 0;/* Options for TLS connections */
 
 
 /*
@@ -1002,6 +1003,17 @@ _httpTLSSetCredentials(http_t *http)	/* I - Connection to server */
 
 
 /*
+ * '_httpTLSSetOptions()' - Set TLS protocol and cipher suite options.
+ */
+
+void
+_httpTLSSetOptions(int options)		/* I - Options */
+{
+  tls_options = options;
+}
+
+
+/*
  * '_httpTLSStart()' - Set up SSL/TLS support on a connection.
  */
 
@@ -1184,6 +1196,15 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
     return (-1);
   }
+
+  if (!tls_options)
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+  else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
+    gnutls_priority_set_direct(http->tls, "NORMAL", NULL);
+  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
+  else
+    gnutls_priority_set_direct(http->tls, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
 
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
   gnutls_transport_set_pull_function(http->tls, http_gnutls_read);

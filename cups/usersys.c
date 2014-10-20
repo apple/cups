@@ -52,7 +52,8 @@ static void	cups_read_client_conf(cups_file_t *fp,
 #endif /* HAVE_GSSAPI */
 				      const char *cups_anyroot,
 				      const char *cups_expiredcerts,
-				      const char *cups_validatecerts);
+				      const char *cups_validatecerts,
+				      int ssl_options);
 
 
 /*
@@ -863,6 +864,30 @@ _cupsSetDefaults(void)
   if (cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
       !cg->user[0] || !cg->ipp_port)
   {
+   /*
+    * Look for CUPS_SERVERROOT/client.conf...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/client.conf",
+	     cg->cups_serverroot);
+    fp = cupsFileOpen(filename, "r");
+
+   /*
+    * Read the configuration file and apply any environment variables; both
+    * functions handle NULL cups_file_t pointers...
+    */
+
+    cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
+#ifdef HAVE_GSSAPI
+			  cups_gssservicename,
+#endif /* HAVE_GSSAPI */
+			  cups_anyroot, cups_expiredcerts, cups_validatecerts, 1);
+    cupsFileClose(fp);
+
+   /*
+    * Then user defaults, if it is safe to do so...
+    */
+
 #  ifdef HAVE_GETEUID
     if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
 #  elif !defined(WIN32)
@@ -877,32 +902,19 @@ _cupsSetDefaults(void)
 
       snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
       fp = cupsFileOpen(filename, "r");
-    }
-    else
-      fp = NULL;
 
-    if (!fp)
-    {
      /*
-      * Look for CUPS_SERVERROOT/client.conf...
+      * Read the configuration file and apply any environment variables; both
+      * functions handle NULL cups_file_t pointers...
       */
 
-      snprintf(filename, sizeof(filename), "%s/client.conf",
-               cg->cups_serverroot);
-      fp = cupsFileOpen(filename, "r");
-    }
-
-   /*
-    * Read the configuration file and apply any environment variables; both
-    * functions handle NULL cups_file_t pointers...
-    */
-
-    cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
+      cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
 #ifdef HAVE_GSSAPI
-			  cups_gssservicename,
+			    cups_gssservicename,
 #endif /* HAVE_GSSAPI */
-			  cups_anyroot, cups_expiredcerts, cups_validatecerts);
-    cupsFileClose(fp);
+			    cups_anyroot, cups_expiredcerts, cups_validatecerts, 0);
+      cupsFileClose(fp);
+    }
   }
 }
 
@@ -924,7 +936,8 @@ cups_read_client_conf(
 #endif /* HAVE_GSSAPI */
     const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
     const char	    *cups_expiredcerts,	/* I - CUPS_EXPIREDCERTS env var */
-    const char      *cups_validatecerts)/* I - CUPS_VALIDATECERTS env var */
+    const char      *cups_validatecerts,/* I - CUPS_VALIDATECERTS env var */
+    int             ssl_options)	/* I - Allow setting of SSLOptions? */
 {
   int	linenum;			/* Current line number */
   char	line[1024],			/* Line from file */
@@ -996,6 +1009,43 @@ cups_read_client_conf(
       cups_gssservicename = gss_service_name;
     }
 #endif /* HAVE_GSSAPI */
+    else if (ssl_options && !_cups_strcasecmp(line, "SSLOptions") && value)
+    {
+     /*
+      * SSLOptions [AllowRC4] [AllowSSL3] [None]
+      */
+
+      int	options = 0;		/* SSL/TLS options */
+      char	*start,			/* Start of option */
+		*end;			/* End of option */
+
+      for (start = value; *start; start = end)
+      {
+       /* 
+	* Find end of keyword...
+	*/
+
+	end = start;
+	while (*end && !_cups_isspace(*end))
+	  end ++;
+
+	if (*end)
+	  *end++ = '\0';
+
+       /*
+	* Compare...
+	*/
+
+	if (!_cups_strcasecmp(start, "AllowRC4"))
+	  options |= _HTTP_TLS_ALLOW_RC4;
+	else if (!_cups_strcasecmp(start, "AllowSSL3"))
+	  options |= _HTTP_TLS_ALLOW_SSL3;
+	else if (!_cups_strcasecmp(start, "None"))
+	  options = 0;
+      }
+
+      _httpTLSSetOptions(options);
+    }
   }
 
  /*

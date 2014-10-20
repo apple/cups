@@ -596,6 +596,8 @@ cupsdReadConfiguration(void)
 #  else
   cupsdSetString(&ServerKeychain, "/Library/Keychains/System.keychain");
 #  endif /* HAVE_GNUTLS */
+
+  _httpTLSSetOptions(0);
 #endif /* HAVE_SSL */
 
   language = cupsLangDefault();
@@ -2928,6 +2930,49 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       cupsdLogMessage(CUPSD_LOG_WARN,
 		      "FaxRetryLimit is deprecated; use "
 		      "JobRetryLimit on line %d.", linenum);
+    }
+    else if (!_cups_strcasecmp(line, "SSLOptions"))
+    {
+     /*
+      * SSLOptions [AllowRC4] [AllowSSL3] [None]
+      */
+
+      int	options = 0;		/* SSL/TLS options */
+
+      if (value)
+      {
+        char	*start,			/* Start of option */
+		*end;			/* End of option */
+
+	for (start = value; *start; start = end)
+	{
+	 /* 
+	  * Find end of keyword...
+	  */
+
+	  end = start;
+	  while (*end && !_cups_isspace(*end))
+	    end ++;
+
+	  if (*end)
+	    *end++ = '\0';
+
+         /*
+	  * Compare...
+	  */
+
+          if (!_cups_strcasecmp(start, "AllowRC4"))
+	    options |= _HTTP_TLS_ALLOW_RC4;
+          else if (!_cups_strcasecmp(start, "AllowSSL3"))
+	    options |= _HTTP_TLS_ALLOW_SSL3;
+          else if (!_cups_strcasecmp(start, "None"))
+	    options = 0;
+	  else if (_cups_strcasecmp(start, "NoEmptyFragments"))
+	    cupsdLogMessage(CUPSD_LOG_WARN, "Unknown SSL option %s at line %d.", start, linenum);
+        }
+      }
+
+      _httpTLSSetOptions(options);
     }
     else if ((!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
 #ifdef HAVE_SSL

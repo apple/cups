@@ -161,6 +161,9 @@ extern "C" {
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
 #define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
 
+#define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
+#define _HTTP_TLS_ALLOW_SSL3	1	/* Allow SSL 3.0 */
+
 
 /*
  * Types and functions for SSL support...
@@ -420,6 +423,7 @@ extern void		_httpTLSInitialize(void);
 extern size_t		_httpTLSPending(http_t *http);
 extern int		_httpTLSRead(http_t *http, char *buf, int len);
 extern int		_httpTLSSetCredentials(http_t *http);
+extern void		_httpTLSSetOptions(int options);
 extern int		_httpTLSStart(http_t *http);
 extern void		_httpTLSStop(http_t *http);
 extern int		_httpTLSWrite(http_t *http, const char *buf, int len);
