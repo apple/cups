@@ -1428,8 +1428,6 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
     * If an error string wasn't set by the callbacks use a generic one...
     */
 
-    fprintf(stderr, "FAILED with code %d\n", (int)error);
-
     if (!message)
 #ifdef HAVE_CSSMERRORSTRING
       message = cssmErrorString(error);
