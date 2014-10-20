@@ -846,10 +846,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
     snprintf(ppdname, sizeof(ppdname), "%s/ppd/%s.ppd", cg->cups_serverroot,
              name);
-    if (!stat(ppdname, &ppdinfo))
+    if (!stat(ppdname, &ppdinfo) && !access(ppdname, R_OK))
     {
      /*
-      * OK, the file exists, use it!
+      * OK, the file exists and is readable, use it!
       */
 
       if (buffer[0])
