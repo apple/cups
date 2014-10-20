@@ -2417,7 +2417,9 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
   * Filter attributes as needed...
   */
 
+#ifndef WIN32 /* Avoid MS compiler bug */
   (void)dst;
+#endif /* !WIN32 */
 
   ipp_tag_t group = ippGetGroupTag(attr);
   const char *name = ippGetName(attr);

@@ -1750,20 +1750,38 @@ http_sspi_find_credentials(
   * Set supported protocols (can also be overriden in the registry...)
   */
 
+#ifdef SP_PROT_TLS1_2_SERVER
   if (http->mode == _HTTP_MODE_SERVER)
   {
     if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS_1_2_SERVER | SP_PROT_TLS_1_1_SERVER | SP_PROT_TLS_1_0_SERVER | SP_PROT_SSL3_SERVER;
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER | SP_PROT_SSL3_SERVER;
     else
-      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS_1_2_SERVER | SP_PROT_TLS_1_1_SERVER | SP_PROT_TLS_1_0_SERVER;
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER;
   }
   else
   {
     if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS_1_2_CLIENT | SP_PROT_TLS_1_1_CLIENT | SP_PROT_TLS_1_0_CLIENT | SP_PROT_SSL3_CLIENT;
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT | SP_PROT_SSL3_CLIENT;
     else
-      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS_1_2_CLIENT | SP_PROT_TLS_1_1_CLIENT | SP_PROT_TLS_1_0_CLIENT;
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT;
   }
+
+#else
+  if (http->mode == _HTTP_MODE_SERVER)
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER | SP_PROT_SSL3_SERVER;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_SERVER;
+  }
+  else
+  {
+    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT | SP_PROT_SSL3_CLIENT;
+    else
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_CLIENT;
+  }
+#endif /* SP_PROT_TLS1_2_SERVER */
 
   /* TODO: Support _HTTP_TLS_ALLOW_RC4 option; right now we'll rely on Windows registry to enable/disable RC4... */
 
