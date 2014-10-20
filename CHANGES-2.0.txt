@@ -5,6 +5,7 @@ CHANGES IN CUPS V2.0.1
 
 	- Security: SSLv3 is now disabled by default to protect against the
 	  POODLE attack (STR #4476)
+	- Printer sharing did not work when systemd was being used (STR #4497)
 	- Fixed a crash in ippAttributeString (<rdar://problem/17903871>)
 	- RPMs did not build (STR #4490)
 

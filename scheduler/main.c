@@ -763,6 +763,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (timeout == 86400 && OnDemand && IdleExitTimeout &&
         !cupsArrayCount(ActiveJobs) &&
+#  ifdef HAVE_SYSTEMD
+        !WebInterface &&
+#  endif /* HAVE_SYSTEMD */
 	(!Browsing || !BrowseLocalProtocols || !cupsArrayCount(Printers)))
     {
       timeout		= IdleExitTimeout;
@@ -2114,8 +2117,12 @@ service_checkout(void)
   * jobs or shared printers to advertise...
   */
 
-  if (cupsArrayCount(ActiveJobs) ||
+  if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
+#  ifdef HAVE_SYSTEMD
+      WebInterface ||			/* Web interface enabled */
+#  endif /* HAVE_SYSTEMD */
       (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
+					/* Printers being shared */
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Creating keep-alive file \"" CUPS_KEEPALIVE "\".");
 
