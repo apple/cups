@@ -15,6 +15,7 @@
 #Group @CUPS_GROUP@
 
 # Administrator user group, used to match @SYSTEM in cupsd.conf policy rules...
+# This cannot contain the Group value for security reasons...
 SystemGroup @CUPS_SYSTEM_GROUPS@
 @CUPS_SYSTEM_AUTHKEY@
 
