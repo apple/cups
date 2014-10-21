@@ -1,5 +1,6 @@
 [Unit]
 Description=CUPS Scheduler
+Documentation=man:cupsd(8)
 
 [Service]
 ExecStart=@sbindir@/cupsd -l

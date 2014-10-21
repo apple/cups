@@ -180,7 +180,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{?_with_systemd:1}%{!?_with_systemd:0}
 # SystemD
-/usr/lib/systemd/system/*
+/usr/lib/systemd/system/org.cups.cupsd.*
 
 %else
 # Legacy init support on Linux
@@ -379,7 +379,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files lpd
 %defattr(-,root,root)
+%if %{?_with_systemd:1}%{!?_with_systemd:0}
+# SystemD
+/usr/lib/systemd/system/org.cups.cups-lpd*
+%else
+# Legacy xinetd
 /etc/xinetd.d/cups-lpd
+%endif
+
 %dir /usr/lib/cups
 %dir /usr/lib/cups/daemon
 /usr/lib/cups/daemon/cups-lpd
