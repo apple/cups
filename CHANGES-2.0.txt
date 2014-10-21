@@ -16,6 +16,8 @@ CHANGES IN CUPS V2.0.1
 	- Added systemd support for cups-lpd (STR #4493)
 	- The scheduler did not honor the FatalErrors directive for mis-
 	  configured Group and SystemGroup values (STR #4495)
+	- The network backends no longer report waste-receptacle conditions when
+	  using SNMP (STR #4499)
 	- RPMs did not build (STR #4490)
 
 

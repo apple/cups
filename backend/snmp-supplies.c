@@ -297,6 +297,7 @@ backendSNMPSupplies(
               else
                 new_supply_state |= CUPS_OPC_NEAR_EOL;
               break;
+#if 0 /* Because no two vendors report waste containers the same, disable SNMP reporting of same */
           case CUPS_TC_wasteInk :
           case CUPS_TC_wastePaper :
           case CUPS_TC_wasteToner :
@@ -307,6 +308,7 @@ backendSNMPSupplies(
               else
                 new_supply_state |= CUPS_WASTE_ALMOST_FULL;
               break;
+#endif /* 0 */
           case CUPS_TC_cleanerUnit :
           case CUPS_TC_fuserCleaningPad :
               if (percent <= 1)
