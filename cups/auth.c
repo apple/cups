@@ -761,7 +761,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
   if (
 #    ifdef HAVE_GSSAPI
-      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
+      _cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
 #    endif /* HAVE_GSSAPI */
 #    ifdef HAVE_AUTHORIZATION_H
       !httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
@@ -808,7 +808,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
                   filename, strerror(errno)));
 
 #  ifdef HAVE_GSSAPI
-    if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
+    if (!_cups_strncasecmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
       * Kerberos required, don't try the root certificate...

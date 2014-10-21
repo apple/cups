@@ -2702,6 +2702,19 @@ httpSetField(http_t       *http,	/* I - HTTP connection */
         http->server = _cupsStrAlloc(value);
         break;
 
+    case HTTP_FIELD_WWW_AUTHENTICATE :
+       /* CUPS STR #4503 - don't override WWW-Authenticate for unknown auth schemes */
+        if (http->fields[HTTP_FIELD_WWW_AUTHENTICATE][0] &&
+	    _cups_strncasecmp(value, "Basic ", 6) &&
+	    _cups_strncasecmp(value, "Digest ", 7) &&
+	    _cups_strncasecmp(value, "Negotiate ", 10))
+	{
+	  DEBUG_printf(("1httpSetField: Ignoring unknown auth scheme in \"%s\".", value));
+          return;
+	}
+
+	/* Fall through to copy */
+
     default :
 	strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
 	break;
