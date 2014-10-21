@@ -186,7 +186,8 @@ void
 cupsdStopColor(void)
 {
 #if !defined(__APPLE__) && defined(HAVE_DBUS)
-  dbus_connection_unref(colord_con);
+  if (colord_con)
+    dbus_connection_unref(colord_con);
   colord_con = NULL;
 #endif /* !__APPLE__ && HAVE_DBUS */
 }

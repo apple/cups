@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.0.1
 	- The web interface now protects against frame "click-jacking" attacks
 	  (STR #4492)
 	- Fixed a crash in ippAttributeString (<rdar://problem/17903871>)
+	- Fixed a crash in the scheduler on Linux/*BSD if colord was not running
+	  (STR #4496)
 	- Added systemd support for cups-lpd (STR #4493)
 	- The scheduler did not honor the FatalErrors directive for mis-
 	  configured Group and SystemGroup values (STR #4495)
