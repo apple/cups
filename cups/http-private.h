@@ -126,6 +126,7 @@ extern CFAbsoluteTime SecCertificateNotValidAfter(SecCertificateRef certificate)
 
 #  ifndef WIN32
 #    include <net/if.h>
+#    include <resolv.h>
 #    ifdef HAVE_GETIFADDRS
 #      include <ifaddrs.h>
 #    else

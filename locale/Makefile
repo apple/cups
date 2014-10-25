@@ -159,7 +159,7 @@ pot:	checkpo po2strings
 #
 
 checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o checkpo checkpo.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
@@ -178,7 +178,7 @@ checkall:	checkpo
 #
 
 po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o po2strings po2strings.o \
 		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
@@ -192,7 +192,7 @@ po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 #
 
 strings2po:	strings2po.o
-	echo Linking $<...
+	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o strings2po strings2po.o
 
 
