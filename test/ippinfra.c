@@ -104,7 +104,7 @@ typedef char _cups_cond_t;
 #  define _IPP_OP_UPDATE_DOCUMENT_STATUS		(ipp_op_t)0x0047
 #  define _IPP_OP_UPDATE_JOB_STATUS			(ipp_op_t)0x0048
 #  define _IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES	(ipp_op_t)0x0049
-#  define _IPP_OP_UNREGISTER_OUTPUT_DEVICE		(ipp_op_t)0x204b
+#  define _IPP_OP_DEREGISTER_OUTPUT_DEVICE		(ipp_op_t)0x204b
 
 /* New IPP status code from IPP INFRA */
 #  define _IPP_STATUS_ERROR_NOT_FETCHABLE		(ipp_status_t)0x0420
@@ -473,6 +473,7 @@ static void		ipp_cancel_subscription(_ipp_client_t *client);
 static void		ipp_close_job(_ipp_client_t *client);
 static void		ipp_create_job(_ipp_client_t *client);
 static void		ipp_create_xxx_subscriptions(_ipp_client_t *client);
+static void		ipp_deregister_output_device(_ipp_client_t *client);
 static void		ipp_fetch_document(_ipp_client_t *client);
 static void		ipp_fetch_job(_ipp_client_t *client);
 static void		ipp_get_document_attributes(_ipp_client_t *client);
@@ -491,7 +492,6 @@ static void		ipp_print_uri(_ipp_client_t *client);
 static void		ipp_renew_subscription(_ipp_client_t *client);
 static void		ipp_send_document(_ipp_client_t *client);
 static void		ipp_send_uri(_ipp_client_t *client);
-static void		ipp_unregister_output_device(_ipp_client_t *client);
 static void		ipp_update_active_jobs(_ipp_client_t *client);
 static void		ipp_update_document_status(_ipp_client_t *client);
 static void		ipp_update_job_status(_ipp_client_t *client);
@@ -526,7 +526,7 @@ static int		valid_job_attributes(_ipp_client_t *client);
 
 static int		KeepFiles = 0,
 			Verbosity = 0;
-static _cups_mutex_t	SubscriptionMutex = _CUPS_MUTEX_INITIALIZER;
+//static _cups_mutex_t	SubscriptionMutex = _CUPS_MUTEX_INITIALIZER;
 static _cups_cond_t	SubscriptionCondition = _CUPS_COND_INITIALIZER;
 
 
@@ -1539,7 +1539,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     _IPP_OP_UPDATE_DOCUMENT_STATUS,
     _IPP_OP_UPDATE_JOB_STATUS,
     _IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES,
-    _IPP_OP_UNREGISTER_OUTPUT_DEVICE
+    _IPP_OP_DEREGISTER_OUTPUT_DEVICE
   };
   static const char * const charsets[] =/* charset-supported values */
   {
@@ -2892,29 +2892,8 @@ static void
 ipp_cancel_subscription(
     _ipp_client_t *client)		/* I - Client */
 {
-  ipp_attribute_t	*sub_ids,	/* notify-subscription-ids */
-			*seq_nums,	/* notify-sequence-numbers */
-			*notify_wait;	/* Wait for events? */
-  int			i,		/* Looping var */
-			count;		/* Number of IDs */
-  _ipp_subscription_t	*sub;		/* Current subscription */
+  _ipp_subscription_t	*sub;		/* Subscription */
 
-
-  if ((sub_ids = ippFindAttribute(client->request, "notify-subscription-ids", IPP_TAG_INTEGER)) == NULL)
-  {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Missing notify-subscription-ids attribute.");
-    return;
-  }
-
-  count       = ippGetCount(sub_ids);
-  seq_nums    = ippFindAttribute(client->request, "notify-sequence-numbers", IPP_TAG_INTEGER);
-  notify_wait = ippFindAttribute(client->request, "notify-wait", IPP_TAG_BOOLEAN);
-
-  if (seq_nums && count != ippGetCount(seq_nums))
-  {
-    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "The notify-subscription-ids and notify-sequence-numbers attributes are different lengths.");
-    return;
-  }
 
   if ((sub = find_subscription(client, 0)) == NULL)
   {
@@ -2923,9 +2902,9 @@ ipp_cancel_subscription(
   }
 
   _cupsRWLockWrite(&client->printer->rwlock);
+  cupsArrayRemove(client->printer->subscriptions, sub);
   delete_subscription(sub);
   _cupsRWUnlock(&client->printer->rwlock);
-
   respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
@@ -3262,6 +3241,50 @@ ipp_create_xxx_subscriptions(
     ippSetStatusCode(client->response, IPP_STATUS_ERROR_IGNORED_ALL_SUBSCRIPTIONS);
   else if (ok_subs != num_subs)
     ippSetStatusCode(client->response, IPP_STATUS_OK_IGNORED_SUBSCRIPTIONS);
+}
+
+
+/*
+ * 'ipp_deregister_output_device()' - Unregister an output device.
+ */
+
+static void
+ipp_deregister_output_device(
+    _ipp_client_t *client)		/* I - Client */
+{
+  _ipp_device_t	*device;		/* Device */
+
+
+ /*
+  * Find the device...
+  */
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Output device not found.");
+    return;
+  }
+
+ /*
+  * Remove the device from the printer...
+  */
+
+  _cupsRWLockWrite(&client->printer->rwlock);
+
+  cupsArrayRemove(client->printer->devices, device);
+
+  update_device_attributes_no_lock(client->printer);
+  update_device_state_no_lock(client->printer);
+
+  _cupsRWUnlock(&client->printer->rwlock);
+
+ /*
+  * Delete the device...
+  */
+
+  delete_device(device);
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -3633,16 +3656,60 @@ static void
 ipp_get_notifications(
     _ipp_client_t *client)		/* I - Client */
 {
-  _ipp_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*sub_ids,	/* notify-subscription-ids */
+			*seq_nums,	/* notify-sequence-numbers */
+			*notify_wait;	/* Wait for events? */
+  int			i,		/* Looping vars */
+			count,		/* Number of IDs */
+			first = 1,	/* First event? */
+			seq_num;	/* Sequence number */
+  _ipp_subscription_t	*sub;		/* Current subscription */
+  ipp_t			*event;		/* Current event */
 
 
-  if ((sub = find_subscription(client, 0)) == NULL)
+  if ((sub_ids = ippFindAttribute(client->request, "notify-subscription-ids", IPP_TAG_INTEGER)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Subscription was not found.");
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Missing notify-subscription-ids attribute.");
+    return;
+  }
+
+  count       = ippGetCount(sub_ids);
+  seq_nums    = ippFindAttribute(client->request, "notify-sequence-numbers", IPP_TAG_INTEGER);
+  notify_wait = ippFindAttribute(client->request, "notify-wait", IPP_TAG_BOOLEAN);
+
+  if (seq_nums && count != ippGetCount(seq_nums))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "The notify-subscription-ids and notify-sequence-numbers attributes are different lengths.");
     return;
   }
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
+  ippAddInteger(client->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "notify-get-interval", 30);
+
+  for (i = 0; i < count; i ++)
+  {
+    if ((sub = find_subscription(client, ippGetInteger(sub_ids, i))) == NULL)
+      continue;
+
+    seq_num = ippGetInteger(seq_nums, i);
+    if (seq_num < sub->first_sequence)
+      seq_num = sub->first_sequence;
+
+    if (seq_num > sub->last_sequence)
+      continue;
+
+    for (event = (ipp_t *)cupsArrayIndex(sub->events, seq_num - sub->first_sequence);
+         event;
+	 event = (ipp_t *)cupsArrayNext(sub->events))
+    {
+      if (first)
+        first = 0;
+      else
+        ippAddSeparator(client->response);
+
+      ippCopyAttributes(client->response, event, 0, NULL, NULL);
+    }
+  }
 }
 
 
@@ -3799,11 +3866,12 @@ ipp_get_subscriptions(
        sub;
        sub = (_ipp_subscription_t *)cupsArrayNext(client->printer->subscriptions))
   {
-    if (!first)
+    if (first)
+      first = 0;
+    else
       ippAddSeparator(client->response);
 
     copy_subscription_attributes(client, sub, ra);
-    first = 0;
   }
 
   cupsArrayDelete(ra);
@@ -4879,50 +4947,6 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
   copy_job_attributes(client, job, ra);
   cupsArrayDelete(ra);
-}
-
-
-/*
- * 'ipp_unregister_output_device()' - Unregister an output device.
- */
-
-static void
-ipp_unregister_output_device(
-    _ipp_client_t *client)		/* I - Client */
-{
-  _ipp_device_t	*device;		/* Device */
-
-
- /*
-  * Find the device...
-  */
-
-  if ((device = find_device(client)) == NULL)
-  {
-    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Output device not found.");
-    return;
-  }
-
- /*
-  * Remove the device from the printer...
-  */
-
-  _cupsRWLockWrite(&client->printer->rwlock);
-
-  cupsArrayRemove(client->printer->devices, device);
-
-  update_device_attributes_no_lock(client->printer);
-  update_device_state_no_lock(client->printer);
-
-  _cupsRWUnlock(&client->printer->rwlock);
-
- /*
-  * Delete the device...
-  */
-
-  delete_device(device);
-
-  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -6274,8 +6298,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	        ipp_update_output_device_attributes(client);
 		break;
 
-            case _IPP_OP_UNREGISTER_OUTPUT_DEVICE :
-	        ipp_unregister_output_device(client);
+            case _IPP_OP_DEREGISTER_OUTPUT_DEVICE :
+	        ipp_deregister_output_device(client);
 		break;
 
 	    default :
