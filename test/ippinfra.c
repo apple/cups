@@ -68,6 +68,26 @@ extern char **environ;
 #  include <sys/vfs.h>
 #endif /* HAVE_SYS_VFS_H */
 
+#ifdef HAVE_PTHREAD_H
+typedef pthread_cond_t _cups_cond_t;
+#  define _CUPS_COND_INITIALIZER PTHREAD_COND_INITIALIZER
+#  define _cupsCondBroadcast(c) pthread_cond_broadcast(c)
+#  define _cupsCondDeinit(c)	pthread_cond_destroy(c)
+#  define _cupsCondInit(c)	pthread_cond_init((c), NULL)
+#  define _cupsCondWait(c,m)	pthread_cond_wait((c),(m))
+#  define _cupsMutexDeinit(m)	pthread_mutex_destroy(m)
+#  define _cupsRWDeinit(rw)	pthread_rwlock_destroy(rw)
+#else
+typedef char _cups_cond_t;
+#  define _CUPS_COND_INITIALIZER 0
+#  define _cupsCondBroadcast(c)
+#  define _cupsCondDeinit(c)
+#  define _cupsCondInit(c)	*(c)=0
+#  define _cupsCondWait(c,m)	0
+#  define _cupsMutexDeinit(m)
+#  define _cupsRWDeinit(rw)
+#endif /* HAVE_PTHREAD_H */
+
 
 /*
  * Constants...
@@ -84,6 +104,7 @@ extern char **environ;
 #  define _IPP_OP_UPDATE_DOCUMENT_STATUS		(ipp_op_t)0x0047
 #  define _IPP_OP_UPDATE_JOB_STATUS			(ipp_op_t)0x0048
 #  define _IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES	(ipp_op_t)0x0049
+#  define _IPP_OP_UNREGISTER_OUTPUT_DEVICE		(ipp_op_t)0x204b
 
 /* New IPP status code from IPP INFRA */
 #  define _IPP_STATUS_ERROR_NOT_FETCHABLE		(ipp_status_t)0x0420
@@ -92,6 +113,9 @@ extern char **environ;
 #  define _IPP_NOTIFY_LEASE_DURATION_MAX		67108863
 /* But a value of 0 means "never expires"... */
 #  define _IPP_NOTIFY_LEASE_DURATION_FOREVER		0
+/* Default duration is 1 day */
+#  define _IPP_NOTIFY_LEASE_DURATION_DEFAULT		86400
+
 
 /*
  * Event mask enumeration...
@@ -133,6 +157,8 @@ enum _ipp_event_e			/* notify-events bit values */
   _IPP_EVENT_ALL = 0x001fffff		/* Everything */
 };
 typedef unsigned int _ipp_event_t;	/* Bitfield for notify-events */
+#define _IPP_EVENT_DEFAULT _IPP_EVENT_JOB_COMPLETED
+#define _IPP_EVENT_DEFAULT_STRING "job-completed"
 static const char * const _ipp_events[] =
 {					/* Strings for bits */
   "document-completed",
@@ -383,9 +409,13 @@ typedef struct _ipp_client_s		/**** Client data ****/
   char			uri[1024],	/* Request URI */
 			*options;	/* URI options */
   http_addr_t		addr;		/* Client address */
-  char			hostname[256];	/* Client hostname */
+  char			hostname[256],	/* Client hostname */
+			username[32];	/* Client authenticated username */
   _ipp_printer_t	*printer;	/* Printer */
   _ipp_job_t		*job;		/* Current job, if any */
+  int			fetch_compression,
+					/* Compress file? */
+			fetch_file;	/* File to fetch */
 } _ipp_client_t;
 
 
@@ -408,19 +438,23 @@ static void		copy_job_state_reasons(ipp_t *ipp, ipp_tag_t group_tag, _ipp_job_t 
 static void		copy_printer_state_reasons(ipp_t *ipp, ipp_tag_t group_tag, _ipp_printer_t *printer);
 static void		copy_subscription_attributes(_ipp_client_t *client, _ipp_subscription_t *sub, cups_array_t *ra);
 static _ipp_client_t	*create_client(_ipp_printer_t *printer, int sock);
+static _ipp_device_t	*create_device(_ipp_client_t *client);
 static _ipp_job_t	*create_job(_ipp_client_t *client);
-static void		create_job_filename(_ipp_printer_t *printer, _ipp_job_t *job, char *fname, size_t fnamesize);
+static void		create_job_filename(_ipp_printer_t *printer, _ipp_job_t *job, const char *format, char *fname, size_t fnamesize);
 static int		create_listener(int family, int port);
-static _ipp_subscription_t *create_subscription(_ipp_printer_t *printer, _ipp_job_t *job, int lease, const char *username, ipp_attribute_t *events, ipp_attribute_t *notify_attrs, ipp_attribute_t *userdata);
+static _ipp_subscription_t *create_subscription(_ipp_printer_t *printer, _ipp_job_t *job, int interval, int lease, const char *username, ipp_attribute_t *notify_events, ipp_attribute_t *notify_attributes, ipp_attribute_t *notify_user_data);
 static _ipp_printer_t	*create_printer(const char *servername, int port, const char *name, const char *directory, const char *proxy_user, const char *proxy_pass);
 static void		debug_attributes(const char *title, ipp_t *ipp,
 			                 int response);
 static void		delete_client(_ipp_client_t *client);
+static void		delete_device(_ipp_device_t *device);
 static void		delete_job(_ipp_job_t *job);
 static void		delete_printer(_ipp_printer_t *printer);
 static void		delete_subscription(_ipp_subscription_t *sub);
 static int		filter_cb(_ipp_filter_t *filter, ipp_t *dst, ipp_attribute_t *attr);
-static _ipp_job_t	*find_job(_ipp_client_t *client);
+static _ipp_device_t	*find_device(_ipp_client_t *client);
+static _ipp_job_t	*find_job(_ipp_client_t *client, int job_id);
+static _ipp_subscription_t *find_subscription(_ipp_client_t *client, int sub_id);
 static _ipp_jreason_t	get_job_state_reasons_bits(ipp_attribute_t *attr);
 static _ipp_event_t	get_notify_events_bits(ipp_attribute_t *attr);
 static const char	*get_notify_subscribed_event(_ipp_event_t event);
@@ -457,13 +491,14 @@ static void		ipp_print_uri(_ipp_client_t *client);
 static void		ipp_renew_subscription(_ipp_client_t *client);
 static void		ipp_send_document(_ipp_client_t *client);
 static void		ipp_send_uri(_ipp_client_t *client);
+static void		ipp_unregister_output_device(_ipp_client_t *client);
 static void		ipp_update_active_jobs(_ipp_client_t *client);
 static void		ipp_update_document_status(_ipp_client_t *client);
 static void		ipp_update_job_status(_ipp_client_t *client);
 static void		ipp_update_output_device_attributes(_ipp_client_t *client);
 static void		ipp_validate_document(_ipp_client_t *client);
 static void		ipp_validate_job(_ipp_client_t *client);
-static int		parse_options(_ipp_client_t *client, cups_option_t **options);
+//static int		parse_options(_ipp_client_t *client, cups_option_t **options);
 static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
@@ -478,6 +513,8 @@ static void		respond_unsupported(_ipp_client_t *client,
 			                    ipp_attribute_t *attr);
 static void		run_printer(_ipp_printer_t *printer);
 static char		*time_string(time_t tv, char *buffer, size_t bufsize);
+static void		update_device_attributes_no_lock(_ipp_printer_t *printer);
+static void		update_device_state_no_lock(_ipp_printer_t *printer);
 static void		usage(int status) __attribute__((noreturn));
 static int		valid_doc_attributes(_ipp_client_t *client);
 static int		valid_job_attributes(_ipp_client_t *client);
@@ -489,8 +526,8 @@ static int		valid_job_attributes(_ipp_client_t *client);
 
 static int		KeepFiles = 0,
 			Verbosity = 0;
-static pthread_mutex_t	SubscriptionMutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t	SubscriptionCondition = PTHREAD_COND_INITIALIZER;
+static _cups_mutex_t	SubscriptionMutex = _CUPS_MUTEX_INITIALIZER;
+static _cups_cond_t	SubscriptionCondition = _CUPS_COND_INITIALIZER;
 
 
 /*
@@ -678,16 +715,6 @@ main(int  argc,				/* I - Number of command-line args */
 
   delete_printer(printer);
 
-  /* TODO: Silence compiler warnings until everything is implemented */
-  add_event(NULL, NULL, _IPP_EVENT_NONE, "");
-  check_jobs(printer);
-  copy_subscription_attributes(NULL, NULL, NULL);
-  create_subscription(NULL);
-  delete_subscription(NULL);
-  get_job_state_reasons_bits(NULL);
-  get_printer_state_reasons_bits(NULL);
-  parse_options(NULL, NULL);
-
   return (0);
 }
 
@@ -707,6 +734,7 @@ add_event(_ipp_printer_t *printer,	/* I - Printer */
   ipp_t		*n;			/* Notify attributes */
   char		text[1024];		/* notify-text value */
   va_list	ap;			/* Argument pointer */
+
 
   va_start(ap, message);
   vsnprintf(text, sizeof(text), message, ap);
@@ -758,7 +786,7 @@ add_event(_ipp_printer_t *printer,	/* I - Printer */
       }
 
       _cupsRWUnlock(&sub->rwlock);
-      pthread_cond_broadcast(&SubscriptionCondition);
+      _cupsCondBroadcast(&SubscriptionCondition);
     }
   }
 }
@@ -1106,7 +1134,7 @@ copy_job_state_reasons(
   else
   {
     int			i,		/* Looping var */
-			num_reasons;	/* Number of reasons */
+			num_reasons = 0;/* Number of reasons */
     _ipp_jreason_t	reason;		/* Current reason */
     const char		*reasons[32];	/* Reason strings */
 
@@ -1197,7 +1225,8 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     return (NULL);
   }
 
-  client->printer = printer;
+  client->printer    = printer;
+  client->fetch_file = -1;
 
  /*
   * Accept the client and get the remote address...
@@ -1218,6 +1247,36 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     fprintf(stderr, "Accepted connection from %s\n", client->hostname);
 
   return (client);
+}
+
+
+/*
+ * 'create_device()' - Create an output device tracking object.
+ */
+
+static _ipp_device_t *			/* O - Device */
+create_device(_ipp_client_t *client)	/* I - Client */
+{
+  _ipp_device_t		*device;	/* Device */
+  ipp_attribute_t	*uuid;		/* output-device-uuid */
+
+
+  if ((uuid = ippFindAttribute(client->request, "output-device-uuid", IPP_TAG_URI)) == NULL)
+    return (NULL);
+
+  if ((device = calloc(1, sizeof(_ipp_device_t))) == NULL)
+    return (NULL);
+
+  _cupsRWInit(&device->rwlock);
+
+  device->uuid  = strdup(ippGetString(uuid, 0, NULL));
+  device->state = IPP_PSTATE_STOPPED;
+
+  _cupsRWLockWrite(&client->printer->rwlock);
+  cupsArrayAdd(client->printer->devices, device);
+  _cupsRWUnlock(&client->printer->rwlock);
+
+  return (device);
 }
 
 
@@ -1322,6 +1381,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
 static void create_job_filename(
     _ipp_printer_t *printer,		/* I - Printer */
     _ipp_job_t     *job,		/* I - Job */
+    const char     *format,		/* I - Format or NULL */
     char           *fname,		/* I - Filename buffer */
     size_t         fnamesize)		/* I - Size of filename buffer */
 {
@@ -1353,17 +1413,20 @@ static void create_job_filename(
   * Figure out the extension...
   */
 
-  if (!strcasecmp(job->format, "image/jpeg"))
+  if (!format)
+    format = job->format;
+
+  if (!strcasecmp(format, "image/jpeg"))
     ext = "jpg";
-  else if (!strcasecmp(job->format, "image/png"))
+  else if (!strcasecmp(format, "image/png"))
     ext = "png";
-  else if (!strcasecmp(job->format, "image/pwg-raster"))
+  else if (!strcasecmp(format, "image/pwg-raster"))
     ext = "ras";
-  else if (!strcasecmp(job->format, "image/urf"))
+  else if (!strcasecmp(format, "image/urf"))
     ext = "urf";
-  else if (!strcasecmp(job->format, "application/pdf"))
+  else if (!strcasecmp(format, "application/pdf"))
     ext = "pdf";
-  else if (!strcasecmp(job->format, "application/postscript"))
+  else if (!strcasecmp(format, "application/postscript"))
     ext = "ps";
   else
     ext = "prn";
@@ -1475,7 +1538,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     _IPP_OP_UPDATE_ACTIVE_JOBS,
     _IPP_OP_UPDATE_DOCUMENT_STATUS,
     _IPP_OP_UPDATE_JOB_STATUS,
-    _IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES
+    _IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES,
+    _IPP_OP_UNREGISTER_OUTPUT_DEVICE
   };
   static const char * const charsets[] =/* charset-supported values */
   {
@@ -1542,7 +1606,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->state_time     = printer->start_time;
   printer->jobs           = cupsArrayNew3((cups_array_func_t)compare_jobs, NULL, NULL, 0, NULL, (cups_afree_func_t)delete_job);
   printer->active_jobs    = cupsArrayNew((cups_array_func_t)compare_active_jobs, NULL);
-  printer->completed_jobs = cupsArrayNew((cups_array_func_t)compare_active_jobs, NULL);
+  printer->completed_jobs = cupsArrayNew((cups_array_func_t)compare_completed_jobs, NULL);
   printer->next_job_id    = 1;
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
@@ -1789,11 +1853,12 @@ static _ipp_subscription_t *		/* O - Subscription object */
 create_subscription(
     _ipp_printer_t  *printer,		/* I - Printer */
     _ipp_job_t      *job,		/* I - Job, if any */
+    int             interval,		/* I - Interval for progress events */
     int             lease,		/* I - Lease duration */
     const char      *username,		/* I - User creating the subscription */
-    ipp_attribute_t *events,		/* I - Events to monitor */
-    ipp_attribute_t *notify_attrs,	/* I - Attributes to report */
-    ipp_attribute_t *userdata)		/* I - User data, if any */
+    ipp_attribute_t *notify_events,	/* I - Events to monitor */
+    ipp_attribute_t *notify_attributes,	/* I - Attributes to report */
+    ipp_attribute_t *notify_user_data)	/* I - User data, if any */
 {
   _ipp_subscription_t	*sub;		/* Subscription */
   ipp_attribute_t	*attr;		/* Subscription attribute */
@@ -1812,16 +1877,20 @@ create_subscription(
 
   _cupsRWLockWrite(&(printer->rwlock));
 
-  sub->id      = printer->next_sub_id ++;
-  sub->mask    = get_notify_events_bits(events);
-  sub->printer = printer;
-  sub->job     = job;
-  sub->lease   = lease;
-  sub->expire  = time(NULL) + sub->lease;
-  sub->attrs   = ippNew();
+  sub->id       = printer->next_sub_id ++;
+  sub->mask     = notify_events ? get_notify_events_bits(notify_events) : _IPP_EVENT_DEFAULT;
+  sub->printer  = printer;
+  sub->job      = job;
+  sub->interval = interval;
+  sub->lease    = lease;
+  sub->attrs    = ippNew();
 
-  _cupsMutexInit(&(sub->mutex));
-  pthread_cond_init(&(sub->cond), NULL);
+  if (lease)
+    sub->expire = time(NULL) + sub->lease;
+  else
+    sub->expire = INT_MAX;
+
+  _cupsRWInit(&(sub->rwlock));
 
  /*
   * Add subscription description attributes and add to the subscriptions
@@ -1844,15 +1913,18 @@ create_subscription(
   attr = ippAddString(sub->attrs, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME, "notify-subscriber-user-name", NULL, username);
   sub->username = ippGetString(attr, 0, NULL);
 
-  ippCopyAttribute(sub->attrs, events, 0);
+  if (notify_events)
+    ippCopyAttribute(sub->attrs, notify_events, 0);
+  else
+    ippAddString(sub->attrs, IPP_TAG_SUBSCRIPTION, IPP_CONST_TAG(IPP_TAG_KEYWORD), "notify-events", NULL, _IPP_EVENT_DEFAULT_STRING);
 
   ippAddString(sub->attrs, IPP_TAG_SUBSCRIPTION, IPP_CONST_TAG(IPP_TAG_KEYWORD), "notify-pull-method", NULL, "ippget");
 
-  if (notify_attrs)
-    ippCopyAttribute(sub->attrs, notify_attrs, 0);
+  if (notify_attributes)
+    ippCopyAttribute(sub->attrs, notify_attributes, 0);
 
-  if (userdata)
-    ippCopyAttribute(sub->attrs, userdata, 0);
+  if (notify_user_data)
+    ippCopyAttribute(sub->attrs, notify_user_data, 0);
 
   sub->events = cupsArrayNew3(NULL, NULL, NULL, 0, NULL, (cups_afree_func_t)ippDelete);
 
@@ -1945,6 +2017,32 @@ delete_client(_ipp_client_t *client)	/* I - Client */
 
 
 /*
+ * 'delete_device()' - Remove a device from a printer.
+ *
+ * Note: Caller is responsible for locking the printer object.
+ */
+
+static void
+delete_device(_ipp_device_t *device)	/* I - Device */
+{
+ /*
+  * Free memory used for the device...
+  */
+
+  _cupsRWDeinit(&device->rwlock);
+
+  if (device->name)
+    free(device->name);
+
+  free(device->uuid);
+
+  ippDelete(device->attrs);
+
+  free(device);
+}
+
+
+/*
  * 'delete_job()' - Remove from the printer and free all memory used by a job
  *                  object.
  */
@@ -1967,7 +2065,7 @@ delete_job(_ipp_job_t *job)		/* I - Job */
     free(job->filename);
   }
 
-  pthread_rwlock_destroy(&job->rwlock);
+  _cupsRWDeinit(&job->rwlock);
 
   free(job);
 }
@@ -2002,6 +2100,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
   if (printer->proxy_pass)
     free(printer->proxy_pass);
 
+
   ippDelete(printer->attrs);
   ippDelete(printer->dev_attrs);
 
@@ -2010,7 +2109,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
   cupsArrayDelete(printer->jobs);
   cupsArrayDelete(printer->subscriptions);
 
-  pthread_rwlock_destroy(&printer->rwlock);
+  _cupsRWDeinit(&printer->rwlock);
 
   free(printer);
 }
@@ -2026,14 +2125,14 @@ delete_subscription(
 {
   sub->pending_delete = 1;
 
-  pthread_cond_broadcast(&SubscriptionCondition);
+  _cupsCondBroadcast(&SubscriptionCondition);
 
   _cupsRWLockWrite(&sub->rwlock);
 
   ippDelete(sub->attrs);
   cupsArrayDelete(sub->events);
 
-  pthread_rwlock_destroy(&sub->rwlock);
+  _cupsRWDeinit(&sub->rwlock);
 
   free(sub);
 }
@@ -2065,18 +2164,48 @@ filter_cb(_ipp_filter_t   *filter,	/* I - Filter parameters */
 
 
 /*
+ * 'find_device()' - Find a device.
+ */
+
+static _ipp_device_t *			/* I - Device */
+find_device(_ipp_client_t *client)	/* I - Client */
+{
+  ipp_attribute_t	*uuid;		/* output-device-uuid */
+  _ipp_device_t		key,		/* Search key */
+			*device;	/* Matching device */
+
+
+  if ((uuid = ippFindAttribute(client->request, "output-device-uuid", IPP_TAG_URI)) == NULL)
+    return (NULL);
+
+  key.uuid = (char *)ippGetString(uuid, 0, NULL);
+
+  _cupsRWLockRead(&client->printer->rwlock);
+  device = (_ipp_device_t *)cupsArrayFind(client->printer->devices, &key);
+  _cupsRWUnlock(&client->printer->rwlock);
+
+  return (device);
+}
+
+
+/*
  * 'find_job()' - Find a job specified in a request.
  */
 
 static _ipp_job_t *			/* O - Job or NULL */
-find_job(_ipp_client_t *client)		/* I - Client */
+find_job(_ipp_client_t *client,		/* I - Client */
+         int           job_id)		/* I - Job ID to find or 0 to lookup */
 {
   ipp_attribute_t	*attr;		/* job-id or job-uri attribute */
   _ipp_job_t		key,		/* Job search key */
 			*job;		/* Matching job, if any */
 
 
-  if ((attr = ippFindAttribute(client->request, "job-uri", IPP_TAG_URI)) != NULL)
+  if (job_id > 0)
+  {
+    key.id = job_id;
+  }
+  else if ((attr = ippFindAttribute(client->request, "job-uri", IPP_TAG_URI)) != NULL)
   {
     const char *uri = ippGetString(attr, 0, NULL);
 
@@ -2087,13 +2216,44 @@ find_job(_ipp_client_t *client)		/* I - Client */
       return (NULL);
   }
   else if ((attr = ippFindAttribute(client->request, "job-id", IPP_TAG_INTEGER)) != NULL)
+  {
     key.id = ippGetInteger(attr, 0);
+  }
 
   _cupsRWLockRead(&(client->printer->rwlock));
   job = (_ipp_job_t *)cupsArrayFind(client->printer->jobs, &key);
   _cupsRWUnlock(&(client->printer->rwlock));
 
   return (job);
+}
+
+
+/*
+ * 'find_subscription()' - Find a subcription.
+ */
+
+static _ipp_subscription_t *		/* O - Subscription */
+find_subscription(_ipp_client_t *client,/* I - Client */
+                  int           sub_id)	/* I - Subscription ID or 0 */
+{
+  ipp_attribute_t	*notify_subscription_id;
+					/* notify-subscription-id */
+  _ipp_subscription_t	key,		/* Search key */
+			*sub;		/* Matching subscription */
+
+
+  if (sub_id > 0)
+    key.id = sub_id;
+  else if ((notify_subscription_id = ippFindAttribute(client->request, "notify-subscription-id", IPP_TAG_INTEGER)) == NULL)
+    return (NULL);
+  else
+    key.id = ippGetInteger(notify_subscription_id, 0);
+
+  _cupsRWLockRead(&client->printer->rwlock);
+  sub = (_ipp_subscription_t *)cupsArrayFind(client->printer->subscriptions, &key);
+  _cupsRWUnlock(&client->printer->rwlock);
+
+  return (sub);
 }
 
 
@@ -2550,8 +2710,36 @@ static void
 ipp_acknowledge_document(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*attr;		/* Attribute */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (!job->dev_uuid || strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job not assigned to device.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "document-number", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(attr) != IPP_TAG_OPERATION || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) != 1)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, attr ? "Bad document-number attribute." : "Missing document-number attribute.");
+    return;
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -2576,8 +2764,42 @@ static void
 ipp_acknowledge_job(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (job->dev_uuid && strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_AUTHORIZED, "Job not assigned to device.");
+    return;
+  }
+
+  if (!(job->state_reasons & _IPP_JREASON_JOB_FETCHABLE))
+  {
+    respond_ipp(client, _IPP_STATUS_ERROR_NOT_FETCHABLE, "Job not fetchable.");
+    return;
+  }
+
+  if (!job->dev_uuid)
+    job->dev_uuid = strdup(device->uuid);
+
+  job->state_reasons &= (_ipp_jreason_t)~_IPP_JREASON_JOB_FETCHABLE;
+
+  add_event(client->printer, job, _IPP_EVENT_JOB_STATE_CHANGED, "Job acknowledged.");
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -2595,7 +2817,7 @@ ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
   * Get the job...
   */
 
-  if ((job = find_job(client)) == NULL)
+  if ((job = find_job(client, 0)) == NULL)
   {
     respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job does not exist.");
     return;
@@ -2641,6 +2863,8 @@ ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
 
 	_cupsRWUnlock(&(client->printer->rwlock));
 
+        add_event(client->printer, job, _IPP_EVENT_JOB_COMPLETED, NULL);
+
 	respond_ipp(client, IPP_STATUS_OK, NULL);
         break;
   }
@@ -2668,8 +2892,41 @@ static void
 ipp_cancel_subscription(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  ipp_attribute_t	*sub_ids,	/* notify-subscription-ids */
+			*seq_nums,	/* notify-sequence-numbers */
+			*notify_wait;	/* Wait for events? */
+  int			i,		/* Looping var */
+			count;		/* Number of IDs */
+  _ipp_subscription_t	*sub;		/* Current subscription */
+
+
+  if ((sub_ids = ippFindAttribute(client->request, "notify-subscription-ids", IPP_TAG_INTEGER)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "Missing notify-subscription-ids attribute.");
+    return;
+  }
+
+  count       = ippGetCount(sub_ids);
+  seq_nums    = ippFindAttribute(client->request, "notify-sequence-numbers", IPP_TAG_INTEGER);
+  notify_wait = ippFindAttribute(client->request, "notify-wait", IPP_TAG_BOOLEAN);
+
+  if (seq_nums && count != ippGetCount(seq_nums))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "The notify-subscription-ids and notify-sequence-numbers attributes are different lengths.");
+    return;
+  }
+
+  if ((sub = find_subscription(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Subscription was not found.");
+    return;
+  }
+
+  _cupsRWLockWrite(&client->printer->rwlock);
+  delete_subscription(sub);
+  _cupsRWUnlock(&client->printer->rwlock);
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -2687,7 +2944,7 @@ ipp_close_job(_ipp_client_t *client)	/* I - Client */
   * Get the job...
   */
 
-  if ((job = find_job(client)) == NULL)
+  if ((job = find_job(client, 0)) == NULL)
   {
     respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job does not exist.");
     return;
@@ -2766,8 +3023,7 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
 
   if ((job = create_job(client)) == NULL)
   {
-    respond_ipp(client, IPP_STATUS_ERROR_BUSY,
-                "Currently printing another job.");
+    respond_ipp(client, IPP_STATUS_ERROR_TOO_MANY_JOBS, "Too many jobs are queued.");
     return;
   }
 
@@ -2786,6 +3042,13 @@ ipp_create_job(_ipp_client_t *client)	/* I - Client */
 
   copy_job_attributes(client, job, ra);
   cupsArrayDelete(ra);
+
+ /*
+  * Add any subscriptions...
+  */
+
+  client->job = job;
+  ipp_create_xxx_subscriptions(client);
 }
 
 
@@ -2797,60 +3060,208 @@ static void
 ipp_create_xxx_subscriptions(
     _ipp_client_t *client)
 {
+  _ipp_subscription_t	*sub;		/* Subscription */
   ipp_attribute_t	*attr;		/* Subscription attribute */
-  _ipp_job_t		*job = NULL;	/* Job */
-  const char		*user;		/* Username */
-  int			lease = -1;	/* notify-lease-duration */
-  _ipp_event_t		events = _IPP_EVENT_NONE;
-					/* notify-events */
+  const char		*username;	/* requesting-user-name or
+					   authenticated username */
+  int			num_subs = 0,	/* Number of subscriptions */
+			ok_subs = 0;	/* Number of good subscriptions */
 
 
-  if (ippGetOperation(client->request) == IPP_OP_CREATE_JOB_SUBSCRIPTIONS)
+ /*
+  * For the Create-xxx-Subscriptions operations, queue up a successful-ok
+  * response...
+  */
+
+  if (ippGetOperation(client->request) == IPP_OP_CREATE_JOB_SUBSCRIPTIONS || ippGetOperation(client->request) == IPP_OP_CREATE_PRINTER_SUBSCRIPTIONS)
+    respond_ipp(client, IPP_STATUS_OK, NULL);
+
+ /*
+  * Get the authenticated user name, if any...
+  */
+
+  if (client->username[0])
+    username = client->username;
+  else if ((attr = ippFindAttribute(client->request, "requesting-user-name", IPP_TAG_NAME)) != NULL && ippGetGroupTag(attr) == IPP_TAG_OPERATION && ippGetCount(attr) == 1)
+    username = ippGetString(attr, 0, NULL);
+  else
+    username = "guest";
+
+ /*
+  * Skip past the initial attributes to the first subscription group.
+  */
+
+  attr = ippFirstAttribute(client->request);
+  while (attr && ippGetGroupTag(attr) != IPP_TAG_SUBSCRIPTION)
+    attr = ippNextAttribute(client->request);
+
+  while (attr)
   {
-    if ((job = find_job(client)) == NULL)
+    _ipp_job_t		*job = NULL;	/* Job */
+    const char		*attrname,	/* Attribute name */
+			*pullmethod = NULL;
+    					/* notify-pull-method */
+    ipp_attribute_t	*notify_attributes = NULL,
+					/* notify-attributes */
+			*notify_events = NULL,
+					/* notify-events */
+			*notify_user_data = NULL;
+					/* notify-user-data */
+    int			interval = 0,	/* notify-time-interval */
+			lease = _IPP_NOTIFY_LEASE_DURATION_DEFAULT;
+					/* notify-lease-duration */
+    ipp_status_t	status = IPP_STATUS_OK;
+					/* notify-status-code */
+
+    num_subs ++;
+
+    while (attr)
     {
-      respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job not found.");
-      return;
+      if ((attrname = ippGetName(attr)) == NULL)
+        break;
+
+      if (!strcmp(attrname, "notify-recipient-uri"))
+      {
+       /*
+        * Push notifications not supported.
+	*/
+
+        status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	ippCopyAttribute(client->response, attr, 0);
+      }
+      else if (!strcmp(attrname, "notify-pull-method"))
+      {
+	pullmethod = ippGetString(attr, 0, NULL);
+
+        if (ippGetValueTag(attr) != IPP_TAG_KEYWORD || ippGetCount(attr) != 1 || !pullmethod || strcmp(pullmethod, "ippget"))
+	{
+          ippCopyAttribute(client->response, attr, 0);
+	  pullmethod = NULL;
+	  status     = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	}
+      }
+      else if (!strcmp(attrname, "notify-attributes"))
+      {
+        if (ippGetValueTag(attr) != IPP_TAG_KEYWORD)
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+
+	notify_attributes = attr;
+      }
+      else if (!strcmp(attrname, "notify-charset"))
+      {
+        if (ippGetValueTag(attr) != IPP_TAG_CHARSET || ippGetCount(attr) != 1 ||
+	    (strcmp(ippGetString(attr, 0, NULL), "us-ascii") && strcmp(ippGetString(attr, 0, NULL), "utf-8")))
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+      }
+      else if (!strcmp(attrname, "notify-natural-language"))
+      {
+        if (ippGetValueTag(attr) !=  IPP_TAG_LANGUAGE || ippGetCount(attr) != 1 || strcmp(ippGetString(attr, 0, NULL), "en"))
+        {
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+      }
+      else if (!strcmp(attrname, "notify-user-data"))
+      {
+        int	datalen;		/* Length of data */
+
+        if (ippGetValueTag(attr) != IPP_TAG_STRING || ippGetCount(attr) != 1 || !ippGetOctetString(attr, 0, &datalen) || datalen > 63)
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+	else
+	  notify_user_data = attr;
+      }
+      else if (!strcmp(attrname, "notify-events"))
+      {
+        if (ippGetValueTag(attr) != IPP_TAG_KEYWORD)
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+	else
+          notify_events = attr;
+      }
+      else if (!strcmp(attrname, "notify-lease-duration"))
+      {
+        if (ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) < 0)
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+	else
+          lease = ippGetInteger(attr, 0);
+      }
+      else if (!strcmp(attrname, "notify-time-interval"))
+      {
+        if (ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) < 0)
+	{
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+	else
+          interval = ippGetInteger(attr, 0);
+      }
+      else if (!strcmp(attrname, "notify-job-id"))
+      {
+        if (ippGetOperation(client->request) != IPP_OP_CREATE_JOB_SUBSCRIPTIONS || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetInteger(attr, 0) < 1)
+        {
+	  status = IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+	else if ((job = find_job(client, ippGetInteger(attr, 0))) == NULL)
+	{
+	  status = IPP_STATUS_ERROR_NOT_FOUND;
+	  ippCopyAttribute(client->response, attr, 0);
+	}
+      }
+
+      attr = ippNextAttribute(client->request);
+    }
+
+    if (status)
+    {
+      ippAddInteger(client->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM, "notify-status-code", status);
+    }
+    else if (!pullmethod)
+    {
+      ippAddInteger(client->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM, "notify-status-code", IPP_STATUS_ERROR_BAD_REQUEST);
+    }
+    else
+    {
+      switch (ippGetOperation(client->request))
+      {
+	case IPP_OP_PRINT_JOB :
+	case IPP_OP_PRINT_URI :
+	case IPP_OP_CREATE_JOB :
+	    job = client->job;
+	    break;
+
+	default :
+	    break;
+      }
+
+      if ((sub = create_subscription(client->printer, job, interval, lease, username, notify_events, notify_attributes, notify_user_data)) == NULL)
+      {
+        ippAddInteger(client->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER, "notify-subscription-id", sub->id);
+        ok_subs ++;
+      }
+      else
+        ippAddInteger(client->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM, "notify-status-code", IPP_STATUS_ERROR_INTERNAL);
     }
   }
 
- /*
-  * See if we have the required subscription attributes...
-  */
-
-  if ((attr = ippFindAttribute(client->request, "notify-pull-method", IPP_TAG_ZERO)) == NULL ||
-      ippGetGroupTag(attr) != IPP_TAG_SUBSCRIPTION || ippGetValueTag(attr) != IPP_TAG_KEYWORD ||
-      strcmp(ippGetString(attr, 0, NULL), "ippget"))
-  {
-    // TODO: Return an error?
-    return (NULL);
-  }
-
-  if ((attr = ippFindAttribute(client->request, "notify-events", IPP_TAG_ZERO)) == NULL ||
-      ippGetGroupTag(attr) != IPP_TAG_SUBSCRIPTION || ippGetValueTag(attr) != IPP_TAG_KEYWORD)
-  {
-    // TODO: Return an error?
-    return (NULL);
-  }
-
- /*
-  * Get the requesting-user-name and other attributes...
-  */
-
-  if ((attr = ippFindAttribute(client->request, "requesting-user-name", IPP_TAG_NAME)) != NULL)
-    sub->username = ippGetString(attr, 0, NULL);
-  else
-    sub->username = "anonymous";
-
-  if ((attr = ippFindAttribute(client->request, "notify-lease-duration", IPP_TAG_INTEGER)) != NULL)
-    sub->lease = ippGetInteger(attr, 0);
-  else
-    sub->lease = 86400;
-
-get_notify_events_bits(attr)
-
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  if (ok_subs == 0)
+    ippSetStatusCode(client->response, IPP_STATUS_ERROR_IGNORED_ALL_SUBSCRIPTIONS);
+  else if (ok_subs != num_subs)
+    ippSetStatusCode(client->response, IPP_STATUS_OK_IGNORED_SUBSCRIPTIONS);
 }
 
 
@@ -2862,8 +3273,78 @@ static void
 ipp_fetch_document(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*attr;		/* Attribute */
+  int			compression;	/* compression */
+  char			filename[1024];	/* Job filename */
+  const char		*format;	/* document-format */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (!job->dev_uuid || strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job not assigned to device.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "document-number", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(attr) != IPP_TAG_OPERATION || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) != 1)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, attr ? "Bad document-number attribute." : "Missing document-number attribute.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "compression-accepted", IPP_TAG_KEYWORD)) != NULL)
+    compression = !strcmp(ippGetString(attr, 0, NULL), "gzip");
+  else
+    compression = 0;
+
+  if ((attr = ippFindAttribute(client->request, "document-format-accepted", IPP_TAG_MIMETYPE)) != NULL)
+  {
+    int	i,				/* Looping var */
+	count = ippGetCount(attr);	/* Number of values */
+
+
+    for (i = 0; i < count; i ++)
+    {
+      format = ippGetString(attr, i, NULL);
+
+      create_job_filename(client->printer, job, NULL, filename, sizeof(filename));
+
+      if (!access(filename, R_OK))
+        break;
+    }
+
+    if (i >= count)
+    {
+      respond_ipp(client, _IPP_STATUS_ERROR_NOT_FETCHABLE, "Document not available in requested format.");
+      return;
+    }
+  }
+  else if ((attr = ippFindAttribute(job->attrs, "document-format", IPP_TAG_MIMETYPE)) != NULL)
+    format = ippGetString(attr, 0, NULL);
+  else
+  {
+    respond_ipp(client, _IPP_STATUS_ERROR_NOT_FETCHABLE, "Document format unknown.");
+    return;
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+  ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE, "document-format", NULL, format);
+  ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "compression", NULL, compression ? "gzip" : "none");
+
+  client->fetch_file = open(filename, O_RDONLY);
 }
 
 
@@ -2874,8 +3355,36 @@ ipp_fetch_document(
 static void
 ipp_fetch_job(_ipp_client_t *client)	/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (job->dev_uuid && strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job not assigned to device.");
+    return;
+  }
+
+  if (!(job->state_reasons & _IPP_JREASON_JOB_FETCHABLE))
+  {
+    respond_ipp(client, _IPP_STATUS_ERROR_NOT_FETCHABLE, "Job not fetchable.");
+    return;
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+  copy_attributes(client->response, job->attrs, NULL, IPP_TAG_JOB, 0);
 }
 
 
@@ -2922,7 +3431,7 @@ ipp_get_job_attributes(
   cups_array_t	*ra;			/* requested-attributes */
 
 
-  if ((job = find_job(client)) == NULL)
+  if ((job = find_job(client, 0)) == NULL)
   {
     respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job not found.");
     return;
@@ -3124,8 +3633,16 @@ static void
 ipp_get_notifications(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_subscription_t	*sub;		/* Subscription */
+
+
+  if ((sub = find_subscription(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Subscription was not found.");
+    return;
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -3223,9 +3740,15 @@ static void
 ipp_get_printer_supported_values(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  cups_array_t	*ra = ippCreateRequestedArray(client->request);
+					/* Requested attributes */
+
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
+
+  copy_attributes(client->response, client->printer->attrs, ra, IPP_TAG_PRINTER, 1);
+
+  cupsArrayDelete(ra);
 }
 
 
@@ -3237,9 +3760,22 @@ static void
 ipp_get_subscription_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  _ipp_subscription_t	*sub;		/* Subscription */
+  cups_array_t		*ra = ippCreateRequestedArray(client->request);
+					/* Requested attributes */
 
-  respond_ipp(client, IPP_STATUS_OK, NULL);
+
+  if ((sub = find_subscription(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Subscription was not found.");
+  }
+  else
+  {
+    respond_ipp(client, IPP_STATUS_OK, NULL);
+    copy_subscription_attributes(client, sub, ra);
+  }
+
+  cupsArrayDelete(ra);
 }
 
 
@@ -3251,9 +3787,26 @@ static void
 ipp_get_subscriptions(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  _ipp_subscription_t	*sub;		/* Current subscription */
+  cups_array_t		*ra = ippCreateRequestedArray(client->request);
+					/* Requested attributes */
+  int			first = 1;	/* First time? */
+
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
+  _cupsRWLockRead(&client->printer->rwlock);
+  for (sub = (_ipp_subscription_t *)cupsArrayFirst(client->printer->subscriptions);
+       sub;
+       sub = (_ipp_subscription_t *)cupsArrayNext(client->printer->subscriptions))
+  {
+    if (!first)
+      ippAddSeparator(client->response);
+
+    copy_subscription_attributes(client, sub, ra);
+    first = 0;
+  }
+
+  cupsArrayDelete(ra);
 }
 
 
@@ -3320,7 +3873,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   * Create a file for the request data...
   */
 
-  create_job_filename(client->printer, job, filename, sizeof(filename));
+  create_job_filename(client->printer, job, NULL, filename, sizeof(filename));
 
   if (Verbosity)
     fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
@@ -3410,6 +3963,13 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
 
   copy_job_attributes(client, job, ra);
   cupsArrayDelete(ra);
+
+ /*
+  * Process any pending subscriptions...
+  */
+
+  client->job = job;
+  ipp_create_xxx_subscriptions(client);
 }
 
 
@@ -3712,6 +4272,13 @@ ipp_print_uri(_ipp_client_t *client)	/* I - Client */
 
   copy_job_attributes(client, job, ra);
   cupsArrayDelete(ra);
+
+ /*
+  * Process any pending subscriptions...
+  */
+
+  client->job = job;
+  ipp_create_xxx_subscriptions(client);
 }
 
 
@@ -3723,7 +4290,42 @@ static void
 ipp_renew_subscription(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  _ipp_subscription_t	*sub;		/* Subscription */
+  ipp_attribute_t	*attr;		/* notify-lease-duration */
+  int			lease;		/* Lease duration in seconds */
+
+
+  if ((sub = find_subscription(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Subscription was not found.");
+    return;
+  }
+
+  if (sub->job)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Per-job subscriptions cannot be renewed.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "notify-lease-duration", IPP_TAG_ZERO)) != NULL)
+  {
+    if (ippGetGroupTag(attr) != IPP_TAG_SUBSCRIPTION || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) < 0)
+    {
+      respond_ipp(client, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, "Bad notify-lease-duration.");
+      return;
+    }
+
+    lease = ippGetInteger(attr, 0);
+  }
+  else
+    lease = _IPP_NOTIFY_LEASE_DURATION_DEFAULT;
+
+  sub->lease = lease;
+
+  if (lease)
+    sub->expire = time(NULL) + sub->lease;
+  else
+    sub->expire = INT_MAX;
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
 }
@@ -3749,7 +4351,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   * Get the job...
   */
 
-  if ((job = find_job(client)) == NULL)
+  if ((job = find_job(client, 0)) == NULL)
   {
     respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job does not exist.");
     httpFlush(client->http);
@@ -3821,7 +4423,7 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   * Create a file for the request data...
   */
 
-  create_job_filename(client->printer, job, filename, sizeof(filename));
+  create_job_filename(client->printer, job, NULL, filename, sizeof(filename));
 
   if (Verbosity)
     fprintf(stderr, "Creating job file \"%s\", format \"%s\".\n", filename, job->format);
@@ -3899,21 +4501,11 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
   _cupsRWUnlock(&(client->printer->rwlock));
 
  /*
-  * Process the job...
+  * Process the job, if possible...
   */
 
-#if 0
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
-#else
-  process_job(job);
-#endif /* 0 */
-
+  check_jobs(client->printer);
+  
  /*
   * Return the job info...
   */
@@ -3973,7 +4565,7 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   * Get the job...
   */
 
-  if ((job = find_job(client)) == NULL)
+  if ((job = find_job(client, 0)) == NULL)
   {
     respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job does not exist.");
     httpFlush(client->http);
@@ -4268,21 +4860,11 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
   _cupsRWUnlock(&(client->printer->rwlock));
 
  /*
-  * Process the job...
+  * Process the job, if possible...
   */
 
-#if 0
-  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
-  {
-    job->state = IPP_JSTATE_ABORTED;
-    respond_ipp(client, IPP_STATUS_ERROR_INTERNAL, "Unable to process job.");
-    return;
-  }
-
-#else
-  process_job(job);
-#endif /* 0 */
-
+  check_jobs(client->printer);
+  
  /*
   * Return the job info...
   */
@@ -4301,6 +4883,50 @@ ipp_send_uri(_ipp_client_t *client)	/* I - Client */
 
 
 /*
+ * 'ipp_unregister_output_device()' - Unregister an output device.
+ */
+
+static void
+ipp_unregister_output_device(
+    _ipp_client_t *client)		/* I - Client */
+{
+  _ipp_device_t	*device;		/* Device */
+
+
+ /*
+  * Find the device...
+  */
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Output device not found.");
+    return;
+  }
+
+ /*
+  * Remove the device from the printer...
+  */
+
+  _cupsRWLockWrite(&client->printer->rwlock);
+
+  cupsArrayRemove(client->printer->devices, device);
+
+  update_device_attributes_no_lock(client->printer);
+  update_device_state_no_lock(client->printer);
+
+  _cupsRWUnlock(&client->printer->rwlock);
+
+ /*
+  * Delete the device...
+  */
+
+  delete_device(device);
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+}
+
+
+/*
  * 'ipp_update_active_jobs()' - Update the list of active jobs.
  */
 
@@ -4308,8 +4934,102 @@ static void
 ipp_update_active_jobs(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Output device */
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*job_ids,	/* job-ids */
+			*job_states;	/* output-device-job-states */
+  int			i,		/* Looping var */
+			count,		/* Number of values */
+			num_different = 0,
+					/* Number of jobs with different states */
+			different[1000],/* Jobs with different states */
+			num_unsupported = 0,
+					/* Number of unsupported job-ids */
+			unsupported[1000];
+					/* Unsupported job-ids */
+  ipp_jstate_t		states[1000];	/* Different job state values */
+
+
+ /*
+  * Process the job-ids and output-device-job-states values...
+  */
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job_ids = ippFindAttribute(client->request, "job-ids", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(job_ids) != IPP_TAG_OPERATION || ippGetValueTag(job_ids) != IPP_TAG_INTEGER)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, job_ids ? "Bad job-ids attribute." : "Missing required job-ids attribute.");
+    return;
+  }
+
+  if ((job_states = ippFindAttribute(client->request, "output-device-job-states", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(job_states) != IPP_TAG_OPERATION || ippGetValueTag(job_states) != IPP_TAG_ENUM)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, job_ids ? "Bad output-device-job-states attribute." : "Missing required output-device-job-states attribute.");
+    return;
+  }
+
+  count = ippGetCount(job_ids);
+  if (count != ippGetCount(job_states))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, "The job-ids and output-device-job-states attributes do not have the same number of values.");
+    return;
+  }
+
+  for (i = 0; i < count; i ++)
+  {
+    if ((job = find_job(client, ippGetInteger(job_ids, i))) == NULL || !job->dev_uuid || strcmp(job->dev_uuid, device->uuid))
+    {
+      if (num_unsupported < 1000)
+        unsupported[num_unsupported ++] = ippGetInteger(job_ids, i);
+    }
+    else
+    {
+      ipp_jstate_t	state = (ipp_jstate_t)ippGetInteger(job_states, i);
+
+      if (job->state >= IPP_JSTATE_STOPPED && state != job->state)
+      {
+        if (num_different < 1000)
+	{
+	  different[num_different] = job->id;
+	  states[num_different ++] = job->state;
+	}
+      }
+      else
+        job->dev_state = state;
+    }
+  }
+
+ /*
+  * Then look for jobs assigned to the device but not listed...
+  */
+
+  for (job = (_ipp_job_t *)cupsArrayFirst(client->printer->jobs);
+       job && num_different < 1000;
+       job = (_ipp_job_t *)cupsArrayNext(client->printer->jobs))
+  {
+    if (job->dev_uuid && !strcmp(job->dev_uuid, device->uuid) && !ippContainsInteger(job_ids, job->id))
+    {
+      different[num_different] = job->id;
+      states[num_different ++] = job->state;
+    }
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
+
+  if (num_different > 0)
+  {
+    ippAddIntegers(client->response, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-ids", num_different, different);
+    ippAddIntegers(client->response, IPP_TAG_OPERATION, IPP_TAG_ENUM, "output-device-job-states", num_different, (int *)states);
+  }
+
+  if (num_unsupported > 0)
+  {
+    ippAddIntegers(client->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_INTEGER, "job-ids", num_unsupported, unsupported);
+  }
 }
 
 
@@ -4321,8 +5041,42 @@ static void
 ipp_update_document_status(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*attr;		/* Attribute */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (!job->dev_uuid || strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job not assigned to device.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "document-number", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(attr) != IPP_TAG_OPERATION || ippGetValueTag(attr) != IPP_TAG_INTEGER || ippGetCount(attr) != 1 || ippGetInteger(attr, 0) != 1)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_BAD_REQUEST, attr ? "Bad document-number attribute." : "Missing document-number attribute.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "impressions-completed", IPP_TAG_INTEGER)) != NULL)
+  {
+    job->impcompleted = ippGetInteger(attr, 0);
+    add_event(client->printer, job, _IPP_EVENT_JOB_PROGRESS, NULL);
+  }
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -4334,8 +5088,53 @@ static void
 ipp_update_job_status(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*attr;		/* Attribute */
+  _ipp_event_t		events = _IPP_EVENT_NONE;
+					/* Event(s) */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Device was not found.");
+    return;
+  }
+
+  if ((job = find_job(client, 0)) == NULL)
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_FOUND, "Job was not found.");
+    return;
+  }
+
+  if (!job->dev_uuid || strcmp(job->dev_uuid, device->uuid))
+  {
+    respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Job not assigned to device.");
+    return;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-impressions-completed", IPP_TAG_INTEGER)) != NULL)
+  {
+    job->impcompleted = ippGetInteger(attr, 0);
+    events |= _IPP_EVENT_JOB_PROGRESS;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "output-device-job-state", IPP_TAG_ENUM)) != NULL)
+  {
+    job->dev_state = (ipp_jstate_t)ippGetInteger(attr, 0);
+    events |= _IPP_EVENT_JOB_STATE_CHANGED;
+  }
+
+  if ((attr = ippFindAttribute(client->request, "output-device-job-state-reasons", IPP_TAG_KEYWORD)) != NULL)
+  {
+    job->dev_state_reasons = get_job_state_reasons_bits(attr);
+    events |= _IPP_EVENT_JOB_STATE_CHANGED;
+  }
+
+  if (events)
+    add_event(client->printer, job, events, NULL);
+
+  respond_ipp(client, IPP_STATUS_OK, NULL);
 }
 
 
@@ -4347,8 +5146,111 @@ static void
 ipp_update_output_device_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
-  // TODO: Implement this!
-  respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Need to implement this.");
+  _ipp_device_t		*device;	/* Device */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*dev_attr;	/* Device attribute */
+  _ipp_event_t		events = _IPP_EVENT_NONE;
+					/* Config/state changed? */
+
+
+  if ((device = find_device(client)) == NULL)
+  {
+    if ((device = create_device(client)) == NULL)
+    {
+      respond_ipp(client, IPP_STATUS_ERROR_NOT_POSSIBLE, "Unable to add output device.");
+      return;
+    }
+  }
+
+  _cupsRWLockWrite(&device->rwlock);
+
+  attr = ippFirstAttribute(client->request);
+  while (attr && ippGetGroupTag(attr) != IPP_TAG_PRINTER)
+    attr = ippNextAttribute(client->request);
+
+  for (; attr; attr = ippNextAttribute(client->request))
+  {
+    const char	*attrname = ippGetName(attr),
+					/* Attribute name */
+		*dotptr;		/* Pointer to dot in name */
+
+   /*
+    * Skip attributes we don't care about...
+    */
+
+    if (!attrname)
+      continue;
+
+    if (strncmp(attrname, "copies", 6) && strncmp(attrname, "document-format", 15) && strncmp(attrname, "finishings", 10) && strncmp(attrname, "media", 5) && strncmp(attrname, "print-", 6) && strncmp(attrname, "sides", 5) && strncmp(attrname, "printer-alert", 13) && strncmp(attrname, "printer-input", 13) && strncmp(attrname, "printer-output", 14) && strncmp(attrname, "printer-resolution", 18) && strncmp(attrname, "pwg-raster", 10) && strncmp(attrname, "urf-", 4))
+      continue;
+
+    if (strncmp(attrname, "printer-alert", 13) || strncmp(attrname, "printer-state", 13))
+      events |= _IPP_EVENT_PRINTER_CONFIG_CHANGED;
+    else
+      events |= _IPP_EVENT_PRINTER_STATE_CHANGED;
+
+    if (!strcmp(attrname, "media-col-ready") || !strcmp(attrname, "media-ready"))
+      events |= _IPP_EVENT_PRINTER_MEDIA_CHANGED;
+
+    if (!strcmp(attrname, "finishings-col-ready") || !strcmp(attrname, "finishings-ready"))
+      events |= _IPP_EVENT_PRINTER_FINISHINGS_CHANGED;
+
+    if ((dotptr = strrchr(attrname, '.')) != NULL && isdigit(dotptr[1] & 255))
+    {
+#if 0
+     /*
+      * Sparse representation: name.NNN or name.NNN-NNN
+      */
+
+      char	temp[256],		/* Temporary name string */
+		*tempptr;		/* Pointer into temporary string */
+      int	low, high;		/* Low and high numbers in range */
+
+      low = (int)strtol(dotptr + 1, (char **)&dotptr, 10);
+      if (dotptr && *dotptr == '-')
+        high = (int)strtol(dotptr + 1, NULL, 10);
+      else
+        high = low;
+
+      strlcpy(temp, attrname, sizeof(temp));
+      if ((tempptr = strrchr(temp, '.')) != NULL)
+        *tempptr = '\0';
+
+      if ((dev_attr = ippFindAttribute(device->attrs, temp, IPP_TAG_ZERO)) != NULL)
+      {
+      }
+      else
+#endif /* 0 */
+        respond_unsupported(client, attr);
+    }
+    else
+    {
+     /*
+      * Regular representation - replace or delete current attribute,
+      * if any...
+      */
+
+      if ((dev_attr = ippFindAttribute(device->attrs, attrname, IPP_TAG_ZERO)) != NULL)
+        ippDeleteAttribute(device->attrs, dev_attr);
+
+      if (ippGetValueTag(attr) != IPP_TAG_DELETEATTR)
+        ippCopyAttribute(device->attrs, attr, 0);
+    }
+  }
+
+  _cupsRWUnlock(&device->rwlock);
+
+  if (events)
+  {
+    _cupsRWLockWrite(&client->printer->rwlock);
+    if (events & _IPP_EVENT_PRINTER_CONFIG_CHANGED)
+      update_device_attributes_no_lock(client->printer);
+    if (events & _IPP_EVENT_PRINTER_STATE_CHANGED)
+      update_device_state_no_lock(client->printer);
+    _cupsRWUnlock(&client->printer->rwlock);
+
+    add_event(client->printer, NULL, events, NULL);
+  }
 }
 
 
@@ -4377,6 +5279,7 @@ ipp_validate_job(_ipp_client_t *client)	/* I - Client */
 }
 
 
+#if 0
 /*
  * 'parse_options()' - Parse URL options into CUPS options.
  *
@@ -4409,6 +5312,7 @@ parse_options(_ipp_client_t *client,	/* I - Client */
 
   return (num_options);
 }
+#endif /* 0 */
 
 
 /*
@@ -5370,6 +6274,10 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 	        ipp_update_output_device_attributes(client);
 		break;
 
+            case _IPP_OP_UNREGISTER_OUTPUT_DEVICE :
+	        ipp_unregister_output_device(client);
+		break;
+
 	    default :
 		respond_ipp(client, IPP_STATUS_ERROR_OPERATION_NOT_SUPPORTED,
 			    "Operation not supported.");
@@ -5388,7 +6296,7 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
     httpFlush(client->http);		/* Flush trailing (junk) data */
 
   return (respond_http(client, HTTP_STATUS_OK, NULL, "application/ipp",
-                       ippLength(client->response)));
+                       client->fetch_file >= 0 ? 0 : ippLength(client->response)));
 }
 
 
@@ -5522,6 +6430,22 @@ respond_http(
 
     if (ippWrite(client->http, client->response) != IPP_STATE_DATA)
       return (0);
+
+    if (client->fetch_file >= 0)
+    {
+      ssize_t	bytes;			/* Bytes read */
+      char	buffer[32768];		/* Buffer */
+
+      if (client->fetch_compression)
+        httpSetField(client->http, HTTP_FIELD_CONTENT_ENCODING, "gzip");
+
+      while ((bytes = read(client->fetch_file, buffer, sizeof(buffer))) > 0)
+        httpWrite2(client->http, buffer, (size_t)bytes);
+
+      httpWrite2(client->http, "", 0);
+      close(client->fetch_file);
+      client->fetch_file = -1;
+    }
   }
 
   return (1);
@@ -5681,6 +6605,65 @@ time_string(time_t tv,			/* I - Time value */
 
   strftime(buffer, bufsize, "%X", curtime);
   return (buffer);
+}
+
+
+/*
+ * 'update_device_attributes_no_lock()' - Update the composite device attributes.
+ *
+ * Note: Caller MUST lock the printer object for writing before using.
+ */
+
+static void
+update_device_attributes_no_lock(
+    _ipp_printer_t *printer)		/* I - Printer */
+{
+  _ipp_device_t		*device;	/* Current device */
+  ipp_t			*dev_attrs;	/* Device attributes */
+
+
+ /* TODO: Support multiple output devices, icons, etc... */
+  device    = (_ipp_device_t *)cupsArrayFirst(printer->devices);
+  dev_attrs = ippNew();
+
+  if (device)
+    copy_attributes(dev_attrs, device->attrs, NULL, IPP_TAG_PRINTER, 0);
+
+  ippDelete(printer->dev_attrs);
+  printer->dev_attrs = dev_attrs;
+
+  printer->config_time = time(NULL);
+}
+
+
+/*
+ * 'update_device_status_no_lock()' - Update the composite device state.
+ *
+ * Note: Caller MUST lock the printer object for writing before using.
+ */
+
+static void
+update_device_state_no_lock(
+    _ipp_printer_t *printer)		/* I - Printer */
+{
+  _ipp_device_t		*device;	/* Current device */
+  ipp_attribute_t	*attr;		/* Current attribute */
+
+
+ /* TODO: Support multiple output devices, icons, etc... */
+  device = (_ipp_device_t *)cupsArrayFirst(printer->devices);
+
+  if ((attr = ippFindAttribute(device->attrs, "printer-state", IPP_TAG_ENUM)) != NULL)
+    printer->dev_state = (ipp_pstate_t)ippGetInteger(attr, 0);
+  else
+    printer->dev_state = IPP_PSTATE_STOPPED;
+
+  if ((attr = ippFindAttribute(device->attrs, "printer-state-reasons", IPP_TAG_KEYWORD)) != NULL)
+    printer->dev_reasons = get_printer_state_reasons_bits(attr);
+  else
+    printer->dev_reasons = _IPP_PREASON_PAUSED;
+
+  printer->state_time = time(NULL);
 }
 
 

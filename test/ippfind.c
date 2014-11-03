@@ -1983,9 +1983,9 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 	    strlcpy(tptr, scheme + 22, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strncmp(keyword, "txt_", 4))
 	  {
-	    const char *txt = cupsGetOption(keyword + 4, service->num_txt, service->txt);
-	    if (txt)
-	      strlcpy(tptr, txt, sizeof(temp) - (size_t)(tptr - temp));
+	    const char *val = cupsGetOption(keyword + 4, service->num_txt, service->txt);
+	    if (val)
+	      strlcpy(tptr, val, sizeof(temp) - (size_t)(tptr - temp));
 	    else
 	      *tptr = '\0';
 	  }

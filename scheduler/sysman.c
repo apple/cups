@@ -360,7 +360,8 @@ cupsdStartSystemMonitor(void)
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartSystemMonitor: IOPSGetTimeRemainingEstimate=%f", IOPSGetTimeRemainingEstimate());
   ACPower = IOPSGetTimeRemainingEstimate() == kIOPSTimeRemainingUnlimited;
-  notify_register_dispatch(kIOPSNotifyPowerSource, &PSToken, dispatch_get_main_queue(), ^(int t) { ACPower = IOPSGetTimeRemainingEstimate() == kIOPSTimeRemainingUnlimited; });
+  notify_register_dispatch(kIOPSNotifyPowerSource, &PSToken, dispatch_get_main_queue(), ^(int t) { (void)t;
+      ACPower = IOPSGetTimeRemainingEstimate() == kIOPSTimeRemainingUnlimited; });
 }
 
 

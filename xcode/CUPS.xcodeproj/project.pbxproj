@@ -13,6 +13,8 @@
 			buildPhases = (
 			);
 			dependencies = (
+				274EE2861A03EEEE003213D1 /* PBXTargetDependency */,
+				274EE2881A03EEEE003213D1 /* PBXTargetDependency */,
 				726AD704135E8AA1002C930D /* PBXTargetDependency */,
 				2767FC5419267469000F61D3 /* PBXTargetDependency */,
 				273BF6DE1333B6370022CAAB /* PBXTargetDependency */,
@@ -29,6 +31,8 @@
 			buildPhases = (
 			);
 			dependencies = (
+				274EE2821A03EEE0003213D1 /* PBXTargetDependency */,
+				274EE2841A03EEE0003213D1 /* PBXTargetDependency */,
 				274FF5E313332D4300317ECB /* PBXTargetDependency */,
 				72BEA8D819AFA8BB0085F0F3 /* PBXTargetDependency */,
 				72F75A711336FACD004BB496 /* PBXTargetDependency */,
@@ -68,6 +72,20 @@
 		270CCDBA135E3D0900007BE2 /* libcupsmime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220FAC13330B2200FCA411 /* libcupsmime.dylib */; };
 		270CCDBC135E3D3E00007BE2 /* testmime.c in Sources */ = {isa = PBXBuildFile; fileRef = 270CCDBB135E3D3E00007BE2 /* testmime.c */; };
 		273BF6C71333B5370022CAAB /* testcups.c in Sources */ = {isa = PBXBuildFile; fileRef = 273BF6C61333B5370022CAAB /* testcups.c */; };
+		274EE2611A03EDCA003213D1 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A4332F155844CF002E172D /* libcups_static.a */; };
+		274EE2621A03EDCA003213D1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC591926750C000F61D3 /* CoreFoundation.framework */; };
+		274EE2631A03EDCA003213D1 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5B1926750C000F61D3 /* libresolv.dylib */; };
+		274EE2641A03EDCA003213D1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5C1926750C000F61D3 /* libz.dylib */; };
+		274EE2651A03EDCA003213D1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5D1926750C000F61D3 /* Security.framework */; };
+		274EE2661A03EDCA003213D1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5E1926750C000F61D3 /* SystemConfiguration.framework */; };
+		274EE2721A03EDCB003213D1 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A4332F155844CF002E172D /* libcups_static.a */; };
+		274EE2731A03EDCB003213D1 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC591926750C000F61D3 /* CoreFoundation.framework */; };
+		274EE2741A03EDCB003213D1 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5B1926750C000F61D3 /* libresolv.dylib */; };
+		274EE2751A03EDCB003213D1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5C1926750C000F61D3 /* libz.dylib */; };
+		274EE2761A03EDCB003213D1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5D1926750C000F61D3 /* Security.framework */; };
+		274EE2771A03EDCB003213D1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2767FC5E1926750C000F61D3 /* SystemConfiguration.framework */; };
+		274EE27E1A03EE0B003213D1 /* ippinfra.c in Sources */ = {isa = PBXBuildFile; fileRef = 274EE27D1A03EE0B003213D1 /* ippinfra.c */; };
+		274EE2801A03EE41003213D1 /* ippproxy.c in Sources */ = {isa = PBXBuildFile; fileRef = 274EE27F1A03EE41003213D1 /* ippproxy.c */; };
 		274FF5D913332CC700317ECB /* cups-driverd.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 274FF5D613332CC700317ECB /* cups-driverd.cxx */; };
 		274FF5DA13332CC700317ECB /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 274FF5D713332CC700317ECB /* util.c */; };
 		274FF5DD13332D0600317ECB /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
@@ -447,6 +465,48 @@
 			proxyType = 1;
 			remoteGlobalIDString = 273BF6BC1333B5000022CAAB;
 			remoteInfo = testcups;
+		};
+		274EE25D1A03EDCA003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274FF6891333B1C400317ECB;
+			remoteInfo = libcups_static;
+		};
+		274EE26E1A03EDCB003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274FF6891333B1C400317ECB;
+			remoteInfo = libcups_static;
+		};
+		274EE2811A03EEE0003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274EE25B1A03EDCA003213D1;
+			remoteInfo = ippinfra;
+		};
+		274EE2831A03EEE0003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274EE26C1A03EDCB003213D1;
+			remoteInfo = ippproxy;
+		};
+		274EE2851A03EEEE003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274EE25B1A03EDCA003213D1;
+			remoteInfo = ippinfra;
+		};
+		274EE2871A03EEEE003213D1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 274EE26C1A03EDCB003213D1;
+			remoteInfo = ippproxy;
 		};
 		274FF5DB13332CF900317ECB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -966,6 +1026,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		274EE2671A03EDCA003213D1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		274EE2781A03EDCB003213D1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		274FF5CA13332B1F00317ECB /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1219,6 +1297,10 @@
 		2732E092137A3F5200FAFEF6 /* lpstat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = lpstat.c; path = ../systemv/lpstat.c; sourceTree = "<group>"; };
 		273BF6BD1333B5000022CAAB /* testcups */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testcups; sourceTree = BUILT_PRODUCTS_DIR; };
 		273BF6C61333B5370022CAAB /* testcups.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = testcups.c; path = ../cups/testcups.c; sourceTree = "<group>"; };
+		274EE26B1A03EDCA003213D1 /* ippserver copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "ippserver copy"; sourceTree = BUILT_PRODUCTS_DIR; };
+		274EE27C1A03EDCB003213D1 /* ippserver copy copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "ippserver copy copy"; sourceTree = BUILT_PRODUCTS_DIR; };
+		274EE27D1A03EE0B003213D1 /* ippinfra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ippinfra.c; path = ../test/ippinfra.c; sourceTree = "<group>"; };
+		274EE27F1A03EE41003213D1 /* ippproxy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ippproxy.c; path = ../test/ippproxy.c; sourceTree = "<group>"; };
 		274FF5CC13332B1F00317ECB /* cups-driverd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cups-driverd"; sourceTree = BUILT_PRODUCTS_DIR; };
 		274FF5D613332CC700317ECB /* cups-driverd.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cups-driverd.cxx"; path = "../scheduler/cups-driverd.cxx"; sourceTree = "<group>"; };
 		274FF5D713332CC700317ECB /* util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util.c; path = ../scheduler/util.c; sourceTree = "<group>"; };
@@ -1588,6 +1670,32 @@
 				2767FC631926750C000F61D3 /* Security.framework in Frameworks */,
 				2767FC641926750C000F61D3 /* SystemConfiguration.framework in Frameworks */,
 				2767FC58192674E0000F61D3 /* libcups_static.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		274EE2601A03EDCA003213D1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				274EE2611A03EDCA003213D1 /* libcups_static.a in Frameworks */,
+				274EE2621A03EDCA003213D1 /* CoreFoundation.framework in Frameworks */,
+				274EE2631A03EDCA003213D1 /* libresolv.dylib in Frameworks */,
+				274EE2641A03EDCA003213D1 /* libz.dylib in Frameworks */,
+				274EE2651A03EDCA003213D1 /* Security.framework in Frameworks */,
+				274EE2661A03EDCA003213D1 /* SystemConfiguration.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		274EE2711A03EDCB003213D1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				274EE2721A03EDCB003213D1 /* libcups_static.a in Frameworks */,
+				274EE2731A03EDCB003213D1 /* CoreFoundation.framework in Frameworks */,
+				274EE2741A03EDCB003213D1 /* libresolv.dylib in Frameworks */,
+				274EE2751A03EDCB003213D1 /* libz.dylib in Frameworks */,
+				274EE2761A03EDCB003213D1 /* Security.framework in Frameworks */,
+				274EE2771A03EDCB003213D1 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1967,6 +2075,8 @@
 		274FF67313333B0A00317ECB /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				274EE27F1A03EE41003213D1 /* ippproxy.c */,
+				274EE27D1A03EE0B003213D1 /* ippinfra.c */,
 				2732E089137A3F5200FAFEF6 /* cancel.c */,
 				2732E08A137A3F5200FAFEF6 /* cupsaccept.c */,
 				276684101337FA7C000D33D0 /* cupsaddsmb.c */,
@@ -2033,6 +2143,8 @@
 				72A4332F155844CF002E172D /* libcups_static.a */,
 				72CF95F118A19134000FCAE4 /* ipptool copy */,
 				2767FC5019266A0D000F61D3 /* testdest */,
+				274EE26B1A03EDCA003213D1 /* ippserver copy */,
+				274EE27C1A03EDCB003213D1 /* ippserver copy copy */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2554,6 +2666,42 @@
 			name = testcups;
 			productName = testcups;
 			productReference = 273BF6BD1333B5000022CAAB /* testcups */;
+			productType = "com.apple.product-type.tool";
+		};
+		274EE25B1A03EDCA003213D1 /* ippinfra */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 274EE2681A03EDCA003213D1 /* Build configuration list for PBXNativeTarget "ippinfra" */;
+			buildPhases = (
+				274EE25E1A03EDCA003213D1 /* Sources */,
+				274EE2601A03EDCA003213D1 /* Frameworks */,
+				274EE2671A03EDCA003213D1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				274EE25C1A03EDCA003213D1 /* PBXTargetDependency */,
+			);
+			name = ippinfra;
+			productName = ippserver;
+			productReference = 274EE26B1A03EDCA003213D1 /* ippserver copy */;
+			productType = "com.apple.product-type.tool";
+		};
+		274EE26C1A03EDCB003213D1 /* ippproxy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 274EE2791A03EDCB003213D1 /* Build configuration list for PBXNativeTarget "ippproxy" */;
+			buildPhases = (
+				274EE26F1A03EDCB003213D1 /* Sources */,
+				274EE2711A03EDCB003213D1 /* Frameworks */,
+				274EE2781A03EDCB003213D1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				274EE26D1A03EDCB003213D1 /* PBXTargetDependency */,
+			);
+			name = ippproxy;
+			productName = ippserver;
+			productReference = 274EE27C1A03EDCB003213D1 /* ippserver copy copy */;
 			productType = "com.apple.product-type.tool";
 		};
 		274FF5CB13332B1F00317ECB /* cups-driverd */ = {
@@ -3161,6 +3309,8 @@
 				724379461333FEA9009631B9 /* dnssd */,
 				724378FC1333E43E009631B9 /* ipp */,
 				72CF95E618A19134000FCAE4 /* ippfind */,
+				274EE25B1A03EDCA003213D1 /* ippinfra */,
+				274EE26C1A03EDCB003213D1 /* ippproxy */,
 				726AD6F6135E88F0002C930D /* ippserver */,
 				276683EF1337F78E000D33D0 /* ipptool */,
 				724379171333E532009631B9 /* lpd */,
@@ -3195,6 +3345,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				273BF6C71333B5370022CAAB /* testcups.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		274EE25E1A03EDCA003213D1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				274EE27E1A03EE0B003213D1 /* ippinfra.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		274EE26F1A03EDCB003213D1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				274EE2801A03EE41003213D1 /* ippproxy.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3631,6 +3797,36 @@
 			target = 273BF6BC1333B5000022CAAB /* testcups */;
 			targetProxy = 273BF6DD1333B6370022CAAB /* PBXContainerItemProxy */;
 		};
+		274EE25C1A03EDCA003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274FF6891333B1C400317ECB /* libcups_static */;
+			targetProxy = 274EE25D1A03EDCA003213D1 /* PBXContainerItemProxy */;
+		};
+		274EE26D1A03EDCB003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274FF6891333B1C400317ECB /* libcups_static */;
+			targetProxy = 274EE26E1A03EDCB003213D1 /* PBXContainerItemProxy */;
+		};
+		274EE2821A03EEE0003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274EE25B1A03EDCA003213D1 /* ippinfra */;
+			targetProxy = 274EE2811A03EEE0003213D1 /* PBXContainerItemProxy */;
+		};
+		274EE2841A03EEE0003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274EE26C1A03EDCB003213D1 /* ippproxy */;
+			targetProxy = 274EE2831A03EEE0003213D1 /* PBXContainerItemProxy */;
+		};
+		274EE2861A03EEEE003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274EE25B1A03EDCA003213D1 /* ippinfra */;
+			targetProxy = 274EE2851A03EEEE003213D1 /* PBXContainerItemProxy */;
+		};
+		274EE2881A03EEEE003213D1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 274EE26C1A03EDCB003213D1 /* ippproxy */;
+			targetProxy = 274EE2871A03EEEE003213D1 /* PBXContainerItemProxy */;
+		};
 		274FF5DC13332CF900317ECB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 72220EAD1333047D00FCA411 /* libcups */;
@@ -4028,6 +4224,34 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		274EE2691A03EDCA003213D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "ippserver copy";
+			};
+			name = Debug;
+		};
+		274EE26A1A03EDCA003213D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "ippserver copy";
+			};
+			name = Release;
+		};
+		274EE27A1A03EDCB003213D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "ippserver copy copy";
+			};
+			name = Debug;
+		};
+		274EE27B1A03EDCB003213D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "ippserver copy copy";
 			};
 			name = Release;
 		};
@@ -4665,6 +4889,24 @@
 			buildConfigurations = (
 				273BF6DB1333B6270022CAAB /* Debug */,
 				273BF6DC1333B6270022CAAB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		274EE2681A03EDCA003213D1 /* Build configuration list for PBXNativeTarget "ippinfra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				274EE2691A03EDCA003213D1 /* Debug */,
+				274EE26A1A03EDCA003213D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		274EE2791A03EDCB003213D1 /* Build configuration list for PBXNativeTarget "ippproxy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				274EE27A1A03EDCB003213D1 /* Debug */,
+				274EE27B1A03EDCB003213D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
