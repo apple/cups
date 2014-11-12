@@ -315,7 +315,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       ippDelete(response);
     }
 
-  if (num_dests == 0 && op == IPP_PURGE_JOBS)
+  if (num_dests == 0 && op != IPP_CANCEL_JOB)
   {
    /*
     * Open a connection to the server...
