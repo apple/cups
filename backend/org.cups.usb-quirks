@@ -84,6 +84,9 @@
 # Canon, Inc. MF4150 Printer, https://bugs.launchpad.net/bugs/1160638
 0x04a9 0x26a3 no-reattach
 
+# Brother Industries, Ltd HL-1250 Laser Printer, https://bugs.debian.org/712512
+0x04f9 0x0007 no-reattach
+
 # Brother Industries, Ltd HL-1430 Laser Printer, https://bugs.launchpad.net/bugs/1038695
 0x04f9 0x001a no-reattach
 

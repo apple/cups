@@ -21,6 +21,7 @@ CHANGES IN CUPS V2.0.1
 	- The IPP backend did not work with some configurations of Windows
 	  (STR #4503)
 	- RPMs did not build (STR #4490)
+	- Added a USB quirk rule for the Brother HL-1250 (STR #4519)
 
 
 CHANGES IN CUPS V2.0.0
