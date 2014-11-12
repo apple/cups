@@ -163,7 +163,7 @@ extern "C" {
 #define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
 
 #define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
-#define _HTTP_TLS_ALLOW_SSL3	1	/* Allow SSL 3.0 */
+#define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
 
 
 /*
