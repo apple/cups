@@ -459,15 +459,15 @@ cupsdStartProcess(
   int		i;			/* Looping var */
   const char	*exec_path = command;	/* Command to be exec'd */
   char		*real_argv[110],	/* Real command-line arguments */
-		cups_exec[1024];	/* Path to "cups-exec" program */
+		cups_exec[1024],	/* Path to "cups-exec" program */
+		user_str[16],		/* User string */
+		group_str[16],		/* Group string */
+		nice_str[16];		/* FilterNice string */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
 #ifdef HAVE_POSIX_SPAWN
   posix_spawn_file_actions_t actions;	/* Spawn file actions */
   posix_spawnattr_t attrs;		/* Spawn attributes */
-  char		user_str[16],		/* User string */
-		group_str[16],		/* Group string */
-		nice_str[16];		/* FilterNice string */
 #elif defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
 #endif /* HAVE_POSIX_SPAWN */
