@@ -100,7 +100,11 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int			i;		/* Looping var */
   char			*opt;		/* Option character */
-  int			fg;		/* Run in the foreground */
+  int			close_all = 1,	/* Close all file descriptors? */
+			disconnect = 1,	/* Disconnect from controlling terminal? */
+			fg = 0,		/* Run in foreground? */
+			run_as_child = 0;
+					/* Running as child process? */
   int			fds;		/* Number of ready descriptors */
   cupsd_client_t	*con;		/* Current client */
   cupsd_job_t		*job;		/* Current job */
@@ -116,8 +120,6 @@ main(int  argc,				/* I - Number of command-line args */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction	action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-  int			run_as_child = 0;
-					/* Needed for background fork/exec */
 #ifdef __APPLE__
   int			use_sysman = 1;	/* Use system management functions? */
 #else
@@ -150,8 +152,10 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_LAUNCHD
   if (getenv("CUPSD_LAUNCHD"))
   {
-    OnDemand = 1;
-    fg       = 1;
+    OnDemand   = 1;
+    fg         = 1;
+    close_all  = 0;
+    disconnect = 0;
   }
 #endif /* HAVE_LAUNCHD */
 
@@ -162,7 +166,8 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  case 'C' : /* Run as child with config file */
               run_as_child = 1;
-	      fg           = -1;
+	      fg           = 1;
+	      close_all    = 0;
 
 	  case 'c' : /* Configuration file */
 	      i ++;
@@ -217,11 +222,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'f' : /* Run in foreground... */
-	      fg = 1;
+	      fg         = 1;
+	      disconnect = 0;
+	      close_all  = 0;
 	      break;
 
           case 'F' : /* Run in foreground, but disconnect from terminal... */
-	      fg = -1;
+	      fg        = 1;
+	      close_all = 0;
 	      break;
 
           case 'h' : /* Show usage/help */
@@ -230,12 +238,16 @@ main(int  argc,				/* I - Number of command-line args */
 
           case 'l' : /* Started by launchd/systemd... */
 #if defined(HAVE_LAUNCHD) || defined(HAVE_SYSTEMD)
-	      OnDemand = 1;
-	      fg       = 1;
+	      OnDemand   = 1;
+	      fg         = 1;
+	      close_all  = 0;
+	      disconnect = 0;
 #else
 	      _cupsLangPuts(stderr, _("cupsd: On-demand support not compiled "
 	                              "in, running in normal mode."));
-              fg = 0;
+              fg         = 0;
+	      disconnect = 1;
+	      close_all  = 1;
 #endif /* HAVE_LAUNCHD || HAVE_SYSTEMD */
 	      break;
 
@@ -244,6 +256,8 @@ main(int  argc,				/* I - Number of command-line args */
                     "use only!\n", stderr);
 	      stop_scheduler = 1;
 	      fg             = 1;
+	      disconnect     = 0;
+	      close_all      = 0;
 	      break;
 
           case 'P' : /* Disable security profiles */
@@ -285,6 +299,8 @@ main(int  argc,				/* I - Number of command-line args */
           case 't' : /* Test the cupsd.conf file... */
 	      TestConfigFile = 1;
 	      fg             = 1;
+	      disconnect     = 0;
+	      close_all      = 0;
 	      break;
 
 	  default : /* Unknown option */
@@ -332,8 +348,57 @@ main(int  argc,				/* I - Number of command-line args */
     free(filename);
   }
 
+  if (disconnect)
+  {
+   /*
+    * Make sure we aren't tying up any filesystems...
+    */
+
+    chdir("/");
+
+   /*
+    * Disconnect from the controlling terminal...
+    */
+
+    setsid();
+  }
+
+  if (close_all)
+  {
+   /*
+    * Close all open files...
+    */
+
+    getrlimit(RLIMIT_NOFILE, &limit);
+
+    for (i = 0; i < (int)limit.rlim_cur && i < 1024; i ++)
+      close(i);
+
+   /*
+    * Redirect stdin/out/err to /dev/null...
+    */
+
+    if ((i = open("/dev/null", O_RDONLY)) != 0)
+    {
+      dup2(i, 0);
+      close(i);
+    }
+
+    if ((i = open("/dev/null", O_WRONLY)) != 1)
+    {
+      dup2(i, 1);
+      close(i);
+    }
+
+    if ((i = open("/dev/null", O_WRONLY)) != 2)
+    {
+      dup2(i, 2);
+      close(i);
+    }
+  }
+
  /*
-  * If the user hasn't specified "-f", run in the background...
+  * Run in the background as needed...
   */
 
   if (!fg)
@@ -408,72 +473,15 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* __OpenBSD__ && OpenBSD < 201211 */
 
    /*
-    * Since CoreFoundation and DBUS both create fork-unsafe data on execution of
-    * a program, and since this kind of really unfriendly behavior seems to be
-    * more common these days in system libraries, we need to re-execute the
-    * background cupsd with the "-C" option to avoid problems.  Unfortunately,
-    * we also have to assume that argv[0] contains the name of the cupsd
-    * executable - there is no portable way to get the real pathname...
+    * Since many system libraries create fork-unsafe data on execution of a
+    * program, we need to re-execute the background cupsd with the "-C" and "-s"
+    * options to avoid problems.  Unfortunately, we also have to assume that
+    * argv[0] contains the name of the cupsd executable - there is no portable
+    * way to get the real pathname...
     */
 
-    execlp(argv[0], argv[0], "-C", ConfigurationFile, (char *)0);
+    execlp(argv[0], argv[0], "-C", ConfigurationFile, "-s", CupsFilesFile, (char *)0);
     exit(errno);
-  }
-
-  if (fg < 1)
-  {
-   /*
-    * Make sure we aren't tying up any filesystems...
-    */
-
-    chdir("/");
-
-#ifndef DEBUG
-   /*
-    * Disable core dumps...
-    */
-
-    getrlimit(RLIMIT_CORE, &limit);
-    limit.rlim_cur = 0;
-    setrlimit(RLIMIT_CORE, &limit);
-
-   /*
-    * Disconnect from the controlling terminal...
-    */
-
-    setsid();
-
-   /*
-    * Close all open files...
-    */
-
-    getrlimit(RLIMIT_NOFILE, &limit);
-
-    for (i = 0; i < limit.rlim_cur && i < 1024; i ++)
-      close(i);
-
-   /*
-    * Redirect stdin/out/err to /dev/null...
-    */
-
-    if ((i = open("/dev/null", O_RDONLY)) != 0)
-    {
-      dup2(i, 0);
-      close(i);
-    }
-
-    if ((i = open("/dev/null", O_WRONLY)) != 1)
-    {
-      dup2(i, 1);
-      close(i);
-    }
-
-    if ((i = open("/dev/null", O_WRONLY)) != 2)
-    {
-      dup2(i, 2);
-      close(i);
-    }
-#endif /* DEBUG */
   }
 
  /*

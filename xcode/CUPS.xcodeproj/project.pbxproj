@@ -1509,6 +1509,8 @@
 		724379C41333FFC7009631B9 /* usb-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "usb-darwin.c"; path = "../backend/usb-darwin.c"; sourceTree = "<group>"; };
 		724379C51333FFC7009631B9 /* usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = usb.c; path = ../backend/usb.c; sourceTree = "<group>"; };
 		724379CA1334000E009631B9 /* ieee1284.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ieee1284.c; path = ../backend/ieee1284.c; sourceTree = "<group>"; };
+		72496E161A13A03B0051899C /* org.cups.cups-lpd.socket */ = {isa = PBXFileReference; lastKnownFileType = text; name = "org.cups.cups-lpd.socket"; path = "../scheduler/org.cups.cups-lpd.socket"; sourceTree = SOURCE_ROOT; };
+		72496E171A13A03B0051899C /* org.cups.cups-lpdAT.service.in */ = {isa = PBXFileReference; lastKnownFileType = text; name = "org.cups.cups-lpdAT.service.in"; path = "../scheduler/org.cups.cups-lpdAT.service.in"; sourceTree = SOURCE_ROOT; };
 		7258EAE2134594C4009286F1 /* rastertopwg */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rastertopwg; sourceTree = BUILT_PRODUCTS_DIR; };
 		7258EAEC134594EB009286F1 /* rastertopwg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rastertopwg.c; path = ../filter/rastertopwg.c; sourceTree = "<group>"; };
 		726AD6F7135E88F0002C930D /* ippserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ippserver; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2267,6 +2269,8 @@
 				72E65BDC18DC852700097E89 /* Makefile */,
 				7226369B18AE6D19004ED309 /* org.cups.cups-lpd.plist */,
 				72E65BD518DC818400097E89 /* org.cups.cups-lpd.plist.in */,
+				72496E171A13A03B0051899C /* org.cups.cups-lpdAT.service.in */,
+				72496E161A13A03B0051899C /* org.cups.cups-lpd.socket */,
 				72E65BD618DC818400097E89 /* org.cups.cupsd.path.in */,
 				7226369C18AE6D19004ED309 /* org.cups.cupsd.plist */,
 				72E65BD718DC818400097E89 /* org.cups.cupsd.service.in */,
