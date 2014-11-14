@@ -465,12 +465,13 @@ cupsdStartProcess(
 		nice_str[16];		/* FilterNice string */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
-#ifdef HAVE_POSIX_SPAWN
+#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__)
   posix_spawn_file_actions_t actions;	/* Spawn file actions */
   posix_spawnattr_t attrs;		/* Spawn attributes */
+  sigset_t	defsignals;		/* Default signals */
 #elif defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_POSIX_SPAWN */
+#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
 #if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */
@@ -534,9 +535,9 @@ cupsdStartProcess(
   * Use helper program when we have a sandbox profile...
   */
 
-#ifndef HAVE_POSIX_SPAWN
+#if !defined(HAVE_POSIX_SPAWN) || defined(__OpenBSD__)
   if (profile)
-#endif /* !HAVE_POSIX_SPAWN */
+#endif /* !HAVE_POSIX_SPAWN || __OpenBSD__ */
   {
     snprintf(cups_exec, sizeof(cups_exec), "%s/daemon/cups-exec", ServerBin);
     snprintf(user_str, sizeof(user_str), "%d", user);
@@ -572,14 +573,21 @@ cupsdStartProcess(
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: argv[%d] = \"%s\"", i, argv[i]);
   }
 
-#ifdef HAVE_POSIX_SPAWN
+#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__) /* OpenBSD posix_spawn is busted with SETSIGDEF */
  /*
   * Setup attributes and file actions for the spawn...
   */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Setting spawn attributes.");
+  sigemptyset(&defsignals);
+  sigaddset(&defsignals, SIGTERM);
+  sigaddset(&defsignals, SIGCHLD);
+  sigaddset(&defsignals, SIGPIPE);
+
   posix_spawnattr_init(&attrs);
   posix_spawnattr_setflags(&attrs, POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_SETSIGDEF);
+  posix_spawnattr_setpgroup(&attrs, 0);
+  posix_spawnattr_setsigdefault(&attrs, &defsignals);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: Setting file actions.");
   posix_spawn_file_actions_init(&actions);
@@ -788,7 +796,7 @@ cupsdStartProcess(
   }
 
   cupsdReleaseSignals();
-#endif /* HAVE_POSIX_SPAWN */
+#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
 
   if (*pid)
   {

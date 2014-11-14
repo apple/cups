@@ -26,6 +26,7 @@ CHANGES IN CUPS V2.0.1
 	- Added a USB quirk rule for the Brother HL-1250 (STR #4519)
 	- Fixed compiles on unsupported platforms (STR #4510)
 	- "cancel -a" did not cancel all jobs on all destinations (STR #4513)
+	- The web interface did not work on OpenBSD (STR #4496)
 
 
 CHANGES IN CUPS V2.0.0
