@@ -1,5 +1,7 @@
-CHANGES.txt - 2.1b1 - 2014-10-31
+CHANGES.txt - 2.1b1 - 2014-11-19
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
 
+	- Improved speed of ppdMarkDefaults for complex/large PPDs
+	  (<rdar://problem/15146999>)
