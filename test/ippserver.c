@@ -1979,6 +1979,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   {
     static const char * const names[] =
     {
+      "job-account-id",
       "job-accounting-user-id",
       "job-password"
     };
@@ -4799,7 +4800,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	    if (client->printer->state_reasons & reason)
 	      html_printf(client, "\n<br>&nbsp;&nbsp;&nbsp;&nbsp;%s", reasons[i]);
 	  html_printf(client, "</p>\n");
-	  
+
           if (cupsArrayCount(client->printer->jobs) > 0)
 	  {
             _cupsRWLockRead(&(client->printer->rwlock));
@@ -5582,6 +5583,11 @@ register_printer(
 #  ifdef HAVE_SSL
   TXTRecordSetValue(&ipp_txt, "TLS", 3, "1.2");
 #  endif /* HAVE_SSL */
+  if (strstr(formats, "image/urf"))
+    TXTRecordSetValue(&ipp_txt, "URF", 66, "CP1,IS1-5-7,MT1-2-3-4-5-6-8-9-10-11-12-13,RS600,SRGB24,V1.4,W8,DM1");
+
+  TXTRecordSetValue(&ipp_txt, "txtvers", 1, "1");
+  TXTRecordSetValue(&ipp_txt, "qtotal", 1, "1");
 
  /*
   * Register the _printer._tcp (LPD) service type with a port number of 0 to
