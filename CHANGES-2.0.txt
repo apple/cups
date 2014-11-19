@@ -1,6 +1,12 @@
 CHANGES-2.0.txt
 ---------------
 
+CHANGES IN CUPS V2.0.2
+
+	- Command-line programs were not localized on Mac OS X
+	  (<rdar://problem/14546232>)
+
+
 CHANGES IN CUPS V2.0.1
 
 	- Security: SSLv3 is now disabled by default to protect against the

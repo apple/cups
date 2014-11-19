@@ -1139,7 +1139,7 @@ appleLangDefault(void)
   int			i;		/* Looping var */
   CFBundleRef		bundle;		/* Main bundle (if any) */
   CFArrayRef		bundleList;	/* List of localizations in bundle */
-  CFPropertyListRef 	localizationList;
+  CFPropertyListRef 	localizationList = NULL;
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
   CFStringRef		localeName;	/* Canonical from of name */
@@ -1165,14 +1165,42 @@ appleLangDefault(void)
     else if ((bundle = CFBundleGetMainBundle()) != NULL &&
              (bundleList = CFBundleCopyBundleLocalizations(bundle)) != NULL)
     {
+      CFURLRef resources = CFBundleCopyResourcesDirectoryURL(bundle);
+
       DEBUG_puts("3appleLangDefault: Getting localizationList from bundle.");
 
-      localizationList =
-	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
+      if (resources)
+      {
+        CFStringRef	cfpath = CFURLCopyPath(resources);
+	char		path[1024];
+
+        if (cfpath)
+	{
+	 /*
+	  * See if we have an Info.plist file in the bundle...
+	  */
+
+	  CFStringGetCString(cfpath, path,sizeof(path), kCFStringEncodingUTF8);
+	  DEBUG_printf(("3appleLangDefault: Got a resource URL (\"%s\")", path));
+	  strlcat(path, "Contents/Info.plist", sizeof(path));
+
+          if (!access(path, R_OK))
+	    localizationList = CFBundleCopyPreferredLocalizationsFromArray(bundleList);
+	  else
+	    DEBUG_puts("3appleLangDefault: No Info.plist, ignoring resource URL...");
+
+	  CFRelease(cfpath);
+	}
+
+	CFRelease(resources);
+      }
+      else
+        DEBUG_puts("3appleLangDefault: No resource URL.");
 
       CFRelease(bundleList);
     }
-    else
+
+    if (!localizationList)
     {
       DEBUG_puts("3appleLangDefault: Getting localizationList from preferences.");
 
