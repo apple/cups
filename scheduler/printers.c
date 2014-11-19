@@ -3685,8 +3685,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
 
-  cupsdClearString(&(p->make_model));
-
   if (cache_info.st_mtime >= ppd_info.st_mtime)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", cache_name);
@@ -3709,6 +3707,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
+
+  cupsdClearString(&(p->make_model));
 
   p->type &= (cups_ptype_t)~CUPS_PRINTER_OPTIONS;
   p->type |= CUPS_PRINTER_BW;
