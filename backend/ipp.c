@@ -2448,6 +2448,8 @@ monitor_printer(
             new_reasons |= _CUPS_JSR_JOB_PASSWORD_WAIT;
           else if (!strcmp(attr->values[i].string.text, "job-release-wait"))
             new_reasons |= _CUPS_JSR_JOB_RELEASE_WAIT;
+          else if (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system"))
+            job_canceled = 1;
         }
 
         if (new_reasons != monitor->job_reasons)

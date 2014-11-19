@@ -5,3 +5,5 @@ CHANGES IN CUPS V2.1b1
 
 	- Improved speed of ppdMarkDefaults for complex/large PPDs
 	  (<rdar://problem/15146999>)
+	- The IPP backend now stops sending print data if the printer indicates
+	  the job has been aborted or canceled (<rdar://problem/17837631>)
