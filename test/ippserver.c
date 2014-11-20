@@ -419,12 +419,12 @@ static int		valid_job_attributes(_ipp_client_t *client);
  * Globals...
  */
 
-#  ifdef HAVE_DNSSD
+#ifdef HAVE_DNSSD
 static DNSServiceRef	DNSSDMaster = NULL;
-#  else /* HAVE_AVAHI */
+#elif defined(HAVE_AVAHI)
 static AvahiThreadedPoll *DNSSDMaster = NULL;
 static AvahiClient	*DNSSDClient = NULL;
-#  endif /* HAVE_DNSSD */
+#endif /* HAVE_DNSSD */
 
 static int		KeepFiles = 0,
 			Verbosity = 0;
