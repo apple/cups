@@ -1107,7 +1107,6 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 		keyfile[1024];		/* Private key file */
     int		have_creds = 0;		/* Have credentials? */
 
-
     if (http->fields[HTTP_FIELD_HOST][0])
     {
      /*
@@ -1197,6 +1196,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
+#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   if (!tls_options)
     gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
   else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
@@ -1205,6 +1205,22 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
   else
     gnutls_priority_set_direct(http->tls, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+
+#else
+  gnutls_priority_t priority;		/* Priority */
+
+  if (!tls_options)
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+  else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
+    gnutls_priority_init(&priority, "NORMAL", NULL);
+  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
+  else
+    gnutls_priority_init(&priority, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+
+  gnutls_priority_set(http->tls, priority);
+  gnutls_priority_deinit(priority);
+#endif /* HAVE_GNUTLS_PRIORITY_SET_DIRECT */
 
   gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr_t)http);
   gnutls_transport_set_pull_function(http->tls, http_gnutls_read);

@@ -7,6 +7,7 @@ CHANGES IN CUPS V2.0.2
 	  (<rdar://problem/14546232>)
 	- The scheduler incorrectly cleared the MakeModel string in the
 	  printers.conf file after a restart (<rdar://problem/16827518>)
+	- CUPS did not work with older versions of GNU TLS (STR #4527)
 
 
 CHANGES IN CUPS V2.0.1

@@ -82,6 +82,7 @@ if test x$enable_ssl != xno; then
 	    SAVELIBS="$LIBS"
 	    LIBS="$LIBS $SSLLIBS"
 	    AC_CHECK_FUNC(gnutls_transport_set_pull_timeout_function, AC_DEFINE(HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION))
+	    AC_CHECK_FUNC(gnutls_priority_set_direct, AC_DEFINE(HAVE_GNUTLS_PRIORITY_SET_DIRECT))
 	    LIBS="$SAVELIBS"
 	fi
     fi

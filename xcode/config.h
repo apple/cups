@@ -301,6 +301,20 @@
 
 
 /*
+ * Do we have the gnutls_transport_set_pull_timeout_function function?
+ */
+
+/* #undef HAVE_GNUTLS_TRANSPORT_SET_PULL_TIMEOUT_FUNCTION */
+
+
+/*
+ * Do we have the gnutls_priority_set_direct function?
+ */
+
+/* #undef HAVE_GNUTLS_PRIORITY_SET_DIRECT */
+
+
+/*
  * What Security framework headers do we have?
  */
 
