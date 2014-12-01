@@ -66,7 +66,6 @@ AC_OUTPUT(Makedefs
 	  conf/pam.std
 	  conf/snmp.conf
 	  cups-config
-	  data/testprint
 	  desktop/cups.desktop
 	  doc/index.html
 	  man/client.conf.man
