@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.0.2
 	  printers.conf file after a restart (<rdar://problem/16827518>)
 	- CUPS did not compile with older versions of GNU TLS (STR #4527)
 	- CUPS did not compile without Avahi or mDNSResponder (STR #4523)
+	- ippLength() did not return the correct length for IPP_TAG_CONST string
+	  values.
 
 
 CHANGES IN CUPS V2.0.1
