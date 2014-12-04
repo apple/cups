@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.0.2
 	- CUPS did not compile without Avahi or mDNSResponder (STR #4523)
 	- ippLength() did not return the correct length for IPP_TAG_CONST string
 	  values.
+	- The scheduler incorrectly aborted jobs after a job was restarted
+	  (<rdar://problem/19129387>)
 
 
 CHANGES IN CUPS V2.0.1

@@ -4738,7 +4738,7 @@ stop_job(cupsd_job_t       *job,	/* I - Job */
   FilterLevel -= job->cost;
   job->cost   = 0;
 
-  if (action == CUPSD_JOB_DEFAULT && !job->kill_time)
+  if (action == CUPSD_JOB_DEFAULT && !job->kill_time && job->backend > 0)
     job->kill_time = time(NULL) + JobKillDelay;
   else if (action >= CUPSD_JOB_FORCE)
     job->kill_time = 0;
