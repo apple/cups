@@ -13,6 +13,8 @@ CHANGES IN CUPS V2.0.2
 	  values.
 	- The scheduler incorrectly aborted jobs after a job was restarted
 	  (<rdar://problem/19129387>)
+	- The cups-files.conf file contained the old ServerCertificate/Key
+	  directives instead of ServerKeychain.
 
 
 CHANGES IN CUPS V2.0.1
