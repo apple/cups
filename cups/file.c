@@ -288,6 +288,7 @@ _cupsFileCheckFilter(
 
   switch (result)
   {
+    default :
     case _CUPS_FILE_CHECK_OK :
         prefix = "DEBUG2";
 	break;
