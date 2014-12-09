@@ -14,12 +14,23 @@ if test ! -f tools/makesrcdist; then
         exit 1
 fi
 
+# Figure out the proper echo options...
+if (echo "testing\c"; echo 1,2,3) | grep c >/dev/null; then
+        ac_n=-n
+        ac_c=
+else
+        ac_n=
+        ac_c='\c'
+fi
+
+# See if we have local changes (other than this script...)
 if (svn st | grep -v makesrcdist | grep -qv '^\?'); then
         echo Local changes remain:
         svn st | grep -v makesrcdist | grep -v '^\?'
         exit 1
 fi
 
+# Prep for snapshot or version release...
 if test $# = 0; then
 	echo Updating for snapshot...
 	svn up
@@ -81,12 +92,14 @@ fi
 
 fileurl=`echo $fileurl | sed -e '1,$s/\\//\\\\\\//g'`
 
+TMPDIR="${TMPDIR:=/tmp}"
+
 echo Exporting $fileversion...
-rm -rf /tmp/cups-$version
-svn export $url /tmp/cups-$version
+rm -rf $TMPDIR/cups-$version
+svn export $url $TMPDIR/cups-$version
 
 echo Updating version information...
-cd /tmp/cups-$version/config-scripts
+cd $TMPDIR/cups-$version/config-scripts
 
 sed -e '1,$s/^CUPS_VERSION=.*/CUPS_VERSION='$version'/' \
 	-e '1,$s/^CUPS_REVISION=.*/CUPS_REVISION='$revision'/' \
@@ -101,7 +114,7 @@ rm -rf everywhere
 rm -rf tools
 cd ..
 
-echo -n Archiving...gz
+echo $ac_n Archiving...gz$ac_c
 sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
 	-e '1,$s/^Release:.*/Release: '$rev'/' \
 	-e '1,$s/^Source:.*/Source: '$fileurl'gz/' \
@@ -109,7 +122,7 @@ sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
 	>cups-$version/packaging/cups.spec
 tar czf cups-$fileversion-source.tar.gz cups-$version
 
-echo -n ...bz2
+echo $ac_n ...bz2$ac_c
 sed -e '1,$s/@CUPS_VERSION@/'$version'/' \
 	-e '1,$s/^Release:.*/Release: '$rev'/' \
 	-e '1,$s/^Source:.*/Source: '$fileurl'bz2/' \
@@ -119,19 +132,20 @@ tar cjf cups-$fileversion-source.tar.bz2 cups-$version
 echo "..."
 
 if test -x /usr/bin/md5sum; then
-	(cd /tmp; md5sum cups-$fileversion-source.tar.{bz2,gz} | awk '{print $1, "'$fileversion' '$fileversion'/" $2}')
+	md5sum cups-$fileversion-source.tar.{bz2,gz} | awk '{print $1, "'$fileversion' '$fileversion'/" $2}'
 elif test -x /sbin/md5; then
-	(cd /tmp; md5 cups-$fileversion-source.tar.{bz2,gz} | awk '{print $4, "'$fileversion' '$fileversion'/" substr($2, 2, length($2) - 2)}')
+	md5 cups-$fileversion-source.tar.{bz2,gz} | awk '{print $4, "'$fileversion' '$fileversion'/" substr($2, 2, length($2) - 2)}'
 fi
 
-for file in /tmp/cups-$fileversion-source.tar.{bz2,gz}; do
+for file in cups-$fileversion-source.tar.{bz2,gz}; do
+	test -f $file.sig && rm -f $file.sig
 	gpg --detach-sign $file
 done
 
 echo Removing temporary files...
 rm -rf cups-$version
 
-echo "Done."
+echo "Done - files in $TMPDIR."
 
 #
 # End of "$Id$".
