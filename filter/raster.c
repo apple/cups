@@ -603,8 +603,8 @@ cupsRasterWriteHeader(
     fh.cupsInteger[15]       = htonl(r->header.cupsInteger[15]);
 					/* VendorLength */
 
-    memcpy(fh.cupsReal, r->header.cupsReal,
-           sizeof(fh.cupsReal) + sizeof(fh.cupsString));
+    void *p = fh.cupsReal; /* Bypass bogus compiler warning */
+    memcpy(p, r->header.cupsReal, sizeof(fh.cupsReal) + sizeof(fh.cupsString));
 					/* VendorData */
 
     strlcpy(fh.cupsRenderingIntent, r->header.cupsRenderingIntent,
