@@ -15,6 +15,7 @@ dnl
 
 AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H),,[
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>])
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(gethostbyaddr, nsl)
