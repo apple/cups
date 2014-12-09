@@ -17,6 +17,7 @@ CHANGES IN CUPS V2.0.2
 	  directives instead of ServerKeychain.
 	- Fixed builds when no SSL/TLS library is available, or when explicitly
 	  disabled (STR #4531)
+	- Fixed an OpenBSD charset transcoding issue.
 
 
 CHANGES IN CUPS V2.0.1
