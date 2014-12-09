@@ -166,7 +166,7 @@ if test "x$xinetd" = x; then
                         fi
                 done
         fi
-elif test "x$xinet" != xno; then
+elif test "x$xinetd" != xno; then
 	XINETD="$xinetd"
 fi
 
