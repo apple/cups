@@ -15,6 +15,8 @@ CHANGES IN CUPS V2.0.2
 	  (<rdar://problem/19129387>)
 	- The cups-files.conf file contained the old ServerCertificate/Key
 	  directives instead of ServerKeychain.
+	- Fixed builds when no SSL/TLS library is available, or when explicitly
+	  disabled (STR #4531)
 
 
 CHANGES IN CUPS V2.0.1

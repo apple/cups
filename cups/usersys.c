@@ -955,6 +955,8 @@ cups_read_client_conf(
 #endif /* HAVE_GSSAPI */
 
 
+  (void)ssl_options; /* Silence compiler warning */
+
  /*
   * Read from the file...
   */
@@ -1009,6 +1011,7 @@ cups_read_client_conf(
       cups_gssservicename = gss_service_name;
     }
 #endif /* HAVE_GSSAPI */
+#ifdef HAVE_SSL
     else if (ssl_options && !_cups_strcasecmp(line, "SSLOptions") && value)
     {
      /*
@@ -1046,6 +1049,7 @@ cups_read_client_conf(
 
       _httpTLSSetOptions(options);
     }
+#endif /* HAVE_SSL */
   }
 
  /*
