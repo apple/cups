@@ -2934,6 +2934,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 		      "FaxRetryLimit is deprecated; use "
 		      "JobRetryLimit on line %d.", linenum);
     }
+#ifdef HAVE_SSL
     else if (!_cups_strcasecmp(line, "SSLOptions"))
     {
      /*
@@ -2977,6 +2978,7 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
 
       _httpTLSSetOptions(options);
     }
+#endif /* HAVE_SSL */
     else if ((!_cups_strcasecmp(line, "Port") || !_cups_strcasecmp(line, "Listen")
 #ifdef HAVE_SSL
              || !_cups_strcasecmp(line, "SSLPort") || !_cups_strcasecmp(line, "SSLListen")
