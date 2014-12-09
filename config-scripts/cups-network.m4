@@ -13,7 +13,9 @@ dnl which should have been included with this file.  If this file is
 dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H))
+AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H),,[
+#include <sys/socket.h>
+#include <netinet/ip.h>])
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(gethostbyaddr, nsl)
 AC_SEARCH_LIBS(getifaddrs, nsl, AC_DEFINE(HAVE_GETIFADDRS))
