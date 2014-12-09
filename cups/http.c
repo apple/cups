@@ -4032,7 +4032,7 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
   for (i = 0; i < bytes; i += 16)
   {
     for (j = 0, ptr = start; j < 16 && (i + j) < bytes; j ++, ptr += 2)
-      sprintf(ptr, "%02X", buffer[i + j] & 255);
+      snprintf(ptr, 3, "%02X", buffer[i + j] & 255);
 
     while (j < 16)
     {
