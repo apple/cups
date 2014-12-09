@@ -178,7 +178,7 @@ main(int  argc,				/* I - Number of command-line args */
 	if (i < argc && !infile)
 	  infile = argv[i];
 	else
-	  usage(opt);
+	  usage(NULL);
       }
       else
       {
