@@ -915,7 +915,7 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 		  write_endp = endp;
 	      }
 
-            if (write_endp >= 0)
+            if (write_endp != 0xff)
 	    {
 	     /*
 	      * Save the best match so far...
