@@ -1451,9 +1451,14 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   else
   {
     printer->usblp_attached = 0;
-    fprintf(stderr, "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" kernel module attached\n",
-	      devdesc.idVendor, devdesc.idProduct);
-    goto error;
+
+    if (errcode != LIBUSB_ERROR_NOT_SUPPORTED)
+    {
+      fprintf(stderr,
+              "DEBUG: Failed to check whether %04x:%04x has the \"usblp\" "
+              "kernel module attached\n", devdesc.idVendor, devdesc.idProduct);
+      goto error;
+    }
   }
 
  /*
