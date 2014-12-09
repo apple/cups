@@ -2032,7 +2032,7 @@ ippFindNextAttribute(ipp_t      *ipp,	/* I - IPP message */
 			*childattr;	/* Child attribute */
   ipp_tag_t		value_tag;	/* Value tag */
   char			parent[1024],	/* Parent attribute name */
-			*child;		/* Child attribute name */
+			*child = NULL;	/* Child attribute name */
 
 
   DEBUG_printf(("2ippFindNextAttribute(ipp=%p, name=\"%s\", type=%02x(%s))",
