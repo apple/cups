@@ -5545,7 +5545,9 @@ register_printer(
     int            duplex,		/* I - 1 = duplex, 0 = simplex */
     const char     *subtype)		/* I - Service subtype */
 {
+#if defined(HAVE_DNSSD) || defined(HAVE_AVAHI)
   _ipp_txt_t		ipp_txt;	/* Bonjour IPP TXT record */
+#endif /* HAVE_DNSSD || HAVE_AVAHI */
 #ifdef HAVE_DNSSD
   DNSServiceErrorType	error;		/* Error from Bonjour */
   char			make_model[256],/* Make and model together */
