@@ -145,6 +145,9 @@ AC_CHECK_HEADER(iconv.h,
 	AC_SEARCH_LIBS(iconv_open,iconv,
 		AC_DEFINE(HAVE_ICONV_H)
 		SAVELIBS="$SAVELIBS $LIBS")
+	AC_SEARCH_LIBS(libiconv_open,iconv,
+		AC_DEFINE(HAVE_ICONV_H)
+		SAVELIBS="$SAVELIBS $LIBS")
 	LIBS="$SAVELIBS")
 
 dnl Checks for Mini-XML (www.minixml.org)...
