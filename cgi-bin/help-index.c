@@ -884,7 +884,7 @@ help_load_file(
 
 
   DEBUG_printf(("2help_load_file(hi=%p, filename=\"%s\", relative=\"%s\", "
-                "mtime=%ld)", hi, filename, relative, mtime));
+                "mtime=%ld)", hi, filename, relative, (long)mtime));
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (-1);
