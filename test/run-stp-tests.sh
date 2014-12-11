@@ -335,13 +335,30 @@ ln -s $root/filter/rastertoepson $BASE/bin/filter
 ln -s $root/filter/rastertohp $BASE/bin/filter
 ln -s $root/filter/rastertolabel $BASE/bin/filter
 ln -s $root/filter/rastertopwg $BASE/bin/filter
+cat >$BASE/share/banners/standard <<EOF
+           ==== Cover Page ====
 
-ln -s $root/data/classified $BASE/share/banners
-ln -s $root/data/confidential $BASE/share/banners
-ln -s $root/data/secret $BASE/share/banners
-ln -s $root/data/standard $BASE/share/banners
-ln -s $root/data/topsecret $BASE/share/banners
-ln -s $root/data/unclassified $BASE/share/banners
+
+      Job: {?printer-name}-{?job-id}
+    Owner: {?job-originating-user-name}
+     Name: {?job-name}
+    Pages: {?job-impressions}
+
+
+           ==== Cover Page ====
+EOF
+cat >$BASE/share/banners/classified <<EOF
+           ==== Classified - Do Not Disclose ====
+
+
+      Job: {?printer-name}-{?job-id}
+    Owner: {?job-originating-user-name}
+     Name: {?job-name}
+    Pages: {?job-impressions}
+
+
+           ==== Classified - Do Not Disclose ====
+EOF
 ln -s $root/data $BASE/share
 ln -s $root/ppdc/sample.drv $BASE/share/drv
 ln -s $root/conf/mime.types $BASE/share/mime
