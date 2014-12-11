@@ -264,7 +264,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
-      _cupsLangPrintError("ERROR", _("Unable to open print file"));
+      if (!JobCanceled)
+        _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (1);
     }
   }
