@@ -14,12 +14,12 @@
 
 <H2 CLASS="title"><A NAME="BASICS">The Basics</A></H2>
 
-<P>Operation policies are used for all IPP requests sent to the scheduler and are evaluated <em>after</em> the <A HREF="ref-cupsd-conf.html#Location"><TT>Location</TT></A> based access control rules. This means that operation policies can only add additional security restrictions to a request, never relax them. Use <TT>Location</TT> based access control rules for server-wide limits and operation policies for limits on individual printers, tasks, or services.</P>
+<P>Operation policies are used for all IPP requests sent to the scheduler and are evaluated <em>after</em> the <A HREF="man-cupsd.conf.html#Location"><TT>Location</TT></A> based access control rules. This means that operation policies can only add additional security restrictions to a request, never relax them. Use <TT>Location</TT> based access control rules for server-wide limits and operation policies for limits on individual printers, tasks, or services.</P>
 
-<P>Policies are stored in the <VAR>cupsd.conf</VAR> file in <A HREF="ref-cupsd-conf.html#Policy"><TT>Policy</TT></A> sections. Each policy has an alphanumeric name that is used to select it. Inside the policy section are one or more <A
-HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list the operations that are affected by the rules inside it. <A HREF="#LISTING01">Listing 1</A> shows the default operation policy, appropriately called "default", that is shipped with CUPS.</P>
+<P>Policies are stored in the <VAR>cupsd.conf</VAR> file in <A HREF="man-cupsd.conf.html#Policy"><TT>Policy</TT></A> sections. Each policy has an alphanumeric name that is used to select it. Inside the policy section are one or more <A
+HREF="man-cupsd.conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list the operations that are affected by the rules inside it. <A HREF="#LISTING01">Listing 1</A> shows the default operation policy, appropriately called "default", that is shipped with CUPS.</P>
 
-<P>The easiest way to add a policy to the <VAR>cupsd.conf</VAR> file is to use the web interface. Click on the <VAR>Administration</VAR> tab and then the <VAR>Edit Configuration File</VAR> button to edit the current <VAR>cupsd.conf</VAR> file. Click on the <VAR>Save Changes</VAR> button to save the changes and restart the scheduler. If you edit the <VAR>cupsd.conf</VAR> file from the console, make sure to <A HREF="ref-cupsd-conf.html">restart the cupsd process</A> before trying to use the new policy.</P>
+<P>The easiest way to add a policy to the <VAR>cupsd.conf</VAR> file is to use the web interface. Click on the <VAR>Administration</VAR> tab and then the <VAR>Edit Configuration File</VAR> button to edit the current <VAR>cupsd.conf</VAR> file. Click on the <VAR>Save Changes</VAR> button to save the changes and restart the scheduler. If you edit the <VAR>cupsd.conf</VAR> file from the console, make sure to <A HREF="man-cupsd.conf.html">restart the cupsd process</A> before trying to use the new policy.</P>
 
 <PRE CLASS="example">
 <EM>Listing 1: <A NAME="LISTING01">Default Operation Policy</A></EM>
@@ -97,7 +97,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 
 <P>The operation names are listed on a single line with spaces separating them. Each name corresponds to the IPP operation described in any of the IETF or PWG standards documents for the Internet Printing Protocol. <A HREF="#TABLE01">Table 1</A> lists all of the operations that have been defined along with their usage in CUPS.</P>
 
-<P>The access control rules are listed after the <TT>Limit</TT> line and are the same as those used for <A HREF="ref-cupsd-conf.html#Location"><TT>Location</TT></A> sections. In this case, we require the owner of the job ("@OWNER") or a member of the <A HREF="ref-cupsd-conf.html#SystemGroup"><TT>SystemGroup</TT></A> ("@SYSTEM") to do the operation. Because we do not include an <A HREF="ref-cupsd-conf.html#AuthType"><TT>AuthType</TT></A> directive here, the user information can come from the IPP request itself or the authenticated username from the HTTP request. The administrative operations starting on line 9, however, <em>do</em> use the <TT>AuthType</TT> directive, and so administrative operations need to be authenticated:</P>
+<P>The access control rules are listed after the <TT>Limit</TT> line and are the same as those used for <A HREF="man-cupsd.conf.html#Location"><TT>Location</TT></A> sections. In this case, we require the owner of the job ("@OWNER") or a member of the <A HREF="man-cupsd.conf.html#SystemGroup"><TT>SystemGroup</TT></A> ("@SYSTEM") to do the operation. Because we do not include an <A HREF="man-cupsd.conf.html#AuthType"><TT>AuthType</TT></A> directive here, the user information can come from the IPP request itself or the authenticated username from the HTTP request. The administrative operations starting on line 9, however, <em>do</em> use the <TT>AuthType</TT> directive, and so administrative operations need to be authenticated:</P>
 
 <PRE CLASS="example">
  9      &lt;Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class
@@ -492,7 +492,7 @@ HREF="ref-cupsd-conf.html#LimitIPP"><TT>Limit</TT></A> subsections which list th
 &lt;/Limit>
 </PRE>
 
-<P>The directives inside the <TT>Limit</TT> subsection can use any of the normal limiting directives: <A HREF="ref-cupsd-conf.html#Allow"><TT>Allow</TT></A>, <A HREF="ref-cupsd-conf.html#AuthType"><TT>AuthType</TT></A>, <A HREF="ref-cupsd-conf.html#Deny"><TT>Deny</TT></A>, <A HREF="ref-cupsd-conf.html#Encryption"><TT>Encryption</TT></A>, <A HREF="ref-cupsd-conf.html#Require"><TT>Require</TT></A>, and <A HREF="ref-cupsd-conf.html#Satisfy"><TT>Satisfy</TT></A>. <A HREF="#TABLE02">Table 2</A> lists some basic "recipes" for different access control rules.</P>
+<P>The directives inside the <TT>Limit</TT> subsection can use any of the normal limiting directives: <A HREF="man-cupsd.conf.html#Allow"><TT>Allow</TT></A>, <A HREF="man-cupsd.conf.html#AuthType"><TT>AuthType</TT></A>, <A HREF="man-cupsd.conf.html#Deny"><TT>Deny</TT></A>, <A HREF="man-cupsd.conf.html#Encryption"><TT>Encryption</TT></A>, <A HREF="man-cupsd.conf.html#Require"><TT>Require</TT></A>, and <A HREF="man-cupsd.conf.html#Satisfy"><TT>Satisfy</TT></A>. <A HREF="#TABLE02">Table 2</A> lists some basic "recipes" for different access control rules.</P>
 
 <DIV CLASS="table"><TABLE WIDTH="80%" SUMMARY="Access Control Recipes">
 <CAPTION>Table 2: <A NAME="TABLE02">Access Control Recipes</A></CAPTION>
@@ -599,7 +599,7 @@ Allow from @LOCAL</PRE></TD>
 
 <H2 CLASS="title"><A NAME="SELECT">Using Policies</A></H2>
 
-<P>Once you have created a policy, you can use it in two ways. The first way is to assign it as the default policy for the system using the <A HREF="ref-cupsd-conf.html#DefaultPolicy"><TT>DefaultPolicy</TT></A> directive in the <VAR>cupsd.conf</VAR> file. For example, add the following line to the <VAR>cupsd.conf</VAR> file to use the "lab999" policy from the previous section:</P>
+<P>Once you have created a policy, you can use it in two ways. The first way is to assign it as the default policy for the system using the <A HREF="man-cupsd.conf.html#DefaultPolicy"><TT>DefaultPolicy</TT></A> directive in the <VAR>cupsd.conf</VAR> file. For example, add the following line to the <VAR>cupsd.conf</VAR> file to use the "lab999" policy from the previous section:</P>
 
 <PRE CLASS="example">
 DefaultPolicy lab999

@@ -27,6 +27,7 @@ Comment lines start with the # character.
 .SS DIRECTIVES
 The following directives are understood by
 .BR cupsd (8):
+.\"#AccessLog
 .TP 5
 \fBAccessLog\fR
 .TP 5
@@ -43,6 +44,7 @@ The server name may be included in filenames using the string "%s", for example:
 
 .fi
 The default is "/var/log/cups/access_log".
+.\"#ConfigFilePerm
 .TP 5
 \fBConfigFilePerm \fImode\fR
 Specifies the permissions for all configuration files that the scheduler writes.
@@ -51,14 +53,17 @@ The default is "0644" on OS X and "0640" on all other operating systems.
 \fBNote:\fR The permissions for the \fIprinters.conf\fR file are currently masked to only allow access from the scheduler user (typically root).
 This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
 There is no way to disable this security feature.
+.\"#DataDir
 .TP 5
 \fBDataDir \fIpath\fR
 Specifies the directory where data files can be found.
 The default is usually "/usr/share/cups".
+.\"#DocumentRoot
 .TP 5
 \fBDocumentRoot \fIdirectory\fR
 Specifies the root directory for the CUPS web interface content.
 The default is usually "/usr/share/doc/cups".
+.\"#ErrorLog
 .TP 5
 \fBErrorLog\fR
 .TP 5
@@ -75,6 +80,7 @@ The server name may be included in filenames using the string "%s", for example:
 
 .fi
 The default is "/var/log/cups/error_log".
+.\"#FatalErrors
 .TP 5
 \fBFatalErrors none\fR
 .TP 5
@@ -107,20 +113,24 @@ Log file creation or write errors are fatal.
 .B permissions
 Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
 .RE
+.\"#FileDevice
 .TP 5
 \fBFileDevice Yes\fR
 .TP 5
 \fBFileDevice No\fR
 Specifies whether the file pseudo-device can be used for new printer queues.
 The URI "file:///dev/null" is always allowed.
+.\"#Group
 .TP 5
 \fBGroup \fIgroup-name-or-number\fR
 Specifies the group name or ID that will be used when executing external programs.
 The default group is operating system specific but is usually "lp" or "nobody".
+.\"#LogFilePerm
 .TP 5
 \fBLogFilePerm \fImode\fR
 Specifies the permissions of all log files that the scheduler writes.
 The default is "0644".
+.\"#PageLog
 .TP 5
 \fBPageLog \fR[ \fIfilename\fR ]
 .TP 5
@@ -135,14 +145,17 @@ The server name may be included in filenames using the string "%s", for example:
 
 .fi
 The default is "/var/log/cups/page_log".
+.\"#RemoteRoot
 .TP 5
 \fBRemoteRoot \fIusername\fR
 Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
 The default is "remroot".
+.\"#RequestRoot
 .TP 5
 \fBRequestRoot \fIdirectory\fR
 Specifies the directory that contains print jobs and other HTTP request data.
 The default is "/var/spool/cups".
+.\"#Sandboxing
 .TP 5
 \fBSandboxing off\fR
 .TP 5
@@ -152,18 +165,22 @@ The default is "/var/spool/cups".
 Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
 The default is "strict".
 This directive is currently only used/supported on OS X.
+.\"#ServerBin
 .TP 5
 \fBServerBin \fIdirectory\fR
 Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
 The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
+.\"#ServerKeychain
 .TP 5
 \fBServerKeychain \fIpath\fR
 Specifies the location of TLS certificates and private keys.
 The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
+.\"#ServerRoot
 .TP 5
 \fBServerRoot \fIdirectory\fR
 Specifies the directory containing the server configuration files.
 The default is "/etc/cups".
+.\"#SyncOnClose
 .TP 5
 \fBSyncOnClose Yes\fR
 .TP 5
@@ -172,14 +189,17 @@ Specifies whether the scheduler calls
 .BR fsync (2)
 after writing configuration or state files.
 The default is "No".
+.\"#SystemGroup
 .TP 5
 \fBSystemGroup \fIgroup-name \fR[ ... \fIgroup-name\fR ]
 Specifies the group(s) to use for \fI@SYSTEM\fR group authentication.
 The default contains "admin", "lpadmin", "root", "sys", and/or "system".
+.\"#TempDir
 .TP 5
 \fBTempDir \fIdirectory\fR
 Specifies the directory where temporary files are stored.
 The default is "/var/spool/cups/tmp".
+.\"#User
 .TP 5
 \fBUser \fIusername\fR
 Specifies the user name or ID that is used when running external programs.

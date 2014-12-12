@@ -53,6 +53,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*outfile;		/* Output file */
   char		line[1024],		/* Line from file */
 		*lineptr,		/* Pointer into line */
+		anchor[1024],		/* Anchor */
 		name[1024],		/* Man page name */
 		ddpost[256];		/* Tagged list post markup */
   int		section = -1,		/* Man page section */
@@ -113,6 +114,8 @@ main(int  argc,				/* I - Number of command-line args */
 	"<head>\n"
 	"\t<link rel=\"stylesheet\" type=\"text/css\" "
 	"href=\"../cups-printable.css\">\n", outfile);
+
+  anchor[0] = '\0';
 
   while (fgets(line, sizeof(line), infile))
   {
@@ -176,13 +179,21 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	  fputs("<h3><a name=\"", outfile);
 
-        for (lineptr = line + 4; *lineptr; lineptr ++)
-	  if (*lineptr  == '\"')
-	    continue;
-	  else if (isalnum(*lineptr & 255))
-	    html_putc(*lineptr, outfile);
-	  else
-	    html_putc('_', outfile);
+        if (anchor[0])
+        {
+          fputs(anchor, outfile);
+          anchor[0] = '\0';
+        }
+        else
+        {
+	  for (lineptr = line + 4; *lineptr; lineptr ++)
+	    if (*lineptr  == '\"')
+	      continue;
+	    else if (isalnum(*lineptr & 255))
+	      html_putc(*lineptr, outfile);
+	    else
+	      html_putc('_', outfile);
+        }
 
 	fputs("\">", outfile);
 
@@ -221,7 +232,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 3, "b", "b", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -238,7 +258,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 3, "i", "i", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -255,7 +284,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "b", "i", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -272,7 +310,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "b", NULL, outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -289,7 +336,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "i", "b", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -306,7 +362,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "i", NULL, outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -323,7 +388,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, NULL, "b", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -340,7 +414,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, NULL, "i", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -357,7 +440,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "small", "b", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -374,7 +466,16 @@ main(int  argc,				/* I - Number of command-line args */
 	fputs(end_fonts[font], outfile);
 	font = 0;
 
+        if (anchor[0])
+          fprintf(outfile, "<a name=\"%s\">", anchor);
+
         html_alternate(line + 4, "small", "small", outfile);
+
+        if (anchor[0])
+        {
+          fputs("</a>", outfile);
+          anchor[0] = '\0';
+        }
 
 	if (post)
 	{
@@ -398,6 +499,12 @@ main(int  argc,				/* I - Number of command-line args */
         }
 
 	fputs("<p>", outfile);
+
+        if (anchor[0])
+        {
+          fprintf(outfile, "<a name=\"%s\"></a>", anchor);
+          anchor[0] = '\0';
+        }
       }
       else if (!strcmp(line, ".RS") || !strncmp(line, ".RS ", 4))
       {
@@ -467,6 +574,12 @@ main(int  argc,				/* I - Number of command-line args */
 
         fprintf(outfile, "<p style=\"margin-left: %.1fem; text-indent: %.1fem\">", amount, -amount);
 
+        if (anchor[0])
+        {
+          fprintf(outfile, "<a name=\"%s\"></a>", anchor);
+          anchor[0] = '\0';
+        }
+
         if (line[1] == 'T')
           post = "<br>\n";
       }
@@ -502,6 +615,12 @@ main(int  argc,				/* I - Number of command-line args */
         fputs("<dt>", outfile);
         snprintf(ddpost, sizeof(ddpost), "<dd style=\"margin-left: %.1fem\">", amount);
 	post = ddpost;
+
+        if (anchor[0])
+        {
+          fprintf(outfile, "<a name=\"%s\"></a>", anchor);
+          anchor[0] = '\0';
+        }
       }
       else if (!strncmp(line, ".IP ", 4))
       {
@@ -585,6 +704,12 @@ main(int  argc,				/* I - Number of command-line args */
           fprintf(outfile, "<li style=\"margin-left: %.1fem;\">", amount);
         else
           fprintf(outfile, "<p style=\"margin-left: %.1fem;\">", amount);
+
+        if (anchor[0])
+        {
+          fprintf(outfile, "<a name=\"%s\"></a>", anchor);
+          anchor[0] = '\0';
+        }
       }
       else if (!strncmp(line, ".br", 3))
       {
@@ -686,6 +811,14 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
       }
 #endif /* 0 */
+      else if (!strncmp(line, ".\\\"#", 4))
+      {
+       /*
+        * Anchor for HTML output...
+        */
+
+        strlcpy(anchor, line + 4, sizeof(anchor));
+      }
       else if (strncmp(line, ".\\\"", 3))
       {
        /*
