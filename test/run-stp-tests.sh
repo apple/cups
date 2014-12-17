@@ -189,15 +189,18 @@ if test -z "$user"; then
 	fi
 fi
 
-port=8631
+port="${CUPS_TESTPORT:=8631}"
 cwd=`pwd`
 root=`dirname $cwd`
 CUPS_TESTROOT="$root"; export CUPS_TESTROOT
 
-if test -d /private/tmp; then
-	BASE=/private/tmp/cups-$user
-else
-	BASE=/tmp/cups-$user
+BASE="${CUPS_TESTBASE:=}"
+if test -z "$BASE"; then
+	if test -d /private/tmp; then
+		BASE=/private/tmp/cups-$user
+	else
+		BASE=/tmp/cups-$user
+	fi
 fi
 export BASE
 
@@ -381,7 +384,7 @@ instfilter() {
 	dst="$2"
 	format="$3"
 
-	for dir in /usr/libexec/cups/filter /usr/lib/cups/filter; do
+	for dir in /usr/local/libexec/cups/filter /usr/libexec/cups/filter /usr/lib/cups/filter; do
 		if test -x "$dir/$src"; then
 			ln -s "$dir/$src" "$BASE/bin/filter/$dst"
 			return
@@ -608,7 +611,7 @@ fi
 export SHLIB_PATH
 
 CUPS_DISABLE_APPLE_DEFAULT=yes; export CUPS_DISABLE_APPLE_DEFAULT
-CUPS_SERVER=localhost:8631; export CUPS_SERVER
+CUPS_SERVER=localhost:$port; export CUPS_SERVER
 CUPS_SERVERROOT=$BASE; export CUPS_SERVERROOT
 CUPS_STATEDIR=$BASE; export CUPS_STATEDIR
 CUPS_DATADIR=$BASE/share; export CUPS_DATADIR
