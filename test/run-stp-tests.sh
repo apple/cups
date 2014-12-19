@@ -657,7 +657,7 @@ cupsd=$!
 
 if test "x$testtype" = x0; then
 	# Not running tests...
-	echo "Scheduler is PID $cupsd and is listening on port 8631."
+	echo "Scheduler is PID $cupsd and is listening on port $port."
 	echo ""
 
 	# Create a helper script to run programs with...
