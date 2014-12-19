@@ -57,8 +57,8 @@ echo ""
 
 echo "Add Shared Printer Test"
 echo ""
-echo "    lpadmin -p Test3 -E -v ipp://localhost:8631/printers/Test2 -m raw"
-$VALGRIND ../systemv/lpadmin -p Test3 -E -v ipp://localhost:8631/printers/Test2 -m raw 2>&1
+echo "    lpadmin -p Test3 -E -v ipp://localhost:$IPP_PORT/printers/Test2 -m raw"
+$VALGRIND ../systemv/lpadmin -p Test3 -E -v ipp://localhost:$IPP_PORT/printers/Test2 -m raw 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
