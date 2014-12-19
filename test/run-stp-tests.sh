@@ -401,6 +401,7 @@ instfilter() {
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
+cat \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		cat "$root/test/onepage-a4.pdf"
@@ -417,6 +418,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
+cat \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		cat "$root/test/onepage-a4.ps"
@@ -433,6 +435,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
+cat \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gunzip -c "$root/test/onepage-a4-300-black-1.pwg.gz"
@@ -820,7 +823,7 @@ while true; do
 	fi
 done
 
-description="`lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
+description="`../systemv/lpstat -l -p Test1 | grep Description | sed -e '1,$s/^[^:]*: //g'`"
 if test "x$description" != "xTest Printer 1"; then
 	echo "Failed, printer-info for Test1 is '$description', expected 'Test Printer 1'." >>$strfile
 	echo "FAIL (got '$description', expected 'Test Printer 1')"
