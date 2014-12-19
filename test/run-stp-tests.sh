@@ -457,10 +457,8 @@ if test `uname` = Darwin; then
 	instfilter cgpdftoraster pdftoraster raster
 	instfilter cgtexttopdf texttopdf pdf
 	instfilter pstocupsraster pstoraster raster
-	instfilter pstopdffilter pstopdf pdf
 else
 	instfilter bannertopdf bannertopdf pdf
-	instfilter bannertops bannertops ps
 	instfilter imagetopdf imagetopdf pdf
 	instfilter pdftopdf pdftopdf passthru
 	instfilter pdftops pdftops ps
