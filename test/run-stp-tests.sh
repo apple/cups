@@ -450,7 +450,6 @@ EOF
 ln -s $root/test/test.convs $BASE/share/mime
 
 if test `uname` = Darwin; then
-	instfilter cgbannertopdf bannertopdf pdf
 	instfilter cgimagetopdf imagetopdf pdf
 	instfilter cgpdftopdf pdftopdf passthru
 	instfilter cgpdftops pdftops ps
@@ -458,7 +457,6 @@ if test `uname` = Darwin; then
 	instfilter cgtexttopdf texttopdf pdf
 	instfilter pstocupsraster pstoraster raster
 else
-	instfilter bannertopdf bannertopdf pdf
 	instfilter imagetopdf imagetopdf pdf
 	instfilter pdftopdf pdftopdf passthru
 	instfilter pdftops pdftops ps
