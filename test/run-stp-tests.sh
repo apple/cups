@@ -401,13 +401,13 @@ instfilter() {
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-cat \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		cat "$root/test/onepage-a4.pdf"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.pdf"
 		;;
 	*)
-		cat "$root/test/onepage-letter.pdf"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter.pdf"
 		;;
 esac
 EOF
@@ -418,13 +418,13 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-cat \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		cat "$root/test/onepage-a4.ps"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.ps"
 		;;
 	*)
-		cat "$root/test/onepage-letter.ps"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter.ps"
 		;;
 esac
 EOF
@@ -435,13 +435,13 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-cat \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
-		gunzip -c "$root/test/onepage-a4-300-black-1.pwg.gz"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4-300-black-1.pwg.gz"
 		;;
 	*)
-		gunzip -c "$root/test/onepage-letter-300-black-1.pwg.gz"
+		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-letter-300-black-1.pwg.gz"
 		;;
 esac
 EOF
