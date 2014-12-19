@@ -399,6 +399,8 @@ instfilter() {
 		pdf)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		cat "$root/test/onepage-a4.pdf"
@@ -413,6 +415,8 @@ EOF
 		ps)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		cat "$root/test/onepage-a4.ps"
@@ -427,6 +431,8 @@ EOF
 		raster)
 			cat >"$BASE/bin/filter/$dst" <<EOF
 #!/bin/sh
+trap "" TERM
+trap "" PIPE
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gunzip -c "$root/test/onepage-a4-300-black-1.pwg.gz"
