@@ -35,6 +35,15 @@ typedef off_t ssize_t;			/* @private@ */
 #  include "language.h"
 #  include "pwg.h"
 
+/*
+ * Define _PPD_DEPRECATED to silence the warnings about PPD functions being
+ * deprecated...
+ */
+
+#  ifndef _PPD_DEPRECATED
+#    define _PPD_DEPRECATED _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo and friends instead.")
+#  endif /* !_PPD_DEPRECATED */
+
 
 /*
  * C++ magic...
@@ -354,8 +363,7 @@ extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED_MSG("Use cupsGetDes
 extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
 			            int myjobs, int whichjobs);
-extern const char	*cupsGetPPD(const char *name)
-			            _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo instead.");
+extern const char	*cupsGetPPD(const char *name) _PPD_DEPRECATED;
 extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED_MSG("Use cupsGetDests instead.");
 extern ipp_status_t	cupsLastError(void);
 extern int		cupsPrintFile(const char *name, const char *filename,
@@ -413,8 +421,7 @@ extern int		cupsGetDests2(http_t *http, cups_dest_t **dests)
 extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
 			             const char *name, int myjobs,
 				     int whichjobs) _CUPS_API_1_1_21;
-extern const char	*cupsGetPPD2(http_t *http, const char *name)
-			             _CUPS_DEPRECATED_1_6_MSG("Use cupsCopyDestInfo instead.");
+extern const char	*cupsGetPPD2(http_t *http, const char *name) _PPD_DEPRECATED;
 extern int		cupsPrintFile2(http_t *http, const char *name,
 			               const char *filename,
 				       const char *title, int num_options,
@@ -479,7 +486,7 @@ extern const char	*cupsGetPassword2(const char *prompt, http_t *http,
 					  const char *resource) _CUPS_API_1_4;
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
 			            time_t *modtime, char *buffer,
-				    size_t bufsize) _CUPS_API_1_4;
+				    size_t bufsize) _PPD_DEPRECATED;
 extern ipp_t		*cupsGetResponse(http_t *http,
 			                 const char *resource) _CUPS_API_1_4;
 extern ssize_t		cupsReadResponseData(http_t *http, char *buffer,
