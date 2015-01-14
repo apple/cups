@@ -3,7 +3,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 6: IPP Tests.
 #
-# Copyright 2014 by The Printer Working Group.
+# Copyright 2014-2015 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -244,7 +244,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?job-password-supported OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT ?job-password-encryption-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 
-	EXPECT job-preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT preferred-attributes-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 
 	EXPECT job-resolvers-supported OF-TYPE collection IN-GROUP printer-attributes-tag IF-DEFINED HAVE_JOB_CONSTRAINTS
 
