@@ -3,7 +3,7 @@
  *
  * TLS support code for CUPS using GNU TLS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1198,25 +1198,25 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   if (!tls_options)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
   else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
     gnutls_priority_set_direct(http->tls, "NORMAL", NULL);
   else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
   else
-    gnutls_priority_set_direct(http->tls, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_set_direct(http->tls, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
 
 #else
   gnutls_priority_t priority;		/* Priority */
 
   if (!tls_options)
-    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
   else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
     gnutls_priority_init(&priority, "NORMAL", NULL);
   else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:VERS-TLS-ALL", NULL);
+    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
   else
-    gnutls_priority_init(&priority, "NORMAL:VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+    gnutls_priority_init(&priority, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
 
   gnutls_priority_set(http->tls, priority);
   gnutls_priority_deinit(priority);
