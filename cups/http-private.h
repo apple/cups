@@ -3,7 +3,7 @@
  *
  * Private HTTP definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -188,8 +188,8 @@ typedef gnutls_certificate_credentials_t *http_tls_credentials_t;
 extern const char *cssmErrorString(int error);
 #    endif /* !HAVE_SECBASEPRIV_H && HAVE_CSSMERRORSTRING */
 #    ifndef HAVE_SECITEMPRIV_H /* Declare constants from that header... */
-extern const CFTypeRef kSecClassCertificate;
-extern const CFTypeRef kSecClassIdentity;
+extern const CFStringRef kSecClassCertificate;
+extern const CFStringRef kSecClassIdentity;
 #    endif /* !HAVE_SECITEMPRIV_H */
 #    if !defined(HAVE_SECIDENTITYSEARCHPRIV_H) && defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
 extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
