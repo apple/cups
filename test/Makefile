@@ -92,7 +92,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(TARGETS) $(OBJS) ippinfra ippinfra-shared ippproxy ippproxy-shared ippserver-shared
+	$(RM) $(TARGETS) $(OBJS) ippfind-static ippinfra ippinfra-shared ippproxy ippproxy-shared ippserver-shared
 
 
 #
