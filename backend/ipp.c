@@ -3,7 +3,7 @@
  *
  * IPP backend for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -2927,8 +2927,19 @@ new_request(
                                                          sizeof(finishings[0])),
                                                    finishings);
       if (num_finishings > 0)
+      {
 	ippAddIntegers(request, IPP_TAG_JOB, IPP_TAG_ENUM, "finishings",
 		       num_finishings, finishings);
+
+	if (copies > 1 && (keyword = cupsGetOption("job-impressions", num_options, options)) != NULL)
+	{
+	 /*
+	  * Send job-pages-per-set attribute to apply finishings correctly...
+          */
+
+          ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-pages-per-set", atoi(keyword) / copies);
+        }
+      }
 
      /*
       * Map FaxOut options...

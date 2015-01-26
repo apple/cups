@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2014-12-01
+CHANGES.txt - 2.1b1 - 2015-01-26
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -7,5 +7,8 @@ CHANGES IN CUPS V2.1b1
 	  (<rdar://problem/15146999>)
 	- The IPP backend now stops sending print data if the printer indicates
 	  the job has been aborted or canceled (<rdar://problem/17837631>)
+	- The IPP backend now sends the job-pages-per-set attribute when
+	  printing multiple copy jobs with finishings
+	  (<rdar://problem/16792757>)
 	- No longer install banner files since third-party banner filters now
 	  supply their own (STR #4518)
