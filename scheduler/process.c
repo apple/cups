@@ -323,6 +323,9 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
     /* Also allow access to device files... */
     cupsFilePuts(fp, "(allow file-write* file-read-data file-read-metadata file-ioctl\n"
                      "       (regex #\"^/dev/\"))\n");
+
+    /* And allow kernel extensions to be loaded, e.g., SMB */
+    cupsFilePuts(fp, "(allow system-kext-load)\n");
   }
   else
   {
