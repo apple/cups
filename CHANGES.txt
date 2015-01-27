@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-01-26
+CHANGES.txt - 2.1b1 - 2015-01-27
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -10,5 +10,7 @@ CHANGES IN CUPS V2.1b1
 	- The IPP backend now sends the job-pages-per-set attribute when
 	  printing multiple copy jobs with finishings
 	  (<rdar://problem/16792757>)
+	- The IPP backend now updates the cupsMandatory values when the printer
+	  configuration changes (<rdar://problem/18126570>)
 	- No longer install banner files since third-party banner filters now
 	  supply their own (STR #4518)

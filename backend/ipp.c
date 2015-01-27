@@ -121,6 +121,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-alert",
   "printer-alert-description",
   "printer-is-accepting-jobs",
+  "printer-mandatory-job-attributes",
   "printer-state",
   "printer-state-message",
   "printer-state-reasons"
@@ -144,6 +145,8 @@ static cups_option_t	*attr_cache = NULL;
 static cups_array_t	*state_reasons;	/* Array of printe-state-reasons keywords */
 static char		tmpfilename[1024] = "";
 					/* Temporary spool file name */
+static char		mandatory_attrs[1024] = "";
+					/* cupsMandatory value */
 
 
 /*
@@ -1294,11 +1297,16 @@ main(int  argc,				/* I - Number of command-line args */
       * Load the PPD file and generate PWG attribute mapping information...
       */
 
+      ppd_attr_t *mandatory;		/* cupsMandatory value */
+
       ppd = ppdOpenFile(getenv("PPD"));
       pc  = _ppdCacheCreateWithPPD(ppd);
 
       ppdMarkDefaults(ppd);
       cupsMarkOptions(ppd, num_options, options);
+
+      if ((mandatory = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
+        strlcpy(mandatory_attrs, mandatory->value, sizeof(mandatory_attrs));
     }
   }
   else
@@ -3221,6 +3229,7 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
 {
   ipp_attribute_t	*pa,		/* printer-alert */
 			*pam,		/* printer-alert-message */
+			*pmja,		/* printer-mandatory-job-attributes */
 			*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
@@ -3240,6 +3249,26 @@ report_printer_state(ipp_t *ipp)	/* I - IPP response */
   if ((pam = ippFindAttribute(ipp, "printer-alert-message",
                               IPP_TAG_TEXT)) != NULL)
     report_attr(pam);
+
+  if ((pmja = ippFindAttribute(ipp, "printer-mandatory-job-attributes", IPP_TAG_KEYWORD)) != NULL)
+  {
+    int	i,				/* Looping var */
+	count = ippGetCount(pmja);	/* Number of values */
+
+    for (i = 0, valptr = value; i < count; i ++, valptr += strlen(valptr))
+    {
+      if (i)
+        snprintf(valptr, sizeof(value) - (size_t)(valptr - value), " %s", ippGetString(pmja, i, NULL));
+      else
+        strlcpy(value, ippGetString(pmja, i, NULL), sizeof(value));
+    }
+
+    if (strcmp(value, mandatory_attrs))
+    {
+      strlcpy(mandatory_attrs, value, sizeof(mandatory_attrs));
+      fprintf(stderr, "PPD: cupsMandatory=\"%s\"\n", value);
+    }
+  }
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
                               IPP_TAG_TEXT)) != NULL)
