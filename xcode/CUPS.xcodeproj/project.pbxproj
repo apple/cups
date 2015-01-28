@@ -2081,8 +2081,6 @@
 		274FF67313333B0A00317ECB /* commands */ = {
 			isa = PBXGroup;
 			children = (
-				274EE27F1A03EE41003213D1 /* ippproxy.c */,
-				274EE27D1A03EE0B003213D1 /* ippinfra.c */,
 				2732E089137A3F5200FAFEF6 /* cancel.c */,
 				2732E08A137A3F5200FAFEF6 /* cupsaccept.c */,
 				276684101337FA7C000D33D0 /* cupsaddsmb.c */,
@@ -2091,6 +2089,8 @@
 				2732E08B137A3F5200FAFEF6 /* cupstestdsc.c */,
 				72F75A5B1336F988004BB496 /* cupstestppd.c */,
 				72CF95F218A19165000FCAE4 /* ippfind.c */,
+				274EE27D1A03EE0B003213D1 /* ippinfra.c */,
+				274EE27F1A03EE41003213D1 /* ippproxy.c */,
 				726AD701135E8A90002C930D /* ippserver.c */,
 				276683F91337F7A9000D33D0 /* ipptool.c */,
 				2732E08C137A3F5200FAFEF6 /* lp.c */,
