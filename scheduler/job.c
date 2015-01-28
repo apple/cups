@@ -1531,9 +1531,10 @@ void
 cupsdLoadAllJobs(void)
 {
   char		filename[1024];		/* Full filename of job.cache file */
-  struct stat	fileinfo,		/* Information on job.cache file */
-		dirinfo;		/* Information on RequestRoot dir */
-
+  struct stat	fileinfo;		/* Information on job.cache file */
+  cups_dir_t	*dir;			/* RequestRoot dir */
+  cups_dentry_t	*dent;			/* Entry in RequestRoot */
+  int		load_cache = 1;		/* Load the job.cache file? */
 
 
  /*
@@ -1557,36 +1558,63 @@ cupsdLoadAllJobs(void)
 
   if (stat(filename, &fileinfo))
   {
-    fileinfo.st_mtime = 0;
+   /*
+    * No job.cache file...
+    */
+
+    load_cache = 0;
 
     if (errno != ENOENT)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to get file information for \"%s\" - %s",
 		      filename, strerror(errno));
   }
-
-  if (stat(RequestRoot, &dirinfo))
+  else if ((dir = cupsDirOpen(RequestRoot)) == NULL)
   {
-    dirinfo.st_mtime = 0;
+   /*
+    * No spool directory...
+    */
 
-    if (errno != ENOENT)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to get directory information for \"%s\" - %s",
-		      RequestRoot, strerror(errno));
+    load_cache = 0;
+  }
+  else
+  {
+    while ((dent = cupsDirRead(dir)) != NULL)
+    {
+      if (strlen(dent->filename) >= 6 && dent->filename[0] == 'c' && dent->fileinfo.st_mtime > fileinfo.st_mtime)
+      {
+       /*
+        * Job history file is newer than job.cache file...
+	*/
+
+        load_cache = 0;
+	break;
+      }
+    }
   }
 
  /*
   * Load the most recent source for job data...
   */
 
-  if (dirinfo.st_mtime > fileinfo.st_mtime)
+  if (load_cache)
   {
+   /*
+    * Load the job.cache file...
+    */
+
+    load_job_cache(filename);
+  }
+  else
+  {
+   /*
+    * Load the job history files...
+    */
+
     load_request_root();
 
     load_next_job_id(filename);
   }
-  else
-    load_job_cache(filename);
 
  /*
   * Clean out old jobs as needed...
