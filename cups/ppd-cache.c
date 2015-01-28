@@ -3,7 +3,7 @@
  *
  * PPD cache implementation for CUPS.
  *
- * Copyright 2010-2014 by Apple Inc.
+ * Copyright 2010-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -2690,6 +2690,25 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
   char	*ptr,				/* Pointer into name buffer */
 	*end;				/* End of name buffer */
 
+
+  if (_cups_islower(*ppd))
+  {
+   /*
+    * Already lowercase name, use as-is?
+    */
+
+    const char *ppdptr;			/* Pointer into PPD keyword */
+
+    for (ppdptr = ppd + 1; *ppdptr; ppdptr ++)
+      if (_cups_isupper(*ppdptr) || strchr(dashchars, *ppdptr))
+        break;
+
+    if (!*ppdptr)
+    {
+      strlcpy(name, ppd, namesize);
+      return;
+    }
+  }
 
   for (ptr = name, end = name + namesize - 1; *ppd && ptr < end; ppd ++)
   {
