@@ -3,7 +3,7 @@
  *
  * Job management routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1591,6 +1591,8 @@ cupsdLoadAllJobs(void)
 	break;
       }
     }
+
+    cupsDirClose(dir);
   }
 
  /*
