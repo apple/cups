@@ -244,7 +244,6 @@ extern char		*_cupsBufferGet(size_t size);
 extern void		_cupsBufferRelease(char *b);
 
 extern http_t		*_cupsConnect(void);
-extern int		_cupsConvertOptions(ipp_t *request, ppd_file_t *ppd, _ppd_cache_t *pc, ipp_attribute_t *media_col_sup, ipp_attribute_t *doc_handling_sup, ipp_attribute_t *print_color_mode_sup, const char *user, const char *format, int copies, int num_options, cups_option_t *options);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
 extern const char	*_cupsGetDestResource(cups_dest_t *dest, char *resource,
