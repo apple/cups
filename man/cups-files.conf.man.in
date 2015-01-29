@@ -157,8 +157,6 @@ Specifies the directory that contains print jobs and other HTTP request data.
 The default is "/var/spool/cups".
 .\"#Sandboxing
 .TP 5
-\fBSandboxing off\fR
-.TP 5
 \fBSandboxing relaxed\fR
 .TP 5
 \fBSandboxing strict\fR
