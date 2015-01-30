@@ -3,7 +3,7 @@
  *
  * Raster file routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * This file is part of the CUPS Imaging library.
@@ -256,7 +256,10 @@ cupsRasterReadHeader(
   */
 
   if (!cups_raster_read_header(r))
+  {
+    memset(h, 0, sizeof(cups_page_header_t));
     return (0);
+  }
 
  /*
   * Copy the header to the user-supplied buffer...
@@ -285,7 +288,10 @@ cupsRasterReadHeader2(
   */
 
   if (!cups_raster_read_header(r))
+  {
+    memset(h, 0, sizeof(cups_page_header2_t));
     return (0);
+  }
 
  /*
   * Copy the header to the user-supplied buffer...
@@ -964,7 +970,7 @@ cups_raster_read_header(
 
   cups_raster_update(r);
 
-  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0);
+  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }
 
 
