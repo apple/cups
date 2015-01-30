@@ -4089,14 +4089,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       if (job)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d.",
-	                linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing </Job> directive on line %d of %s.", linenum, filename);
         continue;
       }
 
       if (!value)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Missing job ID on line %d of %s.", linenum, filename);
 	continue;
       }
 
@@ -4104,8 +4103,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (jobid < 1)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d.", jobid,
-	                linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad job ID %d on line %d of %s.", jobid, linenum, filename);
         continue;
       }
 
@@ -4144,7 +4142,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     else if (!job)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-	              "Missing <Job #> directive on line %d.", linenum);
+	              "Missing <Job #> directive on line %d of %s.", linenum, filename);
       continue;
     }
     else if (!_cups_strcasecmp(line, "</Job>"))
@@ -4166,7 +4164,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     }
     else if (!value)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d of %s.", linenum, filename);
       continue;
     }
     else if (!_cups_strcasecmp(line, "State"))
@@ -4220,8 +4218,7 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 
       if (job->num_files < 0)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d.",
-	                job->num_files, linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Bad NumFiles value %d on line %d of %s.", job->num_files, linenum, filename);
         job->num_files = 0;
 	continue;
       }
@@ -4260,14 +4257,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       if (sscanf(value, "%d%*[ \t]%15[^/]/%255s%d", &number, super, type,
                  &compression) != 4)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File on line %d of %s.", linenum, filename);
 	continue;
       }
 
       if (number < 1 || number > job->num_files)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d.",
-	                number, linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad File number %d on line %d of %s.", number, linenum, filename);
         continue;
       }
 
@@ -4301,14 +4297,13 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       }
     }
     else
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d.",
-                      line, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown %s directive on line %d of %s.", line, linenum, filename);
   }
 
   if (job)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "Missing </Job> directive on line %d.", linenum);
+		    "Missing </Job> directive on line %d of %s.", linenum, filename);
     cupsdDeleteJob(job, CUPSD_JOB_PURGE);
   }
 

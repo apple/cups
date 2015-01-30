@@ -32,6 +32,8 @@ CHANGES IN CUPS V2.0.2
 	- The scheduler could crash during shutdown if Avahi was shutdown
 	  first (STR #4550)
 	- Added a USB quirk rule for Intermec printers (STR #4553)
+	- The scheduler did not always log which configuration file had the
+	  error (STR #4559)
 
 
 CHANGES IN CUPS V2.0.1

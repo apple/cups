@@ -2008,8 +2008,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     else if (!_cups_strcasecmp(value, "always"))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Encryption value \"%s\" on line %d is invalid in this "
-		      "context. Using \"required\" instead.", value, linenum);
+                      "Encryption value \"%s\" on line %d of %s is invalid in this "
+		      "context. Using \"required\" instead.", value, linenum, ConfigurationFile);
 
       loc->encryption = HTTP_ENCRYPT_REQUIRED;
     }
@@ -2020,7 +2020,7 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     else
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown Encryption value %s on line %d.", value, linenum);
+                      "Unknown Encryption value %s on line %d of %s.", value, linenum, ConfigurationFile);
       return (0);
     }
   }
@@ -2036,8 +2036,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       loc->order_type = CUPSD_AUTH_DENY;
     else
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown Order value %s on line %d.",
-	              value, linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unknown Order value %s on line %d of %s.",
+	              value, linenum, ConfigurationFile);
       return (0);
     }
   }
@@ -2139,8 +2139,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
 	if (!get_addr_and_mask(value, ip, mask))
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d.",
-			  value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d of %s.",
+			  value, linenum, ConfigurationFile);
 	  return (0);
 	}
 
@@ -2194,8 +2194,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     else
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
-                      "Unknown authorization type %s on line %d.",
-	              value, linenum);
+                      "Unknown authorization type %s on line %d of %s.",
+	              value, linenum, ConfigurationFile);
       return (0);
     }
   }
@@ -2221,8 +2221,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "\"AuthClass %s\" is deprecated; consider using "
-		      "\"Require valid-user\" on line %d.",
-	              value, linenum);
+		      "\"Require valid-user\" on line %d of %s.",
+	              value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(value, "group"))
     {
@@ -2230,8 +2230,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "\"AuthClass %s\" is deprecated; consider using "
-		      "\"Require user @groupname\" on line %d.",
-	              value, linenum);
+		      "\"Require user @groupname\" on line %d of %s.",
+	              value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(value, "system"))
     {
@@ -2241,14 +2241,14 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "\"AuthClass %s\" is deprecated; consider using "
-		      "\"Require user @SYSTEM\" on line %d.",
-	              value, linenum);
+		      "\"Require user @SYSTEM\" on line %d of %s.",
+	              value, linenum, ConfigurationFile);
     }
     else
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
-                      "Unknown authorization class %s on line %d.",
-	              value, linenum);
+                      "Unknown authorization class %s on line %d of %s.",
+	              value, linenum, ConfigurationFile);
       return (0);
     }
   }
@@ -2258,8 +2258,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
     cupsdLogMessage(CUPSD_LOG_WARN,
                     "\"AuthGroupName %s\" directive is deprecated; consider "
-		    "using \"Require user @%s\" on line %d.",
-		    value, value, linenum);
+		    "using \"Require user @%s\" on line %d of %s.",
+		    value, value, linenum, ConfigurationFile);
   }
   else if (!_cups_strcasecmp(line, "Require"))
   {
@@ -2285,8 +2285,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       loc->level = CUPSD_AUTH_GROUP;
     else
     {
-      cupsdLogMessage(CUPSD_LOG_WARN, "Unknown Require type %s on line %d.",
-	              value, linenum);
+      cupsdLogMessage(CUPSD_LOG_WARN, "Unknown Require type %s on line %d of %s.",
+	              value, linenum, ConfigurationFile);
       return (0);
     }
 
@@ -2348,8 +2348,8 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
       loc->satisfy = CUPSD_AUTH_SATISFY_ANY;
     else
     {
-      cupsdLogMessage(CUPSD_LOG_WARN, "Unknown Satisfy value %s on line %d.",
-                      value, linenum);
+      cupsdLogMessage(CUPSD_LOG_WARN, "Unknown Satisfy value %s on line %d of %s.",
+                      value, linenum, ConfigurationFile);
       return (0);
     }
   }
@@ -2925,14 +2925,14 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       JobRetryInterval = atoi(value);
       cupsdLogMessage(CUPSD_LOG_WARN,
 		      "FaxRetryInterval is deprecated; use "
-		      "JobRetryInterval on line %d.", linenum);
+		      "JobRetryInterval on line %d of %s.", linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "FaxRetryLimit") && value)
     {
       JobRetryLimit = atoi(value);
       cupsdLogMessage(CUPSD_LOG_WARN,
 		      "FaxRetryLimit is deprecated; use "
-		      "JobRetryLimit on line %d.", linenum);
+		      "JobRetryLimit on line %d of %s.", linenum, ConfigurationFile);
     }
 #ifdef HAVE_SSL
     else if (!_cups_strcasecmp(line, "SSLOptions"))
@@ -3107,8 +3107,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       if (protocols < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown browse protocol \"%s\" on line %d.",
-	                value, linenum);
+	                "Unknown browse protocol \"%s\" on line %d of %s.",
+	                value, linenum, ConfigurationFile);
         break;
       }
 
@@ -3133,8 +3133,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Unknown default authorization type %s on line %d.",
-	                value, linenum);
+	                "Unknown default authorization type %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
 	if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
       }
@@ -3155,8 +3155,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Unknown default encryption %s on line %d.",
-	                value, linenum);
+	                "Unknown default encryption %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
 	if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
       }
@@ -3177,8 +3177,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else if (!_cups_strcasecmp(value, "double"))
         HostNameLookups = 2;
       else
-	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown HostNameLookups %s on line %d.",
-	                value, linenum);
+	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown HostNameLookups %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "AccessLogLevel") && value)
     {
@@ -3195,8 +3195,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else if (!_cups_strcasecmp(value, "none"))
         AccessLogLevel = CUPSD_ACCESSLOG_NONE;
       else
-        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d.",
-	                value, linenum);
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "LogLevel") && value)
     {
@@ -3225,8 +3225,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else if (!_cups_strcasecmp(value, "none"))
         LogLevel = CUPSD_LOG_NONE;
       else
-        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogLevel %s on line %d.",
-	                value, linenum);
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogLevel %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "LogTimeFormat") && value)
     {
@@ -3239,8 +3239,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else if (!_cups_strcasecmp(value, "usecs"))
         LogTimeFormat = CUPSD_TIME_USECS;
       else
-        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogTimeFormat %s on line %d.",
-	                value, linenum);
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogTimeFormat %s on line %d of %s.",
+	                value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "ServerTokens") && value)
     {
@@ -3271,8 +3271,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       else if (!_cups_strcasecmp(value, "None"))
 	cupsdClearString(&ServerHeader);
       else
-	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d.",
-                        value, linenum);
+	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown ServerTokens %s on line %d of %s.",
+                        value, linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "PassEnv") && value)
     {
@@ -3348,8 +3348,8 @@ read_cupsd_conf(cups_file_t *fp)	/* I - File to read from */
       }
       else
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Missing value for SetEnv directive on line %d.",
-	                linenum);
+	                "Missing value for SetEnv directive on line %d of %s.",
+	                linenum, ConfigurationFile);
     }
     else if (!_cups_strcasecmp(line, "AccessLog") ||
              !_cups_strcasecmp(line, "CacheDir") ||
@@ -3596,8 +3596,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
 
   if ((parent = cupsdFindLocation(location)) != NULL)
-    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Location %s> on line %d.",
-                    location, linenum);
+    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Location %s> on line %d of %s.",
+                    location, linenum, ConfigurationFile);
   else if ((parent = cupsdNewLocation(location)) == NULL)
     return (0);
   else
@@ -3622,7 +3622,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
     {
       if (!value)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d of %s.", linenum, ConfigurationFile);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
         else
@@ -3657,8 +3657,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	else if (!strcmp(value, "TRACE"))
 	  loc->limit |= CUPSD_AUTH_LIMIT_TRACE;
 	else
-	  cupsdLogMessage(CUPSD_LOG_WARN, "Unknown request type %s on line %d.",
-	                  value, linenum);
+	  cupsdLogMessage(CUPSD_LOG_WARN, "Unknown request type %s on line %d of %s.",
+	                  value, linenum, ConfigurationFile);
 
         for (value = valptr; isspace(*value & 255); value ++);
       }
@@ -3673,15 +3673,15 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       loc = parent;
     else if (!value)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d of %s.", linenum, ConfigurationFile);
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);
     }
     else if (!parse_aaa(loc, line, value, linenum))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown Location directive %s on line %d.",
-	              line, linenum);
+                      "Unknown Location directive %s on line %d of %s.",
+	              line, linenum, ConfigurationFile);
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);
     }
@@ -3720,8 +3720,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   */
 
   if ((pol = cupsdFindPolicy(policy)) != NULL)
-    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Policy %s> on line %d.",
-                    policy, linenum);
+    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Policy %s> on line %d of %s.",
+                    policy, linenum, ConfigurationFile);
   else if ((pol = cupsdAddPolicy(policy)) == NULL)
     return (0);
 
@@ -3742,8 +3742,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     {
       if (op)
         cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Missing </Limit> before </Policy> on line %d.",
-	                linenum);
+	                "Missing </Limit> before </Policy> on line %d of %s.",
+	                linenum, ConfigurationFile);
 
       set_policy_defaults(pol);
 
@@ -3753,7 +3753,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     {
       if (!value)
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d of %s.", linenum, ConfigurationFile);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
         else
@@ -3779,15 +3779,15 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	    ops[num_ops] = IPP_ANY_OPERATION;
 	  else if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
 	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Bad IPP operation name \"%s\" on line %d.",
-	                    value, linenum);
+	                    "Bad IPP operation name \"%s\" on line %d of %s.",
+	                    value, linenum, ConfigurationFile);
           else
 	    num_ops ++;
 	}
 	else
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Too many operations listed on line %d.",
-	                  linenum);
+	                  "Too many operations listed on line %d of %s.",
+	                  linenum, ConfigurationFile);
 
         for (value = valptr; isspace(*value & 255); value ++);
       }
@@ -3828,7 +3828,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     }
     else if (!value)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d.", linenum);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Missing value on line %d of %s.", linenum, ConfigurationFile);
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);
     }
@@ -3841,7 +3841,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "%s directive must appear outside <Limit>...</Limit> "
-			"on line %d.", line, linenum);
+			"on line %d of %s.", line, linenum, ConfigurationFile);
 	if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
       }
@@ -3939,16 +3939,16 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     else if (!op)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Missing <Limit ops> directive before %s on line %d.",
-                      line, linenum);
+                      "Missing <Limit ops> directive before %s on line %d of %s.",
+                      line, linenum, ConfigurationFile);
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);
     }
     else if (!parse_aaa(op, line, value, linenum))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "Unknown Policy Limit directive %s on line %d.",
-		      line, linenum);
+		      "Unknown Policy Limit directive %s on line %d of %s.",
+		      line, linenum, ConfigurationFile);
 
       if (FatalErrors & CUPSD_FATAL_CONFIG)
 	return (0);
