@@ -29,6 +29,8 @@ CHANGES IN CUPS V2.0.2
 	- cupsGetPPD* sent bad requests (STR #4567)
 	- ippserver used the wrong temporary directory on Windows (STR #4547)
 	- ippserver did not handle Bonjour registrations properly (STR #4548)
+	- The scheduler could crash during shutdown if Avahi was shutdown
+	  first (STR #4550)
 
 
 CHANGES IN CUPS V2.0.1

@@ -3,7 +3,7 @@
  *
  * Directory services routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1296,13 +1296,20 @@ dnssdStop(void)
   DNSSDMaster = NULL;
 
 #  else /* HAVE_AVAHI */
-  avahi_threaded_poll_stop(DNSSDMaster);
+  if (DNSSDMaster)
+    avahi_threaded_poll_stop(DNSSDMaster);
 
-  avahi_client_free(DNSSDClient);
-  DNSSDClient = NULL;
+  if (DNSSDClient)
+  {
+    avahi_client_free(DNSSDClient);
+    DNSSDClient = NULL;
+  }
 
-  avahi_threaded_poll_free(DNSSDMaster);
-  DNSSDMaster = NULL;
+  if (DNSSDMaster)
+  {
+    avahi_threaded_poll_free(DNSSDMaster);
+    DNSSDMaster = NULL;
+  }
 #  endif /* HAVE_DNSSD */
 
   cupsArrayDelete(DNSSDPrinters);
