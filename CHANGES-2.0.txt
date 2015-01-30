@@ -28,6 +28,7 @@ CHANGES IN CUPS V2.0.2
 	  keyword was already an IPP keyword (<rdar://problem/19121005>)
 	- cupsGetPPD* sent bad requests (STR #4567)
 	- ippserver used the wrong temporary directory on Windows (STR #4547)
+	- ippserver did not handle Bonjour registrations properly (STR #4548)
 
 
 CHANGES IN CUPS V2.0.1

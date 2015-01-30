@@ -361,7 +361,7 @@ static void		delete_client(_ipp_client_t *client);
 static void		delete_job(_ipp_job_t *job);
 static void		delete_printer(_ipp_printer_t *printer);
 #ifdef HAVE_DNSSD
-static void		dnssd_callback(DNSServiceRef sdRef,
+static void DNSSD_API	dnssd_callback(DNSServiceRef sdRef,
 				       DNSServiceFlags flags,
 				       DNSServiceErrorType errorCode,
 				       const char *name,
@@ -2300,7 +2300,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
  * 'dnssd_callback()' - Handle Bonjour registration events.
  */
 
-static void
+static void DNSSD_API
 dnssd_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Status flags */
