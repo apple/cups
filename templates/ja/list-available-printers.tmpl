@@ -1,0 +1,7 @@
+<H2 CLASS="title">利用可能なプリンター</H2>
+
+{#device_uri=0?<P>プリンターが見つかりません。</P>
+:<UL>{[device_uri]
+<LI><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="HIDDEN" NAME="TEMPLATE_NAME" VALUE="{template_name}"><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="Local Printer"><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{device_make_and_model}"><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}"><INPUT TYPE="SUBMIT" VALUE="このプリンターを追加"></FORM>
+{device_make_and_model} ({device_info})</LI>
+}</UL>}

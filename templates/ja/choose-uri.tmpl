@@ -1,0 +1,40 @@
+<H2 CLASS="title">{op=modify-printer?{printer_name}の変更:プリンターの追加}</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
+<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">接続:</TH>
+<TD><INPUT TYPE="URL" SIZE="60" MAXLENGTH="1023" NAME="DEVICE_URI" VALUE="{current_device_uri?{current_device_uri}:{device_uri}}"></TD>
+</TR>
+<TR>
+<TD></TD>
+<TD>例:
+<PRE>
+    http://hostname:631/ipp/
+    http://hostname:631/ipp/port1
+
+    ipp://hostname/ipp/
+    ipp://hostname/ipp/port1
+
+    lpd://hostname/queue
+
+    socket://hostname
+    socket://hostname:9100
+</PRE>
+
+<P>あなたのプリンターにふさわしい URI については、<A HREF="/help/network.html" TARGET="_blank">"ネットワークプリンター"</A>を参照してください。</P>
+
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="続ける"></TD>
+</TR>
+</TABLE>
+
+</FORM>
