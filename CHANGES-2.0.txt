@@ -11,8 +11,8 @@ CHANGES IN CUPS V2.0.2
 	  printers.conf file after a restart (<rdar://problem/16827518>)
 	- CUPS did not compile with older versions of GNU TLS (STR #4527)
 	- CUPS did not compile without Avahi or mDNSResponder (STR #4523)
-	- ippLength() did not return the correct length for IPP_TAG_CONST string
-	  values.
+	- ippLength() did not return the correct length for IPP_TAG_CONST
+	  string values.
 	- The scheduler incorrectly aborted jobs after a job was restarted
 	  (<rdar://problem/19129387>)
 	- The cups-files.conf file contained the old ServerCertificate/Key
@@ -34,6 +34,8 @@ CHANGES IN CUPS V2.0.2
 	- Added a USB quirk rule for Intermec printers (STR #4553)
 	- The scheduler did not always log which configuration file had the
 	  error (STR #4559)
+	- The ippfind and ipptool programs now correctly match hostnames with
+	  trailing dots (STR #4563)
 
 
 CHANGES IN CUPS V2.0.1

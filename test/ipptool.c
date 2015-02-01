@@ -3,7 +3,7 @@
  *
  * ipptool command for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -3882,6 +3882,10 @@ get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
   {
     if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
+
+    ptr = buffer + strlen(buffer) - 1;
+    if (ptr >= buffer && *ptr == '.')
+      *ptr = '\0';			/* Drop trailing "." */
 
     return (buffer);
   }

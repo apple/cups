@@ -5,7 +5,7 @@
  * commands such as IPP and Bonjour conformance tests.  This tool is
  * inspired by the UNIX "find" command, thus its name.
  *
- * Copyright 2008-2014 by Apple Inc.
+ * Copyright 2008-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -2564,6 +2564,10 @@ resolve_callback(
   service->host        = strdup(hostTarget);
   service->port        = ntohs(port);
 
+  value = service->host + strlen(service->host) - 1;
+  if (value >= service->host && *value == '.')
+    *value = '\0';
+
  /*
   * Loop through the TXT key/value pairs and add them to an array...
   */
@@ -2634,6 +2638,10 @@ resolve_callback(
   service->is_resolved = 1;
   service->host        = strdup(hostTarget);
   service->port        = port;
+
+  value = service->host + strlen(service->host) - 1;
+  if (value >= service->host && *value == '.')
+    *value = '\0';
 
  /*
   * Loop through the TXT key/value pairs and add them to an array...
