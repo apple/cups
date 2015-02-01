@@ -6830,6 +6830,22 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 	break;
       }
     }
+    else if (http->used == 0 && http->timeout_value > 0)
+    {
+     /*
+      * Wait up to timeout seconds for more data on blocking sockets...
+      */
+
+      if (!httpWait(http, (int)(1000 * http->timeout_value)))
+      {
+       /*
+	* Signal no data...
+	*/
+
+	bytes = -1;
+	break;
+      }
+    }
 
     if ((bytes = httpRead2(http, (char *)buffer, length - (size_t)tbytes)) < 0)
     {
