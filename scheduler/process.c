@@ -26,6 +26,15 @@
 #  include <spawn.h>
 extern char **environ;
 #endif /* HAVE_POSIX_SPAWN */
+#ifdef HAVE_POSIX_SPAWN
+#  if !defined(__OpenBSD__) || OpenBSD >= 201505
+#    define USE_POSIX_SPAWN 1
+#  else
+#    define USE_POSIX_SPAWN 0
+#  endif /* !__OpenBSD__ || */
+#else
+#  define USE_POSIX_SPAWN 0
+#endif /* HAVE_POSIX_SPAWN */
 
 
 /*
@@ -468,13 +477,13 @@ cupsdStartProcess(
 		nice_str[16];		/* FilterNice string */
   uid_t		user;			/* Command UID */
   cupsd_proc_t	*proc;			/* New process record */
-#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__)
+#if USE_POSIX_SPAWN
   posix_spawn_file_actions_t actions;	/* Spawn file actions */
   posix_spawnattr_t attrs;		/* Spawn attributes */
   sigset_t	defsignals;		/* Default signals */
 #elif defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
-#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
+#endif /* USE_POSIX_SPAWN */
 #if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */
@@ -538,9 +547,9 @@ cupsdStartProcess(
   * Use helper program when we have a sandbox profile...
   */
 
-#if !defined(HAVE_POSIX_SPAWN) || defined(__OpenBSD__)
+#if !USE_POSIX_SPAWN
   if (profile)
-#endif /* !HAVE_POSIX_SPAWN || __OpenBSD__ */
+#endif /* !USE_POSIX_SPAWN */
   {
     snprintf(cups_exec, sizeof(cups_exec), "%s/daemon/cups-exec", ServerBin);
     snprintf(user_str, sizeof(user_str), "%d", user);
@@ -576,7 +585,7 @@ cupsdStartProcess(
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartProcess: argv[%d] = \"%s\"", i, argv[i]);
   }
 
-#if defined(HAVE_POSIX_SPAWN) && !defined(__OpenBSD__) /* OpenBSD posix_spawn is busted with SETSIGDEF */
+#if USE_POSIX_SPAWN
  /*
   * Setup attributes and file actions for the spawn...
   */
@@ -799,7 +808,7 @@ cupsdStartProcess(
   }
 
   cupsdReleaseSignals();
-#endif /* HAVE_POSIX_SPAWN && !__OpenBSD__ */
+#endif /* USE_POSIX_SPAWN */
 
   if (*pid)
   {
