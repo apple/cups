@@ -39,6 +39,7 @@ CHANGES IN CUPS V2.0.2
 	- The ipptool timeout option did not work (STR #4515)
 	- Another change for OpenBSD (STR #4526)
 	- Added Japanese localization (STR #4524)
+	- Documentation changes (STR #4569)
 
 
 CHANGES IN CUPS V2.0.1
