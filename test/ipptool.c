@@ -70,7 +70,8 @@ typedef enum _cups_with_e		/**** WITH flags ****/
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
   int		optional,		/* Optional attribute? */
-		not_expect;		/* Don't expect attribute? */
+		not_expect,		/* Don't expect attribute? */
+		expect_all;		/* Expect all attributes to match/not match */
   char		*name,			/* Attribute name */
 		*of_type,		/* Type name */
 		*same_count_as,		/* Parallel attribute name */
@@ -1993,11 +1994,13 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	last_status->repeat_match    = 0;
 	last_status->repeat_no_match = 0;
       }
-      else if (!_cups_strcasecmp(token, "EXPECT"))
+      else if (!_cups_strcasecmp(token, "EXPECT") || !_cups_strcasecmp(token, "EXPECT-ALL"))
       {
        /*
         * Expected attributes...
 	*/
+
+	int expect_all = !_cups_strcasecmp(token, "EXPECT-ALL");
 
         if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
         {
@@ -2018,6 +2021,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 
 	memset(last_expect, 0, sizeof(_cups_expect_t));
 	last_expect->repeat_limit = 1000;
+	last_expect->expect_all   = expect_all;
 
         if (token[0] == '!')
         {
@@ -2938,192 +2942,196 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      get_variable(vars, expect->if_not_defined))
 	    continue;
 
-	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+          found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-	  if ((found && expect->not_expect) ||
-	      (!found && !(expect->not_expect || expect->optional)) ||
-	      (found && !expect_matches(expect, found->value_tag)) ||
-	      (found && expect->in_group &&
-	       found->group_tag != expect->in_group))
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
-	    {
-	      if (found && expect->not_expect)
-		add_stringf(errors, "NOT EXPECTED: %s", expect->name);
-	      else if (!found && !(expect->not_expect || expect->optional))
-		add_stringf(errors, "EXPECTED: %s", expect->name);
-	      else if (found)
-	      {
-		if (!expect_matches(expect, found->value_tag))
-		  add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
-			      expect->name, expect->of_type,
-			      ippTagString(found->value_tag));
-
-		if (expect->in_group && found->group_tag != expect->in_group)
-		  add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
-			      expect->name, ippTagString(expect->in_group),
-			      ippTagString(found->group_tag));
-              }
-            }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found)
-	    ippAttributeString(found, buffer, sizeof(buffer));
-
-	  if (found &&
-	      !with_value(outfile, NULL, expect->with_value, expect->with_flags, found,
-			  buffer, sizeof(buffer)))
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value &&
-	             !expect->repeat_match && !expect->repeat_no_match)
-	    {
-	      if (expect->with_flags & _CUPS_WITH_REGEX)
-		add_stringf(errors, "EXPECTED: %s %s /%s/",
-			    expect->name,
-			    (expect->with_flags & _CUPS_WITH_ALL) ?
-			        "WITH-ALL-VALUES" : "WITH-VALUE",
-			    expect->with_value);
-	      else
-		add_stringf(errors, "EXPECTED: %s %s \"%s\"",
-			    expect->name,
-			    (expect->with_flags & _CUPS_WITH_ALL) ?
-			        "WITH-ALL-VALUES" : "WITH-VALUE",
-			    expect->with_value);
-
-	      with_value(outfile, errors, expect->with_value, expect->with_flags, found,
-	                 buffer, sizeof(buffer));
-	    }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found && expect->count > 0 &&
-	      found->num_values != expect->count)
-	  {
-	    if (expect->define_no_match)
-	      set_variable(outfile, vars, expect->define_no_match, "1");
-	    else if (!expect->define_match && !expect->define_value)
-	    {
-	      add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
-			  expect->count, found->num_values);
-	    }
-
-	    if (expect->repeat_no_match &&
-		repeat_count < expect->repeat_limit)
-	      repeat_test = 1;
-
-	    continue;
-	  }
-
-	  if (found && expect->same_count_as)
-	  {
-	    attrptr = ippFindAttribute(response, expect->same_count_as,
-				       IPP_TAG_ZERO);
-
-	    if (!attrptr || attrptr->num_values != found->num_values)
+          do
+          {
+	    if ((found && expect->not_expect) ||
+		(!found && !(expect->not_expect || expect->optional)) ||
+		(found && !expect_matches(expect, found->value_tag)) ||
+		(found && expect->in_group &&
+		 found->group_tag != expect->in_group))
 	    {
 	      if (expect->define_no_match)
 		set_variable(outfile, vars, expect->define_no_match, "1");
 	      else if (!expect->define_match && !expect->define_value)
 	      {
-		if (!attrptr)
-		  add_stringf(errors,
-			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			      "(not returned)", expect->name,
-			      found->num_values, expect->same_count_as);
-		else if (attrptr->num_values != found->num_values)
-		  add_stringf(errors,
-			      "EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			      "(%d values)", expect->name, found->num_values,
-			      expect->same_count_as, attrptr->num_values);
+		if (found && expect->not_expect)
+		  add_stringf(errors, "NOT EXPECTED: %s", expect->name);
+		else if (!found && !(expect->not_expect || expect->optional))
+		  add_stringf(errors, "EXPECTED: %s", expect->name);
+		else if (found)
+		{
+		  if (!expect_matches(expect, found->value_tag))
+		    add_stringf(errors, "EXPECTED: %s OF-TYPE %s (got %s)",
+				expect->name, expect->of_type,
+				ippTagString(found->value_tag));
+
+		  if (expect->in_group && found->group_tag != expect->in_group)
+		    add_stringf(errors, "EXPECTED: %s IN-GROUP %s (got %s).",
+				expect->name, ippTagString(expect->in_group),
+				ippTagString(found->group_tag));
+		}
 	      }
 
 	      if (expect->repeat_no_match &&
-	          repeat_count < expect->repeat_limit)
+		  repeat_count < expect->repeat_limit)
 		repeat_test = 1;
 
-	      continue;
+	      break;
 	    }
-	  }
 
-	  if (found && expect->define_match)
-	    set_variable(outfile, vars, expect->define_match, "1");
+	    if (found)
+	      ippAttributeString(found, buffer, sizeof(buffer));
 
-	  if (found && expect->define_value)
-	  {
-	    if (!expect->with_value)
+	    if (found &&
+		!with_value(outfile, NULL, expect->with_value, expect->with_flags, found,
+			    buffer, sizeof(buffer)))
 	    {
-	      int last = ippGetCount(found) - 1;
-					/* Last element in attribute */
-
-	      switch (ippGetValueTag(found))
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value &&
+		       !expect->repeat_match && !expect->repeat_no_match)
 	      {
-	        case IPP_TAG_ENUM :
-		case IPP_TAG_INTEGER :
-		    snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
-		    break;
+		if (expect->with_flags & _CUPS_WITH_REGEX)
+		  add_stringf(errors, "EXPECTED: %s %s /%s/",
+			      expect->name,
+			      (expect->with_flags & _CUPS_WITH_ALL) ?
+				  "WITH-ALL-VALUES" : "WITH-VALUE",
+			      expect->with_value);
+		else
+		  add_stringf(errors, "EXPECTED: %s %s \"%s\"",
+			      expect->name,
+			      (expect->with_flags & _CUPS_WITH_ALL) ?
+				  "WITH-ALL-VALUES" : "WITH-VALUE",
+			      expect->with_value);
 
-		case IPP_TAG_BOOLEAN :
-		    if (ippGetBoolean(found, last))
-		      strlcpy(buffer, "true", sizeof(buffer));
-		    else
-		      strlcpy(buffer, "false", sizeof(buffer));
-		    break;
+		with_value(outfile, errors, expect->with_value, expect->with_flags, found,
+			   buffer, sizeof(buffer));
+	      }
 
-		case IPP_TAG_RESOLUTION :
-		    {
-		      int	xres,	/* Horizontal resolution */
-				yres;	/* Vertical resolution */
-		      ipp_res_t	units;	/* Resolution units */
+	      if (expect->repeat_no_match &&
+		  repeat_count < expect->repeat_limit)
+		repeat_test = 1;
 
-		      xres = ippGetResolution(found, last, &yres, &units);
+	      break;
+	    }
 
-		      if (xres == yres)
-		        snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
-		      else
-		        snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
-		    }
-		    break;
+	    if (found && expect->count > 0 &&
+		found->num_values != expect->count)
+	    {
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value)
+	      {
+		add_stringf(errors, "EXPECTED: %s COUNT %d (got %d)", expect->name,
+			    expect->count, found->num_values);
+	      }
 
-		case IPP_TAG_CHARSET :
-		case IPP_TAG_KEYWORD :
-		case IPP_TAG_LANGUAGE :
-		case IPP_TAG_MIMETYPE :
-		case IPP_TAG_NAME :
-		case IPP_TAG_NAMELANG :
-		case IPP_TAG_TEXT :
-		case IPP_TAG_TEXTLANG :
-		case IPP_TAG_URI :
-		case IPP_TAG_URISCHEME :
-		    strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
-		    break;
+	      if (expect->repeat_no_match &&
+		  repeat_count < expect->repeat_limit)
+		repeat_test = 1;
 
-		default :
-		    ippAttributeString(found, buffer, sizeof(buffer));
-		    break;
+	      break;
+	    }
+
+	    if (found && expect->same_count_as)
+	    {
+	      attrptr = ippFindAttribute(response, expect->same_count_as,
+					 IPP_TAG_ZERO);
+
+	      if (!attrptr || attrptr->num_values != found->num_values)
+	      {
+		if (expect->define_no_match)
+		  set_variable(outfile, vars, expect->define_no_match, "1");
+		else if (!expect->define_match && !expect->define_value)
+		{
+		  if (!attrptr)
+		    add_stringf(errors,
+				"EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				"(not returned)", expect->name,
+				found->num_values, expect->same_count_as);
+		  else if (attrptr->num_values != found->num_values)
+		    add_stringf(errors,
+				"EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				"(%d values)", expect->name, found->num_values,
+				expect->same_count_as, attrptr->num_values);
+		}
+
+		if (expect->repeat_no_match &&
+		    repeat_count < expect->repeat_limit)
+		  repeat_test = 1;
+
+		break;
 	      }
 	    }
 
-	    set_variable(outfile, vars, expect->define_value, buffer);
-	  }
+	    if (found && expect->define_match)
+	      set_variable(outfile, vars, expect->define_match, "1");
 
-	  if (found && expect->repeat_match &&
-	      repeat_count < expect->repeat_limit)
-	    repeat_test = 1;
+	    if (found && expect->define_value)
+	    {
+	      if (!expect->with_value)
+	      {
+		int last = ippGetCount(found) - 1;
+					  /* Last element in attribute */
+
+		switch (ippGetValueTag(found))
+		{
+		  case IPP_TAG_ENUM :
+		  case IPP_TAG_INTEGER :
+		      snprintf(buffer, sizeof(buffer), "%d", ippGetInteger(found, last));
+		      break;
+
+		  case IPP_TAG_BOOLEAN :
+		      if (ippGetBoolean(found, last))
+			strlcpy(buffer, "true", sizeof(buffer));
+		      else
+			strlcpy(buffer, "false", sizeof(buffer));
+		      break;
+
+		  case IPP_TAG_RESOLUTION :
+		      {
+			int	xres,	/* Horizontal resolution */
+				  yres;	/* Vertical resolution */
+			ipp_res_t	units;	/* Resolution units */
+
+			xres = ippGetResolution(found, last, &yres, &units);
+
+			if (xres == yres)
+			  snprintf(buffer, sizeof(buffer), "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+			else
+			  snprintf(buffer, sizeof(buffer), "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+		      }
+		      break;
+
+		  case IPP_TAG_CHARSET :
+		  case IPP_TAG_KEYWORD :
+		  case IPP_TAG_LANGUAGE :
+		  case IPP_TAG_MIMETYPE :
+		  case IPP_TAG_NAME :
+		  case IPP_TAG_NAMELANG :
+		  case IPP_TAG_TEXT :
+		  case IPP_TAG_TEXTLANG :
+		  case IPP_TAG_URI :
+		  case IPP_TAG_URISCHEME :
+		      strlcpy(buffer, ippGetString(found, last, NULL), sizeof(buffer));
+		      break;
+
+		  default :
+		      ippAttributeString(found, buffer, sizeof(buffer));
+		      break;
+		}
+	      }
+
+	      set_variable(outfile, vars, expect->define_value, buffer);
+	    }
+
+	    if (found && expect->repeat_match &&
+		repeat_count < expect->repeat_limit)
+	      repeat_test = 1;
+          }
+          while (expect->expect_all && (found = ippFindNextAttribute(response, expect->name, IPP_TAG_ZERO)) != NULL);
 	}
       }
 

@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-01-27
+CHANGES.txt - 2.1b1 - 2015-02-03
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -14,3 +14,5 @@ CHANGES IN CUPS V2.1b1
 	  configuration changes (<rdar://problem/18126570>)
 	- No longer install banner files since third-party banner filters now
 	  supply their own (STR #4518)
+	- Added support for EXPECT-ALL directive in ipptool test files
+	  (STR #4469)
