@@ -37,6 +37,8 @@ CHANGES IN CUPS V2.0.2
 	- The ippfind and ipptool programs now correctly match hostnames with
 	  trailing dots (STR #4563)
 	- The ipptool timeout option did not work (STR #4515)
+	- Fixed several issues with client.conf, CUPS_SERVER, and the "-h"
+	  option of most commands (STR #4528)
 	- Another change for OpenBSD (STR #4526)
 	- Added Japanese localization (STR #4524)
 	- Documentation changes (STR #4569)

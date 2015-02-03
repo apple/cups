@@ -3,7 +3,7 @@
  *
  * User, system, and password routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -39,21 +39,44 @@
 
 
 /*
+ * Local types...
+ */
+
+typedef struct _cups_client_conf_s	/**** client.conf config data ****/
+{
+#ifdef HAVE_SSL
+  int			ssl_options;	/* SSLOptions values */
+#endif /* HAVE_SSL */
+  int			any_root,	/* Allow any (e.g., self-signed) root */
+			expired_certs,	/* Allow expired certs */
+			validate_certs;	/* Validate certificates */
+  http_encryption_t	encryption;	/* Encryption setting */
+  char			user[65],	/* User name */
+			server_name[256];
+					/* Server hostname */
+#ifdef HAVE_GSSAPI
+  char			gss_service_name[32];
+  					/* Kerberos service name */
+#endif /* HAVE_GSSAPI */
+} _cups_client_conf_t;
+
+
+/*
  * Local functions...
  */
 
-static void	cups_read_client_conf(cups_file_t *fp,
-		                      _cups_globals_t *cg,
-		                      const char *cups_encryption,
-				      const char *cups_server,
-				      const char *cups_user,
+static void	cups_finalize_client_conf(_cups_client_conf_t *cc);
+static void	cups_init_client_conf(_cups_client_conf_t *cc);
+static void	cups_read_client_conf(cups_file_t *fp, _cups_client_conf_t *cc);
+static void	cups_set_encryption(_cups_client_conf_t *cc, const char *value);
 #ifdef HAVE_GSSAPI
-                                      const char *cups_gssservicename,
+static void	cups_set_gss_service_name(_cups_client_conf_t *cc, const char *value);
 #endif /* HAVE_GSSAPI */
-				      const char *cups_anyroot,
-				      const char *cups_expiredcerts,
-				      const char *cups_validatecerts,
-				      int ssl_options);
+static void	cups_set_server_name(_cups_client_conf_t *cc, const char *value);
+#ifdef HAVE_SSL
+static void	cups_set_ssl_options(_cups_client_conf_t *cc, const char *value);
+#endif /* HAVE_SSL */
+static void	cups_set_user(_cups_client_conf_t *cc, const char *value);
 
 
 /*
@@ -826,270 +849,63 @@ void
 _cupsSetDefaults(void)
 {
   cups_file_t	*fp;			/* File */
-  const char	*home,			/* Home directory of user */
-		*cups_encryption,	/* CUPS_ENCRYPTION env var */
-		*cups_server,		/* CUPS_SERVER env var */
-		*cups_user,		/* CUPS_USER/USER env var */
-#ifdef HAVE_GSSAPI
-		*cups_gssservicename,	/* CUPS_GSSSERVICENAME env var */
-#endif /* HAVE_GSSAPI */
-		*cups_anyroot,		/* CUPS_ANYROOT env var */
-		*cups_expiredcerts,	/* CUPS_EXPIREDCERTS env var */
-		*cups_validatecerts;	/* CUPS_VALIDATECERTS env var */
+  const char	*home;			/* Home directory of user */
   char		filename[1024];		/* Filename */
+  _cups_client_conf_t cc;		/* client.conf values */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_puts("_cupsSetDefaults()");
 
  /*
-  * First collect environment variables...
+  * Load initial client.conf values...
   */
 
-  cups_encryption     = getenv("CUPS_ENCRYPTION");
-  cups_server	      = getenv("CUPS_SERVER");
-#ifdef HAVE_GSSAPI
-  cups_gssservicename = getenv("CUPS_GSSSERVICENAME");
-#endif /* HAVE_GSSAPI */
-  cups_anyroot	      = getenv("CUPS_ANYROOT");
-  cups_expiredcerts   = getenv("CUPS_EXPIREDCERTS");
-  cups_user           = getenv("CUPS_USER");
-  cups_validatecerts  = getenv("CUPS_VALIDATECERTS");
+  cups_init_client_conf(&cc);
 
  /*
-  * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
-  * files to get the default values...
+  * Read the /etc/cups/client.conf and ~/.cups/client.conf files, if
+  * present.
   */
 
-  if (cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
-      !cg->user[0] || !cg->ipp_port)
+  snprintf(filename, sizeof(filename), "%s/client.conf", cg->cups_serverroot);
+  if ((fp = cupsFileOpen(filename, "r")) != NULL)
   {
-   /*
-    * Look for CUPS_SERVERROOT/client.conf...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/client.conf",
-	     cg->cups_serverroot);
-    fp = cupsFileOpen(filename, "r");
-
-   /*
-    * Read the configuration file and apply any environment variables; both
-    * functions handle NULL cups_file_t pointers...
-    */
-
-    cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
-#ifdef HAVE_GSSAPI
-			  cups_gssservicename,
-#endif /* HAVE_GSSAPI */
-			  cups_anyroot, cups_expiredcerts, cups_validatecerts, 1);
+    cups_read_client_conf(fp, &cc);
     cupsFileClose(fp);
-
-   /*
-    * Then user defaults, if it is safe to do so...
-    */
+  }
 
 #  ifdef HAVE_GETEUID
-    if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
+  if ((geteuid() == getuid() || !getuid()) && getegid() == getgid() && (home = getenv("HOME")) != NULL)
 #  elif !defined(WIN32)
-    if (getuid() && (home = getenv("HOME")) != NULL)
+  if (getuid() && (home = getenv("HOME")) != NULL)
 #  else
-    if ((home = getenv("HOME")) != NULL)
+  if ((home = getenv("HOME")) != NULL)
 #  endif /* HAVE_GETEUID */
+  {
+   /*
+    * Look for ~/.cups/client.conf...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
-     /*
-      * Look for ~/.cups/client.conf...
-      */
-
-      snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
-      fp = cupsFileOpen(filename, "r");
-
-     /*
-      * Read the configuration file and apply any environment variables; both
-      * functions handle NULL cups_file_t pointers...
-      */
-
-      cups_read_client_conf(fp, cg, cups_encryption, cups_server, cups_user,
-#ifdef HAVE_GSSAPI
-			    cups_gssservicename,
-#endif /* HAVE_GSSAPI */
-			    cups_anyroot, cups_expiredcerts, cups_validatecerts, 0);
+      cups_read_client_conf(fp, &cc);
       cupsFileClose(fp);
     }
   }
-}
-
-
-/*
- * 'cups_read_client_conf()' - Read a client.conf file.
- */
-
-static void
-cups_read_client_conf(
-    cups_file_t     *fp,		/* I - File to read */
-    _cups_globals_t *cg,		/* I - Global data */
-    const char      *cups_encryption,	/* I - CUPS_ENCRYPTION env var */
-    const char      *cups_server,	/* I - CUPS_SERVER env var */
-    const char      *cups_user,		/* I - CUPS_USER env var */
-#ifdef HAVE_GSSAPI
-    const char      *cups_gssservicename,
-					/* I - CUPS_GSSSERVICENAME env var */
-#endif /* HAVE_GSSAPI */
-    const char	    *cups_anyroot,	/* I - CUPS_ANYROOT env var */
-    const char	    *cups_expiredcerts,	/* I - CUPS_EXPIREDCERTS env var */
-    const char      *cups_validatecerts,/* I - CUPS_VALIDATECERTS env var */
-    int             ssl_options)	/* I - Allow setting of SSLOptions? */
-{
-  int	linenum;			/* Current line number */
-  char	line[1024],			/* Line from file */
-        *value,				/* Pointer into line */
-	encryption[1024],		/* Encryption value */
-#ifndef __APPLE__
-	server_name[1024],		/* ServerName value */
-#endif /* !__APPLE__ */
-	user[256],			/* User value */
-	any_root[1024],			/* AllowAnyRoot value */
-	expired_certs[1024],		/* AllowExpiredCerts value */
-	validate_certs[1024];		/* ValidateCerts value */
-#ifdef HAVE_GSSAPI
-  char	gss_service_name[32];		/* GSSServiceName value */
-#endif /* HAVE_GSSAPI */
-
-
-  (void)ssl_options; /* Silence compiler warning */
 
  /*
-  * Read from the file...
+  * Finalize things so every client.conf value is set...
   */
 
-  linenum = 0;
-  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
-  {
-    if (!cups_encryption && cg->encryption == (http_encryption_t)-1 &&
-        !_cups_strcasecmp(line, "Encryption") && value)
-    {
-      strlcpy(encryption, value, sizeof(encryption));
-      cups_encryption = encryption;
-    }
-#ifndef __APPLE__
-   /*
-    * The Server directive is not supported on OS X due to app sandboxing
-    * restrictions, i.e. not all apps request network access.
-    */
-    else if (!cups_server && (!cg->server[0] || !cg->ipp_port) &&
-             !_cups_strcasecmp(line, "ServerName") && value)
-    {
-      strlcpy(server_name, value, sizeof(server_name));
-      cups_server = server_name;
-    }
-#endif /* !__APPLE__ */
-    else if (!cups_user && !_cups_strcasecmp(line, "User") && value)
-    {
-      strlcpy(user, value, sizeof(user));
-      cups_user = user;
-    }
-    else if (!cups_anyroot && !_cups_strcasecmp(line, "AllowAnyRoot") && value)
-    {
-      strlcpy(any_root, value, sizeof(any_root));
-      cups_anyroot = any_root;
-    }
-    else if (!cups_expiredcerts && !_cups_strcasecmp(line, "AllowExpiredCerts") &&
-             value)
-    {
-      strlcpy(expired_certs, value, sizeof(expired_certs));
-      cups_expiredcerts = expired_certs;
-    }
-    else if (!cups_validatecerts && !_cups_strcasecmp(line, "ValidateCerts") && value)
-    {
-      strlcpy(validate_certs, value, sizeof(validate_certs));
-      cups_validatecerts = validate_certs;
-    }
-#ifdef HAVE_GSSAPI
-    else if (!cups_gssservicename && !_cups_strcasecmp(line, "GSSServiceName") &&
-             value)
-    {
-      strlcpy(gss_service_name, value, sizeof(gss_service_name));
-      cups_gssservicename = gss_service_name;
-    }
-#endif /* HAVE_GSSAPI */
-#ifdef HAVE_SSL
-    else if (ssl_options && !_cups_strcasecmp(line, "SSLOptions") && value)
-    {
-     /*
-      * SSLOptions [AllowRC4] [AllowSSL3] [None]
-      */
+  cups_finalize_client_conf(&cc);
 
-      int	options = 0;		/* SSL/TLS options */
-      char	*start,			/* Start of option */
-		*end;			/* End of option */
+  if (cg->encryption == (http_encryption_t)-1)
+    cg->encryption = cc.encryption;
 
-      for (start = value; *start; start = end)
-      {
-       /* 
-	* Find end of keyword...
-	*/
-
-	end = start;
-	while (*end && !_cups_isspace(*end))
-	  end ++;
-
-	if (*end)
-	  *end++ = '\0';
-
-       /*
-	* Compare...
-	*/
-
-	if (!_cups_strcasecmp(start, "AllowRC4"))
-	  options |= _HTTP_TLS_ALLOW_RC4;
-	else if (!_cups_strcasecmp(start, "AllowSSL3"))
-	  options |= _HTTP_TLS_ALLOW_SSL3;
-	else if (!_cups_strcasecmp(start, "None"))
-	  options = 0;
-      }
-
-      _httpTLSSetOptions(options);
-    }
-#endif /* HAVE_SSL */
-  }
-
- /*
-  * Set values...
-  */
-
-  if (cg->encryption == (http_encryption_t)-1 && cups_encryption)
-  {
-    if (!_cups_strcasecmp(cups_encryption, "never"))
-      cg->encryption = HTTP_ENCRYPTION_NEVER;
-    else if (!_cups_strcasecmp(cups_encryption, "always"))
-      cg->encryption = HTTP_ENCRYPTION_ALWAYS;
-    else if (!_cups_strcasecmp(cups_encryption, "required"))
-      cg->encryption = HTTP_ENCRYPTION_REQUIRED;
-    else
-      cg->encryption = HTTP_ENCRYPTION_IF_REQUESTED;
-  }
-
-  if ((!cg->server[0] || !cg->ipp_port) && cups_server)
-    cupsSetServer(cups_server);
-
-  if (!cg->server[0])
-  {
-#ifdef CUPS_DEFAULT_DOMAINSOCKET
-   /*
-    * If we are compiled with domain socket support, only use the
-    * domain socket if it exists and has the right permissions...
-    */
-
-    struct stat	sockinfo;		/* Domain socket information */
-
-    if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
-	(sockinfo.st_mode & S_IRWXO) == S_IRWXO)
-      cups_server = CUPS_DEFAULT_DOMAINSOCKET;
-    else
-#endif /* CUPS_DEFAULT_DOMAINSOCKET */
-      cups_server = "localhost";
-
-    cupsSetServer(cups_server);
-  }
+  if (!cg->server[0] || !cg->ipp_port)
+    cupsSetServer(cc.server_name);
 
   if (!cg->ipp_port)
   {
@@ -1105,80 +921,345 @@ cups_read_client_conf(
   }
 
   if (!cg->user[0])
+    strlcpy(cg->user, cc.user, sizeof(cg->user));
+
+#ifdef HAVE_GSSAPI
+  if (!cg->gss_service_name[0])
+    strlcpy(cg->gss_service_name, cc.gss_service_name, sizeof(cg->gss_service_name));
+#endif /* HAVE_GSSAPI */
+
+  if (cg->any_root < 0)
+    cg->any_root = cc.any_root;
+
+  if (cg->expired_certs < 0)
+    cg->expired_certs = cc.expired_certs;
+
+  if (cg->validate_certs < 0)
+    cg->validate_certs = cc.validate_certs;
+
+#ifdef HAVE_SSL
+  _httpTLSSetOptions(cc.ssl_options);
+#endif /* HAVE_SSL */
+}
+
+
+/*
+ * 'cups_boolean_value()' - Convert a string to a boolean value.
+ */
+
+static int				/* O - Boolean value */
+cups_boolean_value(const char *value)	/* I - String value */
+{
+  return (!_cups_strcasecmp(value, "yes") || !_cups_strcasecmp(value, "on") || !_cups_strcasecmp(value, "true"));
+}
+
+
+/*
+ * 'cups_finalize_client_conf()' - Finalize client.conf values.
+ */
+
+static void
+cups_finalize_client_conf(
+    _cups_client_conf_t *cc)		/* I - client.conf values */
+{
+  const char	*value;			/* Environment variable */
+
+
+  if ((value = getenv("CUPS_ANYROOT")) != NULL)
+    cc->any_root = cups_boolean_value(value);
+
+  if ((value = getenv("CUPS_ENCRYPTION")) != NULL)
+    cups_set_encryption(cc, value);
+
+  if ((value = getenv("CUPS_EXPIREDCERTS")) != NULL)
+    cc->expired_certs = cups_boolean_value(value);
+
+#ifdef HAVE_GSSAPI
+  if ((value = getenv("CUPS_GSSSERVICENAME")) != NULL)
+    cups_set_gss_service_name(cc, value);
+#endif /* HAVE_GSSAPI */
+
+  if ((value = getenv("CUPS_SERVER")) != NULL)
+    cups_set_server_name(cc, value);
+
+  if ((value = getenv("CUPS_USER")) != NULL)
+    cups_set_user(cc, value);
+
+  if ((value = getenv("CUPS_VALIDATECERTS")) != NULL)
+    cc->validate_certs = cups_boolean_value(value);
+
+ /*
+  * Then apply defaults for those values that haven't been set...
+  */
+
+  if (cc->any_root < 0)
+    cc->any_root = 1;
+
+  if (cc->encryption == (http_encryption_t)-1)
+    cc->encryption = HTTP_ENCRYPTION_IF_REQUESTED;
+
+  if (cc->expired_certs < 0)
+    cc->expired_certs = 1;
+
+#ifdef HAVE_GSSAPI
+  if (!cc->gss_service_name[0])
+    cups_set_gss_service_name(cc, CUPS_DEFAULT_GSSSERVICENAME);
+#endif /* HAVE_GSSAPI */
+
+  if (!cc->server_name[0])
   {
-    if (cups_user)
-      strlcpy(cg->user, cups_user, sizeof(cg->user));
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+   /*
+    * If we are compiled with domain socket support, only use the
+    * domain socket if it exists and has the right permissions...
+    */
+
+    struct stat	sockinfo;		/* Domain socket information */
+
+    if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
+	(sockinfo.st_mode & S_IRWXO) == S_IRWXO)
+      cups_set_server_name(cc, CUPS_DEFAULT_DOMAINSOCKET);
     else
-    {
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
+      cups_set_server_name(cc, "localhost");
+  }
+
+  if (!cc->user[0])
+  {
 #ifdef WIN32
-     /*
-      * Get the current user name from the OS...
-      */
+   /*
+    * Get the current user name from the OS...
+    */
 
-      DWORD	size;			/* Size of string */
+    DWORD	size;			/* Size of string */
 
-      size = sizeof(cg->user);
-      if (!GetUserName(cg->user, &size))
+    size = sizeof(cc->user);
+    if (!GetUserName(cc->user, &size))
 #else
+   /*
+    * Try the USER environment variable as the default username...
+    */
+
+    const char *envuser = getenv("USER");
+					/* Default username */
+    struct passwd *pw = NULL;		/* Account information */
+
+    if (envuser)
+    {
      /*
-      * Try the USER environment variable as the default username...
+      * Validate USER matches the current UID, otherwise don't allow it to
+      * override things...  This makes sure that printing after doing su
+      * or sudo records the correct username.
       */
 
-      const char *envuser = getenv("USER");
-					/* Default username */
-      struct passwd	*pw = NULL;	/* Account information */
+      if ((pw = getpwnam(envuser)) != NULL && pw->pw_uid != getuid())
+	pw = NULL;
+    }
 
-      if (envuser)
-      {
-       /*
-	* Validate USER matches the current UID, otherwise don't allow it to
-	* override things...  This makes sure that printing after doing su or
-	* sudo records the correct username.
-	*/
+    if (!pw)
+      pw = getpwuid(getuid());
 
-	if ((pw = getpwnam(envuser)) != NULL && pw->pw_uid != getuid())
-	  pw = NULL;
-      }
-
-      if (!pw)
-        pw = getpwuid(getuid());
-
-      if (pw)
-	strlcpy(cg->user, pw->pw_name, sizeof(cg->user));
-      else
+    if (pw)
+      strlcpy(cc->user, pw->pw_name, sizeof(cc->user));
+    else
 #endif /* WIN32 */
-      {
-       /*
-	* Use the default "unknown" user name...
-	*/
+    {
+     /*
+      * Use the default "unknown" user name...
+      */
 
-	strlcpy(cg->user, "unknown", sizeof(cg->user));
-      }
+      strlcpy(cc->user, "unknown", sizeof(cc->user));
     }
   }
 
-#ifdef HAVE_GSSAPI
-  if (!cups_gssservicename)
-    cups_gssservicename = CUPS_DEFAULT_GSSSERVICENAME;
+  if (cc->validate_certs < 0)
+    cc->validate_certs = 0;
+}
 
-  strlcpy(cg->gss_service_name, cups_gssservicename,
-	  sizeof(cg->gss_service_name));
+
+/*
+ * 'cups_init_client_conf()' - Initialize client.conf values.
+ */
+
+static void
+cups_init_client_conf(
+    _cups_client_conf_t *cc)		/* I - client.conf values */
+{
+ /*
+  * Clear all values to "not set"...
+  */
+
+  memset(cc, 0, sizeof(_cups_client_conf_t));
+
+  cc->encryption     = (http_encryption_t)-1;
+  cc->any_root       = -1;
+  cc->expired_certs  = -1;
+  cc->validate_certs = -1;
+}
+
+
+/*
+ * 'cups_read_client_conf()' - Read a client.conf file.
+ */
+
+static void
+cups_read_client_conf(
+    cups_file_t         *fp,		/* I - File to read */
+    _cups_client_conf_t *cc)		/* I - client.conf values */
+{
+  int	linenum;			/* Current line number */
+  char	line[1024],			/* Line from file */
+        *value;				/* Pointer into line */
+
+
+ /*
+  * Read from the file...
+  */
+
+  linenum = 0;
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+  {
+    if (!_cups_strcasecmp(line, "Encryption") && value)
+      cups_set_encryption(cc, value);
+#ifndef __APPLE__
+   /*
+    * The ServerName directive is not supported on OS X due to app
+    * sandboxing restrictions, i.e. not all apps request network access.
+    */
+    else if (!_cups_strcasecmp(line, "ServerName") && value)
+      cups_set_server_name(cc, value);
+#endif /* !__APPLE__ */
+    else if (!_cups_strcasecmp(line, "User") && value)
+      cups_set_user(cc, value);
+    else if (!_cups_strcasecmp(line, "AllowAnyRoot") && value)
+      cc->any_root = cups_boolean_value(value);
+    else if (!_cups_strcasecmp(line, "AllowExpiredCerts") &&
+             value)
+      cc->expired_certs = cups_boolean_value(value);
+    else if (!_cups_strcasecmp(line, "ValidateCerts") && value)
+      cc->validate_certs = cups_boolean_value(value);
+#ifdef HAVE_GSSAPI
+    else if (!_cups_strcasecmp(line, "GSSServiceName") && value)
+      cups_set_gss_service_name(cc, value);
+#endif /* HAVE_GSSAPI */
+#ifdef HAVE_SSL
+    else if (!_cups_strcasecmp(line, "SSLOptions") && value)
+      cups_set_ssl_options(cc, value);
+#endif /* HAVE_SSL */
+  }
+}
+
+
+/*
+ * 'cups_set_encryption()' - Set the Encryption value.
+ */
+
+static void
+cups_set_encryption(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  if (!_cups_strcasecmp(value, "never"))
+    cc->encryption = HTTP_ENCRYPTION_NEVER;
+  else if (!_cups_strcasecmp(value, "always"))
+    cc->encryption = HTTP_ENCRYPTION_ALWAYS;
+  else if (!_cups_strcasecmp(value, "required"))
+    cc->encryption = HTTP_ENCRYPTION_REQUIRED;
+  else
+    cc->encryption = HTTP_ENCRYPTION_IF_REQUESTED;
+}
+
+
+/*
+ * 'cups_set_gss_service_name()' - Set the GSSServiceName value.
+ */
+
+#ifdef HAVE_GSSAPI
+static void
+cups_set_gss_service_name(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  strlcpy(cc->gss_service_name, value, sizeof(cc->gss_service_name));
+}
 #endif /* HAVE_GSSAPI */
 
-  if (cups_anyroot)
-    cg->any_root = !_cups_strcasecmp(cups_anyroot, "yes") ||
-		   !_cups_strcasecmp(cups_anyroot, "on")  ||
-		   !_cups_strcasecmp(cups_anyroot, "true");
 
-  if (cups_expiredcerts)
-    cg->expired_certs = !_cups_strcasecmp(cups_expiredcerts, "yes") ||
-			!_cups_strcasecmp(cups_expiredcerts, "on")  ||
-			!_cups_strcasecmp(cups_expiredcerts, "true");
+/*
+ * 'cups_set_server_name()' - Set the ServerName value.
+ */
 
-  if (cups_validatecerts)
-    cg->validate_certs = !_cups_strcasecmp(cups_validatecerts, "yes") ||
-			 !_cups_strcasecmp(cups_validatecerts, "on")  ||
-			 !_cups_strcasecmp(cups_validatecerts, "true");
+static void
+cups_set_server_name(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  strlcpy(cc->server_name, value, sizeof(cc->server_name));
+}
+
+
+/*
+ * 'cups_set_ssl_options()' - Set the SSLOptions value.
+ */
+
+#ifdef HAVE_SSL
+static void
+cups_set_ssl_options(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+ /*
+  * SSLOptions [AllowRC4] [AllowSSL3] [None]
+  */
+
+  int	options = 0;			/* SSL/TLS options */
+  char	temp[256],			/* Copy of value */
+	*start,				/* Start of option */
+	*end;				/* End of option */
+
+
+  strlcpy(temp, value, sizeof(temp));
+
+  for (start = temp; *start; start = end)
+  {
+   /* 
+    * Find end of keyword...
+    */
+
+    end = start;
+    while (*end && !_cups_isspace(*end))
+      end ++;
+
+    if (*end)
+      *end++ = '\0';
+
+   /*
+    * Compare...
+    */
+
+    if (!_cups_strcasecmp(start, "AllowRC4"))
+      options |= _HTTP_TLS_ALLOW_RC4;
+    else if (!_cups_strcasecmp(start, "AllowSSL3"))
+      options |= _HTTP_TLS_ALLOW_SSL3;
+    else if (!_cups_strcasecmp(start, "None"))
+      options = 0;
+  }
+
+  cc->ssl_options = options;
+}
+#endif /* HAVE_SSL */
+
+
+/*
+ * 'cups_set_user()' - Set the User value.
+ */
+
+static void
+cups_set_user(
+    _cups_client_conf_t *cc,		/* I - client.conf values */
+    const char          *value)		/* I - Value */
+{
+  strlcpy(cc->user, value, sizeof(cc->user));
 }
 
 

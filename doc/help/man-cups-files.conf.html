@@ -123,6 +123,7 @@ The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
 <dt><a name="ServerKeychain"></a><b>ServerKeychain </b><i>path</i>
 <dd style="margin-left: 5.0em">Specifies the location of TLS certificates and private keys.
 The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
+OS X uses its keychain database to store certificates and keys while other platforms use separate files in the specified directory, *.crt for PEM-encoded certificates and *.key for PEM-encoded private keys.
 <dt><a name="ServerRoot"></a><b>ServerRoot </b><i>directory</i>
 <dd style="margin-left: 5.0em">Specifies the directory containing the server configuration files.
 The default is "/etc/cups".

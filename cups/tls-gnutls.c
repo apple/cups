@@ -407,6 +407,9 @@ httpCredentialsGetTrust(
   if ((cert = http_gnutls_create_credential((http_credential_t *)cupsArrayFirst(credentials))) == NULL)
     return (HTTP_TRUST_UNKNOWN);
 
+  if (cg->any_root < 0)
+    _cupsSetDefaults();
+
  /*
   * Look this common name up in the default keychains...
   */
