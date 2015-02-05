@@ -11,7 +11,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "3 February 2015" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "4 February 2015" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 .SH DESCRIPTION
@@ -350,6 +350,10 @@ Requires that at least one value of the \fBEXPECT\fR attribute matches the boole
 .TP 5
 \fBWITH\-VALUE "/\fIregular expression\fB/"\fR
 Requires that at least one value of the \fBEXPECT\fR attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+.TP 5
+\fBWITH\-VALUE\-FROM \fIattribute-name\fR
+Requires that the value(s) of the \fBEXPECT\fR attribute matches the value(s) in the specified attribute.
+For example, "EXPECT job\-sheets WITH\-VALUE\-FROM job\-sheets\-supported" requires that the "job\-sheets" value is listed as a value of the "job\-sheets\-supported" attribute.
 .SS STATUS PREDICATES
 The following predicates are understood following the \fBSTATUS\fR test directive:
 .TP 5

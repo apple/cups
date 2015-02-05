@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-02-03
+CHANGES.txt - 2.1b1 - 2015-02-05
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -16,3 +16,5 @@ CHANGES IN CUPS V2.1b1
 	  supply their own (STR #4518)
 	- Added support for EXPECT-ALL directive in ipptool test files
 	  (STR #4469)
+	- Added support for WITH-VALUE-FROM predicate in ipptool test files
+	  (STR #4470)

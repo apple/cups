@@ -78,6 +78,7 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*if_defined,		/* Only required if variable defined */
 		*if_not_defined,	/* Only required if variable is not defined */
 		*with_value,		/* Attribute must include this value */
+		*with_value_from,	/* Attribute must have one of the values in this attribute */
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
 		*define_value;		/* Variable to define with value */
@@ -190,6 +191,7 @@ static int	validate_attr(FILE *outfile, cups_array_t *errors, ipp_attribute_t *a
 static int      with_value(FILE *outfile, cups_array_t *errors, char *value, int flags,
 		           ipp_attribute_t *attr, char *matchbuf,
 		           size_t matchlen);
+static int      with_value_from(cups_array_t *errors, ipp_attribute_t *fromattr, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 
 
 /*
@@ -1259,7 +1261,8 @@ do_tests(FILE         *outfile,		/* I - Output file */
           _cups_strcasecmp(token, "WITH-HOSTNAME") &&
           _cups_strcasecmp(token, "WITH-RESOURCE") &&
           _cups_strcasecmp(token, "WITH-SCHEME") &&
-          _cups_strcasecmp(token, "WITH-VALUE"))
+          _cups_strcasecmp(token, "WITH-VALUE") &&
+          _cups_strcasecmp(token, "WITH-VALUE-FROM"))
         last_expect = NULL;
 
       if (_cups_strcasecmp(token, "DEFINE-MATCH") &&
@@ -2373,6 +2376,34 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  goto test_exit;
 	}
       }
+      else if (!_cups_strcasecmp(token, "WITH-VALUE-FROM"))
+      {
+      	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  print_fatal_error(outfile, "Missing %s value on line %d.", token, linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+        if (last_expect)
+	{
+	 /*
+	  * Expand any variables in the value and then save it.
+	  */
+
+	  expand_variables(vars, token, temp, sizeof(token));
+
+	  last_expect->with_value_from = strdup(token);
+	  last_expect->with_flags      = _CUPS_WITH_LITERAL;
+	}
+	else
+	{
+	  print_fatal_error(outfile, "%s without a preceding EXPECT on line %d.", token,
+		            linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
       else if (!_cups_strcasecmp(token, "DISPLAY"))
       {
        /*
@@ -2984,9 +3015,23 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	    if (found)
 	      ippAttributeString(found, buffer, sizeof(buffer));
 
-	    if (found &&
-		!with_value(outfile, NULL, expect->with_value, expect->with_flags, found,
-			    buffer, sizeof(buffer)))
+            if (found && expect->with_value_from && !with_value_from(NULL, ippFindAttribute(response, expect->with_value_from, IPP_TAG_ZERO), found, buffer, sizeof(buffer)))
+	    {
+	      if (expect->define_no_match)
+		set_variable(outfile, vars, expect->define_no_match, "1");
+	      else if (!expect->define_match && !expect->define_value && !expect->repeat_match && !expect->repeat_no_match)
+	      {
+		add_stringf(errors, "EXPECTED: %s WITH-VALUES-FROM %s", expect->name, expect->with_value_from);
+
+		with_value_from(errors, ippFindAttribute(response, expect->with_value_from, IPP_TAG_ZERO), found, buffer, sizeof(buffer));
+	      }
+
+	      if (expect->repeat_no_match && repeat_count < expect->repeat_limit)
+		repeat_test = 1;
+
+	      break;
+	    }
+	    else if (found && !with_value(outfile, NULL, expect->with_value, expect->with_flags, found, buffer, sizeof(buffer)))
 	    {
 	      if (expect->define_no_match)
 		set_variable(outfile, vars, expect->define_no_match, "1");
@@ -5874,6 +5919,166 @@ with_value(FILE            *outfile,	/* I - Output file */
   }
 
   return (match);
+}
+
+
+/*
+ * 'with_value_from()' - Test a WITH-VALUE-FROM predicate.
+ */
+
+static int				/* O - 1 on match, 0 on non-match */
+with_value_from(
+    cups_array_t    *errors,		/* I - Errors array */
+    ipp_attribute_t *fromattr,		/* I - "From" attribute */
+    ipp_attribute_t *attr,		/* I - Attribute to compare */
+    char            *matchbuf,		/* I - Buffer to hold matching value */
+    size_t          matchlen)		/* I - Length of match buffer */
+{
+  int	i, j,				/* Looping vars */
+	count = ippGetCount(attr),	/* Number of attribute values */
+	match = 1;			/* Match? */
+
+
+  *matchbuf = '\0';
+
+ /*
+  * Compare the from value(s) to the attribute value(s)...
+  */
+
+  switch (ippGetValueTag(attr))
+  {
+    case IPP_TAG_INTEGER :
+        if (ippGetValueTag(fromattr) != IPP_TAG_INTEGER && ippGetValueTag(fromattr) != IPP_TAG_RANGE)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int value = ippGetInteger(attr, i);
+					/* Current integer value */
+
+	  if (ippContainsInteger(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      snprintf(matchbuf, matchlen, "%d", value);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_ENUM :
+        if (ippGetValueTag(fromattr) != IPP_TAG_ENUM)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int value = ippGetInteger(attr, i);
+					/* Current integer value */
+
+	  if (ippContainsInteger(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      snprintf(matchbuf, matchlen, "%d", value);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s=%d", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_RESOLUTION :
+        if (ippGetValueTag(fromattr) != IPP_TAG_RESOLUTION)
+	  goto wrong_value_tag;
+
+	for (i = 0; i < count; i ++)
+	{
+	  int xres, yres;
+	  ipp_res_t units;
+          int fromcount = ippGetCount(fromattr);
+	  int fromxres, fromyres;
+	  ipp_res_t fromunits;
+
+	  xres = ippGetResolution(attr, i, &yres, &units);
+
+          for (j = 0; j < fromcount; j ++)
+	  {
+	    fromxres = ippGetResolution(fromattr, j, &fromyres, &fromunits);
+	    if (fromxres == xres && fromyres == yres && fromunits == units)
+	      break;
+	  }
+
+	  if (j < fromcount)
+	  {
+	    if (!matchbuf[0])
+	    {
+	      if (xres == yres)
+	        snprintf(matchbuf, matchlen, "%d%s", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	      else
+	        snprintf(matchbuf, matchlen, "%dx%d%s", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    }
+	  }
+	  else
+	  {
+	    if (xres == yres)
+	      add_stringf(errors, "GOT: %s=%d%s", ippGetName(attr), xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    else
+	      add_stringf(errors, "GOT: %s=%dx%d%s", ippGetName(attr), xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+
+	    match = 0;
+	  }
+	}
+	break;
+
+    case IPP_TAG_NOVALUE :
+    case IPP_TAG_UNKNOWN :
+	return (1);
+
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
+	for (i = 0; i < count; i ++)
+	{
+	  const char *value = ippGetString(attr, i, NULL);
+					/* Current string value */
+
+	  if (ippContainsString(fromattr, value))
+	  {
+	    if (!matchbuf[0])
+	      strlcpy(matchbuf, value, matchlen);
+	  }
+	  else
+	  {
+	    add_stringf(errors, "GOT: %s='%s'", ippGetName(attr), value);
+	    match = 0;
+	  }
+	}
+	break;
+
+    default :
+        match = 0;
+        break;
+  }
+
+  return (match);
+
+  /* value tag mismatch between fromattr and attr */
+  wrong_value_tag :
+
+  add_stringf(errors, "GOT: %s OF-TYPE %s", ippGetName(attr), ippTagString(ippGetValueTag(attr)));
+
+  return (0);
 }
 
 

@@ -250,6 +250,9 @@ Specifies the maximum number of times to repeat if the <b>REPEAT-MATCH</b> or <b
 <dd style="margin-left: 5.0em">Requires that at least one value of the <b>EXPECT</b> attribute matches the boolean value given.
 <dt><b>WITH-VALUE "/</b><i>regular expression</i><b>/"</b>
 <dd style="margin-left: 5.0em">Requires that at least one value of the <b>EXPECT</b> attribute matches the regular expression, which must conform to the POSIX regular expression syntax. Comparisons are case-sensitive.
+<dt><b>WITH-VALUE-FROM </b><i>attribute-name</i>
+<dd style="margin-left: 5.0em">Requires that the value(s) of the <b>EXPECT</b> attribute matches the value(s) in the specified attribute.
+For example, "EXPECT job-sheets WITH-VALUE-FROM job-sheets-supported" requires that the "job-sheets" value is listed as a value of the "job-sheets-supported" attribute.
 </dl>
 <h3><a name="STATUS_PREDICATES">Status Predicates</a></h3>
 The following predicates are understood following the <b>STATUS</b> test directive:
