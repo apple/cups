@@ -6,6 +6,8 @@
 	<true/>
 	<key>Label</key>
 	<string>org.cups.cups-lpd</string>
+	<key>ProcessType</key>
+	<string>Background</string>
 	<key>EnableTransactions</key>
 	<true/>
 	<key>EnablePressuredExit</key>
