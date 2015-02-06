@@ -2121,14 +2121,12 @@ service_checkout(void)
 
 
  /*
-  * Create or remove the systemd path file based on whether there are active
+  * Create or remove the "keep-alive" file based on whether there are active
   * jobs or shared printers to advertise...
   */
 
   if (cupsArrayCount(ActiveJobs) ||	/* Active jobs */
-#  ifdef HAVE_SYSTEMD
       WebInterface ||			/* Web interface enabled */
-#  endif /* HAVE_SYSTEMD */
       (Browsing && BrowseLocalProtocols && cupsArrayCount(Printers)))
 					/* Printers being shared */
   {

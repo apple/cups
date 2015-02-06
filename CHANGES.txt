@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-02-05
+CHANGES.txt - 2.1b1 - 2015-02-06
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -18,3 +18,6 @@ CHANGES IN CUPS V2.1b1
 	  (STR #4469)
 	- Added support for WITH-VALUE-FROM predicate in ipptool test files
 	  (STR #4470)
+	- The scheduler no longer listens on the loopback interface unless the
+	  web interface or printer sharing are enabled
+	  (<rdar://problem/9136448>)
