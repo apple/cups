@@ -266,6 +266,12 @@ install-libs: $(INSTALLSTATIC)
 		$(RM) $(LIBDIR)/libcupsmime.dylib; \
 		$(LN) $(LIBCUPSMIME) $(LIBDIR)/libcupsmime.dylib; \
 	fi
+	if test "x$(SDKROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SDKLIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSMIME) $(SDKLIBDIR); \
+		$(RM) $(SDKLIBDIR)/libcupsmime.dylib; \
+		$(LN) $(LIBCUPSMIME) $(SDKLIBDIR)/libcupsmime.dylib; \
+	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSMIME) $(SYMROOT); \

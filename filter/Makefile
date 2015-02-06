@@ -137,6 +137,12 @@ install-libs: $(INSTALLSTATIC)
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
+	if test "x$(SDKROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SDKLIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSIMAGE) $(SDKLIBDIR); \
+		$(RM) $(SDKLIBDIR)/libcupsimage.dylib; \
+		$(LN) $(LIBCUPSIMAGE) $(SDKLIBDIR)/libcupsimage.dylib; \
+	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSIMAGE) $(SYMROOT); \

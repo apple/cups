@@ -3,7 +3,7 @@
 #
 # API library Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -268,6 +268,12 @@ install-libs: $(INSTALLSTATIC)
 	if test $(LIBCUPS) = "libcups.2.dylib"; then \
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
+	fi
+	if test "x$(SDKROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SDKLIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPS) $(SDKLIBDIR); \
+		$(RM) $(SDKLIBDIR)/libcups.dylib; \
+		$(LN) $(LIBCUPS) $(SDKLIBDIR)/libcups.dylib; \
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \

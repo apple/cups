@@ -3,7 +3,7 @@
 #
 # Makefile for the CUPS PPD Compiler.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 2002-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -175,6 +175,12 @@ install-libs: $(INSTALLSTATIC)
 	if test $(LIBCUPSPPDC) = "libcupsppdc.1.dylib"; then \
 		$(RM) $(LIBDIR)/libcupsppdc.dylib; \
 		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/libcupsppdc.dylib; \
+	fi
+	if test "x$(SDKROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SDKLIBDIR); \
+		$(INSTALL_LIB) $(LIBCUPSPPDC) $(SDKLIBDIR); \
+		$(RM) $(SDKLIBDIR)/libcupsppdc.dylib; \
+		$(LN) $(LIBCUPSPPDC) $(SDKLIBDIR)/libcupsppdc.dylib; \
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
