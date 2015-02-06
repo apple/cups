@@ -30,7 +30,7 @@ echo "LPSTAT Test"
 echo ""
 echo "    lpstat -H"
 server="`$VALGRIND ../systemv/lpstat -H 2>&1`"
-if test $? != 0 -o "x$server" != xlocalhost:8631; then
+if test $? != 0 -o "x$server" != x$CUPS_SERVER; then
 	echo "    FAILED ($server)"
 	exit 1
 else
