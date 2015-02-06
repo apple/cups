@@ -7,9 +7,9 @@
 	<key>Label</key>
 	<string>org.cups.cups-lpd</string>
 	<key>EnableTransactions</key>
-	<false/>
+	<true/>
 	<key>EnablePressuredExit</key>
-	<false/>
+	<true/>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/libexec/cups/daemon/cups-lpd</string>
