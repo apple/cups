@@ -2815,6 +2815,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   * Range check input...
   */
 
+  if (buffer)
+    *buffer = '\0';
+
   if (!buffer || bufsize < 1 || !response)
     return (NULL);
 

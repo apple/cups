@@ -901,6 +901,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("Unable to create PPD.");
 
     ippDelete(response);
+    httpClose(http);
     return (0);
   }
   else
