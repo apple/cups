@@ -21,4 +21,4 @@ CHANGES IN CUPS V2.1b1
 	- The scheduler no longer listens on the loopback interface unless the
 	  web interface or printer sharing are enabled
 	  (<rdar://problem/9136448>)
-	- Added a PPD generator for IPP Everywhere printers (STR #4251)
+	- Added a PPD generator for IPP Everywhere printers (STR #4258)
