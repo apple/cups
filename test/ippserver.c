@@ -1376,11 +1376,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   };
   static const char * const pwg_raster_document_type_supported[] =
   {
-    "black-1",
-    "cmyk-8",
-    "sgray-8",
-    "srgb-8",
-    "srgb-16"
+    "black_1",
+    "cmyk_8",
+    "sgray_8",
+    "srgb_8",
+    "srgb_16"
   };
   static const char * const reference_uri_schemes_supported[] =
   {					/* reference-uri-schemes-supported */
