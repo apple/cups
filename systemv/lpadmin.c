@@ -1184,7 +1184,8 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
   http_t	*http;			/* Connection to printer */
   ipp_t		*request,		/* Get-Printer-Attributes request */
 		*response;		/* Get-Printer-Attributes response */
-  char		scheme[32],		/* URI scheme */
+  char		resolved[1024],		/* Resolved URI */
+		scheme[32],		/* URI scheme */
 		userpass[256],		/* Username:password */
 		host[256],		/* Hostname */
 		resource[256];		/* Resource path */
@@ -1194,6 +1195,21 @@ get_printer_ppd(const char *uri,	/* I - Printer URI */
  /*
   * Connect to the printer...
   */
+
+  if (strstr(uri, "._tcp"))
+  {
+   /*
+    * Resolve URI...
+    */
+
+    if (!_httpResolveURI(uri, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
+    {
+      _cupsLangPrintf(stderr, _("%s: Unable to resolve \"%s\"."), "lpadmin", uri);
+      return (NULL);
+    }
+
+    uri = resolved;
+  }
 
   if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
   {

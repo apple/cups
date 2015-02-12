@@ -2864,6 +2864,11 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
   cupsFilePrintf(fp, "*NickName: \"%s\"\n", model);
   cupsFilePrintf(fp, "*ShortNickName: \"%s\"\n", model);
 
+  if ((attr = ippFindAttribute(response, "color-supported", IPP_TAG_BOOLEAN)) != NULL && ippGetBoolean(attr, 0))
+    cupsFilePuts(fp, "*ColorDevice: True\n");
+  else
+    cupsFilePuts(fp, "*ColorDevice: False\n");
+
   cupsFilePrintf(fp, "*cupsVersion: %d.%d\n", CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR);
   cupsFilePuts(fp, "*cupsSNMPSupplies: False\n");
   cupsFilePuts(fp, "*cupsLanguages: \"en\"\n");
@@ -2881,7 +2886,9 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       if (!_cups_strcasecmp(format, "application/pdf"))
         cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-pdf application/pdf 10 -\"\n");
-      else if (_cups_strcasecmp(format, "application/octet-stream"))
+      else if (!_cups_strcasecmp(format, "application/postscript"))
+        cupsFilePuts(fp, "*cupsFilter2: \"application/vnd.cups-postscript application/postscript 10 -\"\n");
+      else if (_cups_strcasecmp(format, "application/octet-stream") && _cups_strcasecmp(format, "application/vnd.hp-pcl") && _cups_strcasecmp(format, "text/plain"))
         cupsFilePrintf(fp, "*cupsFilter2: \"%s %s 10 -\"\n", format, format);
     }
   }
@@ -3153,7 +3160,7 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       const char *keyword = ippGetString(attr, i, NULL);
 					/* Keyword for color/bit depth */
 
-      if (!strcmp(keyword, "black_1"))
+      if (!strcmp(keyword, "black_1") || !strcmp(keyword, "bi-level") || !strcmp(keyword, "process-bi-level"))
       {
         cupsFilePuts(fp, "*ColorModel FastGray/Fast Grayscale: \"<</cupsColorSpace 3/cupsBitsPerColor 1/cupsColorOrder 0/cupsCompression 0>>setpagedevice\"\n");
 
@@ -3209,6 +3216,35 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
       else
         cupsFilePuts(fp, "*cupsBackSide: Rotated\n");
     }
+    else if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+    {
+      for (i = 0, count = ippGetCount(attr); i < count; i ++)
+      {
+	const char *dm = ippGetString(attr, i, NULL);
+					  /* DM value */
+
+	if (!_cups_strcasecmp(dm, "DM1"))
+	{
+	  cupsFilePuts(fp, "*cupsBackSide: Normal\n");
+	  break;
+	}
+	else if (!_cups_strcasecmp(dm, "DM2"))
+	{
+	  cupsFilePuts(fp, "*cupsBackSide: Flipped\n");
+	  break;
+	}
+	else if (!_cups_strcasecmp(dm, "DM3"))
+	{
+	  cupsFilePuts(fp, "*cupsBackSide: Rotated\n");
+	  break;
+	}
+	else if (!_cups_strcasecmp(dm, "DM4"))
+	{
+	  cupsFilePuts(fp, "*cupsBackSide: ManualTumble\n");
+	  break;
+	}
+      }
+    }
   }
 
  /*
@@ -3239,6 +3275,53 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
     }
 
     cupsFilePuts(fp, "*CloseUI: *cupsPrintQuality\n");
+  }
+  else if ((attr = ippFindAttribute(response, "urf-supported", IPP_TAG_KEYWORD)) != NULL)
+  {
+    int lowdpi = 0, hidpi = 0;		/* Lower and higher resolution */
+
+    for (i = 0, count = ippGetCount(attr); i < count; i ++)
+    {
+      const char *rs = ippGetString(attr, i, NULL);
+					/* RS value */
+
+      if (_cups_strncasecmp(rs, "RS", 2))
+        continue;
+
+      lowdpi = atoi(rs + 2);
+      if ((rs = strrchr(rs, '-')) != NULL)
+        hidpi = atoi(rs + 1);
+      else
+        hidpi = lowdpi;
+      break;
+    }
+
+    if (lowdpi == 0)
+    {
+     /*
+      * Invalid "urf-supported" value...
+      */
+
+      cupsFilePuts(fp, "*DefaultResolution: 300dpi\n");
+    }
+    else
+    {
+     /*
+      * Generate print qualities based on low and high DPIs...
+      */
+
+      cupsFilePrintf(fp, "*DefaultResolution: %ddpi\n", lowdpi);
+
+      cupsFilePuts(fp, "*OpenUI *cupsPrintQuality/Print Quality: PickOne\n"
+		       "*OrderDependency: 10 AnySetup *cupsPrintQuality\n"
+		       "*DefaultcupsPrintQuality: Normal\n");
+      if ((lowdpi & 1) == 0)
+	cupsFilePrintf(fp, "*cupsPrintQuality Draft: \"<</HWResolution[%d %d]>>setpagedevice\"\n", lowdpi, lowdpi / 2);
+      cupsFilePrintf(fp, "*cupsPrintQuality Normal: \"<</HWResolution[%d %d]>>setpagedevice\"\n", lowdpi, lowdpi);
+      if (hidpi > lowdpi)
+	cupsFilePrintf(fp, "*cupsPrintQuality High: \"<</HWResolution[%d %d]>>setpagedevice\"\n", hidpi, hidpi);
+      cupsFilePuts(fp, "*CloseUI: *cupsPrintQuality\n");
+    }
   }
   else if ((attr = ippFindAttribute(response, "printer-resolution-default", IPP_TAG_RESOLUTION)) != NULL)
   {

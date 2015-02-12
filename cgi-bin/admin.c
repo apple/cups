@@ -3,7 +3,7 @@
  *
  * Administration CGI for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -18,6 +18,8 @@
  */
 
 #include "cgi-private.h"
+#include <cups/http-private.h>
+#include <cups/ppd-private.h>
 #include <cups/adminutil.h>
 #include <cups/ppd.h>
 #include <errno.h>
@@ -38,12 +40,7 @@ static int	current_device = 0;	/* Current device shown */
  * Local functions...
  */
 
-static void	choose_device_cb(const char *device_class,
-                                 const char *device_id, const char *device_info,
-                                 const char *device_make_and_model,
-                                 const char *device_uri,
-                                 const char *device_location,
-				 const char *title);
+static void	choose_device_cb(const char *device_class, const char *device_id, const char *device_info, const char *device_make_and_model, const char *device_uri, const char *device_location, const char *title);
 static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
@@ -61,6 +58,7 @@ static void	do_set_sharing(http_t *http);
 static char	*get_option_value(ppd_file_t *ppd, const char *name,
 		                  char *buffer, size_t bufsize);
 static double	get_points(double number, const char *uval);
+static char	*get_printer_ppd(const char *uri, char *buffer, size_t bufsize);
 
 
 /*
@@ -832,7 +830,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   const cgi_file_t *file;		/* Uploaded file, if any */
   const char	*var;			/* CGI variable */
   char		uri[HTTP_MAX_URI],	/* Device or printer URI */
-		*uriptr;		/* Pointer into URI */
+		*uriptr,		/* Pointer into URI */
+		evefile[1024] = "";	/* IPP Everywhere PPD file */
   int		maxrate;		/* Maximum baud rate */
   char		baudrate[255];		/* Baud rate string */
   const char	*name,			/* Pointer to class name */
@@ -1331,7 +1330,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     if (!file)
     {
       var = cgiGetVariable("PPD_NAME");
-      if (strcmp(var, "__no_change__"))
+      if (!strcmp(var, "everywhere"))
+        get_printer_ppd(cgiGetVariable("DEVICE_URI"), evefile, sizeof(evefile));
+      else if (strcmp(var, "__no_change__"))
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "ppd-name",
 		     NULL, var);
     }
@@ -1384,6 +1385,11 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     if (file)
       ippDelete(cupsDoFileRequest(http, request, "/admin/", file->tempfile));
+    else if (evefile[0])
+    {
+      ippDelete(cupsDoFileRequest(http, request, "/admin/", evefile));
+      unlink(evefile);
+    }
     else
       ippDelete(cupsDoRequest(http, request, "/admin/"));
 
@@ -4194,6 +4200,79 @@ get_points(double     number,		/* I - Original number */
     return (number * 72.0 / 0.0254);
   else					/* Points */
     return (number);
+}
+
+
+/*
+ * 'get_printer_ppd()' - Get an IPP Everywhere PPD file for the given URI.
+ */
+
+static char *				/* O - Filename or NULL */
+get_printer_ppd(const char *uri,	/* I - Printer URI */
+                char       *buffer,	/* I - Filename buffer */
+		size_t     bufsize)	/* I - Size of filename buffer */
+{
+  http_t	*http;			/* Connection to printer */
+  ipp_t		*request,		/* Get-Printer-Attributes request */
+		*response;		/* Get-Printer-Attributes response */
+  char		resolved[1024],		/* Resolved URI */
+		scheme[32],		/* URI scheme */
+		userpass[256],		/* Username:password */
+		host[256],		/* Hostname */
+		resource[256];		/* Resource path */
+  int		port;			/* Port number */
+
+
+ /*
+  * Connect to the printer...
+  */
+
+  if (strstr(uri, "._tcp"))
+  {
+   /*
+    * Resolve URI...
+    */
+
+    if (!_httpResolveURI(uri, resolved, sizeof(resolved), _HTTP_RESOLVE_DEFAULT, NULL, NULL))
+    {
+      fprintf(stderr, "ERROR: Unable to resolve \"%s\".\n", uri);
+      return (NULL);
+    }
+
+    uri = resolved;
+  }
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+  {
+    fprintf(stderr, "ERROR: Bad printer URI \"%s\".\n", uri);
+    return (NULL);
+  }
+
+  http = httpConnect2(host, port, NULL, AF_UNSPEC, !strcmp(scheme, "ipps") ? HTTP_ENCRYPTION_ALWAYS : HTTP_ENCRYPTION_IF_REQUESTED, 1, 30000, NULL);
+  if (!http)
+  {
+    fprintf(stderr, "ERROR: Unable to connect to \"%s:%d\": %s\n", host, port, cupsLastErrorString());
+    return (NULL);
+  }
+
+ /*
+  * Send a Get-Printer-Attributes request...
+  */
+
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+  response = cupsDoRequest(http, request, resource);
+
+  if (!_ppdCreateFromIPP(buffer, bufsize, response))
+    fprintf(stderr, "ERROR: Unable to create PPD file: %s\n", strerror(errno));
+
+  ippDelete(response);
+  httpClose(http);
+
+  if (buffer[0])
+    return (buffer);
+  else
+    return (NULL);
 }
 
 

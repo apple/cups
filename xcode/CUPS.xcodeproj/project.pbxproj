@@ -1552,7 +1552,7 @@
 		7271882313746EA8001A2036 /* rastertolabel.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = rastertolabel.c; path = ../filter/rastertolabel.c; sourceTree = "<group>"; };
 		7271883C1374AB14001A2036 /* mime-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "mime-private.h"; path = "../scheduler/mime-private.h"; sourceTree = "<group>"; };
 		727AD5B619100A58009F6862 /* tls.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tls.c; path = ../cups/tls.c; sourceTree = "<group>"; };
-		727EF02F192E3498001EF690 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = admin.c; path = "../cgi-bin/admin.c"; sourceTree = "<group>"; };
+		727EF02F192E3498001EF690 /* admin.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = admin.c; path = "../cgi-bin/admin.c"; sourceTree = "<group>"; wrapsLines = 1; };
 		727EF030192E3498001EF690 /* cgi-private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "cgi-private.h"; path = "../cgi-bin/cgi-private.h"; sourceTree = "<group>"; };
 		727EF031192E3498001EF690 /* cgi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cgi.h; path = "../cgi-bin/cgi.h"; sourceTree = "<group>"; };
 		727EF032192E3498001EF690 /* classes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = classes.c; path = "../cgi-bin/classes.c"; sourceTree = "<group>"; };
@@ -2491,7 +2491,7 @@
 			indentWidth = 2;
 			sourceTree = "<group>";
 			tabWidth = 8;
-			wrapsLines = 0;
+			wrapsLines = 1;
 		};
 		72E65BA218DC796500097E89 /* Autoconf Files */ = {
 			isa = PBXGroup;
@@ -5238,6 +5238,7 @@
 				27A034801A8BDB1300650675 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		720DD6CB1358FD600064AA82 /* Build configuration list for PBXNativeTarget "snmp" */ = {
 			isa = XCConfigurationList;
