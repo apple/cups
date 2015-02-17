@@ -606,7 +606,7 @@ cupsdStartProcess(
   if (infd != 0)
   {
     if (infd < 0)
-      posix_spawn_file_actions_addopen(&actions, 0, "/dev/null", O_WRONLY, 0);
+      posix_spawn_file_actions_addopen(&actions, 0, "/dev/null", O_RDONLY, 0);
     else
       posix_spawn_file_actions_adddup2(&actions, infd, 0);
   }
