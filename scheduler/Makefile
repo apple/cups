@@ -3,7 +3,7 @@
 #
 # Scheduler Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -266,12 +266,6 @@ install-libs: $(INSTALLSTATIC)
 		$(RM) $(LIBDIR)/libcupsmime.dylib; \
 		$(LN) $(LIBCUPSMIME) $(LIBDIR)/libcupsmime.dylib; \
 	fi
-	if test "x$(SDKROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SDKLIBDIR); \
-		$(INSTALL_LIB) $(LIBCUPSMIME) $(SDKLIBDIR); \
-		$(RM) $(SDKLIBDIR)/libcupsmime.dylib; \
-		$(LN) $(LIBCUPSMIME) $(SDKLIBDIR)/libcupsmime.dylib; \
-	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(LIBCUPSMIME) $(SYMROOT); \
@@ -407,6 +401,12 @@ cupsfilter:	cupsfilter.o $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cupsfilter cupsfilter.o -L. -lcupsmime $(LIBS)
 	$(RM) convert
 	$(LN) cupsfilter convert
+
+cupsfilter-static:	cupsfilter.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsfilter-static cupsfilter.o libcupsmime.a \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		$(DNSSDLIBS) $(LIBGSSAPI)
 
 
 #

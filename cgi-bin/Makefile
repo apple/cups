@@ -3,7 +3,7 @@
 #
 # CGI makefile for CUPS.
 #
-# Copyright 2007-2015 by Apple Inc.
+# Copyright 2007-2014 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -149,12 +149,6 @@ install-libs: $(INSTALLSTATIC)
 	if test $(LIBCUPSCGI) = "libcupscgi.1.dylib"; then \
 		$(RM) $(LIBDIR)/libcupscgi.dylib; \
 		$(LN) $(LIBCUPSCGI) $(LIBDIR)/libcupscgi.dylib; \
-	fi
-	if test "x$(SDKROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SDKLIBDIR); \
-		$(INSTALL_LIB) $(LIBCUPSCGI) $(SDKLIBDIR); \
-		$(RM) $(SDKLIBDIR)/libcupscgi.dylib; \
-		$(LN) $(LIBCUPSCGI) $(SDKLIBDIR)/libcupscgi.dylib; \
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
