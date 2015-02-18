@@ -3656,7 +3656,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   snprintf(script_filename, sizeof(script_filename), "SCRIPT_FILENAME=%s%s",
            DocumentRoot, script_name + 12);
 
-  sprintf(server_port, "SERVER_PORT=%d", con->serverport);
+  snprintf(server_port, sizeof(server_port), "SERVER_PORT=%d", con->serverport);
 
   if (httpGetField(con->http, HTTP_FIELD_HOST)[0])
   {
