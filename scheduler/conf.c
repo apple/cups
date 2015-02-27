@@ -993,7 +993,7 @@ cupsdReadConfiguration(void)
       * Log the error and reset the group to a safe value...
       */
 
-      cupsdLogMessage(CUPSD_LOG_NOTICE,
+      cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Group and SystemGroup cannot use the same groups.");
       if (FatalErrors & (CUPSD_FATAL_CONFIG | CUPSD_FATAL_PERMISSIONS))
         return (0);
