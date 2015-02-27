@@ -2371,8 +2371,41 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (!warn)
         errors ++;
+
+      continue;
     }
-    else if (strcmp(program, "-"))
+
+    if (!strncmp(program, "maxsize(", 8))
+    {
+      size_t	maxsize;		/* Maximum file size */
+      char	*ptr;			/* Pointer into maxsize(nnnn) program */
+
+      maxsize = (size_t)strtoll(program + 8, &ptr, 10);
+
+      if (*ptr != ')')
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Bad cupsFilter value \"%s\"."),
+			  prefix, attr->value);
+
+	if (!warn)
+	  errors ++;
+
+	continue;
+      }
+
+      ptr ++;
+      while (_cups_isspace(*ptr))
+	ptr ++;
+
+      _cups_strcpy(program, ptr);
+    }
+
+    if (strcmp(program, "-"))
     {
       if (program[0] == '/')
 	snprintf(pathprog, sizeof(pathprog), "%s%s", root, program);
@@ -2457,8 +2490,41 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (!warn)
         errors ++;
+
+      continue;
     }
-    else if (strcmp(program, "-"))
+
+    if (!strncmp(program, "maxsize(", 8))
+    {
+      size_t	maxsize;		/* Maximum file size */
+      char	*ptr;			/* Pointer into maxsize(nnnn) program */
+
+      maxsize = (size_t)strtoll(program + 8, &ptr, 10);
+
+      if (*ptr != ')')
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Bad cupsFilter2 value \"%s\"."),
+			  prefix, attr->value);
+
+	if (!warn)
+	  errors ++;
+
+	continue;
+      }
+
+      ptr ++;
+      while (_cups_isspace(*ptr))
+	ptr ++;
+
+      _cups_strcpy(program, ptr);
+    }
+
+    if (strcmp(program, "-"))
     {
       if (strncmp(program, "maxsize(", 8) &&
           (ptr = strchr(program + 8, ')')) != NULL)
