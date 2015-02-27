@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-02-11
+CHANGES.txt - 2.1b1 - 2015-02-27
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -22,3 +22,5 @@ CHANGES IN CUPS V2.1b1
 	  web interface or printer sharing are enabled
 	  (<rdar://problem/9136448>)
 	- Added a PPD generator for IPP Everywhere printers (STR #4258)
+	- Now install "default" versions of more configuration files
+	  (<rdar://problem/19024491>)
