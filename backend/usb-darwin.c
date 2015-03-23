@@ -1226,6 +1226,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
 
 static Boolean list_device_cb(void *refcon, io_service_t obj, CFStringRef deviceIDString, UInt32 deviceLocation, UInt8 interfaceNum, UInt8 alternateSetting)
 {
+    (void)refcon;
     (void)interfaceNum;
     (void)alternateSetting;
 
@@ -1591,15 +1592,15 @@ static CFStringRef printer_interface_deviceid(IOUSBInterfaceInterface220 **print
 				request.pData = NULL;
 			}
 
-			IOReturn err = kIOReturnError;
+			IOReturn berr = kIOReturnError;
 			char *buffer = malloc(size);
 			if (buffer == NULL)
 				return kIOReturnNoMemory;
 
 			request.wLength = HostToUSBWord(size);
 			request.pData = buffer;
-			err = (*printer)->ControlRequestTO(printer, (UInt8)0, &request);
-			return err;
+			berr = (*printer)->ControlRequestTO(printer, (UInt8)0, &request);
+			return berr;
 		};
 
 		/* This request takes the 0 based configuration index. IOKit returns a 1 based configuration index */
@@ -1775,7 +1776,7 @@ static CFStringRef printer_interface_indexed_description(IOUSBInterfaceInterface
 	request.wIndex = language;
 
 	bzero(description, length);
-	request.wLength = length;
+	request.wLength = (UInt16)length;
 	request.pData = &description;
 	request.completionTimeout = 0;
 	request.noDataTimeout = 60L;
@@ -1799,7 +1800,7 @@ static CFStringRef printer_interface_indexed_description(IOUSBInterfaceInterface
 		if (length > maxLength - 1)
 			length = maxLength -1;
 
-		for (int i = 0; i < length; i++)
+		for (unsigned i = 0; i < length; i++)
 			buffer[i] = (char) description[2*i+2];
 
 		buffer[length] = 0;

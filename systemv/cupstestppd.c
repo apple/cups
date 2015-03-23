@@ -2378,11 +2378,11 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
     if (!strncmp(program, "maxsize(", 8))
     {
       size_t	maxsize;		/* Maximum file size */
-      char	*ptr;			/* Pointer into maxsize(nnnn) program */
+      char	*mptr;			/* Pointer into maxsize(nnnn) program */
 
-      maxsize = (size_t)strtoll(program + 8, &ptr, 10);
+      maxsize = (size_t)strtoll(program + 8, &mptr, 10);
 
-      if (*ptr != ')')
+      if (*mptr != ')')
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL"));
@@ -2398,11 +2398,11 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 	continue;
       }
 
-      ptr ++;
-      while (_cups_isspace(*ptr))
-	ptr ++;
+      mptr ++;
+      while (_cups_isspace(*mptr))
+	mptr ++;
 
-      _cups_strcpy(program, ptr);
+      _cups_strcpy(program, mptr);
     }
 
     if (strcmp(program, "-"))
@@ -2497,11 +2497,11 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
     if (!strncmp(program, "maxsize(", 8))
     {
       size_t	maxsize;		/* Maximum file size */
-      char	*ptr;			/* Pointer into maxsize(nnnn) program */
+      char	*mptr;			/* Pointer into maxsize(nnnn) program */
 
-      maxsize = (size_t)strtoll(program + 8, &ptr, 10);
+      maxsize = (size_t)strtoll(program + 8, &mptr, 10);
 
-      if (*ptr != ')')
+      if (*mptr != ')')
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL"));
@@ -2517,11 +2517,11 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 	continue;
       }
 
-      ptr ++;
-      while (_cups_isspace(*ptr))
-	ptr ++;
+      mptr ++;
+      while (_cups_isspace(*mptr))
+	mptr ++;
 
-      _cups_strcpy(program, ptr);
+      _cups_strcpy(program, mptr);
     }
 
     if (strcmp(program, "-"))
