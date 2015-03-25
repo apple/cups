@@ -1291,6 +1291,9 @@ cups_raster_write(
   */
 
   count = r->header.cupsBytesPerLine * 2;
+  if (count < 3)
+    count = 3;
+
   if ((size_t)count > r->bufsize)
   {
     if (r->buffer)
