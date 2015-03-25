@@ -3,7 +3,7 @@
  *
  * CUPS raster to PWG raster format filter for CUPS.
  *
- * Copyright 2011, 2014 Apple Inc.
+ * Copyright 2011, 2014-2015 Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright law.
@@ -400,6 +400,9 @@ main(int  argc,				/* I - Number of command-line args */
    /*
     * Copy raster data...
     */
+
+    if (linesize < inheader.cupsBytesPerLine)
+      linesize = inheader.cupsBytesPerLine;
 
     line = malloc(linesize);
 
