@@ -6,7 +6,7 @@ CHANGES IN CUPS V2.0.3
 	- Restored missing generic printer icon file (STR #4587)
 	- Fixed logging of configuration errors to show up as errors (STR #4582)
 	- Fixed potential buffer overflows in raster code and filters
-	  (STR #4598, STR #4599)
+	  (STR #4598, STR #4599, STR #4600)
 	- Added Russian translation (STR #4577)
 
 

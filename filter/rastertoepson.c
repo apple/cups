@@ -274,7 +274,7 @@ StartPage(
 
   if (header->cupsCompression || DotBytes)
   {
-    if ((CompBuffer = calloc(2, header->cupsWidth)) == NULL)
+    if ((CompBuffer = calloc(2, header->cupsWidth + 1)) == NULL)
     {
       fputs("ERROR: Unable to allocate memory\n", stderr);
       exit(1);
