@@ -3,7 +3,7 @@
  *
  * Hewlett-Packard Page Control Language filter for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -354,7 +354,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   * Allocate memory for a line of graphics...
   */
 
-  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  if ((Planes[0] = malloc(header->cupsBytesPerLine + NumPlanes)) == NULL)
   {
     fputs("ERROR: Unable to allocate memory\n", stderr);
     exit(1);
@@ -369,7 +369,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
     BitBuffer = NULL;
 
   if (header->cupsCompression)
-    CompBuffer = malloc(header->cupsBytesPerLine * 2);
+    CompBuffer = malloc(header->cupsBytesPerLine * 2 + 2);
   else
     CompBuffer = NULL;
 }
