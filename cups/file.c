@@ -8,7 +8,7 @@
  * our own file functions allows us to provide transparent support of
  * gzip'd print files, PPD files, etc.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -639,6 +639,8 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   * Range check input...
   */
 
+  DEBUG_printf(("4cupsFileGetChar(fp=%p)", fp));
+
   if (!fp || (fp->mode != 'r' && fp->mode != 's'))
   {
     DEBUG_puts("5cupsFileGetChar: Bad arguments!");
@@ -649,8 +651,10 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   * If the input buffer is empty, try to read more data...
   */
 
+  DEBUG_printf(("5cupsFileGetChar: fp->eof=%d, fp->ptr=%p, fp->end=%p", fp->eof, fp->ptr, fp->end));
+
   if (fp->ptr >= fp->end)
-    if (cups_fill(fp) < 0)
+    if (cups_fill(fp) <= 0)
     {
       DEBUG_puts("5cupsFileGetChar: Unable to fill buffer!");
       return (-1);
@@ -1284,7 +1288,7 @@ cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
   */
 
   if (fp->ptr >= fp->end)
-    if (cups_fill(fp) < 0)
+    if (cups_fill(fp) <= 0)
       return (-1);
 
  /*
@@ -1779,7 +1783,7 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
     * Preload a buffer to determine whether the file is compressed...
     */
 
-    if (cups_fill(fp) < 0)
+    if (cups_fill(fp) <= 0)
       return (-1);
   }
 #endif /* HAVE_LIBZ */
@@ -2195,6 +2199,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
         DEBUG_printf(("9cups_fill: cups_read() returned " CUPS_LLFMT,
 	              CUPS_LLCAST bytes));
 
+        fp->eof = 1;
+
 	return (-1);
       }
 
@@ -2234,6 +2240,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  * Can't read from file!
 	  */
 
+	  DEBUG_puts("9cups_fill: Extra gzip header data missing, returning -1.");
+
+          fp->eof = 1;
+	  errno   = EIO;
+
 	  return (-1);
 	}
 
@@ -2245,6 +2256,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	 /*
 	  * Can't read from file!
 	  */
+
+	  DEBUG_puts("9cups_fill: Extra gzip header data does not fit in initial buffer, returning -1.");
+
+          fp->eof = 1;
+	  errno   = EIO;
 
 	  return (-1);
 	}
@@ -2267,6 +2283,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  * Can't read from file!
 	  */
 
+	  DEBUG_puts("9cups_fill: Original filename in gzip header data does not fit in initial buffer, returning -1.");
+
+          fp->eof = 1;
+	  errno   = EIO;
+
 	  return (-1);
 	}
       }
@@ -2288,6 +2309,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  * Can't read from file!
 	  */
 
+	  DEBUG_puts("9cups_fill: Comment in gzip header data does not fit in initial buffer, returning -1.");
+
+          fp->eof = 1;
+	  errno   = EIO;
+
 	  return (-1);
 	}
       }
@@ -2305,6 +2331,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	 /*
 	  * Can't read from file!
 	  */
+
+	  DEBUG_puts("9cups_fill: Header CRC in gzip header data does not fit in initial buffer, returning -1.");
+
+          fp->eof = 1;
+	  errno   = EIO;
 
 	  return (-1);
 	}
@@ -2330,8 +2361,15 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->stream.avail_out = 0;
       fp->crc              = crc32(0L, Z_NULL, 0);
 
-      if (inflateInit2(&(fp->stream), -15) != Z_OK)
+      if ((status = inflateInit2(&(fp->stream), -15)) != Z_OK)
+      {
+	DEBUG_printf(("9cups_fill: inflateInit2 returned %d, returning -1.", status));
+
+        fp->eof = 1;
+        errno   = EIO;
+
 	return (-1);
+      }
 
       fp->compressed = 1;
     }
@@ -2343,7 +2381,11 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       */
 
       if (fp->eof)
-	return (-1);
+      {
+        DEBUG_puts("9cups_fill: EOF, returning 0.");
+
+	return (0);
+      }
 
      /*
       * Fill the decompression buffer as needed...
@@ -2352,7 +2394,13 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       if (fp->stream.avail_in == 0)
       {
 	if ((bytes = cups_read(fp, (char *)fp->cbuf, sizeof(fp->cbuf))) <= 0)
-          return (-1);
+	{
+	  DEBUG_printf(("9cups_fill: cups_read error, returning %d.", (int)bytes));
+
+	  fp->eof = 1;
+
+          return (bytes);
+	}
 
 	fp->stream.next_in  = fp->cbuf;
 	fp->stream.avail_in = (uInt)bytes;
@@ -2379,42 +2427,69 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 
 	unsigned char	trailer[8];	/* Trailer bytes */
 	uLong		tcrc;		/* Trailer CRC */
+	ssize_t		tbytes = 0;	/* Number of bytes */
 
-
-	if (read(fp->fd, trailer, sizeof(trailer)) < (ssize_t)sizeof(trailer))
+	if (fp->stream.avail_in > 0)
 	{
-	 /*
-          * Can't get it, so mark end-of-file...
-	  */
+	  if (fp->stream.avail_in > sizeof(trailer))
+	    tbytes = (ssize_t)sizeof(trailer);
+	  else
+	    tbytes = (ssize_t)fp->stream.avail_in;
 
-          fp->eof = 1;
+	  memcpy(trailer, fp->stream.next_in, tbytes);
+	  fp->stream.next_in  += tbytes;
+	  fp->stream.avail_in -= (size_t)tbytes;
 	}
-	else
-	{
-	  tcrc = ((((((uLong)trailer[3] << 8) | (uLong)trailer[2]) << 8) |
-	          (uLong)trailer[1]) << 8) | (uLong)trailer[0];
 
-	  if (tcrc != fp->crc)
+        if (tbytes < (ssize_t)sizeof(trailer))
+	{
+	  if (read(fp->fd, trailer + tbytes, sizeof(trailer) - (size_t)tbytes) < ((ssize_t)sizeof(trailer) - tbytes))
 	  {
 	   /*
-            * Bad CRC, mark end-of-file...
+	    * Can't get it, so mark end-of-file...
 	    */
 
-            DEBUG_printf(("9cups_fill: tcrc=%08x != fp->crc=%08x",
-	                  (unsigned int)tcrc, (unsigned int)fp->crc));
+	    DEBUG_puts("9cups_fill: Unable to read gzip CRC trailer, returning -1.");
 
 	    fp->eof = 1;
+	    errno   = EIO;
 
 	    return (-1);
 	  }
+	}
 
+	tcrc = ((((((uLong)trailer[3] << 8) | (uLong)trailer[2]) << 8) |
+		(uLong)trailer[1]) << 8) | (uLong)trailer[0];
+
+	if (tcrc != fp->crc)
+	{
 	 /*
-	  * Otherwise, reset the compressed flag so that we re-read the
-	  * file header...
+	  * Bad CRC, mark end-of-file...
 	  */
 
-	  fp->compressed = 0;
+	  DEBUG_printf(("9cups_fill: tcrc=%08x != fp->crc=%08x, returning -1.", (unsigned int)tcrc, (unsigned int)fp->crc));
+
+	  fp->eof = 1;
+	  errno   = EIO;
+
+	  return (-1);
 	}
+
+       /*
+	* Otherwise, reset the compressed flag so that we re-read the
+	* file header...
+	*/
+
+	fp->compressed = 0;
+      }
+      else if (status < Z_OK)
+      {
+	DEBUG_printf(("9cups_fill: inflate returned %d, returning -1.", status));
+
+        fp->eof = 1;
+        errno   = EIO;
+
+	return (-1);
       }
 
       bytes = (ssize_t)sizeof(fp->buf) - (ssize_t)fp->stream.avail_out;
@@ -2427,7 +2502,10 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->end = fp->buf + bytes;
 
       if (bytes)
+      {
+        DEBUG_printf(("9cups_fill: Returning %d.", (int)bytes));
 	return (bytes);
+      }
     }
   }
 #endif /* HAVE_LIBZ */
@@ -2445,17 +2523,19 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
     fp->eof = 1;
     fp->ptr = fp->buf;
     fp->end = fp->buf;
+  }
+  else
+  {
+   /*
+    * Return the bytes we read...
+    */
 
-    return (-1);
+    fp->eof = 0;
+    fp->ptr = fp->buf;
+    fp->end = fp->buf + bytes;
   }
 
- /*
-  * Return the bytes we read...
-  */
-
-  fp->eof = 0;
-  fp->ptr = fp->buf;
-  fp->end = fp->buf + bytes;
+  DEBUG_printf(("9cups_fill: Not gzip, returning %d.", (int)bytes));
 
   return (bytes);
 }

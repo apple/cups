@@ -3,7 +3,7 @@
  *
  * MIME typing routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -613,8 +613,23 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
     return (NULL);
   }
 
-  fb.offset = -1;
-  fb.length = 0;
+ /*
+  * Then preload the first MIME_MAX_BUFFER bytes of the file into the file
+  * buffer, returning an error if we can't read anything...
+  */
+
+  fb.offset = 0;
+  fb.length = (int)cupsFileRead(fb.fp, (char *)fb.buffer, MIME_MAX_BUFFER);
+
+  if (fb.length <= 0)
+  {
+    DEBUG_printf(("1mimeFileType: Unable to read from \"%s\": %s", pathname, strerror(errno)));
+    DEBUG_puts("1mimeFileType: Returning NULL.");
+
+    cupsFileClose(fb.fp);
+
+    return (NULL);
+  }
 
  /*
   * Figure out the base filename (without directory portion)...
@@ -780,6 +795,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_ASCII fb->length=%d", fb->length));
 	  }
 
          /*
@@ -822,6 +839,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_PRINTABLE fb->length=%d", fb->length));
 	  }
 
          /*
@@ -870,6 +889,8 @@ mime_check_rules(
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_REGEX fb->length=%d", fb->length));
+
             DEBUG_printf(("5mime_check_rules: loaded %d byte fb->buffer at %d, starts "
 	                  "with \"%c%c%c%c\".",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
@@ -914,6 +935,8 @@ mime_check_rules(
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_STRING fb->length=%d", fb->length));
+
             DEBUG_printf(("5mime_check_rules: loaded %d byte fb->buffer at %d, starts "
 	                  "with \"%c%c%c%c\".",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
@@ -948,6 +971,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_ISTRING fb->length=%d", fb->length));
 	  }
 
          /*
@@ -976,6 +1001,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_CHAR fb->length=%d", fb->length));
 	  }
 
 	 /*
@@ -1006,6 +1033,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_SHORT fb->length=%d", fb->length));
 	  }
 
 	 /*
@@ -1039,6 +1068,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_INT fb->length=%d", fb->length));
 	  }
 
 	 /*
@@ -1080,6 +1111,8 @@ mime_check_rules(
 	    fb->length = cupsFileRead(fb->fp, (char *)fb->buffer,
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
+
+	    DEBUG_printf(("4mime_check_rules: MIME_MAGIC_CONTAINS fb->length=%d", fb->length));
 	  }
 
          /*

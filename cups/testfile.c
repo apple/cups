@@ -3,7 +3,7 @@
  *
  * File test program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -205,14 +205,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Cat the filename on the command-line...
     */
 
-    char	line[1024];		/* Line from file */
+    char	line[8192];		/* Line from file */
 
     if ((fp = cupsFileOpen(argv[1], "r")) == NULL)
     {
       perror(argv[1]);
       status = 1;
     }
-    else
+    else if (argc == 2)
     {
       status = 0;
 
@@ -220,6 +220,21 @@ main(int  argc,				/* I - Number of command-line arguments */
         puts(line);
 
       if (!cupsFileEOF(fp))
+        perror(argv[1]);
+
+      cupsFileClose(fp);
+    }
+    else
+    {
+      status = 0;
+      ssize_t bytes;
+
+      while ((bytes = cupsFileRead(fp, line, sizeof(line))) > 0)
+        printf("%s: %d bytes\n", argv[1], (int)bytes);
+
+      if (cupsFileEOF(fp))
+        printf("%s: EOF\n", argv[1]);
+      else
         perror(argv[1]);
 
       cupsFileClose(fp);
@@ -798,7 +813,8 @@ read_write_tests(int compression)	/* I - Use compression? */
   * Remove the test file...
   */
 
-  unlink(compression ? "testfile.dat.gz" : "testfile.dat");
+  if (!status)
+    unlink(compression ? "testfile.dat.gz" : "testfile.dat");
 
  /*
   * Return the test status...
