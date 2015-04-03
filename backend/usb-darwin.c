@@ -302,7 +302,7 @@ static void parse_pserror (char *sockBuffer, int len);
 
 static IOUSBInterfaceInterface220 **usb_interface220_for_service(io_service_t usbClass);
 static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDevice);
-static CFStringRef printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting);
+static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting);
 static CFStringRef printer_interface_indexed_description(IOUSBInterfaceInterface220 ** printer, UInt8 index, UInt16 language);
 static CFStringRef deviceIDCopyManufacturer(CFStringRef deviceID);
 static CFStringRef deviceIDCopyModel(CFStringRef deviceID);
@@ -1175,7 +1175,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
 
                 if (IsPrintingInterface(intfClass, intfSubclass, intfProtocol))
                 {
-                    CFStringRef deviceIDString = printer_interface_deviceid(intf220, 0);
+                    CFStringRef deviceIDString = copy_printer_interface_deviceid(intf220, 0);
                     if (deviceIDString != NULL)
                     {
                         reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, 0);
@@ -1192,7 +1192,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
 
                     if ((IsPrintingInterface(intfClass, intfSubclass, intfProtocol)))
                     {
-                        CFStringRef deviceIDString = printer_interface_deviceid(intf220, intfDesc->bAlternateSetting);
+                        CFStringRef deviceIDString = copy_printer_interface_deviceid(intf220, intfDesc->bAlternateSetting);
                         if (deviceIDString != NULL)
                         {
                             reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, intfDesc->bAlternateSetting);
@@ -1555,7 +1555,7 @@ static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDe
 }
 
 
-static CFStringRef printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting)
+static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting)
 {
 	// I have tried to make this function as neat as I can, but the possibility of needing to resend
 	// a request to get the entire string makes it hideous...
@@ -2447,7 +2447,7 @@ static void get_device_id(cups_sc_status_t *status,
     IOUSBInterfaceInterface220 **intf220 = usb_interface220_for_service(g.printer_obj);
     if (intf220)
     {
-      deviceIDString = printer_interface_deviceid(intf220, g.alternateSetting);
+      deviceIDString = copy_printer_interface_deviceid(intf220, g.alternateSetting);
       (*intf220)->Release(intf220);
     }
   }

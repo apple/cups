@@ -2377,10 +2377,9 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
     if (!strncmp(program, "maxsize(", 8))
     {
-      size_t	maxsize;		/* Maximum file size */
       char	*mptr;			/* Pointer into maxsize(nnnn) program */
 
-      maxsize = (size_t)strtoll(program + 8, &mptr, 10);
+      strtoll(program + 8, &mptr, 10);
 
       if (*mptr != ')')
       {
@@ -2496,10 +2495,9 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
     if (!strncmp(program, "maxsize(", 8))
     {
-      size_t	maxsize;		/* Maximum file size */
       char	*mptr;			/* Pointer into maxsize(nnnn) program */
 
-      maxsize = (size_t)strtoll(program + 8, &mptr, 10);
+      strtoll(program + 8, &mptr, 10);
 
       if (*mptr != ')')
       {

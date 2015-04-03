@@ -1425,7 +1425,7 @@ cupsdSaveAllPrinters(void)
     {
       cupsFilePuts(fp, "State Stopped\n");
 
-      if (printer->state_message)
+      if (printer->state_message[0])
         cupsFilePutConf(fp, "StateMessage", printer->state_message);
     }
     else
@@ -3485,8 +3485,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	 filter;
 	 filter = (mime_filter_t *)cupsArrayNext(MimeDatabase->filters))
     {
-      if (filter->dst == p->filetype && filter->filter &&
-	  strstr(filter->filter, "PrintJobMgr"))
+      if (filter->dst == p->filetype && strstr(filter->filter, "PrintJobMgr"))
 	break;
     }
 
