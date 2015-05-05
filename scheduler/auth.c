@@ -835,7 +835,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * to use it...
     */
 
-    if (gss_init_sec_context == NULL)
+    if (&gss_init_sec_context == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "[Client %d] GSSAPI/Kerberos authentication failed "
@@ -1375,6 +1375,7 @@ cupsdCopyLocation(
   if (loc->location)
     temp->location = _cupsStrAlloc(loc->location);
 
+  temp->length     = loc->length;
   temp->limit      = loc->limit;
   temp->order_type = loc->order_type;
   temp->type       = loc->type;
@@ -1477,6 +1478,8 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
 		  CUPSD_AUTH_LIMIT_DELETE,
 		  CUPSD_AUTH_LIMIT_TRACE,
 		  CUPSD_AUTH_LIMIT_ALL,
+		  CUPSD_AUTH_LIMIT_ALL,
+		  CUPSD_AUTH_LIMIT_ALL,
 		  CUPSD_AUTH_LIMIT_ALL
 		};
 
@@ -1502,7 +1505,11 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
       *uriptr = '\0';
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: uri = \"%s\"...", uri);
+  if ((uriptr = strchr(uri, '?')) != NULL)
+    *uriptr = '\0';		/* Drop trailing query string */
+
+  if ((uriptr = uri + strlen(uri) - 1) > uri && *uriptr == '/')
+    *uriptr = '\0';		/* Remove trailing '/' */
 
  /*
   * Loop through the list of locations to find a match...
@@ -1512,12 +1519,14 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
   best    = NULL;
   bestlen = 0;
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: uri = \"%s\", limit=%x...", uri, limit);
+
+
   for (loc = (cupsd_location_t *)cupsArrayFirst(Locations);
        loc;
        loc = (cupsd_location_t *)cupsArrayNext(Locations))
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: Location %s Limit %x",
-                    loc->location ? loc->location : "nil", loc->limit);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindBest: Location %s(%d) Limit %x", loc->location ? loc->location : "(null)", (int)loc->length, loc->limit);
 
     if (!strncmp(uri, "/printers/", 10) || !strncmp(uri, "/classes/", 9))
     {
