@@ -407,7 +407,7 @@ cupsdDefaultAuthType(void)
   * to use it...
   */
 
-  if (gss_init_sec_context == NULL)
+  if (&gss_init_sec_context == NULL)
     return (default_auth_type = CUPSD_AUTH_BASIC);
 #  endif /* __APPLE__ */
 
