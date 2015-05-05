@@ -1371,8 +1371,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   static const int	pwg_raster_document_resolution_supported[] =
   {
     150,
-    300,
-    600
+    300
   };
   static const char * const pwg_raster_document_type_supported[] =
   {
@@ -1402,7 +1401,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     "CP1",
     "IS1-5-7",
     "MT1-2-3-4-5-6-8-9-10-11-12-13",
-    "RS600",
+    "RS300",
     "SRGB24",
     "V1.4",
     "W8",
@@ -5605,7 +5604,7 @@ register_printer(
   TXTRecordSetValue(&ipp_txt, "TLS", 3, "1.2");
 #  endif /* HAVE_SSL */
   if (strstr(formats, "image/urf"))
-    TXTRecordSetValue(&ipp_txt, "URF", 66, "CP1,IS1-5-7,MT1-2-3-4-5-6-8-9-10-11-12-13,RS600,SRGB24,V1.4,W8,DM1");
+    TXTRecordSetValue(&ipp_txt, "URF", 66, "CP1,IS1-5-7,MT1-2-3-4-5-6-8-9-10-11-12-13,RS300,SRGB24,V1.4,W8,DM1");
 
   TXTRecordSetValue(&ipp_txt, "txtvers", 1, "1");
   TXTRecordSetValue(&ipp_txt, "qtotal", 1, "1");
