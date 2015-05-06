@@ -418,7 +418,14 @@ main(int  argc,				/* I - Number of command-line args */
 
     for (y = inheader.cupsHeight; y > 0; y --)
     {
-      cupsRasterReadPixels(inras, line + lineoffset, inheader.cupsBytesPerLine);
+      if (cupsRasterReadPixels(inras, line + lineoffset, inheader.cupsBytesPerLine) != inheader.cupsBytesPerLine)
+      {
+	_cupsLangPrintFilter(stderr, "ERROR", _("Error reading raster data."));
+	fprintf(stderr, "DEBUG: Unable to read line %d for page %d.\n",
+	        inheader.cupsHeight - y + page_top + 1, page);
+	return (1);
+      }
+
       if (!cupsRasterWritePixels(outras, line, outheader.cupsBytesPerLine))
       {
 	_cupsLangPrintFilter(stderr, "ERROR", _("Error sending raster data."));
