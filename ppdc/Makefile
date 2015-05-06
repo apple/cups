@@ -3,7 +3,7 @@
 #
 # Makefile for the CUPS PPD Compiler.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 2002-2006 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -354,7 +354,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
 		-exported_symbols_list t.exp \
-		$(LIBOBJS) $(LINKCUPS)
+		$(LIBOBJS) $(LINKCUPS) $(COMMONLIBS)
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 
