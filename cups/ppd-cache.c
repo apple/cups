@@ -2809,6 +2809,8 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 			top;		/* Largest top margin */
   pwg_media_t		*pwg;		/* PWG media size */
   int			xres, yres;	/* Resolution values */
+  struct lconv		*loc = localeconv();
+					/* Locale data */
 
 
  /*
@@ -2966,9 +2968,15 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       if (x_dim && y_dim)
       {
+        char	twidth[256],		/* Width string */
+		tlength[256];		/* Length string */
+
         pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
 
-        cupsFilePrintf(fp, "*PageSize %s: \"<</PageSize[%.1f %.1f]>>setpagedevice\"\n", pwg->ppd, pwg->width * 72.0 / 2540.0, pwg->length * 72.0 / 2540.0);
+        _cupsStrFormatd(twidth, twidth + sizeof(twidth), pwg->width * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(tlength, tlength + sizeof(tlength), pwg->length * 72.0 / 2540.0, loc);
+
+        cupsFilePrintf(fp, "*PageSize %s: \"<</PageSize[%s %s]>>setpagedevice\"\n", pwg->ppd, twidth, tlength);
       }
     }
     cupsFilePuts(fp, "*CloseUI: *PageSize\n");
@@ -2984,7 +2992,13 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       if (x_dim && y_dim)
       {
+        char	twidth[256],		/* Width string */
+		tlength[256];		/* Length string */
+
         pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
+
+        _cupsStrFormatd(twidth, twidth + sizeof(twidth), pwg->width * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(tlength, tlength + sizeof(tlength), pwg->length * 72.0 / 2540.0, loc);
 
         cupsFilePrintf(fp, "*PageRegion %s: \"<</PageSize[%.1f %.1f]>>setpagedevice\"\n", pwg->ppd, pwg->width * 72.0 / 2540.0, pwg->length * 72.0 / 2540.0);
       }
@@ -3001,10 +3015,24 @@ _ppdCreateFromIPP(char   *buffer,	/* I - Filename buffer */
 
       if (x_dim && y_dim)
       {
+        char	tleft[256],		/* Left string */
+		tbottom[256],		/* Bottom string */
+		tright[256],		/* Right string */
+		ttop[256],		/* Top string */
+		twidth[256],		/* Width string */
+		tlength[256];		/* Length string */
+
         pwg = pwgMediaForSize(ippGetInteger(x_dim, 0), ippGetInteger(y_dim, 0));
 
-        cupsFilePrintf(fp, "*ImageableArea %s: \"%.1f %.1f %.1f %.1f\"\n", pwg->ppd, left * 72.0 / 2540.0, bottom * 72.0 / 2540.0, (pwg->width - right) * 72.0 / 2540.0, (pwg->length - top) * 72.0 / 2540.0);
-        cupsFilePrintf(fp, "*PaperDimension %s: \"%.1f %.1f\"\n", pwg->ppd, pwg->width * 72.0 / 2540.0, pwg->length * 72.0 / 2540.0);
+        _cupsStrFormatd(tleft, tleft + sizeof(tleft), left * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(tbottom, tbottom + sizeof(tbottom), bottom * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(tright, tright + sizeof(tright), (pwg->width - right) * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(ttop, ttop + sizeof(ttop), (pwg->length - top) * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(twidth, twidth + sizeof(twidth), pwg->width * 72.0 / 2540.0, loc);
+        _cupsStrFormatd(tlength, tlength + sizeof(tlength), pwg->length * 72.0 / 2540.0, loc);
+
+        cupsFilePrintf(fp, "*ImageableArea %s: \"%s %s %s %s\"\n", pwg->ppd, tleft, tbottom, tright, ttop);
+        cupsFilePrintf(fp, "*PaperDimension %s: \"%s %s\"\n", pwg->ppd, twidth, tlength);
       }
     }
   }
