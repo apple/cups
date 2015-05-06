@@ -18,6 +18,7 @@ CHANGES IN CUPS V2.0.3
 	- The cups-lpd mini-daemon did not check for request parameters
 	  (STR #4603)
 	- The scheduler could get caught in a busy loop (STR #4605)
+	- The sample Epson driver could crash (STR #4616)
 	- Added Russian translation (STR #4577)
 
 
