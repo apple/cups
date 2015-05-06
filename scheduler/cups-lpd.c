@@ -230,8 +230,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   * resource list, and/or user name.
   */
 
-  command = line[0];
-  dest    = line + 1;
+  if ((command = line[0]) == '\0')
+    dest = line;
+  else
+    dest = line + 1;
 
   if (command == 0x02)
     list = NULL;
