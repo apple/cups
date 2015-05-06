@@ -5,7 +5,7 @@
 # Perform the complete set of IPP compliance tests specified in the
 # CUPS Software Test Plan.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -906,7 +906,7 @@ fi
 
 # Requests logged
 count=`wc -l $BASE/log/access_log | awk '{print $1}'`
-expected=`expr 37 + 18 + 29 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+expected=`expr 37 + 18 + 30 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
 if test $count != $expected; then
 	echo "FAIL: $count requests logged, expected $expected."
 	echo "<P>FAIL: $count requests logged, expected $expected.</P>" >>$strfile

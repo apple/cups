@@ -910,7 +910,19 @@ main(int  argc,				/* I - Number of command-line arguments */
     struct stat	fileinfo;		/* File information */
 
 
-    if (!strncmp(argv[1], "-d", 2))
+    if (strchr(argv[1], ':'))
+    {
+     /*
+      * Server PPD...
+      */
+
+      if ((filename = cupsGetServerPPD(CUPS_HTTP_DEFAULT, argv[1])) == NULL)
+      {
+        printf("%s: %s\n", argv[1], cupsLastErrorString());
+        return (1);
+      }
+    }
+    else if (!strncmp(argv[1], "-d", 2))
     {
       const char *printer;		/* Printer name */
 

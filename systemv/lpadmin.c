@@ -1318,7 +1318,7 @@ set_printer_options(
 {
   ipp_t		*request;		/* IPP Request */
   const char	*ppdfile;		/* PPD filename */
-  int		ppdchanged;		/* PPD changed? */
+  int		ppdchanged = 0;		/* PPD changed? */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_choice_t	*choice;		/* Marked choice */
   char		uri[HTTP_MAX_URI],	/* URI for printer/class */
@@ -1328,11 +1328,13 @@ set_printer_options(
 		tempfile[1024];		/* Temporary filename */
   cups_file_t	*in,			/* PPD file */
 		*out;			/* Temporary file */
-  const char	*protocol,		/* Old protocol option */
+  const char	*ppdname,		/* ppd-name value */
+		*protocol,		/* Old protocol option */
 		*customval,		/* Custom option value */
 		*boolval;		/* Boolean value */
   int		wrote_ipp_supplies = 0,	/* Wrote cupsIPPSupplies keyword? */
-		wrote_snmp_supplies = 0;/* Wrote cupsSNMPSupplies keyword? */
+		wrote_snmp_supplies = 0,/* Wrote cupsSNMPSupplies keyword? */
+		copied_options = 0;	/* Copied options? */
 
 
   DEBUG_printf(("set_printer_options(http=%p, printer=\"%s\", num_options=%d, "
@@ -1364,6 +1366,26 @@ set_printer_options(
 
   if (file)
     ppdfile = file;
+  else if ((ppdname = cupsGetOption("ppd-name", num_options, options)) != NULL && strcmp(ppdname, "raw") && num_options > 1)
+  {
+    if ((ppdfile = cupsGetServerPPD(http, ppdname)) != NULL)
+    {
+     /*
+      * Copy options array and remove ppd-name from it...
+      */
+
+      cups_option_t *temp = NULL, *optr;
+      int i, num_temp = 0;
+      for (i = num_options, optr = options; i > 0; i --, optr ++)
+        if (strcmp(optr->name, "ppd-name"))
+	  num_temp = cupsAddOption(optr->name, optr->value, num_temp, &temp);
+
+      copied_options = 1;
+      ppdchanged     = 1;
+      num_options    = num_temp;
+      options        = temp;
+    }
+  }
   else if (request->request.op.operation_id == IPP_OP_CUPS_ADD_MODIFY_PRINTER)
     ppdfile = cupsGetPPD(printer);
   else
@@ -1388,7 +1410,15 @@ set_printer_options(
     * Set default options in the PPD file...
     */
 
-    ppd = ppdOpenFile(ppdfile);
+    if ((ppd = ppdOpenFile(ppdfile)) == NULL)
+    {
+      int		linenum;	/* Line number of error */
+      ppd_status_t	status = ppdLastError(&linenum);
+					/* Status code */
+
+      _cupsLangPrintf(stderr, _("lpadmin: Unable to open PPD \"%s\": %s on line %d."), ppdfile, ppdErrorString(status), linenum);
+    }
+
     ppdMarkDefaults(ppd);
     cupsMarkOptions(ppd, num_options, options);
 
@@ -1398,6 +1428,8 @@ set_printer_options(
       ippDelete(request);
       if (ppdfile != file)
         unlink(ppdfile);
+      if (copied_options)
+        cupsFreeOptions(num_options, options);
       return (1);
     }
 
@@ -1409,12 +1441,12 @@ set_printer_options(
       ippDelete(request);
       if (ppdfile != file)
 	unlink(ppdfile);
+      if (copied_options)
+        cupsFreeOptions(num_options, options);
       cupsFileClose(out);
       unlink(tempfile);
       return (1);
     }
-
-    ppdchanged = 0;
 
     while (cupsFileGets(in, line, sizeof(line)))
     {
@@ -1536,6 +1568,9 @@ set_printer_options(
 
     ippDelete(cupsDoRequest(http, request, "/admin/"));
   }
+
+  if (copied_options)
+    cupsFreeOptions(num_options, options);
 
  /*
   * Check the response...

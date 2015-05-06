@@ -9,6 +9,7 @@ CHANGES IN CUPS V2.0.3
 	  (STR #4598, STR #4599, STR #4600, STR #4601)
 	- Fixed a gzip processing bug (#4602)
 	- Fixed <Limit> inside <Location> (STR #4575)
+	- Fixed lpadmin when both -m and -o are used (STR #4578)
 	- Added Russian translation (STR #4577)
 
 
