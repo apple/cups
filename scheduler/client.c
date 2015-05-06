@@ -585,6 +585,17 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     * connection and we need to shut it down...
     */
 
+    if (!httpGetReady(con->http) && recv(httpGetFd(con->http), buf, 1, MSG_PEEK) < 1)
+    {
+     /*
+      * Connection closed...
+      */
+
+      cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on EOF.");
+      cupsdCloseClient(con);
+      return;
+    }
+
     cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.",
 		   httpStateString(httpGetState(con->http)));
     cupsdCloseClient(con);
@@ -1979,12 +1990,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	if (httpGetState(con->http) == HTTP_STATE_POST_SEND)
 	{
-	 /*
-	  * Don't listen for activity until we decide to do something with this...
-	  */
-
-          cupsdAddSelect(httpGetFd(con->http), NULL, NULL, con);
-
 	  if (con->file >= 0)
 	  {
 	    fstat(con->file, &filestats);
