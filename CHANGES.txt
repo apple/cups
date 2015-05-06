@@ -30,3 +30,4 @@ CHANGES IN CUPS V2.1b1
 	  (STR #4589)
 	- The scheduler now validates ErrorPolicy values in config files
 	  (STR #4591)
+	- Long cookies caused the web interface to stop working (STR #4619)
