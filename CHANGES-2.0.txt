@@ -10,6 +10,8 @@ CHANGES IN CUPS V2.0.3
 	- Fixed a gzip processing bug (#4602)
 	- Fixed <Limit> inside <Location> (STR #4575)
 	- Fixed lpadmin when both -m and -o are used (STR #4578)
+	- The web interface always showed support for 2-sided printing
+	  (STR #4595)
 	- Added Russian translation (STR #4577)
 
 
