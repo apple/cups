@@ -1182,6 +1182,19 @@ cupsdReadConfiguration(void)
 
   cupsdUpdateEnv();
 
+  /*
+   * Validate the default error policy...
+   */
+
+  if (strcmp(ErrorPolicy, "retry-current-job") &&
+      strcmp(ErrorPolicy, "abort-job") &&
+      strcmp(ErrorPolicy, "retry-job") &&
+      strcmp(ErrorPolicy, "stop-printer"))
+  {
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid ErrorPolicy \"%s\", resetting to \"stop-printer\".", ErrorPolicy);
+    cupsdSetString(&ErrorPolicy, "stop-printer");
+  }
+
  /*
   * Update default paper size setting as needed...
   */

@@ -3,7 +3,7 @@
  *
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1214,10 +1214,17 @@ cupsdLoadAllPrinters(void)
     else if (!_cups_strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
-        cupsdSetString(&p->error_policy, value);
+      {
+	if (strcmp(value, "retry-current-job") &&
+	    strcmp(value, "abort-job") &&
+	    strcmp(value, "retry-job") &&
+	    strcmp(value, "stop-printer"))
+	  cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid ErrorPolicy \"%s\" on line %d or printers.conf.", ErrorPolicy, linenum);
+	else
+	  cupsdSetString(&p->error_policy, value);
+      }
       else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Syntax error on line %d of printers.conf.", linenum);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d of printers.conf.", linenum);
     }
     else if (!_cups_strcasecmp(line, "Attribute") && value)
     {

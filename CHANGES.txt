@@ -26,4 +26,7 @@ CHANGES IN CUPS V2.1b1
 	  (<rdar://problem/19024491>)
 	- The cupstestppd program did not handle "maxsize(nnn)" entries in
 	  cupsFilter/cupsFilter2 values (<rdar://problem/18974858>)
-	- Now check the return value of rename() calls (STR #4589)
+	- The scheduler now checks the return value of rename() calls
+	  (STR #4589)
+	- The scheduler now validates ErrorPolicy values in config files
+	  (STR #4591)
