@@ -64,6 +64,7 @@ typedef struct _cups_monitor_s		/**** Monitoring data ****/
 			version,	/* IPP version */
 			job_id,		/* Job ID for submitted job */
 			job_reasons,	/* Job state reasons bits */
+			create_job,	/* Support Create-Job? */
 			get_job_attrs;	/* Support Get-Job-Attributes? */
   const char		*job_name;	/* Job name for submitted job */
   http_encryption_t	encryption;	/* Use encryption? */
@@ -1404,6 +1405,7 @@ main(int  argc,				/* I - Number of command-line args */
   monitor.port          = port;
   monitor.version       = version;
   monitor.job_id        = 0;
+  monitor.create_job    = create_job;
   monitor.get_job_attrs = get_job_attrs;
   monitor.encryption    = cupsEncryption();
   monitor.job_state     = IPP_JOB_PENDING;
@@ -2344,6 +2346,15 @@ monitor_printer(
       if (cupsLastError() <= IPP_OK_CONFLICT)
         password_tries = 0;
 
+      if (monitor->job_id == 0 && monitor->create_job)
+      {
+       /*
+        * No job-id yet, so continue...
+	*/
+
+        goto monitor_disconnect;
+      }
+
      /*
       * Check the status of the job itself...
       */
@@ -2494,6 +2505,8 @@ monitor_printer(
      /*
       * Disconnect from the printer - we'll reconnect on the next poll...
       */
+
+      monitor_disconnect:
 
       _httpDisconnect(http);
     }

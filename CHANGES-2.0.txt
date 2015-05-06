@@ -19,6 +19,8 @@ CHANGES IN CUPS V2.0.3
 	  (STR #4603)
 	- The scheduler could get caught in a busy loop (STR #4605)
 	- The sample Epson driver could crash (STR #4616)
+	- The IPP backend now correctly monitors jobs
+	  (<rdar://problem/20495955>)
 	- Added Russian translation (STR #4577)
 
 
