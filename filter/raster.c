@@ -970,7 +970,7 @@ cups_raster_read_header(
 
   cups_raster_update(r);
 
-  return (r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
+  return (r->header.cupsBitsPerPixel != 0 && r->header.cupsBitsPerColor != 0 && r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }
 
 
@@ -1239,6 +1239,9 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
     r->bpp = (r->header.cupsBitsPerPixel + 7) / 8;
   else
     r->bpp = (r->header.cupsBitsPerColor + 7) / 8;
+
+  if (r->bpp == 0)
+    r->bpp = 1;
 
  /*
   * Set the number of remaining rows...
