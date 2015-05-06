@@ -8255,9 +8255,15 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   if (add_file(con, job, filetype, compression))
     return;
 
-  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
-           job->num_files);
-  rename(con->filename, filename);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  if (rename(con->filename, filename))
+  {
+    cupsdLogJob(job, CUPSD_LOG_ERROR, "Unable to rename job document file \"%s\": %s", filename, strerror(errno));
+
+    send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to rename job document file."));
+    return;
+  }
+
   cupsdClearString(&con->filename);
 
  /*
@@ -9483,9 +9489,14 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(job->attrs, "job-k-octets", IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer += kbytes;
 
-  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
-           job->num_files);
-  rename(con->filename, filename);
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id, job->num_files);
+  if (rename(con->filename, filename))
+  {
+    cupsdLogJob(job, CUPSD_LOG_ERROR, "Unable to rename job document file \"%s\": %s", filename, strerror(errno));
+
+    send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to rename job document file."));
+    return;
+  }
 
   cupsdClearString(&con->filename);
 

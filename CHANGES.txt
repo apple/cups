@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-02-27
+CHANGES.txt - 2.1b1 - 2015-05-06
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -26,3 +26,4 @@ CHANGES IN CUPS V2.1b1
 	  (<rdar://problem/19024491>)
 	- The cupstestppd program did not handle "maxsize(nnn)" entries in
 	  cupsFilter/cupsFilter2 values (<rdar://problem/18974858>)
+	- Now check the return value of rename() calls (STR #4589)

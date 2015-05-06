@@ -311,7 +311,7 @@ _cupsSetNegotiateAuthString(
   * to use it...
   */
 
-  if (gss_init_sec_context == NULL)
+  if (&gss_init_sec_context == NULL)
   {
     DEBUG_puts("1_cupsSetNegotiateAuthString: Weak-linked GSSAPI/Kerberos "
                "framework is not present");

@@ -368,7 +368,7 @@ apple_register_profiles(
   * Make sure ColorSync is available...
   */
 
-  if (ColorSyncRegisterDevice == NULL)
+  if (&ColorSyncRegisterDevice == NULL)
     return;
 
  /*
@@ -868,7 +868,7 @@ apple_unregister_profiles(
   * Make sure ColorSync is available...
   */
 
-  if (ColorSyncUnregisterDevice != NULL)
+  if (&ColorSyncUnregisterDevice != NULL)
   {
     CFUUIDRef deviceUUID;		/* Device UUID */
 
