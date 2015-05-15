@@ -21,6 +21,8 @@ CHANGES IN CUPS V2.0.3
 	- The sample Epson driver could crash (STR #4616)
 	- The IPP backend now correctly monitors jobs
 	  (<rdar://problem/20495955>)
+	- The ppdhtml and ppdpo utilities crashed when the -D option was used
+	  before a driver information file (STR #4627)
 	- Added Russian translation (STR #4577)
 
 

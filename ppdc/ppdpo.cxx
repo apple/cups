@@ -1,22 +1,16 @@
 //
 // "$Id$"
 //
-//   PPD file message catalog program for the CUPS PPD Compiler.
+// PPD file message catalog program for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2012 by Apple Inc.
-//   Copyright 2002-2005 by Easy Software Products.
+// Copyright 2007-2015 by Apple Inc.
+// Copyright 2002-2005 by Easy Software Products.
 //
-//   These coded instructions, statements, and computer programs are the
-//   property of Apple Inc. and are protected by Federal copyright
-//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
-//   which should have been included with this file.  If this file is
-//   file is missing or damaged, see the license at "http://www.cups.org/".
-//
-// Contents:
-//
-//   main()           - Main entry for the PPD compiler.
-//   add_ui_strings() - Add all UI strings from the driver.
-//   usage()          - Show usage and exit.
+// These coded instructions, statements, and computer programs are the
+// property of Apple Inc. and are protected by Federal copyright
+// law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+// which should have been included with this file.  If this file is
+// file is missing or damaged, see the license at "http://www.cups.org/".
 //
 
 //
@@ -58,7 +52,7 @@ main(int  argc,				// I - Number of command-line arguments
 
   // Scan the command-line...
   catalog = new ppdcCatalog("en");
-  src     = 0;
+  src     = new ppdcSource();
   verbose = 0;
   outfile = 0;
 
@@ -123,23 +117,28 @@ main(int  argc,				// I - Number of command-line arguments
 	                _("ppdc: Loading driver information file \"%s\"."),
 			argv[i]);
 
-      src = new ppdcSource(argv[i]);
-
-      // Add UI strings...
-      for (d = (ppdcDriver *)src->drivers->first();
-           d;
-	   d = (ppdcDriver *)src->drivers->next())
-      {
-	if (verbose)
-	  _cupsLangPrintf(stderr, _("ppdc: Adding/updating UI text from %s."),
-			  argv[i]);
-
-        add_ui_strings(d, catalog);
-      }
-
-      // Delete the printer driver information...
-      src->release();
+      src->read_file(argv[i]);
     }
+
+  // If no drivers have been loaded, display the program usage message.
+  if ((d = (ppdcDriver *)src->drivers->first()) != NULL)
+  {
+    // Add UI strings...
+    while (d != NULL)
+    {
+      if (verbose)
+	_cupsLangPrintf(stderr, _("ppdc: Adding/updating UI text from %s."), argv[i]);
+
+      add_ui_strings(d, catalog);
+
+      d = (ppdcDriver *)src->drivers->next();
+    }
+  }
+  else
+    usage();
+
+  // Delete the printer driver information...
+  src->release();
 
   // Write the message catalog...
   if (!outfile)
@@ -148,10 +147,6 @@ main(int  argc,				// I - Number of command-line arguments
     catalog->save_messages(outfile);
 
   catalog->release();
-
-  // If no drivers have been loaded, display the program usage message.
-  if (!src)
-    usage();
 
   // Return with no errors.
   return (0);
