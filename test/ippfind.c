@@ -1978,7 +1978,7 @@ exec_program(ippfind_srv_t *service,	/* I - Service */
 	  else if (!strcmp(keyword, "service_path"))
 	    strlcpy(tptr, service->resource, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_port"))
-	    strlcpy(tptr, port + 20, sizeof(temp) - (size_t)(tptr - temp));
+	    strlcpy(tptr, port + 21, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strcmp(keyword, "service_scheme"))
 	    strlcpy(tptr, scheme + 22, sizeof(temp) - (size_t)(tptr - temp));
 	  else if (!strncmp(keyword, "txt_", 4))

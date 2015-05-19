@@ -23,6 +23,7 @@ CHANGES IN CUPS V2.0.3
 	  (<rdar://problem/20495955>)
 	- The ppdhtml and ppdpo utilities crashed when the -D option was used
 	  before a driver information file (STR #4627)
+	- ippfind incorrectly substituted "=port" for service_port.
 	- Added Russian translation (STR #4577)
 
 
