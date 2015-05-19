@@ -2436,7 +2436,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	  else
 	    tbytes = (ssize_t)fp->stream.avail_in;
 
-	  memcpy(trailer, fp->stream.next_in, tbytes);
+	  memcpy(trailer, fp->stream.next_in, (size_t)tbytes);
 	  fp->stream.next_in  += tbytes;
 	  fp->stream.avail_in -= (size_t)tbytes;
 	}
