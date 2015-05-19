@@ -94,7 +94,8 @@ TESTOBJS	= \
 		testlang.o \
 		testppd.o \
 		testpwg.o \
-		testsnmp.o
+		testsnmp.o \
+		tlscheck.o
 OBJS	=	\
 		$(LIBOBJS) \
 		$(TESTOBJS)
@@ -161,7 +162,8 @@ UNITTARGETS =	\
 		testoptions \
 		testppd \
 		testpwg \
-		testsnmp
+		testsnmp \
+		tlscheck
 
 TARGETS	=	\
 		$(LIBTARGETS)
@@ -536,6 +538,16 @@ testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
 testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testsnmp.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# tlscheck (dependency on static CUPS library is intentional)
+#
+
+tlscheck:	tlscheck.o $(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ tlscheck.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
