@@ -34,6 +34,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*server = argv[1];	/* Hostname from command-line */
   int		port = 631;		/* Port number */
   const char	*cipherName = "UNKNOWN";/* Cipher suite name */
+  int		tlsVersion = 0;		/* TLS version number */
 
 
   if (argc < 2 || argc > 3)
@@ -55,12 +56,39 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
 #ifdef __APPLE__
+  SSLProtocol protocol;
   SSLCipherSuite cipher;
   char unknownCipherName[256];
   int paramsNeeded = 0;
   const void *params;
   size_t paramsLen;
   OSStatus err;
+
+  if ((err = SSLGetNegotiatedProtocolVersion(http->tls, &protocol)) != noErr)
+  {
+    printf("%s: ERROR (No protocol version - %d)\n", server, (int)err);
+    httpClose(http);
+    return (1);
+  }
+
+  switch (protocol)
+  {
+    default :
+        tlsVersion = 0;
+        break;
+    case kSSLProtocol3 :
+        tlsVersion = 30;
+        break;
+    case kTLSProtocol1 :
+        tlsVersion = 10;
+        break;
+    case kTLSProtocol11 :
+        tlsVersion = 11;
+        break;
+    case kTLSProtocol12 :
+        tlsVersion = 12;
+        break;
+  }
 
   if ((err = SSLGetNegotiatedCipher(http->tls, &cipher)) != noErr)
   {
@@ -411,7 +439,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 #endif /* __APPLE__ */
 
-  printf("%s: OK (%s)\n", server, cipherName);
+  printf("%s: OK (%d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
 
   httpClose(http);
 
