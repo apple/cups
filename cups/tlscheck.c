@@ -415,6 +415,152 @@ main(int  argc,				/* I - Number of command-line arguments */
 	cipherName = "TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384";
 	paramsNeeded = 1;
 	break;
+    case TLS_RSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_RSA_WITH_AES_128_CBC_SHA";
+	break;
+    case TLS_DH_DSS_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_DH_DSS_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DH_RSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_DH_RSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DHE_DSS_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_DHE_DSS_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DHE_RSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DH_anon_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_DH_anon_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_RSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_RSA_WITH_AES_256_CBC_SHA";
+	break;
+    case TLS_DH_DSS_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_DH_DSS_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DH_RSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_DH_RSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DHE_DSS_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_DHE_DSS_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DHE_RSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_DHE_RSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_DH_anon_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_DH_anon_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_ECDSA_WITH_NULL_SHA:
+	cipherName = "TLS_ECDH_ECDSA_WITH_NULL_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_ECDSA_WITH_RC4_128_SHA:
+	cipherName = "TLS_ECDH_ECDSA_WITH_RC4_128_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA:
+	cipherName = "TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_ECDSA_WITH_NULL_SHA:
+	cipherName = "TLS_ECDHE_ECDSA_WITH_NULL_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_ECDSA_WITH_RC4_128_SHA:
+	cipherName = "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA:
+	cipherName = "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_RSA_WITH_NULL_SHA:
+	cipherName = "TLS_ECDH_RSA_WITH_NULL_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_RSA_WITH_RC4_128_SHA:
+	cipherName = "TLS_ECDH_RSA_WITH_RC4_128_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA:
+	cipherName = "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_RSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_RSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_RSA_WITH_NULL_SHA:
+	cipherName = "TLS_ECDHE_RSA_WITH_NULL_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_RSA_WITH_RC4_128_SHA:
+	cipherName = "TLS_ECDHE_RSA_WITH_RC4_128_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA:
+	cipherName = "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_anon_WITH_NULL_SHA:
+	cipherName = "TLS_ECDH_anon_WITH_NULL_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_anon_WITH_RC4_128_SHA:
+	cipherName = "TLS_ECDH_anon_WITH_RC4_128_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA:
+	cipherName = "TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_anon_WITH_AES_128_CBC_SHA:
+	cipherName = "TLS_ECDH_anon_WITH_AES_128_CBC_SHA";
+	paramsNeeded = 1;
+	break;
+    case TLS_ECDH_anon_WITH_AES_256_CBC_SHA:
+	cipherName = "TLS_ECDH_anon_WITH_AES_256_CBC_SHA";
+	paramsNeeded = 1;
+	break;
     default :
         snprintf(unknownCipherName, sizeof(unknownCipherName), "UNKNOWN_%04X", cipher);
         cipherName = unknownCipherName;
