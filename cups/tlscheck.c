@@ -46,7 +46,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   if (argc == 3)
-    port = atoi(argv[2]);
+  {
+    if (argv[2][0] == '=')
+      port = atoi(argv[2] + 1);
+    else
+      port = atoi(argv[2]);
+  }
 
   http = httpConnect2(server, port, NULL, AF_UNSPEC, HTTP_ENCRYPTION_ALWAYS, 1, 30000, NULL);
   if (!http)
