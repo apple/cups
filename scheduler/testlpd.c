@@ -3,7 +3,7 @@
  *
  * cups-lpd test program for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 2006 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -447,7 +447,7 @@ status_long(int  outfd,			/* I - Command file descriptor */
   * Send the "send short status" command...
   */
 
-  if (args)
+  if (args[0])
     snprintf(command, sizeof(command), "\004%s %s\n", dest, args[0]);
   else
     snprintf(command, sizeof(command), "\004%s\n", dest);
@@ -490,7 +490,7 @@ status_short(int  outfd,		/* I - Command file descriptor */
   * Send the "send short status" command...
   */
 
-  if (args)
+  if (args[0])
     snprintf(command, sizeof(command), "\003%s %s\n", dest, args[0]);
   else
     snprintf(command, sizeof(command), "\003%s\n", dest);

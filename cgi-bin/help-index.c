@@ -3,7 +3,7 @@
  *
  * Online help index routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1220,7 +1220,7 @@ help_new_node(const char   *filename,	/* I - Filename */
 
   n->filename = strdup(filename);
   n->anchor   = anchor ? strdup(anchor) : NULL;
-  n->section  = (section && *section) ? strdup(section) : NULL;
+  n->section  = *section ? strdup(section) : NULL;
   n->text     = strdup(text);
   n->mtime    = mtime;
   n->offset   = offset;

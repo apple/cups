@@ -3516,7 +3516,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	value = getenv(temp);
         src   += tempptr - temp + 5;
       }
-      else if (vars)
+      else
       {
         if (src[1] == '{')
 	{
@@ -3562,11 +3562,6 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	  value = get_variable(vars, temp);
 
         src += tempptr - temp + 1;
-      }
-      else
-      {
-        value = "$";
-	src ++;
       }
 
       if (value)
