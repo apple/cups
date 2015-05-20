@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-05-06
+CHANGES.txt - 2.1b1 - 2015-05-19
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -31,3 +31,5 @@ CHANGES IN CUPS V2.1b1
 	- The scheduler now validates ErrorPolicy values in config files
 	  (STR #4591)
 	- Long cookies caused the web interface to stop working (STR #4619)
+	- Added SSLOptions values to allow Diffie-Hellman key exchange and
+	  disable TLS/1.0 support.

@@ -3,7 +3,7 @@
  *
  * Configuration file for CUPS and Xcode.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -15,6 +15,8 @@
 
 #ifndef _CUPS_CONFIG_H_
 #define _CUPS_CONFIG_H_
+
+#include <AvailabilityMacros.h>
 
 /*
  * Version of software...
@@ -348,6 +350,15 @@
  */
 
 #define HAVE_SECKEYCHAINOPEN 1
+
+
+/*
+ * Do we have (a working) SSLSetEnabledCiphers function?
+ */
+
+#ifdef AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER
+#  define HAVE_SSLSETENABLEDCIPHERS 1
+#endif /* AVAILABLE_MAC_OS_X_VERSION_10_11_AND_LATER */
 
 
 /*

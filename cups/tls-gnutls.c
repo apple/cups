@@ -1028,6 +1028,8 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
   int			status;		/* Status of handshake */
   gnutls_certificate_credentials_t *credentials;
 					/* TLS credentials */
+  char			priority_string[1024];
+					/* Priority string */
 
 
   DEBUG_printf(("7_httpTLSStart(http=%p)", http));
@@ -1199,28 +1201,33 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   if (!tls_options)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
-  else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
-    gnutls_priority_set_direct(http->tls, "NORMAL", NULL);
-  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    gnutls_priority_set_direct(http->tls, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
+    strlcpy(priority_string, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
   else
-    gnutls_priority_set_direct(http->tls, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
+  {
+    strlcpy(priority_string, "NORMAL", sizeof(priority_string));
+
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string);
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string);
+    else
+      strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string);
+
+    if (!(tls_options & _HTTP_TLS_ALLOW_RC4))
+      strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
+
+    if (!(tls_options & _HTTP_TLS_ALLOW_DH))
+      strlcat(priority_string, ":!DHE-RSA:!DHE-DSS:!ANON-DH", sizeof(priority_string));
+  }
+  
+#ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
+  gnutls_priority_set_direct(http->tls, priority_string, NULL);
 
 #else
   gnutls_priority_t priority;		/* Priority */
 
-  if (!tls_options)
-    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
-  else if ((tls_options & _HTTP_TLS_ALLOW_SSL3) && (tls_options & _HTTP_TLS_ALLOW_RC4))
-    gnutls_priority_init(&priority, "NORMAL", NULL);
-  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-    gnutls_priority_init(&priority, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL", NULL);
-  else
-    gnutls_priority_init(&priority, "NORMAL:+VERS-TLS-ALL:-VERS-SSL3.0", NULL);
-
+  gnutls_priority_init(&priority, priority_string, NULL);
   gnutls_priority_set(http->tls, priority);
   gnutls_priority_deinit(priority);
 #endif /* HAVE_GNUTLS_PRIORITY_SET_DIRECT */

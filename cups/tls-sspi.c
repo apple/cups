@@ -1756,14 +1756,18 @@ http_sspi_find_credentials(
 #ifdef SP_PROT_TLS1_2_SERVER
   if (http->mode == _HTTP_MODE_SERVER)
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER | SP_PROT_SSL3_SERVER;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_1_SERVER | SP_PROT_TLS1_0_SERVER;
   }
   else
   {
-    if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT | SP_PROT_SSL3_CLIENT;
     else
       SchannelCred.grbitEnabledProtocols = SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_0_CLIENT;
@@ -1786,7 +1790,7 @@ http_sspi_find_credentials(
   }
 #endif /* SP_PROT_TLS1_2_SERVER */
 
-  /* TODO: Support _HTTP_TLS_ALLOW_RC4 option; right now we'll rely on Windows registry to enable/disable RC4... */
+  /* TODO: Support _HTTP_TLS_ALLOW_RC4 and _HTTP_TLS_ALLOW_DH options; right now we'll rely on Windows registry to enable/disable RC4/DH... */
 
  /*
   * Create an SSPI credential.

@@ -162,8 +162,11 @@ extern "C" {
 #define _HTTP_RESOLVE_FQDN	2	/* Resolve to a FQDN */
 #define _HTTP_RESOLVE_FAXOUT	4	/* Resolve FaxOut service? */
 
+#define _HTTP_TLS_NONE		0	/* No TLS options */
 #define _HTTP_TLS_ALLOW_RC4	1	/* Allow RC4 cipher suites */
 #define _HTTP_TLS_ALLOW_SSL3	2	/* Allow SSL 3.0 */
+#define _HTTP_TLS_ALLOW_DH	4	/* Allow DH/DHE key negotiation */
+#define _HTTP_TLS_DENY_TLS10	16	/* Deny TLS 1.0 */
 
 
 /*

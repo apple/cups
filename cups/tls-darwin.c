@@ -27,14 +27,6 @@ extern char **environ;
 
 
 /*
- * Test define - set to 1 to use SSLSetEnabledCiphers.  Currently disabled (0)
- * because of <rdar://problem/18707430>.
- */
-
-#define USE_SET_ENABLED_CIPHERS 0
-
-
-/*
  * Local globals...
  */
 
@@ -1061,11 +1053,20 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 
   if (!error)
   {
-    error = SSLSetProtocolVersionMin(http->tls, (tls_options & _HTTP_TLS_ALLOW_SSL3) ? kSSLProtocol3 : kTLSProtocol1);
-    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin, error=%d", (int)error));
+    SSLProtocol minProtocol;
+    
+    if (tls_options & _HTTP_TLS_DENY_TLS10)
+      minProtocol = kTLSProtocol11;
+    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+      minProtocol = kSSLProtocol3;
+    else
+      minProtocol = kTLSProtocol1;
+
+    error = SSLSetProtocolVersionMin(http->tls, minProtocol);
+    DEBUG_printf(("4_httpTLSStart: SSLSetProtocolVersionMin(%d), error=%d", minProtocol, (int)error));
   }
 
-#  if USE_SET_ENABLED_CIPHERS
+#  if HAVE_SSLSETENABLEDCIPHERS
   if (!error)
   {
     SSLCipherSuite	supported[100];	/* Supported cipher suites */
@@ -1146,6 +1147,46 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	        enabled[num_enabled ++] = supported[i];
 	      break;
 
+          /* DH/DHE cipher suites that are problematic with parameters < 1024 bits */
+          case TLS_DH_DSS_WITH_AES_128_CBC_SHA :
+          case TLS_DH_RSA_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_DSS_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_RSA_WITH_AES_128_CBC_SHA :
+          case TLS_DH_DSS_WITH_AES_256_CBC_SHA :
+          case TLS_DH_RSA_WITH_AES_256_CBC_SHA :
+          case TLS_DHE_DSS_WITH_AES_256_CBC_SHA :
+          case TLS_DHE_RSA_WITH_AES_256_CBC_SHA :
+          case TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DH_DSS_WITH_AES_128_CBC_SHA256 :
+          case TLS_DH_RSA_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_DSS_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 :
+          case TLS_DH_DSS_WITH_AES_256_CBC_SHA256 :
+          case TLS_DH_RSA_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_DSS_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 :
+          case TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA :
+          case TLS_DHE_PSK_WITH_AES_128_CBC_SHA :
+          case TLS_DHE_PSK_WITH_AES_256_CBC_SHA :
+          case TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 :
+          case TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 :
+          case TLS_DH_RSA_WITH_AES_128_GCM_SHA256 :
+          case TLS_DH_RSA_WITH_AES_256_GCM_SHA384 :
+          case TLS_DHE_DSS_WITH_AES_128_GCM_SHA256 :
+          case TLS_DHE_DSS_WITH_AES_256_GCM_SHA384 :
+          case TLS_DH_DSS_WITH_AES_128_GCM_SHA256 :
+          case TLS_DH_DSS_WITH_AES_256_GCM_SHA384 :
+          case TLS_DHE_PSK_WITH_AES_128_GCM_SHA256 :
+          case TLS_DHE_PSK_WITH_AES_256_GCM_SHA384 :
+          case TLS_DHE_PSK_WITH_AES_128_CBC_SHA256 :
+          case TLS_DHE_PSK_WITH_AES_256_CBC_SHA384 :
+              if (tls_options & _HTTP_TLS_ALLOW_DH)
+	        enabled[num_enabled ++] = supported[i];
+              break;
+
           /* Anything else we'll assume is secure */
           default :
 	      enabled[num_enabled ++] = supported[i];
@@ -1157,7 +1198,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
       error = SSLSetEnabledCiphers(http->tls, enabled, num_enabled);
     }
   }
-#endif /* USE_SET_ENABLED_CIPHERS */
+#endif /* HAVE_SSLSETENABLEDCIPHERS */
 
   if (!error && http->mode == _HTTP_MODE_CLIENT)
   {
