@@ -41,7 +41,7 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = 0;/* Options for TLS connections */
+static int		tls_options = -1;/* Options for TLS connections */
 #endif /* HAVE_SECKEYCHAINOPEN */
 
 
@@ -1009,7 +1009,14 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   http_credential_t	*credential;	/* Credential data */
 
 
-  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+
+  if (tls_options < 0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting defaults.");
+    _cupsSetDefaults();
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+  }
 
 #ifdef HAVE_SECKEYCHAINOPEN
   if (http->mode == _HTTP_MODE_SERVER && !tls_keychain)
@@ -1131,6 +1138,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	  case TLS_RSA_PSK_WITH_NULL_SHA256 :
 	  case TLS_RSA_PSK_WITH_NULL_SHA384 :
 	  case SSL_RSA_WITH_DES_CBC_MD5 :
+	      DEBUG_printf(("4_httpTLSStart: Excluding insecure cipher suite %d", supported[i]));
 	      break;
 
           /* RC4 cipher suites that should only be used as a last resort */
@@ -1145,6 +1153,8 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	  case TLS_RSA_PSK_WITH_RC4_128_SHA :
 	      if (tls_options & _HTTP_TLS_ALLOW_RC4)
 	        enabled[num_enabled ++] = supported[i];
+	      else
+		DEBUG_printf(("4_httpTLSStart: Excluding RC4 cipher suite %d", supported[i]));
 	      break;
 
           /* DH/DHE cipher suites that are problematic with parameters < 1024 bits */
@@ -1185,6 +1195,8 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
           case TLS_DHE_PSK_WITH_AES_256_CBC_SHA384 :
               if (tls_options & _HTTP_TLS_ALLOW_DH)
 	        enabled[num_enabled ++] = supported[i];
+	      else
+		DEBUG_printf(("4_httpTLSStart: Excluding DH/DHE cipher suite %d", supported[i]));
               break;
 
           /* Anything else we'll assume is secure */

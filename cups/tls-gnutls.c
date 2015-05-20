@@ -36,7 +36,7 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = 0;/* Options for TLS connections */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -1032,7 +1032,14 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
 					/* Priority string */
 
 
-  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+
+  if (tls_options < 0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting defaults.");
+    _cupsSetDefaults();
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+  }
 
   if (http->mode == _HTTP_MODE_SERVER && !tls_keypath)
   {

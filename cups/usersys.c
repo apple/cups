@@ -1250,6 +1250,8 @@ cups_set_ssl_options(
   }
 
   cc->ssl_options = options;
+
+  DEBUG_printf(("4cups_set_ssl_options(cc=%p, value=\"%s\") options=%x", cc, value, options));
 }
 #endif /* HAVE_SSL */
 

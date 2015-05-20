@@ -54,7 +54,7 @@
  * Local globals...
  */
 
-static int		tls_options = 0;/* Options for TLS connections */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -930,7 +930,14 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
 	*hostptr;			/* Pointer into hostname */
 
 
-  DEBUG_printf(("7_httpTLSStart(http=%p)", http));
+  DEBUG_printf(("3_httpTLSStart(http=%p)", http));
+
+  if (tls_options < 0)
+  {
+    DEBUG_puts("4_httpTLSStart: Setting defaults.");
+    _cupsSetDefaults();
+    DEBUG_printf(("4_httpTLSStart: tls_options=%x", tls_options));
+  }
 
   if ((http->tls = http_sspi_alloc()) == NULL)
     return (-1);
