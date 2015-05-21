@@ -23,6 +23,13 @@
 
 
 /*
+ * Local functions...
+ */
+
+static void	usage(void);
+
+
+/*
  * 'main()' - Main entry.
  */
 
@@ -30,28 +37,99 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		i;			/* Looping var */
   http_t	*http;			/* HTTP connection */
-  const char	*server = argv[1];	/* Hostname from command-line */
-  int		port = 631;		/* Port number */
+  const char	*server = NULL;		/* Hostname from command-line */
+  int		port = 0;		/* Port number */
   const char	*cipherName = "UNKNOWN";/* Cipher suite name */
+  int		dhBits = 0;		/* Diffie-Hellman bits */
   int		tlsVersion = 0;		/* TLS version number */
-
-
-  if (argc < 2 || argc > 3)
+  char		uri[1024],		/* Printer URI */
+		scheme[32],		/* URI scheme */
+		host[256],		/* Hostname */
+		userpass[256],		/* Username/password */
+		resource[256];		/* Resource path */
+  int		tls_options = _HTTP_TLS_NONE,
+					/* TLS options */
+		verbose = 0;		/* Verbosity */
+  ipp_t		*request,		/* IPP Get-Printer-Attributes request */
+		*response;		/* IPP Get-Printer-Attributes response */
+  ipp_attribute_t *attr;		/* Current attribute */
+  const char	*name;			/* Attribute name */
+  char		value[1024];		/* Attribute (string) value */
+  static const char * const pattrs[] =	/* Requested attributes */
   {
-    puts("Usage: ./tlscheck server [port]");
-    puts("");
-    puts("The default port is 631.");
-    return (1);
-  }
+    "color-supported",
+    "compression-supported",
+    "document-format-supported",
+    "pages-per-minute",
+    "printer-location",
+    "printer-make-and-model",
+    "printer-state",
+    "printer-state-reasons",
+    "sides-supported",
+    "uri-authentication-supported",
+    "uri-security-supported"
+  };
 
-  if (argc == 3)
+
+  for (i = 1; i < argc; i ++)
   {
-    if (argv[2][0] == '=')
-      port = atoi(argv[2] + 1);
+    if (!strcmp(argv[i], "--dh"))
+    {
+      tls_options |= _HTTP_TLS_ALLOW_DH;
+    }
+    else if (!strcmp(argv[i], "--no-tls10"))
+    {
+      tls_options |= _HTTP_TLS_DENY_TLS10;
+    }
+    else if (!strcmp(argv[i], "--rc4"))
+    {
+      tls_options |= _HTTP_TLS_ALLOW_RC4;
+    }
+    else if (!strcmp(argv[i], "--verbose") || !strcmp(argv[i], "-v"))
+    {
+      verbose = 1;
+    }
+    else if (argv[i][0] == '-')
+    {
+      printf("tlscheck: Unknown option '%s'.\n", argv[i]);
+      usage();
+    }
+    else if (!server)
+    {
+      if (!strncmp(argv[i], "ipps://", 7))
+      {
+        httpSeparateURI(HTTP_URI_CODING_ALL, argv[i], scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource));
+        server = host;
+      }
+      else
+      {
+        server = argv[i];
+        strlcpy(resource, "/ipp/print", sizeof(resource));
+      }
+    }
+    else if (!port && (argv[i][0] == '=' || isdigit(argv[i][0] & 255)))
+    {
+      if (argv[i][0] == '=')
+	port = atoi(argv[i] + 1);
+      else
+	port = atoi(argv[i]);
+    }
     else
-      port = atoi(argv[2]);
+    {
+      printf("tlscheck: Unexpected argument '%s'.\n", argv[i]);
+      usage();
+    }
   }
+
+  if (!server)
+    usage();
+
+  if (!port)
+    port = 631;
+
+  _httpTLSSetOptions(tls_options);
 
   http = httpConnect2(server, port, NULL, AF_UNSPEC, HTTP_ENCRYPTION_ALWAYS, 1, 30000, NULL);
   if (!http)
@@ -588,13 +666,66 @@ main(int  argc,				/* I - Number of command-line arguments */
     httpClose(http);
     return (1);
   }
+
+  dhBits = (int)paramsLen * 8;
 #endif /* __APPLE__ */
 
-  printf("%s: OK (%d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
+  if (dhBits > 0)
+    printf("%s: OK (%d.%d, %s, %d DH bits)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName, dhBits);
+  else
+    printf("%s: OK (%d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
+
+  if (verbose)
+  {
+    httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipps", NULL, host, port, resource);
+    request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", (int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
+
+    response = cupsDoRequest(http, request, resource);
+
+    for (attr = ippFirstAttribute(response); attr; attr = ippNextAttribute(response))
+    {
+      if (ippGetGroupTag(attr) != IPP_TAG_PRINTER)
+        continue;
+
+      if ((name = ippGetName(attr)) == NULL)
+        continue;
+
+      ippAttributeString(attr, value, sizeof(value));
+      printf("    %s=%s\n", name, value);
+    }
+
+    ippDelete(response);
+  }
 
   httpClose(http);
 
   return (0);
+}
+
+
+/*
+ * 'usage()' - Show program usage.
+ */
+
+static void
+usage(void)
+{
+  puts("Usage: ./tlscheck [options] server [port]");
+  puts("       ./tlscheck [options] ipps://server[:port]/path");
+  puts("");
+  puts("Options:");
+  puts("  --dh        Allow DH/DHE key exchange");
+  puts("  --no-tls10  Disable TLS/1.0");
+  puts("  --rc4       Allow RC4 encryption");
+  puts("  --verbose   Be verbose");
+  puts("  -v          Be verbose");
+  puts("");
+  puts("The default port is 631.");
+
+  exit(1);
 }
 
 
