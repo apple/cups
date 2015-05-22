@@ -401,7 +401,7 @@ instfilter() {
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.pdf"
@@ -418,7 +418,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4.ps"
@@ -435,7 +435,7 @@ EOF
 #!/bin/sh
 trap "" TERM
 trap "" PIPE
-gziptoany "$1" "$2" "$3" "$4" "$5" \$6 \>/dev/null
+gziptoany "$1" "$2" "$3" "$4" "$5" \$6 >/dev/null
 case "\$5" in
 	*media=a4* | *media=iso_a4* | *PageSize=A4*)
 		gziptoany "$1" "$2" "$3" "$4" "$5" "$root/test/onepage-a4-300-black-1.pwg.gz"
