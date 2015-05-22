@@ -1208,26 +1208,21 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     return (-1);
   }
 
-  if (!tls_options)
-    strlcpy(priority_string, "NORMAL:-ARCFOUR-128:+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
+  strlcpy(priority_string, "NORMAL", sizeof(priority_string));
+
+  if (tls_options & _HTTP_TLS_DENY_TLS10)
+    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string));
+  else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
+    strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string));
   else
-  {
-    strlcpy(priority_string, "NORMAL", sizeof(priority_string));
+    strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string));
 
-    if (tls_options & _HTTP_TLS_DENY_TLS10)
-      strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-TLS1.0:-VERS-SSL3.0", sizeof(priority_string);
-    else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
-      strlcat(priority_string, ":+VERS-TLS-ALL", sizeof(priority_string);
-    else
-      strlcat(priority_string, ":+VERS-TLS-ALL:-VERS-SSL3.0", sizeof(priority_string);
+  if (!(tls_options & _HTTP_TLS_ALLOW_RC4))
+    strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
 
-    if (!(tls_options & _HTTP_TLS_ALLOW_RC4))
-      strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
+  if (!(tls_options & _HTTP_TLS_ALLOW_DH))
+    strlcat(priority_string, ":!DHE-RSA:!DHE-DSS:!ANON-DH", sizeof(priority_string));
 
-    if (!(tls_options & _HTTP_TLS_ALLOW_DH))
-      strlcat(priority_string, ":!DHE-RSA:!DHE-DSS:!ANON-DH", sizeof(priority_string));
-  }
-  
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   gnutls_priority_set_direct(http->tls, priority_string, NULL);
 
