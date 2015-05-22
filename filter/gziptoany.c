@@ -3,7 +3,7 @@
  *
  * GZIP/raw pre-filter for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1993-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -40,7 +40,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Check command-line...
   */
 
-  if (argc != 7)
+  if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
                     _("Usage: %s job-id user title copies options [file]"),
@@ -62,8 +62,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Open the file...
   */
 
-  if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
+  if (argc == 6)
   {
+    copies = 1;
+    fp     = cupsFileStdin();
+  }
+  else if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
+  {
+    fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", argv[6]);
     _cupsLangPrintError("ERROR", _("Unable to open print file"));
     return (1);
   }
@@ -85,7 +91,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	_cupsLangPrintFilter(stderr, "ERROR",
 			     _("Unable to write uncompressed print data: %s"),
 			     strerror(errno));
-	cupsFileClose(fp);
+        if (argc == 7)
+	  cupsFileClose(fp);
 
 	return (1);
       }
@@ -97,7 +104,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Close the file and return...
   */
 
-  cupsFileClose(fp);
+  if (argc == 7)
+    cupsFileClose(fp);
 
   return (0);
 }
