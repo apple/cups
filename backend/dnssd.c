@@ -3,7 +3,7 @@
  *
  * DNS-SD discovery backend for CUPS.
  *
- * Copyright 2008-2014 by Apple Inc.
+ * Copyright 2008-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -318,7 +318,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((simple_poll = avahi_simple_poll_new()) == NULL)
   {
     fputs("DEBUG: Unable to create Avahi simple poll object.\n", stderr);
-    return (1);
+    return (0);
   }
 
   avahi_simple_poll_set_func(simple_poll, poll_callback, NULL);
@@ -328,7 +328,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (!client)
   {
     fputs("DEBUG: Unable to create Avahi client.\n", stderr);
-    return (1);
+    return (0);
   }
 
   browsers = 6;
