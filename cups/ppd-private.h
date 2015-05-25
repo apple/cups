@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define _PPD_CACHE_VERSION	6	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	7	/* Version number in cache file */
 
 
 /*

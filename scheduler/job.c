@@ -4513,6 +4513,7 @@ static void
 set_time(cupsd_job_t *job,		/* I - Job to update */
          const char  *name)		/* I - Name of attribute */
 {
+  char			date_name[128];	/* date-time-at-xxx */
   ipp_attribute_t	*attr;		/* Time attribute */
   time_t		curtime;	/* Current time */
 
@@ -4525,6 +4526,14 @@ set_time(cupsd_job_t *job,		/* I - Job to update */
   {
     attr->value_tag         = IPP_TAG_INTEGER;
     attr->values[0].integer = curtime;
+  }
+
+  snprintf(date_name, sizeof(date_name), "date-%s", name);
+
+  if ((attr = ippFindAttribute(job->attrs, date_name, IPP_TAG_ZERO)) != NULL)
+  {
+    attr->value_tag = IPP_TAG_DATE;
+    ippSetDate(job->attrs, &attr, 0, ippTimeToDate(curtime));
   }
 
   if (!strcmp(name, "time-at-completed"))

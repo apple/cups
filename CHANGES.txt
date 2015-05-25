@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-05-19
+CHANGES.txt - 2.1b1 - 2015-05-25
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -33,3 +33,5 @@ CHANGES IN CUPS V2.1b1
 	- Long cookies caused the web interface to stop working (STR #4619)
 	- Added SSLOptions values to allow Diffie-Hellman key exchange and
 	  disable TLS/1.0 support.
+	- Updated the scheduler to support more IPP Everywhere attributes
+	  (STR #4630)

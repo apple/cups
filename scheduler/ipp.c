@@ -946,9 +946,17 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   need_restart_job = 0;
 
-  if ((attr = ippFindAttribute(con->request, "printer-location",
-                               IPP_TAG_TEXT)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&pclass->location, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-geo-location", IPP_TAG_URI)) != NULL && !strncmp(attr->values[0].string.text, "geo:", 4))
+    cupsdSetString(&pclass->geo_location, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-organization", IPP_TAG_TEXT)) != NULL)
+    cupsdSetString(&pclass->organization, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-organizational-unit", IPP_TAG_TEXT)) != NULL)
+    cupsdSetString(&pclass->organizational_unit, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-info",
                                IPP_TAG_TEXT)) != NULL)
@@ -1068,6 +1076,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "auth-info-required",
                                IPP_TAG_KEYWORD)) != NULL)
     cupsdSetAuthInfoRequired(pclass, NULL, attr);
+
+  pclass->config_time = time(NULL);
 
  /*
   * Update the printer class attributes and return...
@@ -1204,6 +1214,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_t		*unsup_col;		/* media-col in unsupported response */
   static const char * const readonly[] =/* List of read-only attributes */
   {
+    "date-time-at-completed",
+    "date-time-at-creation",
+    "date-time-at-processing",
     "job-id",
     "job-k-octets-completed",
     "job-impressions-completed",
@@ -1664,14 +1677,12 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
         	 "job-originating-host-name", NULL, con->http->hostname);
   }
 
-  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
-                time(NULL));
-  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                       "time-at-processing", 0);
-  attr->value_tag = IPP_TAG_NOVALUE;
-  attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                       "time-at-completed", 0);
-  attr->value_tag = IPP_TAG_NOVALUE;
+  ippAddOutOfBand(job->attrs, IPP_TAG_JOB, IPP_TAG_NOVALUE, "date-time-at-completed");
+  ippAddDate(job->attrs, IPP_TAG_JOB, "date-time-at-creation", ippTimeToDate(time(NULL)));
+  ippAddOutOfBand(job->attrs, IPP_TAG_JOB, IPP_TAG_NOVALUE, "date-time-at-processing");
+  ippAddOutOfBand(job->attrs, IPP_TAG_JOB, IPP_TAG_NOVALUE, "time-at-completed");
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation", time(NULL));
+  ippAddOutOfBand(job->attrs, IPP_TAG_JOB, IPP_TAG_NOVALUE, "time-at-processing");
 
  /*
   * Add remaining job attributes...
@@ -1898,6 +1909,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
                 job->state_value);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_TEXT, "job-state-message", NULL, "");
   ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-state-reasons",
                NULL, job->reasons->values[0].string.text);
 
@@ -2308,6 +2320,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&printer->location, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-geo-location", IPP_TAG_URI)) != NULL && !strncmp(attr->values[0].string.text, "geo:", 4))
+    cupsdSetString(&printer->geo_location, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-organization", IPP_TAG_TEXT)) != NULL)
+    cupsdSetString(&printer->organization, attr->values[0].string.text);
+
+  if ((attr = ippFindAttribute(con->request, "printer-organizational-unit", IPP_TAG_TEXT)) != NULL)
+    cupsdSetString(&printer->organizational_unit, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-info",
                                IPP_TAG_TEXT)) != NULL)
@@ -2781,6 +2802,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       ppdClose(ppd);
     }
   }
+
+  printer->config_time = time(NULL);
 
  /*
   * Update the printer attributes and return...
@@ -4762,6 +4785,12 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     * Generate attributes from the job structure...
     */
 
+    if (job->completed_time && (!ra || cupsArrayFind(ra, "date-time-at-completed")))
+      ippAddDate(con->response, IPP_TAG_JOB, "date-time-at-completed", ippTimeToDate(job->completed_time));
+
+    if (job->creation_time && (!ra || cupsArrayFind(ra, "date-time-at-creation")))
+      ippAddDate(con->response, IPP_TAG_JOB, "date-time-at-creation", ippTimeToDate(job->creation_time));
+
     if (!ra || cupsArrayFind(ra, "job-id"))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
 
@@ -4798,7 +4827,7 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     if (job->completed_time && (!ra || cupsArrayFind(ra, "time-at-completed")))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-completed", (int)job->completed_time);
 
-    if (job->completed_time && (!ra || cupsArrayFind(ra, "time-at-creation")))
+    if (job->creation_time && (!ra || cupsArrayFind(ra, "time-at-creation")))
       ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation", (int)job->creation_time);
   }
 }
@@ -4877,6 +4906,13 @@ copy_printer_attrs(
                  "printer-alert-description", NULL,
 		 printer->alert_description);
 
+  if (!ra || cupsArrayFind(ra, "printer-config-change-date-time"))
+    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-config-change-date-time", ippTimeToDate(printer->config_time));
+
+  if (!ra || cupsArrayFind(ra, "printer-config-change-time"))
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-config-change-time", printer->config_time);
+
   if (!ra || cupsArrayFind(ra, "printer-current-time"))
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
@@ -4949,6 +4985,9 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-state"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                   printer->state);
+
+  if (!ra || cupsArrayFind(ra, "printer-state-change-date-time"))
+    ippAddDate(con->response, IPP_TAG_PRINTER, "printer-state-change-date-time", ippTimeToDate(printer->state_time));
 
   if (!ra || cupsArrayFind(ra, "printer-state-change-time"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -7097,9 +7136,15 @@ get_printer_supported(
   */
 
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
+                "printer-geo-location", 0);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
                 "printer-info", 0);
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
                 "printer-location", 0);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
+                "printer-organization", 0);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
+                "printer-organizational-unit", 0);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -10232,6 +10277,24 @@ set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
     changed = 1;
   }
 
+  if ((attr = ippFindAttribute(con->request, "printer-geo-location", IPP_TAG_URI)) != NULL && !strncmp(attr->values[0].string.text, "geo:", 4))
+  {
+    cupsdSetString(&printer->geo_location, attr->values[0].string.text);
+    changed = 1;
+  }
+
+  if ((attr = ippFindAttribute(con->request, "printer-organization", IPP_TAG_TEXT)) != NULL)
+  {
+    cupsdSetString(&printer->organization, attr->values[0].string.text);
+    changed = 1;
+  }
+
+  if ((attr = ippFindAttribute(con->request, "printer-organizational-unit", IPP_TAG_TEXT)) != NULL)
+  {
+    cupsdSetString(&printer->organizational_unit, attr->values[0].string.text);
+    changed = 1;
+  }
+
   if ((attr = ippFindAttribute(con->request, "printer-info",
                                IPP_TAG_TEXT)) != NULL)
   {
@@ -10245,6 +10308,8 @@ set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (changed)
   {
+    printer->config_time = time(NULL);
+
     cupsdSetPrinterAttrs(printer);
     cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 

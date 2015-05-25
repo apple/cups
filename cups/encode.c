@@ -274,6 +274,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { 1, "printer-commands",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "printer-geo-location",	IPP_TAG_URI,		IPP_TAG_PRINTER },
   { 0, "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
