@@ -26,6 +26,7 @@ CHANGES IN CUPS V2.0.3
 	- ippfind incorrectly substituted "=port" for service_port.
 	- The IPP/1.1 test file did not handle the initial print job
 	  completing early (STR #4576)
+	- Fixed a memory leak in cupsConnectDest (STR #4634)
 	- Added Russian translation (STR #4577)
 
 
