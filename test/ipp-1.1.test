@@ -3,7 +3,7 @@
 #
 #   IPP/1.1 test suite.
 #
-#   Copyright 2007-2013 by Apple Inc.
+#   Copyright 2007-2015 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -429,22 +429,22 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword requested-attributes all
 
 	STATUS successful-ok
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
-	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$HTTP_URI_SCHEME"
-	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
-	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-state OF-TYPE unknown|enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT ?job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
 	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
 	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
-	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
-	EXPECT job-printer-up-time OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT ?time-at-processing OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT ?time-at-completed OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >-1
+	EXPECT ?job-printer-up-time OF-TYPE no-value|integer IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?date-time-at-creation OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?date-time-at-processing OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?date-time-at-completed OF-TYPE no-value|dateTime IN-GROUP job-attributes-tag COUNT 1
@@ -489,8 +489,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR boolean my-jobs true
 
 	STATUS successful-ok
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
@@ -613,8 +613,8 @@ DEFINE IPP_URI_SCHEME "/^ipps?://.+$$/"
 	ATTR keyword which-jobs not-completed
 
 	STATUS successful-ok
-	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
-	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
+	EXPECT ?job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$IPP_URI_SCHEME"
 	EXPECT !job-printer-uri
 	EXPECT !job-more-info
 	EXPECT !job-name
