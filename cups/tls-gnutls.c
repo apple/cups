@@ -1221,7 +1221,7 @@ _httpTLSStart(http_t *http)		/* I - Connection to server */
     strlcat(priority_string, ":-ARCFOUR-128", sizeof(priority_string));
 
   if (!(tls_options & _HTTP_TLS_ALLOW_DH))
-    strlcat(priority_string, ":!DHE-RSA:!DHE-DSS:!ANON-DH", sizeof(priority_string));
+    strlcat(priority_string, ":!ANON-DH", sizeof(priority_string));
 
 #ifdef HAVE_GNUTLS_PRIORITY_SET_DIRECT
   gnutls_priority_set_direct(http->tls, priority_string, NULL);
