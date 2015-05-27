@@ -1823,9 +1823,12 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       ippSetString(job->attrs, &job->reasons, 0, "none");
   }
 
-  job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
-                                     IPP_TAG_INTEGER);
-  job->job_sheets = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
+  job->impressions = ippFindAttribute(job->attrs, "job-impressions-completed", IPP_TAG_INTEGER);
+  job->sheets      = ippFindAttribute(job->attrs, "job-media-sheets-completed", IPP_TAG_INTEGER);
+  job->job_sheets  = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
+
+  if (!job->impressions)
+    job->impressions = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-impressions-completed", 0);
 
   if (!job->priority)
   {
@@ -4822,6 +4825,7 @@ unload_job(cupsd_job_t *job)		/* I - Job */
   job->attrs           = NULL;
   job->state           = NULL;
   job->reasons         = NULL;
+  job->impressions     = NULL;
   job->sheets          = NULL;
   job->job_sheets      = NULL;
   job->printer_message = NULL;
@@ -4880,6 +4884,25 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "PAGE: %s", message);
 
+      if (job->impressions)
+      {
+        if (!_cups_strncasecmp(message, "total ", 6))
+	{
+	 /*
+	  * Got a total count of pages from a backend or filter...
+	  */
+
+	  copies = atoi(message + 6);
+	  copies -= ippGetInteger(job->impressions, 0); /* Just track the delta */
+	}
+	else if (!sscanf(message, "%*d%d", &copies))
+	  copies = 1;
+
+        ippSetInteger(job->attrs, &job->impressions, 0, ippGetInteger(job->impressions, 0) + copies);
+        job->dirty = 1;
+	cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+      }
+
       if (job->sheets)
       {
         if (!_cups_strncasecmp(message, "total ", 6))
@@ -4889,12 +4912,14 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	  */
 
 	  copies = atoi(message + 6);
-	  copies -= job->sheets->values[0].integer; /* Just track the delta */
+	  copies -= ippGetInteger(job->sheets, 0); /* Just track the delta */
 	}
 	else if (!sscanf(message, "%*d%d", &copies))
 	  copies = 1;
 
-        job->sheets->values[0].integer += copies;
+        ippSetInteger(job->attrs, &job->sheets, 0, ippGetInteger(job->sheets, 0) + copies);
+        job->dirty = 1;
+	cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	if (job->printer->page_limit)
 	  cupsdUpdateQuota(job->printer, job->username, copies, 0);
@@ -4903,8 +4928,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cupsdLogPage(job, message);
 
       if (job->sheets)
-	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-		      "Printed %d page(s).", job->sheets->values[0].integer);
+	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job, "Printed %d page(s).", ippGetInteger(job->sheets, 0));
     }
     else if (loglevel == CUPSD_LOG_JOBSTATE)
     {

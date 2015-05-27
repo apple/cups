@@ -117,6 +117,9 @@ static const _ipp_option_t ipp_options[] =
   { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB,
 							IPP_TAG_DOCUMENT },
   { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "date-time-at-completed",IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "date-time-at-creation",	IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
+  { 0, "date-time-at-processing",IPP_TAG_DATE,		IPP_TAG_ZERO }, /* never send as option */
   { 0, "device-uri",		IPP_TAG_URI,		IPP_TAG_PRINTER },
   { 1, "document-copies",	IPP_TAG_RANGE,		IPP_TAG_JOB,
 							IPP_TAG_DOCUMENT,

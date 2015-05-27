@@ -1217,13 +1217,22 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     "date-time-at-completed",
     "date-time-at-creation",
     "date-time-at-processing",
+    "job-detailed-status-messages",
+    "job-document-access-errors",
     "job-id",
-    "job-k-octets-completed",
     "job-impressions-completed",
+    "job-k-octets-completed",
     "job-media-sheets-completed",
+    "job-pages-completed",
+    "job-printer-up-time",
+    "job-printer-uri",
     "job-state",
     "job-state-message",
     "job-state-reasons",
+    "job-uri",
+    "number-of-documents",
+    "number-of-intervening-jobs",
+    "output-device-assigned",
     "time-at-completed",
     "time-at-creation",
     "time-at-processing"
@@ -1299,22 +1308,17 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   for (i = 0; i < (int)(sizeof(readonly) / sizeof(readonly[0])); i ++)
   {
-    if ((attr = ippFindAttribute(con->request, readonly[i],
-                                 IPP_TAG_ZERO)) != NULL)
+    if ((attr = ippFindAttribute(con->request, readonly[i], IPP_TAG_ZERO)) != NULL)
     {
       ippDeleteAttribute(con->request, attr);
 
       if (StrictConformance)
       {
-	send_ipp_status(con, IPP_BAD_REQUEST,
-			_("The '%s' Job Description attribute cannot be "
-			  "supplied in a job creation request."), readonly[i]);
+	send_ipp_status(con, IPP_BAD_REQUEST, _("The '%s' Job Status attribute cannot be supplied in a job creation request."), readonly[i]);
 	return (NULL);
       }
 
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Unexpected '%s' Job Description attribute in a job "
-                      "creation request.", readonly[i]);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Unexpected '%s' Job Status attribute in a job creation request.", readonly[i]);
     }
   }
 
@@ -1694,6 +1698,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   job->state_value = (ipp_jstate_t)job->state->values[0].integer;
   job->reasons = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
                               "job-state-reasons", NULL, "job-incoming");
+  job->impressions = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-impressions-completed", 0);
   job->sheets = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
@@ -8079,6 +8084,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 	  ipp_attribute_t *uri)		/* I - Printer URI */
 {
   ipp_attribute_t *attr;		/* Current attribute */
+  ipp_attribute_t *doc_name;		/* document-name attribute */
   ipp_attribute_t *format;		/* Document-format attribute */
   const char	*default_format;	/* document-format-default value */
   cupsd_job_t	*job;			/* New job */
@@ -8156,6 +8162,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Is it a format we support?
   */
 
+  doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+  if (doc_name)
+    ippSetName(con->request, &doc_name, "document-name-supplied");
+
   if ((format = ippFindAttribute(con->request, "document-format",
                                  IPP_TAG_MIMETYPE)) != NULL)
   {
@@ -8171,6 +8181,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 		      format->values[0].string.text);
       return;
     }
+
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-supplied", NULL, ippGetString(format, 0, NULL));
   }
   else if ((default_format = cupsGetOption("document-format",
                                            printer->num_options,
@@ -8204,12 +8216,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     * Auto-type the file...
     */
 
-    ipp_attribute_t	*doc_name;	/* document-name attribute */
-
-
     cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job ???] Auto-typing file...");
 
-    doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
+
     filetype = mimeFileType(MimeDatabase, con->filename,
                             doc_name ? doc_name->values[0].string.text : NULL,
 			    &compression);
@@ -8219,6 +8228,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_INFO, "[Job ???] Request file type is %s/%s.",
 		    filetype->super, filetype->type);
+
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super, filetype->type);
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-detected", NULL, mimetype);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -8467,12 +8479,17 @@ read_job_ticket(cupsd_client_t *con)	/* I - Client connection */
     if (attr->group_tag != IPP_TAG_JOB || !attr->name)
       continue;
 
-    if (!strcmp(attr->name, "job-originating-host-name") ||
-        !strcmp(attr->name, "job-originating-user-name") ||
+    if (!strncmp(attr->name, "date-time-at-", 13) ||
+        !strcmp(attr->name, "job-impressions-completed") ||
 	!strcmp(attr->name, "job-media-sheets-completed") ||
-	!strcmp(attr->name, "job-k-octets") ||
+	!strncmp(attr->name, "job-k-octets", 12) ||
 	!strcmp(attr->name, "job-id") ||
+	!strcmp(attr->name, "job-originating-host-name") ||
+        !strcmp(attr->name, "job-originating-user-name") ||
+	!strcmp(attr->name, "job-pages-completed") ||
+	!strcmp(attr->name, "job-printer-uri") ||
 	!strncmp(attr->name, "job-state", 9) ||
+	!strcmp(attr->name, "job-uri") ||
 	!strncmp(attr->name, "time-at-", 8))
       continue; /* Read-only attrs */
 
@@ -9398,6 +9415,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   * Is it a format we support?
   */
 
+  cupsdLoadJob(job);
+
   if ((format = ippFindAttribute(con->request, "document-format",
                                  IPP_TAG_MIMETYPE)) != NULL)
   {
@@ -9412,6 +9431,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 	              format->values[0].string.text);
       return;
     }
+
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-supplied", NULL, ippGetString(format, 0, NULL));
   }
   else if ((default_format = cupsGetOption("document-format",
                                            printer->num_options,
@@ -9460,6 +9481,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (filetype)
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
 		  filetype->super, filetype->type);
+
+    snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super, filetype->type);
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format-detected", NULL, mimetype);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -9517,10 +9541,11 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   * Add the file to the job...
   */
 
-  cupsdLoadJob(job);
-
   if (add_file(con, job, filetype, compression))
     return;
+
+  if ((attr = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME)) != NULL)
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "document-name-supplied", NULL, ippGetString(attr, 0, NULL));
 
   if (stat(con->filename, &fileinfo))
     kbytes = 0;
@@ -9977,15 +10002,18 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
     if (!strcmp(attr->name, "attributes-charset") ||
 	!strcmp(attr->name, "attributes-natural-language") ||
-	!strcmp(attr->name, "document-compression") ||
-	!strcmp(attr->name, "document-format") ||
+	!strncmp(attr->name, "date-time-at-", 13) ||
+	!strncmp(attr->name, "document-compression", 20) ||
+	!strncmp(attr->name, "document-format", 15) ||
 	!strcmp(attr->name, "job-detailed-status-messages") ||
 	!strcmp(attr->name, "job-document-access-errors") ||
 	!strcmp(attr->name, "job-id") ||
 	!strcmp(attr->name, "job-impressions-completed") ||
-	!strcmp(attr->name, "job-k-octets") ||
+	!strcmp(attr->name, "job-k-octets-completed") ||
+	!strcmp(attr->name, "job-media-sheets-completed") ||
         !strcmp(attr->name, "job-originating-host-name") ||
         !strcmp(attr->name, "job-originating-user-name") ||
+	!strcmp(attr->name, "job-pages-completed") ||
 	!strcmp(attr->name, "job-printer-up-time") ||
 	!strcmp(attr->name, "job-printer-uri") ||
 	!strcmp(attr->name, "job-sheets") ||
@@ -9995,9 +10023,6 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	!strcmp(attr->name, "number-of-documents") ||
 	!strcmp(attr->name, "number-of-intervening-jobs") ||
 	!strcmp(attr->name, "output-device-assigned") ||
-	!strncmp(attr->name, "date-time-at-", 13) ||
-	!strncmp(attr->name, "job-k-octets", 12) ||
-	!strncmp(attr->name, "job-media-sheets", 16) ||
 	!strncmp(attr->name, "time-at-", 8))
     {
      /*

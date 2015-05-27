@@ -3,7 +3,7 @@
  *
  * Print job definitions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -46,7 +46,8 @@ struct cupsd_job_s			/**** Job request ****/
   int			num_files;	/* Number of files in job */
   mime_type_t		**filetypes;	/* File types */
   int			*compressions;	/* Compression status of each file */
-  ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
+  ipp_attribute_t	*impressions,	/* job-impressions-completed */
+			*sheets;	/* job-media-sheets-completed */
   time_t		access_time,	/* Last access time */
 			cancel_time,	/* When to cancel/send SIGTERM */
 			creation_time,	/* When job was created */
