@@ -41,8 +41,8 @@ static char		*tls_keypath = NULL;
 					/* Server cert keychain path */
 static _cups_mutex_t	tls_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex for keychain/certs */
-static int		tls_options = -1;/* Options for TLS connections */
 #endif /* HAVE_SECKEYCHAINOPEN */
+static int		tls_options = -1;/* Options for TLS connections */
 
 
 /*
@@ -1061,7 +1061,7 @@ _httpTLSStart(http_t *http)		/* I - HTTP connection */
   if (!error)
   {
     SSLProtocol minProtocol;
-    
+
     if (tls_options & _HTTP_TLS_DENY_TLS10)
       minProtocol = kTLSProtocol11;
     else if (tls_options & _HTTP_TLS_ALLOW_SSL3)
