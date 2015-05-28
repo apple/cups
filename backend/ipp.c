@@ -1467,6 +1467,7 @@ main(int  argc,				/* I - Number of command-line args */
              ipp_status == IPP_STATUS_ERROR_CUPS_ACCOUNT_AUTHORIZATION_FAILED)
       goto cleanup;
     else if (ipp_status == IPP_STATUS_ERROR_FORBIDDEN ||
+             ipp_status == IPP_STATUS_ERROR_NOT_AUTHORIZED ||
 	     ipp_status == IPP_STATUS_ERROR_CUPS_AUTHENTICATION_CANCELED)
     {
       const char *www_auth = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
