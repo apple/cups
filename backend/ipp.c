@@ -2026,12 +2026,8 @@ main(int  argc,				/* I - Number of command-line args */
 	                   remote_job_states[job_state->values[0].integer -
 			                     IPP_JOB_PENDING]);
 
-	  if ((job_sheets = ippFindAttribute(response,
-					     "job-media-sheets-completed",
-					     IPP_TAG_INTEGER)) == NULL)
-	    job_sheets = ippFindAttribute(response,
-					  "job-impressions-completed",
-					  IPP_TAG_INTEGER);
+	  if ((job_sheets = ippFindAttribute(response, "job-impressions-completed", IPP_TAG_INTEGER)) == NULL)
+	    job_sheets = ippFindAttribute(response, "job-media-sheets-completed", IPP_TAG_INTEGER);
 
 	  if (job_sheets)
 	    fprintf(stderr, "PAGE: total %d\n",
