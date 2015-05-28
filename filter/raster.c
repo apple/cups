@@ -706,14 +706,10 @@ cupsRasterWriteHeader2(
     fh.cupsInteger[0]        = htonl(r->header.cupsInteger[0]);
     fh.cupsInteger[1]        = htonl(r->header.cupsInteger[1]);
     fh.cupsInteger[2]        = htonl(r->header.cupsInteger[2]);
-    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] *
-                                                r->header.HWResolution[0]));
-    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] *
-                                                r->header.HWResolution[1]));
-    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] *
-                                                r->header.HWResolution[0]));
-    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] *
-                                                r->header.HWResolution[1]));
+    fh.cupsInteger[3]        = htonl((unsigned)(r->header.cupsImagingBBox[0] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[4]        = htonl((unsigned)(r->header.cupsImagingBBox[1] * r->header.HWResolution[1] / 72.0));
+    fh.cupsInteger[5]        = htonl((unsigned)(r->header.cupsImagingBBox[2] * r->header.HWResolution[0] / 72.0));
+    fh.cupsInteger[6]        = htonl((unsigned)(r->header.cupsImagingBBox[3] * r->header.HWResolution[1] / 72.0));
     fh.cupsInteger[7]        = htonl(0xffffff);
 
     return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
