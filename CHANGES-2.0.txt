@@ -30,6 +30,7 @@ CHANGES IN CUPS V2.0.3
 	- PWG Raster Format output contained invalid ImageBox values
 	  (<rdar://problem/21144309>)
 	- Added Russian translation (STR #4577)
+	- Added German translation (STR #4635)
 
 
 CHANGES IN CUPS V2.0.2
