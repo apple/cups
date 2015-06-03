@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1b1 - 2015-05-25
+CHANGES.txt - 2.1b1 - 2015-06-03
 --------------------------------
 
 CHANGES IN CUPS V2.1b1
@@ -35,3 +35,5 @@ CHANGES IN CUPS V2.1b1
 	  disable TLS/1.0 support.
 	- Updated the scheduler to support more IPP Everywhere attributes
 	  (STR #4630)
+	- The scheduler now supports advanced ASL and journald logging when
+	  "syslog" output is configured (STR #4474)

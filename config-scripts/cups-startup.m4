@@ -56,11 +56,11 @@ if test x$enable_systemd != xno; then
 	        	AC_MSG_ERROR(Need pkg-config to enable systemd support.)
                 fi
         else
-        	AC_MSG_CHECKING(for libsystemd-daemon)
-                if $PKGCONFIG --exists libsystemd-daemon; then
+        	AC_MSG_CHECKING(for libsystemd)
+                if $PKGCONFIG --exists libsystemd; then
                         AC_MSG_RESULT(yes)
-                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
-                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
+                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd`
+                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd`
                         AC_DEFINE(HAVE_SYSTEMD)
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
