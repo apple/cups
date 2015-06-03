@@ -652,21 +652,21 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (cipher == TLS_RSA_WITH_RC4_128_MD5 ||
       cipher == TLS_RSA_WITH_RC4_128_SHA)
   {
-    printf("%s: ERROR (Insecure RC4 negotiated)\n", server);
+    printf("%s: ERROR (Printers MUST NOT negotiate RC4 cipher suites.)\n", server);
     httpClose(http);
     return (1);
   }
 
   if ((err = SSLGetDiffieHellmanParams(http->tls, &params, &paramsLen)) != noErr && paramsNeeded)
   {
-    printf("%s: ERROR (Unable to get Diffie Hellman parameters - %d)\n", server, (int)err);
+    printf("%s: ERROR (Unable to get Diffie-Hellman parameters - %d)\n", server, (int)err);
     httpClose(http);
     return (1);
   }
 
   if (paramsLen < 128 && paramsLen != 0)
   {
-    printf("%s: ERROR (Diffie Hellman parameters only %d bytes/%d bits)\n", server, (int)paramsLen, (int)paramsLen * 8);
+    printf("%s: ERROR (Diffie-Hellman parameters MUST be at least 2048 bits, but Printer uses only %d bits/%d bytes)\n", server, (int)paramsLen * 8, (int)paramsLen);
     httpClose(http);
     return (1);
   }
@@ -675,9 +675,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* __APPLE__ */
 
   if (dhBits > 0)
-    printf("%s: OK (%d.%d, %s, %d DH bits)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName, dhBits);
+    printf("%s: OK (TLS: %d.%d, %s, %d DH bits)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName, dhBits);
   else
-    printf("%s: OK (%d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
+    printf("%s: OK (TLS: %d.%d, %s)\n", server, tlsVersion / 10, tlsVersion % 10, cipherName);
 
   if (verbose)
   {
