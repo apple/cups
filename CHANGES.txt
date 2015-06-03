@@ -37,3 +37,5 @@ CHANGES IN CUPS V2.1b1
 	  (STR #4630)
 	- The scheduler now supports advanced ASL and journald logging when
 	  "syslog" output is configured (STR #4474)
+	- The scheduler now supports logging to stderr when running in the
+	  foreground (STR #4505)

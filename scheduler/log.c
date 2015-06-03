@@ -125,6 +125,16 @@ cupsdCheckLogFile(cups_file_t **lf,	/* IO - Log file */
     return (1);
 
  /*
+  * Handle logging to stderr...
+  */
+
+  if (!strcmp(logname, "stderr"))
+  {
+    *lf = LogStderr;
+    return (1);
+  }
+
+ /*
   * Format the filename as needed...
   */
 

@@ -142,21 +142,24 @@ cupsdStopServer(void)
 
   if (AccessFile != NULL)
   {
-    cupsFileClose(AccessFile);
+    if (AccessFile != LogStderr)
+      cupsFileClose(AccessFile);
 
     AccessFile = NULL;
   }
 
   if (ErrorFile != NULL)
   {
-    cupsFileClose(ErrorFile);
+    if (ErrorFile != LogStderr)
+      cupsFileClose(ErrorFile);
 
     ErrorFile = NULL;
   }
 
   if (PageFile != NULL)
   {
-    cupsFileClose(PageFile);
+    if (PageFile != LogStderr)
+      cupsFileClose(PageFile);
 
     PageFile = NULL;
   }

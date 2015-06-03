@@ -3,7 +3,7 @@
  *
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -20,6 +20,12 @@
 #define _MAIN_C_
 #include "cupsd.h"
 #include <sys/resource.h>
+#ifdef HAVE_ASL_H
+#  include <asl.h>
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+#  define SD_JOURNAL_SUPPRESS_LOCATION
+#  include <systemd/sd-journal.h>
+#endif /* HAVE_ASL_H */
 #include <syslog.h>
 #include <grp.h>
 
@@ -396,6 +402,8 @@ main(int  argc,				/* I - Number of command-line args */
       close(i);
     }
   }
+  else
+    LogStderr = cupsFileStderr();
 
  /*
   * Run in the background as needed...
@@ -728,8 +736,19 @@ main(int  argc,				/* I - Number of command-line args */
 
         if (!cupsdReadConfiguration())
         {
-          syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting!",
-		 ConfigurationFile);
+#ifdef HAVE_ASL_H
+	  asl_object_t	m;		/* Log message */
+
+	  m = asl_new(ASL_TYPE_MSG);
+	  asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
+	  asl_log(NULL, m, ASL_LEVEL_ERR, "Unable to read configuration file \"%s\" - exiting.", ConfigurationFile);
+	  asl_release(m);
+#elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
+	  sd_journal_print(LOG_ERR, "Unable to read configuration file \"%s\" - exiting.", ConfigurationFile);
+#else
+          syslog(LOG_LPR, "Unable to read configuration file \'%s\' - exiting.", ConfigurationFile);
+#endif /* HAVE_ASL_H */
+
           break;
 	}
 

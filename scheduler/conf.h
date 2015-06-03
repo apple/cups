@@ -3,7 +3,7 @@
  *
  * Configuration file definitions for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -182,6 +182,8 @@ VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
 VAR cupsd_time_t	LogTimeFormat		VALUE(CUPSD_TIME_STANDARD);
 					/* Log file time format */
+VAR cups_file_t		*LogStderr		VALUE(NULL);
+					/* Stderr file, if any */
 VAR cupsd_sandboxing_t	Sandboxing		VALUE(CUPSD_SANDBOXING_STRICT);
 					/* Sandboxing level */
 VAR int			UseSandboxing	VALUE(1);
