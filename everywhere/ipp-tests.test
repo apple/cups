@@ -705,7 +705,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
-	EXPECT !media-col
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
@@ -929,7 +929,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
-	EXPECT !media-col
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
@@ -1053,7 +1053,7 @@ DEFINE SUPPLY_REGEX "/^(type\=[A-Za-z]+|(maxcapacity\=([0-9]|\-){0,1})(level\=([
 	EXPECT ?job-account-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?job-accounting-user-id OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
 	EXPECT media OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_MEDIA"
-	EXPECT !media-col
+	EXPECT ?media-col OF-TYPE collection IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1
 	EXPECT ?output-bin OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "$DEFAULT_OUTPUT_BIN"
