@@ -632,7 +632,6 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
-    char		completed[32];	/* job-impressions-completed string */
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -811,8 +810,11 @@ cupsdLogMessage(int        level,	/* I - Log level */
   }
 
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
-  sd_journal_printv(log_levels[level], message, ap);
-
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_printv(log_levels[level], message, ap);
+    return (1);
+  }
 #endif /* HAVE_ASL_H */
 
  /*
@@ -1069,7 +1071,6 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
-    char		completed[32];	/* job-impressions-completed string */
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -1081,20 +1082,8 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
       "Completed"
     };
 
-    va_start(ap, message);
-
-    do
-    {
-      va_copy(ap2, ap);
-      status = format_log_line(message, ap2);
-      va_end(ap2);
-    }
-    while (status == 0);
-
-    va_end(ap);
-
-    sd_journal_send("MESSAGE=%s", log_line,
-                    "PRIORITY=%i", log_levels[level],
+    sd_journal_send("MESSAGE=%s", buffer,
+                    "PRIORITY=%i", LOG_INFO,
 		    PWG_Event"=JobStateChanged",
 		    PWG_ServiceURI"=%s", job->printer->uri,
 		    PWG_JobID"=%d", job->id,
@@ -1299,7 +1288,11 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   }
 
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
-  sd_journal_print(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s", con->http->hostname, con->username[0] != '\0' ? con->username : "-", states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)), con->http->version / 100, con->http->version % 100, code, CUPS_LLCAST con->bytes, con->request ? ippOpString(con->request->request.op.operation_id) : "-", con->response ? ippErrorString(con->response->request.status.status_code) : "-");
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_print(LOG_INFO, "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s", con->http->hostname, con->username[0] != '\0' ? con->username : "-", states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)), con->http->version / 100, con->http->version % 100, code, CUPS_LLCAST con->bytes, con->request ? ippOpString(con->request->request.op.operation_id) : "-", con->response ? ippErrorString(con->response->request.status.status_code) : "-");
+    return (1);
+  }
 
 #elif defined(HAVE_VSYSLOG)
  /*
@@ -1393,7 +1386,11 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   }
 
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
-  sd_journal_print(log_levels[level], "%s", message);
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    sd_journal_print(log_levels[level], "%s", message);
+    return (1);
+  }
 
 #elif defined(HAVE_VSYSLOG)
  /*

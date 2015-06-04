@@ -56,15 +56,24 @@ if test x$enable_systemd != xno; then
 	        	AC_MSG_ERROR(Need pkg-config to enable systemd support.)
                 fi
         else
-        	AC_MSG_CHECKING(for libsystemd)
-                if $PKGCONFIG --exists libsystemd; then
+        	AC_MSG_CHECKING(for libsystemd-daemon)
+                if $PKGCONFIG --exists libsystemd-daemon; then
                         AC_MSG_RESULT(yes)
-                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd`
-                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd`
+                        ONDEMANDFLAGS=`$PKGCONFIG --cflags libsystemd-daemon`
+                        ONDEMANDLIBS=`$PKGCONFIG --libs libsystemd-daemon`
                         AC_DEFINE(HAVE_SYSTEMD)
 			if test "x$SYSTEMD_DIR" = x; then
 			        SYSTEMD_DIR="`$PKGCONFIG --variable=systemdsystemunitdir systemd`"
                         fi
+                else
+                        AC_MSG_RESULT(no)
+                fi
+        	AC_MSG_CHECKING(for libsystemd-journal)
+                if $PKGCONFIG --exists libsystemd-journal; then
+                        AC_MSG_RESULT(yes)
+                        ONDEMANDFLAGS="$ONDEMANDFLAGS `$PKGCONFIG --cflags libsystemd-journal`"
+                        ONDEMANDLIBS="$ONDEMANDLIBS `$PKGCONFIG --libs libsystemd-journal`"
+			AC_CHECK_HEADER(systemd/sd-journal.h,AC_DEFINE(HAVE_SYSTEMD_SD_JOURNAL_H))
                 else
                         AC_MSG_RESULT(no)
                 fi
