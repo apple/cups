@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2014-08-29 22:25-0400\n"
+"POT-Creation-Date: 2015-06-08 17:14-0400\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -1638,6 +1638,10 @@ msgid "%s: %s failed: %s"
 msgstr "%s: %s ha fallat: %s"
 
 #, c-format
+msgid "%s: Bad printer URI \"%s\"."
+msgstr ""
+
+#, c-format
 msgid "%s: Bad version %s for \"-V\"."
 msgstr ""
 
@@ -1841,12 +1845,20 @@ msgid "%s: Sorry, no encryption support."
 msgstr "%s: ho sento, no està compilada la compatibilitat pel xifrat."
 
 #, c-format
+msgid "%s: Unable to connect to \"%s:%d\": %s"
+msgstr ""
+
+#, c-format
 msgid "%s: Unable to connect to server."
 msgstr "%s: no es pot connectar al servidor."
 
 #, c-format
 msgid "%s: Unable to contact server."
 msgstr "%s: no es pot contactar amb el servidor."
+
+#, c-format
+msgid "%s: Unable to create PPD file: %s"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to determine MIME type of \"%s\"."
@@ -1867,6 +1879,10 @@ msgstr "%s: no es pot obrir el fitxer PPD: %s a la línia %d."
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"."
 msgstr "%s: no es pot llegir la base de dades MIME de «%s» o «%s»."
+
+#, c-format
+msgid "%s: Unable to resolve \"%s\"."
+msgstr ""
 
 #, c-format
 msgid "%s: Unknown destination \"%s\"."
@@ -3227,6 +3243,9 @@ msgstr "Epson"
 msgid "Error Policy"
 msgstr "Normes d'error"
 
+msgid "Error reading raster data."
+msgstr ""
+
 msgid "Error sending raster data."
 msgstr "S'ha produït un error quan s'enviaven les dades de la trama."
 
@@ -4277,8 +4296,7 @@ msgstr "No es pot fer servir l'atribut %s amb les job-ids."
 
 #, c-format
 msgid ""
-"The '%s' Job Description attribute cannot be supplied in a job creation "
-"request."
+"The '%s' Job Status attribute cannot be supplied in a job creation request."
 msgstr ""
 
 #, c-format
@@ -4772,6 +4790,9 @@ msgstr "No es pot imprimir la pàgina de prova"
 
 msgid "Unable to read print data."
 msgstr "No es poden llegir les dades d'impressió."
+
+msgid "Unable to rename job document file."
+msgstr ""
 
 msgid "Unable to resolve printer-uri."
 msgstr ""
@@ -5383,6 +5404,10 @@ msgid ""
 msgstr ""
 "lpadmin: no s'ha pogut esborrar l'opció:\n"
 "         Heu d'especificar primer un nom d'impressora."
+
+#, c-format
+msgid "lpadmin: Unable to open PPD \"%s\": %s on line %d."
+msgstr ""
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s"
