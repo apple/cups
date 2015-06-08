@@ -1156,8 +1156,8 @@ cupsdAddString(cups_array_t **a,	/* IO - String array */
   if (!*a)
     *a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
 		       (cups_ahash_func_t)NULL, 0,
-		       (cups_acopy_func_t)_cupsStrAlloc,
-		       (cups_afree_func_t)_cupsStrFree);
+		       (cups_acopy_func_t)strdup,
+		       (cups_afree_func_t)free);
 
   return (cupsArrayAdd(*a, (char *)s));
 }
@@ -1187,7 +1187,7 @@ cupsdClearString(char **s)		/* O - String value */
 {
   if (s && *s)
   {
-    _cupsStrFree(*s);
+    free(*s);
     *s = NULL;
   }
 }
@@ -1268,10 +1268,10 @@ cupsdSetString(char       **s,		/* O - New string */
     return;
 
   if (*s)
-    _cupsStrFree(*s);
+    free(*s);
 
   if (v)
-    *s = _cupsStrAlloc(v);
+    *s = strdup(v);
   else
     *s = NULL;
 }
@@ -1302,13 +1302,13 @@ cupsdSetStringf(char       **s,		/* O - New string */
     vsnprintf(v, sizeof(v), f, ap);
     va_end(ap);
 
-    *s = _cupsStrAlloc(v);
+    *s = strdup(v);
   }
   else
     *s = NULL;
 
   if (olds)
-    _cupsStrFree(olds);
+    free(olds);
 }
 
 
@@ -1468,8 +1468,7 @@ process_children(void)
 	    }
 
 	    if (job->printer_message)
-	      cupsdSetString(&(job->printer_message->values[0].string.text),
-			     message);
+	      ippSetString(job->attrs, &job->printer_message, 0, message);
 	  }
 	}
 

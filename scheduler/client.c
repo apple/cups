@@ -3,7 +3,7 @@
  *
  * Client routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * This file contains Kerberos support code, copyright 2006 by
@@ -484,7 +484,12 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
 
     httpClose(con->http);
 
-    cupsdClearString(&con->filename);
+    if (con->filename)
+    {
+      unlink(con->filename);
+      cupsdClearString(&con->filename);
+    }
+
     cupsdClearString(&con->command);
     cupsdClearString(&con->options);
     cupsdClearString(&con->query_string);
