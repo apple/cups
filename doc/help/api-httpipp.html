@@ -5,7 +5,7 @@
 	<title>HTTP and IPP APIs	</title>
 	<meta name="keywords" content="Programming">
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<meta name="creator" content="Mini-XML v2.7">
+	<meta name="creator" content="Mini-XML v2.8">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -6331,6 +6331,18 @@ are server-oriented...</p>
 <p class="description">IPP operations</p>
 <h4 class="constants">Constants</h4>
 <dl>
+<dt>IPP_OP_ACKNOWLEDGE_DOCUMENT </dt>
+<dd class="description">Acknowledge-Document</dd>
+<dt>IPP_OP_ACKNOWLEDGE_IDENTIFY_PRINTER </dt>
+<dd class="description">Acknowledge-Identify-Printer</dd>
+<dt>IPP_OP_ACKNOWLEDGE_JOB </dt>
+<dd class="description">Acknowledge-Job</dd>
+<dt>IPP_OP_ACTIVATE_PRINTER </dt>
+<dd class="description">Start a printer</dd>
+<dt>IPP_OP_CANCEL_CURRENT_JOB </dt>
+<dd class="description">Cancel the current job</dd>
+<dt>IPP_OP_CANCEL_DOCUMENT </dt>
+<dd class="description">Cancel-Document</dd>
 <dt>IPP_OP_CANCEL_JOB </dt>
 <dd class="description">Cancel a job</dd>
 <dt>IPP_OP_CANCEL_JOBS </dt>
@@ -6381,16 +6393,34 @@ are server-oriented...</p>
 <dd class="description">Reject new jobs on a printer</dd>
 <dt>IPP_OP_CUPS_SET_DEFAULT </dt>
 <dd class="description">Set the default printer</dd>
+<dt>IPP_OP_DEACTIVATE_PRINTER </dt>
+<dd class="description">Stop a printer</dd>
+<dt>IPP_OP_DELETE_DOCUMENT </dt>
+<dd class="description">Delete-Document</dd>
+<dt>IPP_OP_DEREGISTER_OUTPUT_DEVICE </dt>
+<dd class="description">Deregister-Output-Device</dd>
 <dt>IPP_OP_DISABLE_PRINTER </dt>
 <dd class="description">Stop a printer</dd>
 <dt>IPP_OP_ENABLE_PRINTER </dt>
 <dd class="description">Start a printer</dd>
+<dt>IPP_OP_FETCH_DOCUMENT </dt>
+<dd class="description">Fetch-Document</dd>
+<dt>IPP_OP_FETCH_JOB </dt>
+<dd class="description">Fetch-Job</dd>
+<dt>IPP_OP_GET_DOCUMENTS </dt>
+<dd class="description">Get-Documents</dd>
+<dt>IPP_OP_GET_DOCUMENT_ATTRIBUTES </dt>
+<dd class="description">Get-Document-Attributes</dd>
 <dt>IPP_OP_GET_JOBS </dt>
 <dd class="description">Get a list of jobs</dd>
 <dt>IPP_OP_GET_JOB_ATTRIBUTES </dt>
 <dd class="description">Get job attributes</dd>
+<dt>IPP_OP_GET_NEXT_DOCUMENT_DATA </dt>
+<dd class="description">Get-Next-Document-Data</dd>
 <dt>IPP_OP_GET_NOTIFICATIONS <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get notification events </dd>
+<dt>IPP_OP_GET_OUTPUT_DEVICE_ATTRIBUTES </dt>
+<dd class="description">Get-Output-Device-Attributes</dd>
 <dt>IPP_OP_GET_PRINTER_ATTRIBUTES </dt>
 <dd class="description">Get printer attributes</dd>
 <dt>IPP_OP_GET_PRINTER_SUPPORTED_VALUES </dt>
@@ -6401,26 +6431,70 @@ are server-oriented...</p>
 <dd class="description">Get subscription attributes </dd>
 <dt>IPP_OP_HOLD_JOB </dt>
 <dd class="description">Hold a job for printing</dd>
+<dt>IPP_OP_HOLD_NEW_JOBS </dt>
+<dd class="description">Hold new jobs</dd>
+<dt>IPP_OP_IDENTIFY_PRINTER </dt>
+<dd class="description">Identify-Printer</dd>
 <dt>IPP_OP_PAUSE_PRINTER </dt>
 <dd class="description">Stop a printer</dd>
+<dt>IPP_OP_PAUSE_PRINTER_AFTER_CURRENT_JOB </dt>
+<dd class="description">Stop printer after the current job</dd>
 <dt>IPP_OP_PRINT_JOB </dt>
 <dd class="description">Print a single file</dd>
+<dt>IPP_OP_PRINT_URI </dt>
+<dd class="description">Print a single URL</dd>
+<dt>IPP_OP_PROMOTE_JOB </dt>
+<dd class="description">Promote a job to print sooner</dd>
 <dt>IPP_OP_PURGE_JOBS </dt>
 <dd class="description">Cancel all jobs</dd>
+<dt>IPP_OP_RELEASE_HELD_NEW_JOBS </dt>
+<dd class="description">Release new jobs</dd>
 <dt>IPP_OP_RELEASE_JOB </dt>
 <dd class="description">Release a job for printing</dd>
 <dt>IPP_OP_RENEW_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
 <dd class="description">Renew a printer subscription </dd>
+<dt>IPP_OP_REPROCESS_JOB </dt>
+<dd class="description">Reprint a job</dd>
 <dt>IPP_OP_RESTART_JOB </dt>
 <dd class="description">Reprint a job</dd>
+<dt>IPP_OP_RESTART_PRINTER </dt>
+<dd class="description">Restart a printer</dd>
 <dt>IPP_OP_RESUBMIT_JOB </dt>
 <dd class="description">Resubmit-Job</dd>
+<dt>IPP_OP_RESUME_JOB </dt>
+<dd class="description">Resume the current job</dd>
 <dt>IPP_OP_RESUME_PRINTER </dt>
 <dd class="description">Start a printer</dd>
+<dt>IPP_OP_SCHEDULE_JOB_AFTER </dt>
+<dd class="description">Schedule a job to print after another</dd>
 <dt>IPP_OP_SEND_DOCUMENT </dt>
 <dd class="description">Add a file to a job</dd>
+<dt>IPP_OP_SEND_HARDCOPY_DOCUMENT </dt>
+<dd class="description">Send-Hardcopy-Document</dd>
+<dt>IPP_OP_SEND_URI </dt>
+<dd class="description">Add a URL to a job</dd>
+<dt>IPP_OP_SET_DOCUMENT_ATTRIBUTES </dt>
+<dd class="description">Set-Document-Attributes</dd>
 <dt>IPP_OP_SET_JOB_ATTRIBUTES </dt>
 <dd class="description">Set job attributes</dd>
+<dt>IPP_OP_SET_PRINTER_ATTRIBUTES </dt>
+<dd class="description">Set printer attributes</dd>
+<dt>IPP_OP_SHUTDOWN_PRINTER </dt>
+<dd class="description">Turn a printer off</dd>
+<dt>IPP_OP_STARTUP_PRINTER </dt>
+<dd class="description">Turn a printer on</dd>
+<dt>IPP_OP_SUSPEND_CURRENT_JOB </dt>
+<dd class="description">Suspend the current job</dd>
+<dt>IPP_OP_UPDATE_ACTIVE_JOBS </dt>
+<dd class="description">Update-Active-Jobs</dd>
+<dt>IPP_OP_UPDATE_DOCUMENT_STATUS </dt>
+<dd class="description">Update-Document-Status</dd>
+<dt>IPP_OP_UPDATE_JOB_STATUS </dt>
+<dd class="description">Update-Job-Status</dd>
+<dt>IPP_OP_UPDATE_OUTPUT_DEVICE_ATTRIBUTES </dt>
+<dd class="description">Update-Output-Device-Attributes</dd>
+<dt>IPP_OP_VALIDATE_DOCUMENT </dt>
+<dd class="description">Validate-Document</dd>
 <dt>IPP_OP_VALIDATE_JOB </dt>
 <dd class="description">Validate job options</dd>
 </dl>
