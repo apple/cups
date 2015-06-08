@@ -53,7 +53,7 @@ else
 
 	echo Validating sources...
 	cupsversionpatch=`echo $version | awk -F. '{if (NF == 3) { print $3 } else { print "0" } }'`
-	cupsversion=`printf "2.10%02d" $cupsversionpatch`
+	cupsversion=`printf "2.01%02d" $cupsversionpatch`
 
 	temp=`grep CUPS_VERSION cups/cups.h | grep -v CUPS_VERSION_ | awk '{print $4}'`
 	if test "$temp" != $cupsversion; then
