@@ -7,7 +7,7 @@
 # VERSIONS OF CUPS.  Instead, create a "local.types" file that
 # reflects your local configuration changes.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2007 by Easy Software Products.
 #
 # These coded instructions, statements, and computer programs are the
@@ -80,6 +80,13 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				 contains(0,4096,"LANGUAGE = POSTSCRIPT") \
 				 (contains(0,4096,<0a>%!) + \
 				  !contains(0,4096,"ENTER LANGUAGE")))
+
+application/g-code		gcode
+application/sla			stl string(0,"solid ") + contains(0,4096,"facet") + contains(0,4096,"vertex")
+application/vnd.makerbot-s3g	x3g
+model/amf			amf
+model/vnd.collada+xml		dae
+
 
 ########################################################################
 #
