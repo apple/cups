@@ -3990,10 +3990,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (ppd->num_sizes == 0 || !p->pc)
     {
-      if (!ppdFindAttr(ppd, "APScannerOnly", NULL))
+      if (!ppdFindAttr(ppd, "APScannerOnly", NULL) && !ppdFindAttr(ppd, "cups3D", NULL))
 	cupsdLogMessage(CUPSD_LOG_CRIT,
 			"The PPD file for printer %s contains no media "
-			"options and is therefore invalid!", p->name);
+			"options and is therefore invalid.", p->name);
 
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "media-default", NULL, "unknown");
@@ -4681,6 +4681,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "printer-commands", NULL, "none");
     }
+
+   /*
+    * 3D printer support...
+    */
+
+    if (ppdFindAttr(ppd, "cups3D", NULL))
+      p->type |= CUPS_PRINTER_3D;
 
    /*
     * Show current and available port monitors for this printer...
