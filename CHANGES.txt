@@ -1,5 +1,11 @@
-CHANGES.txt - 2.1b1 - 2015-06-03
---------------------------------
+CHANGES.txt - 2.1??? - 2015-06-11
+---------------------------------
+
+CHANGES IN CUPS V2.1???
+
+	- Added support for 3D printers (basic types only, no built-in filters)
+	  based on PWG white paper.
+
 
 CHANGES IN CUPS V2.1b1
 
@@ -39,6 +45,4 @@ CHANGES IN CUPS V2.1b1
 	  "syslog" output is configured (STR #4474)
 	- The scheduler now supports logging to stderr when running in the
 	  foreground (STR #4505)
-	- Added support for 3D printers (basic types only, no built-in filters)
-	  based on PWG white paper.
 
