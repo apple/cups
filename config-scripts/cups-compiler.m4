@@ -154,7 +154,7 @@ if test -n "$GCC"; then
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
-		OPTIM="-Wall -Wno-format-y2k -Wunused $OPTIM"
+		OPTIM="-Wall -Wno-format-y2k -Wunused -Wno-unused-result $OPTIM"
 
 		AC_MSG_CHECKING(whether compiler supports -Wsign-conversion)
 		OLDCFLAGS="$CFLAGS"
