@@ -496,6 +496,8 @@ do_ras_file(const char *filename)	/* I - Filename */
     free(data);
   }
 
+  printf("EOF at %ld\n", (long)lseek(fd, SEEK_CUR, 0));
+
   cupsRasterClose(ras);
   close(fd);
 
