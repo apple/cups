@@ -826,10 +826,15 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
       * Write the byte-swapped buffer...
       */
 
-      return ((unsigned)cups_raster_io(r, r->buffer, len));
+      bytes = cups_raster_io(r, r->buffer, len);
     }
     else
-      return ((unsigned)cups_raster_io(r, p, len));
+      bytes = cups_raster_io(r, p, len);
+
+    if (bytes < len)
+      return (0);
+    else
+      return (len);
   }
 
  /*
@@ -853,7 +858,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 
       if (memcmp(p, r->pcurrent, (size_t)bytes))
       {
-        if (!cups_raster_write(r, r->pixels))
+        if (cups_raster_write(r, r->pixels) <= 0)
 	  return (0);
 
 	r->count = 0;
@@ -882,10 +887,15 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	  r->remaining --;
 
 	  if (r->remaining == 0)
-	    return ((unsigned)cups_raster_write(r, r->pixels));
+	  {
+	    if (cups_raster_write(r, r->pixels) <= 0)
+	      return (0);
+	    else
+	      return (len);
+	  }
 	  else if (r->count == 256)
 	  {
-	    if (cups_raster_write(r, r->pixels) == 0)
+	    if (cups_raster_write(r, r->pixels) <= 0)
 	      return (0);
 
 	    r->count = 0;
@@ -922,7 +932,10 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
 	r->remaining --;
 
 	if (r->remaining == 0)
-	  return ((unsigned)cups_raster_write(r, r->pixels));
+	{
+	  if (cups_raster_write(r, r->pixels) <= 0)
+	    return (0);
+	}
       }
     }
   }
@@ -1029,17 +1042,24 @@ cups_raster_io(cups_raster_t *r,	/* I - Raster stream */
   {
     count = (*r->iocb)(r->ctx, buf, bytes - (size_t)total);
 
-    DEBUG_printf(("6cups_raster_io: count=%d, total=%d", (int)count,
-                  (int)total));
+    DEBUG_printf(("6cups_raster_io: count=%d, total=%d", (int)count, (int)total));
     if (count == 0)
+    {
+      DEBUG_puts("6cups_raster_io: Returning 0.");
       return (0);
+    }
     else if (count < 0)
+    {
+      DEBUG_puts("6cups_raster_io: Returning -1 on error.");
       return (-1);
+    }
 
 #ifdef DEBUG
     r->iocount += (size_t)count;
 #endif /* DEBUG */
   }
+
+  DEBUG_printf(("6cups_raster_io: Returning " CUPS_LLFMT ".", CUPS_LLCAST total));
 
   return (total);
 }
@@ -1346,8 +1366,8 @@ cups_raster_write(
   */
 
   count = r->header.cupsBytesPerLine * 2;
-  if (count < 3)
-    count = 3;
+  if (count < 65536)
+    count = 65536;
 
   if ((size_t)count > r->bufsize)
   {
@@ -1357,7 +1377,10 @@ cups_raster_write(
       wptr = malloc(count);
 
     if (!wptr)
+    {
+      DEBUG_printf(("4cups_raster_write: Unable to allocate " CUPS_LLFMT " bytes for raster buffer: %s", CUPS_LLCAST count, strerror(errno)));
       return (-1);
+    }
 
     r->buffer  = wptr;
     r->bufsize = count;
@@ -1429,6 +1452,8 @@ cups_raster_write(
       wptr += count;
     }
   }
+
+  DEBUG_printf(("4cups_raster_write: Writing " CUPS_LLFMT " bytes.", CUPS_LLCAST (wptr - r->buffer)));
 
   return (cups_raster_io(r, r->buffer, (size_t)(wptr - r->buffer)));
 }
@@ -1511,7 +1536,10 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
   while ((count = write(fd, buf, bytes)) < 0)
 #endif /* WIN32 */
     if (errno != EINTR && errno != EAGAIN)
+    {
+      DEBUG_printf(("4cups_write_fd: %s", strerror(errno)));
       return (-1);
+    }
 
   return (count);
 }
