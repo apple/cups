@@ -392,7 +392,9 @@ cupsdCheckJobs(void)
 	  * Start the job...
 	  */
 
+	  cupsArraySave(ActiveJobs);
 	  start_job(job, printer);
+	  cupsArrayRestore(ActiveJobs);
 	}
       }
     }
