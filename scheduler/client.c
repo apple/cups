@@ -2159,6 +2159,9 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
                http_status_t  code,	/* I - Error code */
 	       int            auth_type)/* I - Authentication type */
 {
+  char	location[HTTP_MAX_VALUE];	/* Location field */
+
+
   cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendError code=%d, auth_type=%d",
 		 code, auth_type);
 
@@ -2191,7 +2194,11 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   * never disable it in that case.
   */
 
+  strlcpy(location, httpGetField(con->http, HTTP_FIELD_LOCATION), sizeof(location));
+
   httpClearFields(con->http);
+
+  httpSetField(con->http, HTTP_FIELD_LOCATION, location);
 
   if (code >= HTTP_STATUS_BAD_REQUEST && con->type != CUPSD_AUTH_NEGOTIATE)
     httpSetKeepAlive(con->http, HTTP_KEEPALIVE_OFF);
