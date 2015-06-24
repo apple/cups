@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl Common configuration stuff for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -20,7 +20,7 @@ dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="2.1b1"
+CUPS_VERSION="2.1b2"
 CUPS_REVISION=""
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
