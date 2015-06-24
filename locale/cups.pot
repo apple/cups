@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-06-08 17:14-0400\n"
+"POT-Creation-Date: 2015-06-24 15:29-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3713,7 +3713,7 @@ msgstr ""
 msgid "English"
 msgstr ""
 
-#: scheduler/client.c:2219
+#: scheduler/client.c:2226
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
 
@@ -4484,7 +4484,7 @@ msgid "Long-Edge (Portrait)"
 msgstr ""
 
 #: cups/http-support.c:1725
-msgid "Looking for printer."
+msgid "Looking for printer..."
 msgstr ""
 
 #: ppdc/sample.c:260
@@ -5518,7 +5518,7 @@ msgstr ""
 msgid "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)."
 msgstr ""
 
-#: scheduler/client.c:2242
+#: scheduler/client.c:2249
 msgid "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it."
 msgstr ""
 
@@ -6281,7 +6281,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: scheduler/client.c:2229
+#: scheduler/client.c:2236
 #, c-format
 msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
 msgstr ""

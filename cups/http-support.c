@@ -3,7 +3,7 @@
  *
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1722,7 +1722,7 @@ _httpResolveURI(
 	while (time(NULL) < end_time)
 	{
 	  if (options & _HTTP_RESOLVE_STDERR)
-	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
+	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer..."));
 
 	  if (cb && !(*cb)(context))
 	  {
