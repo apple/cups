@@ -50,6 +50,9 @@ struct _cups_raster_s			/**** Raster stream data ****/
 			*bufptr,	/* Current (read) position in buffer */
 			*bufend;	/* End of current (read) buffer */
   size_t		bufsize;	/* Buffer size */
+#ifdef DEBUG
+  size_t		iocount;	/* Number of bytes read/written */
+#endif /* DEBUG */
 };
 
 
@@ -193,7 +196,7 @@ cupsRasterOpenIO(
         r->sync == CUPS_RASTER_REVSYNCv2)
       r->swapped = 1;
 
-    DEBUG_printf(("r->swapped=%d, r->sync=%08x\n", r->swapped, r->sync));
+    DEBUG_printf(("1cupsRasterOpenIO: r->swapped=%d, r->sync=%08x\n", r->swapped, r->sync));
   }
   else
   {
@@ -944,6 +947,8 @@ cups_raster_read_header(
   if (r == NULL || r->mode != CUPS_RASTER_READ)
     return (0);
 
+  DEBUG_printf(("4cups_raster_read_header: r->iocount=" CUPS_LLFMT, CUPS_LLCAST r->iocount));
+
  /*
   * Get the length of the raster header...
   */
@@ -963,7 +968,7 @@ cups_raster_read_header(
 
   if (cups_raster_read(r, (unsigned char *)&(r->header), len) < (ssize_t)len)
   {
-    DEBUG_puts("4cups_raster_read_header: EOF");
+    DEBUG_printf(("4cups_raster_read_header: EOF, r->iocount=" CUPS_LLFMT, CUPS_LLCAST r->iocount));
     return (0);
   }
 
@@ -1030,6 +1035,10 @@ cups_raster_io(cups_raster_t *r,	/* I - Raster stream */
       return (0);
     else if (count < 0)
       return (-1);
+
+#ifdef DEBUG
+    r->iocount += (size_t)count;
+#endif /* DEBUG */
   }
 
   return (total);
@@ -1060,6 +1069,8 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   */
 
   count = (ssize_t)(2 * r->header.cupsBytesPerLine);
+  if (count < 65536)
+    count = 65536;
 
   if ((size_t)count > r->bufsize)
   {
@@ -1108,6 +1119,10 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
 	r->bufptr = r->buffer;
 	r->bufend = r->buffer + remaining;
+
+#ifdef DEBUG
+        r->iocount += (size_t)remaining;
+#endif /* DEBUG */
       }
       else
       {
@@ -1119,6 +1134,10 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
 	if (count <= 0)
 	  return (0);
+
+#ifdef DEBUG
+        r->iocount += (size_t)count;
+#endif /* DEBUG */
 
 	continue;
       }
@@ -1435,7 +1454,12 @@ cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
   while ((count = read(fd, buf, bytes)) < 0)
 #endif /* WIN32 */
     if (errno != EINTR && errno != EAGAIN)
+    {
+      DEBUG_printf(("4cups_read_fd: %s", strerror(errno)));
       return (-1);
+    }
+
+  DEBUG_printf(("4cups_read_fd: Returning %d bytes.", (int)count));
 
   return (count);
 }
