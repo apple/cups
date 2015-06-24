@@ -1571,6 +1571,7 @@ main(int  argc,				/* I - Number of command-line args */
           FD_ZERO(&input);
 	  FD_SET(fd, &input);
 	  FD_SET(snmp_fd, &input);
+	  FD_SET(CUPS_SC_FD, &input);
 
           while (select(fd > snmp_fd ? fd + 1 : snmp_fd + 1, &input, NULL, NULL,
 	                NULL) <= 0 && !job_canceled);

@@ -5,6 +5,7 @@ CHANGES IN CUPS V2.0.4
 
 	- Fixed a bug in cupsRasterWritePixels (STR #4650)
 	- Fixed redirection in the web interface (STR #4538)
+	- The IPP backend did not respond to side-channel requests (STR #4645)
 
 
 CHANGES IN CUPS V2.0.3
