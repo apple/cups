@@ -222,6 +222,9 @@ cgiGetIPPObjects(ipp_t *response,	/* I - IPP response */
 	      break;
 
           case IPP_TAG_INTEGER :
+	      if (!strncmp(ippGetName(attr), "time-at-", 8))
+	        break;			/* Ignore time-at-xxx */
+
 	      for (i = 0; !add && i < attr->num_values; i ++)
 	      {
 	        char	buf[255];	/* Number buffer */
