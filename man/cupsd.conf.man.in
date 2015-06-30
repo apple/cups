@@ -3,7 +3,7 @@
 .\"
 .\" cupsd.conf man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2015 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "20 October 2014" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "30 June 2015" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -369,7 +369,8 @@ The following percent sequences are recognized:
     "%u" inserts the username.
 
 .fi
-The default is "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}".
+The default is the empty string, which disables page logging.
+The string "%p %u %j %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}" creates a page log with the standard items.
 .\"#PassEnv
 .TP 5
 \fBPassEnv \fIvariable \fR[ ... \fIvariable \fR]
@@ -869,7 +870,7 @@ Require authentication for accesses from outside the 10. network:
 .BR subscriptions.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

@@ -7,6 +7,7 @@ CHANGES IN CUPS V2.0.4
 	- Fixed redirection in the web interface (STR #4538)
 	- The IPP backend did not respond to side-channel requests (STR #4645)
 	- The scheduler did not start all pending jobs at once (STR #4646)
+	- Documentation changes (STR #4651)
 
 
 CHANGES IN CUPS V2.0.3
