@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-06-24 15:29-0400\n"
+"POT-Creation-Date: 2015-07-02 12:13-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3495,7 +3495,7 @@ msgstr ""
 msgid "Cancel RSS Subscription"
 msgstr ""
 
-#: backend/ipp.c:2205
+#: backend/ipp.c:2206
 msgid "Canceling print job."
 msgstr ""
 
@@ -4394,19 +4394,19 @@ msgstr ""
 msgid "Job #%d is not held."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1035
+#: cgi-bin/ipp-var.c:1038
 msgid "Job Completed"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1033
+#: cgi-bin/ipp-var.c:1036
 msgid "Job Created"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1039
+#: cgi-bin/ipp-var.c:1042
 msgid "Job Options Changed"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1037
+#: cgi-bin/ipp-var.c:1040
 msgid "Job Stopped"
 msgstr ""
 
@@ -4616,11 +4616,11 @@ msgstr ""
 msgid "Modify Printer"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:410 cgi-bin/ipp-var.c:501
+#: cgi-bin/ipp-var.c:413 cgi-bin/ipp-var.c:504
 msgid "Move All Jobs"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:349 cgi-bin/ipp-var.c:408 cgi-bin/ipp-var.c:499
+#: cgi-bin/ipp-var.c:352 cgi-bin/ipp-var.c:411 cgi-bin/ipp-var.c:502
 msgid "Move Job"
 msgstr ""
 
@@ -4693,7 +4693,7 @@ msgstr ""
 msgid "No default printer."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:421 scheduler/ipp.c:7160
+#: cgi-bin/ipp-var.c:424 scheduler/ipp.c:7160
 msgid "No destinations added."
 msgstr ""
 
@@ -5046,7 +5046,7 @@ msgstr ""
 msgid "Print Speed"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:777
+#: cgi-bin/ipp-var.c:780
 msgid "Print Test Page"
 msgstr ""
 
@@ -5062,19 +5062,19 @@ msgstr ""
 msgid "Print file sent."
 msgstr ""
 
-#: backend/ipp.c:2179
+#: backend/ipp.c:2180
 msgid "Print job canceled at printer."
 msgstr ""
 
-#: backend/ipp.c:2171
+#: backend/ipp.c:2172
 msgid "Print job too large."
 msgstr ""
 
-#: backend/ipp.c:1653
+#: backend/ipp.c:1654
 msgid "Print job was not accepted."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1027
+#: cgi-bin/ipp-var.c:1030
 msgid "Printer Added"
 msgstr ""
 
@@ -5082,15 +5082,15 @@ msgstr ""
 msgid "Printer Default"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1031
+#: cgi-bin/ipp-var.c:1034
 msgid "Printer Deleted"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1029
+#: cgi-bin/ipp-var.c:1032
 msgid "Printer Modified"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1025
+#: cgi-bin/ipp-var.c:1028
 msgid "Printer Paused"
 msgstr ""
 
@@ -5098,11 +5098,11 @@ msgstr ""
 msgid "Printer Settings"
 msgstr ""
 
-#: backend/ipp.c:2174
+#: backend/ipp.c:2175
 msgid "Printer cannot print supplied content."
 msgstr ""
 
-#: backend/ipp.c:2177
+#: backend/ipp.c:2178
 msgid "Printer cannot print with supplied options."
 msgstr ""
 
@@ -5195,19 +5195,19 @@ msgstr ""
 msgid "Sending data to printer."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1041
+#: cgi-bin/ipp-var.c:1044
 msgid "Server Restarted"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1047
+#: cgi-bin/ipp-var.c:1050
 msgid "Server Security Auditing"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1043
+#: cgi-bin/ipp-var.c:1046
 msgid "Server Started"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:1045
+#: cgi-bin/ipp-var.c:1048
 msgid "Server Stopped"
 msgstr ""
 
@@ -5408,7 +5408,7 @@ msgid "The printer did not respond."
 msgstr ""
 
 #: backend/ipp.c:829 backend/ipp.c:948 backend/ipp.c:1062 backend/ipp.c:1459
-#: backend/ipp.c:1625 backend/lpd.c:836 backend/socket.c:379
+#: backend/ipp.c:1626 backend/lpd.c:836 backend/socket.c:379
 #: backend/usb-unix.c:124 backend/usb-unix.c:414 backend/usb-unix.c:497
 msgid "The printer is in use."
 msgstr ""
@@ -5634,7 +5634,7 @@ msgstr ""
 msgid "Unable to add class"
 msgstr ""
 
-#: backend/ipp.c:1807
+#: backend/ipp.c:1808
 msgid "Unable to add document to print job."
 msgstr ""
 
@@ -5663,7 +5663,7 @@ msgstr ""
 msgid "Unable to cancel RSS subscription"
 msgstr ""
 
-#: backend/ipp.c:2084 backend/ipp.c:2532
+#: backend/ipp.c:2085 backend/ipp.c:2533
 msgid "Unable to cancel print job."
 msgstr ""
 
@@ -5801,7 +5801,7 @@ msgstr ""
 msgid "Unable to establish a secure connection to host."
 msgstr ""
 
-#: cgi-bin/ipp-var.c:350
+#: cgi-bin/ipp-var.c:353
 msgid "Unable to find destination for job"
 msgstr ""
 
@@ -5813,7 +5813,7 @@ msgstr ""
 msgid "Unable to find server credentials."
 msgstr ""
 
-#: backend/ipp.c:3220
+#: backend/ipp.c:3221
 msgid "Unable to get backend exit status."
 msgstr ""
 
@@ -5877,11 +5877,11 @@ msgstr ""
 msgid "Unable to modify printer"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:417 cgi-bin/ipp-var.c:506
+#: cgi-bin/ipp-var.c:420 cgi-bin/ipp-var.c:509
 msgid "Unable to move job"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:419 cgi-bin/ipp-var.c:508
+#: cgi-bin/ipp-var.c:422 cgi-bin/ipp-var.c:511
 msgid "Unable to move jobs"
 msgstr ""
 
@@ -5906,7 +5906,7 @@ msgstr ""
 msgid "Unable to open help file."
 msgstr ""
 
-#: backend/ipp.c:382 backend/ipp.c:1554 backend/ipp.c:1762 backend/lpd.c:496
+#: backend/ipp.c:382 backend/ipp.c:1554 backend/ipp.c:1763 backend/lpd.c:496
 #: backend/socket.c:150 backend/usb.c:237 filter/gziptoany.c:73
 #: filter/pstops.c:270
 msgid "Unable to open print file"
@@ -5917,7 +5917,7 @@ msgstr ""
 msgid "Unable to open raster file"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:780
+#: cgi-bin/ipp-var.c:783
 msgid "Unable to print test page"
 msgstr ""
 
@@ -5943,7 +5943,7 @@ msgstr ""
 msgid "Unable to see in file"
 msgstr ""
 
-#: cgi-bin/ipp-var.c:583 cgi-bin/ipp-var.c:603
+#: cgi-bin/ipp-var.c:586 cgi-bin/ipp-var.c:606
 msgid "Unable to send command to printer driver"
 msgstr ""
 
@@ -5964,7 +5964,7 @@ msgstr ""
 msgid "Unable to set server default"
 msgstr ""
 
-#: backend/ipp.c:3079 backend/ipp.c:3156 backend/ipp.c:3164
+#: backend/ipp.c:3080 backend/ipp.c:3157 backend/ipp.c:3165
 msgid "Unable to start backend process."
 msgstr ""
 
@@ -6257,7 +6257,7 @@ msgstr ""
 msgid "Version uses indefinite length"
 msgstr ""
 
-#: backend/ipp.c:1924
+#: backend/ipp.c:1925
 msgid "Waiting for job to complete."
 msgstr ""
 

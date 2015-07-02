@@ -311,7 +311,7 @@ normalize_string(const char *idstr,	/* I - msgid string */
     if (*idstr == '.' && idstr[1] == '.' && idstr[2] == '.')
     {
      /*
-      * Convert "..." to Unicode ellipsis...
+      * Convert ... to Unicode ellipsis...
       */
 
       *bufptr++ = (char)0xE2;
@@ -319,12 +319,12 @@ normalize_string(const char *idstr,	/* I - msgid string */
       *bufptr++ = (char)0xA6;
       idstr += 2;
     }
-    else if (*idstr == '\"')
+    else if (*idstr == '\\' && idstr[1] == '\"')
     {
       if (quote)
       {
        /*
-        * Convert " to right quote.
+        * Convert \" to Unicode right (curley) double quote.
         */
 
 	*bufptr++ = (char)0xE2;
@@ -334,7 +334,7 @@ normalize_string(const char *idstr,	/* I - msgid string */
       else
       {
        /*
-        * Convert " to left quote.
+        * Convert \" to Unicode left (curley) double quote.
         */
 
 	*bufptr++ = (char)0xE2;
@@ -343,6 +343,7 @@ normalize_string(const char *idstr,	/* I - msgid string */
       }
 
       quote = !quote;
+      idstr ++;
     }
     else
       *bufptr++ = *idstr;
