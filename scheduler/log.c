@@ -812,7 +812,9 @@ cupsdLogMessage(int        level,	/* I - Log level */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
+    va_start(ap, message);
     sd_journal_printv(log_levels[level], message, ap);
+    va_end(ap);
     return (1);
   }
 #endif /* HAVE_ASL_H */
