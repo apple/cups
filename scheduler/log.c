@@ -595,6 +595,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     asl_object_t	m;		/* Log message */
     char		job_id[32],	/* job-id string */
 			completed[32];	/* job-impressions-completed string */
+    cupsd_printer_t *printer = job->printer ? job->printer : cupsdFindDest(job->dest);
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -611,7 +612,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     m = asl_new(ASL_TYPE_MSG);
     asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
     asl_set(m, PWG_Event, "JobStateChanged");
-    asl_set(m, PWG_ServiceURI, job->printer->uri);
+    asl_set(m, PWG_ServiceURI, printer->uri);
     asl_set(m, PWG_JobID, job_id);
     asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
 
@@ -632,6 +633,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
+    cupsd_printer_t *printer = job->printer ? job->printer : cupsdFindDest(job->dest);
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -658,7 +660,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     sd_journal_send("MESSAGE=%s", log_line,
                     "PRIORITY=%i", log_levels[level],
 		    PWG_Event"=JobStateChanged",
-		    PWG_ServiceURI"=%s", job->printer->uri,
+		    PWG_ServiceURI"=%s", printer->uri,
 		    PWG_JobID"=%d", job->id,
 		    PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
 		    PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
@@ -887,7 +889,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	    break;
 
         case 'p' :			/* Printer name */
-	    strlcpy(bufptr, job->printer->name, sizeof(buffer) - (size_t)(bufptr - buffer));
+	    strlcpy(bufptr, job->dest, sizeof(buffer) - (size_t)(bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
 
