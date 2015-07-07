@@ -213,8 +213,6 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
 			 "Job canceled by user.");
     }
   }
-
-  cupsdCheckJobs();
 }
 
 
@@ -3526,13 +3524,6 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
   job->printer->job = NULL;
   job->printer      = NULL;
-
- /*
-  * Try printing another job...
-  */
-
-  if (printer_state != IPP_PRINTER_STOPPED)
-    cupsdCheckJobs();
 }
 
 
@@ -4849,6 +4840,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		*ptr;			/* Pointer update... */
   int		loglevel,		/* Log level for message */
 		event = 0;		/* Events? */
+  cupsd_printer_t *printer = job->printer;
+					/* Printer */
   static const char * const levels[] =	/* Log levels */
 		{
 		  "NONE",
@@ -5222,10 +5215,11 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     finalize_job(job, 1);
 
    /*
-    * Check for new jobs...
+    * Try printing another job...
     */
 
-    cupsdCheckJobs();
+    if (printer->state != IPP_PRINTER_STOPPED)
+      cupsdCheckJobs();
   }
 }
 

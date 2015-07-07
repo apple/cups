@@ -3312,6 +3312,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
   }
 
   con->response->request.status.status_code = IPP_OK;
+
+  cupsdCheckJobs();
 }
 
 
