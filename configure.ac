@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl Configuration script for CUPS.
 dnl
-dnl Copyright 2007-2014 by Apple Inc.
+dnl Copyright 2007-2015 by Apple Inc.
 dnl Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl These coded instructions, statements, and computer programs are the
@@ -13,7 +13,11 @@ dnl which should have been included with this file.  If this file is
 dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_INIT(cups/cups.h)
+dnl We need at least autoconf 2.60...
+AC_PREREQ(2.60)
+
+dnl Package name and version...
+AC_INIT([CUPS], [2.1rc1])
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)

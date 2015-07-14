@@ -13,18 +13,26 @@ dnl which should have been included with this file.  If this file is
 dnl file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-dnl We need at least autoconf 2.60...
-AC_PREREQ(2.60)
-
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number information...
-CUPS_VERSION="2.1rc1"
-CUPS_REVISION=""
-#if test -z "$CUPS_REVISION" -a -d .svn; then
-#	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-#fi
+CUPS_VERSION="AC_PACKAGE_VERSION"
+
+case "$CUPS_VERSION" in
+	*svn)
+		if test -z "$CUPS_REVISION" -a -d .svn; then
+			CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+		else
+			CUPS_REVISION=""
+		fi
+		;;
+
+	*)
+		CUPS_REVISION=""
+		;;
+esac
+
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],
@@ -33,8 +41,8 @@ AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" str
 AC_SUBST(CUPS_VERSION)
 AC_SUBST(CUPS_REVISION)
 AC_SUBST(CUPS_BUILD)
-AC_DEFINE_UNQUOTED(CUPS_SVERSION, "CUPS v$CUPS_VERSION$CUPS_REVISION")
-AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION$CUPS_REVISION")
+AC_DEFINE_UNQUOTED(CUPS_SVERSION, "AC_PACKAGE_NAME v$CUPS_VERSION$CUPS_REVISION")
+AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "AC_PACKAGE_NAME/$CUPS_VERSION$CUPS_REVISION")
 
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"

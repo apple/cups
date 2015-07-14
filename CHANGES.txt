@@ -7,6 +7,7 @@ CHANGES IN CUPS V2.1rc1
 	  based on PWG white paper.
 	- Fixed bugs in the new journald support (STR #4655, STR #4658)
 	- Configure script changes for systemd support (STR #4669)
+	- Updated autoconf sources to use newer form of AC_INIT (STR #4664)
 
 
 CHANGES IN CUPS V2.1b1
