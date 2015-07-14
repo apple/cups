@@ -1,11 +1,12 @@
-CHANGES.txt - 2.1b2 - 2015-07-02
+CHANGES.txt - 2.1rc1 - 2015-07-14
 ---------------------------------
 
-CHANGES IN CUPS V2.1b2
+CHANGES IN CUPS V2.1rc1
 
 	- Added support for 3D printers (basic types only, no built-in filters)
 	  based on PWG white paper.
 	- Fixed bugs in the new journald support (STR #4655, STR #4658)
+	- Configure script changes for systemd support (STR #4669)
 
 
 CHANGES IN CUPS V2.1b1
