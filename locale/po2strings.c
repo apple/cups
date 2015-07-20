@@ -319,7 +319,7 @@ normalize_string(const char *idstr,	/* I - msgid string */
       *bufptr++ = (char)0xA6;
       idstr += 2;
     }
-    else if (*idstr == '\\' && idstr[1] == '\"')
+    else if (*idstr == '\\' && idstr[1] == '\"' && strchr(idstr + 2, '\"') != NULL)
     {
       if (quote)
       {
