@@ -303,11 +303,17 @@ normalize_string(const char *idstr,	/* I - msgid string */
 {
   char	*bufptr = buffer,		/* Pointer into buffer */
 	*bufend = buffer + bufsize - 3;	/* End of buffer */
-  int	quote = 0;			/* Quote direction */
+  int	quote = 0,			/* Quote direction */
+	html = 0;			/* HTML text */
 
 
   while (*idstr && bufptr < bufend)
   {
+    if (!strncmp(idstr, "<A ", 3))
+      html = 1;
+    else if (html && *idstr == '>')
+      html = 0;
+
     if (*idstr == '.' && idstr[1] == '.' && idstr[2] == '.')
     {
      /*
@@ -319,7 +325,7 @@ normalize_string(const char *idstr,	/* I - msgid string */
       *bufptr++ = (char)0xA6;
       idstr += 2;
     }
-    else if (*idstr == '\\' && idstr[1] == '\"' && strchr(idstr + 2, '\"') != NULL)
+    else if (!html && *idstr == '\\' && idstr[1] == '\"' && (quote || strchr(idstr + 2, '\"') != NULL))
     {
       if (quote)
       {
