@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- * Copyright 2005-2014 Apple Inc. All rights reserved.
+ * Copyright 2005-2015 Apple Inc. All rights reserved.
  *
  * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
  * Inc. ("Apple") in consideration of your agreement to the following
@@ -241,6 +241,7 @@ typedef struct globals_s
   ssize_t		debug_bytes;	/* Current bytes to read */
 #endif /* DEBUG_WRITES */
 
+  Boolean		use_generic_class_driver;
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
   int			bidi_flag;	/* 0=unidirectional, 1=bidirectional */
@@ -957,6 +958,27 @@ static void *read_thread(void *reference)
 
   } while (g.wait_eof || !g.read_thread_stop);	/* Abort from main thread tests error here */
 
+  /* Workaround for usb race condition. <rdar://problem/21882551> */
+  if (!g.wait_eof && g.use_generic_class_driver)
+  {
+     const char *pdl = getenv("FINAL_CONTENT_TYPE");
+     if (pdl && strcmp(pdl, "application/vnd.cups-postscript") == 0)
+     {
+       while (readstatus == kIOReturnSuccess && ((rbytes > 0 && readbuffer[rbytes-1] != 0x4) || rbytes == 0))
+       {
+         start = mach_absolute_time();
+
+         rbytes = sizeof(readbuffer);
+         readstatus = (*g.classdriver)->ReadPipe(g.classdriver, readbuffer, &rbytes);
+         if (readstatus == kIOReturnSuccess && rbytes > 0 && readbuffer[rbytes-1] == 0x4)
+           break;
+
+         /* Make sure this loop executes no more than once every 250 miliseconds... */
+         mach_wait_until(start + delay);
+       }
+     }
+  }
+
  /*
   * Let the main thread know that we have completed the read thread...
   */
@@ -1262,7 +1284,7 @@ static Boolean list_device_cb(void *refcon, io_service_t obj, CFStringRef device
 
         cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
                           NULL);
-    
+
         if (make != NULL) CFRelease(make);
         if (model != NULL) CFRelease(model);
         if (serial != NULL) CFRelease(serial);
@@ -1519,6 +1541,7 @@ static kern_return_t load_printerdriver(CFStringRef *driverBundlePath)
     {
       *driverBundlePath = IORegistryEntryCreateCFProperty(g.printer_obj, kUSBClassDriverProperty, NULL, kNilOptions);
 
+      g.use_generic_class_driver = (*driverBundlePath == NULL || (CFStringCompare(*driverBundlePath, kUSBGenericTOPrinterClassDriver, 0x0) == kCFCompareEqualTo));
       kr = load_classdriver(*driverBundlePath, interface, &g.classdriver);
 
       if (kr != kIOReturnSuccess)
@@ -1722,10 +1745,10 @@ static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **
 
 	if (manufacturer != NULL)
 		CFRelease(manufacturer);
-  
+
 	if (model != NULL)
 		CFRelease(model);
-  
+
 	if (serial != NULL)
 		CFRelease(serial);
 
@@ -1734,7 +1757,7 @@ static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **
 		CFRelease(ret);
 		return NULL;
 	}
-	
+
 	return ret;
 }
 
