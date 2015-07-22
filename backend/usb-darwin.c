@@ -95,7 +95,7 @@ extern char **environ;
 #define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			5000L
 
-#define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
+#define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID245)
 #define kUSBLanguageEnglish		0x409
 
 #define PRINTER_POLLING_INTERVAL	5			/* seconds */
@@ -140,7 +140,7 @@ struct crashreporter_annotations_t gCRAnnotations
 #define kUSBPrintingProtocolBidirectional	2
 #define kUSBPrintingProtocolIPP			4
 
-typedef IOUSBInterfaceInterface190	**printer_interface_t;
+typedef IOUSBInterfaceInterface245	**printer_interface_t;
 
 typedef struct iodevice_request_s	/**** Device request ****/
 {
@@ -301,10 +301,10 @@ static const char *next_line (const char *buffer);
 static void parse_pserror (char *sockBuffer, int len);
 #endif /* PARSE_PS_ERRORS */
 
-static IOUSBInterfaceInterface220 **usb_interface220_for_service(io_service_t usbClass);
+static printer_interface_t usb_printer_interface_interface(io_service_t usbClass);
 static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDevice);
-static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting);
-static CFStringRef copy_printer_interface_indexed_description(IOUSBInterfaceInterface220 ** printer, UInt8 index, UInt16 language);
+static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, UInt8 alternateSetting);
+static CFStringRef copy_printer_interface_indexed_description(printer_interface_t  printer, UInt8 index, UInt16 language);
 static CFStringRef deviceIDCopyManufacturer(CFStringRef deviceID);
 static CFStringRef deviceIDCopyModel(CFStringRef deviceID);
 static CFStringRef deviceIDCopySerialNumber(CFStringRef deviceID);
@@ -1185,19 +1185,19 @@ static void device_added(void *userdata, io_iterator_t iterator)
 
         while (reference->keepRunning && (intf = IOIteratorNext(intfIterator)))
         {
-            IOUSBInterfaceInterface220 **intf220 = usb_interface220_for_service(intf);
-            if (intf220 != NULL)
+            printer_interface_t printerIntf = usb_printer_interface_interface(intf);
+            if (printerIntf != NULL)
             {
                 UInt8 intfClass = 0, intfSubclass = 0, intfProtocol = 0, intfNumber = 0;
 
-                (*intf220)->GetInterfaceClass(intf220, &intfClass);
-                (*intf220)->GetInterfaceSubClass(intf220, &intfSubclass);
-                (*intf220)->GetInterfaceProtocol(intf220, &intfProtocol);
-                (*intf220)->GetInterfaceNumber(intf220, &intfNumber);
+                (*printerIntf)->GetInterfaceClass(printerIntf, &intfClass);
+                (*printerIntf)->GetInterfaceSubClass(printerIntf, &intfSubclass);
+                (*printerIntf)->GetInterfaceProtocol(printerIntf, &intfProtocol);
+                (*printerIntf)->GetInterfaceNumber(printerIntf, &intfNumber);
 
                 if (IsPrintingInterface(intfClass, intfSubclass, intfProtocol))
                 {
-                    CFStringRef deviceIDString = copy_printer_interface_deviceid(intf220, 0);
+                    CFStringRef deviceIDString = copy_printer_interface_deviceid(printerIntf, 0);
                     if (deviceIDString != NULL)
                     {
                         reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, 0);
@@ -1206,7 +1206,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
                 }
 
                 IOUSBInterfaceDescriptor *intfDesc = NULL;
-                while (reference->keepRunning && (intfDesc = (IOUSBInterfaceDescriptor *)(*intf220)->FindNextAssociatedDescriptor(intf220, intfDesc, kUSBInterfaceDesc)))
+                while (reference->keepRunning && (intfDesc = (IOUSBInterfaceDescriptor *)(*printerIntf)->FindNextAssociatedDescriptor(printerIntf, intfDesc, kUSBInterfaceDesc)))
                 {
                     intfClass = intfDesc->bInterfaceClass;
                     intfSubclass = intfDesc->bInterfaceSubClass;
@@ -1214,7 +1214,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
 
                     if ((IsPrintingInterface(intfClass, intfSubclass, intfProtocol)))
                     {
-                        CFStringRef deviceIDString = copy_printer_interface_deviceid(intf220, intfDesc->bAlternateSetting);
+                        CFStringRef deviceIDString = copy_printer_interface_deviceid(printerIntf, intfDesc->bAlternateSetting);
                         if (deviceIDString != NULL)
                         {
                             reference->keepRunning = reference->callback(userdata, intf, deviceIDString, locationID, intfNumber, intfDesc->bAlternateSetting);
@@ -1222,7 +1222,7 @@ static void device_added(void *userdata, io_iterator_t iterator)
                         }
                     }
                 }
-                (*intf220)->Release(intf220);
+                (*printerIntf)->Release(printerIntf);
             }
             IOObjectRelease(intf);
         }
@@ -1552,15 +1552,15 @@ static kern_return_t load_printerdriver(CFStringRef *driverBundlePath)
   return kr;
 }
 
-static IOUSBInterfaceInterface220 **usb_interface220_for_service(io_service_t usbClass)
+static printer_interface_t usb_printer_interface_interface(io_service_t usbClass)
 {
-	IOUSBInterfaceInterface220 ** intf = NULL;
+	printer_interface_t  intf = NULL;
 	IOCFPlugInInterface **plugin = NULL;
 	SInt32	score;
 	int kr = IOCreatePlugInInterfaceForService(usbClass, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
 	if (kr == kIOReturnSuccess)
 	{
-		(*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID220), (LPVOID *)&intf);
+		(*plugin)->QueryInterface(plugin, USB_INTERFACE_KIND, (LPVOID *)&intf);
 		IODestroyPlugInInterface(plugin);
 	}
 
@@ -1584,7 +1584,7 @@ static IOUSBDeviceInterface **usb_device_interface_for_device(io_service_t usbDe
 }
 
 
-static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **printer, UInt8 alternateSetting)
+static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, UInt8 alternateSetting)
 {
 	// I have tried to make this function as neat as I can, but the possibility of needing to resend
 	// a request to get the entire string makes it hideous...
@@ -1761,7 +1761,7 @@ static CFStringRef copy_printer_interface_deviceid(IOUSBInterfaceInterface220 **
 	return ret;
 }
 
-static CFStringRef copy_printer_interface_indexed_description(IOUSBInterfaceInterface220 ** printer, UInt8 index, UInt16 language)
+static CFStringRef copy_printer_interface_indexed_description(printer_interface_t  printer, UInt8 index, UInt16 language)
 {
 	IOReturn err;
 	UInt8 description[256]; // Max possible descriptor length
@@ -2483,11 +2483,11 @@ static void get_device_id(cups_sc_status_t *status,
 
   if (g.printer_obj != IO_OBJECT_NULL)
   {
-    IOUSBInterfaceInterface220 **intf220 = usb_interface220_for_service(g.printer_obj);
-    if (intf220)
+    printer_interface_t printerIntf = usb_printer_interface_interface(g.printer_obj);
+    if (printerIntf)
     {
-      deviceIDString = copy_printer_interface_deviceid(intf220, g.alternateSetting);
-      (*intf220)->Release(intf220);
+      deviceIDString = copy_printer_interface_deviceid(printerIntf, g.alternateSetting);
+      (*printerIntf)->Release(printerIntf);
     }
   }
 
