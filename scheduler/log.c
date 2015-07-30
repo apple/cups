@@ -595,7 +595,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     asl_object_t	m;		/* Log message */
     char		job_id[32],	/* job-id string */
 			completed[32];	/* job-impressions-completed string */
-    cupsd_printer_t *printer = job->printer ? job->printer : cupsdFindDest(job->dest);
+    cupsd_printer_t *printer = job ? (job->printer ? job->printer : (job->dest ? cupsdFindDest(job->dest) : NULL)) : NULL;
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -607,19 +607,23 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
       "Completed"
     };
 
-    snprintf(job_id, sizeof(job_id), "%d", job->id);
-
     m = asl_new(ASL_TYPE_MSG);
     asl_set(m, ASL_KEY_FACILITY, "org.cups.cupsd");
-    asl_set(m, PWG_Event, "JobStateChanged");
-    asl_set(m, PWG_ServiceURI, printer->uri);
-    asl_set(m, PWG_JobID, job_id);
-    asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
-
-    if (job->impressions)
+    if (printer)
+      asl_set(m, PWG_ServiceURI, printer->uri);
+    if (job)
     {
-      snprintf(completed, sizeof(completed), "%d", ippGetInteger(job->impressions, 0));
-      asl_set(m, PWG_JobImpressionsCompleted, completed);
+      snprintf(job_id, sizeof(job_id), "%d", job->id);
+
+      asl_set(m, PWG_Event, "JobStateChanged");
+      asl_set(m, PWG_JobID, job_id);
+      asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
+
+      if (job->impressions)
+      {
+	snprintf(completed, sizeof(completed), "%d", ippGetInteger(job->impressions, 0));
+	asl_set(m, PWG_JobImpressionsCompleted, completed);
+      }
     }
 
     va_start(ap, message);
@@ -633,7 +637,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
-    cupsd_printer_t *printer = job->printer ? job->printer : cupsdFindDest(job->dest);
+    cupsd_printer_t *printer = job->printer ? job->printer : job->dest ? cupsdFindDest(job->dest) : NULL;
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
@@ -657,17 +661,22 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 
     va_end(ap);
 
-    sd_journal_send("MESSAGE=%s", log_line,
-                    "PRIORITY=%i", log_levels[level],
-		    PWG_Event"=JobStateChanged",
-		    PWG_ServiceURI"=%s", printer->uri,
-		    PWG_JobID"=%d", job->id,
-		    PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
-		    PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
-		    NULL);
+    if (job)
+      sd_journal_send("MESSAGE=%s", log_line,
+		      "PRIORITY=%i", log_levels[level],
+		      PWG_Event"=JobStateChanged",
+		      PWG_ServiceURI"=%s", printer ? printer->uri : "",
+		      PWG_JobID"=%d", job->id,
+		      PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
+		      PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
+		      NULL);
+    else
+      sd_journal_send("MESSAGE=%s", log_line,
+		      "PRIORITY=%i", log_levels[level],
+		      NULL);
+
     return (1);
   }
-
 #endif /* HAVE_ASL_H */
 
  /*
