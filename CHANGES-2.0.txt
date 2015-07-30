@@ -11,6 +11,7 @@ CHANGES IN CUPS V2.0.4
 	- Fixed an RPM spec file issue (STR #4657)
 	- The scheduler incorrectly started jobs while canceling multiple jobs
 	  (STR #4648)
+	- Fixed processing of server overrides without port numbers (STR #4675)
 	- Documentation changes (STR #4651)
 
 
