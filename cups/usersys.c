@@ -1012,7 +1012,7 @@ cups_finalize_client_conf(
     struct stat	sockinfo;		/* Domain socket information */
 
     if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
-	(sockinfo.st_mode & S_IRWXO) == S_IRWXO)
+	(sockinfo.st_mode & (S_IROTH | S_IWOTH)) == (S_IROTH | S_IWOTH))
       cups_set_server_name(cc, CUPS_DEFAULT_DOMAINSOCKET);
     else
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
