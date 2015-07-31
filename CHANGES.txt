@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.1rc1
 	  STR #4661)
 	- Fixed domain socket support on Linux (STR #4679)
 	- Fixed signal handlers in the dnssd and usb backends (STR #4671)
+	- <Limit All> in <Policy> sections now applies to all operations when
+	  used by itself (STR #4659)
 	- Configure script changes for systemd support (STR #4669)
 	- Updated autoconf sources to use newer form of AC_INIT (STR #4664)
 
