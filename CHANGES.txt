@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1rc1 - 2015-07-30
+CHANGES.txt - 2.1rc1 - 2015-07-31
 ---------------------------------
 
 CHANGES IN CUPS V2.1rc1
@@ -8,6 +8,7 @@ CHANGES IN CUPS V2.1rc1
 	- Fixed bugs in the new journald support (STR #4655, STR #4658,
 	  STR #4661)
 	- Fixed domain socket support on Linux (STR #4679)
+	- Fixed signal handlers in the dnssd and usb backends (STR #4671)
 	- Configure script changes for systemd support (STR #4669)
 	- Updated autoconf sources to use newer form of AC_INIT (STR #4664)
 

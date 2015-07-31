@@ -1289,7 +1289,7 @@ sigterm_handler(int sig)		/* I - Signal number (unused) */
   (void)sig;
 
   if (job_canceled)
-    exit(CUPS_BACKEND_OK);
+    _exit(CUPS_BACKEND_OK);
   else
     job_canceled = 1;
 }

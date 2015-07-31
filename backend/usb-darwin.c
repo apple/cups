@@ -2285,13 +2285,13 @@ sigterm_handler(int sig)		/* I - Signal */
     while (waitpid(child_pid, &status, 0) < 0 && errno == EINTR);
 
     if (WIFEXITED(status))
-      exit(WEXITSTATUS(status));
+      _exit(WEXITSTATUS(status));
     else if (status == SIGTERM || status == SIGKILL)
-      exit(0);
+      _exit(0);
     else
     {
-      fprintf(stderr, "DEBUG: Child crashed on signal %d\n", status);
-      exit(CUPS_BACKEND_STOP);
+      write(2, "DEBUG: Child crashed.\n", 22);
+      _exit(CUPS_BACKEND_STOP);
     }
   }
 #endif /* __i386__ || __x86_64__ */
