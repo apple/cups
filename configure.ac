@@ -17,7 +17,7 @@ dnl We need at least autoconf 2.60...
 AC_PREREQ(2.60)
 
 dnl Package name and version...
-AC_INIT([CUPS], [2.1rc1], [https://www.cups.org/str.php], [cups], [https://www.cups.org/])
+AC_INIT([CUPS], [2.1.0], [https://www.cups.org/str.php], [cups], [https://www.cups.org/])
 
 sinclude(config-scripts/cups-opsys.m4)
 sinclude(config-scripts/cups-common.m4)
