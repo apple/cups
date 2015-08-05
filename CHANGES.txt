@@ -1,5 +1,11 @@
-CHANGES.txt - 2.1rc1 - 2015-07-31
----------------------------------
+CHANGES.txt - 2.1.0 - 2015-08-05
+--------------------------------
+
+CHANGES IN CUPS V2.1.0
+
+	- "make check" incorrectly reported an expectation of 18 warning
+	  messages when 8 were expected (STR #4684)
+
 
 CHANGES IN CUPS V2.1rc1
 
