@@ -997,9 +997,9 @@ fi
 # Warning log messages
 count=`$GREP '^W ' $BASE/log/error_log | $GREP -v CreateProfile | wc -l | awk '{print $1}'`
 if test $count != 8; then
-	echo "FAIL: $count warning messages, expected 18."
+	echo "FAIL: $count warning messages, expected 8."
 	$GREP '^W ' $BASE/log/error_log
-	echo "<P>FAIL: $count warning messages, expected 18.</P>" >>$strfile
+	echo "<P>FAIL: $count warning messages, expected 8.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	$GREP '^W ' $BASE/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
