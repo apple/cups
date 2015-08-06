@@ -1,8 +1,10 @@
-CHANGES.txt - 2.1.0 - 2015-08-05
+CHANGES.txt - 2.1.0 - 2015-08-06
 --------------------------------
 
 CHANGES IN CUPS V2.1.0
 
+	- The new Hong Kong Chinese locale did not correctly use Taiwan Chinese
+	  as a fallback (<rdar://problem/22130168>)
 	- "make check" incorrectly reported an expectation of 18 warning
 	  messages when 8 were expected (STR #4684)
 

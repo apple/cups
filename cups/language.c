@@ -1346,6 +1346,19 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
       locale = "Japanese";
     else if (!strncmp(locale, "es", 2))
       locale = "Spanish";
+    else if (!strcmp(locale, "zh_HK"))
+    {
+     /*
+      * <rdar://problem/22130168>
+      *
+      * Try zh_TW first, then zh...  Sigh...
+      */
+
+      if (!access(CUPS_BUNDLEDIR "/Resources/zh_TW.lproj/cups.strings", 0))
+        locale = "zh_TW";
+      else
+        locale = "zh";
+    }
     else if (strstr(locale, "_") != NULL || strstr(locale, "-") != NULL)
     {
      /*
