@@ -1324,6 +1324,18 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
   snprintf(filename, sizeof(filename),
            CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings",
 	   _cupsAppleLanguage(locale, applelang, sizeof(applelang)));
+
+  if (access(filename, 0))
+  {
+   /*
+    * <rdar://problem/22086642>
+    *
+    * Try with original locale string...
+    */
+
+    snprintf(filename, sizeof(filename), CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
+  }
+
   DEBUG_printf(("1appleMessageLoad: filename=\"%s\"", filename));
 
   if (access(filename, 0))
