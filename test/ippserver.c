@@ -108,6 +108,26 @@ enum _ipp_preason_e			/* printer-state-reasons bit values */
   _IPP_PREASON_TONER_LOW = 0x8000	/* toner-low */
 };
 typedef unsigned int _ipp_preason_t;	/* Bitfield for printer-state-reasons */
+static const char * const _ipp_preason_strings[] =
+{					/* Strings for each bit */
+  /* "none" is implied for no bits set */
+  "other",
+  "cover-open",
+  "input-tray-missing",
+  "marker-supply-empty",
+  "marker-supply-low",
+  "marker-waste-almost-full",
+  "marker-waste-full",
+  "media-empty",
+  "media-jam",
+  "media-low",
+  "media-needed",
+  "moving-to-paused",
+  "paused",
+  "spool-area-full",
+  "toner-empty",
+  "toner-low"
+};
 
 typedef enum _ipp_media_class_e
 {
@@ -399,10 +419,12 @@ static void		ipp_send_uri(_ipp_client_t *client);
 static void		ipp_validate_job(_ipp_client_t *client);
 static void		load_attributes(const char *filename, ipp_t *attrs);
 static int		parse_options(_ipp_client_t *client, cups_option_t **options);
+static void		process_attr_message(_ipp_job_t *job, char *message);
 static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
 static void		*process_job(_ipp_job_t *job);
+static void		process_state_message(_ipp_job_t *job, char *message);
 static int		register_printer(_ipp_printer_t *printer, const char *location, const char *make, const char *model, const char *formats, const char *adminurl, const char *uuid, int color, int duplex, const char *regtype);
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *content_coding,
@@ -3646,45 +3668,22 @@ ipp_get_printer_attributes(
                    "printer-state-reasons", NULL, "none");
     else
     {
-      int			num_reasons = 0;/* Number of reasons */
-      const char		*reasons[32];	/* Reason strings */
+      ipp_attribute_t	*attr = NULL;		/* printer-state-reasons */
+      _ipp_preason_t	bit;			/* Reason bit */
+      int		i;			/* Looping var */
+      char		reason[32];		/* Reason string */
 
-      if (printer->state_reasons & _IPP_PREASON_OTHER)
-	reasons[num_reasons ++] = "other";
-      if (printer->state_reasons & _IPP_PREASON_COVER_OPEN)
-	reasons[num_reasons ++] = "cover-open";
-      if (printer->state_reasons & _IPP_PREASON_INPUT_TRAY_MISSING)
-	reasons[num_reasons ++] = "input-tray-missing";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_SUPPLY_EMPTY)
-	reasons[num_reasons ++] = "marker-supply-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_SUPPLY_LOW)
-	reasons[num_reasons ++] = "marker-supply-low-report";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_WASTE_ALMOST_FULL)
-	reasons[num_reasons ++] = "marker-waste-almost-full-report";
-      if (printer->state_reasons & _IPP_PREASON_MARKER_WASTE_FULL)
-	reasons[num_reasons ++] = "marker-waste-full-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_EMPTY)
-	reasons[num_reasons ++] = "media-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_JAM)
-	reasons[num_reasons ++] = "media-jam-warning";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_LOW)
-	reasons[num_reasons ++] = "media-low-report";
-      if (printer->state_reasons & _IPP_PREASON_MEDIA_NEEDED)
-	reasons[num_reasons ++] = "media-needed-report";
-      if (printer->state_reasons & _IPP_PREASON_MOVING_TO_PAUSED)
-	reasons[num_reasons ++] = "moving-to-paused";
-      if (printer->state_reasons & _IPP_PREASON_PAUSED)
-	reasons[num_reasons ++] = "paused";
-      if (printer->state_reasons & _IPP_PREASON_SPOOL_AREA_FULL)
-	reasons[num_reasons ++] = "spool-area-full";
-      if (printer->state_reasons & _IPP_PREASON_TONER_EMPTY)
-	reasons[num_reasons ++] = "toner-empty-warning";
-      if (printer->state_reasons & _IPP_PREASON_TONER_LOW)
-	reasons[num_reasons ++] = "toner-low-report";
-
-      ippAddStrings(client->response, IPP_TAG_PRINTER,
-                    IPP_CONST_TAG(IPP_TAG_KEYWORD),
-                    "printer-state-reasons", num_reasons, NULL, reasons);
+      for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+      {
+        if (printer->state_reasons & bit)
+	{
+	  snprintf(reason, sizeof(reason), "%s-%s", _ipp_preason_strings[0], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
+	  if (attr)
+	    ippSetString(client->response, &attr, ippGetCount(attr), reason);
+	  else
+	    attr = ippAddString(client->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "printer-state-reasons", NULL, reason);
+	}
+      }
     }
   }
 
@@ -5099,6 +5098,20 @@ parse_options(_ipp_client_t *client,	/* I - Client */
 
 
 /*
+ * 'process_attr_message()' - Process an ATTR: message from a command.
+ */
+
+static void
+process_attr_message(
+    _ipp_job_t *job,			/* I - Job */
+    char       *message)		/* I - Message */
+{
+  (void)job;
+  (void)message;
+}
+
+
+/*
  * 'process_client()' - Process client requests on a thread.
  */
 
@@ -6024,6 +6037,13 @@ process_job(_ipp_job_t *job)		/* I - Job */
     ipp_attribute_t *attr;		/* Job attribute */
     char	val[1280],		/* IPP_NAME=value */
 		*valptr;		/* Pointer into string */
+#ifndef WIN32
+    int		mypipe[2];		/* Pipe for stderr */
+    char	line[2048],		/* Line from stderr */
+		*ptr,			/* Pointer into line */
+		*endptr;		/* End of line */
+    ssize_t	bytes;			/* Bytes read */
+#endif /* !WIN32 */
 
     fprintf(stderr, "Running command \"%s %s\".\n", job->printer->command,
             job->filename);
@@ -6083,12 +6103,24 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
 #ifdef WIN32
     status = _spawnvpe(_P_WAIT, job->printer->command, myargv, myenvp);
+
 #else
+    if (pipe(mypipe))
+    {
+      perror("Unable to create pipe for stderr");
+      mypipe[0] = mypipe[1] = -1;
+    }
+
     if ((pid = fork()) == 0)
     {
      /*
       * Child comes here...
       */
+
+      close(2);
+      dup2(mypipe[1], 2);
+      close(mypipe[0]);
+      close(mypipe[1]);
 
       execve(job->printer->command, myargv, myenvp);
       exit(errno);
@@ -6101,6 +6133,9 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       perror("Unable to start job processing command");
       status = -1;
+
+      close(mypipe[0]);
+      close(mypipe[1]);
 
      /*
       * Free memory used for environment...
@@ -6117,6 +6152,55 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
       while (myenvc > 0)
 	free(myenvp[-- myenvc]);
+
+     /*
+      * If the pipe exists, read from it until EOF...
+      */
+
+      if (mypipe[0] >= 0)
+      {
+	close(mypipe[1]);
+
+	endptr = line;
+	while ((bytes = read(mypipe[0], endptr, sizeof(line) - (size_t)(endptr - line) - 1)) > 0)
+	{
+	  endptr += bytes;
+	  *endptr = '\0';
+
+          while ((ptr = strchr(line, '\n')) != NULL)
+	  {
+	    *ptr++ = '\0';
+
+	    if (!strncmp(line, "STATE:", 6))
+	    {
+	     /*
+	      * Process printer-state-reasons keywords.
+	      */
+
+	      process_state_message(job, line);
+	    }
+	    else if (!strncmp(line, "ATTR:", 5))
+	    {
+	     /*
+	      * Process printer attribute update.
+	      */
+
+	      process_attr_message(job, line);
+	    }
+	    else if (Verbosity > 1)
+	      fprintf(stderr, "%s: %s\n", job->printer->command, line);
+
+	    bytes = ptr - line;
+            if (ptr < endptr)
+	      memmove(line, ptr, endptr - ptr);
+	    endptr -= bytes;
+	    *endptr = '\0';
+	  }
+	}
+
+	close(mypipe[0]);
+      }
+
      /*
       * Wait for child to complete...
       */
@@ -6176,6 +6260,95 @@ process_job(_ipp_job_t *job)		/* I - Job */
   job->printer->active_job = NULL;
 
   return (NULL);
+}
+
+
+/*
+ * 'process_state_message()' - Process a STATE: message from a command.
+ */
+
+static void
+process_state_message(
+    _ipp_job_t *job,			/* I - Job */
+    char       *message)		/* I - Message */
+{
+  int		i;			/* Looping var */
+  _ipp_preason_t state_reasons,		/* printer-state-reasons values */
+		bit;			/* Current reason bit */
+  char		*ptr,			/* Pointer into message */
+		*next;			/* Next keyword in message */
+  int		remove;			/* Non-zero if we are removing keywords */
+
+
+ /*
+  * Skip leading "STATE:" and any whitespace...
+  */
+
+  for (message += 6; *message; message ++)
+    if (*message != ' ' && *message != '\t')
+      break;
+
+ /*
+  * Support the following forms of message:
+  *
+  * "keyword[,keyword,...]" to set the printer-state-reasons value(s).
+  *
+  * "-keyword[,keyword,...]" to remove keywords.
+  *
+  * "+keyword[,keyword,...]" to add keywords.
+  *
+  * Keywords may or may not have a suffix (-report, -warning, -error) per
+  * RFC 2911.
+  */
+
+  if (*message == '-')
+  {
+    remove        = 1;
+    state_reasons = job->printer->state_reasons;
+    message ++;
+  }
+  else if (*message == '+')
+  {
+    remove        = 0;
+    state_reasons = job->printer->state_reasons;
+    message ++;
+  }
+  else
+  {
+    remove        = 0;
+    state_reasons = _IPP_PREASON_NONE;
+  }
+
+  while (*message)
+  {
+    if ((next = strchr(message, ',')) != NULL)
+      *next++ = '\0';
+
+    if ((ptr = strstr(message, "-error")) != NULL)
+      *ptr = '\0';
+    else if ((ptr = strstr(message, "-report")) != NULL)
+      *ptr = '\0';
+    else if ((ptr = strstr(message, "-warning")) != NULL)
+      *ptr = '\0';
+
+    for (i = 0, bit = 1; i < (int)(sizeof(_ipp_preason_strings) / sizeof(_ipp_preason_strings[0])); i ++, bit *= 2)
+    {
+      if (!strcmp(message, _ipp_preason_strings[i]))
+      {
+        if (remove)
+	  state_reasons &= ~bit;
+	else
+	  state_reasons |= bit;
+      }
+    }
+
+    if (next)
+      message = next;
+    else
+      break;
+  }
+
+  job->printer->state_reasons = state_reasons;
 }
 
 
