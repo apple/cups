@@ -3726,7 +3726,21 @@ static void
 ipp_identify_printer(
     _ipp_client_t *client)		/* I - Client */
 {
-  /* TODO: Do something */
+  ipp_attribute_t	*actions,	/* identify-actions */
+			*message;	/* message */
+
+
+  actions = ippFindAttribute(client->request, "identify-actions", IPP_TAG_KEYWORD);
+  message = ippFindAttribute(client->request, "message", IPP_TAG_TEXT);
+
+  if (!actions || ippContainsString(actions, "sound"))
+  {
+    putchar(0x07);
+    fflush(stdout);
+  }
+
+  if (ippContainsString(actions, "display"))
+    printf("IDENTIFY from %s: %s\n", client->hostname, message ? ippGetString(message, 0, NULL) : "No message supplied");
 
   respond_ipp(client, IPP_STATUS_OK, NULL);
 }
