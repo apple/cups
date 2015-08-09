@@ -251,6 +251,16 @@ static const char * const printer_supplies[] =
   "Toner Waste"
 };
 
+/*
+ * URL scheme for web resources...
+ */
+
+#ifdef HAVE_SSL
+#  define WEB_SCHEME "https"
+#else
+#  define WEB_SCHEME "http"
+#endif /* HAVE_SSL */
+
 
 /*
  * Structures...
@@ -1576,12 +1586,6 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
  /*
   * Prepare values for the printer attributes...
   */
-
-#ifdef HAVE_SSL
-#  define WEB_SCHEME "https"
-#else
-#  define WEB_SCHEME "http"
-#endif /* HAVE_SSL */
 
   httpAssembleURI(HTTP_URI_CODING_ALL, icons, sizeof(icons), WEB_SCHEME, NULL, printer->hostname, printer->port, "/icon.png");
   httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), WEB_SCHEME, NULL, printer->hostname, printer->port, "/");
@@ -6206,7 +6210,7 @@ process_job(_ipp_job_t *job)		/* I - Job */
 
 	    bytes = ptr - line;
             if (ptr < endptr)
-	      memmove(line, ptr, endptr - ptr);
+	      memmove(line, ptr, (size_t)(endptr - ptr));
 	    endptr -= bytes;
 	    *endptr = '\0';
 	  }
@@ -7074,6 +7078,7 @@ valid_job_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
   int			i,		/* Looping var */
+			count,		/* Number of values */
 			valid = 1;	/* Valid attributes? */
   ipp_attribute_t	*attr,		/* Current attribute */
 			*supported;	/* xxx-supported attribute */
@@ -7180,13 +7185,9 @@ valid_job_attributes(
     }
     else
     {
-      for (i = 0;
-           i < (int)(sizeof(media_supported) / sizeof(media_supported[0]));
-	   i ++)
-        if (!strcmp(ippGetString(attr, 0, NULL), media_supported[i]))
-	  break;
+      supported = ippFindAttribute(client->printer->attrs, "media-supported", IPP_TAG_KEYWORD);
 
-      if (i >= (int)(sizeof(media_supported) / sizeof(media_supported[0])))
+      if (!ippContainsString(supported, ippGetString(attr, 0, NULL)))
       {
 	respond_unsupported(client, attr);
 	valid = 0;
@@ -7196,13 +7197,86 @@ valid_job_attributes(
 
   if ((attr = ippFindAttribute(client->request, "media-col", IPP_TAG_ZERO)) != NULL)
   {
+    ipp_t		*col,		/* media-col collection */
+			*size;		/* media-size collection */
+    ipp_attribute_t	*member,	/* Member attribute */
+			*x_dim,		/* x-dimension */
+			*y_dim;		/* y-dimension */
+    int			x_value,	/* y-dimension value */
+			y_value;	/* x-dimension value */
+
     if (ippGetCount(attr) != 1 ||
         ippGetValueTag(attr) != IPP_TAG_BEGIN_COLLECTION)
     {
       respond_unsupported(client, attr);
       valid = 0;
     }
-    /* TODO: check for valid media-col */
+
+    col = ippGetCollection(attr, 0);
+
+    if ((member = ippFindAttribute(col, "media-size-name", IPP_TAG_ZERO)) != NULL)
+    {
+      if (ippGetCount(member) != 1 ||
+	  (ippGetValueTag(member) != IPP_TAG_NAME &&
+	   ippGetValueTag(member) != IPP_TAG_NAMELANG &&
+	   ippGetValueTag(member) != IPP_TAG_KEYWORD))
+      {
+	respond_unsupported(client, attr);
+	valid = 0;
+      }
+      else
+      {
+	supported = ippFindAttribute(client->printer->attrs, "media-supported", IPP_TAG_KEYWORD);
+
+	if (!ippContainsString(supported, ippGetString(member, 0, NULL)))
+	{
+	  respond_unsupported(client, attr);
+	  valid = 0;
+	}
+      }
+    }
+    else if ((member = ippFindAttribute(col, "media-size", IPP_TAG_BEGIN_COLLECTION)) != NULL)
+    {
+      if (ippGetCount(member) != 1)
+      {
+	respond_unsupported(client, attr);
+	valid = 0;
+      }
+      else
+      {
+	size = ippGetCollection(member, 0);
+
+	if ((x_dim = ippFindAttribute(size, "x-dimension", IPP_TAG_INTEGER)) == NULL || ippGetCount(x_dim) != 1 ||
+	    (y_dim = ippFindAttribute(size, "y-dimension", IPP_TAG_INTEGER)) == NULL || ippGetCount(y_dim) != 1)
+	{
+	  respond_unsupported(client, attr);
+	  valid = 0;
+	}
+	else
+	{
+	  x_value   = ippGetInteger(x_dim, 0);
+	  y_value   = ippGetInteger(y_dim, 0);
+	  supported = ippFindAttribute(client->printer->attrs, "media-size-supported", IPP_TAG_BEGIN_COLLECTION);
+	  count     = ippGetCount(supported);
+
+	  for (i = 0; i < count ; i ++)
+	  {
+	    size  = ippGetCollection(supported, i);
+	    x_dim = ippFindAttribute(size, "x-dimension", IPP_TAG_ZERO);
+	    y_dim = ippFindAttribute(size, "y-dimension", IPP_TAG_ZERO);
+
+	    if (ippContainsInteger(x_dim, x_value) && ippContainsInteger(y_dim, y_value))
+	      break;
+	  }
+
+	  if (i >= count)
+	  {
+	    respond_unsupported(client, attr);
+	    valid = 0;
+	  }
+	}
+      }
+    }
   }
 
   if ((attr = ippFindAttribute(client->request, "multiple-document-handling", IPP_TAG_ZERO)) != NULL)
@@ -7261,8 +7335,7 @@ valid_job_attributes(
     }
     else
     {
-      int	count,			/* Number of supported values */
-		xdpi,			/* Horizontal resolution for job template attribute */
+      int	xdpi,			/* Horizontal resolution for job template attribute */
 		ydpi,			/* Vertical resolution for job template attribute */
 		sydpi;			/* Vertical resolution for supported value */
       ipp_res_t	units,			/* Units for job template attribute */
