@@ -1180,7 +1180,7 @@ appleLangDefault(void)
 	  * See if we have an Info.plist file in the bundle...
 	  */
 
-	  CFStringGetCString(cfpath, path,sizeof(path), kCFStringEncodingUTF8);
+	  CFStringGetCString(cfpath, path, sizeof(path), kCFStringEncodingUTF8);
 	  DEBUG_printf(("3appleLangDefault: Got a resource URL (\"%s\")", path));
 	  strlcat(path, "Contents/Info.plist", sizeof(path));
 
@@ -1211,7 +1211,6 @@ appleLangDefault(void)
 
     if (localizationList)
     {
-
 #ifdef DEBUG
       if (CFGetTypeID(localizationList) == CFArrayGetTypeID())
         DEBUG_printf(("3appleLangDefault: Got localizationList, %d entries.",
@@ -1287,6 +1286,8 @@ appleLangDefault(void)
       strlcpy(cg->language, "en_US.UTF-8", sizeof(cg->language));
     }
   }
+  else
+    DEBUG_printf(("3appleLangDefault: Using previous locale \"%s\".", cg->language));
 
  /*
   * Return the cached locale...

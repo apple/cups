@@ -3,7 +3,7 @@
  *
  *   Localization test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2015 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -50,8 +50,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   };
 
 
-  _cupsSetLocale(argv);
-
   if (argc == 1)
   {
     language  = cupsLangDefault();
@@ -61,7 +59,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     language  = cupsLangGet(argv[1]);
     language2 = cupsLangGet(argv[1]);
+
+    setenv("LANG", argv[1], 1);
+    setenv("SOFTWARE", "CUPS/" CUPS_SVERSION, 1);
   }
+
+  _cupsSetLocale(argv);
 
   if (language != language2)
   {
@@ -102,6 +105,45 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       errors ++;
       puts("**** ERROR: Bad formatted number! ****");
+    }
+  }
+
+  if (argc == 3)
+  {
+    ppd_file_t		*ppd;		/* PPD file */
+    ppd_option_t	*option;	/* PageSize option */
+    ppd_choice_t	*choice;	/* PageSize/Letter choice */
+
+    if ((ppd = ppdOpenFile(argv[2])) == NULL)
+    {
+      printf("Unable to open PPD file \"%s\".\n", argv[2]);
+      errors ++;
+    }
+    else
+    {
+      ppdLocalize(ppd);
+
+      if ((option = ppdFindOption(ppd, "PageSize")) == NULL)
+      {
+        puts("No PageSize option.");
+        errors ++;
+      }
+      else
+      {
+        printf("PageSize: %s\n", option->text);
+
+        if ((choice = ppdFindChoice(option, "Letter")) == NULL)
+        {
+	  puts("No Letter PageSize choice.");
+	  errors ++;
+        }
+        else
+        {
+	  printf("Letter: %s\n", choice->text);
+        }
+      }
+
+      ppdClose(ppd);
     }
   }
 
