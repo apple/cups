@@ -617,7 +617,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 
       asl_set(m, PWG_Event, "JobStateChanged");
       asl_set(m, PWG_JobID, job_id);
-      asl_set(m, PWG_JobState, job_states[job->state_value - IPP_JSTATE_PENDING]);
+      asl_set(m, PWG_JobState, job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING]);
 
       if (job->impressions)
       {
@@ -667,7 +667,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 		      PWG_Event"=JobStateChanged",
 		      PWG_ServiceURI"=%s", printer ? printer->uri : "",
 		      PWG_JobID"=%d", job->id,
-		      PWG_JobState"=%s", job_states[job->state_value - IPP_JSTATE_PENDING],
+		      PWG_JobState"=%s", job->state_value < IPP_JSTATE_PENDING ? "" : job_states[job->state_value - IPP_JSTATE_PENDING],
 		      PWG_JobImpressionsCompleted"=%d", ippGetInteger(job->impressions, 0),
 		      NULL);
     else
