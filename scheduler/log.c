@@ -637,7 +637,7 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 #elif defined(HAVE_SYSTEMD_SD_JOURNAL_H)
   if (!strcmp(ErrorLog, "syslog"))
   {
-    cupsd_printer_t *printer = job->printer ? job->printer : job->dest ? cupsdFindDest(job->dest) : NULL;
+    cupsd_printer_t *printer = job ? (job->printer ? job->printer : (job->dest ? cupsdFindDest(job->dest)) : NULL) : NULL;
     static const char * const job_states[] =
     {					/* job-state strings */
       "Pending",
