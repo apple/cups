@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Default cupsd configuration settings for CUPS.
 dnl
-dnl   Copyright 2007-2014 by Apple Inc.
+dnl   Copyright 2007-2015 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -85,7 +85,7 @@ AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
 
 dnl Default PageLogFormat
-AC_ARG_WITH(page_logging, [  --enable-page-logging   enable page_log by default])
+AC_ARG_ENABLE(page_logging, [  --enable-page-logging   enable page_log by default])
 if test "x$enable_page_logging" = xyes; then
 	CUPS_PAGE_LOG_FORMAT=""
 else
