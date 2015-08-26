@@ -313,6 +313,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/*.conf.5.gz
+/usr/share/man/man5/cupsd-logs.5.gz
 /usr/share/man/man5/ipptoolfile.5.gz
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man8
@@ -327,7 +328,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsd-helper.8.gz
-/usr/share/man/man8/cupsd-logs.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
 /usr/share/man/man8/cupsreject.8.gz
