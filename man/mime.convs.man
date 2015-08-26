@@ -3,7 +3,7 @@
 .\"
 .\" mime.convs man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2015 by Apple Inc.
 .\" Copyright 1997-2006 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH mime.convs 5 "CUPS" "12 June 2014" "Apple Inc."
+.TH mime.convs 5 "CUPS" "26 August 2015" "Apple Inc."
 .SH NAME
 mime.convs \- mime type conversion file for cups
 .SH DESCRIPTION
@@ -32,7 +32,7 @@ Filter lines specify the source and destination MIME types along with a relative
 .fi
 The \fIsource/type\fR field specifies the source MIME media type that is consumed by the filter.
 .LP
-The \fIdestination/type\fR field specifies the destiantion MIME media type that is produced by the filter.
+The \fIdestination/type\fR field specifies the destination MIME media type that is produced by the filter.
 .LP
 The \fIcost\fR field specifies the relative cost for running the filter.
 A value of 100 means that the filter uses a large amount of resources while a value of 0 means that the filter uses very few resources.
@@ -60,7 +60,7 @@ Define a filter that converts PostScript documents to CUPS Raster format:
 .BR mime.types (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

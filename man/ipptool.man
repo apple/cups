@@ -11,7 +11,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "3 February 2015" "Apple Inc."
+.TH ipptool 1 "CUPS" "26 August 2015" "Apple Inc."
 .SH NAME
 ipptool \- perform internet printing protocol requests
 .SH SYNOPSIS
@@ -183,7 +183,7 @@ This is the default for XML output.
 .SH EXIT STATUS
 The
 .B ipptool
-program returns 0 if all tests were sucessful and 1 otherwise.
+program returns 0 if all tests were successful and 1 otherwise.
 .SH FILES
 The following standard files are available:
 .nf

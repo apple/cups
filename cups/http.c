@@ -898,7 +898,7 @@ httpGetContentEncoding(http_t *http)	/* I - HTTP connection */
  */
 
 const char *				/* O - Cookie data or NULL */
-httpGetCookie(http_t *http)		/* I - HTTP connecion */
+httpGetCookie(http_t *http)		/* I - HTTP connection */
 {
   return (http ? http->cookie : NULL);
 }

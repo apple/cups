@@ -3,7 +3,7 @@
 .\"
 .\" filter man page for CUPS.
 .\"
-.\" Copyright 2007-2014 by Apple Inc.
+.\" Copyright 2007-2015 by Apple Inc.
 .\" Copyright 1997-2007 by Easy Software Products.
 .\"
 .\" These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "CUPS" "4 April 2014" "Apple Inc."
+.TH filter 7 "CUPS" "26 August 2015" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -68,7 +68,7 @@ Options are passed in \fIargv[5]\fR and are encoded from the corresponding IPP a
 function to load the options into a \fBcups_option_t\fR array and the
 .BR cupsGetOption ()
 function to get the value of a specific attribute.
-Be careful to look for common aliases of IPP attributes such as "lansdscape" for the IPP "orientation-requested" attribute.
+Be careful to look for common aliases of IPP attributes such as "landscape" for the IPP "orientation-requested" attribute.
 .LP
 Options passed on the command-line typically do not include the default choices the printer's PPD file. Use the
 .BR ppdMarkDefaults ()
@@ -222,7 +222,7 @@ program to use the appropriate filters to do the conversions you need.
 .br
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

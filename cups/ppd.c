@@ -283,7 +283,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
 
 /*
- * 'ppdErrorString()' - Returns the text assocated with a status.
+ * 'ppdErrorString()' - Returns the text associated with a status.
  *
  * @since CUPS 1.1.19/OS X 10.3@
  */
