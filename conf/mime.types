@@ -71,7 +71,7 @@
 #
 
 #application/msword		doc string(0,<D0CF11E0A1B11AE1>)
-application/pdf			pdf regex(0,^[\\n\\r]*%PDF)
+application/pdf			pdf regex(0,^[\n\r]*%PDF)
 application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				contains(0,128,<1B>%-12345X) + \
 				(contains(0,4096,"LANGUAGE=POSTSCRIPT") \
