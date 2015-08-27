@@ -83,6 +83,7 @@ LIBOBJS	=	\
 TESTOBJS	= \
 		testadmin.o \
 		testarray.o \
+		testcache.o \
 		testconflicts.o \
 		testcups.o \
 		testdest.o \
