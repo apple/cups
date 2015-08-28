@@ -100,7 +100,7 @@ You cannot set the Listen or Port directives using \fBcupsctl\fR.
 .br
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

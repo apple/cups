@@ -106,7 +106,7 @@ network URIs.
 .B serial
 The device-uri refers to a serial device with configurable baud rate and other options. If the device-uri contains a baud value, it represents the maximum baud rate supported by the device.
 .LP
-The 
+The
 .I scheme
 field provides the URI scheme that is supported by the backend. Backends should use this form only when the backend supports any URI using that scheme. The
 .I device-uri
@@ -199,7 +199,7 @@ for more information.
 .br
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

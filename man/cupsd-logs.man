@@ -235,7 +235,7 @@ The \fIsides\fR field contains a copy of the sides attribute provided with the I
 .BR cups-files.conf (5),
 CUPS Online Help (http://localhost:631/help)
 .SH COPYRIGHT
-Copyright \[co] 2007-2014 by Apple Inc.
+Copyright \[co] 2007-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

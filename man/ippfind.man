@@ -255,7 +255,7 @@ Similarly, to send a PostScript test page to every PostScript printer, run:
 .SH SEE ALSO
 .BR ipptool (1)
 .SH COPYRIGHT
-Copyright \[co] 2013-2014 by Apple Inc.
+Copyright \[co] 2013-2015 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
