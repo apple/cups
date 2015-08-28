@@ -327,7 +327,7 @@ DBUSDIR=""
 DBUS_NOTIFIER=""
 DBUS_NOTIFIERLIBS=""
 
-if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x; then
+if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x -a "x$uname" != xDarwin; then
 	AC_MSG_CHECKING(for DBUS)
 	if $PKGCONFIG --exists dbus-1; then
 		AC_MSG_RESULT(yes)
