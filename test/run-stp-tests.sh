@@ -133,6 +133,7 @@ case "$testtype" in
 		pjobs=10
 		pprinters=0
 		loglevel="debug2"
+		testtype="1"
 		;;
 esac
 
