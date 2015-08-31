@@ -442,6 +442,8 @@ cupsdCleanJobs(void)
         cupsdLogJob(job, CUPSD_LOG_DEBUG, "Removing document files.");
         remove_job_files(job);
 
+        cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+
         if (job->history_time < JobHistoryUpdate || !JobHistoryUpdate)
 	  JobHistoryUpdate = job->history_time;
       }

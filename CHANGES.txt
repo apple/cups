@@ -1,4 +1,4 @@
-CHANGES.txt - 2.1.0 - 2015-08-28
+CHANGES.txt - 2.1.0 - 2015-08-31
 --------------------------------
 
 CHANGES IN CUPS V2.1.0
@@ -12,6 +12,8 @@ CHANGES IN CUPS V2.1.0
 	- "make check" incorrectly reported an expectation of 18 warning
 	  messages when 8 were expected (STR #4684)
 	- The new PDF file type rule did not work (STR #4692)
+	- The scheduler did not update the jobs.cache file when job files were
+	  expired (STR #4706)
 	- Fixed some configure script issues (STR #4694, STR #4695, STR #4698)
 	- Documentation updates (STR #4691, STR #4693)
 
