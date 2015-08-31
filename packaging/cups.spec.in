@@ -21,6 +21,7 @@
 #   dnssd    - Enable/disable DNS-SD support (default = enable)
 #   libusb1  - Enable/disable LIBUSB 1.0 support (default = enable)
 #   static   - Enable/disable static libraries (default = enable)
+#   systemd  - Enable/disable systemd support (default = enable)
 
 %{!?_with_dbus: %{!?_without_dbus: %define _with_dbus --with-dbus}}
 %{?_with_dbus: %define _dbus --enable-dbus}
