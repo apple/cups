@@ -5,6 +5,7 @@ CHANGES IN CUPS V2.1.1
 
 	- Current Primera printers were incorrectly reported as Fargo printers
 	  (STR #4708)
+	- Updated localizations (STR #4709)
 
 
 CHANGES IN CUPS V2.1.0
