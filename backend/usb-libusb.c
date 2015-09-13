@@ -1522,6 +1522,16 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
       goto error;
     }
+    else if ((errcode = libusb_detach_kernel_driver(printer->handle, printer->iface)) < 0)
+    {
+      fprintf(stderr,
+              "DEBUG: Failed to detach \"usblp\" module from %04x:%04x\n",
+              devdesc.idVendor, devdesc.idProduct);
+
+      goto error;
+    }
+
+    sleep (1);
   }
 
  /*

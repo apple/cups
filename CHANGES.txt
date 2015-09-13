@@ -3,6 +3,9 @@ CHANGES.txt - 2.1.1 - 2015-09-13
 
 CHANGES IN CUPS V2.1.1
 
+	- The libusb-based USB backend did not unload the kernel usblp module
+	  if it was preventing the backend from accessing the printer
+	  (STR #4707)
 	- Current Primera printers were incorrectly reported as Fargo printers
 	  (STR #4708)
 	- Updated localizations (STR #4709)
