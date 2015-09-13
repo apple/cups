@@ -1,5 +1,11 @@
-CHANGES.txt - 2.1.0 - 2015-08-31
+CHANGES.txt - 2.1.1 - 2015-09-13
 --------------------------------
+
+CHANGES IN CUPS V2.1.1
+
+	- Current Primera printers were incorrectly reported as Fargo printers
+	  (STR #4708)
+
 
 CHANGES IN CUPS V2.1.0
 
