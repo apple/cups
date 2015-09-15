@@ -642,7 +642,7 @@ print_device(const char *uri,		/* I - Device URI */
   * Close the connection and input file and general clean up...
   */
 
-  if (g.printer.quirks & USB_QUIRK_DELAY_CLOSE)
+  if (g.printer->quirks & USB_QUIRK_DELAY_CLOSE)
     sleep(1);
 
   close_device(g.printer);
