@@ -5,6 +5,7 @@
 # product ID (omit for all vendor products), and a list of known issues:
 #
 #   blacklist     The printer is not functional with the USB backend.
+#   delay-close   Delay close/reset of selected interface
 #   no-reattach   Do no re-attach usblp kernel module after printing.
 #   soft-reset    Do a soft reset after printing for cleanup.
 #   unidir        Only supported unidirectional I/O
@@ -227,3 +228,13 @@
 
 # All Intermec devices (STR #4553)
 0x067e no-reattach
+
+# HP LaserJet 1150 (STR #4549)
+0x03f0 0x0f17 delay-close
+
+# HP LaserJet 1300 (STR #4549)
+0x03f0 0x1017 delay-close
+0x03f0 0x1117 delay-close
+
+# HP LaserJet 1320 (STR #4549)
+0x03f0 0x1d17 delay-close
