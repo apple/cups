@@ -1528,10 +1528,9 @@ cups_get_printer_uri(
     }
 
     if (device_uri &&
-        (!strncmp(device_uri, "ipp://", 6) ||
-         !strncmp(device_uri, "ipps://", 7) ||
-         ((strstr(device_uri, "._ipp.") != NULL ||
-           strstr(device_uri, "._ipps.") != NULL) &&
+        (((!strncmp(device_uri, "ipp://", 6) || !strncmp(device_uri, "ipps://", 7)) &&
+	  (strstr(device_uri, "/printers/") != NULL || strstr(device_uri, "/classes/") != NULL)) ||
+         ((strstr(device_uri, "._ipp.") != NULL || strstr(device_uri, "._ipps.") != NULL) &&
           !strcmp(device_uri + strlen(device_uri) - 5, "/cups"))))
     {
      /*
