@@ -1009,10 +1009,7 @@ cups_finalize_client_conf(
     * domain socket if it exists and has the right permissions...
     */
 
-    struct stat	sockinfo;		/* Domain socket information */
-
-    if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
-	(sockinfo.st_mode & (S_IROTH | S_IWOTH)) == (S_IROTH | S_IWOTH))
+    if (!access(CUPS_DEFAULT_DOMAINSOCKET, R_OK))
       cups_set_server_name(cc, CUPS_DEFAULT_DOMAINSOCKET);
     else
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
