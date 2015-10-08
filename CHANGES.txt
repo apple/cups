@@ -1,4 +1,7 @@
-CHANGES.txt - 2.2b1 - 2015-09-14
+CHANGES.txt - 2.2b1 - 2015-10-08
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
+
+	- The cupsd domain socket is no longer world-accessible on OS X
+	  (<rdar://problem/7542560>)
