@@ -3,7 +3,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 #
-# Copyright 2014 by The Printer Working Group.
+# Copyright 2014-2015 by The Printer Working Group.
 # Copyright 2007-2013 by Apple Inc.
 # Copyright 2001-2006 by Easy Software Products. All rights reserved.
 #
@@ -19,7 +19,7 @@
 #   ippfind ... -x ipptool -t "{}" bonjour-value-tests.test ";"
 #
 
-FILE-ID "org.pwg.ipp-everywhere.20140826.bonjour"
+FILE-ID "org.pwg.ipp-everywhere.20151009.bonjour"
 
 {
 	# The name of the test...

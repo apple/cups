@@ -26,7 +26,7 @@
 # 'media-needed' keywords in the "printer-state-reasons" Printer attribute.
 #
 
-FILE-ID "org.pwg.ipp-everywhere.20140826.ipp"
+FILE-ID "org.pwg.ipp-everywhere.20151009.ipp"
 
 # All tests use IPP version 2.0, unless overridden in a test...
 VERSION 2.0

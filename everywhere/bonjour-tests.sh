@@ -4,7 +4,7 @@
 #
 # IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 #
-# Copyright 2014 by The Printer Working Group.
+# Copyright 2014-2015 by The Printer Working Group.
 #
 # This program may be copied and furnished to others, and derivative works
 # that comment on, or otherwise explain it or assist in its implementation may
@@ -152,7 +152,7 @@ start_test() {
 	total=`expr $total + 1`
 	echo $ac_n "$1: $ac_c"
 	echo "<dict><key>Name</key><string>$1</string>" >>"$PLIST"
-	echo "<key>FileId</key><string>org.pwg.ipp-everywhere.20140826.bonjour</string>" >>"$PLIST"
+	echo "<key>FileId</key><string>org.pwg.ipp-everywhere.20151009.bonjour</string>" >>"$PLIST"
 }
 # end_test PASS/FAIL/SKIP
 end_test() {

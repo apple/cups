@@ -4,7 +4,7 @@
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 7: Document Data Tests.
 ::
-:: Copyright 2014 by The Printer Working Group.
+:: Copyright 2014-2015 by The Printer Working Group.
 ::
 :: This program may be copied and furnished to others, and derivative works
 :: that comment on, or otherwise explain it or assist in its implementation may

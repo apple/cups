@@ -4,7 +4,7 @@
 ::
 :: IPP Everywhere Printer Self-Certification Manual 1.0: Section 5: Bonjour Tests.
 ::
-:: Copyright 2014 by The Printer Working Group.
+:: Copyright 2014-2015 by The Printer Working Group.
 ::
 :: This program may be copied and furnished to others, and derivative works
 :: that comment on, or otherwise explain it or assist in its implementation may
@@ -40,7 +40,7 @@ set skip=0
 set /a total+=1
 set <NUL /p="B-1. IPP Browse test: "
 echo ^<dict^>^<key^>Name^</key^>^<string^>B-1. IPP Browse test^</string^> >>"%PLIST%"
-echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20140826.bonjour^</string^> >>"%PLIST%"
+echo ^<key^>FileId^</key^>^<string^>org.pwg.ipp-everywhere.20151009.bonjour^</string^> >>"%PLIST%"
 
 set result=FAIL
 ippfind _ipp._tcp,_print.local. --name "%1" --quiet && set result=PASS

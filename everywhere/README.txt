@@ -1,4 +1,4 @@
-README.txt - 2014-08-28
+README.txt - 2015-10-09
 -----------------------
 
 INTRODUCTION
@@ -54,9 +54,9 @@ GETTING SUPPORT AND OTHER RESOURCES
 
 LEGAL STUFF
 
-    These tools are Copyright 2014 by The Printer Working Group and Copyright
-    2007-2014 by Apple Inc.  CUPS and the CUPS logo are trademarks of Apple Inc.
-    PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
+    These tools are Copyright 2014-2015 by The Printer Working Group and
+    Copyright 2007-2015 by Apple Inc.  CUPS and the CUPS logo are trademarks of
+    Apple Inc.  PWG and IPP Everywhere are trademarks of the IEEE-ISTO.
 
     CUPS is provided under the terms of version 2 of the GNU General Public
     License and GNU Library General Public License. This program is distributed

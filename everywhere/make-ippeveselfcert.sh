@@ -4,7 +4,7 @@
 #
 #   Make an IPP Everywhere Printer self-certification package.
 #
-#   Copyright 2014 The Printer Working Group.
+#   Copyright 2014-2015 The Printer Working Group.
 #   Copyright 2007-2013 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
