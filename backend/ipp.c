@@ -1800,7 +1800,7 @@ main(int  argc,				/* I - Number of command-line args */
 	fprintf(stderr, "DEBUG: Send-Document: %s (%s)\n",
 		ippErrorString(cupsLastError()), cupsLastErrorString());
 
-	if (cupsLastError() > IPP_OK_CONFLICT)
+	if (cupsLastError() > IPP_OK_CONFLICT && !job_canceled)
 	{
 	  ipp_status = cupsLastError();
 
@@ -1817,6 +1817,9 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
     }
+
+    if (job_canceled)
+      break;
 
     if (ipp_status <= IPP_OK_CONFLICT && argc > 6)
     {
@@ -2444,6 +2447,17 @@ monitor_printer(
         }
       }
 
+      fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
+              ippEnumString("job-state", monitor->job_state));
+
+      if (!job_canceled &&
+          (monitor->job_state == IPP_JOB_CANCELED ||
+	   monitor->job_state == IPP_JOB_ABORTED))
+      {
+	job_canceled = -1;
+	fprintf(stderr, "DEBUG: (monitor) job_canceled = -1\n");
+      }
+
       if ((attr = ippFindAttribute(response, "job-state-reasons",
                                    IPP_TAG_KEYWORD)) != NULL)
       {
@@ -2465,7 +2479,8 @@ monitor_printer(
             new_reasons |= _CUPS_JSR_JOB_PASSWORD_WAIT;
           else if (!strcmp(attr->values[i].string.text, "job-release-wait"))
             new_reasons |= _CUPS_JSR_JOB_RELEASE_WAIT;
-          else if (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system"))
+	  if (!job_canceled &&
+	      (!strncmp(attr->values[i].string.text, "job-canceled-", 13) || !strcmp(attr->values[i].string.text, "aborted-by-system")))
             job_canceled = 1;
         }
 
@@ -2492,7 +2507,7 @@ monitor_printer(
 
       ippDelete(response);
 
-      fprintf(stderr, "DEBUG: (monitor) job-state=%s\n",
+      fprintf(stderr, "DEBUG: (monitor) job-state = %s\n",
               ippEnumString("job-state", monitor->job_state));
 
       if (!job_canceled &&
@@ -2530,7 +2545,10 @@ monitor_printer(
                  monitor->user, monitor->version);
 
       if (cupsLastError() > IPP_OK_CONFLICT)
+      {
+	fprintf(stderr, "DEBUG: (monitor) cancel_job() = %s\n", cupsLastErrorString());
 	_cupsLangPrintFilter(stderr, "ERROR", _("Unable to cancel print job."));
+      }
     }
   }
 
@@ -3258,7 +3276,7 @@ sigterm_handler(int sig)		/* I - Signal */
     * Flag that the job should be canceled...
     */
 
-    write(2, "DEBUG: job_canceled = 1.\n", 25);
+    write(2, "DEBUG: sigterm_handler: job_canceled = 1.\n", 25);
 
     job_canceled = 1;
     return;

@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.1.1
 	  (STR #4707)
 	- Current Primera printers were incorrectly reported as Fargo printers
 	  (STR #4708)
+	- The IPP backend did not always handle jobs getting canceled at the
+	  printer (<rdar://problem/22716820>)
 	- Updated localizations (STR #4709)
 
 
