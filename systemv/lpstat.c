@@ -1835,11 +1835,7 @@ show_printers(const char  *printers,	/* I - Destinations */
 	  {
 	    _cupsLangPuts(stdout, _("\tConnection: direct"));
 
-	    if (make_model && strstr(make_model, "System V Printer"))
-	      _cupsLangPrintf(stdout,
-	                      _("\tInterface: %s/interfaces/%s"),
-			      cg->cups_serverroot, printer);
-	    else if (make_model && !strstr(make_model, "Raw Printer"))
+	    if (make_model && !strstr(make_model, "Raw Printer"))
 	      _cupsLangPrintf(stdout,
 	                      _("\tInterface: %s/ppd/%s.ppd"),
 			      cg->cups_serverroot, printer);
@@ -1958,11 +1954,7 @@ show_printers(const char  *printers,	/* I - Destinations */
 	      {
 		_cupsLangPuts(stdout, _("\tConnection: direct"));
 
-		if (make_model && strstr(make_model, "System V Printer"))
-		  _cupsLangPrintf(stdout,
-	                	  _("\tInterface: %s/interfaces/%s"),
-				  cg->cups_serverroot, printer);
-		else if (make_model && !strstr(make_model, "Raw Printer"))
+		if (make_model && !strstr(make_model, "Raw Printer"))
 		  _cupsLangPrintf(stdout,
 	                	  _("\tInterface: %s/ppd/%s.ppd"),
 				  cg->cups_serverroot, printer);

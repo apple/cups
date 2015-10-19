@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "CUPS" "11 February 2015" "Apple Inc."
+.TH lpadmin 8 "CUPS" "19 October 2015" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -82,16 +82,17 @@ The following options are recognized when configuring a printer queue:
 Adds the named \fIprinter\fR to \fIclass\fR.
 If \fIclass\fR does not exist it is created automatically.
 .TP 5
-\fB\-i \fIinterface\fR
-Sets a System V style interface script for the printer.
-This option cannot be specified with the \fI-P\fR option (PPD file) and is intended for providing support for legacy printer drivers.
+\fB\-i \fIppd-file\fR
+.TP 5
+\fB\-P \fIppd-file\fR
+Specifies a PostScript Printer Description (PPD) file to use with the printer.
 .TP 5
 \fB\-m \fImodel\fR
-Sets a standard System V interface script or PPD file for the printer from the \fImodel\fR directory or using one of the driver interfaces.
+Sets a standard PPD file for the printer from the \fImodel\fR directory or using one of the driver interfaces.
 Use the \fI-m\fR option with the
 .BR lpinfo (8)
 command to get a list of supported models.
-The model "raw" clears any existing interface script or PPD file and the model "everywhere" queries the printer referred to by the specified IPP \fIdevice-uri\fR.
+The model "raw" clears any existing PPD file and the model "everywhere" queries the printer referred to by the specified IPP \fIdevice-uri\fR.
 .TP 5
 \fB\-o cupsIPPSupplies=true\fR
 .TP 5
@@ -189,10 +190,6 @@ programs on the destination.
 .TP 5
 \fB\-L "\fIlocation\fB"\fR
 Provides a textual location of the destination.
-.TP 5
-\fB\-P \fIppd-file\fR
-Specifies a PostScript Printer Description file to use with the printer.
-If specified, this option overrides the \fI-i\fR option (interface script).
 .SH CONFORMING TO
 Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", or "#".
 Also, printer and class names are \fInot\fR case-sensitive.

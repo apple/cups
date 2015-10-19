@@ -2187,7 +2187,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   char		srcfile[1024],		/* Source Script/PPD file */
 		dstfile[1024];		/* Destination Script/PPD file */
   int		modify;			/* Non-zero if we are modifying */
-  int		changed_driver,		/* Changed the PPD/interface script? */
+  int		changed_driver,		/* Changed the PPD? */
 		need_restart_job,	/* Need to restart job? */
 		set_device_uri,		/* Did we set the device URI? */
 		set_port_monitor;	/* Did we set the port monitor? */
@@ -2572,7 +2572,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdSetString(&printer->device_uri, "file:///dev/null");
 
  /*
-  * See if we have an interface script or PPD file attached to the request...
+  * See if we have a PPD file attached to the request...
   */
 
   if (con->filename)
@@ -2596,88 +2596,50 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       * Then see what kind of file it is...
       */
 
-      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
-               printer->name);
-
-      if (!strncmp(line, "*PPD-Adobe", 10))
+      if (strncmp(line, "*PPD-Adobe", 10))
       {
-       /*
-	* The new file is a PPD file, so remove any old interface script
-	* that might be lying around...
-	*/
-
-	unlink(dstfile);
-      }
-      else
-      {
-       /*
-	* This must be an interface script, so move the file over to the
-	* interfaces directory and make it executable...
-	*/
-
-	if (copy_file(srcfile, dstfile, ConfigFilePerm | 0110))
-	{
-          send_ipp_status(con, IPP_INTERNAL_ERROR,
-	                  _("Unable to copy interface script - %s"),
-	                  strerror(errno));
-	  return;
-	}
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG,
-			"Copied interface script successfully");
+	send_ipp_status(con, IPP_STATUS_ERROR_DOCUMENT_FORMAT_NOT_SUPPORTED, _("Bad PPD file."));
+	return;
       }
 
       snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
                printer->name);
 
-      if (!strncmp(line, "*PPD-Adobe", 10))
+     /*
+      * The new file is a PPD file, so move the file over to the ppd
+      * directory...
+      */
+
+      if (copy_file(srcfile, dstfile, ConfigFilePerm))
       {
-       /*
-	* The new file is a PPD file, so move the file over to the
-	* ppd directory and make it readable by all...
-	*/
-
-	if (copy_file(srcfile, dstfile, ConfigFilePerm))
-	{
-          send_ipp_status(con, IPP_INTERNAL_ERROR,
-	                  _("Unable to copy PPD file - %s"),
-	                  strerror(errno));
-	  return;
-	}
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG,
-			"Copied PPD file successfully");
+	send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file - %s"), strerror(errno));
+	return;
       }
-      else
-      {
-       /*
-	* This must be an interface script, so remove any old PPD file that
-	* may be lying around...
-	*/
 
-	unlink(dstfile);
-      }
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Copied PPD file successfully");
     }
   }
-  else if ((attr = ippFindAttribute(con->request, "ppd-name",
-                                    IPP_TAG_NAME)) != NULL)
+  else if ((attr = ippFindAttribute(con->request, "ppd-name", IPP_TAG_NAME)) != NULL)
   {
+    const char *ppd_name = ippGetString(attr, 0, NULL);
+					/* ppd-name value */
+
     need_restart_job = 1;
     changed_driver   = 1;
 
-    if (!strcmp(attr->values[0].string.text, "raw"))
+    if (!strcmp(ppd_name, "raw"))
     {
      /*
-      * Raw driver, remove any existing PPD or interface script files.
+      * Raw driver, remove any existing PPD file.
       */
 
-      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
-               printer->name);
+      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot, printer->name);
       unlink(dstfile);
-
-      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
-               printer->name);
-      unlink(dstfile);
+    }
+    else if (strstr(ppd_name, "../"))
+    {
+      send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Invalid ppd-name value."));
+      return;
     }
     else
     {
@@ -2685,29 +2647,23 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       * PPD model file...
       */
 
-      snprintf(dstfile, sizeof(dstfile), "%s/interfaces/%s", ServerRoot,
-               printer->name);
-      unlink(dstfile);
+      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot, printer->name);
 
-      snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
-               printer->name);
-
-      if (copy_model(con, attr->values[0].string.text, dstfile))
+      if (copy_model(con, ppd_name, dstfile))
       {
         send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file."));
 	return;
       }
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "Copied PPD file successfully");
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Copied PPD file successfully");
     }
   }
 
   if (changed_driver)
   {
    /*
-    * If we changed the PPD/interface script, then remove the printer's cache
-    * file and clear the printer-state-reasons...
+    * If we changed the PPD, then remove the printer's cache file and clear the
+    * printer-state-reasons...
     */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
@@ -4329,7 +4285,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 
 
 /*
- * 'copy_file()' - Copy a PPD file or interface script...
+ * 'copy_file()' - Copy a PPD file...
  */
 
 static int				/* O - 0 = success, -1 = error */
@@ -4415,9 +4371,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 					/* cupsProtocol attribute */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-        	  "copy_model(con=%p, from=\"%s\", to=\"%s\")",
-        	  con, from, to);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "copy_model(con=%p, from=\"%s\", to=\"%s\")", con, from, to);
 
  /*
   * Run cups-driverd to get the PPD file...
@@ -5685,13 +5639,6 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Remove any old PPD or script files...
   */
 
-  snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot,
-           printer->name);
-  unlink(filename);
-  snprintf(filename, sizeof(filename), "%s/interfaces/%s.O", ServerRoot,
-           printer->name);
-  unlink(filename);
-
   snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
            printer->name);
   unlink(filename);
@@ -6699,16 +6646,17 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppd(%p[%d], %p[%s=%s])", con,
                   con->number, uri, uri->name, uri->values[0].string.text);
 
-  if (!strcmp(uri->name, "ppd-name"))
+  if (!strcmp(ippGetName(uri), "ppd-name"))
   {
    /*
     * Return a PPD file from cups-driverd...
     */
 
-    char	command[1024],	/* cups-driverd command */
-		options[1024],	/* Options to pass to command */
-		ppd_name[1024];	/* ppd-name */
-
+    const char *ppd_name = ippGetString(uri, 0, NULL);
+					/* ppd-name value */
+    char	command[1024],		/* cups-driverd command */
+		options[1024],		/* Options to pass to command */
+		oppd_name[1024];	/* Escaped ppd-name */
 
    /*
     * Check policy...
@@ -6721,13 +6669,22 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     }
 
    /*
+    * Check ppd-name value...
+    */
+
+    if (strstr(ppd_name, "../"))
+    {
+      send_ipp_status(con, IPP_STATUS_ERROR_ATTRIBUTES_OR_VALUES, _("Invalid ppd-name value."));
+      return;
+    }
+
+   /*
     * Run cups-driverd command with the given options...
     */
 
     snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
-    url_encode_string(uri->values[0].string.text, ppd_name, sizeof(ppd_name));
-    snprintf(options, sizeof(options), "get+%d+%s",
-             con->request->request.op.request_id, ppd_name);
+    url_encode_string(ppd_name, oppd_name, sizeof(oppd_name));
+    snprintf(options, sizeof(options), "get+%d+%s", ippGetRequestId(con->request), oppd_name);
 
     if (cupsdSendCommand(con, command, options, 0))
     {
@@ -6745,16 +6702,13 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
       * went wrong...
       */
 
-      send_ipp_status(con, IPP_INTERNAL_ERROR,
-		      _("cups-driverd failed to execute."));
+      send_ipp_status(con, IPP_INTERNAL_ERROR, _("cups-driverd failed to execute."));
     }
   }
-  else if (!strcmp(uri->name, "printer-uri") &&
-           cupsdValidateDest(uri->values[0].string.text, &dtype, &dest))
+  else if (!strcmp(ippGetName(uri), "printer-uri") && cupsdValidateDest(ippGetString(uri, 0, NULL), &dtype, &dest))
   {
     int 	i;			/* Looping var */
     char	filename[1024];		/* PPD filename */
-
 
    /*
     * Check policy...
@@ -6770,14 +6724,12 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
     * See if we need the PPD for a class or remote printer...
     */
 
-    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
-             dest->name);
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, dest->name);
 
     if ((dtype & CUPS_PRINTER_REMOTE) && access(filename, 0))
     {
-      con->response->request.status.status_code = CUPS_SEE_OTHER;
-      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
-                   "printer-uri", NULL, dest->uri);
+      send_ipp_status(con, IPP_STATUS_CUPS_SEE_OTHER, _("See remote printer."));
+      ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, dest->uri);
       return;
     }
     else if (dtype & CUPS_PRINTER_CLASS)
@@ -6785,8 +6737,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
       for (i = 0; i < dest->num_printers; i ++)
         if (!(dest->printers[i]->type & CUPS_PRINTER_CLASS))
 	{
-	  snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
-		   dest->printers[i]->name);
+	  snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, dest->printers[i]->name);
 
           if (!access(filename, 0))
 	    break;
@@ -6796,9 +6747,8 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
         dest = dest->printers[i];
       else
       {
-        con->response->request.status.status_code = CUPS_SEE_OTHER;
-	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI,
-		     "printer-uri", NULL, dest->printers[0]->uri);
+	send_ipp_status(con, IPP_STATUS_CUPS_SEE_OTHER, _("See remote printer."));
+        ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, dest->printers[0]->uri);
         return;
       }
     }
@@ -6809,9 +6759,7 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
 
     if ((con->file = open(filename, O_RDONLY)) < 0)
     {
-      send_ipp_status(con, IPP_NOT_FOUND,
-                      _("The PPD file \"%s\" could not be opened: %s"),
-		      uri->values[0].string.text, strerror(errno));
+      send_ipp_status(con, IPP_STATUS_ERROR_NOT_FOUND, _("The PPD file \"%s\" could not be opened: %s"), ippGetString(uri, 0, NULL), strerror(errno));
       return;
     }
 
@@ -6819,12 +6767,10 @@ get_ppd(cupsd_client_t  *con,		/* I - Client connection */
 
     con->pipe_pid = 0;
 
-    con->response->request.status.status_code = IPP_OK;
+    ippSetStatusCode(con->response, IPP_STATUS_OK);
   }
   else
-    send_ipp_status(con, IPP_NOT_FOUND,
-                    _("The PPD file \"%s\" could not be found."),
-                    uri->values[0].string.text);
+    send_ipp_status(con, IPP_STATUS_ERROR_NOT_FOUND, _("The PPD file \"%s\" could not be found."), ippGetString(uri, 0, NULL));
 }
 
 

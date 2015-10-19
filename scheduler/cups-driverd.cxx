@@ -448,6 +448,12 @@ cat_ppd(const char *name,		/* I - PPD name */
   * Figure out if this is a static or dynamic PPD file...
   */
 
+  if (strstr(name, "../"))
+  {
+    fputs("ERROR: Invalid PPD name.\n", stderr);
+    return (1);
+  }
+
   strlcpy(scheme, name, sizeof(scheme));
   if ((sptr = strchr(scheme, ':')) != NULL)
   {

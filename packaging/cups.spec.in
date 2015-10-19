@@ -168,7 +168,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cups/cups-files.conf.default
 /etc/cups/cupsd.conf.default
 /etc/cups/snmp.conf.default
-%dir /etc/cups/interfaces
 %dir /etc/cups/ppd
 %attr(0700,root,root) %dir /etc/cups/ssl
 

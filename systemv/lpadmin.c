@@ -58,7 +58,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		*val;		/* Pointer to allow/deny value */
   int		num_options;	/* Number of options */
   cups_option_t	*options;	/* Options */
-  char		*file,		/* New PPD file/interface script */
+  char		*file,		/* New PPD file */
 		evefile[1024] = "";
 				/* IPP Everywhere PPD */
   const char	*ppd_name,	/* ppd-name value */
@@ -199,7 +199,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    }
 	    break;
 
-        case 'i' : /* Use the specified interface script */
+        case 'P' : /* Use the specified PPD file */
+        case 'i' : /* Use the specified PPD file */
 	    if (argv[i][2])
 	      file = argv[i] + 2;
 	    else
@@ -208,9 +209,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      if (i >= argc)
 	      {
-		_cupsLangPuts(stderr,
-	                      _("lpadmin: Expected interface after \"-i\" "
-			        "option."));
+		_cupsLangPrintf(stderr, _("lpadmin: Expected PPD after \"-%c\" option."), argv[i - 1][1]);
 		return (1);
 	      }
 
@@ -585,24 +584,6 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	      num_options = cupsAddOption("printer-location", argv[i],
 	                                  num_options, &options);
-	    }
-	    break;
-
-        case 'P' : /* Use the specified PPD file */
-	    if (argv[i][2])
-	      file = argv[i] + 2;
-	    else
-	    {
-	      i ++;
-
-	      if (i >= argc)
-	      {
-		_cupsLangPuts(stderr,
-	                      _("lpadmin: Expected PPD after \"-P\" option."));
-		return (1);
-	      }
-
-	      file = argv[i];
 	    }
 	    break;
 

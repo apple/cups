@@ -2344,37 +2344,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     }
     else if (!(p->type & CUPS_PRINTER_REMOTE))
     {
-      char	interface[1024];	/* Interface script */
+     /*
+      * Add a filter from application/vnd.cups-raw to printer/name to
+      * handle "raw" printing by users.
+      */
 
+      add_printer_filter(p, p->filetype, "application/vnd.cups-raw 0 -");
 
-      snprintf(interface, sizeof(interface), "%s/interfaces/%s", ServerRoot,
-	       p->name);
-      if (!access(interface, X_OK))
-      {
-       /*
-	* Yes, we have a System V style interface script; use it!
-	*/
+     /*
+      * Add a PostScript filter, since this is still possibly PS printer.
+      */
 
-	snprintf(interface, sizeof(interface), "*/* 0 %s/interfaces/%s",
-		 ServerRoot, p->name);
-	add_printer_filter(p, p->filetype, interface);
-      }
-      else
-      {
-       /*
-	* Add a filter from application/vnd.cups-raw to printer/name to
-	* handle "raw" printing by users.
-	*/
-
-	add_printer_filter(p, p->filetype, "application/vnd.cups-raw 0 -");
-
-       /*
-	* Add a PostScript filter, since this is still possibly PS printer.
-	*/
-
-	add_printer_filter(p, p->filetype,
-			   "application/vnd.cups-postscript 0 -");
-      }
+      add_printer_filter(p, p->filetype,
+			 "application/vnd.cups-postscript 0 -");
     }
 
     if (p->pc && p->pc->prefilters)
@@ -4881,32 +4863,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   }
   else
   {
-   /*
-    * If we have an interface script, add a filter entry for it...
-    */
-
-    char	interface[1024];	/* Interface script */
-
-
-    snprintf(interface, sizeof(interface), "%s/interfaces/%s", ServerRoot,
-	     p->name);
-    if (!access(interface, X_OK))
-    {
-     /*
-      * Yes, we have a System V style interface script; use it!
-      */
-
-      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-		   "printer-make-and-model", NULL,
-		   "Local System V Printer");
-    }
-    else if (((!strncmp(p->device_uri, "ipp://", 6) ||
-               !strncmp(p->device_uri, "ipps://", 7)) &&
-	      (strstr(p->device_uri, "/printers/") != NULL ||
-	       strstr(p->device_uri, "/classes/") != NULL)) ||
-	     ((strstr(p->device_uri, "._ipp.") != NULL ||
-	       strstr(p->device_uri, "._ipps.") != NULL) &&
-	      !strcmp(p->device_uri + strlen(p->device_uri) - 5, "/cups")))
+    if (((!strncmp(p->device_uri, "ipp://", 6) ||
+	  !strncmp(p->device_uri, "ipps://", 7)) &&
+	 (strstr(p->device_uri, "/printers/") != NULL ||
+	  strstr(p->device_uri, "/classes/") != NULL)) ||
+	((strstr(p->device_uri, "._ipp.") != NULL ||
+	  strstr(p->device_uri, "._ipps.") != NULL) &&
+	 !strcmp(p->device_uri + strlen(p->device_uri) - 5, "/cups")))
     {
      /*
       * Tell the client this is really a hard-wired remote printer.

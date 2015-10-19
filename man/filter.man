@@ -12,7 +12,7 @@
 .\" which should have been included with this file.  If this file is
 .\" file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "CUPS" "26 August 2015" "Apple Inc."
+.TH filter 7 "CUPS" "19 October 2015" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -202,10 +202,7 @@ The timezone of the server.
 .B USER
 The user executing the filter, typically "lp" or "root"; consult the \fIcups-files.conf\fR file for the current setting.
 .SH CONFORMING TO
-While the filter interface is compatible with System V interface
-scripts, it will only work with the System V interface script as the
-only filter.  Typically the interface script will be provided via the
-\fIlpadmin(8)\fR command using the \fI-i\fR option.
+While the filter interface is compatible with System V interface scripts, CUPS does not support System V interface scripts.
 .SH NOTES
 CUPS filters are not meant to be run directly by the user.
 Aside from the legacy System V interface issues (\fIargv[0]\fR is the printer name), CUPS filters also expect specific environment variables and file descriptors, and typically run in a user session that (on OS X) has additional restrictions that affect how it runs.
