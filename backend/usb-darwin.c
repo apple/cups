@@ -1654,7 +1654,7 @@ static CFStringRef copy_printer_interface_deviceid(printer_interface_t printer, 
 			{
 				ret = CFStringCreateWithBytes(NULL, (const UInt8 *) &request.pData[2], actualLength - 2, kCFStringEncodingUTF8, false);
 			}
-			else {
+			else if (actualLength > 2) {
 				err = sendRequest(actualLength);
 				if (err == kIOReturnSuccess && request.wLenDone > 0)
 				{
