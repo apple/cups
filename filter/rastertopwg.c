@@ -105,6 +105,13 @@ main(int  argc,				/* I - Number of command-line args */
     linesize    = (page_width * inheader.cupsBitsPerPixel + 7) / 8;
     lineoffset  = page_left * inheader.cupsBitsPerPixel / 8; /* Round down */
 
+    if (page_left > page_width || page_top > page_height || page_bottom > page_height)
+    {
+      _cupsLangPrintFilter(stderr, "ERROR", _("Unsupported raster data."));
+      fprintf(stderr, "DEBUG: Bad bottom/left/top margin on page %d.\n", page);
+      return (1);
+    }
+
     switch (inheader.cupsColorSpace)
     {
       case CUPS_CSPACE_W :
