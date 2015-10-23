@@ -3,6 +3,7 @@ CHANGES-2.1.txt
 
 CHANGES IN CUPS V2.1.1
 
+	- Security hardening fixes (<rdar://problem/23131948>)
 	- The cupsGetPPD* functions did not work with IPP printers (STR #4725)
 	- Some older HP LaserJet printers need a delayed close when printing
 	  using the libusb-based USB backend (STR #4549)

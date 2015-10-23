@@ -64,7 +64,7 @@ static ssize_t	cups_raster_io(cups_raster_t *r, unsigned char *buf, size_t bytes
 static unsigned	cups_raster_read_header(cups_raster_t *r);
 static ssize_t	cups_raster_read(cups_raster_t *r, unsigned char *buf,
 		                 size_t bytes);
-static void	cups_raster_update(cups_raster_t *r);
+static int	cups_raster_update(cups_raster_t *r);
 static ssize_t	cups_raster_write(cups_raster_t *r,
 		                  const unsigned char *pixels);
 static ssize_t	cups_read_fd(void *ctx, unsigned char *buf, size_t bytes);
@@ -566,7 +566,8 @@ cupsRasterWriteHeader(
   memset(&(r->header), 0, sizeof(r->header));
   memcpy(&(r->header), h, sizeof(cups_page_header_t));
 
-  cups_raster_update(r);
+  if (!cups_raster_update(r))
+    return (0);
 
  /*
   * Write the raster header...
@@ -682,7 +683,8 @@ cupsRasterWriteHeader2(
 
   memcpy(&(r->header), h, sizeof(cups_page_header2_t));
 
-  cups_raster_update(r);
+  if (!cups_raster_update(r))
+    return (0);
 
  /*
   * Write the raster header...
@@ -1015,11 +1017,12 @@ cups_raster_read_header(
   * Update the header and row count...
   */
 
-  cups_raster_update(r);
+  if (!cups_raster_update(r))
+    return (0);
 
   DEBUG_printf(("4cups_raster_read_header: cupsBitsPerPixel=%u, cupsBitsPerColor=%u, cupsBytesPerLine=%u, cupsWidth=%u, cupsHeight=%u, r->bpp=%d", r->header.cupsBitsPerPixel, r->header.cupsBitsPerColor, r->header.cupsBytesPerLine, r->header.cupsWidth, r->header.cupsHeight, r->bpp));
 
-  return (r->header.cupsBitsPerPixel != 0 && r->header.cupsBitsPerColor != 0 && r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
+  return (r->header.cupsBitsPerPixel > 0 && r->header.cupsBitsPerPixel <= 240 && r->header.cupsBitsPerColor > 0 && r->header.cupsBitsPerColor <= 16 && r->header.cupsBytesPerLine != 0 && r->header.cupsHeight != 0 && (r->header.cupsBytesPerLine % r->bpp) == 0);
 }
 
 
@@ -1219,7 +1222,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
  *                          current page.
  */
 
-static void
+static int				/* O - 1 on success, 0 on failure */
 cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
 {
   if (r->sync == CUPS_RASTER_SYNCv1 || r->sync == CUPS_RASTER_REVSYNCv1 ||
@@ -1300,6 +1303,10 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
           r->header.cupsNumColors = r->header.cupsColorSpace -
 	                            CUPS_CSPACE_DEVICE1 + 1;
 	  break;
+
+      default :
+          /* Unknown color space */
+          return (0);
     }
   }
 
