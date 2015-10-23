@@ -1831,6 +1831,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      }
 	    }
 	  }
+          else
+            break;
         }
 	while (httpGetState(con->http) == HTTP_STATE_PUT_RECV && httpGetReady(con->http));
 
