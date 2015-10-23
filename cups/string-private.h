@@ -3,7 +3,7 @@
  *
  * Private string definitions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -147,6 +147,7 @@ extern int _cups_toupper(int ch);
  * Prototypes...
  */
 
+extern ssize_t	_cups_safe_vsnprintf(char *, size_t, const char *, va_list);
 extern void	_cups_strcpy(char *dst, const char *src);
 
 #  ifndef HAVE_STRDUP

@@ -1476,7 +1476,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   * Format the log message...
   */
 
-  len = vsnprintf(log_line, log_linesize, message, ap);
+  len = _cups_safe_vsnprintf(log_line, log_linesize, message, ap);
 
  /*
   * Resize the buffer as needed...
@@ -1485,7 +1485,6 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   if ((size_t)len >= log_linesize && log_linesize < 65536)
   {
     char	*temp;			/* Temporary string pointer */
-
 
     len ++;
 
