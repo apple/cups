@@ -1799,6 +1799,20 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  {
 	    con->bytes += bytes;
 
+            if (MaxRequestSize > 0 && con->bytes > MaxRequestSize)
+            {
+	      close(con->file);
+	      con->file = -1;
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
+
+              if (!cupsdSendError(con, HTTP_STATUS_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+            }
+
             if (write(con->file, line, (size_t)bytes) < bytes)
 	    {
               cupsdLogClient(con, CUPSD_LOG_ERROR,
@@ -1959,6 +1973,20 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    else if (bytes > 0)
 	    {
 	      con->bytes += bytes;
+
+              if (MaxRequestSize > 0 && con->bytes > MaxRequestSize)
+              {
+                close(con->file);
+                con->file = -1;
+                unlink(con->filename);
+                cupsdClearString(&con->filename);
+
+                if (!cupsdSendError(con, HTTP_STATUS_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
+                {
+                  cupsdCloseClient(con);
+                  return;
+                }
+              }
 
               if (write(con->file, line, (size_t)bytes) < bytes)
 	      {
