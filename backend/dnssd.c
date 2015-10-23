@@ -1050,9 +1050,7 @@ query_callback(
                   "interfaceIndex=%d, errorCode=%d, fullName=\"%s\", "
 		  "rrtype=%u, rrclass=%u, rdlen=%u, rdata=%p, ttl=%u, "
 		  "context=%p)\n",
-          sdRef, flags, interfaceIndex, errorCode,
-	  fullName ? fullName : "(null)", rrtype, rrclass, rdlen, rdata, ttl,
-	  context);
+          sdRef, flags, interfaceIndex, errorCode, fullName, rrtype, rrclass, rdlen, rdata, ttl, context);
 
  /*
   * Only process "add" data...
@@ -1065,9 +1063,7 @@ query_callback(
   fprintf(stderr, "DEBUG2: query_callback(browser=%p, interfaceIndex=%d, "
                   "protocol=%d, event=%d, fullName=\"%s\", rrclass=%u, "
 		  "rrtype=%u, rdata=%p, rdlen=%u, flags=%x, context=%p)\n",
-          browser, interfaceIndex, protocol, event,
-	  fullName ? fullName : "(null)", rrclass, rrtype, rdata,
-	  (unsigned)rdlen, flags, context);
+          browser, interfaceIndex, protocol, event, fullName, rrclass, rrtype, rdata, (unsigned)rdlen, flags, context);
 
  /*
   * Only process "add" data...
