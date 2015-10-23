@@ -3,7 +3,7 @@
  *
  * Authentication certificate routines for the CUPS scheduler.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -24,6 +24,13 @@
 #    include <membership.h>
 #  endif /* HAVE_MEMBERSHIP_H */
 #endif /* HAVE_ACL_INIT */
+
+
+/*
+ * Local functions...
+ */
+
+static int	ctcompare(const char *a, const char *b);
 
 
 /*
@@ -356,7 +363,7 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)",
                   certificate);
   for (cert = Certs; cert != NULL; cert = cert->next)
-    if (!_cups_strcasecmp(certificate, cert->certificate))
+    if (!ctcompare(certificate, cert->certificate))
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning %s...",
                       cert->username);
@@ -422,6 +429,24 @@ cupsdInitCerts(void)
 
   if (!RunUser)
     cupsdAddCert(0, "root", cupsdDefaultAuthType());
+}
+
+
+/*
+ * 'ctcompare()' - Compare two strings in constant time.
+ */
+
+static int				/* O - 0 on match, non-zero on non-match */
+ctcompare(const char *a,		/* I - First string */
+          const char *b)		/* I - Second string */
+{
+  int	result = 0;			/* Result */
+
+
+  while (*a && *b)
+    result |= *a ^ *b;
+
+  return (result);
 }
 
 
