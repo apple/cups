@@ -1345,6 +1345,8 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
     r->pend     = r->pixels + r->header.cupsBytesPerLine;
     r->count    = 0;
   }
+
+  return (1);
 }
 
 
