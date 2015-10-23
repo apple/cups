@@ -1831,8 +1831,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      }
 	    }
 	  }
-          else
-            break;
+          else if (httpGetState(con->http) == HTTP_STATE_PUT_RECV)
+          {
+            cupsdCloseClient(con);
+            return;
+          }
         }
 	while (httpGetState(con->http) == HTTP_STATE_PUT_RECV && httpGetReady(con->http));
 
