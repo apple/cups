@@ -2961,7 +2961,8 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   int		status;			/* Status of filesystem calls */
   char		*ptr;			/* Pointer info filename */
   size_t	plen;			/* Remaining length after pointer */
-  char		language[7];		/* Language subdirectory, if any */
+  char		language[7],		/* Language subdirectory, if any */
+		dest[1024];		/* Destination name */
   int		perm_check = 1;		/* Do permissions check? */
 
 
@@ -2973,13 +2974,45 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 
   if (!strncmp(con->uri, "/ppd/", 5) && !strchr(con->uri + 5, '/'))
   {
+    strlcpy(dest, con->uri + 5, sizeof(dest));
+    ptr = dest + strlen(dest) - 4;
+
+    if (ptr <= dest || strcmp(ptr, ".ppd"))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "Disallowed path \"%s\".", con->uri);
+      return (NULL);
+    }
+
+    *ptr = '\0';
+    if (!cupsdFindPrinter(dest))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "No printer \"%s\" found.", dest);
+      return (NULL);
+    }
+
     snprintf(filename, len, "%s%s", ServerRoot, con->uri);
 
     perm_check = 0;
   }
   else if (!strncmp(con->uri, "/icons/", 7) && !strchr(con->uri + 7, '/'))
   {
-    snprintf(filename, len, "%s/%s", CacheDir, con->uri + 7);
+    strlcpy(dest, con->uri + 7, sizeof(dest));
+    ptr = dest + strlen(dest) - 4;
+
+    if (ptr <= dest || strcmp(ptr, ".png"))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "Disallowed path \"%s\".", con->uri);
+      return (NULL);
+    }
+
+    *ptr = '\0';
+    if (!cupsdFindDest(dest))
+    {
+      cupsdLogClient(con, CUPSD_LOG_INFO, "No printer \"%s\" found.", dest);
+      return (NULL);
+    }
+
+    snprintf(filename, len, "%s/%s.png", CacheDir, dest);
     if (access(filename, F_OK) < 0)
       snprintf(filename, len, "%s/images/generic.png", DocumentRoot);
 
