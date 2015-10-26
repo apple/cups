@@ -263,7 +263,7 @@ StartPage(
   * Allocate memory for a line/row of graphics...
   */
 
-  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  if ((Planes[0] = malloc(header->cupsBytesPerLine + NumPlanes)) == NULL)
   {
     fputs("ERROR: Unable to allocate memory\n", stderr);
     exit(1);
