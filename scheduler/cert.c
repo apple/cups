@@ -108,8 +108,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
     fchmod(fd, 0440);
     fchown(fd, RunUser, SystemGroupIDs[0]);
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddCert: NumSystemGroups=%d",
-                    NumSystemGroups);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddCert: NumSystemGroups=%d", NumSystemGroups);
 
 #ifdef HAVE_ACL_INIT
     if (NumSystemGroups > 1)
@@ -285,8 +284,7 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
       * Remove this certificate from the list...
       */
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdDeleteCert: Removing certificate for PID %d", pid);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteCert: Removing certificate for PID %d.", pid);
 
       DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
                     cert->username, cert->certificate));
@@ -360,17 +358,15 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
   cupsd_cert_t	*cert;			/* Current certificate */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)",
-                  certificate);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)", certificate);
   for (cert = Certs; cert != NULL; cert = cert->next)
     if (!ctcompare(certificate, cert->certificate))
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning %s...",
-                      cert->username);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning \"%s\".", cert->username);
       return (cert);
     }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Certificate not found!");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Certificate not found.");
 
   return (NULL);
 }

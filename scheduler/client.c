@@ -78,9 +78,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #endif /* HAVE_TCPD_H */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAcceptClient(lis=%p(%d)) Clients=%d",
-                  lis, lis->fd, cupsArrayCount(Clients));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAcceptClient(lis=%p(%d)) Clients=%d", lis, lis->fd, cupsArrayCount(Clients));
 
  /*
   * Make sure we don't have a full set of clients already...
@@ -383,8 +381,7 @@ cupsdCloseAllClients(void)
   cupsd_client_t	*con;		/* Current client */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCloseAllClients() Clients=%d",
-                  cupsArrayCount(Clients));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCloseAllClients() Clients=%d", cupsArrayCount(Clients));
 
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
@@ -564,22 +561,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
   status = HTTP_STATUS_CONTINUE;
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		 "cupsdReadClient "
-		 "error=%d, "
-		 "used=%d, "
-		 "state=%s, "
-		 "data_encoding=HTTP_ENCODING_%s, "
-		 "data_remaining=" CUPS_LLFMT ", "
-		 "request=%p(%s), "
-		 "file=%d",
-		 httpError(con->http), (int)httpGetReady(con->http),
-		 httpStateString(httpGetState(con->http)),
-		 httpIsChunked(con->http) ? "CHUNKED" : "LENGTH",
-		 CUPS_LLCAST httpGetRemaining(con->http),
-		 con->request,
-		 con->request ? ippStateString(ippGetState(con->request)) : "",
-		 con->file);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdReadClient: error=%d, used=%d, state=%s, data_encoding=HTTP_ENCODING_%s, data_remaining=" CUPS_LLFMT ", request=%p(%s), file=%d", httpError(con->http), (int)httpGetReady(con->http), httpStateString(httpGetState(con->http)), httpIsChunked(con->http) ? "CHUNKED" : "LENGTH", CUPS_LLCAST httpGetRemaining(con->http), con->request, con->request ? ippStateString(ippGetState(con->request)) : "", con->file);
 
   if (httpGetState(con->http) == HTTP_STATE_GET_SEND ||
       httpGetState(con->http) == HTTP_STATE_POST_SEND ||
@@ -601,8 +583,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       return;
     }
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.",
-		   httpStateString(httpGetState(con->http)));
+    cupsdLogClient(con, CUPSD_LOG_DEBUG, "Closing on unexpected HTTP read state %s.", httpStateString(httpGetState(con->http)));
     cupsdCloseClient(con);
     return;
   }
@@ -623,9 +604,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * Encrypt this connection...
       */
 
-      cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-                     "Saw first byte %02X, auto-negotiating "
-		     "SSL/TLS session.", buf[0] & 255);
+      cupsdLogClient(con, CUPSD_LOG_DEBUG2, "Saw first byte %02X, auto-negotiating SSL/TLS session.", buf[0] & 255);
 
       if (cupsd_start_tls(con, HTTP_ENCRYPTION_ALWAYS))
         cupsdCloseClient(con);
@@ -2195,8 +2174,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   char	location[HTTP_MAX_VALUE];	/* Location field */
 
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendError code=%d, auth_type=%d",
-		 code, auth_type);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "cupsdSendError code=%d, auth_type=%d", code, auth_type);
 
 #ifdef HAVE_SSL
  /*
@@ -2871,11 +2849,7 @@ check_if_modified(
   if (*ptr == '\0')
     return (1);
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-                 "check_if_modified "
-		 "filestats=%p(" CUPS_LLFMT ", %d)) If-Modified-Since=\"%s\"",
-                 filestats, CUPS_LLCAST filestats->st_size,
-		 (int)filestats->st_mtime, ptr);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "check_if_modified: filestats=%p(" CUPS_LLFMT ", %d)) If-Modified-Since=\"%s\"", filestats, CUPS_LLCAST filestats->st_size, (int)filestats->st_mtime, ptr);
 
   while (*ptr != '\0')
   {
@@ -3218,7 +3192,7 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     }
   }
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "get_file filestats=%p, filename=%p, len=" CUPS_LLFMT ", returning \"%s\".", filestats, filename, CUPS_LLCAST len, status ? "(null)" : filename);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "get_file: filestats=%p, filename=%p, len=" CUPS_LLFMT ", returning \"%s\".", filestats, filename, CUPS_LLCAST len, status ? "(null)" : filename);
 
   if (status)
     return (NULL);
@@ -3345,11 +3319,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
 
   if (!type || _cups_strcasecmp(type->super, "application"))
   {
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 0", filename,
-		   filestats, type ? type->super : "unknown",
-		   type ? type->type : "unknown");
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 0.", filename, filestats, type ? type->super : "unknown", type ? type->type : "unknown");
     return (0);
   }
 
@@ -3365,10 +3335,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     if (options)
       cupsdSetStringf(&con->options, " %s", options);
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 1", filename,
-		   filestats, type->super, type->type);
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
 #ifdef HAVE_JAVA
@@ -3385,10 +3352,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     else
       cupsdSetStringf(&con->options, " %s", filename);
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 1", filename,
-		   filestats, type->super, type->type);
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_JAVA */
@@ -3406,10 +3370,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     else
       cupsdSetStringf(&con->options, " %s", filename);
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 1", filename,
-		   filestats, type->super, type->type);
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PERL */
@@ -3427,10 +3388,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     else
       cupsdSetStringf(&con->options, " %s", filename);
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 1", filename,
-		   filestats, type->super, type->type);
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PHP */
@@ -3448,18 +3406,12 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     else
       cupsdSetStringf(&con->options, " %s", filename);
 
-    cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		   "is_cgi filename=\"%s\", filestats=%p, "
-		   "type=%s/%s, returning 1", filename,
-		   filestats, type->super, type->type);
+    cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 1.", filename, filestats, type->super, type->type);
     return (1);
   }
 #endif /* HAVE_PYTHON */
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-		 "is_cgi filename=\"%s\", filestats=%p, "
-		 "type=%s/%s, returning 0", filename,
-		 filestats, type->super, type->type);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "is_cgi: filename=\"%s\", filestats=%p, type=%s/%s, returning 0.", filename, filestats, type->super, type->type);
   return (0);
 }
 
@@ -3566,11 +3518,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   * be consistent with Apache...
   */
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-                 "pipe_command infile=%d, outfile=%p, "
-		 "command=\"%s\", options=\"%s\", root=%d",
-                 infile, outfile, command,
-		 options ? options : "(null)", root);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "pipe_command: infile=%d, outfile=%p, command=\"%s\", options=\"%s\", root=%d", infile, outfile, command, options ? options : "(null)", root);
 
   argv[0] = command;
 
@@ -4087,10 +4035,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 {
   con->file = open(filename, O_RDONLY);
 
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2,
-                 "write_file code=%d, filename=\"%s\" (%d), "
-		 "type=\"%s\", filestats=%p",
-		 code, filename, con->file, type ? type : "(null)", filestats);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "write_file: code=%d, filename=\"%s\" (%d), type=\"%s\", filestats=%p.", code, filename, con->file, type ? type : "(null)", filestats);
 
   if (con->file < 0)
     return (0);
@@ -4125,8 +4070,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 static void
 write_pipe(cupsd_client_t *con)		/* I - Client connection */
 {
-  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "write_pipe CGI output on fd %d",
-                 con->file);
+  cupsdLogClient(con, CUPSD_LOG_DEBUG2, "write_pipe: CGI output on fd %d.", con->file);
 
   con->file_ready = 1;
 
