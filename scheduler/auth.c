@@ -1492,6 +1492,12 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
 
   strlcpy(uri, path, sizeof(uri));
 
+  if ((uriptr = strchr(uri, '?')) != NULL)
+    *uriptr = '\0';		/* Drop trailing query string */
+
+  if ((uriptr = uri + strlen(uri) - 1) > uri && *uriptr == '/')
+    *uriptr = '\0';		/* Remove trailing '/' */
+
   if (!strncmp(uri, "/printers/", 10) ||
       !strncmp(uri, "/classes/", 9))
   {
@@ -1504,12 +1510,6 @@ cupsdFindBest(const char   *path,	/* I - Resource path */
     if (!strcmp(uriptr, ".ppd"))
       *uriptr = '\0';
   }
-
-  if ((uriptr = strchr(uri, '?')) != NULL)
-    *uriptr = '\0';		/* Drop trailing query string */
-
-  if ((uriptr = uri + strlen(uri) - 1) > uri && *uriptr == '/')
-    *uriptr = '\0';		/* Remove trailing '/' */
 
  /*
   * Loop through the list of locations to find a match...
