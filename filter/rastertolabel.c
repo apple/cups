@@ -3,7 +3,7 @@
  *
  * Label printer filter for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 2001-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -166,39 +166,15 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   */
 
   fprintf(stderr, "DEBUG: StartPage...\n");
-  fprintf(stderr, "DEBUG: MediaClass = \"%s\"\n", header->MediaClass);
-  fprintf(stderr, "DEBUG: MediaColor = \"%s\"\n", header->MediaColor);
-  fprintf(stderr, "DEBUG: MediaType = \"%s\"\n", header->MediaType);
-  fprintf(stderr, "DEBUG: OutputType = \"%s\"\n", header->OutputType);
-
-  fprintf(stderr, "DEBUG: AdvanceDistance = %d\n", header->AdvanceDistance);
-  fprintf(stderr, "DEBUG: AdvanceMedia = %d\n", header->AdvanceMedia);
-  fprintf(stderr, "DEBUG: Collate = %d\n", header->Collate);
-  fprintf(stderr, "DEBUG: CutMedia = %d\n", header->CutMedia);
   fprintf(stderr, "DEBUG: Duplex = %d\n", header->Duplex);
-  fprintf(stderr, "DEBUG: HWResolution = [ %d %d ]\n", header->HWResolution[0],
-          header->HWResolution[1]);
-  fprintf(stderr, "DEBUG: ImagingBoundingBox = [ %d %d %d %d ]\n",
-          header->ImagingBoundingBox[0], header->ImagingBoundingBox[1],
-          header->ImagingBoundingBox[2], header->ImagingBoundingBox[3]);
-  fprintf(stderr, "DEBUG: InsertSheet = %d\n", header->InsertSheet);
-  fprintf(stderr, "DEBUG: Jog = %d\n", header->Jog);
-  fprintf(stderr, "DEBUG: LeadingEdge = %d\n", header->LeadingEdge);
-  fprintf(stderr, "DEBUG: Margins = [ %d %d ]\n", header->Margins[0],
-          header->Margins[1]);
+  fprintf(stderr, "DEBUG: HWResolution = [ %d %d ]\n", header->HWResolution[0], header->HWResolution[1]);
+  fprintf(stderr, "DEBUG: ImagingBoundingBox = [ %d %d %d %d ]\n", header->ImagingBoundingBox[0], header->ImagingBoundingBox[1], header->ImagingBoundingBox[2], header->ImagingBoundingBox[3]);
+  fprintf(stderr, "DEBUG: Margins = [ %d %d ]\n", header->Margins[0], header->Margins[1]);
   fprintf(stderr, "DEBUG: ManualFeed = %d\n", header->ManualFeed);
   fprintf(stderr, "DEBUG: MediaPosition = %d\n", header->MediaPosition);
-  fprintf(stderr, "DEBUG: MediaWeight = %d\n", header->MediaWeight);
-  fprintf(stderr, "DEBUG: MirrorPrint = %d\n", header->MirrorPrint);
-  fprintf(stderr, "DEBUG: NegativePrint = %d\n", header->NegativePrint);
   fprintf(stderr, "DEBUG: NumCopies = %d\n", header->NumCopies);
   fprintf(stderr, "DEBUG: Orientation = %d\n", header->Orientation);
-  fprintf(stderr, "DEBUG: OutputFaceUp = %d\n", header->OutputFaceUp);
-  fprintf(stderr, "DEBUG: PageSize = [ %d %d ]\n", header->PageSize[0],
-          header->PageSize[1]);
-  fprintf(stderr, "DEBUG: Separations = %d\n", header->Separations);
-  fprintf(stderr, "DEBUG: TraySwitch = %d\n", header->TraySwitch);
-  fprintf(stderr, "DEBUG: Tumble = %d\n", header->Tumble);
+  fprintf(stderr, "DEBUG: PageSize = [ %d %d ]\n", header->PageSize[0], header->PageSize[1]);
   fprintf(stderr, "DEBUG: cupsWidth = %d\n", header->cupsWidth);
   fprintf(stderr, "DEBUG: cupsHeight = %d\n", header->cupsHeight);
   fprintf(stderr, "DEBUG: cupsMediaType = %d\n", header->cupsMediaType);
@@ -208,9 +184,6 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", header->cupsColorOrder);
   fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", header->cupsColorSpace);
   fprintf(stderr, "DEBUG: cupsCompression = %d\n", header->cupsCompression);
-  fprintf(stderr, "DEBUG: cupsRowCount = %d\n", header->cupsRowCount);
-  fprintf(stderr, "DEBUG: cupsRowFeed = %d\n", header->cupsRowFeed);
-  fprintf(stderr, "DEBUG: cupsRowStep = %d\n", header->cupsRowStep);
 
   switch (ModelNumber)
   {

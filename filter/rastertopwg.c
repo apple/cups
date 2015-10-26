@@ -90,6 +90,29 @@ main(int  argc,				/* I - Number of command-line args */
   while (cupsRasterReadHeader2(inras, &inheader))
   {
    /*
+    * Show page device dictionary...
+    */
+
+    fprintf(stderr, "DEBUG: Duplex = %d\n", inheader.Duplex);
+    fprintf(stderr, "DEBUG: HWResolution = [ %d %d ]\n", inheader.HWResolution[0], inheader.HWResolution[1]);
+    fprintf(stderr, "DEBUG: ImagingBoundingBox = [ %d %d %d %d ]\n", inheader.ImagingBoundingBox[0], inheader.ImagingBoundingBox[1], inheader.ImagingBoundingBox[2], inheader.ImagingBoundingBox[3]);
+    fprintf(stderr, "DEBUG: Margins = [ %d %d ]\n", inheader.Margins[0], inheader.Margins[1]);
+    fprintf(stderr, "DEBUG: ManualFeed = %d\n", inheader.ManualFeed);
+    fprintf(stderr, "DEBUG: MediaPosition = %d\n", inheader.MediaPosition);
+    fprintf(stderr, "DEBUG: NumCopies = %d\n", inheader.NumCopies);
+    fprintf(stderr, "DEBUG: Orientation = %d\n", inheader.Orientation);
+    fprintf(stderr, "DEBUG: PageSize = [ %d %d ]\n", inheader.PageSize[0], inheader.PageSize[1]);
+    fprintf(stderr, "DEBUG: cupsWidth = %d\n", inheader.cupsWidth);
+    fprintf(stderr, "DEBUG: cupsHeight = %d\n", inheader.cupsHeight);
+    fprintf(stderr, "DEBUG: cupsMediaType = %d\n", inheader.cupsMediaType);
+    fprintf(stderr, "DEBUG: cupsBitsPerColor = %d\n", inheader.cupsBitsPerColor);
+    fprintf(stderr, "DEBUG: cupsBitsPerPixel = %d\n", inheader.cupsBitsPerPixel);
+    fprintf(stderr, "DEBUG: cupsBytesPerLine = %d\n", inheader.cupsBytesPerLine);
+    fprintf(stderr, "DEBUG: cupsColorOrder = %d\n", inheader.cupsColorOrder);
+    fprintf(stderr, "DEBUG: cupsColorSpace = %d\n", inheader.cupsColorSpace);
+    fprintf(stderr, "DEBUG: cupsCompression = %d\n", inheader.cupsCompression);
+
+   /*
     * Compute the real raster size...
     */
 
@@ -191,7 +214,7 @@ main(int  argc,				/* I - Number of command-line args */
                 sizeof(outheader.OutputType));
       else
       {
-        fprintf(stderr, "DEBUG: Unsupported print-content-type \"%s\".\n", val);
+        fputs("DEBUG: Unsupported print-content-optimize value.\n", stderr);
         outheader.OutputType[0] = '\0';
       }
     }
@@ -232,8 +255,7 @@ main(int  argc,				/* I - Number of command-line args */
                 sizeof(outheader.cupsRenderingIntent));
       else
       {
-        fprintf(stderr, "DEBUG: Unsupported print-rendering-intent \"%s\".\n",
-                val);
+        fputs("DEBUG: Unsupported print-rendering-intent value.\n", stderr);
         outheader.cupsRenderingIntent[0] = '\0';
       }
     }
@@ -367,7 +389,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Unsupported value...
         */
 
-        fprintf(stderr, "DEBUG: Unsupported cupsBackSide \"%s\".\n", back->value);
+        fputs("DEBUG: Unsupported cupsBackSide value.\n", stderr);
 
 	outheader.cupsInteger[1] = 1;	/* CrossFeedTransform */
 	outheader.cupsInteger[2] = 1;	/* FeedTransform */
