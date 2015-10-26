@@ -1340,7 +1340,15 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
     if (r->pixels != NULL)
       free(r->pixels);
 
-    r->pixels   = calloc(r->header.cupsBytesPerLine, 1);
+    if ((r->pixels = calloc(r->header.cupsBytesPerLine, 1)) == NULL)
+    {
+      r->pcurrent = NULL;
+      r->pend     = NULL;
+      r->count    = 0;
+
+      return (0);
+    }
+
     r->pcurrent = r->pixels;
     r->pend     = r->pixels + r->header.cupsBytesPerLine;
     r->count    = 0;
