@@ -3,7 +3,7 @@
  *
  * RSS notifier for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -641,15 +641,21 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
        msg;
        msg = (_cups_rss_t *)cupsArrayPrev(rss))
   {
+    char *subject = xml_escape(msg->subject);
+    char *text = xml_escape(msg->text);
+
     fputs("    <item>\n", fp);
-    fprintf(fp, "      <title>%s</title>\n", msg->subject);
-    fprintf(fp, "      <description>%s</description>\n", msg->text);
+    fprintf(fp, "      <title>%s</title>\n", subject);
+    fprintf(fp, "      <description>%s</description>\n", text);
     if (msg->link_url)
       fprintf(fp, "      <link>%s</link>\n", msg->link_url);
     fprintf(fp, "      <pubDate>%s</pubDate>\n",
             httpGetDateString2(msg->event_time, date, sizeof(date)));
     fprintf(fp, "      <guid>%d</guid>\n", msg->sequence_number);
     fputs("    </item>\n", fp);
+
+    free(subject);
+    free(text);
   }
 
   fputs(" </channel>\n", fp);
