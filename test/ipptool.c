@@ -153,31 +153,23 @@ static int	PasswordTries = 0;	/* Number of tries with password */
  * Local functions...
  */
 
-static void	add_stringf(cups_array_t *a, const char *s, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
+static void	add_stringf(cups_array_t *a, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(FILE *outfile, _cups_vars_t *vars, const char *testfile);
-static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize) __attribute__((nonnull(1,2,3)));
+static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src, size_t dstsize) __attribute__((nonnull(1,2,3)));
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static ipp_t	*get_collection(FILE *outfile, _cups_vars_t *vars, FILE *fp, int *linenum);
-static char	*get_filename(const char *testfile, char *dst, const char *src,
-		              size_t dstsize);
-static char	*get_string(ipp_attribute_t *attr, int element, int flags,
-		            char *buffer, size_t bufsize);
-static char	*get_token(FILE *fp, char *buf, int buflen,
-		           int *linenum);
+static char	*get_filename(const char *testfile, char *dst, const char *src, size_t dstsize);
+static const char *get_string(ipp_attribute_t *attr, int element, int flags, char *buffer, size_t bufsize);
+static char	*get_token(FILE *fp, char *buf, int buflen, int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
 static const char *password_cb(const char *prompt);
 static void	pause_message(const char *message);
 static void	print_attr(FILE *outfile, int format, ipp_attribute_t *attr, ipp_tag_t *group);
-static void	print_csv(FILE *outfile, ipp_attribute_t *attr, int num_displayed,
-		          char **displayed, size_t *widths);
-static void	print_fatal_error(FILE *outfile, const char *s, ...)
-		__attribute__ ((__format__ (__printf__, 2, 3)));
-static void	print_line(FILE *outfile, ipp_attribute_t *attr, int num_displayed,
-		           char **displayed, size_t *widths);
+static void	print_csv(FILE *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
+static void	print_fatal_error(FILE *outfile, const char *s, ...) __attribute__ ((__format__ (__printf__, 2, 3)));
+static void	print_line(FILE *outfile, ipp_attribute_t *attr, int num_displayed, char **displayed, size_t *widths);
 static void	print_xml_header(FILE *outfile);
 static void	print_xml_string(FILE *outfile, const char *element, const char *s);
 static void	print_xml_trailer(FILE *outfile, int success, const char *message);
@@ -188,9 +180,7 @@ static void	sigterm_handler(int sig);
 static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void) __attribute__((noreturn));
 static int	validate_attr(FILE *outfile, cups_array_t *errors, ipp_attribute_t *attr);
-static int      with_value(FILE *outfile, cups_array_t *errors, char *value, int flags,
-		           ipp_attribute_t *attr, char *matchbuf,
-		           size_t matchlen);
+static int      with_value(FILE *outfile, cups_array_t *errors, char *value, int flags, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 static int      with_value_from(cups_array_t *errors, ipp_attribute_t *fromattr, ipp_attribute_t *attr, char *matchbuf, size_t matchlen);
 
 
@@ -1721,7 +1711,19 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strchr(token, ','))
-		attrptr = ippAddInteger(request, group, value, attr, (int)strtol(token, &tokenptr, 0));
+	      {
+	        if (isdigit(token[0] & 255) || token[0] == '-')
+		  attrptr = ippAddInteger(request, group, value, attr, (int)strtol(token, &tokenptr, 0));
+		else
+		{
+                  tokenptr = token;
+                  if ((i = ippEnumValue(attr, tokenptr)) >= 0)
+                  {
+                    attrptr  = ippAddInteger(request, group, value, attr, i);
+                    tokenptr += strlen(tokenptr);
+                  }
+		}
+	      }
 	      else
 	      {
 	        int	values[100],	/* Values */
@@ -1733,11 +1735,32 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		{
 		  if (*tokenptr == ',')
 		    tokenptr ++;
-		  else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
-		    break;
 
-		  values[num_values] = (int)strtol(tokenptr, &tokenptr, 0);
-		  num_values ++;
+		  if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
+		  {
+		    char *ptr, ch;	/* Pointer to next terminator */
+
+		    if (value != IPP_TAG_ENUM)
+		      break;
+
+                    if ((ptr = strchr(tokenptr, ',')) != NULL)
+                    {
+                      ch   = *ptr;
+                      *ptr = '\0';
+                    }
+                    else
+                    {
+                      ch  = '\0';
+                      ptr = tokenptr + strlen(tokenptr);
+                    }
+
+                    if ((i = ippEnumValue(attr, tokenptr)) < 0)
+                      break;
+		  }
+		  else
+		    i = (int)strtol(tokenptr, &tokenptr, 0);
+
+		  values[num_values ++] = i;
 		}
 
 		attrptr = ippAddIntegers(request, group, value, attr, num_values, values);
@@ -3909,26 +3932,27 @@ get_filename(const char *testfile,	/* I - Current test file */
  * 'get_string()' - Get a pointer to a string value or the portion of interest.
  */
 
-static char *				/* O - Pointer to string */
+static const char *			/* O - Pointer to string */
 get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
            int             element,	/* I - Element to fetch */
            int             flags,	/* I - Value ("with") flags */
            char            *buffer,	/* I - Temporary buffer */
 	   size_t          bufsize)	/* I - Size of temporary buffer */
 {
-  char	*ptr,				/* Value */
-	scheme[256],			/* URI scheme */
-	userpass[256],			/* Username/password */
-	hostname[256],			/* Hostname */
-	resource[1024];			/* Resource */
-  int	port;				/* Port number */
+  const char	*value;			/* Value */
+  char		*ptr,			/* Pointer into value */
+		scheme[256],		/* URI scheme */
+		userpass[256],		/* Username/password */
+		hostname[256],		/* Hostname */
+		resource[1024];		/* Resource */
+  int		port;			/* Port number */
 
 
-  ptr = attr->values[element].string.text;
+  value = ippGetString(attr, element, NULL);
 
   if (flags & _CUPS_WITH_HOSTNAME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), buffer, (int)bufsize, &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     ptr = buffer + strlen(buffer) - 1;
@@ -3939,20 +3963,46 @@ get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
   }
   else if (flags & _CUPS_WITH_RESOURCE)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, buffer, (int)bufsize) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, buffer, (int)bufsize) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     return (buffer);
   }
   else if (flags & _CUPS_WITH_SCHEME)
   {
-    if (httpSeparateURI(HTTP_URI_CODING_ALL, ptr, buffer, (int)bufsize, userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    if (httpSeparateURI(HTTP_URI_CODING_ALL, value, buffer, (int)bufsize, userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
       buffer[0] = '\0';
 
     return (buffer);
   }
+  else if (ippGetValueTag(attr) == IPP_TAG_URI && (!strncmp(value, "ipp://", 6) || !strncmp(value, "http://", 7) || !strncmp(value, "ipps://", 7) || !strncmp(value, "https://", 8)))
+  {
+    http_uri_status_t status = httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource));
+
+    if (status < HTTP_URI_STATUS_OK)
+    {
+     /*
+      * Bad URI...
+      */
+
+      buffer[0] = '\0';
+    }
+    else
+    {
+     /*
+      * Normalize URI with no trailing dot...
+      */
+
+      if ((ptr = hostname + strlen(hostname) - 1) >= hostname && *ptr == '.')
+	*ptr = '\0';
+
+      httpAssembleURI(HTTP_URI_CODING_ALL, buffer, bufsize, scheme, userpass, hostname, port, resource);
+    }
+
+    return (buffer);
+  }
   else
-    return (ptr);
+    return (value);
 }
 
 
@@ -5871,6 +5921,55 @@ with_value(FILE            *outfile,	/* I - Output file */
 	  }
 
 	  regfree(&re);
+	}
+	else if (ippGetValueTag(attr) == IPP_TAG_URI)
+	{
+          if (!strncmp(value, "ipp://", 6) || !strncmp(value, "http://", 7) || !strncmp(value, "ipps://", 7) || !strncmp(value, "https://", 8))
+          {
+	    char	scheme[256],	/* URI scheme */
+			userpass[256],	/* username:password, if any */
+			hostname[256],	/* hostname */
+			*hostptr,	/* Pointer into hostname */
+			resource[1024];	/* Resource path */
+	    int		port;		/* Port number */
+
+            if (httpSeparateURI(HTTP_URI_CODING_ALL, value, scheme, sizeof(scheme), userpass, sizeof(userpass), hostname, sizeof(hostname), &port, resource, sizeof(resource)) >= HTTP_URI_STATUS_OK && (hostptr = hostname + strlen(hostname) - 1) > hostname && *hostptr == '.')
+            {
+             /*
+              * Strip trailing "." in hostname of URI...
+              */
+
+              *hostptr = '\0';
+              httpAssembleURI(HTTP_URI_CODING_ALL, temp, sizeof(temp), scheme, userpass, hostname, port, resource);
+              value = temp;
+            }
+          }
+
+	 /*
+	  * Value is a literal URI string, see if the value(s) match...
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!strcmp(value, get_string(attr, i, flags, temp, sizeof(temp))))
+	    {
+	      if (!matchbuf[0])
+		strlcpy(matchbuf,
+		        get_string(attr, i, flags, temp, sizeof(temp)),
+		        matchlen);
+
+	      if (!(flags & _CUPS_WITH_ALL))
+	      {
+	        match = 1;
+	        break;
+	      }
+	    }
+	    else if (flags & _CUPS_WITH_ALL)
+	    {
+	      match = 0;
+	      break;
+	    }
+	  }
 	}
 	else
 	{
