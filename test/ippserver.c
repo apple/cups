@@ -1086,7 +1086,10 @@ create_job(_ipp_client_t *client)	/* I - Client */
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, uri);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL, uuid);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL, client->printer->uri);
+  if ((attr = ippFindAttribute(client->request, "printer-uri", IPP_TAG_URI)) != NULL)
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL, ippGetString(attr, 0, NULL));
+  else
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL, client->printer->uri);
   ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation", (int)(job->created - client->printer->start_time));
 
   cupsArrayAdd(client->printer->jobs, job);
@@ -1770,9 +1773,6 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   if (!ippFindAttribute(printer->attrs, "job-password-supported", IPP_TAG_ZERO))
     ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "job-password-supported", 4);
 
-  /* job-preferred-attributes-supported */
-  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "job-preferred-attributes-supported", 0);
-
   /* job-priority-default */
   if (!ippFindAttribute(printer->attrs, "job-priority-default", IPP_TAG_ZERO))
     ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "job-priority-default", 50);
@@ -1979,6 +1979,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   /* pdl-override-supported */
   if (!ippFindAttribute(printer->attrs, "pdl-override-supported", IPP_TAG_ZERO))
     ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_CONST_TAG(IPP_TAG_KEYWORD), "pdl-override-supported", NULL, "attempted");
+
+  /* preferred-attributes-supported */
+  ippAddBoolean(printer->attrs, IPP_TAG_PRINTER, "preferred-attributes-supported", 0);
 
   /* print-color-mode-default */
   if (!ippFindAttribute(printer->attrs, "print-color-mode-default", IPP_TAG_ZERO))
@@ -3681,7 +3684,7 @@ ipp_get_printer_attributes(
       {
         if (printer->state_reasons & bit)
 	{
-	  snprintf(reason, sizeof(reason), "%s-%s", _ipp_preason_strings[0], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
+	  snprintf(reason, sizeof(reason), "%s-%s", _ipp_preason_strings[i], printer->state == IPP_PSTATE_IDLE ? "report" : printer->state == IPP_PSTATE_PROCESSING ? "warning" : "error");
 	  if (attr)
 	    ippSetString(client->response, &attr, ippGetCount(attr), reason);
 	  else
