@@ -3996,7 +3996,7 @@ get_string(ipp_attribute_t *attr,	/* I - IPP attribute */
       if ((ptr = hostname + strlen(hostname) - 1) >= hostname && *ptr == '.')
 	*ptr = '\0';
 
-      httpAssembleURI(HTTP_URI_CODING_ALL, buffer, bufsize, scheme, userpass, hostname, port, resource);
+      httpAssembleURI(HTTP_URI_CODING_ALL, buffer, (int)bufsize, scheme, userpass, hostname, port, resource);
     }
 
     return (buffer);
