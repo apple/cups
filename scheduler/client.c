@@ -3223,7 +3223,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   {
     cupsdLogClient(con, CUPSD_LOG_ERROR, "Unable to open request file \"%s\": %s",
                     con->filename, strerror(errno));
-    return (HTTP_STATUS_SERVER_ERROR);
+    goto server_error;
   }
 
  /*
@@ -3233,7 +3233,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   if ((out = cupsdCreateConfFile(ConfigurationFile, ConfigFilePerm)) == NULL)
   {
     cupsFileClose(in);
-    return (HTTP_STATUS_SERVER_ERROR);
+    goto server_error;
   }
 
   cupsdLogClient(con, CUPSD_LOG_INFO, "Installing config file \"%s\"...",
@@ -3256,7 +3256,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
       snprintf(filename, sizeof(filename), "%s.N", ConfigurationFile);
       cupsdUnlinkOrRemoveFile(filename);
 
-      return (HTTP_STATUS_SERVER_ERROR);
+      goto server_error;
     }
 
  /*
@@ -3266,7 +3266,7 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   cupsFileClose(in);
 
   if (cupsdCloseCreatedConfFile(out, ConfigurationFile))
-    return (HTTP_STATUS_SERVER_ERROR);
+    goto server_error;
 
  /*
   * Remove the request file...
@@ -3287,6 +3287,17 @@ install_cupsd_conf(cupsd_client_t *con)	/* I - Connection */
   */
 
   return (HTTP_STATUS_CREATED);
+
+ /*
+  * Common exit for errors...
+  */
+
+  server_error:
+
+  cupsdUnlinkOrRemoveFile(con->filename);
+  cupsdClearString(&con->filename);
+
+  return (HTTP_STATUS_SERVER_ERROR);
 }
 
 
