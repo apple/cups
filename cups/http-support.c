@@ -1233,6 +1233,12 @@ httpSeparateURI(
 
       *port = (int)strtol(uri + 1, (char **)&uri, 10);
 
+      if (*port <= 0 || *port > 65535)
+      {
+        *port = 0;
+        return (HTTP_URI_STATUS_BAD_PORT);
+      }
+
       if (*uri != '/' && *uri)
       {
         *port = 0;
