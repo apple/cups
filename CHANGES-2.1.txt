@@ -11,7 +11,8 @@ CHANGES IN CUPS V2.1.1
 	  <rdar://problem/23134228>, <rdar://problem/23134299>,
 	  <rdar://problem/23134356>, <rdar://problem/23134415>,
 	  <rdar://problem/23134506>, <rdar://problem/23135066>,
-	  <rdar://problem/23135122>, <rdar://problem/23135207>)
+	  <rdar://problem/23135122>, <rdar://problem/23135207>,
+	  <rdar://problem/23144290>)
 	- The cupsGetPPD* functions did not work with IPP printers (STR #4725)
 	- Some older HP LaserJet printers need a delayed close when printing
 	  using the libusb-based USB backend (STR #4549)

@@ -3003,7 +3003,7 @@ _httpUpdate(http_t        *http,	/* I - HTTP connection */
     *status = http->status;
     return (0);
   }
-  else if (!strncmp(line, "HTTP/", 5))
+  else if (!strncmp(line, "HTTP/", 5) && http->mode == _HTTP_MODE_CLIENT)
   {
    /*
     * Got the beginning of a response...
