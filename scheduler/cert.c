@@ -440,7 +440,11 @@ ctcompare(const char *a,		/* I - First string */
 
 
   while (*a && *b)
+  {
     result |= *a ^ *b;
+    a ++;
+    b ++;
+  }
 
   return (result);
 }
