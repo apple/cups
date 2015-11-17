@@ -24,6 +24,7 @@ CHANGES IN CUPS V2.1.1
 	  (STR #4708)
 	- The IPP backend did not always handle jobs getting canceled at the
 	  printer (<rdar://problem/22716820>)
+	- Scheduler logging change (STR #4728)
 	- Updated localizations (STR #4709)
 
 

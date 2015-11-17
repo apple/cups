@@ -2916,7 +2916,7 @@ cupsd_start_tls(cupsd_client_t    *con,	/* I - Client connection */
     return (-1);
   }
 
-  cupsdLogClient(con, CUPSD_LOG_INFO, "Connection now encrypted.");
+  cupsdLogClient(con, CUPSD_LOG_DEBUG, "Connection now encrypted.");
   return (0);
 }
 #endif /* HAVE_SSL */
