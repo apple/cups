@@ -238,3 +238,6 @@
 
 # HP LaserJet 1320 (STR #4549)
 0x03f0 0x1d17 delay-close
+
+# Canon, Inc. MP530 Printer
+0x04a9 0x1712 unidir

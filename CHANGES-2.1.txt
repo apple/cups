@@ -25,6 +25,7 @@ CHANGES IN CUPS V2.1.1
 	- The IPP backend did not always handle jobs getting canceled at the
 	  printer (<rdar://problem/22716820>)
 	- Scheduler logging change (STR #4728)
+	- Added USB quirk for Canon MP530 (STR #4730)
 	- Updated localizations (STR #4709)
 
 
