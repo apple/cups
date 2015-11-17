@@ -30,6 +30,8 @@ CHANGES IN CUPS V2.1.1
 	  classes (STR #4733)
 	- Changing the printer-is-shared value for a remote queue did not
 	  produce an error (STR #4738)
+	- The IPP backend incorrectly included the job-password attribute in
+	  Validate-Job requests (<rdar://problem/23531939>)
 	- Updated localizations (STR #4709)
 
 

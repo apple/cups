@@ -85,7 +85,7 @@ _cupsConvertOptions(ipp_t           *request,	/* I - IPP request */
   * Send standard IPP attributes...
   */
 
-  if (pc->password && (keyword = cupsGetOption("job-password", num_options, options)) != NULL)
+  if (pc->password && (keyword = cupsGetOption("job-password", num_options, options)) != NULL && ippGetOperation(request) != IPP_OP_VALIDATE_JOB)
   {
     ippAddOctetString(request, IPP_TAG_OPERATION, "job-password", keyword, (int)strlen(keyword));
 
