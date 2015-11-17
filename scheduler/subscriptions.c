@@ -105,9 +105,7 @@ cupsdAddEvent(
     * Check if this subscription requires this event...
     */
 
-    if ((sub->mask & event) != 0 &&
-        (sub->dest == dest || !sub->dest) &&
-	(sub->job == job || !sub->job))
+    if ((sub->mask & event) != 0 && (sub->dest == dest || !sub->dest || sub->job == job))
     {
      /*
       * Need this event, so create a new event record...
