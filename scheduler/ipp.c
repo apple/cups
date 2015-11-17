@@ -978,6 +978,16 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if ((attr = ippFindAttribute(con->request, "printer-is-shared",
                                IPP_TAG_BOOLEAN)) != NULL)
   {
+    if (pclass->type & CUPS_PRINTER_REMOTE)
+    {
+     /*
+      * Cannot re-share remote printers.
+      */
+
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Cannot change printer-is-shared for remote queues."));
+      return;
+    }
+
     if (pclass->shared && !attr->values[0].boolean)
       cupsdDeregisterPrinter(pclass, 1);
 
@@ -2468,6 +2478,16 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
                       _("Cannot share a remote Kerberized printer."));
+      return;
+    }
+
+    if (printer->type & CUPS_PRINTER_REMOTE)
+    {
+     /*
+      * Cannot re-share remote printers.
+      */
+
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Cannot change printer-is-shared for remote queues."));
       return;
     }
 

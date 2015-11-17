@@ -28,6 +28,8 @@ CHANGES IN CUPS V2.1.1
 	- Added USB quirk for Canon MP530 (STR #4730)
 	- The scheduler did not deliver job notifications for jobs submitted to
 	  classes (STR #4733)
+	- Changing the printer-is-shared value for a remote queue did not
+	  produce an error (STR #4738)
 	- Updated localizations (STR #4709)
 
 
