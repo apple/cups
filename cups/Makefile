@@ -51,6 +51,7 @@ LIBOBJS	=	\
 		getifaddrs.o \
 		getputfile.o \
 		globals.o \
+		hash.o \
 		http.o \
 		http-addr.o \
 		http-addrlist.o \

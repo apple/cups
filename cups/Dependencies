@@ -110,6 +110,12 @@ globals.o: globals.c cups-private.h string-private.h ../config.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
   thread-private.h
+hash.o: hash.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h
 http.o: http.c cups-private.h string-private.h ../config.h \
   debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
   ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
@@ -269,6 +275,11 @@ testadmin.o: testadmin.c adminutil.h cups.h file.h versioning.h ipp.h \
   http.h array.h language.h pwg.h string-private.h ../config.h
 testarray.o: testarray.c string-private.h ../config.h debug-private.h \
   ../cups/versioning.h array-private.h ../cups/array.h dir.h
+testcache.o: testcache.c ppd-private.h ../cups/cups.h file.h versioning.h \
+  ipp.h http.h array.h language.h pwg.h ../cups/ppd.h pwg-private.h \
+  file-private.h cups-private.h string-private.h ../config.h \
+  debug-private.h array-private.h ipp-private.h http-private.h \
+  md5-private.h language-private.h ../cups/transcode.h thread-private.h
 testconflicts.o: testconflicts.c cups.h file.h versioning.h ipp.h http.h \
   array.h language.h pwg.h ppd.h string-private.h ../config.h
 testcups.o: testcups.c string-private.h ../config.h cups.h file.h \
@@ -316,3 +327,9 @@ testsnmp.o: testsnmp.c cups-private.h string-private.h ../config.h \
   md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
   ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
   thread-private.h snmp-private.h
+tlscheck.o: tlscheck.c cups-private.h string-private.h ../config.h \
+  debug-private.h ../cups/versioning.h array-private.h ../cups/array.h \
+  ipp-private.h ../cups/ipp.h http.h http-private.h ../cups/language.h \
+  md5-private.h language-private.h ../cups/transcode.h pwg-private.h \
+  ../cups/cups.h file.h pwg.h ppd-private.h ../cups/ppd.h \
+  thread-private.h

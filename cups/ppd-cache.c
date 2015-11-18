@@ -67,7 +67,8 @@ _cupsConvertOptions(ipp_t           *request,	/* I - IPP request */
 		    cups_option_t *options)	/* I - Options */
 {
   int		i;			/* Looping var */
-  const char	*keyword;		/* PWG keyword */
+  const char	*keyword,		/* PWG keyword */
+		*password;		/* Password string */
   pwg_size_t	*size;			/* PWG media size */
   ipp_t		*media_col,		/* media-col value */
 		*media_size;		/* media-size value */
@@ -85,14 +86,36 @@ _cupsConvertOptions(ipp_t           *request,	/* I - IPP request */
   * Send standard IPP attributes...
   */
 
-  if (pc->password && (keyword = cupsGetOption("job-password", num_options, options)) != NULL && ippGetOperation(request) != IPP_OP_VALIDATE_JOB)
+  if (pc->password && (password = cupsGetOption("job-password", num_options, options)) != NULL && ippGetOperation(request) != IPP_OP_VALIDATE_JOB)
   {
-    ippAddOctetString(request, IPP_TAG_OPERATION, "job-password", keyword, (int)strlen(keyword));
+    ipp_attribute_t	*attr = NULL;	/* job-password attribute */
 
     if ((keyword = cupsGetOption("job-password-encryption", num_options, options)) == NULL)
       keyword = "none";
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "job-password-encryption", NULL, keyword);
+    if (!strcmp(keyword, "none"))
+    {
+     /*
+      * Add plain-text job-password...
+      */
+
+      attr = ippAddOctetString(request, IPP_TAG_OPERATION, "job-password", password, (int)strlen(password));
+    }
+    else
+    {
+     /*
+      * Add hashed job-password...
+      */
+
+      unsigned char	hash[64];	/* Hash of password */
+      ssize_t		hashlen;	/* Length of hash */
+
+      if ((hashlen = cupsHashData(keyword, password, strlen(password), hash, sizeof(hash))) > 0)
+        attr = ippAddOctetString(request, IPP_TAG_OPERATION, "job-password", hash, (int)hashlen);
+    }
+
+    if (attr)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "job-password-encryption", NULL, keyword);
   }
 
   if (pc->account_id)

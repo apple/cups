@@ -108,6 +108,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "copies-supported",
   "cups-version",
   "document-format-supported",
+  "job-password-encryption-supported",
   "marker-colors",
   "marker-high-levels",
   "marker-levels",
@@ -249,6 +250,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LIBZ */
   ipp_attribute_t *copies_sup;		/* copies-supported */
   ipp_attribute_t *cups_version;	/* cups-version */
+  ipp_attribute_t *encryption_sup;	/* job-password-encryption-supported */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *job_auth;		/* job-authorization-uri */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
@@ -880,6 +882,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LIBZ */
   copies_sup           = NULL;
   cups_version         = NULL;
+  encryption_sup       = NULL;
   format_sup           = NULL;
   media_col_sup        = NULL;
   supported            = NULL;
@@ -1125,6 +1128,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
 
+    encryption_sup = ippFindAttribute(supported, "job-password-encryption-supported", IPP_TAG_KEYWORD);
+
     if ((format_sup = ippFindAttribute(supported, "document-format-supported",
 	                               IPP_TAG_MIMETYPE)) != NULL)
     {
@@ -1308,6 +1313,41 @@ main(int  argc,				/* I - Number of command-line args */
 
       if ((mandatory = ppdFindAttr(ppd, "cupsMandatory", NULL)) != NULL)
         strlcpy(mandatory_attrs, mandatory->value, sizeof(mandatory_attrs));
+    }
+
+   /*
+    * Validate job-password/-encryption...
+    */
+
+    if (cupsGetOption("job-password", num_options, options))
+    {
+      const char *keyword;		/* job-password-encryption value */
+      static const char * const hashes[] =
+      {					/* List of supported hash algorithms, in order of preference */
+        "sha-512",
+        "sha-384",
+        "sha-512_256",
+        "sha-512-224",
+        "sha-256",
+        "sha-224",
+        "sha",
+        "none"
+      };
+
+      if ((keyword = cupsGetOption("job-password-encryption", num_options, options)) == NULL || !ippContainsString(encryption_sup, keyword))
+      {
+       /*
+        * Either no job-password-encryption or the value isn't supported by
+        * the printer...
+        */
+
+        for (i = 0; i < (int)(sizeof(hashes) / sizeof(hashes[0])); i ++)
+          if (ippContainsString(encryption_sup, hashes[i]))
+            break;
+
+        if (i < (int)(sizeof(hashes) / sizeof(hashes[0])))
+          num_options = cupsAddOption("job-password-encryption", hashes[i], num_options, &options);
+      }
     }
   }
   else
