@@ -21,6 +21,8 @@
 #include "cups-private.h"
 #ifdef __APPLE__
 #  include <CommonCrypto/CommonDigest.h>
+#elif defined(HAVE_GNUTLS)
+#  include <gnutls/crypto.h>
 #endif /* __APPLE__ */
 
 
@@ -206,7 +208,7 @@ cupsHashData(const char    *algorithm,	/* I - Algorithm name */
       gnutls_hash_fast(alg, data, datalen, temp);
       memcpy(hash, temp, tempsize);
 
-      return (tempsize);
+      return ((ssize_t)tempsize);
     }
 
     if (hashsize < gnutls_hash_get_len(alg))
