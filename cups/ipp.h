@@ -536,6 +536,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
 					/* client-error-account-limit-reached */
   IPP_STATUS_ERROR_ACCOUNT_AUTHORIZATION_FAILED,
 					/* client-error-account-authorization-failed */
+  IPP_STATUS_ERROR_NOT_FETCHABLE,	/* client-error-not-fetchable */
 
   /* Legacy status codes for paid printing */
   IPP_STATUS_ERROR_CUPS_ACCOUNT_INFO_NEEDED = 0x049C,

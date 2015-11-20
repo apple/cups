@@ -78,7 +78,8 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "client-error-account-info-needed",
 		  "client-error-account-closed",
 		  "client-error-account-limit-reached",
-		  "client-error-account-authorization-failed"
+		  "client-error-account-authorization-failed",
+		  "client-error-not-fetchable"
 		},
 		* const ipp_status_480s[] =	/* Vendor client errors */
 		{
