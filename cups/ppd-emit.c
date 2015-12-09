@@ -3,7 +3,7 @@
  *
  * PPD code emission routines for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -22,6 +22,7 @@
  */
 
 #include "cups-private.h"
+#include "ppd.h"
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
 #else

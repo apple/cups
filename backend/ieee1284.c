@@ -3,7 +3,7 @@
  *
  * IEEE-1284 support functions for CUPS.
  *
- * Copyright 2007-2014 by Apple Inc.
+ * Copyright 2007-2015 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -20,6 +20,7 @@
  */
 
 #include "backend-private.h"
+#include <cups/ppd-private.h>
 
 
 /*

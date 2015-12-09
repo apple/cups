@@ -21,6 +21,7 @@
 
 #undef _CUPS_NO_DEPRECATED
 #include "cups-private.h"
+#include "ppd-private.h"
 #include <sys/stat.h>
 #ifdef WIN32
 #  include <io.h>

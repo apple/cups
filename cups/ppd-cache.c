@@ -19,6 +19,7 @@
  */
 
 #include "cups-private.h"
+#include "ppd-private.h"
 #include <math.h>
 
 

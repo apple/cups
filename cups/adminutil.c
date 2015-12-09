@@ -20,6 +20,7 @@
  */
 
 #include "cups-private.h"
+#include "ppd.h"
 #include "adminutil.h"
 #include <fcntl.h>
 #include <sys/stat.h>

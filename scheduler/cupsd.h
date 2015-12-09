@@ -20,6 +20,7 @@
 
 #include <cups/cups-private.h>
 #include <cups/file-private.h>
+#include <cups/ppd-private.h>
 
 #include <limits.h>
 #include <time.h>

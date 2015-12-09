@@ -3,7 +3,7 @@
 #
 # API library Makefile for CUPS.
 #
-# Copyright 2007-2014 by Apple Inc.
+# Copyright 2007-2015 by Apple Inc.
 # Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 # These coded instructions, statements, and computer programs are the
@@ -32,19 +32,15 @@ OPTIONS	=	-D_CUPS_NO_DEPRECATED=1 -D_PPD_DEPRECATED=""
 LIBOBJS	=	\
 		adminutil.o \
 		array.o \
-		attr.o \
 		auth.o \
 		backchannel.o \
 		backend.o \
-		conflicts.o \
-		custom.o \
 		debug.o \
 		dest.o \
 		dest-job.o \
 		dest-localization.o \
 		dest-options.o \
 		dir.o \
-		emit.o \
 		encode.o \
 		file.o \
 		getdevices.o \
@@ -60,15 +56,20 @@ LIBOBJS	=	\
 		ipp-support.o \
 		langprintf.o \
 		language.o \
-		localize.o \
-		mark.o \
 		md5.o \
 		md5passwd.o \
 		notify.o \
 		options.o \
-		page.o \
 		ppd.o \
+		ppd-attr.o \
 		ppd-cache.o \
+		ppd-conflicts.o \
+		ppd-custom.o \
+		ppd-emit.o \
+		ppd-localize.o \
+		ppd-mark.o \
+		ppd-page.o \
+		ppd-util.o \
 		pwg-media.o \
 		request.o \
 		sidechannel.o \

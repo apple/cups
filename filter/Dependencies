@@ -18,15 +18,15 @@ commandtops.o: commandtops.c ../cups/cups-private.h \
   ../cups/ipp-private.h ../cups/ipp.h ../cups/http.h \
   ../cups/http-private.h ../cups/language.h ../cups/md5-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/ppd-private.h \
-  ../cups/ppd.h ../cups/thread-private.h ../cups/sidechannel.h
+  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/thread-private.h \
+  ../cups/ppd.h ../cups/sidechannel.h
 gziptoany.o: gziptoany.c ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/versioning.h \
   ../cups/array-private.h ../cups/array.h ../cups/ipp-private.h \
   ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
   ../cups/md5-private.h ../cups/language-private.h ../cups/transcode.h \
   ../cups/pwg-private.h ../cups/cups.h ../cups/file.h ../cups/pwg.h \
-  ../cups/ppd-private.h ../cups/ppd.h ../cups/thread-private.h
+  ../cups/thread-private.h
 common.o: common.c common.h ../cups/string-private.h ../config.h \
   ../cups/cups.h ../cups/file.h ../cups/versioning.h ../cups/ipp.h \
   ../cups/http.h ../cups/array.h ../cups/language.h ../cups/pwg.h \
@@ -59,8 +59,8 @@ rastertopwg.o: rastertopwg.c ../cups/cups-private.h \
   ../cups/ipp-private.h ../cups/ipp.h ../cups/http.h \
   ../cups/http-private.h ../cups/language.h ../cups/md5-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/ppd-private.h \
-  ../cups/ppd.h ../cups/thread-private.h ../cups/raster.h
+  ../cups/cups.h ../cups/file.h ../cups/pwg.h ../cups/thread-private.h \
+  ../cups/ppd-private.h ../cups/ppd.h ../cups/raster.h
 testraster.o: testraster.c ../cups/raster-private.h ../cups/raster.h \
   ../cups/cups.h ../cups/file.h ../cups/versioning.h ../cups/ipp.h \
   ../cups/http.h ../cups/array.h ../cups/language.h ../cups/pwg.h \

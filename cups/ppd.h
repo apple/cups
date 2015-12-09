@@ -7,7 +7,7 @@
  *   -D_PPD_DEPRECATED="" TO YOUR COMPILE OPTIONS.  THIS HEADER AND THESE
  *   FUNCTIONS WILL BE REMOVED IN A FUTURE RELEASE OF CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
+ *   Copyright 2007-2015 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -362,8 +362,12 @@ typedef struct ppd_file_s		/**** PPD File ****/
  * Prototypes...
  */
 
-extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
-			                cups_option_t *options) _PPD_DEPRECATED;
+extern const char	*cupsGetPPD(const char *name) _PPD_DEPRECATED;
+extern const char	*cupsGetPPD2(http_t *http, const char *name) _PPD_DEPRECATED;
+extern http_status_t	cupsGetPPD3(http_t *http, const char *name, time_t *modtime, char *buffer, size_t bufsize) _PPD_DEPRECATED;
+extern char		*cupsGetServerPPD(http_t *http, const char *name) _PPD_DEPRECATED;
+extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options, cups_option_t *options) _PPD_DEPRECATED;
+
 extern void		ppdClose(ppd_file_t *ppd) _PPD_DEPRECATED;
 extern int		ppdCollect(ppd_file_t *ppd, ppd_section_t section,
 			           ppd_choice_t  ***choices) _PPD_DEPRECATED;

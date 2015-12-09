@@ -3,7 +3,7 @@
  *
  * SNMP supplies functions for CUPS.
  *
- * Copyright 2008-2014 by Apple Inc.
+ * Copyright 2008-2015 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -19,6 +19,7 @@
  */
 
 #include "backend-private.h"
+#include <cups/ppd-private.h>
 #include <cups/array.h>
 
 

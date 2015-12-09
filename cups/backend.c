@@ -1,24 +1,18 @@
 /*
  * "$Id$"
  *
- *   Backend functions for CUPS.
+ * Backend functions for CUPS.
  *
- *   Copyright 2007-2012 by Apple Inc.
- *   Copyright 2006 by Easy Software Products.
+ * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2006 by Easy Software Products.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   cupsBackendDeviceURI() - Get the device URI for a backend.
- *   cupsBackendReport()    - Write a device line from a backend.
- *   quote_string()         - Write a quoted string to stdout, escaping \ and ".
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -27,6 +21,7 @@
 
 #include "cups-private.h"
 #include "backend.h"
+#include "ppd.h"
 
 
 /*

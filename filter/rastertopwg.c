@@ -19,6 +19,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/ppd-private.h>
 #include <cups/raster.h>
 #include <unistd.h>
 #include <fcntl.h>

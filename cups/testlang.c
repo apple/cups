@@ -24,6 +24,7 @@
  */
 
 #include "cups-private.h"
+#include "ppd-private.h"
 
 
 /*

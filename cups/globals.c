@@ -1,29 +1,18 @@
 /*
  * "$Id$"
  *
- *   Global variable access routines for CUPS.
+ * Global variable access routines for CUPS.
  *
- *   Copyright 2007-2013 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * Copyright 2007-2015 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   _cupsGlobalLock()    - Lock the global mutex.
- *   _cupsGlobals()       - Return a pointer to thread local storage
- *   _cupsGlobalUnlock()  - Unlock the global mutex.
- *   DllMain()            - Main entry for library.
- *   cups_fix_path()      - Fix a file path to use forward slashes consistently.
- *   cups_globals_alloc() - Allocate and initialize global data.
- *   cups_globals_free()  - Free global data.
- *   cups_globals_init()  - Initialize environment variables.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -36,7 +25,6 @@
 /*
  * Local globals...
  */
-
 
 #ifdef DEBUG
 static int		cups_global_index = 0;

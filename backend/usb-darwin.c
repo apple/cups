@@ -63,6 +63,7 @@
 #include <cups/file-private.h>
 #include <cups/sidechannel.h>
 #include <cups/language-private.h>
+#include <cups/ppd-private.h>
 #include "backend-private.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>

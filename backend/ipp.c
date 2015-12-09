@@ -20,6 +20,7 @@
  */
 
 #include "backend-private.h"
+#include <cups/ppd-private.h>
 #include <cups/array-private.h>
 #include <sys/types.h>
 #include <sys/stat.h>

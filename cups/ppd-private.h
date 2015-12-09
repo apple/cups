@@ -56,6 +56,18 @@ extern "C" {
  * Types and structures...
  */
 
+typedef struct _ppd_globals_s		/**** CUPS PPD global state data ****/
+{
+  /* ppd.c */
+  ppd_status_t		ppd_status;	/* Status of last ppdOpen*() */
+  int			ppd_line;	/* Current line number */
+  ppd_conform_t		ppd_conform;	/* Level of conformance required */
+
+  /* ppd-util.c */
+  char			ppd_filename[HTTP_MAX_URI];
+					/* PPD filename */
+} _ppd_globals_t;
+
 typedef enum _ppd_localization_e	/**** Selector for _ppdOpen ****/
 {
   _PPD_LOCALIZATION_DEFAULT,		/* Load only the default localization */
@@ -205,6 +217,7 @@ extern char		*_ppdCreateFromIPP(char *buffer, size_t bufsize, ipp_t *response);
 extern void		_ppdFreeLanguages(cups_array_t *languages);
 extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);
+extern _ppd_globals_t	*_ppdGlobals(void);
 extern unsigned		_ppdHashName(const char *name);
 extern ppd_attr_t	*_ppdLocalizedAttr(ppd_file_t *ppd, const char *keyword,
 			                   const char *spec, const char *ll_CC);

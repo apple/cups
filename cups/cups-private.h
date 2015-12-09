@@ -29,7 +29,6 @@
 #  include "http-private.h"
 #  include "language-private.h"
 #  include "pwg-private.h"
-#  include "ppd-private.h"
 #  include "thread-private.h"
 #  include <cups/cups.h>
 #  ifdef __APPLE__
@@ -122,11 +121,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			language[32];	/* Cached language */
 #  endif /* __APPLE__ */
 
-  /* ppd.c */
-  ppd_status_t		ppd_status;	/* Status of last ppdOpen*() */
-  int			ppd_line;	/* Current line number */
-  ppd_conform_t		ppd_conform;	/* Level of conformance required */
-
   /* pwg-media.c */
   cups_array_t		*leg_size_lut,	/* Lookup table for legacy names */
 			*ppd_size_lut,	/* Lookup table for PPD names */
@@ -173,8 +167,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   /* util.c */
   char			def_printer[256];
 					/* Default printer */
-  char			ppd_filename[HTTP_MAX_URI];
-					/* PPD filename */
 } _cups_globals_t;
 
 typedef struct _cups_media_db_s		/* Media database */

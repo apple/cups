@@ -124,16 +124,16 @@
 		274FF68813333B6E00317ECB /* cupsfilter.c in Sources */ = {isa = PBXBuildFile; fileRef = 274FF68713333B6E00317ECB /* cupsfilter.c */; };
 		274FF68B1333B1C400317ECB /* adminutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EB51333052D00FCA411 /* adminutil.c */; };
 		274FF68C1333B1C400317ECB /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EB81333056300FCA411 /* array.c */; };
-		274FF68D1333B1C400317ECB /* attr.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBA1333056300FCA411 /* attr.c */; };
+		274FF68D1333B1C400317ECB /* ppd-attr.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBA1333056300FCA411 /* ppd-attr.c */; };
 		274FF68E1333B1C400317ECB /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBB1333056300FCA411 /* auth.c */; };
 		274FF68F1333B1C400317ECB /* backchannel.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBC1333056300FCA411 /* backchannel.c */; };
 		274FF6901333B1C400317ECB /* backend.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBD1333056300FCA411 /* backend.c */; };
-		274FF6911333B1C400317ECB /* conflicts.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBF1333056300FCA411 /* conflicts.c */; };
-		274FF6921333B1C400317ECB /* custom.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EC21333056300FCA411 /* custom.c */; };
+		274FF6911333B1C400317ECB /* ppd-conflicts.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBF1333056300FCA411 /* ppd-conflicts.c */; };
+		274FF6921333B1C400317ECB /* ppd-custom.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EC21333056300FCA411 /* ppd-custom.c */; };
 		274FF6931333B1C400317ECB /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED1133305BB00FCA411 /* debug.c */; };
 		274FF6941333B1C400317ECB /* dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED2133305BB00FCA411 /* dest.c */; };
 		274FF6951333B1C400317ECB /* dir.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED3133305BB00FCA411 /* dir.c */; };
-		274FF6961333B1C400317ECB /* emit.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED5133305BB00FCA411 /* emit.c */; };
+		274FF6961333B1C400317ECB /* ppd-emit.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED5133305BB00FCA411 /* ppd-emit.c */; };
 		274FF6971333B1C400317ECB /* encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED6133305BB00FCA411 /* encode.c */; };
 		274FF6981333B1C400317ECB /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED8133305BB00FCA411 /* file.c */; };
 		274FF6991333B1C400317ECB /* getdevices.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EDA133305BB00FCA411 /* getdevices.c */; };
@@ -148,13 +148,13 @@
 		274FF6A21333B1C400317ECB /* ipp.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EE6133305BB00FCA411 /* ipp.c */; };
 		274FF6A31333B1C400317ECB /* langprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EE8133305BB00FCA411 /* langprintf.c */; };
 		274FF6A41333B1C400317ECB /* language.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEA133305BB00FCA411 /* language.c */; };
-		274FF6A51333B1C400317ECB /* localize.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEC133305BB00FCA411 /* localize.c */; };
-		274FF6A61333B1C400317ECB /* mark.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EED133305BB00FCA411 /* mark.c */; };
+		274FF6A51333B1C400317ECB /* ppd-localize.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEC133305BB00FCA411 /* ppd-localize.c */; };
+		274FF6A61333B1C400317ECB /* ppd-mark.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EED133305BB00FCA411 /* ppd-mark.c */; };
 		274FF6A71333B1C400317ECB /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEF133305BB00FCA411 /* md5.c */; };
 		274FF6A81333B1C400317ECB /* md5passwd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF0133305BB00FCA411 /* md5passwd.c */; };
 		274FF6A91333B1C400317ECB /* notify.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF1133305BB00FCA411 /* notify.c */; };
 		274FF6AA1333B1C400317ECB /* options.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF2133305BB00FCA411 /* options.c */; };
-		274FF6AB1333B1C400317ECB /* page.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF3133305BB00FCA411 /* page.c */; };
+		274FF6AB1333B1C400317ECB /* ppd-page.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF3133305BB00FCA411 /* ppd-page.c */; };
 		274FF6AC1333B1C400317ECB /* ppd-cache.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF4133305BB00FCA411 /* ppd-cache.c */; };
 		274FF6AD1333B1C400317ECB /* ppd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF6133305BB00FCA411 /* ppd.c */; };
 		274FF6AE1333B1C400317ECB /* pwg-media.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF8133305BB00FCA411 /* pwg-media.c */; };
@@ -257,21 +257,21 @@
 		72220EC41333056300FCA411 /* adminutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EB71333056300FCA411 /* adminutil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220EC51333056300FCA411 /* array.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EB81333056300FCA411 /* array.c */; };
 		72220EC61333056300FCA411 /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EB91333056300FCA411 /* array.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72220EC71333056300FCA411 /* attr.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBA1333056300FCA411 /* attr.c */; };
+		72220EC71333056300FCA411 /* ppd-attr.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBA1333056300FCA411 /* ppd-attr.c */; };
 		72220EC81333056300FCA411 /* auth.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBB1333056300FCA411 /* auth.c */; };
 		72220EC91333056300FCA411 /* backchannel.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBC1333056300FCA411 /* backchannel.c */; };
 		72220ECA1333056300FCA411 /* backend.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBD1333056300FCA411 /* backend.c */; };
 		72220ECB1333056300FCA411 /* backend.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EBE1333056300FCA411 /* backend.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72220ECC1333056300FCA411 /* conflicts.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBF1333056300FCA411 /* conflicts.c */; };
+		72220ECC1333056300FCA411 /* ppd-conflicts.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EBF1333056300FCA411 /* ppd-conflicts.c */; };
 		72220ECD1333056300FCA411 /* cups-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC01333056300FCA411 /* cups-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220ECE1333056300FCA411 /* cups.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC11333056300FCA411 /* cups.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72220ECF1333056300FCA411 /* custom.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EC21333056300FCA411 /* custom.c */; };
+		72220ECF1333056300FCA411 /* ppd-custom.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EC21333056300FCA411 /* ppd-custom.c */; };
 		72220ED01333056300FCA411 /* debug-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EC31333056300FCA411 /* debug-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F0B133305BB00FCA411 /* debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED1133305BB00FCA411 /* debug.c */; };
 		72220F0C133305BB00FCA411 /* dest.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED2133305BB00FCA411 /* dest.c */; };
 		72220F0D133305BB00FCA411 /* dir.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED3133305BB00FCA411 /* dir.c */; };
 		72220F0E133305BB00FCA411 /* dir.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220ED4133305BB00FCA411 /* dir.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72220F0F133305BB00FCA411 /* emit.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED5133305BB00FCA411 /* emit.c */; };
+		72220F0F133305BB00FCA411 /* ppd-emit.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED5133305BB00FCA411 /* ppd-emit.c */; };
 		72220F10133305BB00FCA411 /* encode.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED6133305BB00FCA411 /* encode.c */; };
 		72220F11133305BB00FCA411 /* file-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220ED7133305BB00FCA411 /* file-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F12133305BB00FCA411 /* file.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220ED8133305BB00FCA411 /* file.c */; };
@@ -294,14 +294,14 @@
 		72220F23133305BB00FCA411 /* language-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EE9133305BB00FCA411 /* language-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F24133305BB00FCA411 /* language.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEA133305BB00FCA411 /* language.c */; };
 		72220F25133305BB00FCA411 /* language.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEB133305BB00FCA411 /* language.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72220F26133305BB00FCA411 /* localize.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEC133305BB00FCA411 /* localize.c */; };
-		72220F27133305BB00FCA411 /* mark.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EED133305BB00FCA411 /* mark.c */; };
+		72220F26133305BB00FCA411 /* ppd-localize.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEC133305BB00FCA411 /* ppd-localize.c */; };
+		72220F27133305BB00FCA411 /* ppd-mark.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EED133305BB00FCA411 /* ppd-mark.c */; };
 		72220F28133305BB00FCA411 /* md5-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEE133305BB00FCA411 /* md5-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F29133305BB00FCA411 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EEF133305BB00FCA411 /* md5.c */; };
 		72220F2A133305BB00FCA411 /* md5passwd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF0133305BB00FCA411 /* md5passwd.c */; };
 		72220F2B133305BB00FCA411 /* notify.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF1133305BB00FCA411 /* notify.c */; };
 		72220F2C133305BB00FCA411 /* options.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF2133305BB00FCA411 /* options.c */; };
-		72220F2D133305BB00FCA411 /* page.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF3133305BB00FCA411 /* page.c */; };
+		72220F2D133305BB00FCA411 /* ppd-page.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF3133305BB00FCA411 /* ppd-page.c */; };
 		72220F2E133305BB00FCA411 /* ppd-cache.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF4133305BB00FCA411 /* ppd-cache.c */; };
 		72220F2F133305BB00FCA411 /* ppd-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EF5133305BB00FCA411 /* ppd-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72220F30133305BB00FCA411 /* ppd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF6133305BB00FCA411 /* ppd.c */; };
@@ -392,6 +392,8 @@
 		728FB7EE15361642005426E1 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E8136B64B000836530 /* SystemConfiguration.framework */; };
 		728FB7F11536167A005426E1 /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7EF1536167A005426E1 /* libiconv.dylib */; };
 		728FB7F21536167A005426E1 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 728FB7F01536167A005426E1 /* libresolv.dylib */; };
+		72A8B3D71C188CB800A1A547 /* ppd-util.c in Sources */ = {isa = PBXBuildFile; fileRef = 72A8B3D61C188BDE00A1A547 /* ppd-util.c */; };
+		72A8B3D81C188CB900A1A547 /* ppd-util.c in Sources */ = {isa = PBXBuildFile; fileRef = 72A8B3D61C188BDE00A1A547 /* ppd-util.c */; };
 		72BFD5FB191AF0A30005DA37 /* libcups_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A4332F155844CF002E172D /* libcups_static.a */; };
 		72BFD5FC191AF0A30005DA37 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E5136B64AF00836530 /* CoreFoundation.framework */; };
 		72BFD5FD191AF0A30005DA37 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278C58E6136B64B000836530 /* Kerberos.framework */; };
@@ -1406,21 +1408,21 @@
 		72220EB71333056300FCA411 /* adminutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adminutil.h; path = ../cups/adminutil.h; sourceTree = "<group>"; };
 		72220EB81333056300FCA411 /* array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = array.c; path = ../cups/array.c; sourceTree = "<group>"; };
 		72220EB91333056300FCA411 /* array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = array.h; path = ../cups/array.h; sourceTree = "<group>"; };
-		72220EBA1333056300FCA411 /* attr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attr.c; path = ../cups/attr.c; sourceTree = "<group>"; };
+		72220EBA1333056300FCA411 /* ppd-attr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-attr.c"; path = "../cups/ppd-attr.c"; sourceTree = "<group>"; };
 		72220EBB1333056300FCA411 /* auth.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = auth.c; path = ../cups/auth.c; sourceTree = "<group>"; };
 		72220EBC1333056300FCA411 /* backchannel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = backchannel.c; path = ../cups/backchannel.c; sourceTree = "<group>"; };
 		72220EBD1333056300FCA411 /* backend.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = backend.c; path = ../cups/backend.c; sourceTree = "<group>"; };
 		72220EBE1333056300FCA411 /* backend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = backend.h; path = ../cups/backend.h; sourceTree = "<group>"; };
-		72220EBF1333056300FCA411 /* conflicts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = conflicts.c; path = ../cups/conflicts.c; sourceTree = "<group>"; };
+		72220EBF1333056300FCA411 /* ppd-conflicts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-conflicts.c"; path = "../cups/ppd-conflicts.c"; sourceTree = "<group>"; };
 		72220EC01333056300FCA411 /* cups-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "cups-private.h"; path = "../cups/cups-private.h"; sourceTree = "<group>"; };
 		72220EC11333056300FCA411 /* cups.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cups.h; path = ../cups/cups.h; sourceTree = "<group>"; };
-		72220EC21333056300FCA411 /* custom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = custom.c; path = ../cups/custom.c; sourceTree = "<group>"; };
+		72220EC21333056300FCA411 /* ppd-custom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-custom.c"; path = "../cups/ppd-custom.c"; sourceTree = "<group>"; };
 		72220EC31333056300FCA411 /* debug-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "debug-private.h"; path = "../cups/debug-private.h"; sourceTree = "<group>"; };
 		72220ED1133305BB00FCA411 /* debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = debug.c; path = ../cups/debug.c; sourceTree = "<group>"; };
 		72220ED2133305BB00FCA411 /* dest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dest.c; path = ../cups/dest.c; sourceTree = "<group>"; };
 		72220ED3133305BB00FCA411 /* dir.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dir.c; path = ../cups/dir.c; sourceTree = "<group>"; };
 		72220ED4133305BB00FCA411 /* dir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dir.h; path = ../cups/dir.h; sourceTree = "<group>"; };
-		72220ED5133305BB00FCA411 /* emit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = emit.c; path = ../cups/emit.c; sourceTree = "<group>"; };
+		72220ED5133305BB00FCA411 /* ppd-emit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-emit.c"; path = "../cups/ppd-emit.c"; sourceTree = "<group>"; };
 		72220ED6133305BB00FCA411 /* encode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = encode.c; path = ../cups/encode.c; sourceTree = "<group>"; };
 		72220ED7133305BB00FCA411 /* file-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "file-private.h"; path = "../cups/file-private.h"; sourceTree = "<group>"; };
 		72220ED8133305BB00FCA411 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = ../cups/file.c; sourceTree = "<group>"; };
@@ -1443,14 +1445,14 @@
 		72220EE9133305BB00FCA411 /* language-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "language-private.h"; path = "../cups/language-private.h"; sourceTree = "<group>"; };
 		72220EEA133305BB00FCA411 /* language.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = language.c; path = ../cups/language.c; sourceTree = "<group>"; };
 		72220EEB133305BB00FCA411 /* language.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = language.h; path = ../cups/language.h; sourceTree = "<group>"; };
-		72220EEC133305BB00FCA411 /* localize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = localize.c; path = ../cups/localize.c; sourceTree = "<group>"; };
-		72220EED133305BB00FCA411 /* mark.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mark.c; path = ../cups/mark.c; sourceTree = "<group>"; };
+		72220EEC133305BB00FCA411 /* ppd-localize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-localize.c"; path = "../cups/ppd-localize.c"; sourceTree = "<group>"; };
+		72220EED133305BB00FCA411 /* ppd-mark.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-mark.c"; path = "../cups/ppd-mark.c"; sourceTree = "<group>"; };
 		72220EEE133305BB00FCA411 /* md5-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "md5-private.h"; path = "../cups/md5-private.h"; sourceTree = "<group>"; };
 		72220EEF133305BB00FCA411 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5.c; path = ../cups/md5.c; sourceTree = "<group>"; };
 		72220EF0133305BB00FCA411 /* md5passwd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = md5passwd.c; path = ../cups/md5passwd.c; sourceTree = "<group>"; };
 		72220EF1133305BB00FCA411 /* notify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = notify.c; path = ../cups/notify.c; sourceTree = "<group>"; };
 		72220EF2133305BB00FCA411 /* options.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = options.c; path = ../cups/options.c; sourceTree = "<group>"; };
-		72220EF3133305BB00FCA411 /* page.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = page.c; path = ../cups/page.c; sourceTree = "<group>"; };
+		72220EF3133305BB00FCA411 /* ppd-page.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-page.c"; path = "../cups/ppd-page.c"; sourceTree = "<group>"; };
 		72220EF4133305BB00FCA411 /* ppd-cache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-cache.c"; path = "../cups/ppd-cache.c"; sourceTree = "<group>"; };
 		72220EF5133305BB00FCA411 /* ppd-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ppd-private.h"; path = "../cups/ppd-private.h"; sourceTree = "<group>"; };
 		72220EF6133305BB00FCA411 /* ppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ppd.c; path = ../cups/ppd.c; sourceTree = "<group>"; };
@@ -1595,6 +1597,7 @@
 		729D4B561A2CB48700692B21 /* CHANGES-2.0.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-2.0.txt"; path = "../CHANGES-2.0.txt"; sourceTree = "<group>"; };
 		729D4B571A2CB48700692B21 /* CHANGES-IPPTOOL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = "CHANGES-IPPTOOL.txt"; path = "../CHANGES-IPPTOOL.txt"; sourceTree = "<group>"; };
 		72A4332F155844CF002E172D /* libcups_static.a */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		72A8B3D61C188BDE00A1A547 /* ppd-util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "ppd-util.c"; path = "../cups/ppd-util.c"; sourceTree = "<group>"; };
 		72C16CB8137B195D007E4BF4 /* file.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file.c; path = ../scheduler/file.c; sourceTree = SOURCE_ROOT; };
 		72CF95E018A13543000FCAE4 /* dest-job.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "dest-job.c"; path = "../cups/dest-job.c"; sourceTree = "<group>"; };
 		72CF95E118A13543000FCAE4 /* dest-localization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "dest-localization.c"; path = "../cups/dest-localization.c"; sourceTree = "<group>"; };
@@ -2203,20 +2206,16 @@
 				27D3037D134148CB00F022B1 /* libcups2.def */,
 				72220EB51333052D00FCA411 /* adminutil.c */,
 				72220EB81333056300FCA411 /* array.c */,
-				72220EBA1333056300FCA411 /* attr.c */,
 				72220EBB1333056300FCA411 /* auth.c */,
 				72220EBC1333056300FCA411 /* backchannel.c */,
 				72220EBD1333056300FCA411 /* backend.c */,
-				72220EBF1333056300FCA411 /* conflicts.c */,
-				72220EC21333056300FCA411 /* custom.c */,
 				72220ED1133305BB00FCA411 /* debug.c */,
-				72220ED2133305BB00FCA411 /* dest.c */,
 				72CF95E018A13543000FCAE4 /* dest-job.c */,
 				72CF95E118A13543000FCAE4 /* dest-localization.c */,
 				72CF95E218A13543000FCAE4 /* dest-options.c */,
+				72220ED2133305BB00FCA411 /* dest.c */,
 				72220ED3133305BB00FCA411 /* dir.c */,
 				72220ED4133305BB00FCA411 /* dir.h */,
-				72220ED5133305BB00FCA411 /* emit.c */,
 				72220ED6133305BB00FCA411 /* encode.c */,
 				72220ED8133305BB00FCA411 /* file.c */,
 				72220EDA133305BB00FCA411 /* getdevices.c */,
@@ -2224,23 +2223,28 @@
 				72220EDC133305BB00FCA411 /* getputfile.c */,
 				72220EDD133305BB00FCA411 /* globals.c */,
 				7284F9EF1BFCCD940026F886 /* hash.c */,
-				72220EE2133305BB00FCA411 /* http.c */,
 				72220EDE133305BB00FCA411 /* http-addr.c */,
 				72220EDF133305BB00FCA411 /* http-addrlist.c */,
 				72220EE1133305BB00FCA411 /* http-support.c */,
-				72220EE6133305BB00FCA411 /* ipp.c */,
+				72220EE2133305BB00FCA411 /* http.c */,
 				72220EE5133305BB00FCA411 /* ipp-support.c */,
+				72220EE6133305BB00FCA411 /* ipp.c */,
 				72220EE8133305BB00FCA411 /* langprintf.c */,
 				72220EEA133305BB00FCA411 /* language.c */,
-				72220EEC133305BB00FCA411 /* localize.c */,
-				72220EED133305BB00FCA411 /* mark.c */,
 				72220EEF133305BB00FCA411 /* md5.c */,
 				72220EF0133305BB00FCA411 /* md5passwd.c */,
 				72220EF1133305BB00FCA411 /* notify.c */,
 				72220EF2133305BB00FCA411 /* options.c */,
-				72220EF3133305BB00FCA411 /* page.c */,
-				72220EF4133305BB00FCA411 /* ppd-cache.c */,
 				72220EF6133305BB00FCA411 /* ppd.c */,
+				72220EBA1333056300FCA411 /* ppd-attr.c */,
+				72220EF4133305BB00FCA411 /* ppd-cache.c */,
+				72220EBF1333056300FCA411 /* ppd-conflicts.c */,
+				72220EC21333056300FCA411 /* ppd-custom.c */,
+				72220ED5133305BB00FCA411 /* ppd-emit.c */,
+				72220EEC133305BB00FCA411 /* ppd-localize.c */,
+				72220EED133305BB00FCA411 /* ppd-mark.c */,
+				72220EF3133305BB00FCA411 /* ppd-page.c */,
+				72A8B3D61C188BDE00A1A547 /* ppd-util.c */,
 				72220EF8133305BB00FCA411 /* pwg-media.c */,
 				72220EFB133305BB00FCA411 /* request.c */,
 				72220EFC133305BB00FCA411 /* sidechannel.c */,
@@ -2249,10 +2253,10 @@
 				72220F02133305BB00FCA411 /* string.c */,
 				72220F03133305BB00FCA411 /* tempfile.c */,
 				72220F05133305BB00FCA411 /* thread.c */,
-				727AD5B619100A58009F6862 /* tls.c */,
 				270B267D17F5C06700C8A3A9 /* tls-darwin.c */,
 				270B267E17F5C06700C8A3A9 /* tls-gnutls.c */,
 				270B268117F5C5D600C8A3A9 /* tls-sspi.c */,
+				727AD5B619100A58009F6862 /* tls.c */,
 				72220F06133305BB00FCA411 /* transcode.c */,
 				72220F08133305BB00FCA411 /* usersys.c */,
 				72220F09133305BB00FCA411 /* util.c */,
@@ -3516,16 +3520,16 @@
 			files = (
 				274FF68B1333B1C400317ECB /* adminutil.c in Sources */,
 				274FF68C1333B1C400317ECB /* array.c in Sources */,
-				274FF68D1333B1C400317ECB /* attr.c in Sources */,
+				274FF68D1333B1C400317ECB /* ppd-attr.c in Sources */,
 				274FF68E1333B1C400317ECB /* auth.c in Sources */,
 				274FF68F1333B1C400317ECB /* backchannel.c in Sources */,
 				274FF6901333B1C400317ECB /* backend.c in Sources */,
-				274FF6911333B1C400317ECB /* conflicts.c in Sources */,
-				274FF6921333B1C400317ECB /* custom.c in Sources */,
+				274FF6911333B1C400317ECB /* ppd-conflicts.c in Sources */,
+				274FF6921333B1C400317ECB /* ppd-custom.c in Sources */,
 				274FF6931333B1C400317ECB /* debug.c in Sources */,
 				274FF6941333B1C400317ECB /* dest.c in Sources */,
 				274FF6951333B1C400317ECB /* dir.c in Sources */,
-				274FF6961333B1C400317ECB /* emit.c in Sources */,
+				274FF6961333B1C400317ECB /* ppd-emit.c in Sources */,
 				274FF6971333B1C400317ECB /* encode.c in Sources */,
 				274FF6981333B1C400317ECB /* file.c in Sources */,
 				274FF6991333B1C400317ECB /* getdevices.c in Sources */,
@@ -3536,20 +3540,21 @@
 				274FF69E1333B1C400317ECB /* http-addrlist.c in Sources */,
 				274FF69F1333B1C400317ECB /* http-support.c in Sources */,
 				274FF6A01333B1C400317ECB /* http.c in Sources */,
+				72A8B3D81C188CB900A1A547 /* ppd-util.c in Sources */,
 				2767FC7419268F0C000F61D3 /* dest-options.c in Sources */,
 				274FF6A11333B1C400317ECB /* ipp-support.c in Sources */,
 				274FF6A21333B1C400317ECB /* ipp.c in Sources */,
 				274FF6A31333B1C400317ECB /* langprintf.c in Sources */,
 				274FF6A41333B1C400317ECB /* language.c in Sources */,
-				274FF6A51333B1C400317ECB /* localize.c in Sources */,
-				274FF6A61333B1C400317ECB /* mark.c in Sources */,
+				274FF6A51333B1C400317ECB /* ppd-localize.c in Sources */,
+				274FF6A61333B1C400317ECB /* ppd-mark.c in Sources */,
 				274FF6A71333B1C400317ECB /* md5.c in Sources */,
 				274FF6A81333B1C400317ECB /* md5passwd.c in Sources */,
 				7284F9F11BFCCDB20026F886 /* hash.c in Sources */,
 				274FF6A91333B1C400317ECB /* notify.c in Sources */,
 				274FF6AA1333B1C400317ECB /* options.c in Sources */,
 				727AD5B819100A58009F6862 /* tls.c in Sources */,
-				274FF6AB1333B1C400317ECB /* page.c in Sources */,
+				274FF6AB1333B1C400317ECB /* ppd-page.c in Sources */,
 				274FF6AC1333B1C400317ECB /* ppd-cache.c in Sources */,
 				2767FC7219268F06000F61D3 /* dest-job.c in Sources */,
 				274FF6AD1333B1C400317ECB /* ppd.c in Sources */,
@@ -3671,17 +3676,17 @@
 			files = (
 				72220EB61333052D00FCA411 /* adminutil.c in Sources */,
 				72220EC51333056300FCA411 /* array.c in Sources */,
-				72220EC71333056300FCA411 /* attr.c in Sources */,
+				72220EC71333056300FCA411 /* ppd-attr.c in Sources */,
 				727AD5B719100A58009F6862 /* tls.c in Sources */,
 				72220EC81333056300FCA411 /* auth.c in Sources */,
 				72220EC91333056300FCA411 /* backchannel.c in Sources */,
 				72220ECA1333056300FCA411 /* backend.c in Sources */,
-				72220ECC1333056300FCA411 /* conflicts.c in Sources */,
-				72220ECF1333056300FCA411 /* custom.c in Sources */,
+				72220ECC1333056300FCA411 /* ppd-conflicts.c in Sources */,
+				72220ECF1333056300FCA411 /* ppd-custom.c in Sources */,
 				72220F0B133305BB00FCA411 /* debug.c in Sources */,
 				72220F0C133305BB00FCA411 /* dest.c in Sources */,
 				72220F0D133305BB00FCA411 /* dir.c in Sources */,
-				72220F0F133305BB00FCA411 /* emit.c in Sources */,
+				72220F0F133305BB00FCA411 /* ppd-emit.c in Sources */,
 				72220F10133305BB00FCA411 /* encode.c in Sources */,
 				72220F12133305BB00FCA411 /* file.c in Sources */,
 				72220F14133305BB00FCA411 /* getdevices.c in Sources */,
@@ -3691,20 +3696,21 @@
 				72220F18133305BB00FCA411 /* http-addr.c in Sources */,
 				72220F19133305BB00FCA411 /* http-addrlist.c in Sources */,
 				72220F1B133305BB00FCA411 /* http-support.c in Sources */,
+				72A8B3D71C188CB800A1A547 /* ppd-util.c in Sources */,
 				72220F1C133305BB00FCA411 /* http.c in Sources */,
 				72CF95E518A13543000FCAE4 /* dest-options.c in Sources */,
 				72220F1F133305BB00FCA411 /* ipp-support.c in Sources */,
 				72220F20133305BB00FCA411 /* ipp.c in Sources */,
 				72220F22133305BB00FCA411 /* langprintf.c in Sources */,
 				72220F24133305BB00FCA411 /* language.c in Sources */,
-				72220F26133305BB00FCA411 /* localize.c in Sources */,
-				72220F27133305BB00FCA411 /* mark.c in Sources */,
+				72220F26133305BB00FCA411 /* ppd-localize.c in Sources */,
+				72220F27133305BB00FCA411 /* ppd-mark.c in Sources */,
 				72220F29133305BB00FCA411 /* md5.c in Sources */,
 				7284F9F01BFCCDB10026F886 /* hash.c in Sources */,
 				72220F2A133305BB00FCA411 /* md5passwd.c in Sources */,
 				72220F2B133305BB00FCA411 /* notify.c in Sources */,
 				72220F2C133305BB00FCA411 /* options.c in Sources */,
-				72220F2D133305BB00FCA411 /* page.c in Sources */,
+				72220F2D133305BB00FCA411 /* ppd-page.c in Sources */,
 				72220F2E133305BB00FCA411 /* ppd-cache.c in Sources */,
 				72220F30133305BB00FCA411 /* ppd.c in Sources */,
 				72220F32133305BB00FCA411 /* pwg-media.c in Sources */,

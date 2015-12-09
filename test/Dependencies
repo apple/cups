@@ -4,7 +4,7 @@ ippfind.o: ippfind.c ../cups/cups-private.h ../cups/string-private.h \
   ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
   ../cups/md5-private.h ../cups/language-private.h ../cups/transcode.h \
   ../cups/pwg-private.h ../cups/cups.h ../cups/file.h ../cups/pwg.h \
-  ../cups/ppd-private.h ../cups/ppd.h ../cups/thread-private.h
+  ../cups/thread-private.h
 ippinfra.o: ippinfra.c ../config.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
   ../cups/language.h ../cups/pwg.h ../cups/string-private.h \
@@ -22,8 +22,7 @@ ipptool.o: ipptool.c ../cups/cups-private.h ../cups/string-private.h \
   ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
   ../cups/md5-private.h ../cups/language-private.h ../cups/transcode.h \
   ../cups/pwg-private.h ../cups/cups.h ../cups/file.h ../cups/pwg.h \
-  ../cups/ppd-private.h ../cups/ppd.h ../cups/thread-private.h \
-  ../cups/file-private.h
+  ../cups/thread-private.h ../cups/file-private.h
 xmltotest.o: xmltotest.c ../config.h ../cups/cups.h ../cups/file.h \
   ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h \
   ../cups/language.h ../cups/pwg.h
