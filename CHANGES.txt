@@ -1,8 +1,10 @@
-CHANGES.txt - 2.2b1 - 2015-11-18
+CHANGES.txt - 2.2b1 - 2015-12-11
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
+	- The httpAddrConnect and httpConnect* APIs now try connecting to
+	  multiple addresses in parallel (<rdar://problem/20643153>)
 	- The cupsd domain socket is no longer world-accessible on OS X
 	  (<rdar://problem/7542560>)
 	- Interface scripts are no longer supported for security reasons
