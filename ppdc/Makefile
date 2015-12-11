@@ -347,7 +347,7 @@ libcupsppdc.so.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 
 libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Creating export list for $@...
-	nm $(LIBOBJS) | grep "T __" | grep -v weak | awk '{print $$3}' | sort >t.exp
+	nm -gm $(LIBOBJS) | grep "__text" | grep -v weak | awk '{print $$NF}' | sort >t.exp
 	echo Linking $@...
 	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \

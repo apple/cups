@@ -322,13 +322,14 @@ libcups.so.2:	$(LIBOBJS)
 
 libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Creating export list for $@...
-	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
-		grep -v -e '^(_cupsConnect|_cupsCharset|_cupsEncodingName|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
+	nm -gm $(LIBOBJS) 2>/dev/null | grep "__text" | grep -v weak | \
+		awk '{print $$NF}' | \
+		grep -v -E -e '^(_cupsConnect|_cupsCharset|_cupsEncodingName|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
 		sort >t.exp
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.11.0 \
+		-current_version 2.12.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
@@ -344,7 +345,7 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:11 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:12 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
