@@ -471,6 +471,13 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 	*/
 
         puts("P1");
+
+       /*
+        * Cut the label as needed...
+        */
+
+      	if (header->CutMedia)
+	  puts("C");
 	break;
 
     case ZEBRA_ZPL :
@@ -602,6 +609,13 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 
         puts("^IDR:CUPS.GRF^FS");
 	puts("^XZ");
+
+       /*
+        * Cut the label as needed...
+        */
+
+      	if (header->CutMedia)
+	  puts("^CN1");
         break;
 
     case ZEBRA_CPCL :

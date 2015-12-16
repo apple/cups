@@ -5,6 +5,8 @@ CHANGES IN CUPS V2.1.3
 
 	- The scheduler should not exit under memory pressure
 	  (<rdar://problem/23255001>)
+	- The EPL2 and ZPL sample drivers did not properly support the CutMedia
+	  option.
 
 
 CHANGES IN CUPS V2.1.2
