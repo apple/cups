@@ -75,7 +75,8 @@ ppdc-import.o: ppdc-import.cxx ppdc-private.h ppdc.h ../cups/file.h \
   ../cups/array.h ../cups/ipp-private.h ../cups/ipp.h ../cups/http.h \
   ../cups/http-private.h ../cups/language.h ../cups/md5-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
-  ../cups/cups.h ../cups/pwg.h ../cups/thread-private.h ../cups/ppd.h
+  ../cups/cups.h ../cups/pwg.h ../cups/thread-private.h ../cups/ppd.h \
+  ../cups/raster.h
 ppdc-mediasize.o: ppdc-mediasize.cxx ppdc-private.h ppdc.h ../cups/file.h \
   ../cups/versioning.h ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/array-private.h \
@@ -118,7 +119,7 @@ ppdc-source.o: ppdc-source.cxx ppdc-private.h ppdc.h ../cups/file.h \
   ../cups/http-private.h ../cups/language.h ../cups/md5-private.h \
   ../cups/language-private.h ../cups/transcode.h ../cups/pwg-private.h \
   ../cups/cups.h ../cups/pwg.h ../cups/thread-private.h ../cups/raster.h \
-  ../cups/ppd.h ../data/epson.h ../data/hp.h ../data/label.h
+  ../data/epson.h ../data/hp.h ../data/label.h
 ppdc-string.o: ppdc-string.cxx ppdc-private.h ppdc.h ../cups/file.h \
   ../cups/versioning.h ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/array-private.h \
@@ -167,7 +168,8 @@ ppdmerge.o: ppdmerge.cxx ../cups/cups-private.h ../cups/string-private.h \
   ../cups/ipp.h ../cups/http.h ../cups/http-private.h ../cups/language.h \
   ../cups/md5-private.h ../cups/language-private.h ../cups/transcode.h \
   ../cups/pwg-private.h ../cups/cups.h ../cups/file.h ../cups/pwg.h \
-  ../cups/thread-private.h ../cups/ppd-private.h ../cups/ppd.h
+  ../cups/thread-private.h ../cups/ppd-private.h ../cups/ppd.h \
+  ../cups/raster.h
 ppdpo.o: ppdpo.cxx ppdc-private.h ppdc.h ../cups/file.h \
   ../cups/versioning.h ../cups/cups-private.h ../cups/string-private.h \
   ../config.h ../cups/debug-private.h ../cups/array-private.h \

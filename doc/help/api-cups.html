@@ -455,15 +455,10 @@ destination.">cupsGetDestMediaCount</a></li>
 	<li><a href="#cupsGetJobs2" title="Get the jobs from the specified server.">cupsGetJobs2</a></li>
 	<li><a href="#cupsGetNamedDest" title="Get options for the named destination.">cupsGetNamedDest</a></li>
 	<li><a href="#cupsGetOption" title="Get an option value.">cupsGetOption</a></li>
-	<li><a href="#cupsGetPPD" title="Get the PPD file for a printer on the default server.">cupsGetPPD</a></li>
-	<li><a href="#cupsGetPPD2" title="Get the PPD file for a printer from the specified server.">cupsGetPPD2</a></li>
-	<li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
-server if it has changed.">cupsGetPPD3</a></li>
 	<li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
 	<li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
 password callback.">cupsGetPassword2</a></li>
 	<li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
-	<li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
 	<li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
 	<li><a href="#cupsLangEncoding" title="Return the character encoding (us-ascii, etc.)
 for the given language.">cupsLangEncoding</a></li>
@@ -2287,95 +2282,6 @@ const char *cupsGetOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Option value or <code>NULL</code></p>
-<h3 class="function"><a name="cupsGetPPD">cupsGetPPD</a></h3>
-<p class="description">Get the PPD file for a printer on the default server.</p>
-<p class="code">
-const char *cupsGetPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Filename for PPD file</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">For classes, <code>cupsGetPPD</code> returns the PPD file for the first printer
-in the class.<br>
-<br>
-The returned filename is stored in a static buffer and is overwritten with
-each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.  The caller &quot;owns&quot; the
-file that is created and must <code>unlink</code> the returned filename.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/OS X 10.4&nbsp;</span><a name="cupsGetPPD2">cupsGetPPD2</a></h3>
-<p class="description">Get the PPD file for a printer from the specified server.</p>
-<p class="code">
-const char *cupsGetPPD2 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Filename for PPD file</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">For classes, <code>cupsGetPPD2</code> returns the PPD file for the first printer
-in the class.<br>
-<br>
-The returned filename is stored in a static buffer and is overwritten with
-each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.  The caller &quot;owns&quot; the
-file that is created and must <code>unlink</code> the returned filename.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4/OS X 10.6&nbsp;</span><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
-<p class="description">Get the PPD file for a printer on the specified
-server if it has changed.</p>
-<p class="code">
-http_status_t cupsGetPPD3 (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;time_t *modtime,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Destination name</dd>
-<dt>modtime</dt>
-<dd class="description">Modification time</dd>
-<dt>buffer</dt>
-<dd class="description">Filename buffer</dd>
-<dt>bufsize</dt>
-<dd class="description">Size of filename buffer</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">HTTP status</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;modtime&quot; parameter contains the modification time of any
-locally-cached content and is updated with the time from the PPD file on
-the server.<br>
-<br>
-The &quot;buffer&quot; parameter contains the local PPD filename.  If it contains
-the empty string, a new temporary file is created, otherwise the existing
-file will be overwritten as needed.  The caller &quot;owns&quot; the file that is
-created and must <code>unlink</code> the returned filename.<br>
-<br>
-On success, <code>HTTP_STATUS_OK</code> is returned for a new PPD file and
-<code>HTTP_STATUS_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other
-status is an error.<br>
-<br>
-For classes, <code>cupsGetPPD3</code> returns the PPD file for the first printer
-in the class.
-
-</p>
 <h3 class="function"><a name="cupsGetPassword">cupsGetPassword</a></h3>
 <p class="description">Get a password from the user.</p>
 <p class="code">
@@ -2446,33 +2352,6 @@ int cupsGetPrinters (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function is deprecated and no longer returns a list of printers - use
 <a href="#cupsGetDests"><code>cupsGetDests</code></a> instead.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span><a name="cupsGetServerPPD">cupsGetServerPPD</a></h3>
-<p class="description">Get an available PPD file from the server.</p>
-<p class="code">
-char *cupsGetServerPPD (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>http</dt>
-<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
-<dt>name</dt>
-<dd class="description">Name of PPD file (&quot;ppd-name&quot;)</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Name of PPD file or <code>NULL</code> on error</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">This function returns the named PPD file from the server.  The
-list of available PPDs is provided by the IPP <code>CUPS_GET_PPDS</code>
-operation.<br>
-<br>
-You must remove (unlink) the PPD file when you are finished with
-it. The PPD filename is stored in a static location that will be
-overwritten on the next call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a>, <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>,
-or <a href="#cupsGetServerPPD"><code>cupsGetServerPPD</code></a>.
 
 </p>
 <h3 class="function"><a name="cupsLangDefault">cupsLangDefault</a></h3>

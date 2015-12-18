@@ -96,6 +96,248 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
 
 
 /*
+ * 'cupsRasterInitPWGHeader()' - Initialize a page header for PWG Raster output.
+ *
+ * The "media" argument specifies the media to use.
+ *
+ * The "type" argument specifies a "pwg-raster-document-type-supported" value
+ * that controls the color space and bit depth of the raster data.
+ *
+ * The "xres" and "yres" arguments specify the raster resolution in dots per
+ * inch.
+ *
+ * The "sheet_back" argument specifies a "pwg-raster-document-sheet-back" value
+ * to apply for the back side of a page.  Pass @code NULL@ for the front side.
+ *
+ * @since CUPS 2.2@
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsRasterInitPWGHeader(
+    cups_page_header2_t *h,		/* I - Page header */
+    pwg_media_t         *media,		/* I - PWG media information */
+    const char          *type,		/* I - PWG raster type string */
+    int                 xdpi,		/* I - Cross-feed direction (horizontal) resolution */
+    int                 ydpi,		/* I - Feed direction (vertical) resolution */
+    const char          *sides,		/* I - IPP "sides" option value */
+    const char          *sheet_back)	/* I - Transform for back side or @code NULL@ for none */
+{
+  if (!h || !media || !type || xdpi <= 0 || ydpi <= 0)
+  {
+    _cupsRasterAddError("%s", strerror(EINVAL));
+    return (0);
+  }
+
+ /*
+  * Initialize the page header...
+  */
+
+  memset(h, 0, sizeof(cups_page_header2_t));
+
+  strlcpy(h->cupsPageSizeName, media->pwg, sizeof(h->cupsPageSizeName));
+
+  h->PageSize[0] = (unsigned)(72 * media->width / 2540);
+  h->PageSize[1] = (unsigned)(72 * media->length / 2540);
+
+  h->ImagingBoundingBox[2] = h->PageSize[0];
+  h->ImagingBoundingBox[3] = h->PageSize[1];
+
+  h->HWResolution[0] = (unsigned)xdpi;
+  h->HWResolution[1] = (unsigned)ydpi;
+
+  h->cupsWidth  = (unsigned)(media->width * xdpi / 2540);
+  h->cupsHeight = (unsigned)(media->length * ydpi / 2540);
+
+  if (h->cupsWidth > 0x00ffffff || h->cupsHeight > 0x00ffffff)
+  {
+    _cupsRasterAddError("Raster dimensions too large.");
+    return (0);
+  }
+
+  h->cupsInteger[5] = h->cupsWidth;
+  h->cupsInteger[6] = h->cupsHeight;
+
+ /*
+  * Colorspace and bytes per line...
+  */
+
+  if (!strcmp(type, "adobe-rgb_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 24;
+    h->cupsColorSpace   = CUPS_CSPACE_ADOBERGB;
+  }
+  else if (!strcmp(type, "adobe-rgb_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 48;
+    h->cupsColorSpace   = CUPS_CSPACE_ADOBERGB;
+  }
+  else if (!strcmp(type, "black_1"))
+  {
+    h->cupsBitsPerColor = 1;
+    h->cupsBitsPerPixel = 1;
+    h->cupsColorSpace   = CUPS_CSPACE_K;
+  }
+  else if (!strcmp(type, "black_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 8;
+    h->cupsColorSpace   = CUPS_CSPACE_K;
+  }
+  else if (!strcmp(type, "black_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 16;
+    h->cupsColorSpace   = CUPS_CSPACE_K;
+  }
+  else if (!strcmp(type, "cmyk_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 32;
+    h->cupsColorSpace   = CUPS_CSPACE_CMYK;
+  }
+  else if (!strcmp(type, "cmyk_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 64;
+    h->cupsColorSpace   = CUPS_CSPACE_CMYK;
+  }
+  else if (!strncmp(type, "device", 6) && type[6] >= '1' && type[6] <= '9')
+  {
+    int ncolors, bits;			/* Number of colors and bits */
+
+
+    if (sscanf(type, "device%d_%d", &ncolors, &bits) != 2 || ncolors > 15 || (bits != 8 && bits != 16))
+    {
+      _cupsRasterAddError("Unsupported raster type \'%s\'.", type);
+      return (0);
+    }
+
+    h->cupsBitsPerColor = (unsigned)bits;
+    h->cupsBitsPerPixel = (unsigned)(ncolors * bits);
+    h->cupsColorSpace   = (cups_cspace_t)(CUPS_CSPACE_DEVICE1 + ncolors - 1);
+  }
+  else if (!strcmp(type, "rgb_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 24;
+    h->cupsColorSpace   = CUPS_CSPACE_RGB;
+  }
+  else if (!strcmp(type, "rgb_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 48;
+    h->cupsColorSpace   = CUPS_CSPACE_RGB;
+  }
+  else if (!strcmp(type, "sgray_1"))
+  {
+    h->cupsBitsPerColor = 1;
+    h->cupsBitsPerPixel = 1;
+    h->cupsColorSpace   = CUPS_CSPACE_SW;
+  }
+  else if (!strcmp(type, "sgray_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 8;
+    h->cupsColorSpace   = CUPS_CSPACE_SW;
+  }
+  else if (!strcmp(type, "sgray_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 16;
+    h->cupsColorSpace   = CUPS_CSPACE_SW;
+  }
+  else if (!strcmp(type, "srgb_8"))
+  {
+    h->cupsBitsPerColor = 8;
+    h->cupsBitsPerPixel = 24;
+    h->cupsColorSpace   = CUPS_CSPACE_SRGB;
+  }
+  else if (!strcmp(type, "srgb_16"))
+  {
+    h->cupsBitsPerColor = 16;
+    h->cupsBitsPerPixel = 48;
+    h->cupsColorSpace   = CUPS_CSPACE_SRGB;
+  }
+  else
+  {
+    _cupsRasterAddError("Unsupported raster type \'%s\'.", type);
+    return (0);
+  }
+
+  h->cupsColorOrder   = CUPS_ORDER_CHUNKED;
+  h->cupsNumColors    = h->cupsBitsPerPixel / h->cupsBitsPerColor;
+  h->cupsBytesPerLine = (h->cupsWidth * h->cupsBitsPerPixel + 7) / 8;
+
+ /*
+  * Duplex support...
+  */
+
+  h->cupsInteger[1] = 1;		/* CrossFeedTransform */
+  h->cupsInteger[2] = 1;		/* FeedTransform */
+
+  if (sides)
+  {
+    if (!strcmp(sides, "two-sided-long-edge"))
+    {
+      h->Duplex = 1;
+    }
+    else if (!strcmp(sides, "two-sided-short-edge"))
+    {
+      h->Duplex = 1;
+      h->Tumble = 1;
+    }
+    else if (strcmp(sides, "one-sided"))
+    {
+      _cupsRasterAddError("Unsupported sides value \'%s\'.", sides);
+      return (0);
+    }
+
+    if (sheet_back)
+    {
+      if (!strcmp(sheet_back, "flipped"))
+      {
+        if (h->Tumble)
+        {
+          h->cupsInteger[1] = 0xffffffffU;
+          h->cupsInteger[2] = 1;
+        }
+        else
+        {
+          h->cupsInteger[1] = 1;
+          h->cupsInteger[2] = 0xffffffffU;
+        }
+      }
+      else if (!strcmp(sheet_back, "manual-tumble"))
+      {
+        if (h->Tumble)
+        {
+          h->cupsInteger[1] = 0xffffffffU;
+          h->cupsInteger[2] = 0xffffffffU;
+        }
+      }
+      else if (!strcmp(sheet_back, "rotated"))
+      {
+        if (!h->Tumble)
+        {
+          h->cupsInteger[1] = 0xffffffffU;
+          h->cupsInteger[2] = 0xffffffffU;
+        }
+      }
+      else if (strcmp(sheet_back, "normal"))
+      {
+	_cupsRasterAddError("Unsupported sheet_back value \'%s\'.", sheet_back);
+	return (0);
+      }
+    }
+  }
+
+  return (1);
+}
+
+
+/*
  * 'cupsRasterOpen()' - Open a raster stream using a file descriptor.
  *
  * This function associates a raster stream with the given file descriptor.

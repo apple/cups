@@ -592,9 +592,7 @@ apihelp:
 	mxmldoc --section "Programming" --title "PPD API (DEPRECATED)" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
-		api-ppd.xml \
-		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c page.c \
-		ppd.c >../doc/help/api-ppd.html
+		api-ppd.xml ppd.h ppd-*.c >../doc/help/api-ppd.html
 	mxmldoc --tokens help/api-ppd.html api-ppd.xml >../doc/help/api-ppd.tokens
 	$(RM) api-ppd.xml
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \

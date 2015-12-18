@@ -39,6 +39,7 @@
 #  include "cups.h"
 #  include "array.h"
 #  include "file.h"
+#  include "raster.h"
 
 
 /*
@@ -413,6 +414,11 @@ extern ppd_status_t	ppdLastError(int *line) _PPD_DEPRECATED;
 extern void		ppdSetConformance(ppd_conform_t c) _PPD_DEPRECATED;
 
 /**** New in CUPS 1.2 ****/
+extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
+			                       ppd_file_t *ppd,
+					       int num_options,
+					       cups_option_t *options,
+					       cups_interpret_cb_t func) _PPD_DEPRECATED;
 extern int		ppdCollect2(ppd_file_t *ppd, ppd_section_t section,
 			            float min_order, ppd_choice_t  ***choices)
 			            _PPD_DEPRECATED;

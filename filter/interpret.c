@@ -20,6 +20,7 @@
  */
 
 #include <cups/raster-private.h>
+#include <cups/ppd.h>
 
 
 /*
