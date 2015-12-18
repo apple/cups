@@ -402,7 +402,10 @@ _cupsAppleSetDefaultPaperID(
 {
   CFPreferencesSetAppValue(kDefaultPaperIDKey, name, kCUPSPrintingPrefs);
   CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+
+#  ifdef HAVE_NOTIFY_POST
   notify_post("com.apple.printerPrefsChange");
+#  endif /* HAVE_NOTIFY_POST */
 }
 
 
@@ -490,7 +493,10 @@ _cupsAppleSetDefaultPrinter(
       CFPreferencesSetAppValue(kLastUsedPrintersKey, newlocations,
                                kCUPSPrintingPrefs);
       CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+
+#  ifdef HAVE_NOTIFY_POST
       notify_post("com.apple.printerPrefsChange");
+#  endif /* HAVE_NOTIFY_POST */
     }
 
     if (newlocations)
@@ -519,7 +525,10 @@ _cupsAppleSetUseLastPrinter(
 			   uselast ? kCFBooleanTrue : kCFBooleanFalse,
 			   kCUPSPrintingPrefs);
   CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+
+#  ifdef HAVE_NOTIFY_POST
   notify_post("com.apple.printerPrefsChange");
+#  endif /* HAVE_NOTIFY_POST */
 }
 #endif /* __APPLE__ */
 
