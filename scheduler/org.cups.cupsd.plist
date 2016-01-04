@@ -40,12 +40,8 @@
 		<key>Listeners</key>
 		<array>
 			<dict>
-				<key>SockPathOwner</key>
-				<integer>26</integer>
-				<key>SockPathGroup</key>
-				<integer>20</integer>
 				<key>SockPathMode</key>
-				<integer>49656</integer>
+				<integer>49663</integer>
 				<key>SockPathName</key>
 				<string>/private/var/run/cupsd</string>
 			</dict>
