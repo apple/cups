@@ -710,6 +710,8 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
   noecho = original;
   noecho.c_lflag &= (tcflag_t)~(ICANON | ECHO | ECHOE | ISIG);
+  noecho.c_cc[VMIN]  = 1;
+  noecho.c_cc[VTIME] = 0;
 
   if (tcsetattr(tty, TCSAFLUSH, &noecho))
   {
@@ -1234,7 +1236,7 @@ cups_set_ssl_options(
 
   for (start = temp; *start; start = end)
   {
-   /* 
+   /*
     * Find end of keyword...
     */
 
