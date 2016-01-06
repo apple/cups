@@ -259,9 +259,9 @@ VAR char		*SystemGroupAuthKey	VALUE(NULL);
 #ifdef HAVE_GSSAPI
 VAR char		*GSSServiceName		VALUE(NULL);
 					/* GSS service name */
-int			HaveServerCreds		VALUE(0);
+VAR int			HaveServerCreds		VALUE(0);
 					/* Do we have server credentials? */
-gss_cred_id_t		ServerCreds;	/* Server's GSS credentials */
+VAR gss_cred_id_t	ServerCreds;	/* Server's GSS credentials */
 #endif /* HAVE_GSSAPI */
 
 
