@@ -3,7 +3,7 @@
  *
  * Line Printer Daemon backend for CUPS.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -77,6 +77,7 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
  * Local functions...
  */
 
+static int	cups_rresvport(int *port, int family);
 static int	lpd_command(int lpd_fd, char *format, ...);
 static int	lpd_queue(const char *hostname, http_addrlist_t *addrlist,
 			  const char *printer, int print_fd, int snmp_fd,
@@ -85,9 +86,6 @@ static int	lpd_queue(const char *hostname, http_addrlist_t *addrlist,
 			  int reserve, int manual_copies, int timeout,
 			  int contimeout, const char *orighost);
 static ssize_t	lpd_write(int lpd_fd, char *buffer, size_t length);
-#ifndef HAVE_RRESVPORT_AF
-static int	rresvport_af(int *port, int family);
-#endif /* !HAVE_RRESVPORT_AF */
 static void	sigterm_handler(int sig);
 
 
@@ -573,6 +571,84 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
+ * 'cups_rresvport()' - A simple implementation of rresvport_af().
+ */
+
+static int				/* O  - Socket or -1 on error */
+cups_rresvport(int *port,		/* IO - Port number to bind to */
+               int family)		/* I  - Address family */
+{
+  http_addr_t	addr;			/* Socket address */
+  int		fd;			/* Socket file descriptor */
+
+
+ /*
+  * Try to create an IPv4 socket...
+  */
+
+  if ((fd = socket(family, SOCK_STREAM, 0)) < 0)
+    return (-1);
+
+ /*
+  * Initialize the address buffer...
+  */
+
+  memset(&addr, 0, sizeof(addr));
+  addr.addr.sa_family = family;
+
+ /*
+  * Try to bind the socket to a reserved port...
+  */
+
+  while (*port > 511)
+  {
+   /*
+    * Set the port number...
+    */
+
+    _httpAddrSetPort(&addr, *port);
+
+   /*
+    * Try binding the port to the socket; return if all is OK...
+    */
+
+    if (!bind(fd, (struct sockaddr *)&addr, (socklen_t)httpAddrLength(&addr)))
+      return (fd);
+
+   /*
+    * Stop if we have any error other than "address already in use"...
+    */
+
+    if (errno != EADDRINUSE)
+    {
+      httpAddrClose(NULL, fd);
+
+      return (-1);
+    }
+
+   /*
+    * Try the next port...
+    */
+
+    (*port)--;
+  }
+
+ /*
+  * Wasn't able to bind to a reserved port, so close the socket and return
+  * -1...
+  */
+
+#ifdef WIN32
+  closesocket(fd);
+#else
+  close(fd);
+#endif /* WIN32 */
+
+  return (-1);
+}
+
+
+/*
  * 'lpd_command()' - Send an LPR command sequence and wait for a reply.
  */
 
@@ -753,7 +829,7 @@ lpd_queue(const char      *hostname,	/* I - Host to connect to */
 	* priviledged lport between 721 and 731...
 	*/
 
-	if ((fd = rresvport_af(&lport, addr->addr.addr.sa_family)) < 0)
+	if ((fd = cups_rresvport(&lport, addr->addr.addr.sa_family)) < 0)
 	{
 	  perror("DEBUG: Unable to reserve port");
 	  sleep(1);
@@ -1224,86 +1300,6 @@ lpd_write(int     lpd_fd,		/* I - LPD socket */
   else
     return (total);
 }
-
-
-#ifndef HAVE_RRESVPORT_AF
-/*
- * 'rresvport_af()' - A simple implementation of rresvport_af().
- */
-
-static int				/* O  - Socket or -1 on error */
-rresvport_af(int *port,			/* IO - Port number to bind to */
-             int family)		/* I  - Address family */
-{
-  http_addr_t	addr;			/* Socket address */
-  int		fd;			/* Socket file descriptor */
-
-
- /*
-  * Try to create an IPv4 socket...
-  */
-
-  if ((fd = socket(family, SOCK_STREAM, 0)) < 0)
-    return (-1);
-
- /*
-  * Initialize the address buffer...
-  */
-
-  memset(&addr, 0, sizeof(addr));
-  addr.addr.sa_family = family;
-
- /*
-  * Try to bind the socket to a reserved port...
-  */
-
-  while (*port > 511)
-  {
-   /*
-    * Set the port number...
-    */
-
-    _httpAddrSetPort(&addr, *port);
-
-   /*
-    * Try binding the port to the socket; return if all is OK...
-    */
-
-    if (!bind(fd, (struct sockaddr *)&addr, httpAddrLength(&addr)))
-      return (fd);
-
-   /*
-    * Stop if we have any error other than "address already in use"...
-    */
-
-    if (errno != EADDRINUSE)
-    {
-      httpAddrClose(NULL, fd);
-
-      return (-1);
-    }
-
-   /*
-    * Try the next port...
-    */
-
-    (*port)--;
-  }
-
- /*
-  * Wasn't able to bind to a reserved port, so close the socket and return
-  * -1...
-  */
-
-#  ifdef WIN32
-  closesocket(fd);
-#  else
-  close(fd);
-#  endif /* WIN32 */
-
-  return (-1);
-}
-#endif /* !HAVE_RRESVPORT_AF */
 
 
 /*
