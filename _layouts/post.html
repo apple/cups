@@ -24,7 +24,7 @@
 	<div class="collapse navbar-collapse" id="cups-collapsible">
 	  <ul class="nav navbar-nav">
 	    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Blog <b class="caret"></b></a><ul class="dropdown-menu">
-{% for post in site.posts offset: 0 limit: 4 %}
+{% for post in site.posts offset: 0 limit: 10 %}
 	    <li><a href="../../../{{ post.url }}">{{post.title}}</a></li>
 {% endfor %}
 	      <li class="divider"></li>

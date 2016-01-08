@@ -1,0 +1,11 @@
+---
+title: How To Restrict Disk, Memory and CPU Usage
+layout: post
+---
+
+If you are running into a performance problem with disk space, memory and CPU usage, editing one or more of the following directives inside the /etc/cups/cupsd.conf file may aid the situation.The AutoPurgeJobs directive:Can be enabled if you are using quotas. This will purge completed jobs once they are no longer needed for quota information. The default setting is No.AutoPurgeJobs YesThe PreserveJobHistory directive:Can be turned off to remove each job's information from disk as soon the corresponding job is completed, cancelled, or aborted. The default setting is On.PreserveJobHistory OffThe PreserveJobFiles directive:Controls whether the document files of completed, cancelled, or aborted print jobs are stored on disk The default setting is Off.PreserveJobFiles OffThe MaxJobs directive:Controls the maximum number of jobs that are kept in memory. Once the number of jobs reaches the limit, the oldest completed job is automatically purged from the system to make room for the new one. If all of the known jobs are still pending or active then the new job will be rejected. The default setting is 500. The setting of 0 disables this functionality. Here is an example to keep only 400 jobs intact:MaxJobs 400The FilterLimit directive:Sets the maximum cost of all running job filters. It can be used to limit the number of filter programs that are run on a server to minimize disk, memory, and CPU resource problems. The default limit value of 0 disables filter limiting. An average print to a non-PostScript printer needs a filter limit of about 200. A PostScript printer needs about half that (100). Setting the limit below these thresholds will effectively limit the scheduler to printing a single job at any time. For example:FilterLimit 200To enable the changes in the configuration file, restart the cupsd daemon.CUPS also stores old jobs on the hard disk in the "/var/spool/cups" directory. To clean things up when the amount of data gets too large or when there are problems starting the CUPS daemon, stop the cupsd daemon and clean the spool directory with the following commands:
+
+ /etc/software/init.d/cups stop ENTER
+ rm -f /var/spool/cups/c* ENTER
+ rm -f /var/spool/cups/tmp/* ENTER
+ /etc/software/init.d/cups start ENTER
