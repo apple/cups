@@ -3,10 +3,15 @@ title: CUPS.org
 layout: default
 ---
 
-# CUPS
+<div class="jumbotron">
+  <h1>CUPS</h1>
+  <p>CUPS is the standards-based, open source printing system developed by <a href="http://www.apple.com/">Apple Inc.</a> for OS X<sup>&reg;</sup> and other UNIX<sup>&reg;</sup>-like operating systems. CUPS uses the Internet Printing Protocol (IPP) to support printing to local and network printers.</p>
+  <p><a class="btn btn-primary btn-large" href="{{site.github.releases_url}}"><span class="glyphicon glyphicon-download-alt"></span> Download CUPS</a> <a class="btn btn-default btn-large" href="faq.html">Frequently Asked Questions</a></p>
+</div>
 
-CUPS is the standards-based, open source printing system developed by Apple Inc. for OS X® and other UNIX®-like operating systems. CUPS uses the Internet Printing Protocol (IPP) to support printing to local and network printers.
-
-[Download v2.1.0](http://www.cups.org/software.php)
-[Download Developer Snapshot](https://github.com/michaelrsweet/cups/archive/master.tar.gz)
-
+{% for post in site.posts offset: 0 limit: 4 %}
+<hr>
+<h2><small class="float-right muted">{{ post.date | date_to_string }}</small>{{post.title}}</h2>
+<p>{{ post.excerpt | remove: '<p>' | remove: '</p>' }}</p>
+<p><a class="btn btn-default btn-xs" href="{{ site.prefix }}{{ post.url }}">Read</a></p>
+{% endfor %}

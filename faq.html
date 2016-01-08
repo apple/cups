@@ -1,0 +1,27 @@
+---
+title: Frequently Asked Questions - CUPS.org
+layout: default
+---
+
+<h1>Frequently Asked Questions</h1>
+
+<h2><a name="LOGIN">What Username and Password Do I Use?</a></h2>
+
+<p>If you are asked for a username and password when accessing the CUPS web interface (localhost:631), use your login name and password. This is the same information you use to access your computer every day, unlock your computer's screen saver, install new software, etc.</p>
+
+<p>Common variations:</p>
+
+<blockquote>Q: I want to add a printer but was asked to enter a name and password. Which name and password do I use?<br>&nbsp;<br>
+<em>A: Use the username and password for your computer.</em></blockquote>
+
+<blockquote>Q: I am trying to add a printer through the CUPS GUI. But when I enter my CUPS.org username and password it just keeps asking me for my username and password! How can I use the CUPS GUI?<br>&nbsp;<br>
+<em>A: Do not try to use your CUPS.org username and password. They will not work. Use the username and password for your computer.</em></blockquote>
+
+<blockquote>Q: The CUPS web interface keeps asking me for a password, but I don't have one on this computer. How can I use the web interface?<br>&nbsp;<br>
+<em>A: If you have setup your computer to not require a password or have a blank or empty password, then the CUPS web interface will not work for you. CUPS requires a login username and password to allow you to make changes through the web interface.</em></blockquote>
+
+<h2><a name="UNICODEPASS">Why Can't I Use a Password Like こんにちは?</a></h2>
+
+<p>Unicode passwords are poorly supported by web browsers, the Hypertext Transfer Protocol (HTTP), and by UNIX in general. Many browsers simply truncate password characters at 8 bits (!) and there is no way to know which character set is being used by the Pluggable Authentication Module (PAM) provided by the operating system. Thus, there is no way to reliably support Unicode passwords today.</p>
+
+<p>The Internet Engineering Task Force (IETF) is working on updates to HTTP that will allow servers to advertise support for UTF-8 passwords - assuming that browsers adopt the updates and PAM allows or supports UTF-8 passwords, we may be able to support Unicode passwords in the future.</p>

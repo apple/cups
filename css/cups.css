@@ -1,0 +1,319 @@
+/*
+ * "$Id: cups.css 12207 2014-10-16 15:45:58Z msweet $"
+ *
+ * CUPS stylesheet in addition to bootstrap CSS...
+ */
+
+/* Basic site appearance */
+BODY {
+  font-size: 16px;
+  line-height: 20px;
+  margin: 0px;
+}
+
+A, A:hover {
+  color: black;
+  text-decoration: none;
+}
+
+A:link {
+  color: #0088cc;
+}
+
+/*A:visited {
+  color: #005580;
+}*/
+
+A:link:hover, A:visited:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+
+A.btn:link, A.btn:hover, A.btn:focus,
+A.btn:active, A.btn.active, A.btn.disabled,
+A.btn[disabled], A.navbar-brand:hover {
+  color: #000000;
+  text-decoration: none;
+}
+
+A.btn-primary:link, A.btn-primary:hover, A.btn-primary:focus,
+A.btn-primary:active, A.btn-primary.active, A.btn-primary.disabled,
+A.btn-primary[disabled] {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/*UL.nav {
+  font-size: 14px;
+}*/
+
+SUP, SUB {
+  font-size: 62%;
+}
+
+FORM {
+  display: inline;
+}
+
+INPUT[TYPE="TEXT"], INPUT[TYPE="EMAIL"], INPUT[TYPE="NUMBER"], INPUT[TYPE="PASSWORD"], INPUT[TYPE="SEARCH"], TEXTAREA {
+  font-family: Consolas, "Courier New", monospace;
+}
+
+INPUT[TYPE="NUMBER"] {
+  text-align: right;
+}
+
+INPUT, SELECT, TEXTAREA {
+  vertical-align: middle;
+  width: auto;
+}
+
+FORM.navbar-search, FORM.pull-right {
+  display: inline-block;
+}
+
+FORM.navbar-search INPUT {
+  margin-top: 12px;
+}
+
+INPUT[type="checkbox"] {
+  height: 16px !important;
+}
+
+.form-horizontal .control-label {
+  padding-right: 0px;
+  padding-top: 0px;
+}
+
+.control-label:after {
+  content: ":";
+}
+
+DIV.jumbotron {
+  border-radius: 5px;
+  margin-top: 20px;
+  padding: 20px 30px;
+}
+
+DIV.jumbotron H1 {
+  font-size: 32px;
+  line-height: 40px;
+  margin: 0px;
+  padding: 0px;
+}
+DIV.jumbotron P {
+  font-size: 16px;
+  line-height: 20px;
+}
+
+DIV.footer {
+  background-color: rgba(248,248,248,0.7);
+  background-image: linear-gradient(rgba(248,248,248,0.7) 0px, rgba(255,255,255,0.7) 100%);
+  bottom: 0px;
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.1) inset;
+  font-size: 11px;
+  left: 0px;
+  line-height: 12px;
+  padding: 10px 10px 0px; /* top right+left bottom */
+  position: fixed;
+  right: 0px;
+}
+
+P {
+  margin-bottom: 20px;
+}
+
+DIV.footer P {
+  margin-bottom: 10px;
+}
+
+DIV.container-top {
+  padding: 50px 20px; /* top+bottom right+left */
+}
+
+.form-control {
+  display: inline-block;
+  height: auto;
+  width: auto;
+}
+
+TABLE.table {
+  border-bottom: solid 1px #dddddd;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.float-right {
+  float: right;
+}
+
+SPAN.message {
+  font-style: italic;
+  font-size: smaller;
+}
+
+.strtext CODE {
+  background: none;
+  border: none;
+  color: black;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 14px;
+  white-space: pre-wrap !important;
+}
+
+DL.comment DT, DL.comment DT A {
+  color: #999999;
+  font-weight: normal;
+}
+
+DD.small, DD.small > P, DD.small > PRE, DD.small > H2, DD.small > H2 > A,
+DD.small > H3, DD.small > H3 > A, DD.small > H4, DD.small > H4 > A,
+DD.small > UL {
+  font-size: 12px;
+  line-height: 14px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+/* API documentation stuff... */
+span.info {
+  background: #333333;
+  border: thin solid #333333;
+  border-radius: 10px;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+h2 span.info, h3 span.info, h4 span.info {
+  border-radius: 20px;
+  float: right;
+  font-size: 100%;
+  padding: 0px 10px;
+}
+
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* iPhone/iPod touch overrides */
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px),
+       only screen and (min-device-width: 320px) and (max-device-width: 568px) {
+  DIV.page-header {
+    margin: 0px;
+    padding: 0px;
+  }
+  DIV.page-header H1 {
+    font-size: 30px;
+    line-height: 36px;
+    margin: 0px;
+    padding: 0px;
+  }
+  DIV.jumbotron {
+    margin: 20px 0px 10px; /* top right+left bottom */
+    padding: 10px 20px;
+  }
+  H2 {
+    font-size: 25px;
+    line-height: 25px;
+  }
+  H3 {
+    font-size: 20px;
+    line-height: 20px;
+  }
+  DIV.footer {
+    height: auto;
+    padding: 10px 10px 5px; /* top right+left bottom */
+    position: relative;
+  }
+}
+
+/* iPad overrides */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+}
+
+/* Print overrides */
+@media print {
+/*  DIV.navbar, DIV.container-top UL.breadcrumb {
+    display: none;
+  }*/
+
+  DIV.container-top {
+    padding: 0px;
+  }
+
+  DIV.footer {
+    font-style: italic;
+    position: relative;
+  }
+
+  .hidden-print {
+    display: none;
+  }
+
+  /* Bootstrap adds URLs after every link, stop doing that... */
+  a[href]:after {
+    content: none !important;
+  }
+
+  /* and don't print any form controls, either */
+  button, input, option, select {
+    display: none !important;
+  }
+}
+
+/*
+ * End of "$Id: cups.css 12207 2014-10-16 15:45:58Z msweet $".
+ */
