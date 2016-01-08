@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<!-- SECTION: Specifications -->
+<HEAD>
+	<TITLE>CUPS Software Test Plan</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">CUPS Software Test Plan</H1>
+
+<P>This software test plan provides detailed tests that are used
+to evaluate the stability and compliance of CUPS.</P>
+
+
+<H2 CLASS="title"><A NAME="PROCEDURE">Test Procedure</A></H2>
+
+<P>The test software and data files are located in the
+<VAR>test</VAR> subdirectory of the source distribution. A script
+is provided to compile the <CODE>ipptool</CODE> program and run
+all of the tests that follow, producing a success/fail
+report.</P>
+
+<P>The <CODE>test</CODE> target of the top-level makefile can be
+used to run this script:</P>
+
+<PRE CLASS="command">
+make test
+</PRE>
+
+<P>or you can run the test script directly:</P>
+
+<PRE CLASS="command">
+cd test
+./run-stp-tests
+</PRE>
+
+<P>A Software Test Report is stored in a HTML file in the
+<VAR>test</VAR> subdirectory at the conclusion of the test.</P>
+
+
+<H2 CLASS="title"><A NAME="IPP">IPP Compliance Tests</A></H2>
+
+<P>This section describes the tests used to validate the IPP
+standards compliance of the CUPS server.</P>
+
+<H3>Request Tests</H3>
+
+<P>These tests verify that the CUPS scheduler only accepts valid
+IPP requests that start with the <CODE>attributes-charset</CODE>
+and <CODE>attributes-natural-language</CODE> attributes and also
+contain a <CODE>printer-uri</CODE> or <CODE>job-uri</CODE>
+attribute.</P>
+
+<P>It also verifies that the CUPS scheduler always responds with
+<CODE>attributes-charset</CODE> and
+<CODE>attributes-natural-language</CODE> attributes, using
+default values if they are not provided by the client.</P>
+
+<H3>CUPS Printer Operation Tests</H3>
+
+<P>These tests verify that the CUPS printer operations are
+supported and function properly. Two printers called
+<CODE>Test1</CODE> and <CODE>Test2</CODE> are created, one as a
+PostScript printer and one as a raster printer.</P>
+
+<H3>Job Operation Tests</H3>
+
+<P>These test verify that the CUPS scheduler accepts print jobs
+for all supported file formats and that the
+<CODE>cancel-job</CODE>, <CODE>hold-job</CODE>, and
+<CODE>resume-job</CODE> operations work.</P>
+
+<H3>Subscription Operation Tests</H3>
+
+<P>These test verify that the CUPS scheduler accepts
+subscriptions with print jobs and that all subscription
+operations work as required by the IPP notification and mailto
+specifications.</P>
+
+
+<H2 CLASS="title"><A NAME="COMMAND">Command Tests</A></H2>
+
+<P>This section describes the tests used to validate the Berkeley
+and System V commands included with CUPS.</P>
+
+<H3>lpadmin</H3>
+
+<P>This test verifies that printers can be added, modified, and
+defaulted using the <CODE>lpadmin</CODE> command.</P>
+
+<H3>lpc</H3>
+
+<P>This test verifies that the <CODE>lpc</CODE> command can show
+the current status of all print queues.</P>
+
+<H3>lpq</H3>
+
+<P>This test verifies that the <CODE>lpq</CODE> command lists
+any jobs in the queue.</P>
+
+<H3>lpstat</H3>
+
+<P>This test verifies that the <CODE>lpstat</CODE> command works
+with all reports using the "<CODE>-t</CODE>" option.</P>
+
+<H3>lp</H3>
+
+<P>This test verifies that the <CODE>lp</CODE> command works with
+both the default destination and a specific destination.</P>
+
+<H3>lpr</H3>
+
+<P>This test verifies that the <CODE>lpr</CODE> command works
+with both the default destination and a specific destination.</P>
+
+<H3>lprm</H3>
+
+<P>This test verifies that the <CODE>lprm</CODE> command can
+properly cancel a job.</P>
+
+<H3>cancel</H3>
+
+<P>This test verifies that the <CODE>cancel</CODE> command can
+properly cancel a job or all jobs.</P>
+
+<H3>lpinfo</H3>
+
+<P>This test verifies that the <CODE>lpinfo</CODE> command
+returns a list of available printer drivers and devices.</P>
+
+</BODY>
+</HTML>

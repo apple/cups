@@ -1,0 +1,1156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>Printer Driver API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+  
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: normal;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id$"
+
+  Driver API header for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>Driver API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/driver.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupsdriver</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#cupsCMYKDelete" title="Delete a color separation.">cupsCMYKDelete</a></li>
+	<li><a href="#cupsCMYKDoBlack" title="Do a black separation...">cupsCMYKDoBlack</a></li>
+	<li><a href="#cupsCMYKDoCMYK" title="Do a CMYK separation...">cupsCMYKDoCMYK</a></li>
+	<li><a href="#cupsCMYKDoGray" title="Do a grayscale separation...">cupsCMYKDoGray</a></li>
+	<li><a href="#cupsCMYKDoRGB" title="Do an sRGB separation...">cupsCMYKDoRGB</a></li>
+	<li><a href="#cupsCMYKLoad" title="Load a CMYK color profile from PPD attributes.">cupsCMYKLoad</a></li>
+	<li><a href="#cupsCMYKNew" title="Create a new CMYK color separation.">cupsCMYKNew</a></li>
+	<li><a href="#cupsCMYKSetBlack" title="Set the transition range for CMY to black.">cupsCMYKSetBlack</a></li>
+	<li><a href="#cupsCMYKSetCurve" title="Set a color transform curve using points.">cupsCMYKSetCurve</a></li>
+	<li><a href="#cupsCMYKSetGamma" title="Set a color transform curve using gamma and density.">cupsCMYKSetGamma</a></li>
+	<li><a href="#cupsCMYKSetInkLimit" title="Set the limit on the amount of ink.">cupsCMYKSetInkLimit</a></li>
+	<li><a href="#cupsCMYKSetLtDk" title="Set light/dark ink transforms.">cupsCMYKSetLtDk</a></li>
+	<li><a href="#cupsCheckBytes" title="Check to see if all bytes are zero.">cupsCheckBytes</a></li>
+	<li><a href="#cupsCheckValue" title="Check to see if all bytes match the given value.">cupsCheckValue</a></li>
+	<li><a href="#cupsDitherDelete" title="Free a dithering buffer.">cupsDitherDelete</a></li>
+	<li><a href="#cupsDitherLine" title="Dither a line of pixels...">cupsDitherLine</a></li>
+	<li><a href="#cupsDitherNew" title="Create an error-diffusion dithering buffer.">cupsDitherNew</a></li>
+	<li><a href="#cupsFindAttr" title="Find a PPD attribute based on the colormodel,
+media, and resolution.">cupsFindAttr</a></li>
+	<li><a href="#cupsLutDelete" title="Free the memory used by a lookup table.">cupsLutDelete</a></li>
+	<li><a href="#cupsLutLoad" title="Load a LUT from a PPD file.">cupsLutLoad</a></li>
+	<li><a href="#cupsLutNew" title="Make a lookup table from a list of pixel values.">cupsLutNew</a></li>
+	<li><a href="#cupsPackHorizontal" title="Pack pixels horizontally...">cupsPackHorizontal</a></li>
+	<li><a href="#cupsPackHorizontal2" title="Pack 2-bit pixels horizontally...">cupsPackHorizontal2</a></li>
+	<li><a href="#cupsPackHorizontalBit" title="Pack pixels horizontally by bit...">cupsPackHorizontalBit</a></li>
+	<li><a href="#cupsPackVertical" title="Pack pixels vertically...">cupsPackVertical</a></li>
+	<li><a href="#cupsRGBDelete" title="Delete a color separation.">cupsRGBDelete</a></li>
+	<li><a href="#cupsRGBDoGray" title="Do a grayscale separation...">cupsRGBDoGray</a></li>
+	<li><a href="#cupsRGBDoRGB" title="Do a RGB separation...">cupsRGBDoRGB</a></li>
+	<li><a href="#cupsRGBLoad" title="Load a RGB color profile from a PPD file.">cupsRGBLoad</a></li>
+	<li><a href="#cupsRGBNew" title="Create a new RGB color separation.">cupsRGBNew</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cups_cmyk_t" title="Simple CMYK lookup table">cups_cmyk_t</a></li>
+	<li><a href="#cups_dither_t" title="Dithering State">cups_dither_t</a></li>
+	<li><a href="#cups_lut_t" title="Lookup Table for Dithering">cups_lut_t</a></li>
+	<li><a href="#cups_rgb_t" title="Color separation lookup table">cups_rgb_t</a></li>
+	<li><a href="#cups_sample_t" title="Color sample point">cups_sample_t</a></li>
+</ul></li>
+<li><a href="#STRUCTURES">Structures</a><ul class="code">
+	<li><a href="#cups_cmyk_s" title="Simple CMYK lookup table">cups_cmyk_s</a></li>
+	<li><a href="#cups_dither_s" title="Dithering State">cups_dither_s</a></li>
+	<li><a href="#cups_lut_s" title="Lookup Table for Dithering">cups_lut_s</a></li>
+	<li><a href="#cups_rgb_s" title="Color separation lookup table">cups_rgb_s</a></li>
+	<li><a href="#cups_sample_s" title="Color sample point">cups_sample_s</a></li>
+</ul></li>
+<li><a href="#VARIABLES">Variables</a><ul class="code">
+	<li><a href="#cups_scmy_lut[256]" title="sRGB gamma lookup table (inverted)">cups_scmy_lut[256]</a></li>
+	<li><a href="#cups_srgb_lut[256]" title="sRGB gamma lookup table">cups_srgb_lut[256]</a></li>
+</ul></li>
+</ul>
+<!--
+  "$Id$"
+
+  Driver API introduction for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The driver API provides common dithering, color conversion, and utility
+functions for CUPS drivers.</p>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="cupsCMYKDelete">cupsCMYKDelete</a></h3>
+<p class="description">Delete a color separation.</p>
+<p class="code">
+void cupsCMYKDelete (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">Color separation</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKDoBlack">cupsCMYKDoBlack</a></h3>
+<p class="description">Do a black separation...</p>
+<p class="code">
+void cupsCMYKDoBlack (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input grayscale pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKDoCMYK">cupsCMYKDoCMYK</a></h3>
+<p class="description">Do a CMYK separation...</p>
+<p class="code">
+void cupsCMYKDoCMYK (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input grayscale pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKDoGray">cupsCMYKDoGray</a></h3>
+<p class="description">Do a grayscale separation...</p>
+<p class="code">
+void cupsCMYKDoGray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input grayscale pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKDoRGB">cupsCMYKDoRGB</a></h3>
+<p class="description">Do an sRGB separation...</p>
+<p class="code">
+void cupsCMYKDoRGB (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input grayscale pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKLoad">cupsCMYKLoad</a></h3>
+<p class="description">Load a CMYK color profile from PPD attributes.</p>
+<p class="code">
+<a href="#cups_cmyk_t">cups_cmyk_t</a> *cupsCMYKLoad (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_file_t *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *colormodel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resolution<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>colormodel</dt>
+<dd class="description">ColorModel value</dd>
+<dt>media</dt>
+<dd class="description">MediaType value</dd>
+<dt>resolution</dt>
+<dd class="description">Resolution value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">CMYK color separation</p>
+<h3 class="function"><a name="cupsCMYKNew">cupsCMYKNew</a></h3>
+<p class="description">Create a new CMYK color separation.</p>
+<p class="code">
+<a href="#cups_cmyk_t">cups_cmyk_t</a> *cupsCMYKNew (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_channels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>num_channels</dt>
+<dd class="description">Number of color components</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New CMYK separation or NULL</p>
+<h3 class="function"><a name="cupsCMYKSetBlack">cupsCMYKSetBlack</a></h3>
+<p class="description">Set the transition range for CMY to black.</p>
+<p class="code">
+void cupsCMYKSetBlack (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float lower,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float upper<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">CMYK color separation</dd>
+<dt>lower</dt>
+<dd class="description">No black ink</dd>
+<dt>upper</dt>
+<dd class="description">Only black ink</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKSetCurve">cupsCMYKSetCurve</a></h3>
+<p class="description">Set a color transform curve using points.</p>
+<p class="code">
+void cupsCMYKSetCurve (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int channel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_xypoints,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const float *xypoints<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">CMYK color separation</dd>
+<dt>channel</dt>
+<dd class="description">Color channel</dd>
+<dt>num_xypoints</dt>
+<dd class="description">Number of X,Y points</dd>
+<dt>xypoints</dt>
+<dd class="description">X,Y points</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKSetGamma">cupsCMYKSetGamma</a></h3>
+<p class="description">Set a color transform curve using gamma and density.</p>
+<p class="code">
+void cupsCMYKSetGamma (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int channel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float gamval,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float density<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">CMYK color separation</dd>
+<dt>channel</dt>
+<dd class="description">Ink channel</dd>
+<dt>gamval</dt>
+<dd class="description">Gamma correction</dd>
+<dt>density</dt>
+<dd class="description">Maximum density</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKSetInkLimit">cupsCMYKSetInkLimit</a></h3>
+<p class="description">Set the limit on the amount of ink.</p>
+<p class="code">
+void cupsCMYKSetInkLimit (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float limit<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">CMYK color separation</dd>
+<dt>limit</dt>
+<dd class="description">Limit of ink</dd>
+</dl>
+<h3 class="function"><a name="cupsCMYKSetLtDk">cupsCMYKSetLtDk</a></h3>
+<p class="description">Set light/dark ink transforms.</p>
+<p class="code">
+void cupsCMYKSetLtDk (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cmyk_t">cups_cmyk_t</a> *cmyk,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int channel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float light,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float dark<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cmyk</dt>
+<dd class="description">CMYK color separation</dd>
+<dt>channel</dt>
+<dd class="description">Dark ink channel (+1 for light)</dd>
+<dt>light</dt>
+<dd class="description">Light ink only level</dd>
+<dt>dark</dt>
+<dd class="description">Dark ink only level</dd>
+</dl>
+<h3 class="function"><a name="cupsCheckBytes">cupsCheckBytes</a></h3>
+<p class="description">Check to see if all bytes are zero.</p>
+<p class="code">
+int cupsCheckBytes (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *bytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int length<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>bytes</dt>
+<dd class="description">Bytes to check</dd>
+<dt>length</dt>
+<dd class="description">Number of bytes to check</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if they match</p>
+<h3 class="function"><a name="cupsCheckValue">cupsCheckValue</a></h3>
+<p class="description">Check to see if all bytes match the given value.</p>
+<p class="code">
+int cupsCheckValue (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *bytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int length,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>bytes</dt>
+<dd class="description">Bytes to check</dd>
+<dt>length</dt>
+<dd class="description">Number of bytes to check</dd>
+<dt>value</dt>
+<dd class="description">Value to check</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if they match</p>
+<h3 class="function"><a name="cupsDitherDelete">cupsDitherDelete</a></h3>
+<p class="description">Free a dithering buffer.</p>
+<p class="code">
+void cupsDitherDelete (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dither_t">cups_dither_t</a> *d<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>d</dt>
+<dd class="description">Dithering buffer</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns 0 on success, -1 on failure.</p>
+<h3 class="function"><a name="cupsDitherLine">cupsDitherLine</a></h3>
+<p class="description">Dither a line of pixels...</p>
+<p class="code">
+void cupsDitherLine (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_dither_t">cups_dither_t</a> *d,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const <a href="#cups_lut_t">cups_lut_t</a> *lut,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const short *data,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_channels,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *p<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>d</dt>
+<dd class="description">Dither data</dd>
+<dt>lut</dt>
+<dd class="description">Lookup table</dd>
+<dt>data</dt>
+<dd class="description">Separation data</dd>
+<dt>num_channels</dt>
+<dd class="description">Number of components</dd>
+<dt>p</dt>
+<dd class="description">Pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsDitherNew">cupsDitherNew</a></h3>
+<p class="description">Create an error-diffusion dithering buffer.</p>
+<p class="code">
+<a href="#cups_dither_t">cups_dither_t</a> *cupsDitherNew (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>width</dt>
+<dd class="description">Width of output in pixels</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New state array</p>
+<h3 class="function"><a name="cupsFindAttr">cupsFindAttr</a></h3>
+<p class="description">Find a PPD attribute based on the colormodel,
+media, and resolution.</p>
+<p class="code">
+ppd_attr_t *cupsFindAttr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_file_t *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *colormodel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resolution,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *spec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int specsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>name</dt>
+<dd class="description">Attribute name</dd>
+<dt>colormodel</dt>
+<dd class="description">Color model</dd>
+<dt>media</dt>
+<dd class="description">Media type</dd>
+<dt>resolution</dt>
+<dd class="description">Resolution</dd>
+<dt>spec</dt>
+<dd class="description">Final selection string</dd>
+<dt>specsize</dt>
+<dd class="description">Size of string buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Matching attribute or NULL</p>
+<h3 class="function"><a name="cupsLutDelete">cupsLutDelete</a></h3>
+<p class="description">Free the memory used by a lookup table.</p>
+<p class="code">
+void cupsLutDelete (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_lut_t">cups_lut_t</a> *lut<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>lut</dt>
+<dd class="description">Lookup table to free</dd>
+</dl>
+<h3 class="function"><a name="cupsLutLoad">cupsLutLoad</a></h3>
+<p class="description">Load a LUT from a PPD file.</p>
+<p class="code">
+<a href="#cups_lut_t">cups_lut_t</a> *cupsLutLoad (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_file_t *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *colormodel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resolution,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *ink<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>colormodel</dt>
+<dd class="description">Color model</dd>
+<dt>media</dt>
+<dd class="description">Media type</dd>
+<dt>resolution</dt>
+<dd class="description">Resolution</dd>
+<dt>ink</dt>
+<dd class="description">Ink name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New lookup table</p>
+<h3 class="function"><a name="cupsLutNew">cupsLutNew</a></h3>
+<p class="description">Make a lookup table from a list of pixel values.</p>
+<p class="code">
+<a href="#cups_lut_t">cups_lut_t</a> *cupsLutNew (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const float *values<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>num_values</dt>
+<dd class="description">Number of values</dd>
+<dt>values</dt>
+<dd class="description">Lookup table values</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New lookup table</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Returns a pointer to the lookup table on success, NULL on failure.</p>
+<h3 class="function"><a name="cupsPackHorizontal">cupsPackHorizontal</a></h3>
+<p class="description">Pack pixels horizontally...</p>
+<p class="code">
+void cupsPackHorizontal (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *ipixels,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *obytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char clearto,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const int step<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipixels</dt>
+<dd class="description">Input pixels</dd>
+<dt>obytes</dt>
+<dd class="description">Output bytes</dd>
+<dt>width</dt>
+<dd class="description">Number of pixels</dd>
+<dt>clearto</dt>
+<dd class="description">Initial value of bytes</dd>
+<dt>step</dt>
+<dd class="description">Step value between pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsPackHorizontal2">cupsPackHorizontal2</a></h3>
+<p class="description">Pack 2-bit pixels horizontally...</p>
+<p class="code">
+void cupsPackHorizontal2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *ipixels,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *obytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const int step<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipixels</dt>
+<dd class="description">Input pixels</dd>
+<dt>obytes</dt>
+<dd class="description">Output bytes</dd>
+<dt>width</dt>
+<dd class="description">Number of pixels</dd>
+<dt>step</dt>
+<dd class="description">Stepping value</dd>
+</dl>
+<h3 class="function"><a name="cupsPackHorizontalBit">cupsPackHorizontalBit</a></h3>
+<p class="description">Pack pixels horizontally by bit...</p>
+<p class="code">
+void cupsPackHorizontalBit (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *ipixels,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *obytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char clearto,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char bit<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipixels</dt>
+<dd class="description">Input pixels</dd>
+<dt>obytes</dt>
+<dd class="description">Output bytes</dd>
+<dt>width</dt>
+<dd class="description">Number of pixels</dd>
+<dt>clearto</dt>
+<dd class="description">Initial value of bytes</dd>
+<dt>bit</dt>
+<dd class="description">Bit to check</dd>
+</dl>
+<h3 class="function"><a name="cupsPackVertical">cupsPackVertical</a></h3>
+<p class="description">Pack pixels vertically...</p>
+<p class="code">
+void cupsPackVertical (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *ipixels,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *obytes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char bit,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const int step<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ipixels</dt>
+<dd class="description">Input pixels</dd>
+<dt>obytes</dt>
+<dd class="description">Output bytes</dd>
+<dt>width</dt>
+<dd class="description">Number of input pixels</dd>
+<dt>bit</dt>
+<dd class="description">Output bit</dd>
+<dt>step</dt>
+<dd class="description">Number of bytes between columns</dd>
+</dl>
+<h3 class="function"><a name="cupsRGBDelete">cupsRGBDelete</a></h3>
+<p class="description">Delete a color separation.</p>
+<p class="code">
+void cupsRGBDelete (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_rgb_t">cups_rgb_t</a> *rgbptr<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>rgbptr</dt>
+<dd class="description">Color separation</dd>
+</dl>
+<h3 class="function"><a name="cupsRGBDoGray">cupsRGBDoGray</a></h3>
+<p class="description">Do a grayscale separation...</p>
+<p class="code">
+void cupsRGBDoGray (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_rgb_t">cups_rgb_t</a> *rgbptr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>rgbptr</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input grayscale pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsRGBDoRGB">cupsRGBDoRGB</a></h3>
+<p class="description">Do a RGB separation...</p>
+<p class="code">
+void cupsRGBDoRGB (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_rgb_t">cups_rgb_t</a> *rgbptr,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const unsigned char *input,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *output,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_pixels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>rgbptr</dt>
+<dd class="description">Color separation</dd>
+<dt>input</dt>
+<dd class="description">Input RGB pixels</dd>
+<dt>output</dt>
+<dd class="description">Output Device-N pixels</dd>
+<dt>num_pixels</dt>
+<dd class="description">Number of pixels</dd>
+</dl>
+<h3 class="function"><a name="cupsRGBLoad">cupsRGBLoad</a></h3>
+<p class="description">Load a RGB color profile from a PPD file.</p>
+<p class="code">
+<a href="#cups_rgb_t">cups_rgb_t</a> *cupsRGBLoad (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_file_t *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *colormodel,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *media,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resolution<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>colormodel</dt>
+<dd class="description">Color model</dd>
+<dt>media</dt>
+<dd class="description">Media type</dd>
+<dt>resolution</dt>
+<dd class="description">Resolution</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New color profile</p>
+<h3 class="function"><a name="cupsRGBNew">cupsRGBNew</a></h3>
+<p class="description">Create a new RGB color separation.</p>
+<p class="code">
+<a href="#cups_rgb_t">cups_rgb_t</a> *cupsRGBNew (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_samples,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sample_t">cups_sample_t</a> *samples,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cube_size,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_channels<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>num_samples</dt>
+<dd class="description">Number of samples</dd>
+<dt>samples</dt>
+<dd class="description">Samples</dd>
+<dt>cube_size</dt>
+<dd class="description">Size of LUT cube</dd>
+<dt>num_channels</dt>
+<dd class="description">Number of color components</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New color separation or NULL</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="cups_cmyk_t">cups_cmyk_t</a></h3>
+<p class="description">Simple CMYK lookup table</p>
+<p class="code">
+typedef struct <a href="#cups_cmyk_s">cups_cmyk_s</a> cups_cmyk_t;
+</p>
+<h3 class="typedef"><a name="cups_dither_t">cups_dither_t</a></h3>
+<p class="description">Dithering State</p>
+<p class="code">
+typedef struct <a href="#cups_dither_s">cups_dither_s</a> cups_dither_t;
+</p>
+<h3 class="typedef"><a name="cups_lut_t">cups_lut_t</a></h3>
+<p class="description">Lookup Table for Dithering</p>
+<p class="code">
+typedef struct <a href="#cups_lut_s">cups_lut_s</a> cups_lut_t;
+</p>
+<h3 class="typedef"><a name="cups_rgb_t">cups_rgb_t</a></h3>
+<p class="description">Color separation lookup table</p>
+<p class="code">
+typedef struct <a href="#cups_rgb_s">cups_rgb_s</a> cups_rgb_t;
+</p>
+<h3 class="typedef"><a name="cups_sample_t">cups_sample_t</a></h3>
+<p class="description">Color sample point</p>
+<p class="code">
+typedef struct <a href="#cups_sample_s">cups_sample_s</a> cups_sample_t;
+</p>
+<h2 class="title"><a name="STRUCTURES">Structures</a></h2>
+<h3 class="struct"><a name="cups_cmyk_s">cups_cmyk_s</a></h3>
+<p class="description">Simple CMYK lookup table</p>
+<p class="code">struct cups_cmyk_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char black_lut[256];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short *channels[CUPS_MAX_CHAN];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char color_lut[256];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int ink_limit;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_channels;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>black_lut[256] </dt>
+<dd class="description">Black generation LUT</dd>
+<dt>channels[CUPS_MAX_CHAN] </dt>
+<dd class="description">Lookup tables</dd>
+<dt>color_lut[256] </dt>
+<dd class="description">Color removal LUT</dd>
+<dt>ink_limit </dt>
+<dd class="description">Ink limit</dd>
+<dt>num_channels </dt>
+<dd class="description">Number of components</dd>
+</dl>
+<h3 class="struct"><a name="cups_dither_s">cups_dither_s</a></h3>
+<p class="description">Dithering State</p>
+<p class="code">struct cups_dither_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int errors[96];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int row;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int width;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>errors[96] </dt>
+<dd class="description">Error values</dd>
+<dt>row </dt>
+<dd class="description">Current row</dd>
+<dt>width </dt>
+<dd class="description">Width of buffer</dd>
+</dl>
+<h3 class="struct"><a name="cups_lut_s">cups_lut_s</a></h3>
+<p class="description">Lookup Table for Dithering</p>
+<p class="code">struct cups_lut_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int error;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short intensity;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;short pixel;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>error </dt>
+<dd class="description">Error from desired value</dd>
+<dt>intensity </dt>
+<dd class="description">Adjusted intensity</dd>
+<dt>pixel </dt>
+<dd class="description">Output pixel value</dd>
+</dl>
+<h3 class="struct"><a name="cups_rgb_s">cups_rgb_s</a></h3>
+<p class="description">Color separation lookup table</p>
+<p class="code">struct cups_rgb_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char black[CUPS_MAX_RGB];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cache_init;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char ****colors;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cube_index[256];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cube_mult[256];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int cube_size;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_channels;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char white[CUPS_MAX_RGB];<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>black[CUPS_MAX_RGB] </dt>
+<dd class="description">Cached black (sRGB = 0,0,0)</dd>
+<dt>cache_init </dt>
+<dd class="description">Are cached values initialized?</dd>
+<dt>colors </dt>
+<dd class="description">4-D array of sample values</dd>
+<dt>cube_index[256] </dt>
+<dd class="description">Index into cube for a given sRGB value</dd>
+<dt>cube_mult[256] </dt>
+<dd class="description">Multiplier value for a given sRGB value</dd>
+<dt>cube_size </dt>
+<dd class="description">Size of color cube (2-N) on a side</dd>
+<dt>num_channels </dt>
+<dd class="description">Number of colors per sample</dd>
+<dt>white[CUPS_MAX_RGB] </dt>
+<dd class="description">Cached white (sRGB = 255,255,255)</dd>
+</dl>
+<h3 class="struct"><a name="cups_sample_s">cups_sample_s</a></h3>
+<p class="description">Color sample point</p>
+<p class="code">struct cups_sample_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char colors[CUPS_MAX_RGB];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char rgb[3];<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>colors[CUPS_MAX_RGB] </dt>
+<dd class="description">Color values</dd>
+<dt>rgb[3] </dt>
+<dd class="description">sRGB values</dd>
+</dl>
+<h2 class="title"><a name="VARIABLES">Variables</a></h2>
+<h3 class="variable"><a name="cups_scmy_lut[256]">cups_scmy_lut[256]</a></h3>
+<p class="description">sRGB gamma lookup table (inverted)</p>
+<p class="code">extern const unsigned char cups_scmy_lut[256];</p>
+<h3 class="variable"><a name="cups_srgb_lut[256]">cups_srgb_lut[256]</a></h3>
+<p class="description">sRGB gamma lookup table</p>
+<p class="code">extern const unsigned char cups_srgb_lut[256];</p>
+</div>
+</body>
+</html>

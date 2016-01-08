@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsctl(8)</title>
+</head>
+<body>
+<h1 class="title">cupsctl(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsctl - configure cupsd.conf options
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cupsctl</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h</b>
+<i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>--</b>[<b>no-</b>]<b>debug-logging</b>
+] [
+<b>--</b>[<b>no-</b>]<b>remote-admin</b>
+] [
+<b>--</b>[<b>no-</b>]<b>remote-any</b>
+] [
+<b>--</b>[<b>no-</b>]<b>share-printers</b>
+] [
+<b>--</b>[<b>no-</b>]<b>user-cancel-any</b>
+] [
+<i>name=value</i>
+]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>cupsctl</b> updates or queries the <i>cupsd.conf</i> file for a server. When
+no changes are requested, the current configuration values are written to the
+standard output in the format "name=value", one per line.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The following options are recognized:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Enables encryption on the connection to the scheduler.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies an alternate username to use when authenticating with the scheduler.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Specifies the server address.
+<dt><b>--fR[fBno-fR]fBdebug-logging</b>
+<dd style="margin-left: 5.0em">Enables (disables) debug logging to the <i>error_log</i> file.
+<dt><b>--fR[fBno-fR]fBremote-admin</b>
+<dd style="margin-left: 5.0em">Enables (disables) remote administration.
+<dt><b>--fR[fBno-fR]fBremote-any</b>
+<dd style="margin-left: 5.0em">Enables (disables) printing from any address, e.g., the Internet.
+<dt><b>--fR[fBno-fR]fBshare-printers</b>
+<dd style="margin-left: 5.0em">Enables (disables) sharing of local printers with other computers.
+<dt><b>--fR[fBno-fR]fBuser-cancel-any</b>
+<dd style="margin-left: 5.0em">Allows (prevents) users to cancel jobs owned by others.
+</dl>
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+Display the current settings:
+<pre class="man">
+
+    cupsctl
+
+</pre>
+Enable debug logging:
+<pre class="man">
+
+    cupsctl --debug-logging
+
+</pre>
+Get the current debug logging state:
+<pre class="man">
+
+    cupsctl | grep '^_debug_logging' | awk -F= '{print $2}'
+
+</pre>
+Disable printer sharing:
+<pre class="man">
+
+    cupsctl --no-share-printers
+</pre>
+<h2 class="title"><a name="KNOWN_ISSUES">Known Issues</a></h2>
+You cannot set the Listen or Port directives using <b>cupsctl</b>.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<br>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

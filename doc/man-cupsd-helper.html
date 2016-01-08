@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cupsd-helper(8)</title>
+</head>
+<body>
+<h1 class="title">cupsd-helper(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cupsd-helper - cupsd helper programs
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cups-deviced</b>
+<i>request-id</i>
+<i>limit</i>
+<i>user-id</i>
+<i>options</i>
+<br>
+<b>cups-driverd</b>
+<b>cat</b>
+<i>ppd-name</i>
+<br>
+<b>cups-driverd</b>
+<b>list</b>
+<i>request_id</i>
+<i>limit</i>
+<i>options</i>
+<br>
+<b>cups-exec</b>
+<i>sandbox-profile</i>
+[
+<i>-g</i>
+<i>group-id</i>
+] [
+<i>-n</i>
+<i>nice-value</i>
+] [
+<i>-u</i>
+<i>user-id</i>
+]
+<i>/path/to/program</i>
+<i>argv0</i>
+<i>...</i>
+<i>argvN</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <b>cupsd-helper</b> programs perform long-running operations on behalf of the scheduler,
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
+The <b>cups-deviced</b> helper program runs each CUPS
+<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7)</a>
+with no arguments in order to discover the available printers.
+<p>The <b>cups-driverd</b> helper program lists all available printer drivers, a subset of "matching" printer drivers, or a copy of a specific driver PPD file.
+<p>The <b>cups-exec</b> helper program runs backends, filters, and other programs. On OS X these programs are run in a secure sandbox.
+<h2 class="title"><a name="FILES">Files</a></h2>
+The <b>cups-driverd</b> program looks for PPD and driver information files in the following directories:
+<pre class="man">
+
+    <i>/Library/Printers</i>
+    <i>/opt/share/ppd</i>
+    <i>/System/Library/Printers</i>
+    <i>/usr/local/share/ppd</i>
+    <i>/usr/share/cups/drv</i>
+    <i>/usr/share/cups/model</i>
+    <i>/usr/share/ppd</i>
+</pre>
+<p>PPD files can be compressed using the
+<b>gzip</b>(1)
+program or placed in compressed
+<b>tar</b>(1)
+archives to further reduce their size.
+<p>Driver information files must conform to the format defined in
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5).</a>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

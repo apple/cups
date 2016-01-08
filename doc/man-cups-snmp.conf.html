@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>snmp.conf(5)</title>
+</head>
+<body>
+<h1 class="title">snmp.conf(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+snmp.conf - snmp configuration file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The
+<b>snmp.conf</b>
+file configures how the standard CUPS network backends (http, https, ipp, ipps, lpd, snmp, and socket) access printer information using SNMPv1 and is normally located in the <i>/etc/cups</i> directory.
+Each line in the file can be a configuration directive, a blank line, or a comment. Comment lines start with the # character.
+<p>The Community and DebugLevel directives are used by all backends. The remainder apply only to the SNMP backend -
+<a href="man-cups-snmp.html?TOPIC=Man+Pages"><b>cups-snmp</b>(8).</a>
+<h2 class="title"><a name="DIRECTIVES">Directives</a></h2>
+The following directives are understood by the CUPS network backends:
+<dl class="man">
+<dt><b>Address @IF(</b><i>name</i><b>)</b>
+<dd style="margin-left: 5.0em"><dt><b>Address @LOCAL</b>
+<dd style="margin-left: 5.0em"><dt><b>Address </b><i>address</i>
+<dd style="margin-left: 5.0em">Sends SNMP broadcast queries (for discovery) to the specified address(es).
+There is no default for the broadcast address.
+<dt><b>Community </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the community name to use.
+Only a single community name may be specified.
+The default community name is "public".
+<dt><b>DebugLevel </b><i>number</i>
+<dd style="margin-left: 5.0em">Specifies the logging level from 0 (none) to 3 (everything).
+Typically only used for debugging (thus the name).
+The default debug level is 0.
+<dt><b>DeviceURI "</b><i>regular expression</i><b>" </b><i>device-uri </i>[... <i>device-uri</i>]
+<dd style="margin-left: 5.0em">Specifies one or more device URIs that should be used for a given make and model string.
+The regular expression is used to match the detected make and model, and the device URI strings must be of the form "scheme://%s[:port]/[path]", where "%s" represents the detected address or hostname.
+There are no default device URI matching rules.
+<dt><b>HostNameLookups on</b>
+<dd style="margin-left: 5.0em"><dt><b>HostNameLookups off</b>
+<dd style="margin-left: 5.0em">Specifies whether the addresses of printers should be converted to hostnames or left as numeric IP addresses.
+The default is "off".
+<dt><b>MaxRunTime </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the maximum number of seconds that the SNMP backend will scan the
+network for printers.
+The default is 120 seconds (2 minutes).
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cups-snmp.html?TOPIC=Man+Pages"><b>cups-snmp</b>(8),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

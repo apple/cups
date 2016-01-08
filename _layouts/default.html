@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CUPS.org</title>
+    <style>
+      body { font-family: sans-serif; margin: 0; }
+      div.header {
+        background: #90f0f0;
+        color: black;
+        font-size: 10px;
+        height: 20px;
+        line-height: 10px;
+        left: 0;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0;
+        padding: 5px;
+        top: 0;
+      }
+      div.header a, div.header a:visited, div.header a:link {
+        color: inherit;
+      }
+      div.body {
+        font-size: 12px;
+        margin-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 20px;
+        padding: 10px;
+      }
+      div.footer {
+        background: #90f0f0;
+        color: black;
+        font-size: 10px;
+        line-height: 10px;
+        margin-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <a href="http://www.cups.org/">CUPS.org</a>
+      <a href="{{site.github.issues_url}}">Bugs</a>
+      <a href="documentation.html">Documentation</a>
+      <a href="{{site.github.releases_url}}">Download</a>
+    </div>
+    <div class="body">
+      {{ content }}
+    </div>
+    <div class="footer">
+      CUPS is Copyright © 2007-2016 Apple Inc. All rights reserved. CUPS, the CUPS logo, and OS X are trademarks of Apple Inc. All other trademarks are the property of their respective owners.
+    </div>
+  </body>
+</html>

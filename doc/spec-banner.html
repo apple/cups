@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS Banner File Format</title>
+	<meta name='keywords' content='job-sheets'>
+	<link rel='stylesheet' type='text/css' href='../cups-printable.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  Banner file format specification for CUPS.
+
+  Copyright 2008-2011 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<H1 CLASS="title">CUPS Banner File Format</H1>
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This specification describes the CUPS banner file format
+(application/vnd.cups-banner) which is used to generate print job cover pages
+and the CUPS test page. The format itself consists of a header followed by
+lines of UTF-8 text containing comments or keywords and values:</p>
+
+<pre class='command'>
+#CUPS-BANNER
+
+# What to show on the cover page
+Show job-id job-name job-originating-user-name time-at-creation
+
+# The header and footer text
+Header Cover Page
+Footer Cover Page
+
+# Arbitrary "notice" text
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+
+# Images to place below the rest
+Image /usr/share/doc/cups/images/cups-icon.png
+Image /usr/share/doc/cups/images/smiley.jpg
+</pre>
+
+
+<h2 class='title'><a name='KEYWORDS'>Standard Keywords</a></h2>
+
+<h3><a name='Footer'>Footer</a></h3>
+
+<p class='summary'>
+Footer text for footer
+</p>
+
+<p>The <code>Footer</code> key defines the text that is centered at the bottom
+of the page. Only one <code>Footer</code> key can be specified.</p>
+
+
+<h3><a name='Header'>Header</a></h3>
+
+<p class='summary'>
+Header text for Header
+</p>
+
+<p>The <code>Header</code> key defines the text that is centered at the top
+of the page. Only one <code>Header</code> key can be specified.</p>
+
+
+<h3><a name='Image'>Image</a></h3>
+
+<p class='summary'>
+Image /path/to/image/filename<br>
+Image relative/path/in/DocumentRoot/filename
+</p>
+
+<p>The <code>Image</code> key defines images that are centered above the footer
+text. Multiple images are centered as a group from left to right. Images are
+scaled as needed to fit on the page with a nominal size of 1"/25cm.</p>
+
+
+<h3><a name='Notice'>Notice</a></h3>
+
+<p class='summary'>
+Notice Text to display below the job information.<br>
+Notice More text to display below the job information.
+</p>
+
+<p>The <code>Notice</code> key defines lines of text that are centered below
+the job information.</p>
+
+
+<h3><a name='Show'>Show</a></h3>
+
+<p class='summary'>
+Show <em>value value ... value</em>
+</p>
+
+<p>The <code>Show</code> key lists the job information that is shown. The
+following values are supported:</p>
+
+<ul>
+
+	<li><code>imageable-area</code>: The imageable area of the current
+	page size</li>
+
+	<li><code>job-billing</code>: Billing information for the job</li>
+
+	<li><code>job-id</code>: The job ID</li>
+
+	<li><code>job-name</code>: The title of the job</li>
+
+	<li><code>job-originating-host-name</code>: The computer that printed
+	the job</li>
+
+	<li><code>job-originating-user-name</code>: The user that printed the
+	job</li>
+
+	<li><code>job-uuid</code>: The job UUID</li>
+
+	<li><code>options</code>: The options that were provided with the
+	job</li>
+
+	<li><code>paper-name</code>: The name of the paper size used</li>
+
+	<li><code>paper-size</code>: The dimensions of the paper size used.</li>
+
+	<li><code>printer-driver-name</code>: The printer driver used</li>
+
+	<li><code>printer-driver-version</code>: The driver version</li>
+
+	<li><code>printer-info</code>: The printer description</li>
+
+	<li><code>printer-location</code>: The location of the printer</li>
+
+	<li><code>printer-make-and-model</code>: The make and model strings
+	reported by the printer driver</li>
+
+	<li><code>printer-name</code>: The printer used</li>
+
+	<li><code>time-at-creation</code>: When the job was submitted</li>
+
+	<li><code>time-at-processing</code>: The current date and time</li>
+
+</ul>
+
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpinfo(8)</title>
+</head>
+<body>
+<h1 class="title">lpinfo(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lpinfo - show available devices or drivers
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lpinfo</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-l</b>
+] [
+<b>--device-id</b>
+<i>device-id-string</i>
+] [
+<b>--exclude-schemes</b>
+<i>scheme-list</i>
+] [
+<b>--include-schemes</b>
+<i>scheme-list</i>
+] [
+<b>--language</b>
+<i>locale</i>
+] [
+<b>--make-and-model</b>
+<i>name</i>
+] [
+<b>--product</b>
+<i>name</i>
+]
+<b>-m</b>
+<br>
+<b>lpinfo</b>
+[
+<b>-E</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+] [
+<b>-l</b>
+] [
+<b>--exclude-schemes</b>
+<i>scheme-list</i>
+] [
+<b>--include-schemes</b>
+<i>scheme-list</i>
+] [
+<b>--timeout</b>
+<i>seconds</i>
+]
+<b>-v</b>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>lpinfo</b> lists the available devices or drivers known to the CUPS server.
+The first form (<i>-m</i>) lists the available drivers, while the second form (<i>-v</i>) lists the available devices.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>lpinfo</b> accepts the following options:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Sets the username to use when connecting to the server.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Selects an alternate server.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em">Shows a "long" listing of devices or drivers.
+<dt><b>--device-id </b><i>device-id-string</i>
+<dd style="margin-left: 5.0em">Specifies the IEEE-1284 device ID to match when listing drivers with the <i>-m</i> option.
+<dt><b>--exclude-schemes </b><i>scheme-list</i>
+<dd style="margin-left: 5.0em">Specifies a comma-delimited list of device or PPD schemes that should be excluded from the results.
+Static PPD files use the "file" scheme.
+<dt><b>--include-schemes </b><i>scheme-list</i>
+<dd style="margin-left: 5.0em">Specifies a comma-delimited list of device or PPD schemes that should be included in the results.
+Static PPD files use the "file" scheme.
+<dt><b>--language </b><i>locale</i>
+<dd style="margin-left: 5.0em">Specifies the language to match when listing drivers with the <i>-m</i> option.
+<dt><b>--make-and-model </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the make and model to match when listing drivers with the <i>-m</i> option.
+<dt><b>--product </b><i>name</i>
+<dd style="margin-left: 5.0em">Specifies the product to match when listing drivers with the <i>-m</i> option.
+<dt><b>--timeout </b><i>seconds</i>
+<dd style="margin-left: 5.0em">Specifies the timeout when listing devices with the <i>-v</i> option.
+</dl>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+The <i>lpinfo</i> command is unique to CUPS.
+<h2 class="title"><a name="EXAMPLES">Examples</a></h2>
+List all devices:
+<pre class="man">
+
+    lpinfo -v
+
+</pre>
+List all drivers:
+<pre class="man">
+
+    lpinfo -m
+
+</pre>
+List drivers matching "HP LaserJet":
+<pre class="man">
+
+    lpinfo --make-and-model "HP LaserJet" -m
+</pre>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-lpadmin.html?TOPIC=Man+Pages"><b>lpadmin</b>(8),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

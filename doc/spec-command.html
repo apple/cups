@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS Command File Format</title>
+	<meta name='keywords' content='Programming, CUPS Command File Format'>
+	<link rel='stylesheet' type='text/css' href='../cups-printable.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS command file format specification for CUPS.
+
+  Copyright 2007-2011 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<H1 CLASS="title">CUPS Command File Format</H1>
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This specification describes the CUPS command file format
+(application/vnd.cups-command) which is used to send printer
+maintenance commands to a printer in a device-independent way.
+The current specification supports basic maintenance functions
+such as head cleaning and self-test pages and query functions
+such as auto-configure, report supply levels, and report status.</p>
+
+<p>Printer drivers advertise support for the CUPS command file
+format by providing a filter for the
+<var>application/vnd.cups-command</var> file type. Applications
+can determine if a printer supports printing of CUPS command
+files by checking the <code>printer-type</code> attribute for the
+<code>CUPS_PRINTER_COMMANDS</code> capability bit.</p>
+
+<p>In addition, the PPD file for a printer can contain a
+<code>cupsCommands</code> keyword that provides a list of supported
+commands separated by spaces, for example:</p>
+
+<pre class='command'>
+*cupsCommand: "AutoConfigure Clean PrintSelfTestPage ReportLevels ReportStatus"
+</pre>
+
+<p>If no <code>cupsCommands</code> keyword is provided, the command filter
+must support <a href='#AutoConfigure'><code>AutoConfigure</code></a>,
+<a href='#Clean'><code>Clean</code></a>,
+<a href='#PrintSelfTestPage'><code>PrintSelfTestPage</code></a>,
+and <a href='#ReportLevels'><code>ReportLevels</code></a>. The scheduler also
+provides the <code>printer-commands</code> attribute containing the list of
+supported commands.</p>
+
+
+<h2 class='title'><a name='SYNTAX'>File Syntax</a></h2>
+
+<p>CUPS command files are ASCII text files.  The first line of a
+CUPS command file MUST contain:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+</pre>
+
+<p>After that, each line is either a command or a comment.
+Comments begin with the # character, e.g.:</p>
+
+<pre class='command'>
+# This is a comment
+</pre>
+
+<p>Commands are any sequence of letters, numbers, and punctuation characters
+optionally followed by parameters separated by whitespace, e.g.:</p>
+
+<pre class='command'>
+Clean all
+PrintSelfTestPage
+</pre>
+
+<p>Command names are case-insensitive, so "PRINTSELFTESTPAGE",
+"printselftestpage", and "PrintSelfTestPage" are equivalent. Vendor-specific
+commands should use a domain name prefix, e.g.:</p>
+
+<pre class='command'>
+com.vendor.foo
+com.vendor.bar param param2 ... paramN
+</pre>
+
+
+<h2 class='title'><a name='COMMANDS'>Standard Commands</a></h2>
+
+<p>The following are the standard commands supported by the format. The only
+required command is
+<a href='#PrintSelfTestPage'><code>PrintSelfTestPage</code></a>.</p>
+
+
+<h3><a name='AutoConfigure'>AutoConfigure</a></h3>
+
+<p class='summary'>AutoConfigure</p>
+
+<p>The <code>AutoConfigure</code> command updates the printer's PPD file
+and driver state information to reflect the current configuration of the
+printer. There are no arguments for this command.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+AutoConfigure
+</pre>
+
+
+<h3><a name='Clean'>Clean</a></h3>
+
+<p class='summary'>Clean <i>colorname</i></p>
+
+<p>The <code>Clean</code> command performs a standard print head cleaning. The
+"colorname" parameter specifies which color or head to clean. If a printer does
+not support cleaning of individual colors or cartridges, then all colors are
+cleaned. Command filters MUST support the "all" colorname. Other standard color
+names include "black", "color", "photo", "cyan", "magenta", "yellow",
+"light-cyan", "light-magenta", "light-black", "light-gray", and "dark-gray".</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+Clean all
+</pre>
+
+
+<h3><a name='PrintAlignmentPage'>PrintAlignmentPage</a></h3>
+
+<p class='summary'>PrintAlignmentPage pass</p>
+
+<p>The <code>PrintAlignmentPage</code> command prints a head alignment page on
+the printer. The "pass" parameter provides a pass number from 1 to N. The number
+of passes is device-dependent.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+PrintAlignmentPage 1
+</pre>
+
+
+<h3><a name='PrintSelfTestPage'>PrintSelfTestPage</a></h3>
+
+<p class='summary'>PrintSelfTestPage</p>
+
+<p>The <code>PrintSelfTestPage</code> command prints a self-test page on the
+printer. Typically this page shows whether all jets on a print head are
+functioning and that the print feed mechanisms are working properly.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+PrintSelfTestPage
+</pre>
+
+
+<h3><a name='ReportLevels'>ReportLevels</a></h3>
+
+<p class='summary'>ReportLevels</p>
+
+<p>The <code>ReportLevels</code> command queries the supply levels on a printer
+and reports "marker-colors", "marker-levels", "marker-names", and
+"marker-types" attributes using "ATTR:" messages sent to the scheduler. This
+command should also report the current printer status using "STATE:" messages
+like the <a href='#ReportStatus'><code>ReportStatus</code></a> command.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+ReportLevels
+</pre>
+
+
+<h3><a name='ReportStatus'>ReportStatus</a></h3>
+
+<p class='summary'>ReportStatus</p>
+
+<p>The <code>ReportStatus</code> command queries the printer for its current
+status and reports it using "STATE:" messages sent to the scheduler.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+ReportLevels
+</pre>
+
+
+<h3><a name='SetAlignment'>SetAlignment</a></h3>
+
+<p class='summary'>SetAlignment pass value ... valueN</p>
+
+<p>The <code>SetAlignment</code> command sets print head alignment values. The
+"pass" parameter is a number from 1 to N. All parameters are
+device-dependent.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+SetAlignment 1 14
+</pre>
+
+
+</body>
+</html>

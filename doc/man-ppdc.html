@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>ppdc(1)</title>
+</head>
+<body>
+<h1 class="title">ppdc(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+ppdc - cups ppd compiler (deprecated)
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>ppdc</b>
+[
+<b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+] [
+<b>-I</b>
+<i>include-directory</i>
+] [
+<b>-c</b>
+<i>message-catalog</i>
+] [
+<b>-d</b>
+<i>output-directory</i>
+] [
+<b>-l</b>
+<i>language(s)</i>
+] [
+<b>-m</b>
+] [
+<b>-t</b>
+] [
+<b>-v</b>
+] [
+<b>-z</b>
+] [
+<b>--cr</b>
+] [
+<b>--crlf</b>
+] [
+<b>--lf</b>
+]
+<i>source-file</i>
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>ppdc</b> compiles PPDC source files into one or more PPD files.
+<b>This program is deprecated and will be removed in a future release of CUPS.</b>
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<b>ppdc</b> supports the following options:
+<dl class="man">
+<dt><b>-D </b><i>name</i>[<b>=</b><i>value</i>]
+<dd style="margin-left: 5.0em">Sets the named variable for use in the source file.
+It is equivalent to using the <i>#define</i> directive in the source file.
+<dt><b>-I </b><i>include-directory</i>
+<dd style="margin-left: 5.0em">Specifies an alternate include directory.
+Multiple <i>-I</i> options can be supplied to add additional directories.
+<dt><b>-c </b><i>message-catalog</i>
+<dd style="margin-left: 5.0em">Specifies a single message catalog file in GNU gettext (filename.po) or Apple strings (filename.strings) format to be used for localization.
+<dt><b>-d </b><i>output-directory</i>
+<dd style="margin-left: 5.0em">Specifies the output directory for PPD files.
+The default output directory is "ppd".
+<dt><b>-l </b><i>language(s)</i>
+<dd style="margin-left: 5.0em">Specifies one or more languages to use when localizing the PPD file(s).
+The default language is "en" (English).
+Separate multiple languages with commas, for example "de_DE,en_UK,es_ES,es_MX,es_US,fr_CA,fr_FR,it_IT" will create PPD files with German, UK English, Spanish (Spain, Mexico, and US), French (France and Canada), and Italian languages in each file.
+<dt><b>-m</b>
+<dd style="margin-left: 5.0em">Specifies that the output filename should be based on the ModelName value instead of FileName or PCFilenName.
+<dt><b>-t</b>
+<dd style="margin-left: 5.0em">Specifies that PPD files should be tested instead of generated.
+<dt><b>-v</b>
+<dd style="margin-left: 5.0em">Specifies verbose output, basically a running status of which files are being loaded or written.
+<b>-z</b>
+Generates compressed PPD files (filename.ppd.gz).
+The default is to generate uncompressed PPD files.
+<dt><b>--cr</b>
+<dd style="margin-left: 5.0em"><dt><b>--crlf</b>
+<dd style="margin-left: 5.0em"><dt><b>--lf</b>
+<dd style="margin-left: 5.0em">Specifies the line ending to use - carriage return, carriage return and line feed, or line feed alone.
+The default is to use the line feed character alone.
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-ppdhtml.html?TOPIC=Man+Pages"><b>ppdhtml</b>(1),</a>
+<a href="man-ppdi.html?TOPIC=Man+Pages"><b>ppdi</b>(1),</a>
+<a href="man-ppdmerge.html?TOPIC=Man+Pages"><b>ppdmerge</b>(1),</a>
+<a href="man-ppdpo.html?TOPIC=Man+Pages"><b>ppdpo</b>(1),</a>
+<a href="man-ppdcfile.html?TOPIC=Man+Pages"><b>ppdcfile</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

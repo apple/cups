@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>Generating PostScript for CUPS</title>
+	<meta name='keywords' content='Programming, PostScript, Document Structuring Conventions'>
+	<link rel='stylesheet' type='text/css' href='../cups-printable.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS PostScript file specification for CUPS.
+
+  Copyright 2007-2012 by Apple Inc.
+  Copyright 2006 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<H1 CLASS="title">Generating PostScript for CUPS</H1>
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This document describes how to generate PostScript output for
+CUPS and is largely based on the <a
+href="http://partners.adobe.com/public/developer/en/ps/5001.DSC_Spec.pdf">
+Adobe TechNote #5001: PostScript Language Document Structuring
+Conventions Specification Version 3.0</a>. While CUPS can
+generally print any PostScript file, following the rules in the
+Adobe TechNote and this document will ensure that your PostScript
+output will work reliably.</p>
+
+<blockquote><b>Note:</b> While PostScript is currently the
+de-facto standard print job file format/language for UNIX-based
+applications, it is slowly being phased out in favor of Adobe's
+Portable Document Format ("PDF") which offers many advantages
+over PostScript. OS X uses PDF as the primary print job file
+format and Linux is making the transition. Both PostScript and
+PDF are complex formats, and we highly recommend using high-level
+toolkits whenever possible to create your print jobs.</blockquote>
+
+<h3>Anatomy of a PostScript File</h3>
+
+<p>PostScript files are ASCII text files starting with a header
+line (<tt>%!PS-Adobe-3.0</tt>) followed by a combination of
+comment lines starting with the percent sign (<tt>%</tt>) and
+PostScript code lines. The lines themselves should not exceed 255
+characters to conform to the DSC. The following short PostScript
+file produces a box with a smiley face in it:</p>
+
+<pre class="command">
+%!PS-Adobe-3.0
+%%BoundingBox: 36 36 576 756
+%%Pages: 1
+%%LanguageLevel: 2
+%%EndComments
+%%BeginSetup
+% this is where fonts would be embedded
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+% this is where page-specific features would be specified
+%%EndPageSetup
+% Draw a black box around the page
+0 setgray
+1 setlinewidth
+36 36 540 720 rectstroke
+
+% Draw a two inch blue circle in the middle of the page
+0 0 1 setrgbcolor
+306 396 144 0 360 arc closepath fill
+
+% Draw two half inch yellow circles for eyes
+1 1 0 setrgbcolor
+252 432 36 0 360 arc closepath fill
+360 432 36 0 360 arc closepath fill
+
+% Draw the smile
+1 setlinecap
+18 setlinewidth
+306 396 99 200 340 arc stroke
+
+% Print it!
+showpage
+%%EOF
+</pre>
+
+<div class="figure"><table summary="Sample PostScript File Output">
+<caption>Figure 1: <a name="FIGURE_1">Sample PostScript File Output</a></caption>
+<tr><td align="center"><img src="../images/smiley.jpg"
+width="445" height="570" alt="Sample PostScript File Output"></td></tr>
+</table></div>
+
+
+<h2><a name='OPTIONS'>Embedding Printer Options</a></h2>
+
+<p>There are two main strategies for embedding printer options in PostScript
+files. The first is to list CUPS options using the <code>%cupsJobTicket</code>
+comment:</p>
+
+<pre>
+%!PS-Adobe-3.0
+%cupsJobTicket: media=A4 sides=two-sided-long-edge
+%cupsJobTicket: PrinterOption=foo PrinterOption2=bar
+...
+%%EndComments
+</pre>
+
+<p>CUPS options apply to the entire job. To apply options to individual pages,
+use the <code>%%IncludeFeature</code> comment instead:</p>
+
+<pre>
+%%Page: label 123
+%%BeginPageSetup
+%%IncludeFeature: *PageSize A4
+%%IncludeFeature: *PrinterOption Foo
+%%IncludeFeature: *PrinterOption2 Bar
+%%EndPageSetup
+...
+</pre>
+
+
+<h2><a name='FONTS'>Embedding Fonts and Text</a></h2>
+
+<p>Always embed the fonts used by your print job, and for best performance
+embed the fonts and character encodings in the setup section of the PostScript
+file. Type 1 and Type 3 fonts are supported by all PostScript printers, while
+Type 42 (TrueType) and CID fonts are supported by most level 2 and all level 3
+PostScript printers. Binary font files should always be converted to the
+corresponding ASCII (hex) encoding to avoid problems when printing over
+interfaces that do not support binary PostScript.</p>
+
+
+<h2><a name='IMAGES'>Embedding Images</a></h2>
+
+<p>The <code>image</code> operator should be used to embed images in PostScript
+files. Always use ASCII hex or Base-85 encoding for the image data to avoid
+problems when printing over interfaces that do not support binary PostScript.
+In most cases, the Base-85 encoding and compression filters can be used to
+embed images with very little, if any, increase in data size.</p>
+
+</body>
+</html>

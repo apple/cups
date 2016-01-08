@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>lpstat(1)</title>
+</head>
+<body>
+<h1 class="title">lpstat(1)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+lpstat - print cups status information
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>lpstat</b>
+[
+<b>-E</b>
+] [
+<b>-H</b>
+] [
+<b>-U</b>
+<i>username</i>
+] [
+<b>-h </b><i>hostname</i>[<b>:</b><i>port</i>]
+] [
+<b>-l</b>
+] [
+<b>-W</b>
+<i>which-jobs</i>
+] [
+<b>-a</b>
+[
+<i>destination(s)</i>
+] ] [
+<b>-c</b>
+[
+<i>class(es)</i>
+] ] [
+<b>-d</b>
+] [
+<b>-o</b>
+[
+<i>destination(s)</i>
+] ] [
+<b>-p</b>
+[
+<i>printer(s)</i>
+] ] [
+<b>-r</b>
+] [
+<b>-R</b>
+] [
+<b>-s</b>
+] [
+<b>-t</b>
+] [
+<b>-u</b>
+[
+<i>user(s)</i>
+] ] [
+<b>-v</b>
+[
+<i>printer(s)</i>
+] ]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>lpstat</b> displays status information about the current classes, jobs, and printers.
+When run with no arguments, <b>lpstat</b> will list active jobs queued by the current user.
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+The <b>lpstat</b> command supports the following options:
+<dl class="man">
+<dt><b>-E</b>
+<dd style="margin-left: 5.0em">Forces encryption when connecting to the server.
+<dt><b>-H</b>
+<dd style="margin-left: 5.0em">Shows the server hostname and port.
+<dt><b>-R</b>
+<dd style="margin-left: 5.0em">Shows the ranking of print jobs.
+<dt><b>-U </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies an alternate username.
+<dt><b>-W </b><i>which-jobs</i>
+<dd style="margin-left: 5.0em">Specifies which jobs to show, "completed" or "not-completed" (the default).
+This option <i>must</i> appear before the <i>-o</i> option and/or any printer names, otherwise the default ("not-completed") value will be used in the request to the scheduler.
+<dt><b>-a </b>[<i>printer(s)</i>]
+<dd style="margin-left: 5.0em">Shows the accepting state of printer queues.
+If no printers are specified then all printers are listed.
+<dt><b>-c </b>[<i>class(es)</i>]
+<dd style="margin-left: 5.0em">Shows the printer classes and the printers that belong to them.
+If no classes are specified then all classes are listed.
+<dt><b>-d</b>
+<dd style="margin-left: 5.0em">Shows the current default destination.
+<dt><b>-h </b><i>server</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Specifies an alternate server.
+<dt><b>-l</b>
+<dd style="margin-left: 5.0em">Shows a long listing of printers, classes, or jobs.
+<dt><b>-o </b>[<i>destination(s)</i>]
+<dd style="margin-left: 5.0em">Shows the jobs queued on the specified destinations.
+If no destinations are specified all jobs are shown.
+<dt><b>-p </b>[<i>printer(s)</i>]
+<dd style="margin-left: 5.0em">Shows the printers and whether they are enabled for printing.
+If no printers are specified then all printers are listed.
+<dt><b>-r</b>
+<dd style="margin-left: 5.0em">Shows whether the CUPS server is running.
+<dt><b>-s</b>
+<dd style="margin-left: 5.0em">Shows a status summary, including the default destination, a list of classes and their member printers, and a list of printers and their associated devices.
+This is equivalent to using the <i>-d</i>, <i>-c</i>, and <i>-v</i> options.
+<dt><b>-t</b>
+<dd style="margin-left: 5.0em">Shows all status information.
+This is equivalent to using the <i>-r</i>, <i>-d</i>, <i>-c</i>, <i>-v</i>, <i>-a</i>, <i>-p</i>, and <i>-o</i> options.
+<dt><b>-u </b>[<i>user(s)</i>]
+<dd style="margin-left: 5.0em">Shows a list of print jobs queued by the specified users.
+If no users are specified, lists the jobs queued by the current user.
+<dt><b>-v </b>[<i>printer(s)</i>]
+<dd style="margin-left: 5.0em">Shows the printers and what device they are attached to.
+If no printers are specified then all printers are listed.
+</dl>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+Unlike the System V printing system, CUPS allows printer names to contain any printable character except SPACE, TAB, "/", and "#".
+Also, printer and class names are <i>not</i> case-sensitive.
+<p>The <i>-h</i>, <i>-E</i>, <i>-U</i>, and <i>-W</i> options are unique to CUPS.
+<p>The Solaris <i>-f</i>, <i>-P</i>, and <i>-S</i> options are silently ignored.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cancel.html?TOPIC=Man+Pages"><b>cancel</b>(1),</a>
+<a href="man-lp.html?TOPIC=Man+Pages"><b>lp</b>(1),</a>
+<a href="man-lpq.html?TOPIC=Man+Pages"><b>lpq</b>(1),</a>
+<a href="man-lpr.html?TOPIC=Man+Pages"><b>lpr</b>(1),</a>
+<a href="man-lprm.html?TOPIC=Man+Pages"><b>lprm</b>(1),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups-files.conf(5)</title>
+</head>
+<body>
+<h1 class="title">cups-files.conf(5)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cups-files.conf - file and directory configuration file for cups
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The <b>cups-files.conf</b> file configures the files and directories used by the CUPS scheduler,
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8).</a>
+It is normally located in the <i>/etc/cups</i> directory.
+<p>Each line in the file can be a configuration directive, a blank line, or a comment.
+Configuration directives typically consist of a name and zero or more values separated by whitespace.
+The configuration directive name and values are case-insensitive.
+Comment lines start with the # character.
+<h3><a name="DIRECTIVES">Directives</a></h3>
+The following directives are understood by
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8):</a>
+<dl class="man">
+<dt><a name="AccessLog"></a><b>AccessLog</b>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog </b><i>filename</i>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog stderr</b>
+<dd style="margin-left: 5.0em"><dt><b>AccessLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the access log filename.
+Specifying a blank filename disables access log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
+The value "syslog" causes log entries to be sent to the system log daemon.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    AccessLog /var/log/cups/%s-access_log
+
+</pre>
+The default is "/var/log/cups/access_log".
+<dt><a name="ConfigFilePerm"></a><b>ConfigFilePerm </b><i>mode</i>
+<dd style="margin-left: 5.0em">Specifies the permissions for all configuration files that the scheduler writes.
+The default is "0644" on OS X and "0640" on all other operating systems.
+</dl>
+<p><b>Note:</b> The permissions for the <i>printers.conf</i> file are currently masked to only allow access from the scheduler user (typically root).
+This is done because printer device URIs sometimes contain sensitive authentication information that should not be generally known on the system.
+There is no way to disable this security feature.
+<dl class="man">
+<dt><a name="DataDir"></a><b>DataDir </b><i>path</i>
+<dd style="margin-left: 5.0em">Specifies the directory where data files can be found.
+The default is usually "/usr/share/cups".
+<dt><a name="DocumentRoot"></a><b>DocumentRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the root directory for the CUPS web interface content.
+The default is usually "/usr/share/doc/cups".
+<dt><a name="ErrorLog"></a><b>ErrorLog</b>
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog </b><i>filename</i>
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog stderr</b>
+<dd style="margin-left: 5.0em"><dt><b>ErrorLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the error log filename.
+Specifying a blank filename disables error log generation.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
+The value "syslog" causes log entries to be sent to the system log daemon.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    ErrorLog /var/log/cups/%s-error_log
+
+</pre>
+The default is "/var/log/cups/error_log".
+<dt><a name="FatalErrors"></a><b>FatalErrors none</b>
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors all </b><i>-kind </i>[ ... <i>-kind </i>]
+<dd style="margin-left: 5.0em"><dt><b>FatalErrors </b><i>kind </i>[ ... <i>kind </i>]
+<dd style="margin-left: 5.0em">Specifies which errors are fatal, causing the scheduler to exit.
+The default is "config".
+The <i>kind</i> strings are:
+<div style="margin-left: 0.0em;">
+<dl class="man">
+<dt><b>none</b>
+<dd style="margin-left: 5.0em">No errors are fatal.
+<dt><b>all</b>
+<dd style="margin-left: 5.0em">All of the errors below are fatal.
+<dt><b>browse</b>
+<dd style="margin-left: 5.0em">Browsing initialization errors are fatal, for example failed connections to the DNS-SD daemon.
+<dt><b>config</b>
+<dd style="margin-left: 5.0em">Configuration file syntax errors are fatal.
+<dt><b>listen</b>
+<dd style="margin-left: 5.0em">Listen or Port errors are fatal, except for IPv6 failures on the loopback or "any" addresses.
+<dt><b>log</b>
+<dd style="margin-left: 5.0em">Log file creation or write errors are fatal.
+<dt><b>permissions</b>
+<dd style="margin-left: 5.0em">Bad startup file permissions are fatal, for example shared TLS certificate and key files with world-read permissions.
+</div>
+<dt><a name="FileDevice"></a><b>FileDevice Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>FileDevice No</b>
+<dd style="margin-left: 5.0em">Specifies whether the file pseudo-device can be used for new printer queues.
+The URI "file:///dev/null" is always allowed.
+<dt><a name="Group"></a><b>Group </b><i>group-name-or-number</i>
+<dd style="margin-left: 5.0em">Specifies the group name or ID that will be used when executing external programs.
+The default group is operating system specific but is usually "lp" or "nobody".
+<dt><a name="LogFilePerm"></a><b>LogFilePerm </b><i>mode</i>
+<dd style="margin-left: 5.0em">Specifies the permissions of all log files that the scheduler writes.
+The default is "0644".
+<dt><a name="PageLog"></a><b>PageLog </b>[ <i>filename</i> ]
+<dd style="margin-left: 5.0em"><dt><b>PageLog stderr</b>
+<dd style="margin-left: 5.0em"><dt><b>PageLog syslog</b>
+<dd style="margin-left: 5.0em">Defines the page log filename.
+The value "stderr" causes log entries to be sent to the standard error file when the scheduler is running in the foreground, or to the system log daemon when run in the background.
+The value "syslog" causes log entries to be sent to the system log daemon.
+Specifying a blank filename disables page log generation.
+The server name may be included in filenames using the string "%s", for example:
+<pre class="man">
+
+    PageLog /var/log/cups/%s-page_log
+
+</pre>
+The default is "/var/log/cups/page_log".
+<dt><a name="RemoteRoot"></a><b>RemoteRoot </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies the username that is associated with unauthenticated accesses by clients claiming to be the root user.
+The default is "remroot".
+<dt><a name="RequestRoot"></a><b>RequestRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory that contains print jobs and other HTTP request data.
+The default is "/var/spool/cups".
+<dt><a name="Sandboxing"></a><b>Sandboxing relaxed</b>
+<dd style="margin-left: 5.0em"><dt><b>Sandboxing strict</b>
+<dd style="margin-left: 5.0em">Specifies the level of security sandboxing that is applied to print filters, backends, and other child processes of the scheduler.
+The default is "strict".
+This directive is currently only used/supported on OS X.
+<dt><a name="ServerBin"></a><b>ServerBin </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory containing the backends, CGI programs, filters, helper programs, notifiers, and port monitors.
+The default is "/usr/lib/cups" or "/usr/libexec/cups" depending on the platform.
+<dt><a name="ServerKeychain"></a><b>ServerKeychain </b><i>path</i>
+<dd style="margin-left: 5.0em">Specifies the location of TLS certificates and private keys.
+The default is "/Library/Keychains/System.keychain" on OS X and "/etc/cups/ssl" on all other operating systems.
+OS X uses its keychain database to store certificates and keys while other platforms use separate files in the specified directory, *.crt for PEM-encoded certificates and *.key for PEM-encoded private keys.
+<dt><a name="ServerRoot"></a><b>ServerRoot </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory containing the server configuration files.
+The default is "/etc/cups".
+<dt><a name="SyncOnClose"></a><b>SyncOnClose Yes</b>
+<dd style="margin-left: 5.0em"><dt><b>SyncOnClose No</b>
+<dd style="margin-left: 5.0em">Specifies whether the scheduler calls
+<b>fsync</b>(2)
+after writing configuration or state files.
+The default is "No".
+<dt><a name="SystemGroup"></a><b>SystemGroup </b><i>group-name </i>[ ... <i>group-name</i> ]
+<dd style="margin-left: 5.0em">Specifies the group(s) to use for <i>@SYSTEM</i> group authentication.
+The default contains "admin", "lpadmin", "root", "sys", and/or "system".
+<dt><a name="TempDir"></a><b>TempDir </b><i>directory</i>
+<dd style="margin-left: 5.0em">Specifies the directory where temporary files are stored.
+The default is "/var/spool/cups/tmp".
+<dt><a name="User"></a><b>User </b><i>username</i>
+<dd style="margin-left: 5.0em">Specifies the user name or ID that is used when running external programs.
+The default is "lp".
+</dl>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
+<a href="man-mime.convs.html?TOPIC=Man+Pages"><b>mime.convs</b>(5),</a>
+<a href="man-mime.types.html?TOPIC=Man+Pages"><b>mime.types</b>(5),</a>
+<a href="man-printers.conf.html?TOPIC=Man+Pages"><b>printers.conf</b>(5),</a>
+<a href="man-subscriptions.conf.html?TOPIC=Man+Pages"><b>subscriptions.conf</b>(5),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

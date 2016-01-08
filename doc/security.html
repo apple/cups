@@ -1,0 +1,123 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Server Security</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">Server Security</H1>
+
+<P>In the default "standalone" configuration, there are few
+potential security risks - the CUPS server does not accept remote
+connections, and only accepts shared printer information from the
+local subnet. When you share printers and/or enable remote
+administration, you expose your system to potential unauthorized
+access. This help page provides an analysis of possible CUPS
+security concerns and describes how to better secure your
+server.</P>
+
+<H2 CLASS="title"><A NAME="AUTHENTICATION">Authentication Issues</A></H2>
+
+<P>When you enable remote administration, the server will use Basic authentication for administration tasks. The current CUPS server supports Basic, Kerberos, and local certificate authentication:</P>
+
+<OL>
+
+	<LI>Basic authentication essentially places the clear
+	text of the username and password on the network.
+
+	<P>Since CUPS uses the system username and password
+	account information, the authentication information could
+	be used to gain access to possibly privileged accounts on
+	the server.</P>
+
+	<P><B>Recommendation:</B> Enable encryption to hide the
+	username and password information - this is the default on
+	MacOS X and systems with GNU TLS or OpenSSL installed.</P></LI>
+
+	<LI>Local certificate authentication passes 128-bit
+	"certificates" that identify an authenticated user.
+	Certificates are created on-the-fly from random data and
+	stored in files under <VAR>/var/run/cups/certs</VAR>.
+	They have restricted read permissions: root +
+	system-group(s) for the root certificate, and lp + lp
+	for CGI certificates.
+
+	<P>Because certificates are only available on the local
+	system, the CUPS server does not accept local
+	authentication unless the client is connected to the
+	loopback interface (127.0.0.1 or ::1) or domain
+	socket.</P>
+
+	<P><B>Recommendation:</B> Ensure that unauthorized users
+	are not added to the system group(s).</P></LI>
+
+</OL>
+
+<H2 CLASS="title"><A NAME="DOS">Denial of Service Attacks</A></H2>
+
+<P>When printer sharing or remote administration is enabled, the
+CUPS server, like all Internet services, is vulnerable to a
+variety of denial of service attacks:</P>
+
+<OL>
+
+	<LI>Establishing multiple connections to the server until
+	the server will accept no more.
+
+	<P>This cannot be protected against by any known
+	software. The <CODE>MaxClientsPerHost</CODE> directive
+	can be used to configure CUPS to limit the number of
+	connections allowed from a single host, however that does
+	not prevent a distributed attack.</P>
+
+	<P><B>Recommendation:</B> Limit access to trusted systems
+	and networks.</P></LI>
+
+	<LI>Repeatedly opening and closing connections to the
+	server as fast as possible.
+
+	<P>There is no easy way of protecting against this in the
+	CUPS software. If the attack is coming from outside the
+	local network, it may be possible to filter such an
+	attack. However, once the connection request has been
+	received by the server it must at least accept the
+	connection to find out who is connecting.</P>
+
+	<P><B>Recommendation:</B> None.</P></LI>
+
+	<LI>Sending partial IPP requests; specifically, sending
+	part of an attribute value and then stopping
+	transmission.
+
+	<P>The current code will wait up to 1 second before
+	timing out the partial value and closing the connection.
+	This will slow the server responses to valid requests and
+	may lead to dropped browsing packets, but will otherwise
+	not affect the operation of the server.</P>
+
+	<P><B>Recommendation:</B> Block IPP packets from foreign
+	or untrusted networks using a router or
+	firewall.</P></LI>
+
+	<LI>Sending large/long print jobs to printers, preventing
+	other users from printing.
+
+	<P>There are limited facilities for protecting against
+	large print jobs (the <CODE>MaxRequestSize</CODE>
+	attribute), however this will not protect printers from
+	malicious users and print files that generate hundreds or
+	thousands of pages.</P>
+
+	<P><B>Recommendation:</B> Restrict printer access to
+	known hosts or networks, and add user-level access
+	controls as needed for expensive printers.</P></LI>
+
+</OL>
+
+<H2 CLASS="title"><A NAME="ENCRYPTION">Encryption Issues</A></H2>
+
+<P>CUPS supports 128-bit TLS encryption of network connections via the GNU TLS library, OS X Security framework, and Windows Schannel APIs. Secure deployment of TLS depends on proper certificate management and software maintenance.</P>
+
+</BODY>
+</HTML>

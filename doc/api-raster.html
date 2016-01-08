@@ -1,0 +1,1428 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- SECTION: Programming -->
+<head>
+	<title>Raster API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
+<style type="text/css"><!--
+BODY {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+KBD {
+  font-family: monaco, courier, monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monaco, courier, monospace;
+}
+
+PRE.command {
+  border: dotted thin #7f7f7f;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+P.compact {
+  margin: 0;
+}
+
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+DL.man DD {
+  margin-left: 5em;
+}
+
+DL.man DT {
+  margin-left: 0;
+}
+
+PRE.man {
+  margin: 0;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10pt;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
+}
+
+P.command {
+  font-family: monaco, courier, monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #eeeeee;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
+A:link, A:visited {
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  text-align: right;
+  vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: black;
+  border: thin solid black;
+  color: white;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H1.title {
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monaco, courier, monospace;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
+}
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}
+--></style>
+</head>
+<body>
+<div class='body'>
+<!--
+  "$Id$"
+
+  Raster API documentation for CUPS.
+
+  Copyright 2008-2010 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>Raster API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/raster.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupsimage</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-cups.html'>CUPS API</a><br>
+	Programming: <a href='api-cups.html'>PPD API</a><br>
+	References: <a href='spec-ppd.html'>CUPS PPD Specification</a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+<li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#TASKS">Functions by Task</a><ul class="subcontents">
+	<li><a href="#OPENCLOSE">Opening and Closing Raster Streams</a></li>
+	<li><a href="#READING">Reading Raster Streams</a></li>
+	<li><a href="#WRITING">Writing Raster Streams</a></li>
+</ul></li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
+	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
+	<li><a href="#cupsRasterOpen" title="Open a raster stream using a file descriptor.">cupsRasterOpen</a></li>
+	<li><a href="#cupsRasterOpenIO" title="Open a raster stream using a callback function.">cupsRasterOpenIO</a></li>
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a
+version 1 page header structure.">cupsRasterReadHeader</a></li>
+	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a
+version 2 page header structure.">cupsRasterReadHeader2</a></li>
+	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page
+header structure.">cupsRasterWriteHeader</a></li>
+	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2
+page header structure.">cupsRasterWriteHeader2</a></li>
+	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
+</ul></li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cups_adv_t" title="AdvanceMedia attribute values">cups_adv_t</a></li>
+	<li><a href="#cups_bool_t" title="Boolean type">cups_bool_t</a></li>
+	<li><a href="#cups_cspace_t" title="cupsColorSpace attribute values">cups_cspace_t</a></li>
+	<li><a href="#cups_cut_t" title="CutMedia attribute values">cups_cut_t</a></li>
+	<li><a href="#cups_edge_t" title="LeadingEdge attribute values">cups_edge_t</a></li>
+	<li><a href="#cups_interpret_cb_t" title="cupsRasterInterpretPPD callback function">cups_interpret_cb_t</a></li>
+	<li><a href="#cups_jog_t" title="Jog attribute values">cups_jog_t</a></li>
+	<li><a href="#cups_mode_t" title="cupsRasterOpen modes">cups_mode_t</a></li>
+	<li><a href="#cups_order_t" title="cupsColorOrder attribute values">cups_order_t</a></li>
+	<li><a href="#cups_orient_t" title="Orientation attribute values">cups_orient_t</a></li>
+	<li><a href="#cups_page_header2_t" title="Version 2 page header ">cups_page_header2_t</a></li>
+	<li><a href="#cups_page_header_t" title="Version 1 page header ">cups_page_header_t</a></li>
+	<li><a href="#cups_raster_iocb_t" title="cupsRasterOpenIO callback function">cups_raster_iocb_t</a></li>
+	<li><a href="#cups_raster_t" title="Raster stream data">cups_raster_t</a></li>
+</ul></li>
+<li><a href="#STRUCTURES">Structures</a><ul class="code">
+	<li><a href="#cups_page_header2_s" title="Version 2 page header ">cups_page_header2_s</a></li>
+	<li><a href="#cups_page_header_s" title="Version 1 page header ">cups_page_header_s</a></li>
+</ul></li>
+<li><a href="#ENUMERATIONS">Constants</a><ul class="code">
+	<li><a href="#cups_adv_e" title="AdvanceMedia attribute values">cups_adv_e</a></li>
+	<li><a href="#cups_bool_e" title="Boolean type">cups_bool_e</a></li>
+	<li><a href="#cups_cspace_e" title="cupsColorSpace attribute values">cups_cspace_e</a></li>
+	<li><a href="#cups_cut_e" title="CutMedia attribute values">cups_cut_e</a></li>
+	<li><a href="#cups_edge_e" title="LeadingEdge attribute values">cups_edge_e</a></li>
+	<li><a href="#cups_jog_e" title="Jog attribute values">cups_jog_e</a></li>
+	<li><a href="#cups_mode_e" title="cupsRasterOpen modes">cups_mode_e</a></li>
+	<li><a href="#cups_order_e" title="cupsColorOrder attribute values">cups_order_e</a></li>
+	<li><a href="#cups_orient_e" title="Orientation attribute values">cups_orient_e</a></li>
+</ul></li>
+</ul>
+<!--
+  "$Id$"
+
+  Raster API introduction for CUPS.
+
+  Copyright 2007-2013 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
+
+<p>The CUPS raster API provides a standard interface for reading and writing
+CUPS raster streams which are used for printing to raster printers. Because the
+raster format is updated from time to time, it is important to use this API to
+avoid incompatibilities with newer versions of CUPS.</p>
+
+<p>Two kinds of CUPS filters use the CUPS raster API - raster image processor
+(RIP) filters such as <code>pstoraster</code> and <code>cgpdftoraster</code>
+(OS X) that produce CUPS raster files and printer driver filters that
+convert CUPS raster files into a format usable by the printer. Printer
+driver filters are by far the most common.</p>
+
+<p>CUPS raster files (<code>application/vnd.cups-raster</code>) consists of
+a stream of raster page descriptions produced by one of the RIP filters such as
+<var>pstoraster</var>, <var>imagetoraster</var>, or
+<var>cgpdftoraster</var>. CUPS raster files are referred to using the
+<a href='#cups_raster_t'><code>cups_raster_t</code></a> type and are
+opened using the <a href='#cupsRasterOpen'><code>cupsRasterOpen</code></a>
+function. For example, to read raster data from the standard input, open
+file descriptor 0:</p>
+
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
+
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+</pre>
+
+<p>Each page of data begins with a page dictionary structure called
+<a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a>. This
+structure contains the colorspace, bits per color, media size, media type,
+hardware resolution, and so forth used for the page.</p>
+
+<blockquote><b>Note:</b>
+
+  <p>Do not confuse the colorspace in the page header with the PPD
+  <tt>ColorModel</tt> keyword. <tt>ColorModel</tt> refers to the general type of
+  color used for a device (Gray, RGB, CMYK, DeviceN) and is often used to
+  select a particular colorspace for the page header along with the associate
+  color profile. The page header colorspace (<tt>cupsColorSpace</tt>) describes
+  both the type and organization of the color data, for example KCMY (black
+  first) instead of CMYK and RGBA (RGB + alpha) instead of RGB.</p>
+
+</blockquote>
+
+<p>You read the page header using the
+<a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a>
+function:</p>
+
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
+
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
+
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+
+  /* read raster data */
+
+  /* finish this page */
+}
+</pre>
+
+<p>After the page dictionary comes the page data which is a full-resolution,
+possibly compressed bitmap representing the page in the printer's output
+colorspace. You read uncompressed raster data using the
+<a href="#cupsRasterReadPixels"><code>cupsRasterReadPixels</code></a>
+function. A <code>for</code> loop is normally used to read the page one line
+at a time:</p>
+
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
+
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
+int page = 0;
+int y;
+char *buffer;
+
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+  page ++;
+  fprintf(stderr, "PAGE: %d %d\n", page, header.NumCopies);
+
+  /* allocate memory for 1 line */
+  buffer = malloc(header.cupsBytesPerLine);
+
+  /* read raster data */
+  for (y = 0; y &lt; header.cupsHeight; y ++)
+  {
+    if (<a href="#cupsRasterReadPixels">cupsRasterReadPixels</a>(ras, buffer, header.cupsBytesPerLine) == 0)
+      break;
+
+    /* write raster data to printer on stdout */
+  }
+
+  /* finish this page */
+}
+</pre>
+
+<p>When you are done reading the raster data, call the
+<a href="#cupsRasterClose"><code>cupsRasterClose</code></a> function to free
+the memory used to read the raster file:</p>
+
+<pre class="example">
+<a href="#cups_raster_t">cups_raster_t</a> *ras;
+
+<a href="#cupsRasterClose">cupsRasterClose</a>(ras);
+</pre>
+
+
+<h2 class='title'><a name="TASKS">Functions by Task</a></h2>
+
+<h3><a name="OPENCLOSE">Opening and Closing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
+	<li><a href="#cupsRasterOpen" title="Open a raster stream.">cupsRasterOpen</a></li>
+
+</ul>
+
+<h3><a name="READING">Reading Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
+	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a version 2 page header structure.">cupsRasterReadHeader2</a></li>
+	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
+
+</ul>
+
+<h3><a name="WRITING">Writing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a> <span class="info">Deprecated in CUPS 1.2/OS X 10.5</span></li>
+	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a></li>
+	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
+
+</ul>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="cupsRasterClose">cupsRasterClose</a></h3>
+<p class="description">Close a raster stream.</p>
+<p class="code">
+void cupsRasterClose (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Stream to close</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The file descriptor associated with the raster stream must be closed
+separately as needed.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
+<p class="description">Interpret PPD commands to create a page header.</p>
+<p class="code">
+int cupsRasterInterpretPPD (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_file_t *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_interpret_cb_t">cups_interpret_cb_t</a> func<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>h</dt>
+<dd class="description">Page header to create</dd>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>num_options</dt>
+<dd class="description">Number of options</dd>
+<dt>options</dt>
+<dd class="description">Options</dd>
+<dt>func</dt>
+<dd class="description">Optional page header callback (<code>NULL</code> for none)</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is used by raster image processing (RIP) filters like
+cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
+It is not used by raster printer driver filters which only read CUPS
+raster data.<br>
+<br>
+
+<code>cupsRasterInterpretPPD</code> does not mark the options in the PPD using
+the &quot;num_options&quot; and &quot;options&quot; arguments.  Instead, mark the options with
+<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling it -
+this allows for per-page options without manipulating the options array.<br>
+<br>
+The &quot;func&quot; argument specifies an optional callback function that is
+called prior to the computation of the final raster data.  The function
+can make changes to the <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a> data as needed to use a
+supported raster format and then returns 0 on success and -1 if the
+requested attributes cannot be supported.<br>
+<br>
+
+<code>cupsRasterInterpretPPD</code> supports a subset of the PostScript language.
+Currently only the <code>[</code>, <code>]</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>{</code>,
+<code>}</code>, <code>cleartomark</code>, <code>copy</code>, <code>dup</code>, <code>index</code>,
+<code>pop</code>, <code>roll</code>, <code>setpagedevice</code>, and <code>stopped</code> operators
+are supported.
+
+</p>
+<h3 class="function"><a name="cupsRasterOpen">cupsRasterOpen</a></h3>
+<p class="description">Open a raster stream using a file descriptor.</p>
+<p class="code">
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>fd</dt>
+<dd class="description">File descriptor</dd>
+<dt>mode</dt>
+<dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESSED</code>,
+or <code>CUPS_RASTER_WRITE_PWG</code></dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New stream</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function associates a raster stream with the given file descriptor.
+For most printer driver filters, &quot;fd&quot; will be 0 (stdin).  For most raster
+image processor (RIP) filters that generate raster data, &quot;fd&quot; will be 1
+(stdout).<br>
+<br>
+When writing raster data, the <code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESS</code>, or <code>CUPS_RASTER_WRITE_PWG</code> mode can
+be used - compressed and PWG output is generally 25-50% smaller but adds a
+100-300% execution time overhead.</p>
+<h3 class="function"><a name="cupsRasterOpenIO">cupsRasterOpenIO</a></h3>
+<p class="description">Open a raster stream using a callback function.</p>
+<p class="code">
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *ctx,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>iocb</dt>
+<dd class="description">Read/write callback</dd>
+<dt>ctx</dt>
+<dd class="description">Context pointer for callback</dd>
+<dt>mode</dt>
+<dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESSED</code>,
+or <code>CUPS_RASTER_WRITE_PWG</code></dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New stream</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function associates a raster stream with the given callback function and
+context pointer.<br>
+<br>
+When writing raster data, the <code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESS</code>, or <code>CUPS_RASTER_WRITE_PWG</code> mode can
+be used - compressed and PWG output is generally 25-50% smaller but adds a
+100-300% execution time overhead.</p>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsRasterReadHeader">cupsRasterReadHeader</a></h3>
+<p class="description">Read a raster page header and store it in a
+version 1 page header structure.</p>
+<p class="code">
+unsigned cupsRasterReadHeader (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>h</dt>
+<dd class="description">Pointer to header data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure/end-of-file</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is deprecated. Use <a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a> instead.<br>
+<br>
+Version 1 page headers were used in CUPS 1.0 and 1.1 and contain a subset
+of the version 2 page header data. This function handles reading version 2
+page headers and copying only the version 1 data into the provided buffer.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterReadHeader2">cupsRasterReadHeader2</a></h3>
+<p class="description">Read a raster page header and store it in a
+version 2 page header structure.</p>
+<p class="code">
+unsigned cupsRasterReadHeader2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>h</dt>
+<dd class="description">Pointer to header data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure/end-of-file</p>
+<h3 class="function"><a name="cupsRasterReadPixels">cupsRasterReadPixels</a></h3>
+<p class="description">Read raster pixels.</p>
+<p class="code">
+unsigned cupsRasterReadPixels (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *p,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned len<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>p</dt>
+<dd class="description">Pointer to pixel buffer</dd>
+<dt>len</dt>
+<dd class="description">Number of bytes to read</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes read</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For best performance, filters should read one or more whole lines.
+The &quot;cupsBytesPerLine&quot; value from the page header can be used to allocate
+the line buffer and as the number of bytes to read.</p>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsRasterWriteHeader">cupsRasterWriteHeader</a></h3>
+<p class="description">Write a raster page header from a version 1 page
+header structure.</p>
+<p class="code">
+unsigned cupsRasterWriteHeader (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header_t">cups_page_header_t</a> *h<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>h</dt>
+<dd class="description">Raster page header</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is deprecated. Use <a href="#cupsRasterWriteHeader2"><code>cupsRasterWriteHeader2</code></a> instead.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cupsRasterWriteHeader2">cupsRasterWriteHeader2</a></h3>
+<p class="description">Write a raster page header from a version 2
+page header structure.</p>
+<p class="code">
+unsigned cupsRasterWriteHeader2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_page_header2_t">cups_page_header2_t</a> *h<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>h</dt>
+<dd class="description">Raster page header</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The page header can be initialized using <a href="#cupsRasterInterpretPPD"><code>cupsRasterInterpretPPD</code></a>.
+
+</p>
+<h3 class="function"><a name="cupsRasterWritePixels">cupsRasterWritePixels</a></h3>
+<p class="description">Write raster pixels.</p>
+<p class="code">
+unsigned cupsRasterWritePixels (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned char *p,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned len<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>r</dt>
+<dd class="description">Raster stream</dd>
+<dt>p</dt>
+<dd class="description">Bytes to write</dd>
+<dt>len</dt>
+<dd class="description">Number of bytes to write</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes written</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For best performance, filters should write one or more whole lines.
+The &quot;cupsBytesPerLine&quot; value from the page header can be used to allocate
+the line buffer and as the number of bytes to write.</p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="cups_adv_t">cups_adv_t</a></h3>
+<p class="description">AdvanceMedia attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_adv_e">cups_adv_e</a> cups_adv_t;
+</p>
+<h3 class="typedef"><a name="cups_bool_t">cups_bool_t</a></h3>
+<p class="description">Boolean type</p>
+<p class="code">
+typedef enum <a href="#cups_bool_e">cups_bool_e</a> cups_bool_t;
+</p>
+<h3 class="typedef"><a name="cups_cspace_t">cups_cspace_t</a></h3>
+<p class="description">cupsColorSpace attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_cspace_e">cups_cspace_e</a> cups_cspace_t;
+</p>
+<h3 class="typedef"><a name="cups_cut_t">cups_cut_t</a></h3>
+<p class="description">CutMedia attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_cut_e">cups_cut_e</a> cups_cut_t;
+</p>
+<h3 class="typedef"><a name="cups_edge_t">cups_edge_t</a></h3>
+<p class="description">LeadingEdge attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_edge_e">cups_edge_e</a> cups_edge_t;
+</p>
+<h3 class="typedef"><a name="cups_interpret_cb_t">cups_interpret_cb_t</a></h3>
+<p class="description">cupsRasterInterpretPPD callback function</p>
+<p class="code">
+typedef int (*cups_interpret_cb_t)(<a href="#cups_page_header2_t">cups_page_header2_t</a> *header, int preferred_bits);
+</p>
+<h3 class="typedef"><a name="cups_jog_t">cups_jog_t</a></h3>
+<p class="description">Jog attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_jog_e">cups_jog_e</a> cups_jog_t;
+</p>
+<h3 class="typedef"><a name="cups_mode_t">cups_mode_t</a></h3>
+<p class="description">cupsRasterOpen modes</p>
+<p class="code">
+typedef enum <a href="#cups_mode_e">cups_mode_e</a> cups_mode_t;
+</p>
+<h3 class="typedef"><a name="cups_order_t">cups_order_t</a></h3>
+<p class="description">cupsColorOrder attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_order_e">cups_order_e</a> cups_order_t;
+</p>
+<h3 class="typedef"><a name="cups_orient_t">cups_orient_t</a></h3>
+<p class="description">Orientation attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_orient_e">cups_orient_e</a> cups_orient_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
+<p class="description">Version 2 page header </p>
+<p class="code">
+typedef struct <a href="#cups_page_header2_s">cups_page_header2_s</a> cups_page_header2_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cups_page_header_t">cups_page_header_t</a></h3>
+<p class="description">Version 1 page header </p>
+<p class="code">
+typedef struct <a href="#cups_page_header_s">cups_page_header_s</a> cups_page_header_t;
+</p>
+<h3 class="typedef"><a name="cups_raster_iocb_t">cups_raster_iocb_t</a></h3>
+<p class="description">cupsRasterOpenIO callback function</p>
+<p class="code">
+typedef ssize_t (*cups_raster_iocb_t)(void *ctx, unsigned char *buffer, size_t length);
+</p>
+<h3 class="typedef"><a name="cups_raster_t">cups_raster_t</a></h3>
+<p class="description">Raster stream data</p>
+<p class="code">
+typedef struct _cups_raster_s cups_raster_t;
+</p>
+<h2 class="title"><a name="STRUCTURES">Structures</a></h2>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
+<p class="description">Version 2 page header </p>
+<p class="code">struct cups_page_header2_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned HWResolution[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned ImagingBoundingBox[4];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned Margins[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaClass[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaColor[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaPosition;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaType[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaWeight;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned NumCopies;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char OutputType[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned PageSize[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerColor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerPixel;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float cupsBorderlessScalingFactor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBytesPerLine;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsCompression;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsHeight;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float cupsImagingBBox[4];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsInteger[16];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char cupsMarkerType[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsMediaType;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsNumColors;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char cupsPageSizeName[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float cupsPageSize[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float cupsReal[16];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char cupsRenderingIntent[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowCount;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowStep;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char cupsString[16][64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsWidth;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>AdvanceDistance </dt>
+<dd class="description">AdvanceDistance value in points</dd>
+<dt>AdvanceMedia </dt>
+<dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
+<dt>Collate </dt>
+<dd class="description">Collated copies value</dd>
+<dt>CutMedia </dt>
+<dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
+<dt>Duplex </dt>
+<dd class="description">Duplexed (double-sided) value</dd>
+<dt>HWResolution[2] </dt>
+<dd class="description">Resolution in dots-per-inch</dd>
+<dt>ImagingBoundingBox[4] </dt>
+<dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
+<dt>InsertSheet </dt>
+<dd class="description">InsertSheet value</dd>
+<dt>Jog </dt>
+<dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
+<dt>LeadingEdge </dt>
+<dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
+<dt>ManualFeed </dt>
+<dd class="description">ManualFeed value</dd>
+<dt>Margins[2] </dt>
+<dd class="description">Lower-lefthand margins in points</dd>
+<dt>MediaClass[64] </dt>
+<dd class="description">MediaClass string</dd>
+<dt>MediaColor[64] </dt>
+<dd class="description">MediaColor string</dd>
+<dt>MediaPosition </dt>
+<dd class="description">MediaPosition value</dd>
+<dt>MediaType[64] </dt>
+<dd class="description">MediaType string</dd>
+<dt>MediaWeight </dt>
+<dd class="description">MediaWeight value in grams/m^2</dd>
+<dt>MirrorPrint </dt>
+<dd class="description">MirrorPrint value</dd>
+<dt>NegativePrint </dt>
+<dd class="description">NegativePrint value</dd>
+<dt>NumCopies </dt>
+<dd class="description">Number of copies to produce</dd>
+<dt>Orientation </dt>
+<dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
+<dt>OutputFaceUp </dt>
+<dd class="description">OutputFaceUp value</dd>
+<dt>OutputType[64] </dt>
+<dd class="description">OutputType string</dd>
+<dt>PageSize[2] </dt>
+<dd class="description">Width and length of page in points</dd>
+<dt>Separations </dt>
+<dd class="description">Separations value</dd>
+<dt>TraySwitch </dt>
+<dd class="description">TraySwitch value</dd>
+<dt>Tumble </dt>
+<dd class="description">Tumble value</dd>
+<dt>cupsBitsPerColor </dt>
+<dd class="description">Number of bits for each color</dd>
+<dt>cupsBitsPerPixel </dt>
+<dd class="description">Number of bits for each pixel</dd>
+<dt>cupsBorderlessScalingFactor <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Scaling that was applied to page data </dd>
+<dt>cupsBytesPerLine </dt>
+<dd class="description">Number of bytes per line</dd>
+<dt>cupsColorOrder </dt>
+<dd class="description">Order of colors</dd>
+<dt>cupsColorSpace </dt>
+<dd class="description">True colorspace</dd>
+<dt>cupsCompression </dt>
+<dd class="description">Device compression to use</dd>
+<dt>cupsHeight </dt>
+<dd class="description">Height of page image in pixels</dd>
+<dt>cupsImagingBBox[4] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Floating point ImagingBoundingBox
+(scaling factor not applied, left,
+bottom, right, top) </dd>
+<dt>cupsInteger[16] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">User-defined integer values </dd>
+<dt>cupsMarkerType[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Ink/toner type </dd>
+<dt>cupsMediaType </dt>
+<dd class="description">Media type code</dd>
+<dt>cupsNumColors <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Number of color compoents </dd>
+<dt>cupsPageSizeName[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">PageSize name </dd>
+<dt>cupsPageSize[2] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Floating point PageSize (scaling *
+factor not applied) </dd>
+<dt>cupsReal[16] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">User-defined floating-point values </dd>
+<dt>cupsRenderingIntent[64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Color rendering intent </dd>
+<dt>cupsRowCount </dt>
+<dd class="description">Rows per band</dd>
+<dt>cupsRowFeed </dt>
+<dd class="description">Feed between bands</dd>
+<dt>cupsRowStep </dt>
+<dd class="description">Spacing between lines</dd>
+<dt>cupsString[16][64] <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">User-defined string values </dd>
+<dt>cupsWidth </dt>
+<dd class="description">Width of page image in pixels</dd>
+</dl>
+<h3 class="struct"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cups_page_header_s">cups_page_header_s</a></h3>
+<p class="description">Version 1 page header </p>
+<p class="code">struct cups_page_header_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned HWResolution[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned ImagingBoundingBox[4];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned Margins[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaClass[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaColor[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaPosition;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char MediaType[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaWeight;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned NumCopies;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char OutputType[64];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned PageSize[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerColor;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerPixel;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBytesPerLine;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsCompression;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsHeight;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsMediaType;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowCount;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsRowStep;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsWidth;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>AdvanceDistance </dt>
+<dd class="description">AdvanceDistance value in points</dd>
+<dt>AdvanceMedia </dt>
+<dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
+<dt>Collate </dt>
+<dd class="description">Collated copies value</dd>
+<dt>CutMedia </dt>
+<dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
+<dt>Duplex </dt>
+<dd class="description">Duplexed (double-sided) value</dd>
+<dt>HWResolution[2] </dt>
+<dd class="description">Resolution in dots-per-inch</dd>
+<dt>ImagingBoundingBox[4] </dt>
+<dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
+<dt>InsertSheet </dt>
+<dd class="description">InsertSheet value</dd>
+<dt>Jog </dt>
+<dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
+<dt>LeadingEdge </dt>
+<dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
+<dt>ManualFeed </dt>
+<dd class="description">ManualFeed value</dd>
+<dt>Margins[2] </dt>
+<dd class="description">Lower-lefthand margins in points</dd>
+<dt>MediaClass[64] </dt>
+<dd class="description">MediaClass string</dd>
+<dt>MediaColor[64] </dt>
+<dd class="description">MediaColor string</dd>
+<dt>MediaPosition </dt>
+<dd class="description">MediaPosition value</dd>
+<dt>MediaType[64] </dt>
+<dd class="description">MediaType string</dd>
+<dt>MediaWeight </dt>
+<dd class="description">MediaWeight value in grams/m^2</dd>
+<dt>MirrorPrint </dt>
+<dd class="description">MirrorPrint value</dd>
+<dt>NegativePrint </dt>
+<dd class="description">NegativePrint value</dd>
+<dt>NumCopies </dt>
+<dd class="description">Number of copies to produce</dd>
+<dt>Orientation </dt>
+<dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
+<dt>OutputFaceUp </dt>
+<dd class="description">OutputFaceUp value</dd>
+<dt>OutputType[64] </dt>
+<dd class="description">OutputType string</dd>
+<dt>PageSize[2] </dt>
+<dd class="description">Width and length of page in points</dd>
+<dt>Separations </dt>
+<dd class="description">Separations value</dd>
+<dt>TraySwitch </dt>
+<dd class="description">TraySwitch value</dd>
+<dt>Tumble </dt>
+<dd class="description">Tumble value</dd>
+<dt>cupsBitsPerColor </dt>
+<dd class="description">Number of bits for each color</dd>
+<dt>cupsBitsPerPixel </dt>
+<dd class="description">Number of bits for each pixel</dd>
+<dt>cupsBytesPerLine </dt>
+<dd class="description">Number of bytes per line</dd>
+<dt>cupsColorOrder </dt>
+<dd class="description">Order of colors</dd>
+<dt>cupsColorSpace </dt>
+<dd class="description">True colorspace</dd>
+<dt>cupsCompression </dt>
+<dd class="description">Device compression to use</dd>
+<dt>cupsHeight </dt>
+<dd class="description">Height of page image in pixels</dd>
+<dt>cupsMediaType </dt>
+<dd class="description">Media type code</dd>
+<dt>cupsRowCount </dt>
+<dd class="description">Rows per band</dd>
+<dt>cupsRowFeed </dt>
+<dd class="description">Feed between bands</dd>
+<dt>cupsRowStep </dt>
+<dd class="description">Spacing between lines</dd>
+<dt>cupsWidth </dt>
+<dd class="description">Width of page image in pixels</dd>
+</dl>
+<h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
+<h3 class="enumeration"><a name="cups_adv_e">cups_adv_e</a></h3>
+<p class="description">AdvanceMedia attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_ADVANCE_FILE </dt>
+<dd class="description">Advance the roll after this file</dd>
+<dt>CUPS_ADVANCE_JOB </dt>
+<dd class="description">Advance the roll after this job</dd>
+<dt>CUPS_ADVANCE_NONE </dt>
+<dd class="description">Never advance the roll</dd>
+<dt>CUPS_ADVANCE_PAGE </dt>
+<dd class="description">Advance the roll after this page</dd>
+<dt>CUPS_ADVANCE_SET </dt>
+<dd class="description">Advance the roll after this set</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_bool_e">cups_bool_e</a></h3>
+<p class="description">Boolean type</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_FALSE </dt>
+<dd class="description">Logical false</dd>
+<dt>CUPS_TRUE </dt>
+<dd class="description">Logical true</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_cspace_e">cups_cspace_e</a></h3>
+<p class="description">cupsColorSpace attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_CSPACE_ADOBERGB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Red, green, blue (Adobe RGB) </dd>
+<dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">CIE Lab </dd>
+<dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">CIE XYZ </dd>
+<dt>CUPS_CSPACE_CMY </dt>
+<dd class="description">Cyan, magenta, yellow (DeviceCMY)</dd>
+<dt>CUPS_CSPACE_CMYK </dt>
+<dd class="description">Cyan, magenta, yellow, black (DeviceCMYK)</dd>
+<dt>CUPS_CSPACE_DEVICE1 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 1 color </dd>
+<dt>CUPS_CSPACE_DEVICE2 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 2 colors </dd>
+<dt>CUPS_CSPACE_DEVICE3 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 3 colors </dd>
+<dt>CUPS_CSPACE_DEVICE4 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 4 colors </dd>
+<dt>CUPS_CSPACE_DEVICE5 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 5 colors </dd>
+<dt>CUPS_CSPACE_DEVICE6 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 6 colors </dd>
+<dt>CUPS_CSPACE_DEVICE7 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 7 colors </dd>
+<dt>CUPS_CSPACE_DEVICE8 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 8 colors </dd>
+<dt>CUPS_CSPACE_DEVICE9 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 9 colors </dd>
+<dt>CUPS_CSPACE_DEVICEA <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 10 colors </dd>
+<dt>CUPS_CSPACE_DEVICEB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 11 colors </dd>
+<dt>CUPS_CSPACE_DEVICEC <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 12 colors </dd>
+<dt>CUPS_CSPACE_DEVICED <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 13 colors </dd>
+<dt>CUPS_CSPACE_DEVICEE <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 14 colors </dd>
+<dt>CUPS_CSPACE_DEVICEF <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 15 colors </dd>
+<dt>CUPS_CSPACE_GMCK <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold, magenta, yellow, black </dd>
+<dt>CUPS_CSPACE_GMCS <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold, magenta, yellow, silver </dd>
+<dt>CUPS_CSPACE_GOLD <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold foil </dd>
+<dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 1 color </dd>
+<dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 2 colors </dd>
+<dt>CUPS_CSPACE_ICC3 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 3 colors </dd>
+<dt>CUPS_CSPACE_ICC4 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 4 colors </dd>
+<dt>CUPS_CSPACE_ICC5 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 5 colors </dd>
+<dt>CUPS_CSPACE_ICC6 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 6 colors </dd>
+<dt>CUPS_CSPACE_ICC7 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 7 colors </dd>
+<dt>CUPS_CSPACE_ICC8 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 8 colors </dd>
+<dt>CUPS_CSPACE_ICC9 <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 9 colors </dd>
+<dt>CUPS_CSPACE_ICCA <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 10 colors </dd>
+<dt>CUPS_CSPACE_ICCB <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 11 colors </dd>
+<dt>CUPS_CSPACE_ICCC <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 12 colors </dd>
+<dt>CUPS_CSPACE_ICCD <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 13 colors </dd>
+<dt>CUPS_CSPACE_ICCE <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 14 colors </dd>
+<dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19/OS X 10.3&nbsp;</span></dt>
+<dd class="description">ICC-based, 15 colors </dd>
+<dt>CUPS_CSPACE_K </dt>
+<dd class="description">Black (DeviceK)</dd>
+<dt>CUPS_CSPACE_KCMY <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Black, cyan, magenta, yellow </dd>
+<dt>CUPS_CSPACE_KCMYcm <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Black, cyan, magenta, yellow, light-cyan, light-magenta </dd>
+<dt>CUPS_CSPACE_RGB </dt>
+<dd class="description">Red, green, blue (DeviceRGB, sRGB by default)</dd>
+<dt>CUPS_CSPACE_RGBA </dt>
+<dd class="description">Red, green, blue, alpha (DeviceRGB, sRGB by default)</dd>
+<dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Red, green, blue, white (DeviceRGB, sRGB by default) </dd>
+<dt>CUPS_CSPACE_SILVER <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Silver foil </dd>
+<dt>CUPS_CSPACE_SRGB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Red, green, blue (sRGB) </dd>
+<dt>CUPS_CSPACE_SW <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Luminance (gamma 2.2) </dd>
+<dt>CUPS_CSPACE_W </dt>
+<dd class="description">Luminance (DeviceGray, gamma 2.2 by default)</dd>
+<dt>CUPS_CSPACE_WHITE <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">White ink (as black) </dd>
+<dt>CUPS_CSPACE_YMC <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Yellow, magenta, cyan </dd>
+<dt>CUPS_CSPACE_YMCK <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Yellow, magenta, cyan, black </dd>
+</dl>
+<h3 class="enumeration"><a name="cups_cut_e">cups_cut_e</a></h3>
+<p class="description">CutMedia attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_CUT_FILE </dt>
+<dd class="description">Cut the roll after this file</dd>
+<dt>CUPS_CUT_JOB </dt>
+<dd class="description">Cut the roll after this job</dd>
+<dt>CUPS_CUT_NONE </dt>
+<dd class="description">Never cut the roll</dd>
+<dt>CUPS_CUT_PAGE </dt>
+<dd class="description">Cut the roll after this page</dd>
+<dt>CUPS_CUT_SET </dt>
+<dd class="description">Cut the roll after this set</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_edge_e">cups_edge_e</a></h3>
+<p class="description">LeadingEdge attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_EDGE_BOTTOM </dt>
+<dd class="description">Leading edge is the bottom of the page</dd>
+<dt>CUPS_EDGE_LEFT </dt>
+<dd class="description">Leading edge is the left of the page</dd>
+<dt>CUPS_EDGE_RIGHT </dt>
+<dd class="description">Leading edge is the right of the page</dd>
+<dt>CUPS_EDGE_TOP </dt>
+<dd class="description">Leading edge is the top of the page</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_jog_e">cups_jog_e</a></h3>
+<p class="description">Jog attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_JOG_FILE </dt>
+<dd class="description">Move pages after this file</dd>
+<dt>CUPS_JOG_JOB </dt>
+<dd class="description">Move pages after this job</dd>
+<dt>CUPS_JOG_NONE </dt>
+<dd class="description">Never move pages</dd>
+<dt>CUPS_JOG_SET </dt>
+<dd class="description">Move pages after this set</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_mode_e">cups_mode_e</a></h3>
+<p class="description">cupsRasterOpen modes</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_RASTER_READ </dt>
+<dd class="description">Open stream for reading</dd>
+<dt>CUPS_RASTER_WRITE </dt>
+<dd class="description">Open stream for writing</dd>
+<dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3/OS X 10.5&nbsp;</span></dt>
+<dd class="description">Open stream for compressed writing </dd>
+<dt>CUPS_RASTER_WRITE_PWG <span class="info">&nbsp;CUPS 1.5/OS X 10.7&nbsp;</span></dt>
+<dd class="description">Open stream for compressed writing in PWG mode </dd>
+</dl>
+<h3 class="enumeration"><a name="cups_order_e">cups_order_e</a></h3>
+<p class="description">cupsColorOrder attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_ORDER_BANDED </dt>
+<dd class="description">CCC MMM YYY KKK ...</dd>
+<dt>CUPS_ORDER_CHUNKED </dt>
+<dd class="description">CMYK CMYK CMYK ...</dd>
+<dt>CUPS_ORDER_PLANAR </dt>
+<dd class="description">CCC ... MMM ... YYY ... KKK ...</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_orient_e">cups_orient_e</a></h3>
+<p class="description">Orientation attribute values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_ORIENT_0 </dt>
+<dd class="description">Don't rotate the page</dd>
+<dt>CUPS_ORIENT_180 </dt>
+<dd class="description">Turn the page upside down</dd>
+<dt>CUPS_ORIENT_270 </dt>
+<dd class="description">Rotate the page clockwise</dd>
+<dt>CUPS_ORIENT_90 </dt>
+<dd class="description">Rotate the page counter-clockwise</dd>
+</dl>
+</div>
+</body>
+</html>

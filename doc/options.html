@@ -1,0 +1,654 @@
+<HTML>
+<!-- SECTION: Getting Started -->
+<HEAD>
+	<TITLE>Command-Line Printing and Options</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">Command-Line Printing and Options</H1>
+
+<P>CUPS provides both the System V (<A
+HREF="man-lp.html">lp(1)</A>) and Berkeley (<A
+HREF="man-lpr.html">lpr(1)</A>) printing commands for printing
+files. In addition, it supported a large number of standard and
+printer-specific options that allow you to control how and where
+files are printed.</P>
+
+
+<H2 CLASS="title"><A NAME="BASICS">Printing Files</A></H2>
+
+<P>CUPS understands many different types of files directly,
+including text, PostScript, PDF, and image files. This allows you
+to print from inside your applications or at the command-line,
+whichever is most convenient! Type either of the following
+commands to print a file to the default (or only) printer on the
+system:</P>
+
+<PRE CLASS="command">
+lp filename
+lpr filename
+</PRE>
+
+<H3><A NAME="PRINTER">Choosing a Printer</A></H3>
+
+<P>Many systems will have more than one printer available to the
+user. These printers can be attached to the local system via a
+parallel, serial, or USB port, or available over the network. Use
+the <A HREF="man-lpstat.html">lpstat(1)</A> command to see a list
+of available printers:</P>
+
+<PRE CLASS="command">
+lpstat -p -d
+</PRE>
+
+<P>The <CODE>-p</CODE> option specifies that you want to see a
+list of printers, and the <CODE>-d</CODE> option reports the
+current default printer or class.</P>
+
+<P>Use the <CODE>-d</CODE> option with the <B>lp</B> command to
+print to a specific printer:</P>
+
+<PRE CLASS="command">
+lp -d printer filename
+</PRE>
+
+<P>or the <CODE>-P</CODE> option with the <B>lpr</B> command:</P>
+
+<PRE CLASS="command">
+lpr -P printer filename
+</PRE>
+
+<H3><A NAME="DEFAULT">Setting the Default Printer</A></H3>
+
+<P>If you normally use a particular printer, you can tell CUPS to
+use it by default using the <A
+HREF="man-lpoptions.html">lpoptions(1)</A> command:</P>
+
+<PRE CLASS="command">
+lpoptions -d printer
+</PRE>
+
+<H3><A NAME="PIPE">Printing the Output of a Program</A></H3>
+
+<P>Both the <B>lp</B> and <B>lpr</B> commands support printing
+from the standard input:</P>
+
+<PRE CLASS="command">
+program | lp
+program | lp -d printer
+program | lpr
+program | lpr -P printer
+</PRE>
+
+<P>If the program does not provide any output, then nothing will
+be queued for printing.</P>
+
+<H3><A NAME="WITHOPTIONS">Specifying Printer Options</A></H3>
+
+<P>For many types of files, the default printer options may be
+sufficient for your needs. However, there may be times when you
+need to change the options for a particular file you are
+printing.</P>
+
+<P>The <B>lp</B> and <B>lpr</B> commands allow you to pass
+printer options using the <CODE>-o</CODE> option:</P>
+
+<PRE CLASS="command">
+lp -o landscape -o fit-to-page -o media=A4 filename.jpg
+lpr -o landscape -o fit-to-page -o media=A4 filename.jpg
+</PRE>
+
+<P>The available printer options vary depending on the printer.
+The standard options are described in the "<A
+HREF="#OPTIONS">Standard Printing Options</A>" section
+below. Printer-specific options are also available and can be
+listed using the <B>lpoptions</B> command:</P>
+
+<PRE CLASS="command">
+lpoptions -p printer -l
+</PRE>
+
+<H3><A NAME="INSTANCES">Creating Saved Options</A></H3>
+
+<P>Saved options are supported in CUPS through <em>printer
+instances</em>. Printer instances are, as their name implies, copies
+of a printer that have certain options associated with them. Use the
+<B>lpoptions</B> command to create a printer instance:</P>
+
+<PRE CLASS="command">
+lpoptions -p printer/instance -o name=value ...
+</PRE>
+
+<P>The <CODE>-p printer/instance</CODE> option provides the name of
+the instance, which is always the printer name, a slash, and the
+instance name which can contain any printable characters except
+space and slash. The remaining options are then associated with the
+instance instead of the main queue. For example, the following
+command creates a duplex instance of the LaserJet queue:</P>
+
+<PRE CLASS="command">
+lpoptions -p LaserJet/duplex -o sides=two-sided-long-edge
+</PRE>
+
+<P>Instances <em>do not</em> inherit lpoptions from the main
+queue.</P>
+
+<H3><A NAME="COPIES">Printing Multiple Copies</A></H3>
+
+<P>Both the <B>lp</B> and <B>lpr</B> commands have options for
+printing more than one copy of a file:</P>
+
+<PRE CLASS="command">
+lp -n <EM>num-copies</EM> filename
+lpr -#<EM>num-copies</EM> filename
+</PRE>
+
+<P>Copies are normally <EM>not</EM> collated for you. Use the
+<CODE>-o Collate=True</CODE> option to get collated copies:</P>
+
+<PRE CLASS="command">
+lp -n <EM>num-copies</EM> -o Collate=True filename
+lpr -#<EM>num-copies</EM> -o Collate=True filename
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="CANCEL">Canceling a Print Job</A></H2>
+
+<P>The <A HREF="man-cancel.html">cancel(1)</A> and <A
+HREF="man-lprm.html">lprm(1)</A> commands cancel a print job:</P>
+
+<PRE CLASS="command">
+cancel <EM>job-id</EM>
+lprm <EM>job-id</EM>
+</PRE>
+
+<P>The <EM>job-id</EM> is the number that was reported to you by
+the <B>lp</B> command. You can also get the job ID using the <A
+HREF="man-lpq.html">lpq(1)</A> or <A
+HREF="man-lpstat.html">lpstat</A> commands:</P>
+
+<PRE CLASS="command">
+lpq
+lpstat
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="LPMOVE">Moving a Print Job</A></H2>
+
+<P>The <A HREF="man-lpmove.html">lpmove(8)</A> command moves a print
+job to a new printer or class:</P>
+
+<PRE CLASS="command">
+lpmove <EM>job-id</EM> <i>destination</i>
+</PRE>
+
+<P>The <EM>job-id</EM> is the number that was reported to you by
+the <B>lp</B> or <B>lpstat</B> commands. <i>Destination</i> is the
+name of a printer or class that you want to actually print the job.
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The <B>lpmove</B> command is located in the system command
+directory (typically <VAR>/usr/sbin</VAR> or <VAR>/usr/local/sbin</VAR>),
+and so may not be in your command path. Specify the full path to the
+command if you get a "command not found" error, for example:
+
+<PRE CLASS="command">
+/usr/sbin/lpmove foo-123 bar
+</PRE>
+
+</BLOCKQUOTE>
+
+
+<H2 CLASS="title"><A NAME="OPTIONS">Standard Printing Options</A></H2>
+
+<P>The following options apply when printing all types of
+files.</P>
+
+<H3><A NAME="MEDIA">Selecting the Media Size, Type, and Source</A></H3>
+
+<P>The <CODE>-o media=xyz</CODE> option sets the media size,
+type, and/or source:</P>
+
+<PRE CLASS="command">
+lp -o media=Letter filename
+lp -o media=Letter,MultiPurpose filename
+lpr -o media=Letter,Transparency filename
+lpr -o media=Letter,MultiPurpose,Transparency filename
+</PRE>
+
+<P>The available media sizes, types, and sources depend on the
+printer, but most support the following options (case is not
+significant):</P>
+
+<UL>
+
+	<LI><CODE>Letter</CODE> - US Letter (8.5x11 inches, or 216x279mm)
+
+	<LI><CODE>Legal</CODE> - US Legal (8.5x14 inches, or 216x356mm)
+
+	<LI><CODE>A4</CODE> - ISO A4 (8.27x11.69 inches, or 210x297mm)
+
+	<LI><CODE>COM10</CODE> - US #10 Envelope (9.5x4.125 inches, or
+	241x105mm)
+
+	<LI><CODE>DL</CODE> - ISO DL Envelope (8.66x4.33 inches, or 220x110mm)
+
+	<LI><CODE>Transparency</CODE> - Transparency media type or source
+
+	<LI><CODE>Upper</CODE> - Upper paper tray
+
+	<LI><CODE>Lower</CODE> - Lower paper tray
+
+	<LI><CODE>MultiPurpose</CODE> - Multi-purpose paper tray
+
+	<LI><CODE>LargeCapacity</CODE> - Large capacity paper tray
+
+</UL>
+
+<P>The actual options supported are defined in the printer's PPD
+file in the <CODE>PageSize</CODE>, <CODE>InputSlot</CODE>, and
+<CODE>MediaType</CODE> options. You can list them using the
+<B>lpoptions(1)</B> command:</P>
+
+<PRE CLASS="command">
+lpoptions -p printer -l
+</PRE>
+
+<P>When <CODE>Custom</CODE> is listed for the <CODE>PageSize</CODE> option, you can specify custom media sizes using one of the following forms:</P>
+
+<PRE CLASS="command">
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM> filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>in filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>cm filename
+lp -o media=Custom.<EM>WIDTH</EM>x<EM>LENGTH</EM>mm filename
+</PRE>
+
+<P>where "WIDTH" and "LENGTH" are the width and length of the media in points, inches, centimeters, or millimeters, respectively.</P>
+
+
+<H3><A NAME="ORIENTATION">Setting the Orientation</A></H3>
+
+<P>The <CODE>-o landscape</CODE> option will rotate the page 90
+degrees to print in landscape orientation:</P>
+
+<PRE CLASS="command">
+lp -o landscape filename
+lpr -o landscape filename
+</PRE>
+
+<P>The <CODE>-o orientation-requested=N</CODE> option rotates the
+page depending on the value of N:</P>
+
+<UL>
+
+	<LI><CODE>-o orientation-requested=3</CODE> - portrait
+	orientation (no rotation)</LI>
+
+	<LI><CODE>-o orientation-requested=4</CODE> - landscape
+	orientation (90 degrees)</LI>
+
+	<LI><CODE>-o orientation-requested=5</CODE> - reverse
+	landscape or seascape orientation (270 degrees)</LI>
+
+	<LI><CODE>-o orientation-requested=6</CODE> - reverse
+	portrait or upside-down orientation (180 degrees)</LI>
+
+</UL>
+
+
+<H3><A NAME="SIDES">Printing On Both Sides of the Paper</A></H3>
+
+<P>The <CODE>-o sides=two-sided-short-edge</CODE> and <CODE>-o
+sides=two-sided-long-edge</CODE> options will enable two-sided
+printing on the printer if the printer supports it. The <CODE>-o
+sides=two-sided-short-edge</CODE> option is suitable for
+landscape pages, while the <CODE>-o
+sides=two-sided-long-edge</CODE> option is suitable for portrait
+pages:</P>
+
+<PRE CLASS="command">
+lp -o sides=two-sided-short-edge filename
+lp -o sides=two-sided-long-edge filename
+lpr -o sides=two-sided-long-edge filename
+</PRE>
+
+<P>The default is to print single-sided:</P>
+
+<PRE CLASS="command">
+lp -o sides=one-sided filename
+lpr -o sides=one-sided filename
+</PRE>
+
+
+<H3><A NAME="JOBSHEETS">Selecting the Banner Page(s)</A></H3>
+
+<P>The <CODE>-o job-sheets=start,end</CODE> option sets the banner
+page(s) to use for a job:</P>
+
+<PRE CLASS="command">
+lp -o job-sheets=none filename
+lp -o job-sheets=standard filename
+lpr -o job-sheets=classified,classified filename
+</PRE>
+
+<P>If only one banner file is specified, it will be printed
+before the files in the job. If a second banner file is
+specified, it is printed after the files in the job.</P>
+
+<P>The available banner pages depend on the local system
+configuration; CUPS includes the following banner files:</P>
+
+<UL>
+
+	<LI><CODE>none</CODE> - Do not produce a banner page.
+
+	<LI><CODE>classified</CODE> - A banner page with a "classified"
+	label at the top and bottom.
+
+	<LI><CODE>confidential</CODE> - A banner page with a
+	"confidential" label at the top and bottom.
+
+	<LI><CODE>secret</CODE> - A banner page with a "secret" label
+	at the top and bottom.
+
+	<LI><CODE>standard</CODE> - A banner page with no label at the
+	top and bottom.
+
+	<LI><CODE>topsecret</CODE> - A banner page with a "top secret"
+	label at the top and bottom.
+
+	<LI><CODE>unclassified</CODE> - A banner page with an
+	"unclassified" label at the top and bottom.
+
+</UL>
+
+
+<H3><A NAME="JOBHOLDUNTIL">Holding Jobs for Later Printing</A></H3>
+
+<P>The <CODE>-o job-hold-until=when</CODE> option tells CUPS to
+delay printing until the "when" time, which can be one of the
+following:</P>
+
+<UL>
+
+	<LI><CODE>-o job-hold-until=indefinite</CODE>; print only
+	after released by the user or an administrator</LI>
+
+	<LI><CODE>-o job-hold-until=day-time</CODE>; print from
+	6am to 6pm local time</LI>
+
+	<LI><CODE>-o job-hold-until=night</CODE>; print from
+	6pm to 6am local time</LI>
+
+	<LI><CODE>-o job-hold-until=second-shift</CODE>; print from
+	4pm to 12am local time</LI>
+
+	<LI><CODE>-o job-hold-until=third-shift</CODE>; print from
+	12am to 8am local time</LI>
+
+	<LI><CODE>-o job-hold-until=weekend</CODE>; print on Saturday
+	or Sunday</LI>
+
+	<LI><CODE>-o job-hold-until=HH:MM</CODE>; print at the specified
+	UTC time</LI>
+
+</UL>
+
+<H3><A NAME="RELEASEJOB">Releasing Held Jobs</A></H3>
+
+<P>Aside from the web interface, you can use the <B>lp</B> command
+to release a held job:</P>
+
+<PRE CLASS="command">
+lp -i <em>job-id</em> -H resume
+</PRE>
+
+<P>where "job-id" is the job ID reported by the <B>lpstat</B>
+command.</P>
+
+
+<H3><A NAME="JOBPRIORITY">Setting the Job Priority</A></H3>
+
+<P>The <CODE>-o job-priority=NNN</CODE> option tells CUPS to
+assign a priority to your job from 1 (lowest) to 100 (highest),
+which influences where the job appears in the print queue. Higher
+priority jobs are printed before lower priority jobs, however
+submitting a new job with a high priority will not interrupt an
+already printing job.</P>
+
+
+<H3><A NAME="OUTPUTORDER">Specifying the Output Order</A></H3>
+
+<P>The <CODE>-o outputorder=normal</CODE> and <CODE>-o outputorder=reverse</CODE> options specify the order of the pages. Normal order prints page 1 first, page 2 second, and so forth. Reverse order prints page 1 last.</P>
+
+
+<H3><A NAME="PAGERANGES">Selecting a Range of Pages</A></H3>
+
+<P>The <CODE>-o page-ranges=pages</CODE> option selects a range
+of pages for printing:</P>
+
+<PRE CLASS="command">
+lp -o page-ranges=1 filename
+lp -o page-ranges=1-4 filename
+lp -o page-ranges=1-4,7,9-12 filename
+lpr -o page-ranges=1-4,7,9-12 filename
+</PRE>
+
+<P>As shown above, the <CODE>pages</CODE> value can be a single page, a
+range of pages, or a collection of page numbers and ranges separated by
+commas. The pages will always be printed in ascending order, regardless
+of the order of the pages in the <CODE>page-ranges</CODE> option.
+
+<P>The default is to print all pages.
+
+<blockquote><b>Note:</b>
+
+<p>The page numbers used by <code>page-ranges</code> refer to the output
+pages and not the document's page numbers. Options like <code>number-up</code>
+can make the output page numbering not match the document page numbers.</p>
+
+</blockquote>
+
+
+<H3><A NAME="PAGESET">Selecting Even or Odd Pages</A></H3>
+
+<P>Use the <CODE>-o page-set=set</CODE> option to select the even or odd pages:</P>
+
+<PRE CLASS="command">
+lp -o page-set=odd filename
+lp -o page-set=even filename
+lpr -o page-set=even filename
+</PRE>
+
+<P>The default is to print all pages.
+
+<H3><A NAME="NUMBERUP">N-Up Printing</A></H3>
+
+<P>The <CODE>-o number-up=value</CODE> option selects N-Up
+printing. N-Up printing places multiple document pages on a
+single printed page. CUPS supports 1, 2, 4, 6, 9, and 16-Up
+formats; the default format is 1-Up:</P>
+
+<PRE CLASS="command">
+lp -o number-up=1 filename
+lp -o number-up=2 filename
+lp -o number-up=4 filename
+lpr -o number-up=16 filename
+</PRE>
+
+<P>The <CODE>-o page-border=value</CODE> option chooses the
+border to draw around each page:</P>
+
+<UL>
+	<LI><CODE>-o page-border=double</CODE>; draw two hairline borders around each page</LI>
+	<LI><CODE>-o page-border=double-thick</CODE>; draw two 1pt borders around each page</LI>
+	<LI><CODE>-o page-border=none</CODE>; do not draw a border (default)</LI>
+	<LI><CODE>-o page-border=single</CODE>; draw one hairline border around each page</LI>
+	<LI><CODE>-o page-border=single-thick</CODE>; draw one 1pt border around each page</LI>
+</UL>
+
+<P>The <CODE>-o number-up-layout=value</CODE> option chooses the
+layout of the pages on each output page:</P>
+
+<UL>
+	<LI><CODE>-o number-up-layout=btlr</CODE>; Bottom to top, left to right</LI>
+	<LI><CODE>-o number-up-layout=btrl</CODE>; Bottom to top, right to left</LI>
+	<LI><CODE>-o number-up-layout=lrbt</CODE>; Left to right, bottom to top</LI>
+	<LI><CODE>-o number-up-layout=lrtb</CODE>; Left to right, top to bottom (default)</LI>
+	<LI><CODE>-o number-up-layout=rlbt</CODE>; Right to left, bottom to top</LI>
+	<LI><CODE>-o number-up-layout=rltb</CODE>; Right to left, top to bottom</LI>
+	<LI><CODE>-o number-up-layout=tblr</CODE>; Top to bottom, left to right</LI>
+	<LI><CODE>-o number-up-layout=tbrl</CODE>; Top to bottom, right to left</LI>
+</UL>
+
+<H3><A NAME="FIT_TO_PAGE">Scaling to Fit</A></H3>
+
+<P>The <CODE>-o fit-to-page</CODE> option specifies that the document
+should be scaled to fit on the page:</P>
+
+<PRE CLASS="command">
+lp -o fit-to-page filename
+lpr -o fit-to-page filename
+</PRE>
+
+<P>The default is to use the size specified in the file.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>This feature depends upon an accurate size in
+the print file. If no size is given in the file, the page may be
+scaled incorrectly!
+
+</BLOCKQUOTE>
+
+<H3><A NAME="OUTPUTORDER">Printing in Reverse Order</A></H3>
+
+<P>The <CODE>-o outputorder=reverse</CODE> option will print the
+pages in reverse order:</P>
+
+<PRE CLASS="command">
+lp -o outputorder=reverse filename
+lpr -o outputorder=reverse filename
+</PRE>
+
+<P>Similarly, the <CODE>-o outputorder=normal</CODE> option will
+print starting with page 1:</P>
+
+<PRE CLASS="command">
+lp -o outputorder=normal filename
+lpr -o outputorder=normal filename
+</PRE>
+
+<P>The default is <CODE>-o outputorder=normal</CODE> for
+printers that print face down and <CODE>-o outputorder=reverse</CODE>
+for printers that print face up.
+
+<H3><A NAME="MIRROR">Printing Mirrored Pages</A></H3>
+
+<P>The <CODE>-o mirror</CODE> option flips each page along the
+vertical axis to produce a mirrored image:</P>
+
+<PRE CLASS="command">
+lp -o mirror filename
+lpr -o mirror filename
+</PRE>
+
+<P>This is typically used when printing on T-shirt transfer
+media or sometimes on transparencies.</P>
+
+<H3><A NAME="RAW">Raw or Unfiltered Output</A></H3>
+
+<P>The <CODE>-o raw</CODE> option allows you to send files
+directly to a printer without filtering. This is sometimes
+required when printing from applications that provide their own
+"printer drivers" for your printer:</P>
+
+<PRE CLASS="command">
+lp -o raw filename
+lpr -o raw filename
+</PRE>
+
+<P>The <CODE>-l</CODE> option can also be used with the
+<B>lpr</B> command to send files directly to a printer:</P>
+
+<PRE CLASS="command">
+lpr -l filename
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="TEXTOPTIONS">Text Options</A></H2>
+
+<P>CUPS supports several options that are only used when printing
+plain text files. These options have absolutely no effect on
+PostScript, PDF, HP-GL/2, or image files.</P>
+
+<H3><A NAME="CPI">Setting the Number of Characters Per Inch</A></H3>
+
+<P>The <CODE>-o cpi=value</CODE> option sets the number of
+characters per inch:</P>
+
+<PRE CLASS="command">
+lp -o cpi=10 filename
+lp -o cpi=12 filename
+lpr -o cpi=17 filename
+</PRE>
+
+<P>The default characters per inch is 10.</P>
+
+<H3><A NAME="LPI">Setting the Number of Lines Per Inch</A></H3>
+
+<P>The <CODE>-o lpi=value</CODE> option sets the number of lines
+per inch:</P>
+
+<PRE CLASS="command">
+lp -o lpi=6 filename
+lpr -o lpi=8 filename
+</PRE>
+
+<P>The default lines per inch is 6.</P>
+
+<H3><A NAME="MARGINS">Setting the Page Margins</A></H3>
+
+<P>Normally the page margins are set to the hard limits of the
+printer. Use the <CODE>-o page-left=value</CODE>, <CODE>-o
+page-right=value</CODE>, <CODE>-o page-top=value</CODE>, and
+<CODE>-o page-bottom=value</CODE> options to adjust the page
+margins:</P>
+
+<PRE CLASS="command">
+lp -o page-left=<EM>value</EM> filename
+lp -o page-right=<EM>value</EM> filename
+lp -o page-top=<EM>value</EM> filename
+lp -o page-bottom=<EM>value</EM> filename
+lpr -o page-left=<EM>value</EM> -o page-right=<EM>value</EM> -o page-top=<EM>value</EM> -o page-bottom=<EM>value</EM> filename
+</PRE>
+
+<P>The <CODE>value</CODE> argument is the margin in points; each
+point is 1/72 inch or 0.35mm.</P>
+
+<H3><A NAME="PRETTYPRINT">Pretty Printing</A></H3>
+
+<P>The <CODE>-o prettyprint</CODE> option puts a header at the
+top of each page with the page number, job title (usually the
+filename), and the date. Also, C and C++ keywords are
+highlighted, and comment lines are italicized:</P>
+
+<PRE CLASS="command">
+lp -o prettyprint filename
+lpr -o prettyprint filename
+</PRE>
+
+<H3><A NAME="WRAP">Turning Off Text Wrapping</A></H3>
+
+<P>The <CODE>-o nowrap</CODE> option disables wrapping of long lines:</P>
+
+<PRE CLASS="command">
+lp -o nowrap filename
+lpr -o nowrap filename
+</PRE>
+
+
+</BODY>
+</HTML>

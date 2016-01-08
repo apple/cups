@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<HTML>
+<!-- SECTION: Specifications -->
+<HEAD>
+	<TITLE>CUPS Developer Guide</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
+</HEAD>
+<BODY>
+
+<H1 CLASS="title">CUPS Developer Guide</H1>
+
+<P>This developer guide documents the guidelines and processes we use when developing and maintaining CUPS and related software. Our goal is to provide reliable and efficient software and documentation that addresses the needs of our users.</P>
+
+
+<H2 CLASS="title"><A NAME="OVERVIEW">Overview</A></H2>
+
+<P>CUPS is developed by Apple Inc. and distributed as open source software under a combination of GNU GPL2 and GNU LGPL2 licenses with exceptions to allow developers on Apple's operating systems to develop CUPS-based software under alternate license terms. Significant contributions to CUPS must be licensed to Apple using the <A HREF="https://www.cups.org/AppleContributorAgreement_2011-03-10.pdf">Apple Contributor Agreement</A>.</P>
+
+<P>Apple releases updates to the CUPS software approximately every three months. Each release has a version number consisting of the major version (currently 1), minor version (currently 6), and patch version (starting at 0) separated by the period, for example "1.6.0". Releases where only the patch version number changes will contain only bug fixes to the previous release, for example "1.6.1" includes bug fixes for the "1.6.0" release. New features require the major or minor version numbers to change, for example "1.6.0" release contains new features compared to the "1.5.3" release. Multiple beta and "candidate" releases generally precede each new feature release, for example "1.5b1", "1.5b2", and "1.5rc1" preceded the "1.5.0" release. Finally, we also post regular Subversion snapshot releases, for example "1.6svn-r10486", which represent a snapshot of the development for the next feature release.</P>
+
+<P>CUPS interfaces, including the C APIs and command-line arguments, environment variables, configuration files, and output format, are stable across patch versions and are generally backwards-compatible with interfaces used in prior major and minor versions. However, program interfaces such as those used by the scheduler to run filter, port monitor, and backend processes for job processing should only be considered stable from the point of view of a filter, port monitor, or backend. Software that simulates the scheduler in order to run those programs outside of CUPS must necessarily be updated when the corresponding interface is changed in a subsequent CUPS release, otherwise undefined behavior can occur.</P>
+
+<P>CUPS C APIs starting with an underscore (_) are considered to be private to CUPS and are not subject to the normal guarantees of stability between CUPS releases and must <em>never</em> be used in non-CUPS source code. Similarly, configuration and state files written by CUPS are considered private if a corresponding man page is not provided with the CUPS release. <em>Never</em> rely on undocumented files or formats when developing software for CUPS. <em>Always</em> use a published C API to access data stored in a file to avoid compatibility problems in the future.</P>
+
+
+<H2 CLASS="title"><A NAME="COMMUNICATION">Communication</A></H2>
+
+<H3><A NAME="CONTACT">How to Contact the Developers</A></H3>
+
+<P>The <A HREF="https://www.cups.org/lists.php">CUPS.org mailing lists</A> are the primary means of asking questions and informally discussing issues and feature requests with the CUPS developers and other experienced CUPS users and developers. The <a href="https://www.cups.org/mailman/listinfo/cups">cups&#x40;cups.org</a> mailing list is intended for CUPS usage questions and new software announcements while the <a href="https://www.cups.org/mailman/listinfo/cups-devel">cups-devel&#x40;cups.org</a> mailing list provides a forum for CUPS developers and monitoring new bugs.</p>
+
+
+<H3><A NAME="SUBMIT">How to Submit a Bug Report or Feature Request</A></H3>
+
+<P>The CUPS.org <A HREF="https://www.cups.org/str.php">Bugs</A> page provides access to the CUPS <em>Software Trouble Report</em> (STR) database and is the formal way to submit a bug report or feature request to the CUPS developers. Please note, however, that we <em>do not</em> provide answers to usage questions or resolve problems in third-party software on this page - use the <A HREF="#CONTACT">CUPS.org mailing lists</A> for that instead.</P>
+
+<P>Unlike discussions that occur on the CUPS.org mailing lists, formal bug reports and feature requests must be acted on by the CUPS developers. This does not mean that every bug report is resolved or every feature request is implemented, but we do respond and keep track of them all for posterity.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>Please use the search feature of the Bugs page before submitting a new bug report or feature request. If you see an existing report that matches your issue, please post a message to that report ("I have this issue as well", "I would also like to see", etc.) rather than submitting a new report. This helps speed the resolution of your issue by reducing the CUPS developers' work load and identifying popular issues.</P></BLOCKQUOTE>
+
+
+<H3><A NAME="PATCH">How to Prepare a Patch</A></H3>
+
+<P>When submitting a bug report or feature request, you can include patch files that resolve the bug or implement the feature to speed the inclusion of that bug fix or feature in a new CUPS release. For changes to existing files, we prefer a unified diff against the current GIT "master" branch, which can be generated easily using the following Git command:</P>
+
+<PRE CLASS="command">
+git format-patch remotes/trunk >filename.patch
+</PRE>
+
+<P>If you produce a patch using a released source archive, use one of the following commands instead:</P>
+
+<PRE CLASS="command">
+diff -u oldfilename filename >filename.patch
+
+diff -urN olddirectory directory >filename.patch
+</PRE>
+
+<P>New files and files with significant changes can be submitted in their entirety, however that may delay the adoption of your changes.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>Patches and files must conform to the standards outlined in the "<A HREF="#CODING">Coding Guidelines</A>" and "<A HREF="#MAKEFILES">Makefile Guidelines</A>" sections in this document. In addition, since Apple Inc. provides CUPS under multiple licenses, we require that you <A HREF="https://www.cups.org/AppleContributorAgreement_2011-03-10.pdf">license</A> significant changes and files to us for inclusion in CUPS. The CUPS developers will inform you if licensing is required.</P></BLOCKQUOTE>
+
+
+<H2 CLASS="title"><A NAME="PRACTICES">Software Development Practices</A></H2>
+
+<H3><A NAME="VERSIONS">Version Numbering</A></H3>
+
+<P>CUPS uses a three-part version number separated by periods to represent the major, minor, and patch release numbers. Major release numbers indicate large design changes or backwards-incompatible changes to the CUPS API or CUPS Imaging API. Minor release numbers indicate new features and other smaller changes which are backwards-compatible with previous CUPS releases. Patch numbers indicate bug fixes to the previous feature release.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>When we talk about compatibility, we are talking about binary compatibility for public APIs and output format compatibility for program interfaces. Changes to configuration file formats or the default behavior of programs are not generally considered incompatible as the upgrade process can normally address such changes gracefully.</P></BLOCKQUOTE>
+
+<P>Production releases use the plain version numbers:</P>
+
+<PRE CLASS="command">
+MAJOR.MINOR.PATCH
+1.0.0
+1.0.1
+1.0.2
+...
+1.1.0
+...
+1.1.23
+1.2.0
+1.2.1
+...
+1.3.0
+...
+2.0.0
+</PRE>
+
+<P>The first production release in a MAJOR.MINOR series (MAJOR.MINOR.0) is called a feature release. Feature releases are the only releases that may contain new features. Subsequent production releases in a MAJOR.MINOR series may only contain bug fixes.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>We did not hold to this limitation in the CUPS 1.1 series for a variety of reasons. Starting with CUPS 1.2, the "no new features in a patch release" policy has been strictly enforced. The policy has also resulted in fewer new features (and interactions!) to validate/test in the subsequence feature releases.</P></BLOCKQUOTE>
+
+<P>Beta-test releases are identified by appending the letter B to the major and minor version numbers followed by the beta release number:</P>
+
+<PRE CLASS="command">
+MAJOR.MINORbNUMBER
+1.2b1
+</PRE>
+
+<P>Release candidates are identified by appending the letters RC to the major and minor version numbers followed by the release candidate number:</P>
+
+<PRE CLASS="command">
+MAJOR.MINORrcNUMBER
+1.2rc1
+</PRE>
+
+<P>Developer snapshots are identified by appending the letters SVN-R to the major and minor version numbers followed by the revision number:</P>
+
+<PRE CLASS="command">
+MAJOR.MINORsvn-rREV
+1.2svn-r1234
+</PRE>
+
+<P>Beta-test releases, release candidates, and developer snapshots are only created for new minor releases. Once a production release has been made (MAJOR.MINOR.0), subsequent patch releases are issued without preliminary beta or release testing.</P>
+
+<H3>Version Control (Subversion)</H3>
+
+<P>The CUPS source files are managed by the Subversion ("SVN") software, available at:</P>
+
+<PRE CLASS="command">
+<A HREF="http://subversion.apache.org/" TARGET="_blank">subversion.apache.org</A>
+</PRE>
+
+<p>A public read-only Git mirror is maintained for external developers. Details can be found on the CUPS.org <a href="https://www.cups.org/software.php">Software</a> page.</P>
+
+<P>Source files are "checked in" with each change so that modifications can be tracked, and each checkin must reference any applicable STRs. The following format <em>must</em> be used for commit log messages:</P>
+
+<PRE CLASS="command">
+Summary of the change on one line followed by bug number (STR #NNNN)
+
+Detailed list of changes.
+</PRE>
+
+<P>Primary development occurs on the <var>trunk</var> branch, with changes merged back to release branches as needed.</P>
+
+<P>The branch for a MAJOR.MINOR release are created when the first production release (MAJOR.MINOR.0) is made using the name "branch-MAJOR.MINOR". Release tags are created for every beta, candidate, and production release using the name "release-MAJOR.MINORbNUMBER", "release-MAJOR.MINORrcNUMBER", or "release-MAJOR.MINOR.PATCH", respectively. No release tags are created for developer snapshots.</P>
+
+
+<H3>Files and Directories</H3>
+
+<P>File and directory names may not exceed 16 characters in length to ensure compatibility with older UNIX filesystems. In addition, to avoid problems with case-insensitive filesystems, you may not use names which differ only by case, for example "ReadMe" and "README" are not allowed in the same directory.</P>
+
+<P>Source files must be documented and formatted as described in "<A HREF="#CODING">Coding Requirements</A>". Makefiles must follow the guidelines in "<A HREF="#MAKEFILE">Makefile Guidelines</A>".</P>
+
+
+<H3>Build System</H3>
+
+<P>The CUPS build system uses <A HREF="http://www.gnu.org/software/autoconf/">GNU autoconf</A> to tailor the library to the local operating system. Project files for the current release of Microsoft Visual Studio are also provided for Microsoft Windows<SUP>&reg;</SUP>. To improve portability, makefiles must not make use of features unique to <A HREF="http://www.gnu.org/software/make/">GNU make</A>. See the <A HREF="#MAKEFILES">Makefile Guidelines</A> section for a description of the allowed make features and makefile guidelines.</P>
+
+<P>Additional GNU build programs such as <A HREF="http://www.gnu.org/software/automake">GNU automake</A> and <A HREF="http://www.gnu.org/software/libtool">GNU libtool</A> must not be used. GNU automake produces non-portable makefiles which depend on GNU-specific extensions, and GNU libtool is not portable or reliable enough for CUPS.</P>
+
+
+<H3><A NAME="PACKAGING">Packaging</A></H3>
+
+<P>Source packages are created using the <VAR>tools/makesrcdist</VAR> script in the Subversion repository. The script optionally uses a version number argument:</P>
+
+<PRE CLASS="command">
+tools/makesrcdist
+tools/makesrcdist <I>version</I>
+</PRE>
+
+<P>When run with no arguments, the script creates a snapshot of the current working copy and names it using the highest revision number in the WC, for example "/tmp/cups-1.3svn-r1234-source.tar.bz2" and "/tmp/cups-1.3svn-r1234-source.tar.gz". When run with two arguments, the script creates a release tag in the repository and exports that tag, creating the files
+"/tmp/cups-<I>version</I>-source.tar.bz2" and "/tmp/cups-<I>version</I>-source.tar.gz".</P>
+
+<P>Binary packages are not generally distributed by the CUPS team, however the <VAR>packaging/cups.spec</VAR> and <VAR>packaging/cups.list</VAR> files may be used to create binary packages on Linux, OS X, and UNIX. The <VAR>packaging/cups.spec</VAR> file produces a binary package using the <CODE>rpmbuild(8)</CODE> software:</P>
+
+<PRE CLASS="command">
+rpmbuild -ta cups-<I>version</I>-source.tar.gz
+</PRE>
+
+<P>The <VAR>cups.list</VAR> file is generated by the <VAR>configure</VAR> script and produces binary packages for many platforms using the <A HREF="https://www.msweet.org/projects.php?Z2" TARGET="_blank">EPM</A> software. Table 3 shows the targets that are available for each type of binary package:</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="Binary Package Targets">
+<CAPTION>Table 3: Binary Package Targets</CAPTION>
+<TR>
+	<TH>Target</TH>
+	<TH>Type of Package</TH>
+</TR>
+<TR>
+	<TD>bsd</TD>
+	<TD>*BSD pkg_install</TD>
+</TR>
+<TR>
+	<TD>deb</TD>
+	<TD>Debian dpkg</TD>
+</TR>
+<TR>
+	<TD>epm</TD>
+	<TD>Portable tarball with install script</TD>
+</TR>
+<TR>
+	<TD>pkg</TD>
+	<TD>Solaris pkgadd</TD>
+</TR>
+<TR>
+	<TD>rpm</TD>
+	<TD>RPM binary</TD>
+</TR>
+<TR>
+	<TD>slackware</TD>
+	<TD>Slackware install</TD>
+</TR>
+</TABLE></DIV>
+
+<P>Finally, the <VAR>tools/testrpm</VAR> and <VAR>tools/testosx</VAR> scripts can be used to create binary packages from the current working copy for testing on Linux and OS X, respectively:</P>
+
+<PRE CLASS="command">
+tools/testrpm
+sudo rpm -U /usr/src/redhat/RPMS/{arm,i386,x64_64}/cups*.rpm
+
+sudo tools/testosx
+open cups.pkg
+</PRE>
+
+
+<H3><A NAME="TESTING">Testing</A></H3>
+
+<P>Software testing is conducted according to the <A HREF="spec-stp.html">CUPS Software Test Plan</A>. This testing is automated via the top-level makefile <VAR>test</VAR> target:</P>
+
+<PRE CLASS="command">
+make test
+</PRE>
+
+<P>The test environment allows for both short-term automated testing and long-term testing and development without the automated test script.</P>
+
+
+<H2 CLASS="title"><A NAME="STR">Trouble Report Processing</A></H2>
+
+<P>A Software Trouble Report ("STR") must be submitted every time a user or vendor experiences a problem with the CUPS software. Trouble reports are maintained on the <A HREF="https://www.cups.org/str.php" TARGET="_blank">Bugs</A> page with one of the following states:</P>
+
+<OL>
+
+	<LI>STR is closed with complete resolution</LI>
+
+	<LI>STR is closed without resolution</LI>
+
+	<LI>STR is active, waiting on information from submitter</LI>
+
+	<LI>STR is pending with additional information from submitter</LI>
+
+	<LI>STR is newly submitted</LI>
+
+</OL>
+
+<P>Trouble reports are processed using the following steps.</P>
+
+<H3>1. Classification</H3>
+
+<P>When a trouble report is received it must be classified at one of the following priority levels:</P>
+
+<OL>
+
+	<LI>Request for enhancement, e.g. asking for a feature
+
+	<LI>Low, e.g. a documentation error or undocumented side-effect
+
+	<LI>Moderate, e.g. unable to print a file or unable to compile the software
+
+	<LI>High, e.g. unable to print to a printer or key functionality not working
+
+	<LI>Critical, e.g. unable to print at all
+
+</OL>
+
+<P>Level 4 and 5 trouble reports must be resolved in the next software release. Level 2 and 3 trouble reports are scheduled for resolution in a specific release at the discretion of the release coordinator. Level 1 trouble reports are scheduled for resolution in a future feature release.</P>
+
+<P>The scope of the problem is also determined as:</P>
+
+<OL>
+
+	<LI>Specific to a machine or printer
+
+	<LI>Specific to an operating system
+
+	<LI>Applies to all machines, printers, and operating systems
+
+</OL>
+
+<H3>2. Identification</H3>
+
+<P>Once the level and scope of the trouble report is determined the software sub-system(s) involved with the problem are determined. This may involve additional communication with the user or vendor to isolate the problem to a specific cause.</P>
+
+<P>When the sub-system(s) involved have been identified, an engineer will then determine the change(s) needed and estimate the time required for the change(s).</P>
+
+<H3>3. Correction</H3>
+
+<P>Corrections are scheduled based upon the severity and complexity of the problem. Once all changes have been made, documented, and tested successfully a new software release snapshot is generated. Additional tests are added as necessary for proper testing of the changes.</P>
+
+<H3>4. Notification</H3>
+
+<P>The user or vendor is notified when the fix is available or if the problem was caused by user error.</P>
+
+
+<H2 CLASS="title"><A NAME="RELEASES">Release Management</A></H2>
+
+<P>When testing has been completed successfully, a new source package is created using the <VAR>tools/makesrcdist</VAR> script. Three types of releases - beta, candidate, and production - are created and released to the public using the basic schedule in Table 4. At least one beta and one release candidate must be created prior to a production release, and there must be at least two weeks between the last beta and first candidate and last candidate and first production release.</P>
+
+<DIV CLASS="table"><TABLE SUMMARY="CUPS Basic Release Schedule">
+<CAPTION>Table: CUPS Basic Release Schedule</CAPTION>
+<TR>
+	<TH>Week</TH>
+	<TH>Version</TH>
+	<TH>Description</TH>
+</TR>
+<TR>
+	<TD>T-6 weeks</TD>
+	<TD>1.2b1</TD>
+	<TD>First beta release</TD>
+</TR>
+<TR>
+	<TD>T-5 weeks</TD>
+	<TD>1.2b2</TD>
+	<TD>Second beta release</TD>
+</TR>
+<TR>
+	<TD>T-3 weeks</TD>
+	<TD>1.2rc1</TD>
+	<TD>First release candidate</TD>
+</TR>
+<TR>
+	<TD>T-2 weeks</TD>
+	<TD>1.2rc2</TD>
+	<TD>Second release candidate</TD>
+</TR>
+<TR>
+	<TD>T-0 weeks</TD>
+	<TD>1.2.0</TD>
+	<TD>Production (feature) release</TD>
+</TR>
+</TABLE></DIV>
+
+
+<H2 CLASS="title"><A NAME="CODING">Coding Guidelines</A></H2>
+
+<P>These coding guidelines provide detailed information on source file formatting and documentation content and must be applied to all C and C++ source files provided with CUPS. Source code for other languages should conform to these guidelines as allowed by the language.</P>
+
+
+<H3>Source Files</H3>
+
+<P>All source files names must be 16 characters or less in length to ensure compatibility with older UNIX filesystems. Source files containing functions have an extension of ".c" for ANSI C and ".cxx" for C++ source files. All other "include" files have an extension of ".h". Tabs are set to 8 characters.</P>
+
+<BLOCKQUOTE><B>Note:</B>
+
+<P>The ".cxx" extension is used because it is the only common C++ extension between Linux, OS X, UNIX, and Windows.</P></BLOCKQUOTE>
+
+<P>The top of each source file contains a header giving the name of the file, the purpose or nature of the source file, and the copyright and licensing notice.  The file name and revision information is provided by the Subversion "&#36;Id$" tag:</P>
+
+<PRE CLASS="command">
+/*
+ * "&#36;Id$"
+ *
+ * Description of file contents.
+ *
+ * Copyright 2013 by Apple Inc.
+ *
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
+ */
+</PRE>
+
+<P>For source files that are subject to the Apple OS-Developed Software exception, the following additional comment appears after the contact information:</P>
+
+<PRE CLASS="command">
+ * This file is subject to the Apple OS-Developed Software exception.
+</PRE>
+
+<P>The bottom of each source file contains a trailer giving the name of the file using the Subversion "&#36;Id$" tag. The primary purpose of this is to mark the end of a source file; if the trailer is missing it is possible that code has been lost near the end of the file:</P>
+
+<PRE CLASS="command">
+/*
+ * End of "&#36;Id$".
+ */
+</PRE>
+
+
+<H3>Header Files</H3>
+
+<P>All public header files must include the <var>versioning.h</var> header file, or a header that does so. Function declarations are then "decorated" with the correct <tt>_CUPS_API_major_minor</tt> macro to define its availability based on the build environment, for example:</p>
+
+<PRE CLASS="command">
+extern int cupsDoThis(int foo, int bar) _CUPS_API_2_0;
+</PRE>
+
+<P>Private API header files must be named with the suffix "-private", for example the <var>cups.h</var> header file defines all of the public CUPS APIs while the <var>cups-private.h</var> header file defines all of the private CUPS APIs as well. Typically a private API header file will include the corresponding public API header file.</P>
+
+
+<H3>Comments</H3>
+
+<P>All source code utilizes block comments within functions to describe the operations being performed by a group of statements; avoid putting a comment per line unless absolutely necessary, and then consider refactoring the code so that it is not necessary.  C source files use the block comment format ("/* comment */") since many vendor C compilers still do not support C99/C++ comments ("// comment"):</P>
+
+<PRE CLASS="command">
+ /*
+  * Clear the state array before we begin...
+  */
+
+  for (i = 0; i &lt; (sizeof(array) / sizeof(sizeof(array[0])); i ++)
+    array[i] = CUPS_STATE_IDLE;
+
+ /*
+  * Wait for state changes on another thread...
+  */
+
+  do
+  {
+    for (i = 0; i &lt; (sizeof(array) / sizeof(sizeof(array[0])); i ++)
+      if (array[i] != CUPS_STATE_IDLE)
+        break;
+
+    if (i == (sizeof(array) / sizeof(array[0])))
+      sleep(1);
+  } while (i == (sizeof(array) / sizeof(array[0])));
+</PRE>
+
+<H3>Indentation</H3>
+
+<P>All code blocks enclosed by brackets begin with the opening brace on a new line. The code then follows starting on a new line after the brace and is indented 2 spaces. The closing brace is then placed on a new line following the code at the original indentation:</P>
+
+<PRE CLASS="command">
+{
+  int i; /* Looping var */
+
+
+ /*
+  * Process foobar values from 0 to 999...
+  */
+
+  for (i = 0; i &lt; 1000; i ++)
+  {
+    do_this(i);
+    do_that(i);
+  }
+}
+</PRE>
+
+<P>Single-line statements following "do", "else", "for", "if", and "while" are indented 2 spaces as well. Blocks of code in a "switch" block are indented 4 spaces after each "case" and "default" case:</P>
+
+<PRE CLASS="command">
+switch (array[i])
+{
+  case CUPS_STATE_IDLE :
+      do_this(i);
+      do_that(i);
+      break;
+  default :
+      do_nothing(i);
+      break;
+}
+</PRE>
+
+
+<H3>Spacing</H3>
+
+<P>A space follows each reserved word such as "if", "while", etc. Spaces are not inserted between a function name and the arguments in parenthesis.</P>
+
+
+<H3>Return Values</H3>
+
+<P>Parenthesis surround values returned from a function:</P>
+
+<PRE CLASS="command">
+return (CUPS_STATE_IDLE);
+</PRE>
+
+
+<H3>Functions</H3>
+
+<P>Functions with a global scope have a lowercase prefix followed by capitalized words, e.g., "cupsDoThis", "cupsDoThat", "cupsDoSomethingElse", etc. Private global functions begin with a leading underscore, e.g., "_cupsDoThis", "_cupsDoThat", etc.</P>
+
+<P>Functions with a local scope are declared "static" with lowercase names and underscores between words, e.g., "do_this", "do_that", "do_something_else", etc.</P>
+
+<P>Each function begins with a comment header describing what the function does, the possible input limits (if any), and the possible output values (if any), and any special information needed:</P>
+
+<PRE CLASS="command">
+/*
+ * 'do_this()' - Compute y = this(x).
+ *
+ * Notes: none.
+ */
+
+static float                            /* O - Inverse power value, 0.0 &lt;= y &lt;= 1.1 */
+do_this(float x)                        /* I - Power value (0.0 &lt;= x &lt;= 1.1) */
+{
+  ...
+  return (y);
+}
+</PRE>
+
+<P>Return/output values are indicated using an "O" prefix, input values are indicated using the "I" prefix, and values that are both input and output use the "IO" prefix for the corresponding in-line comment.</P>
+
+<P>The Mini-XML documentation generator also understands the following special text in the function description comment:</P>
+
+<UL>
+
+	<LI><CODE>@deprecated@</CODE> - Marks the function as deprecated (not recommended for new development and scheduled for removal)</LI>
+
+	<LI><CODE>@since CUPS <I>version</I>@</CODE> - Marks the function as new in the specified version of CUPS.</LI>
+
+	<LI><CODE>@private@</CODE> - Marks the function as private (same as starting the function name with an underscore)</LI>
+
+</UL>
+
+
+<H3>Variables</H3>
+
+<P>Variables with a global scope are capitalized, e.g., "ThisVariable", "ThatVariable", "ThisStateVariable", etc. Globals in CUPS libraries are either part of the per-thread global values managed by the "_cupsGlobals()" function or are suitably protected for concurrent access. Global variables should be replaced by function arguments whenever possible.</P>
+
+<P>Variables with a local scope are lowercase with underscores between words, e.g., "this_variable", "that_variable", etc. Any "local global" variables shared by functions within a source file are declared "static". As for global variables, local static variables are suitably protected for concurrent access.</P>
+
+<P>Each variable is declared on a separate line and is immediately followed by a comment block describing the variable:</P>
+
+<PRE CLASS="command">
+int         ThisVariable;    /* The current state of this */
+static int  that_variable;   /* The current state of that */
+</PRE>
+
+
+<H3>Types</H3>
+
+<P>All type names are lowercase with underscores between words and "_t" appended to the end of the name, e.g., "cups_this_type_t", "cups_that_type_t", etc. Type names start with a prefix, typically "cups" or the name of the program, to avoid conflicts with system types. Private type names start with an underscore, e.g., "_cups_this_t", "_cups_that_t", etc.</P>
+
+<P>Each type has a comment block immediately after the typedef:</P>
+
+<PRE CLASS="command">
+typedef int cups_this_type_t;       /* This type is for CUPS foobar options. */
+</PRE>
+
+
+<H3>Structures</H3>
+
+<P>All structure names are lowercase with underscores between words and "_s" appended to the end of the name, e.g., "cups_this_s", "cups_that_s", etc. Structure names start with a prefix, typically "cups" or the name of the program, to avoid conflicts with system types. Private structure names start with an underscore, e.g., "_cups_this_s", "_cups_that_s", etc.</P>
+
+<P>Each structure has a comment block immediately after the struct and each member is documented similar to the variable naming policy above:</P>
+
+<PRE CLASS="command">
+struct cups_this_struct_s     /* This structure is for CUPS foobar options. */
+{
+  int this_member;            /* Current state for this */
+  int that_member;            /* Current state for that */
+};
+</PRE>
+
+
+<H3>Constants</H3>
+
+<P>All constant names are uppercase with underscores between words, e.g., "CUPS_THIS_CONSTANT", "CUPS_THAT_CONSTANT", etc. Constants begin with an uppercase prefix, typically "CUPS" or the program name. Private constants start with an underscore, e.g., "_CUPS_THIS_CONSTANT", "_CUPS_THAT_CONSTANT", etc.</P>
+
+<P>Typed enumerations should be used whenever possible to allow for type checking by the compiler.</P>
+
+<P>Comment blocks immediately follow each constant:</P>
+
+<PRE CLASS="command">
+enum
+{
+  CUPS_THIS_TRAY,                       /* This tray */
+  CUPS_THAT_TRAY                        /* That tray */
+};
+</PRE>
+
+
+<H2 CLASS="title"><A NAME="MAKEFILES">Makefile Guidelines</A></H2>
+
+<P>The following is a guide to the makefile-based build system used by CUPS. These standards have been developed over the years to allow CUPS to be built on as many systems and environments as possible.</P>
+
+
+<H3>General Organization</H3>
+
+<P>The CUPS source code is organized functionally into a top-level makefile, include file, and subdirectories each with their own makefile and dependencies files. The ".in" files are template files for the <CODE>autoconf</CODE> software and are used to generate a static version of the corresponding file.</P>
+
+
+<H3>Makefile Documentation</H3>
+
+<P>Each makefile starts with the standard CUPS header containing the Subversion "&#36;Id$" keyword, description of the file, and CUPS copyright and license notice:</P>
+
+<PRE CLASS="command">
+#
+# "&#36;Id$"
+#
+# Makefile for ...
+#
+# Copyright 2013 by Apple Inc.
+#
+# These coded instructions, statements, and computer programs are the
+# property of Apple Inc. and are protected by Federal copyright
+# law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+# which should have been included with this file.  If this file is
+# file is missing or damaged, see the license at "http://www.cups.org/".
+#
+</PRE>
+
+<P>The end of each makefile has a comment saying:</P>
+
+<PRE CLASS="command">
+#
+# End of "&#36;Id$".
+#
+</PRE>
+
+<P>The purpose of the trailer is to indicate the end of the makefile so that truncations are immediately obvious.</P>
+
+
+<H3>Portable Makefile Construction</H3>
+
+<P>CUPS uses a common subset of make program syntax to ensure that the software can be compiled "out of the box" on as many systems as possible. The following is a list of assumptions we follow when constructing makefiles:</P>
+
+<UL>
+
+	<LI><b>Targets</b>; we assume that the make program supports the notion of simple targets of the form "name:" that perform tab-indented commands that follow the target, e.g.:
+	<PRE CLASS="command">
+target:
+&rarr; target commands</PRE></LI>
+
+	<LI><b>Dependencies</b>; we assume that the make program supports recursive dependencies on targets, e.g.:
+	<PRE CLASS="command">
+target: foo bar
+&rarr; target commands
+
+foo: bla
+&rarr; foo commands
+
+bar:
+&rarr; bar commands
+
+bla:
+&rarr; bla commands</PRE></LI>
+
+	<LI><b>Variable Definition</b>; we assume that the make program supports variable definition on the command-line or in the makefile using the following form:
+	<PRE CLASS="command">
+name=value</PRE>
+
+	<LI><b>Variable Substitution</b>; we assume that the make program supports variable substitution using the following forms:
+	<UL>
+		<LI><CODE>$(name)</CODE>; substitutes the value of "name",</LI>
+		<LI><CODE>($name:.old=.new)</CODE>; substitutes the value of "name" 	with the filename extension ".old" changed to ".new",</LI>
+		<LI><CODE>$(MAKEFLAGS)</CODE>; substitutes the command-line options passed to the program without the leading hyphen (-),</LI>
+		<LI><CODE>$$</CODE>; substitutes a single <CODE>$</CODE> character,</LI>
+		<LI><CODE>$&lt;</CODE>; substitutes the current source file or dependency, and</LI>
+		<LI><CODE>$@</CODE>; substitutes the current target name.</LI>
+	</UL></LI>
+
+	<LI><b>Suffixes</b>; we assume that the make program supports filename suffixes with assumed dependencies, e.g.:
+	<PRE CLASS="command">
+.SUFFIXES: .c .o
+.c.o:
+&rarr; $(CC) $(CFLAGS) -o $@ -c $&lt;</PRE></LI>
+
+	<LI><b>Include Files</b>; we assume that the make program
+	supports the <CODE>include</CODE> directive, e.g.:
+	<PRE CLASS="command">
+include ../Makedefs
+include Dependencies</PRE></LI>
+
+	<LI><b>Comments</b>; we assume that comments begin with a <CODE>#</CODE> character and proceed to the end of the current line.</LI>
+
+	<LI><b>Line Length</b>; we assume that there is no practical limit to the length of lines.</LI>
+
+	<LI><b>Continuation of long lines</b>; we assume that the <CODE>\</CODE> character may be placed at the end of a line to concatenate two or more lines in a makefile to form a single long line.</LI>
+
+	<LI><b>Shell</b>; we assume a POSIX-compatible shell is present on the build system.</LI>
+
+</UL>
+
+
+<H3>Standard Variables</H3>
+
+<P>The following variables are defined in the "Makedefs" file generated by the <CODE>autoconf</CODE> software:</P>
+
+<UL>
+
+	<LI><CODE>ALL_CFLAGS</CODE>; the combined C compiler options,</LI>
+
+	<LI><CODE>ALL_CXXFLAGS</CODE>; the combined C++ compiler options,</LI>
+
+	<LI><CODE>AMANDIR</CODE>; the administrative man page installation directory (section 8/1m depending on the platform),</LI>
+
+	<LI><CODE>AR</CODE>; the library archiver command,</LI>
+
+	<LI><CODE>ARFLAGS</CODE>; options for the library archiver command,</LI>
+
+	<LI><CODE>AWK</CODE>; the local awk command,</LI>
+
+	<LI><CODE>BINDIR</CODE>; the binary installation directory,</LI>
+
+	<LI><CODE>BUILDROOT</CODE>; optional installation prefix (defaults to DSTROOT),</LI>
+
+	<LI><CODE>CC</CODE>; the C compiler command,</LI>
+
+	<LI><CODE>CFLAGS</CODE>; options for the C compiler command,</LI>
+
+	<LI><CODE>CHMOD</CODE>; the chmod command,</LI>
+
+	<LI><CODE>CXX</CODE>; the C++ compiler command,</LI>
+
+	<LI><CODE>CXXFLAGS</CODE>; options for the C++ compiler command,</LI>
+
+	<LI><CODE>DATADIR</CODE>; the data file installation directory,</LI>
+
+	<LI><CODE>DSO</CODE>; the C shared library building command,</LI>
+
+	<LI><CODE>DSOXX</CODE>; the C++ shared library building command,</LI>
+
+	<LI><CODE>DSOFLAGS</CODE>; options for the shared library building command,</LI>
+
+	<LI><CODE>INCLUDEDIR</CODE>; the public header file installation directory,</LI>
+
+	<LI><CODE>INSTALL</CODE>; the <CODE>install</CODE> command,</LI>
+
+	<LI><CODE>INSTALL_BIN</CODE>; the program installation command,</LI>
+
+	<LI><CODE>INSTALL_COMPDATA</CODE>; the compressed data file installation command,</LI>
+
+	<LI><CODE>INSTALL_CONFIG</CODE>; the configuration file installation command,</LI>
+
+	<LI><CODE>INSTALL_DATA</CODE>; the data file installation command,</LI>
+
+	<LI><CODE>INSTALL_DIR</CODE>; the directory installation command,</LI>
+
+	<LI><CODE>INSTALL_LIB</CODE>; the library installation command,</LI>
+
+	<LI><CODE>INSTALL_MAN</CODE>; the documentation installation command,</LI>
+
+	<LI><CODE>INSTALL_SCRIPT</CODE>; the shell script installation command,</LI>
+
+	<LI><CODE>LD</CODE>; the linker command,</LI>
+
+	<LI><CODE>LDFLAGS</CODE>; options for the linker,</LI>
+
+	<LI><CODE>LIBDIR</CODE>; the library installation directory,</LI>
+
+	<LI><CODE>LIBS</CODE>; libraries for all programs,</LI>
+
+	<LI><CODE>LN</CODE>; the <CODE>ln</CODE> command,</LI>
+
+	<LI><CODE>MAN1EXT</CODE>; extension for man pages in section 1,</LI>
+
+	<LI><CODE>MAN3EXT</CODE>; extension for man pages in section 3,</LI>
+
+	<LI><CODE>MAN5EXT</CODE>; extension for man pages in section 5,</LI>
+
+	<LI><CODE>MAN7EXT</CODE>; extension for man pages in section 7,</LI>
+
+	<LI><CODE>MAN8DIR</CODE>; subdirectory for man pages in section 8,</LI>
+
+	<LI><CODE>MAN8EXT</CODE>; extension for man pages in section 8,</LI>
+
+	<LI><CODE>MANDIR</CODE>; the man page installation directory,</LI>
+
+	<LI><CODE>OPTIM</CODE>; common compiler optimization options,</LI>
+
+	<LI><CODE>PRIVATEINCLUDE</CODE>; the private header file installation directory,</LI>
+
+	<LI><CODE>RM</CODE>; the <CODE>rm</CODE> command,</LI>
+
+	<LI><CODE>SHELL</CODE>; the <CODE>sh</CODE> (POSIX shell) command,</LI>
+
+	<LI><CODE>STRIP</CODE>; the <CODE>strip</CODE> command,</LI>
+
+	<LI><CODE>srcdir</CODE>; the source directory.</LI>
+
+</UL>
+
+
+<H3>Standard Targets</H3>
+
+<P>The following standard targets are defined in each makefile:</P>
+
+<UL>
+
+	<LI><CODE>all</CODE>; creates all target programs, libraries, and documentation files,</LI>
+
+	<LI><CODE>clean</CODE>; removes all target programs libraries, documentation files, and object files,</LI>
+
+	<LI><CODE>depend</CODE>; generates automatic dependencies for any C or C++ source files (also see <A HREF="#DEPEND_TARGET">"Dependencies"</A>),</LI>
+
+	<LI><CODE>distclean</CODE>; removes autoconf-generated files in addition to those removed by the "clean" target,</LI>
+
+	<LI><CODE>install</CODE>; installs all distribution files in their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>),</LI>
+
+	<LI><CODE>install-data</CODE>; installs all data files in their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>),</LI>
+
+	<LI><CODE>install-exec</CODE>; installs all executable files in their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>),</LI>
+
+	<LI><CODE>install-headers</CODE>; installs all include files in their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>),</LI>
+
+	<LI><CODE>install-libs</CODE>; installs all library files in their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>),</LI>
+
+	<LI><CODE>uninstall</CODE>; removes all distribution files from their corresponding locations (also see <A HREF="#INSTALL_TARGET">"Install/Uninstall Support"</A>), and</LI>
+
+</UL>
+
+
+<H3>Object Files</H3>
+
+<P>Object files (the result of compiling a C or C++ source file) have the extension ".o".</P>
+
+
+<H3>Programs</H3>
+
+<P>Program files are the result of linking object files and libraries together to form an executable file. A typical program target looks like:</P>
+
+<PRE CLASS="command">
+program: $(OBJS)
+&rarr; echo Linking $@...
+&rarr; $(CC) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+</PRE>
+
+
+<H3>Static Libraries</H3>
+
+<P>Static libraries have a prefix of "lib" and the extension ".a". A typical static library target looks like:</P>
+
+<PRE CLASS="command">
+libname.a: $(OBJECTS)
+&rarr; echo Creating $@...
+&rarr; $(RM) $@
+&rarr; $(AR) $(ARFLAGS) $@ $(OBJECTS)
+&rarr; $(RANLIB) $@
+</PRE>
+
+
+<H3>Shared Libraries</H3>
+
+<P>Shared libraries have a prefix of "lib" and the extension ".dylib" or ".so" depending on the operating system. A typical shared library is composed of several targets that look like:</P>
+
+<PRE CLASS="command">
+libname.so: $(OBJECTS)
+&rarr; echo $(DSOCOMMAND) libname.so.$(DSOVERSION) ...
+&rarr; $(DSOCOMMAND) libname.so.$(DSOVERSION) $(OBJECTS)
+&rarr; $(RM) libname.so libname.so.$(DSOMAJOR)
+&rarr; $(LN) libname.so.$(DSOVERSION) libname.so.$(DSOMAJOR)
+&rarr; $(LN) libname.so.$(DSOVERSION) libname.so
+
+libname.dylib: $(OBJECTS)
+&rarr; echo $(DSOCOMMAND) libname.$(DSOVERSION).dylib ...
+&rarr; $(DSOCOMMAND) libname.$(DSOVERSION).dylib \
+&rarr; &rarr; -install_name $(libdir)/libname.$(DSOMAJOR).dylib \
+&rarr; &rarr; -current_version libname.$(DSOVERSION).dylib \
+&rarr; &rarr; -compatibility_version $(DSOMAJOR).0 \
+&rarr; &rarr; $(OBJECTS) $(LIBS)
+&rarr; $(RM) libname.dylib
+&rarr; $(RM) libname.$(DSOMAJOR).dylib
+&rarr; $(LN) libname.$(DSOVERSION).dylib libname.$(DSOMAJOR).dylib
+&rarr; $(LN) libname.$(DSOVERSION).dylib libname.dylib
+</PRE>
+
+
+<H3>Dependencies</H3>
+
+<P>Static dependencies are expressed in each makefile following the target, for example:</P>
+
+<PRE CLASS="command">
+foo: bar
+</PRE>
+
+<P>Static dependencies are only used when it is not possible to automatically generate them. Automatic dependencies are stored in a file named "Dependencies" and included at the end of the makefile. The following "depend" target rule is used to create the automatic dependencies:
+
+<PRE CLASS="command">
+depend:
+&rarr; $(CC) -MM $(ALL_CFLAGS) $(OBJS:.o=.c) >Dependencies
+</PRE>
+
+<P>We regenerate the automatic dependencies on an OS X system and express any non-OS X dependencies statically in the makefile.</P>
+
+
+<H3><A NAME="TARGET_INSTALL">Install/Uninstall Support</A></H3>
+
+<P>All makefiles contains install and uninstall rules which install or remove the corresponding software. These rules must use the <CODE>$(BUILDROOT)</CODE> variable as a prefix to any installation directory so that CUPS can be installed in a temporary location for packaging by programs like <CODE>rpmbuild</CODE>.</P>
+
+<P>The <CODE>$(INSTALL_BIN)</CODE>, <CODE>$(INSTALL_COMPDATA)</CODE>, <CODE>$(INSTALL_CONFIG)</CODE>, <CODE>$(INSTALL_DATA)</CODE>, <CODE>$(INSTALL_DIR)</CODE>, <CODE>$(INSTALL_LIB)</CODE>, <CODE>$(INSTALL_MAN)</CODE>, and <CODE>$(INSTALL_SCRIPT)</CODE> variables must be used when installing files so that the proper ownership and permissions are set on the installed files.</P>
+
+<P>The <CODE>$(RANLIB)</CODE> command must be run on any static libraries after installation since the symbol table is invalidated when the library is copied on some platforms.</P>
+
+</BODY>
+</HTML>

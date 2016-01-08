@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>notifier(7)</title>
+</head>
+<body>
+<h1 class="title">notifier(7)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+notifier - cups notification interface
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>notifier</b>
+<i>recipient</i>
+[
+<i>user-data</i>
+]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+The CUPS notifier interface provides a standard method for adding support for new event notification methods to CUPS.
+Each notifier delivers one or more IPP events from the standard input to the specified recipient.
+<p>Notifiers <b>MUST</b> read IPP messages from the standard input using the
+<b>ippNew</b>()
+and
+<b>ippReadFile</b>()
+functions and exit on error.
+Notifiers are encouraged to exit after a suitable period of inactivity, however they may exit after reading the first message or stay running until an error is seen.
+Notifiers inherit the environment and can use the logging mechanism documented in
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7).</a>
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<a href="man-filter.html?TOPIC=Man+Pages"><b>filter</b>(7),</a>
+CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2015 by Apple Inc.
+
+</body>
+</html>

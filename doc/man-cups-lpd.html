@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+<!-- SECTION: Man Pages -->
+<head>
+	<link rel="stylesheet" type="text/css" href="../cups-printable.css">
+	<title>cups-lpd(8)</title>
+</head>
+<body>
+<h1 class="title">cups-lpd(8)</h1>
+<h2 class="title"><a name="NAME">Name</a></h2>
+cups-lpd - receive print jobs and report printer status to lpd clients
+<h2 class="title"><a name="SYNOPSIS">Synopsis</a></h2>
+<b>cups-lpd</b>
+[
+<b>-h </b><i>hostname</i>[<b>:</b><i>port</i>]
+] [
+<b>-n</b>
+] [
+<b>-o</b>
+<i>option=value</i>
+]
+<h2 class="title"><a name="DESCRIPTION">Description</a></h2>
+<b>cups-lpd</b>
+is the CUPS Line Printer Daemon ("LPD") mini-server that supports legacy client systems that use the LPD protocol.
+<b>cups-lpd</b>
+does not act as a standalone network daemon but instead operates using any of the Internet "super-servers" such as
+<b>inetd</b>(8),
+<b>launchd</b>(8),
+and
+<b>systemd</b>(8).
+<h2 class="title"><a name="OPTIONS">Options</a></h2>
+<dl class="man">
+<dt><b>-h </b><i>hostname</i>[<b>:</b><i>port</i>]
+<dd style="margin-left: 5.0em">Sets the CUPS server (and port) to use.
+<dt><b>-n</b>
+<dd style="margin-left: 5.0em">Disables reverse address lookups; normally
+<b>cups-lpd</b>
+will try to discover the hostname of the client via a reverse DNS lookup.
+<dt><b>-o </b><i>name=value</i>
+<dd style="margin-left: 5.0em">Inserts options for all print queues. Most often this is used to disable the "l" filter so that remote print jobs are filtered as needed for printing; the
+<b>inetd</b>(8)
+example below sets the "document-format" option to "application/octet-stream" which forces autodetection of the print file format.
+</dl>
+<h2 class="title"><a name="CONFORMING_TO">Conforming To</a></h2>
+<b>cups-lpd</b>
+does not enforce the restricted source port number specified in RFC 1179, as using restricted ports does not prevent users from submitting print jobs.
+While this behavior is different than standard Berkeley LPD implementations, it should not affect normal client operations.
+<p>The output of the status requests follows RFC 2569, Mapping between LPD and IPP Protocols. Since many LPD implementations stray from this definition, remote status reporting to LPD clients may be unreliable.
+<h2 class="title"><a name="ERRORS">Errors</a></h2>
+Errors are sent to the system log.
+<h2 class="title"><a name="FILES">Files</a></h2>
+<pre class="man">
+<i>/etc/inetd.conf</i>
+<i>/etc/xinetd.d/cups-lpd</i>
+<i>/System/Library/LaunchDaemons/org.cups.cups-lpd.plist</i>
+</pre>
+<h2 class="title"><a name="NOTES">Notes</a></h2>
+<h3><a name="PERFORMANCE">Performance</a></h3>
+<b>cups-lpd</b>
+performs well with small numbers of clients and printers.
+However, since a new process is created for each connection and since each process must query the printing system before each job submission, it does not scale to larger configurations.
+We highly recommend that large configurations use the native IPP support provided by CUPS instead.
+<h3><a name="SECURITY">Security</a></h3>
+<b>cups-lpd</b>
+currently does not perform any access control based on the settings in <i>cupsd.conf(5)</i> or in the <i>hosts.allow(5)</i> or <i>hosts.deny(5)</i> files used by TCP wrappers.
+Therefore, running
+<b>cups-lpd</b>
+on your server will allow any computer on your network (and perhaps the entire
+Internet) to print to your server.
+<p>While
+<b>xinetd</b>(8)
+has built-in access control support, you should use the TCP wrappers package with
+<b>inetd</b>(8)
+to limit access to only those computers that should be able to print through your server.
+<p><b>cups-lpd</b>
+is not enabled by the standard CUPS distribution.
+Please consult with your operating system vendor to determine whether it is enabled by default on your system.
+<h2 class="title"><a name="EXAMPLE">Example</a></h2>
+If you are using
+<b>inetd</b>(8),
+add the following line to the <i>inetd.conf</i> file to enable the
+<b>cups-lpd</b>
+mini-server:
+<pre class="man">
+
+    printer stream tcp nowait lp /usr/lib/cups/daemon/cups-lpd cups-lpd \
+        -o document-format=application/octet-stream
+
+</pre>
+<p><i>Note:</i> If you are using Solaris 10 or higher, you must run the
+<b>inetdconv</b>(1m)
+program to register the changes to the <i>inetd.conf</i> file.
+<p>CUPS includes configuration files for
+<b>launchd</b>(8),
+<b>systemd</b>(8),
+and
+<b>xinetd(8).</b>
+Simply enable the
+<b>cups-lpd</b>
+service using the corresponding control program.
+<h2 class="title"><a name="SEE_ALSO">See Also</a></h2>
+<a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cupsd.html?TOPIC=Man+Pages"><b>cupsd</b>(8),</a>
+<b>inetconv</b>(1m),
+<b>inetd</b>(8),
+<b>launchd</b>(8),
+<b>xinetd</b>(8),
+CUPS Online Help (<a href="http://localhost:631/help)">http://localhost:631/help)</a>,
+RFC 2569
+<h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
+Copyright &copy; 2007-2014 by Apple Inc.
+
+</body>
+</html>
