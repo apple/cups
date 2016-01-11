@@ -594,7 +594,7 @@ cups_rresvport(int *port,		/* IO - Port number to bind to */
   */
 
   memset(&addr, 0, sizeof(addr));
-  addr.addr.sa_family = family;
+  addr.addr.sa_family = (sa_family_t)family;
 
  /*
   * Try to bind the socket to a reserved port...

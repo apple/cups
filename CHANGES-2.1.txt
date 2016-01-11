@@ -9,6 +9,8 @@ CHANGES IN CUPS V2.1.3
 	  (<rdar://problem/23255001>)
 	- The EPL2 and ZPL sample drivers did not properly support the CutMedia
 	  option.
+	- Pending subscriptions would prevent the scheduler from idle exiting
+	  (STR #4754)
 
 
 CHANGES IN CUPS V2.1.2

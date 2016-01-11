@@ -3,7 +3,7 @@
  *
  * Main loop for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1573,7 +1573,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   time_t		now;		/* Current time */
   cupsd_client_t	*con;		/* Client information */
   cupsd_job_t		*job;		/* Job information */
-  cupsd_subscription_t	*sub;		/* Subscription information */
   const char		*why;		/* Debugging aid */
 
 
@@ -1709,19 +1708,6 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
     why     = "display memory usage";
   }
 #endif /* HAVE_MALLINFO */
-
- /*
-  * Expire subscriptions as needed...
-  */
-
-  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
-       sub;
-       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
-    if (!sub->job && sub->expire && sub->expire < timeout)
-    {
-      timeout = sub->expire;
-      why     = "expire subscription";
-    }
 
  /*
   * Adjust from absolute to relative time.  We add 1 second to the timeout since
