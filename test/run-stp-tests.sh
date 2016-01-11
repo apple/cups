@@ -723,9 +723,9 @@ date=`date "+%Y-%m-%d"`
 
 if test -d $root/.svn; then
 	rev=`svn info . | grep Revision: | awk '{print $2}'`
-	strfile=$BASE/cups-str-2.1-r$rev-$user.html
+	strfile=$BASE/cups-str-2.2-r$rev-$user.html
 else
-	strfile=$BASE/cups-str-2.1-$date-$user.html
+	strfile=$BASE/cups-str-2.2-$date-$user.html
 fi
 
 rm -f $strfile
