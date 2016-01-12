@@ -18,6 +18,7 @@
 
 #include <libusb.h>
 #include <cups/cups-private.h>
+#include <cups/ppd-private.h>
 #include <cups/dir.h>
 #include <pthread.h>
 #include <sys/select.h>
