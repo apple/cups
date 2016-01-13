@@ -2316,7 +2316,10 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
 
   }
 
-  ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
+  if (strcmp(when, "no-hold"))
+    ippSetString(job->attrs, &job->reasons, 0, "job-hold-until-specified");
+  else
+    ippSetString(job->attrs, &job->reasons, 0, "none");
 
  /*
   * Update the hold time...
