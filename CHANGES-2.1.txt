@@ -11,6 +11,8 @@ CHANGES IN CUPS V2.1.3
 	  option.
 	- Pending subscriptions would prevent the scheduler from idle exiting
 	  (STR #4754)
+	- Fixed some issues in ipptool for skipped tests
+	  (<rdar://problem/24137160>)
 
 
 CHANGES IN CUPS V2.1.2

@@ -868,7 +868,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
                              (cups_afree_func_t)free);
   file_id[0] = '\0';
   pass       = 1;
-  linenum    = 1;
+  linenum    = 0;
   request_id = (CUPS_RAND() % 1000) * 137 + 1;
 
   while (!Cancel && get_token(fp, token, sizeof(token), &linenum) != NULL)
@@ -1780,10 +1780,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		attrptr = ippAddIntegers(request, group, value, attr, num_values, values);
 	      }
 
-	      if (!tokenptr || *tokenptr)
+	      if ((!token[0] || !tokenptr || *tokenptr) && !skip_test)
 	      {
-		print_fatal_error(outfile, "Bad %s value \"%s\" on line %d.",
-				  ippTagString(value), token, linenum);
+		print_fatal_error(outfile, "Bad %s value \'%s\' for \"%s\" on line %d.",
+				  ippTagString(value), token, attr, linenum);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -1808,8 +1808,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	             _cups_strcasecmp(ptr, "dpcm") &&
 	             _cups_strcasecmp(ptr, "other")))
 	        {
-	          print_fatal_error(outfile, "Bad resolution value \"%s\" on line %d.",
-		                    token, linenum);
+	          if (skip_test)
+	            break;
+
+	          print_fatal_error(outfile, "Bad resolution value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
 		  pass = 0;
 		  goto test_exit;
 	        }
@@ -1839,8 +1841,10 @@ do_tests(FILE         *outfile,		/* I - Output file */
 
                 if ((num_vals & 1) || num_vals == 0)
 		{
-		  print_fatal_error(outfile, "Bad rangeOfInteger value \"%s\" on line "
-		                    "%d.", token, linenum);
+	          if (skip_test)
+	            break;
+
+		  print_fatal_error(outfile, "Bad rangeOfInteger value \'%s\' for \"%s\" on line %d.", token, attr, linenum);
 		  pass = 0;
 		  goto test_exit;
 		}
@@ -1867,10 +1871,11 @@ do_tests(FILE         *outfile,		/* I - Output file */
 		  goto test_exit;
 	        }
               }
+              else if (skip_test)
+		break;
 	      else
 	      {
-		print_fatal_error(outfile, "Bad ATTR collection value on line %d.",
-				  linenum);
+		print_fatal_error(outfile, "Bad ATTR collection value for \"%s\" on line %d.", attr, linenum);
 		pass = 0;
 		goto test_exit;
 	      }
@@ -1878,14 +1883,16 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      do
 	      {
 	        ipp_t	*col;			/* Collection value */
-	        long	pos = ftell(fp);	/* Save position of file */
+	        long	savepos = ftell(fp);	/* Save position of file */
+	        int	savelinenum = linenum;	/* Save line number */
 
 		if (!get_token(fp, token, sizeof(token), &linenum))
 		  break;
 
 		if (strcmp(token, ","))
 		{
-		  fseek(fp, pos, SEEK_SET);
+		  fseek(fp, savepos, SEEK_SET);
+		  linenum = savelinenum;
 		  break;
 		}
 
@@ -1911,8 +1918,7 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      break;
 
 	  default :
-	      print_fatal_error(outfile, "Unsupported ATTR value tag %s on line %d.",
-				ippTagString(value), linenum);
+	      print_fatal_error(outfile, "Unsupported ATTR value tag %s for \"%s\" on line %d.", ippTagString(value), attr, linenum);
 	      pass = 0;
 	      goto test_exit;
 
@@ -1960,10 +1966,9 @@ do_tests(FILE         *outfile,		/* I - Output file */
 	      break;
 	}
 
-	if (!attrptr)
+	if (!attrptr && !skip_test)
 	{
-	  print_fatal_error(outfile, "Unable to add attribute on line %d: %s", linenum,
-	                    cupsLastErrorString());
+	  print_fatal_error(outfile, "Unable to add attribute \"%s\" on line %d.", attr, linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
@@ -3868,6 +3873,11 @@ get_collection(FILE         *outfile,	/* I  - Output file */
 	    }
 	    break;
       }
+    }
+    else
+    {
+      print_fatal_error(outfile, "Unexpected token %s seen on line %d.", token, *linenum);
+      goto col_error;
     }
   }
 
