@@ -5,6 +5,7 @@
 *.o
 *.so
 *.so.*
+*.swp
 .buildrev
 autom4te.cache
 config.h
