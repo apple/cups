@@ -109,8 +109,10 @@ main(int  argc,				/* I - Number of command-line args */
   int			close_all = 1,	/* Close all file descriptors? */
 			disconnect = 1,	/* Disconnect from controlling terminal? */
 			fg = 0,		/* Run in foreground? */
-			run_as_child = 0;
+			run_as_child = 0,
 					/* Running as child process? */
+			print_profile = 0;
+					/* Print the sandbox profile to stdout? */
   int			fds;		/* Number of ready descriptors */
   cupsd_client_t	*con;		/* Current client */
   cupsd_job_t		*job;		/* Current job */
@@ -308,6 +310,13 @@ main(int  argc,				/* I - Number of command-line args */
 	      disconnect     = 0;
 	      close_all      = 0;
 	      break;
+
+          case 'T' : /* Print security profile */
+              print_profile = 1;
+              fg            = 1;
+              disconnect    = 0;
+              close_all     = 0;
+              break;
 
 	  default : /* Unknown option */
               _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
@@ -544,6 +553,27 @@ main(int  argc,				/* I - Number of command-line args */
   {
     printf("\"%s\" is OK.\n", CupsFilesFile);
     printf("\"%s\" is OK.\n", ConfigurationFile);
+    return (0);
+  }
+  else if (print_profile)
+  {
+    cups_file_t	*fp;			/* File pointer */
+    const char	*profile = cupsdCreateProfile(42, 0);
+					/* Profile */
+    char	line[1024];		/* Line from file */
+
+
+    if ((fp = cupsFileOpen(profile, "r")) == NULL)
+    {
+      printf("Unable to open profile file \"%s\": %s\n", profile ? profile : "(null)", strerror(errno));
+      return (1);
+    }
+
+    while (cupsFileGets(fp, line, sizeof(line)))
+      puts(line);
+
+    cupsFileClose(fp);
+
     return (0);
   }
 

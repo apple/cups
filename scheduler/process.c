@@ -341,7 +341,7 @@ cupsdCreateProfile(int job_id,		/* I - Job ID or 0 for none */
     /* Only allow SNMP (UDP) and LPD (TCP) off the machine... */
     cupsFilePuts(fp, ")\n");
     cupsFilePuts(fp, "(allow network-outbound\n"
-		     "       (remote udp \"*:161\")"
+		     "       (remote udp \"*:161\")\n"
 		     "       (remote tcp \"*:515\"))\n");
     cupsFilePuts(fp, "(allow network-inbound\n"
 		     "       (local udp \"localhost:*\"))\n");
