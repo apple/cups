@@ -17,6 +17,8 @@ CHANGES IN CUPS V2.1.3
 	  attribute value (STR #4752)
 	- cupsEncodeOptions2 incorrectly handled escaped values
 	  (<rdar://problem/19736672>)
+	- The scheduler did not allow access to resource files (icons, etc.)
+	  when the web interface was disabled (STR #4755)
 	- Localization fix (STR #4756)
 
 
