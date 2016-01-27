@@ -632,7 +632,7 @@ cupsEncodeOptions2(
 	    * Skip quoted character...
 	    */
 
-	    memmove(sep, sep + 1, strlen(val));
+	    memmove(sep, sep + 1, strlen(sep));
 	    sep ++;
 	  }
 	}
