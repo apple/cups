@@ -122,7 +122,7 @@ typedef struct _cups_dnssd_resolve_s	/* Data for resolving URI */
 #ifdef __APPLE__
 static CFArrayRef	appleCopyLocations(void);
 static CFStringRef	appleCopyNetwork(void);
-static char		*appleGetPaperSize(char *name, int namesize);
+static char		*appleGetPaperSize(char *name, size_t namesize);
 static CFStringRef	appleGetPrinter(CFArrayRef locations,
 			                CFStringRef network, CFIndex *locindex);
 #endif /* __APPLE__ */
@@ -2500,8 +2500,8 @@ appleCopyNetwork(void)
  */
 
 static char *				/* O - Default paper size */
-appleGetPaperSize(char *name,		/* I - Paper size name buffer */
-                  int  namesize)	/* I - Size of buffer */
+appleGetPaperSize(char   *name,		/* I - Paper size name buffer */
+                  size_t namesize)	/* I - Size of buffer */
 {
   CFStringRef	defaultPaperID;		/* Default paper ID */
   pwg_media_t	*pwgmedia;		/* PWG media size */
@@ -2510,8 +2510,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
   defaultPaperID = _cupsAppleCopyDefaultPaperID();
   if (!defaultPaperID ||
       CFGetTypeID(defaultPaperID) != CFStringGetTypeID() ||
-      !CFStringGetCString(defaultPaperID, name, namesize,
-			  kCFStringEncodingUTF8))
+      !CFStringGetCString(defaultPaperID, name, (CFIndex)namesize, kCFStringEncodingUTF8))
     name[0] = '\0';
   else if ((pwgmedia = pwgMediaForLegacy(name)) != NULL)
     strlcpy(name, pwgmedia->pwg, namesize);
