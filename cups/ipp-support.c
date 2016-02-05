@@ -1578,6 +1578,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-organization",
     "printer-organizational-unit",
     "printer-output-tray",		/* IPP JPS3 */
+    "printer-queue-id",			/* CUPS extension */
     "printer-settable-attributes-supported",
     "printer-state",
     "printer-state-change-date-time",
