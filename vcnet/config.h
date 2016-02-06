@@ -565,23 +565,6 @@ typedef unsigned long useconds_t;
 
 
 /*
- * Location of the poppler/Xpdf pdftops program...
- */
-
-/* #undef HAVE_PDFTOPS */
-/* #undef HAVE_PDFTOPS_WITH_ORIGPAGESIZES */
-#define CUPS_PDFTOPS ""
-
-
-/*
- * Location of the Ghostscript gs program...
- */
-
-/* #undef HAVE_GHOSTSCRIPT */
-#define CUPS_GHOSTSCRIPT ""
-
-
-/*
  * Do we have CoreFoundation public and private headers?
  */
 
