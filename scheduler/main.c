@@ -2193,12 +2193,11 @@ usage(int status)			/* O - Exit status */
   _cupsLangPuts(fp, _("Options:"));
   _cupsLangPuts(fp, _("  -c cupsd.conf           Set cupsd.conf file to use."));
   _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
-  _cupsLangPuts(fp, _("  -F                      Run in the foreground but "
-                      "detach from console."));
+  _cupsLangPuts(fp, _("  -F                      Run in the foreground but detach from console."));
   _cupsLangPuts(fp, _("  -h                      Show this usage message."));
   _cupsLangPuts(fp, _("  -l                      Run cupsd on demand."));
-  _cupsLangPuts(fp, _("  -t                      Test the configuration "
-                      "file."));
+  _cupsLangPuts(fp, _("  -s cups-files.conf      Set cups-files.conf file to use."));
+  _cupsLangPuts(fp, _("  -t                      Test the configuration file."));
 
   exit(status);
 }
