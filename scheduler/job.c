@@ -2195,6 +2195,15 @@ cupsdSaveAllJobs(void)
        job;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
   {
+    if (job->printer && job->printer->temporary)
+    {
+     /*
+      * Don't save jobs on temporary printers...
+      */
+
+      continue;
+    }
+
     cupsFilePrintf(fp, "<Job %d>\n", job->id);
     cupsFilePrintf(fp, "State %d\n", job->state_value);
     cupsFilePrintf(fp, "Created %ld\n", (long)job->creation_time);
@@ -2233,6 +2242,16 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSaveJob(job=%p(%d)): job->attrs=%p",
                   job, job->id, job->attrs);
+
+  if (job->printer && job->printer->temporary)
+  {
+   /*
+    * Don't save jobs on temporary printers...
+    */
+
+    job->dirty = 0;
+    return;
+  }
 
   snprintf(filename, sizeof(filename), "%s/c%05d", RequestRoot, job->id);
 

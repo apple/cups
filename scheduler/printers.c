@@ -3,7 +3,7 @@
  *
  * Printer routines for the CUPS scheduler.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -744,6 +744,42 @@ cupsdDeletePrinter(
   cupsdDeregisterPrinter(p, 1);
 
  /*
+  * Remove support files if this is a temporary queue and deregister color
+  * profiles...
+  */
+
+  if (p->temporary)
+  {
+    char	filename[1024];		/* Script/PPD filename */
+
+   /*
+    * Remove any old PPD or script files...
+    */
+
+    snprintf(filename, sizeof(filename), "%s/interfaces/%s", ServerRoot, p->name);
+    unlink(filename);
+    snprintf(filename, sizeof(filename), "%s/interfaces/%s.O", ServerRoot, p->name);
+    unlink(filename);
+
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot, p->name);
+    unlink(filename);
+    snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd.O", ServerRoot, p->name);
+    unlink(filename);
+
+    snprintf(filename, sizeof(filename), "%s/%s.png", CacheDir, p->name);
+    unlink(filename);
+
+    snprintf(filename, sizeof(filename), "%s/%s.data", CacheDir, p->name);
+    unlink(filename);
+
+   /*
+    * Unregister color profiles...
+    */
+
+    cupsdUnregisterColor(p);
+  }
+
+ /*
   * Free all memory used by the printer...
   */
 
@@ -1413,10 +1449,10 @@ cupsdSaveAllPrinters(void)
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
    /*
-    * Skip printer classes...
+    * Skip printer classes and temporary queues...
     */
 
-    if (printer->type & CUPS_PRINTER_CLASS)
+    if ((printer->type & CUPS_PRINTER_CLASS) || printer->temporary)
       continue;
 
    /*

@@ -1564,6 +1564,7 @@ ippCreateRequestedArray(ipp_t *request)	/* I - IPP request */
     "printer-input-tray",		/* IPP JPS3 */
     "printer-is-accepting-jobs",
     "printer-is-shared",		/* CUPS extension */
+    "printer-is-temporary",		/* CUPS extension */
     "printer-kind",			/* IPP Paid Printing */
     "printer-location",
     "printer-make-and-model",

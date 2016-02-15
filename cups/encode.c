@@ -281,6 +281,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "printer-is-temporary",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "printer-location",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-make-and-model", IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },

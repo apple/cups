@@ -3,7 +3,7 @@
  *
  * API definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products.
  *
  * These coded instructions, statements, and computer programs are the
@@ -241,7 +241,7 @@ enum cups_ptype_e			/* Printer type/capability bit
 					 * @since CUPS 1.4/OS X 10.6@ */
   CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities
 					 * @since CUPS 1.4/OS X 10.6@ */
-  CUPS_PRINTER_3D = 0x8000000,		/* 3D Printing @since CUPS 2.1@ */
+  CUPS_PRINTER_3D = 0x8000000,		/* Printer with 3D capabilities @since CUPS 2.1@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT |
 					 * DEFAULT | FAX | REJECTING | DELETE |
 					 * NOT_SHARED | AUTHENTICATED |
@@ -596,7 +596,7 @@ extern int		cupsGetDestMediaByIndex(http_t *http, cups_dest_t *dest,
 			                        unsigned flags,
 			                        cups_size_t *size)
 			                        _CUPS_API_1_7;
-extern  int		cupsGetDestMediaCount(http_t *http, cups_dest_t *dest,
+extern int		cupsGetDestMediaCount(http_t *http, cups_dest_t *dest,
 			                      cups_dinfo_t *dinfo,
 			                      unsigned flags) _CUPS_API_1_7;
 extern int		cupsGetDestMediaDefault(http_t *http, cups_dest_t *dest,

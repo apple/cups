@@ -3,7 +3,7 @@
  *
  * Printer definitions for the CUPS scheduler.
  *
- * Copyright 2007-2013 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -73,6 +73,7 @@ struct cupsd_printer_s
 		*error_policy;		/* Error policy */
   cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */
   int		shared;			/* Shared? */
+  int		temporary;		/* Temporary queue? */
   int		accepting;		/* Accepting jobs? */
   int		holding_new_jobs;	/* Holding new jobs for printing? */
   int		in_implicit_class;	/* In an implicit class? */

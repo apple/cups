@@ -13,7 +13,7 @@ cupsd - cups scheduler
 <b>cupsd</b>
 [
 <b>-c</b>
-<i>config-file</i>
+<i>cupsd.conf</i>
 ] [
 <b>-f</b>
 ] [
@@ -23,17 +23,20 @@ cupsd - cups scheduler
 ] [
 <b>-l</b>
 ] [
+<b>-s</b>
+<i>cups-files.conf</i>
+] [
 <b>-t</b>
 ]
 <h2 class="title"><a name="DESCRIPTION">Description</a></h2>
 <b>cupsd</b>
-is the scheduler for CUPS. It implements a printing system based upon the Internet Printing Protocol, version 2.1. If no options are specified on the command-line then the default configuration file
+is the scheduler for CUPS. It implements a printing system based upon the Internet Printing Protocol, version 2.1, and supports most of the requirements for IPP Everywhere. If no options are specified on the command-line then the default configuration file
 <i>/etc/cups/cupsd.conf</i>
 will be used.
 <h2 class="title"><a name="OPTIONS">Options</a></h2>
 <dl class="man">
-<dt><b>-c</b><i> config-file</i>
-<dd style="margin-left: 5.0em">Uses the named configuration file.
+<dt><b>-c</b><i> cupsd.conf</i>
+<dd style="margin-left: 5.0em">Uses the named cupsd.conf configuration file.
 <dt><b>-f</b>
 <dd style="margin-left: 5.0em">Run
 <b>cupsd</b>
@@ -54,6 +57,8 @@ when it is run from
 <b>launchd</b>(8)
 or
 <b>systemd</b>(8).
+<dt><b>-s</b><i> cups-files.conf</i>
+<dd style="margin-left: 5.0em">Uses the named cups-files.conf configuration file.
 <dt><b>-t</b>
 <dd style="margin-left: 5.0em">Test the configuration file for syntax errors.
 </dl>
@@ -99,6 +104,7 @@ in the foreground with a test configuration file called
 <a href="man-backend.html?TOPIC=Man+Pages"><b>backend</b>(7),</a>
 <a href="man-classes.conf.html?TOPIC=Man+Pages"><b>classes.conf</b>(5),</a>
 <a href="man-cups.html?TOPIC=Man+Pages"><b>cups</b>(1),</a>
+<a href="man-cups-files.conf.html?TOPIC=Man+Pages"><b>cups-files.conf</b>(5),</a>
 <a href="man-cups-lpd.html?TOPIC=Man+Pages"><b>cups-lpd</b>(8),</a>
 <a href="man-cupsd.conf.html?TOPIC=Man+Pages"><b>cupsd.conf</b>(5),</a>
 <a href="man-cupsd-helper.html?TOPIC=Man+Pages"><b>cupsd-helper</b>(8),</a>
@@ -111,7 +117,7 @@ in the foreground with a test configuration file called
 <b>systemd</b>(8),
 CUPS Online Help (<a href="http://localhost:631/help">http://localhost:631/help</a>)
 <h2 class="title"><a name="COPYRIGHT">Copyright</a></h2>
-Copyright &copy; 2007-2015 by Apple Inc.
+Copyright &copy; 2007-2016 by Apple Inc.
 
 </body>
 </html>

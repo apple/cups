@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * User-defined destination (and option) support for CUPS.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -801,6 +799,57 @@ cupsCopyDest(cups_dest_t *dest,
   }
 
   return (num_dests);
+}
+
+
+/*
+ * '_cupsCreateDest()' - Create a local (temporary) queue.
+ */
+
+char *					/* O - Printer URI or @code NULL@ on error */
+_cupsCreateDest(const char *name,	/* I - Printer name */
+                const char *info,	/* I - Printer description of @code NULL@ */
+		const char *device_id,	/* I - 1284 Device ID or @code NULL@ */
+		const char *device_uri,	/* I - Device URI */
+		char       *uri,	/* I - Printer URI buffer */
+		size_t     urisize)	/* I - Size of URI buffer */
+{
+  http_t	*http;			/* Connection to server */
+  ipp_t		*request,		/* CUPS-Create-Local-Printer request */
+		*response;		/* CUPS-Create-Local-Printer response */
+  ipp_attribute_t *attr;		/* printer-uri-supported attribute */
+
+
+  (void)info;
+  (void)device_id;
+
+  if (!name || !device_uri || !uri || urisize < 32)
+    return (NULL);
+
+  if ((http = httpConnect2(cupsServer(), ippPort(), NULL, AF_UNSPEC, HTTP_ENCRYPTION_IF_REQUESTED, 1, 30000, NULL)) == NULL)
+    return (NULL);
+
+  request = ippNewRequest(IPP_OP_CUPS_CREATE_LOCAL_PRINTER);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+
+  ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL, device_uri);
+  ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name", NULL, name);
+  if (info)
+    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info", NULL, info);
+  if (device_id)
+    ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-device-id", NULL, device_id);
+
+  response = cupsDoRequest(http, request, "/");
+
+  httpClose(http);
+
+  if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
+    strlcpy(uri, ippGetString(attr, 0, NULL), urisize);
+
+  ippDelete(response);
+
+  return (attr ? uri : NULL);
 }
 
 
@@ -3948,8 +3997,3 @@ cups_make_string(
 
   return (buffer);
 }
-
-
-/*
- * End of "$Id$".
- */

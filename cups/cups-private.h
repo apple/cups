@@ -236,6 +236,7 @@ extern char		*_cupsBufferGet(size_t size);
 extern void		_cupsBufferRelease(char *b);
 
 extern http_t		*_cupsConnect(void);
+extern char		*_cupsCreateDest(const char *name, const char *info, const char *device_id, const char *device_uri, char *uri, size_t urisize);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
 extern const char	*_cupsGetDestResource(cups_dest_t *dest, char *resource,

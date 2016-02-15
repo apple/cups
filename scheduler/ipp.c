@@ -84,6 +84,7 @@ static void	copy_subscription_attrs(cupsd_client_t *con,
 					cups_array_t *ra,
 					cups_array_t *exclude);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	create_local_printer(cupsd_client_t *con);
 static cups_array_t *create_requested_array(ipp_t *request);
 static void	create_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -606,6 +607,10 @@ cupsdProcessIPPRequest(
 	      get_notifications(con);
 	      break;
 
+	  case IPP_OP_CUPS_CREATE_LOCAL_PRINTER :
+	      create_local_printer(con);
+	      break;
+
 	  default :
 	      cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
                 	    "%04X %s Operation %04X (%s) not supported",
@@ -975,8 +980,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 		  pclass->accepting ? "Now" : "No longer");
   }
 
-  if ((attr = ippFindAttribute(con->request, "printer-is-shared",
-                               IPP_TAG_BOOLEAN)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
   {
     if (pclass->type & CUPS_PRINTER_REMOTE)
     {
@@ -988,14 +992,14 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
       return;
     }
 
-    if (pclass->shared && !attr->values[0].boolean)
+    if (pclass->shared && !ippGetBoolean(attr, 0))
       cupsdDeregisterPrinter(pclass, 1);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-shared to %d (was %d.)",
                     pclass->name, attr->values[0].boolean, pclass->shared);
 
-    pclass->shared = attr->values[0].boolean;
+    pclass->shared = ippGetBoolean(attr, 0);
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-state",
@@ -2293,6 +2297,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   changed_driver   = 0;
   need_restart_job = 0;
 
+  if ((attr = ippFindAttribute(con->request, "printer-is-temporary", IPP_TAG_BOOLEAN)) != NULL)
+    printer->temporary = ippGetBoolean(attr, 0);
+
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     cupsdSetString(&printer->location, attr->values[0].string.text);
@@ -2469,10 +2476,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 		  printer->accepting ? "Now" : "No longer");
   }
 
-  if ((attr = ippFindAttribute(con->request, "printer-is-shared",
-                               IPP_TAG_BOOLEAN)) != NULL)
+  if ((attr = ippFindAttribute(con->request, "printer-is-shared", IPP_TAG_BOOLEAN)) != NULL)
   {
-    if (attr->values[0].boolean &&
+    if (ippGetBoolean(attr, 0) &&
         printer->num_auth_info_required == 1 &&
 	!strcmp(printer->auth_info_required[0], "negotiate"))
     {
@@ -2491,14 +2497,16 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       return;
     }
 
-    if (printer->shared && !attr->values[0].boolean)
+    if (printer->shared && !ippGetBoolean(attr, 0))
       cupsdDeregisterPrinter(printer, 1);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-shared to %d (was %d.)",
                     printer->name, attr->values[0].boolean, printer->shared);
 
-    printer->shared = attr->values[0].boolean;
+    printer->shared = ippGetBoolean(attr, 0);
+    if (printer->shared && printer->temporary)
+      printer->temporary = 0;
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-state",
@@ -2750,7 +2758,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSetPrinterAttrs(printer);
-  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+  if (!printer->temporary)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
   if (need_restart_job && printer->job)
   {
@@ -4909,6 +4918,9 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-is-shared"))
     ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared", (char)printer->shared);
 
+  if (!ra || cupsArrayFind(ra, "printer-is-temporary"))
+    ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-temporary", (char)printer->temporary);
+
   if (!ra || cupsArrayFind(ra, "printer-more-info"))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
@@ -5185,6 +5197,19 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Queued on \"%s\" by \"%s\".",
 	      job->dest, job->username);
+}
+
+
+/*
+ * 'create_local_printer()' - Create a local (temporary) print queue.
+ */
+
+static void
+create_local_printer(
+    cupsd_client_t *con)		/* I - Client connection */
+{
+  // TODO: Finish me
+  (void)con;
 }
 
 
@@ -5608,6 +5633,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer/class */
   char		filename[1024];		/* Script/PPD filename */
+  int		temporary;		/* Temporary queue? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "delete_printer(%p[%d], %s)", con,
@@ -5678,26 +5704,31 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdUnregisterColor(printer);
 
+  temporary = printer->temporary;
+
   if (dtype & CUPS_PRINTER_CLASS)
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" deleted by \"%s\".",
                     printer->name, get_username(con));
 
     cupsdDeletePrinter(printer, 0);
-    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
+    if (!temporary)
+      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
   }
   else
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" deleted by \"%s\".",
                     printer->name, get_username(con));
 
-    if (cupsdDeletePrinter(printer, 0))
+    if (cupsdDeletePrinter(printer, 0) && !temporary)
       cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
 
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+    if (!temporary)
+      cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
   }
 
-  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+  if (!temporary)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
  /*
   * Return with no errors...
