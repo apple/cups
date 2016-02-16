@@ -178,7 +178,7 @@ cleanup:
 		status,			/* Status of command */
 		i;			/* Looping var */
   char		command[1024],		/* Command */
-		*argv[4],		/* Command-line arguments */
+		*argv[5],		/* Command-line arguments */
 		*envp[1000],		/* Environment variables */
 		days[32],		/* CERTTOOL_EXPIRATION_DAYS env var */
 		keychain[1024],		/* Keychain argument */
@@ -215,7 +215,7 @@ cleanup:
   cupsFilePrintf(fp,
                  "CUPS Self-Signed Certificate\n"
 		 			/* Enter key and certificate label */
-                 "e\n"			/* Generate ECDSA key pair */
+                 "r\n"			/* Generate RSA key pair */
                  "2048\n"		/* 2048 bit encryption key */
                  "y\n"			/* OK (y = yes) */
                  "b\n"			/* Usage (b=signing/encryption) */
