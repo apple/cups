@@ -247,7 +247,8 @@ static const char * const ipp_std_ops[] =
 		},
 		* const ipp_cups_ops2[] =
 		{
-		  "CUPS-Get-Document"
+		  "CUPS-Get-Document",
+		  "CUPS-Create-Local-Printer"
 		},
 		* const ipp_tag_names[] =
 		{			/* Value/group tag names */

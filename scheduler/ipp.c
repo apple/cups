@@ -5201,6 +5201,101 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
 /*
+ * 'create_local_bg_thread()' - Background thread for creating a local print queue.
+ */
+
+static void *				/* O - Exit status */
+create_local_bg_thread(
+    cupsd_printer_t *printer)		/* I - Printer */
+{
+  cups_file_t	*from,			/* Source file */
+		*to;			/* Destination file */
+  char		fromppd[1024],		/* Source PPD */
+		toppd[1024],		/* Destination PPD */
+		scheme[32],		/* URI scheme */
+		userpass[256],		/* User:pass */
+		host[256],		/* Hostname */
+		resource[1024],		/* Resource path */
+		line[1024];		/* Line from PPD */
+  int		port;			/* Port number */
+  http_encryption_t encryption;		/* Type of encryption to use */
+  http_t	*http;			/* Connection to printer */
+  ipp_t		*request,		/* Request to printer */
+		*response;		/* Response from printer */
+  ipp_attribute_t *attr;		/* Attribute in response */
+
+
+ /*
+  * Try connecting to the printer...
+  */
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, printer->device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+    return (NULL);
+
+  if (!strcmp(scheme, "ipps") || port == 443)
+    encryption = HTTP_ENCRYPTION_ALWAYS;
+  else
+    encryption = HTTP_ENCRYPTION_IF_REQUESTED;
+
+  if ((http = httpConnect2(host, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL)) == NULL)
+    return (NULL);
+
+ /*
+  * Query the printer for its capabilities...
+  */
+
+  request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, printer->device_uri);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "all");
+
+  response = cupsDoRequest(http, request, resource);
+
+  // TODO: Grab printer icon file...
+  httpClose(http);
+
+ /*
+  * Write the PPD for the queue...
+  */
+
+  if (_ppdCreateFromIPP(fromppd, sizeof(fromppd), response))
+  {
+    if ((!printer->info || !*(printer->info)) && (attr = ippFindAttribute(response, "printer-info", IPP_TAG_TEXT)) != NULL)
+      cupsdSetString(&printer->info, ippGetString(attr, 0, NULL));
+
+    if ((!printer->location || !*(printer->location)) && (attr = ippFindAttribute(response, "printer-location", IPP_TAG_TEXT)) != NULL)
+      cupsdSetString(&printer->location, ippGetString(attr, 0, NULL));
+
+    if ((!printer->geo_location || !*(printer->geo_location)) && (attr = ippFindAttribute(response, "printer-geo-location", IPP_TAG_URI)) != NULL)
+      cupsdSetString(&printer->geo_location, ippGetString(attr, 0, NULL));
+
+    if ((from = cupsFileOpen(fromppd, "r")) == NULL)
+      return (NULL);
+
+    snprintf(toppd, sizeof(toppd), "%s/ppd/%s.ppd", ServerRoot, printer->name);
+    if ((to = cupsdCreateConfFile(toppd, ConfigFilePerm)) == NULL)
+    {
+      cupsFileClose(from);
+      return (NULL);
+    }
+
+    while (cupsFileGets(from, line, sizeof(line)))
+      cupsFilePrintf(to, "%s\n", line);
+
+    cupsFileClose(from);
+    if (!cupsdCloseCreatedConfFile(to, toppd))
+    {
+      printer->state     = IPP_PSTATE_IDLE;
+      printer->accepting = 1;
+
+      cupsdSetPrinterAttrs(printer);
+    }
+  }
+
+  return (NULL);
+}
+
+
+/*
  * 'create_local_printer()' - Create a local (temporary) print queue.
  */
 
@@ -5208,8 +5303,124 @@ static void
 create_local_printer(
     cupsd_client_t *con)		/* I - Client connection */
 {
-  // TODO: Finish me
-  (void)con;
+  ipp_attribute_t *device_uri,		/* device-uri attribute */
+		*printer_geo_location,	/* printer-geo-location attribute */
+		*printer_info,		/* printer-info attribute */
+		*printer_location,	/* printer-location attribute */
+		*printer_name;		/* printer-name attribute */
+  cupsd_printer_t *printer;		/* New printer */
+  http_status_t	status;			/* Policy status */
+  char		name[128],		/* Sanitized printer name */
+		*nameptr,		/* Pointer into name */
+		uri[1024];		/* printer-uri-supported value */
+  const char	*ptr;			/* Pointer into attribute value */
+
+
+ /*
+  * Require local access to create a local printer...
+  */
+
+  if (!httpAddrLocalhost(httpGetAddress(con->http)))
+  {
+    send_ipp_status(con, IPP_STATUS_ERROR_FORBIDDEN, _("Only local users can create a local printer."));
+    return;
+  }
+
+ /*
+  * Check any other policy limits...
+  */
+
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
+  }
+
+ /*
+  * Grab needed attributes...
+  */
+
+  if ((printer_name = ippFindAttribute(con->request, "printer-name", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(printer_name) != IPP_TAG_PRINTER || ippGetValueTag(printer_name) != IPP_TAG_NAME)
+  {
+    if (!printer_name)
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Missing required attribute \"%s\"."), "printer-name");
+    else if (ippGetGroupTag(printer_name) != IPP_TAG_PRINTER)
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Attribute \"%s\" is in the wrong group."), "printer-name");
+    else
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Attribute \"%s\" is the wrong value type."), "printer-name");
+
+    return;
+  }
+
+  for (nameptr = name, ptr = ippGetString(printer_name, 0, NULL); *ptr && nameptr < (name + sizeof(name) - 1); ptr ++)
+  {
+   /*
+    * Sanitize the printer name...
+    */
+
+    if (_cups_isalnum(*ptr))
+      *nameptr++ = *ptr;
+    else if (nameptr == name || nameptr[-1] != '_')
+      *nameptr++ = '_';
+  }
+
+  *nameptr = '\0';
+
+  if ((device_uri = ippFindAttribute(con->request, "device-uri", IPP_TAG_ZERO)) == NULL || ippGetGroupTag(device_uri) != IPP_TAG_PRINTER || ippGetValueTag(device_uri) != IPP_TAG_URI)
+  {
+    if (!device_uri)
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Missing required attribute \"%s\"."), "device-uri");
+    else if (ippGetGroupTag(device_uri) != IPP_TAG_PRINTER)
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Attribute \"%s\" is in the wrong group."), "device-uri");
+    else
+      send_ipp_status(con, IPP_STATUS_ERROR_BAD_REQUEST, _("Attribute \"%s\" is the wrong value type."), "device-uri");
+
+    return;
+  }
+
+  printer_geo_location = ippFindAttribute(con->request, "printer-geo-location", IPP_TAG_URI);
+  printer_info         = ippFindAttribute(con->request, "printer-info", IPP_TAG_TEXT);
+  printer_location     = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT);
+
+ /*
+  * Create the printer...
+  */
+
+  if ((printer = cupsdAddPrinter(name)) == NULL)
+  {
+    send_ipp_status(con, IPP_STATUS_ERROR_INTERNAL, _("Unable to create printer."));
+    return;
+  }
+
+  cupsdSetDeviceURI(printer, ippGetString(device_uri, 0, NULL));
+
+  if (printer_geo_location)
+    cupsdSetString(&printer->geo_location, ippGetString(printer_geo_location, 0, NULL));
+  if (printer_info)
+    cupsdSetString(&printer->info, ippGetString(printer_info, 0, NULL));
+  if (printer_location)
+    cupsdSetString(&printer->location, ippGetString(printer_location, 0, NULL));
+
+  cupsdSetPrinterAttrs(printer);
+
+ /*
+  * Run a background thread to create the PPD...
+  */
+
+  _cupsThreadCreate((_cups_thread_func_t)create_local_bg_thread, printer);
+
+ /*
+  * Return printer attributes...
+  */
+
+  send_ipp_status(con, IPP_STATUS_OK, _("Local printer created."));
+
+  ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", (char)printer->accepting);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", printer->state);
+  add_printer_state_reasons(con, printer);
+
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), httpIsEncrypted(con->http) ? "ipps" : "ipp", NULL, con->clientname, con->clientport, "/printers/%s", printer->name);
+  ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uri-supported", NULL, uri);
 }
 
 

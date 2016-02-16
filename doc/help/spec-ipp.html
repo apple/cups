@@ -1330,7 +1330,11 @@ CUPS-Get-PPDs Response:
 
 <h3 class='title'><a name='CUPS_CREATE_LOCAL_PRINTER'>CUPS-Create-Local-Printer</a></h3>
 
-<p>The CUPS-Create-Local-Printer operation (0x4028) creates a local (temporary) print queue pointing to a remote IPP Everywhere printer.</p>
+<p>The CUPS-Create-Local-Printer operation (0x4028) creates a local (temporary) print queue pointing to a remote IPP Everywhere Printer. The queue will remain until the scheduler idle exits, is restarted, or the system is restarted or shutdown. Temporary print queues can be made permanent by an administrator by setting the "printer-is-shared" attribute to 'true'.</p>
+
+<p>At a minimum, the scheduler requires a name and URI for the Printer to add. When successful, the local "printer-uri" values are returned and may be used by the Client to submit Job Creation Requests, monitor for state changes, and so forth.</p>
+
+<p>Access Rights: The authenticated user performing this operation MUST be a Local User of the system, and the request MUST be made over a local (domain socket or loopback interface) address. Otherwise, the request will be rejected with the 'client-error-forbidden' status code.</p>
 
 <h4>CUPS-Create-Local-Printer Request</h4>
 
@@ -1350,29 +1354,29 @@ CUPS-Get-PPDs Response:
 
 <dl>
 
+	<dt>"printer-name" (name(127)):
+
+	<dd>The Client MUST supply this attribute which provides the name for the new Printer.
+
 	<dt>"device-uri" (uri):
 
-	<dd>An "ipp" or "ipps" URI pointing to an IPP Everywhere printer.
+	<dd>The Client MUST supply this attribute which provides an "ipp" or "ipps" URI pointing to an IPP Everywhere Printer.
 
 	<dt>"printer-device-id" (text(1023)):
 
-	<dd>The IEEE 1284 device ID for the new printer.
+	<dd>The Client OPTIONALLY supplies this attribute which provides the IEEE 1284 device ID for the new Printer.
 
 	<dt>"printer-geo-location" (uri):
 
-	<dd>The geo-location of the new printer as a "geo" URI.
+	<dd>The Client OPTIONALLY supplies this attribute which provides the geo-location of the new Printer as a "geo" URI.
 
 	<dt>"printer-info" (text(127)):
 
-	<dd>The description for the new printer.
+	<dd>The Client OPTIONALLY supplies this attribute which provides the description for the new Printer.
 
 	<dt>"printer-location" (text(127)):
 
-	<dd>The location of the new printer.
-
-	<dt>"printer-name" (name(127)):
-
-	<dd>The name for the new printer.
+	<dd>The Client OPTIONALLY supplies this attribute which provides the location of the new Printer.
 
 </dl>
 
@@ -1392,21 +1396,31 @@ CUPS-Get-PPDs Response:
 
 	<dd>The standard response status message.
 
+</dl>
+
+<p>Group 2: Printer Attributes
+
+<dl>
+
+	<dt>"printer-id" (integer(0:65535)):
+
+	<dd>The numeric identifier for the created Printer.
+
 	<dt>"printer-is-accepting-jobs" (boolean):
 
-	<dd>Whether the new printer is accepting jobs at the time of the response.
+	<dd>Whether the created Printer is accepting jobs at the time of the response.
 
 	<dt>"printer-state" (type1 enum):
 
-	<dd>The state of the created printer at the time of the response.
+	<dd>The state of the created Printer at the time of the response.
 
 	<dt>"printer-state-reasons" (1setOf type2 keyword):
 
-	<dd>The state keywords for the created printer at the time of the response.
+	<dd>The state keywords for the created Printer at the time of the response.
 
 	<dt>"printer-uri-supported" (1setOf uri):
 
-	<dd>The URIs for the created printer.
+	<dd>The URIs for the created Printer.
 
 </dl>
 

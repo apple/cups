@@ -130,6 +130,9 @@ depend:
 #
 # At least checker-231 is required.
 #
+# Alternatively, use "--analyze -Xanalyzer -analyzer-output=text" for OPTIM (text
+# output instead of HTML...)
+#
 
 .PHONY: clang clang-changes
 clang:

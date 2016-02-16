@@ -84,6 +84,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
     return (NULL);
   }
 
+  _cupsRWInit(&p->lock);
+
   cupsdSetString(&p->name, name);
   cupsdSetString(&p->info, name);
   cupsdSetString(&p->hostname, ServerName);
@@ -2193,6 +2195,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   if (!CommonData)
     cupsdCreateCommonData();
 
+  _cupsRWLockWrite(&p->lock);
+
  /*
   * Clear out old filters, if any...
   */
@@ -2520,6 +2524,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   */
 
   add_printer_defaults(p);
+
+  _cupsRWUnlock(&p->lock);
 
  /*
   * Let the browse protocols reflect the change
