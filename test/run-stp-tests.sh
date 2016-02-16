@@ -279,7 +279,7 @@ case "$usedebugprintfs" in
 		echo "Enabling debug printfs (level $usedebugprintfs); log files can be found in $BASE/log..."
 		CUPS_DEBUG_LOG="$BASE/log/debug_printfs.%d"; export CUPS_DEBUG_LOG
 		CUPS_DEBUG_LEVEL="$usedebugprintfs"; export CUPS_DEBUG_LEVEL
-		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend).*$'; export CUPS_DEBUG_FILTER
+		CUPS_DEBUG_FILTER='^(http|_http|ipp|_ipp|cups.*Request|cupsGetResponse|cupsSend|mime).*$'; export CUPS_DEBUG_FILTER
 		;;
 
 	*)
@@ -452,12 +452,14 @@ EOF
 }
 
 ln -s $root/test/test.convs $BASE/share/mime
+ln -s $root/test/test.types $BASE/share/mime
 
 if test `uname` = Darwin; then
 	instfilter cgimagetopdf imagetopdf pdf
 	instfilter cgpdftopdf pdftopdf passthru
 	instfilter cgpdftops pdftops ps
 	instfilter cgpdftoraster pdftoraster raster
+	instfilter cgpdftoraster pdftourf raster
 	instfilter cgtexttopdf texttopdf pdf
 	instfilter pstocupsraster pstoraster raster
 else
