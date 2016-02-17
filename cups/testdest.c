@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * CUPS destination API test program for CUPS.
  *
- * Copyright 2014 by Apple Inc.
+ * Copyright 2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -26,6 +24,7 @@
  * Local functions...
  */
 
+static int	enum_cb(void *user_data, unsigned flags, cups_dest_t *dest);
 static void	localize(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, const char *option, const char *value);
 static void	print_file(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, const char *filename, int num_options, cups_option_t *options);
 static void	show_conflicts(http_t *http, cups_dest_t *dest, cups_dinfo_t *dinfo, int num_options, cups_option_t *options);
@@ -53,6 +52,54 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!strcmp(argv[1], "--enum"))
   {
+    int			i;		/* Looping var */
+    cups_ptype_t	type = 0,	/* Printer type filter */
+			mask = 0;	/* Printer type mask */
+
+
+    for (i = 2; i < argc; i ++)
+    {
+      if (!strcmp(argv[i], "grayscale"))
+      {
+        type |= CUPS_PRINTER_BW;
+	mask |= CUPS_PRINTER_BW;
+      }
+      else if (!strcmp(argv[i], "color"))
+      {
+        type |= CUPS_PRINTER_COLOR;
+	mask |= CUPS_PRINTER_COLOR;
+      }
+      else if (!strcmp(argv[i], "duplex"))
+      {
+        type |= CUPS_PRINTER_DUPLEX;
+	mask |= CUPS_PRINTER_DUPLEX;
+      }
+      else if (!strcmp(argv[i], "staple"))
+      {
+        type |= CUPS_PRINTER_STAPLE;
+	mask |= CUPS_PRINTER_STAPLE;
+      }
+      else if (!strcmp(argv[i], "small"))
+      {
+        type |= CUPS_PRINTER_SMALL;
+	mask |= CUPS_PRINTER_SMALL;
+      }
+      else if (!strcmp(argv[i], "medium"))
+      {
+        type |= CUPS_PRINTER_MEDIUM;
+	mask |= CUPS_PRINTER_MEDIUM;
+      }
+      else if (!strcmp(argv[i], "large"))
+      {
+        type |= CUPS_PRINTER_LARGE;
+	mask |= CUPS_PRINTER_LARGE;
+      }
+      else
+        usage(argv[i]);
+    }
+
+    cupsEnumDests(CUPS_DEST_FLAGS_NONE, 5000, NULL, type, mask, enum_cb, NULL);
+
     return (0);
   }
   else if (!strncmp(argv[1], "ipp://", 6) || !strncmp(argv[1], "ipps://", 7))
@@ -146,6 +193,33 @@ main(int  argc,				/* I - Number of command-line arguments */
     usage(argv[2]);
 
   return (0);
+}
+
+
+/*
+ * 'enum_cb()' - Print the results from the enumeration of destinations.
+ */
+
+static int				/* O - 1 to continue */
+enum_cb(void        *user_data,		/* I - User data (unused) */
+        unsigned    flags,		/* I - Flags */
+	cups_dest_t *dest)		/* I - Destination */
+{
+  int	i;				/* Looping var */
+
+
+  (void)user_data;
+  (void)flags;
+
+  if (dest->instance)
+    printf("%s/%s:\n", dest->name, dest->instance);
+  else
+    printf("%s:\n", dest->name);
+
+  for (i = 0; i < dest->num_options; i ++)
+    printf("    %s=\"%s\"\n", dest->options[i].name, dest->options[i].value);
+
+  return (1);
 }
 
 

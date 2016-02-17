@@ -5383,6 +5383,16 @@ create_local_printer(
   printer_location     = ippFindAttribute(con->request, "printer-location", IPP_TAG_TEXT);
 
  /*
+  * See if the printer already exists...
+  */
+
+  if ((printer = cupsdFindDest(name)) != NULL)
+  {
+    send_ipp_status(con, IPP_STATUS_ERROR_NOT_POSSIBLE, _("Printer \"%s\" already exists."), name);
+    goto add_printer_attributes;
+  }
+
+ /*
   * Create the printer...
   */
 
@@ -5414,6 +5424,8 @@ create_local_printer(
   */
 
   send_ipp_status(con, IPP_STATUS_OK, _("Local printer created."));
+
+  add_printer_attributes:
 
   ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs", (char)printer->accepting);
   ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state", printer->state);

@@ -1334,6 +1334,8 @@ CUPS-Get-PPDs Response:
 
 <p>At a minimum, the scheduler requires a name and URI for the Printer to add. When successful, the local "printer-uri" values are returned and may be used by the Client to submit Job Creation Requests, monitor for state changes, and so forth.</p>
 
+<p>If the named printer already exists, the scheduler will reject the request with the 'client-error-not-possible' status code.</p>
+
 <p>Access Rights: The authenticated user performing this operation MUST be a Local User of the system, and the request MUST be made over a local (domain socket or loopback interface) address. Otherwise, the request will be rejected with the 'client-error-forbidden' status code.</p>
 
 <h4>CUPS-Create-Local-Printer Request</h4>

@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Destination job support for CUPS.
  *
- * Copyright 2012-2014 by Apple Inc.
+ * Copyright 2012-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -26,8 +24,9 @@
  *
  * The "job_id" is the number returned by cupsCreateDestJob.
  *
- * Returns IPP_STATUS_OK on success and IPP_NOT_AUTHORIZED or IPP_FORBIDDEN on
- * failure.
+ * Returns @code IPP_STATUS_OK@ on success and
+ * @code IPP_STATUS_ERRPR_NOT_AUTHORIZED@ or
+ * @code IPP_STATUS_ERROR_FORBIDDEN@ on failure.
  *
  * @since CUPS 1.6/OS X 10.8@
  */
@@ -37,13 +36,26 @@ cupsCancelDestJob(http_t      *http,	/* I - Connection to destination */
                   cups_dest_t *dest,	/* I - Destination */
                   int         job_id)	/* I - Job ID */
 {
-  /* TODO: Needs to be implemented! */
-  /* Probably also needs to be revved to accept cups_dinfo_t... */
-  (void)http;
-  (void)dest;
-  (void)job_id;
+  cups_dinfo_t	*info;			/* Destination information */
 
-  return (IPP_STATUS_ERROR_NOT_FOUND);
+
+  if ((info = cupsCopyDestInfo(http, dest)) != NULL)
+  {
+    ipp_t	*request;		/* Cancel-Job request */
+
+    request = ippNewRequest(IPP_OP_CANCEL_JOB);
+
+    ippSetVersion(request, info->version / 10, info->version % 10);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, info->uri);
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id", job_id);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+
+    ippDelete(cupsDoRequest(http, request, info->resource));
+    cupsFreeDestInfo(info);
+  }
+
+  return (cupsLastError());
 }
 
 
@@ -357,8 +369,3 @@ cupsStartDestDocument(
 
   return (status);
 }
-
-
-/*
- * End of "$Id$".
- */
