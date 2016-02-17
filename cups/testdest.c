@@ -450,6 +450,20 @@ show_supported(http_t       *http,	/* I - Connection to destination */
 	    }
 	    break;
 
+        case IPP_TAG_RESOLUTION :
+	    for (i = 0; i < count; i ++)
+	    {
+	      int xres, yres;
+	      ipp_res_t units;
+	      xres = ippGetResolution(attr, i, &yres, &units);
+
+              if (xres == yres)
+                printf("  %d%s\n", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	      else
+                printf("  %dx%d%s\n", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    }
+	    break;
+
 	case IPP_TAG_TEXTLANG :
 	case IPP_TAG_NAMELANG :
 	case IPP_TAG_TEXT :

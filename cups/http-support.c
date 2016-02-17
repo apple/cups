@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * HTTP support routines for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -1580,9 +1578,7 @@ _httpResolveURI(
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("4_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
-                "resolved_size=" CUPS_LLFMT ")", uri, resolved_uri,
-		CUPS_LLCAST resolved_size));
+  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, resolved_size=" CUPS_LLFMT ", options=0x%x, cb=%p, context=%p)", uri, resolved_uri, CUPS_LLCAST resolved_size, options, cb, context));
 
  /*
   * Get the device URI...
@@ -1603,8 +1599,8 @@ _httpResolveURI(
     if (options & _HTTP_RESOLVE_STDERR)
       _cupsLangPrintFilter(stderr, "ERROR", _("Bad device-uri \"%s\"."), uri);
 
-    DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
-    DEBUG_puts("5_httpResolveURI: Returning NULL");
+    DEBUG_printf(("2_httpResolveURI: httpSeparateURI returned %d!", status));
+    DEBUG_puts("2_httpResolveURI: Returning NULL");
     return (NULL);
   }
 
@@ -1664,7 +1660,7 @@ _httpResolveURI(
 
     if (regtype <= hostname)
     {
-      DEBUG_puts("5_httpResolveURI: Bad hostname, returning NULL");
+      DEBUG_puts("2_httpResolveURI: Bad hostname, returning NULL");
       return (NULL);
     }
 
@@ -1693,7 +1689,7 @@ _httpResolveURI(
     uribuf.resource = resource;
     uribuf.uuid     = uuid;
 
-    DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
+    DEBUG_printf(("2_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
     if (options & _HTTP_RESOLVE_STDERR)
     {
@@ -1732,7 +1728,7 @@ _httpResolveURI(
 
 	  if (cb && !(*cb)(context))
 	  {
-	    DEBUG_puts("5_httpResolveURI: callback returned 0 (stop)");
+	    DEBUG_puts("2_httpResolveURI: callback returned 0 (stop)");
 	    break;
 	  }
 
@@ -1768,7 +1764,7 @@ _httpResolveURI(
 	  {
 	    if (errno != EINTR && errno != EAGAIN)
 	    {
-	      DEBUG_printf(("5_httpResolveURI: poll error: %s", strerror(errno)));
+	      DEBUG_printf(("2_httpResolveURI: poll error: %s", strerror(errno)));
 	      break;
 	    }
 	  }
@@ -1964,7 +1960,7 @@ _httpResolveURI(
     uri = resolved_uri;
   }
 
-  DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));
+  DEBUG_printf(("2_httpResolveURI: Returning \"%s\"", uri));
 
   return (uri);
 }
@@ -2151,7 +2147,7 @@ http_resolve_cb(
   uint8_t		valueLen;	/* Length of value */
 
 
-  DEBUG_printf(("7http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, "
+  DEBUG_printf(("4http_resolve_cb(sdRef=%p, flags=%x, interfaceIndex=%u, "
 	        "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
 	        "txtLen=%u, txtRecord=%p, context=%p)", sdRef, flags,
 	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
@@ -2176,7 +2172,7 @@ http_resolve_cb(
 	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
 		uribuf->uuid);
 
-      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+      DEBUG_printf(("5http_resolve_cb: Found UUID %s, looking for %s.", uuid,
                     uribuf->uuid));
       return;
     }
@@ -2266,7 +2262,7 @@ http_resolve_cb(
     http_addrlist_t	*addrlist,	/* List of addresses */
 			*addr;		/* Current address */
 
-    DEBUG_printf(("8http_resolve_cb: Looking up \"%s\".", hostTarget));
+    DEBUG_printf(("5http_resolve_cb: Looking up \"%s\".", hostTarget));
 
     snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
     if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
@@ -2277,7 +2273,7 @@ http_resolve_cb(
 
         if (!error)
 	{
-	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
+	  DEBUG_printf(("5http_resolve_cb: Found \"%s\".", fqdn));
 
 	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
 	      _cups_strcasecmp(hostptr, ".local"))
@@ -2288,7 +2284,7 @@ http_resolve_cb(
 	}
 #ifdef DEBUG
 	else
-	  DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+	  DEBUG_printf(("5http_resolve_cb: \"%s\" did not resolve: %d",
 	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
 			error));
 #endif /* DEBUG */
@@ -2308,7 +2304,7 @@ http_resolve_cb(
   else
     httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, (int)uribuf->bufsize, scheme, NULL, hostTarget, ntohs(port), resource);
 
-  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
+  DEBUG_printf(("5http_resolve_cb: Resolved URI is \"%s\"...", uribuf->buffer));
 }
 
 #elif defined(HAVE_AVAHI)
@@ -2367,7 +2363,7 @@ http_resolve_cb(
   size_t		valueLen = 0;	/* Length of "rp" key */
 
 
-  DEBUG_printf(("7http_resolve_cb(resolver=%p, "
+  DEBUG_printf(("4http_resolve_cb(resolver=%p, "
 		"interface=%d, protocol=%d, event=%d, name=\"%s\", "
 		"type=\"%s\", domain=\"%s\", hostTarget=\"%s\", address=%p, "
 		"port=%d, txt=%p, flags=%d, context=%p)",
@@ -2400,7 +2396,7 @@ http_resolve_cb(
 	fprintf(stderr, "DEBUG: Found UUID %s, looking for %s.", uuid,
 		uribuf->uuid);
 
-      DEBUG_printf(("7http_resolve_cb: Found UUID %s, looking for %s.", uuid,
+      DEBUG_printf(("5http_resolve_cb: Found UUID %s, looking for %s.", uuid,
                     uribuf->uuid));
       return;
     }
@@ -2504,7 +2500,7 @@ http_resolve_cb(
     http_addrlist_t	*addrlist,	/* List of addresses */
 			*addr;		/* Current address */
 
-    DEBUG_printf(("8http_resolve_cb: Looking up \"%s\".", hostTarget));
+    DEBUG_printf(("5http_resolve_cb: Looking up \"%s\".", hostTarget));
 
     snprintf(fqdn, sizeof(fqdn), "%d", ntohs(port));
     if ((addrlist = httpAddrGetList(hostTarget, AF_UNSPEC, fqdn)) != NULL)
@@ -2515,7 +2511,7 @@ http_resolve_cb(
 
         if (!error)
 	{
-	  DEBUG_printf(("8http_resolve_cb: Found \"%s\".", fqdn));
+	  DEBUG_printf(("5http_resolve_cb: Found \"%s\".", fqdn));
 
 	  if ((hostptr = fqdn + strlen(fqdn) - 6) <= fqdn ||
 	      _cups_strcasecmp(hostptr, ".local"))
@@ -2526,7 +2522,7 @@ http_resolve_cb(
 	}
 #ifdef DEBUG
 	else
-	  DEBUG_printf(("8http_resolve_cb: \"%s\" did not resolve: %d",
+	  DEBUG_printf(("5http_resolve_cb: \"%s\" did not resolve: %d",
 	                httpAddrString(&(addr->addr), fqdn, sizeof(fqdn)),
 			error));
 #endif /* DEBUG */
@@ -2542,13 +2538,8 @@ http_resolve_cb(
 
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
                   NULL, hostTarget, port, resource);
-  DEBUG_printf(("8http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
+  DEBUG_printf(("5http_resolve_cb: Resolved URI is \"%s\".", uribuf->buffer));
 
   avahi_simple_poll_quit(uribuf->poll);
 }
 #endif /* HAVE_DNSSD */
-
-
-/*
- * End of "$Id$".
- */

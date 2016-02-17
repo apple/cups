@@ -566,6 +566,8 @@ cupsConnectDest(
   http_t	*http;			/* Connection to server */
 
 
+  DEBUG_printf(("cupsConnectDest(dest=%p, flags=0x%x, msec=%d, cancel=%p(%d), resource=\"%s\", resourcesize=" CUPS_LLFMT ", cb=%p, user_data=%p)", dest, flags, msec, cancel, cancel ? *cancel : -1, resource, CUPS_LLCAST resourcesize, cb, user_data));
+
  /*
   * Range check input...
   */
@@ -837,6 +839,7 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
 
   request = ippNewRequest(IPP_OP_CUPS_CREATE_LOCAL_PRINTER);
 
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, "ipp://localhost/");
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
 
   ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL, device_uri);
@@ -1454,7 +1457,7 @@ cupsGetDestWithURI(const char *name,	/* I - Desired printer name or @code NULL@ 
   }
 
   dest->name        = _cupsStrAlloc(name);
-  dest->num_options = cupsAddOption("printer-uri-supported", uri, dest->num_options, &(dest->options));
+  dest->num_options = cupsAddOption("device-uri", uri, dest->num_options, &(dest->options));
   dest->num_options = cupsAddOption("printer-info", name, dest->num_options, &(dest->options));
 
   return (dest);
@@ -3493,8 +3496,7 @@ cups_dnssd_resolve(
     resolve.end_time.tv_sec += 75;
 
   if (cb)
-    (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_RESOLVING,
-	  dest);
+    (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_RESOLVING, dest);
 
   if ((uri = _httpResolveURI(uri, tempuri, sizeof(tempuri), _HTTP_RESOLVE_FQDN, cups_dnssd_resolve_cb, &resolve)) == NULL)
   {
@@ -3532,8 +3534,11 @@ cups_dnssd_resolve_cb(void *context)	/* I - Resolve data */
   * If the cancel variable is set, return immediately.
   */
 
-  if (*resolve->cancel)
+  if (resolve->cancel && *(resolve->cancel))
+  {
+    DEBUG_puts("4cups_dnssd_resolve_cb: Canceled.");
     return (0);
+  }
 
  /*
   * Otherwise check the end time...
@@ -3541,9 +3546,11 @@ cups_dnssd_resolve_cb(void *context)	/* I - Resolve data */
 
   gettimeofday(&curtime, NULL);
 
-  return (curtime.tv_sec > resolve->end_time.tv_sec ||
+  DEBUG_printf(("4cups_dnssd_resolve_cb: curtime=%d.%06d, end_time=%d.%06d", (int)curtime.tv_sec, curtime.tv_usec, (int)resolve->end_time.tv_sec, resolve->end_time.tv_usec));
+
+  return (curtime.tv_sec < resolve->end_time.tv_sec ||
           (curtime.tv_sec == resolve->end_time.tv_sec &&
-           curtime.tv_usec > resolve->end_time.tv_usec));
+           curtime.tv_usec < resolve->end_time.tv_usec));
 }
 
 
