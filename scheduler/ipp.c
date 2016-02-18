@@ -5229,8 +5229,13 @@ create_local_bg_thread(
   * Try connecting to the printer...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Generating PPD file from \"%s\"...", printer->name, printer->device_uri);
+
   if (httpSeparateURI(HTTP_URI_CODING_ALL, printer->device_uri, scheme, sizeof(scheme), userpass, sizeof(userpass), host, sizeof(host), &port, resource, sizeof(resource)) < HTTP_URI_STATUS_OK)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: Bad device URI \"%s\".", printer->name, printer->device_uri);
     return (NULL);
+  }
 
   if (!strcmp(scheme, "ipps") || port == 443)
     encryption = HTTP_ENCRYPTION_ALWAYS;
@@ -5238,17 +5243,24 @@ create_local_bg_thread(
     encryption = HTTP_ENCRYPTION_IF_REQUESTED;
 
   if ((http = httpConnect2(host, port, NULL, AF_UNSPEC, encryption, 1, 30000, NULL)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: Unable to connect to %s:%d: %s", printer->name, host, port, cupsLastErrorString());
     return (NULL);
+  }
 
  /*
   * Query the printer for its capabilities...
   */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Connected to %s:%d, sending Get-Printer-Attributes request...", printer->name, host, port);
 
   request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, printer->device_uri);
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "all");
 
   response = cupsDoRequest(http, request, resource);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "%s: Get-Printer-Attributes returned %s", printer->name, ippErrorString(cupsLastError()));
 
   // TODO: Grab printer icon file...
   httpClose(http);
@@ -5269,11 +5281,15 @@ create_local_bg_thread(
       cupsdSetString(&printer->geo_location, ippGetString(attr, 0, NULL));
 
     if ((from = cupsFileOpen(fromppd, "r")) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: Unable to read generated PPD: %s", printer->name, strerror(errno));
       return (NULL);
+    }
 
     snprintf(toppd, sizeof(toppd), "%s/ppd/%s.ppd", ServerRoot, printer->name);
     if ((to = cupsdCreateConfFile(toppd, ConfigFilePerm)) == NULL)
     {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: Unable to create PPD for printer: %s", printer->name, strerror(errno));
       cupsFileClose(from);
       return (NULL);
     }
@@ -5284,12 +5300,18 @@ create_local_bg_thread(
     cupsFileClose(from);
     if (!cupsdCloseCreatedConfFile(to, toppd))
     {
-      printer->state     = IPP_PSTATE_IDLE;
-      printer->accepting = 1;
+      printer->config_time = time(NULL);
+      printer->state       = IPP_PSTATE_IDLE;
+      printer->accepting   = 1;
 
       cupsdSetPrinterAttrs(printer);
+
+      cupsdAddEvent(CUPSD_EVENT_PRINTER_CONFIG, printer, NULL, "Printer \"%s\" is now available.", printer->name);
+      cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" is now available.", printer->name);
     }
   }
+  else
+    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: PPD creation failed.", printer->name);
 
   return (NULL);
 }

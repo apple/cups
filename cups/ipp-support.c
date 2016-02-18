@@ -2051,8 +2051,8 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
     return ("windows-ext");
   else if (op >= IPP_OP_CUPS_GET_DEFAULT && op <= IPP_OP_CUPS_GET_PPD)
     return (ipp_cups_ops[op - IPP_OP_CUPS_GET_DEFAULT]);
-  else if (op == IPP_OP_CUPS_GET_DOCUMENT)
-    return (ipp_cups_ops2[0]);
+  else if (op >= IPP_OP_CUPS_GET_DOCUMENT && op <= IPP_OP_CUPS_CREATE_LOCAL_PRINTER)
+    return (ipp_cups_ops2[op - IPP_OP_CUPS_GET_DOCUMENT]);
 
  /*
   * No, build an "0xxxxx" operation string...

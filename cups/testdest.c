@@ -1,7 +1,7 @@
 /*
  * CUPS destination API test program for CUPS.
  *
- * Copyright 2016 by Apple Inc.
+ * Copyright 2012-2016 by Apple Inc.
  *
  * These coded instructions, statements, and computer programs are the
  * property of Apple Inc. and are protected by Federal copyright
@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 #include "cups.h"
 
 
@@ -149,9 +150,14 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     show_default(http, dest, dinfo, argv[3]);
   }
-  else if (!strcmp(argv[2], "localize") && argc > 3 && argc < 6)
+  else if (!strcmp(argv[2], "localize") && argc < 6)
   {
-    localize(http, dest, dinfo, argv[3], argv[4]);
+    if (argc > 3)
+      localize(http, dest, dinfo, argv[3], argv[4]);
+    else if (argc > 2)
+      localize(http, dest, dinfo, argv[3], NULL);
+    else
+      localize(http, dest, dinfo, NULL, NULL);
   }
   else if (!strcmp(argv[2], "media"))
   {
@@ -234,11 +240,128 @@ localize(http_t       *http,		/* I - Connection to destination */
          const char   *option,		/* I - Option */
 	 const char   *value)		/* I - Value, if any */
 {
-  (void)http;
-  (void)dest;
-  (void)dinfo;
-  (void)option;
-  (void)value;
+  ipp_attribute_t	*attr;		/* Attribute */
+  int			i,		/* Looping var */
+			count;		/* Number of values */
+
+
+  if (!option)
+  {
+    attr = cupsFindDestSupported(http, dest, dinfo, "job-creation-attributes");
+    if (attr)
+    {
+      count = ippGetCount(attr);
+      for (i = 0; i < count; i ++)
+        localize(http, dest, dinfo, ippGetString(attr, i, NULL), NULL);
+    }
+    else
+    {
+      static const char * const options[] =
+      {					/* List of standard options */
+        CUPS_COPIES,
+	CUPS_FINISHINGS,
+	CUPS_MEDIA,
+	CUPS_NUMBER_UP,
+	CUPS_ORIENTATION,
+	CUPS_PRINT_COLOR_MODE,
+	CUPS_PRINT_QUALITY,
+	CUPS_SIDES
+      };
+
+      puts("No job-creation-attributes-supported attribute, probing instead.");
+
+      for (i = 0; i < (int)(sizeof(options) / sizeof(options[0])); i ++)
+        if (cupsCheckDestSupported(http, dest, dinfo, options[i], NULL))
+	  localize(http, dest, dinfo, options[i], NULL);
+    }
+  }
+  else if (!value)
+  {
+    printf("%s (%s)\n", option, cupsLocalizeDestOption(http, dest, dinfo, option));
+
+    if ((attr = cupsFindDestSupported(http, dest, dinfo, option)) != NULL)
+    {
+      count = ippGetCount(attr);
+
+      switch (ippGetValueTag(attr))
+      {
+        case IPP_TAG_INTEGER :
+	    for (i = 0; i < count; i ++)
+              printf("  %d\n", ippGetInteger(attr, i));
+	    break;
+
+        case IPP_TAG_ENUM :
+	    for (i = 0; i < count; i ++)
+              printf("  %s\n", ippEnumString(option, ippGetInteger(attr, i)));
+	    break;
+
+        case IPP_TAG_RANGE :
+	    for (i = 0; i < count; i ++)
+	    {
+	      int upper, lower = ippGetRange(attr, i, &upper);
+
+              printf("  %d-%d\n", lower, upper);
+	    }
+	    break;
+
+        case IPP_TAG_RESOLUTION :
+	    for (i = 0; i < count; i ++)
+	    {
+	      int xres, yres;
+	      ipp_res_t units;
+	      xres = ippGetResolution(attr, i, &yres, &units);
+
+              if (xres == yres)
+                printf("  %d%s\n", xres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	      else
+                printf("  %dx%d%s\n", xres, yres, units == IPP_RES_PER_INCH ? "dpi" : "dpcm");
+	    }
+	    break;
+
+	case IPP_TAG_TEXTLANG :
+	case IPP_TAG_NAMELANG :
+	case IPP_TAG_TEXT :
+	case IPP_TAG_NAME :
+	case IPP_TAG_KEYWORD :
+	case IPP_TAG_URI :
+	case IPP_TAG_URISCHEME :
+	case IPP_TAG_CHARSET :
+	case IPP_TAG_LANGUAGE :
+	case IPP_TAG_MIMETYPE :
+	    for (i = 0; i < count; i ++)
+              printf("  %s (%s)\n", ippGetString(attr, i, NULL), cupsLocalizeDestValue(http, dest, dinfo, option, ippGetString(attr, i, NULL)));
+	    break;
+
+        case IPP_TAG_STRING :
+	    for (i = 0; i < count; i ++)
+	    {
+	      int j, len;
+	      unsigned char *data = ippGetOctetString(attr, i, &len);
+
+              fputs("  ", stdout);
+	      for (j = 0; j < len; j ++)
+	      {
+	        if (data[j] < ' ' || data[j] >= 0x7f)
+		  printf("<%02X>", data[j]);
+		else
+		  putchar(data[j]);
+              }
+              putchar('\n');
+	    }
+	    break;
+
+        case IPP_TAG_BOOLEAN :
+	    break;
+
+        default :
+	    printf("  %s\n", ippTagString(ippGetValueTag(attr)));
+	    break;
+      }
+    }
+    
+  }
+  else
+    puts(cupsLocalizeDestValue(http, dest, dinfo, option, value));
 }
 
 
@@ -254,12 +377,59 @@ print_file(http_t        *http,		/* I - Connection to destination */
 	   int           num_options,	/* I - Number of options */
 	   cups_option_t *options)	/* I - Options */
 {
-  (void)http;
-  (void)dest;
-  (void)dinfo;
-  (void)filename;
-  (void)num_options;
-  (void)options;
+  cups_file_t	*fp;			/* File to print */
+  int		job_id;			/* Job ID */
+  ipp_status_t	status;			/* Submission status */
+  const char	*title;			/* Title of job */
+  char		buffer[32768];		/* File buffer */
+  ssize_t	bytes;			/* Bytes read/to write */
+
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    printf("Unable to open \"%s\": %s\n", filename, strerror(errno));
+    return;
+  }
+
+  if ((title = strrchr(filename, '/')) != NULL)
+    title ++;
+  else
+    title = filename;
+
+  if ((status = cupsCreateDestJob(http, dest, dinfo, &job_id, title, num_options, options)) > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
+  {
+    printf("Unable to create job: %s\n", cupsLastErrorString());
+    cupsFileClose(fp);
+    return;
+  }
+
+  printf("Created job ID: %d\n", job_id);
+
+  if (cupsStartDestDocument(http, dest, dinfo, job_id, title, CUPS_FORMAT_AUTO, 0, NULL, 1) != HTTP_STATUS_CONTINUE)
+  {
+    printf("Unable to send document: %s\n", cupsLastErrorString());
+    cupsFileClose(fp);
+    return;
+  }
+
+  while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
+  {
+    if (cupsWriteRequestData(http, buffer, (size_t)bytes) != HTTP_STATUS_CONTINUE)
+    {
+      printf("Unable to write document data: %s\n", cupsLastErrorString());
+      break;
+    }
+  }
+
+  cupsFileClose(fp);
+
+  if ((status = cupsFinishDestDocument(http, dest, dinfo)) > IPP_STATUS_OK_IGNORED_OR_SUBSTITUTED)
+  {
+    printf("Unable to send document: %s\n", cupsLastErrorString());
+    return;
+  }
+
+  puts("Job queued.");
 }
 
 
@@ -510,7 +680,6 @@ show_supported(http_t       *http,	/* I - Connection to destination */
     puts("YES");
   else
     puts("NO");
-
 }
 
 

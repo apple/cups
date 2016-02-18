@@ -826,10 +826,9 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
   ipp_t		*request,		/* CUPS-Create-Local-Printer request */
 		*response;		/* CUPS-Create-Local-Printer response */
   ipp_attribute_t *attr;		/* printer-uri-supported attribute */
+  ipp_pstate_t	state = IPP_PSTATE_STOPPED;
+					/* printer-state value */
 
-
-  (void)info;
-  (void)device_id;
 
   if (!name || !device_uri || !uri || urisize < 32)
     return (NULL);
@@ -851,14 +850,40 @@ _cupsCreateDest(const char *name,	/* I - Printer name */
 
   response = cupsDoRequest(http, request, "/");
 
-  httpClose(http);
-
   if ((attr = ippFindAttribute(response, "printer-uri-supported", IPP_TAG_URI)) != NULL)
     strlcpy(uri, ippGetString(attr, 0, NULL), urisize);
+  else
+  {
+    ippDelete(response);
+    httpClose(http);
+    return (NULL);
+  }
+
+  if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
+    state = (ipp_pstate_t)ippGetInteger(attr, 0);
+
+  while (state == IPP_PSTATE_STOPPED && cupsLastError() == IPP_STATUS_OK)
+  {
+    sleep(1);
+    ippDelete(response);
+
+    request = ippNewRequest(IPP_OP_GET_PRINTER_ATTRIBUTES);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name", NULL, cupsUser());
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "requested-attributes", NULL, "printer-state");
+
+    response = cupsDoRequest(http, request, "/");
+
+    if ((attr = ippFindAttribute(response, "printer-state", IPP_TAG_ENUM)) != NULL)
+      state = (ipp_pstate_t)ippGetInteger(attr, 0);
+  }
 
   ippDelete(response);
 
-  return (attr ? uri : NULL);
+  httpClose(http);
+
+  return (uri);
 }
 
 
@@ -3498,7 +3523,7 @@ cups_dnssd_resolve(
   if (cb)
     (*cb)(user_data, CUPS_DEST_FLAGS_UNCONNECTED | CUPS_DEST_FLAGS_RESOLVING, dest);
 
-  if ((uri = _httpResolveURI(uri, tempuri, sizeof(tempuri), _HTTP_RESOLVE_FQDN, cups_dnssd_resolve_cb, &resolve)) == NULL)
+  if ((uri = _httpResolveURI(uri, tempuri, sizeof(tempuri), _HTTP_RESOLVE_DEFAULT, cups_dnssd_resolve_cb, &resolve)) == NULL)
   {
     _cupsSetError(IPP_STATUS_ERROR_INTERNAL, _("Unable to resolve printer-uri."), 1);
 
