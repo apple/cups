@@ -154,8 +154,8 @@ cupsRasterInitPWGHeader(
     return (0);
   }
 
-  h->cupsInteger[5] = h->cupsWidth;
-  h->cupsInteger[6] = h->cupsHeight;
+  h->cupsInteger[CUPS_RASTER_PWG_ImageBoxRight]  = h->cupsWidth;
+  h->cupsInteger[CUPS_RASTER_PWG_ImageBoxBottom] = h->cupsHeight;
 
  /*
   * Colorspace and bytes per line...
@@ -274,8 +274,8 @@ cupsRasterInitPWGHeader(
   * Duplex support...
   */
 
-  h->cupsInteger[1] = 1;		/* CrossFeedTransform */
-  h->cupsInteger[2] = 1;		/* FeedTransform */
+  h->cupsInteger[CUPS_RASTER_PWG_CrossFeedTransform] = 1;
+  h->cupsInteger[CUPS_RASTER_PWG_FeedTransform]      = 1;
 
   if (sides)
   {
@@ -299,30 +299,24 @@ cupsRasterInitPWGHeader(
       if (!strcmp(sheet_back, "flipped"))
       {
         if (h->Tumble)
-        {
-          h->cupsInteger[1] = 0xffffffffU;
-          h->cupsInteger[2] = 1;
-        }
+          h->cupsInteger[CUPS_RASTER_PWG_CrossFeedTransform] = 0xffffffffU;
         else
-        {
-          h->cupsInteger[1] = 1;
-          h->cupsInteger[2] = 0xffffffffU;
-        }
+          h->cupsInteger[CUPS_RASTER_PWG_FeedTransform] = 0xffffffffU;
       }
       else if (!strcmp(sheet_back, "manual-tumble"))
       {
         if (h->Tumble)
         {
-          h->cupsInteger[1] = 0xffffffffU;
-          h->cupsInteger[2] = 0xffffffffU;
+          h->cupsInteger[CUPS_RASTER_PWG_CrossFeedTransform] = 0xffffffffU;
+          h->cupsInteger[CUPS_RASTER_PWG_FeedTransform]      = 0xffffffffU;
         }
       }
       else if (!strcmp(sheet_back, "rotated"))
       {
         if (!h->Tumble)
         {
-          h->cupsInteger[1] = 0xffffffffU;
-          h->cupsInteger[2] = 0xffffffffU;
+          h->cupsInteger[CUPS_RASTER_PWG_CrossFeedTransform] = 0xffffffffU;
+          h->cupsInteger[CUPS_RASTER_PWG_FeedTransform]      = 0xffffffffU;
         }
       }
       else if (strcmp(sheet_back, "normal"))

@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * Raster file definitions for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2006 by Easy Software Products.
  *
  * This file is part of the CUPS Imaging library.
@@ -56,7 +54,6 @@ extern "C" {
 
 #  define CUPS_RASTER_SYNC_PWG	CUPS_RASTER_SYNCv2
 
-
 /*
  * The following definition can be used to determine if the
  * colorimetric colorspaces (CIEXYZ, CIELAB, and ICCn) are
@@ -77,6 +74,25 @@ extern "C" {
  */
 
 #  define CUPS_RASTER_HAVE_PWGRASTER 1
+
+/*
+ * The following PWG 5102.4 definitions specify indices into the
+ * cupsInteger[] array in the raster header.
+ */
+
+#  define CUPS_RASTER_PWG_TotalPageCount	0
+#  define CUPS_RASTER_PWG_CrossFeedTransform	1
+#  define CUPS_RASTER_PWG_FeedTransform		2
+#  define CUPS_RASTER_PWG_ImageBoxLeft		3
+#  define CUPS_RASTER_PWG_ImageBoxTop		4
+#  define CUPS_RASTER_PWG_ImageBoxRight		5
+#  define CUPS_RASTER_PWG_ImageBoxBottom	6
+#  define CUPS_RASTER_PWG_AlternatePrimary	7
+#  define CUPS_RASTER_PWG_PrintQuality		8
+#  define CUPS_RASTER_PWG_VendorIdentifier	14
+#  define CUPS_RASTER_PWG_VendorLength		15
+
+
 
 
 /*
@@ -396,7 +412,3 @@ extern int		cupsRasterInitPWGHeader(cups_page_header2_t *h, pwg_media_t *media, 
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_RASTER_H_ */
-
-/*
- * End of "$Id$".
- */
