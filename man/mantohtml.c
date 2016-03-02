@@ -974,7 +974,8 @@ html_alternate(const char *s,		/* I - String */
     {
       if (*s == '\"')
         quote = !quote;
-      else if (*s == '\\' && s[1])
+
+      if (*s == '\\' && s[1])
       {
         s ++;
         html_putc(*s++, fp);
