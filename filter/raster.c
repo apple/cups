@@ -139,6 +139,10 @@ cupsRasterInitPWGHeader(
   h->PageSize[0] = (unsigned)(72 * media->width / 2540);
   h->PageSize[1] = (unsigned)(72 * media->length / 2540);
 
+  /* This never gets written but is needed for some applications */
+  h->cupsPageSize[0] = 72.0f * media->width / 2540.0f;
+  h->cupsPageSize[1] = 72.0f * media->length / 2540.0f;
+
   h->ImagingBoundingBox[2] = h->PageSize[0];
   h->ImagingBoundingBox[3] = h->PageSize[1];
 
