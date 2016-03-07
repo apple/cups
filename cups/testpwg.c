@@ -1,23 +1,15 @@
 /*
- * "$Id$"
+ * PWG unit test program for CUPS.
  *
- *   PWG test program for CUPS.
+ * Copyright 2009-2016 by Apple Inc.
  *
- *   Copyright 2009-2013 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
- *
- * Contents:
- *
- *   main()           - Main entry.
- *   test_pagesize()  - Test the PWG mapping functions.
- *   test_ppd_cache() - Test the PPD cache functions.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -181,6 +173,20 @@ main(int  argc,				/* I - Number of command-line args */
     status ++;
   }
   else if (pwgmedia->width != 91700 || pwgmedia->length != 9199999)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    printf("PASS (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+
+  fputs("pwgMediaForPWG(\"disc_test_10x100mm\"): ", stdout);
+  if ((pwgmedia = pwgMediaForPWG("disc_test_10x100mm")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (pwgmedia->width != 10000 || pwgmedia->length != 10000)
   {
     printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
     status ++;

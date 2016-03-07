@@ -57,14 +57,6 @@ extern void		_pwgGenerateSize(char *keyword, size_t keysize,
 extern int		_pwgInitSize(pwg_size_t *size, ipp_t *job,
 				     int *margins_set)
 				     _CUPS_INTERNAL_MSG("Use pwgInitSize instead.");
-extern pwg_media_t	*_pwgMediaForLegacy(const char *legacy)
-			    _CUPS_INTERNAL_MSG("Use pwgMediaForLegacy instead.");
-extern pwg_media_t	*_pwgMediaForPPD(const char *ppd)
-			    _CUPS_INTERNAL_MSG("Use pwgMediaForPPD instead.");
-extern pwg_media_t	*_pwgMediaForPWG(const char *pwg)
-			    _CUPS_INTERNAL_MSG("Use pwgMediaForPWG instead.");
-extern pwg_media_t	*_pwgMediaForSize(int width, int length)
-			    _CUPS_INTERNAL_MSG("Use pwgMediaForSize instead.");
 extern const pwg_media_t *_pwgMediaTable(size_t *num_media);
 extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon);
 
