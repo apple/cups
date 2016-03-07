@@ -3,6 +3,8 @@ CHANGES.txt - 2.2b1 - 2016-03-07
 
 CHANGES IN CUPS V2.2b1
 
+	- The scheduler now reads the spool directory if one or more job cache
+	  entries point to deleted jobs (<rdar://problem/24048846>)
 	- Added support for disc media sizes (<rdar://problem/20219536>)
 	- The httpAddrConnect and httpConnect* APIs now try connecting to
 	  multiple addresses in parallel (<rdar://problem/20643153>)

@@ -4135,7 +4135,15 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Files have gone away.",
 			  jobid);
-	  continue;
+
+         /*
+          * job.cache file is out-of-date compared to spool directory; load
+          * that instead...
+          */
+
+	  cupsFileClose(fp);
+          load_request_root();
+          return;
 	}
       }
 
