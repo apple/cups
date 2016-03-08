@@ -1,20 +1,18 @@
 /*
- * "$Id$"
+ * PPD test program for CUPS.
  *
- *   PPD test program for CUPS.
+ * Copyright 2007-2016 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
- *   Copyright 2007-2015 by Apple Inc.
- *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
+ * PostScript is a trademark of Adobe Systems, Inc.
  *
- *   PostScript is a trademark of Adobe Systems, Inc.
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 /*
@@ -3124,7 +3122,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
   const char	*prefix;		/* WARN/FAIL prefix */
   ppd_option_t	*page_size,		/* PageSize option */
 		*page_region;		/* PageRegion option */
-  _pwg_media_t	*pwg_media;		/* PWG media */
+  pwg_media_t	*pwg_media;		/* PWG media */
   char		buf[PPD_MAX_NAME];	/* PapeSize name that is supposed to be */
   const char	*ptr;			/* Pointer into string */
   int		width_2540ths,		/* PageSize width in 2540ths */
@@ -4033,8 +4031,3 @@ valid_utf8(const char *s)		/* I - String to check */
 
   return (1);
 }
-
-
-/*
- * End of "$Id$".
- */

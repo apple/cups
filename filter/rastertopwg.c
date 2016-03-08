@@ -50,8 +50,8 @@ main(int  argc,				/* I - Number of command-line args */
   ppd_file_t		*ppd;		/* PPD file */
   ppd_attr_t		*back;		/* cupsBackSize attribute */
   _ppd_cache_t		*cache;		/* PPD cache */
-  _pwg_size_t		*pwg_size;	/* PWG media size */
-  _pwg_media_t		*pwg_media;	/* PWG media name */
+  pwg_size_t		*pwg_size;	/* PWG media size */
+  pwg_media_t		*pwg_media;	/* PWG media name */
   int	 		num_options;	/* Number of options */
   cups_option_t		*options = NULL;/* Options */
   const char		*val;		/* Option value */

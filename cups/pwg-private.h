@@ -1,17 +1,15 @@
 /*
- * "$Id$"
+ * Private PWG media API definitions for CUPS.
  *
- *   Private PWG media API definitions for CUPS.
+ * Copyright 2009-2016 by Apple Inc.
  *
- *   Copyright 2009-2013 by Apple Inc.
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
  *
- *   These coded instructions, statements, and computer programs are the
- *   property of Apple Inc. and are protected by Federal copyright
- *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
- *   which should have been included with this file.  If this file is
- *   file is missing or damaged, see the license at "http://www.cups.org/".
- *
- *   This file is subject to the Apple OS-Developed Software exception.
+ * This file is subject to the Apple OS-Developed Software exception.
  */
 
 #ifndef _CUPS_PWG_PRIVATE_H_
@@ -35,17 +33,6 @@ extern "C" {
 
 
 /*
- * Deprecated stuff for prior users of the private PWG media API...
- */
-
-#  ifndef _CUPS_NO_DEPRECATED
-typedef struct pwg_map_s _pwg_map_t;
-typedef struct pwg_media_s _pwg_media_t;
-typedef struct pwg_size_s _pwg_size_t;
-#  endif /* _CUPS_NO_DEPRECATED */
-
-
-/*
  * Functions...
  */
 
@@ -65,7 +52,3 @@ extern pwg_media_t *_pwgMediaNearSize(int width, int length, int epsilon);
 #  endif /* __cplusplus */
 
 #endif /* !_CUPS_PWG_PRIVATE_H_ */
-
-/*
- * End of "$Id$".
- */

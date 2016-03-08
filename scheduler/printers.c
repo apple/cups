@@ -50,7 +50,7 @@ static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
 static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
-static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
+static ipp_t	*new_media_col(pwg_size_t *size, const char *source,
 		               const char *type);
 static void	write_xml_string(cups_file_t *fp, const char *s);
 
@@ -3798,8 +3798,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   int		xdpi,			/* Horizontal resolution */
 		ydpi;			/* Vertical resolution */
   const char	*resptr;		/* Pointer into resolution keyword */
-  _pwg_size_t	*pwgsize;		/* Current PWG size */
-  _pwg_map_t	*pwgsource,		/* Current PWG source */
+  pwg_size_t	*pwgsize;		/* Current PWG size */
+  pwg_map_t	*pwgsource,		/* Current PWG source */
 		*pwgtype;		/* Current PWG type */
   ipp_attribute_t *attr;		/* Attribute data */
   _ipp_value_t	*val;			/* Attribute value */
@@ -5004,7 +5004,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
  */
 
 static ipp_t *				/* O - Collection value */
-new_media_col(_pwg_size_t *size,	/* I - media-size/margin values */
+new_media_col(pwg_size_t *size,	/* I - media-size/margin values */
               const char  *source,	/* I - media-source value */
               const char  *type)	/* I - media-type value */
 {
