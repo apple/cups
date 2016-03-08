@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-07-20 14:24-0400\n"
+"POT-Creation-Date: 2016-03-08 16:15-0500\n"
 "PO-Revision-Date: 2013-07-14 12:00+0200\n"
 "Last-Translator: Giovanni Scafora <giovanni@archlinux.org>\n"
 "Language-Team: Arch Linux Italian Team <giovanni@archlinux.org>\n"
@@ -96,10 +96,6 @@ msgstr "\tModuli consentiti:"
 #, c-format
 msgid "\tInterface: %s.ppd"
 msgstr "\tInterfaccia: %s.ppd"
-
-#, c-format
-msgid "\tInterface: %s/interfaces/%s"
-msgstr "\tInterfaccia: %s/interfacce/%s"
 
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd"
@@ -1289,6 +1285,9 @@ msgstr "  -r                      Utilizza la modalità di apertura 'relaxed'."
 
 msgid "  -s                      Print service name if true."
 msgstr "  -s                      Stampa il nome del servizio se è vero."
+
+msgid "  -s cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
 
 msgid "  -t                      Produce a test report."
 msgstr "  -t                      Produce un rapporto di prova."
@@ -2757,6 +2756,14 @@ msgid "Attempt to set %s printer-state to bad value %d."
 msgstr "Tentativo di impostare %s printer-state al valore non valido %d."
 
 #, c-format
+msgid "Attribute \"%s\" is in the wrong group."
+msgstr ""
+
+#, c-format
+msgid "Attribute \"%s\" is the wrong value type."
+msgstr ""
+
+#, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "I gruppi degli attributi sono fuori uso (%x < %x)."
 
@@ -2814,6 +2821,9 @@ msgstr "OrderDependency non è valido"
 
 msgid "Bad PPD cache file."
 msgstr "Il file della cache del PPD non è valido."
+
+msgid "Bad PPD file."
+msgstr ""
 
 msgid "Bad Request"
 msgstr "La richiesta non è valida"
@@ -2967,6 +2977,9 @@ msgstr "Eliminare l'abbonamento RSS"
 
 msgid "Canceling print job."
 msgstr "Eliminazione del processo di stampa in corso."
+
+msgid "Cannot change printer-is-shared for remote queues."
+msgstr ""
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr "Non è possibile condividere una stampante remota kerberizzata."
@@ -3446,6 +3459,9 @@ msgstr "HP"
 msgid "Hanging Folder"
 msgstr "Directory appesa"
 
+msgid "Hash buffer too small."
+msgstr ""
+
 msgid "Help file not in index."
 msgstr "Il file di aiuto non è nell'indice."
 
@@ -3568,6 +3584,9 @@ msgstr "Gli argomenti del nome del supporto non sono validi."
 
 msgid "Invalid media size."
 msgstr "La dimensione del supporto non è valida."
+
+msgid "Invalid ppd-name value."
+msgstr ""
 
 #, c-format
 msgid "Invalid printer command \"%s\"."
@@ -3718,6 +3737,9 @@ msgstr "Elenco delle stampanti disponibili"
 msgid "Load paper."
 msgstr ""
 
+msgid "Local printer created."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Long-Edge (Portrait)"
 
@@ -3781,6 +3803,10 @@ msgstr "Manca la parola chiave dell'opzione"
 
 msgid "Missing requesting-user-name attribute."
 msgstr "Manca l'attributo di requesting-user-name."
+
+#, c-format
+msgid "Missing required attribute \"%s\"."
+msgstr ""
 
 msgid "Missing required attributes."
 msgstr "Mancano gli attributi richiesti."
@@ -3994,6 +4020,9 @@ msgstr "Oki"
 msgid "Online Help"
 msgstr "Guida in linea"
 
+msgid "Only local users can create a local printer."
+msgstr ""
+
 #, c-format
 msgid "Open of %s failed: %s"
 msgstr "L'apertura di %s non è andata a buon fine: %s"
@@ -4172,6 +4201,10 @@ msgstr "Il processo di stampa è troppo grande."
 msgid "Print job was not accepted."
 msgstr "Il processo di stampa non è stato accettato."
 
+#, c-format
+msgid "Printer \"%s\" already exists."
+msgstr ""
+
 msgid "Printer Added"
 msgstr "La stampante è stata aggiunta"
 
@@ -4259,6 +4292,9 @@ msgstr "Errore di negoziazione SSL/TLS"
 
 msgid "See Other"
 msgstr "Vedi altro"
+
+msgid "See remote printer."
+msgstr ""
 
 msgid "Sending data to printer."
 msgstr "Invio dei dati alla stampante."
@@ -4699,12 +4735,11 @@ msgstr "Non è possibile copiare i driver di Windows 2000 della stampante (%d)."
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr "Non è possibile copiare i driver di Windows 9x della stampante (%d)."
 
-#, c-format
-msgid "Unable to copy interface script - %s"
-msgstr "Non è possibile copiare lo script dell'interfaccia - %s"
-
 msgid "Unable to create printer-uri"
 msgstr "Non è possibile creare il printer-uri"
+
+msgid "Unable to create printer."
+msgstr ""
 
 msgid "Unable to create server credentials."
 msgstr ""
@@ -4930,6 +4965,9 @@ msgstr "ordine del file sconosciuto: \"%s\"."
 #, c-format
 msgid "Unknown format character: \"%c\"."
 msgstr "Formato del carattere sconosciuto: \"%c\"."
+
+msgid "Unknown hash algorithm."
+msgstr ""
 
 msgid "Unknown media size name."
 msgstr "Nome del formato del supporto sconosciuto."
@@ -5396,8 +5434,9 @@ msgstr "manca l'attributo di job-printer-uri."
 msgid "lpadmin: Class name can only contain printable characters."
 msgstr "lpadmin: il nome della classe può contenere solo caratteri stampabili."
 
-msgid "lpadmin: Expected PPD after \"-P\" option."
-msgstr "lpadmin: è previsto PPD dopo l'opzione \"-P\"."
+#, c-format
+msgid "lpadmin: Expected PPD after \"-%c\" option."
+msgstr ""
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
 msgstr "lpadmin: è previsto allow/deny:listautente dopo l'opzione \"-u\"."
@@ -5419,9 +5458,6 @@ msgstr "lpadmin: è previsto il tipo del(i) file dopo l'opzione \"-I\"."
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
 msgstr "lpadmin: è previsto l'hostname dopo l'opzione \"-h\"."
-
-msgid "lpadmin: Expected interface after \"-i\" option."
-msgstr "lpadmin: è prevista l'interfaccia dopo l'opzione \"-i\"."
 
 msgid "lpadmin: Expected location after \"-L\" option."
 msgstr "lpadmin: è prevista la posizione dopo l'opzione \"-L\"."
@@ -6090,6 +6126,9 @@ msgstr "senza titolo"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings utilizza una lunghezza indefinita"
 
+#~ msgid "\tInterface: %s/interfaces/%s"
+#~ msgstr "\tInterfaccia: %s/interfacce/%s"
+
 #~ msgid "  -l                      Run cupsd from launchd(8)."
 #~ msgstr "  -l                      Avvia cupsd da launchd(8)."
 
@@ -6189,6 +6228,9 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 #~ msgid "There is a paper jam."
 #~ msgstr "Vi è un inceppamento della carta."
 
+#~ msgid "Unable to copy interface script - %s"
+#~ msgstr "Non è possibile copiare lo script dell'interfaccia - %s"
+
 #~ msgid "Unable to resolve printer URI."
 #~ msgstr "Non è possibile risolvere l'URI della stampante."
 
@@ -6220,6 +6262,12 @@ msgstr "variable-bindings utilizza una lunghezza indefinita"
 
 #~ msgid "ipptool: \"-i\" and \"-n\" are incompatible with -X\"."
 #~ msgstr "ipptool: \"-i\" e \"-n\" sono incompatibili con -X\"."
+
+#~ msgid "lpadmin: Expected PPD after \"-P\" option."
+#~ msgstr "lpadmin: è previsto PPD dopo l'opzione \"-P\"."
+
+#~ msgid "lpadmin: Expected interface after \"-i\" option."
+#~ msgstr "lpadmin: è prevista l'interfaccia dopo l'opzione \"-i\"."
 
 #~ msgid "lppasswd: Only root can add or delete passwords."
 #~ msgstr "lppasswd: solo root può aggiungere o eliminare le password."

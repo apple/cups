@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 2.0\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-07-20 14:24-0400\n"
+"POT-Creation-Date: 2016-03-08 16:15-0500\n"
 "PO-Revision-Date: 2015-01-28 12:00-0800\n"
 "Last-Translator: Aleksandr Proklov\n"
 "Language-Team: PuppyRus Linux Team\n"
@@ -69,10 +69,6 @@ msgstr "\tРазрешенные формы:"
 #, c-format
 msgid "\tInterface: %s.ppd"
 msgstr "\tИнтерфейс: %s.ppd"
-
-#, c-format
-msgid "\tInterface: %s/interfaces/%s"
-msgstr "\tИнтерфейс: %s/интерфейсы/%s"
 
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd"
@@ -1228,6 +1224,9 @@ msgstr "  -r                      Используется открытый ре
 
 msgid "  -s                      Print service name if true."
 msgstr "  -s                      Печать имени сервиса если соответствует."
+
+msgid "  -s cups-files.conf      Set cups-files.conf file to use."
+msgstr ""
 
 msgid "  -t                      Produce a test report."
 msgstr "  -t                      Создать тестовый отчет."
@@ -2690,6 +2689,14 @@ msgid "Attempt to set %s printer-state to bad value %d."
 msgstr "Попытка установить %s printer-state на неверное значение %d"
 
 #, c-format
+msgid "Attribute \"%s\" is in the wrong group."
+msgstr ""
+
+#, c-format
+msgid "Attribute \"%s\" is the wrong value type."
+msgstr ""
+
+#, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "Атрибут группы не в диапазоне (%x < %x)"
 
@@ -2746,6 +2753,9 @@ msgid "Bad OrderDependency"
 msgstr "Неверное значение OrderDependency"
 
 msgid "Bad PPD cache file."
+msgstr ""
+
+msgid "Bad PPD file."
 msgstr ""
 
 msgid "Bad Request"
@@ -2900,6 +2910,9 @@ msgstr "Отменить подписку на RSS"
 
 msgid "Canceling print job."
 msgstr "Отмена задания печати."
+
+msgid "Cannot change printer-is-shared for remote queues."
+msgstr ""
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr ""
@@ -3372,6 +3385,9 @@ msgstr "HP"
 msgid "Hanging Folder"
 msgstr "Папка подвесного хранения"
 
+msgid "Hash buffer too small."
+msgstr ""
+
 msgid "Help file not in index."
 msgstr "Файл справки не проиндексирован."
 
@@ -3494,6 +3510,9 @@ msgstr "Неверные аргументы имени бумаги."
 
 msgid "Invalid media size."
 msgstr "Неверный размер бумаги."
+
+msgid "Invalid ppd-name value."
+msgstr ""
 
 #, c-format
 msgid "Invalid printer command \"%s\"."
@@ -3644,6 +3663,9 @@ msgstr "Список доступных принтеров"
 msgid "Load paper."
 msgstr "Загрузка бумаги."
 
+msgid "Local printer created."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "По длинной стороне (книжная)"
 
@@ -3707,6 +3729,10 @@ msgstr "Отсутствует ключевое слово параметра"
 
 msgid "Missing requesting-user-name attribute."
 msgstr "Отсутствует атрибут requesting-user-name."
+
+#, c-format
+msgid "Missing required attribute \"%s\"."
+msgstr ""
 
 msgid "Missing required attributes."
 msgstr "Отсутствуют обязательные атрибуты."
@@ -3919,6 +3945,9 @@ msgstr "Oki"
 msgid "Online Help"
 msgstr "Интернет справка"
 
+msgid "Only local users can create a local printer."
+msgstr ""
+
 #, c-format
 msgid "Open of %s failed: %s"
 msgstr "Не удалось открыть %s: %s"
@@ -4097,6 +4126,10 @@ msgstr "Задание слишком большое."
 msgid "Print job was not accepted."
 msgstr "Задание не принято."
 
+#, c-format
+msgid "Printer \"%s\" already exists."
+msgstr ""
+
 msgid "Printer Added"
 msgstr "Принтер добавлен"
 
@@ -4185,6 +4218,9 @@ msgstr "SSL/TLS Negotiation Error"
 
 msgid "See Other"
 msgstr "Посмотреть другие"
+
+msgid "See remote printer."
+msgstr ""
 
 msgid "Sending data to printer."
 msgstr "Отправка данных на принтер."
@@ -4614,12 +4650,11 @@ msgstr "Не удается копировать файлы драйвера п�
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr "Не удается копировать файлы драйвера принтера Windows 9x (%d)"
 
-#, c-format
-msgid "Unable to copy interface script - %s"
-msgstr "Не удается копировать скрипт интерфейса - %s"
-
 msgid "Unable to create printer-uri"
 msgstr "Не удается создать printer-uri"
+
+msgid "Unable to create printer."
+msgstr ""
 
 msgid "Unable to create server credentials."
 msgstr "Не удается создать учетные данные сервера."
@@ -4836,6 +4871,9 @@ msgstr "Неизвестный порядок файлов \"%s\"."
 #, c-format
 msgid "Unknown format character: \"%c\"."
 msgstr "Символ неизвестного формата \"%c\"."
+
+msgid "Unknown hash algorithm."
+msgstr ""
 
 msgid "Unknown media size name."
 msgstr "Неизвестное имя размера бумаги."
@@ -5308,8 +5346,9 @@ msgstr "Атрибут job-printer-uri отсутствует."
 msgid "lpadmin: Class name can only contain printable characters."
 msgstr "lpadmin: Имя группы может содержать только печатаемые символы."
 
-msgid "lpadmin: Expected PPD after \"-P\" option."
-msgstr "lpadmin: После параметра '-P' должен быть указан PPD"
+#, c-format
+msgid "lpadmin: Expected PPD after \"-%c\" option."
+msgstr ""
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
 msgstr "lpadmin: После параметра '-u' должен быть указан allow/deny:userlist."
@@ -5331,9 +5370,6 @@ msgstr "После параметра \"-I\" должен(-ны) быть ука
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
 msgstr "lpadmin: После параметра \"-h\" должно быть указано имя хоста."
-
-msgid "lpadmin: Expected interface after \"-i\" option."
-msgstr "lpadmin: После параметра \"-i\" должен быть указан интерфейс."
 
 msgid "lpadmin: Expected location after \"-L\" option."
 msgstr "lpadmin: После параметра \"-L\" должно быть указано местоположение."
@@ -5992,6 +6028,9 @@ msgstr "новый"
 msgid "variable-bindings uses indefinite length"
 msgstr "Для variable-bindings длина не установлена"
 
+#~ msgid "\tInterface: %s/interfaces/%s"
+#~ msgstr "\tИнтерфейс: %s/интерфейсы/%s"
+
 #~ msgid "      %s  Missing \"%s\" translation string for option %s"
 #~ msgstr "\t%s Перевод \"%s\" отсутствует для параметра %s"
 
@@ -6010,3 +6049,12 @@ msgstr "Для variable-bindings длина не установлена"
 #~ "request."
 #~ msgstr ""
 #~ "Атрибут '%s' Job Description не может быть подставлен при созданиизадания"
+
+#~ msgid "Unable to copy interface script - %s"
+#~ msgstr "Не удается копировать скрипт интерфейса - %s"
+
+#~ msgid "lpadmin: Expected PPD after \"-P\" option."
+#~ msgstr "lpadmin: После параметра '-P' должен быть указан PPD"
+
+#~ msgid "lpadmin: Expected interface after \"-i\" option."
+#~ msgstr "lpadmin: После параметра \"-i\" должен быть указан интерфейс."

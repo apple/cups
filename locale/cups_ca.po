@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-07-20 14:24-0400\n"
+"POT-Creation-Date: 2016-03-08 16:15-0500\n"
 "PO-Revision-Date: 2012-09-29 11:21+0200\n"
 "Last-Translator: Àngel Mompó <mecatxis@gmail.com>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
@@ -100,10 +100,6 @@ msgstr "\tFormularis admesos:"
 #, c-format
 msgid "\tInterface: %s.ppd"
 msgstr "\tInterfície: %s.ppd"
-
-#, c-format
-msgid "\tInterface: %s/interfaces/%s"
-msgstr "\tInterfície: %s/interfícies/%s"
 
 #, c-format
 msgid "\tInterface: %s/ppd/%s.ppd"
@@ -1271,6 +1267,9 @@ msgid "  -r                      Use 'relaxed' open mode."
 msgstr "  -r                      Fa servir el mode obert «relaxat»."
 
 msgid "  -s                      Print service name if true."
+msgstr ""
+
+msgid "  -s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
 msgid "  -t                      Produce a test report."
@@ -2682,6 +2681,14 @@ msgstr ""
 "S'ha intentat posar l'estat de la impressora %s a un valor incorrecte %d."
 
 #, c-format
+msgid "Attribute \"%s\" is in the wrong group."
+msgstr ""
+
+#, c-format
+msgid "Attribute \"%s\" is the wrong value type."
+msgstr ""
+
+#, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr "Grups d'atribut desordenats (%x < %x)."
 
@@ -2739,6 +2746,9 @@ msgstr "La OrderDependency és incorrecta"
 
 msgid "Bad PPD cache file."
 msgstr "El fitxer PPD de memòria cau és incorrecte."
+
+msgid "Bad PPD file."
+msgstr ""
 
 msgid "Bad Request"
 msgstr "La petició és incorrecta"
@@ -2892,6 +2902,9 @@ msgstr "Cancel·la la subscripció RSS"
 
 msgid "Canceling print job."
 msgstr "Es cancel·la feina."
+
+msgid "Cannot change printer-is-shared for remote queues."
+msgstr ""
 
 msgid "Cannot share a remote Kerberized printer."
 msgstr "No es pot compartir una impressora remota sobre Kerberos."
@@ -3369,6 +3382,9 @@ msgstr "HP"
 msgid "Hanging Folder"
 msgstr "Carpeta per penjar"
 
+msgid "Hash buffer too small."
+msgstr ""
+
 msgid "Help file not in index."
 msgstr "El fitxer d'ajuda no és a l'índex."
 
@@ -3494,6 +3510,9 @@ msgstr ""
 
 msgid "Invalid media size."
 msgstr "Mida del suport no vàlida."
+
+msgid "Invalid ppd-name value."
+msgstr ""
 
 #, c-format
 msgid "Invalid printer command \"%s\"."
@@ -3644,6 +3663,9 @@ msgstr "Llista les impressores disponibles"
 msgid "Load paper."
 msgstr ""
 
+msgid "Local printer created."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Costat-llarg (vertical)"
 
@@ -3707,6 +3729,10 @@ msgstr "Falta l'opció keyword"
 
 msgid "Missing requesting-user-name attribute."
 msgstr "Falta l'atribut requesting-user-name."
+
+#, c-format
+msgid "Missing required attribute \"%s\"."
+msgstr ""
 
 msgid "Missing required attributes."
 msgstr "Falten alguns atributs necessaris."
@@ -3919,6 +3945,9 @@ msgstr "Oki"
 msgid "Online Help"
 msgstr "Ajuda en línia"
 
+msgid "Only local users can create a local printer."
+msgstr ""
+
 #, c-format
 msgid "Open of %s failed: %s"
 msgstr "No s'ha pogut obrir %s: %s"
@@ -4097,6 +4126,10 @@ msgstr "La feina d'impressió és massa llarga."
 msgid "Print job was not accepted."
 msgstr ""
 
+#, c-format
+msgid "Printer \"%s\" already exists."
+msgstr ""
+
 msgid "Printer Added"
 msgstr "S'ha afegit una impressora"
 
@@ -4185,6 +4218,9 @@ msgstr "S'ha produït un error mentre es negociava el SSL/TLS"
 
 msgid "See Other"
 msgstr "Vegeu altres"
+
+msgid "See remote printer."
+msgstr ""
 
 msgid "Sending data to printer."
 msgstr "S'envien les dades a la impressora."
@@ -4627,12 +4663,11 @@ msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 "No es poden copiar els fitxers del controlador d'impressora Windows 9x (%d)."
 
-#, c-format
-msgid "Unable to copy interface script - %s"
-msgstr "No es pot copiar l'script de la interfície - %s"
-
 msgid "Unable to create printer-uri"
 msgstr "No es pot crear el printer-uri"
+
+msgid "Unable to create printer."
+msgstr ""
 
 msgid "Unable to create server credentials."
 msgstr ""
@@ -4860,6 +4895,9 @@ msgstr "Ordre desconegut del fitxer: «%s»."
 #, c-format
 msgid "Unknown format character: \"%c\"."
 msgstr "Format del caràcter desconegut: «%c»."
+
+msgid "Unknown hash algorithm."
+msgstr ""
 
 msgid "Unknown media size name."
 msgstr "El nom de la mida del suport no és conegut."
@@ -5321,8 +5359,9 @@ msgstr "Falta l'atribut de job-printer-uri."
 msgid "lpadmin: Class name can only contain printable characters."
 msgstr "lpadmin: el nom de la classe només pot tenir caràcters imprimibles."
 
-msgid "lpadmin: Expected PPD after \"-P\" option."
-msgstr "lpadmin: s'esperava un PPD després de l'opció «-P»."
+#, c-format
+msgid "lpadmin: Expected PPD after \"-%c\" option."
+msgstr ""
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
 msgstr "lpadmin: s'esperava allow/deny:llistausuaris després de l'opció «-u»."
@@ -5344,9 +5383,6 @@ msgstr "lpadmin: s'esperava un(s) tipus de fitxer(s) després de l'opció «-I»
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
 msgstr "lpadmin: s'esperava un nom d'amfitrió després de l'opció «-h»."
-
-msgid "lpadmin: Expected interface after \"-i\" option."
-msgstr "lpadmin: s'esperava una interfície després de l'opció «-i»."
 
 msgid "lpadmin: Expected location after \"-L\" option."
 msgstr "lpadmin: s'esperava una ubicació després de l'opció «-L»."
@@ -6024,6 +6060,9 @@ msgstr "sense títol"
 msgid "variable-bindings uses indefinite length"
 msgstr "La variable-bindings fa servir una longitud indefinida"
 
+#~ msgid "\tInterface: %s/interfaces/%s"
+#~ msgstr "\tInterfície: %s/interfícies/%s"
+
 #~ msgid ""
 #~ "      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
 #~ "                REF: Page 211, table D.1."
@@ -6272,6 +6311,9 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 #~ msgid "There is a paper jam."
 #~ msgstr "S'ha encallat el paper."
 
+#~ msgid "Unable to copy interface script - %s"
+#~ msgstr "No es pot copiar l'script de la interfície - %s"
+
 #~ msgid "Unable to create compressed print file"
 #~ msgstr "No es pot crear el fitxer d'impressió comprimit"
 
@@ -6351,6 +6393,12 @@ msgstr "La variable-bindings fa servir una longitud indefinida"
 
 #~ msgid "ipptool: Missing version for \"-V\"."
 #~ msgstr "ipptool: falta la versió a «-V»."
+
+#~ msgid "lpadmin: Expected PPD after \"-P\" option."
+#~ msgstr "lpadmin: s'esperava un PPD després de l'opció «-P»."
+
+#~ msgid "lpadmin: Expected interface after \"-i\" option."
+#~ msgstr "lpadmin: s'esperava una interfície després de l'opció «-i»."
 
 #~ msgid "lppasswd: Only root can add or delete passwords."
 #~ msgstr ""

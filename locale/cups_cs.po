@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.6\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2015-07-20 14:24-0400\n"
+"POT-Creation-Date: 2016-03-08 16:15-0500\n"
 "PO-Revision-Date: 2012-09-14 10:26+0100\n"
 "Last-Translator: Jan Bartos <jan.bartos@madeta.cz>\n"
 "Language-Team: Czech\n"
@@ -95,10 +95,6 @@ msgstr ""
 
 #, c-format
 msgid "\tInterface: %s.ppd"
-msgstr ""
-
-#, c-format
-msgid "\tInterface: %s/interfaces/%s"
 msgstr ""
 
 #, c-format
@@ -1095,6 +1091,9 @@ msgid "  -r                      Use 'relaxed' open mode."
 msgstr ""
 
 msgid "  -s                      Print service name if true."
+msgstr ""
+
+msgid "  -s cups-files.conf      Set cups-files.conf file to use."
 msgstr ""
 
 msgid "  -t                      Produce a test report."
@@ -2489,6 +2488,14 @@ msgid "Attempt to set %s printer-state to bad value %d."
 msgstr ""
 
 #, c-format
+msgid "Attribute \"%s\" is in the wrong group."
+msgstr ""
+
+#, c-format
+msgid "Attribute \"%s\" is the wrong value type."
+msgstr ""
+
+#, c-format
 msgid "Attribute groups are out of order (%x < %x)."
 msgstr ""
 
@@ -2545,6 +2552,9 @@ msgid "Bad OrderDependency"
 msgstr "Chybný OrderDependency"
 
 msgid "Bad PPD cache file."
+msgstr ""
+
+msgid "Bad PPD file."
 msgstr ""
 
 msgid "Bad Request"
@@ -2698,6 +2708,9 @@ msgid "Cancel RSS Subscription"
 msgstr "Zrušit RSS předplatné"
 
 msgid "Canceling print job."
+msgstr ""
+
+msgid "Cannot change printer-is-shared for remote queues."
 msgstr ""
 
 msgid "Cannot share a remote Kerberized printer."
@@ -3166,6 +3179,9 @@ msgstr "HP"
 msgid "Hanging Folder"
 msgstr "Závěsná složka"
 
+msgid "Hash buffer too small."
+msgstr ""
+
 msgid "Help file not in index."
 msgstr ""
 
@@ -3287,6 +3303,9 @@ msgid "Invalid media name arguments."
 msgstr ""
 
 msgid "Invalid media size."
+msgstr ""
+
+msgid "Invalid ppd-name value."
 msgstr ""
 
 #, c-format
@@ -3438,6 +3457,9 @@ msgstr "Seznam dostupných tiskáren"
 msgid "Load paper."
 msgstr ""
 
+msgid "Local printer created."
+msgstr ""
+
 msgid "Long-Edge (Portrait)"
 msgstr "Delší okraj (na výšku)"
 
@@ -3500,6 +3522,10 @@ msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute."
+msgstr ""
+
+#, c-format
+msgid "Missing required attribute \"%s\"."
 msgstr ""
 
 msgid "Missing required attributes."
@@ -3706,6 +3732,9 @@ msgstr "Oki"
 msgid "Online Help"
 msgstr "Nápověda"
 
+msgid "Only local users can create a local printer."
+msgstr ""
+
 #, c-format
 msgid "Open of %s failed: %s"
 msgstr "Otevření %s selhalo: %s"
@@ -3884,6 +3913,10 @@ msgstr ""
 msgid "Print job was not accepted."
 msgstr ""
 
+#, c-format
+msgid "Printer \"%s\" already exists."
+msgstr ""
+
 msgid "Printer Added"
 msgstr "Tiskárna přidána"
 
@@ -3971,6 +4004,9 @@ msgstr ""
 
 msgid "See Other"
 msgstr "Viz další"
+
+msgid "See remote printer."
+msgstr ""
 
 msgid "Sending data to printer."
 msgstr ""
@@ -4394,11 +4430,10 @@ msgstr ""
 msgid "Unable to copy Windows 9x printer driver files (%d)."
 msgstr ""
 
-#, c-format
-msgid "Unable to copy interface script - %s"
+msgid "Unable to create printer-uri"
 msgstr ""
 
-msgid "Unable to create printer-uri"
+msgid "Unable to create printer."
 msgstr ""
 
 msgid "Unable to create server credentials."
@@ -4608,6 +4643,9 @@ msgstr ""
 
 #, c-format
 msgid "Unknown format character: \"%c\"."
+msgstr ""
+
+msgid "Unknown hash algorithm."
 msgstr ""
 
 msgid "Unknown media size name."
@@ -5050,7 +5088,8 @@ msgstr ""
 msgid "lpadmin: Class name can only contain printable characters."
 msgstr ""
 
-msgid "lpadmin: Expected PPD after \"-P\" option."
+#, c-format
+msgid "lpadmin: Expected PPD after \"-%c\" option."
 msgstr ""
 
 msgid "lpadmin: Expected allow/deny:userlist after \"-u\" option."
@@ -5072,9 +5111,6 @@ msgid "lpadmin: Expected file type(s) after \"-I\" option."
 msgstr ""
 
 msgid "lpadmin: Expected hostname after \"-h\" option."
-msgstr ""
-
-msgid "lpadmin: Expected interface after \"-i\" option."
 msgstr ""
 
 msgid "lpadmin: Expected location after \"-L\" option."
