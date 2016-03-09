@@ -143,7 +143,12 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   * Save the connected address and port number...
   */
 
-  con->clientaddr = lis->address;
+  addrlen = sizeof(con->clientaddr);
+
+  if (getsockname(httpGetFd(con->http), (struct sockaddr *)&con->clientaddr, &addrlen) || addrlen == 0)
+    con->clientaddr = lis->address;
+
+  cupsdLogClient(con, CUPSD_LOG_DEBUG, "Server address is \"%s\".", httpAddrString(&con->clientaddr, name, sizeof(name)));
 
  /*
   * Check the number of clients on the same address...
