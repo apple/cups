@@ -3571,7 +3571,7 @@ cups_dnssd_resolve_cb(void *context)	/* I - Resolve data */
 
   gettimeofday(&curtime, NULL);
 
-  DEBUG_printf(("4cups_dnssd_resolve_cb: curtime=%d.%06d, end_time=%d.%06d", (int)curtime.tv_sec, curtime.tv_usec, (int)resolve->end_time.tv_sec, resolve->end_time.tv_usec));
+  DEBUG_printf(("4cups_dnssd_resolve_cb: curtime=%d.%06d, end_time=%d.%06d", (int)curtime.tv_sec, (int)curtime.tv_usec, (int)resolve->end_time.tv_sec, (int)resolve->end_time.tv_usec));
 
   return (curtime.tv_sec < resolve->end_time.tv_sec ||
           (curtime.tv_sec == resolve->end_time.tv_sec &&
