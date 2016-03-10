@@ -1,9 +1,7 @@
 /*
- * "$Id$"
- *
  * IPP backend for CUPS.
  *
- * Copyright 2007-2015 by Apple Inc.
+ * Copyright 2007-2016 by Apple Inc.
  * Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  * These coded instructions, statements, and computer programs are the
@@ -238,9 +236,10 @@ main(int  argc,				/* I - Number of command-line args */
   int		delay,			/* Delay for retries */
 		prev_delay;		/* Previous delay */
   const char	*compression;		/* Compression mode */
-  int		waitjob,		/* Wait for job complete? */
+  int		waitjob,			/* Wait for job complete? */
 		waitjob_tries = 0,	/* Number of times we've waited */
 		waitprinter;		/* Wait for printer ready? */
+  time_t	waittime;		/* Wait time for held jobs */
   _cups_monitor_t monitor;		/* Monitoring data */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
   int		job_id;			/* job-id value */
@@ -1968,7 +1967,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for job to complete."));
 
-    for (delay = _cupsNextDelay(0, &prev_delay); !job_canceled;)
+    for (delay = _cupsNextDelay(0, &prev_delay), waittime = time(NULL) + 30; !job_canceled;)
     {
      /*
       * Check for side-channel requests...
@@ -2079,10 +2078,11 @@ main(int  argc,				/* I - Number of command-line args */
 		    job_sheets->values[0].integer);
 
 	 /*
-          * Stop polling if the job is finished or pending-held...
+          * Stop polling if the job is finished or pending-held for 30 seconds...
 	  */
 
-          if (job_state->values[0].integer > IPP_JOB_STOPPED)
+          if (job_state->values[0].integer > IPP_JSTATE_STOPPED ||
+	      (job_state->values[0].integer == IPP_JSTATE_HELD && time(NULL) > waittime))
 	  {
 	    ippDelete(response);
 	    break;
@@ -3541,7 +3541,3 @@ update_reasons(ipp_attribute_t *attr,	/* I - printer-state-reasons or NULL */
   else if (rem[0])
     fprintf(stderr, "%s\n", rem);
 }
-
-/*
- * End of "$Id$".
- */
