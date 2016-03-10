@@ -1,6 +1,7 @@
 ---
 title: ESP Ghostscript 8.15rc4
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 ESP Ghostscript 8.15rc4 is the fourth release candidate based on

@@ -1,6 +1,7 @@
 ---
 title: CUPS Driver Development Kit 1.2.2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS DDK 1.2.2 is now available from the CUPS web site and fixes some localization bugs in the PPD compiler. Changes include:

@@ -1,6 +1,7 @@
 ---
 title: CUPS Imaging library now provided under the GNU LGPL
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Effective immediately, the CUPS Imaging library (libcupsimage*) is now provided under the same license as the CUPS API library, version 2 of the GNU Library General Public License. This change allows printer manufacturers and driver developers to ship CUPS raster drivers with or without source on all operating systems.

@@ -1,6 +1,7 @@
 ---
 title: How To Restrict Group Access To A Printer
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Two ways of restricting groups from accessing a printer1. The lpadmin commandThe first way and most popular is to use the lpadmin command. The -u option controls which groups can print to a printer. The default configuration allows all groups to print to a printer:

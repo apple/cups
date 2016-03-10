@@ -1,6 +1,7 @@
 ---
 title: SAMBA Printing How-To 0.75beta3
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Kurt Pfeifle has written a Draft for the Printing Chapter of the new Samba-3.0 

@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.2.3
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>CUPS 1.2.3 is now available for download from the CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>CUPS 1.2.3 fixes a number of web interface, networking, remote printing, and CUPS API issues. Changes include:</P>

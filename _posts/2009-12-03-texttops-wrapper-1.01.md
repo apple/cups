@@ -1,6 +1,7 @@
 ---
 title: texttops wrapper 1.01
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The nstexttopdf filter seems to accept only MacRoman encoded text. 

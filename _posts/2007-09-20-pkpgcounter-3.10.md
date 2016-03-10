@@ -1,6 +1,7 @@
 ---
 title: pkpgcounter 3.10
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Summary of changes :

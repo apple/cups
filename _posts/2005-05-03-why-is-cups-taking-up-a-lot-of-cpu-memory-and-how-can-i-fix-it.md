@@ -1,6 +1,7 @@
 ---
 title: Why Is CUPS Taking Up A Lot Of CPU Memory And How Can I Fix It?
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Number 1: Job History Set Up To Keep Too Many DocumentsA common error is the MaxJobs parameters found in /etc/cups/cupsd.conf is being set to 0. What this does is disable the MaxJobs feature, allowing an unlimited amount of files to be kept. If jobs are not purged, a lot of CPU memory is being used. How do I fix this?Access your /etc/cups/cupsd.conf file and change the MaxJob to a different number. The default setting is 500. Number 2: Improperly Configured Printer Sharing BrowseInterval 

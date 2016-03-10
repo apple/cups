@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.0
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.0 is now available for download from:

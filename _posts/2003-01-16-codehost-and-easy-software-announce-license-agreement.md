@@ -1,6 +1,7 @@
 ---
 title: Codehost and Easy Software Announce License Agreement
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Codehost to include portions of CUPS source for use with BrightQ&reg; Printing Suite

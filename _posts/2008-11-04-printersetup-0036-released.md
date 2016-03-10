@@ -1,6 +1,7 @@
 ---
 title: PrinterSetup 0036 Released
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 !! New in this version

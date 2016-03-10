@@ -1,6 +1,7 @@
 ---
 title: CUPS Driver Development Kit 1.2.1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS DDK 1.2.1 is now available for download from the CUPS web site and fixes a number of issues in the PPD compiler. Changes include:

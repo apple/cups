@@ -1,6 +1,7 @@
 ---
 title: ESP Ghostscript 8.15.2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 ESP Ghostscript 8.15.2 is the second stable release based on GPL Ghostscript 8.15 which adds enhanced CUPS raster support for CUPS 1.2, improves the Open Printing Vector API driver, updates the CID font support files, and fixes several bugs that were reported against 8.15.1.

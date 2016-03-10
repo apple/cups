@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.6
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.6 is now available for download from the CUPS web site:    http://www.cups.org/software.htmlThe new release fixes some platform-specific build problems, web interface issues, PDF and PostScript filter option handling, and a number of minor bugs discovered during routine code audits.Changes include:

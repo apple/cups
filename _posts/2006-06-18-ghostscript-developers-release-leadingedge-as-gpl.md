@@ -1,6 +1,7 @@
 ---
 title: Ghostscript Developers Release Leading-Edge as GPL!
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Raph Levien (Ghostscript lead developer) has announced that the leading edge of Ghostscript is now released under the GPL:

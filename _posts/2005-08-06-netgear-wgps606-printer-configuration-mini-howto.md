@@ -1,6 +1,7 @@
 ---
 title: Netgear WGPS606 Printer Configuration Mini HowTo
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 I had a terrible time getting my HP1200 configured on the Netgear WGPS606 as a linux only user.  These are the simple steps on how to go about configuring it.

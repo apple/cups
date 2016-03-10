@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.4
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.4 is now available for download from the CUPS web site and includes fixes for a buffer overflow bug along with some localization, authentication, and printing bugs:

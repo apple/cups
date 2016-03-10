@@ -1,6 +1,7 @@
 ---
 title: Absolute Basics For Setting Up Your Printing Network
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Setting Up Your Client And Your ServerAll the information below can be entered in the cupsd.conf file with your favorite text editor.For example, if I was using the text editor nedit, I'd type: nedit /etc/cups/cupsd.conf1) Browsing must be allowed in both the client and the serverBy default, CUPS allows browsing. (Redhat, SUSE are turned off by default). So both the client and the server need to be set up to accept browsing.To accept browsing, scroll down to the Browsing directive in your cupsd.conf file and change the Off to On.It should now read Browsing On.2) Make sure the Server is listening to the ClientBy default, this should already be set as:

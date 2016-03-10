@@ -1,6 +1,7 @@
 ---
 title: alternate pstops 1.93n
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Several recently reported bugs have been fixed.

@@ -1,6 +1,7 @@
 ---
 title: How To Restrict User Access To A Printer
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Two Ways To Restrict User Access To A Printer1) Use the lpadmin command 

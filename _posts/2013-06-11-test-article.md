@@ -1,6 +1,7 @@
 ---
 title: Test article
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 This is a short test article for the new blog page.

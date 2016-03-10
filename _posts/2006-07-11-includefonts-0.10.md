@@ -1,6 +1,7 @@
 ---
 title: includefonts 0.10
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Includefonts is a filter for the CUPS print system, which embeds the fonts required by PostScript print jobs, given that the PostScript contains the necessary DSC comments and that the required fonts are available on the system.

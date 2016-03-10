@@ -1,6 +1,7 @@
 ---
 title: How Do I Fix The Error&#58; "client-error-request-value-too-long"
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
  Here is a quick check list to get you on your way:

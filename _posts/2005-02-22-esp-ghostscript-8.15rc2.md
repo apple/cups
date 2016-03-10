@@ -1,6 +1,7 @@
 ---
 title: ESP Ghostscript 8.15rc2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 ESP Ghostscript 8.15rc2 is the second release candidate based on GPL Ghostscript 8.15 and includes an enhanced configure script, the CUPS raster driver, many GPL drivers, support for dynamically loaded drivers (currently implemented for the X11 driver), and several GPL Ghostscript bug fixes. The new release also fixes all of the reported STRs from ESP Ghostscript 7.07.x.

@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.2.5
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>CUPS 1.2.5 is now available for download from the CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>CUPS 1.2.5 fixes minor printing, networking, and documentation issues and adds support for older versions of DBUS and a translation for Estonian. Changes include:</P>

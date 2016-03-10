@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.2.6
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>CUPS 1.2.6 is now available for download from the CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>CUPS 1.2.6 fixes some compile errors, localization of the web interface on Mac OS X, bugs in the lpc and lpstat commands, and backchannel support in the parallel backend. Changes include:</P>

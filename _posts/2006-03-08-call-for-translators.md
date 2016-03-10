@@ -1,6 +1,7 @@
 ---
 title: Call for Translators!
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 We need translators for CUPS 1.2! The first beta release of CUPS 1.2 includes English and Japanese localizations. We'd like to include as many languages as possible when 1.2 goes stable.

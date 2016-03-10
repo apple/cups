@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3b1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The first beta release of CUPS 1.3 is now available for download from:

@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.1.21rc2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>The second release candidate for version 1.1.21 of the CommonUNIX Printing System ("CUPS") is now available for download fromthe CUPS web site at:<PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html<P>In accordance with the CUPS Configuration Management Plan,you now have until Monday, September 6th to test this releasecandidate to determine if there are any high-priority problemsand report them using the Software Trouble Report form at:<PRE>    <A HREF="http://www.cups.org/str.php">http://www.cups.org/str.php<P>Reports sent to the CUPS newsgroups or mailing lists are notautomatically entered into the trouble report database and willnot influence the final production release of 1.1.21, so it isvery important that you report any problems you identify usingthe form.<P>CUPS 1.1.21 is primarily a bug fix and performance tuningrelease and includes fixes for the IPP, LPD, parallel, serial,and USB backends, authentication and status processing issues inthe CUPS API, and various PostScript and PDF printing issues.The new release also adds support for Zebra label printers andIPP device URI options.<P>Changes in CUPS v1.1.21rc2:<UL>	

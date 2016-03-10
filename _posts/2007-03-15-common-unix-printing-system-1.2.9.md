@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.2.9
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>CUPS 1.2.9 is now available for download from the CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>CUPS 1.2.9 fixes several printing issues and scheduler crash bug. Changes include:</P>

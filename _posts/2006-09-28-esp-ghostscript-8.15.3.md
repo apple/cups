@@ -1,6 +1,7 @@
 ---
 title: ESP Ghostscript 8.15.3
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 ESP Ghostscript 8.15.3 is the third stable release based on GPL Ghostscript 8.15 which fixes CUPS driver, CJKV font support, IJS KRGB support, various compile problems, and several small issues in the command-line utilities.

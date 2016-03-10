@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.4b1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The first beta release of CUPS 1.4 is now available from:    http://www.cups.org/software.htmlThe new release adds over 65 changes and new features to CUPS 1.3.x. Changes include:

@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.1.23rc1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>The first release candidate for version 1.1.23 of the CommonUNIX Printing System ("CUPS") is now available for download fromthe CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>In accordance with the CUPS Configuration Management Plan,you now have until Friday, December 31st to test this releasecandidate to determine if there are any high-priority problemsand report them using the Software Trouble Report form at:</P><PRE>    <A HREF="http://www.cups.org/str.php">http://www.cups.org/str.php</A></PRE><P>Reports sent to the CUPS newsgroups or mailing lists are notautomatically entered into the trouble report database and willnot influence the final production release of 1.1.23, so it isvery important that you report any problems you identify usingthe form.</P><P>CUPS 1.1.23 is a bug fix release which fixes two securityvulnerabilities reported by Daniel J. Bernstein (djb@cr.yp.to).The new release also contains other minor bug and documentationfixes that are not security related.</P><P>Changes in CUPS v1.1.23rc1:</P><UL>	

@@ -1,6 +1,7 @@
 ---
 title: Remaining CUPS.org Services are Back Online!
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 After a very long absence, I am pleased to announce that the CUPS.org bug database is back!  CUPS.org login accounts, along with all bug reports, have been restored from the old web site.

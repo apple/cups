@@ -1,6 +1,7 @@
 ---
 title: December 2011 ipptool update now available
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The December 2011 release of ipptool is now available for download from:

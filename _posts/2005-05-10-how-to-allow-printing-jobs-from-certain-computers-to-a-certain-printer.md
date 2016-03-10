@@ -1,6 +1,7 @@
 ---
 title: How To Allow Printing Jobs From Certain Computers To A Certain Printer
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 To allow printing from certain computers to a certain printer, edit the /etc/cups/cupsd.conf file and see if the <Location /printers/printer_name> is already present. Otherwise, create it with these two lines:

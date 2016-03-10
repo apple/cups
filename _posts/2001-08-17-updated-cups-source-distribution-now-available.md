@@ -1,6 +1,7 @@
 ---
 title: Updated CUPS Source Distribution Now Available
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 An updated CUPS source distribution is now available which provides some minor fixes to the filter, systemv, and template makefiles to install files properly.

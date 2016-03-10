@@ -1,6 +1,7 @@
 ---
 title: How To Restrict User Access To A Class Of Printers
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Two ways of restricting users from accessing a class of printers1. The lpadmin commandThe first way and most popular is to use the lpadmin command. The -u option controls which users can print to a class of printers. The default configuration allows all users to print to a class of printers:

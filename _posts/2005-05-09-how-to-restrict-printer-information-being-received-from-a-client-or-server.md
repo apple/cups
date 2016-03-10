@@ -1,6 +1,7 @@
 ---
 title: How To Restrict Printer Information Being Received From A Client Or Server
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Printer browsing allows your server to automatically share its printers with client machines and other servers. To make sure printer information only comes from certain servers and clients, edit the /etc/cups/cupsd.conf file. Locate the BrowseOrder, BrowseAllow and BrowseDeny directives and then edit or add IP or netmask addresses to your liking. Some examples:

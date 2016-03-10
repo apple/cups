@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3rc2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The second release candidate for CUPS 1.3 is now available for download from:

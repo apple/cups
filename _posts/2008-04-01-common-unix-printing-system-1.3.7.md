@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.7
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.7 is now available for download from the CUPS web site:    http://www.cups.org/software.htmlThe new release includes three security fixes and several printing and authentication fixes. We encourage all CUPS users to update to the current release.Changes include:

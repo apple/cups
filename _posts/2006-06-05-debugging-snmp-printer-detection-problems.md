@@ -1,6 +1,7 @@
 ---
 title: Debugging SNMP Printer Detection Problems
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The new SNMP network printer detection functionality in CUPS 1.2 sometimes exposes problems in vendor SNMP or IPP implementations. If you are experiencing long delays in loading the CUPS web interface administration page, or if you don't see your printer listed, the following instructions will help you to diagnose those problems and/or provide important feedback to the CUPS developers so that we can correct problems and improve the SNMP backend in future releases.

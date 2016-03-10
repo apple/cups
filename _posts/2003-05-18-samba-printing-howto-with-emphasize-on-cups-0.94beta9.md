@@ -1,6 +1,7 @@
 ---
 title: SAMBA Printing How-To (with emphasize on CUPS) 0.94beta9
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The Draft for the Printing Chapter of the new Samba 3.0 HOWTO-Collection  has been updated. The version now is 0.94beta9. (That means I regard it as 94% finished.... hmmm, the last 6% seem to be harder than the first 60   ;-) 

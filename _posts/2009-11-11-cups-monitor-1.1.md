@@ -1,6 +1,7 @@
 ---
 title: CUPS Monitor 1.1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Version 1.1 ( November 11th 2009 )

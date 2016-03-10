@@ -1,6 +1,7 @@
 ---
 title: ESP Print Pro 4.5.10
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Hollywood, MD (January 9, 2006) -- Easy Software Products today announced the release of ESP Print Pro v4.5.10, a complete cross-platform printing solution. The product is based on the company's Common UNIX Printing System technology and is available for AIX, HP-UX, IRIX, Linux, MacOS X, and Solaris. A separate client printing package is available for Microsoft Windows 2000, XP, and 2003.

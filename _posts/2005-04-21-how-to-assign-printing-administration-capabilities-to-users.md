@@ -1,6 +1,7 @@
 ---
 title: How To Assign Printing Administration Capabilities To Users
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 If you want certain users to have access to administer printers and nothing else, you need to create a group.FOR LINUX USERS ONLY:1) From the command line type:<UL> groupadd (and the name of the group)Then for each user you want to add to that group type: usermod -G nameofgroup nameofpersonFor example, if I wanted to create a group called printadmin and wanted to add Steve and Debbie to that group, I'd type the following commands: groupadd printadmin usermod -G printadmin Steve usermod -G printadmin Debbie2) In your cupsd.conf file, add this line: SystemGroup nameofgroup

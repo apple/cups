@@ -1,6 +1,7 @@
 ---
 title: Call for Translators
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 We need translators for CUPS 1.6! The first beta release of CUPS 1.6 includes only an English localization. We'd like to include as many languages as possible when 1.6 goes stable.

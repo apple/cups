@@ -1,6 +1,7 @@
 ---
 title: PHP CUPS support (PHP5 class) V0.75
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 After several years from v0.74, The V.075 version of PhpPrintIPP is out.Homepage: http://www.nongnu.org/phpprintipp/PrintIPP is a PHP5 class which implements an IPP client (Internet Printing Protocol) on the web-server side.PrintIPP, in it's current state, do all RFC2911 operations,as well as some CUPS specific ones. PrintIPP is distributed under GNU LGPL. Thus, it is a Free Software.

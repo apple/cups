@@ -1,6 +1,7 @@
 ---
 title: CUPS Driver for Windows v6.0 Nearing Release
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 We have made major progress on the new CUPS driver for Windows, and will be doing a release candidate very soon. The new driver adds support for the page-label and job-billing options that are missing from the standard Windows PostScript driver.

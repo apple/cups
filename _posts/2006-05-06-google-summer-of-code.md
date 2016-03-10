@@ -1,6 +1,7 @@
 ---
 title: Google Summer of Code
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The CUPS project is participating in the Google Summer of Code 2006. Qualifying students will be paid $4500 to work on any of the tasks on the CUPS roadmap page or a cool new idea of their own.

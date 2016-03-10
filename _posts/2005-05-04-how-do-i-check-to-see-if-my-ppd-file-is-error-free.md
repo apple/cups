@@ -1,6 +1,7 @@
 ---
 title: How Do I Check To See If My PPD File Is Error Free?
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 PPD files can be tested on-line or from the command line using the cupstestppd program. If you are experiencing difficulties with a printer, use this page to validate the PPD file you are using and report any problems to the author of the file/driver. Where Do I Find This Program? To access online:

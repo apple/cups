@@ -1,6 +1,7 @@
 ---
 title: Administrative Privileges From A Remote Location
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 1) Go to the text file /etc/cups/cupsd.conf

@@ -1,6 +1,7 @@
 ---
 title: pkpgcounter 1.00
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 pkpgcounter is a generic Page Description Language parser which main feature is to count the number of pages in files ready to be printed.

@@ -1,6 +1,7 @@
 ---
 title: How To Allow Printing Jobs From Certain Computers
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 To allow printing from certain computers, edit the /etc/cups/cupsd.conf file and find the <Location /> directive. There you can add or edit the  Order, Allow, and  Deny directives to your liking. Here are two examples:

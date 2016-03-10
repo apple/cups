@@ -1,6 +1,7 @@
 ---
 title: xpstopdf / xpstops 1.00
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 These experimental filters convert Microsoft XPS (Xml Paper Specification)

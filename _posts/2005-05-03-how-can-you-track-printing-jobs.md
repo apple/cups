@@ -1,6 +1,7 @@
 ---
 title: How Can You Track Printing Jobs?
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The easiest way to track your jobs is from the web interface located at: http://localhost:631/adminJust click on the printer you are interested in and see who has used the printer and see all completed and uncompleted jobs.

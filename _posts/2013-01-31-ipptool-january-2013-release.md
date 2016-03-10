@@ -1,6 +1,7 @@
 ---
 title: ipptool January 2013 Release
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The January 2013 release of ipptool for Windows, Linux (32-bit and 64-bit Intel), and Mac OS X is now available at:

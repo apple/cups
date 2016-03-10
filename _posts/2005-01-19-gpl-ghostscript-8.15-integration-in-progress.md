@@ -1,6 +1,7 @@
 ---
 title: GPL Ghostscript 8.15 Integration In Progress
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Work has begun on integrating ESP Ghostscript with the GPL Ghostscript 8.15 baseline. We now have a Subversion repository for ESP Ghostscript (http://svn.easysw.com/public/espgs/trunk) which has the following items completed:

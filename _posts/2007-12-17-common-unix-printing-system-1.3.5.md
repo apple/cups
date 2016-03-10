@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.5
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.5 is now available from the CUPS web site and fixes some SNMP and PDF filter security issues, some USB printing issues, and several scheduler issues. Changes include:

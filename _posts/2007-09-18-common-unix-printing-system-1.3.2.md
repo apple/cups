@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.2
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.3.2 is now available for download from the CUPS web site. CUPS 1.3.2 replaces the invalid 1.3.1 release tarballs and fixes some scheduler and printing issues. Changes include:	

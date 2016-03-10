@@ -1,6 +1,7 @@
 ---
 title: CUPS Driver for Windows Status
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 We are still working on version 6 of our CUPS-specific driver for Windows. The driver is not yet available, but in the meantime you can use the standard Windows 2000 PostScript driver. Consult the cupsaddsmb man page for instructions.

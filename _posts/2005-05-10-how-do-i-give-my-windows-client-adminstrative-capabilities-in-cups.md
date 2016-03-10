@@ -1,6 +1,7 @@
 ---
 title: How Do I Give My Windows Client Adminstrative Capabilities In CUPS?
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 From your CUPS server:

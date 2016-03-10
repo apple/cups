@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.2.11
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <P>CUPS 1.2.11 is now available for download from the CUPS web site at:</P><PRE>    <A HREF="http://www.cups.org/software.html">http://www.cups.org/software.html</A></PRE><P>CUPS 1.2.11 fixes several build system, printing, PPD, and IPP conformance issues. It also fixes a crash bug in the scheduler when printing to files in non-existent directories. Changes include:</P>

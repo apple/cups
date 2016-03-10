@@ -1,6 +1,7 @@
 ---
 title: filter grofftops&#58; print GNU troff source code documents
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 This filter converts GNU troff (groff) sources to PostScript or PDF

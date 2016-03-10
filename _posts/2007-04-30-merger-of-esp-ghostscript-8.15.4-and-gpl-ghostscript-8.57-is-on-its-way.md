@@ -1,6 +1,7 @@
 ---
 title: Merger of ESP Ghostscript 8.15.4 and GPL Ghostscript 8.57 is on its way
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 As the head branch of Ghostscript is now under GPL (and not only theprevious major version as formerly) the ESP Ghostscript project isdiscontinued and the extra functionality of ESP Ghostscript is merged into the head development of Ghostscript, GPL Ghostscript.

@@ -1,6 +1,7 @@
 ---
 title: ESP Ghostscript 8.15.1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 ESP Ghostscript 8.15.1 is the first stable release based on

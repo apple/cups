@@ -1,6 +1,7 @@
 ---
 title: 15 Years of CUPS...
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 CUPS 1.0 was released [https://web.archive.org/web/20000126074742/http://cups.org/news.html#01OCT1999 15 years ago today], and a lot has changed. That first release supported IPP/1.0, PostScript and CUPS Raster drivers, and network, parallel, serial, and SCSI printers. It even included a copy of GNU Ghostscript to support the PostScript workflow that was standard in 1999.

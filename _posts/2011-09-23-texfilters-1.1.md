@@ -1,6 +1,7 @@
 ---
 title: texfilters 1.1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 In case of errors, an error page is printed; with the option "log=yes"

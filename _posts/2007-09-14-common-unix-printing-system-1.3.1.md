@@ -1,6 +1,7 @@
 ---
 title: Common UNIX Printing System 1.3.1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 " This release has been pulled since the tarballs were actually snapshots of CUPS 1.4.x and not the CUPS 1.3.x branch. A 1.3.2 release is forthcoming that fixes this issue. We apologize for any inconvenience this may have caused...

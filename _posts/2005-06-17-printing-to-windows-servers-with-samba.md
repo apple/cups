@@ -1,6 +1,7 @@
 ---
 title: Printing To Windows Servers With Samba
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 <b><u>Printing to Windows Servers with Samba</b></u>

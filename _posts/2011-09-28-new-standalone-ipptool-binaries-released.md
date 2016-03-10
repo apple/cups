@@ -1,6 +1,7 @@
 ---
 title: New standalone ipptool binaries released
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The latest version of the standalone binaries for CUPS ipptool is now available for download from:

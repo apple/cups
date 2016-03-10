@@ -1,6 +1,7 @@
 ---
 title: How To Allow Printing Jobs From Certain Computers To A Certain Class Of Printers
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 To allow printing from certain computers to a certain class, edit the /etc/cups/cupsd.conf file and see if the <Location /classes/class_name> is already present. Otherwise, create it with these two lines:

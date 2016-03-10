@@ -1,6 +1,7 @@
 ---
 title: alternate pdftops filter 1.20
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The Perl script is a wrapper that wraps either the pdftops utility of the xpdf (3.0x) suite or the Adobe reader (acroread) to act as a CUPS filter.

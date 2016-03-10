@@ -1,6 +1,7 @@
 ---
 title: pkpgcounter 1.73
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 Better detection of duplex mode in PCL3/4/5 parser.

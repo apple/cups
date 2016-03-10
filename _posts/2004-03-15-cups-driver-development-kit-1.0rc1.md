@@ -1,6 +1,7 @@
 ---
 title: CUPS Driver Development Kit 1.0rc1
 layout: post
+permalink: /blog/:year-:month-:day-:title.html
 ---
 
 The first release candidate for version 1.0 of the Common UNIX Printing System Driver Development Kit is now available for download from the CUPS web site at:
