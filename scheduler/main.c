@@ -1,6 +1,4 @@
 /*
- * "$Id$"
- *
  * Main loop for the CUPS scheduler.
  *
  * Copyright 2007-2016 by Apple Inc.
@@ -1507,7 +1505,19 @@ process_children(void)
 	* filters are done, and if so move to the next file.
 	*/
 
-	if (job->current_file < job->num_files && job->printer)
+	if (job->state_value >= IPP_JOB_CANCELED)
+	{
+	 /*
+	  * Remove the job from the active list if there are no processes still
+	  * running for it...
+	  */
+
+	  for (i = 0; job->filters[i] < 0; i++);
+
+	  if (!job->filters[i] && job->backend <= 0)
+	    cupsArrayRemove(ActiveJobs, job);
+	}
+	else if (job->current_file < job->num_files && job->printer)
 	{
 	  for (i = 0; job->filters[i] < 0; i ++);
 
@@ -1521,18 +1531,6 @@ process_children(void)
 
 	    cupsdContinueJob(job);
 	  }
-	}
-	else if (job->state_value >= IPP_JOB_CANCELED)
-	{
-	 /*
-	  * Remove the job from the active list if there are no processes still
-	  * running for it...
-	  */
-
-	  for (i = 0; job->filters[i] < 0; i++);
-
-	  if (!job->filters[i] && job->backend <= 0)
-	    cupsArrayRemove(ActiveJobs, job);
 	}
       }
     }
@@ -2201,8 +2199,3 @@ usage(int status)			/* O - Exit status */
 
   exit(status);
 }
-
-
-/*
- * End of "$Id$".
- */

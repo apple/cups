@@ -1,8 +1,10 @@
-CHANGES.txt - 2.2b1 - 2016-03-09
+CHANGES.txt - 2.2b1 - 2016-03-10
 --------------------------------
 
 CHANGES IN CUPS V2.2b1
 
+	- The scheduler did not cancel multi-document jobs immediately
+	  (<rdar://problem/24854834>)
 	- The scheduler did not return non-shared printers to local clients
 	  unless they connected to the domain socket (<rdar://problem/24566996>)
 	- The scheduler now reads the spool directory if one or more job cache
